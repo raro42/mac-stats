@@ -646,23 +646,25 @@ fn get_cpu_details() -> CpuDetails {
                 let processes = if should_collect_processes {
                     // CRITICAL: Refresh processes before reading them (only when window is open)
                     // This is necessary because processes() returns empty if not refreshed
-                    debug3!("Refreshing processes for collection...");
                     use sysinfo::ProcessesToUpdate;
                     sys.refresh_processes(ProcessesToUpdate::All, true);
-                    debug3!("Processes refreshed, collecting top processes...");
                     
+                    // Collect ALL processes first (HashMap iteration order is undefined)
+                    // Then sort by CPU usage to get the actual top processes
                     let mut processes: Vec<ProcessUsage> = sys
                         .processes()
                         .values()
-                        .take(100) // Limit to first 100 processes to avoid blocking
                         .map(|proc| ProcessUsage {
                             name: proc.name().to_string_lossy().to_string(),
                             cpu: proc.cpu_usage(),
                         })
                         .collect();
+                    
+                    // Sort by CPU usage (descending) to get actual top processes
                     processes.sort_by(|a, b| b.cpu.partial_cmp(&a.cpu).unwrap_or(std::cmp::Ordering::Equal));
+                    
+                    // Take top 8 after sorting
                     processes.truncate(8);
-                    debug3!("Collected {} processes", processes.len());
                     processes
                 } else {
                     // Window is not visible - return empty process list to save CPU
@@ -670,7 +672,6 @@ fn get_cpu_details() -> CpuDetails {
                     Vec::new()
                 };
                 
-                write_structured_log("lib.rs:690", "get_cpu_details got data from SYSTEM", &serde_json::json!({"usage": usage, "process_count": processes.len(), "window_visible": should_collect_processes}), "L");
                 (usage, load, uptime_secs, processes)
             }
         },
