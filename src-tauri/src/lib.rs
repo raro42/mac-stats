@@ -510,15 +510,10 @@ fn get_gpu_power() -> f32 {
 }
 
 fn get_metrics() -> SystemMetrics {
-    // #region agent log
-    let start_time = std::time::Instant::now();
-    write_structured_log("lib.rs:512", "get_metrics ENTRY", &serde_json::json!({"timestamp": start_time.elapsed().as_millis()}), "CPU1");
-    // #endregion
     debug3!("get_metrics() called");
     
     // Check if we should refresh (only every 2 seconds to reduce CPU usage)
     // Use try_lock to avoid blocking
-    let refresh_check_start = std::time::Instant::now();
     let should_refresh = match LAST_SYSTEM_REFRESH.try_lock() {
         Ok(mut last_refresh) => {
             let now = std::time::Instant::now();
@@ -537,12 +532,8 @@ fn get_metrics() -> SystemMetrics {
             false
         }
     };
-    // #region agent log
-    write_structured_log("lib.rs:534", "refresh_check_duration", &serde_json::json!({"duration_ms": refresh_check_start.elapsed().as_millis()}), "CPU1");
-    // #endregion
     
     // Use try_lock ONCE - if locked, return cached values immediately (no retry loop)
-    let cpu_ram_start = std::time::Instant::now();
     let (cpu_usage, ram_usage) = match SYSTEM.try_lock() {
         Ok(mut sys) => {
             if sys.is_none() {
@@ -554,15 +545,9 @@ fn get_metrics() -> SystemMetrics {
             
             // Only refresh if enough time has passed (reduces CPU usage)
             if should_refresh {
-                // #region agent log
-                let refresh_start = std::time::Instant::now();
-                // #endregion
                 debug3!("Refreshing CPU usage and memory");
                 sys.refresh_cpu_usage();
                 sys.refresh_memory();
-                // #region agent log
-                write_structured_log("lib.rs:553", "refresh_cpu_memory_duration", &serde_json::json!({"duration_ms": refresh_start.elapsed().as_millis()}), "CPU1");
-                // #endregion
             }
 
             let cpu = sys.global_cpu_usage();
@@ -577,12 +562,8 @@ fn get_metrics() -> SystemMetrics {
             (0.0, 0.0)
         }
     };
-    // #region agent log
-    write_structured_log("lib.rs:576", "cpu_ram_duration", &serde_json::json!({"duration_ms": cpu_ram_start.elapsed().as_millis()}), "CPU1");
-    // #endregion
     
     // Get disk usage - use try_lock and skip refresh entirely
-    let disk_start = std::time::Instant::now();
     let mut disk_usage = 0.0;
     match DISKS.try_lock() {
         Ok(mut disks) => {
@@ -612,15 +593,8 @@ fn get_metrics() -> SystemMetrics {
             debug1!("WARNING: DISKS mutex is locked, using 0% for disk");
         }
     }
-    // #region agent log
-    write_structured_log("lib.rs:607", "disk_duration", &serde_json::json!({"duration_ms": disk_start.elapsed().as_millis()}), "CPU1");
-    // #endregion
     
-    let gpu_start = std::time::Instant::now();
     let gpu_usage = get_gpu_usage();
-    // #region agent log
-    write_structured_log("lib.rs:609", "gpu_duration", &serde_json::json!({"duration_ms": gpu_start.elapsed().as_millis()}), "CPU1");
-    // #endregion
     debug3!("GPU usage: {}%", gpu_usage);
 
     let metrics = SystemMetrics {
@@ -631,19 +605,24 @@ fn get_metrics() -> SystemMetrics {
     };
     debug3!("Returning metrics: CPU={}%, GPU={}%, RAM={}%, DISK={}%", 
         metrics.cpu, metrics.gpu, metrics.ram, metrics.disk);
-    // #region agent log
-    write_structured_log("lib.rs:620", "get_metrics EXIT", &serde_json::json!({"total_duration_ms": start_time.elapsed().as_millis()}), "CPU1");
-    // #endregion
     metrics
 }
 
 #[tauri::command]
 fn get_cpu_details() -> CpuDetails {
-    // #region agent log
-    let start_time = std::time::Instant::now();
-    write_structured_log("lib.rs:624", "get_cpu_details ENTRY", &serde_json::json!({"timestamp": start_time.elapsed().as_millis()}), "CPU2");
-    // #endregion
     debug3!("get_cpu_details() called");
+    
+    // CRITICAL: Only collect processes if CPU window exists and is visible to save CPU
+    // Check window existence and visibility before doing expensive process collection
+    // If window was closed (destroyed), get_window returns None, so no processes collected
+    let should_collect_processes = APP_HANDLE.get()
+        .and_then(|app_handle| {
+            app_handle.get_window("cpu").and_then(|window| {
+                // Window exists - check if it's visible
+                window.is_visible().ok().filter(|&visible| visible)
+            })
+        })
+        .is_some();
     
     // CRITICAL: Use try_lock ONCE - if locked, return defaults immediately
     // This prevents blocking the main thread when the window opens
@@ -653,7 +632,7 @@ fn get_cpu_details() -> CpuDetails {
                 // Don't create System here - it's expensive and blocks
                 // Return defaults and let background thread create it
                 debug1!("WARNING: SYSTEM is None in get_cpu_details, returning defaults");
-                write_structured_log("lib.rs:616", "SYSTEM is None, returning defaults", &serde_json::json!({}), "L");
+                write_structured_log("lib.rs:658", "SYSTEM is None, returning defaults", &serde_json::json!({}), "L");
                 (0.0, sysinfo::LoadAvg { one: 0.0, five: 0.0, fifteen: 0.0 }, 0, Vec::new())
             } else {
                 let sys = sys.as_mut().unwrap();
@@ -663,33 +642,42 @@ fn get_cpu_details() -> CpuDetails {
                 let load = sysinfo::System::load_average();
                 let uptime_secs = sysinfo::System::uptime();
                 
-                // Limit process collection to avoid blocking
-                // #region agent log
-                let proc_start = std::time::Instant::now();
-                // #endregion
-                let mut processes: Vec<ProcessUsage> = sys
-                    .processes()
-                    .values()
-                    .take(100) // Limit to first 100 processes to avoid blocking
-                    .map(|proc| ProcessUsage {
-                        name: proc.name().to_string_lossy().to_string(),
-                        cpu: proc.cpu_usage(),
-                    })
-                    .collect();
-                processes.sort_by(|a, b| b.cpu.partial_cmp(&a.cpu).unwrap_or(std::cmp::Ordering::Equal));
-                processes.truncate(8);
-                // #region agent log
-                write_structured_log("lib.rs:656", "process_collection_duration", &serde_json::json!({"duration_ms": proc_start.elapsed().as_millis(), "count": processes.len()}), "CPU2");
-                // #endregion
+                // Only collect processes if window is visible (saves CPU when window is closed)
+                let processes = if should_collect_processes {
+                    // CRITICAL: Refresh processes before reading them (only when window is open)
+                    // This is necessary because processes() returns empty if not refreshed
+                    debug3!("Refreshing processes for collection...");
+                    use sysinfo::ProcessesToUpdate;
+                    sys.refresh_processes(ProcessesToUpdate::All, true);
+                    debug3!("Processes refreshed, collecting top processes...");
+                    
+                    let mut processes: Vec<ProcessUsage> = sys
+                        .processes()
+                        .values()
+                        .take(100) // Limit to first 100 processes to avoid blocking
+                        .map(|proc| ProcessUsage {
+                            name: proc.name().to_string_lossy().to_string(),
+                            cpu: proc.cpu_usage(),
+                        })
+                        .collect();
+                    processes.sort_by(|a, b| b.cpu.partial_cmp(&a.cpu).unwrap_or(std::cmp::Ordering::Equal));
+                    processes.truncate(8);
+                    debug3!("Collected {} processes", processes.len());
+                    processes
+                } else {
+                    // Window is not visible - return empty process list to save CPU
+                    debug3!("Window not visible, skipping process collection");
+                    Vec::new()
+                };
                 
-                write_structured_log("lib.rs:637", "get_cpu_details got data from SYSTEM", &serde_json::json!({"usage": usage, "process_count": processes.len()}), "L");
+                write_structured_log("lib.rs:690", "get_cpu_details got data from SYSTEM", &serde_json::json!({"usage": usage, "process_count": processes.len(), "window_visible": should_collect_processes}), "L");
                 (usage, load, uptime_secs, processes)
             }
         },
         Err(_) => {
             // Lock is held - return defaults immediately, don't retry
             debug1!("WARNING: SYSTEM mutex locked in get_cpu_details, returning defaults immediately");
-            write_structured_log("lib.rs:644", "SYSTEM locked, returning defaults", &serde_json::json!({}), "L");
+            write_structured_log("lib.rs:697", "SYSTEM locked, returning defaults", &serde_json::json!({}), "L");
             (0.0, sysinfo::LoadAvg { one: 0.0, five: 0.0, fifteen: 0.0 }, 0, Vec::new())
         }
     };
@@ -725,10 +713,6 @@ fn get_cpu_details() -> CpuDetails {
         }
     };
 
-    // #region agent log
-    write_structured_log("lib.rs:743", "get_cpu_details EXIT", &serde_json::json!({"total_duration_ms": start_time.elapsed().as_millis(), "usage": usage, "process_count": top_processes.len()}), "CPU2");
-    // #endregion
-    
     CpuDetails {
         usage,
         temperature,
@@ -765,10 +749,6 @@ fn as_any<T: objc2::Message>(obj: &T) -> &AnyObject {
 }
 
 fn process_menu_bar_update() {
-    // #region agent log
-    let update_start = std::time::Instant::now();
-    write_structured_log("lib.rs:782", "process_menu_bar_update ENTRY", &serde_json::json!({}), "CPU4");
-    // #endregion
     // This function must be called from the main thread
     if let Some(mtm) = MainThreadMarker::new() {
         write_structured_log("lib.rs:672", "MainThreadMarker obtained", &serde_json::json!({}), "G");
@@ -803,9 +783,6 @@ fn process_menu_bar_update() {
     } else {
         write_structured_log("lib.rs:671", "MainThreadMarker::new() FAILED", &serde_json::json!({}), "G");
     }
-    // #region agent log
-    write_structured_log("lib.rs:820", "process_menu_bar_update EXIT", &serde_json::json!({"duration_ms": update_start.elapsed().as_millis()}), "CPU4");
-    // #endregion
 }
 
 fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> {
@@ -1068,14 +1045,7 @@ fn click_handler_class() -> &'static AnyClass {
             _sender: *mut AnyObject,
         ) {
             // This is called from Objective-C runtime, we're on the main thread
-            // #region agent log
-            let timer_start = std::time::Instant::now();
-            write_structured_log("lib.rs:1031", "process_menu_bar_update_timer ENTRY", &serde_json::json!({}), "CPU3");
-            // #endregion
             process_menu_bar_update();
-            // #region agent log
-            write_structured_log("lib.rs:1038", "process_menu_bar_update_timer EXIT", &serde_json::json!({"duration_ms": timer_start.elapsed().as_millis()}), "CPU3");
-            // #endregion
             
             // Schedule next update in 2 seconds
             let sel = sel!(processMenuBarUpdate:);
