@@ -198,6 +198,11 @@ const BUILD_DATE: &str = env!("BUILD_DATE");
 // SMC cannot be cached in static (not Sync) - will create on demand but cache access checks
 static CHIP_INFO_CACHE: OnceLock<String> = OnceLock::new();
 static ACCESS_CACHE: Mutex<Option<(bool, bool, bool, bool)>> = Mutex::new(None); // temp, freq, cpu_power, gpu_power
+// Temperature cache: (temperature_value, last_update_timestamp)
+// Only updated by background thread when CPU window is visible
+static TEMP_CACHE: Mutex<Option<(f32, std::time::Instant)>> = Mutex::new(None);
+// Cache the working M3 Max temperature key name (discovered once, reused)
+static M3_TEMP_KEY: Mutex<Option<String>> = Mutex::new(None);
 
 #[derive(serde::Serialize, Clone)]
 struct SystemMetrics {
@@ -312,39 +317,64 @@ fn get_gpu_usage() -> f32 {
     0.0
 }
 
-#[allow(dead_code)]
 fn can_read_temperature() -> bool {
-    // Check cache first (only check once, then cache)
-    let mut cache = ACCESS_CACHE.lock().unwrap();
-    if let Some((temp, _, _, _)) = cache.as_ref() {
-        return *temp;
-    }
-    
-    // Check if we can access temperature data (only once)
-    let can_read = {
-        // Try SMC first
-        if let Ok(mut smc) = Smc::connect() {
-            smc.cpu_temperature().is_ok()
-        } else {
-            // Fallback to NSProcessInfo (always available)
-            if let Some(_mtm) = MainThreadMarker::new() {
-                let process_info = NSProcessInfo::processInfo();
-                let thermal_state = process_info.thermalState();
-                thermal_state.0 <= 3 // Valid thermal state
-            } else {
-                false
+    // Check if we have a valid cached temperature (indicates SMC access works)
+    // This is more efficient than checking SMC directly
+    if let Ok(cache) = TEMP_CACHE.try_lock() {
+        if let Some((temp, timestamp)) = cache.as_ref() {
+            // If we have a recent temperature reading, SMC access works
+            if *temp > 0.0 && timestamp.elapsed().as_secs() < 10 {
+                debug3!("can_read_temperature: true (from TEMP_CACHE with temp={:.1}°C)", *temp);
+                return true;
             }
         }
-    };
-    
-    // Cache the result permanently
-    if let Some((_, freq, cpu_power, gpu_power)) = cache.as_ref() {
-        *cache = Some((can_read, *freq, *cpu_power, *gpu_power));
-    } else {
-        *cache = Some((can_read, false, false, false));
     }
     
-    can_read
+    // Fallback: check ACCESS_CACHE (one-time check, cached permanently)
+    if let Ok(mut cache) = ACCESS_CACHE.try_lock() {
+        if let Some((temp, _, _, _)) = cache.as_ref() {
+            debug3!("can_read_temperature: {} (from ACCESS_CACHE)", *temp);
+            return *temp;
+        }
+        
+        // First time check - try SMC (only once)
+        // Even if SMC returns 0.0, the connection succeeded, so we "can read" it
+        // (it just means the Mac model doesn't expose temperature via standard keys)
+        debug2!("can_read_temperature: First time check - trying SMC connection...");
+        let can_read = if let Ok(mut smc) = Smc::connect() {
+            // Connection succeeded - we can attempt to read (even if it returns 0.0)
+            match smc.cpu_temperature() {
+                Ok(_) => {
+                    // SMC read succeeded (even if temp is 0.0, the read worked)
+                    debug2!("SMC connection and read succeeded - can_read_temperature=true");
+                    true
+                },
+                Err(e) => {
+                    // SMC read failed
+                    debug2!("SMC read failed: {:?} - can_read_temperature=false", e);
+                    false
+                }
+            }
+        } else {
+            // SMC connection failed - can't read
+            debug2!("SMC connection failed - can_read_temperature=false");
+            false
+        };
+        
+        // Cache the result permanently
+        if let Some((_, freq, cpu_power, gpu_power)) = cache.as_ref() {
+            *cache = Some((can_read, *freq, *cpu_power, *gpu_power));
+        } else {
+            *cache = Some((can_read, false, false, false));
+        }
+        
+        debug2!("can_read_temperature: Cached result: {}", can_read);
+        can_read
+    } else {
+        // Lock held - return false (non-blocking)
+        debug3!("can_read_temperature: ACCESS_CACHE locked, returning false");
+        false
+    }
 }
 
 #[allow(dead_code)]
@@ -688,32 +718,59 @@ fn get_cpu_details() -> CpuDetails {
     // Use try_lock for cache access too
     let (temperature, frequency, cpu_power, gpu_power, chip_info, can_read_temperature, can_read_frequency, can_read_cpu_power, can_read_gpu_power) = {
         // Try to get cached access flags without blocking
-        match ACCESS_CACHE.try_lock() {
+        let (can_read_temp, can_read_freq, can_read_cpu_p, can_read_gpu_p) = match ACCESS_CACHE.try_lock() {
             Ok(mut access_cache) => {
-                let (can_read_temp, can_read_freq, can_read_cpu_p, can_read_gpu_p) = 
-                    if let Some(cached) = access_cache.as_ref() {
-                        *cached
-                    } else {
-                        // First time - use defaults, don't check (expensive)
-                        let result = (false, false, false, false);
-                        *access_cache = Some(result);
-                        result
-                    };
-                
-                // Use cached chip info or default
-                let chip = CHIP_INFO_CACHE.get().cloned().unwrap_or_else(|| "—".to_string());
-                
-                // Return defaults for expensive values - they'll be populated on next refresh
-                (0.0, 0.0, 0.0, 0.0, chip, can_read_temp, can_read_freq, can_read_cpu_p, can_read_gpu_p)
+                if let Some(cached) = access_cache.as_ref() {
+                    *cached
+                } else {
+                    // First time - use defaults, don't check (expensive)
+                    let result = (false, false, false, false);
+                    *access_cache = Some(result);
+                    result
+                }
             },
             Err(_) => {
-                // Cache locked - return all defaults
-                let chip = CHIP_INFO_CACHE.get().cloned().unwrap_or_else(|| "—".to_string());
-                (0.0, 0.0, 0.0, 0.0, chip, false, false, false, false)
+                // Cache locked - return defaults
+                (false, false, false, false)
             }
-        }
+        };
+        
+        // CRITICAL: Read temperature from cache (updated by background thread)
+        // Non-blocking read - returns 0.0 if cache is locked or stale
+        // Cache is valid for up to 10 seconds (background thread updates every 2 seconds)
+        let temperature = match TEMP_CACHE.try_lock() {
+            Ok(cache) => {
+                if let Some((temp, timestamp)) = cache.as_ref() {
+                    // Only use cached value if it's fresh (less than 10 seconds old)
+                    if timestamp.elapsed().as_secs() < 10 {
+                        *temp
+                    } else {
+                        debug3!("Temperature cache is stale ({}s old), using 0.0", timestamp.elapsed().as_secs());
+                        0.0
+                    }
+                } else {
+                    0.0
+                }
+            },
+            Err(_) => {
+                // Cache locked - return 0.0 (non-blocking)
+                0.0
+            }
+        };
+        
+        // Check if we can read temperature (uses efficient cache check)
+        let can_read_temp = can_read_temperature();
+        
+        // Use cached chip info or default
+        let chip = CHIP_INFO_CACHE.get().cloned().unwrap_or_else(|| "—".to_string());
+        
+        // Return cached temperature and defaults for other expensive values
+        (temperature, 0.0, 0.0, 0.0, chip, can_read_temp, can_read_freq, can_read_cpu_p, can_read_gpu_p)
     };
 
+    // Log temperature data being sent to frontend for debugging
+    debug2!("get_cpu_details returning: temperature={:.1}°C, can_read_temperature={}", temperature, can_read_temperature);
+    
     CpuDetails {
         usage,
         temperature,
@@ -1351,6 +1408,10 @@ fn run_internal(open_cpu_window: bool) {
                 // Wait longer before first update to let background initialization complete
                 std::thread::sleep(std::time::Duration::from_millis(1500));
                 
+                // CRITICAL: Keep SMC connection alive in background thread (reuse for efficiency)
+                // SMC connection is not Sync, so we keep it thread-local
+                let mut smc_connection: Option<Smc> = None;
+                
                 loop {
                     debug3!("Update loop: getting metrics...");
                     let metrics = get_metrics();
@@ -1361,6 +1422,138 @@ fn run_internal(open_cpu_window: bool) {
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {
                         *pending = Some(text);
                         debug3!("Menu bar update stored");
+                    }
+                    
+                    // CRITICAL: Only read temperature when CPU window is visible (saves CPU)
+                    // Check window visibility before expensive SMC operations
+                    let should_read_temp = APP_HANDLE.get()
+                        .and_then(|app_handle| {
+                            app_handle.get_window("cpu").and_then(|window| {
+                                window.is_visible().ok().filter(|&visible| visible)
+                            })
+                        })
+                        .is_some();
+                    
+                    if should_read_temp {
+                        // CPU window is visible - read temperature
+                        // Reuse SMC connection if available, otherwise create new one
+                        if smc_connection.is_none() {
+                            match Smc::connect() {
+                                Ok(smc) => {
+                                    smc_connection = Some(smc);
+                                    debug3!("SMC connection established in background thread");
+                                    // CRITICAL: Update ACCESS_CACHE to indicate SMC works
+                                    // This ensures can_read_temperature() returns true
+                                    if let Ok(mut cache) = ACCESS_CACHE.try_lock() {
+                                        if let Some((_, freq, cpu_power, gpu_power)) = cache.as_ref() {
+                                            *cache = Some((true, *freq, *cpu_power, *gpu_power));
+                                        } else {
+                                            *cache = Some((true, false, false, false));
+                                        }
+                                        debug2!("ACCESS_CACHE updated: can_read_temperature=true (SMC connection successful)");
+                                    }
+                                },
+                                Err(e) => {
+                                    debug2!("Failed to connect to SMC: {:?}", e);
+                                    // Will retry on next iteration
+                                }
+                            }
+                        }
+                        
+                        // Read temperature using existing connection
+                        if let Some(ref mut smc) = smc_connection {
+                            // First try standard cpu_temperature() method (works for M1/M2)
+                            let mut temp = 0.0;
+                            match smc.cpu_temperature() {
+                                Ok(temps) => {
+                                    let die_temp: f64 = temps.die.into();
+                                    let prox_temp: f64 = temps.proximity.into();
+                                    
+                                    // Priority: die > proximity
+                                    temp = if die_temp > 0.0 {
+                                        die_temp
+                                    } else if prox_temp > 0.0 {
+                                        prox_temp
+                                    } else {
+                                        0.0
+                                    };
+                                },
+                                Err(_) => {
+                                    // Standard method failed, continue to raw key reading
+                                }
+                            }
+                            
+                            // If standard method returned 0.0, try reading M3 Max raw keys directly
+                            // These are the keys that exelban/stats uses for M3 Max
+                            if temp == 0.0 {
+                                // Check if we've already discovered a working M3 key
+                                let cached_key = M3_TEMP_KEY.lock().ok().and_then(|k| k.clone());
+                                
+                                if let Some(key_name) = cached_key {
+                                    // Use cached key - read it via all_data() (filtering for this key)
+                                    if let Ok(data_iter) = smc.all_data() {
+                                        for dbg_result in data_iter {
+                                            if let Ok(dbg) = dbg_result {
+                                                if dbg.key == key_name {
+                                                    if let Ok(Some(macsmc::DataValue::Float(val))) = dbg.value {
+                                                        if val > 0.0 {
+                                                            temp = val as f64;
+                                                            debug3!("Temperature read from cached M3 key {}: {:.1}°C", key_name, temp);
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    // First time: discover which M3 key works
+                                    // Try known M3 Max temperature keys (same as exelban/stats uses)
+                                    let m3_keys = ["Tf04", "Tf09", "Tf0A", "Tf0B", "Tf0D", "Tf0E"];
+                                    if let Ok(data_iter) = smc.all_data() {
+                                        for dbg_result in data_iter {
+                                            if let Ok(dbg) = dbg_result {
+                                                // Check if this is one of our target M3 keys
+                                                if m3_keys.contains(&dbg.key.as_str()) {
+                                                    if let Ok(Some(macsmc::DataValue::Float(val))) = dbg.value {
+                                                        if val > 0.0 {
+                                                            temp = val as f64;
+                                                            // Cache this key for future use
+                                                            if let Ok(mut cached) = M3_TEMP_KEY.lock() {
+                                                                *cached = Some(dbg.key.clone());
+                                                                debug2!("Discovered working M3 temperature key: {} = {:.1}°C", dbg.key, temp);
+                                                            }
+                                                            break; // Use first valid temperature found
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if temp > 0.0 {
+                                // Update cache with new temperature and timestamp
+                                if let Ok(mut cache) = TEMP_CACHE.try_lock() {
+                                    *cache = Some((temp as f32, std::time::Instant::now()));
+                                    debug2!("Temperature updated in cache: {:.1}°C", temp);
+                                } else {
+                                    debug2!("Temperature cache lock failed, skipping update");
+                                }
+                            } else {
+                                debug3!("Temperature read returned 0.0 - no valid temperature found");
+                                // Don't update cache - keep previous value if available
+                            }
+                        } else {
+                            debug3!("SMC connection not available for temperature read");
+                        }
+                    } else {
+                        // CPU window is not visible - clear SMC connection to save resources
+                        if smc_connection.is_some() {
+                            smc_connection = None;
+                            debug3!("CPU window closed, SMC connection released");
+                        }
                     }
                     
                     // NOTE: Automatic menu bar updates are not implemented because:
