@@ -23,7 +23,8 @@ objc2 = "0.6.3"
 macsmc = "0.1"
 core-foundation = "0.10"
 libc = "0.2"
-objc2-foundation = { version = "0.3.2", features = ["NSString", "NSDictionary", "NSArray", "NSAttributedString", "NSRange", "NSObject", "NSProcessInfo"] }
+clap = { version = "4", features = ["derive"] }
+objc2-foundation = { version = "0.3.2", features = ["NSString", "NSDictionary", "NSArray", "NSAttributedString", "NSRange", "NSObject", "NSProcessInfo", "NSRunLoop"] }
 objc2-app-kit = { version = "0.3.2", features = [
   "NSApplication",
   "NSColor",

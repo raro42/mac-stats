@@ -1,6 +1,32 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use clap::Parser;
+
+#[derive(Parser, Debug)]
+#[command(name = "mac_stats")]
+#[command(about = "macOS system statistics menu bar app", long_about = None)]
+struct Args {
+    /// Verbose output (-v, -vv, -vvv)
+    #[arg(short = 'v', action = clap::ArgAction::Count)]
+    verbose: u8,
+    
+    /// Open CPU window directly (for testing)
+    #[arg(long = "cpu")]
+    open_cpu: bool,
+}
+
 fn main() {
-    mac_stats_lib::run()
+    let args = Args::parse();
+    
+    // Set verbosity level (0-3)
+    let verbosity = if args.verbose > 3 { 3 } else { args.verbose };
+    mac_stats_lib::set_verbosity(verbosity);
+    
+    // If -cpu flag is set, open window directly after a short delay
+    if args.open_cpu {
+        mac_stats_lib::run_with_cpu_window()
+    } else {
+        mac_stats_lib::run()
+    }
 }
