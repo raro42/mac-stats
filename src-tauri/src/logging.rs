@@ -1,0 +1,113 @@
+use std::sync::atomic::{AtomicU8, Ordering};
+
+// Debug verbosity level: 0 = none, 1 = -v, 2 = -vv, 3 = -vvv
+// Make VERBOSITY accessible to macros
+pub(crate) static VERBOSITY: AtomicU8 = AtomicU8::new(0);
+
+// Log file path - accessible when running as root
+// TODO: Make this configurable/portable
+const LOG_FILE_PATH: &str = "/Users/raro42/projects/mac-stats/src-tauri/.cursor/debug.log";
+
+// Debug logging macros with timestamps
+fn format_timestamp() -> String {
+    use std::time::SystemTime;
+    let now = SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap();
+    let secs = now.as_secs();
+    let nanos = now.subsec_nanos();
+    let total_millis = secs * 1000 + (nanos / 1_000_000) as u64;
+    let millis = total_millis % 1000;
+    let secs = (total_millis / 1000) % 60;
+    let mins = (total_millis / 60000) % 60;
+    let hours = (total_millis / 3600000) % 24;
+    format!("{:02}:{:02}:{:02}.{:03}", hours, mins, secs, millis)
+}
+
+// Write log entry to both terminal and log file
+// Internal function for write_log_entry - needs to be accessible to macros
+pub(crate) fn write_log_entry(level_str: &str, message: &str) {
+    let timestamp = format_timestamp();
+    let log_line = format!("[{}] [{}] {}", timestamp, level_str, message);
+    
+    // Write to terminal (stderr)
+    eprintln!("{}", log_line);
+    
+    // Write to log file
+    if let Ok(mut file) = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(LOG_FILE_PATH)
+    {
+        use std::io::Write;
+        let _ = writeln!(file, "{}", log_line);
+    }
+}
+
+// Write structured log entry (JSON) to log file
+pub(crate) fn write_structured_log(location: &str, message: &str, data: &serde_json::Value, hypothesis_id: &str) {
+    let log_data = serde_json::json!({
+        "location": location,
+        "message": message,
+        "data": data,
+        "timestamp": std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis(),
+        "sessionId": "debug-session",
+        "runId": "run3",
+        "hypothesisId": hypothesis_id
+    });
+    
+    if let Ok(mut file) = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(LOG_FILE_PATH)
+    {
+        use std::io::Write;
+        if let Ok(json_str) = serde_json::to_string(&log_data) {
+            let _ = writeln!(file, "{}", json_str);
+        }
+    }
+    
+    // Also write human-readable version to terminal
+    eprintln!("[DEBUG] {}: {} (hypothesis: {})", location, message, hypothesis_id);
+}
+
+#[macro_export]
+macro_rules! debug {
+    ($level:expr, $($arg:tt)*) => {
+        {
+            use std::sync::atomic::Ordering;
+            if $crate::logging::VERBOSITY.load(Ordering::Relaxed) >= $level {
+                let level_str = match $level {
+                    1 => "INFO",
+                    2 => "DEBUG",
+                    3 => "TRACE",
+                    _ => "LOG",
+                };
+                let message = format!($($arg)*);
+                $crate::logging::write_log_entry(level_str, &message);
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! debug1 {
+    ($($arg:tt)*) => { $crate::debug!(1, $($arg)*); };
+}
+
+#[macro_export]
+macro_rules! debug2 {
+    ($($arg:tt)*) => { $crate::debug!(2, $($arg)*); };
+}
+
+#[macro_export]
+macro_rules! debug3 {
+    ($($arg:tt)*) => { $crate::debug!(3, $($arg)*); };
+}
+
+pub fn set_verbosity(level: u8) {
+    VERBOSITY.store(level, Ordering::Relaxed);
+    if level > 0 {
+        eprintln!("Debug verbosity level set to: {}", level);
+    }
+}
