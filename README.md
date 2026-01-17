@@ -4,7 +4,7 @@ A lightweight system monitor for macOS built with Rust and Tauri.
 
 ![mac-stats Apple Theme](screens/apple.png)
 
-![mac-stats Menu Bar](menu-bar.png)
+![mac-stats Menu Bar](screen_actual/menu-bar.png)
 
 ## Inspiration
 
