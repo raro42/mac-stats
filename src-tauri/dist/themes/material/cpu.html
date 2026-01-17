@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="./cpu.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CPU</title>
+  </head>
+  <body>
+    <main class="mat-card">
+      <header class="mat-header">
+        <div class="mat-title">
+          <h1>CPU</h1>
+          <div class="mat-subtitle" id="chip-info">—</div>
+        </div>
+
+        <div class="mat-actions">
+          <button id="refresh-btn" class="icon-btn" title="Refresh">↻</button>
+          <button id="settings-btn" class="icon-btn" title="Settings">⚙️</button>
+        </div>
+      </header>
+
+      <div class="mat-rule" aria-hidden="true"></div>
+
+      <section class="mat-metrics">
+        <div class="dial">
+          <div class="metric-label">Temperature</div>
+          <div class="metric-value" id="temperature-value">0°</div>
+          <div class="metric-subtext" id="temperature-subtext">—</div>
+
+          <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="ring-track" cx="50" cy="50" r="42" />
+            <circle class="ring-progress" id="temperature-ring-progress" cx="50" cy="50" r="42" />
+          </svg>
+
+          <div class="metric-hint" id="temperature-hint" style="display: none;">Requires root privileges</div>
+        </div>
+
+        <div class="dial">
+          <div class="metric-label">Usage</div>
+          <div class="metric-value" id="cpu-usage-value">0%</div>
+          <div class="metric-subtext" id="cpu-usage-subtext">—</div>
+
+          <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="ring-track" cx="50" cy="50" r="42" />
+            <circle class="ring-progress" id="cpu-usage-ring-progress" cx="50" cy="50" r="42" />
+          </svg>
+        </div>
+
+        <div class="dial">
+          <div class="metric-label">Frequency</div>
+          <div class="metric-value" id="frequency-value">—</div>
+          <div class="metric-subtext" id="frequency-subtext">—</div>
+
+          <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="ring-track" cx="50" cy="50" r="42" />
+            <circle class="ring-progress" id="frequency-ring-progress" cx="50" cy="50" r="42" />
+          </svg>
+
+          <div class="metric-hint" id="frequency-hint" style="display: none;">Requires root privileges</div>
+        </div>
+      </section>
+
+      <div class="mat-rule" aria-hidden="true"></div>
+
+      <section class="mat-details">
+        <h2 class="section-title">Details</h2>
+        <div class="details-grid">
+          <div class="detail-label">Load 1m</div>
+          <div class="detail-value" id="load-1">0.0</div>
+
+          <div class="detail-label">Load 5m</div>
+          <div class="detail-value" id="load-5">0.0</div>
+
+          <div class="detail-label">Load 15m</div>
+          <div class="detail-value" id="load-15">0.0</div>
+
+          <div class="detail-label">CPU Power</div>
+          <div class="detail-value">
+            <span id="cpu-power">0.0 W</span>
+            <div class="metric-hint" id="cpu-power-hint" style="display: none;">Requires root privileges</div>
+          </div>
+
+          <div class="detail-label">GPU Power</div>
+          <div class="detail-value">
+            <span id="gpu-power">0.0 W</span>
+            <div class="metric-hint" id="gpu-power-hint" style="display: none;">Requires root privileges</div>
+          </div>
+
+          <div class="detail-label">Uptime</div>
+          <div class="detail-value" id="uptime-value">0h</div>
+        </div>
+      </section>
+
+      <div class="mat-rule" aria-hidden="true"></div>
+
+      <section class="mat-processes">
+        <h2 class="section-title">Top Processes</h2>
+        <div class="process-table" id="process-list"></div>
+      </section>
+    </main>
+
+    <div id="settings-modal" class="settings-modal" style="display: none;">
+      <div class="settings-card">
+        <div class="settings-header">
+          <h2>Settings</h2>
+          <button id="close-settings" class="icon-btn" aria-label="Close">×</button>
+        </div>
+        <div class="settings-body">
+          <div class="setting-item">
+            <label for="theme-select">Theme</label>
+            <select id="theme-select" class="theme-select">
+              <option value="light">Light</option>
+              <option value="dark">Dark (TUI)</option>
+              <option value="futuristic">Futuristic</option>
+              <option value="neon">Neon</option>
+              <option value="apple">Apple</option>
+              <option value="architect">Architect</option>
+              <option value="data-poster">Data Poster</option>
+              <option value="material">Material</option>
+              <option value="swiss-minimalistic">Swiss Minimalistic</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../../cpu.js"></script>
+    <script src="../../cpu-ui.js"></script>
+  </body>
+</html>

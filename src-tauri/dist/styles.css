@@ -1,0 +1,67 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: transparent;
+  color: #ffffff;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0;
+}
+
+.stats-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 20px 50px;
+  background-color: rgba(30, 30, 30, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(150, 150, 150, 0.4);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 10px;
+}
+
+.stat-label {
+  font-size: 13px;
+  font-weight: 400;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  opacity: 0.95;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  opacity: 1;
+}

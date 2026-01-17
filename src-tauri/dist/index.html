@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mac-stats</title>
+    <script type="module" src="/main.js" defer></script>
+  </head>
+
+  <body>
+    <main class="stats-container">
+      <div class="stat-item">
+        <div class="stat-label">CPU</div>
+        <div class="stat-value" id="cpu-value">0%</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">GPU</div>
+        <div class="stat-value" id="gpu-value">0%</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">RAM</div>
+        <div class="stat-value" id="ram-value">0%</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">SSD</div>
+        <div class="stat-value" id="disk-value">0%</div>
+      </div>
+    </main>
+  </body>
+</html>
