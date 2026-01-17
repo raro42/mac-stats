@@ -2,7 +2,7 @@ use std::sync::atomic::{AtomicU8, Ordering};
 
 // Debug verbosity level: 0 = none, 1 = -v, 2 = -vv, 3 = -vvv
 // Make VERBOSITY accessible to macros
-pub(crate) static VERBOSITY: AtomicU8 = AtomicU8::new(0);
+pub static VERBOSITY: AtomicU8 = AtomicU8::new(0);
 
 // Log file path - accessible when running as root
 // TODO: Make this configurable/portable
@@ -26,7 +26,7 @@ fn format_timestamp() -> String {
 
 // Write log entry to both terminal and log file
 // Internal function for write_log_entry - needs to be accessible to macros
-pub(crate) fn write_log_entry(level_str: &str, message: &str) {
+pub fn write_log_entry(level_str: &str, message: &str) {
     let timestamp = format_timestamp();
     let log_line = format!("[{}] [{}] {}", timestamp, level_str, message);
     
@@ -45,7 +45,7 @@ pub(crate) fn write_log_entry(level_str: &str, message: &str) {
 }
 
 // Write structured log entry (JSON) to log file
-pub(crate) fn write_structured_log(location: &str, message: &str, data: &serde_json::Value, hypothesis_id: &str) {
+pub fn write_structured_log(location: &str, message: &str, data: &serde_json::Value, hypothesis_id: &str) {
     let log_data = serde_json::json!({
         "location": location,
         "message": message,
@@ -76,15 +76,19 @@ macro_rules! debug {
     ($level:expr, $($arg:tt)*) => {
         {
             use std::sync::atomic::Ordering;
+            // Check legacy verbosity for backward compatibility
             if $crate::logging::VERBOSITY.load(Ordering::Relaxed) >= $level {
-                let level_str = match $level {
-                    1 => "INFO",
-                    2 => "DEBUG",
-                    3 => "TRACE",
-                    _ => "LOG",
-                };
+                // Use tracing macros directly
                 let message = format!($($arg)*);
-                $crate::logging::write_log_entry(level_str, &message);
+                match $level {
+                    1 => tracing::info!("{}", message),
+                    2 => tracing::debug!("{}", message),
+                    3 => tracing::trace!("{}", message),
+                    _ => {
+                        let level_str = "LOG";
+                        $crate::logging::write_log_entry(level_str, &message);
+                    }
+                }
             }
         }
     };

@@ -10,7 +10,7 @@ use sysinfo::{Disks, System};
 use macsmc::Smc;
 
 // Re-export logging functions (macros are auto-exported via #[macro_export])
-pub use logging::set_verbosity;
+pub use logging::{set_verbosity, init_tracing};
 // IOReport types kept for future use (extern block still references them)
 use core_foundation::base::{CFTypeRef, TCFType};
 use core_foundation::dictionary::{CFDictionaryRef, CFMutableDictionaryRef, CFMutableDictionary};

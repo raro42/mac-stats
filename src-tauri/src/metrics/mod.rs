@@ -6,7 +6,9 @@ use tauri::Manager;
 use crate::state::*;
 use crate::logging::write_structured_log;
 
-// Import debug macros - they're exported at crate root
+// Import debug macros - they're exported at crate root via #[macro_export]
+// These now use tracing internally but maintain the same interface
+#[allow(unused_imports)]
 use crate::{debug1, debug2, debug3};
 
 #[derive(serde::Serialize, Clone)]
