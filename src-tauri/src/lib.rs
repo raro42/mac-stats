@@ -2,6 +2,7 @@ mod logging;
 mod state;
 mod metrics;
 pub mod config;
+mod ffi;
 
 use std::ffi::CStr;
 use std::os::raw::c_void;

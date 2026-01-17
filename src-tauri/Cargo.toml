@@ -26,6 +26,7 @@ libc = "0.2"
 clap = { version = "4", features = ["derive"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+thiserror = "1.0"
 objc2-foundation = { version = "0.3.2", features = ["NSString", "NSDictionary", "NSArray", "NSAttributedString", "NSRange", "NSObject", "NSProcessInfo", "NSRunLoop"] }
 objc2-app-kit = { version = "0.3.2", features = [
   "NSApplication",
