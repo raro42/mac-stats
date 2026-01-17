@@ -88,6 +88,8 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
 /// Set verbosity level (compatibility function)
 /// 
 /// This function updates both the legacy VERBOSITY and tracing filter.
+/// Currently unused but kept for potential future use.
+#[allow(dead_code)]
 pub fn set_verbosity_with_tracing(level: u8) {
     // Update legacy verbosity for compatibility
     legacy::set_verbosity(level);

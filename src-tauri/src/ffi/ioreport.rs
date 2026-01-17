@@ -10,6 +10,9 @@ use core_foundation::string::{CFStringRef, CFString};
 use thiserror::Error;
 
 /// IOReport error types
+/// Currently unused as direct FFI calls are used in lib.rs.
+/// Kept for future migration to safer FFI patterns.
+#[allow(dead_code)]
 #[derive(Error, Debug)]
 pub enum IOReportError {
     #[error("IOReport function returned null pointer")]
@@ -32,9 +35,13 @@ pub enum IOReportError {
 }
 
 /// Result type for IOReport operations
+#[allow(dead_code)] // Kept for future FFI migration
 pub type IOReportResult<T> = Result<T, IOReportError>;
 
 // Raw FFI bindings (unsafe)
+// Note: These are declared but currently unused as direct calls are in lib.rs.
+// Kept for future migration to safer FFI patterns.
+#[allow(dead_code)] // All FFI functions kept for future migration
 #[link(name = "IOReport", kind = "dylib")]
 extern "C" {
     fn IOReportCopyAllChannels(a: u64, b: u64) -> CFDictionaryRef;
@@ -78,9 +85,10 @@ extern "C" {
 }
 
 /// Safe wrapper for IOReportCopyChannelsInGroup
-/// Safe wrapper for IOReportCopyChannelsInGroup
 /// 
 /// Note: This function expects static string literals for group and subgroup.
+/// Currently unused - kept for future FFI migration.
+#[allow(dead_code)]
 pub fn copy_channels_in_group(
     group: &'static str,
     subgroup: &'static str,
@@ -114,6 +122,8 @@ pub fn copy_channels_in_group(
 }
 
 /// Safe wrapper for IOReportMergeChannels
+/// Currently unused - kept for future FFI migration.
+#[allow(dead_code)]
 pub fn merge_channels(
     dest: CFMutableDictionaryRef,
     src: CFDictionaryRef,
@@ -133,6 +143,8 @@ pub fn merge_channels(
 }
 
 /// Safe wrapper for IOReportCreateSubscription
+/// Currently unused - kept for future FFI migration.
+#[allow(dead_code)]
 pub fn create_subscription(
     channels: CFMutableDictionaryRef,
 ) -> IOReportResult<(*mut c_void, CFMutableDictionaryRef)> {
@@ -160,6 +172,8 @@ pub fn create_subscription(
 }
 
 /// Safe wrapper for IOReportCreateSamples
+/// Currently unused - kept for future FFI migration.
+#[allow(dead_code)]
 pub fn create_samples(
     subscription: *const c_void,
     channels: CFMutableDictionaryRef,
@@ -187,6 +201,7 @@ pub fn create_samples(
 }
 
 /// Safe wrapper for IOReportChannelGetChannelName
+#[allow(dead_code)] // Kept for future FFI migration
 pub fn get_channel_name(channel: CFDictionaryRef) -> IOReportResult<String> {
     if channel.is_null() {
         return Err(IOReportError::InvalidDictionary);
@@ -203,6 +218,7 @@ pub fn get_channel_name(channel: CFDictionaryRef) -> IOReportResult<String> {
 }
 
 /// Safe wrapper for IOReportStateGetCount
+#[allow(dead_code)] // Kept for future FFI migration
 pub fn get_state_count(channel: CFDictionaryRef) -> IOReportResult<i32> {
     if channel.is_null() {
         return Err(IOReportError::InvalidDictionary);
@@ -218,6 +234,7 @@ pub fn get_state_count(channel: CFDictionaryRef) -> IOReportResult<i32> {
 }
 
 /// Safe wrapper for IOReportStateGetNameForIndex
+#[allow(dead_code)] // Kept for future FFI migration
 pub fn get_state_name_for_index(channel: CFDictionaryRef, index: i32) -> IOReportResult<String> {
     if channel.is_null() {
         return Err(IOReportError::InvalidDictionary);
@@ -240,6 +257,7 @@ pub fn get_state_name_for_index(channel: CFDictionaryRef, index: i32) -> IORepor
 }
 
 /// Safe wrapper for IOReportStateGetResidency
+#[allow(dead_code)] // Kept for future FFI migration
 pub fn get_state_residency(channel: CFDictionaryRef, index: i32) -> IOReportResult<i64> {
     if channel.is_null() {
         return Err(IOReportError::InvalidDictionary);

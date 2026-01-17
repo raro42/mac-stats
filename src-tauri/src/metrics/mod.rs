@@ -56,6 +56,9 @@ pub struct CpuDetails {
     pub can_read_gpu_power: bool,
 }
 
+/// Get chip information (cached)
+/// Currently unused but kept for potential future use.
+#[allow(dead_code)]
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once
     CHIP_INFO_CACHE.get_or_init(|| {
@@ -274,6 +277,9 @@ pub(crate) fn get_nominal_frequency() -> f32 {
     })
 }
 
+/// Check if frequency reading is available
+/// Currently unused but kept for potential future use.
+#[allow(dead_code)]
 pub fn can_read_frequency() -> bool {
     // Check if we have a valid cached frequency (indicates frequency reading works)
     if let Ok(cache) = FREQ_CACHE.try_lock() {

@@ -8,10 +8,12 @@
 
 pub mod status_bar;
 
-// Re-export public functions (used in lib.rs)
-pub use status_bar::{
-    setup_status_item,
-    process_menu_bar_update,
-    make_attributed_title,
-    create_cpu_window,
-};
+// Note: lib.rs imports directly from status_bar, so re-exports are not needed.
+// If other modules want to import from ui:: instead of ui::status_bar::,
+// uncomment the re-exports below.
+// pub use status_bar::{
+//     setup_status_item,
+//     make_attributed_title,
+//     create_cpu_window,
+//     build_status_text,
+// };

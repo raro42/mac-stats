@@ -25,7 +25,6 @@ mod ffi;
 mod ui;
 
 use std::os::raw::c_void;
-use std::sync::OnceLock;
 use sysinfo::{Disks, System};
 use macsmc::Smc;
 
@@ -83,23 +82,8 @@ extern "C" {
 
 // IOReport helper functions removed - IOReport operations were too expensive for real-time monitoring
 // If needed in the future, these can be re-implemented with proper caching
-use objc2::declare::ClassBuilder;
-use objc2::rc::Retained;
-use objc2::runtime::{AnyClass, AnyObject, NSObject, Sel};
-use objc2::{msg_send, AnyThread, ClassType, MainThreadMarker, sel};
-use objc2_app_kit::{
-    NSAboutPanelOptionApplicationName, NSAboutPanelOptionApplicationVersion,
-    NSAboutPanelOptionCredits, NSAboutPanelOptionVersion, NSApplication, NSColor, NSFont,
-    NSFontWeightRegular, NSFontWeightSemibold, NSBaselineOffsetAttributeName,
-    NSFontAttributeName, NSForegroundColorAttributeName, NSParagraphStyleAttributeName,
-    NSMutableParagraphStyle, NSStatusBar,
-    NSVariableStatusItemLength, NSTextAlignment, NSTextTab, NSTextTabOptionKey, NSEvent,
-};
-use objc2_foundation::{
-    NSArray, NSDictionary, NSMutableAttributedString, NSMutableDictionary, NSNumber,
-    NSAttributedString, NSProcessInfo, NSRange, NSString,
-};
-use tauri::{Manager, WindowBuilder, WindowUrl};
+use objc2::MainThreadMarker;
+use tauri::Manager;
 
 // Use write_structured_log from logging module
 use logging::write_structured_log;
@@ -107,17 +91,13 @@ use logging::write_structured_log;
 // Use state from state module
 use state::*;
 
-// Use config module for build date instead of hard-coded constant
-use config::Config;
-
-// Use metrics from metrics module
-use metrics::{ProcessUsage, get_gpu_usage, get_chip_info, can_read_temperature, can_read_frequency, can_read_cpu_power, can_read_gpu_power};
+// Use metrics from metrics module (only re-export what's needed)
 
 // Re-export for Tauri commands
 pub use metrics::{SystemMetrics, CpuDetails, get_cpu_details, get_metrics};
 
 // UI functions are now in ui module
-use ui::status_bar::{build_status_text, setup_status_item, create_cpu_window, process_menu_bar_update, make_attributed_title};
+use ui::status_bar::{build_status_text, setup_status_item, create_cpu_window, make_attributed_title};
 
 // Old metrics functions removed - now in metrics module
 

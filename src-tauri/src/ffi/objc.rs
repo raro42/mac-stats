@@ -8,6 +8,9 @@ use objc2::msg_send;
 use thiserror::Error;
 
 /// Objective-C FFI error types
+/// Currently unused as direct FFI calls are used in ui module.
+/// Kept for future migration to safer FFI patterns.
+#[allow(dead_code)]
 #[derive(Error, Debug)]
 pub enum ObjCError {
     #[error("Objective-C object is null")]
@@ -27,9 +30,12 @@ pub enum ObjCError {
 }
 
 /// Result type for Objective-C operations
+#[allow(dead_code)] // Kept for future FFI migration
 pub type ObjCResult<T> = Result<T, ObjCError>;
 
 /// Safe wrapper to check if an object responds to a selector
+/// Currently unused - kept for future FFI migration.
+#[allow(dead_code)]
 pub fn responds_to_selector(obj: &AnyObject, sel: Sel) -> bool {
     unsafe {
         let responds: bool = msg_send![obj, respondsToSelector: sel];
@@ -38,6 +44,8 @@ pub fn responds_to_selector(obj: &AnyObject, sel: Sel) -> bool {
 }
 
 /// Safe wrapper to verify an object is not null
+/// Currently unused - kept for future FFI migration.
+#[allow(dead_code)]
 pub fn check_not_null<T>(obj: Option<&T>) -> ObjCResult<&T> {
     obj.ok_or(ObjCError::NullObject)
 }
@@ -46,6 +54,8 @@ pub fn check_not_null<T>(obj: Option<&T>) -> ObjCResult<&T> {
 /// 
 /// Note: This is a helper for common patterns. Most msg_send! calls
 /// should still use the macro directly but with proper null checks.
+/// Currently unused - kept for future FFI migration.
+#[allow(dead_code)]
 pub fn safe_msg_send_bool(obj: &AnyObject, sel: Sel) -> ObjCResult<bool> {
     if !responds_to_selector(obj, sel) {
         return Err(ObjCError::DoesNotRespondToSelector(
@@ -60,12 +70,16 @@ pub fn safe_msg_send_bool(obj: &AnyObject, sel: Sel) -> ObjCResult<bool> {
 }
 
 /// Validate that a class exists and can be used
+/// Currently unused - kept for future FFI migration.
+#[allow(dead_code)]
 pub fn validate_class(class: &'static AnyClass) -> ObjCResult<&'static AnyClass> {
     // Basic validation - class should not be null (though AnyClass is a reference)
     Ok(class)
 }
 
 /// Validate that an object instance is valid
+/// Currently unused - kept for future FFI migration.
+#[allow(dead_code)]
 pub fn validate_object(obj: &AnyObject) -> ObjCResult<&AnyObject> {
     // Basic validation - in practice, objc2 handles null checks
     Ok(obj)
