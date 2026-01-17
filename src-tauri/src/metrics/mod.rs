@@ -497,8 +497,9 @@ pub fn get_metrics() -> SystemMetrics {
 #[tauri::command]
 pub fn get_cpu_details() -> CpuDetails {
     // STEP 5: Rate limiting - prevent get_cpu_details from being called too frequently
-    // Even if frontend calls it more often, we'll throttle to max once per 2 seconds
-    let should_allow_call = match crate::state::LAST_CPU_DETAILS_CALL.try_lock() {
+    // BUT: Always allow process cache age check - processes need to refresh every 5s
+    // Rate limit other expensive operations, but check process cache on every call
+    let should_allow_full_call = match crate::state::LAST_CPU_DETAILS_CALL.try_lock() {
         Ok(mut last_call) => {
             let now = std::time::Instant::now();
             let should = last_call.as_ref()
@@ -517,10 +518,14 @@ pub fn get_cpu_details() -> CpuDetails {
         }
     };
     
-    if !should_allow_call {
-        debug3!("get_cpu_details() rate limited - returning cached values");
-        // Return cached values immediately without doing any work
-        // This prevents CPU spikes from excessive calls
+    // CRITICAL: Always check process cache age, even if rate-limited
+    // This ensures processes refresh every 5 seconds as requested
+    let should_check_process_cache = true;
+    
+    if !should_allow_full_call {
+        debug3!("get_cpu_details() rate limited - returning cached values for most metrics");
+        // Return cached values immediately without doing expensive work
+        // BUT: Still check and refresh process cache if stale (>5s)
         let (usage, load, uptime_secs) = match crate::state::SYSTEM.try_lock() {
             Ok(sys) => {
                 if let Some(sys) = sys.as_ref() {
@@ -552,10 +557,72 @@ pub fn get_cpu_details() -> CpuDetails {
                 .unwrap_or(0.0),
         );
         
-        let processes = crate::state::PROCESS_CACHE.try_lock()
-            .ok()
-            .and_then(|c| c.as_ref().map(|(p, _)| p.clone()))
-            .unwrap_or_default();
+        // CRITICAL: Check process cache age even when rate-limited
+        // If stale (>5s), refresh it now (process refresh is the priority)
+        let processes = if should_check_process_cache {
+            let should_collect_processes = crate::state::APP_HANDLE.get()
+                .and_then(|app_handle| {
+                    app_handle.get_window("cpu").and_then(|window| {
+                        window.is_visible().ok().filter(|&visible| visible)
+                    })
+                })
+                .is_some();
+            
+            if should_collect_processes {
+                match crate::state::PROCESS_CACHE.try_lock() {
+                    Ok(cache) => {
+                        if let Some((procs, timestamp)) = cache.as_ref() {
+                            let age_secs = timestamp.elapsed().as_secs();
+                            if age_secs >= 5 {
+                                // Cache is stale - refresh now even if rate-limited
+                                debug2!("Process cache is stale ({}s) - refreshing now (even though rate-limited)", age_secs);
+                                // Need SYSTEM lock to refresh processes
+                                match crate::state::SYSTEM.try_lock() {
+                                    Ok(mut sys) => {
+                                        if let Some(sys) = sys.as_mut() {
+                                            use sysinfo::ProcessesToUpdate;
+                                            sys.refresh_processes(ProcessesToUpdate::All, true);
+                                            
+                                            let mut processes: Vec<crate::metrics::ProcessUsage> = sys
+                                                .processes()
+                                                .values()
+                                                .map(|proc| crate::metrics::ProcessUsage {
+                                                    name: proc.name().to_string_lossy().to_string(),
+                                                    cpu: proc.cpu_usage(),
+                                                })
+                                                .collect();
+                                            
+                                            processes.sort_by(|a, b| b.cpu.partial_cmp(&a.cpu).unwrap_or(std::cmp::Ordering::Equal));
+                                            processes.truncate(8);
+                                            
+                                            // Update cache
+                                            if let Ok(mut process_cache) = crate::state::PROCESS_CACHE.try_lock() {
+                                                *process_cache = Some((processes.clone(), std::time::Instant::now()));
+                                                debug2!("Process cache refreshed (rate-limited call)");
+                                            }
+                                            
+                                            processes
+                                        } else {
+                                            procs.clone()
+                                        }
+                                    },
+                                    Err(_) => procs.clone(), // SYSTEM locked, return cached
+                                }
+                            } else {
+                                procs.clone()
+                            }
+                        } else {
+                            Vec::new()
+                        }
+                    },
+                    Err(_) => Vec::new(),
+                }
+            } else {
+                Vec::new()
+            }
+        } else {
+            Vec::new()
+        };
         
         return CpuDetails {
             usage,
@@ -624,8 +691,8 @@ pub fn get_cpu_details() -> CpuDetails {
                 
                 // Only collect processes if window is visible (saves CPU when window is closed)
                 let processes = if should_collect_processes {
-                    // STEP 4: Cache process list for 20 seconds to avoid expensive refresh on every call
-                    // CRITICAL: Always check cache first and return immediately if available (even if stale)
+                    // STEP 4: Cache process list for 5 seconds when window is open (refresh every 5s)
+                    // CRITICAL: Always check cache first and return immediately if available
                     // This prevents blocking on expensive refresh_processes() when window first opens
                     let cached_processes = match PROCESS_CACHE.try_lock() {
                         Ok(cache) => {
@@ -637,17 +704,16 @@ pub fn get_cpu_details() -> CpuDetails {
                         Err(_) => None, // Lock held, skip cache check
                     };
                     
-                    // If we have cached data (even if stale), return it immediately
-                    // This ensures instant display when window opens
+                    // If we have cached data, check if it's still fresh (<5 seconds)
                     if let Some((cached_procs, age_secs)) = cached_processes {
-                        if age_secs < 60 {
-                            // Cache is less than 60 seconds old - return immediately
-                            // This prevents blocking on first window open
-                            debug2!("Returning cached process list immediately (age: {}s) - will refresh in background", age_secs);
+                        if age_secs < 5 {
+                            // Cache is less than 5 seconds old - return immediately
+                            // This prevents blocking and reduces CPU usage
+                            debug2!("Returning cached process list (age: {}s) - refresh every 5s", age_secs);
                             cached_procs
                         } else {
-                            // Cache is very stale (>60s) - refresh now, but this should be rare
-                            debug2!("Process cache is very stale ({}s), refreshing now", age_secs);
+                            // Cache is stale (>5s) - refresh now
+                            debug2!("Process cache is stale ({}s), refreshing now (5s interval)", age_secs);
                             use sysinfo::ProcessesToUpdate;
                             sys.refresh_processes(ProcessesToUpdate::All, true);
                             
