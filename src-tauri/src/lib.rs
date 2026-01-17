@@ -1,6 +1,7 @@
 mod logging;
 mod state;
 mod metrics;
+pub mod config;
 
 use std::ffi::CStr;
 use std::os::raw::c_void;
@@ -87,7 +88,8 @@ use logging::write_structured_log;
 // Use state from state module
 use state::*;
 
-const BUILD_DATE: &str = env!("BUILD_DATE");
+// Use config module for build date instead of hard-coded constant
+use config::Config;
 
 // Use metrics from metrics module
 use metrics::{ProcessUsage, get_gpu_usage, get_chip_info, can_read_temperature, can_read_frequency, can_read_cpu_power, can_read_gpu_power};
@@ -585,12 +587,12 @@ fn show_about_panel() {
     let mtm = MainThreadMarker::new().unwrap();
     let app = NSApplication::sharedApplication(mtm);
     let name = NSString::from_str("mac_stats");
-    let version = NSString::from_str(env!("CARGO_PKG_VERSION"));
-    let build = NSString::from_str(BUILD_DATE);
-    let authors = NSString::from_str(env!("CARGO_PKG_AUTHORS"));
+    let version = NSString::from_str(&Config::version());
+    let build = NSString::from_str(&Config::build_date());
+    let authors = NSString::from_str(&Config::authors());
     let credits_text = NSString::from_str(&format!(
         "Author: {}\nBuild: {}",
-        authors, BUILD_DATE
+        Config::authors(), Config::build_date()
     ));
     let credits = NSAttributedString::from_nsstring(&credits_text);
 

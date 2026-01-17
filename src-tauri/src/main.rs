@@ -22,14 +22,11 @@ fn main() {
     // Set verbosity level (0-3)
     let verbosity = if args.verbose > 3 { 3 } else { args.verbose };
     
-    // Initialize tracing (structured logging)
-    // TODO: Use config module for log path (Phase 3)
-    let temp_log_path = std::env::var("HOME")
-        .ok()
-        .map(|home| std::path::PathBuf::from(home).join(".mac-stats").join("debug.log"))
-        .or_else(|| Some(std::env::temp_dir().join("mac-stats-debug.log")));
-    
-    mac_stats_lib::init_tracing(verbosity, temp_log_path);
+    // Initialize tracing (structured logging) using config module
+    use mac_stats_lib::config::Config;
+    Config::ensure_log_directory().ok(); // Create log directory if needed
+    let log_path = Config::log_file_path();
+    mac_stats_lib::init_tracing(verbosity, Some(log_path));
     
     // Also set legacy verbosity for compatibility during migration
     mac_stats_lib::set_verbosity(verbosity);

@@ -4,10 +4,6 @@ use std::sync::atomic::{AtomicU8, Ordering};
 // Make VERBOSITY accessible to macros
 pub static VERBOSITY: AtomicU8 = AtomicU8::new(0);
 
-// Log file path - accessible when running as root
-// TODO: Make this configurable/portable
-const LOG_FILE_PATH: &str = "/Users/raro42/projects/mac-stats/src-tauri/.cursor/debug.log";
-
 // Debug logging macros with timestamps
 fn format_timestamp() -> String {
     use std::time::SystemTime;
@@ -33,11 +29,13 @@ pub fn write_log_entry(level_str: &str, message: &str) {
     // Write to terminal (stderr)
     eprintln!("{}", log_line);
     
-    // Write to log file
+    // Write to log file using config module
+    use crate::config::Config;
+    let log_path = Config::log_file_path();
     if let Ok(mut file) = std::fs::OpenOptions::new()
         .create(true)
         .append(true)
-        .open(LOG_FILE_PATH)
+        .open(&log_path)
     {
         use std::io::Write;
         let _ = writeln!(file, "{}", log_line);
@@ -56,10 +54,13 @@ pub fn write_structured_log(location: &str, message: &str, data: &serde_json::Va
         "hypothesisId": hypothesis_id
     });
     
+    // Use config module for log file path
+    use crate::config::Config;
+    let log_path = Config::log_file_path();
     if let Ok(mut file) = std::fs::OpenOptions::new()
         .create(true)
         .append(true)
-        .open(LOG_FILE_PATH)
+        .open(&log_path)
     {
         use std::io::Write;
         if let Ok(json_str) = serde_json::to_string(&log_data) {
