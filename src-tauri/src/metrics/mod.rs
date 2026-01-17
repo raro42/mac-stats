@@ -1,3 +1,14 @@
+//! System metrics collection module
+//! 
+//! This module provides functions to collect and cache system metrics:
+//! - CPU, RAM, Disk, GPU usage
+//! - Temperature readings (via SMC)
+//! - CPU frequency (via IOReport)
+//! - Power consumption (CPU/GPU)
+//! - Process information
+//! 
+//! All metrics are cached to reduce system load and improve performance.
+
 use std::process::Command;
 use sysinfo::{Disks, System};
 use macsmc::Smc;

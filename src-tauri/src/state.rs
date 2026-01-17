@@ -1,3 +1,19 @@
+//! Application state management
+//! 
+//! This module manages global application state including:
+//! - System information (CPU, RAM, Disk)
+//! - UI state (status bar, menu items)
+//! - Caches (temperature, frequency, chip info)
+//! - IOReport subscriptions
+//! 
+//! Note: Some state remains global due to:
+//! - Thread-local requirements (UI must be on main thread)
+//! - Cross-thread access patterns
+//! - Tauri's architecture requiring global handles
+//! 
+//! Future improvement: Consider consolidating into AppState struct
+//! and passing it through Tauri's state management.
+
 use std::cell::RefCell;
 use std::sync::{Mutex, OnceLock};
 use std::time::Instant;
@@ -13,6 +29,7 @@ pub(crate) static DISKS: Mutex<Option<Disks>> = Mutex::new(None);
 pub(crate) static LAST_SYSTEM_REFRESH: Mutex<Option<Instant>> = Mutex::new(None);
 
 // UI state
+// Note: Thread-local is required for UI elements that must be accessed from main thread
 thread_local! {
     pub(crate) static STATUS_ITEM: RefCell<Option<Retained<NSStatusItem>>> = RefCell::new(None);
     pub(crate) static CLICK_HANDLER: RefCell<Option<Retained<AnyObject>>> = RefCell::new(None);
@@ -42,3 +59,49 @@ pub(crate) static IOREPORT_CHANNELS: Mutex<Option<usize>> = Mutex::new(None);
 pub(crate) static IOREPORT_SUBSCRIPTION_DICT: Mutex<Option<usize>> = Mutex::new(None);
 pub(crate) static IOREPORT_ORIGINAL_CHANNELS: Mutex<Option<usize>> = Mutex::new(None);
 pub(crate) static LAST_IOREPORT_SAMPLE: Mutex<Option<(usize, Instant)>> = Mutex::new(None);
+
+/// Application state structure (future refactoring target)
+/// 
+/// This struct represents the ideal state organization.
+/// Currently, state is stored in global statics for compatibility
+/// with existing code and Tauri's architecture.
+/// 
+/// Future work: Migrate global statics to this struct and pass
+/// it through Tauri's state management system.
+#[allow(dead_code)]
+pub struct AppState {
+    // System information
+    pub system: Option<System>,
+    pub disks: Option<Disks>,
+    pub last_system_refresh: Option<Instant>,
+    
+    // Caches
+    pub chip_info: Option<String>,
+    pub access_flags: Option<(bool, bool, bool, bool)>, // temp, freq, cpu_power, gpu_power
+    pub temp_cache: Option<(f32, Instant)>,
+    pub freq_cache: Option<(f32, Instant)>,
+    pub nominal_freq: Option<f32>,
+    
+    // IOReport
+    pub ioreport_subscription: Option<usize>,
+    pub ioreport_channels: Option<usize>,
+}
+
+impl AppState {
+    /// Create a new AppState instance
+    #[allow(dead_code)]
+    pub fn new() -> Self {
+        Self {
+            system: None,
+            disks: None,
+            last_system_refresh: None,
+            chip_info: None,
+            access_flags: None,
+            temp_cache: None,
+            freq_cache: None,
+            nominal_freq: None,
+            ioreport_subscription: None,
+            ioreport_channels: None,
+        }
+    }
+}

@@ -3,9 +3,8 @@
 //! These wrappers add null checks and validation for Objective-C runtime calls
 //! to prevent foreign exceptions from crossing into Rust.
 
-use objc2::rc::Retained;
-use objc2::runtime::{AnyClass, AnyObject, NSObject, Sel};
-use objc2::{msg_send, ClassType};
+use objc2::runtime::{AnyClass, AnyObject, Sel};
+use objc2::msg_send;
 use thiserror::Error;
 
 /// Objective-C FFI error types

@@ -3,7 +3,15 @@
 //! This module provides a centralized way to access configuration values
 //! like log file paths and build information, replacing hard-coded values.
 
-use std::path::{PathBuf, Path};
+//! Configuration management module
+//! 
+//! Provides centralized configuration including:
+//! - Log file paths (replaces hard-coded paths)
+//! - Build information (date, version, authors)
+//! 
+//! All configuration is environment-aware and portable.
+
+use std::path::PathBuf;
 
 /// Configuration manager
 pub struct Config;
