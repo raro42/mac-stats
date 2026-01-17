@@ -16,7 +16,12 @@
 
         <div class="swiss-actions">
           <button id="refresh-btn" class="icon-btn" title="Refresh">↻</button>
-          <button id="settings-btn" class="icon-btn" title="Settings">⚙️</button>
+          <button id="settings-btn" class="icon-btn" title="Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364l-4.243-4.243m-4.242 0l-4.243 4.243m0-8.485l4.243 4.243m4.242 0l4.243-4.243"></path>
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -103,18 +108,18 @@
         </div>
         <div class="settings-body">
           <div class="setting-item">
-            <label for="theme-select">Theme</label>
-            <select id="theme-select" class="theme-select">
-              <option value="light">Light</option>
-              <option value="dark">Dark (TUI)</option>
-              <option value="futuristic">Futuristic</option>
-              <option value="neon">Neon</option>
-              <option value="apple">Apple</option>
-              <option value="architect">Architect</option>
-              <option value="data-poster">Data Poster</option>
-              <option value="material">Material</option>
-              <option value="swiss-minimalistic">Swiss Minimalistic</option>
-            </select>
+            <div class="setting-label">Theme</div>
+            <div id="theme-list" class="theme-list" role="list">
+              <button type="button" class="theme-item" data-theme="apple">Apple</button>
+              <button type="button" class="theme-item" data-theme="architect">Architect</button>
+              <button type="button" class="theme-item" data-theme="data-poster">Data Poster</button>
+              <button type="button" class="theme-item" data-theme="dark">Dark (TUI)</button>
+              <button type="button" class="theme-item" data-theme="futuristic">Futuristic</button>
+              <button type="button" class="theme-item" data-theme="light">Light</button>
+              <button type="button" class="theme-item" data-theme="material">Material</button>
+              <button type="button" class="theme-item" data-theme="neon">Neon</button>
+              <button type="button" class="theme-item" data-theme="swiss-minimalistic">Swiss Minimalistic</button>
+            </div>
           </div>
         </div>
       </div>

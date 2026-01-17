@@ -94,6 +94,11 @@ body {
   justify-content: center;
 }
 
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
 .icon-btn:hover {
   transform: translateY(-1px);
 }
@@ -326,7 +331,7 @@ body {
   gap: 10px;
 }
 
-.setting-item label {
+.setting-label {
   font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
@@ -334,11 +339,27 @@ body {
   color: rgba(24, 24, 26, 0.52);
 }
 
-.theme-select {
+.theme-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.theme-item {
   height: 42px;
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.12);
   background: rgba(255, 255, 255, 0.55);
   padding: 0 12px;
   font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.theme-item:hover {
+  background: rgba(255, 255, 255, 0.70);
+}
+
+.theme-item[aria-current="true"] {
+  box-shadow: 0 0 0 3px rgba(184, 166, 139, 0.18);
 }

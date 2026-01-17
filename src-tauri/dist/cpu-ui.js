@@ -65,7 +65,35 @@
     }
   }
 
-  function initThemeSelect() {
+  function applyTheme(theme) {
+    localStorage.setItem("theme", theme);
+    syncThemeClass(theme);
+    navigateToTheme(theme);
+  }
+
+  function initThemePicker() {
+    // New: one-click list of themes
+    const themeList = document.getElementById("theme-list");
+    if (themeList) {
+      const savedTheme = getSavedTheme();
+      const buttons = themeList.querySelectorAll("[data-theme]");
+      buttons.forEach((btn) => {
+        const theme = btn.getAttribute("data-theme");
+
+        if (theme === savedTheme) {
+          btn.setAttribute("aria-current", "true");
+        } else {
+          btn.removeAttribute("aria-current");
+        }
+
+        btn.addEventListener("click", () => {
+          applyTheme(theme);
+        });
+      });
+      return;
+    }
+
+    // Fallback: legacy select
     const themeSelect = document.getElementById("theme-select");
     if (!themeSelect) return;
 
@@ -73,10 +101,7 @@
     themeSelect.value = savedTheme;
 
     themeSelect.addEventListener("change", (e) => {
-      const theme = e.target.value;
-      localStorage.setItem("theme", theme);
-      syncThemeClass(theme);
-      navigateToTheme(theme);
+      applyTheme(e.target.value);
     });
   }
 
@@ -95,7 +120,7 @@
     const savedTheme = getSavedTheme();
     syncThemeClass(savedTheme);
     initSettingsModal();
-    initThemeSelect();
+    initThemePicker();
     initRefresh();
   }
 

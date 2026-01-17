@@ -5,20 +5,28 @@
 }
 
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Segoe UI",
+    sans-serif;
 
   --text: rgba(12, 12, 16, 0.88);
-  --muted: rgba(12, 12, 16, 0.56);
-  --hairline: rgba(12, 12, 16, 0.10);
+  --muted: rgba(12, 12, 16, 0.50);
+  --hairline: rgba(12, 12, 16, 0.05);
 
-  --panel: rgba(248, 248, 252, 0.70);
-  --panel-border: rgba(255, 255, 255, 0.65);
-  --panel-shadow: 0 26px 90px rgba(0, 0, 0, 0.14);
+  --panel: rgba(255, 255, 255, 0.55);
+  --panel-border: rgba(255, 255, 255, 0.80);
+  --panel-shadow: 0 20px 80px rgba(0, 0, 0, 0.10);
 
-  --accent: #6a9fd3;
-  --ring-track: rgba(0, 0, 0, 0.10);
+  --accent: #34c759; /* Apple Green for nominal temperature */
+  --accent-usage: #007aff; /* Apple Blue for usage */
+  --accent-freq: #ff9500; /* Apple Orange for frequency */
+  --ring-track: rgba(0, 0, 0, 0.06);
 
-  --modal-backdrop: rgba(0, 0, 0, 0.32);
+  --modal-backdrop: rgba(0, 0, 0, 0.30);
 }
 
 body {
@@ -36,23 +44,57 @@ body {
 }
 
 .apple-shell {
+  position: relative;
+  overflow: hidden;
   height: 100%;
   max-width: 560px;
   margin: 0 auto;
 
-  border-radius: 44px;
-  background: var(--panel);
-  border: 1px solid var(--panel-border);
-  box-shadow: var(--panel-shadow);
+  background-color: rgba(255, 255, 255, 0.42);
 
-  backdrop-filter: blur(36px) saturate(180%);
-  -webkit-backdrop-filter: blur(36px) saturate(180%);
+  background-image:
+    radial-gradient(1100px 900px at 18% 12%, rgba(165, 190, 255, 0.22), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(1100px 900px at 85% 10%, rgba(255, 190, 245, 0.18), rgba(255, 255, 255, 0) 62%);
+
+  backdrop-filter: blur(34px) saturate(1.35);
+  -webkit-backdrop-filter: blur(34px) saturate(1.35);
+
+  border-radius: 24px;
+
+  border: none;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+    0 26px 85px rgba(0, 0, 0, 0.12);
 
   padding: 40px 38px 30px;
 
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 15px;
+}
+
+.apple-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.72),
+    rgba(255, 255, 255, 0.30)
+  );
+
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+
+  pointer-events: none;
 }
 
 .apple-header {
@@ -63,16 +105,23 @@ body {
 }
 
 .apple-title h1 {
-  font-size: 48px;
-  letter-spacing: -0.9px;
-  font-weight: 800;
-  line-height: 1;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "SF Pro Text",
+    sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: rgba(28, 28, 30, 0.92);
 }
 
 .apple-subtitle {
   margin-top: 12px;
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 400;
   color: var(--muted);
 }
 
@@ -94,18 +143,26 @@ body {
   width: 54px;
   height: 54px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.80);
-  background: rgba(255, 255, 255, 0.55);
+  border: none;
+  background: rgba(255, 255, 255, 0.42);
   color: rgba(30, 30, 34, 0.60);
   font-size: 22px;
   cursor: pointer;
 
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+    0 16px 34px rgba(0, 0, 0, 0.14);
   transition: transform 0.16s ease, box-shadow 0.16s ease;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .icon-btn:hover {
@@ -130,106 +187,143 @@ body {
 
 .metric-card {
   position: relative;
-  border-radius: 26px;
-  background: rgba(255, 255, 255, 0.32);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.10);
-  padding: 24px 18px 18px;
-  min-height: 236px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.28);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.70),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+    0 14px 34px rgba(0, 0, 0, 0.10);
+  padding: 16px 12px;
+  min-height: 160px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .metric-label {
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: -0.35px;
-  text-align: center;
-  margin-bottom: 18px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text);
+  opacity: 0.5;
+  margin-top: 4px;
+  z-index: 2;
 }
 
 .metric-value {
-  position: absolute;
-  top: 54%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 70px;
-  font-weight: 800;
-  letter-spacing: -1px;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
   line-height: 1;
   white-space: nowrap;
+  color: var(--text);
+  margin-top: 28px;
+  z-index: 2;
 }
 
 .metric-subtext {
-  position: absolute;
-  top: 71%;
-  left: 50%;
-  transform: translate(-50%, 0);
-  font-size: 18px;
+  font-size: 10px;
+  font-weight: 600;
   color: var(--muted);
+  opacity: 0.8;
   white-space: nowrap;
+  margin-bottom: 4px;
+  z-index: 2;
 }
 
 .metric-hint {
-  margin-top: auto;
-  font-size: 12px;
-  color: var(--muted);
+  display: none;
 }
 
 .ring {
   position: absolute;
-  top: 56%;
+  top: 58%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 185px;
-  height: 185px;
+  width: 120px;
+  height: 120px;
   pointer-events: none;
+  z-index: 1;
 }
 
 .ring-track {
   fill: none;
   stroke: var(--ring-track);
-  stroke-width: 6;
+  stroke-width: 5;
+  stroke-linecap: round;
 }
 
 .ring-progress {
   fill: none;
   stroke: var(--accent);
-  stroke-width: 6;
+  stroke-width: 5;
   stroke-linecap: round;
   stroke-dasharray: 264;
   stroke-dashoffset: 264;
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#cpu-usage-ring-progress {
+  stroke: var(--accent-usage);
+}
+
+#frequency-ring-progress {
+  stroke: var(--accent-freq);
 }
 
 .section-title {
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  margin-bottom: 14px;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  color: rgb(1, 1, 1, 0.75);
 }
 
 .details-grid {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 14px 28px;
-  font-size: 22px;
+  gap: 8px 28px;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Segoe UI",
+    sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: rgba(60, 60, 67, 0.72);
 }
 
 .detail-label {
-  color: var(--muted);
-  font-weight: 600;
+  /* Inherit font styles from .details-grid */
 }
 
 .detail-value {
   text-align: right;
-  font-weight: 700;
+  /* Inherit font styles from .details-grid */
 }
 
 .process-table {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 8px;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Segoe UI",
+    sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: rgba(60, 60, 67, 0.72);
 }
 
 .process-row {
@@ -237,17 +331,15 @@ body {
   grid-template-columns: 1fr auto;
   gap: 18px;
   align-items: center;
-  padding: 10px 0;
+  padding: 4px 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .process-name {
-  font-size: 20px;
-  font-weight: 700;
-  color: rgba(30, 30, 34, 0.74);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  /* Inherit font styles from .process-table */
 }
 
 .process-usage {
@@ -258,7 +350,7 @@ body {
 
 .process-bar {
   width: 120px;
-  height: 8px;
+  height: 5px;
   background: rgba(0, 0, 0, 0.10);
   border-radius: 99px;
   overflow: hidden;
@@ -274,9 +366,7 @@ body {
 .process-percent {
   min-width: 62px;
   text-align: right;
-  font-size: 22px;
-  font-weight: 800;
-  color: rgba(30, 30, 34, 0.78);
+  /* Inherit font styles from .process-table */
 }
 
 .process-empty {
@@ -331,21 +421,43 @@ body {
   gap: 10px;
 }
 
-.setting-item label {
+.setting-label {
   font-size: 14px;
   font-weight: 700;
   color: var(--muted);
 }
 
-.theme-select {
-  width: 100%;
-  height: 44px;
+.theme-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.theme-item {
+  height: 40px;
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  background: rgba(255, 255, 255, 0.86);
-  padding: 0 12px;
-  font-size: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  background: rgba(255, 255, 255, 0.78);
   color: rgba(10, 10, 12, 0.78);
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  text-align: left;
+  padding: 0 12px;
+
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
+  transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+}
+
+.theme-item:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+}
+
+.theme-item[aria-current="true"] {
+  border-color: rgba(106, 159, 211, 0.60);
+  box-shadow: 0 0 0 3px rgba(106, 159, 211, 0.18);
 }
 
 @media (max-width: 560px) {
@@ -355,10 +467,11 @@ body {
 
   .apple-shell {
     padding: 26px;
+    border-radius: 32px;
   }
 
   .apple-title h1 {
-    font-size: 36px;
+    font-size: 32px;
   }
 
   .apple-subtitle {
@@ -366,20 +479,20 @@ body {
   }
 
   .metric-label {
-    font-size: 16px;
+    font-size: 10px;
   }
 
   .metric-value {
-    font-size: 48px;
+    font-size: 26px;
   }
 
   .ring {
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
   }
 
   .details-grid {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .process-name {
@@ -391,6 +504,6 @@ body {
   }
 
   .process-bar {
-    width: 90px;
+    width: 80px;
   }
 }

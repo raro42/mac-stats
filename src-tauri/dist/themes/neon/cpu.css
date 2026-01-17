@@ -205,6 +205,13 @@ body::before {
   height: 120px;
   pointer-events: none;
   z-index: 0;
+  /* Show a top arc like the screenshot - clip to show only top semicircle */
+  clip-path: inset(0 0 42% 0);
+}
+
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
 .ring-track {
@@ -345,16 +352,32 @@ body::before {
   gap: 8px;
 }
 
-.setting-item label {
+.setting-label {
   font-size: 12px;
   color: rgba(190, 255, 205, 0.72);
 }
 
-.theme-select {
+.theme-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.theme-item {
   height: 38px;
   border-radius: 12px;
   border: 1px solid rgba(120, 255, 160, 0.22);
   background: rgba(8, 18, 12, 0.8);
   color: rgba(215, 255, 225, 0.90);
   padding: 0 10px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.theme-item:hover {
+  background: rgba(10, 30, 18, 0.85);
+}
+
+.theme-item[aria-current="true"] {
+  box-shadow: 0 0 0 3px rgba(120, 255, 160, 0.18);
 }

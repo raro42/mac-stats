@@ -82,6 +82,11 @@ body {
   justify-content: center;
 }
 
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 .icon-btn:hover {
   color: var(--text);
   background: rgba(0, 255, 0, 0.06);
@@ -290,16 +295,32 @@ body {
   gap: 8px;
 }
 
-.setting-item label {
+.setting-label {
   color: var(--text-secondary);
   font-size: 11px;
 }
 
-.theme-select {
+.theme-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.theme-item {
   height: 34px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--bg);
   color: var(--text);
   padding: 0 10px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.theme-item:hover {
+  background: rgba(0, 255, 0, 0.06);
+}
+
+.theme-item[aria-current="true"] {
+  box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.22);
 }

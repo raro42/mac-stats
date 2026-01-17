@@ -76,10 +76,15 @@ function updateRingGauge(ringId, percent, key) {
   
   const targetOffset = CIRCUMFERENCE - (clamped / 100) * CIRCUMFERENCE;
   
-  // STEP 7: Only update if change is significant (>2% of gauge) to reduce WebKit rendering
-  // Skip updates for tiny changes - they're not visible anyway
-  if (!ringAnimations.has(key)) {
-    ringAnimations.set(key, { current: CIRCUMFERENCE, target: targetOffset, lastFrameTime: null });
+  // Check if this is the first time we're updating this gauge
+  const isFirstUpdate = !ringAnimations.has(key);
+  
+  if (isFirstUpdate) {
+    // First update: initialize and paint immediately (no animation, no batching)
+    ringAnimations.set(key, { current: targetOffset, target: targetOffset, lastFrameTime: null, frameId: null });
+    // Paint immediately on first load - don't batch this, it needs to show right away
+    progressEl.style.strokeDashoffset = targetOffset;
+    return;
   }
   
   const anim = ringAnimations.get(key);
@@ -87,7 +92,8 @@ function updateRingGauge(ringId, percent, key) {
   
   // STEP 7: If change is very small (<2% of gauge), skip update entirely
   // This prevents unnecessary WebKit rendering for imperceptible changes
-  if (diff < (CIRCUMFERENCE * 0.02)) {
+  // BUT: Always allow updates if current value is at default (CIRCUMFERENCE) - means gauge wasn't painted yet
+  if (diff < (CIRCUMFERENCE * 0.02) && anim.current !== CIRCUMFERENCE) {
     // Change is too small to be visible - skip update
     return;
   }
@@ -183,6 +189,7 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 let refreshInterval = null;
 let invoke = null;
 let lastProcessUpdate = 0;
+let isWaitingForData = false; // Track if we're waiting for real data (non-zero usage)
 
 // Make refresh available globally for refresh button
 window.refreshData = refresh;
@@ -198,6 +205,19 @@ async function refresh() {
   
   try {
     const data = await invoke("get_cpu_details");
+    
+    // CRITICAL: If we're waiting for real data and we got it, switch to normal interval
+    // Match menu bar update frequency (1 second) for consistent CPU usage display
+    if (isWaitingForData && data.usage > 0.0) {
+      isWaitingForData = false;
+      // Clear the fast polling interval
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+      // Start 1-second interval to match menu bar update frequency
+      refreshInterval = setInterval(refresh, 1000);
+      console.log("Got real data, switched to 1-second interval (matching menu bar)");
+    }
     
     // STEP 7: Batch all DOM updates to reduce WebKit rendering
     // Collect all changes first, then apply in one batch
@@ -274,15 +294,14 @@ async function refresh() {
         }
       }
     }
-    // STEP 7: Only update ring gauge if temperature changed significantly (>1°C)
-    if (Math.abs(data.temperature - previousValues.temperature) > 1.0) {
-      updateRingGauge("temperature-ring-progress", Math.min(100, data.temperature), 'temperature');
-    }
+    // Always update ring gauge (it handles first paint and change detection internally)
+    updateRingGauge("temperature-ring-progress", Math.min(100, data.temperature), 'temperature');
 
     // Update CPU usage
     const cpuUsageEl = document.getElementById("cpu-usage-value");
     const cpuUsageSubtext = document.getElementById("cpu-usage-subtext");
-    const newUsage = Math.round(data.usage);
+    // Always show usage as percentage, even if 0 (don't show "-")
+    const newUsage = Math.max(0, Math.round(data.usage || 0));
     const formatted = `${newUsage}%`;
     
     if (cpuUsageEl.textContent !== formatted) {
@@ -291,13 +310,16 @@ async function refresh() {
       });
       previousValues.usage = newUsage;
     }
-    // STEP 7: Only update subtext if it actually changed (it's static, so skip)
-    // Removed unnecessary subtext update - it's always "Avg last 10s"
-    
-    // STEP 7: Only update ring gauge if usage changed significantly (>0.5%)
-    if (Math.abs(data.usage - previousValues.usage) > 0.5) {
-      updateRingGauge("cpu-usage-ring-progress", data.usage, 'usage');
+    // Update usage subtext to show "Avg. 10s"
+    const usageSubtext = "Avg. 10s";
+    if (cpuUsageSubtext.textContent !== usageSubtext) {
+      scheduleDOMUpdate(() => {
+        cpuUsageSubtext.textContent = usageSubtext;
+      });
     }
+    
+    // Always update ring gauge (it handles first paint and change detection internally)
+    updateRingGauge("cpu-usage-ring-progress", data.usage, 'usage');
 
     // Update frequency
     const freqEl = document.getElementById("frequency-value");
@@ -333,25 +355,30 @@ async function refresh() {
         });
         previousValues.frequency = data.frequency;
       }
-      // Display P-core and E-core frequencies if available
-      let subtext = "GHz";
+      // Display P-core and E-core frequencies if available (removed "GHz" to prevent flickering)
+      // CRITICAL: Cache last known good values to prevent flickering when values temporarily become 0
+      let subtext = freqSubtext.textContent || "—"; // Keep current value if no new valid data
+      
+      // Only update if we have valid P/E core frequencies (both > 0)
       if (data.p_core_frequency && data.p_core_frequency > 0 && data.e_core_frequency && data.e_core_frequency > 0) {
         subtext = `P: ${data.p_core_frequency.toFixed(1)} • E: ${data.e_core_frequency.toFixed(1)}`;
       } else if (data.p_core_frequency && data.p_core_frequency > 0) {
+        // Only P-core available
         subtext = `P: ${data.p_core_frequency.toFixed(1)}`;
       } else if (data.e_core_frequency && data.e_core_frequency > 0) {
+        // Only E-core available
         subtext = `E: ${data.e_core_frequency.toFixed(1)}`;
       }
+      // If neither is available, keep the last known value (don't switch to "—" immediately)
+      // Only update if subtext actually changed to prevent flickering
       if (freqSubtext.textContent !== subtext) {
         scheduleDOMUpdate(() => {
           freqSubtext.textContent = subtext;
         });
       }
     }
-    // STEP 7: Only update ring gauge if frequency changed significantly (>0.1 GHz)
-    if (Math.abs(data.frequency - previousValues.frequency) > 0.1) {
-      updateRingGauge("frequency-ring-progress", Math.min(100, (data.frequency / 5.0) * 100), 'frequency');
-    }
+    // Always update ring gauge (it handles first paint and change detection internally)
+    updateRingGauge("frequency-ring-progress", Math.min(100, (data.frequency / 5.0) * 100), 'frequency');
 
     // Update uptime
     const uptimeEl = document.getElementById("uptime-value");
@@ -521,7 +548,8 @@ async function refresh() {
 }
 
 // Wait for Tauri to be available
-function waitForTauri(callback, maxAttempts = 100) {
+// CRITICAL: Keep trying even after maxAttempts - Tauri might not be ready when window first opens
+function waitForTauri(callback, maxAttempts = 200) {
   const invokeFn = getInvoke();
   
   if (invokeFn) {
@@ -532,26 +560,48 @@ function waitForTauri(callback, maxAttempts = 100) {
   if (maxAttempts > 0) {
     setTimeout(() => waitForTauri(callback, maxAttempts - 1), 50);
   } else {
-    console.error("Tauri API not available after waiting");
+    // Don't give up - keep trying every 100ms until Tauri is ready
+    // This ensures we call refresh() as soon as Tauri becomes available
+    console.warn("Tauri API not available yet, continuing to wait...");
+    setTimeout(() => waitForTauri(callback, 0), 100);
   }
 }
 
 // Start refreshing when Tauri is ready
-// Use 3 second interval to reduce CPU usage
+// CRITICAL: Poll every 1 second (matches menu bar update frequency)
+// This ensures CPU usage gauge updates at same rate as menu bar
 function startRefresh() {
-  refresh();
+  // Don't call refresh() here - it's already called in init() or visibilitychange
+  // This prevents double-calling on startup
   if (refreshInterval) {
     clearInterval(refreshInterval);
   }
-  refreshInterval = setInterval(refresh, 8000); // STEP 4: 8 seconds (increased from 5s) to reduce CPU usage
+  
+  // Check if we got real data on first call
+  // If not, poll every 1 second until we do (SYSTEM might not be initialized yet)
+  // Once we get real data (usage > 0), continue with 1-second interval (matches menu bar)
+  isWaitingForData = true;
+  refreshInterval = setInterval(refresh, 1000); // 1-second polling (matches menu bar frequency)
 }
 
 // Initialize when DOM and Tauri are ready
 function init() {
-  waitForTauri((invokeFn) => {
-    invoke = invokeFn;
+  // Try to get Tauri immediately - don't wait if it's already available
+  const immediateInvoke = getInvoke();
+  if (immediateInvoke) {
+    invoke = immediateInvoke;
+    // Call refresh immediately - don't wait for interval
+    refresh();
     startRefresh();
-  });
+  } else {
+    // Tauri not ready yet - wait for it
+    waitForTauri((invokeFn) => {
+      invoke = invokeFn;
+      // Call refresh immediately when Tauri becomes available
+      refresh();
+      startRefresh();
+    });
+  }
 }
 
 // Initialize ring gauges
@@ -584,9 +634,17 @@ window.addEventListener("load", () => {
 });
 
 document.addEventListener("visibilitychange", () => {
-  if (!document.hidden && !refreshInterval && invoke) {
-    startRefresh();
-  } else if (!document.hidden && !invoke) {
-    init();
+  if (!document.hidden) {
+    // Window became visible - refresh immediately
+    if (invoke) {
+      // Tauri is ready - refresh immediately and start interval
+      refresh(); // Immediate refresh
+      if (!refreshInterval) {
+        startRefresh();
+      }
+    } else {
+      // Tauri not ready - initialize (will keep trying until ready)
+      init();
+    }
   }
 });

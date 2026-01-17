@@ -16,7 +16,12 @@
 
         <div class="apple-actions">
           <button id="refresh-btn" class="icon-btn" title="Refresh">↻</button>
-          <button id="settings-btn" class="icon-btn" title="Settings">⚙️</button>
+          <button id="settings-btn" class="icon-btn" title="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -29,8 +34,8 @@
           <div class="metric-subtext" id="temperature-subtext">—</div>
 
           <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
-            <circle class="ring-track" cx="50" cy="50" r="42" />
-            <circle class="ring-progress" id="temperature-ring-progress" cx="50" cy="50" r="42" />
+            <path class="ring-track" d="M 13.6 71 A 42 42 0 1 1 86.4 71" />
+            <path class="ring-progress" id="temperature-ring-progress" d="M 13.6 71 A 42 42 0 1 1 86.4 71" pathLength="264" style="stroke-dashoffset: 264;" />
           </svg>
 
           <div class="metric-hint" id="temperature-hint" style="display: none;">Requires root privileges</div>
@@ -42,8 +47,8 @@
           <div class="metric-subtext" id="cpu-usage-subtext">—</div>
 
           <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
-            <circle class="ring-track" cx="50" cy="50" r="42" />
-            <circle class="ring-progress" id="cpu-usage-ring-progress" cx="50" cy="50" r="42" />
+            <path class="ring-track" d="M 13.6 71 A 42 42 0 1 1 86.4 71" />
+            <path class="ring-progress" id="cpu-usage-ring-progress" d="M 13.6 71 A 42 42 0 1 1 71 86.4" pathLength="264" style="stroke-dashoffset: 264;" />
           </svg>
         </div>
 
@@ -53,8 +58,8 @@
           <div class="metric-subtext" id="frequency-subtext">—</div>
 
           <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
-            <circle class="ring-track" cx="50" cy="50" r="42" />
-            <circle class="ring-progress" id="frequency-ring-progress" cx="50" cy="50" r="42" />
+            <path class="ring-track" d="M 13.6 71 A 42 42 0 1 1 86.4 71" />
+            <path class="ring-progress" id="frequency-ring-progress" d="M 13.6 71 A 42 42 0 1 1 71 86.4" pathLength="264" style="stroke-dashoffset: 264;" />
           </svg>
 
           <div class="metric-hint" id="frequency-hint" style="display: none;">Requires root privileges</div>
@@ -108,18 +113,18 @@
         </div>
         <div class="settings-body">
           <div class="setting-item">
-            <label for="theme-select">Theme</label>
-            <select id="theme-select" class="theme-select">
-              <option value="light">Light</option>
-              <option value="dark">Dark (TUI)</option>
-              <option value="futuristic">Futuristic</option>
-              <option value="neon">Neon</option>
-              <option value="apple">Apple</option>
-              <option value="architect">Architect</option>
-              <option value="data-poster">Data Poster</option>
-              <option value="material">Material</option>
-              <option value="swiss-minimalistic">Swiss Minimalistic</option>
-            </select>
+            <div class="setting-label">Theme</div>
+            <div id="theme-list" class="theme-list" role="list">
+              <button type="button" class="theme-item" data-theme="apple">Apple</button>
+              <button type="button" class="theme-item" data-theme="architect">Architect</button>
+              <button type="button" class="theme-item" data-theme="data-poster">Data Poster</button>
+              <button type="button" class="theme-item" data-theme="dark">Dark (TUI)</button>
+              <button type="button" class="theme-item" data-theme="futuristic">Futuristic</button>
+              <button type="button" class="theme-item" data-theme="light">Light</button>
+              <button type="button" class="theme-item" data-theme="material">Material</button>
+              <button type="button" class="theme-item" data-theme="neon">Neon</button>
+              <button type="button" class="theme-item" data-theme="swiss-minimalistic">Swiss Minimalistic</button>
+            </div>
           </div>
         </div>
       </div>

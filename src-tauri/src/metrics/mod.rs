@@ -592,16 +592,23 @@ pub fn get_cpu_details() -> CpuDetails {
         })
         .is_some();
     
-    // CRITICAL: Use try_lock ONCE - if locked, return defaults immediately
+    // CRITICAL: Use try_lock ONCE - if locked, return cached values immediately
     // This prevents blocking the main thread when the window opens
     let (usage, load, uptime_secs, top_processes) = match SYSTEM.try_lock() {
         Ok(mut sys) => {
             if sys.is_none() {
-                // Don't create System here - it's expensive and blocks
-                // Return defaults and let background thread create it
-                debug1!("WARNING: SYSTEM is None in get_cpu_details, returning defaults");
-                write_structured_log("lib.rs:658", "SYSTEM is None, returning defaults", &serde_json::json!({}), "L");
-                (0.0, sysinfo::LoadAvg { one: 0.0, five: 0.0, fifteen: 0.0 }, 0, Vec::new())
+                // System not initialized yet - return cached/fallback values immediately
+                // Don't wait for initialization - return what we have NOW
+                debug2!("SYSTEM is None - returning cached/fallback values for instant display");
+                let load = sysinfo::System::load_average();
+                let uptime_secs = sysinfo::System::uptime();
+                // Try to get cached processes, otherwise empty
+                let processes = crate::state::PROCESS_CACHE.try_lock()
+                    .ok()
+                    .and_then(|c| c.as_ref().map(|(p, _)| p.clone()))
+                    .unwrap_or_default();
+                // Return 0.0 for usage (will be updated on next refresh)
+                (0.0, load, uptime_secs, processes)
             } else {
                 let sys = sys.as_mut().unwrap();
                 // CRITICAL: Don't refresh here - it's expensive and blocks
@@ -618,20 +625,61 @@ pub fn get_cpu_details() -> CpuDetails {
                 // Only collect processes if window is visible (saves CPU when window is closed)
                 let processes = if should_collect_processes {
                     // STEP 4: Cache process list for 20 seconds to avoid expensive refresh on every call
-                    // Increased from 15s to 20s to further reduce CPU usage
-                    // Check cache first - only refresh if cache is empty or older than 20 seconds
-                    let should_refresh_processes = match PROCESS_CACHE.try_lock() {
+                    // CRITICAL: Always check cache first and return immediately if available (even if stale)
+                    // This prevents blocking on expensive refresh_processes() when window first opens
+                    let cached_processes = match PROCESS_CACHE.try_lock() {
                         Ok(cache) => {
-                            cache.as_ref()
-                                .map(|(_, timestamp)| timestamp.elapsed().as_secs() >= 20)
-                                .unwrap_or(true) // Cache is empty, need to refresh
+                            cache.as_ref().map(|(procs, timestamp)| {
+                                let age_secs = timestamp.elapsed().as_secs();
+                                (procs.clone(), age_secs)
+                            })
                         },
-                        Err(_) => false, // Lock held, use cached value if available
+                        Err(_) => None, // Lock held, skip cache check
                     };
                     
-                    if should_refresh_processes {
-                        // STEP 4: Refresh processes (expensive operation, but cached for 20 seconds)
-                        // This is necessary because processes() returns empty if not refreshed
+                    // If we have cached data (even if stale), return it immediately
+                    // This ensures instant display when window opens
+                    if let Some((cached_procs, age_secs)) = cached_processes {
+                        if age_secs < 60 {
+                            // Cache is less than 60 seconds old - return immediately
+                            // This prevents blocking on first window open
+                            debug2!("Returning cached process list immediately (age: {}s) - will refresh in background", age_secs);
+                            cached_procs
+                        } else {
+                            // Cache is very stale (>60s) - refresh now, but this should be rare
+                            debug2!("Process cache is very stale ({}s), refreshing now", age_secs);
+                            use sysinfo::ProcessesToUpdate;
+                            sys.refresh_processes(ProcessesToUpdate::All, true);
+                            
+                            // Collect ALL processes first (HashMap iteration order is undefined)
+                            // Then sort by CPU usage to get the actual top processes
+                            let mut processes: Vec<ProcessUsage> = sys
+                                .processes()
+                                .values()
+                                .map(|proc| ProcessUsage {
+                                    name: proc.name().to_string_lossy().to_string(),
+                                    cpu: proc.cpu_usage(),
+                                })
+                                .collect();
+                            
+                            // Sort by CPU usage (descending) to get actual top processes
+                            processes.sort_by(|a, b| b.cpu.partial_cmp(&a.cpu).unwrap_or(std::cmp::Ordering::Equal));
+                            
+                            // Take top 8 after sorting
+                            processes.truncate(8);
+                            
+                            // Update cache
+                            if let Ok(mut cache) = PROCESS_CACHE.try_lock() {
+                                *cache = Some((processes.clone(), std::time::Instant::now()));
+                                debug2!("Process cache updated (refreshed from system)");
+                            }
+                            
+                            processes
+                        }
+                    } else {
+                        // No cache available - refresh now (first time or cache was cleared)
+                        // This is the only case where we block on refresh_processes()
+                        debug2!("Process cache is empty, refreshing now (this may take a moment)");
                         use sysinfo::ProcessesToUpdate;
                         sys.refresh_processes(ProcessesToUpdate::All, true);
                         
@@ -659,23 +707,6 @@ pub fn get_cpu_details() -> CpuDetails {
                         }
                         
                         processes
-                    } else {
-                        // Use cached process list
-                        match PROCESS_CACHE.try_lock() {
-                            Ok(cache) => {
-                                if let Some((procs, _)) = cache.as_ref() {
-                                    debug2!("Using cached process list ({} processes)", procs.len());
-                                    procs.clone()
-                                } else {
-                                    debug2!("Process cache is empty, returning empty list");
-                                    Vec::new()
-                                }
-                            },
-                            Err(_) => {
-                                debug2!("Process cache lock held, returning empty list");
-                                Vec::new()
-                            }
-                        }
                     }
                 } else {
                     // Window is not visible - return empty process list to save CPU
