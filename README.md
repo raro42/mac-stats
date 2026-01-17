@@ -1,12 +1,16 @@
 # mac-stats
 
-A lightweight system monitor for macOS built with Rust.
+A lightweight system monitor for macOS built with Rust and Tauri.
 
 ## Features
 
-- Displays CPU, RAM, and Disk usage in the console
-- Updates every 10 seconds
-- Low CPU usage: ~0.1-0.5% idle
+- Real-time CPU, RAM, Disk, and GPU monitoring
+- Temperature readings (SMC integration)
+- CPU frequency monitoring (IOReport)
+- Process list with top CPU consumers
+- Menu bar integration
+- Modern, customizable UI themes
+- Low CPU usage: ~0.5% idle, <1% when CPU window is open
 
 ## Installation
 
@@ -32,9 +36,36 @@ cd src-tauri
 cargo run
 ```
 
+## Screenshots / Roadmap
+
+### Current Features
+
+- ✅ CPU monitoring window with real-time usage graphs
+- ✅ Temperature monitoring (SMC integration)
+- ✅ Process list with top CPU consumers (refreshes every 5s)
+- ✅ Menu bar integration
+- ✅ Customizable themes (Apple, Material, Architect, Data Poster, Swiss Minimalistic, Neon)
+- ✅ System resource monitoring (CPU, RAM, Disk, GPU)
+- ✅ Low CPU usage optimizations
+
+### Screenshots
+
+Screenshots of the app in action are available in:
+- `screens/` - Theme previews
+- `screen-what-i-see/` - Development screenshots
+
+> **Note:** Screenshots will be added to `docs/screenshots/` as the project progresses.
+
+### Planned Features
+
+- [ ] Additional monitoring metrics
+- [ ] Export/import settings
+- [ ] More theme customization options
+- [ ] Performance optimizations
+
 ## Notes
 
-- Console output: "CPU: X%, RAM: Y%, Disk: Z%"
-- Run in background with `nohup ./target/release/mac-stats &`
-- Accurate against Activity Monitor.
-- No GUI/menu bar due to framework issues; console version is efficient.
+- Menu bar updates every 1-2 seconds
+- CPU window updates every 1 second (processes refresh every 5s)
+- Accurate against Activity Monitor
+- Built with Tauri for native performance
