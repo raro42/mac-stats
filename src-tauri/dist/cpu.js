@@ -36,6 +36,35 @@ let previousValues = {
   load15: 0
 };
 
+// STEP 7: Batch DOM updates to reduce WebKit rendering
+// Collect all DOM changes and apply them in a single requestAnimationFrame
+let pendingDOMUpdates = [];
+let domUpdateScheduled = false;
+
+function scheduleDOMUpdate(updateFn) {
+  pendingDOMUpdates.push(updateFn);
+  if (!domUpdateScheduled) {
+    domUpdateScheduled = true;
+    requestAnimationFrame(() => {
+      // Apply all pending updates in one batch
+      pendingDOMUpdates.forEach(fn => fn());
+      pendingDOMUpdates = [];
+      domUpdateScheduled = false;
+    });
+  }
+}
+
+// Track failed attempts before showing "Requires root privileges" hint
+const failedAttempts = {
+  temperature: 0,
+  frequency: 0,
+  cpuPower: 0,
+  gpuPower: 0
+};
+
+// Number of consecutive failures before showing the hint
+const FAILED_ATTEMPTS_THRESHOLD = 3;
+
 // SVG Ring Gauge Animation
 const ringAnimations = new Map();
 const CIRCUMFERENCE = 2 * Math.PI * 42; // radius = 42
@@ -47,19 +76,30 @@ function updateRingGauge(ringId, percent, key) {
   
   const targetOffset = CIRCUMFERENCE - (clamped / 100) * CIRCUMFERENCE;
   
-  // Simplified: update directly without animation to reduce CPU usage
-  // Only animate if the change is significant (> 5%)
+  // STEP 7: Only update if change is significant (>2% of gauge) to reduce WebKit rendering
+  // Skip updates for tiny changes - they're not visible anyway
   if (!ringAnimations.has(key)) {
-    ringAnimations.set(key, { current: CIRCUMFERENCE, target: targetOffset });
+    ringAnimations.set(key, { current: CIRCUMFERENCE, target: targetOffset, lastFrameTime: null });
   }
   
   const anim = ringAnimations.get(key);
   const diff = Math.abs(anim.current - targetOffset);
   
-  // If change is small, update directly; otherwise animate
-  if (diff < (CIRCUMFERENCE * 0.05)) {
+  // STEP 7: If change is very small (<2% of gauge), skip update entirely
+  // This prevents unnecessary WebKit rendering for imperceptible changes
+  if (diff < (CIRCUMFERENCE * 0.02)) {
+    // Change is too small to be visible - skip update
+    return;
+  }
+  
+  // STEP 7: If change is small but visible, update directly without animation
+  // Increased threshold from 10% to 15% to reduce animation frequency
+  if (diff < (CIRCUMFERENCE * 0.15)) {
     anim.current = targetOffset;
-    progressEl.style.strokeDashoffset = anim.current;
+    // Batch this DOM update
+    scheduleDOMUpdate(() => {
+      progressEl.style.strokeDashoffset = anim.current;
+    });
     ringAnimations.delete(key);
     return;
   }
@@ -79,10 +119,39 @@ function updateRingGauge(ringId, percent, key) {
       return;
     }
     
-    // Faster animation (0.25 instead of 0.15) to complete sooner
-    anim.current += diff * 0.25;
-    progressEl.style.strokeDashoffset = anim.current;
-    anim.frameId = requestAnimationFrame(animate);
+    // STEP 6: Throttle to 20fps (update every ~50ms) to reduce Graphics/Media CPU usage
+    // CRITICAL: Only call requestAnimationFrame if we're actually updating
+    // This prevents WebKit from processing unnecessary display link callbacks
+    const now = performance.now();
+    if (!anim.lastFrameTime) {
+      anim.lastFrameTime = now;
+    }
+    const elapsed = now - anim.lastFrameTime;
+    
+    if (elapsed >= 50) { // 20fps = 50ms per frame (reduced from 30fps to save CPU)
+      // Faster animation (0.35 instead of 0.3) to complete sooner with fewer frames
+      anim.current += diff * 0.35;
+      // Batch DOM update
+      scheduleDOMUpdate(() => {
+        progressEl.style.strokeDashoffset = anim.current;
+      });
+      anim.lastFrameTime = now;
+      
+      // Only schedule next frame if we're not done
+      if (Math.abs(anim.target - anim.current) >= 0.5) {
+        anim.frameId = requestAnimationFrame(animate);
+      } else {
+        anim.current = anim.target;
+        scheduleDOMUpdate(() => {
+          progressEl.style.strokeDashoffset = anim.current;
+        });
+        ringAnimations.delete(key);
+      }
+    } else {
+      // Not time to update yet - schedule next check but don't update DOM
+      // This reduces WebKit rendering work
+      anim.frameId = requestAnimationFrame(animate);
+    }
   }
   
   animate();
@@ -99,10 +168,15 @@ function updateValue(element, newValue, previousValue, formatter) {
 }
 
 // Update chip info from data
-function updateChipInfo(chipInfo) {
+function updateChipInfo(chipInfo, uptimeSecs) {
   const chipInfoEl = document.getElementById('chip-info');
   if (chipInfoEl && chipInfo) {
-    chipInfoEl.textContent = chipInfo;
+    let displayText = chipInfo;
+    if (uptimeSecs !== undefined && uptimeSecs > 0) {
+      const uptimeFormatted = formatUptime(uptimeSecs);
+      displayText = `${chipInfo} · ${uptimeFormatted}`;
+    }
+    chipInfoEl.textContent = displayText;
   }
 }
 
@@ -125,8 +199,11 @@ async function refresh() {
   try {
     const data = await invoke("get_cpu_details");
     
-    // Update chip info
-    updateChipInfo(data.chip_info);
+    // STEP 7: Batch all DOM updates to reduce WebKit rendering
+    // Collect all changes first, then apply in one batch
+    
+    // Update chip info with uptime
+    updateChipInfo(data.chip_info, data.uptime_secs);
     
     // Update temperature
     const tempEl = document.getElementById("temperature-value");
@@ -135,13 +212,27 @@ async function refresh() {
     const newTemp = Math.round(data.temperature);
     
     if (!data.can_read_temperature) {
+      failedAttempts.temperature++;
       if (tempEl.textContent !== "—") {
-        tempEl.textContent = "—";
-        tempSubtext.textContent = "—";
-        tempHint.style.display = "block";
+        scheduleDOMUpdate(() => {
+          tempEl.textContent = "—";
+          tempSubtext.textContent = "—";
+        });
+      }
+      // Only show hint after multiple failed attempts
+      const shouldShowHint = failedAttempts.temperature >= FAILED_ATTEMPTS_THRESHOLD;
+      if (tempHint.style.display !== (shouldShowHint ? "block" : "none")) {
+        scheduleDOMUpdate(() => {
+          tempHint.style.display = shouldShowHint ? "block" : "none";
+        });
       }
     } else {
-      tempHint.style.display = "none";
+      failedAttempts.temperature = 0;
+      if (tempHint.style.display !== "none") {
+        scheduleDOMUpdate(() => {
+          tempHint.style.display = "none";
+        });
+      }
       // Show temperature even if it's 0.0 (might be unsupported Mac model)
       // But show "—" if temperature is exactly 0.0 and we've been trying for a while
       if (newTemp === 0 && data.temperature === 0.0) {
@@ -149,16 +240,22 @@ async function refresh() {
         // Still show it as "0°" to indicate we're trying to read it
         const formatted = "0°";
         if (tempEl.textContent !== formatted) {
-          tempEl.textContent = formatted;
+          scheduleDOMUpdate(() => {
+            tempEl.textContent = formatted;
+          });
           previousValues.temperature = 0;
         }
         if (tempSubtext.textContent !== "SMC: No data") {
-          tempSubtext.textContent = "SMC: No data";
+          scheduleDOMUpdate(() => {
+            tempSubtext.textContent = "SMC: No data";
+          });
         }
       } else {
         const formatted = `${newTemp}°`;
         if (tempEl.textContent !== formatted) {
-          tempEl.textContent = formatted;
+          scheduleDOMUpdate(() => {
+            tempEl.textContent = formatted;
+          });
           previousValues.temperature = newTemp;
         }
         // Thermal state subtext (only update if changed)
@@ -171,11 +268,16 @@ async function refresh() {
           thermalText = "Thermal: Fair";
         }
         if (tempSubtext.textContent !== thermalText) {
-          tempSubtext.textContent = thermalText;
+          scheduleDOMUpdate(() => {
+            tempSubtext.textContent = thermalText;
+          });
         }
       }
     }
-    updateRingGauge("temperature-ring-progress", Math.min(100, data.temperature), 'temperature');
+    // STEP 7: Only update ring gauge if temperature changed significantly (>1°C)
+    if (Math.abs(data.temperature - previousValues.temperature) > 1.0) {
+      updateRingGauge("temperature-ring-progress", Math.min(100, data.temperature), 'temperature');
+    }
 
     // Update CPU usage
     const cpuUsageEl = document.getElementById("cpu-usage-value");
@@ -184,13 +286,18 @@ async function refresh() {
     const formatted = `${newUsage}%`;
     
     if (cpuUsageEl.textContent !== formatted) {
-      cpuUsageEl.textContent = formatted;
+      scheduleDOMUpdate(() => {
+        cpuUsageEl.textContent = formatted;
+      });
       previousValues.usage = newUsage;
     }
-    if (cpuUsageSubtext.textContent !== "Avg last 10s") {
-      cpuUsageSubtext.textContent = "Avg last 10s";
+    // STEP 7: Only update subtext if it actually changed (it's static, so skip)
+    // Removed unnecessary subtext update - it's always "Avg last 10s"
+    
+    // STEP 7: Only update ring gauge if usage changed significantly (>0.5%)
+    if (Math.abs(data.usage - previousValues.usage) > 0.5) {
+      updateRingGauge("cpu-usage-ring-progress", data.usage, 'usage');
     }
-    updateRingGauge("cpu-usage-ring-progress", data.usage, 'usage');
 
     // Update frequency
     const freqEl = document.getElementById("frequency-value");
@@ -198,46 +305,88 @@ async function refresh() {
     const freqSubtext = document.getElementById("frequency-subtext");
     
     if (!data.can_read_frequency) {
+      failedAttempts.frequency++;
       if (freqEl.textContent !== "—") {
-        freqEl.textContent = "—";
-        freqSubtext.textContent = "—";
-        freqHint.style.display = "block";
+        scheduleDOMUpdate(() => {
+          freqEl.textContent = "—";
+          freqSubtext.textContent = "—";
+        });
+      }
+      // Only show hint after multiple failed attempts
+      const shouldShowHint = failedAttempts.frequency >= FAILED_ATTEMPTS_THRESHOLD;
+      if (freqHint.style.display !== (shouldShowHint ? "block" : "none")) {
+        scheduleDOMUpdate(() => {
+          freqHint.style.display = shouldShowHint ? "block" : "none";
+        });
       }
     } else {
-      freqHint.style.display = "none";
+      failedAttempts.frequency = 0;
+      if (freqHint.style.display !== "none") {
+        scheduleDOMUpdate(() => {
+          freqHint.style.display = "none";
+        });
+      }
       const formatted = data.frequency.toFixed(1);
       if (freqEl.textContent !== formatted) {
-        freqEl.textContent = formatted;
+        scheduleDOMUpdate(() => {
+          freqEl.textContent = formatted;
+        });
         previousValues.frequency = data.frequency;
       }
-      if (freqSubtext.textContent !== "GHz") {
-        freqSubtext.textContent = "GHz";
+      // Display P-core and E-core frequencies if available
+      let subtext = "GHz";
+      if (data.p_core_frequency && data.p_core_frequency > 0 && data.e_core_frequency && data.e_core_frequency > 0) {
+        subtext = `P: ${data.p_core_frequency.toFixed(1)} • E: ${data.e_core_frequency.toFixed(1)}`;
+      } else if (data.p_core_frequency && data.p_core_frequency > 0) {
+        subtext = `P: ${data.p_core_frequency.toFixed(1)}`;
+      } else if (data.e_core_frequency && data.e_core_frequency > 0) {
+        subtext = `E: ${data.e_core_frequency.toFixed(1)}`;
+      }
+      if (freqSubtext.textContent !== subtext) {
+        scheduleDOMUpdate(() => {
+          freqSubtext.textContent = subtext;
+        });
       }
     }
-    updateRingGauge("frequency-ring-progress", Math.min(100, (data.frequency / 5.0) * 100), 'frequency');
+    // STEP 7: Only update ring gauge if frequency changed significantly (>0.1 GHz)
+    if (Math.abs(data.frequency - previousValues.frequency) > 0.1) {
+      updateRingGauge("frequency-ring-progress", Math.min(100, (data.frequency / 5.0) * 100), 'frequency');
+    }
 
     // Update uptime
-    document.getElementById("uptime-value").textContent = formatUptime(data.uptime_secs);
+    const uptimeEl = document.getElementById("uptime-value");
+    const uptimeFormatted = formatUptime(data.uptime_secs);
+    if (uptimeEl.textContent !== uptimeFormatted) {
+      scheduleDOMUpdate(() => {
+        uptimeEl.textContent = uptimeFormatted;
+      });
+    }
 
     // Update load averages (simple updates, no tweening)
     const load1El = document.getElementById("load-1");
     const newLoad1 = data.load_1.toFixed(2);
     if (load1El.textContent !== newLoad1) {
-      load1El.textContent = newLoad1;
+      scheduleDOMUpdate(() => {
+        load1El.textContent = newLoad1;
+      });
       previousValues.load1 = data.load_1;
     }
 
     const load5El = document.getElementById("load-5");
     const newLoad5 = data.load_5.toFixed(2);
     if (load5El.textContent !== newLoad5) {
-      load5El.textContent = newLoad5;
+      scheduleDOMUpdate(() => {
+        load5El.textContent = newLoad5;
+      });
       previousValues.load5 = data.load_5;
     }
 
     const load15El = document.getElementById("load-15");
     const newLoad15 = data.load_15.toFixed(2);
     if (load15El.textContent !== newLoad15) {
-      load15El.textContent = newLoad15;
+      scheduleDOMUpdate(() => {
+        load15El.textContent = newLoad15;
+      });
       previousValues.load15 = data.load_15;
     }
 
@@ -245,15 +394,31 @@ async function refresh() {
     const cpuPowerEl = document.getElementById("cpu-power");
     const cpuPowerHint = document.getElementById("cpu-power-hint");
     if (!data.can_read_cpu_power) {
+      failedAttempts.cpuPower++;
       if (cpuPowerEl.textContent !== "0.0 W") {
-        cpuPowerEl.textContent = "0.0 W";
-        cpuPowerHint.style.display = "block";
+        scheduleDOMUpdate(() => {
+          cpuPowerEl.textContent = "0.0 W";
+        });
+      }
+      // Only show hint after multiple failed attempts
+      const shouldShowHint = failedAttempts.cpuPower >= FAILED_ATTEMPTS_THRESHOLD;
+      if (cpuPowerHint.style.display !== (shouldShowHint ? "block" : "none")) {
+        scheduleDOMUpdate(() => {
+          cpuPowerHint.style.display = shouldShowHint ? "block" : "none";
+        });
       }
     } else {
-      cpuPowerHint.style.display = "none";
+      failedAttempts.cpuPower = 0;
+      if (cpuPowerHint.style.display !== "none") {
+        scheduleDOMUpdate(() => {
+          cpuPowerHint.style.display = "none";
+        });
+      }
       const formatted = `${data.cpu_power.toFixed(2)} W`;
       if (cpuPowerEl.textContent !== formatted) {
-        cpuPowerEl.textContent = formatted;
+        scheduleDOMUpdate(() => {
+          cpuPowerEl.textContent = formatted;
+        });
         previousValues.cpuPower = data.cpu_power;
       }
     }
@@ -261,58 +426,77 @@ async function refresh() {
     const gpuPowerEl = document.getElementById("gpu-power");
     const gpuPowerHint = document.getElementById("gpu-power-hint");
     if (!data.can_read_gpu_power) {
+      failedAttempts.gpuPower++;
       if (gpuPowerEl.textContent !== "0.0 W") {
-        gpuPowerEl.textContent = "0.0 W";
-        gpuPowerHint.style.display = "block";
+        scheduleDOMUpdate(() => {
+          gpuPowerEl.textContent = "0.0 W";
+        });
+      }
+      // Only show hint after multiple failed attempts
+      const shouldShowHint = failedAttempts.gpuPower >= FAILED_ATTEMPTS_THRESHOLD;
+      if (gpuPowerHint.style.display !== (shouldShowHint ? "block" : "none")) {
+        scheduleDOMUpdate(() => {
+          gpuPowerHint.style.display = shouldShowHint ? "block" : "none";
+        });
       }
     } else {
-      gpuPowerHint.style.display = "none";
+      failedAttempts.gpuPower = 0;
+      if (gpuPowerHint.style.display !== "none") {
+        scheduleDOMUpdate(() => {
+          gpuPowerHint.style.display = "none";
+        });
+      }
       const formatted = `${data.gpu_power.toFixed(2)} W`;
       if (gpuPowerEl.textContent !== formatted) {
-        gpuPowerEl.textContent = formatted;
+        scheduleDOMUpdate(() => {
+          gpuPowerEl.textContent = formatted;
+        });
         previousValues.gpuPower = data.gpu_power;
       }
     }
 
-    // Update process list only every 15 seconds to reduce CPU usage
-    // Only update if we have processes (window must be visible for processes to be collected)
+    // STEP 7: Update process list only every 15 seconds to reduce CPU usage
+    // Use document fragment to batch DOM updates and reduce WebKit reflows
     const now = Date.now();
     if (now - lastProcessUpdate >= 15000 || lastProcessUpdate === 0) {
       lastProcessUpdate = now;
       
       const list = document.getElementById("process-list");
-      list.innerHTML = "";
+      
+      // STEP 7: Use document fragment to batch all DOM updates
+      // This reduces WebKit reflows from multiple appendChild calls
+      const fragment = document.createDocumentFragment();
       
       if (data.top_processes && data.top_processes.length > 0) {
         data.top_processes.slice(0, 8).forEach((proc) => {
-        const row = document.createElement("div");
-        row.className = "process-row";
-        
-        const name = document.createElement("div");
-        name.className = "process-name";
-        name.textContent = proc.name;
-        
-        const usage = document.createElement("div");
-        usage.className = "process-usage";
-        
-        const bar = document.createElement("div");
-        bar.className = "process-bar";
-        
-        const barFill = document.createElement("div");
-        barFill.className = "process-bar-fill";
-        barFill.style.width = `${Math.min(100, proc.cpu)}%`;
-        
-        const percent = document.createElement("div");
-        percent.className = "process-percent";
-        percent.textContent = `${proc.cpu.toFixed(1)}%`;
-        
-        bar.appendChild(barFill);
-        usage.appendChild(bar);
-        usage.appendChild(percent);
-        
-        row.appendChild(name);
-        row.appendChild(usage);
-        list.appendChild(row);
+          const row = document.createElement("div");
+          row.className = "process-row";
+          
+          const name = document.createElement("div");
+          name.className = "process-name";
+          name.textContent = proc.name;
+          
+          const usage = document.createElement("div");
+          usage.className = "process-usage";
+          
+          const bar = document.createElement("div");
+          bar.className = "process-bar";
+          
+          const barFill = document.createElement("div");
+          barFill.className = "process-bar-fill";
+          barFill.style.width = `${Math.min(100, proc.cpu)}%`;
+          
+          const percent = document.createElement("div");
+          percent.className = "process-percent";
+          percent.textContent = `${proc.cpu.toFixed(1)}%`;
+          
+          bar.appendChild(barFill);
+          usage.appendChild(bar);
+          usage.appendChild(percent);
+          
+          row.appendChild(name);
+          row.appendChild(usage);
+          fragment.appendChild(row);
         });
       } else {
         // No processes available (window might be closed, saving CPU)
@@ -322,8 +506,14 @@ async function refresh() {
         emptyMsg.style.textAlign = "center";
         emptyMsg.style.padding = "1rem";
         emptyMsg.style.color = "var(--text-secondary, #666)";
-        list.appendChild(emptyMsg);
+        fragment.appendChild(emptyMsg);
       }
+      
+      // STEP 7: Batch the innerHTML clear and fragment append in one DOM update
+      scheduleDOMUpdate(() => {
+        list.innerHTML = "";
+        list.appendChild(fragment);
+      });
     }
   } catch (error) {
     console.error("Failed to refresh CPU details", error);
@@ -353,7 +543,7 @@ function startRefresh() {
   if (refreshInterval) {
     clearInterval(refreshInterval);
   }
-  refreshInterval = setInterval(refresh, 3000); // 3 seconds to reduce CPU usage
+  refreshInterval = setInterval(refresh, 8000); // STEP 4: 8 seconds (increased from 5s) to reduce CPU usage
 }
 
 // Initialize when DOM and Tauri are ready

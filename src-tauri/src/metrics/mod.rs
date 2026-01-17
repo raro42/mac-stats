@@ -30,7 +30,7 @@ pub struct SystemMetrics {
     pub disk: f32,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Clone)]
 pub struct ProcessUsage {
     pub name: String,
     pub cpu: f32,
@@ -41,6 +41,8 @@ pub struct CpuDetails {
     pub usage: f32,
     pub temperature: f32,
     pub frequency: f32,
+    pub p_core_frequency: f32,
+    pub e_core_frequency: f32,
     pub cpu_power: f32,
     pub gpu_power: f32,
     pub load_1: f64,
@@ -57,8 +59,6 @@ pub struct CpuDetails {
 }
 
 /// Get chip information (cached)
-/// Currently unused but kept for potential future use.
-#[allow(dead_code)]
 pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once
     CHIP_INFO_CACHE.get_or_init(|| {
@@ -82,29 +82,51 @@ pub fn get_chip_info() -> String {
                             .unwrap_or("");
                         
                         if !chip_type.is_empty() {
-                            // Format: "Apple M3 • 16 cores" or similar
+                            // Format: "Apple M3 · 16 cores" (using middle dot · not bullet •)
                             let mut info = chip_type.to_string();
                             if !num_procs.is_empty() {
-                                // number_processors format: "proc 1:8:8" (total:performance:efficiency)
+                                // number_processors format: "proc 16:12:4" (total:performance:efficiency)
                                 let num_procs_clean = num_procs.strip_prefix("proc ").unwrap_or(num_procs);
                                 let parts: Vec<&str> = num_procs_clean.split(':').collect();
-                                if parts.len() >= 3 {
-                                    let p_cores = parts.get(1).unwrap_or(&"0");
-                                    let e_cores = parts.get(2).unwrap_or(&"0");
-                                    let total: u32 = p_cores.parse().unwrap_or(0) + e_cores.parse().unwrap_or(0);
-                                    if total > 0 {
-                                        info.push_str(&format!(" • {} cores", total));
-                                    }
+                                
+                                // Try to get total cores
+                                let total_cores = if parts.len() >= 3 {
+                                    // Format: "16:12:4" - first number is total cores
+                                    parts.get(0).and_then(|s| s.parse::<u32>().ok())
+                                        .or_else(|| {
+                                            // Fallback: add P + E cores if first number fails
+                                            let p_cores = parts.get(1).and_then(|s| s.parse::<u32>().ok()).unwrap_or(0);
+                                            let e_cores = parts.get(2).and_then(|s| s.parse::<u32>().ok()).unwrap_or(0);
+                                            if p_cores > 0 || e_cores > 0 {
+                                                Some(p_cores + e_cores)
+                                            } else {
+                                                None
+                                            }
+                                        })
                                 } else if parts.len() == 1 {
                                     // Single number (total cores)
-                                    if let Ok(total) = parts[0].parse::<u32>() {
-                                        if total > 0 {
-                                            info.push_str(&format!(" • {} cores", total));
-                                        }
+                                    parts[0].parse::<u32>().ok()
+                                } else {
+                                    None
+                                };
+                                
+                                if let Some(total) = total_cores {
+                                    if total > 0 {
+                                        info.push_str(&format!(" · {} cores", total));
+                                        debug2!("Chip info formatted: '{}' (from chip_type='{}', num_procs='{}')", info, chip_type, num_procs);
+                                    } else {
+                                        debug2!("Chip info: total_cores is 0, not adding core count");
                                     }
+                                } else {
+                                    debug2!("Chip info: could not parse total_cores from '{}'", num_procs);
                                 }
+                            } else {
+                                debug2!("Chip info: num_procs is empty, chip_type='{}'", chip_type);
                             }
+                            debug2!("Chip info returning: '{}'", info);
                             return info;
+                        } else {
+                            debug2!("Chip info: chip_type is empty");
                         }
                     }
                 }
@@ -143,7 +165,8 @@ pub fn can_read_temperature() -> bool {
     if let Ok(cache) = TEMP_CACHE.try_lock() {
         if let Some((temp, timestamp)) = cache.as_ref() {
             // If we have a recent temperature reading, SMC access works
-            if *temp > 0.0 && timestamp.elapsed().as_secs() < 10 {
+            // Increased from 10s to 20s to match the 15s reading frequency
+            if *temp > 0.0 && timestamp.elapsed().as_secs() < 20 {
                 debug3!("can_read_temperature: true (from TEMP_CACHE with temp={:.1}°C)", *temp);
                 return true;
             }
@@ -367,7 +390,8 @@ pub fn can_read_gpu_power() -> bool {
 pub fn get_metrics() -> SystemMetrics {
     debug3!("get_metrics() called");
     
-    // Check if we should refresh (only every 2 seconds to reduce CPU usage)
+    // Fast metrics refresh: every 2 seconds for menu bar responsiveness
+    // This is cheap because we use cached values and only refresh when needed
     // Use try_lock to avoid blocking
     let should_refresh = match LAST_SYSTEM_REFRESH.try_lock() {
         Ok(mut last_refresh) => {
@@ -375,9 +399,9 @@ pub fn get_metrics() -> SystemMetrics {
             let should = last_refresh.map(|lr| now.duration_since(lr).as_secs() >= 2).unwrap_or(true);
             if should {
                 *last_refresh = Some(now);
-                debug3!("Refresh allowed (1 second passed)");
+                debug3!("Refresh allowed (2 seconds passed)");
             } else {
-                debug3!("Refresh skipped (less than 1 second since last)");
+                debug3!("Refresh skipped (less than 2 seconds since last)");
             }
             should
         },
@@ -472,6 +496,88 @@ pub fn get_metrics() -> SystemMetrics {
 
 #[tauri::command]
 pub fn get_cpu_details() -> CpuDetails {
+    // STEP 5: Rate limiting - prevent get_cpu_details from being called too frequently
+    // Even if frontend calls it more often, we'll throttle to max once per 2 seconds
+    let should_allow_call = match crate::state::LAST_CPU_DETAILS_CALL.try_lock() {
+        Ok(mut last_call) => {
+            let now = std::time::Instant::now();
+            let should = last_call.as_ref()
+                .map(|lc| now.duration_since(*lc).as_secs_f64() >= 2.0)
+                .unwrap_or(true);
+            if should {
+                *last_call = Some(now);
+                true
+            } else {
+                false
+            }
+        },
+        Err(_) => {
+            // Lock held - allow call (non-blocking)
+            true
+        }
+    };
+    
+    if !should_allow_call {
+        debug3!("get_cpu_details() rate limited - returning cached values");
+        // Return cached values immediately without doing any work
+        // This prevents CPU spikes from excessive calls
+        let (usage, load, uptime_secs) = match crate::state::SYSTEM.try_lock() {
+            Ok(sys) => {
+                if let Some(sys) = sys.as_ref() {
+                    (sys.global_cpu_usage(), sysinfo::System::load_average(), sysinfo::System::uptime())
+                } else {
+                    (0.0, sysinfo::LoadAvg { one: 0.0, five: 0.0, fifteen: 0.0 }, 0)
+                }
+            },
+            Err(_) => (0.0, sysinfo::LoadAvg { one: 0.0, five: 0.0, fifteen: 0.0 }, 0),
+        };
+        
+        // Return cached values only
+        let (temperature, frequency, p_core_frequency, e_core_frequency) = (
+            crate::state::TEMP_CACHE.try_lock()
+                .ok()
+                .and_then(|c| c.as_ref().map(|(t, _)| *t))
+                .unwrap_or(0.0),
+            crate::state::FREQ_CACHE.try_lock()
+                .ok()
+                .and_then(|c| c.as_ref().map(|(f, _)| *f))
+                .unwrap_or(crate::metrics::get_nominal_frequency()),
+            crate::state::P_CORE_FREQ_CACHE.try_lock()
+                .ok()
+                .and_then(|c| c.as_ref().map(|(f, _)| *f))
+                .unwrap_or(0.0),
+            crate::state::E_CORE_FREQ_CACHE.try_lock()
+                .ok()
+                .and_then(|c| c.as_ref().map(|(f, _)| *f))
+                .unwrap_or(0.0),
+        );
+        
+        let processes = crate::state::PROCESS_CACHE.try_lock()
+            .ok()
+            .and_then(|c| c.as_ref().map(|(p, _)| p.clone()))
+            .unwrap_or_default();
+        
+        return CpuDetails {
+            usage,
+            temperature,
+            frequency,
+            p_core_frequency,
+            e_core_frequency,
+            cpu_power: 0.0,
+            gpu_power: 0.0,
+            load_1: load.one,
+            load_5: load.five,
+            load_15: load.fifteen,
+            uptime_secs,
+            top_processes: processes,
+            chip_info: crate::metrics::get_chip_info(),
+            can_read_temperature: crate::metrics::can_read_temperature(),
+            can_read_frequency: crate::metrics::can_read_frequency(),
+            can_read_cpu_power: false,
+            can_read_gpu_power: false,
+        };
+    }
+    
     debug3!("get_cpu_details() called");
     
     // CRITICAL: Only collect processes if CPU window exists and is visible to save CPU
@@ -503,31 +609,74 @@ pub fn get_cpu_details() -> CpuDetails {
                 let usage = sys.global_cpu_usage();
                 let load = sysinfo::System::load_average();
                 let uptime_secs = sysinfo::System::uptime();
+                debug3!("System uptime: {} seconds ({} days, {} hours, {} minutes)", 
+                    uptime_secs, 
+                    uptime_secs / 86400,
+                    (uptime_secs % 86400) / 3600,
+                    (uptime_secs % 3600) / 60);
                 
                 // Only collect processes if window is visible (saves CPU when window is closed)
                 let processes = if should_collect_processes {
-                    // CRITICAL: Refresh processes before reading them (only when window is open)
-                    // This is necessary because processes() returns empty if not refreshed
-                    use sysinfo::ProcessesToUpdate;
-                    sys.refresh_processes(ProcessesToUpdate::All, true);
+                    // STEP 4: Cache process list for 20 seconds to avoid expensive refresh on every call
+                    // Increased from 15s to 20s to further reduce CPU usage
+                    // Check cache first - only refresh if cache is empty or older than 20 seconds
+                    let should_refresh_processes = match PROCESS_CACHE.try_lock() {
+                        Ok(cache) => {
+                            cache.as_ref()
+                                .map(|(_, timestamp)| timestamp.elapsed().as_secs() >= 20)
+                                .unwrap_or(true) // Cache is empty, need to refresh
+                        },
+                        Err(_) => false, // Lock held, use cached value if available
+                    };
                     
-                    // Collect ALL processes first (HashMap iteration order is undefined)
-                    // Then sort by CPU usage to get the actual top processes
-                    let mut processes: Vec<ProcessUsage> = sys
-                        .processes()
-                        .values()
-                        .map(|proc| ProcessUsage {
-                            name: proc.name().to_string_lossy().to_string(),
-                            cpu: proc.cpu_usage(),
-                        })
-                        .collect();
-                    
-                    // Sort by CPU usage (descending) to get actual top processes
-                    processes.sort_by(|a, b| b.cpu.partial_cmp(&a.cpu).unwrap_or(std::cmp::Ordering::Equal));
-                    
-                    // Take top 8 after sorting
-                    processes.truncate(8);
-                    processes
+                    if should_refresh_processes {
+                        // STEP 4: Refresh processes (expensive operation, but cached for 20 seconds)
+                        // This is necessary because processes() returns empty if not refreshed
+                        use sysinfo::ProcessesToUpdate;
+                        sys.refresh_processes(ProcessesToUpdate::All, true);
+                        
+                        // Collect ALL processes first (HashMap iteration order is undefined)
+                        // Then sort by CPU usage to get the actual top processes
+                        let mut processes: Vec<ProcessUsage> = sys
+                            .processes()
+                            .values()
+                            .map(|proc| ProcessUsage {
+                                name: proc.name().to_string_lossy().to_string(),
+                                cpu: proc.cpu_usage(),
+                            })
+                            .collect();
+                        
+                        // Sort by CPU usage (descending) to get actual top processes
+                        processes.sort_by(|a, b| b.cpu.partial_cmp(&a.cpu).unwrap_or(std::cmp::Ordering::Equal));
+                        
+                        // Take top 8 after sorting
+                        processes.truncate(8);
+                        
+                        // Update cache
+                        if let Ok(mut cache) = PROCESS_CACHE.try_lock() {
+                            *cache = Some((processes.clone(), std::time::Instant::now()));
+                            debug2!("Process cache updated (refreshed from system)");
+                        }
+                        
+                        processes
+                    } else {
+                        // Use cached process list
+                        match PROCESS_CACHE.try_lock() {
+                            Ok(cache) => {
+                                if let Some((procs, _)) = cache.as_ref() {
+                                    debug2!("Using cached process list ({} processes)", procs.len());
+                                    procs.clone()
+                                } else {
+                                    debug2!("Process cache is empty, returning empty list");
+                                    Vec::new()
+                                }
+                            },
+                            Err(_) => {
+                                debug2!("Process cache lock held, returning empty list");
+                                Vec::new()
+                            }
+                        }
+                    }
                 } else {
                     // Window is not visible - return empty process list to save CPU
                     debug3!("Window not visible, skipping process collection");
@@ -548,7 +697,7 @@ pub fn get_cpu_details() -> CpuDetails {
     // CRITICAL: Use cached values or defaults - don't call expensive functions
     // SMC calls and other operations can block the main thread
     // Use try_lock for cache access too
-    let (temperature, frequency, cpu_power, gpu_power, chip_info, can_read_temperature, can_read_frequency, can_read_cpu_power, can_read_gpu_power) = {
+    let (temperature, frequency, p_core_frequency, e_core_frequency, cpu_power, gpu_power, chip_info, can_read_temperature, can_read_frequency, can_read_cpu_power, can_read_gpu_power) = {
         // Try to get cached access flags without blocking
         let (_can_read_temp, can_read_freq, can_read_cpu_p, can_read_gpu_p) = match ACCESS_CACHE.try_lock() {
             Ok(mut access_cache) => {
@@ -569,12 +718,13 @@ pub fn get_cpu_details() -> CpuDetails {
         
         // CRITICAL: Read temperature from cache (updated by background thread)
         // Non-blocking read - returns 0.0 if cache is locked or stale
-        // Cache is valid for up to 10 seconds (background thread updates every 2 seconds)
+        // Cache is valid for up to 20 seconds (background thread updates every 15 seconds)
         let temperature = match TEMP_CACHE.try_lock() {
             Ok(cache) => {
                 if let Some((temp, timestamp)) = cache.as_ref() {
-                    // Only use cached value if it's fresh (less than 10 seconds old)
-                    if timestamp.elapsed().as_secs() < 10 {
+                    // Only use cached value if it's fresh (less than 20 seconds old)
+                    // Increased from 10s to 20s to match the 15s reading frequency
+                    if timestamp.elapsed().as_secs() < 20 {
                         *temp
                     } else {
                         debug3!("Temperature cache is stale ({}s old), using 0.0", timestamp.elapsed().as_secs());
@@ -618,11 +768,42 @@ pub fn get_cpu_details() -> CpuDetails {
             }
         };
         
-        // Use cached chip info or default
-        let chip = CHIP_INFO_CACHE.get().cloned().unwrap_or_else(|| "—".to_string());
+        // Read P-core and E-core frequencies from cache
+        let p_core_frequency = match P_CORE_FREQ_CACHE.try_lock() {
+            Ok(cache) => {
+                if let Some((freq, timestamp)) = cache.as_ref() {
+                    if timestamp.elapsed().as_secs() < 35 {
+                        *freq
+                    } else {
+                        get_nominal_frequency() // Fallback to nominal if stale
+                    }
+                } else {
+                    get_nominal_frequency()
+                }
+            },
+            Err(_) => get_nominal_frequency(),
+        };
+        
+        let e_core_frequency = match E_CORE_FREQ_CACHE.try_lock() {
+            Ok(cache) => {
+                if let Some((freq, timestamp)) = cache.as_ref() {
+                    if timestamp.elapsed().as_secs() < 35 {
+                        *freq
+                    } else {
+                        get_nominal_frequency() // Fallback to nominal if stale
+                    }
+                } else {
+                    get_nominal_frequency()
+                }
+            },
+            Err(_) => get_nominal_frequency(),
+        };
+        
+        // Use cached chip info or default - ensure it's initialized by calling get_chip_info()
+        let chip = get_chip_info();
         
         // Return cached temperature, frequency, and defaults for other expensive values
-        (temperature, frequency, 0.0, 0.0, chip, can_read_temp, can_read_freq, can_read_cpu_p, can_read_gpu_p)
+        (temperature, frequency, p_core_frequency, e_core_frequency, 0.0, 0.0, chip, can_read_temp, can_read_freq, can_read_cpu_p, can_read_gpu_p)
     };
 
     // Log data being sent to frontend for debugging
@@ -632,6 +813,8 @@ pub fn get_cpu_details() -> CpuDetails {
         usage,
         temperature,
         frequency,
+        p_core_frequency,
+        e_core_frequency,
         cpu_power,
         gpu_power,
         load_1: load.one,

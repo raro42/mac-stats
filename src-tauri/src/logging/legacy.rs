@@ -44,6 +44,12 @@ pub fn write_log_entry(level_str: &str, message: &str) {
 
 // Write structured log entry (JSON) to log file
 pub fn write_structured_log(location: &str, message: &str, data: &serde_json::Value, hypothesis_id: &str) {
+    // CRITICAL: Only write structured logs if verbosity is >= 2 (debug level)
+    // This prevents excessive logging and CPU usage in normal operation
+    if VERBOSITY.load(Ordering::Relaxed) < 2 {
+        return;
+    }
+    
     let log_data = serde_json::json!({
         "location": location,
         "message": message,
@@ -68,7 +74,7 @@ pub fn write_structured_log(location: &str, message: &str, data: &serde_json::Va
         }
     }
     
-    // Also write human-readable version to terminal
+    // Also write human-readable version to terminal (only if verbosity >= 2)
     eprintln!("[DEBUG] {}: {} (hypothesis: {})", location, message, hypothesis_id);
 }
 

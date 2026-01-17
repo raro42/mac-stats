@@ -47,11 +47,21 @@ pub(crate) static M3_TEMP_KEY: Mutex<Option<String>> = Mutex::new(None);
 
 // Frequency cache: (frequency_value_ghz, last_update_timestamp)
 pub(crate) static FREQ_CACHE: Mutex<Option<(f32, Instant)>> = Mutex::new(None);
+
+// Process list cache: (process_list, last_update_timestamp)
+// Cache processes for 30 seconds to avoid expensive refresh on every call
+pub(crate) static PROCESS_CACHE: Mutex<Option<(Vec<crate::metrics::ProcessUsage>, Instant)>> = Mutex::new(None);
+// P-core and E-core frequency caches: (frequency_value_ghz, last_update_timestamp)
+pub(crate) static P_CORE_FREQ_CACHE: Mutex<Option<(f32, Instant)>> = Mutex::new(None);
+pub(crate) static E_CORE_FREQ_CACHE: Mutex<Option<(f32, Instant)>> = Mutex::new(None);
 #[allow(dead_code)]
 pub(crate) static M3_FREQ_KEY: Mutex<Option<String>> = Mutex::new(None);
 pub(crate) static NOMINAL_FREQ: OnceLock<f32> = OnceLock::new();
 pub(crate) static LAST_FREQ_READ: Mutex<Option<Instant>> = Mutex::new(None);
 pub(crate) static LAST_TEMP_UPDATE: Mutex<Option<Instant>> = Mutex::new(None);
+
+// Rate limiting for get_cpu_details() - prevent excessive calls
+pub(crate) static LAST_CPU_DETAILS_CALL: Mutex<Option<Instant>> = Mutex::new(None);
 
 // IOReport state
 pub(crate) static IOREPORT_SUBSCRIPTION: Mutex<Option<usize>> = Mutex::new(None);

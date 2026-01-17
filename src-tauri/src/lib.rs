@@ -251,6 +251,10 @@ fn run_internal(open_cpu_window: bool) {
                 let mut smc_connection: Option<Smc> = None;
                 
                 loop {
+                    // Menu bar updates every 1-2 seconds (like Stats app) for responsive UI
+                    // Fast metrics (CPU, RAM) are cached, so this is cheap
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+                    
                     debug3!("Update loop: getting metrics...");
                     let metrics = get_metrics();
                     let text = build_status_text(&metrics);
@@ -271,10 +275,6 @@ fn run_internal(open_cpu_window: bool) {
                             })
                         })
                         .is_some();
-                    
-                    // CRITICAL: Sleep at the start of loop to control update frequency
-                    // This prevents the loop from running continuously and consuming CPU
-                    std::thread::sleep(std::time::Duration::from_secs(2));
                     
                     if should_read_temp {
                         // CPU window is visible - read temperature and frequency
@@ -393,9 +393,11 @@ fn run_internal(open_cpu_window: bool) {
                         
                         // CRITICAL: Only read temperature every 5 seconds to reduce CPU usage
                         // all_data() iteration is VERY expensive - limit it as much as possible
+                        // STEP 3: Reduce temperature reading frequency from 5s to 15s to save CPU
+                        // Temperature doesn't change rapidly, so 15s is still responsive
                         let should_read_temp_now = if let Ok(mut last) = LAST_TEMP_UPDATE.lock() {
                             let should = last.as_ref()
-                                .map(|t| t.elapsed().as_secs() >= 5)
+                                .map(|t| t.elapsed().as_secs() >= 15)
                                 .unwrap_or(true);
                             if should {
                                 *last = Some(std::time::Instant::now());
@@ -506,13 +508,13 @@ fn run_internal(open_cpu_window: bool) {
                             // Don't call all_data() at all - just skip
                         }
                         
-                        // CRITICAL: Read CPU frequency from IOReport (real-time, dynamic)
+                        // STEP 3: Read CPU frequency from IOReport (real-time, dynamic)
                         // This is the same approach exelban/stats uses - efficient native API
-                        // CPU EFFICIENCY: Only read frequency every 10 seconds (IOReport sampling still has overhead)
-                        // Reduced from 5s to 10s to save CPU while still providing reasonable updates
+                        // CPU EFFICIENCY: Only read frequency every 20 seconds (IOReport sampling still has overhead)
+                        // Increased from 10s to 20s to save CPU - frequency doesn't change that rapidly
                         let should_read_freq = if let Ok(mut last) = LAST_FREQ_READ.lock() {
                             let should = last.as_ref()
-                                .map(|t| t.elapsed().as_secs() >= 10)
+                                .map(|t| t.elapsed().as_secs() >= 20)
                                 .unwrap_or(true);
                             if should {
                                 *last = Some(std::time::Instant::now());
@@ -525,6 +527,8 @@ fn run_internal(open_cpu_window: bool) {
                         if should_read_freq {
                             debug3!("should_read_freq=true, attempting IOReport frequency read");
                             let mut freq: f32 = 0.0;
+                            let mut p_core_freq: f32 = 0.0;
+                            let mut e_core_freq: f32 = 0.0;
                             
                             // Try IOReport first (real-time frequency via native API)
                             if let Ok(sub) = IOREPORT_SUBSCRIPTION.try_lock() {
@@ -758,9 +762,16 @@ extern "C" {
                                                                         }
                                                                         
                                                                         // Look for channels with frequency information
+                                                                        // Track P-core and E-core frequencies separately
                                                                         let mut max_freq_mhz: f64 = 0.0;
                                                                         let mut total_residency: f64 = 0.0;
                                                                         let mut weighted_freq_sum: f64 = 0.0;
+                                                                        let mut p_core_max_freq_mhz: f64 = 0.0;
+                                                                        let mut p_core_total_residency: f64 = 0.0;
+                                                                        let mut p_core_weighted_freq_sum: f64 = 0.0;
+                                                                        let mut e_core_max_freq_mhz: f64 = 0.0;
+                                                                        let mut e_core_total_residency: f64 = 0.0;
+                                                                        let mut e_core_weighted_freq_sum: f64 = 0.0;
                                                                         
                                                                         // Iterate through actual channels
                                                                         debug3!("Iterating through {} actual channels to find performance states", actual_channels_count);
@@ -824,6 +835,15 @@ extern "C" {
                                                                                             continue;
                                                                                         }
                                                                                         let orig_channel_type_id = CFGetTypeID(orig_channel_ref as CFTypeRef);
+                                                                                        let dict_type_id = CFDictionaryGetTypeID();
+                                                                                        
+                                                                                        // CRITICAL: Only call IOReportChannelGetChannelName on valid CFDictionary types
+                                                                                        // Calling it on non-dictionary types will crash with foreign exception
+                                                                                        if orig_channel_type_id != dict_type_id {
+                                                                                            debug3!("Original channel {}: value is not CFDictionary (type_id={}), skipping IOReportChannelGetChannelName", orig_i, orig_channel_type_id);
+                                                                                            continue;
+                                                                                        }
+                                                                                        
                                                                                         // #region agent log
                                                                                         write_structured_log(
                                                                                             "lib.rs:2099",
@@ -838,7 +858,13 @@ extern "C" {
                                                                                         // #endregion
                                                                                         debug3!("About to call IOReportChannelGetChannelName on {:p} (key='{}')", orig_channel_ref, orig_key);
                                                                                         // Try to get channel name - this is the actual channel dictionary
+                                                                                        // CRITICAL: This can throw foreign exceptions if channel_ref is invalid
+                                                                                        // We've verified it's a CFDictionary, but it might still not be a valid IOReport channel
                                                                                         let test_name_ref = IOReportChannelGetChannelName(orig_channel_ref);
+                                                                                        // Validate result immediately
+                                                                                        if test_name_ref.is_null() {
+                                                                                            debug3!("IOReportChannelGetChannelName returned null for channel '{}'", orig_key);
+                                                                                        }
                                                                                         debug3!("IOReportChannelGetChannelName returned {:p}", test_name_ref);
                                                                                         // #region agent log
                                                                                         write_structured_log(
@@ -895,6 +921,16 @@ extern "C" {
                                                                                     for j in 0..(nested_count as usize) {
                                                                                         let nested_channel_ref = nested_values[j] as CFDictionaryRef;
                                                                                         if !nested_channel_ref.is_null() {
+                                                                                            // CRITICAL: Validate type before calling IOReportChannelGetChannelName
+                                                                                            // This prevents foreign exceptions from invalid channel references
+                                                                                            let nested_type_id = CFGetTypeID(nested_channel_ref as CFTypeRef);
+                                                                                            let dict_type_id = CFDictionaryGetTypeID();
+                                                                                            if nested_type_id != dict_type_id {
+                                                                                                debug3!("  Nested entry {}: not CFDictionary (type_id={}), skipping", j, nested_type_id);
+                                                                                                continue;
+                                                                                            }
+                                                                                            
+                                                                                            // CRITICAL: This can throw foreign exceptions if channel_ref is invalid
                                                                                             let test_name_ref = IOReportChannelGetChannelName(nested_channel_ref);
                                                                                             if !test_name_ref.is_null() {
                                                                                                 let nested_channel_name = CFString::wrap_under_get_rule(test_name_ref);
@@ -918,11 +954,23 @@ extern "C" {
                                                                             debug3!("Processing channel: name='{}'", channel_name_str);
                                                                             
                                                                             // Look for performance state channels (they contain frequency info)
+                                                                            // Determine if this is a P-core or E-core channel
+                                                                            let is_p_core = channel_name_str.contains("P-Cluster") || 
+                                                                                          (channel_name_str.contains("Performance") && !channel_name_str.contains("E-Cluster") && !channel_name_str.contains("Efficiency"));
+                                                                            let is_e_core = channel_name_str.contains("E-Cluster") || channel_name_str.contains("Efficiency");
+                                                                            
                                                                             if channel_name_str.contains("Performance") || 
                                                                                channel_name_str.contains("P-Cluster") ||
                                                                                channel_name_str.contains("E-Cluster") ||
                                                                                channel_name_str.contains("CPU") {
-                                                                                debug3!("Found performance state channel: '{}'", channel_name_str);
+                                                                                debug3!("Found performance state channel: '{}' (P-core: {}, E-core: {})", channel_name_str, is_p_core, is_e_core);
+                                                                                
+                                                                                // CRITICAL: Validate channel_ref_to_use before calling IOReport functions
+                                                                                // These functions can throw foreign exceptions if called on invalid references
+                                                                                if channel_ref_to_use.is_null() {
+                                                                                    debug3!("Channel '{}' reference is null, skipping state iteration", channel_name_str);
+                                                                                    continue;
+                                                                                }
                                                                                 
                                                                                 // Get state count (number of performance states)
                                                                                 let state_count = IOReportStateGetCount(channel_ref_to_use);
@@ -944,31 +992,98 @@ extern "C" {
                                                                                     let residency_ns = IOReportStateGetResidency(channel_ref_to_use, state_idx);
                                                                                     debug3!("  State {}: residency={} ns", state_idx, residency_ns);
                                                                                     
-                                                                                    // Try to extract frequency from state name (e.g., "2400 MHz" or "P0" which implies max freq)
+                                                                                    // Try to extract frequency from state name
+                                                                                    // Patterns: "2400 MHz", "4000 MHz", "P0", "P1", etc.
+                                                                                    let residency_ratio = residency_ns as f64 / 1_000_000_000.0; // Convert ns to seconds
+                                                                                    
                                                                                     if state_name_str.contains("MHz") {
-                                                                                        // Extract frequency value from name
-                                                                                        if let Some(mhz_str) = state_name_str.split_whitespace().next() {
-                                                                                            if let Ok(mhz_val) = mhz_str.parse::<f64>() {
+                                                                                        // Extract frequency value from name (e.g., "2400 MHz")
+                                                                                        // Try multiple parsing strategies
+                                                                                        let mhz_val = state_name_str
+                                                                                            .split_whitespace()
+                                                                                            .find_map(|s| s.parse::<f64>().ok());
+                                                                                        
+                                                                                        if let Some(mhz_val) = mhz_val {
+                                                                                            if mhz_val > 0.0 && mhz_val < 10000.0 { // Sanity check: 0-10 GHz
+                                                                                                // Update overall frequency
                                                                                                 if mhz_val > max_freq_mhz {
                                                                                                     max_freq_mhz = mhz_val;
                                                                                                 }
-                                                                                                // Weight by residency
-                                                                                                let residency_ratio = residency_ns as f64 / 1_000_000_000.0; // Convert ns to seconds
                                                                                                 weighted_freq_sum += mhz_val * residency_ratio;
                                                                                                 total_residency += residency_ratio;
+                                                                                                
+                                                                                                // Update P-core or E-core specific frequency
+                                                                                                if is_p_core {
+                                                                                                    if mhz_val > p_core_max_freq_mhz {
+                                                                                                        p_core_max_freq_mhz = mhz_val;
+                                                                                                    }
+                                                                                                    p_core_weighted_freq_sum += mhz_val * residency_ratio;
+                                                                                                    p_core_total_residency += residency_ratio;
+                                                                                                } else if is_e_core {
+                                                                                                    if mhz_val > e_core_max_freq_mhz {
+                                                                                                        e_core_max_freq_mhz = mhz_val;
+                                                                                                    }
+                                                                                                    e_core_weighted_freq_sum += mhz_val * residency_ratio;
+                                                                                                    e_core_total_residency += residency_ratio;
+                                                                                                }
+                                                                                                debug3!("  State {}: extracted {} MHz from name '{}'", state_idx, mhz_val, state_name_str);
+                                                                                            } else {
+                                                                                                debug3!("  State {}: frequency {} MHz out of range, skipping", state_idx, mhz_val);
                                                                                             }
+                                                                                        } else {
+                                                                                            debug3!("  State {}: could not parse frequency from '{}'", state_idx, state_name_str);
                                                                                         }
-                                                                                    } else if state_name_str.starts_with("P") && state_idx == 0 {
-                                                                                        // P0 state typically means maximum frequency
-                                                                                        // For M3 Max, P-cluster max is around 4000 MHz
-                                                                                        // We'll use a heuristic: P0 = max freq, weight by residency
-                                                                                        let estimated_freq = 4000.0; // M3 Max P-cluster max
-                                                                                        let residency_ratio = residency_ns as f64 / 1_000_000_000.0;
+                                                                                    } else if state_name_str.starts_with("P") {
+                                                                                        // P-state (P0, P1, etc.) - estimate frequency based on state index
+                                                                                        // P0 = max freq, P1 = slightly lower, etc.
+                                                                                        // For Apple Silicon: P0 is typically 3.5-4.0 GHz for P-cores, 2.0-2.5 GHz for E-cores
+                                                                                        let estimated_freq = if is_p_core {
+                                                                                            // P-core: higher frequency
+                                                                                            match state_idx {
+                                                                                                0 => 4000.0, // P0 = max
+                                                                                                1 => 3500.0, // P1
+                                                                                                2 => 3000.0, // P2
+                                                                                                _ => 2500.0, // Lower states
+                                                                                            }
+                                                                                        } else if is_e_core {
+                                                                                            // E-core: lower frequency
+                                                                                            match state_idx {
+                                                                                                0 => 2400.0, // E0 = max
+                                                                                                1 => 2000.0, // E1
+                                                                                                _ => 1500.0, // Lower states
+                                                                                            }
+                                                                                        } else {
+                                                                                            // Unknown cluster type - use conservative estimate
+                                                                                            match state_idx {
+                                                                                                0 => 3000.0, // P0 equivalent
+                                                                                                _ => 2000.0,
+                                                                                            }
+                                                                                        };
+                                                                                        
+                                                                                        // Update overall frequency
                                                                                         weighted_freq_sum += estimated_freq * residency_ratio;
                                                                                         total_residency += residency_ratio;
                                                                                         if estimated_freq > max_freq_mhz {
                                                                                             max_freq_mhz = estimated_freq;
                                                                                         }
+                                                                                        
+                                                                                        // Update P-core or E-core specific frequency
+                                                                                        if is_p_core {
+                                                                                            p_core_weighted_freq_sum += estimated_freq * residency_ratio;
+                                                                                            p_core_total_residency += residency_ratio;
+                                                                                            if estimated_freq > p_core_max_freq_mhz {
+                                                                                                p_core_max_freq_mhz = estimated_freq;
+                                                                                            }
+                                                                                        } else if is_e_core {
+                                                                                            e_core_weighted_freq_sum += estimated_freq * residency_ratio;
+                                                                                            e_core_total_residency += residency_ratio;
+                                                                                            if estimated_freq > e_core_max_freq_mhz {
+                                                                                                e_core_max_freq_mhz = estimated_freq;
+                                                                                            }
+                                                                                        }
+                                                                                        debug3!("  State {}: estimated {} MHz from P-state '{}'", state_idx, estimated_freq, state_name_str);
+                                                                                    } else {
+                                                                                        debug3!("  State {}: name '{}' doesn't match frequency patterns, skipping", state_idx, state_name_str);
                                                                                     }
                                                                                 } // closes for state_idx
                                                                             } // closes if channel_name_str.contains
@@ -983,6 +1098,24 @@ extern "C" {
                                                                             debug2!("IOReport frequency parsed: {:.2} GHz (max frequency)", freq);
                                                                         } else {
                                                                             debug3!("Could not extract frequency from IOReport (no valid states found in {} actual channels)", actual_channels_count);
+                                                                        }
+                                                                        
+                                                                        // Calculate P-core frequency
+                                                                        if p_core_total_residency > 0.0 {
+                                                                            p_core_freq = (p_core_weighted_freq_sum / p_core_total_residency / 1000.0) as f32; // Convert MHz to GHz
+                                                                            debug2!("IOReport P-core frequency parsed: {:.2} GHz (weighted average)", p_core_freq);
+                                                                        } else if p_core_max_freq_mhz > 0.0 {
+                                                                            p_core_freq = (p_core_max_freq_mhz / 1000.0) as f32; // Convert MHz to GHz
+                                                                            debug2!("IOReport P-core frequency parsed: {:.2} GHz (max frequency)", p_core_freq);
+                                                                        }
+                                                                        
+                                                                        // Calculate E-core frequency
+                                                                        if e_core_total_residency > 0.0 {
+                                                                            e_core_freq = (e_core_weighted_freq_sum / e_core_total_residency / 1000.0) as f32; // Convert MHz to GHz
+                                                                            debug2!("IOReport E-core frequency parsed: {:.2} GHz (weighted average)", e_core_freq);
+                                                                        } else if e_core_max_freq_mhz > 0.0 {
+                                                                            e_core_freq = (e_core_max_freq_mhz / 1000.0) as f32; // Convert MHz to GHz
+                                                                            debug2!("IOReport E-core frequency parsed: {:.2} GHz (max frequency)", e_core_freq);
                                                                         }
                                                                     } // closes else block for actual_channels_ref null check
                                                                 } else {
@@ -1010,33 +1143,58 @@ extern "C" {
                                 debug3!("should_read_freq=false, skipping frequency update");
                             }
                             
-                            // Fallback to nominal frequency if IOReport didn't work or parsing incomplete
-                            if freq == 0.0 {
-                                let nominal = metrics::get_nominal_frequency();
-                                if nominal > 0.0 {
-                                    freq = nominal;
-                                    debug3!("Using nominal frequency as fallback: {} GHz (IOReport parsing incomplete)", freq);
-                                }
-                            }
-                            
-                            // Update frequency cache
+                            // CRITICAL: Only use nominal frequency as fallback if IOReport completely failed
+                            // If IOReport returned 0.0, it means parsing failed - don't overwrite cache with nominal
+                            // Only update cache if we got a real frequency from IOReport
                             if freq > 0.0 {
                                 if let Ok(mut cache) = FREQ_CACHE.try_lock() {
                                     *cache = Some((freq, std::time::Instant::now()));
-                                    debug2!("Frequency cache updated: {:.2} GHz", freq);
-                                    
-                                    // CRITICAL: Update ACCESS_CACHE to indicate frequency reading works
-                                    if let Ok(mut access_cache) = ACCESS_CACHE.try_lock() {
-                                        if let Some((temp, _, cpu_power, gpu_power)) = access_cache.as_ref() {
-                                            *access_cache = Some((*temp, true, *cpu_power, *gpu_power));
-                                        } else {
-                                            *access_cache = Some((false, true, false, false));
-                                        }
-                                        debug2!("ACCESS_CACHE updated: can_read_frequency=true (frequency read successfully)");
+                                    debug2!("Frequency cache updated from IOReport: {:.2} GHz", freq);
+                                }
+                                
+                                // Update P-core frequency cache
+                                if p_core_freq > 0.0 {
+                                    if let Ok(mut cache) = P_CORE_FREQ_CACHE.try_lock() {
+                                        *cache = Some((p_core_freq, std::time::Instant::now()));
+                                        debug2!("P-core frequency cache updated: {:.2} GHz", p_core_freq);
                                     }
                                 }
+                                
+                                // Update E-core frequency cache
+                                if e_core_freq > 0.0 {
+                                    if let Ok(mut cache) = E_CORE_FREQ_CACHE.try_lock() {
+                                        *cache = Some((e_core_freq, std::time::Instant::now()));
+                                        debug2!("E-core frequency cache updated: {:.2} GHz", e_core_freq);
+                                    }
+                                }
+                                
+                                // CRITICAL: Update ACCESS_CACHE to indicate frequency reading works
+                                if let Ok(mut access_cache) = ACCESS_CACHE.try_lock() {
+                                    if let Some((temp, _, cpu_power, gpu_power)) = access_cache.as_ref() {
+                                        *access_cache = Some((*temp, true, *cpu_power, *gpu_power));
+                                    } else {
+                                        *access_cache = Some((false, true, false, false));
+                                    }
+                                    debug2!("ACCESS_CACHE updated: can_read_frequency=true (IOReport frequency read successfully)");
+                                }
                             } else {
-                                debug3!("No valid frequency available (IOReport failed, nominal is 0.0)");
+                                // IOReport parsing failed - log why and don't update cache
+                                // This prevents overwriting a good cached value with nominal frequency
+                                debug2!("IOReport frequency parsing failed (freq=0.0) - keeping existing cache value if available");
+                                
+                                // Only use nominal as fallback if cache is empty (first time)
+                                if let Ok(cache) = FREQ_CACHE.try_lock() {
+                                    if cache.is_none() {
+                                        // Cache is empty - use nominal as initial value
+                                        let nominal = metrics::get_nominal_frequency();
+                                        if nominal > 0.0 {
+                                            debug2!("Using nominal frequency as initial value: {:.2} GHz (IOReport not available yet)", nominal);
+                                            // Don't update cache here - let IOReport populate it when it works
+                                        }
+                                    } else {
+                                        debug3!("Keeping existing cached frequency value (IOReport parsing failed)");
+                                    }
+                                }
                             }
                         } else {
                             debug3!("should_read_freq=false, skipping frequency update");

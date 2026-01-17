@@ -513,7 +513,7 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
     )
     .title("CPU")
     .visible(true)  // Show immediately when created
-    .inner_size(400.0, 700.0)
+    .inner_size(644.0, 995.0)
     .resizable(true)
     .always_on_top(true)
     .build();
@@ -522,6 +522,14 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
         Ok(window) => {
             debug1!("CPU window created successfully");
             write_structured_log("ui/status_bar.rs", "CPU window created successfully", &serde_json::json!({}), "I");
+            
+            // STEP 3: Clear process cache when window opens so process list appears immediately
+            use crate::state::PROCESS_CACHE;
+            if let Ok(mut cache) = PROCESS_CACHE.try_lock() {
+                *cache = None;
+                debug2!("Process cache cleared - will refresh on first get_cpu_details() call");
+            }
+            
             let _ = window.set_always_on_top(true);
             let _ = window.show();
             let _ = window.set_focus();

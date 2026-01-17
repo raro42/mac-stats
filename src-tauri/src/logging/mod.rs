@@ -31,8 +31,10 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
     };
 
     // Create env filter
-    let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new(filter_level));
+    // CRITICAL: Always use command-line verbosity, ignore RUST_LOG environment variable
+    // This ensures that -v flags control logging, not environment variables
+    // Default to "error" level (verbosity 0) for minimal logging and CPU usage
+    let filter = EnvFilter::new(filter_level);
 
     // Build subscriber with console and file output
     let registry = tracing_subscriber::registry()
