@@ -2,6 +2,22 @@
 
 A lightweight system monitor for macOS built with Rust and Tauri.
 
+## Inspiration
+
+This project is inspired by [Stats](https://github.com/exelban/stats) by [exelban](https://github.com/exelban), a popular macOS system monitor with 35.8k+ stars.
+
+### Motivation
+
+This work was motivated by two main factors:
+
+1. **CPU Usage Optimization**: While Stats is an excellent application, I noticed that CPU usage remained relatively high even when all windows were closed and only menu bar updates were needed. This project aims to achieve lower CPU usage (<1%) while maintaining real-time monitoring capabilities.
+
+2. **Rust Implementation**: I wanted to explore building a system monitor using Rust instead of Swift, leveraging Rust's performance characteristics and safety guarantees.
+
+### Development Note
+
+This project was developed through "vibe coding" - building features iteratively based on what felt right at the time. I have no prior experience with Rust, so this has been a learning journey. The codebase may not follow all Rust best practices, but it works and achieves the goal of efficient system monitoring.
+
 ## Features
 
 - Real-time CPU, RAM, Disk, and GPU monitoring
