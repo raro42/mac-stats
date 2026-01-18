@@ -259,15 +259,10 @@ fn run_internal(open_cpu_window: bool) {
                                 Ok(smc) => {
                                     smc_connection = Some(smc);
                                     debug3!("SMC connection established in background thread");
-                                    // CRITICAL: Update ACCESS_CACHE to indicate SMC works
+                                    // OPTIMIZATION Phase 3: Update OnceLock to indicate SMC works
                                     // This ensures can_read_temperature() returns true
-                                    if let Ok(mut cache) = ACCESS_CACHE.try_lock() {
-                                        if let Some((_, freq, cpu_power, gpu_power)) = cache.as_ref() {
-                                            *cache = Some((true, *freq, *cpu_power, *gpu_power));
-                                        } else {
-                                            *cache = Some((true, false, false, false));
-                                        }
-                                        debug2!("ACCESS_CACHE updated: can_read_temperature=true (SMC connection successful)");
+                                    if CAN_READ_TEMPERATURE.set(true).is_ok() {
+                                        debug2!("CAN_READ_TEMPERATURE set to true (SMC connection successful)");
                                     }
                                 },
                                 Err(e) => {
@@ -382,13 +377,9 @@ fn run_internal(open_cpu_window: bool) {
                                             debug2!("IOReport subscription created successfully for CPU frequency (handle={:p}, dict={:p})", subscription_ptr, subscription_dict);
                                             
                                             // Update ACCESS_CACHE to indicate frequency reading works
-                                            if let Ok(mut cache) = ACCESS_CACHE.try_lock() {
-                                                if let Some((temp, _, cpu_power, gpu_power)) = cache.as_ref() {
-                                                    *cache = Some((*temp, true, *cpu_power, *gpu_power));
-                                                } else {
-                                                    *cache = Some((false, true, false, false));
-                                                }
-                                                debug2!("ACCESS_CACHE updated: can_read_frequency=true (IOReport subscription created)");
+                                            // OPTIMIZATION Phase 3: Update OnceLock to indicate frequency reading works
+                                            if CAN_READ_FREQUENCY.set(true).is_ok() {
+                                                debug2!("CAN_READ_FREQUENCY set to true (IOReport subscription created)");
                                             }
                                         } else {
                                             debug2!("Failed to create IOReport subscription: subscription_ptr is null, subscription_dict={:p}", subscription_dict);
@@ -685,14 +676,9 @@ fn run_internal(open_cpu_window: bool) {
                                     }
                                 }
                                 
-                                // CRITICAL: Update ACCESS_CACHE to indicate frequency reading works
-                                if let Ok(mut access_cache) = ACCESS_CACHE.try_lock() {
-                                    if let Some((temp, _, cpu_power, gpu_power)) = access_cache.as_ref() {
-                                        *access_cache = Some((*temp, true, *cpu_power, *gpu_power));
-                                    } else {
-                                        *access_cache = Some((false, true, false, false));
-                                    }
-                                    debug2!("ACCESS_CACHE updated: can_read_frequency=true (IOReport frequency read successfully)");
+                                // OPTIMIZATION Phase 3: Update OnceLock to indicate frequency reading works
+                                if CAN_READ_FREQUENCY.set(true).is_ok() {
+                                    debug2!("CAN_READ_FREQUENCY set to true (IOReport frequency read successfully)");
                                 }
                             } else {
                                 // This prevents overwriting a good cached value with nominal frequency
