@@ -398,23 +398,23 @@ pub fn click_handler_class() -> &'static AnyClass {
                             let _ = window.close();
                             write_structured_log("ui/status_bar.rs", "Window closed completely", &serde_json::json!({}), "I");
                         } else {
-                            // Window exists but is hidden - show it
-                            debug1!("CPU window exists but is hidden, showing it...");
-                            write_structured_log("ui/status_bar.rs", "Before set_always_on_top", &serde_json::json!({}), "I");
-                            let _ = window.set_always_on_top(true);
-                            write_structured_log("ui/status_bar.rs", "Before show", &serde_json::json!({}), "I");
-                            let _ = window.show();
-                            write_structured_log("ui/status_bar.rs", "Before set_focus", &serde_json::json!({}), "I");
-                            let _ = window.set_focus();
-                            write_structured_log("ui/status_bar.rs", "Before unminimize", &serde_json::json!({}), "I");
-                            let _ = window.unminimize();
-                            debug1!("Window show commands sent");
-                            write_structured_log("ui/status_bar.rs", "Window show commands completed", &serde_json::json!({}), "I");
+                            // Window exists but is hidden - close and recreate to ensure decorations are up-to-date
+                            // This ensures that if the user changed the decorations setting, it will be applied
+                            debug1!("CPU window exists but is hidden, closing and recreating to apply decorations...");
+                            let _ = window.close();
+                            write_structured_log("ui/status_bar.rs", "Window closed for recreation", &serde_json::json!({}), "I");
+                            // Fall through to create new window
                         }
                     } else {
                         // Window doesn't exist - create and show it
                         debug1!("CPU window doesn't exist, creating it...");
                         write_structured_log("ui/status_bar.rs", "Creating new CPU window", &serde_json::json!({}), "I");
+                        create_cpu_window(app_handle);
+                    }
+                    
+                    // If we closed a window above, create a new one now
+                    if app_handle.get_window("cpu").is_none() {
+                        debug1!("Creating CPU window after close...");
                         create_cpu_window(app_handle);
                     }
                 } else {
@@ -509,6 +509,12 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
     debug1!("Creating CPU window...");
     write_structured_log("ui/status_bar.rs", "create_cpu_window ENTRY", &serde_json::json!({}), "I");
     
+    // Read window decorations preference from config file
+    // This allows the preference to be changed without recompiling
+    use crate::config::Config;
+    let decorations = Config::get_window_decorations();
+    debug1!("Window decorations preference: {} (from config file)", decorations);
+    
     let cpu_window = WindowBuilder::new(
         app_handle,
         "cpu",
@@ -519,6 +525,7 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
     .inner_size(644.0, 995.0)
     .resizable(true)
     .always_on_top(true)
+    .decorations(decorations)
     .build();
     
     match cpu_window {

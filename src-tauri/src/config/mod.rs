@@ -65,4 +65,35 @@ impl Config {
         }
         Ok(())
     }
+    
+    /// Get the config file path
+    /// 
+    /// Returns a path in the user's home directory: `$HOME/.mac-stats/config.json`
+    /// Falls back to a temporary directory if HOME is not available.
+    pub fn config_file_path() -> PathBuf {
+        // Try to use $HOME/.mac-stats/config.json
+        if let Ok(home) = std::env::var("HOME") {
+            let home_path = PathBuf::from(home);
+            return home_path.join(".mac-stats").join("config.json");
+        }
+        
+        // Fallback to temp directory
+        std::env::temp_dir().join("mac-stats-config.json")
+    }
+    
+    /// Read window decorations preference from config file
+    /// 
+    /// Returns true (show decorations) by default if file doesn't exist or can't be read.
+    pub fn get_window_decorations() -> bool {
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(decorations) = json.get("windowDecorations").and_then(|v| v.as_bool()) {
+                    return decorations;
+                }
+            }
+        }
+        // Default to true (show decorations)
+        true
+    }
 }

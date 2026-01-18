@@ -552,6 +552,44 @@ pub fn get_app_version() -> String {
     crate::config::Config::version()
 }
 
+/// Get window decorations preference
+#[tauri::command]
+pub fn get_window_decorations() -> bool {
+    // Read from config file (allows changes without recompiling)
+    crate::config::Config::get_window_decorations()
+}
+
+/// Set window decorations preference
+#[tauri::command]
+pub fn set_window_decorations(decorations: bool) -> Result<(), String> {
+    use crate::config::Config;
+    
+    // Update Rust state
+    use crate::state::WINDOW_DECORATIONS;
+    if let Ok(mut pref) = WINDOW_DECORATIONS.lock() {
+        *pref = decorations;
+    }
+    
+    // Write to config file so it persists and works without recompiling
+    let config_path = Config::config_file_path();
+    if let Some(parent) = config_path.parent() {
+        if let Err(e) = std::fs::create_dir_all(parent) {
+            return Err(format!("Failed to create config directory: {}", e));
+        }
+    }
+    
+    let config = serde_json::json!({
+        "windowDecorations": decorations
+    });
+    
+    if let Err(e) = std::fs::write(&config_path, serde_json::to_string_pretty(&config).unwrap_or_else(|_| config.to_string())) {
+        return Err(format!("Failed to write config file: {}", e));
+    }
+    
+    crate::debug1!("Window decorations preference set to: {} (saved to config file)", decorations);
+    Ok(())
+}
+
 #[tauri::command]
 pub fn get_cpu_details() -> CpuDetails {
     // STEP 5: Rate limiting - prevent get_cpu_details from being called too frequently

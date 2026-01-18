@@ -73,29 +73,35 @@
       <section class="poster-details">
         <h2 class="section-title">Details</h2>
         <div class="details-grid">
-          <div class="detail-label">Load 1m</div>
-          <div class="detail-value" id="load-1">0.0</div>
-
-          <div class="detail-label">Load 5m</div>
-          <div class="detail-value" id="load-5">0.0</div>
-
-          <div class="detail-label">Load 15m</div>
-          <div class="detail-value" id="load-15">0.0</div>
-
-          <div class="detail-label">CPU Power</div>
-          <div class="detail-value">
-            <span id="cpu-power">0.0 W</span>
-            <div class="metric-hint" id="cpu-power-hint" style="display: none;">Requires root privileges</div>
+          <div class="detail-row">
+            <div class="detail-label">Load 1m</div>
+            <div class="detail-value" id="load-1">0.0</div>
           </div>
 
-          <div class="detail-label">GPU Power</div>
-          <div class="detail-value">
-            <span id="gpu-power">0.0 W</span>
-            <div class="metric-hint" id="gpu-power-hint" style="display: none;">Requires root privileges</div>
+          <div class="detail-row">
+            <div class="detail-label">Load 5m</div>
+            <div class="detail-value" id="load-5">0.0</div>
           </div>
 
-          <div class="detail-label">Uptime</div>
-          <div class="detail-value" id="uptime-value">0h</div>
+          <div class="detail-row">
+            <div class="detail-label">Load 15m</div>
+            <div class="detail-value" id="load-15">0.0</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">CPU Power</div>
+            <div class="detail-value" id="cpu-power">0.0 W</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">GPU Power</div>
+            <div class="detail-value" id="gpu-power">0.0 W</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-label">Uptime</div>
+            <div class="detail-value" id="uptime-value">0h</div>
+          </div>
         </div>
       </section>
 
@@ -132,6 +138,14 @@
               <button type="button" class="theme-item" data-theme="neon">Neon</button>
               <button type="button" class="theme-item" data-theme="swiss-minimalistic">Swiss Minimalistic</button>
             </div>
+          </div>
+          <div class="setting-item">
+            <div class="setting-label">Window Frame</div>
+            <label class="setting-toggle">
+              <input type="checkbox" id="window-decorations-toggle" />
+              <span class="toggle-label">Show window frame</span>
+            </label>
+            <div class="setting-note" style="font-size: 11px; color: rgba(255, 255, 255, 0.74); margin-top: 4px; font-style: italic;">Not yet functional</div>
           </div>
         </div>
       </div>

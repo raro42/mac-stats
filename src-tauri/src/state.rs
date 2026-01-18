@@ -72,6 +72,10 @@ pub(crate) static LAST_IOREPORT_SAMPLE: Mutex<Option<(usize, Instant)>> = Mutex:
 // Flag to enable detailed frequency logging
 pub(crate) static FREQUENCY_LOGGING_ENABLED: Mutex<bool> = Mutex::new(false);
 
+// Window decorations preference (true = show decorations, false = frameless)
+// Default to true (show decorations) for better UX
+pub(crate) static WINDOW_DECORATIONS: Mutex<bool> = Mutex::new(true);
+
 /// Application state structure (future refactoring target)
 /// 
 /// This struct represents the ideal state organization.
