@@ -112,7 +112,7 @@ body {
     "SF Pro Text",
     sans-serif;
   font-size: 30px;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: -0.01em;
   line-height: 1.05;
   color: rgba(28, 28, 30, 0.92);
@@ -120,8 +120,8 @@ body {
 
 .apple-subtitle {
   margin-top: 12px;
-  font-size: 14px;
-  font-weight: 400;
+  font-size: 12px;
+  font-weight: 300;
   color: var(--muted);
 }
 
@@ -471,11 +471,11 @@ body {
   }
 
   .apple-title h1 {
-    font-size: 32px;
+    font-size: 30px;
   }
 
   .apple-subtitle {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .metric-label {
