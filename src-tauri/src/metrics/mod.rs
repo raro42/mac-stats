@@ -175,16 +175,8 @@ pub fn can_read_temperature() -> bool {
         }
     }
     
-    // Fallback: check ACCESS_CACHE (one-time check, cached permanently)
-    if let Ok(mut cache) = ACCESS_CACHE.try_lock() {
-        if let Some((temp, _, _, _)) = cache.as_ref() {
-            debug3!("can_read_temperature: {} (from ACCESS_CACHE)", *temp);
-            return *temp;
-        }
-        
-        // First time check - try SMC (only once)
-        // Even if SMC returns 0.0, the connection succeeded, so we "can read" it
-        // (it just means the Mac model doesn't expose temperature via standard keys)
+    // OPTIMIZATION Phase 3: Use OnceLock for faster access (no locking required)
+    *CAN_READ_TEMPERATURE.get_or_init(|| {
         debug2!("can_read_temperature: First time check - trying SMC connection...");
         let can_read = if let Ok(mut smc) = Smc::connect() {
             // Connection succeeded - we can attempt to read (even if it returns 0.0)
@@ -205,21 +197,10 @@ pub fn can_read_temperature() -> bool {
             debug2!("SMC connection failed - can_read_temperature=false");
             false
         };
-        
-        // Cache the result permanently
-        if let Some((_, freq, cpu_power, gpu_power)) = cache.as_ref() {
-            *cache = Some((can_read, *freq, *cpu_power, *gpu_power));
-        } else {
-            *cache = Some((can_read, false, false, false));
-        }
-        
+
         debug2!("can_read_temperature: Cached result: {}", can_read);
         can_read
-    } else {
-        // Lock held - return false (non-blocking)
-        debug3!("can_read_temperature: ACCESS_CACHE locked, returning false");
-        false
-    }
+    })
 }
 
 // Get nominal CPU frequency using sysctl (cheap, no sudo required)
@@ -366,75 +347,34 @@ pub fn can_read_frequency() -> bool {
         }
     }
     
-    // Fallback: check ACCESS_CACHE (one-time check, cached permanently)
-    if let Ok(mut cache) = ACCESS_CACHE.try_lock() {
-        if let Some((_, freq, _, _)) = cache.as_ref() {
-            debug3!("can_read_frequency: {} (from ACCESS_CACHE)", *freq);
-            return *freq;
-        }
-        
-        // First time check - try to compute nominal frequency (cheap, no sudo)
+    // OPTIMIZATION Phase 3: Use OnceLock for faster access (no locking required)
+    *CAN_READ_FREQUENCY.get_or_init(|| {
         debug2!("can_read_frequency: First time check - trying nominal frequency computation...");
         let nominal = get_nominal_frequency();
         let can_read = nominal > 0.0;
-        
-        // Cache the result permanently
-        if let Some((temp, _, cpu_power, gpu_power)) = cache.as_ref() {
-            *cache = Some((*temp, can_read, *cpu_power, *gpu_power));
-        } else {
-            *cache = Some((false, can_read, false, false));
-        }
-        
+
         debug2!("can_read_frequency: Cached result: {} (nominal={:.2} GHz)", can_read, nominal);
         can_read
-    } else {
-        // Lock held - return false (non-blocking)
-        debug3!("can_read_frequency: ACCESS_CACHE locked, returning false");
-        false
-    }
+    })
 }
 
 #[allow(dead_code)]
 pub fn can_read_cpu_power() -> bool {
-    // Check cache first
-    let mut cache = ACCESS_CACHE.lock().unwrap();
-    if let Some((_, _, cpu_power, _)) = cache.as_ref() {
-        return *cpu_power;
-    }
-    
-    // IOReport is too expensive - check once and cache
-    // For now, assume false unless we can verify cheaply
-    let can_read = false; // IOReport too expensive to check every time
-    
-    // Update cache
-    if let Some((temp, freq, _, gpu_power)) = cache.as_ref() {
-        *cache = Some((*temp, *freq, can_read, *gpu_power));
-    } else {
-        *cache = Some((false, false, can_read, false));
-    }
-    
-    can_read
+    // OPTIMIZATION Phase 3: Use OnceLock for faster access (no locking required)
+    *CAN_READ_CPU_POWER.get_or_init(|| {
+        // IOReport is too expensive - check once and cache
+        // For now, assume false unless we can verify cheaply
+        false // IOReport too expensive to check every time
+    })
 }
 
 #[allow(dead_code)]
 pub fn can_read_gpu_power() -> bool {
-    // Check cache first
-    let mut cache = ACCESS_CACHE.lock().unwrap();
-    if let Some((_, _, _, gpu_power)) = cache.as_ref() {
-        return *gpu_power;
-    }
-    
-    // IOReport is too expensive - check once and cache
-    let can_read = false; // IOReport too expensive to check every time
-    
-    // Update cache
-    if let Some((temp, freq, cpu_power, _)) = cache.as_ref() {
-        *cache = Some((*temp, *freq, *cpu_power, can_read));
-    } else {
-        *cache = Some((false, false, false, can_read));
-    }
-    
-    can_read
+    // OPTIMIZATION Phase 3: Use OnceLock for faster access (no locking required)
+    *CAN_READ_GPU_POWER.get_or_init(|| {
+        // IOReport is too expensive - check once and cache
+        false // IOReport too expensive to check every time
+    })
 }
 
 #[tauri::command]
@@ -890,25 +830,13 @@ pub fn get_cpu_details() -> CpuDetails {
 
     // CRITICAL: Use cached values or defaults - don't call expensive functions
     // SMC calls and other operations can block the main thread
-    // Use try_lock for cache access too
+    // OPTIMIZATION Phase 3: Use OnceLock for fast capability flag access (no locking)
     let (temperature, frequency, p_core_frequency, e_core_frequency, cpu_power, gpu_power, chip_info, can_read_temperature, can_read_frequency, can_read_cpu_power, can_read_gpu_power) = {
-        // Try to get cached access flags without blocking
-        let (_can_read_temp, can_read_freq, can_read_cpu_p, can_read_gpu_p) = match ACCESS_CACHE.try_lock() {
-            Ok(mut access_cache) => {
-                if let Some(cached) = access_cache.as_ref() {
-                    *cached
-                } else {
-                    // First time - use defaults, don't check (expensive)
-                    let result = (false, false, false, false);
-                    *access_cache = Some(result);
-                    result
-                }
-            },
-            Err(_) => {
-                // Cache locked - return defaults
-                (false, false, false, false)
-            }
-        };
+        // Get cached access flags (fast OnceLock access, no blocking)
+        let _can_read_temp = CAN_READ_TEMPERATURE.get().copied().unwrap_or(false);
+        let can_read_freq = CAN_READ_FREQUENCY.get().copied().unwrap_or(false);
+        let can_read_cpu_p = CAN_READ_CPU_POWER.get().copied().unwrap_or(false);
+        let can_read_gpu_p = CAN_READ_GPU_POWER.get().copied().unwrap_or(false);
         
         // CRITICAL: Read temperature from cache (updated by background thread)
         // Non-blocking read - returns 0.0 if cache is locked or stale
