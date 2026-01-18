@@ -4,11 +4,6 @@ A lightweight system monitor for macOS built with Rust and Tauri.
 
 <img src="screens/apple.png" alt="mac-stats Apple Theme" width="400">
 
-
-The menubar shows:
-
-![mac-stats Menu Bar](screen_actual/menu-bar.png)
-
 ## Inspiration
 
 This project is inspired by [Stats](https://github.com/exelban/stats) by [exelban](https://github.com/exelban), a popular macOS system monitor with 35.8k+ stars.
@@ -120,13 +115,27 @@ Use launchd or add to Login Items manually.
 - ✅ System resource monitoring (CPU, RAM, Disk, GPU)
 - ✅ Low CPU usage optimizations
 
-### Screenshots
+### Theme Gallery
 
-Screenshots of the app in action are available in:
-- `screens/` - Theme previews
-- `screen-what-i-see/` - Development screenshots
+mac-stats comes with 9 beautiful, customizable themes:
 
-> **Note:** Screenshots will be added to `docs/screenshots/` as the project progresses.
+<table>
+<tr>
+<td><strong>Apple</strong><br><img src="screens/apple.png" alt="Apple Theme" width="300"></td>
+<td><strong>Architect</strong><br><img src="screens/architect.png" alt="Architect Theme" width="300"></td>
+<td><strong>Data Poster</strong><br><img src="screens/data-poster.png" alt="Data Poster Theme" width="300"></td>
+</tr>
+<tr>
+<td><strong>Dark (TUI)</strong><br><img src="screens/dark-tui.png" alt="Dark TUI Theme" width="300"></td>
+<td><strong>Futuristic</strong><br><img src="screens/futuristic.png" alt="Futuristic Theme" width="300"></td>
+<td><strong>Light</strong><br><img src="screens/light.png" alt="Light Theme" width="300"></td>
+</tr>
+<tr>
+<td><strong>Material</strong><br><img src="screens/material.png" alt="Material Theme" width="300"></td>
+<td><strong>Neon</strong><br><img src="screens/neon.png" alt="Neon Theme" width="300"></td>
+<td><strong>Swiss Minimalistic</strong><br><img src="screens/swiss-minimalistic.png" alt="Swiss Minimalistic Theme" width="300"></td>
+</tr>
+</table>
 
 ### Planned Features
 
