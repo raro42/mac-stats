@@ -116,6 +116,66 @@
     });
   }
 
+  function initWindowDecorations() {
+    const toggle = document.getElementById("window-decorations-toggle");
+    if (!toggle) return;
+
+    // Load saved preference from Tauri command (reads from config file)
+    async function loadPreference() {
+      try {
+        if (window.__TAURI__?.invoke) {
+          const decorations = await window.__TAURI__.invoke("get_window_decorations");
+          toggle.checked = decorations;
+          // Also sync to localStorage for consistency
+          localStorage.setItem("windowDecorations", decorations.toString());
+        } else {
+          // Fallback to localStorage if Tauri not available
+          const saved = localStorage.getItem("windowDecorations");
+          const decorations = saved !== null ? saved === "true" : true;
+          toggle.checked = decorations;
+        }
+      } catch (err) {
+        console.error("Failed to load window decorations preference:", err);
+        // Fallback to localStorage
+        const saved = localStorage.getItem("windowDecorations");
+        const decorations = saved !== null ? saved === "true" : true;
+        toggle.checked = decorations;
+      }
+    }
+
+    // Save preference when toggled
+    toggle.addEventListener("change", async (e) => {
+      const enabled = e.target.checked;
+      
+      // Save to localStorage for immediate UI feedback
+      localStorage.setItem("windowDecorations", enabled.toString());
+      
+      // Save to config file via Tauri command (works without recompiling)
+      try {
+        if (window.__TAURI__?.invoke) {
+          await window.__TAURI__.invoke("set_window_decorations", { decorations: enabled });
+          console.log(`Window decorations preference saved: ${enabled}`);
+        }
+      } catch (err) {
+        console.error("Failed to save window decorations preference:", err);
+      }
+      
+      // Show a message that the change will take effect on next window open
+      const label = toggle.parentElement?.querySelector('.toggle-label');
+      if (label) {
+        const originalText = label.textContent;
+        label.textContent = "Close & reopen window to apply";
+        setTimeout(() => {
+          label.textContent = originalText;
+        }, 3000);
+      } else {
+        console.warn("Could not find toggle-label element to show message");
+      }
+    });
+
+    loadPreference();
+  }
+
   function initExternalLinks() {
     const githubLink = document.getElementById("github-link");
     if (!githubLink) return;
@@ -181,6 +241,7 @@
     initThemePicker();
     initRefresh();
     initExternalLinks();
+    initWindowDecorations();
     injectAppVersion();
   }
 

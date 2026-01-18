@@ -10,16 +10,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **App Version Display**: Added version number display in footer of all HTML templates
 - **Version API**: Added `get_app_version` Tauri command to fetch version at runtime
+- **Window Decorations Toggle**: Added window frame toggle in settings (affects new windows)
+- **Config File Support**: Added persistent configuration file (`~/.mac-stats/config.json`) for window decorations preference
+- **Toggle Switch Component**: Added modern toggle switch styling to all themes
 - **GitHub Actions Workflow**: Automated DMG build and release on GitHub
 - **Build Script**: Added `scripts/build-dmg.sh` for local DMG creation
 - **DMG Download Section**: Added download instructions to README with Gatekeeper bypass steps
 
 ### Changed
 - **Theme Improvements**: Massively improved all themes with better styling and visual consistency
+- **Data Poster Theme**: Improved Details section styling to match Processes section (flex layout, consistent font sizes and weights)
 - **Metric Unit Styling**: Improved metric unit display (%, GHz) with better font sizing and positioning
 - **CPU Usage Display**: Fixed CPU usage value updates to properly maintain HTML structure with unit spans
 - **Frequency Display**: Enhanced frequency display to include unit (GHz) with proper formatting
 - **HTTPS Support**: Changed git clone URLs from SSH to HTTPS for better accessibility
+- **Window Creation**: CPU window now respects window decorations preference from config file
 
 ### Fixed
 - **Build Configuration**: Fixed Tauri build configuration (custom-protocol feature, bundle settings)
@@ -30,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 - **README Updates**: Added comprehensive DMG download instructions with Gatekeeper bypass methods
+- **Known Limitations**: Added note about window frame toggle behavior (affects new windows only)
 - **Installation Guide**: Improved installation section with multiple options and troubleshooting
 
 ## [0.0.3] - 2026-01-18

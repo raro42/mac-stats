@@ -40,6 +40,10 @@ This project was developed through "vibe coding" - building features iteratively
 - Modern, customizable UI themes
 - Low CPU usage: ~0.5% idle, <1% when CPU window is open
 
+### Known Limitations
+
+- **Window Frame Toggle**: The "Window Frame" setting in the settings modal affects newly created windows. Existing windows will not update their decorations until they are closed and reopened. The preference is saved to `~/.mac-stats/config.json` and persists across app restarts.
+
 ## Installation
 
 ### Download DMG (Recommended)
