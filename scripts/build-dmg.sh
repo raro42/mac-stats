@@ -20,12 +20,15 @@ fi
 cargo tauri build --bundles dmg
 
 # Show the result
-DMG_PATH="target/release/bundle/dmg/mac-stats_*.dmg"
-if ls $DMG_PATH 1> /dev/null 2>&1; then
+DMG_DIR="target/release/bundle/dmg"
+DMG_FILES=($DMG_DIR/mac-stats_*.dmg(N))
+
+if [[ ${#DMG_FILES[@]} -gt 0 ]]; then
+    DMG_FILE="${DMG_FILES[1]}"
     echo ""
     echo "✅ DMG created successfully!"
-    echo "Location: $(ls -1 $DMG_PATH | head -1)"
-    ls -lh $DMG_PATH | head -1
+    echo "Location: $DMG_FILE"
+    ls -lh "$DMG_FILE"
 else
     echo "❌ DMG not found. Build may have failed."
     exit 1
