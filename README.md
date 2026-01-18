@@ -34,12 +34,16 @@ This project was developed through "vibe coding" - building features iteratively
 
 ## Installation
 
-1. Clone the repo.
-2. Run `./run` (builds and starts the app).
-
-One-liner to fetch the launcher:
+Top choice (no clone needed):
 ```bash
-curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/refs/heads/main/run -o run && chmod +x run
+curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/refs/heads/main/run -o run && chmod +x run && ./run
+```
+
+Clone the repo (optional):
+```bash
+git clone git@github.com:raro42/mac-stats.git
+cd mac-stats
+./run
 ```
 
 Run from anywhere (clones the repo if needed):
