@@ -11,6 +11,9 @@ jobs:
   build-dmg:
     runs-on: macos-latest
     
+    permissions:
+      contents: write
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,8 +31,11 @@ jobs:
         run: cargo tauri build
 
       - name: Upload DMG to release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           files: src-tauri/target/release/bundle/dmg/*.dmg
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

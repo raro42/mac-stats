@@ -42,6 +42,14 @@ This project was developed through "vibe coding" - building features iteratively
 
 ## Installation
 
+### Download DMG (Recommended)
+
+Download the latest release DMG from [GitHub Releases](https://github.com/raro42/mac-stats/releases/latest).
+
+Simply download the `.dmg` file, open it, and drag `mac-stats.app` to your Applications folder.
+
+### Build from Source
+
 Top choice (no clone needed):
 ```bash
 curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/refs/heads/main/run -o run && chmod +x run && ./run
