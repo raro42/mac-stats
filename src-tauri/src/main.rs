@@ -27,21 +27,21 @@ fn main() {
     let verbosity = if args.verbose > 3 { 3 } else { args.verbose };
     
     // Initialize tracing (structured logging) using config module
-    use mac_stats_lib::config::Config;
+    use mac_stats::config::Config;
     Config::ensure_log_directory().ok(); // Create log directory if needed
     let log_path = Config::log_file_path();
-    mac_stats_lib::init_tracing(verbosity, Some(log_path));
+    mac_stats::init_tracing(verbosity, Some(log_path));
     
     // Also set legacy verbosity for compatibility during migration
-    mac_stats_lib::set_verbosity(verbosity);
+    mac_stats::set_verbosity(verbosity);
     
     // Set frequency logging flag
-    mac_stats_lib::set_frequency_logging(args.frequency);
+    mac_stats::set_frequency_logging(args.frequency);
     
     // If -cpu flag is set, open window directly after a short delay
     if args.open_cpu {
-        mac_stats_lib::run_with_cpu_window()
+        mac_stats::run_with_cpu_window()
     } else {
-        mac_stats_lib::run()
+        mac_stats::run()
     }
 }

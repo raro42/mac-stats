@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build-dmg:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^1.0"
+
+      - name: Build Tauri app
+        working-directory: ./src-tauri
+        run: cargo tauri build
+
+      - name: Upload DMG to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: src-tauri/target/release/bundle/dmg/*.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
