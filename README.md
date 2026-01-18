@@ -49,7 +49,7 @@ curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/refs/heads/main/ru
 
 Clone the repo (optional):
 ```bash
-git clone git@github.com:raro42/mac-stats.git
+git clone https://github.com/raro42/mac-stats.git
 cd mac-stats
 ./run
 ```
