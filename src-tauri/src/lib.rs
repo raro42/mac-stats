@@ -365,8 +365,13 @@ fn run_internal(open_cpu_window: bool) {
                                             }
                                             
                                             // Store channels dictionary for sampling (needed for IOReportCreateSamples)
+                                            // Retain the dictionary to avoid use-after-free crashes
+                                            #[link(name = "CoreFoundation", kind = "framework")]
+                                            extern "C" {
+                                                fn CFRetain(cf: CFTypeRef) -> CFTypeRef;
+                                            }
+                                            CFRetain(channels_mut.as_concrete_TypeRef() as CFTypeRef);
                                             if let Ok(mut channels_storage) = IOREPORT_CHANNELS.try_lock() {
-                                                // Store the channels_mut dictionary pointer
                                                 *channels_storage = Some(channels_mut.as_concrete_TypeRef() as usize);
                                             }
                                             
@@ -531,14 +536,7 @@ fn run_internal(open_cpu_window: bool) {
                             let mut e_core_freq: f32 = 0.0;
                             
                             // Try IOReport first (real-time frequency via native API)
-                            // CRITICAL: IOReport crashes with NSInvalidArgumentException when iterating samples
-                            // Temporarily disabled to prevent crashes - will re-enable after fixing
-                            // The crash happens inside IOReport's internal _iterate function
-                            // TODO: Fix IOReport sample iteration or use alternative frequency reading method
-                            let ioreport_disabled = true; // Temporarily disable to prevent crashes
-                            
-                            if !ioreport_disabled {
-                                if let Ok(sub) = IOREPORT_SUBSCRIPTION.try_lock() {
+                            if let Ok(sub) = IOREPORT_SUBSCRIPTION.try_lock() {
                                 if let Some(subscription_usize) = sub.as_ref() {
                                     let subscription_ptr = *subscription_usize as *mut c_void;
                                     
@@ -1146,15 +1144,6 @@ extern "C" {
                                 } else {
                                     debug3!("IOReport subscription not available");
                                 }
-                            } else {
-                                debug3!("IOReport is disabled (due to crashes), skipping frequency reading");
-                            }
-                            
-                            // Fallback: Use nominal frequency if IOReport is disabled
-                            if freq == 0.0 && ioreport_disabled {
-                                freq = crate::metrics::get_nominal_frequency();
-                                debug2!("Using nominal frequency as fallback (IOReport disabled due to crashes)");
-                            }
                         } else {
                             debug3!("should_read_freq=false, skipping frequency update");
                         }
@@ -1232,7 +1221,16 @@ extern "C" {
                                 debug2!("CPU window closed, IOReport subscription cleared");
                                 
                                 // Clear channels dictionary
+                                #[link(name = "CoreFoundation", kind = "framework")]
+                                extern "C" {
+                                    fn CFRelease(cf: CFTypeRef);
+                                }
                                 if let Ok(mut channels_storage) = IOREPORT_CHANNELS.try_lock() {
+                                    if let Some(ptr) = *channels_storage {
+                                        unsafe {
+                                            CFRelease(ptr as CFTypeRef);
+                                        }
+                                    }
                                     *channels_storage = None;
                                 }
                                 
