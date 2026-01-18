@@ -7,7 +7,7 @@
 
 (function () {
   function getSavedTheme() {
-    return localStorage.getItem("theme") || "light";
+    return localStorage.getItem("theme") || "apple";
   }
 
   function getThemeBasePath() {

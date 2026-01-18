@@ -1,21 +1,25 @@
 [package]
 name = "mac_stats"
-version = "0.0.2"
+version = "0.0.3"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+custom-protocol = ["tauri/custom-protocol"]
+
 [build-dependencies]
 tauri-build = { version = "1", features = [] }
 
 [lib]
-name = "mac_stats_lib"
-crate-type = ["staticlib", "cdylib", "rlib"]
+name = "mac_stats"
+path = "src/lib.rs"
+crate-type = ["rlib"]
 
 [[bin]]
-name = "mac-stats-backend"
+name = "mac_stats"
 path = "src/main.rs"
 
 [dependencies]
