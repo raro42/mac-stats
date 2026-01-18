@@ -531,7 +531,14 @@ fn run_internal(open_cpu_window: bool) {
                             let mut e_core_freq: f32 = 0.0;
                             
                             // Try IOReport first (real-time frequency via native API)
-                            if let Ok(sub) = IOREPORT_SUBSCRIPTION.try_lock() {
+                            // CRITICAL: IOReport crashes with NSInvalidArgumentException when iterating samples
+                            // Temporarily disabled to prevent crashes - will re-enable after fixing
+                            // The crash happens inside IOReport's internal _iterate function
+                            // TODO: Fix IOReport sample iteration or use alternative frequency reading method
+                            let ioreport_disabled = true; // Temporarily disable to prevent crashes
+                            
+                            if !ioreport_disabled {
+                                if let Ok(sub) = IOREPORT_SUBSCRIPTION.try_lock() {
                                 if let Some(subscription_usize) = sub.as_ref() {
                                     let subscription_ptr = *subscription_usize as *mut c_void;
                                     
@@ -1140,8 +1147,17 @@ extern "C" {
                                     debug3!("IOReport subscription not available");
                                 }
                             } else {
-                                debug3!("should_read_freq=false, skipping frequency update");
+                                debug3!("IOReport is disabled (due to crashes), skipping frequency reading");
                             }
+                            
+                            // Fallback: Use nominal frequency if IOReport is disabled
+                            if freq == 0.0 && ioreport_disabled {
+                                freq = crate::metrics::get_nominal_frequency();
+                                debug2!("Using nominal frequency as fallback (IOReport disabled due to crashes)");
+                            }
+                        } else {
+                            debug3!("should_read_freq=false, skipping frequency update");
+                        }
                             
                             // CRITICAL: Only use nominal frequency as fallback if IOReport completely failed
                             // If IOReport returned 0.0, it means parsing failed - don't overwrite cache with nominal
