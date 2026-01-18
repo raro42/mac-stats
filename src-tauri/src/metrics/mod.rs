@@ -545,6 +545,13 @@ pub fn get_metrics() -> SystemMetrics {
     metrics
 }
 
+/// Get application version from Cargo.toml
+/// This is called by the frontend to always display the correct version
+#[tauri::command]
+pub fn get_app_version() -> String {
+    crate::config::Config::version()
+}
+
 #[tauri::command]
 pub fn get_cpu_details() -> CpuDetails {
     // STEP 5: Rate limiting - prevent get_cpu_details from being called too frequently

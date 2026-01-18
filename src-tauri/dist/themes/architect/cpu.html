@@ -17,9 +17,9 @@
         <div class="arch-actions">
           <button id="refresh-btn" class="icon-btn" title="Refresh">↻</button>
           <button id="settings-btn" class="icon-btn" title="Settings">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"></circle>
-              <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364l-4.243-4.243m-4.242 0l-4.243 4.243m0-8.485l4.243 4.243m4.242 0l4.243-4.243"></path>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
           </button>
         </div>
@@ -33,19 +33,19 @@
           <div class="metric-value" id="temperature-value">0°</div>
           <div class="metric-subtext" id="temperature-subtext">—</div>
           <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
-            <circle class="ring-track" cx="50" cy="50" r="42" />
-            <circle class="ring-progress" id="temperature-ring-progress" cx="50" cy="50" r="42" />
+            <path class="ring-track" d="M 15.2 72.4 A 38 38 0 1 1 84.8 72.4" />
+            <path class="ring-progress" id="temperature-ring-progress" d="M 15.2 72.4 A 38 38 0 1 1 84.8 72.4" pathLength="264" style="stroke-dashoffset: 264;" />
           </svg>
           <div class="metric-hint" id="temperature-hint" style="display: none;">Requires root privileges</div>
         </div>
 
         <div class="metric-box">
           <div class="metric-label">Usage</div>
-          <div class="metric-value" id="cpu-usage-value">0%</div>
+          <div class="metric-value" id="cpu-usage-value">0<span class="metric-unit">%</span></div>
           <div class="metric-subtext" id="cpu-usage-subtext">—</div>
           <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
-            <circle class="ring-track" cx="50" cy="50" r="42" />
-            <circle class="ring-progress" id="cpu-usage-ring-progress" cx="50" cy="50" r="42" />
+            <path class="ring-track" d="M 15.2 72.4 A 38 38 0 1 1 84.8 72.4" />
+            <path class="ring-progress" id="cpu-usage-ring-progress" d="M 15.2 72.4 A 38 38 0 1 1 84.8 72.4" pathLength="264" style="stroke-dashoffset: 264;" />
           </svg>
         </div>
 
@@ -54,10 +54,22 @@
           <div class="metric-value" id="frequency-value">—</div>
           <div class="metric-subtext" id="frequency-subtext">—</div>
           <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
-            <circle class="ring-track" cx="50" cy="50" r="42" />
-            <circle class="ring-progress" id="frequency-ring-progress" cx="50" cy="50" r="42" />
+            <path class="ring-track" d="M 15.2 72.4 A 38 38 0 1 1 84.8 72.4" />
+            <path class="ring-progress" id="frequency-ring-progress" d="M 15.2 72.4 A 38 38 0 1 1 84.8 72.4" pathLength="264" style="stroke-dashoffset: 264;" />
           </svg>
           <div class="metric-hint" id="frequency-hint" style="display: none;">Requires root privileges</div>
+        </div>
+      </section>
+
+      <section class="history-section">
+        <div class="history-chart-container">
+          <canvas class="history-chart" id="temperature-history-chart" width="200" height="40"></canvas>
+        </div>
+        <div class="history-chart-container">
+          <canvas class="history-chart" id="usage-history-chart" width="200" height="40"></canvas>
+        </div>
+        <div class="history-chart-container">
+          <canvas class="history-chart" id="frequency-history-chart" width="200" height="40"></canvas>
         </div>
       </section>
 
@@ -76,16 +88,10 @@
           <div class="detail-value" id="load-15">0.0</div>
 
           <div class="detail-label">CPU Power</div>
-          <div class="detail-value">
-            <span id="cpu-power">0.0 W</span>
-            <div class="metric-hint" id="cpu-power-hint" style="display: none;">Requires root privileges</div>
-          </div>
+          <div class="detail-value" id="cpu-power">0.0 W</div>
 
           <div class="detail-label">GPU Power</div>
-          <div class="detail-value">
-            <span id="gpu-power">0.0 W</span>
-            <div class="metric-hint" id="gpu-power-hint" style="display: none;">Requires root privileges</div>
-          </div>
+          <div class="detail-value" id="gpu-power">0.0 W</div>
 
           <div class="detail-label">Uptime</div>
           <div class="detail-value" id="uptime-value">0h</div>
@@ -98,6 +104,11 @@
         <h2 class="section-title">Top Processes</h2>
         <div class="process-table" id="process-list"></div>
       </section>
+
+      <footer class="arch-footer">
+        <span class="arch-version">Architect v0.0.3</span>
+        <a href="https://github.com/raro42/mac-stats" target="_blank" rel="noopener noreferrer" class="arch-github-link" id="github-link">GitHub</a>
+      </footer>
     </main>
 
     <div id="settings-modal" class="settings-modal" style="display: none;">
@@ -127,5 +138,6 @@
 
     <script src="../../cpu.js"></script>
     <script src="../../cpu-ui.js"></script>
+    <script src="./architect-history.js"></script>
   </body>
 </html>

@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.4] - 2026-01-18
+
+### Added
+- **App Version Display**: Added version number display in footer of all HTML templates
+- **Version API**: Added `get_app_version` Tauri command to fetch version at runtime
+- **GitHub Actions Workflow**: Automated DMG build and release on GitHub
+- **Build Script**: Added `scripts/build-dmg.sh` for local DMG creation
+- **DMG Download Section**: Added download instructions to README with Gatekeeper bypass steps
+
+### Changed
+- **Theme Improvements**: Massively improved all themes with better styling and visual consistency
+- **Metric Unit Styling**: Improved metric unit display (%, GHz) with better font sizing and positioning
+- **CPU Usage Display**: Fixed CPU usage value updates to properly maintain HTML structure with unit spans
+- **Frequency Display**: Enhanced frequency display to include unit (GHz) with proper formatting
+- **HTTPS Support**: Changed git clone URLs from SSH to HTTPS for better accessibility
+
+### Fixed
+- **Build Configuration**: Fixed Tauri build configuration (custom-protocol feature, bundle settings)
+- **Binary Naming**: Fixed binary name from `mac-stats-backend` to `mac_stats` to match package name
+- **DMG Detection**: Fixed build-dmg.sh script to properly detect DMG files using zsh array expansion
+- **Release Workflow**: Fixed GitHub Actions workflow to properly upload DMG files to releases
+- **Version Fetching**: Fixed duplicate command definition by moving `get_app_version` to metrics module
+
+### Documentation
+- **README Updates**: Added comprehensive DMG download instructions with Gatekeeper bypass methods
+- **Installation Guide**: Improved installation section with multiple options and troubleshooting
+
+## [0.0.3] - 2026-01-18
+
+### Added
+- **DMG Build Support**: Added DMG bundle creation for macOS distribution
+- **GitHub Actions**: Added automated release workflow for building and publishing DMG files
+
+### Changed
+- **Version**: Bumped to 0.0.3
+
 ## [0.0.2] - 2026-01-18
 
 ### Fixed

@@ -304,6 +304,46 @@ async function refresh() {
     }
     // Always update ring gauge (it handles first paint and change detection internally)
     updateRingGauge("temperature-ring-progress", Math.min(100, data.temperature), 'temperature');
+    
+    // Update data-poster charts if available
+    if (window.posterCharts && data.can_read_temperature && data.temperature > 0) {
+      window.posterCharts.updateTemperature(data.temperature);
+    }
+    
+    // Update dark theme history charts if available
+    if (window.darkHistory && data.can_read_temperature && data.temperature > 0) {
+      window.darkHistory.updateTemperature(data.temperature);
+    }
+    
+    // Update light theme history charts if available
+    if (window.lightHistory && data.can_read_temperature && data.temperature > 0) {
+      window.lightHistory.updateTemperature(data.temperature);
+    }
+    
+    // Update futuristic theme history charts if available
+    if (window.futuristicHistory && data.can_read_temperature && data.temperature > 0) {
+      window.futuristicHistory.updateTemperature(data.temperature);
+    }
+    
+    // Update material theme history charts if available
+    if (window.materialHistory && data.can_read_temperature && data.temperature > 0) {
+      window.materialHistory.updateTemperature(data.temperature);
+    }
+    
+    // Update neon theme history charts if available
+    if (window.neonHistory && data.can_read_temperature && data.temperature > 0) {
+      window.neonHistory.updateTemperature(data.temperature);
+    }
+    
+    // Update swiss theme history charts if available
+    if (window.swissHistory && data.can_read_temperature && data.temperature > 0) {
+      window.swissHistory.updateTemperature(data.temperature);
+    }
+    
+    // Update architect theme history charts if available
+    if (window.architectHistory && data.can_read_temperature && data.temperature > 0) {
+      window.architectHistory.updateTemperature(data.temperature);
+    }
 
     // Update CPU usage
     const cpuUsageEl = document.getElementById("cpu-usage-value");
@@ -311,16 +351,13 @@ async function refresh() {
     // Always show usage as percentage, even if 0 (don't show "-")
     const newUsage = Math.max(0, Math.round(data.usage || 0));
     const numberText = `${newUsage}`;
-    const currentText = cpuUsageEl.childNodes[0]?.textContent || "";
+    // Check if we need to update (extract number from current content)
+    const currentText = cpuUsageEl.textContent.match(/^\d+/) ? cpuUsageEl.textContent.match(/^\d+/)[0] : "";
     
     if (currentText !== numberText) {
       scheduleDOMUpdate(() => {
-        // Update the number part, keep the % span
-        if (cpuUsageEl.childNodes[0]) {
-          cpuUsageEl.childNodes[0].textContent = numberText;
-        } else {
-          cpuUsageEl.innerHTML = `${numberText}<span class="metric-unit">%</span>`;
-        }
+        // Always rebuild with the correct structure: number + span
+        cpuUsageEl.innerHTML = `${numberText}<span class="metric-unit">%</span>`;
       });
       previousValues.usage = newUsage;
     }
@@ -334,6 +371,46 @@ async function refresh() {
     
     // Always update ring gauge (it handles first paint and change detection internally)
     updateRingGauge("cpu-usage-ring-progress", data.usage, 'usage');
+    
+    // Update data-poster charts if available
+    if (window.posterCharts) {
+      window.posterCharts.updateUsage(data.usage);
+    }
+    
+    // Update dark theme history charts if available
+    if (window.darkHistory) {
+      window.darkHistory.updateUsage(data.usage);
+    }
+    
+    // Update light theme history charts if available
+    if (window.lightHistory) {
+      window.lightHistory.updateUsage(data.usage);
+    }
+    
+    // Update futuristic theme history charts if available
+    if (window.futuristicHistory) {
+      window.futuristicHistory.updateUsage(data.usage);
+    }
+    
+    // Update material theme history charts if available
+    if (window.materialHistory) {
+      window.materialHistory.updateUsage(data.usage);
+    }
+    
+    // Update neon theme history charts if available
+    if (window.neonHistory) {
+      window.neonHistory.updateUsage(data.usage);
+    }
+    
+    // Update swiss theme history charts if available
+    if (window.swissHistory) {
+      window.swissHistory.updateUsage(data.usage);
+    }
+    
+    // Update architect theme history charts if available
+    if (window.architectHistory) {
+      window.architectHistory.updateUsage(data.usage);
+    }
 
     // Update frequency
     const freqEl = document.getElementById("frequency-value");
@@ -342,9 +419,9 @@ async function refresh() {
     
     if (!data.can_read_frequency) {
       failedAttempts.frequency++;
-      if (freqEl.textContent !== "—") {
+      if (!freqEl.textContent.includes("—")) {
         scheduleDOMUpdate(() => {
-          freqEl.textContent = "—";
+          freqEl.innerHTML = "—<span class=\"metric-unit\">GHz</span>";
           freqSubtext.textContent = "—";
         });
       }
@@ -363,9 +440,13 @@ async function refresh() {
         });
       }
       const formatted = data.frequency.toFixed(1);
-      if (freqEl.textContent !== formatted) {
+      // Check if we need to update (extract number from current content)
+      const currentFreqText = freqEl.textContent.match(/[\d.]+/) ? freqEl.textContent.match(/[\d.]+/)[0] : "";
+      
+      if (currentFreqText !== formatted) {
         scheduleDOMUpdate(() => {
-          freqEl.textContent = formatted;
+          // Always rebuild with the correct structure: number + span
+          freqEl.innerHTML = `${formatted}<span class="metric-unit">GHz</span>`;
         });
         previousValues.frequency = data.frequency;
       }
@@ -393,6 +474,46 @@ async function refresh() {
     }
     // Always update ring gauge (it handles first paint and change detection internally)
     updateRingGauge("frequency-ring-progress", Math.min(100, (data.frequency / 5.0) * 100), 'frequency');
+    
+      // Update data-poster charts if available
+      if (window.posterCharts && data.frequency > 0) {
+        window.posterCharts.updateFrequency(data.frequency);
+      }
+      
+      // Update dark theme history charts if available
+      if (window.darkHistory && data.frequency > 0) {
+        window.darkHistory.updateFrequency(data.frequency);
+      }
+      
+      // Update light theme history charts if available
+      if (window.lightHistory && data.frequency > 0) {
+        window.lightHistory.updateFrequency(data.frequency);
+      }
+      
+      // Update futuristic theme history charts if available
+      if (window.futuristicHistory && data.frequency > 0) {
+        window.futuristicHistory.updateFrequency(data.frequency);
+      }
+      
+      // Update material theme history charts if available
+      if (window.materialHistory && data.frequency > 0) {
+        window.materialHistory.updateFrequency(data.frequency);
+      }
+      
+      // Update neon theme history charts if available
+      if (window.neonHistory && data.frequency > 0) {
+        window.neonHistory.updateFrequency(data.frequency);
+      }
+      
+      // Update swiss theme history charts if available
+      if (window.swissHistory && data.frequency > 0) {
+        window.swissHistory.updateFrequency(data.frequency);
+      }
+      
+      // Update architect theme history charts if available
+      if (window.architectHistory && data.frequency > 0) {
+        window.architectHistory.updateFrequency(data.frequency);
+      }
 
     // Update uptime
     const uptimeEl = document.getElementById("uptime-value");
@@ -433,28 +554,18 @@ async function refresh() {
 
     // Update power consumption (simple updates)
     const cpuPowerEl = document.getElementById("cpu-power");
-    const cpuPowerHint = document.getElementById("cpu-power-hint");
     if (!data.can_read_cpu_power) {
       failedAttempts.cpuPower++;
-      if (cpuPowerEl.textContent !== "0.0 W") {
-        scheduleDOMUpdate(() => {
-          cpuPowerEl.textContent = "0.0 W";
-        });
-      }
       // Only show hint after multiple failed attempts
       const shouldShowHint = failedAttempts.cpuPower >= FAILED_ATTEMPTS_THRESHOLD;
-      if (cpuPowerHint.style.display !== (shouldShowHint ? "block" : "none")) {
+      const displayText = shouldShowHint ? "Requires root privileges" : "0.0 W";
+      if (cpuPowerEl.textContent !== displayText) {
         scheduleDOMUpdate(() => {
-          cpuPowerHint.style.display = shouldShowHint ? "block" : "none";
+          cpuPowerEl.textContent = displayText;
         });
       }
     } else {
       failedAttempts.cpuPower = 0;
-      if (cpuPowerHint.style.display !== "none") {
-        scheduleDOMUpdate(() => {
-          cpuPowerHint.style.display = "none";
-        });
-      }
       const formatted = `${data.cpu_power.toFixed(2)} W`;
       if (cpuPowerEl.textContent !== formatted) {
         scheduleDOMUpdate(() => {
@@ -465,28 +576,18 @@ async function refresh() {
     }
 
     const gpuPowerEl = document.getElementById("gpu-power");
-    const gpuPowerHint = document.getElementById("gpu-power-hint");
     if (!data.can_read_gpu_power) {
       failedAttempts.gpuPower++;
-      if (gpuPowerEl.textContent !== "0.0 W") {
-        scheduleDOMUpdate(() => {
-          gpuPowerEl.textContent = "0.0 W";
-        });
-      }
       // Only show hint after multiple failed attempts
       const shouldShowHint = failedAttempts.gpuPower >= FAILED_ATTEMPTS_THRESHOLD;
-      if (gpuPowerHint.style.display !== (shouldShowHint ? "block" : "none")) {
+      const displayText = shouldShowHint ? "Requires root privileges" : "0.0 W";
+      if (gpuPowerEl.textContent !== displayText) {
         scheduleDOMUpdate(() => {
-          gpuPowerHint.style.display = shouldShowHint ? "block" : "none";
+          gpuPowerEl.textContent = displayText;
         });
       }
     } else {
       failedAttempts.gpuPower = 0;
-      if (gpuPowerHint.style.display !== "none") {
-        scheduleDOMUpdate(() => {
-          gpuPowerHint.style.display = "none";
-        });
-      }
       const formatted = `${data.gpu_power.toFixed(2)} W`;
       if (gpuPowerEl.textContent !== formatted) {
         scheduleDOMUpdate(() => {
@@ -632,7 +733,50 @@ function initRingGauges() {
 
 // Try multiple initialization strategies
 if (document.readyState === "loading") {
+  // Fetch app version once at startup (no polling for CPU efficiency)
+  let appVersion = null;
+  
+  async function fetchAppVersion() {
+    if (appVersion !== null) {
+      return appVersion; // Already fetched, return cached value
+    }
+    
+    const invoke = getInvoke();
+    if (!invoke) {
+      appVersion = "unknown";
+      return appVersion;
+    }
+    
+    try {
+      appVersion = await invoke("get_app_version");
+      // Set version in all footer elements
+      const versionElements = document.querySelectorAll('.app-version, .theme-version, .arch-version');
+      versionElements.forEach(el => {
+        const text = el.textContent;
+        // Preserve theme name if present (e.g., "Apple v0.0.3" -> "Apple v0.0.4")
+        if (text.includes('v')) {
+          const parts = text.split('v');
+          const themeName = parts[0].trim();
+          if (themeName) {
+            el.textContent = `${themeName} v${appVersion}`;
+          } else {
+            el.textContent = `v${appVersion}`;
+          }
+        } else {
+          el.textContent = `v${appVersion}`;
+        }
+      });
+      return appVersion;
+    } catch (error) {
+      console.error("Error fetching app version:", error);
+      appVersion = "unknown";
+      return appVersion;
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
+    // Fetch version once at startup (no polling)
+    fetchAppVersion();
     initRingGauges();
     init();
   });

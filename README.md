@@ -46,7 +46,23 @@ This project was developed through "vibe coding" - building features iteratively
 
 Download the latest release DMG from [GitHub Releases](https://github.com/raro42/mac-stats/releases/latest).
 
-Simply download the `.dmg` file, open it, and drag `mac-stats.app` to your Applications folder.
+**Important:** If macOS says the DMG is "damaged" or "can't be opened", this is macOS Gatekeeper blocking unsigned applications. This is normal for open-source apps that aren't code-signed. Here's how to fix it:
+
+**Option 1: Right-click method (Easiest)**
+1. **Right-click** (or Control+click) the downloaded DMG file
+2. Select **"Open"** from the context menu
+3. Click **"Open"** in the security dialog that appears
+4. The DMG will now open normally
+
+**Option 2: Terminal method**
+```bash
+# Remove quarantine attribute (replace with your actual DMG path)
+xattr -d com.apple.quarantine ~/Downloads/mac-stats_*.dmg
+
+# Then double-click the DMG to open it
+```
+
+Once the DMG opens, drag `mac-stats.app` to your Applications folder.
 
 ### Build from Source
 
