@@ -37,7 +37,7 @@ This project was developed through "vibe coding" - building features iteratively
 1. Clone the repo.
 2. `cd src-tauri`
 3. `cargo build --release`
-4. Run `./target/release/mac-stats`
+4. Run `./target/release/mac-stats-backend`
 
 ## Auto-start on Login
 
