@@ -265,8 +265,12 @@ async function refresh() {
         
         if (currentText !== numberText) {
           scheduleDOMUpdate(() => {
-            // Always rebuild with the correct structure: number + span
-            tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
+            // OPTIMIZATION Phase 2: Update first text node instead of innerHTML rebuild
+            if (tempEl.firstChild && tempEl.firstChild.nodeType === 3) {
+              tempEl.firstChild.textContent = numberText;
+            } else {
+              tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
+            }
           });
           previousValues.temperature = 0;
         }
@@ -282,8 +286,12 @@ async function refresh() {
         
         if (currentText !== numberText) {
           scheduleDOMUpdate(() => {
-            // Always rebuild with the correct structure: number + span
-            tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
+            // OPTIMIZATION Phase 2: Update first text node instead of innerHTML rebuild
+            if (tempEl.firstChild && tempEl.firstChild.nodeType === 3) {
+              tempEl.firstChild.textContent = numberText;
+            } else {
+              tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
+            }
           });
           previousValues.temperature = newTemp;
         }
@@ -357,8 +365,12 @@ async function refresh() {
     
     if (currentText !== numberText) {
       scheduleDOMUpdate(() => {
-        // Always rebuild with the correct structure: number + span
-        cpuUsageEl.innerHTML = `${numberText}<span class="metric-unit">%</span>`;
+        // OPTIMIZATION Phase 2: Update first text node instead of innerHTML rebuild
+        if (cpuUsageEl.firstChild && cpuUsageEl.firstChild.nodeType === 3) {
+          cpuUsageEl.firstChild.textContent = numberText;
+        } else {
+          cpuUsageEl.innerHTML = `${numberText}<span class="metric-unit">%</span>`;
+        }
       });
       previousValues.usage = newUsage;
     }
@@ -446,8 +458,12 @@ async function refresh() {
       
       if (currentFreqText !== formatted) {
         scheduleDOMUpdate(() => {
-          // Always rebuild with the correct structure: number + span
-          freqEl.innerHTML = `${formatted}<span class="metric-unit">GHz</span>`;
+          // OPTIMIZATION Phase 2: Update first text node instead of innerHTML rebuild
+          if (freqEl.firstChild && freqEl.firstChild.nodeType === 3) {
+            freqEl.firstChild.textContent = formatted;
+          } else {
+            freqEl.innerHTML = `${formatted}<span class="metric-unit">GHz</span>`;
+          }
         });
         previousValues.frequency = data.frequency;
       }
@@ -806,4 +822,14 @@ document.addEventListener("visibilitychange", () => {
       init();
     }
   }
+});
+
+// OPTIMIZATION Phase 2: Cleanup on window unload
+window.addEventListener('beforeunload', () => {
+  ringAnimations.clear();  // Clear animation state map
+  pendingDOMUpdates = [];  // Clear pending updates
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+  }
+  console.log('Cleaned up animation state on window close');
 });

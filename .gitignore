@@ -25,3 +25,10 @@ dist-ssr
 *.sw?
 
 .config.env
+
+# Performance measurement outputs
+performance_*.txt
+performance_*.csv
+cpu-comparison-report-*.txt
+cpu-comparison-data-*.csv
+cpu-comparison-screenshots/

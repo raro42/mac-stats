@@ -204,14 +204,27 @@
   }
 
   async function injectAppVersion() {
+    // OPTIMIZATION Phase 2: Cache app version in localStorage
     // Fetch app version from Rust backend and inject into all version elements
     try {
-      if (!window.__TAURI__?.invoke) {
-        console.warn("Tauri invoke not available, skipping version injection");
-        return;
-      }
+      let version = localStorage.getItem('appVersion');
 
-      const version = await window.__TAURI__.invoke("get_app_version");
+      // If not cached, fetch from backend
+      if (!version) {
+        if (!window.__TAURI__?.invoke) {
+          console.warn("Tauri invoke not available, skipping version injection");
+          return;
+        }
+
+        version = await window.__TAURI__.invoke("get_app_version");
+
+        // Cache for future loads
+        try {
+          localStorage.setItem('appVersion', version);
+        } catch (e) {
+          console.warn("Failed to cache version:", e);
+        }
+      }
 
       // Update all version elements (theme name varies per theme)
       // .theme-version, .arch-version, etc.
