@@ -470,15 +470,24 @@ pub fn click_handler_class() -> &'static AnyClass {
 pub fn show_about_panel() {
     let mtm = MainThreadMarker::new().unwrap();
     let app = NSApplication::sharedApplication(mtm);
-    let name = NSString::from_str("mac_stats");
+    
+    // Use a nicer application name
+    let name = NSString::from_str("mac-stats");
     let version = NSString::from_str(&Config::version());
     let build = NSString::from_str(&Config::build_date());
-    let _authors = NSString::from_str(&Config::authors());
-    let credits_text = NSString::from_str(&format!(
-        "Author: {}\nBuild: {}",
-        Config::authors(), Config::build_date()
-    ));
-    let credits = NSAttributedString::from_nsstring(&credits_text);
+    
+    // Create a nicely formatted credits text with better styling
+    let credits_text = format!(
+        "A lightweight system monitor for macOS\n\n\
+        Built with Rust and Tauri\n\
+        Inspired by Stats by exelban\n\n\
+        Version {}\n\
+        Build: {}\n\n\
+        © 2026",
+        Config::version(),
+        Config::build_date()
+    );
+    let credits = NSAttributedString::from_nsstring(&NSString::from_str(&credits_text));
 
     let keys = unsafe {
         [
