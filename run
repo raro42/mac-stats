@@ -11,7 +11,7 @@ if [[ ! -d "$root_dir/src-tauri" ]]; then
       exit 1
     fi
     echo "Cloning repo to $target_dir ..."
-    git clone --depth 1 git@github.com:raro42/mac-stats.git "$target_dir"
+    git clone --depth 1 https://github.com/raro42/mac-stats.git "$target_dir"
   fi
   root_dir="$target_dir"
 fi
@@ -22,5 +22,5 @@ if [[ "${1:-release}" == "dev" ]]; then
   cargo run
 else
   cargo build --release
-  exec ./target/release/mac-stats-backend
+  exec ./target/release/mac_stats
 fi

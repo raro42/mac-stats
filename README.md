@@ -62,7 +62,7 @@ Run from anywhere (clones the repo if needed):
 Manual steps:
 1. `cd src-tauri`
 2. `cargo build --release`
-3. Run `./target/release/mac-stats-backend`
+3. Run `./target/release/mac_stats`
 
 ## Auto-start on Login
 

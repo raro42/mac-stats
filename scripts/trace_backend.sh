@@ -1,11 +1,11 @@
 #!/bin/bash
-# Script to trace the mac-stats-backend process
+# Script to trace the mac_stats process
 
 # Find the backend process
-PID=$(ps aux | grep -E "mac-stats-backend|mac_stats" | grep -v grep | awk '{print $2}' | head -1)
+PID=$(ps aux | grep -E "mac_stats" | grep -v grep | awk '{print $2}' | head -1)
 
 if [ -z "$PID" ]; then
-    echo "Error: mac-stats-backend process not found"
+    echo "Error: mac_stats process not found"
     echo "Please start the backend first with: sudo cargo run -- --cpu"
     exit 1
 fi
