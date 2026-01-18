@@ -39,7 +39,7 @@ This project was developed through "vibe coding" - building features iteratively
 
 One-liner to fetch the launcher:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/run -o run && chmod +x run
+curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/refs/heads/main/run -o run && chmod +x run
 ```
 
 Manual steps:

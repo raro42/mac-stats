@@ -1,7 +1,7 @@
 #!/bin/zsh
 set -euo pipefail
 
-repo_raw_base="https://raw.githubusercontent.com/raro42/mac-stats/main"
+repo_raw_base="https://raw.githubusercontent.com/raro42/mac-stats/refs/heads/main"
 target="./run"
 source_url="${repo_raw_base}/run"
 
