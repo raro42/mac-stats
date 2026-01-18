@@ -90,17 +90,18 @@ function updateRingGauge(ringId, percent, key) {
   const anim = ringAnimations.get(key);
   const diff = Math.abs(anim.current - targetOffset);
   
-  // STEP 7: If change is very small (<2% of gauge), skip update entirely
+  // STEP 7: If change is very small (<5% of gauge), skip update entirely
+  // OPTIMIZATION Phase 1: Increased from 2% to 5% (human perception threshold)
   // This prevents unnecessary WebKit rendering for imperceptible changes
   // BUT: Always allow updates if current value is at default (CIRCUMFERENCE) - means gauge wasn't painted yet
-  if (diff < (CIRCUMFERENCE * 0.02) && anim.current !== CIRCUMFERENCE) {
+  if (diff < (CIRCUMFERENCE * 0.05) && anim.current !== CIRCUMFERENCE) {
     // Change is too small to be visible - skip update
     return;
   }
   
   // STEP 7: If change is small but visible, update directly without animation
-  // Increased threshold from 10% to 15% to reduce animation frequency
-  if (diff < (CIRCUMFERENCE * 0.15)) {
+  // OPTIMIZATION Phase 1: Increased threshold from 15% to 20% to reduce animation frequency
+  if (diff < (CIRCUMFERENCE * 0.20)) {
     anim.current = targetOffset;
     // Batch this DOM update
     scheduleDOMUpdate(() => {

@@ -800,12 +800,13 @@ pub fn get_cpu_details() -> CpuDetails {
                         Err(_) => None, // Lock held, skip cache check
                     };
                     
-                    // If we have cached data, check if it's still fresh (<5 seconds)
+                    // If we have cached data, check if it's still fresh (<10 seconds)
+                    // OPTIMIZATION Phase 1: Increased from 5s to 10s to reduce process enumeration overhead
                     if let Some((cached_procs, age_secs)) = cached_processes {
-                        if age_secs < 5 {
-                            // Cache is less than 5 seconds old - return immediately
+                        if age_secs < 10 {
+                            // Cache is less than 10 seconds old - return immediately
                             // This prevents blocking and reduces CPU usage
-                            debug2!("Returning cached process list (age: {}s) - refresh every 5s", age_secs);
+                            debug2!("Returning cached process list (age: {}s) - refresh every 10s", age_secs);
                             cached_procs
                         } else {
                             // Cache is stale (>5s) - refresh now
