@@ -35,7 +35,14 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
+          body: |
+            Release ${{ github.ref_name }}
+            
+            See [CHANGELOG.md](https://github.com/raro42/mac-stats/blob/main/CHANGELOG.md) for details.
           files: src-tauri/target/release/bundle/dmg/*.dmg
-          fail_on_unmatched_files: true
+          overwrite_files: true
+          fail_on_unmatched_files: false
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
