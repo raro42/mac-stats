@@ -42,6 +42,11 @@ One-liner to fetch the launcher:
 curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/refs/heads/main/run -o run && chmod +x run
 ```
 
+Run from anywhere (clones the repo if needed):
+```bash
+./run
+```
+
 Manual steps:
 1. `cd src-tauri`
 2. `cargo build --release`

@@ -2,4 +2,25 @@
 set -euo pipefail
 
 root_dir="$(cd "$(dirname "$0")" && pwd)"
-exec "$root_dir/run.sh" "${1:-}"
+
+if [[ ! -d "$root_dir/src-tauri" ]]; then
+  target_dir="${MAC_STATS_DIR:-$PWD/mac-stats}"
+  if [[ ! -d "$target_dir/src-tauri" ]]; then
+    if ! command -v git >/dev/null 2>&1; then
+      echo "Error: git is required to clone the repo." >&2
+      exit 1
+    fi
+    echo "Cloning repo to $target_dir ..."
+    git clone --depth 1 git@github.com:raro42/mac-stats.git "$target_dir"
+  fi
+  root_dir="$target_dir"
+fi
+
+cd "$root_dir/src-tauri"
+
+if [[ "${1:-release}" == "dev" ]]; then
+  cargo run
+else
+  cargo build --release
+  exec ./target/release/mac-stats-backend
+fi
