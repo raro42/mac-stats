@@ -63,9 +63,10 @@ pub fn get_chip_info() -> String {
     // Cache chip info - only fetch once
     CHIP_INFO_CACHE.get_or_init(|| {
         // Get chip information from system_profiler (JSON format)
-        let output = Command::new("sh")
-            .arg("-c")
-            .arg("system_profiler SPHardwareDataType -json 2>/dev/null")
+        let output = Command::new("/usr/sbin/system_profiler")
+            .arg("SPHardwareDataType")
+            .arg("-json")
+            .stderr(std::process::Stdio::null())
             .output();
         
         if let Ok(output) = output {
@@ -134,9 +135,10 @@ pub fn get_chip_info() -> String {
         }
         
         // Fallback: try sysctl for Intel Macs
-        let output = Command::new("sh")
-            .arg("-c")
-            .arg("sysctl -n machdep.cpu.brand_string 2>/dev/null | head -1")
+        let output = Command::new("/usr/sbin/sysctl")
+            .arg("-n")
+            .arg("machdep.cpu.brand_string")
+            .stderr(std::process::Stdio::null())
             .output();
         
         if let Ok(output) = output {
@@ -225,21 +227,25 @@ pub fn can_read_temperature() -> bool {
 pub(crate) fn get_nominal_frequency() -> f32 {
     *NOMINAL_FREQ.get_or_init(|| {
         // Try hw.tbfrequency * kern.clockrate.hz approach (works on Apple Silicon)
-        let tbfreq_output = Command::new("sh")
-            .arg("-c")
-            .arg("sysctl -n hw.tbfrequency 2>/dev/null || echo '0'")
+        let tbfreq_output = Command::new("/usr/sbin/sysctl")
+            .arg("-n")
+            .arg("hw.tbfrequency")
+            .stderr(std::process::Stdio::null())
             .output();
         
         // kern.clockrate.hz doesn't work directly - need to parse the struct
-        let clockrate_output = Command::new("sh")
-            .arg("-c")
-            .arg("sysctl kern.clockrate 2>/dev/null | grep -o 'hz = [0-9]*' | head -1 | grep -o '[0-9]*' || echo '0'")
+        // Call sysctl directly and parse the output
+        let clockrate_output = Command::new("/usr/sbin/sysctl")
+            .arg("kern.clockrate")
+            .stderr(std::process::Stdio::null())
             .output();
         
         // Try standard cpufrequency (works on Intel)
-        let cpufreq_output = Command::new("sh")
-            .arg("-c")
-            .arg("sysctl -n hw.cpufrequency_max 2>/dev/null || sysctl -n hw.cpufrequency 2>/dev/null || echo '0'")
+        // Try cpufrequency_max first, then fallback to cpufrequency
+        let cpufreq_output = Command::new("/usr/sbin/sysctl")
+            .arg("-n")
+            .arg("hw.cpufrequency_max")
+            .stderr(std::process::Stdio::null())
             .output();
         
         // Try tbfrequency * clockrate first (Apple Silicon)
@@ -248,13 +254,33 @@ pub(crate) fn get_nominal_frequency() -> f32 {
         if let (Ok(tb), Ok(clock)) = (tbfreq_output, clockrate_output) {
             if tb.status.success() && clock.status.success() {
                 let tb_str = String::from_utf8_lossy(&tb.stdout).trim().to_string();
-                let clock_str = String::from_utf8_lossy(&clock.stdout).trim().to_string();
-                debug3!("tbfrequency: '{}', clockrate.hz: '{}'", tb_str, clock_str);
-                if let (Ok(tb_hz), Ok(clock_hz)) = (tb_str.parse::<f64>(), clock_str.parse::<f64>()) {
-                    debug3!("Parsed: tb_hz={}, clock_hz={}", tb_hz, clock_hz);
-                    if tb_hz > 0.0 && clock_hz > 0.0 {
+                // Parse clockrate output: "kern.clockrate: { hz = 100, tick = 10000, tickadj = 2, ... }"
+                // Extract "hz = <number>" from the output
+                let clock_str = String::from_utf8_lossy(&clock.stdout);
+                let hz_value = clock_str
+                    .lines()
+                    .flat_map(|line| {
+                        // Look for "hz = <number>" pattern
+                        line.split_whitespace()
+                            .collect::<Vec<_>>()
+                            .windows(3)
+                            .find_map(|w| {
+                                if w[0] == "hz" && w[1] == "=" {
+                                    w[2].trim_end_matches(',').parse::<f64>().ok()
+                                } else {
+                                    None
+                                }
+                            })
+                    })
+                    .next()
+                    .unwrap_or(0.0);
+                
+                debug3!("tbfrequency: '{}', clockrate.hz: '{}'", tb_str, hz_value);
+                if let Ok(tb_hz) = tb_str.parse::<f64>() {
+                    debug3!("Parsed: tb_hz={}, clock_hz={}", tb_hz, hz_value);
+                    if tb_hz > 0.0 && hz_value > 0.0 {
                         // Formula: tbfrequency * clockrate.hz = CPU frequency in Hz
-                        let freq_hz = tb_hz * clock_hz;
+                        let freq_hz = tb_hz * hz_value;
                         let freq_ghz = (freq_hz / 1_000_000_000.0) as f32;
                         debug3!("Computed: freq_hz={}, freq_ghz={:.2}", freq_hz, freq_ghz);
                         if freq_ghz > 0.1 && freq_ghz < 10.0 {
@@ -264,10 +290,10 @@ pub(crate) fn get_nominal_frequency() -> f32 {
                             debug3!("Computed frequency {:.2} GHz is out of range (0.1-10.0)", freq_ghz);
                         }
                     } else {
-                        debug3!("tb_hz or clock_hz is zero: tb_hz={}, clock_hz={}", tb_hz, clock_hz);
+                        debug3!("tb_hz or clock_hz is zero: tb_hz={}, clock_hz={}", tb_hz, hz_value);
                     }
                 } else {
-                    debug3!("Failed to parse tbfrequency or clockrate as numbers");
+                    debug3!("Failed to parse tbfrequency as number");
                 }
             } else {
                 debug3!("sysctl commands failed: tb.status={:?}, clock.status={:?}", tb.status, clock.status);
@@ -287,6 +313,31 @@ pub(crate) fn get_nominal_frequency() -> f32 {
                             let freq_ghz = (freq_hz / 1_000_000_000.0) as f32;
                             if freq_ghz > 0.1 && freq_ghz < 10.0 {
                                 debug2!("Nominal frequency from sysctl: {:.2} GHz", freq_ghz);
+                                return freq_ghz;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Try cpufrequency fallback (without _max)
+        let cpufreq_fallback = Command::new("/usr/sbin/sysctl")
+            .arg("-n")
+            .arg("hw.cpufrequency")
+            .stderr(std::process::Stdio::null())
+            .output();
+        
+        if let Ok(output) = cpufreq_fallback {
+            if output.status.success() {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let trimmed = stdout.trim();
+                if !trimmed.is_empty() && trimmed != "0" {
+                    if let Ok(freq_hz) = trimmed.parse::<f64>() {
+                        if freq_hz > 0.0 {
+                            let freq_ghz = (freq_hz / 1_000_000_000.0) as f32;
+                            if freq_ghz > 0.1 && freq_ghz < 10.0 {
+                                debug2!("Nominal frequency from sysctl (fallback): {:.2} GHz", freq_ghz);
                                 return freq_ghz;
                             }
                         }
@@ -866,34 +917,68 @@ pub fn get_cpu_details() -> CpuDetails {
         };
         
         // Read P-core and E-core frequencies from cache
+        let freq_logging = crate::state::FREQUENCY_LOGGING_ENABLED.lock()
+            .map(|f| *f)
+            .unwrap_or(false);
+        
         let p_core_frequency = match P_CORE_FREQ_CACHE.try_lock() {
             Ok(cache) => {
                 if let Some((freq, timestamp)) = cache.as_ref() {
-                    if timestamp.elapsed().as_secs() < 35 {
+                    let age_secs = timestamp.elapsed().as_secs();
+                    if age_secs < 35 {
+                        if freq_logging {
+                            debug1!("P-core frequency from cache: {:.2} GHz (age: {}s)", *freq, age_secs);
+                        }
                         *freq
                     } else {
+                        if freq_logging {
+                            debug1!("P-core frequency cache is stale ({}s old), falling back to nominal", age_secs);
+                        }
                         get_nominal_frequency() // Fallback to nominal if stale
                     }
                 } else {
+                    if freq_logging {
+                        debug1!("P-core frequency cache is empty, falling back to nominal");
+                    }
                     get_nominal_frequency()
                 }
             },
-            Err(_) => get_nominal_frequency(),
+            Err(_) => {
+                if freq_logging {
+                    debug1!("P-core frequency cache is locked, falling back to nominal");
+                }
+                get_nominal_frequency()
+            },
         };
         
         let e_core_frequency = match E_CORE_FREQ_CACHE.try_lock() {
             Ok(cache) => {
                 if let Some((freq, timestamp)) = cache.as_ref() {
-                    if timestamp.elapsed().as_secs() < 35 {
+                    let age_secs = timestamp.elapsed().as_secs();
+                    if age_secs < 35 {
+                        if freq_logging {
+                            debug1!("E-core frequency from cache: {:.2} GHz (age: {}s)", *freq, age_secs);
+                        }
                         *freq
                     } else {
+                        if freq_logging {
+                            debug1!("E-core frequency cache is stale ({}s old), falling back to nominal", age_secs);
+                        }
                         get_nominal_frequency() // Fallback to nominal if stale
                     }
                 } else {
+                    if freq_logging {
+                        debug1!("E-core frequency cache is empty, falling back to nominal");
+                    }
                     get_nominal_frequency()
                 }
             },
-            Err(_) => get_nominal_frequency(),
+            Err(_) => {
+                if freq_logging {
+                    debug1!("E-core frequency cache is locked, falling back to nominal");
+                }
+                get_nominal_frequency()
+            },
         };
         
         // Use cached chip info or default - ensure it's initialized by calling get_chip_info()

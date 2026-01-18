@@ -22,6 +22,7 @@ fn format_timestamp() -> String {
 
 // Write log entry to both terminal and log file
 // Internal function for write_log_entry - needs to be accessible to macros
+#[allow(dead_code)]
 pub fn write_log_entry(level_str: &str, message: &str) {
     let timestamp = format_timestamp();
     let log_line = format!("[{}] [{}] {}", timestamp, level_str, message);
@@ -42,11 +43,28 @@ pub fn write_log_entry(level_str: &str, message: &str) {
     }
 }
 
+// Helper function to convert full file path to short format (e.g., "src-tauri/src/ui/status_bar.rs" -> "ui/status_bar.rs")
+fn shorten_file_path(file_path: &str) -> String {
+    // Remove common prefixes
+    if let Some(stripped) = file_path.strip_prefix("src-tauri/src/") {
+        stripped.to_string()
+    } else if let Some(stripped) = file_path.strip_prefix("src/") {
+        stripped.to_string()
+    } else {
+        // If no prefix matches, try to find the last "src/" and strip everything before it
+        if let Some(pos) = file_path.rfind("src/") {
+            file_path[pos + 4..].to_string()
+        } else {
+            file_path.to_string()
+        }
+    }
+}
+
 // Write structured log entry (JSON) to log file
-pub fn write_structured_log(location: &str, message: &str, data: &serde_json::Value, hypothesis_id: &str) {
-    // CRITICAL: Only write structured logs if verbosity is >= 2 (debug level)
-    // This prevents excessive logging and CPU usage in normal operation
-    if VERBOSITY.load(Ordering::Relaxed) < 2 {
+// min_verbosity: minimum verbosity level required (1, 2, or 3)
+pub fn write_structured_log_with_verbosity(location: &str, message: &str, data: &serde_json::Value, hypothesis_id: &str, min_verbosity: u8) {
+    // Check verbosity level
+    if VERBOSITY.load(Ordering::Relaxed) < min_verbosity {
         return;
     }
     
@@ -74,8 +92,25 @@ pub fn write_structured_log(location: &str, message: &str, data: &serde_json::Va
         }
     }
     
-    // Also write human-readable version to terminal (only if verbosity >= 2)
-    eprintln!("[DEBUG] {}: {} (hypothesis: {})", location, message, hypothesis_id);
+    // Also write human-readable version to terminal
+    let timestamp = format_timestamp();
+    if hypothesis_id.is_empty() {
+        eprintln!("[{}] [DEBUG] {}: {}", timestamp, location, message);
+    } else {
+        eprintln!("[{}] [DEBUG] {}: {} (hypothesis: {})", timestamp, location, message, hypothesis_id);
+    }
+}
+
+// Write structured log entry (JSON) to log file
+// Defaults to verbosity >= 2 for backward compatibility
+pub fn write_structured_log(location: &str, message: &str, data: &serde_json::Value, hypothesis_id: &str) {
+    write_structured_log_with_verbosity(location, message, data, hypothesis_id, 2);
+}
+    
+
+// Internal helper function for debug macros to convert file path
+pub fn shorten_file_path_internal(file_path: &str) -> String {
+    shorten_file_path(file_path)
 }
 
 #[macro_export]
@@ -85,17 +120,13 @@ macro_rules! debug {
             use std::sync::atomic::Ordering;
             // Check legacy verbosity for backward compatibility
             if $crate::logging::VERBOSITY.load(Ordering::Relaxed) >= $level {
-                // Use tracing macros directly
                 let message = format!($($arg)*);
-                match $level {
-                    1 => tracing::info!("{}", message),
-                    2 => tracing::debug!("{}", message),
-                    3 => tracing::trace!("{}", message),
-                    _ => {
-                        let level_str = "LOG";
-                        $crate::logging::write_log_entry(level_str, &message);
-                    }
-                }
+                // Extract file location from macro call site
+                let file_path = file!();
+                let location = $crate::logging::shorten_file_path_internal(file_path);
+                // Use write_structured_log_with_verbosity with the appropriate level
+                // For debug macros, use empty hypothesis_id
+                $crate::logging::write_structured_log_with_verbosity(&location, &message, &serde_json::json!({}), "", $level);
             }
         }
     };
