@@ -6,11 +6,17 @@ A lightweight system monitor for macOS built with Rust and Tauri.
 
 
 The menubar shows:
+
 ![mac-stats Menu Bar](screen_actual/menu-bar.png)
 
 ## Inspiration
 
 This project is inspired by [Stats](https://github.com/exelban/stats) by [exelban](https://github.com/exelban), a popular macOS system monitor with 35.8k+ stars.
+
+Other remarkable macOS system monitoring projects:
+- **[NeoAsitop](https://github.com/op06072/NeoAsitop)** - Command-line monitoring tool for Apple Silicon Macs, inspired by asitop but sudoless (no root required). Provides real-time CPU/GPU utilization, frequency, power consumption, temperature, and memory bandwidth monitoring. *(Last commit: 2024-07-16)*
+- **[EMG](https://github.com/cyrilzakka/EMG)** - macOS system monitor by [cyrilzakka](https://github.com/cyrilzakka) *(Last commit: 2024-11-22)*
+- **[XRG](https://github.com/mikepj/XRG)** - Open-source system monitor displaying CPU, GPU, memory, network, disk I/O, temperature, battery status, weather, and stock data in a clean, minimal interface. Available via Homebrew. *(Last commit: 2024-03-15)*
 
 ### Motivation
 
@@ -107,3 +113,9 @@ Screenshots of the app in action are available in:
 - CPU window updates every 1 second (processes refresh every 5s)
 - Accurate against Activity Monitor
 - Built with Tauri for native performance
+
+---
+
+## Contact
+
+Have questions, suggestions, or want to contribute? Reach out to me on [Discord](https://discord.com/users/687953899566530588) or open an issue on GitHub.
