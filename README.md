@@ -35,9 +35,17 @@ This project was developed through "vibe coding" - building features iteratively
 ## Installation
 
 1. Clone the repo.
-2. `cd src-tauri`
-3. `cargo build --release`
-4. Run `./target/release/mac-stats-backend`
+2. Run `./run` (builds and starts the app).
+
+One-liner to fetch the launcher:
+```bash
+curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/run -o run && chmod +x run
+```
+
+Manual steps:
+1. `cd src-tauri`
+2. `cargo build --release`
+3. Run `./target/release/mac-stats-backend`
 
 ## Auto-start on Login
 
@@ -52,8 +60,7 @@ Use launchd or add to Login Items manually.
 ### Run
 
 ```bash
-cd src-tauri
-cargo run
+./run dev
 ```
 
 ## Screenshots / Roadmap
