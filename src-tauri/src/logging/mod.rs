@@ -14,7 +14,7 @@ use tracing_subscriber::{
 mod legacy;
 
 // Re-export legacy logging for compatibility during migration
-pub use legacy::{set_verbosity, write_structured_log, VERBOSITY, write_log_entry};
+pub use legacy::{set_verbosity, write_structured_log, write_structured_log_with_verbosity, shorten_file_path_internal, VERBOSITY};
 
 /// Initialize tracing with file and console output
 /// 

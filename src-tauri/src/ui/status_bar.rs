@@ -53,7 +53,6 @@ pub fn build_status_text(metrics: &SystemMetrics) -> String {
 pub fn process_menu_bar_update() {
     // This function must be called from the main thread
     if let Some(mtm) = MainThreadMarker::new() {
-        write_structured_log("ui/status_bar.rs", "MainThreadMarker obtained", &serde_json::json!({}), "G");
         let update_text = {
             if let Ok(mut pending) = MENU_BAR_TEXT.try_lock() {
                 pending.take()
@@ -64,23 +63,18 @@ pub fn process_menu_bar_update() {
         };
         
         if let Some(text) = update_text {
-            write_structured_log("ui/status_bar.rs", "Processing menu bar update", &serde_json::json!({"text": text.clone()}), "G");
             debug3!("Processing menu bar update: '{}'", text);
             let attributed = make_attributed_title(&text);
             STATUS_ITEM.with(|cell| {
                 if let Some(item) = cell.borrow().as_ref() {
                     if let Some(button) = item.button(mtm) {
-                        write_structured_log("ui/status_bar.rs", "About to call setAttributedTitle", &serde_json::json!({}), "H");
                         button.setAttributedTitle(&attributed);
-                        write_structured_log("ui/status_bar.rs", "setAttributedTitle called", &serde_json::json!({}), "H");
                         debug3!("Menu bar text updated successfully");
                     } else {
                         write_structured_log("ui/status_bar.rs", "Button not found", &serde_json::json!({}), "G");
                     }
                 }
             });
-        } else {
-            write_structured_log("ui/status_bar.rs", "No update text available", &serde_json::json!({}), "G");
         }
     } else {
         write_structured_log("ui/status_bar.rs", "MainThreadMarker::new() FAILED", &serde_json::json!({}), "G");

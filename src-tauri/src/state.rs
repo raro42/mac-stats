@@ -69,6 +69,8 @@ pub(crate) static IOREPORT_CHANNELS: Mutex<Option<usize>> = Mutex::new(None);
 pub(crate) static IOREPORT_SUBSCRIPTION_DICT: Mutex<Option<usize>> = Mutex::new(None);
 pub(crate) static IOREPORT_ORIGINAL_CHANNELS: Mutex<Option<usize>> = Mutex::new(None);
 pub(crate) static LAST_IOREPORT_SAMPLE: Mutex<Option<(usize, Instant)>> = Mutex::new(None);
+// Flag to enable detailed frequency logging
+pub(crate) static FREQUENCY_LOGGING_ENABLED: Mutex<bool> = Mutex::new(false);
 
 /// Application state structure (future refactoring target)
 /// 

@@ -14,6 +14,10 @@ struct Args {
     /// Open CPU window directly (for testing)
     #[arg(long = "cpu")]
     open_cpu: bool,
+    
+    /// Enable detailed frequency logging for debugging
+    #[arg(long = "frequency")]
+    frequency: bool,
 }
 
 fn main() {
@@ -30,6 +34,9 @@ fn main() {
     
     // Also set legacy verbosity for compatibility during migration
     mac_stats_lib::set_verbosity(verbosity);
+    
+    // Set frequency logging flag
+    mac_stats_lib::set_frequency_logging(args.frequency);
     
     // If -cpu flag is set, open window directly after a short delay
     if args.open_cpu {

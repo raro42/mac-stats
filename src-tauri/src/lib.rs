@@ -80,13 +80,18 @@ extern "C" {
     fn IOReportStateGetResidency(item: CFDictionaryRef, index: i32) -> i64;
 }
 
+// CoreFoundation functions for memory management
+#[link(name = "CoreFoundation", kind = "framework")]
+extern "C" {
+    fn CFRelease(cf: CFTypeRef);
+    fn CFRetain(cf: CFTypeRef) -> CFTypeRef;
+}
+
 // IOReport helper functions removed - IOReport operations were too expensive for real-time monitoring
 // If needed in the future, these can be re-implemented with proper caching
 use objc2::MainThreadMarker;
 use tauri::Manager;
 
-// Use write_structured_log from logging module
-use logging::write_structured_log;
 
 // Use state from state module
 use state::*;
@@ -99,45 +104,15 @@ pub use metrics::{SystemMetrics, CpuDetails, get_cpu_details, get_metrics};
 // UI functions are now in ui module
 use ui::status_bar::{build_status_text, setup_status_item, create_cpu_window, make_attributed_title};
 
-// Old metrics functions removed - now in metrics module
-
-// Old metrics function implementations removed - now in metrics module
-// Removing duplicate make_attributed_title - keeping the one below
-
-// Old function implementations removed - see metrics module and correct implementations below
-
-// All old metrics function implementations removed - they are now in the metrics module
-
-// All old metrics function implementations removed - they are now in the metrics module
-
-// Wrong make_attributed_title function removed - correct one is below
-
-// All old metrics function implementations removed - they are now in the metrics module
-
-// All old metrics function implementations removed - they are now in the metrics module
-
-// Wrong make_attributed_title function removed - correct one is below
-
-// All old metrics function implementations removed - they are now in the metrics module
-
-// All old metrics function implementations removed - they are now in the metrics module
-
-// Wrong make_attributed_title and all old metrics functions removed - correct implementations are below
-
-// All old metrics function implementations removed - they are now in the metrics module
-
-// All old metrics function implementations removed - they are now in the metrics module
-
-// All old metrics function implementations removed - they are now in the metrics module
-
-// Wrong make_attributed_title function removed - correct one is below
-
-// All old metrics function implementations removed - they are now in the metrics module
-
-// All old metrics function implementations removed - they are now in the metrics module
-// All UI functions removed - now in ui module
-
-// UI functions are imported from ui module (see imports at top)
+/// Set frequency logging flag for detailed debugging
+pub fn set_frequency_logging(enabled: bool) {
+    if let Ok(mut flag) = state::FREQUENCY_LOGGING_ENABLED.lock() {
+        *flag = enabled;
+        if enabled {
+            debug1!("Frequency logging enabled - detailed frequency information will be logged");
+        }
+    }
+}
 
 pub fn run_with_cpu_window() {
     debug1!("Running with -cpu flag: will open CPU window after setup");
@@ -258,7 +233,6 @@ fn run_internal(open_cpu_window: bool) {
                     debug3!("Update loop: getting metrics...");
                     let metrics = get_metrics();
                     let text = build_status_text(&metrics);
-                    debug2!("Update loop: status text: '{}'", text);
                     
                     // Store update in static variable
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {
@@ -324,9 +298,21 @@ fn run_internal(open_cpu_window: bool) {
                                     );
                                     
                                     if !channels_dict.is_null() {
+                                        // CRITICAL: Retain channels_dict before storing (Create/Copy rule)
+                                        CFRetain(channels_dict as CFTypeRef);
                                         // Store original channels_dict for iterating channel structure
                                         if let Ok(mut orig_channels_storage) = IOREPORT_ORIGINAL_CHANNELS.try_lock() {
+                                            // Release old one if it exists
+                                            if let Some(old_dict_usize) = orig_channels_storage.take() {
+                                                let old_dict = old_dict_usize as CFDictionaryRef;
+                                                if !old_dict.is_null() {
+                                                    CFRelease(old_dict as CFTypeRef);
+                                                }
+                                            }
                                             *orig_channels_storage = Some(channels_dict as usize);
+                                        } else {
+                                            // Lock failed, release the retained dict
+                                            CFRelease(channels_dict as CFTypeRef);
                                         }
                                         
                                         // Create mutable dictionary for subscription
@@ -359,20 +345,37 @@ fn run_internal(open_cpu_window: bool) {
                                         if !subscription_ptr.is_null() {
                                             *sub = Some(subscription_ptr as usize);
                                             
-                                            // Store subscription_dict (contains channel structure we can iterate)
-                                            if let Ok(mut sub_dict_storage) = IOREPORT_SUBSCRIPTION_DICT.try_lock() {
-                                                *sub_dict_storage = Some(subscription_dict as usize);
+                                            // CRITICAL: Retain subscription_dict before storing
+                                            if !subscription_dict.is_null() {
+                                                CFRetain(subscription_dict as CFTypeRef);
+                                                // Store subscription_dict (contains channel structure we can iterate)
+                                                if let Ok(mut sub_dict_storage) = IOREPORT_SUBSCRIPTION_DICT.try_lock() {
+                                                    // Release old one if it exists
+                                                    if let Some(old_dict_usize) = sub_dict_storage.take() {
+                                                        let old_dict = old_dict_usize as CFMutableDictionaryRef;
+                                                        if !old_dict.is_null() {
+                                                            CFRelease(old_dict as CFTypeRef);
+                                                        }
+                                                    }
+                                                    *sub_dict_storage = Some(subscription_dict as usize);
+                                                } else {
+                                                    // Lock failed, release the retained dict
+                                                    CFRelease(subscription_dict as CFTypeRef);
+                                                }
                                             }
                                             
                                             // Store channels dictionary for sampling (needed for IOReportCreateSamples)
-                                            // Retain the dictionary to avoid use-after-free crashes
-                                            #[link(name = "CoreFoundation", kind = "framework")]
-                                            extern "C" {
-                                                fn CFRetain(cf: CFTypeRef) -> CFTypeRef;
-                                            }
+                                            // CRITICAL: Retain the dictionary to avoid use-after-free crashes
                                             CFRetain(channels_mut.as_concrete_TypeRef() as CFTypeRef);
                                             if let Ok(mut channels_storage) = IOREPORT_CHANNELS.try_lock() {
+                                                // Release old one if it exists
+                                                if let Some(old_ptr) = channels_storage.take() {
+                                                    CFRelease(old_ptr as CFTypeRef);
+                                                }
                                                 *channels_storage = Some(channels_mut.as_concrete_TypeRef() as usize);
+                                            } else {
+                                                // Lock failed, release the retained dict
+                                                CFRelease(channels_mut.as_concrete_TypeRef() as CFTypeRef);
                                             }
                                             
                                             debug2!("IOReport subscription created successfully for CPU frequency (handle={:p}, dict={:p})", subscription_ptr, subscription_dict);
@@ -518,6 +521,7 @@ fn run_internal(open_cpu_window: bool) {
                         // CPU EFFICIENCY: Only read frequency every 20 seconds (IOReport sampling still has overhead)
                         // Increased from 10s to 20s to save CPU - frequency doesn't change that rapidly
                         let should_read_freq = if let Ok(mut last) = LAST_FREQ_READ.lock() {
+                            debug2!("========> LAST_FREQ_READ: {:?}", last);
                             let should = last.as_ref()
                                 .map(|t| t.elapsed().as_secs() >= 20)
                                 .unwrap_or(true);
@@ -531,637 +535,136 @@ fn run_internal(open_cpu_window: bool) {
                         
                         if should_read_freq {
                             debug3!("should_read_freq=true, attempting IOReport frequency read");
+                            
+                            // Check if frequency logging is enabled
+                            let freq_logging = state::FREQUENCY_LOGGING_ENABLED.lock()
+                                .map(|f| *f)
+                                .unwrap_or(false);
+                            
                             let mut freq: f32 = 0.0;
                             let mut p_core_freq: f32 = 0.0;
                             let mut e_core_freq: f32 = 0.0;
                             
                             // Try IOReport first (real-time frequency via native API)
-                            if let Ok(sub) = IOREPORT_SUBSCRIPTION.try_lock() {
+                            let freq_result = if let Ok(sub) = IOREPORT_SUBSCRIPTION.try_lock() {
                                 if let Some(subscription_usize) = sub.as_ref() {
                                     let subscription_ptr = *subscription_usize as *mut c_void;
                                     
-                                    if !subscription_ptr.is_null() {
-                                        unsafe {
-                                            // Get channels dictionary for sampling
-                                            // We need to use the channels dictionary that was used to create the subscription
-                                            let channels_ptr = if let Ok(channels_storage) = IOREPORT_CHANNELS.try_lock() {
-                                                channels_storage.as_ref().map(|&usize_ptr| usize_ptr as CFMutableDictionaryRef)
-                                            } else {
-                                                None
-                                            };
-                                            
-                                            // Create sample from subscription
-                                            // CRITICAL: IOReportCreateSamples requires the channels dictionary
-                                            // Use stored channels dictionary (the one used to create the subscription)
-                                            let channels_ref = channels_ptr.unwrap_or(std::ptr::null_mut());
-                                            let sample = IOReportCreateSamples(
-                                                subscription_ptr as *const c_void,
-                                                channels_ref, // Use stored channels dictionary
-                                                std::ptr::null(), // options
-                                            );
-                                            
-                                            if channels_ref.is_null() {
-                                                debug3!("Using NULL channels for IOReportCreateSamples (may fail)");
-                                            } else {
-                                                debug3!("Using stored channels dictionary for IOReportCreateSamples");
-                                            }
-                                            
-                                            // #region agent log
-                                            write_structured_log(
-                                                "lib.rs:1843",
-                                                "IOReportCreateSamples returned",
-                                                &serde_json::json!({
-                                                    "sample_ptr": format!("{:p}", sample),
-                                                    "channels_ptr": format!("{:p}", channels_ref)
-                                                }),
-                                                "A",
-                                            );
-                                            // #endregion
-                                            
-                                            if !sample.is_null() {
-                                                // Store sample for potential future delta calculation
-                                                if let Ok(mut last_sample) = LAST_IOREPORT_SAMPLE.try_lock() {
-                                                    *last_sample = Some((sample as usize, std::time::Instant::now()));
-                                                }
-                                                
-                                                // CRITICAL: Use original channels_dict to iterate channels and extract frequency
-                                                // The sample structure is complex - we'll use the original channels_dict
-                                                // which contains the actual channel dictionaries we can safely query
-                                                let original_channels_dict = if let Ok(orig_channels_storage) = IOREPORT_ORIGINAL_CHANNELS.try_lock() {
-                                                    orig_channels_storage.as_ref().map(|&dict_usize| dict_usize as CFDictionaryRef)
-                                                } else {
-                                                    None
-                                                };
-                                                
-                                                if let Some(orig_channels) = original_channels_dict {
-                                                    use core_foundation::string::CFString;
-                                                    
-                                                    // Declare FFI functions for CFDictionary iteration
-#[link(name = "CoreFoundation", kind = "framework")]
-extern "C" {
-    fn CFDictionaryGetCount(theDict: CFDictionaryRef) -> i32;
-    fn CFDictionaryGetKeysAndValues(
-        theDict: CFDictionaryRef,
-        keys: *mut *const c_void,
-        values: *mut *const c_void,
-    );
-    fn CFGetTypeID(cf: CFTypeRef) -> u64;
-    fn CFDictionaryGetTypeID() -> u64;
-    fn CFArrayGetTypeID() -> u64;
-    fn CFStringGetTypeID() -> u64;
-}
-                                                    
-                                                    // Note: unsafe block is nested inside outer unsafe block, but kept for clarity
-                                                    {
-                                                        // Get count of channels in original channels_dict
-                                                        let channels_count = CFDictionaryGetCount(orig_channels);
-                                                        debug3!("Original channels_dict has {} channels", channels_count);
-                                                        
-                                                        if channels_count > 0 {
-                                                            // Allocate buffers for keys and values from original channels_dict
-                                                            let mut channel_keys_buf: Vec<*const c_void> = vec![std::ptr::null(); channels_count as usize];
-                                                            let mut channel_values_buf: Vec<*const c_void> = vec![std::ptr::null(); channels_count as usize];
-                                                            
-                                                            // Get all channel keys and values from original channels_dict
-                                                            CFDictionaryGetKeysAndValues(
-                                                                orig_channels,
-                                                                channel_keys_buf.as_mut_ptr(),
-                                                                channel_values_buf.as_mut_ptr(),
-                                                            );
-                                                            
-                                                            // Log channel keys to understand structure
-                                                            for i in 0..(channels_count as usize) {
-                                                                let channel_key_ref = channel_keys_buf[i] as CFStringRef;
-                                                                if !channel_key_ref.is_null() {
-                                                                    let channel_key_str = CFString::wrap_under_get_rule(channel_key_ref);
-                                                                    debug3!("Entry {}: key='{}', value_ptr={:p}", i, channel_key_str.to_string(), channel_values_buf[i]);
-                                                                }
-                                                            }
-                                                            
-                                                            // CRITICAL: Find "IOReportChannels" key - this contains the actual channel array/dictionary
-                                                            // PARANOID MODE: Add type checking and null guards
-                                                            let mut actual_channels_ref: CFDictionaryRef = std::ptr::null_mut();
-                                                            for i in 0..(channels_count as usize) {
-                                                                let channel_key_ref = channel_keys_buf[i] as CFStringRef;
-                                                                if channel_key_ref.is_null() {
-                                                                    debug3!("Entry {}: key is null, skipping", i);
-                                                                    continue;
-                                                                }
-                                                                
-                                                                // PARANOID: Verify key is actually a CFString
-                                                                let key_type_id = CFGetTypeID(channel_key_ref as CFTypeRef);
-                                                                let string_type_id = CFStringGetTypeID();
-                                                                if key_type_id != string_type_id {
-                                                                    debug3!("Entry {}: key is not CFString (type_id={}, expected={}), skipping", i, key_type_id, string_type_id);
-                                                                    continue;
-                                                                }
-                                                                
-                                                                let channel_key_str = CFString::wrap_under_get_rule(channel_key_ref);
-                                                                let key_str = channel_key_str.to_string();
-                                                                debug3!("Entry {}: key='{}'", i, key_str);
-                                                                
-                                                                if key_str == "IOReportChannels" {
-                                                                    let value_ptr = channel_values_buf[i];
-                                                                    if value_ptr.is_null() {
-                                                                        debug3!("Entry {}: IOReportChannels value is null!", i);
-                                                                        continue;
-                                                                    }
-                                                                    
-                                                                    // PARANOID: Verify value type before casting
-                                                                    let value_type_id = CFGetTypeID(value_ptr as CFTypeRef);
-                                                                    let dict_type_id = CFDictionaryGetTypeID();
-                                                                    let array_type_id = CFArrayGetTypeID();
-                                                                    // #region agent log
-                                                                    write_structured_log(
-                                                                        "lib.rs:1946",
-                                                                        "IOReportChannels value type check",
-                                                                        &serde_json::json!({
-                                                                            "value_ptr": format!("{:p}", value_ptr),
-                                                                            "value_type_id": value_type_id,
-                                                                            "dict_type_id": dict_type_id,
-                                                                            "array_type_id": array_type_id
-                                                                        }),
-                                                                        "A",
-                                                                    );
-                                                                    // #endregion
-                                                                    
-                                                                    debug3!("Entry {}: IOReportChannels value type_id={}, dict_type_id={}, array_type_id={}", 
-                                                                        i, value_type_id, dict_type_id, array_type_id);
-                                                                    
-                                                                    if value_type_id == dict_type_id {
-                                                                        actual_channels_ref = value_ptr as CFDictionaryRef;
-                                                                        debug3!("Found IOReportChannels entry (CFDictionary), value_ptr={:p}", actual_channels_ref);
-                                                                        break;
-                                                                    } else if value_type_id == array_type_id {
-                                                                        debug3!("IOReportChannels is CFArray (not CFDictionary), cannot iterate as dictionary");
-                                                                        // TODO: Handle CFArray case if needed
-                                                                        continue;
-                                                                    } else {
-                                                                        debug3!("IOReportChannels value is neither CFDictionary nor CFArray (type_id={}), skipping", value_type_id);
-                                                                        continue;
-                                                                    }
-                                                                }
-                                                            }
-                                                            
-                                                            if actual_channels_ref.is_null() {
-                                                                debug3!("IOReportChannels key not found in channels_dict, cannot parse frequency");
-                                                            } else {
-                                                                // IOReportChannels is a dictionary/array of actual channel dictionaries
-                                                                let actual_channels_count = CFDictionaryGetCount(actual_channels_ref);
-                                                                debug3!("IOReportChannels contains {} actual channels", actual_channels_count);
-                                                                
-                                                                if actual_channels_count > 0 {
-                                                                    // PARANOID: Verify actual_channels_ref is still valid
-                                                                    if actual_channels_ref.is_null() {
-                                                                        debug3!("actual_channels_ref is null before CFDictionaryGetKeysAndValues!");
-                                                                    } else {
-                                                                        // Allocate buffers for actual channel keys and values
-                                                                        let mut actual_channel_keys: Vec<*const c_void> = vec![std::ptr::null(); actual_channels_count as usize];
-                                                                        let mut actual_channel_values: Vec<*const c_void> = vec![std::ptr::null(); actual_channels_count as usize];
-                                                                        
-                                                                        debug3!("About to call CFDictionaryGetKeysAndValues on {:p}", actual_channels_ref);
-                                                                        CFDictionaryGetKeysAndValues(
-                                                                            actual_channels_ref,
-                                                                            actual_channel_keys.as_mut_ptr(),
-                                                                            actual_channel_values.as_mut_ptr(),
-                                                                        );
-                                                                        debug3!("CFDictionaryGetKeysAndValues completed successfully");
-                                                                        // #region agent log
-                                                                        write_structured_log(
-                                                                            "lib.rs:1996",
-                                                                            "IOReportChannels keys/values loaded",
-                                                                            &serde_json::json!({
-                                                                                "channels_count": actual_channels_count,
-                                                                                "channels_ptr": format!("{:p}", actual_channels_ref)
-                                                                            }),
-                                                                            "B",
-                                                                        );
-                                                                        // #endregion
-                                                                        
-                                                                        // PARANOID: Log actual channel keys with type checking
-                                                                        for i in 0..(actual_channels_count as usize) {
-                                                                            let actual_key_ptr = actual_channel_keys[i];
-                                                                            if actual_key_ptr.is_null() {
-                                                                                debug3!("Actual channel {}: key is null", i);
-                                                                                continue;
-                                                                            }
-                                                                            
-                                                                            // PARANOID: Verify key type
-                                                                            let key_type_id = CFGetTypeID(actual_key_ptr as CFTypeRef);
-                                                                            let string_type_id = CFStringGetTypeID();
-                                                                            if key_type_id != string_type_id {
-                                                                                debug3!("Actual channel {}: key is not CFString (type_id={}), skipping", i, key_type_id);
-                                                                                continue;
-                                                                            }
-                                                                            
-                                                                            let actual_key_ref = actual_key_ptr as CFStringRef;
-                                                                            let actual_key_str = CFString::wrap_under_get_rule(actual_key_ref);
-                                                                            let value_ptr = actual_channel_values[i];
-                                                                            debug3!("Actual channel {}: key='{}', value_ptr={:p}", i, actual_key_str.to_string(), value_ptr);
-                                                                            
-                                                                            // PARANOID: Check value type
-                                                                            if !value_ptr.is_null() {
-                                                                                let value_type_id = CFGetTypeID(value_ptr as CFTypeRef);
-                                                                                debug3!("Actual channel {}: value type_id={}", i, value_type_id);
-                                                                            }
-                                                                        }
-                                                                        
-                                                                        // Look for channels with frequency information
-                                                                        // Track P-core and E-core frequencies separately
-                                                                        let mut max_freq_mhz: f64 = 0.0;
-                                                                        let mut total_residency: f64 = 0.0;
-                                                                        let mut weighted_freq_sum: f64 = 0.0;
-                                                                        let mut p_core_max_freq_mhz: f64 = 0.0;
-                                                                        let mut p_core_total_residency: f64 = 0.0;
-                                                                        let mut p_core_weighted_freq_sum: f64 = 0.0;
-                                                                        let mut e_core_max_freq_mhz: f64 = 0.0;
-                                                                        let mut e_core_total_residency: f64 = 0.0;
-                                                                        let mut e_core_weighted_freq_sum: f64 = 0.0;
-                                                                        
-                                                                        // Iterate through actual channels
-                                                                        debug3!("Iterating through {} actual channels to find performance states", actual_channels_count);
-                                                                        for i in 0..(actual_channels_count as usize) {
-                                                                            let mut channel_ref_to_use: CFDictionaryRef = actual_channel_values[i] as CFDictionaryRef;
-                                                                            debug3!("Entry {}: value_ref = {:p}", i, channel_ref_to_use);
-                                                                            if channel_ref_to_use.is_null() {
-                                                                                debug3!("Entry {} value is null, skipping", i);
-                                                                                continue;
-                                                                            }
-                                                                            
-                                                                            // CRITICAL: IOReportChannelGetChannelName can crash if called on invalid channel references
-                                                                            // The values in IOReportChannels are likely channel IDs/keys, not channel dictionaries
-                                                                            // We need to look up the actual channel dictionaries from the original channels_dict
-                                                                            
-                                                                            // Get the channel key from IOReportChannels (this is the channel ID/name)
-                                                                            let actual_key_ref = actual_channel_keys[i] as CFStringRef;
-                                                                            if actual_key_ref.is_null() {
-                                                                                debug3!("Entry {}: key is null, skipping", i);
-                                                                                continue;
-                                                                            }
-                                                                            
-                                                                            let channel_key_str = CFString::wrap_under_get_rule(actual_key_ref);
-                                                                            let channel_key = channel_key_str.to_string();
-                                                                            debug3!("Entry {}: channel_key='{}'", i, channel_key);
-                                                                            
-                                                                            // Look up the actual channel dictionary from the original channels_dict using the channel_key
-                                                                            // The original channels_dict contains the actual channel dictionaries we can safely query
-                                                                            let mut found_channel = false;
-                                                                            let mut channel_name_ref: CFStringRef = std::ptr::null_mut();
-                                                                            
-                                                                            for orig_i in 0..(channels_count as usize) {
-                                                                                let orig_key_ref = channel_keys_buf[orig_i] as CFStringRef;
-                                                                                if !orig_key_ref.is_null() {
-                                                                                    let orig_key_str = CFString::wrap_under_get_rule(orig_key_ref);
-                                                                                    let orig_key = orig_key_str.to_string();
-                                                                                    
-                                                                                    // Check if this key matches our channel_key, or if it's in the IOReportChannels structure
-                                                                                    // The channel_key from IOReportChannels should help us find the right channel
-                                                                                    // For now, let's try to find channels that contain "Performance" in their structure
-                                                                                    // by checking if we can safely get the channel name
-                                                                                    
-                                                                                    let orig_value_ptr = channel_values_buf[orig_i];
-                                                                                    if orig_value_ptr.is_null() {
-                                                                                        continue;
-                                                                                    }
-                                                                                    
-                                                                                    // PARANOID: Verify value type before casting
-                                                                                    let orig_value_type_id = CFGetTypeID(orig_value_ptr as CFTypeRef);
-                                                                                    let dict_type_id = CFDictionaryGetTypeID();
-                                                                                    if orig_value_type_id != dict_type_id {
-                                                                                        debug3!("Original channel {}: value is not CFDictionary (type_id={}), skipping", orig_i, orig_value_type_id);
-                                                                                        continue;
-                                                                                    }
-                                                                                    
-                                                                                    let orig_channel_ref = orig_value_ptr as CFDictionaryRef;
-                                                                                    if orig_key != "QueryOpts" && orig_key != "IOReportChannels" {
-                                                                                        // PARANOID: Verify channel_ref is valid before calling IOReport API
-                                                                                        if orig_channel_ref.is_null() {
-                                                                                            debug3!("Original channel {}: channel_ref is null before IOReportChannelGetChannelName!", orig_i);
-                                                                                            continue;
-                                                                                        }
-                                                                                        let orig_channel_type_id = CFGetTypeID(orig_channel_ref as CFTypeRef);
-                                                                                        let dict_type_id = CFDictionaryGetTypeID();
-                                                                                        
-                                                                                        // CRITICAL: Only call IOReportChannelGetChannelName on valid CFDictionary types
-                                                                                        // Calling it on non-dictionary types will crash with foreign exception
-                                                                                        if orig_channel_type_id != dict_type_id {
-                                                                                            debug3!("Original channel {}: value is not CFDictionary (type_id={}), skipping IOReportChannelGetChannelName", orig_i, orig_channel_type_id);
-                                                                                            continue;
-                                                                                        }
-                                                                                        
-                                                                                        // #region agent log
-                                                                                        write_structured_log(
-                                                                                            "lib.rs:2099",
-                                                                                            "About to call IOReportChannelGetChannelName",
-                                                                                            &serde_json::json!({
-                                                                                                "channel_ptr": format!("{:p}", orig_channel_ref),
-                                                                                                "channel_type_id": orig_channel_type_id,
-                                                                                                "channel_key": orig_key
-                                                                                            }),
-                                                                                            "B",
-                                                                                        );
-                                                                                        // #endregion
-                                                                                        debug3!("About to call IOReportChannelGetChannelName on {:p} (key='{}')", orig_channel_ref, orig_key);
-                                                                                        // Try to get channel name - this is the actual channel dictionary
-                                                                                        // CRITICAL: This can throw foreign exceptions if channel_ref is invalid
-                                                                                        // We've verified it's a CFDictionary, but it might still not be a valid IOReport channel
-                                                                                        let test_name_ref = IOReportChannelGetChannelName(orig_channel_ref);
-                                                                                        // Validate result immediately
-                                                                                        if test_name_ref.is_null() {
-                                                                                            debug3!("IOReportChannelGetChannelName returned null for channel '{}'", orig_key);
-                                                                                        }
-                                                                                        debug3!("IOReportChannelGetChannelName returned {:p}", test_name_ref);
-                                                                                        // #region agent log
-                                                                                        write_structured_log(
-                                                                                            "lib.rs:2102",
-                                                                                            "IOReportChannelGetChannelName returned",
-                                                                                            &serde_json::json!({
-                                                                                                "channel_ptr": format!("{:p}", orig_channel_ref),
-                                                                                                "name_ptr": format!("{:p}", test_name_ref)
-                                                                                            }),
-                                                                                            "C",
-                                                                                        );
-                                                                                        // #endregion
-                                                                                        if !test_name_ref.is_null() {
-                                                                                            let test_channel_name = CFString::wrap_under_get_rule(test_name_ref);
-                                                                                            let test_channel_name_str = test_channel_name.to_string();
-                                                                                            debug3!("Original channel {}: key='{}', name='{}'", orig_i, orig_key, test_channel_name_str);
-                                                                                            
-                                                                                            // Check if this is a performance state channel
-                                                                                            if test_channel_name_str.contains("Performance") || 
-                                                                                               test_channel_name_str.contains("P-Cluster") ||
-                                                                                               test_channel_name_str.contains("E-Cluster") ||
-                                                                                               test_channel_name_str.contains("CPU") {
-                                                                                                // Found a performance state channel - use it
-                                                                                                channel_ref_to_use = orig_channel_ref;
-                                                                                                channel_name_ref = test_name_ref;
-                                                                                                found_channel = true;
-                                                                                                debug3!("Found performance state channel: '{}' (key='{}')", test_channel_name_str, orig_key);
-                                                                                                break;
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                            
-                                                                            if !found_channel {
-                                                                                debug3!("Entry {}: Could not find performance state channel in original channels_dict, skipping", i);
-                                                                                continue;
-                                                                            }
-                                                                            
-                                                                            // If channel name is null, might be nested structure
-                                                                            if channel_name_ref.is_null() {
-                                                                                debug3!("Entry {} channel name is null - might be nested structure", i);
-                                                                                let nested_count = CFDictionaryGetCount(channel_ref_to_use);
-                                                                                debug3!("Entry {} is a CFDictionary with {} nested entries", i, nested_count);
-                                                                                if nested_count > 0 {
-                                                                                    // This might be a nested structure - iterate it
-                                                                                    let mut nested_keys: Vec<*const c_void> = vec![std::ptr::null(); nested_count as usize];
-                                                                                    let mut nested_values: Vec<*const c_void> = vec![std::ptr::null(); nested_count as usize];
-                                                                                    CFDictionaryGetKeysAndValues(
-                                                                                        channel_ref_to_use,
-                                                                                        nested_keys.as_mut_ptr(),
-                                                                                        nested_values.as_mut_ptr(),
-                                                                                    );
-                                                                                    for j in 0..(nested_count as usize) {
-                                                                                        let nested_channel_ref = nested_values[j] as CFDictionaryRef;
-                                                                                        if !nested_channel_ref.is_null() {
-                                                                                            // CRITICAL: Validate type before calling IOReportChannelGetChannelName
-                                                                                            // This prevents foreign exceptions from invalid channel references
-                                                                                            let nested_type_id = CFGetTypeID(nested_channel_ref as CFTypeRef);
-                                                                                            let dict_type_id = CFDictionaryGetTypeID();
-                                                                                            if nested_type_id != dict_type_id {
-                                                                                                debug3!("  Nested entry {}: not CFDictionary (type_id={}), skipping", j, nested_type_id);
-                                                                                                continue;
-                                                                                            }
-                                                                                            
-                                                                                            // CRITICAL: This can throw foreign exceptions if channel_ref is invalid
-                                                                                            let test_name_ref = IOReportChannelGetChannelName(nested_channel_ref);
-                                                                                            if !test_name_ref.is_null() {
-                                                                                                let nested_channel_name = CFString::wrap_under_get_rule(test_name_ref);
-                                                                                                debug3!("  Nested entry {}: channel='{}'", j, nested_channel_name.to_string());
-                                                                                                // Use nested channel instead
-                                                                                                channel_ref_to_use = nested_channel_ref;
-                                                                                                channel_name_ref = test_name_ref;
-                                                                                                break;
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                if channel_name_ref.is_null() {
-                                                                                    debug3!("Entry {}: no valid channel found, skipping", i);
-                                                                                    continue;
-                                                                                }
-                                                                            }
-                                                                            
-                                                                            let channel_name = CFString::wrap_under_get_rule(channel_name_ref);
-                                                                            let channel_name_str = channel_name.to_string();
-                                                                            debug3!("Processing channel: name='{}'", channel_name_str);
-                                                                            
-                                                                            // Look for performance state channels (they contain frequency info)
-                                                                            // Determine if this is a P-core or E-core channel
-                                                                            let is_p_core = channel_name_str.contains("P-Cluster") || 
-                                                                                          (channel_name_str.contains("Performance") && !channel_name_str.contains("E-Cluster") && !channel_name_str.contains("Efficiency"));
-                                                                            let is_e_core = channel_name_str.contains("E-Cluster") || channel_name_str.contains("Efficiency");
-                                                                            
-                                                                            if channel_name_str.contains("Performance") || 
-                                                                               channel_name_str.contains("P-Cluster") ||
-                                                                               channel_name_str.contains("E-Cluster") ||
-                                                                               channel_name_str.contains("CPU") {
-                                                                                debug3!("Found performance state channel: '{}' (P-core: {}, E-core: {})", channel_name_str, is_p_core, is_e_core);
-                                                                                
-                                                                                // CRITICAL: Validate channel_ref_to_use before calling IOReport functions
-                                                                                // These functions can throw foreign exceptions if called on invalid references
-                                                                                if channel_ref_to_use.is_null() {
-                                                                                    debug3!("Channel '{}' reference is null, skipping state iteration", channel_name_str);
-                                                                                    continue;
-                                                                                }
-                                                                                
-                                                                                // Get state count (number of performance states)
-                                                                                let state_count = IOReportStateGetCount(channel_ref_to_use);
-                                                                                debug3!("Channel '{}' has {} performance states", channel_name_str, state_count);
-                                                                                
-                                                                                // Iterate through states to find active frequency
-                                                                                for state_idx in 0..state_count {
-                                                                                    // Get state name (e.g., "P0", "P1", "IDLE", or frequency like "2400 MHz")
-                                                                                    let state_name_ref = IOReportStateGetNameForIndex(channel_ref_to_use, state_idx);
-                                                                                    if state_name_ref.is_null() {
-                                                                                        continue;
-                                                                                    }
-                                                                                    
-                                                                                    let state_name = CFString::wrap_under_get_rule(state_name_ref);
-                                                                                    let state_name_str = state_name.to_string();
-                                                                                    debug3!("  State {}: name='{}'", state_idx, state_name_str);
-                                                                                    
-                                                                                    // Get residency (time spent in this state)
-                                                                                    let residency_ns = IOReportStateGetResidency(channel_ref_to_use, state_idx);
-                                                                                    debug3!("  State {}: residency={} ns", state_idx, residency_ns);
-                                                                                    
-                                                                                    // Try to extract frequency from state name
-                                                                                    // Patterns: "2400 MHz", "4000 MHz", "P0", "P1", etc.
-                                                                                    let residency_ratio = residency_ns as f64 / 1_000_000_000.0; // Convert ns to seconds
-                                                                                    
-                                                                                    if state_name_str.contains("MHz") {
-                                                                                        // Extract frequency value from name (e.g., "2400 MHz")
-                                                                                        // Try multiple parsing strategies
-                                                                                        let mhz_val = state_name_str
-                                                                                            .split_whitespace()
-                                                                                            .find_map(|s| s.parse::<f64>().ok());
-                                                                                        
-                                                                                        if let Some(mhz_val) = mhz_val {
-                                                                                            if mhz_val > 0.0 && mhz_val < 10000.0 { // Sanity check: 0-10 GHz
-                                                                                                // Update overall frequency
-                                                                                                if mhz_val > max_freq_mhz {
-                                                                                                    max_freq_mhz = mhz_val;
-                                                                                                }
-                                                                                                weighted_freq_sum += mhz_val * residency_ratio;
-                                                                                                total_residency += residency_ratio;
-                                                                                                
-                                                                                                // Update P-core or E-core specific frequency
-                                                                                                if is_p_core {
-                                                                                                    if mhz_val > p_core_max_freq_mhz {
-                                                                                                        p_core_max_freq_mhz = mhz_val;
-                                                                                                    }
-                                                                                                    p_core_weighted_freq_sum += mhz_val * residency_ratio;
-                                                                                                    p_core_total_residency += residency_ratio;
-                                                                                                } else if is_e_core {
-                                                                                                    if mhz_val > e_core_max_freq_mhz {
-                                                                                                        e_core_max_freq_mhz = mhz_val;
-                                                                                                    }
-                                                                                                    e_core_weighted_freq_sum += mhz_val * residency_ratio;
-                                                                                                    e_core_total_residency += residency_ratio;
-                                                                                                }
-                                                                                                debug3!("  State {}: extracted {} MHz from name '{}'", state_idx, mhz_val, state_name_str);
-                                                                                            } else {
-                                                                                                debug3!("  State {}: frequency {} MHz out of range, skipping", state_idx, mhz_val);
-                                                                                            }
-                                                                                        } else {
-                                                                                            debug3!("  State {}: could not parse frequency from '{}'", state_idx, state_name_str);
-                                                                                        }
-                                                                                    } else if state_name_str.starts_with("P") {
-                                                                                        // P-state (P0, P1, etc.) - estimate frequency based on state index
-                                                                                        // P0 = max freq, P1 = slightly lower, etc.
-                                                                                        // For Apple Silicon: P0 is typically 3.5-4.0 GHz for P-cores, 2.0-2.5 GHz for E-cores
-                                                                                        let estimated_freq = if is_p_core {
-                                                                                            // P-core: higher frequency
-                                                                                            match state_idx {
-                                                                                                0 => 4000.0, // P0 = max
-                                                                                                1 => 3500.0, // P1
-                                                                                                2 => 3000.0, // P2
-                                                                                                _ => 2500.0, // Lower states
-                                                                                            }
-                                                                                        } else if is_e_core {
-                                                                                            // E-core: lower frequency
-                                                                                            match state_idx {
-                                                                                                0 => 2400.0, // E0 = max
-                                                                                                1 => 2000.0, // E1
-                                                                                                _ => 1500.0, // Lower states
-                                                                                            }
-                                                                                        } else {
-                                                                                            // Unknown cluster type - use conservative estimate
-                                                                                            match state_idx {
-                                                                                                0 => 3000.0, // P0 equivalent
-                                                                                                _ => 2000.0,
-                                                                                            }
-                                                                                        };
-                                                                                        
-                                                                                        // Update overall frequency
-                                                                                        weighted_freq_sum += estimated_freq * residency_ratio;
-                                                                                        total_residency += residency_ratio;
-                                                                                        if estimated_freq > max_freq_mhz {
-                                                                                            max_freq_mhz = estimated_freq;
-                                                                                        }
-                                                                                        
-                                                                                        // Update P-core or E-core specific frequency
-                                                                                        if is_p_core {
-                                                                                            p_core_weighted_freq_sum += estimated_freq * residency_ratio;
-                                                                                            p_core_total_residency += residency_ratio;
-                                                                                            if estimated_freq > p_core_max_freq_mhz {
-                                                                                                p_core_max_freq_mhz = estimated_freq;
-                                                                                            }
-                                                                                        } else if is_e_core {
-                                                                                            e_core_weighted_freq_sum += estimated_freq * residency_ratio;
-                                                                                            e_core_total_residency += residency_ratio;
-                                                                                            if estimated_freq > e_core_max_freq_mhz {
-                                                                                                e_core_max_freq_mhz = estimated_freq;
-                                                                                            }
-                                                                                        }
-                                                                                        debug3!("  State {}: estimated {} MHz from P-state '{}'", state_idx, estimated_freq, state_name_str);
-                                                                                    } else {
-                                                                                        debug3!("  State {}: name '{}' doesn't match frequency patterns, skipping", state_idx, state_name_str);
-                                                                                    }
-                                                                                } // closes for state_idx
-                                                                            } // closes if channel_name_str.contains
-                                                                        } // closes for i in 0..actual_channels_count
-                                                                        
-                                                                        // Calculate frequency: use weighted average if available, otherwise max
-                                                                        if total_residency > 0.0 {
-                                                                            freq = (weighted_freq_sum / total_residency / 1000.0) as f32; // Convert MHz to GHz
-                                                                            debug2!("IOReport frequency parsed: {:.2} GHz (weighted average from {} states)", freq, total_residency);
-                                                                        } else if max_freq_mhz > 0.0 {
-                                                                            freq = (max_freq_mhz / 1000.0) as f32; // Convert MHz to GHz
-                                                                            debug2!("IOReport frequency parsed: {:.2} GHz (max frequency)", freq);
-                                                                        } else {
-                                                                            debug3!("Could not extract frequency from IOReport (no valid states found in {} actual channels)", actual_channels_count);
-                                                                        }
-                                                                        
-                                                                        // Calculate P-core frequency
-                                                                        if p_core_total_residency > 0.0 {
-                                                                            p_core_freq = (p_core_weighted_freq_sum / p_core_total_residency / 1000.0) as f32; // Convert MHz to GHz
-                                                                            debug2!("IOReport P-core frequency parsed: {:.2} GHz (weighted average)", p_core_freq);
-                                                                        } else if p_core_max_freq_mhz > 0.0 {
-                                                                            p_core_freq = (p_core_max_freq_mhz / 1000.0) as f32; // Convert MHz to GHz
-                                                                            debug2!("IOReport P-core frequency parsed: {:.2} GHz (max frequency)", p_core_freq);
-                                                                        }
-                                                                        
-                                                                        // Calculate E-core frequency
-                                                                        if e_core_total_residency > 0.0 {
-                                                                            e_core_freq = (e_core_weighted_freq_sum / e_core_total_residency / 1000.0) as f32; // Convert MHz to GHz
-                                                                            debug2!("IOReport E-core frequency parsed: {:.2} GHz (weighted average)", e_core_freq);
-                                                                        } else if e_core_max_freq_mhz > 0.0 {
-                                                                            e_core_freq = (e_core_max_freq_mhz / 1000.0) as f32; // Convert MHz to GHz
-                                                                            debug2!("IOReport E-core frequency parsed: {:.2} GHz (max frequency)", e_core_freq);
-                                                                        }
-                                                                    } // closes else block for actual_channels_ref null check
-                                                                } else {
-                                                                    debug3!("IOReportChannels is empty (no actual channels)");
-                                                                }
-                                                            }
-                                                        } else {
-                                                            debug3!("Original channels_dict is empty (no channels)");
-                                                        }
-                                                    } // closes inner block
-                                                } else {
-                                                    debug3!("Original channels_dict not available, cannot parse frequency");
-                                                }
-                                            } else {
-                                                debug3!("Failed to create IOReport sample (sample is null)");
-                                            }
-                                        } // closes outer unsafe block
-                                    } else {
+                                    if subscription_ptr.is_null() {
                                         debug3!("Subscription pointer is null, cannot create sample");
+                                        None
+                                    } else {
+                                        // Get channels dictionary for sampling
+                                        let channels_ptr = if let Ok(channels_storage) = IOREPORT_CHANNELS.try_lock() {
+                                            channels_storage.as_ref().map(|&usize_ptr| usize_ptr as CFMutableDictionaryRef)
+                                        } else {
+                                            None
+                                        };
+                                        
+                                        let channels_ref = channels_ptr.unwrap_or(std::ptr::null_mut());
+                                        if channels_ref.is_null() {
+                                            debug3!("Using NULL channels for IOReportCreateSamples (may fail)");
+                                        } else {
+                                            debug3!("Using stored channels dictionary for IOReportCreateSamples");
+                                        }
+                                        
+                                        // Get original channels dictionary
+                                        let original_channels_dict = if let Ok(orig_channels_storage) = IOREPORT_ORIGINAL_CHANNELS.try_lock() {
+                                            orig_channels_storage.as_ref().map(|&dict_usize| dict_usize as CFDictionaryRef)
+                                        } else {
+                                            None
+                                        };
+                                        
+                                        // Get last sample for delta calculation
+                                        let last_sample = if let Ok(last_sample_storage) = LAST_IOREPORT_SAMPLE.try_lock() {
+                                            last_sample_storage.as_ref().map(|&(sample_usize, _)| sample_usize as CFDictionaryRef)
+                                        } else {
+                                            None
+                                        };
+                                        
+                                        // Use the extracted frequency reading function
+                                        unsafe {
+                                            use ffi::ioreport::read_frequencies_from_ioreport;
+                                            
+                                            let (result, current_sample_opt) = read_frequencies_from_ioreport(
+                                                subscription_ptr as *const c_void,
+                                                channels_ref,
+                                                original_channels_dict,
+                                                last_sample,
+                                                freq_logging,
+                                            );
+                                            
+                                            // Store current sample for next delta calculation
+                                            if let Some(current_sample) = current_sample_opt {
+                                                // Retain the sample before storing (Core Foundation ownership rule)
+                                                let retained_sample = CFRetain(current_sample as CFTypeRef) as CFDictionaryRef;
+                                                if let Ok(mut last_sample_storage) = LAST_IOREPORT_SAMPLE.try_lock() {
+                                                    // Release old sample if it exists
+                                                    if let Some((old_sample_usize, _)) = last_sample_storage.take() {
+                                                        let old_sample = old_sample_usize as CFDictionaryRef;
+                                                        if !old_sample.is_null() {
+                                                            CFRelease(old_sample as CFTypeRef);
+                                                        }
+                                                    }
+                                                    // Store retained sample
+                                                    *last_sample_storage = Some((retained_sample as usize, std::time::Instant::now()));
+                                                } else {
+                                                    // Lock failed, release the retained sample
+                                                    CFRelease(retained_sample as CFTypeRef);
+                                                }
+                                                // Release the original sample (we've retained a copy)
+                                                CFRelease(current_sample as CFTypeRef);
+                                            }
+                                            
+                                            Some(result)
+                                        }
                                     }
                                 } else {
                                     debug3!("IOReport subscription not available");
+                                    None
                                 }
-                        } else {
-                            debug3!("should_read_freq=false, skipping frequency update");
-                        }
+                            } else {
+                                debug3!("IOReport subscription lock failed");
+                                None
+                            };
+                            
+                            // Update frequency values from result
+                            if let Some(freq_result) = freq_result {
+                                freq = freq_result.overall;
+                                p_core_freq = freq_result.p_core;
+                                e_core_freq = freq_result.e_core;
+                            }
                             
                             // CRITICAL: Only use nominal frequency as fallback if IOReport completely failed
                             // If IOReport returned 0.0, it means parsing failed - don't overwrite cache with nominal
                             // Only update cache if we got a real frequency from IOReport
+                            let freq_logging = state::FREQUENCY_LOGGING_ENABLED.lock()
+                                .map(|f| *f)
+                                .unwrap_or(false);
+                            
                             if freq > 0.0 {
                                 if let Ok(mut cache) = FREQ_CACHE.try_lock() {
                                     *cache = Some((freq, std::time::Instant::now()));
-                                    debug2!("Frequency cache updated from IOReport: {:.2} GHz", freq);
+                                    if freq_logging {
+                                        debug1!("Overall frequency cache updated: {:.2} GHz", freq);
+                                    } else {
+                                        debug2!("Frequency cache updated from IOReport: {:.2} GHz", freq);
+                                    }
                                 }
                                 
                                 // Update P-core frequency cache
                                 if p_core_freq > 0.0 {
                                     if let Ok(mut cache) = P_CORE_FREQ_CACHE.try_lock() {
                                         *cache = Some((p_core_freq, std::time::Instant::now()));
-                                        debug2!("P-core frequency cache updated: {:.2} GHz", p_core_freq);
+                                        if freq_logging {
+                                            debug1!("P-core frequency cache updated: {:.2} GHz", p_core_freq);
+                                        } else {
+                                            debug2!("P-core frequency cache updated: {:.2} GHz", p_core_freq);
+                                        }
+                                    }
+                                } else {
+                                    if freq_logging {
+                                        debug1!("P-core frequency is 0.0 - NOT updating cache");
                                     }
                                 }
                                 
@@ -1169,7 +672,15 @@ extern "C" {
                                 if e_core_freq > 0.0 {
                                     if let Ok(mut cache) = E_CORE_FREQ_CACHE.try_lock() {
                                         *cache = Some((e_core_freq, std::time::Instant::now()));
-                                        debug2!("E-core frequency cache updated: {:.2} GHz", e_core_freq);
+                                        if freq_logging {
+                                            debug1!("E-core frequency cache updated: {:.2} GHz", e_core_freq);
+                                        } else {
+                                            debug2!("E-core frequency cache updated: {:.2} GHz", e_core_freq);
+                                        }
+                                    }
+                                } else {
+                                    if freq_logging {
+                                        debug1!("E-core frequency is 0.0 - NOT updating cache");
                                     }
                                 }
                                 
@@ -1183,26 +694,22 @@ extern "C" {
                                     debug2!("ACCESS_CACHE updated: can_read_frequency=true (IOReport frequency read successfully)");
                                 }
                             } else {
-                                // IOReport parsing failed - log why and don't update cache
                                 // This prevents overwriting a good cached value with nominal frequency
                                 debug2!("IOReport frequency parsing failed (freq=0.0) - keeping existing cache value if available");
                                 
-                                // Only use nominal as fallback if cache is empty (first time)
-                                if let Ok(cache) = FREQ_CACHE.try_lock() {
+                                // Only initialize cache with nominal frequency if it's completely empty
+                                if let Ok(mut cache) = FREQ_CACHE.try_lock() {
                                     if cache.is_none() {
-                                        // Cache is empty - use nominal as initial value
                                         let nominal = metrics::get_nominal_frequency();
-                                        if nominal > 0.0 {
-                                            debug2!("Using nominal frequency as initial value: {:.2} GHz (IOReport not available yet)", nominal);
-                                            // Don't update cache here - let IOReport populate it when it works
-                                        }
+                                        *cache = Some((nominal, std::time::Instant::now()));
+                                        debug2!("Using nominal frequency as initial value: {:.2} GHz (IOReport not available yet)", nominal);
                                     } else {
                                         debug3!("Keeping existing cached frequency value (IOReport parsing failed)");
                                     }
                                 }
                             }
                         } else {
-                            debug3!("should_read_freq=false, skipping frequency update");
+                            debug2!("should_read_freq=false, skipping frequency update");
                         }
                     } else {
                         // CPU window is not visible - clear SMC connection and IOReport subscription to save resources
@@ -1221,10 +728,6 @@ extern "C" {
                                 debug2!("CPU window closed, IOReport subscription cleared");
                                 
                                 // Clear channels dictionary
-                                #[link(name = "CoreFoundation", kind = "framework")]
-                                extern "C" {
-                                    fn CFRelease(cf: CFTypeRef);
-                                }
                                 if let Ok(mut channels_storage) = IOREPORT_CHANNELS.try_lock() {
                                     if let Some(ptr) = *channels_storage {
                                         unsafe {

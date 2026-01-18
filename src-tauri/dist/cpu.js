@@ -233,9 +233,10 @@ async function refresh() {
     
     if (!data.can_read_temperature) {
       failedAttempts.temperature++;
-      if (tempEl.textContent !== "—") {
+      const currentDisplay = tempEl.textContent.replace(/°C/g, "").trim();
+      if (currentDisplay !== "—") {
         scheduleDOMUpdate(() => {
-          tempEl.textContent = "—";
+          tempEl.innerHTML = "—";
           tempSubtext.textContent = "—";
         });
       }
@@ -257,11 +258,14 @@ async function refresh() {
       // But show "—" if temperature is exactly 0.0 and we've been trying for a while
       if (newTemp === 0 && data.temperature === 0.0) {
         // Temperature is 0.0 - might be unsupported Mac model
-        // Still show it as "0°" to indicate we're trying to read it
-        const formatted = "0°";
-        if (tempEl.textContent !== formatted) {
+        // Still show it as "0°C" to indicate we're trying to read it
+        const numberText = "0";
+        const currentText = tempEl.textContent.match(/^\d+/) ? tempEl.textContent.match(/^\d+/)[0] : "";
+        
+        if (currentText !== numberText) {
           scheduleDOMUpdate(() => {
-            tempEl.textContent = formatted;
+            // Always rebuild with the correct structure: number + span
+            tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
           });
           previousValues.temperature = 0;
         }
@@ -271,10 +275,14 @@ async function refresh() {
           });
         }
       } else {
-        const formatted = `${newTemp}°`;
-        if (tempEl.textContent !== formatted) {
+        const numberText = `${newTemp}`;
+        // Get current number by extracting digits from textContent (ignoring °C)
+        const currentText = tempEl.textContent.match(/^\d+/) ? tempEl.textContent.match(/^\d+/)[0] : "";
+        
+        if (currentText !== numberText) {
           scheduleDOMUpdate(() => {
-            tempEl.textContent = formatted;
+            // Always rebuild with the correct structure: number + span
+            tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
           });
           previousValues.temperature = newTemp;
         }
@@ -302,11 +310,17 @@ async function refresh() {
     const cpuUsageSubtext = document.getElementById("cpu-usage-subtext");
     // Always show usage as percentage, even if 0 (don't show "-")
     const newUsage = Math.max(0, Math.round(data.usage || 0));
-    const formatted = `${newUsage}%`;
+    const numberText = `${newUsage}`;
+    const currentText = cpuUsageEl.childNodes[0]?.textContent || "";
     
-    if (cpuUsageEl.textContent !== formatted) {
+    if (currentText !== numberText) {
       scheduleDOMUpdate(() => {
-        cpuUsageEl.textContent = formatted;
+        // Update the number part, keep the % span
+        if (cpuUsageEl.childNodes[0]) {
+          cpuUsageEl.childNodes[0].textContent = numberText;
+        } else {
+          cpuUsageEl.innerHTML = `${numberText}<span class="metric-unit">%</span>`;
+        }
       });
       previousValues.usage = newUsage;
     }

@@ -21,9 +21,9 @@
   --panel-border: rgba(255, 255, 255, 0.80);
   --panel-shadow: 0 20px 80px rgba(0, 0, 0, 0.10);
 
-  --accent: #34c759; /* Apple Green for nominal temperature */
-  --accent-usage: #007aff; /* Apple Blue for usage */
-  --accent-freq: #ff9500; /* Apple Orange for frequency */
+  --accent: #8bb4e8; /* Pastel blue for temperature */
+  --accent-usage: #9db5c4; /* Pastel blue-grey for usage */
+  --accent-freq: #a8c5e8; /* Pastel blue for frequency */
   --ring-track: rgba(0, 0, 0, 0.06);
 
   --modal-backdrop: rgba(0, 0, 0, 0.30);
@@ -136,42 +136,55 @@ body {
 
 .apple-actions {
   display: flex;
-  gap: 14px;
-}
-
-.icon-btn {
-  width: 54px;
-  height: 54px;
-  border-radius: 18px;
-  border: none;
+  gap: 0;
   background: rgba(255, 255, 255, 0.42);
-  color: rgba(30, 30, 34, 0.60);
-  font-size: 22px;
-  cursor: pointer;
-
+  border-radius: 12px;
+  padding: 2px;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.75),
     inset 0 -1px 0 rgba(0, 0, 0, 0.04),
-    0 16px 34px rgba(0, 0, 0, 0.14);
-  transition: transform 0.16s ease, box-shadow 0.16s ease;
+    0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: rgba(30, 30, 34, 0.60);
+  font-size: 18px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.12s ease;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.icon-btn svg {
-  width: 18px;
-  height: 18px;
+.icon-btn:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.08);
 }
 
 .icon-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.14);
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .icon-btn:active {
-  transform: translateY(0);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
 .apple-divider {
@@ -215,14 +228,27 @@ body {
 }
 
 .metric-value {
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: -0.8px;
-  line-height: 1;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "SF Pro Text",
+    sans-serif;
+  font-size: 38px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
   white-space: nowrap;
   color: var(--text);
   margin-top: 28px;
   z-index: 2;
+}
+
+.metric-unit {
+  font-size: 0.7em;
+  vertical-align: baseline;
+  position: relative;
+  top: -4px;
 }
 
 .metric-subtext {
@@ -483,7 +509,7 @@ body {
   }
 
   .metric-value {
-    font-size: 26px;
+    font-size: 38px;
   }
 
   .ring {
