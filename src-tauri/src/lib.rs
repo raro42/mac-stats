@@ -406,7 +406,7 @@ fn run_internal(open_cpu_window: bool) {
                         // Temperature doesn't change rapidly, so 15s is still responsive
                         let should_read_temp_now = if let Ok(mut last) = LAST_TEMP_UPDATE.lock() {
                             let should = last.as_ref()
-                                .map(|t| t.elapsed().as_secs() >= 15)
+                                .map(|t| t.elapsed().as_secs() >= 20)
                                 .unwrap_or(true);
                             if should {
                                 *last = Some(std::time::Instant::now());
@@ -524,7 +524,7 @@ fn run_internal(open_cpu_window: bool) {
                         let should_read_freq = if let Ok(mut last) = LAST_FREQ_READ.lock() {
                             debug2!("========> LAST_FREQ_READ: {:?}", last);
                             let should = last.as_ref()
-                                .map(|t| t.elapsed().as_secs() >= 20)
+                                .map(|t| t.elapsed().as_secs() >= 30)
                                 .unwrap_or(true);
                             if should {
                                 *last = Some(std::time::Instant::now());
