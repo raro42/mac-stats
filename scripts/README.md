@@ -59,6 +59,117 @@ Measures real-time performance metrics for mac-stats process.
 
 ---
 
+## CPU Comparison Monitoring
+
+### `monitor_cpu_comparison.py` - Compare mac_stats vs Stats App
+
+Monitors CPU usage of both `mac_stats` and `Stats` apps simultaneously for side-by-side comparison. Perfect for demonstrating that mac_stats uses less CPU.
+
+**Usage**:
+```bash
+# Monitor for 60 seconds (default), 1-second intervals
+./scripts/monitor_cpu.sh
+
+# Monitor for 120 seconds, 2-second intervals
+./scripts/monitor_cpu.sh 120 2
+
+# Or use Python directly
+python3 ./scripts/monitor_cpu_comparison.py 60 1
+```
+
+**Parameters**:
+- `duration` (seconds): How long to monitor [default: 60]
+- `interval` (seconds): Sampling interval [default: 1.0]
+
+**Features**:
+- Monitors all processes matching "mac_stats" and "Stats"
+- Real-time comparison display
+- Generates summary report with statistics
+- Exports CSV data for further analysis
+- Optional screenshot capture
+
+**Output**:
+- `cpu-comparison-report-YYYYMMDD_HHMMSS.txt` - Summary report with averages
+- `cpu-comparison-data-YYYYMMDD_HHMMSS.csv` - Raw data for analysis
+- `cpu-comparison-screenshots/comparison-YYYYMMDD_HHMMSS.png` - Screenshot (optional)
+
+**Example Workflow**:
+```bash
+# 1. Start both apps
+./target/release/mac_stats &
+open -a Stats
+
+# 2. Wait a few seconds for apps to stabilize
+
+# 3. Run comparison monitor
+./scripts/monitor_cpu.sh 60 1
+
+# 4. Review the generated report
+cat cpu-comparison-report-*.txt
+
+# 5. Open CSV in spreadsheet for visualization
+open cpu-comparison-data-*.csv
+```
+
+**Example Output**:
+```
+================================================================================
+  CPU Usage Comparison Monitor
+================================================================================
+Started: 2025-01-18 18:00:00
+
+Monitoring for 60 seconds (interval: 1.0s)
+
+Time     | mac_stats CPU | Stats CPU | Comparison
+--------------------------------------------------------------------------------
+18:00:01 | mac_stats:     0.45% (1 procs) | Stats:     2.30% (3 procs) | ✓ mac_stats uses LESS
+18:00:02 | mac_stats:     0.52% (1 procs) | Stats:     2.15% (3 procs) | ✓ mac_stats uses LESS
+18:00:03 | mac_stats:     0.48% (1 procs) | Stats:     2.40% (3 procs) | ✓ mac_stats uses LESS
+...
+
+================================================================================
+CPU Usage Comparison Report
+================================================================================
+mac_stats App:
+  Average CPU: 0.48%
+  Minimum CPU: 0.35%
+  Maximum CPU: 0.65%
+
+Stats App:
+  Average CPU: 2.25%
+  Minimum CPU: 1.90%
+  Maximum CPU: 2.80%
+
+Comparison:
+  ✓ mac_stats uses LESS CPU
+  Difference: 1.77%
+```
+
+**Process Detection**:
+The script automatically finds ALL processes belonging to mac-stats, including:
+- Main Rust process (`mac_stats`)
+- Tauri WebView processes
+- Helper processes spawned by Tauri
+- Any child processes
+
+It identifies processes by:
+- Process name patterns: `mac_stats`, `mac-stats`
+- Bundle identifier: `com.raro42.mac-stats`
+- Process paths containing `/mac-stats` or `/mac_stats`
+- Parent-child relationships (finds all children of main process)
+
+The script will show all found processes at startup so you can verify it's tracking everything correctly.
+
+**Tips for Best Results**:
+1. **Start both apps** before running the monitor
+2. **Let apps stabilize** for 10-15 seconds before monitoring
+3. **Close other apps** to minimize background noise
+4. **Monitor for at least 60 seconds** for meaningful averages
+5. **Use the CSV data** to create charts/graphs for presentations
+6. **Verify process detection** - check the startup process list to ensure all mac-stats processes are found
+
+---
+
 ## Build & Release
 
 ### `build-dmg.sh` - Create DMG Installer
