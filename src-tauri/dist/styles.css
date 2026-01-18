@@ -19,9 +19,11 @@ body {
   width: 100vw;
   height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   padding-top: 0;
+  position: relative;
 }
 
 .stats-container {
@@ -64,4 +66,39 @@ body {
   line-height: 1;
   font-variant-numeric: tabular-nums;
   opacity: 1;
+}
+
+.stats-footer {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.stats-footer:hover {
+  opacity: 0.8;
+}
+
+.app-version {
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-github-link {
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.stats-github-link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
 }

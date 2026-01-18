@@ -245,10 +245,12 @@ body {
 }
 
 .metric-unit {
-  font-size: 0.7em;
+  font-size: 8px;
+  font-weight: 300;
   vertical-align: baseline;
   position: relative;
-  top: -4px;
+  top: -2px;
+  margin-left: 2px;
 }
 
 .metric-subtext {
@@ -532,4 +534,38 @@ body {
   .process-bar {
     width: 80px;
   }
+}
+
+.apple-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+  padding-bottom: 4px;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--muted);
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.apple-footer:hover {
+  opacity: 0.8;
+}
+
+.app-version {
+  font-variant-numeric: tabular-nums;
+}
+
+.apple-github-link {
+  color: var(--muted);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.apple-github-link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
 }

@@ -538,6 +538,15 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
                 debug2!("Rate limiter cleared - first get_cpu_details() call will execute immediately");
             }
             
+            // Enable devtools for right-click inspect
+            // In debug builds, devtools should be available by default
+            // We can also try to enable it via the webview if needed
+            #[cfg(debug_assertions)]
+            {
+                // Devtools are typically enabled by default in debug builds
+                // Right-click inspect should work
+            }
+            
             let _ = window.set_always_on_top(true);
             let _ = window.show();
             let _ = window.set_focus();

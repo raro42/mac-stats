@@ -99,7 +99,8 @@ use state::*;
 // Use metrics from metrics module (only re-export what's needed)
 
 // Re-export for Tauri commands
-pub use metrics::{SystemMetrics, CpuDetails, get_cpu_details, get_metrics};
+pub use metrics::{SystemMetrics, CpuDetails, get_cpu_details, get_metrics, get_app_version};
+
 
 // UI functions are now in ui module
 use ui::status_bar::{build_status_text, setup_status_item, create_cpu_window, make_attributed_title};
@@ -125,7 +126,7 @@ pub fn run() {
 
 fn run_internal(open_cpu_window: bool) {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![get_cpu_details])
+        .invoke_handler(tauri::generate_handler![get_cpu_details, get_app_version])
         .setup(move |app| {
             // Hide the main window immediately (menu bar app)
             if let Some(main_window) = app.get_window("main") {

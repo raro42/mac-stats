@@ -116,12 +116,72 @@
     });
   }
 
+  function initExternalLinks() {
+    const githubLink = document.getElementById("github-link");
+    if (!githubLink) return;
+
+    githubLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      const url = githubLink.href;
+
+      // Try to use Tauri shell API if available (Tauri v1)
+      if (window.__TAURI__?.shell?.open) {
+        window.__TAURI__.shell.open(url).catch((err) => {
+          console.error("Failed to open URL with Tauri shell:", err);
+          // Fallback to window.open
+          window.open(url, "_blank", "noopener,noreferrer");
+        });
+      } else if (window.__TAURI__?.tauri?.shell?.open) {
+        window.__TAURI__.tauri.shell.open(url).catch((err) => {
+          console.error("Failed to open URL with Tauri shell:", err);
+          window.open(url, "_blank", "noopener,noreferrer");
+        });
+      } else {
+        // Fallback to window.open if Tauri API is not available
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+    });
+  }
+
+  async function injectAppVersion() {
+    // Fetch app version from Rust backend and inject into all version elements
+    try {
+      if (!window.__TAURI__?.invoke) {
+        console.warn("Tauri invoke not available, skipping version injection");
+        return;
+      }
+
+      const version = await window.__TAURI__.invoke("get_app_version");
+
+      // Update all version elements (theme name varies per theme)
+      // .theme-version, .arch-version, etc.
+      const versionElements = document.querySelectorAll(
+        "[class*='version'], .theme-version, .arch-version"
+      );
+
+      versionElements.forEach((el) => {
+        const themeName = el.textContent.split(" v")[0].trim();
+        if (themeName) {
+          el.textContent = `${themeName} v${version}`;
+        } else {
+          el.textContent = `v${version}`;
+        }
+      });
+
+      console.log(`App version injected: v${version}`);
+    } catch (err) {
+      console.error("Failed to fetch app version:", err);
+    }
+  }
+
   function bootstrap() {
     const savedTheme = getSavedTheme();
     syncThemeClass(savedTheme);
     initSettingsModal();
     initThemePicker();
     initRefresh();
+    initExternalLinks();
+    injectAppVersion();
   }
 
   if (document.readyState === "loading") {

@@ -25,30 +25,29 @@ body {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  padding: 48px;
-  background: radial-gradient(900px 900px at 30% 15%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 60%),
-    radial-gradient(900px 900px at 70% 80%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 55%),
-    var(--bg);
+  padding: 0;
+  background: #ffffff;
   color: var(--text);
 }
 
 .swiss-shell {
   height: 100%;
-  max-width: 560px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
 
-  border-radius: 46px;
-  background: var(--panel);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 28px 100px rgba(0, 0, 0, 0.12);
+  border-radius: 0;
+  background: #ffffff;
+  border: none;
+  box-shadow: none;
 
-  backdrop-filter: blur(34px) saturate(160%);
-  -webkit-backdrop-filter: blur(34px) saturate(160%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 
-  padding: 40px 36px 30px;
+  padding: 24px 20px 20px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 .swiss-header {
@@ -59,9 +58,17 @@ body {
 }
 
 .swiss-title h1 {
-  font-size: 52px;
-  font-weight: 800;
-  letter-spacing: -0.9px;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "SF Pro Text",
+    sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: rgba(18, 18, 22, 0.92);
 }
 
 .swiss-subtitle {
@@ -103,6 +110,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
+  margin-bottom: 0;
 }
 
 .tile {
@@ -117,33 +125,52 @@ body {
 }
 
 .metric-label {
-  font-size: 24px;
-  font-weight: 650;
-  letter-spacing: -0.35px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
   text-align: center;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
+  opacity: 0.5;
 }
 
 .metric-value {
   position: absolute;
-  top: 54%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 72px;
-  font-weight: 800;
-  letter-spacing: -1px;
-  line-height: 1;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "SF Pro Text",
+    sans-serif;
+  font-size: 38px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
   white-space: nowrap;
+}
+
+.metric-unit {
+  font-size: 8px;
+  font-weight: 300;
+  vertical-align: baseline;
+  position: relative;
+  top: -2px;
+  margin-left: 2px;
 }
 
 .metric-subtext {
   position: absolute;
-  top: 71%;
+  top: calc(68% + 17px);
   left: 50%;
   transform: translate(-50%, 0);
-  font-size: 16px;
+  font-size: 10px;
+  font-weight: 600;
   color: var(--muted);
   white-space: nowrap;
+  opacity: 0.8;
 }
 
 .metric-hint {
@@ -187,47 +214,104 @@ body {
 }
 
 .section-title {
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  margin-bottom: 14px;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  color: rgb(1, 1, 1, 0.75);
+  text-transform: uppercase;
 }
 
 .details-grid {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 14px 28px;
-  font-size: 22px;
+  gap: 8px 28px;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: rgba(60, 60, 67, 0.72);
 }
 
 .detail-label {
-  color: var(--muted);
-  font-weight: 600;
+  /* Inherit font styles from .details-grid */
 }
 
 .detail-value {
   text-align: right;
-  font-weight: 750;
+  /* Inherit font styles from .details-grid */
+}
+
+.history-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-bottom: 4px;
+  margin-top: -40px;
+  padding: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.history-chart-container {
+  position: relative;
+  height: 40px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.20);
+  padding: 0;
+  margin: 0;
+}
+
+.history-chart {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.swiss-details {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.swiss-processes {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 4px;
 }
 
 .process-table {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 2px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  font-size: 12px;
 }
 
 .process-row {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 18px;
+  gap: 12px;
   align-items: center;
-  padding: 10px 0;
+  padding: 4px 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .process-name {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 400;
   color: rgba(18, 18, 22, 0.76);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -241,8 +325,8 @@ body {
 }
 
 .process-bar {
-  width: 120px;
-  height: 8px;
+  width: 100px;
+  height: 4px;
   background: rgba(0, 0, 0, 0.10);
   border-radius: 99px;
   overflow: hidden;
@@ -256,10 +340,10 @@ body {
 }
 
 .process-percent {
-  min-width: 62px;
+  min-width: 40px;
   text-align: right;
-  font-size: 22px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 400;
   color: rgba(18, 18, 22, 0.72);
 }
 
@@ -277,6 +361,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 30px;
+  z-index: 10000;
 }
 
 .settings-card {
@@ -393,4 +478,56 @@ body {
   .process-bar {
     width: 90px;
   }
+}
+
+.theme-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+  padding-bottom: 4px;
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.5);
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.theme-footer:hover {
+  opacity: 0.8;
+}
+
+.theme-version {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.theme-github-link {
+  color: inherit;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.theme-github-link::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+}
+
+.theme-github-link:hover {
+  color: rgba(0, 0, 0, 0.8);
+  opacity: 1;
+}
+
+.theme-github-link:hover::after {
+  opacity: 0.6;
 }

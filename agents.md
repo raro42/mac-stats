@@ -47,6 +47,7 @@ Build a polished macOS (Apple Silicon) stats app (Rust + Tauri) that reads CPU/p
   - separate binary/daemon, launched via launchd or explicit sudo in dev mode
   - communicate over a Unix domain socket or localhost with auth token
 - Make root metrics optional; app must work gracefully without them.
+- When doing "frontend" changes, you can pkill running instance and restart the app.
 
 ## Logging & Diagnostics
 - Use `tracing` for structured logs.
@@ -84,3 +85,86 @@ Build a polished macOS (Apple Silicon) stats app (Rust + Tauri) that reads CPU/p
 ## When Uncertain
 - Ask for the exact macOS version and target (Dev vs notarized distribution).
 - Default to the safest, Apple-supported approach.
+
+---
+
+## Performance Measurement & Optimization
+
+### Measuring CPU, GPU, and RAM Usage
+
+Use the provided measurement script to track performance metrics:
+
+```bash
+# Measure with CPU window open (30 seconds)
+./scripts/measure_performance.sh 30 1 window
+
+# Measure idle (menu bar only, 60 seconds)
+./scripts/measure_performance.sh 60 1 idle
+
+# Custom: 120 seconds, 2-second intervals
+./scripts/measure_performance.sh 120 2 idle
+```
+
+**Script Features**:
+- Measures CPU usage (%), Memory (%), RSS/VSZ (MB), thread count
+- Outputs live measurements + statistics
+- Saves results as text report + CSV for analysis
+- Reusable for before/after comparison
+- Located in `scripts/` directory (keep root clean)
+
+**Output Files**:
+- `performance_window_YYYYMMDD_HHMMSS.txt` - Detailed report
+- `performance_window_YYYYMMDD_HHMMSS.csv` - Data for spreadsheets
+
+### CPU Optimization Workflow
+
+1. **Baseline Measurement** (before any changes):
+   ```bash
+   ./scripts/measure_performance.sh 30 1 window  # With window
+   ./scripts/measure_performance.sh 30 1 idle    # Without window
+   ```
+
+2. **Implement Optimizations**:
+   - See `docs/001_task_optimize_backend.md` (backend)
+   - See `docs/002_task_optimize_frontend.md` (frontend)
+   - See `docs/003_task_optimize_advanced_idle.md` (advanced)
+
+3. **Measure After Each Phase**:
+   ```bash
+   # After Phase 1:
+   ./scripts/measure_performance.sh 30 1 window
+
+   # After Phase 2:
+   ./scripts/measure_performance.sh 30 1 window
+
+   # Compare: Phase 1 vs Phase 2 vs baseline
+   ```
+
+4. **Track Cumulative Improvement**:
+   - Save results with phase names
+   - Compare CSV files in spreadsheet
+   - Document CPU reduction percentage
+
+### Directory Structure: Keep Root Clean
+
+```
+mac-stats/
+├── scripts/                    ← All development/measurement scripts
+│   ├── build-dmg.sh
+│   ├── measure_performance.sh  ← Performance measurement
+│   ├── take-screenshot.sh
+│   └── trace_backend.sh
+├── docs/                       ← Documentation and analysis
+│   ├── 000_task_optimize_summary.md
+│   ├── 001_task_optimize_backend.md
+│   ├── 002_task_optimize_frontend.md
+│   ├── 003_task_optimize_advanced_idle.md
+│   └── OPTIMIZE_CHECKLIST.md
+├── src-tauri/                  ← Source code
+│   ├── src/                    ← Rust backend
+│   ├── dist/                   ← Frontend assets
+│   └── Cargo.toml
+└── README.md                   ← Keep root clean, no scripts here!
+```
+
+**Rule**: All `.sh`, `.py`, and utility scripts go in `scripts/` directory, not root.

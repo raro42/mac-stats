@@ -16,7 +16,7 @@
   --accent: #3bd6ff;
   --accent2: #a67bff;
 
-  --glass-bg: rgba(18, 18, 26, 0.55);
+  --glass-bg: rgba(18, 18, 26, 0.25);
   --glass-border: rgba(255, 255, 255, 0.16);
   --shadow: 0 20px 70px rgba(0, 0, 0, 0.55);
 }
@@ -28,9 +28,11 @@ body {
   overflow: hidden;
 
   background:
+    url('./futuristic-bg.svg'),
     radial-gradient(900px 900px at 20% 15%, rgba(59, 214, 255, 0.25), rgba(0, 0, 0, 0) 55%),
     radial-gradient(900px 900px at 80% 20%, rgba(166, 123, 255, 0.22), rgba(0, 0, 0, 0) 60%),
     linear-gradient(135deg, #07070c 0%, #111123 55%, #090916 100%);
+  background-size: cover, auto, auto, auto;
 }
 
 .glass-panel {
@@ -38,8 +40,8 @@ body {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(18px) saturate(150%);
-  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
 
   max-width: 420px;
   width: 100%;
@@ -62,9 +64,17 @@ body {
 }
 
 .header-left h1 {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "SF Pro Text",
+    sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .subtitle {
@@ -124,30 +134,53 @@ body {
 }
 
 .metric-label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
   color: var(--muted);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  opacity: 0.5;
 }
 
 .metric-value {
-  font-size: 36px;
-  font-weight: 700;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "SF Pro Text",
+    sans-serif;
+  font-size: 38px;
+  font-weight: 400;
   position: absolute;
-  top: calc(50% + 8px);
+  top: 53%;
   left: 50%;
   transform: translate(-50%, -50%);
-  letter-spacing: -0.5px;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.metric-unit {
+  font-size: 8px;
+  font-weight: 300;
+  vertical-align: baseline;
+  position: relative;
+  top: -2px;
+  margin-left: 2px;
+  opacity: 0.7;
 }
 
 .metric-subtext {
   font-size: 10px;
+  font-weight: 600;
   color: var(--muted);
   position: absolute;
-  top: calc(50% + 8px + 24px);
+  top: calc(68% + 17px);
   left: 50%;
   transform: translate(-50%, 0);
   white-space: nowrap;
+  opacity: 0.8;
 }
 
 .metric-hint {
@@ -180,36 +213,88 @@ body {
   stroke-linecap: round;
   stroke-dasharray: 264;
   stroke-dashoffset: 264;
-  transform: rotate(-90deg);
+  transform: rotate(-120deg);
   transform-origin: 50% 50%;
   filter: drop-shadow(0 0 8px rgba(59, 214, 255, 0.35));
 }
 
 .details-section {
+  margin-top: 24px;
   margin-bottom: 18px;
 }
 
 .section-title {
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
 }
 
 .details-grid {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 10px 16px;
-  font-size: 13px;
+  gap: 8px 28px;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Segoe UI",
+    sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .detail-label {
-  color: var(--muted);
+  /* Inherit font styles from .details-grid */
 }
 
 .detail-value {
   text-align: right;
-  color: var(--text);
+  /* Inherit font styles from .details-grid */
+}
+
+.history-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 0;
+  margin-top: 4px;
+  padding: 0;
+}
+
+.history-chart-container {
+  position: relative;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.20);
+  padding: 0;
+  margin: 0;
+}
+
+.history-chart-label {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 8px;
   font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.history-chart {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .processes-section {
@@ -222,21 +307,21 @@ body {
 .process-table {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
   overflow-y: auto;
 }
 
 .process-row {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
-  padding: 8px 0;
+  padding: 3px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.10);
 }
 
 .process-name {
-  font-size: 13px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.78);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -246,11 +331,11 @@ body {
 .process-usage {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .process-bar {
-  width: 52px;
+  width: 50px;
   height: 3px;
   background: rgba(255, 255, 255, 0.12);
   border-radius: 2px;
@@ -265,10 +350,10 @@ body {
 }
 
 .process-percent {
-  min-width: 52px;
+  min-width: 45px;
   text-align: right;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .process-empty {
@@ -286,7 +371,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 10000;
   padding: 24px;
 }
 
@@ -342,4 +427,56 @@ body {
 
 .theme-item[aria-current="true"] {
   box-shadow: 0 0 0 3px rgba(59, 214, 255, 0.16);
+}
+
+.theme-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+  padding-bottom: 4px;
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.theme-footer:hover {
+  opacity: 0.9;
+}
+
+.theme-version {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.theme-github-link {
+  color: inherit;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.theme-github-link::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
+}
+
+.theme-github-link:hover {
+  color: rgba(255, 255, 255, 0.86);
+  opacity: 1;
+}
+
+.theme-github-link:hover::after {
+  opacity: 0.7;
 }

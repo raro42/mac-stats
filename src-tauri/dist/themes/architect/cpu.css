@@ -44,7 +44,7 @@ body {
   border: 1px solid rgba(35, 45, 65, 0.14);
   box-shadow: var(--paper-shadow);
 
-  padding: 34px 34px 26px;
+  padding: 34px 34px 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -58,49 +58,97 @@ body {
 }
 
 .arch-title h1 {
-  font-size: 50px;
-  font-weight: 500;
-  letter-spacing: -0.8px;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "SF Pro Text",
+    sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: rgba(28, 28, 30, 0.92);
 }
 
 .arch-subtitle {
-  margin-top: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(35, 45, 65, 0.35);
-  text-transform: uppercase;
-  letter-spacing: 0.10em;
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--ink-muted);
 }
 
 .arch-actions {
   display: flex;
-  gap: 8px;
+  gap: 0;
   border: 1px solid var(--line-strong);
-  padding: 8px;
+  padding: 2px;
+  background: rgba(255, 255, 255, 0.42);
+  border-radius: 10px;
 }
 
 .icon-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  border: 1px solid var(--line-strong);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
   background: transparent;
   color: rgba(35, 45, 65, 0.75);
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
+  position: relative;
+  transition: background 0.12s ease;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
+.icon-btn:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 20px;
+  background: rgba(35, 45, 65, 0.15);
+}
+
 .icon-btn:hover {
-  background: rgba(35, 45, 65, 0.06);
+  background: rgba(35, 45, 65, 0.08);
+}
+
+.icon-btn:active {
+  background: rgba(35, 45, 65, 0.12);
 }
 
 .arch-rule {
   height: 1px;
   background: var(--line);
+}
+
+.history-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-bottom: 8px;
+  padding: 8px 0;
+}
+
+.history-chart-container {
+  position: relative;
+  height: 40px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.history-chart {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .arch-metrics {
@@ -114,9 +162,13 @@ body {
   border-radius: 14px;
   border: 1px solid var(--line-strong);
   background: rgba(255, 255, 255, 0.20);
-  padding: 22px 18px 18px;
-  min-height: 220px;
+  padding: 18px 14px 14px;
+  min-height: 180px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .metric-box::before {
@@ -129,31 +181,45 @@ body {
 }
 
 .metric-label {
-  font-size: 22px;
+  font-size: 14px;
   font-weight: 500;
   text-align: center;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
+  text-transform: capitalize;
 }
 
 .metric-value {
   position: absolute;
-  top: 54%;
+  top: calc(50% + 19px);
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 66px;
+  font-size: 38px;
   font-weight: 500;
-  letter-spacing: -1px;
-  line-height: 1;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.metric-unit {
+  font-size: 6px;
+  font-weight: 300;
+  vertical-align: baseline;
+  position: relative;
+  top: -2px;
+  margin-left: 2px;
 }
 
 .metric-subtext {
   position: absolute;
-  top: 71%;
+  top: calc(68% + 19px);
   left: 50%;
   transform: translate(-50%, 0);
-  font-size: 16px;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--ink-muted);
   white-space: nowrap;
+  z-index: 2;
 }
 
 .metric-hint {
@@ -164,25 +230,25 @@ body {
 
 .ring {
   position: absolute;
-  top: 56%;
+  top: 58%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 180px;
-  height: 180px;
+  width: 128px;
+  height: 128px;
   pointer-events: none;
-  /* Show a top arc like the screenshot - clip to show only top semicircle */
-  clip-path: inset(0 0 42% 0);
+  z-index: 1;
 }
 
 .icon-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 .ring-track {
   fill: none;
   stroke: var(--ring-track);
   stroke-width: 5;
+  stroke-linecap: round;
 }
 
 .ring-progress {
@@ -192,70 +258,86 @@ body {
   stroke-linecap: round;
   stroke-dasharray: 264;
   stroke-dashoffset: 264;
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .section-title {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  color: rgb(1, 1, 1, 0.75);
   text-transform: uppercase;
-  letter-spacing: 0.10em;
-  margin-bottom: 12px;
-  color: rgba(35, 45, 65, 0.78);
 }
 
 .details-grid {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 14px 28px;
-  font-size: 22px;
+  gap: 8px 28px;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Segoe UI",
+    sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: rgba(60, 60, 67, 0.72);
 }
 
 .detail-label {
-  color: rgba(35, 45, 65, 0.72);
-  font-weight: 500;
+  /* Inherit font styles from .details-grid */
 }
 
 .detail-value {
   text-align: right;
-  font-weight: 600;
-  color: rgba(35, 45, 65, 0.86);
+  /* Inherit font styles from .details-grid */
 }
 
 .process-table {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 4px;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: rgba(60, 60, 67, 0.72);
 }
 
 .process-row {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 18px;
+  gap: 12px;
   align-items: center;
-  padding: 10px 0;
+  padding: 2px 0;
   border-bottom: 1px solid rgba(35, 45, 65, 0.12);
 }
 
 .process-name {
-  font-size: 18px;
-  font-weight: 600;
-  color: rgba(35, 45, 65, 0.78);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  /* Inherit font styles from .process-table */
 }
 
 .process-usage {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
 }
 
 .process-bar {
-  width: 120px;
-  height: 6px;
+  width: 100px;
+  height: 4px;
   background: rgba(35, 45, 65, 0.12);
   border-radius: 99px;
   overflow: hidden;
@@ -268,11 +350,9 @@ body {
 }
 
 .process-percent {
-  min-width: 62px;
+  min-width: 50px;
   text-align: right;
-  font-size: 20px;
-  font-weight: 700;
-  color: rgba(35, 45, 65, 0.78);
+  /* Inherit font styles from .process-table */
 }
 
 .process-empty {
@@ -289,6 +369,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 30px;
+  z-index: 10000;
 }
 
 .settings-card {
@@ -358,4 +439,56 @@ body {
 
 .theme-item[aria-current="true"] {
   box-shadow: 0 0 0 2px rgba(35, 45, 65, 0.22);
+}
+
+.arch-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 12px;
+  padding-bottom: 4px;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--ink-muted);
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.arch-footer:hover {
+  opacity: 0.8;
+}
+
+.arch-version {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.arch-github-link {
+  color: inherit;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.arch-github-link::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+}
+
+.arch-github-link:hover {
+  color: var(--ink);
+  opacity: 1;
+}
+
+.arch-github-link:hover::after {
+  opacity: 0.6;
 }
