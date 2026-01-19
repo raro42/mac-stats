@@ -4,6 +4,8 @@ A lightweight system monitor for macOS built with Rust and Tauri.
 
 <img src="screens/apple.png" alt="mac-stats Apple Theme" width="400">
 
+📋 [View Changelog](CHANGELOG.md)
+
 ## Inspiration
 
 This project is inspired by [Stats](https://github.com/exelban/stats) by [exelban](https://github.com/exelban), a popular macOS system monitor with 35.8k+ stars.
