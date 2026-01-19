@@ -55,4 +55,5 @@ objc2-app-kit = { version = "0.3.2", features = [
   "NSView",
   "objc2-core-foundation"
 ] }
+battery = "0.7"
 

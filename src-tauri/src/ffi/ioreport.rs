@@ -4,6 +4,7 @@
 //! These wrappers add null checks and error handling to prevent crashes.
 
 use std::os::raw::c_void;
+use std::time::Instant;
 use core_foundation::base::{CFTypeRef, TCFType};
 use core_foundation::dictionary::{CFDictionaryRef, CFMutableDictionaryRef};
 use core_foundation::string::{CFStringRef, CFString};
@@ -302,6 +303,13 @@ pub struct FrequencyData {
     pub overall: f32,
     pub p_core: f32,
     pub e_core: f32,
+}
+
+/// Power data structure (CPU and GPU power in watts)
+#[derive(Debug, Default)]
+pub struct PowerData {
+    pub cpu_power: f32,  // CPU power in watts
+    pub gpu_power: f32, // GPU power in watts
 }
 
 /// Internal structure for accumulating frequency statistics
@@ -1189,5 +1197,517 @@ pub unsafe fn read_frequencies_from_ioreport(
     
     // Return the current sample for storage (don't release it yet)
     sample_guard.1 = true; // Prevent automatic release
+    (result, Some(sample_guard.0))
+}
+
+/// Read CPU and GPU power consumption from IOReport
+/// 
+/// This function reads power/energy channels from IOReport and calculates
+/// power consumption in watts by computing energy deltas over time.
+/// 
+/// Power channels are typically in groups like:
+/// - "CPU Stats" / "CPU Power" or "CPU Energy"
+/// - "GPU Stats" / "GPU Power" or "GPU Energy"
+/// 
+/// Returns (PowerData, Option<CFDictionaryRef>) where the dictionary is the
+/// current sample for delta calculation on next call.
+pub unsafe fn read_power_from_ioreport(
+    subscription_ptr: *const c_void,
+    channels_ref: CFMutableDictionaryRef,
+    orig_channels: Option<CFDictionaryRef>,
+    last_sample: Option<CFDictionaryRef>,
+    last_read_time: Option<Instant>,
+    power_logging: bool,
+) -> (PowerData, Option<CFDictionaryRef>) {
+    use crate::{debug1, debug2};
+    
+    debug1!("=== POWER READ START ===");
+    debug1!("subscription_ptr={:p}, channels_ref={:p}, orig_channels.is_some()={}", 
+        subscription_ptr, channels_ref, orig_channels.is_some());
+    
+    // Validate inputs
+    if subscription_ptr.is_null() {
+        debug1!("ERROR: subscription_ptr is null!");
+        return (PowerData::default(), None);
+    }
+    if channels_ref.is_null() {
+        debug1!("ERROR: channels_ref is null!");
+        return (PowerData::default(), None);
+    }
+    
+    let mut cpu_energy_total: i64 = 0;
+    let mut gpu_energy_total: i64 = 0;
+    
+    // Create current sample from subscription
+    debug1!("Creating IOReport power sample...");
+    let current_sample = IOReportCreateSamples(
+        subscription_ptr,
+        channels_ref,
+        std::ptr::null(),
+    );
+    
+    if current_sample.is_null() {
+        debug1!("ERROR: Failed to create IOReport power sample (sample is null)");
+        return (PowerData::default(), None);
+    }
+    debug1!("IOReport power sample created successfully: {:p}", current_sample);
+    
+    // Use a guard to ensure current_sample is released on all exit paths
+    struct SampleGuard(CFDictionaryRef, bool);
+    impl Drop for SampleGuard {
+        fn drop(&mut self) {
+            if !self.1 && !self.0.is_null() {
+                unsafe {
+                    CFRelease(self.0 as CFTypeRef);
+                }
+            }
+        }
+    }
+    let mut sample_guard = SampleGuard(current_sample, false);
+    
+    // Compute delta sample if we have a last sample (for recent power)
+    // Power = Energy / Time, so we need delta energy and delta time
+    let (sample_to_parse, time_delta_secs) = if let (Some(last), Some(last_time)) = (last_sample, last_read_time) {
+        let now = Instant::now();
+        let time_delta = now.duration_since(last_time).as_secs_f64();
+        
+        if time_delta > 0.0 && time_delta < 60.0 {
+            // Valid time delta (between 0 and 60 seconds)
+            if power_logging {
+                debug1!("Computing delta power sample (time delta: {:.2}s)", time_delta);
+            }
+            let delta = IOReportCreateSamplesDelta(
+                last,
+                sample_guard.0,
+                std::ptr::null(),
+            );
+            
+            if delta.is_null() {
+                debug2!("Failed to create delta power sample, using raw sample");
+                (sample_guard.0, time_delta)
+            } else {
+                (delta, time_delta)
+            }
+        } else {
+            debug2!("Invalid time delta ({:.2}s), using raw sample", time_delta);
+            (sample_guard.0, 0.0)
+        }
+    } else {
+        debug1!("No last sample available, using raw sample (absolute counters)");
+        (sample_guard.0, 0.0)
+    };
+    
+    debug1!("Sample to parse: {:p}, time_delta={:.2}s", sample_to_parse, time_delta_secs);
+    
+    // Guard for delta sample (if we created one)
+    let created_delta = sample_to_parse != sample_guard.0;
+    let delta_guard = if created_delta {
+        Some(SampleGuard(sample_to_parse, false))
+    } else {
+        None
+    };
+    
+    let sample = sample_to_parse;
+    debug1!("Using sample: {:p} for power parsing", sample);
+    
+    // Get original channels dictionary (for channel name lookup)
+    debug1!("Checking original channels dict... orig_channels.is_some()={}", orig_channels.is_some());
+    let orig_channels = match orig_channels {
+        Some(ch) => {
+            debug1!("Original power channels_dict available: {:p}", ch);
+            ch
+        },
+        None => {
+            debug1!("ERROR: Original power channels_dict not available, cannot parse power - returning 0.0W");
+            drop(delta_guard);
+            sample_guard.1 = true;
+            unsafe { CFRelease(sample_guard.0 as CFTypeRef); }
+            return (PowerData::default(), None);
+        }
+    };
+    
+    debug1!("Extracting IOReportChannels from sample (sample={:p})...", sample);
+    // Extract IOReportChannels from sample
+    let sample_keys_count = CFDictionaryGetCount(sample);
+    debug1!("Power sample dictionary has {} keys", sample_keys_count);
+    
+    if sample_keys_count == 0 {
+        debug1!("Power sample dictionary is empty!");
+        drop(delta_guard);
+        sample_guard.1 = true;
+        unsafe { CFRelease(sample_guard.0 as CFTypeRef); }
+        return (PowerData::default(), None);
+    }
+    
+    let mut sample_keys_buf: Vec<*const c_void> = vec![std::ptr::null(); sample_keys_count as usize];
+    let mut sample_values_buf: Vec<*const c_void> = vec![std::ptr::null(); sample_keys_count as usize];
+    CFDictionaryGetKeysAndValues(sample, sample_keys_buf.as_mut_ptr(), sample_values_buf.as_mut_ptr());
+    
+    // Log sample keys for debugging
+    for i in 0..(sample_keys_count as usize) {
+        let key_ref = sample_keys_buf[i] as CFStringRef;
+        if !key_ref.is_null() {
+            let key_type_id = CFGetTypeID(key_ref as CFTypeRef);
+            let string_type_id = CFStringGetTypeID();
+            if key_type_id == string_type_id {
+                let key_str = CFString::wrap_under_get_rule(key_ref);
+                let key_name = key_str.to_string();
+                debug1!("Sample key[{}]: '{}'", i, key_name);
+                
+                // Check value type
+                let value_ptr = sample_values_buf[i];
+                if !value_ptr.is_null() {
+                    let value_type_id = CFGetTypeID(value_ptr as CFTypeRef);
+                    let dict_type_id = CFDictionaryGetTypeID();
+                    let array_type_id = CFArrayGetTypeID();
+                    debug1!("  Value type_id={}, dict_type_id={}, array_type_id={}", value_type_id, dict_type_id, array_type_id);
+                    if value_type_id == array_type_id {
+                        unsafe {
+                            extern "C" {
+                                fn CFArrayGetCount(theArray: *const c_void) -> i32;
+                            }
+                            let array_count = CFArrayGetCount(value_ptr as *const c_void);
+                            debug1!("  Array has {} elements", array_count);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Find IOReportChannels value (can be dict or array)
+    // CRITICAL: Energy Model uses arrays, so we need to handle both
+    let (sample_channels_ref, is_array, array_ptr_opt) = {
+        let mut found: Option<(CFDictionaryRef, bool, Option<*const c_void>)> = None;
+        for i in 0..(sample_keys_count as usize) {
+            let key_ref = sample_keys_buf[i] as CFStringRef;
+            if !key_ref.is_null() {
+                let key_type_id = CFGetTypeID(key_ref as CFTypeRef);
+                let string_type_id = CFStringGetTypeID();
+                if key_type_id == string_type_id {
+                    let key_str = CFString::wrap_under_get_rule(key_ref);
+                    let key_name = key_str.to_string();
+                    if key_name == "IOReportChannels" {
+                        let value_ptr = sample_values_buf[i];
+                        if !value_ptr.is_null() {
+                            let value_type_id = CFGetTypeID(value_ptr as CFTypeRef);
+                            let dict_type_id = CFDictionaryGetTypeID();
+                            let array_type_id = CFArrayGetTypeID();
+                            if value_type_id == dict_type_id {
+                                found = Some((value_ptr as CFDictionaryRef, false, None));
+                                break;
+                            } else if value_type_id == array_type_id {
+                                // For arrays, we'll process them directly
+                                unsafe {
+                                    extern "C" {
+                                        fn CFArrayGetCount(theArray: *const c_void) -> i32;
+                                    }
+                                    let array_count = CFArrayGetCount(value_ptr as *const c_void);
+                                    if power_logging {
+                                        debug1!("IOReportChannels in sample is an array with {} elements", array_count);
+                                    }
+                                    // Store array pointer for processing
+                                    found = Some((std::ptr::null_mut(), true, Some(value_ptr as *const c_void)));
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        match found {
+            Some((ch, is_arr, arr_ptr)) => (ch, is_arr, arr_ptr),
+            None => {
+                debug2!("Failed to extract IOReportChannels from power sample");
+                drop(delta_guard);
+                sample_guard.1 = true;
+                unsafe { CFRelease(sample_guard.0 as CFTypeRef); }
+                return (PowerData::default(), None);
+            }
+        }
+    };
+    
+    // If IOReportChannels is an array, process it directly
+    if is_array {
+        let array_ptr = match array_ptr_opt {
+            Some(arr) => arr,
+            None => {
+                debug2!("Array pointer is None");
+                drop(delta_guard);
+                sample_guard.1 = true;
+                unsafe { CFRelease(sample_guard.0 as CFTypeRef); }
+                return (PowerData::default(), None);
+            }
+        };
+        
+        // Process array channels directly
+        unsafe {
+            extern "C" {
+                fn CFArrayGetCount(theArray: *const c_void) -> i32;
+                fn CFArrayGetValueAtIndex(theArray: *const c_void, idx: i32) -> *const c_void;
+            }
+            
+            let array_count = CFArrayGetCount(array_ptr);
+            if power_logging {
+                debug1!("Processing {} channels from array", array_count);
+            }
+            
+            for i in 0..array_count {
+                let channel_value_ptr = CFArrayGetValueAtIndex(array_ptr, i);
+                if channel_value_ptr.is_null() {
+                    continue;
+                }
+                
+                let value_type_id = CFGetTypeID(channel_value_ptr as CFTypeRef);
+                let dict_type_id = CFDictionaryGetTypeID();
+                if value_type_id != dict_type_id {
+                    continue;
+                }
+                
+                let channel_dict = channel_value_ptr as CFDictionaryRef;
+                
+                // Get channel name
+                let channel_name_ref = IOReportChannelGetChannelName(channel_dict);
+                if channel_name_ref.is_null() {
+                    continue;
+                }
+                
+                let channel_name = CFString::wrap_under_get_rule(channel_name_ref);
+                let channel_name_str = channel_name.to_string();
+                
+                // Check if this is a power/energy channel
+                // Energy Model channels might have names like "CPU Power", "GPU Power", "Package Power", etc.
+                let is_power_channel = channel_name_str.contains("Power") || 
+                                      channel_name_str.contains("Energy") ||
+                                      channel_name_str.contains("Watt") ||
+                                      channel_name_str.contains("Package") ||
+                                      channel_name_str.contains("SoC");
+                
+                if is_power_channel {
+                    if power_logging {
+                        debug1!("Found power channel in array: '{}'", channel_name_str);
+                    }
+                    
+                    // Try to get energy value - for Energy Model, we might need to use state residency
+                    // or integer values. Let's try multiple approaches.
+                    let energy_value = IOReportSimpleGetIntegerValue(channel_dict, 0);
+                    
+                    // Also try getting from states if available
+                    let state_count = IOReportStateGetCount(channel_dict);
+                    if state_count > 0 && power_logging {
+                        debug1!("  Channel '{}' has {} states", channel_name_str, state_count);
+                    }
+                    
+                    if energy_value != 0 || state_count > 0 {
+                        // Classify as CPU or GPU
+                        let is_cpu = channel_name_str.contains("CPU") || 
+                                    channel_name_str.contains("P-Core") || 
+                                    channel_name_str.contains("E-Core") ||
+                                    channel_name_str.contains("Package");
+                        let is_gpu = channel_name_str.contains("GPU");
+                        
+                        if is_cpu {
+                            cpu_energy_total += energy_value;
+                            if power_logging {
+                                debug1!("  Added to CPU: energy={}", energy_value);
+                            }
+                        } else if is_gpu {
+                            gpu_energy_total += energy_value;
+                            if power_logging {
+                                debug1!("  Added to GPU: energy={}", energy_value);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Calculate power from energy totals
+        let mut result = PowerData::default();
+        if time_delta_secs > 0.0 && time_delta_secs < 60.0 {
+            // Energy Model might report in different units - try micro-joules first
+            if cpu_energy_total > 0 {
+                result.cpu_power = (cpu_energy_total as f64 / time_delta_secs / 1_000_000.0) as f32;
+            }
+            if gpu_energy_total > 0 {
+                result.gpu_power = (gpu_energy_total as f64 / time_delta_secs / 1_000_000.0) as f32;
+            }
+            
+            // If that gives unrealistic values, try nano-joules
+            if result.cpu_power > 1000.0 || result.gpu_power > 1000.0 {
+                if power_logging {
+                    debug1!("Power values too high, trying nano-joules conversion");
+                }
+                if cpu_energy_total > 0 {
+                    result.cpu_power = (cpu_energy_total as f64 / time_delta_secs / 1_000_000_000.0) as f32;
+                }
+                if gpu_energy_total > 0 {
+                    result.gpu_power = (gpu_energy_total as f64 / time_delta_secs / 1_000_000_000.0) as f32;
+                }
+            }
+            
+            if power_logging {
+                debug1!("Power calculated: CPU={:.2}W, GPU={:.2}W (energy: CPU={}, GPU={}, time={:.2}s)", 
+                    result.cpu_power, result.gpu_power, cpu_energy_total, gpu_energy_total, time_delta_secs);
+            }
+        }
+        
+        drop(delta_guard);
+        sample_guard.1 = true;
+        return (result, Some(sample_guard.0));
+    }
+    
+    // Continue with dictionary processing (original code)
+    
+    // Get channel keys and values from orig_channels
+    let channels_count = CFDictionaryGetCount(orig_channels) as usize;
+    if channels_count == 0 {
+        debug2!("Original power channels_dict is empty");
+        drop(delta_guard);
+        sample_guard.1 = true;
+        unsafe { CFRelease(sample_guard.0 as CFTypeRef); }
+        return (PowerData::default(), None);
+    }
+    
+    let mut channel_keys_buf: Vec<*const c_void> = vec![std::ptr::null(); channels_count];
+    let mut channel_values_buf: Vec<*const c_void> = vec![std::ptr::null(); channels_count];
+    CFDictionaryGetKeysAndValues(orig_channels, channel_keys_buf.as_mut_ptr(), channel_values_buf.as_mut_ptr());
+    
+    // Process channels from sample (dictionary case)
+    // Note: Array case is handled above
+    let sample_channels_count = CFDictionaryGetCount(sample_channels_ref);
+    debug2!("Power sample contains {} channels (dictionary)", sample_channels_count);
+    
+    let mut sample_channel_keys: Vec<*const c_void> = vec![std::ptr::null(); sample_channels_count as usize];
+    let mut sample_channel_values: Vec<*const c_void> = vec![std::ptr::null(); sample_channels_count as usize];
+    CFDictionaryGetKeysAndValues(sample_channels_ref, sample_channel_keys.as_mut_ptr(), sample_channel_values.as_mut_ptr());
+    
+    // Iterate through channels and extract power/energy values
+    if power_logging {
+        debug1!("Processing {} power channels from sample", sample_channels_count);
+    }
+    
+    for i in 0..(sample_channels_count as usize) {
+        let channel_key_ref = sample_channel_keys[i] as CFStringRef;
+        if channel_key_ref.is_null() {
+            continue;
+        }
+        
+        let channel_key_str = CFString::wrap_under_get_rule(channel_key_ref);
+        let channel_key = channel_key_str.to_string();
+        
+        let channel_value = sample_channel_values[i];
+        if channel_value.is_null() {
+            continue;
+        }
+        
+        // Get channel name from original channels
+        let channel_name = {
+            let mut found_name: Option<String> = None;
+            for j in 0..channels_count {
+                let orig_key_ref = channel_keys_buf[j] as CFStringRef;
+                if orig_key_ref.is_null() {
+                    continue;
+                }
+                let orig_key_str = CFString::wrap_under_get_rule(orig_key_ref);
+                if orig_key_str.to_string() == channel_key {
+                    let orig_value = channel_values_buf[j];
+                    if !orig_value.is_null() {
+                        let orig_value_type_id = CFGetTypeID(orig_value as CFTypeRef);
+                        let dict_type_id = CFDictionaryGetTypeID();
+                        if orig_value_type_id == dict_type_id {
+                            let channel_dict = orig_value as CFDictionaryRef;
+                            let name_ref = IOReportChannelGetChannelName(channel_dict);
+                            if !name_ref.is_null() {
+                                let name = CFString::wrap_under_get_rule(name_ref);
+                                found_name = Some(name.to_string());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            found_name
+        };
+        
+        if let Some(name) = channel_name {
+            if power_logging {
+                debug1!("Power channel found: '{}' (key: '{}')", name, channel_key);
+            }
+            
+            // Check if this is a power/energy channel
+            // Be more flexible with matching - try to match any channel that might contain power/energy data
+            let is_cpu_power = name.contains("CPU") && (name.contains("Power") || name.contains("Energy") || name.contains("P-Core") || name.contains("E-Core") || name.contains("P-CPU") || name.contains("E-CPU"));
+            let is_gpu_power = name.contains("GPU") && (name.contains("Power") || name.contains("Energy"));
+            
+            if is_cpu_power || is_gpu_power {
+                // Try to extract energy value from channel
+                // IOReportSimpleGetIntegerValue can get integer values from channels
+                // Energy is typically in micro-joules or nano-joules
+                let energy_value = IOReportSimpleGetIntegerValue(channel_value as CFDictionaryRef, 0);
+                
+                if power_logging {
+                    debug1!("Power channel '{}': energy={} (raw value)", name, energy_value);
+                }
+                
+                if is_cpu_power {
+                    cpu_energy_total += energy_value;
+                    if power_logging {
+                        debug1!("Added to CPU energy total: {} (new total: {})", energy_value, cpu_energy_total);
+                    }
+                } else if is_gpu_power {
+                    gpu_energy_total += energy_value;
+                    if power_logging {
+                        debug1!("Added to GPU energy total: {} (new total: {})", energy_value, gpu_energy_total);
+                    }
+                }
+            } else if power_logging {
+                debug2!("Channel '{}' is not a power channel (skipping)", name);
+            }
+        } else if power_logging {
+            debug2!("Could not find channel name for key '{}'", channel_key);
+        }
+    }
+    
+    if power_logging {
+        debug1!("Total energy: CPU={}, GPU={}, time_delta={:.2}s", cpu_energy_total, gpu_energy_total, time_delta_secs);
+    }
+    
+    // Calculate power in watts
+    // Energy is typically in micro-joules (μJ), so power = energy_μJ / time_s / 1_000_000
+    // Or if in nano-joules: power = energy_nJ / time_s / 1_000_000_000
+    // We'll assume micro-joules for now (common in IOReport)
+    let mut result = PowerData::default();
+    
+    if time_delta_secs > 0.0 && time_delta_secs < 60.0 {
+        // Convert energy (assumed micro-joules) to watts
+        // Power (W) = Energy (μJ) / Time (s) / 1,000,000
+        if cpu_energy_total > 0 {
+            result.cpu_power = (cpu_energy_total as f64 / time_delta_secs / 1_000_000.0) as f32;
+            if power_logging {
+                debug1!("CPU power: {:.2}W (energy={} μJ, time={:.2}s)", result.cpu_power, cpu_energy_total, time_delta_secs);
+            }
+        }
+        
+        if gpu_energy_total > 0 {
+            result.gpu_power = (gpu_energy_total as f64 / time_delta_secs / 1_000_000.0) as f32;
+            if power_logging {
+                debug1!("GPU power: {:.2}W (energy={} μJ, time={:.2}s)", result.gpu_power, gpu_energy_total, time_delta_secs);
+            }
+        }
+    } else {
+        debug2!("Cannot calculate power: invalid time delta ({:.2}s)", time_delta_secs);
+    }
+    
+    if power_logging {
+        debug1!("=== POWER READ END: CPU={:.2}W, GPU={:.2}W ===", result.cpu_power, result.gpu_power);
+    }
+    
+    // Release delta sample if we created one
+    drop(delta_guard);
+    
+    // Return the current sample for storage
+    sample_guard.1 = true;
     (result, Some(sample_guard.0))
 }

@@ -598,6 +598,17 @@ body {
 .theme-version {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.theme-version:hover {
+  opacity: 0.7;
+}
+
+.theme-version:active {
+  opacity: 0.6;
 }
 
 .theme-github-link {
@@ -622,6 +633,152 @@ body {
 .theme-github-link:hover {
   color: rgba(255, 255, 255, 0.86);
   opacity: 1;
+}
+
+/* Changelog Modal Styling */
+.changelog-card {
+  width: min(600px, 90vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.changelog-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(80vh - 100px);
+  padding: 8px 4px;
+  line-height: 1.6;
+}
+
+.changelog-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.changelog-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.changelog-body::-webkit-scrollbar-thumb {
+  background: rgba(59, 214, 255, 0.4);
+  border-radius: 3px;
+}
+
+.changelog-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 214, 255, 0.6);
+}
+
+.changelog-loading,
+.changelog-error {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.changelog-error {
+  color: rgba(255, 59, 48, 0.9);
+}
+
+.changelog-h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 24px 0 12px 0;
+  color: var(--text);
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.changelog-h2:first-child {
+  margin-top: 0;
+}
+
+.changelog-version {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.changelog-date {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.changelog-h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 16px 0 8px 0;
+  color: var(--text);
+}
+
+.changelog-paragraph {
+  margin: 12px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.changelog-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.changelog-list:not(.changelog-list .changelog-list) {
+  margin: 8px 0 8px 0;
+}
+
+.changelog-item {
+  margin: 0;
+  padding: 0 0 0 20px;
+  position: relative;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Nested lists - indent and reduce spacing */
+.changelog-list .changelog-list {
+  margin: 4px 0 4px 24px;
+  padding: 0;
+}
+
+.changelog-list .changelog-list .changelog-item {
+  padding-left: 20px;
+}
+
+.changelog-item::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* Reduce spacing between list items */
+.changelog-item + .changelog-item {
+  margin-top: 15px;
+}
+
+/* Nested items have less spacing */
+.changelog-list .changelog-list .changelog-item + .changelog-item {
+  margin-top: 12px;
+}
+
+.changelog-code {
+  background: rgba(59, 214, 255, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: "SF Mono", "Monaco", "Menlo", monospace;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.changelog-body strong {
+  font-weight: 700;
+  color: var(--text);
 }
 
 .theme-github-link:hover::after {

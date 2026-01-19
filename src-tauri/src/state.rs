@@ -75,18 +75,40 @@ pub(crate) static LAST_TEMP_UPDATE: Mutex<Option<Instant>> = Mutex::new(None);
 // Rate limiting for get_cpu_details() - prevent excessive calls
 pub(crate) static LAST_CPU_DETAILS_CALL: Mutex<Option<Instant>> = Mutex::new(None);
 
-// IOReport state
+// IOReport state (frequency)
 pub(crate) static IOREPORT_SUBSCRIPTION: Mutex<Option<usize>> = Mutex::new(None);
 pub(crate) static IOREPORT_CHANNELS: Mutex<Option<usize>> = Mutex::new(None);
 pub(crate) static IOREPORT_SUBSCRIPTION_DICT: Mutex<Option<usize>> = Mutex::new(None);
 pub(crate) static IOREPORT_ORIGINAL_CHANNELS: Mutex<Option<usize>> = Mutex::new(None);
 pub(crate) static LAST_IOREPORT_SAMPLE: Mutex<Option<(usize, Instant)>> = Mutex::new(None);
+
+// IOReport state (power)
+pub(crate) static IOREPORT_POWER_SUBSCRIPTION: Mutex<Option<usize>> = Mutex::new(None);
+pub(crate) static IOREPORT_POWER_CHANNELS: Mutex<Option<usize>> = Mutex::new(None);
+pub(crate) static IOREPORT_POWER_SUBSCRIPTION_DICT: Mutex<Option<usize>> = Mutex::new(None);
+pub(crate) static IOREPORT_POWER_ORIGINAL_CHANNELS: Mutex<Option<usize>> = Mutex::new(None);
+pub(crate) static LAST_IOREPORT_POWER_SAMPLE: Mutex<Option<(usize, Instant)>> = Mutex::new(None);
+pub(crate) static LAST_POWER_READ_TIME: Mutex<Option<Instant>> = Mutex::new(None);
 // Flag to enable detailed frequency logging
 pub(crate) static FREQUENCY_LOGGING_ENABLED: Mutex<bool> = Mutex::new(false);
+// Flag to enable detailed power usage logging
+pub(crate) static POWER_USAGE_LOGGING_ENABLED: Mutex<bool> = Mutex::new(false);
 
 // Window decorations preference (true = show decorations, false = frameless)
 // Default to true (show decorations) for better UX
 pub(crate) static WINDOW_DECORATIONS: Mutex<bool> = Mutex::new(true);
+
+// Power and battery caches
+// CPU/GPU power cache: (cpu_power_watts, gpu_power_watts, last_update_timestamp)
+pub(crate) static POWER_CACHE: Mutex<Option<(f32, f32, Instant)>> = Mutex::new(None);
+// Battery cache: (battery_level_percent, is_charging, last_update_timestamp)
+// Battery is read every second in background thread (IOKit is lightweight)
+pub(crate) static BATTERY_CACHE: Mutex<Option<(f32, bool, Instant)>> = Mutex::new(None);
+// Reserved for future rate limiting when IOReport power reading is implemented
+#[allow(dead_code)]
+pub(crate) static LAST_POWER_READ: Mutex<Option<Instant>> = Mutex::new(None);
+#[allow(dead_code)]
+pub(crate) static LAST_BATTERY_READ: Mutex<Option<Instant>> = Mutex::new(None);
 
 /// Application state structure (future refactoring target)
 /// 

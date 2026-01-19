@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.6] - 2026-01-18
 
 ### Added
+- **Power Consumption Monitoring**: Real-time CPU and GPU power consumption monitoring via IOReport Energy Model API
+  - CPU power consumption in watts (W)
+  - GPU power consumption in watts (W)
+  - Power readings only when CPU window is visible (optimized for low CPU usage)
+  - `--power-usage` command-line flag for detailed power debugging logs
+- **Battery Monitoring**: Battery level and charging status display
+  - Battery percentage display
+  - Charging status indicator
+  - Battery information only read when CPU window is visible
 - **Process Details Modal**: Click any process in the list to view comprehensive details including:
   - Process name, PID, and current CPU usage
   - Total CPU time, parent process information
@@ -20,17 +29,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Auto-refresh Process Details**: Process details modal automatically refreshes every 2 seconds while open
 - **Scrollable Sections**: Added scrollable containers for Details and Processes sections with custom scrollbar styling
 - **Process PID Display**: Process list now includes PID information in data attributes
+- **Embedded Changelog**: Changelog is now embedded in the binary for reliable access
+- **Changelog CLI Flag**: Added `--changelog` flag to test changelog functionality
 
 ### Changed
 - **Process List Refresh**: Increased refresh interval from 5 seconds to 15 seconds for better CPU efficiency
 - **Process Cache**: Improved process cache handling with immediate refresh on window open
 - **UI Layout**: Improved flex layout with proper min-height and overflow handling for scrollable sections
 - **Process Data Structure**: Added PID field to ProcessUsage struct for better process identification
+- **Changelog Reading**: Improved changelog reading with multiple fallback strategies (current directory, executable directory, embedded)
 
 ### Performance
 - **Smart Process Refresh**: Process details only refresh when CPU window is visible (saves CPU when window is hidden)
 - **Conditional Process Updates**: Process list updates immediately on initial load and when window becomes visible
 - **Efficient Modal Updates**: Process details modal only refreshes when actually visible
+- **Power Reading Optimization**: Power consumption and battery readings only occur when CPU window is visible, maintaining <0.1% CPU usage when window is closed
+- **IOReport Power Subscription**: Power subscription is created on-demand and cleaned up when window closes
+
+### Technical
+- **IOReport Power Integration**: Implemented IOReport Energy Model API integration for power monitoring
+- **Array Channel Support**: Added support for IOReportChannels as arrays (Energy Model format)
+- **Memory Management**: Proper CoreFoundation memory management for power channel dictionaries
+- **Error Handling**: Graceful handling when power channels are not available on certain Mac models
 
 ## [0.0.5] - 2026-01-18
 
