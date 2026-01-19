@@ -77,6 +77,160 @@
         </div>
       </section>
 
+      <section class="battery-power-strip" id="battery-power-strip">
+        <div class="battery-info">
+          <svg class="battery-icon" id="battery-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
+            <line x1="18" y1="11" x2="20" y2="11"></line>
+          </svg>
+          <span class="battery-level" id="battery-level">--</span>
+          <span class="battery-status" id="battery-status">--</span>
+        </div>
+        <div class="power-info">
+          <span class="power-label">Power:</span>
+          <span class="power-value" id="power-value">-- W</span>
+        </div>
+        <div class="time-remaining" id="time-remaining">--</div>
+      </section>
+
+      <!-- Icon Line -->
+      <div class="icon-line" id="icon-line">
+        <!-- Icon 1: Monitors -->
+        <button class="icon-line-item" id="icon-monitors" title="Monitors">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+            <circle cx="6" cy="6" r="1"></circle>
+            <circle cx="12" cy="6" r="1"></circle>
+            <circle cx="18" cy="6" r="1"></circle>
+          </svg>
+        </button>
+        
+        <!-- Icon 2: Ollama (Official Ollama icon) -->
+        <button class="icon-line-item" id="icon-ollama" title="AI Chat (Ollama)">
+          <img src="../../assets/ollama.svg" alt="Ollama" />
+        </button>
+        
+        <!-- Icons 3-15: Placeholders -->
+        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
+        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
+        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
+        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
+        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
+        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
+        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
+        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
+        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
+        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
+        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
+        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
+        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
+      </div>
+
+      <div class="mat-rule" aria-hidden="true"></div>
+
+      <!-- External Monitors Section (Collapsible) -->
+      <section class="monitors-section">
+        <div class="section-header-collapsible" id="monitors-header">
+          <div class="section-title-with-status">
+            <h2 class="section-title">External / Monitors</h2>
+            <div class="monitors-status-dot-container">
+              <span class="monitors-status-dot" id="monitors-status-dot"></span>
+            </div>
+          </div>
+          <div class="monitors-header-actions">
+            <button class="monitors-menu-btn" id="monitors-menu-btn" title="Settings">⋯</button>
+          </div>
+        </div>
+        <div class="section-content-collapsible" id="monitors-content">
+          <div class="monitors-summary" id="monitors-summary">
+            <span id="monitors-summary-text">0 / 0 sites up · Avg -- ms</span>
+          </div>
+          <div class="monitors-list" id="monitors-list"></div>
+        </div>
+      </section>
+
+      <!-- Monitors Settings Popover -->
+      <div class="monitors-settings-popover" id="monitors-settings-popover" style="display: none;">
+        <div class="popover-content">
+          <div class="popover-header">
+            <h3>Monitor Settings</h3>
+            <button class="popover-close" id="monitors-settings-close">×</button>
+          </div>
+          <div class="popover-body">
+            <div class="monitors-list-container">
+              <div class="monitors-list-header">
+                <h4>Active Monitors</h4>
+                <button class="popover-btn-primary" id="monitors-add-btn">+ Add Monitor</button>
+              </div>
+              <div class="monitors-settings-list" id="monitors-settings-list">
+                <!-- Monitors will be listed here -->
+              </div>
+            </div>
+            <div class="add-monitor-form" id="add-monitor-form" style="display: none;">
+              <h4>Add New Monitor</h4>
+              <label for="monitor-url-input">Website URL:</label>
+              <input type="text" id="monitor-url-input" placeholder="https://www.amvara.de/" value="https://www.amvara.de/" />
+              <div class="popover-actions">
+                <button class="popover-btn-secondary" id="monitors-add-cancel">Cancel</button>
+                <button class="popover-btn-primary" id="monitors-add-save">Add Monitor</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mat-rule" id="monitors-ollama-divider" aria-hidden="true"></div>
+
+      <!-- Ollama Chat Section (Collapsible) -->
+      <section class="ollama-section">
+        <div class="section-header-collapsible" id="ollama-header">
+          <div class="section-title-with-status">
+            <h2 class="section-title">AI Chat (Ollama)</h2>
+            <button class="ollama-menu-btn" id="ollama-menu-btn" title="Options">⋯</button>
+            <div class="ollama-menu" id="ollama-menu" style="display: none;">
+              <button class="ollama-menu-item" id="ollama-menu-collapse">Collapse</button>
+              <button class="ollama-menu-item" id="ollama-menu-settings">Settings</button>
+            </div>
+            <div class="ollama-header-controls">
+              <div class="connection-indicator" id="ollama-connection-indicator" title="Click to configure Ollama URL"></div>
+              <span class="model-text" id="ollama-model-text" style="display: none;">—</span>
+              <select id="ollama-model-select" class="model-select-dropdown" style="display: none;">
+                <option value="">Loading models...</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="section-content-collapsible" id="ollama-content">
+          <div class="ollama-chat" id="ollama-chat" style="display: none;">
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-container">
+              <input type="text" id="chat-input" placeholder="Ask about system metrics..." />
+              <button id="chat-send-btn">Send</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- System Prompt Settings Popover -->
+      <div class="ollama-settings-popover" id="ollama-settings-popover" style="display: none;">
+        <div class="popover-content">
+          <div class="popover-header">
+            <h3>Ollama Settings</h3>
+            <button class="popover-close" id="ollama-settings-close">×</button>
+          </div>
+          <div class="popover-body">
+            <label for="ollama-system-prompt">System Prompt:</label>
+            <textarea id="ollama-system-prompt" rows="6" placeholder="You are a helpful assistant that answers questions about system metrics and monitoring."></textarea>
+            <div class="popover-actions">
+              <button class="popover-btn-secondary" id="ollama-settings-reset">Reset to Default</button>
+              <button class="popover-btn-primary" id="ollama-settings-save">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="mat-rule" aria-hidden="true"></div>
 
       <section class="mat-details">

@@ -23,6 +23,12 @@ mod metrics;
 pub mod config;
 mod ffi;
 mod ui;
+mod security;
+mod monitors;
+mod alerts;
+mod plugins;
+mod ollama;
+mod commands;
 
 use std::os::raw::c_void;
 use sysinfo::{Disks, System};
@@ -136,8 +142,58 @@ pub fn run() {
 
 fn run_internal(open_cpu_window: bool) {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![get_cpu_details, get_app_version, get_window_decorations, set_window_decorations, get_process_details, force_quit_process, get_changelog])
+        .invoke_handler(tauri::generate_handler![
+            get_cpu_details,
+            get_metrics,
+            get_app_version, 
+            get_window_decorations, 
+            set_window_decorations, 
+            get_process_details, 
+            force_quit_process, 
+            get_changelog,
+            // Security commands
+            commands::security::store_credential,
+            commands::security::get_credential,
+            commands::security::delete_credential,
+            commands::security::list_credentials,
+            // Monitor commands
+            commands::monitors::add_website_monitor,
+            commands::monitors::add_mastodon_monitor,
+            commands::monitors::check_monitor,
+            commands::monitors::list_monitors,
+            commands::monitors::remove_monitor,
+            commands::monitors::get_monitor_details,
+            // Alert commands
+            commands::alerts::add_alert,
+            commands::alerts::remove_alert,
+            commands::alerts::evaluate_alerts,
+            // Plugin commands
+            commands::plugins::add_plugin,
+            commands::plugins::remove_plugin,
+            commands::plugins::execute_plugin,
+            commands::plugins::list_plugins,
+            commands::plugins::run_due_plugins,
+            // Ollama commands
+            commands::ollama::configure_ollama,
+            commands::ollama::check_ollama_connection,
+            commands::ollama::ollama_chat,
+            commands::ollama::list_ollama_models,
+            commands::ollama::log_ollama_js_execution,
+            commands::ollama::log_ollama_js_check,
+            commands::ollama::log_ollama_js_extraction,
+            commands::ollama::log_ollama_js_no_blocks,
+            commands::ollama::ollama_chat_with_execution,
+            commands::ollama::ollama_chat_continue_with_result,
+            // Logging commands
+            commands::logging::log_from_js,
+        ])
         .setup(move |app| {
+            // Load persistent monitors on startup
+            use crate::commands::monitors;
+            if let Err(e) = monitors::load_monitors_internal() {
+                tracing::warn!("Failed to load monitors: {}", e);
+            }
+            
             // Hide the main window immediately (menu bar app)
             if let Some(main_window) = app.get_window("main") {
                 let _ = main_window.hide();
@@ -243,12 +299,23 @@ fn run_internal(open_cpu_window: bool) {
                     
                     debug3!("Update loop: getting metrics...");
                     let metrics = get_metrics();
+                    
+                    // CRITICAL: Only update menu bar if metrics are valid
+                    // Invalid metrics (all zeros) can occur during initialization or when locks are held
+                    // In that case, skip this update and wait for the next cycle
+                    if !metrics.is_valid() {
+                        debug3!("Skipping menu bar update: invalid metrics (CPU={}%, GPU={}%, RAM={}%, DISK={}%)", 
+                            metrics.cpu, metrics.gpu, metrics.ram, metrics.disk);
+                        continue; // Skip this update cycle
+                    }
+                    
                     let text = build_status_text(&metrics);
                     
                     // Store update in static variable
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {
                         *pending = Some(text);
-                        debug3!("Menu bar update stored");
+                        debug3!("Menu bar update stored: CPU={}%, GPU={}%, RAM={}%, DISK={}%", 
+                            metrics.cpu, metrics.gpu, metrics.ram, metrics.disk);
                     }
                     
                     // CRITICAL: Only read temperature when CPU window is visible (saves CPU)

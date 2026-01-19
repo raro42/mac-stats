@@ -1,6 +1,6 @@
 [package]
 name = "mac_stats"
-version = "0.0.6"
+version = "0.1.0"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
@@ -56,4 +56,12 @@ objc2-app-kit = { version = "0.3.2", features = [
   "objc2-core-foundation"
 ] }
 battery = "0.7"
+reqwest = { version = "0.11", features = ["json", "blocking"] }
+tokio = { version = "1", features = ["full"] }
+security-framework = "2.9"
+security-framework-sys = "2.9"
+chrono = { version = "0.4", features = ["serde"] }
+url = "2.5"
+anyhow = "1.0"
+toml = "0.8"
 
