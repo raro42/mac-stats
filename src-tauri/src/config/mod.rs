@@ -96,4 +96,30 @@ impl Config {
         // Default to true (show decorations)
         true
     }
+    
+    /// Get the monitors file path
+    /// 
+    /// Returns a path in the user's home directory: `$HOME/.mac-stats/monitors.json`
+    /// Falls back to a temporary directory if HOME is not available.
+    pub fn monitors_file_path() -> PathBuf {
+        // Try to use $HOME/.mac-stats/monitors.json
+        if let Ok(home) = std::env::var("HOME") {
+            let home_path = PathBuf::from(home);
+            return home_path.join(".mac-stats").join("monitors.json");
+        }
+        
+        // Fallback to temp directory
+        std::env::temp_dir().join("mac-stats-monitors.json")
+    }
+    
+    /// Ensure the monitors directory exists
+    /// 
+    /// Creates the directory containing the monitors file if it doesn't exist.
+    pub fn ensure_monitors_directory() -> std::io::Result<()> {
+        let monitors_path = Self::monitors_file_path();
+        if let Some(parent) = monitors_path.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+        Ok(())
+    }
 }

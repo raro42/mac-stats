@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="dashboard.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mac-stats Dashboard</title>
+  </head>
+
+  <body>
+    <main class="dashboard-container">
+      <!-- Three Core Gauges -->
+      <section class="gauges-section">
+        <div class="gauge" id="temperature-gauge">
+          <div class="gauge-label">Temperature</div>
+          <div class="gauge-value" id="temperature-value">--</div>
+          <div class="gauge-unit">°C</div>
+          <div class="gauge-bar">
+            <div class="gauge-fill" id="temperature-fill"></div>
+          </div>
+        </div>
+
+        <div class="gauge" id="cpu-usage-gauge">
+          <div class="gauge-label">CPU Usage</div>
+          <div class="gauge-value" id="cpu-usage-value">--</div>
+          <div class="gauge-unit">%</div>
+          <div class="gauge-bar">
+            <div class="gauge-fill" id="cpu-usage-fill"></div>
+          </div>
+        </div>
+
+        <div class="gauge" id="cpu-frequency-gauge">
+          <div class="gauge-label">CPU Frequency</div>
+          <div class="gauge-value" id="cpu-frequency-value">--</div>
+          <div class="gauge-unit">GHz</div>
+          <div class="gauge-bar">
+            <div class="gauge-fill" id="cpu-frequency-fill"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Battery & Power Status Strip -->
+      <section class="battery-power-strip" id="battery-power-strip">
+        <div class="battery-info">
+          <span class="battery-icon" id="battery-icon">🔋</span>
+          <span class="battery-level" id="battery-level">--</span>
+          <span class="battery-status" id="battery-status">--</span>
+        </div>
+        <div class="power-info">
+          <span class="power-label">Power:</span>
+          <span class="power-value" id="power-value">-- W</span>
+        </div>
+        <div class="time-remaining" id="time-remaining">--</div>
+      </section>
+
+      <!-- External Monitors Section (Collapsible) -->
+      <section class="monitors-section">
+        <div class="section-header" id="monitors-header">
+          <h2>External / Monitors</h2>
+          <button class="collapse-btn" id="monitors-collapse-btn">−</button>
+        </div>
+        <div class="section-content" id="monitors-content">
+          <!-- Aggregated Summary -->
+          <div class="monitors-summary" id="monitors-summary">
+            <span id="monitors-summary-text">0 / 0 sites up · Avg -- ms</span>
+            <button class="add-btn" id="add-monitor-btn">+</button>
+          </div>
+          
+          <!-- Monitor List (hidden by default, shown on expand) -->
+          <div class="monitors-list" id="monitors-list" style="display: none;">
+            <!-- Monitors will be added here dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Ollama Chat Section (Collapsible) -->
+      <section class="ollama-section">
+        <div class="section-header" id="ollama-header">
+          <h2>AI Chat (Ollama)</h2>
+          <button class="collapse-btn" id="ollama-collapse-btn">−</button>
+        </div>
+        <div class="section-content" id="ollama-content">
+          <div class="ollama-status" id="ollama-status">Not connected</div>
+          <div class="ollama-chat" id="ollama-chat" style="display: none;">
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-container">
+              <input type="text" id="chat-input" placeholder="Ask about system metrics..." />
+              <button id="chat-send-btn">Send</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Button (Floating) -->
+      <button class="settings-btn" id="settings-btn">⚙️</button>
+    </main>
+
+    <script src="tauri-logger.js"></script>
+    <script type="module" src="ollama.js"></script>
+    <script type="module" src="dashboard.js"></script>
+  </body>
+</html>
