@@ -13,6 +13,7 @@ use std::process::Command;
 use sysinfo::{Disks, System};
 use macsmc::Smc;
 use tauri::Manager;
+use battery::{Manager as BatteryManager, State};
 
 use crate::state::*;
 use crate::logging::write_structured_log;
@@ -76,6 +77,9 @@ pub struct CpuDetails {
     pub can_read_frequency: bool,
     pub can_read_cpu_power: bool,
     pub can_read_gpu_power: bool,
+    pub battery_level: f32, // Battery level as percentage (0-100), or -1.0 if not available
+    pub is_charging: bool,  // True if battery is charging, false if discharging or no battery
+    pub has_battery: bool,  // True if device has a battery
 }
 
 /// Get chip information (cached)
@@ -397,6 +401,153 @@ pub fn can_read_gpu_power() -> bool {
     })
 }
 
+/// Get battery level and charging state (cached)
+/// Returns (battery_level_percent, is_charging, has_battery)
+/// battery_level_percent: 0-100 if battery exists, -1.0 if no battery
+/// is_charging: true if charging, false if discharging or no battery
+/// has_battery: true if device has a battery
+/// 
+/// CRITICAL: Only reads fresh data when CPU window is visible to save CPU.
+/// Returns cached values when window is closed.
+pub fn get_battery_info() -> (f32, bool, bool) {
+    // Check cache first (battery state doesn't change rapidly)
+    // Battery reading via IOKit is lightweight, but we only read when window is visible
+    if let Ok(cache) = crate::state::BATTERY_CACHE.try_lock() {
+        if let Some((level, charging, timestamp)) = cache.as_ref() {
+            // Check if CPU window is visible before doing fresh read
+            let window_visible = crate::state::APP_HANDLE.get()
+                .and_then(|app_handle| {
+                    app_handle.get_window("cpu").and_then(|window| {
+                        window.is_visible().ok().filter(|&visible| visible)
+                    })
+                })
+                .is_some();
+            
+            // If window is closed, always return cache (even if stale) to save CPU
+            if !window_visible {
+                debug3!("Battery info from cache (window closed): {:.1}%, charging={}, has_battery={}", 
+                    level, charging, *level >= 0.0);
+                return (*level, *charging, *level >= 0.0);
+            }
+            
+            // If window is visible, use cache if fresh (less than 1 second old)
+            if timestamp.elapsed().as_secs() < 1 {
+                debug3!("Battery info from cache: {:.1}%, charging={}, has_battery={}", 
+                    level, charging, *level >= 0.0);
+                return (*level, *charging, *level >= 0.0);
+            }
+        } else {
+            // No cache - check if window is visible before reading
+            let window_visible = crate::state::APP_HANDLE.get()
+                .and_then(|app_handle| {
+                    app_handle.get_window("cpu").and_then(|window| {
+                        window.is_visible().ok().filter(|&visible| visible)
+                    })
+                })
+                .is_some();
+            
+            if !window_visible {
+                // Window closed and no cache - return default values to save CPU
+                debug3!("Battery info: window closed, no cache, returning defaults");
+                return (-1.0, false, false);
+            }
+        }
+    }
+    
+    // Read battery info using battery crate (only if window is visible)
+    let result = match BatteryManager::new() {
+        Ok(manager) => {
+            match manager.batteries() {
+                Ok(mut batteries) => {
+                    if let Some(battery_result) = batteries.next() {
+                        match battery_result {
+                            Ok(battery) => {
+                                // Get battery percentage
+                                let percentage = battery.state_of_charge().get::<battery::units::ratio::percent>();
+                                let is_charging = matches!(battery.state(), State::Charging);
+                                
+                                debug2!("Battery read: {:.1}%, charging={}", percentage, is_charging);
+                                
+                                // Update cache
+                                if let Ok(mut cache) = crate::state::BATTERY_CACHE.try_lock() {
+                                    *cache = Some((percentage as f32, is_charging, std::time::Instant::now()));
+                                }
+                                
+                                (percentage as f32, is_charging, true)
+                            },
+                            Err(e) => {
+                                debug2!("Failed to read battery: {:?}", e);
+                                (-1.0, false, false)
+                            }
+                        }
+                    } else {
+                        // No battery found
+                        debug2!("No battery found on this system");
+                        (-1.0, false, false)
+                    }
+                },
+                Err(e) => {
+                    debug2!("Failed to enumerate batteries: {:?}", e);
+                    (-1.0, false, false)
+                }
+            }
+        },
+        Err(e) => {
+            debug2!("Failed to create battery manager: {:?}", e);
+            (-1.0, false, false)
+        }
+    };
+    
+    result
+}
+
+/// Get CPU and GPU power consumption (cached)
+/// Returns (cpu_power_watts, gpu_power_watts)
+/// 
+/// CRITICAL: Only reads fresh data when CPU window is visible to save CPU.
+/// Returns cached values when window is closed.
+/// Power is read from IOReport every 5 seconds when window is visible.
+pub fn get_power_consumption() -> (f32, f32) {
+    // Check if CPU window is visible - if not, return cache or 0.0 to save CPU
+    let window_visible = crate::state::APP_HANDLE.get()
+        .and_then(|app_handle| {
+            app_handle.get_window("cpu").and_then(|window| {
+                window.is_visible().ok().filter(|&visible| visible)
+            })
+        })
+        .is_some();
+    
+    // Check cache first
+    // IOReport power reading is expensive, so we cache longer
+    if let Ok(cache) = crate::state::POWER_CACHE.try_lock() {
+        if let Some((cpu_power, gpu_power, timestamp)) = cache.as_ref() {
+            // If window is closed, always return cache (even if stale) to save CPU
+            if !window_visible {
+                debug3!("Power consumption from cache (window closed): CPU={:.2}W, GPU={:.2}W", cpu_power, gpu_power);
+                return (*cpu_power, *gpu_power);
+            }
+            
+            // If window is visible, use cache if fresh (less than 6 seconds old)
+            // Background thread updates every 5 seconds
+            if timestamp.elapsed().as_secs() < 6 {
+                debug3!("Power consumption from cache: CPU={:.2}W, GPU={:.2}W", cpu_power, gpu_power);
+                return (*cpu_power, *gpu_power);
+            }
+        } else {
+            // No cache - if window is closed, return 0.0 to save CPU
+            if !window_visible {
+                debug3!("Power consumption: window closed, no cache, returning 0.0W");
+                return (0.0, 0.0);
+            }
+        }
+    }
+    
+    // Power reading is handled by background thread when window is visible
+    // This function just returns cached values
+    // If cache is stale and window is visible, background thread will update it soon
+    (0.0, 0.0)
+}
+
 #[tauri::command]
 pub fn get_metrics() -> SystemMetrics {
     debug3!("get_metrics() called");
@@ -510,6 +661,94 @@ pub fn get_metrics() -> SystemMetrics {
 #[tauri::command]
 pub fn get_app_version() -> String {
     crate::config::Config::version()
+}
+
+/// Embedded changelog content (compiled into binary at build time)
+/// This ensures the changelog is always available regardless of where the executable is located.
+/// Path is relative to this file (src-tauri/src/metrics/mod.rs):
+///   ../../../CHANGELOG.md = project root/CHANGELOG.md
+const EMBEDDED_CHANGELOG: &str = include_str!("../../../CHANGELOG.md");
+
+/// Get changelog content from CHANGELOG.md
+/// Returns the changelog as a string
+/// 
+/// This function tries multiple strategies in order:
+/// 1. First tries to read from the project root (for development - allows live updates)
+/// 2. Falls back to embedded changelog (compiled into binary - always works)
+#[tauri::command]
+pub fn get_changelog() -> Result<String, String> {
+    
+    // Strategy 1: Try to read from project root (development builds)
+    // This allows the changelog to be updated without recompiling during development
+    if let Ok(cwd) = std::env::current_dir() {
+        let cwd_changelog = cwd.join("CHANGELOG.md");
+        if cwd_changelog.exists() {
+            debug2!("Reading changelog from current directory: {:?}", cwd_changelog);
+            if let Ok(content) = std::fs::read_to_string(&cwd_changelog) {
+                if !content.trim().is_empty() {
+                    return Ok(content);
+                }
+            }
+        }
+        
+        // Also try going up from current directory (in case we're in a subdirectory)
+        if let Some(parent) = cwd.parent() {
+            let parent_changelog = parent.join("CHANGELOG.md");
+            if parent_changelog.exists() {
+                debug2!("Reading changelog from parent directory: {:?}", parent_changelog);
+                if let Ok(content) = std::fs::read_to_string(&parent_changelog) {
+                    if !content.trim().is_empty() {
+                        return Ok(content);
+                    }
+                }
+            }
+        }
+    }
+    
+    // Strategy 2: Try to read from executable's directory hierarchy
+    // In development: target/debug/mac_stats or target/release/mac_stats
+    // In production: mac-stats.app/Contents/MacOS/mac_stats
+    if let Ok(exe_path) = std::env::current_exe() {
+        let mut current = exe_path.parent();
+        
+        // Try going up to 6 levels (should cover most cases)
+        for _ in 0..6 {
+            if let Some(dir) = current {
+                let changelog_path = dir.join("CHANGELOG.md");
+                if changelog_path.exists() {
+                    debug2!("Reading changelog from: {:?}", changelog_path);
+                    if let Ok(content) = std::fs::read_to_string(&changelog_path) {
+                        if !content.trim().is_empty() {
+                            return Ok(content);
+                        }
+                    }
+                }
+                current = dir.parent();
+            } else {
+                break;
+            }
+        }
+    }
+    
+    // Strategy 3: Use embedded changelog (compiled into binary)
+    // This always works and is the most reliable fallback
+    let embedded_len = EMBEDDED_CHANGELOG.len();
+    debug1!("Embedded changelog length: {} bytes", embedded_len);
+    
+    if !EMBEDDED_CHANGELOG.trim().is_empty() {
+        debug1!("Using embedded changelog (compiled into binary)");
+        return Ok(EMBEDDED_CHANGELOG.to_string());
+    }
+    
+    // If embedded changelog is also empty, return an error with helpful info
+    let error_msg = format!(
+        "Changelog is not available. Embedded changelog is empty ({} bytes). \
+        The CHANGELOG.md file may not have been found at compile time. \
+        Please ensure CHANGELOG.md exists at the project root and rebuild the app.",
+        embedded_len
+    );
+    debug1!("{}", error_msg);
+    Err(error_msg)
 }
 
 /// Get window decorations preference
@@ -681,14 +920,25 @@ pub fn get_cpu_details() -> CpuDetails {
             Vec::new()
         };
         
+        // Get cached battery and power info
+        let (battery_level, is_charging, has_battery) = crate::state::BATTERY_CACHE.try_lock()
+            .ok()
+            .and_then(|c| c.as_ref().map(|(level, charging, _)| (*level, *charging, *level >= 0.0)))
+            .unwrap_or((-1.0, false, false));
+        
+        let (cpu_power, gpu_power) = crate::state::POWER_CACHE.try_lock()
+            .ok()
+            .and_then(|c| c.as_ref().map(|(cpu, gpu, _)| (*cpu, *gpu)))
+            .unwrap_or((0.0, 0.0));
+        
         return CpuDetails {
             usage,
             temperature,
             frequency,
             p_core_frequency,
             e_core_frequency,
-            cpu_power: 0.0,
-            gpu_power: 0.0,
+            cpu_power,
+            gpu_power,
             load_1: load.one,
             load_5: load.five,
             load_15: load.fifteen,
@@ -699,6 +949,9 @@ pub fn get_cpu_details() -> CpuDetails {
             can_read_frequency: crate::metrics::can_read_frequency(),
             can_read_cpu_power: false,
             can_read_gpu_power: false,
+            battery_level,
+            is_charging,
+            has_battery,
         };
     }
     
@@ -853,10 +1106,10 @@ pub fn get_cpu_details() -> CpuDetails {
         }
     };
 
-    // CRITICAL: Use cached values or defaults - don't call expensive functions
-    // SMC calls and other operations can block the main thread
-    // OPTIMIZATION Phase 3: Use OnceLock for fast capability flag access (no locking)
-    let (temperature, frequency, p_core_frequency, e_core_frequency, cpu_power, gpu_power, chip_info, can_read_temperature, can_read_frequency, can_read_cpu_power, can_read_gpu_power) = {
+        // CRITICAL: Use cached values or defaults - don't call expensive functions
+        // SMC calls and other operations can block the main thread
+        // OPTIMIZATION Phase 3: Use OnceLock for fast capability flag access (no locking)
+        let (temperature, frequency, p_core_frequency, e_core_frequency, cpu_power, gpu_power, chip_info, can_read_temperature, can_read_frequency, can_read_cpu_power, can_read_gpu_power, battery_level, is_charging, has_battery) = {
         // Get cached access flags (fast OnceLock access, no blocking)
         let _can_read_temp = CAN_READ_TEMPERATURE.get().copied().unwrap_or(false);
         let can_read_freq = CAN_READ_FREQUENCY.get().copied().unwrap_or(false);
@@ -983,12 +1236,27 @@ pub fn get_cpu_details() -> CpuDetails {
         // Use cached chip info or default - ensure it's initialized by calling get_chip_info()
         let chip = get_chip_info();
         
-        // Return cached temperature, frequency, and defaults for other expensive values
-        (temperature, frequency, p_core_frequency, e_core_frequency, 0.0, 0.0, chip, can_read_temp, can_read_freq, can_read_cpu_p, can_read_gpu_p)
+        // Get power consumption (cached)
+        let (cpu_power_val, gpu_power_val) = get_power_consumption();
+        
+        // Get battery info (cached)
+        let (battery_level_val, is_charging_val, has_battery_val) = get_battery_info();
+        
+        // Return cached temperature, frequency, power, battery, and defaults for other expensive values
+        (temperature, frequency, p_core_frequency, e_core_frequency, cpu_power_val, gpu_power_val, chip, can_read_temp, can_read_freq, can_read_cpu_p, can_read_gpu_p, battery_level_val, is_charging_val, has_battery_val)
     };
-
+    
     // Log data being sent to frontend for debugging
-    debug2!("get_cpu_details returning: temperature={:.1}°C, frequency={:.2} GHz, can_read_temperature={}, can_read_frequency={}", temperature, frequency, can_read_temperature, can_read_frequency);
+    let power_logging = crate::state::POWER_USAGE_LOGGING_ENABLED.lock()
+        .map(|f| *f)
+        .unwrap_or(false);
+    
+    if power_logging {
+        debug1!("get_cpu_details returning: temperature={:.1}°C, frequency={:.2} GHz, cpu_power={:.2}W, gpu_power={:.2}W, battery={:.1}%, charging={}, has_battery={}", 
+            temperature, frequency, cpu_power, gpu_power, battery_level, is_charging, has_battery);
+    } else {
+        debug2!("get_cpu_details returning: temperature={:.1}°C, frequency={:.2} GHz, can_read_temperature={}, can_read_frequency={}", temperature, frequency, can_read_temperature, can_read_frequency);
+    }
     
     CpuDetails {
         usage,
@@ -1008,6 +1276,9 @@ pub fn get_cpu_details() -> CpuDetails {
         can_read_frequency,
         can_read_cpu_power,
         can_read_gpu_power,
+        battery_level,
+        is_charging,
+        has_battery,
     }
 }
 

@@ -579,6 +579,9 @@ def main():
     keep_running = None  # None = ask, True = keep, False = kill
     debug = False
     
+    # Track which numeric args we've seen
+    numeric_args_seen = 0
+    
     i = 0
     while i < len(args):
         arg = args[i]
@@ -590,16 +593,17 @@ def main():
             keep_running = False
         elif arg == '--debug':
             debug = True
-        elif arg.isdigit() or ('.' in arg and arg.replace('.', '').isdigit()):
-            if duration == 60 and interval == 1.0 and warmup == 30:
-                # First numeric arg is duration
+        elif arg.replace('.', '').replace('-', '').isdigit():
+            # Numeric argument
+            if numeric_args_seen == 0:
                 duration = int(float(arg))
-            elif interval == 1.0 and warmup == 30:
-                # Second numeric arg is interval
+                numeric_args_seen = 1
+            elif numeric_args_seen == 1:
                 interval = float(arg)
-            else:
-                # Third numeric arg is warmup
+                numeric_args_seen = 2
+            elif numeric_args_seen == 2:
                 warmup = int(float(arg))
+                numeric_args_seen = 3
         i += 1
     
     print_header()
@@ -712,6 +716,9 @@ def main():
         print("  [DEBUG] mac_stats PIDs:", mac_stats_pids)
         print("  [DEBUG] Stats PIDs:", stats_pids)
     
+    # Wait a moment before capturing baseline to ensure processes are stable
+    time.sleep(0.5)
+    
     mac_stats_initial_times = capture_initial_cpu_times(mac_stats_pids, debug)
     stats_initial_times = capture_initial_cpu_times(stats_pids, debug)
     
@@ -734,6 +741,12 @@ def main():
         return
     
     print(f"  ✓ Baseline captured ({len(mac_stats_initial_times)} mac_stats, {len(stats_initial_times)} Stats)")
+    
+    # Wait a bit more before first sample to ensure we get a measurable delta
+    # This helps avoid 0.0s on first sample due to ps time resolution
+    if interval < 2:
+        print("  Waiting 1 second before first sample for better accuracy...")
+        time.sleep(1)
     
     # Start monitoring
     print(f"\n📊 Monitoring for {duration} seconds (interval: {interval}s)")

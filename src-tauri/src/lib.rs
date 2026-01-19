@@ -99,7 +99,7 @@ use state::*;
 // Use metrics from metrics module (only re-export what's needed)
 
 // Re-export for Tauri commands
-pub use metrics::{SystemMetrics, CpuDetails, get_cpu_details, get_metrics, get_app_version, get_window_decorations, set_window_decorations, get_process_details, force_quit_process};
+pub use metrics::{SystemMetrics, CpuDetails, get_cpu_details, get_metrics, get_app_version, get_window_decorations, set_window_decorations, get_process_details, force_quit_process, get_changelog};
 
 
 // UI functions are now in ui module
@@ -115,6 +115,16 @@ pub fn set_frequency_logging(enabled: bool) {
     }
 }
 
+/// Set power usage logging flag for detailed debugging
+pub fn set_power_usage_logging(enabled: bool) {
+    if let Ok(mut flag) = state::POWER_USAGE_LOGGING_ENABLED.lock() {
+        *flag = enabled;
+        if enabled {
+            debug1!("Power usage logging enabled - detailed power and battery information will be logged");
+        }
+    }
+}
+
 pub fn run_with_cpu_window() {
     debug1!("Running with -cpu flag: will open CPU window after setup");
     run_internal(true)
@@ -126,7 +136,7 @@ pub fn run() {
 
 fn run_internal(open_cpu_window: bool) {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![get_cpu_details, get_app_version, get_window_decorations, set_window_decorations, get_process_details, force_quit_process])
+        .invoke_handler(tauri::generate_handler![get_cpu_details, get_app_version, get_window_decorations, set_window_decorations, get_process_details, force_quit_process, get_changelog])
         .setup(move |app| {
             // Hide the main window immediately (menu bar app)
             if let Some(main_window) = app.get_window("main") {
@@ -386,6 +396,304 @@ fn run_internal(open_cpu_window: bool) {
                                         }
                                     } else {
                                         debug2!("No CPU Performance States channels found in IOReport");
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // CRITICAL: Create IOReport subscription for power reading (once, when window opens)
+                        // This is expensive to create, so we keep it alive and reuse it
+                        // Power channels are in groups like "CPU Stats" / "CPU Power" or "GPU Stats" / "GPU Power"
+                        if let Ok(mut power_sub) = IOREPORT_POWER_SUBSCRIPTION.try_lock() {
+                            if power_sub.is_none() {
+                                // Try to find power channels - common groups:
+                                // "CPU Stats" / "CPU Power" or "CPU Energy"
+                                // "GPU Stats" / "GPU Power" or "GPU Energy"
+                                unsafe {
+                                    // Try multiple power channel combinations
+                                    // Power channels vary by Mac model and macOS version
+                                    // Based on research: "Energy Model" group is commonly used for power
+                                    let mut power_channels_dict: CFDictionaryRef = std::ptr::null_mut();
+                                    let mut found_channel_name = String::new();
+                                    
+                                    // Try "Energy Model" group first (common for power metrics)
+                                    let energy_model_group_cf = CFString::from_static_string("Energy Model");
+                                    let energy_model_dict = IOReportCopyChannelsInGroup(
+                                        energy_model_group_cf.as_concrete_TypeRef(),
+                                        std::ptr::null(), // NULL subgroup = all subgroups
+                                        0, 0, 0,
+                                    );
+                                    if !energy_model_dict.is_null() {
+                                        use core_foundation::dictionary::CFDictionaryGetCount;
+                                        let count = CFDictionaryGetCount(energy_model_dict);
+                                        if count > 0 {
+                                            power_channels_dict = energy_model_dict;
+                                            found_channel_name = "Energy Model (all subgroups)".to_string();
+                                            debug1!("Found power channels: Energy Model ({} entries)", count);
+                                        } else {
+                                            CFRelease(energy_model_dict as CFTypeRef);
+                                        }
+                                    }
+                                    
+                                    // If Energy Model didn't work, try CPU Power
+                                    if power_channels_dict.is_null() {
+                                        let cpu_group_cf = CFString::from_static_string("CPU Stats");
+                                        let cpu_power_subgroup_cf = CFString::from_static_string("CPU Power");
+                                        let cpu_channels_dict = IOReportCopyChannelsInGroup(
+                                            cpu_group_cf.as_concrete_TypeRef(),
+                                            cpu_power_subgroup_cf.as_concrete_TypeRef(),
+                                            0, 0, 0,
+                                        );
+                                        if !cpu_channels_dict.is_null() {
+                                            power_channels_dict = cpu_channels_dict;
+                                            found_channel_name = "CPU Stats / CPU Power".to_string();
+                                            debug1!("Found power channels: CPU Stats / CPU Power");
+                                        } else {
+                                            // Try CPU Energy
+                                            let cpu_energy_subgroup_cf = CFString::from_static_string("CPU Energy");
+                                            let cpu_energy_channels_dict = IOReportCopyChannelsInGroup(
+                                                cpu_group_cf.as_concrete_TypeRef(),
+                                                cpu_energy_subgroup_cf.as_concrete_TypeRef(),
+                                                0, 0, 0,
+                                            );
+                                            if !cpu_energy_channels_dict.is_null() {
+                                                power_channels_dict = cpu_energy_channels_dict;
+                                                found_channel_name = "CPU Stats / CPU Energy".to_string();
+                                                debug1!("Found power channels: CPU Stats / CPU Energy");
+                                            } else {
+                                                // Try GPU Power
+                                                let gpu_group_cf = CFString::from_static_string("GPU Stats");
+                                                let gpu_power_subgroup_cf = CFString::from_static_string("GPU Power");
+                                                let gpu_channels_dict = IOReportCopyChannelsInGroup(
+                                                    gpu_group_cf.as_concrete_TypeRef(),
+                                                    gpu_power_subgroup_cf.as_concrete_TypeRef(),
+                                                    0, 0, 0,
+                                                );
+                                                if !gpu_channels_dict.is_null() {
+                                                    power_channels_dict = gpu_channels_dict;
+                                                    found_channel_name = "GPU Stats / GPU Power".to_string();
+                                                    debug1!("Found power channels: GPU Stats / GPU Power");
+                                                } else {
+                                                    // Try GPU Energy
+                                                    let gpu_energy_subgroup_cf = CFString::from_static_string("GPU Energy");
+                                                    let gpu_energy_channels_dict = IOReportCopyChannelsInGroup(
+                                                        gpu_group_cf.as_concrete_TypeRef(),
+                                                        gpu_energy_subgroup_cf.as_concrete_TypeRef(),
+                                                        0, 0, 0,
+                                                    );
+                                                    if !gpu_energy_channels_dict.is_null() {
+                                                        power_channels_dict = gpu_energy_channels_dict;
+                                                        found_channel_name = "GPU Stats / GPU Energy".to_string();
+                                                        debug1!("Found power channels: GPU Stats / GPU Energy");
+                                                    } else {
+                                                        debug1!("No power channels found - tried: Energy Model, CPU Power, CPU Energy, GPU Power, GPU Energy");
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    if !power_channels_dict.is_null() {
+                                        // Check channel count before proceeding
+                                        use core_foundation::dictionary::CFDictionaryGetCount;
+                                        let channel_count = CFDictionaryGetCount(power_channels_dict);
+                                        debug1!("Power channels dictionary has {} entries", channel_count);
+                                        
+                                        if channel_count == 0 {
+                                            debug1!("Power channels dictionary is empty - cannot create subscription");
+                                            CFRelease(power_channels_dict as CFTypeRef);
+                                        } else {
+                                            // CRITICAL: Extract actual channels from nested structure
+                                            // IOReportCopyChannelsInGroup returns a dict with "IOReportChannels" key
+                                            // containing the actual channel dictionaries
+                                            use core_foundation::base::CFGetTypeID;
+                                            use core_foundation::dictionary::CFDictionaryGetTypeID;
+                                            use core_foundation::string::CFStringGetTypeID;
+                                            
+                                            let actual_channels_dict = {
+                                                use core_foundation::dictionary::CFDictionaryGetCount;
+                                                
+                                                let keys_count = CFDictionaryGetCount(power_channels_dict);
+                                                let mut keys_buf: Vec<*const c_void> = vec![std::ptr::null(); keys_count as usize];
+                                                let mut values_buf: Vec<*const c_void> = vec![std::ptr::null(); keys_count as usize];
+                                                
+                                                extern "C" {
+                                                    fn CFDictionaryGetKeysAndValues(
+                                                        theDict: CFDictionaryRef,
+                                                        keys: *mut *const c_void,
+                                                        values: *mut *const c_void,
+                                                    );
+                                                }
+                                                
+                                                CFDictionaryGetKeysAndValues(
+                                                    power_channels_dict,
+                                                    keys_buf.as_mut_ptr(),
+                                                    values_buf.as_mut_ptr(),
+                                                );
+                                                
+                                                // Log all keys to understand structure
+                                                for i in 0..(keys_count as usize) {
+                                                    let key_ref = keys_buf[i] as CFStringRef;
+                                                    if !key_ref.is_null() {
+                                                        let key_type_id = CFGetTypeID(key_ref as CFTypeRef);
+                                                        let string_type_id = CFStringGetTypeID();
+                                                        if key_type_id == string_type_id {
+                                                            let key_str = CFString::wrap_under_get_rule(key_ref);
+                                                            let key_name = key_str.to_string();
+                                                            debug1!("Power channels dict key[{}]: '{}'", i, key_name);
+                                                            
+                                                            let value_ptr = values_buf[i];
+                                                            if !value_ptr.is_null() {
+                                                                let value_type_id = CFGetTypeID(value_ptr as CFTypeRef);
+                                                                let dict_type_id = CFDictionaryGetTypeID();
+                                                                extern "C" {
+                                                                    fn CFArrayGetTypeID() -> u64;
+                                                                }
+                                                                let array_type_id = CFArrayGetTypeID();
+                                                                debug1!("  Value type_id={}, dict_type_id={}, array_type_id={}", value_type_id, dict_type_id, array_type_id);
+                                                                
+                                                                if value_type_id == dict_type_id {
+                                                                    let nested_dict = value_ptr as CFDictionaryRef;
+                                                                    let nested_count = CFDictionaryGetCount(nested_dict);
+                                                                    debug1!("  Nested dict has {} entries", nested_count);
+                                                                } else if value_type_id as u64 == array_type_id {
+                                                                    extern "C" {
+                                                                        fn CFArrayGetCount(theArray: *const c_void) -> i32;
+                                                                    }
+                                                                    let array_count = CFArrayGetCount(value_ptr as *const c_void);
+                                                                    debug1!("  Nested array has {} entries", array_count);
+                                                                    // If this is IOReportChannels array, we need to extract it
+                                                                    if key_name == "IOReportChannels" && array_count > 0 {
+                                                                        // For arrays, we need to process them differently
+                                                                        // The array contains channel dictionaries directly
+                                                                        debug1!("  Found IOReportChannels array with {} channels", array_count);
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                
+                                                // For Energy Model, IOReportChannels is an array, not a dict
+                                                // We need to store the original dict (with IOReportChannels array) for channel name lookup
+                                                // IOReportMergeChannels will handle the array structure when creating subscription
+                                                debug1!("Using original power channels dict (contains IOReportChannels array)");
+                                                CFRetain(power_channels_dict as CFTypeRef);
+                                                power_channels_dict
+                                            };
+                                            
+                                            // Retain and store original channels dict (the wrapper with IOReportChannels)
+                                            // This is needed for channel name lookup during power reading
+                                            // The actual_channels_dict is what we'll merge, but we store the wrapper for lookup
+                                            CFRetain(power_channels_dict as CFTypeRef);
+                                            if let Ok(mut orig_storage) = IOREPORT_POWER_ORIGINAL_CHANNELS.try_lock() {
+                                                if let Some(old_dict) = orig_storage.take() {
+                                                    CFRelease(old_dict as CFTypeRef);
+                                                }
+                                                // Store the wrapper dict (contains IOReportChannels array) for name lookup
+                                                *orig_storage = Some(power_channels_dict as usize);
+                                                debug1!("Stored original power channels dict in IOREPORT_POWER_ORIGINAL_CHANNELS");
+                                            } else {
+                                                CFRelease(power_channels_dict as CFTypeRef);
+                                            }
+                                            
+                                            // Create mutable dictionary for subscription
+                                            // CRITICAL: Try using the channels dict directly first, then merge if needed
+                                            use core_foundation::base::CFType;
+                                            let power_channels_mut: CFMutableDictionary<CFString, CFType> = CFMutableDictionary::new();
+                                            
+                                            debug1!("Merging power channels into mutable dictionary...");
+                                            IOReportMergeChannels(
+                                                power_channels_mut.as_concrete_TypeRef(),
+                                                actual_channels_dict,
+                                                std::ptr::null(),
+                                            );
+                                            
+                                            // Release the extracted dict after merging (we've copied its contents)
+                                            CFRelease(actual_channels_dict as CFTypeRef);
+                                            
+                                            // Check merged dictionary count
+                                            use core_foundation::dictionary::CFDictionaryGetCount;
+                                            let merged_count = CFDictionaryGetCount(power_channels_mut.as_concrete_TypeRef());
+                                            debug1!("Merged power channels dictionary has {} entries", merged_count);
+                                            
+                                            // If merge resulted in 0 entries, try using the original dict directly
+                                            // This might work if the structure is already in the correct format
+                                            let channels_for_subscription = if merged_count == 0 {
+                                                debug1!("Merge resulted in 0 entries, trying to use channels dict directly");
+                                                // Retain the actual_channels_dict again since we'll use it directly
+                                                CFRetain(actual_channels_dict as CFTypeRef);
+                                                actual_channels_dict as CFMutableDictionaryRef
+                                            } else {
+                                                // Release the extracted channels dict (we've merged it)
+                                                CFRelease(actual_channels_dict as CFTypeRef);
+                                                power_channels_mut.as_concrete_TypeRef()
+                                            };
+                                            
+                                            // Create subscription
+                                            let mut power_subscription_dict: CFMutableDictionaryRef = std::ptr::null_mut();
+                                            debug1!("Creating IOReport power subscription...");
+                                            let power_subscription_ptr = IOReportCreateSubscription(
+                                                std::ptr::null(),
+                                                channels_for_subscription,
+                                                &mut power_subscription_dict,
+                                                0,
+                                                std::ptr::null(),
+                                            );
+                                            
+                                            // If we used the direct dict and subscription failed, release it
+                                            if merged_count == 0 && power_subscription_ptr.is_null() {
+                                                CFRelease(channels_for_subscription as CFTypeRef);
+                                            }
+                                            
+                                            if !power_subscription_ptr.is_null() {
+                                                debug1!("IOReport power subscription created successfully!");
+                                            *power_sub = Some(power_subscription_ptr as usize);
+                                            
+                                            if !power_subscription_dict.is_null() {
+                                                CFRetain(power_subscription_dict as CFTypeRef);
+                                                if let Ok(mut sub_dict_storage) = IOREPORT_POWER_SUBSCRIPTION_DICT.try_lock() {
+                                                    if let Some(old_dict) = sub_dict_storage.take() {
+                                                        CFRelease(old_dict as CFTypeRef);
+                                                    }
+                                                    *sub_dict_storage = Some(power_subscription_dict as usize);
+                                                } else {
+                                                    CFRelease(power_subscription_dict as CFTypeRef);
+                                                }
+                                            }
+                                            
+                                            CFRetain(power_channels_mut.as_concrete_TypeRef() as CFTypeRef);
+                                            if let Ok(mut channels_storage) = IOREPORT_POWER_CHANNELS.try_lock() {
+                                                if let Some(old_ptr) = channels_storage.take() {
+                                                    CFRelease(old_ptr as CFTypeRef);
+                                                }
+                                                *channels_storage = Some(power_channels_mut.as_concrete_TypeRef() as usize);
+                                            } else {
+                                                CFRelease(power_channels_mut.as_concrete_TypeRef() as CFTypeRef);
+                                            }
+                                            
+                                            debug1!("IOReport power subscription created successfully (handle={:p}, channels={})", power_subscription_ptr, found_channel_name);
+                                            
+                                            if CAN_READ_CPU_POWER.set(true).is_ok() {
+                                                debug1!("CAN_READ_CPU_POWER set to true");
+                                            }
+                                            if CAN_READ_GPU_POWER.set(true).is_ok() {
+                                                debug1!("CAN_READ_GPU_POWER set to true");
+                                            }
+                                            } else {
+                                                debug1!("Failed to create IOReport power subscription: subscription_ptr is null");
+                                                debug1!("This may indicate the power channels require different handling or permissions");
+                                                // Release the retained channels dict since subscription failed
+                                                if let Ok(mut orig_storage) = IOREPORT_POWER_ORIGINAL_CHANNELS.try_lock() {
+                                                    if let Some(dict) = orig_storage.take() {
+                                                        CFRelease(dict as CFTypeRef);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        debug1!("No power channels found in IOReport (tried: CPU Power, CPU Energy, GPU Power, GPU Energy)");
+                                        debug1!("Power consumption will show 0.0W - power channels may not be available on this Mac model");
                                     }
                                 }
                             }
@@ -698,21 +1006,154 @@ fn run_internal(open_cpu_window: bool) {
                         } else {
                             debug2!("should_read_freq=false, skipping frequency update");
                         }
+                        
+                        // CRITICAL: Only read battery and power when CPU window is visible
+                        // This ensures menu bar (which only shows CPU/RAM/Disk) remains super lightweight
+                        // Battery reading via IOKit is lightweight, but we still only read when window is visible
+                        // Battery state can change (charging/discharging), so we read frequently when visible
+                        let (battery_level, is_charging, has_battery) = metrics::get_battery_info();
+                        let power_logging = state::POWER_USAGE_LOGGING_ENABLED.lock()
+                            .map(|f| *f)
+                            .unwrap_or(false);
+                        if power_logging && has_battery {
+                            debug1!("Battery updated: {:.1}%, charging={}", battery_level, is_charging);
+                        }
+                        
+                        // Read power consumption from IOReport
+                        // Power reading is expensive (IOReport), so we read it every 5 seconds
+                        let should_read_power = if let Ok(mut last) = LAST_POWER_READ_TIME.lock() {
+                            let should = last.as_ref()
+                                .map(|t| t.elapsed().as_secs() >= 5)
+                                .unwrap_or(true);
+                            if should {
+                                *last = Some(std::time::Instant::now());
+                            }
+                            should
+                        } else {
+                            false
+                        };
+                        
+                        if should_read_power {
+                            debug1!("Reading power from IOReport (should_read_power=true)...");
+                            // Read power from IOReport
+                            let power_result = if let Ok(power_sub) = IOREPORT_POWER_SUBSCRIPTION.try_lock() {
+                                debug1!("Power subscription lock acquired");
+                                if let Some(subscription_usize) = power_sub.as_ref() {
+                                    let subscription_ptr = *subscription_usize as *mut c_void;
+                                    debug1!("Power subscription found: {:p}", subscription_ptr);
+                                    
+                                    if !subscription_ptr.is_null() {
+                                        debug1!("Subscription pointer is valid, proceeding with power read...");
+                                        let channels_ptr = if let Ok(channels_storage) = IOREPORT_POWER_CHANNELS.try_lock() {
+                                            channels_storage.as_ref().map(|&usize_ptr| usize_ptr as CFMutableDictionaryRef)
+                                        } else {
+                                            None
+                                        };
+                                        
+                                        let channels_ref = channels_ptr.unwrap_or(std::ptr::null_mut());
+                                        
+                                        let original_channels_dict = if let Ok(orig_storage) = IOREPORT_POWER_ORIGINAL_CHANNELS.try_lock() {
+                                            orig_storage.as_ref().map(|&dict_usize| dict_usize as CFDictionaryRef)
+                                        } else {
+                                            None
+                                        };
+                                        
+                                        debug1!("Power reading: original_channels_dict.is_some()={}, channels_ref.is_null()={}", 
+                                            original_channels_dict.is_some(), channels_ref.is_null());
+                                        
+                                        let last_sample = if let Ok(last_sample_storage) = LAST_IOREPORT_POWER_SAMPLE.try_lock() {
+                                            last_sample_storage.as_ref().map(|&(sample_usize, _)| sample_usize as CFDictionaryRef)
+                                        } else {
+                                            None
+                                        };
+                                        
+                                        let last_read_time = LAST_POWER_READ_TIME.lock()
+                                            .ok()
+                                            .and_then(|t| *t);
+                                        
+                                        unsafe {
+                                            use ffi::ioreport::read_power_from_ioreport;
+                                            
+                                            debug1!("Calling read_power_from_ioreport...");
+                                            let (result, current_sample_opt) = read_power_from_ioreport(
+                                                subscription_ptr as *const c_void,
+                                                channels_ref,
+                                                original_channels_dict,
+                                                last_sample,
+                                                last_read_time,
+                                                power_logging,
+                                            );
+                                            debug1!("read_power_from_ioreport returned: CPU={:.2}W, GPU={:.2}W", result.cpu_power, result.gpu_power);
+                                            
+                                            // Store current sample for next delta calculation
+                                            if let Some(current_sample) = current_sample_opt {
+                                                let retained_sample = CFRetain(current_sample as CFTypeRef) as CFDictionaryRef;
+                                                if let Ok(mut last_sample_storage) = LAST_IOREPORT_POWER_SAMPLE.try_lock() {
+                                                    if let Some((old_sample_usize, _)) = last_sample_storage.take() {
+                                                        let old_sample = old_sample_usize as CFDictionaryRef;
+                                                        if !old_sample.is_null() {
+                                                            CFRelease(old_sample as CFTypeRef);
+                                                        }
+                                                    }
+                                                    *last_sample_storage = Some((retained_sample as usize, std::time::Instant::now()));
+                                                } else {
+                                                    CFRelease(retained_sample as CFTypeRef);
+                                                }
+                                                CFRelease(current_sample as CFTypeRef);
+                                            }
+                                            
+                                            Some(result)
+                                        }
+                                    } else {
+                                        None
+                                    }
+                                } else {
+                                    debug1!("Power subscription is None");
+                                    None
+                                }
+                            } else {
+                                debug1!("Power subscription lock failed");
+                                None
+                            };
+                            
+                            if let Some(power_data) = power_result {
+                                // Update cache
+                                if let Ok(mut cache) = POWER_CACHE.try_lock() {
+                                    *cache = Some((power_data.cpu_power, power_data.gpu_power, std::time::Instant::now()));
+                                    debug1!("Power cache updated: CPU={:.2}W, GPU={:.2}W", power_data.cpu_power, power_data.gpu_power);
+                                }
+                            } else {
+                                debug1!("Power reading returned None - subscription may not be available");
+                            }
+                        }
+                        
+                        // Get cached power values for logging
+                        let (cpu_power, gpu_power) = POWER_CACHE.try_lock()
+                            .ok()
+                            .and_then(|c| c.as_ref().map(|(cpu, gpu, _)| (*cpu, *gpu)))
+                            .unwrap_or((0.0, 0.0));
+                        
+                        if power_logging && (cpu_power > 0.0 || gpu_power > 0.0) {
+                            debug1!("Power: CPU={:.2}W, GPU={:.2}W", cpu_power, gpu_power);
+                        }
                     } else {
+                        // CPU window is not visible - DO NOT read battery or power to save CPU
+                        // Menu bar only needs CPU/RAM/Disk which are already lightweight
+                        debug3!("CPU window closed - skipping battery and power reads to save CPU");
                         // CPU window is not visible - clear SMC connection and IOReport subscription to save resources
                         if smc_connection.is_some() {
                             smc_connection = None;
                             debug3!("CPU window closed, SMC connection released");
                         }
                         
-                        // CRITICAL: Clear IOReport subscription when window closes to save CPU
+                        // CRITICAL: Clear IOReport subscriptions when window closes to save CPU
                         // Note: IOReport doesn't have an explicit destroy function in the API
                         // The subscription will be cleaned up when the process exits
                         // For now, just clear the reference
                         if let Ok(mut sub) = IOREPORT_SUBSCRIPTION.try_lock() {
                             if sub.is_some() {
                                 *sub = None;
-                                debug2!("CPU window closed, IOReport subscription cleared");
+                                debug2!("CPU window closed, IOReport frequency subscription cleared");
                                 
                                 // Clear channels dictionary
                                 if let Ok(mut channels_storage) = IOREPORT_CHANNELS.try_lock() {
@@ -727,6 +1168,36 @@ fn run_internal(open_cpu_window: bool) {
                                 // Clear last sample
                                 if let Ok(mut last_sample) = LAST_IOREPORT_SAMPLE.try_lock() {
                                     *last_sample = None;
+                                }
+                            }
+                        }
+                        
+                        // Clear power subscription
+                        if let Ok(mut power_sub) = IOREPORT_POWER_SUBSCRIPTION.try_lock() {
+                            if power_sub.is_some() {
+                                *power_sub = None;
+                                debug2!("CPU window closed, IOReport power subscription cleared");
+                                
+                                // Clear power channels dictionary
+                                if let Ok(mut channels_storage) = IOREPORT_POWER_CHANNELS.try_lock() {
+                                    if let Some(ptr) = *channels_storage {
+                                        unsafe {
+                                            CFRelease(ptr as CFTypeRef);
+                                        }
+                                    }
+                                    *channels_storage = None;
+                                }
+                                
+                                // Clear last power sample
+                                if let Ok(mut last_sample) = LAST_IOREPORT_POWER_SAMPLE.try_lock() {
+                                    if let Some((sample_usize, _)) = last_sample.take() {
+                                        let sample = sample_usize as CFDictionaryRef;
+                                        if !sample.is_null() {
+                                            unsafe {
+                                                CFRelease(sample as CFTypeRef);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

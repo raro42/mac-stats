@@ -18,6 +18,14 @@ struct Args {
     /// Enable detailed frequency logging for debugging
     #[arg(long = "frequency")]
     frequency: bool,
+    
+    /// Enable detailed power usage logging for debugging
+    #[arg(long = "power-usage")]
+    power_usage: bool,
+    
+    /// Test changelog functionality (prints changelog to console)
+    #[arg(long = "changelog")]
+    changelog: bool,
 }
 
 fn main() {
@@ -37,6 +45,24 @@ fn main() {
     
     // Set frequency logging flag
     mac_stats::set_frequency_logging(args.frequency);
+    
+    // Set power usage logging flag
+    mac_stats::set_power_usage_logging(args.power_usage);
+    
+    // If --changelog flag is set, test changelog functionality
+    if args.changelog {
+        use mac_stats::get_changelog;
+        match get_changelog() {
+            Ok(changelog) => {
+                println!("Changelog ({} bytes):\n{}", changelog.len(), changelog);
+                std::process::exit(0);
+            }
+            Err(e) => {
+                eprintln!("Error getting changelog: {}", e);
+                std::process::exit(1);
+            }
+        }
+    }
     
     // If -cpu flag is set, open window directly after a short delay
     if args.open_cpu {
