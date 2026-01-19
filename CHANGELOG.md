@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.6] - 2026-01-18
+
+### Added
+- **Process Details Modal**: Click any process in the list to view comprehensive details including:
+  - Process name, PID, and current CPU usage
+  - Total CPU time, parent process information
+  - Start time with relative time display
+  - User and effective user information
+  - Memory usage (physical and virtual)
+  - Disk I/O statistics (read/written)
+- **Force Quit Functionality**: Force quit processes directly from the process details modal
+- **Process List Interactivity**: Process rows are now clickable and show cursor pointer
+- **Auto-refresh Process Details**: Process details modal automatically refreshes every 2 seconds while open
+- **Scrollable Sections**: Added scrollable containers for Details and Processes sections with custom scrollbar styling
+- **Process PID Display**: Process list now includes PID information in data attributes
+
+### Changed
+- **Process List Refresh**: Increased refresh interval from 5 seconds to 15 seconds for better CPU efficiency
+- **Process Cache**: Improved process cache handling with immediate refresh on window open
+- **UI Layout**: Improved flex layout with proper min-height and overflow handling for scrollable sections
+- **Process Data Structure**: Added PID field to ProcessUsage struct for better process identification
+
+### Performance
+- **Smart Process Refresh**: Process details only refresh when CPU window is visible (saves CPU when window is hidden)
+- **Conditional Process Updates**: Process list updates immediately on initial load and when window becomes visible
+- **Efficient Modal Updates**: Process details modal only refreshes when actually visible
+
 ## [0.0.5] - 2026-01-18
 
 ### Performance Improvements

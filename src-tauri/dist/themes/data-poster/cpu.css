@@ -55,6 +55,39 @@ body {
   flex-direction: column;
   gap: 18px;
   overflow: hidden;
+  min-height: 0; /* Allow flex children to shrink below content size */
+}
+
+/* Scrollable container for details and processes sections */
+.poster-details,
+.poster-processes {
+  flex: 0 1 auto; /* Don't grow, but can shrink - use natural size */
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0; /* Critical: allows flex item to shrink below content size */
+  max-height: 300px; /* Limit height to allow scrolling on small screens */
+}
+
+/* Smooth scrolling */
+.poster-details::-webkit-scrollbar,
+.poster-processes::-webkit-scrollbar {
+  width: 1px;
+}
+
+.poster-details::-webkit-scrollbar-track,
+.poster-processes::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.poster-details::-webkit-scrollbar-thumb,
+.poster-processes::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+.poster-details::-webkit-scrollbar-thumb:hover,
+.poster-processes::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .poster-header {
@@ -62,6 +95,7 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   gap: 16px;
+  flex-shrink: 0; /* Don't shrink header */
 }
 
 .poster-title h1 {
@@ -113,12 +147,14 @@ body {
 .poster-rule {
   height: 1px;
   background: var(--rule);
+  flex-shrink: 0; /* Don't shrink rules */
 }
 
 .poster-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
+  flex-shrink: 0; /* Don't shrink metrics section */
 }
 
 .poster-tile {
@@ -452,6 +488,70 @@ body {
 
 .theme-item[aria-current="true"] {
   box-shadow: 0 0 0 3px rgba(85, 199, 255, 0.18);
+}
+
+.process-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  gap: 16px;
+}
+
+.process-detail-label {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 400;
+  flex-shrink: 0;
+}
+
+.process-detail-value {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 400;
+  text-align: right;
+  word-break: break-word;
+  flex: 1;
+}
+
+.process-detail-row-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.process-detail-row-group .process-detail-row {
+  padding: 6px 0;
+}
+
+.force-quit-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.force-quit-btn {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255, 59, 48, 0.15);
+  border: 1px solid rgba(255, 59, 48, 0.4);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.force-quit-btn:hover {
+  background: rgba(255, 59, 48, 0.25);
+  border-color: rgba(255, 59, 48, 0.5);
+}
+
+.force-quit-btn:active {
+  background: rgba(255, 59, 48, 0.35);
 }
 
 .setting-toggle {

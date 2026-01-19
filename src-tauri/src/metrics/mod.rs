@@ -34,6 +34,26 @@ pub struct SystemMetrics {
 pub struct ProcessUsage {
     pub name: String,
     pub cpu: f32,
+    pub pid: u32,
+}
+
+#[derive(serde::Serialize)]
+pub struct ProcessDetails {
+    pub pid: u32,
+    pub name: String,
+    pub cpu: f32,
+    pub parent_pid: Option<u32>,
+    pub parent_name: Option<String>,
+    pub start_time: u64,
+    pub user_id: Option<String>,
+    pub user_name: Option<String>,
+    pub effective_user_id: Option<String>,
+    pub effective_user_name: Option<String>,
+    pub memory: u64,
+    pub virtual_memory: u64,
+    pub disk_read: u64,
+    pub disk_written: u64,
+    pub total_cpu_time: u64, // Total CPU time in milliseconds
 }
 
 #[derive(serde::Serialize)]
@@ -621,10 +641,11 @@ pub fn get_cpu_details() -> CpuDetails {
                                             
                                             let mut processes: Vec<crate::metrics::ProcessUsage> = sys
                                                 .processes()
-                                                .values()
-                                                .map(|proc| crate::metrics::ProcessUsage {
+                                                .iter()
+                                                .map(|(pid, proc)| crate::metrics::ProcessUsage {
                                                     name: proc.name().to_string_lossy().to_string(),
                                                     cpu: proc.cpu_usage(),
+                                                    pid: pid.as_u32(),
                                                 })
                                                 .collect();
                                             
@@ -742,6 +763,7 @@ pub fn get_cpu_details() -> CpuDetails {
                     
                     // If we have cached data, check if it's still fresh (<10 seconds)
                     // OPTIMIZATION Phase 1: Increased from 5s to 10s to reduce process enumeration overhead
+                    // BUT: If cache is empty (None), always refresh immediately for instant display
                     if let Some((cached_procs, age_secs)) = cached_processes {
                         if age_secs < 10 {
                             // Cache is less than 10 seconds old - return immediately
@@ -758,10 +780,11 @@ pub fn get_cpu_details() -> CpuDetails {
                             // Then sort by CPU usage to get the actual top processes
                             let mut processes: Vec<ProcessUsage> = sys
                                 .processes()
-                                .values()
-                                .map(|proc| ProcessUsage {
+                                .iter()
+                                .map(|(pid, proc)| ProcessUsage {
                                     name: proc.name().to_string_lossy().to_string(),
                                     cpu: proc.cpu_usage(),
+                                    pid: pid.as_u32(),
                                 })
                                 .collect();
                             
@@ -782,7 +805,8 @@ pub fn get_cpu_details() -> CpuDetails {
                     } else {
                         // No cache available - refresh now (first time or cache was cleared)
                         // This is the only case where we block on refresh_processes()
-                        debug2!("Process cache is empty, refreshing now (this may take a moment)");
+                        // CRITICAL: This happens when window first opens (cache was cleared)
+                        debug2!("Process cache is empty, refreshing now immediately (window just opened)");
                         use sysinfo::ProcessesToUpdate;
                         sys.refresh_processes(ProcessesToUpdate::All, true);
                         
@@ -790,10 +814,11 @@ pub fn get_cpu_details() -> CpuDetails {
                         // Then sort by CPU usage to get the actual top processes
                         let mut processes: Vec<ProcessUsage> = sys
                             .processes()
-                            .values()
-                            .map(|proc| ProcessUsage {
+                            .iter()
+                            .map(|(pid, proc)| ProcessUsage {
                                 name: proc.name().to_string_lossy().to_string(),
                                 cpu: proc.cpu_usage(),
+                                pid: pid.as_u32(),
                             })
                             .collect();
                         
@@ -983,5 +1008,158 @@ pub fn get_cpu_details() -> CpuDetails {
         can_read_frequency,
         can_read_cpu_power,
         can_read_gpu_power,
+    }
+}
+
+/// Get detailed information about a specific process by PID
+#[tauri::command]
+pub fn get_process_details(pid: u32) -> Result<ProcessDetails, String> {
+    use sysinfo::Pid;
+    
+    debug2!("get_process_details() called for PID: {}", pid);
+    
+    // CRITICAL: Only refresh processes if CPU window is visible (saves CPU)
+    // Process details modal is part of the CPU window, so check window visibility
+    let should_refresh_processes = APP_HANDLE.get()
+        .and_then(|app_handle| {
+            app_handle.get_window("cpu").and_then(|window| {
+                window.is_visible().ok().filter(|&visible| visible)
+            })
+        })
+        .is_some();
+    
+    if !should_refresh_processes {
+        debug3!("CPU window not visible, skipping process refresh in get_process_details");
+        // Still try to get the process from cache if available, but don't refresh
+    }
+    
+    // Use try_lock to avoid blocking - collect all data while lock is held
+    match SYSTEM.try_lock() {
+        Ok(mut sys) => {
+            if sys.is_none() {
+                return Err("System not initialized".to_string());
+            }
+            let sys = sys.as_mut().unwrap();
+            
+            // Only refresh all processes if CPU window is visible (saves CPU)
+            if should_refresh_processes {
+                use sysinfo::ProcessesToUpdate;
+                sys.refresh_processes(ProcessesToUpdate::All, true);
+            }
+            
+            // Get the process while lock is held
+            if let Some(proc) = sys.process(Pid::from_u32(pid)) {
+                // Get parent process information while lock is still held
+                let (parent_pid, parent_name) = if let Some(ppid) = proc.parent() {
+                    let parent_proc = sys.process(ppid);
+                    let parent_name = parent_proc
+                        .map(|p| p.name().to_string_lossy().to_string());
+                    (Some(ppid.as_u32()), parent_name)
+                } else {
+                    (None, None)
+                };
+                
+                // Get user ID and username information
+                // Parse the UID string to get the numeric value for getpwuid
+                let (user_id, user_name) = if let Some(uid) = proc.user_id() {
+                    let uid_str = uid.to_string();
+                    let username = uid_str.parse::<u32>()
+                        .ok()
+                        .and_then(|uid_value| get_username_from_uid(uid_value));
+                    (Some(uid_str), username)
+                } else {
+                    (None, None)
+                };
+                
+                let (effective_user_id, effective_user_name) = if let Some(euid) = proc.effective_user_id() {
+                    let euid_str = euid.to_string();
+                    let username = euid_str.parse::<u32>()
+                        .ok()
+                        .and_then(|euid_value| get_username_from_uid(euid_value));
+                    (Some(euid_str), username)
+                } else {
+                    (None, None)
+                };
+                
+                // Get total CPU time (in milliseconds)
+                // sysinfo 0.35 provides accumulated_cpu_time() method
+                let total_cpu_time = proc.accumulated_cpu_time();
+                
+                // Collect all data before lock is released
+                let details = ProcessDetails {
+                    pid,
+                    name: proc.name().to_string_lossy().to_string(),
+                    cpu: proc.cpu_usage(),
+                    parent_pid,
+                    parent_name,
+                    start_time: proc.start_time(),
+                    user_id,
+                    user_name,
+                    effective_user_id,
+                    effective_user_name,
+                    memory: proc.memory(),
+                    virtual_memory: proc.virtual_memory(),
+                    disk_read: proc.disk_usage().total_read_bytes,
+                    disk_written: proc.disk_usage().total_written_bytes,
+                    total_cpu_time,
+                };
+                
+                debug2!("Process details retrieved for PID {}: {}", pid, details.name);
+                Ok(details)
+            } else {
+                Err(format!("Process with PID {} not found", pid))
+            }
+        },
+        Err(_) => {
+            Err("System lock unavailable".to_string())
+        }
+    }
+}
+
+/// Get username from UID using getpwuid
+fn get_username_from_uid(uid: u32) -> Option<String> {
+    unsafe {
+        use libc::{getpwuid, passwd, c_char};
+        let pw = getpwuid(uid);
+        if pw.is_null() {
+            return None;
+        }
+        let passwd: *const passwd = pw;
+        let pw_name = (*passwd).pw_name;
+        if pw_name.is_null() {
+            return None;
+        }
+        let c_str: *const c_char = pw_name;
+        let c_str_slice = std::ffi::CStr::from_ptr(c_str);
+        c_str_slice.to_str().ok().map(|s| s.to_string())
+    }
+}
+
+/// Force quit a process by PID
+#[tauri::command]
+pub fn force_quit_process(pid: u32) -> Result<(), String> {
+    debug2!("force_quit_process() called for PID: {}", pid);
+    
+    // Use kill -9 to force quit the process
+    let output = Command::new("kill")
+        .arg("-9")
+        .arg(pid.to_string())
+        .output();
+    
+    match output {
+        Ok(result) => {
+            if result.status.success() {
+                debug1!("Successfully force quit process PID: {}", pid);
+                Ok(())
+            } else {
+                let error_msg = String::from_utf8_lossy(&result.stderr);
+                debug1!("Failed to force quit process PID {}: {}", pid, error_msg);
+                Err(format!("Failed to force quit process: {}", error_msg))
+            }
+        },
+        Err(e) => {
+            debug1!("Error executing kill command for PID {}: {}", pid, e);
+            Err(format!("Failed to execute kill command: {}", e))
+        }
     }
 }

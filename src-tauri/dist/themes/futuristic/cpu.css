@@ -52,6 +52,39 @@ body {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  min-height: 0; /* Allow flex children to shrink below content size */
+}
+
+/* Scrollable container for details and processes sections */
+.details-section,
+.processes-section {
+  flex: 0 1 auto; /* Don't grow, but can shrink - use natural size */
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0; /* Critical: allows flex item to shrink below content size */
+  max-height: 300px; /* Limit height to allow scrolling on small screens */
+}
+
+/* Smooth scrolling */
+.details-section::-webkit-scrollbar,
+.processes-section::-webkit-scrollbar {
+  width: 1px;
+}
+
+.details-section::-webkit-scrollbar-track,
+.processes-section::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.details-section::-webkit-scrollbar-thumb,
+.processes-section::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+.details-section::-webkit-scrollbar-thumb:hover,
+.processes-section::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .panel-header {
@@ -61,6 +94,7 @@ body {
   margin-bottom: 20px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--hairline);
+  flex-shrink: 0; /* Don't shrink header */
 }
 
 .header-left h1 {
@@ -118,6 +152,7 @@ body {
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 22px;
+  flex-shrink: 0; /* Don't shrink metrics section */
 }
 
 .metric-tile {
@@ -176,7 +211,7 @@ body {
   font-weight: 600;
   color: var(--muted);
   position: absolute;
-  top: calc(68% + 17px);
+  top: calc(68% + 23px);
   left: 50%;
   transform: translate(-50%, 0);
   white-space: nowrap;
@@ -191,7 +226,7 @@ body {
 
 .ring-gauge {
   position: absolute;
-  top: calc(50% + 8px);
+  top: calc(50% + 5px);
   left: 50%;
   transform: translate(-50%, -50%);
   width: 95px;
@@ -265,6 +300,7 @@ body {
   margin-bottom: 0;
   margin-top: 4px;
   padding: 0;
+  flex-shrink: 0; /* Don't shrink history section */
 }
 
 .history-chart-container {
@@ -427,6 +463,70 @@ body {
 
 .theme-item[aria-current="true"] {
   box-shadow: 0 0 0 3px rgba(59, 214, 255, 0.16);
+}
+
+.process-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  gap: 16px;
+}
+
+.process-detail-label {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 400;
+  flex-shrink: 0;
+}
+
+.process-detail-value {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 400;
+  text-align: right;
+  word-break: break-word;
+  flex: 1;
+}
+
+.process-detail-row-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.process-detail-row-group .process-detail-row {
+  padding: 6px 0;
+}
+
+.force-quit-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.force-quit-btn {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255, 59, 48, 0.15);
+  border: 1px solid rgba(255, 59, 48, 0.4);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.force-quit-btn:hover {
+  background: rgba(255, 59, 48, 0.25);
+  border-color: rgba(255, 59, 48, 0.5);
+}
+
+.force-quit-btn:active {
+  background: rgba(255, 59, 48, 0.35);
 }
 
 .setting-toggle {

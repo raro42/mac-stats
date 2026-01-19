@@ -63,51 +63,59 @@ Measures real-time performance metrics for mac-stats process.
 
 ### `monitor_cpu_comparison.py` - Compare mac_stats vs Stats App
 
-Monitors CPU usage of both `mac_stats` and `Stats` apps simultaneously for side-by-side comparison. Perfect for demonstrating that mac_stats uses less CPU.
+Starts both apps fresh, waits for stabilization, then monitors CPU usage for accurate, reproducible comparison. Perfect for demonstrating that mac_stats uses less CPU.
 
 **Usage**:
 ```bash
-# Monitor for 60 seconds (default), 1-second intervals
+# Monitor for 60 seconds (default), 1-second intervals, 30-second warmup
 ./scripts/monitor_cpu.sh
 
-# Monitor for 120 seconds, 2-second intervals
+# Monitor for 120 seconds, 2-second intervals, 30-second warmup
 ./scripts/monitor_cpu.sh 120 2
 
+# Custom warmup period (e.g., 15 seconds)
+./scripts/monitor_cpu.sh 60 1 15
+
 # Or use Python directly
-python3 ./scripts/monitor_cpu_comparison.py 60 1
+python3 ./scripts/monitor_cpu_comparison.py 60 1 30
 ```
 
 **Parameters**:
-- `duration` (seconds): How long to monitor [default: 60]
+- `duration` (seconds): How long to monitor after warmup [default: 60]
 - `interval` (seconds): Sampling interval [default: 1.0]
+- `warmup` (seconds): Warmup/stabilization period [default: 30]
 
 **Features**:
-- Monitors all processes matching "mac_stats" and "Stats"
-- Real-time comparison display
-- Generates summary report with statistics
-- Exports CSV data for further analysis
-- Optional screenshot capture
+- **Starts apps fresh**: Launches both apps from command line for clean test
+- **30-second warmup**: Waits for apps to stabilize before measuring
+- **Precise PID tracking**: Captures main PID and tracks all child processes
+- **CPU time measurement**: Uses cumulative CPU time (more reliable than instant %)
+- **Real-time comparison**: Shows CPU time consumed and percentage reduction
+- **Comprehensive reports**: Summary with statistics and CSV export
+- **Optional cleanup**: Can kill processes after monitoring
 
 **Output**:
-- `cpu-comparison-report-YYYYMMDD_HHMMSS.txt` - Summary report with averages
+- `cpu-comparison-report-YYYYMMDD_HHMMSS.txt` - Summary report with CPU time comparison
 - `cpu-comparison-data-YYYYMMDD_HHMMSS.csv` - Raw data for analysis
 - `cpu-comparison-screenshots/comparison-YYYYMMDD_HHMMSS.png` - Screenshot (optional)
 
 **Example Workflow**:
 ```bash
-# 1. Start both apps
-./target/release/mac_stats &
-open -a Stats
-
-# 2. Wait a few seconds for apps to stabilize
-
-# 3. Run comparison monitor
+# Simply run the script - it handles everything:
 ./scripts/monitor_cpu.sh 60 1
 
-# 4. Review the generated report
+# The script will:
+# 1. Check for existing processes (ask to kill or use them)
+# 2. Start both apps fresh
+# 3. Wait 30 seconds for stabilization (warmup)
+# 4. Monitor for 60 seconds
+# 5. Generate reports
+# 6. Ask if you want to keep apps running
+
+# Review the generated report
 cat cpu-comparison-report-*.txt
 
-# 5. Open CSV in spreadsheet for visualization
+# Open CSV in spreadsheet for visualization
 open cpu-comparison-data-*.csv
 ```
 
@@ -118,55 +126,73 @@ open cpu-comparison-data-*.csv
 ================================================================================
 Started: 2025-01-18 18:00:00
 
-Monitoring for 60 seconds (interval: 1.0s)
+Checking for existing processes...
+  No existing processes found. Starting fresh...
+Starting mac_stats...
+  ✓ Started mac_stats (PID 12345)
+Starting Stats.app...
+  ✓ Started Stats.app (PID 12346)
 
-Time     | mac_stats CPU | Stats CPU | Comparison
+  mac_stats: 4 process(es) (main PID: 12345)
+  Stats: 8 process(es) (main PID: 12346)
+
+⏱️  Warmup period: 30 seconds
+   Apps are initializing and stabilizing...
+   30 seconds remaining...
+   ...
+   ✓ Warmup complete!
+
+Capturing baseline CPU times...
+  ✓ Baseline captured
+
+📊 Monitoring for 60 seconds (interval: 1.0s)
+
+Time     | mac_stats CPU Time | Stats CPU Time | Reduction
 --------------------------------------------------------------------------------
-18:00:01 | mac_stats:     0.45% (1 procs) | Stats:     2.30% (3 procs) | ✓ mac_stats uses LESS
-18:00:02 | mac_stats:     0.52% (1 procs) | Stats:     2.15% (3 procs) | ✓ mac_stats uses LESS
-18:00:03 | mac_stats:     0.48% (1 procs) | Stats:     2.40% (3 procs) | ✓ mac_stats uses LESS
+18:00:31 | mac_stats:      2.1s (4 procs) | Stats:     12.5s (8 procs) | ✓ -83.2% CPU time
+18:00:32 | mac_stats:      4.3s (4 procs) | Stats:     25.1s (8 procs) | ✓ -82.9% CPU time
 ...
 
 ================================================================================
-CPU Usage Comparison Report
+RESULTS SUMMARY (Based on CPU Time - Most Reliable Metric)
 ================================================================================
-mac_stats App:
-  Average CPU: 0.48%
-  Minimum CPU: 0.35%
-  Maximum CPU: 0.65%
-
-Stats App:
-  Average CPU: 2.25%
-  Minimum CPU: 1.90%
-  Maximum CPU: 2.80%
-
-Comparison:
-  ✓ mac_stats uses LESS CPU
-  Difference: 1.77%
+  mac_stats: 45.2s CPU time (0.75% average)
+  Stats:     275.8s CPU time (4.60% average)
+  Absolute Difference: 230.6s
+  
+  ✓ mac_stats uses 83.6% LESS CPU time than Stats
+  
+  🎉
 ```
 
-**Process Detection**:
-The script automatically finds ALL processes belonging to mac-stats, including:
-- Main Rust process (`mac_stats`)
-- Tauri WebView processes
-- Helper processes spawned by Tauri
-- Any child processes
+**How It Works**:
+1. **Starts apps fresh**: Launches both apps from command line, capturing main PIDs immediately
+2. **Tracks all processes**: Recursively finds all child processes (Tauri WebView, helpers, etc.)
+3. **30-second warmup**: Waits for apps to stabilize (initialization complete, steady-state reached)
+4. **Baseline capture**: Records CPU times at end of warmup (our "zero point")
+5. **Monitors CPU time**: Measures cumulative CPU time delta (more reliable than instant %)
+6. **Fair comparison**: Both apps start at same time, same conditions, same warmup period
 
-It identifies processes by:
-- Process name patterns: `mac_stats`, `mac-stats`
-- Bundle identifier: `com.raro42.mac-stats`
-- Process paths containing `/mac-stats` or `/mac_stats`
-- Parent-child relationships (finds all children of main process)
+**Why CPU Time Instead of Instantaneous %?**
+- **More stable**: CPU time is cumulative, doesn't fluctuate wildly
+- **More accurate**: Represents actual resource usage over time
+- **Fairer**: Not affected by momentary spikes or sampling timing
+- **Same as Activity Monitor**: Uses the same metric Activity Monitor shows
 
 The script will show all found processes at startup so you can verify it's tracking everything correctly.
 
 **Tips for Best Results**:
-1. **Start both apps** before running the monitor
-2. **Let apps stabilize** for 10-15 seconds before monitoring
-3. **Close other apps** to minimize background noise
-4. **Monitor for at least 60 seconds** for meaningful averages
+1. **Close other apps** to minimize background noise during testing
+2. **Monitor for at least 60 seconds** after warmup for meaningful data
+3. **Use default 30-second warmup** to ensure steady-state measurements
+4. **Review the process list** at startup to verify all processes are tracked
 5. **Use the CSV data** to create charts/graphs for presentations
-6. **Verify process detection** - check the startup process list to ensure all mac-stats processes are found
+6. **Multiple runs**: Run 2-3 times and average results for most accurate comparison
+
+**If Apps Are Already Running**:
+The script will detect existing processes and ask if you want to:
+- Kill them and start fresh (recommended for fair comparison)
+- Use existing processes (skips warmup, measures from current state)
 
 ---
 
