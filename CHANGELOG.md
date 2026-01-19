@@ -63,8 +63,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Logging**: Structured logging for monitoring and Ollama operations
 - **Cross-Theme Support**: All new features (monitoring, Ollama chat, status icons) are available across all 9 themes
 - **CSS Architecture**: Universal CSS with cascading variable fallbacks for cross-theme compatibility
-- **Theme Support**: All new features (monitoring, Ollama chat, status icons) are available across all 9 themes
-- **CSS Architecture**: Universal CSS with cascading variable fallbacks for cross-theme compatibility
 
 ## [0.0.6] - 2026-01-18
 
