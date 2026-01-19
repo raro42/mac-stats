@@ -23,7 +23,7 @@ use crate::logging::write_structured_log;
 #[allow(unused_imports)]
 use crate::{debug1, debug2, debug3};
 
-#[derive(serde::Serialize, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct SystemMetrics {
     pub cpu: f32,
     pub gpu: f32,
@@ -31,7 +31,19 @@ pub struct SystemMetrics {
     pub disk: f32,
 }
 
-#[derive(serde::Serialize, Clone)]
+impl SystemMetrics {
+    /// Check if metrics are valid (not all zeros for critical metrics)
+    /// Returns false if CPU, GPU, and RAM are all 0% (invalid state)
+    /// This can happen during initialization or when locks are held
+    pub fn is_valid(&self) -> bool {
+        // If CPU, GPU, and RAM are all 0%, this is invalid data
+        // Disk can be 0% legitimately, so we don't check it
+        let critical_metrics_zero = self.cpu == 0.0 && self.gpu == 0.0 && self.ram == 0.0;
+        !critical_metrics_zero
+    }
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct ProcessUsage {
     pub name: String,
     pub cpu: f32,
@@ -57,7 +69,7 @@ pub struct ProcessDetails {
     pub total_cpu_time: u64, // Total CPU time in milliseconds
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct CpuDetails {
     pub usage: f32,
     pub temperature: f32,
@@ -180,9 +192,257 @@ pub fn get_chip_info() -> String {
 }
 
 pub fn get_gpu_usage() -> f32 {
-    // GPU usage reading is expensive (ioreg commands) - return 0 for now to save CPU
-    // TODO: Cache or optimize if GPU usage is needed
+    // Check cache first - GPU usage reading is expensive, so we cache for 2 seconds
+    if let Ok(cache) = GPU_USAGE_CACHE.try_lock() {
+        if let Some((usage, timestamp)) = cache.as_ref() {
+            // Return cached value if less than 2 seconds old
+            if timestamp.elapsed().as_secs() < 2 {
+                debug3!("GPU usage from cache: {}%", usage);
+                return *usage;
+            }
+        }
+    }
+    
+    // Cache miss or expired - read GPU usage
+    // On macOS, GPU utilization can be read from ioreg
+    // Try reading from IOGPUWrangler or AGXAccelerator
+    let gpu_usage = read_gpu_usage_from_system();
+    
+    // Update cache
+    if let Ok(mut cache) = GPU_USAGE_CACHE.try_lock() {
+        *cache = Some((gpu_usage, std::time::Instant::now()));
+        debug3!("GPU usage updated: {}%", gpu_usage);
+    }
+    
+    gpu_usage
+}
+
+/// Read GPU usage from system (ioreg or other methods)
+/// Returns GPU utilization as a percentage (0.0-100.0)
+fn read_gpu_usage_from_system() -> f32 {
+    // Method 1: Try AGXAccelerator (Apple Silicon GPUs)
+    // This is the most reliable method on Apple Silicon Macs
+    // The PerformanceStatistics dictionary contains "Device Utilization %"
+    let output = Command::new("/usr/sbin/ioreg")
+        .arg("-r")
+        .arg("-d")
+        .arg("1")
+        .arg("-w")
+        .arg("0")
+        .arg("-c")
+        .arg("AGXAccelerator")
+        .stderr(std::process::Stdio::null())
+        .output();
+    
+    match output {
+        Ok(output) => {
+            if output.status.success() {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                debug3!("ioreg AGXAccelerator output length: {} bytes", stdout.len());
+                
+                // Look for "Device Utilization %" in PerformanceStatistics
+                // Format: "Device Utilization %"=22 (within a JSON-like dictionary)
+                for line in stdout.lines() {
+                    // Look for Device Utilization % (most accurate)
+                    if line.contains("Device Utilization %") {
+                        debug3!("Found 'Device Utilization %' in line: {}", line);
+                        if let Some(percent) = extract_percentage_after_key(line, "Device Utilization %") {
+                            if percent >= 0.0 && percent <= 100.0 {
+                                debug2!("GPU usage from ioreg (Device Utilization %): {}%", percent);
+                                return percent;
+                            } else {
+                                debug3!("GPU usage value {}% is out of range (0-100)", percent);
+                            }
+                        } else {
+                            debug3!("Failed to extract percentage from line containing 'Device Utilization %'");
+                        }
+                    }
+                    // Fallback to Renderer Utilization % if Device Utilization not found
+                    if line.contains("Renderer Utilization %") {
+                        debug3!("Found 'Renderer Utilization %' in line: {}", line);
+                        if let Some(percent) = extract_percentage_after_key(line, "Renderer Utilization %") {
+                            if percent >= 0.0 && percent <= 100.0 {
+                                debug2!("GPU usage from ioreg (Renderer Utilization %): {}%", percent);
+                                return percent;
+                            }
+                        }
+                    }
+                    // Fallback to Tiler Utilization % if others not found
+                    if line.contains("Tiler Utilization %") {
+                        debug3!("Found 'Tiler Utilization %' in line: {}", line);
+                        if let Some(percent) = extract_percentage_after_key(line, "Tiler Utilization %") {
+                            if percent >= 0.0 && percent <= 100.0 {
+                                debug2!("GPU usage from ioreg (Tiler Utilization %): {}%", percent);
+                                return percent;
+                            }
+                        }
+                    }
+                }
+                debug3!("ioreg AGXAccelerator: No utilization found in output");
+            } else {
+                debug3!("ioreg AGXAccelerator command failed with status: {:?}", output.status);
+            }
+        }
+        Err(e) => {
+            debug3!("Failed to execute ioreg AGXAccelerator command: {}", e);
+        }
+    }
+    
+    // Method 2: Try IOGPUWrangler (Intel Macs or older systems)
+    let output = Command::new("/usr/sbin/ioreg")
+        .arg("-r")
+        .arg("-d")
+        .arg("1")
+        .arg("-w")
+        .arg("0")
+        .arg("-c")
+        .arg("IOGPUWrangler")
+        .stderr(std::process::Stdio::null())
+        .output();
+    
+    if let Ok(output) = output {
+        if output.status.success() {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            for line in stdout.lines() {
+                if line.contains("Utilization") || line.contains("utilization") {
+                    if let Some(percent) = extract_percentage_from_line(line) {
+                        if percent >= 0.0 && percent <= 100.0 {
+                            debug3!("GPU usage from ioreg (IOGPUWrangler): {}%", percent);
+                            return percent;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // If we can't read GPU usage, return 0.0
+    // This is better than showing incorrect data
+    debug3!("GPU usage: could not read from system, returning 0%");
     0.0
+}
+
+/// Extract percentage value after a specific key in a line
+/// Looks for patterns like "Device Utilization %"=22 or Device Utilization %=22
+/// The key must be followed by = and then a number
+fn extract_percentage_after_key(line: &str, key: &str) -> Option<f32> {
+    // Find the key in the line (with or without quotes)
+    let key_variants = [
+        format!("\"{}\"", key),  // "Device Utilization %"
+        key.to_string(),          // Device Utilization %
+    ];
+    
+    for key_variant in &key_variants {
+        if let Some(key_pos) = line.find(key_variant) {
+            // Find the = sign after the key
+            let after_key = &line[key_pos + key_variant.len()..];
+            if let Some(eq_pos) = after_key.find('=') {
+                let after_eq = &after_key[eq_pos + 1..];
+                // Extract the number after =
+                // Remove any leading/trailing whitespace, quotes, commas
+                let trimmed = after_eq.trim()
+                    .trim_start_matches('"')
+                    .trim_start_matches(' ')
+                    .trim_end_matches(',')
+                    .trim_end_matches('"')
+                    .trim_end_matches('}');
+                
+                debug3!("Extracting from '{}' after key '{}'", trimmed, key_variant);
+                
+                // Try to parse the first number (before any comma or closing brace)
+                // Handle cases like "22," or "22}" or just "22"
+                let num_str: String = trimmed.chars()
+                    .take_while(|c| c.is_numeric() || *c == '.')
+                    .collect();
+                
+                if !num_str.is_empty() {
+                    if let Ok(num) = num_str.parse::<f32>() {
+                        if num >= 0.0 && num <= 100.0 {
+                            debug3!("Successfully extracted {}% from '{}'", num, trimmed);
+                            return Some(num);
+                        } else {
+                            debug3!("Value {} is out of range (0-100)", num);
+                        }
+                    } else {
+                        debug3!("Failed to parse '{}' as f32", num_str);
+                    }
+                }
+                
+                // Fallback: try parsing the whole trimmed string
+                if let Ok(num) = trimmed.parse::<f32>() {
+                    if num >= 0.0 && num <= 100.0 {
+                        debug3!("Successfully extracted {}% (fallback parse)", num);
+                        return Some(num);
+                    }
+                }
+                
+                // Also try splitting by whitespace in case there's extra text
+                for word in trimmed.split_whitespace() {
+                    let cleaned = word.trim_end_matches(',').trim_end_matches('}');
+                    if let Ok(num) = cleaned.parse::<f32>() {
+                        if num >= 0.0 && num <= 100.0 {
+                            debug3!("Successfully extracted {}% (from split)", num);
+                            return Some(num);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    debug3!("Could not extract percentage after key '{}' in line", key);
+    None
+}
+
+/// Extract percentage value from a line of text (fallback method)
+/// Looks for patterns like "= 45" or "45%" or similar
+fn extract_percentage_from_line(line: &str) -> Option<f32> {
+    // Try to find "=" followed by a number (most common format)
+    if let Some(eq_pos) = line.find('=') {
+        let after_eq = &line[eq_pos + 1..];
+        // Extract the first number after =
+        // Remove any trailing commas or other punctuation
+        let trimmed = after_eq.trim().trim_end_matches(',');
+        if let Ok(num) = trimmed.parse::<f32>() {
+            if num >= 0.0 && num <= 100.0 {
+                return Some(num);
+            }
+        }
+        // Also try splitting by whitespace in case there's extra text
+        for word in after_eq.split_whitespace() {
+            let cleaned = word.trim_end_matches(',');
+            if let Ok(num) = cleaned.parse::<f32>() {
+                if num >= 0.0 && num <= 100.0 {
+                    return Some(num);
+                }
+            }
+        }
+    }
+    
+    // Try to find a percentage sign
+    if let Some(percent_pos) = line.find('%') {
+        // Look backwards from % to find the number
+        let before_percent = &line[..percent_pos];
+        // Extract the last number before %
+        if let Some(num_str) = before_percent.split_whitespace().last() {
+            if let Ok(num) = num_str.parse::<f32>() {
+                return Some(num);
+            }
+        }
+    }
+    
+    // Try to find any number between 0-100 in the line
+    for word in line.split_whitespace() {
+        // Remove common punctuation but keep decimal point
+        let cleaned = word.trim_matches(|c: char| !c.is_numeric() && c != '.' && c != '-');
+        if let Ok(num) = cleaned.parse::<f32>() {
+            if num >= 0.0 && num <= 100.0 {
+                return Some(num);
+            }
+        }
+    }
+    
+    None
 }
 
 pub fn can_read_temperature() -> bool {
@@ -577,16 +837,18 @@ pub fn get_metrics() -> SystemMetrics {
     // Use try_lock ONCE - if locked, return cached values immediately (no retry loop)
     let (cpu_usage, ram_usage) = match SYSTEM.try_lock() {
         Ok(mut sys) => {
-            if sys.is_none() {
+            let is_new_instance = sys.is_none();
+            if is_new_instance {
                 debug3!("Creating new System instance");
                 // Create outside lock scope if possible, but we need the lock to store it
                 *sys = Some(System::new());
             }
             let sys = sys.as_mut().unwrap();
             
-            // Only refresh if enough time has passed (reduces CPU usage)
-            if should_refresh {
-                debug3!("Refreshing CPU usage and memory");
+            // CRITICAL: Always refresh on first use to get valid data
+            // After that, only refresh if enough time has passed (reduces CPU usage)
+            if is_new_instance || should_refresh {
+                debug3!("Refreshing CPU usage and memory (is_new={}, should_refresh={})", is_new_instance, should_refresh);
                 sys.refresh_cpu_usage();
                 sys.refresh_memory();
             }
@@ -599,7 +861,8 @@ pub fn get_metrics() -> SystemMetrics {
         },
         Err(_) => {
             // Lock held - return zeros immediately, no retry to avoid CPU spinning
-            debug3!("SYSTEM mutex locked, using cached zeros");
+            // This will be caught by is_valid() check and update will be skipped
+            debug3!("SYSTEM mutex locked, returning zeros (update will be skipped if invalid)");
             (0.0, 0.0)
         }
     };

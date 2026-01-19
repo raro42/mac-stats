@@ -4,32 +4,36 @@
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mac-stats</title>
+    <title>Tauri App</title>
     <script type="module" src="/main.js" defer></script>
   </head>
 
   <body>
-    <main class="stats-container">
-      <div class="stat-item">
-        <div class="stat-label">CPU</div>
-        <div class="stat-value" id="cpu-value">0%</div>
+    <main class="container">
+      <h1>Welcome to Tauri</h1>
+
+      <div class="row">
+        <a href="https://tauri.app" target="_blank">
+          <img src="/assets/tauri.svg" class="logo tauri" alt="Tauri logo" />
+        </a>
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"
+          target="_blank"
+        >
+          <img
+            src="/assets/javascript.svg"
+            class="logo vanilla"
+            alt="JavaScript logo"
+          />
+        </a>
       </div>
-      <div class="stat-item">
-        <div class="stat-label">GPU</div>
-        <div class="stat-value" id="gpu-value">0%</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">RAM</div>
-        <div class="stat-value" id="ram-value">0%</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">SSD</div>
-        <div class="stat-value" id="disk-value">0%</div>
-      </div>
+      <p>Click on the Tauri logo to learn more about the framework</p>
+
+      <form class="row" id="greet-form">
+        <input id="greet-input" placeholder="Enter a name..." />
+        <button type="submit">Greet</button>
+      </form>
+      <p id="greet-msg"></p>
     </main>
-    <footer class="stats-footer">
-      <span class="app-version">v0.0.3</span>
-      <a href="https://github.com/raro42/mac-stats" target="_blank" rel="noopener noreferrer" class="stats-github-link">GitHub</a>
-    </footer>
   </body>
 </html>

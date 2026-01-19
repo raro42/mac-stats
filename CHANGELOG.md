@@ -5,6 +5,67 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0] - 2026-01-19
+
+### Added
+- **Monitoring System**: Comprehensive website and social media monitoring
+  - Website uptime monitoring with response time tracking
+  - Social media platform monitoring (Twitter/X, Facebook, Instagram, LinkedIn, YouTube)
+  - Monitor status indicators (up/down) with response time display
+  - Configurable monitor intervals and timeout settings
+  - Monitor health summary with up/down counts
+- **Alert System**: Multi-channel alerting infrastructure
+  - Alert rules engine for monitor status changes
+  - Alert channel support (prepared for future integrations)
+  - Alert history and management
+- **Ollama AI Chat Integration**: AI-powered chat assistant
+  - Integration with local Ollama instance
+  - Chat interface for system metrics queries
+  - Model selection and connection status indicators
+  - System prompt customization
+  - Code execution support for JavaScript
+  - Markdown rendering with syntax highlighting
+- **Status Icon Line**: Quick access icon bar with status indicators
+  - Monitors icon with green status when all monitors are up
+  - Ollama icon with green status when connected, yellow when unavailable
+  - 15-icon layout with placeholders for future features
+  - Click-to-toggle section visibility
+- **Dashboard UI**: New dashboard view for monitoring overview
+  - Centralized monitoring status display
+  - Quick access to all monitoring features
+- **Security Infrastructure**: Keychain integration for secure credential storage
+  - API key storage in macOS Keychain
+  - Secure credential management for monitors and services
+- **Plugin System**: Extensible plugin architecture
+  - Plugin loading and management infrastructure
+  - Prepared for future plugin integrations
+
+### Changed
+- **UI Layout**: Added collapsible sections for Monitors and AI Chat
+  - Sections can be toggled via header clicks or icon clicks
+  - Smooth expand/collapse animations
+  - State persistence across sessions
+- **Icon Styling**: Enhanced icon display with status-based color coding
+  - Green for healthy/connected status
+  - Yellow/amber for warnings/unavailable status
+  - CSS filters for external SVG icons
+- **Connection Status**: Real-time connection status updates
+  - Visual indicators for Ollama connection state
+  - Automatic connection checking on section expansion
+
+### Technical
+- **Backend Commands**: New Tauri commands for monitoring and Ollama
+  - `list_monitors`, `add_monitor`, `remove_monitor`, `check_monitor`
+  - `check_ollama_connection`, `ollama_chat`, `configure_ollama`
+  - `list_alerts`, `add_alert_rule`, `remove_alert_rule`
+- **State Management**: Enhanced application state with monitoring and Ollama state
+- **Error Handling**: Comprehensive error handling for network requests and API calls
+- **Logging**: Structured logging for monitoring and Ollama operations
+- **Cross-Theme Support**: All new features (monitoring, Ollama chat, status icons) are available across all 9 themes
+- **CSS Architecture**: Universal CSS with cascading variable fallbacks for cross-theme compatibility
+- **Theme Support**: All new features (monitoring, Ollama chat, status icons) are available across all 9 themes
+- **CSS Architecture**: Universal CSS with cascading variable fallbacks for cross-theme compatibility
+
 ## [0.0.6] - 2026-01-18
 
 ### Added
