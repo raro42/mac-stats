@@ -30,9 +30,12 @@ This project was developed through "vibe coding" - building features iteratively
 - Real-time CPU, RAM, Disk, and GPU monitoring
 - Temperature readings (SMC integration)
 - CPU frequency monitoring (IOReport)
-- Process list with top CPU consumers
+- Process list with top CPU consumers (clickable for details)
+- Process details modal with comprehensive information (PID, memory, disk I/O, user info, etc.)
+- Force quit processes directly from the app
 - Menu bar integration
 - Modern, customizable UI themes
+- Scrollable sections for better content organization
 - Low CPU usage: ~0.5% idle, <1% when CPU window is open
 
 ### Known Limitations
@@ -109,10 +112,13 @@ Use launchd or add to Login Items manually.
 
 - ✅ CPU monitoring window with real-time usage graphs
 - ✅ Temperature monitoring (SMC integration)
-- ✅ Process list with top CPU consumers (refreshes every 5s)
+- ✅ Process list with top CPU consumers (refreshes every 15s, clickable for details)
+- ✅ Process details modal with comprehensive information
+- ✅ Force quit processes functionality
 - ✅ Menu bar integration
-- ✅ Customizable themes (Apple, Material, Architect, Data Poster, Swiss Minimalistic, Neon)
+- ✅ Customizable themes (9 themes: Apple, Architect, Data Poster, Dark, Futuristic, Light, Material, Neon, Swiss Minimalistic)
 - ✅ System resource monitoring (CPU, RAM, Disk, GPU)
+- ✅ Scrollable sections for better content organization
 - ✅ Low CPU usage optimizations
 
 ### Theme Gallery
@@ -147,7 +153,9 @@ mac-stats comes with 9 beautiful, customizable themes:
 ## Notes
 
 - Menu bar updates every 1-2 seconds
-- CPU window updates every 1 second (processes refresh every 5s)
+- CPU window updates every 1 second
+- Process list refreshes every 15 seconds (click any process for instant details)
+- Process details modal auto-refreshes every 2 seconds while open
 - Accurate against Activity Monitor
 - Built with Tauri for native performance
 

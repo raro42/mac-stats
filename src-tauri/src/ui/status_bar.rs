@@ -533,10 +533,13 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             debug1!("CPU window created successfully");
             write_structured_log("ui/status_bar.rs", "CPU window created successfully", &serde_json::json!({}), "I");
             
-            // Don't clear process cache - keep existing data for instant display
-            // The cache will refresh naturally when it expires (20 seconds)
-            // This prevents expensive refresh_processes() blocking the first call
-            debug2!("Window opened - keeping existing process cache for instant display");
+            // Clear process cache to force fresh collection on first call
+            // This ensures we get up-to-date process list immediately when window opens
+            use crate::state::PROCESS_CACHE;
+            if let Ok(mut cache) = PROCESS_CACHE.try_lock() {
+                *cache = None;
+                debug2!("Process cache cleared - will refresh immediately on first get_cpu_details() call");
+            }
             
             // Clear rate limiter so first call always goes through (instant data on window open)
             use crate::state::LAST_CPU_DETAILS_CALL;

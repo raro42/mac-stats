@@ -205,6 +205,12 @@ async function refresh() {
   }
   
   try {
+    // Force process update on first call (when lastProcessUpdate is 0)
+    const isFirstCall = lastProcessUpdate === 0;
+    if (isFirstCall) {
+      window._forceProcessUpdate = true;
+    }
+    
     const data = await invoke("get_cpu_details");
     
     // CRITICAL: If we're waiting for real data and we got it, switch to normal interval
@@ -616,9 +622,13 @@ async function refresh() {
 
     // STEP 7: Update process list only every 15 seconds to reduce CPU usage
     // Use document fragment to batch DOM updates and reduce WebKit reflows
+    // But allow forced immediate updates when needed (e.g., after force quit, or on initial load)
     const now = Date.now();
-    if (now - lastProcessUpdate >= 15000 || lastProcessUpdate === 0) {
+    const forceUpdate = window._forceProcessUpdate === true;
+    const isInitialLoad = lastProcessUpdate === 0;
+    if (forceUpdate || isInitialLoad || now - lastProcessUpdate >= 15000) {
       lastProcessUpdate = now;
+      window._forceProcessUpdate = false; // Reset flag after use
       
       const list = document.getElementById("process-list");
       
@@ -630,6 +640,9 @@ async function refresh() {
         data.top_processes.slice(0, 8).forEach((proc) => {
           const row = document.createElement("div");
           row.className = "process-row";
+          row.setAttribute("data-pid", proc.pid);
+          row.style.cursor = "pointer";
+          row.title = "Click for details";
           
           const name = document.createElement("div");
           name.className = "process-name";
@@ -655,6 +668,12 @@ async function refresh() {
           
           row.appendChild(name);
           row.appendChild(usage);
+          
+          // Add click handler for process details
+          row.addEventListener("click", () => {
+            showProcessDetails(proc.pid);
+          });
+          
           fragment.appendChild(row);
         });
       } else {
@@ -718,6 +737,9 @@ function startRefresh() {
 
 // Initialize when DOM and Tauri are ready
 function init() {
+  // Force immediate process update on initial load
+  window._forceProcessUpdate = true;
+  
   // Try to get Tauri immediately - don't wait if it's already available
   const immediateInvoke = getInvoke();
   if (immediateInvoke) {
@@ -810,7 +832,8 @@ window.addEventListener("load", () => {
 
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
-    // Window became visible - refresh immediately
+    // Window became visible - refresh immediately and force process update
+    window._forceProcessUpdate = true; // Force immediate process list update
     if (invoke) {
       // Tauri is ready - refresh immediately and start interval
       refresh(); // Immediate refresh
@@ -824,12 +847,355 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
+// Process details popover
+let processDetailsModal = null;
+let currentProcessPid = null;
+let processDetailsRefreshInterval = null;
+
+function formatBytes(bytes) {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+}
+
+function formatTime(seconds) {
+  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return `${hours}h ${minutes}m`;
+}
+
+function formatDate(timestamp) {
+  const date = new Date(timestamp * 1000);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+  
+  // Format the date nicely: "18th January 2026, 3:45 PM"
+  const day = date.getDate();
+  const daySuffix = getDaySuffix(day);
+  const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+  
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+  
+  const formattedDate = `${day}${daySuffix} ${month} ${year}, ${hours}:${minutesStr} ${ampm}`;
+  
+  // Calculate relative time: "1 day 15h ago"
+  let relativeTime = "";
+  if (diffDays > 0) {
+    const remainingHours = diffHours % 24;
+    if (remainingHours > 0) {
+      relativeTime = `${diffDays} day${diffDays > 1 ? 's' : ''} ${remainingHours}h ago`;
+    } else {
+      relativeTime = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    }
+  } else if (diffHours > 0) {
+    relativeTime = `${diffHours}h ago`;
+  } else if (diffMinutes > 0) {
+    relativeTime = `${diffMinutes}m ago`;
+  } else {
+    relativeTime = `${diffSeconds}s ago`;
+  }
+  
+  return `${formattedDate} - ${relativeTime}`;
+}
+
+function getDaySuffix(day) {
+  if (day > 3 && day < 21) return 'th';
+  switch (day % 10) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
+}
+
+async function updateProcessDetailsContent(pid) {
+  // CRITICAL: Only refresh if modal is actually visible
+  // This prevents unnecessary backend calls when modal is closed
+  if (!processDetailsModal || processDetailsModal.style.display === "none") {
+    // Modal is not visible, don't refresh
+    return;
+  }
+  
+  if (!invoke) {
+    invoke = getInvoke();
+    if (!invoke) {
+      console.error("Cannot refresh process details: Tauri invoke not available");
+      return;
+    }
+  }
+  
+  try {
+    const details = await invoke("get_process_details", { pid });
+    
+    // Double-check modal is still visible after async call (might have been closed)
+    if (!processDetailsModal || processDetailsModal.style.display === "none") {
+      return;
+    }
+    
+    const body = document.getElementById("process-details-body");
+    if (!body) return;
+    
+    populateProcessDetailsBody(body, details, pid);
+  } catch (error) {
+    console.error("Failed to refresh process details:", error);
+    // Don't show alert on auto-refresh failures, only log
+  }
+}
+
+function populateProcessDetailsBody(body, details, pid) {
+    const startDate = formatDate(details.start_time);
+    const cpuTimeFormatted = formatTime(Math.floor(details.total_cpu_time / 1000));
+    const memoryFormatted = formatBytes(details.memory);
+    const virtualMemoryFormatted = formatBytes(details.virtual_memory);
+    const diskReadFormatted = formatBytes(details.disk_read);
+    const diskWrittenFormatted = formatBytes(details.disk_written);
+    
+    body.innerHTML = `
+      <div class="process-detail-row">
+        <span class="process-detail-label">Name</span>
+        <span class="process-detail-value">${details.name}</span>
+      </div>
+      <div class="process-detail-row">
+        <span class="process-detail-label">PID</span>
+        <span class="process-detail-value">${details.pid}</span>
+      </div>
+      <div class="process-detail-row">
+        <span class="process-detail-label">Current CPU</span>
+        <span class="process-detail-value">${details.cpu.toFixed(1)}%</span>
+      </div>
+      <div class="process-detail-row">
+        <span class="process-detail-label">Total CPU Time</span>
+        <span class="process-detail-value">${cpuTimeFormatted}</span>
+      </div>
+      <div class="process-detail-row">
+        <span class="process-detail-label">Parent Process</span>
+        <span class="process-detail-value">${details.parent_name ? `${details.parent_name} (PID: ${details.parent_pid})` : "—"}</span>
+      </div>
+      <div class="process-detail-row">
+        <span class="process-detail-label">Started</span>
+        <span class="process-detail-value">${startDate}</span>
+      </div>
+      <div class="process-detail-row">
+        <span class="process-detail-label">User</span>
+        <span class="process-detail-value">${details.user_name ? `${details.user_name} (${details.user_id})` : (details.user_id || "—")}</span>
+      </div>
+      <div class="process-detail-row">
+        <span class="process-detail-label">Effective User</span>
+        <span class="process-detail-value">${details.effective_user_name ? `${details.effective_user_name} (${details.effective_user_id})` : (details.effective_user_id || "—")}</span>
+      </div>
+      <div class="process-detail-row-group">
+        <div class="process-detail-row">
+          <span class="process-detail-label">Memory</span>
+          <span class="process-detail-value">${memoryFormatted}</span>
+        </div>
+        <div class="process-detail-row">
+          <span class="process-detail-label">Virtual Memory</span>
+          <span class="process-detail-value">${virtualMemoryFormatted}</span>
+        </div>
+      </div>
+      <div class="process-detail-row-group">
+        <div class="process-detail-row">
+          <span class="process-detail-label">Disk Read</span>
+          <span class="process-detail-value">${diskReadFormatted}</span>
+        </div>
+        <div class="process-detail-row">
+          <span class="process-detail-label">Disk Written</span>
+          <span class="process-detail-value">${diskWrittenFormatted}</span>
+        </div>
+      </div>
+      <div class="force-quit-section">
+        <button id="force-quit-process-btn" class="force-quit-btn">Force Quit Process</button>
+      </div>
+    `;
+    
+    // Set up force quit button handler (remove old listeners first by cloning)
+    const forceQuitBtn = document.getElementById("force-quit-process-btn");
+    if (forceQuitBtn) {
+      // Clone and replace to remove old event listeners when refreshing
+      const newBtn = forceQuitBtn.cloneNode(true);
+      forceQuitBtn.parentNode.replaceChild(newBtn, forceQuitBtn);
+      
+      newBtn.addEventListener("click", async () => {
+        if (!confirm(`Are you sure you want to force quit "${details.name}" (PID: ${pid})? This action cannot be undone.`)) {
+          return;
+        }
+        
+        try {
+          if (!invoke) {
+            invoke = getInvoke();
+            if (!invoke) {
+              alert("Cannot force quit: Tauri invoke not available");
+              return;
+            }
+          }
+          
+          await invoke("force_quit_process", { pid });
+          
+          // Clear refresh interval and close modal
+          if (processDetailsRefreshInterval) {
+            clearInterval(processDetailsRefreshInterval);
+            processDetailsRefreshInterval = null;
+          }
+          currentProcessPid = null;
+          processDetailsModal.style.display = "none";
+          
+          // Force immediate refresh of process list (bypass 15-second throttle)
+          window._forceProcessUpdate = true;
+          if (window.refreshData) {
+            // Refresh immediately to show updated process list
+            await window.refreshData();
+          }
+          
+          alert(`Process "${details.name}" has been force quit.`);
+        } catch (error) {
+          console.error("Failed to force quit process:", error);
+          alert(`Failed to force quit process: ${error}`);
+        }
+      });
+    }
+}
+
+async function showProcessDetails(pid) {
+  if (!invoke) {
+    invoke = getInvoke();
+    if (!invoke) {
+      console.error("Cannot show process details: Tauri invoke not available");
+      return;
+    }
+  }
+  
+  try {
+    const details = await invoke("get_process_details", { pid });
+    
+    // Use existing modal from HTML or create it
+    processDetailsModal = document.getElementById("process-details-modal");
+    if (!processDetailsModal) {
+      // Create modal if it doesn't exist in HTML
+      processDetailsModal = document.createElement("div");
+      processDetailsModal.id = "process-details-modal";
+      processDetailsModal.className = "settings-modal";
+      processDetailsModal.style.display = "none";
+      processDetailsModal.innerHTML = `
+        <div class="settings-card">
+          <div class="settings-header">
+            <h2>Process Details</h2>
+            <button id="close-process-details" class="icon-btn" aria-label="Close">×</button>
+          </div>
+          <div class="settings-body" id="process-details-body"></div>
+        </div>
+      `;
+      document.body.appendChild(processDetailsModal);
+    }
+    
+    // Set up close handlers (only once)
+    if (!processDetailsModal.dataset.handlersSetup) {
+      const closeBtn = processDetailsModal.querySelector("#close-process-details");
+      if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+          // Clear refresh interval when closing
+          if (processDetailsRefreshInterval) {
+            clearInterval(processDetailsRefreshInterval);
+            processDetailsRefreshInterval = null;
+          }
+          currentProcessPid = null;
+          processDetailsModal.style.display = "none";
+        });
+      }
+      
+      // Click outside to close
+      processDetailsModal.addEventListener("click", (e) => {
+        if (e.target === processDetailsModal) {
+          // Clear refresh interval when closing
+          if (processDetailsRefreshInterval) {
+            clearInterval(processDetailsRefreshInterval);
+            processDetailsRefreshInterval = null;
+          }
+          currentProcessPid = null;
+          processDetailsModal.style.display = "none";
+        }
+      });
+      
+      // ESC key to close
+      const escHandler = (e) => {
+        if (e.key === "Escape" && processDetailsModal.style.display !== "none") {
+          // Clear refresh interval when closing
+          if (processDetailsRefreshInterval) {
+            clearInterval(processDetailsRefreshInterval);
+            processDetailsRefreshInterval = null;
+          }
+          currentProcessPid = null;
+          processDetailsModal.style.display = "none";
+        }
+      };
+      document.addEventListener("keydown", escHandler);
+      processDetailsModal.dataset.handlersSetup = "true";
+    }
+    
+    // Store current PID for refresh functionality
+    currentProcessPid = pid;
+    
+    // Clear any existing refresh interval
+    if (processDetailsRefreshInterval) {
+      clearInterval(processDetailsRefreshInterval);
+      processDetailsRefreshInterval = null;
+    }
+    
+    // Populate details
+    const body = document.getElementById("process-details-body");
+    populateProcessDetailsBody(body, details, pid);
+    
+    // Show modal (using same display style as settings modal)
+    processDetailsModal.style.display = "flex";
+    
+    // Start auto-refresh every 2 seconds while modal is open
+    // CRITICAL: Only refresh if modal is actually visible (checked in updateProcessDetailsContent too)
+    processDetailsRefreshInterval = setInterval(() => {
+      // Check if modal is visible before refreshing
+      if (currentProcessPid !== null && 
+          processDetailsModal && 
+          processDetailsModal.style.display !== "none") {
+        updateProcessDetailsContent(currentProcessPid);
+      } else {
+        // Modal closed or not visible, clear interval to stop refreshing
+        if (processDetailsRefreshInterval) {
+          clearInterval(processDetailsRefreshInterval);
+          processDetailsRefreshInterval = null;
+        }
+        currentProcessPid = null;
+      }
+    }, 2000);
+  } catch (error) {
+    console.error("Failed to fetch process details:", error);
+    alert(`Failed to fetch process details: ${error}`);
+  }
+}
+
 // OPTIMIZATION Phase 2: Cleanup on window unload
 window.addEventListener('beforeunload', () => {
   ringAnimations.clear();  // Clear animation state map
   pendingDOMUpdates = [];  // Clear pending updates
   if (refreshInterval) {
     clearInterval(refreshInterval);
+  }
+  if (processDetailsRefreshInterval) {
+    clearInterval(processDetailsRefreshInterval);
+    processDetailsRefreshInterval = null;
   }
   console.log('Cleaned up animation state on window close');
 });

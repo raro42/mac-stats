@@ -15,6 +15,7 @@ Build a polished macOS (Apple Silicon) stats app (Rust + Tauri) that reads CPU/p
 - Keep modules small and cohesive.
 - When coding, create logs and read them afterwards.
 - Execute the app yourself, read the logs, understand if changes are working from the logs - iterate until you are confident the change is good to be test by a human.
+- **ALWAYS check for build errors before starting the app**: Run `cargo check` in `src-tauri/` directory and fix any compilation errors before attempting to start the app.
 - Never install software on the host. Always ask before installing.
 - If you need to install software, use containers.  
 - No "god files": split into `metrics/`, `ffi/`, `ui/bridge/`, `cli/`, `logging/`.

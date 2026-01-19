@@ -341,6 +341,11 @@ body.theme-dark .ring-track {
 
 .process-row:hover {
   padding-left: 4px;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.process-row[data-pid] {
+  cursor: pointer;
 }
 
 .process-name {
@@ -762,4 +767,40 @@ body.theme-futuristic .settings-header h2 {
 
 body.theme-futuristic .setting-item label {
   color: rgba(255,255,255,.92);
+}
+
+/* Process Details Modal - uses same styles as settings-modal */
+.process-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  gap: 16px;
+}
+
+.process-detail-label {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 400;
+  flex-shrink: 0;
+}
+
+.process-detail-value {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 400;
+  text-align: right;
+  word-break: break-word;
+  flex: 1;
+}
+
+.process-detail-row-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.process-detail-row-group .process-detail-row {
+  padding: 6px 0;
 }
