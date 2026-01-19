@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.5] - 2026-01-18
+
+### Performance Improvements
+- **Access Flags Optimization**: Replaced `Mutex<Option<_>>` with `OnceLock<bool>` for capability flags (temperature, frequency, power reading) - eliminates locking overhead on every access
+- **Process Cache TTL**: Increased process list cache from 5 seconds to 10 seconds to reduce CPU overhead
+- **Temperature Update Interval**: Increased from 15 seconds to 20 seconds for better efficiency
+- **Frequency Read Interval**: Increased from 20 seconds to 30 seconds to reduce IOReport overhead
+- **DOM Update Optimization**: Changed from `innerHTML` rebuilds to direct text node updates for metric values (reduces WebKit rendering overhead)
+- **Ring Gauge Thresholds**: Increased update thresholds from 2% to 5% (visual) and 15% to 20% (animation) to reduce unnecessary animations
+- **Window Cleanup**: Added cleanup handlers on window unload to clear animation state and pending updates
+
+### Fixed
+- **GitHub Actions Workflow**: Fixed workflow to properly handle missing code signing secrets (builds successfully without secrets)
+- **Code Signing**: Made code signing optional - workflow builds unsigned DMG when secrets are not available
+- **Legacy Code**: Removed outdated ACCESS_CACHE comment references
+
+### Changed
+- **Theme Gallery**: Updated README with comprehensive theme gallery showing all 9 themes
+- **Screenshot Organization**: Removed old screenshot folders (screen_actual, screen-what-i-see), consolidated to screens/ folder
+
 ## [0.0.4] - 2026-01-18
 
 ### Added
