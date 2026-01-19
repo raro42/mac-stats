@@ -376,7 +376,7 @@ fn run_internal(open_cpu_window: bool) {
                                             
                                             debug2!("IOReport subscription created successfully for CPU frequency (handle={:p}, dict={:p})", subscription_ptr, subscription_dict);
                                             
-                                            // Update ACCESS_CACHE to indicate frequency reading works
+                                            // OPTIMIZATION Phase 3: Update OnceLock to indicate frequency reading works
                                             // OPTIMIZATION Phase 3: Update OnceLock to indicate frequency reading works
                                             if CAN_READ_FREQUENCY.set(true).is_ok() {
                                                 debug2!("CAN_READ_FREQUENCY set to true (IOReport subscription created)");

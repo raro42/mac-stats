@@ -26,8 +26,21 @@ jobs:
       - name: Install Tauri CLI
         run: cargo install tauri-cli --version "^1.0"
 
+      - name: Check for code signing secrets
+        id: check-secrets
+        env:
+          APPLE_CERT: ${{ secrets.APPLE_CERTIFICATE }}
+        run: |
+          if [ -n "$APPLE_CERT" ] && [ "$APPLE_CERT" != "" ]; then
+            echo "has_signing=true" >> $GITHUB_OUTPUT
+            echo "Code signing secrets found - will sign the app"
+          else
+            echo "has_signing=false" >> $GITHUB_OUTPUT
+            echo "No code signing secrets - building unsigned app"
+          fi
+
       - name: Setup code signing (optional)
-        if: ${{ secrets.APPLE_CERTIFICATE != '' }}
+        if: steps.check-secrets.outputs.has_signing == 'true'
         env:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -49,17 +62,7 @@ jobs:
 
       - name: Build Tauri app
         working-directory: ./src-tauri
-        env:
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: |
-          if [ -n "$APPLE_SIGNING_IDENTITY" ]; then
-            cargo tauri build --bundles dmg
-          else
-            cargo tauri build --bundles dmg
-          fi
+        run: cargo tauri build --bundles dmg
 
       - name: Upload DMG to release
         uses: softprops/action-gh-release@v2
