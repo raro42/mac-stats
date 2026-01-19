@@ -1,8 +1,6 @@
 # mac-stats
 
-A lightweight system monitor for macOS built with Rust and Tauri.
-
-A calm, high-fidelity system and service monitor that tells you when something matters — and stays quiet otherwise.
+A calm, high-fidelity system monitor for macOS built with Rust and Tauri. It tells you when something matters — and stays quiet otherwise.
 
 <img src="screens/apple.png" alt="mac-stats Apple Theme" width="400">
 
@@ -36,12 +34,16 @@ This project was developed through "vibe coding" - building features iteratively
 - CPU frequency monitoring (IOReport)
 - **Power consumption monitoring** (CPU and GPU power in watts)
 - **Battery monitoring** (battery level and charging status)
+- **Website & Social Media Monitoring** - Monitor website uptime and social media platforms with response time tracking
+- **AI Chat Integration (Ollama)** - Chat with AI about your system metrics using local Ollama instance
+- **Status Icon Dashboard** - Quick access icon bar with real-time status indicators
 - Process list with top CPU consumers (clickable for details)
 - Process details modal with comprehensive information (PID, memory, disk I/O, user info, etc.)
 - Force quit processes directly from the app
 - Menu bar integration
-- Modern, customizable UI themes
+- Modern, customizable UI themes (9 themes available)
 - Scrollable sections for better content organization
+- Collapsible sections for monitoring and AI chat
 - Low CPU usage: <0.1% with window closed, ~3% with window open
 
 ### Known Limitations
@@ -152,6 +154,11 @@ mac-stats is designed to be extremely efficient:
 
 - ✅ CPU monitoring window with real-time usage graphs
 - ✅ Temperature monitoring (SMC integration)
+- ✅ Power consumption monitoring (CPU and GPU)
+- ✅ Battery monitoring with charging status
+- ✅ Website & Social Media Monitoring with uptime tracking
+- ✅ AI Chat Integration (Ollama) for system metrics queries
+- ✅ Status Icon Dashboard with real-time indicators
 - ✅ Process list with top CPU consumers (refreshes every 15s, clickable for details)
 - ✅ Process details modal with comprehensive information
 - ✅ Force quit processes functionality
@@ -159,6 +166,7 @@ mac-stats is designed to be extremely efficient:
 - ✅ Customizable themes (9 themes: Apple, Architect, Data Poster, Dark, Futuristic, Light, Material, Neon, Swiss Minimalistic)
 - ✅ System resource monitoring (CPU, RAM, Disk, GPU)
 - ✅ Scrollable sections for better content organization
+- ✅ Collapsible sections for monitoring and AI chat
 - ✅ Low CPU usage optimizations
 
 ### Theme Gallery

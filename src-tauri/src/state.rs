@@ -104,6 +104,9 @@ pub(crate) static POWER_CACHE: Mutex<Option<(f32, f32, Instant)>> = Mutex::new(N
 // Battery cache: (battery_level_percent, is_charging, last_update_timestamp)
 // Battery is read every second in background thread (IOKit is lightweight)
 pub(crate) static BATTERY_CACHE: Mutex<Option<(f32, bool, Instant)>> = Mutex::new(None);
+// GPU usage cache: (gpu_usage_percent, last_update_timestamp)
+// GPU usage reading is expensive, so we cache it for 2 seconds
+pub(crate) static GPU_USAGE_CACHE: Mutex<Option<(f32, Instant)>> = Mutex::new(None);
 // Reserved for future rate limiting when IOReport power reading is implemented
 #[allow(dead_code)]
 pub(crate) static LAST_POWER_READ: Mutex<Option<Instant>> = Mutex::new(None);

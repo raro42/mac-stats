@@ -84,6 +84,29 @@ Notes:
 
 ---
 
+## Local AI Integration (Ollama)
+Support for locally running Ollama instance as an endpoint.
+
+### Chat Interface
+- Optional chat interface to interact with local AI LLM
+- Accessible via collapsed section or separate view
+- Uses local Ollama API endpoint (default: `http://localhost:11434`)
+- Configurable endpoint URL in settings
+
+### Use Cases
+- Ask questions about system metrics
+- Get insights on monitoring data
+- Natural language queries about alerts and status
+- All processing stays local (privacy-focused)
+
+### Configuration
+- Ollama endpoint URL (defaults to localhost:11434)
+- Model selection
+- Optional API key if using remote Ollama instance
+- Connection status indicator
+
+---
+
 ## Alerts & Notifications
 Alerts are essential but **invisible unless configured**.
 
@@ -127,6 +150,43 @@ Core responsibilities:
 - Parsing
 - Caching
 - Alerts
+
+---
+
+## Security & Credentials Management
+
+### Critical Security Requirements
+**Never expose API keys, tokens, or credentials in any form.**
+
+### Secure Storage
+- **macOS Keychain** for all secrets (API keys, tokens, passwords)
+  - Use Keychain Services API (`Security.framework`)
+  - Never store credentials in plaintext files
+  - Never log credentials (mask in logs if necessary)
+- Encrypt sensitive data at rest
+- Secure token refresh flows for OAuth-based services
+
+### Credential Scope
+The following features require secure credential storage:
+- **Alert Channels**: Telegram, Slack, Signal, Mastodon API tokens
+- **Social Monitoring**: Mastodon/X OAuth tokens or API keys
+- **Website Monitoring**: API keys for authenticated endpoints
+- **Plugin Scripts**: Credentials passed securely to plugins (never in command line args)
+- **Ollama Integration**: API keys if using remote instances
+
+### Implementation Guidelines
+- Validate and sanitize all plugin inputs/outputs to prevent credential leakage
+- Use secure inter-process communication for plugins
+- Never include credentials in URLs, logs, UI displays, or error messages
+- Implement proper keychain access controls (user-only, app-specific)
+- Provide secure credential entry UI (password fields, masked inputs)
+- Support credential rotation and revocation
+
+### Security Audit Points
+- All external API calls must use secure credential retrieval
+- Plugin execution must not expose credentials in process lists
+- Logging must mask or exclude sensitive data
+- Network traffic should use HTTPS/TLS for all external communications
 
 ---
 
