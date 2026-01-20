@@ -40,7 +40,7 @@
           <div class="metric-hint" id="temperature-hint" style="display: none;">Requires root privileges</div>
         </div>
 
-        <div class="metric-tile">
+        <div class="metric-tile" id="cpu-usage-card">
           <div class="metric-label">Usage</div>
           <div class="metric-value" id="cpu-usage-value">0<span class="metric-unit">%</span></div>
           <div class="metric-subtext" id="cpu-usage-subtext">—</div>
@@ -230,8 +230,8 @@
 
       <div class="divider" aria-hidden="true"></div>
 
-      <section class="details-section">
-        <h2 class="section-title">Details</h2>
+      <section class="details-section" id="details-section">
+        <h2 class="section-title collapsible-header" id="details-header">Details</h2>
         <div class="details-grid">
           <div class="detail-label">Load 1m</div>
           <div class="detail-value" id="load-1">0.0</div>
@@ -255,8 +255,8 @@
 
       <div class="divider" aria-hidden="true"></div>
 
-      <section class="processes-section">
-        <h2 class="section-title">Top Processes</h2>
+      <section class="processes-section" id="processes-section">
+        <h2 class="section-title collapsible-header" id="processes-header">Top Processes</h2>
         <div class="process-table" id="process-list"></div>
       </section>
 

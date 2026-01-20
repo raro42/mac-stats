@@ -81,18 +81,20 @@ struct MonitorsFile {
 }
 
 /// Save monitors to disk
+/// Uses try_lock to avoid blocking if locks are busy (non-blocking)
 fn save_monitors() -> Result<(), String> {
     use tracing::{debug, info};
     
     Config::ensure_monitors_directory()
         .map_err(|e| format!("Failed to create monitors directory: {}", e))?;
     
-    let _monitors = get_monitors().lock()
-        .map_err(|e| format!("Failed to lock monitors: {}", e))?;
-    let urls = get_monitor_urls().lock()
-        .map_err(|e| format!("Failed to lock monitor URLs: {}", e))?;
-    let stats = get_monitor_stats().lock()
-        .map_err(|e| format!("Failed to lock monitor stats: {}", e))?;
+    // Use try_lock to avoid blocking - if locks are busy, skip this save
+    let _monitors = get_monitors().try_lock()
+        .map_err(|_| "Failed to lock monitors (busy)")?;
+    let urls = get_monitor_urls().try_lock()
+        .map_err(|_| "Failed to lock monitor URLs (busy)")?;
+    let stats = get_monitor_stats().try_lock()
+        .map_err(|_| "Failed to lock monitor stats (busy)")?;
     
     let mut persistent_monitors = Vec::new();
     
@@ -100,8 +102,8 @@ fn save_monitors() -> Result<(), String> {
     // Since we can't directly serialize trait objects, we'll use the URLs map
     // and reconstruct from that. For now, we'll store website monitors only.
     // Get monitor configs
-    let configs = get_monitor_configs().lock()
-        .map_err(|e| format!("Failed to lock monitor configs: {}", e))?;
+    let configs = get_monitor_configs().try_lock()
+        .map_err(|_| "Failed to lock monitor configs (busy)")?;
     
     for (id, url) in urls.iter() {
         // Try to get saved config, or use defaults
@@ -372,19 +374,15 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
               monitor_id, monitor_url, error_msg, duration);
     }
 
-    // Save stats after check
+    // Save stats after check (in memory only - don't save to disk on every check)
+    // Disk saves happen on explicit actions (add/remove monitor) to avoid blocking
     let now = Utc::now();
     if let Ok(mut stats) = get_monitor_stats().lock() {
         stats.insert(monitor_id.clone(), MonitorStats {
             last_check: Some(now),
             last_status: Some(result.clone()),
         });
-        debug!("Monitor: Saved stats for monitor - ID: {}, Last check: {:?}", monitor_id, now);
-        
-        // Save to disk (async, don't block on errors)
-        if let Err(e) = save_monitors() {
-            debug!("Monitor: Failed to save monitors after check - ID: {}, Error: {}", monitor_id, e);
-        }
+        debug!("Monitor: Saved stats in memory for monitor - ID: {}, Last check: {:?}", monitor_id, now);
     }
 
     Ok(result)

@@ -999,6 +999,9 @@ body {
   height: 100%;
   display: block;
   object-fit: contain;
+  /* Default: Make Ollama icon visible with neutral gray filter */
+  filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(100%);
+  opacity: 0.7;
 }
 
 .icon-line-item.status-good {
@@ -1013,10 +1016,12 @@ body {
 /* For external SVG images (like Ollama icon), use filter to change color to green */
 .icon-line-item.status-good img {
   filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(1234%) hue-rotate(87deg) brightness(95%) contrast(85%);
+  opacity: 1; /* Override default opacity when connected */
 }
 
 .icon-line-item.status-good:hover img {
   filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(1234%) hue-rotate(87deg) brightness(100%) contrast(90%);
+  opacity: 1;
 }
 
 .icon-line-item.status-warning {

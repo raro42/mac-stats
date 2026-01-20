@@ -10,6 +10,7 @@
   --bg: #0b0b10;
   --text: rgba(255, 255, 255, 0.92);
   --muted: rgba(255, 255, 255, 0.60);
+  --hairline: rgba(255, 255, 255, 0.12);
   --rule: rgba(255, 255, 255, 0.12);
 
   --accent: #55c7ff;
@@ -191,6 +192,27 @@ body {
   background:
     radial-gradient(circle at 70% 35%, rgba(96, 255, 170, 0.45), rgba(0, 0, 0, 0) 55%),
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06) 0, rgba(255, 255, 255, 0.06) 1px, transparent 1px, transparent 10px);
+}
+
+/* Usage card clickable */
+#cpu-usage-card {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+#cpu-usage-card:hover {
+  opacity: 0.9;
+}
+
+/* Collapsible header styling */
+.collapsible-header {
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s;
+}
+
+.collapsible-header:hover {
+  opacity: 0.7;
 }
 
 .metric-label {
@@ -760,14 +782,16 @@ body {
   background: rgba(0, 122, 255, 1);
 }
 /* Battery/Power Strip - Theme-agnostic */
+/* Battery & Power Status Strip */
+/* Battery & Power Status Strip - aligned with Apple theme */
 .battery-power-strip {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
   margin: 16px 0 8px 0;
-  background: var(--panel-bg, var(--panel, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.4)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--hairline);
   border-radius: 12px;
   font-size: 13px;
 }
@@ -776,12 +800,15 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
+  background: none; /* Ensure no background is applied */
+  padding: 0; /* Ensure no padding creates visual boxes */
+  border: none; /* Ensure no borders */
 }
 
 .battery-icon {
   width: 16px;
   height: 16px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: rgba(255, 255, 255, 0.60); /* Use theme's --muted equivalent for dark theme */
   flex-shrink: 0;
   display: inline-block;
   vertical-align: middle;
@@ -789,7 +816,7 @@ body {
 }
 
 .battery-icon.charging {
-  color: rgba(52, 199, 89, 0.8);
+  color: rgba(52, 199, 89, 0.8); /* Slightly green when charging */
 }
 
 .battery-icon.no-battery {
@@ -798,25 +825,28 @@ body {
 
 .battery-level {
   font-weight: 600;
-  color: var(--text, var(--ink, inherit));
+  color: var(--text);
 }
 
 .battery-status {
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted);
   font-size: 12px;
 }
 
 .power-label {
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted);
+  background: none; /* Explicitly remove any background */
+  padding: 0; /* No padding */
+  border: none; /* No border */
 }
 
 .power-value {
   font-weight: 600;
-  color: var(--text, var(--ink, inherit));
+  color: var(--text);
 }
 
 .time-remaining {
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted);
   font-size: 12px;
 }
 
@@ -864,6 +894,9 @@ body {
   height: 100%;
   display: block;
   object-fit: contain;
+  /* Default: Make Ollama icon visible with neutral gray filter */
+  filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(100%);
+  opacity: 0.7;
 }
 
 .icon-line-item.status-good {
@@ -875,12 +908,15 @@ body {
   background: rgba(52, 199, 89, 0.1);
 }
 
+/* For external SVG images (like Ollama icon), use filter to change color to green */
 .icon-line-item.status-good img {
-  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(1234%) hue-rotate(87deg) brightness(95%) contrast(85%);
+  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(1234%) hue-rotate(87deg) brightness(95%) contrast(85%) !important;
+  opacity: 1 !important; /* Override default opacity when connected */
 }
 
 .icon-line-item.status-good:hover img {
-  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(1234%) hue-rotate(87deg) brightness(100%) contrast(90%);
+  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(1234%) hue-rotate(87deg) brightness(100%) contrast(90%) !important;
+  opacity: 1 !important;
 }
 
 .icon-line-item.status-warning {
@@ -892,14 +928,15 @@ body {
   background: rgba(255, 159, 10, 0.08);
 }
 
+/* For external SVG images (like Ollama icon), use filter to change color to softer amber */
 .icon-line-item.status-warning img {
-  filter: brightness(0) saturate(100%) invert(70%) sepia(95%) saturate(800%) hue-rotate(15deg) brightness(95%) contrast(90%);
-  opacity: 0.8;
+  filter: brightness(0) saturate(100%) invert(70%) sepia(95%) saturate(800%) hue-rotate(15deg) brightness(95%) contrast(90%) !important;
+  opacity: 0.8 !important;
 }
 
 .icon-line-item.status-warning:hover img {
-  filter: brightness(0) saturate(100%) invert(70%) sepia(95%) saturate(800%) hue-rotate(15deg) brightness(100%) contrast(95%);
-  opacity: 0.9;
+  filter: brightness(0) saturate(100%) invert(70%) sepia(95%) saturate(800%) hue-rotate(15deg) brightness(100%) contrast(95%) !important;
+  opacity: 0.9 !important;
 }
 
 .icon-placeholder {

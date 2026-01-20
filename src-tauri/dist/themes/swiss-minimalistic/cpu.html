@@ -39,7 +39,7 @@
           <div class="metric-hint" id="temperature-hint" style="display: none;">Requires root privileges</div>
         </div>
 
-        <div class="tile">
+        <div class="tile" id="cpu-usage-card">
           <div class="metric-label">Usage</div>
           <div class="metric-value" id="cpu-usage-value">0%</div>
           <div class="metric-subtext" id="cpu-usage-subtext">—</div>
@@ -229,8 +229,8 @@
 
       <div class="swiss-rule" aria-hidden="true"></div>
 
-      <section class="swiss-details">
-        <h2 class="section-title">Details</h2>
+      <section class="swiss-details" id="details-section">
+        <h2 class="section-title collapsible-header" id="details-header">Details</h2>
         <div class="details-grid">
           <div class="detail-label">Load 1m</div>
           <div class="detail-value" id="load-1">0.0</div>
@@ -254,8 +254,8 @@
 
       <div class="swiss-rule" aria-hidden="true"></div>
 
-      <section class="swiss-processes">
-        <h2 class="section-title">Top Processes</h2>
+      <section class="swiss-processes" id="processes-section">
+        <h2 class="section-title collapsible-header" id="processes-header">Top Processes</h2>
         <div class="process-table" id="process-list"></div>
       </section>
 

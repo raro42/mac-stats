@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-01-19
+
+### Added
+- **Universal Collapsible Sections**: Replicated Apple theme's USAGE card click behavior across all themes
+  - Clicking the USAGE card toggles both Details and Processes sections
+  - Clicking section headers individually hides respective sections
+  - Sections are hidden by default (collapsed state)
+  - State persists in localStorage across sessions
+  - Added universal IDs (`cpu-usage-card`, `details-section`, `processes-section`, `details-header`, `processes-header`) to all themes
+  - Added clickable cursor and hover effects for better UX
+
+### Fixed
+- **Ollama Icon Visibility**: Fixed Ollama icon not being visible/green in themes other than Apple
+  - Added default gray filter and opacity to all themes for icon visibility
+  - Fixed green status filter to properly override default styling using `!important`
+  - Icon now correctly displays green when Ollama is connected, yellow/amber when unavailable
+  - Applied fixes to all 9 themes (apple, dark, architect, data-poster, futuristic, light, material, neon, swiss-minimalistic)
+- **Data-Poster Theme Layout**: Fixed battery/power strip layout alignment with Apple theme
+  - Removed unwanted grey background box around "Power:" label
+  - Fixed battery icon color for dark theme visibility
+  - Added missing `--hairline` CSS variable
+  - Aligned spacing, padding, and styling to match Apple theme exactly
+  - Fixed charging indicator to display green when charging
+
 ## [0.1.1] - 2026-01-19
 
 ### Fixed
