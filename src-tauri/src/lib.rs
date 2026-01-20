@@ -163,6 +163,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::monitors::list_monitors,
             commands::monitors::remove_monitor,
             commands::monitors::get_monitor_details,
+            commands::monitors::get_monitor_status,
             // Alert commands
             commands::alerts::add_alert,
             commands::alerts::remove_alert,
