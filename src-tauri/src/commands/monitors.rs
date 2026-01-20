@@ -44,6 +44,19 @@ fn get_monitor_configs() -> &'static Mutex<HashMap<String, PersistentMonitor>> {
     MONITOR_CONFIGS.get_or_init(|| Mutex::new(HashMap::new()))
 }
 
+// Store monitor stats (last_check, last_status) separately
+fn get_monitor_stats() -> &'static Mutex<HashMap<String, MonitorStats>> {
+    static MONITOR_STATS: OnceLock<Mutex<HashMap<String, MonitorStats>>> = OnceLock::new();
+    MONITOR_STATS.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
+// Monitor stats for persistence
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct MonitorStats {
+    last_check: Option<chrono::DateTime<chrono::Utc>>,
+    last_status: Option<crate::monitors::MonitorStatus>,
+}
+
 // Serializable monitor data for persistence
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct PersistentMonitor {
@@ -57,6 +70,9 @@ struct PersistentMonitor {
     // For Mastodon monitors
     instance_url: Option<String>,
     account_username: Option<String>,
+    // Monitor stats
+    last_check: Option<chrono::DateTime<chrono::Utc>>,
+    last_status: Option<crate::monitors::MonitorStatus>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -75,6 +91,8 @@ fn save_monitors() -> Result<(), String> {
         .map_err(|e| format!("Failed to lock monitors: {}", e))?;
     let urls = get_monitor_urls().lock()
         .map_err(|e| format!("Failed to lock monitor URLs: {}", e))?;
+    let stats = get_monitor_stats().lock()
+        .map_err(|e| format!("Failed to lock monitor stats: {}", e))?;
     
     let mut persistent_monitors = Vec::new();
     
@@ -87,11 +105,11 @@ fn save_monitors() -> Result<(), String> {
     
     for (id, url) in urls.iter() {
         // Try to get saved config, or use defaults
-        if let Some(config) = configs.get(id) {
-            persistent_monitors.push(config.clone());
+        let mut pm = if let Some(config) = configs.get(id) {
+            config.clone()
         } else {
             // Fallback: create from URL with defaults
-            persistent_monitors.push(PersistentMonitor {
+            PersistentMonitor {
                 id: id.clone(),
                 name: id.clone(),
                 url: url.clone(),
@@ -101,8 +119,18 @@ fn save_monitors() -> Result<(), String> {
                 verify_ssl: true,
                 instance_url: None,
                 account_username: None,
-            });
+                last_check: None,
+                last_status: None,
+            }
+        };
+        
+        // Update stats from separate storage
+        if let Some(monitor_stats) = stats.get(id) {
+            pm.last_check = monitor_stats.last_check;
+            pm.last_status = monitor_stats.last_status.clone();
         }
+        
+        persistent_monitors.push(pm);
     }
     
     let file_data = MonitorsFile {
@@ -118,7 +146,8 @@ fn save_monitors() -> Result<(), String> {
     
     info!("Monitor: Saved {} monitors to disk - Path: {:?}", persistent_monitors.len(), monitors_path);
     for pm in persistent_monitors {
-        debug!("Monitor: Saved monitor - ID: {}, URL: {}", pm.id, pm.url);
+        debug!("Monitor: Saved monitor - ID: {}, URL: {}, Last check: {:?}", 
+               pm.id, pm.url, pm.last_check);
     }
     
     Ok(())
@@ -155,6 +184,8 @@ fn load_monitors() -> Result<(), String> {
         .map_err(|e| format!("Failed to lock monitor URLs: {}", e))?;
     let mut configs = get_monitor_configs().lock()
         .map_err(|e| format!("Failed to lock monitor configs: {}", e))?;
+    let mut stats = get_monitor_stats().lock()
+        .map_err(|e| format!("Failed to lock monitor stats: {}", e))?;
     
     let mut loaded_count = 0;
     for pm in file_data.monitors {
@@ -171,13 +202,28 @@ fn load_monitors() -> Result<(), String> {
             monitor.check_interval_secs = pm.check_interval_secs;
             monitor.verify_ssl = pm.verify_ssl;
             
+            // Restore stats if available
+            monitor.last_check = pm.last_check;
+            monitor.last_status = pm.last_status.clone();
+            
             let monitor_box: Box<dyn crate::monitors::MonitorCheck + Send> = Box::new(monitor);
             monitors.insert(pm.id.clone(), monitor_box);
             urls.insert(pm.id.clone(), pm.url.clone());
-            configs.insert(pm.id.clone(), pm.clone());
             
-            info!("Monitor: Loaded website monitor - ID: {}, Name: {}, URL: {}, Timeout: {}s, Interval: {}s, SSL: {}", 
-                  pm.id, pm.name, pm.url, pm.timeout_secs, pm.check_interval_secs, pm.verify_ssl);
+            // Store config without stats (stats stored separately)
+            let mut config_without_stats = pm.clone();
+            config_without_stats.last_check = None;
+            config_without_stats.last_status = None;
+            configs.insert(pm.id.clone(), config_without_stats);
+            
+            // Store stats separately
+            stats.insert(pm.id.clone(), MonitorStats {
+                last_check: pm.last_check,
+                last_status: pm.last_status,
+            });
+            
+            info!("Monitor: Loaded website monitor - ID: {}, Name: {}, URL: {}, Timeout: {}s, Interval: {}s, SSL: {}, Last check: {:?}", 
+                  pm.id, pm.name, pm.url, pm.timeout_secs, pm.check_interval_secs, pm.verify_ssl, pm.last_check);
             loaded_count += 1;
         }
         // Add other monitor types here as needed
@@ -238,10 +284,20 @@ pub fn add_website_monitor(request: AddWebsiteMonitorRequest) -> Result<Monitor,
         verify_ssl: monitor.verify_ssl,
         instance_url: None,
         account_username: None,
+        last_check: None,
+        last_status: None,
     };
     get_monitor_configs().lock()
         .map_err(|e| e.to_string())?
         .insert(request.id.clone(), persistent_monitor);
+    
+    // Initialize stats storage
+    get_monitor_stats().lock()
+        .map_err(|e| e.to_string())?
+        .insert(request.id.clone(), MonitorStats {
+            last_check: None,
+            last_status: None,
+        });
     
     // Save to disk
     save_monitors()
@@ -275,6 +331,7 @@ pub fn add_mastodon_monitor(request: AddMastodonMonitorRequest) -> Result<Monito
 #[tauri::command]
 pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatus, String> {
     use tracing::{debug, info};
+    use chrono::Utc;
     
     // Get monitor URL for logging
     let monitor_url = get_monitor_urls().lock()
@@ -313,6 +370,21 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
         let error_msg = result.error.as_deref().unwrap_or("unknown error");
         info!("Monitor: Check failed - ID: {}, URL: {}, Status: DOWN, Error: {}, Duration: {:?}", 
               monitor_id, monitor_url, error_msg, duration);
+    }
+
+    // Save stats after check
+    let now = Utc::now();
+    if let Ok(mut stats) = get_monitor_stats().lock() {
+        stats.insert(monitor_id.clone(), MonitorStats {
+            last_check: Some(now),
+            last_status: Some(result.clone()),
+        });
+        debug!("Monitor: Saved stats for monitor - ID: {}, Last check: {:?}", monitor_id, now);
+        
+        // Save to disk (async, don't block on errors)
+        if let Err(e) = save_monitors() {
+            debug!("Monitor: Failed to save monitors after check - ID: {}, Error: {}", monitor_id, e);
+        }
     }
 
     Ok(result)
@@ -358,6 +430,11 @@ pub fn remove_monitor(monitor_id: String) -> Result<(), String> {
         .map_err(|e| e.to_string())?
         .remove(&monitor_id);
     
+    // Remove from stats
+    get_monitor_stats().lock()
+        .map_err(|e| e.to_string())?
+        .remove(&monitor_id);
+    
     // Save to disk
     save_monitors()
         .map_err(|e| format!("Failed to save monitors: {}", e))?;
@@ -395,4 +472,14 @@ pub fn get_monitor_details(monitor_id: String) -> Result<MonitorDetails, String>
         url,
         monitor_type: "Website".to_string(), // Assume website for now
     })
+}
+
+/// Get cached monitor status without performing a check
+#[tauri::command]
+pub fn get_monitor_status(monitor_id: String) -> Result<Option<crate::monitors::MonitorStatus>, String> {
+    let stats = get_monitor_stats().lock()
+        .map_err(|e| e.to_string())?;
+    
+    Ok(stats.get(&monitor_id)
+        .and_then(|s| s.last_status.clone()))
 }
