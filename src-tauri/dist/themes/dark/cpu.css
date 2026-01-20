@@ -779,18 +779,18 @@ body {
   font-weight: 700;
   color: var(--text);
 }
-  background: rgba(0, 122, 255, 1);
-}
-/* Battery/Power Strip - Theme-agnostic */
+
 /* Battery & Power Status Strip */
 .battery-power-strip {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
   margin: 16px 0 8px 0;
-  background: var(--panel-bg, var(--panel, var(--paper, var(--glass-bg, rgba(255, 255, 255, 0.4)))));
-  border: 1px solid var(--hairline, var(--border, var(--rule, var(--line, rgba(0, 0, 0, 0.1)))));
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--hairline);
   border-radius: 12px;
   font-size: 13px;
 }
@@ -804,7 +804,7 @@ body {
 .battery-icon {
   width: 16px;
   height: 16px;
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: rgba(12, 12, 16, 0.50); /* Same grey as --muted, matching settings icon */
   flex-shrink: 0;
   display: inline-block;
   vertical-align: middle;
@@ -821,25 +821,25 @@ body {
 
 .battery-level {
   font-weight: 600;
-  color: var(--text, var(--ink, inherit));
+  color: var(--text);
 }
 
 .battery-status {
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted);
   font-size: 12px;
 }
 
 .power-label {
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted);
 }
 
 .power-value {
   font-weight: 600;
-  color: var(--text, var(--ink, inherit));
+  color: var(--text);
 }
 
 .time-remaining {
-  color: var(--muted, var(--text-muted, var(--text-secondary, var(--ink-muted, rgba(128, 128, 128, 0.6)))));
+  color: var(--muted);
   font-size: 12px;
 }
 
@@ -1940,4 +1940,66 @@ body {
 
 #chat-send-btn:hover {
   background: rgba(0, 122, 255, 1);
+}
+
+/* History controls - time range dropdown */
+.history-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.history-controls label {
+  color: var(--text-muted, rgba(128, 128, 128, 0.8));
+  font-weight: 500;
+}
+
+.time-range-dropdown {
+  background: rgba(0, 255, 0, 0.05);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  border-radius: 4px;
+  color: #00ff00;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.time-range-dropdown:hover {
+  background: rgba(0, 255, 0, 0.1);
+  border-color: rgba(0, 255, 0, 0.5);
+}
+
+.time-range-dropdown:focus {
+  outline: none;
+  background: rgba(0, 255, 0, 0.15);
+  border-color: rgba(0, 255, 0, 0.7);
+  box-shadow: 0 0 0 2px rgba(0, 255, 0, 0.1);
+}
+
+.time-range-dropdown option {
+  background: #1a1a1a;
+  color: #00ff00;
+}
+
+/* History tooltip */
+.history-tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.95);
+  color: #00ff00;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 255, 0, 0.5);
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: monospace;
+  pointer-events: none;
+  z-index: 10000;
+  display: none;
+  white-space: pre;
+  line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
 }

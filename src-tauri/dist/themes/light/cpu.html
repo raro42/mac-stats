@@ -41,7 +41,7 @@
             <path class="ring-progress" id="temperature-ring-progress" d="M 13.6 71 A 42 42 0 1 1 86.4 71" pathLength="264" />
           </svg>
 
-          <div class="metric-hint" id="temperature-hint" style="display: none;">Requires root privileges</div>
+          <div class="metric-hint" id="temperature-hint" style="display: none;">--</div>
         </div>
 
         <div class="metric-card" id="cpu-usage-card">
@@ -65,11 +65,34 @@
             <path class="ring-progress" id="frequency-ring-progress" d="M 13.6 71 A 42 42 0 1 1 86.4 71" pathLength="264" />
           </svg>
 
-          <div class="metric-hint" id="frequency-hint" style="display: none;">Requires root privileges</div>
+          <div class="metric-hint" id="frequency-hint" style="display: none;">--</div>
         </div>
       </section>
 
-      <section class="battery-power-strip" id="battery-power-strip">
+      
+      <section class="history-section">
+        <div class="history-controls" id="history-controls" style="display: none;">
+          <label for="time-range-select">History:</label>
+          <select id="time-range-select" class="time-range-dropdown">
+            <option value="5m" selected>Last 5 minutes</option>
+            <option value="1h">Last 1 hour</option>
+            <option value="6h">Last 6 hours</option>
+            <option value="24h">Last 24 hours</option>
+            <option value="7d">Last 7 days</option>
+          </select>
+        </div>
+        <div class="history-chart-container">
+          <canvas class="history-chart" id="temperature-history-chart" width="200" height="40"></canvas>
+        </div>
+        <div class="history-chart-container">
+          <canvas class="history-chart" id="usage-history-chart" width="200" height="40"></canvas>
+        </div>
+        <div class="history-chart-container">
+          <canvas class="history-chart" id="frequency-history-chart" width="200" height="40"></canvas>
+        </div>
+      </section>
+
+<section class="battery-power-strip" id="battery-power-strip">
         <div class="battery-info">
           <svg class="battery-icon" id="battery-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
@@ -316,8 +339,10 @@
       </div>
     </div>
 
+    <script src="../../tauri-logger.js"></script>
+    <script type="module" src="../../ollama.js"></script>
     <script src="../../cpu.js"></script>
     <script src="../../cpu-ui.js"></script>
-    <script src="./light-history.js"></script>
+    <script src="./chart.js"></script>
   </body>
 </html>

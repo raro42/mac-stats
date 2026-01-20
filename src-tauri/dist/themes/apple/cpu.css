@@ -653,6 +653,94 @@ body {
   background: rgba(255, 59, 48, 0.2);
 }
 
+
+/* History section and charts */
+.history-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 8px 0;
+  flex-shrink: 0; /* Don't shrink history section */
+}
+
+.history-chart-container {
+  position: relative;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.history-chart {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* History controls - time range dropdown */
+.history-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.history-controls label {
+  color: var(--text-muted, rgba(128, 128, 128, 0.8));
+  font-weight: 500;
+}
+
+.time-range-dropdown {
+  background: rgba(139, 180, 232, 0.05);
+  border: 1px solid rgba(139, 180, 232, 0.3);
+  border-radius: 4px;
+  color: #8bb4e8;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.time-range-dropdown:hover {
+  background: rgba(139, 180, 232, 0.1);
+  border-color: rgba(139, 180, 232, 0.5);
+}
+
+.time-range-dropdown:focus {
+  outline: none;
+  background: rgba(139, 180, 232, 0.15);
+  border-color: rgba(139, 180, 232, 0.7);
+  box-shadow: 0 0 0 2px rgba(139, 180, 232, 0.1);
+}
+
+.time-range-dropdown option {
+  background: #1a1a1a;
+  color: #8bb4e8;
+}
+
+/* History tooltip */
+.history-tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.95);
+  color: #8bb4e8;
+  padding: 8px 12px;
+  border: 1px solid rgba(139, 180, 232, 0.5);
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: monospace;
+  pointer-events: none;
+  z-index: 10000;
+  display: none;
+  white-space: pre;
+  line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+}
+
 @media (max-width: 560px) {
   body {
     padding: 18px;
@@ -895,6 +983,8 @@ body {
 /* Battery & Power Status Strip */
 .battery-power-strip {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
