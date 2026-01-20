@@ -273,6 +273,34 @@ async function loadAvailableModels() {
 // Chat Message Handling
 // ============================================================================
 
+// Conversation history storage (in-memory, per session)
+let conversationHistory = [];
+
+/**
+ * Get conversation history
+ */
+function getConversationHistory() {
+  return conversationHistory;
+}
+
+/**
+ * Add message to conversation history
+ */
+function addToHistory(role, content) {
+  conversationHistory.push({ role, content });
+  // Limit history to last 20 messages to avoid token limits
+  if (conversationHistory.length > 20) {
+    conversationHistory = conversationHistory.slice(-20);
+  }
+}
+
+/**
+ * Clear conversation history
+ */
+function clearConversationHistory() {
+  conversationHistory = [];
+}
+
 /**
  * Send chat message to Ollama using unified command
  */
@@ -287,21 +315,29 @@ async function sendChatMessage() {
 
   console.log('[Ollama] ========== sendChatMessage() CALLED ==========');
   console.log('[Ollama] Message:', message);
+  console.log('[Ollama] Conversation history length:', conversationHistory.length);
 
   // Add user message to chat
   addChatMessage('user', message);
   input.value = '';
 
+  // Add user message to conversation history
+  addToHistory('user', message);
+
   try {
     // Get system prompt
     const systemPrompt = getSystemPrompt();
+    
+    // Get conversation history (excluding the current message - it's in question)
+    const history = getConversationHistory().slice(0, -1);
     
     // Use unified command that handles everything
     console.log('[Ollama] Sending request via unified command...');
     const response = await invoke('ollama_chat_with_execution', {
       request: {
         question: message,
-        system_prompt: systemPrompt
+        system_prompt: systemPrompt,
+        conversation_history: history.length > 0 ? history : null
       }
     });
     
@@ -318,6 +354,8 @@ async function sendChatMessage() {
     } else if (response.final_answer) {
       // Direct answer, no code execution needed
       addChatMessage('assistant', response.final_answer);
+      // Add assistant response to history
+      addToHistory('assistant', response.final_answer);
     } else {
       addChatMessage('assistant', 'Received unexpected response format');
     }
@@ -404,13 +442,17 @@ async function executeCodeAndContinue(response, originalQuestion, systemPrompt, 
     // Continue with result (may trigger another code execution - ping-pong)
     console.log(`[Ollama] Sending execution result to Ollama (iteration ${iteration + 1})...`);
     try {
+      // Get conversation history for context
+      const history = getConversationHistory();
+      
       const continueResponse = await invoke('ollama_chat_continue_with_result', {
         code: response.code,
         executionResult: resultString,
         originalQuestion: originalQuestion,
         contextMessage: response.context_message || '',
         intermediateResponse: response.intermediate_response || '',
-        systemPrompt: systemPrompt
+        systemPrompt: systemPrompt,
+        conversationHistory: history.length > 0 ? history : null
       });
       
       console.log(`[Ollama] Continue response (iteration ${iteration + 1}):`, continueResponse);
@@ -436,6 +478,8 @@ async function executeCodeAndContinue(response, originalQuestion, systemPrompt, 
         }
         
         addChatMessage('assistant', continueResponse.final_answer);
+        // Add assistant response to history
+        addToHistory('assistant', continueResponse.final_answer);
       } else {
         // Unexpected response format
         console.warn('[Ollama] Unexpected continue response format:', continueResponse);
@@ -846,6 +890,8 @@ window.Ollama = {
   // Chat
   sendMessage: sendChatMessage,
   processResponse: processOllamaResponse,
+  getHistory: getConversationHistory,
+  clearHistory: clearConversationHistory,
   
   // Code execution
   executeCode: executeJavaScriptCode,

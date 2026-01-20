@@ -1449,30 +1449,75 @@ pub unsafe fn read_power_from_ioreport(
             }
             
             let array_count = CFArrayGetCount(array_ptr);
-            if power_logging {
-                debug1!("Processing {} channels from array", array_count);
-            }
+            // Always log channel count (not just when power_logging is enabled)
+            debug1!("Processing {} channels from array for power reading", array_count);
             
-            for i in 0..array_count {
-                let channel_value_ptr = CFArrayGetValueAtIndex(array_ptr, i);
-                if channel_value_ptr.is_null() {
-                    continue;
+            // Safety: Process channels but be defensive
+            // Process all channels, but stop early if we hit too many errors
+            // This allows us to find GPU channels that might be anywhere in the array
+            let max_channels = array_count;
+            
+            // Track all CPU/GPU-related channels for debugging
+            let mut cpu_candidates: Vec<String> = Vec::new();
+            let mut gpu_candidates: Vec<String> = Vec::new();
+            let mut power_candidates: Vec<String> = Vec::new();
+            let mut error_count = 0;
+            const MAX_ERRORS: i32 = 50; // Stop processing if we hit too many errors (increased to allow more channels)
+            let mut consecutive_errors = 0;
+            const MAX_CONSECUTIVE_ERRORS: i32 = 20; // Stop if we hit too many consecutive errors
+            
+            for i in 0..max_channels {
+                // Basic bounds check (shouldn't be needed but be safe)
+                if i < 0 {
+                    debug2!("Invalid array index {} (negative), stopping", i);
+                    break;
                 }
                 
+                let channel_value_ptr = CFArrayGetValueAtIndex(array_ptr, i);
+                if channel_value_ptr.is_null() {
+                    error_count += 1;
+                    consecutive_errors += 1;
+                    if error_count > MAX_ERRORS || consecutive_errors > MAX_CONSECUTIVE_ERRORS {
+                        debug1!("Too many errors encountered (total: {}, consecutive: {}), stopping processing at channel {}", 
+                            error_count, consecutive_errors, i);
+                        break;
+                    }
+                    continue;
+                }
+                consecutive_errors = 0; // Reset on success
+                
+                // Validate that this is actually a dictionary
                 let value_type_id = CFGetTypeID(channel_value_ptr as CFTypeRef);
                 let dict_type_id = CFDictionaryGetTypeID();
                 if value_type_id != dict_type_id {
+                    error_count += 1;
+                    consecutive_errors += 1;
+                    if error_count > MAX_ERRORS || consecutive_errors > MAX_CONSECUTIVE_ERRORS {
+                        debug1!("Too many non-dictionary channels encountered (total: {}, consecutive: {}), stopping processing at channel {}", 
+                            error_count, consecutive_errors, i);
+                        break;
+                    }
                     continue;
                 }
+                consecutive_errors = 0; // Reset on success
                 
                 let channel_dict = channel_value_ptr as CFDictionaryRef;
                 
                 // Get channel name
                 let channel_name_ref = IOReportChannelGetChannelName(channel_dict);
                 if channel_name_ref.is_null() {
+                    error_count += 1;
+                    consecutive_errors += 1;
+                    if error_count > MAX_ERRORS || consecutive_errors > MAX_CONSECUTIVE_ERRORS {
+                        debug1!("Too many channels with null names (total: {}, consecutive: {}), stopping processing at channel {}", 
+                            error_count, consecutive_errors, i);
+                        break;
+                    }
                     continue;
                 }
+                consecutive_errors = 0; // Reset on success
                 
+                // Wrap the CFString safely - this should not panic if channel_name_ref is valid
                 let channel_name = CFString::wrap_under_get_rule(channel_name_ref);
                 let channel_name_str = channel_name.to_string();
                 
@@ -1484,72 +1529,199 @@ pub unsafe fn read_power_from_ioreport(
                                       channel_name_str.contains("Package") ||
                                       channel_name_str.contains("SoC");
                 
+                // Classify as CPU or GPU (check this BEFORE the is_power_channel check)
+                // CPU channels might not have "Power" in the name
+                let is_cpu = channel_name_str.contains("CPU") || 
+                            channel_name_str.contains("P-Core") || 
+                            channel_name_str.contains("E-Core") ||
+                            channel_name_str.contains("Package") ||
+                            channel_name_str.contains("P-CPU") ||
+                            channel_name_str.contains("E-CPU");
+                let is_gpu = channel_name_str.contains("GPU");
+                
+                // Track candidates for debugging
+                if is_cpu {
+                    cpu_candidates.push(channel_name_str.clone());
+                }
+                if is_gpu {
+                    gpu_candidates.push(channel_name_str.clone());
+                }
                 if is_power_channel {
+                    power_candidates.push(channel_name_str.clone());
+                }
+                
+                // Process if it's a power channel OR if it's CPU/GPU (even without "Power" in name)
+                // This is important because some CPU channels might not explicitly say "Power"
+                // CRITICAL: Always process GPU channels, even if they have state_count=-1
+                // GPU channels like "GPU Energy" were working before and need to be processed
+                if is_power_channel || is_cpu || is_gpu {
                     if power_logging {
-                        debug1!("Found power channel in array: '{}'", channel_name_str);
+                        debug1!("Found channel in array: '{}' (is_power={}, is_cpu={}, is_gpu={})", 
+                            channel_name_str, is_power_channel, is_cpu, is_gpu);
                     }
                     
-                    // Try to get energy value - for Energy Model, we might need to use state residency
-                    // or integer values. Let's try multiple approaches.
-                    let energy_value = IOReportSimpleGetIntegerValue(channel_dict, 0);
+                    // Check state count - if it's -1, the channel doesn't support state-based operations
+                    // but IOReportSimpleGetIntegerValue might still work (this is how GPU power was working before)
+                    let state_count_raw = IOReportStateGetCount(channel_dict);
                     
-                    // Also try getting from states if available
-                    let state_count = IOReportStateGetCount(channel_dict);
-                    if state_count > 0 && power_logging {
-                        debug1!("  Channel '{}' has {} states", channel_name_str, state_count);
+                    // Get energy value - try index 0 first
+                    // This should work even if state_count is -1 (GPU channels work this way)
+                    // However, some channels might still crash, so we need to be careful
+                    let mut energy_value = IOReportSimpleGetIntegerValue(channel_dict, 0);
+                    
+                    // Only use state-based operations if state_count is valid
+                    // Channels with state_count=-1 don't support state operations, but may have valid energy values
+                    let state_count = if state_count_raw < 0 || state_count_raw > 1000 {
+                        // Invalid state count - skip state-based operations but still use energy_value
+                        0
+                    } else {
+                        state_count_raw
+                    };
+                    
+                    // Safety check: If we got a suspiciously large energy value, it might be invalid
+                    // Energy values are typically in micro-joules or nano-joules, so very large values
+                    // (like > 1e15) are likely invalid/corrupted data
+                    if energy_value > 1_000_000_000_000_000 || energy_value < -1_000_000_000_000_000 {
+                        debug2!("Suspicious energy value {} for channel '{}', treating as 0", energy_value, channel_name_str);
+                        energy_value = 0;
                     }
                     
-                    if energy_value != 0 || state_count > 0 {
-                        // Classify as CPU or GPU
-                        let is_cpu = channel_name_str.contains("CPU") || 
-                                    channel_name_str.contains("P-Core") || 
-                                    channel_name_str.contains("E-Core") ||
-                                    channel_name_str.contains("Package");
-                        let is_gpu = channel_name_str.contains("GPU");
+                    // If we got 0 and state_count is valid, we might need to look at states
+                    // But if state_count is -1, skip state operations entirely
+                    
+                    // Only process states if state_count is valid (not -1)
+                    if state_count > 0 {
+                        if power_logging {
+                            debug1!("  Channel '{}' has {} states", channel_name_str, state_count);
+                        }
                         
-                        if is_cpu {
-                            cpu_energy_total += energy_value;
-                            if power_logging {
-                                debug1!("  Added to CPU: energy={}", energy_value);
+                        // For CPU channels, try extracting energy from states if simple value is 0
+                        // Some CPU channels might store energy in state residency
+                        if is_cpu && energy_value == 0 {
+                            // Try summing state residencies as a fallback
+                            let mut state_energy_sum: i64 = 0;
+                            for state_idx in 0..state_count {
+                                let residency = IOReportStateGetResidency(channel_dict, state_idx);
+                                state_energy_sum += residency;
                             }
-                        } else if is_gpu {
-                            gpu_energy_total += energy_value;
-                            if power_logging {
-                                debug1!("  Added to GPU: energy={}", energy_value);
+                            if state_energy_sum > 0 && power_logging {
+                                debug1!("  Channel '{}': using state residency sum={} (simple value was 0)", 
+                                    channel_name_str, state_energy_sum);
+                                energy_value = state_energy_sum;
                             }
                         }
                     }
+                    
+                    // Try index 1 if index 0 returned 0 (some channels might use different indices)
+                    // Only do this if state_count is valid - channels with state_count=-1 might not support multiple indices
+                    if energy_value == 0 && state_count_raw != -1 {
+                        let energy_value_1 = IOReportSimpleGetIntegerValue(channel_dict, 1);
+                        // Safety check: validate the value before using it
+                        if energy_value_1 != 0 && energy_value_1 < 1_000_000_000_000_000 && energy_value_1 > -1_000_000_000_000_000 {
+                            if power_logging {
+                                debug1!("  Channel '{}': index 0 was 0, trying index 1: {}", channel_name_str, energy_value_1);
+                            }
+                            energy_value = energy_value_1;
+                        }
+                    }
+                    
+                    // Always try to classify and add, even if energy_value is 0
+                    // Some channels might have 0 energy but still be valid power channels
+                    if is_cpu {
+                        cpu_energy_total += energy_value;
+                        if power_logging && energy_value != 0 {
+                            debug1!("  Added to CPU: energy={} (total: {})", energy_value, cpu_energy_total);
+                        }
+                    } else if is_gpu {
+                        gpu_energy_total += energy_value;
+                        if power_logging && energy_value != 0 {
+                            debug1!("  Added to GPU: energy={} (total: {})", energy_value, gpu_energy_total);
+                        }
+                    } else if power_logging && (energy_value != 0 || state_count > 0) {
+                        debug2!("  Channel '{}' has energy={} but is not CPU or GPU (skipping)", channel_name_str, energy_value);
+                    }
                 }
+                
+                // Log progress every 50 channels to help identify crash location
+                if (i + 1) % 50 == 0 {
+                    debug1!("Processed {} / {} channels (CPU energy: {}, GPU energy: {})", 
+                        i + 1, max_channels, cpu_energy_total, gpu_energy_total);
+                }
+            }
+            
+            // Log summary of candidates found (always log, not just when power_logging is enabled)
+            // This is critical for debugging CPU power issues
+            debug1!("Channel summary: {} CPU candidates, {} GPU candidates, {} power candidates, cpu_energy_total={}, gpu_energy_total={}, time_delta={:.2}s", 
+                cpu_candidates.len(), gpu_candidates.len(), power_candidates.len(), cpu_energy_total, gpu_energy_total, time_delta_secs);
+            if !cpu_candidates.is_empty() {
+                // Limit to first 10 CPU candidates to avoid log spam
+                let display_candidates: Vec<String> = cpu_candidates.iter().take(10).cloned().collect();
+                debug1!("CPU candidate channels (first 10): {:?}", display_candidates);
+                if cpu_candidates.len() > 10 {
+                    debug1!("... and {} more CPU candidates", cpu_candidates.len() - 10);
+                }
+            } else {
+                debug1!("WARNING: No CPU candidate channels found! This explains why CPU power is 0W");
+            }
+            if !gpu_candidates.is_empty() {
+                // Limit to first 10 GPU candidates to avoid log spam
+                let display_candidates: Vec<String> = gpu_candidates.iter().take(10).cloned().collect();
+                debug1!("GPU candidate channels (first 10): {:?}", display_candidates);
             }
         }
         
         // Calculate power from energy totals
         let mut result = PowerData::default();
         if time_delta_secs > 0.0 && time_delta_secs < 60.0 {
-            // Energy Model might report in different units - try micro-joules first
+            // Energy Model might report in different units
+            // CPU and GPU energy values can be in different units, so we need to try multiple conversions
+            
+            // Calculate CPU power
+            // Based on research: CPU energy from IOReport Energy Model is typically in MILLIJOULES (mJ)
+            // Power (W) = Energy (mJ) / Time (s) / 1000
             if cpu_energy_total > 0 {
-                result.cpu_power = (cpu_energy_total as f64 / time_delta_secs / 1_000_000.0) as f32;
-            }
-            if gpu_energy_total > 0 {
-                result.gpu_power = (gpu_energy_total as f64 / time_delta_secs / 1_000_000.0) as f32;
+                // Try millijoules first (most common for CPU on Apple Silicon)
+                result.cpu_power = (cpu_energy_total as f64 / time_delta_secs / 1_000.0) as f32;
+                
+                // Sanity check: CPU power should be reasonable (0.1W to 100W for Apple Silicon)
+                // If unreasonably high, try microjoules as fallback
+                if result.cpu_power > 100.0 {
+                    result.cpu_power = (cpu_energy_total as f64 / time_delta_secs / 1_000_000.0) as f32;
+                    if power_logging {
+                        debug1!("CPU power: millijoules gave {:.2}W (too high), trying microjoules: {:.2}W", 
+                            (cpu_energy_total as f64 / time_delta_secs / 1_000.0) as f32, result.cpu_power);
+                    }
+                }
             }
             
-            // If that gives unrealistic values, try nano-joules
-            if result.cpu_power > 1000.0 || result.gpu_power > 1000.0 {
-                if power_logging {
-                    debug1!("Power values too high, trying nano-joules conversion");
-                }
-                if cpu_energy_total > 0 {
-                    result.cpu_power = (cpu_energy_total as f64 / time_delta_secs / 1_000_000_000.0) as f32;
-                }
-                if gpu_energy_total > 0 {
+            // Calculate GPU power
+            // Based on research: GPU energy from IOReport Energy Model is typically in MICROJOULES (μJ)
+            // Power (W) = Energy (μJ) / Time (s) / 1,000,000
+            if gpu_energy_total > 0 {
+                // Try microjoules first (most common for GPU on Apple Silicon)
+                result.gpu_power = (gpu_energy_total as f64 / time_delta_secs / 1_000_000.0) as f32;
+                
+                // Sanity check: GPU power should be reasonable (0.1W to 200W for Apple Silicon)
+                // If unreasonably high, try nanojoules as fallback
+                if result.gpu_power > 200.0 {
                     result.gpu_power = (gpu_energy_total as f64 / time_delta_secs / 1_000_000_000.0) as f32;
+                    if power_logging {
+                        debug1!("GPU power: microjoules gave {:.2}W (too high), trying nanojoules: {:.2}W", 
+                            (gpu_energy_total as f64 / time_delta_secs / 1_000_000.0) as f32, result.gpu_power);
+                    }
                 }
             }
             
             if power_logging {
                 debug1!("Power calculated: CPU={:.2}W, GPU={:.2}W (energy: CPU={}, GPU={}, time={:.2}s)", 
                     result.cpu_power, result.gpu_power, cpu_energy_total, gpu_energy_total, time_delta_secs);
+            }
+        } else {
+            // time_delta is 0 or invalid - cannot calculate power
+            // Return 0.0 for both (cache update logic will preserve previous values)
+            if power_logging {
+                debug1!("Cannot calculate power: time_delta={:.2}s (energy: CPU={}, GPU={})", 
+                    time_delta_secs, cpu_energy_total, gpu_energy_total);
             }
         }
         
@@ -1637,9 +1809,23 @@ pub unsafe fn read_power_from_ioreport(
             }
             
             // Check if this is a power/energy channel
-            // Be more flexible with matching - try to match any channel that might contain power/energy data
-            let is_cpu_power = name.contains("CPU") && (name.contains("Power") || name.contains("Energy") || name.contains("P-Core") || name.contains("E-Core") || name.contains("P-CPU") || name.contains("E-CPU"));
-            let is_gpu_power = name.contains("GPU") && (name.contains("Power") || name.contains("Energy"));
+            // Be more flexible with matching - Energy Model channels might have various names
+            // CPU channels: "CPU", "P-Core", "E-Core", "Package", "P-CPU", "E-CPU" (with or without "Power"/"Energy")
+            // GPU channels: "GPU" (with or without "Power"/"Energy")
+            let is_power_channel = name.contains("Power") || 
+                                  name.contains("Energy") ||
+                                  name.contains("Package") ||
+                                  name.contains("SoC");
+            
+            let is_cpu_power = (name.contains("CPU") || 
+                               name.contains("P-Core") || 
+                               name.contains("E-Core") ||
+                               name.contains("Package") ||
+                               name.contains("P-CPU") ||
+                               name.contains("E-CPU")) && 
+                               (is_power_channel || name.contains("CPU") || name.contains("Core") || name.contains("Package"));
+            
+            let is_gpu_power = name.contains("GPU") && (is_power_channel || name.contains("GPU"));
             
             if is_cpu_power || is_gpu_power {
                 // Try to extract energy value from channel
@@ -1648,7 +1834,8 @@ pub unsafe fn read_power_from_ioreport(
                 let energy_value = IOReportSimpleGetIntegerValue(channel_value as CFDictionaryRef, 0);
                 
                 if power_logging {
-                    debug1!("Power channel '{}': energy={} (raw value)", name, energy_value);
+                    debug1!("Power channel '{}': energy={} (raw value), is_cpu={}, is_gpu={}", 
+                        name, energy_value, is_cpu_power, is_gpu_power);
                 }
                 
                 if is_cpu_power {
@@ -1662,8 +1849,12 @@ pub unsafe fn read_power_from_ioreport(
                         debug1!("Added to GPU energy total: {} (new total: {})", energy_value, gpu_energy_total);
                     }
                 }
-            } else if power_logging {
-                debug2!("Channel '{}' is not a power channel (skipping)", name);
+            } else {
+                // Log all channels for debugging (even non-power channels) to help diagnose CPU power issue
+                if power_logging {
+                    debug2!("Channel '{}' is not a power channel (skipping) - is_power_channel={}, contains CPU={}, contains GPU={}", 
+                        name, is_power_channel, name.contains("CPU"), name.contains("GPU"));
+                }
             }
         } else if power_logging {
             debug2!("Could not find channel name for key '{}'", channel_key);

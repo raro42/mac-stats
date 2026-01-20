@@ -22,6 +22,7 @@ use objc2::rc::Retained;
 use objc2::runtime::AnyObject;
 use objc2_app_kit::NSStatusItem;
 use tauri::AppHandle;
+use crate::metrics::history::HistoryBuffer;
 
 // System state
 pub(crate) static SYSTEM: Mutex<Option<System>> = Mutex::new(None);
@@ -112,6 +113,9 @@ pub(crate) static GPU_USAGE_CACHE: Mutex<Option<(f32, Instant)>> = Mutex::new(No
 pub(crate) static LAST_POWER_READ: Mutex<Option<Instant>> = Mutex::new(None);
 #[allow(dead_code)]
 pub(crate) static LAST_BATTERY_READ: Mutex<Option<Instant>> = Mutex::new(None);
+
+// Metrics history buffer for adaptive tiered history storage
+pub(crate) static METRICS_HISTORY: Mutex<Option<HistoryBuffer>> = Mutex::new(None);
 
 /// Application state structure (future refactoring target)
 /// 

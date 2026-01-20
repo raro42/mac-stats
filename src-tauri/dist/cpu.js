@@ -362,6 +362,11 @@ async function refresh() {
     if (window.architectHistory && data.can_read_temperature && data.temperature > 0) {
       window.architectHistory.updateTemperature(data.temperature);
     }
+    
+    // Update apple theme history charts if available
+    if (window.appleHistory && data.can_read_temperature && data.temperature > 0) {
+      window.appleHistory.updateTemperature(data.temperature);
+    }
 
     // Update CPU usage
     const cpuUsageEl = document.getElementById("cpu-usage-value");
@@ -432,6 +437,11 @@ async function refresh() {
     // Update architect theme history charts if available
     if (window.architectHistory) {
       window.architectHistory.updateUsage(data.usage);
+    }
+    
+    // Update apple theme history charts if available
+    if (window.appleHistory) {
+      window.appleHistory.updateUsage(data.usage);
     }
 
     // Update frequency
@@ -540,6 +550,11 @@ async function refresh() {
       if (window.architectHistory && data.frequency > 0) {
         window.architectHistory.updateFrequency(data.frequency);
       }
+      
+      // Update apple theme history charts if available
+      if (window.appleHistory && data.frequency > 0) {
+        window.appleHistory.updateFrequency(data.frequency);
+      }
 
     // Update uptime
     const uptimeEl = document.getElementById("uptime-value");
@@ -584,7 +599,7 @@ async function refresh() {
       failedAttempts.cpuPower++;
       // Only show hint after multiple failed attempts
       const shouldShowHint = failedAttempts.cpuPower >= FAILED_ATTEMPTS_THRESHOLD;
-      const displayText = shouldShowHint ? "Requires root privileges" : "0 W";
+      const displayText = shouldShowHint ? "--:--" : "0 W";
       if (cpuPowerEl.textContent !== displayText) {
         scheduleDOMUpdate(() => {
           cpuPowerEl.textContent = displayText;
@@ -592,18 +607,33 @@ async function refresh() {
       }
     } else {
       failedAttempts.cpuPower = 0;
-      // CRITICAL: Cache last known good value to prevent flickering when value temporarily becomes 0
-      let cpuPowerValue = previousValues.cpuPower || 0; // Keep current value if no new valid data
+      // CRITICAL: Preserve last known good value to prevent flickering
+      // Strategy: Only update if backend value > 0, otherwise preserve what we have
       
-      // Only update if we have a valid non-zero value
+      // Initialize from DOM on first call if previousValues is 0 (handles page reload)
+      if (previousValues.cpuPower === 0 && cpuPowerEl && cpuPowerEl.textContent) {
+        const currentText = cpuPowerEl.textContent.trim();
+        const match = currentText.match(/(\d+(?:\.\d+)?)\s*W/);
+        if (match) {
+          const domValue = parseFloat(match[1]);
+          if (domValue > 0) {
+            previousValues.cpuPower = domValue;
+          }
+        }
+      }
+      
+      // Use cached value as default
+      let cpuPowerValue = previousValues.cpuPower || 0;
+      
+      // Only update if backend has a valid value > 0
       if (data.cpu_power && data.cpu_power > 0) {
         cpuPowerValue = data.cpu_power;
-        previousValues.cpuPower = data.cpu_power; // Update cache
+        previousValues.cpuPower = data.cpu_power;
       }
-      // If value is 0, keep the last known good value (don't update)
+      // If backend value is 0 or undefined, keep using previousValues (don't reset to 0)
       
       const formatted = `${Math.round(cpuPowerValue)} W`;
-      // Only update if value actually changed to prevent unnecessary DOM updates
+      // Only update DOM if value actually changed
       if (cpuPowerEl.textContent !== formatted) {
         scheduleDOMUpdate(() => {
           cpuPowerEl.textContent = formatted;
@@ -616,7 +646,7 @@ async function refresh() {
       failedAttempts.gpuPower++;
       // Only show hint after multiple failed attempts
       const shouldShowHint = failedAttempts.gpuPower >= FAILED_ATTEMPTS_THRESHOLD;
-      const displayText = shouldShowHint ? "Requires root privileges" : "0 W";
+      const displayText = shouldShowHint ? "--:--" : "0 W";
       if (gpuPowerEl.textContent !== displayText) {
         scheduleDOMUpdate(() => {
           gpuPowerEl.textContent = displayText;
@@ -624,18 +654,33 @@ async function refresh() {
       }
     } else {
       failedAttempts.gpuPower = 0;
-      // CRITICAL: Cache last known good value to prevent flickering when value temporarily becomes 0
-      let gpuPowerValue = previousValues.gpuPower || 0; // Keep current value if no new valid data
+      // CRITICAL: Preserve last known good value to prevent flickering
+      // Strategy: Only update if backend value > 0, otherwise preserve what we have
       
-      // Only update if we have a valid non-zero value
+      // Initialize from DOM on first call if previousValues is 0 (handles page reload)
+      if (previousValues.gpuPower === 0 && gpuPowerEl && gpuPowerEl.textContent) {
+        const currentText = gpuPowerEl.textContent.trim();
+        const match = currentText.match(/(\d+(?:\.\d+)?)\s*W/);
+        if (match) {
+          const domValue = parseFloat(match[1]);
+          if (domValue > 0) {
+            previousValues.gpuPower = domValue;
+          }
+        }
+      }
+      
+      // Use cached value as default
+      let gpuPowerValue = previousValues.gpuPower || 0;
+      
+      // Only update if backend has a valid value > 0
       if (data.gpu_power && data.gpu_power > 0) {
         gpuPowerValue = data.gpu_power;
-        previousValues.gpuPower = data.gpu_power; // Update cache
+        previousValues.gpuPower = data.gpu_power;
       }
-      // If value is 0, keep the last known good value (don't update)
+      // If backend value is 0 or undefined, keep using previousValues (don't reset to 0)
       
       const formatted = `${Math.round(gpuPowerValue)} W`;
-      // Only update if value actually changed to prevent unnecessary DOM updates
+      // Only update DOM if value actually changed
       if (gpuPowerEl.textContent !== formatted) {
         scheduleDOMUpdate(() => {
           gpuPowerEl.textContent = formatted;
@@ -1226,13 +1271,7 @@ function updateBatteryPower(cpuDetails) {
     return; // Element might not exist in all themes
   }
 
-  console.log('[Battery] Updating battery/power:', {
-    has_battery: cpuDetails.has_battery,
-    battery_level: cpuDetails.battery_level,
-    is_charging: cpuDetails.is_charging,
-    cpu_power: cpuDetails.cpu_power,
-    gpu_power: cpuDetails.gpu_power
-  });
+  // Battery/power logging removed to reduce console noise
 
   if (cpuDetails.has_battery) {
     const level = cpuDetails.battery_level || 0;
@@ -3035,6 +3074,46 @@ function initIconLine() {
   }
 }
 
+// Check if history data is available and show/hide dropdown accordingly
+async function checkHistoryAvailability() {
+  try {
+    // Check if we have >24h of data available to show the dropdown
+    const result = await window.__TAURI__.invoke('get_metrics_history', {
+      time_range_seconds: 86400, // 24 hours
+      max_display_points: null
+    });
+
+    if (result && result.oldest_available_timestamp) {
+      const now = Math.floor(Date.now() / 1000);
+      const availableSeconds = now - result.oldest_available_timestamp;
+      const hasMore24h = availableSeconds > 86400;
+
+      const historyControls = document.getElementById('history-controls');
+      if (historyControls) {
+        // Show dropdown if we have >24h of data
+        historyControls.style.display = hasMore24h ? 'flex' : 'none';
+      }
+    }
+  } catch (error) {
+    // History not yet available (normal on startup) - silent
+  }
+}
+
+// Initialize history controls
+function initHistoryControls() {
+  const timeRangeSelect = document.getElementById('time-range-select');
+  if (timeRangeSelect) {
+    timeRangeSelect.addEventListener('change', (e) => {
+      const timeRange = e.target.value;
+      // Time range selection removed - charts now use real-time updates only
+    });
+  }
+
+  // Check history availability periodically
+  checkHistoryAvailability();
+  setInterval(checkHistoryAvailability, 60000); // Check every minute
+}
+
 // Initialize monitoring features when DOM is ready
 function initMonitoringFeatures() {
   // Use setTimeout to ensure DOM is fully ready
@@ -3043,6 +3122,7 @@ function initMonitoringFeatures() {
     initCollapsibleSections();
     initMonitorsSection();
     initOllamaSection();
+    initHistoryControls();
     // Auto-configure Ollama with default endpoint (if module is available)
     if (window.Ollama) {
       autoConfigureOllama();
