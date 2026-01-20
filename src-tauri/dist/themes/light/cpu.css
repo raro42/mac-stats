@@ -213,6 +213,27 @@ body {
   pointer-events: none;
 }
 
+/* Usage card clickable */
+#cpu-usage-card {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+#cpu-usage-card:hover {
+  opacity: 0.9;
+}
+
+/* Collapsible header styling */
+.collapsible-header {
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s;
+}
+
+.collapsible-header:hover {
+  opacity: 0.7;
+}
+
 .metric-label {
   position: relative;
   z-index: 2;
@@ -882,6 +903,7 @@ body {
   background: rgba(0, 122, 255, 1);
 }
 /* Battery/Power Strip - Theme-agnostic */
+/* Battery & Power Status Strip */
 .battery-power-strip {
   display: flex;
   justify-content: space-between;
@@ -911,7 +933,7 @@ body {
 }
 
 .battery-icon.charging {
-  color: rgba(52, 199, 89, 0.8);
+  color: rgba(52, 199, 89, 0.8); /* Slightly green when charging */
 }
 
 .battery-icon.no-battery {
@@ -986,6 +1008,9 @@ body {
   height: 100%;
   display: block;
   object-fit: contain;
+  /* Default: Make Ollama icon visible with neutral gray filter */
+  filter: brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(100%);
+  opacity: 0.7;
 }
 
 .icon-line-item.status-good {
@@ -999,10 +1024,12 @@ body {
 
 .icon-line-item.status-good img {
   filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(1234%) hue-rotate(87deg) brightness(95%) contrast(85%);
+  opacity: 1; /* Override default opacity when connected */
 }
 
 .icon-line-item.status-good:hover img {
   filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(1234%) hue-rotate(87deg) brightness(100%) contrast(90%);
+  opacity: 1;
 }
 
 .icon-line-item.status-warning {

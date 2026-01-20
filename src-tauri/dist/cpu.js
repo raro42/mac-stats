@@ -2894,22 +2894,38 @@ function replaceThinkingWithResponse(thinkingId, content, durationMs) {
 }
 
 // Initialize collapsible sections (Details and Top Processes)
+// Universal implementation that works across all themes using IDs
 function initCollapsibleSections() {
   // Get collapsed state from localStorage (default to true - hidden)
   const sectionsCollapsed = localStorage.getItem('details_processes_collapsed') !== 'false';
   
-  const detailsSection = document.querySelector('.apple-details');
-  const processesSection = document.querySelector('.apple-processes');
+  // Use IDs for universal theme support (fallback to class selectors for backward compatibility)
+  const detailsSection = document.getElementById('details-section') || 
+                         document.querySelector('.apple-details, .arch-details, .swiss-details, .mat-details, .cpu-details, .details-section');
+  const processesSection = document.getElementById('processes-section') || 
+                           document.querySelector('.apple-processes, .arch-processes, .swiss-processes, .mat-processes, .cpu-processes, .processes-section');
   const detailsDivider = detailsSection?.previousElementSibling;
   const processesDivider = processesSection?.previousElementSibling;
   const detailsHeader = document.getElementById('details-header');
   const processesHeader = document.getElementById('processes-header');
   const usageCard = document.getElementById('cpu-usage-card');
   
+  // Helper to check if element is a divider (works across themes)
+  function isDivider(el) {
+    if (!el) return false;
+    return el.classList.contains('apple-divider') || 
+           el.classList.contains('arch-rule') || 
+           el.classList.contains('panel-divider') ||
+           el.classList.contains('swiss-rule') ||
+           el.classList.contains('mat-divider') ||
+           el.classList.contains('theme-divider') ||
+           el.getAttribute('aria-hidden') === 'true';
+  }
+  
   // Hide Details section
   function hideDetails() {
     if (detailsSection) detailsSection.style.display = 'none';
-    if (detailsDivider && detailsDivider.classList.contains('apple-divider')) {
+    if (detailsDivider && isDivider(detailsDivider)) {
       detailsDivider.style.display = 'none';
     }
   }
@@ -2917,7 +2933,7 @@ function initCollapsibleSections() {
   // Show Details section
   function showDetails() {
     if (detailsSection) detailsSection.style.display = '';
-    if (detailsDivider && detailsDivider.classList.contains('apple-divider')) {
+    if (detailsDivider && isDivider(detailsDivider)) {
       detailsDivider.style.display = '';
     }
   }
@@ -2925,7 +2941,7 @@ function initCollapsibleSections() {
   // Hide Processes section
   function hideProcesses() {
     if (processesSection) processesSection.style.display = 'none';
-    if (processesDivider && processesDivider.classList.contains('apple-divider')) {
+    if (processesDivider && isDivider(processesDivider)) {
       processesDivider.style.display = 'none';
     }
   }
@@ -2933,7 +2949,7 @@ function initCollapsibleSections() {
   // Show Processes section
   function showProcesses() {
     if (processesSection) processesSection.style.display = '';
-    if (processesDivider && processesDivider.classList.contains('apple-divider')) {
+    if (processesDivider && isDivider(processesDivider)) {
       processesDivider.style.display = '';
     }
   }
