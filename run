@@ -22,5 +22,5 @@ if [[ "${1:-release}" == "dev" ]]; then
   cargo run
 else
   cargo build --release
-  exec ./target/release/mac_stats
+  exec ./target/release/mac_stats -vvv
 fi

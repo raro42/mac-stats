@@ -145,11 +145,12 @@ fn run_internal(open_cpu_window: bool) {
         .invoke_handler(tauri::generate_handler![
             get_cpu_details,
             get_metrics,
-            get_app_version, 
-            get_window_decorations, 
-            set_window_decorations, 
-            get_process_details, 
-            force_quit_process, 
+            metrics::get_metrics_history,
+            get_app_version,
+            get_window_decorations,
+            set_window_decorations,
+            get_process_details,
+            force_quit_process,
             get_changelog,
             // Security commands
             commands::security::store_credential,
@@ -288,11 +289,19 @@ fn run_internal(open_cpu_window: bool) {
             std::thread::spawn(move || {
                 // Wait longer before first update to let background initialization complete
                 std::thread::sleep(std::time::Duration::from_millis(1500));
-                
+
+                // Initialize history buffer (adaptive tiered storage with automatic downsampling)
+                if let Ok(mut history) = METRICS_HISTORY.try_lock() {
+                    *history = Some(metrics::history::HistoryBuffer::new());
+                    debug1!("Metrics history buffer initialized (capacity: 26 KB)");
+                } else {
+                    debug1!("Warning: Could not initialize metrics history buffer - lock contention at startup");
+                }
+
                 // CRITICAL: Keep SMC connection alive in background thread (reuse for efficiency)
                 // SMC connection is not Sync, so we keep it thread-local
                 let mut smc_connection: Option<Smc> = None;
-                
+
                 loop {
                     // Menu bar updates every 1-2 seconds (like Stats app) for responsive UI
                     // Fast metrics (CPU, RAM) are cached, so this is cheap
@@ -311,14 +320,33 @@ fn run_internal(open_cpu_window: bool) {
                     }
                     
                     let text = build_status_text(&metrics);
-                    
+
                     // Store update in static variable
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {
                         *pending = Some(text);
-                        debug3!("Menu bar update stored: CPU={}%, GPU={}%, RAM={}%, DISK={}%", 
+                        debug3!("Menu bar update stored: CPU={}%, GPU={}%, RAM={}%, DISK={}%",
                             metrics.cpu, metrics.gpu, metrics.ram, metrics.disk);
                     }
-                    
+
+                    // Add to history buffer (always collect basic metrics when available)
+                    // We'll enhance with temperature/frequency when CPU window is visible
+                    let history_point = metrics::history::MetricPoint::from_metrics(
+                        metrics.cpu,
+                        metrics.gpu,
+                        metrics.ram,
+                        metrics.disk,
+                        0.0,  // temperature (will be updated below if CPU window visible)
+                        0.0,  // frequency (will be updated below if CPU window visible)
+                        0.0,  // p_core_frequency
+                        0.0,  // e_core_frequency
+                        0.0,  // cpu_power
+                        0.0,  // gpu_power
+                        -1.0, // battery_level
+                    );
+
+                    // Store for later enhancement with CPU details
+                    let mut final_history_point = history_point;
+
                     // CRITICAL: Only read temperature when CPU window is visible (saves CPU)
                     // Check window visibility before expensive SMC operations
                     let should_read_temp = APP_HANDLE.get()
@@ -1089,14 +1117,12 @@ fn run_internal(open_cpu_window: bool) {
                         
                         // Read power consumption from IOReport
                         // Power reading is expensive (IOReport), so we read it every 5 seconds
-                        let should_read_power = if let Ok(mut last) = LAST_POWER_READ_TIME.lock() {
-                            let should = last.as_ref()
+                        // CRITICAL: Update LAST_POWER_READ_TIME AFTER we successfully read and store the sample
+                        // This ensures we always have a last_sample for delta calculation
+                        let should_read_power = if let Ok(last) = LAST_POWER_READ_TIME.lock() {
+                            last.as_ref()
                                 .map(|t| t.elapsed().as_secs() >= 5)
-                                .unwrap_or(true);
-                            if should {
-                                *last = Some(std::time::Instant::now());
-                            }
-                            should
+                                .unwrap_or(true)
                         } else {
                             false
                         };
@@ -1154,6 +1180,8 @@ fn run_internal(open_cpu_window: bool) {
                                             debug1!("read_power_from_ioreport returned: CPU={:.2}W, GPU={:.2}W", result.cpu_power, result.gpu_power);
                                             
                                             // Store current sample for next delta calculation
+                                            // CRITICAL: Always store the sample, even if time_delta was 0
+                                            // This ensures we have a sample for the next read
                                             if let Some(current_sample) = current_sample_opt {
                                                 let retained_sample = CFRetain(current_sample as CFTypeRef) as CFDictionaryRef;
                                                 if let Ok(mut last_sample_storage) = LAST_IOREPORT_POWER_SAMPLE.try_lock() {
@@ -1168,6 +1196,12 @@ fn run_internal(open_cpu_window: bool) {
                                                     CFRelease(retained_sample as CFTypeRef);
                                                 }
                                                 CFRelease(current_sample as CFTypeRef);
+                                                
+                                                // Update LAST_POWER_READ_TIME AFTER storing the sample
+                                                // This ensures next read will have a valid last_sample and last_read_time
+                                                if let Ok(mut last_read_time) = LAST_POWER_READ_TIME.lock() {
+                                                    *last_read_time = Some(std::time::Instant::now());
+                                                }
                                             }
                                             
                                             Some(result)
@@ -1185,10 +1219,42 @@ fn run_internal(open_cpu_window: bool) {
                             };
                             
                             if let Some(power_data) = power_result {
-                                // Update cache
-                                if let Ok(mut cache) = POWER_CACHE.try_lock() {
-                                    *cache = Some((power_data.cpu_power, power_data.gpu_power, std::time::Instant::now()));
-                                    debug1!("Power cache updated: CPU={:.2}W, GPU={:.2}W", power_data.cpu_power, power_data.gpu_power);
+                                // Update cache - CRITICAL: Only update if we have at least one valid value > 0.0
+                                // This prevents setting cache to (0.0, 0.0) on first read when time_delta=0
+                                if power_data.cpu_power > 0.0 || power_data.gpu_power > 0.0 {
+                                    if let Ok(mut cache) = POWER_CACHE.try_lock() {
+                                        let (prev_cpu, prev_gpu, _) = cache.as_ref()
+                                            .map(|(c, g, t)| (*c, *g, *t))
+                                            .unwrap_or((0.0, 0.0, std::time::Instant::now()));
+
+                                        // Only update values that are > 0.0
+                                        // If a value is 0.0, keep the previous value to prevent flickering
+                                        let new_cpu = if power_data.cpu_power > 0.0 {
+                                            power_data.cpu_power
+                                        } else {
+                                            prev_cpu  // Keep previous value if new is 0.0
+                                        };
+
+                                        let new_gpu = if power_data.gpu_power > 0.0 {
+                                            power_data.gpu_power
+                                        } else {
+                                            prev_gpu  // Keep previous value if new is 0.0
+                                        };
+
+                                        *cache = Some((new_cpu, new_gpu, std::time::Instant::now()));
+
+                                        // CRITICAL: Also update LAST_SUCCESSFUL_POWER for fallback when lock fails
+                                        if let Ok(mut last_successful) = crate::state::LAST_SUCCESSFUL_POWER.try_lock() {
+                                            *last_successful = Some((new_cpu, new_gpu));
+                                        }
+
+                                        debug1!("Power cache updated: CPU={:.2}W, GPU={:.2}W (prev: CPU={:.2}W, GPU={:.2}W, new_cpu={:.2}W, new_gpu={:.2}W)",
+                                            new_cpu, new_gpu, prev_cpu, prev_gpu, power_data.cpu_power, power_data.gpu_power);
+                                    }
+                                } else {
+                                    // Both values are 0.0 - don't update cache to prevent overwriting good values
+                                    // This happens on first read when time_delta=0
+                                    debug2!("Power read returned 0.0W for both (time_delta likely 0) - not updating cache to preserve previous values");
                                 }
                             } else {
                                 debug1!("Power reading returned None - subscription may not be available");
@@ -1270,13 +1336,63 @@ fn run_internal(open_cpu_window: bool) {
                             }
                         }
                     }
-                    
+
+                    // Populate metrics history buffer with current data
+                    // Update final_history_point with CPU details if available from caches
+                    if let Ok(cache) = TEMP_CACHE.try_lock() {
+                        if let Some((temp, _)) = cache.as_ref() {
+                            final_history_point.temperature = *temp;
+                        }
+                    }
+                    if let Ok(cache) = FREQ_CACHE.try_lock() {
+                        if let Some((freq, _)) = cache.as_ref() {
+                            final_history_point.frequency = *freq;
+                        }
+                    }
+                    if let Ok(cache) = P_CORE_FREQ_CACHE.try_lock() {
+                        if let Some((p_freq, _)) = cache.as_ref() {
+                            final_history_point.p_core_frequency = *p_freq;
+                        }
+                    }
+                    if let Ok(cache) = E_CORE_FREQ_CACHE.try_lock() {
+                        if let Some((e_freq, _)) = cache.as_ref() {
+                            final_history_point.e_core_frequency = *e_freq;
+                        }
+                    }
+                    if let Ok(cache) = POWER_CACHE.try_lock() {
+                        if let Some((cpu_power, gpu_power, _)) = cache.as_ref() {
+                            final_history_point.cpu_power = *cpu_power;
+                            final_history_point.gpu_power = *gpu_power;
+                        }
+                    }
+                    if let Ok(cache) = BATTERY_CACHE.try_lock() {
+                        if let Some((battery_level, _, _)) = cache.as_ref() {
+                            final_history_point.battery_level = *battery_level;
+                        }
+                    }
+
+                    // Push to history buffer
+                    if let Ok(mut history_opt) = METRICS_HISTORY.try_lock() {
+                        if let Some(history) = history_opt.as_mut() {
+                            history.push(final_history_point.clone());
+                            debug3!("Added history point: CPU={}%, GPU={}%, RAM={}%, DISK={}%, Temp={}°C, Freq={}GHz",
+                                final_history_point.cpu,
+                                final_history_point.gpu,
+                                final_history_point.ram,
+                                final_history_point.disk,
+                                final_history_point.temperature,
+                                final_history_point.frequency);
+                        }
+                    } else {
+                        debug3!("Could not lock history buffer for update (lock contention)");
+                    }
+
                     // NOTE: Automatic menu bar updates are not implemented because:
                     // - run_on_main_thread callbacks don't execute (Tauri limitation)
-                    // - performSelector doesn't fire reliably  
+                    // - performSelector doesn't fire reliably
                     // Menu bar will update when user clicks on it (click handler works)
                     // Updates are stored in MENU_BAR_TEXT and processed on click
-                    
+
                     // Update menu bar every 2 seconds to reduce CPU usage
                     std::thread::sleep(std::time::Duration::from_secs(2));
                 }

@@ -1,13 +1,16 @@
 //! System metrics collection module
-//! 
+//!
 //! This module provides functions to collect and cache system metrics:
 //! - CPU, RAM, Disk, GPU usage
 //! - Temperature readings (via SMC)
 //! - CPU frequency (via IOReport)
 //! - Power consumption (CPU/GPU)
 //! - Process information
-//! 
+//! - Metrics history with adaptive downsampling
+//!
 //! All metrics are cached to reduce system load and improve performance.
+
+pub mod history;
 
 use std::process::Command;
 use sysinfo::{Disks, System};
@@ -645,20 +648,43 @@ pub fn can_read_frequency() -> bool {
 #[allow(dead_code)]
 pub fn can_read_cpu_power() -> bool {
     // OPTIMIZATION Phase 3: Use OnceLock for faster access (no locking required)
-    *CAN_READ_CPU_POWER.get_or_init(|| {
-        // IOReport is too expensive - check once and cache
-        // For now, assume false unless we can verify cheaply
-        false // IOReport too expensive to check every time
-    })
+    // First check if it's been explicitly set
+    if let Some(can_read) = CAN_READ_CPU_POWER.get() {
+        return *can_read;
+    }
+    
+    // If not set yet, check if we have power cache or actual power values
+    // This handles the case where power reading works but the flag hasn't been set yet
+    if let Ok(cache) = crate::state::POWER_CACHE.try_lock() {
+        if cache.is_some() {
+            // We have a power cache, so we can read power
+            return true;
+        }
+    }
+    
+    // Default to false if nothing indicates we can read power
+    false
 }
 
 #[allow(dead_code)]
 pub fn can_read_gpu_power() -> bool {
     // OPTIMIZATION Phase 3: Use OnceLock for faster access (no locking required)
-    *CAN_READ_GPU_POWER.get_or_init(|| {
-        // IOReport is too expensive - check once and cache
-        false // IOReport too expensive to check every time
-    })
+    // First check if it's been explicitly set
+    if let Some(can_read) = CAN_READ_GPU_POWER.get() {
+        return *can_read;
+    }
+    
+    // If not set yet, check if we have power cache or actual power values
+    // This handles the case where power reading works but the flag hasn't been set yet
+    if let Ok(cache) = crate::state::POWER_CACHE.try_lock() {
+        if cache.is_some() {
+            // We have a power cache, so we can read power
+            return true;
+        }
+    }
+    
+    // Default to false if nothing indicates we can read power
+    false
 }
 
 /// Get battery level and charging state (cached)
@@ -792,6 +818,12 @@ pub fn get_power_consumption() -> (f32, f32) {
             if timestamp.elapsed().as_secs() < 6 {
                 debug3!("Power consumption from cache: CPU={:.2}W, GPU={:.2}W", cpu_power, gpu_power);
                 return (*cpu_power, *gpu_power);
+            } else {
+                // Cache is stale, but return last known values instead of 0.0 to prevent flickering
+                // Background thread will update it soon
+                debug3!("Power consumption from stale cache: CPU={:.2}W, GPU={:.2}W (age: {}s)", 
+                    cpu_power, gpu_power, timestamp.elapsed().as_secs());
+                return (*cpu_power, *gpu_power);
             }
         } else {
             // No cache - if window is closed, return 0.0 to save CPU
@@ -804,7 +836,35 @@ pub fn get_power_consumption() -> (f32, f32) {
     
     // Power reading is handled by background thread when window is visible
     // This function just returns cached values
-    // If cache is stale and window is visible, background thread will update it soon
+    // If no cache exists yet, return last successful reading or 0.0
+    // CRITICAL: Never return 0.0 if we have a cache - always return cached values
+    // This prevents flickering when cache exists but is being queried before update
+    if let Ok(cache) = crate::state::POWER_CACHE.try_lock() {
+        if let Some((cpu_power, gpu_power, _)) = cache.as_ref() {
+            // We have a cache - return it even if it seems stale
+            // This prevents flickering to 0.0
+            // Also update the last successful reading so we have a fallback if lock fails later
+            if let Ok(mut last_successful) = crate::state::LAST_SUCCESSFUL_POWER.try_lock() {
+                *last_successful = Some((*cpu_power, *gpu_power));
+            }
+            debug3!("Power consumption: returning cached values (no fresh update yet): CPU={:.2}W, GPU={:.2}W",
+                cpu_power, gpu_power);
+            return (*cpu_power, *gpu_power);
+        }
+    } else {
+        // CRITICAL: try_lock() failed (background thread has the lock)
+        // Return last successful reading instead of 0.0 to prevent flickering
+        if let Ok(last_successful) = crate::state::LAST_SUCCESSFUL_POWER.try_lock() {
+            if let Some((cpu_power, gpu_power)) = last_successful.as_ref() {
+                debug3!("Power consumption: returning last successful values (lock failed): CPU={:.2}W, GPU={:.2}W",
+                    cpu_power, gpu_power);
+                return (*cpu_power, *gpu_power);
+            }
+        }
+    }
+
+    // No cache and no previous successful reading - return 0.0 (initial state)
+    debug3!("Power consumption: no cache and no previous reading, returning 0.0W");
     (0.0, 0.0)
 }
 
@@ -1189,10 +1249,22 @@ pub fn get_cpu_details() -> CpuDetails {
             .and_then(|c| c.as_ref().map(|(level, charging, _)| (*level, *charging, *level >= 0.0)))
             .unwrap_or((-1.0, false, false));
         
-        let (cpu_power, gpu_power) = crate::state::POWER_CACHE.try_lock()
+        // Use get_power_consumption() for consistent cache handling
+        // This ensures we always return cached values (even if stale) instead of 0.0
+        let (cpu_power, gpu_power) = get_power_consumption();
+        
+        // Check if we actually have power values (even if 0, if we have a cache entry, we can read power)
+        // This is more reliable than checking the flags, which might not be set yet
+        let has_power_cache = crate::state::POWER_CACHE.try_lock()
             .ok()
-            .and_then(|c| c.as_ref().map(|(cpu, gpu, _)| (*cpu, *gpu)))
-            .unwrap_or((0.0, 0.0));
+            .map(|c| c.is_some())
+            .unwrap_or(false);
+        
+        // If we have power cache, we can read power (even if values are currently 0)
+        // This prevents showing "Requires root privileges" when we're just waiting for the first read
+        // OR if we have actual power values > 0, we definitely can read power
+        let can_read_cpu_power = has_power_cache || cpu_power > 0.0 || crate::metrics::can_read_cpu_power();
+        let can_read_gpu_power = has_power_cache || gpu_power > 0.0 || crate::metrics::can_read_gpu_power();
         
         return CpuDetails {
             usage,
@@ -1210,8 +1282,8 @@ pub fn get_cpu_details() -> CpuDetails {
             chip_info: crate::metrics::get_chip_info(),
             can_read_temperature: crate::metrics::can_read_temperature(),
             can_read_frequency: crate::metrics::can_read_frequency(),
-            can_read_cpu_power: false,
-            can_read_gpu_power: false,
+            can_read_cpu_power,
+            can_read_gpu_power,
             battery_level,
             is_charging,
             has_battery,
@@ -1673,13 +1745,13 @@ fn get_username_from_uid(uid: u32) -> Option<String> {
 #[tauri::command]
 pub fn force_quit_process(pid: u32) -> Result<(), String> {
     debug2!("force_quit_process() called for PID: {}", pid);
-    
+
     // Use kill -9 to force quit the process
     let output = Command::new("kill")
         .arg("-9")
         .arg(pid.to_string())
         .output();
-    
+
     match output {
         Ok(result) => {
             if result.status.success() {
@@ -1694,6 +1766,59 @@ pub fn force_quit_process(pid: u32) -> Result<(), String> {
         Err(e) => {
             debug1!("Error executing kill command for PID {}: {}", pid, e);
             Err(format!("Failed to execute kill command: {}", e))
+        }
+    }
+}
+
+/// Get metrics history for a given time range
+///
+/// # Arguments
+/// * `time_range_seconds` - Time range to query: 300 (5m), 3600 (1h), 21600 (6h), 604800 (7d)
+/// * `max_display_points` - Optional max points for display width optimization
+///
+/// # Returns
+/// History query result with points and metadata
+#[tauri::command]
+pub fn get_metrics_history(
+    time_range_seconds: u64,
+    max_display_points: Option<usize>,
+) -> Result<history::HistoryQueryResult, String> {
+    debug2!("get_metrics_history() called with time_range_seconds={}, max_display_points={:?}",
+        time_range_seconds, max_display_points);
+
+    // Try to get history buffer with non-blocking lock
+    match METRICS_HISTORY.try_lock() {
+        Ok(history_opt) => {
+            if let Some(history) = history_opt.as_ref() {
+                let points = history.query(time_range_seconds, max_display_points);
+                let oldest = history.oldest_timestamp();
+                let now = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_secs() as i64)
+                    .unwrap_or(0);
+
+                debug1!("get_metrics_history: returning {} points, oldest_ts={:?}, newest_ts={}",
+                    points.len(), oldest, now);
+
+                Ok(history::HistoryQueryResult {
+                    points,
+                    time_range_seconds,
+                    oldest_available_timestamp: oldest,
+                    newest_available_timestamp: Some(now),
+                })
+            } else {
+                debug2!("get_metrics_history: history buffer not initialized yet");
+                Ok(history::HistoryQueryResult {
+                    points: Vec::new(),
+                    time_range_seconds,
+                    oldest_available_timestamp: None,
+                    newest_available_timestamp: None,
+                })
+            }
+        },
+        Err(e) => {
+            debug1!("get_metrics_history: lock contention - {}", e);
+            Err("History buffer temporarily unavailable".to_string())
         }
     }
 }
