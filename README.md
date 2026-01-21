@@ -56,9 +56,15 @@ This project was developed through "vibe coding" - building features iteratively
 
 Download the latest release DMG from [GitHub Releases](https://github.com/raro42/mac-stats/releases/latest).
 
-**Important:** If macOS says the DMG is "damaged" or "can't be opened", this is macOS Gatekeeper blocking unsigned applications. This is normal for open-source apps that aren't code-signed. Here's how to fix it:
+> **💡 TIP: "DMG is damaged" message?**  
+> **This is NOT a real problem!** macOS Gatekeeper is blocking the unsigned app (normal for open-source apps).  
+> **The DMG is perfectly fine** — you just need to tell macOS it's safe to open. See solutions below ⬇️
 
-**Option 1: Right-click method (Easiest)**
+**If macOS says the DMG is "damaged" or "can't be opened":**
+
+This is macOS Gatekeeper blocking unsigned applications. This is completely normal for open-source apps that aren't code-signed. **The DMG is not actually damaged** — macOS is just being cautious. Here's how to fix it:
+
+**Option 1: Right-click method (Easiest) ⭐ Recommended**
 1. **Right-click** (or Control+click) the downloaded DMG file
 2. Select **"Open"** from the context menu
 3. Click **"Open"** in the security dialog that appears
