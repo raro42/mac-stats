@@ -33,7 +33,8 @@ let previousValues = {
   gpuPower: 0,
   load1: 0,
   load5: 0,
-  load15: 0
+  load15: 0,
+  totalPower: 0  // CRITICAL: Cache total power to prevent flickering in updateBatteryPower()
 };
 
 // STEP 7: Batch DOM updates to reduce WebKit rendering
@@ -596,10 +597,13 @@ async function refresh() {
     // Update power consumption (with caching to prevent flickering)
     const cpuPowerEl = document.getElementById("cpu-power");
     if (!data.can_read_cpu_power) {
+      console.log("[CPU Power] Cannot read CPU power");
+      console.log("[CPU Power] Failed attempts: ", failedAttempts.cpuPower);
+      console.log("[CPU Power] Should show hint: ", cpuPowerEl);
       failedAttempts.cpuPower++;
       // Only show hint after multiple failed attempts
       const shouldShowHint = failedAttempts.cpuPower >= FAILED_ATTEMPTS_THRESHOLD;
-      const displayText = shouldShowHint ? "--:--" : "0 W";
+      const displayText = shouldShowHint ? "--:--" : previousValues.cpuPower;
       if (cpuPowerEl.textContent !== displayText) {
         scheduleDOMUpdate(() => {
           cpuPowerEl.textContent = displayText;
@@ -629,12 +633,16 @@ async function refresh() {
       if (data.cpu_power && data.cpu_power > 0) {
         cpuPowerValue = data.cpu_power;
         previousValues.cpuPower = data.cpu_power;
+        console.log("[CPU Power] Updated to: ", data.cpu_power, "from: ", previousValues.cpuPower);
       }
       // If backend value is 0 or undefined, keep using previousValues (don't reset to 0)
       
-      const formatted = `${Math.round(cpuPowerValue)} W`;
+      // CRITICAL: Show 1 decimal place to prevent flickering when values are < 1W
+      // Math.round() would show 0.3W as "0 W", causing flicker between 0 and actual values
+      const formatted = `${cpuPowerValue.toFixed(1)} W`;
       // Only update DOM if value actually changed
       if (cpuPowerEl.textContent !== formatted) {
+        console.log("[CPU Power] Updating DOM to: ", formatted);
         scheduleDOMUpdate(() => {
           cpuPowerEl.textContent = formatted;
         });
@@ -679,7 +687,9 @@ async function refresh() {
       }
       // If backend value is 0 or undefined, keep using previousValues (don't reset to 0)
       
-      const formatted = `${Math.round(gpuPowerValue)} W`;
+      // CRITICAL: Show 1 decimal place to prevent flickering when values are < 1W
+      // Math.round() would show 0.3W as "0 W", causing flicker between 0 and actual values
+      const formatted = `${gpuPowerValue.toFixed(1)} W`;
       // Only update DOM if value actually changed
       if (gpuPowerEl.textContent !== formatted) {
         scheduleDOMUpdate(() => {
@@ -1300,7 +1310,16 @@ function updateBatteryPower(cpuDetails) {
       }
     }
     
-    const totalPower = (cpuDetails.cpu_power || 0) + (cpuDetails.gpu_power || 0);
+    // CRITICAL: Use cached total power to prevent flickering
+    // Only update if backend has valid values > 0, otherwise preserve cached value
+    let totalPower = previousValues.totalPower || 0;
+    const backendTotal = (cpuDetails.cpu_power || 0) + (cpuDetails.gpu_power || 0);
+    if (backendTotal > 0) {
+      totalPower = backendTotal;
+      previousValues.totalPower = backendTotal;
+    }
+    // If backend values are 0 or undefined, keep using previousValues (don't reset to 0)
+
     if (powerValue) {
       if (totalPower > 0) {
         powerValue.textContent = `${totalPower.toFixed(1)} W`;
@@ -1323,7 +1342,16 @@ function updateBatteryPower(cpuDetails) {
       batteryIcon.classList.add('no-battery');
       batteryIcon.setAttribute('title', 'No battery');
     }
-    const totalPower = (cpuDetails.cpu_power || 0) + (cpuDetails.gpu_power || 0);
+    // CRITICAL: Use cached total power to prevent flickering
+    // Only update if backend has valid values > 0, otherwise preserve cached value
+    let totalPower = previousValues.totalPower || 0;
+    const backendTotal = (cpuDetails.cpu_power || 0) + (cpuDetails.gpu_power || 0);
+    if (backendTotal > 0) {
+      totalPower = backendTotal;
+      previousValues.totalPower = backendTotal;
+    }
+    // If backend values are 0 or undefined, keep using previousValues (don't reset to 0)
+
     if (powerValue) {
       if (totalPower > 0) {
         powerValue.textContent = `${totalPower.toFixed(1)} W`;
@@ -2173,7 +2201,21 @@ let ollamaCollapsed = true;
 // The actual prompt is used by ollama.js via window.Ollama.getSystemPrompt()
 // ============================================================================
 
-const DEFAULT_SYSTEM_PROMPT = 'You are a helpful assistant that answers questions about system metrics and monitoring.';
+const DEFAULT_SYSTEM_PROMPT = 'You are a helpful assistant that answers questions, a general purpose AI, you are extremly well about system metrics and monitoring.\n\
+### Super Powers\n\
+You have super powers: you can execute javascript code to get real-time information.\n\
+In case your ansswer would container a [variable-name], you must answer using ROLE=code-assistant.\n\
+In case your need realtime information, you must answer using ROLE=code-assistant.\n\
+In case you find it usefull to execute code, e.g. someone asks you for todays date or what ever that can be answered with javascript, you can answer using ROLE=code-assistant\n --oneliner of pure javascript code without anyformatting or comments.\n\
+Your code-request, will be execute somewhere else and the result will be returned to you, to use it in your answer.\n\
+Important: only oneliner, no comments, no formatting, no nothing.\n\
+Do not add any other words around it. \n\
+Do not insert formatting. Only return the code to be executed.\n\
+This is needed for the next AI to understand and execute the same.\n\
+When answering, use the ROLE=code-assistant to signle the execution of the code in the response.\n\
+\n\
+Keep it simple and concise.\n\
+';
 
 function getSystemPrompt() {
   const saved = localStorage.getItem('ollama_system_prompt');

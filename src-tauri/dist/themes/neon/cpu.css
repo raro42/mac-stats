@@ -368,7 +368,6 @@ body::before {
   grid-template-columns: repeat(3, 1fr);
   gap: 0;
   margin-top: -40px;
-  margin-bottom: 8px;
   padding: 0;
   position: relative;
   z-index: 1;
@@ -378,17 +377,24 @@ body::before {
 .history-chart-container {
   position: relative;
   height: 40px;
-  border: 1px solid rgba(120, 255, 160, 0.18);
   border-top: none;
   border-radius: 0 0 12px 12px;
   overflow: hidden;
-  background: rgba(8, 18, 12, 0.30);
+  background: rgba(8, 18, 12, 0.20);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 rgba(120, 255, 160, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.30),
+    0 2px 8px rgba(0, 0, 0, 0.20);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
 }
 
 .history-chart {
   width: 100%;
   height: 100%;
   display: block;
+  background: transparent;
 }
 
 .detail-label {
@@ -866,7 +872,7 @@ body::before {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  margin: 16px 0 8px 0;
+  margin: 0;
   background: rgba(255, 255, 255, 0.4);
   border: 1px solid var(--hairline);
   border-radius: 12px;
@@ -2025,7 +2031,6 @@ body::before {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
-  margin-bottom: 16px;
   padding: 8px 0;
   flex-shrink: 0; /* Don't shrink history section */
 }
@@ -2033,16 +2038,23 @@ body::before {
 .history-chart-container {
   position: relative;
   height: 40px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.20);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.20),
+    0 2px 8px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
 }
 
 .history-chart {
   width: 100%;
   height: 100%;
   display: block;
+  background: transparent;
 }
 
 /* History controls - time range dropdown */

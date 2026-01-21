@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-01-19
+
+### Fixed
+- **Power Consumption Flickering**: Fixed power consumption values flickering to 0.0W when background thread updates cache
+  - Added `LAST_SUCCESSFUL_POWER` fallback cache to prevent flickering when main lock is unavailable
+  - Power values now persist across lock contention scenarios
+  - Improved power cache update logic to always maintain last successful reading
+- **Power Display Precision**: Fixed power values < 1W showing as "0 W" causing visual flicker
+  - Changed from `Math.round()` to `.toFixed(1)` to show 1 decimal place (e.g., "0.3 W" instead of "0 W")
+  - Applied to both CPU and GPU power displays
+  - Total power calculation now uses cached values to prevent flickering
+- **Ollama Logging Safety**: Enhanced JavaScript execution logging with comprehensive sanitization
+  - Added `sanitizeForLogging()` function to prevent dangerous characters from breaking logs
+  - Safe logging wrapper that never throws errors, ensuring logging failures don't break execution flow
+  - Truncates long strings, removes control characters, and sanitizes quotes/backticks
+  - Prevents log injection and system breakage from malformed execution results
+
+### Changed
+- **History Chart Styling**: Improved visual design of history chart container
+  - Enhanced glass effect with backdrop blur and subtle shadows
+  - Removed border, added inset highlights for depth
+  - Better visual consistency with macOS glass aesthetic
+- **Power Capability Detection**: Improved `can_read_cpu_power()` and `can_read_gpu_power()` functions
+  - Now checks power cache existence as fallback when capability flags aren't set yet
+  - Handles edge cases where power reading works but flags haven't been initialized
+- **Development Logging**: Added verbose logging (`-vvv`) to release build script for easier debugging
+
+### Technical
+- **State Management**: Added `LAST_SUCCESSFUL_POWER` static state for power reading fallback
+- **Error Handling**: Enhanced error handling in power consumption reading with graceful fallbacks
+- **Logging Infrastructure**: Improved Ollama JavaScript execution logging with sanitization and error isolation
+
 ## [0.1.2] - 2026-01-19
 
 ### Added

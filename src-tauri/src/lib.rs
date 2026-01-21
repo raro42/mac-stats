@@ -1226,7 +1226,7 @@ fn run_internal(open_cpu_window: bool) {
                                         let (prev_cpu, prev_gpu, _) = cache.as_ref()
                                             .map(|(c, g, t)| (*c, *g, *t))
                                             .unwrap_or((0.0, 0.0, std::time::Instant::now()));
-                                        
+
                                         // Only update values that are > 0.0
                                         // If a value is 0.0, keep the previous value to prevent flickering
                                         let new_cpu = if power_data.cpu_power > 0.0 {
@@ -1234,15 +1234,21 @@ fn run_internal(open_cpu_window: bool) {
                                         } else {
                                             prev_cpu  // Keep previous value if new is 0.0
                                         };
-                                        
+
                                         let new_gpu = if power_data.gpu_power > 0.0 {
                                             power_data.gpu_power
                                         } else {
                                             prev_gpu  // Keep previous value if new is 0.0
                                         };
-                                        
+
                                         *cache = Some((new_cpu, new_gpu, std::time::Instant::now()));
-                                        debug1!("Power cache updated: CPU={:.2}W, GPU={:.2}W (prev: CPU={:.2}W, GPU={:.2}W, new_cpu={:.2}W, new_gpu={:.2}W)", 
+
+                                        // CRITICAL: Also update LAST_SUCCESSFUL_POWER for fallback when lock fails
+                                        if let Ok(mut last_successful) = crate::state::LAST_SUCCESSFUL_POWER.try_lock() {
+                                            *last_successful = Some((new_cpu, new_gpu));
+                                        }
+
+                                        debug1!("Power cache updated: CPU={:.2}W, GPU={:.2}W (prev: CPU={:.2}W, GPU={:.2}W, new_cpu={:.2}W, new_gpu={:.2}W)",
                                             new_cpu, new_gpu, prev_cpu, prev_gpu, power_data.cpu_power, power_data.gpu_power);
                                     }
                                 } else {
