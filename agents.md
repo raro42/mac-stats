@@ -169,3 +169,252 @@ mac-stats/
 ```
 
 **Rule**: All `.sh`, `.py`, and utility scripts go in `scripts/` directory, not root.
+
+---
+
+## Codebase Structure & Organization
+
+### Overview
+
+The codebase follows a clear separation between Rust backend (Tauri) and JavaScript frontend, with modular organization for maintainability.
+
+### Directory Structure
+
+```
+mac-stats/
+├── src/                          ← Frontend source (JavaScript/HTML/CSS)
+│   ├── dashboard.html            ← Main dashboard UI
+│   ├── dashboard.js              ← Dashboard logic (delegates to modules)
+│   ├── dashboard.css             ← Dashboard styles
+│   ├── ollama.js                 ← Ollama AI chat integration (unified module)
+│   ├── tauri-logger.js           ← Console logging bridge to Rust
+│   ├── main.js                   ← Main entry point
+│   ├── index.html                ← App entry HTML
+│   └── assets/                   ← Icons and images
+├── src-tauri/                    ← Rust backend (Tauri application)
+│   ├── src/
+│   │   ├── main.rs               ← Entry point, CLI argument parsing
+│   │   ├── lib.rs                ← Main app logic, Tauri setup, background threads
+│   │   ├── state.rs              ← Application state management
+│   │   │
+│   │   ├── commands/             ← Tauri commands (exposed to frontend)
+│   │   │   ├── mod.rs            ← Command module exports
+│   │   │   ├── ollama.rs         ← Ollama AI chat commands (chat, code execution)
+│   │   │   ├── monitors.rs       ← Monitor management (add, remove, check)
+│   │   │   ├── alerts.rs         ← Alert management
+│   │   │   ├── security.rs       ← Keychain/credential management
+│   │   │   ├── logging.rs        ← Generic JS console logging bridge
+│   │   │   └── plugins.rs        ← Plugin system commands
+│   │   │
+│   │   ├── metrics/              ← System metrics collection
+│   │   │   └── mod.rs            ← CPU, RAM, GPU, disk, temperature, frequency
+│   │   │
+│   │   ├── ollama/               ← Ollama API client
+│   │   │   └── mod.rs            ← HTTP client, chat API, model listing
+│   │   │
+│   │   ├── monitors/             ← Monitoring implementations
+│   │   │   ├── mod.rs            ← Monitor trait and registry
+│   │   │   ├── website.rs        ← HTTP/HTTPS website monitoring
+│   │   │   └── social.rs         ← Social media monitoring (Mastodon, etc.)
+│   │   │
+│   │   ├── alerts/               ← Alert system
+│   │   │   ├── mod.rs            ← Alert rules and engine
+│   │   │   ├── rules.rs          ← Alert rule definitions
+│   │   │   └── channels.rs       ← Alert delivery channels (Telegram, Slack, etc.)
+│   │   │
+│   │   ├── plugins/              ← Plugin system
+│   │   │   └── mod.rs            ← Script-based plugin execution
+│   │   │
+│   │   ├── security/             ← Security utilities
+│   │   │   └── mod.rs            ← macOS Keychain integration
+│   │   │
+│   │   ├── config/               ← Configuration management
+│   │   │   └── mod.rs            ← Paths, build info, app config
+│   │   │
+│   │   ├── ffi/                  ← Foreign Function Interface
+│   │   │   ├── mod.rs            ← FFI module exports
+│   │   │   ├── ioreport.rs       ← IOReport API wrappers (CPU frequency)
+│   │   │   └── objc.rs           ← Objective-C wrappers (thermal state)
+│   │   │
+│   │   ├── ui/                   ← UI components
+│   │   │   ├── mod.rs            ← UI module exports
+│   │   │   └── status_bar.rs     ← Menu bar status item
+│   │   │
+│   │   └── logging/              ← Logging infrastructure
+│   │       ├── mod.rs            ← Tracing setup and configuration
+│   │       └── legacy.rs         ← Legacy logging (if any)
+│   │
+│   ├── dist/                     ← Frontend assets (copied from src/)
+│   │   ├── cpu.js                ← CPU window logic (UI-specific, delegates to ollama.js)
+│   │   ├── ollama.js             ← Synced from src/ollama.js
+│   │   ├── tauri-logger.js       ← Synced from src/tauri-logger.js
+│   │   └── themes/               ← UI themes
+│   │       └── apple/
+│   │           ├── cpu.html      ← CPU window HTML template
+│   │           └── cpu.css       ← CPU window styles
+│   │
+│   └── Cargo.toml                ← Rust dependencies
+│
+├── scripts/                      ← Development and utility scripts
+│   ├── sync-dist.sh              ← Sync frontend files to dist/
+│   ├── measure_performance.sh    ← Performance measurement tool
+│   └── ...
+└── docs/                         ← Documentation
+    └── ...
+```
+
+### Key Modules & Responsibilities
+
+#### Frontend (JavaScript)
+
+**`src/ollama.js`** - **Ollama AI Chat Integration** (Single Source of Truth)
+- **Purpose**: Unified module for all Ollama-related functionality
+- **Features**:
+  - Connection management (auto-configuration, connection checking)
+  - Chat message handling with conversation history
+  - Code execution flow (ping-pong with Ollama)
+  - Model management
+  - Exposed via `window.Ollama` global object
+- **Conversation History**: Maintains in-memory conversation history (last 20 messages) for context-aware responses
+- **Code Execution**: Handles `ROLE=code-assistant` responses, executes JavaScript, sends results back to Ollama
+- **Location**: Primary source in `src/ollama.js`, synced to `src-tauri/dist/ollama.js`
+
+**`src/dashboard.js`**
+- Main dashboard logic
+- Delegates Ollama functionality to `ollama.js` module
+- UI event handling
+
+**`src/tauri-logger.js`**
+- Intercepts `console.log/warn/error` calls
+- Forwards logs to Rust via `log_from_js` Tauri command
+- Provides source file detection from stack traces
+
+**`src-tauri/dist/cpu.js`**
+- CPU window-specific UI logic
+- Delegates Ollama functionality to `window.Ollama.*`
+- Monitor history, collapsible sections, icon status management
+
+#### Backend (Rust)
+
+**`src-tauri/src/commands/ollama.rs`** - **Ollama Tauri Commands**
+- **`ollama_chat_with_execution`**: Unified chat command that:
+  - Gets system metrics for context
+  - Sends question to Ollama with conversation history
+  - Detects JavaScript code in responses (`ROLE=code-assistant` or pattern matching)
+  - Extracts code (handles `console.log()` wrappers)
+  - Returns structured response indicating if code execution is needed
+- **`ollama_chat_continue_with_result`**: Follow-up command for code execution flow:
+  - Takes JavaScript execution result
+  - Sends follow-up message to Ollama with full conversation history
+  - Handles ping-pong (recursive code execution up to 5 iterations)
+  - Returns final answer or next code block
+- **`check_ollama_connection`**: Connection status checking
+- **`list_ollama_models`**: Model listing
+- **`configure_ollama`**: Endpoint/model configuration
+
+**`src-tauri/src/ollama/mod.rs`** - **Ollama API Client**
+- HTTP client for Ollama API
+- Chat request/response handling
+- Model listing
+- Connection checking
+- API key management (Keychain integration)
+
+**`src-tauri/src/commands/monitors.rs`** - **Monitor Management**
+- Add/remove monitors
+- Check monitor status
+- Monitor persistence (disk storage)
+- Monitor stats caching (last check, last status)
+
+**`src-tauri/src/monitors/`** - **Monitor Implementations**
+- **`website.rs`**: HTTP/HTTPS website monitoring (response time, status codes, SSL)
+- **`social.rs`**: Social media monitoring (Mastodon mentions, etc.)
+- **`mod.rs`**: Monitor trait definition and registry
+
+**`src-tauri/src/alerts/`** - **Alert System**
+- Rule-based alerting (SiteDown, BatteryLow, TemperatureHigh, etc.)
+- Alert channels (Telegram, Slack, Mastodon, Signal)
+- Cooldown mechanism to prevent spam
+
+**`src-tauri/src/metrics/mod.rs`** - **System Metrics**
+- CPU usage, temperature, frequency
+- RAM, disk, GPU usage
+- Battery status
+- Process list
+- Optimized with caching to minimize CPU overhead
+
+**`src-tauri/src/ffi/`** - **Foreign Function Interface**
+- **`ioreport.rs`**: IOReport API wrappers for CPU frequency (Apple Silicon)
+- **`objc.rs`**: Objective-C wrappers for thermal state
+- All `unsafe` code isolated here with safety comments
+
+**`src-tauri/src/security/mod.rs`** - **Security**
+- macOS Keychain integration
+- Credential storage/retrieval
+- API key management
+
+**`src-tauri/src/lib.rs`** - **Main Application Logic**
+- Tauri application setup
+- Background threads for metrics collection
+- Menu bar updates
+- Window management
+- Resource lifecycle management (IOReport, SMC)
+
+### Data Flow Examples
+
+#### Ollama Chat with Code Execution
+
+1. **User sends message** → `src/ollama.js::sendChatMessage()`
+2. **Add to history** → `addToHistory('user', message)`
+3. **Invoke Rust** → `ollama_chat_with_execution` command
+4. **Rust command** (`commands/ollama.rs`):
+   - Gets system metrics
+   - Builds messages array with conversation history
+   - Calls Ollama API via `ollama/mod.rs`
+   - Detects code in response
+   - Returns structured response
+5. **JavaScript execution** → `executeJavaScriptCode()` in `ollama.js`
+6. **Follow-up** → `ollama_chat_continue_with_result` with execution result
+7. **Final answer** → Displayed in UI, added to history
+
+#### Monitor Check Flow
+
+1. **Frontend** → `check_monitor(monitor_id)` Tauri command
+2. **Rust** → `commands/monitors.rs::check_monitor()`
+3. **Monitor lookup** → `monitors/mod.rs` registry
+4. **Execute check** → `monitors/website.rs` or `monitors/social.rs`
+5. **Update stats** → In-memory cache (last_check, last_status)
+6. **Return result** → Frontend updates UI
+
+### File Sync & Build Process
+
+- **Frontend files** in `src/` are synced to `src-tauri/dist/` via `scripts/sync-dist.sh`
+- **Single source of truth**: `src/ollama.js` is the primary file, synced to `dist/ollama.js`
+- **Always sync after changes**: Run sync script or manually copy when modifying frontend files
+- **Tauri serves from**: `src-tauri/dist/` directory
+
+### Key Design Patterns
+
+1. **Module Delegation**: Frontend modules delegate to specialized modules (e.g., `dashboard.js` → `ollama.js`)
+2. **Single Source of Truth**: One primary file per feature, synced to distribution locations
+3. **Conversation History**: Maintained in JavaScript, passed to Rust for API calls
+4. **Structured Responses**: Rust commands return structured data (needs_code_execution, final_answer, etc.)
+5. **Error Handling**: Comprehensive error handling with logging at each layer
+6. **State Management**: In-memory state in Rust (monitors, alerts), localStorage in JavaScript (Ollama config)
+
+### Adding New Features
+
+**Frontend Feature**:
+1. Add to `src/` directory
+2. Update `scripts/sync-dist.sh` if needed
+3. Include in HTML templates (`dashboard.html`, `cpu.html`)
+
+**Backend Feature**:
+1. Create module in `src-tauri/src/`
+2. Add Tauri command in `src-tauri/src/commands/`
+3. Register command in `src-tauri/src/lib.rs` → `tauri::generate_handler!`
+4. Update `src-tauri/src/commands/mod.rs` exports
+
+**Ollama Integration**:
+- All Ollama code lives in `src/ollama.js` (frontend) and `src-tauri/src/commands/ollama.rs` + `src-tauri/src/ollama/mod.rs` (backend)
+- Conversation history managed in JavaScript, passed to Rust
+- Code execution handled in JavaScript, results sent back to Rust for follow-up

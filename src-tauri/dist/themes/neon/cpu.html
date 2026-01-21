@@ -37,7 +37,7 @@
             <circle class="ring-track" cx="50" cy="50" r="42" />
             <circle class="ring-progress" id="temperature-ring-progress" cx="50" cy="50" r="42" />
           </svg>
-          <div class="metric-hint" id="temperature-hint" style="display: none;">Requires root privileges</div>
+          <div class="metric-hint" id="temperature-hint" style="display: none;">--</div>
         </div>
 
         <div class="metric-tile" id="cpu-usage-card">
@@ -58,11 +58,21 @@
             <circle class="ring-track" cx="50" cy="50" r="42" />
             <circle class="ring-progress" id="frequency-ring-progress" cx="50" cy="50" r="42" />
           </svg>
-          <div class="metric-hint" id="frequency-hint" style="display: none;">Requires root privileges</div>
+          <div class="metric-hint" id="frequency-hint" style="display: none;">--</div>
         </div>
       </section>
 
       <section class="history-section">
+        <div class="history-controls" id="history-controls" style="display: none;">
+          <label for="time-range-select">History:</label>
+          <select id="time-range-select" class="time-range-dropdown">
+            <option value="5m" selected>Last 5 minutes</option>
+            <option value="1h">Last 1 hour</option>
+            <option value="6h">Last 6 hours</option>
+            <option value="24h">Last 24 hours</option>
+            <option value="7d">Last 7 days</option>
+          </select>
+        </div>
         <div class="history-chart-container">
           <canvas class="history-chart" id="temperature-history-chart" width="200" height="40"></canvas>
         </div>
@@ -321,8 +331,10 @@
       </div>
     </div>
 
+    <script src="../../tauri-logger.js"></script>
+    <script type="module" src="../../ollama.js"></script>
     <script src="../../cpu.js"></script>
     <script src="../../cpu-ui.js"></script>
-    <script src="./neon-history.js"></script>
+    <script src="./chart.js"></script>
   </body>
 </html>

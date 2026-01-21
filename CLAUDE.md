@@ -2,6 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⚠️ Important: Read agents.md First
+
+**Before making any changes or answering questions about this codebase, always read `agents.md` first.** 
+
+The `agents.md` file contains:
+- Project goals and coding principles
+- Complete codebase structure and organization
+- Module responsibilities and data flow
+- Design patterns and conventions
+- Where code lives and what it does
+
+This ensures you understand the project context, architecture, and conventions before making changes.
+
 ## Project Overview
 
 **mac-stats** is a lightweight system monitor for macOS built with Rust and Tauri. It displays real-time CPU, GPU, RAM, and disk usage in the menu bar with minimal CPU overhead (~0.5% idle, <1% with CPU window open). The app features:

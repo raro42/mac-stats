@@ -356,6 +356,7 @@ pub fn log_ollama_js_no_blocks(response_content: String) -> Result<(), String> {
 pub struct OllamaChatWithExecutionRequest {
     pub question: String,
     pub system_prompt: Option<String>,
+    pub conversation_history: Option<Vec<crate::ollama::ChatMessage>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -407,18 +408,34 @@ pub async fn ollama_chat_with_execution(
         "You are a general purpose AI. If you are asked for actual data like day or weather information, or flight information or stock information. Then we need to compile that information using speciallz crafted clients for doing so. You will put \"[variable-name]\" into the answer to signal that we need to go another step and ask and agent to fullfill the answer.\n\nWhenever asked with \"[variable-name]\", you must provide a javascript snipplet to be executed in the browser console to retrieve that information. Mark the answer to be executed as javascript. Do not put any other words around it. Do not insert formatting. Onlz return the code to be executed. This is needed for the next AI to understand and execute the same. When answering, use the role: code-assistant in the response. When you return executable code:\n- Start the response with: ROLE=code-assistant\n- On the next line, output ONLY executable JavaScript\n- Do not add explanations or formatting".to_string()
     });
     
-    // Send initial request to Ollama
+    // Build messages array with conversation history
+    let mut messages = vec![
+        crate::ollama::ChatMessage {
+            role: "system".to_string(),
+            content: system_prompt.clone(),
+        },
+    ];
+    
+    // Add conversation history if provided (exclude system messages - we already have one)
+    if let Some(ref history) = request.conversation_history {
+        for msg in history {
+            // Only add user and assistant messages from history (skip system messages)
+            if msg.role == "user" || msg.role == "assistant" {
+                messages.push(msg.clone());
+            }
+        }
+        info!("Ollama Chat with Execution: Added {} messages from conversation history", 
+              history.iter().filter(|m| m.role == "user" || m.role == "assistant").count());
+    }
+    
+    // Add current user message
+    messages.push(crate::ollama::ChatMessage {
+        role: "user".to_string(),
+        content: context_message.clone(),
+    });
+    
     let chat_request = ChatRequest {
-        messages: vec![
-            crate::ollama::ChatMessage {
-                role: "system".to_string(),
-                content: system_prompt.clone(),
-            },
-            crate::ollama::ChatMessage {
-                role: "user".to_string(),
-                content: context_message.clone(),
-            },
-        ],
+        messages,
     };
     
     info!("Ollama Chat with Execution: Sending initial request to Ollama");
@@ -574,6 +591,7 @@ pub async fn ollama_chat_continue_with_result(
     context_message: String,
     intermediate_response: String,
     system_prompt: Option<String>,
+    conversation_history: Option<Vec<crate::ollama::ChatMessage>>,
 ) -> Result<OllamaChatContinueResponse, String> {
     use tracing::info;
     
@@ -589,25 +607,42 @@ pub async fn ollama_chat_continue_with_result(
         original_question
     );
     
+    // Build messages array with conversation history
+    let mut messages = vec![
+        crate::ollama::ChatMessage {
+            role: "system".to_string(),
+            content: system_prompt.clone(),
+        },
+    ];
+    
+    // Add conversation history if provided (exclude system messages - we already have one)
+    if let Some(ref history) = conversation_history {
+        for msg in history {
+            // Only add user and assistant messages from history (skip system messages)
+            if msg.role == "user" || msg.role == "assistant" {
+                messages.push(msg.clone());
+            }
+        }
+        info!("Ollama Chat Continue: Added {} messages from conversation history", 
+              history.iter().filter(|m| m.role == "user" || m.role == "assistant").count());
+    }
+    
+    // Add the conversation flow for this code execution cycle
+    messages.push(crate::ollama::ChatMessage {
+        role: "user".to_string(),
+        content: context_message.clone(),
+    });
+    messages.push(crate::ollama::ChatMessage {
+        role: "assistant".to_string(),
+        content: intermediate_response.clone(),
+    });
+    messages.push(crate::ollama::ChatMessage {
+        role: "user".to_string(),
+        content: follow_up_message,
+    });
+    
     let chat_request = ChatRequest {
-        messages: vec![
-            crate::ollama::ChatMessage {
-                role: "system".to_string(),
-                content: system_prompt.clone(),
-            },
-            crate::ollama::ChatMessage {
-                role: "user".to_string(),
-                content: context_message.clone(),
-            },
-            crate::ollama::ChatMessage {
-                role: "assistant".to_string(),
-                content: intermediate_response.clone(),
-            },
-            crate::ollama::ChatMessage {
-                role: "user".to_string(),
-                content: follow_up_message,
-            },
-        ],
+        messages,
     };
     
     info!("Ollama Chat Continue: Sending follow-up to Ollama");
