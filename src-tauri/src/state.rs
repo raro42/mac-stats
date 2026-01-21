@@ -102,6 +102,10 @@ pub(crate) static WINDOW_DECORATIONS: Mutex<bool> = Mutex::new(true);
 // Power and battery caches
 // CPU/GPU power cache: (cpu_power_watts, gpu_power_watts, last_update_timestamp)
 pub(crate) static POWER_CACHE: Mutex<Option<(f32, f32, Instant)>> = Mutex::new(None);
+// Last successful power reading (cpu_power_watts, gpu_power_watts)
+// This is used as a fallback when POWER_CACHE is locked, to prevent flickering to 0.0
+// CRITICAL: Only updated when we successfully read from POWER_CACHE
+pub(crate) static LAST_SUCCESSFUL_POWER: Mutex<Option<(f32, f32)>> = Mutex::new(None);
 // Battery cache: (battery_level_percent, is_charging, last_update_timestamp)
 // Battery is read every second in background thread (IOKit is lightweight)
 pub(crate) static BATTERY_CACHE: Mutex<Option<(f32, bool, Instant)>> = Mutex::new(None);

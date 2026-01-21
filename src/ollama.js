@@ -37,6 +37,75 @@ function getSystemPrompt() {
   return saved || 'You are a helpful assistant that answers questions about system metrics and monitoring.';
 }
 
+/**
+ * Sanitize string for safe logging
+ * - Truncates to specified max length (default 100)
+ * - Removes/replaces dangerous characters (quotes, backticks, newlines, control chars)
+ * - Prevents breaking log format or system
+ */
+function sanitizeForLogging(str, maxLength = 100) {
+  if (str === null || str === undefined) {
+    return String(str);
+  }
+  
+  let sanitized = String(str);
+  
+  // Replace newlines and carriage returns with spaces
+  sanitized = sanitized.replace(/[\r\n]+/g, ' ');
+  
+  // Replace tabs with spaces
+  sanitized = sanitized.replace(/\t/g, ' ');
+  
+  // Remove control characters (except space)
+  sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
+  
+  // Replace dangerous quotes (double quotes, single quotes, backticks) with single quotes
+  sanitized = sanitized.replace(/["'`]/g, "'");
+  
+  // Collapse multiple spaces
+  sanitized = sanitized.replace(/\s+/g, ' ').trim();
+  
+  // Truncate to max length
+  if (sanitized.length > maxLength) {
+    sanitized = sanitized.substring(0, maxLength - 3) + '...';
+  }
+  
+  return sanitized;
+}
+
+/**
+ * Sanitize result string for safe logging (100 chars)
+ */
+function sanitizeResultForLogging(result) {
+  return sanitizeForLogging(result, 100);
+}
+
+/**
+ * Safely log JavaScript execution to Rust backend
+ * Catches all errors and never throws to prevent breaking execution flow
+ */
+async function safeLogExecution(logData) {
+  try {
+    // Sanitize all string fields to prevent breaking the system
+    const sanitizedLog = {
+      code: sanitizeForLogging(logData.code || '', 200), // Code can be longer, but still limit it
+      result: sanitizeResultForLogging(logData.result || ''),
+      result_type: sanitizeForLogging(logData.result_type || 'unknown', 50),
+      is_undefined: Boolean(logData.is_undefined),
+      success: Boolean(logData.success),
+      error_name: logData.error_name ? sanitizeForLogging(logData.error_name, 100) : null,
+      error_message: logData.error_message ? sanitizeForLogging(logData.error_message, 200) : null,
+      error_stack: logData.error_stack ? sanitizeForLogging(logData.error_stack, 500) : null
+    };
+    
+    await invoke('log_ollama_js_execution', sanitizedLog);
+  } catch (logErr) {
+    // Silently catch and log to console only - never throw
+    // This ensures logging failures never break the main execution flow
+    console.warn('[Ollama] Failed to log execution (non-fatal):', logErr?.message || logErr);
+  }
+}
+
 // ============================================================================
 // Connection Management
 // ============================================================================
@@ -409,21 +478,17 @@ async function executeCodeAndContinue(response, originalQuestion, systemPrompt, 
     
     console.log(`[Ollama] Code executed (iteration ${iteration + 1}), result:`, resultString);
     
-    // Log execution to Rust
-    try {
-      await invoke('log_ollama_js_execution', {
-        code: response.code,
-        result: resultString,
-        result_type: typeof executionResult,
-        is_undefined: executionResult === undefined,
-        success: true,
-        error_name: null,
-        error_message: null,
-        error_stack: null
-      });
-    } catch (logErr) {
-      console.warn('[Ollama] Failed to log execution:', logErr);
-    }
+    // Log execution to Rust (safe logging - never throws)
+    await safeLogExecution({
+      code: response.code,
+      result: resultString,
+      result_type: typeof executionResult,
+      is_undefined: executionResult === undefined,
+      success: true,
+      error_name: null,
+      error_message: null,
+      error_stack: null
+    });
     
     // Update UI with code and result
     const messagesContainer = document.getElementById('chat-messages');
@@ -497,21 +562,17 @@ async function executeCodeAndContinue(response, originalQuestion, systemPrompt, 
     const errorMsg = error?.message || error?.toString() || String(error) || 'Unknown error';
     addChatMessage('assistant', `Error executing code: ${errorMsg}`);
     
-    // Log error to Rust
-    try {
-      await invoke('log_ollama_js_execution', {
-        code: response.code,
-        result: `ERROR: ${error.name || 'Error'}: ${error.message || errorMsg}`,
-        result_type: 'error',
-        is_undefined: false,
-        success: false,
-        error_name: error.name || null,
-        error_message: error.message || null,
-        error_stack: error.stack || null
-      });
-    } catch (logErr) {
-      console.warn('[Ollama] Failed to log error:', logErr);
-    }
+    // Log error to Rust (safe logging - never throws)
+    await safeLogExecution({
+      code: response.code,
+      result: `ERROR: ${error.name || 'Error'}: ${error.message || errorMsg}`,
+      result_type: 'error',
+      is_undefined: false,
+      success: false,
+      error_name: error.name || null,
+      error_message: error.message || null,
+      error_stack: error.stack || null
+    });
   }
 }
 
@@ -614,22 +675,18 @@ async function processOllamaResponse(response, originalMessage, contextMessage) 
       console.log('[Ollama JS Execution] Code executed successfully, result:', resultString);
       console.log('[Ollama JS Execution] Logging execution result to Rust backend...');
       
-      // Log execution to Rust - this should show the result in Tauri logs
-      try {
-        await invoke('log_ollama_js_execution', {
-          code: code,
-          result: resultString,
-          result_type: typeof executionResult,
-          is_undefined: executionResult === undefined,
-          success: true,
-          error_name: null,
-          error_message: null,
-          error_stack: null
-        });
-        console.log('[Ollama JS Execution] Successfully logged execution result to Rust backend');
-      } catch (logErr) {
-        console.error('[Ollama JS Execution] Failed to log execution to backend:', logErr);
-      }
+      // Log execution to Rust (safe logging - never throws)
+      await safeLogExecution({
+        code: code,
+        result: resultString,
+        result_type: typeof executionResult,
+        is_undefined: executionResult === undefined,
+        success: true,
+        error_name: null,
+        error_message: null,
+        error_stack: null
+      });
+      console.log('[Ollama JS Execution] Logged execution result to Rust backend');
       
       // Send result back to Ollama with original question
       const followUpMessage = `I have executed your last codeblocks and the result is: ${resultString}
@@ -677,21 +734,17 @@ Can you now answer the original question: ${originalMessage}?`;
     } catch (error) {
       console.error('[Ollama JS Execution] ERROR executing code:', error);
       
-      // Log error to Rust
-      try {
-        await invoke('log_ollama_js_execution', {
-          code: code,
-          result: `ERROR: ${error.name}: ${error.message}`,
-          result_type: 'error',
-          is_undefined: false,
-          success: false,
-          error_name: error.name || null,
-          error_message: error.message || null,
-          error_stack: error.stack || null
-        });
-      } catch (logErr) {
-        console.warn('[Ollama JS Execution] Failed to log error to backend:', logErr);
-      }
+      // Log error to Rust (safe logging - never throws)
+      await safeLogExecution({
+        code: code,
+        result: `ERROR: ${error.name}: ${error.message}`,
+        result_type: 'error',
+        is_undefined: false,
+        success: false,
+        error_name: error.name || null,
+        error_message: error.message || null,
+        error_stack: error.stack || null
+      });
       
       // Show error to user
       addChatMessage('assistant', `Error executing code: ${error.name}: ${error.message}`);

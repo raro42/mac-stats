@@ -648,20 +648,43 @@ pub fn can_read_frequency() -> bool {
 #[allow(dead_code)]
 pub fn can_read_cpu_power() -> bool {
     // OPTIMIZATION Phase 3: Use OnceLock for faster access (no locking required)
-    *CAN_READ_CPU_POWER.get_or_init(|| {
-        // IOReport is too expensive - check once and cache
-        // For now, assume false unless we can verify cheaply
-        false // IOReport too expensive to check every time
-    })
+    // First check if it's been explicitly set
+    if let Some(can_read) = CAN_READ_CPU_POWER.get() {
+        return *can_read;
+    }
+    
+    // If not set yet, check if we have power cache or actual power values
+    // This handles the case where power reading works but the flag hasn't been set yet
+    if let Ok(cache) = crate::state::POWER_CACHE.try_lock() {
+        if cache.is_some() {
+            // We have a power cache, so we can read power
+            return true;
+        }
+    }
+    
+    // Default to false if nothing indicates we can read power
+    false
 }
 
 #[allow(dead_code)]
 pub fn can_read_gpu_power() -> bool {
     // OPTIMIZATION Phase 3: Use OnceLock for faster access (no locking required)
-    *CAN_READ_GPU_POWER.get_or_init(|| {
-        // IOReport is too expensive - check once and cache
-        false // IOReport too expensive to check every time
-    })
+    // First check if it's been explicitly set
+    if let Some(can_read) = CAN_READ_GPU_POWER.get() {
+        return *can_read;
+    }
+    
+    // If not set yet, check if we have power cache or actual power values
+    // This handles the case where power reading works but the flag hasn't been set yet
+    if let Ok(cache) = crate::state::POWER_CACHE.try_lock() {
+        if cache.is_some() {
+            // We have a power cache, so we can read power
+            return true;
+        }
+    }
+    
+    // Default to false if nothing indicates we can read power
+    false
 }
 
 /// Get battery level and charging state (cached)
@@ -813,18 +836,35 @@ pub fn get_power_consumption() -> (f32, f32) {
     
     // Power reading is handled by background thread when window is visible
     // This function just returns cached values
-    // If no cache exists yet, return 0.0 (will be updated by background thread)
+    // If no cache exists yet, return last successful reading or 0.0
     // CRITICAL: Never return 0.0 if we have a cache - always return cached values
     // This prevents flickering when cache exists but is being queried before update
     if let Ok(cache) = crate::state::POWER_CACHE.try_lock() {
         if let Some((cpu_power, gpu_power, _)) = cache.as_ref() {
             // We have a cache - return it even if it seems stale
             // This prevents flickering to 0.0
-            debug3!("Power consumption: returning cached values (no fresh update yet): CPU={:.2}W, GPU={:.2}W", 
+            // Also update the last successful reading so we have a fallback if lock fails later
+            if let Ok(mut last_successful) = crate::state::LAST_SUCCESSFUL_POWER.try_lock() {
+                *last_successful = Some((*cpu_power, *gpu_power));
+            }
+            debug3!("Power consumption: returning cached values (no fresh update yet): CPU={:.2}W, GPU={:.2}W",
                 cpu_power, gpu_power);
             return (*cpu_power, *gpu_power);
         }
+    } else {
+        // CRITICAL: try_lock() failed (background thread has the lock)
+        // Return last successful reading instead of 0.0 to prevent flickering
+        if let Ok(last_successful) = crate::state::LAST_SUCCESSFUL_POWER.try_lock() {
+            if let Some((cpu_power, gpu_power)) = last_successful.as_ref() {
+                debug3!("Power consumption: returning last successful values (lock failed): CPU={:.2}W, GPU={:.2}W",
+                    cpu_power, gpu_power);
+                return (*cpu_power, *gpu_power);
+            }
+        }
     }
+
+    // No cache and no previous successful reading - return 0.0 (initial state)
+    debug3!("Power consumption: no cache and no previous reading, returning 0.0W");
     (0.0, 0.0)
 }
 
