@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6] - 2026-01-22
+
+### Fixed
+- **DMG Asset Bundling**: Fixed missing assets (Ollama icon, JavaScript/Tauri icons) in DMG builds
+  - Added explicit `resources` configuration in `tauri.conf.json` to bundle `dist/assets/` files
+  - Assets are now properly included in production DMG builds
+- **Ollama Icon Path**: Fixed Ollama icon not displaying in DMG builds
+  - Changed icon paths from relative (`../../assets/ollama.svg`) to absolute (`/assets/ollama.svg`) in all theme HTML files
+  - Icons now resolve correctly in Tauri production builds
+- **History Chart Initialization**: Fixed history charts not drawing in DMG builds
+  - Moved canvas element lookup and context initialization to `initializeCanvases()` function
+  - Added defensive initialization in `updateCharts()` to handle delayed DOM loading
+  - Charts now properly initialize in production builds
+
+### Added
+- **DMG Testing Script**: Added `scripts/test-dmg.sh` for automated DMG verification before release
+  - Mounts DMG and verifies app structure
+  - Checks for required assets and theme files
+  - Provides installation and testing instructions
+  - Validates bundle correctness before distribution
+
+### Changed
+- **Test Script Path Detection**: Updated test script to check correct asset path (`dist/assets/` instead of `assets/`)
+
 ## [0.1.5] - 2026-01-22
 
 ### Changed
