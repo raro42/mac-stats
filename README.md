@@ -80,6 +80,16 @@ xattr -d com.apple.quarantine ~/Downloads/mac-stats_*.dmg
 
 Once the DMG opens, drag `mac-stats.app` to your Applications folder.
 
+**After installing, if macOS blocks the app from opening:**
+
+If macOS shows a message that the app "can't be opened because it is from an unidentified developer" or similar Gatekeeper warnings, remove the quarantine attribute:
+
+```bash
+xattr -rd com.apple.quarantine /Applications/mac-stats.app
+```
+
+After running this command, you should be able to open the app normally from Applications or Launchpad.
+
 ### Build from Source
 
 Top choice (no clone needed):
@@ -196,6 +206,14 @@ mac-stats comes with 9 beautiful, customizable themes:
 <td><strong>Swiss Minimalistic</strong><br><img src="screens/swiss-minimalistic.png" alt="Swiss Minimalistic Theme" width="300"></td>
 </tr>
 </table>
+
+### Feature Screenshots
+
+#### AI Chat Integration (Ollama)
+
+Chat with AI about your system metrics using a local Ollama instance. Ask questions about your CPU usage, processes, and system health.
+
+<img src="screens/feature-ollama-integration.png" alt="Ollama AI Chat Integration" width="600">
 
 ### Planned Features
 

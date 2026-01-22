@@ -1,7 +1,7 @@
 {
   "package": {
     "productName": "mac-stats",
-    "version": "0.1.5"
+    "version": "0.1.6"
   },
   "tauri": {
     "bundle": {
@@ -14,6 +14,11 @@
         "icons/128x128@2x.png",
         "icons/icon.icns",
         "icons/icon.ico"
+      ],
+      "resources": [
+        "dist/assets/ollama.svg",
+        "dist/assets/javascript.svg",
+        "dist/assets/tauri.svg"
       ]
     },
     "allowlist": {
