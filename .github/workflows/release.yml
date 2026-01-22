@@ -60,6 +60,11 @@ jobs:
           # Clean up
           rm certificate.p12
 
+      - name: Sync frontend files to dist
+        run: |
+          chmod +x scripts/sync-dist.sh
+          ./scripts/sync-dist.sh
+
       - name: Build Tauri app
         working-directory: ./src-tauri
         run: cargo tauri build --bundles dmg
