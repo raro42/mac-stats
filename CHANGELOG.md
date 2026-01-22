@@ -7,7 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.3] - 2026-01-19
 
+### Added
+- **CLI Parameter Support**: Added support for passing CLI arguments through the `run` script
+  - `./run --help` or `./run -h` to show help
+  - `./run --openwindow` flag to optionally open CPU window at startup
+  - All CLI flags (`-v`, `-vv`, `-vvv`, `--cpu`, `--frequency`, `--power-usage`, `--changelog`) now work through the `run` script
+  - Development mode (`./run dev`) also passes arguments to `cargo run`
+
 ### Fixed
+- **Window Opening at Startup**: Fixed issue where CPU window was automatically opening at startup
+  - Removed manual `sendAction` test code that was triggering the click handler during setup
+  - All windows are now properly hidden at startup (menu bar only mode)
+  - Window only opens when explicitly requested via `--cpu` or `--openwindow` flags or when menu bar is clicked
+- **Compilation Warnings**: Suppressed dead code warnings for utility methods
+  - Added `#[allow(dead_code)]` to `total_points()`, `estimate_memory_bytes()`, `save_to_disk()`, and `load_from_disk()` methods
+  - These methods are reserved for future use or used in tests
 - **Power Consumption Flickering**: Fixed power consumption values flickering to 0.0W when background thread updates cache
   - Added `LAST_SUCCESSFUL_POWER` fallback cache to prevent flickering when main lock is unavailable
   - Power values now persist across lock contention scenarios
@@ -23,6 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Prevents log injection and system breakage from malformed execution results
 
 ### Changed
+- **Startup Behavior**: App now starts in menu bar only mode by default
+  - No windows are visible at startup
+  - CPU window is created on-demand when menu bar is clicked
+  - Improved startup logging to indicate menu bar only mode
 - **History Chart Styling**: Improved visual design of history chart container
   - Enhanced glass effect with backdrop blur and subtle shadows
   - Removed border, added inset highlights for depth

@@ -137,6 +137,7 @@ pub fn run_with_cpu_window() {
 }
 
 pub fn run() {
+    debug1!(" !! Running without -cpu flag: will not open CPU window at startup");
     run_internal(false)
 }
 
@@ -196,7 +197,12 @@ fn run_internal(open_cpu_window: bool) {
                 tracing::warn!("Failed to load monitors: {}", e);
             }
             
-            // Hide the main window immediately (menu bar app)
+            // Hide ALL windows immediately (menu bar app - no windows should be visible at startup)
+            for window in app.windows().values() {
+                let _ = window.hide();
+            }
+            
+            // Also hide the main window specifically if it exists
             if let Some(main_window) = app.get_window("main") {
                 let _ = main_window.hide();
             }
@@ -206,8 +212,9 @@ fn run_internal(open_cpu_window: bool) {
             // Don't create CPU window at startup - create it on demand when clicked
             // This saves CPU by not having the window exist until needed
             debug1!("CPU window will be created on demand when menu bar is clicked");
+            debug1!("All windows hidden at startup - app running in menu bar only");
             
-            // If -cpu flag is set, create the window after a short delay
+            // If -cpu flag is set, create the window after a short delay (for testing only)
             if open_cpu_window {
                 std::thread::spawn(move || {
                     std::thread::sleep(std::time::Duration::from_millis(1000));

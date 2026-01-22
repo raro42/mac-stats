@@ -18,9 +18,20 @@ fi
 
 cd "$root_dir/src-tauri"
 
+# Check for help flag first
+if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]]; then
+  # Build first to ensure binary exists, then show help
+  cargo build --release 2>/dev/null || true
+  exec ./target/release/mac_stats --help
+fi
+
+# Check if first argument is "dev" for development mode
 if [[ "${1:-release}" == "dev" ]]; then
-  cargo run
+  shift  # Remove "dev" from arguments
+  # Pass remaining arguments to cargo run
+  cargo run -- "$@"
 else
   cargo build --release
-  exec ./target/release/mac_stats -vvv
+  # Pass all arguments to the binary
+  exec ./target/release/mac_stats "$@"
 fi

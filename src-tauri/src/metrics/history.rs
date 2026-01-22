@@ -232,11 +232,13 @@ impl HistoryBuffer {
     }
 
     /// Get total number of data points across all tiers
+    #[allow(dead_code)] // Used in tests
     pub fn total_points(&self) -> usize {
         self.tier1_1s.len() + self.tier2_1m.len() + self.tier3_5m.len() + self.tier4_1h.len()
     }
 
     /// Get memory usage estimate in bytes
+    #[allow(dead_code)] // Utility method for debugging/monitoring
     pub fn estimate_memory_bytes(&self) -> usize {
         // Each point is roughly 100 bytes when serialized
         const BYTES_PER_POINT: usize = 100;
@@ -367,6 +369,7 @@ pub struct HistoryQueryResult {
 impl HistoryBuffer {
     /// Optional: Save history to disk for persistence across restarts
     /// Saves to ~/.mac-stats/history.json
+    #[allow(dead_code)] // Reserved for future persistence feature
     pub fn save_to_disk(&self) -> Result<(), String> {
         let home = std::env::var("HOME").map_err(|_| "Could not determine HOME directory".to_string())?;
         let history_dir = std::path::Path::new(&home).join(".mac-stats");
@@ -392,6 +395,7 @@ impl HistoryBuffer {
 
     /// Optional: Load history from disk
     /// Loads from ~/.mac-stats/history.json if it exists
+    #[allow(dead_code)] // Reserved for future persistence feature
     pub fn load_from_disk() -> Result<Self, String> {
         let home = std::env::var("HOME").map_err(|_| "Could not determine HOME directory".to_string())?;
         let history_dir = std::path::Path::new(&home).join(".mac-stats");

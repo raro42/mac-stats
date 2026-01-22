@@ -5,26 +5,31 @@ use clap::Parser;
 
 #[derive(Parser, Debug)]
 #[command(name = "mac_stats")]
-#[command(about = "macOS system statistics menu bar app", long_about = None)]
+#[command(about = "macOS system statistics menu bar app")]
+#[command(long_about = "A lightweight system monitor for macOS that displays real-time CPU, GPU, RAM, and disk usage in the menu bar with minimal CPU overhead.")]
 struct Args {
-    /// Verbose output (-v, -vv, -vvv)
-    #[arg(short = 'v', action = clap::ArgAction::Count)]
+    /// Verbose output level (use -v, -vv, or -vvv for increasing verbosity)
+    #[arg(short = 'v', action = clap::ArgAction::Count, help = "Verbosity level: -v (minimal), -vv (moderate), -vvv (maximum)")]
     verbose: u8,
     
-    /// Open CPU window directly (for testing)
-    #[arg(long = "cpu")]
+    /// Open CPU window directly at startup (for testing)
+    #[arg(long = "cpu", help = "Open the CPU details window immediately when the app starts")]
     open_cpu: bool,
     
+    /// Open CPU window directly at startup (alternative to --cpu)
+    #[arg(long = "openwindow", help = "Open the CPU details window immediately when the app starts (same as --cpu)")]
+    open_window: bool,
+    
     /// Enable detailed frequency logging for debugging
-    #[arg(long = "frequency")]
+    #[arg(long = "frequency", help = "Enable detailed logging of CPU frequency readings from IOReport")]
     frequency: bool,
     
     /// Enable detailed power usage logging for debugging
-    #[arg(long = "power-usage")]
+    #[arg(long = "power-usage", help = "Enable detailed logging of CPU and GPU power consumption")]
     power_usage: bool,
     
-    /// Test changelog functionality (prints changelog to console)
-    #[arg(long = "changelog")]
+    /// Print changelog to console and exit
+    #[arg(long = "changelog", help = "Display the application changelog and exit")]
     changelog: bool,
 }
 
@@ -64,8 +69,8 @@ fn main() {
         }
     }
     
-    // If -cpu flag is set, open window directly after a short delay
-    if args.open_cpu {
+    // If --cpu or --openwindow flag is set, open window directly after a short delay
+    if args.open_cpu || args.open_window {
         mac_stats::run_with_cpu_window()
     } else {
         mac_stats::run()
