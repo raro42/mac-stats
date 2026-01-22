@@ -274,18 +274,18 @@ pub fn setup_status_item() {
             write_structured_log("ui/status_bar.rs", "Button enabled check", &serde_json::json!({"enabled": is_enabled}), "J");
             
             // CRITICAL: Try manually sending the action to verify it works
-            if let Some(target) = button.target() {
-                debug1!("Attempting to manually send action to verify it works...");
-                write_structured_log("ui/status_bar.rs", "Manual action send attempt", &serde_json::json!({}), "J");
-                let action_sent = {
-                    use objc2_app_kit::NSApplication;
-                    let app = NSApplication::sharedApplication(mtm);
-                    let sent: bool = msg_send![&*app, sendAction: action, to: &*target, from: &*button];
-                    sent
-                };
-                debug1!("Manual sendAction result: {}", action_sent);
-                write_structured_log("ui/status_bar.rs", "Manual sendAction result", &serde_json::json!({"sent": action_sent}), "J");
-            }
+            // if let Some(target) = button.target() {
+            //     debug1!("Attempting to manually send action to verify it works...");
+            //     write_structured_log("ui/status_bar.rs", "Manual action send attempt", &serde_json::json!({}), "J");
+            //     let action_sent = {
+            //         use objc2_app_kit::NSApplication;
+            //         let app = NSApplication::sharedApplication(mtm);
+            //         let sent: bool = msg_send![&*app, sendAction: action, to: &*target, from: &*button];
+            //         sent
+            //     };
+            //     debug1!("Manual sendAction result: {}", action_sent);
+            //     write_structured_log("ui/status_bar.rs", "Manual sendAction result", &serde_json::json!({"sent": action_sent}), "J");
+            // }
         }
         debug2!("Button target and action set (no menu)");
     } else {
