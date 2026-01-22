@@ -246,6 +246,23 @@ fn run_internal(open_cpu_window: bool) {
                 }
             });
             
+            // Welcome message when menu bar is ready (always printed, regardless of verbosity)
+            println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            println!("✨ Welcome to mac-stats v{}! ✨", config::Config::version());
+            println!("");
+            println!("We hope this app brings you joy and helps you monitor");
+            println!("your Mac's performance effortlessly.");
+            println!("");
+            println!("Application is ready and can be clicked in the menu bar.");
+            println!("");
+            println!("💝 Love this app? Share your happiness with others!");
+            println!("   • Star on GitHub: https://github.com/raro42/mac-stats");
+            println!("   • Share on Mastodon and spread the word!");
+            println!("   • Contributions and feedback are always welcome!");
+            println!("");
+            println!("Happy monitoring! 🚀");
+            println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            
             // For automatic updates, we'll use a simple approach:
             // The background update loop stores updates in MENU_BAR_TEXT
             // We'll process them in the click handler (which works)
