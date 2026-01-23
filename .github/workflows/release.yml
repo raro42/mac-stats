@@ -64,6 +64,11 @@ jobs:
         run: |
           chmod +x scripts/sync-dist.sh
           ./scripts/sync-dist.sh
+          echo "Verifying assets were synced..."
+          ls -la src-tauri/dist/assets/ || echo "ERROR: assets directory not found!"
+          test -f src-tauri/dist/assets/ollama.svg && echo "✅ ollama.svg found" || (echo "❌ ollama.svg missing!" && exit 1)
+          test -f src-tauri/dist/assets/javascript.svg && echo "✅ javascript.svg found" || (echo "❌ javascript.svg missing!" && exit 1)
+          test -f src-tauri/dist/assets/tauri.svg && echo "✅ tauri.svg found" || (echo "❌ tauri.svg missing!" && exit 1)
 
       - name: Build Tauri app
         working-directory: ./src-tauri
