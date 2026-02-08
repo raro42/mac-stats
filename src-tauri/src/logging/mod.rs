@@ -21,11 +21,12 @@ pub use legacy::{set_verbosity, write_structured_log, write_structured_log_with_
 /// The log file path will be determined by the config module (when available).
 /// For now, uses a temporary path that will be replaced in Phase 3.
 pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
-    // Convert verbosity level (0-3) to tracing level
+    // Convert verbosity level (0-3) to tracing level.
+    // -v (1): warn only, no debug. -vv (2): debug. -vvv (3): trace.
     let filter_level = match verbosity {
         0 => "error",
-        1 => "info",
-        2 => "debug",
+        1 => "warn",   // -v: no debug logs
+        2 => "debug",  // -vv: show debug
         3 => "trace",
         _ => "trace",
     };

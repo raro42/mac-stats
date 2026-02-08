@@ -524,7 +524,7 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
     .visible(true)  // Show immediately when created
     .inner_size(644.0, 995.0)
     .resizable(true)
-    .always_on_top(true)
+    .always_on_top(false)
     .decorations(decorations)
     .build();
     
@@ -557,7 +557,7 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
                 // Right-click inspect should work
             }
             
-            let _ = window.set_always_on_top(true);
+            let _ = window.set_always_on_top(false);
             let _ = window.show();
             let _ = window.set_focus();
             let _ = window.unminimize();

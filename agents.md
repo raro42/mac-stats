@@ -199,7 +199,8 @@ mac-stats/
 │   │   │
 │   │   ├── commands/             ← Tauri commands (exposed to frontend)
 │   │   │   ├── mod.rs            ← Command module exports
-│   │   │   ├── ollama.rs         ← Ollama AI chat commands (chat, code execution)
+│   │   │   ├── ollama.rs         ← Ollama AI chat commands (chat, code execution, FETCH_URL)
+│   │   │   ├── browser.rs        ← fetch_page for Ollama web tasks (no CORS)
 │   │   │   ├── monitors.rs       ← Monitor management (add, remove, check)
 │   │   │   ├── alerts.rs         ← Alert management
 │   │   │   ├── security.rs       ← Keychain/credential management
@@ -300,6 +301,7 @@ mac-stats/
 - **`ollama_chat_with_execution`**: Unified chat command that:
   - Gets system metrics for context
   - Sends question to Ollama with conversation history
+  - Handles **FETCH_URL** tool: if the model replies with `FETCH_URL: <url>`, the app fetches the page and sends the content back to Ollama (no CORS; server-side fetch)
   - Detects JavaScript code in responses (`ROLE=code-assistant` or pattern matching)
   - Extracts code (handles `console.log()` wrappers)
   - Returns structured response indicating if code execution is needed

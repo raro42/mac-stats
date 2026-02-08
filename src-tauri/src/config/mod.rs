@@ -122,4 +122,27 @@ impl Config {
         }
         Ok(())
     }
+
+    /// Get the schedules file path
+    ///
+    /// Returns a path in the user's home directory: `$HOME/.mac-stats/schedules.json`
+    /// Falls back to a temporary directory if HOME is not available.
+    pub fn schedules_file_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            let home_path = PathBuf::from(home);
+            return home_path.join(".mac-stats").join("schedules.json");
+        }
+        std::env::temp_dir().join("mac-stats-schedules.json")
+    }
+
+    /// Ensure the schedules directory exists
+    ///
+    /// Creates the directory containing the schedules file if it doesn't exist.
+    pub fn ensure_schedules_directory() -> std::io::Result<()> {
+        let schedules_path = Self::schedules_file_path();
+        if let Some(parent) = schedules_path.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+        Ok(())
+    }
 }

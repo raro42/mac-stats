@@ -28,8 +28,8 @@ fi
 # Check if first argument is "dev" for development mode
 if [[ "${1:-release}" == "dev" ]]; then
   shift  # Remove "dev" from arguments
-  # Pass remaining arguments to cargo run
-  cargo run -- "$@"
+  # Pass remaining arguments to cargo run (--bin mac_stats needed when multiple binaries exist)
+  cargo run --bin mac_stats -- "$@"
 else
   cargo build --release
   # Pass all arguments to the binary
