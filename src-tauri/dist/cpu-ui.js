@@ -63,6 +63,7 @@
     if (settingsBtn && settingsModal) {
       settingsBtn.addEventListener("click", () => {
         settingsModal.style.display = "flex";
+        if (window.Discord?.refreshStatus) window.Discord.refreshStatus();
       });
     }
 

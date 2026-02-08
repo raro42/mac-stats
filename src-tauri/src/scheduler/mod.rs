@@ -1,0 +1,334 @@
+//! Scheduler agent: runs tasks at scheduled times from ~/.mac-stats/schedules.json.
+//!
+//! Loads the file at startup and in a loop: sleeps until the next due time (or a short interval
+//! to check for file changes), executes the task (via Ollama + agents or direct FETCH_URL/BRAVE_SEARCH),
+//! and re-reads the file whenever it changes (mtime poll) or after each run.
+
+use crate::config::Config;
+use chrono::{DateTime, Local, TimeZone};
+use cron::Schedule;
+use serde::{Deserialize, Serialize};
+use std::str::FromStr;
+use std::time::Duration;
+use tracing::{debug, error, info, warn};
+
+/// Max sleep between checks so we periodically reload the schedule file (seconds).
+const MAX_SLEEP_SECS: u64 = 60;
+
+/// How often to check if schedules.json changed (seconds). Enables reload whenever the file is modified.
+const FILE_CHECK_INTERVAL_SECS: u64 = 2;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct ScheduleEntryRaw {
+    #[serde(default)]
+    id: Option<String>,
+    cron: Option<String>,
+    at: Option<String>,
+    task: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct ScheduleEntry {
+    pub id: Option<String>,
+    pub cron: Option<Schedule>,
+    pub at: Option<DateTime<Local>>,
+    pub task: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct SchedulesFile {
+    schedules: Vec<ScheduleEntryRaw>,
+}
+
+/// Returns the modification time of the schedules file, if it exists.
+fn schedules_file_mtime() -> Option<std::time::SystemTime> {
+    let path = Config::schedules_file_path();
+    std::fs::metadata(&path).ok().and_then(|m| m.modified().ok())
+}
+
+fn load_schedules() -> Vec<ScheduleEntry> {
+    let _ = Config::ensure_schedules_directory();
+    let path = Config::schedules_file_path();
+
+    if !path.exists() {
+        return Vec::new();
+    }
+
+    let content = match std::fs::read_to_string(&path) {
+        Ok(c) => c,
+        Err(e) => {
+            warn!("Scheduler: failed to read schedules file {:?}: {}", path, e);
+            return Vec::new();
+        }
+    };
+
+    let file_data: SchedulesFile = match serde_json::from_str(&content) {
+        Ok(d) => d,
+        Err(e) => {
+            warn!("Scheduler: failed to parse schedules file {:?}: {}", path, e);
+            return Vec::new();
+        }
+    };
+
+    let mut entries = Vec::new();
+    for raw in file_data.schedules {
+        if raw.task.is_empty() {
+            warn!("Scheduler: skipping entry with empty task (id={:?})", raw.id);
+            continue;
+        }
+        let has_cron = raw.cron.is_some();
+        let has_at = raw.at.is_some();
+        if has_cron == has_at {
+            warn!(
+                "Scheduler: entry must have exactly one of cron or at (id={:?})",
+                raw.id
+            );
+            continue;
+        }
+
+        if let Some(ref cron_str) = raw.cron {
+            match Schedule::from_str(cron_str) {
+                Ok(schedule) => {
+                    entries.push(ScheduleEntry {
+                        id: raw.id.clone(),
+                        cron: Some(schedule),
+                        at: None,
+                        task: raw.task,
+                    });
+                }
+                Err(e) => {
+                    warn!(
+                        "Scheduler: invalid cron {:?} (id={:?}): {}",
+                        cron_str, raw.id, e
+                    );
+                }
+            }
+        } else if let Some(ref at_str) = raw.at {
+            // Parse as local datetime (ISO 8601 without Z = local)
+            let at_dt = chrono::DateTime::parse_from_rfc3339(at_str)
+                .map(|dt| dt.with_timezone(&Local))
+                .or_else(|_| {
+                    // Try without timezone as local
+                    chrono::NaiveDateTime::parse_from_str(at_str, "%Y-%m-%dT%H:%M:%S")
+                        .map(|n| Local.from_local_datetime(&n).single().unwrap_or(n.and_utc().with_timezone(&Local)))
+                });
+            match at_dt {
+                Ok(dt) => {
+                    entries.push(ScheduleEntry {
+                        id: raw.id.clone(),
+                        cron: None,
+                        at: Some(dt),
+                        task: raw.task,
+                    });
+                }
+                Err(_) => {
+                    warn!(
+                        "Scheduler: invalid at datetime {:?} (id={:?})",
+                        at_str, raw.id
+                    );
+                }
+            }
+        }
+    }
+
+    info!(
+        "Scheduler: loaded {} entries from {:?}",
+        entries.len(),
+        path
+    );
+    entries
+}
+
+/// Compute the next run time for this entry (in local time). Returns None if one-shot already past or invalid.
+fn next_run(entry: &ScheduleEntry, after: DateTime<Local>) -> Option<DateTime<Local>> {
+    if let Some(ref schedule) = entry.cron {
+        schedule
+            .after(&after)
+            .next()
+    } else if let Some(at) = entry.at {
+        if at > after {
+            Some(at)
+        } else {
+            None
+        }
+    } else {
+        None
+    }
+}
+
+/// Execute a single task: direct tool (FETCH_URL/BRAVE_SEARCH) or Ollama.
+async fn execute_task(entry: &ScheduleEntry) {
+    let id_info = entry
+        .id
+        .as_deref()
+        .unwrap_or("(no id)");
+    let task = entry.task.trim();
+
+    if task.to_uppercase().starts_with("FETCH_URL:") {
+        let arg = task["FETCH_URL:".len()..].trim();
+        let semi = arg.find(';').unwrap_or(arg.len());
+        let url: String = arg[..semi].trim().to_string();
+        if url.is_empty() {
+            warn!("Scheduler: FETCH_URL with empty URL (id={})", id_info);
+            return;
+        }
+        info!("Scheduler: running FETCH_URL for {} (id={})", url, id_info);
+        match tokio::task::spawn_blocking(move || crate::commands::browser::fetch_page_content(&url)).await {
+            Ok(Ok(body)) => {
+                info!("Scheduler: FETCH_URL succeeded ({} chars)", body.chars().count());
+            }
+            Ok(Err(e)) => {
+                error!("Scheduler: FETCH_URL failed (id={}): {}", id_info, e);
+            }
+            Err(e) => {
+                error!("Scheduler: FETCH_URL task join error (id={}): {}", id_info, e);
+            }
+        }
+        return;
+    }
+
+    if task.to_uppercase().starts_with("BRAVE_SEARCH:") {
+        let query = task["BRAVE_SEARCH:".len()..].trim();
+        let semi = query.find(';').unwrap_or(query.len());
+        let query = query[..semi].trim();
+        if query.is_empty() {
+            warn!("Scheduler: BRAVE_SEARCH with empty query (id={})", id_info);
+            return;
+        }
+        info!("Scheduler: running BRAVE_SEARCH for {} (id={})", query, id_info);
+        match crate::commands::brave::get_brave_api_key() {
+            Some(api_key) => {
+                match crate::commands::brave::brave_web_search(query, &api_key).await {
+                    Ok(results) => {
+                        info!("Scheduler: BRAVE_SEARCH succeeded ({} chars)", results.chars().count());
+                    }
+                    Err(e) => {
+                        error!("Scheduler: BRAVE_SEARCH failed (id={}): {}", id_info, e);
+                    }
+                }
+            }
+            None => {
+                warn!("Scheduler: BRAVE_SEARCH skipped (no API key) (id={})", id_info);
+            }
+        }
+        return;
+    }
+
+    info!("Scheduler: running via Ollama (id={}): {}...", id_info, task.chars().take(60).collect::<String>());
+    match crate::commands::ollama::answer_with_ollama_and_fetch(task, None).await {
+        Ok(reply) => {
+            info!("Scheduler: Ollama completed (id={}, {} chars)", id_info, reply.chars().count());
+        }
+        Err(e) => {
+            error!("Scheduler: Ollama failed (id={}): {}", id_info, e);
+        }
+    }
+}
+
+async fn scheduler_loop() {
+    loop {
+        let mtime_before = schedules_file_mtime();
+        let entries = load_schedules();
+        let now = Local::now();
+
+        let mut next_runs: Vec<(DateTime<Local>, usize)> = entries
+            .iter()
+            .enumerate()
+            .filter_map(|(i, e)| next_run(e, now).map(|t| (t, i)))
+            .collect();
+
+        if next_runs.is_empty() {
+            tokio::time::sleep(Duration::from_secs(FILE_CHECK_INTERVAL_SECS)).await;
+            if schedules_file_mtime() != mtime_before {
+                info!("Scheduler: schedules file changed, reloading");
+            }
+            continue;
+        }
+
+        next_runs.sort_by_key(|(t, _)| *t);
+        let (next_time, idx) = next_runs[0];
+        let entry = &entries[idx];
+        let id_info = entry.id.as_deref().unwrap_or("(no id)");
+        debug!(
+            "Scheduler: next run at {} for id={} (task: {}...)",
+            next_time.format("%Y-%m-%d %H:%M:%S"),
+            id_info,
+            entry.task.chars().take(40).collect::<String>()
+        );
+        let wait_secs = (next_time - now).num_seconds().max(0) as u64;
+        let sleep_duration = Duration::from_secs(
+            wait_secs
+                .min(MAX_SLEEP_SECS)
+                .min(FILE_CHECK_INTERVAL_SECS),
+        );
+
+        tokio::time::sleep(sleep_duration).await;
+
+        if schedules_file_mtime() != mtime_before {
+            info!("Scheduler: schedules file changed, reloading");
+            continue;
+        }
+
+        let now_after_sleep = Local::now();
+        if now_after_sleep >= next_time {
+            let entry = &entries[idx];
+            execute_task(entry).await;
+            // One-shot: if it was "at", we don't remove from file; next load will skip it (at is in past).
+            // So we just continue and reload.
+        }
+    }
+}
+
+/// Add a schedule entry to the file (e.g. from Discord when Ollama invokes SCHEDULE).
+/// Uses cron only (no one-shot "at"). Id should be unique (e.g. "discord-<timestamp>").
+/// Logs at INFO so scheduling is visible in debug output and Discord flow.
+pub fn add_schedule(id: String, cron_str: String, task: String) -> Result<(), String> {
+    let _ = Config::ensure_schedules_directory();
+    let path = Config::schedules_file_path();
+
+    let mut file_data = if path.exists() {
+        let content = std::fs::read_to_string(&path)
+            .map_err(|e| format!("Failed to read schedules file: {}", e))?;
+        serde_json::from_str::<SchedulesFile>(&content)
+            .map_err(|e| format!("Failed to parse schedules file: {}", e))?
+    } else {
+        SchedulesFile {
+            schedules: Vec::new(),
+        }
+    };
+
+    file_data.schedules.push(ScheduleEntryRaw {
+        id: Some(id.clone()),
+        cron: Some(cron_str.clone()),
+        at: None,
+        task: task.clone(),
+    });
+
+    let json = serde_json::to_string_pretty(&file_data)
+        .map_err(|e| format!("Failed to serialize schedules: {}", e))?;
+    std::fs::write(&path, json).map_err(|e| format!("Failed to write schedules file: {}", e))?;
+
+    info!(
+        "Scheduler: schedule added from agent (id={}, cron={}, task_len={})",
+        id,
+        cron_str,
+        task.chars().count()
+    );
+    Ok(())
+}
+
+/// Spawn the scheduler in a background thread. Reads ~/.mac-stats/schedules.json and runs due tasks.
+/// Safe to call once at startup.
+pub fn spawn_scheduler_thread() {
+    std::thread::spawn(|| {
+        let rt = match tokio::runtime::Runtime::new() {
+            Ok(r) => r,
+            Err(e) => {
+                error!("Scheduler: failed to create tokio runtime: {}", e);
+                return;
+            }
+        };
+        info!("Scheduler: thread spawned");
+        rt.block_on(scheduler_loop());
+    });
+}

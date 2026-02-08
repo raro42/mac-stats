@@ -23,11 +23,14 @@ mod metrics;
 pub mod config;
 mod ffi;
 mod ui;
-mod security;
+pub mod security;
 mod monitors;
 mod alerts;
 mod plugins;
 mod ollama;
+pub mod discord;
+mod scheduler;
+mod mcp;
 mod commands;
 
 use std::os::raw::c_void;
@@ -187,6 +190,11 @@ fn run_internal(open_cpu_window: bool) {
             commands::ollama::log_ollama_js_no_blocks,
             commands::ollama::ollama_chat_with_execution,
             commands::ollama::ollama_chat_continue_with_result,
+            // Browser / fetch for Ollama
+            commands::browser::fetch_page,
+            // Discord commands
+            commands::discord::configure_discord,
+            commands::discord::is_discord_configured,
             // Logging commands
             commands::logging::log_from_js,
         ])
@@ -263,6 +271,15 @@ fn run_internal(open_cpu_window: bool) {
             println!("Happy monitoring! 🚀");
             println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
             
+            // Start Discord gateway in a background thread. Token is read from DISCORD_BOT_TOKEN
+            // env, .config.env, or Keychain (no Keychain write here, so no blocking).
+            std::thread::spawn(|| {
+                discord::spawn_discord_if_configured();
+            });
+
+            // Start scheduler agent: reads ~/.mac-stats/schedules.json and runs due tasks (Ollama + tools).
+            scheduler::spawn_scheduler_thread();
+
             // For automatic updates, we'll use a simple approach:
             // The background update loop stores updates in MENU_BAR_TEXT
             // We'll process them in the click handler (which works)
@@ -905,7 +922,7 @@ fn run_internal(open_cpu_window: bool) {
                                                                 // Cache this key for future use
                                                                 if let Ok(mut cached) = M3_TEMP_KEY.lock() {
                                                                     *cached = Some(dbg.key.clone());
-                                                                    debug2!("Discovered working M3 temperature key: {} = {:.1}°C", dbg.key, temp);
+                                                                    debug3!("Discovered working M3 temperature key: {} = {:.1}°C", dbg.key, temp);
                                                                 }
                                                                 break; // Early exit - use first valid temperature found
                                                             }
@@ -921,7 +938,7 @@ fn run_internal(open_cpu_window: bool) {
                                     // Update cache with new temperature and timestamp
                                     if let Ok(mut cache) = TEMP_CACHE.try_lock() {
                                         *cache = Some((temp as f32, std::time::Instant::now()));
-                                        debug2!("Temperature updated in cache: {:.1}°C", temp);
+                                        debug3!("Temperature updated in cache: {:.1}°C", temp);
                                     } else {
                                         debug2!("Temperature cache lock failed, skipping update");
                                     }
@@ -941,7 +958,7 @@ fn run_internal(open_cpu_window: bool) {
                         // CPU EFFICIENCY: Only read frequency every 20 seconds (IOReport sampling still has overhead)
                         // Increased from 10s to 20s to save CPU - frequency doesn't change that rapidly
                         let should_read_freq = if let Ok(mut last) = LAST_FREQ_READ.lock() {
-                            debug2!("========> LAST_FREQ_READ: {:?}", last);
+                            debug3!("========> LAST_FREQ_READ: {:?}", last);
                             let should = last.as_ref()
                                 .map(|t| t.elapsed().as_secs() >= 30)
                                 .unwrap_or(true);
@@ -1425,4 +1442,7 @@ fn run_internal(open_cpu_window: bool) {
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+
+    // Log off from Discord on app shutdown so the user appears offline.
+    discord::disconnect_discord();
 }

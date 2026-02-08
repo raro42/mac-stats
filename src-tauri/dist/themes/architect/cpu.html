@@ -304,6 +304,16 @@
             </label>
             <div class="setting-note" style="font-size: 11px; color: rgba(35, 45, 65, 0.70); margin-top: 4px; font-style: italic;">Not yet functional</div>
           </div>
+          <div class="setting-item" id="discord-setting">
+            <div class="setting-label">Discord bot</div>
+            <div class="discord-status" id="discord-status">—</div>
+            <input type="password" id="discord-token-input" class="discord-token-input" placeholder="Paste bot token here" autocomplete="off" style="width:100%; margin-top:4px; padding:6px 8px; box-sizing:border-box; min-height:28px;" />
+            <div class="discord-actions" style="margin-top: 6px;">
+              <button type="button" class="theme-item discord-btn" id="discord-save-token" style="margin-right: 8px; cursor: pointer;">Save token</button>
+              <button type="button" class="theme-item discord-btn" id="discord-clear-token" style="cursor: pointer;">Clear token</button>
+            </div>
+            <div class="setting-note" style="font-size: 11px; color: rgba(35, 45, 65, 0.70); margin-top: 4px; font-style: italic;">Saving connects right away. Restart to disconnect after clearing.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -333,6 +343,7 @@
     <script src="../../tauri-logger.js"></script>
     <script type="module" src="../../ollama.js"></script>
     <script src="../../cpu.js"></script>
+    <script src="../../discord.js"></script>
     <script src="../../cpu-ui.js"></script>
     <script src="./chart.js"></script>
   </body>

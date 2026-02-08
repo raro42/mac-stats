@@ -2,6 +2,8 @@
 
 use crate::ollama::{OllamaClient, OllamaConfig, ChatMessage};
 use serde::{Deserialize, Serialize};
+use std::io::Write;
+use std::process::Command;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 
@@ -114,79 +116,525 @@ pub async fn check_ollama_connection() -> Result<bool, String> {
     }
 }
 
-/// Send chat message to Ollama (async, non-blocking)
-#[tauri::command]
-pub async fn ollama_chat(request: ChatRequest) -> Result<crate::ollama::ChatResponse, String> {
+/// Internal: send messages to Ollama and return the chat response.
+/// Used by the ollama_chat command and by answer_with_ollama_and_fetch (Discord / agent).
+pub async fn send_ollama_chat_messages(
+    messages: Vec<crate::ollama::ChatMessage>,
+) -> Result<crate::ollama::ChatResponse, String> {
     use tracing::{debug, info};
-    use serde_json;
-    
-    // Log raw request JSON
-    let request_json = serde_json::to_string_pretty(&request)
-        .unwrap_or_else(|_| "Failed to serialize request".to_string());
-    info!("Ollama: Chat request JSON:\n{}", request_json);
-    
-    // Clone client data to avoid holding lock across await
-    let (endpoint, model, api_key, messages) = {
-        let client_guard = get_ollama_client().lock()
-            .map_err(|e| e.to_string())?;
 
-        let client = client_guard.as_ref()
+    let (endpoint, model, api_key) = {
+        let client_guard = get_ollama_client()
+            .lock()
+            .map_err(|e| e.to_string())?;
+        let client = client_guard
+            .as_ref()
             .ok_or_else(|| "Ollama not configured".to_string())?;
-        
-        (client.config.endpoint.clone(), 
-         client.config.model.clone(),
-         client.config.api_key.clone(),
-         request.messages)
+        (
+            client.config.endpoint.clone(),
+            client.config.model.clone(),
+            client.config.api_key.clone(),
+        )
     };
-    
-    // Create a temporary client for this request (non-blocking)
+
     let temp_client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(120))
         .build()
         .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
-    
+
     let url = format!("{}/api/chat", endpoint);
-    info!("Ollama: Using endpoint: {}", url);
-    info!("Ollama: Streaming is disabled (stream: false)");
     let chat_request = crate::ollama::ChatRequest {
         model: model.clone(),
-        messages: messages.clone(),
+        messages,
         stream: false,
     };
-    
+
     let mut http_request = temp_client.post(&url).json(&chat_request);
-    
-    // Add API key if configured
     if let Some(keychain_account) = &api_key {
         if let Ok(Some(api_key_value)) = crate::security::get_credential(keychain_account) {
-            let masked = crate::security::mask_credential(&api_key_value);
+            let _masked = crate::security::mask_credential(&api_key_value);
             http_request = http_request.header("Authorization", format!("Bearer {}", api_key_value));
-            debug!("Ollama: Using API key for chat request (masked: {})", masked);
+            debug!("Ollama: Using API key for chat request");
         }
     }
 
-    let start_time = std::time::Instant::now();
     let response = http_request
         .send()
         .await
-        .map_err(|e| {
-            debug!("Ollama: Chat request failed: {}", e);
-            format!("Failed to send chat request: {}", e)
-        })?
+        .map_err(|e| format!("Failed to send chat request: {}", e))?
         .json::<crate::ollama::ChatResponse>()
         .await
-        .map_err(|e| {
-            debug!("Ollama: Failed to parse response: {}", e);
-            format!("Failed to parse response: {}", e)
-        })?;
-    let duration = start_time.elapsed();
-
-    // Log raw response JSON
-    let response_json = serde_json::to_string_pretty(&response)
-        .unwrap_or_else(|_| "Failed to serialize response".to_string());
-    info!("Ollama: Chat response JSON (duration: {:?}):\n{}", duration, response_json);
-
+        .map_err(|e| format!("Failed to parse response: {}", e))?;
+    let content = &response.message.content;
+    let n = content.chars().count();
+    const LOG_MAX: usize = 500;
+    if n <= LOG_MAX {
+        info!("Ollama: Chat response received ({} chars): {}", n, content);
+    } else {
+        let head: String = content.chars().take(LOG_MAX).collect();
+        info!("Ollama: Chat response received ({} chars): {}...", n, head);
+    }
     Ok(response)
+}
+
+/// Send chat message to Ollama (async, non-blocking)
+#[tauri::command]
+pub async fn ollama_chat(request: ChatRequest) -> Result<crate::ollama::ChatResponse, String> {
+    use serde_json;
+    use tracing::info;
+
+    let request_json = serde_json::to_string_pretty(&request)
+        .unwrap_or_else(|_| "Failed to serialize request".to_string());
+    info!("Ollama: Chat request JSON:\n{}", request_json);
+
+    send_ollama_chat_messages(request.messages).await
+}
+
+/// Base agent descriptions (without MCP). Includes RUN_JS, FETCH_URL, BRAVE_SEARCH, SCHEDULE.
+const AGENT_DESCRIPTIONS_BASE: &str = r#"We have 4 agents available:
+
+1. **RUN_JS** (JavaScript superpowers): Execute JavaScript in the app context (e.g. browser console). Use for: dynamic data, DOM inspection, client-side state. To invoke: reply with exactly one line: RUN_JS: <JavaScript code>. Note: In some contexts (e.g. Discord) JS is not executed; then answer without running code.
+
+2. **FETCH_URL**: Fetch the full text of a web page. Use for: reading a specific URL's content. To invoke: reply with exactly one line: FETCH_URL: <full URL> (e.g. FETCH_URL: https://www.example.com). The app will return the page text.
+
+3. **BRAVE_SEARCH**: Web search via Brave Search API. Use for: finding current info, facts, multiple sources. To invoke: reply with exactly one line: BRAVE_SEARCH: <search query>. The app will return search results.
+
+4. **SCHEDULE** (scheduler): Add a task to run at scheduled times. Use when the user wants something to run later or repeatedly (e.g. every 5 minutes, daily). To invoke: reply with exactly one line: SCHEDULE: every N minutes <task description> (e.g. SCHEDULE: every 5 minutes Execute RUN_JS to fetch CPU and RAM). Or SCHEDULE: <cron expression> <task>. We will add it to ~/.mac-stats/schedules.json and confirm to the user."#;
+
+/// RUN_CMD agent description (appended when ALLOW_LOCAL_CMD is not 0).
+const RUN_CMD_DESCRIPTION: &str = r#"
+
+5. **RUN_CMD** (local read-only): Run a restricted local command to read app data under ~/.mac-stats. Use for: reading schedules.json, config, or other files in ~/.mac-stats. To invoke: reply with exactly one line: RUN_CMD: <command> [args] (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json or RUN_CMD: ls ~/.mac-stats). Only cat, head, tail, ls are allowed; paths must be under ~/.mac-stats."#;
+
+/// Build agent descriptions string: base, optional RUN_CMD when allowed, then MCP tools when configured.
+async fn build_agent_descriptions() -> String {
+    use tracing::info;
+    let mut base = AGENT_DESCRIPTIONS_BASE.to_string();
+    if crate::commands::run_cmd::is_local_cmd_allowed() {
+        base.push_str(RUN_CMD_DESCRIPTION);
+    }
+    let Some(server_url) = crate::mcp::get_mcp_server_url() else {
+        return base;
+    };
+    info!("Agent router: MCP configured, fetching tool list from server");
+    match crate::mcp::list_tools(&server_url).await {
+        Ok(tools) => {
+            if tools.is_empty() {
+                info!("Agent router: MCP server returned no tools");
+                return base;
+            }
+            let mcp_num = if crate::commands::run_cmd::is_local_cmd_allowed() {
+                6
+            } else {
+                5
+            };
+            let mut mcp_section = format!("\n\n{}. **MCP** (tools from configured MCP server, {} tools): Use when the task matches a tool below. To invoke: reply with exactly one line: MCP: <tool_name> <arguments>. Arguments can be JSON (e.g. MCP: get_weather {{\"location\": \"NYC\"}}) or plain text (e.g. MCP: fetch_url https://example.com).\n\nAvailable MCP tools:\n", mcp_num, tools.len());
+            for t in &tools {
+                let desc = t.description.as_deref().unwrap_or("(no description)");
+                mcp_section.push_str(&format!("- **{}**: {}\n", t.name, desc));
+            }
+            base + &mcp_section
+        }
+        Err(e) => {
+            info!("Agent router: MCP list_tools failed ({}), omitting MCP from agent list", e);
+            base
+        }
+    }
+}
+
+/// Shared API for Discord (and other agents): ask Ollama how to solve, then run agents (FETCH_URL, BRAVE_SEARCH, RUN_JS).
+/// 1) Planning: send user question + agent list, get RECOMMEND: plan.
+/// 2) Execution: send plan + "now answer using agents", loop on FETCH_URL / BRAVE_SEARCH / RUN_JS (max 5 tool calls).
+/// If `status_tx` is provided (e.g. from Discord), short status messages are sent so the user sees we're still working.
+pub async fn answer_with_ollama_and_fetch(
+    question: &str,
+    status_tx: Option<tokio::sync::mpsc::UnboundedSender<String>>,
+) -> Result<String, String> {
+    use tracing::info;
+
+    let send_status = |msg: &str| {
+        if let Some(ref tx) = status_tx {
+            let _ = tx.send(msg.to_string());
+        }
+    };
+
+    let q_preview: String = question.chars().take(120).collect();
+    if question.len() > 120 {
+        info!("Agent router: starting (question: {}... [{} chars])", q_preview, question.len());
+    } else {
+        info!("Agent router: starting (question: {})", q_preview);
+    }
+    send_status("Thinking…");
+
+    let agent_descriptions = build_agent_descriptions().await;
+    info!("Agent router: agent list built ({} chars)", agent_descriptions.len());
+
+    // --- Planning step: ask Ollama how it would solve the question ---
+    info!("Agent router: planning step — asking Ollama for RECOMMEND");
+    const PLANNING_PROMPT: &str = "You are a helpful assistant. We will give you a user question and a list of available agents. Reply with your recommended approach in this exact format: RECOMMEND: <your plan in one or two sentences: which agents to use and in what order>. Do not execute anything yet.";
+    let planning_messages = vec![
+        crate::ollama::ChatMessage {
+            role: "system".to_string(),
+            content: format!("{}\n\n{}\n\nUser question: {}", PLANNING_PROMPT, agent_descriptions, question),
+        },
+        crate::ollama::ChatMessage {
+            role: "user".to_string(),
+            content: "Reply with RECOMMEND: your plan.".to_string(),
+        },
+    ];
+    let plan_response = send_ollama_chat_messages(planning_messages).await?;
+    let recommendation = plan_response.message.content.trim().to_string();
+    info!("Agent router: understood plan — RECOMMEND: {}", recommendation.chars().take(200).collect::<String>());
+    send_status("Working on it…");
+
+    // --- Execution: system prompt with agents + plan, then tool loop ---
+    info!("Agent router: execution step — sending plan + question, starting tool loop (max 5 tools)");
+    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or RUN_CMD: <command and args> or SCHEDULE: every N minutes <task> or MCP: <tool_name> <arguments> (if MCP tools are listed). We will run it and give you the result. Then continue with your answer. Answer concisely.";
+    let mut messages = vec![
+        crate::ollama::ChatMessage {
+            role: "system".to_string(),
+            content: format!(
+                "{}\n\n{}\n\nYour plan: {}",
+                EXECUTION_PROMPT,
+                agent_descriptions,
+                recommendation
+            ),
+        },
+        crate::ollama::ChatMessage {
+            role: "user".to_string(),
+            content: question.to_string(),
+        },
+    ];
+
+    /// Log content in full if ≤500 chars, else first 500 + truncation note.
+    const LOG_CONTENT_MAX: usize = 500;
+    let log_content = |content: &str| {
+        let n = content.chars().count();
+        if n <= LOG_CONTENT_MAX {
+            content.to_string()
+        } else {
+            format!(
+                "{}... [truncated, {} chars total]",
+                content.chars().take(LOG_CONTENT_MAX).collect::<String>(),
+                n
+            )
+        }
+    };
+
+    const MAX_TOOL_ITERATIONS: u32 = 5;
+    let mut tool_count: u32 = 0;
+    let mut response = send_ollama_chat_messages(messages.clone()).await?;
+    let mut response_content = response.message.content.clone();
+    let n_first = response_content.chars().count();
+    info!("Agent router: first response received ({} chars): {}", n_first, log_content(&response_content));
+
+    while tool_count < MAX_TOOL_ITERATIONS {
+        let (tool, arg) = match parse_tool_from_response(&response_content) {
+            Some((t, a)) => {
+                let arg_preview: String = a.chars().take(80).collect();
+                let arg_len = a.chars().count();
+                if arg_len > 80 {
+                    info!("Agent router: understood tool {} (arg: {}... [{} chars])", t, arg_preview, arg_len);
+                } else {
+                    info!("Agent router: understood tool {} (arg: {})", t, arg_preview);
+                }
+                (t, a)
+            }
+            None => {
+                info!("Agent router: no tool call in response ({} chars), treating as final answer: {}", response_content.chars().count(), log_content(&response_content));
+                break;
+            }
+        };
+        tool_count += 1;
+        info!("Agent router: running tool {}/{} — {}", tool_count, MAX_TOOL_ITERATIONS, tool);
+
+        let user_message = match tool.as_str() {
+            "FETCH_URL" => {
+                send_status("Fetching page…");
+                info!("Discord/Ollama: FETCH_URL requested: {}", arg);
+                let url = arg.to_string();
+                let fetch_result = tokio::task::spawn_blocking(move || crate::commands::browser::fetch_page_content(&url))
+                    .await
+                    .map_err(|e| format!("Fetch task: {}", e))?
+                    .map_err(|e| format!("Fetch page failed: {}", e));
+                match fetch_result {
+                    Ok(body) => format!(
+                        "Here is the page content:\n\n{}\n\nPlease answer the user's question based on this content.",
+                        body
+                    ),
+                    Err(e) => {
+                        if e.contains("401") {
+                            info!("Discord/Ollama: Fetch returned 401 Unauthorized, stopping");
+                            format!("That URL returned 401 Unauthorized. Do not try another URL. Answer based on what you know.")
+                        } else {
+                            return Err(e);
+                        }
+                    }
+                }
+            }
+            "BRAVE_SEARCH" => {
+                send_status("Searching the web…");
+                info!("Discord/Ollama: BRAVE_SEARCH requested: {}", arg);
+                match crate::commands::brave::get_brave_api_key() {
+                    Some(api_key) => match crate::commands::brave::brave_web_search(&arg, &api_key).await {
+                        Ok(results) => format!(
+                            "Brave Search results:\n\n{}\n\nUse these to answer the user's question.",
+                            results
+                        ),
+                        Err(e) => format!("Brave Search failed: {}. Answer without search results.", e),
+                    },
+                    None => "Brave Search is not configured (no BRAVE_API_KEY in env or .config.env). Answer without search results.".to_string(),
+                }
+            }
+            "RUN_JS" => {
+                send_status("Running code…");
+                info!("Discord/Ollama: RUN_JS requested: {}... [{} chars]", arg.chars().take(60).collect::<String>(), arg.len());
+                match run_js_via_node(&arg) {
+                    Ok(result) => format!(
+                        "JavaScript result:\n\n{}\n\nUse this to answer the user's question.",
+                        result
+                    ),
+                    Err(e) => {
+                        info!("Discord/Ollama: RUN_JS failed: {}", e);
+                        format!("JavaScript execution failed: {}. Answer the user's question without running code.", e)
+                    }
+                }
+            }
+            "SCHEDULE" => {
+                send_status("Scheduling…");
+                info!("Agent router: SCHEDULE requested (arg len={})", arg.chars().count());
+                match parse_schedule_arg(&arg) {
+                    Ok((cron_str, task)) => {
+                        let id = format!("discord-{}", chrono::Utc::now().timestamp());
+                        match crate::scheduler::add_schedule(id.clone(), cron_str.clone(), task.clone()) {
+                            Ok(()) => {
+                                info!("Agent router: SCHEDULE added (id={}, cron={})", id, cron_str);
+                                let task_preview: String = task.chars().take(100).collect();
+                                format!(
+                                    "Schedule added successfully. The scheduler will run this task (cron: {}): \"{}\". Tell the user in your reply that it is scheduled and they will see it in the scheduler.",
+                                    cron_str,
+                                    task_preview.trim()
+                                )
+                            }
+                            Err(e) => {
+                                info!("Agent router: SCHEDULE failed: {}", e);
+                                format!("Failed to add schedule: {}. Tell the user and suggest they check ~/.mac-stats/schedules.json.", e)
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        info!("Agent router: SCHEDULE parse failed: {}", e);
+                        format!("Could not parse schedule (expected e.g. \"every 5 minutes <task>\"): {}. Ask the user to rephrase.", e)
+                    }
+                }
+            }
+            "RUN_CMD" => {
+                if !crate::commands::run_cmd::is_local_cmd_allowed() {
+                    "RUN_CMD is not available (disabled by ALLOW_LOCAL_CMD=0). Answer without running local commands.".to_string()
+                } else {
+                    let status_preview: String = arg.chars().take(40).collect();
+                    let status_msg = if arg.chars().count() > 40 {
+                        format!("Running local command: {}…", status_preview)
+                    } else {
+                        format!("Running local command: {}", arg)
+                    };
+                    send_status(&status_msg);
+                    info!("Agent router: RUN_CMD requested: {}", arg);
+                    match tokio::task::spawn_blocking({
+                        let arg = arg.to_string();
+                        move || crate::commands::run_cmd::run_local_command(&arg)
+                    })
+                    .await
+                    .map_err(|e| format!("RUN_CMD task: {}", e))
+                    .and_then(|r| r)
+                    {
+                        Ok(output) => format!(
+                            "Here is the command output:\n\n{}\n\nUse this to answer the user's question.",
+                            output
+                        ),
+                        Err(e) => format!(
+                            "RUN_CMD failed: {}. Answer the user's question without this result.",
+                            e
+                        ),
+                    }
+                }
+            }
+            "MCP" => {
+                send_status("Calling MCP tool…");
+                info!("Agent router: MCP requested (arg len={})", arg.chars().count());
+                match crate::mcp::get_mcp_server_url() {
+                    Some(server_url) => {
+                        let (mcp_tool_name, mcp_args) = if let Some(space) = arg.find(' ') {
+                            let (name, rest) = arg.split_at(space);
+                            let rest = rest.trim();
+                            let args = if rest.starts_with('{') {
+                                serde_json::from_str(rest).ok()
+                            } else {
+                                Some(serde_json::json!({ "input": rest }))
+                            };
+                            (name.to_string(), args)
+                        } else {
+                            (arg.clone(), None)
+                        };
+                        match crate::mcp::call_tool(&server_url, &mcp_tool_name, mcp_args).await {
+                            Ok(result) => {
+                                info!("Agent router: MCP tool {} completed ({} chars)", mcp_tool_name, result.len());
+                                format!(
+                                    "MCP tool \"{}\" result:\n\n{}\n\nUse this to answer the user's question.",
+                                    mcp_tool_name, result
+                                )
+                            }
+                            Err(e) => {
+                                info!("Agent router: MCP tool {} failed: {}", mcp_tool_name, e);
+                                format!("MCP tool \"{}\" failed: {}. Answer the user without this result.", mcp_tool_name, e)
+                            }
+                        }
+                    }
+                    None => {
+                        info!("Agent router: MCP not configured (no MCP_SERVER_URL)");
+                        "MCP is not configured (set MCP_SERVER_URL in env or .config.env). Answer without using MCP.".to_string()
+                    }
+                }
+            }
+            _ => continue,
+        };
+
+        let result_len = user_message.chars().count();
+        info!("Agent router: tool {} completed, sending result back to Ollama ({} chars): {}", tool, result_len, log_content(&user_message));
+
+        messages.push(crate::ollama::ChatMessage {
+            role: "assistant".to_string(),
+            content: response_content.clone(),
+        });
+        messages.push(crate::ollama::ChatMessage {
+            role: "user".to_string(),
+            content: user_message,
+        });
+
+        response = send_ollama_chat_messages(messages.clone()).await?;
+        response_content = response.message.content.clone();
+        if tool_count >= MAX_TOOL_ITERATIONS {
+            info!("Agent router: max tool iterations reached ({}), using last response as final", MAX_TOOL_ITERATIONS);
+        }
+    }
+
+    let final_len = response_content.chars().count();
+    info!("Agent router: done after {} tool(s), returning final response ({} chars): {}", tool_count, final_len, log_content(&response_content));
+    Ok(response_content)
+}
+
+/// Run JavaScript via Node.js (if available). Used for RUN_JS in Discord/agent context.
+/// Writes code to a temp file and runs `node -e "..."` to eval and print the result.
+fn run_js_via_node(code: &str) -> Result<String, String> {
+    let tmp_dir = std::env::temp_dir();
+    let stamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_millis())
+        .unwrap_or(0);
+    let path = tmp_dir.join(format!("mac_stats_js_{}_{}.js", std::process::id(), stamp));
+    let path_str = path
+        .to_str()
+        .ok_or_else(|| "Invalid temp path".to_string())?;
+
+    let mut f = std::fs::File::create(&path).map_err(|e| format!("Create temp file: {}", e))?;
+    f.write_all(code.as_bytes())
+        .map_err(|e| format!("Write temp file: {}", e))?;
+    f.flush().map_err(|e| format!("Flush: {}", e))?;
+    drop(f);
+
+    // Node -e script: read file, eval code, print result (no user code in -e, so no escaping).
+    let eval_script = r#"const fs=require('fs');const p=process.argv[1];const c=fs.readFileSync(p,'utf8');try{const r=eval(c);console.log(r!==undefined?String(r):'undefined');}catch(e){console.error(e.message);process.exit(1);}"#;
+    let out = Command::new("node")
+        .arg("-e")
+        .arg(eval_script)
+        .arg(path_str)
+        .output()
+        .map_err(|e| format!("Node not available or failed: {}", e))?;
+
+    let _ = std::fs::remove_file(&path);
+
+    if !out.status.success() {
+        let stderr = String::from_utf8_lossy(&out.stderr);
+        return Err(stderr.trim().to_string());
+    }
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    Ok(stdout.trim().to_string())
+}
+
+/// Parse SCHEDULE argument into (cron_str, task). Supports "every N minutes <task>" (case insensitive).
+/// Returns (cron_expression, task_text). Task is the full arg so the scheduler runs it as the Ollama question.
+fn parse_schedule_arg(arg: &str) -> Result<(String, String), String> {
+    let lower = arg.to_lowercase();
+    let rest = lower.trim_start();
+    if let Some(after_every) = rest.strip_prefix("every ") {
+        let mut n_str = String::new();
+        for c in after_every.chars() {
+            if c.is_ascii_digit() {
+                n_str.push(c);
+            } else {
+                break;
+            }
+        }
+        let remainder = after_every[n_str.len()..].trim_start();
+        if n_str.is_empty() {
+            return Err("expected a number after 'every' (e.g. every 5 minutes)".to_string());
+        }
+        let n: u64 = n_str.parse().map_err(|_| "expected integer after 'every'".to_string())?;
+        if n == 0 {
+            return Err("interval must be at least 1 minute".to_string());
+        }
+        if !remainder.to_lowercase().starts_with("minute") {
+            return Err("expected 'minutes' after the number (e.g. every 5 minutes)".to_string());
+        }
+        // Cron: every N minutes = "0 */N * * * *" (second 0, every N minutes)
+        let cron_str = format!("0 */{} * * * *", n);
+        let task = arg.trim().to_string();
+        Ok((cron_str, task))
+    } else {
+        // Optional: allow raw cron at start (e.g. "0 */5 * * * * Task here"). For now only "every N minutes".
+        Err("expected 'every N minutes' (e.g. SCHEDULE: every 5 minutes Execute RUN_JS to fetch CPU)".to_string())
+    }
+}
+
+/// Parse one of FETCH_URL:, BRAVE_SEARCH:, RUN_JS:, SCHEDULE:/SCHEDULER:, MCP: from assistant content.
+/// Also accepts lines starting with "RECOMMEND: " (e.g. "RECOMMEND: SCHEDULER: Every 5 minutes...").
+/// Returns (tool_name, argument) or None.
+fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "MCP:"];
+    for line in content.lines() {
+        let line = line.trim();
+        // Ollama sometimes echoes the plan format: "RECOMMEND: RUN_JS: ..." or "RECOMMEND: SCHEDULER: ...".
+        let search = if line.to_uppercase().starts_with("RECOMMEND: ") {
+            line[11..].trim()
+        } else {
+            line
+        };
+        for prefix in prefixes {
+            if search.to_uppercase().starts_with(prefix) {
+                let mut arg = search[prefix.len()..].trim().to_string();
+                if arg.is_empty() {
+                    continue;
+                }
+                let tool_name = prefix.trim_end_matches(':');
+                // Normalize SCHEDULER -> SCHEDULE
+                let tool_name = if tool_name.eq_ignore_ascii_case("SCHEDULER") {
+                    "SCHEDULE".to_string()
+                } else {
+                    tool_name.to_string()
+                };
+                // Ollama sometimes concatenates multiple tools on one line; for FETCH_URL and BRAVE_SEARCH, stop at first ';'.
+                if tool_name == "FETCH_URL" || tool_name == "BRAVE_SEARCH" {
+                    if let Some(idx) = arg.find(';') {
+                        arg = arg[..idx].trim().to_string();
+                    }
+                }
+                if !arg.is_empty() {
+                    return Some((tool_name, arg));
+                }
+            }
+        }
+    }
+    None
 }
 
 /// List available Ollama models (async, non-blocking)
@@ -369,12 +817,28 @@ pub struct OllamaChatWithExecutionResponse {
     pub context_message: Option<String>, // Store context for follow-up
 }
 
+/// Parse FETCH_URL: <url> from assistant response. Returns the URL if present.
+fn parse_fetch_url_from_response(content: &str) -> Option<String> {
+    let prefix = "FETCH_URL:";
+    for line in content.lines() {
+        let line = line.trim();
+        if line.to_uppercase().starts_with(prefix) {
+            let url = line[prefix.len()..].trim();
+            if !url.is_empty() {
+                return Some(url.to_string());
+            }
+        }
+    }
+    None
+}
+
 /// Unified Ollama chat command that handles code execution flow
 /// This command:
 /// 1. Gets system metrics
 /// 2. Sends question to Ollama
-/// 3. Detects if code needs execution
-/// 4. Returns structured response
+/// 3. Handles FETCH_URL tool (fetch page, send content back)
+/// 4. Detects if code needs execution
+/// 5. Returns structured response
 #[tauri::command]
 pub async fn ollama_chat_with_execution(
     request: OllamaChatWithExecutionRequest,
@@ -403,9 +867,11 @@ pub async fn ollama_chat_with_execution(
         request.question
     );
     
-    // Get system prompt
+    // Get system prompt (includes FETCH_URL tool for web navigation)
     let system_prompt = request.system_prompt.unwrap_or_else(|| {
-        "You are a general purpose AI. If you are asked for actual data like day or weather information, or flight information or stock information. Then we need to compile that information using speciallz crafted clients for doing so. You will put \"[variable-name]\" into the answer to signal that we need to go another step and ask and agent to fullfill the answer.\n\nWhenever asked with \"[variable-name]\", you must provide a javascript snipplet to be executed in the browser console to retrieve that information. Mark the answer to be executed as javascript. Do not put any other words around it. Do not insert formatting. Onlz return the code to be executed. This is needed for the next AI to understand and execute the same. When answering, use the role: code-assistant in the response. When you return executable code:\n- Start the response with: ROLE=code-assistant\n- On the next line, output ONLY executable JavaScript\n- Do not add explanations or formatting".to_string()
+        let base = "You are a general purpose AI. If you are asked for actual data like day or weather information, or flight information or stock information. Then we need to compile that information using speciallz crafted clients for doing so. You will put \"[variable-name]\" into the answer to signal that we need to go another step and ask and agent to fullfill the answer.\n\nWhenever asked with \"[variable-name]\", you must provide a javascript snipplet to be executed in the browser console to retrieve that information. Mark the answer to be executed as javascript. Do not put any other words around it. Do not insert formatting. Onlz return the code to be executed. This is needed for the next AI to understand and execute the same. When answering, use the role: code-assistant in the response. When you return executable code:\n- Start the response with: ROLE=code-assistant\n- On the next line, output ONLY executable JavaScript\n- Do not add explanations or formatting";
+        let fetch_tool = "\n\nFor web pages: To fetch a page and use its content (e.g. \"navigate to X and get Y\"), reply with exactly one line: FETCH_URL: <full URL> (e.g. FETCH_URL: https://www.example.com). The app will fetch the page and give you the text; then answer the user based on that.";
+        format!("{}{}", base, fetch_tool)
     });
     
     // Build messages array with conversation history
@@ -435,14 +901,54 @@ pub async fn ollama_chat_with_execution(
     });
     
     let chat_request = ChatRequest {
-        messages,
+        messages: messages.clone(),
     };
     
     info!("Ollama Chat with Execution: Sending initial request to Ollama");
-    let response = ollama_chat(chat_request).await
+    let mut response = ollama_chat(chat_request).await
         .map_err(|e| format!("Failed to send chat request: {}", e))?;
     
-    let response_content = response.message.content;
+    let mut response_content = response.message.content.clone();
+    const MAX_FETCH_ITERATIONS: u32 = 3;
+    let mut fetch_count: u32 = 0;
+
+    // FETCH_URL tool loop: if model returns FETCH_URL: <url>, fetch page and send content back to Ollama
+    while fetch_count < MAX_FETCH_ITERATIONS {
+        let url = match parse_fetch_url_from_response(&response_content) {
+            Some(u) => u,
+            None => break,
+        };
+        fetch_count += 1;
+        info!("Ollama Chat with Execution: FETCH_URL requested: {}", url);
+
+        let page_content = crate::commands::browser::fetch_page_content(&url)
+            .map_err(|e| format!("Fetch page failed: {}", e))?;
+        info!("Ollama Chat with Execution: Fetched {} chars from {}", page_content.len(), url);
+
+        // Build follow-up: current messages + assistant's FETCH_URL message + user with page content
+        let mut follow_up_messages = messages.clone();
+        follow_up_messages.push(crate::ollama::ChatMessage {
+            role: "assistant".to_string(),
+            content: response_content.clone(),
+        });
+        follow_up_messages.push(crate::ollama::ChatMessage {
+            role: "user".to_string(),
+            content: format!(
+                "Here is the page content:\n\n{}\n\nPlease answer the user's question based on this content.",
+                page_content
+            ),
+        });
+
+        let follow_up_request = ChatRequest {
+            messages: follow_up_messages.clone(),
+        };
+        response = ollama_chat(follow_up_request).await
+            .map_err(|e| format!("Failed to send follow-up after fetch: {}", e))?;
+        response_content = response.message.content.clone();
+        messages = follow_up_messages;
+        info!("Ollama Chat with Execution: Received response after fetch ({} chars)", response_content.len());
+    }
+
     info!("Ollama Chat with Execution: Received response ({} chars)", response_content.len());
     
     // Process response content - handle escaped newlines
