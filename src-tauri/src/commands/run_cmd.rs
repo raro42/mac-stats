@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use tracing::info;
 
-const ALLOWED_COMMANDS: &[&str] = &["cat", "head", "tail", "ls"];
+const ALLOWED_COMMANDS: &[&str] = &["cat", "head", "tail", "ls", "grep"];
 
 /// Read ALLOW_LOCAL_CMD from env or .config.env. "0", "false", "no" => false; default true.
 fn allow_local_cmd_from_config_env_file(path: &Path) -> Option<bool> {
@@ -159,6 +159,9 @@ pub fn run_local_command(arg: &str) -> Result<String, String> {
 
     if args.is_empty() && cmd != "ls" {
         return Err("RUN_CMD: command requires a path (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json).".to_string());
+    }
+    if cmd == "grep" && args.len() < 2 {
+        return Err("RUN_CMD: grep requires pattern and path (e.g. RUN_CMD: grep pattern ~/.mac-stats/task/file.md).".to_string());
     }
 
     info!("RUN_CMD: executing {} with {} args", cmd, args.len());

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [0.1.9] - 2026-02-09
+
+### Added
+- **Discord API agent**: When a request comes from Discord, Ollama can call the Discord HTTP API via the DISCORD_API tool (e.g. list guilds, channels, members, get user). Endpoint list is documented in `docs/007_discord_agent.md` and injected into the agent context. Only GET and POST to `/channels/{id}/messages` are allowed.
+- **Discord user names**: The bot records the message author's display name and passes it to Ollama so it can address the user by name; names are cached for reuse in the session.
+- **MCP Agent (Model Context Protocol)**: Ollama can use tools from any MCP server
+  - Configure via `MCP_SERVER_URL` (HTTP/SSE) or `MCP_SERVER_STDIO` (e.g. `npx|-y|@openbnb/mcp-server-airbnb`) in env or `~/.mac-stats/.config.env`
+  - When configured, the app fetches the tool list and adds it to the agent descriptions; Ollama invokes tools by replying `MCP: <tool_name> <arguments>`
+  - Supported in Discord bot, scheduler, and CPU window chat (same tool loop)
+  - Documentation: `docs/010_mcp_agent.md`
+- **Task agent**: Task files under `~/.mac-stats/task/` with TASK_APPEND, TASK_STATUS, TASK_CREATE. Scheduler supports `TASK: <path or id>` / `TASK_RUN: <path or id>` to run a task loop until status is `finished`; optional `reply_to_channel_id` sends start and result to Discord. Documentation: `docs/013_task_agent.md`.
+- **PYTHON_SCRIPT agent**: Ollama can create and run Python scripts; scripts are written to `~/.mac-stats/scripts/` and executed with `python3`. Disable with `ALLOW_PYTHON_SCRIPT=0`. Documentation: `docs/014_python_agent.md`.
+
 ## [0.1.8] - 2026-02-08
 
 ### Added

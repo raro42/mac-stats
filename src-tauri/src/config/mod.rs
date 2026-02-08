@@ -174,4 +174,34 @@ impl Config {
     pub fn ensure_skills_directory() -> std::io::Result<()> {
         std::fs::create_dir_all(Self::skills_dir())
     }
+
+    /// Task directory for task files: `$HOME/.mac-stats/task/`
+    /// Files: task-<topic>-<id>-<date-time>-<open|wip|finished>.md
+    pub fn task_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("task")
+        } else {
+            std::env::temp_dir().join("mac-stats-task")
+        }
+    }
+
+    /// Ensure the task directory exists.
+    pub fn ensure_task_directory() -> std::io::Result<()> {
+        std::fs::create_dir_all(Self::task_dir())
+    }
+
+    /// Scripts directory for agent-written scripts: `$HOME/.mac-stats/scripts/`
+    /// Files: python-script-<id>-<topic>.py (from PYTHON_SCRIPT agent).
+    pub fn scripts_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("scripts")
+        } else {
+            std::env::temp_dir().join("mac-stats-scripts")
+        }
+    }
+
+    /// Ensure the scripts directory exists.
+    pub fn ensure_scripts_directory() -> std::io::Result<()> {
+        std::fs::create_dir_all(Self::scripts_dir())
+    }
 }

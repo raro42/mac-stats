@@ -434,7 +434,7 @@ unsafe fn parse_channel_states(
     accumulator: &mut FrequencyAccumulator,
     freq_logging: bool,
 ) {
-    use crate::{debug1, debug2, debug3};
+    use crate::debug3;
     
     if channel_ref.is_null() {
         debug3!("Channel '{}' reference is null, skipping state iteration", channel_name);
@@ -445,24 +445,24 @@ unsafe fn parse_channel_states(
     // Check that we can get the channel name (validates it's a channel dict)
     let name_check = IOReportChannelGetChannelName(channel_ref);
     if name_check.is_null() {
-        debug2!("Channel '{}': IOReportChannelGetChannelName returned null, not a valid channel dict, skipping", channel_name);
+        debug3!("Channel '{}': IOReportChannelGetChannelName returned null, not a valid channel dict, skipping", channel_name);
         return;
     }
     
     // Validate state count is reasonable before iterating
     let state_count = IOReportStateGetCount(channel_ref);
     if state_count < 0 {
-        debug2!("Channel '{}': IOReportStateGetCount returned negative value ({}), invalid channel, skipping", channel_name, state_count);
+        debug3!("Channel '{}': IOReportStateGetCount returned negative value ({}), invalid channel, skipping", channel_name, state_count);
         return;
     }
     // Reasonable max: 100 states (typical CPUs have 8-22 states)
     if state_count > 100 {
-        debug2!("Channel '{}': IOReportStateGetCount returned suspiciously high value ({}), likely invalid channel, skipping", channel_name, state_count);
+        debug3!("Channel '{}': IOReportStateGetCount returned suspiciously high value ({}), likely invalid channel, skipping", channel_name, state_count);
         return;
     }
     
     if freq_logging {
-        debug1!("Channel '{}' has {} performance states", channel_name, state_count);
+        debug3!("Channel '{}' has {} performance states", channel_name, state_count);
     } else {
         debug3!("Channel '{}' has {} performance states", channel_name, state_count);
     }
@@ -479,7 +479,7 @@ unsafe fn parse_channel_states(
         let residency_ratio = residency_ns as f64 / 1_000_000_000.0;
         
         if freq_logging {
-            debug1!("  State {}: name='{}', residency={} ns ({:.3} s)", 
+            debug3!("  State {}: name='{}', residency={} ns ({:.3} s)", 
                 state_idx, state_name_str, residency_ns, residency_ratio);
         } else {
             debug3!("  State {}: name='{}', residency={} ns", 
@@ -489,7 +489,7 @@ unsafe fn parse_channel_states(
         // Skip DOWN and IDLE states (they don't represent active frequencies)
         if state_name_str == "DOWN" || state_name_str == "IDLE" {
             if freq_logging {
-                debug1!("  State {}: skipping '{}' (not an active frequency state)", state_idx, state_name_str);
+                debug3!("  State {}: skipping '{}' (not an active frequency state)", state_idx, state_name_str);
             }
             continue;
         }
@@ -519,7 +519,7 @@ unsafe fn parse_channel_states(
             }
             
             if freq_logging {
-                debug1!("  State {}: extracted {} MHz from '{}' (weighted: {:.2} MHz)", 
+                debug3!("  State {}: extracted {} MHz from '{}' (weighted: {:.2} MHz)", 
                     state_idx, mhz_val, state_name_str, mhz_val * residency_ratio);
             } else {
                 debug3!("  State {}: extracted {} MHz from name '{}'", 
@@ -552,7 +552,7 @@ unsafe fn parse_channel_states(
             }
             
             if freq_logging {
-                debug1!("  State {}: estimated {} MHz from P-state '{}' (weighted: {:.2} MHz)", 
+                debug3!("  State {}: estimated {} MHz from P-state '{}' (weighted: {:.2} MHz)", 
                     state_idx, estimated_freq, state_name_str, estimated_freq * residency_ratio);
             } else {
                 debug3!("  State {}: estimated {} MHz from P-state '{}'", 
@@ -713,22 +713,22 @@ unsafe fn process_array_channels(
     _channels_count: usize,
     freq_logging: bool,
 ) -> (FrequencyData, Option<CFDictionaryRef>) {
-    use crate::{debug1, debug2};
-    
+    use crate::debug3;
+
     let mut accumulator = FrequencyAccumulator::default();
-    debug2!("Processing {} channels from array", array_count);
+    debug3!("Processing {} channels from array", array_count);
     
     for i in 0..array_count {
         let channel_value_ptr = CFArrayGetValueAtIndex(array_ptr, i);
         if channel_value_ptr.is_null() {
-            debug2!("Array element {} is null, skipping", i);
+            debug3!("Array element {} is null, skipping", i);
             continue;
         }
         
         let value_type_id = CFGetTypeID(channel_value_ptr as CFTypeRef);
         let dict_type_id = CFDictionaryGetTypeID();
         if value_type_id != dict_type_id {
-            debug2!("Array element {} is not a dictionary (type_id={}), skipping", i, value_type_id);
+            debug3!("Array element {} is not a dictionary (type_id={}), skipping", i, value_type_id);
             continue;
         }
         
@@ -737,28 +737,28 @@ unsafe fn process_array_channels(
         // Get channel name directly from the channel dictionary
         let channel_name_ref = IOReportChannelGetChannelName(channel_ref);
         if channel_name_ref.is_null() {
-            debug2!("Array element {}: channel name is null, skipping", i);
+            debug3!("Array element {}: channel name is null, skipping", i);
             continue;
         }
         
         let channel_name = CFString::wrap_under_get_rule(channel_name_ref);
         let channel_name_str = channel_name.to_string();
-        debug2!("Array element {}: Processing channel '{}'", i, channel_name_str);
+        debug3!("Array element {}: Processing channel '{}'", i, channel_name_str);
         
         let (is_p_core, is_e_core) = classify_channel(&channel_name_str);
         
         if is_performance_channel(&channel_name_str) {
-            debug2!("Found performance channel in array: '{}' (P-core: {}, E-core: {})", 
+            debug3!("Found performance channel in array: '{}' (P-core: {}, E-core: {})", 
                 channel_name_str, is_p_core, is_e_core);
             parse_channel_states(channel_ref, &channel_name_str, is_p_core, is_e_core, &mut accumulator, freq_logging);
         } else {
-            debug2!("Array element {}: Channel '{}' is NOT a performance channel, skipping", i, channel_name_str);
+            debug3!("Array element {}: Channel '{}' is NOT a performance channel, skipping", i, channel_name_str);
         }
     }
     
     let result = calculate_frequencies(&accumulator, freq_logging);
     if freq_logging {
-        debug1!("=== ARRAY PROCESSING END: Overall={:.2} GHz, P-core={:.2} GHz, E-core={:.2} GHz ===", 
+        debug3!("=== ARRAY PROCESSING END: Overall={:.2} GHz, P-core={:.2} GHz, E-core={:.2} GHz ===", 
             result.overall, result.p_core, result.e_core);
     }
     // Note: We return None for the sample since we're processing an array directly,
@@ -776,13 +776,13 @@ unsafe fn process_actual_channels(
     accumulator: &mut FrequencyAccumulator,
     freq_logging: bool,
 ) {
-    use crate::debug2;
-    
+    use crate::debug3;
+
     let actual_channels_count = CFDictionaryGetCount(actual_channels_ref);
-    debug2!("IOReportChannels contains {} actual channels", actual_channels_count);
+    debug3!("IOReportChannels contains {} actual channels", actual_channels_count);
     
     if actual_channels_count == 0 {
-        debug2!("No channels found in IOReportChannels, cannot process frequencies");
+        debug3!("No channels found in IOReportChannels, cannot process frequencies");
         return;
     }
     
@@ -795,7 +795,7 @@ unsafe fn process_actual_channels(
         actual_channel_values.as_mut_ptr(),
     );
     
-    debug2!("Iterating through {} actual channels to find performance states", actual_channels_count);
+    debug3!("Iterating through {} actual channels to find performance states", actual_channels_count);
     
     let mut channels_processed = 0;
     let mut performance_channels_found = 0;
@@ -803,25 +803,25 @@ unsafe fn process_actual_channels(
     for i in 0..(actual_channels_count as usize) {
         let actual_key_ref = actual_channel_keys[i] as CFStringRef;
         if actual_key_ref.is_null() {
-            debug2!("Entry {}: key is null, skipping", i);
+            debug3!("Entry {}: key is null, skipping", i);
             continue;
         }
         
         let channel_key_str = CFString::wrap_under_get_rule(actual_key_ref);
         let channel_key = channel_key_str.to_string();
-        debug2!("Entry {}: channel_key='{}'", i, channel_key);
+        debug3!("Entry {}: channel_key='{}'", i, channel_key);
         
         // Get the channel value from the sample (contains residency data)
         let sample_channel_value = actual_channel_values[i];
         if sample_channel_value.is_null() {
-            debug2!("Entry {}: channel value is null, skipping", i);
+            debug3!("Entry {}: channel value is null, skipping", i);
             continue;
         }
         
         let value_type_id = CFGetTypeID(sample_channel_value as CFTypeRef);
         let dict_type_id = CFDictionaryGetTypeID();
         if value_type_id != dict_type_id {
-            debug2!("Entry {}: channel value is not a dict (type_id={}), skipping", i, value_type_id);
+            debug3!("Entry {}: channel value is not a dict (type_id={}), skipping", i, value_type_id);
             continue;
         }
         
@@ -833,7 +833,7 @@ unsafe fn process_actual_channels(
             let channel_name = CFString::wrap_under_get_rule(channel_name_ref);
             channel_name.to_string()
         } else {
-            debug2!("Entry {}: channel_name_ref is null, trying fallback lookup", i);
+            debug3!("Entry {}: channel_name_ref is null, trying fallback lookup", i);
             // Fallback: try to get name from orig_channels
             match lookup_channel_dict(
                 &channel_key,
@@ -847,65 +847,65 @@ unsafe fn process_actual_channels(
                     channel_name.to_string()
                 }
                 None => {
-                    debug2!("Entry {}: Could not get channel name from fallback, skipping", i);
+                    debug3!("Entry {}: Could not get channel name from fallback, skipping", i);
                     continue;
                 }
             }
         };
         
-        debug2!("Entry {}: Processing channel: name='{}'", i, channel_name_str);
+        debug3!("Entry {}: Processing channel: name='{}'", i, channel_name_str);
         
         let (is_p_core, is_e_core) = classify_channel(&channel_name_str);
         
-        debug2!("Entry {}: Channel '{}' classification: is_p_core={}, is_e_core={}", 
+        debug3!("Entry {}: Channel '{}' classification: is_p_core={}, is_e_core={}", 
             i, channel_name_str, is_p_core, is_e_core);
         
         channels_processed += 1;
         
         let is_perf = is_performance_channel(&channel_name_str);
-        debug2!("Entry {}: is_performance_channel('{}') = {}", i, channel_name_str, is_perf);
+        debug3!("Entry {}: is_performance_channel('{}') = {}", i, channel_name_str, is_perf);
         
         if is_perf {
             performance_channels_found += 1;
-            debug2!("Found performance state channel: '{}' (P-core: {}, E-core: {})", 
+            debug3!("Found performance state channel: '{}' (P-core: {}, E-core: {})", 
                 channel_name_str, is_p_core, is_e_core);
             
             // CRITICAL: Use sample_channel_ref (from sample) which has residency data
             // not channel_ref from orig_channels which only has definitions
             parse_channel_states(sample_channel_ref, &channel_name_str, is_p_core, is_e_core, accumulator, freq_logging);
         } else {
-            debug2!("Entry {}: Channel '{}' is NOT a performance channel, skipping", i, channel_name_str);
+            debug3!("Entry {}: Channel '{}' is NOT a performance channel, skipping", i, channel_name_str);
         }
     }
     
-    debug2!("Processed {} channels, found {} performance channels", channels_processed, performance_channels_found);
+    debug3!("Processed {} channels, found {} performance channels", channels_processed, performance_channels_found);
 }
 
 /// Calculate final frequencies from accumulator
 fn calculate_frequencies(accumulator: &FrequencyAccumulator, freq_logging: bool) -> FrequencyData {
-    use crate::{debug1, debug2, debug3};
-    
+    use crate::debug3;
+
     let mut result = FrequencyData::default();
     
     // Calculate overall frequency
     if accumulator.total_residency > 0.0 {
         result.overall = (accumulator.weighted_freq_sum / accumulator.total_residency / 1000.0) as f32;
         if freq_logging {
-            debug1!("Overall frequency: {:.2} GHz (weighted average, total_residency={:.3} s, weighted_sum={:.2} MHz)", 
+            debug3!("Overall frequency: {:.2} GHz (weighted average, total_residency={:.3} s, weighted_sum={:.2} MHz)", 
                 result.overall, accumulator.total_residency, accumulator.weighted_freq_sum);
         } else {
-            debug2!("IOReport frequency parsed: {:.2} GHz (weighted average)", result.overall);
+            debug3!("IOReport frequency parsed: {:.2} GHz (weighted average)", result.overall);
         }
     } else if accumulator.max_freq_mhz > 0.0 {
         result.overall = (accumulator.max_freq_mhz / 1000.0) as f32;
         if freq_logging {
-            debug1!("Overall frequency: {:.2} GHz (max frequency)", result.overall);
+            debug3!("Overall frequency: {:.2} GHz (max frequency)", result.overall);
         } else {
-            debug2!("IOReport frequency parsed: {:.2} GHz (max frequency)", result.overall);
+            debug3!("IOReport frequency parsed: {:.2} GHz (max frequency)", result.overall);
         }
     } else {
         if freq_logging {
-            debug1!("Could not extract overall frequency from IOReport");
+            debug3!("Could not extract overall frequency from IOReport");
         } else {
             debug3!("Could not extract overall frequency from IOReport");
         }
@@ -915,21 +915,21 @@ fn calculate_frequencies(accumulator: &FrequencyAccumulator, freq_logging: bool)
     if accumulator.p_core_total_residency > 0.0 {
         result.p_core = (accumulator.p_core_weighted_freq_sum / accumulator.p_core_total_residency / 1000.0) as f32;
         if freq_logging {
-            debug1!("P-core frequency: {:.2} GHz (weighted average, total_residency={:.3} s, weighted_sum={:.2} MHz)", 
+            debug3!("P-core frequency: {:.2} GHz (weighted average, total_residency={:.3} s, weighted_sum={:.2} MHz)", 
                 result.p_core, accumulator.p_core_total_residency, accumulator.p_core_weighted_freq_sum);
         } else {
-            debug2!("IOReport P-core frequency parsed: {:.2} GHz (weighted average)", result.p_core);
+            debug3!("IOReport P-core frequency parsed: {:.2} GHz (weighted average)", result.p_core);
         }
     } else if accumulator.p_core_max_freq_mhz > 0.0 {
         result.p_core = (accumulator.p_core_max_freq_mhz / 1000.0) as f32;
         if freq_logging {
-            debug1!("P-core frequency: {:.2} GHz (max frequency)", result.p_core);
+            debug3!("P-core frequency: {:.2} GHz (max frequency)", result.p_core);
         } else {
-            debug2!("IOReport P-core frequency parsed: {:.2} GHz (max frequency)", result.p_core);
+            debug3!("IOReport P-core frequency parsed: {:.2} GHz (max frequency)", result.p_core);
         }
     } else {
         if freq_logging {
-            debug1!("P-core frequency: NOT FOUND (p_core_total_residency={:.3} s, p_core_max_freq_mhz={:.2} MHz)", 
+            debug3!("P-core frequency: NOT FOUND (p_core_total_residency={:.3} s, p_core_max_freq_mhz={:.2} MHz)", 
                 accumulator.p_core_total_residency, accumulator.p_core_max_freq_mhz);
         }
     }
@@ -938,21 +938,21 @@ fn calculate_frequencies(accumulator: &FrequencyAccumulator, freq_logging: bool)
     if accumulator.e_core_total_residency > 0.0 {
         result.e_core = (accumulator.e_core_weighted_freq_sum / accumulator.e_core_total_residency / 1000.0) as f32;
         if freq_logging {
-            debug1!("E-core frequency: {:.2} GHz (weighted average, total_residency={:.3} s, weighted_sum={:.2} MHz)", 
+            debug3!("E-core frequency: {:.2} GHz (weighted average, total_residency={:.3} s, weighted_sum={:.2} MHz)", 
                 result.e_core, accumulator.e_core_total_residency, accumulator.e_core_weighted_freq_sum);
         } else {
-            debug2!("IOReport E-core frequency parsed: {:.2} GHz (weighted average)", result.e_core);
+            debug3!("IOReport E-core frequency parsed: {:.2} GHz (weighted average)", result.e_core);
         }
     } else if accumulator.e_core_max_freq_mhz > 0.0 {
         result.e_core = (accumulator.e_core_max_freq_mhz / 1000.0) as f32;
         if freq_logging {
-            debug1!("E-core frequency: {:.2} GHz (max frequency)", result.e_core);
+            debug3!("E-core frequency: {:.2} GHz (max frequency)", result.e_core);
         } else {
-            debug2!("IOReport E-core frequency parsed: {:.2} GHz (max frequency)", result.e_core);
+            debug3!("IOReport E-core frequency parsed: {:.2} GHz (max frequency)", result.e_core);
         }
     } else {
         if freq_logging {
-            debug1!("E-core frequency: NOT FOUND (e_core_total_residency={:.3} s, e_core_max_freq_mhz={:.2} MHz)", 
+            debug3!("E-core frequency: NOT FOUND (e_core_total_residency={:.3} s, e_core_max_freq_mhz={:.2} MHz)", 
                 accumulator.e_core_total_residency, accumulator.e_core_max_freq_mhz);
         }
     }
@@ -974,10 +974,10 @@ pub unsafe fn read_frequencies_from_ioreport(
     last_sample: Option<CFDictionaryRef>,
     freq_logging: bool,
 ) -> (FrequencyData, Option<CFDictionaryRef>) {
-    use crate::{debug1, debug2, debug3};
+    use crate::debug3;
     
     if freq_logging {
-        debug1!("=== FREQUENCY READ START ===");
+        debug3!("=== FREQUENCY READ START ===");
     }
     
     let mut accumulator = FrequencyAccumulator::default();
@@ -992,7 +992,7 @@ pub unsafe fn read_frequencies_from_ioreport(
     );
     
     if current_sample.is_null() {
-        debug2!("Failed to create IOReport sample (sample is null)");
+        debug3!("Failed to create IOReport sample (sample is null)");
         return (FrequencyData::default(), None);
     }
     
@@ -1014,7 +1014,7 @@ pub unsafe fn read_frequencies_from_ioreport(
     // Otherwise use the raw sample (absolute counters)
     let sample_to_parse = if let Some(last) = last_sample {
         if freq_logging {
-            debug1!("Computing delta sample from last sample");
+            debug3!("Computing delta sample from last sample");
         }
         let delta = IOReportCreateSamplesDelta(
             last,
@@ -1023,18 +1023,18 @@ pub unsafe fn read_frequencies_from_ioreport(
         );
         
         if delta.is_null() {
-            debug2!("Failed to create delta sample, using raw sample");
+            debug3!("Failed to create delta sample, using raw sample");
             sample_guard.0
         } else {
             if freq_logging {
-                debug1!("Using delta sample for recent frequency calculation");
+                debug3!("Using delta sample for recent frequency calculation");
             }
             // We'll parse the delta, but keep current_sample for next iteration
             delta
         }
     } else {
         if freq_logging {
-            debug1!("No last sample available, using raw sample (absolute counters)");
+            debug3!("No last sample available, using raw sample (absolute counters)");
         }
         sample_guard.0
     };
@@ -1055,7 +1055,7 @@ pub unsafe fn read_frequencies_from_ioreport(
     let orig_channels = match orig_channels {
         Some(ch) => ch,
         None => {
-            debug2!("Original channels_dict not available, cannot parse frequency");
+            debug3!("Original channels_dict not available, cannot parse frequency");
             // Release delta if we created one (guard will drop and release)
             drop(delta_guard);
             // Release current sample
@@ -1089,7 +1089,7 @@ pub unsafe fn read_frequencies_from_ioreport(
     // CRITICAL: Extract IOReportChannels dictionary from sample
     // The sample has structure: { "IOReportChannels" -> [array of channel_dicts] or {dict of channel_dicts} }
     let sample_keys_count = CFDictionaryGetCount(sample);
-    debug2!("Sample dictionary has {} keys", sample_keys_count);
+    debug3!("Sample dictionary has {} keys", sample_keys_count);
     
     let mut sample_keys_buf: Vec<*const c_void> = vec![std::ptr::null(); sample_keys_count as usize];
     let mut sample_values_buf: Vec<*const c_void> = vec![std::ptr::null(); sample_keys_count as usize];
@@ -1106,25 +1106,25 @@ pub unsafe fn read_frequencies_from_ioreport(
                 if key_type_id == string_type_id {
                     let key_str = CFString::wrap_under_get_rule(key_ref);
                     let key_name = key_str.to_string();
-                    debug2!("Sample key[{}]: '{}'", i, key_name);
+                    debug3!("Sample key[{}]: '{}'", i, key_name);
                     if key_name == "IOReportChannels" {
                         let value_ptr = sample_values_buf[i];
                         if !value_ptr.is_null() {
                             let value_type_id = CFGetTypeID(value_ptr as CFTypeRef);
                             let dict_type_id = CFDictionaryGetTypeID();
                             let array_type_id = CFArrayGetTypeID();
-                            debug2!("IOReportChannels value: type_id={}, dict_type_id={}, array_type_id={}", value_type_id, dict_type_id, array_type_id);
+                            debug3!("IOReportChannels value: type_id={}, dict_type_id={}, array_type_id={}", value_type_id, dict_type_id, array_type_id);
                             
                             if value_type_id == dict_type_id {
-                                debug2!("Successfully extracted IOReportChannels dictionary from sample");
+                                debug3!("Successfully extracted IOReportChannels dictionary from sample");
                                 found = Some(value_ptr as CFDictionaryRef);
                                 break;
                             } else if value_type_id == array_type_id {
                                 // IOReportChannels is an array of channel dictionaries
-                                debug2!("IOReportChannels value is an array - processing directly");
+                                debug3!("IOReportChannels value is an array - processing directly");
                                 let array_ptr = value_ptr as *const c_void;
                                 let array_count = CFArrayGetCount(array_ptr);
-                                debug2!("IOReportChannels array has {} elements", array_count);
+                                debug3!("IOReportChannels array has {} elements", array_count);
                                 // Process array first (while delta sample is still valid - delta_guard keeps it alive)
                                 let (result, _) = process_array_channels(
                                     array_ptr,
@@ -1141,21 +1141,21 @@ pub unsafe fn read_frequencies_from_ioreport(
                                 sample_guard.1 = true; // Prevent release
                                 return (result, Some(sample_guard.0));
                             } else {
-                                debug2!("IOReportChannels value is not a dictionary or array (type_id={}, expected_dict={})", value_type_id, dict_type_id);
+                                debug3!("IOReportChannels value is not a dictionary or array (type_id={}, expected_dict={})", value_type_id, dict_type_id);
                             }
                         } else {
-                            debug2!("IOReportChannels value pointer is null");
+                            debug3!("IOReportChannels value pointer is null");
                         }
                     }
                 } else {
-                    debug2!("Sample key[{}] is not a string (type_id={})", i, key_type_id);
+                    debug3!("Sample key[{}] is not a string (type_id={})", i, key_type_id);
                 }
             }
         }
         match found {
             Some(ch) => ch,
             None => {
-                debug2!("Failed to extract IOReportChannels from sample, cannot parse frequency");
+                debug3!("Failed to extract IOReportChannels from sample, cannot parse frequency");
                 // Release delta if we created one (guard will drop and release)
                 drop(delta_guard);
                 // Release current sample (we won't store it if we can't parse)
@@ -1180,7 +1180,7 @@ pub unsafe fn read_frequencies_from_ioreport(
     
     // Debug: Check accumulator state
     if freq_logging || accumulator.total_residency == 0.0 {
-        debug2!("Accumulator after processing: total_residency={:.3}, max_freq={:.2} MHz, p_core_residency={:.3}, e_core_residency={:.3}",
+        debug3!("Accumulator after processing: total_residency={:.3}, max_freq={:.2} MHz, p_core_residency={:.3}, e_core_residency={:.3}",
             accumulator.total_residency, accumulator.max_freq_mhz, accumulator.p_core_total_residency, accumulator.e_core_total_residency);
     }
     
@@ -1188,7 +1188,7 @@ pub unsafe fn read_frequencies_from_ioreport(
     let result = calculate_frequencies(&accumulator, freq_logging);
     
     if freq_logging {
-        debug1!("=== FREQUENCY READ END: Overall={:.2} GHz, P-core={:.2} GHz, E-core={:.2} GHz ===", 
+        debug3!("=== FREQUENCY READ END: Overall={:.2} GHz, P-core={:.2} GHz, E-core={:.2} GHz ===", 
             result.overall, result.p_core, result.e_core);
     }
     
@@ -1219,19 +1219,19 @@ pub unsafe fn read_power_from_ioreport(
     last_read_time: Option<Instant>,
     power_logging: bool,
 ) -> (PowerData, Option<CFDictionaryRef>) {
-    use crate::{debug1, debug2};
-    
-    debug1!("=== POWER READ START ===");
-    debug1!("subscription_ptr={:p}, channels_ref={:p}, orig_channels.is_some()={}", 
+    use crate::debug3;
+
+    debug3!("=== POWER READ START ===");
+    debug3!("subscription_ptr={:p}, channels_ref={:p}, orig_channels.is_some()={}", 
         subscription_ptr, channels_ref, orig_channels.is_some());
     
     // Validate inputs
     if subscription_ptr.is_null() {
-        debug1!("ERROR: subscription_ptr is null!");
+        debug3!("ERROR: subscription_ptr is null!");
         return (PowerData::default(), None);
     }
     if channels_ref.is_null() {
-        debug1!("ERROR: channels_ref is null!");
+        debug3!("ERROR: channels_ref is null!");
         return (PowerData::default(), None);
     }
     
@@ -1239,7 +1239,7 @@ pub unsafe fn read_power_from_ioreport(
     let mut gpu_energy_total: i64 = 0;
     
     // Create current sample from subscription
-    debug1!("Creating IOReport power sample...");
+    debug3!("Creating IOReport power sample...");
     let current_sample = IOReportCreateSamples(
         subscription_ptr,
         channels_ref,
@@ -1247,10 +1247,10 @@ pub unsafe fn read_power_from_ioreport(
     );
     
     if current_sample.is_null() {
-        debug1!("ERROR: Failed to create IOReport power sample (sample is null)");
+        debug3!("ERROR: Failed to create IOReport power sample (sample is null)");
         return (PowerData::default(), None);
     }
-    debug1!("IOReport power sample created successfully: {:p}", current_sample);
+    debug3!("IOReport power sample created successfully: {:p}", current_sample);
     
     // Use a guard to ensure current_sample is released on all exit paths
     struct SampleGuard(CFDictionaryRef, bool);
@@ -1274,7 +1274,7 @@ pub unsafe fn read_power_from_ioreport(
         if time_delta > 0.0 && time_delta < 60.0 {
             // Valid time delta (between 0 and 60 seconds)
             if power_logging {
-                debug1!("Computing delta power sample (time delta: {:.2}s)", time_delta);
+                debug3!("Computing delta power sample (time delta: {:.2}s)", time_delta);
             }
             let delta = IOReportCreateSamplesDelta(
                 last,
@@ -1283,21 +1283,21 @@ pub unsafe fn read_power_from_ioreport(
             );
             
             if delta.is_null() {
-                debug2!("Failed to create delta power sample, using raw sample");
+                debug3!("Failed to create delta power sample, using raw sample");
                 (sample_guard.0, time_delta)
             } else {
                 (delta, time_delta)
             }
         } else {
-            debug2!("Invalid time delta ({:.2}s), using raw sample", time_delta);
+            debug3!("Invalid time delta ({:.2}s), using raw sample", time_delta);
             (sample_guard.0, 0.0)
         }
     } else {
-        debug1!("No last sample available, using raw sample (absolute counters)");
+        debug3!("No last sample available, using raw sample (absolute counters)");
         (sample_guard.0, 0.0)
     };
     
-    debug1!("Sample to parse: {:p}, time_delta={:.2}s", sample_to_parse, time_delta_secs);
+    debug3!("Sample to parse: {:p}, time_delta={:.2}s", sample_to_parse, time_delta_secs);
     
     // Guard for delta sample (if we created one)
     let created_delta = sample_to_parse != sample_guard.0;
@@ -1308,17 +1308,17 @@ pub unsafe fn read_power_from_ioreport(
     };
     
     let sample = sample_to_parse;
-    debug1!("Using sample: {:p} for power parsing", sample);
+    debug3!("Using sample: {:p} for power parsing", sample);
     
     // Get original channels dictionary (for channel name lookup)
-    debug1!("Checking original channels dict... orig_channels.is_some()={}", orig_channels.is_some());
+    debug3!("Checking original channels dict... orig_channels.is_some()={}", orig_channels.is_some());
     let orig_channels = match orig_channels {
         Some(ch) => {
-            debug1!("Original power channels_dict available: {:p}", ch);
+            debug3!("Original power channels_dict available: {:p}", ch);
             ch
         },
         None => {
-            debug1!("ERROR: Original power channels_dict not available, cannot parse power - returning 0.0W");
+            debug3!("ERROR: Original power channels_dict not available, cannot parse power - returning 0.0W");
             drop(delta_guard);
             sample_guard.1 = true;
             unsafe { CFRelease(sample_guard.0 as CFTypeRef); }
@@ -1326,13 +1326,13 @@ pub unsafe fn read_power_from_ioreport(
         }
     };
     
-    debug1!("Extracting IOReportChannels from sample (sample={:p})...", sample);
+    debug3!("Extracting IOReportChannels from sample (sample={:p})...", sample);
     // Extract IOReportChannels from sample
     let sample_keys_count = CFDictionaryGetCount(sample);
-    debug1!("Power sample dictionary has {} keys", sample_keys_count);
+    debug3!("Power sample dictionary has {} keys", sample_keys_count);
     
     if sample_keys_count == 0 {
-        debug1!("Power sample dictionary is empty!");
+        debug3!("Power sample dictionary is empty!");
         drop(delta_guard);
         sample_guard.1 = true;
         unsafe { CFRelease(sample_guard.0 as CFTypeRef); }
@@ -1352,7 +1352,7 @@ pub unsafe fn read_power_from_ioreport(
             if key_type_id == string_type_id {
                 let key_str = CFString::wrap_under_get_rule(key_ref);
                 let key_name = key_str.to_string();
-                debug1!("Sample key[{}]: '{}'", i, key_name);
+                debug3!("Sample key[{}]: '{}'", i, key_name);
                 
                 // Check value type
                 let value_ptr = sample_values_buf[i];
@@ -1360,14 +1360,14 @@ pub unsafe fn read_power_from_ioreport(
                     let value_type_id = CFGetTypeID(value_ptr as CFTypeRef);
                     let dict_type_id = CFDictionaryGetTypeID();
                     let array_type_id = CFArrayGetTypeID();
-                    debug1!("  Value type_id={}, dict_type_id={}, array_type_id={}", value_type_id, dict_type_id, array_type_id);
+                    debug3!("  Value type_id={}, dict_type_id={}, array_type_id={}", value_type_id, dict_type_id, array_type_id);
                     if value_type_id == array_type_id {
                         unsafe {
                             extern "C" {
                                 fn CFArrayGetCount(theArray: *const c_void) -> i32;
                             }
                             let array_count = CFArrayGetCount(value_ptr as *const c_void);
-                            debug1!("  Array has {} elements", array_count);
+                            debug3!("  Array has {} elements", array_count);
                         }
                     }
                 }
@@ -1404,7 +1404,7 @@ pub unsafe fn read_power_from_ioreport(
                                     }
                                     let array_count = CFArrayGetCount(value_ptr as *const c_void);
                                     if power_logging {
-                                        debug1!("IOReportChannels in sample is an array with {} elements", array_count);
+                                        debug3!("IOReportChannels in sample is an array with {} elements", array_count);
                                     }
                                     // Store array pointer for processing
                                     found = Some((std::ptr::null_mut(), true, Some(value_ptr as *const c_void)));
@@ -1419,7 +1419,7 @@ pub unsafe fn read_power_from_ioreport(
         match found {
             Some((ch, is_arr, arr_ptr)) => (ch, is_arr, arr_ptr),
             None => {
-                debug2!("Failed to extract IOReportChannels from power sample");
+                debug3!("Failed to extract IOReportChannels from power sample");
                 drop(delta_guard);
                 sample_guard.1 = true;
                 unsafe { CFRelease(sample_guard.0 as CFTypeRef); }
@@ -1433,7 +1433,7 @@ pub unsafe fn read_power_from_ioreport(
         let array_ptr = match array_ptr_opt {
             Some(arr) => arr,
             None => {
-                debug2!("Array pointer is None");
+                debug3!("Array pointer is None");
                 drop(delta_guard);
                 sample_guard.1 = true;
                 unsafe { CFRelease(sample_guard.0 as CFTypeRef); }
@@ -1450,7 +1450,7 @@ pub unsafe fn read_power_from_ioreport(
             
             let array_count = CFArrayGetCount(array_ptr);
             // Always log channel count (not just when power_logging is enabled)
-            debug1!("Processing {} channels from array for power reading", array_count);
+            debug3!("Processing {} channels from array for power reading", array_count);
             
             // Safety: Process channels but be defensive
             // Process all channels, but stop early if we hit too many errors
@@ -1469,7 +1469,7 @@ pub unsafe fn read_power_from_ioreport(
             for i in 0..max_channels {
                 // Basic bounds check (shouldn't be needed but be safe)
                 if i < 0 {
-                    debug2!("Invalid array index {} (negative), stopping", i);
+                    debug3!("Invalid array index {} (negative), stopping", i);
                     break;
                 }
                 
@@ -1478,7 +1478,7 @@ pub unsafe fn read_power_from_ioreport(
                     error_count += 1;
                     consecutive_errors += 1;
                     if error_count > MAX_ERRORS || consecutive_errors > MAX_CONSECUTIVE_ERRORS {
-                        debug1!("Too many errors encountered (total: {}, consecutive: {}), stopping processing at channel {}", 
+                        debug3!("Too many errors encountered (total: {}, consecutive: {}), stopping processing at channel {}", 
                             error_count, consecutive_errors, i);
                         break;
                     }
@@ -1493,7 +1493,7 @@ pub unsafe fn read_power_from_ioreport(
                     error_count += 1;
                     consecutive_errors += 1;
                     if error_count > MAX_ERRORS || consecutive_errors > MAX_CONSECUTIVE_ERRORS {
-                        debug1!("Too many non-dictionary channels encountered (total: {}, consecutive: {}), stopping processing at channel {}", 
+                        debug3!("Too many non-dictionary channels encountered (total: {}, consecutive: {}), stopping processing at channel {}", 
                             error_count, consecutive_errors, i);
                         break;
                     }
@@ -1509,7 +1509,7 @@ pub unsafe fn read_power_from_ioreport(
                     error_count += 1;
                     consecutive_errors += 1;
                     if error_count > MAX_ERRORS || consecutive_errors > MAX_CONSECUTIVE_ERRORS {
-                        debug1!("Too many channels with null names (total: {}, consecutive: {}), stopping processing at channel {}", 
+                        debug3!("Too many channels with null names (total: {}, consecutive: {}), stopping processing at channel {}", 
                             error_count, consecutive_errors, i);
                         break;
                     }
@@ -1556,7 +1556,7 @@ pub unsafe fn read_power_from_ioreport(
                 // GPU channels like "GPU Energy" were working before and need to be processed
                 if is_power_channel || is_cpu || is_gpu {
                     if power_logging {
-                        debug1!("Found channel in array: '{}' (is_power={}, is_cpu={}, is_gpu={})", 
+                        debug3!("Found channel in array: '{}' (is_power={}, is_cpu={}, is_gpu={})", 
                             channel_name_str, is_power_channel, is_cpu, is_gpu);
                     }
                     
@@ -1582,7 +1582,7 @@ pub unsafe fn read_power_from_ioreport(
                     // Energy values are typically in micro-joules or nano-joules, so very large values
                     // (like > 1e15) are likely invalid/corrupted data
                     if energy_value > 1_000_000_000_000_000 || energy_value < -1_000_000_000_000_000 {
-                        debug2!("Suspicious energy value {} for channel '{}', treating as 0", energy_value, channel_name_str);
+                        debug3!("Suspicious energy value {} for channel '{}', treating as 0", energy_value, channel_name_str);
                         energy_value = 0;
                     }
                     
@@ -1592,7 +1592,7 @@ pub unsafe fn read_power_from_ioreport(
                     // Only process states if state_count is valid (not -1)
                     if state_count > 0 {
                         if power_logging {
-                            debug1!("  Channel '{}' has {} states", channel_name_str, state_count);
+                            debug3!("  Channel '{}' has {} states", channel_name_str, state_count);
                         }
                         
                         // For CPU channels, try extracting energy from states if simple value is 0
@@ -1605,7 +1605,7 @@ pub unsafe fn read_power_from_ioreport(
                                 state_energy_sum += residency;
                             }
                             if state_energy_sum > 0 && power_logging {
-                                debug1!("  Channel '{}': using state residency sum={} (simple value was 0)", 
+                                debug3!("  Channel '{}': using state residency sum={} (simple value was 0)", 
                                     channel_name_str, state_energy_sum);
                                 energy_value = state_energy_sum;
                             }
@@ -1619,7 +1619,7 @@ pub unsafe fn read_power_from_ioreport(
                         // Safety check: validate the value before using it
                         if energy_value_1 != 0 && energy_value_1 < 1_000_000_000_000_000 && energy_value_1 > -1_000_000_000_000_000 {
                             if power_logging {
-                                debug1!("  Channel '{}': index 0 was 0, trying index 1: {}", channel_name_str, energy_value_1);
+                                debug3!("  Channel '{}': index 0 was 0, trying index 1: {}", channel_name_str, energy_value_1);
                             }
                             energy_value = energy_value_1;
                         }
@@ -1630,43 +1630,43 @@ pub unsafe fn read_power_from_ioreport(
                     if is_cpu {
                         cpu_energy_total += energy_value;
                         if power_logging && energy_value != 0 {
-                            debug1!("  Added to CPU: energy={} (total: {})", energy_value, cpu_energy_total);
+                            debug3!("  Added to CPU: energy={} (total: {})", energy_value, cpu_energy_total);
                         }
                     } else if is_gpu {
                         gpu_energy_total += energy_value;
                         if power_logging && energy_value != 0 {
-                            debug1!("  Added to GPU: energy={} (total: {})", energy_value, gpu_energy_total);
+                            debug3!("  Added to GPU: energy={} (total: {})", energy_value, gpu_energy_total);
                         }
                     } else if power_logging && (energy_value != 0 || state_count > 0) {
-                        debug2!("  Channel '{}' has energy={} but is not CPU or GPU (skipping)", channel_name_str, energy_value);
+                        debug3!("  Channel '{}' has energy={} but is not CPU or GPU (skipping)", channel_name_str, energy_value);
                     }
                 }
                 
                 // Log progress every 50 channels to help identify crash location
                 if (i + 1) % 50 == 0 {
-                    debug1!("Processed {} / {} channels (CPU energy: {}, GPU energy: {})", 
+                    debug3!("Processed {} / {} channels (CPU energy: {}, GPU energy: {})", 
                         i + 1, max_channels, cpu_energy_total, gpu_energy_total);
                 }
             }
             
             // Log summary of candidates found (always log, not just when power_logging is enabled)
             // This is critical for debugging CPU power issues
-            debug1!("Channel summary: {} CPU candidates, {} GPU candidates, {} power candidates, cpu_energy_total={}, gpu_energy_total={}, time_delta={:.2}s", 
+            debug3!("Channel summary: {} CPU candidates, {} GPU candidates, {} power candidates, cpu_energy_total={}, gpu_energy_total={}, time_delta={:.2}s", 
                 cpu_candidates.len(), gpu_candidates.len(), power_candidates.len(), cpu_energy_total, gpu_energy_total, time_delta_secs);
             if !cpu_candidates.is_empty() {
                 // Limit to first 10 CPU candidates to avoid log spam
                 let display_candidates: Vec<String> = cpu_candidates.iter().take(10).cloned().collect();
-                debug1!("CPU candidate channels (first 10): {:?}", display_candidates);
+                debug3!("CPU candidate channels (first 10): {:?}", display_candidates);
                 if cpu_candidates.len() > 10 {
-                    debug1!("... and {} more CPU candidates", cpu_candidates.len() - 10);
+                    debug3!("... and {} more CPU candidates", cpu_candidates.len() - 10);
                 }
             } else {
-                debug1!("WARNING: No CPU candidate channels found! This explains why CPU power is 0W");
+                debug3!("WARNING: No CPU candidate channels found! This explains why CPU power is 0W");
             }
             if !gpu_candidates.is_empty() {
                 // Limit to first 10 GPU candidates to avoid log spam
                 let display_candidates: Vec<String> = gpu_candidates.iter().take(10).cloned().collect();
-                debug1!("GPU candidate channels (first 10): {:?}", display_candidates);
+                debug3!("GPU candidate channels (first 10): {:?}", display_candidates);
             }
         }
         
@@ -1688,7 +1688,7 @@ pub unsafe fn read_power_from_ioreport(
                 if result.cpu_power > 100.0 {
                     result.cpu_power = (cpu_energy_total as f64 / time_delta_secs / 1_000_000.0) as f32;
                     if power_logging {
-                        debug1!("CPU power: millijoules gave {:.2}W (too high), trying microjoules: {:.2}W", 
+                        debug3!("CPU power: millijoules gave {:.2}W (too high), trying microjoules: {:.2}W", 
                             (cpu_energy_total as f64 / time_delta_secs / 1_000.0) as f32, result.cpu_power);
                     }
                 }
@@ -1706,21 +1706,21 @@ pub unsafe fn read_power_from_ioreport(
                 if result.gpu_power > 200.0 {
                     result.gpu_power = (gpu_energy_total as f64 / time_delta_secs / 1_000_000_000.0) as f32;
                     if power_logging {
-                        debug1!("GPU power: microjoules gave {:.2}W (too high), trying nanojoules: {:.2}W", 
+                        debug3!("GPU power: microjoules gave {:.2}W (too high), trying nanojoules: {:.2}W", 
                             (gpu_energy_total as f64 / time_delta_secs / 1_000_000.0) as f32, result.gpu_power);
                     }
                 }
             }
             
             if power_logging {
-                debug1!("Power calculated: CPU={:.2}W, GPU={:.2}W (energy: CPU={}, GPU={}, time={:.2}s)", 
+                debug3!("Power calculated: CPU={:.2}W, GPU={:.2}W (energy: CPU={}, GPU={}, time={:.2}s)", 
                     result.cpu_power, result.gpu_power, cpu_energy_total, gpu_energy_total, time_delta_secs);
             }
         } else {
             // time_delta is 0 or invalid - cannot calculate power
             // Return 0.0 for both (cache update logic will preserve previous values)
             if power_logging {
-                debug1!("Cannot calculate power: time_delta={:.2}s (energy: CPU={}, GPU={})", 
+                debug3!("Cannot calculate power: time_delta={:.2}s (energy: CPU={}, GPU={})", 
                     time_delta_secs, cpu_energy_total, gpu_energy_total);
             }
         }
@@ -1735,7 +1735,7 @@ pub unsafe fn read_power_from_ioreport(
     // Get channel keys and values from orig_channels
     let channels_count = CFDictionaryGetCount(orig_channels) as usize;
     if channels_count == 0 {
-        debug2!("Original power channels_dict is empty");
+        debug3!("Original power channels_dict is empty");
         drop(delta_guard);
         sample_guard.1 = true;
         unsafe { CFRelease(sample_guard.0 as CFTypeRef); }
@@ -1749,7 +1749,7 @@ pub unsafe fn read_power_from_ioreport(
     // Process channels from sample (dictionary case)
     // Note: Array case is handled above
     let sample_channels_count = CFDictionaryGetCount(sample_channels_ref);
-    debug2!("Power sample contains {} channels (dictionary)", sample_channels_count);
+    debug3!("Power sample contains {} channels (dictionary)", sample_channels_count);
     
     let mut sample_channel_keys: Vec<*const c_void> = vec![std::ptr::null(); sample_channels_count as usize];
     let mut sample_channel_values: Vec<*const c_void> = vec![std::ptr::null(); sample_channels_count as usize];
@@ -1757,7 +1757,7 @@ pub unsafe fn read_power_from_ioreport(
     
     // Iterate through channels and extract power/energy values
     if power_logging {
-        debug1!("Processing {} power channels from sample", sample_channels_count);
+        debug3!("Processing {} power channels from sample", sample_channels_count);
     }
     
     for i in 0..(sample_channels_count as usize) {
@@ -1805,7 +1805,7 @@ pub unsafe fn read_power_from_ioreport(
         
         if let Some(name) = channel_name {
             if power_logging {
-                debug1!("Power channel found: '{}' (key: '{}')", name, channel_key);
+                debug3!("Power channel found: '{}' (key: '{}')", name, channel_key);
             }
             
             // Check if this is a power/energy channel
@@ -1834,35 +1834,35 @@ pub unsafe fn read_power_from_ioreport(
                 let energy_value = IOReportSimpleGetIntegerValue(channel_value as CFDictionaryRef, 0);
                 
                 if power_logging {
-                    debug1!("Power channel '{}': energy={} (raw value), is_cpu={}, is_gpu={}", 
+                    debug3!("Power channel '{}': energy={} (raw value), is_cpu={}, is_gpu={}", 
                         name, energy_value, is_cpu_power, is_gpu_power);
                 }
                 
                 if is_cpu_power {
                     cpu_energy_total += energy_value;
                     if power_logging {
-                        debug1!("Added to CPU energy total: {} (new total: {})", energy_value, cpu_energy_total);
+                        debug3!("Added to CPU energy total: {} (new total: {})", energy_value, cpu_energy_total);
                     }
                 } else if is_gpu_power {
                     gpu_energy_total += energy_value;
                     if power_logging {
-                        debug1!("Added to GPU energy total: {} (new total: {})", energy_value, gpu_energy_total);
+                        debug3!("Added to GPU energy total: {} (new total: {})", energy_value, gpu_energy_total);
                     }
                 }
             } else {
                 // Log all channels for debugging (even non-power channels) to help diagnose CPU power issue
                 if power_logging {
-                    debug2!("Channel '{}' is not a power channel (skipping) - is_power_channel={}, contains CPU={}, contains GPU={}", 
+                    debug3!("Channel '{}' is not a power channel (skipping) - is_power_channel={}, contains CPU={}, contains GPU={}", 
                         name, is_power_channel, name.contains("CPU"), name.contains("GPU"));
                 }
             }
         } else if power_logging {
-            debug2!("Could not find channel name for key '{}'", channel_key);
+            debug3!("Could not find channel name for key '{}'", channel_key);
         }
     }
     
     if power_logging {
-        debug1!("Total energy: CPU={}, GPU={}, time_delta={:.2}s", cpu_energy_total, gpu_energy_total, time_delta_secs);
+        debug3!("Total energy: CPU={}, GPU={}, time_delta={:.2}s", cpu_energy_total, gpu_energy_total, time_delta_secs);
     }
     
     // Calculate power in watts
@@ -1877,22 +1877,22 @@ pub unsafe fn read_power_from_ioreport(
         if cpu_energy_total > 0 {
             result.cpu_power = (cpu_energy_total as f64 / time_delta_secs / 1_000_000.0) as f32;
             if power_logging {
-                debug1!("CPU power: {:.2}W (energy={} μJ, time={:.2}s)", result.cpu_power, cpu_energy_total, time_delta_secs);
+                debug3!("CPU power: {:.2}W (energy={} μJ, time={:.2}s)", result.cpu_power, cpu_energy_total, time_delta_secs);
             }
         }
         
         if gpu_energy_total > 0 {
             result.gpu_power = (gpu_energy_total as f64 / time_delta_secs / 1_000_000.0) as f32;
             if power_logging {
-                debug1!("GPU power: {:.2}W (energy={} μJ, time={:.2}s)", result.gpu_power, gpu_energy_total, time_delta_secs);
+                debug3!("GPU power: {:.2}W (energy={} μJ, time={:.2}s)", result.gpu_power, gpu_energy_total, time_delta_secs);
             }
         }
     } else {
-        debug2!("Cannot calculate power: invalid time delta ({:.2}s)", time_delta_secs);
+        debug3!("Cannot calculate power: invalid time delta ({:.2}s)", time_delta_secs);
     }
     
     if power_logging {
-        debug1!("=== POWER READ END: CPU={:.2}W, GPU={:.2}W ===", result.cpu_power, result.gpu_power);
+        debug3!("=== POWER READ END: CPU={:.2}W, GPU={:.2}W ===", result.cpu_power, result.gpu_power);
     }
     
     // Release delta sample if we created one

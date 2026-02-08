@@ -221,8 +221,54 @@ async fn execute_task(entry: &ScheduleEntry) -> Option<String> {
         return None;
     }
 
+    if task.to_uppercase().starts_with("TASK:") || task.to_uppercase().starts_with("TASK_RUN:") {
+        let prefix_len = if task.to_uppercase().starts_with("TASK_RUN:") {
+            "TASK_RUN:".len()
+        } else {
+            "TASK:".len()
+        };
+        let path_or_id = task[prefix_len..].trim();
+        if path_or_id.is_empty() {
+            warn!("Scheduler: TASK: with empty path/id (id={})", id_info);
+            return None;
+        }
+        info!("Scheduler: running task until finished (id={}, path_or_id={})", id_info, path_or_id);
+        return match crate::task::resolve_task_path(path_or_id) {
+            Ok(path) => {
+                let task_name = path
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .unwrap_or(path_or_id);
+                if let Some(ref channel_id_str) = entry.reply_to_channel_id {
+                    if let Ok(channel_id) = channel_id_str.parse::<u64>() {
+                        let msg = format!("Working on task '{}' now.", task_name);
+                        if let Err(e) = crate::discord::send_message_to_channel(channel_id, &msg).await {
+                            error!("Scheduler: failed to send 'working on task' to Discord channel {}: {}", channel_id_str, e);
+                        } else {
+                            info!("Scheduler: sent 'working on task' to Discord channel {}", channel_id_str);
+                        }
+                    }
+                }
+                match crate::commands::ollama::run_task_until_finished(path, 10).await {
+                    Ok(reply) => {
+                        info!("Scheduler: task completed (id={}, {} chars)", id_info, reply.chars().count());
+                        Some(reply)
+                    }
+                    Err(e) => {
+                        error!("Scheduler: task run failed (id={}): {}", id_info, e);
+                        None
+                    }
+                }
+            }
+            Err(e) => {
+                error!("Scheduler: task path resolve failed (id={}): {}", id_info, e);
+                None
+            }
+        };
+    }
+
     info!("Scheduler: running via Ollama (id={}): {}...", id_info, task.chars().take(60).collect::<String>());
-    match crate::commands::ollama::answer_with_ollama_and_fetch(task, None, None, None, None, None).await {
+    match crate::commands::ollama::answer_with_ollama_and_fetch(task, None, None, None, None, None, None, None, false).await {
         Ok(reply) => {
             info!("Scheduler: Ollama completed (id={}, {} chars)", id_info, reply.chars().count());
             Some(reply)

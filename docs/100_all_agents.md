@@ -13,10 +13,12 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 | **FETCH_URL** | `FETCH_URL: <full URL>` | Fetch a web page’s body as text (server-side, no CORS). | `commands/browser.rs` → `fetch_page_content()` (reqwest blocking client, 15s timeout). Used by Discord pipeline and by CPU-window chat (`ollama_chat_with_execution`). |
 | **BRAVE_SEARCH** | `BRAVE_SEARCH: <search query>` | Web search via Brave Search API; results (titles, URLs, snippets) are injected back for Ollama to summarize. | `commands/brave.rs` → `brave_web_search()`. Requires `BRAVE_API_KEY` (env or `.config.env`). Used by Discord and (when wired) CPU-window agent flow. |
 | **RUN_JS** | `RUN_JS: <JavaScript code>` | Execute JavaScript (e.g. in CPU window). | In **CPU window**: executed in frontend and result sent back to Ollama. In **Discord**: not available; Ollama is told "JavaScript execution is not available in this context." |
-| **RUN_CMD** | `RUN_CMD: <command> [args]` | Run a restricted local command (read-only). Use for reading app data under ~/.mac-stats (e.g. schedules.json). | `commands/run_cmd.rs` → `run_local_command()`. Only cat, head, tail, ls; paths must be under ~/.mac-stats. Disabled when `ALLOW_LOCAL_CMD=0`. See `docs/011_local_cmd_agent.md`. |
+| **RUN_CMD** | `RUN_CMD: <command> [args]` | Run a restricted local command (read-only). Use for reading app data under ~/.mac-stats (e.g. schedules.json, task files). | `commands/run_cmd.rs` → `run_local_command()`. Allowed: cat, head, tail, ls, grep; paths must be under ~/.mac-stats. Disabled when `ALLOW_LOCAL_CMD=0`. See `docs/011_local_cmd_agent.md`. |
+| **TASK** | `TASK_APPEND: <path or id> <content>`, `TASK_STATUS: <path or id> wip\|finished`, `TASK_CREATE: <topic> <id> <content>` | Create/update task files under ~/.mac-stats/task/ (append feedback, set status open/wip/finished). | `task/mod.rs` (helpers), `commands/ollama.rs` (tool loop). See `docs/013_task_agent.md`. |
+| **PYTHON_SCRIPT** | `PYTHON_SCRIPT: <id> <topic>` then Python code on next lines or in a fenced code block | Write script to ~/.mac-stats/scripts/python-script-<id>-<topic>.py, run with python3, return stdout or error. | `commands/python_agent.rs` → `run_python_script()`. Disabled when `ALLOW_PYTHON_SCRIPT=0`. See `docs/014_python_agent.md`. |
 | **MCP** | `MCP: <tool_name> <arguments>` | Run a tool from the configured MCP server (any server on the internet via HTTP/SSE). | `mcp/` or `commands/mcp.rs` → list tools, `call_tool()`. Requires `MCP_SERVER_URL` (env or `.config.env`). See `docs/010_mcp_agent.md`. |
 
-**Parsing:** The app parses assistant content for lines starting with `FETCH_URL:`, `BRAVE_SEARCH:`, `RUN_JS:`, `RUN_CMD:`, or `MCP:` (see `parse_tool_from_response` in `commands/ollama.rs`). For FETCH_URL and BRAVE_SEARCH, the argument is truncated at the first `;` if Ollama concatenates multiple tools on one line.
+**Parsing:** The app parses assistant content for lines starting with `FETCH_URL:`, `BRAVE_SEARCH:`, `RUN_JS:`, `RUN_CMD:`, `TASK_APPEND:`, `TASK_STATUS:`, `TASK_CREATE:`, `PYTHON_SCRIPT:`, or `MCP:` (see `parse_tool_from_response` in `commands/ollama.rs`). For FETCH_URL and BRAVE_SEARCH, the argument is truncated at the first `;` if Ollama concatenates multiple tools on one line. For PYTHON_SCRIPT, the script body is taken from a fenced ```python block or from lines after the PYTHON_SCRIPT: line.
 
 ---
 
@@ -28,7 +30,7 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 - **Behaviour:** Listens for **DMs** and **@mentions** via Discord Gateway. For each relevant message it calls a **shared "answer with Ollama + tools"** API.
 - **Flow:**
   1. **Planning:** Send user question + list of available tools; ask Ollama to reply with `RECOMMEND: <plan>` (which agents to use, in what order). No execution yet.
-  2. **Execution:** Send system prompt + agent descriptions + the plan + user question. Then **tool loop**: if the model replies with `FETCH_URL:`, `BRAVE_SEARCH:`, `RUN_JS:`, `RUN_CMD:`, or `MCP:`, the app runs the tool (FETCH_URL/BRAVE_SEARCH/RUN_CMD in Rust; RUN_JS only returns "not available"), appends the result to the conversation, and calls Ollama again. Up to **5 tool iterations**.
+  2. **Execution:** Send system prompt + agent descriptions + the plan + user question. Then **tool loop**: if the model replies with `FETCH_URL:`, `BRAVE_SEARCH:`, `RUN_JS:`, `RUN_CMD:`, `PYTHON_SCRIPT:`, or `MCP:`, the app runs the tool (FETCH_URL/BRAVE_SEARCH/RUN_CMD/PYTHON_SCRIPT in Rust; RUN_JS only returns "not available"), appends the result to the conversation, and calls Ollama again. Up to **5 tool iterations**.
 - **Rust:** `discord/mod.rs` (EventHandler) → `commands::ollama::answer_with_ollama_and_fetch(question, ..., model_override, options_override, skill_content)`. Token from env, `.config.env`, or Keychain (see 007).
 - **Message overrides:** Leading lines in the message (stripped before the question) can set **model** (`model: llama3.2`), **temperature** / **num_ctx** (`temperature: 0.7`, `num_ctx: 8192` or `params: temperature=0.7 num_ctx=8192`), and **skill** (`skill: 2` or `skill: code`). Skills are Markdown files in `~/.mac-stats/skills/skill-<number>-<topic>.md` and are prepended to the system prompt. See `docs/012_ollama_context_skills.md`.
 - **Result:** Reply is sent back to the same Discord channel. If something fails (e.g. FETCH_URL error), the user sees a short error message and "(Is Ollama configured?)".
@@ -43,7 +45,7 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 ### 2.3 Scheduler agent
 
 - **Docs:** `docs/009_scheduler_agent.md`
-- **Behaviour:** Runs at app startup; reads `~/.mac-stats/schedules.json` and in a loop sleeps until the next due time, then executes the task. Tasks are either free text (passed to `answer_with_ollama_and_fetch`, so Ollama plans and uses FETCH_URL/BRAVE_SEARCH/RUN_JS) or direct tool lines (`FETCH_URL: <url>` / `BRAVE_SEARCH: <query>` run without Ollama).
+- **Behaviour:** Runs at app startup; reads `~/.mac-stats/schedules.json` and in a loop sleeps until the next due time, then executes the task. Tasks are either free text (passed to `answer_with_ollama_and_fetch`), direct tool lines (`FETCH_URL: <url>` / `BRAVE_SEARCH: <query>`), or **task runs**: `TASK: <path or id>` / `TASK_RUN: <path or id>` run the **task loop** (`run_task_until_finished`) until the task file status is `finished` (see `docs/013_task_agent.md`).
 - **Rust:** `scheduler/mod.rs` → `spawn_scheduler_thread()`; schedule entries use **cron** (recurring, local time) or **at** (one-shot datetime). File is reloaded periodically so edits take effect without restart.
 
 ### 2.4 Brave Search agent (tool only)
@@ -58,13 +60,25 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 - **Behaviour:** Not an entry point; it's a **tool** Ollama uses when it outputs `RUN_CMD: <command> [args]`. The app runs a restricted set of local commands (cat, head, tail, ls) with paths under ~/.mac-stats and injects the result into the conversation.
 - **Where used:** Discord agent, Scheduler agent, and (when the CPU-window flow uses the same tool loop) the CPU window. Omitted from the agent list when `ALLOW_LOCAL_CMD=0`.
 
-### 2.6 MCP agent (tool only)
+### 2.6 TASK agent (tool + scheduler entry)
+
+- **Docs:** `docs/013_task_agent.md`
+- **Behaviour:** **Tools:** Ollama can output `TASK_APPEND: <path or id> <content>`, `TASK_STATUS: <path or id> wip|finished`, and `TASK_CREATE: <topic> <id> <content>` to create/update task files under `~/.mac-stats/task/`. **Task loop:** When the scheduler runs a task line `TASK: <path or id>` or `TASK_RUN: <path or id>`, the app calls `run_task_until_finished(path, 10)`: it repeatedly reads the task file, sends it to Ollama, and processes TASK_APPEND/TASK_STATUS until the file status is `finished` or max iterations is reached.
+- **Where used:** Discord agent and Scheduler agent (tool loop); Scheduler only for the task loop entry (`TASK:` / `TASK_RUN:`).
+
+### 2.7 PYTHON_SCRIPT agent (tool only)
+
+- **Docs:** `docs/014_python_agent.md`
+- **Behaviour:** Not an entry point; it's a **tool** Ollama uses when it outputs `PYTHON_SCRIPT: <id> <topic>` and then the Python code (on next lines or in a ```python block). The app writes the script to ~/.mac-stats/scripts/python-script-<id>-<topic>.py, runs it with python3, and injects stdout (success) or error (non-zero exit) into the conversation.
+- **Where used:** Discord agent, Scheduler agent. Omitted from the agent list when `ALLOW_PYTHON_SCRIPT=0`. CPU window chat can be wired later.
+
+### 2.8 MCP agent (tool only)
 
 - **Docs:** `docs/010_mcp_agent.md`
 - **Behaviour:** Not an entry point; it's a **tool** Ollama uses when MCP is configured and the model outputs `MCP: <tool_name> <arguments>`. The app calls the configured MCP server (HTTP/SSE), runs the tool, and injects the result into the conversation.
 - **Where used:** Discord agent, Scheduler agent, and (when the CPU-window flow uses the same tool loop) the CPU window. Only active when `MCP_SERVER_URL` is set.
 
-### 2.7 "ask-local-ollama" (Cursor skill)
+### 2.9 "ask-local-ollama" (Cursor skill)
 
 - **File:** `src-tauri/.claude/agents/ask-local-ollama.md`
 - **Behaviour:** Instruction for Cursor to try **local Ollama** (e.g. `http://127.0.0.1:11434/`) for tasks/questions/code before using other models. No direct effect on Discord or CPU-window agents; it only guides the IDE's model usage.
@@ -79,6 +93,8 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 | BRAVE_SEARCH | Yes | Same pipeline when wired | Yes (scheduler: direct or via Ollama) |
 | RUN_JS | No (returns "not available") | Yes (executed in frontend) | No (scheduler runs headless) |
 | RUN_CMD | Yes (when allowed) | Same pipeline when wired | Yes (when allowed) |
+| TASK_APPEND / TASK_STATUS / TASK_CREATE | Yes | Same pipeline when wired | Yes |
+| PYTHON_SCRIPT | Yes (when allowed) | Not in initial scope | Yes (when allowed) |
 | MCP | Yes (when configured) | Same pipeline when wired | Yes (when configured) |
 
 ---
@@ -107,4 +123,6 @@ but the same URL works in a browser, the usual cause is **request shape**, not t
 - **MCP agent:** `docs/010_mcp_agent.md`
 - **RUN_CMD agent:** `docs/011_local_cmd_agent.md`
 - **Ollama context, model/params, skills:** `docs/012_ollama_context_skills.md` (context window per model, Discord model/temperature/num_ctx/skill overrides, FETCH_URL reduction, skills dir)
-- **Code:** `src-tauri/src/commands/ollama.rs` (planning + tool loop, parsing), `commands/browser.rs` (FETCH_URL), `commands/brave.rs` (BRAVE_SEARCH), `commands/run_cmd.rs` (RUN_CMD), `src-tauri/src/mcp/` or `commands/mcp.rs` (MCP client), `src-tauri/src/discord/mod.rs` (Gateway + handler), `src-tauri/src/scheduler/mod.rs` (schedule loop + execution)
+- **Task agent:** `docs/013_task_agent.md` (task files, TASK_APPEND/TASK_STATUS/TASK_CREATE, task loop)
+- **Python script agent:** `docs/014_python_agent.md` (PYTHON_SCRIPT, scripts under ~/.mac-stats/scripts/)
+- **Code:** `src-tauri/src/commands/ollama.rs` (planning + tool loop, parsing, run_task_until_finished), `commands/browser.rs` (FETCH_URL), `commands/brave.rs` (BRAVE_SEARCH), `commands/run_cmd.rs` (RUN_CMD), `commands/python_agent.rs` (PYTHON_SCRIPT), `src-tauri/src/task/mod.rs` (task file helpers), `src-tauri/src/mcp/` or `commands/mcp.rs` (MCP client), `src-tauri/src/discord/mod.rs` (Gateway + handler), `src-tauri/src/scheduler/mod.rs` (schedule loop + execution)
