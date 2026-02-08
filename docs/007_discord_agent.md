@@ -59,6 +59,14 @@ Ollama invokes the Discord API by replying with exactly one line:
 
 Only **GET** is allowed for general read endpoints. **POST** is allowed only for `/channels/{channel_id}/messages`. Heavy use may hit Discord’s rate limits; see [Discord rate limits](https://discord.com/developers/docs/topics/rate-limits).
 
+## SCHEDULE tool (reminders and recurring tasks)
+
+The agent can add entries to `~/.mac-stats/schedules.json` via the **SCHEDULE** tool. Three formats are accepted:
+
+1. **Recurring (every N minutes):** `SCHEDULE: every N minutes <task>` — e.g. `every 5 minutes Check CPU and reply here`.
+2. **Recurring (cron):** `SCHEDULE: <cron expression> <task>` — cron is 6-field (sec min hour day month dow) or 5-field (min hour day month dow; the app prepends `0` for seconds). For patterns (every day at 5am, weekdays at 9am, etc.) see [crontab.guru examples](https://crontab.guru/examples.html); use the 6-field form or the standard 5-field form.
+3. **One-shot (at a specific time):** `SCHEDULE: at <datetime> <task>` — run once at the given local time. Datetime must be ISO format: `YYYY-MM-DDTHH:MM:SS` or `YYYY-MM-DD HH:MM` (e.g. `at 2025-02-09T05:00:00 Remind me of my flight`). For "tomorrow 5am" the model can use `RUN_CMD: date +%Y-%m-%d` to get today's date and compute the next day.
+
 ## Understanding servers, users, channels, guilds
 
 - **Servers (guilds)**  

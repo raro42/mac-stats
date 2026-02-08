@@ -434,6 +434,50 @@ pub fn add_schedule(
     Ok(ScheduleAddOutcome::Added)
 }
 
+/// Add a one-shot schedule entry (run once at a specific datetime). Id should be unique.
+/// at_str must be ISO format (e.g. 2025-02-09T05:00:00) as used by load_schedules.
+pub fn add_schedule_at(
+    id: String,
+    at_str: String,
+    task: String,
+    reply_to_channel_id: Option<String>,
+) -> Result<ScheduleAddOutcome, String> {
+    let _ = Config::ensure_schedules_directory();
+    let path = Config::schedules_file_path();
+
+    let mut file_data = if path.exists() {
+        let content = std::fs::read_to_string(&path)
+            .map_err(|e| format!("Failed to read schedules file: {}", e))?;
+        serde_json::from_str::<SchedulesFile>(&content)
+            .map_err(|e| format!("Failed to parse schedules file: {}", e))?
+    } else {
+        SchedulesFile {
+            schedules: Vec::new(),
+        }
+    };
+
+    file_data.schedules.push(ScheduleEntryRaw {
+        id: Some(id.clone()),
+        cron: None,
+        at: Some(at_str.clone()),
+        task: task.clone(),
+        reply_to_channel_id: reply_to_channel_id.clone(),
+    });
+
+    let json = serde_json::to_string_pretty(&file_data)
+        .map_err(|e| format!("Failed to serialize schedules: {}", e))?;
+    std::fs::write(&path, json).map_err(|e| format!("Failed to write schedules file: {}", e))?;
+
+    info!(
+        "Scheduler: one-shot schedule added (id={}, at={}, task_len={}, reply_channel={})",
+        id,
+        at_str,
+        task.chars().count(),
+        reply_to_channel_id.is_some()
+    );
+    Ok(ScheduleAddOutcome::Added)
+}
+
 /// Spawn the scheduler in a background thread. Reads ~/.mac-stats/schedules.json and runs due tasks.
 /// Safe to call once at startup.
 pub fn spawn_scheduler_thread() {

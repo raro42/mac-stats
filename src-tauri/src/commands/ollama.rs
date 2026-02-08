@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
+use std::str::FromStr;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 
@@ -311,7 +312,23 @@ const AGENT_DESCRIPTIONS_BASE: &str = r#"We have 4 agents available:
 
 3. **BRAVE_SEARCH**: Web search via Brave Search API. Use for: finding current info, facts, multiple sources. To invoke: reply with exactly one line: BRAVE_SEARCH: <search query>. The app will return search results.
 
-4. **SCHEDULE** (scheduler): Add a task to run at scheduled times. Use when the user wants something to run later or repeatedly (e.g. every 5 minutes, daily). To invoke: reply with exactly one line: SCHEDULE: every N minutes <task description> (e.g. SCHEDULE: every 5 minutes Execute RUN_JS to fetch CPU and RAM). Or SCHEDULE: <cron expression> <task>. We will add it to ~/.mac-stats/schedules.json and confirm to the user."#;
+4. **SCHEDULE** (scheduler): Add a task to run at scheduled times (recurring or one-shot). Use when the user wants something to run later or repeatedly. Three formats (reply exactly one line):
+   - SCHEDULE: every N minutes <task> (e.g. SCHEDULE: every 5 minutes Execute RUN_JS to fetch CPU and RAM).
+   - SCHEDULE: <cron expression> <task> — cron is 6-field (sec min hour day month dow) or 5-field (min hour day month dow; we accept and prepend 0 for seconds). Examples below.
+   - SCHEDULE: at <datetime> <task> — one-shot (e.g. reminder tomorrow 5am: use RUN_CMD: date +%Y-%m-%d to get today, then SCHEDULE: at 2025-02-09T05:00:00 Remind me of my flight). Datetime must be ISO local: YYYY-MM-DDTHH:MM:SS or YYYY-MM-DD HH:MM.
+   We add to ~/.mac-stats/schedules.json and confirm."#;
+
+/// Cron examples for SCHEDULE (6-field: sec min hour day month dow). Shown to the model so it can pick the right pattern (see crontab.guru for more).
+const SCHEDULE_CRON_EXAMPLES: &str = r#"
+
+SCHEDULE cron examples (6-field: sec min hour day month dow). Use as SCHEDULE: <expression> <task>:
+- Every minute: 0 * * * * *
+- Every 5 minutes: 0 */5 * * * *
+- Every day at 5:00: 0 0 5 * * *
+- Every day at midnight: 0 0 0 * * *
+- Every Monday: 0 0 * * * 1
+- Every weekday at 9am: 0 0 9 * * 1-5
+- Once a day at 8am: 0 0 8 * * *"#;
 
 /// RUN_CMD agent description (appended when ALLOW_LOCAL_CMD is not 0). Call with agent number via format_run_cmd_description(n).
 fn format_run_cmd_description(num: u32) -> String {
@@ -322,6 +339,7 @@ fn format_run_cmd_description(num: u32) -> String {
 }
 
 /// Build the SKILL agent description paragraph when skills exist. Use {} for agent number.
+/// This text is sent to Ollama in the planning and execution steps so it can recommend and invoke SKILL.
 fn build_skill_agent_description(num: u32, skills: &[crate::skills::Skill]) -> String {
     let list: String = skills
         .iter()
@@ -329,7 +347,7 @@ fn build_skill_agent_description(num: u32, skills: &[crate::skills::Skill]) -> S
         .collect::<Vec<_>>()
         .join(", ");
     format!(
-        "\n\n{}. **SKILL**: Use a specialized skill for a focused task (e.g. summarize text, create a joke, get date/time). Each skill runs in a separate session. To invoke: reply with exactly one line: SKILL: <number or topic> [optional task]. Available skills: {}.",
+        "\n\n{}. **SKILL**: Use a specialized skill for a focused task (e.g. summarize text, create a joke, get date/time). Each skill runs in a separate Ollama session (no main conversation history); the result is injected back so you can cite or refine it. Prefer SKILL when the user wants a single focused outcome that matches one of the skills below. To invoke: reply with exactly one line: SKILL: <number or topic> [optional task]. Available skills: {}.",
         num, list
     )
 }
@@ -352,6 +370,7 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
     use tracing::info;
     let skills = crate::skills::load_skills();
     let mut base = AGENT_DESCRIPTIONS_BASE.to_string();
+    base.push_str(SCHEDULE_CRON_EXAMPLES);
     let mut num = 5u32;
     if !skills.is_empty() {
         base.push_str(&build_skill_agent_description(num, &skills));
@@ -643,7 +662,7 @@ pub async fn answer_with_ollama_and_fetch(
 
     // --- Execution: system prompt with agents + plan, then tool loop ---
     info!("Agent router: execution step — sending plan + question, starting tool loop (max 5 tools)");
-    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or RUN_CMD: <command and args> or OLLAMA_API: <action> [args] (list_models, version, running, pull/delete/load/unload, embed) or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or TASK_LIST (to list open and WIP tasks) or TASK_APPEND/TASK_STATUS/TASK_CREATE or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. Then continue with your answer. Answer concisely.";
+    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or RUN_CMD: <command and args> or OLLAMA_API: <action> [args] (list_models, version, running, pull/delete/load/unload, embed) or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or SCHEDULE: <cron> <task> or SCHEDULE: at <ISO datetime> <task> or TASK_LIST (to list open and WIP tasks) or TASK_APPEND/TASK_STATUS/TASK_CREATE or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. Then continue with your answer. Answer concisely.";
     let execution_system_content = match &skill_content {
         Some(skill) => format!(
             "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}\n\nYour plan: {}",
@@ -847,10 +866,15 @@ pub async fn answer_with_ollama_and_fetch(
                     "Scheduling is not available when running from a scheduled task. Do not add a schedule; complete the task without scheduling."
                         .to_string()
                 } else {
-                    send_status("Scheduling…");
+                    let schedule_preview: String = arg.chars().take(50).collect();
+                    let schedule_preview = schedule_preview.trim();
+                    send_status(&format!(
+                        "Scheduling: {}…",
+                        if schedule_preview.is_empty() { "…" } else { schedule_preview }
+                    ));
                     info!("Agent router: SCHEDULE requested (arg len={})", arg.chars().count());
                     match parse_schedule_arg(&arg) {
-                        Ok((cron_str, task)) => {
+                        Ok(ScheduleParseResult::Cron { cron_str, task }) => {
                             let id = format!("discord-{}", chrono::Utc::now().timestamp());
                             let reply_to_channel_id = discord_reply_channel_id.map(|u| u.to_string());
                             match crate::scheduler::add_schedule(id.clone(), cron_str.clone(), task.clone(), reply_to_channel_id) {
@@ -874,9 +898,32 @@ pub async fn answer_with_ollama_and_fetch(
                                 }
                             }
                         }
+                        Ok(ScheduleParseResult::At { at_str, task }) => {
+                            let id = format!("discord-{}", chrono::Utc::now().timestamp());
+                            let reply_to_channel_id = discord_reply_channel_id.map(|u| u.to_string());
+                            match crate::scheduler::add_schedule_at(id.clone(), at_str.clone(), task.clone(), reply_to_channel_id) {
+                                Ok(crate::scheduler::ScheduleAddOutcome::Added) => {
+                                    info!("Agent router: SCHEDULE at added (id={}, at={})", id, at_str);
+                                    let task_preview: String = task.chars().take(100).collect();
+                                    format!(
+                                        "One-time schedule added for {}. The scheduler will run this task once at that time: \"{}\". Tell the user in your reply.",
+                                        at_str,
+                                        task_preview.trim()
+                                    )
+                                }
+                                Ok(crate::scheduler::ScheduleAddOutcome::AlreadyExists) => {
+                                    info!("Agent router: SCHEDULE at skipped (duplicate)");
+                                    "This one-time schedule was already added. Tell the user no duplicate was added.".to_string()
+                                }
+                                Err(e) => {
+                                    info!("Agent router: SCHEDULE at failed: {}", e);
+                                    format!("Failed to add one-shot schedule: {}. Tell the user and suggest they check ~/.mac-stats/schedules.json.", e)
+                                }
+                            }
+                        }
                         Err(e) => {
                             info!("Agent router: SCHEDULE parse failed: {}", e);
-                            format!("Could not parse schedule (expected e.g. \"every 5 minutes <task>\"): {}. Ask the user to rephrase.", e)
+                            format!("Could not parse schedule (expected e.g. \"every 5 minutes <task>\", \"at <datetime> <task>\", or \"<cron> <task>\"): {}. Ask the user to rephrase.", e)
                         }
                     }
                 }
@@ -1260,11 +1307,23 @@ fn run_js_via_node(code: &str) -> Result<String, String> {
     Ok(stdout.trim().to_string())
 }
 
-/// Parse SCHEDULE argument into (cron_str, task). Supports "every N minutes <task>" (case insensitive).
-/// Returns (cron_expression, task_text). Task is the full arg so the scheduler runs it as the Ollama question.
-fn parse_schedule_arg(arg: &str) -> Result<(String, String), String> {
-    let lower = arg.to_lowercase();
+/// Result of parsing a SCHEDULE argument: either a recurring cron or a one-shot "at" datetime.
+#[derive(Debug)]
+enum ScheduleParseResult {
+    Cron { cron_str: String, task: String },
+    At { at_str: String, task: String },
+}
+
+/// Parse SCHEDULE argument. Supports:
+/// - "every N minutes <task>"
+/// - "at <datetime> <task>" (one-shot; datetime ISO or YYYY-MM-DD HH:MM)
+/// - "<cron expression> <task>" (5- or 6-field; 5-field gets "0 " prepended)
+fn parse_schedule_arg(arg: &str) -> Result<ScheduleParseResult, String> {
+    let trimmed = arg.trim();
+    let lower = trimmed.to_lowercase();
     let rest = lower.trim_start();
+
+    // 1. "every N minutes <task>"
     if let Some(after_every) = rest.strip_prefix("every ") {
         let mut n_str = String::new();
         for c in after_every.chars() {
@@ -1285,14 +1344,89 @@ fn parse_schedule_arg(arg: &str) -> Result<(String, String), String> {
         if !remainder.to_lowercase().starts_with("minute") {
             return Err("expected 'minutes' after the number (e.g. every 5 minutes)".to_string());
         }
-        // Cron: every N minutes = "0 */N * * * *" (second 0, every N minutes)
         let cron_str = format!("0 */{} * * * *", n);
-        let task = arg.trim().to_string();
-        Ok((cron_str, task))
-    } else {
-        // Optional: allow raw cron at start (e.g. "0 */5 * * * * Task here"). For now only "every N minutes".
-        Err("expected 'every N minutes' (e.g. SCHEDULE: every 5 minutes Execute RUN_JS to fetch CPU)".to_string())
+        let task = trimmed.to_string();
+        return Ok(ScheduleParseResult::Cron { cron_str, task });
     }
+
+    // 2. "at <datetime> <task>" (one-shot)
+    if let Some(after_at) = rest.strip_prefix("at ") {
+        let after_at = after_at.trim_start();
+        let tokens: Vec<&str> = after_at.split_whitespace().collect();
+        if tokens.is_empty() {
+            return Err("at requires a datetime and task (e.g. at 2025-02-09T05:00:00 Remind me)".to_string());
+        }
+        // Try first token as ISO (2025-02-09T05:00:00)
+        if tokens[0].contains('T') {
+            if let Ok(dt) = parse_at_datetime(tokens[0]) {
+                let task = tokens[1..].join(" ").trim().to_string();
+                if task.is_empty() {
+                    return Err("at requires a task description after the datetime".to_string());
+                }
+                return Ok(ScheduleParseResult::At { at_str: dt, task });
+            }
+        }
+        // Try first two tokens as "YYYY-MM-DD HH:MM" or "YYYY-MM-DD HH:MM:SS"
+        if tokens.len() >= 2 {
+            let combined = format!("{} {}", tokens[0], tokens[1]);
+            if let Ok(dt) = parse_at_datetime(&combined) {
+                let task = tokens[2..].join(" ").trim().to_string();
+                if task.is_empty() {
+                    return Err("at requires a task description after the datetime".to_string());
+                }
+                return Ok(ScheduleParseResult::At { at_str: dt, task });
+            }
+        }
+        return Err("invalid at datetime: use YYYY-MM-DDTHH:MM:SS or YYYY-MM-DD HH:MM (local time)".to_string());
+    }
+
+    // 3. Raw cron: first 5 or 6 space-separated tokens, then task
+    let tokens: Vec<&str> = trimmed.split_whitespace().collect();
+    for &n in &[6, 5] {
+        if tokens.len() >= n {
+            let cron_part: String = if n == 5 {
+                format!("0 {}", tokens[..5].join(" "))
+            } else {
+                tokens[..6].join(" ")
+            };
+            if cron::Schedule::from_str(&cron_part).is_ok() {
+                let task = tokens[n..].join(" ").trim().to_string();
+                return Ok(ScheduleParseResult::Cron {
+                    cron_str: cron_part,
+                    task,
+                });
+            }
+        }
+    }
+
+    Err("expected 'every N minutes <task>', 'at <datetime> <task>', or '<cron> <task>' (see SCHEDULE cron examples)".to_string())
+}
+
+/// Parse datetime for "at" one-shot. Returns ISO string for storage (local, no Z).
+/// Rejects past times.
+fn parse_at_datetime(s: &str) -> Result<String, String> {
+    use chrono::{Local, TimeZone};
+    let s = s.trim();
+    let dt = chrono::DateTime::parse_from_rfc3339(s)
+        .map(|dt| dt.with_timezone(&Local))
+        .or_else(|_| {
+            chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%dT%H:%M:%S")
+                .map(|n| Local.from_local_datetime(&n).single().unwrap_or_else(|| n.and_utc().with_timezone(&Local)))
+        })
+        .or_else(|_| {
+            chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S")
+                .map(|n| Local.from_local_datetime(&n).single().unwrap_or_else(|| n.and_utc().with_timezone(&Local)))
+        })
+        .or_else(|_| {
+            chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M")
+                .map(|n| Local.from_local_datetime(&n).single().unwrap_or_else(|| n.and_utc().with_timezone(&Local)))
+        })
+        .map_err(|e| format!("invalid datetime: {} (use YYYY-MM-DDTHH:MM:SS or YYYY-MM-DD HH:MM)", e))?;
+    let now = Local::now();
+    if dt < now {
+        return Err("datetime must be in the future".to_string());
+    }
+    Ok(dt.format("%Y-%m-%dT%H:%M:%S").to_string())
 }
 
 /// Parse one of FETCH_URL:, BRAVE_SEARCH:, RUN_JS:, SCHEDULE:/SCHEDULER:, MCP:, PYTHON_SCRIPT: from assistant content.
