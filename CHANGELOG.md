@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.11] - 2026-02-09
+
+### Added
+- **SKILL agent documentation**: `docs/016_skill_agent.md` — SKILL tool invocation, logging, and future modify path. Agent descriptions sent to Ollama include enriched SKILL info for better recommendation; skills load is logged (info: available list; warn: read errors). See `docs/100_all_agents.md` (tool table, subsection 2.9).
+- **SCHEDULE tool (one-shot and cron)**: The agent can add one-shot reminders and recurring tasks via SCHEDULE in three formats:
+  - **Every N minutes**: `SCHEDULE: every N minutes <task>` (unchanged).
+  - **Cron**: `SCHEDULE: <cron expression> <task>` — 6-field (sec min hour day month dow) or 5-field (min hour day month dow; app prepends `0` for seconds). Cron examples are injected into the agent context (e.g. every day at 5am, weekdays at 9am). See `docs/007_discord_agent.md`.
+  - **One-shot (at datetime)**: `SCHEDULE: at <datetime> <task>` — run once at local time; datetime ISO `YYYY-MM-DDTHH:MM:SS` or `YYYY-MM-DD HH:MM`. Scheduler supports `add_schedule_at()` for one-shot entries in `~/.mac-stats/schedules.json`.
+
+### Changed
+- **SCHEDULE status**: Status line now shows a short preview of the schedule text while adding (e.g. "Scheduling: every 5 minutes…").
+
 ## [0.1.10] - 2026-02-09
 
 ### Added
