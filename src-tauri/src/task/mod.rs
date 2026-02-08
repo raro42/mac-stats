@@ -1,12 +1,15 @@
 //! Task files under ~/.mac-stats/task/ with naming:
-//! task-<topic>-<id>-<date-time>-<open|wip|finished>.md
+//! task-<topic>-<id>-<date-time>-<open|wip|finished|unsuccessful>.md
+
+pub mod review;
 
 use crate::config::Config;
 use std::path::{Path, PathBuf};
 use std::fs;
+use std::time::SystemTime;
 use tracing::info;
 
-const VALID_STATUSES: &[&str] = &["open", "wip", "finished"];
+const VALID_STATUSES: &[&str] = &["open", "wip", "finished", "unsuccessful"];
 
 fn is_valid_status(s: &str) -> bool {
     VALID_STATUSES.contains(&s)
@@ -18,7 +21,7 @@ pub fn task_path(topic: &str, id: &str, datetime: &str, status: &str) -> PathBuf
     Config::task_dir().join(filename)
 }
 
-/// Parse status from filename (segment before .md: open, wip, or finished).
+/// Parse status from filename (segment before .md: open, wip, finished, or unsuccessful).
 /// Returns None if the path does not match the task file naming convention.
 pub fn status_from_path(path: &Path) -> Option<String> {
     let name = path.file_name()?.to_str()?;
@@ -40,7 +43,7 @@ pub fn status_from_path(path: &Path) -> Option<String> {
 /// Rename task file to new status; return the new path.
 pub fn set_task_status(path: &Path, new_status: &str) -> Result<PathBuf, String> {
     if !is_valid_status(new_status) {
-        return Err(format!("Invalid status: {} (allowed: open, wip, finished)", new_status));
+        return Err(format!("Invalid status: {} (allowed: open, wip, finished, unsuccessful)", new_status));
     }
     let parent = path.parent().ok_or("No parent dir")?;
     let name = path.file_name().and_then(|n| n.to_str()).ok_or("Invalid filename")?;
@@ -160,13 +163,82 @@ pub fn find_current_path(previous_path: &Path) -> Option<PathBuf> {
         .or_else(|| stem.strip_suffix("-wip"))
         .or_else(|| stem.strip_suffix("-finished"))
         .unwrap_or(stem);
-    for status in ["open", "wip", "finished"] {
+    for status in ["open", "wip", "finished", "unsuccessful"] {
         let p = parent.join(format!("{}-{}.md", base, status));
         if p.exists() {
             return Some(p);
         }
     }
     None
+}
+
+/// Format a human-readable list of open and wip tasks for Ollama/user (e.g. "Open tasks:\n- task-foo-1-...\nWIP tasks:\n- ...").
+pub fn format_list_open_and_wip_tasks() -> Result<String, String> {
+    let list = list_open_and_wip_tasks()?;
+    if list.is_empty() {
+        return Ok("No open or WIP tasks. Use TASK_CREATE to create a new task.".to_string());
+    }
+    let mut open = Vec::new();
+    let mut wip = Vec::new();
+    for (path, status, _mtime) in list {
+        let name = path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("?")
+            .to_string();
+        if status == "open" {
+            open.push(name);
+        } else {
+            wip.push(name);
+        }
+    }
+    let mut out = String::new();
+    if !open.is_empty() {
+        out.push_str("Open tasks:\n");
+        for n in open {
+            out.push_str("- ");
+            out.push_str(&n);
+            out.push('\n');
+        }
+    }
+    if !wip.is_empty() {
+        if !out.is_empty() {
+            out.push('\n');
+        }
+        out.push_str("WIP tasks:\n");
+        for n in wip {
+            out.push_str("- ");
+            out.push_str(&n);
+            out.push('\n');
+        }
+    }
+    Ok(out.trim_end().to_string())
+}
+
+/// List all task files with status open or wip, with their modification time.
+/// Returns (path, status, mtime). Used by the task review loop to find work and close stale WIPs.
+pub fn list_open_and_wip_tasks() -> Result<Vec<(PathBuf, String, SystemTime)>, String> {
+    let task_base = Config::task_dir();
+    if !task_base.exists() {
+        return Ok(Vec::new());
+    }
+    let entries = fs::read_dir(&task_base).map_err(|e| format!("Read task dir: {}", e))?;
+    let mut out = Vec::new();
+    for entry in entries {
+        let path = entry.map_err(|e| format!("Read dir entry: {}", e))?.path();
+        if !path.is_file() {
+            continue;
+        }
+        let status = match status_from_path(&path) {
+            Some(s) if s == "open" || s == "wip" => s,
+            _ => continue,
+        };
+        let mtime = fs::metadata(&path)
+            .and_then(|m| m.modified())
+            .unwrap_or_else(|_| SystemTime::UNIX_EPOCH);
+        out.push((path, status, mtime));
+    }
+    Ok(out)
 }
 
 fn expand_tilde(s: &str) -> String {
