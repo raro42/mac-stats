@@ -5,7 +5,7 @@ The RUN_CMD agent lets Ollama read app data by running restricted local commands
 ## Overview
 
 - **Agent name**: RUN_CMD  
-- **Invocation**: Ollama replies with one line: `RUN_CMD: <command> [args]` (e.g. `RUN_CMD: cat ~/.mac-stats/schedules.json` or `RUN_CMD: ls ~/.mac-stats`).  
+- **Invocation**: Ollama replies with one line: `RUN_CMD: <command> [args]` (e.g. `RUN_CMD: cat ~/.mac-stats/schedules.json`, `RUN_CMD: date`, `RUN_CMD: whoami`, or `RUN_CMD: ls ~/.mac-stats`).  
 - The app runs the command (no shell), validates that any path arguments are under `~/.mac-stats`, and injects stdout (or an error message) back into the conversation.
 
 When RUN_CMD is disabled via `ALLOW_LOCAL_CMD=0`, the agent is omitted from the list Ollama sees so the model does not try to use it.
@@ -17,10 +17,10 @@ When RUN_CMD is disabled via `ALLOW_LOCAL_CMD=0`, the agent is omitted from the 
 
 ## Allowlist and path rules
 
-- **Allowed commands**: `cat`, `head`, `tail`, `ls`, `grep`. Any other command is rejected with "Command not allowed". For `grep`, use e.g. `RUN_CMD: grep pattern ~/.mac-stats/task/file.md` (pattern and path required).
+- **Allowed commands**: `cat`, `head`, `tail`, `ls`, `grep`, `date`, `whoami`. Any other command is rejected with "Command not allowed". For `grep`, use e.g. `RUN_CMD: grep pattern ~/.mac-stats/task/file.md` (pattern and path required). For current time or user, use `RUN_CMD: date` or `RUN_CMD: whoami` (no path needed); `date` accepts format args (e.g. `RUN_CMD: date +%Y-%m-%d`).
 - **Paths**: Any argument that looks like a path (contains `/` or starts with `~`) must resolve to a location under `~/.mac-stats`. Paths are expanded (`~` → `$HOME`) and validated (canonical form must be under the permitted base). Paths outside `~/.mac-stats` are rejected with "Path not allowed (must be under ~/.mac-stats)."
 - **No shell**: The app does not invoke a shell. It splits the RUN_CMD argument on whitespace, validates the command and path args, and runs the binary with the given arguments.
-- **`ls` with no path**: If the user invokes `RUN_CMD: ls` with no arguments, the app runs `ls` with the permitted base directory (`~/.mac-stats`) so only that directory is listed.
+- **`ls` with no path**: If the user invokes `RUN_CMD: ls` with no arguments, the app runs `ls` with the permitted base directory (`~/.mac-stats`) so only that directory is listed. **`date` and `whoami`** need no path; use e.g. `RUN_CMD: date` or `RUN_CMD: whoami`.
 
 ## Behaviour
 
@@ -30,7 +30,7 @@ When RUN_CMD is disabled via `ALLOW_LOCAL_CMD=0`, the agent is omitted from the 
 
 ## Security
 
-- Only the five commands above are allowed (cat, head, tail, ls, grep). No `find`, `sed`, or shell.
+- Only the seven commands above are allowed (cat, head, tail, ls, grep, date, whoami). No `find`, `sed`, or shell.
 - Path validation ensures no escape from `~/.mac-stats` (canonical path check).
 - Do not pass user input to a shell; all execution is via `Command::new(cmd).args(args)`.
 
