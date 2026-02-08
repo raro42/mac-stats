@@ -145,4 +145,33 @@ impl Config {
         }
         Ok(())
     }
+
+    /// Session directory for persisted chat memory: `$HOME/.mac-stats/session/`
+    pub fn session_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("session")
+        } else {
+            std::env::temp_dir().join("mac-stats-session")
+        }
+    }
+
+    /// Ensure the session directory exists
+    pub fn ensure_session_directory() -> std::io::Result<()> {
+        std::fs::create_dir_all(Self::session_dir())
+    }
+
+    /// Skills directory for agent prompt overlays: `$HOME/.mac-stats/skills/`
+    /// Files: skill-<number>-<topic>.md (e.g. skill-1-summarize.md, skill-2-code.md).
+    pub fn skills_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("skills")
+        } else {
+            std::env::temp_dir().join("mac-stats-skills")
+        }
+    }
+
+    /// Ensure the skills directory exists.
+    pub fn ensure_skills_directory() -> std::io::Result<()> {
+        std::fs::create_dir_all(Self::skills_dir())
+    }
 }

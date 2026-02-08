@@ -26,7 +26,29 @@ mac-stats can run a Discord bot that connects via the Gateway and responds to **
 
 - Listens for **direct messages** to the bot and for **messages that @mention the bot** in guilds.
 - Ignores the bot’s own messages and messages that don’t mention it (in guilds).
-- Reply is currently a **stub** (“mac-stats received your message …”). The plan is to wire the same “answer with Ollama + fetch” pipeline used by the chat UI so the bot can reply with local Ollama or browser-agent results.
+- Replies using the **“answer with Ollama + fetch”** pipeline: planning step (RECOMMEND) then execution with FETCH_URL, BRAVE_SEARCH, RUN_CMD, MCP, etc. (see `docs/100_all_agents.md`).
+
+### Message prefixes (optional)
+
+You can put **optional leading lines** in your message to override model, parameters, or skill for that request only. These lines are stripped before the question is sent to Ollama.
+
+| Prefix | Example | Effect |
+|--------|---------|--------|
+| `model:` or `model=` | `model: llama3.2` | Use this model for this request (must be available in Ollama). |
+| `temperature:` or `temperature=` | `temperature: 0.7` | Set temperature for this request. |
+| `num_ctx:` or `num_ctx=` | `num_ctx: 8192` | Set context window size for this request. |
+| `params:` | `params: temperature=0.7 num_ctx=8192` | Set multiple options in one line. |
+| `skill:` or `skill=` | `skill: 2` or `skill: code` | Load `~/.mac-stats/skills/skill-<number>-<topic>.md` and prepend its content to the system prompt. |
+
+Example message:
+
+```
+model: llama3.2
+skill: code
+Write a small Python function to compute factorial.
+```
+
+See **Ollama context, model/params, and skills** in `docs/012_ollama_context_skills.md` for details.
 
 ## Security
 

@@ -29,7 +29,8 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 - **Flow:**
   1. **Planning:** Send user question + list of available tools; ask Ollama to reply with `RECOMMEND: <plan>` (which agents to use, in what order). No execution yet.
   2. **Execution:** Send system prompt + agent descriptions + the plan + user question. Then **tool loop**: if the model replies with `FETCH_URL:`, `BRAVE_SEARCH:`, `RUN_JS:`, `RUN_CMD:`, or `MCP:`, the app runs the tool (FETCH_URL/BRAVE_SEARCH/RUN_CMD in Rust; RUN_JS only returns "not available"), appends the result to the conversation, and calls Ollama again. Up to **5 tool iterations**.
-- **Rust:** `discord/mod.rs` (EventHandler) → `commands::ollama::answer_with_ollama_and_fetch(question)`. Token from env, `.config.env`, or Keychain (see 007).
+- **Rust:** `discord/mod.rs` (EventHandler) → `commands::ollama::answer_with_ollama_and_fetch(question, ..., model_override, options_override, skill_content)`. Token from env, `.config.env`, or Keychain (see 007).
+- **Message overrides:** Leading lines in the message (stripped before the question) can set **model** (`model: llama3.2`), **temperature** / **num_ctx** (`temperature: 0.7`, `num_ctx: 8192` or `params: temperature=0.7 num_ctx=8192`), and **skill** (`skill: 2` or `skill: code`). Skills are Markdown files in `~/.mac-stats/skills/skill-<number>-<topic>.md` and are prepended to the system prompt. See `docs/012_ollama_context_skills.md`.
 - **Result:** Reply is sent back to the same Discord channel. If something fails (e.g. FETCH_URL error), the user sees a short error message and "(Is Ollama configured?)".
 
 ### 2.2 CPU window / Chat UI agent
@@ -105,4 +106,5 @@ but the same URL works in a browser, the usual cause is **request shape**, not t
 - **Scheduler:** `docs/009_scheduler_agent.md`
 - **MCP agent:** `docs/010_mcp_agent.md`
 - **RUN_CMD agent:** `docs/011_local_cmd_agent.md`
+- **Ollama context, model/params, skills:** `docs/012_ollama_context_skills.md` (context window per model, Discord model/temperature/num_ctx/skill overrides, FETCH_URL reduction, skills dir)
 - **Code:** `src-tauri/src/commands/ollama.rs` (planning + tool loop, parsing), `commands/browser.rs` (FETCH_URL), `commands/brave.rs` (BRAVE_SEARCH), `commands/run_cmd.rs` (RUN_CMD), `src-tauri/src/mcp/` or `commands/mcp.rs` (MCP client), `src-tauri/src/discord/mod.rs` (Gateway + handler), `src-tauri/src/scheduler/mod.rs` (schedule loop + execution)

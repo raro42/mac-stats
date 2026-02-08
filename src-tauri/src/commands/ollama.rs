@@ -18,6 +18,10 @@ pub struct OllamaConfigRequest {
     pub endpoint: String,
     pub model: String,
     pub api_key_keychain_account: Option<String>,
+    #[serde(default)]
+    pub temperature: Option<f32>,
+    #[serde(default)]
+    pub num_ctx: Option<u32>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -40,6 +44,8 @@ pub fn configure_ollama(config: OllamaConfigRequest) -> Result<(), String> {
         endpoint: config.endpoint.clone(),
         model: config.model.clone(),
         api_key: config.api_key_keychain_account.clone(),
+        temperature: config.temperature,
+        num_ctx: config.num_ctx,
     };
 
     ollama_config.validate()
@@ -116,14 +122,97 @@ pub async fn check_ollama_connection() -> Result<bool, String> {
     }
 }
 
+/// Called at app startup so the Ollama agent is available for Discord, scheduler, and CPU window
+/// without requiring the user to open the CPU window first. If the client is not yet configured,
+/// configures with default endpoint (http://localhost:11434) and model (llama2), then checks
+/// the connection. If the endpoint is reachable, the agent is ready for all entry points.
+pub async fn ensure_ollama_agent_ready_at_startup() {
+    use tracing::{debug, info};
+
+    let already_configured = {
+        let guard = match get_ollama_client().lock() {
+            Ok(g) => g,
+            Err(_) => return,
+        };
+        guard.is_some()
+    };
+
+    if !already_configured {
+        info!("Ollama agent: not configured at startup, applying default endpoint");
+        let default = OllamaConfigRequest {
+            endpoint: "http://localhost:11434".to_string(),
+            model: "llama2".to_string(),
+            api_key_keychain_account: None,
+            temperature: None,
+            num_ctx: None,
+        };
+        if let Err(e) = configure_ollama(default) {
+            debug!("Ollama agent: default config failed (endpoint may be down): {}", e);
+            return;
+        }
+    }
+
+    match check_ollama_connection().await {
+        Ok(true) => {
+            info!("Ollama agent: ready at startup (endpoint reachable)");
+            let (endpoint, model, api_key_account) = {
+                let guard = match get_ollama_client().lock() {
+                    Ok(g) => g,
+                    Err(_) => return,
+                };
+                match guard.as_ref() {
+                    Some(c) => (
+                        c.config.endpoint.clone(),
+                        c.config.model.clone(),
+                        c.config.api_key.clone(),
+                    ),
+                    None => return,
+                }
+            };
+            let api_key = api_key_account
+                .as_ref()
+                .and_then(|acc| crate::security::get_credential(acc).ok().flatten());
+            if let Ok(info) =
+                crate::ollama::get_model_info(&endpoint, &model, api_key.as_deref()).await
+            {
+                info!(
+                    "Ollama agent: model {} context size {} tokens",
+                    model, info.context_size_tokens
+                );
+            }
+        }
+        Ok(false) => debug!("Ollama agent: endpoint not reachable at startup (will retry when used)"),
+        Err(e) => debug!("Ollama agent: startup check failed: {}", e),
+    }
+}
+
+/// Merge config defaults with per-request options. Request override wins.
+fn merge_chat_options(
+    config_temp: Option<f32>,
+    config_num_ctx: Option<u32>,
+    options_override: Option<crate::ollama::ChatOptions>,
+) -> Option<crate::ollama::ChatOptions> {
+    let o = options_override.unwrap_or_default();
+    let temperature = o.temperature.or(config_temp);
+    let num_ctx = o.num_ctx.or(config_num_ctx);
+    if temperature.is_some() || num_ctx.is_some() {
+        Some(crate::ollama::ChatOptions { temperature, num_ctx })
+    } else {
+        None
+    }
+}
+
 /// Internal: send messages to Ollama and return the chat response.
 /// Used by the ollama_chat command and by answer_with_ollama_and_fetch (Discord / agent).
+/// When set, `model_override` and `options_override` apply only to this request.
 pub async fn send_ollama_chat_messages(
     messages: Vec<crate::ollama::ChatMessage>,
+    model_override: Option<String>,
+    options_override: Option<crate::ollama::ChatOptions>,
 ) -> Result<crate::ollama::ChatResponse, String> {
     use tracing::{debug, info};
 
-    let (endpoint, model, api_key) = {
+    let (endpoint, model, api_key, config_temp, config_num_ctx) = {
         let client_guard = get_ollama_client()
             .lock()
             .map_err(|e| e.to_string())?;
@@ -134,19 +223,25 @@ pub async fn send_ollama_chat_messages(
             client.config.endpoint.clone(),
             client.config.model.clone(),
             client.config.api_key.clone(),
+            client.config.temperature,
+            client.config.num_ctx,
         )
     };
+
+    let effective_model = model_override.unwrap_or(model);
+    let options = merge_chat_options(config_temp, config_num_ctx, options_override);
 
     let temp_client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(120))
         .build()
         .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
 
-    let url = format!("{}/api/chat", endpoint);
+    let url = format!("{}/api/chat", endpoint.trim_end_matches('/'));
     let chat_request = crate::ollama::ChatRequest {
-        model: model.clone(),
+        model: effective_model,
         messages,
         stream: false,
+        options,
     };
 
     let mut http_request = temp_client.post(&url).json(&chat_request);
@@ -187,7 +282,7 @@ pub async fn ollama_chat(request: ChatRequest) -> Result<crate::ollama::ChatResp
         .unwrap_or_else(|_| "Failed to serialize request".to_string());
     info!("Ollama: Chat request JSON:\n{}", request_json);
 
-    send_ollama_chat_messages(request.messages).await
+    send_ollama_chat_messages(request.messages, None, None).await
 }
 
 /// Base agent descriptions (without MCP). Includes RUN_JS, FETCH_URL, BRAVE_SEARCH, SCHEDULE.
@@ -201,17 +296,40 @@ const AGENT_DESCRIPTIONS_BASE: &str = r#"We have 4 agents available:
 
 4. **SCHEDULE** (scheduler): Add a task to run at scheduled times. Use when the user wants something to run later or repeatedly (e.g. every 5 minutes, daily). To invoke: reply with exactly one line: SCHEDULE: every N minutes <task description> (e.g. SCHEDULE: every 5 minutes Execute RUN_JS to fetch CPU and RAM). Or SCHEDULE: <cron expression> <task>. We will add it to ~/.mac-stats/schedules.json and confirm to the user."#;
 
-/// RUN_CMD agent description (appended when ALLOW_LOCAL_CMD is not 0).
-const RUN_CMD_DESCRIPTION: &str = r#"
+/// RUN_CMD agent description (appended when ALLOW_LOCAL_CMD is not 0). Call with agent number via format_run_cmd_description(n).
+fn format_run_cmd_description(num: u32) -> String {
+    format!(
+        "\n\n{}. **RUN_CMD** (local read-only): Run a restricted local command to read app data under ~/.mac-stats. Use for: reading schedules.json, config, or other files in ~/.mac-stats. To invoke: reply with exactly one line: RUN_CMD: <command> [args] (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json or RUN_CMD: ls ~/.mac-stats). Only cat, head, tail, ls are allowed; paths must be under ~/.mac-stats.",
+        num
+    )
+}
 
-5. **RUN_CMD** (local read-only): Run a restricted local command to read app data under ~/.mac-stats. Use for: reading schedules.json, config, or other files in ~/.mac-stats. To invoke: reply with exactly one line: RUN_CMD: <command> [args] (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json or RUN_CMD: ls ~/.mac-stats). Only cat, head, tail, ls are allowed; paths must be under ~/.mac-stats."#;
+/// Build the SKILL agent description paragraph when skills exist. Use {} for agent number.
+fn build_skill_agent_description(num: u32, skills: &[crate::skills::Skill]) -> String {
+    let list: String = skills
+        .iter()
+        .map(|s| format!("{}-{}", s.number, s.topic))
+        .collect::<Vec<_>>()
+        .join(", ");
+    format!(
+        "\n\n{}. **SKILL**: Use a specialized skill for a focused task (e.g. summarize text, create a joke, get date/time). Each skill runs in a separate session. To invoke: reply with exactly one line: SKILL: <number or topic> [optional task]. Available skills: {}.",
+        num, list
+    )
+}
 
-/// Build agent descriptions string: base, optional RUN_CMD when allowed, then MCP tools when configured.
+/// Build agent descriptions string: base, optional SKILL (when skills exist), optional RUN_CMD, then MCP when configured.
 async fn build_agent_descriptions() -> String {
     use tracing::info;
+    let skills = crate::skills::load_skills();
     let mut base = AGENT_DESCRIPTIONS_BASE.to_string();
+    let mut num = 5u32;
+    if !skills.is_empty() {
+        base.push_str(&build_skill_agent_description(num, &skills));
+        num += 1;
+    }
     if crate::commands::run_cmd::is_local_cmd_allowed() {
-        base.push_str(RUN_CMD_DESCRIPTION);
+        base.push_str(&format_run_cmd_description(num));
+        num += 1;
     }
     let Some(server_url) = crate::mcp::get_mcp_server_url() else {
         return base;
@@ -223,12 +341,7 @@ async fn build_agent_descriptions() -> String {
                 info!("Agent router: MCP server returned no tools");
                 return base;
             }
-            let mcp_num = if crate::commands::run_cmd::is_local_cmd_allowed() {
-                6
-            } else {
-                5
-            };
-            let mut mcp_section = format!("\n\n{}. **MCP** (tools from configured MCP server, {} tools): Use when the task matches a tool below. To invoke: reply with exactly one line: MCP: <tool_name> <arguments>. Arguments can be JSON (e.g. MCP: get_weather {{\"location\": \"NYC\"}}) or plain text (e.g. MCP: fetch_url https://example.com).\n\nAvailable MCP tools:\n", mcp_num, tools.len());
+            let mut mcp_section = format!("\n\n{}. **MCP** (tools from configured MCP server, {} tools): Use when the task matches a tool below. To invoke: reply with exactly one line: MCP: <tool_name> <arguments>. Arguments can be JSON (e.g. MCP: get_weather {{\"location\": \"NYC\"}}) or plain text (e.g. MCP: fetch_url https://example.com).\n\nAvailable MCP tools:\n", num, tools.len());
             for t in &tools {
                 let desc = t.description.as_deref().unwrap_or("(no description)");
                 mcp_section.push_str(&format!("- **{}**: {}\n", t.name, desc));
@@ -242,15 +355,153 @@ async fn build_agent_descriptions() -> String {
     }
 }
 
+/// Heuristic: chars to tokens (conservative).
+const CHARS_PER_TOKEN: usize = 4;
+
+/// Reserve tokens for model reply and wrapper text.
+const RESERVE_TOKENS: u32 = 512;
+
+/// Reduce fetched page content to fit the model context: summarize via Ollama if needed, else truncate.
+async fn reduce_fetched_content_to_fit(
+    body: &str,
+    context_size_tokens: u32,
+    estimated_used_tokens: u32,
+    model_override: Option<String>,
+    options_override: Option<crate::ollama::ChatOptions>,
+) -> Result<String, String> {
+    use tracing::info;
+
+    let max_tokens_for_body = context_size_tokens
+        .saturating_sub(RESERVE_TOKENS)
+        .saturating_sub(estimated_used_tokens);
+    let max_chars = (max_tokens_for_body as usize).saturating_mul(CHARS_PER_TOKEN);
+    let body_tokens_est = body.chars().count() / CHARS_PER_TOKEN;
+
+    if body_tokens_est <= max_tokens_for_body as usize {
+        return Ok(body.to_string());
+    }
+
+    info!(
+        "Agent router: page content too large (est. {} tokens), max {} tokens; reducing",
+        body_tokens_est, max_tokens_for_body
+    );
+
+    let body_truncated_for_request: String = body.chars().take(max_chars).collect();
+    let summary_tokens = (max_tokens_for_body / 2).max(256);
+    let summarization_messages = vec![
+        crate::ollama::ChatMessage {
+            role: "system".to_string(),
+            content: format!(
+                "Summarize the following web page content in under {} tokens, keeping the most relevant information for answering questions. Output only the summary, no preamble.",
+                summary_tokens
+            ),
+        },
+        crate::ollama::ChatMessage {
+            role: "user".to_string(),
+            content: body_truncated_for_request,
+        },
+    ];
+
+    match send_ollama_chat_messages(
+        summarization_messages,
+        model_override,
+        options_override,
+    )
+    .await
+    {
+        Ok(resp) => {
+            let summary = resp.message.content.trim().to_string();
+            if summary.is_empty() {
+                let fallback: String = body.chars().take(max_chars).collect();
+                Ok(format!(
+                    "{} (content truncated due to context limit)",
+                    fallback
+                ))
+            } else {
+                Ok(summary)
+            }
+        }
+        Err(e) => {
+            info!("Agent router: summarization failed ({}), truncating", e);
+            let fallback: String = body.chars().take(max_chars).collect();
+            Ok(format!(
+                "{} (content truncated due to context limit)",
+                fallback
+            ))
+        }
+    }
+}
+
+/// Run a single Ollama request in a new session (no conversation history). Used for SKILL agent.
+/// System message = skill content, user message = task. Returns the assistant reply or error string.
+async fn run_skill_ollama_session(
+    skill_content: &str,
+    user_message: &str,
+    model_override: Option<String>,
+    options_override: Option<crate::ollama::ChatOptions>,
+) -> Result<String, String> {
+    use tracing::info;
+    let messages = vec![
+        crate::ollama::ChatMessage {
+            role: "system".to_string(),
+            content: skill_content.to_string(),
+        },
+        crate::ollama::ChatMessage {
+            role: "user".to_string(),
+            content: user_message.to_string(),
+        },
+    ];
+    info!(
+        "Agent router: SKILL session request (user message {} chars)",
+        user_message.chars().count()
+    );
+    let response = send_ollama_chat_messages(messages, model_override, options_override).await?;
+    Ok(response.message.content.trim().to_string())
+}
+
 /// Shared API for Discord (and other agents): ask Ollama how to solve, then run agents (FETCH_URL, BRAVE_SEARCH, RUN_JS).
 /// 1) Planning: send user question + agent list, get RECOMMEND: plan.
 /// 2) Execution: send plan + "now answer using agents", loop on FETCH_URL / BRAVE_SEARCH / RUN_JS (max 5 tool calls).
 /// If `status_tx` is provided (e.g. from Discord), short status messages are sent so the user sees we're still working.
+/// If `discord_reply_channel_id` is set (when the request came from Discord), SCHEDULE will store it so the scheduler can post results to that channel (DM or mention channel).
+/// When set, `model_override` and `options_override` apply only to this request (e.g. from Discord "model: llama3" line).
+/// When set, `skill_content` is prepended to system prompts (from ~/.mac-stats/skills/skill-<n>-<topic>.md).
 pub async fn answer_with_ollama_and_fetch(
     question: &str,
     status_tx: Option<tokio::sync::mpsc::UnboundedSender<String>>,
+    discord_reply_channel_id: Option<u64>,
+    model_override: Option<String>,
+    options_override: Option<crate::ollama::ChatOptions>,
+    skill_content: Option<String>,
 ) -> Result<String, String> {
     use tracing::info;
+
+    if let Some(ref model) = model_override {
+        let available = list_ollama_models().await.map_err(|e| format!("Could not list models: {}", e))?;
+        let found = available.iter().any(|m| m == model || m.starts_with(&format!("{}:", model)));
+        if !found {
+            return Err(format!("Model '{}' not found. Available: {}", model, available.join(", ")));
+        }
+    }
+
+    let (endpoint, effective_model, api_key) = {
+        let guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
+        let client = guard.as_ref().ok_or_else(|| "Ollama not configured".to_string())?;
+        let effective = model_override.clone().unwrap_or_else(|| client.config.model.clone());
+        let api_key = client
+            .config
+            .api_key
+            .as_ref()
+            .and_then(|acc| crate::security::get_credential(acc).ok().flatten());
+        (
+            client.config.endpoint.clone(),
+            effective,
+            api_key,
+        )
+    };
+    let model_info = crate::ollama::get_model_info(&endpoint, &effective_model, api_key.as_deref())
+        .await
+        .unwrap_or_else(|_| crate::ollama::ModelInfo::default());
 
     let send_status = |msg: &str| {
         if let Some(ref tx) = status_tx {
@@ -272,33 +523,50 @@ pub async fn answer_with_ollama_and_fetch(
     // --- Planning step: ask Ollama how it would solve the question ---
     info!("Agent router: planning step — asking Ollama for RECOMMEND");
     const PLANNING_PROMPT: &str = "You are a helpful assistant. We will give you a user question and a list of available agents. Reply with your recommended approach in this exact format: RECOMMEND: <your plan in one or two sentences: which agents to use and in what order>. Do not execute anything yet.";
+    let planning_system_content = match &skill_content {
+        Some(skill) => format!(
+            "Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}\n\nUser question: {}",
+            skill, PLANNING_PROMPT, agent_descriptions, question
+        ),
+        None => format!(
+            "{}\n\n{}\n\nUser question: {}",
+            PLANNING_PROMPT, agent_descriptions, question
+        ),
+    };
     let planning_messages = vec![
         crate::ollama::ChatMessage {
             role: "system".to_string(),
-            content: format!("{}\n\n{}\n\nUser question: {}", PLANNING_PROMPT, agent_descriptions, question),
+            content: planning_system_content,
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
             content: "Reply with RECOMMEND: your plan.".to_string(),
         },
     ];
-    let plan_response = send_ollama_chat_messages(planning_messages).await?;
+    let plan_response = send_ollama_chat_messages(planning_messages, model_override.clone(), options_override.clone()).await?;
     let recommendation = plan_response.message.content.trim().to_string();
     info!("Agent router: understood plan — RECOMMEND: {}", recommendation.chars().take(200).collect::<String>());
     send_status("Working on it…");
 
     // --- Execution: system prompt with agents + plan, then tool loop ---
     info!("Agent router: execution step — sending plan + question, starting tool loop (max 5 tools)");
-    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or RUN_CMD: <command and args> or SCHEDULE: every N minutes <task> or MCP: <tool_name> <arguments> (if MCP tools are listed). We will run it and give you the result. Then continue with your answer. Answer concisely.";
+    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or RUN_CMD: <command and args> or SCHEDULE: every N minutes <task> or MCP: <tool_name> <arguments> (if MCP tools are listed). We will run it and give you the result. Then continue with your answer. Answer concisely.";
+    let execution_system_content = match &skill_content {
+        Some(skill) => format!(
+            "Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}\n\nYour plan: {}",
+            skill, EXECUTION_PROMPT, agent_descriptions, recommendation
+        ),
+        None => format!(
+            "{}\n\n{}\n\nYour plan: {}",
+            EXECUTION_PROMPT,
+            agent_descriptions,
+            recommendation
+        ),
+    };
     let mut messages = vec![
         crate::ollama::ChatMessage {
             role: "system".to_string(),
-            content: format!(
-                "{}\n\n{}\n\nYour plan: {}",
-                EXECUTION_PROMPT,
-                agent_descriptions,
-                recommendation
-            ),
+            content: execution_system_content,
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
@@ -323,7 +591,7 @@ pub async fn answer_with_ollama_and_fetch(
 
     const MAX_TOOL_ITERATIONS: u32 = 5;
     let mut tool_count: u32 = 0;
-    let mut response = send_ollama_chat_messages(messages.clone()).await?;
+    let mut response = send_ollama_chat_messages(messages.clone(), model_override.clone(), options_override.clone()).await?;
     let mut response_content = response.message.content.clone();
     let n_first = response_content.chars().count();
     info!("Agent router: first response received ({} chars): {}", n_first, log_content(&response_content));
@@ -358,10 +626,24 @@ pub async fn answer_with_ollama_and_fetch(
                     .map_err(|e| format!("Fetch task: {}", e))?
                     .map_err(|e| format!("Fetch page failed: {}", e));
                 match fetch_result {
-                    Ok(body) => format!(
-                        "Here is the page content:\n\n{}\n\nPlease answer the user's question based on this content.",
-                        body
-                    ),
+                    Ok(body) => {
+                        let estimated_used = (messages.iter().map(|m| m.content.len()).sum::<usize>()
+                            + agent_descriptions.len())
+                            / CHARS_PER_TOKEN
+                            + 50;
+                        let body_fit = reduce_fetched_content_to_fit(
+                            &body,
+                            model_info.context_size_tokens,
+                            estimated_used as u32,
+                            model_override.clone(),
+                            options_override.clone(),
+                        )
+                        .await?;
+                        format!(
+                            "Here is the page content:\n\n{}\n\nPlease answer the user's question based on this content.",
+                            body_fit
+                        )
+                    }
                     Err(e) => {
                         if e.contains("401") {
                             info!("Discord/Ollama: Fetch returned 401 Unauthorized, stopping");
@@ -400,21 +682,76 @@ pub async fn answer_with_ollama_and_fetch(
                     }
                 }
             }
+            "SKILL" => {
+                send_status("Using skill…");
+                let arg = arg.trim();
+                let (selector, task_message) = if let Some(space_idx) = arg.find(' ') {
+                    let (sel, rest) = arg.split_at(space_idx);
+                    (sel.trim(), rest.trim())
+                } else {
+                    (arg, "")
+                };
+                let skills = crate::skills::load_skills();
+                match crate::skills::find_skill_by_number_or_topic(&skills, selector) {
+                    Some(skill) => {
+                        info!(
+                            "Agent router: using skill {} ({}) — new session (no main context)",
+                            skill.number, skill.topic
+                        );
+                        let user_msg = if task_message.is_empty() {
+                            question
+                        } else {
+                            task_message
+                        };
+                        match run_skill_ollama_session(
+                            &skill.content,
+                            user_msg,
+                            model_override.clone(),
+                            options_override.clone(),
+                        )
+                        .await
+                        {
+                            Ok(result) => format!(
+                                "Skill \"{}-{}\" result:\n\n{}\n\nUse this to answer the user's question.",
+                                skill.number, skill.topic, result
+                            ),
+                            Err(e) => {
+                                info!("Agent router: SKILL session failed: {}", e);
+                                format!("Skill \"{}-{}\" failed: {}. Answer without this result.", skill.number, skill.topic, e)
+                            }
+                        }
+                    }
+                    None => {
+                        info!("Agent router: SKILL unknown selector \"{}\" (available: {:?})", selector, skills.iter().map(|s| format!("{}-{}", s.number, s.topic)).collect::<Vec<_>>());
+                        format!(
+                            "Unknown skill \"{}\". Available skills: {}. Answer without using a skill.",
+                            selector,
+                            skills.iter().map(|s| format!("{}-{}", s.number, s.topic)).collect::<Vec<_>>().join(", ")
+                        )
+                    }
+                }
+            }
             "SCHEDULE" => {
                 send_status("Scheduling…");
                 info!("Agent router: SCHEDULE requested (arg len={})", arg.chars().count());
                 match parse_schedule_arg(&arg) {
                     Ok((cron_str, task)) => {
                         let id = format!("discord-{}", chrono::Utc::now().timestamp());
-                        match crate::scheduler::add_schedule(id.clone(), cron_str.clone(), task.clone()) {
-                            Ok(()) => {
+                        let reply_to_channel_id = discord_reply_channel_id.map(|u| u.to_string());
+                        match crate::scheduler::add_schedule(id.clone(), cron_str.clone(), task.clone(), reply_to_channel_id) {
+                            Ok(crate::scheduler::ScheduleAddOutcome::Added) => {
                                 info!("Agent router: SCHEDULE added (id={}, cron={})", id, cron_str);
                                 let task_preview: String = task.chars().take(100).collect();
                                 format!(
-                                    "Schedule added successfully. The scheduler will run this task (cron: {}): \"{}\". Tell the user in your reply that it is scheduled and they will see it in the scheduler.",
+                                    "Schedule added successfully. The scheduler will run this task (cron: {}): \"{}\". Tell the user in your reply that it is scheduled and they will see the result in this channel when it runs.",
                                     cron_str,
                                     task_preview.trim()
                                 )
+                            }
+                            Ok(crate::scheduler::ScheduleAddOutcome::AlreadyExists) => {
+                                info!("Agent router: SCHEDULE skipped (same task already scheduled)");
+                                "This task is already scheduled with the same cron and description. Tell the user no duplicate was added."
+                                    .to_string()
                             }
                             Err(e) => {
                                 info!("Agent router: SCHEDULE failed: {}", e);
@@ -432,13 +769,7 @@ pub async fn answer_with_ollama_and_fetch(
                 if !crate::commands::run_cmd::is_local_cmd_allowed() {
                     "RUN_CMD is not available (disabled by ALLOW_LOCAL_CMD=0). Answer without running local commands.".to_string()
                 } else {
-                    let status_preview: String = arg.chars().take(40).collect();
-                    let status_msg = if arg.chars().count() > 40 {
-                        format!("Running local command: {}…", status_preview)
-                    } else {
-                        format!("Running local command: {}", arg)
-                    };
-                    send_status(&status_msg);
+                    send_status(&format!("Running local command: {}", arg));
                     info!("Agent router: RUN_CMD requested: {}", arg);
                     match tokio::task::spawn_blocking({
                         let arg = arg.to_string();
@@ -511,7 +842,7 @@ pub async fn answer_with_ollama_and_fetch(
             content: user_message,
         });
 
-        response = send_ollama_chat_messages(messages.clone()).await?;
+        response = send_ollama_chat_messages(messages.clone(), model_override.clone(), options_override.clone()).await?;
         response_content = response.message.content.clone();
         if tool_count >= MAX_TOOL_ITERATIONS {
             info!("Agent router: max tool iterations reached ({}), using last response as final", MAX_TOOL_ITERATIONS);
@@ -600,7 +931,7 @@ fn parse_schedule_arg(arg: &str) -> Result<(String, String), String> {
 /// Also accepts lines starting with "RECOMMEND: " (e.g. "RECOMMEND: SCHEDULER: Every 5 minutes...").
 /// Returns (tool_name, argument) or None.
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "MCP:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "MCP:"];
     for line in content.lines() {
         let line = line.trim();
         // Ollama sometimes echoes the plan format: "RECOMMEND: RUN_JS: ..." or "RECOMMEND: SCHEDULER: ...".

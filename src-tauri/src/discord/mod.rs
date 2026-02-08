@@ -16,6 +16,112 @@ use std::sync::{Arc, OnceLock};
 use tokio::sync::mpsc;
 use tracing::{debug, error, info};
 
+/// Parse leading "model: ...", "temperature: ...", "num_ctx: ...", "skill: ..." from a Discord message.
+/// Returns (rest of message as question, model_override, options_override, skill_content).
+fn parse_discord_ollama_overrides(
+    content: &str,
+) -> (
+    String,
+    Option<String>,
+    Option<crate::ollama::ChatOptions>,
+    Option<String>,
+) {
+    let mut model_override: Option<String> = None;
+    let mut temperature: Option<f32> = None;
+    let mut num_ctx: Option<u32> = None;
+    let mut skill_selector: Option<String> = None;
+    let lines: Vec<&str> = content.lines().collect();
+    let mut consumed = 0;
+
+    for line in lines.iter() {
+        let line = line.trim();
+        if line.is_empty() {
+            consumed += 1;
+            continue;
+        }
+        let lower = line.to_lowercase();
+        if lower.starts_with("model:") {
+            let v = line["model:".len()..].trim().to_string();
+            if !v.is_empty() {
+                model_override = Some(v);
+            }
+            consumed += 1;
+        } else if lower.starts_with("model=") {
+            let v = line["model=".len()..].trim().to_string();
+            if !v.is_empty() {
+                model_override = Some(v);
+            }
+            consumed += 1;
+        } else if lower.starts_with("skill:") {
+            let v = line["skill:".len()..].trim().to_string();
+            if !v.is_empty() {
+                skill_selector = Some(v);
+            }
+            consumed += 1;
+        } else if lower.starts_with("skill=") {
+            let v = line["skill=".len()..].trim().to_string();
+            if !v.is_empty() {
+                skill_selector = Some(v);
+            }
+            consumed += 1;
+        } else if lower.starts_with("temperature:") {
+            if let Ok(t) = line["temperature:".len()..].trim().parse::<f32>() {
+                temperature = Some(t);
+            }
+            consumed += 1;
+        } else if lower.starts_with("temperature=") {
+            if let Ok(t) = line["temperature=".len()..].trim().parse::<f32>() {
+                temperature = Some(t);
+            }
+            consumed += 1;
+        } else if lower.starts_with("num_ctx:") {
+            if let Ok(n) = line["num_ctx:".len()..].trim().parse::<u32>() {
+                num_ctx = Some(n);
+            }
+            consumed += 1;
+        } else if lower.starts_with("num_ctx=") {
+            if let Ok(n) = line["num_ctx=".len()..].trim().parse::<u32>() {
+                num_ctx = Some(n);
+            }
+            consumed += 1;
+        } else if lower.starts_with("params:") {
+            let rest = line["params:".len()..].trim();
+            for part in rest.split_whitespace() {
+                if let Some((k, v)) = part.split_once('=') {
+                    let k = k.to_lowercase();
+                    if k == "temperature" {
+                        if let Ok(t) = v.parse::<f32>() {
+                            temperature = Some(t);
+                        }
+                    } else if k == "num_ctx" {
+                        if let Ok(n) = v.parse::<u32>() {
+                            num_ctx = Some(n);
+                        }
+                    }
+                }
+            }
+            consumed += 1;
+        } else {
+            break;
+        }
+    }
+
+    let question = lines[consumed..].join("\n").trim().to_string();
+    let options_override = if temperature.is_some() || num_ctx.is_some() {
+        Some(crate::ollama::ChatOptions {
+            temperature,
+            num_ctx,
+        })
+    } else {
+        None
+    };
+    let skill_content = skill_selector.and_then(|sel| {
+        let skills = crate::skills::load_skills();
+        crate::skills::find_skill_by_number_or_topic(&skills, &sel).map(|s| s.content.clone())
+    });
+    (question, model_override, options_override, skill_content)
+}
+
 /// True if we already spawned the gateway thread (only one gateway per process).
 static GATEWAY_STARTED: AtomicBool = AtomicBool::new(false);
 
@@ -65,6 +171,9 @@ impl EventHandler for Handler {
             return;
         }
 
+        let (question, model_override, options_override, skill_content) =
+            parse_discord_ollama_overrides(content);
+
         info!(
             "Discord: {} from {} (channel {})",
             if is_dm { "DM" } else { "mention" },
@@ -73,12 +182,16 @@ impl EventHandler for Handler {
         );
 
         const LOG_MAX: usize = 800;
-        let to_ollama = if content.len() <= LOG_MAX {
-            content.to_string()
+        let to_ollama = if question.len() <= LOG_MAX {
+            question.to_string()
         } else {
-            format!("{}... ({} chars)", &content[..LOG_MAX], content.len())
+            format!("{}... ({} chars)", question.chars().take(LOG_MAX).collect::<String>(), question.len())
         };
         info!("Discord→Ollama: sending: {}", to_ollama);
+
+        // Short-term memory: add user message when we receive the request (store original content)
+        let channel_id_u64 = new_message.channel_id.get();
+        crate::session_memory::add_message("discord", channel_id_u64, "user", content);
 
         // Channel for status updates so the user sees we're still working (Thinking…, Fetching page…, etc.)
         let (status_tx, mut status_rx) = mpsc::unbounded_channel();
@@ -92,7 +205,14 @@ impl EventHandler for Handler {
             }
         });
 
-        let reply = match crate::commands::ollama::answer_with_ollama_and_fetch(content, Some(status_tx)).await {
+        let reply = match crate::commands::ollama::answer_with_ollama_and_fetch(
+            &question,
+            Some(status_tx),
+            Some(channel_id_u64),
+            model_override,
+            options_override,
+            skill_content,
+        ).await {
             Ok(r) => r,
             Err(e) => {
                 error!("Discord: Failed to generate reply: {}", e);
@@ -117,6 +237,9 @@ impl EventHandler for Handler {
         if let Err(e) = new_message.channel_id.say(&ctx, &reply).await {
             error!("Discord: Failed to send reply: {}", e);
         }
+
+        // Short-term memory: add assistant reply (user was added when request received); persist when > 3 messages
+        crate::session_memory::add_message("discord", channel_id_u64, "assistant", &reply);
     }
 }
 
@@ -182,6 +305,40 @@ fn token_from_config_env_file(path: &Path) -> Option<String> {
         .and_then(|l| l.split_once('='))
         .map(|(_, v)| v.trim().to_string());
     token.filter(|t| !t.is_empty())
+}
+
+/// Send a message to a Discord channel (DM or guild channel). Used by the scheduler to post task results.
+/// Requires the bot token; uses Discord HTTP API so it works from any thread/runtime.
+pub async fn send_message_to_channel(channel_id: u64, content: &str) -> Result<(), String> {
+    const MAX_LEN: usize = 2000;
+    let token = match get_discord_token() {
+        Some(t) => t,
+        None => return Err("Discord not configured (no token)".to_string()),
+    };
+    let content = if content.chars().count() > MAX_LEN {
+        format!("{}... [truncated]", content.chars().take(MAX_LEN - 20).collect::<String>())
+    } else {
+        content.to_string()
+    };
+    let url = format!("https://discord.com/api/v10/channels/{}/messages", channel_id);
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(15))
+        .build()
+        .map_err(|e| format!("HTTP client: {}", e))?;
+    let resp = client
+        .post(&url)
+        .header("Authorization", format!("Bot {}", token))
+        .header("Content-Type", "application/json")
+        .json(&serde_json::json!({ "content": content }))
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    if !resp.status().is_success() {
+        let status = resp.status();
+        let body = resp.text().await.unwrap_or_default();
+        return Err(format!("Discord API {}: {}", status, body));
+    }
+    Ok(())
 }
 
 /// Get Discord token: DISCORD_BOT_TOKEN env, then .config.env (cwd then ~/.mac-stats), then Keychain.
