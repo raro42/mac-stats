@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.8] - 2026-02-08
+
+### Added
+- **Ollama context window and model/params**: Per-model context size via `POST /api/show`, cached; Discord can override model (`model: llama3.2`), temperature and num_ctx (`temperature: 0.7`, `num_ctx: 8192` or `params: ...`). Config supports optional default temperature/num_ctx. See `docs/012_ollama_context_skills.md`.
+- **Context-aware FETCH_URL**: When fetched page content would exceed the model context, the app summarizes it via one Ollama call or truncates with a note. Uses heuristic token estimate (chars/4) and reserved space for the reply.
+- **Skills**: Markdown files in `~/.mac-stats/skills/skill-<number>-<topic>.md` can be selected in Discord with `skill: 2` or `skill: code`; content is prepended to the system prompt so different “agents” respond differently.
+- **Ollama agent at startup**: The app configures and checks the default Ollama endpoint at startup so the agent is available for Discord, scheduler, and CPU window without opening the CPU window first.
+
+### Changed
+- **Discord agent**: Reply uses full Ollama + tools pipeline (planning + execution). Message prefixes for model, temperature, num_ctx, and skill documented in `docs/007_discord_agent.md` and `docs/012_ollama_context_skills.md`.
+
 ## [0.1.7] - 2026-02-06
 
 ### Added

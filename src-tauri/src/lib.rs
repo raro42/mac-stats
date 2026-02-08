@@ -31,6 +31,8 @@ mod ollama;
 pub mod discord;
 mod scheduler;
 mod mcp;
+mod session_memory;
+mod skills;
 mod commands;
 
 use std::os::raw::c_void;
@@ -279,6 +281,12 @@ fn run_internal(open_cpu_window: bool) {
 
             // Start scheduler agent: reads ~/.mac-stats/schedules.json and runs due tasks (Ollama + tools).
             scheduler::spawn_scheduler_thread();
+
+            // Ensure Ollama agent is ready at startup (default endpoint) so Discord, scheduler, and CPU window
+            // can use it without requiring the user to open the CPU window first.
+            tauri::async_runtime::spawn(async {
+                commands::ollama::ensure_ollama_agent_ready_at_startup().await;
+            });
 
             // For automatic updates, we'll use a simple approach:
             // The background update loop stores updates in MENU_BAR_TEXT

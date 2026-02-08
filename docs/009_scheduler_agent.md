@@ -32,14 +32,15 @@ The scheduler agent runs tasks at scheduled times. It reads `~/.mac-stats/schedu
 - **task** (required): What to run.
   - **Free text:** Passed to Ollama as the question; the app uses the same pipeline as the Discord agent (planning + FETCH_URL/BRAVE_SEARCH/RUN_JS loop). Ollama decides which agents to use.
   - **Direct tool:** If the task string starts with `FETCH_URL: <url>` or `BRAVE_SEARCH: <query>`, that tool is run directly (no Ollama call). Useful for simple recurring fetches or searches.
+- **reply_to_channel_id** (optional): Discord channel ID (numeric string). When set, the scheduler sends the task result (Ollama reply) to that channel when the task runs. Used when a schedule was created from Discord (DM or channel mention) so the user sees the result in the same place they asked.
 
-Each entry must have exactly one of `cron` or `at`. Invalid entries are skipped and a warning is logged.
+Each entry must have exactly one of `cron` or `at`. Invalid entries are skipped and a warning is logged. **Deduplication:** If you add a schedule with the same `cron` and same `task` (after normalizing whitespace) as an existing entry, the add is skipped and no duplicate is created.
 
 ## Behaviour
 
 - The scheduler runs in a background thread started when the app starts (same as the Discord gateway).
 - It loads the schedule file, computes the next run time for each entry (cron = next match in local time; at = that time if in the future), and sleeps until the soonest time (capped at 60 seconds so the file is reloaded regularly).
-- When a time is due, it runs that entry’s task (Ollama or direct tool), then reloads the file and repeats.
+- When a time is due, it runs that entry’s task (Ollama or direct tool). If the entry has `reply_to_channel_id` (e.g. from Discord), the result is posted to that channel (DM or the channel where the user was mentioned).
 - Errors (Ollama down, fetch failure, etc.) are logged; the loop continues. One-shot entries with `at` in the past never run and are skipped on each load.
 
 ## References
