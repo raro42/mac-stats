@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7] - 2026-02-06
+
+### Added
+- **Discord Agent (Gateway)**: Optional Discord bot that connects via the Gateway and responds to DMs and @mentions
+  - Bot token stored in macOS Keychain (account `discord_bot_token`); never logged or exposed
+  - Listens for direct messages and guild messages that mention the bot; ignores own messages
+  - Requires Message Content Intent enabled in Discord Developer Portal
+  - Tauri commands: `configure_discord(token?)` to set/clear token, `is_discord_configured()` to check
+  - Reply is currently a stub; Ollama/browser pipeline to be wired in a follow-up
+  - Documentation: `docs/007_discord_agent.md`
+
 ## [0.1.6] - 2026-01-22
 
 ### Fixed

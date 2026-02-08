@@ -26,15 +26,19 @@ static KEYCHAIN_LOCK: Mutex<()> = Mutex::new(());
 /// # Returns
 /// Ok(()) on success, Err on failure
 pub fn store_credential(account: &str, password: &str) -> Result<()> {
-    let _lock = KEYCHAIN_LOCK.lock().unwrap();
+    let _lock = KEYCHAIN_LOCK
+        .lock()
+        .map_err(|e| anyhow::anyhow!("Keychain lock poisoned: {:?}", e))?;
     
     // Delete existing credential if it exists (update operation)
     let _ = delete_credential(account);
     
-    set_generic_password(KEYCHAIN_SERVICE, account, password.as_bytes())
-        .context("Failed to store credential in Keychain")?;
+    if let Err(e) = set_generic_password(KEYCHAIN_SERVICE, account, password.as_bytes()) {
+        tracing::error!("Keychain: set_generic_password failed for account '{}' (service '{}'): {:?}", account, KEYCHAIN_SERVICE, e);
+        return Err(anyhow::anyhow!("Failed to store credential in Keychain: {:?}", e));
+    }
     
-    tracing::debug!("Credential stored for account: {}", account);
+    tracing::info!("Keychain: stored credential for account '{}' (service '{}')", account, KEYCHAIN_SERVICE);
     Ok(())
 }
 
@@ -46,7 +50,9 @@ pub fn store_credential(account: &str, password: &str) -> Result<()> {
 /// # Returns
 /// Ok(Some(String)) if found, Ok(None) if not found, Err on error
 pub fn get_credential(account: &str) -> Result<Option<String>> {
-    let _lock = KEYCHAIN_LOCK.lock().unwrap();
+    let _lock = KEYCHAIN_LOCK
+        .lock()
+        .map_err(|e| anyhow::anyhow!("Keychain lock poisoned: {:?}", e))?;
     
     match get_generic_password(KEYCHAIN_SERVICE, account) {
         Ok(password_bytes) => {
@@ -72,7 +78,9 @@ pub fn get_credential(account: &str) -> Result<Option<String>> {
 /// # Returns
 /// Ok(()) on success (even if credential didn't exist), Err on error
 pub fn delete_credential(account: &str) -> Result<()> {
-    let _lock = KEYCHAIN_LOCK.lock().unwrap();
+    let _lock = KEYCHAIN_LOCK
+        .lock()
+        .map_err(|e| anyhow::anyhow!("Keychain lock poisoned: {:?}", e))?;
     
     match delete_generic_password(KEYCHAIN_SERVICE, account) {
         Ok(()) => {
@@ -95,7 +103,9 @@ pub fn delete_credential(account: &str) -> Result<()> {
 /// # Returns
 /// Vector of account names stored in Keychain
 pub fn list_credentials() -> Result<Vec<String>> {
-    let _lock = KEYCHAIN_LOCK.lock().unwrap();
+    let _lock = KEYCHAIN_LOCK
+        .lock()
+        .map_err(|e| anyhow::anyhow!("Keychain lock poisoned: {:?}", e))?;
     
     let mut accounts = Vec::new();
     
@@ -140,7 +150,7 @@ pub fn mask_credential(credential: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_mask_credential() {
         assert_eq!(mask_credential("short"), "****");

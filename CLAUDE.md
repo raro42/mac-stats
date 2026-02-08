@@ -24,6 +24,7 @@ This ensures you understand the project context, architecture, and conventions b
 - Process list with top CPU consumers
 - Customizable UI themes
 - Low CPU usage optimizations
+- Ollama AI chat with code execution and **FETCH_URL** (navigate to URL, fetch page content server-side, no CORS)
 
 ## Build and Run Commands
 
