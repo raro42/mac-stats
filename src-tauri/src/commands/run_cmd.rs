@@ -1,13 +1,13 @@
 //! RUN_CMD agent: restricted local command execution for Ollama.
 //!
-//! Allows read-only commands (cat, head, tail, ls) with paths under ~/.mac-stats.
+//! Allows read-only commands (cat, head, tail, ls, grep, date, whoami) with paths under ~/.mac-stats where applicable.
 //! No shell; allowlist and path validation only. See docs/011_local_cmd_agent.md.
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use tracing::info;
 
-const ALLOWED_COMMANDS: &[&str] = &["cat", "head", "tail", "ls", "grep"];
+const ALLOWED_COMMANDS: &[&str] = &["cat", "head", "tail", "ls", "grep", "date", "whoami"];
 
 /// Read ALLOW_LOCAL_CMD from env or .config.env. "0", "false", "no" => false; default true.
 fn allow_local_cmd_from_config_env_file(path: &Path) -> Option<bool> {
@@ -135,7 +135,7 @@ fn validate_path_args(args: &[String], base: &Path) -> Result<Vec<String>, Strin
     Ok(out)
 }
 
-/// Run a restricted local command. No shell; allowlist cat, head, tail, ls; paths under ~/.mac-stats.
+/// Run a restricted local command. No shell; allowlist cat, head, tail, ls, grep, date, whoami; paths under ~/.mac-stats where applicable.
 pub fn run_local_command(arg: &str) -> Result<String, String> {
     let tokens = parse_arg(arg);
     if tokens.is_empty() {
@@ -157,8 +157,8 @@ pub fn run_local_command(arg: &str) -> Result<String, String> {
         vec![]
     };
 
-    if args.is_empty() && cmd != "ls" {
-        return Err("RUN_CMD: command requires a path (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json).".to_string());
+    if args.is_empty() && !matches!(cmd.as_str(), "ls" | "date" | "whoami") {
+        return Err("RUN_CMD: command requires a path (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json). Use date or whoami with no path for system time/user.".to_string());
     }
     if cmd == "grep" && args.len() < 2 {
         return Err("RUN_CMD: grep requires pattern and path (e.g. RUN_CMD: grep pattern ~/.mac-stats/task/file.md).".to_string());

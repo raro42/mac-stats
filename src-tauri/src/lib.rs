@@ -292,6 +292,9 @@ fn run_internal(open_cpu_window: bool) {
             // Start scheduler agent: reads ~/.mac-stats/schedules.json and runs due tasks (Ollama + tools).
             scheduler::spawn_scheduler_thread();
 
+            // Start task review: every 10 min, close WIP tasks older than 30 min as unsuccessful, work on one open task.
+            task::review::spawn_review_thread();
+
             // Ensure Ollama agent is ready at startup (default endpoint) so Discord, scheduler, and CPU window
             // can use it without requiring the user to open the CPU window first.
             tauri::async_runtime::spawn(async {

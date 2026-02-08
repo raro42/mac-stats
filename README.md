@@ -29,22 +29,34 @@ This project was developed through "vibe coding" - building features iteratively
 
 ## Features
 
+### System monitoring
 - Real-time CPU, RAM, Disk, and GPU monitoring
 - Temperature readings (SMC integration)
 - CPU frequency monitoring (IOReport)
-- **Power consumption monitoring** (CPU and GPU power in watts)
-- **Battery monitoring** (battery level and charging status)
-- **Website & Social Media Monitoring** - Monitor website uptime and social media platforms with response time tracking
-- **AI Chat Integration (Ollama)** - Chat with AI about your system metrics using local Ollama instance
-- **Status Icon Dashboard** - Quick access icon bar with real-time status indicators
+- Power consumption monitoring (CPU and GPU power in watts)
+- Battery monitoring (battery level and charging status)
 - Process list with top CPU consumers (clickable for details)
-- Process details modal with comprehensive information (PID, memory, disk I/O, user info, etc.)
-- Force quit processes directly from the app
-- Menu bar integration
-- Modern, customizable UI themes (9 themes available)
-- Scrollable sections for better content organization
-- Collapsible sections for monitoring and AI chat
+- Process details modal (PID, memory, disk I/O, user info, etc.) and force quit
 - Low CPU usage: <0.1% with window closed, ~3% with window open
+
+### Website & monitoring
+- Website uptime and social media monitoring with response time tracking
+- Alert system (rules and channels)
+
+### AI & agents (Ollama)
+- **AI Chat (Ollama)** — Chat about system metrics using a local Ollama instance; supports code execution (JavaScript), context-aware **FETCH_URL**, **BRAVE_SEARCH**, and optional **RUN_CMD** (local commands).
+- **Discord bot** — Optional bot (Gateway) for DMs and @mentions; replies use the full Ollama + tools pipeline; can call the **Discord HTTP API** (list guilds/channels/members, send messages); records user display names for personalized replies.
+- **MCP agent** — Use tools from any MCP server (HTTP/SSE or stdio); configure via `MCP_SERVER_URL` or `MCP_SERVER_STDIO`; available in Discord, scheduler, and CPU window chat.
+- **Task agent** — Task files under `~/.mac-stats/task/` with TASK_APPEND, TASK_STATUS, TASK_CREATE; scheduler can run a task loop until finished and optionally post results to a Discord channel.
+- **PYTHON_SCRIPT agent** — Ollama can create and run Python scripts under `~/.mac-stats/scripts/` (disable with `ALLOW_PYTHON_SCRIPT=0`).
+- **Scheduler** — Run tasks on a schedule (`~/.mac-stats/schedules.json`); cron or one-shot; tasks go through Ollama + tools; optional `reply_to_channel_id` to send results to Discord.
+- **Skills** — Markdown files in `~/.mac-stats/skills/` for different “agent” personalities; optional per-model context and temperature/num_ctx overrides.
+
+### UI
+- Menu bar integration
+- Status icon dashboard with real-time indicators (monitors, Ollama, etc.)
+- Modern, customizable UI themes (9 themes available)
+- Scrollable and collapsible sections for monitoring and AI chat
 
 ### Known Limitations
 
@@ -173,16 +185,19 @@ mac-stats is designed to be extremely efficient:
 - ✅ Power consumption monitoring (CPU and GPU)
 - ✅ Battery monitoring with charging status
 - ✅ Website & Social Media Monitoring with uptime tracking
-- ✅ AI Chat Integration (Ollama) for system metrics queries
+- ✅ AI Chat (Ollama) with FETCH_URL, BRAVE_SEARCH, RUN_CMD, code execution
+- ✅ Discord bot (Gateway + Discord API tool, user names)
+- ✅ MCP agent (external MCP server tools)
+- ✅ Task agent (task files, TASK_APPEND/STATUS/CREATE, scheduler task loop)
+- ✅ PYTHON_SCRIPT agent (run Python scripts from Ollama)
+- ✅ Scheduler (cron/at, optional Discord reply channel)
+- ✅ Skills and per-model context/params
 - ✅ Status Icon Dashboard with real-time indicators
-- ✅ Process list with top CPU consumers (refreshes every 15s, clickable for details)
-- ✅ Process details modal with comprehensive information
-- ✅ Force quit processes functionality
+- ✅ Process list (refreshes every 15s, clickable for details) and force quit
 - ✅ Menu bar integration
 - ✅ Customizable themes (9 themes: Apple, Architect, Data Poster, Dark, Futuristic, Light, Material, Neon, Swiss Minimalistic)
 - ✅ System resource monitoring (CPU, RAM, Disk, GPU)
-- ✅ Scrollable sections for better content organization
-- ✅ Collapsible sections for monitoring and AI chat
+- ✅ Scrollable and collapsible sections
 - ✅ Low CPU usage optimizations
 
 ### Theme Gallery

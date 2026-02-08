@@ -1,5 +1,7 @@
 //! Ollama Tauri commands
 
+use tauri::Manager;
+
 use crate::ollama::{
     ChatMessage, EmbedInput, EmbedResponse, ListResponse, OllamaClient, OllamaConfig,
     PsResponse, VersionResponse,
@@ -248,6 +250,17 @@ pub async fn send_ollama_chat_messages(
         options,
     };
 
+    // Log outgoing request (ping) so logs show full ping-pong with Ollama
+    const REQUEST_LOG_MAX: usize = 4000;
+    let request_json = serde_json::to_string_pretty(&chat_request)
+        .unwrap_or_else(|_| "Failed to serialize request".to_string());
+    if request_json.len() <= REQUEST_LOG_MAX {
+        info!("Ollama → Request (POST /api/chat):\n{}", request_json);
+    } else {
+        let truncated: String = request_json.chars().take(REQUEST_LOG_MAX).collect();
+        info!("Ollama → Request (POST /api/chat) ({} chars total, truncated):\n{}...", request_json.len(), truncated);
+    }
+
     let mut http_request = temp_client.post(&url).json(&chat_request);
     if let Some(keychain_account) = &api_key {
         if let Ok(Some(api_key_value)) = crate::security::get_credential(keychain_account) {
@@ -266,12 +279,12 @@ pub async fn send_ollama_chat_messages(
         .map_err(|e| format!("Failed to parse response: {}", e))?;
     let content = &response.message.content;
     let n = content.chars().count();
-    const LOG_MAX: usize = 500;
-    if n <= LOG_MAX {
-        info!("Ollama: Chat response received ({} chars): {}", n, content);
+    const RESPONSE_LOG_MAX: usize = 1000;
+    if n <= RESPONSE_LOG_MAX {
+        info!("Ollama ← Response ({} chars):\n{}", n, content);
     } else {
-        let head: String = content.chars().take(LOG_MAX).collect();
-        info!("Ollama: Chat response received ({} chars): {}...", n, head);
+        let head: String = content.chars().take(RESPONSE_LOG_MAX).collect();
+        info!("Ollama ← Response ({} chars, truncated):\n{}...", n, head);
     }
     Ok(response)
 }
@@ -303,7 +316,7 @@ const AGENT_DESCRIPTIONS_BASE: &str = r#"We have 4 agents available:
 /// RUN_CMD agent description (appended when ALLOW_LOCAL_CMD is not 0). Call with agent number via format_run_cmd_description(n).
 fn format_run_cmd_description(num: u32) -> String {
     format!(
-        "\n\n{}. **RUN_CMD** (local read-only): Run a restricted local command to read app data under ~/.mac-stats. Use for: reading schedules.json, config, or task files in ~/.mac-stats/task. To invoke: reply with exactly one line: RUN_CMD: <command> [args] (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json or RUN_CMD: grep pattern ~/.mac-stats/task/file.md). Allowed: cat, head, tail, ls, grep; paths must be under ~/.mac-stats.",
+        "\n\n{}. **RUN_CMD** (local read-only): Run a restricted local command. Use for: reading app data under ~/.mac-stats (schedules.json, config, task files), or current time/user (date, whoami). To invoke: reply with exactly one line: RUN_CMD: <command> [args] (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json, RUN_CMD: date, RUN_CMD: whoami, RUN_CMD: date +%Y-%m-%d, RUN_CMD: grep pattern ~/.mac-stats/task/file.md). Allowed: cat, head, tail, ls, grep, date, whoami; file paths must be under ~/.mac-stats; date and whoami need no path.",
         num
     )
 }
@@ -349,7 +362,7 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
         num += 1;
     }
     base.push_str(&format!(
-        "\n\n{}. **TASK** (task files under ~/.mac-stats/task/): Use when working on a task file. TASK_APPEND: append feedback to a task (reply with one line: TASK_APPEND: <path or task id> <content>). TASK_STATUS: set status (reply: TASK_STATUS: <path or task id> wip|finished). TASK_CREATE: create a new task file (reply: TASK_CREATE: <topic> <id> <initial content>). Paths must be under ~/.mac-stats/task.",
+        "\n\n{}. **TASK** (task files under ~/.mac-stats/task/): Use when working on a task file or when the user asks for the list of open tasks. TASK_LIST: get the list of open and WIP tasks (reply: TASK_LIST or TASK_LIST: ). TASK_APPEND: append feedback to a task (reply: TASK_APPEND: <path or task id> <content>). TASK_STATUS: set status (reply: TASK_STATUS: <path or task id> wip|finished). TASK_CREATE: create a new task file (reply: TASK_CREATE: <topic> <id> <initial content>). Paths must be under ~/.mac-stats/task.",
         num
     ));
     num += 1;
@@ -630,7 +643,7 @@ pub async fn answer_with_ollama_and_fetch(
 
     // --- Execution: system prompt with agents + plan, then tool loop ---
     info!("Agent router: execution step — sending plan + question, starting tool loop (max 5 tools)");
-    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or RUN_CMD: <command and args> or OLLAMA_API: <action> [args] (list_models, version, running, pull/delete/load/unload, embed) or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. Then continue with your answer. Answer concisely.";
+    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or RUN_CMD: <command and args> or OLLAMA_API: <action> [args] (list_models, version, running, pull/delete/load/unload, embed) or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or TASK_LIST (to list open and WIP tasks) or TASK_APPEND/TASK_STATUS/TASK_CREATE or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. Then continue with your answer. Answer concisely.";
     let execution_system_content = match &skill_content {
         Some(skill) => format!(
             "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}\n\nYour plan: {}",
@@ -750,8 +763,23 @@ pub async fn answer_with_ollama_and_fetch(
                 }
             }
             "RUN_JS" => {
-                send_status("Running code…");
-                info!("Discord/Ollama: RUN_JS requested: {}... [{} chars]", arg.chars().take(60).collect::<String>(), arg.len());
+                const CODE_PREVIEW_LEN: usize = 50;
+                let code_preview: String = arg
+                    .trim()
+                    .lines()
+                    .next()
+                    .unwrap_or(arg.trim())
+                    .chars()
+                    .take(CODE_PREVIEW_LEN)
+                    .collect();
+                let code_label = if arg.trim().chars().count() > CODE_PREVIEW_LEN {
+                    format!("{}…", code_preview.trim())
+                } else {
+                    code_preview.trim().to_string()
+                };
+                let code_ref = if code_label.is_empty() { "…" } else { &code_label };
+                send_status(&format!("Running code: {}…", code_ref));
+                info!("Discord/Ollama: RUN_JS running code: {} [{} chars]", code_ref, arg.chars().count());
                 match run_js_via_node(&arg) {
                     Ok(result) => format!(
                         "JavaScript result:\n\n{}\n\nUse this to answer the user's question.",
@@ -882,10 +910,11 @@ pub async fn answer_with_ollama_and_fetch(
                 if !crate::commands::python_agent::is_python_script_allowed() {
                     "PYTHON_SCRIPT is not available (disabled by ALLOW_PYTHON_SCRIPT=0). Answer without running Python.".to_string()
                 } else {
-                    send_status("Running Python script…");
                     match parse_python_script_from_response(&response_content) {
                         Some((id, topic, script_body)) => {
-                            info!("Agent router: PYTHON_SCRIPT requested: id={}, topic={}, body {} chars", id, topic, script_body.len());
+                            let script_label = format!("{} ({})", id, topic);
+                            send_status(&format!("Running Python script '{}'…", script_label));
+                            info!("Agent router: PYTHON_SCRIPT running script '{}' (id={}, topic={}, body {} chars)", script_label, id, topic, script_body.len());
                             match tokio::task::spawn_blocking({
                                 let id = id.clone();
                                 let topic = topic.clone();
@@ -1013,7 +1042,6 @@ pub async fn answer_with_ollama_and_fetch(
                 }
             }
             "TASK_APPEND" => {
-                send_status("Appending to task…");
                 let (path_or_id, content) = match arg.find(' ') {
                     Some(i) => (arg[..i].trim(), arg[i..].trim()),
                     None => ("", ""),
@@ -1022,10 +1050,18 @@ pub async fn answer_with_ollama_and_fetch(
                     "TASK_APPEND requires: TASK_APPEND: <path or task id> <content>.".to_string()
                 } else {
                     match crate::task::resolve_task_path(path_or_id) {
-                        Ok(path) => match crate::task::append_to_task(&path, content) {
-                            Ok(()) => format!("Appended to task file {:?}. Use this to continue.", path),
-                            Err(e) => format!("TASK_APPEND failed: {}.", e),
-                        },
+                        Ok(path) => {
+                            let task_label = path
+                                .file_name()
+                                .and_then(|n| n.to_str())
+                                .unwrap_or(path_or_id);
+                            send_status(&format!("Appending to task '{}'…", task_label));
+                            info!("Agent router: TASK_APPEND for task '{}' ({} chars)", task_label, content.chars().count());
+                            match crate::task::append_to_task(&path, content) {
+                                Ok(()) => format!("Appended to task file '{}'. Use this to continue.", task_label),
+                                Err(e) => format!("TASK_APPEND failed: {}.", e),
+                            }
+                        }
                         Err(e) => format!("TASK_APPEND failed: {}.", e),
                     }
                 }
@@ -1062,6 +1098,17 @@ pub async fn answer_with_ollama_and_fetch(
                     }
                 } else {
                     "TASK_CREATE requires: TASK_CREATE: <topic> <id> <initial content>.".to_string()
+                }
+            }
+            "TASK_LIST" => {
+                send_status("Listing open and WIP tasks…");
+                info!("Agent router: TASK_LIST requested");
+                match crate::task::format_list_open_and_wip_tasks() {
+                    Ok(list) => format!(
+                        "You MUST include this list in your reply to the user. Show it verbatim — do not replace it with generic instructions.\n\nActive task list:\n---\n{}\n---\n\nReply to the user with the above list (or, if it says 'No open or WIP tasks', say that). Task ids are the filenames; they can use TASK_APPEND or TASK_STATUS with those ids.",
+                        list
+                    ),
+                    Err(e) => format!("TASK_LIST failed: {}.", e),
                 }
             }
             "MCP" => {
@@ -1138,9 +1185,16 @@ pub async fn run_task_until_finished(task_path: PathBuf, max_iterations: u32) ->
         .unwrap_or("task")
         .to_string();
     info!("Task loop: working on task '{}'", task_name);
-    if crate::task::status_from_path(&task_path).as_deref() == Some("finished") {
-        info!("Task loop: task '{}' already finished", task_name);
-        return Ok("Task already finished.".to_string());
+    match crate::task::status_from_path(&task_path).as_deref() {
+        Some("finished") => {
+            info!("Task loop: task '{}' already finished", task_name);
+            return Ok("Task already finished.".to_string());
+        }
+        Some("unsuccessful") => {
+            info!("Task loop: task '{}' already closed as unsuccessful", task_name);
+            return Ok("Task already closed as unsuccessful.".to_string());
+        }
+        _ => {}
     }
     let mut current_path = task_path;
     let mut last_reply = String::new();
@@ -1245,7 +1299,7 @@ fn parse_schedule_arg(arg: &str) -> Result<(String, String), String> {
 /// Also accepts lines starting with "RECOMMEND: " (e.g. "RECOMMEND: SCHEDULER: Every 5 minutes...").
 /// Returns (tool_name, argument) or None.
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "TASK_LIST:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:"];
     for line in content.lines() {
         let line = line.trim();
         // Ollama sometimes echoes the plan format: "RECOMMEND: RUN_JS: ..." or "RECOMMEND: SCHEDULER: ...".
@@ -1273,7 +1327,7 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
                         arg = arg[..idx].trim().to_string();
                     }
                 }
-                if !arg.is_empty() {
+                if !arg.is_empty() || tool_name == "TASK_LIST" {
                     return Some((tool_name, arg));
                 }
             }
@@ -1285,7 +1339,7 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
 /// Tool line prefixes that indicate start of another tool (used to stop script body extraction).
 const TOOL_LINE_PREFIXES: &[&str] = &[
     "FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:",
-    "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:",
+    "TASK_LIST:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:",
 ];
 
 /// Parse PYTHON_SCRIPT from full response: (id, topic, script_body).
@@ -1701,6 +1755,41 @@ fn parse_fetch_url_from_response(content: &str) -> Option<String> {
     None
 }
 
+/// If the CPU window is not open, schedule opening or showing it on the main thread so the user can see the chat.
+fn ensure_cpu_window_open() {
+    use crate::state::APP_HANDLE;
+    use crate::ui::status_bar::create_cpu_window;
+
+    let need_open = APP_HANDLE
+        .get()
+        .and_then(|app_handle| {
+            app_handle
+                .get_window("cpu")
+                .and_then(|w| w.is_visible().ok())
+                .map(|visible| !visible)
+        })
+        .unwrap_or(true);
+
+    if !need_open {
+        return;
+    }
+    if let Some(app_handle) = APP_HANDLE.get() {
+        let app_handle = app_handle.clone();
+        let _ = app_handle.run_on_main_thread(move || {
+            if let Some(handle) = APP_HANDLE.get() {
+                if let Some(window) = handle.get_window("cpu") {
+                    if !window.is_visible().unwrap_or(true) {
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                    }
+                } else {
+                    create_cpu_window(handle);
+                }
+            }
+        });
+    }
+}
+
 /// Unified Ollama chat command that handles code execution flow
 /// This command:
 /// 1. Gets system metrics
@@ -1714,9 +1803,11 @@ pub async fn ollama_chat_with_execution(
 ) -> Result<OllamaChatWithExecutionResponse, String> {
     use tracing::info;
     use crate::metrics::{get_cpu_details, get_metrics};
-    
+
+    ensure_cpu_window_open();
+
     info!("Ollama Chat with Execution: Starting for question: {}", request.question);
-    
+
     // Get system metrics for context
     let cpu_details = get_cpu_details();
     let system_metrics = get_metrics();
@@ -1969,7 +2060,9 @@ pub async fn ollama_chat_continue_with_result(
     conversation_history: Option<Vec<crate::ollama::ChatMessage>>,
 ) -> Result<OllamaChatContinueResponse, String> {
     use tracing::info;
-    
+
+    ensure_cpu_window_open();
+
     info!("Ollama Chat Continue: Code executed, result: {}", execution_result);
     
     let system_prompt = system_prompt.unwrap_or_else(|| {

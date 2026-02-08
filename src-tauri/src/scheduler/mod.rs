@@ -292,6 +292,27 @@ async fn scheduler_loop() {
             .filter_map(|(i, e)| next_run(e, now).map(|t| (t, i)))
             .collect();
 
+        next_runs.sort_by_key(|(t, _)| *t);
+
+        // Log every schedule's next run so all are visible (not just the soonest).
+        for (t, idx) in &next_runs {
+            let e = &entries[*idx];
+            let id_info = e.id.as_deref().unwrap_or("(no id)");
+            debug!(
+                "Scheduler: id={} next at {} (task: {}...)",
+                id_info,
+                t.format("%Y-%m-%d %H:%M:%S"),
+                e.task.chars().take(35).collect::<String>()
+            );
+        }
+        if next_runs.len() != entries.len() {
+            debug!(
+                "Scheduler: {} entries loaded, {} have a next run (others may be one-shot past)",
+                entries.len(),
+                next_runs.len()
+            );
+        }
+
         if next_runs.is_empty() {
             tokio::time::sleep(Duration::from_secs(FILE_CHECK_INTERVAL_SECS)).await;
             if schedules_file_mtime() != mtime_before {
@@ -300,7 +321,6 @@ async fn scheduler_loop() {
             continue;
         }
 
-        next_runs.sort_by_key(|(t, _)| *t);
         let (next_time, idx) = next_runs[0];
         let entry = &entries[idx];
         let id_info = entry.id.as_deref().unwrap_or("(no id)");
@@ -310,12 +330,12 @@ async fn scheduler_loop() {
             id_info,
             entry.task.chars().take(40).collect::<String>()
         );
-        let wait_secs = (next_time - now).num_seconds().max(0) as u64;
-        let sleep_duration = Duration::from_secs(
-            wait_secs
-                .min(MAX_SLEEP_SECS)
-                .min(FILE_CHECK_INTERVAL_SECS),
-        );
+        // Use millisecond precision so we don't spin when next run is < 1 second away (num_seconds() would truncate to 0).
+        let wait_ms = (next_time - now).num_milliseconds().max(0) as u64;
+        let sleep_millis = wait_ms
+            .min(MAX_SLEEP_SECS * 1000)
+            .min(FILE_CHECK_INTERVAL_SECS * 1000);
+        let sleep_duration = Duration::from_millis(sleep_millis);
 
         tokio::time::sleep(sleep_duration).await;
 
