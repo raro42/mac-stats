@@ -145,4 +145,75 @@ impl Config {
         }
         Ok(())
     }
+
+    /// Get the user-info file path
+    ///
+    /// Returns a path in the user's home directory: `$HOME/.mac-stats/user-info.json`
+    /// Contains information about many users (e.g. Discord user id -> details). Falls back to temp if HOME is not available.
+    pub fn user_info_file_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            let home_path = PathBuf::from(home);
+            return home_path.join(".mac-stats").join("user-info.json");
+        }
+        std::env::temp_dir().join("mac-stats-user-info.json")
+    }
+
+    /// Session directory for persisted chat memory: `$HOME/.mac-stats/session/`
+    pub fn session_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("session")
+        } else {
+            std::env::temp_dir().join("mac-stats-session")
+        }
+    }
+
+    /// Ensure the session directory exists
+    pub fn ensure_session_directory() -> std::io::Result<()> {
+        std::fs::create_dir_all(Self::session_dir())
+    }
+
+    /// Skills directory for agent prompt overlays: `$HOME/.mac-stats/skills/`
+    /// Files: skill-<number>-<topic>.md (e.g. skill-1-summarize.md, skill-2-code.md).
+    pub fn skills_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("skills")
+        } else {
+            std::env::temp_dir().join("mac-stats-skills")
+        }
+    }
+
+    /// Ensure the skills directory exists.
+    pub fn ensure_skills_directory() -> std::io::Result<()> {
+        std::fs::create_dir_all(Self::skills_dir())
+    }
+
+    /// Task directory for task files: `$HOME/.mac-stats/task/`
+    /// Files: task-<topic>-<id>-<date-time>-<open|wip|finished>.md
+    pub fn task_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("task")
+        } else {
+            std::env::temp_dir().join("mac-stats-task")
+        }
+    }
+
+    /// Ensure the task directory exists.
+    pub fn ensure_task_directory() -> std::io::Result<()> {
+        std::fs::create_dir_all(Self::task_dir())
+    }
+
+    /// Scripts directory for agent-written scripts: `$HOME/.mac-stats/scripts/`
+    /// Files: python-script-<id>-<topic>.py (from PYTHON_SCRIPT agent).
+    pub fn scripts_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("scripts")
+        } else {
+            std::env::temp_dir().join("mac-stats-scripts")
+        }
+    }
+
+    /// Ensure the scripts directory exists.
+    pub fn ensure_scripts_directory() -> std::io::Result<()> {
+        std::fs::create_dir_all(Self::scripts_dir())
+    }
 }

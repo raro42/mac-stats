@@ -17,7 +17,7 @@ When RUN_CMD is disabled via `ALLOW_LOCAL_CMD=0`, the agent is omitted from the 
 
 ## Allowlist and path rules
 
-- **Allowed commands**: `cat`, `head`, `tail`, `ls` only. Any other command is rejected with "Command not allowed".
+- **Allowed commands**: `cat`, `head`, `tail`, `ls`, `grep`. Any other command is rejected with "Command not allowed". For `grep`, use e.g. `RUN_CMD: grep pattern ~/.mac-stats/task/file.md` (pattern and path required).
 - **Paths**: Any argument that looks like a path (contains `/` or starts with `~`) must resolve to a location under `~/.mac-stats`. Paths are expanded (`~` → `$HOME`) and validated (canonical form must be under the permitted base). Paths outside `~/.mac-stats` are rejected with "Path not allowed (must be under ~/.mac-stats)."
 - **No shell**: The app does not invoke a shell. It splits the RUN_CMD argument on whitespace, validates the command and path args, and runs the binary with the given arguments.
 - **`ls` with no path**: If the user invokes `RUN_CMD: ls` with no arguments, the app runs `ls` with the permitted base directory (`~/.mac-stats`) so only that directory is listed.
@@ -30,7 +30,7 @@ When RUN_CMD is disabled via `ALLOW_LOCAL_CMD=0`, the agent is omitted from the 
 
 ## Security
 
-- Only the four commands above are allowed. No `grep`, `find`, or other utilities.
+- Only the five commands above are allowed (cat, head, tail, ls, grep). No `find`, `sed`, or shell.
 - Path validation ensures no escape from `~/.mac-stats` (canonical path check).
 - Do not pass user input to a shell; all execution is via `Command::new(cmd).args(args)`.
 

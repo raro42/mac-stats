@@ -1,6 +1,6 @@
-# Discord Agent (Gateway)
+# Discord Agent (Gateway + HTTP API)
 
-mac-stats can run a Discord bot that connects via the Gateway and responds to **DMs** and **@mentions** with replies (stub for now; Ollama/browser pipeline to be wired later).
+mac-stats can run a Discord bot that connects via the **Gateway** and responds to **DMs** and **@mentions**. Replies use the Ollama agent pipeline and can call the **Discord HTTP API** (list servers, channels, members, get user info, send messages). The bot records the message author’s display name and passes it to Ollama so it can address the user by name.
 
 ## Setup
 
@@ -26,12 +26,99 @@ mac-stats can run a Discord bot that connects via the Gateway and responds to **
 
 - Listens for **direct messages** to the bot and for **messages that @mention the bot** in guilds.
 - Ignores the bot’s own messages and messages that don’t mention it (in guilds).
-- Reply is currently a **stub** (“mac-stats received your message …”). The plan is to wire the same “answer with Ollama + fetch” pipeline used by the chat UI so the bot can reply with local Ollama or browser-agent results.
+- Replies using the **“answer with Ollama + tools”** pipeline: planning step (RECOMMEND) then execution with FETCH_URL, BRAVE_SEARCH, RUN_CMD, MCP, **DISCORD_API**, etc. (see `docs/100_all_agents.md`).
+- When you message the bot, it records your **display name** and tells Ollama “You are talking to **&lt;name&gt;** (user id: …)” so replies can be personalized. Names are cached for reuse in the session.
+
+## Discord API (HTTP)
+
+When a request comes **from Discord**, the agent router adds a **DISCORD_API** tool so Ollama can call Discord’s REST API. This is only available in the Discord context (not in the scheduler or CPU-window chat).
+
+### Endpoints available to the agent
+
+Base URL: `https://discord.com/api/v10`. Paths are relative to this base.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/users/@me` | Current bot user. |
+| GET | `/users/@me/guilds` | List servers (guilds) the bot is in. Optional query: `?with_counts=true`. |
+| GET | `/guilds/{guild_id}/channels` | List channels in a server. |
+| GET | `/guilds/{guild_id}/members?limit=100` | List members (use `after=user_id` for pagination). |
+| GET | `/guilds/{guild_id}/members/search?query=...` | Search members by nickname/username. |
+| GET | `/users/{user_id}` | Get user by ID. |
+| GET | `/channels/{channel_id}` | Get channel. |
+| POST | `/channels/{channel_id}/messages` | Send message. Body: `{"content":"..."}`. |
+
+### DISCORD_API tool
+
+Ollama invokes the Discord API by replying with exactly one line:
+
+- **Read**: `DISCORD_API: GET <path>`  
+  Example: `DISCORD_API: GET /users/@me/guilds`
+- **Send message**: `DISCORD_API: POST /channels/<channel_id>/messages {"content":"Hello"}`  
+  The path and optional JSON body are on the same line (body after a space and `{`).
+
+Only **GET** is allowed for general read endpoints. **POST** is allowed only for `/channels/{channel_id}/messages`. Heavy use may hit Discord’s rate limits; see [Discord rate limits](https://discord.com/developers/docs/topics/rate-limits).
+
+## Understanding servers, users, channels, guilds
+
+- **Servers (guilds)**  
+  Use `GET /users/@me/guilds` to see which servers the bot is in. Each guild has an `id` and `name`.
+
+- **Channels**  
+  Use `GET /guilds/{guild_id}/channels` to list channels in a server (text, voice, categories, etc.).
+
+- **Users on a server**  
+  Use `GET /guilds/{guild_id}/members` to list members, or `GET /guilds/{guild_id}/members/search?query=...` to search by nickname/username.
+
+- **User names**  
+  The bot records the display name of users who message it and passes it to Ollama. Ollama can also call `GET /users/{user_id}` for full user details (username, global_name, etc.).
+
+- **User details (user-info.json)**  
+  You can add per-user details in `~/.mac-stats/user-info.json` (many users, keyed by Discord user id). The file is read when handling a message; if the author’s id is present, the bot adds "User details: …" to the context (notes, timezone, extra fields). Example:
+
+  ```json
+  {
+    "users": [
+      {
+        "id": "123456789012345678",
+        "display_name": "Alice",
+        "notes": "Prefers short answers.",
+        "timezone": "Europe/Paris",
+        "extra": { "language": "en" }
+      }
+    ]
+  }
+  ```
+
+  `id` is the Discord user id (snowflake) as a string. Optional: `display_name` (override), `notes`, `timezone`, `extra` (key-value). Ollama can read the file via `RUN_CMD: cat ~/.mac-stats/user-info.json` if needed.
+
+## Message prefixes (optional)
+
+You can put **optional leading lines** in your message to override model, parameters, or skill for that request only. These lines are stripped before the question is sent to Ollama.
+
+| Prefix | Example | Effect |
+|--------|---------|--------|
+| `model:` or `model=` | `model: llama3.2` | Use this model for this request (must be available in Ollama). |
+| `temperature:` or `temperature=` | `temperature: 0.7` | Set temperature for this request. |
+| `num_ctx:` or `num_ctx=` | `num_ctx: 8192` | Set context window size for this request. |
+| `params:` | `params: temperature=0.7 num_ctx=8192` | Set multiple options in one line. |
+| `skill:` or `skill=` | `skill: 2` or `skill: code` | Load `~/.mac-stats/skills/skill-<number>-<topic>.md` and prepend its content to the system prompt. |
+
+Example message:
+
+```
+model: llama3.2
+skill: code
+Write a small Python function to compute factorial.
+```
+
+See **Ollama context, model/params, and skills** in `docs/012_ollama_context_skills.md` for details.
 
 ## Security
 
 - Token is resolved from **DISCORD_BOT_TOKEN** env, then **.config.env** (cwd or `~/.mac-stats/.config.env`), then **Keychain** (service `com.raro42.mac-stats`, account `discord_bot_token`). Using env or .config.env avoids Keychain entirely.
 - The token is never logged or exposed in the UI or in error messages.
+- **DISCORD_API** uses the same bot token and only allows **GET** (read) and **POST** to `/channels/{id}/messages` (send message). Other write operations are not exposed.
 
 ## Using .config.env or DISCORD_BOT_TOKEN (no Keychain needed)
 
@@ -68,14 +155,14 @@ If you use **Save token** in the app, the token is stored in Keychain. If the OS
 ```bash
 cd src-tauri && cargo run --bin test_discord_keychain -- .config.env
 ```
-Only needed if you rely on Keychain. If it hangs after “Token length: N chars”, use env or .config.env instead.
+Only needed if you rely on Keychain. If it hangs after "Token length: N chars", use env or .config.env instead.
 
 ## Granting the app access to Keychain (optional)
 
 Only needed if you use **Save token** in the app. mac-stats stores that token in the **login** keychain. If Keychain is locked or the app was never allowed, storage can block or fail.
 
 1. **Unlock the login keychain** in Keychain Access (select **login** → unlock with macOS password).
-2. **Run the app from Terminal** so any “X wants to access keychain” dialog is visible; click **Always Allow**.
+2. **Run the app from Terminal** so any "X wants to access keychain" dialog is visible; click **Always Allow**.
 3. If the OS never shows the dialog, use **.config.env or DISCORD_BOT_TOKEN** (see above) and skip Keychain.
 
 ## Testing the Discord connection
@@ -92,6 +179,8 @@ With a valid token you should see in the output:
 - `Discord: Bot connected as <YourBotName> (id: …)`
 
 You can pass a custom env file path: `cargo run --bin test_discord_connect -- path/to/.config.env`.
+
+To test the **DISCORD_API** tool, send the bot a message in Discord such as: “What servers are you in?” or “List the channels in this server.” (The bot must be in the server and have access to the channel.)
 
 ## Debugging “Save token”
 
