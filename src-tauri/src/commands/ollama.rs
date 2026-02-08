@@ -322,6 +322,7 @@ fn format_run_cmd_description(num: u32) -> String {
 }
 
 /// Build the SKILL agent description paragraph when skills exist. Use {} for agent number.
+/// This text is sent to Ollama in the planning and execution steps so it can recommend and invoke SKILL.
 fn build_skill_agent_description(num: u32, skills: &[crate::skills::Skill]) -> String {
     let list: String = skills
         .iter()
@@ -329,7 +330,7 @@ fn build_skill_agent_description(num: u32, skills: &[crate::skills::Skill]) -> S
         .collect::<Vec<_>>()
         .join(", ");
     format!(
-        "\n\n{}. **SKILL**: Use a specialized skill for a focused task (e.g. summarize text, create a joke, get date/time). Each skill runs in a separate session. To invoke: reply with exactly one line: SKILL: <number or topic> [optional task]. Available skills: {}.",
+        "\n\n{}. **SKILL**: Use a specialized skill for a focused task (e.g. summarize text, create a joke, get date/time). Each skill runs in a separate Ollama session (no main conversation history); the result is injected back so you can cite or refine it. Prefer SKILL when the user wants a single focused outcome that matches one of the skills below. To invoke: reply with exactly one line: SKILL: <number or topic> [optional task]. Available skills: {}.",
         num, list
     )
 }
