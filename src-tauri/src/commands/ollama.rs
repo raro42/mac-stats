@@ -3,6 +3,7 @@
 use crate::ollama::{OllamaClient, OllamaConfig, ChatMessage};
 use serde::{Deserialize, Serialize};
 use std::io::Write;
+use std::path::PathBuf;
 use std::process::Command;
 use std::sync::Mutex;
 use std::sync::OnceLock;
@@ -299,7 +300,7 @@ const AGENT_DESCRIPTIONS_BASE: &str = r#"We have 4 agents available:
 /// RUN_CMD agent description (appended when ALLOW_LOCAL_CMD is not 0). Call with agent number via format_run_cmd_description(n).
 fn format_run_cmd_description(num: u32) -> String {
     format!(
-        "\n\n{}. **RUN_CMD** (local read-only): Run a restricted local command to read app data under ~/.mac-stats. Use for: reading schedules.json, config, or other files in ~/.mac-stats. To invoke: reply with exactly one line: RUN_CMD: <command> [args] (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json or RUN_CMD: ls ~/.mac-stats). Only cat, head, tail, ls are allowed; paths must be under ~/.mac-stats.",
+        "\n\n{}. **RUN_CMD** (local read-only): Run a restricted local command to read app data under ~/.mac-stats. Use for: reading schedules.json, config, or task files in ~/.mac-stats/task. To invoke: reply with exactly one line: RUN_CMD: <command> [args] (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json or RUN_CMD: grep pattern ~/.mac-stats/task/file.md). Allowed: cat, head, tail, ls, grep; paths must be under ~/.mac-stats.",
         num
     )
 }
@@ -317,8 +318,21 @@ fn build_skill_agent_description(num: u32, skills: &[crate::skills::Skill]) -> S
     )
 }
 
+/// Discord API endpoint list (injected when request is from Discord). Condensed for agent context.
+const DISCORD_API_ENDPOINTS_CONTEXT: &str = r#"
+Discord API (base: https://discord.com/api/v10). Use DISCORD_API: <METHOD> <path> [json body for POST]:
+- GET /users/@me — current bot user
+- GET /users/@me/guilds — list servers (guilds) the bot is in (optional ?with_counts=true)
+- GET /guilds/{guild_id}/channels — list channels in a server
+- GET /guilds/{guild_id}/members?limit=100 — list members (use after=user_id for pagination)
+- GET /guilds/{guild_id}/members/search?query=name — search members by nickname/username
+- GET /users/{user_id} — get user by ID
+- GET /channels/{channel_id} — get channel
+- POST /channels/{channel_id}/messages — send message (body: {"content":"..."})"#;
+
 /// Build agent descriptions string: base, optional SKILL (when skills exist), optional RUN_CMD, then MCP when configured.
-async fn build_agent_descriptions() -> String {
+/// When from_discord is true and Discord is configured, appends DISCORD_API agent and endpoint list.
+async fn build_agent_descriptions(from_discord: bool) -> String {
     use tracing::info;
     let skills = crate::skills::load_skills();
     let mut base = AGENT_DESCRIPTIONS_BASE.to_string();
@@ -329,6 +343,26 @@ async fn build_agent_descriptions() -> String {
     }
     if crate::commands::run_cmd::is_local_cmd_allowed() {
         base.push_str(&format_run_cmd_description(num));
+        num += 1;
+    }
+    base.push_str(&format!(
+        "\n\n{}. **TASK** (task files under ~/.mac-stats/task/): Use when working on a task file. TASK_APPEND: append feedback to a task (reply with one line: TASK_APPEND: <path or task id> <content>). TASK_STATUS: set status (reply: TASK_STATUS: <path or task id> wip|finished). TASK_CREATE: create a new task file (reply: TASK_CREATE: <topic> <id> <initial content>). Paths must be under ~/.mac-stats/task.",
+        num
+    ));
+    num += 1;
+    if crate::commands::python_agent::is_python_script_allowed() {
+        base.push_str(&format!(
+            "\n\n{}. **PYTHON_SCRIPT**: Run Python code. Reply with exactly one line: PYTHON_SCRIPT: <id> <topic>, then put the Python code on the following lines or inside a ```python ... ``` block. The app writes ~/.mac-stats/scripts/python-script-<id>-<topic>.py, runs it with python3, and returns stdout (or error). Use for data processing, calculations, or local scripts.",
+            num
+        ));
+        num += 1;
+    }
+    if from_discord && crate::discord::get_discord_token().is_some() {
+        base.push_str(&format!(
+            "\n\n{}. **DISCORD_API**: Call Discord HTTP API to list servers (guilds), channels, members, or get user info. Invoke with one line: DISCORD_API: GET <path> or DISCORD_API: POST <path> [json body]. Path is relative to https://discord.com/api/v10 (e.g. GET /users/@me/guilds, GET /guilds/{{guild_id}}/channels, GET /guilds/{{guild_id}}/members, GET /users/{{user_id}}, POST /channels/{{channel_id}}/messages with body {{\"content\":\"...\"}}).",
+            num
+        ));
+        base.push_str(DISCORD_API_ENDPOINTS_CONTEXT);
         num += 1;
     }
     let Some(server_url) = crate::mcp::get_mcp_server_url() else {
@@ -464,15 +498,20 @@ async fn run_skill_ollama_session(
 /// 2) Execution: send plan + "now answer using agents", loop on FETCH_URL / BRAVE_SEARCH / RUN_JS (max 5 tool calls).
 /// If `status_tx` is provided (e.g. from Discord), short status messages are sent so the user sees we're still working.
 /// If `discord_reply_channel_id` is set (when the request came from Discord), SCHEDULE will store it so the scheduler can post results to that channel (DM or mention channel).
+/// When `discord_user_id` and `discord_user_name` are set (from Discord message author), the prompt is prefixed with "You are talking to Discord user **{name}** (user id: {id})."
 /// When set, `model_override` and `options_override` apply only to this request (e.g. from Discord "model: llama3" line).
 /// When set, `skill_content` is prepended to system prompts (from ~/.mac-stats/skills/skill-<n>-<topic>.md).
+/// When `allow_schedule` is false (e.g. when running from the scheduler), the SCHEDULE tool is disabled so a scheduled task cannot create more schedules.
 pub async fn answer_with_ollama_and_fetch(
     question: &str,
     status_tx: Option<tokio::sync::mpsc::UnboundedSender<String>>,
     discord_reply_channel_id: Option<u64>,
+    discord_user_id: Option<u64>,
+    discord_user_name: Option<String>,
     model_override: Option<String>,
     options_override: Option<crate::ollama::ChatOptions>,
     skill_content: Option<String>,
+    allow_schedule: bool,
 ) -> Result<String, String> {
     use tracing::info;
 
@@ -517,20 +556,31 @@ pub async fn answer_with_ollama_and_fetch(
     }
     send_status("Thinking…");
 
-    let agent_descriptions = build_agent_descriptions().await;
+    let from_discord = discord_reply_channel_id.is_some();
+    let agent_descriptions = build_agent_descriptions(from_discord).await;
     info!("Agent router: agent list built ({} chars)", agent_descriptions.len());
+
+    let discord_user_context = match (discord_user_id, &discord_user_name) {
+        (Some(id), Some(name)) if !name.is_empty() => {
+            format!(
+                "You are talking to Discord user **{}** (user id: {}). Use this when addressing the user or when calling Discord API with this user.\n\n",
+                name, id
+            )
+        }
+        _ => String::new(),
+    };
 
     // --- Planning step: ask Ollama how it would solve the question ---
     info!("Agent router: planning step — asking Ollama for RECOMMEND");
     const PLANNING_PROMPT: &str = "You are a helpful assistant. We will give you a user question and a list of available agents. Reply with your recommended approach in this exact format: RECOMMEND: <your plan in one or two sentences: which agents to use and in what order>. Do not execute anything yet.";
     let planning_system_content = match &skill_content {
         Some(skill) => format!(
-            "Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}\n\nUser question: {}",
-            skill, PLANNING_PROMPT, agent_descriptions, question
+            "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}\n\nUser question: {}",
+            discord_user_context, skill, PLANNING_PROMPT, agent_descriptions, question
         ),
         None => format!(
-            "{}\n\n{}\n\nUser question: {}",
-            PLANNING_PROMPT, agent_descriptions, question
+            "{}{}\n\n{}\n\nUser question: {}",
+            discord_user_context, PLANNING_PROMPT, agent_descriptions, question
         ),
     };
     let planning_messages = vec![
@@ -550,14 +600,15 @@ pub async fn answer_with_ollama_and_fetch(
 
     // --- Execution: system prompt with agents + plan, then tool loop ---
     info!("Agent router: execution step — sending plan + question, starting tool loop (max 5 tools)");
-    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or RUN_CMD: <command and args> or SCHEDULE: every N minutes <task> or MCP: <tool_name> <arguments> (if MCP tools are listed). We will run it and give you the result. Then continue with your answer. Answer concisely.";
+    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or RUN_CMD: <command and args> or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. Then continue with your answer. Answer concisely.";
     let execution_system_content = match &skill_content {
         Some(skill) => format!(
-            "Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}\n\nYour plan: {}",
-            skill, EXECUTION_PROMPT, agent_descriptions, recommendation
+            "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}\n\nYour plan: {}",
+            discord_user_context, skill, EXECUTION_PROMPT, agent_descriptions, recommendation
         ),
         None => format!(
-            "{}\n\n{}\n\nYour plan: {}",
+            "{}{}\n\n{}\n\nYour plan: {}",
+            discord_user_context,
             EXECUTION_PROMPT,
             agent_descriptions,
             recommendation
@@ -732,36 +783,42 @@ pub async fn answer_with_ollama_and_fetch(
                 }
             }
             "SCHEDULE" => {
-                send_status("Scheduling…");
-                info!("Agent router: SCHEDULE requested (arg len={})", arg.chars().count());
-                match parse_schedule_arg(&arg) {
-                    Ok((cron_str, task)) => {
-                        let id = format!("discord-{}", chrono::Utc::now().timestamp());
-                        let reply_to_channel_id = discord_reply_channel_id.map(|u| u.to_string());
-                        match crate::scheduler::add_schedule(id.clone(), cron_str.clone(), task.clone(), reply_to_channel_id) {
-                            Ok(crate::scheduler::ScheduleAddOutcome::Added) => {
-                                info!("Agent router: SCHEDULE added (id={}, cron={})", id, cron_str);
-                                let task_preview: String = task.chars().take(100).collect();
-                                format!(
-                                    "Schedule added successfully. The scheduler will run this task (cron: {}): \"{}\". Tell the user in your reply that it is scheduled and they will see the result in this channel when it runs.",
-                                    cron_str,
-                                    task_preview.trim()
-                                )
-                            }
-                            Ok(crate::scheduler::ScheduleAddOutcome::AlreadyExists) => {
-                                info!("Agent router: SCHEDULE skipped (same task already scheduled)");
-                                "This task is already scheduled with the same cron and description. Tell the user no duplicate was added."
-                                    .to_string()
-                            }
-                            Err(e) => {
-                                info!("Agent router: SCHEDULE failed: {}", e);
-                                format!("Failed to add schedule: {}. Tell the user and suggest they check ~/.mac-stats/schedules.json.", e)
+                if !allow_schedule {
+                    info!("Agent router: SCHEDULE ignored (disabled in scheduler context)");
+                    "Scheduling is not available when running from a scheduled task. Do not add a schedule; complete the task without scheduling."
+                        .to_string()
+                } else {
+                    send_status("Scheduling…");
+                    info!("Agent router: SCHEDULE requested (arg len={})", arg.chars().count());
+                    match parse_schedule_arg(&arg) {
+                        Ok((cron_str, task)) => {
+                            let id = format!("discord-{}", chrono::Utc::now().timestamp());
+                            let reply_to_channel_id = discord_reply_channel_id.map(|u| u.to_string());
+                            match crate::scheduler::add_schedule(id.clone(), cron_str.clone(), task.clone(), reply_to_channel_id) {
+                                Ok(crate::scheduler::ScheduleAddOutcome::Added) => {
+                                    info!("Agent router: SCHEDULE added (id={}, cron={})", id, cron_str);
+                                    let task_preview: String = task.chars().take(100).collect();
+                                    format!(
+                                        "Schedule added successfully. The scheduler will run this task (cron: {}): \"{}\". Tell the user in your reply that it is scheduled and they will see the result in this channel when it runs.",
+                                        cron_str,
+                                        task_preview.trim()
+                                    )
+                                }
+                                Ok(crate::scheduler::ScheduleAddOutcome::AlreadyExists) => {
+                                    info!("Agent router: SCHEDULE skipped (same task already scheduled)");
+                                    "This task is already scheduled with the same cron and description. Tell the user no duplicate was added."
+                                        .to_string()
+                                }
+                                Err(e) => {
+                                    info!("Agent router: SCHEDULE failed: {}", e);
+                                    format!("Failed to add schedule: {}. Tell the user and suggest they check ~/.mac-stats/schedules.json.", e)
+                                }
                             }
                         }
-                    }
-                    Err(e) => {
-                        info!("Agent router: SCHEDULE parse failed: {}", e);
-                        format!("Could not parse schedule (expected e.g. \"every 5 minutes <task>\"): {}. Ask the user to rephrase.", e)
+                        Err(e) => {
+                            info!("Agent router: SCHEDULE parse failed: {}", e);
+                            format!("Could not parse schedule (expected e.g. \"every 5 minutes <task>\"): {}. Ask the user to rephrase.", e)
+                        }
                     }
                 }
             }
@@ -788,6 +845,115 @@ pub async fn answer_with_ollama_and_fetch(
                             e
                         ),
                     }
+                }
+            }
+            "PYTHON_SCRIPT" => {
+                if !crate::commands::python_agent::is_python_script_allowed() {
+                    "PYTHON_SCRIPT is not available (disabled by ALLOW_PYTHON_SCRIPT=0). Answer without running Python.".to_string()
+                } else {
+                    send_status("Running Python script…");
+                    match parse_python_script_from_response(&response_content) {
+                        Some((id, topic, script_body)) => {
+                            info!("Agent router: PYTHON_SCRIPT requested: id={}, topic={}, body {} chars", id, topic, script_body.len());
+                            match tokio::task::spawn_blocking({
+                                let id = id.clone();
+                                let topic = topic.clone();
+                                let script_body = script_body.clone();
+                                move || crate::commands::python_agent::run_python_script(&id, &topic, &script_body)
+                            })
+                            .await
+                            .map_err(|e| format!("PYTHON_SCRIPT task: {}", e))
+                            .and_then(|r| r)
+                            {
+                                Ok(stdout) => format!(
+                                    "Python script result:\n\n{}\n\nUse this to answer the user's question.",
+                                    stdout
+                                ),
+                                Err(e) => format!(
+                                    "PYTHON_SCRIPT failed: {}. Answer without this result.",
+                                    e
+                                ),
+                            }
+                        }
+                        None => "PYTHON_SCRIPT requires: PYTHON_SCRIPT: <id> <topic> and then the Python code on the next lines or in a ```python block.".to_string(),
+                    }
+                }
+            }
+            "DISCORD_API" => {
+                send_status("Calling Discord API…");
+                let arg = arg.trim();
+                let (method, rest) = match arg.find(' ') {
+                    Some(i) => (arg[..i].trim().to_string(), arg[i..].trim()),
+                    None => ("GET".to_string(), arg),
+                };
+                let (path, body) = if let Some(idx) = rest.find(" {") {
+                    let (p, b) = rest.split_at(idx);
+                    (p.trim().to_string(), Some(b.trim().to_string()))
+                } else {
+                    (rest.to_string(), None)
+                };
+                if path.is_empty() {
+                    "DISCORD_API requires: DISCORD_API: <METHOD> <path> or DISCORD_API: POST <path> {\"content\":\"...\"}.".to_string()
+                } else {
+                    match crate::discord::api::discord_api_request(&method, &path, body.as_deref()).await {
+                        Ok(result) => format!(
+                            "Discord API result:\n\n{}\n\nUse this to answer the user's question.",
+                            result
+                        ),
+                        Err(e) => format!("Discord API failed: {}. Answer without this result.", e),
+                    }
+                }
+            }
+            "TASK_APPEND" => {
+                send_status("Appending to task…");
+                let (path_or_id, content) = match arg.find(' ') {
+                    Some(i) => (arg[..i].trim(), arg[i..].trim()),
+                    None => ("", ""),
+                };
+                if path_or_id.is_empty() || content.is_empty() {
+                    "TASK_APPEND requires: TASK_APPEND: <path or task id> <content>.".to_string()
+                } else {
+                    match crate::task::resolve_task_path(path_or_id) {
+                        Ok(path) => match crate::task::append_to_task(&path, content) {
+                            Ok(()) => format!("Appended to task file {:?}. Use this to continue.", path),
+                            Err(e) => format!("TASK_APPEND failed: {}.", e),
+                        },
+                        Err(e) => format!("TASK_APPEND failed: {}.", e),
+                    }
+                }
+            }
+            "TASK_STATUS" => {
+                let parts: Vec<&str> = arg.split_whitespace().collect();
+                if parts.len() < 2 {
+                    "TASK_STATUS requires: TASK_STATUS: <path or task id> wip|finished.".to_string()
+                } else {
+                    let path_or_id = parts[..parts.len() - 1].join(" ");
+                    let status = parts[parts.len() - 1].to_lowercase();
+                    if status != "wip" && status != "finished" {
+                        "TASK_STATUS status must be wip or finished.".to_string()
+                    } else {
+                        match crate::task::resolve_task_path(&path_or_id) {
+                            Ok(path) => match crate::task::set_task_status(&path, &status) {
+                                Ok(new_path) => format!("Task status set to {} (file: {:?}).", status, new_path),
+                                Err(e) => format!("TASK_STATUS failed: {}.", e),
+                            },
+                            Err(e) => format!("TASK_STATUS failed: {}.", e),
+                        }
+                    }
+                }
+            }
+            "TASK_CREATE" => {
+                let segs: Vec<&str> = arg.splitn(3, ' ').map(str::trim).collect();
+                if segs.len() >= 3 && !segs[2].is_empty() {
+                    let topic = segs[0];
+                    let id = segs[1];
+                    let initial_content = segs[2];
+                    match crate::task::create_task(topic, id, initial_content) {
+                        Ok(path) => format!("Task created: {:?}. Use TASK_APPEND and TASK_STATUS to update.", path),
+                        Err(e) => format!("TASK_CREATE failed: {}.", e),
+                    }
+                } else {
+                    "TASK_CREATE requires: TASK_CREATE: <topic> <id> <initial content>.".to_string()
                 }
             }
             "MCP" => {
@@ -852,6 +1018,46 @@ pub async fn answer_with_ollama_and_fetch(
     let final_len = response_content.chars().count();
     info!("Agent router: done after {} tool(s), returning final response ({} chars): {}", tool_count, final_len, log_content(&response_content));
     Ok(response_content)
+}
+
+/// Run a task file until status is finished. Reads the task, sends to Ollama with TASK_APPEND/TASK_STATUS
+/// instructions, then re-reads and repeats until status is "finished" or max_iterations is reached.
+pub async fn run_task_until_finished(task_path: PathBuf, max_iterations: u32) -> Result<String, String> {
+    use tracing::info;
+    let task_name = task_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("task")
+        .to_string();
+    info!("Task loop: working on task '{}'", task_name);
+    if crate::task::status_from_path(&task_path).as_deref() == Some("finished") {
+        info!("Task loop: task '{}' already finished", task_name);
+        return Ok("Task already finished.".to_string());
+    }
+    let mut current_path = task_path;
+    let mut last_reply = String::new();
+    for iteration in 0..max_iterations {
+        let content = crate::task::read_task(&current_path).map_err(|e| e.clone())?;
+        let question = format!(
+            "Current task file content:\n\n{}\n\nDecide the next step. Use TASK_APPEND to add feedback and TASK_STATUS to set wip or finished when done. Reply with your action (TASK_APPEND, TASK_STATUS, or a final summary).",
+            content
+        );
+        info!("Task loop: iteration {}/{} for task '{}'", iteration + 1, max_iterations, task_name);
+        last_reply = answer_with_ollama_and_fetch(&question, None, None, None, None, None, None, None, false).await?;
+        if let Some(ref p) = crate::task::find_current_path(&current_path) {
+            current_path = p.clone();
+        }
+        if crate::task::status_from_path(&current_path).as_deref() == Some("finished") {
+            info!("Task loop: task '{}' finished", task_name);
+            return Ok(last_reply);
+        }
+    }
+    info!("Task loop: max iterations ({}) reached for task '{}'", max_iterations, task_name);
+    Ok(format!(
+        "Max iterations ({}) reached. Last reply: {}",
+        max_iterations,
+        last_reply.chars().take(500).collect::<String>()
+    ))
 }
 
 /// Run JavaScript via Node.js (if available). Used for RUN_JS in Discord/agent context.
@@ -927,11 +1133,11 @@ fn parse_schedule_arg(arg: &str) -> Result<(String, String), String> {
     }
 }
 
-/// Parse one of FETCH_URL:, BRAVE_SEARCH:, RUN_JS:, SCHEDULE:/SCHEDULER:, MCP: from assistant content.
+/// Parse one of FETCH_URL:, BRAVE_SEARCH:, RUN_JS:, SCHEDULE:/SCHEDULER:, MCP:, PYTHON_SCRIPT: from assistant content.
 /// Also accepts lines starting with "RECOMMEND: " (e.g. "RECOMMEND: SCHEDULER: Every 5 minutes...").
 /// Returns (tool_name, argument) or None.
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "MCP:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:"];
     for line in content.lines() {
         let line = line.trim();
         // Ollama sometimes echoes the plan format: "RECOMMEND: RUN_JS: ..." or "RECOMMEND: SCHEDULER: ...".
@@ -966,6 +1172,87 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
         }
     }
     None
+}
+
+/// Tool line prefixes that indicate start of another tool (used to stop script body extraction).
+const TOOL_LINE_PREFIXES: &[&str] = &[
+    "FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:",
+    "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:",
+];
+
+/// Parse PYTHON_SCRIPT from full response: (id, topic, script_body).
+/// Script body is taken from a ```python ... ``` block, or from all lines after PYTHON_SCRIPT: until another tool line or end.
+fn parse_python_script_from_response(content: &str) -> Option<(String, String, String)> {
+    let prefix = "PYTHON_SCRIPT:";
+    let mut id_topic_line: Option<&str> = None;
+    let mut python_line_index = None::<usize>;
+    for (idx, line) in content.lines().enumerate() {
+        let trimmed = line.trim();
+        let search = if trimmed.to_uppercase().starts_with("RECOMMEND: ") {
+            trimmed[11..].trim()
+        } else {
+            trimmed
+        };
+        if search.to_uppercase().starts_with(prefix) {
+            id_topic_line = Some(search[prefix.len()..].trim());
+            python_line_index = Some(idx);
+            break;
+        }
+    }
+    let id_topic_line = id_topic_line?;
+    let parts: Vec<&str> = id_topic_line.split_whitespace().collect();
+    if parts.len() < 2 {
+        return None;
+    }
+    let id = parts[0].to_string();
+    let topic = parts[1].to_string();
+
+    // Extract script body: first try ```python ... ```
+    if let Some(start) = content.find("```python") {
+        let after_marker = &content[start + 9..];
+        if let Some(close) = after_marker.find("```") {
+            let body = after_marker[..close].trim().to_string();
+            if !body.is_empty() {
+                return Some((id, topic, body));
+            }
+        }
+    }
+    // Also try ``` (no "python") for flexibility
+    if let Some(start) = content.find("```") {
+        let after_newline = content[start + 3..].find('\n').map(|i| start + 3 + i + 1).unwrap_or(start + 3);
+        let rest = &content[after_newline..];
+        if let Some(close) = rest.find("```") {
+            let body = rest[..close].trim().to_string();
+            if !body.is_empty() {
+                return Some((id, topic, body));
+            }
+        }
+    }
+
+    // Else: lines after PYTHON_SCRIPT: until another tool line or end
+    let python_line_index = python_line_index.unwrap_or(0);
+    let lines: Vec<&str> = content.lines().collect();
+    let mut body_lines = Vec::new();
+    for (i, line) in lines.iter().enumerate() {
+        if i <= python_line_index {
+            continue;
+        }
+        let trimmed = line.trim();
+        if trimmed.is_empty() {
+            body_lines.push(trimmed);
+            continue;
+        }
+        let is_other_tool = TOOL_LINE_PREFIXES.iter().any(|p| trimmed.to_uppercase().starts_with(p));
+        if is_other_tool {
+            break;
+        }
+        body_lines.push(trimmed);
+    }
+    let body = body_lines.join("\n").trim().to_string();
+    if body.is_empty() {
+        return None;
+    }
+    Some((id, topic, body))
 }
 
 /// List available Ollama models (async, non-blocking)

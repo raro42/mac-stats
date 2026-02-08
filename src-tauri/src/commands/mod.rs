@@ -9,4 +9,5 @@ pub mod brave;
 pub mod browser;
 pub mod discord;
 pub mod run_cmd;
+pub mod python_agent;
 pub mod logging;

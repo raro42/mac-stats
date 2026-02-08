@@ -5,14 +5,17 @@
 //! Token is resolved (in order) from: DISCORD_BOT_TOKEN env, .config.env file, Keychain.
 //! Token is never logged or exposed.
 
+pub mod api;
+
 use serenity::client::{Client, Context, EventHandler};
 use serenity::gateway::ShardManager;
 use serenity::model::gateway::GatewayIntents;
 use serenity::model::id::UserId;
 use serenity::model::channel::Message;
+use std::collections::HashMap;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, OnceLock};
+use std::sync::{Arc, Mutex, OnceLock};
 use tokio::sync::mpsc;
 use tracing::{debug, error, info};
 
@@ -134,6 +137,25 @@ pub const DISCORD_TOKEN_KEYCHAIN_ACCOUNT: &str = "discord_bot_token";
 /// Bot user id (set on Ready, used to filter self and mentions).
 static BOT_USER_ID: OnceLock<UserId> = OnceLock::new();
 
+/// Cache of Discord user id -> display name for reuse in prompts. Updated on each message.
+static DISCORD_USER_NAMES: OnceLock<Mutex<HashMap<u64, String>>> = OnceLock::new();
+
+fn discord_user_names() -> &'static Mutex<HashMap<u64, String>> {
+    DISCORD_USER_NAMES.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
+/// Record a Discord user's display name (call when we receive a message from them).
+pub fn set_discord_user_name(user_id: u64, display_name: String) {
+    if let Ok(mut map) = discord_user_names().lock() {
+        map.insert(user_id, display_name);
+    }
+}
+
+/// Get a cached Discord display name for a user id, if known.
+pub fn get_discord_display_name(user_id: u64) -> Option<String> {
+    discord_user_names().lock().ok().and_then(|map| map.get(&user_id).cloned())
+}
+
 struct Handler;
 
 #[serenity::async_trait]
@@ -193,6 +215,16 @@ impl EventHandler for Handler {
         let channel_id_u64 = new_message.channel_id.get();
         crate::session_memory::add_message("discord", channel_id_u64, "user", content);
 
+        // Record author's display name for reuse in prompts and API context
+        let author_id_u64 = new_message.author.id.get();
+        let display_name = new_message
+            .author
+            .global_name
+            .as_deref()
+            .unwrap_or(&new_message.author.name)
+            .to_string();
+        set_discord_user_name(author_id_u64, display_name.clone());
+
         // Channel for status updates so the user sees we're still working (Thinking…, Fetching page…, etc.)
         let (status_tx, mut status_rx) = mpsc::unbounded_channel();
         let ctx_send = ctx.clone();
@@ -209,9 +241,12 @@ impl EventHandler for Handler {
             &question,
             Some(status_tx),
             Some(channel_id_u64),
+            Some(author_id_u64),
+            Some(display_name),
             model_override,
             options_override,
             skill_content,
+            true,
         ).await {
             Ok(r) => r,
             Err(e) => {

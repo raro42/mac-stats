@@ -33,6 +33,7 @@ mod scheduler;
 mod mcp;
 mod session_memory;
 mod skills;
+mod task;
 mod commands;
 
 use std::os::raw::c_void;

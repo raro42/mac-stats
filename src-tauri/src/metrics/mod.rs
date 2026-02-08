@@ -251,7 +251,7 @@ fn read_gpu_usage_from_system() -> f32 {
                         debug3!("Found 'Device Utilization %' in line: {}", line);
                         if let Some(percent) = extract_percentage_after_key(line, "Device Utilization %") {
                             if percent >= 0.0 && percent <= 100.0 {
-                                debug2!("GPU usage from ioreg (Device Utilization %): {}%", percent);
+                                debug3!("GPU usage from ioreg (Device Utilization %): {}%", percent);
                                 return percent;
                             } else {
                                 debug3!("GPU usage value {}% is out of range (0-100)", percent);
@@ -265,7 +265,7 @@ fn read_gpu_usage_from_system() -> f32 {
                         debug3!("Found 'Renderer Utilization %' in line: {}", line);
                         if let Some(percent) = extract_percentage_after_key(line, "Renderer Utilization %") {
                             if percent >= 0.0 && percent <= 100.0 {
-                                debug2!("GPU usage from ioreg (Renderer Utilization %): {}%", percent);
+                                debug3!("GPU usage from ioreg (Renderer Utilization %): {}%", percent);
                                 return percent;
                             }
                         }
@@ -275,7 +275,7 @@ fn read_gpu_usage_from_system() -> f32 {
                         debug3!("Found 'Tiler Utilization %' in line: {}", line);
                         if let Some(percent) = extract_percentage_after_key(line, "Tiler Utilization %") {
                             if percent >= 0.0 && percent <= 100.0 {
-                                debug2!("GPU usage from ioreg (Tiler Utilization %): {}%", percent);
+                                debug3!("GPU usage from ioreg (Tiler Utilization %): {}%", percent);
                                 return percent;
                             }
                         }
@@ -470,12 +470,12 @@ pub fn can_read_temperature() -> bool {
             match smc.cpu_temperature() {
                 Ok(_) => {
                     // SMC read succeeded (even if temp is 0.0, the read worked)
-                    debug2!("SMC connection and read succeeded - can_read_temperature=true");
+                    debug3!("SMC connection and read succeeded - can_read_temperature=true");
                     true
                 },
                 Err(e) => {
                     // SMC read failed
-                    debug2!("SMC read failed: {:?} - can_read_temperature=false", e);
+                    debug3!("SMC read failed: {:?} - can_read_temperature=false", e);
                     false
                 }
             }
