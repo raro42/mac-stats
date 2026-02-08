@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Full Ollama API coverage**: List models with details, get version, list running models, pull/update/delete models, generate embeddings, load/unload models from memory.
+  - Tauri commands: `list_ollama_models_full`, `get_ollama_version`, `list_ollama_running_models`, `pull_ollama_model`, `delete_ollama_model`, `ollama_embeddings`, `unload_ollama_model`, `load_ollama_model`. All use the configured Ollama endpoint (same as chat/Discord/scheduler).
+  - Backend: `ollama/mod.rs` types and `OllamaClient` methods for GET /api/tags (full), GET /api/version, GET /api/ps, POST /api/pull, DELETE /api/delete, POST /api/embed, and load/unload via keep_alive on generate/chat.
+  - Documentation: `docs/015_ollama_api.md`.
+- **User info (user-info.json)**: Per-user details from `~/.mac-stats/user-info.json` (keyed by Discord user id) are merged into the agent context (display_name, notes, timezone, extra). See `docs/007_discord_agent.md`.
+
+### Changed
+- **Agent status messages**: When the agent uses a skill or the Ollama API, the status line now shows details: "Using skill &lt;number&gt;-&lt;topic&gt;…" (e.g. "Using skill 3-create-rule…") and "Ollama API: &lt;action&gt; [args]…" (e.g. "Ollama API: list_models…", "Ollama API: pull llama3.2…").
+
 ## [0.1.9] - 2026-02-09
 
 ### Added

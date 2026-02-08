@@ -73,6 +73,25 @@ Only **GET** is allowed for general read endpoints. **POST** is allowed only for
 - **User names**  
   The bot records the display name of users who message it and passes it to Ollama. Ollama can also call `GET /users/{user_id}` for full user details (username, global_name, etc.).
 
+- **User details (user-info.json)**  
+  You can add per-user details in `~/.mac-stats/user-info.json` (many users, keyed by Discord user id). The file is read when handling a message; if the author’s id is present, the bot adds "User details: …" to the context (notes, timezone, extra fields). Example:
+
+  ```json
+  {
+    "users": [
+      {
+        "id": "123456789012345678",
+        "display_name": "Alice",
+        "notes": "Prefers short answers.",
+        "timezone": "Europe/Paris",
+        "extra": { "language": "en" }
+      }
+    ]
+  }
+  ```
+
+  `id` is the Discord user id (snowflake) as a string. Optional: `display_name` (override), `notes`, `timezone`, `extra` (key-value). Ollama can read the file via `RUN_CMD: cat ~/.mac-stats/user-info.json` if needed.
+
 ## Message prefixes (optional)
 
 You can put **optional leading lines** in your message to override model, parameters, or skill for that request only. These lines are stripped before the question is sent to Ollama.

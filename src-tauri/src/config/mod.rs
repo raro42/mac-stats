@@ -146,6 +146,18 @@ impl Config {
         Ok(())
     }
 
+    /// Get the user-info file path
+    ///
+    /// Returns a path in the user's home directory: `$HOME/.mac-stats/user-info.json`
+    /// Contains information about many users (e.g. Discord user id -> details). Falls back to temp if HOME is not available.
+    pub fn user_info_file_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            let home_path = PathBuf::from(home);
+            return home_path.join(".mac-stats").join("user-info.json");
+        }
+        std::env::temp_dir().join("mac-stats-user-info.json")
+    }
+
     /// Session directory for persisted chat memory: `$HOME/.mac-stats/session/`
     pub fn session_dir() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {

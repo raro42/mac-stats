@@ -34,6 +34,7 @@ mod mcp;
 mod session_memory;
 mod skills;
 mod task;
+mod user_info;
 mod commands;
 
 use std::os::raw::c_void;
@@ -122,7 +123,7 @@ pub fn set_frequency_logging(enabled: bool) {
     if let Ok(mut flag) = state::FREQUENCY_LOGGING_ENABLED.lock() {
         *flag = enabled;
         if enabled {
-            debug1!("Frequency logging enabled - detailed frequency information will be logged");
+            debug3!("Frequency logging enabled - detailed frequency information will be logged");
         }
     }
 }
@@ -132,18 +133,18 @@ pub fn set_power_usage_logging(enabled: bool) {
     if let Ok(mut flag) = state::POWER_USAGE_LOGGING_ENABLED.lock() {
         *flag = enabled;
         if enabled {
-            debug1!("Power usage logging enabled - detailed power and battery information will be logged");
+            debug3!("Power usage logging enabled - detailed power and battery information will be logged");
         }
     }
 }
 
 pub fn run_with_cpu_window() {
-    debug1!("Running with -cpu flag: will open CPU window after setup");
+    debug3!("Running with -cpu flag: will open CPU window after setup");
     run_internal(true)
 }
 
 pub fn run() {
-    debug1!(" !! Running without -cpu flag: will not open CPU window at startup");
+    debug3!(" !! Running without -cpu flag: will not open CPU window at startup");
     run_internal(false)
 }
 
@@ -187,6 +188,14 @@ fn run_internal(open_cpu_window: bool) {
             commands::ollama::check_ollama_connection,
             commands::ollama::ollama_chat,
             commands::ollama::list_ollama_models,
+            commands::ollama::list_ollama_models_full,
+            commands::ollama::get_ollama_version,
+            commands::ollama::list_ollama_running_models,
+            commands::ollama::pull_ollama_model,
+            commands::ollama::delete_ollama_model,
+            commands::ollama::ollama_embeddings,
+            commands::ollama::unload_ollama_model,
+            commands::ollama::load_ollama_model,
             commands::ollama::log_ollama_js_execution,
             commands::ollama::log_ollama_js_check,
             commands::ollama::log_ollama_js_extraction,
@@ -222,18 +231,18 @@ fn run_internal(open_cpu_window: bool) {
 
             // Don't create CPU window at startup - create it on demand when clicked
             // This saves CPU by not having the window exist until needed
-            debug1!("CPU window will be created on demand when menu bar is clicked");
-            debug1!("All windows hidden at startup - app running in menu bar only");
+            debug3!("CPU window will be created on demand when menu bar is clicked");
+            debug3!("All windows hidden at startup - app running in menu bar only");
             
             // If -cpu flag is set, create the window after a short delay (for testing only)
             if open_cpu_window {
                 std::thread::spawn(move || {
                     std::thread::sleep(std::time::Duration::from_millis(1000));
-                    debug1!("Opening CPU window (from -cpu flag)");
+                    debug3!("Opening CPU window (from -cpu flag)");
                     if let Some(app_handle) = APP_HANDLE.get() {
                         let app_handle = app_handle.clone();
                         let _ = app_handle.run_on_main_thread(move || {
-                            debug2!("In run_on_main_thread callback for CPU window");
+                            debug3!("In run_on_main_thread callback for CPU window");
                             if let Some(app_handle) = APP_HANDLE.get() {
                                 create_cpu_window(app_handle);
                             }
@@ -252,7 +261,7 @@ fn run_internal(open_cpu_window: bool) {
                     let mtm = MainThreadMarker::new().unwrap();
                     if let Some(button) = item.button(mtm) {
                         button.setAttributedTitle(&initial_attributed);
-                        debug2!("Initial placeholder menu bar text set");
+                        debug3!("Initial placeholder menu bar text set");
                     }
                 }
             });
@@ -300,33 +309,33 @@ fn run_internal(open_cpu_window: bool) {
             
             // Initialize System and Disks in background thread to avoid blocking
             std::thread::spawn(move || {
-                debug2!("Background thread: initializing System and Disks");
+                debug3!("Background thread: initializing System and Disks");
                 // Create System outside the lock to avoid holding it
                 let new_system = System::new();
-                debug2!("Background thread: System::new() completed");
+                debug3!("Background thread: System::new() completed");
                 // Use try_lock to avoid blocking - if locked, skip initialization
                 if let Ok(mut sys) = SYSTEM.try_lock() {
                     if sys.is_none() {
                         *sys = Some(new_system);
-                        debug2!("Background thread: System stored");
+                        debug3!("Background thread: System stored");
                     }
                 } else {
-                    debug1!("Background thread: SYSTEM lock unavailable, skipping");
+                    debug3!("Background thread: SYSTEM lock unavailable, skipping");
                 }
                 
                 // Create Disks outside the lock
                 let mut new_disks = Disks::new();
                 new_disks.refresh(false);
-                debug2!("Background thread: Disks::new() and refresh completed");
+                debug3!("Background thread: Disks::new() and refresh completed");
                 if let Ok(mut disks) = DISKS.try_lock() {
                     if disks.is_none() {
                         *disks = Some(new_disks);
-                        debug2!("Background thread: Disks stored");
+                        debug3!("Background thread: Disks stored");
                     }
                 } else {
-                    debug1!("Background thread: DISKS lock unavailable, skipping");
+                    debug3!("Background thread: DISKS lock unavailable, skipping");
                 }
-                debug2!("Background thread: initialization complete");
+                debug3!("Background thread: initialization complete");
             });
             
             // Menu bar updates will be processed by the click handler
@@ -343,9 +352,9 @@ fn run_internal(open_cpu_window: bool) {
                 // Initialize history buffer (adaptive tiered storage with automatic downsampling)
                 if let Ok(mut history) = METRICS_HISTORY.try_lock() {
                     *history = Some(metrics::history::HistoryBuffer::new());
-                    debug1!("Metrics history buffer initialized (capacity: 26 KB)");
+                    debug3!("Metrics history buffer initialized (capacity: 26 KB)");
                 } else {
-                    debug1!("Warning: Could not initialize metrics history buffer - lock contention at startup");
+                    debug3!("Warning: Could not initialize metrics history buffer - lock contention at startup");
                 }
 
                 // CRITICAL: Keep SMC connection alive in background thread (reuse for efficiency)
@@ -418,11 +427,11 @@ fn run_internal(open_cpu_window: bool) {
                                     // OPTIMIZATION Phase 3: Update OnceLock to indicate SMC works
                                     // This ensures can_read_temperature() returns true
                                     if CAN_READ_TEMPERATURE.set(true).is_ok() {
-                                        debug2!("CAN_READ_TEMPERATURE set to true (SMC connection successful)");
+                                        debug3!("CAN_READ_TEMPERATURE set to true (SMC connection successful)");
                                     }
                                 },
                                 Err(e) => {
-                                    debug2!("Failed to connect to SMC: {:?}", e);
+                                    debug3!("Failed to connect to SMC: {:?}", e);
                                     // Will retry on next iteration
                                 }
                             }
@@ -530,18 +539,18 @@ fn run_internal(open_cpu_window: bool) {
                                                 CFRelease(channels_mut.as_concrete_TypeRef() as CFTypeRef);
                                             }
                                             
-                                            debug2!("IOReport subscription created successfully for CPU frequency (handle={:p}, dict={:p})", subscription_ptr, subscription_dict);
+                                            debug3!("IOReport subscription created successfully for CPU frequency (handle={:p}, dict={:p})", subscription_ptr, subscription_dict);
                                             
                                             // OPTIMIZATION Phase 3: Update OnceLock to indicate frequency reading works
                                             // OPTIMIZATION Phase 3: Update OnceLock to indicate frequency reading works
                                             if CAN_READ_FREQUENCY.set(true).is_ok() {
-                                                debug2!("CAN_READ_FREQUENCY set to true (IOReport subscription created)");
+                                                debug3!("CAN_READ_FREQUENCY set to true (IOReport subscription created)");
                                             }
                                         } else {
-                                            debug2!("Failed to create IOReport subscription: subscription_ptr is null, subscription_dict={:p}", subscription_dict);
+                                            debug3!("Failed to create IOReport subscription: subscription_ptr is null, subscription_dict={:p}", subscription_dict);
                                         }
                                     } else {
-                                        debug2!("No CPU Performance States channels found in IOReport");
+                                        debug3!("No CPU Performance States channels found in IOReport");
                                     }
                                 }
                             }
@@ -575,7 +584,7 @@ fn run_internal(open_cpu_window: bool) {
                                         if count > 0 {
                                             power_channels_dict = energy_model_dict;
                                             found_channel_name = "Energy Model (all subgroups)".to_string();
-                                            debug1!("Found power channels: Energy Model ({} entries)", count);
+                                            debug3!("Found power channels: Energy Model ({} entries)", count);
                                         } else {
                                             CFRelease(energy_model_dict as CFTypeRef);
                                         }
@@ -593,7 +602,7 @@ fn run_internal(open_cpu_window: bool) {
                                         if !cpu_channels_dict.is_null() {
                                             power_channels_dict = cpu_channels_dict;
                                             found_channel_name = "CPU Stats / CPU Power".to_string();
-                                            debug1!("Found power channels: CPU Stats / CPU Power");
+                                            debug3!("Found power channels: CPU Stats / CPU Power");
                                         } else {
                                             // Try CPU Energy
                                             let cpu_energy_subgroup_cf = CFString::from_static_string("CPU Energy");
@@ -605,7 +614,7 @@ fn run_internal(open_cpu_window: bool) {
                                             if !cpu_energy_channels_dict.is_null() {
                                                 power_channels_dict = cpu_energy_channels_dict;
                                                 found_channel_name = "CPU Stats / CPU Energy".to_string();
-                                                debug1!("Found power channels: CPU Stats / CPU Energy");
+                                                debug3!("Found power channels: CPU Stats / CPU Energy");
                                             } else {
                                                 // Try GPU Power
                                                 let gpu_group_cf = CFString::from_static_string("GPU Stats");
@@ -618,7 +627,7 @@ fn run_internal(open_cpu_window: bool) {
                                                 if !gpu_channels_dict.is_null() {
                                                     power_channels_dict = gpu_channels_dict;
                                                     found_channel_name = "GPU Stats / GPU Power".to_string();
-                                                    debug1!("Found power channels: GPU Stats / GPU Power");
+                                                    debug3!("Found power channels: GPU Stats / GPU Power");
                                                 } else {
                                                     // Try GPU Energy
                                                     let gpu_energy_subgroup_cf = CFString::from_static_string("GPU Energy");
@@ -630,9 +639,9 @@ fn run_internal(open_cpu_window: bool) {
                                                     if !gpu_energy_channels_dict.is_null() {
                                                         power_channels_dict = gpu_energy_channels_dict;
                                                         found_channel_name = "GPU Stats / GPU Energy".to_string();
-                                                        debug1!("Found power channels: GPU Stats / GPU Energy");
+                                                        debug3!("Found power channels: GPU Stats / GPU Energy");
                                                     } else {
-                                                        debug1!("No power channels found - tried: Energy Model, CPU Power, CPU Energy, GPU Power, GPU Energy");
+                                                        debug3!("No power channels found - tried: Energy Model, CPU Power, CPU Energy, GPU Power, GPU Energy");
                                                     }
                                                 }
                                             }
@@ -643,10 +652,10 @@ fn run_internal(open_cpu_window: bool) {
                                         // Check channel count before proceeding
                                         use core_foundation::dictionary::CFDictionaryGetCount;
                                         let channel_count = CFDictionaryGetCount(power_channels_dict);
-                                        debug1!("Power channels dictionary has {} entries", channel_count);
+                                        debug3!("Power channels dictionary has {} entries", channel_count);
                                         
                                         if channel_count == 0 {
-                                            debug1!("Power channels dictionary is empty - cannot create subscription");
+                                            debug3!("Power channels dictionary is empty - cannot create subscription");
                                             CFRelease(power_channels_dict as CFTypeRef);
                                         } else {
                                             // CRITICAL: Extract actual channels from nested structure
@@ -686,7 +695,7 @@ fn run_internal(open_cpu_window: bool) {
                                                         if key_type_id == string_type_id {
                                                             let key_str = CFString::wrap_under_get_rule(key_ref);
                                                             let key_name = key_str.to_string();
-                                                            debug1!("Power channels dict key[{}]: '{}'", i, key_name);
+                                                            debug3!("Power channels dict key[{}]: '{}'", i, key_name);
                                                             
                                                             let value_ptr = values_buf[i];
                                                             if !value_ptr.is_null() {
@@ -696,23 +705,23 @@ fn run_internal(open_cpu_window: bool) {
                                                                     fn CFArrayGetTypeID() -> u64;
                                                                 }
                                                                 let array_type_id = CFArrayGetTypeID();
-                                                                debug1!("  Value type_id={}, dict_type_id={}, array_type_id={}", value_type_id, dict_type_id, array_type_id);
+                                                                debug3!("  Value type_id={}, dict_type_id={}, array_type_id={}", value_type_id, dict_type_id, array_type_id);
                                                                 
                                                                 if value_type_id == dict_type_id {
                                                                     let nested_dict = value_ptr as CFDictionaryRef;
                                                                     let nested_count = CFDictionaryGetCount(nested_dict);
-                                                                    debug1!("  Nested dict has {} entries", nested_count);
+                                                                    debug3!("  Nested dict has {} entries", nested_count);
                                                                 } else if value_type_id as u64 == array_type_id {
                                                                     extern "C" {
                                                                         fn CFArrayGetCount(theArray: *const c_void) -> i32;
                                                                     }
                                                                     let array_count = CFArrayGetCount(value_ptr as *const c_void);
-                                                                    debug1!("  Nested array has {} entries", array_count);
+                                                                    debug3!("  Nested array has {} entries", array_count);
                                                                     // If this is IOReportChannels array, we need to extract it
                                                                     if key_name == "IOReportChannels" && array_count > 0 {
                                                                         // For arrays, we need to process them differently
                                                                         // The array contains channel dictionaries directly
-                                                                        debug1!("  Found IOReportChannels array with {} channels", array_count);
+                                                                        debug3!("  Found IOReportChannels array with {} channels", array_count);
                                                                     }
                                                                 }
                                                             }
@@ -723,7 +732,7 @@ fn run_internal(open_cpu_window: bool) {
                                                 // For Energy Model, IOReportChannels is an array, not a dict
                                                 // We need to store the original dict (with IOReportChannels array) for channel name lookup
                                                 // IOReportMergeChannels will handle the array structure when creating subscription
-                                                debug1!("Using original power channels dict (contains IOReportChannels array)");
+                                                debug3!("Using original power channels dict (contains IOReportChannels array)");
                                                 CFRetain(power_channels_dict as CFTypeRef);
                                                 power_channels_dict
                                             };
@@ -738,7 +747,7 @@ fn run_internal(open_cpu_window: bool) {
                                                 }
                                                 // Store the wrapper dict (contains IOReportChannels array) for name lookup
                                                 *orig_storage = Some(power_channels_dict as usize);
-                                                debug1!("Stored original power channels dict in IOREPORT_POWER_ORIGINAL_CHANNELS");
+                                                debug3!("Stored original power channels dict in IOREPORT_POWER_ORIGINAL_CHANNELS");
                                             } else {
                                                 CFRelease(power_channels_dict as CFTypeRef);
                                             }
@@ -748,7 +757,7 @@ fn run_internal(open_cpu_window: bool) {
                                             use core_foundation::base::CFType;
                                             let power_channels_mut: CFMutableDictionary<CFString, CFType> = CFMutableDictionary::new();
                                             
-                                            debug1!("Merging power channels into mutable dictionary...");
+                                            debug3!("Merging power channels into mutable dictionary...");
                                             IOReportMergeChannels(
                                                 power_channels_mut.as_concrete_TypeRef(),
                                                 actual_channels_dict,
@@ -761,12 +770,12 @@ fn run_internal(open_cpu_window: bool) {
                                             // Check merged dictionary count
                                             use core_foundation::dictionary::CFDictionaryGetCount;
                                             let merged_count = CFDictionaryGetCount(power_channels_mut.as_concrete_TypeRef());
-                                            debug1!("Merged power channels dictionary has {} entries", merged_count);
+                                            debug3!("Merged power channels dictionary has {} entries", merged_count);
                                             
                                             // If merge resulted in 0 entries, try using the original dict directly
                                             // This might work if the structure is already in the correct format
                                             let channels_for_subscription = if merged_count == 0 {
-                                                debug1!("Merge resulted in 0 entries, trying to use channels dict directly");
+                                                debug3!("Merge resulted in 0 entries, trying to use channels dict directly");
                                                 // Retain the actual_channels_dict again since we'll use it directly
                                                 CFRetain(actual_channels_dict as CFTypeRef);
                                                 actual_channels_dict as CFMutableDictionaryRef
@@ -778,7 +787,7 @@ fn run_internal(open_cpu_window: bool) {
                                             
                                             // Create subscription
                                             let mut power_subscription_dict: CFMutableDictionaryRef = std::ptr::null_mut();
-                                            debug1!("Creating IOReport power subscription...");
+                                            debug3!("Creating IOReport power subscription...");
                                             let power_subscription_ptr = IOReportCreateSubscription(
                                                 std::ptr::null(),
                                                 channels_for_subscription,
@@ -793,7 +802,7 @@ fn run_internal(open_cpu_window: bool) {
                                             }
                                             
                                             if !power_subscription_ptr.is_null() {
-                                                debug1!("IOReport power subscription created successfully!");
+                                                debug3!("IOReport power subscription created successfully!");
                                             *power_sub = Some(power_subscription_ptr as usize);
                                             
                                             if !power_subscription_dict.is_null() {
@@ -818,17 +827,17 @@ fn run_internal(open_cpu_window: bool) {
                                                 CFRelease(power_channels_mut.as_concrete_TypeRef() as CFTypeRef);
                                             }
                                             
-                                            debug1!("IOReport power subscription created successfully (handle={:p}, channels={})", power_subscription_ptr, found_channel_name);
+                                            debug3!("IOReport power subscription created successfully (handle={:p}, channels={})", power_subscription_ptr, found_channel_name);
                                             
                                             if CAN_READ_CPU_POWER.set(true).is_ok() {
-                                                debug1!("CAN_READ_CPU_POWER set to true");
+                                                debug3!("CAN_READ_CPU_POWER set to true");
                                             }
                                             if CAN_READ_GPU_POWER.set(true).is_ok() {
-                                                debug1!("CAN_READ_GPU_POWER set to true");
+                                                debug3!("CAN_READ_GPU_POWER set to true");
                                             }
                                             } else {
-                                                debug1!("Failed to create IOReport power subscription: subscription_ptr is null");
-                                                debug1!("This may indicate the power channels require different handling or permissions");
+                                                debug3!("Failed to create IOReport power subscription: subscription_ptr is null");
+                                                debug3!("This may indicate the power channels require different handling or permissions");
                                                 // Release the retained channels dict since subscription failed
                                                 if let Ok(mut orig_storage) = IOREPORT_POWER_ORIGINAL_CHANNELS.try_lock() {
                                                     if let Some(dict) = orig_storage.take() {
@@ -838,8 +847,8 @@ fn run_internal(open_cpu_window: bool) {
                                             }
                                         }
                                     } else {
-                                        debug1!("No power channels found in IOReport (tried: CPU Power, CPU Energy, GPU Power, GPU Energy)");
-                                        debug1!("Power consumption will show 0.0W - power channels may not be available on this Mac model");
+                                        debug3!("No power channels found in IOReport (tried: CPU Power, CPU Energy, GPU Power, GPU Energy)");
+                                        debug3!("Power consumption will show 0.0W - power channels may not be available on this Mac model");
                                     }
                                 }
                             }
@@ -949,7 +958,7 @@ fn run_internal(open_cpu_window: bool) {
                                         *cache = Some((temp as f32, std::time::Instant::now()));
                                         debug3!("Temperature updated in cache: {:.1}°C", temp);
                                     } else {
-                                        debug2!("Temperature cache lock failed, skipping update");
+                                        debug3!("Temperature cache lock failed, skipping update");
                                     }
                                 } else {
                                     debug3!("Temperature read returned 0.0 - no valid temperature found");
@@ -1092,9 +1101,9 @@ fn run_internal(open_cpu_window: bool) {
                                 if let Ok(mut cache) = FREQ_CACHE.try_lock() {
                                     *cache = Some((freq, std::time::Instant::now()));
                                     if freq_logging {
-                                        debug1!("Overall frequency cache updated: {:.2} GHz", freq);
+                                        debug3!("Overall frequency cache updated: {:.2} GHz", freq);
                                     } else {
-                                        debug2!("Frequency cache updated from IOReport: {:.2} GHz", freq);
+                                        debug3!("Frequency cache updated from IOReport: {:.2} GHz", freq);
                                     }
                                 }
                                 
@@ -1103,14 +1112,14 @@ fn run_internal(open_cpu_window: bool) {
                                     if let Ok(mut cache) = P_CORE_FREQ_CACHE.try_lock() {
                                         *cache = Some((p_core_freq, std::time::Instant::now()));
                                         if freq_logging {
-                                            debug1!("P-core frequency cache updated: {:.2} GHz", p_core_freq);
+                                            debug3!("P-core frequency cache updated: {:.2} GHz", p_core_freq);
                                         } else {
-                                            debug2!("P-core frequency cache updated: {:.2} GHz", p_core_freq);
+                                            debug3!("P-core frequency cache updated: {:.2} GHz", p_core_freq);
                                         }
                                     }
                                 } else {
                                     if freq_logging {
-                                        debug1!("P-core frequency is 0.0 - NOT updating cache");
+                                        debug3!("P-core frequency is 0.0 - NOT updating cache");
                                     }
                                 }
                                 
@@ -1119,38 +1128,38 @@ fn run_internal(open_cpu_window: bool) {
                                     if let Ok(mut cache) = E_CORE_FREQ_CACHE.try_lock() {
                                         *cache = Some((e_core_freq, std::time::Instant::now()));
                                         if freq_logging {
-                                            debug1!("E-core frequency cache updated: {:.2} GHz", e_core_freq);
+                                            debug3!("E-core frequency cache updated: {:.2} GHz", e_core_freq);
                                         } else {
-                                            debug2!("E-core frequency cache updated: {:.2} GHz", e_core_freq);
+                                            debug3!("E-core frequency cache updated: {:.2} GHz", e_core_freq);
                                         }
                                     }
                                 } else {
                                     if freq_logging {
-                                        debug1!("E-core frequency is 0.0 - NOT updating cache");
+                                        debug3!("E-core frequency is 0.0 - NOT updating cache");
                                     }
                                 }
                                 
                                 // OPTIMIZATION Phase 3: Update OnceLock to indicate frequency reading works
                                 if CAN_READ_FREQUENCY.set(true).is_ok() {
-                                    debug2!("CAN_READ_FREQUENCY set to true (IOReport frequency read successfully)");
+                                    debug3!("CAN_READ_FREQUENCY set to true (IOReport frequency read successfully)");
                                 }
                             } else {
                                 // This prevents overwriting a good cached value with nominal frequency
-                                debug2!("IOReport frequency parsing failed (freq=0.0) - keeping existing cache value if available");
+                                debug3!("IOReport frequency parsing failed (freq=0.0) - keeping existing cache value if available");
                                 
                                 // Only initialize cache with nominal frequency if it's completely empty
                                 if let Ok(mut cache) = FREQ_CACHE.try_lock() {
                                     if cache.is_none() {
                                         let nominal = metrics::get_nominal_frequency();
                                         *cache = Some((nominal, std::time::Instant::now()));
-                                        debug2!("Using nominal frequency as initial value: {:.2} GHz (IOReport not available yet)", nominal);
+                                        debug3!("Using nominal frequency as initial value: {:.2} GHz (IOReport not available yet)", nominal);
                                     } else {
                                         debug3!("Keeping existing cached frequency value (IOReport parsing failed)");
                                     }
                                 }
                             }
                         } else {
-                            debug2!("should_read_freq=false, skipping frequency update");
+                            debug3!("should_read_freq=false, skipping frequency update");
                         }
                         
                         // CRITICAL: Only read battery and power when CPU window is visible
@@ -1162,7 +1171,7 @@ fn run_internal(open_cpu_window: bool) {
                             .map(|f| *f)
                             .unwrap_or(false);
                         if power_logging && has_battery {
-                            debug1!("Battery updated: {:.1}%, charging={}", battery_level, is_charging);
+                            debug3!("Battery updated: {:.1}%, charging={}", battery_level, is_charging);
                         }
                         
                         // Read power consumption from IOReport
@@ -1178,16 +1187,16 @@ fn run_internal(open_cpu_window: bool) {
                         };
                         
                         if should_read_power {
-                            debug1!("Reading power from IOReport (should_read_power=true)...");
+                            debug3!("Reading power from IOReport (should_read_power=true)...");
                             // Read power from IOReport
                             let power_result = if let Ok(power_sub) = IOREPORT_POWER_SUBSCRIPTION.try_lock() {
-                                debug1!("Power subscription lock acquired");
+                                debug3!("Power subscription lock acquired");
                                 if let Some(subscription_usize) = power_sub.as_ref() {
                                     let subscription_ptr = *subscription_usize as *mut c_void;
-                                    debug1!("Power subscription found: {:p}", subscription_ptr);
+                                    debug3!("Power subscription found: {:p}", subscription_ptr);
                                     
                                     if !subscription_ptr.is_null() {
-                                        debug1!("Subscription pointer is valid, proceeding with power read...");
+                                        debug3!("Subscription pointer is valid, proceeding with power read...");
                                         let channels_ptr = if let Ok(channels_storage) = IOREPORT_POWER_CHANNELS.try_lock() {
                                             channels_storage.as_ref().map(|&usize_ptr| usize_ptr as CFMutableDictionaryRef)
                                         } else {
@@ -1202,7 +1211,7 @@ fn run_internal(open_cpu_window: bool) {
                                             None
                                         };
                                         
-                                        debug1!("Power reading: original_channels_dict.is_some()={}, channels_ref.is_null()={}", 
+                                        debug3!("Power reading: original_channels_dict.is_some()={}, channels_ref.is_null()={}", 
                                             original_channels_dict.is_some(), channels_ref.is_null());
                                         
                                         let last_sample = if let Ok(last_sample_storage) = LAST_IOREPORT_POWER_SAMPLE.try_lock() {
@@ -1218,7 +1227,7 @@ fn run_internal(open_cpu_window: bool) {
                                         unsafe {
                                             use ffi::ioreport::read_power_from_ioreport;
                                             
-                                            debug1!("Calling read_power_from_ioreport...");
+                                            debug3!("Calling read_power_from_ioreport...");
                                             let (result, current_sample_opt) = read_power_from_ioreport(
                                                 subscription_ptr as *const c_void,
                                                 channels_ref,
@@ -1227,7 +1236,7 @@ fn run_internal(open_cpu_window: bool) {
                                                 last_read_time,
                                                 power_logging,
                                             );
-                                            debug1!("read_power_from_ioreport returned: CPU={:.2}W, GPU={:.2}W", result.cpu_power, result.gpu_power);
+                                            debug3!("read_power_from_ioreport returned: CPU={:.2}W, GPU={:.2}W", result.cpu_power, result.gpu_power);
                                             
                                             // Store current sample for next delta calculation
                                             // CRITICAL: Always store the sample, even if time_delta was 0
@@ -1260,11 +1269,11 @@ fn run_internal(open_cpu_window: bool) {
                                         None
                                     }
                                 } else {
-                                    debug1!("Power subscription is None");
+                                    debug3!("Power subscription is None");
                                     None
                                 }
                             } else {
-                                debug1!("Power subscription lock failed");
+                                debug3!("Power subscription lock failed");
                                 None
                             };
                             
@@ -1298,16 +1307,16 @@ fn run_internal(open_cpu_window: bool) {
                                             *last_successful = Some((new_cpu, new_gpu));
                                         }
 
-                                        debug1!("Power cache updated: CPU={:.2}W, GPU={:.2}W (prev: CPU={:.2}W, GPU={:.2}W, new_cpu={:.2}W, new_gpu={:.2}W)",
+                                        debug3!("Power cache updated: CPU={:.2}W, GPU={:.2}W (prev: CPU={:.2}W, GPU={:.2}W, new_cpu={:.2}W, new_gpu={:.2}W)",
                                             new_cpu, new_gpu, prev_cpu, prev_gpu, power_data.cpu_power, power_data.gpu_power);
                                     }
                                 } else {
                                     // Both values are 0.0 - don't update cache to prevent overwriting good values
                                     // This happens on first read when time_delta=0
-                                    debug2!("Power read returned 0.0W for both (time_delta likely 0) - not updating cache to preserve previous values");
+                                    debug3!("Power read returned 0.0W for both (time_delta likely 0) - not updating cache to preserve previous values");
                                 }
                             } else {
-                                debug1!("Power reading returned None - subscription may not be available");
+                                debug3!("Power reading returned None - subscription may not be available");
                             }
                         }
                         
@@ -1318,7 +1327,7 @@ fn run_internal(open_cpu_window: bool) {
                             .unwrap_or((0.0, 0.0));
                         
                         if power_logging && (cpu_power > 0.0 || gpu_power > 0.0) {
-                            debug1!("Power: CPU={:.2}W, GPU={:.2}W", cpu_power, gpu_power);
+                            debug3!("Power: CPU={:.2}W, GPU={:.2}W", cpu_power, gpu_power);
                         }
                     } else {
                         // CPU window is not visible - DO NOT read battery or power to save CPU
@@ -1337,7 +1346,7 @@ fn run_internal(open_cpu_window: bool) {
                         if let Ok(mut sub) = IOREPORT_SUBSCRIPTION.try_lock() {
                             if sub.is_some() {
                                 *sub = None;
-                                debug2!("CPU window closed, IOReport frequency subscription cleared");
+                                debug3!("CPU window closed, IOReport frequency subscription cleared");
                                 
                                 // Clear channels dictionary
                                 if let Ok(mut channels_storage) = IOREPORT_CHANNELS.try_lock() {
@@ -1360,7 +1369,7 @@ fn run_internal(open_cpu_window: bool) {
                         if let Ok(mut power_sub) = IOREPORT_POWER_SUBSCRIPTION.try_lock() {
                             if power_sub.is_some() {
                                 *power_sub = None;
-                                debug2!("CPU window closed, IOReport power subscription cleared");
+                                debug3!("CPU window closed, IOReport power subscription cleared");
                                 
                                 // Clear power channels dictionary
                                 if let Ok(mut channels_storage) = IOREPORT_POWER_CHANNELS.try_lock() {

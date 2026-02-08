@@ -153,20 +153,20 @@ pub fn get_chip_info() -> String {
                                 if let Some(total) = total_cores {
                                     if total > 0 {
                                         info.push_str(&format!(" · {} cores", total));
-                                        debug2!("Chip info formatted: '{}' (from chip_type='{}', num_procs='{}')", info, chip_type, num_procs);
+                                        debug3!("Chip info formatted: '{}' (from chip_type='{}', num_procs='{}')", info, chip_type, num_procs);
                                     } else {
-                                        debug2!("Chip info: total_cores is 0, not adding core count");
+                                        debug3!("Chip info: total_cores is 0, not adding core count");
                                     }
                                 } else {
-                                    debug2!("Chip info: could not parse total_cores from '{}'", num_procs);
+                                    debug3!("Chip info: could not parse total_cores from '{}'", num_procs);
                                 }
                             } else {
-                                debug2!("Chip info: num_procs is empty, chip_type='{}'", chip_type);
+                                debug3!("Chip info: num_procs is empty, chip_type='{}'", chip_type);
                             }
-                            debug2!("Chip info returning: '{}'", info);
+                            debug3!("Chip info returning: '{}'", info);
                             return info;
                         } else {
-                            debug2!("Chip info: chip_type is empty");
+                            debug3!("Chip info: chip_type is empty");
                         }
                     }
                 }
@@ -464,7 +464,7 @@ pub fn can_read_temperature() -> bool {
     
     // OPTIMIZATION Phase 3: Use OnceLock for faster access (no locking required)
     *CAN_READ_TEMPERATURE.get_or_init(|| {
-        debug2!("can_read_temperature: First time check - trying SMC connection...");
+        debug3!("can_read_temperature: First time check - trying SMC connection...");
         let can_read = if let Ok(mut smc) = Smc::connect() {
             // Connection succeeded - we can attempt to read (even if it returns 0.0)
             match smc.cpu_temperature() {
@@ -481,11 +481,11 @@ pub fn can_read_temperature() -> bool {
             }
         } else {
             // SMC connection failed - can't read
-            debug2!("SMC connection failed - can_read_temperature=false");
+            debug3!("SMC connection failed - can_read_temperature=false");
             false
         };
 
-        debug2!("can_read_temperature: Cached result: {}", can_read);
+        debug3!("can_read_temperature: Cached result: {}", can_read);
         can_read
     })
 }
@@ -552,7 +552,7 @@ pub(crate) fn get_nominal_frequency() -> f32 {
                         let freq_ghz = (freq_hz / 1_000_000_000.0) as f32;
                         debug3!("Computed: freq_hz={}, freq_ghz={:.2}", freq_hz, freq_ghz);
                         if freq_ghz > 0.1 && freq_ghz < 10.0 {
-                            debug2!("Nominal frequency computed: {:.2} GHz (tbfreq * clockrate.hz)", freq_ghz);
+                            debug3!("Nominal frequency computed: {:.2} GHz (tbfreq * clockrate.hz)", freq_ghz);
                             return freq_ghz;
                         } else {
                             debug3!("Computed frequency {:.2} GHz is out of range (0.1-10.0)", freq_ghz);
@@ -580,7 +580,7 @@ pub(crate) fn get_nominal_frequency() -> f32 {
                         if freq_hz > 0.0 {
                             let freq_ghz = (freq_hz / 1_000_000_000.0) as f32;
                             if freq_ghz > 0.1 && freq_ghz < 10.0 {
-                                debug2!("Nominal frequency from sysctl: {:.2} GHz", freq_ghz);
+                                debug3!("Nominal frequency from sysctl: {:.2} GHz", freq_ghz);
                                 return freq_ghz;
                             }
                         }
@@ -605,7 +605,7 @@ pub(crate) fn get_nominal_frequency() -> f32 {
                         if freq_hz > 0.0 {
                             let freq_ghz = (freq_hz / 1_000_000_000.0) as f32;
                             if freq_ghz > 0.1 && freq_ghz < 10.0 {
-                                debug2!("Nominal frequency from sysctl (fallback): {:.2} GHz", freq_ghz);
+                                debug3!("Nominal frequency from sysctl (fallback): {:.2} GHz", freq_ghz);
                                 return freq_ghz;
                             }
                         }
@@ -614,7 +614,7 @@ pub(crate) fn get_nominal_frequency() -> f32 {
             }
         }
         
-        debug2!("Could not determine nominal frequency, using 0.0");
+        debug3!("Could not determine nominal frequency, using 0.0");
         0.0
     })
 }
@@ -636,11 +636,11 @@ pub fn can_read_frequency() -> bool {
     
     // OPTIMIZATION Phase 3: Use OnceLock for faster access (no locking required)
     *CAN_READ_FREQUENCY.get_or_init(|| {
-        debug2!("can_read_frequency: First time check - trying nominal frequency computation...");
+        debug3!("can_read_frequency: First time check - trying nominal frequency computation...");
         let nominal = get_nominal_frequency();
         let can_read = nominal > 0.0;
 
-        debug2!("can_read_frequency: Cached result: {} (nominal={:.2} GHz)", can_read, nominal);
+        debug3!("can_read_frequency: Cached result: {} (nominal={:.2} GHz)", can_read, nominal);
         can_read
     })
 }
@@ -752,7 +752,7 @@ pub fn get_battery_info() -> (f32, bool, bool) {
                                 let percentage = battery.state_of_charge().get::<battery::units::ratio::percent>();
                                 let is_charging = matches!(battery.state(), State::Charging);
                                 
-                                debug2!("Battery read: {:.1}%, charging={}", percentage, is_charging);
+                                debug3!("Battery read: {:.1}%, charging={}", percentage, is_charging);
                                 
                                 // Update cache
                                 if let Ok(mut cache) = crate::state::BATTERY_CACHE.try_lock() {
@@ -762,24 +762,24 @@ pub fn get_battery_info() -> (f32, bool, bool) {
                                 (percentage as f32, is_charging, true)
                             },
                             Err(e) => {
-                                debug2!("Failed to read battery: {:?}", e);
+                                debug3!("Failed to read battery: {:?}", e);
                                 (-1.0, false, false)
                             }
                         }
                     } else {
                         // No battery found
-                        debug2!("No battery found on this system");
+                        debug3!("No battery found on this system");
                         (-1.0, false, false)
                     }
                 },
                 Err(e) => {
-                    debug2!("Failed to enumerate batteries: {:?}", e);
+                    debug3!("Failed to enumerate batteries: {:?}", e);
                     (-1.0, false, false)
                 }
             }
         },
         Err(e) => {
-            debug2!("Failed to create battery manager: {:?}", e);
+            debug3!("Failed to create battery manager: {:?}", e);
             (-1.0, false, false)
         }
     };
@@ -958,7 +958,7 @@ pub fn get_metrics() -> SystemMetrics {
         },
         Err(_) => {
             // Lock held - return zero immediately, no retry
-            debug1!("WARNING: DISKS mutex is locked, using 0% for disk");
+            debug3!("WARNING: DISKS mutex is locked, using 0% for disk");
             0.0
         }
     };
@@ -1006,7 +1006,7 @@ pub fn get_changelog() -> Result<String, String> {
     if let Ok(cwd) = std::env::current_dir() {
         let cwd_changelog = cwd.join("CHANGELOG.md");
         if cwd_changelog.exists() {
-            debug2!("Reading changelog from current directory: {:?}", cwd_changelog);
+            debug3!("Reading changelog from current directory: {:?}", cwd_changelog);
             if let Ok(content) = std::fs::read_to_string(&cwd_changelog) {
                 if !content.trim().is_empty() {
                     return Ok(content);
@@ -1018,7 +1018,7 @@ pub fn get_changelog() -> Result<String, String> {
         if let Some(parent) = cwd.parent() {
             let parent_changelog = parent.join("CHANGELOG.md");
             if parent_changelog.exists() {
-                debug2!("Reading changelog from parent directory: {:?}", parent_changelog);
+                debug3!("Reading changelog from parent directory: {:?}", parent_changelog);
                 if let Ok(content) = std::fs::read_to_string(&parent_changelog) {
                     if !content.trim().is_empty() {
                         return Ok(content);
@@ -1039,7 +1039,7 @@ pub fn get_changelog() -> Result<String, String> {
             if let Some(dir) = current {
                 let changelog_path = dir.join("CHANGELOG.md");
                 if changelog_path.exists() {
-                    debug2!("Reading changelog from: {:?}", changelog_path);
+                    debug3!("Reading changelog from: {:?}", changelog_path);
                     if let Ok(content) = std::fs::read_to_string(&changelog_path) {
                         if !content.trim().is_empty() {
                             return Ok(content);
@@ -1056,10 +1056,10 @@ pub fn get_changelog() -> Result<String, String> {
     // Strategy 3: Use embedded changelog (compiled into binary)
     // This always works and is the most reliable fallback
     let embedded_len = EMBEDDED_CHANGELOG.len();
-    debug1!("Embedded changelog length: {} bytes", embedded_len);
+    debug3!("Embedded changelog length: {} bytes", embedded_len);
     
     if !EMBEDDED_CHANGELOG.trim().is_empty() {
-        debug1!("Using embedded changelog (compiled into binary)");
+        debug3!("Using embedded changelog (compiled into binary)");
         return Ok(EMBEDDED_CHANGELOG.to_string());
     }
     
@@ -1070,7 +1070,7 @@ pub fn get_changelog() -> Result<String, String> {
         Please ensure CHANGELOG.md exists at the project root and rebuild the app.",
         embedded_len
     );
-    debug1!("{}", error_msg);
+    debug3!("{}", error_msg);
     Err(error_msg)
 }
 
@@ -1108,7 +1108,7 @@ pub fn set_window_decorations(decorations: bool) -> Result<(), String> {
         return Err(format!("Failed to write config file: {}", e));
     }
     
-    crate::debug1!("Window decorations preference set to: {} (saved to config file)", decorations);
+    crate::debug3!("Window decorations preference set to: {} (saved to config file)", decorations);
     Ok(())
 }
 
@@ -1193,7 +1193,7 @@ pub fn get_cpu_details() -> CpuDetails {
                             let age_secs = timestamp.elapsed().as_secs();
                             if age_secs >= 5 {
                                 // Cache is stale - refresh now even if rate-limited
-                                debug2!("Process cache is stale ({}s) - refreshing now (even though rate-limited)", age_secs);
+                                debug3!("Process cache is stale ({}s) - refreshing now (even though rate-limited)", age_secs);
                                 // Need SYSTEM lock to refresh processes
                                 match crate::state::SYSTEM.try_lock() {
                                     Ok(mut sys) => {
@@ -1217,7 +1217,7 @@ pub fn get_cpu_details() -> CpuDetails {
                                             // Update cache
                                             if let Ok(mut process_cache) = crate::state::PROCESS_CACHE.try_lock() {
                                                 *process_cache = Some((processes.clone(), std::time::Instant::now()));
-                                                debug2!("Process cache refreshed (rate-limited call)");
+                                                debug3!("Process cache refreshed (rate-limited call)");
                                             }
                                             
                                             processes
@@ -1311,7 +1311,7 @@ pub fn get_cpu_details() -> CpuDetails {
             if sys.is_none() {
                 // System not initialized yet - return cached/fallback values immediately
                 // Don't wait for initialization - return what we have NOW
-                debug2!("SYSTEM is None - returning cached/fallback values for instant display");
+                debug3!("SYSTEM is None - returning cached/fallback values for instant display");
                 let load = sysinfo::System::load_average();
                 let uptime_secs = sysinfo::System::uptime();
                 // Try to get cached processes, otherwise empty
@@ -1356,11 +1356,11 @@ pub fn get_cpu_details() -> CpuDetails {
                         if age_secs < 10 {
                             // Cache is less than 10 seconds old - return immediately
                             // This prevents blocking and reduces CPU usage
-                            debug2!("Returning cached process list (age: {}s) - refresh every 10s", age_secs);
+                            debug3!("Returning cached process list (age: {}s) - refresh every 10s", age_secs);
                             cached_procs
                         } else {
                             // Cache is stale (>5s) - refresh now
-                            debug2!("Process cache is stale ({}s), refreshing now (5s interval)", age_secs);
+                            debug3!("Process cache is stale ({}s), refreshing now (5s interval)", age_secs);
                             use sysinfo::ProcessesToUpdate;
                             sys.refresh_processes(ProcessesToUpdate::All, true);
                             
@@ -1385,7 +1385,7 @@ pub fn get_cpu_details() -> CpuDetails {
                             // Update cache
                             if let Ok(mut cache) = PROCESS_CACHE.try_lock() {
                                 *cache = Some((processes.clone(), std::time::Instant::now()));
-                                debug2!("Process cache updated (refreshed from system)");
+                                debug3!("Process cache updated (refreshed from system)");
                             }
                             
                             processes
@@ -1394,7 +1394,7 @@ pub fn get_cpu_details() -> CpuDetails {
                         // No cache available - refresh now (first time or cache was cleared)
                         // This is the only case where we block on refresh_processes()
                         // CRITICAL: This happens when window first opens (cache was cleared)
-                        debug2!("Process cache is empty, refreshing now immediately (window just opened)");
+                        debug3!("Process cache is empty, refreshing now immediately (window just opened)");
                         use sysinfo::ProcessesToUpdate;
                         sys.refresh_processes(ProcessesToUpdate::All, true);
                         
@@ -1419,7 +1419,7 @@ pub fn get_cpu_details() -> CpuDetails {
                         // Update cache
                         if let Ok(mut cache) = PROCESS_CACHE.try_lock() {
                             *cache = Some((processes.clone(), std::time::Instant::now()));
-                            debug2!("Process cache updated (refreshed from system)");
+                            debug3!("Process cache updated (refreshed from system)");
                         }
                         
                         processes
@@ -1435,7 +1435,7 @@ pub fn get_cpu_details() -> CpuDetails {
         },
         Err(_) => {
             // Lock is held - return defaults immediately, don't retry
-            debug1!("WARNING: SYSTEM mutex locked in get_cpu_details, returning defaults immediately");
+            debug3!("WARNING: SYSTEM mutex locked in get_cpu_details, returning defaults immediately");
             write_structured_log("lib.rs:697", "SYSTEM locked, returning defaults", &serde_json::json!({}), "L");
             (0.0, sysinfo::LoadAvg { one: 0.0, five: 0.0, fifteen: 0.0 }, 0, Vec::new())
         }
@@ -1514,25 +1514,25 @@ pub fn get_cpu_details() -> CpuDetails {
                     let age_secs = timestamp.elapsed().as_secs();
                     if age_secs < 35 {
                         if freq_logging {
-                            debug1!("P-core frequency from cache: {:.2} GHz (age: {}s)", *freq, age_secs);
+                            debug3!("P-core frequency from cache: {:.2} GHz (age: {}s)", *freq, age_secs);
                         }
                         *freq
                     } else {
                         if freq_logging {
-                            debug1!("P-core frequency cache is stale ({}s old), falling back to nominal", age_secs);
+                            debug3!("P-core frequency cache is stale ({}s old), falling back to nominal", age_secs);
                         }
                         get_nominal_frequency() // Fallback to nominal if stale
                     }
                 } else {
                     if freq_logging {
-                        debug1!("P-core frequency cache is empty, falling back to nominal");
+                        debug3!("P-core frequency cache is empty, falling back to nominal");
                     }
                     get_nominal_frequency()
                 }
             },
             Err(_) => {
                 if freq_logging {
-                    debug1!("P-core frequency cache is locked, falling back to nominal");
+                    debug3!("P-core frequency cache is locked, falling back to nominal");
                 }
                 get_nominal_frequency()
             },
@@ -1544,25 +1544,25 @@ pub fn get_cpu_details() -> CpuDetails {
                     let age_secs = timestamp.elapsed().as_secs();
                     if age_secs < 35 {
                         if freq_logging {
-                            debug1!("E-core frequency from cache: {:.2} GHz (age: {}s)", *freq, age_secs);
+                            debug3!("E-core frequency from cache: {:.2} GHz (age: {}s)", *freq, age_secs);
                         }
                         *freq
                     } else {
                         if freq_logging {
-                            debug1!("E-core frequency cache is stale ({}s old), falling back to nominal", age_secs);
+                            debug3!("E-core frequency cache is stale ({}s old), falling back to nominal", age_secs);
                         }
                         get_nominal_frequency() // Fallback to nominal if stale
                     }
                 } else {
                     if freq_logging {
-                        debug1!("E-core frequency cache is empty, falling back to nominal");
+                        debug3!("E-core frequency cache is empty, falling back to nominal");
                     }
                     get_nominal_frequency()
                 }
             },
             Err(_) => {
                 if freq_logging {
-                    debug1!("E-core frequency cache is locked, falling back to nominal");
+                    debug3!("E-core frequency cache is locked, falling back to nominal");
                 }
                 get_nominal_frequency()
             },
@@ -1587,10 +1587,10 @@ pub fn get_cpu_details() -> CpuDetails {
         .unwrap_or(false);
     
     if power_logging {
-        debug1!("get_cpu_details returning: temperature={:.1}°C, frequency={:.2} GHz, cpu_power={:.2}W, gpu_power={:.2}W, battery={:.1}%, charging={}, has_battery={}", 
+        debug3!("get_cpu_details returning: temperature={:.1}°C, frequency={:.2} GHz, cpu_power={:.2}W, gpu_power={:.2}W, battery={:.1}%, charging={}, has_battery={}", 
             temperature, frequency, cpu_power, gpu_power, battery_level, is_charging, has_battery);
     } else {
-        debug2!("get_cpu_details returning: temperature={:.1}°C, frequency={:.2} GHz, can_read_temperature={}, can_read_frequency={}", temperature, frequency, can_read_temperature, can_read_frequency);
+        debug3!("get_cpu_details returning: temperature={:.1}°C, frequency={:.2} GHz, can_read_temperature={}, can_read_frequency={}", temperature, frequency, can_read_temperature, can_read_frequency);
     }
     
     CpuDetails {
@@ -1622,7 +1622,7 @@ pub fn get_cpu_details() -> CpuDetails {
 pub fn get_process_details(pid: u32) -> Result<ProcessDetails, String> {
     use sysinfo::Pid;
     
-    debug2!("get_process_details() called for PID: {}", pid);
+    debug3!("get_process_details() called for PID: {}", pid);
     
     // CRITICAL: Only refresh processes if CPU window is visible (saves CPU)
     // Process details modal is part of the CPU window, so check window visibility
@@ -1710,7 +1710,7 @@ pub fn get_process_details(pid: u32) -> Result<ProcessDetails, String> {
                     total_cpu_time,
                 };
                 
-                debug2!("Process details retrieved for PID {}: {}", pid, details.name);
+                debug3!("Process details retrieved for PID {}: {}", pid, details.name);
                 Ok(details)
             } else {
                 Err(format!("Process with PID {} not found", pid))
@@ -1744,7 +1744,7 @@ fn get_username_from_uid(uid: u32) -> Option<String> {
 /// Force quit a process by PID
 #[tauri::command]
 pub fn force_quit_process(pid: u32) -> Result<(), String> {
-    debug2!("force_quit_process() called for PID: {}", pid);
+    debug3!("force_quit_process() called for PID: {}", pid);
 
     // Use kill -9 to force quit the process
     let output = Command::new("kill")
@@ -1755,16 +1755,16 @@ pub fn force_quit_process(pid: u32) -> Result<(), String> {
     match output {
         Ok(result) => {
             if result.status.success() {
-                debug1!("Successfully force quit process PID: {}", pid);
+                debug3!("Successfully force quit process PID: {}", pid);
                 Ok(())
             } else {
                 let error_msg = String::from_utf8_lossy(&result.stderr);
-                debug1!("Failed to force quit process PID {}: {}", pid, error_msg);
+                debug3!("Failed to force quit process PID {}: {}", pid, error_msg);
                 Err(format!("Failed to force quit process: {}", error_msg))
             }
         },
         Err(e) => {
-            debug1!("Error executing kill command for PID {}: {}", pid, e);
+            debug3!("Error executing kill command for PID {}: {}", pid, e);
             Err(format!("Failed to execute kill command: {}", e))
         }
     }
@@ -1783,7 +1783,7 @@ pub fn get_metrics_history(
     time_range_seconds: u64,
     max_display_points: Option<usize>,
 ) -> Result<history::HistoryQueryResult, String> {
-    debug2!("get_metrics_history() called with time_range_seconds={}, max_display_points={:?}",
+    debug3!("get_metrics_history() called with time_range_seconds={}, max_display_points={:?}",
         time_range_seconds, max_display_points);
 
     // Try to get history buffer with non-blocking lock
@@ -1797,7 +1797,7 @@ pub fn get_metrics_history(
                     .map(|d| d.as_secs() as i64)
                     .unwrap_or(0);
 
-                debug1!("get_metrics_history: returning {} points, oldest_ts={:?}, newest_ts={}",
+                debug3!("get_metrics_history: returning {} points, oldest_ts={:?}, newest_ts={}",
                     points.len(), oldest, now);
 
                 Ok(history::HistoryQueryResult {
@@ -1807,7 +1807,7 @@ pub fn get_metrics_history(
                     newest_available_timestamp: Some(now),
                 })
             } else {
-                debug2!("get_metrics_history: history buffer not initialized yet");
+                debug3!("get_metrics_history: history buffer not initialized yet");
                 Ok(history::HistoryQueryResult {
                     points: Vec::new(),
                     time_range_seconds,
@@ -1817,7 +1817,7 @@ pub fn get_metrics_history(
             }
         },
         Err(e) => {
-            debug1!("get_metrics_history: lock contention - {}", e);
+            debug3!("get_metrics_history: lock contention - {}", e);
             Err("History buffer temporarily unavailable".to_string())
         }
     }

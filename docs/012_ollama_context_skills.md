@@ -63,4 +63,5 @@ This document describes how mac-stats uses **per-model context window size**, **
 
 - **All agents overview:** `docs/100_all_agents.md`
 - **Discord agent:** `docs/007_discord_agent.md`
+- **Ollama API (list, version, pull, delete, embeddings, load/unload):** `docs/015_ollama_api.md`
 - **Code:** `src-tauri/src/ollama/mod.rs` (ModelInfo, ChatOptions, get_model_info), `src-tauri/src/commands/ollama.rs` (answer_with_ollama_and_fetch, reduce_fetched_content_to_fit, send_ollama_chat_messages), `src-tauri/src/discord/mod.rs` (parse_discord_ollama_overrides), `src-tauri/src/skills.rs` (load_skills, find_skill_by_number_or_topic), `src-tauri/src/config/mod.rs` (skills_dir).
