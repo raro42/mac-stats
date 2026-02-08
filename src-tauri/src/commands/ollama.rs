@@ -1,6 +1,9 @@
 //! Ollama Tauri commands
 
-use crate::ollama::{OllamaClient, OllamaConfig, ChatMessage};
+use crate::ollama::{
+    ChatMessage, EmbedInput, EmbedResponse, ListResponse, OllamaClient, OllamaConfig,
+    PsResponse, VersionResponse,
+};
 use serde::{Deserialize, Serialize};
 use std::io::Write;
 use std::path::PathBuf;
@@ -350,6 +353,11 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
         num
     ));
     num += 1;
+    base.push_str(&format!(
+        "\n\n{}. **OLLAMA_API** (Ollama model management): List models (with details), get server version, list running models, pull/delete/load/unload models, generate embeddings. Use when the user asks what models are installed, to pull or delete a model, to free memory (unload), or to get embeddings for text. To invoke: reply with exactly one line: OLLAMA_API: <action> [args]. Actions: list_models (no args), version (no args), running (no args), pull <model> [stream true|false], delete <model>, embed <model> <text>, load <model> [keep_alive e.g. 5m], unload <model>. Results are returned as JSON or text.",
+        num
+    ));
+    num += 1;
     if crate::commands::python_agent::is_python_script_allowed() {
         base.push_str(&format!(
             "\n\n{}. **PYTHON_SCRIPT**: Run Python code. Reply with exactly one line: PYTHON_SCRIPT: <id> <topic>, then put the Python code on the following lines or inside a ```python ... ``` block. The app writes ~/.mac-stats/scripts/python-script-<id>-<topic>.py, runs it with python3, and returns stdout (or error). Use for data processing, calculations, or local scripts.",
@@ -561,11 +569,33 @@ pub async fn answer_with_ollama_and_fetch(
     info!("Agent router: agent list built ({} chars)", agent_descriptions.len());
 
     let discord_user_context = match (discord_user_id, &discord_user_name) {
-        (Some(id), Some(name)) if !name.is_empty() => {
-            format!(
-                "You are talking to Discord user **{}** (user id: {}). Use this when addressing the user or when calling Discord API with this user.\n\n",
-                name, id
-            )
+        (Some(id), name_opt) => {
+            let name = name_opt.as_deref().unwrap_or("").to_string();
+            let stored = crate::user_info::get_user_details(id);
+            let display_name = stored
+                .as_ref()
+                .and_then(|d| d.display_name.as_deref())
+                .filter(|s| !s.is_empty())
+                .unwrap_or(name.as_str());
+            let mut ctx = if !display_name.is_empty() {
+                format!(
+                    "You are talking to Discord user **{}** (user id: {}). Use this when addressing the user or when calling Discord API with this user.",
+                    display_name, id
+                )
+            } else {
+                format!(
+                    "You are talking to Discord user (user id: {}). Use this when calling Discord API with this user.",
+                    id
+                )
+            };
+            if let Some(ref details) = stored {
+                let extra = crate::user_info::format_user_details_for_context(details);
+                if !extra.is_empty() {
+                    ctx.push_str(&format!("\nUser details: {}.", extra));
+                }
+            }
+            ctx.push_str("\n\n");
+            ctx
         }
         _ => String::new(),
     };
@@ -600,7 +630,7 @@ pub async fn answer_with_ollama_and_fetch(
 
     // --- Execution: system prompt with agents + plan, then tool loop ---
     info!("Agent router: execution step — sending plan + question, starting tool loop (max 5 tools)");
-    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or RUN_CMD: <command and args> or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. Then continue with your answer. Answer concisely.";
+    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or RUN_CMD: <command and args> or OLLAMA_API: <action> [args] (list_models, version, running, pull/delete/load/unload, embed) or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. Then continue with your answer. Answer concisely.";
     let execution_system_content = match &skill_content {
         Some(skill) => format!(
             "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}\n\nYour plan: {}",
@@ -745,6 +775,7 @@ pub async fn answer_with_ollama_and_fetch(
                 let skills = crate::skills::load_skills();
                 match crate::skills::find_skill_by_number_or_topic(&skills, selector) {
                     Some(skill) => {
+                        send_status(&format!("Using skill {}-{}…", skill.number, skill.topic));
                         info!(
                             "Agent router: using skill {} ({}) — new session (no main context)",
                             skill.number, skill.topic
@@ -880,7 +911,6 @@ pub async fn answer_with_ollama_and_fetch(
                 }
             }
             "DISCORD_API" => {
-                send_status("Calling Discord API…");
                 let arg = arg.trim();
                 let (method, rest) = match arg.find(' ') {
                     Some(i) => (arg[..i].trim().to_string(), arg[i..].trim()),
@@ -895,6 +925,9 @@ pub async fn answer_with_ollama_and_fetch(
                 if path.is_empty() {
                     "DISCORD_API requires: DISCORD_API: <METHOD> <path> or DISCORD_API: POST <path> {\"content\":\"...\"}.".to_string()
                 } else {
+                    let status_msg = format!("Calling Discord API: {} {}", method, path);
+                    send_status(&status_msg);
+                    info!("Discord API: {} {}", method, path);
                     match crate::discord::api::discord_api_request(&method, &path, body.as_deref()).await {
                         Ok(result) => format!(
                             "Discord API result:\n\n{}\n\nUse this to answer the user's question.",
@@ -902,6 +935,81 @@ pub async fn answer_with_ollama_and_fetch(
                         ),
                         Err(e) => format!("Discord API failed: {}. Answer without this result.", e),
                     }
+                }
+            }
+            "OLLAMA_API" => {
+                let arg = arg.trim();
+                let (action, rest) = match arg.find(' ') {
+                    Some(i) => (arg[..i].trim().to_lowercase(), arg[i..].trim()),
+                    None => (arg.to_lowercase(), ""),
+                };
+                let status_detail = if rest.is_empty() {
+                    format!("Ollama API: {}…", action)
+                } else {
+                    let preview: String = rest.chars().take(40).collect();
+                    format!("Ollama API: {} {}…", action, preview)
+                };
+                send_status(&status_detail);
+                info!("Agent router: OLLAMA_API requested: action={}, rest={} chars", action, rest.chars().count());
+                let result = match action.as_str() {
+                    "list_models" => {
+                        list_ollama_models_full().await.map(|r| serde_json::to_string_pretty(&r).unwrap_or_else(|_| "[]".to_string())).map_err(|e| e)
+                    }
+                    "version" => get_ollama_version().await.map(|r| r.version).map_err(|e| e),
+                    "running" => {
+                        list_ollama_running_models().await.map(|r| serde_json::to_string_pretty(&r).unwrap_or_else(|_| "[]".to_string())).map_err(|e| e)
+                    }
+                    "pull" => {
+                        let parts: Vec<&str> = rest.split_whitespace().collect();
+                        let model = parts.first().map(|s| (*s).to_string()).unwrap_or_default();
+                        let stream = parts.get(1).map(|s| *s == "true").unwrap_or(true);
+                        if model.is_empty() {
+                            Err("OLLAMA_API pull requires a model name.".to_string())
+                        } else {
+                            pull_ollama_model(model, stream).await.map(|_| "Pull completed.".to_string())
+                        }
+                    }
+                    "delete" => {
+                        let model = rest.to_string();
+                        if model.is_empty() {
+                            Err("OLLAMA_API delete requires a model name.".to_string())
+                        } else {
+                            delete_ollama_model(model).await.map(|_| "Model deleted.".to_string())
+                        }
+                    }
+                    "embed" => {
+                        let parts: Vec<&str> = rest.splitn(2, ' ').map(str::trim).collect();
+                        if parts.len() < 2 || parts[1].is_empty() {
+                            Err("OLLAMA_API embed requires: embed <model> <text>.".to_string())
+                        } else {
+                            let model = parts[0].to_string();
+                            let input = serde_json::Value::String(parts[1].to_string());
+                            ollama_embeddings(model, input, None).await.map(|r| serde_json::to_string_pretty(&r).unwrap_or_else(|_| "{}".to_string())).map_err(|e| e)
+                        }
+                    }
+                    "load" => {
+                        let parts: Vec<&str> = rest.splitn(2, char::is_whitespace).map(str::trim).collect();
+                        let model = parts.first().map(|s| (*s).to_string()).unwrap_or_default();
+                        let keep_alive = parts.get(1).filter(|s| !s.is_empty()).map(|s| (*s).to_string());
+                        if model.is_empty() {
+                            Err("OLLAMA_API load requires a model name.".to_string())
+                        } else {
+                            load_ollama_model(model, keep_alive).await.map(|_| "Model loaded.".to_string())
+                        }
+                    }
+                    "unload" => {
+                        let model = rest.to_string();
+                        if model.is_empty() {
+                            Err("OLLAMA_API unload requires a model name.".to_string())
+                        } else {
+                            unload_ollama_model(model).await.map(|_| "Model unloaded.".to_string())
+                        }
+                    }
+                    _ => Err(format!("Unknown OLLAMA_API action: {}. Use list_models, version, running, pull, delete, embed, load, or unload.", action)),
+                };
+                match result {
+                    Ok(msg) => format!("Ollama API result:\n\n{}\n\nUse this to answer the user's question.", msg),
+                    Err(e) => format!("OLLAMA_API failed: {}. Answer without this result.", e),
                 }
             }
             "TASK_APPEND" => {
@@ -1137,7 +1245,7 @@ fn parse_schedule_arg(arg: &str) -> Result<(String, String), String> {
 /// Also accepts lines starting with "RECOMMEND: " (e.g. "RECOMMEND: SCHEDULER: Every 5 minutes...").
 /// Returns (tool_name, argument) or None.
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:"];
     for line in content.lines() {
         let line = line.trim();
         // Ollama sometimes echoes the plan format: "RECOMMEND: RUN_JS: ..." or "RECOMMEND: SCHEDULER: ...".
@@ -1177,7 +1285,7 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
 /// Tool line prefixes that indicate start of another tool (used to stop script body extraction).
 const TOOL_LINE_PREFIXES: &[&str] = &[
     "FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:",
-    "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:",
+    "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:",
 ];
 
 /// Parse PYTHON_SCRIPT from full response: (id, topic, script_body).
@@ -1324,6 +1432,149 @@ pub async fn list_ollama_models() -> Result<Vec<String>, String> {
 
     info!("Ollama: Extracted {} models from response", models.len());
     Ok(models)
+}
+
+/// List available Ollama models with full details (GET /api/tags).
+#[tauri::command]
+pub async fn list_ollama_models_full() -> Result<ListResponse, String> {
+    let config = {
+        let guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
+        let client = guard.as_ref().ok_or_else(|| "Ollama not configured".to_string())?;
+        client.config.clone()
+    };
+    let client = OllamaClient::new(config).map_err(|e| e.to_string())?;
+    client
+        .list_models_full()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get Ollama server version (GET /api/version).
+#[tauri::command]
+pub async fn get_ollama_version() -> Result<VersionResponse, String> {
+    let config = {
+        let guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
+        let client = guard.as_ref().ok_or_else(|| "Ollama not configured".to_string())?;
+        client.config.clone()
+    };
+    let client = OllamaClient::new(config).map_err(|e| e.to_string())?;
+    client.get_version().await.map_err(|e| e.to_string())
+}
+
+/// List models currently loaded in memory (GET /api/ps).
+#[tauri::command]
+pub async fn list_ollama_running_models() -> Result<PsResponse, String> {
+    let config = {
+        let guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
+        let client = guard.as_ref().ok_or_else(|| "Ollama not configured".to_string())?;
+        client.config.clone()
+    };
+    let client = OllamaClient::new(config).map_err(|e| e.to_string())?;
+    client
+        .list_running_models()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Pull (download or update) a model (POST /api/pull).
+#[tauri::command]
+pub async fn pull_ollama_model(model: String, stream: bool) -> Result<(), String> {
+    let config = {
+        let guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
+        let client = guard.as_ref().ok_or_else(|| "Ollama not configured".to_string())?;
+        client.config.clone()
+    };
+    let client = OllamaClient::new(config).map_err(|e| e.to_string())?;
+    client
+        .pull_model(&model, stream)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Delete a model from disk (DELETE /api/delete).
+#[tauri::command]
+pub async fn delete_ollama_model(model: String) -> Result<(), String> {
+    let config = {
+        let guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
+        let client = guard.as_ref().ok_or_else(|| "Ollama not configured".to_string())?;
+        client.config.clone()
+    };
+    let client = OllamaClient::new(config).map_err(|e| e.to_string())?;
+    client
+        .delete_model(&model)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Generate embeddings (POST /api/embed). Input can be a single string or array of strings.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct OllamaEmbedOptions {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub truncate: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dimensions: Option<u32>,
+}
+
+#[tauri::command]
+pub async fn ollama_embeddings(
+    model: String,
+    input: serde_json::Value,
+    options: Option<OllamaEmbedOptions>,
+) -> Result<EmbedResponse, String> {
+    let embed_input = match input {
+        serde_json::Value::String(s) => EmbedInput::Single(s),
+        serde_json::Value::Array(arr) => {
+            let strings: Vec<String> = arr
+                .into_iter()
+                .filter_map(|v| v.as_str().map(String::from))
+                .collect();
+            EmbedInput::Multiple(strings)
+        }
+        _ => return Err("input must be a string or array of strings".to_string()),
+    };
+    let (truncate, dimensions) = options
+        .map(|o| (o.truncate, o.dimensions))
+        .unwrap_or((None, None));
+    let config = {
+        let guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
+        let client = guard.as_ref().ok_or_else(|| "Ollama not configured".to_string())?;
+        client.config.clone()
+    };
+    let client = OllamaClient::new(config).map_err(|e| e.to_string())?;
+    client
+        .generate_embeddings(&model, embed_input, truncate, dimensions)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Unload a model from memory (keep_alive: 0).
+#[tauri::command]
+pub async fn unload_ollama_model(model: String) -> Result<(), String> {
+    let config = {
+        let guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
+        let client = guard.as_ref().ok_or_else(|| "Ollama not configured".to_string())?;
+        client.config.clone()
+    };
+    let client = OllamaClient::new(config).map_err(|e| e.to_string())?;
+    client
+        .unload_model(&model)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Load (warm) a model into memory. Optional keep_alive e.g. "5m".
+#[tauri::command]
+pub async fn load_ollama_model(model: String, keep_alive: Option<String>) -> Result<(), String> {
+    let config = {
+        let guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
+        let client = guard.as_ref().ok_or_else(|| "Ollama not configured".to_string())?;
+        client.config.clone()
+    };
+    let client = OllamaClient::new(config).map_err(|e| e.to_string())?;
+    client
+        .load_model(&model, keep_alive.as_deref())
+        .await
+        .map_err(|e| e.to_string())
 }
 
 #[derive(Debug, Serialize, Deserialize)]

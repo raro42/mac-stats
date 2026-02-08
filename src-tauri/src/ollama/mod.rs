@@ -86,6 +86,127 @@ pub struct ChatResponse {
     pub done: bool,
 }
 
+// --- GET /api/tags (list models with details) ---
+
+/// Details sub-object for a model in the tags list.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ModelDetails {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub format: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub family: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub families: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parameter_size: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quantization_level: Option<String>,
+}
+
+/// Single model entry from GET /api/tags.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ModelSummary {
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub modified_at: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub digest: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<ModelDetails>,
+}
+
+/// Response from GET /api/tags.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ListResponse {
+    #[serde(default)]
+    pub models: Vec<ModelSummary>,
+}
+
+// --- GET /api/version ---
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VersionResponse {
+    pub version: String,
+}
+
+// --- GET /api/ps (list running models) ---
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct PsModelDetails {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_model: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub format: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub family: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub families: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parameter_size: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quantization_level: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PsModel {
+    pub model: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub digest: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<PsModelDetails>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expires_at: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size_vram: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub context_length: Option<u32>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PsResponse {
+    #[serde(default)]
+    pub models: Vec<PsModel>,
+}
+
+// --- POST /api/embed ---
+
+/// Input for embeddings: single string or list of strings.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum EmbedInput {
+    Single(String),
+    Multiple(Vec<String>),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EmbedRequest {
+    pub model: String,
+    pub input: EmbedInput,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub truncate: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dimensions: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub keep_alive: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EmbedResponse {
+    pub model: String,
+    #[serde(default)]
+    pub embeddings: Vec<Vec<f64>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_duration: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub load_duration: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub prompt_eval_count: Option<u32>,
+}
+
 /// Model metadata from POST /api/show (context size for prompt fitting).
 #[derive(Debug, Clone)]
 pub struct ModelInfo {
@@ -308,48 +429,223 @@ impl OllamaClient {
         Ok(response)
     }
 
-    /// List available models (async, non-blocking)
+    /// List available models (names only). Backward-compatible wrapper around list_models_full.
     #[allow(dead_code)] // May be used in future or via direct client access
     pub async fn list_models(&self) -> Result<Vec<String>> {
-        use tracing::{debug, info};
-        
-        let url = format!("{}/api/tags", self.config.endpoint);
-        info!("Ollama: Using endpoint: {}", url);
-        debug!("Ollama: Listing models from {}", url);
-        
-        let mut request = self.client.get(&url);
-        
-        // Add API key if configured
-        if let Ok(Some(api_key)) = self.config.get_api_key() {
-            let masked = security::mask_credential(&api_key);
-            request = request.header("Authorization", format!("Bearer {}", api_key));
-            debug!("Ollama: Using API key for model listing (masked: {})", masked);
-        }
+        let list = self.list_models_full().await?;
+        Ok(list.models.into_iter().map(|m| m.name).collect())
+    }
 
-        let response: serde_json::Value = request
+    /// List available models with full details (GET /api/tags).
+    pub async fn list_models_full(&self) -> Result<ListResponse> {
+        use tracing::{debug, info};
+        let url = format!("{}/api/tags", self.config.endpoint.trim_end_matches('/'));
+        debug!("Ollama: GET {}", url);
+        let mut request = self.client.get(&url);
+        if let Ok(Some(api_key)) = self.config.get_api_key() {
+            request = request.header("Authorization", format!("Bearer {}", api_key));
+            debug!("Ollama: Using API key for tags");
+        }
+        let response = request
             .send()
             .await
-            .context("Failed to request models from Ollama")?
-            .json()
+            .context("Failed to request /api/tags")?
+            .json::<ListResponse>()
             .await
-            .context("Failed to parse models response")?;
-        
-        // Log raw response JSON
-        let response_json = serde_json::to_string_pretty(&response)
-            .unwrap_or_else(|_| "Failed to serialize response".to_string());
-        info!("Ollama: Received models list HTTP response JSON:\n{}", response_json);
-        
-        let models: Vec<String> = response
-            .get("models")
-            .and_then(|m| m.as_array())
-            .map(|arr| {
-                arr.iter()
-                    .filter_map(|m| m.get("name").and_then(|n| n.as_str()).map(|s| s.to_string()))
-                    .collect()
-            })
-            .unwrap_or_default();
-
-        info!("Ollama: Extracted {} models from response", models.len());
-        Ok(models)
+            .context("Failed to parse /api/tags response")?;
+        info!("Ollama: list_models_full returned {} models", response.models.len());
+        Ok(response)
     }
+
+    /// Get Ollama server version (GET /api/version).
+    pub async fn get_version(&self) -> Result<VersionResponse> {
+        use tracing::debug;
+        let url = format!("{}/api/version", self.config.endpoint.trim_end_matches('/'));
+        debug!("Ollama: GET {}", url);
+        let mut request = self.client.get(&url);
+        if let Ok(Some(api_key)) = self.config.get_api_key() {
+            request = request.header("Authorization", format!("Bearer {}", api_key));
+        }
+        let response = request
+            .send()
+            .await
+            .context("Failed to request /api/version")?
+            .json::<VersionResponse>()
+            .await
+            .context("Failed to parse /api/version response")?;
+        Ok(response)
+    }
+
+    /// List models currently loaded in memory (GET /api/ps).
+    pub async fn list_running_models(&self) -> Result<PsResponse> {
+        use tracing::debug;
+        let url = format!("{}/api/ps", self.config.endpoint.trim_end_matches('/'));
+        debug!("Ollama: GET {}", url);
+        let mut request = self.client.get(&url);
+        if let Ok(Some(api_key)) = self.config.get_api_key() {
+            request = request.header("Authorization", format!("Bearer {}", api_key));
+        }
+        let response = request
+            .send()
+            .await
+            .context("Failed to request /api/ps")?
+            .json::<PsResponse>()
+            .await
+            .context("Failed to parse /api/ps response")?;
+        Ok(response)
+    }
+
+    /// Pull (download or update) a model (POST /api/pull). If stream is true, consumes NDJSON and returns the last status.
+    pub async fn pull_model(&self, model: &str, stream: bool) -> Result<()> {
+        use tracing::{debug, info};
+        let url = format!("{}/api/pull", self.config.endpoint.trim_end_matches('/'));
+        let body = serde_json::json!({ "model": model, "stream": stream });
+        debug!("Ollama: POST {} model={} stream={}", url, model, stream);
+        let mut request = self.client.post(&url).json(&body);
+        if let Ok(Some(api_key)) = self.config.get_api_key() {
+            request = request.header("Authorization", format!("Bearer {}", api_key));
+        }
+        let response = request
+            .send()
+            .await
+            .context("Failed to request /api/pull")?;
+        if !response.status().is_success() {
+            let status = response.status();
+            let text = response.text().await.unwrap_or_default();
+            anyhow::bail!("Pull failed: {} {}", status, text);
+        }
+        if stream {
+            let body = response.bytes().await.context("Failed to read pull response body")?;
+            let last_status = parse_pull_ndjson(&body)?;
+            info!("Ollama: pull finished: {}", last_status);
+        }
+        Ok(())
+    }
+
+    /// Delete a model from disk (DELETE /api/delete).
+    pub async fn delete_model(&self, model: &str) -> Result<()> {
+        use tracing::debug;
+        let url = format!("{}/api/delete", self.config.endpoint.trim_end_matches('/'));
+        let body = serde_json::json!({ "model": model });
+        debug!("Ollama: DELETE {} model={}", url, model);
+        let mut request = self.client.delete(&url).json(&body);
+        if let Ok(Some(api_key)) = self.config.get_api_key() {
+            request = request.header("Authorization", format!("Bearer {}", api_key));
+        }
+        let response = request
+            .send()
+            .await
+            .context("Failed to request /api/delete")?;
+        if !response.status().is_success() {
+            let status = response.status();
+            let text = response.text().await.unwrap_or_default();
+            anyhow::bail!("Delete failed: {} {}", status, text);
+        }
+        Ok(())
+    }
+
+    /// Generate embeddings (POST /api/embed).
+    pub async fn generate_embeddings(
+        &self,
+        model: &str,
+        input: EmbedInput,
+        truncate: Option<bool>,
+        dimensions: Option<u32>,
+    ) -> Result<EmbedResponse> {
+        use tracing::debug;
+        let url = format!("{}/api/embed", self.config.endpoint.trim_end_matches('/'));
+        let req = EmbedRequest {
+            model: model.to_string(),
+            input,
+            truncate,
+            dimensions,
+            keep_alive: None,
+        };
+        debug!("Ollama: POST {} model={}", url, model);
+        let mut request = self.client.post(&url).json(&req);
+        if let Ok(Some(api_key)) = self.config.get_api_key() {
+            request = request.header("Authorization", format!("Bearer {}", api_key));
+        }
+        let response = request
+            .send()
+            .await
+            .context("Failed to request /api/embed")?
+            .json::<EmbedResponse>()
+            .await
+            .context("Failed to parse /api/embed response")?;
+        Ok(response)
+    }
+
+    /// Unload a model from memory by sending keep_alive: 0 (POST /api/chat with empty messages).
+    pub async fn unload_model(&self, model: &str) -> Result<()> {
+        use tracing::debug;
+        let url = format!("{}/api/chat", self.config.endpoint.trim_end_matches('/'));
+        let body = serde_json::json!({
+            "model": model,
+            "messages": [],
+            "stream": false,
+            "keep_alive": 0
+        });
+        debug!("Ollama: POST {} unload model={}", url, model);
+        let mut request = self.client.post(&url).json(&body);
+        if let Ok(Some(api_key)) = self.config.get_api_key() {
+            request = request.header("Authorization", format!("Bearer {}", api_key));
+        }
+        let response = request
+            .send()
+            .await
+            .context("Failed to send unload request")?;
+        if !response.status().is_success() {
+            let status = response.status();
+            let text = response.text().await.unwrap_or_default();
+            anyhow::bail!("Unload failed: {} {}", status, text);
+        }
+        Ok(())
+    }
+
+    /// Load (warm) a model into memory with optional keep_alive (e.g. "5m"). Uses POST /api/generate with a minimal prompt.
+    pub async fn load_model(&self, model: &str, keep_alive: Option<&str>) -> Result<()> {
+        use tracing::debug;
+        let url = format!("{}/api/generate", self.config.endpoint.trim_end_matches('/'));
+        let mut body = serde_json::json!({
+            "model": model,
+            "prompt": "",
+            "stream": false
+        });
+        if let Some(ka) = keep_alive {
+            body["keep_alive"] = serde_json::Value::String(ka.to_string());
+        }
+        debug!("Ollama: POST {} load model={} keep_alive={:?}", url, model, keep_alive);
+        let mut request = self.client.post(&url).json(&body);
+        if let Ok(Some(api_key)) = self.config.get_api_key() {
+            request = request.header("Authorization", format!("Bearer {}", api_key));
+        }
+        let response = request
+            .send()
+            .await
+            .context("Failed to send load request")?;
+        if !response.status().is_success() {
+            let status = response.status();
+            let text = response.text().await.unwrap_or_default();
+            anyhow::bail!("Load failed: {} {}", status, text);
+        }
+        Ok(())
+    }
+}
+
+/// Parse NDJSON from /api/pull response and return the last "status" value.
+fn parse_pull_ndjson(body: &[u8]) -> Result<String> {
+    let mut last = "unknown".to_string();
+    for line in body.split(|&b| b == b'\n') {
+        let line = std::str::from_utf8(line).unwrap_or("").trim();
+        if line.is_empty() {
+            continue;
+        }
+        if let Ok(v) = serde_json::from_str::<serde_json::Value>(line) {
+            if let Some(s) = v.get("status").and_then(|x| x.as_str()) {
+                last = s.to_string();
+            }
+        }
+    }
+    Ok(last)
 }
