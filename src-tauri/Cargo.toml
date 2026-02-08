@@ -1,6 +1,6 @@
 [package]
 name = "mac_stats"
-version = "0.1.10"
+version = "0.1.11"
 description = "A lightweight macOS system monitoring app with menu bar integration, real-time metrics (CPU/GPU/RAM/disk), website monitoring, AI chat integration, and alert system. Built with Rust and Tauri for minimal CPU overhead."
 authors = ["raro42"]
 edition = "2021"
