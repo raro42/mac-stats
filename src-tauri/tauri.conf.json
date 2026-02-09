@@ -1,42 +1,41 @@
 {
-  "package": {
-    "productName": "mac-stats",
-    "version": "0.1.8"
-  },
-  "tauri": {
-    "bundle": {
-      "active": true,
-      "targets": "dmg",
-      "identifier": "com.raro42.mac-stats",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "resources": [
-        "dist/assets/ollama.svg",
-        "dist/assets/javascript.svg",
-        "dist/assets/tauri.svg"
-      ]
+    "package": {
+        "productName": "mac-stats"
     },
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "open": true
-      }
+    "tauri": {
+        "bundle": {
+            "active": true,
+            "targets": "dmg",
+            "identifier": "com.raro42.mac-stats",
+            "icon": [
+                "icons/32x32.png",
+                "icons/128x128.png",
+                "icons/128x128@2x.png",
+                "icons/icon.icns",
+                "icons/icon.ico"
+            ],
+            "resources": [
+                "dist/assets/ollama.svg",
+                "dist/assets/javascript.svg",
+                "dist/assets/tauri.svg"
+            ]
+        },
+        "allowlist": {
+            "all": false,
+            "shell": {
+                "open": true
+            }
+        },
+        "windows": [
+            {
+                "title": "mac-stats",
+                "width": 300,
+                "height": 100,
+                "visible": false
+            }
+        ]
     },
-    "windows": [
-      {
-        "title": "mac-stats",
-        "width": 300,
-        "height": 100,
-        "visible": false
-      }
-    ]
-  },
-  "build": {
-    "distDir": "./dist"
-  }
+    "build": {
+        "distDir": "./dist"
+    }
 }
