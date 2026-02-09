@@ -19,8 +19,41 @@ use std::sync::{Arc, Mutex, OnceLock};
 use tokio::sync::mpsc;
 use tracing::{debug, error, info};
 
-/// Parse leading "model: ...", "temperature: ...", "num_ctx: ...", "skill: ..." from a Discord message.
-/// Returns (rest of message as question, model_override, options_override, skill_content).
+/// Discord API limit for message content (characters). Messages longer than this must be split.
+/// See https://discord.com/developers/docs/resources/channel#create-message: content max 2000.
+const DISCORD_MESSAGE_MAX_CHARS: usize = 2000;
+
+/// Split text into chunks of at most DISCORD_MESSAGE_MAX_CHARS. Prefer splitting at newlines.
+fn split_message_for_discord(text: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut remaining = text.to_string();
+    while !remaining.is_empty() {
+        let nchars = remaining.chars().count();
+        if nchars <= DISCORD_MESSAGE_MAX_CHARS {
+            out.push(remaining.clone());
+            break;
+        }
+        let byte_pos = remaining
+            .char_indices()
+            .take(DISCORD_MESSAGE_MAX_CHARS)
+            .last()
+            .map(|(i, c)| i + c.len_utf8())
+            .unwrap_or(0);
+        let (head, tail) = remaining.split_at(byte_pos);
+        let split_at = head.rfind('\n').map(|i| i + 1).unwrap_or(byte_pos);
+        let (chunk, put_back) = if split_at > 0 && split_at < byte_pos {
+            (head[..split_at].to_string(), format!("{}{}", &head[split_at..], tail))
+        } else {
+            (head.to_string(), tail.to_string())
+        };
+        out.push(chunk);
+        remaining = put_back;
+    }
+    out
+}
+
+/// Parse leading "model: ...", "temperature: ...", "num_ctx: ...", "skill: ...", "agent: ..." from a Discord message.
+/// Returns (rest of message as question, model_override, options_override, skill_content, agent_selector).
 fn parse_discord_ollama_overrides(
     content: &str,
 ) -> (
@@ -28,11 +61,13 @@ fn parse_discord_ollama_overrides(
     Option<String>,
     Option<crate::ollama::ChatOptions>,
     Option<String>,
+    Option<String>,
 ) {
     let mut model_override: Option<String> = None;
     let mut temperature: Option<f32> = None;
     let mut num_ctx: Option<u32> = None;
     let mut skill_selector: Option<String> = None;
+    let mut agent_selector: Option<String> = None;
     let lines: Vec<&str> = content.lines().collect();
     let mut consumed = 0;
 
@@ -65,6 +100,18 @@ fn parse_discord_ollama_overrides(
             let v = line["skill=".len()..].trim().to_string();
             if !v.is_empty() {
                 skill_selector = Some(v);
+            }
+            consumed += 1;
+        } else if lower.starts_with("agent:") {
+            let v = line["agent:".len()..].trim().to_string();
+            if !v.is_empty() {
+                agent_selector = Some(v);
+            }
+            consumed += 1;
+        } else if lower.starts_with("agent=") {
+            let v = line["agent=".len()..].trim().to_string();
+            if !v.is_empty() {
+                agent_selector = Some(v);
             }
             consumed += 1;
         } else if lower.starts_with("temperature:") {
@@ -122,7 +169,7 @@ fn parse_discord_ollama_overrides(
         let skills = crate::skills::load_skills();
         crate::skills::find_skill_by_number_or_topic(&skills, &sel).map(|s| s.content.clone())
     });
-    (question, model_override, options_override, skill_content)
+    (question, model_override, options_override, skill_content, agent_selector)
 }
 
 /// True if we already spawned the gateway thread (only one gateway per process).
@@ -193,8 +240,12 @@ impl EventHandler for Handler {
             return;
         }
 
-        let (question, model_override, options_override, skill_content) =
+        let (question, model_override, options_override, skill_content, agent_selector) =
             parse_discord_ollama_overrides(content);
+        let agent_override = agent_selector.and_then(|sel| {
+            let agents = crate::agents::load_agents();
+            crate::agents::find_agent_by_id_or_name(&agents, &sel).cloned()
+        });
 
         info!(
             "Discord: {} from {} (channel {})",
@@ -246,6 +297,7 @@ impl EventHandler for Handler {
             model_override,
             options_override,
             skill_content,
+            agent_override,
             true,
         ).await {
             Ok(r) => r,
@@ -269,8 +321,15 @@ impl EventHandler for Handler {
             info!("Discord←Ollama: received ({} chars, first {}): {}... [truncated]", nchars, RECV_LOG_MAX, head);
         }
 
-        if let Err(e) = new_message.channel_id.say(&ctx, &reply).await {
-            error!("Discord: Failed to send reply: {}", e);
+        let chunks = split_message_for_discord(&reply);
+        for (i, chunk) in chunks.iter().enumerate() {
+            if let Err(e) = new_message.channel_id.say(&ctx, chunk).await {
+                error!("Discord: Failed to send reply (part {}/{}): {}", i + 1, chunks.len(), e);
+                break;
+            }
+            if chunks.len() > 1 && i < chunks.len() - 1 {
+                tokio::time::sleep(tokio::time::Duration::from_millis(300)).await;
+            }
         }
 
         // Short-term memory: add assistant reply (user was added when request received); persist when > 3 messages

@@ -203,6 +203,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::ollama::log_ollama_js_no_blocks,
             commands::ollama::ollama_chat_with_execution,
             commands::ollama::ollama_chat_continue_with_result,
+            commands::ollama::get_default_ollama_system_prompt,
             // Browser / fetch for Ollama
             commands::browser::fetch_page,
             // Discord commands
@@ -210,6 +211,17 @@ fn run_internal(open_cpu_window: bool) {
             commands::discord::is_discord_configured,
             // Logging commands
             commands::logging::log_from_js,
+            // Agent commands
+            commands::agents::list_agents,
+            commands::agents::get_agent_details,
+            commands::agents::update_agent_skill,
+            commands::agents::update_agent_soul,
+            commands::agents::update_agent_mood,
+            commands::agents::update_agent_config,
+            commands::agents::create_agent,
+            commands::agents::delete_agent,
+            commands::agents::disable_agent,
+            commands::agents::enable_agent,
         ])
         .setup(move |app| {
             // Load persistent monitors on startup
@@ -295,6 +307,9 @@ fn run_internal(open_cpu_window: bool) {
 
             // Start task review: every 10 min, close WIP tasks older than 30 min as unsuccessful, work on one open task.
             task::review::spawn_review_thread();
+
+            // Watch agent and skills directories so file edits are picked up (emit events for frontend).
+            agents::watch::spawn_agents_and_skills_watcher();
 
             // Ensure Ollama agent is ready at startup (default endpoint) so Discord, scheduler, and CPU window
             // can use it without requiring the user to open the CPU window first.

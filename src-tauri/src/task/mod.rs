@@ -453,6 +453,27 @@ pub fn list_open_and_wip_tasks() -> Result<Vec<(PathBuf, String, SystemTime)>, S
     Ok(out)
 }
 
+/// Count task files by status. Returns (open, wip, paused, finished, unsuccessful).
+pub fn count_tasks_by_status() -> Result<(usize, usize, usize, usize, usize), String> {
+    let list = list_all_tasks()?;
+    let mut open = 0;
+    let mut wip = 0;
+    let mut paused = 0;
+    let mut finished = 0;
+    let mut unsuccessful = 0;
+    for (_, status, _) in list {
+        match status.as_str() {
+            "open" => open += 1,
+            "wip" => wip += 1,
+            "paused" => paused += 1,
+            "finished" => finished += 1,
+            "unsuccessful" => unsuccessful += 1,
+            _ => {}
+        }
+    }
+    Ok((open, wip, paused, finished, unsuccessful))
+}
+
 /// List all task files (any status) with modification time.
 /// Returns (path, status, mtime). Used for "all tasks" view.
 pub fn list_all_tasks() -> Result<Vec<(PathBuf, String, SystemTime)>, String> {

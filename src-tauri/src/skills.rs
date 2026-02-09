@@ -14,9 +14,56 @@ pub struct Skill {
     pub content: String,
 }
 
+/// Default skills created when the skills directory is empty (planned "two agent skills": summarize, code).
+const DEFAULT_SKILLS: &[(u32, &str, &str)] = &[
+    (
+        1,
+        "summarize",
+        "You are a summarization assistant. Give a clear, concise summary of the user's text. Preserve key facts and tone.",
+    ),
+    (
+        2,
+        "code",
+        "You are a code assistant. Help with code: explain, fix, refactor, or write snippets. Prefer short, correct answers.",
+    ),
+];
+
+/// Ensure the skills directory exists and, if it has no skill files, create the two default skills (1-summarize, 2-code).
+fn ensure_default_skills() {
+    if let Err(e) = Config::ensure_skills_directory() {
+        warn!("Skills: could not create directory: {}", e);
+        return;
+    }
+    let dir = Config::skills_dir();
+    let has_any = std::fs::read_dir(&dir)
+        .ok()
+        .map(|rd| {
+            rd.filter_map(Result::ok)
+                .any(|e| e.path().extension().map_or(false, |ext| ext == "md"))
+        })
+        .unwrap_or(false);
+    if has_any {
+        return;
+    }
+    for (number, topic, content) in DEFAULT_SKILLS {
+        let name = format!("skill-{}-{}.md", number, topic);
+        let path = dir.join(&name);
+        if path.exists() {
+            continue;
+        }
+        if std::fs::write(&path, content.trim()).is_ok() {
+            info!("Skills: created default {}", name);
+        } else {
+            warn!("Skills: failed to create {}", name);
+        }
+    }
+}
+
 /// Load all skills from ~/.mac-stats/skills/. Files must match skill-<number>-<topic>.md.
 /// On error (unreadable file) log and skip that file. Results are logged (available list or failures).
+/// If the directory is empty, the two default skills (summarize, code) are created first.
 pub fn load_skills() -> Vec<Skill> {
+    ensure_default_skills();
     let dir = Config::skills_dir();
     if !dir.is_dir() {
         info!("Skills: directory missing or empty, path={:?}", dir);

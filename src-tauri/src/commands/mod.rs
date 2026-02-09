@@ -11,3 +11,4 @@ pub mod discord;
 pub mod run_cmd;
 pub mod python_agent;
 pub mod logging;
+pub mod agents;

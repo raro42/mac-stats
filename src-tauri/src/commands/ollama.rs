@@ -2,6 +2,7 @@
 
 use tauri::Manager;
 
+use crate::config::Config;
 use crate::ollama::{
     ChatMessage, EmbedInput, EmbedResponse, ListResponse, OllamaClient, OllamaConfig,
     PsResponse, VersionResponse,
@@ -12,6 +13,27 @@ use std::process::Command;
 use std::str::FromStr;
 use std::sync::Mutex;
 use std::sync::OnceLock;
+
+/// Tool instructions appended to soul for non-agent chat (code execution + FETCH_URL).
+const NON_AGENT_TOOL_INSTRUCTIONS: &str = "\n\nYou are a general purpose AI. If you are asked for actual data like day or weather information, or flight information or stock information. Then we need to compile that information using specially crafted clients for doing so. You will put \"[variable-name]\" into the answer to signal that we need to go another step and ask an agent to fulfil the answer.\n\nWhenever asked with \"[variable-name]\", you must provide a javascript snippet to be executed in the browser console to retrieve that information. Mark the answer to be executed as javascript. Do not put any other words around it. Do not insert formatting. Only return the code to be executed. This is needed for the next AI to understand and execute the same. When answering, use the role: code-assistant in the response. When you return executable code:\n- Start the response with: ROLE=code-assistant\n- On the next line, output ONLY executable JavaScript\n- Do not add explanations or formatting\n\nFor web pages: To fetch a page and use its content (e.g. \"navigate to X and get Y\"), reply with exactly one line: FETCH_URL: <full URL> (e.g. FETCH_URL: https://www.example.com). The app will fetch the page and give you the text; then answer the user based on that.";
+
+/// Load soul content for non-agent Ollama chat from ~/.mac-stats/agent/soul.md (or write default there if missing).
+fn load_soul_content() -> String {
+    Config::load_default_soul_content()
+}
+
+/// Default system prompt for non-agent Ollama chat: soul (from file or bundled) + tool instructions.
+pub fn default_non_agent_system_prompt() -> String {
+    let soul = load_soul_content();
+    format!("{}{}", soul, NON_AGENT_TOOL_INSTRUCTIONS)
+}
+
+/// Tauri command: return the default system prompt (soul + tools) for non-agent Ollama chat.
+/// Used by the frontend when no custom system prompt is set (e.g. for legacy ollama_chat message building).
+#[tauri::command]
+pub fn get_default_ollama_system_prompt() -> String {
+    default_non_agent_system_prompt()
+}
 
 // Global Ollama client (in production, use proper state management)
 fn get_ollama_client() -> &'static Mutex<Option<OllamaClient>> {
@@ -273,10 +295,32 @@ pub async fn send_ollama_chat_messages(
     let response = http_request
         .send()
         .await
-        .map_err(|e| format!("Failed to send chat request: {}", e))?
-        .json::<crate::ollama::ChatResponse>()
+        .map_err(|e| format!("Failed to send chat request: {}", e))?;
+    let status = response.status();
+    let body = response
+        .text()
         .await
-        .map_err(|e| format!("Failed to parse response: {}", e))?;
+        .map_err(|e| format!("Failed to read response body: {}", e))?;
+
+    let response: crate::ollama::ChatResponse = match serde_json::from_str(&body) {
+        Ok(r) => r,
+        Err(_) => {
+            if let Ok(err_payload) = serde_json::from_str::<crate::ollama::OllamaErrorResponse>(&body) {
+                return Err(format!("Ollama error: {}", err_payload.error));
+            }
+            if !status.is_success() {
+                return Err(format!("Ollama HTTP {}: {}", status, body.trim()));
+            }
+            return Err(format!("Ollama returned invalid response (missing message): {}", body.trim()));
+        }
+    };
+    if !status.is_success() {
+        let msg = response
+            .message
+            .content
+            .trim();
+        return Err(format!("Ollama HTTP {}: {}", status, if msg.is_empty() { &body } else { msg }));
+    }
     let content = &response.message.content;
     let n = content.chars().count();
     const RESPONSE_LOG_MAX: usize = 1000;
@@ -592,6 +636,7 @@ pub(crate) async fn run_agent_ollama_session(
 /// When `discord_user_id` and `discord_user_name` are set (from Discord message author), the prompt is prefixed with "You are talking to Discord user **{name}** (user id: {id})."
 /// When set, `model_override` and `options_override` apply only to this request (e.g. from Discord "model: llama3" line).
 /// When set, `skill_content` is prepended to system prompts (from ~/.mac-stats/skills/skill-<n>-<topic>.md).
+/// When set, `agent_override` uses that agent's model and combined_prompt (soul+mood+skill) for the main run (e.g. Discord "agent: 001").
 /// When `allow_schedule` is false (e.g. when running from the scheduler), the SCHEDULE tool is disabled so a scheduled task cannot create more schedules.
 pub async fn answer_with_ollama_and_fetch(
     question: &str,
@@ -602,9 +647,24 @@ pub async fn answer_with_ollama_and_fetch(
     model_override: Option<String>,
     options_override: Option<crate::ollama::ChatOptions>,
     skill_content: Option<String>,
+    agent_override: Option<crate::agents::Agent>,
     allow_schedule: bool,
 ) -> Result<String, String> {
     use tracing::info;
+
+    let (model_override, skill_content, max_tool_iterations) = if let Some(ref a) = agent_override {
+        (
+            a.model.clone().or(model_override),
+            Some(a.combined_prompt.clone()),
+            a.max_tool_iterations,
+        )
+    } else {
+        (
+            model_override,
+            skill_content,
+            15u32, // default when no agent override
+        )
+    };
 
     if let Some(ref model) = model_override {
         let available = list_ollama_models().await.map_err(|e| format!("Could not list models: {}", e))?;
@@ -727,7 +787,7 @@ pub async fn answer_with_ollama_and_fetch(
 
     // --- Execution: system prompt with agents + plan, then tool loop ---
     info!("Agent router: execution step — sending plan + question, starting tool loop (max 5 tools)");
-    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or AGENT: <slug or id> [task] (if LLM agents are listed) or RUN_CMD: <command and args> or OLLAMA_API: <action> [args] (list_models, version, running, pull/delete/load/unload, embed) or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or SCHEDULE: <cron> <task> or SCHEDULE: at <ISO datetime> <task> or REMOVE_SCHEDULE: <schedule-id> or TASK_LIST or TASK_LIST: all or TASK_SHOW: <id> (show task to user) or TASK_APPEND/TASK_STATUS/TASK_CREATE or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. Then continue with your answer. Answer concisely.";
+    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or AGENT: <slug or id> [task] (if LLM agents are listed) or RUN_CMD: <command and args> or OLLAMA_API: <action> [args] (list_models, version, running, pull/delete/load/unload, embed) or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or SCHEDULE: <cron> <task> or SCHEDULE: at <ISO datetime> <task> or REMOVE_SCHEDULE: <schedule-id> or TASK_LIST or TASK_LIST: all or TASK_SHOW: <id> (show task to user) or TASK_APPEND/TASK_STATUS/TASK_CREATE or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. When an Agent (or other tool) result is given, your reply to the user MUST include or relay that result—e.g. list the agents, show the fetched content, or summarize the outcome. Do not reply with only a generic acknowledgment like \"Thank you for providing the information.\" Then continue with your answer. Answer concisely.";
     let execution_system_content = match &skill_content {
         Some(skill) => format!(
             "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}\n\nYour plan: {}",
@@ -767,14 +827,15 @@ pub async fn answer_with_ollama_and_fetch(
         }
     };
 
-    const MAX_TOOL_ITERATIONS: u32 = 5;
     let mut tool_count: u32 = 0;
+    // Collect (agent_name, reply) for each AGENT call so we can append a conversation transcript when multiple agents participated.
+    let mut agent_conversation: Vec<(String, String)> = Vec::new();
     let mut response = send_ollama_chat_messages(messages.clone(), model_override.clone(), options_override.clone()).await?;
     let mut response_content = response.message.content.clone();
     let n_first = response_content.chars().count();
     info!("Agent router: first response received ({} chars): {}", n_first, log_content(&response_content));
 
-    while tool_count < MAX_TOOL_ITERATIONS {
+    while tool_count < max_tool_iterations {
         let (tool, arg) = match parse_tool_from_response(&response_content) {
             Some((t, a)) => {
                 let arg_preview: String = a.chars().take(80).collect();
@@ -792,7 +853,7 @@ pub async fn answer_with_ollama_and_fetch(
             }
         };
         tool_count += 1;
-        info!("Agent router: running tool {}/{} — {}", tool_count, MAX_TOOL_ITERATIONS, tool);
+        info!("Agent router: running tool {}/{} — {}", tool_count, max_tool_iterations, tool);
 
         let user_message = match tool.as_str() {
             "FETCH_URL" => {
@@ -926,7 +987,6 @@ pub async fn answer_with_ollama_and_fetch(
                 }
             }
             "AGENT" => {
-                send_status("Using agent…");
                 let arg = arg.trim();
                 let (selector, task_message) = if let Some(space_idx) = arg.find(' ') {
                     let (sel, rest) = arg.split_at(space_idx);
@@ -937,12 +997,19 @@ pub async fn answer_with_ollama_and_fetch(
                 let agents = crate::agents::load_agents();
                 match crate::agents::find_agent_by_id_or_name(&agents, selector) {
                     Some(agent) => {
-                        send_status(&format!("Agent {} ({})…", agent.name, agent.id));
                         let user_msg = if task_message.is_empty() {
                             question
                         } else {
                             task_message
                         };
+                        const STATUS_MSG_MAX: usize = 120;
+                        let preview: String = user_msg.chars().take(STATUS_MSG_MAX).collect();
+                        let status_text = if user_msg.chars().count() > STATUS_MSG_MAX {
+                            format!("{}…", preview)
+                        } else {
+                            preview
+                        };
+                        send_status(&format!("{} -> Ollama: {}", agent.name, status_text));
                         match run_agent_ollama_session(
                             agent,
                             user_msg,
@@ -950,10 +1017,14 @@ pub async fn answer_with_ollama_and_fetch(
                         )
                         .await
                         {
-                            Ok(result) => format!(
-                                "Agent \"{}\" ({}) result:\n\n{}\n\nUse this to answer the user's question.",
-                                agent.name, agent.id, result
-                            ),
+                            Ok(result) => {
+                                let label = format!("{} ({})", agent.name, agent.id);
+                                agent_conversation.push((label.clone(), result.trim().to_string()));
+                                format!(
+                                    "Agent \"{}\" ({}) result:\n\n{}\n\nUse this to answer the user's question.",
+                                    agent.name, agent.id, result
+                                )
+                            }
                             Err(e) => {
                                 info!("Agent router: AGENT session failed: {}", e);
                                 format!(
@@ -1461,13 +1532,33 @@ pub async fn answer_with_ollama_and_fetch(
 
         response = send_ollama_chat_messages(messages.clone(), model_override.clone(), options_override.clone()).await?;
         response_content = response.message.content.clone();
-        if tool_count >= MAX_TOOL_ITERATIONS {
-            info!("Agent router: max tool iterations reached ({}), using last response as final", MAX_TOOL_ITERATIONS);
+        if tool_count >= max_tool_iterations {
+            info!("Agent router: max tool iterations reached ({}), using last response as final", max_tool_iterations);
         }
     }
 
     let final_len = response_content.chars().count();
     info!("Agent router: done after {} tool(s), returning final response ({} chars): {}", tool_count, final_len, log_content(&response_content));
+
+    // When multiple agents participated, ensure the user sees the conversation: append a transcript if we have 2+ agent turns and the final reply is short (so we don't hide a long model summary).
+    if agent_conversation.len() >= 2 {
+        const SHORT_REPLY_THRESHOLD: usize = 500;
+        if response_content.chars().count() < SHORT_REPLY_THRESHOLD
+            || response_content.contains("Thank you for providing")
+            || response_content.contains("If you have any specific tasks")
+        {
+            let mut transcript = String::from("\n\n---\n**Conversation:**\n\n");
+            for (label, reply) in &agent_conversation {
+                transcript.push_str("**");
+                transcript.push_str(label);
+                transcript.push_str(":**\n");
+                transcript.push_str(reply);
+                transcript.push_str("\n\n");
+            }
+            response_content.push_str(transcript.trim_end());
+        }
+    }
+
     Ok(response_content)
 }
 
@@ -2170,12 +2261,10 @@ pub async fn ollama_chat_with_execution(
         request.question
     );
     
-    // Get system prompt (includes FETCH_URL tool for web navigation)
-    let system_prompt = request.system_prompt.unwrap_or_else(|| {
-        let base = "You are a general purpose AI. If you are asked for actual data like day or weather information, or flight information or stock information. Then we need to compile that information using speciallz crafted clients for doing so. You will put \"[variable-name]\" into the answer to signal that we need to go another step and ask and agent to fullfill the answer.\n\nWhenever asked with \"[variable-name]\", you must provide a javascript snipplet to be executed in the browser console to retrieve that information. Mark the answer to be executed as javascript. Do not put any other words around it. Do not insert formatting. Onlz return the code to be executed. This is needed for the next AI to understand and execute the same. When answering, use the role: code-assistant in the response. When you return executable code:\n- Start the response with: ROLE=code-assistant\n- On the next line, output ONLY executable JavaScript\n- Do not add explanations or formatting";
-        let fetch_tool = "\n\nFor web pages: To fetch a page and use its content (e.g. \"navigate to X and get Y\"), reply with exactly one line: FETCH_URL: <full URL> (e.g. FETCH_URL: https://www.example.com). The app will fetch the page and give you the text; then answer the user based on that.";
-        format!("{}{}", base, fetch_tool)
-    });
+    // Get system prompt: use soul.md (~/.mac-stats/agent/soul.md or bundled default) + tools when not overridden
+    let system_prompt = request
+        .system_prompt
+        .unwrap_or_else(default_non_agent_system_prompt);
     
     // Build messages array with conversation history
     let mut messages = vec![
@@ -2408,9 +2497,8 @@ pub async fn ollama_chat_continue_with_result(
 
     info!("Ollama Chat Continue: Code executed, result: {}", execution_result);
     
-    let system_prompt = system_prompt.unwrap_or_else(|| {
-        "You are a helpful assistant that answers questions about system metrics and monitoring.".to_string()
-    });
+    let system_prompt = system_prompt
+        .unwrap_or_else(default_non_agent_system_prompt);
     
     let follow_up_message = format!(
         "I have executed your last codeblocks and the result is: {}\n\nCan you now answer the original question: {}?",

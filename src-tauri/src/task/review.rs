@@ -4,9 +4,9 @@
 use std::time::{Duration, SystemTime};
 
 use chrono::TimeZone;
-use tracing::{debug, error, info, warn};
+use tracing::{error, info, warn};
 
-const REVIEW_INTERVAL_SECS: u64 = 10 * 60; // 10 minutes
+const REVIEW_INTERVAL_SECS: u64 = 60; // 1 minute (tasks looked at at least once per minute)
 const WIP_TIMEOUT_SECS: u64 = 30 * 60;     // 30 minutes
 const MAX_ITERATIONS_PER_TASK: u32 = 20;
 const MAX_TASKS_PER_CYCLE: u32 = 3;
@@ -56,18 +56,46 @@ const REVIEW_AGENTS: &[&str] = &["scheduler", "default"];
 /// Pick one open task path to work on (only tasks assigned to scheduler or default). Returns None if no open tasks.
 fn pick_one_open_task() -> Option<std::path::PathBuf> {
     let list = crate::task::list_open_and_wip_tasks().ok()?;
-    let open: Vec<_> = list
+    let open_all: Vec<_> = list
         .into_iter()
         .filter(|(_, s, _)| s == "open")
         .map(|(p, _, _)| p)
+        .collect();
+    if open_all.is_empty() {
+        return None;
+    }
+    let for_scheduler: Vec<_> = open_all
+        .iter()
         .filter(|p| {
             crate::task::get_assignee(p)
                 .map(|a| REVIEW_AGENTS.contains(&a.as_str()))
                 .unwrap_or(true)
         })
+        .cloned()
+        .collect();
+    if for_scheduler.is_empty() {
+        let assignees: Vec<String> = open_all
+            .iter()
+            .filter_map(|p| crate::task::get_assignee(p).ok())
+            .collect();
+        info!(
+            "Task review: {} open task(s) but none assigned to scheduler/default (assignees: {:?}). Use TASK_ASSIGN or mac_stats assign <id> scheduler to have the review loop pick them.",
+            open_all.len(),
+            assignees
+        );
+        return None;
+    }
+    let ready: Vec<_> = for_scheduler
+        .into_iter()
         .filter(|p| crate::task::is_ready(p).unwrap_or(false))
         .collect();
-    open.into_iter().next()
+    if ready.is_empty() {
+        info!(
+            "Task review: open tasks assigned to scheduler/default exist but none are ready (check ## Depends: or sub-tasks)."
+        );
+        return None;
+    }
+    ready.into_iter().next()
 }
 
 /// Resume paused tasks whose "paused until" time has passed (rename to open, clear paused-until line).
@@ -105,6 +133,12 @@ fn resume_paused_tasks() {
 
 /// Run one review cycle: close stale WIPs, resume due paused tasks, then work on up to MAX_TASKS_PER_CYCLE open tasks.
 async fn run_review_once() {
+    if let Ok((open, wip, paused, finished, unsuccessful)) = crate::task::count_tasks_by_status() {
+        info!(
+            "Task scan: open={}, wip={}, paused={}, finished={}, unsuccessful={}",
+            open, wip, paused, finished, unsuccessful
+        );
+    }
     close_stale_wips();
     resume_paused_tasks();
     let mut count = 0u32;
@@ -113,7 +147,7 @@ async fn run_review_once() {
             Some(p) => p,
             None => {
                 if count == 0 {
-                    debug!("Task review: no open tasks to work on");
+                    info!("Task review: no open task to work on this cycle (see above if open tasks exist: assignee or dependencies)");
                 }
                 break;
             }
@@ -135,7 +169,7 @@ async fn run_review_once() {
     }
 }
 
-/// Async loop: every 10 minutes run a review cycle.
+/// Async loop: every REVIEW_INTERVAL_SECS run a review cycle (default 1 minute).
 async fn review_loop() {
     loop {
         tokio::time::sleep(Duration::from_secs(REVIEW_INTERVAL_SECS)).await;
@@ -143,7 +177,7 @@ async fn review_loop() {
     }
 }
 
-/// Spawn the task review thread. Runs every 10 min: close WIP > 30 min as unsuccessful, work on one open task.
+/// Spawn the task review thread. Runs every REVIEW_INTERVAL_SECS (e.g. 1 min): close WIP > 30 min as unsuccessful, work on open tasks.
 pub fn spawn_review_thread() {
     std::thread::spawn(|| {
         let rt = match tokio::runtime::Runtime::new() {

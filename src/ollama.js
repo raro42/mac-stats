@@ -32,9 +32,10 @@ function getDefaultModel() {
   return 'llama2';
 }
 
+/** Returns custom system prompt from localStorage, or null if not set (backend then uses soul.md from ~/.mac-stats/agent/soul.md). */
 function getSystemPrompt() {
   const saved = localStorage.getItem('ollama_system_prompt');
-  return saved || 'You are a helpful assistant that answers questions about system metrics and monitoring.';
+  return saved || null;
 }
 
 /**
@@ -394,7 +395,7 @@ async function sendChatMessage() {
   addToHistory('user', message);
 
   try {
-    // Get system prompt
+    // System prompt: only send if user set a custom one; otherwise backend uses soul.md
     const systemPrompt = getSystemPrompt();
     
     // Get conversation history (excluding the current message - it's in question)
@@ -405,7 +406,7 @@ async function sendChatMessage() {
     const response = await invoke('ollama_chat_with_execution', {
       request: {
         question: message,
-        system_prompt: systemPrompt,
+        ...(systemPrompt ? { system_prompt: systemPrompt } : {}),
         conversation_history: history.length > 0 ? history : null
       }
     });
@@ -516,7 +517,7 @@ async function executeCodeAndContinue(response, originalQuestion, systemPrompt, 
         originalQuestion: originalQuestion,
         contextMessage: response.context_message || '',
         intermediateResponse: response.intermediate_response || '',
-        systemPrompt: systemPrompt,
+        system_prompt: systemPrompt ?? undefined,
         conversationHistory: history.length > 0 ? history : null
       });
       
@@ -708,8 +709,8 @@ Can you now answer the original question: ${originalMessage}?`;
         </div>`;
       }
       
-      // Send follow-up to Ollama
-      const systemPrompt = getSystemPrompt();
+      // Send follow-up to Ollama (use soul-based default when no custom system prompt)
+      const systemPrompt = getSystemPrompt() || await invoke('get_default_ollama_system_prompt');
       const followUpResponse = await invoke('ollama_chat', {
         request: {
           messages: [

@@ -86,6 +86,12 @@ pub struct ChatResponse {
     pub done: bool,
 }
 
+/// Ollama API error payload (e.g. {"error": "model not found"}).
+#[derive(Debug, Clone, Deserialize)]
+pub struct OllamaErrorResponse {
+    pub error: String,
+}
+
 // --- GET /api/tags (list models with details) ---
 
 /// Details sub-object for a model in the tags list.

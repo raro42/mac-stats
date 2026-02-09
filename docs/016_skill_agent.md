@@ -11,12 +11,13 @@ The SKILL agent lets Ollama run a **specialized skill** (a Markdown system-promp
 - **Task**: Optional. If present (text after the first space), it is the user message for the skill session. If omitted, the **current user question** is used as the user message.  
 - **Execution**: The app loads the skill content from `~/.mac-stats/skills/`, runs one Ollama request (system = skill content, user = task or question), and injects the result as `Skill "<number>-<topic>" result:\n\n<result>` into the main conversation.
 
-When there are **no skills** in `~/.mac-stats/skills/`, the SKILL agent is **not** added to the list Ollama sees, so the model cannot invoke it.
+When there are **no skills** in `~/.mac-stats/skills/`, the SKILL agent is **not** added to the list Ollama sees, so the model cannot invoke it. For per-agent **model** and **soul/mood/skill** (orchestrator and specialists), use **LLM agents** in `~/.mac-stats/agents/` instead; see `docs/017_llm_agents.md`.
 
 ## Skill files
 
 - **Directory**: `~/.mac-stats/skills/` (see `Config::skills_dir()` in `config/mod.rs`).  
 - **Naming**: `skill-<number>-<topic>.md`, e.g. `skill-1-summarize.md`, `skill-2-code.md`.  
+- **Default skills**: When the skills directory is empty, the app creates two default skills: **1-summarize** (summarization) and **2-code** (code help). You can edit or remove them.
 - **Content**: Markdown (or plain text) used as the **system prompt** for the skill session. The file is read and trimmed; empty files are skipped.  
 - **Listing**: Skills are loaded at runtime; the app builds the “Available skills: 1-summarize, 2-code, …” list from filenames and passes it to Ollama so it can recommend and invoke by number or topic.
 

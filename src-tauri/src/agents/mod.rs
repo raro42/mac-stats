@@ -5,14 +5,15 @@
 //! Used by the Ollama tool loop (AGENT: <selector> [task]) and by the agent-test CLI.
 
 pub mod cli;
+pub mod watch;
 
 use crate::config::Config;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tracing::{debug, info, warn};
 
 /// Per-agent config from agent.json. Name is required; others optional.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AgentConfig {
     pub name: String,
     #[serde(default)]
@@ -23,6 +24,11 @@ pub struct AgentConfig {
     pub orchestrator: Option<bool>,
     #[serde(default)]
     pub enabled: Option<bool>,
+    #[serde(default)]
+    pub description: Option<String>,
+    /// Max tool iterations per request (AGENT, TASK_*, etc.). Default 15 when missing.
+    #[serde(default)]
+    pub max_tool_iterations: Option<u32>,
 }
 
 /// One loaded agent: id from directory name, config from agent.json, combined prompt from soul+mood+skill.
@@ -35,6 +41,8 @@ pub struct Agent {
     pub orchestrator: bool,
     pub enabled: bool,
     pub combined_prompt: String,
+    /// Max tool iterations per request when this agent is in charge. Default 15.
+    pub max_tool_iterations: u32,
 }
 
 /// Load all agents from ~/.mac-stats/agents/. Each subdirectory named agent-<id> is one agent.
@@ -98,6 +106,40 @@ pub fn load_agents() -> Vec<Agent> {
     agents
 }
 
+/// Load all agents (enabled and disabled). Used by UI/CRUD to list and manage agents.
+pub fn load_all_agents() -> Vec<Agent> {
+    let dir = Config::agents_dir();
+    if !dir.is_dir() {
+        return Vec::new();
+    }
+    let read_dir = match std::fs::read_dir(&dir) {
+        Ok(r) => r,
+        Err(_) => return Vec::new(),
+    };
+    let mut agents: Vec<Agent> = read_dir
+        .filter_map(Result::ok)
+        .map(|e| e.path())
+        .filter(|p| p.is_dir())
+        .filter_map(|path| {
+            let dir_name = path.file_name().and_then(|s| s.to_str())?;
+            let id = dir_name.strip_prefix("agent-").filter(|s| !s.is_empty())?;
+            load_one_agent(&path, id)
+        })
+        .collect();
+    agents.sort_by(|a, b| a.id.cmp(&b.id));
+    agents
+}
+
+/// Return the directory path for an agent id if it exists.
+pub fn get_agent_dir(id: &str) -> Option<std::path::PathBuf> {
+    let path = Config::agents_dir().join(format!("agent-{}", id));
+    if path.is_dir() {
+        Some(path)
+    } else {
+        None
+    }
+}
+
 fn load_one_agent(dir: &Path, id: &str) -> Option<Agent> {
     let config_path = dir.join("agent.json");
     let content = std::fs::read_to_string(&config_path).map_err(|e| {
@@ -119,7 +161,15 @@ fn load_one_agent(dir: &Path, id: &str) -> Option<Agent> {
     let soul = std::fs::read_to_string(dir.join("soul.md"))
         .ok()
         .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty());
+        .filter(|s| !s.is_empty())
+        .or_else(|| {
+            let default = Config::load_default_soul_content();
+            if default.is_empty() {
+                None
+            } else {
+                Some(default)
+            }
+        });
     let mood = std::fs::read_to_string(dir.join("mood.md"))
         .ok()
         .map(|s| s.trim().to_string())
@@ -127,6 +177,7 @@ fn load_one_agent(dir: &Path, id: &str) -> Option<Agent> {
 
     let combined_prompt = build_combined_prompt(soul.as_deref(), mood.as_deref(), &skill);
 
+    let max_tool_iterations = config.max_tool_iterations.unwrap_or(15);
     Some(Agent {
         id: id.to_string(),
         name: config.name,
@@ -135,6 +186,7 @@ fn load_one_agent(dir: &Path, id: &str) -> Option<Agent> {
         orchestrator: config.orchestrator.unwrap_or(false),
         enabled: config.enabled.unwrap_or(true),
         combined_prompt,
+        max_tool_iterations,
     })
 }
 
@@ -198,6 +250,7 @@ mod tests {
                 orchestrator: false,
                 enabled: true,
                 combined_prompt: String::new(),
+                max_tool_iterations: 15,
             },
         ];
         assert!(find_agent_by_id_or_name(&agents, "generalist").is_some());
@@ -215,6 +268,7 @@ mod tests {
                 orchestrator: false,
                 enabled: true,
                 combined_prompt: String::new(),
+                max_tool_iterations: 15,
             },
         ];
         assert!(find_agent_by_id_or_name(&agents, "001").is_some());

@@ -44,6 +44,7 @@ Example: `mac_stats add foo 1 "Hello"` then `mac_stats list`, `mac_stats show 1`
 
 - **Path or task id**: Full path under `~/.mac-stats/task/` or a short id; the app resolves the id (prefers `open`, then `wip`).
 - **Assignee**: Every task has an assignee (default `default`). The **review loop** only works on tasks assigned to `scheduler` or `default`. Use TASK_ASSIGN so Discord-assigned tasks are not picked by the background loop.
+- **Discord / natural language**: When a user says "close the task", "finish", "mark done", or "cancel" a task (e.g. in Discord), the agent instructions tell the LLM to reply with **TASK_STATUS: &lt;id&gt; finished** (success) or **TASK_STATUS: &lt;id&gt; unsuccessful** (failed), not `wip`. This is defined in `commands/ollama.rs` in `build_agent_descriptions` so the model reliably closes the task instead of leaving it in progress.
 
 ## Task file format
 
@@ -54,13 +55,16 @@ Example: `mac_stats add foo 1 "Hello"` then `mac_stats list`, `mac_stats show 1`
   - `## Sub-tasks: id1, id2` — parent cannot be set to `finished` until all sub-tasks are finished or unsuccessful.
 - **Sections**: `## Feedback` (appended by TASK_APPEND with timestamp).
 
-## Task review loop (every 10 minutes)
+## Task review loop (every 1 minute)
 
 - **Entry point**: `task/review.rs` — `spawn_review_thread()` at app startup.
+- **Interval**: Review runs every **1 minute** so tasks are looked at at least once per minute (configurable via `REVIEW_INTERVAL_SECS` in `review.rs`).
 - **Behaviour** each cycle:
   1. **Close stale WIP**: Any task in `wip` last modified more than **30 minutes** ago is set to **unsuccessful** and a note appended.
   2. **Resume paused**: Any task in `paused` with `## Paused until: <datetime>` where now >= datetime is renamed to `open` and the paused-until line is removed.
   3. **Work on open tasks**: Pick open tasks that are **assigned to scheduler or default**, **ready** (all `## Depends:` satisfied), up to **3 tasks per cycle**, each with up to **20 iterations** via `task::runner::run_task_until_finished`. If max iterations is reached without `finished`, the task is auto-closed as **unsuccessful**.
+
+**Why aren’t my tasks being worked on?** The review loop only picks tasks that are (1) status **open**, (2) **assigned to `scheduler` or `default`** (tasks assigned to `discord` or `cpu` are skipped), and (3) **ready** (no unmet `## Depends:`). If you have many open tasks but none are picked, check assignees: `mac_stats list --all` shows `(assigned: …)`; reassign with `mac_stats assign <id> scheduler` or via **TASK_ASSIGN: &lt;id&gt; scheduler**. The app logs each cycle: "Task scan: open=…" and, when no task is picked, either "none assigned to scheduler/default" or "none are ready (check ## Depends:)".
 
 ## Task loop (run until finished)
 
