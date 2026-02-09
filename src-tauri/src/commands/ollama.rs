@@ -353,6 +353,19 @@ fn build_skill_agent_description(num: u32, skills: &[crate::skills::Skill]) -> S
     )
 }
 
+/// Build the AGENT description paragraph when LLM agents exist. Lists agents by slug or name so the model can invoke AGENT: <slug or id> [task].
+fn build_agent_agent_description(num: u32, agents: &[crate::agents::Agent]) -> String {
+    let list: String = agents
+        .iter()
+        .map(|a| a.slug.as_deref().unwrap_or(a.name.as_str()).to_string())
+        .collect::<Vec<_>>()
+        .join(", ");
+    format!(
+        "\n\n{}. **AGENT**: Run a specialized LLM agent (its own model and prompt). Use when a task fits an agent below. To invoke: reply with exactly one line: AGENT: <slug or id> [optional task]. If no task is given, the current user question is used. Available agents: {}.",
+        num, list
+    )
+}
+
 /// Discord API endpoint list (injected when request is from Discord). Condensed for agent context.
 const DISCORD_API_ENDPOINTS_CONTEXT: &str = r#"
 Discord API (base: https://discord.com/api/v10). Use DISCORD_API: <METHOD> <path> [json body for POST]:
@@ -382,7 +395,7 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
         num += 1;
     }
     base.push_str(&format!(
-        "\n\n{}. **TASK** (task files under ~/.mac-stats/task/): Use when working on a task file or when the user asks for tasks. TASK_LIST: default is open and WIP only (reply: TASK_LIST or TASK_LIST: ). TASK_LIST: all — list all tasks grouped by status (reply: TASK_LIST: all when the user asks for all tasks). TASK_SHOW: <path or id> — show that task's content and status to the user so they can read and request updates. TASK_APPEND: append feedback (reply: TASK_APPEND: <path or task id> <content>). TASK_STATUS: set status (reply: TASK_STATUS: <path or task id> wip|finished|unsuccessful). TASK_CREATE: create a new task (reply: TASK_CREATE: <topic> <id> <initial content>). TASK_ASSIGN: <path or id> <agent_id> — reassign task to scheduler, discord, cpu, or default. Paths must be under ~/.mac-stats/task.",
+        "\n\n{}. **TASK** (task files under ~/.mac-stats/task/): Use when working on a task file or when the user asks for tasks. TASK_LIST: default is open and WIP only (reply: TASK_LIST or TASK_LIST: ). TASK_LIST: all — list all tasks grouped by status (reply: TASK_LIST: all when the user asks for all tasks). TASK_SHOW: <path or id> — show that task's content and status to the user so they can read and request updates. TASK_APPEND: append feedback (reply: TASK_APPEND: <path or task id> <content>). TASK_STATUS: set status (reply: TASK_STATUS: <path or task id> wip|finished|unsuccessful). When the user says \"close the task\", \"finish\", \"mark done\", or \"cancel\" a task, reply TASK_STATUS: <path or id> finished (success) or TASK_STATUS: <path or id> unsuccessful (failed) — do not use wip. TASK_CREATE: create a new task (reply: TASK_CREATE: <topic> <id> <initial content>). TASK_ASSIGN: <path or id> <agent_id> — reassign task to scheduler, discord, cpu, or default. Paths must be under ~/.mac-stats/task.",
         num
     ));
     num += 1;
@@ -404,6 +417,11 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
             num
         ));
         base.push_str(DISCORD_API_ENDPOINTS_CONTEXT);
+        num += 1;
+    }
+    let agent_list = crate::agents::load_agents();
+    if !agent_list.is_empty() {
+        base.push_str(&build_agent_agent_description(num, &agent_list));
         num += 1;
     }
     let Some(server_url) = crate::mcp::get_mcp_server_url() else {
@@ -532,6 +550,38 @@ async fn run_skill_ollama_session(
     );
     let response = send_ollama_chat_messages(messages, model_override, options_override).await?;
     Ok(response.message.content.trim().to_string())
+}
+
+/// Run a single Ollama request for an LLM agent (soul+mood+skill as system prompt, task as user message).
+/// Uses the agent's model if set; otherwise default. No conversation history. Logs agent name/id.
+/// Used by the tool loop (AGENT:) and by the agent-test CLI.
+pub(crate) async fn run_agent_ollama_session(
+    agent: &crate::agents::Agent,
+    user_message: &str,
+    _status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
+) -> Result<String, String> {
+    use tracing::info;
+    info!(
+        "Agent: {} ({}) running (model: {:?}, prompt {} chars)",
+        agent.name,
+        agent.id,
+        agent.model,
+        agent.combined_prompt.chars().count()
+    );
+    let messages = vec![
+        crate::ollama::ChatMessage {
+            role: "system".to_string(),
+            content: agent.combined_prompt.clone(),
+        },
+        crate::ollama::ChatMessage {
+            role: "user".to_string(),
+            content: user_message.to_string(),
+        },
+    ];
+    let response = send_ollama_chat_messages(messages, agent.model.clone(), None).await?;
+    let out = response.message.content.trim().to_string();
+    info!("Agent: {} ({}) returned ({} chars)", agent.name, agent.id, out.chars().count());
+    Ok(out)
 }
 
 /// Shared API for Discord (and other agents): ask Ollama how to solve, then run agents (FETCH_URL, BRAVE_SEARCH, RUN_JS).
@@ -677,7 +727,7 @@ pub async fn answer_with_ollama_and_fetch(
 
     // --- Execution: system prompt with agents + plan, then tool loop ---
     info!("Agent router: execution step — sending plan + question, starting tool loop (max 5 tools)");
-    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or RUN_CMD: <command and args> or OLLAMA_API: <action> [args] (list_models, version, running, pull/delete/load/unload, embed) or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or SCHEDULE: <cron> <task> or SCHEDULE: at <ISO datetime> <task> or REMOVE_SCHEDULE: <schedule-id> or TASK_LIST or TASK_LIST: all or TASK_SHOW: <id> (show task to user) or TASK_APPEND/TASK_STATUS/TASK_CREATE or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. Then continue with your answer. Answer concisely.";
+    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or AGENT: <slug or id> [task] (if LLM agents are listed) or RUN_CMD: <command and args> or OLLAMA_API: <action> [args] (list_models, version, running, pull/delete/load/unload, embed) or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or SCHEDULE: <cron> <task> or SCHEDULE: at <ISO datetime> <task> or REMOVE_SCHEDULE: <schedule-id> or TASK_LIST or TASK_LIST: all or TASK_SHOW: <id> (show task to user) or TASK_APPEND/TASK_STATUS/TASK_CREATE or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. Then continue with your answer. Answer concisely.";
     let execution_system_content = match &skill_content {
         Some(skill) => format!(
             "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}\n\nYour plan: {}",
@@ -871,6 +921,58 @@ pub async fn answer_with_ollama_and_fetch(
                             "Unknown skill \"{}\". Available skills: {}. Answer without using a skill.",
                             selector,
                             skills.iter().map(|s| format!("{}-{}", s.number, s.topic)).collect::<Vec<_>>().join(", ")
+                        )
+                    }
+                }
+            }
+            "AGENT" => {
+                send_status("Using agent…");
+                let arg = arg.trim();
+                let (selector, task_message) = if let Some(space_idx) = arg.find(' ') {
+                    let (sel, rest) = arg.split_at(space_idx);
+                    (sel.trim(), rest.trim())
+                } else {
+                    (arg, "")
+                };
+                let agents = crate::agents::load_agents();
+                match crate::agents::find_agent_by_id_or_name(&agents, selector) {
+                    Some(agent) => {
+                        send_status(&format!("Agent {} ({})…", agent.name, agent.id));
+                        let user_msg = if task_message.is_empty() {
+                            question
+                        } else {
+                            task_message
+                        };
+                        match run_agent_ollama_session(
+                            agent,
+                            user_msg,
+                            status_tx.as_ref(),
+                        )
+                        .await
+                        {
+                            Ok(result) => format!(
+                                "Agent \"{}\" ({}) result:\n\n{}\n\nUse this to answer the user's question.",
+                                agent.name, agent.id, result
+                            ),
+                            Err(e) => {
+                                info!("Agent router: AGENT session failed: {}", e);
+                                format!(
+                                    "Agent \"{}\" ({}) failed: {}. Answer without this result.",
+                                    agent.name, agent.id, e
+                                )
+                            }
+                        }
+                    }
+                    None => {
+                        let list: String = agents
+                            .iter()
+                            .map(|a| a.slug.as_deref().unwrap_or(a.name.as_str()).to_string())
+                            .collect::<Vec<_>>()
+                            .join(", ");
+                        info!("Agent router: AGENT unknown selector \"{}\" (available: {})", selector, list);
+                        format!(
+                            "Unknown agent \"{}\". Available agents: {}. Answer without using an agent.",
+                            selector, list
                         )
                     }
                 }
@@ -1533,7 +1635,7 @@ fn parse_at_datetime(s: &str) -> Result<String, String> {
 /// Also accepts lines starting with "RECOMMEND: " (e.g. "RECOMMEND: SCHEDULER: Every 5 minutes...").
 /// Returns (tool_name, argument) or None.
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:"];
     for line in content.lines() {
         let line = line.trim();
         // Ollama sometimes replies with just "TASK_LIST" (no colon); treat as tool call with empty arg.
@@ -1579,7 +1681,7 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
 
 /// Tool line prefixes that indicate start of another tool (used to stop script body extraction).
 const TOOL_LINE_PREFIXES: &[&str] = &[
-    "FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:",
+    "FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:",
     "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:",
 ];
 

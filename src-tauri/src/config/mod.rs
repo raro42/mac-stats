@@ -216,4 +216,19 @@ impl Config {
     pub fn ensure_scripts_directory() -> std::io::Result<()> {
         std::fs::create_dir_all(Self::scripts_dir())
     }
+
+    /// Agents directory: `$HOME/.mac-stats/agents/`
+    /// Each agent is a subdirectory: agent-<id>/ with agent.json, skill.md, optional soul.md, mood.md, testing.md.
+    pub fn agents_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("agents")
+        } else {
+            std::env::temp_dir().join("mac-stats-agents")
+        }
+    }
+
+    /// Ensure the agents directory exists.
+    pub fn ensure_agents_directory() -> std::io::Result<()> {
+        std::fs::create_dir_all(Self::agents_dir())
+    }
 }

@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use clap::Parser;
+use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[command(name = "mac_stats")]
@@ -32,9 +33,30 @@ struct Args {
     #[arg(long = "changelog", help = "Display the application changelog and exit")]
     changelog: bool,
     
-    /// Task operations (add, list, show, status, remove, assign, append). Run and exit without starting the app.
+    /// Subcommands: task (add, list, show, ...) or agent (test). Run and exit without starting the app.
     #[command(subcommand)]
-    task: Option<mac_stats::task::cli::TaskCmd>,
+    cmd: Option<MainCmd>,
+}
+
+#[derive(clap::Subcommand, Debug)]
+enum MainCmd {
+    /// Task operations (add, list, show, status, remove, assign, append)
+    #[command(subcommand)]
+    Task(mac_stats::task::cli::TaskCmd),
+    /// Agent operations (test with testing.md)
+    #[command(subcommand)]
+    Agent(AgentCmd),
+}
+
+#[derive(clap::Subcommand, Debug)]
+enum AgentCmd {
+    /// Run agent with prompts from testing.md. Logs to ~/.mac-stats/debug.log; use -vv.
+    Test {
+        /// Agent selector: id, slug, or name (e.g. 001, senior-coder, General Assistant)
+        selector: String,
+        /// Path to a markdown file with test prompts. If omitted, uses ~/.mac-stats/agents/agent-<id>/testing.md
+        path: Option<PathBuf>,
+    },
 }
 
 fn main() {
@@ -73,11 +95,22 @@ fn main() {
         }
     }
     
-    // If --task subcommand is used, run task CLI and exit
-    if let Some(cmd) = args.task {
-        let code = match mac_stats::task::cli::run(cmd) {
-            Ok(()) => 0,
-            Err(c) => c,
+    // If a subcommand is used, run it and exit
+    if let Some(cmd) = args.cmd {
+        let code = match cmd {
+            MainCmd::Task(task_cmd) => match mac_stats::task::cli::run(task_cmd) {
+                Ok(()) => 0,
+                Err(c) => c,
+            },
+            MainCmd::Agent(AgentCmd::Test { selector, path }) => {
+                let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+                rt.block_on(async {
+                    mac_stats::agents::cli::run_agent_test(&selector, path.as_deref())
+                        .await
+                        .map(|_| 0)
+                        .unwrap_or_else(|c| c)
+                })
+            }
         };
         std::process::exit(code);
     }
