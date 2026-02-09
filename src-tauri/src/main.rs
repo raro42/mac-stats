@@ -31,6 +31,10 @@ struct Args {
     /// Print changelog to console and exit
     #[arg(long = "changelog", help = "Display the application changelog and exit")]
     changelog: bool,
+    
+    /// Task operations (add, list, show, status, remove, assign, append). Run and exit without starting the app.
+    #[command(subcommand)]
+    task: Option<mac_stats::task::cli::TaskCmd>,
 }
 
 fn main() {
@@ -67,6 +71,15 @@ fn main() {
                 std::process::exit(1);
             }
         }
+    }
+    
+    // If --task subcommand is used, run task CLI and exit
+    if let Some(cmd) = args.task {
+        let code = match mac_stats::task::cli::run(cmd) {
+            Ok(()) => 0,
+            Err(c) => c,
+        };
+        std::process::exit(code);
     }
     
     // If --cpu or --openwindow flag is set, open window directly after a short delay

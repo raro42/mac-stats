@@ -1,6 +1,7 @@
 //! Task files under ~/.mac-stats/task/ with naming:
 //! task-<topic>-<id>-<date-time>-<open|wip|finished|unsuccessful>.md
 
+pub mod cli;
 pub mod review;
 
 use crate::config::Config;
@@ -162,6 +163,7 @@ pub fn find_current_path(previous_path: &Path) -> Option<PathBuf> {
         .strip_suffix("-open")
         .or_else(|| stem.strip_suffix("-wip"))
         .or_else(|| stem.strip_suffix("-finished"))
+        .or_else(|| stem.strip_suffix("-unsuccessful"))
         .unwrap_or(stem);
     for status in ["open", "wip", "finished", "unsuccessful"] {
         let p = parent.join(format!("{}-{}.md", base, status));
@@ -170,6 +172,35 @@ pub fn find_current_path(previous_path: &Path) -> Option<PathBuf> {
         }
     }
     None
+}
+
+/// All status suffixes for a task (same base name, different status file).
+const STATUS_SUFFIXES: &[&str] = &["open", "wip", "finished", "unsuccessful"];
+
+/// Delete all files for a task (open, wip, finished, unsuccessful). Returns number of files removed.
+pub fn delete_task(path_or_id: &str) -> Result<usize, String> {
+    let path = resolve_task_path(path_or_id)?;
+    let parent = path.parent().ok_or("No parent dir")?;
+    let stem = path.file_stem().and_then(|n| n.to_str()).ok_or("Invalid filename")?;
+    let base = stem
+        .strip_suffix("-open")
+        .or_else(|| stem.strip_suffix("-wip"))
+        .or_else(|| stem.strip_suffix("-finished"))
+        .or_else(|| stem.strip_suffix("-unsuccessful"))
+        .unwrap_or(stem);
+    let mut removed = 0;
+    for status in STATUS_SUFFIXES {
+        let p = parent.join(format!("{}-{}.md", base, status));
+        if p.exists() {
+            fs::remove_file(&p).map_err(|e| format!("Remove {:?}: {}", p, e))?;
+            removed += 1;
+            info!("Task: deleted {:?}", p);
+        }
+    }
+    if removed == 0 {
+        return Err("No task files found to delete.".to_string());
+    }
+    Ok(removed)
 }
 
 /// Format a human-readable list of open and wip tasks for Ollama/user (e.g. "Open tasks:\n- task-foo-1-...\nWIP tasks:\n- ...").
@@ -239,6 +270,79 @@ pub fn list_open_and_wip_tasks() -> Result<Vec<(PathBuf, String, SystemTime)>, S
         out.push((path, status, mtime));
     }
     Ok(out)
+}
+
+/// List all task files (any status) with modification time.
+/// Returns (path, status, mtime). Used for "all tasks" view.
+pub fn list_all_tasks() -> Result<Vec<(PathBuf, String, SystemTime)>, String> {
+    let task_base = Config::task_dir();
+    if !task_base.exists() {
+        return Ok(Vec::new());
+    }
+    let entries = fs::read_dir(&task_base).map_err(|e| format!("Read task dir: {}", e))?;
+    let mut out = Vec::new();
+    for entry in entries {
+        let path = entry.map_err(|e| format!("Read dir entry: {}", e))?.path();
+        if !path.is_file() {
+            continue;
+        }
+        let status = match status_from_path(&path) {
+            Some(s) => s,
+            _ => continue,
+        };
+        let mtime = fs::metadata(&path)
+            .and_then(|m| m.modified())
+            .unwrap_or_else(|_| SystemTime::UNIX_EPOCH);
+        out.push((path, status, mtime));
+    }
+    Ok(out)
+}
+
+/// Format all tasks grouped by status: Open, WIP, Finished, Unsuccessful.
+pub fn format_list_all_tasks() -> Result<String, String> {
+    let list = list_all_tasks()?;
+    if list.is_empty() {
+        return Ok("No tasks. Use TASK_CREATE to create a new task.".to_string());
+    }
+    let order = |s: &str| match s {
+        "open" => 0,
+        "wip" => 1,
+        "finished" => 2,
+        "unsuccessful" => 3,
+        _ => 4,
+    };
+    let mut by_status: std::collections::BTreeMap<u8, Vec<String>> = std::collections::BTreeMap::new();
+    for (path, status, _mtime) in list {
+        let name = path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("?")
+            .to_string();
+        by_status
+            .entry(order(&status))
+            .or_default()
+            .push(name);
+    }
+    let headers = ["Open", "WIP", "Finished", "Unsuccessful"];
+    let keys = [0u8, 1, 2, 3];
+    let mut out = String::new();
+    for (i, &k) in keys.iter().enumerate() {
+        if let Some(names) = by_status.get(&k) {
+            if !names.is_empty() {
+                if !out.is_empty() {
+                    out.push_str("\n\n");
+                }
+                out.push_str(headers[i]);
+                out.push_str(" tasks:\n");
+                for n in names {
+                    out.push_str("- ");
+                    out.push_str(n);
+                    out.push('\n');
+                }
+            }
+        }
+    }
+    Ok(out.trim_end().to_string())
 }
 
 fn expand_tilde(s: &str) -> String {

@@ -33,7 +33,7 @@ mod scheduler;
 mod mcp;
 mod session_memory;
 mod skills;
-mod task;
+pub mod task;
 mod user_info;
 mod commands;
 
