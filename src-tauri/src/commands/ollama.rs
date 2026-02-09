@@ -8,7 +8,6 @@ use crate::ollama::{
 };
 use serde::{Deserialize, Serialize};
 use std::io::Write;
-use std::path::PathBuf;
 use std::process::Command;
 use std::str::FromStr;
 use std::sync::Mutex;
@@ -316,7 +315,9 @@ const AGENT_DESCRIPTIONS_BASE: &str = r#"We have 4 agents available:
    - SCHEDULE: every N minutes <task> (e.g. SCHEDULE: every 5 minutes Execute RUN_JS to fetch CPU and RAM).
    - SCHEDULE: <cron expression> <task> — cron is 6-field (sec min hour day month dow) or 5-field (min hour day month dow; we accept and prepend 0 for seconds). Examples below.
    - SCHEDULE: at <datetime> <task> — one-shot (e.g. reminder tomorrow 5am: use RUN_CMD: date +%Y-%m-%d to get today, then SCHEDULE: at 2025-02-09T05:00:00 Remind me of my flight). Datetime must be ISO local: YYYY-MM-DDTHH:MM:SS or YYYY-MM-DD HH:MM.
-   We add to ~/.mac-stats/schedules.json and confirm."#;
+   We add to ~/.mac-stats/schedules.json and return a schedule ID (e.g. discord-1770648842). Always tell the user this ID so they can remove it later with REMOVE_SCHEDULE.
+
+5. **REMOVE_SCHEDULE**: Remove a scheduled task by its ID. Use when the user asks to remove, delete, or cancel a schedule (e.g. "Remove schedule: discord-1770648842"). Reply with exactly one line: REMOVE_SCHEDULE: <schedule-id> (e.g. REMOVE_SCHEDULE: discord-1770648842)."#;
 
 /// Cron examples for SCHEDULE (6-field: sec min hour day month dow). Shown to the model so it can pick the right pattern (see crontab.guru for more).
 const SCHEDULE_CRON_EXAMPLES: &str = r#"
@@ -371,7 +372,7 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
     let skills = crate::skills::load_skills();
     let mut base = AGENT_DESCRIPTIONS_BASE.to_string();
     base.push_str(SCHEDULE_CRON_EXAMPLES);
-    let mut num = 5u32;
+    let mut num = 6u32;
     if !skills.is_empty() {
         base.push_str(&build_skill_agent_description(num, &skills));
         num += 1;
@@ -381,7 +382,7 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
         num += 1;
     }
     base.push_str(&format!(
-        "\n\n{}. **TASK** (task files under ~/.mac-stats/task/): Use when working on a task file or when the user asks for the list of open tasks. TASK_LIST: get the list of open and WIP tasks (reply: TASK_LIST or TASK_LIST: ). TASK_APPEND: append feedback to a task (reply: TASK_APPEND: <path or task id> <content>). TASK_STATUS: set status (reply: TASK_STATUS: <path or task id> wip|finished). TASK_CREATE: create a new task file (reply: TASK_CREATE: <topic> <id> <initial content>). Paths must be under ~/.mac-stats/task.",
+        "\n\n{}. **TASK** (task files under ~/.mac-stats/task/): Use when working on a task file or when the user asks for tasks. TASK_LIST: default is open and WIP only (reply: TASK_LIST or TASK_LIST: ). TASK_LIST: all — list all tasks grouped by status (reply: TASK_LIST: all when the user asks for all tasks). TASK_SHOW: <path or id> — show that task's content and status to the user so they can read and request updates. TASK_APPEND: append feedback (reply: TASK_APPEND: <path or task id> <content>). TASK_STATUS: set status (reply: TASK_STATUS: <path or task id> wip|finished|unsuccessful). TASK_CREATE: create a new task (reply: TASK_CREATE: <topic> <id> <initial content>). TASK_ASSIGN: <path or id> <agent_id> — reassign task to scheduler, discord, cpu, or default. Paths must be under ~/.mac-stats/task.",
         num
     ));
     num += 1;
@@ -594,7 +595,18 @@ pub async fn answer_with_ollama_and_fetch(
     } else {
         info!("Agent router: starting (question: {})", q_preview);
     }
-    send_status("Thinking…");
+    let truncate_status = |s: &str, max: usize| {
+        let taken: String = s.chars().take(max).collect();
+        if s.chars().count() > max {
+            format!("{}…", taken)
+        } else {
+            taken
+        }
+    };
+    send_status(&format!(
+        "Asking Ollama for a plan (sending your question: \"{}\")…",
+        truncate_status(question, 50)
+    ));
 
     let from_discord = discord_reply_channel_id.is_some();
     let agent_descriptions = build_agent_descriptions(from_discord).await;
@@ -658,11 +670,14 @@ pub async fn answer_with_ollama_and_fetch(
     let plan_response = send_ollama_chat_messages(planning_messages, model_override.clone(), options_override.clone()).await?;
     let recommendation = plan_response.message.content.trim().to_string();
     info!("Agent router: understood plan — RECOMMEND: {}", recommendation.chars().take(200).collect::<String>());
-    send_status("Working on it…");
+    send_status(&format!(
+        "Executing plan: {}…",
+        truncate_status(&recommendation, 72)
+    ));
 
     // --- Execution: system prompt with agents + plan, then tool loop ---
     info!("Agent router: execution step — sending plan + question, starting tool loop (max 5 tools)");
-    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or RUN_CMD: <command and args> or OLLAMA_API: <action> [args] (list_models, version, running, pull/delete/load/unload, embed) or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or SCHEDULE: <cron> <task> or SCHEDULE: at <ISO datetime> <task> or TASK_LIST (to list open and WIP tasks) or TASK_APPEND/TASK_STATUS/TASK_CREATE or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. Then continue with your answer. Answer concisely.";
+    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or RUN_CMD: <command and args> or OLLAMA_API: <action> [args] (list_models, version, running, pull/delete/load/unload, embed) or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or SCHEDULE: <cron> <task> or SCHEDULE: at <ISO datetime> <task> or REMOVE_SCHEDULE: <schedule-id> or TASK_LIST or TASK_LIST: all or TASK_SHOW: <id> (show task to user) or TASK_APPEND/TASK_STATUS/TASK_CREATE or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. Then continue with your answer. Answer concisely.";
     let execution_system_content = match &skill_content {
         Some(skill) => format!(
             "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}\n\nYour plan: {}",
@@ -882,9 +897,8 @@ pub async fn answer_with_ollama_and_fetch(
                                     info!("Agent router: SCHEDULE added (id={}, cron={})", id, cron_str);
                                     let task_preview: String = task.chars().take(100).collect();
                                     format!(
-                                        "Schedule added successfully. The scheduler will run this task (cron: {}): \"{}\". Tell the user in your reply that it is scheduled and they will see the result in this channel when it runs.",
-                                        cron_str,
-                                        task_preview.trim()
+                                        "Schedule added successfully. Schedule ID: **{}**. The scheduler will run this task (cron: {}): \"{}\". Tell the user the schedule ID is {} and they can remove it later with \"Remove schedule: {}\" or by saying REMOVE_SCHEDULE: {}.",
+                                        id, cron_str, task_preview.trim(), id, id, id
                                     )
                                 }
                                 Ok(crate::scheduler::ScheduleAddOutcome::AlreadyExists) => {
@@ -906,9 +920,8 @@ pub async fn answer_with_ollama_and_fetch(
                                     info!("Agent router: SCHEDULE at added (id={}, at={})", id, at_str);
                                     let task_preview: String = task.chars().take(100).collect();
                                     format!(
-                                        "One-time schedule added for {}. The scheduler will run this task once at that time: \"{}\". Tell the user in your reply.",
-                                        at_str,
-                                        task_preview.trim()
+                                        "One-time schedule added. Schedule ID: **{}** (at {}): \"{}\". Tell the user the schedule ID is {} and they can remove it with \"Remove schedule: {}\" or REMOVE_SCHEDULE: {}.",
+                                        id, at_str, task_preview.trim(), id, id, id
                                     )
                                 }
                                 Ok(crate::scheduler::ScheduleAddOutcome::AlreadyExists) => {
@@ -925,6 +938,20 @@ pub async fn answer_with_ollama_and_fetch(
                             info!("Agent router: SCHEDULE parse failed: {}", e);
                             format!("Could not parse schedule (expected e.g. \"every 5 minutes <task>\", \"at <datetime> <task>\", or \"<cron> <task>\"): {}. Ask the user to rephrase.", e)
                         }
+                    }
+                }
+            }
+            "REMOVE_SCHEDULE" => {
+                let id = arg.trim();
+                if id.is_empty() {
+                    "REMOVE_SCHEDULE requires a schedule ID (e.g. discord-1770648842). Ask the user which schedule to remove or to provide the ID.".to_string()
+                } else {
+                    send_status(&format!("Removing schedule: {}…", id));
+                    info!("Agent router: REMOVE_SCHEDULE requested: id={}", id);
+                    match crate::scheduler::remove_schedule_by_id(id) {
+                        Ok(true) => format!("Schedule {} has been removed. Tell the user it is cancelled.", id),
+                        Ok(false) => format!("No schedule found with ID \"{}\". The ID may be wrong or already removed. Tell the user.", id),
+                        Err(e) => format!("Failed to remove schedule: {}. Tell the user.", e),
                     }
                 }
             }
@@ -1120,14 +1147,20 @@ pub async fn answer_with_ollama_and_fetch(
                 } else {
                     let path_or_id = parts[..parts.len() - 1].join(" ");
                     let status = parts[parts.len() - 1].to_lowercase();
-                    if status != "wip" && status != "finished" {
-                        "TASK_STATUS status must be wip or finished.".to_string()
+                    if !["wip", "finished", "unsuccessful", "paused"].contains(&status.as_str()) {
+                        "TASK_STATUS status must be wip, finished, unsuccessful, or paused.".to_string()
                     } else {
                         match crate::task::resolve_task_path(&path_or_id) {
-                            Ok(path) => match crate::task::set_task_status(&path, &status) {
-                                Ok(new_path) => format!("Task status set to {} (file: {:?}).", status, new_path),
-                                Err(e) => format!("TASK_STATUS failed: {}.", e),
-                            },
+                            Ok(path) => {
+                                if status == "finished" && !crate::task::all_sub_tasks_closed(&path).unwrap_or(true) {
+                                    "Cannot set status to finished: not all sub-tasks (## Sub-tasks: ...) are finished or unsuccessful.".to_string()
+                                } else {
+                                    match crate::task::set_task_status(&path, &status) {
+                                        Ok(new_path) => format!("Task status set to {} (file: {:?}).", status, new_path),
+                                        Err(e) => format!("TASK_STATUS failed: {}.", e),
+                                    }
+                                }
+                            }
                             Err(e) => format!("TASK_STATUS failed: {}.", e),
                         }
                     }
@@ -1139,7 +1172,7 @@ pub async fn answer_with_ollama_and_fetch(
                     let topic = segs[0];
                     let id = segs[1];
                     let initial_content = segs[2];
-                    match crate::task::create_task(topic, id, initial_content) {
+                    match crate::task::create_task(topic, id, initial_content, None) {
                         Ok(path) => format!("Task created: {:?}. Use TASK_APPEND and TASK_STATUS to update.", path),
                         Err(e) => format!("TASK_CREATE failed: {}.", e),
                     }
@@ -1147,16 +1180,130 @@ pub async fn answer_with_ollama_and_fetch(
                     "TASK_CREATE requires: TASK_CREATE: <topic> <id> <initial content>.".to_string()
                 }
             }
-            "TASK_LIST" => {
-                send_status("Listing open and WIP tasks…");
-                info!("Agent router: TASK_LIST requested");
-                match crate::task::format_list_open_and_wip_tasks() {
-                    Ok(list) => format!(
-                        "You MUST include this list in your reply to the user. Show it verbatim — do not replace it with generic instructions.\n\nActive task list:\n---\n{}\n---\n\nReply to the user with the above list (or, if it says 'No open or WIP tasks', say that). Task ids are the filenames; they can use TASK_APPEND or TASK_STATUS with those ids.",
-                        list
-                    ),
-                    Err(e) => format!("TASK_LIST failed: {}.", e),
+            "TASK_SHOW" => {
+                if arg.trim().is_empty() {
+                    "TASK_SHOW requires: TASK_SHOW: <path or task id>.".to_string()
+                } else {
+                    send_status("Showing task…");
+                    info!("Agent router: TASK_SHOW requested: {}", arg.trim());
+                    match crate::task::resolve_task_path(arg.trim()) {
+                        Ok(path) => match crate::task::show_task_content(&path) {
+                            Ok((status, assignee, content)) => {
+                                const MAX_CHANNEL_MSG: usize = 1900;
+                                let body = format!(
+                                    "**Status:** {} | **Assigned:** {}\n\n{}",
+                                    status, assignee, content
+                                );
+                                let msg = if body.len() <= MAX_CHANNEL_MSG {
+                                    body
+                                } else {
+                                    format!(
+                                        "{}… [truncated]",
+                                        body.chars().take(MAX_CHANNEL_MSG - 20).collect::<String>()
+                                    )
+                                };
+                                send_status(&msg);
+                                "Task content was sent to the user in the channel. They can ask you to TASK_APPEND or TASK_STATUS for this task.".to_string()
+                            }
+                            Err(e) => format!("TASK_SHOW failed: {}.", e),
+                        },
+                        Err(e) => format!("TASK_SHOW failed: {}.", e),
+                    }
                 }
+            }
+            "TASK_ASSIGN" => {
+                let parts: Vec<&str> = arg.split_whitespace().collect();
+                if parts.len() < 2 {
+                    "TASK_ASSIGN requires: TASK_ASSIGN: <path or task id> <agent_id> (e.g. scheduler, discord, cpu, default).".to_string()
+                } else {
+                    let path_or_id = parts[..parts.len() - 1].join(" ");
+                    let agent_id = parts[parts.len() - 1];
+                    send_status(&format!("Assigning task to {}…", agent_id));
+                    info!("Agent router: TASK_ASSIGN {} -> {}", path_or_id, agent_id);
+                    match crate::task::resolve_task_path(&path_or_id) {
+                        Ok(path) => {
+                            match crate::task::set_assignee(&path, agent_id) {
+                                Ok(()) => {
+                                    let _ = crate::task::append_to_task(&path, &format!("Reassigned to {}.", agent_id));
+                                    format!("Task assigned to {}.", agent_id)
+                                }
+                                Err(e) => format!("TASK_ASSIGN failed: {}.", e),
+                            }
+                        }
+                        Err(e) => format!("TASK_ASSIGN failed: {}.", e),
+                    }
+                }
+            }
+            "TASK_SLEEP" => {
+                let parts: Vec<&str> = arg.split_whitespace().collect();
+                let (path_or_id, until_str) = if parts.len() >= 3 && parts[parts.len() - 2].eq_ignore_ascii_case("until") {
+                    (parts[..parts.len() - 2].join(" "), parts[parts.len() - 1])
+                } else if parts.len() >= 2 {
+                    (parts[..parts.len() - 1].join(" "), parts[parts.len() - 1])
+                } else {
+                    ("".to_string(), "")
+                };
+                if path_or_id.is_empty() || until_str.is_empty() {
+                    "TASK_SLEEP requires: TASK_SLEEP: <path or task id> until <ISO datetime> (e.g. 2025-02-10T09:00:00).".to_string()
+                } else {
+                    send_status("Pausing task…");
+                    info!("Agent router: TASK_SLEEP {} until {}", path_or_id, until_str);
+                    match crate::task::resolve_task_path(&path_or_id) {
+                        Ok(path) => {
+                            if let Ok(new_path) = crate::task::set_task_status(&path, "paused") {
+                                let _ = crate::task::set_paused_until(&new_path, Some(until_str));
+                                let _ = crate::task::append_to_task(&new_path, &format!("Paused until {}.", until_str));
+                            }
+                            format!("Task paused until {}. It will resume automatically after that time.", until_str)
+                        }
+                        Err(e) => format!("TASK_SLEEP failed: {}.", e),
+                    }
+                }
+            }
+            "TASK_LIST" => {
+                let show_all = arg.trim().to_lowercase() == "all"
+                    || arg.trim().to_lowercase() == "all tasks"
+                    || arg.trim().to_lowercase().starts_with("all ");
+                let result = if show_all {
+                    send_status("Listing all tasks (by status)…");
+                    info!("Agent router: TASK_LIST all requested");
+                    match crate::task::format_list_all_tasks() {
+                        Ok(list) => {
+                            const MAX_CHANNEL_MSG: usize = 1900;
+                            let msg = if list.len() <= MAX_CHANNEL_MSG {
+                                format!("**All tasks**\n\n{}", list)
+                            } else {
+                                format!(
+                                    "**All tasks**\n\n{}… [truncated]",
+                                    list.chars().take(MAX_CHANNEL_MSG - 20).collect::<String>()
+                                )
+                            };
+                            send_status(&msg);
+                            "The full task list (Open, WIP, Finished, Unsuccessful) was sent to the user in the channel. Acknowledge that you showed all tasks. Task ids are the filenames; the user can use TASK_APPEND or TASK_STATUS with those ids.".to_string()
+                        }
+                        Err(e) => format!("TASK_LIST failed: {}.", e),
+                    }
+                } else {
+                    send_status("Listing open and WIP tasks…");
+                    info!("Agent router: TASK_LIST requested");
+                    match crate::task::format_list_open_and_wip_tasks() {
+                        Ok(list) => {
+                            const MAX_CHANNEL_MSG: usize = 1900;
+                            let msg = if list.len() <= MAX_CHANNEL_MSG {
+                                format!("**Active task list**\n\n{}", list)
+                            } else {
+                                format!(
+                                    "**Active task list**\n\n{}… [truncated]",
+                                    list.chars().take(MAX_CHANNEL_MSG - 20).collect::<String>()
+                                )
+                            };
+                            send_status(&msg);
+                            "The task list was sent to the user in the channel. Acknowledge that you showed the list. Task ids are the filenames; the user can use TASK_APPEND or TASK_STATUS with those ids.".to_string()
+                        }
+                        Err(e) => format!("TASK_LIST failed: {}.", e),
+                    }
+                };
+                result
             }
             "MCP" => {
                 send_status("Calling MCP tool…");
@@ -1220,53 +1367,6 @@ pub async fn answer_with_ollama_and_fetch(
     let final_len = response_content.chars().count();
     info!("Agent router: done after {} tool(s), returning final response ({} chars): {}", tool_count, final_len, log_content(&response_content));
     Ok(response_content)
-}
-
-/// Run a task file until status is finished. Reads the task, sends to Ollama with TASK_APPEND/TASK_STATUS
-/// instructions, then re-reads and repeats until status is "finished" or max_iterations is reached.
-pub async fn run_task_until_finished(task_path: PathBuf, max_iterations: u32) -> Result<String, String> {
-    use tracing::info;
-    let task_name = task_path
-        .file_name()
-        .and_then(|n| n.to_str())
-        .unwrap_or("task")
-        .to_string();
-    info!("Task loop: working on task '{}'", task_name);
-    match crate::task::status_from_path(&task_path).as_deref() {
-        Some("finished") => {
-            info!("Task loop: task '{}' already finished", task_name);
-            return Ok("Task already finished.".to_string());
-        }
-        Some("unsuccessful") => {
-            info!("Task loop: task '{}' already closed as unsuccessful", task_name);
-            return Ok("Task already closed as unsuccessful.".to_string());
-        }
-        _ => {}
-    }
-    let mut current_path = task_path;
-    let mut last_reply = String::new();
-    for iteration in 0..max_iterations {
-        let content = crate::task::read_task(&current_path).map_err(|e| e.clone())?;
-        let question = format!(
-            "Current task file content:\n\n{}\n\nDecide the next step. Use TASK_APPEND to add feedback and TASK_STATUS to set wip or finished when done. Reply with your action (TASK_APPEND, TASK_STATUS, or a final summary).",
-            content
-        );
-        info!("Task loop: iteration {}/{} for task '{}'", iteration + 1, max_iterations, task_name);
-        last_reply = answer_with_ollama_and_fetch(&question, None, None, None, None, None, None, None, false).await?;
-        if let Some(ref p) = crate::task::find_current_path(&current_path) {
-            current_path = p.clone();
-        }
-        if crate::task::status_from_path(&current_path).as_deref() == Some("finished") {
-            info!("Task loop: task '{}' finished", task_name);
-            return Ok(last_reply);
-        }
-    }
-    info!("Task loop: max iterations ({}) reached for task '{}'", max_iterations, task_name);
-    Ok(format!(
-        "Max iterations ({}) reached. Last reply: {}",
-        max_iterations,
-        last_reply.chars().take(500).collect::<String>()
-    ))
 }
 
 /// Run JavaScript via Node.js (if available). Used for RUN_JS in Discord/agent context.
@@ -1433,9 +1533,13 @@ fn parse_at_datetime(s: &str) -> Result<String, String> {
 /// Also accepts lines starting with "RECOMMEND: " (e.g. "RECOMMEND: SCHEDULER: Every 5 minutes...").
 /// Returns (tool_name, argument) or None.
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "TASK_LIST:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:"];
     for line in content.lines() {
         let line = line.trim();
+        // Ollama sometimes replies with just "TASK_LIST" (no colon); treat as tool call with empty arg.
+        if line.eq_ignore_ascii_case("TASK_LIST") {
+            return Some(("TASK_LIST".to_string(), String::new()));
+        }
         // Ollama sometimes echoes the plan format: "RECOMMEND: RUN_JS: ..." or "RECOMMEND: SCHEDULER: ...".
         let search = if line.to_uppercase().starts_with("RECOMMEND: ") {
             line[11..].trim()
@@ -1461,7 +1565,10 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
                         arg = arg[..idx].trim().to_string();
                     }
                 }
-                if !arg.is_empty() || tool_name == "TASK_LIST" {
+                if !arg.is_empty() || tool_name == "TASK_LIST" || tool_name == "TASK_SHOW" {
+                    return Some((tool_name, arg));
+                }
+                if tool_name == "TASK_SLEEP" && !arg.is_empty() {
                     return Some((tool_name, arg));
                 }
             }
@@ -1472,8 +1579,8 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
 
 /// Tool line prefixes that indicate start of another tool (used to stop script body extraction).
 const TOOL_LINE_PREFIXES: &[&str] = &[
-    "FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:",
-    "TASK_LIST:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:",
+    "FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:",
+    "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:",
 ];
 
 /// Parse PYTHON_SCRIPT from full response: (id, topic, script_body).

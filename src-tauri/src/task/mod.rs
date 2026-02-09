@@ -3,6 +3,7 @@
 
 pub mod cli;
 pub mod review;
+pub mod runner;
 
 use crate::config::Config;
 use std::path::{Path, PathBuf};
@@ -10,7 +11,7 @@ use std::fs;
 use std::time::SystemTime;
 use tracing::info;
 
-const VALID_STATUSES: &[&str] = &["open", "wip", "finished", "unsuccessful"];
+const VALID_STATUSES: &[&str] = &["open", "wip", "finished", "unsuccessful", "paused"];
 
 fn is_valid_status(s: &str) -> bool {
     VALID_STATUSES.contains(&s)
@@ -66,12 +67,21 @@ pub fn set_task_status(path: &Path, new_status: &str) -> Result<PathBuf, String>
 }
 
 /// Create a new task file with status "open". Returns the path.
-pub fn create_task(topic: &str, id: &str, initial_content: &str) -> Result<PathBuf, String> {
+/// If assigned_to is Some, writes "## Assigned: agent_id" at top; otherwise "## Assigned: default".
+pub fn create_task(
+    topic: &str,
+    id: &str,
+    initial_content: &str,
+    assigned_to: Option<&str>,
+) -> Result<PathBuf, String> {
     let _ = Config::ensure_task_directory();
     let topic_slug = slug(topic);
     let datetime = chrono::Local::now().format("%Y%m%d-%H%M%S").to_string();
     let path = task_path(&topic_slug, id, &datetime, "open");
-    fs::write(&path, initial_content.trim()).map_err(|e| format!("Write task file: {}", e))?;
+    let agent = assigned_to.unwrap_or("default").trim();
+    let header = format!("{} {}\n\n", ASSIGNED_HEADER, if agent.is_empty() { "default" } else { agent });
+    let content = format!("{}{}", header, initial_content.trim());
+    fs::write(&path, content).map_err(|e| format!("Write task file: {}", e))?;
     info!("Task: created {:?} (topic={}, id={})", path, topic_slug, id);
     Ok(path)
 }
@@ -92,6 +102,175 @@ pub fn read_task(path: &Path) -> Result<String, String> {
     let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
     info!("Task: read {:?} ({} chars)", path, content.len());
     Ok(content)
+}
+
+/// In-file header for assignee. Line format: "## Assigned: agent_id"
+const ASSIGNED_HEADER: &str = "## Assigned:";
+
+/// Get assignee from task file (first line matching ## Assigned: ...). Default "default".
+pub fn get_assignee(path: &Path) -> Result<String, String> {
+    let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
+    for line in content.lines() {
+        let line = line.trim();
+        if line.starts_with(ASSIGNED_HEADER) {
+            let agent = line[ASSIGNED_HEADER.len()..].trim();
+            return Ok(if agent.is_empty() {
+                "default".to_string()
+            } else {
+                agent.to_string()
+            });
+        }
+    }
+    Ok("default".to_string())
+}
+
+/// Set assignee in task file (add or replace ## Assigned: line).
+pub fn set_assignee(path: &Path, agent_id: &str) -> Result<(), String> {
+    let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
+    let new_line = format!("{} {}\n", ASSIGNED_HEADER, agent_id.trim());
+    let mut found = false;
+    let lines: Vec<&str> = content.lines().collect();
+    let mut out = String::new();
+    for line in &lines {
+        if line.trim().starts_with(ASSIGNED_HEADER) {
+            out.push_str(&new_line);
+            found = true;
+        } else {
+            out.push_str(line);
+            out.push('\n');
+        }
+    }
+    if !found {
+        out = format!("{}{}\n{}", new_line, if out.is_empty() { "" } else { "\n" }, out);
+    }
+    fs::write(path, out.trim_end()).map_err(|e| format!("Write task file: {}", e))?;
+    info!("Task: assignee set to {} for {:?}", agent_id, path);
+    Ok(())
+}
+
+/// Result of showing a task: status, assignee, and full content.
+pub fn show_task_content(path: &Path) -> Result<(String, String, String), String> {
+    let status = status_from_path(path).unwrap_or_else(|| "?".to_string());
+    let assignee = get_assignee(path).unwrap_or_else(|_| "default".to_string());
+    let content = read_task(path)?;
+    Ok((status, assignee, content))
+}
+
+/// In-file line for pause deadline. Format: "## Paused until: 2025-02-10T09:00:00"
+const PAUSED_UNTIL_HEADER: &str = "## Paused until:";
+
+/// Get paused-until datetime from task file (None if not paused or no until).
+pub fn get_paused_until(path: &Path) -> Result<Option<String>, String> {
+    let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
+    for line in content.lines() {
+        let line = line.trim();
+        if line.starts_with(PAUSED_UNTIL_HEADER) {
+            let s = line[PAUSED_UNTIL_HEADER.len()..].trim();
+            return Ok(if s.is_empty() { None } else { Some(s.to_string()) });
+        }
+    }
+    Ok(None)
+}
+
+/// In-file line for dependencies. Format: "## Depends: id1, id2"
+const DEPENDS_HEADER: &str = "## Depends:";
+
+/// Get dependency task ids from file (empty if none).
+pub fn get_depends_on(path: &Path) -> Result<Vec<String>, String> {
+    let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
+    for line in content.lines() {
+        let line = line.trim();
+        if line.starts_with(DEPENDS_HEADER) {
+            let rest = line[DEPENDS_HEADER.len()..].trim();
+            let ids: Vec<String> = rest.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
+            return Ok(ids);
+        }
+    }
+    Ok(Vec::new())
+}
+
+/// In-file line for sub-tasks. Format: "## Sub-tasks: id1, id2"
+const SUB_TASKS_HEADER: &str = "## Sub-tasks:";
+
+/// Get sub-task ids from file (empty if none).
+pub fn get_sub_tasks(path: &Path) -> Result<Vec<String>, String> {
+    let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
+    for line in content.lines() {
+        let line = line.trim();
+        if line.starts_with(SUB_TASKS_HEADER) {
+            let rest = line[SUB_TASKS_HEADER.len()..].trim();
+            let ids: Vec<String> = rest.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
+            return Ok(ids);
+        }
+    }
+    Ok(Vec::new())
+}
+
+/// True if all sub-tasks are finished or unsuccessful.
+pub fn all_sub_tasks_closed(path: &Path) -> Result<bool, String> {
+    let ids = get_sub_tasks(path)?;
+    if ids.is_empty() {
+        return Ok(true);
+    }
+    for id in &ids {
+        let sub_path = resolve_task_path(id)?;
+        let status = status_from_path(&sub_path).unwrap_or_default();
+        if status != "finished" && status != "unsuccessful" {
+            return Ok(false);
+        }
+    }
+    Ok(true)
+}
+
+/// True if all dependency tasks are finished or unsuccessful (task is ready to run).
+pub fn is_ready(path: &Path) -> Result<bool, String> {
+    let deps = get_depends_on(path)?;
+    if deps.is_empty() {
+        return Ok(true);
+    }
+    let task_base = Config::task_dir();
+    for id in &deps {
+        let entries = fs::read_dir(&task_base).map_err(|e| format!("Read task dir: {}", e))?;
+        let mut found = false;
+        for entry in entries {
+            let p = entry.map_err(|e| format!("Read dir: {}", e))?.path();
+            if !p.is_file() {
+                continue;
+            }
+            let name = p.file_name().and_then(|n| n.to_str()).unwrap_or("");
+            if !name.contains(id.as_str()) {
+                continue;
+            }
+            found = true;
+            let status = status_from_path(&p).unwrap_or_default();
+            if status != "finished" && status != "unsuccessful" {
+                return Ok(false);
+            }
+            break;
+        }
+        if !found {
+            return Ok(false);
+        }
+    }
+    Ok(true)
+}
+
+/// Set or clear paused-until line in task file (add/replace/remove).
+pub fn set_paused_until(path: &Path, until_iso: Option<&str>) -> Result<(), String> {
+    let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
+    let mut out = String::new();
+    for line in content.lines() {
+        if line.trim().starts_with(PAUSED_UNTIL_HEADER) {
+            continue;
+        }
+        out.push_str(line);
+        out.push('\n');
+    }
+    if let Some(until) = until_iso {
+        out = format!("{} {}\n\n{}", PAUSED_UNTIL_HEADER, until.trim(), out.trim_start());
+    }
+    fs::write(path, out.trim_end()).map_err(|e| format!("Write task file: {}", e))?;
+    Ok(())
 }
 
 /// Filename-safe slug from topic (alphanumeric, spaces to dashes, lowercase).
@@ -165,7 +344,7 @@ pub fn find_current_path(previous_path: &Path) -> Option<PathBuf> {
         .or_else(|| stem.strip_suffix("-finished"))
         .or_else(|| stem.strip_suffix("-unsuccessful"))
         .unwrap_or(stem);
-    for status in ["open", "wip", "finished", "unsuccessful"] {
+    for status in ["open", "wip", "finished", "unsuccessful", "paused"] {
         let p = parent.join(format!("{}-{}.md", base, status));
         if p.exists() {
             return Some(p);
@@ -175,7 +354,7 @@ pub fn find_current_path(previous_path: &Path) -> Option<PathBuf> {
 }
 
 /// All status suffixes for a task (same base name, different status file).
-const STATUS_SUFFIXES: &[&str] = &["open", "wip", "finished", "unsuccessful"];
+const STATUS_SUFFIXES: &[&str] = &["open", "wip", "finished", "unsuccessful", "paused"];
 
 /// Delete all files for a task (open, wip, finished, unsuccessful). Returns number of files removed.
 pub fn delete_task(path_or_id: &str) -> Result<usize, String> {
@@ -217,10 +396,12 @@ pub fn format_list_open_and_wip_tasks() -> Result<String, String> {
             .and_then(|n| n.to_str())
             .unwrap_or("?")
             .to_string();
+        let assignee = get_assignee(&path).unwrap_or_else(|_| "default".to_string());
+        let line = format!("{} (assigned: {})", name, assignee);
         if status == "open" {
-            open.push(name);
+            open.push(line);
         } else {
-            wip.push(name);
+            wip.push(line);
         }
     }
     let mut out = String::new();
@@ -309,7 +490,8 @@ pub fn format_list_all_tasks() -> Result<String, String> {
         "wip" => 1,
         "finished" => 2,
         "unsuccessful" => 3,
-        _ => 4,
+        "paused" => 4,
+        _ => 5,
     };
     let mut by_status: std::collections::BTreeMap<u8, Vec<String>> = std::collections::BTreeMap::new();
     for (path, status, _mtime) in list {
@@ -318,13 +500,15 @@ pub fn format_list_all_tasks() -> Result<String, String> {
             .and_then(|n| n.to_str())
             .unwrap_or("?")
             .to_string();
+        let assignee = get_assignee(&path).unwrap_or_else(|_| "default".to_string());
+        let line = format!("{} (assigned: {})", name, assignee);
         by_status
             .entry(order(&status))
             .or_default()
-            .push(name);
+            .push(line);
     }
-    let headers = ["Open", "WIP", "Finished", "Unsuccessful"];
-    let keys = [0u8, 1, 2, 3];
+    let headers = ["Open", "WIP", "Finished", "Unsuccessful", "Paused"];
+    let keys = [0u8, 1, 2, 3, 4];
     let mut out = String::new();
     for (i, &k) in keys.iter().enumerate() {
         if let Some(names) = by_status.get(&k) {

@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Task module and CLI**: All task logic centralized in `task/` (mod, runner, review, cli). Ollama and scheduler only call into the task module.
+  - **CLI**: `mac_stats add|list|show|status|remove|assign|append` for testing and scripting (e.g. `mac_stats add foo 1 "Content"`, `mac_stats list --all`, `mac_stats assign 1 scheduler`).
+  - **TASK_SHOW**: Show one task's status, assignee, and content to the user in the message channel (Discord/UI).
+  - **Assignee**: Every task has `## Assigned: agent_id` (default `default`). **TASK_ASSIGN** reassigns to scheduler|discord|cpu|default. Review loop only picks tasks assigned to **scheduler** or **default**.
+  - **TASK_STATUS** allows **unsuccessful** and **paused**. **TASK_SLEEP: &lt;id&gt; until &lt;ISO datetime&gt;** pauses until that time; review loop auto-resumes when time has passed.
+  - **Dependencies**: `## Depends: id1, id2` in task file; review loop only picks tasks whose dependencies are finished or unsuccessful (**is_ready**).
+  - **Sub-tasks**: `## Sub-tasks: id1, id2`; parent cannot be set to **finished** until all sub-tasks are finished or unsuccessful.
+  - **Review loop**: Up to 3 open tasks per cycle, 20 iterations per task; auto-close as unsuccessful on max iterations; resume due paused tasks each cycle.
+  - **task/runner.rs**: `run_task_until_finished` moved from ollama to task module; scheduler and review call `task::runner::run_task_until_finished`.
+- **delete_task**: Remove all status files for a task (CLI `remove`, used by CLI only).
+
+### Changed
+- **Task docs**: `docs/013_task_agent.md` rewritten — CLI, TASK_SHOW, assignee, TASK_ASSIGN, pause/sleep, dependencies, sub-tasks, module layout, review behaviour.
+
 ## [0.1.11] - 2026-02-09
 
 ### Added

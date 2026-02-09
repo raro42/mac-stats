@@ -47,7 +47,7 @@ pub enum TaskCmd {
 pub fn run(cmd: TaskCmd) -> Result<(), i32> {
     match cmd {
         TaskCmd::Add { topic, id, content } => {
-            match crate::task::create_task(&topic, &id, &content) {
+            match crate::task::create_task(&topic, &id, &content, None) {
                 Ok(path) => {
                     println!("Created: {}", path.display());
                     Ok(())
@@ -83,16 +83,15 @@ pub fn run(cmd: TaskCmd) -> Result<(), i32> {
                     return Err(1);
                 }
             };
-            let status = crate::task::status_from_path(&path)
-                .unwrap_or_else(|| "?".to_string());
-            let content = match crate::task::read_task(&path) {
-                Ok(c) => c,
+            let (status, assignee, content) = match crate::task::show_task_content(&path) {
+                Ok(t) => t,
                 Err(e) => {
                     eprintln!("Error: {}", e);
                     return Err(1);
                 }
             };
             println!("Status: {}", status);
+            println!("Assigned: {}", assignee);
             println!("Path: {}", path.display());
             println!("---");
             println!("{}", content);
@@ -145,9 +144,26 @@ pub fn run(cmd: TaskCmd) -> Result<(), i32> {
             }
         }
         TaskCmd::Assign { id, agent } => {
-            // Phase C: will implement set_assignee in task module
-            eprintln!("Assign not implemented yet (phase C). Use: --task assign {} {}", id, agent);
-            Err(1)
+            let path = match crate::task::resolve_task_path(&id) {
+                Ok(p) => p,
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    return Err(1);
+                }
+            };
+            match crate::task::set_assignee(&path, &agent) {
+                Ok(()) => {
+                    if let Err(e) = crate::task::append_to_task(&path, &format!("Reassigned to {}.", agent)) {
+                        eprintln!("Warning: append note failed: {}", e);
+                    }
+                    println!("Assigned task {} to {}", id, agent);
+                    Ok(())
+                }
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    Err(1)
+                }
+            }
         }
         TaskCmd::Append { id, content } => {
             let path = match crate::task::resolve_task_path(&id) {

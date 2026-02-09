@@ -241,7 +241,8 @@ async fn execute_task(entry: &ScheduleEntry) -> Option<String> {
                     .unwrap_or(path_or_id);
                 if let Some(ref channel_id_str) = entry.reply_to_channel_id {
                     if let Ok(channel_id) = channel_id_str.parse::<u64>() {
-                        let msg = format!("Working on task '{}' now.", task_name);
+                        let schedule_prefix = entry.id.as_deref().map(|sid| format!("[Schedule: {}] ", sid)).unwrap_or_default();
+                        let msg = format!("{}Working on task '{}' now.", schedule_prefix, task_name);
                         if let Err(e) = crate::discord::send_message_to_channel(channel_id, &msg).await {
                             error!("Scheduler: failed to send 'working on task' to Discord channel {}: {}", channel_id_str, e);
                         } else {
@@ -249,7 +250,7 @@ async fn execute_task(entry: &ScheduleEntry) -> Option<String> {
                         }
                     }
                 }
-                match crate::commands::ollama::run_task_until_finished(path, 10).await {
+                match crate::task::runner::run_task_until_finished(path, 10).await {
                     Ok(reply) => {
                         info!("Scheduler: task completed (id={}, {} chars)", id_info, reply.chars().count());
                         Some(reply)
@@ -350,7 +351,12 @@ async fn scheduler_loop() {
             let reply = execute_task(entry).await;
             if let (Some(ref channel_id_str), Some(ref text)) = (&entry.reply_to_channel_id, &reply) {
                 if let Ok(channel_id) = channel_id_str.parse::<u64>() {
-                    if let Err(e) = crate::discord::send_message_to_channel(channel_id, text).await {
+                    let message = if let Some(ref sid) = entry.id {
+                        format!("[Schedule: {}]\n\n{}", sid, text)
+                    } else {
+                        text.clone()
+                    };
+                    if let Err(e) = crate::discord::send_message_to_channel(channel_id, &message).await {
                         error!("Scheduler: failed to send result to Discord channel {}: {}", channel_id_str, e);
                     } else {
                         info!("Scheduler: sent result to Discord channel {}", channel_id_str);
@@ -476,6 +482,33 @@ pub fn add_schedule_at(
         reply_to_channel_id.is_some()
     );
     Ok(ScheduleAddOutcome::Added)
+}
+
+/// Remove a schedule entry by id (e.g. "discord-1770648842"). Returns Ok(true) if removed, Ok(false) if not found.
+pub fn remove_schedule_by_id(id: &str) -> Result<bool, String> {
+    let _ = Config::ensure_schedules_directory();
+    let path = Config::schedules_file_path();
+
+    if !path.exists() {
+        return Ok(false);
+    }
+
+    let content = std::fs::read_to_string(&path).map_err(|e| format!("Failed to read schedules file: {}", e))?;
+    let mut file_data: SchedulesFile =
+        serde_json::from_str(&content).map_err(|e| format!("Failed to parse schedules file: {}", e))?;
+
+    let original_len = file_data.schedules.len();
+    file_data.schedules.retain(|e| e.id.as_deref() != Some(id));
+    let removed = file_data.schedules.len() < original_len;
+
+    if removed {
+        let json = serde_json::to_string_pretty(&file_data)
+            .map_err(|e| format!("Failed to serialize schedules: {}", e))?;
+        std::fs::write(&path, json).map_err(|e| format!("Failed to write schedules file: {}", e))?;
+        info!("Scheduler: schedule removed (id={})", id);
+    }
+
+    Ok(removed)
 }
 
 /// Spawn the scheduler in a background thread. Reads ~/.mac-stats/schedules.json and runs due tasks.
