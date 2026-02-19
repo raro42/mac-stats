@@ -21,7 +21,11 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 | **MCP** | `MCP: <tool_name> <arguments>` | Run a tool from the configured MCP server (any server on the internet via HTTP/SSE). | `mcp/` or `commands/mcp.rs` → list tools, `call_tool()`. Requires `MCP_SERVER_URL` (env or `.config.env`). See `docs/010_mcp_agent.md`. |
 | **AGENT** | `AGENT: <id or slug or name> [optional task]` | Run a specialized LLM agent (its own model and prompt: soul + mood + skill). Use when a task fits an agent below; result is injected back. | `agents/mod.rs` → `load_agents()`, `find_agent_by_id_or_name()`; `commands/ollama.rs` → `run_agent_ollama_session()`. Only listed when `~/.mac-stats/agents/` has at least one enabled `agent-<id>/`. See `docs/017_llm_agents.md`. |
 
-**Parsing:** The app parses assistant content for lines starting with `FETCH_URL:`, `BRAVE_SEARCH:`, `RUN_JS:`, `SKILL:`, `AGENT:`, `RUN_CMD:`, `TASK_APPEND:`, `TASK_STATUS:`, `TASK_CREATE:`, `OLLAMA_API:`, `PYTHON_SCRIPT:`, or `MCP:` (see `parse_tool_from_response` in `commands/ollama.rs`). For FETCH_URL and BRAVE_SEARCH, the argument is truncated at the first `;` if Ollama concatenates multiple tools on one line. For PYTHON_SCRIPT, the script body is taken from a fenced ```python block or from lines after the PYTHON_SCRIPT: line.
+**Parsing:** The app parses assistant content for lines starting with `FETCH_URL:`, `BRAVE_SEARCH:`, `RUN_JS:`, `SKILL:`, `AGENT:`, `RUN_CMD:`, `TASK_APPEND:`, `TASK_STATUS:`, `TASK_CREATE:`, `OLLAMA_API:`, `PYTHON_SCRIPT:`, or `MCP:` (see `parse_tool_from_response` in `commands/ollama.rs`). The parser strips leading list numbering (`1. `, `2) `, `- `, `* `) and nested `RECOMMEND:` prefixes before matching tool names. For FETCH_URL and BRAVE_SEARCH, the argument is truncated at the first `;`. For all tools, the argument is truncated at the next numbered step boundary (` 2. `, ` 3) `) to isolate the first tool call when the model concatenates multiple plan steps on one line. For PYTHON_SCRIPT, the script body is taken from a fenced ```python block or from lines after the PYTHON_SCRIPT: line.
+
+**Empty response fallback:** When Ollama returns an empty response after a successful tool execution (RUN_CMD, FETCH_URL, DISCORD_API, MCP, or search), the raw tool output is returned directly to the user instead of showing nothing.
+
+**System prompts:** The planning and execution prompts are loaded from `~/.mac-stats/prompts/planning_prompt.md` and `~/.mac-stats/prompts/execution_prompt.md`. The execution prompt contains a `{{AGENTS}}` placeholder that is replaced at runtime with the dynamically generated tool descriptions. Defaults are written on first launch from embedded content; edits take effect on the next request. See `docs/023_externalized_prompts.md`.
 
 ---
 
@@ -61,6 +65,7 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 
 - **Docs:** `docs/011_local_cmd_agent.md`
 - **Behaviour:** Not an entry point; it's a **tool** Ollama uses when it outputs `RUN_CMD: <command> [args]`. The app runs a restricted set of local commands (cat, head, tail, ls, grep, date, whoami); file paths must be under ~/.mac-stats; date and whoami need no path. Result is injected into the conversation.
+- **Retry loop:** When a command fails (non-zero exit), the error is sent back to Ollama in a focused prompt asking for the corrected command. The corrected command is extracted and retried, up to 3 times. This handles cases where the model appends plan commentary to the command (e.g. `cat file.json to view...` → Ollama fixes to `cat file.json`).
 - **Where used:** Discord agent, Scheduler agent, and (when the CPU-window flow uses the same tool loop) the CPU window. Omitted from the agent list when `ALLOW_LOCAL_CMD=0`.
 
 ### 2.6 TASK agent (tool + scheduler entry)

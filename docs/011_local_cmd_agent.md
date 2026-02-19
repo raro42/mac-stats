@@ -28,6 +28,18 @@ When RUN_CMD is disabled via `ALLOW_LOCAL_CMD=0`, the agent is omitted from the 
 - Ollama can reply with `RUN_CMD: cat ~/.mac-stats/schedules.json`. The app runs the command, validates paths, and injects the result (or an error) into the conversation.
 - The tool loop (Discord, scheduler, and when wired CPU-window flow) supports RUN_CMD like other tools; each RUN_CMD call counts as one tool iteration (max 5).
 
+## Retry loop (AI-assisted error correction)
+
+When a command fails (non-zero exit code), the app does **not** give up immediately. Instead it enters a retry loop (up to 3 retries):
+
+1. The error message (e.g. `cat: to: No such file or directory`) is sent to Ollama in a focused, minimal prompt: *"The command `<cmd>` failed with error: `<error>`. Reply with ONLY the corrected command: `RUN_CMD: <corrected command>`."*
+2. Ollama returns the corrected command (e.g. `RUN_CMD: cat ~/.mac-stats/schedules.json`).
+3. The corrected command is extracted via `parse_tool_from_response` and executed.
+4. If it succeeds, the output is used. If it fails again, the loop repeats (up to 3 retries).
+5. If all retries fail, the last error is returned.
+
+This handles the common case where the model appends plan commentary to the command arg (e.g. `cat file.json to view the schedule, then REMOVE_SCHEDULE: <id>`), which causes `cat` to fail on the extra words. The retry prompt forces the model to output just the clean command.
+
 ## Security
 
 - Only the seven commands above are allowed (cat, head, tail, ls, grep, date, whoami). No `find`, `sed`, or shell.

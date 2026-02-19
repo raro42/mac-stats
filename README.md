@@ -54,6 +54,9 @@ This project was developed through "vibe coding" - building features iteratively
 - **Chat commands** — Type `--cpu` to toggle the CPU window, `-v`/`-vv`/`-vvv` to change log verbosity at runtime.
 - **Session memory** — Discord bot remembers conversation context (last 20 turns per channel); resumes after restart from session files.
 - **Auto-detection** — Ollama model auto-detected at startup from installed models (no hardcoded model names).
+- **LLM agents** — Four default agents ship with the app (orchestrator, general assistant, coder, generalist) under `~/.mac-stats/agents/`; each has its own model, skill, and testing scenarios.
+- **Externalized prompts** — System prompts (planning, execution, soul) are editable Markdown files under `~/.mac-stats/prompts/` and `~/.mac-stats/agents/soul.md`. Changes take effect immediately without rebuild.
+- **RUN_CMD retry** — When a local command fails, the AI automatically corrects and retries (up to 3 times).
 
 ### UI
 - Menu bar integration
@@ -195,6 +198,9 @@ mac-stats is designed to be extremely efficient:
 - ✅ PYTHON_SCRIPT agent (run Python scripts from Ollama)
 - ✅ Scheduler (cron/at, optional Discord reply channel)
 - ✅ Skills and per-model context/params
+- ✅ LLM agents with default agents (orchestrator, assistant, coder, generalist)
+- ✅ Externalized prompts (editable planning, execution, soul files)
+- ✅ RUN_CMD retry with AI-assisted error correction
 - ✅ Status Icon Dashboard with real-time indicators
 - ✅ Process list (refreshes every 15s, clickable for details) and force quit
 - ✅ Menu bar integration

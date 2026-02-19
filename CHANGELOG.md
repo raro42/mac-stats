@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.14] - 2026-02-19
+
+### Added
+- **Externalized prompts**: System prompts (`planning_prompt.md`, `execution_prompt.md`) and soul (`soul.md`) are now editable files under `~/.mac-stats/prompts/` and `~/.mac-stats/agents/`. Previously hardcoded as Rust constants. The execution prompt supports a `{{AGENTS}}` placeholder that is replaced at runtime with the dynamically generated tool list.
+- **Default agents shipped**: Four default agents (orchestrator, general assistant, coder, generalist) are embedded in the binary via `include_str!` from `src-tauri/defaults/`. On first launch, `ensure_defaults()` writes all missing files (`agent.json`, `skill.md`, `testing.md` per agent, plus `soul.md` and prompts). Existing user files are never overwritten.
+- **Tauri commands for prompt editing**: `list_prompt_files` returns name, path, and content of all prompt files; `save_prompt_file(name, content)` writes to a named prompt file. Available for frontend integration.
+- **RUN_CMD retry loop**: When a local command fails (non-zero exit), the app sends the error to Ollama in a focused prompt asking for a corrected command. Retries up to 3 times. Handles cases where the model appends plan commentary to the command arg (e.g. `cat file.json then do X`).
+- **Empty response fallback**: When Ollama returns an empty response after a successful tool execution, the raw tool output is returned directly to the user instead of showing nothing. Covers RUN_CMD, FETCH_URL, DISCORD_API, MCP, and search results.
+
+### Fixed
+- **Tool parsing: numbered list plans**: `parse_tool_from_response` now strips leading list numbering (`1. `, `2) `, `- `, `* `) and multiple nested `RECOMMEND:` prefixes. Previously, plans like `1. RUN_CMD: cat file.json 2. Extract...` were not recognized as tool calls.
+- **Tool arg truncation**: When Ollama concatenates multiple plan steps on one line, the arg is now truncated at the next numbered step boundary (e.g. ` 2. `) so commands receive clean arguments.
+- **RECOMMEND prefix stripping**: The recommendation from the planning step now has all `RECOMMEND:` prefixes stripped before being used in the execution system prompt and before tool parsing. Previously, the raw `RECOMMEND: RUN_CMD: ...` was passed to Ollama's execution step as `Your plan: RECOMMEND: RUN_CMD: ...`, which confused the model into returning empty responses.
+- **Stale binary**: Ensured all code changes (fast-path tool execution, RECOMMEND stripping) are compiled into the running binary. Previous session's changes were only in source but not rebuilt.
+
+### Changed
+- **Prompts loaded from files**: `EXECUTION_PROMPT` and `PLANNING_PROMPT` are no longer Rust `const` strings. They are read from `~/.mac-stats/prompts/` at each request, so edits take effect immediately without rebuild.
+- **`DEFAULT_SOUL` uses `include_str!`**: The default soul content is now a real Markdown file at `src-tauri/defaults/agents/soul.md`, embedded at compile time. Easier to read and diff than an inline Rust string literal.
+- **`src-tauri/defaults/` directory**: All default content (soul, prompts, agents) lives as real `.md`/`.json` files in the repo, embedded via `include_str!`. Clean Markdown diffs in PRs.
+
 ## [0.1.13] - 2026-02-19
 
 ### Added

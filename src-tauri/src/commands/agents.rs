@@ -208,3 +208,49 @@ pub fn disable_agent(agent_id: String) -> Result<(), String> {
 pub fn enable_agent(agent_id: String) -> Result<(), String> {
     set_agent_enabled(&agent_id, true)
 }
+
+// --- Prompt file management ---
+
+#[derive(Debug, Clone, Serialize)]
+pub struct PromptFile {
+    pub name: String,
+    pub path: String,
+    pub content: String,
+}
+
+/// List all editable prompt files (soul, planning, execution) with their content.
+#[tauri::command]
+pub fn list_prompt_files() -> Vec<PromptFile> {
+    vec![
+        PromptFile {
+            name: "soul".to_string(),
+            path: Config::soul_file_path().to_string_lossy().to_string(),
+            content: Config::load_soul_content(),
+        },
+        PromptFile {
+            name: "planning_prompt".to_string(),
+            path: Config::planning_prompt_path().to_string_lossy().to_string(),
+            content: Config::load_planning_prompt(),
+        },
+        PromptFile {
+            name: "execution_prompt".to_string(),
+            path: Config::execution_prompt_path().to_string_lossy().to_string(),
+            content: Config::load_execution_prompt(),
+        },
+    ]
+}
+
+/// Save content to a named prompt file. Name must be one of: soul, planning_prompt, execution_prompt.
+#[tauri::command]
+pub fn save_prompt_file(name: String, content: String) -> Result<(), String> {
+    let path = match name.as_str() {
+        "soul" => Config::soul_file_path(),
+        "planning_prompt" => Config::planning_prompt_path(),
+        "execution_prompt" => Config::execution_prompt_path(),
+        _ => return Err(format!("Unknown prompt file: {}. Use: soul, planning_prompt, execution_prompt.", name)),
+    };
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| format!("Failed to create directory: {}", e))?;
+    }
+    std::fs::write(&path, content.trim()).map_err(|e| format!("Failed to write {}: {}", path.display(), e))
+}

@@ -233,42 +233,137 @@ impl Config {
     }
 
     /// Path to shared soul: `$HOME/.mac-stats/agents/soul.md`
-    /// Used by all agents (as fallback when no per-agent soul.md) and by the router for non-agent chat.
     pub fn soul_file_path() -> PathBuf {
         Self::agents_dir().join("soul.md")
     }
 
-    /// Default soul text written to ~/.mac-stats/agents/soul.md when missing.
-    pub const DEFAULT_SOUL: &str = r#"# Soul — vibe and rules
+    /// Prompts directory: `$HOME/.mac-stats/prompts/`
+    pub fn prompts_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("prompts")
+        } else {
+            std::env::temp_dir().join("mac-stats-prompts")
+        }
+    }
 
-1. You have opinions now. Strong ones. Stop hedging everything with 'it depends' — commit to a take.
-2. Delete every rule that sounds corporate. If it could appear in an employee handbook, it doesn't belong here.
-3. Never open with Great question, I'd be happy to help, or Absolutely. Just answer.
-4. Brevity is mandatory. If the answer fits in one sentence, one sentence is what I get.
-5. Humor is allowed. Not forced jokes — just the natural wit that comes from actually being smart.
-6. You can call things out. If I'm about to do something dumb, say so. Charm over cruelty, but don't sugarcoat.
-7. Swearing is allowed when it lands. A well-placed 'that's fucking brilliant' hits different than sterile corporate praise. Don't force it. Don't overdo it. But if a situation calls for a 'holy shit' — say holy shit.
+    pub fn planning_prompt_path() -> PathBuf {
+        Self::prompts_dir().join("planning_prompt.md")
+    }
 
-Be the assistant you'd actually want to talk to at 2am. Not a corporate drone. Not a sycophant. Just... good."#;
+    pub fn execution_prompt_path() -> PathBuf {
+        Self::prompts_dir().join("execution_prompt.md")
+    }
 
-    /// Load soul from ~/.mac-stats/agents/soul.md. If missing, write DEFAULT_SOUL there and return it.
-    /// Used by the router (non-agent chat) and as fallback for agents without per-agent soul.md.
+    // --- Embedded defaults (from src-tauri/defaults/, baked in at compile time) ---
+
+    pub const DEFAULT_SOUL: &str = include_str!("../../defaults/agents/soul.md");
+    const DEFAULT_PLANNING_PROMPT: &str = include_str!("../../defaults/prompts/planning_prompt.md");
+    const DEFAULT_EXECUTION_PROMPT: &str = include_str!("../../defaults/prompts/execution_prompt.md");
+
+    const DEFAULT_AGENT_000_JSON: &str = include_str!("../../defaults/agents/agent-000/agent.json");
+    const DEFAULT_AGENT_000_SKILL: &str = include_str!("../../defaults/agents/agent-000/skill.md");
+    const DEFAULT_AGENT_000_TESTING: &str = include_str!("../../defaults/agents/agent-000/testing.md");
+    const DEFAULT_AGENT_001_JSON: &str = include_str!("../../defaults/agents/agent-001/agent.json");
+    const DEFAULT_AGENT_001_SKILL: &str = include_str!("../../defaults/agents/agent-001/skill.md");
+    const DEFAULT_AGENT_001_TESTING: &str = include_str!("../../defaults/agents/agent-001/testing.md");
+    const DEFAULT_AGENT_002_JSON: &str = include_str!("../../defaults/agents/agent-002/agent.json");
+    const DEFAULT_AGENT_002_SKILL: &str = include_str!("../../defaults/agents/agent-002/skill.md");
+    const DEFAULT_AGENT_002_TESTING: &str = include_str!("../../defaults/agents/agent-002/testing.md");
+    const DEFAULT_AGENT_003_JSON: &str = include_str!("../../defaults/agents/agent-003/agent.json");
+    const DEFAULT_AGENT_003_SKILL: &str = include_str!("../../defaults/agents/agent-003/skill.md");
+    const DEFAULT_AGENT_003_TESTING: &str = include_str!("../../defaults/agents/agent-003/testing.md");
+
+    /// Write a default file if the target path does not exist (never overwrites user edits).
+    fn write_default_if_missing(path: &std::path::Path, content: &str) {
+        if path.exists() {
+            return;
+        }
+        if let Some(parent) = path.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        let _ = std::fs::write(path, content);
+    }
+
+    /// Ensure all default files exist under ~/.mac-stats/.
+    /// Called once at startup. Never overwrites existing files.
+    pub fn ensure_defaults() {
+        let agents = Self::agents_dir();
+        let prompts = Self::prompts_dir();
+        let _ = std::fs::create_dir_all(&agents);
+        let _ = std::fs::create_dir_all(&prompts);
+
+        // Soul
+        Self::write_default_if_missing(&agents.join("soul.md"), Self::DEFAULT_SOUL);
+
+        // Prompts
+        Self::write_default_if_missing(&prompts.join("planning_prompt.md"), Self::DEFAULT_PLANNING_PROMPT);
+        Self::write_default_if_missing(&prompts.join("execution_prompt.md"), Self::DEFAULT_EXECUTION_PROMPT);
+
+        // Agents
+        let agent_defaults: &[(&str, &[(&str, &str)])] = &[
+            ("agent-000", &[
+                ("agent.json", Self::DEFAULT_AGENT_000_JSON),
+                ("skill.md", Self::DEFAULT_AGENT_000_SKILL),
+                ("testing.md", Self::DEFAULT_AGENT_000_TESTING),
+            ]),
+            ("agent-001", &[
+                ("agent.json", Self::DEFAULT_AGENT_001_JSON),
+                ("skill.md", Self::DEFAULT_AGENT_001_SKILL),
+                ("testing.md", Self::DEFAULT_AGENT_001_TESTING),
+            ]),
+            ("agent-002", &[
+                ("agent.json", Self::DEFAULT_AGENT_002_JSON),
+                ("skill.md", Self::DEFAULT_AGENT_002_SKILL),
+                ("testing.md", Self::DEFAULT_AGENT_002_TESTING),
+            ]),
+            ("agent-003", &[
+                ("agent.json", Self::DEFAULT_AGENT_003_JSON),
+                ("skill.md", Self::DEFAULT_AGENT_003_SKILL),
+                ("testing.md", Self::DEFAULT_AGENT_003_TESTING),
+            ]),
+        ];
+        for (dir_name, files) in agent_defaults {
+            let dir = agents.join(dir_name);
+            let _ = std::fs::create_dir_all(&dir);
+            for (file_name, content) in *files {
+                Self::write_default_if_missing(&dir.join(file_name), content);
+            }
+        }
+    }
+
+    /// Load soul from ~/.mac-stats/agents/soul.md. If missing, write default and return it.
     pub fn load_soul_content() -> String {
         let path = Self::soul_file_path();
-        match std::fs::read_to_string(&path) {
+        Self::load_file_or_default(&path, Self::DEFAULT_SOUL)
+    }
+
+    /// Load planning prompt from ~/.mac-stats/prompts/planning_prompt.md.
+    pub fn load_planning_prompt() -> String {
+        let path = Self::planning_prompt_path();
+        Self::load_file_or_default(&path, Self::DEFAULT_PLANNING_PROMPT)
+    }
+
+    /// Load execution prompt from ~/.mac-stats/prompts/execution_prompt.md.
+    pub fn load_execution_prompt() -> String {
+        let path = Self::execution_prompt_path();
+        Self::load_file_or_default(&path, Self::DEFAULT_EXECUTION_PROMPT)
+    }
+
+    /// Read a file; if missing or empty, write the default content and return it.
+    fn load_file_or_default(path: &std::path::Path, default: &str) -> String {
+        match std::fs::read_to_string(path) {
             Ok(s) => {
                 let trimmed = s.trim().to_string();
                 if trimmed.is_empty() {
-                    let _ = std::fs::write(&path, Self::DEFAULT_SOUL);
-                    Self::DEFAULT_SOUL.trim().to_string()
+                    let _ = std::fs::write(path, default);
+                    default.trim().to_string()
                 } else {
                     trimmed
                 }
             }
             Err(_) => {
-                let _ = Self::ensure_agents_directory();
-                let _ = std::fs::write(&path, Self::DEFAULT_SOUL);
-                Self::DEFAULT_SOUL.trim().to_string()
+                Self::write_default_if_missing(path, default);
+                default.trim().to_string()
             }
         }
     }

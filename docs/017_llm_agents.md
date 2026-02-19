@@ -44,6 +44,21 @@ When at least one enabled agent exists, the app adds an **AGENT** tool to the li
 - **Functions**: `load_agents() -> Vec<Agent>`, `find_agent_by_id_or_name(agents, selector) -> Option<&Agent>`, `load_all_agents()`, `get_agent_dir(id)`.
 - **Execution**: `commands/ollama.rs` → `run_agent_ollama_session(agent, user_message, status_tx)`; tool loop handles `AGENT:` and calls it.
 
+## Default agents
+
+Four agents ship as defaults, embedded in the binary via `include_str!` from `src-tauri/defaults/agents/`. On first launch (or if missing), `Config::ensure_defaults()` writes them to `~/.mac-stats/agents/`:
+
+| Dir | Name | Slug | Model | Role |
+|-----|------|------|-------|------|
+| `agent-000` | Orchestrator | `orchestrator` | qwen3:latest | Routes to specialists, has full Router API Commands in skill.md |
+| `agent-001` | General Assistant | `general-purpose-mommy` | qwen3:latest | General-purpose Q&A |
+| `agent-002` | Coder | `senior-coder` | qwen2.5-coder:latest | Code generation, refactoring, debugging |
+| `agent-003` | Generalist | `humble-generalist` | huihui_ai/granite3.2-abliterated:2b | Non-code topics, discussion, reflection |
+
+Each includes `agent.json`, `skill.md`, and `testing.md`. Users can edit any file — `ensure_defaults()` never overwrites existing files. To reset an agent to defaults, delete its directory and restart.
+
+The default source files live in `src-tauri/defaults/agents/` and are easy to edit in the repo (clean Markdown diffs).
+
 ## Relationship to SKILL
 
 - **SKILL** (see `docs/016_skill_agent.md`): Simple prompt overlays in `~/.mac-stats/skills/` (e.g. `skill-1-summarize.md`). No per-skill model; one default model, skill content as system prompt. Use for lightweight, single-session tasks.

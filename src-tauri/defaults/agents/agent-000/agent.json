@@ -1,0 +1,7 @@
+{
+  "name": "Orchestrator",
+  "slug": "orchestrator",
+  "model": "qwen3:latest",
+  "orchestrator": true,
+  "enabled": true
+}

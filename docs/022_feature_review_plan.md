@@ -212,3 +212,20 @@ Given the 10 features span different concerns, consider splitting into 2-3 atomi
 3. **Task dedup + prompt fixes + chat reserved words + monitor checks** (F5, F6, F8, F10): Bug fixes and small features.
 
 Or commit all at once with a descriptive message covering the highlights.
+
+---
+
+## 7. Post-review additions (0.1.14)
+
+After the initial feature review and merge to main, the following changes were made on top of 0.1.13:
+
+| # | Feature | Files | Risk |
+|---|---------|-------|------|
+| F11 | **Externalized prompts** — planning_prompt.md, execution_prompt.md, soul.md as user-editable files | `config/mod.rs`, `commands/ollama.rs`, `commands/agents.rs`, `lib.rs` | Low |
+| F12 | **Default agents shipped** — 4 agents embedded via `include_str!`, written to `~/.mac-stats/` on first launch | `config/mod.rs`, `src-tauri/defaults/` (new dir) | Low |
+| F13 | **Tauri prompt API** — `list_prompt_files`, `save_prompt_file` commands | `commands/agents.rs`, `lib.rs` | Low |
+| F14 | **RUN_CMD retry loop** — AI-corrected retries (up to 3) on command failure | `commands/ollama.rs` | Medium |
+| F15 | **Tool parsing improvements** — strip numbered-list prefixes, multi-RECOMMEND, arg truncation | `commands/ollama.rs` | Low |
+| F16 | **Empty response fallback** — use raw tool output when Ollama returns empty | `commands/ollama.rs` | Low |
+
+See `CHANGELOG.md` (0.1.14) and `docs/023_externalized_prompts.md` for details.

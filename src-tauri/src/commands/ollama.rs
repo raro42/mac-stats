@@ -824,15 +824,15 @@ pub async fn answer_with_ollama_and_fetch(
 
     // --- Planning step: ask Ollama how it would solve the question ---
     info!("Agent router: planning step — asking Ollama for RECOMMEND");
-    const PLANNING_PROMPT: &str = "You are a helpful assistant. We will give you a user question and a list of available agents. Reply with your recommended approach in this exact format: RECOMMEND: <your plan in one or two sentences: which agents to use and in what order>. Do not execute anything yet. If the user wants agents to have a conversation or chat together, your plan must start with AGENT: orchestrator (or the appropriate agent) so the conversation actually runs; do not only create a task file (TASK_CREATE).";
+    let planning_prompt = crate::config::Config::load_planning_prompt();
     let planning_system_content = match &skill_content {
         Some(skill) => format!(
             "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}",
-            discord_user_context, skill, PLANNING_PROMPT, agent_descriptions
+            discord_user_context, skill, planning_prompt, agent_descriptions
         ),
         None => format!(
             "{}{}{}\n\n{}",
-            router_soul, discord_user_context, PLANNING_PROMPT, agent_descriptions
+            router_soul, discord_user_context, planning_prompt, agent_descriptions
         ),
     };
     let mut planning_messages: Vec<crate::ollama::ChatMessage> = vec![
@@ -852,15 +852,26 @@ pub async fn answer_with_ollama_and_fetch(
         ),
     });
     let plan_response = send_ollama_chat_messages(planning_messages, model_override.clone(), options_override.clone()).await?;
-    let recommendation = plan_response.message.content.trim().to_string();
-    info!("Agent router: understood plan — RECOMMEND: {}", recommendation.chars().take(200).collect::<String>());
+    let mut recommendation = plan_response.message.content.trim().to_string();
+    // Strip leading RECOMMEND: prefix(es) — the planning prompt asks for this format
+    // but we don't want it echoed into the execution system prompt or confusing parse_tool_from_response.
+    while recommendation.to_uppercase().starts_with("RECOMMEND: ") || recommendation.to_uppercase().starts_with("RECOMMEND:") {
+        let prefix_len = if recommendation.len() >= 11 && recommendation[..11].to_uppercase() == "RECOMMEND: " {
+            11
+        } else {
+            10
+        };
+        recommendation = recommendation[prefix_len..].trim().to_string();
+    }
+    info!("Agent router: understood plan — {}", recommendation.chars().take(200).collect::<String>());
     send_status(&format!(
         "Executing plan: {}…",
         truncate_status(&recommendation, 72)
     ));
 
     // --- Execution: system prompt with agents + plan, then tool loop ---
-    const EXECUTION_PROMPT: &str = "You are a helpful assistant. Use the agents when needed. When you need an agent, output exactly one line: FETCH_URL: <url> or BRAVE_SEARCH: <query> or RUN_JS: <code> or SKILL: <number or topic> [task] or AGENT: <slug or id> [task] (if LLM agents are listed) or RUN_CMD: <command and args> or OLLAMA_API: <action> [args] (list_models, version, running, pull/delete/load/unload, embed) or PYTHON_SCRIPT: <id> <topic> (then put Python code on next lines or in a ```python block) or SCHEDULE: every N minutes <task> or SCHEDULE: <cron> <task> or SCHEDULE: at <ISO datetime> <task> or REMOVE_SCHEDULE: <schedule-id> or TASK_LIST or TASK_LIST: all or TASK_SHOW: <id> (show task to user) or TASK_APPEND/TASK_STATUS/TASK_CREATE or MCP: <tool_name> <arguments> (if MCP tools are listed) or DISCORD_API: <METHOD> <path> (if from Discord). We will run it and give you the result. When an Agent (or other tool) result is given, your reply to the user MUST include or relay that result—e.g. list the agents, show the fetched content, or summarize the outcome. Do not reply with only a generic acknowledgment like \"Thank you for providing the information.\" Then continue with your answer. Answer concisely.";
+    let execution_prompt_raw = crate::config::Config::load_execution_prompt();
+    let execution_prompt = execution_prompt_raw.replace("{{AGENTS}}", &agent_descriptions);
 
     /// Log content in full if ≤500 chars (or always in -vv), else ellipse (first half + "..." + last half).
     const LOG_CONTENT_MAX: usize = 500;
@@ -881,12 +892,12 @@ pub async fn answer_with_ollama_and_fetch(
         info!("Agent router: plan contains direct tool call {}:{} — skipping execution Ollama call", tool, crate::logging::ellipse(arg, 60));
         let execution_system_content = match &skill_content {
             Some(skill) => format!(
-                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}",
-                discord_user_context, skill, EXECUTION_PROMPT, agent_descriptions
+                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}",
+                discord_user_context, skill, execution_prompt
             ),
             None => format!(
-                "{}{}{}\n\n{}",
-                router_soul, discord_user_context, EXECUTION_PROMPT, agent_descriptions
+                "{}{}{}",
+                router_soul, discord_user_context, execution_prompt
             ),
         };
         let mut msgs: Vec<crate::ollama::ChatMessage> = vec![
@@ -904,12 +915,12 @@ pub async fn answer_with_ollama_and_fetch(
         info!("Agent router: execution step — sending plan + question, starting tool loop (max {} tools)", max_tool_iterations);
         let execution_system_content = match &skill_content {
             Some(skill) => format!(
-                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}\n\nYour plan: {}",
-                discord_user_context, skill, EXECUTION_PROMPT, agent_descriptions, recommendation
+                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\nYour plan: {}",
+                discord_user_context, skill, execution_prompt, recommendation
             ),
             None => format!(
-                "{}{}{}\n\n{}\n\nYour plan: {}",
-                router_soul, discord_user_context, EXECUTION_PROMPT, agent_descriptions, recommendation
+                "{}{}{}\n\nYour plan: {}",
+                router_soul, discord_user_context, execution_prompt, recommendation
             ),
         };
         let mut msgs: Vec<crate::ollama::ChatMessage> = vec![
@@ -923,7 +934,19 @@ pub async fn answer_with_ollama_and_fetch(
         let content = response.message.content.clone();
         let n = content.chars().count();
         info!("Agent router: first response received ({} chars): {}", n, log_content(&content));
-        (msgs, content)
+        // Fallback: if Ollama returned empty but the recommendation contains a parseable tool,
+        // synthesize the tool call so the tool loop can execute it.
+        if n == 0 {
+            if let Some((tool, arg)) = parse_tool_from_response(&recommendation) {
+                let synthetic = format!("{}: {}", tool, arg);
+                info!("Agent router: empty response — falling back to tool from recommendation: {}", crate::logging::ellipse(&synthetic, 80));
+                (msgs, synthetic)
+            } else {
+                (msgs, content)
+            }
+        } else {
+            (msgs, content)
+        }
     };
 
     let mut tool_count: u32 = 0;
@@ -1227,25 +1250,72 @@ pub async fn answer_with_ollama_and_fetch(
                 if !crate::commands::run_cmd::is_local_cmd_allowed() {
                     "RUN_CMD is not available (disabled by ALLOW_LOCAL_CMD=0). Answer without running local commands.".to_string()
                 } else {
-                    send_status(&format!("Running local command: {}", arg));
-                    info!("Agent router: RUN_CMD requested: {}", arg);
-                    match tokio::task::spawn_blocking({
-                        let arg = arg.to_string();
-                        move || crate::commands::run_cmd::run_local_command(&arg)
-                    })
-                    .await
-                    .map_err(|e| format!("RUN_CMD task: {}", e))
-                    .and_then(|r| r)
-                    {
-                        Ok(output) => format!(
-                            "Here is the command output:\n\n{}\n\nUse this to answer the user's question.",
-                            output
-                        ),
-                        Err(e) => format!(
-                            "RUN_CMD failed: {}. Answer the user's question without this result.",
-                            e
-                        ),
+                    const MAX_CMD_RETRIES: u32 = 3;
+                    let mut current_cmd = arg.to_string();
+                    let mut last_output = String::new();
+
+                    for attempt in 0..=MAX_CMD_RETRIES {
+                        send_status(&format!("Running local command{}: {}", if attempt > 0 { format!(" (retry {})", attempt) } else { String::new() }, current_cmd));
+                        info!("Agent router: RUN_CMD attempt {}: {}", attempt, current_cmd);
+                        match tokio::task::spawn_blocking({
+                            let cmd = current_cmd.clone();
+                            move || crate::commands::run_cmd::run_local_command(&cmd)
+                        })
+                        .await
+                        .map_err(|e| format!("RUN_CMD task: {}", e))
+                        .and_then(|r| r)
+                        {
+                            Ok(output) => {
+                                last_output = format!(
+                                    "Here is the command output:\n\n{}\n\nUse this to answer the user's question.",
+                                    output
+                                );
+                                break;
+                            }
+                            Err(e) => {
+                                info!("Agent router: RUN_CMD failed (attempt {}): {}", attempt, e);
+                                if attempt >= MAX_CMD_RETRIES {
+                                    last_output = format!(
+                                        "RUN_CMD failed after {} retries: {}. Answer the user's question without this result.",
+                                        MAX_CMD_RETRIES, e
+                                    );
+                                    break;
+                                }
+                                // Ask Ollama to fix the command
+                                let fix_prompt = format!(
+                                    "The command `{}` failed with error:\n{}\n\nReply with ONLY the corrected command on a single line, in this exact format:\nRUN_CMD: <corrected command>\n\nAllowed commands: cat, head, tail, ls, grep, date, whoami. Paths must be under ~/.mac-stats.",
+                                    current_cmd, e
+                                );
+                                let fix_messages = vec![
+                                    crate::ollama::ChatMessage { role: "user".to_string(), content: fix_prompt },
+                                ];
+                                match send_ollama_chat_messages(fix_messages, model_override.clone(), options_override.clone()).await {
+                                    Ok(resp) => {
+                                        let fixed = resp.message.content.trim().to_string();
+                                        info!("Agent router: RUN_CMD fix suggestion: {}", crate::logging::ellipse(&fixed, 120));
+                                        if let Some((_, new_arg)) = parse_tool_from_response(&fixed) {
+                                            current_cmd = new_arg;
+                                        } else {
+                                            last_output = format!(
+                                                "RUN_CMD failed: {}. AI could not produce a corrected command. Answer the user's question without this result.",
+                                                e
+                                            );
+                                            break;
+                                        }
+                                    }
+                                    Err(ollama_err) => {
+                                        info!("Agent router: RUN_CMD fix Ollama call failed: {}", ollama_err);
+                                        last_output = format!(
+                                            "RUN_CMD failed: {}. Answer the user's question without this result.",
+                                            e
+                                        );
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                     }
+                    last_output
                 }
             }
             "PYTHON_SCRIPT" => {
@@ -1625,6 +1695,29 @@ pub async fn answer_with_ollama_and_fetch(
 
         let follow_up = send_ollama_chat_messages(messages.clone(), model_override.clone(), options_override.clone()).await?;
         response_content = follow_up.message.content.clone();
+
+        // Fallback: if Ollama returned empty after a successful tool result, use the raw
+        // tool output directly so the user at least sees what the tool produced.
+        if response_content.trim().is_empty() {
+            if let Some(last_msg) = messages.last() {
+                let raw = &last_msg.content;
+                if raw.starts_with("Here is the command output")
+                    || raw.starts_with("Here is the page content")
+                    || raw.starts_with("MCP tool")
+                    || raw.starts_with("Search results")
+                    || raw.starts_with("Discord API")
+                {
+                    info!("Agent router: Ollama returned empty after tool success — using raw tool output as response");
+                    // Strip the instruction suffix we appended for the model
+                    let cleaned = raw
+                        .replace("\n\nUse this to answer the user's question.", "")
+                        .replace("Here is the command output:\n\n", "")
+                        .replace("Here is the page content:\n\n", "");
+                    response_content = cleaned;
+                }
+            }
+        }
+
         if tool_count >= max_tool_iterations {
             info!("Agent router: max tool iterations reached ({}), using last response as final", max_tool_iterations);
         }
@@ -1826,12 +1919,27 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
         if line.eq_ignore_ascii_case("TASK_LIST") {
             return Some(("TASK_LIST".to_string(), String::new()));
         }
-        // Ollama sometimes echoes the plan format: "RECOMMEND: RUN_JS: ..." or "RECOMMEND: SCHEDULER: ...".
-        let search = if line.to_uppercase().starts_with("RECOMMEND: ") {
-            line[11..].trim()
-        } else {
-            line
-        };
+        // Strip leading list numbering ("1. ", "2) ", "- ", "* ") and RECOMMEND: prefixes.
+        // Models often return numbered plans like "1. RUN_CMD: cat ..." or "RECOMMEND: RUN_CMD: ...".
+        let mut search = line;
+        loop {
+            let upper = search.to_uppercase();
+            if upper.starts_with("RECOMMEND: ") {
+                search = search[11..].trim();
+            } else if search.len() >= 2 && search.as_bytes()[0].is_ascii_digit() {
+                // Strip "1. ", "2) ", "1: " etc.
+                let rest = search.trim_start_matches(|c: char| c.is_ascii_digit());
+                if rest.starts_with(". ") || rest.starts_with(") ") || rest.starts_with(": ") {
+                    search = rest[2..].trim();
+                } else {
+                    break;
+                }
+            } else if search.starts_with("- ") || search.starts_with("* ") {
+                search = search[2..].trim();
+            } else {
+                break;
+            }
+        }
         for prefix in prefixes {
             if search.to_uppercase().starts_with(prefix) {
                 let mut arg = search[prefix.len()..].trim().to_string();
@@ -1845,11 +1953,29 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
                 } else {
                     tool_name.to_string()
                 };
-                // Ollama sometimes concatenates multiple tools on one line; for FETCH_URL and BRAVE_SEARCH, stop at first ';'.
+                // Ollama sometimes concatenates multiple tools or plan steps on one line.
+                // Truncate at first ';' (for URLs/searches) or next numbered step like " 2. ", " 3) ".
                 if tool_name == "FETCH_URL" || tool_name == "BRAVE_SEARCH" {
                     if let Some(idx) = arg.find(';') {
                         arg = arg[..idx].trim().to_string();
                     }
+                }
+                // Truncate at next numbered step boundary (" 2. ", " 3) ", etc.)
+                // so "cat ~/.mac-stats/schedules.json 2. Extract ..." becomes just the command.
+                if let Some(pos) = arg.find(|c: char| c.is_ascii_digit()).and_then(|_| {
+                    let bytes = arg.as_bytes();
+                    for i in 1..bytes.len().saturating_sub(2) {
+                        if bytes[i].is_ascii_digit()
+                            && bytes[i - 1] == b' '
+                            && (bytes.get(i + 1) == Some(&b'.') || bytes.get(i + 1) == Some(&b')'))
+                            && bytes.get(i + 2) == Some(&b' ')
+                        {
+                            return Some(i - 1);
+                        }
+                    }
+                    None
+                }) {
+                    arg = arg[..pos].trim().to_string();
                 }
                 if !arg.is_empty() || tool_name == "TASK_LIST" || tool_name == "TASK_SHOW" {
                     return Some((tool_name, arg));

@@ -225,8 +225,14 @@ fn run_internal(open_cpu_window: bool) {
             commands::agents::delete_agent,
             commands::agents::disable_agent,
             commands::agents::enable_agent,
+            // Prompt file commands
+            commands::agents::list_prompt_files,
+            commands::agents::save_prompt_file,
         ])
         .setup(move |app| {
+            // Write default prompt/agent files if missing (first launch or after update)
+            crate::config::Config::ensure_defaults();
+
             // Load persistent monitors on startup
             use crate::commands::monitors;
             if let Err(e) = monitors::load_monitors_internal() {
