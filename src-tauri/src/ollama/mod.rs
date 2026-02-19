@@ -77,6 +77,12 @@ pub struct ChatRequest {
     pub stream: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<ChatOptions>,
+    /// Send empty array to disable Ollama's native tool-call parsing.
+    /// Without this, models with built-in tool support (qwen3, command-r, etc.)
+    /// emit tool-call JSON that Ollama tries to parse, causing
+    /// "error parsing tool call" failures. We handle tools via text prefixes instead.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tools: Option<Vec<serde_json::Value>>,
 }
 
 /// Chat response
@@ -401,6 +407,7 @@ impl OllamaClient {
             messages: messages.clone(),
             stream: false,
             options,
+            tools: Some(vec![]),
         };
 
         // Log raw request JSON before sending

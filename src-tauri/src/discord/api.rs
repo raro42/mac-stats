@@ -3,6 +3,7 @@
 //! Allows Ollama to call Discord's REST API (GET for read, POST only for sending messages)
 //! when the request originates from Discord. Token and base URL are shared with the Gateway.
 
+use std::sync::atomic::Ordering;
 use tracing::debug;
 
 const BASE_URL: &str = "https://discord.com/api/v10";
@@ -75,6 +76,9 @@ pub async fn discord_api_request(
 
     if method_upper == "POST" && body.is_some() {
         let body_str = body.unwrap_or("{}").trim();
+        if crate::logging::VERBOSITY.load(Ordering::Relaxed) >= 3 {
+            debug!("Discord API request body (decoded): {}", body_str);
+        }
         let body_json: serde_json::Value = serde_json::from_str(body_str)
             .map_err(|e| format!("Invalid JSON body: {}", e))?;
         req = req.header("Content-Type", "application/json").json(&body_json);
@@ -93,16 +97,12 @@ pub async fn discord_api_request(
         return Err(format!(
             "Discord API {}: {}",
             status,
-            body_text.chars().take(500).collect::<String>()
+            crate::logging::ellipse(&body_text, 500)
         ));
     }
 
-    if body_text.len() > MAX_RESPONSE_CHARS {
-        Ok(format!(
-            "{}... [truncated, {} chars total]",
-            body_text.chars().take(MAX_RESPONSE_CHARS).collect::<String>(),
-            body_text.len()
-        ))
+    if body_text.chars().count() > MAX_RESPONSE_CHARS {
+        Ok(crate::logging::ellipse(&body_text, MAX_RESPONSE_CHARS))
     } else {
         Ok(body_text)
     }

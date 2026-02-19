@@ -66,7 +66,28 @@ pub fn set_task_status(path: &Path, new_status: &str) -> Result<PathBuf, String>
     Ok(new_path)
 }
 
+/// If a task file already exists with the same topic_slug and id (any status), return its path.
+/// Filename pattern: task-{topic_slug}-{id}-{datetime}-{status}.md.
+fn existing_task_with_topic_id(topic_slug: &str, id: &str) -> Option<PathBuf> {
+    let task_base = Config::task_dir();
+    let prefix = format!("task-{}-{}-", topic_slug, id);
+    let entries = fs::read_dir(&task_base).ok()?;
+    for entry in entries.flatten() {
+        let p = entry.path();
+        if !p.is_file() {
+            continue;
+        }
+        let name = p.file_name().and_then(|n| n.to_str()).unwrap_or("");
+        let stem = name.strip_suffix(".md").unwrap_or(name);
+        if stem.starts_with(&prefix) {
+            return Some(p);
+        }
+    }
+    None
+}
+
 /// Create a new task file with status "open". Returns the path.
+/// If a task with the same topic and id already exists, returns an error (avoids duplicate task explosion).
 /// If assigned_to is Some, writes "## Assigned: agent_id" at top; otherwise "## Assigned: default".
 pub fn create_task(
     topic: &str,
@@ -76,6 +97,12 @@ pub fn create_task(
 ) -> Result<PathBuf, String> {
     let _ = Config::ensure_task_directory();
     let topic_slug = slug(topic);
+    if let Some(existing) = existing_task_with_topic_id(&topic_slug, id) {
+        return Err(format!(
+            "A task with this topic and id already exists: {:?}. Use TASK_APPEND or TASK_STATUS to update it.",
+            existing
+        ));
+    }
     let datetime = chrono::Local::now().format("%Y%m%d-%H%M%S").to_string();
     let path = task_path(&topic_slug, id, &datetime, "open");
     let agent = assigned_to.unwrap_or("default").trim();

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.13] - 2026-02-19
+
 ### Added
 - **Task module and CLI**: All task logic centralized in `task/` (mod, runner, review, cli). Ollama and scheduler only call into the task module.
   - **CLI**: `mac_stats add|list|show|status|remove|assign|append` for testing and scripting (e.g. `mac_stats add foo 1 "Content"`, `mac_stats list --all`, `mac_stats assign 1 scheduler`).
@@ -18,8 +20,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Review loop**: Up to 3 open tasks per cycle, 20 iterations per task; auto-close as unsuccessful on max iterations; resume due paused tasks each cycle.
   - **task/runner.rs**: `run_task_until_finished` moved from ollama to task module; scheduler and review call `task::runner::run_task_until_finished`.
 - **delete_task**: Remove all status files for a task (CLI `remove`, used by CLI only).
+- **Discord session memory**: Discord bot now maintains short-term conversation context (last 20 messages per channel). The model can resolve references like "there", "it", etc. from prior turns. After app restart, context is resumed from the latest session file on disk.
+- **Conversation history in agent router**: `answer_with_ollama_and_fetch` accepts optional `conversation_history` so Discord (and future entry points) can pass prior turns into planning and execution prompts.
+- **Chat reserved words**: Type `--cpu` in chat to toggle the CPU window, or `-v`/`-vv`/`-vvv` to change log verbosity at runtime without restarting. New Tauri commands: `toggle_cpu_window`, `set_chat_verbosity`.
+- **Background monitor checks**: Website monitors are now checked in a background thread every 30 seconds (by their configured interval), even when the CPU window is closed.
+- **TASK_CREATE deduplication**: Creating a task with the same topic and id as an existing task now returns an error instead of silently creating duplicates.
+
+### Fixed
+- **Ollama model auto-detection at startup**: The app no longer hardcodes `llama2` as the default model. At startup, it queries `GET /api/tags` and picks the first available model. Frontend `getDefaultModel()` also queries installed models via `list_ollama_models`. Fallback is `llama3.2`.
+- **Native tool-call parsing errors**: Models with built-in tool support (qwen3, command-r, etc.) caused Ollama to fail with "error parsing tool call" because Ollama tried to parse text tool invocations as JSON. Fixed by sending `"tools": []` in all chat requests, which disables Ollama's native tool-call parser.
+- **Direct tool execution from plan**: When the planning step returns a recommendation that already contains a parseable tool call (e.g. `DISCORD_API: GET /users/@me/guilds`), the router now executes it directly instead of asking Ollama a second time. Saves one full Ollama round-trip per request.
+- **Logging `ellipse()` helper**: Truncated text now shows first half + `...` + last half instead of hard truncation. Applied to Ollama request/response logs, FETCH_URL content, and Discord API responses.
+- **Verbosity-aware logging**: At `-vv` or higher, Ollama request/response logs are never truncated.
+- **Char-count vs byte-count**: Fixed Discord API response truncation to use `.chars().count()` instead of `.len()` for correct Unicode handling.
 
 ### Changed
+- **Unified soul path**: Consolidated `~/.mac-stats/agent/soul.md` (router) and `~/.mac-stats/agents/soul.md` (agent fallback) into a single path: `~/.mac-stats/agents/soul.md`. Used by all agents (as fallback) and by the router (non-agent chat). The old `~/.mac-stats/agent/` directory is no longer used. **Migration**: move any customized `~/.mac-stats/agent/soul.md` to `~/.mac-stats/agents/soul.md`.
+- **Task prompt guidance**: Agent descriptions now instruct the model to invoke `AGENT: orchestrator` (not just `TASK_CREATE`) when users want agents to chat, and to use `TASK_APPEND`/`TASK_STATUS` when a task with the same topic+id already exists.
+- **Toggle CPU window refactored**: Extracted inline window toggle logic from the click handler into `toggle_cpu_window()` function, reusable from both menu bar clicks and the new `--cpu` chat command.
 - **Task docs**: `docs/013_task_agent.md` rewritten — CLI, TASK_SHOW, assignee, TASK_ASSIGN, pause/sleep, dependencies, sub-tasks, module layout, review behaviour.
 
 ## [0.1.11] - 2026-02-09

@@ -255,15 +255,30 @@ impl EventHandler for Handler {
         );
 
         const LOG_MAX: usize = 800;
-        let to_ollama = if question.len() <= LOG_MAX {
+        let to_ollama = if question.chars().count() <= LOG_MAX {
             question.to_string()
         } else {
-            format!("{}... ({} chars)", question.chars().take(LOG_MAX).collect::<String>(), question.len())
+            format!("{} ({} chars)", crate::logging::ellipse(&question, LOG_MAX), question.chars().count())
         };
         info!("Discord→Ollama: sending: {}", to_ollama);
 
-        // Short-term memory: add user message when we receive the request (store original content)
         let channel_id_u64 = new_message.channel_id.get();
+        // Load prior conversation (in-memory, or from latest session file after restart) before adding this turn
+        let mut prior = crate::session_memory::get_messages("discord", channel_id_u64);
+        if prior.is_empty() {
+            prior = crate::session_memory::load_messages_from_latest_session_file("discord", channel_id_u64);
+        }
+        let conversation_history: Option<Vec<crate::ollama::ChatMessage>> = if prior.is_empty() {
+            None
+        } else {
+            Some(
+                prior
+                    .into_iter()
+                    .map(|(role, content)| crate::ollama::ChatMessage { role, content })
+                    .collect(),
+            )
+        };
+        // Short-term memory: add user message when we receive the request (store original content)
         crate::session_memory::add_message("discord", channel_id_u64, "user", content);
 
         // Record author's display name for reuse in prompts and API context
@@ -282,6 +297,9 @@ impl EventHandler for Handler {
         let channel_id = new_message.channel_id;
         let status_task = tokio::spawn(async move {
             while let Some(msg) = status_rx.recv().await {
+                if crate::logging::VERBOSITY.load(Ordering::Relaxed) >= 3 {
+                    debug!("Discord outbound (decoded): {}", msg);
+                }
                 if let Err(e) = channel_id.say(&ctx_send, &msg).await {
                     debug!("Discord: status message failed: {}", e);
                 }
@@ -299,6 +317,7 @@ impl EventHandler for Handler {
             skill_content,
             agent_override,
             true,
+            conversation_history,
         ).await {
             Ok(r) => r,
             Err(e) => {
@@ -311,18 +330,21 @@ impl EventHandler for Handler {
         // Wait for the status task to finish so all status messages are sent before we send the final reply.
         let _ = status_task.await;
 
-        // Log full reply if ≤500 chars, else first 500 and clip.
+        // Log full reply if ≤500 chars (or always in -vv), else first 500 + ellipsis.
         const RECV_LOG_MAX: usize = 500;
         let nchars = reply.chars().count();
-        if nchars <= RECV_LOG_MAX {
+        let verbosity = crate::logging::VERBOSITY.load(Ordering::Relaxed);
+        if verbosity >= 2 || nchars <= RECV_LOG_MAX {
             info!("Discord←Ollama: received ({} chars): {}", nchars, reply);
         } else {
-            let head: String = reply.chars().take(RECV_LOG_MAX).collect();
-            info!("Discord←Ollama: received ({} chars, first {}): {}... [truncated]", nchars, RECV_LOG_MAX, head);
+            info!("Discord←Ollama: received ({} chars): {}", nchars, crate::logging::ellipse(&reply, RECV_LOG_MAX));
         }
 
         let chunks = split_message_for_discord(&reply);
         for (i, chunk) in chunks.iter().enumerate() {
+            if verbosity >= 3 {
+                debug!("Discord outbound (decoded) reply part {}/{}: {}", i + 1, chunks.len(), chunk);
+            }
             if let Err(e) = new_message.channel_id.say(&ctx, chunk).await {
                 error!("Discord: Failed to send reply (part {}/{}): {}", i + 1, chunks.len(), e);
                 break;
@@ -410,10 +432,13 @@ pub async fn send_message_to_channel(channel_id: u64, content: &str) -> Result<(
         None => return Err("Discord not configured (no token)".to_string()),
     };
     let content = if content.chars().count() > MAX_LEN {
-        format!("{}... [truncated]", content.chars().take(MAX_LEN - 20).collect::<String>())
+        crate::logging::ellipse(content, MAX_LEN)
     } else {
         content.to_string()
     };
+    if crate::logging::VERBOSITY.load(Ordering::Relaxed) >= 3 {
+        debug!("Discord outbound (decoded) send_message_to_channel: {}", content);
+    }
     let url = format!("https://discord.com/api/v10/channels/{}/messages", channel_id);
     let client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(15))

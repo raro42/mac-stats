@@ -16,6 +16,24 @@ mod legacy;
 // Re-export legacy logging for compatibility during migration
 pub use legacy::{set_verbosity, write_structured_log, write_structured_log_with_verbosity, shorten_file_path_internal, VERBOSITY};
 
+/// Ellipse a string for display: first half + "..." + last half (no truncation of one end).
+/// If `s` has ≤ `max_len` chars, returns `s` unchanged. Otherwise returns
+/// `s[0..first_n] + "..." + s[last_n..]` where first_n + 3 + last_n ≤ max_len.
+pub fn ellipse(s: &str, max_len: usize) -> String {
+    const SEP: &str = "...";
+    let sep_len = 3;
+    let chars: Vec<char> = s.chars().collect();
+    let n = chars.len();
+    if n <= max_len {
+        return s.to_string();
+    }
+    let first_count = (max_len - sep_len) / 2;
+    let last_count = (max_len - sep_len) - first_count;
+    let first: String = chars[..first_count].iter().collect();
+    let last: String = chars[n - last_count..].iter().collect();
+    format!("{}{}{}", first, SEP, last)
+}
+
 /// Initialize tracing with file and console output
 /// 
 /// The log file path will be determined by the config module (when available).

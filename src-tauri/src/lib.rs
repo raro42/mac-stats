@@ -211,6 +211,9 @@ fn run_internal(open_cpu_window: bool) {
             commands::discord::is_discord_configured,
             // Logging commands
             commands::logging::log_from_js,
+            commands::logging::set_chat_verbosity,
+            // Window commands (e.g. from chat reserved words)
+            commands::window::toggle_cpu_window,
             // Agent commands
             commands::agents::list_agents,
             commands::agents::get_agent_details,
@@ -315,6 +318,15 @@ fn run_internal(open_cpu_window: bool) {
             // can use it without requiring the user to open the CPU window first.
             tauri::async_runtime::spawn(async {
                 commands::ollama::ensure_ollama_agent_ready_at_startup().await;
+            });
+
+            // Run website monitor checks in the background so monitors are checked even when the CPU window
+            // is not open. Wakes every 30s and runs checks for any monitor that is due (by its interval).
+            std::thread::spawn(|| {
+                loop {
+                    std::thread::sleep(std::time::Duration::from_secs(30));
+                    commands::monitors::run_due_monitor_checks();
+                }
             });
 
             // For automatic updates, we'll use a simple approach:

@@ -51,6 +51,9 @@ This project was developed through "vibe coding" - building features iteratively
 - **PYTHON_SCRIPT agent** — Ollama can create and run Python scripts under `~/.mac-stats/scripts/` (disable with `ALLOW_PYTHON_SCRIPT=0`).
 - **Scheduler** — Run tasks on a schedule (`~/.mac-stats/schedules.json`); cron or one-shot; tasks go through Ollama + tools; optional `reply_to_channel_id` to send results to Discord.
 - **Skills** — Markdown files in `~/.mac-stats/skills/` for different “agent” personalities; optional per-model context and temperature/num_ctx overrides.
+- **Chat commands** — Type `--cpu` to toggle the CPU window, `-v`/`-vv`/`-vvv` to change log verbosity at runtime.
+- **Session memory** — Discord bot remembers conversation context (last 20 turns per channel); resumes after restart from session files.
+- **Auto-detection** — Ollama model auto-detected at startup from installed models (no hardcoded model names).
 
 ### UI
 - Menu bar integration

@@ -1,4 +1,5 @@
 //! Logging Tauri commands for forwarding JavaScript console messages to Rust logs
+//! and for runtime verbosity control (e.g. from chat reserved words -v, -vv, -vvv).
 
 use serde::{Deserialize, Serialize};
 use tracing::{debug, error, info, warn};
@@ -29,5 +30,14 @@ pub fn log_from_js(log: LogMessage) -> Result<(), String> {
         _ => info!("JS: {}", full_message),
     }
     
+    Ok(())
+}
+
+/// Set log verbosity from chat (reserved words -v, -vv, -vvv).
+/// Level: 0 = error, 1 = warn (-v), 2 = debug (-vv), 3 = trace (-vvv).
+#[tauri::command]
+pub fn set_chat_verbosity(level: u8) -> Result<(), String> {
+    let level = level.min(3);
+    crate::logging::set_verbosity(level);
     Ok(())
 }

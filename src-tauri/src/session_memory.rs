@@ -1,10 +1,14 @@
 //! Short-term session memory for chat: keep messages in memory and persist to disk when > 3.
 //!
 //! When a session has more than 3 messages, the conversation is written to
-//! `~/.mac-stats/session/session-memory-<topic>-<sessionid>-<timestamp>.md`.
+//! `~/.mac-stats/session/session-memory-<sessionid>-<timestamp>-<topic>.md`.
+//!
+//! Callers can use `get_messages()` for in-memory history and
+//! `load_messages_from_latest_session_file()` to resume from disk (e.g. after restart).
 
 use crate::config::Config;
 use std::collections::HashMap;
+use std::path::Path;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 use tracing::debug;
@@ -91,9 +95,9 @@ fn persist_session(source: &str, session_id: u64) -> std::io::Result<()> {
     let timestamp = created_at.format("%Y%m%d-%H%M%S");
     let filename = format!(
         "session-memory-{}-{}-{}.md",
-        topic_slug,
         session_id,
-        timestamp
+        timestamp,
+        topic_slug
     );
     let path = dir.join(filename);
 
@@ -106,4 +110,77 @@ fn persist_session(source: &str, session_id: u64) -> std::io::Result<()> {
     std::fs::write(&path, body)?;
     debug!("Session memory: wrote {} ({} messages)", path.display(), messages.len());
     Ok(())
+}
+
+/// Return the current in-memory messages for this session (role, content).
+/// Call this *before* adding the current user message so the result is prior turns only.
+pub fn get_messages(source: &str, session_id: u64) -> Vec<(String, String)> {
+    let key = format!("{}-{}", source, session_id);
+    let store = match session_store().lock() {
+        Ok(g) => g,
+        Err(_) => return Vec::new(),
+    };
+    store
+        .get(&key)
+        .map(|state| state.messages.clone())
+        .unwrap_or_default()
+}
+
+/// Load messages from the most recent session file for this session (e.g. after app restart).
+/// File format: `## User\n\n...\n\n## Assistant\n\n...`. Returns (role, content) with role "user" or "assistant".
+pub fn load_messages_from_latest_session_file(_source: &str, session_id: u64) -> Vec<(String, String)> {
+    let dir = Config::session_dir();
+    if !dir.is_dir() {
+        return Vec::new();
+    }
+    let prefix = format!("session-memory-{}-", session_id);
+    let mut entries: Vec<_> = match std::fs::read_dir(&dir) {
+        Ok(rd) => rd
+            .filter_map(|e| e.ok())
+            .filter(|e| {
+                e.path()
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .map_or(false, |n| n.starts_with(&prefix))
+            })
+            .collect(),
+        Err(_) => return Vec::new(),
+    };
+    entries.sort_by(|a, b| {
+        b.path()
+            .metadata()
+            .and_then(|m| m.modified())
+            .ok()
+            .cmp(&a.path().metadata().and_then(|m| m.modified()).ok())
+    });
+    let path = match entries.into_iter().next().map(|e| e.path()) {
+        Some(p) => p,
+        None => return Vec::new(),
+    };
+    parse_session_file(&path)
+}
+
+fn parse_session_file(path: &Path) -> Vec<(String, String)> {
+    let content = match std::fs::read_to_string(path) {
+        Ok(c) => c,
+        Err(_) => return Vec::new(),
+    };
+    let mut out = Vec::new();
+    for block in content.split("\n## ") {
+        let block = block.trim();
+        if block.is_empty() {
+            continue;
+        }
+        let (role, body) = if block.starts_with("User\n") {
+            ("user", block["User\n".len()..].trim())
+        } else if block.starts_with("Assistant\n") {
+            ("assistant", block["Assistant\n".len()..].trim())
+        } else {
+            continue;
+        };
+        if !body.is_empty() {
+            out.push((role.to_string(), body.to_string()));
+        }
+    }
+    out
 }

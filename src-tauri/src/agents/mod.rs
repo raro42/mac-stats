@@ -1,7 +1,8 @@
 //! Agents: directory-based LLM agents under ~/.mac-stats/agents/agent-<id>/
 //!
 //! Each agent has agent.json (name, optional slug, model, orchestrator, enabled),
-//! required skill.md, optional soul.md and mood.md. Combined prompt order: soul → mood → skill.
+//! required skill.md, optional soul.md and mood.md. Soul: use agent-<id>/soul.md if present,
+//! else ~/.mac-stats/agents/soul.md. Combined prompt order: soul → mood → skill.
 //! Used by the Ollama tool loop (AGENT: <selector> [task]) and by the agent-test CLI.
 
 pub mod cli;
@@ -101,6 +102,16 @@ pub fn load_agents() -> Vec<Agent> {
             .collect::<Vec<_>>()
             .join(", ");
         info!("Agents: loaded {} from {:?}: {}", agents.len(), dir, list);
+        let soul_path = Config::soul_file_path();
+        let soul_exists = std::fs::read_to_string(&soul_path)
+            .ok()
+            .map(|s| !s.trim().is_empty())
+            .unwrap_or(false);
+        info!(
+            "Agents: shared soul {:?}: {}",
+            soul_path,
+            if soul_exists { "present" } else { "missing (will write default on first use)" }
+        );
     }
 
     agents
@@ -158,16 +169,23 @@ fn load_one_agent(dir: &Path, id: &str) -> Option<Agent> {
         return None;
     }
 
-    let soul = std::fs::read_to_string(dir.join("soul.md"))
+    // Soul: per-agent soul.md if present, else shared ~/.mac-stats/agents/soul.md. Always include in context when available.
+    let soul_path = dir.join("soul.md");
+    let soul = std::fs::read_to_string(&soul_path)
         .ok()
         .map(|s| s.trim().to_string())
         .filter(|s| !s.is_empty())
+        .map(|s| {
+            debug!("Agents: agent {} using soul from {:?}", id, soul_path);
+            s
+        })
         .or_else(|| {
-            let default = Config::load_default_soul_content();
-            if default.is_empty() {
+            let shared = Config::load_soul_content();
+            if shared.is_empty() {
                 None
             } else {
-                Some(default)
+                debug!("Agents: agent {} using shared soul from {:?}", id, Config::soul_file_path());
+                Some(shared)
             }
         });
     let mood = std::fs::read_to_string(dir.join("mood.md"))

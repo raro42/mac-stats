@@ -3,8 +3,8 @@
 ## Current state
 
 - **CPU window**: Frontend sends `conversation_history` to `ollama_chat_with_execution`; the main chat has multi-turn context within the request.
-- **Discord**: Calls `answer_with_ollama_and_fetch` with only the current `question`. **No conversation_history** is passed. `session_memory::add_message` stores each user/assistant message in memory and persists to `~/.mac-stats/session/session-memory-*.md` when there are more than 3 messages, but that stored history is **never loaded back** into the next Ollama request. So each Discord turn is stateless from the model's point of view.
-- **SKILL / AGENT sub-calls**: `run_skill_ollama_session` and (planned) `run_agent_ollama_session` are **one-shot**: system prompt + single user message, no prior messages.
+- **Discord**: **Session history is now passed into Ollama.** Before each request we call `session_memory::get_messages("discord", channel_id)` (and if empty, `load_messages_from_latest_session_file` to resume from the latest session file after restart). That history is converted to `ChatMessage` and passed as `conversation_history` into `answer_with_ollama_and_fetch`, so the model sees prior turns and can resolve "there", "it", "El Masnou", etc. Capped at 20 messages. Messages are still stored with `add_message` and persisted when > 3.
+- **SKILL / AGENT sub-calls**: `run_skill_ollama_session` and `run_agent_ollama_session` are **one-shot**: system prompt + single user message, no prior messages.
 
 ---
 

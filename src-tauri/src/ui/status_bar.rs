@@ -20,7 +20,7 @@ use objc2_foundation::{
     NSArray, NSDictionary, NSMutableAttributedString, NSMutableDictionary, NSNumber,
     NSAttributedString, NSRange, NSString,
 };
-use tauri::{Manager, WindowBuilder, WindowUrl};
+use tauri::{AppHandle, Manager, WindowBuilder, WindowUrl};
 
 use crate::state::*;
 use crate::logging::write_structured_log;
@@ -317,6 +317,28 @@ pub fn setup_status_item() {
     }
 }
 
+/// Toggle the CPU window: if visible, close it; otherwise create or show it.
+/// Must be called on the main thread (e.g. from menu bar click or via run_on_main_thread).
+pub fn toggle_cpu_window(app_handle: &AppHandle) {
+    if let Some(window) = app_handle.get_window("cpu") {
+        let is_visible = window.is_visible().unwrap_or(false);
+        if is_visible {
+            debug1!("CPU window is visible, closing it");
+            let _ = window.close();
+        } else {
+            debug1!("CPU window exists but is hidden, closing and recreating");
+            let _ = window.close();
+        }
+    } else {
+        debug1!("CPU window doesn't exist, creating it");
+        create_cpu_window(app_handle);
+    }
+    if app_handle.get_window("cpu").is_none() {
+        debug1!("Creating CPU window after close");
+        create_cpu_window(app_handle);
+    }
+}
+
 /// Get or create the Objective-C click handler class
 pub fn click_handler_class() -> &'static AnyClass {
     static REGISTER: OnceLock<&'static AnyClass> = OnceLock::new();
@@ -383,40 +405,9 @@ pub fn click_handler_class() -> &'static AnyClass {
             } else {
                 debug1!("Left click - toggling CPU window");
                 write_structured_log("ui/status_bar.rs", "Click handler: about to toggle window", &serde_json::json!({}), "I");
-                // We're already on main thread, so we can access the window directly
                 if let Some(app_handle) = APP_HANDLE.get() {
                     write_structured_log("ui/status_bar.rs", "APP_HANDLE found", &serde_json::json!({}), "I");
-                    
-                    // Check if window exists and is visible
-                    if let Some(window) = app_handle.get_window("cpu") {
-                        let is_visible = window.is_visible().unwrap_or(false);
-                        write_structured_log("ui/status_bar.rs", "CPU window found", &serde_json::json!({"is_visible": is_visible}), "I");
-                        
-                        if is_visible {
-                            // Window is visible - close it completely to save CPU
-                            debug1!("CPU window is visible, closing it completely...");
-                            let _ = window.close();
-                            write_structured_log("ui/status_bar.rs", "Window closed completely", &serde_json::json!({}), "I");
-                        } else {
-                            // Window exists but is hidden - close and recreate to ensure decorations are up-to-date
-                            // This ensures that if the user changed the decorations setting, it will be applied
-                            debug1!("CPU window exists but is hidden, closing and recreating to apply decorations...");
-                            let _ = window.close();
-                            write_structured_log("ui/status_bar.rs", "Window closed for recreation", &serde_json::json!({}), "I");
-                            // Fall through to create new window
-                        }
-                    } else {
-                        // Window doesn't exist - create and show it
-                        debug1!("CPU window doesn't exist, creating it...");
-                        write_structured_log("ui/status_bar.rs", "Creating new CPU window", &serde_json::json!({}), "I");
-                        create_cpu_window(app_handle);
-                    }
-                    
-                    // If we closed a window above, create a new one now
-                    if app_handle.get_window("cpu").is_none() {
-                        debug1!("Creating CPU window after close...");
-                        create_cpu_window(app_handle);
-                    }
+                    toggle_cpu_window(app_handle);
                 } else {
                     write_structured_log("ui/status_bar.rs", "APP_HANDLE not available", &serde_json::json!({}), "I");
                     debug1!("APP_HANDLE not available!");

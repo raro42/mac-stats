@@ -28,11 +28,18 @@ function saveOllamaEndpoint(endpoint) {
   localStorage.setItem('ollama_endpoint', endpoint);
 }
 
-function getDefaultModel() {
-  return 'llama2';
+async function getDefaultModel() {
+  try {
+    const models = await invoke('list_ollama_models');
+    if (models && models.length > 0) {
+      console.log('[Ollama] Detected models:', models.join(', '));
+      return models[0];
+    }
+  } catch (_) { /* Ollama may not be reachable yet */ }
+  return 'llama3.2';
 }
 
-/** Returns custom system prompt from localStorage, or null if not set (backend then uses soul.md from ~/.mac-stats/agent/soul.md). */
+/** Returns custom system prompt from localStorage, or null if not set (backend then uses soul.md from ~/.mac-stats/agents/soul.md). */
 function getSystemPrompt() {
   const saved = localStorage.getItem('ollama_system_prompt');
   return saved || null;
@@ -116,7 +123,7 @@ async function safeLogExecution(logData) {
  */
 async function autoConfigureOllama() {
   const endpoint = getOllamaEndpoint();
-  const defaultModel = getDefaultModel();
+  const defaultModel = await getDefaultModel();
   
   console.log('[Ollama] Auto-configuring with endpoint:', endpoint, 'model:', defaultModel);
   
@@ -293,7 +300,7 @@ async function showOllamaUrlDialog() {
 
   // Save and reconfigure
   saveOllamaEndpoint(url);
-  const defaultModel = getDefaultModel();
+  const defaultModel = await getDefaultModel();
   
   try {
     await configureOllama(url, defaultModel);
@@ -391,7 +398,30 @@ async function sendChatMessage() {
   addChatMessage('user', message);
   input.value = '';
 
-  // Add user message to conversation history
+  // Reserved words: change app behaviour without sending to Ollama (do not add to history)
+  const trimmed = message.trim();
+  if (trimmed === '--cpu') {
+    try {
+      await invoke('toggle_cpu_window');
+      addChatMessage('assistant', 'CPU window toggled.');
+    } catch (err) {
+      addChatMessage('assistant', `Error: ${err}`);
+    }
+    return;
+  }
+  if (trimmed === '-v' || trimmed === '-vv' || trimmed === '-vvv') {
+    const level = trimmed.length - 1; // -v=1, -vv=2, -vvv=3
+    try {
+      await invoke('set_chat_verbosity', { level });
+      const labels = { 1: 'warn (-v)', 2: 'debug (-vv)', 3: 'trace (-vvv)' };
+      addChatMessage('assistant', `Verbosity set to ${labels[level]}.`);
+    } catch (err) {
+      addChatMessage('assistant', `Error: ${err}`);
+    }
+    return;
+  }
+
+  // Add user message to conversation history (non-reserved messages only)
   addToHistory('user', message);
 
   try {

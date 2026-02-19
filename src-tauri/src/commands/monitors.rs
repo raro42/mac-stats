@@ -235,6 +235,52 @@ fn load_monitors() -> Result<(), String> {
     Ok(())
 }
 
+/// Run checks for all monitors that are due (last_check + check_interval_secs <= now).
+/// Called from the background monitor thread so website monitoring runs even when no window is open.
+pub fn run_due_monitor_checks() {
+    use chrono::Utc;
+    use tracing::debug;
+
+    let configs = match get_monitor_configs().try_lock() {
+        Ok(c) => c,
+        Err(_) => {
+            debug!("Monitor: skip run_due (configs lock busy)");
+            return;
+        }
+    };
+    let stats = match get_monitor_stats().try_lock() {
+        Ok(s) => s,
+        Err(_) => {
+            debug!("Monitor: skip run_due (stats lock busy)");
+            return;
+        }
+    };
+    let now = Utc::now();
+    let due_ids: Vec<String> = configs
+        .keys()
+        .filter(|id| {
+            let interval_secs = configs
+                .get(*id)
+                .map(|c| c.check_interval_secs as i64)
+                .unwrap_or(60);
+            let last = stats.get(*id).and_then(|s| s.last_check);
+            match last {
+                None => true,
+                Some(t) => (now - t).num_seconds() >= interval_secs,
+            }
+        })
+        .cloned()
+        .collect();
+    drop(stats);
+    drop(configs);
+
+    for id in due_ids {
+        if let Err(e) = check_monitor(id.clone()) {
+            debug!("Monitor: background check failed for {}: {}", id, e);
+        }
+    }
+}
+
 /// Add a website monitor
 #[tauri::command]
 pub fn add_website_monitor(request: AddWebsiteMonitorRequest) -> Result<Monitor, String> {

@@ -57,8 +57,7 @@ pub fn fetch_page_content(url: &str) -> Result<String, String> {
         .map_err(|e| format!("Read body: {}", e))?;
 
     let body = if body.chars().count() > MAX_BODY_CHARS {
-        let truncated: String = body.chars().take(MAX_BODY_CHARS).collect();
-        format!("{}\n\n[truncated]", truncated)
+        crate::logging::ellipse(&body, MAX_BODY_CHARS)
     } else {
         body
     };
