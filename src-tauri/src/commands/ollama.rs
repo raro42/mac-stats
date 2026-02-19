@@ -220,6 +220,11 @@ pub async fn ensure_ollama_agent_ready_at_startup() {
 
 /// Query GET /api/tags and return the first model name, or "llama3.2" as a fallback.
 async fn detect_first_model(endpoint: &str, api_key: Option<&str>) -> String {
+    // OLLAMA_MODEL env var or .config.env override
+    if let Some(override_model) = read_ollama_model_override() {
+        tracing::info!("Ollama agent: using model override '{}'", override_model);
+        return override_model;
+    }
     let url = format!("{}/api/tags", endpoint.trim_end_matches('/'));
     let client = match reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(5))
@@ -247,6 +252,37 @@ async fn detect_first_model(endpoint: &str, api_key: Option<&str>) -> String {
         }
         _ => "llama3.2".to_string(),
     }
+}
+
+/// Read OLLAMA_MODEL from env or .config.env files.
+fn read_ollama_model_override() -> Option<String> {
+    if let Ok(v) = std::env::var("OLLAMA_MODEL") {
+        let v = v.trim().to_string();
+        if !v.is_empty() {
+            return Some(v);
+        }
+    }
+    let paths = [
+        std::env::current_dir().ok().map(|d| d.join(".config.env")),
+        std::env::current_dir().ok().map(|d| d.join("src-tauri").join(".config.env")),
+        std::env::var("HOME").ok().map(|h| std::path::PathBuf::from(h).join(".mac-stats").join(".config.env")),
+    ];
+    for maybe_path in paths.iter().flatten() {
+        if let Ok(content) = std::fs::read_to_string(maybe_path) {
+            for line in content.lines() {
+                let t = line.trim();
+                if t.starts_with("OLLAMA_MODEL=") || t.starts_with("OLLAMA-MODEL=") {
+                    if let Some((_, v)) = t.split_once('=') {
+                        let v = v.trim().to_string();
+                        if !v.is_empty() {
+                            return Some(v);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    None
 }
 
 /// Merge config defaults with per-request options. Request override wins.
@@ -499,6 +535,13 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
             num
         ));
         base.push_str(DISCORD_API_ENDPOINTS_CONTEXT);
+        num += 1;
+    }
+    if crate::commands::cursor_agent::is_cursor_agent_available() {
+        base.push_str(&format!(
+            "\n\n{}. **CURSOR_AGENT** (Cursor AI coding agent): Delegate coding tasks to the Cursor Agent CLI (an AI pair-programmer with full codebase access). Use when the user asks to write code, refactor, fix bugs, create files, or make changes in a project. The agent has access to read/write files and run shell commands in the configured workspace. To invoke: reply with exactly one line: CURSOR_AGENT: <detailed prompt describing the coding task>. The result (what cursor-agent did and its output) is returned. This is a powerful tool — use it for complex coding tasks that benefit from full codebase context.",
+            num
+        ));
         num += 1;
     }
     let agent_list = crate::agents::load_agents();
@@ -1673,6 +1716,48 @@ pub async fn answer_with_ollama_and_fetch(
                     }
                 }
             }
+            "CURSOR_AGENT" => {
+                if !crate::commands::cursor_agent::is_cursor_agent_available() {
+                    "CURSOR_AGENT is not available (cursor-agent CLI not found on PATH). Answer without it.".to_string()
+                } else {
+                    let prompt = arg.trim().to_string();
+                    if prompt.is_empty() {
+                        "CURSOR_AGENT requires a prompt: CURSOR_AGENT: <detailed coding task>".to_string()
+                    } else {
+                        let preview: String = prompt.chars().take(80).collect();
+                        send_status(&format!("Running Cursor Agent: {}…", preview));
+                        info!("Agent router: CURSOR_AGENT running prompt ({} chars)", prompt.len());
+                        match tokio::task::spawn_blocking({
+                            let p = prompt.clone();
+                            move || crate::commands::cursor_agent::run_cursor_agent(&p)
+                        })
+                        .await
+                        .map_err(|e| format!("CURSOR_AGENT task: {}", e))
+                        .and_then(|r| r)
+                        {
+                            Ok(output) => {
+                                info!("Agent router: CURSOR_AGENT completed ({} chars output)", output.len());
+                                let truncated = if output.chars().count() > 4000 {
+                                    let half = 1800;
+                                    let start: String = output.chars().take(half).collect();
+                                    let end: String = output.chars().rev().take(half).collect::<String>().chars().rev().collect();
+                                    format!("{}...\n[truncated]\n...{}", start, end)
+                                } else {
+                                    output
+                                };
+                                format!(
+                                    "Cursor Agent result:\n\n{}\n\nUse this to answer the user's question.",
+                                    truncated
+                                )
+                            }
+                            Err(e) => {
+                                info!("Agent router: CURSOR_AGENT failed: {}", e);
+                                format!("CURSOR_AGENT failed: {}. Answer the user without this result.", e)
+                            }
+                        }
+                    }
+                }
+            }
             _ => continue,
         };
 
@@ -1912,7 +1997,7 @@ fn parse_at_datetime(s: &str) -> Result<String, String> {
 /// Also accepts lines starting with "RECOMMEND: " (e.g. "RECOMMEND: SCHEDULER: Every 5 minutes...").
 /// Returns (tool_name, argument) or None.
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:"];
     for line in content.lines() {
         let line = line.trim();
         // Ollama sometimes replies with just "TASK_LIST" (no colon); treat as tool call with empty arg.
@@ -1992,7 +2077,7 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
 /// Tool line prefixes that indicate start of another tool (used to stop script body extraction).
 const TOOL_LINE_PREFIXES: &[&str] = &[
     "FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:",
-    "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:",
+    "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:", "CURSOR_AGENT:",
 ];
 
 /// Parse PYTHON_SCRIPT from full response: (id, topic, script_body).

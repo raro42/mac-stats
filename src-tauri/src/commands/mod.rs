@@ -13,3 +13,4 @@ pub mod python_agent;
 pub mod logging;
 pub mod window;
 pub mod agents;
+pub mod cursor_agent;

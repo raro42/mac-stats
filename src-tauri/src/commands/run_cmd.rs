@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use tracing::info;
 
-const ALLOWED_COMMANDS: &[&str] = &["cat", "head", "tail", "ls", "grep", "date", "whoami"];
+const ALLOWED_COMMANDS: &[&str] = &["cat", "head", "tail", "ls", "grep", "date", "whoami", "ps", "wc", "uptime"];
 
 /// Read ALLOW_LOCAL_CMD from env or .config.env. "0", "false", "no" => false; default true.
 fn allow_local_cmd_from_config_env_file(path: &Path) -> Option<bool> {
@@ -135,45 +135,85 @@ fn validate_path_args(args: &[String], base: &Path) -> Result<Vec<String>, Strin
     Ok(out)
 }
 
-/// Run a restricted local command. No shell; allowlist cat, head, tail, ls, grep, date, whoami; paths under ~/.mac-stats where applicable.
-pub fn run_local_command(arg: &str) -> Result<String, String> {
-    let tokens = parse_arg(arg);
-    if tokens.is_empty() {
-        return Err("RUN_CMD requires: RUN_CMD: <command> [args] (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json).".to_string());
-    }
-    let cmd = tokens[0].to_lowercase();
-    if !ALLOWED_COMMANDS.contains(&cmd.as_str()) {
-        return Err(format!(
-            "Command not allowed (allowed: {}).",
-            ALLOWED_COMMANDS.join(", ")
-        ));
-    }
-    let base = permitted_base_dir()?;
-    let args = if tokens.len() > 1 {
-        validate_path_args(&tokens[1..], &base)?
-    } else if cmd == "ls" {
-        vec![base.to_string_lossy().to_string()]
-    } else {
-        vec![]
-    };
-
-    if args.is_empty() && !matches!(cmd.as_str(), "ls" | "date" | "whoami") {
-        return Err("RUN_CMD: command requires a path (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json). Use date or whoami with no path for system time/user.".to_string());
-    }
-    if cmd == "grep" && args.len() < 2 {
-        return Err("RUN_CMD: grep requires pattern and path (e.g. RUN_CMD: grep pattern ~/.mac-stats/task/file.md).".to_string());
-    }
+/// Run a single pipeline stage. Returns stdout bytes.
+fn run_single_command(cmd: &str, args: &[String], stdin_data: Option<&[u8]>) -> Result<Vec<u8>, String> {
+    use std::process::Stdio;
 
     info!("RUN_CMD: executing {} with {} args", cmd, args.len());
-    let output = Command::new(&cmd)
-        .args(&args)
-        .output()
+    let mut child = Command::new(cmd)
+        .args(args)
+        .stdin(if stdin_data.is_some() { Stdio::piped() } else { Stdio::null() })
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
         .map_err(|e| format!("Command failed: {}", e))?;
 
+    if let Some(data) = stdin_data {
+        use std::io::Write;
+        if let Some(ref mut stdin) = child.stdin {
+            let _ = stdin.write_all(data);
+        }
+        drop(child.stdin.take());
+    }
+
+    let output = child.wait_with_output().map_err(|e| format!("Command failed: {}", e))?;
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(format!("Command failed: {}", stderr.trim()));
+        if !stderr.trim().is_empty() {
+            return Err(format!("Command failed: {}", stderr.trim()));
+        }
     }
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    Ok(stdout.trim().to_string())
+    Ok(output.stdout)
+}
+
+/// Run a restricted local command with pipe support.
+/// Allowlist: cat, head, tail, ls, grep, date, whoami, ps, wc, uptime.
+/// Supports `cmd1 | cmd2 | cmd3` pipelines; each stage must use an allowed command.
+/// Paths under ~/.mac-stats where applicable.
+pub fn run_local_command(arg: &str) -> Result<String, String> {
+    let stages: Vec<&str> = arg.split('|').map(|s| s.trim()).filter(|s| !s.is_empty()).collect();
+    if stages.is_empty() {
+        return Err("RUN_CMD requires: RUN_CMD: <command> [args] (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json).".to_string());
+    }
+
+    let base = permitted_base_dir()?;
+    let mut prev_stdout: Option<Vec<u8>> = None;
+
+    for (i, stage) in stages.iter().enumerate() {
+        let tokens = parse_arg(stage);
+        if tokens.is_empty() {
+            return Err(format!("Empty command in pipeline stage {}", i + 1));
+        }
+        let cmd = tokens[0].to_lowercase();
+        if !ALLOWED_COMMANDS.contains(&cmd.as_str()) {
+            return Err(format!(
+                "Command not allowed (allowed: {}).",
+                ALLOWED_COMMANDS.join(", ")
+            ));
+        }
+
+        let args = if tokens.len() > 1 {
+            validate_path_args(&tokens[1..], &base)?
+        } else if cmd == "ls" {
+            vec![base.to_string_lossy().to_string()]
+        } else {
+            vec![]
+        };
+
+        let no_path_needed = matches!(cmd.as_str(), "ls" | "date" | "whoami" | "ps" | "wc" | "uptime");
+        let has_stdin = prev_stdout.is_some();
+        if args.is_empty() && !no_path_needed && !has_stdin {
+            return Err("RUN_CMD: command requires a path (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json). Use date, whoami, ps, wc, or uptime with no path for system info.".to_string());
+        }
+        if cmd == "grep" && args.len() < 2 && !has_stdin {
+            return Err("RUN_CMD: grep requires pattern and path, or pipe input (e.g. RUN_CMD: ps aux | grep tail).".to_string());
+        }
+
+        let stdin_data = prev_stdout.as_deref();
+        prev_stdout = Some(run_single_command(&cmd, &args, stdin_data)?);
+    }
+
+    let stdout = prev_stdout.unwrap_or_default();
+    let out = String::from_utf8_lossy(&stdout);
+    Ok(out.trim().to_string())
 }
