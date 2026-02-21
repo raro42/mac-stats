@@ -1,6 +1,6 @@
 {
   "name": "Coder",
   "slug": "senior-coder",
-  "model": "qwen2.5-coder:latest",
+  "model_role": "code",
   "enabled": true
 }

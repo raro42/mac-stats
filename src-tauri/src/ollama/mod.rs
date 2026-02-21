@@ -2,6 +2,9 @@
 //!
 //! Local LLM chat interface using Ollama API.
 //! Includes model info (context size) via POST /api/show and cache.
+//! Sub-module `models` provides role-based model classification and resolution.
+
+pub mod models;
 
 use serde::{Deserialize, Serialize};
 use anyhow::{Result, Context};

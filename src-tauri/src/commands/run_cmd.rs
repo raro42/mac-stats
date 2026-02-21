@@ -1,13 +1,30 @@
 //! RUN_CMD agent: restricted local command execution for Ollama.
 //!
-//! Allows read-only commands (cat, head, tail, ls, grep, date, whoami) with paths under ~/.mac-stats where applicable.
+//! Allowlist is read from the first enabled orchestrator's skill.md (section "## RUN_CMD allowlist");
+//! if missing, the default list below is used. Paths under ~/.mac-stats where applicable.
 //! No shell; allowlist and path validation only. See docs/011_local_cmd_agent.md.
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use tracing::info;
 
-const ALLOWED_COMMANDS: &[&str] = &["cat", "head", "tail", "ls", "grep", "date", "whoami", "ps", "wc", "uptime"];
+/// Default allowlist when orchestrator skill.md has no "## RUN_CMD allowlist" section.
+const DEFAULT_ALLOWED_COMMANDS: &[&str] = &[
+    "cat", "head", "tail", "ls", "grep", "date", "whoami", "ps", "wc", "uptime", "cursor-agent",
+];
+
+/// Commands that always require a path (under ~/.mac-stats). All others in the allowlist are treated as no-path.
+const PATH_REQUIRED_COMMANDS: &[&str] = &["cat", "head", "tail", "grep"];
+
+/// Return the current allowlist (from orchestrator skill.md or default). Used by the tool loop for retry prompts.
+pub fn allowed_commands() -> Vec<String> {
+    crate::agents::get_run_cmd_allowlist()
+        .unwrap_or_else(|| DEFAULT_ALLOWED_COMMANDS.iter().map(|s| (*s).to_string()).collect())
+}
+
+fn get_allowed_commands() -> Vec<String> {
+    allowed_commands()
+}
 
 /// Read ALLOW_LOCAL_CMD from env or .config.env. "0", "false", "no" => false; default true.
 fn allow_local_cmd_from_config_env_file(path: &Path) -> Option<bool> {
@@ -167,7 +184,7 @@ fn run_single_command(cmd: &str, args: &[String], stdin_data: Option<&[u8]>) -> 
 }
 
 /// Run a restricted local command with pipe support.
-/// Allowlist: cat, head, tail, ls, grep, date, whoami, ps, wc, uptime.
+/// Allowlist from orchestrator skill.md "## RUN_CMD allowlist" or default (cat, head, tail, ls, grep, date, whoami, ps, wc, uptime, cursor-agent).
 /// Supports `cmd1 | cmd2 | cmd3` pipelines; each stage must use an allowed command.
 /// Paths under ~/.mac-stats where applicable.
 pub fn run_local_command(arg: &str) -> Result<String, String> {
@@ -185,10 +202,11 @@ pub fn run_local_command(arg: &str) -> Result<String, String> {
             return Err(format!("Empty command in pipeline stage {}", i + 1));
         }
         let cmd = tokens[0].to_lowercase();
-        if !ALLOWED_COMMANDS.contains(&cmd.as_str()) {
+        let allowed = get_allowed_commands();
+        if !allowed.contains(&cmd) {
             return Err(format!(
                 "Command not allowed (allowed: {}).",
-                ALLOWED_COMMANDS.join(", ")
+                allowed.join(", ")
             ));
         }
 
@@ -200,7 +218,7 @@ pub fn run_local_command(arg: &str) -> Result<String, String> {
             vec![]
         };
 
-        let no_path_needed = matches!(cmd.as_str(), "ls" | "date" | "whoami" | "ps" | "wc" | "uptime");
+        let no_path_needed = !PATH_REQUIRED_COMMANDS.contains(&cmd.as_str());
         let has_stdin = prev_stdout.is_some();
         if args.is_empty() && !no_path_needed && !has_stdin {
             return Err("RUN_CMD: command requires a path (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json). Use date, whoami, ps, wc, or uptime with no path for system info.".to_string());

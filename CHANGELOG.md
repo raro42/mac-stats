@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.15] - 2026-02-21
+
+### Added
+- **Dynamic model resolution for agents**: Agents now declare a `model_role` ("general", "code", "small") instead of hardcoding a model name. At startup, the app queries Ollama `/api/tags`, classifies all installed models by capability (Code vs General) and size tier (Small <4B, Medium 4-15B, Large >15B), and resolves each agent to the best available model. Models above 15B are excluded from auto-selection. Resolution is logged at startup for full visibility. The `model` field remains as an optional explicit override.
+  - New module: `ollama/models.rs` with `ModelCatalog`, classification logic, and 7 unit tests
+  - New field: `model_role` in `AgentConfig` / `Agent` structs and all CRUD commands
+  - Default agent configs updated: orchestrator=general, coder=code, generalist=small
+- **Redmine API agent**: Ollama can access Redmine issues, projects, and time entries via `REDMINE_API: GET /issues/1234.json`. Pre-routes ticket/issue questions directly to Redmine when configured. Configure via `REDMINE_URL` and `REDMINE_API_KEY` in env or `~/.mac-stats/.config.env`.
+- **Discord "new session" command**: Type `new session: <question>` in Discord to clear conversation history and start fresh. Prior messages are persisted to disk before clearing.
+- **Session memory `clear_session()`**: New function to flush and clear in-memory conversation history for a source/channel.
+- **RUN_CMD dynamic allowlist**: The command allowlist is now read from the orchestrator agent's `skill.md` (section `## RUN_CMD allowlist`). Falls back to the default list if not configured. Added `cursor-agent` to default allowlist.
+- **RUN_CMD pipe support**: Commands now support `cmd1 | cmd2 | cmd3` pipelines; each stage is validated against the allowlist independently.
+
+### Changed
+- **Agent default configs**: Shipped agent.json files use `model_role` instead of hardcoded `model` names. Existing user configs with explicit `model` continue to work (explicit model takes priority when available, falls back to `model_role` if the model is removed).
+
 ## [0.1.14] - 2026-02-19
 
 ### Added

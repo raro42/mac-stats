@@ -25,6 +25,8 @@ dist-ssr
 *.sw?
 
 .config.env
+.env*
+.config*
 
 # Performance measurement outputs
 performance_*.txt

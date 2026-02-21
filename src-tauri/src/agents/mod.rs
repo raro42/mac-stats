@@ -19,8 +19,13 @@ pub struct AgentConfig {
     pub name: String,
     #[serde(default)]
     pub slug: Option<String>,
+    /// Explicit model override. When set and available, used as-is.
     #[serde(default)]
     pub model: Option<String>,
+    /// Desired model role: "general", "code", or "small".
+    /// Used to auto-resolve the best available model when `model` is absent or unavailable.
+    #[serde(default)]
+    pub model_role: Option<String>,
     #[serde(default)]
     pub orchestrator: Option<bool>,
     #[serde(default)]
@@ -38,7 +43,10 @@ pub struct Agent {
     pub id: String,
     pub name: String,
     pub slug: Option<String>,
+    /// Effective model: either explicit override from agent.json or resolved from model_role.
     pub model: Option<String>,
+    /// Declared model role from agent.json (e.g., "general", "code", "small").
+    pub model_role: Option<String>,
     pub orchestrator: bool,
     pub enabled: bool,
     pub combined_prompt: String,
@@ -112,6 +120,11 @@ pub fn load_agents() -> Vec<Agent> {
             soul_path,
             if soul_exists { "present" } else { "missing (will write default on first use)" }
         );
+    }
+
+    // Auto-resolve model assignments from cached catalog (if available)
+    if let Some(catalog) = crate::ollama::models::get_global_catalog() {
+        resolve_agent_models(&mut agents, &catalog);
     }
 
     agents
@@ -201,6 +214,7 @@ fn load_one_agent(dir: &Path, id: &str) -> Option<Agent> {
         name: config.name,
         slug: config.slug,
         model: config.model,
+        model_role: config.model_role,
         orchestrator: config.orchestrator.unwrap_or(false),
         enabled: config.enabled.unwrap_or(true),
         combined_prompt,
@@ -245,6 +259,98 @@ pub fn find_agent_by_id_or_name<'a>(agents: &'a [Agent], selector: &str) -> Opti
     agents.iter().find(|a| a.id == id_from_prefix)
 }
 
+/// Read RUN_CMD allowlist from the first enabled orchestrator's skill.md.
+/// Looks for a section "## RUN_CMD allowlist" (case-insensitive); content until next "## " or EOF
+/// is split by comma and newline, trimmed, lowercased. Returns None if no orchestrator or no section.
+pub fn get_run_cmd_allowlist() -> Option<Vec<String>> {
+    let agents = load_agents();
+    let orchestrator = agents.iter().find(|a| a.orchestrator)?;
+    let dir = get_agent_dir(&orchestrator.id)?;
+    let skill_path = dir.join("skill.md");
+    let content = std::fs::read_to_string(&skill_path).ok()?;
+    parse_run_cmd_allowlist_from_md(&content)
+}
+
+/// Parse "## RUN_CMD allowlist" section from markdown. Returns None if section empty or missing.
+fn parse_run_cmd_allowlist_from_md(content: &str) -> Option<Vec<String>> {
+    const HEADER: &str = "## run_cmd allowlist";
+    let content_lower = content.to_lowercase();
+    let start = content_lower.find(HEADER)?;
+    // Slice from original content so we preserve the block text (index matches content_lower).
+    let after_header = content[start + HEADER.len()..].trim_start();
+    let block = if let Some(next) = after_header.find("\n## ") {
+        after_header[..next].trim()
+    } else {
+        after_header.trim()
+    };
+    let mut commands: Vec<String> = block
+        .split(|c| c == ',' || c == '\n')
+        .map(|s| s.trim().to_lowercase())
+        .filter(|s| !s.is_empty())
+        .collect();
+    if commands.is_empty() {
+        return None;
+    }
+    // Dedupe preserving order
+    commands.sort();
+    commands.dedup();
+    Some(commands)
+}
+
+/// Resolve model assignments for all agents using the given catalog.
+///
+/// For each agent:
+/// 1. If `model` is set and available in catalog -> keep it.
+/// 2. If `model` is set but NOT available -> warn, fall through to model_role.
+/// 3. If `model_role` is set -> resolve from catalog.
+/// 4. Otherwise -> leave model as-is (will use global default at chat time).
+pub fn resolve_agent_models(agents: &mut [Agent], catalog: &crate::ollama::models::ModelCatalog) {
+    for agent in agents.iter_mut() {
+        let agent_label = agent.slug.as_deref().unwrap_or(&agent.name);
+
+        // Step 1: explicit model override
+        if let Some(ref model_name) = agent.model {
+            if catalog.has_model(model_name) {
+                info!(
+                    "Model resolution: {} -> {} (explicit override, available)",
+                    agent_label, model_name
+                );
+                continue;
+            }
+            warn!(
+                "Model resolution: {} -> model '{}' not available, falling back to model_role={:?}",
+                agent_label,
+                model_name,
+                agent.model_role
+            );
+        }
+
+        // Step 2: resolve from model_role
+        if let Some(ref role) = agent.model_role {
+            if let Some(resolved) = catalog.resolve_role(role) {
+                info!(
+                    "Model resolution: {} -> {} (role={}, {:.1}B)",
+                    agent_label, resolved.name, role, resolved.param_billions
+                );
+                agent.model = Some(resolved.name.clone());
+                continue;
+            }
+            warn!(
+                "Model resolution: {} -> no model found for role '{}', leaving unset",
+                agent_label, role
+            );
+            agent.model = None;
+            continue;
+        }
+
+        // Step 3: neither model nor model_role set
+        debug!(
+            "Model resolution: {} -> no model or model_role, will use global default",
+            agent_label
+        );
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -265,6 +371,7 @@ mod tests {
                 name: "General".to_string(),
                 slug: Some("generalist".to_string()),
                 model: None,
+                model_role: None,
                 orchestrator: false,
                 enabled: true,
                 combined_prompt: String::new(),
@@ -283,6 +390,7 @@ mod tests {
                 name: "General".to_string(),
                 slug: None,
                 model: None,
+                model_role: None,
                 orchestrator: false,
                 enabled: true,
                 combined_prompt: String::new(),

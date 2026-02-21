@@ -254,6 +254,27 @@ impl EventHandler for Handler {
             new_message.channel_id
         );
 
+        let channel_id_u64 = new_message.channel_id.get();
+
+        // "New session:" prefix clears conversation history so the model starts fresh.
+        let question = {
+            let lower = question.trim().to_lowercase();
+            if lower.starts_with("new session:") || lower.starts_with("new session ") {
+                crate::session_memory::clear_session("discord", channel_id_u64);
+                info!("Discord: new session requested, cleared history for channel {}", channel_id_u64);
+                let stripped = question.trim();
+                let colon_pos = stripped.find(':').or_else(|| stripped.find(' '));
+                match colon_pos {
+                    Some(i) if stripped[..i].to_lowercase().trim() == "new session" => {
+                        stripped[i+1..].trim().to_string()
+                    }
+                    _ => stripped.replacen("new session", "", 1).trim().to_string(),
+                }
+            } else {
+                question.to_string()
+            }
+        };
+
         const LOG_MAX: usize = 800;
         let to_ollama = if question.chars().count() <= LOG_MAX {
             question.to_string()
@@ -262,7 +283,6 @@ impl EventHandler for Handler {
         };
         info!("Discord→Ollama: sending: {}", to_ollama);
 
-        let channel_id_u64 = new_message.channel_id.get();
         // Load prior conversation (in-memory, or from latest session file after restart) before adding this turn
         let mut prior = crate::session_memory::get_messages("discord", channel_id_u64);
         if prior.is_empty() {

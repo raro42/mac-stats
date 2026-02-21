@@ -36,6 +36,7 @@ mod skills;
 pub mod agents;
 pub mod task;
 mod user_info;
+pub mod redmine;
 mod commands;
 
 use std::os::raw::c_void;

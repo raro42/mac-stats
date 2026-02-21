@@ -13,6 +13,7 @@ pub struct AgentSummary {
     pub name: String,
     pub slug: Option<String>,
     pub model: Option<String>,
+    pub model_role: Option<String>,
     pub orchestrator: bool,
     pub enabled: bool,
 }
@@ -24,6 +25,7 @@ pub struct AgentDetails {
     pub name: String,
     pub slug: Option<String>,
     pub model: Option<String>,
+    pub model_role: Option<String>,
     pub orchestrator: bool,
     pub enabled: bool,
     pub skill: String,
@@ -40,6 +42,7 @@ pub fn list_agents() -> Vec<AgentSummary> {
             name: a.name,
             slug: a.slug,
             model: a.model,
+            model_role: a.model_role,
             orchestrator: a.orchestrator,
             enabled: a.enabled,
         })
@@ -66,6 +69,7 @@ pub fn get_agent_details(selector: String) -> Result<AgentDetails, String> {
         name: agent.name.clone(),
         slug: agent.slug.clone(),
         model: agent.model.clone(),
+        model_role: agent.model_role.clone(),
         orchestrator: agent.orchestrator,
         enabled: agent.enabled,
         skill,
@@ -102,6 +106,7 @@ pub struct UpdateAgentConfigPayload {
     pub name: Option<String>,
     pub slug: Option<String>,
     pub model: Option<String>,
+    pub model_role: Option<String>,
     pub orchestrator: Option<bool>,
     pub enabled: Option<bool>,
     pub description: Option<String>,
@@ -119,6 +124,7 @@ pub fn update_agent_config(agent_id: String, payload: UpdateAgentConfigPayload) 
     let name = payload.name.unwrap_or(current.name);
     let slug = payload.slug.or(current.slug);
     let model = payload.model.or(current.model);
+    let model_role = payload.model_role.or(current.model_role);
     let orchestrator = payload.orchestrator.or(current.orchestrator).unwrap_or(false);
     let enabled = payload.enabled.unwrap_or(current.enabled.unwrap_or(true));
     let description = payload.description.or(current.description);
@@ -127,6 +133,7 @@ pub fn update_agent_config(agent_id: String, payload: UpdateAgentConfigPayload) 
         name,
         slug,
         model,
+        model_role,
         orchestrator: Some(orchestrator),
         enabled: Some(enabled),
         description,
@@ -144,6 +151,8 @@ pub struct CreateAgentPayload {
     pub slug: Option<String>,
     #[serde(default)]
     pub model: Option<String>,
+    #[serde(default)]
+    pub model_role: Option<String>,
     #[serde(default)]
     pub skill_initial: Option<String>,
 }
@@ -167,6 +176,7 @@ pub fn create_agent(payload: CreateAgentPayload) -> Result<(), String> {
         name: payload.name.trim().to_string(),
         slug: payload.slug.filter(|s| !s.trim().is_empty()),
         model: payload.model.filter(|s| !s.trim().is_empty()),
+        model_role: payload.model_role.filter(|s| !s.trim().is_empty()),
         orchestrator: Some(false),
         enabled: Some(true),
         description: None,

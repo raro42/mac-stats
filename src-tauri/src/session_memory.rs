@@ -112,6 +112,26 @@ fn persist_session(source: &str, session_id: u64) -> std::io::Result<()> {
     Ok(())
 }
 
+/// Clear in-memory session history. Persists current messages to disk first (if any).
+pub fn clear_session(source: &str, session_id: u64) {
+    let key = format!("{}-{}", source, session_id);
+    {
+        let store = match session_store().lock() {
+            Ok(g) => g,
+            Err(_) => return,
+        };
+        let has_messages = store.get(&key).map_or(false, |s| !s.messages.is_empty());
+        if has_messages {
+            drop(store);
+            let _ = persist_session(source, session_id);
+        }
+    }
+    if let Ok(mut store) = session_store().lock() {
+        store.remove(&key);
+    }
+    debug!("Session memory: cleared session {}", key);
+}
+
 /// Return the current in-memory messages for this session (role, content).
 /// Call this *before* adding the current user message so the result is prior turns only.
 pub fn get_messages(source: &str, session_id: u64) -> Vec<(String, String)> {

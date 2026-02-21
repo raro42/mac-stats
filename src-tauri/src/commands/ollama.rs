@@ -154,6 +154,7 @@ pub async fn check_ollama_connection() -> Result<bool, String> {
 /// Called at app startup so the Ollama agent is available for Discord, scheduler, and CPU window
 /// without requiring the user to open the CPU window first. If the client is not yet configured,
 /// configures with default endpoint and auto-detects the first available model from Ollama.
+/// Also builds and caches a ModelCatalog so agents can resolve model_role at load time.
 pub async fn ensure_ollama_agent_ready_at_startup() {
     use tracing::{debug, info};
 
@@ -212,9 +213,74 @@ pub async fn ensure_ollama_agent_ready_at_startup() {
                     model, info.context_size_tokens
                 );
             }
+
+            // Build model catalog from full model list and cache it for agent model resolution
+            build_and_cache_model_catalog(&endpoint, api_key.as_deref()).await;
         }
         Ok(false) => debug!("Ollama agent: endpoint not reachable at startup (will retry when used)"),
         Err(e) => debug!("Ollama agent: startup check failed: {}", e),
+    }
+}
+
+/// Fetch the full model list from Ollama, build a ModelCatalog, and cache it globally.
+/// Subsequent calls to load_agents() will use this catalog to resolve model_role fields.
+async fn build_and_cache_model_catalog(endpoint: &str, api_key: Option<&str>) {
+    use tracing::{info, warn};
+
+    let url = format!("{}/api/tags", endpoint.trim_end_matches('/'));
+    let client = match reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(10))
+        .build()
+    {
+        Ok(c) => c,
+        Err(e) => {
+            warn!("ModelCatalog: failed to create HTTP client: {}", e);
+            return;
+        }
+    };
+    let mut req = client.get(&url);
+    if let Some(key) = api_key {
+        req = req.header("Authorization", format!("Bearer {}", key));
+    }
+    let resp = match req.send().await {
+        Ok(r) if r.status().is_success() => r,
+        Ok(r) => {
+            warn!("ModelCatalog: /api/tags returned {}", r.status());
+            return;
+        }
+        Err(e) => {
+            warn!("ModelCatalog: /api/tags request failed: {}", e);
+            return;
+        }
+    };
+    let list: crate::ollama::ListResponse = match resp.json().await {
+        Ok(l) => l,
+        Err(e) => {
+            warn!("ModelCatalog: failed to parse /api/tags: {}", e);
+            return;
+        }
+    };
+
+    let catalog = crate::ollama::models::ModelCatalog::from_model_list(&list.models);
+    info!(
+        "ModelCatalog: cached {} classified models for agent model resolution",
+        catalog.models.len()
+    );
+    crate::ollama::models::set_global_catalog(catalog);
+
+    // Trigger initial agent load to resolve models and log the results at startup
+    let agents = crate::agents::load_agents();
+    if !agents.is_empty() {
+        let summary: Vec<String> = agents
+            .iter()
+            .map(|a| {
+                let label = a.slug.as_deref().unwrap_or(&a.name);
+                let model = a.model.as_deref().unwrap_or("(default)");
+                let role = a.model_role.as_deref().unwrap_or("(none)");
+                format!("{}: {} [role={}]", label, model, role)
+            })
+            .collect();
+        info!("Startup model assignments: {}", summary.join(", "));
     }
 }
 
@@ -449,11 +515,12 @@ SCHEDULE cron examples (6-field: sec min hour day month dow). Use as SCHEDULE: <
 - Every weekday at 9am: 0 0 9 * * 1-5
 - Once a day at 8am: 0 0 8 * * *"#;
 
-/// RUN_CMD agent description (appended when ALLOW_LOCAL_CMD is not 0). Call with agent number via format_run_cmd_description(n).
+/// RUN_CMD agent description (appended when ALLOW_LOCAL_CMD is not 0). Allowlist is read from orchestrator skill.md.
 fn format_run_cmd_description(num: u32) -> String {
+    let allowed = crate::commands::run_cmd::allowed_commands().join(", ");
     format!(
-        "\n\n{}. **RUN_CMD** (local read-only): Run a restricted local command. Use for: reading app data under ~/.mac-stats (schedules.json, config, task files), or current time/user (date, whoami). To invoke: reply with exactly one line: RUN_CMD: <command> [args] (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json, RUN_CMD: date, RUN_CMD: whoami, RUN_CMD: date +%Y-%m-%d, RUN_CMD: grep pattern ~/.mac-stats/task/file.md). Allowed: cat, head, tail, ls, grep, date, whoami; file paths must be under ~/.mac-stats; date and whoami need no path.",
-        num
+        "\n\n{}. **RUN_CMD** (local read-only): Run a restricted local command. Use for: reading app data under ~/.mac-stats (schedules.json, config, task files), or current time/user (date, whoami), or allowed CLI tools. To invoke: reply with exactly one line: RUN_CMD: <command> [args] (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json, RUN_CMD: date, RUN_CMD: cursor-agent --help). Allowed: {}; file paths must be under ~/.mac-stats; date, whoami, ps, cursor-agent and similar need no path.",
+        num, allowed
     )
 }
 
@@ -540,6 +607,13 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
     if crate::commands::cursor_agent::is_cursor_agent_available() {
         base.push_str(&format!(
             "\n\n{}. **CURSOR_AGENT** (Cursor AI coding agent): Delegate coding tasks to the Cursor Agent CLI (an AI pair-programmer with full codebase access). Use when the user asks to write code, refactor, fix bugs, create files, or make changes in a project. The agent has access to read/write files and run shell commands in the configured workspace. To invoke: reply with exactly one line: CURSOR_AGENT: <detailed prompt describing the coding task>. The result (what cursor-agent did and its output) is returned. This is a powerful tool — use it for complex coding tasks that benefit from full codebase context.",
+            num
+        ));
+        num += 1;
+    }
+    if crate::redmine::is_configured() {
+        base.push_str(&format!(
+            "\n\n{}. **REDMINE_API** (Redmine project management): Access Redmine issues, projects, and time entries via REST API. Use when the user asks to review a ticket, list issues, check project status, or look up issue details. To invoke: reply with exactly one line: REDMINE_API: GET /issues/1234.json?include=journals,attachments (fetch issue with full history). Key endpoints:\n- GET /issues/{{id}}.json?include=journals,attachments — full issue with comments and files\n- GET /issues.json?assigned_to_id=me&status_id=open — my open issues\n- GET /issues.json?project_id=ID&status_id=open&limit=25 — project issues\n- GET /projects.json — list projects\n- PUT /issues/{{id}}.json — update issue (add notes: {{\"issue\":{{\"notes\":\"comment\"}}}})\nAlways use .json suffix. When reviewing a ticket, fetch with include=journals,attachments to get the full picture.",
             num
         ));
         num += 1;
@@ -716,6 +790,29 @@ pub(crate) async fn run_agent_ollama_session(
 /// If `discord_reply_channel_id` is set (when the request came from Discord), SCHEDULE will store it so the scheduler can post results to that channel (DM or mention channel).
 /// When `discord_user_id` and `discord_user_name` are set (from Discord message author), the prompt is prefixed with "You are talking to Discord user **{name}** (user id: {id})."
 /// When set, `model_override` and `options_override` apply only to this request (e.g. from Discord "model: llama3" line).
+/// Extract a numeric ticket/issue ID from text like "ticket #1234", "#1234", "issue 1234".
+fn extract_ticket_id(text: &str) -> Option<u64> {
+    // Match #NNNN
+    if let Some(pos) = text.find('#') {
+        let after = &text[pos + 1..];
+        let digits: String = after.chars().take_while(|c| c.is_ascii_digit()).collect();
+        if !digits.is_empty() {
+            return digits.parse().ok();
+        }
+    }
+    // Match "ticket NNNN" or "issue NNNN" without #
+    for keyword in &["ticket ", "issue "] {
+        if let Some(pos) = text.find(keyword) {
+            let after = &text[pos + keyword.len()..];
+            let digits: String = after.chars().take_while(|c| c.is_ascii_digit()).collect();
+            if !digits.is_empty() {
+                return digits.parse().ok();
+            }
+        }
+    }
+    None
+}
+
 /// When set, `skill_content` is prepended to system prompts (from ~/.mac-stats/skills/skill-<n>-<topic>.md).
 /// When set, `agent_override` uses that agent's model and combined_prompt (soul+mood+skill) for the main run (e.g. Discord "agent: 001").
 /// When `allow_schedule` is false (e.g. when running from the scheduler), the SCHEDULE tool is disabled so a scheduled task cannot create more schedules.
@@ -825,9 +922,9 @@ pub async fn answer_with_ollama_and_fetch(
         || {
             let s = load_soul_content();
             if s.is_empty() {
-                String::new()
+                format!("You are mac-stats v{}.\n\n", crate::config::Config::version())
             } else {
-                format!("{}\n\n", s)
+                format!("{}\n\nYou are mac-stats v{}.\n\n", s, crate::config::Config::version())
             }
         },
         |_| String::new(),
@@ -865,52 +962,112 @@ pub async fn answer_with_ollama_and_fetch(
         _ => String::new(),
     };
 
-    // --- Planning step: ask Ollama how it would solve the question ---
-    info!("Agent router: planning step — asking Ollama for RECOMMEND");
-    let planning_prompt = crate::config::Config::load_planning_prompt();
-    let planning_system_content = match &skill_content {
-        Some(skill) => format!(
-            "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}",
-            discord_user_context, skill, planning_prompt, agent_descriptions
-        ),
-        None => format!(
-            "{}{}{}\n\n{}",
-            router_soul, discord_user_context, planning_prompt, agent_descriptions
-        ),
-    };
-    let mut planning_messages: Vec<crate::ollama::ChatMessage> = vec![
-        crate::ollama::ChatMessage {
-            role: "system".to_string(),
-            content: planning_system_content,
-        },
-    ];
-    for msg in &conversation_history {
-        planning_messages.push(msg.clone());
-    }
-    planning_messages.push(crate::ollama::ChatMessage {
-        role: "user".to_string(),
-        content: format!(
-            "Current user question: {}\n\nReply with RECOMMEND: your plan.",
-            question
-        ),
-    });
-    let plan_response = send_ollama_chat_messages(planning_messages, model_override.clone(), options_override.clone()).await?;
-    let mut recommendation = plan_response.message.content.trim().to_string();
-    // Strip leading RECOMMEND: prefix(es) — the planning prompt asks for this format
-    // but we don't want it echoed into the execution system prompt or confusing parse_tool_from_response.
-    while recommendation.to_uppercase().starts_with("RECOMMEND: ") || recommendation.to_uppercase().starts_with("RECOMMEND:") {
-        let prefix_len = if recommendation.len() >= 11 && recommendation[..11].to_uppercase() == "RECOMMEND: " {
-            11
+    // --- Pre-routing: deterministic tool dispatch for unambiguous patterns ---
+    // "run <command>" or "run command: <command>" → RUN_CMD, skip LLM planning (so we execute, not explain).
+    let pre_routed_recommendation = if crate::commands::run_cmd::is_local_cmd_allowed() {
+        let q = question.trim();
+        let q_lower = q.to_lowercase();
+        let cmd_rest = if q_lower.starts_with("run command:") {
+            q[12..].trim() // "run command:".len() == 12
+        } else if q_lower.starts_with("run ") {
+            q[4..].trim() // "run ".len() == 4
         } else {
-            10
+            ""
         };
-        recommendation = recommendation[prefix_len..].trim().to_string();
-    }
+        if !cmd_rest.is_empty() {
+            let rec = format!("RUN_CMD: {}", cmd_rest);
+            info!("Agent router: pre-routed to RUN_CMD (run command): {}", crate::logging::ellipse(cmd_rest, 60));
+            Some(rec)
+        } else if crate::redmine::is_configured() {
+            let ticket_id = extract_ticket_id(&q_lower);
+            if ticket_id.is_some() && (q_lower.contains("ticket") || q_lower.contains("issue") || q_lower.contains("redmine")) {
+                let id = ticket_id.unwrap();
+                let rec = format!("REDMINE_API: GET /issues/{}.json?include=journals,attachments", id);
+                info!("Agent router: pre-routed to REDMINE_API for ticket #{}", id);
+                Some(rec)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    } else if crate::redmine::is_configured() {
+        let q_lower = question.to_lowercase();
+        let ticket_id = extract_ticket_id(&q_lower);
+        if ticket_id.is_some() && (q_lower.contains("ticket") || q_lower.contains("issue") || q_lower.contains("redmine")) {
+            let id = ticket_id.unwrap();
+            let rec = format!("REDMINE_API: GET /issues/{}.json?include=journals,attachments", id);
+            info!("Agent router: pre-routed to REDMINE_API for ticket #{}", id);
+            Some(rec)
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
+    // --- Planning step: ask Ollama how it would solve the question (skip if pre-routed) ---
+    let recommendation = if let Some(pre_routed) = pre_routed_recommendation {
+        info!("Agent router: skipping LLM planning (pre-routed)");
+        pre_routed
+    } else {
+        info!("Agent router: planning step — asking Ollama for RECOMMEND");
+        let planning_prompt = crate::config::Config::load_planning_prompt();
+        let planning_system_content = match &skill_content {
+            Some(skill) => format!(
+                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\n{}",
+                discord_user_context, skill, planning_prompt, agent_descriptions
+            ),
+            None => format!(
+                "{}{}{}\n\n{}",
+                router_soul, discord_user_context, planning_prompt, agent_descriptions
+            ),
+        };
+        let mut planning_messages: Vec<crate::ollama::ChatMessage> = vec![
+            crate::ollama::ChatMessage {
+                role: "system".to_string(),
+                content: planning_system_content,
+            },
+        ];
+        for msg in &conversation_history {
+            planning_messages.push(msg.clone());
+        }
+        planning_messages.push(crate::ollama::ChatMessage {
+            role: "user".to_string(),
+            content: format!(
+                "Current user question: {}\n\nReply with RECOMMEND: your plan.",
+                question
+            ),
+        });
+        let plan_response = send_ollama_chat_messages(planning_messages, model_override.clone(), options_override.clone()).await?;
+        let mut rec = plan_response.message.content.trim().to_string();
+        while rec.to_uppercase().starts_with("RECOMMEND: ") || rec.to_uppercase().starts_with("RECOMMEND:") {
+            let prefix_len = if rec.len() >= 11 && rec[..11].to_uppercase() == "RECOMMEND: " {
+                11
+            } else {
+                10
+            };
+            rec = rec[prefix_len..].trim().to_string();
+        }
+        rec
+    };
     info!("Agent router: understood plan — {}", recommendation.chars().take(200).collect::<String>());
     send_status(&format!(
         "Executing plan: {}…",
         truncate_status(&recommendation, 72)
     ));
+
+    // Tools that benefit from a clean session (no stale conversation context).
+    // Redmine reviews must not be polluted by prior turns — the model hallucinates.
+    let fresh_session_tools = ["REDMINE_API"];
+    let rec_upper = recommendation.to_uppercase();
+    let needs_fresh_session = fresh_session_tools.iter().any(|t| rec_upper.contains(t));
+    let conversation_history = if needs_fresh_session && !conversation_history.is_empty() {
+        info!("Agent router: clearing conversation history for fresh-session tool");
+        Vec::new()
+    } else {
+        conversation_history
+    };
 
     // --- Execution: system prompt with agents + plan, then tool loop ---
     let execution_prompt_raw = crate::config::Config::load_execution_prompt();
@@ -1325,9 +1482,10 @@ pub async fn answer_with_ollama_and_fetch(
                                     break;
                                 }
                                 // Ask Ollama to fix the command
+                                let allowed = crate::commands::run_cmd::allowed_commands().join(", ");
                                 let fix_prompt = format!(
-                                    "The command `{}` failed with error:\n{}\n\nReply with ONLY the corrected command on a single line, in this exact format:\nRUN_CMD: <corrected command>\n\nAllowed commands: cat, head, tail, ls, grep, date, whoami. Paths must be under ~/.mac-stats.",
-                                    current_cmd, e
+                                    "The command `{}` failed with error:\n{}\n\nReply with ONLY the corrected command on a single line, in this exact format:\nRUN_CMD: <corrected command>\n\nAllowed commands: {}. Paths must be under ~/.mac-stats.",
+                                    current_cmd, e, allowed
                                 );
                                 let fix_messages = vec![
                                     crate::ollama::ChatMessage { role: "user".to_string(), content: fix_prompt },
@@ -1758,6 +1916,32 @@ pub async fn answer_with_ollama_and_fetch(
                     }
                 }
             }
+            "REDMINE_API" => {
+                let arg = arg.trim();
+                let (method, rest) = match arg.find(' ') {
+                    Some(i) => (arg[..i].trim().to_string(), arg[i..].trim()),
+                    None => ("GET".to_string(), arg),
+                };
+                let (path, body) = if let Some(idx) = rest.find(" {") {
+                    let (p, b) = rest.split_at(idx);
+                    (p.trim().to_string(), Some(b.trim().to_string()))
+                } else {
+                    (rest.to_string(), None)
+                };
+                if path.is_empty() {
+                    "REDMINE_API requires: REDMINE_API: GET /issues/1234.json?include=journals,attachments".to_string()
+                } else {
+                    send_status(&format!("Querying Redmine: {} {}", method, path));
+                    info!("Agent router: REDMINE_API {} {}", method, path);
+                    match crate::redmine::redmine_api_request(&method, &path, body.as_deref()).await {
+                        Ok(result) => format!(
+                            "Redmine API result:\n\n{}\n\nUse this data to answer the user's question. Summarize the issue clearly: subject, description quality, what's missing, status, assignee, and key comments.",
+                            result
+                        ),
+                        Err(e) => format!("Redmine API failed: {}. Answer without this result.", e),
+                    }
+                }
+            }
             _ => continue,
         };
 
@@ -1997,7 +2181,7 @@ fn parse_at_datetime(s: &str) -> Result<String, String> {
 /// Also accepts lines starting with "RECOMMEND: " (e.g. "RECOMMEND: SCHEDULER: Every 5 minutes...").
 /// Returns (tool_name, argument) or None.
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:"];
     for line in content.lines() {
         let line = line.trim();
         // Ollama sometimes replies with just "TASK_LIST" (no colon); treat as tool call with empty arg.
@@ -2077,7 +2261,7 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
 /// Tool line prefixes that indicate start of another tool (used to stop script body extraction).
 const TOOL_LINE_PREFIXES: &[&str] = &[
     "FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:",
-    "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:", "CURSOR_AGENT:",
+    "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:",
 ];
 
 /// Parse PYTHON_SCRIPT from full response: (id, topic, script_body).

@@ -1,6 +1,6 @@
 {
   "name": "Generalist",
   "slug": "humble-generalist",
-  "model": "huihui_ai/granite3.2-abliterated:2b",
+  "model_role": "small",
   "enabled": true
 }

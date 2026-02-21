@@ -1,5 +1,5 @@
 {
   "name": "General Assistant",
   "slug": "general-purpose-mommy",
-  "model": "qwen3:latest"
+  "model_role": "general"
 }
