@@ -22,6 +22,7 @@ You can invoke these by replying with **exactly one line** in the form `COMMAND:
 | **TASK_ASSIGN:** | `TASK_ASSIGN: <path or id> discord` | Reassign task to scheduler, discord, cpu, or default. |
 | **SCHEDULE:** | `SCHEDULE: every 5 minutes <task>` or `SCHEDULE: 0 0 8 * * * <task>` or `SCHEDULE: at 2025-02-10T09:00:00 <task>` | Add recurring (cron) or one-shot (at) schedule. |
 | **REMOVE_SCHEDULE:** | `REMOVE_SCHEDULE: discord-123` | Remove a schedule by ID. |
+| **LIST_SCHEDULES** | `LIST_SCHEDULES` or `LIST_SCHEDULES:` | List all active schedules (id, type, next run, task). Use when user asks to list or show schedules. |
 | **OLLAMA_API:** | `OLLAMA_API: list_models` or `OLLAMA_API: version` | List models, version, running, pull/delete/load/unload, embed. |
 | **SKILL:** | `SKILL: 2 <task>` or `SKILL: summarize <task>` | Run a skill by number or topic. |
 | **MCP:** | `MCP: <tool_name> <args>` | Call an MCP server tool (if configured). |

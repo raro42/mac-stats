@@ -1,0 +1,8 @@
+{
+  "name": "Discord Expert",
+  "slug": "discord-expert",
+  "model_role": "general",
+  "enabled": true,
+  "description": "Specialized Discord API agent. Handles user lookups, member search, channel listing, guild info, and message sending via the Discord REST API.",
+  "max_tool_iterations": 10
+}

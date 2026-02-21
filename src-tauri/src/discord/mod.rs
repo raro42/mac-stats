@@ -23,6 +23,348 @@ use tracing::{debug, error, info};
 /// See https://discord.com/developers/docs/resources/channel#create-message: content max 2000.
 const DISCORD_MESSAGE_MAX_CHARS: usize = 2000;
 
+/// Per-channel listen mode loaded from `~/.mac-stats/discord_channels.json`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ChannelMode {
+    /// Only respond when @mentioned or in DMs (default).
+    MentionOnly,
+    /// Respond to every human message in this channel (no @mention required). Bots ignored.
+    AllMessages,
+    /// Like all_messages, but also responds to other bots. Loop-protected.
+    HavingFun,
+}
+
+/// Per-channel settings: mode + optional prompt injected into the system context.
+#[derive(Debug, Clone)]
+struct ChannelSettings {
+    mode: ChannelMode,
+    prompt: Option<String>,
+}
+
+/// Cached channel config, loaded once at startup from `discord_channels.json`.
+static CHANNEL_CONFIG: OnceLock<(ChannelSettings, HashMap<u64, ChannelSettings>)> = OnceLock::new();
+
+fn parse_mode(s: &str) -> ChannelMode {
+    match s {
+        "all_messages" => ChannelMode::AllMessages,
+        "having_fun" => ChannelMode::HavingFun,
+        _ => ChannelMode::MentionOnly,
+    }
+}
+
+fn load_channel_config() -> (ChannelSettings, HashMap<u64, ChannelSettings>) {
+    let default_settings = ChannelSettings { mode: ChannelMode::MentionOnly, prompt: None };
+    let path = crate::config::Config::discord_channels_path();
+    let json = match std::fs::read_to_string(&path) {
+        Ok(s) => s,
+        Err(_) => {
+            info!("Discord channels config not found at {:?}, using mention_only default", path);
+            return (default_settings, HashMap::new());
+        }
+    };
+    let parsed: serde_json::Value = match serde_json::from_str(&json) {
+        Ok(v) => v,
+        Err(e) => {
+            tracing::warn!("Discord channels config parse error: {}, using mention_only default", e);
+            return (default_settings, HashMap::new());
+        }
+    };
+    let default_mode = parsed
+        .get("default")
+        .and_then(|v| v.as_str())
+        .map(parse_mode)
+        .unwrap_or(ChannelMode::MentionOnly);
+    let default_prompt = parsed
+        .get("default_prompt")
+        .and_then(|v| v.as_str())
+        .map(|s| s.to_string());
+    let default_settings = ChannelSettings { mode: default_mode, prompt: default_prompt };
+
+    let mut channels = HashMap::new();
+    if let Some(obj) = parsed.get("channels").and_then(|v| v.as_object()) {
+        for (k, v) in obj {
+            let Ok(id) = k.parse::<u64>() else { continue };
+            let settings = if let Some(mode_str) = v.as_str() {
+                // Simple format: "channel_id": "mode"
+                ChannelSettings { mode: parse_mode(mode_str), prompt: None }
+            } else if let Some(obj) = v.as_object() {
+                // Extended format: "channel_id": { "mode": "...", "prompt": "..." }
+                let mode = obj.get("mode")
+                    .and_then(|v| v.as_str())
+                    .map(parse_mode)
+                    .unwrap_or(ChannelMode::MentionOnly);
+                let prompt = obj.get("prompt")
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.to_string());
+                ChannelSettings { mode, prompt }
+            } else {
+                continue;
+            };
+            channels.insert(id, settings);
+        }
+    }
+    info!(
+        "Discord channels config: default={:?}, {} channel overrides",
+        default_settings.mode,
+        channels.len()
+    );
+    (default_settings, channels)
+}
+
+fn channel_settings(channel_id: u64) -> ChannelSettings {
+    let (default, overrides) = CHANNEL_CONFIG.get_or_init(load_channel_config);
+    overrides.get(&channel_id).cloned().unwrap_or_else(|| default.clone())
+}
+
+// ---------------------------------------------------------------------------
+// having_fun: buffered responses + idle thoughts
+// ---------------------------------------------------------------------------
+
+const HAVING_FUN_MAX_CONSECUTIVE_BOT_REPLIES: u32 = 5;
+const HAVING_FUN_RESPONSE_DELAY_SECS: u64 = 30;
+const HAVING_FUN_IDLE_THOUGHT_SECS: u64 = 300; // 5 min of silence
+const HAVING_FUN_TICK_SECS: u64 = 10;
+
+struct BufferedMessage {
+    author_name: String,
+    content: String,
+    is_bot: bool,
+}
+
+struct HavingFunState {
+    buffer: Vec<BufferedMessage>,
+    consecutive_bot_replies: u32,
+    last_response: std::time::Instant,
+    last_activity: std::time::Instant,
+    last_thought: std::time::Instant,
+}
+
+static HAVING_FUN_STATES: OnceLock<Mutex<HashMap<u64, HavingFunState>>> = OnceLock::new();
+
+fn having_fun_states() -> &'static Mutex<HashMap<u64, HavingFunState>> {
+    HAVING_FUN_STATES.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
+fn buffer_having_fun_message(channel_id: u64, author_name: String, content: String, is_bot: bool) {
+    if let Ok(mut map) = having_fun_states().lock() {
+        let state = map.entry(channel_id).or_insert_with(|| {
+            let now = std::time::Instant::now();
+            HavingFunState {
+                buffer: Vec::new(),
+                consecutive_bot_replies: 0,
+                last_response: now,
+                last_activity: now,
+                last_thought: now,
+            }
+        });
+        if !is_bot {
+            state.consecutive_bot_replies = 0;
+        }
+        if is_bot && state.consecutive_bot_replies >= HAVING_FUN_MAX_CONSECUTIVE_BOT_REPLIES {
+            debug!("Discord: dropping bot message in having_fun channel {} (loop protection)", channel_id);
+            return;
+        }
+        state.buffer.push(BufferedMessage { author_name, content, is_bot });
+        state.last_activity = std::time::Instant::now();
+    }
+}
+
+/// Background loop for having_fun channels: flushes buffered messages every 30s,
+/// posts random thoughts after 5min of silence.
+async fn having_fun_background_loop(ctx: Context) {
+    let mut interval = tokio::time::interval(std::time::Duration::from_secs(HAVING_FUN_TICK_SECS));
+    loop {
+        interval.tick().await;
+
+        // --- Phase 1: flush channels with buffered messages ---
+        let channels_to_flush: Vec<(u64, Vec<BufferedMessage>)> = {
+            let mut map = match having_fun_states().lock() {
+                Ok(m) => m,
+                Err(_) => continue,
+            };
+            let mut flush = Vec::new();
+            for (channel_id, state) in map.iter_mut() {
+                if !state.buffer.is_empty()
+                    && state.last_response.elapsed()
+                        >= std::time::Duration::from_secs(HAVING_FUN_RESPONSE_DELAY_SECS)
+                {
+                    flush.push((*channel_id, std::mem::take(&mut state.buffer)));
+                    state.last_response = std::time::Instant::now();
+                }
+            }
+            flush
+        };
+
+        for (channel_id, messages) in channels_to_flush {
+            let had_bot = messages.iter().any(|m| m.is_bot);
+            having_fun_respond(channel_id, messages, &ctx).await;
+            if had_bot {
+                if let Ok(mut map) = having_fun_states().lock() {
+                    if let Some(state) = map.get_mut(&channel_id) {
+                        state.consecutive_bot_replies += 1;
+                    }
+                }
+            }
+        }
+
+        // --- Phase 2: idle thoughts for quiet having_fun channels ---
+        let idle_channels: Vec<u64> = {
+            let (_, overrides) = CHANNEL_CONFIG.get_or_init(load_channel_config);
+            let map = match having_fun_states().lock() {
+                Ok(m) => m,
+                Err(_) => continue,
+            };
+            overrides
+                .iter()
+                .filter(|(_, s)| s.mode == ChannelMode::HavingFun)
+                .filter_map(|(id, _)| {
+                    if let Some(state) = map.get(id) {
+                        let idle = state.buffer.is_empty()
+                            && state.last_activity.elapsed()
+                                >= std::time::Duration::from_secs(HAVING_FUN_IDLE_THOUGHT_SECS)
+                            && state.last_thought.elapsed()
+                                >= std::time::Duration::from_secs(HAVING_FUN_IDLE_THOUGHT_SECS);
+                        if idle { Some(*id) } else { None }
+                    } else {
+                        None
+                    }
+                })
+                .collect()
+        };
+
+        for channel_id in idle_channels {
+            if let Ok(mut map) = having_fun_states().lock() {
+                if let Some(state) = map.get_mut(&channel_id) {
+                    state.last_thought = std::time::Instant::now();
+                    state.last_activity = std::time::Instant::now();
+                }
+            }
+            having_fun_idle_thought(channel_id, &ctx).await;
+        }
+    }
+}
+
+/// Flush buffered messages: send them as context to Ollama (direct chat, no planning/tools)
+/// and post the reply to the channel.
+async fn having_fun_respond(channel_id: u64, messages: Vec<BufferedMessage>, ctx: &Context) {
+    let chan = channel_settings(channel_id);
+    let soul = crate::config::Config::load_soul_content();
+
+    let mut prior = crate::session_memory::get_messages("discord", channel_id);
+    if prior.is_empty() {
+        prior = crate::session_memory::load_messages_from_latest_session_file("discord", channel_id);
+    }
+
+    let mut ollama_msgs: Vec<crate::ollama::ChatMessage> = Vec::new();
+    let mut system = soul;
+    if let Some(ref prompt) = chan.prompt {
+        system.push_str("\n\n");
+        system.push_str(prompt);
+    }
+    ollama_msgs.push(crate::ollama::ChatMessage {
+        role: "system".to_string(),
+        content: system,
+    });
+
+    const HISTORY_CAP: usize = 20;
+    for (role, content) in prior.into_iter().rev().take(HISTORY_CAP).rev() {
+        ollama_msgs.push(crate::ollama::ChatMessage { role, content });
+    }
+
+    let new_context: String = messages
+        .iter()
+        .map(|m| format!("{}: {}", m.author_name, m.content))
+        .collect::<Vec<_>>()
+        .join("\n");
+    ollama_msgs.push(crate::ollama::ChatMessage {
+        role: "user".to_string(),
+        content: new_context,
+    });
+
+    let channel = serenity::model::id::ChannelId::new(channel_id);
+    let _ = channel.broadcast_typing(&ctx).await;
+
+    match crate::commands::ollama::send_ollama_chat_messages(ollama_msgs, None, None).await {
+        Ok(response) => {
+            let reply = response.message.content.trim().to_string();
+            if reply.is_empty() {
+                return;
+            }
+            info!(
+                "Having fun (channel {}): reply ({} chars): {}",
+                channel_id,
+                reply.len(),
+                crate::logging::ellipse(&reply, 200)
+            );
+            let chunks = split_message_for_discord(&reply);
+            for chunk in &chunks {
+                let _ = channel.say(&ctx, chunk).await;
+            }
+            crate::session_memory::add_message("discord", channel_id, "assistant", &reply);
+        }
+        Err(e) => {
+            debug!("Having fun: Ollama failed for channel {}: {}", channel_id, e);
+        }
+    }
+}
+
+/// Generate and post a random thought when the channel has been quiet.
+async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
+    let chan = channel_settings(channel_id);
+    let soul = crate::config::Config::load_soul_content();
+
+    let mut prior = crate::session_memory::get_messages("discord", channel_id);
+    if prior.is_empty() {
+        prior = crate::session_memory::load_messages_from_latest_session_file("discord", channel_id);
+    }
+
+    let mut ollama_msgs: Vec<crate::ollama::ChatMessage> = Vec::new();
+    let mut system = soul;
+    if let Some(ref prompt) = chan.prompt {
+        system.push_str("\n\n");
+        system.push_str(prompt);
+    }
+    ollama_msgs.push(crate::ollama::ChatMessage {
+        role: "system".to_string(),
+        content: system,
+    });
+
+    const HISTORY_CAP: usize = 10;
+    for (role, content) in prior.into_iter().rev().take(HISTORY_CAP).rev() {
+        ollama_msgs.push(crate::ollama::ChatMessage { role, content });
+    }
+
+    ollama_msgs.push(crate::ollama::ChatMessage {
+        role: "user".to_string(),
+        content: "The chat has been quiet for a while. Share a random thought, observation, or bring up something interesting. Be casual and brief — one or two sentences.".to_string(),
+    });
+
+    let channel = serenity::model::id::ChannelId::new(channel_id);
+    let _ = channel.broadcast_typing(&ctx).await;
+
+    match crate::commands::ollama::send_ollama_chat_messages(ollama_msgs, None, None).await {
+        Ok(response) => {
+            let reply = response.message.content.trim().to_string();
+            if reply.is_empty() {
+                return;
+            }
+            info!(
+                "Having fun idle thought (channel {}): {}",
+                channel_id,
+                crate::logging::ellipse(&reply, 200)
+            );
+            let chunks = split_message_for_discord(&reply);
+            for chunk in &chunks {
+                let _ = channel.say(&ctx, chunk).await;
+            }
+            crate::session_memory::add_message("discord", channel_id, "assistant", &reply);
+        }
+        Err(e) => {
+            debug!("Having fun: idle thought failed for channel {}: {}", channel_id, e);
+        }
+    }
+}
+
 /// Split text into chunks of at most DISCORD_MESSAGE_MAX_CHARS. Prefer splitting at newlines.
 fn split_message_for_discord(text: &str) -> Vec<String> {
     let mut out = Vec::new();
@@ -52,8 +394,9 @@ fn split_message_for_discord(text: &str) -> Vec<String> {
     out
 }
 
-/// Parse leading "model: ...", "temperature: ...", "num_ctx: ...", "skill: ...", "agent: ..." from a Discord message.
-/// Returns (rest of message as question, model_override, options_override, skill_content, agent_selector).
+/// Parse leading "model: ...", "temperature: ...", "num_ctx: ...", "skill: ...", "agent: ...", "verbose" from a Discord message.
+/// Returns (rest of message as question, model_override, options_override, skill_content, agent_selector, verbose).
+/// When `verbose` is false (the default), status/thinking messages are suppressed in the channel.
 fn parse_discord_ollama_overrides(
     content: &str,
 ) -> (
@@ -62,12 +405,14 @@ fn parse_discord_ollama_overrides(
     Option<crate::ollama::ChatOptions>,
     Option<String>,
     Option<String>,
+    bool,
 ) {
     let mut model_override: Option<String> = None;
     let mut temperature: Option<f32> = None;
     let mut num_ctx: Option<u32> = None;
     let mut skill_selector: Option<String> = None;
     let mut agent_selector: Option<String> = None;
+    let mut verbose = false;
     let lines: Vec<&str> = content.lines().collect();
     let mut consumed = 0;
 
@@ -78,7 +423,10 @@ fn parse_discord_ollama_overrides(
             continue;
         }
         let lower = line.to_lowercase();
-        if lower.starts_with("model:") {
+        if lower == "verbose" || lower == "verbose:" || lower == "verbose: true" || lower == "verbose=true" {
+            verbose = true;
+            consumed += 1;
+        } else if lower.starts_with("model:") {
             let v = line["model:".len()..].trim().to_string();
             if !v.is_empty() {
                 model_override = Some(v);
@@ -169,7 +517,7 @@ fn parse_discord_ollama_overrides(
         let skills = crate::skills::load_skills();
         crate::skills::find_skill_by_number_or_topic(&skills, &sel).map(|s| s.content.clone())
     });
-    (question, model_override, options_override, skill_content, agent_selector)
+    (question, model_override, options_override, skill_content, agent_selector, verbose)
 }
 
 /// True if we already spawned the gateway thread (only one gateway per process).
@@ -207,10 +555,11 @@ struct Handler;
 
 #[serenity::async_trait]
 impl EventHandler for Handler {
-    async fn ready(&self, _ctx: Context, data_about_bot: serenity::model::gateway::Ready) {
+    async fn ready(&self, ctx: Context, data_about_bot: serenity::model::gateway::Ready) {
         let id = data_about_bot.user.id;
         let _ = BOT_USER_ID.set(id);
         info!("Discord: Bot connected as {} (id: {})", data_about_bot.user.name, id);
+        tokio::spawn(having_fun_background_loop(ctx));
     }
 
     async fn message(&self, ctx: Context, new_message: Message) {
@@ -222,36 +571,81 @@ impl EventHandler for Handler {
             }
         };
 
-        // Ignore our own messages
+        // Always ignore our own messages
         if new_message.author.id == bot_id {
             return;
         }
 
-        // Respond only to DMs or when we are mentioned
         let is_dm = new_message.guild_id.is_none();
         let mentions_bot = new_message.mentions.iter().any(|u| u.id == bot_id);
-        if !is_dm && !mentions_bot {
-            return;
-        }
+        let is_bot = new_message.author.bot;
+        let chan_id = new_message.channel_id.get();
+        let chan = channel_settings(chan_id);
+        let mode = chan.mode;
 
-        let content = new_message.content.trim();
+        let content = {
+            let raw = new_message.content.trim();
+            let mention_tag = format!("<@{}>", bot_id);
+            raw.replace(&mention_tag, "").trim().to_string()
+        };
         if content.is_empty() {
             debug!("Discord: Ignoring empty message");
             return;
         }
 
-        let (question, model_override, options_override, skill_content, agent_selector) =
-            parse_discord_ollama_overrides(content);
+        if is_bot {
+            if mode != ChannelMode::HavingFun {
+                return;
+            }
+        } else {
+            if !is_dm && !mentions_bot && mode == ChannelMode::MentionOnly {
+                return;
+            }
+        }
+
+        // having_fun channels: buffer the message and let the background loop respond
+        if mode == ChannelMode::HavingFun {
+            let author_name = new_message
+                .author
+                .global_name
+                .as_deref()
+                .unwrap_or(&new_message.author.name)
+                .to_string();
+            info!(
+                "Discord: having_fun buffered from {} (bot={}) in channel {}: {}",
+                author_name,
+                is_bot,
+                chan_id,
+                crate::logging::ellipse(&content, 100)
+            );
+            crate::session_memory::add_message("discord", chan_id, "user",
+                &format!("{}: {}", author_name, content));
+            buffer_having_fun_message(chan_id, author_name, content, is_bot);
+            return;
+        }
+
+        let (question, model_override, options_override, skill_content, agent_selector, verbose) =
+            parse_discord_ollama_overrides(&content);
+        // Channel prompt from discord_channels.json; used when no explicit skill: override
+        let skill_content = skill_content.or(chan.prompt);
         let agent_override = agent_selector.and_then(|sel| {
             let agents = crate::agents::load_agents();
             crate::agents::find_agent_by_id_or_name(&agents, &sel).cloned()
         });
 
+        let trigger = if is_dm {
+            "DM"
+        } else if mentions_bot {
+            "mention"
+        } else {
+            "all_messages"
+        };
         info!(
-            "Discord: {} from {} (channel {})",
-            if is_dm { "DM" } else { "mention" },
+            "Discord: {} from {} (channel {}) verbose={}",
+            trigger,
             new_message.author.name,
-            new_message.channel_id
+            new_message.channel_id,
+            verbose
         );
 
         let channel_id_u64 = new_message.channel_id.get();
@@ -299,7 +693,7 @@ impl EventHandler for Handler {
             )
         };
         // Short-term memory: add user message when we receive the request (store original content)
-        crate::session_memory::add_message("discord", channel_id_u64, "user", content);
+        crate::session_memory::add_message("discord", channel_id_u64, "user", &content);
 
         // Record author's display name for reuse in prompts and API context
         let author_id_u64 = new_message.author.id.get();
@@ -311,17 +705,34 @@ impl EventHandler for Handler {
             .to_string();
         set_discord_user_name(author_id_u64, display_name.clone());
 
-        // Channel for status updates so the user sees we're still working (Thinking…, Fetching page…, etc.)
+        // Channel for status updates. Only posted to Discord when verbose mode is on;
+        // otherwise they are only logged internally to keep the channel clean for other bots.
         let (status_tx, mut status_rx) = mpsc::unbounded_channel();
         let ctx_send = ctx.clone();
         let channel_id = new_message.channel_id;
         let status_task = tokio::spawn(async move {
             while let Some(msg) = status_rx.recv().await {
-                if crate::logging::VERBOSITY.load(Ordering::Relaxed) >= 3 {
-                    debug!("Discord outbound (decoded): {}", msg);
+                debug!("Discord status (verbose={}): {}", verbose, msg);
+                if verbose {
+                    if let Err(e) = channel_id.say(&ctx_send, &msg).await {
+                        debug!("Discord: status message failed: {}", e);
+                    }
                 }
-                if let Err(e) = channel_id.say(&ctx_send, &msg).await {
-                    debug!("Discord: status message failed: {}", e);
+            }
+        });
+
+        // Show "Werner_Amvara is typing..." while processing. Fires immediately,
+        // then every 8s (indicator lasts ~10s server-side). Cancelled when reply is ready.
+        let typing_ctx = ctx.clone();
+        let typing_channel = new_message.channel_id;
+        let typing_cancel = tokio_util::sync::CancellationToken::new();
+        let typing_token = typing_cancel.clone();
+        let typing_task = tokio::spawn(async move {
+            loop {
+                let _ = typing_channel.broadcast_typing(&typing_ctx).await;
+                tokio::select! {
+                    _ = tokio::time::sleep(std::time::Duration::from_secs(8)) => {}
+                    _ = typing_token.cancelled() => break,
                 }
             }
         });
@@ -345,6 +756,9 @@ impl EventHandler for Handler {
                 format!("Sorry, I couldn't generate a reply: {}. (Is Ollama configured?)", e)
             }
         };
+
+        typing_cancel.cancel();
+        let _ = typing_task.await;
 
         // Sender was moved into answer_with_ollama_and_fetch and is dropped when it returns, so status_rx gets None.
         // Wait for the status task to finish so all status messages are sent before we send the final reply.
@@ -389,6 +803,7 @@ pub async fn run_discord_client(token: String) -> Result<(), String> {
     info!("Discord: Connecting to Discord Gateway (discord.com)…");
 
     let intents = GatewayIntents::GUILDS
+        | GatewayIntents::GUILD_MEMBERS
         | GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;

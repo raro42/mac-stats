@@ -378,7 +378,7 @@ pub fn add_mastodon_monitor(request: AddMastodonMonitorRequest) -> Result<Monito
 /// Check a monitor
 #[tauri::command]
 pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatus, String> {
-    use tracing::{debug, info};
+    use tracing::{debug, trace};
     use chrono::Utc;
     
     // Get monitor URL for logging
@@ -387,7 +387,7 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
         .and_then(|urls| urls.get(&monitor_id).cloned())
         .unwrap_or_else(|| "unknown".to_string());
     
-    info!("Monitor: Checking monitor - ID: {}, URL: {}", monitor_id, monitor_url);
+    trace!("Monitor: Checking monitor - ID: {}, URL: {}", monitor_id, monitor_url);
     
     let monitors = get_monitors().lock()
         .map_err(|e| e.to_string())?;
@@ -404,20 +404,14 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
             debug!("Monitor: Check failed - ID: {}, URL: {}, Error: {}", monitor_id, monitor_url, e);
             e.to_string()
         })?;
-    let duration = start_time.elapsed();
+    let _duration = start_time.elapsed();
     
     if result.is_up {
-        if let Some(response_time) = result.response_time_ms {
-            info!("Monitor: Check successful - ID: {}, URL: {}, Status: UP, Response time: {}ms, Duration: {:?}", 
-                  monitor_id, monitor_url, response_time, duration);
-        } else {
-            info!("Monitor: Check successful - ID: {}, URL: {}, Status: UP, Duration: {:?}", 
-                  monitor_id, monitor_url, duration);
-        }
+        let ms = result.response_time_ms.unwrap_or(0);
+        debug!("Monitor: {} UP {}ms", monitor_url, ms);
     } else {
-        let error_msg = result.error.as_deref().unwrap_or("unknown error");
-        info!("Monitor: Check failed - ID: {}, URL: {}, Status: DOWN, Error: {}, Duration: {:?}", 
-              monitor_id, monitor_url, error_msg, duration);
+        let err = result.error.as_deref().unwrap_or("error");
+        debug!("Monitor: {} DOWN {}ms {}", monitor_url, result.response_time_ms.unwrap_or(0), err);
     }
 
     // Save stats after check (in memory only - don't save to disk on every check)
@@ -428,7 +422,7 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
             last_check: Some(now),
             last_status: Some(result.clone()),
         });
-        debug!("Monitor: Saved stats in memory for monitor - ID: {}, Last check: {:?}", monitor_id, now);
+        trace!("Monitor: Saved stats in memory for monitor - ID: {}, Last check: {:?}", monitor_id, now);
     }
 
     Ok(result)

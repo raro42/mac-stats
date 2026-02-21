@@ -52,9 +52,9 @@ impl MonitorCheck for WebsiteMonitor {
     }
 
     fn check(&self) -> Result<MonitorStatus> {
-        use tracing::info;
+        use tracing::trace;
         
-        info!("Monitor: Starting website check - ID: {}, URL: {}, Timeout: {}s (SSL verification disabled - accepting invalid certificates)", 
+        trace!("Monitor: Starting website check - ID: {}, URL: {}, Timeout: {}s (SSL verification disabled - accepting invalid certificates)", 
               self.id, self.url, self.timeout_secs);
         
         let start_time = std::time::Instant::now();
@@ -83,10 +83,10 @@ impl MonitorCheck for WebsiteMonitor {
                     .unwrap_or(resp.status().is_success());
 
                 if is_up {
-                    info!("Monitor: Website check successful - ID: {}, URL: {}, Status code: {}, Response time: {}ms", 
+                    trace!("Monitor: Website check successful - ID: {}, URL: {}, Status code: {}, Response time: {}ms", 
                           self.id, self.url, status_code, elapsed_ms);
                 } else {
-                    info!("Monitor: Website check failed - ID: {}, URL: {}, Status code: {} (expected: {:?}), Response time: {}ms", 
+                    trace!("Monitor: Website check failed - ID: {}, URL: {}, Status code: {} (expected: {:?}), Response time: {}ms", 
                           self.id, self.url, status_code, self.expected_status_code, elapsed_ms);
                 }
 
@@ -102,7 +102,7 @@ impl MonitorCheck for WebsiteMonitor {
                 })
             }
             Err(e) => {
-                info!("Monitor: Website check error - ID: {}, URL: {}, Error: {}, Response time: {}ms", 
+                trace!("Monitor: Website check error - ID: {}, URL: {}, Error: {}, Response time: {}ms", 
                       self.id, self.url, e, elapsed_ms);
                 Ok(MonitorStatus {
                     is_up: false,

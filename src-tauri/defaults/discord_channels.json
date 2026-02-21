@@ -1,0 +1,11 @@
+{
+  "_doc": "Discord channel listen modes for mac-stats. Modes: mention_only = respond only to @mentions and DMs (default), all_messages = respond to every human message (bots ignored), having_fun = respond to everyone including other bots (loop-protected). Channels support a simple string format or an object with 'mode' and optional 'prompt' to shape response style.",
+  "default": "mention_only",
+  "channels": {
+    "123456789012345678": "all_messages",
+    "987654321098765432": {
+      "mode": "having_fun",
+      "prompt": "This is a casual conversation channel. You are chatting, not helping. NEVER offer help, NEVER ask 'how can I help?', NEVER say 'need help?'. You are a friend in a group chat, not an assistant. Keep responses short (1-3 sentences), casual, human-like. No bullet points, no headers, no markdown. React to what others say, share thoughts, joke around, be curious."
+    }
+  }
+}

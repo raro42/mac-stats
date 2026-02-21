@@ -1,6 +1,6 @@
 [package]
 name = "mac_stats"
-version = "0.1.15"
+version = "0.1.16"
 description = "A lightweight macOS system monitoring app with menu bar integration, real-time metrics (CPU/GPU/RAM/disk), website monitoring, AI chat integration, and alert system. Built with Rust and Tauri for minimal CPU overhead."
 authors = ["raro42"]
 edition = "2021"
@@ -68,4 +68,5 @@ toml = "0.8"
 serenity = { version = "0.12", default-features = false, features = ["client", "gateway", "http", "model", "utils", "rustls_backend"] }
 futures-util = "0.3"
 notify = "6"
+tokio-util = "0.7.18"
 

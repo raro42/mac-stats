@@ -206,7 +206,32 @@ fn load_one_agent(dir: &Path, id: &str) -> Option<Agent> {
         .map(|s| s.trim().to_string())
         .filter(|s| !s.is_empty());
 
-    let combined_prompt = build_combined_prompt(soul.as_deref(), mood.as_deref(), &skill);
+    // Memory: global memory.md (shared) + per-agent memory.md, concatenated
+    let global_memory = std::fs::read_to_string(Config::memory_file_path())
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+    let agent_memory = std::fs::read_to_string(dir.join("memory.md"))
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+    let memory = match (global_memory, agent_memory) {
+        (Some(g), Some(a)) => {
+            debug!("Agents: agent {} using global + agent memory", id);
+            Some(format!("{}\n\n{}", g, a))
+        }
+        (Some(g), None) => {
+            debug!("Agents: agent {} using global memory only", id);
+            Some(g)
+        }
+        (None, Some(a)) => {
+            debug!("Agents: agent {} using agent memory only", id);
+            Some(a)
+        }
+        (None, None) => None,
+    };
+
+    let combined_prompt = build_combined_prompt(soul.as_deref(), mood.as_deref(), memory.as_deref(), &skill);
 
     let max_tool_iterations = config.max_tool_iterations.unwrap_or(15);
     Some(Agent {
@@ -222,7 +247,7 @@ fn load_one_agent(dir: &Path, id: &str) -> Option<Agent> {
     })
 }
 
-fn build_combined_prompt(soul: Option<&str>, mood: Option<&str>, skill: &str) -> String {
+fn build_combined_prompt(soul: Option<&str>, mood: Option<&str>, memory: Option<&str>, skill: &str) -> String {
     let mut out = String::new();
     if let Some(s) = soul {
         out.push_str(s);
@@ -230,6 +255,11 @@ fn build_combined_prompt(soul: Option<&str>, mood: Option<&str>, skill: &str) ->
     }
     if let Some(s) = mood {
         out.push_str(s);
+        out.push_str("\n\n");
+    }
+    if let Some(m) = memory {
+        out.push_str("## Memory (lessons learned — follow these)\n\n");
+        out.push_str(m);
         out.push_str("\n\n");
     }
     out.push_str(skill);
@@ -357,9 +387,10 @@ mod tests {
 
     #[test]
     fn build_combined_prompt_order() {
-        let s = build_combined_prompt(Some("soul"), Some("mood"), "skill");
+        let s = build_combined_prompt(Some("soul"), Some("mood"), Some("memory"), "skill");
         assert!(s.starts_with("soul"));
         assert!(s.contains("mood"));
+        assert!(s.contains("memory"));
         assert!(s.ends_with("skill"));
     }
 

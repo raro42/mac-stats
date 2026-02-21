@@ -132,6 +132,35 @@ pub fn clear_session(source: &str, session_id: u64) {
     debug!("Session memory: cleared session {}", key);
 }
 
+/// Replace the in-memory session with compacted messages. Persists the old session first.
+/// Used after session compaction to replace verbose history with a concise summary.
+pub fn replace_session(source: &str, session_id: u64, new_messages: Vec<(String, String)>) {
+    let key = format!("{}-{}", source, session_id);
+    {
+        let store = match session_store().lock() {
+            Ok(g) => g,
+            Err(_) => return,
+        };
+        let has_messages = store.get(&key).map_or(false, |s| !s.messages.is_empty());
+        if has_messages {
+            drop(store);
+            let _ = persist_session(source, session_id);
+        }
+    }
+    if let Ok(mut store) = session_store().lock() {
+        let state = store.entry(key).or_insert_with(|| SessionState {
+            messages: Vec::new(),
+            topic_slug: None,
+            created_at: None,
+        });
+        if state.created_at.is_none() {
+            state.created_at = Some(chrono::Local::now());
+        }
+        state.messages = new_messages;
+        debug!("Session memory: replaced session with {} compacted messages", state.messages.len());
+    }
+}
+
 /// Return the current in-memory messages for this session (role, content).
 /// Call this *before* adding the current user message so the result is prior turns only.
 pub fn get_messages(source: &str, session_id: u64) -> Vec<(String, String)> {

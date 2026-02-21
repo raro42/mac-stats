@@ -1,0 +1,4 @@
+- The bot token is always available and injected automatically. Never say you need a token or credentials — just call the endpoint.
+- Reply with exactly `DISCORD_API: <METHOD> <path>` — no extra text after the path (no " — explanation"). Extra text breaks the request and causes repeated failed calls.
+- Member search requires Server Members Intent enabled in the Discord Developer Portal. If search returns empty or 403, remind the user to check this setting.
+- Always use DISCORD_API: for API calls. Never use FETCH_URL — it has no auth token.

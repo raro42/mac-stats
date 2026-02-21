@@ -146,6 +146,28 @@ impl Config {
         Ok(())
     }
 
+    /// Scheduler check interval in seconds: how often to reload schedules from disk.
+    /// Default 60 (every minute). Config: config.json `schedulerCheckIntervalSecs`;
+    /// override: env `MAC_STATS_SCHEDULER_CHECK_SECS`. Clamped to 1..=86400.
+    pub fn scheduler_check_interval_secs() -> u64 {
+        let default_secs = 60u64;
+        let from_env = std::env::var("MAC_STATS_SCHEDULER_CHECK_SECS")
+            .ok()
+            .and_then(|s| s.parse::<u64>().ok());
+        if let Some(secs) = from_env {
+            return secs.clamp(1, 86400);
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(n) = json.get("schedulerCheckIntervalSecs").and_then(|v| v.as_u64()) {
+                    return n.clamp(1, 86400);
+                }
+            }
+        }
+        default_secs
+    }
+
     /// Get the user-info file path
     ///
     /// Returns a path in the user's home directory: `$HOME/.mac-stats/user-info.json`
@@ -237,6 +259,21 @@ impl Config {
         Self::agents_dir().join("soul.md")
     }
 
+    /// Path to shared (global) memory: `$HOME/.mac-stats/agents/memory.md`
+    /// Loaded into every agent's prompt. Contains lessons learned across all sessions.
+    pub fn memory_file_path() -> PathBuf {
+        Self::agents_dir().join("memory.md")
+    }
+
+    /// Path to Discord channel config: `$HOME/.mac-stats/discord_channels.json`
+    pub fn discord_channels_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("discord_channels.json")
+        } else {
+            std::env::temp_dir().join("mac-stats-discord_channels.json")
+        }
+    }
+
     /// Prompts directory: `$HOME/.mac-stats/prompts/`
     pub fn prompts_dir() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {
@@ -273,6 +310,8 @@ impl Config {
     const DEFAULT_AGENT_003_SKILL: &str = include_str!("../../defaults/agents/agent-003/skill.md");
     const DEFAULT_AGENT_003_TESTING: &str = include_str!("../../defaults/agents/agent-003/testing.md");
 
+    const DEFAULT_DISCORD_CHANNELS: &str = include_str!("../../defaults/discord_channels.json");
+
     /// Write a default file if the target path does not exist (never overwrites user edits).
     fn write_default_if_missing(path: &std::path::Path, content: &str) {
         if path.exists() {
@@ -298,6 +337,9 @@ impl Config {
         // Prompts
         Self::write_default_if_missing(&prompts.join("planning_prompt.md"), Self::DEFAULT_PLANNING_PROMPT);
         Self::write_default_if_missing(&prompts.join("execution_prompt.md"), Self::DEFAULT_EXECUTION_PROMPT);
+
+        // Discord channel config
+        Self::write_default_if_missing(&Self::discord_channels_path(), Self::DEFAULT_DISCORD_CHANNELS);
 
         // Agents
         let agent_defaults: &[(&str, &[(&str, &str)])] = &[

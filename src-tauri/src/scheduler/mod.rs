@@ -12,11 +12,8 @@ use std::str::FromStr;
 use std::time::Duration;
 use tracing::{debug, error, info, warn};
 
-/// Max sleep between checks so we periodically reload the schedule file (seconds).
-const MAX_SLEEP_SECS: u64 = 60;
-
-/// How often to check if schedules.json changed (seconds). Enables reload whenever the file is modified.
-const FILE_CHECK_INTERVAL_SECS: u64 = 2;
+/// Minimum interval when user config is below 1 (safety).
+const MIN_CHECK_SECS: u64 = 1;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct ScheduleEntryRaw {
@@ -143,6 +140,51 @@ fn load_schedules() -> Vec<ScheduleEntry> {
         path
     );
     entries
+}
+
+/// Returns a human-readable list of active schedules (id, cron/at, task preview, next run).
+/// Used when the user or agent asks to "list schedules".
+pub fn list_schedules_formatted() -> String {
+    let entries = load_schedules();
+    let now = Local::now();
+    if entries.is_empty() {
+        return "No active schedules.".to_string();
+    }
+    let mut lines: Vec<String> = Vec::with_capacity(entries.len());
+    for (i, e) in entries.iter().enumerate() {
+        let id = e.id.as_deref().unwrap_or("(no id)");
+        let kind = if e.cron.is_some() {
+            "cron"
+        } else if e.at.is_some() {
+            "one-shot"
+        } else {
+            "?"
+        };
+        let next = next_run(e, now)
+            .map(|t| t.format("%Y-%m-%d %H:%M:%S").to_string())
+            .unwrap_or_else(|| "—".to_string());
+        let task_preview: String = e.task.chars().take(50).collect::<String>();
+        if task_preview.len() < e.task.chars().count() {
+            lines.push(format!(
+                "{}. id: {} ({}), next: {}, task: {}…",
+                i + 1,
+                id,
+                kind,
+                next,
+                task_preview.trim()
+            ));
+        } else {
+            lines.push(format!(
+                "{}. id: {} ({}), next: {}, task: {}",
+                i + 1,
+                id,
+                kind,
+                next,
+                task_preview.trim()
+            ));
+        }
+    }
+    format!("Active schedules ({}):\n{}", entries.len(), lines.join("\n"))
 }
 
 /// Compute the next run time for this entry (in local time). Returns None if one-shot already past or invalid.
@@ -283,6 +325,7 @@ async fn execute_task(entry: &ScheduleEntry) -> Option<String> {
 
 async fn scheduler_loop() {
     loop {
+        let check_interval_secs = Config::scheduler_check_interval_secs().max(MIN_CHECK_SECS);
         let mtime_before = schedules_file_mtime();
         let entries = load_schedules();
         let now = Local::now();
@@ -315,7 +358,7 @@ async fn scheduler_loop() {
         }
 
         if next_runs.is_empty() {
-            tokio::time::sleep(Duration::from_secs(FILE_CHECK_INTERVAL_SECS)).await;
+            tokio::time::sleep(Duration::from_secs(check_interval_secs)).await;
             if schedules_file_mtime() != mtime_before {
                 info!("Scheduler: schedules file changed, reloading");
             }
@@ -333,9 +376,7 @@ async fn scheduler_loop() {
         );
         // Use millisecond precision so we don't spin when next run is < 1 second away (num_seconds() would truncate to 0).
         let wait_ms = (next_time - now).num_milliseconds().max(0) as u64;
-        let sleep_millis = wait_ms
-            .min(MAX_SLEEP_SECS * 1000)
-            .min(FILE_CHECK_INTERVAL_SECS * 1000);
+        let sleep_millis = wait_ms.min(check_interval_secs * 1000);
         let sleep_duration = Duration::from_millis(sleep_millis);
 
         tokio::time::sleep(sleep_duration).await;

@@ -1,0 +1,4 @@
+- NEVER use FETCH_URL for discord.com/api URLs. FETCH_URL has no authentication token and always returns 401 Unauthorized. Use DISCORD_API: GET/POST <path> instead — the bot token is injected automatically.
+- DISCORD_API format: one line, path only. Do not add text after the path (e.g. no " — fetch the last 10 messages"). Wrong: `DISCORD_API: GET /channels/123/messages?limit=10 — fetch messages`. Right: `DISCORD_API: GET /channels/123/messages?limit=10`.
+- For any Discord task (find users, list channels, server info, member search, send messages), delegate to **AGENT: discord-expert** which can make multiple authenticated API calls autonomously.
+- When a previous conversation mentions "401" or "can't access" about Discord, ignore it — it was caused by using the wrong tool (FETCH_URL instead of DISCORD_API). The DISCORD_API tool works.

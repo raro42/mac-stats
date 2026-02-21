@@ -501,7 +501,9 @@ const AGENT_DESCRIPTIONS_BASE: &str = r#"We have 4 agents available:
    - SCHEDULE: at <datetime> <task> — one-shot (e.g. reminder tomorrow 5am: use RUN_CMD: date +%Y-%m-%d to get today, then SCHEDULE: at 2025-02-09T05:00:00 Remind me of my flight). Datetime must be ISO local: YYYY-MM-DDTHH:MM:SS or YYYY-MM-DD HH:MM.
    We add to ~/.mac-stats/schedules.json and return a schedule ID (e.g. discord-1770648842). Always tell the user this ID so they can remove it later with REMOVE_SCHEDULE.
 
-5. **REMOVE_SCHEDULE**: Remove a scheduled task by its ID. Use when the user asks to remove, delete, or cancel a schedule (e.g. "Remove schedule: discord-1770648842"). Reply with exactly one line: REMOVE_SCHEDULE: <schedule-id> (e.g. REMOVE_SCHEDULE: discord-1770648842)."#;
+5. **REMOVE_SCHEDULE**: Remove a scheduled task by its ID. Use when the user asks to remove, delete, or cancel a schedule (e.g. "Remove schedule: discord-1770648842"). Reply with exactly one line: REMOVE_SCHEDULE: <schedule-id> (e.g. REMOVE_SCHEDULE: discord-1770648842).
+
+6. **LIST_SCHEDULES**: List all active schedules (id, type, next run, task). Use when the user asks to list schedules, show schedules, what's scheduled, what reminders are set, etc. Reply with exactly one line: LIST_SCHEDULES or LIST_SCHEDULES:."#;
 
 /// Cron examples for SCHEDULE (6-field: sec min hour day month dow). Shown to the model so it can pick the right pattern (see crontab.guru for more).
 const SCHEDULE_CRON_EXAMPLES: &str = r#"
@@ -553,15 +555,9 @@ fn build_agent_agent_description(num: u32, agents: &[crate::agents::Agent]) -> S
 
 /// Discord API endpoint list (injected when request is from Discord). Condensed for agent context.
 const DISCORD_API_ENDPOINTS_CONTEXT: &str = r#"
-Discord API (base: https://discord.com/api/v10). Use DISCORD_API: <METHOD> <path> [json body for POST]:
-- GET /users/@me — current bot user
-- GET /users/@me/guilds — list servers (guilds) the bot is in (optional ?with_counts=true)
-- GET /guilds/{guild_id}/channels — list channels in a server
-- GET /guilds/{guild_id}/members?limit=100 — list members (use after=user_id for pagination)
-- GET /guilds/{guild_id}/members/search?query=name — search members by nickname/username
-- GET /users/{user_id} — get user by ID
-- GET /channels/{channel_id} — get channel
-- POST /channels/{channel_id}/messages — send message (body: {"content":"..."})"#;
+IMPORTANT: For Discord tasks, prefer **AGENT: discord-expert** — it makes multiple API calls autonomously and knows all endpoints.
+If calling directly: use DISCORD_API: GET <path> (NOT FETCH_URL — FETCH_URL has no Discord token and will get 401).
+Key endpoints: GET /users/@me/guilds, GET /guilds/{guild_id}/members/search?query=name, GET /guilds/{guild_id}/channels, POST /channels/{channel_id}/messages {"content":"..."}"#;
 
 /// Build agent descriptions string: base, optional SKILL (when skills exist), optional RUN_CMD, then MCP when configured.
 /// When from_discord is true and Discord is configured, appends DISCORD_API agent and endpoint list.
@@ -618,6 +614,11 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
         ));
         num += 1;
     }
+    base.push_str(&format!(
+        "\n\n{}. **MEMORY_APPEND** (persistent memory): Save a lesson learned for future sessions. Use when something important was discovered (a mistake to avoid, a working approach, a user preference). To invoke: reply with exactly one line: MEMORY_APPEND: <lesson> (saves to global memory, loaded for all agents) or MEMORY_APPEND: agent:<slug-or-id> <lesson> (saves to that agent's memory only). Keep lessons concise and actionable.",
+        num
+    ));
+    num += 1;
     let agent_list = crate::agents::load_agents();
     if !agent_list.is_empty() {
         base.push_str(&build_agent_agent_description(num, &agent_list));
@@ -751,13 +752,15 @@ async fn run_skill_ollama_session(
     Ok(response.message.content.trim().to_string())
 }
 
-/// Run a single Ollama request for an LLM agent (soul+mood+skill as system prompt, task as user message).
+/// Run an Ollama request for an LLM agent (soul+mood+skill as system prompt, task as user message).
 /// Uses the agent's model if set; otherwise default. No conversation history. Logs agent name/id.
+/// If the agent's response contains DISCORD_API: tool calls, executes them and feeds results back
+/// in a loop (up to max_tool_iterations) so agents like the Discord Expert can do multi-step API work.
 /// Used by the tool loop (AGENT:) and by the agent-test CLI.
 pub(crate) async fn run_agent_ollama_session(
     agent: &crate::agents::Agent,
     user_message: &str,
-    _status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
+    status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
 ) -> Result<String, String> {
     use tracing::info;
     info!(
@@ -767,7 +770,7 @@ pub(crate) async fn run_agent_ollama_session(
         agent.model,
         agent.combined_prompt.chars().count()
     );
-    let messages = vec![
+    let mut messages = vec![
         crate::ollama::ChatMessage {
             role: "system".to_string(),
             content: agent.combined_prompt.clone(),
@@ -777,10 +780,253 @@ pub(crate) async fn run_agent_ollama_session(
             content: user_message.to_string(),
         },
     ];
-    let response = send_ollama_chat_messages(messages, agent.model.clone(), None).await?;
-    let out = response.message.content.trim().to_string();
-    info!("Agent: {} ({}) returned ({} chars)", agent.name, agent.id, out.chars().count());
-    Ok(out)
+    let max_iters = agent.max_tool_iterations;
+    let mut iteration = 0u32;
+    loop {
+        let response = send_ollama_chat_messages(messages.clone(), agent.model.clone(), None).await?;
+        let out = response.message.content.trim().to_string();
+        info!(
+            "Agent: {} ({}) iter {} returned ({} chars)",
+            agent.name, agent.id, iteration, out.chars().count()
+        );
+
+        if let Some(tool_result) = execute_agent_tool_call(&out, status_tx).await {
+            iteration += 1;
+            if iteration >= max_iters {
+                info!("Agent: {} ({}) hit max tool iterations ({})", agent.name, agent.id, max_iters);
+                return Ok(out);
+            }
+            messages.push(crate::ollama::ChatMessage {
+                role: "assistant".to_string(),
+                content: out,
+            });
+            messages.push(crate::ollama::ChatMessage {
+                role: "user".to_string(),
+                content: tool_result,
+            });
+            continue;
+        }
+
+        return Ok(out);
+    }
+}
+
+/// Normalize Discord API path: strip model commentary after " — " so the path is valid for HTTP.
+/// E.g. "/channels/123/messages?limit=10 — fetch the last 10 messages" -> "/channels/123/messages?limit=10"
+fn normalize_discord_api_path(path_and_commentary: &str) -> String {
+    let s = path_and_commentary.trim();
+    let path_only = if let Some(idx) = s.find(" — ") {
+        s[..idx].trim()
+    } else {
+        s
+    };
+    path_only.to_string()
+}
+
+/// Execute a tool call found in an agent's response. Currently supports DISCORD_API.
+/// Returns Some(result_text) if a tool was executed, None if no tool call was found.
+async fn execute_agent_tool_call(
+    content: &str,
+    status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
+) -> Option<String> {
+    use tracing::info;
+    let (tool, arg) = parse_agent_tool_from_response(content)?;
+    match tool.as_str() {
+        "DISCORD_API" => {
+            let arg = arg.trim();
+            let (method, rest) = match arg.find(' ') {
+                Some(i) => (arg[..i].trim().to_string(), arg[i..].trim().to_string()),
+                None => ("GET".to_string(), arg.to_string()),
+            };
+            let (path_raw, body) = if let Some(idx) = rest.find(" {") {
+                let (p, b) = rest.split_at(idx);
+                (p.trim().to_string(), Some(b.trim().to_string()))
+            } else {
+                (rest.clone(), None)
+            };
+            let path = normalize_discord_api_path(&path_raw);
+            if path.is_empty() {
+                return Some("DISCORD_API requires a path (e.g. GET /users/@me/guilds). Try again.".to_string());
+            }
+            if let Some(tx) = status_tx {
+                let _ = tx.send(format!("Discord API: {} {}", &method, &path));
+            }
+            info!("Agent tool: DISCORD_API {} {}", &method, &path);
+            match crate::discord::api::discord_api_request(&method, &path, body.as_deref()).await {
+                Ok(result) => Some(format!(
+                    "DISCORD_API result ({} {}):\n\n{}\n\nUse this data to continue or answer the user's question. If you need more data, make another DISCORD_API call.",
+                    &method, &path, result
+                )),
+                Err(e) => Some(format!(
+                    "DISCORD_API failed ({} {}): {}. Explain the error to the user or try a different approach.",
+                    &method, &path, e
+                )),
+            }
+        }
+        _ => None,
+    }
+}
+
+/// Parse DISCORD_API: tool calls from an agent's response content.
+fn parse_agent_tool_from_response(content: &str) -> Option<(String, String)> {
+    let prefixes = ["DISCORD_API:"];
+    for line in content.lines() {
+        let line = line.trim();
+        let mut search = line;
+        loop {
+            if search.len() >= 2 && search.as_bytes()[0].is_ascii_digit() {
+                let rest = search.trim_start_matches(|c: char| c.is_ascii_digit());
+                if rest.starts_with(". ") || rest.starts_with(") ") || rest.starts_with(": ") {
+                    search = rest[2..].trim();
+                } else {
+                    break;
+                }
+            } else if search.starts_with("- ") || search.starts_with("* ") {
+                search = search[2..].trim();
+            } else {
+                break;
+            }
+        }
+        for prefix in prefixes {
+            if search.to_uppercase().starts_with(prefix) {
+                let arg = search[prefix.len()..].trim().to_string();
+                if !arg.is_empty() {
+                    return Some((prefix.trim_end_matches(':').to_string(), arg));
+                }
+            }
+        }
+    }
+    None
+}
+
+/// Minimum number of messages before session compaction triggers.
+const COMPACTION_THRESHOLD: usize = 8;
+
+/// Compact a long conversation history into a concise summary using a fast model.
+/// Extracts verified facts, successful outcomes, and user intent; drops failures and hallucinations.
+/// Also extracts lessons learned (returned separately for memory.md).
+async fn compact_conversation_history(
+    messages: &[crate::ollama::ChatMessage],
+    current_question: &str,
+) -> Result<(String, Option<String>), String> {
+    use tracing::info;
+
+    let small_model = crate::ollama::models::get_global_catalog()
+        .and_then(|c| c.resolve_role("small").map(|m| m.name.clone()));
+
+    let model = small_model.or_else(|| {
+        let guard = get_ollama_client().lock().ok()?;
+        let client = guard.as_ref()?;
+        Some(client.config.model.clone())
+    });
+
+    let conversation_text: String = messages
+        .iter()
+        .map(|m| format!("[{}]: {}", m.role, m.content))
+        .collect::<Vec<_>>()
+        .join("\n\n");
+
+    let system_prompt = r#"You are a session compactor. Given a conversation between a user and an assistant, produce TWO sections:
+
+## CONTEXT
+A concise summary (max 300 words) of ONLY verified facts and successful outcomes. Rules:
+- KEEP: IDs confirmed by API responses (guild IDs, channel IDs, user IDs), successful API calls and their actual results, user preferences and standing instructions, established context the user built up.
+- DROP: Failed attempts (401 errors, wrong tool usage, timeouts), hallucinated or unverified claims (assistant saying something happened without API confirmation), apologies, suggestions that weren't followed, repeated back-and-forth about the same error.
+- If the assistant claimed an action succeeded but there's no API result confirming it, mark it as UNVERIFIED.
+- Write as a factual briefing, not a conversation recap.
+
+## LESSONS
+Bullet points of important lessons learned (if any). Things like:
+- Tools that worked vs. tools that failed
+- Correct IDs or endpoints discovered
+- User corrections about how things should work
+- Mistakes to avoid in future
+
+If no lessons, write "None."
+
+Output ONLY these two sections, nothing else."#;
+
+    let user_msg = format!(
+        "The user's current question is: \"{}\"\n\nCompact this conversation:\n\n{}",
+        current_question, conversation_text
+    );
+
+    let msgs = vec![
+        crate::ollama::ChatMessage {
+            role: "system".to_string(),
+            content: system_prompt.to_string(),
+        },
+        crate::ollama::ChatMessage {
+            role: "user".to_string(),
+            content: user_msg,
+        },
+    ];
+
+    info!(
+        "Session compaction: sending {} messages ({} chars) to model {:?}",
+        messages.len(),
+        conversation_text.len(),
+        model
+    );
+
+    let response = send_ollama_chat_messages(msgs, model, None).await?;
+    let output = response.message.content.trim().to_string();
+
+    let (context, lessons) = parse_compaction_output(&output);
+    info!(
+        "Session compaction: produced context ({} chars), lessons: {}",
+        context.len(),
+        lessons.as_deref().unwrap_or("none")
+    );
+
+    Ok((context, lessons))
+}
+
+/// Parse the compaction output into context and lessons sections.
+fn parse_compaction_output(output: &str) -> (String, Option<String>) {
+    let lower = output.to_lowercase();
+    let context_header = lower.find("## context");
+    let lessons_header = lower.find("## lessons");
+
+    let context_body_start = context_header.map(|i| i + "## context".len());
+    let lessons_body_start = lessons_header.map(|i| i + "## lessons".len());
+
+    let context = match (context_body_start, lessons_header) {
+        (Some(cs), Some(lh)) => output[cs..lh].trim().to_string(),
+        (Some(cs), None) => output[cs..].trim().to_string(),
+        _ => output.to_string(),
+    };
+
+    let lessons = lessons_body_start
+        .map(|ls| output[ls..].trim().to_string())
+        .filter(|s| !s.is_empty() && s.to_lowercase() != "none." && s.to_lowercase() != "none");
+
+    (context, lessons)
+}
+
+/// Append a line to a file, creating it if needed. Returns the path on success.
+fn append_to_file(path: &std::path::Path, content: &str) -> Result<std::path::PathBuf, String> {
+    use std::io::Write;
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| format!("mkdir: {}", e))?;
+    }
+    let mut f = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(path)
+        .map_err(|e| format!("open: {}", e))?;
+    f.write_all(content.as_bytes())
+        .map_err(|e| format!("write: {}", e))?;
+    Ok(path.to_path_buf())
+}
+
+/// Detect prior assistant messages that mention 401/token errors about Discord (from FETCH_URL misuse).
+/// Used to annotate conversation history so the model doesn't repeat the mistake.
+fn looks_like_discord_401_confusion(content: &str) -> bool {
+    let lower = content.to_lowercase();
+    (lower.contains("401") || lower.contains("unauthorized"))
+        && (lower.contains("token") || lower.contains("credential") || lower.contains("authentication"))
+        && (lower.contains("discord") || lower.contains("guild") || lower.contains("channel"))
 }
 
 /// Shared API for Discord (and other agents): ask Ollama how to solve, then run agents (FETCH_URL, BRAVE_SEARCH, RUN_JS).
@@ -899,13 +1145,69 @@ pub async fn answer_with_ollama_and_fetch(
     ));
 
     const CONVERSATION_HISTORY_CAP: usize = 20;
-    let conversation_history: Vec<crate::ollama::ChatMessage> = conversation_history
+    let raw_history: Vec<crate::ollama::ChatMessage> = conversation_history
         .unwrap_or_default()
         .into_iter()
         .rev()
         .take(CONVERSATION_HISTORY_CAP)
         .rev()
         .collect();
+
+    let conversation_history: Vec<crate::ollama::ChatMessage> = if raw_history.len() >= COMPACTION_THRESHOLD {
+        send_status("Compacting session memory…");
+        info!(
+            "Session compaction: {} messages exceed threshold ({}), compacting",
+            raw_history.len(), COMPACTION_THRESHOLD
+        );
+        match compact_conversation_history(&raw_history, question).await {
+            Ok((context, lessons)) => {
+                if let Some(ref lesson_text) = lessons {
+                    let memory_path = crate::config::Config::memory_file_path();
+                    for line in lesson_text.lines() {
+                        let line = line.trim().trim_start_matches("- ").trim();
+                        if !line.is_empty() && line.len() > 5 {
+                            let entry = format!("- {}\n", line);
+                            let _ = append_to_file(&memory_path, &entry);
+                        }
+                    }
+                    info!("Session compaction: wrote lessons to {:?}", memory_path);
+                }
+                if let Some(channel_id) = discord_reply_channel_id {
+                    let compacted = vec![
+                        ("system".to_string(), context.clone()),
+                    ];
+                    crate::session_memory::replace_session("discord", channel_id, compacted);
+                }
+                info!("Session compaction: replaced {} messages with summary ({} chars)", raw_history.len(), context.len());
+                vec![crate::ollama::ChatMessage {
+                    role: "system".to_string(),
+                    content: format!("Previous session context (compacted from {} messages):\n\n{}", raw_history.len(), context),
+                }]
+            }
+            Err(e) => {
+                tracing::warn!("Session compaction failed: {}, using raw history with 401 annotations", e);
+                raw_history
+                    .into_iter()
+                    .map(|mut msg| {
+                        if msg.role == "assistant" && looks_like_discord_401_confusion(&msg.content) {
+                            msg.content.push_str("\n\n[SYSTEM CORRECTION: The above 401 was from FETCH_URL (no token). Use DISCORD_API instead.]");
+                        }
+                        msg
+                    })
+                    .collect()
+            }
+        }
+    } else {
+        raw_history
+            .into_iter()
+            .map(|mut msg| {
+                if msg.role == "assistant" && looks_like_discord_401_confusion(&msg.content) {
+                    msg.content.push_str("\n\n[SYSTEM CORRECTION: The above 401 was from FETCH_URL (no token). Use DISCORD_API instead.]");
+                }
+                msg
+            })
+            .collect()
+    };
     if !conversation_history.is_empty() {
         info!(
             "Agent router: using {} prior messages as context",
@@ -1152,6 +1454,8 @@ pub async fn answer_with_ollama_and_fetch(
     let mut tool_count: u32 = 0;
     // Collect (agent_name, reply) for each AGENT call so we can append a conversation transcript when multiple agents participated.
     let mut agent_conversation: Vec<(String, String)> = Vec::new();
+    // Dedupe repeated identical DISCORD_API calls so the model can't loop on the same request.
+    let mut last_successful_discord_call: Option<(String, String)> = None;
 
     while tool_count < max_tool_iterations {
         let (tool, arg) = match parse_tool_from_response(&response_content) {
@@ -1174,6 +1478,29 @@ pub async fn answer_with_ollama_and_fetch(
         info!("Agent router: running tool {}/{} — {}", tool_count, max_tool_iterations, tool);
 
         let user_message = match tool.as_str() {
+            "FETCH_URL" if arg.contains("discord.com") => {
+                let path = if let Some(pos) = arg.find("/api/v10") {
+                    arg[pos + "/api/v10".len()..].to_string()
+                } else if let Some(pos) = arg.find("/api/") {
+                    arg[pos + "/api".len()..].to_string()
+                } else {
+                    String::new()
+                };
+                if !path.is_empty() {
+                    info!("Agent router: redirecting FETCH_URL discord.com -> DISCORD_API GET {}", path);
+                    send_status(&format!("Discord API: GET {}", path));
+                    match crate::discord::api::discord_api_request("GET", &path, None).await {
+                        Ok(result) => format!(
+                            "Discord API result (GET {}):\n\n{}\n\nUse this to answer the user's question.",
+                            path, result
+                        ),
+                        Err(e) => format!("Discord API failed (GET {}): {}. Try DISCORD_API: GET {} or delegate to AGENT: discord-expert.", path, e, path),
+                    }
+                } else {
+                    info!("Agent router: blocked FETCH_URL for discord.com (no API path). Redirecting to discord-expert.");
+                    "Cannot fetch discord.com pages directly. Discord requires authenticated API access. Use AGENT: discord-expert for all Discord tasks, or use DISCORD_API: GET <path> with the correct API endpoint.".to_string()
+                }
+            }
             "FETCH_URL" => {
                 send_status("Fetching page…");
                 info!("Discord/Ollama: FETCH_URL requested: {}", arg);
@@ -1446,6 +1773,12 @@ pub async fn answer_with_ollama_and_fetch(
                     }
                 }
             }
+            "LIST_SCHEDULES" => {
+                send_status("Listing schedules…");
+                info!("Agent router: LIST_SCHEDULES requested");
+                let list = crate::scheduler::list_schedules_formatted();
+                format!("{}\n\nUse this to answer the user.", list)
+            }
             "RUN_CMD" => {
                 if !crate::commands::run_cmd::is_local_cmd_allowed() {
                     "RUN_CMD is not available (disabled by ALLOW_LOCAL_CMD=0). Answer without running local commands.".to_string()
@@ -1558,23 +1891,29 @@ pub async fn answer_with_ollama_and_fetch(
                     Some(i) => (arg[..i].trim().to_string(), arg[i..].trim()),
                     None => ("GET".to_string(), arg),
                 };
-                let (path, body) = if let Some(idx) = rest.find(" {") {
+                let (path_raw, body) = if let Some(idx) = rest.find(" {") {
                     let (p, b) = rest.split_at(idx);
                     (p.trim().to_string(), Some(b.trim().to_string()))
                 } else {
                     (rest.to_string(), None)
                 };
+                let path = normalize_discord_api_path(&path_raw);
                 if path.is_empty() {
                     "DISCORD_API requires: DISCORD_API: <METHOD> <path> or DISCORD_API: POST <path> {\"content\":\"...\"}.".to_string()
+                } else if last_successful_discord_call.as_ref().map(|(m, p)| m == &method && p == &path).unwrap_or(false) {
+                    "You already received the data for this endpoint above. Format it for the user and reply; do not call DISCORD_API again for the same path.".to_string()
                 } else {
                     let status_msg = format!("Calling Discord API: {} {}", method, path);
                     send_status(&status_msg);
                     info!("Discord API: {} {}", method, path);
                     match crate::discord::api::discord_api_request(&method, &path, body.as_deref()).await {
-                        Ok(result) => format!(
-                            "Discord API result:\n\n{}\n\nUse this to answer the user's question.",
-                            result
-                        ),
+                        Ok(result) => {
+                            last_successful_discord_call = Some((method.clone(), path.clone()));
+                            format!(
+                                "Discord API result:\n\n{}\n\nUse this to answer the user's question.",
+                                result
+                            )
+                        }
                         Err(e) => format!("Discord API failed: {}. Answer without this result.", e),
                     }
                 }
@@ -1942,6 +2281,51 @@ pub async fn answer_with_ollama_and_fetch(
                     }
                 }
             }
+            "MEMORY_APPEND" => {
+                let arg = arg.trim();
+                if arg.is_empty() {
+                    "MEMORY_APPEND requires content. Usage: MEMORY_APPEND: <lesson> or MEMORY_APPEND: agent:<slug-or-id> <lesson>".to_string()
+                } else {
+                    let (target, lesson) = if arg.to_lowercase().starts_with("agent:") {
+                        let rest = arg["agent:".len()..].trim();
+                        if let Some(space_idx) = rest.find(' ') {
+                            let (sel, content) = rest.split_at(space_idx);
+                            (Some(sel.trim().to_string()), content.trim().to_string())
+                        } else {
+                            (None, arg.to_string())
+                        }
+                    } else {
+                        (None, arg.to_string())
+                    };
+                    let lesson_line = format!("- {}\n", lesson.trim_start_matches("- "));
+                    let result = if let Some(selector) = target {
+                        let agents = crate::agents::load_agents();
+                        if let Some(agent) = crate::agents::find_agent_by_id_or_name(&agents, &selector) {
+                            if let Some(dir) = crate::agents::get_agent_dir(&agent.id) {
+                                let path = dir.join("memory.md");
+                                append_to_file(&path, &lesson_line)
+                            } else {
+                                Err(format!("Agent directory not found for '{}'", selector))
+                            }
+                        } else {
+                            Err(format!("Agent '{}' not found", selector))
+                        }
+                    } else {
+                        let path = crate::config::Config::memory_file_path();
+                        append_to_file(&path, &lesson_line)
+                    };
+                    match result {
+                        Ok(path) => {
+                            info!("Agent router: MEMORY_APPEND wrote to {:?}", path);
+                            format!("Memory updated ({}). The lesson will be included in future prompts.", path.display())
+                        }
+                        Err(e) => {
+                            info!("Agent router: MEMORY_APPEND failed: {}", e);
+                            format!("Failed to update memory: {}", e)
+                        }
+                    }
+                }
+            }
             _ => continue,
         };
 
@@ -2181,12 +2565,15 @@ fn parse_at_datetime(s: &str) -> Result<String, String> {
 /// Also accepts lines starting with "RECOMMEND: " (e.g. "RECOMMEND: SCHEDULER: Every 5 minutes...").
 /// Returns (tool_name, argument) or None.
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:"];
     for line in content.lines() {
         let line = line.trim();
-        // Ollama sometimes replies with just "TASK_LIST" (no colon); treat as tool call with empty arg.
+        // Ollama sometimes replies with just "TASK_LIST" or "LIST_SCHEDULES" (no colon); treat as tool call with empty arg.
         if line.eq_ignore_ascii_case("TASK_LIST") {
             return Some(("TASK_LIST".to_string(), String::new()));
+        }
+        if line.eq_ignore_ascii_case("LIST_SCHEDULES") {
+            return Some(("LIST_SCHEDULES".to_string(), String::new()));
         }
         // Strip leading list numbering ("1. ", "2) ", "- ", "* ") and RECOMMEND: prefixes.
         // Models often return numbered plans like "1. RUN_CMD: cat ..." or "RECOMMEND: RUN_CMD: ...".
@@ -2246,7 +2633,7 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
                 }) {
                     arg = arg[..pos].trim().to_string();
                 }
-                if !arg.is_empty() || tool_name == "TASK_LIST" || tool_name == "TASK_SHOW" {
+                if !arg.is_empty() || tool_name == "TASK_LIST" || tool_name == "TASK_SHOW" || tool_name == "LIST_SCHEDULES" {
                     return Some((tool_name, arg));
                 }
                 if tool_name == "TASK_SLEEP" && !arg.is_empty() {
@@ -2260,8 +2647,8 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
 
 /// Tool line prefixes that indicate start of another tool (used to stop script body extraction).
 const TOOL_LINE_PREFIXES: &[&str] = &[
-    "FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:",
-    "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:",
+    "FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:",
+    "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:",
 ];
 
 /// Parse PYTHON_SCRIPT from full response: (id, topic, script_body).

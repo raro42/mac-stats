@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.16] - 2026-02-21
+
+### Added
+- **Discord channel modes** (`~/.mac-stats/discord_channels.json`): Per-channel listen configuration with three modes:
+  - `mention_only` (default) — respond only to @mentions and DMs
+  - `all_messages` — respond to every human message, no @mention required
+  - `having_fun` — respond to everyone including other bots, with 30s buffered responses, idle thoughts after 5min silence, and loop protection (max 5 consecutive bot exchanges)
+- **Per-channel prompt injection**: Channels support an optional `prompt` field that shapes response style (e.g. "be casual, no bullet points, never offer help"). Injected into the system context for that channel only.
+- **Discord typing indicator**: Werner_Amvara now shows "is typing..." while processing a message. Fires immediately and refreshes every 8s until the reply is ready.
+- **Verbose mode for Discord**: Status/thinking messages (e.g. "Asking Ollama for a plan...") are suppressed by default to keep channels clean. Add `verbose` as a header line to see them.
+- **Bot mention stripping**: The `<@BOT_ID>` tag is now removed from message content before processing, so Ollama receives a clean question.
+- **Session compaction**: When conversation history exceeds 8 messages, it is automatically compacted using a fast model (small role). Extracts verified facts and successful outcomes, drops failed attempts and hallucinations. Lessons learned are appended to global `memory.md`.
+- **Session memory `replace_session()`**: Persists old session to disk and replaces in-memory history with compacted summary.
+- **Discord Expert agent** (agent-004): Specialized agent for Discord API operations with its own tool loop and memory.
+- **Persistent memory system**: Global (`memory.md`) and per-agent memory files loaded into every agent's prompt. `MEMORY_APPEND` tool for agents to write lessons learned.
+- **Default `discord_channels.json`**: Shipped with the app via `ensure_defaults()`, with documentation and examples for all three modes.
+
+### Changed
+- **Discord bot ignores other bots** in `mention_only` and `all_messages` channels (prevents accidental bot-to-bot loops).
+- **`having_fun` uses direct Ollama chat**: Bypasses the full planning/tools pipeline for faster, more conversational responses. Soul + channel prompt + history only.
+- **FETCH_URL Discord intercept widened**: All `discord.com` URLs (not just `/api/`) are now intercepted and redirected to `DISCORD_API` or rejected with guidance to use the discord-expert agent.
+- **Orchestrator skill.md**: Updated with Discord Expert delegation rules and DISCORD_API critical rules.
+
+### Dependencies
+- Added `tokio-util` (CancellationToken for typing indicator lifecycle).
+
 ## [0.1.15] - 2026-02-21
 
 ### Added

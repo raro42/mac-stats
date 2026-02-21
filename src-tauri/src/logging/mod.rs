@@ -40,20 +40,18 @@ pub fn ellipse(s: &str, max_len: usize) -> String {
 /// For now, uses a temporary path that will be replaced in Phase 3.
 pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
     // Convert verbosity level (0-3) to tracing level.
-    // -v (1): warn only, no debug. -vv (2): debug. -vvv (3): trace.
-    let filter_level = match verbosity {
-        0 => "error",
-        1 => "warn",   // -v: no debug logs
-        2 => "debug",  // -vv: show debug
-        3 => "trace",
-        _ => "trace",
+    // -v (1): warn only. -vv (2): info + mac_stats=debug (no HTTP client noise). -vvv (3): full trace.
+    let filter = match verbosity {
+        0 => EnvFilter::new("error"),
+        1 => EnvFilter::new("warn"),
+        2 => EnvFilter::try_new("info,mac_stats=debug").unwrap_or_else(|_| EnvFilter::new("debug")),
+        3 => EnvFilter::new("trace"),
+        _ => EnvFilter::new("trace"),
     };
 
-    // Create env filter
     // CRITICAL: Always use command-line verbosity, ignore RUST_LOG environment variable
-    // This ensures that -v flags control logging, not environment variables
-    // Default to "error" level (verbosity 0) for minimal logging and CPU usage
-    let filter = EnvFilter::new(filter_level);
+    // This ensures that -v flags control logging, not environment variables.
+    // At -vv we enable mac_stats=debug but not reqwest/hyper, so monitor checks stay compact.
 
     // Build subscriber with console and file output
     let registry = tracing_subscriber::registry()
