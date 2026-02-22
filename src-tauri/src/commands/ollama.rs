@@ -614,6 +614,13 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
         ));
         num += 1;
     }
+    if get_mastodon_config().is_some() {
+        base.push_str(&format!(
+            "\n\n{}. **MASTODON_POST**: Post a status (toot) to Mastodon. To invoke: reply with exactly one line: MASTODON_POST: <text to post>. Default visibility is public. Optional visibility prefix: MASTODON_POST: unlisted: <text>, MASTODON_POST: private: <text>, MASTODON_POST: direct: <text>. Keep posts concise (<500 chars). The post URL is returned on success.",
+            num
+        ));
+        num += 1;
+    }
     base.push_str(&format!(
         "\n\n{}. **MEMORY_APPEND** (persistent memory): Save a lesson learned for future sessions. Use when something important was discovered (a mistake to avoid, a working approach, a user preference). To invoke: reply with exactly one line: MEMORY_APPEND: <lesson> (saves to global memory, loaded for all agents) or MEMORY_APPEND: agent:<slug-or-id> <lesson> (saves to that agent's memory only). Keep lessons concise and actionable.",
         num
@@ -1002,6 +1009,134 @@ fn parse_compaction_output(output: &str) -> (String, Option<String>) {
         .filter(|s| !s.is_empty() && s.to_lowercase() != "none." && s.to_lowercase() != "none");
 
     (context, lessons)
+}
+
+/// Minimum messages to compact in the 30-min periodic pass (lower than on-request 8 so we flush more).
+const PERIODIC_COMPACTION_MIN_MESSAGES: usize = 4;
+/// Sessions with no activity for this long are considered inactive; after compacting they are cleared.
+const INACTIVE_THRESHOLD_MINUTES: i64 = 30;
+
+/// Run session compaction for all in-memory sessions that meet the threshold.
+/// Writes lessons to global memory; replaces active sessions with summary, clears inactive ones.
+/// Call from a 30-minute background loop.
+pub async fn run_periodic_session_compaction() {
+    use tracing::info;
+    let sessions = crate::session_memory::list_sessions();
+    let now = chrono::Local::now();
+    let inactive_cutoff = now - chrono::Duration::minutes(INACTIVE_THRESHOLD_MINUTES);
+    for entry in sessions {
+        if entry.message_count < PERIODIC_COMPACTION_MIN_MESSAGES {
+            continue;
+        }
+        let messages: Vec<crate::ollama::ChatMessage> = crate::session_memory::get_messages(&entry.source, entry.session_id)
+            .into_iter()
+            .map(|(role, content)| crate::ollama::ChatMessage { role, content })
+            .collect();
+        if messages.len() < PERIODIC_COMPACTION_MIN_MESSAGES {
+            continue;
+        }
+        info!(
+            "Periodic session compaction: {} {} ({} messages, last_activity {:?})",
+            entry.source,
+            entry.session_id,
+            messages.len(),
+            entry.last_activity
+        );
+        match compact_conversation_history(&messages, "Periodic session compaction.").await {
+            Ok((context, lessons)) => {
+                if let Some(ref lesson_text) = lessons {
+                    let memory_path = crate::config::Config::memory_file_path();
+                    for line in lesson_text.lines() {
+                        let line = line.trim().trim_start_matches("- ").trim();
+                        if !line.is_empty() && line.len() > 5 {
+                            let entry_line = format!("- {}\n", line);
+                            let _ = append_to_file(&memory_path, &entry_line);
+                        }
+                    }
+                    info!("Periodic session compaction: wrote lessons to {:?}", memory_path);
+                }
+                let inactive = entry.last_activity < inactive_cutoff;
+                if inactive {
+                    crate::session_memory::clear_session(&entry.source, entry.session_id);
+                    info!("Periodic session compaction: cleared inactive session {} {}", entry.source, entry.session_id);
+                } else {
+                    let compacted = vec![("system".to_string(), context)];
+                    crate::session_memory::replace_session(&entry.source, entry.session_id, compacted);
+                    info!("Periodic session compaction: replaced active session {} {} with summary", entry.source, entry.session_id);
+                }
+            }
+            Err(e) => {
+                tracing::warn!("Periodic session compaction failed for {} {}: {}", entry.source, entry.session_id, e);
+            }
+        }
+    }
+}
+
+/// Resolve Mastodon credentials: instance URL and access token.
+/// Checks env vars (MASTODON_INSTANCE_URL, MASTODON_ACCESS_TOKEN), then ~/.mac-stats/.config.env,
+/// then Keychain (mastodon_instance_url, mastodon_access_token).
+fn get_mastodon_config() -> Option<(String, String)> {
+    let resolve = |env_key: &str, file_key: &str, keychain_key: &str| -> Option<String> {
+        if let Ok(v) = std::env::var(env_key) {
+            let v = v.trim().to_string();
+            if !v.is_empty() { return Some(v); }
+        }
+        for base in [std::env::current_dir().ok(), std::env::var("HOME").ok().map(std::path::PathBuf::from)].into_iter().flatten() {
+            let paths = [base.join(".config.env"), base.join(".mac-stats").join(".config.env")];
+            for p in &paths {
+                if let Ok(content) = std::fs::read_to_string(p) {
+                    for line in content.lines() {
+                        if let Some(val) = line.strip_prefix(file_key) {
+                            let val = val.trim().trim_matches('"').trim().to_string();
+                            if !val.is_empty() { return Some(val); }
+                        }
+                    }
+                }
+            }
+        }
+        if let Ok(Some(v)) = crate::security::get_credential(keychain_key) {
+            if !v.is_empty() { return Some(v); }
+        }
+        None
+    };
+    let instance = resolve("MASTODON_INSTANCE_URL", "MASTODON_INSTANCE_URL=", "mastodon_instance_url")?;
+    let token = resolve("MASTODON_ACCESS_TOKEN", "MASTODON_ACCESS_TOKEN=", "mastodon_access_token")?;
+    Some((instance.trim_end_matches('/').to_string(), token))
+}
+
+/// Post a status to Mastodon. Visibility: public, unlisted, private, or direct.
+async fn mastodon_post(status: &str, visibility: &str) -> Result<String, String> {
+    let (instance, token) = get_mastodon_config()
+        .ok_or("Mastodon not configured. Set MASTODON_INSTANCE_URL and MASTODON_ACCESS_TOKEN in env or ~/.mac-stats/.config.env")?;
+    let url = format!("{}/api/v1/statuses", instance);
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(15))
+        .build()
+        .map_err(|e| format!("HTTP client: {}", e))?;
+    let payload = serde_json::json!({
+        "status": status,
+        "visibility": visibility,
+    });
+    let resp = client
+        .post(&url)
+        .header("Authorization", format!("Bearer {}", token))
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| format!("Mastodon API request failed: {}", e))?;
+    let status_code = resp.status();
+    let body = resp.text().await.unwrap_or_default();
+    if status_code.is_success() {
+        let url = serde_json::from_str::<serde_json::Value>(&body)
+            .ok()
+            .and_then(|v| v.get("url").and_then(|u| u.as_str()).map(|s| s.to_string()));
+        Ok(match url {
+            Some(u) => format!("Posted to Mastodon: {}", u),
+            None => "Posted to Mastodon successfully.".to_string(),
+        })
+    } else {
+        Err(format!("Mastodon API error {}: {}", status_code, body))
+    }
 }
 
 /// Append a line to a file, creating it if needed. Returns the path on success.
@@ -2281,6 +2416,30 @@ pub async fn answer_with_ollama_and_fetch(
                     }
                 }
             }
+            "MASTODON_POST" => {
+                let arg = arg.trim();
+                if arg.is_empty() {
+                    "MASTODON_POST requires text. Usage: MASTODON_POST: <text to post>. Optional visibility prefix: MASTODON_POST: unlisted: <text> (default: public).".to_string()
+                } else {
+                    let (visibility, text) = if let Some(rest) = arg.strip_prefix("unlisted:").or_else(|| arg.strip_prefix("unlisted ")) {
+                        ("unlisted", rest.trim())
+                    } else if let Some(rest) = arg.strip_prefix("private:").or_else(|| arg.strip_prefix("private ")) {
+                        ("private", rest.trim())
+                    } else if let Some(rest) = arg.strip_prefix("direct:").or_else(|| arg.strip_prefix("direct ")) {
+                        ("direct", rest.trim())
+                    } else if let Some(rest) = arg.strip_prefix("public:").or_else(|| arg.strip_prefix("public ")) {
+                        ("public", rest.trim())
+                    } else {
+                        ("public", arg)
+                    };
+                    send_status(&format!("Posting to Mastodon ({})…", visibility));
+                    info!("Agent router: MASTODON_POST visibility={} text={}", visibility, crate::logging::ellipse(text, 100));
+                    match mastodon_post(text, visibility).await {
+                        Ok(msg) => msg,
+                        Err(e) => format!("Mastodon post failed: {}", e),
+                    }
+                }
+            }
             "MEMORY_APPEND" => {
                 let arg = arg.trim();
                 if arg.is_empty() {
@@ -2565,7 +2724,7 @@ fn parse_at_datetime(s: &str) -> Result<String, String> {
 /// Also accepts lines starting with "RECOMMEND: " (e.g. "RECOMMEND: SCHEDULER: Every 5 minutes...").
 /// Returns (tool_name, argument) or None.
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:", "MASTODON_POST:"];
     for line in content.lines() {
         let line = line.trim();
         // Ollama sometimes replies with just "TASK_LIST" or "LIST_SCHEDULES" (no colon); treat as tool call with empty arg.

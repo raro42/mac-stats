@@ -318,6 +318,19 @@ fn run_internal(open_cpu_window: bool) {
             // Start task review: every 10 min, close WIP tasks older than 30 min as unsuccessful, work on one open task.
             task::review::spawn_review_thread();
 
+            // Session compaction: every 30 min, compact in-memory sessions into long-term memory; clear inactive sessions.
+            std::thread::spawn(|| {
+                let rt = match tokio::runtime::Runtime::new() {
+                    Ok(r) => r,
+                    Err(_) => return,
+                };
+                const INTERVAL_SECS: u64 = 30 * 60;
+                loop {
+                    std::thread::sleep(std::time::Duration::from_secs(INTERVAL_SECS));
+                    rt.block_on(commands::ollama::run_periodic_session_compaction());
+                }
+            });
+
             // Watch agent and skills directories so file edits are picked up (emit events for frontend).
             agents::watch::spawn_agents_and_skills_watcher();
 

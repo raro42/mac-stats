@@ -4,6 +4,9 @@
 //! and can reply using a shared pipeline (Ollama / browser agent).
 //! Token is resolved (in order) from: DISCORD_BOT_TOKEN env, .config.env file, Keychain.
 //! Token is never logged or exposed.
+//!
+//! Channel config is loaded from `~/.mac-stats/discord_channels.json` and is **reloaded
+//! automatically** when the file is modified (no app restart needed).
 
 pub mod api;
 
@@ -15,9 +18,61 @@ use serenity::model::channel::Message;
 use std::collections::HashMap;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::RwLock;
 use std::sync::{Arc, Mutex, OnceLock};
+use std::time::UNIX_EPOCH;
 use tokio::sync::mpsc;
 use tracing::{debug, error, info};
+use chrono::Timelike;
+
+/// Time-of-day period for having_fun: influences tone (e.g. quieter at night).
+#[derive(Clone, Copy)]
+enum TimeOfDay {
+    Night,    // ~22:00–06:00
+    Morning,  // ~06:00–12:00
+    Afternoon, // ~12:00–17:00
+    Evening,  // ~17:00–22:00
+}
+
+fn time_of_day(hour: u32) -> TimeOfDay {
+    match hour {
+        0..=5 => TimeOfDay::Night,
+        6..=11 => TimeOfDay::Morning,
+        12..=16 => TimeOfDay::Afternoon,
+        _ => TimeOfDay::Evening, // 17..=23
+    }
+}
+
+/// Returns a short block to inject into having_fun channel prompt: current time + period-aware guidance.
+/// So the model (e.g. Werner) can behave differently at night vs morning/afternoon/evening.
+fn time_awareness_for_having_fun() -> String {
+    let now = chrono::Local::now();
+    let hour = now.hour();
+    let period = time_of_day(hour);
+    let date = now.format("%A, %d %b %Y, %H:%M");
+    let (period_name, guidance) = match period {
+        TimeOfDay::Night => (
+            "night",
+            "Keep replies short and calm. Avoid long threads or complex topics.",
+        ),
+        TimeOfDay::Morning => (
+            "morning",
+            "You can be a bit more energetic and concise. Good for quick check-ins.",
+        ),
+        TimeOfDay::Afternoon => (
+            "afternoon",
+            "Respond naturally; casual and engaged is fine.",
+        ),
+        TimeOfDay::Evening => (
+            "evening",
+            "Relaxed tone; can be a bit more expansive if the conversation invites it.",
+        ),
+    };
+    format!(
+        "[Current time: {} — {}. {}]",
+        date, period_name, guidance
+    )
+}
 
 /// Discord API limit for message content (characters). Messages longer than this must be split.
 /// See https://discord.com/developers/docs/resources/channel#create-message: content max 2000.
@@ -41,8 +96,35 @@ struct ChannelSettings {
     prompt: Option<String>,
 }
 
-/// Cached channel config, loaded once at startup from `discord_channels.json`.
-static CHANNEL_CONFIG: OnceLock<(ChannelSettings, HashMap<u64, ChannelSettings>)> = OnceLock::new();
+/// Having-fun timeframes: min/max in seconds. Each use picks a random value in [min, max].
+#[derive(Debug, Clone)]
+struct HavingFunParams {
+    response_delay_secs_min: u64,
+    response_delay_secs_max: u64,
+    idle_thought_secs_min: u64,
+    idle_thought_secs_max: u64,
+}
+
+impl Default for HavingFunParams {
+    fn default() -> Self {
+        Self {
+            response_delay_secs_min: 300,  // 5 min
+            response_delay_secs_max: 3600, // 60 min
+            idle_thought_secs_min: 300,
+            idle_thought_secs_max: 3600,
+        }
+    }
+}
+
+/// Cached channel config, reloaded when `discord_channels.json` mtime changes.
+/// Holds (file mtime, default, overrides, having_fun params).
+static CHANNEL_CONFIG: RwLock<Option<(Option<std::time::SystemTime>, ChannelSettings, HashMap<u64, ChannelSettings>, HavingFunParams)>> =
+    RwLock::new(None);
+
+fn discord_channels_file_mtime() -> Option<std::time::SystemTime> {
+    let path = crate::config::Config::discord_channels_path();
+    std::fs::metadata(&path).ok().and_then(|m| m.modified().ok())
+}
 
 fn parse_mode(s: &str) -> ChannelMode {
     match s {
@@ -52,23 +134,50 @@ fn parse_mode(s: &str) -> ChannelMode {
     }
 }
 
-fn load_channel_config() -> (ChannelSettings, HashMap<u64, ChannelSettings>) {
+/// If the config file has no "having_fun" key, insert the default block and write the file back.
+/// Ensures both the shipped default and the runtime file in ~/.mac-stats have the option.
+fn ensure_having_fun_in_config(path: &Path, parsed: &mut serde_json::Value) {
+    let obj = match parsed.as_object_mut() {
+        Some(o) => o,
+        None => return,
+    };
+    if obj.contains_key("having_fun") {
+        return;
+    }
+    obj.insert(
+        "having_fun".to_string(),
+        serde_json::json!({
+            "response_delay_secs_min": 300,
+            "response_delay_secs_max": 3600,
+            "idle_thought_secs_min": 300,
+            "idle_thought_secs_max": 3600
+        }),
+    );
+    if let Ok(pretty) = serde_json::to_string_pretty(parsed) {
+        let _ = std::fs::write(path, pretty);
+        info!("Discord channels config: added default 'having_fun' block to {}", path.display());
+    }
+}
+
+fn load_channel_config_full() -> (ChannelSettings, HashMap<u64, ChannelSettings>, HavingFunParams) {
     let default_settings = ChannelSettings { mode: ChannelMode::MentionOnly, prompt: None };
     let path = crate::config::Config::discord_channels_path();
     let json = match std::fs::read_to_string(&path) {
         Ok(s) => s,
         Err(_) => {
             info!("Discord channels config not found at {:?}, using mention_only default", path);
-            return (default_settings, HashMap::new());
+            return (default_settings, HashMap::new(), HavingFunParams::default());
         }
     };
-    let parsed: serde_json::Value = match serde_json::from_str(&json) {
+    let mut parsed: serde_json::Value = match serde_json::from_str(&json) {
         Ok(v) => v,
         Err(e) => {
             tracing::warn!("Discord channels config parse error: {}, using mention_only default", e);
-            return (default_settings, HashMap::new());
+            return (default_settings, HashMap::new(), HavingFunParams::default());
         }
     };
+    // Upgrade: if file exists but has no having_fun block, add default and write back
+    ensure_having_fun_in_config(path.as_path(), &mut parsed);
     let default_mode = parsed
         .get("default")
         .and_then(|v| v.as_str())
@@ -80,15 +189,29 @@ fn load_channel_config() -> (ChannelSettings, HashMap<u64, ChannelSettings>) {
         .map(|s| s.to_string());
     let default_settings = ChannelSettings { mode: default_mode, prompt: default_prompt };
 
+    let having_fun = if let Some(hf) = parsed.get("having_fun").and_then(|v| v.as_object()) {
+        let u = |k: &str, default: u64| hf.get(k).and_then(|v| v.as_u64()).unwrap_or(default);
+        let rd_min = u("response_delay_secs_min", 300).min(86400);
+        let rd_max = u("response_delay_secs_max", 3600).max(rd_min).min(86400);
+        let it_min = u("idle_thought_secs_min", 300).min(86400);
+        let it_max = u("idle_thought_secs_max", 3600).max(it_min).min(86400);
+        HavingFunParams {
+            response_delay_secs_min: rd_min,
+            response_delay_secs_max: rd_max,
+            idle_thought_secs_min: it_min,
+            idle_thought_secs_max: it_max,
+        }
+    } else {
+        HavingFunParams::default()
+    };
+
     let mut channels = HashMap::new();
     if let Some(obj) = parsed.get("channels").and_then(|v| v.as_object()) {
         for (k, v) in obj {
             let Ok(id) = k.parse::<u64>() else { continue };
             let settings = if let Some(mode_str) = v.as_str() {
-                // Simple format: "channel_id": "mode"
                 ChannelSettings { mode: parse_mode(mode_str), prompt: None }
             } else if let Some(obj) = v.as_object() {
-                // Extended format: "channel_id": { "mode": "...", "prompt": "..." }
                 let mode = obj.get("mode")
                     .and_then(|v| v.as_str())
                     .map(parse_mode)
@@ -104,16 +227,82 @@ fn load_channel_config() -> (ChannelSettings, HashMap<u64, ChannelSettings>) {
         }
     }
     info!(
-        "Discord channels config: default={:?}, {} channel overrides",
+        "Discord channels config: default={:?}, {} channel overrides, having_fun delay {:?}–{:?}s idle {:?}–{:?}s",
         default_settings.mode,
-        channels.len()
+        channels.len(),
+        having_fun.response_delay_secs_min,
+        having_fun.response_delay_secs_max,
+        having_fun.idle_thought_secs_min,
+        having_fun.idle_thought_secs_max
     );
-    (default_settings, channels)
+    (default_settings, channels, having_fun)
+}
+
+/// Ensures config is loaded; call before reading channel settings or having_fun params.
+fn ensure_channel_config_loaded() {
+    let mut guard = match CHANNEL_CONFIG.write() {
+        Ok(g) => g,
+        Err(_) => return,
+    };
+    if guard.is_none() {
+        let mtime = discord_channels_file_mtime();
+        let (default, channels, having_fun) = load_channel_config_full();
+        *guard = Some((mtime, default, channels, having_fun));
+    }
+}
+
+/// Reloads config from disk if `discord_channels.json` modification time changed. Call from background loop.
+fn reload_channel_config_if_changed() {
+    let mtime = discord_channels_file_mtime();
+    let mut guard = match CHANNEL_CONFIG.write() {
+        Ok(g) => g,
+        Err(_) => return,
+    };
+    let should_reload = match guard.as_ref() {
+        None => true,
+        Some((cached_mtime, _, _, _)) => *cached_mtime != mtime,
+    };
+    if should_reload {
+        let (default, channels, having_fun) = load_channel_config_full();
+        *guard = Some((mtime, default, channels, having_fun));
+        info!("Discord channels config reloaded (file changed)");
+    }
 }
 
 fn channel_settings(channel_id: u64) -> ChannelSettings {
-    let (default, overrides) = CHANNEL_CONFIG.get_or_init(load_channel_config);
+    ensure_channel_config_loaded();
+    let guard = match CHANNEL_CONFIG.read() {
+        Ok(g) => g,
+        Err(_) => return ChannelSettings { mode: ChannelMode::MentionOnly, prompt: None },
+    };
+    let Some((_, default, overrides, _)) = guard.as_ref() else {
+        return ChannelSettings { mode: ChannelMode::MentionOnly, prompt: None };
+    };
     overrides.get(&channel_id).cloned().unwrap_or_else(|| default.clone())
+}
+
+fn get_having_fun_params() -> HavingFunParams {
+    ensure_channel_config_loaded();
+    let guard = match CHANNEL_CONFIG.read() {
+        Ok(g) => g,
+        Err(_) => return HavingFunParams::default(),
+    };
+    guard.as_ref().map(|(_, _, _, p)| p.clone()).unwrap_or_default()
+}
+
+/// Random seconds in [min, max] (inclusive) using system time for variety. Clamps so min <= max.
+fn random_secs_in_range(min_secs: u64, max_secs: u64) -> u64 {
+    let (lo, hi) = if min_secs <= max_secs {
+        (min_secs, max_secs)
+    } else {
+        (max_secs, min_secs)
+    };
+    let span = hi - lo + 1;
+    let nanos = std::time::SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_nanos() as u64;
+    lo + (nanos % span)
 }
 
 // ---------------------------------------------------------------------------
@@ -121,8 +310,6 @@ fn channel_settings(channel_id: u64) -> ChannelSettings {
 // ---------------------------------------------------------------------------
 
 const HAVING_FUN_MAX_CONSECUTIVE_BOT_REPLIES: u32 = 5;
-const HAVING_FUN_RESPONSE_DELAY_SECS: u64 = 30;
-const HAVING_FUN_IDLE_THOUGHT_SECS: u64 = 300; // 5 min of silence
 const HAVING_FUN_TICK_SECS: u64 = 10;
 
 struct BufferedMessage {
@@ -137,6 +324,10 @@ struct HavingFunState {
     last_response: std::time::Instant,
     last_activity: std::time::Instant,
     last_thought: std::time::Instant,
+    /// Next response only after this many seconds since last_response (random in config range).
+    next_response_after_secs: u64,
+    /// Next idle thought only after this many seconds since last_thought (random in config range).
+    next_idle_thought_after_secs: u64,
 }
 
 static HAVING_FUN_STATES: OnceLock<Mutex<HashMap<u64, HavingFunState>>> = OnceLock::new();
@@ -147,6 +338,7 @@ fn having_fun_states() -> &'static Mutex<HashMap<u64, HavingFunState>> {
 
 fn buffer_having_fun_message(channel_id: u64, author_name: String, content: String, is_bot: bool) {
     if let Ok(mut map) = having_fun_states().lock() {
+        let params = get_having_fun_params();
         let state = map.entry(channel_id).or_insert_with(|| {
             let now = std::time::Instant::now();
             HavingFunState {
@@ -155,6 +347,8 @@ fn buffer_having_fun_message(channel_id: u64, author_name: String, content: Stri
                 last_response: now,
                 last_activity: now,
                 last_thought: now,
+                next_response_after_secs: random_secs_in_range(params.response_delay_secs_min, params.response_delay_secs_max),
+                next_idle_thought_after_secs: random_secs_in_range(params.idle_thought_secs_min, params.idle_thought_secs_max),
             }
         });
         if !is_bot {
@@ -169,12 +363,14 @@ fn buffer_having_fun_message(channel_id: u64, author_name: String, content: Stri
     }
 }
 
-/// Background loop for having_fun channels: flushes buffered messages every 30s,
-/// posts random thoughts after 5min of silence.
+/// Background loop for having_fun channels: flushes buffered messages after configurable random delay,
+/// posts random thoughts after configurable random idle time. Reloads discord_channels.json when file changes.
 async fn having_fun_background_loop(ctx: Context) {
     let mut interval = tokio::time::interval(std::time::Duration::from_secs(HAVING_FUN_TICK_SECS));
     loop {
         interval.tick().await;
+
+        reload_channel_config_if_changed();
 
         // --- Phase 1: flush channels with buffered messages ---
         let channels_to_flush: Vec<(u64, Vec<BufferedMessage>)> = {
@@ -186,10 +382,13 @@ async fn having_fun_background_loop(ctx: Context) {
             for (channel_id, state) in map.iter_mut() {
                 if !state.buffer.is_empty()
                     && state.last_response.elapsed()
-                        >= std::time::Duration::from_secs(HAVING_FUN_RESPONSE_DELAY_SECS)
+                        >= std::time::Duration::from_secs(state.next_response_after_secs)
                 {
                     flush.push((*channel_id, std::mem::take(&mut state.buffer)));
                     state.last_response = std::time::Instant::now();
+                    let params = get_having_fun_params();
+                    state.next_response_after_secs =
+                        random_secs_in_range(params.response_delay_secs_min, params.response_delay_secs_max);
                 }
             }
             flush
@@ -209,7 +408,15 @@ async fn having_fun_background_loop(ctx: Context) {
 
         // --- Phase 2: idle thoughts for quiet having_fun channels ---
         let idle_channels: Vec<u64> = {
-            let (_, overrides) = CHANNEL_CONFIG.get_or_init(load_channel_config);
+            let guard = match CHANNEL_CONFIG.read() {
+                Ok(g) => g,
+                Err(_) => continue,
+            };
+            let overrides = match guard.as_ref() {
+                Some((_, _, o, _)) => o.clone(),
+                None => continue,
+            };
+            drop(guard);
             let map = match having_fun_states().lock() {
                 Ok(m) => m,
                 Err(_) => continue,
@@ -221,9 +428,9 @@ async fn having_fun_background_loop(ctx: Context) {
                     if let Some(state) = map.get(id) {
                         let idle = state.buffer.is_empty()
                             && state.last_activity.elapsed()
-                                >= std::time::Duration::from_secs(HAVING_FUN_IDLE_THOUGHT_SECS)
+                                >= std::time::Duration::from_secs(state.next_idle_thought_after_secs)
                             && state.last_thought.elapsed()
-                                >= std::time::Duration::from_secs(HAVING_FUN_IDLE_THOUGHT_SECS);
+                                >= std::time::Duration::from_secs(state.next_idle_thought_after_secs);
                         if idle { Some(*id) } else { None }
                     } else {
                         None
@@ -237,6 +444,9 @@ async fn having_fun_background_loop(ctx: Context) {
                 if let Some(state) = map.get_mut(&channel_id) {
                     state.last_thought = std::time::Instant::now();
                     state.last_activity = std::time::Instant::now();
+                    let params = get_having_fun_params();
+                    state.next_idle_thought_after_secs =
+                        random_secs_in_range(params.idle_thought_secs_min, params.idle_thought_secs_max);
                 }
             }
             having_fun_idle_thought(channel_id, &ctx).await;
@@ -261,6 +471,8 @@ async fn having_fun_respond(channel_id: u64, messages: Vec<BufferedMessage>, ctx
         system.push_str("\n\n");
         system.push_str(prompt);
     }
+    system.push_str("\n\n");
+    system.push_str(&time_awareness_for_having_fun());
     ollama_msgs.push(crate::ollama::ChatMessage {
         role: "system".to_string(),
         content: system,
@@ -324,6 +536,8 @@ async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
         system.push_str("\n\n");
         system.push_str(prompt);
     }
+    system.push_str("\n\n");
+    system.push_str(&time_awareness_for_having_fun());
     ollama_msgs.push(crate::ollama::ChatMessage {
         role: "system".to_string(),
         content: system,
@@ -597,10 +811,8 @@ impl EventHandler for Handler {
             if mode != ChannelMode::HavingFun {
                 return;
             }
-        } else {
-            if !is_dm && !mentions_bot && mode == ChannelMode::MentionOnly {
-                return;
-            }
+        } else if !is_dm && !mentions_bot && mode == ChannelMode::MentionOnly {
+            return;
         }
 
         // having_fun channels: buffer the message and let the background loop respond

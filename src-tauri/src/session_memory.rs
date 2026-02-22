@@ -19,6 +19,8 @@ struct SessionState {
     messages: Vec<(String, String)>,
     topic_slug: Option<String>,
     created_at: Option<chrono::DateTime<chrono::Local>>,
+    /// Last time a message was added; used for active vs inactive (e.g. 30-min compaction).
+    last_activity: Option<chrono::DateTime<chrono::Local>>,
 }
 
 fn session_store() -> &'static Mutex<HashMap<String, SessionState>> {
@@ -50,15 +52,18 @@ pub fn add_message(source: &str, session_id: u64, role: &str, content: &str) {
         Err(_) => return,
     };
 
+    let now = chrono::Local::now();
     let state = store.entry(key.clone()).or_insert_with(|| SessionState {
         messages: Vec::new(),
         topic_slug: None,
         created_at: None,
+        last_activity: None,
     });
 
     if state.created_at.is_none() {
-        state.created_at = Some(chrono::Local::now());
+        state.created_at = Some(now);
     }
+    state.last_activity = Some(now);
     if role == "user" && state.topic_slug.is_none() {
         state.topic_slug = Some(topic_slug(content, 40));
     }
@@ -147,18 +152,58 @@ pub fn replace_session(source: &str, session_id: u64, new_messages: Vec<(String,
             let _ = persist_session(source, session_id);
         }
     }
+    let now = chrono::Local::now();
     if let Ok(mut store) = session_store().lock() {
         let state = store.entry(key).or_insert_with(|| SessionState {
             messages: Vec::new(),
             topic_slug: None,
             created_at: None,
+            last_activity: None,
         });
         if state.created_at.is_none() {
-            state.created_at = Some(chrono::Local::now());
+            state.created_at = Some(now);
         }
+        state.last_activity = Some(now);
         state.messages = new_messages;
         debug!("Session memory: replaced session with {} compacted messages", state.messages.len());
     }
+}
+
+/// One session entry for listing (source, session_id, message_count, last_activity).
+pub struct SessionEntry {
+    pub source: String,
+    pub session_id: u64,
+    pub message_count: usize,
+    pub last_activity: chrono::DateTime<chrono::Local>,
+}
+
+/// List all in-memory sessions. Used by the 30-min compaction loop.
+pub fn list_sessions() -> Vec<SessionEntry> {
+    let store = match session_store().lock() {
+        Ok(g) => g,
+        Err(_) => return Vec::new(),
+    };
+    let mut out = Vec::new();
+    for (key, state) in store.iter() {
+        let last_activity = match state.last_activity.or(state.created_at) {
+            Some(t) => t,
+            None => continue,
+        };
+        let (source, session_id) = match key.split_once('-') {
+            Some((s, id)) => match id.parse::<u64>() {
+                Ok(id) => (s.to_string(), id),
+                Err(_) => continue,
+            },
+            None => continue,
+        };
+        out.push(SessionEntry {
+            source,
+            session_id,
+            message_count: state.messages.len(),
+            last_activity,
+        });
+    }
+    out
 }
 
 /// Return the current in-memory messages for this session (role, content).

@@ -4,12 +4,17 @@
 //! like log file paths and build information, replacing hard-coded values.
 
 //! Configuration management module
-//! 
+//!
 //! Provides centralized configuration including:
 //! - Log file paths (replaces hard-coded paths)
 //! - Build information (date, version, authors)
-//! 
+//!
 //! All configuration is environment-aware and portable.
+//!
+//! **JSON config reload (no restart needed):**
+//! - `config.json` — read on every access (window decorations, scheduler interval).
+//! - `schedules.json` — scheduler checks file mtime each loop and reloads when changed.
+//! - `discord_channels.json` — Discord loop checks mtime every tick and reloads when changed.
 
 use std::path::PathBuf;
 
