@@ -82,11 +82,11 @@ The diff on top of the last commit (844c4bc) contains **10 distinct features/imp
 ### F5: TASK_CREATE deduplication
 
 **What changed:**
-- `task/mod.rs`: Before creating a task, `existing_task_with_topic_id()` scans `~/.mac-stats/task/` for any file matching `task-{slug}-{id}-*`. If found, `create_task()` returns an error.
+- `task/mod.rs`: Before creating a task, `existing_task_with_topic_id()` scans `~/.mac-stats/task/` and reads `## Topic:` and `## Id:` from each task file; if any file has the same topic (slug) and id, `create_task()` returns an error. (Filenames are `task-<date-time>-<status>.md`.)
 
 **Review checklist:**
 - [ ] Verify slug generation is deterministic (same topic always gives same slug).
-- [ ] Verify the dedup check matches by `topic_slug + id` prefix, not the full filename (so status differences don't matter).
+- [ ] Verify the dedup check matches by `## Topic:` (as slug) and `## Id:` in file content.
 - [ ] Edge case: what if the existing task is `finished` or `unsuccessful`? Should creating a new task with the same topic+id be allowed? Currently it is not — decide if this is intentional.
 - [ ] Verify the error message is informative enough for Ollama to switch to TASK_APPEND.
 

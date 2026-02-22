@@ -64,6 +64,7 @@
       settingsBtn.addEventListener("click", () => {
         settingsModal.style.display = "flex";
         if (window.Discord?.refreshStatus) window.Discord.refreshStatus();
+        if (window.Perplexity?.refreshStatus) window.Perplexity.refreshStatus();
       });
     }
 

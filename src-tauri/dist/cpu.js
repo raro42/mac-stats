@@ -3086,10 +3086,136 @@ function initCollapsibleSections() {
   }
 }
 
+// ============================================================================
+// Perplexity Search Section
+// ============================================================================
+const PERPLEXITY_KEYCHAIN_ACCOUNT = 'perplexity_api_key';
+
+function updatePerplexityConfigStatus(statusText, elId) {
+  const el = document.getElementById(elId);
+  if (el) el.textContent = statusText;
+}
+
+async function refreshPerplexityStatus() {
+  const invoke = getInvoke();
+  if (!invoke) return;
+  try {
+    const configured = await invoke('is_perplexity_configured');
+    const text = configured ? 'API key set' : 'No API key';
+    updatePerplexityConfigStatus(text, 'perplexity-config-status');
+    updatePerplexityConfigStatus(configured ? 'Key set' : 'No key', 'perplexity-settings-status');
+  } catch (_) {
+    updatePerplexityConfigStatus('—', 'perplexity-config-status');
+    updatePerplexityConfigStatus('—', 'perplexity-settings-status');
+  }
+}
+
+function initPerplexitySection() {
+  const header = document.getElementById('perplexity-header');
+  const content = document.getElementById('perplexity-content');
+  const section = document.querySelector('.perplexity-section');
+  const divider = document.getElementById('perplexity-details-divider');
+  const searchBtn = document.getElementById('perplexity-search-btn');
+  const queryInput = document.getElementById('perplexity-query');
+  const resultsEl = document.getElementById('perplexity-results');
+
+  if (!header || !content) return;
+
+  let perplexityCollapsed = localStorage.getItem('perplexity_collapsed') !== 'false';
+  if (perplexityCollapsed) {
+    content.classList.add('collapsed');
+    if (section) section.classList.add('collapsed');
+    if (divider) divider.style.display = 'none';
+  } else {
+    content.classList.remove('collapsed');
+    if (section) section.classList.remove('collapsed');
+    if (divider) divider.style.display = '';
+  }
+
+  header.addEventListener('click', () => {
+    perplexityCollapsed = !perplexityCollapsed;
+    localStorage.setItem('perplexity_collapsed', perplexityCollapsed.toString());
+    if (perplexityCollapsed) {
+      content.classList.add('collapsed');
+      if (section) section.classList.add('collapsed');
+      if (divider) divider.style.display = 'none';
+    } else {
+      content.classList.remove('collapsed');
+      if (section) section.classList.remove('collapsed');
+      if (divider) divider.style.display = '';
+      refreshPerplexityStatus();
+    }
+  });
+
+  if (searchBtn && queryInput && resultsEl) {
+    searchBtn.addEventListener('click', async () => {
+      const query = queryInput.value.trim();
+      if (!query) return;
+      const invoke = getInvoke();
+      if (!invoke) {
+        resultsEl.innerHTML = '<p class="perplexity-result-snippet">App not ready.</p>';
+        return;
+      }
+      resultsEl.innerHTML = '<p class="perplexity-result-snippet">Searching…</p>';
+      try {
+        const resp = await invoke('perplexity_search', { request: { query: query, max_results: 10 } });
+        if (!resp.results || resp.results.length === 0) {
+          resultsEl.innerHTML = '<p class="perplexity-result-snippet">No results.</p>';
+          return;
+        }
+        resultsEl.innerHTML = resp.results.map(function (r) {
+          const snippet = (r.snippet || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          return '<div class="perplexity-result-item">' +
+            '<a href="' + (r.url || '#') + '" target="_blank" rel="noopener noreferrer">' + (r.title || 'Untitled') + '</a>' +
+            (snippet ? '<div class="perplexity-result-snippet">' + snippet + '</div>' : '') + '</div>';
+        }).join('');
+      } catch (err) {
+        resultsEl.innerHTML = '<p class="perplexity-result-snippet">Error: ' + String(err) + '</p>';
+      }
+    });
+  }
+
+  // Settings: Save / Clear API key (only if elements exist, e.g. Apple theme)
+  const saveBtn = document.getElementById('perplexity-save-key');
+  const clearBtn = document.getElementById('perplexity-clear-key');
+  const keyInput = document.getElementById('perplexity-api-key-input');
+  if (saveBtn && keyInput) {
+    saveBtn.addEventListener('click', async () => {
+      const invoke = getInvoke();
+      if (!invoke) return;
+      const key = keyInput.value.trim();
+      try {
+        await invoke('store_credential', { request: { account: PERPLEXITY_KEYCHAIN_ACCOUNT, password: key } });
+        keyInput.value = '';
+        await refreshPerplexityStatus();
+      } catch (e) {
+        console.error('Perplexity save key:', e);
+      }
+    });
+  }
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async () => {
+      const invoke = getInvoke();
+      if (!invoke) return;
+      try {
+        await invoke('delete_credential', { account: PERPLEXITY_KEYCHAIN_ACCOUNT });
+        if (keyInput) keyInput.value = '';
+        await refreshPerplexityStatus();
+      } catch (e) {
+        console.error('Perplexity clear key:', e);
+      }
+    });
+  }
+
+  refreshPerplexityStatus();
+  window.Perplexity = { refreshStatus: refreshPerplexityStatus };
+}
+
 // Initialize icon line click handlers
 function initIconLine() {
   const monitorsIcon = document.getElementById('icon-monitors');
   const ollamaIcon = document.getElementById('icon-ollama');
+  const perplexityIcon = document.getElementById('icon-perplexity');
   
   // Monitors icon click - toggle the External / Monitors section
   if (monitorsIcon) {
@@ -3097,7 +3223,6 @@ function initIconLine() {
       e.stopPropagation();
       const monitorsHeader = document.getElementById('monitors-header');
       if (monitorsHeader) {
-        // Always toggle by clicking the header (it handles expand/collapse)
         monitorsHeader.click();
       }
     });
@@ -3109,8 +3234,18 @@ function initIconLine() {
       e.stopPropagation();
       const ollamaHeader = document.getElementById('ollama-header');
       if (ollamaHeader) {
-        // Always toggle by clicking the header (it handles expand/collapse)
         ollamaHeader.click();
+      }
+    });
+  }
+  
+  // Perplexity icon click - toggle the Perplexity Search section
+  if (perplexityIcon) {
+    perplexityIcon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const perplexityHeader = document.getElementById('perplexity-header');
+      if (perplexityHeader) {
+        perplexityHeader.click();
       }
     });
   }
@@ -3163,6 +3298,7 @@ function initMonitoringFeatures() {
     initIconLine();
     initCollapsibleSections();
     initMonitorsSection();
+    initPerplexitySection();
     initOllamaSection();
     initHistoryControls();
     // Auto-configure Ollama with default endpoint (if module is available)

@@ -576,7 +576,7 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
         num += 1;
     }
     base.push_str(&format!(
-        "\n\n{}. **TASK** (task files under ~/.mac-stats/task/): Use when working on a task file or when the user asks for tasks. When the user wants agents to chat or have a conversation, invoke AGENT: orchestrator (or the right agent) so the conversation runs; do not only create a task. TASK_LIST: default is open and WIP only (reply: TASK_LIST or TASK_LIST: ). TASK_LIST: all — list all tasks grouped by status (reply: TASK_LIST: all when the user asks for all tasks). TASK_SHOW: <path or id> — show that task's content and status to the user so they can read and request updates. TASK_APPEND: append feedback (reply: TASK_APPEND: <path or task id> <content>). TASK_STATUS: set status (reply: TASK_STATUS: <path or task id> wip|finished|unsuccessful). When the user says \"close the task\", \"finish\", \"mark done\", or \"cancel\" a task, reply TASK_STATUS: <path or id> finished (success) or TASK_STATUS: <path or id> unsuccessful (failed) — do not use wip. TASK_CREATE: create a new task (reply: TASK_CREATE: <topic> <id> <initial content>). If a task with that topic and id already exists, use TASK_APPEND or TASK_STATUS instead. TASK_ASSIGN: <path or id> <agent_id> — reassign task to scheduler, discord, cpu, or default. Paths must be under ~/.mac-stats/task.",
+        "\n\n{}. **TASK** (task files under ~/.mac-stats/task/): Use when working on a task file or when the user asks for tasks. When the user wants agents to chat or have a conversation, invoke AGENT: orchestrator (or the right agent) so the conversation runs; do not only create a task. TASK_LIST: default is open and WIP only (reply: TASK_LIST or TASK_LIST: ). TASK_LIST: all — list all tasks grouped by status (reply: TASK_LIST: all when the user asks for all tasks). TASK_SHOW: <path or id> — show that task's content and status to the user. TASK_APPEND: append feedback (reply: TASK_APPEND: <path or task id> <content>). TASK_STATUS: set status (reply: TASK_STATUS: <path or task id> wip|finished|unsuccessful). When the user says \"close the task\", \"finish\", \"mark done\", or \"cancel\" a task, reply TASK_STATUS: <path or id> finished or unsuccessful. TASK_CREATE: create a new task (reply: TASK_CREATE: <topic> <id> <initial content>). Put the **full** user request into the initial content, including duration (e.g. \"research for 15 minutes\"), scope, and topic — the whole content is stored. If a task with that topic and id already exists, use TASK_APPEND or TASK_STATUS instead. For TASK_APPEND/TASK_STATUS use the task file name (e.g. task-20250222-120000-open) or the short id or topic (e.g. 1, research). TASK_ASSIGN: <path or id> <agent_id>. Paths must be under ~/.mac-stats/task.",
         num
     ));
     num += 1;
@@ -1591,6 +1591,8 @@ pub async fn answer_with_ollama_and_fetch(
     let mut agent_conversation: Vec<(String, String)> = Vec::new();
     // Dedupe repeated identical DISCORD_API calls so the model can't loop on the same request.
     let mut last_successful_discord_call: Option<(String, String)> = None;
+    // Track the task file we're working on so we can append the full conversation at the end.
+    let mut current_task_path: Option<std::path::PathBuf> = None;
 
     while tool_count < max_tool_iterations {
         let (tool, arg) = match parse_tool_from_response(&response_content) {
@@ -2138,10 +2140,8 @@ pub async fn answer_with_ollama_and_fetch(
                 } else {
                     match crate::task::resolve_task_path(path_or_id) {
                         Ok(path) => {
-                            let task_label = path
-                                .file_name()
-                                .and_then(|n| n.to_str())
-                                .unwrap_or(path_or_id);
+                            current_task_path = Some(path.clone());
+                            let task_label = crate::task::task_file_name(&path);
                             send_status(&format!("Appending to task '{}'…", task_label));
                             info!("Agent router: TASK_APPEND for task '{}' ({} chars)", task_label, content.chars().count());
                             match crate::task::append_to_task(&path, content) {
@@ -2169,7 +2169,10 @@ pub async fn answer_with_ollama_and_fetch(
                                     "Cannot set status to finished: not all sub-tasks (## Sub-tasks: ...) are finished or unsuccessful.".to_string()
                                 } else {
                                     match crate::task::set_task_status(&path, &status) {
-                                        Ok(new_path) => format!("Task status set to {} (file: {:?}).", status, new_path),
+                                        Ok(new_path) => {
+                                            current_task_path = Some(new_path.clone());
+                                            format!("Task status set to {} (file: {}).", status, crate::task::task_file_name(&new_path))
+                                        }
                                         Err(e) => format!("TASK_STATUS failed: {}.", e),
                                     }
                                 }
@@ -2186,7 +2189,11 @@ pub async fn answer_with_ollama_and_fetch(
                     let id = segs[1];
                     let initial_content = segs[2];
                     match crate::task::create_task(topic, id, initial_content, None) {
-                        Ok(path) => format!("Task created: {:?}. Use TASK_APPEND and TASK_STATUS to update.", path),
+                        Ok(path) => {
+                            current_task_path = Some(path.clone());
+                            let name = crate::task::task_file_name(&path);
+                            format!("Task created: {}. Use TASK_APPEND: {} or TASK_APPEND: <id> <content> and TASK_STATUS to update.", name, name)
+                        }
                         Err(e) => format!("TASK_CREATE failed: {}.", e),
                     }
                 } else {
@@ -2200,23 +2207,26 @@ pub async fn answer_with_ollama_and_fetch(
                     send_status("Showing task…");
                     info!("Agent router: TASK_SHOW requested: {}", arg.trim());
                     match crate::task::resolve_task_path(arg.trim()) {
-                        Ok(path) => match crate::task::show_task_content(&path) {
-                            Ok((status, assignee, content)) => {
-                                const MAX_CHANNEL_MSG: usize = 1900;
-                                let body = format!(
-                                    "**Status:** {} | **Assigned:** {}\n\n{}",
-                                    status, assignee, content
-                                );
-                                let msg = if body.chars().count() <= MAX_CHANNEL_MSG {
-                                    body
-                                } else {
-                                    crate::logging::ellipse(&body, MAX_CHANNEL_MSG)
-                                };
-                                send_status(&msg);
-                                "Task content was sent to the user in the channel. They can ask you to TASK_APPEND or TASK_STATUS for this task.".to_string()
+                        Ok(path) => {
+                            current_task_path = Some(path.clone());
+                            match crate::task::show_task_content(&path) {
+                                Ok((status, assignee, content)) => {
+                                    const MAX_CHANNEL_MSG: usize = 1900;
+                                    let body = format!(
+                                        "**Status:** {} | **Assigned:** {}\n\n{}",
+                                        status, assignee, content
+                                    );
+                                    let msg = if body.chars().count() <= MAX_CHANNEL_MSG {
+                                        body
+                                    } else {
+                                        crate::logging::ellipse(&body, MAX_CHANNEL_MSG)
+                                    };
+                                    send_status(&msg);
+                                    "Task content was sent to the user in the channel. They can ask you to TASK_APPEND or TASK_STATUS for this task.".to_string()
+                                }
+                                Err(e) => format!("TASK_SHOW failed: {}.", e),
                             }
-                            Err(e) => format!("TASK_SHOW failed: {}.", e),
-                        },
+                        }
                         Err(e) => format!("TASK_SHOW failed: {}.", e),
                     }
                 }
@@ -2232,6 +2242,7 @@ pub async fn answer_with_ollama_and_fetch(
                     info!("Agent router: TASK_ASSIGN {} -> {}", path_or_id, agent_id);
                     match crate::task::resolve_task_path(&path_or_id) {
                         Ok(path) => {
+                            current_task_path = Some(path.clone());
                             match crate::task::set_assignee(&path, agent_id) {
                                 Ok(()) => {
                                     let _ = crate::task::append_to_task(&path, &format!("Reassigned to {}.", agent_id));
@@ -2260,7 +2271,9 @@ pub async fn answer_with_ollama_and_fetch(
                     info!("Agent router: TASK_SLEEP {} until {}", path_or_id, until_str);
                     match crate::task::resolve_task_path(&path_or_id) {
                         Ok(path) => {
+                            current_task_path = Some(path.clone());
                             if let Ok(new_path) = crate::task::set_task_status(&path, "paused") {
+                                current_task_path = Some(new_path.clone());
                                 let _ = crate::task::set_paused_until(&new_path, Some(until_str));
                                 let _ = crate::task::append_to_task(&new_path, &format!("Paused until {}.", until_str));
                             }
@@ -2557,6 +2570,21 @@ pub async fn answer_with_ollama_and_fetch(
         }
     }
 
+    // Log the full conversation (user question + assistant reply) into the task file when we touched a task this run.
+    // Skip when the "user" message is the task runner's prompt (synthetic), so we don't log runner turns as User/Assistant.
+    let is_runner_prompt = question.trim_start().starts_with("Current task file content:");
+    if let Some(ref path) = current_task_path {
+        if !is_runner_prompt {
+            if let Err(e) = crate::task::append_conversation_block(path, question, &response_content) {
+                info!("Agent router: could not append conversation to task file: {}", e);
+            } else {
+                info!("Agent router: appended conversation to task {}", crate::task::task_file_name(path));
+            }
+        } else {
+            info!("Agent router: skipped appending conversation (task runner turn) for {}", crate::task::task_file_name(path));
+        }
+    }
+
     Ok(response_content)
 }
 
@@ -2720,12 +2748,46 @@ fn parse_at_datetime(s: &str) -> Result<String, String> {
     Ok(dt.format("%Y-%m-%dT%H:%M:%S").to_string())
 }
 
+/// True if the trimmed line looks like the start of a tool call (e.g. "TASK_APPEND:", "RUN_CMD:").
+fn line_starts_with_tool_prefix(line: &str) -> bool {
+    let line = line.trim();
+    if line.eq_ignore_ascii_case("TASK_LIST") || line.eq_ignore_ascii_case("LIST_SCHEDULES") {
+        return true;
+    }
+    let mut search = line;
+    loop {
+        let upper = search.to_uppercase();
+        if upper.starts_with("RECOMMEND: ") {
+            search = search[11..].trim();
+        } else if search.len() >= 2 && search.as_bytes()[0].is_ascii_digit() {
+            let rest = search.trim_start_matches(|c: char| c.is_ascii_digit());
+            if rest.starts_with(". ") || rest.starts_with(") ") || rest.starts_with(": ") {
+                search = rest[2..].trim();
+            } else {
+                break;
+            }
+        } else if search.starts_with("- ") || search.starts_with("* ") {
+            search = search[2..].trim();
+        } else {
+            break;
+        }
+    }
+    for prefix in TOOL_LINE_PREFIXES {
+        if search.to_uppercase().starts_with(prefix) {
+            return true;
+        }
+    }
+    false
+}
+
 /// Parse one of FETCH_URL:, BRAVE_SEARCH:, RUN_JS:, SCHEDULE:/SCHEDULER:, MCP:, PYTHON_SCRIPT: from assistant content.
 /// Also accepts lines starting with "RECOMMEND: " (e.g. "RECOMMEND: SCHEDULER: Every 5 minutes...").
+/// For TASK_APPEND and TASK_CREATE, content is taken to the end of the block (all lines until the next tool line) so research/full text is stored completely.
 /// Returns (tool_name, argument) or None.
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
     let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:", "MASTODON_POST:"];
-    for line in content.lines() {
+    let lines: Vec<&str> = content.lines().collect();
+    for (line_index, line) in lines.iter().enumerate() {
         let line = line.trim();
         // Ollama sometimes replies with just "TASK_LIST" or "LIST_SCHEDULES" (no colon); treat as tool call with empty arg.
         if line.eq_ignore_ascii_case("TASK_LIST") {
@@ -2735,14 +2797,12 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
             return Some(("LIST_SCHEDULES".to_string(), String::new()));
         }
         // Strip leading list numbering ("1. ", "2) ", "- ", "* ") and RECOMMEND: prefixes.
-        // Models often return numbered plans like "1. RUN_CMD: cat ..." or "RECOMMEND: RUN_CMD: ...".
         let mut search = line;
         loop {
             let upper = search.to_uppercase();
             if upper.starts_with("RECOMMEND: ") {
                 search = search[11..].trim();
             } else if search.len() >= 2 && search.as_bytes()[0].is_ascii_digit() {
-                // Strip "1. ", "2) ", "1: " etc.
                 let rest = search.trim_start_matches(|c: char| c.is_ascii_digit());
                 if rest.starts_with(". ") || rest.starts_with(") ") || rest.starts_with(": ") {
                     search = rest[2..].trim();
@@ -2758,39 +2818,50 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
         for prefix in prefixes {
             if search.to_uppercase().starts_with(prefix) {
                 let mut arg = search[prefix.len()..].trim().to_string();
-                if arg.is_empty() {
+                if arg.is_empty() && prefix != "TASK_LIST:" && prefix != "TASK_SHOW:" && prefix != "LIST_SCHEDULES:" {
                     continue;
                 }
                 let tool_name = prefix.trim_end_matches(':');
-                // Normalize SCHEDULER -> SCHEDULE
                 let tool_name = if tool_name.eq_ignore_ascii_case("SCHEDULER") {
                     "SCHEDULE".to_string()
                 } else {
                     tool_name.to_string()
                 };
-                // Ollama sometimes concatenates multiple tools or plan steps on one line.
-                // Truncate at first ';' (for URLs/searches) or next numbered step like " 2. ", " 3) ".
+                // TASK_APPEND and TASK_CREATE: take full content including all following lines until the next tool line (so research/long text is stored completely).
+                if tool_name == "TASK_APPEND" || tool_name == "TASK_CREATE" {
+                    let rest_lines: Vec<&str> = lines[line_index + 1..]
+                        .iter()
+                        .take_while(|l| !line_starts_with_tool_prefix(l))
+                        .copied()
+                        .collect();
+                    if !rest_lines.is_empty() {
+                        arg.push('\n');
+                        arg.push_str(&rest_lines.join("\n"));
+                    }
+                }
+                // Ollama sometimes concatenates multiple tools on one line. Truncate at first ';' for URLs/searches.
                 if tool_name == "FETCH_URL" || tool_name == "BRAVE_SEARCH" {
                     if let Some(idx) = arg.find(';') {
                         arg = arg[..idx].trim().to_string();
                     }
                 }
-                // Truncate at next numbered step boundary (" 2. ", " 3) ", etc.)
-                // so "cat ~/.mac-stats/schedules.json 2. Extract ..." becomes just the command.
-                if let Some(pos) = arg.find(|c: char| c.is_ascii_digit()).and_then(|_| {
-                    let bytes = arg.as_bytes();
-                    for i in 1..bytes.len().saturating_sub(2) {
-                        if bytes[i].is_ascii_digit()
-                            && bytes[i - 1] == b' '
-                            && (bytes.get(i + 1) == Some(&b'.') || bytes.get(i + 1) == Some(&b')'))
-                            && bytes.get(i + 2) == Some(&b' ')
-                        {
-                            return Some(i - 1);
+                // Truncate at next numbered step boundary for single-line tools (not TASK_APPEND/TASK_CREATE — those keep full content).
+                if tool_name != "TASK_APPEND" && tool_name != "TASK_CREATE" {
+                    if let Some(pos) = arg.find(|c: char| c.is_ascii_digit()).and_then(|_| {
+                        let bytes = arg.as_bytes();
+                        for i in 1..bytes.len().saturating_sub(2) {
+                            if bytes[i].is_ascii_digit()
+                                && bytes[i - 1] == b' '
+                                && (bytes.get(i + 1) == Some(&b'.') || bytes.get(i + 1) == Some(&b')'))
+                                && bytes.get(i + 2) == Some(&b' ')
+                            {
+                                return Some(i - 1);
+                            }
                         }
+                        None
+                    }) {
+                        arg = arg[..pos].trim().to_string();
                     }
-                    None
-                }) {
-                    arg = arg[..pos].trim().to_string();
                 }
                 if !arg.is_empty() || tool_name == "TASK_LIST" || tool_name == "TASK_SHOW" || tool_name == "LIST_SCHEDULES" {
                     return Some((tool_name, arg));

@@ -129,7 +129,15 @@
           <img src="/assets/ollama.svg" alt="Ollama" />
         </button>
         
-        <!-- Icons 3-15: Placeholders -->
+        <!-- Icon 3: Perplexity Search -->
+        <button class="icon-line-item" id="icon-perplexity" title="Perplexity Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+        
+        <!-- Icons 4-15: Placeholders -->
         <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
         <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
         <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
@@ -199,6 +207,25 @@
       </div>
 
       <div class="apple-divider" id="monitors-ollama-divider" aria-hidden="true"></div>
+
+      <!-- Perplexity Search Section (Collapsible) -->
+      <section class="perplexity-section">
+        <div class="section-header-collapsible" id="perplexity-header">
+          <div class="section-title-with-status">
+            <h2 class="section-title">Perplexity Search</h2>
+            <span class="perplexity-config-status" id="perplexity-config-status" title="API key status">—</span>
+          </div>
+        </div>
+        <div class="section-content-collapsible" id="perplexity-content">
+          <div class="perplexity-search-box">
+            <input type="text" id="perplexity-query" placeholder="Search the web..." />
+            <button type="button" id="perplexity-search-btn">Search</button>
+          </div>
+          <div class="perplexity-results" id="perplexity-results"></div>
+        </div>
+      </section>
+
+      <div class="apple-divider" id="perplexity-details-divider" aria-hidden="true"></div>
 
       <!-- Ollama Chat Section (Collapsible) -->
       <section class="ollama-section">
@@ -330,6 +357,16 @@
               <button type="button" class="theme-item discord-btn" id="discord-clear-token" style="cursor: pointer;">Clear token</button>
             </div>
             <div class="setting-note" style="font-size: 11px; color: rgba(10, 10, 12, 0.78); margin-top: 4px; font-style: italic;">Saving connects right away. Restart to disconnect after clearing.</div>
+          </div>
+          <div class="setting-item" id="perplexity-setting">
+            <div class="setting-label">Perplexity API key</div>
+            <div class="perplexity-status" id="perplexity-settings-status">—</div>
+            <input type="password" id="perplexity-api-key-input" class="discord-token-input" placeholder="Paste API key (pplx-...)" autocomplete="off" style="width:100%; margin-top:4px; padding:6px 8px; box-sizing:border-box; min-height:28px;" />
+            <div class="perplexity-actions" style="margin-top: 6px;">
+              <button type="button" class="theme-item discord-btn" id="perplexity-save-key" style="margin-right: 8px; cursor: pointer;">Save key</button>
+              <button type="button" class="theme-item discord-btn" id="perplexity-clear-key" style="cursor: pointer;">Clear key</button>
+            </div>
+            <div class="setting-note" style="font-size: 11px; color: rgba(10, 10, 12, 0.78); margin-top: 4px; font-style: italic;">Get a key at <a href="https://www.perplexity.ai/settings/api" target="_blank" rel="noopener noreferrer">perplexity.ai/settings/api</a>. Stored in Keychain.</div>
           </div>
         </div>
       </div>

@@ -5,12 +5,10 @@ The task agent lets you work on tasks stored as Markdown files under `~/.mac-sta
 ## Overview
 
 - **Task directory**: `~/.mac-stats/task/`
-- **File naming**: `task-<topic>-<id>-<date-time>-<status>.md`
-  - `topic`: short slug (e.g. `refactor-api`)
-  - `id`: short id (e.g. `1`, `2`, or a label)
-  - `date-time`: `%Y%m%d-%H%M%S` (e.g. `20250208-143000`)
+- **File naming**: `task-<date-time>-<status>.md`
+  - `date-time`: `%Y%m%d-%H%M%S` (e.g. `20260222-140215`)
   - **Status** in filename: `open`, `wip`, `finished`, `unsuccessful`, or `paused`
-- **In-file metadata** (optional): `## Assigned: agent_id`, `## Paused until: ISO datetime`, `## Depends: id1, id2`, `## Sub-tasks: id1, id2`
+- **In-file metadata**: `## Assigned: agent_id`, `## Topic: <topic>`, `## Id: <id>` (topic and id are stored in the file, not in the filename); optional `## Paused until: ISO datetime`, `## Depends: id1, id2`, `## Sub-tasks: id1, id2`
 - **Writing**: Ollama uses **TASK_LIST**, **TASK_LIST: all**, **TASK_SHOW**, **TASK_APPEND**, **TASK_STATUS**, **TASK_CREATE**, **TASK_ASSIGN**, **TASK_SLEEP**. Paths must be under `~/.mac-stats/task/`.
 
 ## CLI (test from command line)
@@ -42,14 +40,16 @@ Example: `mac_stats add foo 1 "Hello"` then `mac_stats list`, `mac_stats show 1`
 | **TASK_ASSIGN** | `TASK_ASSIGN: <path or id> <agent_id>` | Reassign task to `scheduler`, `discord`, `cpu`, or `default`. Appends "Reassigned to X." |
 | **TASK_SLEEP** | `TASK_SLEEP: <path or id> until <ISO datetime>` | Set status to `paused` and write `## Paused until: <datetime>`. Review loop will auto-resume after that time. |
 
-- **Path or task id**: Full path under `~/.mac-stats/task/` or a short id; the app resolves the id (prefers `open`, then `wip`).
+- **Path or task id**: Full path under `~/.mac-stats/task/`, the task filename (e.g. `task-20260222-140215-open.md`), or the short id/topic from the file (e.g. `1`, `research`); the app resolves by filename, then by `## Id:` or `## Topic:` in file (prefers `open`, then `wip`).
 - **Assignee**: Every task has an assignee (default `default`). The **review loop** only works on tasks assigned to `scheduler` or `default`. Use TASK_ASSIGN so Discord-assigned tasks are not picked by the background loop.
 - **Discord / natural language**: When a user says "close the task", "finish", "mark done", or "cancel" a task (e.g. in Discord), the agent instructions tell the LLM to reply with **TASK_STATUS: &lt;id&gt; finished** (success) or **TASK_STATUS: &lt;id&gt; unsuccessful** (failed), not `wip`. This is defined in `commands/ollama.rs` in `build_agent_descriptions` so the model reliably closes the task instead of leaving it in progress.
 
 ## Task file format
 
-- **Content**: Free-form Markdown. Optional in-file lines:
+- **Content**: Free-form Markdown. In-file lines:
   - `## Assigned: scheduler` — who owns the task (scheduler, discord, cpu, default).
+  - `## Topic: <topic>` — topic (e.g. research, refactor-api); used for listing and resolve by topic.
+  - `## Id: <id>` — short id (e.g. 1, 2); used for resolve by id.
   - `## Paused until: 2025-02-10T09:00:00` — resume after this time (review loop clears and reopens).
   - `## Depends: id1, id2` — task is only **ready** when all listed tasks are finished or unsuccessful.
   - `## Sub-tasks: id1, id2` — parent cannot be set to `finished` until all sub-tasks are finished or unsuccessful.

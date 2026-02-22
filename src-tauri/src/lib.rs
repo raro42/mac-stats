@@ -28,6 +28,7 @@ mod monitors;
 mod alerts;
 mod plugins;
 mod ollama;
+mod perplexity;
 pub mod discord;
 mod scheduler;
 mod mcp;
@@ -205,6 +206,9 @@ fn run_internal(open_cpu_window: bool) {
             commands::ollama::ollama_chat_with_execution,
             commands::ollama::ollama_chat_continue_with_result,
             commands::ollama::get_default_ollama_system_prompt,
+            // Perplexity Search
+            commands::perplexity::perplexity_search,
+            commands::perplexity::is_perplexity_configured,
             // Browser / fetch for Ollama
             commands::browser::fetch_page,
             // Discord commands

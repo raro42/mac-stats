@@ -215,7 +215,7 @@ impl Config {
     }
 
     /// Task directory for task files: `$HOME/.mac-stats/task/`
-    /// Files: task-<topic>-<id>-<date-time>-<open|wip|finished>.md
+    /// Files: task-<date-time>-<open|wip|finished|unsuccessful>.md (topic and id stored in-file)
     pub fn task_dir() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {
             PathBuf::from(home).join(".mac-stats").join("task")

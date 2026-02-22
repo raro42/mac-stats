@@ -1,5 +1,6 @@
 //! Task files under ~/.mac-stats/task/ with naming:
-//! task-<topic>-<id>-<date-time>-<open|wip|finished|unsuccessful>.md
+//! task-<date-time>-<open|wip|finished|unsuccessful>.md
+//! Topic and id are stored in-file (## Topic:, ## Id:) for listing and resolution.
 
 pub mod cli;
 pub mod review;
@@ -17,14 +18,13 @@ fn is_valid_status(s: &str) -> bool {
     VALID_STATUSES.contains(&s)
 }
 
-/// Build path for a task file under Config::task_dir().
-pub fn task_path(topic: &str, id: &str, datetime: &str, status: &str) -> PathBuf {
-    let filename = format!("task-{}-{}-{}-{}.md", topic, id, datetime, status);
+/// Build path for a task file under Config::task_dir(). Naming: task-<datetime>-<status>.md
+pub fn task_path(datetime: &str, status: &str) -> PathBuf {
+    let filename = format!("task-{}-{}.md", datetime, status);
     Config::task_dir().join(filename)
 }
 
-/// Parse status from filename (segment before .md: open, wip, finished, or unsuccessful).
-/// Returns None if the path does not match the task file naming convention.
+/// Parse status from filename. Stem format: task-<datetime>-<status>, last segment is status.
 pub fn status_from_path(path: &Path) -> Option<String> {
     let name = path.file_name()?.to_str()?;
     let stem = name.strip_suffix(".md")?;
@@ -32,8 +32,6 @@ pub fn status_from_path(path: &Path) -> Option<String> {
         return None;
     }
     let parts: Vec<&str> = stem.split('-').collect();
-    // task-<topic>-<id>-<date>-<time>-<status>  => at least 6 parts (topic could have dashes)
-    // So we need: task, topic..., id, date, time, status. Simplest: last part is status.
     let status = parts.last().copied()?;
     if is_valid_status(status) {
         Some(status.to_string())
@@ -66,21 +64,27 @@ pub fn set_task_status(path: &Path, new_status: &str) -> Result<PathBuf, String>
     Ok(new_path)
 }
 
-/// If a task file already exists with the same topic_slug and id (any status), return its path.
-/// Filename pattern: task-{topic_slug}-{id}-{datetime}-{status}.md.
+/// If a task file already exists with the same topic (slug) and id, return its path.
+/// Reads ## Topic: and ## Id: from each file; supports legacy filenames (task-topic-id-datetime-status) via id_from_path fallback.
 fn existing_task_with_topic_id(topic_slug: &str, id: &str) -> Option<PathBuf> {
     let task_base = Config::task_dir();
-    let prefix = format!("task-{}-{}-", topic_slug, id);
     let entries = fs::read_dir(&task_base).ok()?;
     for entry in entries.flatten() {
         let p = entry.path();
-        if !p.is_file() {
+        if !p.is_file() || status_from_path(&p).is_none() {
             continue;
         }
-        let name = p.file_name().and_then(|n| n.to_str()).unwrap_or("");
-        let stem = name.strip_suffix(".md").unwrap_or(name);
-        if stem.starts_with(&prefix) {
-            return Some(p);
+        if let Ok(Some(ref file_topic)) = get_topic_from_file(&p) {
+            if slug(file_topic) != topic_slug {
+                continue;
+            }
+        } else {
+            continue;
+        }
+        if let Ok(Some(ref file_id)) = get_id_from_file(&p) {
+            if file_id == id {
+                return Some(p);
+            }
         }
     }
     None
@@ -88,7 +92,7 @@ fn existing_task_with_topic_id(topic_slug: &str, id: &str) -> Option<PathBuf> {
 
 /// Create a new task file with status "open". Returns the path.
 /// If a task with the same topic and id already exists, returns an error (avoids duplicate task explosion).
-/// If assigned_to is Some, writes "## Assigned: agent_id" at top; otherwise "## Assigned: default".
+/// Topic and id are sanitized for safe filenames; topic/id that look like existing task filenames are rejected.
 pub fn create_task(
     topic: &str,
     id: &str,
@@ -96,17 +100,31 @@ pub fn create_task(
     assigned_to: Option<&str>,
 ) -> Result<PathBuf, String> {
     let _ = Config::ensure_task_directory();
+    if topic.contains(".md") || (topic.starts_with("task-") && topic.matches('-').count() >= 4) {
+        return Err(
+            "TASK_CREATE topic looks like an existing task filename. Use TASK_APPEND: <filename or id> <content> to add to that task, or use short topic and id (e.g. TASK_CREATE: research 1 <content>).".to_string()
+        );
+    }
     let topic_slug = slug(topic);
-    if let Some(existing) = existing_task_with_topic_id(&topic_slug, id) {
+    let id_safe = sanitize_id(id);
+    if let Some(existing) = existing_task_with_topic_id(&topic_slug, &id_safe) {
         return Err(format!(
             "A task with this topic and id already exists: {:?}. Use TASK_APPEND or TASK_STATUS to update it.",
             existing
         ));
     }
     let datetime = chrono::Local::now().format("%Y%m%d-%H%M%S").to_string();
-    let path = task_path(&topic_slug, id, &datetime, "open");
+    let path = task_path(&datetime, "open");
     let agent = assigned_to.unwrap_or("default").trim();
-    let header = format!("{} {}\n\n", ASSIGNED_HEADER, if agent.is_empty() { "default" } else { agent });
+    let header = format!(
+        "{} {}\n{} {}\n{} {}\n\n",
+        ASSIGNED_HEADER,
+        if agent.is_empty() { "default" } else { agent },
+        TOPIC_HEADER,
+        topic.trim(),
+        ID_HEADER,
+        id_safe
+    );
     let content = format!("{}{}", header, initial_content.trim());
     fs::write(&path, content).map_err(|e| format!("Write task file: {}", e))?;
     info!("Task: created {:?} (topic={}, id={})", path, topic_slug, id);
@@ -124,6 +142,19 @@ pub fn append_to_task(path: &Path, block: &str) -> Result<(), String> {
     Ok(())
 }
 
+/// Append a conversation turn to the task file (## Conversation <timestamp> with User and Assistant).
+/// Use to log the full exchange so the task file is the single record of what was asked and answered.
+pub fn append_conversation_block(path: &Path, user_message: &str, assistant_reply: &str) -> Result<(), String> {
+    let ts = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+    let block = format!(
+        "\n\n## Conversation {}\n\n**User:**\n{}\n\n**Assistant:**\n{}\n",
+        ts,
+        user_message.trim(),
+        assistant_reply.trim()
+    );
+    append_to_task(path, &block)
+}
+
 /// Read full task file content.
 pub fn read_task(path: &Path) -> Result<String, String> {
     let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
@@ -133,6 +164,10 @@ pub fn read_task(path: &Path) -> Result<String, String> {
 
 /// In-file header for assignee. Line format: "## Assigned: agent_id"
 const ASSIGNED_HEADER: &str = "## Assigned:";
+/// In-file header for topic (task-[date]-[status].md does not contain topic in filename).
+const TOPIC_HEADER: &str = "## Topic:";
+/// In-file header for id (task-[date]-[status].md does not contain id in filename).
+const ID_HEADER: &str = "## Id:";
 
 /// Get assignee from task file (first line matching ## Assigned: ...). Default "default".
 pub fn get_assignee(path: &Path) -> Result<String, String> {
@@ -149,6 +184,32 @@ pub fn get_assignee(path: &Path) -> Result<String, String> {
         }
     }
     Ok("default".to_string())
+}
+
+/// Get topic from task file (## Topic: ...). None if missing (e.g. legacy file).
+pub fn get_topic_from_file(path: &Path) -> Result<Option<String>, String> {
+    let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
+    for line in content.lines() {
+        let line = line.trim();
+        if line.starts_with(TOPIC_HEADER) {
+            let t = line[TOPIC_HEADER.len()..].trim();
+            return Ok(Some(if t.is_empty() { "task".to_string() } else { t.to_string() }));
+        }
+    }
+    Ok(None)
+}
+
+/// Get id from task file (## Id: ...). None if missing (e.g. legacy file).
+pub fn get_id_from_file(path: &Path) -> Result<Option<String>, String> {
+    let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
+    for line in content.lines() {
+        let line = line.trim();
+        if line.starts_with(ID_HEADER) {
+            let id = line[ID_HEADER.len()..].trim();
+            return Ok(Some(if id.is_empty() { "1".to_string() } else { id.to_string() }));
+        }
+    }
+    Ok(None)
 }
 
 /// Set assignee in task file (add or replace ## Assigned: line).
@@ -315,9 +376,47 @@ fn slug(topic: &str) -> String {
     }
 }
 
+/// Filename-safe id: strip quotes, slashes, newlines; keep alphanumeric, dash, underscore; limit length.
+fn sanitize_id(id: &str) -> String {
+    let s: String = id
+        .chars()
+        .take(80)
+        .filter(|c| !matches!(c, '"' | '\'' | '/' | '\\' | '\n' | '\r'))
+        .map(|c| if c.is_alphanumeric() || c == '-' || c == '_' { c } else { '_' })
+        .collect();
+    let s = s.trim().trim_matches('_');
+    if s.is_empty() {
+        "1".to_string()
+    } else {
+        s.to_string()
+    }
+}
+
+/// Id for a task: from in-file ## Id: first; for legacy filenames (task-topic-id-datetime-status) falls back to 4th-from-last segment.
+pub fn id_from_path(path: &Path) -> Option<String> {
+    if let Ok(Some(id)) = get_id_from_file(path) {
+        return Some(id);
+    }
+    let stem = path.file_stem()?.to_str()?;
+    let parts: Vec<&str> = stem.split('-').collect();
+    if parts.len() >= 6 {
+        Some(parts[parts.len() - 4].to_string())
+    } else {
+        None
+    }
+}
+
+/// Task file name only (e.g. task-20260222-140215-open.md) for consistent display and references.
+pub fn task_file_name(path: &Path) -> String {
+    path.file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("task.md")
+        .to_string()
+}
+
 /// Resolve path_or_id to a PathBuf under task dir.
-/// If it looks like a path (contains '/' or starts with '~'), expand and validate under task dir.
-/// Otherwise treat as id: list task dir and find a single file whose name contains the id (prefer open/wip).
+/// Accepts: full path (with / or ~), task file name (e.g. task-research-1-20250222-120000-open.md or without .md), or short id (e.g. 1).
+/// Full filename is matched first; then short id by exact id segment; then filename contains.
 pub fn resolve_task_path(path_or_id: &str) -> Result<PathBuf, String> {
     let path_or_id = path_or_id.trim();
     let task_base = Config::task_dir();
@@ -331,32 +430,75 @@ pub fn resolve_task_path(path_or_id: &str) -> Result<PathBuf, String> {
         }
         return Ok(canonical);
     }
-    // Resolve by id: list task dir, find files containing this id
     let entries = fs::read_dir(&task_base).map_err(|e| format!("Read task dir: {}", e))?;
-    let mut candidates: Vec<PathBuf> = entries
+    let all_task_files: Vec<PathBuf> = entries
         .filter_map(|e| e.ok())
         .map(|e| e.path())
         .filter(|p| p.is_file())
-        .filter(|p| {
-            p.file_name()
-                .and_then(|n| n.to_str())
-                .map(|n| n.contains(path_or_id))
-                .unwrap_or(false)
-        })
+        .filter(|p| status_from_path(p).is_some())
         .collect();
+    // 0) Exact task filename match (model often sends full name e.g. task-research-1-20260222-140215-open.md)
+    let by_filename = all_task_files.iter().find(|p| {
+        let name = p.file_name().and_then(|n| n.to_str()).unwrap_or("");
+        let stem = p.file_stem().and_then(|s| s.to_str()).unwrap_or("");
+        name == path_or_id
+            || stem == path_or_id
+            || (!path_or_id.ends_with(".md") && name == format!("{}.md", path_or_id))
+    });
+    if let Some(p) = by_filename {
+        return Ok(p.clone());
+    }
+    // 1) Match by id (from ## Id: in file or legacy filename)
+    let by_id: Vec<PathBuf> = all_task_files
+        .iter()
+        .filter(|p| id_from_path(p).as_deref() == Some(path_or_id))
+        .cloned()
+        .collect();
+    let candidates = if !by_id.is_empty() {
+        by_id
+    } else {
+        // 2) Match by topic (from ## Topic: in file; compare slug or raw)
+        let by_topic: Vec<PathBuf> = all_task_files
+            .iter()
+            .filter(|p| {
+                get_topic_from_file(p)
+                    .ok()
+                    .flatten()
+                    .map(|t| slug(&t) == path_or_id || t == path_or_id)
+                    .unwrap_or(false)
+            })
+            .cloned()
+            .collect();
+        if !by_topic.is_empty() {
+            by_topic
+        } else {
+            // 3) Fallback: filename contains path_or_id
+            all_task_files
+                .into_iter()
+                .filter(|p| {
+                    p.file_name()
+                        .and_then(|n| n.to_str())
+                        .map(|n| n.contains(path_or_id))
+                        .unwrap_or(false)
+                })
+                .collect()
+        }
+    };
     if candidates.is_empty() {
-        return Err(format!("No task file found for id '{}'. Use full path under ~/.mac-stats/task.", path_or_id));
+        return Err(format!(
+            "No task file found for id '{}'. Use task file name or full path under ~/.mac-stats/task.",
+            path_or_id
+        ));
     }
     if candidates.len() > 1 {
-        // Prefer open, then wip
         let order = |s: Option<String>| match s.as_deref() {
             Some("open") => 0,
             Some("wip") => 1,
             _ => 2,
         };
-        candidates.sort_by(|a, b| {
-            order(status_from_path(a)).cmp(&order(status_from_path(b)))
-        });
+        let mut sorted = candidates;
+        sorted.sort_by(|a, b| order(status_from_path(a)).cmp(&order(status_from_path(b))));
+        return Ok(sorted.into_iter().next().unwrap());
     }
     Ok(candidates.into_iter().next().unwrap())
 }
@@ -598,11 +740,11 @@ mod tests {
     #[test]
     fn test_status_from_path() {
         assert_eq!(
-            status_from_path(Path::new("/tmp/task-foo-1-20250208-100000-open.md")),
+            status_from_path(Path::new("task-20260222-140215-open.md")),
             Some("open".to_string())
         );
         assert_eq!(
-            status_from_path(Path::new("task-a-b-20250208-100000-finished.md")),
+            status_from_path(Path::new("/tmp/task-20250208-100000-finished.md")),
             Some("finished".to_string())
         );
         assert_eq!(status_from_path(Path::new("other.md")), None);
@@ -612,5 +754,32 @@ mod tests {
     fn test_slug() {
         assert_eq!(slug("Hello World"), "hello-world");
         assert!(!slug("x").is_empty());
+    }
+
+    #[test]
+    fn test_id_from_path_legacy_filename() {
+        // Legacy format (task-topic-id-datetime-status): id parsed from filename when file doesn't exist
+        assert_eq!(
+            id_from_path(Path::new("task-research-1-20250222-120000-open.md")),
+            Some("1".to_string())
+        );
+        assert_eq!(
+            id_from_path(Path::new("/tmp/task-my-topic-15min-20250222-120000-wip.md")),
+            Some("15min".to_string())
+        );
+    }
+
+    #[test]
+    fn test_id_from_path_no_file() {
+        assert_eq!(id_from_path(Path::new("other.md")), None);
+        assert_eq!(id_from_path(Path::new("task-20260222-140215-open.md")), None);
+    }
+
+    #[test]
+    fn test_task_file_name() {
+        assert_eq!(
+            task_file_name(Path::new("/foo/task-20260222-140215-open.md")),
+            "task-20260222-140215-open.md"
+        );
     }
 }

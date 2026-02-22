@@ -44,19 +44,19 @@ This project was developed through "vibe coding" - building features iteratively
 - Alert system (rules and channels)
 
 ### AI & agents (Ollama)
-- **AI Chat (Ollama)** — Chat about system metrics using a local Ollama instance; supports code execution (JavaScript), context-aware **FETCH_URL**, **BRAVE_SEARCH**, and optional **RUN_CMD** (local commands).
-- **Discord bot** — Optional bot (Gateway) for DMs and @mentions; replies use the full Ollama + tools pipeline; can call the **Discord HTTP API** (list guilds/channels/members, send messages); records user display names for personalized replies.
+- **AI Chat (Ollama)** — Chat about system metrics using a local Ollama instance; supports code execution (JavaScript), context-aware **FETCH_URL**, **BRAVE_SEARCH**, and optional **RUN_CMD** (local commands). **RUN_CMD retry**: when a local command fails, the AI corrects and retries (up to 3 times).
+- **Long-term memory** — Global `~/.mac-stats/agents/memory.md` and per-agent `memory.md`; loaded into every agent’s prompt. **MEMORY_APPEND** tool lets the AI save lessons learned (global or per-agent). Session compaction automatically extracts lessons from long conversations and appends them to memory.
+- **Session compaction** — When conversation history exceeds 8 messages, it is compacted into a short summary; lessons are written to memory. A **30-minute background job** compacts all in-memory sessions into memory, replaces active sessions with the summary, and clears inactive ones (no activity for 30 min). Session files live under `~/.mac-stats/session/`.
+- **Discord bot** — Optional bot (Gateway) for DMs and @mentions. **Channel modes** (`~/.mac-stats/discord_channels.json`): `mention_only` (default), `all_messages`, or **having_fun** (respond to everyone including other bots, with configurable random delays and idle thoughts). Replies use the full Ollama + tools pipeline; can call the **Discord HTTP API** (list guilds/channels/members, send messages). **Having_fun**: time-of-day awareness (e.g. calmer at night), fetches latest channel messages before replying for better flow. Records user display names for personalized replies. CLI: `mac_stats discord send <channel_id> <message>` to post from scripts.
 - **MCP agent** — Use tools from any MCP server (HTTP/SSE or stdio); configure via `MCP_SERVER_URL` or `MCP_SERVER_STDIO`; available in Discord, scheduler, and CPU window chat.
-- **Task agent** — Task files under `~/.mac-stats/task/` with TASK_APPEND, TASK_STATUS, TASK_CREATE; scheduler can run a task loop until finished and optionally post results to a Discord channel.
-- **PYTHON_SCRIPT agent** — Ollama can create and run Python scripts under `~/.mac-stats/scripts/` (disable with `ALLOW_PYTHON_SCRIPT=0`).
+- **Tasks** — Task files under `~/.mac-stats/task/` with **TASK_LIST**, **TASK_SHOW**, **TASK_APPEND**, **TASK_STATUS**, **TASK_CREATE**, **TASK_ASSIGN**, **TASK_SLEEP**. Assignees (scheduler, discord, cpu, default); dependencies; review loop closes stale WIP tasks. Scheduler can run a task until finished and optionally post results to a Discord channel.
 - **Scheduler** — Run tasks on a schedule (`~/.mac-stats/schedules.json`); cron or one-shot; tasks go through Ollama + tools; optional `reply_to_channel_id` to send results to Discord.
+- **PYTHON_SCRIPT agent** — Ollama can create and run Python scripts under `~/.mac-stats/scripts/` (disable with `ALLOW_PYTHON_SCRIPT=0`).
 - **Skills** — Markdown files in `~/.mac-stats/skills/` for different “agent” personalities; optional per-model context and temperature/num_ctx overrides.
+- **LLM agents** — Directory-based agents under `~/.mac-stats/agents/` (orchestrator, general assistant, coder, generalist, Discord expert, etc.); each has its own model (or `model_role`: general/code/small), skill, optional mood and soul, and memory. **AGENT:** tool delegates to a chosen agent. Model catalog auto-resolves roles from installed Ollama models.
+- **Externalized prompts** — System prompts (planning, execution, soul) are editable Markdown under `~/.mac-stats/prompts/` and `~/.mac-stats/agents/soul.md`. Changes take effect immediately without rebuild.
 - **Chat commands** — Type `--cpu` to toggle the CPU window, `-v`/`-vv`/`-vvv` to change log verbosity at runtime.
-- **Session memory** — Discord bot remembers conversation context (last 20 turns per channel); resumes after restart from session files.
-- **Auto-detection** — Ollama model auto-detected at startup from installed models (no hardcoded model names).
-- **LLM agents** — Four default agents ship with the app (orchestrator, general assistant, coder, generalist) under `~/.mac-stats/agents/`; each has its own model, skill, and testing scenarios.
-- **Externalized prompts** — System prompts (planning, execution, soul) are editable Markdown files under `~/.mac-stats/prompts/` and `~/.mac-stats/agents/soul.md`. Changes take effect immediately without rebuild.
-- **RUN_CMD retry** — When a local command fails, the AI automatically corrects and retries (up to 3 times).
+- **Auto-detection** — Ollama model auto-detected at startup from installed models; override with `OLLAMA_MODEL` in env or `~/.mac-stats/.config.env`.
 
 ### UI
 - Menu bar integration
@@ -192,13 +192,17 @@ mac-stats is designed to be extremely efficient:
 - ✅ Battery monitoring with charging status
 - ✅ Website & Social Media Monitoring with uptime tracking
 - ✅ AI Chat (Ollama) with FETCH_URL, BRAVE_SEARCH, RUN_CMD, code execution
-- ✅ Discord bot (Gateway + Discord API tool, user names)
+- ✅ Long-term memory (global + per-agent, MEMORY_APPEND, session compaction → memory)
+- ✅ Session compaction (on-request at 8 msgs + 30-min periodic; clear inactive sessions)
+- ✅ Discord bot (Gateway + Discord API tool, user names, channel modes)
+- ✅ Having_fun mode (configurable delays, time-of-day, fetch latest messages before reply)
+- ✅ Discord send CLI (`mac_stats discord send <channel_id> <message>`)
 - ✅ MCP agent (external MCP server tools)
-- ✅ Task agent (task files, TASK_APPEND/STATUS/CREATE, scheduler task loop)
+- ✅ Task agent (task files, TASK_* tools, assignees, dependencies, scheduler task loop)
 - ✅ PYTHON_SCRIPT agent (run Python scripts from Ollama)
 - ✅ Scheduler (cron/at, optional Discord reply channel)
 - ✅ Skills and per-model context/params
-- ✅ LLM agents with default agents (orchestrator, assistant, coder, generalist)
+- ✅ LLM agents (orchestrator, assistant, coder, generalist, Discord expert; model_role resolution)
 - ✅ Externalized prompts (editable planning, execution, soul files)
 - ✅ RUN_CMD retry with AI-assisted error correction
 - ✅ Status Icon Dashboard with real-time indicators
@@ -236,6 +240,16 @@ mac-stats comes with 9 beautiful, customizable themes:
 #### AI Chat Integration (Ollama)
 
 Chat with AI about your system metrics using a local Ollama instance. Ask questions about your CPU usage, processes, and system health.
+
+**Core chat** — The CPU window and optional Discord bot use the same Ollama + tools pipeline: **FETCH_URL** (fetch web pages server-side, no CORS), **BRAVE_SEARCH**, **RUN_CMD** (allowlisted commands), JavaScript code execution, and **MCP** (tools from any MCP server). The AI can invoke **AGENT:** to delegate to a specialized agent (orchestrator, coder, Discord expert, etc.).
+
+**Memory & session** — Long-term memory is stored in `~/.mac-stats/agents/memory.md` (global) and per-agent `memory.md`. The AI can save lessons with **MEMORY_APPEND**. Long conversations are automatically compacted: after 8 messages, history is summarized and lessons are written to memory; a 30-minute background job does the same for all sessions and clears inactive ones so the session folder stays manageable.
+
+**Discord** — Configure the bot via token (env, `~/.mac-stats/.config.env`, or Keychain). Channel modes in `~/.mac-stats/discord_channels.json`: respond only to @mentions, to every human message, or use **having_fun** for casual channels (configurable random delays, time-of-day awareness, and fetching the latest channel messages before replying for a natural flow). Use `mac_stats discord send <channel_id> <message>` from the CLI to post from scripts.
+
+**Tasks & scheduler** — Create and manage task files under `~/.mac-stats/task/` (TASK_LIST, TASK_CREATE, TASK_STATUS, etc.). The scheduler runs tasks on a cron or one-shot schedule and can post results to a Discord channel. Task review closes stale WIP tasks automatically.
+
+**Agents** — Multiple LLM agents live under `~/.mac-stats/agents/` with their own model, skill, and memory. The orchestrator and others are available via the **AGENT:** tool. Model roles (general, code, small) are resolved from your installed Ollama models at startup.
 
 <img src="screens/feature-ollama-integration.png" alt="Ollama AI Chat Integration" width="600">
 

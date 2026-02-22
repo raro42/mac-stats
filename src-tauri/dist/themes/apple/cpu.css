@@ -1223,6 +1223,70 @@ body {
   /* Hide the entire ollama section when collapsed */
   display: none;
 }
+
+/* Perplexity Search section */
+.perplexity-section.collapsed {
+  display: none;
+}
+.perplexity-config-status {
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: 8px;
+}
+.perplexity-search-box {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.perplexity-search-box input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+}
+.perplexity-search-box button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--hairline);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+.perplexity-search-box button:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+.perplexity-results {
+  max-height: 240px;
+  overflow-y: auto;
+  font-size: 13px;
+}
+.perplexity-result-item {
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  line-height: 1.5;
+}
+.perplexity-result-item a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.perplexity-result-item a:hover {
+  text-decoration: underline;
+}
+.perplexity-result-snippet {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
 .monitors-summary {
   display: flex;
   justify-content: space-between;

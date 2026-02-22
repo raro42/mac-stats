@@ -2,13 +2,13 @@
 
 ## What happened
 
-From `~/.mac-stats/debug.log` (2026-02-19, task `task-casual-Chat-20260219-165058-open.md` created via Discord):
+From `~/.mac-stats/debug.log` (2026-02-19, task created via Discord):
 
 1. **User asked for a casual chat between all agents** (via Discord).
 2. **Plan produced**: `TASK_CREATE: Casual Chat Task 174 "Have a casual chat..." | AGENT: orchestrator`
 3. **Router executes one tool per response.** The first line was `TASK_CREATE`, so the app created the task file and never ran `AGENT: orchestrator`. The chat between agents never happened.
 4. **Model then replied with natural language** (“Great! I've appended the summary…”) instead of outputting `AGENT: orchestrator ...`, so the conversation was never started.
-5. **In later turns the model repeatedly output `TASK_CREATE`** with the same intent (e.g. `TASK_CREATE: Casual Chat between Agents ~/mac-stats/task/casual-chat-agents.md`). Each call created a **new** task file (new timestamp in filename). With up to 15 tool iterations, this produced many duplicate tasks (e.g. multiple `task-casual-Chat-20260219-*-open.md`).
+5. **In later turns the model repeatedly output `TASK_CREATE`** with the same intent (e.g. `TASK_CREATE: Casual Chat between Agents ~/mac-stats/task/casual-chat-agents.md`). Each call created a **new** task file (new timestamp in filename). With up to 15 tool iterations, this produced many duplicate tasks.
 
 ## Root causes
 
@@ -18,9 +18,9 @@ From `~/.mac-stats/debug.log` (2026-02-19, task `task-casual-Chat-20260219-16505
 ## Fixes applied
 
 1. **TASK_CREATE deduplication** (`src-tauri/src/task/mod.rs`):
-   - Before creating a task, we check for an existing file with the same `topic_slug` and `id` (filename prefix `task-{topic_slug}-{id}-`).
+   - Before creating a task, we check for an existing file with the same topic and id by reading `## Topic:` and `## Id:` from each task file under `~/.mac-stats/task/`.
    - If one exists, `create_task` returns an error: *"A task with this topic and id already exists: ... Use TASK_APPEND or TASK_STATUS to update it."*
-   - This stops the loop of creating many identical tasks.
+   - This stops the loop of creating many identical tasks. (Task filenames are now `task-<date-time>-<status>.md`; topic and id are stored in-file.)
 
 2. **Prompt guidance** (`src-tauri/src/commands/ollama.rs`):
    - **Planning**: Added to the planning prompt: *"If the user wants agents to have a conversation or chat together, your plan must start with AGENT: orchestrator (or the appropriate agent) so the conversation actually runs; do not only create a task file (TASK_CREATE)."*

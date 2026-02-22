@@ -22,7 +22,7 @@ use std::sync::RwLock;
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::UNIX_EPOCH;
 use tokio::sync::mpsc;
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, trace};
 use chrono::Timelike;
 
 /// Time-of-day period for having_fun: influences tone (e.g. quieter at night).
@@ -378,11 +378,22 @@ async fn fetch_channel_messages_after(
     out
 }
 
-fn buffer_having_fun_message(channel_id: u64, author_name: String, content: String, is_bot: bool) {
+/// Buffer a message for having_fun. If answer_asap is true (mention or from human), next response is scheduled immediately (next tick).
+fn buffer_having_fun_message(
+    channel_id: u64,
+    author_name: String,
+    content: String,
+    is_bot: bool,
+    answer_asap: bool,
+) {
     if let Ok(mut map) = having_fun_states().lock() {
         let params = get_having_fun_params();
         let state = map.entry(channel_id).or_insert_with(|| {
             let now = std::time::Instant::now();
+            let idle_secs = random_secs_in_range(params.idle_thought_secs_min, params.idle_thought_secs_max);
+            let resp_secs = random_secs_in_range(params.response_delay_secs_min, params.response_delay_secs_max);
+            // Response must fire before idle thought: cap response at idle.
+            let next_response_after_secs = resp_secs.min(idle_secs);
             HavingFunState {
                 buffer: Vec::new(),
                 consecutive_bot_replies: 0,
@@ -390,8 +401,8 @@ fn buffer_having_fun_message(channel_id: u64, author_name: String, content: Stri
                 last_activity: now,
                 last_thought: now,
                 last_response_message_id: None,
-                next_response_after_secs: random_secs_in_range(params.response_delay_secs_min, params.response_delay_secs_max),
-                next_idle_thought_after_secs: random_secs_in_range(params.idle_thought_secs_min, params.idle_thought_secs_max),
+                next_response_after_secs,
+                next_idle_thought_after_secs: idle_secs,
             }
         });
         if !is_bot {
@@ -401,17 +412,71 @@ fn buffer_having_fun_message(channel_id: u64, author_name: String, content: Stri
             debug!("Discord: dropping bot message in having_fun channel {} (loop protection)", channel_id);
             return;
         }
+        if answer_asap {
+            state.next_response_after_secs = 0;
+        }
         state.buffer.push(BufferedMessage { author_name, content, is_bot });
         state.last_activity = std::time::Instant::now();
+        if state.buffer.len() == 1 {
+            let when = chrono::Local::now() + chrono::Duration::seconds(state.next_response_after_secs as i64);
+            info!(
+                "Having fun channel {}: will answer in {}s (around {}){}",
+                channel_id,
+                state.next_response_after_secs,
+                when.format("%H:%M"),
+                if answer_asap { " (ASAP: mention or human)" } else { "" }
+            );
+        }
     }
 }
 
 /// Background loop for having_fun channels: flushes buffered messages after configurable random delay,
 /// posts random thoughts after configurable random idle time. Reloads discord_channels.json when file changes.
+/// Log idle timer heartbeat every this many ticks (tick = 10s → 6 ticks = 1 min).
+const HAVING_FUN_LOG_TICKS: u64 = 6;
+
 async fn having_fun_background_loop(ctx: Context) {
     let mut interval = tokio::time::interval(std::time::Duration::from_secs(HAVING_FUN_TICK_SECS));
+    let mut tick_count: u64 = 0;
     loop {
         interval.tick().await;
+        tick_count = tick_count.wrapping_add(1);
+
+        let (having_fun_count, next_response_in_secs, next_idle_in_secs) = having_fun_states()
+            .lock()
+            .ok()
+            .map(|map| {
+                let n = map.len();
+                let (mut next_resp, mut next_idle) = (None::<u64>, None::<u64>);
+                for state in map.values() {
+                    let resp_elapsed = state.last_response.elapsed().as_secs();
+                    let resp_remaining = state.next_response_after_secs.saturating_sub(resp_elapsed);
+                    next_resp = Some(next_resp.map_or(resp_remaining, |a| a.min(resp_remaining)));
+                    let activity_elapsed = state.last_activity.elapsed().as_secs();
+                    let thought_elapsed = state.last_thought.elapsed().as_secs();
+                    let idle_wait = state.next_idle_thought_after_secs;
+                    let until_activity = idle_wait.saturating_sub(activity_elapsed);
+                    let until_thought = idle_wait.saturating_sub(thought_elapsed);
+                    let idle_remaining = until_activity.max(until_thought);
+                    next_idle = Some(next_idle.map_or(idle_remaining, |a| a.min(idle_remaining)));
+                }
+                (n, next_resp, next_idle)
+            })
+            .unwrap_or((0, None, None));
+        if having_fun_count > 0 {
+            if tick_count % HAVING_FUN_LOG_TICKS == 0 {
+                let resp_str = next_response_in_secs.map(|s| format!("next response in {}s", s)).unwrap_or_default();
+                let idle_str = next_idle_in_secs.map(|s| format!("next idle thought in {}s", s)).unwrap_or_default();
+                let extra = [resp_str, idle_str].into_iter().filter(|x| !x.is_empty()).collect::<Vec<_>>().join(", ");
+                info!(
+                    "Having fun: idle timer ({} channel(s)){}",
+                    having_fun_count,
+                    if extra.is_empty() { String::new() } else { format!(" — {}", extra) }
+                );
+            } else {
+                trace!("Having fun: idle timer tick ({} channel(s))", having_fun_count);
+            }
+        }
 
         reload_channel_config_if_changed();
 
@@ -428,11 +493,21 @@ async fn having_fun_background_loop(ctx: Context) {
                         >= std::time::Duration::from_secs(state.next_response_after_secs)
                 {
                     let after_id = state.last_response_message_id;
+                    let n_msgs = state.buffer.len();
                     flush.push((*channel_id, std::mem::take(&mut state.buffer), after_id));
                     state.last_response = std::time::Instant::now();
                     let params = get_having_fun_params();
-                    state.next_response_after_secs =
-                        random_secs_in_range(params.response_delay_secs_min, params.response_delay_secs_max);
+                    let resp_secs = random_secs_in_range(params.response_delay_secs_min, params.response_delay_secs_max);
+                    // Response must fire before next idle thought.
+                    state.next_response_after_secs = resp_secs.min(state.next_idle_thought_after_secs);
+                    let next_when = chrono::Local::now() + chrono::Duration::seconds(state.next_response_after_secs as i64);
+                    info!(
+                        "Having fun: answering now channel {} ({} msgs), next answer in {}s (around {})",
+                        channel_id,
+                        n_msgs,
+                        state.next_response_after_secs,
+                        next_when.format("%H:%M")
+                    );
                 }
             }
             flush
@@ -491,14 +566,29 @@ async fn having_fun_background_loop(ctx: Context) {
         };
 
         for channel_id in idle_channels {
-            if let Ok(mut map) = having_fun_states().lock() {
+            let next_idle_secs = if let Ok(mut map) = having_fun_states().lock() {
                 if let Some(state) = map.get_mut(&channel_id) {
                     state.last_thought = std::time::Instant::now();
                     state.last_activity = std::time::Instant::now();
                     let params = get_having_fun_params();
-                    state.next_idle_thought_after_secs =
-                        random_secs_in_range(params.idle_thought_secs_min, params.idle_thought_secs_max);
+                    let idle_secs = random_secs_in_range(params.idle_thought_secs_min, params.idle_thought_secs_max);
+                    // Idle thought must fire after next response (so response stays smaller).
+                    state.next_idle_thought_after_secs = idle_secs.max(state.next_response_after_secs);
+                    Some(state.next_idle_thought_after_secs)
+                } else {
+                    None
                 }
+            } else {
+                None
+            };
+            if let Some(secs) = next_idle_secs {
+                let when = chrono::Local::now() + chrono::Duration::seconds(secs as i64);
+                info!(
+                    "Having fun: idle thought now channel {}, next idle thought in {}s (around {})",
+                    channel_id,
+                    secs,
+                    when.format("%H:%M")
+                );
             }
             having_fun_idle_thought(channel_id, &ctx).await;
         }
@@ -906,7 +996,8 @@ impl EventHandler for Handler {
             );
             crate::session_memory::add_message("discord", chan_id, "user",
                 &format!("{}: {}", author_name, content));
-            buffer_having_fun_message(chan_id, author_name, content, is_bot);
+            let answer_asap = mentions_bot || !is_bot;
+            buffer_having_fun_message(chan_id, author_name, content, is_bot, answer_asap);
             return;
         }
 
