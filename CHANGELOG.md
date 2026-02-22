@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Having_fun flow**: Before replying in a having_fun channel, the app fetches the latest messages from Discord (after the bot’s last response) and uses those as context so the conversation stays in sync and flows better. Falls back to the in-memory buffer if the API fetch fails.
+
 ## [0.1.17] - 2026-02-22
 
 ### Added

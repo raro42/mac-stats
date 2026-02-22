@@ -324,6 +324,8 @@ struct HavingFunState {
     last_response: std::time::Instant,
     last_activity: std::time::Instant,
     last_thought: std::time::Instant,
+    /// Discord message ID of our last reply; used to fetch messages after it for better flow.
+    last_response_message_id: Option<u64>,
     /// Next response only after this many seconds since last_response (random in config range).
     next_response_after_secs: u64,
     /// Next idle thought only after this many seconds since last_thought (random in config range).
@@ -334,6 +336,46 @@ static HAVING_FUN_STATES: OnceLock<Mutex<HashMap<u64, HavingFunState>>> = OnceLo
 
 fn having_fun_states() -> &'static Mutex<HashMap<u64, HavingFunState>> {
     HAVING_FUN_STATES.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
+/// Fetch the latest messages from a Discord channel (after our last response) for better flow.
+/// Returns (author_name, content) in chronological order (oldest first). Empty on API error or no messages.
+async fn fetch_channel_messages_after(
+    channel_id: u64,
+    after_message_id: Option<u64>,
+) -> Vec<(String, String)> {
+    let path = match after_message_id {
+        Some(id) => format!("/channels/{}/messages?limit=50&after={}", channel_id, id),
+        None => format!("/channels/{}/messages?limit=25", channel_id),
+    };
+    let body = match crate::discord::api::discord_api_request("GET", &path, None).await {
+        Ok(b) => b,
+        Err(e) => {
+            debug!("Having fun: fetch channel messages failed: {}", e);
+            return Vec::new();
+        }
+    };
+    let arr: Vec<serde_json::Value> = match serde_json::from_str(&body) {
+        Ok(a) => a,
+        Err(_) => return Vec::new(),
+    };
+    // API returns newest first; we want oldest first for conversation order.
+    let mut out: Vec<(String, String)> = Vec::new();
+    for msg in arr.into_iter().rev() {
+        let content = msg.get("content").and_then(|c| c.as_str()).unwrap_or("").to_string();
+        let author = msg
+            .get("author")
+            .and_then(|a| {
+                a.get("global_name")
+                    .and_then(|g| g.as_str())
+                    .filter(|s| !s.is_empty())
+                    .or_else(|| a.get("username").and_then(|u| u.as_str()))
+            })
+            .unwrap_or("?")
+            .to_string();
+        out.push((author, content));
+    }
+    out
 }
 
 fn buffer_having_fun_message(channel_id: u64, author_name: String, content: String, is_bot: bool) {
@@ -347,6 +389,7 @@ fn buffer_having_fun_message(channel_id: u64, author_name: String, content: Stri
                 last_response: now,
                 last_activity: now,
                 last_thought: now,
+                last_response_message_id: None,
                 next_response_after_secs: random_secs_in_range(params.response_delay_secs_min, params.response_delay_secs_max),
                 next_idle_thought_after_secs: random_secs_in_range(params.idle_thought_secs_min, params.idle_thought_secs_max),
             }
@@ -373,7 +416,7 @@ async fn having_fun_background_loop(ctx: Context) {
         reload_channel_config_if_changed();
 
         // --- Phase 1: flush channels with buffered messages ---
-        let channels_to_flush: Vec<(u64, Vec<BufferedMessage>)> = {
+        let channels_to_flush: Vec<(u64, Vec<BufferedMessage>, Option<u64>)> = {
             let mut map = match having_fun_states().lock() {
                 Ok(m) => m,
                 Err(_) => continue,
@@ -384,7 +427,8 @@ async fn having_fun_background_loop(ctx: Context) {
                     && state.last_response.elapsed()
                         >= std::time::Duration::from_secs(state.next_response_after_secs)
                 {
-                    flush.push((*channel_id, std::mem::take(&mut state.buffer)));
+                    let after_id = state.last_response_message_id;
+                    flush.push((*channel_id, std::mem::take(&mut state.buffer), after_id));
                     state.last_response = std::time::Instant::now();
                     let params = get_having_fun_params();
                     state.next_response_after_secs =
@@ -394,9 +438,16 @@ async fn having_fun_background_loop(ctx: Context) {
             flush
         };
 
-        for (channel_id, messages) in channels_to_flush {
+        for (channel_id, messages, after_message_id) in channels_to_flush {
             let had_bot = messages.iter().any(|m| m.is_bot);
-            having_fun_respond(channel_id, messages, &ctx).await;
+            let new_reply_id = having_fun_respond(channel_id, messages, after_message_id, &ctx).await;
+            if let Some(id) = new_reply_id {
+                if let Ok(mut map) = having_fun_states().lock() {
+                    if let Some(state) = map.get_mut(&channel_id) {
+                        state.last_response_message_id = Some(id);
+                    }
+                }
+            }
             if had_bot {
                 if let Ok(mut map) = having_fun_states().lock() {
                     if let Some(state) = map.get_mut(&channel_id) {
@@ -454,9 +505,14 @@ async fn having_fun_background_loop(ctx: Context) {
     }
 }
 
-/// Flush buffered messages: send them as context to Ollama (direct chat, no planning/tools)
-/// and post the reply to the channel.
-async fn having_fun_respond(channel_id: u64, messages: Vec<BufferedMessage>, ctx: &Context) {
+/// Flush buffered messages: fetch latest from channel (after our last response), send as context to Ollama,
+/// and post the reply. Returns the Discord message ID of the reply (last chunk) for next fetch.
+async fn having_fun_respond(
+    channel_id: u64,
+    messages: Vec<BufferedMessage>,
+    after_message_id: Option<u64>,
+    ctx: &Context,
+) -> Option<u64> {
     let chan = channel_settings(channel_id);
     let soul = crate::config::Config::load_soul_content();
 
@@ -483,24 +539,37 @@ async fn having_fun_respond(channel_id: u64, messages: Vec<BufferedMessage>, ctx
         ollama_msgs.push(crate::ollama::ChatMessage { role, content });
     }
 
-    let new_context: String = messages
-        .iter()
-        .map(|m| format!("{}: {}", m.author_name, m.content))
-        .collect::<Vec<_>>()
-        .join("\n");
+    // Retrieve latest messages from Discord (after our last response) for better flow.
+    let latest = fetch_channel_messages_after(channel_id, after_message_id).await;
+    let new_context: String = if latest.is_empty() {
+        messages
+            .iter()
+            .map(|m| format!("{}: {}", m.author_name, m.content))
+            .collect::<Vec<_>>()
+            .join("\n")
+    } else {
+        latest
+            .into_iter()
+            .map(|(author, content)| format!("{}: {}", author, content))
+            .collect::<Vec<_>>()
+            .join("\n")
+    };
+    if new_context.is_empty() {
+        return None;
+    }
     ollama_msgs.push(crate::ollama::ChatMessage {
         role: "user".to_string(),
         content: new_context,
     });
 
     let channel = serenity::model::id::ChannelId::new(channel_id);
-    let _ = channel.broadcast_typing(&ctx).await;
+    let _ = channel.broadcast_typing(ctx).await;
 
     match crate::commands::ollama::send_ollama_chat_messages(ollama_msgs, None, None).await {
         Ok(response) => {
             let reply = response.message.content.trim().to_string();
             if reply.is_empty() {
-                return;
+                return None;
             }
             info!(
                 "Having fun (channel {}): reply ({} chars): {}",
@@ -509,13 +578,18 @@ async fn having_fun_respond(channel_id: u64, messages: Vec<BufferedMessage>, ctx
                 crate::logging::ellipse(&reply, 200)
             );
             let chunks = split_message_for_discord(&reply);
+            let mut last_msg_id: Option<u64> = None;
             for chunk in &chunks {
-                let _ = channel.say(&ctx, chunk).await;
+                if let Ok(msg) = channel.say(ctx, chunk).await {
+                    last_msg_id = Some(msg.id.get());
+                }
             }
             crate::session_memory::add_message("discord", channel_id, "assistant", &reply);
+            last_msg_id
         }
         Err(e) => {
             debug!("Having fun: Ollama failed for channel {}: {}", channel_id, e);
+            None
         }
     }
 }
