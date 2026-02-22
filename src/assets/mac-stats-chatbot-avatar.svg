@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="bubble" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8fafc"/>
+      <stop offset="100%" style="stop-color:#e2e8f0"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="60" fill="url(#bg)"/>
+  <!-- Small chart bars (stats) -->
+  <rect x="44" y="52" width="8" height="20" rx="2" fill="white" opacity="0.95"/>
+  <rect x="56" y="44" width="8" height="28" rx="2" fill="white" opacity="0.95"/>
+  <rect x="68" y="48" width="8" height="24" rx="2" fill="white" opacity="0.95"/>
+  <rect x="80" y="40" width="8" height="32" rx="2" fill="white" opacity="0.95"/>
+  <!-- Speech bubble tip -->
+  <path d="M 64 88 L 58 98 L 70 98 Z" fill="url(#bubble)"/>
+  <!-- Speech bubble body -->
+  <rect x="28" y="56" width="72" height="32" rx="8" fill="url(#bubble)" stroke="#cbd5e1" stroke-width="1"/>
+  <!-- Three dots (chat) -->
+  <circle cx="44" cy="72" r="3" fill="#64748b"/>
+  <circle cx="64" cy="72" r="3" fill="#64748b"/>
+  <circle cx="84" cy="72" r="3" fill="#64748b"/>
+</svg>

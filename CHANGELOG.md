@@ -7,12 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.17] - 2026-02-22
+
 ### Added
 - **Periodic session compaction**: Every 30 minutes a background thread compacts all in-memory sessions (≥ 4 messages) into long-term memory. Lessons are appended to global `memory.md`. Active sessions (activity within 30 min) are replaced with the summary; inactive sessions are cleared after compacting.
 - **Session memory `last_activity` and `list_sessions()`**: Sessions now track last activity time. `list_sessions()` returns all in-memory sessions for the periodic compaction loop.
 - **Having_fun configurable delays**: `discord_channels.json` supports a top-level `having_fun` block with `response_delay_secs_min/max` and `idle_thought_secs_min/max` (seconds). Each response or idle thought uses a random value in that range (e.g. 5–60 min). Default 300–3600. Config is reloaded when the file changes.
 - **Having_fun time-of-day awareness**: The having_fun system prompt now includes current local time and period-aware guidance (night / morning / afternoon / evening) so the bot can behave differently by time of day (e.g. shorter and calmer at night, more energetic in the morning).
 - **Discord channels config upgrade**: If `~/.mac-stats/discord_channels.json` exists but has no `having_fun` block, the app adds the default block on load and writes the file back.
+- **Chatbot avatar assets**: SVG (and optional PNG) avatar icon for mac-stats chatbot in `src/assets/`.
+- **Discord send CLI**: Subcommand `mac_stats discord send <channel_id> <message>` to post a message to a Discord channel (uses bot token from config). Useful for scripts and wrap-up notifications.
 
 ### Changed
 - **Session compaction**: On-request compaction unchanged (≥ 8 messages); periodic compaction uses a lower threshold (4 messages) so more conversations are flushed to long-term memory.

@@ -46,6 +46,20 @@ enum MainCmd {
     /// Agent operations (test with testing.md)
     #[command(subcommand)]
     Agent(AgentCmd),
+    /// Discord: send a message to a channel (uses bot token from config)
+    #[command(subcommand)]
+    Discord(DiscordCmd),
+}
+
+#[derive(clap::Subcommand, Debug)]
+enum DiscordCmd {
+    /// Post a message to a Discord channel. Channel ID from Discord (e.g. right-click channel → Copy ID).
+    Send {
+        #[arg(help = "Discord channel ID (number)")]
+        channel_id: u64,
+        #[arg(help = "Message text to send")]
+        message: String,
+    },
 }
 
 #[derive(clap::Subcommand, Debug)]
@@ -109,6 +123,21 @@ fn main() {
                         .await
                         .map(|_| 0)
                         .unwrap_or_else(|c| c)
+                })
+            }
+            MainCmd::Discord(DiscordCmd::Send { channel_id, message }) => {
+                let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+                rt.block_on(async {
+                    match mac_stats::discord::send_message_to_channel(channel_id, &message).await {
+                        Ok(()) => {
+                            println!("Sent to channel {}", channel_id);
+                            0
+                        }
+                        Err(e) => {
+                            eprintln!("Discord send failed: {}", e);
+                            1
+                        }
+                    }
                 })
             }
         };
