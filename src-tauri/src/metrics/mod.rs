@@ -979,6 +979,61 @@ pub fn get_metrics() -> SystemMetrics {
     metrics
 }
 
+/// Format current system metrics for AI context (Ollama chat, agent router, Discord).
+/// Use when the user may ask about CPU, GPU, RAM, disk, temperature, etc., so the model can answer accurately.
+pub fn format_metrics_for_ai_context() -> String {
+    let m = get_metrics();
+    let c = get_cpu_details();
+    let mut lines: Vec<String> = Vec::new();
+    lines.push(format!(
+        "CPU: {:.1}%, GPU: {:.1}%, RAM: {:.1}%, Disk: {:.1}%",
+        m.cpu, m.gpu, m.ram, m.disk
+    ));
+    if c.can_read_temperature {
+        lines.push(format!("Temperature: {:.1}°C", c.temperature));
+    }
+    if c.can_read_frequency {
+        lines.push(format!(
+            "Frequency: {:.2} GHz (P-core: {:.2}, E-core: {:.2})",
+            c.frequency, c.p_core_frequency, c.e_core_frequency
+        ));
+    }
+    lines.push(format!(
+        "Load (1/5/15 min): {:.1} / {:.1} / {:.1}",
+        c.load_1, c.load_5, c.load_15
+    ));
+    if !c.chip_info.is_empty() {
+        lines.push(format!("Chip: {}", c.chip_info));
+    }
+    if c.has_battery {
+        let charging = if c.is_charging { ", charging" } else { "" };
+        lines.push(format!("Battery: {:.0}%{}", c.battery_level, charging));
+    }
+    if c.can_read_cpu_power || c.can_read_gpu_power {
+        let parts: Vec<String> = [
+            c.can_read_cpu_power.then(|| format!("CPU {:.1} W", c.cpu_power)),
+            c.can_read_gpu_power.then(|| format!("GPU {:.1} W", c.gpu_power)),
+        ]
+        .into_iter()
+        .flatten()
+        .collect();
+        if !parts.is_empty() {
+            lines.push(format!("Power: {}", parts.join(", ")));
+        }
+    }
+    lines.push(format!("Uptime: {} s", c.uptime_secs));
+    if !c.top_processes.is_empty() {
+        let top: Vec<String> = c
+            .top_processes
+            .iter()
+            .take(5)
+            .map(|p| format!("{} ({:.1}%)", p.name, p.cpu))
+            .collect();
+        lines.push(format!("Top processes by CPU: {}", top.join(", ")));
+    }
+    format!("Current system metrics:\n{}", lines.join("\n"))
+}
+
 /// Get application version from Cargo.toml
 /// This is called by the frontend to always display the correct version
 #[tauri::command]

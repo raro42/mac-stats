@@ -16,6 +16,7 @@ Build a polished macOS (Apple Silicon) stats app (Rust + Tauri) that reads CPU/p
 - When coding, create logs and read them afterwards.
 - Execute the app yourself, read the logs, understand if changes are working from the logs - iterate until you are confident the change is good to be test by a human.
 - **ALWAYS check for build errors before starting the app**: Run `cargo check` in `src-tauri/` directory and fix any compilation errors before attempting to start the app.
+- **After changes that affect runtime behavior** (Redmine, tasks, agent prompts, scheduler, Discord, Ollama tools): **restart mac-stats** (e.g. `pkill -x mac_stats; cd src-tauri && cargo run --bin mac_stats -- -vv`) and **test** (run a relevant task, trigger the feature, or check `~/.mac-stats/debug.log`). Do not assume it works without restart and verification.
 - Never install software on the host. Always ask before installing.
 - If you need to install software, use containers.  
 - No "god files": split into `metrics/`, `ffi/`, `ui/bridge/`, `cli/`, `logging/`.
@@ -82,6 +83,10 @@ Build a polished macOS (Apple Silicon) stats app (Rust + Tauri) that reads CPU/p
 - Use `rustfmt` and `clippy` clean builds.
 - Prefer `anyhow` + `thiserror` for error handling.
 - Use `serde` for structured data exchanged with UI.
+
+## Updating ~/.mac-stats from defaults
+- When asked to update MD files or agents inside `.mac-stats`, or to sync repo defaults into `~/.mac-stats`: **merge** default content into existing files; **do not overwrite**.
+- Add missing sections, new agents, or new bullets; preserve the user’s existing content. See `docs/024_mac_stats_merge_defaults.md`.
 
 ## When Uncertain
 - Ask for the exact macOS version and target (Dev vs notarized distribution).

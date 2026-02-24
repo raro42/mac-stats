@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.19] - 2026-02-23
+
+### Added
+- **Redmine search API**: Keyword search for issues via `GET /search.json?q=<keyword>&issues=1&limit=100`. Documented in REDMINE_API tool description and in `docs/025_redmine_api_skill.md`. Use for "search/list tickets about X"; the issues list endpoint has no full-text search param.
+- **Redmine create context**: When Redmine is configured, the app fetches projects, trackers, issue statuses, and priorities from the API, caches them for 5 minutes, and injects the list into the agent description so the model can resolve "Create in AMVARA" (or similar) to the correct `project_id`. See `docs/025_redmine_api_skill.md`.
+- **Default agent macro**: New `default_agent_entry!("id")` macro in config; default agents are built from `DEFAULT_AGENT_IDS` so adding agent-004/005 (or more) is a single line. `Config::tmp_dir()` and `Config::tmp_js_dir()` for runtime scratch paths.
+- **AGENTS.md restart-and-test rule**: After changes that affect runtime behavior (Redmine, tasks, agent prompts, scheduler, Discord, Ollama tools), restart mac-stats and test; do not assume it works without verification.
+- **Merge-defaults doc**: `docs/024_mac_stats_merge_defaults.md` and agents.md section on updating `~/.mac-stats` from defaults (merge, do not overwrite).
+
+### Changed
+- **RUN_CMD logging**: Logs the exact command string (e.g. `RUN_CMD: executing: cat ~/.mac-stats/schedules.json`) and at entry the full argument line for debugging.
+- **cargo default binary**: `default-run = "mac_stats"` in Cargo.toml so `cargo run -- -vv` works without `--bin mac_stats`.
+- **Discord having_fun**: Casual-context constant for having_fun channels; channel config log moved to after having_fun state init; log line includes next response and next idle thought timing when having_fun channels exist.
+- **Orchestrator skill**: REDMINE_API bullet now includes search endpoint and create-context note; task-create-and-assign flow documented for delegated coding tasks; RUN_CMD allowlist in skill.
+
 ## [0.1.18] - 2026-02-22
 
 ### Added

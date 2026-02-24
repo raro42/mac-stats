@@ -28,13 +28,16 @@ pub async fn run_task_until_finished(task_path: PathBuf, max_iterations: u32) ->
     let mut last_reply = String::new();
     for iteration in 0..max_iterations {
         let content = crate::task::read_task(&current_path).map_err(|e| e.clone())?;
+        let assignee = crate::task::get_assignee(&current_path).unwrap_or_else(|_| "default".to_string());
+        let agents = crate::agents::load_agents();
+        let agent_override = crate::agents::find_agent_by_id_or_name(&agents, &assignee).cloned();
         let question = format!(
             "Current task file content:\n\n{}\n\nDecide the next step. Use TASK_APPEND to add feedback and TASK_STATUS to set wip or finished when done. Reply with your action (TASK_APPEND, TASK_STATUS, or a final summary).",
             content
         );
-        info!("Task loop: iteration {}/{} for task '{}'", iteration + 1, max_iterations, task_name);
+        info!("Task loop: iteration {}/{} for task '{}' (assignee: {})", iteration + 1, max_iterations, task_name, assignee);
         last_reply = crate::commands::ollama::answer_with_ollama_and_fetch(
-            &question, None, None, None, None, None, None, None, None, false, None,
+            &question, None, None, None, None, None, None, None, agent_override, false, None,
         )
         .await?;
         if let Some(ref p) = crate::task::find_current_path(&current_path) {

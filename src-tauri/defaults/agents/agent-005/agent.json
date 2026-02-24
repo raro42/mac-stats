@@ -1,0 +1,1 @@
+{"name":"Task Runner","slug":"scheduler","model_role":"general","enabled":true,"description":"Runs task file instructions. Use RUN_CMD for cursor-agent tasks, then TASK_APPEND and TASK_STATUS.","max_tool_iterations":20}

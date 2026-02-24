@@ -18,6 +18,20 @@
 
 use std::path::PathBuf;
 
+/// Build one default-agent entry from an id. Add new agents by creating defaults/agents/agent-<id>/ and adding default_agent_entry!("<id>") to DEFAULT_AGENT_IDS.
+macro_rules! default_agent_entry {
+    ($id:literal) => {
+        (
+            concat!("agent-", $id),
+            &[
+                ("agent.json", include_str!(concat!("../../defaults/agents/agent-", $id, "/agent.json"))),
+                ("skill.md", include_str!(concat!("../../defaults/agents/agent-", $id, "/skill.md"))),
+                ("testing.md", include_str!(concat!("../../defaults/agents/agent-", $id, "/testing.md"))),
+            ] as &[(&str, &str)],
+        )
+    };
+}
+
 /// Configuration manager
 pub struct Config;
 
@@ -296,24 +310,38 @@ impl Config {
         Self::prompts_dir().join("execution_prompt.md")
     }
 
+    /// Temporary directory for runtime files: `$HOME/.mac-stats/tmp/`
+    /// Used for JS execution scratch files, etc. Fallback to system temp if HOME is not set.
+    pub fn tmp_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("tmp")
+        } else {
+            std::env::temp_dir().join("mac-stats-tmp")
+        }
+    }
+
+    /// Subdirectory for JS execution scratch files: `$HOME/.mac-stats/tmp/js/`
+    pub fn tmp_js_dir() -> PathBuf {
+        Self::tmp_dir().join("js")
+    }
+
     // --- Embedded defaults (from src-tauri/defaults/, baked in at compile time) ---
+    // Add a new default agent: create defaults/agents/agent-<id>/ with agent.json, skill.md, testing.md,
+    // then add one line below (default_agent_entry!("<id>")).
 
     pub const DEFAULT_SOUL: &str = include_str!("../../defaults/agents/soul.md");
     const DEFAULT_PLANNING_PROMPT: &str = include_str!("../../defaults/prompts/planning_prompt.md");
     const DEFAULT_EXECUTION_PROMPT: &str = include_str!("../../defaults/prompts/execution_prompt.md");
 
-    const DEFAULT_AGENT_000_JSON: &str = include_str!("../../defaults/agents/agent-000/agent.json");
-    const DEFAULT_AGENT_000_SKILL: &str = include_str!("../../defaults/agents/agent-000/skill.md");
-    const DEFAULT_AGENT_000_TESTING: &str = include_str!("../../defaults/agents/agent-000/testing.md");
-    const DEFAULT_AGENT_001_JSON: &str = include_str!("../../defaults/agents/agent-001/agent.json");
-    const DEFAULT_AGENT_001_SKILL: &str = include_str!("../../defaults/agents/agent-001/skill.md");
-    const DEFAULT_AGENT_001_TESTING: &str = include_str!("../../defaults/agents/agent-001/testing.md");
-    const DEFAULT_AGENT_002_JSON: &str = include_str!("../../defaults/agents/agent-002/agent.json");
-    const DEFAULT_AGENT_002_SKILL: &str = include_str!("../../defaults/agents/agent-002/skill.md");
-    const DEFAULT_AGENT_002_TESTING: &str = include_str!("../../defaults/agents/agent-002/testing.md");
-    const DEFAULT_AGENT_003_JSON: &str = include_str!("../../defaults/agents/agent-003/agent.json");
-    const DEFAULT_AGENT_003_SKILL: &str = include_str!("../../defaults/agents/agent-003/skill.md");
-    const DEFAULT_AGENT_003_TESTING: &str = include_str!("../../defaults/agents/agent-003/testing.md");
+    /// List of default agents. Agents are read in a loop; add new ids here and add the files under defaults/agents/agent-<id>/.
+    const DEFAULT_AGENT_IDS: &[(&str, &[(&str, &str)])] = &[
+        default_agent_entry!("000"),
+        default_agent_entry!("001"),
+        default_agent_entry!("002"),
+        default_agent_entry!("003"),
+        default_agent_entry!("004"),
+        default_agent_entry!("005"),
+    ];
 
     const DEFAULT_DISCORD_CHANNELS: &str = include_str!("../../defaults/discord_channels.json");
 
@@ -328,15 +356,27 @@ impl Config {
         let _ = std::fs::write(path, content);
     }
 
-    /// Ensure all default files exist under ~/.mac-stats/.
-    /// Called once at startup. Never overwrites existing files.
+    /// Write content to path (overwrite). Used to sync skill.md and testing.md from bundled defaults into ~/.mac-stats/agents/.
+    fn write_agent_file(path: &std::path::Path, content: &str) {
+        if let Some(parent) = path.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        let _ = std::fs::write(path, content);
+    }
+
+    /// Ensure all default files exist under ~/.mac-stats/. Shared soul.md is written if missing.
+    /// For each default agent: agent.json is written only if missing; skill.md and testing.md are
+    /// overwritten from the bundled defaults so changes in defaults/ propagate to ~/.mac-stats/agents/.
     pub fn ensure_defaults() {
         let agents = Self::agents_dir();
         let prompts = Self::prompts_dir();
+        let tmp = Self::tmp_dir();
         let _ = std::fs::create_dir_all(&agents);
         let _ = std::fs::create_dir_all(&prompts);
+        let _ = std::fs::create_dir_all(&tmp);
+        let _ = std::fs::create_dir_all(&Self::tmp_js_dir());
 
-        // Soul
+        // Shared soul (personality/tone for all agents when no per-agent soul.md). Read by load_soul_content().
         Self::write_default_if_missing(&agents.join("soul.md"), Self::DEFAULT_SOUL);
 
         // Prompts
@@ -346,34 +386,17 @@ impl Config {
         // Discord channel config
         Self::write_default_if_missing(&Self::discord_channels_path(), Self::DEFAULT_DISCORD_CHANNELS);
 
-        // Agents
-        let agent_defaults: &[(&str, &[(&str, &str)])] = &[
-            ("agent-000", &[
-                ("agent.json", Self::DEFAULT_AGENT_000_JSON),
-                ("skill.md", Self::DEFAULT_AGENT_000_SKILL),
-                ("testing.md", Self::DEFAULT_AGENT_000_TESTING),
-            ]),
-            ("agent-001", &[
-                ("agent.json", Self::DEFAULT_AGENT_001_JSON),
-                ("skill.md", Self::DEFAULT_AGENT_001_SKILL),
-                ("testing.md", Self::DEFAULT_AGENT_001_TESTING),
-            ]),
-            ("agent-002", &[
-                ("agent.json", Self::DEFAULT_AGENT_002_JSON),
-                ("skill.md", Self::DEFAULT_AGENT_002_SKILL),
-                ("testing.md", Self::DEFAULT_AGENT_002_TESTING),
-            ]),
-            ("agent-003", &[
-                ("agent.json", Self::DEFAULT_AGENT_003_JSON),
-                ("skill.md", Self::DEFAULT_AGENT_003_SKILL),
-                ("testing.md", Self::DEFAULT_AGENT_003_TESTING),
-            ]),
-        ];
-        for (dir_name, files) in agent_defaults {
+        // Default agents: loop over DEFAULT_AGENT_IDS. agent.json only if missing; skill.md and testing.md overwritten from bundle.
+        for (dir_name, files) in Self::DEFAULT_AGENT_IDS {
             let dir = agents.join(dir_name);
             let _ = std::fs::create_dir_all(&dir);
             for (file_name, content) in *files {
-                Self::write_default_if_missing(&dir.join(file_name), content);
+                let path = dir.join(file_name);
+                if file_name == &"agent.json" {
+                    Self::write_default_if_missing(&path, content);
+                } else {
+                    Self::write_agent_file(&path, content);
+                }
             }
         }
     }

@@ -22,7 +22,7 @@ use std::sync::RwLock;
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::UNIX_EPOCH;
 use tokio::sync::mpsc;
-use tracing::{debug, error, info, trace};
+use tracing::{debug, error, info};
 use chrono::Timelike;
 
 /// Time-of-day period for having_fun: influences tone (e.g. quieter at night).
@@ -42,6 +42,9 @@ fn time_of_day(hour: u32) -> TimeOfDay {
         _ => TimeOfDay::Evening, // 17..=23
     }
 }
+
+/// Short, fixed context for having_fun channels so the tone stays casual even if soul or channel prompt change.
+const HAVING_FUN_CASUAL_CONTEXT: &str = "This is a casual hangout channel. Be conversational, brief, and human — no corporate or assistant fluff. You can have a nice conversation about life in general.";
 
 /// Returns a short block to inject into having_fun channel prompt: current time + period-aware guidance.
 /// So the model (e.g. Werner) can behave differently at night vs morning/afternoon/evening.
@@ -226,15 +229,6 @@ fn load_channel_config_full() -> (ChannelSettings, HashMap<u64, ChannelSettings>
             channels.insert(id, settings);
         }
     }
-    info!(
-        "Discord channels config: default={:?}, {} channel overrides, having_fun delay {:?}–{:?}s idle {:?}–{:?}s",
-        default_settings.mode,
-        channels.len(),
-        having_fun.response_delay_secs_min,
-        having_fun.response_delay_secs_max,
-        having_fun.idle_thought_secs_min,
-        having_fun.idle_thought_secs_max
-    );
     (default_settings, channels, having_fun)
 }
 
@@ -247,7 +241,62 @@ fn ensure_channel_config_loaded() {
     if guard.is_none() {
         let mtime = discord_channels_file_mtime();
         let (default, channels, having_fun) = load_channel_config_full();
-        *guard = Some((mtime, default, channels, having_fun));
+        *guard = Some((mtime, default.clone(), channels.clone(), having_fun.clone()));
+        drop(guard);
+
+        let having_fun_count = channels.values().filter(|s| s.mode == ChannelMode::HavingFun).count();
+        let timer_suffix = if having_fun_count > 0 {
+            ensure_having_fun_state_for_configured_channels();
+            let (next_resp, next_idle) = having_fun_states()
+                .lock()
+                .ok()
+                .map(|map| {
+                    let (mut next_resp, mut next_idle) = (None::<u64>, None::<u64>);
+                    for state in map.values() {
+                        if !state.buffer.is_empty() {
+                            let resp_elapsed = state.last_response.elapsed().as_secs();
+                            let resp_remaining =
+                                state.next_response_after_secs.saturating_sub(resp_elapsed);
+                            next_resp =
+                                Some(next_resp.map_or(resp_remaining, |a| a.min(resp_remaining)));
+                        }
+                        let activity_elapsed = state.last_activity.elapsed().as_secs();
+                        let thought_elapsed = state.last_thought.elapsed().as_secs();
+                        let idle_wait = state.next_idle_thought_after_secs;
+                        let until_activity = idle_wait.saturating_sub(activity_elapsed);
+                        let until_thought = idle_wait.saturating_sub(thought_elapsed);
+                        let idle_remaining = until_activity.max(until_thought);
+                        next_idle =
+                            Some(next_idle.map_or(idle_remaining, |a| a.min(idle_remaining)));
+                    }
+                    (next_resp, next_idle)
+                })
+                .unwrap_or((None, None));
+            let resp_str = next_resp
+                .map(|s| format!("next response in {}", format_secs_min_sec(s)))
+                .unwrap_or_else(|| "next response: (no pending)".to_string());
+            let idle_str = next_idle
+                .map(|s| format!("next idle thought in {}", format_secs_min_sec(s)))
+                .unwrap_or_default();
+            let suffix = if idle_str.is_empty() {
+                format!(" — {}", resp_str)
+            } else {
+                format!(" — {}, {}", resp_str, idle_str)
+            };
+            suffix
+        } else {
+            String::new()
+        };
+        info!(
+            "Discord channels config: default={:?}, {} channel overrides, having_fun delay {:?}–{:?}s idle {:?}–{:?}s{}",
+            default.mode,
+            channels.len(),
+            having_fun.response_delay_secs_min,
+            having_fun.response_delay_secs_max,
+            having_fun.idle_thought_secs_min,
+            having_fun.idle_thought_secs_max,
+            timer_suffix
+        );
     }
 }
 
@@ -288,6 +337,83 @@ fn get_having_fun_params() -> HavingFunParams {
         Err(_) => return HavingFunParams::default(),
     };
     guard.as_ref().map(|(_, _, _, p)| p.clone()).unwrap_or_default()
+}
+
+/// Number of channels configured as having_fun in discord_channels.json. Used for heartbeat logging.
+fn count_configured_having_fun_channels() -> usize {
+    ensure_channel_config_loaded();
+    let guard = match CHANNEL_CONFIG.read() {
+        Ok(g) => g,
+        Err(_) => return 0,
+    };
+    guard
+        .as_ref()
+        .map(|(_, _, overrides, _)| overrides.values().filter(|s| s.mode == ChannelMode::HavingFun).count())
+        .unwrap_or(0)
+}
+
+/// Channel IDs configured as having_fun. Used to ensure state exists so we can show next response/idle countdown.
+fn configured_having_fun_channel_ids() -> Vec<u64> {
+    ensure_channel_config_loaded();
+    let guard = match CHANNEL_CONFIG.read() {
+        Ok(g) => g,
+        Err(_) => return Vec::new(),
+    };
+    guard
+        .as_ref()
+        .map(|(_, _, overrides, _)| {
+            overrides
+                .iter()
+                .filter(|(_, s)| s.mode == ChannelMode::HavingFun)
+                .map(|(id, _)| *id)
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_default()
+}
+
+/// Ensure every configured having_fun channel has state so idle thoughts can run and heartbeat shows countdown.
+fn ensure_having_fun_state_for_configured_channels() {
+    let channel_ids = configured_having_fun_channel_ids();
+    if channel_ids.is_empty() {
+        return;
+    }
+    let params = get_having_fun_params();
+    if let Ok(mut map) = having_fun_states().lock() {
+        for channel_id in channel_ids {
+            map.entry(channel_id).or_insert_with(|| {
+                let now = std::time::Instant::now();
+                let idle_secs = random_secs_in_range(params.idle_thought_secs_min, params.idle_thought_secs_max);
+                let resp_secs = random_secs_in_range(params.response_delay_secs_min, params.response_delay_secs_max);
+                let next_response_after_secs = resp_secs.min(idle_secs);
+                HavingFunState {
+                    buffer: Vec::new(),
+                    consecutive_bot_replies: 0,
+                    last_response: now,
+                    last_activity: now,
+                    last_thought: now,
+                    last_response_message_id: None,
+                    next_response_after_secs,
+                    next_idle_thought_after_secs: idle_secs,
+                }
+            });
+        }
+    }
+}
+
+/// Format seconds as "X minutes, Y sec" for readability (e.g. 785 -> "13 minutes, 5 sec", 45 -> "45 sec").
+fn format_secs_min_sec(secs: u64) -> String {
+    if secs < 60 {
+        format!("{} sec", secs)
+    } else {
+        let m = secs / 60;
+        let s = secs % 60;
+        let min_label = if m == 1 { "minute" } else { "minutes" };
+        if s == 0 {
+            format!("{} {}", m, min_label)
+        } else {
+            format!("{} {}, {} sec", m, min_label, s)
+        }
+    }
 }
 
 /// Random seconds in [min, max] (inclusive) using system time for variety. Clamps so min <= max.
@@ -417,12 +543,14 @@ fn buffer_having_fun_message(
         }
         state.buffer.push(BufferedMessage { author_name, content, is_bot });
         state.last_activity = std::time::Instant::now();
+        // Reset idle clock so response always fires before idle (no message = idle kicks in).
+        state.last_thought = std::time::Instant::now();
         if state.buffer.len() == 1 {
             let when = chrono::Local::now() + chrono::Duration::seconds(state.next_response_after_secs as i64);
             info!(
-                "Having fun channel {}: will answer in {}s (around {}){}",
+                "Having fun channel {}: will answer in {} (around {}){}",
                 channel_id,
-                state.next_response_after_secs,
+                format_secs_min_sec(state.next_response_after_secs),
                 when.format("%H:%M"),
                 if answer_asap { " (ASAP: mention or human)" } else { "" }
             );
@@ -442,6 +570,10 @@ async fn having_fun_background_loop(ctx: Context) {
         interval.tick().await;
         tick_count = tick_count.wrapping_add(1);
 
+        ensure_having_fun_state_for_configured_channels();
+
+        // Response timer must always be lower than idle: for channels with buffered messages,
+        // only count idle if it's after the response (so we never show "idle in 59s, response in 605s").
         let (having_fun_count, next_response_in_secs, next_idle_in_secs) = having_fun_states()
             .lock()
             .ok()
@@ -449,32 +581,55 @@ async fn having_fun_background_loop(ctx: Context) {
                 let n = map.len();
                 let (mut next_resp, mut next_idle) = (None::<u64>, None::<u64>);
                 for state in map.values() {
-                    let resp_elapsed = state.last_response.elapsed().as_secs();
-                    let resp_remaining = state.next_response_after_secs.saturating_sub(resp_elapsed);
-                    next_resp = Some(next_resp.map_or(resp_remaining, |a| a.min(resp_remaining)));
+                    let resp_remaining = if !state.buffer.is_empty() {
+                        let resp_elapsed = state.last_response.elapsed().as_secs();
+                        Some(state.next_response_after_secs.saturating_sub(resp_elapsed))
+                    } else {
+                        None
+                    };
+                    if let Some(rr) = resp_remaining {
+                        next_resp = Some(next_resp.map_or(rr, |a| a.min(rr)));
+                    }
                     let activity_elapsed = state.last_activity.elapsed().as_secs();
                     let thought_elapsed = state.last_thought.elapsed().as_secs();
                     let idle_wait = state.next_idle_thought_after_secs;
                     let until_activity = idle_wait.saturating_sub(activity_elapsed);
                     let until_thought = idle_wait.saturating_sub(thought_elapsed);
-                    let idle_remaining = until_activity.max(until_thought);
+                    let mut idle_remaining = until_activity.max(until_thought);
+                    // If we have buffered messages, idle must not be before response: show idle only when >= response.
+                    if !state.buffer.is_empty() {
+                        if let Some(rr) = resp_remaining {
+                            if idle_remaining < rr {
+                                idle_remaining = rr;
+                            }
+                        }
+                    }
                     next_idle = Some(next_idle.map_or(idle_remaining, |a| a.min(idle_remaining)));
                 }
                 (n, next_resp, next_idle)
             })
             .unwrap_or((0, None, None));
-        if having_fun_count > 0 {
-            if tick_count % HAVING_FUN_LOG_TICKS == 0 {
-                let resp_str = next_response_in_secs.map(|s| format!("next response in {}s", s)).unwrap_or_default();
-                let idle_str = next_idle_in_secs.map(|s| format!("next idle thought in {}s", s)).unwrap_or_default();
-                let extra = [resp_str, idle_str].into_iter().filter(|x| !x.is_empty()).collect::<Vec<_>>().join(", ");
-                info!(
-                    "Having fun: idle timer ({} channel(s)){}",
-                    having_fun_count,
-                    if extra.is_empty() { String::new() } else { format!(" — {}", extra) }
-                );
-            } else {
-                trace!("Having fun: idle timer tick ({} channel(s))", having_fun_count);
+
+        // At least once a minute: log heartbeat when any having_fun channel is configured
+        if tick_count % HAVING_FUN_LOG_TICKS == 0 {
+            let configured = count_configured_having_fun_channels();
+            if configured > 0 {
+                if having_fun_count > 0 {
+                    let resp_str = next_response_in_secs.map(|s| format!("next response in {}", format_secs_min_sec(s))).unwrap_or_default();
+                    let idle_str = next_idle_in_secs.map(|s| format!("next idle thought in {}", format_secs_min_sec(s))).unwrap_or_default();
+                    let extra = [resp_str, idle_str].into_iter().filter(|x| !x.is_empty()).collect::<Vec<_>>().join(", ");
+                    info!(
+                        "Having fun: {} channel(s) configured, {} with state — {}",
+                        configured,
+                        having_fun_count,
+                        if extra.is_empty() { "no pending response or idle".to_string() } else { extra }
+                    );
+                } else {
+                    info!(
+                        "Having fun: {} channel(s) configured; no buffered messages yet. Next heartbeat in 60s.",
+                        configured
+                    );
+                }
             }
         }
 
@@ -502,10 +657,10 @@ async fn having_fun_background_loop(ctx: Context) {
                     state.next_response_after_secs = resp_secs.min(state.next_idle_thought_after_secs);
                     let next_when = chrono::Local::now() + chrono::Duration::seconds(state.next_response_after_secs as i64);
                     info!(
-                        "Having fun: answering now channel {} ({} msgs), next answer in {}s (around {})",
+                        "Having fun: answering now channel {} ({} msgs), next answer in {} (around {})",
                         channel_id,
                         n_msgs,
-                        state.next_response_after_secs,
+                        format_secs_min_sec(state.next_response_after_secs),
                         next_when.format("%H:%M")
                     );
                 }
@@ -584,9 +739,9 @@ async fn having_fun_background_loop(ctx: Context) {
             if let Some(secs) = next_idle_secs {
                 let when = chrono::Local::now() + chrono::Duration::seconds(secs as i64);
                 info!(
-                    "Having fun: idle thought now channel {}, next idle thought in {}s (around {})",
+                    "Having fun: idle thought now channel {}, next idle thought in {} (around {})",
                     channel_id,
-                    secs,
+                    format_secs_min_sec(secs),
                     when.format("%H:%M")
                 );
             }
@@ -612,13 +767,18 @@ async fn having_fun_respond(
     }
 
     let mut ollama_msgs: Vec<crate::ollama::ChatMessage> = Vec::new();
-    let mut system = soul;
+    let mut system = String::new();
+    system.push_str(HAVING_FUN_CASUAL_CONTEXT);
+    system.push_str("\n\n");
+    system.push_str(&soul);
     if let Some(ref prompt) = chan.prompt {
         system.push_str("\n\n");
         system.push_str(prompt);
     }
     system.push_str("\n\n");
     system.push_str(&time_awareness_for_having_fun());
+    system.push_str("\n\n");
+    system.push_str(&crate::metrics::format_metrics_for_ai_context());
     ollama_msgs.push(crate::ollama::ChatMessage {
         role: "system".to_string(),
         content: system,
@@ -695,13 +855,18 @@ async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
     }
 
     let mut ollama_msgs: Vec<crate::ollama::ChatMessage> = Vec::new();
-    let mut system = soul;
+    let mut system = String::new();
+    system.push_str(HAVING_FUN_CASUAL_CONTEXT);
+    system.push_str("\n\n");
+    system.push_str(&soul);
     if let Some(ref prompt) = chan.prompt {
         system.push_str("\n\n");
         system.push_str(prompt);
     }
     system.push_str("\n\n");
     system.push_str(&time_awareness_for_having_fun());
+    system.push_str("\n\n");
+    system.push_str(&crate::metrics::format_metrics_for_ai_context());
     ollama_msgs.push(crate::ollama::ChatMessage {
         role: "system".to_string(),
         content: system,

@@ -1,7 +1,1 @@
-{
-  "name": "Orchestrator",
-  "slug": "orchestrator",
-  "model_role": "general",
-  "orchestrator": true,
-  "enabled": true
-}
+{"name":"Orchestrator","slug":"orchestrator","model_role":"small","orchestrator":true,"enabled":true}

@@ -573,10 +573,11 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
     }
     if crate::commands::run_cmd::is_local_cmd_allowed() {
         base.push_str(&format_run_cmd_description(num));
+        base.push_str(" When the user asks you to run a command, organize files, or use cursor-agent, use RUN_CMD or CURSOR_AGENT (if listed below); do not refuse by saying you cannot run external commands.");
         num += 1;
     }
     base.push_str(&format!(
-        "\n\n{}. **TASK** (task files under ~/.mac-stats/task/): Use when working on a task file or when the user asks for tasks. When the user wants agents to chat or have a conversation, invoke AGENT: orchestrator (or the right agent) so the conversation runs; do not only create a task. TASK_LIST: default is open and WIP only (reply: TASK_LIST or TASK_LIST: ). TASK_LIST: all — list all tasks grouped by status (reply: TASK_LIST: all when the user asks for all tasks). TASK_SHOW: <path or id> — show that task's content and status to the user. TASK_APPEND: append feedback (reply: TASK_APPEND: <path or task id> <content>). TASK_STATUS: set status (reply: TASK_STATUS: <path or task id> wip|finished|unsuccessful). When the user says \"close the task\", \"finish\", \"mark done\", or \"cancel\" a task, reply TASK_STATUS: <path or id> finished or unsuccessful. TASK_CREATE: create a new task (reply: TASK_CREATE: <topic> <id> <initial content>). Put the **full** user request into the initial content, including duration (e.g. \"research for 15 minutes\"), scope, and topic — the whole content is stored. If a task with that topic and id already exists, use TASK_APPEND or TASK_STATUS instead. For TASK_APPEND/TASK_STATUS use the task file name (e.g. task-20250222-120000-open) or the short id or topic (e.g. 1, research). TASK_ASSIGN: <path or id> <agent_id>. Paths must be under ~/.mac-stats/task.",
+        "\n\n{}. **TASK** (task files under ~/.mac-stats/task/): Use when working on a task file or when the user asks for tasks. When the user wants agents to chat or have a conversation, invoke AGENT: orchestrator (or the right agent) so the conversation runs; do not only create a task. TASK_LIST: default is open and WIP only (reply: TASK_LIST or TASK_LIST: ). TASK_LIST: all — list all tasks grouped by status (reply: TASK_LIST: all when the user asks for all tasks). TASK_SHOW: <path or id> — show that task's content and status to the user. TASK_APPEND: append feedback (reply: TASK_APPEND: <path or task id> <content>). TASK_STATUS: set status (reply: TASK_STATUS: <path or task id> wip|finished|unsuccessful). When the user says \"close the task\", \"finish\", \"mark done\", or \"cancel\" a task, reply TASK_STATUS: <path or id> finished or unsuccessful. TASK_CREATE: create a new task (reply: TASK_CREATE: <topic> <id> <initial content>). Put the **full** user request into the initial content, including duration (e.g. \"research for 15 minutes\"), scope, and topic — the whole content is stored. For cursor-agent tasks follow your skill (section Cursor-agent tasks). If a task with that topic and id already exists, use TASK_APPEND or TASK_STATUS instead. For TASK_APPEND/TASK_STATUS use the task file name (e.g. task-20250222-120000-open) or the short id or topic (e.g. 1, research). TASK_ASSIGN: <path or id> <agent_id> — use scheduler, discord, cpu, or default (CURSOR_AGENT is normalized to scheduler). Paths must be under ~/.mac-stats/task.",
         num
     ));
     num += 1;
@@ -585,6 +586,13 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
         num
     ));
     num += 1;
+    if crate::commands::perplexity::is_perplexity_configured().unwrap_or(false) {
+        base.push_str(&format!(
+            "\n\n{}. **PERPLEXITY_SEARCH**: Web search via Perplexity API. Use for: current info, facts, recent events, multi-source answers. To invoke: reply with exactly one line: PERPLEXITY_SEARCH: <search query>. The app returns search results with snippets and URLs.",
+            num
+        ));
+        num += 1;
+    }
     if crate::commands::python_agent::is_python_script_allowed() {
         base.push_str(&format!(
             "\n\n{}. **PYTHON_SCRIPT**: Run Python code. Reply with exactly one line: PYTHON_SCRIPT: <id> <topic>, then put the Python code on the following lines or inside a ```python ... ``` block. The app writes ~/.mac-stats/scripts/python-script-<id>-<topic>.py, runs it with python3, and returns stdout (or error). Use for data processing, calculations, or local scripts.",
@@ -602,16 +610,20 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
     }
     if crate::commands::cursor_agent::is_cursor_agent_available() {
         base.push_str(&format!(
-            "\n\n{}. **CURSOR_AGENT** (Cursor AI coding agent): Delegate coding tasks to the Cursor Agent CLI (an AI pair-programmer with full codebase access). Use when the user asks to write code, refactor, fix bugs, create files, or make changes in a project. The agent has access to read/write files and run shell commands in the configured workspace. To invoke: reply with exactly one line: CURSOR_AGENT: <detailed prompt describing the coding task>. The result (what cursor-agent did and its output) is returned. This is a powerful tool — use it for complex coding tasks that benefit from full codebase context.",
+            "\n\n{}. **CURSOR_AGENT** (Cursor AI coding agent): Delegate coding tasks to the Cursor Agent CLI (an AI pair-programmer with full codebase access). Use when the user asks to write code, refactor, fix bugs, create files, organize a folder, or make changes in a project. To invoke: reply with exactly one line: CURSOR_AGENT: <detailed prompt describing the task>. The result (what cursor-agent did and its output) is returned. You have access to this tool — use it when the user asks to run cursor-agent or to organize/code something; do not say you cannot run external commands.",
             num
         ));
         num += 1;
     }
     if crate::redmine::is_configured() {
         base.push_str(&format!(
-            "\n\n{}. **REDMINE_API** (Redmine project management): Access Redmine issues, projects, and time entries via REST API. Use when the user asks to review a ticket, list issues, check project status, or look up issue details. To invoke: reply with exactly one line: REDMINE_API: GET /issues/1234.json?include=journals,attachments (fetch issue with full history). Key endpoints:\n- GET /issues/{{id}}.json?include=journals,attachments — full issue with comments and files\n- GET /issues.json?assigned_to_id=me&status_id=open — my open issues\n- GET /issues.json?project_id=ID&status_id=open&limit=25 — project issues\n- GET /projects.json — list projects\n- PUT /issues/{{id}}.json — update issue (add notes: {{\"issue\":{{\"notes\":\"comment\"}}}})\nAlways use .json suffix. When reviewing a ticket, fetch with include=journals,attachments to get the full picture.",
+            "\n\n{}. **REDMINE_API** (Redmine project management): Access Redmine issues, projects, and time entries via REST API. Use when the user asks to review a ticket, list issues, check project status, or look up issue details. To invoke: reply with exactly one line: REDMINE_API: GET /issues/1234.json?include=journals,attachments (fetch issue with full history). Key endpoints:\n- GET /issues/{{id}}.json?include=journals,attachments — full issue with comments and files\n- GET /issues.json?assigned_to_id=me&status_id=open — my open issues\n- GET /issues.json?project_id=ID&status_id=open&limit=25 — project issues\n- GET /projects.json — list projects\n- GET /search.json?q=<keyword>&issues=1&limit=100 — search issues by keyword (subject, description, journals). Use when the user asks to search or list tickets by topic (e.g. \"datadog\", \"monitoring\"); always call this for keyword search. Do not use GET /issues.json with a search param (issues list has no full-text search).\n- POST /issues.json — create issue: use project_id, tracker_id, status_id, priority_id, is_private false, subject, description (optional assigned_to_id). Match project by name or identifier from context below (e.g. \"Create in AMVARA\" → use that project's id). Example: REDMINE_API: POST /issues.json {{\"issue\":{{\"project_id\":2,\"tracker_id\":1,\"status_id\":1,\"priority_id\":2,\"is_private\":false,\"subject\":\"Title\",\"description\":\"\"}}}}.\n- PUT /issues/{{id}}.json — update issue (add notes: {{\"issue\":{{\"notes\":\"comment\"}}}})\nAlways use .json suffix. When reviewing a ticket, fetch with include=journals,attachments to get the full picture.",
             num
         ));
+        if let Some(ctx) = crate::redmine::get_redmine_create_context().await {
+            base.push_str("\n\n");
+            base.push_str(&ctx);
+        }
         num += 1;
     }
     if get_mastodon_config().is_some() {
@@ -1417,7 +1429,10 @@ pub async fn answer_with_ollama_and_fetch(
             Some(rec)
         } else if crate::redmine::is_configured() {
             let ticket_id = extract_ticket_id(&q_lower);
-            if ticket_id.is_some() && (q_lower.contains("ticket") || q_lower.contains("issue") || q_lower.contains("redmine")) {
+            let wants_update = q_lower.contains("update") || q_lower.contains("add comment")
+                || q_lower.contains("with the next steps") || q_lower.contains("post a comment")
+                || q_lower.contains("write ") || q_lower.contains("put ");
+            if ticket_id.is_some() && (q_lower.contains("ticket") || q_lower.contains("issue") || q_lower.contains("redmine")) && !wants_update {
                 let id = ticket_id.unwrap();
                 let rec = format!("REDMINE_API: GET /issues/{}.json?include=journals,attachments", id);
                 info!("Agent router: pre-routed to REDMINE_API for ticket #{}", id);
@@ -1431,7 +1446,10 @@ pub async fn answer_with_ollama_and_fetch(
     } else if crate::redmine::is_configured() {
         let q_lower = question.to_lowercase();
         let ticket_id = extract_ticket_id(&q_lower);
-        if ticket_id.is_some() && (q_lower.contains("ticket") || q_lower.contains("issue") || q_lower.contains("redmine")) {
+        let wants_update = q_lower.contains("update") || q_lower.contains("add comment")
+            || q_lower.contains("with the next steps") || q_lower.contains("post a comment")
+            || q_lower.contains("write ") || q_lower.contains("put ");
+        if ticket_id.is_some() && (q_lower.contains("ticket") || q_lower.contains("issue") || q_lower.contains("redmine")) && !wants_update {
             let id = ticket_id.unwrap();
             let rec = format!("REDMINE_API: GET /issues/{}.json?include=journals,attachments", id);
             info!("Agent router: pre-routed to REDMINE_API for ticket #{}", id);
@@ -1522,6 +1540,10 @@ pub async fn answer_with_ollama_and_fetch(
         }
     };
 
+    // Include current system metrics so the model can answer accurately when the user asks about CPU, RAM, disk, etc.
+    let metrics_block = crate::metrics::format_metrics_for_ai_context();
+    let metrics_for_system = format!("\n\n{}", metrics_block);
+
     // Fast path: if the recommendation already contains a parseable tool call, execute it
     // directly instead of asking Ollama a second time to regurgitate the same tool line.
     let direct_tool = parse_tool_from_response(&recommendation);
@@ -1529,12 +1551,12 @@ pub async fn answer_with_ollama_and_fetch(
         info!("Agent router: plan contains direct tool call {}:{} — skipping execution Ollama call", tool, crate::logging::ellipse(arg, 60));
         let execution_system_content = match &skill_content {
             Some(skill) => format!(
-                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}",
-                discord_user_context, skill, execution_prompt
+                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}",
+                discord_user_context, skill, execution_prompt, metrics_for_system
             ),
             None => format!(
-                "{}{}{}",
-                router_soul, discord_user_context, execution_prompt
+                "{}{}{}{}",
+                router_soul, discord_user_context, execution_prompt, metrics_for_system
             ),
         };
         let mut msgs: Vec<crate::ollama::ChatMessage> = vec![
@@ -1552,12 +1574,12 @@ pub async fn answer_with_ollama_and_fetch(
         info!("Agent router: execution step — sending plan + question, starting tool loop (max {} tools)", max_tool_iterations);
         let execution_system_content = match &skill_content {
             Some(skill) => format!(
-                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}\n\nYour plan: {}",
-                discord_user_context, skill, execution_prompt, recommendation
+                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}\n\nYour plan: {}",
+                discord_user_context, skill, execution_prompt, metrics_for_system, recommendation
             ),
             None => format!(
-                "{}{}{}\n\nYour plan: {}",
-                router_soul, discord_user_context, execution_prompt, recommendation
+                "{}{}{}{}\n\nYour plan: {}",
+                router_soul, discord_user_context, execution_prompt, metrics_for_system, recommendation
             ),
         };
         let mut msgs: Vec<crate::ollama::ChatMessage> = vec![
@@ -1591,6 +1613,10 @@ pub async fn answer_with_ollama_and_fetch(
     let mut agent_conversation: Vec<(String, String)> = Vec::new();
     // Dedupe repeated identical DISCORD_API calls so the model can't loop on the same request.
     let mut last_successful_discord_call: Option<(String, String)> = None;
+    // Dedupe repeated identical RUN_CMD so the model can't loop (e.g. task says run once then TASK_APPEND/TASK_STATUS).
+    let mut last_run_cmd_arg: Option<String> = None;
+    // When the model does TASK_APPEND right after RUN_CMD, use this so the task file gets the full command output (not a summary).
+    let mut last_run_cmd_raw_output: Option<String> = None;
     // Track the task file we're working on so we can append the full conversation at the end.
     let mut current_task_path: Option<std::path::PathBuf> = None;
 
@@ -1687,6 +1713,34 @@ pub async fn answer_with_ollama_and_fetch(
                         Err(e) => format!("Brave Search failed: {}. Answer without search results.", e),
                     },
                     None => "Brave Search is not configured (no BRAVE_API_KEY in env or .config.env). Answer without search results.".to_string(),
+                }
+            }
+            "PERPLEXITY_SEARCH" => {
+                send_status("Searching (Perplexity)…");
+                info!("Discord/Ollama: PERPLEXITY_SEARCH requested: {}", arg);
+                match crate::commands::perplexity::perplexity_search(crate::commands::perplexity::PerplexitySearchRequest {
+                    query: arg.to_string(),
+                    max_results: Some(10),
+                })
+                .await
+                {
+                    Ok(resp) => {
+                        let results: String = resp
+                            .results
+                            .into_iter()
+                            .map(|r| format!("- {}: {} ({})", r.title, r.snippet, r.url))
+                            .collect::<Vec<_>>()
+                            .join("\n\n");
+                        if results.is_empty() {
+                            "Perplexity search returned no results. Answer from general knowledge.".to_string()
+                        } else {
+                            format!(
+                                "Perplexity Search results:\n\n{}\n\nUse these to answer the user's question.",
+                                results
+                            )
+                        }
+                    }
+                    Err(e) => format!("Perplexity search failed: {}. Answer without search results.", e),
                 }
             }
             "RUN_JS" => {
@@ -1917,8 +1971,12 @@ pub async fn answer_with_ollama_and_fetch(
                 format!("{}\n\nUse this to answer the user.", list)
             }
             "RUN_CMD" => {
+                info!("Agent router: RUN_CMD requested: {}", crate::logging::ellipse(&arg, 120));
                 if !crate::commands::run_cmd::is_local_cmd_allowed() {
                     "RUN_CMD is not available (disabled by ALLOW_LOCAL_CMD=0). Answer without running local commands.".to_string()
+                } else if last_run_cmd_arg.as_deref() == Some(arg.as_str()) {
+                    info!("Agent router: RUN_CMD duplicate (same arg as last run), skipping execution");
+                    "You already ran this command; the result is in the message above. Do not run RUN_CMD again. Reply with TASK_APPEND then TASK_STATUS as the task instructs.".to_string()
                 } else {
                     const MAX_CMD_RETRIES: u32 = 3;
                     let mut current_cmd = arg.to_string();
@@ -1936,6 +1994,8 @@ pub async fn answer_with_ollama_and_fetch(
                         .and_then(|r| r)
                         {
                             Ok(output) => {
+                                last_run_cmd_raw_output = Some(output.clone());
+                                info!("Agent router: RUN_CMD completed, stored output for next TASK_APPEND ({} chars)", output.len());
                                 last_output = format!(
                                     "Here is the command output:\n\n{}\n\nUse this to answer the user's question.",
                                     output
@@ -2143,8 +2203,15 @@ pub async fn answer_with_ollama_and_fetch(
                             current_task_path = Some(path.clone());
                             let task_label = crate::task::task_file_name(&path);
                             send_status(&format!("Appending to task '{}'…", task_label));
-                            info!("Agent router: TASK_APPEND for task '{}' ({} chars)", task_label, content.chars().count());
-                            match crate::task::append_to_task(&path, content) {
+                            // If we just ran RUN_CMD, append the full command output to the task (model often sends a summary only).
+                            let content_to_append = if let Some(raw) = last_run_cmd_raw_output.take() {
+                                info!("Agent router: TASK_APPEND using full RUN_CMD output ({} chars) for task '{}'", raw.chars().count(), task_label);
+                                raw
+                            } else {
+                                content.to_string()
+                            };
+                            info!("Agent router: TASK_APPEND for task '{}' ({} chars)", task_label, content_to_append.chars().count());
+                            match crate::task::append_to_task(&path, &content_to_append) {
                                 Ok(()) => format!("Appended to task file '{}'. Use this to continue.", task_label),
                                 Err(e) => format!("TASK_APPEND failed: {}.", e),
                             }
@@ -2158,27 +2225,47 @@ pub async fn answer_with_ollama_and_fetch(
                 if parts.len() < 2 {
                     "TASK_STATUS requires: TASK_STATUS: <path or task id> wip|finished.".to_string()
                 } else {
-                    let path_or_id = parts[..parts.len() - 1].join(" ");
-                    let status = parts[parts.len() - 1].to_lowercase();
-                    if !["wip", "finished", "unsuccessful", "paused"].contains(&status.as_str()) {
-                        "TASK_STATUS status must be wip, finished, unsuccessful, or paused.".to_string()
-                    } else {
-                        match crate::task::resolve_task_path(&path_or_id) {
+                    // Find first valid status word (allow trailing punctuation: "finished." -> "finished")
+                    let mut path_or_id = parts[0].to_string();
+                    let mut status: Option<String> = None;
+                    for (i, part) in parts.iter().skip(1).enumerate() {
+                        let s = part
+                            .trim_end_matches(|c: char| c == '.' || c == ',' || c == ';')
+                            .to_lowercase();
+                        if ["wip", "finished", "unsuccessful", "paused"].contains(&s.as_str()) {
+                            status = Some(s);
+                            if i > 0 {
+                                path_or_id = parts[..=i].join(" ");
+                            }
+                            break;
+                        }
+                    }
+                    match status {
+                        None => {
+                            "TASK_STATUS status must be wip, finished, unsuccessful, or paused.".to_string()
+                        }
+                        Some(status) => match crate::task::resolve_task_path(&path_or_id) {
                             Ok(path) => {
-                                if status == "finished" && !crate::task::all_sub_tasks_closed(&path).unwrap_or(true) {
+                                if status == "finished"
+                                    && !crate::task::all_sub_tasks_closed(&path).unwrap_or(true)
+                                {
                                     "Cannot set status to finished: not all sub-tasks (## Sub-tasks: ...) are finished or unsuccessful.".to_string()
                                 } else {
                                     match crate::task::set_task_status(&path, &status) {
                                         Ok(new_path) => {
                                             current_task_path = Some(new_path.clone());
-                                            format!("Task status set to {} (file: {}).", status, crate::task::task_file_name(&new_path))
+                                            format!(
+                                                "Task status set to {} (file: {}).",
+                                                status,
+                                                crate::task::task_file_name(&new_path)
+                                            )
                                         }
                                         Err(e) => format!("TASK_STATUS failed: {}.", e),
                                     }
                                 }
                             }
                             Err(e) => format!("TASK_STATUS failed: {}.", e),
-                        }
+                        },
                     }
                 }
             }
@@ -2187,8 +2274,17 @@ pub async fn answer_with_ollama_and_fetch(
                 if segs.len() >= 3 && !segs[2].is_empty() {
                     let topic = segs[0];
                     let id = segs[1];
+                    // Truncate at " then " / " then TASK" so we don't store the next tool call in the task body
                     let initial_content = segs[2];
-                    match crate::task::create_task(topic, id, initial_content, None) {
+                    let content = if let Some(pos) = initial_content
+                        .to_uppercase()
+                        .find(" THEN ")
+                    {
+                        initial_content[..pos].trim()
+                    } else {
+                        initial_content
+                    };
+                    match crate::task::create_task(topic, id, content, None) {
                         Ok(path) => {
                             current_task_path = Some(path.clone());
                             let name = crate::task::task_file_name(&path);
@@ -2237,9 +2333,14 @@ pub async fn answer_with_ollama_and_fetch(
                     "TASK_ASSIGN requires: TASK_ASSIGN: <path or task id> <agent_id> (e.g. scheduler, discord, cpu, default).".to_string()
                 } else {
                     let path_or_id = parts[..parts.len() - 1].join(" ");
-                    let agent_id = parts[parts.len() - 1];
+                    let agent_id_raw = parts[parts.len() - 1];
+                    // Normalize so "CURSOR_AGENT" / "cursor-agent" => scheduler (review loop only picks scheduler/default)
+                    let agent_id = match agent_id_raw.to_uppercase().as_str() {
+                        "CURSOR_AGENT" | "CURSOR-AGENT" => "scheduler",
+                        _ => agent_id_raw,
+                    };
                     send_status(&format!("Assigning task to {}…", agent_id));
-                    info!("Agent router: TASK_ASSIGN {} -> {}", path_or_id, agent_id);
+                    info!("Agent router: TASK_ASSIGN {} -> {} (raw: {})", path_or_id, agent_id, agent_id_raw);
                     match crate::task::resolve_task_path(&path_or_id) {
                         Ok(path) => {
                             current_task_path = Some(path.clone());
@@ -2421,10 +2522,26 @@ pub async fn answer_with_ollama_and_fetch(
                     send_status(&format!("Querying Redmine: {} {}", method, path));
                     info!("Agent router: REDMINE_API {} {}", method, path);
                     match crate::redmine::redmine_api_request(&method, &path, body.as_deref()).await {
-                        Ok(result) => format!(
-                            "Redmine API result:\n\n{}\n\nUse this data to answer the user's question. Summarize the issue clearly: subject, description quality, what's missing, status, assignee, and key comments.",
-                            result
-                        ),
+                        Ok(result) => {
+                            let mut msg = format!(
+                                "Redmine API result:\n\n{}\n\nUse this data to answer the user's question. Summarize the issue clearly: subject, description quality, what's missing, status, assignee, and key comments.",
+                                result
+                            );
+                            if method.to_uppercase() == "GET" {
+                                let id = path
+                                    .trim_start_matches('/')
+                                    .strip_prefix("issues/")
+                                    .map(|s| s.split(|c| c == '.' || c == '?').next().unwrap_or("").to_string())
+                                    .unwrap_or_default();
+                                if !id.is_empty() && id.chars().all(|c| c.is_ascii_digit()) {
+                                    msg.push_str(&format!(
+                                        "\n\nIf the user asked to **update** this ticket or **add a comment**, your next reply MUST be exactly one line: REDMINE_API: PUT /issues/{}.json {{\"issue\":{{\"notes\":\"<your comment text>\"}}}}. Do not reply with only a summary.",
+                                        id
+                                    ));
+                                }
+                            }
+                            msg
+                        }
                         Err(e) => format!("Redmine API failed: {}. Answer without this result.", e),
                     }
                 }
@@ -2503,6 +2620,17 @@ pub async fn answer_with_ollama_and_fetch(
 
         let result_len = user_message.chars().count();
         info!("Agent router: tool {} completed, sending result back to Ollama ({} chars): {}", tool, result_len, log_content(&user_message));
+
+        if tool == "RUN_CMD" && user_message.starts_with("Here is the command output") {
+            last_run_cmd_arg = Some(arg.clone());
+        } else if tool != "RUN_CMD" {
+            last_run_cmd_arg = None;
+        }
+        // Only clear stored RUN_CMD output when we run something other than RUN_CMD or TASK_APPEND
+        // (so it stays set for the next TASK_APPEND after RUN_CMD).
+        if tool != "TASK_APPEND" && tool != "RUN_CMD" {
+            last_run_cmd_raw_output = None;
+        }
 
         messages.push(crate::ollama::ChatMessage {
             role: "assistant".to_string(),
@@ -2591,11 +2719,12 @@ pub async fn answer_with_ollama_and_fetch(
 /// Run JavaScript via Node.js (if available). Used for RUN_JS in Discord/agent context.
 /// Writes code to a temp file and runs `node -e "..."` to eval and print the result.
 fn run_js_via_node(code: &str) -> Result<String, String> {
-    let tmp_dir = std::env::temp_dir();
+    let tmp_dir = crate::config::Config::tmp_js_dir();
     let stamp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.as_millis())
         .unwrap_or(0);
+    let _ = std::fs::create_dir_all(&tmp_dir);
     let path = tmp_dir.join(format!("mac_stats_js_{}_{}.js", std::process::id(), stamp));
     let path_str = path
         .to_str()
@@ -2785,7 +2914,7 @@ fn line_starts_with_tool_prefix(line: &str) -> bool {
 /// For TASK_APPEND and TASK_CREATE, content is taken to the end of the block (all lines until the next tool line) so research/full text is stored completely.
 /// Returns (tool_name, argument) or None.
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:", "MASTODON_POST:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "PERPLEXITY_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:", "MASTODON_POST:"];
     let lines: Vec<&str> = content.lines().collect();
     for (line_index, line) in lines.iter().enumerate() {
         let line = line.trim();
@@ -2840,7 +2969,7 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
                     }
                 }
                 // Ollama sometimes concatenates multiple tools on one line. Truncate at first ';' for URLs/searches.
-                if tool_name == "FETCH_URL" || tool_name == "BRAVE_SEARCH" {
+                if tool_name == "FETCH_URL" || tool_name == "BRAVE_SEARCH" || tool_name == "PERPLEXITY_SEARCH" {
                     if let Some(idx) = arg.find(';') {
                         arg = arg[..idx].trim().to_string();
                     }
@@ -2877,7 +3006,7 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
 
 /// Tool line prefixes that indicate start of another tool (used to stop script body extraction).
 const TOOL_LINE_PREFIXES: &[&str] = &[
-    "FETCH_URL:", "BRAVE_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:",
+    "FETCH_URL:", "BRAVE_SEARCH:", "PERPLEXITY_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:",
     "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:",
 ];
 
@@ -3346,28 +3475,17 @@ pub async fn ollama_chat_with_execution(
     request: OllamaChatWithExecutionRequest,
 ) -> Result<OllamaChatWithExecutionResponse, String> {
     use tracing::info;
-    use crate::metrics::{get_cpu_details, get_metrics};
+    use crate::metrics::format_metrics_for_ai_context;
 
     ensure_cpu_window_open();
 
     info!("Ollama Chat with Execution: Starting for question: {}", request.question);
 
-    // Get system metrics for context
-    let cpu_details = get_cpu_details();
-    let system_metrics = get_metrics();
-    
-    // Create context message
+    // Include gathered metrics so the model can answer accurately when the user asks about CPU, RAM, etc.
+    let metrics_block = format_metrics_for_ai_context();
     let context_message = format!(
-        "Current system status:\n- CPU: {:.1}%\n- Temperature: {:.1}°C\n- Frequency: {:.2} GHz\n- RAM: {:.1}%\n- Battery: {}\n\nUser question: {}",
-        cpu_details.usage,
-        cpu_details.temperature,
-        cpu_details.frequency,
-        system_metrics.ram,
-        if cpu_details.has_battery {
-            format!("{:.0}%", cpu_details.battery_level)
-        } else {
-            "N/A".to_string()
-        },
+        "{}\n\nUser question: {}",
+        metrics_block,
         request.question
     );
     

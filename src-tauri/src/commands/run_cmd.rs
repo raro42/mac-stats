@@ -156,7 +156,8 @@ fn validate_path_args(args: &[String], base: &Path) -> Result<Vec<String>, Strin
 fn run_single_command(cmd: &str, args: &[String], stdin_data: Option<&[u8]>) -> Result<Vec<u8>, String> {
     use std::process::Stdio;
 
-    info!("RUN_CMD: executing {} with {} args", cmd, args.len());
+    let exact = std::iter::once(cmd).chain(args.iter().map(String::as_str)).collect::<Vec<_>>().join(" ");
+    info!("RUN_CMD: executing: {}", exact);
     let mut child = Command::new(cmd)
         .args(args)
         .stdin(if stdin_data.is_some() { Stdio::piped() } else { Stdio::null() })
@@ -188,6 +189,7 @@ fn run_single_command(cmd: &str, args: &[String], stdin_data: Option<&[u8]>) -> 
 /// Supports `cmd1 | cmd2 | cmd3` pipelines; each stage must use an allowed command.
 /// Paths under ~/.mac-stats where applicable.
 pub fn run_local_command(arg: &str) -> Result<String, String> {
+    info!("RUN_CMD: exact command: {}", arg);
     let stages: Vec<&str> = arg.split('|').map(|s| s.trim()).filter(|s| !s.is_empty()).collect();
     if stages.is_empty() {
         return Err("RUN_CMD requires: RUN_CMD: <command> [args] (e.g. RUN_CMD: cat ~/.mac-stats/schedules.json).".to_string());
@@ -210,7 +212,10 @@ pub fn run_local_command(arg: &str) -> Result<String, String> {
             ));
         }
 
-        let args = if tokens.len() > 1 {
+        let args = if cmd == "cursor-agent" {
+            // cursor-agent args are the prompt; do not restrict paths in the prompt
+            tokens[1..].to_vec()
+        } else if tokens.len() > 1 {
             validate_path_args(&tokens[1..], &base)?
         } else if cmd == "ls" {
             vec![base.to_string_lossy().to_string()]
