@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Before making any changes or answering questions about this codebase, always read `agents.md` first.** 
 
+Do **not** add `Co-authored-by:` or any agent/IDE attribution to commit messages. 
+
 The `agents.md` file contains:
 - Project goals and coding principles
 - Complete codebase structure and organization
