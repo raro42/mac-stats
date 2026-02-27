@@ -17,7 +17,7 @@ Build a polished macOS (Apple Silicon) stats app (Rust + Tauri) that reads CPU/p
 - Execute the app yourself, read the logs, understand if changes are working from the logs - iterate until you are confident the change is good to be test by a human.
 - **ALWAYS check for build errors before starting the app**: Run `cargo check` in `src-tauri/` directory and fix any compilation errors before attempting to start the app.
 - **Commits**: Do **not** add `Co-authored-by:`, `Signed-off-by:`, or any Cursor/agent/IDE attribution to commit messages. Do not advertise the agent or tool in commits or in the repo. To enforce this locally, run `./scripts/install-git-hooks.sh` once (installs a prepare-commit-msg hook that strips such lines).
-- **After changes that affect runtime behavior** (Redmine, tasks, agent prompts, scheduler, Discord, Ollama tools): **restart mac-stats** (e.g. `pkill -x mac_stats; cd src-tauri && cargo run --bin mac_stats -- -vv`) and **test** (run a relevant task, trigger the feature, or check `~/.mac-stats/debug.log`). Do not assume it works without restart and verification.
+- **After changes that affect runtime behavior** (Redmine, tasks, agent prompts, scheduler, Discord, Ollama tools): **restart mac-stats automatically** (e.g. `pkill -x mac_stats; cd src-tauri && cargo run --release -- -vv`) and **test** (run a relevant task, trigger the feature, or check `~/.mac-stats/debug.log`). Do not assume it works without restart and verification. Do not skip the restart step.
 - Never install software on the host. Always ask before installing.
 - If you need to install software, use containers.  
 - No "god files": split into `metrics/`, `ffi/`, `ui/bridge/`, `cli/`, `logging/`.

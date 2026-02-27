@@ -326,7 +326,10 @@ pub async fn redmine_api_request(
     let body_text = resp.text().await.unwrap_or_default();
 
     if !status.is_success() {
-        info!("Redmine API {} {} → {}", method_upper, path, status);
+        info!("Redmine API {} {} → {} body: {}", method_upper, path, status, crate::logging::ellipse(&body_text, 500));
+        if status.as_u16() == 422 {
+            return Err("Redmine didn't accept the query (invalid parameters, e.g. updated_on). Use a date in YYYY-MM-DD or a range like YYYY-MM-DD..YYYY-MM-DD.".to_string());
+        }
         return Err(format!(
             "Redmine API {}: {}",
             status,

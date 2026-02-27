@@ -9,6 +9,16 @@ use tracing::debug;
 const BASE_URL: &str = "https://discord.com/api/v10";
 const MAX_RESPONSE_CHARS: usize = 8000;
 
+/// If the error looks like a Discord scope/permission failure, return a short user-facing message
+/// so we don't echo technical errors into the conversation (log-005).
+pub fn sanitize_discord_api_error(err: &str) -> String {
+    let lower = err.to_lowercase();
+    if lower.contains("scope") || lower.contains("operator.read") || lower.contains("permission") || lower.contains("403") {
+        return "Message could not be sent (permission missing). Check bot permissions (e.g. operator.read scope).".to_string();
+    }
+    err.to_string()
+}
+
 /// POST paths that are allowed (e.g. send message). All other POST/PATCH/DELETE are rejected.
 fn is_allowed_post_path(path: &str) -> bool {
     let path = path.trim().trim_start_matches('/');

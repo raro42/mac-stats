@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.20] - 2026-02-27
+
+### Added
+- **Loop-protection visibility (log-007)**: Per-channel `loop_protection_drops` counter in having_fun state; incremented when a bot message is dropped; every 60s heartbeat logs `DEBUG Discord: loop protection: channel <id> dropped N message(s) this period` and resets counter. Use `-vv` to see summaries.
+
+### Changed
+- **Agent-tasks**: All log-001 through log-009 verified implemented; README and task files updated to status **done**. Log-002 (log rotation), log-003 (temperature N/A), log-004 (image 404), log-005 (Discord scope sanitize), log-006 (Ollama dedupe), log-007 (loop-protection visibility), log-008 (FETCH_URL redmine hint), log-009 (Redmine 422) confirmed in code.
+- **Release**: Version 0.1.20; release build and app restart with `-vv` for verification.
+
 ## [0.1.19] - 2026-02-23
 
 ### Added

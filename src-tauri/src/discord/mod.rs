@@ -77,6 +77,25 @@ fn time_awareness_for_having_fun() -> String {
     )
 }
 
+/// If the message content looks like a long image-fetch 404 error, return a short user-facing line
+/// so we don't forward raw error paragraphs to the model (log-004).
+fn sanitize_image_error_content(content: &str) -> String {
+    let t = content.trim();
+    let lower = t.to_lowercase();
+    let is_image_error = lower.contains("404")
+        && (lower.contains("could not be fetched") || lower.contains("requested image") || lower.contains("verify the url"));
+    if !is_image_error {
+        return content.to_string();
+    }
+    if let Some((author, _)) = t.split_once(':') {
+        let author = author.trim();
+        if !author.is_empty() {
+            return format!("{}: Image link returned 404 — could not load image.", author);
+        }
+    }
+    "Image link returned 404 — could not load image.".to_string()
+}
+
 /// Discord API limit for message content (characters). Messages longer than this must be split.
 /// See https://discord.com/developers/docs/resources/channel#create-message: content max 2000.
 const DISCORD_MESSAGE_MAX_CHARS: usize = 2000;
@@ -394,6 +413,7 @@ fn ensure_having_fun_state_for_configured_channels() {
                     last_response_message_id: None,
                     next_response_after_secs,
                     next_idle_thought_after_secs: idle_secs,
+                    loop_protection_drops: 0,
                 }
             });
         }
@@ -456,6 +476,8 @@ struct HavingFunState {
     next_response_after_secs: u64,
     /// Next idle thought only after this many seconds since last_thought (random in config range).
     next_idle_thought_after_secs: u64,
+    /// Messages dropped by loop protection since last heartbeat (log-007 visibility).
+    loop_protection_drops: u64,
 }
 
 static HAVING_FUN_STATES: OnceLock<Mutex<HashMap<u64, HavingFunState>>> = OnceLock::new();
@@ -529,12 +551,14 @@ fn buffer_having_fun_message(
                 last_response_message_id: None,
                 next_response_after_secs,
                 next_idle_thought_after_secs: idle_secs,
+                loop_protection_drops: 0,
             }
         });
         if !is_bot {
             state.consecutive_bot_replies = 0;
         }
         if is_bot && state.consecutive_bot_replies >= HAVING_FUN_MAX_CONSECUTIVE_BOT_REPLIES {
+            state.loop_protection_drops = state.loop_protection_drops.saturating_add(1);
             debug!("Discord: dropping bot message in having_fun channel {} (loop protection)", channel_id);
             return;
         }
@@ -629,6 +653,19 @@ async fn having_fun_background_loop(ctx: Context) {
                         "Having fun: {} channel(s) configured; no buffered messages yet. Next heartbeat in 60s.",
                         configured
                     );
+                }
+                // log-007: periodic summary of loop-protection drops (DEBUG), then reset counters
+                if let Ok(mut map) = having_fun_states().lock() {
+                    for (channel_id, state) in map.iter_mut() {
+                        if state.loop_protection_drops > 0 {
+                            debug!(
+                                "Discord: loop protection: channel {} dropped {} message(s) this period",
+                                channel_id,
+                                state.loop_protection_drops
+                            );
+                            state.loop_protection_drops = 0;
+                        }
+                    }
                 }
             }
         }
@@ -937,6 +974,53 @@ fn split_message_for_discord(text: &str) -> Vec<String> {
     out
 }
 
+/// If the question starts with "switch your model to: X" or "switch model to: X" or "use model X",
+/// extract the model name and the rest of the question (after " and " / " then "). Used so the user
+/// can say "switch model to: llama3 and explain Y" and we use that model for the reply.
+fn extract_model_switch_from_question(question: &str) -> Option<(String, String)> {
+    let t = question.trim();
+    if t.is_empty() {
+        return None;
+    }
+    let lower = t.to_lowercase();
+    let (prefix_len, after_prefix): (usize, &str) = if lower.starts_with("switch your model to:") {
+        (21, t.get(21..).unwrap_or("").trim_start())
+    } else if lower.starts_with("switch model to:") {
+        (15, t.get(15..).unwrap_or("").trim_start())
+    } else if lower.starts_with("use model ") {
+        (10, t.get(10..).unwrap_or("").trim_start())
+    } else if lower.starts_with("use the model ") {
+        (14, t.get(14..).unwrap_or("").trim_start())
+    } else {
+        return None;
+    };
+    if after_prefix.is_empty() {
+        return None;
+    }
+    // Model name can contain / and : (e.g. huihui_ai/gpt-oss-abliterated:latest). Split on " and " or " then ".
+    let rest_lower = lower.get(prefix_len..).unwrap_or("");
+    let (model_name, rest) = if let Some(and_pos) = rest_lower.find(" and ") {
+        let model = after_prefix[..and_pos.min(after_prefix.len())].trim().to_string();
+        let tail = after_prefix.get(and_pos + 5..).unwrap_or("").trim().to_string();
+        (model, tail)
+    } else if let Some(then_pos) = rest_lower.find(" then ") {
+        let model = after_prefix[..then_pos.min(after_prefix.len())].trim().to_string();
+        let tail = after_prefix.get(then_pos + 6..).unwrap_or("").trim().to_string();
+        (model, tail)
+    } else {
+        let model = after_prefix
+            .split_whitespace()
+            .next()
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| after_prefix.to_string());
+        (model, String::new())
+    };
+    if model_name.is_empty() {
+        return None;
+    }
+    Some((model_name, rest))
+}
+
 /// Parse leading "model: ...", "temperature: ...", "num_ctx: ...", "skill: ...", "agent: ...", "verbose" from a Discord message.
 /// Returns (rest of message as question, model_override, options_override, skill_content, agent_selector, verbose).
 /// When `verbose` is false (the default), status/thinking messages are suppressed in the channel.
@@ -1129,7 +1213,7 @@ impl EventHandler for Handler {
         let content = {
             let raw = new_message.content.trim();
             let mention_tag = format!("<@{}>", bot_id);
-            raw.replace(&mention_tag, "").trim().to_string()
+            sanitize_image_error_content(&raw.replace(&mention_tag, "").trim().to_string())
         };
         if content.is_empty() {
             debug!("Discord: Ignoring empty message");
@@ -1166,8 +1250,17 @@ impl EventHandler for Handler {
             return;
         }
 
-        let (question, model_override, options_override, skill_content, agent_selector, verbose) =
+        let (mut question, mut model_override, options_override, skill_content, agent_selector, verbose) =
             parse_discord_ollama_overrides(&content);
+        // Natural-language model switch: "switch model to: X and do Y" -> use model X, question = Y
+        if model_override.is_none() {
+            if let Some((model, rest)) = extract_model_switch_from_question(&question) {
+                model_override = Some(model);
+                if !rest.is_empty() {
+                    question = rest;
+                }
+            }
+        }
         // Channel prompt from discord_channels.json; used when no explicit skill: override
         let skill_content = skill_content.or(chan.prompt);
         let agent_override = agent_selector.and_then(|sel| {

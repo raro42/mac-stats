@@ -989,8 +989,10 @@ pub fn format_metrics_for_ai_context() -> String {
         "CPU: {:.1}%, GPU: {:.1}%, RAM: {:.1}%, Disk: {:.1}%",
         m.cpu, m.gpu, m.ram, m.disk
     ));
-    if c.can_read_temperature {
+    if c.can_read_temperature && c.temperature > 0.0 {
         lines.push(format!("Temperature: {:.1}°C", c.temperature));
+    } else if c.can_read_temperature {
+        lines.push("Temperature: N/A".to_string());
     }
     if c.can_read_frequency {
         lines.push(format!(

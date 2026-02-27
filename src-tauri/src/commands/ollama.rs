@@ -367,6 +367,21 @@ fn merge_chat_options(
     }
 }
 
+/// Remove consecutive duplicate messages (same role and content) to avoid wasting tokens and confusing the model.
+fn deduplicate_consecutive_messages(messages: Vec<crate::ollama::ChatMessage>) -> Vec<crate::ollama::ChatMessage> {
+    let mut out: Vec<crate::ollama::ChatMessage> = Vec::with_capacity(messages.len());
+    for msg in messages {
+        let is_dup = out
+            .last()
+            .map(|last| last.role == msg.role && last.content == msg.content)
+            .unwrap_or(false);
+        if !is_dup {
+            out.push(msg);
+        }
+    }
+    out
+}
+
 /// Internal: send messages to Ollama and return the chat response.
 /// Used by the ollama_chat command and by answer_with_ollama_and_fetch (Discord / agent).
 /// When set, `model_override` and `options_override` apply only to this request.
@@ -376,6 +391,8 @@ pub async fn send_ollama_chat_messages(
     options_override: Option<crate::ollama::ChatOptions>,
 ) -> Result<crate::ollama::ChatResponse, String> {
     use tracing::{debug, info};
+
+    let messages = deduplicate_consecutive_messages(messages);
 
     let (endpoint, model, api_key, config_temp, config_num_ctx) = {
         let client_guard = get_ollama_client()
@@ -617,7 +634,7 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
     }
     if crate::redmine::is_configured() {
         base.push_str(&format!(
-            "\n\n{}. **REDMINE_API** (Redmine project management): Access Redmine issues, projects, and time entries via REST API. Use when the user asks to review a ticket, list issues, check project status, or look up issue details. To invoke: reply with exactly one line: REDMINE_API: GET /issues/1234.json?include=journals,attachments (fetch issue with full history). Key endpoints:\n- GET /issues/{{id}}.json?include=journals,attachments — full issue with comments and files\n- GET /issues.json?assigned_to_id=me&status_id=open — my open issues\n- GET /issues.json?project_id=ID&status_id=open&limit=25 — project issues\n- GET /projects.json — list projects\n- GET /search.json?q=<keyword>&issues=1&limit=100 — search issues by keyword (subject, description, journals). Use when the user asks to search or list tickets by topic (e.g. \"datadog\", \"monitoring\"); always call this for keyword search. Do not use GET /issues.json with a search param (issues list has no full-text search).\n- POST /issues.json — create issue: use project_id, tracker_id, status_id, priority_id, is_private false, subject, description (optional assigned_to_id). Match project by name or identifier from context below (e.g. \"Create in AMVARA\" → use that project's id). Example: REDMINE_API: POST /issues.json {{\"issue\":{{\"project_id\":2,\"tracker_id\":1,\"status_id\":1,\"priority_id\":2,\"is_private\":false,\"subject\":\"Title\",\"description\":\"\"}}}}.\n- PUT /issues/{{id}}.json — update issue (add notes: {{\"issue\":{{\"notes\":\"comment\"}}}})\nAlways use .json suffix. When reviewing a ticket, fetch with include=journals,attachments to get the full picture.",
+            "\n\n{}. **REDMINE_API** (Redmine project management): Access Redmine issues, projects, and time entries via REST API. Use when the user asks to review a ticket, list issues, check project status, or look up issue details. To invoke: reply with exactly one line: REDMINE_API: GET /issues/1234.json?include=journals,attachments (fetch issue with full history). Key endpoints:\n- GET /issues/{{id}}.json?include=journals,attachments — full issue with comments and files\n- GET /issues.json?assigned_to_id=me&status_id=open — my open issues\n- GET /issues.json?project_id=ID&status_id=open&limit=25 — project issues\n- GET /projects.json — list projects\n- GET /search.json?q=<keyword>&issues=1&limit=100 — search issues by keyword (subject, description, journals). Use when the user asks to search or list tickets by topic (e.g. \"datadog\", \"monitoring\"); always call this for keyword search. Do not use GET /issues.json with a search param (issues list has no full-text search).\n- POST /issues.json — create issue: use project_id, tracker_id, status_id, priority_id, is_private false, subject, description (optional assigned_to_id). Match project by name or identifier from context below (e.g. \"Create in AMVARA\" → use that project's id). Example: REDMINE_API: POST /issues.json {{\"issue\":{{\"project_id\":2,\"tracker_id\":1,\"status_id\":1,\"priority_id\":2,\"is_private\":false,\"subject\":\"Title\",\"description\":\"\"}}}}.\n- PUT /issues/{{id}}.json — update issue (add notes: {{\"issue\":{{\"notes\":\"comment\"}}}})\nFor issues.json filters use updated_on=YYYY-MM-DD or updated_on=YYYY-MM-DD..YYYY-MM-DD (not 'last_week'). Always use .json suffix. When reviewing a ticket, fetch with include=journals,attachments to get the full picture.",
             num
         ));
         if let Some(ctx) = crate::redmine::get_redmine_create_context().await {
@@ -876,10 +893,13 @@ async fn execute_agent_tool_call(
                     "DISCORD_API result ({} {}):\n\n{}\n\nUse this data to continue or answer the user's question. If you need more data, make another DISCORD_API call.",
                     &method, &path, result
                 )),
-                Err(e) => Some(format!(
-                    "DISCORD_API failed ({} {}): {}. Explain the error to the user or try a different approach.",
-                    &method, &path, e
-                )),
+                Err(e) => {
+                    let msg = crate::discord::api::sanitize_discord_api_error(&e);
+                    Some(format!(
+                        "DISCORD_API failed ({} {}): {}. Explain the error to the user or try a different approach.",
+                        &method, &path, msg
+                    ))
+                }
             }
         }
         _ => None,
@@ -1487,11 +1507,12 @@ pub async fn answer_with_ollama_and_fetch(
         for msg in &conversation_history {
             planning_messages.push(msg.clone());
         }
+        let model_hint = model_override.as_ref().map(|m| format!("\n\nFor this request the user selected Ollama model: {}. The app will use that model for the reply; recommend answering the question (or using an agent) with that in mind.", m)).unwrap_or_default();
         planning_messages.push(crate::ollama::ChatMessage {
             role: "user".to_string(),
             content: format!(
-                "Current user question: {}\n\nReply with RECOMMEND: your plan.",
-                question
+                "Current user question: {}{}\n\nReply with RECOMMEND: your plan.",
+                question, model_hint
             ),
         });
         let plan_response = send_ollama_chat_messages(planning_messages, model_override.clone(), options_override.clone()).await?;
@@ -1696,7 +1717,14 @@ pub async fn answer_with_ollama_and_fetch(
                             info!("Discord/Ollama: Fetch returned 401 Unauthorized, stopping");
                             format!("That URL returned 401 Unauthorized. Do not try another URL. Answer based on what you know.")
                         } else {
-                            return Err(e);
+                            info!("Discord/Ollama: FETCH_URL failed: {}", crate::logging::ellipse(&e, 300));
+                            let url_lower = arg.to_lowercase();
+                            let redmine_hint = if url_lower.contains("redmine") || url_lower.contains("/issues/") {
+                                " For Redmine tickets use REDMINE_API or say \"review ticket <id>\"."
+                            } else {
+                                ""
+                            };
+                            format!("That URL could not be fetched (connection or server error).{redmine_hint} Answer without that page.")
                         }
                     }
                 }
@@ -2111,7 +2139,10 @@ pub async fn answer_with_ollama_and_fetch(
                                 result
                             )
                         }
-                        Err(e) => format!("Discord API failed: {}. Answer without this result.", e),
+                        Err(e) => {
+                            let msg = crate::discord::api::sanitize_discord_api_error(&e);
+                            format!("Discord API failed: {}. Answer without this result.", msg)
+                        }
                     }
                 }
             }

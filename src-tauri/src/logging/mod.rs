@@ -71,6 +71,19 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
             let _ = std::fs::create_dir_all(parent);
         }
 
+        // Rotate: if log file exceeds 10 MB, truncate to avoid unbounded growth
+        const MAX_LOG_BYTES: u64 = 10 * 1024 * 1024;
+        if log_path.exists() {
+            if let Ok(meta) = std::fs::metadata(&log_path) {
+                if meta.len() > MAX_LOG_BYTES {
+                    let _ = std::fs::OpenOptions::new()
+                        .write(true)
+                        .truncate(true)
+                        .open(&log_path);
+                }
+            }
+        }
+
         // Create file layer
         let file = std::fs::OpenOptions::new()
             .create(true)
