@@ -111,20 +111,27 @@ enum ChannelMode {
     HavingFun,
 }
 
-/// Per-channel settings: mode + optional prompt injected into the system context.
+/// Per-channel settings: mode + optional prompt, model, and agent for having_fun.
 #[derive(Debug, Clone)]
 struct ChannelSettings {
     mode: ChannelMode,
     prompt: Option<String>,
+    /// Optional model override for this channel (e.g. "huihui_ai/granite3.2-abliterated:2b").
+    model: Option<String>,
+    /// Optional agent override for this channel (e.g. "abliterated"). Uses that agent's soul+skill and model.
+    agent: Option<String>,
 }
 
 /// Having-fun timeframes: min/max in seconds. Each use picks a random value in [min, max].
+/// max_consecutive_bot_replies: after this many bot messages in a row we drop further bot messages (loop protection). 0 = never reply to bots.
 #[derive(Debug, Clone)]
 struct HavingFunParams {
     response_delay_secs_min: u64,
     response_delay_secs_max: u64,
     idle_thought_secs_min: u64,
     idle_thought_secs_max: u64,
+    /// Max bot messages we buffer in a row before dropping (0 = don't reply to bot messages).
+    max_consecutive_bot_replies: u32,
 }
 
 impl Default for HavingFunParams {
@@ -134,6 +141,7 @@ impl Default for HavingFunParams {
             response_delay_secs_max: 3600, // 60 min
             idle_thought_secs_min: 300,
             idle_thought_secs_max: 3600,
+            max_consecutive_bot_replies: 0, // don't reply to bots by default (avoids "talking to himself" when another bot echoes)
         }
     }
 }
@@ -172,7 +180,8 @@ fn ensure_having_fun_in_config(path: &Path, parsed: &mut serde_json::Value) {
             "response_delay_secs_min": 300,
             "response_delay_secs_max": 3600,
             "idle_thought_secs_min": 300,
-            "idle_thought_secs_max": 3600
+            "idle_thought_secs_max": 3600,
+            "max_consecutive_bot_replies": 0
         }),
     );
     if let Ok(pretty) = serde_json::to_string_pretty(parsed) {
@@ -182,7 +191,7 @@ fn ensure_having_fun_in_config(path: &Path, parsed: &mut serde_json::Value) {
 }
 
 fn load_channel_config_full() -> (ChannelSettings, HashMap<u64, ChannelSettings>, HavingFunParams) {
-    let default_settings = ChannelSettings { mode: ChannelMode::MentionOnly, prompt: None };
+    let default_settings = ChannelSettings { mode: ChannelMode::MentionOnly, prompt: None, model: None, agent: None };
     let path = crate::config::Config::discord_channels_path();
     let json = match std::fs::read_to_string(&path) {
         Ok(s) => s,
@@ -209,7 +218,7 @@ fn load_channel_config_full() -> (ChannelSettings, HashMap<u64, ChannelSettings>
         .get("default_prompt")
         .and_then(|v| v.as_str())
         .map(|s| s.to_string());
-    let default_settings = ChannelSettings { mode: default_mode, prompt: default_prompt };
+    let default_settings = ChannelSettings { mode: default_mode, prompt: default_prompt, model: None, agent: None };
 
     let having_fun = if let Some(hf) = parsed.get("having_fun").and_then(|v| v.as_object()) {
         let u = |k: &str, default: u64| hf.get(k).and_then(|v| v.as_u64()).unwrap_or(default);
@@ -217,11 +226,17 @@ fn load_channel_config_full() -> (ChannelSettings, HashMap<u64, ChannelSettings>
         let rd_max = u("response_delay_secs_max", 3600).max(rd_min).min(86400);
         let it_min = u("idle_thought_secs_min", 300).min(86400);
         let it_max = u("idle_thought_secs_max", 3600).max(it_min).min(86400);
+        let max_bot = hf
+            .get("max_consecutive_bot_replies")
+            .and_then(|v| v.as_u64())
+            .map(|n| n.min(20) as u32)
+            .unwrap_or(0);
         HavingFunParams {
             response_delay_secs_min: rd_min,
             response_delay_secs_max: rd_max,
             idle_thought_secs_min: it_min,
             idle_thought_secs_max: it_max,
+            max_consecutive_bot_replies: max_bot,
         }
     } else {
         HavingFunParams::default()
@@ -232,7 +247,7 @@ fn load_channel_config_full() -> (ChannelSettings, HashMap<u64, ChannelSettings>
         for (k, v) in obj {
             let Ok(id) = k.parse::<u64>() else { continue };
             let settings = if let Some(mode_str) = v.as_str() {
-                ChannelSettings { mode: parse_mode(mode_str), prompt: None }
+                ChannelSettings { mode: parse_mode(mode_str), prompt: None, model: None, agent: None }
             } else if let Some(obj) = v.as_object() {
                 let mode = obj.get("mode")
                     .and_then(|v| v.as_str())
@@ -241,7 +256,9 @@ fn load_channel_config_full() -> (ChannelSettings, HashMap<u64, ChannelSettings>
                 let prompt = obj.get("prompt")
                     .and_then(|v| v.as_str())
                     .map(|s| s.to_string());
-                ChannelSettings { mode, prompt }
+                let model = obj.get("model").and_then(|v| v.as_str()).map(|s| s.to_string());
+                let agent = obj.get("agent").and_then(|v| v.as_str()).map(|s| s.to_string());
+                ChannelSettings { mode, prompt, model, agent }
             } else {
                 continue;
             };
@@ -341,10 +358,10 @@ fn channel_settings(channel_id: u64) -> ChannelSettings {
     ensure_channel_config_loaded();
     let guard = match CHANNEL_CONFIG.read() {
         Ok(g) => g,
-        Err(_) => return ChannelSettings { mode: ChannelMode::MentionOnly, prompt: None },
+        Err(_) => return ChannelSettings { mode: ChannelMode::MentionOnly, prompt: None, model: None, agent: None },
     };
     let Some((_, default, overrides, _)) = guard.as_ref() else {
-        return ChannelSettings { mode: ChannelMode::MentionOnly, prompt: None };
+        return ChannelSettings { mode: ChannelMode::MentionOnly, prompt: None, model: None, agent: None };
     };
     overrides.get(&channel_id).cloned().unwrap_or_else(|| default.clone())
 }
@@ -455,7 +472,6 @@ fn random_secs_in_range(min_secs: u64, max_secs: u64) -> u64 {
 // having_fun: buffered responses + idle thoughts
 // ---------------------------------------------------------------------------
 
-const HAVING_FUN_MAX_CONSECUTIVE_BOT_REPLIES: u32 = 5;
 const HAVING_FUN_TICK_SECS: u64 = 10;
 
 struct BufferedMessage {
@@ -557,7 +573,8 @@ fn buffer_having_fun_message(
         if !is_bot {
             state.consecutive_bot_replies = 0;
         }
-        if is_bot && state.consecutive_bot_replies >= HAVING_FUN_MAX_CONSECUTIVE_BOT_REPLIES {
+        let max_bot = get_having_fun_params().max_consecutive_bot_replies;
+        if is_bot && state.consecutive_bot_replies >= max_bot {
             state.loop_protection_drops = state.loop_protection_drops.saturating_add(1);
             debug!("Discord: dropping bot message in having_fun channel {} (loop protection)", channel_id);
             return;
@@ -796,29 +813,73 @@ async fn having_fun_respond(
     ctx: &Context,
 ) -> Option<u64> {
     let chan = channel_settings(channel_id);
-    let soul = crate::config::Config::load_soul_content();
+    let (system_content, model_override) = if let Some(ref agent_selector) = chan.agent {
+        let agents = crate::agents::load_agents();
+        if let Some(agent) = crate::agents::find_agent_by_id_or_name(&agents, agent_selector) {
+            let mut system = String::new();
+            system.push_str(HAVING_FUN_CASUAL_CONTEXT);
+            system.push_str("\n\n");
+            system.push_str(&agent.combined_prompt);
+            system.push_str("\n\n");
+            system.push_str(&time_awareness_for_having_fun());
+            system.push_str("\n\n");
+            system.push_str(&crate::metrics::format_metrics_for_ai_context());
+            (system, agent.model.clone())
+        } else {
+            let soul = crate::config::Config::load_soul_content();
+            let mut system = String::new();
+            system.push_str(HAVING_FUN_CASUAL_CONTEXT);
+            system.push_str("\n\n");
+            system.push_str(&soul);
+            if let Some(ref prompt) = chan.prompt {
+                system.push_str("\n\n");
+                system.push_str(prompt);
+            }
+            system.push_str("\n\n");
+            system.push_str(&time_awareness_for_having_fun());
+            system.push_str("\n\n");
+            system.push_str(&crate::metrics::format_metrics_for_ai_context());
+            (system, chan.model.clone())
+        }
+    } else {
+        let soul = crate::config::Config::load_soul_content();
+        let mut system = String::new();
+        system.push_str(HAVING_FUN_CASUAL_CONTEXT);
+        system.push_str("\n\n");
+        system.push_str(&soul);
+        if let Some(ref prompt) = chan.prompt {
+            system.push_str("\n\n");
+            system.push_str(prompt);
+        }
+        system.push_str("\n\n");
+        system.push_str(&time_awareness_for_having_fun());
+        system.push_str("\n\n");
+        system.push_str(&crate::metrics::format_metrics_for_ai_context());
+        (system, chan.model.clone())
+    };
 
     let mut prior = crate::session_memory::get_messages("discord", channel_id);
     if prior.is_empty() {
         prior = crate::session_memory::load_messages_from_latest_session_file("discord", channel_id);
     }
 
+    // So the model can answer "which model are you running on?" with the actual Ollama model name.
+    let effective_model = model_override
+        .clone()
+        .or_else(crate::commands::ollama::get_default_ollama_model_name);
+    let system_content_with_model = if let Some(ref m) = effective_model {
+        format!(
+            "{}\n\nYou are replying as the Ollama model: **{}**. If the user asks which model you are (or what model you run on), name this model.",
+            system_content, m
+        )
+    } else {
+        system_content
+    };
+
     let mut ollama_msgs: Vec<crate::ollama::ChatMessage> = Vec::new();
-    let mut system = String::new();
-    system.push_str(HAVING_FUN_CASUAL_CONTEXT);
-    system.push_str("\n\n");
-    system.push_str(&soul);
-    if let Some(ref prompt) = chan.prompt {
-        system.push_str("\n\n");
-        system.push_str(prompt);
-    }
-    system.push_str("\n\n");
-    system.push_str(&time_awareness_for_having_fun());
-    system.push_str("\n\n");
-    system.push_str(&crate::metrics::format_metrics_for_ai_context());
     ollama_msgs.push(crate::ollama::ChatMessage {
         role: "system".to_string(),
-        content: system,
+        content: system_content_with_model,
     });
 
     const HISTORY_CAP: usize = 20;
@@ -852,9 +913,9 @@ async fn having_fun_respond(
     let channel = serenity::model::id::ChannelId::new(channel_id);
     let _ = channel.broadcast_typing(ctx).await;
 
-    match crate::commands::ollama::send_ollama_chat_messages(ollama_msgs, None, None).await {
+    match crate::commands::ollama::send_ollama_chat_messages(ollama_msgs, model_override, None).await {
         Ok(response) => {
-            let reply = response.message.content.trim().to_string();
+            let reply = strip_leading_label(response.message.content.trim());
             if reply.is_empty() {
                 return None;
             }
@@ -884,29 +945,72 @@ async fn having_fun_respond(
 /// Generate and post a random thought when the channel has been quiet.
 async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
     let chan = channel_settings(channel_id);
-    let soul = crate::config::Config::load_soul_content();
+    let (system_content, model_override) = if let Some(ref agent_selector) = chan.agent {
+        let agents = crate::agents::load_agents();
+        if let Some(agent) = crate::agents::find_agent_by_id_or_name(&agents, agent_selector) {
+            let mut system = String::new();
+            system.push_str(HAVING_FUN_CASUAL_CONTEXT);
+            system.push_str("\n\n");
+            system.push_str(&agent.combined_prompt);
+            system.push_str("\n\n");
+            system.push_str(&time_awareness_for_having_fun());
+            system.push_str("\n\n");
+            system.push_str(&crate::metrics::format_metrics_for_ai_context());
+            (system, agent.model.clone())
+        } else {
+            let soul = crate::config::Config::load_soul_content();
+            let mut system = String::new();
+            system.push_str(HAVING_FUN_CASUAL_CONTEXT);
+            system.push_str("\n\n");
+            system.push_str(&soul);
+            if let Some(ref prompt) = chan.prompt {
+                system.push_str("\n\n");
+                system.push_str(prompt);
+            }
+            system.push_str("\n\n");
+            system.push_str(&time_awareness_for_having_fun());
+            system.push_str("\n\n");
+            system.push_str(&crate::metrics::format_metrics_for_ai_context());
+            (system, chan.model.clone())
+        }
+    } else {
+        let soul = crate::config::Config::load_soul_content();
+        let mut system = String::new();
+        system.push_str(HAVING_FUN_CASUAL_CONTEXT);
+        system.push_str("\n\n");
+        system.push_str(&soul);
+        if let Some(ref prompt) = chan.prompt {
+            system.push_str("\n\n");
+            system.push_str(prompt);
+        }
+        system.push_str("\n\n");
+        system.push_str(&time_awareness_for_having_fun());
+        system.push_str("\n\n");
+        system.push_str(&crate::metrics::format_metrics_for_ai_context());
+        (system, chan.model.clone())
+    };
 
     let mut prior = crate::session_memory::get_messages("discord", channel_id);
     if prior.is_empty() {
         prior = crate::session_memory::load_messages_from_latest_session_file("discord", channel_id);
     }
 
+    let effective_model = model_override
+        .clone()
+        .or_else(crate::commands::ollama::get_default_ollama_model_name);
+    let system_content_with_model = if let Some(ref m) = effective_model {
+        format!(
+            "{}\n\nYou are replying as the Ollama model: **{}**. If the user asks which model you are (or what model you run on), name this model.",
+            system_content, m
+        )
+    } else {
+        system_content
+    };
+
     let mut ollama_msgs: Vec<crate::ollama::ChatMessage> = Vec::new();
-    let mut system = String::new();
-    system.push_str(HAVING_FUN_CASUAL_CONTEXT);
-    system.push_str("\n\n");
-    system.push_str(&soul);
-    if let Some(ref prompt) = chan.prompt {
-        system.push_str("\n\n");
-        system.push_str(prompt);
-    }
-    system.push_str("\n\n");
-    system.push_str(&time_awareness_for_having_fun());
-    system.push_str("\n\n");
-    system.push_str(&crate::metrics::format_metrics_for_ai_context());
     ollama_msgs.push(crate::ollama::ChatMessage {
         role: "system".to_string(),
-        content: system,
+        content: system_content_with_model,
     });
 
     const HISTORY_CAP: usize = 10;
@@ -922,9 +1026,9 @@ async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
     let channel = serenity::model::id::ChannelId::new(channel_id);
     let _ = channel.broadcast_typing(&ctx).await;
 
-    match crate::commands::ollama::send_ollama_chat_messages(ollama_msgs, None, None).await {
+    match crate::commands::ollama::send_ollama_chat_messages(ollama_msgs, model_override, None).await {
         Ok(response) => {
-            let reply = response.message.content.trim().to_string();
+            let reply = strip_leading_label(response.message.content.trim());
             if reply.is_empty() {
                 return;
             }
@@ -943,6 +1047,29 @@ async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
             debug!("Having fun: idle thought failed for channel {}: {}", channel_id, e);
         }
     }
+}
+
+/// Strip a leading "Label:" line from model output (e.g. "NastyNemesis: hello" -> "hello").
+/// Some models or fine-tunes prefix replies with a persona name; we don't send that to Discord.
+fn strip_leading_label(text: &str) -> String {
+    let t = text.trim();
+    if t.is_empty() {
+        return t.to_string();
+    }
+    let first_line_end = t.find('\n').unwrap_or(t.len());
+    let first_line = t[..first_line_end].trim_end();
+    // Match "Word:" where Word is 2+ identifier chars (avoids stripping "I: think")
+    if first_line.len() >= 3 && first_line.ends_with(':') {
+        let label = first_line.trim_end_matches(':').trim_end();
+        if label.len() >= 2
+            && label.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
+            && !label.contains(' ')
+        {
+            let rest = t[first_line_end..].trim();
+            return if rest.is_empty() { first_line.trim_end_matches(':').trim().to_string() } else { rest.to_string() };
+        }
+    }
+    t.to_string()
 }
 
 /// Split text into chunks of at most DISCORD_MESSAGE_MAX_CHARS. Prefer splitting at newlines.
@@ -1263,10 +1390,18 @@ impl EventHandler for Handler {
         }
         // Channel prompt from discord_channels.json; used when no explicit skill: override
         let skill_content = skill_content.or(chan.prompt);
-        let agent_override = agent_selector.and_then(|sel| {
-            let agents = crate::agents::load_agents();
-            crate::agents::find_agent_by_id_or_name(&agents, &sel).cloned()
-        });
+        // Agent: from message (e.g. "agent: abliterated") or from channel config (e.g. agents-aliberated channel)
+        let agents = crate::agents::load_agents();
+        let agent_override = agent_selector
+            .as_ref()
+            .and_then(|sel| crate::agents::find_agent_by_id_or_name(&agents, sel).cloned())
+            .or_else(|| {
+                chan.agent
+                    .as_ref()
+                    .and_then(|sel| crate::agents::find_agent_by_id_or_name(&agents, sel).cloned())
+            });
+        // Model: from message or from channel config (when no agent override)
+        let model_override = model_override.or(chan.model.clone());
 
         let trigger = if is_dm {
             "DM"
@@ -1387,8 +1522,14 @@ impl EventHandler for Handler {
         ).await {
             Ok(r) => r,
             Err(e) => {
-                error!("Discord: Failed to generate reply: {}", e);
-                format!("Sorry, I couldn't generate a reply: {}. (Is Ollama configured?)", e)
+                error!("Discord: Failed to generate reply (channel {}): {}", channel_id_u64, e);
+                let err_lower = e.to_string().to_lowercase();
+                let hint = if err_lower.contains("timed out") || err_lower.contains("timeout") {
+                    "Request timed out — Ollama may be busy; try again in a moment."
+                } else {
+                    "Is Ollama configured?"
+                };
+                format!("Sorry, I couldn't generate a reply: {}. ({})", e, hint)
             }
         };
 
@@ -1401,6 +1542,7 @@ impl EventHandler for Handler {
 
         // Log full reply if ≤500 chars (or always in -vv), else first 500 + ellipsis.
         const RECV_LOG_MAX: usize = 500;
+        let reply = strip_leading_label(reply.trim());
         let nchars = reply.chars().count();
         let verbosity = crate::logging::VERBOSITY.load(Ordering::Relaxed);
         if verbosity >= 2 || nchars <= RECV_LOG_MAX {

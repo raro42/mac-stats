@@ -21,5 +21,5 @@
 ## Next
 1. Use the app (Discord, Ollama, monitors, etc.) so new log lines are written.
 2. Re-scan: `tail -n 300 ~/.mac-stats/debug.log` for any new errors or improvements.
-3. If clean: next cycle = annotate enhancements (e.g. from docs) and create new agent-tasks as needed.
+3. If clean: next cycle = annotate enhancements (e.g. from docs) and create new agents-tasks as needed.
 4. If issues: create new log-NNN task files and implement.

@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.21] - 2026-02-28
+
+### Added
+- **Discord having_fun per-channel model/agent**: In `discord_channels.json`, channels can set `model` (Ollama model override) and `agent` (agent id, e.g. `abliterated`) so having_fun uses that agent's soul+skill and model. When `agent` is set, the channel uses the agent's combined prompt and model; otherwise soul + optional channel `prompt` and `model` as before.
+- **Discord having_fun configurable loop protection**: `having_fun.max_consecutive_bot_replies` in config (default 0). 0 = do not reply to bot messages; 1–20 = max consecutive bot messages before dropping (loop protection). Replaces hardcoded limit of 5.
+- **Ollama chat timeout config**: `config.json` key `ollamaChatTimeoutSecs` (default 300, range 15–900). Env override `MAC_STATS_OLLAMA_CHAT_TIMEOUT_SECS`. Used for all Ollama /api/chat requests (UI, Discord, session compaction).
+- **Model identity in prompts**: Agent router and having_fun system prompts now include "You are replying as the Ollama model: **<name>**" so the bot can answer "which model are you?" accurately. `get_default_ollama_model_name()` exposed for Discord/UI.
+- **Default agent with soul**: New macro `default_agent_entry_with_soul!("id")` and default agent **abliterated** (`agent-abliterated/`: agent.json, skill.md, soul.md, testing.md) for having_fun channels that want a distinct persona.
+- **docs/012_cursor_agent_tasks.md**: Cursor agent tasks documentation.
+
+### Changed
+- **having_fun**: Uses agent's soul+skill+model when channel has `agent`; otherwise unchanged (soul + channel prompt/model). Default `max_consecutive_bot_replies` 0 to avoid replying to other bots unless explicitly configured.
+- **agents-tasks**: README clarifies log-NNN vs task-NNN, log path `~/.mac-stats/debug.log`; review docs and .gitignore use `agents-tasks` (fixed typo).
+
+### Removed
+- **OPTIMIZATION_PROGRESS.md** and **docs/OPTIMIZE_CHECKLIST.md**: Obsolete optimization checklists removed.
+
 ## [0.1.20] - 2026-02-27
 
 ### Added

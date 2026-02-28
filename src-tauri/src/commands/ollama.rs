@@ -42,6 +42,13 @@ fn get_ollama_client() -> &'static Mutex<Option<OllamaClient>> {
     OLLAMA_CLIENT.get_or_init(|| Mutex::new(None))
 }
 
+/// Return the configured default Ollama model name, if any. Used so the model can answer "which model are you?" accurately.
+pub fn get_default_ollama_model_name() -> Option<String> {
+    let guard = get_ollama_client().lock().ok()?;
+    let client = guard.as_ref()?;
+    Some(client.config.model.clone())
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OllamaConfigRequest {
     pub endpoint: String,
@@ -413,8 +420,9 @@ pub async fn send_ollama_chat_messages(
     let effective_model = model_override.unwrap_or(model);
     let options = merge_chat_options(config_temp, config_num_ctx, options_override);
 
+    let timeout_secs = crate::config::Config::ollama_chat_timeout_secs();
     let temp_client = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(120))
+        .timeout(std::time::Duration::from_secs(timeout_secs))
         .build()
         .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
 
@@ -1564,6 +1572,10 @@ pub async fn answer_with_ollama_and_fetch(
     // Include current system metrics so the model can answer accurately when the user asks about CPU, RAM, disk, etc.
     let metrics_block = crate::metrics::format_metrics_for_ai_context();
     let metrics_for_system = format!("\n\n{}", metrics_block);
+    let model_identity = format!(
+        "\n\nYou are replying as the Ollama model: **{}**. If the user asks which model you are (or what model you run on), name this model.",
+        effective_model
+    );
 
     // Fast path: if the recommendation already contains a parseable tool call, execute it
     // directly instead of asking Ollama a second time to regurgitate the same tool line.
@@ -1572,12 +1584,12 @@ pub async fn answer_with_ollama_and_fetch(
         info!("Agent router: plan contains direct tool call {}:{} — skipping execution Ollama call", tool, crate::logging::ellipse(arg, 60));
         let execution_system_content = match &skill_content {
             Some(skill) => format!(
-                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}",
-                discord_user_context, skill, execution_prompt, metrics_for_system
+                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}{}",
+                discord_user_context, skill, execution_prompt, metrics_for_system, model_identity
             ),
             None => format!(
-                "{}{}{}{}",
-                router_soul, discord_user_context, execution_prompt, metrics_for_system
+                "{}{}{}{}{}",
+                router_soul, discord_user_context, execution_prompt, metrics_for_system, model_identity
             ),
         };
         let mut msgs: Vec<crate::ollama::ChatMessage> = vec![
@@ -1595,12 +1607,12 @@ pub async fn answer_with_ollama_and_fetch(
         info!("Agent router: execution step — sending plan + question, starting tool loop (max {} tools)", max_tool_iterations);
         let execution_system_content = match &skill_content {
             Some(skill) => format!(
-                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}\n\nYour plan: {}",
-                discord_user_context, skill, execution_prompt, metrics_for_system, recommendation
+                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}\n\nYour plan: {}{}",
+                discord_user_context, skill, execution_prompt, metrics_for_system, recommendation, model_identity
             ),
             None => format!(
-                "{}{}{}{}\n\nYour plan: {}",
-                router_soul, discord_user_context, execution_prompt, metrics_for_system, recommendation
+                "{}{}{}{}\n\nYour plan: {}{}",
+                router_soul, discord_user_context, execution_prompt, metrics_for_system, recommendation, model_identity
             ),
         };
         let mut msgs: Vec<crate::ollama::ChatMessage> = vec![

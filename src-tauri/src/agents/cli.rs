@@ -37,6 +37,7 @@ pub fn parse_testing_md(content: &str) -> Vec<String> {
 
 /// Run agent tests: resolve agent, read testing.md, run each prompt via Ollama. Returns exit code (0 = ok).
 pub async fn run_agent_test(selector: &str, path: Option<&Path>) -> Result<(), i32> {
+    Config::ensure_defaults();
     crate::commands::ollama::ensure_ollama_agent_ready_at_startup().await;
 
     let agents = load_agents();

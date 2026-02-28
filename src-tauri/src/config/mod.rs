@@ -12,7 +12,7 @@
 //! All configuration is environment-aware and portable.
 //!
 //! **JSON config reload (no restart needed):**
-//! - `config.json` — read on every access (window decorations, scheduler interval).
+//! - `config.json` — read on every access (window decorations, scheduler interval, ollamaChatTimeoutSecs).
 //! - `schedules.json` — scheduler checks file mtime each loop and reloads when changed.
 //! - `discord_channels.json` — Discord loop checks mtime every tick and reloads when changed.
 
@@ -26,6 +26,21 @@ macro_rules! default_agent_entry {
             &[
                 ("agent.json", include_str!(concat!("../../defaults/agents/agent-", $id, "/agent.json"))),
                 ("skill.md", include_str!(concat!("../../defaults/agents/agent-", $id, "/skill.md"))),
+                ("testing.md", include_str!(concat!("../../defaults/agents/agent-", $id, "/testing.md"))),
+            ] as &[(&str, &str)],
+        )
+    };
+}
+
+/// Like default_agent_entry but includes soul.md (for agents with a custom persona, e.g. abliterated).
+macro_rules! default_agent_entry_with_soul {
+    ($id:literal) => {
+        (
+            concat!("agent-", $id),
+            &[
+                ("agent.json", include_str!(concat!("../../defaults/agents/agent-", $id, "/agent.json"))),
+                ("skill.md", include_str!(concat!("../../defaults/agents/agent-", $id, "/skill.md"))),
+                ("soul.md", include_str!(concat!("../../defaults/agents/agent-", $id, "/soul.md"))),
                 ("testing.md", include_str!(concat!("../../defaults/agents/agent-", $id, "/testing.md"))),
             ] as &[(&str, &str)],
         )
@@ -187,6 +202,30 @@ impl Config {
         default_secs
     }
 
+    /// Ollama /api/chat request timeout in seconds. Used for all chat requests (UI, Discord, session compaction).
+    /// Default 300 (5 min). Config: config.json `ollamaChatTimeoutSecs`;
+    /// override: env `MAC_STATS_OLLAMA_CHAT_TIMEOUT_SECS`. Clamped to 15..=900.
+    pub fn ollama_chat_timeout_secs() -> u64 {
+        const DEFAULT_SECS: u64 = 300;
+        const MIN_SECS: u64 = 15;
+        const MAX_SECS: u64 = 900;
+        let from_env = std::env::var("MAC_STATS_OLLAMA_CHAT_TIMEOUT_SECS")
+            .ok()
+            .and_then(|s| s.parse::<u64>().ok());
+        if let Some(secs) = from_env {
+            return secs.clamp(MIN_SECS, MAX_SECS);
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(n) = json.get("ollamaChatTimeoutSecs").and_then(|v| v.as_u64()) {
+                    return n.clamp(MIN_SECS, MAX_SECS);
+                }
+            }
+        }
+        DEFAULT_SECS
+    }
+
     /// Get the user-info file path
     ///
     /// Returns a path in the user's home directory: `$HOME/.mac-stats/user-info.json`
@@ -341,6 +380,7 @@ impl Config {
         default_agent_entry!("003"),
         default_agent_entry!("004"),
         default_agent_entry!("005"),
+        default_agent_entry_with_soul!("abliterated"),
     ];
 
     const DEFAULT_DISCORD_CHANNELS: &str = include_str!("../../defaults/discord_channels.json");

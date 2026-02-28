@@ -1,6 +1,8 @@
 # agents-tasks
 
-Tasks created by the logfile scanner from `~/.mac-stats/debug.log` (cron every 10 minutes). Each task is dated and sourced from the log scan run.
+Single directory for all agent tasks: scanner-created tasks (log-NNN) and manual/legacy tasks (task-NNN). Tasks are sourced from `~/.mac-stats/debug.log` or created by the logfile scanner (cron every 10 minutes). See `PROMPT-DEBUG-LOG-SCANNER.md` for scanner instructions.
+
+**Log path:** The app writes to `~/.mac-stats/debug.log` (with a dot: `.mac-stats`).
 
 ## Summary
 
@@ -20,9 +22,16 @@ Tasks created by the logfile scanner from `~/.mac-stats/debug.log` (cron every 1
 
 See `scan-log.md` for per-run details (scan time, tasks created, notes).
 
+## Task-NNN (manual / legacy)
+
+| Id       | Topic                        | Summary |
+|----------|------------------------------|---------|
+| task-001 | Ollama timeout / compaction  | Retries, user message, compaction on failure. |
+| task-002 | URL validation FETCH_URL     | Validate/sanitize URLs; IDN handling. |
+| task-004 | Scheduler log churn          | Reduce "loaded N entries" log and disk reads. |
+| task-005 | Session compaction log       | Clarify "401" (annotations) vs HTTP 401. |
+
 ## Task format
 
-- **Id**: log-NNN
-- **Topic**: kebab-case identifier
-- **Created**: date and time (UTC) when the task was created by the scanner
-- **Source**: ~/.mac-stats/debug.log and scan date
+- **log-NNN**: Id from scanner; **Topic**: kebab-case; **Created**: UTC; **Source**: ~/.mac-stats/debug.log
+- **task-NNN**: Manual tasks; see individual `task-NNN.md` files.
