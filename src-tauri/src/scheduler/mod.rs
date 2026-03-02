@@ -134,7 +134,7 @@ fn load_schedules() -> Vec<ScheduleEntry> {
         }
     }
 
-    info!(
+    debug!(
         "Scheduler: loaded {} entries from {:?}",
         entries.len(),
         path
@@ -311,7 +311,7 @@ async fn execute_task(entry: &ScheduleEntry) -> Option<String> {
     }
 
     info!("Scheduler: running via Ollama (id={}): {}...", id_info, task.chars().take(60).collect::<String>());
-    match crate::commands::ollama::answer_with_ollama_and_fetch(task, None, None, None, None, None, None, None, None, false, None, false, true).await {
+    match crate::commands::ollama::answer_with_ollama_and_fetch(task, None, None, None, None, None, None, None, None, false, None, false, true, true).await {
         Ok(reply) => {
             info!("Scheduler: Ollama completed (id={}, {} chars)", id_info, reply.text.chars().count());
             Some(reply.text)

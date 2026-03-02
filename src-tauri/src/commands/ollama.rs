@@ -1801,10 +1801,11 @@ pub fn answer_with_ollama_and_fetch(
                 }]
             }
             Err(e) => {
+                let n = raw_history.len();
                 let msg = if e.to_string().to_lowercase().contains("unauthorized") || e.to_string().contains("401") {
-                    format!("Session compaction failed: {} (use a local model for compaction; cloud models may require auth). Using raw history.", e)
+                    format!("Session compaction failed: {} (use a local model for compaction; cloud models may require auth). Keeping full history ({} messages) for this request.", e, n)
                 } else {
-                    format!("Session compaction failed: {}, using raw history.", e)
+                    format!("Session compaction failed: {}; keeping full history ({} messages) for this request.", e, n)
                 };
                 tracing::warn!("{}", msg);
                 raw_history

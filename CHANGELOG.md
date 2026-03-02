@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Session compaction log (task-005)** — On compaction failure the log now says "keeping full history (N messages) for this request" instead of "using raw history" so the number is clearly message count, not HTTP 401.
+- **Scheduler log (task-004)** — "Scheduler: loaded N entries from ..." is now at DEBUG so short check intervals don't spam INFO every few seconds.
 - **BROWSER_INPUT status label** — Status now shows element label when available (e.g. "✍️ Typing into element 4 (Search box)…"). BROWSER_CLICK already showed label.
 - **Browser tool cap per run** — Max 15 browser tools (NAVIGATE, CLICK, INPUT, SCROLL, EXTRACT, SEARCH_PAGE, SCREENSHOT) per run; when exceeded the model gets "Maximum browser actions per run reached (15). Reply with your answer or DONE: success / DONE: no." Log: "Agent router: browser tool #N/15 this run". See `docs/032_browser_loop_and_status_fix_plan.md`.
 
