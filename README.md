@@ -41,7 +41,7 @@ curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/refs/heads/main/ru
 
 - **AI** — Ollama on your Mac; models and inference stay on-device.
 - **Your data** — Config, memory, sessions, and tasks in `~/.mac-stats`. Nothing sent to a vendor. Secrets in `~/.mac-stats/.config.env` or Keychain.
-- **Optional network** — Discord, FETCH_URL, Brave Search, website checks only when you use them.
+- **Optional network** — Discord, Mastodon, FETCH_URL, Brave Search, website checks only when you use them.
 - **Metrics** — CPU, GPU, RAM, disk, temperature, processes read from your machine when you open the window.
 
 No subscription. No lock-in. Works offline for chat and monitoring. All you need is a nice pet from [Ollama](https://ollama.com)—the kind that runs on your Mac and never asks for a subscription.
@@ -55,7 +55,7 @@ All settings live under `~/.mac-stats/`:
 ```
 ~/.mac-stats/
 ├── config.json            # Window decorations, scheduler interval, ollamaChatTimeoutSecs
-├── .config.env            # Secrets (Discord token, API keys) — never commit ;-)
+├── .config.env            # Secrets (Discord, Mastodon, API keys) — never commit ;-)
 ├── discord_channels.json  # Per-channel modes (mention_only, all_messages, having_fun)
 ├── escalation_patterns.md # Phrases that trigger “try harder” (e.g. “think harder”, “you are stupid”); user-editable, auto-adds when you complain
 ├── schedules.json         # Cron and one-shot tasks
@@ -87,7 +87,7 @@ All settings live under `~/.mac-stats/`:
 ## Features
 
 ### AI & agents (Ollama, local)
-- **Chat** — In the app window or via Discord. Code execution (JS), **FETCH_URL**, **BRAVE_SEARCH**, **RUN_CMD** (allowlisted), retry and correction.
+- **Chat** — In the app window or via Discord. Code execution (JS), **FETCH_URL**, **BRAVE_SEARCH**, **RUN_CMD** (allowlisted), **MASTODON_POST** (toot from the agent), retry and correction.
 - **Completion verification** — We extract 1–3 success criteria at the start and ask “Did we satisfy the request?” at the end; if not, we append a disclaimer. Heuristic: “screenshot requested but none attached” → note. See [docs/025_expectation_check_design.md](docs/025_expectation_check_design.md).
 - **Escalation / “try harder”** — Edit **~/.mac-stats/escalation_patterns.md** (one phrase per line). When your message contains one (e.g. “think harder”, “you are stupid”), we run a stronger completion pass (+10 tool steps). New phrases you use get auto-added.
 - **Memory** — Global and per-agent `memory.md`; **MEMORY_APPEND**; session compaction writes lessons to memory.
@@ -104,7 +104,7 @@ All settings live under `~/.mac-stats/`:
 
 ### System monitoring (background)
 - Real-time CPU, RAM, disk, GPU in the menu bar; temperature, frequency, battery. Process list with top consumers; click for details. Low CPU: &lt;0.1% with window closed, ~3% with window open.
-- **Monitoring & alerts** — Website and social monitoring; alert rules and channels (Telegram, Slack, etc.).
+- **Monitoring & alerts** — Website and social monitoring (Mastodon mentions); alert rules and channels (Telegram, Slack, Mastodon, etc.).
 
 ---
 
@@ -112,6 +112,7 @@ All settings live under `~/.mac-stats/`:
 
 - **Chat** — Open the window (click the menu bar icon or run with `--cpu`) and use the AI panel. Verbosity: `-v` / `-vv` / `-vvv`.
 - **Discord** — Configure `~/.mac-stats/discord_channels.json` and ensure your bot token is set; the agent responds to @mentions, DMs, or in having_fun channels (where your Mac can chill and talk to other bots). See [Discord setup and channel modes](docs/007_discord_agent.md) for details.
+- **Mastodon** — Set `MASTODON_INSTANCE_URL` and `MASTODON_ACCESS_TOKEN` in env or `~/.mac-stats/.config.env`; the agent can **MASTODON_POST** toots, and you can add Mastodon monitors (mentions) and alert channels. No X.com yet ;-) — let's see who implements it first.
 - **Monitoring** — Click any percentage in the menu bar (CPU, GPU, RAM, Disk) to open the details window. ⌘W to hide; click again to toggle; ⌘Q to quit. CPU use: &lt;0.1% with window closed, ~3% with window open.
 
 ---
