@@ -53,19 +53,20 @@ All settings live under `~/.mac-stats/`:
 
 ```
 ~/.mac-stats/
-├── config.json          # Window decorations, scheduler interval, ollamaChatTimeoutSecs
-├── .config.env          # Secrets (Discord token, API keys) — never commit
-├── discord_channels.json # Per-channel modes (mention_only, all_messages, having_fun)
-├── schedules.json       # Cron and one-shot tasks
-├── user-info.json       # Per-user details (Discord id → display_name, notes, timezone)
-├── agents/              # LLM agents (orchestrator, coder, etc.), soul.md, memory.md
-├── prompts/             # Editable planning_prompt.md, execution_prompt.md
-├── skills/              # skill-<n>-<topic>.md for different agent personalities
-├── task/                # Task files (TASK_LIST, TASK_CREATE, TASK_STATUS)
-├── scripts/             # PYTHON_SCRIPT output
-├── session/             # Conversation sessions (compacted to memory)
-├── screenshots/         # BROWSER_SCREENSHOT output
-└── debug.log            # App logs (tail -f ~/.mac-stats/debug.log)
+├── config.json            # Window decorations, scheduler interval, ollamaChatTimeoutSecs
+├── .config.env            # Secrets (Discord token, API keys) — never commit
+├── discord_channels.json  # Per-channel modes (mention_only, all_messages, having_fun)
+├── escalation_patterns.md # Phrases that trigger “try harder” (e.g. “think harder”, “you are stupid”); user-editable, auto-adds when you complain
+├── schedules.json         # Cron and one-shot tasks
+├── user-info.json         # Per-user details (Discord id → display_name, notes, timezone)
+├── agents/                # LLM agents (orchestrator, coder, etc.), soul.md, memory.md
+├── prompts/               # Editable planning_prompt.md, execution_prompt.md
+├── skills/                # skill-<n>-<topic>.md for different agent personalities
+├── task/                  # Task files (TASK_LIST, TASK_CREATE, TASK_STATUS)
+├── scripts/               # PYTHON_SCRIPT output
+├── session/               # Conversation sessions (compacted to memory)
+├── screenshots/           # BROWSER_SCREENSHOT output
+└── debug.log              # App logs (tail -f ~/.mac-stats/debug.log)
 ```
 
 ---
@@ -86,6 +87,8 @@ All settings live under `~/.mac-stats/`:
 
 ### AI & agents (Ollama, local)
 - **Chat** — In the app window or via Discord. Code execution (JS), **FETCH_URL**, **BRAVE_SEARCH**, **RUN_CMD** (allowlisted), retry and correction.
+- **Completion verification** — We extract 1–3 success criteria at the start and ask “Did we satisfy the request?” at the end; if not, we append a disclaimer. Heuristic: “screenshot requested but none attached” → note. See [docs/025_expectation_check_design.md](docs/025_expectation_check_design.md).
+- **Escalation / “try harder”** — Edit **~/.mac-stats/escalation_patterns.md** (one phrase per line). When your message contains one (e.g. “think harder”, “you are stupid”), we run a stronger completion pass (+10 tool steps). New phrases you use get auto-added.
 - **Memory** — Global and per-agent `memory.md`; **MEMORY_APPEND**; session compaction writes lessons to memory.
 - **Discord bot** — Optional. @mentions, DMs, or having_fun mode (your Mac chats with other bots when bored); per-channel model/agent. Full Ollama + tools.
 - **Tasks** — `~/.mac-stats/task/` with **TASK_LIST**, **TASK_CREATE**, **TASK_STATUS**, assignees, scheduler loop.
@@ -150,9 +153,9 @@ This repo is edited by the mac-stats-reviewer Coder agent in place (yolo mode). 
 
 ## Inspiration & notes
 
-Local AI agent stack first; system monitoring lives in the menu bar when you need it. Inspired by [Stats](https://github.com/exelban/stats) by exelban (low CPU, native metrics). Built with Rust + Tauri; metrics use libproc, SMC, IOReport where appropriate.
+Local AI agent stack first; system monitoring lives in the menu bar when you need it. Inspired by [Stats](https://github.com/exelban/stats) by exelban (low CPU, native metrics), [OpenClaw](https://github.com/openclaw/openclaw), [browser-use](https://github.com/browser-use/browser-use), and [Hermes](https://github.com/NousResearch/hermes-agent) by Nous Research. Built with Rust + Tauri; metrics use libproc, SMC, IOReport where appropriate.
 
-- Menu bar: every 1–2s | Window: 1s | Process list: 15s | Window stays on top when open
+- Menu bar: refresh every 1–2s | Window: 1s | Process list: 15s
 
 ---
 
