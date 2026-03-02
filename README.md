@@ -21,7 +21,8 @@ A local AI agent for macOS: Ollama chat, Discord bot, task runner, scheduler, an
 curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/refs/heads/main/run -o run && chmod +x run && ./run
 ```
 
-*If macOS says the DMG is "damaged":* Right-click → **Open** (Gatekeeper blocks unsigned apps; the file is fine). Or: `xattr -d com.apple.quarantine ~/Downloads/mac-stats_*.dmg`
+> **💡 TIP — "DMG is damaged"**  
+> macOS Gatekeeper is blocking the unsigned app; the file is fine. Right-click the DMG → **Open**, then confirm. Or run: `xattr -d com.apple.quarantine ~/Downloads/mac-stats_*.dmg`
 
 ---
 
