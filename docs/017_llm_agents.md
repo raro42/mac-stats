@@ -9,13 +9,26 @@ This document describes **LLM agents**: directory-based entities under `~/.mac-s
 
 | File         | Purpose                                                                 |
 | ------------ | ----------------------------------------------------------------------- |
-| **agent.json** | Required. `{ "name": "...", "slug": "...", "model": "...", "orchestrator": true/false, "enabled": true/false }`. `model` optional (fallback: default Ollama config). |
+| **agent.json** | Required. `{ "name": "...", "slug": "...", "model": "...", "model_role": "...", "orchestrator": true/false, "enabled": true/false }`. `model` optional (explicit model name). `model_role` optional (resolved from catalog at load time). See **Model and model_role** below. |
 | **skill.md**   | Required. What the agent is good at (system-prompt overlay).            |
 | **mood.md**   | Optional. Mood / tone / additional context.                            |
 | **soul.md**   | Optional. “Soul” of the agent (identity, principles).                   |
 | **testing.md**| Required for `mac_stats agent test`. Test prompts (one per `## ` section or whole file). |
 
 **Combined prompt** for an agent: concatenate in order **soul → mood → skill**. Empty files are skipped.
+
+**Model and model_role**: You can set either **`model`** (exact Ollama model name) or **`model_role`** (resolved at startup from the local model list). If both are set and `model` is available, it is used. **`model_role`** values (see `ollama/models.rs` and `docs/030_agent_model_assignment_plan.md`):
+
+| Role | Picks |
+|------|--------|
+| `code` | Best code-oriented model (name/family: coder, code). Fallback: general. |
+| `general` | Best general-purpose model (medium size preferred). |
+| `small` / `cheap` | Smallest eligible local model (fast, low resource). |
+| `vision` | First vision/multimodal model (llava, pixtral, etc.). Fallback: general. |
+| `thinking` / `reasoning` | First reasoning model (deepseek-r1, thinking, etc.). Fallback: general. |
+| `expensive` | Largest eligible local model. |
+
+Models are classified from Ollama’s `/api/tags` (name, family, parameter size). **Only local models are chosen** for role resolution; cloud is used only when you explicitly set it (e.g. `model: "qwen3.5:cloud"` in agent.json or as default).
 
 **Naming**: Agent **id** comes from the directory (`agent-001` → id `"001"`). **Name** and optional **slug** come from `agent.json`. **Slug** is a short natural-language identifier (e.g. `humble-coder`, `senior-coder`) used for display and for **AGENT: <selector>** resolution: match by **slug** (case-insensitive) first, then by **name**, then by **id**.
 
@@ -48,12 +61,14 @@ When at least one enabled agent exists, the app adds an **AGENT** tool to the li
 
 Four agents ship as defaults, embedded in the binary via `include_str!` from `src-tauri/defaults/agents/`. On first launch (or if missing), `Config::ensure_defaults()` writes them to `~/.mac-stats/agents/`:
 
-| Dir | Name | Slug | Model | Role |
-|-----|------|------|-------|------|
-| `agent-000` | Orchestrator | `orchestrator` | qwen3:latest | Routes to specialists, has full Router API Commands in skill.md |
-| `agent-001` | General Assistant | `general-purpose-mommy` | qwen3:latest | General-purpose Q&A |
-| `agent-002` | Coder | `senior-coder` | qwen2.5-coder:latest | Code generation, refactoring, debugging |
-| `agent-003` | Generalist | `humble-generalist` | huihui_ai/granite3.2-abliterated:2b | Non-code topics, discussion, reflection |
+| Dir | Name | Slug | model_role (resolved at startup) | Role |
+|-----|------|------|----------------------------------|------|
+| `agent-000` | Orchestrator | `orchestrator` | `thinking` | Routes to specialists; uses reasoning model when available |
+| `agent-001` | General Assistant | `general-purpose-mommy` | `general` | General-purpose Q&A |
+| `agent-002` | Coder | `senior-coder` | `code` | Code generation; uses code model when available |
+| `agent-003` | Generalist | `humble-generalist` | `small` | Fast replies; smallest local model |
+| `agent-004` | Discord Expert | `discord-expert` | `cheap` | Discord API specialist; fast model |
+| `agent-005` | Task Runner | `scheduler` | `general` | Task file execution; general model |
 
 Each includes `agent.json`, `skill.md`, and `testing.md`. Users can edit any file — `ensure_defaults()` never overwrites existing files. To reset an agent to defaults, delete its directory and restart.
 
