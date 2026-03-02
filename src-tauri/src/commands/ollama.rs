@@ -8,8 +8,10 @@ use crate::ollama::{
     PsResponse, VersionResponse,
 };
 use serde::{Deserialize, Serialize};
+use std::future::Future;
 use std::io::Write;
 use std::path::PathBuf;
+use std::pin::Pin;
 use std::process::Command;
 use std::str::FromStr;
 use std::sync::atomic::Ordering;
@@ -1393,11 +1395,115 @@ pub struct OllamaReply {
     pub attachment_paths: Vec<PathBuf>,
 }
 
+/// One short Ollama call to extract 1–3 concrete success criteria from the user request.
+/// Returns None on error or empty so the run is not blocked.
+async fn extract_success_criteria(
+    question: &str,
+    model_override: Option<String>,
+    options_override: Option<crate::ollama::ChatOptions>,
+) -> Option<Vec<String>> {
+    let q: String = question.chars().take(800).collect();
+    let system = "You are an assistant that extracts success criteria. Reply with 1 to 3 concrete success criteria, one per line (e.g. 'screenshot of the page attached', 'page content fetched'). No numbering, no extra text.";
+    let user = format!(
+        "User request:\n\n{}\n\nList 1–3 concrete success criteria (one per line). Reply with only the criteria.",
+        q
+    );
+    let messages = vec![
+        crate::ollama::ChatMessage { role: "system".to_string(), content: system.to_string() },
+        crate::ollama::ChatMessage { role: "user".to_string(), content: user },
+    ];
+    let response = match send_ollama_chat_messages(messages, model_override, options_override).await {
+        Ok(r) => r,
+        Err(e) => {
+            tracing::debug!("Agent router: success criteria extraction failed: {}", e);
+            return None;
+        }
+    };
+    let text = response.message.content.trim();
+    let criteria: Vec<String> = text
+        .lines()
+        .map(str::trim)
+        .filter(|s| !s.is_empty() && s.len() > 2)
+        .take(3)
+        .map(String::from)
+        .collect();
+    if criteria.is_empty() {
+        tracing::debug!("Agent router: success criteria extraction returned no criteria (empty or parse)");
+        None
+    } else {
+        Some(criteria)
+    }
+}
+
+/// One short Ollama call to check if we fully satisfied the user's request.
+/// Returns (satisfied, optional reason when not satisfied).
+/// When success_criteria is provided, the verifier is asked to check against those criteria.
+async fn verify_completion(
+    question: &str,
+    response_content: &str,
+    attachment_count: usize,
+    success_criteria: Option<&[String]>,
+    model_override: Option<String>,
+    options_override: Option<crate::ollama::ChatOptions>,
+) -> Result<(bool, Option<String>), String> {
+    let response_summary: String = response_content.chars().take(1500).collect();
+    let has_attachments = attachment_count > 0;
+    let system = "You are a completion checker. Answer only with YES or NO, and if NO add one short sentence after a newline explaining what's missing.";
+    let criteria_block = success_criteria
+        .filter(|c| !c.is_empty())
+        .map(|c| format!("Success criteria (from user request):\n{}\n\n", c.join("\n")))
+        .unwrap_or_default();
+    let user = format!(
+        "Original request: {}\n\n{}What we did (summary): {}\n\nAttachments sent: {}.\n\nDid we fully satisfy the request (e.g. screenshot taken and attached if asked)? Reply YES or NO. If NO, on the next line add one sentence: what's missing.",
+        question.chars().take(500).collect::<String>(),
+        criteria_block,
+        response_summary,
+        if has_attachments { "yes" } else { "no" }
+    );
+    let messages = vec![
+        crate::ollama::ChatMessage { role: "system".to_string(), content: system.to_string() },
+        crate::ollama::ChatMessage { role: "user".to_string(), content: user },
+    ];
+    let response = match send_ollama_chat_messages(messages, model_override, options_override).await {
+        Ok(r) => r.message.content,
+        Err(e) => {
+            tracing::warn!("Completion verification call failed: {}", e);
+            return Ok((true, None)); // on error assume satisfied to avoid blocking
+        }
+    };
+    let response_upper = response.trim().to_uppercase();
+    let satisfied = response_upper.starts_with("YES");
+    tracing::debug!(
+        "Agent router: verification result: {} (response: {}...)",
+        if satisfied { "YES" } else { "NO" },
+        response.trim().chars().take(80).collect::<String>()
+    );
+    let reason = if !satisfied {
+        let first_line = response.lines().next().unwrap_or("").trim();
+        let rest = response
+            .lines()
+            .skip(1)
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+            .next()
+            .or_else(|| response.lines().nth(1).map(str::trim))
+            .filter(|s| !s.is_empty());
+        rest.or_else(|| if first_line.len() > 3 { Some(first_line) } else { None })
+            .map(|s| s.to_string())
+    } else {
+        None
+    };
+    Ok((satisfied, reason))
+}
+
 /// When set, `skill_content` is prepended to system prompts (from ~/.mac-stats/skills/skill-<n>-<topic>.md).
 /// When set, `agent_override` uses that agent's model and combined_prompt (soul+mood+skill) for the main run (e.g. Discord "agent: 001").
 /// When `allow_schedule` is false (e.g. when running from the scheduler), the SCHEDULE tool is disabled so a scheduled task cannot create more schedules.
 /// When `conversation_history` is set (e.g. from Discord session memory), it is prepended so the model sees prior turns and can resolve "there", "it", etc.
-pub async fn answer_with_ollama_and_fetch(
+/// When `escalation` is true (e.g. user said "think harder" or "get it done"), we inject a stronger "you MUST complete the task" instruction and allow more tool steps.
+/// When `retry_on_verification_no` is true and verification says we didn't satisfy the request, we run one retry with a "complete the remaining steps" prompt; the retry run is called with `retry_on_verification_no: false` so we don't retry indefinitely.
+/// Returns a boxed future to allow one level of async recursion (retry path).
+pub fn answer_with_ollama_and_fetch(
     question: &str,
     status_tx: Option<tokio::sync::mpsc::UnboundedSender<String>>,
     discord_reply_channel_id: Option<u64>,
@@ -1409,10 +1515,16 @@ pub async fn answer_with_ollama_and_fetch(
     agent_override: Option<crate::agents::Agent>,
     allow_schedule: bool,
     conversation_history: Option<Vec<crate::ollama::ChatMessage>>,
-) -> Result<OllamaReply, String> {
+    escalation: bool,
+    retry_on_verification_no: bool,
+) -> Pin<Box<dyn Future<Output = Result<OllamaReply, String>> + Send>> {
+    let question = question.to_string();
+    let conversation_history = conversation_history.map(|v| v.to_vec());
+    Box::pin(async move {
     use tracing::info;
+    let question = question.as_str();
 
-    let (model_override, skill_content, max_tool_iterations) = if let Some(ref a) = agent_override {
+    let (model_override, skill_content, mut max_tool_iterations) = if let Some(ref a) = agent_override {
         (
             a.model.clone().or(model_override),
             Some(a.combined_prompt.clone()),
@@ -1425,6 +1537,10 @@ pub async fn answer_with_ollama_and_fetch(
             15u32, // default when no agent override
         )
     };
+    if escalation {
+        max_tool_iterations = max_tool_iterations.saturating_add(10);
+        info!("Agent router: escalation mode — max_tool_iterations raised to {}", max_tool_iterations);
+    }
 
     if let Some(ref model) = model_override {
         let available = list_ollama_models().await.map_err(|e| format!("Could not list models: {}", e))?;
@@ -1474,6 +1590,15 @@ pub async fn answer_with_ollama_and_fetch(
         }
     };
 
+    let question_for_plan_and_exec = if escalation {
+        format!(
+            "[The user is not satisfied and wants the task actually completed. You MUST use tools to fulfill the request; do not reply with only text.]\n\n{}",
+            question
+        )
+    } else {
+        question.to_string()
+    };
+
     let q_preview: String = question.chars().take(120).collect();
     if question.len() > 120 {
         info!("Agent router: starting (question: {}... [{} chars])", q_preview, question.len());
@@ -1492,6 +1617,20 @@ pub async fn answer_with_ollama_and_fetch(
         "Asking Ollama for a plan (sending your question: \"{}\")…",
         truncate_status(question, 50)
     ));
+
+    // Criteria at start: extract 1–3 success criteria to feed into end verification
+    send_status("Extracting success criteria…");
+    let success_criteria = extract_success_criteria(
+        question,
+        model_override.clone(),
+        options_override.clone(),
+    )
+    .await;
+    if let Some(ref c) = success_criteria {
+        info!("Agent router: extracted {} success criteria", c.len());
+    } else {
+        tracing::debug!("Agent router: no success criteria extracted (verification will use request summary only)");
+    }
 
     const CONVERSATION_HISTORY_CAP: usize = 20;
     let raw_history: Vec<crate::ollama::ChatMessage> = conversation_history
@@ -1699,7 +1838,7 @@ pub async fn answer_with_ollama_and_fetch(
             role: "user".to_string(),
             content: format!(
                 "Current user question: {}{}\n\nReply with RECOMMEND: your plan.",
-                question, model_hint
+                question_for_plan_and_exec, model_hint
             ),
         });
         let plan_response = send_ollama_chat_messages(planning_messages, model_override.clone(), options_override.clone()).await?;
@@ -1777,7 +1916,7 @@ pub async fn answer_with_ollama_and_fetch(
         for msg in &conversation_history {
             msgs.push(msg.clone());
         }
-        msgs.push(crate::ollama::ChatMessage { role: "user".to_string(), content: question.to_string() });
+        msgs.push(crate::ollama::ChatMessage { role: "user".to_string(), content: question_for_plan_and_exec.clone() });
         // Use full recommendation when it contains multiple tools (e.g. BROWSER_NAVIGATE + BROWSER_SCREENSHOT)
         let synthetic = if recommendation.contains('\n') {
             recommendation.clone()
@@ -1803,7 +1942,7 @@ pub async fn answer_with_ollama_and_fetch(
         for msg in &conversation_history {
             msgs.push(msg.clone());
         }
-        msgs.push(crate::ollama::ChatMessage { role: "user".to_string(), content: question.to_string() });
+        msgs.push(crate::ollama::ChatMessage { role: "user".to_string(), content: question_for_plan_and_exec.clone() });
         let response = send_ollama_chat_messages(msgs.clone(), model_override.clone(), options_override.clone()).await?;
         let content = response.message.content.clone();
         let n = content.chars().count();
@@ -3117,9 +3256,87 @@ pub async fn answer_with_ollama_and_fetch(
         }
     }
 
+    // Heuristic guard: screenshot requested but no attachment
+    let question_lower = question.to_lowercase();
+    let plan_mentions_screenshot = recommendation.to_uppercase().contains("BROWSER_SCREENSHOT");
+    let user_asked_screenshot = question_lower.contains("screenshot");
+    if (user_asked_screenshot || plan_mentions_screenshot) && attachment_paths.is_empty() {
+        response_content.push_str("\n\nNote: A screenshot was requested but none was attached.");
+        info!("Agent router: heuristic guard — screenshot requested but no attachment, appended note");
+    }
+
+    // Completion verification: one short Ollama call; if not satisfied, retry once (A2) or append disclaimer
+    let criteria_count = success_criteria.as_ref().map(|c| c.len()).unwrap_or(0);
+    info!(
+        "Agent router: running completion verification ({} criteria, {} attachment(s))",
+        criteria_count,
+        attachment_paths.len()
+    );
+    match verify_completion(
+        question,
+        &response_content,
+        attachment_paths.len(),
+        success_criteria.as_deref(),
+        model_override.clone(),
+        options_override.clone(),
+    )
+    .await
+    {
+        Ok((false, reason)) => {
+            if retry_on_verification_no {
+                let retry_question = reason
+                    .as_deref()
+                    .map(|r| format!("Verification said we didn't fully complete: {}. Complete the remaining steps now, then reply.", r.trim()))
+                    .unwrap_or_else(|| "Verification said we didn't fully complete. Complete the remaining steps now, then reply.".to_string());
+                info!("Agent router: verification said not satisfied, retrying once with: {}...", retry_question.chars().take(60).collect::<String>());
+                let mut updated_history: Vec<crate::ollama::ChatMessage> = conversation_history.clone();
+                updated_history.push(crate::ollama::ChatMessage {
+                    role: "user".to_string(),
+                    content: question.to_string(),
+                });
+                updated_history.push(crate::ollama::ChatMessage {
+                    role: "assistant".to_string(),
+                    content: response_content.clone(),
+                });
+                return answer_with_ollama_and_fetch(
+                    &retry_question,
+                    status_tx,
+                    discord_reply_channel_id,
+                    discord_user_id,
+                    discord_user_name,
+                    model_override,
+                    options_override,
+                    skill_content,
+                    agent_override,
+                    allow_schedule,
+                    Some(updated_history),
+                    escalation,
+                    false, // don't retry again
+                )
+                .await;
+            }
+            let reason_preview = reason.as_deref().map(|r| r.chars().take(80).collect::<String>()).unwrap_or_default();
+            let disclaimer = reason
+                .map(|r| format!("\n\nNote: We may not have fully met your request: {}.", r.trim()))
+                .unwrap_or_else(|| "\n\nNote: We may not have fully met your request.".to_string());
+            response_content.push_str(&disclaimer);
+            info!(
+                "Agent router: verification said not satisfied, appended disclaimer (reason: {}...)",
+                reason_preview
+            );
+        }
+        Ok((true, _)) => {
+            info!("Agent router: verification passed (satisfied)");
+        }
+        Err(e) => {
+            tracing::debug!("Agent router: verification failed (ignored): {}", e);
+        }
+    }
+
     Ok(OllamaReply {
         text: response_content,
         attachment_paths,
+    })
     })
 }
 

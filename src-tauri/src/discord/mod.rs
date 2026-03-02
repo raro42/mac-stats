@@ -1307,6 +1307,19 @@ fn parse_discord_ollama_overrides(
     (question, model_override, options_override, skill_content, agent_selector, verbose)
 }
 
+/// True if the message indicates the user is not satisfied and wants the task actually completed.
+/// Patterns are loaded from ~/.mac-stats/escalation_patterns.md (one phrase per line; user-editable).
+fn is_escalation_message(question: &str) -> bool {
+    let lower = question.trim().to_lowercase();
+    if lower.is_empty() {
+        return false;
+    }
+    let patterns = crate::config::Config::load_escalation_patterns();
+    patterns
+        .iter()
+        .any(|p| lower.contains(&p.to_lowercase()))
+}
+
 /// True if we already spawned the gateway thread (only one gateway per process).
 static GATEWAY_STARTED: AtomicBool = AtomicBool::new(false);
 
@@ -1412,6 +1425,11 @@ impl EventHandler for Handler {
 
         let (mut question, mut model_override, options_override, skill_content, agent_selector, verbose_opt) =
             parse_discord_ollama_overrides(&content);
+        let escalation = is_escalation_message(&question);
+        if escalation {
+            info!("Discord: escalation detected (user wants task actually completed)");
+            crate::config::Config::append_escalation_pattern_if_new(&question);
+        }
         let verbose = match verbose_opt {
             Some(v) => v,
             None if is_dm => default_verbose_for_dm(),
@@ -1557,6 +1575,8 @@ impl EventHandler for Handler {
             agent_override,
             true,
             conversation_history,
+            escalation,
+            true, // retry once when verification says NO
         ).await {
             Ok(r) => (r.text, r.attachment_paths),
             Err(e) => {

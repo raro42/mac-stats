@@ -8,20 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **BROWSER_SCROLL** — Agent tool: scroll the current CDP page. Reply with `BROWSER_SCROLL: down|up|bottom|top` or `BROWSER_SCROLL: <pixels>`. Returns updated browser state (URL, elements list).
+- **Completion verification** — At the start of each agent run we extract 1–3 success criteria from the user request; at the end we ask Ollama “Did we fully satisfy the request?” and, if not, retry once then append a short disclaimer if still not satisfied. Heuristic: if a screenshot was requested but none was attached, we add a note. See `docs/025_expectation_check_design.md`.
+- **Escalation patterns (user-editable)** — Phrases that trigger “user is not satisfied” (stronger completion run, +10 tool steps) are now read from **~/.mac-stats/escalation_patterns.md**. One phrase per line; lines starting with `#` are comments. Edit the file to add your own triggers (e.g. “I don’t like your answer”, “You are stupid”) so the bot actually tries harder instead of just apologising. Default list includes “think harder”, “get it done”, “try again”, “no”, “nope”, etc. No restart needed — the file is read on each message. When we detect escalation, we append the user's phrase to the file if it's not already there (auto-add).
+- **BROWSER_SCROLL** — Agent tool: scroll the current CDP page. Reply with `BROWSER_SCROLL: down|up|bottom|top` or `BROWSER_SCROLL: <pixels>`.
 - **BROWSER_EXTRACT** — Agent tool: return visible text of the current CDP page (body innerText, truncated to 30k chars). Use after BROWSER_NAVIGATE/CLICK to get page content for the LLM.
+- **HTTP-only browser fallback** — When Chrome/CDP is not available (e.g. port 9222), BROWSER_NAVIGATE / BROWSER_CLICK / BROWSER_INPUT / BROWSER_EXTRACT use HTTP fetch + HTML parsing; CLICK follows links or submits forms, INPUT fills form fields. No JavaScript execution.
 
 ### Changed
-- **Browser agent retry on connection error** — When CDP connection is stale (connection closed, timeout, "Unable to make method calls"), the app clears the cached session and retries once. All CDP entry points (navigate, click, input, scroll, extract, screenshot) use this retry wrapper for seamless recovery without user restart.
-- **Browser-use style browser tools** — Adopted [browser-use](https://github.com/browser-use/browser-use) semantics: (1) **BROWSER_SCREENSHOT** only works on current page — use BROWSER_NAVIGATE first, then BROWSER_SCREENSHOT: current. BROWSER_SCREENSHOT: \<url\> is rejected. (2) **BROWSER_SEARCH_PAGE: \<pattern\>** — new tool to search page text for a pattern (like grep), returns matches with context. Use to find specific text (e.g. a name) without reading the whole page. (3) Pre-route "screenshot + URL" now runs BROWSER_NAVIGATE + BROWSER_SCREENSHOT: current in sequence.
-
-### Added
-- **HTTP-only browser fallback** — When Chrome/CDP is not available (e.g. port 9222), BROWSER_NAVIGATE / BROWSER_CLICK / BROWSER_INPUT / BROWSER_EXTRACT use HTTP fetch + HTML parsing (`scraper`): fetch page, parse links and forms, present numbered list to LLM; CLICK follows links or submits forms, INPUT fills form fields. No JavaScript execution.
-
-### Changed
-- **README** — Fresh layout inspired by OpenClaw/Hermes: Quick install at top, "At a glance" feature bullets, `~/.mac-stats/` config tree, commands table, GitHub release badge. Hero screenshot switched to `data-poster.png` so Mac users see the interface. Link bar: Changelog · Screenshots.
+- **Browser agent retry on connection error** — When CDP connection is stale (connection closed, timeout, "Unable to make method calls"), the app clears the cached session and retries once. All CDP entry points use this retry wrapper.
+- **Browser-use style browser tools** — (1) **BROWSER_SCREENSHOT** only on current page — BROWSER_NAVIGATE first, then BROWSER_SCREENSHOT: current. (2) **BROWSER_SEARCH_PAGE: \<pattern\>** to search page text. (3) Pre-route "screenshot + URL" runs BROWSER_NAVIGATE + BROWSER_SCREENSHOT: current in sequence.
+- **Logging for expectation check flow** — Added info/debug logs so `tail -f ~/.mac-stats/debug.log` shows: criteria extraction (count or “no criteria”), completion verification run (criteria + attachment count), verification result (passed / not satisfied with reason), retry-on-NO, disclaimer with reason, heuristic guard, escalation mode. Use `-vvv` for debug (extraction failure, raw verifier response, duplicate escalation pattern skip).
 - **Task runner prompt** — Explicit hint to use CURSOR_AGENT for implement/refactor/add-feature/code tasks, then TASK_APPEND and TASK_STATUS.
-- **Tool-first routing** — Pre-route "screenshot + URL" requests to BROWSER_SCREENSHOT (skip planner). Default planning prompt includes a tool-first rule: when one base tool fits the request, recommend that tool instead of AGENT. See `docs/031_orchestrator_tool_first_proposal.md`.
+- **Tool-first routing** — Pre-route "screenshot + URL" to BROWSER_SCREENSHOT (skip planner). Planning prompt: when one base tool fits, recommend that tool instead of AGENT. See `docs/031_orchestrator_tool_first_proposal.md`.
 
 ## [0.1.22] - 2026-02-28
 

@@ -353,6 +353,16 @@ impl Config {
         }
     }
 
+    /// Path to escalation patterns: `$HOME/.mac-stats/escalation_patterns.md`
+    /// One phrase per line; when a user message contains any phrase (case-insensitive), escalation mode is triggered.
+    pub fn escalation_patterns_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("escalation_patterns.md")
+        } else {
+            std::env::temp_dir().join("mac-stats-escalation_patterns.md")
+        }
+    }
+
     /// Prompts directory: `$HOME/.mac-stats/prompts/`
     pub fn prompts_dir() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {
@@ -405,6 +415,7 @@ impl Config {
     ];
 
     const DEFAULT_DISCORD_CHANNELS: &str = include_str!("../../defaults/discord_channels.json");
+    const DEFAULT_ESCALATION_PATTERNS: &str = include_str!("../../defaults/escalation_patterns.md");
 
     /// Write a default file if the target path does not exist (never overwrites user edits).
     fn write_default_if_missing(path: &std::path::Path, content: &str) {
@@ -447,6 +458,9 @@ impl Config {
         // Discord channel config
         Self::write_default_if_missing(&Self::discord_channels_path(), Self::DEFAULT_DISCORD_CHANNELS);
 
+        // Escalation patterns (user-editable; triggers "think harder" / completion-oriented run)
+        Self::write_default_if_missing(&Self::escalation_patterns_path(), Self::DEFAULT_ESCALATION_PATTERNS);
+
         // Default agents: loop over DEFAULT_AGENT_IDS. agent.json only if missing; skill.md and testing.md overwritten from bundle.
         for (dir_name, files) in Self::DEFAULT_AGENT_IDS {
             let dir = agents.join(dir_name);
@@ -478,6 +492,65 @@ impl Config {
     pub fn load_execution_prompt() -> String {
         let path = Self::execution_prompt_path();
         Self::load_file_or_default(&path, Self::DEFAULT_EXECUTION_PROMPT)
+    }
+
+    /// Load escalation patterns from ~/.mac-stats/escalation_patterns.md.
+    /// Returns a list of phrases (one per non-empty, non-comment line). When a user message
+    /// contains any phrase case-insensitively, escalation mode is triggered.
+    /// If the file is missing, writes the default and returns the default list.
+    pub fn load_escalation_patterns() -> Vec<String> {
+        let path = Self::escalation_patterns_path();
+        let content = Self::load_file_or_default(&path, Self::DEFAULT_ESCALATION_PATTERNS);
+        content
+            .lines()
+            .map(str::trim)
+            .filter(|s| !s.is_empty() && !s.starts_with('#'))
+            .map(String::from)
+            .collect::<Vec<_>>()
+    }
+
+    /// When we detect user dissatisfaction, append their phrase to escalation_patterns.md if it's not already there.
+    /// Normalizes to one trimmed line (collapses whitespace). Skips very short phrases and duplicates.
+    pub fn append_escalation_pattern_if_new(phrase: &str) {
+        let normalized = phrase
+            .trim()
+            .lines()
+            .next()
+            .unwrap_or("")
+            .trim()
+            .chars()
+            .fold((String::with_capacity(phrase.len()), true), |(mut s, mut prev_ws), c| {
+                let is_ws = c.is_ascii_whitespace();
+                if is_ws && !prev_ws {
+                    s.push(' ');
+                } else if !is_ws {
+                    s.push(c);
+                }
+                prev_ws = is_ws;
+                (s, prev_ws)
+            })
+            .0;
+        let normalized = normalized.trim();
+        if normalized.len() < 2 || normalized.starts_with('#') {
+            return;
+        }
+        let existing = Self::load_escalation_patterns();
+        let already = existing
+            .iter()
+            .any(|p| p.eq_ignore_ascii_case(normalized));
+        if already {
+            tracing::debug!("Escalation pattern already in file, not appending: \"{}\"", normalized);
+            return;
+        }
+        let path = Self::escalation_patterns_path();
+        if let Ok(mut f) = std::fs::OpenOptions::new().append(true).open(&path) {
+            use std::io::Write;
+            if let Err(e) = writeln!(f, "{}", normalized) {
+                tracing::debug!("Could not append escalation pattern: {}", e);
+            } else {
+                tracing::info!("Escalation pattern added (user phrase): \"{}\"", normalized);
+            }
+        }
     }
 
     /// Read a file; if missing or empty, write the default content and return it.
