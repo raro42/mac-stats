@@ -7,23 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.26] - 2026-02-27
+
 ### Changed
-- **Headless when from_remote** — For Discord, scheduler, and `discord run-ollama`, browser runs use headless unless the question explicitly asks to see the browser (`wants_visible_browser`). When `from_remote` is true, `prefer_headless = !wants_visible_browser(question)` so retries (e.g. after verification no) stay headless and no visible Chrome windows appear.
+- **Headless when from_remote** — For Discord, scheduler, and `discord run-ollama`, browser runs use headless unless the question explicitly asks to see the browser (`wants_visible_browser`). When `from_remote` is true, `prefer_headless = !wants_visible_browser(question)`; `ensure_chrome_on_port` skips launching visible Chrome when headless was requested for the run.
+- **Docs** — CLAUDE, README, agents, 007_discord_agent, 100_all_agents, docs/README.
 
 ### Added
-- **Ollama timeout/503 retry and user message (task-001)** — `send_ollama_chat_messages` retries once after 2s on timeout or HTTP 503; after retry still failing returns "Ollama is busy or unavailable; try again in a moment." instead of raw error. Periodic session compaction retries once after 3s on failure before logging WARN.
-- **Clippy (batch 2)** — Applied `cargo clippy --fix`: needless borrows, redundant closures, manual string strip, filter+next_back→rfind, and similar across ollama, browser_agent, discord, task, session_memory, scheduler, etc. Manual: drop unused CStr, remove unnecessary unsafe (status_bar), prefix unused var with _ (agents).
-- **Clippy / code quality** — thread_local const init (state.rs), div_ceil/first/range contains (metrics), unnecessary casts and redundant closures (metrics), needless borrows (config, ioreport, test_discord_keychain), collapsible else-if (ioreport, lib.rs). Allow too_many_arguments on history from_metrics.
-- **ModelCatalog** — Removed unused `eligible()` in ollama/models.rs (clean build).
-- **FETCH_URL URL validation (task-002)** — `extract_first_url()` in browser.rs takes the first http(s) URL from arg (trim, up to first whitespace); `validate_fetch_url()` enforces http/https and returns a clear error for IDN ("international domain names (IDN) are not supported..."). Used in `fetch_page_content`, `parse_fetch_url_from_response`, and scheduler FETCH_URL so malformed or multi-token URLs are rejected with one clear message.
-- **Session compaction log (task-005)** — On compaction failure the log now says "keeping full history (N messages) for this request" instead of "using raw history" so the number is clearly message count, not HTTP 401.
-- **Scheduler log (task-004)** — "Scheduler: loaded N entries from ..." is now at DEBUG so short check intervals don't spam INFO every few seconds.
-- **BROWSER_INPUT status label** — Status now shows element label when available (e.g. "✍️ Typing into element 4 (Search box)…"). BROWSER_CLICK already showed label.
-- **Browser tool cap per run** — Max 15 browser tools (NAVIGATE, CLICK, INPUT, SCROLL, EXTRACT, SEARCH_PAGE, SCREENSHOT) per run; when exceeded the model gets "Maximum browser actions per run reached (15). Reply with your answer or DONE: success / DONE: no." Log: "Agent router: browser tool #N/15 this run". See `docs/032_browser_loop_and_status_fix_plan.md`.
-
-### Changed
-- **Docs** — Implemented plan/design docs renamed with `_DONE` suffix: 021_task_system_fix_feb2026, 023_externalized_prompts, 025_expectation_check_design, 026_light_browser_agent_plan, 028_discord_attachments, 030_agent_model_assignment_plan, 031_orchestrator_tool_first_proposal, 032_tool_first_implementation_plan, session_compaction_and_memory_plan. All references updated in README, CHANGELOG, and other docs.
-- **README** — Single Install section (DMG + build + Gatekeeper note). Deduplicated CPU/GPU/RAM and low-CPU stats (one place: At a glance). Commands: binary vs app name note, repo-root hint for `./run dev`. Escalation and Development shortened; link to agent_workflow for Coder workflow.
+- **Ollama timeout/503 retry and user message (task-001)** — `send_ollama_chat_messages` retries once after 2s on timeout or HTTP 503; after retry still failing returns "Ollama is busy or unavailable; try again in a moment." Periodic session compaction retries once after 3s on failure before logging WARN.
+- **FETCH_URL URL validation (task-002)** — `extract_first_url()` in browser.rs; `validate_fetch_url()` enforces http/https and clear IDN error. Used in `fetch_page_content`, `parse_fetch_url_from_response`, and scheduler FETCH_URL.
+- **Browser tool cap** — Max 15 browser tools per run; BROWSER_INPUT status shows element label when available. See docs/032.
+- **Scheduler log (task-004)** — "Scheduler: loaded N entries" at DEBUG. **Session compaction log (task-005)** — "keeping full history (N messages)" on failure.
+- **Clippy** — thread_local const, div_ceil/first/range contains, casts, closures, needless borrows, collapsible else-if; `cargo clippy --fix` batch; drop unused CStr, unnecessary unsafe, unused var. ModelCatalog: removed unused `eligible()`.
 
 ## [0.1.25] - 2026-03-02
 
