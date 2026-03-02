@@ -12,7 +12,7 @@ This folder contains comprehensive CPU optimization analysis and implementation 
 
 1. Read: [`000_task_optimize_summary.md`](000_task_optimize_summary.md) (5-10 min read)
 2. Choose a phase (Phase 1 recommended for quick wins)
-3. Use: [`OPTIMIZE_CHECKLIST.md`](OPTIMIZE_CHECKLIST.md) to track progress
+3. Track progress using the task docs (000, 001, 002) and phase table below
 4. Implement: Reference the detailed task documents
 
 ---
@@ -61,13 +61,8 @@ This folder contains comprehensive CPU optimization analysis and implementation 
 - Task F6: Window cleanup listeners (5 lines)
 - Task F7: Optimize process list DOM (25 lines)
 
-### ✅ Implementation Checklist
-**[`OPTIMIZE_CHECKLIST.md`](OPTIMIZE_CHECKLIST.md)** (368 lines)
-- Detailed tracking for all 15 tasks
-- Phase-by-phase verification steps
-- Before/after performance measurements
-- Sign-off sections for development tracking
-- Rollback procedures
+### ✅ Tracking progress
+Use the phase table below and the task docs (000, 001, 002) to track which tasks are done. Take before/after measurements with `scripts/measure_performance.sh`.
 
 ---
 
@@ -91,7 +86,6 @@ docs/
 ├── 000_task_optimize_summary.md         ← Start here
 ├── 001_task_optimize_backend.md         ← Backend tasks
 ├── 002_task_optimize_frontend.md        ← Frontend tasks
-├── OPTIMIZE_CHECKLIST.md                ← Track progress
 └── data-poster-charts-backend.md        ← (Unrelated)
 ```
 
@@ -148,7 +142,7 @@ For each task in your chosen phase:
 3. Make code changes as specified
 4. Build: `cargo build --release`
 5. Test: Open app and verify behavior
-6. Check: Use [`OPTIMIZE_CHECKLIST.md`](OPTIMIZE_CHECKLIST.md) to mark complete
+6. Check: Track completion via the phase table and task docs
 
 ### Step 5: Measure Results
 ```bash
@@ -310,7 +304,7 @@ A: No. These are performance-only optimizations. All features unchanged.
 1. ✅ Read [`000_task_optimize_summary.md`](000_task_optimize_summary.md)
 2. ✅ Choose your phase
 3. ✅ Start Phase 1 (5 minutes!)
-4. ✅ Use [`OPTIMIZE_CHECKLIST.md`](OPTIMIZE_CHECKLIST.md) to track
+4. ✅ Use the phase table and task docs to track
 5. ✅ Reference task documents for code details
 
 **Ready to optimize? Start with Phase 1!**

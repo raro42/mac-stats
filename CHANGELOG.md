@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.22] - 2026-02-28
+
+### Added
+- **BROWSER_SCREENSHOT** — New agent tool: open a URL in a headless browser (CDP), take a screenshot, save to `~/.mac-stats/screenshots/`. Reply with `BROWSER_SCREENSHOT: <URL>`. In Discord, screenshot paths are sent as file attachments (only paths under `~/.mac-stats/screenshots/` are allowed). Requires Chrome with `--remote-debugging-port=9222` or use of headless Chrome via `browser_agent` module.
+- **browser_agent** — CDP (Chrome DevTools Protocol) module: connect to Chrome, navigate, capture screenshot. Config: `Config::screenshots_dir()`, `Config::browser_idle_timeout_secs()` (default 1 hour).
+- **Discord reply attachments** — `answer_with_ollama_and_fetch` returns `OllamaReply { text, attachment_paths }`. Discord sends allowed attachment paths (e.g. BROWSER_SCREENSHOT outputs) as message files. `send_message_to_channel_with_attachments` for CLI/API. Paths outside `~/.mac-stats/screenshots/` are rejected.
+- **Security and secrets** — No-logging rule for credentials and `.config.env`: do not log file content or path. Security module docs: `get_credential`/`list_credentials` backend-only, never expose to frontend. Config doc on storing secrets in `~/.mac-stats/.config.env` or Keychain. RUN_CMD: cursor-agent documented as privileged (user/agent-controlled prompts).
+- **README** — AI-first positioning: "The AI agent that just gets it done. All local." Features reordered: AI & agents first, UI, then system monitoring (background). Usage: Chat, Discord, Monitoring. Shorter copy and inspiration note.
+
+### Changed
+- **Agent tool list** — Base tools described as "7 base tools"; BROWSER_SCREENSHOT added between FETCH_URL and BRAVE_SEARCH. Session compaction: clearer error for 401/unauthorized (suggest local model for compaction).
+- **Cargo** — reqwest `multipart` feature; deps `headless_chrome`, `regex`. Package description updated for AI-first wording.
+
 ## [0.1.21] - 2026-02-28
 
 ### Added

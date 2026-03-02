@@ -50,6 +50,8 @@ pub struct ClassifiedModel {
     pub capability: ModelCapability,
     pub size_tier: ModelSizeTier,
     pub param_billions: f64,
+    /// True if model is a cloud/remote model (e.g. qwen3.5:cloud). Used to prefer local models.
+    pub is_cloud: bool,
 }
 
 /// Catalog of available models, classified by capability and size.
@@ -114,47 +116,55 @@ impl ModelCatalog {
             .filter(|m| m.param_billions <= MAX_AUTO_PARAMS_B)
     }
 
+    /// Eligible models excluding cloud; use first, then fall back to eligible() to save tokens.
+    fn eligible_local(&self) -> impl Iterator<Item = &ClassifiedModel> {
+        self.models
+            .iter()
+            .filter(|m| m.param_billions <= MAX_AUTO_PARAMS_B && !m.is_cloud)
+    }
+
     fn pick_code(&self) -> Option<&ClassifiedModel> {
-        // Prefer code-capability models in medium tier
-        let code_medium: Vec<_> = self
-            .eligible()
-            .filter(|m| m.capability == ModelCapability::Code && m.size_tier == ModelSizeTier::Medium)
-            .collect();
-        if let Some(best) = code_medium.last() {
-            debug!("ModelCatalog: role=code -> {} (code/medium, {:.1}B)", best.name, best.param_billions);
-            return Some(best);
+        let local: Vec<_> = self.eligible_local().collect();
+        let all_eligible: Vec<_> = self.eligible().collect();
+        for pool in [&local, &all_eligible] {
+            let code_medium: Vec<_> = pool
+                .iter()
+                .filter(|m| m.capability == ModelCapability::Code && m.size_tier == ModelSizeTier::Medium)
+                .collect();
+            if let Some(best) = code_medium.last() {
+                debug!("ModelCatalog: role=code -> {} (code/medium, {:.1}B)", best.name, best.param_billions);
+                return Some(*best);
+            }
+            if let Some(best) = pool.iter().filter(|m| m.capability == ModelCapability::Code).last() {
+                debug!("ModelCatalog: role=code -> {} (code/any, {:.1}B)", best.name, best.param_billions);
+                return Some(*best);
+            }
         }
-        // Fall back to any code model under cap
-        if let Some(best) = self.eligible().filter(|m| m.capability == ModelCapability::Code).last() {
-            debug!("ModelCatalog: role=code -> {} (code/any, {:.1}B)", best.name, best.param_billions);
-            return Some(best);
-        }
-        // Fall back to largest general under cap
         debug!("ModelCatalog: role=code -> no code models, falling back to general");
         self.pick_general()
     }
 
     fn pick_general(&self) -> Option<&ClassifiedModel> {
-        // Prefer general-capability models in medium tier
-        let general_medium: Vec<_> = self
-            .eligible()
-            .filter(|m| m.capability == ModelCapability::General && m.size_tier == ModelSizeTier::Medium)
-            .collect();
-        if let Some(best) = general_medium.last() {
-            debug!("ModelCatalog: role=general -> {} (general/medium, {:.1}B)", best.name, best.param_billions);
-            return Some(best);
+        let local: Vec<_> = self.eligible_local().collect();
+        let all_eligible: Vec<_> = self.eligible().collect();
+        for pool in [&local, &all_eligible] {
+            let general_medium: Vec<_> = pool
+                .iter()
+                .filter(|m| m.capability == ModelCapability::General && m.size_tier == ModelSizeTier::Medium)
+                .collect();
+            if let Some(best) = general_medium.last() {
+                debug!("ModelCatalog: role=general -> {} (general/medium, {:.1}B)", best.name, best.param_billions);
+                return Some(*best);
+            }
+            if let Some(best) = pool.iter().filter(|m| m.capability == ModelCapability::General).last() {
+                debug!("ModelCatalog: role=general -> {} (general/any, {:.1}B)", best.name, best.param_billions);
+                return Some(*best);
+            }
+            if let Some(best) = pool.last() {
+                debug!("ModelCatalog: role=general -> {} (any/fallback, {:.1}B)", best.name, best.param_billions);
+                return Some(*best);
+            }
         }
-        // Fall back to any general model under cap (prefer larger)
-        if let Some(best) = self.eligible().filter(|m| m.capability == ModelCapability::General).last() {
-            debug!("ModelCatalog: role=general -> {} (general/any, {:.1}B)", best.name, best.param_billions);
-            return Some(best);
-        }
-        // Last resort: any model under cap
-        if let Some(best) = self.eligible().last() {
-            debug!("ModelCatalog: role=general -> {} (any/fallback, {:.1}B)", best.name, best.param_billions);
-            return Some(best);
-        }
-        // If all models are above cap, pick the smallest available
         if let Some(best) = self.models.first() {
             warn!(
                 "ModelCatalog: all models above {:.0}B cap, using smallest: {} ({:.1}B)",
@@ -166,19 +176,27 @@ impl ModelCatalog {
     }
 
     fn pick_small(&self) -> Option<&ClassifiedModel> {
-        // Smallest model overall (sorted ascending by param_billions)
+        // Prefer local smallest first (saves tokens vs cloud)
+        let local: Vec<_> = self.eligible_local().collect();
+        if let Some(best) = local.first() {
+            debug!("ModelCatalog: role=small -> {} ({:.1}B, local)", best.name, best.param_billions);
+            return Some(best);
+        }
         let eligible: Vec<_> = self.eligible().collect();
         if let Some(best) = eligible.first() {
-            debug!("ModelCatalog: role=small -> {} ({:.1}B)", best.name, best.param_billions);
-            return Some(*best);
+            debug!("ModelCatalog: role=small -> {} ({:.1}B, cloud fallback)", best.name, best.param_billions);
+            return Some(best);
         }
-        // Fallback: smallest of any size
         if let Some(best) = self.models.first() {
             warn!("ModelCatalog: role=small -> {} ({:.1}B, above cap)", best.name, best.param_billions);
             return Some(best);
         }
         None
     }
+}
+
+fn is_cloud_model(name: &str) -> bool {
+    name.to_lowercase().contains("cloud")
 }
 
 fn classify_model(summary: &ModelSummary) -> Option<ClassifiedModel> {
@@ -191,12 +209,14 @@ fn classify_model(summary: &ModelSummary) -> Option<ClassifiedModel> {
     } else {
         ModelSizeTier::Large
     };
+    let is_cloud = is_cloud_model(&summary.name);
 
     Some(ClassifiedModel {
         name: summary.name.clone(),
         capability,
         size_tier,
         param_billions,
+        is_cloud,
     })
 }
 

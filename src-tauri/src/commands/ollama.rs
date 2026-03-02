@@ -9,6 +9,7 @@ use crate::ollama::{
 };
 use serde::{Deserialize, Serialize};
 use std::io::Write;
+use std::path::PathBuf;
 use std::process::Command;
 use std::str::FromStr;
 use std::sync::atomic::Ordering;
@@ -135,7 +136,7 @@ pub async fn check_ollama_connection() -> Result<bool, String> {
         
         let url = format!("{}/api/tags", endpoint);
         let mut request = temp_client.get(&url);
-        
+        // Do not log request/response headers or bodies that may contain credentials.
         // Add API key if configured
         if let Some(keychain_account) = &api_key {
             if let Ok(Some(api_key_value)) = crate::security::get_credential(keychain_account) {
@@ -341,6 +342,7 @@ fn read_ollama_model_override() -> Option<String> {
         std::env::var("HOME").ok().map(|h| std::path::PathBuf::from(h).join(".mac-stats").join(".config.env")),
     ];
     for maybe_path in paths.iter().flatten() {
+        // Do not log file content or path; file may contain secrets.
         if let Ok(content) = std::fs::read_to_string(maybe_path) {
             for line in content.lines() {
                 let t = line.trim();
@@ -512,23 +514,25 @@ pub async fn ollama_chat(request: ChatRequest) -> Result<crate::ollama::ChatResp
 }
 
 /// Base agent descriptions (without MCP). Includes RUN_JS, FETCH_URL, BRAVE_SEARCH, SCHEDULE.
-const AGENT_DESCRIPTIONS_BASE: &str = r#"We have 4 agents available:
+const AGENT_DESCRIPTIONS_BASE: &str = r#"We have 7 base tools available:
 
 1. **RUN_JS** (JavaScript superpowers): Execute JavaScript in the app context (e.g. browser console). Use for: dynamic data, DOM inspection, client-side state. To invoke: reply with exactly one line: RUN_JS: <JavaScript code>. Note: In some contexts (e.g. Discord) JS is not executed; then answer without running code.
 
 2. **FETCH_URL**: Fetch the full text of a web page. Use for: reading a specific URL's content. To invoke: reply with exactly one line: FETCH_URL: <full URL> (e.g. FETCH_URL: https://www.example.com). The app will return the page text.
 
-3. **BRAVE_SEARCH**: Web search via Brave Search API. Use for: finding current info, facts, multiple sources. To invoke: reply with exactly one line: BRAVE_SEARCH: <search query>. The app will return search results.
+3. **BROWSER_SCREENSHOT**: Open a URL in a headless browser and take a screenshot. Use when the user asks to "go to" a URL and take a screenshot, or to capture a page as an image. To invoke: reply with exactly one line: BROWSER_SCREENSHOT: <URL> (e.g. BROWSER_SCREENSHOT: https://www.amvara.de). The app will return the path to the saved PNG (e.g. ~/.mac-stats/screenshots/...). Tell the user where the screenshot was saved; in Discord you cannot attach the image in-chat, so report the path.
 
-4. **SCHEDULE** (scheduler): Add a task to run at scheduled times (recurring or one-shot). Use when the user wants something to run later or repeatedly. Three formats (reply exactly one line):
+4. **BRAVE_SEARCH**: Web search via Brave Search API. Use for: finding current info, facts, multiple sources. To invoke: reply with exactly one line: BRAVE_SEARCH: <search query>. The app will return search results.
+
+5. **SCHEDULE** (scheduler): Add a task to run at scheduled times (recurring or one-shot). Use when the user wants something to run later or repeatedly. Three formats (reply exactly one line):
    - SCHEDULE: every N minutes <task> (e.g. SCHEDULE: every 5 minutes Execute RUN_JS to fetch CPU and RAM).
    - SCHEDULE: <cron expression> <task> — cron is 6-field (sec min hour day month dow) or 5-field (min hour day month dow; we accept and prepend 0 for seconds). Examples below.
    - SCHEDULE: at <datetime> <task> — one-shot (e.g. reminder tomorrow 5am: use RUN_CMD: date +%Y-%m-%d to get today, then SCHEDULE: at 2025-02-09T05:00:00 Remind me of my flight). Datetime must be ISO local: YYYY-MM-DDTHH:MM:SS or YYYY-MM-DD HH:MM.
    We add to ~/.mac-stats/schedules.json and return a schedule ID (e.g. discord-1770648842). Always tell the user this ID so they can remove it later with REMOVE_SCHEDULE.
 
-5. **REMOVE_SCHEDULE**: Remove a scheduled task by its ID. Use when the user asks to remove, delete, or cancel a schedule (e.g. "Remove schedule: discord-1770648842"). Reply with exactly one line: REMOVE_SCHEDULE: <schedule-id> (e.g. REMOVE_SCHEDULE: discord-1770648842).
+6. **REMOVE_SCHEDULE**: Remove a scheduled task by its ID. Use when the user asks to remove, delete, or cancel a schedule (e.g. "Remove schedule: discord-1770648842"). Reply with exactly one line: REMOVE_SCHEDULE: <schedule-id> (e.g. REMOVE_SCHEDULE: discord-1770648842).
 
-6. **LIST_SCHEDULES**: List all active schedules (id, type, next run, task). Use when the user asks to list schedules, show schedules, what's scheduled, what reminders are set, etc. Reply with exactly one line: LIST_SCHEDULES or LIST_SCHEDULES:."#;
+7. **LIST_SCHEDULES**: List all active schedules (id, type, next run, task). Use when the user asks to list schedules, show schedules, what's scheduled, what reminders are set, etc. Reply with exactly one line: LIST_SCHEDULES or LIST_SCHEDULES:."#;
 
 /// Cron examples for SCHEDULE (6-field: sec min hour day month dow). Shown to the model so it can pick the right pattern (see crontab.guru for more).
 const SCHEDULE_CRON_EXAMPLES: &str = r#"
@@ -1124,6 +1128,7 @@ fn get_mastodon_config() -> Option<(String, String)> {
         for base in [std::env::current_dir().ok(), std::env::var("HOME").ok().map(std::path::PathBuf::from)].into_iter().flatten() {
             let paths = [base.join(".config.env"), base.join(".mac-stats").join(".config.env")];
             for p in &paths {
+                // Do not log file content or path; file may contain secrets.
                 if let Ok(content) = std::fs::read_to_string(p) {
                     for line in content.lines() {
                         if let Some(val) = line.strip_prefix(file_key) {
@@ -1234,6 +1239,13 @@ fn extract_ticket_id(text: &str) -> Option<u64> {
     None
 }
 
+/// Reply from the agent: text plus optional attachment paths (e.g. screenshots) for Discord.
+#[derive(Debug, Clone)]
+pub struct OllamaReply {
+    pub text: String,
+    pub attachment_paths: Vec<PathBuf>,
+}
+
 /// When set, `skill_content` is prepended to system prompts (from ~/.mac-stats/skills/skill-<n>-<topic>.md).
 /// When set, `agent_override` uses that agent's model and combined_prompt (soul+mood+skill) for the main run (e.g. Discord "agent: 001").
 /// When `allow_schedule` is false (e.g. when running from the scheduler), the SCHEDULE tool is disabled so a scheduled task cannot create more schedules.
@@ -1250,7 +1262,7 @@ pub async fn answer_with_ollama_and_fetch(
     agent_override: Option<crate::agents::Agent>,
     allow_schedule: bool,
     conversation_history: Option<Vec<crate::ollama::ChatMessage>>,
-) -> Result<String, String> {
+) -> Result<OllamaReply, String> {
     use tracing::info;
 
     let (model_override, skill_content, max_tool_iterations) = if let Some(ref a) = agent_override {
@@ -1360,7 +1372,12 @@ pub async fn answer_with_ollama_and_fetch(
                 }]
             }
             Err(e) => {
-                tracing::warn!("Session compaction failed: {}, using raw history with 401 annotations", e);
+                let msg = if e.to_string().to_lowercase().contains("unauthorized") || e.to_string().contains("401") {
+                    format!("Session compaction failed: {} (use a local model for compaction; cloud models may require auth). Using raw history.", e)
+                } else {
+                    format!("Session compaction failed: {}, using raw history.", e)
+                };
+                tracing::warn!("{}", msg);
                 raw_history
                     .into_iter()
                     .map(|mut msg| {
@@ -1642,6 +1659,8 @@ pub async fn answer_with_ollama_and_fetch(
     };
 
     let mut tool_count: u32 = 0;
+    // Paths to attach when replying on Discord (e.g. BROWSER_SCREENSHOT); only under ~/.mac-stats/screenshots/.
+    let mut attachment_paths: Vec<PathBuf> = Vec::new();
     // Collect (agent_name, reply) for each AGENT call so we can append a conversation transcript when multiple agents participated.
     let mut agent_conversation: Vec<(String, String)> = Vec::new();
     // Dedupe repeated identical DISCORD_API calls so the model can't loop on the same request.
@@ -1741,6 +1760,33 @@ pub async fn answer_with_ollama_and_fetch(
                     }
                 }
             }
+            "BROWSER_SCREENSHOT" => {
+                send_status("Opening page and taking screenshot…");
+                let url_arg = arg.trim().to_string();
+                if url_arg.is_empty() {
+                    "BROWSER_SCREENSHOT requires a URL (e.g. BROWSER_SCREENSHOT: https://www.example.com). Please try again with a URL.".to_string()
+                } else {
+                    info!(
+                        "BROWSER_SCREENSHOT: arg from parser (raw): {}",
+                        crate::logging::ellipse(&arg, 500)
+                    );
+                    info!("BROWSER_SCREENSHOT: URL sent to CDP: {}", url_arg);
+                    match tokio::task::spawn_blocking(move || crate::browser_agent::take_screenshot(&url_arg)).await {
+                        Ok(Ok(path)) => {
+                            attachment_paths.push(path.clone());
+                            format!(
+                                "Screenshot saved to: {}.\n\nTell the user the screenshot was taken; the app will attach it in Discord.",
+                                path.display()
+                            )
+                        }
+                        Ok(Err(e)) => {
+                            info!("Discord/Ollama: BROWSER_SCREENSHOT failed: {}", crate::logging::ellipse(&e, 200));
+                            format!("Screenshot failed: {}. (Chrome may need to be installed or available on port 9222.)", e)
+                        }
+                        Err(e) => format!("Screenshot task error: {}", e),
+                    }
+                }
+            }
             "BRAVE_SEARCH" => {
                 send_status("Searching the web…");
                 info!("Discord/Ollama: BRAVE_SEARCH requested: {}", arg);
@@ -1783,6 +1829,8 @@ pub async fn answer_with_ollama_and_fetch(
                     Err(e) => format!("Perplexity search failed: {}. Answer without search results.", e),
                 }
             }
+            // RUN_JS: agent-triggered; runs with process privileges via run_js_via_node.
+            // Treat agent output as untrusted code. Audit log code length + hash only (no full body).
             "RUN_JS" => {
                 const CODE_PREVIEW_LEN: usize = 50;
                 let code_preview: String = arg
@@ -1800,7 +1848,18 @@ pub async fn answer_with_ollama_and_fetch(
                 };
                 let code_ref = if code_label.is_empty() { "…" } else { &code_label };
                 send_status(&format!("Running code: {}…", code_ref));
-                info!("Discord/Ollama: RUN_JS running code: {} [{} chars]", code_ref, arg.chars().count());
+                // Audit: code length + content hash only (no full code in logs).
+                let code_len = arg.chars().count();
+                let code_hash = {
+                    use std::hash::{Hash, Hasher};
+                    let mut h = std::collections::hash_map::DefaultHasher::new();
+                    arg.hash(&mut h);
+                    h.finish()
+                };
+                info!(
+                    "RUN_JS audit: len={} hash_hex={:016x} preview={}",
+                    code_len, code_hash, code_ref
+                );
                 match run_js_via_node(&arg) {
                     Ok(result) => format!(
                         "JavaScript result:\n\n{}\n\nUse this to answer the user's question.",
@@ -2756,11 +2815,17 @@ pub async fn answer_with_ollama_and_fetch(
         }
     }
 
-    Ok(response_content)
+    Ok(OllamaReply {
+        text: response_content,
+        attachment_paths,
+    })
 }
 
 /// Run JavaScript via Node.js (if available). Used for RUN_JS in Discord/agent context.
 /// Writes code to a temp file and runs `node -e "..."` to eval and print the result.
+///
+/// **Security:** RUN_JS is agent-triggered and runs with process privileges. Agent or prompt
+/// compromise can lead to arbitrary code execution. Treat agent output as untrusted code.
 fn run_js_via_node(code: &str) -> Result<String, String> {
     let tmp_dir = crate::config::Config::tmp_js_dir();
     let stamp = std::time::SystemTime::now()
@@ -2957,7 +3022,7 @@ fn line_starts_with_tool_prefix(line: &str) -> bool {
 /// For TASK_APPEND and TASK_CREATE, content is taken to the end of the block (all lines until the next tool line) so research/full text is stored completely.
 /// Returns (tool_name, argument) or None.
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "PERPLEXITY_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:", "MASTODON_POST:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "BROWSER_SCREENSHOT:", "PERPLEXITY_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:", "MASTODON_POST:"];
     let lines: Vec<&str> = content.lines().collect();
     for (line_index, line) in lines.iter().enumerate() {
         let line = line.trim();
@@ -3012,10 +3077,18 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
                     }
                 }
                 // Ollama sometimes concatenates multiple tools on one line. Truncate at first ';' for URLs/searches.
-                if tool_name == "FETCH_URL" || tool_name == "BRAVE_SEARCH" || tool_name == "PERPLEXITY_SEARCH" {
+                if tool_name == "FETCH_URL" || tool_name == "BRAVE_SEARCH" || tool_name == "BROWSER_SCREENSHOT" || tool_name == "PERPLEXITY_SEARCH" {
                     if let Some(idx) = arg.find(';') {
                         arg = arg[..idx].trim().to_string();
                     }
+                }
+                // For URL tools, take only the first token (the URL) so "https://example.com to retrieve..." -> "https://example.com"
+                if tool_name == "FETCH_URL" || tool_name == "BROWSER_SCREENSHOT" {
+                    if let Some(first_space) = arg.find(' ') {
+                        arg = arg[..first_space].trim().to_string();
+                    }
+                    // Strip trailing sentence punctuation so "https://example.com." (model wrote "...usecases. The...") -> "https://example.com"
+                    arg = arg.trim_end_matches(|c: char| c == '.' || c == ',' || c == ';' || c == ':').to_string();
                 }
                 // Truncate at next numbered step boundary for single-line tools (not TASK_APPEND/TASK_CREATE — those keep full content).
                 if tool_name != "TASK_APPEND" && tool_name != "TASK_CREATE" {

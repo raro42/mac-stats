@@ -412,7 +412,7 @@ Use these scripts alongside the optimization documentation:
 2. Take baseline measurement: `./scripts/measure_performance.sh 30 1 window`
 3. Implement optimizations from `docs/001_task_optimize_backend.md`, etc.
 4. Measure after each phase: `./scripts/measure_performance.sh 30 1 window`
-5. Track progress using `docs/OPTIMIZE_CHECKLIST.md`
+5. Track progress using the task docs in `docs/` (000, 001, 002)
 
 ---
 

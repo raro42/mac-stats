@@ -11,6 +11,13 @@
 //!
 //! All configuration is environment-aware and portable.
 //!
+//! **Secrets and `.config.env`:**
+//! For production use, store secrets (e.g. Discord token, API keys) in
+//! `~/.mac-stats/.config.env` or in Keychain where supported. Avoid placing
+//! `.config.env` in the repo or in a shared cwd so it is not exposed. Code that
+//! reads `.config.env` must not log file content or paths in a way that could
+//! leak secrets.
+//!
 //! **JSON config reload (no restart needed):**
 //! - `config.json` — read on every access (window decorations, scheduler interval, ollamaChatTimeoutSecs).
 //! - `schedules.json` — scheduler checks file mtime each loop and reloads when changed.
@@ -250,6 +257,20 @@ impl Config {
     /// Ensure the session directory exists
     pub fn ensure_session_directory() -> std::io::Result<()> {
         std::fs::create_dir_all(Self::session_dir())
+    }
+
+    /// Screenshots directory for BROWSER_SCREENSHOT: `$HOME/.mac-stats/screenshots/`
+    pub fn screenshots_dir() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("screenshots")
+        } else {
+            std::env::temp_dir().join("mac-stats-screenshots")
+        }
+    }
+
+    /// Idle timeout in seconds for the CDP browser session. If the browser is not used for this long, it is closed. Default: 3600 (1 hour).
+    pub fn browser_idle_timeout_secs() -> u64 {
+        3600
     }
 
     /// Skills directory for agent prompt overlays: `$HOME/.mac-stats/skills/`

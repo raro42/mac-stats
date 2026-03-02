@@ -68,6 +68,7 @@ fn config_env_paths() -> Vec<std::path::PathBuf> {
 }
 
 fn read_config_env_key(path: &std::path::Path, key: &str) -> Option<String> {
+    // Do not log file content or path; file may contain secrets.
     let content = std::fs::read_to_string(path).ok()?;
     let needle_eq = format!("{}=", key);
     let needle_dash = format!("{}=", key.replace('_', "-"));

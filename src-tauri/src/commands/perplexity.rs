@@ -12,6 +12,7 @@ pub const PERPLEXITY_KEYCHAIN_ACCOUNT: &str = "perplexity_api_key";
 
 /// Read PERPLEXITY_API_KEY from a .config.env / .env.config style file.
 fn perplexity_key_from_file(path: &Path) -> Option<String> {
+    // Do not log file content or path; file may contain secrets.
     let content = std::fs::read_to_string(path).ok()?;
     let line = content.lines().find(|l| {
         let t = l.trim();

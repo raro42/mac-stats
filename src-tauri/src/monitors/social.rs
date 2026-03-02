@@ -53,6 +53,7 @@ impl MastodonMonitor {
             .timeout(std::time::Duration::from_secs(10))
             .build()?;
 
+        // Do not log request/response headers or bodies that may contain credentials.
         let response = client
             .get(&url)
             .header("Authorization", format!("Bearer {}", token))

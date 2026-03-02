@@ -165,8 +165,7 @@ mac-stats/
 │   ├── 000_task_optimize_summary.md
 │   ├── 001_task_optimize_backend.md
 │   ├── 002_task_optimize_frontend.md
-│   ├── 003_task_optimize_advanced_idle.md
-│   └── OPTIMIZE_CHECKLIST.md
+│   └── 003_task_optimize_advanced_idle.md
 ├── src-tauri/                  ← Source code
 │   ├── src/                    ← Rust backend
 │   ├── dist/                   ← Frontend assets
@@ -205,7 +204,7 @@ mac-stats/
 │   │   │
 │   │   ├── commands/             ← Tauri commands (exposed to frontend)
 │   │   │   ├── mod.rs            ← Command module exports
-│   │   │   ├── ollama.rs         ← Ollama AI chat commands (chat, code execution, FETCH_URL)
+│   │   │   ├── ollama.rs         ← Ollama AI chat commands (chat, code execution, FETCH_URL, BROWSER_SCREENSHOT)
 │   │   │   ├── browser.rs        ← fetch_page for Ollama web tasks (no CORS)
 │   │   │   ├── monitors.rs       ← Monitor management (add, remove, check)
 │   │   │   ├── alerts.rs         ← Alert management
@@ -236,7 +235,10 @@ mac-stats/
 │   │   │   └── mod.rs            ← macOS Keychain integration
 │   │   │
 │   │   ├── config/               ← Configuration management
-│   │   │   └── mod.rs            ← Paths, build info, app config
+│   │   │   └── mod.rs            ← Paths, build info, app config, screenshots_dir()
+│   │   │
+│   │   ├── browser_agent/        ← CDP browser (screenshots)
+│   │   │   └── mod.rs            ← connect_cdp, navigate, take_screenshot (PNG to ~/.mac-stats/screenshots/)
 │   │   │
 │   │   ├── ffi/                  ← Foreign Function Interface
 │   │   │   ├── mod.rs            ← FFI module exports
@@ -308,9 +310,12 @@ mac-stats/
   - Gets system metrics for context
   - Sends question to Ollama with conversation history
   - Handles **FETCH_URL** tool: if the model replies with `FETCH_URL: <url>`, the app fetches the page and sends the content back to Ollama (no CORS; server-side fetch)
+  - Handles **BROWSER_SCREENSHOT**: opens URL via CDP (browser_agent), saves PNG to ~/.mac-stats/screenshots/, returns path; from Discord the screenshot is attached to the channel
+  - URL parsing for FETCH_URL and BROWSER_SCREENSHOT: first token only, trailing punctuation (`.`, `,`, `;`, `:`) stripped so model text like "...usecases. The..." does not produce a trailing dot on the URL
   - Detects JavaScript code in responses (`ROLE=code-assistant` or pattern matching)
   - Extracts code (handles `console.log()` wrappers)
   - Returns structured response indicating if code execution is needed
+- **`answer_with_ollama_and_fetch`**: Used by Discord and scheduler; returns **OllamaReply** `{ text, attachment_paths }` so callers can attach screenshot paths (e.g. Discord sends the PNG).
 - **`ollama_chat_continue_with_result`**: Follow-up command for code execution flow:
   - Takes JavaScript execution result
   - Sends follow-up message to Ollama with full conversation history

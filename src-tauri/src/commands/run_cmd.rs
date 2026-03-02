@@ -9,6 +9,8 @@ use std::process::Command;
 use tracing::info;
 
 /// Default allowlist when orchestrator skill.md has no "## RUN_CMD allowlist" section.
+/// Security: cursor-agent is an exception — it runs user/agent-controlled prompts in the user
+/// environment and receives args without path validation; treat it as a privileged capability.
 const DEFAULT_ALLOWED_COMMANDS: &[&str] = &[
     "cat", "head", "tail", "ls", "grep", "date", "whoami", "ps", "wc", "uptime", "cursor-agent",
 ];
@@ -28,6 +30,7 @@ fn get_allowed_commands() -> Vec<String> {
 
 /// Read ALLOW_LOCAL_CMD from env or .config.env. "0", "false", "no" => false; default true.
 fn allow_local_cmd_from_config_env_file(path: &Path) -> Option<bool> {
+    // Do not log file content or path; file may contain secrets.
     let content = std::fs::read_to_string(path).ok()?;
     let line = content.lines().find(|l| {
         let t = l.trim();
@@ -186,6 +189,7 @@ fn run_single_command(cmd: &str, args: &[String], stdin_data: Option<&[u8]>) -> 
 
 /// Run a restricted local command with pipe support.
 /// Allowlist from orchestrator skill.md "## RUN_CMD allowlist" or default (cat, head, tail, ls, grep, date, whoami, ps, wc, uptime, cursor-agent).
+/// cursor-agent runs user/agent-controlled prompts and is not path-bound; document or restrict via skill.md if locking down.
 /// Supports `cmd1 | cmd2 | cmd3` pipelines; each stage must use an allowed command.
 /// Paths under ~/.mac-stats where applicable.
 pub fn run_local_command(arg: &str) -> Result<String, String> {
@@ -213,7 +217,7 @@ pub fn run_local_command(arg: &str) -> Result<String, String> {
         }
 
         let args = if cmd == "cursor-agent" {
-            // cursor-agent args are the prompt; do not restrict paths in the prompt
+            // Privileged: args are passed through as prompt/CLI args; no path validation (see DEFAULT_ALLOWED_COMMANDS comment).
             tokens[1..].to_vec()
         } else if tokens.len() > 1 {
             validate_path_args(&tokens[1..], &base)?

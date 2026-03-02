@@ -53,6 +53,7 @@ pub async fn search(api_key: &str, query: &str, max_results: Option<u32>) -> Res
         .build()
         .context("Perplexity HTTP client")?;
 
+    // Do not log request/response headers or bodies that may contain credentials.
     let response = client
         .post(SEARCH_URL)
         .header("Authorization", format!("Bearer {}", api_key))

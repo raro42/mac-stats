@@ -163,6 +163,7 @@ impl AlertChannel for MastodonChannel {
             "visibility": "direct" // Private toot
         });
 
+        // Do not log request/response headers or bodies that may contain credentials.
         client
             .post(&url)
             .header("Authorization", format!("Bearer {}", token))

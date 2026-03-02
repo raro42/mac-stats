@@ -22,6 +22,7 @@ static REDMINE_CONTEXT_CACHE: Mutex<Option<(String, Instant)>> = Mutex::new(None
 
 /// Read a key from `.config.env` style files (KEY=value, one per line).
 fn read_key_from_file(path: &Path, key_names: &[&str]) -> Option<String> {
+    // Do not log file content or path; file may contain secrets.
     let content = std::fs::read_to_string(path).ok()?;
     for line in content.lines() {
         let t = line.trim();
@@ -105,6 +106,7 @@ async fn redmine_get(path: &str) -> Result<String, String> {
         .timeout(std::time::Duration::from_secs(TIMEOUT_SECS))
         .build()
         .map_err(|e| format!("HTTP client: {}", e))?;
+    // Do not log request/response headers or bodies that may contain credentials.
     let resp = client
         .get(&url)
         .header("X-Redmine-API-Key", &api_key)
@@ -301,6 +303,7 @@ pub async fn redmine_api_request(
         .build()
         .map_err(|e| format!("HTTP client: {}", e))?;
 
+    // Do not log request/response headers or bodies that may contain credentials.
     let mut req = client
         .request(
             method_upper.parse().map_err(|e| format!("Invalid method: {}", e))?,

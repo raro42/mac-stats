@@ -38,6 +38,7 @@ pub mod agents;
 pub mod task;
 mod user_info;
 pub mod redmine;
+pub mod browser_agent;
 mod commands;
 
 use std::os::raw::c_void;
@@ -163,11 +164,9 @@ fn run_internal(open_cpu_window: bool) {
             get_process_details,
             force_quit_process,
             get_changelog,
-            // Security commands
+            // Security: only store/delete exposed; never expose get_credential or list_credentials
             commands::security::store_credential,
-            commands::security::get_credential,
             commands::security::delete_credential,
-            commands::security::list_credentials,
             // Monitor commands
             commands::monitors::add_website_monitor,
             commands::monitors::add_mastodon_monitor,

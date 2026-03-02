@@ -11,7 +11,7 @@ This doc describes what is already in place and what you may need to do so that 
    - **CURSOR_AGENT:** `<prompt>` — runs cursor-agent in the configured workspace with `--print --trust --output-format text`, returns stdout to the conversation.
 
 2. **RUN_CMD allowlist**  
-   `cursor-agent` is in the default allowlist (and in `~/.mac-stats/agents/agent-000/skill.md`). The agent can also run e.g. `RUN_CMD: cursor-agent --help` or `RUN_CMD: cursor-agent <args>` (path rules don’t apply to cursor-agent).
+   `cursor-agent` is in the default allowlist (and in `~/.mac-stats/agents/agent-000/skill.md`). The agent can also run e.g. `RUN_CMD: cursor-agent --help` or `RUN_CMD: cursor-agent <args>` (path rules don’t apply to cursor-agent). **Security:** RUN_CMD’s cursor-agent runs arbitrary prompts in the user environment; it is a privileged capability. To disable it, remove `cursor-agent` from the RUN_CMD allowlist in the orchestrator’s `skill.md`.
 
 3. **Task runner uses full tool loop**  
    When the scheduler runs `TASK: <path_or_id>` (or `TASK_RUN: <path_or_id>`), or when you run a task until finished, the code uses `answer_with_ollama_and_fetch`. That includes **all** tools (TASK_*, RUN_CMD, CURSOR_AGENT, etc.). So the model **can** already:

@@ -45,6 +45,7 @@ fn log_brave_rate_limit_headers(resp: &reqwest::Response) {
 /// Read Brave API key from a .config.env-style file.
 /// Accepts BRAVE_API_KEY= or BRAVE-API-KEY= (hyphens).
 fn brave_key_from_config_env_file(path: &Path) -> Option<String> {
+    // Do not log file content or path; file may contain secrets.
     let content = std::fs::read_to_string(path).ok()?;
     let line = content.lines().find(|l| {
         let t = l.trim();
@@ -103,6 +104,7 @@ pub async fn brave_web_search(query: &str, api_key: &str) -> Result<String, Stri
 
     info!("Brave agent: search query \"{}\"", query);
 
+    // Do not log request/response headers or bodies that may contain credentials.
     let resp = client
         .get(BRAVE_WEB_SEARCH_URL)
         .query(&[("q", query)])

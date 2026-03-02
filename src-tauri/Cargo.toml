@@ -1,7 +1,7 @@
 [package]
 name = "mac_stats"
-version = "0.1.21"
-description = "A lightweight macOS system monitoring app with menu bar integration, real-time metrics (CPU/GPU/RAM/disk), website monitoring, AI chat integration, and alert system. Built with Rust and Tauri for minimal CPU overhead."
+version = "0.1.22"
+description = "macOS system monitor (Rust + Tauri): menu bar metrics (CPU/GPU/RAM/disk/temperature), process list, website monitoring and alerts, Ollama-powered AI (chat, Discord bot, scheduler, MCP, task system). Built for minimal CPU overhead."
 authors = ["raro42"]
 edition = "2021"
 default-run = "mac_stats"
@@ -57,7 +57,7 @@ objc2-app-kit = { version = "0.3.2", features = [
   "objc2-core-foundation"
 ] }
 battery = "0.7"
-reqwest = { version = "0.11", features = ["json", "blocking"] }
+reqwest = { version = "0.11", features = ["json", "blocking", "multipart"] }
 tokio = { version = "1", features = ["full"] }
 security-framework = "2.9"
 security-framework-sys = "2.9"
@@ -70,4 +70,6 @@ serenity = { version = "0.12", default-features = false, features = ["client", "
 futures-util = "0.3"
 notify = "6"
 tokio-util = "0.7.18"
+headless_chrome = "1.0"
+regex = "1"
 

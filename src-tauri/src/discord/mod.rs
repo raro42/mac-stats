@@ -16,7 +16,7 @@ use serenity::model::gateway::GatewayIntents;
 use serenity::model::id::UserId;
 use serenity::model::channel::Message;
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::RwLock;
 use std::sync::{Arc, Mutex, OnceLock};
@@ -1507,7 +1507,7 @@ impl EventHandler for Handler {
             }
         });
 
-        let reply = match crate::commands::ollama::answer_with_ollama_and_fetch(
+        let (reply_text, attachment_paths) = match crate::commands::ollama::answer_with_ollama_and_fetch(
             &question,
             Some(status_tx),
             Some(channel_id_u64),
@@ -1520,7 +1520,7 @@ impl EventHandler for Handler {
             true,
             conversation_history,
         ).await {
-            Ok(r) => r,
+            Ok(r) => (r.text, r.attachment_paths),
             Err(e) => {
                 error!("Discord: Failed to generate reply (channel {}): {}", channel_id_u64, e);
                 let err_lower = e.to_string().to_lowercase();
@@ -1529,7 +1529,10 @@ impl EventHandler for Handler {
                 } else {
                     "Is Ollama configured?"
                 };
-                format!("Sorry, I couldn't generate a reply: {}. ({})", e, hint)
+                (
+                    format!("Sorry, I couldn't generate a reply: {}. ({})", e, hint),
+                    Vec::new(),
+                )
             }
         };
 
@@ -1542,7 +1545,7 @@ impl EventHandler for Handler {
 
         // Log full reply if ≤500 chars (or always in -vv), else first 500 + ellipsis.
         const RECV_LOG_MAX: usize = 500;
-        let reply = strip_leading_label(reply.trim());
+        let reply = strip_leading_label(reply_text.trim());
         let nchars = reply.chars().count();
         let verbosity = crate::logging::VERBOSITY.load(Ordering::Relaxed);
         if verbosity >= 2 || nchars <= RECV_LOG_MAX {
@@ -1562,6 +1565,36 @@ impl EventHandler for Handler {
             }
             if chunks.len() > 1 && i < chunks.len() - 1 {
                 tokio::time::sleep(tokio::time::Duration::from_millis(300)).await;
+            }
+        }
+
+        // Send attachment(s) if any (e.g. BROWSER_SCREENSHOT); only paths under ~/.mac-stats/screenshots/
+        let allowed: Vec<_> = attachment_paths
+            .iter()
+            .filter(|p| allowed_attachment_path(p))
+            .cloned()
+            .collect();
+        if !allowed.is_empty() {
+            use serenity::builder::CreateAttachment;
+            use serenity::builder::CreateMessage;
+            let mut attachments = Vec::with_capacity(allowed.len());
+            for path in &allowed {
+                match CreateAttachment::path(path).await {
+                    Ok(att) => attachments.push(att),
+                    Err(e) => {
+                        debug!("Discord: skip attachment {}: {}", path.display(), e);
+                    }
+                }
+            }
+            if !attachments.is_empty() {
+                let builder = CreateMessage::new()
+                    .content("Screenshot(s) as requested:")
+                    .add_files(attachments);
+                if let Err(e) = new_message.channel_id.send_message(&ctx, builder).await {
+                    error!("Discord: Failed to send attachment(s): {}", e);
+                } else {
+                    info!("Discord: sent {} attachment(s) to channel {}", allowed.len(), channel_id_u64);
+                }
             }
         }
 
@@ -1622,6 +1655,7 @@ pub fn disconnect_discord() {
 
 /// Read Discord token from a .config.env-style file (DISCORD_BOT_TOKEN= or DISCORD-USER1/2-TOKEN=).
 fn token_from_config_env_file(path: &Path) -> Option<String> {
+    // Do not log file content or path; file may contain secrets.
     let content = std::fs::read_to_string(path).ok()?;
     let token = content
         .lines()
@@ -1633,6 +1667,78 @@ fn token_from_config_env_file(path: &Path) -> Option<String> {
         .and_then(|l| l.split_once('='))
         .map(|(_, v)| v.trim().to_string());
     token.filter(|t| !t.is_empty())
+}
+
+/// Returns true only if `path` is under `~/.mac-stats/screenshots/` (canonicalized) so we never send arbitrary files.
+fn allowed_attachment_path(path: &Path) -> bool {
+    let Ok(canon_path) = path.canonicalize() else {
+        return false;
+    };
+    let Ok(allowed_dir) = crate::config::Config::screenshots_dir().canonicalize() else {
+        return false;
+    };
+    canon_path.starts_with(allowed_dir)
+}
+
+/// Send a message to a Discord channel with optional file attachments (e.g. screenshots).
+/// Paths must be under ~/.mac-stats/screenshots/; others are skipped.
+pub async fn send_message_to_channel_with_attachments(
+    channel_id: u64,
+    content: &str,
+    attachment_paths: &[PathBuf],
+) -> Result<(), String> {
+    let token = match get_discord_token() {
+        Some(t) => t,
+        None => return Err("Discord not configured (no token)".to_string()),
+    };
+    let allowed: Vec<_> = attachment_paths
+        .iter()
+        .filter(|p| allowed_attachment_path(p))
+        .collect();
+    if allowed.is_empty() {
+        return send_message_to_channel(channel_id, content).await;
+    }
+    const MAX_LEN: usize = 2000;
+    let content = if content.chars().count() > MAX_LEN {
+        crate::logging::ellipse(content, MAX_LEN)
+    } else {
+        content.to_string()
+    };
+    let url = format!("https://discord.com/api/v10/channels/{}/messages", channel_id);
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(30))
+        .build()
+        .map_err(|e| format!("HTTP client: {}", e))?;
+    let mut form = reqwest::multipart::Form::new().text("content", content);
+    for (i, path) in allowed.iter().enumerate() {
+        let name = format!("files[{}]", i);
+        let data = tokio::fs::read(path.as_path())
+            .await
+            .map_err(|e| format!("Read attachment {}: {}", path.display(), e))?;
+        let filename = path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("screenshot.png")
+            .to_string();
+        form = form.part(
+            name,
+            reqwest::multipart::Part::bytes(data).file_name(filename),
+        );
+    }
+    // Do not log request/response headers or bodies that may contain credentials.
+    let resp = client
+        .post(&url)
+        .header("Authorization", format!("Bot {}", token))
+        .multipart(form)
+        .send()
+        .await
+        .map_err(|e| format!("Request failed: {}", e))?;
+    if !resp.status().is_success() {
+        let status = resp.status();
+        let body = resp.text().await.unwrap_or_default();
+        return Err(format!("Discord API {}: {}", status, body));
+    }
+    Ok(())
 }
 
 /// Send a message to a Discord channel (DM or guild channel). Used by the scheduler to post task results.
@@ -1656,6 +1762,7 @@ pub async fn send_message_to_channel(channel_id: u64, content: &str) -> Result<(
         .timeout(std::time::Duration::from_secs(15))
         .build()
         .map_err(|e| format!("HTTP client: {}", e))?;
+    // Do not log request/response headers or bodies that may contain credentials.
     let resp = client
         .post(&url)
         .header("Authorization", format!("Bot {}", token))
@@ -1748,4 +1855,26 @@ pub fn spawn_discord_if_configured() {
         }
     });
     info!("Discord: Gateway thread spawned (connecting to Discord API)");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn allowed_attachment_path_under_screenshots_only() {
+        let screenshots = crate::config::Config::screenshots_dir();
+        let _ = std::fs::create_dir_all(&screenshots);
+        let under = screenshots.join("test_attachment_allowed.png");
+        let _ = std::fs::write(&under, b"x");
+        assert!(allowed_attachment_path(&under), "path under screenshots_dir should be allowed");
+        let _ = std::fs::remove_file(&under);
+
+        let outside = std::env::temp_dir().join("mac-stats-attachment-test-outside").join("file.png");
+        let _ = std::fs::create_dir_all(outside.parent().unwrap());
+        let _ = std::fs::write(&outside, b"x");
+        assert!(!allowed_attachment_path(&outside), "path outside screenshots_dir should be rejected");
+        let _ = std::fs::remove_file(&outside);
+        let _ = std::fs::remove_dir(outside.parent().unwrap());
+    }
 }

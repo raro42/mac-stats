@@ -1,4 +1,8 @@
-//! Security/Keychain Tauri commands
+//! Security/Keychain Tauri commands.
+//!
+//! **Exposed to frontend:** only `store_credential` and `delete_credential`.
+//! Do **not** add `get_credential` or `list_credentials` as Tauri commands:
+//! they would allow credential enumeration and theft from the renderer.
 
 use crate::security;
 use serde::{Deserialize, Serialize};
@@ -9,11 +13,6 @@ pub struct StoreCredentialRequest {
     pub password: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GetCredentialRequest {
-    pub account: String,
-}
-
 /// Store a credential in Keychain
 #[tauri::command]
 pub fn store_credential(request: StoreCredentialRequest) -> Result<(), String> {
@@ -21,23 +20,9 @@ pub fn store_credential(request: StoreCredentialRequest) -> Result<(), String> {
         .map_err(|e| e.to_string())
 }
 
-/// Get a credential from Keychain
-#[tauri::command]
-pub fn get_credential(request: GetCredentialRequest) -> Result<Option<String>, String> {
-    security::get_credential(&request.account)
-        .map_err(|e| e.to_string())
-}
-
 /// Delete a credential from Keychain
 #[tauri::command]
 pub fn delete_credential(account: String) -> Result<(), String> {
     security::delete_credential(&account)
-        .map_err(|e| e.to_string())
-}
-
-/// List all stored credentials
-#[tauri::command]
-pub fn list_credentials() -> Result<Vec<String>, String> {
-    security::list_credentials()
         .map_err(|e| e.to_string())
 }

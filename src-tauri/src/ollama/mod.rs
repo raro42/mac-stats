@@ -267,6 +267,7 @@ pub async fn get_model_info(
         .map_err(|e| format!("HTTP client: {}", e))?;
 
     let mut request = client.post(&url).json(&body);
+    // Do not log request/response headers or bodies that may contain credentials.
     if let Some(key) = api_key {
         request = request.header("Authorization", format!("Bearer {}", key));
     }

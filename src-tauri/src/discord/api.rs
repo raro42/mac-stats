@@ -76,6 +76,7 @@ pub async fn discord_api_request(
         .build()
         .map_err(|e| format!("HTTP client: {}", e))?;
 
+    // Do not log request/response headers or bodies that may contain credentials.
     let mut req = client
         .request(
             method_upper.parse().map_err(|e| format!("Invalid method: {}", e))?,

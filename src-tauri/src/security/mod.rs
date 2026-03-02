@@ -1,7 +1,10 @@
 //! Security and credential management module
-//! 
+//!
 //! Provides secure storage for API keys, tokens, and passwords using macOS Keychain.
 //! All credentials are stored securely and never exposed in logs, UI, or files.
+//!
+//! **No-logging rule:** Do not log credential values or any buffer that might contain them
+//! (e.g. request/response headers or bodies). Use `mask_credential` for safe display only.
 
 use security_framework::item::{ItemClass, ItemSearchOptions, SearchResult};
 use security_framework::passwords::set_generic_password;
@@ -42,11 +45,13 @@ pub fn store_credential(account: &str, password: &str) -> Result<()> {
     Ok(())
 }
 
-/// Retrieve a credential from macOS Keychain
-/// 
+/// Retrieve a credential from macOS Keychain (backend use only).
+///
+/// **Security:** Must never be exposed to the frontend as a Tauri command.
+///
 /// # Arguments
 /// * `account` - Unique identifier for the credential
-/// 
+///
 /// # Returns
 /// Ok(Some(String)) if found, Ok(None) if not found, Err on error
 pub fn get_credential(account: &str) -> Result<Option<String>> {
@@ -98,8 +103,12 @@ pub fn delete_credential(account: &str) -> Result<()> {
     }
 }
 
-/// List all stored credential accounts
-/// 
+/// List all stored credential accounts (backend use only).
+///
+/// **Security:** Must never be exposed to the frontend as a Tauri command.
+/// Account names plus get_credential would allow enumeration and theft of all
+/// stored credentials from the renderer.
+///
 /// # Returns
 /// Vector of account names stored in Keychain
 pub fn list_credentials() -> Result<Vec<String>> {
@@ -139,7 +148,8 @@ fn get_account_from_item(_item_ref: &security_framework::item::Reference) -> Res
     Ok(None)
 }
 
-/// Mask a credential for logging (shows only first/last few characters)
+/// Mask a credential for safe display only (shows only first/last few characters).
+/// Never log raw credentials or headers/bodies that may contain them.
 pub fn mask_credential(credential: &str) -> String {
     if credential.len() <= 8 {
         return "****".to_string();

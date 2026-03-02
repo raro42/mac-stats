@@ -36,10 +36,11 @@ pub async fn run_task_until_finished(task_path: PathBuf, max_iterations: u32) ->
             content
         );
         info!("Task loop: iteration {}/{} for task '{}' (assignee: {})", iteration + 1, max_iterations, task_name, assignee);
-        last_reply = crate::commands::ollama::answer_with_ollama_and_fetch(
+        let reply = crate::commands::ollama::answer_with_ollama_and_fetch(
             &question, None, None, None, None, None, None, None, agent_override, false, None,
         )
         .await?;
+        last_reply = reply.text;
         if let Some(ref p) = crate::task::find_current_path(&current_path) {
             current_path = p.clone();
         }

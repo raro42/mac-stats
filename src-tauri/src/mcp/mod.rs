@@ -19,6 +19,7 @@ pub struct McpTool {
 
 /// Read a key from .config.env (value after =).
 fn mcp_value_from_config_env(path: &Path, key: &str, key_alt: &str) -> Option<String> {
+    // Do not log file content or path; file may contain secrets.
     let content = std::fs::read_to_string(path).ok()?;
     let line = content.lines().find(|l| {
         let t = l.trim();

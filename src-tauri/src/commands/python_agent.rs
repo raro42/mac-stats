@@ -10,6 +10,7 @@ use tracing::info;
 
 /// Read ALLOW_PYTHON_SCRIPT from env or .config.env. "0", "false", "no" => false; default true.
 fn allow_python_script_from_config_env_file(path: &Path) -> Option<bool> {
+    // Do not log file content or path; file may contain secrets.
     let content = std::fs::read_to_string(path).ok()?;
     let line = content.lines().find(|l| {
         let t = l.trim();

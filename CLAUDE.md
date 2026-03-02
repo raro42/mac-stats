@@ -26,7 +26,7 @@ This ensures you understand the project context, architecture, and conventions b
 - Process list with top CPU consumers
 - Customizable UI themes
 - Low CPU usage optimizations
-- Ollama AI chat with code execution and **FETCH_URL** (navigate to URL, fetch page content server-side, no CORS)
+- Ollama AI chat with code execution, **FETCH_URL** (fetch page content server-side, no CORS), and **BROWSER_SCREENSHOT** (CDP: open URL in Chrome, save PNG under ~/.mac-stats/screenshots/, attach in Discord when requested)
 
 ## Build and Run Commands
 
