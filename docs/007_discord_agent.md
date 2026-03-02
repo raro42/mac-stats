@@ -123,6 +123,10 @@ You can put **optional leading lines** in your message to override model, parame
 | `num_ctx:` or `num_ctx=` | `num_ctx: 8192` | Set context window size for this request. |
 | `params:` | `params: temperature=0.7 num_ctx=8192` | Set multiple options in one line. |
 | `skill:` or `skill=` | `skill: 2` or `skill: code` | Load `~/.mac-stats/skills/skill-<number>-<topic>.md` and prepend its content to the system prompt. |
+| `verbose` or `verbose: true` | (on its own line) | Show status/thinking messages in the channel for this request. |
+| `verbose: false` | (on its own line) | Hide status messages for this request (default in channels). |
+
+**Verbose default by context:** For **direct messages (DMs)** the app defaults to **verbose** (you see “Asking Ollama…”, “Executing plan…”, etc.). For **channel** messages it defaults to **non-verbose**. You can override in `~/.mac-stats/discord_channels.json` with top-level keys: `"default_verbose_for_dm": true` (default) and `"default_verbose_for_channel": false` (default). Omit them to keep these defaults; set to `false`/`true` to change. A `verbose` or `verbose: false` line in the message overrides the config for that request.
 
 Example message:
 

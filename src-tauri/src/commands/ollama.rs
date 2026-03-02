@@ -600,9 +600,9 @@ const AGENT_DESCRIPTIONS_BASE: &str = r#"We have 10 base tools available:
 
 2. **FETCH_URL**: Fetch the full text of a web page. Use for: reading a specific URL's content. To invoke: reply with exactly one line: FETCH_URL: <full URL> (e.g. FETCH_URL: https://www.example.com). The app will return the page text.
 
-3. **BROWSER_SCREENSHOT**: Take a screenshot. Two modes: (a) BROWSER_SCREENSHOT: <URL> — open URL and screenshot (e.g. BROWSER_SCREENSHOT: https://www.amvara.de). (b) BROWSER_SCREENSHOT: current — screenshot the **current page** (use after BROWSER_NAVIGATE and BROWSER_CLICK; same browser). For multi-step tasks (navigate → click contact → screenshot), use BROWSER_NAVIGATE, BROWSER_CLICK, then BROWSER_SCREENSHOT: current so the screenshot uses the same browser.
+3. **BROWSER_SCREENSHOT**: Take a screenshot of the **current page only**. Use BROWSER_SCREENSHOT: current (or BROWSER_SCREENSHOT: with no arg). **You must navigate first**: use BROWSER_NAVIGATE: <url>, then optionally BROWSER_CLICK through links, then BROWSER_SCREENSHOT: current. Never use BROWSER_SCREENSHOT: <url> — that is invalid. For \"screenshot this URL\" use BROWSER_NAVIGATE: <url> then BROWSER_SCREENSHOT: current.
 
-4. **BROWSER_NAVIGATE**, **BROWSER_CLICK**, **BROWSER_INPUT**, **BROWSER_SCROLL**, **BROWSER_EXTRACT** (lightweight browser): Use for multi-step browser tasks (e.g. accept cookie consent then search). **Browser mode**: user says \"headless\" → no visible window. User says \"browser\" or default → visible Chrome (desktop app, you can watch navigation). BROWSER_NAVIGATE: <url> — open URL and return current page state with numbered elements. BROWSER_CLICK: <index> — click the element at that index (1-based). BROWSER_INPUT: <index> <text> — type text into the element at that index. BROWSER_SCROLL: <direction> — scroll the current page: use "down", "up", "bottom", "top", or a number of pixels (e.g. BROWSER_SCROLL: 500 or BROWSER_SCROLL: bottom). BROWSER_EXTRACT — return the visible text of the current page (use after navigating/clicking to get content for answering). After each action you get "Current page: ..." and an Elements list; use the index for the next CLICK or INPUT. **If the Elements list shows cookie consent** (e.g. \"Rechazar todo\", \"Aceptar todo\", \"Accept all\", \"Reject all\"), **click the accept button first** (use the index of \"Aceptar todo\" or \"Accept all\") before typing in search boxes or submitting. Reply with exactly one line per tool (e.g. BROWSER_NAVIGATE: https://google.com then BROWSER_CLICK: 27 for Aceptar todo, then BROWSER_INPUT: 10 <query> then BROWSER_CLICK: 9 for the search button).
+4. **BROWSER_NAVIGATE**, **BROWSER_CLICK**, **BROWSER_INPUT**, **BROWSER_SCROLL**, **BROWSER_EXTRACT**, **BROWSER_SEARCH_PAGE** (lightweight browser): Use for multi-step browser tasks. **Browser mode**: user says \"headless\" → no visible window. User says \"browser\" or default → visible Chrome. BROWSER_NAVIGATE: <url> — open URL and return current page state with numbered elements. BROWSER_CLICK: <index> — click the element at that index (1-based). BROWSER_INPUT: <index> <text> — type text into the element at that index. BROWSER_SCROLL: <direction> — scroll: \"down\", \"up\", \"bottom\", \"top\", or pixels. BROWSER_EXTRACT — return full visible text of current page. BROWSER_SEARCH_PAGE: <pattern> — search page text for a pattern (like grep); returns matches with context. Use to find specific text (e.g. a name) without reading the whole page. For \"find X on this site\": BROWSER_NAVIGATE to start URL, BROWSER_CLICK through links (Team, Contact, etc.), BROWSER_SEARCH_PAGE: \"X\" to check if found, repeat until found, then BROWSER_SCREENSHOT: current. After each action you get \"Current page: ...\" and an Elements list. **If the Elements list shows cookie consent** (e.g. \"Rechazar todo\", \"Aceptar todo\", \"Accept all\", \"Reject all\"), **click the accept button first** (use the index of \"Aceptar todo\" or \"Accept all\") before typing in search boxes or submitting. Reply with exactly one line per tool (e.g. BROWSER_NAVIGATE: https://google.com then BROWSER_CLICK: 27 for Aceptar todo, then BROWSER_INPUT: 10 <query> then BROWSER_CLICK: 9 for the search button).
 
 5. **BRAVE_SEARCH**: Web search via Brave Search API. Use for: finding current info, facts, multiple sources. To invoke: reply with exactly one line: BRAVE_SEARCH: <search query>. The app will return search results.
 
@@ -1335,25 +1335,16 @@ fn extract_url_from_question(text: &str) -> Option<String> {
     None
 }
 
-/// True when the user wants multi-step browser flow (navigate → click/find → screenshot), not a simple screenshot of a URL.
-fn has_multi_step_browser_intent(question: &str) -> bool {
-    let q_lower = question.trim().to_lowercase();
-    q_lower.contains("click on") || q_lower.contains("click the")
-        || q_lower.contains("and click") || q_lower.contains("then click")
-        || q_lower.contains("first ") || q_lower.contains("accept cookie")
-        || q_lower.contains("accept all") || q_lower.contains("reject all")
-        || q_lower.contains("navigate all") || q_lower.contains("find ")
-        || q_lower.contains("when you found") || q_lower.contains("when found")
-        || (q_lower.contains("find") && (q_lower.contains('"') || q_lower.contains(" and ")))
-}
-
 /// If the question clearly asks for a screenshot of a URL, return RECOMMEND string for pre-routing.
-/// Do NOT pre-route when the request includes multi-step browser actions (click, navigate then, etc.)
-/// — those need NAVIGATE → CLICK → BROWSER_SCREENSHOT: current.
+/// Browser-use style: screenshot only works on current page. Pre-route to NAVIGATE + SCREENSHOT: current.
+/// Skip pre-route when user wants multi-step (navigate all, find X) — let planner handle it.
 fn extract_screenshot_recommendation(question: &str) -> Option<String> {
     let q = question.trim();
     let q_lower = q.to_lowercase();
-    if has_multi_step_browser_intent(question) {
+    let has_multi_step = q_lower.contains("navigate all") || q_lower.contains("find ")
+        || q_lower.contains("when you found") || q_lower.contains("when found")
+        || (q_lower.contains("click on") || q_lower.contains("and click") || q_lower.contains("then click"));
+    if has_multi_step {
         return None;
     }
     let has_screenshot_intent = q_lower.contains("screenshot") || q_lower.contains("take a screenshot")
@@ -1364,8 +1355,8 @@ fn extract_screenshot_recommendation(question: &str) -> Option<String> {
         || q_lower.contains("http") || q_lower.contains("www.");
     if has_screenshot_intent && has_browser_or_url_context {
         if let Some(url) = extract_url_from_question(q) {
-            let rec = format!("BROWSER_SCREENSHOT: {}", url);
-            tracing::info!("Agent router: pre-routed to BROWSER_SCREENSHOT (screenshot + URL): {}", crate::logging::ellipse(&url, 60));
+            let rec = format!("BROWSER_NAVIGATE: {}\nBROWSER_SCREENSHOT: current", url);
+            tracing::info!("Agent router: pre-routed to BROWSER_NAVIGATE + BROWSER_SCREENSHOT (browser-use style): {}", crate::logging::ellipse(&url, 60));
             return Some(rec);
         }
     }
@@ -1787,9 +1778,12 @@ pub async fn answer_with_ollama_and_fetch(
             msgs.push(msg.clone());
         }
         msgs.push(crate::ollama::ChatMessage { role: "user".to_string(), content: question.to_string() });
-        // Synthesize the tool line as if the model had output it — the tool loop
-        // will push this as an assistant message before appending the tool result.
-        let synthetic = format!("{}: {}", tool, arg);
+        // Use full recommendation when it contains multiple tools (e.g. BROWSER_NAVIGATE + BROWSER_SCREENSHOT)
+        let synthetic = if recommendation.contains('\n') {
+            recommendation.clone()
+        } else {
+            format!("{}: {}", tool, arg)
+        };
         (msgs, synthetic)
     } else {
         info!("Agent router: execution step — sending plan + question, starting tool loop (max {} tools)", max_tool_iterations);
@@ -1938,17 +1932,15 @@ pub async fn answer_with_ollama_and_fetch(
             "BROWSER_SCREENSHOT" => {
                 let url_arg = arg.trim().to_string();
                 let is_current = url_arg.is_empty() || url_arg.eq_ignore_ascii_case("current");
-                // Block shortcut: "navigate all pages and find X" requires multi-step flow, not screenshot-of-URL
-                if !is_current && has_multi_step_browser_intent(question) {
-                    info!("Agent router: blocking BROWSER_SCREENSHOT: {} — user asked for multi-step navigation", crate::logging::ellipse(&url_arg, 60));
+                // Browser-use style: screenshot only works on current page. Reject BROWSER_SCREENSHOT: <url>.
+                if !is_current {
+                    info!("Agent router: rejecting BROWSER_SCREENSHOT: {} — use NAVIGATE first, then SCREENSHOT: current", crate::logging::ellipse(&url_arg, 60));
                     format!(
-                        "This task requires multi-step navigation. Do NOT use BROWSER_SCREENSHOT: <url> for \"navigate all pages\" or \"find X\". \
-Use BROWSER_NAVIGATE: {} first, then BROWSER_CLICK through links (Team, Contact, etc.), BROWSER_EXTRACT to search page text for the name, repeat until found, then BROWSER_SCREENSHOT: current.",
+                        "BROWSER_SCREENSHOT only works on the current page. Use BROWSER_NAVIGATE: {} first, then BROWSER_SCREENSHOT: current. Never use BROWSER_SCREENSHOT: <url>.",
                         url_arg
                     )
                 } else {
-                send_status(if is_current { "Taking screenshot of current page…" } else { "Opening page and taking screenshot…" });
-                if is_current {
+                    send_status("Taking screenshot of current page…");
                     match tokio::task::spawn_blocking(|| crate::browser_agent::take_screenshot_current_page()).await {
                         Ok(Ok(path)) => {
                             attachment_paths.push(path.clone());
@@ -1963,27 +1955,6 @@ Use BROWSER_NAVIGATE: {} first, then BROWSER_CLICK through links (Team, Contact,
                         }
                         Err(e) => format!("Screenshot task error: {}", e),
                     }
-                } else {
-                    info!(
-                        "BROWSER_SCREENSHOT: arg from parser (raw): {}",
-                        crate::logging::ellipse(&arg, 500)
-                    );
-                    info!("BROWSER_SCREENSHOT: URL sent to CDP: {}", url_arg);
-                    match tokio::task::spawn_blocking(move || crate::browser_agent::take_screenshot(&url_arg)).await {
-                        Ok(Ok(path)) => {
-                            attachment_paths.push(path.clone());
-                            format!(
-                                "Screenshot saved to: {}.\n\nTell the user the screenshot was taken; the app will attach it in Discord.",
-                                path.display()
-                            )
-                        }
-                        Ok(Err(e)) => {
-                            info!("Discord/Ollama: BROWSER_SCREENSHOT failed: {}", crate::logging::ellipse(&e, 200));
-                            format!("Screenshot failed: {}. (Chrome may need to be installed or available on port 9222.)", e)
-                        }
-                        Err(e) => format!("Screenshot task error: {}", e),
-                    }
-                }
                 }
             }
             "BROWSER_NAVIGATE" => {
@@ -2096,6 +2067,22 @@ Use BROWSER_NAVIGATE: {} first, then BROWSER_CLICK through links (Team, Contact,
                         }
                     }
                     Err(e) => format!("BROWSER_EXTRACT task error: {}", e),
+                }
+            }
+            "BROWSER_SEARCH_PAGE" => {
+                let pattern = arg.trim().to_string();
+                if pattern.is_empty() {
+                    "BROWSER_SEARCH_PAGE requires a search pattern (e.g. BROWSER_SEARCH_PAGE: Ralf Röber). Use to find specific text on the current page.".to_string()
+                } else {
+                    send_status("Searching page for pattern…");
+                    match tokio::task::spawn_blocking(move || crate::browser_agent::search_page_text(&pattern)).await {
+                        Ok(Ok(result)) => result,
+                        Ok(Err(e)) => {
+                            info!("BROWSER_SEARCH_PAGE failed: {}", crate::logging::ellipse(&e, 200));
+                            format!("BROWSER_SEARCH_PAGE failed: {}. (Navigate to a page first with BROWSER_NAVIGATE.)", e)
+                        }
+                        Err(e) => format!("BROWSER_SEARCH_PAGE task error: {}", e),
+                    }
                 }
             }
             "BRAVE_SEARCH" => {
@@ -3334,7 +3321,7 @@ fn line_starts_with_tool_prefix(line: &str) -> bool {
 
 /// Parse one tool starting at the given line index. Returns (tool_name, argument) and the next line index to scan.
 fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String, String), usize)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "BROWSER_SCREENSHOT:", "BROWSER_NAVIGATE:", "BROWSER_CLICK:", "BROWSER_INPUT:", "BROWSER_SCROLL:", "BROWSER_EXTRACT:", "PERPLEXITY_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:", "MASTODON_POST:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "BROWSER_SCREENSHOT:", "BROWSER_NAVIGATE:", "BROWSER_CLICK:", "BROWSER_INPUT:", "BROWSER_SCROLL:", "BROWSER_EXTRACT:", "BROWSER_SEARCH_PAGE:", "PERPLEXITY_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:", "MASTODON_POST:"];
     let line = lines.get(line_index)?.trim();
     if line.eq_ignore_ascii_case("TASK_LIST") {
         return Some((("TASK_LIST".to_string(), String::new()), line_index + 1));
@@ -3363,7 +3350,7 @@ fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String,
     for prefix in prefixes {
         if search.to_uppercase().starts_with(prefix) {
             let mut arg = search[prefix.len()..].trim().to_string();
-            if arg.is_empty() && prefix != "TASK_LIST:" && prefix != "TASK_SHOW:" && prefix != "LIST_SCHEDULES:" && prefix != "BROWSER_EXTRACT:" {
+            if arg.is_empty() && prefix != "TASK_LIST:" && prefix != "TASK_SHOW:" && prefix != "LIST_SCHEDULES:" && prefix != "BROWSER_EXTRACT:" && prefix != "BROWSER_SCREENSHOT:" {
                 continue;
             }
             let tool_name = prefix.trim_end_matches(':');
@@ -3377,7 +3364,7 @@ fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String,
             } else {
                 line_index + 1
             };
-            if tool_name == "FETCH_URL" || tool_name == "BRAVE_SEARCH" || tool_name == "BROWSER_SCREENSHOT" || tool_name == "BROWSER_NAVIGATE" || tool_name == "PERPLEXITY_SEARCH" {
+            if tool_name == "FETCH_URL" || tool_name == "BRAVE_SEARCH" || tool_name == "BROWSER_SCREENSHOT" || tool_name == "BROWSER_NAVIGATE" || tool_name == "BROWSER_SEARCH_PAGE" || tool_name == "PERPLEXITY_SEARCH" {
                 if let Some(idx) = arg.find(';') {
                     arg = arg[..idx].trim().to_string();
                 }
@@ -3386,6 +3373,9 @@ fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String,
                 if let Some(first_space) = arg.find(' ') {
                     arg = arg[..first_space].trim().to_string();
                 }
+                arg = arg.trim_end_matches(|c: char| c == '.' || c == ',' || c == ';' || c == ':').to_string();
+            }
+            if tool_name == "BROWSER_SEARCH_PAGE" {
                 arg = arg.trim_end_matches(|c: char| c == '.' || c == ',' || c == ';' || c == ':').to_string();
             }
             if tool_name != "TASK_APPEND" && tool_name != "TASK_CREATE" {
@@ -3405,7 +3395,7 @@ fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String,
                     arg = arg[..pos].trim().to_string();
                 }
             }
-            if !arg.is_empty() || tool_name == "TASK_LIST" || tool_name == "TASK_SHOW" || tool_name == "LIST_SCHEDULES" || tool_name == "BROWSER_EXTRACT" || (tool_name == "TASK_SLEEP" && !arg.is_empty()) {
+            if !arg.is_empty() || tool_name == "TASK_LIST" || tool_name == "TASK_SHOW" || tool_name == "LIST_SCHEDULES" || tool_name == "BROWSER_EXTRACT" || tool_name == "BROWSER_SCREENSHOT" || (tool_name == "TASK_SLEEP" && !arg.is_empty()) {
                 return Some(((tool_name, arg), next_line));
             }
         }
@@ -3440,7 +3430,7 @@ fn parse_all_tools_from_response(content: &str) -> Vec<(String, String)> {
 
 /// Tool line prefixes that indicate start of another tool (used to stop script body extraction).
 const TOOL_LINE_PREFIXES: &[&str] = &[
-    "FETCH_URL:", "BRAVE_SEARCH:", "BROWSER_SCREENSHOT:", "BROWSER_NAVIGATE:", "BROWSER_CLICK:", "BROWSER_INPUT:", "BROWSER_SCROLL:", "BROWSER_EXTRACT:", "PERPLEXITY_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:",
+    "FETCH_URL:", "BRAVE_SEARCH:", "BROWSER_SCREENSHOT:", "BROWSER_NAVIGATE:", "BROWSER_CLICK:", "BROWSER_INPUT:", "BROWSER_SCROLL:", "BROWSER_EXTRACT:", "BROWSER_SEARCH_PAGE:", "PERPLEXITY_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:",
     "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:",
 ];
 

@@ -29,7 +29,7 @@ curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/refs/heads/main/ru
 
 - **Menu bar** — CPU, GPU, RAM, disk at a glance; click to open the details window.
 - **AI chat** — Ollama in the app or via Discord; FETCH_URL, BRAVE_SEARCH, RUN_CMD, code execution, MCP.
-- **Discord bot** — Optional; @mentions, DMs, having_fun mode; full Ollama + tools.
+- **Discord bot** — Optional; @mentions, DMs, having_fun mode (let your Mac chat with other bots when bored—yes, it gets weird); full Ollama + tools.
 - **Tasks & scheduler** — Task files under `~/.mac-stats/task/`; cron or one-shot; optional Discord reply.
 - **All local** — Models and data on your Mac; no cloud backend; works offline.
 - **Low CPU** — &lt;0.1% with window closed, ~3% with window open.
@@ -43,7 +43,7 @@ curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/refs/heads/main/ru
 - **Optional network** — Discord, FETCH_URL, Brave Search, website checks only when you use them.
 - **Metrics** — CPU, GPU, RAM, disk, temperature, processes read from your machine when you open the window.
 
-No subscription. No lock-in. Works offline for chat and monitoring.
+No subscription. No lock-in. Works offline for chat and monitoring. All you need is a nice pet from [Ollama](https://ollama.com)—the kind that runs on your Mac and never asks for a subscription.
 
 ---
 
@@ -87,7 +87,7 @@ All settings live under `~/.mac-stats/`:
 ### AI & agents (Ollama, local)
 - **Chat** — In the app window or via Discord. Code execution (JS), **FETCH_URL**, **BRAVE_SEARCH**, **RUN_CMD** (allowlisted), retry and correction.
 - **Memory** — Global and per-agent `memory.md`; **MEMORY_APPEND**; session compaction writes lessons to memory.
-- **Discord bot** — Optional. @mentions, DMs, or "having_fun" mode; per-channel model/agent. Full Ollama + tools.
+- **Discord bot** — Optional. @mentions, DMs, or having_fun mode (your Mac chats with other bots when bored); per-channel model/agent. Full Ollama + tools.
 - **Tasks** — `~/.mac-stats/task/` with **TASK_LIST**, **TASK_CREATE**, **TASK_STATUS**, assignees, scheduler loop.
 - **Scheduler** — Cron or one-shot (`~/.mac-stats/schedules.json`); tasks through Ollama; optional Discord reply channel.
 - **MCP** — Tools from any MCP server (HTTP/SSE or stdio).
@@ -102,15 +102,12 @@ All settings live under `~/.mac-stats/`:
 - Real-time CPU, RAM, disk, GPU in the menu bar; temperature, frequency, battery. Process list with top consumers; click for details. Low CPU: &lt;0.1% with window closed, ~3% with window open.
 - **Monitoring & alerts** — Website and social monitoring; alert rules and channels (Telegram, Slack, etc.).
 
-### Known limitation
-- **Window frame** — "Window Frame" in settings applies to new windows; existing ones update after close/reopen. Stored in `~/.mac-stats/config.json`.
-
 ---
 
 ## Usage
 
 - **Chat** — Open the window (click the menu bar icon or run with `--cpu`) and use the AI panel. Verbosity: `-v` / `-vv` / `-vvv`.
-- **Discord** — Configure `~/.mac-stats/discord_channels.json` and ensure your bot token is set; the agent responds to @mentions, DMs, or in having_fun channels.
+- **Discord** — Configure `~/.mac-stats/discord_channels.json` and ensure your bot token is set; the agent responds to @mentions, DMs, or in having_fun channels (where your Mac can chill and talk to other bots). See [Discord setup and channel modes](docs/007_discord_agent.md) for details.
 - **Monitoring** — Click any percentage in the menu bar (CPU, GPU, RAM, Disk) to open the details window. ⌘W to hide; click again to toggle; ⌘Q to quit. CPU use: &lt;0.1% with window closed, ~3% with window open.
 
 ---
@@ -162,3 +159,9 @@ Local AI agent stack first; system monitoring lives in the menu bar when you nee
 ## Contact
 
 Questions or ideas? [Discord](https://discord.com/users/687953899566530588) or open an issue on GitHub.
+
+**We’d love your feedback.** If you’ve tried mac-stats—or you’re thinking about it—drop a note in [**this discussion**](https://github.com/raro42/mac-stats/issues/3). What works, what doesn’t, and what you’d like to see next. It all helps.
+
+---
+
+[MIT License](https://opensource.org/licenses/MIT)

@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Browser agent retry on connection error** — When CDP connection is stale (connection closed, timeout, "Unable to make method calls"), the app clears the cached session and retries once. All CDP entry points (navigate, click, input, scroll, extract, screenshot) use this retry wrapper for seamless recovery without user restart.
-- **Multi-step browser guard** — Block `BROWSER_SCREENSHOT: <url>` when the user asked for multi-step navigation (e.g. "navigate all pages", "find X", "when you found"). The model receives a hint to use BROWSER_NAVIGATE first, then BROWSER_CLICK through links, BROWSER_EXTRACT to search page text, and BROWSER_SCREENSHOT: current when found.
+- **Browser-use style browser tools** — Adopted [browser-use](https://github.com/browser-use/browser-use) semantics: (1) **BROWSER_SCREENSHOT** only works on current page — use BROWSER_NAVIGATE first, then BROWSER_SCREENSHOT: current. BROWSER_SCREENSHOT: \<url\> is rejected. (2) **BROWSER_SEARCH_PAGE: \<pattern\>** — new tool to search page text for a pattern (like grep), returns matches with context. Use to find specific text (e.g. a name) without reading the whole page. (3) Pre-route "screenshot + URL" now runs BROWSER_NAVIGATE + BROWSER_SCREENSHOT: current in sequence.
 
 ### Added
 - **HTTP-only browser fallback** — When Chrome/CDP is not available (e.g. port 9222), BROWSER_NAVIGATE / BROWSER_CLICK / BROWSER_INPUT / BROWSER_EXTRACT use HTTP fetch + HTML parsing (`scraper`): fetch page, parse links and forms, present numbered list to LLM; CLICK follows links or submits forms, INPUT fills form fields. No JavaScript execution.

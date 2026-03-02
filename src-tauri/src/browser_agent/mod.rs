@@ -714,6 +714,125 @@ fn scroll_page_inner(arg: &str) -> Result<String, String> {
     Ok(format_browser_state_for_llm(&state))
 }
 
+/// Search current page for a text pattern (like grep). Returns matches with surrounding context. Zero LLM cost.
+/// Use to find specific text, verify content exists, or locate data. Use after BROWSER_NAVIGATE/CLICK.
+pub fn search_page_text(pattern: &str) -> Result<String, String> {
+    with_connection_retry(|| search_page_text_inner(pattern))
+}
+
+fn search_page_text_inner(pattern: &str) -> Result<String, String> {
+    let (_, tab) = get_current_tab().map_err(|e| {
+        clear_browser_session_on_error(&e);
+        e
+    })?;
+    // Escape for JS string: backslash and quotes
+    let pattern_escaped = pattern
+        .replace('\\', "\\\\")
+        .replace('\'', "\\'")
+        .replace('\n', " ")
+        .replace('\r', " ");
+    const CONTEXT_CHARS: i32 = 80;
+    const MAX_RESULTS: i32 = 20;
+    // Use indexOf for literal substring search (no regex escaping issues)
+    let js = format!(
+        r#"
+(function() {{
+  var scope = document.body;
+  if (!scope) return {{ error: 'no body', matches: [], total: 0 }};
+  var walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT);
+  var fullText = '';
+  var nodeOffsets = [];
+  while (walker.nextNode()) {{
+    var node = walker.currentNode;
+    var text = node.textContent;
+    if (text && text.trim()) {{
+      nodeOffsets.push({{ offset: fullText.length, length: text.length, node: node }});
+      fullText += text;
+    }}
+  }}
+  var pat = '{}';
+  var patLower = pat.toLowerCase();
+  var textLower = fullText.toLowerCase();
+  var matches = [];
+  var idx = textLower.indexOf(patLower);
+  while (idx !== -1 && matches.length < {}) {{
+    var start = Math.max(0, idx - {});
+    var end = Math.min(fullText.length, idx + pat.length + {});
+    var context = fullText.slice(start, end).replace(/\s+/g, ' ').trim();
+    var elemPath = '';
+    for (var i = 0; i < nodeOffsets.length; i++) {{
+      var no = nodeOffsets[i];
+      if (no.offset <= idx && no.offset + no.length > idx) {{
+        var el = no.node.parentElement;
+        while (el && el !== document.body) {{
+          elemPath = (el.tagName ? el.tagName.toLowerCase() : '') + (elemPath ? ' > ' + elemPath : '');
+          el = el.parentElement;
+        }}
+        break;
+      }}
+    }}
+    matches.push({{ context: (start > 0 ? '...' : '') + context + (end < fullText.length ? '...' : ''), path: elemPath }});
+    idx = textLower.indexOf(patLower, idx + 1);
+  }}
+  var totalFound = 0;
+  var i = textLower.indexOf(patLower);
+  while (i !== -1) {{ totalFound++; i = textLower.indexOf(patLower, i + 1); }}
+  return {{ matches: matches, total: totalFound, has_more: totalFound > {} }};
+}})()
+"#,
+        pattern_escaped,
+        MAX_RESULTS,
+        CONTEXT_CHARS,
+        CONTEXT_CHARS,
+        MAX_RESULTS
+    );
+    let result = tab.evaluate(&js, false).map_err(|e| {
+        let s = format!("Search page evaluate: {}", e);
+        clear_browser_session_on_error(&s);
+        s
+    })?;
+    let value = result.value.as_ref().ok_or("search_page returned no value")?;
+    let obj = value.as_object().ok_or("search_page did not return object")?;
+    if let Some(err) = obj.get("error").and_then(|v| v.as_str()) {
+        return Err(format!("search_page error: {}", err));
+    }
+    let total = obj.get("total").and_then(|v| v.as_i64()).unwrap_or(0);
+    let empty: &[serde_json::Value] = &[];
+    let matches = obj.get("matches").and_then(|v| v.as_array()).map(|v| v.as_slice()).unwrap_or(empty);
+    if total == 0 {
+        return Ok(format!("No matches found for \"{}\" on page.", pattern));
+    }
+    let mut lines = vec![format!(
+        "Found {} match{} for \"{}\" on page:",
+        total,
+        if total == 1 { "" } else { "es" },
+        pattern
+    )];
+    lines.push(String::new());
+    for (i, m) in matches.iter().enumerate() {
+        let ctx = m
+            .get("context")
+            .and_then(|v| v.as_str())
+            .unwrap_or("?");
+        let path = m.get("path").and_then(|v| v.as_str()).unwrap_or("");
+        let loc = if path.is_empty() {
+            String::new()
+        } else {
+            format!(" (in {})", path)
+        };
+        lines.push(format!("[{}] {}{}", i + 1, ctx, loc));
+    }
+    let has_more = obj.get("has_more").and_then(|v| v.as_bool()).unwrap_or(false);
+    if has_more {
+        lines.push(format!(
+            "\n... showing {} of {} total matches.",
+            matches.len(),
+            total
+        ));
+    }
+    Ok(lines.join("\n"))
+}
+
 /// Extract visible text from the current page (body innerText). Use after BROWSER_NAVIGATE/CLICK to get page content for the LLM.
 pub fn extract_page_text() -> Result<String, String> {
     with_connection_retry(extract_page_text_inner)

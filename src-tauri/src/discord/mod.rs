@@ -147,8 +147,8 @@ impl Default for HavingFunParams {
 }
 
 /// Cached channel config, reloaded when `discord_channels.json` mtime changes.
-/// Holds (file mtime, default, overrides, having_fun params).
-static CHANNEL_CONFIG: RwLock<Option<(Option<std::time::SystemTime>, ChannelSettings, HashMap<u64, ChannelSettings>, HavingFunParams)>> =
+/// Holds (file mtime, default, overrides, having_fun params, default_verbose_dm, default_verbose_channel).
+static CHANNEL_CONFIG: RwLock<Option<(Option<std::time::SystemTime>, ChannelSettings, HashMap<u64, ChannelSettings>, HavingFunParams, bool, bool)>> =
     RwLock::new(None);
 
 fn discord_channels_file_mtime() -> Option<std::time::SystemTime> {
@@ -190,21 +190,21 @@ fn ensure_having_fun_in_config(path: &Path, parsed: &mut serde_json::Value) {
     }
 }
 
-fn load_channel_config_full() -> (ChannelSettings, HashMap<u64, ChannelSettings>, HavingFunParams) {
+fn load_channel_config_full() -> (ChannelSettings, HashMap<u64, ChannelSettings>, HavingFunParams, bool, bool) {
     let default_settings = ChannelSettings { mode: ChannelMode::MentionOnly, prompt: None, model: None, agent: None };
     let path = crate::config::Config::discord_channels_path();
     let json = match std::fs::read_to_string(&path) {
         Ok(s) => s,
         Err(_) => {
             info!("Discord channels config not found at {:?}, using mention_only default", path);
-            return (default_settings, HashMap::new(), HavingFunParams::default());
+            return (default_settings, HashMap::new(), HavingFunParams::default(), true, false);
         }
     };
     let mut parsed: serde_json::Value = match serde_json::from_str(&json) {
         Ok(v) => v,
         Err(e) => {
             tracing::warn!("Discord channels config parse error: {}, using mention_only default", e);
-            return (default_settings, HashMap::new(), HavingFunParams::default());
+            return (default_settings, HashMap::new(), HavingFunParams::default(), true, false);
         }
     };
     // Upgrade: if file exists but has no having_fun block, add default and write back
@@ -219,6 +219,15 @@ fn load_channel_config_full() -> (ChannelSettings, HashMap<u64, ChannelSettings>
         .and_then(|v| v.as_str())
         .map(|s| s.to_string());
     let default_settings = ChannelSettings { mode: default_mode, prompt: default_prompt, model: None, agent: None };
+
+    let default_verbose_dm = parsed
+        .get("default_verbose_for_dm")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(true);
+    let default_verbose_channel = parsed
+        .get("default_verbose_for_channel")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
 
     let having_fun = if let Some(hf) = parsed.get("having_fun").and_then(|v| v.as_object()) {
         let u = |k: &str, default: u64| hf.get(k).and_then(|v| v.as_u64()).unwrap_or(default);
@@ -265,7 +274,7 @@ fn load_channel_config_full() -> (ChannelSettings, HashMap<u64, ChannelSettings>
             channels.insert(id, settings);
         }
     }
-    (default_settings, channels, having_fun)
+    (default_settings, channels, having_fun, default_verbose_dm, default_verbose_channel)
 }
 
 /// Ensures config is loaded; call before reading channel settings or having_fun params.
@@ -276,8 +285,8 @@ fn ensure_channel_config_loaded() {
     };
     if guard.is_none() {
         let mtime = discord_channels_file_mtime();
-        let (default, channels, having_fun) = load_channel_config_full();
-        *guard = Some((mtime, default.clone(), channels.clone(), having_fun.clone()));
+        let (default, channels, having_fun, verbose_dm, verbose_channel) = load_channel_config_full();
+        *guard = Some((mtime, default.clone(), channels.clone(), having_fun.clone(), verbose_dm, verbose_channel));
         drop(guard);
 
         let having_fun_count = channels.values().filter(|s| s.mode == ChannelMode::HavingFun).count();
@@ -345,11 +354,11 @@ fn reload_channel_config_if_changed() {
     };
     let should_reload = match guard.as_ref() {
         None => true,
-        Some((cached_mtime, _, _, _)) => *cached_mtime != mtime,
+        Some((cached_mtime, _, _, _, _, _)) => *cached_mtime != mtime,
     };
     if should_reload {
-        let (default, channels, having_fun) = load_channel_config_full();
-        *guard = Some((mtime, default, channels, having_fun));
+        let (default, channels, having_fun, verbose_dm, verbose_channel) = load_channel_config_full();
+        *guard = Some((mtime, default, channels, having_fun, verbose_dm, verbose_channel));
         info!("Discord channels config reloaded (file changed)");
     }
 }
@@ -360,10 +369,30 @@ fn channel_settings(channel_id: u64) -> ChannelSettings {
         Ok(g) => g,
         Err(_) => return ChannelSettings { mode: ChannelMode::MentionOnly, prompt: None, model: None, agent: None },
     };
-    let Some((_, default, overrides, _)) = guard.as_ref() else {
+    let Some((_, default, overrides, _, _, _)) = guard.as_ref() else {
         return ChannelSettings { mode: ChannelMode::MentionOnly, prompt: None, model: None, agent: None };
     };
     overrides.get(&channel_id).cloned().unwrap_or_else(|| default.clone())
+}
+
+/// Default verbose for DMs (when not set in message). From discord_channels.json "default_verbose_for_dm", default true.
+fn default_verbose_for_dm() -> bool {
+    ensure_channel_config_loaded();
+    let guard = match CHANNEL_CONFIG.read() {
+        Ok(g) => g,
+        Err(_) => return true,
+    };
+    guard.as_ref().map(|(_, _, _, _, v, _)| *v).unwrap_or(true)
+}
+
+/// Default verbose for channel messages (when not set in message). From discord_channels.json "default_verbose_for_channel", default false.
+fn default_verbose_for_channel() -> bool {
+    ensure_channel_config_loaded();
+    let guard = match CHANNEL_CONFIG.read() {
+        Ok(g) => g,
+        Err(_) => return false,
+    };
+    guard.as_ref().map(|(_, _, _, _, _, v)| *v).unwrap_or(false)
 }
 
 fn get_having_fun_params() -> HavingFunParams {
@@ -372,7 +401,7 @@ fn get_having_fun_params() -> HavingFunParams {
         Ok(g) => g,
         Err(_) => return HavingFunParams::default(),
     };
-    guard.as_ref().map(|(_, _, _, p)| p.clone()).unwrap_or_default()
+    guard.as_ref().map(|(_, _, _, p, _, _)| p.clone()).unwrap_or_default()
 }
 
 /// Number of channels configured as having_fun in discord_channels.json. Used for heartbeat logging.
@@ -384,7 +413,7 @@ fn count_configured_having_fun_channels() -> usize {
     };
     guard
         .as_ref()
-        .map(|(_, _, overrides, _)| overrides.values().filter(|s| s.mode == ChannelMode::HavingFun).count())
+        .map(|(_, _, overrides, _, _, _)| overrides.values().filter(|s| s.mode == ChannelMode::HavingFun).count())
         .unwrap_or(0)
 }
 
@@ -397,7 +426,7 @@ fn configured_having_fun_channel_ids() -> Vec<u64> {
     };
     guard
         .as_ref()
-        .map(|(_, _, overrides, _)| {
+        .map(|(_, _, overrides, _, _, _)| {
             overrides
                 .iter()
                 .filter(|(_, s)| s.mode == ChannelMode::HavingFun)
@@ -748,7 +777,7 @@ async fn having_fun_background_loop(ctx: Context) {
                 Err(_) => continue,
             };
             let overrides = match guard.as_ref() {
-                Some((_, _, o, _)) => o.clone(),
+                Some((_, _, o, _, _, _)) => o.clone(),
                 None => continue,
             };
             drop(guard);
@@ -1149,8 +1178,9 @@ fn extract_model_switch_from_question(question: &str) -> Option<(String, String)
 }
 
 /// Parse leading "model: ...", "temperature: ...", "num_ctx: ...", "skill: ...", "agent: ...", "verbose" from a Discord message.
-/// Returns (rest of message as question, model_override, options_override, skill_content, agent_selector, verbose).
-/// When `verbose` is false (the default), status/thinking messages are suppressed in the channel.
+/// Returns (rest of message, model_override, options_override, skill_content, agent_selector, verbose).
+/// `verbose`: None = not set (use default from config: DM vs channel), Some(true/false) = explicit.
+/// When verbose is false, status/thinking messages are suppressed in the channel.
 fn parse_discord_ollama_overrides(
     content: &str,
 ) -> (
@@ -1159,14 +1189,14 @@ fn parse_discord_ollama_overrides(
     Option<crate::ollama::ChatOptions>,
     Option<String>,
     Option<String>,
-    bool,
+    Option<bool>,
 ) {
     let mut model_override: Option<String> = None;
     let mut temperature: Option<f32> = None;
     let mut num_ctx: Option<u32> = None;
     let mut skill_selector: Option<String> = None;
     let mut agent_selector: Option<String> = None;
-    let mut verbose = false;
+    let mut verbose: Option<bool> = None;
     let lines: Vec<&str> = content.lines().collect();
     let mut consumed = 0;
 
@@ -1178,7 +1208,10 @@ fn parse_discord_ollama_overrides(
         }
         let lower = line.to_lowercase();
         if lower == "verbose" || lower == "verbose:" || lower == "verbose: true" || lower == "verbose=true" {
-            verbose = true;
+            verbose = Some(true);
+            consumed += 1;
+        } else if lower == "verbose: false" || lower == "verbose=false" {
+            verbose = Some(false);
             consumed += 1;
         } else if lower.starts_with("model:") {
             let v = line["model:".len()..].trim().to_string();
@@ -1377,8 +1410,13 @@ impl EventHandler for Handler {
             return;
         }
 
-        let (mut question, mut model_override, options_override, skill_content, agent_selector, verbose) =
+        let (mut question, mut model_override, options_override, skill_content, agent_selector, verbose_opt) =
             parse_discord_ollama_overrides(&content);
+        let verbose = match verbose_opt {
+            Some(v) => v,
+            None if is_dm => default_verbose_for_dm(),
+            None => default_verbose_for_channel(),
+        };
         // Natural-language model switch: "switch model to: X and do Y" -> use model X, question = Y
         if model_override.is_none() {
             if let Some((model, rest)) = extract_model_switch_from_question(&question) {
