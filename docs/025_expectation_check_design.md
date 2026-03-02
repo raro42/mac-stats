@@ -55,7 +55,8 @@ When the bot gives you a shrug or a half-baked answer, you don’t have to stick
 | Escalation detection and framing | **Done** | `discord/mod.rs`: `is_escalation_message()`, `default_verbose_for_dm`; `ollama.rs`: `escalation` param, prepend text, `max_tool_iterations += 10` |
 | Retry once on verification NO (A2) | **Done** | When verification says NO we re-run once with "complete the remaining steps"; retry run uses `retry_on_verification_no: false`. Discord, scheduler, task runner pass `true`. |
 | Vision verification (screenshot tasks) | **Done** | When we have image attachment(s) and a local vision model is available, we send the first image (base64) and ask "Does this image satisfy the request?" Fallback: text-only. |
-| Optional: “done” tool (browser-use style) | Deferred | Would require planner/execution to emit and honour `done(success=…)`; not required for best-of-breed. |
+| Status messages (reasoning + emojis) | **Done** | In Discord/UI, tool-run status shows *what* we're doing: 🧭 Navigating to \<url\>…, 🖱️ Clicking element \<n\>…, 📜 Scrolling \<direction\>…, ✍️ Typing into element \<n\>…, 📸 screenshot, 🌐 fetch/search, 🔍 page search, 📄 extract. Long URLs/queries truncated. |
+| Optional: “done” tool (browser-use style) | **Done** | Model can end with **DONE: success** or **DONE: no**; we exit the tool loop, strip the DONE line from the reply, then run completion verification as usual. Described in agent base tools and planning prompt. |
 
 ---
 
@@ -64,7 +65,7 @@ When the bot gives you a shrug or a half-baked answer, you don’t have to stick
 We promised **“retries or warns”** in the stand-out line. To satisfy that and the user:
 
 - **A2 (retry once on verification NO)** is now **implemented**: when the verifier says we didn’t complete, we run one more pass with a “complete the remaining steps” prompt and return that result (or append the disclaimer if the retry still doesn’t satisfy). So we truly **retry or warn**, not only warn.
-- **“Done” tool** remains deferred: it would add a clear commit step (model calls `done(success=…)`) but would need planner/execution changes. We already have criteria at start, always-on verification, heuristic guard, escalation, and one retry — which is enough to be best-of-breed. The done tool would be a UX/structural improvement, not a requirement for “did we satisfy the user?”
+- **“Done” tool** is implemented: the model can reply with **DONE: success** or **DONE: no**; we honour it by exiting the tool loop (no further tool runs), stripping the DONE line from the final reply, then running completion verification as usual. Planning prompt instructs the executor to end with DONE when the task is complete or cannot be completed.
 
 ---
 

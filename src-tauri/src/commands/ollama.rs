@@ -618,7 +618,9 @@ const AGENT_DESCRIPTIONS_BASE: &str = r#"We have 10 base tools available:
 
 7. **REMOVE_SCHEDULE**: Remove a scheduled task by its ID. Use when the user asks to remove, delete, or cancel a schedule (e.g. "Remove schedule: discord-1770648842"). Reply with exactly one line: REMOVE_SCHEDULE: <schedule-id> (e.g. REMOVE_SCHEDULE: discord-1770648842).
 
-8. **LIST_SCHEDULES**: List all active schedules (id, type, next run, task). Use when the user asks to list schedules, show schedules, what's scheduled, what reminders are set, etc. Reply with exactly one line: LIST_SCHEDULES or LIST_SCHEDULES:."#;
+8. **LIST_SCHEDULES**: List all active schedules (id, type, next run, task). Use when the user asks to list schedules, show schedules, what's scheduled, what reminders are set, etc. Reply with exactly one line: LIST_SCHEDULES or LIST_SCHEDULES:.
+
+When you have fully completed the user's request (or cannot complete it), you may end your reply with exactly one line: **DONE: success** (task completed) or **DONE: no** (could not complete). This stops further tool runs; the app still runs completion verification. Prefer DONE when you are done rather than replying with text alone."#;
 
 /// Cron examples for SCHEDULE (6-field: sec min hour day month dow). Shown to the model so it can pick the right pattern (see crontab.guru for more).
 const SCHEDULE_CRON_EXAMPLES: &str = r#"
@@ -2088,6 +2090,8 @@ pub fn answer_with_ollama_and_fetch(
     let mut last_run_cmd_raw_output: Option<String> = None;
     // Track the task file we're working on so we can append the full conversation at the end.
     let mut current_task_path: Option<std::path::PathBuf> = None;
+    // When the model calls DONE we break the tool loop; strip the DONE line from the final reply.
+    let mut exited_via_done: bool = false;
 
     while tool_count < max_tool_iterations {
         let tools = parse_all_tools_from_response(&response_content);
@@ -2098,6 +2102,7 @@ pub fn answer_with_ollama_and_fetch(
         if tools.len() > 1 {
             info!("Agent router: running {} tools in one turn: {}", tools.len(), tools.iter().map(|(t, _)| t.as_str()).collect::<Vec<_>>().join(", "));
         }
+        let mut done_claimed: Option<bool> = None;
         let mut tool_results: Vec<String> = Vec::with_capacity(tools.len());
         for (tool, arg) in tools {
             if tool_count >= max_tool_iterations {
@@ -2112,6 +2117,24 @@ pub fn answer_with_ollama_and_fetch(
             }
 
             let user_message = match tool.as_str() {
+            "DONE" => {
+                let arg_lower = arg.trim().to_lowercase();
+                let claimed_success = arg_lower.is_empty()
+                    || arg_lower.contains("success")
+                    || arg_lower.contains("yes")
+                    || arg_lower.contains("true");
+                done_claimed = Some(claimed_success);
+                send_status(if claimed_success {
+                    "✅ Task marked done (success)."
+                } else {
+                    "⏹️ Task marked done (could not complete)."
+                });
+                info!(
+                    "Agent router: model called DONE (success={}), exiting tool loop",
+                    claimed_success
+                );
+                String::new()
+            }
             "FETCH_URL" if arg.contains("discord.com") => {
                 let path = if let Some(pos) = arg.find("/api/v10") {
                     arg[pos + "/api/v10".len()..].to_string()
@@ -2136,7 +2159,7 @@ pub fn answer_with_ollama_and_fetch(
                 }
             }
             "FETCH_URL" => {
-                send_status("Fetching page…");
+                send_status(&format!("🌐 Fetching page at {}…", crate::logging::ellipse(&arg, 45)));
                 info!("Discord/Ollama: FETCH_URL requested: {}", arg);
                 let url = arg.to_string();
                 let fetch_result = tokio::task::spawn_blocking(move || crate::commands::browser::fetch_page_content(&url))
@@ -2190,7 +2213,7 @@ pub fn answer_with_ollama_and_fetch(
                         url_arg
                     )
                 } else {
-                    send_status("Taking screenshot of current page…");
+                    send_status("📸 Taking screenshot of current page…");
                     match tokio::task::spawn_blocking(|| crate::browser_agent::take_screenshot_current_page()).await {
                         Ok(Ok(path)) => {
                             attachment_paths.push(path.clone());
@@ -2209,7 +2232,7 @@ pub fn answer_with_ollama_and_fetch(
             }
             "BROWSER_NAVIGATE" => {
                 let url_arg = arg.trim().to_string();
-                send_status(&format!("Navigating to {}…", crate::logging::ellipse(&url_arg, 50)));
+                send_status(&format!("🧭 Navigating to {}…", crate::logging::ellipse(&url_arg, 50)));
                 if url_arg.is_empty() {
                     "BROWSER_NAVIGATE requires a URL (e.g. BROWSER_NAVIGATE: https://www.example.com). Please try again with a URL.".to_string()
                 } else {
@@ -2248,7 +2271,7 @@ pub fn answer_with_ollama_and_fetch(
             }
             "BROWSER_CLICK" => {
                 let index_arg = arg.trim().split_whitespace().next().unwrap_or("").trim();
-                send_status(&format!("Clicking element {}…", if index_arg.is_empty() { "?" } else { index_arg }));
+                send_status(&format!("🖱️ Clicking element {}…", if index_arg.is_empty() { "?" } else { index_arg }));
                 let index = index_arg.parse::<u32>().ok();
                 match index {
                     Some(idx) => {
@@ -2269,9 +2292,9 @@ pub fn answer_with_ollama_and_fetch(
                 }
             }
             "BROWSER_INPUT" => {
-                send_status("Typing…");
                 let mut parts = arg.trim().splitn(2, |c: char| c.is_whitespace());
                 let index_arg = parts.next().unwrap_or("").trim();
+                send_status(&format!("✍️ Typing into element {}…", if index_arg.is_empty() { "?" } else { index_arg }));
                 let text = parts.next().unwrap_or("").trim().to_string();
                 let index = index_arg.parse::<u32>().ok();
                 match index {
@@ -2294,8 +2317,8 @@ pub fn answer_with_ollama_and_fetch(
                 }
             }
             "BROWSER_SCROLL" => {
-                send_status("Scrolling…");
                 let scroll_arg = if arg.trim().is_empty() { "down".to_string() } else { arg.trim().to_string() };
+                send_status(&format!("📜 Scrolling {}…", crate::logging::ellipse(&scroll_arg, 20)));
                 match tokio::task::spawn_blocking(move || crate::browser_agent::scroll_page(&scroll_arg)).await {
                     Ok(Ok(state_str)) => state_str,
                     Ok(Err(e)) => {
@@ -2306,7 +2329,7 @@ pub fn answer_with_ollama_and_fetch(
                 }
             }
             "BROWSER_EXTRACT" => {
-                send_status("Extracting page text…");
+                send_status("📄 Extracting page text…");
                 match tokio::task::spawn_blocking(|| crate::browser_agent::extract_page_text()).await {
                     Ok(Ok(text)) => text,
                     Ok(Err(_cdp_err)) => {
@@ -2324,7 +2347,7 @@ pub fn answer_with_ollama_and_fetch(
                 if pattern.is_empty() {
                     "BROWSER_SEARCH_PAGE requires a search pattern (e.g. BROWSER_SEARCH_PAGE: Ralf Röber). Use to find specific text on the current page.".to_string()
                 } else {
-                    send_status("Searching page for pattern…");
+                    send_status(&format!("🔍 Searching page for \"{}\"…", crate::logging::ellipse(&pattern, 30)));
                     match tokio::task::spawn_blocking(move || crate::browser_agent::search_page_text(&pattern)).await {
                         Ok(Ok(result)) => result,
                         Ok(Err(e)) => {
@@ -2336,7 +2359,7 @@ pub fn answer_with_ollama_and_fetch(
                 }
             }
             "BRAVE_SEARCH" => {
-                send_status("Searching the web…");
+                send_status(&format!("🌐 Searching the web for \"{}\"…", crate::logging::ellipse(&arg, 35)));
                 info!("Discord/Ollama: BRAVE_SEARCH requested: {}", arg);
                 match crate::commands::brave::get_brave_api_key() {
                     Some(api_key) => match crate::commands::brave::brave_web_search(&arg, &api_key).await {
@@ -2350,7 +2373,7 @@ pub fn answer_with_ollama_and_fetch(
                 }
             }
             "PERPLEXITY_SEARCH" => {
-                send_status("Searching (Perplexity)…");
+                send_status(&format!("🔎 Searching (Perplexity) for \"{}\"…", crate::logging::ellipse(&arg, 35)));
                 info!("Discord/Ollama: PERPLEXITY_SEARCH requested: {}", arg);
                 match crate::commands::perplexity::perplexity_search(crate::commands::perplexity::PerplexitySearchRequest {
                     query: arg.to_string(),
@@ -3284,6 +3307,10 @@ pub fn answer_with_ollama_and_fetch(
 
         tool_results.push(user_message);
         }
+        if done_claimed.is_some() {
+            exited_via_done = true;
+            break;
+        }
         let user_message = tool_results.join("\n\n---\n\n");
 
         messages.push(crate::ollama::ChatMessage {
@@ -3329,6 +3356,17 @@ pub fn answer_with_ollama_and_fetch(
 
         if tool_count >= max_tool_iterations {
             info!("Agent router: max tool iterations reached ({}), using last response as final", max_tool_iterations);
+        }
+    }
+
+    if exited_via_done {
+        let lines: Vec<&str> = response_content.lines().collect();
+        if let Some(last) = lines.last() {
+            let t = last.trim();
+            if t.to_uppercase().starts_with("DONE") && t.contains(':') {
+                let keep = lines.len().saturating_sub(1);
+                response_content = lines[..keep].join("\n").trim_end().to_string();
+            }
         }
     }
 
@@ -3653,7 +3691,7 @@ fn line_starts_with_tool_prefix(line: &str) -> bool {
 
 /// Parse one tool starting at the given line index. Returns (tool_name, argument) and the next line index to scan.
 fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String, String), usize)> {
-    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "BROWSER_SCREENSHOT:", "BROWSER_NAVIGATE:", "BROWSER_CLICK:", "BROWSER_INPUT:", "BROWSER_SCROLL:", "BROWSER_EXTRACT:", "BROWSER_SEARCH_PAGE:", "PERPLEXITY_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:", "MASTODON_POST:"];
+    let prefixes = ["FETCH_URL:", "BRAVE_SEARCH:", "BROWSER_SCREENSHOT:", "BROWSER_NAVIGATE:", "BROWSER_CLICK:", "BROWSER_INPUT:", "BROWSER_SCROLL:", "BROWSER_EXTRACT:", "BROWSER_SEARCH_PAGE:", "PERPLEXITY_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:", "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "PYTHON_SCRIPT:", "MCP:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:", "MASTODON_POST:", "DONE:"];
     let line = lines.get(line_index)?.trim();
     if line.eq_ignore_ascii_case("TASK_LIST") {
         return Some((("TASK_LIST".to_string(), String::new()), line_index + 1));
@@ -3689,7 +3727,7 @@ fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String,
     for prefix in prefixes {
         if search.to_uppercase().starts_with(prefix) {
             let mut arg = search[prefix.len()..].trim().to_string();
-            if arg.is_empty() && prefix != "TASK_LIST:" && prefix != "TASK_SHOW:" && prefix != "LIST_SCHEDULES:" && prefix != "BROWSER_EXTRACT:" && prefix != "BROWSER_SCREENSHOT:" {
+            if arg.is_empty() && prefix != "TASK_LIST:" && prefix != "TASK_SHOW:" && prefix != "LIST_SCHEDULES:" && prefix != "BROWSER_EXTRACT:" && prefix != "BROWSER_SCREENSHOT:" && prefix != "DONE:" {
                 continue;
             }
             let tool_name = prefix.trim_end_matches(':');
@@ -3770,7 +3808,7 @@ fn parse_all_tools_from_response(content: &str) -> Vec<(String, String)> {
 /// Tool line prefixes that indicate start of another tool (used to stop script body extraction).
 const TOOL_LINE_PREFIXES: &[&str] = &[
     "FETCH_URL:", "BRAVE_SEARCH:", "BROWSER_SCREENSHOT:", "BROWSER_NAVIGATE:", "BROWSER_CLICK:", "BROWSER_INPUT:", "BROWSER_SCROLL:", "BROWSER_EXTRACT:", "BROWSER_SEARCH_PAGE:", "PERPLEXITY_SEARCH:", "RUN_JS:", "SKILL:", "AGENT:", "RUN_CMD:", "SCHEDULE:", "SCHEDULER:", "REMOVE_SCHEDULE:", "LIST_SCHEDULES:",
-    "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:",
+    "TASK_LIST:", "TASK_SHOW:", "TASK_APPEND:", "TASK_STATUS:", "TASK_CREATE:", "TASK_ASSIGN:", "TASK_SLEEP:", "OLLAMA_API:", "MCP:", "PYTHON_SCRIPT:", "DISCORD_API:", "CURSOR_AGENT:", "REDMINE_API:", "MEMORY_APPEND:", "DONE:",
 ];
 
 /// Parse PYTHON_SCRIPT from full response: (id, topic, script_body).

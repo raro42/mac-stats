@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **DONE tool (browser-use style)** — Model can end a reply with **DONE: success** or **DONE: no**; we exit the tool loop (no further tool runs), strip the DONE line from the final reply, then run completion verification as usual. Described in agent base tools and planning prompt. See `docs/025_expectation_check_design.md`.
 - **Completion verification** — At the start of each agent run we extract 1–3 success criteria from the user request; at the end we ask Ollama “Did we fully satisfy the request?” and, if not, retry once then append a short disclaimer if still not satisfied. Heuristic: if a screenshot was requested but none was attached, we add a note. See `docs/025_expectation_check_design.md`.
 - **Escalation patterns (user-editable)** — Phrases that trigger “user is not satisfied” (stronger completion run, +10 tool steps) are now read from **~/.mac-stats/escalation_patterns.md**. One phrase per line; lines starting with `#` are comments. Edit the file to add your own triggers (e.g. “I don’t like your answer”, “You are stupid”) so the bot actually tries harder instead of just apologising. Default list includes “think harder”, “get it done”, “try again”, “no”, “nope”, etc. No restart needed — the file is read on each message. When we detect escalation, we append the user's phrase to the file if it's not already there (auto-add).
 - **BROWSER_SCROLL** — Agent tool: scroll the current CDP page. Reply with `BROWSER_SCROLL: down|up|bottom|top` or `BROWSER_SCROLL: <pixels>`.
@@ -15,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **HTTP-only browser fallback** — When Chrome/CDP is not available (e.g. port 9222), BROWSER_NAVIGATE / BROWSER_CLICK / BROWSER_INPUT / BROWSER_EXTRACT use HTTP fetch + HTML parsing; CLICK follows links or submits forms, INPUT fills form fields. No JavaScript execution.
 
 ### Changed
+- **Status messages (emojis + context)** — Tool-run status in Discord/UI now includes emojis (🧭 🌐 🖱️ ✍️ 📜 📸 🔍 📄) and full context (e.g. "Navigating to \<url\>", "Clicking element N", "Typing into element N", "Scrolling direction", "Fetching page at \<url\>", "Searching page for pattern").
 - **README** — Mastodon: optional network, .config.env, MASTODON_POST in Chat, Monitoring & alerts (Mastodon mentions/channels), Usage bullet (MASTODON_INSTANCE_URL, MASTODON_ACCESS_TOKEN). X.com note: "No X.com yet ;-) — let's see who implements it first."
 - **Browser agent retry on connection error** — When CDP connection is stale (connection closed, timeout, "Unable to make method calls"), the app clears the cached session and retries once. All CDP entry points use this retry wrapper.
 - **Browser-use style browser tools** — (1) **BROWSER_SCREENSHOT** only on current page — BROWSER_NAVIGATE first, then BROWSER_SCREENSHOT: current. (2) **BROWSER_SEARCH_PAGE: \<pattern\>** to search page text. (3) Pre-route "screenshot + URL" runs BROWSER_NAVIGATE + BROWSER_SCREENSHOT: current in sequence.
