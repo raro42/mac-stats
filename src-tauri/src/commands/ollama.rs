@@ -1625,6 +1625,7 @@ async fn verify_completion(
 /// When `conversation_history` is set (e.g. from Discord session memory), it is prepended so the model sees prior turns and can resolve "there", "it", etc.
 /// When `escalation` is true (e.g. user said "think harder" or "get it done"), we inject a stronger "you MUST complete the task" instruction and allow more tool steps.
 /// When `retry_on_verification_no` is true and verification says we didn't satisfy the request, we run one retry with a "complete the remaining steps" prompt; the retry run is called with `retry_on_verification_no: false` so we don't retry indefinitely.
+/// When `from_remote` is true (Discord, scheduler, task runner), browser runs default to headless (no visible window) unless the question explicitly asks to see the browser (e.g. "visible", "show me").
 /// Returns a boxed future to allow one level of async recursion (retry path).
 pub fn answer_with_ollama_and_fetch(
     question: &str,
@@ -1640,6 +1641,7 @@ pub fn answer_with_ollama_and_fetch(
     conversation_history: Option<Vec<crate::ollama::ChatMessage>>,
     escalation: bool,
     retry_on_verification_no: bool,
+    from_remote: bool,
 ) -> Pin<Box<dyn Future<Output = Result<OllamaReply, String>> + Send>> {
     let question = question.to_string();
     let conversation_history = conversation_history.map(|v| v.to_vec());
@@ -2091,8 +2093,10 @@ pub fn answer_with_ollama_and_fetch(
     };
 
     let mut tool_count: u32 = 0;
-    // Browser mode: "headless" in question → no visible window. "browser" or default → visible Chrome.
-    crate::browser_agent::set_prefer_headless_for_run(question.to_lowercase().contains("headless"));
+    // Browser mode: "headless" in question → no visible window. From Discord/scheduler/task (from_remote) → headless unless user asks to see the browser.
+    let prefer_headless = question.to_lowercase().contains("headless")
+        || (from_remote && !wants_visible_browser(question));
+    crate::browser_agent::set_prefer_headless_for_run(prefer_headless);
     // Paths to attach when replying on Discord (e.g. BROWSER_SCREENSHOT); only under ~/.mac-stats/screenshots/.
     let mut attachment_paths: Vec<PathBuf> = Vec::new();
     // Collect (agent_name, reply) for each AGENT call so we can append a conversation transcript when multiple agents participated.
@@ -2109,6 +2113,8 @@ pub fn answer_with_ollama_and_fetch(
     let mut exited_via_done: bool = false;
     // Last BROWSER_EXTRACT result (JS-rendered page text) for completion verification so we check against real content, not FETCH_URL HTML.
     let mut last_browser_extract: Option<String> = None;
+    // Cap browser tools per run to prevent runaway NAVIGATE/CLICK loops (see docs/032_browser_loop_and_status_fix_plan.md).
+    let mut browser_tool_count: u32 = 0;
 
     while tool_count < max_tool_iterations {
         let tools = parse_all_tools_from_response(&response_content);
@@ -2131,6 +2137,32 @@ pub fn answer_with_ollama_and_fetch(
                 info!("Agent router: running tool {}/{} — {} (arg: {}...)", tool_count, max_tool_iterations, tool, arg_preview);
             } else {
                 info!("Agent router: running tool {}/{} — {} (arg: {})", tool_count, max_tool_iterations, tool, arg_preview);
+            }
+
+            // Cap browser tools per run to prevent runaway loops (032_browser_loop_and_status_fix_plan).
+            let is_browser_tool = matches!(
+                tool.as_str(),
+                "BROWSER_NAVIGATE" | "BROWSER_CLICK" | "BROWSER_INPUT" | "BROWSER_SCROLL"
+                    | "BROWSER_EXTRACT" | "BROWSER_SEARCH_PAGE" | "BROWSER_SCREENSHOT"
+            );
+            if is_browser_tool {
+                if browser_tool_count >= MAX_BROWSER_TOOLS_PER_RUN {
+                    let msg = format!(
+                        "Maximum browser actions per run reached ({}). Reply with your answer or DONE: success / DONE: no.",
+                        MAX_BROWSER_TOOLS_PER_RUN
+                    );
+                    tool_results.push(msg);
+                    info!(
+                        "Agent router: browser tool cap reached ({}), skipping {}",
+                        MAX_BROWSER_TOOLS_PER_RUN, tool
+                    );
+                    continue;
+                }
+                browser_tool_count += 1;
+                info!(
+                    "Agent router: browser tool #{}/{} this run",
+                    browser_tool_count, MAX_BROWSER_TOOLS_PER_RUN
+                );
             }
 
             let user_message = match tool.as_str() {
@@ -2322,7 +2354,19 @@ pub fn answer_with_ollama_and_fetch(
             "BROWSER_INPUT" => {
                 let mut parts = arg.trim().splitn(2, |c: char| c.is_whitespace());
                 let index_arg = parts.next().unwrap_or("").trim();
-                send_status(&format!("✍️ Typing into element {}…", if index_arg.is_empty() { "?" } else { index_arg }));
+                let index_for_status = index_arg.parse::<u32>().ok();
+                let status_msg = match index_for_status {
+                    Some(idx) => {
+                        let label = crate::browser_agent::get_last_element_label(idx);
+                        if let Some(l) = label {
+                            format!("✍️ Typing into element {} ({})…", idx, crate::logging::ellipse(&l, 30))
+                        } else {
+                            format!("✍️ Typing into element {}…", idx)
+                        }
+                    }
+                    None => format!("✍️ Typing into element {}…", if index_arg.is_empty() { "?" } else { index_arg }),
+                };
+                send_status(&status_msg);
                 let text = parts.next().unwrap_or("").trim().to_string();
                 let index = index_arg.parse::<u32>().ok();
                 match index {
@@ -3497,6 +3541,7 @@ pub fn answer_with_ollama_and_fetch(
                     Some(updated_history),
                     escalation,
                     false, // don't retry again
+                    from_remote,
                 )
                 .await;
             }
@@ -3812,11 +3857,24 @@ fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String,
     None
 }
 
+/// True if the question explicitly asks for a visible browser (e.g. "show me the browser", "visible", "I want to see").
+fn wants_visible_browser(question: &str) -> bool {
+    let q = question.to_lowercase();
+    q.contains("visible")
+        || q.contains("show me the browser")
+        || q.contains("show me a browser")
+        || q.contains("i want to see the browser")
+        || q.contains("open a window")
+}
+
 /// Parse one of FETCH_URL:, BRAVE_SEARCH:, RUN_JS:, SCHEDULE:/SCHEDULER:, MCP:, PYTHON_SCRIPT: from assistant content (first match only).
 fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
     let lines: Vec<&str> = content.lines().collect();
     parse_one_tool_at_line(&lines, 0).map(|(pair, _)| pair)
 }
+
+/// Max browser tools (NAVIGATE, CLICK, INPUT, SCROLL, EXTRACT, SEARCH_PAGE, SCREENSHOT) per run. Prevents runaway loops.
+const MAX_BROWSER_TOOLS_PER_RUN: u32 = 15;
 
 /// Parse all tool invocations from a response (e.g. BROWSER_CLICK and BROWSER_SCREENSHOT on consecutive lines).
 /// Returns up to 5 per response so one model reply can trigger multiple actions (fixes screenshot-after-click).

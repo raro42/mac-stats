@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **BROWSER_INPUT status label** — Status now shows element label when available (e.g. "✍️ Typing into element 4 (Search box)…"). BROWSER_CLICK already showed label.
+- **Browser tool cap per run** — Max 15 browser tools (NAVIGATE, CLICK, INPUT, SCROLL, EXTRACT, SEARCH_PAGE, SCREENSHOT) per run; when exceeded the model gets "Maximum browser actions per run reached (15). Reply with your answer or DONE: success / DONE: no." Log: "Agent router: browser tool #N/15 this run". See `docs/032_browser_loop_and_status_fix_plan.md`.
+
 ### Changed
 - **Docs** — Implemented plan/design docs renamed with `_DONE` suffix: 021_task_system_fix_feb2026, 023_externalized_prompts, 025_expectation_check_design, 026_light_browser_agent_plan, 028_discord_attachments, 030_agent_model_assignment_plan, 031_orchestrator_tool_first_proposal, 032_tool_first_implementation_plan, session_compaction_and_memory_plan. All references updated in README, CHANGELOG, and other docs.
 - **README** — Single Install section (DMG + build + Gatekeeper note). Deduplicated CPU/GPU/RAM and low-CPU stats (one place: At a glance). Commands: binary vs app name note, repo-root hint for `./run dev`. Escalation and Development shortened; link to agent_workflow for Coder workflow.

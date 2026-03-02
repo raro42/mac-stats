@@ -106,3 +106,10 @@ When reproducing:
   - How many browser tools run before the run ends or errors.
 
 Use that to confirm loop pattern and tune the cap or repetition logic.
+
+---
+
+## Implementation status
+
+- **Phase 1 (element label):** Done. `browser_agent` has `LAST_ELEMENT_LABELS` cache, `set_last_element_labels()`, `get_last_element_label(index)`. CDP and HTTP fallback set the cache after navigate/click/input. In `ollama.rs`, BROWSER_CLICK and BROWSER_INPUT status messages show the label when available (e.g. "🖱️ Clicking element 7 (Accept all)…", "✍️ Typing into element 4 (Search box)…").
+- **Phase 2 (browser tool cap):** Done. In `ollama.rs` tool loop: `browser_tool_count` and `MAX_BROWSER_TOOLS_PER_RUN` (15). Before running any BROWSER_* tool we check the cap; if exceeded we push "Maximum browser actions per run reached (15). Reply with your answer or DONE: success / DONE: no." and skip that tool. Log line: "Agent router: browser tool #N/15 this run".
