@@ -77,7 +77,7 @@ All settings live under `~/.mac-stats/`:
 |---------|-------------|
 | `mac_stats` | Start app (menu bar + optional CPU window) |
 | `mac_stats --cpu` | Start with CPU window open |
-| `mac_stats -v` / `-vv` / `-vvv` | Verbosity levels |
+| `mac_stats -v` / `-vv` / `-vvv` | Verbosity levels of debug.log so you see what is happening |
 | `mac_stats discord send <channel_id> <message>` | Post message to Discord from CLI |
 | `./run dev` | Development mode (hot reload) |
 
