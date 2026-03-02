@@ -215,12 +215,13 @@ async fn execute_task(entry: &ScheduleEntry) -> Option<String> {
 
     if task.to_uppercase().starts_with("FETCH_URL:") {
         let arg = task["FETCH_URL:".len()..].trim();
-        let semi = arg.find(';').unwrap_or(arg.len());
-        let url: String = arg[..semi].trim().to_string();
-        if url.is_empty() {
-            warn!("Scheduler: FETCH_URL with empty URL (id={})", id_info);
-            return None;
-        }
+        let url = match crate::commands::browser::extract_first_url(arg) {
+            Some(u) => u,
+            None => {
+                warn!("Scheduler: FETCH_URL with no valid URL (id={})", id_info);
+                return None;
+            }
+        };
         info!("Scheduler: running FETCH_URL for {} (id={})", url, id_info);
         match tokio::task::spawn_blocking(move || crate::commands::browser::fetch_page_content(&url)).await {
             Ok(Ok(body)) => {

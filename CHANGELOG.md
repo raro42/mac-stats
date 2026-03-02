@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Ollama timeout/503 retry and user message (task-001)** — `send_ollama_chat_messages` retries once after 2s on timeout or HTTP 503; after retry still failing returns "Ollama is busy or unavailable; try again in a moment." instead of raw error. Periodic session compaction retries once after 3s on failure before logging WARN.
+- **FETCH_URL URL validation (task-002)** — `extract_first_url()` in browser.rs takes the first http(s) URL from arg (trim, up to first whitespace); `validate_fetch_url()` enforces http/https and returns a clear error for IDN ("international domain names (IDN) are not supported..."). Used in `fetch_page_content`, `parse_fetch_url_from_response`, and scheduler FETCH_URL so malformed or multi-token URLs are rejected with one clear message.
 - **Session compaction log (task-005)** — On compaction failure the log now says "keeping full history (N messages) for this request" instead of "using raw history" so the number is clearly message count, not HTTP 401.
 - **Scheduler log (task-004)** — "Scheduler: loaded N entries from ..." is now at DEBUG so short check intervals don't spam INFO every few seconds.
 - **BROWSER_INPUT status label** — Status now shows element label when available (e.g. "✍️ Typing into element 4 (Search box)…"). BROWSER_CLICK already showed label.

@@ -532,56 +532,78 @@ pub async fn send_ollama_chat_messages(
         info!("Ollama → Request (POST /api/chat) ({} chars total):\n{}", request_json.len(), ellipsed);
     }
 
-    let mut http_request = temp_client.post(&url).json(&chat_request);
     let api_key_value = api_key
         .as_ref()
         .and_then(|acc| crate::security::get_credential(acc).ok().flatten())
         .or_else(read_ollama_api_key_from_env_or_config);
-    if let Some(key) = &api_key_value {
-        let _masked = crate::security::mask_credential(key);
-        http_request = http_request.header("Authorization", format!("Bearer {}", key));
-        debug!("Ollama: Using API key for chat request");
-    }
-
-    let response = http_request
-        .send()
-        .await
-        .map_err(|e| format!("Failed to send chat request: {}", e))?;
-    let status = response.status();
-    let body = response
-        .text()
-        .await
-        .map_err(|e| format!("Failed to read response body: {}", e))?;
-
-    let response: crate::ollama::ChatResponse = match serde_json::from_str(&body) {
-        Ok(r) => r,
-        Err(_) => {
-            if let Ok(err_payload) = serde_json::from_str::<crate::ollama::OllamaErrorResponse>(&body) {
-                return Err(format!("Ollama error: {}", err_payload.error));
-            }
-            if !status.is_success() {
-                return Err(format!("Ollama HTTP {}: {}", status, body.trim()));
-            }
-            return Err(format!("Ollama returned invalid response (missing message): {}", body.trim()));
+    // task-001: retry once on timeout or 503, then return user-friendly message
+    const RETRY_DELAY_SECS: u64 = 2;
+    let mut last_send_err: Option<String> = None;
+    for attempt in 0..2 {
+        if attempt > 0 {
+            tokio::time::sleep(std::time::Duration::from_secs(RETRY_DELAY_SECS)).await;
         }
-    };
-    if !status.is_success() {
-        let msg = response
-            .message
-            .content
-            .trim();
-        return Err(format!("Ollama HTTP {}: {}", status, if msg.is_empty() { &body } else { msg }));
+        let mut http_request = temp_client.post(&url).json(&chat_request);
+        if let Some(key) = &api_key_value {
+            let _masked = crate::security::mask_credential(key);
+            http_request = http_request.header("Authorization", format!("Bearer {}", key));
+            debug!("Ollama: Using API key for chat request");
+        }
+        match http_request.send().await {
+            Ok(resp) => {
+                let status = resp.status();
+                let body = resp
+                    .text()
+                    .await
+                    .map_err(|e| format!("Failed to read response body: {}", e))?;
+                if status.as_u16() == 503 && attempt < 1 {
+                    info!("Ollama returned 503, retrying in {}s (attempt {})", RETRY_DELAY_SECS, attempt + 1);
+                    continue;
+                }
+                let response: crate::ollama::ChatResponse = match serde_json::from_str(&body) {
+                    Ok(r) => r,
+                    Err(_) => {
+                        if let Ok(err_payload) = serde_json::from_str::<crate::ollama::OllamaErrorResponse>(&body) {
+                            return Err(format!("Ollama error: {}", err_payload.error));
+                        }
+                        if !status.is_success() {
+                            return Err(format!("Ollama HTTP {}: {}", status, body.trim()));
+                        }
+                        return Err(format!("Ollama returned invalid response (missing message): {}", body.trim()));
+                    }
+                };
+                if !status.is_success() {
+                    let msg = response.message.content.trim();
+                    return Err(format!("Ollama HTTP {}: {}", status, if msg.is_empty() { body.as_str() } else { msg }));
+                }
+                // Success: log and return
+                let content = &response.message.content;
+                let n = content.chars().count();
+                const RESPONSE_LOG_MAX: usize = 1000;
+                if verbosity >= 2 || n <= RESPONSE_LOG_MAX {
+                    info!("Ollama ← Response ({} chars):\n{}", n, content);
+                } else {
+                    let ellipsed = crate::logging::ellipse(content, RESPONSE_LOG_MAX);
+                    info!("Ollama ← Response ({} chars):\n{}", n, ellipsed);
+                }
+                return Ok(response);
+            }
+            Err(e) => {
+                let err_str = e.to_string();
+                last_send_err = Some(err_str.clone());
+                let is_timeout = e.is_timeout() || err_str.to_lowercase().contains("timed out");
+                if is_timeout && attempt < 1 {
+                    info!("Ollama request timed out, retrying in {}s (attempt {})", RETRY_DELAY_SECS, attempt + 1);
+                    continue;
+                }
+                if is_timeout {
+                    return Err("Ollama is busy or unavailable; try again in a moment.".to_string());
+                }
+                return Err(format!("Failed to send chat request: {}", e));
+            }
+        }
     }
-    let content = &response.message.content;
-    let n = content.chars().count();
-    const RESPONSE_LOG_MAX: usize = 1000;
-    if verbosity >= 2 || n <= RESPONSE_LOG_MAX {
-        info!("Ollama ← Response ({} chars):\n{}", n, content);
-    } else {
-        let ellipsed = crate::logging::ellipse(content, RESPONSE_LOG_MAX);
-        info!("Ollama ← Response ({} chars):\n{}", n, ellipsed);
-    }
-    Ok(response)
+    Err(last_send_err.unwrap_or_else(|| "No response".to_string()))
 }
 
 /// Send chat message to Ollama (async, non-blocking)
@@ -1184,7 +1206,17 @@ pub async fn run_periodic_session_compaction() {
             messages.len(),
             entry.last_activity
         );
-        match compact_conversation_history(&messages, "Periodic session compaction.").await {
+        // task-001: retry once on failure
+        let compact_result = compact_conversation_history(&messages, "Periodic session compaction.").await;
+        let compact_result = match compact_result {
+            Ok(ok) => Ok(ok),
+            Err(e) => {
+                tracing::warn!("Periodic session compaction failed for {} {}: {}, retrying once in 3s", entry.source, entry.session_id, e);
+                tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+                compact_conversation_history(&messages, "Periodic session compaction (retry).").await
+            }
+        };
+        match compact_result {
             Ok((context, lessons)) => {
                 if let Some(ref lesson_text) = lessons {
                     let memory_path = crate::config::Config::memory_file_path();
@@ -4305,15 +4337,15 @@ pub struct OllamaChatWithExecutionResponse {
     pub context_message: Option<String>, // Store context for follow-up
 }
 
-/// Parse FETCH_URL: <url> from assistant response. Returns the URL if present.
+/// Parse FETCH_URL: <url> from assistant response. Returns the first valid URL if present (task-002).
 fn parse_fetch_url_from_response(content: &str) -> Option<String> {
     let prefix = "FETCH_URL:";
     for line in content.lines() {
         let line = line.trim();
         if line.to_uppercase().starts_with(prefix) {
-            let url = line[prefix.len()..].trim();
-            if !url.is_empty() {
-                return Some(url.to_string());
+            let arg = line[prefix.len()..].trim();
+            if let Some(url) = crate::commands::browser::extract_first_url(arg) {
+                return Some(url);
             }
         }
     }
