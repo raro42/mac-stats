@@ -193,15 +193,7 @@ fn next_run(entry: &ScheduleEntry, after: DateTime<Local>) -> Option<DateTime<Lo
         schedule
             .after(&after)
             .next()
-    } else if let Some(at) = entry.at {
-        if at > after {
-            Some(at)
-        } else {
-            None
-        }
-    } else {
-        None
-    }
+    } else { entry.at.filter(|&at| at > after) }
 }
 
 /// Execute a single task: direct tool (FETCH_URL/BRAVE_SEARCH) or Ollama.
@@ -420,7 +412,7 @@ pub enum ScheduleAddOutcome {
 
 /// Normalize task for duplicate check (trim, collapse whitespace).
 fn task_normalized_for_dedup(task: &str) -> String {
-    task.trim().split_whitespace().collect::<Vec<_>>().join(" ")
+    task.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
 /// Add a schedule entry to the file (e.g. from Discord when Ollama invokes SCHEDULE).

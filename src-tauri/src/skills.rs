@@ -39,7 +39,7 @@ fn ensure_default_skills() {
         .ok()
         .map(|rd| {
             rd.filter_map(Result::ok)
-                .any(|e| e.path().extension().map_or(false, |ext| ext == "md"))
+                .any(|e| e.path().extension().is_some_and(|ext| ext == "md"))
         })
         .unwrap_or(false);
     if has_any {

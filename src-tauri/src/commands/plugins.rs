@@ -92,10 +92,8 @@ pub fn run_due_plugins() -> Result<Vec<PluginResult>, String> {
     
     // Convert Results to Vec, filtering out errors
     let mut successful_results = Vec::new();
-    for result in results {
-        if let Ok(plugin_result) = result {
-            successful_results.push(plugin_result);
-        }
+    for plugin_result in results.into_iter().flatten() {
+        successful_results.push(plugin_result);
     }
 
     Ok(successful_results)

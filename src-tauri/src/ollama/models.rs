@@ -208,7 +208,7 @@ impl ModelCatalog {
             debug!("ModelCatalog: role=expensive -> {} ({:.1}B, largest local)", best.name, best.param_billions);
             return Some(best);
         }
-        if let Some(best) = self.models.iter().filter(|m| !m.is_cloud).last() {
+        if let Some(best) = self.models.iter().filter(|m| !m.is_cloud).next_back() {
             warn!("ModelCatalog: role=expensive -> {} (above cap, local only)", best.name);
             return Some(best);
         }
@@ -225,7 +225,7 @@ impl ModelCatalog {
             debug!("ModelCatalog: role=code -> {} (code/medium, {:.1}B)", best.name, best.param_billions);
             return Some(*best);
         }
-        if let Some(best) = local.iter().filter(|m| m.capability == ModelCapability::Code).last() {
+        if let Some(best) = local.iter().filter(|m| m.capability == ModelCapability::Code).next_back() {
             debug!("ModelCatalog: role=code -> {} (code/any, {:.1}B)", best.name, best.param_billions);
             return Some(*best);
         }
@@ -243,7 +243,7 @@ impl ModelCatalog {
             debug!("ModelCatalog: role=general -> {} (general/medium, {:.1}B)", best.name, best.param_billions);
             return Some(*best);
         }
-        if let Some(best) = local.iter().filter(|m| m.capability == ModelCapability::General).last() {
+        if let Some(best) = local.iter().filter(|m| m.capability == ModelCapability::General).next_back() {
             debug!("ModelCatalog: role=general -> {} (general/any, {:.1}B)", best.name, best.param_billions);
             return Some(*best);
         }

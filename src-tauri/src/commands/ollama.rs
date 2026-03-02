@@ -1360,7 +1360,7 @@ fn extract_url_from_question(text: &str) -> Option<String> {
                 .map(|(i, _)| i)
                 .unwrap_or(after.len());
             let url = format!("{}{}", &text[start..start + prefix.len()], &after[..end]);
-            let url = url.trim_end_matches(|c| c == '.' || c == ',' || c == ';' || c == '!' || c == '?');
+            let url = url.trim_end_matches(['.', ',', ';', '!', '?']);
             if !url.is_empty() && url.len() > prefix.len() {
                 return Some(url.to_string());
             }
@@ -1374,7 +1374,7 @@ fn extract_url_from_question(text: &str) -> Option<String> {
             .find(|(_, c)| *c == ' ' || *c == '\n' || *c == '\t' || *c == ')' || *c == ']' || *c == '"' || *c == '>')
             .map(|(i, _)| i)
             .unwrap_or(after.len());
-        let url = after[..end].trim_end_matches(|c| c == '.' || c == ',' || c == ';' || c == '!' || c == '?');
+        let url = after[..end].trim_end_matches(['.', ',', ';', '!', '?']);
         if url.len() > 4 {
             let full = if url.starts_with("http") { url.to_string() } else { format!("https://{}", url) };
             return Some(full);
@@ -1638,12 +1638,10 @@ async fn verify_completion(
         let rest = response
             .lines()
             .skip(1)
-            .map(str::trim)
-            .filter(|s| !s.is_empty())
-            .next()
+            .map(str::trim).find(|s| !s.is_empty())
             .or_else(|| response.lines().nth(1).map(str::trim))
             .filter(|s| !s.is_empty());
-        rest.or_else(|| if first_line.len() > 3 { Some(first_line) } else { None })
+        rest.or(if first_line.len() > 3 { Some(first_line) } else { None })
             .map(|s| s.to_string())
     } else {
         None
@@ -2126,9 +2124,12 @@ pub fn answer_with_ollama_and_fetch(
     };
 
     let mut tool_count: u32 = 0;
-    // Browser mode: "headless" in question → no visible window. From Discord/scheduler/task (from_remote) → headless unless user asks to see the browser.
-    let prefer_headless = question.to_lowercase().contains("headless")
-        || (from_remote && !wants_visible_browser(question));
+    // Browser mode: "headless" in question → no visible window. From Discord/scheduler/task (from_remote) → headless unless user explicitly asks to see the browser (so retries stay headless).
+    let prefer_headless = if from_remote {
+        !wants_visible_browser(question)
+    } else {
+        question.to_lowercase().contains("headless")
+    };
     crate::browser_agent::set_prefer_headless_for_run(prefer_headless);
     // Paths to attach when replying on Discord (e.g. BROWSER_SCREENSHOT); only under ~/.mac-stats/screenshots/.
     let mut attachment_paths: Vec<PathBuf> = Vec::new();
@@ -2270,7 +2271,7 @@ pub fn answer_with_ollama_and_fetch(
                     Err(e) => {
                         if e.contains("401") {
                             info!("Discord/Ollama: Fetch returned 401 Unauthorized, stopping");
-                            format!("That URL returned 401 Unauthorized. Do not try another URL. Answer based on what you know.")
+                            "That URL returned 401 Unauthorized. Do not try another URL. Answer based on what you know.".to_string()
                         } else {
                             info!("Discord/Ollama: FETCH_URL failed: {}", crate::logging::ellipse(&e, 300));
                             let url_lower = arg.to_lowercase();
@@ -2296,7 +2297,7 @@ pub fn answer_with_ollama_and_fetch(
                     )
                 } else {
                     send_status("📸 Taking screenshot of current page…");
-                    match tokio::task::spawn_blocking(|| crate::browser_agent::take_screenshot_current_page()).await {
+                    match tokio::task::spawn_blocking(crate::browser_agent::take_screenshot_current_page).await {
                         Ok(Ok(path)) => {
                             attachment_paths.push(path.clone());
                             format!(
@@ -2352,7 +2353,7 @@ pub fn answer_with_ollama_and_fetch(
                 }
             }
             "BROWSER_CLICK" => {
-                let index_arg = arg.trim().split_whitespace().next().unwrap_or("").trim();
+                let index_arg = arg.split_whitespace().next().unwrap_or("").trim();
                 let index = index_arg.parse::<u32>().ok();
                 let status_msg = match index {
                     Some(idx) => {
@@ -2435,10 +2436,10 @@ pub fn answer_with_ollama_and_fetch(
             }
             "BROWSER_EXTRACT" => {
                 send_status("📄 Extracting page text…");
-                match tokio::task::spawn_blocking(|| crate::browser_agent::extract_page_text()).await {
+                match tokio::task::spawn_blocking(crate::browser_agent::extract_page_text).await {
                     Ok(Ok(text)) => text,
                     Ok(Err(_cdp_err)) => {
-                        match tokio::task::spawn_blocking(|| crate::browser_agent::extract_http()).await {
+                        match tokio::task::spawn_blocking(crate::browser_agent::extract_http).await {
                             Ok(Ok(text)) => text,
                             Ok(Err(e)) => format!("BROWSER_EXTRACT failed: {}. (Navigate to a page first with BROWSER_NAVIGATE.)", e),
                             Err(e) => format!("BROWSER_EXTRACT task error: {}", e),
@@ -2909,11 +2910,11 @@ pub fn answer_with_ollama_and_fetch(
                 info!("Agent router: OLLAMA_API requested: action={}, rest={} chars", action, rest.chars().count());
                 let result = match action.as_str() {
                     "list_models" => {
-                        list_ollama_models_full().await.map(|r| serde_json::to_string_pretty(&r).unwrap_or_else(|_| "[]".to_string())).map_err(|e| e)
+                        list_ollama_models_full().await.map(|r| serde_json::to_string_pretty(&r).unwrap_or_else(|_| "[]".to_string()))
                     }
-                    "version" => get_ollama_version().await.map(|r| r.version).map_err(|e| e),
+                    "version" => get_ollama_version().await.map(|r| r.version),
                     "running" => {
-                        list_ollama_running_models().await.map(|r| serde_json::to_string_pretty(&r).unwrap_or_else(|_| "[]".to_string())).map_err(|e| e)
+                        list_ollama_running_models().await.map(|r| serde_json::to_string_pretty(&r).unwrap_or_else(|_| "[]".to_string()))
                     }
                     "pull" => {
                         let parts: Vec<&str> = rest.split_whitespace().collect();
@@ -2940,7 +2941,7 @@ pub fn answer_with_ollama_and_fetch(
                         } else {
                             let model = parts[0].to_string();
                             let input = serde_json::Value::String(parts[1].to_string());
-                            ollama_embeddings(model, input, None).await.map(|r| serde_json::to_string_pretty(&r).unwrap_or_else(|_| "{}".to_string())).map_err(|e| e)
+                            ollama_embeddings(model, input, None).await.map(|r| serde_json::to_string_pretty(&r).unwrap_or_else(|_| "{}".to_string()))
                         }
                     }
                     "load" => {
@@ -3008,7 +3009,7 @@ pub fn answer_with_ollama_and_fetch(
                     let mut status: Option<String> = None;
                     for (i, part) in parts.iter().skip(1).enumerate() {
                         let s = part
-                            .trim_end_matches(|c: char| c == '.' || c == ',' || c == ';')
+                            .trim_end_matches(['.', ',', ';'])
                             .to_lowercase();
                         if ["wip", "finished", "unsuccessful", "paused"].contains(&s.as_str()) {
                             status = Some(s);
@@ -3309,7 +3310,7 @@ pub fn answer_with_ollama_and_fetch(
                                 let id = path
                                     .trim_start_matches('/')
                                     .strip_prefix("issues/")
-                                    .map(|s| s.split(|c| c == '.' || c == '?').next().unwrap_or("").to_string())
+                                    .map(|s| s.split(['.', '?']).next().unwrap_or("").to_string())
                                     .unwrap_or_default();
                                 if !id.is_empty() && id.chars().all(|c| c.is_ascii_digit()) {
                                     msg.push_str(&format!(
@@ -3860,10 +3861,10 @@ fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String,
                 if let Some(first_space) = arg.find(' ') {
                     arg = arg[..first_space].trim().to_string();
                 }
-                arg = arg.trim_end_matches(|c: char| c == '.' || c == ',' || c == ';' || c == ':').to_string();
+                arg = arg.trim_end_matches(['.', ',', ';', ':']).to_string();
             }
             if tool_name == "BROWSER_SEARCH_PAGE" {
-                arg = arg.trim_end_matches(|c: char| c == '.' || c == ',' || c == ';' || c == ':').to_string();
+                arg = arg.trim_end_matches(['.', ',', ';', ':']).to_string();
             }
             if tool_name != "TASK_APPEND" && tool_name != "TASK_CREATE" {
                 if let Some(pos) = arg.find(|c: char| c.is_ascii_digit()).and_then(|_| {

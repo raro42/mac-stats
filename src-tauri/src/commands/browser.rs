@@ -23,7 +23,7 @@ pub fn extract_first_url(arg: &str) -> Option<String> {
     let end = rest
         .find(|c: char| c.is_whitespace())
         .unwrap_or(rest.len());
-    let url = rest[..end].trim_end_matches(|c: char| c == '.' || c == ',' || c == ';' || c == ':');
+    let url = rest[..end].trim_end_matches(['.', ',', ';', ':']);
     if url.is_empty() {
         return None;
     }

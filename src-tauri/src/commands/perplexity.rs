@@ -104,7 +104,7 @@ pub async fn perplexity_search(request: PerplexitySearchRequest) -> Result<Perpl
     use tracing::debug;
 
     let api_key = get_perplexity_api_key()
-        .ok_or_else(|| "Perplexity API key not set. Set PERPLEXITY_API_KEY in env or .config.env / .env.config, or add it in Settings.")?;
+        .ok_or("Perplexity API key not set. Set PERPLEXITY_API_KEY in env or .config.env / .env.config, or add it in Settings.")?;
 
     let query = request.query.trim();
     if query.is_empty() {

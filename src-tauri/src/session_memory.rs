@@ -82,7 +82,7 @@ fn persist_session(source: &str, session_id: u64) -> std::io::Result<()> {
     let key = format!("{}-{}", source, session_id);
     let (messages, topic_slug, created_at) = {
         let store = session_store().lock().map_err(|_| {
-            std::io::Error::new(std::io::ErrorKind::Other, "session store lock failed")
+            std::io::Error::other("session store lock failed")
         })?;
         let state = store.get(&key).ok_or_else(|| {
             std::io::Error::new(std::io::ErrorKind::NotFound, "session not found")
@@ -125,7 +125,7 @@ pub fn clear_session(source: &str, session_id: u64) {
             Ok(g) => g,
             Err(_) => return,
         };
-        let has_messages = store.get(&key).map_or(false, |s| !s.messages.is_empty());
+        let has_messages = store.get(&key).is_some_and(|s| !s.messages.is_empty());
         if has_messages {
             drop(store);
             let _ = persist_session(source, session_id);
@@ -146,7 +146,7 @@ pub fn replace_session(source: &str, session_id: u64, new_messages: Vec<(String,
             Ok(g) => g,
             Err(_) => return,
         };
-        let has_messages = store.get(&key).map_or(false, |s| !s.messages.is_empty());
+        let has_messages = store.get(&key).is_some_and(|s| !s.messages.is_empty());
         if has_messages {
             drop(store);
             let _ = persist_session(source, session_id);
@@ -235,7 +235,7 @@ pub fn load_messages_from_latest_session_file(_source: &str, session_id: u64) ->
                 e.path()
                     .file_name()
                     .and_then(|n| n.to_str())
-                    .map_or(false, |n| n.starts_with(&prefix))
+                    .is_some_and(|n| n.starts_with(&prefix))
             })
             .collect(),
         Err(_) => return Vec::new(),

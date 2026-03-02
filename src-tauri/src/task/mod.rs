@@ -497,7 +497,7 @@ pub fn resolve_task_path(path_or_id: &str) -> Result<PathBuf, String> {
             _ => 2,
         };
         let mut sorted = candidates;
-        sorted.sort_by(|a, b| order(status_from_path(a)).cmp(&order(status_from_path(b))));
+        sorted.sort_by_key(|a| order(status_from_path(a)));
         return Ok(sorted.into_iter().next().unwrap());
     }
     Ok(candidates.into_iter().next().unwrap())
@@ -616,7 +616,7 @@ pub fn list_open_and_wip_tasks() -> Result<Vec<(PathBuf, String, SystemTime)>, S
         };
         let mtime = fs::metadata(&path)
             .and_then(|m| m.modified())
-            .unwrap_or_else(|_| SystemTime::UNIX_EPOCH);
+            .unwrap_or(SystemTime::UNIX_EPOCH);
         out.push((path, status, mtime));
     }
     Ok(out)
@@ -663,7 +663,7 @@ pub fn list_all_tasks() -> Result<Vec<(PathBuf, String, SystemTime)>, String> {
         };
         let mtime = fs::metadata(&path)
             .and_then(|m| m.modified())
-            .unwrap_or_else(|_| SystemTime::UNIX_EPOCH);
+            .unwrap_or(SystemTime::UNIX_EPOCH);
         out.push((path, status, mtime));
     }
     Ok(out)

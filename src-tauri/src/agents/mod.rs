@@ -188,9 +188,8 @@ fn load_one_agent(dir: &Path, id: &str) -> Option<Agent> {
         .ok()
         .map(|s| s.trim().to_string())
         .filter(|s| !s.is_empty())
-        .map(|s| {
+        .inspect(|_s| {
             debug!("Agents: agent {} using soul from {:?}", id, soul_path);
-            s
         })
         .or_else(|| {
             let shared = Config::load_soul_content();
@@ -314,7 +313,7 @@ fn parse_run_cmd_allowlist_from_md(content: &str) -> Option<Vec<String>> {
         after_header.trim()
     };
     let mut commands: Vec<String> = block
-        .split(|c| c == ',' || c == '\n')
+        .split([',', '\n'])
         .map(|s| s.trim().to_lowercase())
         .filter(|s| !s.is_empty())
         .collect();

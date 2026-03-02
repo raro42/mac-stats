@@ -1777,7 +1777,7 @@ pub unsafe fn read_power_from_ioreport(
                     continue;
                 }
                 let orig_key_str = CFString::wrap_under_get_rule(orig_key_ref);
-                if orig_key_str.to_string() == channel_key {
+                if orig_key_str == channel_key {
                     let orig_value = channel_values_buf[j];
                     if !orig_value.is_null() {
                         let orig_value_type_id = CFGetTypeID(orig_value as CFTypeRef);

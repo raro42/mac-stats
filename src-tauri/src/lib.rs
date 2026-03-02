@@ -298,17 +298,17 @@ fn run_internal(open_cpu_window: bool) {
             println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
             println!("✨ Welcome to mac-stats v{}! ✨", config::Config::version());
             println!("   Logs: tail -f ~/.mac-stats/debug.log");
-            println!("");
+            println!();
             println!("We hope this app brings you joy and helps you monitor");
             println!("your Mac's performance effortlessly.");
-            println!("");
+            println!();
             println!("Application is ready and can be clicked in the menu bar.");
-            println!("");
+            println!();
             println!("💝 Love this app? Share your happiness with others!");
             println!("   • Star on GitHub: https://github.com/raro42/mac-stats");
             println!("   • Share on Mastodon and spread the word!");
             println!("   • Contributions and feedback are always welcome!");
-            println!("");
+            println!();
             println!("Happy monitoring! 🚀");
             println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
             
@@ -1174,10 +1174,8 @@ fn run_internal(open_cpu_window: bool) {
                                             debug3!("P-core frequency cache updated: {:.2} GHz", p_core_freq);
                                         }
                                     }
-                                } else {
-                                    if freq_logging {
-                                        debug3!("P-core frequency is 0.0 - NOT updating cache");
-                                    }
+                                } else if freq_logging {
+                                    debug3!("P-core frequency is 0.0 - NOT updating cache");
                                 }
                                 
                                 // Update E-core frequency cache

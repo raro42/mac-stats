@@ -681,7 +681,7 @@ async fn having_fun_background_loop(ctx: Context) {
             .unwrap_or((0, None, None));
 
         // At least once a minute: log heartbeat when any having_fun channel is configured
-        if tick_count % HAVING_FUN_LOG_TICKS == 0 {
+        if tick_count.is_multiple_of(HAVING_FUN_LOG_TICKS) {
             let configured = count_configured_having_fun_channels();
             if configured > 0 {
                 if having_fun_count > 0 {
@@ -1390,7 +1390,7 @@ impl EventHandler for Handler {
         let content = {
             let raw = new_message.content.trim();
             let mention_tag = format!("<@{}>", bot_id);
-            sanitize_image_error_content(&raw.replace(&mention_tag, "").trim().to_string())
+            sanitize_image_error_content(raw.replace(&mention_tag, "").trim())
         };
         if content.is_empty() {
             debug!("Discord: Ignoring empty message");
@@ -1581,6 +1581,7 @@ impl EventHandler for Handler {
             conversation_history,
             escalation,
             true, // retry once when verification says NO
+            true, // from_remote: use headless browser unless user asks to see it
         ).await {
             Ok(r) => (r.text, r.attachment_paths),
             Err(e) => {

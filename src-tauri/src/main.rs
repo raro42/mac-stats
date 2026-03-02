@@ -60,6 +60,11 @@ enum DiscordCmd {
         #[arg(help = "Message text to send")]
         message: String,
     },
+    /// Run the same Ollama+tools pipeline as a Discord DM (headless browser, no Discord). For testing.
+    RunOllama {
+        #[arg(help = "Question to run (same flow as Discord DM)")]
+        question: String,
+    },
 }
 
 #[derive(clap::Subcommand, Debug)]
@@ -143,6 +148,43 @@ fn main() {
                         }
                         Err(e) => {
                             eprintln!("Discord send failed: {}", e);
+                            1
+                        }
+                    }
+                })
+            }
+            MainCmd::Discord(DiscordCmd::RunOllama { question }) => {
+                let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+                rt.block_on(async {
+                    mac_stats::config::Config::ensure_defaults();
+                    mac_stats::ensure_ollama_agent_ready_at_startup().await;
+                    match mac_stats::answer_with_ollama_and_fetch(
+                        &question,
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        true,  // allow_schedule
+                        None,
+                        false, // escalation
+                        true,  // retry_on_verification_no
+                        true,  // from_remote: headless browser
+                    )
+                    .await
+                    {
+                        Ok(reply) => {
+                            println!("Reply ({} chars):\n{}", reply.text.chars().count(), reply.text);
+                            for p in &reply.attachment_paths {
+                                println!("Attachment: {}", p.display());
+                            }
+                            0
+                        }
+                        Err(e) => {
+                            eprintln!("Run failed: {}", e);
                             1
                         }
                     }

@@ -2,7 +2,6 @@
 //! 
 //! Handles the macOS menu bar status item, click handlers, and window management.
 
-use std::ffi::CStr;
 use std::sync::OnceLock;
 use objc2::declare::ClassBuilder;
 use objc2::rc::Retained;
@@ -150,20 +149,20 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
     let baseline_offset = NSNumber::new_f64(-4.8);
 
     unsafe {
-        attributed.addAttribute_value_range(&NSFontAttributeName, as_any(&*label_font), label_range);
-        attributed.addAttribute_value_range(&NSFontAttributeName, as_any(&*value_font), value_range);
+        attributed.addAttribute_value_range(NSFontAttributeName, as_any(&*label_font), label_range);
+        attributed.addAttribute_value_range(NSFontAttributeName, as_any(&*value_font), value_range);
         attributed.addAttribute_value_range(
-            &NSForegroundColorAttributeName,
+            NSForegroundColorAttributeName,
             as_any(&*color),
             full_range,
         );
         attributed.addAttribute_value_range(
-            &NSParagraphStyleAttributeName,
+            NSParagraphStyleAttributeName,
             as_any(&*paragraph),
             full_range,
         );
         attributed.addAttribute_value_range(
-            &NSBaselineOffsetAttributeName,
+            NSBaselineOffsetAttributeName,
             as_any(&*baseline_offset),
             full_range,
         );
@@ -343,7 +342,7 @@ pub fn toggle_cpu_window(app_handle: &AppHandle) {
 pub fn click_handler_class() -> &'static AnyClass {
     static REGISTER: OnceLock<&'static AnyClass> = OnceLock::new();
     REGISTER.get_or_init(|| {
-        let name = unsafe { CStr::from_bytes_with_nul_unchecked(b"MacStatsStatusHandler\0") };
+        let name = c"MacStatsStatusHandler";
         debug2!("Creating Objective-C class: {:?}", name);
         let mut builder = ClassBuilder::new(name, NSObject::class()).expect("class already exists");
         
@@ -476,10 +475,10 @@ pub fn show_about_panel() {
 
     let keys = unsafe {
         [
-            &*NSAboutPanelOptionApplicationName,
-            &*NSAboutPanelOptionApplicationVersion,
-            &*NSAboutPanelOptionVersion,
-            &*NSAboutPanelOptionCredits,
+            NSAboutPanelOptionApplicationName,
+            NSAboutPanelOptionApplicationVersion,
+            NSAboutPanelOptionVersion,
+            NSAboutPanelOptionCredits,
         ]
     };
     let values: [&AnyObject; 4] = [

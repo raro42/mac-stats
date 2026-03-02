@@ -570,9 +570,8 @@ pub fn navigate_and_get_state(url: &str) -> Result<String, String> {
 fn navigate_and_get_state_inner(url: &str) -> Result<String, String> {
     let url_normalized = normalize_url_for_screenshot(url);
     info!("Browser agent [CDP]: BROWSER_NAVIGATE: {}", url_normalized);
-    let (_, tab) = get_current_tab().map_err(|e| {
-        clear_browser_session_on_error(&e);
-        e
+    let (_, tab) = get_current_tab().inspect_err(|e| {
+        clear_browser_session_on_error(e);
     })?;
     tab.navigate_to(&url_normalized)
         .map_err(|e| {
@@ -585,9 +584,8 @@ fn navigate_and_get_state_inner(url: &str) -> Result<String, String> {
         std::thread::sleep(Duration::from_secs(2));
     }
     std::thread::sleep(Duration::from_millis(1500));
-    let state = get_browser_state(&tab).map_err(|e| {
-        clear_browser_session_on_error(&e);
-        e
+    let state = get_browser_state(&tab).inspect_err(|e| {
+        clear_browser_session_on_error(e);
     })?;
     set_last_element_labels(
         state.interactables.iter().map(|i| (i.index, element_label_for_status(i))).collect(),
@@ -604,9 +602,8 @@ fn click_by_index_inner(index: u32) -> Result<String, String> {
     if index == 0 {
         return Err("BROWSER_CLICK index must be >= 1".to_string());
     }
-    let (_, tab) = get_current_tab().map_err(|e| {
-        clear_browser_session_on_error(&e);
-        e
+    let (_, tab) = get_current_tab().inspect_err(|e| {
+        clear_browser_session_on_error(e);
     })?;
     if is_new_tab_or_blank(tab.get_url().as_str()) {
         return Err(SESSION_RESET_MSG.to_string());
@@ -650,9 +647,8 @@ fn click_by_index_inner(index: u32) -> Result<String, String> {
         return Err(format!("BROWSER_CLICK: {}", msg));
     }
     std::thread::sleep(Duration::from_millis(800));
-    let state = get_browser_state(&tab).map_err(|e| {
-        clear_browser_session_on_error(&e);
-        e
+    let state = get_browser_state(&tab).inspect_err(|e| {
+        clear_browser_session_on_error(e);
     })?;
     set_last_element_labels(
         state.interactables.iter().map(|i| (i.index, element_label_for_status(i))).collect(),
@@ -669,9 +665,8 @@ fn input_by_index_inner(index: u32, text: &str) -> Result<String, String> {
     if index == 0 {
         return Err("BROWSER_INPUT index must be >= 1".to_string());
     }
-    let (_, tab) = get_current_tab().map_err(|e| {
-        clear_browser_session_on_error(&e);
-        e
+    let (_, tab) = get_current_tab().inspect_err(|e| {
+        clear_browser_session_on_error(e);
     })?;
     if is_new_tab_or_blank(tab.get_url().as_str()) {
         return Err(SESSION_RESET_MSG.to_string());
@@ -726,9 +721,8 @@ fn input_by_index_inner(index: u32, text: &str) -> Result<String, String> {
         return Err(format!("BROWSER_INPUT: {}", msg));
     }
     std::thread::sleep(Duration::from_millis(300));
-    let state = get_browser_state(&tab).map_err(|e| {
-        clear_browser_session_on_error(&e);
-        e
+    let state = get_browser_state(&tab).inspect_err(|e| {
+        clear_browser_session_on_error(e);
     })?;
     set_last_element_labels(
         state.interactables.iter().map(|i| (i.index, element_label_for_status(i))).collect(),
@@ -742,9 +736,8 @@ pub fn scroll_page(arg: &str) -> Result<String, String> {
 }
 
 fn scroll_page_inner(arg: &str) -> Result<String, String> {
-    let (_, tab) = get_current_tab().map_err(|e| {
-        clear_browser_session_on_error(&e);
-        e
+    let (_, tab) = get_current_tab().inspect_err(|e| {
+        clear_browser_session_on_error(e);
     })?;
     if is_new_tab_or_blank(tab.get_url().as_str()) {
         return Err(SESSION_RESET_MSG.to_string());
@@ -774,9 +767,8 @@ fn scroll_page_inner(arg: &str) -> Result<String, String> {
         s
     })?;
     std::thread::sleep(Duration::from_millis(400));
-    let state = get_browser_state(&tab).map_err(|e| {
-        clear_browser_session_on_error(&e);
-        e
+    let state = get_browser_state(&tab).inspect_err(|e| {
+        clear_browser_session_on_error(e);
     })?;
     Ok(format_browser_state_for_llm(&state))
 }
@@ -788,9 +780,8 @@ pub fn search_page_text(pattern: &str) -> Result<String, String> {
 }
 
 fn search_page_text_inner(pattern: &str) -> Result<String, String> {
-    let (_, tab) = get_current_tab().map_err(|e| {
-        clear_browser_session_on_error(&e);
-        e
+    let (_, tab) = get_current_tab().inspect_err(|e| {
+        clear_browser_session_on_error(e);
     })?;
     if is_new_tab_or_blank(tab.get_url().as_str()) {
         return Err(SESSION_RESET_MSG.to_string());
@@ -799,8 +790,7 @@ fn search_page_text_inner(pattern: &str) -> Result<String, String> {
     let pattern_escaped = pattern
         .replace('\\', "\\\\")
         .replace('\'', "\\'")
-        .replace('\n', " ")
-        .replace('\r', " ");
+        .replace(['\n', '\r'], " ");
     const CONTEXT_CHARS: i32 = 80;
     const MAX_RESULTS: i32 = 20;
     // Use indexOf for literal substring search (no regex escaping issues)
@@ -909,16 +899,14 @@ pub fn extract_page_text() -> Result<String, String> {
 }
 
 fn extract_page_text_inner() -> Result<String, String> {
-    let (_, tab) = get_current_tab().map_err(|e| {
-        clear_browser_session_on_error(&e);
-        e
+    let (_, tab) = get_current_tab().inspect_err(|e| {
+        clear_browser_session_on_error(e);
     })?;
     if is_new_tab_or_blank(tab.get_url().as_str()) {
         return Err(SESSION_RESET_MSG.to_string());
     }
-    let text = get_page_text(&tab).map_err(|e| {
-        clear_browser_session_on_error(&e);
-        e
+    let text = get_page_text(&tab).inspect_err(|e| {
+        clear_browser_session_on_error(e);
     })?;
     const MAX_EXTRACT_CHARS: usize = 30_000;
     let out = if text.chars().count() > MAX_EXTRACT_CHARS {
@@ -942,9 +930,8 @@ pub fn take_screenshot_current_page() -> Result<PathBuf, String> {
 
 fn take_screenshot_current_page_inner() -> Result<PathBuf, String> {
     info!("Browser agent [CDP]: take_screenshot_current_page (no navigation)");
-    let (_, tab) = get_current_tab().map_err(|e| {
-        clear_browser_session_on_error(&e);
-        e
+    let (_, tab) = get_current_tab().inspect_err(|e| {
+        clear_browser_session_on_error(e);
     })?;
     let final_url = tab.get_url();
     if is_new_tab_or_blank(final_url.as_str()) {
@@ -986,9 +973,8 @@ fn take_screenshot_inner(url: &str) -> Result<PathBuf, String> {
     let url_normalized = normalize_url_for_screenshot(url_trimmed);
     info!("Browser agent [CDP]: normalized URL: {}", url_normalized);
     let port = 9222u16;
-    let browser = get_or_create_browser(port).map_err(|e| {
-        clear_browser_session_on_error(&e);
-        e
+    let browser = get_or_create_browser(port).inspect_err(|e| {
+        clear_browser_session_on_error(e);
     })?;
     let tabs = browser.get_tabs().lock().map_err(|e| {
         let s = e.to_string();
