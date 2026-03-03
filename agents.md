@@ -431,3 +431,10 @@ mac-stats/
 - All Ollama code lives in `src/ollama.js` (frontend) and `src-tauri/src/commands/ollama.rs` + `src-tauri/src/ollama/mod.rs` (backend)
 - Conversation history managed in JavaScript, passed to Rust
 - Code execution handled in JavaScript, results sent back to Rust for follow-up
+
+---
+
+## Reference — sibling repos (remember)
+
+- **OpenClaw**: `../openclaw` (from repo root: multi-channel AI gateway; compaction, memory, session reset; see `docs/035_memory_and_topic_handling.md`).
+- **Hermes**: `../hermes-agent` (from repo root: skills/workspace with SKILL.md files; not a chat gateway — the Hermes repo on disk is named **hermes-agent**, not `hermes`).

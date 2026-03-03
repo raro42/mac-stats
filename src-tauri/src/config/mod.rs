@@ -19,7 +19,7 @@
 //! leak secrets.
 //!
 //! **JSON config reload (no restart needed):**
-//! - `config.json` — read on every access (window decorations, scheduler interval, ollamaChatTimeoutSecs).
+//! - `config.json` — read on every access (window decorations, scheduler interval, ollamaChatTimeoutSecs, browserViewportWidth/Height).
 //! - `schedules.json` — scheduler checks file mtime each loop and reloads when changed.
 //! - `discord_channels.json` — Discord loop checks mtime every tick and reloads when changed.
 
@@ -273,6 +273,40 @@ impl Config {
         3600
     }
 
+    /// Browser viewport width in pixels (CDP/headless window size). Config: config.json `browserViewportWidth`.
+    /// Default 1800. Clamped to 800..=3840.
+    pub fn browser_viewport_width() -> u32 {
+        const DEFAULT: u32 = 1800;
+        const MIN: u32 = 800;
+        const MAX: u32 = 3840;
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(n) = json.get("browserViewportWidth").and_then(|v| v.as_u64()) {
+                    return (n as u32).clamp(MIN, MAX);
+                }
+            }
+        }
+        DEFAULT
+    }
+
+    /// Browser viewport height in pixels (CDP/headless window size). Config: config.json `browserViewportHeight`.
+    /// Default 2400. Clamped to 600..=2160.
+    pub fn browser_viewport_height() -> u32 {
+        const DEFAULT: u32 = 2400;
+        const MIN: u32 = 600;
+        const MAX: u32 = 2160;
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(n) = json.get("browserViewportHeight").and_then(|v| v.as_u64()) {
+                    return (n as u32).clamp(MIN, MAX);
+                }
+            }
+        }
+        DEFAULT
+    }
+
     /// Skills directory for agent prompt overlays: `$HOME/.mac-stats/skills/`
     /// Files: skill-<number>-<topic>.md (e.g. skill-1-summarize.md, skill-2-code.md).
     pub fn skills_dir() -> PathBuf {
@@ -344,6 +378,13 @@ impl Config {
         Self::agents_dir().join("memory.md")
     }
 
+    /// Path to per-channel Discord memory: `$HOME/.mac-stats/agents/memory-discord-{channel_id}.md`
+    /// When replying in a Discord channel (or DM), lessons and compaction output for that channel
+    /// are stored here so context is not mixed between channels.
+    pub fn memory_file_path_for_discord_channel(channel_id: u64) -> PathBuf {
+        Self::agents_dir().join(format!("memory-discord-{}.md", channel_id))
+    }
+
     /// Path to Discord channel config: `$HOME/.mac-stats/discord_channels.json`
     pub fn discord_channels_path() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {
@@ -360,6 +401,16 @@ impl Config {
             PathBuf::from(home).join(".mac-stats").join("escalation_patterns.md")
         } else {
             std::env::temp_dir().join("mac-stats-escalation_patterns.md")
+        }
+    }
+
+    /// Path to session reset phrases: `$HOME/.mac-stats/session_reset_phrases.md`
+    /// One phrase per line; when a user message contains any phrase (case-insensitive substring), the session is cleared (like OpenClaw's resetTriggers, but in an MD file).
+    pub fn session_reset_phrases_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home).join(".mac-stats").join("session_reset_phrases.md")
+        } else {
+            std::env::temp_dir().join("mac-stats-session_reset_phrases.md")
         }
     }
 
@@ -416,6 +467,7 @@ impl Config {
 
     const DEFAULT_DISCORD_CHANNELS: &str = include_str!("../../defaults/discord_channels.json");
     const DEFAULT_ESCALATION_PATTERNS: &str = include_str!("../../defaults/escalation_patterns.md");
+    const DEFAULT_SESSION_RESET_PHRASES: &str = include_str!("../../defaults/session_reset_phrases.md");
 
     /// Write a default file if the target path does not exist (never overwrites user edits).
     fn write_default_if_missing(path: &std::path::Path, content: &str) {
@@ -461,6 +513,9 @@ impl Config {
         // Escalation patterns (user-editable; triggers "think harder" / completion-oriented run)
         Self::write_default_if_missing(&Self::escalation_patterns_path(), Self::DEFAULT_ESCALATION_PATTERNS);
 
+        // Session reset phrases (user-editable; phrases that clear session / start fresh, any language)
+        Self::write_default_if_missing(&Self::session_reset_phrases_path(), Self::DEFAULT_SESSION_RESET_PHRASES);
+
         // Default agents: loop over DEFAULT_AGENT_IDS. agent.json only if missing; skill.md and testing.md overwritten from bundle.
         for (dir_name, files) in Self::DEFAULT_AGENT_IDS {
             let dir = agents.join(dir_name);
@@ -501,6 +556,21 @@ impl Config {
     pub fn load_escalation_patterns() -> Vec<String> {
         let path = Self::escalation_patterns_path();
         let content = Self::load_file_or_default(&path, Self::DEFAULT_ESCALATION_PATTERNS);
+        content
+            .lines()
+            .map(str::trim)
+            .filter(|s| !s.is_empty() && !s.starts_with('#'))
+            .map(String::from)
+            .collect::<Vec<_>>()
+    }
+
+    /// Load session reset phrases from ~/.mac-stats/session_reset_phrases.md.
+    /// Returns a list of phrases (one per non-empty, non-comment line). When a user message
+    /// contains any phrase (case-insensitive substring), the session is cleared. If the file
+    /// is missing, writes the default and returns the default list.
+    pub fn load_session_reset_phrases() -> Vec<String> {
+        let path = Self::session_reset_phrases_path();
+        let content = Self::load_file_or_default(&path, Self::DEFAULT_SESSION_RESET_PHRASES);
         content
             .lines()
             .map(str::trim)

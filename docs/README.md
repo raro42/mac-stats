@@ -283,6 +283,7 @@ A: No. These are performance-only optimizations. All features unchanged.
 - **README**: [`../README.md`](../README.md)
 - **Docs vs code review**: [`033_docs_vs_code_review.md`](033_docs_vs_code_review.md)
 - **What others do & plan**: [`034_what_others_do_and_plan.md`](034_what_others_do_and_plan.md) — research and proposed priorities
+- **Memory and topic handling**: [`035_memory_and_topic_handling.md`](035_memory_and_topic_handling.md) — log review, OpenClaw/Hermes, topic-aware compaction and user reset
 
 ---
 

@@ -37,7 +37,7 @@ pub async fn run_task_until_finished(task_path: PathBuf, max_iterations: u32) ->
         );
         info!("Task loop: iteration {}/{} for task '{}' (assignee: {})", iteration + 1, max_iterations, task_name, assignee);
         let reply = crate::commands::ollama::answer_with_ollama_and_fetch(
-            &question, None, None, None, None, None, None, None, agent_override, false, None, false, true, true,
+            &question, None, None, None, None, None, None, None, agent_override, false, None, false, true, true, None,
         )
         .await?;
         last_reply = reply.text;

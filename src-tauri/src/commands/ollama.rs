@@ -28,6 +28,100 @@ fn load_soul_content() -> String {
     Config::load_soul_content()
 }
 
+/// Load global memory (~/.mac-stats/agents/memory.md) for inclusion in system prompt.
+fn load_global_memory_block() -> String {
+    let path = Config::memory_file_path();
+    let content = match std::fs::read_to_string(&path) {
+        Ok(s) => s.trim().to_string(),
+        Err(_) => return String::new(),
+    };
+    if content.is_empty() {
+        return String::new();
+    }
+    format!("\n\n## Memory (lessons learned — follow these)\n\n{}\n\n", content)
+}
+
+/// Load per-channel Discord memory (~/.mac-stats/agents/memory-discord-{id}.md). Returns empty if missing.
+fn load_channel_memory_block(channel_id: u64) -> String {
+    let path = Config::memory_file_path_for_discord_channel(channel_id);
+    let content = match std::fs::read_to_string(&path) {
+        Ok(s) => s.trim().to_string(),
+        Err(_) => return String::new(),
+    };
+    if content.is_empty() {
+        return String::new();
+    }
+    format!("\n\n## Memory (this channel — follow these)\n\n{}\n\n", content)
+}
+
+/// Load memory for the current request: global + per-channel when replying in a Discord channel.
+/// Keeps channel conversations from mixing; DMs and each server channel have their own lesson file.
+fn load_memory_block_for_request(discord_channel_id: Option<u64>) -> String {
+    let global = load_global_memory_block();
+    let channel = discord_channel_id.map(load_channel_memory_block).unwrap_or_default();
+    if channel.is_empty() {
+        global
+    } else {
+        format!("{}{}", global, channel)
+    }
+}
+
+/// Extract words (alphanumeric, lowercase) for simple keyword matching.
+fn words_for_search(text: &str) -> Vec<String> {
+    text.to_lowercase()
+        .split(|c: char| !c.is_alphanumeric())
+        .filter(|s| s.len() >= 2)
+        .map(String::from)
+        .collect::<std::collections::HashSet<_>>()
+        .into_iter()
+        .collect()
+}
+
+/// Search memory (global + optional Discord channel) for lines relevant to the request.
+/// Returns at most 5 matching lines, or None if no matches. When discord_channel_id is Some,
+/// channel memory is merged with global so we search both.
+fn search_memory_for_request(
+    question: &str,
+    reason: Option<&str>,
+    discord_channel_id: Option<u64>,
+) -> Option<String> {
+    let global = std::fs::read_to_string(Config::memory_file_path()).ok().unwrap_or_default();
+    let channel = discord_channel_id
+        .and_then(|id| std::fs::read_to_string(Config::memory_file_path_for_discord_channel(id)).ok())
+        .unwrap_or_default();
+    let content = format!("{}\n{}", global.trim(), channel.trim()).trim().to_string();
+    if content.is_empty() {
+        return None;
+    }
+    let mut query_words: Vec<String> = words_for_search(question);
+    if let Some(r) = reason {
+        query_words.extend(words_for_search(r));
+    }
+    query_words.sort();
+    query_words.dedup();
+    if query_words.is_empty() {
+        return None;
+    }
+    let mut scored: Vec<(usize, String)> = content
+        .lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty() && !line.starts_with('#'))
+        .map(|line| {
+            let line_lower = line.to_lowercase();
+            let score = query_words.iter().filter(|w| line_lower.contains(w.as_str())).count();
+            (score, line.to_string())
+        })
+        .filter(|(score, _)| *score > 0)
+        .collect();
+    scored.sort_by(|a, b| b.0.cmp(&a.0));
+    let top: Vec<String> = scored.into_iter().take(5).map(|(_, line)| line).collect();
+    if top.is_empty() {
+        None
+    } else {
+        Some(top.join("\n"))
+    }
+}
+
 /// Default system prompt for non-agent Ollama chat: soul (from file or bundled) + tool instructions.
 pub fn default_non_agent_system_prompt() -> String {
     let soul = load_soul_content();
@@ -773,7 +867,7 @@ async fn build_agent_descriptions(from_discord: bool) -> String {
         num += 1;
     }
     base.push_str(&format!(
-        "\n\n{}. **MEMORY_APPEND** (persistent memory): Save a lesson learned for future sessions. Use when something important was discovered (a mistake to avoid, a working approach, a user preference). To invoke: reply with exactly one line: MEMORY_APPEND: <lesson> (saves to global memory, loaded for all agents) or MEMORY_APPEND: agent:<slug-or-id> <lesson> (saves to that agent's memory only). Keep lessons concise and actionable.",
+        "\n\n{}. **MEMORY_APPEND** (persistent memory): Save a lesson learned for future sessions. Use when something important was discovered (a mistake to avoid, a working approach, a user preference). To invoke: reply with exactly one line: MEMORY_APPEND: <lesson> (in Discord: saves to this channel's memory; otherwise global) or MEMORY_APPEND: agent:<slug-or-id> <lesson> (saves to that agent's memory only). Keep lessons concise and actionable.",
         num
     ));
     num += 1;
@@ -1098,8 +1192,9 @@ async fn compact_conversation_history(
     let system_prompt = r#"You are a session compactor. Given a conversation between a user and an assistant, produce TWO sections:
 
 ## CONTEXT
-A concise summary (max 300 words) of ONLY verified facts and successful outcomes. Rules:
-- KEEP: IDs confirmed by API responses (guild IDs, channel IDs, user IDs), successful API calls and their actual results, user preferences and standing instructions, established context the user built up.
+A concise summary (max 300 words) of ONLY verified facts and successful outcomes **relevant to the user's current question**. Rules:
+- If the conversation spans **multiple unrelated topics**, summarize ONLY what is relevant to the **current question** (see below). If the current question is clearly a **new topic** (unrelated to most of the history), output exactly: "Previous context covered different topics; not needed for this request." and keep CONTEXT to that one sentence.
+- KEEP: IDs confirmed by API responses (guild IDs, channel IDs, user IDs), successful API calls and their actual results, user preferences and standing instructions, established context the user built up — but only if relevant to the current question.
 - DROP: Failed attempts (401 errors, wrong tool usage, timeouts), hallucinated or unverified claims (assistant saying something happened without API confirmation), apologies, suggestions that weren't followed, repeated back-and-forth about the same error.
 - If the assistant claimed an action succeeded but there's no API result confirming it, mark it as UNVERIFIED.
 - Write as a factual briefing, not a conversation recap.
@@ -1219,7 +1314,11 @@ pub async fn run_periodic_session_compaction() {
         match compact_result {
             Ok((context, lessons)) => {
                 if let Some(ref lesson_text) = lessons {
-                    let memory_path = crate::config::Config::memory_file_path();
+                    let memory_path = if entry.source == "discord" {
+                        crate::config::Config::memory_file_path_for_discord_channel(entry.session_id)
+                    } else {
+                        crate::config::Config::memory_file_path()
+                    };
                     for line in lesson_text.lines() {
                         let line = line.trim().trim_start_matches("- ").trim();
                         if !line.is_empty() && line.len() > 5 {
@@ -1411,7 +1510,7 @@ fn extract_screenshot_recommendation(question: &str) -> Option<String> {
     None
 }
 
-/// Extract a numeric ticket/issue ID from text like "ticket #1234", "#1234", "issue 1234".
+/// Extract a numeric ticket/issue ID from text like "ticket #1234", "#1234", "issue 1234", "review redmine 7209".
 fn extract_ticket_id(text: &str) -> Option<u64> {
     // Match #NNNN
     if let Some(pos) = text.find('#') {
@@ -1421,8 +1520,8 @@ fn extract_ticket_id(text: &str) -> Option<u64> {
             return digits.parse().ok();
         }
     }
-    // Match "ticket NNNN" or "issue NNNN" without #
-    for keyword in &["ticket ", "issue "] {
+    // Match "ticket NNNN", "issue NNNN", or "redmine NNNN" (e.g. "Review redmine 7209")
+    for keyword in &["ticket ", "issue ", "redmine "] {
         if let Some(pos) = text.find(keyword) {
             let after = &text[pos + keyword.len()..];
             let digits: String = after.chars().take_while(|c| c.is_ascii_digit()).collect();
@@ -1478,6 +1577,60 @@ async fn extract_success_criteria(
         None
     } else {
         Some(criteria)
+    }
+}
+
+/// Build a short summary of the last N turns (user/assistant pairs) for the new-topic check.
+/// Each message content is truncated to avoid blowing context.
+fn summarize_last_turns(messages: &[crate::ollama::ChatMessage], max_turns: usize) -> String {
+    const PER_MSG: usize = 120;
+    let take = (max_turns * 2).min(messages.len()); // pairs = 2 messages each
+    let start = messages.len().saturating_sub(take);
+    messages[start..]
+        .iter()
+        .map(|m| {
+            let c: String = m.content.chars().take(PER_MSG).collect();
+            let suffix = if m.content.chars().count() > PER_MSG { "…" } else { "" };
+            format!("{}: {}{}", m.role, c, suffix)
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+/// One short Ollama call to detect if the user's current message is a new topic vs same thread (section 6.A).
+/// Returns Ok(true) for NEW_TOPIC, Ok(false) for SAME_TOPIC. On error returns Err (caller may keep history).
+/// Uses the given model (prefer local/small when running locally to avoid cost; skip entirely when cloud).
+async fn detect_new_topic(
+    question: &str,
+    last_turns_summary: &str,
+    model: &str,
+) -> Result<bool, String> {
+    let system = "You are a classifier. Answer only with exactly one of: NEW_TOPIC or SAME_TOPIC.";
+    let user = format!(
+        "Given the user's current message and a short summary of the last turns, is the user starting a **new topic** (reply NEW_TOPIC) or continuing the **same thread** (SAME_TOPIC)?\n\nCurrent message: {}\n\nLast turns:\n{}",
+        question.chars().take(500).collect::<String>(),
+        last_turns_summary
+    );
+    let messages = vec![
+        crate::ollama::ChatMessage {
+            role: "system".to_string(),
+            content: system.to_string(),
+            images: None,
+        },
+        crate::ollama::ChatMessage {
+            role: "user".to_string(),
+            content: user,
+            images: None,
+        },
+    ];
+    let response = send_ollama_chat_messages(messages, Some(model.to_string()), None).await?;
+    let text = response.message.content.trim().to_uppercase();
+    if text.contains("NEW_TOPIC") {
+        Ok(true)
+    } else if text.contains("SAME_TOPIC") {
+        Ok(false)
+    } else {
+        Err(format!("Unexpected response (expected NEW_TOPIC or SAME_TOPIC): {}…", text.chars().take(80).collect::<String>()))
     }
 }
 
@@ -1672,12 +1825,26 @@ pub fn answer_with_ollama_and_fetch(
     escalation: bool,
     retry_on_verification_no: bool,
     from_remote: bool,
+    // When set (e.g. from Discord message attachments), the first user message is sent with these base64-encoded images for vision models.
+    attachment_images_base64: Option<Vec<String>>,
 ) -> Pin<Box<dyn Future<Output = Result<OllamaReply, String>> + Send>> {
     let question = question.to_string();
-    let conversation_history = conversation_history.map(|v| v.to_vec());
+    let mut conversation_history = conversation_history.map(|v| v.to_vec());
+    let attachment_images_base64 = attachment_images_base64.map(|v| v.to_vec());
     Box::pin(async move {
     use tracing::info;
     let question = question.as_str();
+
+    // When Discord user asks for screenshots to be sent here, focus on current task only (no prior chat).
+    if discord_reply_channel_id.is_some() {
+        let q = question.to_lowercase();
+        if q.contains("screenshot") && (q.contains("send") || q.contains("here") || q.contains("discord")) {
+            if conversation_history.as_ref().map_or(false, |h| !h.is_empty()) {
+                info!("Agent router: clearing history for Discord screenshot-send request (focus on current task)");
+                conversation_history = Some(vec![]);
+            }
+        }
+    }
 
     let (model_override, skill_content, mut max_tool_iterations) = if let Some(ref a) = agent_override {
         (
@@ -1783,10 +1950,38 @@ pub fn answer_with_ollama_and_fetch(
         options_override.clone(),
     )
     .await;
-    if let Some(ref c) = success_criteria {
-        info!("Agent router: extracted {} success criteria", c.len());
-    } else {
-        tracing::debug!("Agent router: no success criteria extracted (verification will use request summary only)");
+    let criteria_status = match &success_criteria {
+        Some(c) if !c.is_empty() => {
+            info!("Agent router: extracted {} success criteria", c.len());
+            truncate_status(&c.join("; "), 200)
+        }
+        _ => {
+            tracing::debug!("Agent router: no success criteria extracted (verification will use request summary only)");
+            "(none)".to_string()
+        }
+    };
+    send_status(&format!("EDIT:Extracted success criteria: {}", criteria_status));
+
+    // 6.A New-topic check: one short LLM call when we have history and use a local model.
+    // Skip when using a cloud model to minimize cost (only when cloud do we care about extra calls).
+    if !crate::ollama::models::is_cloud_model(&effective_model) {
+        if let Some(ref hist) = conversation_history {
+            const NEW_TOPIC_MIN_HISTORY: usize = 2;
+            if hist.len() >= NEW_TOPIC_MIN_HISTORY {
+                send_status("Checking if new topic…");
+                let summary = summarize_last_turns(hist, 3);
+                match detect_new_topic(question, &summary, &effective_model).await {
+                    Ok(true) => {
+                        info!("Agent router: new-topic check returned NEW_TOPIC, using no prior context");
+                        conversation_history = None;
+                    }
+                    Ok(false) => {}
+                    Err(e) => {
+                        tracing::debug!("Agent router: new-topic check failed (keeping history): {}", e);
+                    }
+                }
+            }
+        }
     }
 
     const CONVERSATION_HISTORY_CAP: usize = 20;
@@ -1807,7 +2002,9 @@ pub fn answer_with_ollama_and_fetch(
         match compact_conversation_history(&raw_history, question).await {
             Ok((context, lessons)) => {
                 if let Some(ref lesson_text) = lessons {
-                    let memory_path = crate::config::Config::memory_file_path();
+                    let memory_path = discord_reply_channel_id
+                        .map(crate::config::Config::memory_file_path_for_discord_channel)
+                        .unwrap_or_else(crate::config::Config::memory_file_path);
                     for line in lesson_text.lines() {
                         let line = line.trim().trim_start_matches("- ").trim();
                         if !line.is_empty() && line.len() > 5 {
@@ -1817,18 +2014,28 @@ pub fn answer_with_ollama_and_fetch(
                     }
                     info!("Session compaction: wrote lessons to {:?}", memory_path);
                 }
+                let context_lower = context.to_lowercase();
+                let not_needed = context_lower.contains("not needed for this request")
+                    || context_lower.contains("covered different topics");
                 if let Some(channel_id) = discord_reply_channel_id {
                     let compacted = vec![
                         ("system".to_string(), context.clone()),
                     ];
                     crate::session_memory::replace_session("discord", channel_id, compacted);
                 }
-                info!("Session compaction: replaced {} messages with summary ({} chars)", raw_history.len(), context.len());
-                vec![crate::ollama::ChatMessage {
-                    role: "system".to_string(),
-                    content: format!("Previous session context (compacted from {} messages):\n\n{}", raw_history.len(), context),
-                    images: None,
-                }]
+                if not_needed {
+                    info!(
+                        "Session compaction: prior context not relevant to current question (new topic), using no prior context"
+                    );
+                    vec![]
+                } else {
+                    info!("Session compaction: replaced {} messages with summary ({} chars)", raw_history.len(), context.len());
+                    vec![crate::ollama::ChatMessage {
+                        role: "system".to_string(),
+                        content: format!("Previous session context (compacted from {} messages):\n\n{}", raw_history.len(), context),
+                        images: None,
+                    }]
+                }
             }
             Err(e) => {
                 let n = raw_history.len();
@@ -2000,7 +2207,7 @@ pub fn answer_with_ollama_and_fetch(
                 "Current user question: {}{}\n\nReply with RECOMMEND: your plan.",
                 question_for_plan_and_exec, model_hint
             ),
-            images: None,
+            images: attachment_images_base64.clone(),
         });
         let plan_response = send_ollama_chat_messages(planning_messages, model_override.clone(), options_override.clone()).await?;
         let mut rec = plan_response.message.content.trim().to_string();
@@ -2055,20 +2262,32 @@ pub fn answer_with_ollama_and_fetch(
         "\n\nYou are replying as the Ollama model: **{}**. If the user asks which model you are (or what model you run on), name this model.",
         effective_model
     );
+    // When Discord user asked for screenshots to be sent here, remind executor to actually run BROWSER_NAVIGATE + BROWSER_SCREENSHOT per URL.
+    let discord_screenshot_reminder = if discord_reply_channel_id.is_some() {
+        let q = question.to_lowercase();
+        if q.contains("screenshot") && (q.contains("send") || q.contains("here") || q.contains("discord")) {
+            "\n\n**Discord:** The user asked for screenshot(s) to be sent here. You MUST call BROWSER_NAVIGATE then BROWSER_SCREENSHOT: current for each URL; the app will attach the images to the reply."
+        } else {
+            ""
+        }
+    } else {
+        ""
+    };
 
     // Fast path: if the recommendation already contains a parseable tool call, execute it
     // directly instead of asking Ollama a second time to regurgitate the same tool line.
     let direct_tool = parse_tool_from_response(&recommendation);
     let (mut messages, mut response_content) = if let Some((ref tool, ref arg)) = direct_tool {
         info!("Agent router: plan contains direct tool call {}:{} — skipping execution Ollama call", tool, crate::logging::ellipse(arg, 60));
+        let memory_block = load_memory_block_for_request(discord_reply_channel_id);
         let execution_system_content = match &skill_content {
             Some(skill) => format!(
-                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}{}",
-                discord_user_context, skill, execution_prompt, metrics_for_system, model_identity
+                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}{}{}",
+                discord_user_context, skill, execution_prompt, metrics_for_system, discord_screenshot_reminder, model_identity
             ),
             None => format!(
-                "{}{}{}{}{}",
-                router_soul, discord_user_context, execution_prompt, metrics_for_system, model_identity
+                "{}{}{}{}{}{}{}",
+                router_soul, memory_block, discord_user_context, execution_prompt, metrics_for_system, discord_screenshot_reminder, model_identity
             ),
         };
         let mut msgs: Vec<crate::ollama::ChatMessage> = vec![
@@ -2077,7 +2296,7 @@ pub fn answer_with_ollama_and_fetch(
         for msg in &conversation_history {
             msgs.push(msg.clone());
         }
-        msgs.push(crate::ollama::ChatMessage { role: "user".to_string(), content: question_for_plan_and_exec.clone(), images: None });
+        msgs.push(crate::ollama::ChatMessage { role: "user".to_string(), content: question_for_plan_and_exec.clone(), images: attachment_images_base64.clone() });
         // Use full recommendation when it contains multiple tools (e.g. BROWSER_NAVIGATE + BROWSER_SCREENSHOT)
         let synthetic = if recommendation.contains('\n') {
             recommendation.clone()
@@ -2087,14 +2306,15 @@ pub fn answer_with_ollama_and_fetch(
         (msgs, synthetic)
     } else {
         info!("Agent router: execution step — sending plan + question, starting tool loop (max {} tools)", max_tool_iterations);
+        let memory_block = load_memory_block_for_request(discord_reply_channel_id);
         let execution_system_content = match &skill_content {
             Some(skill) => format!(
-                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}\n\nYour plan: {}{}",
-                discord_user_context, skill, execution_prompt, metrics_for_system, recommendation, model_identity
+                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}{}\n\nYour plan: {}{}",
+                discord_user_context, skill, execution_prompt, metrics_for_system, discord_screenshot_reminder, recommendation, model_identity
             ),
             None => format!(
-                "{}{}{}{}\n\nYour plan: {}{}",
-                router_soul, discord_user_context, execution_prompt, metrics_for_system, recommendation, model_identity
+                "{}{}{}{}{}{}\n\nYour plan: {}{}",
+                router_soul, memory_block, discord_user_context, execution_prompt, metrics_for_system, discord_screenshot_reminder, recommendation, model_identity
             ),
         };
         let mut msgs: Vec<crate::ollama::ChatMessage> = vec![
@@ -2103,7 +2323,7 @@ pub fn answer_with_ollama_and_fetch(
         for msg in &conversation_history {
             msgs.push(msg.clone());
         }
-        msgs.push(crate::ollama::ChatMessage { role: "user".to_string(), content: question_for_plan_and_exec.clone(), images: None });
+        msgs.push(crate::ollama::ChatMessage { role: "user".to_string(), content: question_for_plan_and_exec.clone(), images: attachment_images_base64.clone() });
         let response = send_ollama_chat_messages(msgs.clone(), model_override.clone(), options_override.clone()).await?;
         let content = response.message.content.clone();
         let n = content.chars().count();
@@ -2296,10 +2516,13 @@ pub fn answer_with_ollama_and_fetch(
                         url_arg
                     )
                 } else {
-                    send_status("📸 Taking screenshot of current page…");
+                    send_status("📸 Taking screenshot of current page");
                     match tokio::task::spawn_blocking(crate::browser_agent::take_screenshot_current_page).await {
                         Ok(Ok(path)) => {
                             attachment_paths.push(path.clone());
+                            if let Some(ref tx) = status_tx {
+                                let _ = tx.send(format!("ATTACH:{}", path.display()));
+                            }
                             format!(
                                 "Screenshot of current page saved to: {}.\n\nTell the user the screenshot was taken; the app will attach it in Discord.",
                                 path.display()
@@ -2359,12 +2582,12 @@ pub fn answer_with_ollama_and_fetch(
                     Some(idx) => {
                         let label = crate::browser_agent::get_last_element_label(idx);
                         if let Some(l) = label {
-                            format!("🖱️ Clicking element {} ({})…", idx, crate::logging::ellipse(&l, 30))
+                            format!("🖱️ Clicking element {} ({})", idx, crate::logging::ellipse(&l, 30))
                         } else {
-                            format!("🖱️ Clicking element {}…", idx)
+                            format!("🖱️ Clicking element {}", idx)
                         }
                     }
-                    None => format!("🖱️ Clicking element {}…", if index_arg.is_empty() { "?" } else { index_arg }),
+                    None => format!("🖱️ Clicking element {}", if index_arg.is_empty() { "?" } else { index_arg }),
                 };
                 send_status(&status_msg);
                 match index {
@@ -3379,7 +3602,9 @@ pub fn answer_with_ollama_and_fetch(
                             Err(format!("Agent '{}' not found", selector))
                         }
                     } else {
-                        let path = crate::config::Config::memory_file_path();
+                        let path = discord_reply_channel_id
+                            .map(crate::config::Config::memory_file_path_for_discord_channel)
+                            .unwrap_or_else(crate::config::Config::memory_file_path);
                         append_to_file(&path, &lesson_line)
                     };
                     match result {
@@ -3544,11 +3769,17 @@ pub fn answer_with_ollama_and_fetch(
     .await
     {
         Ok((false, reason)) => {
+            let memory_snippet = search_memory_for_request(question, reason.as_deref(), discord_reply_channel_id);
             if retry_on_verification_no {
-                let retry_question = reason
+                let retry_base = reason
                     .as_deref()
                     .map(|r| format!("Verification said we didn't fully complete: {}. Complete the remaining steps now, then reply.", r.trim()))
                     .unwrap_or_else(|| "Verification said we didn't fully complete. Complete the remaining steps now, then reply.".to_string());
+                let retry_question = if let Some(ref from_memory) = memory_snippet {
+                    format!("From memory (possibly relevant):\n{}\n\n{}", from_memory, retry_base)
+                } else {
+                    retry_base
+                };
                 info!("Agent router: verification said not satisfied, retrying once with: {}...", retry_question.chars().take(60).collect::<String>());
                 let mut updated_history: Vec<crate::ollama::ChatMessage> = conversation_history.clone();
                 updated_history.push(crate::ollama::ChatMessage {
@@ -3562,7 +3793,7 @@ pub fn answer_with_ollama_and_fetch(
                     images: None,
                 });
                 return answer_with_ollama_and_fetch(
-                    &retry_question,
+                    retry_question.as_str(),
                     status_tx,
                     discord_reply_channel_id,
                     discord_user_id,
@@ -3576,6 +3807,7 @@ pub fn answer_with_ollama_and_fetch(
                     escalation,
                     false, // don't retry again
                     from_remote,
+                    None, // don't re-send attachment images on retry
                 )
                 .await;
             }
@@ -3584,6 +3816,10 @@ pub fn answer_with_ollama_and_fetch(
                 .map(|r| format!("\n\nNote: We may not have fully met your request: {}.", r.trim()))
                 .unwrap_or_else(|| "\n\nNote: We may not have fully met your request.".to_string());
             response_content.push_str(&disclaimer);
+            // Do not append "From past sessions" memory dump to the user-visible reply — it creates a messy mix and confuses Discord users.
+            if let Some(ref from_memory) = memory_snippet {
+                info!("Agent router: memory search found {} chars (not appended to reply)", from_memory.len());
+            }
             info!(
                 "Agent router: verification said not satisfied, appended disclaimer (reason: {}...)",
                 reason_preview

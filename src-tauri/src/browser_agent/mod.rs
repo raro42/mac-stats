@@ -21,6 +21,8 @@ use std::time::{Duration, Instant};
 
 use headless_chrome::Browser;
 use headless_chrome::protocol::cdp::Page::CaptureScreenshotFormatOption;
+use headless_chrome::LaunchOptions;
+use headless_chrome::types::Bounds;
 use regex::Regex;
 use serde::Deserialize;
 use std::path::PathBuf;
@@ -109,6 +111,14 @@ pub fn ensure_chrome_on_port(port: u16) {
     }
 }
 
+/// Viewport size (width, height) from config.json (browserViewportWidth, browserViewportHeight); defaults 1800x2400.
+fn viewport_width() -> u32 {
+    crate::config::Config::browser_viewport_width()
+}
+fn viewport_height() -> u32 {
+    crate::config::Config::browser_viewport_height()
+}
+
 /// Launch Chrome with --remote-debugging-port so mac-stats can connect. Chrome keeps running (process is detached).
 /// Returns Ok(()) if spawn succeeded; caller should wait 2–3s then try get_ws_url(port) / connect_cdp(port).
 #[cfg(target_os = "macos")]
@@ -116,6 +126,7 @@ fn launch_chrome_on_port(port: u16) -> Result<(), String> {
     let chrome_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
     Command::new(chrome_path)
         .arg(format!("--remote-debugging-port={}", port))
+        .arg(format!("--window-size={},{}", viewport_width(), viewport_height()))
         .arg("--no-first-run")
         .arg("--no-default-browser-check")
         .stdin(Stdio::null())
@@ -132,6 +143,7 @@ fn launch_chrome_on_port(port: u16) -> Result<(), String> {
     let chrome_path = "google-chrome";
     Command::new(chrome_path)
         .arg(format!("--remote-debugging-port={}", port))
+        .arg(format!("--window-size={},{}", viewport_width(), viewport_height()))
         .arg("--no-first-run")
         .arg("--no-default-browser-check")
         .stdin(Stdio::null())
@@ -145,7 +157,11 @@ fn launch_chrome_on_port(port: u16) -> Result<(), String> {
 
 /// Launch Chrome via headless_chrome crate (fallback when we cannot launch on a fixed port).
 fn launch_via_headless_chrome() -> Result<Browser, String> {
-    let b = Browser::default().map_err(|e| format!("Launch Chrome: {}", e))?;
+    let opts = LaunchOptions::default_builder()
+        .window_size(Some((viewport_width(), viewport_height())))
+        .build()
+        .map_err(|e| format!("Launch options: {}", e))?;
+    let b = Browser::new(opts).map_err(|e| format!("Launch Chrome: {}", e))?;
     for _ in 0..30 {
         std::thread::sleep(Duration::from_millis(200));
         let tabs = b.get_tabs().lock().map_err(|e| e.to_string())?;
@@ -560,6 +576,7 @@ fn normalize_url_for_screenshot(url: &str) -> String {
 const PORT: u16 = 9222;
 
 /// Get the current tab from BROWSER_SESSION. Fails if no browser or no tab.
+/// Ensures tab window bounds are at least VIEWPORT_WIDTH x VIEWPORT_HEIGHT (e.g. when connecting to existing Chrome).
 fn get_current_tab() -> Result<(Browser, Arc<headless_chrome::Tab>), String> {
     let browser = get_or_create_browser(PORT)?;
     let tabs = browser.get_tabs().lock().map_err(|e| e.to_string())?;
@@ -568,6 +585,15 @@ fn get_current_tab() -> Result<(Browser, Arc<headless_chrome::Tab>), String> {
         .cloned()
         .ok_or_else(|| "No tab in browser".to_string())?;
     drop(tabs);
+    let bounds = Bounds::Normal {
+        left: None,
+        top: None,
+        width: Some(viewport_width() as f64),
+        height: Some(viewport_height() as f64),
+    };
+    if let Err(e) = tab.set_bounds(bounds) {
+        warn!("Browser agent: set_bounds {}x{} failed: {} (continuing)", viewport_width(), viewport_height(), e);
+    }
     Ok((browser, tab))
 }
 

@@ -173,6 +173,7 @@ fn main() {
                         false, // escalation
                         true,  // retry_on_verification_no
                         true,  // from_remote: headless browser
+                        None,  // attachment_images_base64
                     )
                     .await
                     {

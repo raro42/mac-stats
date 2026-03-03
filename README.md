@@ -29,7 +29,7 @@ Or one-liner: `curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/ref
 ## At a glance
 
 - **Menu bar** — CPU, GPU, RAM, disk at a glance; click to open the details window.
-- **AI chat** — Ollama in the app or via Discord; FETCH_URL, BRAVE_SEARCH, RUN_CMD, code execution, MCP.
+- **AI chat** — Ollama in the app or via Discord; FETCH_URL, BRAVE_SEARCH, PERPLEXITY_SEARCH, RUN_CMD, code execution, MCP.
 - **Discord bot** — Optional; @mentions, DMs, having_fun mode (let your Mac chat with other bots when bored—yes, it gets weird); full Ollama + tools.
 - **Tasks & scheduler** — Task files under `~/.mac-stats/task/`; cron or one-shot; optional Discord reply.
 - **All local** — Models and data on your Mac; no cloud backend; works offline.
@@ -41,7 +41,7 @@ Or one-liner: `curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/ref
 
 - **AI** — Ollama on your Mac; models and inference stay on-device.
 - **Your data** — Config, memory, sessions, and tasks in `~/.mac-stats`. Nothing sent to a vendor. Secrets in `~/.mac-stats/.config.env` or Keychain.
-- **Optional network** — Discord, Mastodon, FETCH_URL, Brave Search, website checks only when you use them.
+- **Optional network** — Discord, Mastodon, FETCH_URL, Brave Search, Perplexity (web search), website checks only when you use them.
 - **Metrics** — Read from your machine when you open the window (temperature, frequency, process list).
 
 No subscription. No lock-in. Works offline for chat and monitoring. All you need is a nice pet from [Ollama](https://ollama.com)—the kind that runs on your Mac and never asks for a subscription.
@@ -54,8 +54,8 @@ All settings live under `~/.mac-stats/`:
 
 ```
 ~/.mac-stats/
-├── config.json            # Window decorations, scheduler interval, ollamaChatTimeoutSecs
-├── .config.env            # Secrets (Discord, Mastodon, API keys) — never commit ;-)
+├── config.json            # Window decorations, scheduler interval, ollamaChatTimeoutSecs, browserViewportWidth/Height
+├── .config.env            # Secrets (Discord, Mastodon, API keys, Perplexity) — never commit ;-)
 ├── discord_channels.json  # Per-channel modes (mention_only, all_messages, having_fun)
 ├── escalation_patterns.md # Phrases that trigger “try harder” (e.g. “think harder”, “you are stupid”); user-editable, auto-adds when you complain
 ├── schedules.json         # Cron and one-shot tasks
@@ -89,7 +89,7 @@ Binary name `mac_stats`; app shows as **mac-stats**. From repo root unless noted
 ## Features
 
 ### AI & agents (Ollama, local)
-- **Chat** — In the app window or via Discord. Code execution (JS), **FETCH_URL**, **BRAVE_SEARCH**, **RUN_CMD** (allowlisted), **MASTODON_POST** (toot from the agent), retry and correction.
+- **Chat** — In the app window or via Discord. Code execution (JS), **FETCH_URL**, **BRAVE_SEARCH**, **PERPLEXITY_SEARCH** (optional; API key in env, `.config.env`, or Keychain/Settings), **RUN_CMD** (allowlisted), **MASTODON_POST** (toot from the agent), retry and correction.
 - **Completion verification** — We extract 1–3 success criteria at the start and ask “Did we satisfy the request?” at the end; if not, we append a disclaimer. Heuristic: “screenshot requested but none attached” → note. See [docs/025_expectation_check_design_DONE.md](docs/025_expectation_check_design_DONE.md).
 - **Escalation / “try harder”** — Edit `escalation_patterns.md` (see config tree); one phrase per line. When your message matches one, we run a stronger pass (+10 tool steps). New phrases you use get auto-added.
 - **Memory** — Global and per-agent `memory.md`; **MEMORY_APPEND**; session compaction writes lessons to memory.

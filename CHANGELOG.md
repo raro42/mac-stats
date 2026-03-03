@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.27] - 2026-03-03
+
+### Added
+- **Browser viewport configurable** — `config.json` keys `browserViewportWidth` and `browserViewportHeight` (defaults 1800, 2400; clamped 800–3840 and 600–2160). Used for headless launch, visible Chrome `--window-size`, and tab `set_bounds` when connecting to existing Chrome.
+- **Discord status: edit criteria message** — Send "Extracting success criteria…" then when done edit that message to "Extracted success criteria: &lt;text&gt;" (EDIT: protocol) so the channel shows one updated message instead of two.
+- **Discord status: attach screenshot immediately** — In verbose mode, when a screenshot is taken we send it to the channel right away (ATTACH: protocol); final reply no longer re-attaches the same screenshots.
+- **Discord: image-only messages** — If the user sends only image attachment(s) and no text, we use a default prompt ("What do you see…") and pass images to Ollama vision.
+- **Discord: session reset by request** — When the user asks to clear or start a new session (phrases in `session_reset_phrases.md`), we clear that channel's conversation and start fresh. See docs/035.
+- **Memory search for requests** — Global and per-channel memory are searched for lines relevant to the question; up to 5 matching lines are injected into the prompt when useful.
+- **MEMORY_APPEND in Discord** — In Discord, plain `MEMORY_APPEND: &lt;lesson&gt;` now saves to that channel's memory file (`memory-discord-{id}.md`); non-Discord still uses global memory.
+
+### Changed
+- **Status messages: no trailing ellipsis** — "Clicking element N (label)" and "Taking screenshot of current page" no longer end with "…".
+- **Browser viewport size** — Default 1800×2400 for headless, visible launch, and when connecting to existing Chrome (set_bounds on first tab). Configurable via config.json (see above).
+- **README** — Perplexity (PERPLEXITY_SEARCH, optional network, config tree, Chat). Optimized: single Install section, deduplicated CPU/stats, Commands/Dev tightened. Menu bar copy tightened.
+
 ## [0.1.26] - 2026-02-27
 
 ### Changed

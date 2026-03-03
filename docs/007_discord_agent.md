@@ -33,6 +33,15 @@ mac-stats can run a Discord bot that connects via the **Gateway** and responds t
 
 When no channel or message overrides the model, the app uses a default. To get **faster replies** (e.g. for browser/screenshot flows), set **OLLAMA_FAST_MODEL** in env or `~/.mac-stats/.config.env` (e.g. `OLLAMA_FAST_MODEL=qwen2.5:1.5b` or `qwen2.5:latest`). The agent router will use that model for planning and tool runs. **OLLAMA_MODEL** still overrides the UI/default elsewhere when set.
 
+### Session reset and memory (clear context)
+
+To **start a fresh conversation** in a channel (clear prior context), say a phrase that means "clear session" or "new topic" — the bot clears the session for that channel and replies without old context. **Phrases are matched in any language** (substring, case-insensitive).
+
+**Configurable (like OpenClaw's resetTriggers, but in an MD file):** The list of phrases is loaded from **`~/.mac-stats/session_reset_phrases.md`** — one phrase per line; lines starting with `#` are comments. Edit this file to add or remove phrases. If the file is missing, the app writes a default at first run. No JSON; the MD file is easy to edit without breaking syntax. Default content includes examples in English, German, Spanish, French, Italian, Portuguese, and Dutch.
+
+
+See `docs/035_memory_and_topic_handling.md` for topic-aware compaction and when prior context is dropped automatically (e.g. new topic).
+
 ## Discord API (HTTP)
 
 When a request comes **from Discord**, the agent router adds a **DISCORD_API** tool so Ollama can call Discord’s REST API. This is only available in the Discord context (not in the scheduler or CPU-window chat).

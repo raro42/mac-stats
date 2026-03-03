@@ -43,6 +43,31 @@ fn topic_slug(content: &str, max_len: usize) -> String {
     }
 }
 
+/// Built-in fallback phrases when ~/.mac-stats/session_reset_phrases.md is missing or empty.
+const SESSION_RESET_PHRASES_FALLBACK: &[&str] = &[
+    "new session", "clear session", "reset", "new topic", "start over", "fresh start",
+    "neue sitzung", "sitzung löschen", "zurücksetzen",
+    "nueva sesión", "limpiar sesión", "reiniciar",
+    "nouvelle session", "effacer la session", "recommencer",
+];
+
+/// True if the user message asks to clear/reset the session (any language). Use before loading history.
+/// Phrases are loaded from ~/.mac-stats/session_reset_phrases.md (one per line; user-editable).
+/// If the file is missing or yields no phrases, a built-in list is used. Matching is case-insensitive substring.
+pub fn user_wants_session_reset(message: &str) -> bool {
+    let normalized = message.trim().to_lowercase();
+    if normalized.is_empty() {
+        return false;
+    }
+    let phrases = Config::load_session_reset_phrases();
+    let mut iter: Box<dyn Iterator<Item = &str>> = if phrases.is_empty() {
+        Box::new(SESSION_RESET_PHRASES_FALLBACK.iter().copied())
+    } else {
+        Box::new(phrases.iter().map(String::as_str))
+    };
+    iter.any(|phrase| normalized.contains(&phrase.to_lowercase()))
+}
+
 /// Add a message to the session and persist to disk when we have more than 3 messages.
 /// `source` e.g. "discord", `session_id` e.g. Discord channel id.
 pub fn add_message(source: &str, session_id: u64, role: &str, content: &str) {

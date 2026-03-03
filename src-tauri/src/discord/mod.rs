@@ -10,10 +10,12 @@
 
 pub mod api;
 
+use base64::Engine;
 use serenity::client::{Client, Context, EventHandler};
 use serenity::gateway::ShardManager;
 use serenity::model::gateway::GatewayIntents;
 use serenity::model::id::UserId;
+use serenity::builder::EditMessage;
 use serenity::model::channel::Message;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -94,6 +96,44 @@ fn sanitize_image_error_content(content: &str) -> String {
         }
     }
     "Image link returned 404 — could not load image.".to_string()
+}
+
+/// Default prompt when the user sends only image attachment(s) and no text.
+const DISCORD_IMAGE_ONLY_PROMPT: &str =
+    "What do you see in the attached image(s)? Describe the content.";
+
+fn is_image_attachment(att: &serenity::model::channel::Attachment) -> bool {
+    att.content_type
+        .as_deref()
+        .map_or(false, |c| c.starts_with("image/"))
+        || att.filename.to_lowercase().ends_with(".png")
+        || att.filename.to_lowercase().ends_with(".jpg")
+        || att.filename.to_lowercase().ends_with(".jpeg")
+        || att.filename.to_lowercase().ends_with(".gif")
+        || att.filename.to_lowercase().ends_with(".webp")
+}
+
+/// Download image attachments and return their base64-encoded bytes for Ollama vision.
+async fn download_discord_image_attachments(
+    attachments: &[serenity::model::channel::Attachment],
+) -> Vec<String> {
+    let mut out = Vec::new();
+    for att in attachments {
+        if !is_image_attachment(att) {
+            continue;
+        }
+        match att.download().await {
+            Ok(bytes) => out.push(base64::engine::general_purpose::STANDARD.encode(&bytes)),
+            Err(e) => {
+                tracing::warn!(
+                    "Discord: failed to download attachment {}: {}",
+                    att.filename,
+                    e
+                );
+            }
+        }
+    }
+    out
 }
 
 /// Discord API limit for message content (characters). Messages longer than this must be split.
@@ -1392,6 +1432,11 @@ impl EventHandler for Handler {
             let mention_tag = format!("<@{}>", bot_id);
             sanitize_image_error_content(raw.replace(&mention_tag, "").trim())
         };
+        let attachment_images_base64 = download_discord_image_attachments(&new_message.attachments).await;
+        let mut content = content;
+        if content.is_empty() && !attachment_images_base64.is_empty() {
+            content = DISCORD_IMAGE_ONLY_PROMPT.to_string();
+        }
         if content.is_empty() {
             debug!("Discord: Ignoring empty message");
             return;
@@ -1507,11 +1552,19 @@ impl EventHandler for Handler {
         };
         info!("Discord→Ollama: sending: {}", to_ollama);
 
-        // Load prior conversation (in-memory, or from latest session file after restart) before adding this turn
-        let mut prior = crate::session_memory::get_messages("discord", channel_id_u64);
-        if prior.is_empty() {
-            prior = crate::session_memory::load_messages_from_latest_session_file("discord", channel_id_u64);
-        }
+        // Load prior conversation (in-memory, or from latest session file after restart) before adding this turn.
+        // If the user asks to clear/new session (any language), clear session and start fresh (see docs/035).
+        let prior = if crate::session_memory::user_wants_session_reset(&content) {
+            crate::session_memory::clear_session("discord", channel_id_u64);
+            tracing::info!("Discord: user requested session reset (e.g. clear session / new session), starting fresh");
+            vec![]
+        } else {
+            let mut p = crate::session_memory::get_messages("discord", channel_id_u64);
+            if p.is_empty() {
+                p = crate::session_memory::load_messages_from_latest_session_file("discord", channel_id_u64);
+            }
+            p
+        };
         let conversation_history: Option<Vec<crate::ollama::ChatMessage>> = if prior.is_empty() {
             None
         } else {
@@ -1537,15 +1590,50 @@ impl EventHandler for Handler {
 
         // Channel for status updates. Only posted to Discord when verbose mode is on;
         // otherwise they are only logged internally to keep the channel clean for other bots.
-        let (status_tx, mut status_rx) = mpsc::unbounded_channel();
+        let (status_tx, mut status_rx) = mpsc::unbounded_channel::<String>();
         let ctx_send = ctx.clone();
         let channel_id = new_message.channel_id;
+        const EDIT_PREFIX: &str = "EDIT:";
+        const ATTACH_PREFIX: &str = "ATTACH:";
+        const CRITERIA_PROGRESS: &str = "Extracting success criteria…";
         let status_task = tokio::spawn(async move {
+            let mut last_criteria_message: Option<Message> = None;
             while let Some(msg) = status_rx.recv().await {
                 debug!("Discord status (verbose={}): {}", verbose, msg);
-                if verbose {
-                    if let Err(e) = channel_id.say(&ctx_send, &msg).await {
-                        debug!("Discord: status message failed: {}", e);
+                if !verbose {
+                    continue;
+                }
+                if let Some(path_str) = msg.strip_prefix(ATTACH_PREFIX) {
+                    let path = PathBuf::from(path_str.trim());
+                    if allowed_attachment_path(&path) {
+                        use serenity::builder::CreateAttachment;
+                        use serenity::builder::CreateMessage;
+                        if let Ok(att) = CreateAttachment::path(&path).await {
+                            let builder = CreateMessage::new()
+                                .content("Screenshot:")
+                                .add_files(vec![att]);
+                            if let Err(e) = channel_id.send_message(&ctx_send, builder).await {
+                                debug!("Discord: send screenshot now failed: {}", e);
+                            }
+                        }
+                    }
+                    continue;
+                }
+                if let Some(edit_content) = msg.strip_prefix(EDIT_PREFIX) {
+                    if let Some(mut m) = last_criteria_message.take() {
+                        if let Err(e) = m.edit(&ctx_send, EditMessage::new().content(edit_content)).await {
+                            debug!("Discord: edit status message failed: {}", e);
+                        }
+                    }
+                } else {
+                    match channel_id.say(&ctx_send, &msg).await {
+                        Ok(message) if msg == CRITERIA_PROGRESS => {
+                            last_criteria_message = Some(message);
+                        }
+                        Err(e) => {
+                            debug!("Discord: status message failed: {}", e);
+                        }
+                        _ => {}
                     }
                 }
             }
@@ -1567,6 +1655,19 @@ impl EventHandler for Handler {
             }
         });
 
+        let attachment_images_for_ollama = if attachment_images_base64.is_empty() {
+            None
+        } else {
+            Some(attachment_images_base64)
+        };
+        if let Some(ref imgs) = attachment_images_for_ollama {
+            info!(
+                "Discord: sending {} image attachment(s) to Ollama (user_id={}, channel_id={})",
+                imgs.len(),
+                author_id_u64,
+                channel_id_u64
+            );
+        }
         let (reply_text, attachment_paths) = match crate::commands::ollama::answer_with_ollama_and_fetch(
             &question,
             Some(status_tx),
@@ -1582,6 +1683,7 @@ impl EventHandler for Handler {
             escalation,
             true, // retry once when verification says NO
             true, // from_remote: use headless browser unless user asks to see it
+            attachment_images_for_ollama,
         ).await {
             Ok(r) => (r.text, r.attachment_paths),
             Err(e) => {
@@ -1631,12 +1733,17 @@ impl EventHandler for Handler {
             }
         }
 
-        // Send attachment(s) if any (e.g. BROWSER_SCREENSHOT); only paths under ~/.mac-stats/screenshots/
-        let allowed: Vec<_> = attachment_paths
-            .iter()
-            .filter(|p| allowed_attachment_path(p))
-            .cloned()
-            .collect();
+        // Send attachment(s) if any (e.g. BROWSER_SCREENSHOT); only paths under ~/.mac-stats/screenshots/.
+        // In verbose mode we already sent each screenshot via ATTACH when taken, so skip to avoid duplicates.
+        let allowed: Vec<_> = if verbose {
+            Vec::new()
+        } else {
+            attachment_paths
+                .iter()
+                .filter(|p| allowed_attachment_path(p))
+                .cloned()
+                .collect()
+        };
         if !allowed.is_empty() {
             use serenity::builder::CreateAttachment;
             use serenity::builder::CreateMessage;

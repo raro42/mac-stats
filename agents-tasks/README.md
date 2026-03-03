@@ -26,10 +26,10 @@ See `scan-log.md` for per-run details (scan time, tasks created, notes).
 
 | Id       | Topic                        | Summary |
 |----------|------------------------------|---------|
-| task-001 | Ollama timeout / compaction  | Retries, user message, compaction on failure. |
-| task-002 | URL validation FETCH_URL     | Validate/sanitize URLs; IDN handling. |
-| task-004 | Scheduler log churn          | Reduce "loaded N entries" log and disk reads. |
-| task-005 | Session compaction log       | Clarify "401" (annotations) vs HTTP 401. |
+| task-001 | Ollama timeout / compaction  | done — Retries, user message, compaction retry once. |
+| task-002 | URL validation FETCH_URL     | done — extract_first_url, validate_fetch_url, IDN message. |
+| task-004 | Scheduler log churn          | done — "loaded N entries" at DEBUG. |
+| task-005 | Session compaction log       | done — "keeping full history (N messages)". |
 
 ## Task format
 
