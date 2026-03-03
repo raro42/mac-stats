@@ -480,6 +480,61 @@ impl Config {
         let _ = std::fs::write(path, content);
     }
 
+    /// First-line key for a paragraph (trimmed, up to 80 chars). Used to detect same section.
+    fn paragraph_key(block: &str) -> String {
+        block
+            .trim()
+            .lines()
+            .next()
+            .map(|l| l.trim())
+            .unwrap_or("")
+            .chars()
+            .take(80)
+            .collect()
+    }
+
+    /// Merge default content into existing: append any default paragraph whose first-line key
+    /// is not present in existing. Preserves user content; adds new sections from defaults.
+    /// See docs/024_mac_stats_merge_defaults.md.
+    fn merge_prompt_content(existing: &str, default: &str) -> String {
+        let existing_trim = existing.trim();
+        let default_trim = default.trim();
+        if existing_trim.is_empty() {
+            return default_trim.to_string();
+        }
+        let existing_blocks: Vec<&str> = existing_trim.split("\n\n").map(str::trim).filter(|s| !s.is_empty()).collect();
+        let existing_keys: std::collections::HashSet<String> = existing_blocks.iter().map(|b| Self::paragraph_key(b)).collect();
+        let default_blocks: Vec<&str> = default_trim.split("\n\n").map(str::trim).filter(|s| !s.is_empty()).collect();
+        let mut out = existing_trim.to_string();
+        for block in default_blocks {
+            let key = Self::paragraph_key(block);
+            if !existing_keys.contains(&key) {
+                out.push_str("\n\n");
+                out.push_str(block);
+            }
+        }
+        out
+    }
+
+    /// Ensure prompt file exists: if missing write default; if present merge in any new default paragraphs and write back if changed.
+    fn merge_default_prompt_if_exists(path: &std::path::Path, default: &str) {
+        if let Some(parent) = path.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        if !path.exists() {
+            let _ = std::fs::write(path, default);
+            return;
+        }
+        let existing = match std::fs::read_to_string(path) {
+            Ok(s) => s,
+            Err(_) => return,
+        };
+        let merged = Self::merge_prompt_content(&existing, default);
+        if merged != existing.trim() {
+            let _ = std::fs::write(path, merged);
+        }
+    }
+
     /// Write content to path (overwrite). Used to sync skill.md and testing.md from bundled defaults into ~/.mac-stats/agents/.
     fn write_agent_file(path: &std::path::Path, content: &str) {
         if let Some(parent) = path.parent() {
@@ -503,9 +558,9 @@ impl Config {
         // Shared soul (personality/tone for all agents when no per-agent soul.md). Read by load_soul_content().
         Self::write_default_if_missing(&agents.join("soul.md"), Self::DEFAULT_SOUL);
 
-        // Prompts
-        Self::write_default_if_missing(&prompts.join("planning_prompt.md"), Self::DEFAULT_PLANNING_PROMPT);
-        Self::write_default_if_missing(&prompts.join("execution_prompt.md"), Self::DEFAULT_EXECUTION_PROMPT);
+        // Prompts: merge defaults into existing so new sections (e.g. Search → screenshot → Discord) are added without overwriting user edits.
+        Self::merge_default_prompt_if_exists(&prompts.join("planning_prompt.md"), Self::DEFAULT_PLANNING_PROMPT);
+        Self::merge_default_prompt_if_exists(&prompts.join("execution_prompt.md"), Self::DEFAULT_EXECUTION_PROMPT);
 
         // Discord channel config
         Self::write_default_if_missing(&Self::discord_channels_path(), Self::DEFAULT_DISCORD_CHANNELS);

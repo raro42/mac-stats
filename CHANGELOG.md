@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Prompt merge on startup** — `planning_prompt.md` and `execution_prompt.md` under `~/.mac-stats/prompts/` are now merged with bundled defaults when they already exist: new paragraphs from defaults (identified by first-line key) are appended so new sections (e.g. "Search → screenshot → Discord") propagate without overwriting user edits. See `docs/024_mac_stats_merge_defaults.md`.
+
 ## [0.1.27] - 2026-03-03
 
 ### Added
