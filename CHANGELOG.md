@@ -7,8 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.28] - 2026-03-04
+
 ### Added
 - **Prompt merge on startup** — `planning_prompt.md` and `execution_prompt.md` under `~/.mac-stats/prompts/` are now merged with bundled defaults when they already exist: new paragraphs from defaults (identified by first-line key) are appended so new sections (e.g. "Search → screenshot → Discord") propagate without overwriting user edits. See `docs/024_mac_stats_merge_defaults.md`.
+- **Discord guild/channel metadata for discord-expert** — When routing to the discord-expert agent from Discord, the app fetches current guild and channel info via the Discord API and injects it into the prompt (channel_id, guild_id, guild name, channel list) so the agent can use correct IDs in DISCORD_API calls without an extra round-trip. New `fetch_guild_channel_metadata()` in `discord/api.rs`.
+- **PERPLEXITY + auto-screenshot flow** — If the user asks for screenshots (e.g. "screenshot", "visit", "send me in Discord"), after a Perplexity search the app auto-visits the first 5 result URLs, takes a screenshot of each, attaches them in Discord (ATTACH protocol), and tells the model they were attached. Perplexity max_results increased to 15 for search.
+- **Search query truncation for chained tools** — When the plan puts multiple tools on one line (e.g. `PERPLEXITY_SEARCH: spanish newspapers then BROWSER_NAVIGATE...`), only the search query is passed to PERPLEXITY_SEARCH and BRAVE_SEARCH via `truncate_search_query_arg()` so the query is not truncated incorrectly.
+
+### Changed
+- **Session compaction uses actual user question** — Periodic session compaction now uses the last user message in the session as the "question" for the compaction call instead of a generic "Periodic session compaction." string, improving summary relevance.
+- **New-topic session handling** — When the new-topic check returns true, we set `is_new_topic` and clear prior context; on compaction skip we also replace the session with system + current user message so the next turn starts clean. Compaction "not needed" and new-topic both clear history consistently.
+- **Discord API context text** — Agent context for Discord tasks now describes guild/channel data endpoints (GET /users/@me/guilds, GET /guilds/{id}/channels) and prefers AGENT: discord-expert for fetching guild/channel data autonomously.
+- **Docs** — Agent task flow (020), Discord log review (027), browser loop/status plan (032), discord-expert skill (agent-004), planning prompt wording.
 
 ## [0.1.27] - 2026-03-03
 

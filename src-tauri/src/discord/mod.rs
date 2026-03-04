@@ -1351,6 +1351,22 @@ fn parse_discord_ollama_overrides(
     (question, model_override, options_override, skill_content, agent_selector, verbose)
 }
 
+/// True if the message clearly requests tools (search, browser, screenshot, send here) that only the full agent router can fulfill.
+/// In having_fun channels we use this to route such messages to answer_with_ollama_and_fetch instead of casual chat.
+fn message_wants_agent_tools(content: &str) -> bool {
+    let lower = content.trim().to_lowercase();
+    if lower.len() < 10 {
+        return false;
+    }
+    let has_search = lower.contains("perplexity") || lower.contains("brave search") || lower.contains("search the web") || lower.contains("search for ");
+    let has_browser = lower.contains("browser") || lower.contains("visit ") || lower.contains(" open ") || lower.contains("url") || lower.contains("extract the url");
+    let has_screenshot = lower.contains("screenshot") || lower.contains("take a screen") || lower.contains("capture");
+    let has_send_here = lower.contains("send me") || lower.contains("send the") || lower.contains("here in discord") || lower.contains("in discord");
+    (has_search || has_browser) && (has_screenshot || has_send_here)
+        || (has_screenshot && has_send_here)
+        || (lower.contains("perplexity") && lower.contains("url") && (lower.contains("visit") || lower.contains("screenshot")))
+}
+
 /// True if the message indicates the user is not satisfied and wants the task actually completed.
 /// Patterns are loaded from ~/.mac-stats/escalation_patterns.md (one phrase per line; user-editable).
 fn is_escalation_message(question: &str) -> bool {
@@ -1450,26 +1466,34 @@ impl EventHandler for Handler {
             return;
         }
 
-        // having_fun channels: buffer the message and let the background loop respond
+        // having_fun channels: buffer the message and let the background loop respond — unless the user clearly wants tools (search, browser, screenshot, send here), then use full agent router.
         if mode == ChannelMode::HavingFun {
-            let author_name = new_message
-                .author
-                .global_name
-                .as_deref()
-                .unwrap_or(&new_message.author.name)
-                .to_string();
-            info!(
-                "Discord: having_fun buffered from {} (bot={}) in channel {}: {}",
-                author_name,
-                is_bot,
-                chan_id,
-                crate::logging::ellipse(&content, 100)
-            );
-            crate::session_memory::add_message("discord", chan_id, "user",
-                &format!("{}: {}", author_name, content));
-            let answer_asap = mentions_bot || !is_bot;
-            buffer_having_fun_message(chan_id, author_name, content, is_bot, answer_asap);
-            return;
+            let from_human_or_mention = !is_bot || mentions_bot;
+            if from_human_or_mention && message_wants_agent_tools(&content) {
+                info!(
+                    "Discord: having_fun channel but message requests tools (perplexity/browser/screenshot/send) — using full agent router"
+                );
+                // Fall through to full flow (answer_with_ollama_and_fetch) below; do not buffer.
+            } else {
+                let author_name = new_message
+                    .author
+                    .global_name
+                    .as_deref()
+                    .unwrap_or(&new_message.author.name)
+                    .to_string();
+                info!(
+                    "Discord: having_fun buffered from {} (bot={}) in channel {}: {}",
+                    author_name,
+                    is_bot,
+                    chan_id,
+                    crate::logging::ellipse(&content, 100)
+                );
+                crate::session_memory::add_message("discord", chan_id, "user",
+                    &format!("{}: {}", author_name, content));
+                let answer_asap = mentions_bot || !is_bot;
+                buffer_having_fun_message(chan_id, author_name, content, is_bot, answer_asap);
+                return;
+            }
         }
 
         let (mut question, mut model_override, options_override, skill_content, agent_selector, verbose_opt) =
@@ -1734,17 +1758,27 @@ impl EventHandler for Handler {
         }
 
         // Send attachment(s) if any (e.g. BROWSER_SCREENSHOT); only paths under ~/.mac-stats/screenshots/.
-        // In verbose mode we already sent each screenshot via ATTACH when taken, so skip to avoid duplicates.
-        let allowed: Vec<_> = if verbose {
-            Vec::new()
-        } else {
-            attachment_paths
-                .iter()
-                .filter(|p| allowed_attachment_path(p))
-                .cloned()
-                .collect()
-        };
+        // Always send the batch so screenshots reliably reach Discord (verbose per-ATTACH can be unreliable).
+        let allowed: Vec<_> = attachment_paths
+            .iter()
+            .filter(|p| allowed_attachment_path(p))
+            .cloned()
+            .collect();
+        if allowed.len() != attachment_paths.len() && !attachment_paths.is_empty() {
+            info!(
+                "Discord: {} of {} attachment(s) under screenshots dir (rest skipped)",
+                allowed.len(),
+                attachment_paths.len()
+            );
+        }
+        if !attachment_paths.is_empty() && allowed.is_empty() {
+            info!(
+                "Discord: had {} attachment path(s) but none allowed (must be under ~/.mac-stats/screenshots/)",
+                attachment_paths.len()
+            );
+        }
         if !allowed.is_empty() {
+            info!("Discord: sending {} screenshot(s) to channel {}", allowed.len(), channel_id_u64);
             use serenity::builder::CreateAttachment;
             use serenity::builder::CreateMessage;
             let mut attachments = Vec::with_capacity(allowed.len());
@@ -1752,7 +1786,7 @@ impl EventHandler for Handler {
                 match CreateAttachment::path(path).await {
                     Ok(att) => attachments.push(att),
                     Err(e) => {
-                        debug!("Discord: skip attachment {}: {}", path.display(), e);
+                        error!("Discord: failed to read attachment {}: {}", path.display(), e);
                     }
                 }
             }
@@ -1761,10 +1795,12 @@ impl EventHandler for Handler {
                     .content("Screenshot(s) as requested:")
                     .add_files(attachments);
                 if let Err(e) = new_message.channel_id.send_message(&ctx, builder).await {
-                    error!("Discord: Failed to send attachment(s): {}", e);
+                    error!("Discord: Failed to send attachment(s) to channel {}: {}", channel_id_u64, e);
                 } else {
                     info!("Discord: sent {} attachment(s) to channel {}", allowed.len(), channel_id_u64);
                 }
+            } else {
+                error!("Discord: all {} path(s) failed CreateAttachment::path", allowed.len());
             }
         }
 

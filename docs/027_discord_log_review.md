@@ -55,3 +55,35 @@ Without cleaning, the URL would be `https://github.com/foo/bar.` (trailing dot),
   - The text reply to the user, then a follow-up message with the screenshot **attached** (if the bot has permission and the path is under `~/.mac-stats/screenshots/`).
 
 Restart mac-stats after code changes so the new behaviour is loaded.
+
+## PERPLEXITY_SEARCH (search → visit URLs → screenshot)
+
+When the user asks to search the web (e.g. Perplexity) and to visit URLs or get screenshots "here" or "in Discord", the planner recommends **PERPLEXITY_SEARCH: &lt;query&gt;**. The app then:
+
+1. **Truncates the search query** so the API gets only the query (e.g. "spanish newspaper websites"), not the rest of the plan (e.g. "then BROWSER_NAVIGATE: ..."). Truncation uses separators: ` then `, ` and then `, ` → `, `BROWSER_NAVIGATE:`, `BROWSER_SCREENSHOT:`, etc., and a 150-character cap.
+2. **Runs Perplexity search** and gets results with URLs.
+3. **If the question asked for screenshots** (e.g. "screenshot", "visit", "send me … in Discord"), the app **auto-visits** the first 5 result URLs and **takes a screenshot** of each, then attaches them in Discord.
+
+### What to search for in the log
+
+| Search term | Meaning |
+|-------------|---------|
+| `PERPLEXITY_SEARCH requested:` | Query sent to Perplexity (after truncation) |
+| `Agent router: running tool … PERPLEXITY_SEARCH` | Tool and arg (arg is truncated in parser) |
+| `Agent router: auto-visit and screenshot for N URLs` | User asked for screenshots; visiting first N result URLs |
+| `Agent router: auto-screenshot N saved to` | Screenshot PNG path for the N-th visited page |
+| `Discord: sent N attachment(s)` | Screenshot(s) posted to the channel |
+
+If the model recommended a long line (e.g. `PERPLEXITY_SEARCH: spanish newspapers then BROWSER_NAVIGATE: https://...`), the log will show the truncated query only (e.g. `PERPLEXITY_SEARCH requested: spanish newspapers`).
+
+### Log review
+
+When debugging a Perplexity search + screenshot run, search the log for the terms in the table above in order: confirm `PERPLEXITY_SEARCH requested:` shows the truncated query, then `Agent router: auto-visit and screenshot for N URLs` if the user asked for screenshots (e.g. "send me screenshots in Discord"), then each `Agent router: auto-screenshot N saved to`, and finally `Discord: sent N attachment(s)`.
+
+---
+
+## Feedback
+
+**TASK_APPEND:** Auto-visit + screenshot workflow for Perplexity search results: implemented in `commands/ollama.rs` (query truncation, `want_screenshots` detection including "send me", "in discord", "send the", " here "; first 5 result URLs visited via browser_agent, screenshots saved and attached in Discord). Log review section added above. `want_screenshots` broadened so "send me the screenshots in Discord" triggers the workflow without requiring "visit" or "url" in the question.
+
+**TASK_STATUS:** finished

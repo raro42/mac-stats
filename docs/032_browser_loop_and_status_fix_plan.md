@@ -79,7 +79,8 @@
 
 1. **Phase 1 (quick)**: Add `get_last_element_label` + cache and use it in status ("Clicking element 7 (Accept all)…"). Improves observability immediately.
 2. **Phase 2**: Add browser-tool counter and hard cap (e.g. 15) per run; when exceeded, stop browser tools and prompt model to reply or DONE. Log "browser tool #N" for each browser tool.
-3. **Phase 3 (optional)**: Repetition detection; DONE reminder in prompts; headless default for Discord/scheduler.
+3. **Phase 3**: Error short-circuiting. If a `BROWSER_*` tool returns an error (e.g., `net::ERR_NAME_NOT_RESOLVED` for `BROWSER_NAVIGATE`), abort the remaining tools in that turn. This prevents the agent from continuing its batched plan (like taking a `BROWSER_SCREENSHOT` of a blank/error page).
+4. **Phase 4 (optional)**: Repetition detection; DONE reminder in prompts; headless default for Discord/scheduler.
 
 ### Files (Phase 2)
 
@@ -113,3 +114,4 @@ Use that to confirm loop pattern and tune the cap or repetition logic.
 
 - **Phase 1 (element label):** Done. `browser_agent` has `LAST_ELEMENT_LABELS` cache, `set_last_element_labels()`, `get_last_element_label(index)`. CDP and HTTP fallback set the cache after navigate/click/input. In `ollama.rs`, BROWSER_CLICK and BROWSER_INPUT status messages show the label when available (e.g. "🖱️ Clicking element 7 (Accept all)…", "✍️ Typing into element 4 (Search box)…").
 - **Phase 2 (browser tool cap):** Done. In `ollama.rs` tool loop: `browser_tool_count` and `MAX_BROWSER_TOOLS_PER_RUN` (15). Before running any BROWSER_* tool we check the cap; if exceeded we push "Maximum browser actions per run reached (15). Reply with your answer or DONE: success / DONE: no." and skip that tool. Log line: "Agent router: browser tool #N/15 this run".
+- **Phase 3 (Error short-circuiting):** Done. Added logic in `ollama.rs` after tool execution to detect if a `BROWSER_` tool (or `BROWSER_SCREENSHOT`) returned an error. If an error is detected, the batched tool execution loop is aborted via `break`, preventing subsequent batched tools (like `BROWSER_SCREENSHOT` immediately after a failed `BROWSER_NAVIGATE`) from incorrectly executing on an invalid state.

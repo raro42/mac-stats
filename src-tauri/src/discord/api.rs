@@ -118,3 +118,88 @@ pub async fn discord_api_request(
         Ok(body_text)
     }
 }
+
+/// Fetch guild and channel metadata for the given channel via the Discord API.
+/// Used when invoking the discord-expert agent from a Discord context so it has
+/// current channel, guild, and channel list without an extra round-trip.
+///
+/// Returns a concise text summary (channel_id, channel name/type, guild_id, guild name,
+/// and channels in the guild) or an error string. DM channels only get channel info (no guild).
+pub async fn fetch_guild_channel_metadata(channel_id: u64) -> Result<String, String> {
+    let channel_path = format!("/channels/{}", channel_id);
+    let channel_body = discord_api_request("GET", &channel_path, None).await?;
+    let channel_json: serde_json::Value =
+        serde_json::from_str(&channel_body).map_err(|e| format!("Parse channel JSON: {}", e))?;
+
+    let ch_id = channel_json.get("id").and_then(|v| v.as_str()).unwrap_or("?");
+    let ch_name = channel_json.get("name").and_then(|v| v.as_str()).unwrap_or("(no name)");
+    let ch_type = channel_json
+        .get("type")
+        .and_then(|v| v.as_u64())
+        .unwrap_or(0);
+    let channel_type_name = match ch_type {
+        0 => "text",
+        2 => "voice",
+        4 => "category",
+        5 => "announcement",
+        13 => "stage",
+        15 => "forum",
+        _ => "other",
+    };
+
+    let mut lines = vec![
+        format!("channel_id: {}", ch_id),
+        format!("channel: #{} (type: {})", ch_name, channel_type_name),
+    ];
+
+    let guild_id = channel_json.get("guild_id").and_then(|v| v.as_str());
+    if let Some(gid) = guild_id {
+        lines.push(format!("guild_id: {}", gid));
+
+        if let Ok(guild_body) = discord_api_request("GET", &format!("/guilds/{}", gid), None).await {
+            if let Ok(guild_json) = serde_json::from_str::<serde_json::Value>(&guild_body) {
+                let guild_name = guild_json
+                    .get("name")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("(no name)");
+                lines.push(format!("guild: {}", guild_name));
+            }
+        }
+
+        if let Ok(channels_body) =
+            discord_api_request("GET", &format!("/guilds/{}/channels", gid), None).await
+        {
+            if let Ok(channels_arr) = serde_json::from_str::<Vec<serde_json::Value>>(&channels_body)
+            {
+                let mut channel_entries: Vec<String> = channels_arr
+                    .iter()
+                    .map(|c| {
+                        let id = c.get("id").and_then(|v| v.as_str()).unwrap_or("?");
+                        let name = c.get("name").and_then(|v| v.as_str()).unwrap_or("(no name)");
+                        let ty = c
+                            .get("type")
+                            .and_then(|v| v.as_u64())
+                            .unwrap_or(0);
+                        let ty_name = match ty {
+                            0 => "text",
+                            2 => "voice",
+                            4 => "category",
+                            5 => "announcement",
+                            13 => "stage",
+                            15 => "forum",
+                            _ => "other",
+                        };
+                        format!("  {} #{} ({})", id, name, ty_name)
+                    })
+                    .collect();
+                channel_entries.sort();
+                lines.push("channels in this guild:".to_string());
+                lines.push(channel_entries.join("\n"));
+            }
+        }
+    } else {
+        lines.push("(DM channel — no guild)".to_string());
+    }
+
+    Ok(lines.join("\n"))
+}

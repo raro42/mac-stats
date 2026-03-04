@@ -788,9 +788,9 @@ fn build_agent_agent_description(num: u32, agents: &[crate::agents::Agent]) -> S
 
 /// Discord API endpoint list (injected when request is from Discord). Condensed for agent context.
 const DISCORD_API_ENDPOINTS_CONTEXT: &str = r#"
-IMPORTANT: For Discord tasks, prefer **AGENT: discord-expert** — it makes multiple API calls autonomously and knows all endpoints.
+IMPORTANT: For Discord tasks, prefer **AGENT: discord-expert** — it fetches guild and channel data via the API and can make multiple calls autonomously.
 If calling directly: use DISCORD_API: GET <path> (NOT FETCH_URL — FETCH_URL has no Discord token and will get 401).
-Key endpoints: GET /users/@me/guilds, GET /guilds/{guild_id}/members/search?query=name, GET /guilds/{guild_id}/channels, POST /channels/{channel_id}/messages {"content":"..."}"#;
+Guild/channel data: GET /users/@me/guilds (bot's servers), GET /guilds/{guild_id}/channels (channels in a server). Also: GET /guilds/{guild_id}/members/search?query=name, POST /channels/{channel_id}/messages {"content":"..."}"#;
 
 /// Build agent descriptions string: base, optional SKILL (when skills exist), optional RUN_CMD, then MCP when configured.
 /// When from_discord is true and Discord is configured, appends DISCORD_API agent and endpoint list.
@@ -1302,13 +1302,21 @@ pub async fn run_periodic_session_compaction() {
             entry.last_activity
         );
         // task-001: retry once on failure
-        let compact_result = compact_conversation_history(&messages, "Periodic session compaction.").await;
+        let mut actual_question = "Periodic session compaction.".to_string();
+        for msg in messages.iter().rev() {
+            if msg.role == "user" {
+                actual_question = msg.content.clone();
+                break;
+            }
+        }
+        
+        let compact_result = compact_conversation_history(&messages, &actual_question).await;
         let compact_result = match compact_result {
             Ok(ok) => Ok(ok),
             Err(e) => {
                 tracing::warn!("Periodic session compaction failed for {} {}: {}, retrying once in 3s", entry.source, entry.session_id, e);
                 tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-                compact_conversation_history(&messages, "Periodic session compaction (retry).").await
+                compact_conversation_history(&messages, &actual_question).await
             }
         };
         match compact_result {
@@ -1962,6 +1970,7 @@ pub fn answer_with_ollama_and_fetch(
     };
     send_status(&format!("EDIT:Extracted success criteria: {}", criteria_status));
 
+    let mut is_new_topic = false;
     // 6.A New-topic check: one short LLM call when we have history and use a local model.
     // Skip when using a cloud model to minimize cost (only when cloud do we care about extra calls).
     if !crate::ollama::models::is_cloud_model(&effective_model) {
@@ -1973,7 +1982,7 @@ pub fn answer_with_ollama_and_fetch(
                 match detect_new_topic(question, &summary, &effective_model).await {
                     Ok(true) => {
                         info!("Agent router: new-topic check returned NEW_TOPIC, using no prior context");
-                        conversation_history = None;
+                        is_new_topic = true;
                     }
                     Ok(false) => {}
                     Err(e) => {
@@ -2020,10 +2029,11 @@ pub fn answer_with_ollama_and_fetch(
                 if let Some(channel_id) = discord_reply_channel_id {
                     let compacted = vec![
                         ("system".to_string(), context.clone()),
+                        ("user".to_string(), question.to_string()),
                     ];
                     crate::session_memory::replace_session("discord", channel_id, compacted);
                 }
-                if not_needed {
+                if is_new_topic || not_needed {
                     info!(
                         "Session compaction: prior context not relevant to current question (new topic), using no prior context"
                     );
@@ -2056,6 +2066,8 @@ pub fn answer_with_ollama_and_fetch(
                     .collect()
             }
         }
+    } else if is_new_topic {
+        vec![]
     } else {
         raw_history
             .into_iter()
@@ -2386,6 +2398,12 @@ pub fn answer_with_ollama_and_fetch(
                 break;
             }
             tool_count += 1;
+            // When the plan puts the whole chain in one line (e.g. PERPLEXITY_SEARCH: spanish newspapers then BROWSER_NAVIGATE...), pass only the search query to PERPLEXITY/BRAVE.
+            let arg = if tool == "PERPLEXITY_SEARCH" || tool == "BRAVE_SEARCH" {
+                truncate_search_query_arg(&arg)
+            } else {
+                arg
+            };
             let arg_preview: String = arg.chars().take(80).collect();
             if arg.chars().count() > 80 {
                 info!("Agent router: running tool {}/{} — {} (arg: {}...)", tool_count, max_tool_iterations, tool, arg_preview);
@@ -2706,25 +2724,71 @@ pub fn answer_with_ollama_and_fetch(
                 info!("Discord/Ollama: PERPLEXITY_SEARCH requested: {}", arg);
                 match crate::commands::perplexity::perplexity_search(crate::commands::perplexity::PerplexitySearchRequest {
                     query: arg.to_string(),
-                    max_results: Some(10),
+                    max_results: Some(15),
                 })
                 .await
                 {
                     Ok(resp) => {
+                        let q_lower = question.to_lowercase();
+                        let want_screenshots = (q_lower.contains("screenshot") || q_lower.contains("screen shot"))
+                            && (q_lower.contains("visit") || q_lower.contains("url") || q_lower.contains(" 5 ") || q_lower.contains(" 3 ")
+                                || q_lower.contains("send me") || q_lower.contains("send the") || q_lower.contains("in discord") || q_lower.contains(" here "));
+                        let urls: Vec<String> = resp
+                            .results
+                            .iter()
+                            .filter(|r| r.url.starts_with("http://") || r.url.starts_with("https://"))
+                            .map(|r| r.url.clone())
+                            .take(5)
+                            .collect();
                         let results: String = resp
                             .results
                             .into_iter()
                             .map(|r| format!("- {}: {} ({})", r.title, r.snippet, r.url))
                             .collect::<Vec<_>>()
                             .join("\n\n");
-                        if results.is_empty() {
+                        let mut result_text = if results.is_empty() {
                             "Perplexity search returned no results. Answer from general knowledge.".to_string()
                         } else {
                             format!(
                                 "Perplexity Search results:\n\n{}\n\nUse these to answer the user's question.",
                                 results
                             )
+                        };
+                        if want_screenshots && !urls.is_empty() {
+                            info!("Agent router: auto-visit and screenshot for {} URLs (user asked for screenshots)", urls.len());
+                            for (i, url) in urls.iter().enumerate() {
+                                send_status(&format!("🧭 Visiting {} of {}…", i + 1, urls.len()));
+                                let nav_result = tokio::task::spawn_blocking({
+                                    let u = url.clone();
+                                    move || crate::browser_agent::navigate_and_get_state(&u)
+                                })
+                                .await;
+                                match nav_result {
+                                    Ok(Ok(_)) => {
+                                        send_status(&format!("📸 Taking screenshot {} of {}…", i + 1, urls.len()));
+                                        let shot_result = tokio::task::spawn_blocking(crate::browser_agent::take_screenshot_current_page).await;
+                                        if let Ok(Ok(path)) = shot_result {
+                                            attachment_paths.push(path.clone());
+                                            if let Some(ref tx) = status_tx {
+                                                let _ = tx.send(format!("ATTACH:{}", path.display()));
+                                            }
+                                            info!("Agent router: auto-screenshot {} saved to {:?}", i + 1, path);
+                                        }
+                                    }
+                                    Ok(Err(e)) => {
+                                        info!("Agent router: auto-navigate {} failed: {}", url, crate::logging::ellipse(&e, 80));
+                                    }
+                                    Err(e) => {
+                                        info!("Agent router: auto-navigate task error: {}", e);
+                                    }
+                                }
+                            }
+                            result_text.push_str(&format!(
+                                "\n\nI navigated to and took screenshots of {} page(s). The app will attach them in Discord.",
+                                urls.len()
+                            ));
                         }
+                        result_text
                     }
                     Err(e) => format!("Perplexity search failed: {}. Answer without search results.", e),
                 }
@@ -2832,11 +2896,31 @@ pub fn answer_with_ollama_and_fetch(
                 let agents = crate::agents::load_agents();
                 match crate::agents::find_agent_by_id_or_name(&agents, selector) {
                     Some(agent) => {
-                        let user_msg = if task_message.is_empty() {
-                            question
+                        let mut user_msg: String = if task_message.is_empty() {
+                            question.to_string()
                         } else {
-                            task_message
+                            task_message.to_string()
                         };
+                        // When invoking discord-expert from Discord, fetch guild/channel metadata via API and inject so the agent has current context.
+                        let is_discord_expert = agent.slug.as_deref().map_or(false, |s| s.eq_ignore_ascii_case("discord-expert"))
+                            || agent.id == "004";
+                        if is_discord_expert {
+                            if let Some(channel_id) = discord_reply_channel_id {
+                                send_status("Fetching Discord guild/channel context…");
+                                match crate::discord::api::fetch_guild_channel_metadata(channel_id).await {
+                                    Ok(meta) => {
+                                        user_msg = format!(
+                                            "Current Discord context (use these IDs in DISCORD_API calls):\n{}\n\nUser request: {}",
+                                            meta, user_msg
+                                        );
+                                        info!("Agent router: injected Discord guild/channel metadata for discord-expert (channel {})", channel_id);
+                                    }
+                                    Err(e) => {
+                                        tracing::debug!("Agent router: Discord metadata fetch failed (channel {}): {}", channel_id, e);
+                                    }
+                                }
+                            }
+                        }
                         const STATUS_MSG_MAX: usize = 120;
                         let preview: String = user_msg.chars().take(STATUS_MSG_MAX).collect();
                         let status_text = if user_msg.chars().count() > STATUS_MSG_MAX {
@@ -2847,7 +2931,7 @@ pub fn answer_with_ollama_and_fetch(
                         send_status(&format!("{} -> Ollama: {}", agent.name, status_text));
                         match run_agent_ollama_session(
                             agent,
-                            user_msg,
+                            &user_msg,
                             status_tx.as_ref(),
                         )
                         .await
@@ -3639,8 +3723,25 @@ pub fn answer_with_ollama_and_fetch(
             last_browser_extract = Some(user_message.clone());
         }
 
+        let is_browser_error = if tool == "BROWSER_SCREENSHOT" {
+            user_message.starts_with("Screenshot of current page failed") || user_message.starts_with("Screenshot task error")
+        } else if tool.starts_with("BROWSER_") {
+            user_message.starts_with(&format!("{} failed", tool))
+                || user_message.starts_with(&format!("{} task error", tool))
+                || user_message.starts_with(&format!("{} HTTP fallback task error", tool))
+                || user_message.starts_with(&format!("{} CDP retry task error", tool))
+        } else {
+            false
+        };
+
         tool_results.push(user_message);
+
+        if is_browser_error {
+            info!("Agent router: {} returned an error, aborting remaining tools in this turn", tool);
+            break;
         }
+        }
+
         if done_claimed.is_some() {
             exited_via_done = true;
             break;
@@ -4119,6 +4220,9 @@ fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String,
                     arg = arg[..pos].trim().to_string();
                 }
             }
+            if tool_name == "PERPLEXITY_SEARCH" || tool_name == "BRAVE_SEARCH" {
+                arg = truncate_search_query_arg(&arg);
+            }
             if !arg.is_empty() || tool_name == "TASK_LIST" || tool_name == "TASK_SHOW" || tool_name == "LIST_SCHEDULES" || tool_name == "BROWSER_EXTRACT" || tool_name == "BROWSER_SCREENSHOT" || (tool_name == "TASK_SLEEP" && !arg.is_empty()) {
                 return Some(((tool_name, arg), next_line));
             }
@@ -4135,6 +4239,27 @@ fn wants_visible_browser(question: &str) -> bool {
         || q.contains("show me a browser")
         || q.contains("i want to see the browser")
         || q.contains("open a window")
+}
+
+/// For PERPLEXITY_SEARCH/BRAVE_SEARCH, the recommendation often contains the whole plan after the query (e.g. "spanish newspapers then BROWSER_NAVIGATE: ..."). Truncate to just the search query so the API gets a clean query.
+fn truncate_search_query_arg(arg: &str) -> String {
+    let arg = arg.trim();
+    let arg_lower = arg.to_lowercase();
+    let earliest = [
+        " then ",
+        " extract ",
+        " → ",
+        "\n",
+        " browser_navigate",
+        " browser_navigate:",
+        " browser_screenshot:",
+        " and then ",
+    ]
+    .iter()
+    .filter_map(|sep| arg_lower.find(sep).map(|i| i))
+    .min();
+    let base = earliest.map(|i| arg[..i].trim()).unwrap_or(arg);
+    base.chars().take(150).collect::<String>().trim().to_string()
 }
 
 /// Parse one of FETCH_URL:, BRAVE_SEARCH:, RUN_JS:, SCHEDULE:/SCHEDULER:, MCP:, PYTHON_SCRIPT: from assistant content (first match only).
