@@ -36,8 +36,10 @@ That loop now normalizes `RECOMMEND:` wrappers and inline mixed-tool text before
 - My open issues: `REDMINE_API: GET /issues.json?assigned_to_id=me&status_id=open`
 - Project issues: `REDMINE_API: GET /issues.json?project_id=ID&status_id=open&limit=25`
 - List projects: `REDMINE_API: GET /projects.json`
-- **Time entries (spent time/hours):** `REDMINE_API: GET /time_entries.json?from=YYYY-MM-DD&to=YYYY-MM-DD`. Use current-month range for “this month”.
-- **Tickets worked on today:** use the same-day range, for example `REDMINE_API: GET /time_entries.json?from=2026-03-06&to=2026-03-06`.
+- **Time entries (spent time/hours):** `REDMINE_API: GET /time_entries.json?from=YYYY-MM-DD&to=YYYY-MM-DD&limit=100`. Use current-month range for “this month”.
+- **Tickets worked on today:** use the same-day range, for example `REDMINE_API: GET /time_entries.json?from=2026-03-06&to=2026-03-06&limit=100`.
+- **Tickets worked on yesterday:** use the previous UTC day, for example `REDMINE_API: GET /time_entries.json?from=2026-03-05&to=2026-03-05&limit=100`.
+- The standalone Redmine agent now receives the current local date and UTC date in its runtime context. For “today”, it should use the injected current UTC date unless the task explicitly asks for local time.
 - Only add optional filters like `project_id` or `user_id` if the user explicitly asked for them.
 - Derive the concrete dates directly in the Redmine plan. Do not chain `RUN_CMD` and `REDMINE_API` just to compute the date.
 - Do not use `/search.json` for time entries.
