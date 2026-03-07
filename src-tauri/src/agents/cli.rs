@@ -3,6 +3,7 @@
 use crate::agents::{find_agent_by_id_or_name, load_agents};
 use crate::config::Config;
 use std::path::Path;
+use std::time::Duration;
 use tracing::info;
 
 /// Parse testing.md content into a list of test prompts. Splits on `## `; each section body (after first newline) is one prompt.
@@ -35,10 +36,35 @@ pub fn parse_testing_md(content: &str) -> Vec<String> {
     prompts
 }
 
+async fn run_agent_test_prompt_with_timeout<F>(
+    timeout: Duration,
+    future: F,
+) -> Result<String, String>
+where
+    F: std::future::Future<Output = Result<String, String>> + Send + 'static,
+{
+    let mut task = tokio::spawn(future);
+    tokio::select! {
+        result = &mut task => match result {
+            Ok(inner) => inner,
+            Err(e) => Err(format!("agent test task failed: {}", e)),
+        },
+        _ = tokio::time::sleep(timeout) => {
+            task.abort();
+            let _ = task.await;
+            Err(format!(
+                "timed out after {}s while waiting for the agent to finish. Override with MAC_STATS_AGENT_TEST_TIMEOUT_SECS or config.json agentTestTimeoutSecs if needed.",
+                timeout.as_secs()
+            ))
+        }
+    }
+}
+
 /// Run agent tests: resolve agent, read testing.md, run each prompt via Ollama. Returns exit code (0 = ok).
 pub async fn run_agent_test(selector: &str, path: Option<&Path>) -> Result<(), i32> {
     Config::ensure_defaults();
     crate::commands::ollama::ensure_ollama_agent_ready_at_startup().await;
+    let prompt_timeout = Duration::from_secs(Config::agent_test_timeout_secs());
 
     let agents = load_agents();
     let agent = match find_agent_by_id_or_name(&agents, selector) {
@@ -85,11 +111,12 @@ pub async fn run_agent_test(selector: &str, path: Option<&Path>) -> Result<(), i
     }
 
     info!(
-        "Agent test: {} ({}) — {} prompt(s) from {}",
+        "Agent test: {} ({}) — {} prompt(s) from {} (timeout {}s per prompt)",
         agent.name,
         agent.id,
         prompts.len(),
-        test_path.display()
+        test_path.display(),
+        prompt_timeout.as_secs()
     );
 
     for (i, prompt) in prompts.iter().enumerate() {
@@ -99,7 +126,18 @@ pub async fn run_agent_test(selector: &str, path: Option<&Path>) -> Result<(), i
             prompts.len(),
             prompt.chars().count()
         );
-        match crate::commands::ollama::run_agent_ollama_session(agent, prompt, None).await {
+        let agent_for_prompt = agent.clone();
+        let prompt_for_run = prompt.clone();
+        match run_agent_test_prompt_with_timeout(prompt_timeout, async move {
+            crate::commands::ollama::run_agent_ollama_session(
+                &agent_for_prompt,
+                &prompt_for_run,
+                None,
+            )
+            .await
+        })
+        .await
+        {
             Ok(response) => {
                 info!(
                     "Agent test {}/{}: response {} chars",
@@ -123,4 +161,42 @@ pub async fn run_agent_test(selector: &str, path: Option<&Path>) -> Result<(), i
         prompts.len()
     );
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{parse_testing_md, run_agent_test_prompt_with_timeout};
+    use std::time::Duration;
+
+    #[test]
+    fn parse_testing_md_splits_sections_into_prompts() {
+        let prompts = parse_testing_md(
+            "## Test: one\nFirst prompt.\n\n## Test: two\nSecond prompt.\n",
+        );
+        assert_eq!(prompts, vec!["First prompt.", "Second prompt."]);
+    }
+
+    #[tokio::test]
+    async fn prompt_timeout_returns_clear_error() {
+        let err = run_agent_test_prompt_with_timeout(Duration::from_millis(20), async {
+            tokio::time::sleep(Duration::from_millis(60)).await;
+            Ok::<_, String>("late".to_string())
+        })
+        .await
+        .unwrap_err();
+
+        assert!(err.contains("timed out"));
+        assert!(err.contains("MAC_STATS_AGENT_TEST_TIMEOUT_SECS"));
+    }
+
+    #[tokio::test]
+    async fn prompt_timeout_allows_fast_completion() {
+        let result = run_agent_test_prompt_with_timeout(Duration::from_millis(50), async {
+            Ok::<_, String>("ok".to_string())
+        })
+        .await
+        .unwrap();
+
+        assert_eq!(result, "ok");
+    }
 }

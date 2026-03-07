@@ -268,6 +268,31 @@ impl Config {
         DEFAULT_SECS
     }
 
+    /// Per-prompt timeout for `mac_stats agent test`.
+    /// Default 45s so a stuck or overloaded model fails fast during CLI regression runs.
+    /// Config: config.json `agentTestTimeoutSecs`; override: env `MAC_STATS_AGENT_TEST_TIMEOUT_SECS`.
+    /// Clamped to 5..=300.
+    pub fn agent_test_timeout_secs() -> u64 {
+        const DEFAULT_SECS: u64 = 45;
+        const MIN_SECS: u64 = 5;
+        const MAX_SECS: u64 = 300;
+        let from_env = std::env::var("MAC_STATS_AGENT_TEST_TIMEOUT_SECS")
+            .ok()
+            .and_then(|s| s.parse::<u64>().ok());
+        if let Some(secs) = from_env {
+            return secs.clamp(MIN_SECS, MAX_SECS);
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(n) = json.get("agentTestTimeoutSecs").and_then(|v| v.as_u64()) {
+                    return n.clamp(MIN_SECS, MAX_SECS);
+                }
+            }
+        }
+        DEFAULT_SECS
+    }
+
     /// Get the user-info file path
     ///
     /// Returns a path in the user's home directory: `$HOME/.mac-stats/user-info.json`

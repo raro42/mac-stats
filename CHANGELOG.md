@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.34] - 2026-03-07
+
+### Added
+- **Agent test per-prompt timeout** — `mac_stats agent test` now enforces a 45s (configurable) timeout per prompt so a stuck or overloaded model fails fast instead of hanging. Config: `agentTestTimeoutSecs` in config.json or env `MAC_STATS_AGENT_TEST_TIMEOUT_SECS`. Regression tests added for timeout behavior and `testing.md` prompt parsing.
+
+### Fixed
+- **Agent test hang** — The Redmine (and any other) agent test no longer blocks indefinitely on the first Ollama call; the harness aborts the prompt task and returns a clear timeout error with override instructions.
+
 ## [0.1.33] - 2026-03-07
 
 ### Added
