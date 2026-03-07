@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Agent test hang** — The Redmine (and any other) agent test no longer blocks indefinitely on the first Ollama call; the harness aborts the prompt task and returns a clear timeout error with override instructions.
+- **News verification when search returns only hubs** — When a news-style PERPLEXITY_SEARCH returns only hub/landing/tag/standings pages (no article-like results), completion verification now instructs the verifier not to accept an answer that presents them as complete news; the model is told article-grade results were not found and may retry or state so.
 
 ## [0.1.33] - 2026-03-07
 

@@ -2861,12 +2861,14 @@ fn first_image_as_base64(paths: &[PathBuf]) -> Option<String> {
 /// Returns (satisfied, optional reason when not satisfied).
 /// When we have image attachment(s) and a local vision model, sends the first image and asks "Does this image satisfy the request?"; otherwise text-only verification.
 /// When page_content_from_browser is Some (e.g. from BROWSER_EXTRACT), it is included so the verifier can check requested text against JS-rendered content (SPAs).
+/// When news_search_was_hub_only is Some(true), the verifier must not accept an answer that presents hub/landing/tag/standings pages as complete recent news.
 async fn verify_completion(
     question: &str,
     response_content: &str,
     attachment_paths: &[PathBuf],
     success_criteria: Option<&[String]>,
     page_content_from_browser: Option<&str>,
+    news_search_was_hub_only: Option<bool>,
     model_override: Option<String>,
     options_override: Option<crate::ollama::ChatOptions>,
 ) -> Result<(bool, Option<String>), String> {
@@ -2914,15 +2916,21 @@ async fn verify_completion(
     } else {
         String::new()
     };
+    let news_hub_only_block = if news_search_was_hub_only == Some(true) && is_news_query(question) {
+        "The search results given to the assistant for this news request were only hub/landing/tag/standings pages (no concrete article links). If the assistant's answer presents them as complete recent news articles, reply NO and state that article-grade sources were not found.\n\n"
+    } else {
+        ""
+    };
     let verification_tail = if screenshot_requested {
         "Did we fully satisfy the request (including any requested screenshot/file attachment)? Reply YES or NO. If NO, on the next line add one sentence: what's missing."
     } else {
         "Did we fully satisfy the request? Reply YES or NO. If NO, on the next line add one sentence: what's missing."
     };
     let user_text = format!(
-        "Original request: {}\n\n{}What we did (summary): {}\n\n{}{}{}",
+        "Original request: {}\n\n{}{}What we did (summary): {}\n\n{}{}{}",
         question.chars().take(500).collect::<String>(),
         criteria_block,
+        news_hub_only_block,
         response_summary,
         browser_content_block,
         attachment_block,
@@ -2997,9 +3005,10 @@ async fn verify_completion(
                     crate::ollama::ChatMessage {
                         role: "user".to_string(),
                         content: format!(
-                            "Original request: {}\n\n{}What we did (summary): {}\n\n{}Did we fully satisfy the request? Reply YES or NO. If NO, on the next line add one sentence: what's missing.",
+                            "Original request: {}\n\n{}{}What we did (summary): {}\n\n{}Did we fully satisfy the request? Reply YES or NO. If NO, on the next line add one sentence: what's missing.",
                             question.chars().take(500).collect::<String>(),
                             criteria_block,
+                            news_hub_only_block,
                             response_summary,
                             if screenshot_requested {
                                 "Attachments sent: yes.\n\n"
@@ -3949,6 +3958,8 @@ pub fn answer_with_ollama_and_fetch(
         let mut last_browser_extract: Option<String> = None;
         // Cap browser tools per run to prevent runaway NAVIGATE/CLICK loops (see docs/032_browser_loop_and_status_fix_plan.md).
         let mut browser_tool_count: u32 = 0;
+        // For news requests: if the last PERPLEXITY_SEARCH returned only hub/landing/tag/standings pages, verification must not accept a confident news answer.
+        let mut last_news_search_was_hub_only: Option<bool> = None;
 
         while tool_count < max_tool_iterations {
             let tools = parse_all_tools_from_response(&response_content);
@@ -4512,6 +4523,24 @@ pub fn answer_with_ollama_and_fetch(
                                     send_status(&summary);
                                 }
                                 let num_results = shaped_results.len();
+                                let search_had_article_like = is_news_query
+                                    && shaped_results
+                                        .iter()
+                                        .any(|r| {
+                                            is_likely_article_like_result(
+                                                &r.title,
+                                                &r.url,
+                                                &r.snippet,
+                                            )
+                                        });
+                                if is_news_query {
+                                    last_news_search_was_hub_only = Some(!search_had_article_like);
+                                    if !search_had_article_like {
+                                        info!(
+                                            "Agent router: news search returned only hub/landing pages; completion verification will require article-grade evidence"
+                                        );
+                                    }
+                                }
                                 // Structured markdown: numbered results with explicit Title/URL/Date/Snippet so the model parses and cites reliably.
                                 let results: String = shaped_results
                                     .into_iter()
@@ -4559,6 +4588,11 @@ pub fn answer_with_ollama_and_fetch(
                                     )
                                 };
                                 if is_news_query && !results.is_empty() {
+                                    if !search_had_article_like {
+                                        result_text.push_str(
+                                            "\n\n**Article-grade results were not found;** only hub/landing/tag/standings pages are listed below. Do not present these as a complete news answer; state that concrete article links were not found or run another search.",
+                                        );
+                                    }
                                     result_text.push_str(
                                         "\n\nFor news requests, prefer concrete article/report results over homepages, hub pages, standings pages, rumor indexes, or official landing pages. If a result looks like a hub, use it only as fallback and say so clearly.",
                                     );
@@ -6149,6 +6183,7 @@ pub fn answer_with_ollama_and_fetch(
             &attachment_paths,
             success_criteria.as_deref(),
             last_browser_extract.as_deref(),
+            last_news_search_was_hub_only,
             model_override.clone(),
             options_override.clone(),
         )
