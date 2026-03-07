@@ -6817,6 +6817,7 @@ mod tests {
         build_agent_runtime_context, build_perplexity_verbose_summary, extract_last_prefixed_argument,
         parse_agent_tool_from_response, parse_all_tools_from_response,
         parse_tool_from_response,
+        redmine_direct_fallback_hint,
         redmine_time_entries_range_for_date,
     };
 
@@ -6983,5 +6984,14 @@ mod tests {
             ),
             ("2026-03-05".to_string(), "2026-03-05".to_string())
         );
+    }
+
+    #[test]
+    fn redmine_direct_fallback_hint_for_today_avoids_user_id_me() {
+        let hint = redmine_direct_fallback_hint("List redmine tickets that have been worked on today");
+        assert!(hint.contains("/time_entries.json?from="));
+        assert!(hint.contains("&to="));
+        assert!(hint.contains("&limit=100"));
+        assert!(!hint.contains("user_id=me"));
     }
 }

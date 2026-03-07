@@ -927,4 +927,40 @@ mod tests {
         assert!(summary.contains("Time entries without issue"));
         assert!(summary.contains("Internal — 1.00h"));
     }
+
+    #[test]
+    fn summarizes_ticket_list_uses_subject_lookup_when_time_entries_only_return_issue_ids() {
+        let entries = vec![RedmineTimeEntry {
+            id: 1,
+            hours: 2.0,
+            spent_on: Some("2026-03-06".to_string()),
+            comments: Some("Worked on issue".to_string()),
+            project: Some(RedmineNamedRef {
+                name: Some("Core".to_string()),
+            }),
+            issue: Some(RedmineIssueRef {
+                id: 7209,
+                subject: None,
+            }),
+            user: Some(RedmineNamedRef {
+                name: Some("Ralf".to_string()),
+            }),
+            activity: Some(RedmineNamedRef {
+                name: Some("Development".to_string()),
+            }),
+        }];
+        let mut subjects = BTreeMap::new();
+        subjects.insert(7209, "Fetched subject from issue lookup".to_string());
+
+        let summary = summarize_time_entries(
+            "/time_entries.json?from=2026-03-06&to=2026-03-06&limit=100",
+            &entries,
+            1,
+            1,
+            &subjects,
+        );
+
+        assert!(summary.contains("#7209 Fetched subject from issue lookup — 2.00h"));
+        assert!(!summary.contains("#7209 (subject unavailable)"));
+    }
 }
