@@ -97,16 +97,6 @@ Review of `ollama list` with rough purpose and size. Exclude the large 30B-class
 
 ---
 
-## Open tasks:
-### Questionable Logic
-* Gatekeeper blocking unsigned apps
-* Missing features (e.g. more agent options, better error handling)
-
-### Missing Features
-* More agent options
-* Better error handling
-* Integration with other macOS apps
-
 ### Pending Items
 * Update README.md with more detailed installation instructions
 * Improve documentation for new users

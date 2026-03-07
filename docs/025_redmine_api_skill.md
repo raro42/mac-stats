@@ -42,6 +42,9 @@ That loop now normalizes `RECOMMEND:` wrappers and inline mixed-tool text before
 - The standalone Redmine agent now receives the current local date and UTC date in its runtime context. For “today”, it should use the injected current UTC date unless the task explicitly asks for local time.
 - Only add optional filters like `project_id` or `user_id` if the user explicitly asked for them.
 - Derive the concrete dates directly in the Redmine plan. Do not chain `RUN_CMD` and `REDMINE_API` just to compute the date.
+- For text-only time-entry reports, stay in the `REDMINE_API /time_entries.json` flow. Do not switch to browser/screenshot steps or single-issue inspection unless the user explicitly asks for that.
+- If a retry is needed, keep the same requested date window and return a user-facing summary from the actual Redmine result or failure. Do not return raw tool directives as the final answer.
+- If Redmine is not configured, the URL is invalid, or the host/DNS is unreachable, stop at that blocker. Say the fetch could not be completed and that no Redmine data was fetched; do not claim that no tickets/time entries were found and do not retry the same call in the same turn.
 - Do not use `/search.json` for time entries.
 - Search issues by keyword: `REDMINE_API: GET /search.json?q=<keyword>&issues=1&limit=100`
 
@@ -56,7 +59,6 @@ That loop now normalizes `RECOMMEND:` wrappers and inline mixed-tool text before
 
 ## Open tasks:
 
-- Investigate why Gatekeeper blocks the app on some systems.
 - Implement a more robust way to handle Redmine API errors.
 - Improve the documentation for the `REDMINE_API` command.
 - Consider adding support for other Redmine features, such as issue attachments and custom fields.

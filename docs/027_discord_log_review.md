@@ -70,8 +70,3 @@ When the user asks to search the web (e.g. Perplexity) and to visit URLs or get 
 implemented in `commands/ollama.rs` (query truncation, `want_screenshots` detection including "send me", "in discord", "send the", " here "; first 5 result URLs visited via browser_agent, screenshots saved and attached in Discord). Log review section added above. `want_screenshots` broadened so "send me the screenshots in Discord" triggers the workflow without requiring "visit" or "url" in the question.
 
 ### TASK_STATUS: finished
-
-## Open tasks:
-- Investigate why Gatekeeper sometimes blocks the app.
-- Improve the auto-visit + screenshot workflow for Perplexity search results.
-- Enhance the `want_screenshots` detection to handle more user queries.

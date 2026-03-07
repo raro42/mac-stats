@@ -76,8 +76,3 @@ mac_stats append <id> <content>        # Append feedback block
 - **task/cli.rs**: CLI subcommands (add, list, show, status, remove, assign, append) invoked from `main` when the user runs `mac_stats add ...` etc.
 - **commands/ollama.rs**: Thin — parses TASK_* tool lines and calls one task function per tool; no task file I/O.
 - **scheduler/mod.rs**: For TASK:/TASK_RUN:, resolves path and calls `task::runner::run_task_until_finished(path, 10)`.
-
-## Open tasks:
-- Questionable logic: 
-- Missing features: 
-- Pending items:

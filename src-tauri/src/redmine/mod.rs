@@ -8,11 +8,11 @@
 //! When building agent descriptions, we fetch projects, trackers, statuses, and priorities
 //! and inject them as context so the LLM can resolve names (e.g. "Create in AMVARA") to IDs.
 
+use serde::Deserialize;
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
-use serde::Deserialize;
 use tracing::{debug, info, warn};
 use url::Url;
 
@@ -242,7 +242,10 @@ fn with_query_params(path: &str, extra: &[(&str, &str)]) -> Result<String, Strin
 }
 
 fn extract_time_entries_range(path: &str) -> Option<String> {
-    let joined = Url::parse("https://example.invalid").ok()?.join(path).ok()?;
+    let joined = Url::parse("https://example.invalid")
+        .ok()?
+        .join(path)
+        .ok()?;
     let mut from = None;
     let mut to = None;
     let mut spent_on = None;
@@ -264,7 +267,10 @@ fn extract_time_entries_range(path: &str) -> Option<String> {
 }
 
 fn extract_single_day_from_range(path: &str) -> Option<String> {
-    let joined = Url::parse("https://example.invalid").ok()?.join(path).ok()?;
+    let joined = Url::parse("https://example.invalid")
+        .ok()?
+        .join(path)
+        .ok()?;
     let mut from = None;
     let mut to = None;
     for (k, v) in joined.query_pairs() {
@@ -386,7 +392,10 @@ async fn fetch_issue_subjects_for_entries(
         let body = match redmine_get_with_client(client, base_url, api_key, &path).await {
             Ok(body) => body,
             Err(e) => {
-                debug!("Redmine: failed to fetch issue {} for subject lookup: {}", id, e);
+                debug!(
+                    "Redmine: failed to fetch issue {} for subject lookup: {}",
+                    id, e
+                );
                 continue;
             }
         };
@@ -483,7 +492,12 @@ fn summarize_time_entries(
         out.push_str("\nTickets worked:\n");
         for (id, agg) in ticket_rows {
             let users = agg.users.iter().cloned().collect::<Vec<_>>().join(", ");
-            let activities = agg.activities.iter().cloned().collect::<Vec<_>>().join(", ");
+            let activities = agg
+                .activities
+                .iter()
+                .cloned()
+                .collect::<Vec<_>>()
+                .join(", ");
             out.push_str(&format!(
                 "- #{} {} — {:.2}h across {} entr{} (project: {}; users: {}; activities: {})\n",
                 id,
@@ -508,7 +522,12 @@ fn summarize_time_entries(
         });
         for agg in rows {
             let users = agg.users.iter().cloned().collect::<Vec<_>>().join(", ");
-            let activities = agg.activities.iter().cloned().collect::<Vec<_>>().join(", ");
+            let activities = agg
+                .activities
+                .iter()
+                .cloned()
+                .collect::<Vec<_>>()
+                .join(", ");
             out.push_str(&format!(
                 "- {} — {:.2}h across {} entr{} (users: {}; activities: {})\n",
                 agg.label,
@@ -634,19 +653,23 @@ async fn fetch_and_summarize_time_entries(
         Ok((all_entries, total_count))
     }
 
-    let (mut all_entries, mut total_count) = match fetch_pages(client, base_url, api_key, path).await {
-        Ok(v) => v,
-        Err(body) => return Ok(body),
-    };
+    let (mut all_entries, mut total_count) =
+        match fetch_pages(client, base_url, api_key, path).await {
+            Ok(v) => v,
+            Err(body) => return Ok(body),
+        };
 
     if all_entries.is_empty() {
         if let Some(day) = extract_single_day_from_range(path) {
-            let spent_on_path = with_query_params(path, &[("spent_on", &day), ("from", ""), ("to", "")])?;
+            let spent_on_path =
+                with_query_params(path, &[("spent_on", &day), ("from", ""), ("to", "")])?;
             let spent_on_path = spent_on_path
                 .replace("from=&", "")
                 .replace("&to=", "")
                 .replace("?to=", "?");
-            if let Ok((entries, count)) = fetch_pages(client, base_url, api_key, &spent_on_path).await {
+            if let Ok((entries, count)) =
+                fetch_pages(client, base_url, api_key, &spent_on_path).await
+            {
                 if !entries.is_empty() {
                     debug!(
                         "Redmine: same-day from/to returned no entries; spent_on={} returned {} entr{}",
@@ -852,7 +875,9 @@ mod tests {
 
     #[test]
     fn time_entries_path_detection_works() {
-        assert!(is_time_entries_path("/time_entries.json?from=2026-03-06&to=2026-03-06"));
+        assert!(is_time_entries_path(
+            "/time_entries.json?from=2026-03-06&to=2026-03-06"
+        ));
         assert!(is_time_entries_path("time_entries.json"));
         assert!(!is_time_entries_path("/issues/7209.json"));
     }

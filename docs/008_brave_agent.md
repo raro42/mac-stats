@@ -118,7 +118,6 @@ The Brave Search API uses a 1-second sliding window and returns rate limit info 
 
 ## Open tasks:
 
-*   Investigate why Gatekeeper is blocking the app on some systems.
 *   Improve the Brave Search API documentation for better user experience.
 *   Consider adding more tool agents to the list.
 *   Review the code for potential security vulnerabilities.

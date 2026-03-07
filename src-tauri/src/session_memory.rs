@@ -15,6 +15,51 @@ use tracing::debug;
 
 const PERSIST_THRESHOLD: usize = 3;
 
+fn extract_assistant_final_answer(content: &str) -> Option<String> {
+    let trimmed = content.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    if !trimmed.starts_with("--- Intermediate answer:") {
+        return Some(trimmed.to_string());
+    }
+
+    if let Some(idx) = trimmed.find("--- Final answer:") {
+        let final_part = trimmed[idx + "--- Final answer:".len()..]
+            .trim()
+            .trim_matches('-')
+            .trim();
+        if !final_part.is_empty() {
+            return Some(final_part.to_string());
+        }
+    }
+
+    if trimmed.contains("Final answer is the same as intermediate.") {
+        let without_prefix = trimmed["--- Intermediate answer:".len()..].trim();
+        let intermediate = without_prefix
+            .split("\n\n---\n\n")
+            .next()
+            .unwrap_or(without_prefix)
+            .trim();
+        if !intermediate.is_empty() {
+            return Some(intermediate.to_string());
+        }
+    }
+
+    Some(trimmed.to_string())
+}
+
+fn normalize_conversational_message(role: &str, content: &str) -> Option<String> {
+    let trimmed = content.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    match role {
+        "assistant" => extract_assistant_final_answer(trimmed),
+        _ => Some(trimmed.to_string()),
+    }
+}
+
 struct SessionState {
     messages: Vec<(String, String)>,
     topic_slug: Option<String>,
@@ -42,11 +87,7 @@ fn topic_slug(content: &str, max_len: usize) -> String {
         })
         .collect();
     let s = s.trim().replace(' ', "-").trim_matches('-').to_lowercase();
-    if s.is_empty() {
-        "chat".to_string()
-    } else {
-        s
-    }
+    if s.is_empty() { "chat".to_string() } else { s }
 }
 
 /// Built-in fallback phrases when ~/.mac-stats/agents/session_reset_phrases.md is missing or empty.
@@ -88,6 +129,9 @@ pub fn user_wants_session_reset(message: &str) -> bool {
 /// Add a message to the session and persist to disk when we have more than 3 messages.
 /// `source` e.g. "discord", `session_id` e.g. Discord channel id.
 pub fn add_message(source: &str, session_id: u64, role: &str, content: &str) {
+    let Some(content) = normalize_conversational_message(role, content) else {
+        return;
+    };
     let key = format!("{}-{}", source, session_id);
     let mut store = match session_store().lock() {
         Ok(g) => g,
@@ -107,10 +151,10 @@ pub fn add_message(source: &str, session_id: u64, role: &str, content: &str) {
     }
     state.last_activity = Some(now);
     if role == "user" && state.topic_slug.is_none() {
-        state.topic_slug = Some(topic_slug(content, 40));
+        state.topic_slug = Some(topic_slug(&content, 40));
     }
 
-    state.messages.push((role.to_string(), content.to_string()));
+    state.messages.push((role.to_string(), content));
 
     if state.messages.len() > PERSIST_THRESHOLD {
         drop(store);
@@ -196,6 +240,12 @@ pub fn replace_session(source: &str, session_id: u64, new_messages: Vec<(String,
             let _ = persist_session(source, session_id);
         }
     }
+    let normalized_messages: Vec<(String, String)> = new_messages
+        .into_iter()
+        .filter_map(|(role, content)| {
+            normalize_conversational_message(&role, &content).map(|normalized| (role, normalized))
+        })
+        .collect();
     let now = chrono::Local::now();
     if let Ok(mut store) = session_store().lock() {
         let state = store.entry(key).or_insert_with(|| SessionState {
@@ -208,7 +258,7 @@ pub fn replace_session(source: &str, session_id: u64, new_messages: Vec<(String,
             state.created_at = Some(now);
         }
         state.last_activity = Some(now);
-        state.messages = new_messages;
+        state.messages = normalized_messages;
         debug!(
             "Session memory: replaced session with {} compacted messages",
             state.messages.len()
@@ -263,7 +313,16 @@ pub fn get_messages(source: &str, session_id: u64) -> Vec<(String, String)> {
     };
     store
         .get(&key)
-        .map(|state| state.messages.clone())
+        .map(|state| {
+            state
+                .messages
+                .iter()
+                .filter_map(|(role, content)| {
+                    normalize_conversational_message(role, content)
+                        .map(|normalized| (role.clone(), normalized))
+                })
+                .collect()
+        })
         .unwrap_or_default()
 }
 
@@ -322,9 +381,37 @@ fn parse_session_file(path: &Path) -> Vec<(String, String)> {
         } else {
             continue;
         };
-        if !body.is_empty() {
-            out.push((role.to_string(), body.to_string()));
+        if let Some(normalized) = normalize_conversational_message(role, body) {
+            out.push((role.to_string(), normalized));
         }
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{extract_assistant_final_answer, normalize_conversational_message};
+
+    #[test]
+    fn extract_assistant_final_answer_prefers_final_section() {
+        let wrapped = "--- Intermediate answer:\n\nFirst try.\n\n---\n\n--- Final answer:\n\nSecond try.\n\n---";
+        assert_eq!(
+            extract_assistant_final_answer(wrapped),
+            Some("Second try.".to_string())
+        );
+    }
+
+    #[test]
+    fn extract_assistant_final_answer_keeps_intermediate_when_marked_same() {
+        let wrapped = "--- Intermediate answer:\n\nReusable answer.\n\n---\n\nFinal answer is the same as intermediate.";
+        assert_eq!(
+            extract_assistant_final_answer(wrapped),
+            Some("Reusable answer.".to_string())
+        );
+    }
+
+    #[test]
+    fn normalize_conversational_message_discards_empty_content() {
+        assert_eq!(normalize_conversational_message("assistant", "   "), None);
+    }
 }

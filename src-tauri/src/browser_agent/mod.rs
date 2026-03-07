@@ -13,16 +13,16 @@ mod http_fallback;
 pub use http_fallback::{click_http, extract_http, input_http, navigate_http};
 
 use std::process::{Command, Stdio};
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::OnceLock;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 
-use headless_chrome::protocol::cdp::Page::CaptureScreenshotFormatOption;
-use headless_chrome::types::Bounds;
 use headless_chrome::Browser;
 use headless_chrome::LaunchOptions;
+use headless_chrome::protocol::cdp::Page::CaptureScreenshotFormatOption;
+use headless_chrome::types::Bounds;
 use regex::Regex;
 use serde::Deserialize;
 use std::path::PathBuf;
@@ -212,7 +212,10 @@ pub fn navigate(browser: &Browser, url: &str) -> Result<Arc<headless_chrome::Tab
     tab.navigate_to(url)
         .map_err(|e| format!("Navigate to {}: {}", url, e))?;
     if let Err(e) = tab.wait_until_navigated() {
-        warn!("Browser agent: wait_until_navigated failed (SPA/hash nav?): {} — continuing after short delay", e);
+        warn!(
+            "Browser agent: wait_until_navigated failed (SPA/hash nav?): {} — continuing after short delay",
+            e
+        );
         std::thread::sleep(Duration::from_secs(2));
     }
     info!("Browser agent: navigated to {}", url);
@@ -526,7 +529,9 @@ fn clear_browser_session_on_error(err_msg: &str) {
         if let Ok(mut guard) = browser_session().lock() {
             if guard.is_some() {
                 *guard = None;
-                info!("Browser agent [CDP]: cleared session after connection error (next use will reconnect or relaunch)");
+                info!(
+                    "Browser agent [CDP]: cleared session after connection error (next use will reconnect or relaunch)"
+                );
             }
         }
     }
@@ -584,7 +589,9 @@ fn get_or_create_browser(port: u16) -> Result<Browser, String> {
     *guard = None;
     drop(guard);
     let browser = if prefer_headless {
-        info!("Browser agent [CDP]: user requested headless — launching headless Chrome (no visible window)");
+        info!(
+            "Browser agent [CDP]: user requested headless — launching headless Chrome (no visible window)"
+        );
         launch_via_headless_chrome()?
     } else if get_ws_url(port).is_ok() {
         info!(
@@ -606,11 +613,16 @@ fn get_or_create_browser(port: u16) -> Result<Browser, String> {
                 );
                 connect_cdp(port)?
             } else {
-                warn!("Browser agent [CDP]: Chrome launch may have failed or not ready; falling back to headless_chrome launcher");
+                warn!(
+                    "Browser agent [CDP]: Chrome launch may have failed or not ready; falling back to headless_chrome launcher"
+                );
                 launch_via_headless_chrome()?
             }
         } else {
-            info!("Browser agent [CDP]: could not launch Chrome on {}, using headless_chrome launcher", port);
+            info!(
+                "Browser agent [CDP]: could not launch Chrome on {}, using headless_chrome launcher",
+                port
+            );
             launch_via_headless_chrome()?
         }
     };
@@ -678,7 +690,10 @@ fn navigate_and_get_state_inner(url: &str) -> Result<String, String> {
         s
     })?;
     if let Err(e) = tab.wait_until_navigated() {
-        warn!("Browser agent [CDP]: wait_until_navigated failed (SPA/hash?): {} — continuing after delay", e);
+        warn!(
+            "Browser agent [CDP]: wait_until_navigated failed (SPA/hash?): {} — continuing after delay",
+            e
+        );
         std::thread::sleep(Duration::from_secs(2));
     }
     std::thread::sleep(Duration::from_millis(1500));
@@ -890,6 +905,66 @@ pub fn search_page_text(pattern: &str) -> Result<String, String> {
     with_connection_retry(|| search_page_text_inner(pattern))
 }
 
+fn truncate_context_window(text: &str, start: usize, end: usize) -> String {
+    let mut start_byte = start.min(text.len());
+    while start_byte > 0 && !text.is_char_boundary(start_byte) {
+        start_byte -= 1;
+    }
+    let mut end_byte = end.min(text.len());
+    while end_byte < text.len() && !text.is_char_boundary(end_byte) {
+        end_byte += 1;
+    }
+    text[start_byte..end_byte].replace(char::is_whitespace, " ")
+}
+
+fn search_page_text_from_plain_text(pattern: &str, text: &str) -> Result<String, String> {
+    let normalized = text.trim();
+    if normalized.is_empty() {
+        return Ok(format!("No matches found for \"{}\" on page.", pattern));
+    }
+    let regex = regex::RegexBuilder::new(&regex::escape(pattern))
+        .case_insensitive(true)
+        .build()
+        .map_err(|e| format!("Search regex build: {}", e))?;
+    let matches: Vec<_> = regex.find_iter(normalized).collect();
+    if matches.is_empty() {
+        return Ok(format!("No matches found for \"{}\" on page.", pattern));
+    }
+    let mut lines = vec![format!(
+        "Found {} match{} for \"{}\" on page:",
+        matches.len(),
+        if matches.len() == 1 { "" } else { "es" },
+        pattern
+    )];
+    lines.push(String::new());
+    for (i, m) in matches.iter().take(20).enumerate() {
+        let context = truncate_context_window(
+            normalized,
+            m.start().saturating_sub(80),
+            (m.end() + 80).min(normalized.len()),
+        );
+        lines.push(format!(
+            "[{}] {}{}{}",
+            i + 1,
+            if m.start() > 0 { "..." } else { "" },
+            context.trim(),
+            if m.end() < normalized.len() {
+                "..."
+            } else {
+                ""
+            }
+        ));
+    }
+    if matches.len() > 20 {
+        lines.push(format!(
+            "\n... showing {} of {} total matches.",
+            20,
+            matches.len()
+        ));
+    }
+    Ok(lines.join("\n"))
+}
+
 fn search_page_text_inner(pattern: &str) -> Result<String, String> {
     let (_, tab) = get_current_tab().inspect_err(|e| {
         clear_browser_session_on_error(e);
@@ -958,10 +1033,14 @@ fn search_page_text_inner(pattern: &str) -> Result<String, String> {
         clear_browser_session_on_error(&s);
         s
     })?;
-    let value = result
-        .value
-        .as_ref()
-        .ok_or("search_page returned no value")?;
+    let value = if let Some(value) = result.value.as_ref() {
+        value
+    } else {
+        let text = get_page_text(&tab).inspect_err(|e| {
+            clear_browser_session_on_error(e);
+        })?;
+        return search_page_text_from_plain_text(pattern, &text);
+    };
     let obj = value
         .as_object()
         .ok_or("search_page did not return object")?;
@@ -1113,7 +1192,10 @@ fn take_screenshot_inner(url: &str) -> Result<PathBuf, String> {
         s
     })?;
     if let Err(e) = tab.wait_until_navigated() {
-        warn!("Browser agent [CDP]: wait_until_navigated failed (SPA/hash?): {} — continuing after delay", e);
+        warn!(
+            "Browser agent [CDP]: wait_until_navigated failed (SPA/hash?): {} — continuing after delay",
+            e
+        );
         std::thread::sleep(Duration::from_secs(2));
     }
     let final_url = tab.get_url();
@@ -1168,5 +1250,22 @@ mod tests {
         let t = "Kontakt: +49 30 12345678 oder 0049 30 87654321";
         let p = extract_telephone_numbers(t);
         assert!(!p.is_empty());
+    }
+
+    #[test]
+    fn search_page_text_from_plain_text_returns_no_matches_cleanly() {
+        let result = search_page_text_from_plain_text("videos", "About us and services").unwrap();
+        assert_eq!(result, "No matches found for \"videos\" on page.");
+    }
+
+    #[test]
+    fn search_page_text_from_plain_text_returns_context_matches() {
+        let result = search_page_text_from_plain_text(
+            "videos",
+            "About. Amvara's videos are featured on the about page.",
+        )
+        .unwrap();
+        assert!(result.contains("Found 1 match"));
+        assert!(result.contains("Amvara's videos"));
     }
 }

@@ -20,8 +20,8 @@ use serenity::model::gateway::GatewayIntents;
 use serenity::model::id::UserId;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::RwLock;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::UNIX_EPOCH;
 use tokio::sync::mpsc;
@@ -505,7 +505,7 @@ fn channel_settings(channel_id: u64) -> ChannelSettings {
                 prompt: None,
                 model: None,
                 agent: None,
-            }
+            };
         }
     };
     let Some((_, default, overrides, _, _, _)) = guard.as_ref() else {
@@ -899,8 +899,7 @@ async fn having_fun_background_loop(ctx: Context) {
                         if state.loop_protection_drops > 0 {
                             debug!(
                                 "Discord: loop protection: channel {} dropped {} message(s) this period",
-                                channel_id,
-                                state.loop_protection_drops
+                                channel_id, state.loop_protection_drops
                             );
                             state.loop_protection_drops = 0;
                         }
@@ -998,11 +997,7 @@ async fn having_fun_background_loop(ctx: Context) {
                                 >= std::time::Duration::from_secs(
                                     state.next_idle_thought_after_secs,
                                 );
-                        if idle {
-                            Some(*id)
-                        } else {
-                            None
-                        }
+                        if idle { Some(*id) } else { None }
                     } else {
                         None
                     }
@@ -1826,7 +1821,9 @@ impl EventHandler for Handler {
         // If the user asks to clear/new session (any language), clear session and start fresh (see docs/035).
         let prior = if crate::session_memory::user_wants_session_reset(&content) {
             crate::session_memory::clear_session("discord", channel_id_u64);
-            tracing::info!("Discord: user requested session reset (e.g. clear session / new session), starting fresh");
+            tracing::info!(
+                "Discord: user requested session reset (e.g. clear session / new session), starting fresh"
+            );
             vec![]
         } else {
             let mut p = crate::session_memory::get_messages("discord", channel_id_u64);
@@ -1972,6 +1969,8 @@ impl EventHandler for Handler {
                 attachment_images_for_ollama,
                 None,  // discord_intermediate: set only when recursing from retry path
                 false, // is_verification_retry
+                None,  // original_user_request
+                None,  // success_criteria_override
             )
             .await
             {

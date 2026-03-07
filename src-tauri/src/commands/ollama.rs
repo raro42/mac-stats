@@ -16,9 +16,9 @@ use std::path::PathBuf;
 use std::pin::Pin;
 use std::process::Command;
 use std::str::FromStr;
-use std::sync::atomic::Ordering;
 use std::sync::Mutex;
 use std::sync::OnceLock;
+use std::sync::atomic::Ordering;
 
 /// Tool instructions appended to soul for non-agent chat (code execution + FETCH_URL).
 const NON_AGENT_TOOL_INSTRUCTIONS: &str = "\n\nYou are a general purpose AI. If you are asked for actual data like day or weather information, or flight information or stock information. Then we need to compile that information using specially crafted clients for doing so. You will put \"[variable-name]\" into the answer to signal that we need to go another step and ask an agent to fulfil the answer.\n\nWhenever asked with \"[variable-name]\", you must provide a javascript snippet to be executed in the browser console to retrieve that information. Mark the answer to be executed as javascript. Do not put any other words around it. Do not insert formatting. Only return the code to be executed. This is needed for the next AI to understand and execute the same. When answering, use the role: code-assistant in the response. When you return executable code:\n- Start the response with: ROLE=code-assistant\n- On the next line, output ONLY executable JavaScript\n- Do not add explanations or formatting\n\nFor web pages: To fetch a page and use its content (e.g. \"navigate to X and get Y\"), reply with exactly one line: FETCH_URL: <full URL> (e.g. FETCH_URL: https://www.example.com). The app will fetch the page and give you the text; then answer the user based on that.";
@@ -981,7 +981,11 @@ async fn build_agent_descriptions(from_discord: bool, question: Option<&str>) ->
                 info!("Agent router: MCP server returned no tools");
                 return base;
             }
-            let mut mcp_section = format!("\n\n{}. **MCP** (tools from configured MCP server, {} tools): Use when the task matches a tool below. To invoke: reply with exactly one line: MCP: <tool_name> <arguments>. Arguments can be JSON (e.g. MCP: get_weather {{\"location\": \"NYC\"}}) or plain text (e.g. MCP: fetch_url https://example.com).\n\nAvailable MCP tools:\n", num, tools.len());
+            let mut mcp_section = format!(
+                "\n\n{}. **MCP** (tools from configured MCP server, {} tools): Use when the task matches a tool below. To invoke: reply with exactly one line: MCP: <tool_name> <arguments>. Arguments can be JSON (e.g. MCP: get_weather {{\"location\": \"NYC\"}}) or plain text (e.g. MCP: fetch_url https://example.com).\n\nAvailable MCP tools:\n",
+                num,
+                tools.len()
+            );
             for t in &tools {
                 let desc = t.description.as_deref().unwrap_or("(no description)");
                 mcp_section.push_str(&format!("- **{}**: {}\n", t.name, desc));
@@ -1240,6 +1244,450 @@ fn extract_redmine_time_entries_summary_for_reply(tool_result: &str) -> Option<S
         None
     } else {
         Some(cleaned)
+    }
+}
+
+fn extract_redmine_failure_message(text: &str) -> Option<String> {
+    let start = text.find("Redmine API failed:")?;
+    let rest = text[start + "Redmine API failed:".len()..].trim();
+    let first_block = rest.split("\n\n---\n\n").next().unwrap_or(rest).trim();
+    let without_instruction = first_block
+        .strip_suffix("Answer without this result.")
+        .unwrap_or(first_block)
+        .trim();
+    if without_instruction.is_empty() {
+        None
+    } else {
+        Some(without_instruction.trim_end_matches('.').trim().to_string())
+    }
+}
+
+fn is_redmine_infrastructure_failure_text(text: &str) -> bool {
+    let t = text.to_lowercase();
+    t.contains("redmine not configured")
+        || t.contains("redmine_url missing")
+        || t.contains("redmine_api_key missing")
+        || t.contains("invalid url")
+        || t.contains("dns")
+        || t.contains("failed to lookup address")
+        || t.contains("failed to lookup address information")
+        || t.contains("name or service not known")
+        || t.contains("nodename nor servname provided")
+        || t.contains("no address associated with hostname")
+        || t.contains("could not resolve host")
+        || t.contains("connection refused")
+        || t.contains("unreachable")
+}
+
+fn format_redmine_time_entries_period(question: &str) -> String {
+    let (from, to) = redmine_time_entries_range(question);
+    if from == to {
+        from
+    } else {
+        format!("{}..{}", from, to)
+    }
+}
+
+fn grounded_redmine_time_entries_failure_reply(question: &str, text: &str) -> Option<String> {
+    if !is_redmine_time_entries_request(question) {
+        return None;
+    }
+
+    let failure = extract_redmine_failure_message(text)?;
+    if !is_redmine_infrastructure_failure_text(&failure) {
+        return None;
+    }
+
+    let failure_lower = failure.to_lowercase();
+    if failure_lower.contains("no time entries")
+        || failure_lower.contains("no worked tickets")
+        || failure_lower.contains("tickets were found")
+    {
+        return None;
+    }
+
+    let blocker = if failure_lower.contains("redmine not configured")
+        || failure_lower.contains("redmine_url missing")
+        || failure_lower.contains("redmine_api_key missing")
+    {
+        "Redmine is not configured on this machine."
+    } else if failure_lower.contains("invalid url") {
+        "the configured Redmine URL is invalid."
+    } else if failure_lower.contains("dns")
+        || failure_lower.contains("failed to lookup address")
+        || failure_lower.contains("failed to lookup address information")
+        || failure_lower.contains("name or service not known")
+        || failure_lower.contains("nodename nor servname provided")
+        || failure_lower.contains("no address associated with hostname")
+        || failure_lower.contains("could not resolve host")
+    {
+        "the configured Redmine host could not be resolved."
+    } else {
+        "the configured Redmine host could not be reached."
+    };
+
+    Some(format!(
+        "Could not retrieve Redmine time entries for {} because {} No Redmine data was fetched. Fix the Redmine configuration or connectivity, then retry.",
+        format_redmine_time_entries_period(question),
+        blocker
+    ))
+}
+
+fn is_grounded_redmine_time_entries_blocked_reply(question: &str, response_content: &str) -> bool {
+    if !is_redmine_time_entries_request(question) {
+        return false;
+    }
+
+    let t = response_content.to_lowercase();
+    let mentions_blocked_fetch = t.contains("could not retrieve redmine time entries")
+        || (t.contains("redmine api failed")
+            && is_redmine_infrastructure_failure_text(response_content));
+    let mentions_infra_blocker = is_redmine_infrastructure_failure_text(response_content)
+        || t.contains("no redmine data was fetched");
+    let invents_empty_result = t.contains("no time entries or tickets were found")
+        || t.contains("no time entries were found")
+        || t.contains("no worked tickets were found")
+        || t.contains("tickets were found for that period");
+
+    mentions_blocked_fetch && mentions_infra_blocker && !invents_empty_result
+}
+
+fn truncate_text_on_line_boundaries(text: &str, max_chars: usize) -> String {
+    if text.chars().count() <= max_chars {
+        return text.to_string();
+    }
+    let mut out = String::new();
+    let mut used = 0usize;
+    for line in text.lines() {
+        let line_len = line.chars().count();
+        let extra = if out.is_empty() {
+            line_len
+        } else {
+            line_len + 1
+        };
+        if used + extra > max_chars {
+            break;
+        }
+        if !out.is_empty() {
+            out.push('\n');
+            used += 1;
+        }
+        out.push_str(line);
+        used += line_len;
+    }
+    if out.trim().is_empty() {
+        let take = max_chars.saturating_sub(12);
+        let mut truncated: String = text.chars().take(take).collect();
+        truncated.push_str("\n[truncated]");
+        return truncated;
+    }
+    out.push_str("\n[truncated]");
+    out
+}
+
+fn is_news_query(question: &str) -> bool {
+    let q = question.to_lowercase();
+    q.contains("news")
+        || q.contains("latest")
+        || q.contains("recent")
+        || q.contains("headlines")
+        || q.contains("current events")
+}
+
+fn normalized_search_result_domain(url: &str) -> String {
+    url::Url::parse(url)
+        .ok()
+        .and_then(|u| {
+            u.host_str()
+                .map(|s| s.trim_start_matches("www.").to_string())
+        })
+        .unwrap_or_default()
+}
+
+fn is_likely_article_like_result(title: &str, url: &str, snippet: &str) -> bool {
+    score_search_result_for_news(title, url, snippet) > 0
+}
+
+fn score_search_result_for_news(title: &str, url: &str, snippet: &str) -> i32 {
+    let title_l = title.to_lowercase();
+    let url_l = url.to_lowercase();
+    let snippet_l = snippet.to_lowercase();
+    let domain = normalized_search_result_domain(url);
+    let path = url::Url::parse(url)
+        .ok()
+        .map(|u| u.path().trim_matches('/').to_string())
+        .unwrap_or_default();
+    let path_depth = path.split('/').filter(|s| !s.is_empty()).count();
+
+    let mut score = 0i32;
+
+    if path_depth >= 2 {
+        score += 2;
+    }
+    if path.contains('-') && path.len() > 18 {
+        score += 2;
+    }
+    if snippet.lines().count() <= 3 {
+        score += 1;
+    }
+    if [
+        "reuters.com",
+        "apnews.com",
+        "bbc.com",
+        "euronews.com",
+        "catalannews.com",
+    ]
+    .iter()
+    .any(|d| domain.ends_with(d))
+    {
+        score += 2;
+    }
+
+    if path.is_empty() || path == "news" || path.ends_with("/news") || path.ends_with("/news/") {
+        score -= 3;
+    }
+    if url_l.contains("/tag/") || url_l.contains("/category/") || url_l.contains("/topics/") {
+        score -= 3;
+    }
+    if url_l.contains("wikipedia.org/wiki/")
+        || domain.ends_with("wikipedia.org")
+        || domain.ends_with("spain.info")
+        || url_l.contains("/destination/")
+        || url_l.contains("/destinazione/")
+    {
+        score -= 5;
+    }
+    if title_l.contains("top stories")
+        || title_l.contains("latest ")
+        || title_l.contains("breaking ")
+        || title_l.contains("scores")
+        || title_l.contains("standings")
+        || title_l.contains("rumors")
+        || title_l.contains("official channel")
+        || title_l.contains("what to see and do")
+    {
+        score -= 3;
+    }
+    if snippet_l.contains("view on x")
+        || snippet_l.contains("rumor")
+        || snippet_l.contains("standings")
+        || snippet_l.contains("scores")
+        || snippet_l.contains("trendiest")
+        || snippet_l.contains("tourist")
+    {
+        score -= 2;
+    }
+    if snippet.lines().count() >= 5 {
+        score -= 1;
+    }
+    if domain.contains("newsnow") || domain.contains("transferfeed") {
+        score -= 2;
+    }
+
+    score
+}
+
+fn shape_perplexity_results_for_question(
+    question: &str,
+    results: Vec<crate::commands::perplexity::PerplexitySearchResult>,
+    snippet_max: usize,
+) -> (
+    Vec<crate::commands::perplexity::PerplexitySearchResult>,
+    Vec<String>,
+    bool,
+) {
+    let is_news = is_news_query(question);
+    if !is_news {
+        let urls = results.iter().map(|r| r.url.clone()).collect();
+        return (results, urls, false);
+    }
+
+    let mut ranked: Vec<_> = results
+        .into_iter()
+        .map(|r| {
+            let score = score_search_result_for_news(&r.title, &r.url, &r.snippet);
+            (score, r)
+        })
+        .collect();
+    ranked.sort_by(|a, b| {
+        b.0.cmp(&a.0).then_with(|| {
+            let ad =
+                a.1.date
+                    .as_deref()
+                    .or(a.1.last_updated.as_deref())
+                    .unwrap_or("");
+            let bd =
+                b.1.date
+                    .as_deref()
+                    .or(b.1.last_updated.as_deref())
+                    .unwrap_or("");
+            bd.cmp(ad)
+        })
+    });
+
+    let mut kept = Vec::new();
+    let mut urls = Vec::new();
+    let mut per_domain: std::collections::HashMap<String, usize> = std::collections::HashMap::new();
+    let mut filtered_any = false;
+    for (score, mut result) in ranked {
+        let domain = normalized_search_result_domain(&result.url);
+        let domain_count = per_domain.get(&domain).copied().unwrap_or(0);
+        let article_like = score > 0;
+        let allow = article_like || kept.len() < 3;
+        if !allow || domain_count >= 2 {
+            filtered_any = true;
+            continue;
+        }
+        if result.snippet.chars().count() > snippet_max {
+            result.snippet = format!(
+                "{}…",
+                result.snippet.chars().take(snippet_max).collect::<String>()
+            );
+        }
+        per_domain.insert(domain, domain_count + 1);
+        urls.push(result.url.clone());
+        kept.push(result);
+        if kept.len() >= 6 {
+            break;
+        }
+    }
+
+    (kept, urls, filtered_any)
+}
+
+async fn search_perplexity_with_news_fallback(
+    question: &str,
+    query: &str,
+    max_results: u32,
+    snippet_max: usize,
+) -> Result<
+    (
+        Vec<crate::commands::perplexity::PerplexitySearchResult>,
+        Vec<String>,
+        bool,
+        Option<String>,
+    ),
+    String,
+> {
+    let mut effective_query = query.trim().to_string();
+    if is_news_query(question)
+        && (effective_query.chars().count() < 18 || effective_query.split_whitespace().count() < 3)
+    {
+        effective_query = format!("{} latest news sources dates", question.trim());
+    }
+
+    let first = crate::commands::perplexity::perplexity_search(
+        crate::commands::perplexity::PerplexitySearchRequest {
+            query: effective_query.clone(),
+            max_results: Some(max_results),
+        },
+    )
+    .await?;
+
+    let is_news = is_news_query(question);
+    let mut used_query = None;
+    let (mut shaped, mut urls, mut filtered_any) =
+        shape_perplexity_results_for_question(question, first.results, snippet_max);
+
+    let need_fallback = is_news
+        && !shaped.is_empty()
+        && shaped
+            .iter()
+            .all(|r| !is_likely_article_like_result(&r.title, &r.url, &r.snippet));
+
+    if need_fallback {
+        let fallback_query = format!("{} recent article source date", effective_query.trim());
+        tracing::info!(
+            "Perplexity search: first pass for news returned only hub/landing pages, retrying with refined query: {}",
+            fallback_query
+        );
+        let second = crate::commands::perplexity::perplexity_search(
+            crate::commands::perplexity::PerplexitySearchRequest {
+                query: fallback_query.clone(),
+                max_results: Some(max_results),
+            },
+        )
+        .await?;
+        let (fallback_shaped, fallback_urls, fallback_filtered) =
+            shape_perplexity_results_for_question(question, second.results, snippet_max);
+        let fallback_has_article_like = fallback_shaped
+            .iter()
+            .any(|r| is_likely_article_like_result(&r.title, &r.url, &r.snippet));
+        if fallback_has_article_like {
+            shaped = fallback_shaped;
+            urls = fallback_urls;
+            filtered_any = fallback_filtered;
+            used_query = Some(fallback_query);
+        }
+    }
+
+    Ok((shaped, urls, filtered_any, used_query))
+}
+
+fn summarize_response_for_verification(
+    question: &str,
+    response_content: &str,
+    attachment_count: usize,
+) -> String {
+    if response_content.trim().is_empty() && attachment_count > 0 {
+        return format!("{} attachment(s) were sent to the user.", attachment_count);
+    }
+    let preferred = if is_redmine_time_entries_request(question) {
+        extract_redmine_time_entries_summary_for_reply(response_content)
+            .unwrap_or_else(|| response_content.to_string())
+    } else {
+        response_content.to_string()
+    };
+    let max_chars = if is_redmine_time_entries_request(question) {
+        4000
+    } else {
+        1500
+    };
+    truncate_text_on_line_boundaries(&preferred, max_chars)
+}
+
+fn strip_tool_result_instructions(tool_result: &str) -> String {
+    let mut cleaned = tool_result;
+    for marker in [
+        "\n\nUse this data to answer the user's question.",
+        "\n\nUse only this Redmine data to continue or answer",
+        "\n\nUse this data to answer.",
+        "\n\nUse this to answer the user's question.",
+    ] {
+        if let Some(idx) = cleaned.find(marker) {
+            cleaned = &cleaned[..idx];
+            break;
+        }
+    }
+    for prefix in [
+        "Redmine API result:\n\n",
+        "Discord API result:\n\n",
+        "Here is the command output:\n\n",
+        "Here is the page content:\n\n",
+        "Search results:\n\n",
+    ] {
+        if let Some(rest) = cleaned.strip_prefix(prefix) {
+            cleaned = rest;
+            break;
+        }
+    }
+    cleaned.trim().to_string()
+}
+
+fn final_reply_from_tool_results(question: &str, tool_result: &str) -> String {
+    if let Some(reply) = grounded_redmine_time_entries_failure_reply(question, tool_result) {
+        return reply;
+    }
+    if !question_explicitly_requests_json(question) {
+        if let Some(summary) = extract_redmine_time_entries_summary_for_reply(tool_result) {
+            return summary;
+        }
+    }
+    let cleaned = strip_tool_result_instructions(tool_result);
+    if cleaned.is_empty() {
+        "The requested tool ran, but no final user-facing answer was produced.".to_string()
+    } else {
+        cleaned
     }
 }
 
@@ -1795,7 +2243,10 @@ fn extract_screenshot_recommendation(question: &str) -> Option<String> {
     if has_screenshot_intent && has_browser_or_url_context {
         if let Some(url) = extract_url_from_question(q) {
             let rec = format!("BROWSER_NAVIGATE: {}\nBROWSER_SCREENSHOT: current", url);
-            tracing::info!("Agent router: pre-routed to BROWSER_NAVIGATE + BROWSER_SCREENSHOT (browser-use style): {}", crate::logging::ellipse(&url, 60));
+            tracing::info!(
+                "Agent router: pre-routed to BROWSER_NAVIGATE + BROWSER_SCREENSHOT (browser-use style): {}",
+                crate::logging::ellipse(&url, 60)
+            );
             return Some(rec);
         }
     }
@@ -1956,7 +2407,11 @@ fn redmine_time_entries_range_for_date(
 
     let q = question.trim().to_lowercase();
     if is_redmine_yesterday_request(&q) {
-        let day = today.pred_opt().unwrap_or(today).format("%Y-%m-%d").to_string();
+        let day = today
+            .pred_opt()
+            .unwrap_or(today)
+            .format("%Y-%m-%d")
+            .to_string();
         return (day.clone(), day);
     }
     if q.contains("today") {
@@ -1986,6 +2441,21 @@ fn redmine_time_entries_range(question: &str) -> (String, String) {
     redmine_time_entries_range_for_date(question, chrono::Utc::now().date_naive())
 }
 
+fn redmine_request_for_routing<'a>(
+    question: &'a str,
+    request_for_verification: &'a str,
+    is_verification_retry: bool,
+) -> &'a str {
+    if is_verification_retry
+        && (is_redmine_time_entries_request(request_for_verification)
+            || is_redmine_review_or_summarize_only(request_for_verification))
+    {
+        request_for_verification
+    } else {
+        question
+    }
+}
+
 fn redmine_direct_fallback_hint(question: &str) -> String {
     if is_redmine_time_entries_request(question) {
         let (from, to) = redmine_time_entries_range(question);
@@ -1999,8 +2469,7 @@ fn redmine_direct_fallback_hint(question: &str) -> String {
             id
         )
     } else {
-        "Use REDMINE_API directly with the correct concrete endpoint for this request."
-            .to_string()
+        "Use REDMINE_API directly with the correct concrete endpoint for this request.".to_string()
     }
 }
 
@@ -2068,6 +2537,53 @@ async fn extract_success_criteria(
     } else {
         Some(criteria)
     }
+}
+
+fn sanitize_success_criteria(question: &str, criteria: Vec<String>) -> Vec<String> {
+    let q = question.to_lowercase();
+    let explicit_last_30_days = q.contains("last 30 days")
+        || q.contains("past 30 days")
+        || q.contains("30-day")
+        || q.contains("30 day")
+        || q.contains("this month")
+        || q.contains("last month");
+    let generic_news_request = q.contains("news");
+    let explicit_named_sources = q.contains("bbc")
+        || q.contains("cnn")
+        || q.contains("reuters")
+        || q.contains("ap ")
+        || q.contains("associated press");
+
+    let mut sanitized = Vec::new();
+    for criterion in criteria {
+        let trimmed = criterion.trim();
+        if trimmed.is_empty() {
+            continue;
+        }
+        let lower = trimmed.to_lowercase();
+        if lower.contains("last 30 days") && !explicit_last_30_days {
+            if generic_news_request {
+                sanitized.push("recent news items were summarized".to_string());
+            }
+            continue;
+        }
+        if generic_news_request
+            && !explicit_named_sources
+            && (lower.contains("bbc") || lower.contains("cnn") || lower.contains("reuters"))
+        {
+            if !sanitized
+                .iter()
+                .any(|existing| existing == "credible named sources cited")
+            {
+                sanitized.push("credible named sources cited".to_string());
+            }
+            continue;
+        }
+        if !sanitized.iter().any(|existing| existing == trimmed) {
+            sanitized.push(trimmed.to_string());
+        }
+    }
+    sanitized
 }
 
 /// Build a short summary of the last N turns (user/assistant pairs) for the new-topic check.
@@ -2165,15 +2681,15 @@ async fn verify_completion(
     use crate::ollama::models::{get_vision_model_for_verification, is_vision_capable};
 
     let has_attachments = !attachment_paths.is_empty();
-    // When executor only said DONE: success (empty reply) but we have attachments, give verifier
-    // a concrete summary so it can answer YES instead of "Screenshots are missing."
-    // Use generic wording so we don't assume attachment type (e.g. could be other files in future).
-    let response_summary: String = if response_content.trim().is_empty() && has_attachments {
-        let n = attachment_paths.len();
-        format!("{} attachment(s) were sent to the user.", n)
-    } else {
-        response_content.chars().take(1500).collect()
-    };
+    let screenshot_requested = user_explicitly_asked_for_screenshot(question);
+    // Keep verification summaries line-safe so large Redmine replies do not get truncated
+    // in the middle of a ticket row and trigger fake "missing details" failures.
+    let response_summary =
+        summarize_response_for_verification(question, response_content, attachment_paths.len());
+    if is_grounded_redmine_time_entries_blocked_reply(question, &response_summary) {
+        tracing::info!("Agent router: verification accepted grounded Redmine blocked-state answer");
+        return Ok((true, None));
+    }
     let system = "You are a completion checker. Answer only with YES or NO, and if NO add one short sentence after a newline explaining what's missing.";
     let criteria_block = success_criteria
         .filter(|c| !c.is_empty())
@@ -2194,13 +2710,27 @@ async fn verify_completion(
             )
         })
         .unwrap_or_default();
+    let attachment_block = if screenshot_requested || has_attachments {
+        format!(
+            "Attachments sent: {}.\n\n",
+            if has_attachments { "yes" } else { "no" }
+        )
+    } else {
+        String::new()
+    };
+    let verification_tail = if screenshot_requested {
+        "Did we fully satisfy the request (including any requested screenshot/file attachment)? Reply YES or NO. If NO, on the next line add one sentence: what's missing."
+    } else {
+        "Did we fully satisfy the request? Reply YES or NO. If NO, on the next line add one sentence: what's missing."
+    };
     let user_text = format!(
-        "Original request: {}\n\n{}What we did (summary): {}\n\n{}Attachments sent: {}.\n\nDid we fully satisfy the request (e.g. screenshot taken and attached if asked)? Reply YES or NO. If NO, on the next line add one sentence: what's missing.",
+        "Original request: {}\n\n{}What we did (summary): {}\n\n{}{}{}",
         question.chars().take(500).collect::<String>(),
         criteria_block,
         response_summary,
         browser_content_block,
-        if has_attachments { "yes" } else { "no" }
+        attachment_block,
+        verification_tail
     );
 
     // Vision path: when we have an image and a vision model, send image + prompt for better verification.
@@ -2271,10 +2801,15 @@ async fn verify_completion(
                     crate::ollama::ChatMessage {
                         role: "user".to_string(),
                         content: format!(
-                            "Original request: {}\n\n{}What we did (summary): {}\n\nAttachments sent: yes.\n\nDid we fully satisfy the request? Reply YES or NO. If NO, on the next line add one sentence: what's missing.",
+                            "Original request: {}\n\n{}What we did (summary): {}\n\n{}Did we fully satisfy the request? Reply YES or NO. If NO, on the next line add one sentence: what's missing.",
                             question.chars().take(500).collect::<String>(),
                             criteria_block,
-                            response_summary
+                            response_summary,
+                            if screenshot_requested {
+                                "Attachments sent: yes.\n\n"
+                            } else {
+                                ""
+                            }
                         ),
                         images: None,
                     },
@@ -2326,6 +2861,25 @@ async fn verify_completion(
     Ok((satisfied, reason))
 }
 
+fn original_request_for_retry(
+    question: &str,
+    conversation_history: Option<&[crate::ollama::ChatMessage]>,
+    is_verification_retry: bool,
+) -> String {
+    if !is_verification_retry {
+        return question.to_string();
+    }
+    conversation_history
+        .and_then(|history| {
+            history
+                .iter()
+                .rev()
+                .find(|msg| msg.role == "user" && !msg.content.trim().is_empty())
+        })
+        .map(|msg| msg.content.trim().to_string())
+        .unwrap_or_else(|| question.to_string())
+}
+
 /// When set, `skill_content` is prepended to system prompts (from ~/.mac-stats/agents/skills/skill-<n>-<topic>.md).
 /// When set, `agent_override` uses that agent's model and combined_prompt (soul+mood+skill) for the main run (e.g. Discord "agent: 001").
 /// When `allow_schedule` is false (e.g. when running from the scheduler), the SCHEDULE tool is disabled so a scheduled task cannot create more schedules.
@@ -2355,15 +2909,29 @@ pub fn answer_with_ollama_and_fetch(
     discord_intermediate: Option<String>,
     // When true (verification retry path), we keep conversation history and skip NEW_TOPIC check so the model retains context.
     is_verification_retry: bool,
+    // Original end-user request for this run. When set, verification/criteria extraction use this
+    // instead of inferring from retry prompts or conversation history.
+    original_user_request: Option<String>,
+    // Request-local criteria extracted on the first pass. Reused on retry to avoid context bleed.
+    success_criteria_override: Option<Vec<String>>,
 ) -> Pin<Box<dyn Future<Output = Result<OllamaReply, String>> + Send>> {
     let question = question.to_string();
     let mut conversation_history = conversation_history.map(|v| v.to_vec());
     let attachment_images_base64 = attachment_images_base64.map(|v| v.to_vec());
     let discord_intermediate = discord_intermediate.map(|s| s.to_string());
     let is_verification_retry = is_verification_retry;
+    let original_user_request = original_user_request.map(|s| s.to_string());
+    let success_criteria_override = success_criteria_override.map(|v| v.to_vec());
     Box::pin(async move {
         use tracing::info;
         let question = question.as_str();
+        let request_for_verification = original_user_request.clone().unwrap_or_else(|| {
+            original_request_for_retry(
+                question,
+                conversation_history.as_deref(),
+                is_verification_retry,
+            )
+        });
         let request_id: String = format!(
             "{:08x}",
             std::time::SystemTime::now()
@@ -2390,7 +2958,9 @@ pub fn answer_with_ollama_and_fetch(
                     .as_ref()
                     .map_or(false, |h| !h.is_empty())
                 {
-                    info!("Agent router: clearing history for Discord screenshot-send request (focus on current task)");
+                    info!(
+                        "Agent router: clearing history for Discord screenshot-send request (focus on current task)"
+                    );
                     conversation_history = Some(vec![]);
                 }
             }
@@ -2475,9 +3045,9 @@ pub fn answer_with_ollama_and_fetch(
 
         let question_for_plan_and_exec = if escalation {
             format!(
-            "[The user is not satisfied and wants the task actually completed. You MUST use tools to fulfill the request; do not reply with only text.]\n\n{}",
-            question
-        )
+                "[The user is not satisfied and wants the task actually completed. You MUST use tools to fulfill the request; do not reply with only text.]\n\n{}",
+                question
+            )
         } else {
             question.to_string()
         };
@@ -2513,21 +3083,40 @@ pub fn answer_with_ollama_and_fetch(
 
         // Criteria at start: extract 1–3 success criteria to feed into end verification
         send_status("Extracting success criteria…");
-        let success_criteria = if is_redmine_review_or_summarize_only(question) {
-            info!("Agent router: review/summarize-only Redmine request — overriding success criteria to summary-only");
+        let success_criteria = if let Some(criteria) = success_criteria_override.clone() {
+            info!(
+                "Agent router [{}]: reusing {} request-local success criteria",
+                request_id,
+                criteria.len()
+            );
+            Some(sanitize_success_criteria(
+                &request_for_verification,
+                criteria,
+            ))
+        } else if is_redmine_review_or_summarize_only(&request_for_verification) {
+            info!(
+                "Agent router: review/summarize-only Redmine request — overriding success criteria to summary-only"
+            );
             Some(vec![
-                "Summary of ticket content provided to the user.".to_string()
+                "Summary of ticket content provided to the user.".to_string(),
             ])
-        } else if is_redmine_time_entries_request(question) {
-            info!("Agent router: Redmine time-entries request — overriding success criteria to Redmine data-only");
+        } else if is_redmine_time_entries_request(&request_for_verification) {
+            info!(
+                "Agent router: Redmine time-entries request — overriding success criteria to Redmine data-only"
+            );
             Some(vec![
                 "Actual Redmine time entries for the requested period were fetched.".to_string(),
                 "A clear summary of hours or worked tickets was provided from that Redmine data."
                     .to_string(),
             ])
         } else {
-            extract_success_criteria(question, model_override.clone(), options_override.clone())
-                .await
+            extract_success_criteria(
+                &request_for_verification,
+                model_override.clone(),
+                options_override.clone(),
+            )
+            .await
+            .map(|criteria| sanitize_success_criteria(&request_for_verification, criteria))
         };
         let criteria_status = match &success_criteria {
             Some(c) if !c.is_empty() => {
@@ -2535,7 +3124,9 @@ pub fn answer_with_ollama_and_fetch(
                 truncate_status(&c.join("; "), 200)
             }
             _ => {
-                tracing::debug!("Agent router: no success criteria extracted (verification will use request summary only)");
+                tracing::debug!(
+                    "Agent router: no success criteria extracted (verification will use request summary only)"
+                );
                 "(none)".to_string()
             }
         };
@@ -2556,7 +3147,9 @@ pub fn answer_with_ollama_and_fetch(
                     let summary = summarize_last_turns(hist, 3);
                     match detect_new_topic(question, &summary, &effective_model).await {
                         Ok(true) => {
-                            info!("Agent router: new-topic check returned NEW_TOPIC, using no prior context");
+                            info!(
+                                "Agent router: new-topic check returned NEW_TOPIC, using no prior context"
+                            );
                             is_new_topic = true;
                         }
                         Ok(false) => {}
@@ -2616,8 +3209,8 @@ pub fn answer_with_ollama_and_fetch(
                     }
                     if is_new_topic || not_needed {
                         info!(
-                        "Session compaction: prior context not relevant to current question (new topic), using no prior context"
-                    );
+                            "Session compaction: prior context not relevant to current question (new topic), using no prior context"
+                        );
                         vec![]
                     } else {
                         info!(
@@ -2641,9 +3234,15 @@ pub fn answer_with_ollama_and_fetch(
                     let msg = if e.to_string().to_lowercase().contains("unauthorized")
                         || e.to_string().contains("401")
                     {
-                        format!("Session compaction failed: {} (use a local model for compaction; cloud models may require auth). Keeping full history ({} messages) for this request.", e, n)
+                        format!(
+                            "Session compaction failed: {} (use a local model for compaction; cloud models may require auth). Keeping full history ({} messages) for this request.",
+                            e, n
+                        )
                     } else {
-                        format!("Session compaction failed: {}; keeping full history ({} messages) for this request.", e, n)
+                        format!(
+                            "Session compaction failed: {}; keeping full history ({} messages) for this request.",
+                            e, n
+                        )
                     };
                     tracing::warn!("{}", msg);
                     raw_history
@@ -2715,14 +3314,14 @@ pub fn answer_with_ollama_and_fetch(
                     .unwrap_or(name.as_str());
                 let mut ctx = if !display_name.is_empty() {
                     format!(
-                    "You are talking to Discord user **{}** (user id: {}). Use this when addressing the user or when calling Discord API with this user.",
-                    display_name, id
-                )
+                        "You are talking to Discord user **{}** (user id: {}). Use this when addressing the user or when calling Discord API with this user.",
+                        display_name, id
+                    )
                 } else {
                     format!(
-                    "You are talking to Discord user (user id: {}). Use this when calling Discord API with this user.",
-                    id
-                )
+                        "You are talking to Discord user (user id: {}). Use this when calling Discord API with this user.",
+                        id
+                    )
                 };
                 if let Some(ref details) = stored {
                     let extra = crate::user_info::format_user_details_for_context(details);
@@ -2759,8 +3358,14 @@ pub fn answer_with_ollama_and_fetch(
                     );
                     Some(rec)
                 } else if crate::redmine::is_configured() {
-                    if is_redmine_time_entries_request(q) {
-                        let (from, to) = redmine_time_entries_range(q);
+                    let redmine_request = redmine_request_for_routing(
+                        q,
+                        &request_for_verification,
+                        is_verification_retry,
+                    );
+                    let redmine_request_lower = redmine_request.to_lowercase();
+                    if is_redmine_time_entries_request(redmine_request) {
+                        let (from, to) = redmine_time_entries_range(redmine_request);
                         let rec = format!(
                             "REDMINE_API: GET /time_entries.json?from={}&to={}&limit=100",
                             from, to
@@ -2771,37 +3376,42 @@ pub fn answer_with_ollama_and_fetch(
                         );
                         Some(rec)
                     } else {
-                    let ticket_id = extract_ticket_id(&q_lower);
-                    let wants_update = q_lower.contains("update")
-                        || q_lower.contains("add comment")
-                        || q_lower.contains("with the next steps")
-                        || q_lower.contains("post a comment")
-                        || q_lower.contains("write ")
-                        || q_lower.contains("put ");
-                    if ticket_id.is_some()
-                        && (q_lower.contains("ticket")
-                            || q_lower.contains("issue")
-                            || q_lower.contains("redmine"))
-                        && !wants_update
-                    {
-                        let id = ticket_id.unwrap();
-                        let rec = format!(
-                            "REDMINE_API: GET /issues/{}.json?include=journals,attachments",
-                            id
-                        );
-                        info!("Agent router: pre-routed to REDMINE_API for ticket #{}", id);
-                        Some(rec)
-                    } else {
-                        None
-                    }
+                        let ticket_id = extract_ticket_id(&redmine_request_lower);
+                        let wants_update = redmine_request_lower.contains("update")
+                            || redmine_request_lower.contains("add comment")
+                            || redmine_request_lower.contains("with the next steps")
+                            || redmine_request_lower.contains("post a comment")
+                            || redmine_request_lower.contains("write ")
+                            || redmine_request_lower.contains("put ");
+                        if ticket_id.is_some()
+                            && (redmine_request_lower.contains("ticket")
+                                || redmine_request_lower.contains("issue")
+                                || redmine_request_lower.contains("redmine"))
+                            && !wants_update
+                        {
+                            let id = ticket_id.unwrap();
+                            let rec = format!(
+                                "REDMINE_API: GET /issues/{}.json?include=journals,attachments",
+                                id
+                            );
+                            info!("Agent router: pre-routed to REDMINE_API for ticket #{}", id);
+                            Some(rec)
+                        } else {
+                            None
+                        }
                     }
                 } else {
                     None
                 }
             } else if crate::redmine::is_configured() {
-                let q_lower = question.to_lowercase();
-                if is_redmine_time_entries_request(question) {
-                    let (from, to) = redmine_time_entries_range(question);
+                let redmine_request = redmine_request_for_routing(
+                    question,
+                    &request_for_verification,
+                    is_verification_retry,
+                );
+                let redmine_request_lower = redmine_request.to_lowercase();
+                if is_redmine_time_entries_request(redmine_request) {
+                    let (from, to) = redmine_time_entries_range(redmine_request);
                     let rec = format!(
                         "REDMINE_API: GET /time_entries.json?from={}&to={}&limit=100",
                         from, to
@@ -2812,26 +3422,26 @@ pub fn answer_with_ollama_and_fetch(
                     );
                     Some(rec)
                 } else {
-                    let ticket_id = extract_ticket_id(&q_lower);
-                    let wants_update = q_lower.contains("update")
-                        || q_lower.contains("add comment")
-                        || q_lower.contains("with the next steps")
-                        || q_lower.contains("post a comment")
-                        || q_lower.contains("write ")
-                        || q_lower.contains("put ");
+                    let ticket_id = extract_ticket_id(&redmine_request_lower);
+                    let wants_update = redmine_request_lower.contains("update")
+                        || redmine_request_lower.contains("add comment")
+                        || redmine_request_lower.contains("with the next steps")
+                        || redmine_request_lower.contains("post a comment")
+                        || redmine_request_lower.contains("write ")
+                        || redmine_request_lower.contains("put ");
                     if ticket_id.is_some()
-                        && (q_lower.contains("ticket")
-                            || q_lower.contains("issue")
-                            || q_lower.contains("redmine"))
+                        && (redmine_request_lower.contains("ticket")
+                            || redmine_request_lower.contains("issue")
+                            || redmine_request_lower.contains("redmine"))
                         && !wants_update
                     {
                         let id = ticket_id.unwrap();
-                    let rec = format!(
-                        "REDMINE_API: GET /issues/{}.json?include=journals,attachments",
-                        id
-                    );
-                    info!("Agent router: pre-routed to REDMINE_API for ticket #{}", id);
-                    Some(rec)
+                        let rec = format!(
+                            "REDMINE_API: GET /issues/{}.json?include=journals,attachments",
+                            id
+                        );
+                        info!("Agent router: pre-routed to REDMINE_API for ticket #{}", id);
+                        Some(rec)
                     } else {
                         None
                     }
@@ -2902,7 +3512,10 @@ pub fn answer_with_ollama_and_fetch(
         if is_bare_done_plan(&recommendation) {
             let q = question.to_lowercase();
             if q.contains("could not be attached") || q.contains("could not attach") {
-                info!("Agent router [{}]: planner returned bare DONE plan but question indicates attachment failure; using synthetic summary instruction", request_id);
+                info!(
+                    "Agent router [{}]: planner returned bare DONE plan but question indicates attachment failure; using synthetic summary instruction",
+                    request_id
+                );
                 recommendation = "Reply with a brief summary of what was done and that the app could not attach the file(s) to Discord, then end with **DONE: no**. Do not run further tools.".to_string();
             }
         }
@@ -2948,9 +3561,9 @@ pub fn answer_with_ollama_and_fetch(
         let metrics_block = crate::metrics::format_metrics_for_ai_context();
         let metrics_for_system = format!("\n\n{}", metrics_block);
         let model_identity = format!(
-        "\n\nYou are replying as the Ollama model: **{}**. If the user asks which model you are (or what model you run on), name this model.",
-        effective_model
-    );
+            "\n\nYou are replying as the Ollama model: **{}**. If the user asks which model you are (or what model you run on), name this model.",
+            effective_model
+        );
         // When Discord user asked for screenshots to be sent here, remind executor to actually run BROWSER_NAVIGATE + BROWSER_SCREENSHOT per URL.
         let discord_screenshot_reminder = if discord_reply_channel_id.is_some() {
             let q = question.to_lowercase();
@@ -2985,7 +3598,11 @@ pub fn answer_with_ollama_and_fetch(
         // directly instead of asking Ollama a second time to regurgitate the same tool line.
         let direct_tool = parse_tool_from_response(&recommendation);
         let (mut messages, mut response_content) = if let Some((ref tool, ref arg)) = direct_tool {
-            info!("Agent router: plan contains direct tool call {}:{} — skipping execution Ollama call", tool, crate::logging::ellipse(arg, 60));
+            info!(
+                "Agent router: plan contains direct tool call {}:{} — skipping execution Ollama call",
+                tool,
+                crate::logging::ellipse(arg, 60)
+            );
             let memory_block = load_memory_block_for_request(discord_reply_channel_id);
             let execution_system_content = match &skill_content {
                 Some(skill) => format!(
@@ -3031,18 +3648,36 @@ pub fn answer_with_ollama_and_fetch(
             };
             (msgs, synthetic)
         } else {
-            info!("Agent router: execution step — sending plan + question, starting tool loop (max {} tools)", max_tool_iterations);
+            info!(
+                "Agent router: execution step — sending plan + question, starting tool loop (max {} tools)",
+                max_tool_iterations
+            );
             let memory_block = load_memory_block_for_request(discord_reply_channel_id);
             let execution_system_content = match &skill_content {
-            Some(skill) => format!(
-                "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}{}{}\n\nYour plan: {}{}",
-                discord_user_context, skill, execution_prompt, metrics_for_system, discord_screenshot_reminder, redmine_howto_reminder, recommendation, model_identity
-            ),
-            None => format!(
-                "{}{}{}{}{}{}{}\n\nYour plan: {}{}",
-                router_soul, memory_block, discord_user_context, execution_prompt, metrics_for_system, discord_screenshot_reminder, redmine_howto_reminder, recommendation, model_identity
-            ),
-        };
+                Some(skill) => format!(
+                    "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}{}{}\n\nYour plan: {}{}",
+                    discord_user_context,
+                    skill,
+                    execution_prompt,
+                    metrics_for_system,
+                    discord_screenshot_reminder,
+                    redmine_howto_reminder,
+                    recommendation,
+                    model_identity
+                ),
+                None => format!(
+                    "{}{}{}{}{}{}{}\n\nYour plan: {}{}",
+                    router_soul,
+                    memory_block,
+                    discord_user_context,
+                    execution_prompt,
+                    metrics_for_system,
+                    discord_screenshot_reminder,
+                    redmine_howto_reminder,
+                    recommendation,
+                    model_identity
+                ),
+            };
             let mut msgs: Vec<crate::ollama::ChatMessage> = vec![crate::ollama::ChatMessage {
                 role: "system".to_string(),
                 content: execution_system_content,
@@ -3078,7 +3713,10 @@ pub fn answer_with_ollama_and_fetch(
                     } else {
                         format!("{}: {}", tool, arg)
                     };
-                    info!("Agent router: empty response — falling back to tool from recommendation: {}", crate::logging::ellipse(&synthetic, 80));
+                    info!(
+                        "Agent router: empty response — falling back to tool from recommendation: {}",
+                        crate::logging::ellipse(&synthetic, 80)
+                    );
                     (msgs, synthetic)
                 } else {
                     (msgs, content)
@@ -3098,6 +3736,7 @@ pub fn answer_with_ollama_and_fetch(
         crate::browser_agent::set_prefer_headless_for_run(prefer_headless);
         // Paths to attach when replying on Discord (e.g. BROWSER_SCREENSHOT); only under ~/.mac-stats/screenshots/.
         let mut attachment_paths: Vec<PathBuf> = Vec::new();
+        let mut screenshot_requested_by_tool_run = false;
         // Collect (agent_name, reply) for each AGENT call so we can append a conversation transcript when multiple agents participated.
         let mut agent_conversation: Vec<(String, String)> = Vec::new();
         // Dedupe repeated identical DISCORD_API calls so the model can't loop on the same request.
@@ -3118,7 +3757,11 @@ pub fn answer_with_ollama_and_fetch(
         while tool_count < max_tool_iterations {
             let tools = parse_all_tools_from_response(&response_content);
             if tools.is_empty() {
-                info!("Agent router: no tool call in response ({} chars), treating as final answer: {}", response_content.chars().count(), log_content(&response_content));
+                info!(
+                    "Agent router: no tool call in response ({} chars), treating as final answer: {}",
+                    response_content.chars().count(),
+                    log_content(&response_content)
+                );
                 break;
             }
             if tools.len() > 1 {
@@ -3173,9 +3816,9 @@ pub fn answer_with_ollama_and_fetch(
                 if is_browser_tool {
                     if browser_tool_count >= MAX_BROWSER_TOOLS_PER_RUN {
                         let msg = format!(
-                        "Maximum browser actions per run reached ({}). Reply with your answer or DONE: success / DONE: no.",
-                        MAX_BROWSER_TOOLS_PER_RUN
-                    );
+                            "Maximum browser actions per run reached ({}). Reply with your answer or DONE: success / DONE: no.",
+                            MAX_BROWSER_TOOLS_PER_RUN
+                        );
                         tool_results.push(msg);
                         info!(
                             "Agent router: browser tool cap reached ({}), skipping {}",
@@ -3188,6 +3831,9 @@ pub fn answer_with_ollama_and_fetch(
                         "Agent router: browser tool #{}/{} this run",
                         browser_tool_count, MAX_BROWSER_TOOLS_PER_RUN
                     );
+                }
+                if tool == "BROWSER_SCREENSHOT" {
+                    screenshot_requested_by_tool_run = true;
                 }
 
                 let user_message = match tool.as_str() {
@@ -3218,17 +3864,26 @@ pub fn answer_with_ollama_and_fetch(
                             String::new()
                         };
                         if !path.is_empty() {
-                            info!("Agent router: redirecting FETCH_URL discord.com -> DISCORD_API GET {}", path);
+                            info!(
+                                "Agent router: redirecting FETCH_URL discord.com -> DISCORD_API GET {}",
+                                path
+                            );
                             send_status(&format!("Discord API: GET {}", path));
-                            match crate::discord::api::discord_api_request("GET", &path, None).await {
-                        Ok(result) => format!(
-                            "Discord API result (GET {}):\n\n{}\n\nUse this to answer the user's question.",
-                            path, result
-                        ),
-                        Err(e) => format!("Discord API failed (GET {}): {}. Try DISCORD_API: GET {} or delegate to AGENT: discord-expert.", path, e, path),
-                    }
+                            match crate::discord::api::discord_api_request("GET", &path, None).await
+                            {
+                                Ok(result) => format!(
+                                    "Discord API result (GET {}):\n\n{}\n\nUse this to answer the user's question.",
+                                    path, result
+                                ),
+                                Err(e) => format!(
+                                    "Discord API failed (GET {}): {}. Try DISCORD_API: GET {} or delegate to AGENT: discord-expert.",
+                                    path, e, path
+                                ),
+                            }
                         } else {
-                            info!("Agent router: blocked FETCH_URL for discord.com (no API path). Redirecting to discord-expert.");
+                            info!(
+                                "Agent router: blocked FETCH_URL for discord.com (no API path). Redirecting to discord-expert."
+                            );
                             "Cannot fetch discord.com pages directly. Discord requires authenticated API access. Use AGENT: discord-expert for all Discord tasks, or use DISCORD_API: GET <path> with the correct API endpoint.".to_string()
                         }
                     }
@@ -3261,9 +3916,9 @@ pub fn answer_with_ollama_and_fetch(
                                 )
                                 .await?;
                                 format!(
-                            "Here is the page content:\n\n{}\n\nPlease answer the user's question based on this content.",
-                            body_fit
-                        )
+                                    "Here is the page content:\n\n{}\n\nPlease answer the user's question based on this content.",
+                                    body_fit
+                                )
                             }
                             Err(e) => {
                                 if e.contains("401") {
@@ -3284,7 +3939,9 @@ pub fn answer_with_ollama_and_fetch(
                                     } else {
                                         ""
                                     };
-                                    format!("That URL could not be fetched (connection or server error).{redmine_hint} Answer without that page.")
+                                    format!(
+                                        "That URL could not be fetched (connection or server error).{redmine_hint} Answer without that page."
+                                    )
                                 }
                             }
                         }
@@ -3295,11 +3952,14 @@ pub fn answer_with_ollama_and_fetch(
                             url_arg.is_empty() || url_arg.eq_ignore_ascii_case("current");
                         // Browser-use style: screenshot only works on current page. Reject BROWSER_SCREENSHOT: <url>.
                         if !is_current {
-                            info!("Agent router: rejecting BROWSER_SCREENSHOT: {} — use NAVIGATE first, then SCREENSHOT: current", crate::logging::ellipse(&url_arg, 60));
+                            info!(
+                                "Agent router: rejecting BROWSER_SCREENSHOT: {} — use NAVIGATE first, then SCREENSHOT: current",
+                                crate::logging::ellipse(&url_arg, 60)
+                            );
                             format!(
-                        "BROWSER_SCREENSHOT only works on the current page. Use BROWSER_NAVIGATE: {} first, then BROWSER_SCREENSHOT: current. Never use BROWSER_SCREENSHOT: <url>.",
-                        url_arg
-                    )
+                                "BROWSER_SCREENSHOT only works on the current page. Use BROWSER_NAVIGATE: {} first, then BROWSER_SCREENSHOT: current. Never use BROWSER_SCREENSHOT: <url>.",
+                                url_arg
+                            )
                         } else {
                             send_status("📸 Taking screenshot of current page");
                             match tokio::task::spawn_blocking(
@@ -3313,13 +3973,20 @@ pub fn answer_with_ollama_and_fetch(
                                         let _ = tx.send(format!("ATTACH:{}", path.display()));
                                     }
                                     format!(
-                                "Screenshot of current page saved to: {}.\n\nTell the user the screenshot was taken; the app will attach it in Discord.",
-                                path.display()
-                            )
+                                        "Screenshot of current page saved to: {}.\n\nTell the user the screenshot was taken; the app will attach it in Discord.",
+                                        path.display()
+                                    )
                                 }
                                 Ok(Err(e)) => {
-                                    info!("Agent router [{}]: BROWSER_SCREENSHOT (current) failed: {}", request_id, crate::logging::ellipse(&e, 200));
-                                    format!("Screenshot of current page failed: {}. (Use BROWSER_NAVIGATE and BROWSER_CLICK first with CDP; then BROWSER_SCREENSHOT: current. Chrome may need to be on port 9222.)", e)
+                                    info!(
+                                        "Agent router [{}]: BROWSER_SCREENSHOT (current) failed: {}",
+                                        request_id,
+                                        crate::logging::ellipse(&e, 200)
+                                    );
+                                    format!(
+                                        "Screenshot of current page failed: {}. (Use BROWSER_NAVIGATE and BROWSER_CLICK first with CDP; then BROWSER_SCREENSHOT: current. Chrome may need to be on port 9222.)",
+                                        e
+                                    )
                                 }
                                 Err(e) => format!("Screenshot task error: {}", e),
                             }
@@ -3343,7 +4010,10 @@ pub fn answer_with_ollama_and_fetch(
                             {
                                 Ok(Ok(state_str)) => state_str,
                                 Ok(Err(cdp_err)) => {
-                                    info!("BROWSER_NAVIGATE CDP failed, ensuring Chrome on 9222 and retrying: {}", crate::logging::ellipse(&cdp_err, 120));
+                                    info!(
+                                        "BROWSER_NAVIGATE CDP failed, ensuring Chrome on 9222 and retrying: {}",
+                                        crate::logging::ellipse(&cdp_err, 120)
+                                    );
                                     tokio::task::spawn_blocking(|| {
                                         crate::browser_agent::ensure_chrome_on_port(9222)
                                     })
@@ -3357,16 +4027,26 @@ pub fn answer_with_ollama_and_fetch(
                                     {
                                         Ok(Ok(state_str)) => state_str,
                                         Ok(Err(cdp_err2)) => {
-                                            info!("BROWSER_NAVIGATE CDP retry failed, trying HTTP fallback: {}", crate::logging::ellipse(&cdp_err2, 120));
-                                            match tokio::task::spawn_blocking(move || crate::browser_agent::navigate_http(&url_arg)).await {
-                                        Ok(Ok(state_str)) => state_str,
-                                        Ok(Err(http_err)) => format!(
-                                            "BROWSER_NAVIGATE failed (CDP: {}). HTTP fallback also failed: {}",
-                                            crate::logging::ellipse(&cdp_err2, 80),
-                                            http_err
-                                        ),
-                                        Err(e) => format!("BROWSER_NAVIGATE HTTP fallback task error: {}", e),
-                                    }
+                                            info!(
+                                                "BROWSER_NAVIGATE CDP retry failed, trying HTTP fallback: {}",
+                                                crate::logging::ellipse(&cdp_err2, 120)
+                                            );
+                                            match tokio::task::spawn_blocking(move || {
+                                                crate::browser_agent::navigate_http(&url_arg)
+                                            })
+                                            .await
+                                            {
+                                                Ok(Ok(state_str)) => state_str,
+                                                Ok(Err(http_err)) => format!(
+                                                    "BROWSER_NAVIGATE failed (CDP: {}). HTTP fallback also failed: {}",
+                                                    crate::logging::ellipse(&cdp_err2, 80),
+                                                    http_err
+                                                ),
+                                                Err(e) => format!(
+                                                    "BROWSER_NAVIGATE HTTP fallback task error: {}",
+                                                    e
+                                                ),
+                                            }
                                         }
                                         Err(e) => {
                                             format!("BROWSER_NAVIGATE CDP retry task error: {}", e)
@@ -3494,11 +4174,18 @@ pub fn answer_with_ollama_and_fetch(
                         {
                             Ok(Ok(text)) => text,
                             Ok(Err(_cdp_err)) => {
-                                match tokio::task::spawn_blocking(crate::browser_agent::extract_http).await {
-                            Ok(Ok(text)) => text,
-                            Ok(Err(e)) => format!("BROWSER_EXTRACT failed: {}. (Navigate to a page first with BROWSER_NAVIGATE.)", e),
-                            Err(e) => format!("BROWSER_EXTRACT task error: {}", e),
-                        }
+                                match tokio::task::spawn_blocking(
+                                    crate::browser_agent::extract_http,
+                                )
+                                .await
+                                {
+                                    Ok(Ok(text)) => text,
+                                    Ok(Err(e)) => format!(
+                                        "BROWSER_EXTRACT failed: {}. (Navigate to a page first with BROWSER_NAVIGATE.)",
+                                        e
+                                    ),
+                                    Err(e) => format!("BROWSER_EXTRACT task error: {}", e),
+                                }
                             }
                             Err(e) => format!("BROWSER_EXTRACT task error: {}", e),
                         }
@@ -3523,7 +4210,10 @@ pub fn answer_with_ollama_and_fetch(
                                         "BROWSER_SEARCH_PAGE failed: {}",
                                         crate::logging::ellipse(&e, 200)
                                     );
-                                    format!("BROWSER_SEARCH_PAGE failed: {}. (Navigate to a page first with BROWSER_NAVIGATE.)", e)
+                                    format!(
+                                        "BROWSER_SEARCH_PAGE failed: {}. (Navigate to a page first with BROWSER_NAVIGATE.)",
+                                        e
+                                    )
                                 }
                                 Err(e) => format!("BROWSER_SEARCH_PAGE task error: {}", e),
                             }
@@ -3552,16 +4242,19 @@ pub fn answer_with_ollama_and_fetch(
                             crate::logging::ellipse(&arg, 35)
                         ));
                         info!("Discord/Ollama: PERPLEXITY_SEARCH requested: {}", arg);
-                        match crate::commands::perplexity::perplexity_search(
-                            crate::commands::perplexity::PerplexitySearchRequest {
-                                query: arg.to_string(),
-                                max_results: Some(crate::config::Config::perplexity_max_results()),
-                            },
+                        let q_lower = question.to_lowercase();
+                        let is_news_query = is_news_query(question);
+                        let snippet_max = crate::config::Config::perplexity_snippet_max_chars();
+                        let max_results = crate::config::Config::perplexity_max_results();
+                        match search_perplexity_with_news_fallback(
+                            question,
+                            &arg,
+                            max_results,
+                            snippet_max,
                         )
                         .await
                         {
-                            Ok(resp) => {
-                                let q_lower = question.to_lowercase();
+                            Ok((shaped_results, urls, filtered_any, refined_query_used)) => {
                                 let want_screenshots = (q_lower.contains("screenshot")
                                     || q_lower.contains("screen shot"))
                                     && (q_lower.contains("visit")
@@ -3572,22 +4265,18 @@ pub fn answer_with_ollama_and_fetch(
                                         || q_lower.contains("send the")
                                         || q_lower.contains("in discord")
                                         || q_lower.contains(" here "));
-                                let urls: Vec<String> = resp
-                                    .results
-                                    .iter()
-                                    .filter(|r| {
-                                        r.url.starts_with("http://")
-                                            || r.url.starts_with("https://")
+                                let urls: Vec<String> = urls
+                                    .into_iter()
+                                    .filter(|url| {
+                                        url.starts_with("http://") || url.starts_with("https://")
                                     })
-                                    .map(|r| r.url.clone())
                                     .take(5)
                                     .collect();
                                 // In verbose mode (Discord): brief feedback that results were received before next step.
                                 const MAX_PERPLEXITY_SUMMARY_CHARS: usize = 380;
                                 if status_tx.is_some() {
-                                    let n = resp.results.len();
-                                    let titles: String = resp
-                                        .results
+                                    let n = shaped_results.len();
+                                    let titles: String = shaped_results
                                         .iter()
                                         .take(5)
                                         .map(|r| r.title.trim().to_string())
@@ -3601,26 +4290,12 @@ pub fn answer_with_ollama_and_fetch(
                                     );
                                     send_status(&summary);
                                 }
-                                let snippet_max =
-                                    crate::config::Config::perplexity_snippet_max_chars();
-                                let num_results = resp.results.len();
+                                let num_results = shaped_results.len();
                                 // Structured markdown: numbered results with explicit Title/URL/Date/Snippet so the model parses and cites reliably.
-                                let results: String = resp
-                                    .results
+                                let results: String = shaped_results
                                     .into_iter()
                                     .enumerate()
                                     .map(|(i, r)| {
-                                        let snippet = if r.snippet.chars().count() > snippet_max {
-                                            format!(
-                                                "{}…",
-                                                r.snippet
-                                                    .chars()
-                                                    .take(snippet_max)
-                                                    .collect::<String>()
-                                            )
-                                        } else {
-                                            r.snippet
-                                        };
                                         let date_str = r
                                             .date
                                             .as_deref()
@@ -3632,13 +4307,24 @@ pub fn answer_with_ollama_and_fetch(
                                         } else {
                                             format!("- **Date:** {}\n", date_str)
                                         };
+                                        let page_type = if is_news_query
+                                            && is_likely_article_like_result(
+                                                &r.title, &r.url, &r.snippet,
+                                            ) {
+                                            "- **Page type:** article-like\n"
+                                        } else if is_news_query {
+                                            "- **Page type:** hub/landing page\n"
+                                        } else {
+                                            ""
+                                        };
                                         format!(
-                                            "### {}. {}\n- **URL:** {}\n{}- **Snippet:** {}",
+                                            "### {}. {}\n- **URL:** {}\n{}{}- **Snippet:** {}",
                                             i + 1,
                                             r.title,
                                             r.url,
                                             date_line,
-                                            snippet
+                                            page_type,
+                                            r.snippet
                                         )
                                     })
                                     .collect::<Vec<_>>()
@@ -3647,13 +4333,31 @@ pub fn answer_with_ollama_and_fetch(
                                     "Perplexity search returned no results. Answer from general knowledge.".to_string()
                                 } else {
                                     format!(
-                                "## Perplexity Search Results ({} items)\n\n{}\n\nUse these to answer the user's question. Cite source number, title or URL, and date when given.",
-                                num_results,
-                                results
-                            )
+                                        "## Perplexity Search Results ({} items)\n\n{}\n\nUse these to answer the user's question. Cite source number, title or URL, and date when given.",
+                                        num_results, results
+                                    )
                                 };
+                                if is_news_query && !results.is_empty() {
+                                    result_text.push_str(
+                                        "\n\nFor news requests, prefer concrete article/report results over homepages, hub pages, standings pages, rumor indexes, or official landing pages. If a result looks like a hub, use it only as fallback and say so clearly.",
+                                    );
+                                    if let Some(ref refined_query) = refined_query_used {
+                                        result_text.push_str(&format!(
+                                            "\nRefined search query used to find article-like results: {}.",
+                                            refined_query
+                                        ));
+                                    }
+                                    if filtered_any {
+                                        result_text.push_str(
+                                            "\nFiltered to higher-signal results and limited repeated domains where possible.",
+                                        );
+                                    }
+                                }
                                 if want_screenshots && !urls.is_empty() {
-                                    info!("Agent router: auto-visit and screenshot for {} URLs (user asked for screenshots)", urls.len());
+                                    info!(
+                                        "Agent router: auto-visit and screenshot for {} URLs (user asked for screenshots)",
+                                        urls.len()
+                                    );
                                     for (i, url) in urls.iter().enumerate() {
                                         send_status(&format!(
                                             "🧭 Visiting {} of {}…",
@@ -3681,7 +4385,11 @@ pub fn answer_with_ollama_and_fetch(
                                                             path.display()
                                                         ));
                                                     }
-                                                    info!("Agent router: auto-screenshot {} saved to {:?}", i + 1, path);
+                                                    info!(
+                                                        "Agent router: auto-screenshot {} saved to {:?}",
+                                                        i + 1,
+                                                        path
+                                                    );
                                                 }
                                             }
                                             Ok(Err(e)) => {
@@ -3757,12 +4465,15 @@ pub fn answer_with_ollama_and_fetch(
                         );
                         match run_js_via_node(&arg) {
                             Ok(result) => format!(
-                        "JavaScript result:\n\n{}\n\nUse this to answer the user's question.",
-                        result
-                    ),
+                                "JavaScript result:\n\n{}\n\nUse this to answer the user's question.",
+                                result
+                            ),
                             Err(e) => {
                                 info!("Discord/Ollama: RUN_JS failed: {}", e);
-                                format!("JavaScript execution failed: {}. Answer the user's question without running code.", e)
+                                format!(
+                                    "JavaScript execution failed: {}. Answer the user's question without running code.",
+                                    e
+                                )
                             }
                         }
                     }
@@ -3783,31 +4494,34 @@ pub fn answer_with_ollama_and_fetch(
                                     skill.number, skill.topic
                                 ));
                                 info!(
-                            "Agent router: using skill {} ({}) — new session (no main context)",
-                            skill.number, skill.topic
-                        );
+                                    "Agent router: using skill {} ({}) — new session (no main context)",
+                                    skill.number, skill.topic
+                                );
                                 let user_msg = if task_message.is_empty() {
                                     question
                                 } else {
                                     task_message
                                 };
                                 match run_skill_ollama_session(
-                            &skill.content,
-                            user_msg,
-                            model_override.clone(),
-                            options_override.clone(),
-                        )
-                        .await
-                        {
-                            Ok(result) => format!(
-                                "Skill \"{}-{}\" result:\n\n{}\n\nUse this to answer the user's question.",
-                                skill.number, skill.topic, result
-                            ),
-                            Err(e) => {
-                                info!("Agent router: SKILL session failed: {}", e);
-                                format!("Skill \"{}-{}\" failed: {}. Answer without this result.", skill.number, skill.topic, e)
-                            }
-                        }
+                                    &skill.content,
+                                    user_msg,
+                                    model_override.clone(),
+                                    options_override.clone(),
+                                )
+                                .await
+                                {
+                                    Ok(result) => format!(
+                                        "Skill \"{}-{}\" result:\n\n{}\n\nUse this to answer the user's question.",
+                                        skill.number, skill.topic, result
+                                    ),
+                                    Err(e) => {
+                                        info!("Agent router: SKILL session failed: {}", e);
+                                        format!(
+                                            "Skill \"{}-{}\" failed: {}. Answer without this result.",
+                                            skill.number, skill.topic, e
+                                        )
+                                    }
+                                }
                             }
                             None => {
                                 info!(
@@ -3819,10 +4533,14 @@ pub fn answer_with_ollama_and_fetch(
                                         .collect::<Vec<_>>()
                                 );
                                 format!(
-                            "Unknown skill \"{}\". Available skills: {}. Answer without using a skill.",
-                            selector,
-                            skills.iter().map(|s| format!("{}-{}", s.number, s.topic)).collect::<Vec<_>>().join(", ")
-                        )
+                                    "Unknown skill \"{}\". Available skills: {}. Answer without using a skill.",
+                                    selector,
+                                    skills
+                                        .iter()
+                                        .map(|s| format!("{}-{}", s.number, s.topic))
+                                        .collect::<Vec<_>>()
+                                        .join(", ")
+                                )
                             }
                         }
                     }
@@ -3846,10 +4564,12 @@ pub fn answer_with_ollama_and_fetch(
                                     .map(|m| m.content.starts_with("Agent \"Orchestrator\""))
                                     .unwrap_or(false);
                                 if is_orchestrator && last_is_orchestrator_result {
-                                    info!("Agent router: skipping repeated AGENT: orchestrator (loop breaker)");
+                                    info!(
+                                        "Agent router: skipping repeated AGENT: orchestrator (loop breaker)"
+                                    );
                                     format!(
-                                "The orchestrator already replied above. Reply with a one-sentence summary for the user and **DONE: success** or **DONE: no**. Do not output AGENT: orchestrator again."
-                            )
+                                        "The orchestrator already replied above. Reply with a one-sentence summary for the user and **DONE: success** or **DONE: no**. Do not output AGENT: orchestrator again."
+                                    )
                                 } else {
                                     let mut user_msg: String = if task_message.is_empty() {
                                         question.to_string()
@@ -3876,13 +4596,20 @@ pub fn answer_with_ollama_and_fetch(
                                             {
                                                 Ok(meta) => {
                                                     user_msg = format!(
-                                            "Current Discord context (use these IDs in DISCORD_API calls):\n{}\n\nUser request: {}",
-                                            meta, user_msg
-                                        );
-                                                    info!("Agent router: injected Discord guild/channel metadata for discord-expert (channel {})", channel_id);
+                                                        "Current Discord context (use these IDs in DISCORD_API calls):\n{}\n\nUser request: {}",
+                                                        meta, user_msg
+                                                    );
+                                                    info!(
+                                                        "Agent router: injected Discord guild/channel metadata for discord-expert (channel {})",
+                                                        channel_id
+                                                    );
                                                 }
                                                 Err(e) => {
-                                                    tracing::debug!("Agent router: Discord metadata fetch failed (channel {}): {}", channel_id, e);
+                                                    tracing::debug!(
+                                                        "Agent router: Discord metadata fetch failed (channel {}): {}",
+                                                        channel_id,
+                                                        e
+                                                    );
                                                 }
                                             }
                                         }
@@ -3911,25 +4638,25 @@ pub fn answer_with_ollama_and_fetch(
                                             agent_conversation
                                                 .push((label.clone(), result.trim().to_string()));
                                             format!(
-                                    "Agent \"{}\" ({}) result:\n\n{}\n\nUse this to answer the user's question.",
-                                    agent.name, agent.id, result
-                                )
+                                                "Agent \"{}\" ({}) result:\n\n{}\n\nUse this to answer the user's question.",
+                                                agent.name, agent.id, result
+                                            )
                                         }
                                         Err(e) => {
                                             info!("Agent router: AGENT session failed: {}", e);
                                             if is_redmine_agent && is_agent_unavailable_error(&e) {
                                                 format!(
-                                    "Agent \"{}\" ({}) failed: {}.\n\nRe-plan this request without AGENT: redmine. {} Do not use FETCH_URL and do not reply with only another RUN_CMD.",
-                                    agent.name,
-                                    agent.id,
-                                    e,
-                                    redmine_direct_fallback_hint(question)
-                                )
+                                                    "Agent \"{}\" ({}) failed: {}.\n\nRe-plan this request without AGENT: redmine. {} Do not use FETCH_URL and do not reply with only another RUN_CMD.",
+                                                    agent.name,
+                                                    agent.id,
+                                                    e,
+                                                    redmine_direct_fallback_hint(question)
+                                                )
                                             } else {
                                                 format!(
-                                    "Agent \"{}\" ({}) failed: {}. Answer without this result.",
-                                    agent.name, agent.id, e
-                                )
+                                                    "Agent \"{}\" ({}) failed: {}. Answer without this result.",
+                                                    agent.name, agent.id, e
+                                                )
                                             }
                                         }
                                     }
@@ -3948,9 +4675,9 @@ pub fn answer_with_ollama_and_fetch(
                                     selector, list
                                 );
                                 format!(
-                            "Unknown agent \"{}\". Available agents: {}. Answer without using an agent.",
-                            selector, list
-                        )
+                                    "Unknown agent \"{}\". Available agents: {}. Answer without using an agent.",
+                                    selector, list
+                                )
                             }
                         }
                     }
@@ -3993,18 +4720,28 @@ pub fn answer_with_ollama_and_fetch(
                                             let task_preview: String =
                                                 task.chars().take(100).collect();
                                             format!(
-                                        "Schedule added successfully. Schedule ID: **{}**. The scheduler will run this task (cron: {}): \"{}\". Tell the user the schedule ID is {} and they can remove it later with \"Remove schedule: {}\" or by saying REMOVE_SCHEDULE: {}.",
-                                        id, cron_str, task_preview.trim(), id, id, id
-                                    )
+                                                "Schedule added successfully. Schedule ID: **{}**. The scheduler will run this task (cron: {}): \"{}\". Tell the user the schedule ID is {} and they can remove it later with \"Remove schedule: {}\" or by saying REMOVE_SCHEDULE: {}.",
+                                                id,
+                                                cron_str,
+                                                task_preview.trim(),
+                                                id,
+                                                id,
+                                                id
+                                            )
                                         }
                                         Ok(crate::scheduler::ScheduleAddOutcome::AlreadyExists) => {
-                                            info!("Agent router: SCHEDULE skipped (same task already scheduled)");
+                                            info!(
+                                                "Agent router: SCHEDULE skipped (same task already scheduled)"
+                                            );
                                             "This task is already scheduled with the same cron and description. Tell the user no duplicate was added."
                                         .to_string()
                                         }
                                         Err(e) => {
                                             info!("Agent router: SCHEDULE failed: {}", e);
-                                            format!("Failed to add schedule: {}. Tell the user and suggest they check ~/.mac-stats/schedules.json.", e)
+                                            format!(
+                                                "Failed to add schedule: {}. Tell the user and suggest they check ~/.mac-stats/schedules.json.",
+                                                e
+                                            )
                                         }
                                     }
                                 }
@@ -4026,9 +4763,14 @@ pub fn answer_with_ollama_and_fetch(
                                             let task_preview: String =
                                                 task.chars().take(100).collect();
                                             format!(
-                                        "One-time schedule added. Schedule ID: **{}** (at {}): \"{}\". Tell the user the schedule ID is {} and they can remove it with \"Remove schedule: {}\" or REMOVE_SCHEDULE: {}.",
-                                        id, at_str, task_preview.trim(), id, id, id
-                                    )
+                                                "One-time schedule added. Schedule ID: **{}** (at {}): \"{}\". Tell the user the schedule ID is {} and they can remove it with \"Remove schedule: {}\" or REMOVE_SCHEDULE: {}.",
+                                                id,
+                                                at_str,
+                                                task_preview.trim(),
+                                                id,
+                                                id,
+                                                id
+                                            )
                                         }
                                         Ok(crate::scheduler::ScheduleAddOutcome::AlreadyExists) => {
                                             info!("Agent router: SCHEDULE at skipped (duplicate)");
@@ -4036,13 +4778,19 @@ pub fn answer_with_ollama_and_fetch(
                                         }
                                         Err(e) => {
                                             info!("Agent router: SCHEDULE at failed: {}", e);
-                                            format!("Failed to add one-shot schedule: {}. Tell the user and suggest they check ~/.mac-stats/schedules.json.", e)
+                                            format!(
+                                                "Failed to add one-shot schedule: {}. Tell the user and suggest they check ~/.mac-stats/schedules.json.",
+                                                e
+                                            )
                                         }
                                     }
                                 }
                                 Err(e) => {
                                     info!("Agent router: SCHEDULE parse failed: {}", e);
-                                    format!("Could not parse schedule (expected e.g. \"every 5 minutes <task>\", \"at <datetime> <task>\", or \"<cron> <task>\"): {}. Ask the user to rephrase.", e)
+                                    format!(
+                                        "Could not parse schedule (expected e.g. \"every 5 minutes <task>\", \"at <datetime> <task>\", or \"<cron> <task>\"): {}. Ask the user to rephrase.",
+                                        e
+                                    )
                                 }
                             }
                         }
@@ -4055,10 +4803,18 @@ pub fn answer_with_ollama_and_fetch(
                             send_status(&format!("Removing schedule: {}…", id));
                             info!("Agent router: REMOVE_SCHEDULE requested: id={}", id);
                             match crate::scheduler::remove_schedule_by_id(id) {
-                        Ok(true) => format!("Schedule {} has been removed. Tell the user it is cancelled.", id),
-                        Ok(false) => format!("No schedule found with ID \"{}\". The ID may be wrong or already removed. Tell the user.", id),
-                        Err(e) => format!("Failed to remove schedule: {}. Tell the user.", e),
-                    }
+                                Ok(true) => format!(
+                                    "Schedule {} has been removed. Tell the user it is cancelled.",
+                                    id
+                                ),
+                                Ok(false) => format!(
+                                    "No schedule found with ID \"{}\". The ID may be wrong or already removed. Tell the user.",
+                                    id
+                                ),
+                                Err(e) => {
+                                    format!("Failed to remove schedule: {}. Tell the user.", e)
+                                }
+                            }
                         }
                     }
                     "LIST_SCHEDULES" => {
@@ -4075,7 +4831,9 @@ pub fn answer_with_ollama_and_fetch(
                         if !crate::commands::run_cmd::is_local_cmd_allowed() {
                             "RUN_CMD is not available (disabled by ALLOW_LOCAL_CMD=0). Answer without running local commands.".to_string()
                         } else if last_run_cmd_arg.as_deref() == Some(arg.as_str()) {
-                            info!("Agent router: RUN_CMD duplicate (same arg as last run), skipping execution");
+                            info!(
+                                "Agent router: RUN_CMD duplicate (same arg as last run), skipping execution"
+                            );
                             "You already ran this command; the result is in the message above. Do not run RUN_CMD again. Reply with TASK_APPEND then TASK_STATUS as the task instructs.".to_string()
                         } else {
                             const MAX_CMD_RETRIES: u32 = 3;
@@ -4103,11 +4861,14 @@ pub fn answer_with_ollama_and_fetch(
                                 {
                                     Ok(output) => {
                                         last_run_cmd_raw_output = Some(output.clone());
-                                        info!("Agent router: RUN_CMD completed, stored output for next TASK_APPEND ({} chars)", output.len());
+                                        info!(
+                                            "Agent router: RUN_CMD completed, stored output for next TASK_APPEND ({} chars)",
+                                            output.len()
+                                        );
                                         last_output = format!(
-                                    "Here is the command output:\n\n{}\n\nUse this to answer the user's question.",
-                                    output
-                                );
+                                            "Here is the command output:\n\n{}\n\nUse this to answer the user's question.",
+                                            output
+                                        );
                                         break;
                                     }
                                     Err(e) => {
@@ -4117,25 +4878,25 @@ pub fn answer_with_ollama_and_fetch(
                                         );
                                         if multi_tool_turn {
                                             last_output = format!(
-                                        "RUN_CMD failed in a multi-step plan: {}.\n\nRe-plan the full task from here. Keep the request in the correct tool domain. If Redmine data is still needed, use REDMINE_API directly with concrete parameters. Do not reply with only another RUN_CMD.",
-                                        e
-                                    );
+                                                "RUN_CMD failed in a multi-step plan: {}.\n\nRe-plan the full task from here. Keep the request in the correct tool domain. If Redmine data is still needed, use REDMINE_API directly with concrete parameters. Do not reply with only another RUN_CMD.",
+                                                e
+                                            );
                                             break;
                                         }
                                         if attempt >= MAX_CMD_RETRIES {
                                             last_output = format!(
-                                        "RUN_CMD failed after {} retries: {}.\n\nAnswer the user's question only (e.g. explain that the export or command failed). Do not include Redmine time entries, summaries, or other tool output that is unrelated to this request.",
-                                        MAX_CMD_RETRIES, e
-                                    );
+                                                "RUN_CMD failed after {} retries: {}.\n\nAnswer the user's question only (e.g. explain that the export or command failed). Do not include Redmine time entries, summaries, or other tool output that is unrelated to this request.",
+                                                MAX_CMD_RETRIES, e
+                                            );
                                             break;
                                         }
                                         // Ask Ollama to fix the command
                                         let allowed =
                                             crate::commands::run_cmd::allowed_commands().join(", ");
                                         let fix_prompt = format!(
-                                    "The command `{}` failed with error:\n{}\n\nReply with ONLY the corrected command on a single line, in this exact format:\nRUN_CMD: <corrected command>\n\nAllowed commands: {}. Paths must be under ~/.mac-stats.",
-                                    current_cmd, e, allowed
-                                );
+                                            "The command `{}` failed with error:\n{}\n\nReply with ONLY the corrected command on a single line, in this exact format:\nRUN_CMD: <corrected command>\n\nAllowed commands: {}. Paths must be under ~/.mac-stats.",
+                                            current_cmd, e, allowed
+                                        );
                                         let fix_messages = vec![crate::ollama::ChatMessage {
                                             role: "user".to_string(),
                                             content: fix_prompt,
@@ -4160,18 +4921,21 @@ pub fn answer_with_ollama_and_fetch(
                                                     current_cmd = new_arg;
                                                 } else {
                                                     last_output = format!(
-                                                "RUN_CMD failed: {}. AI could not produce a corrected command. Answer the user's question only; do not include Redmine or other unrelated tool output.",
-                                                e
-                                            );
+                                                        "RUN_CMD failed: {}. AI could not produce a corrected command. Answer the user's question only; do not include Redmine or other unrelated tool output.",
+                                                        e
+                                                    );
                                                     break;
                                                 }
                                             }
                                             Err(ollama_err) => {
-                                                info!("Agent router: RUN_CMD fix Ollama call failed: {}", ollama_err);
+                                                info!(
+                                                    "Agent router: RUN_CMD fix Ollama call failed: {}",
+                                                    ollama_err
+                                                );
                                                 last_output = format!(
-                                            "RUN_CMD failed: {}. Answer the user's question only; do not include Redmine or other unrelated tool output.",
-                                            e
-                                        );
+                                                    "RUN_CMD failed: {}. Answer the user's question only; do not include Redmine or other unrelated tool output.",
+                                                    e
+                                                );
                                                 break;
                                             }
                                         }
@@ -4250,9 +5014,9 @@ pub fn answer_with_ollama_and_fetch(
                                     last_successful_discord_call =
                                         Some((method.clone(), path.clone()));
                                     format!(
-                                "Discord API result:\n\n{}\n\nUse this to answer the user's question.",
-                                result
-                            )
+                                        "Discord API result:\n\n{}\n\nUse this to answer the user's question.",
+                                        result
+                                    )
                                 }
                                 Err(e) => {
                                     let msg = crate::discord::api::sanitize_discord_api_error(&e);
@@ -4283,65 +5047,93 @@ pub fn answer_with_ollama_and_fetch(
                             rest.chars().count()
                         );
                         let result = match action.as_str() {
-                    "list_models" => {
-                        list_ollama_models_full().await.map(|r| serde_json::to_string_pretty(&r).unwrap_or_else(|_| "[]".to_string()))
-                    }
-                    "version" => get_ollama_version().await.map(|r| r.version),
-                    "running" => {
-                        list_ollama_running_models().await.map(|r| serde_json::to_string_pretty(&r).unwrap_or_else(|_| "[]".to_string()))
-                    }
-                    "pull" => {
-                        let parts: Vec<&str> = rest.split_whitespace().collect();
-                        let model = parts.first().map(|s| (*s).to_string()).unwrap_or_default();
-                        let stream = parts.get(1).map(|s| *s == "true").unwrap_or(true);
-                        if model.is_empty() {
-                            Err("OLLAMA_API pull requires a model name.".to_string())
-                        } else {
-                            pull_ollama_model(model, stream).await.map(|_| "Pull completed.".to_string())
-                        }
-                    }
-                    "delete" => {
-                        let model = rest.to_string();
-                        if model.is_empty() {
-                            Err("OLLAMA_API delete requires a model name.".to_string())
-                        } else {
-                            delete_ollama_model(model).await.map(|_| "Model deleted.".to_string())
-                        }
-                    }
-                    "embed" => {
-                        let parts: Vec<&str> = rest.splitn(2, ' ').map(str::trim).collect();
-                        if parts.len() < 2 || parts[1].is_empty() {
-                            Err("OLLAMA_API embed requires: embed <model> <text>.".to_string())
-                        } else {
-                            let model = parts[0].to_string();
-                            let input = serde_json::Value::String(parts[1].to_string());
-                            ollama_embeddings(model, input, None).await.map(|r| serde_json::to_string_pretty(&r).unwrap_or_else(|_| "{}".to_string()))
-                        }
-                    }
-                    "load" => {
-                        let parts: Vec<&str> = rest.splitn(2, char::is_whitespace).map(str::trim).collect();
-                        let model = parts.first().map(|s| (*s).to_string()).unwrap_or_default();
-                        let keep_alive = parts.get(1).filter(|s| !s.is_empty()).map(|s| (*s).to_string());
-                        if model.is_empty() {
-                            Err("OLLAMA_API load requires a model name.".to_string())
-                        } else {
-                            load_ollama_model(model, keep_alive).await.map(|_| "Model loaded.".to_string())
-                        }
-                    }
-                    "unload" => {
-                        let model = rest.to_string();
-                        if model.is_empty() {
-                            Err("OLLAMA_API unload requires a model name.".to_string())
-                        } else {
-                            unload_ollama_model(model).await.map(|_| "Model unloaded.".to_string())
-                        }
-                    }
-                    _ => Err(format!("Unknown OLLAMA_API action: {}. Use list_models, version, running, pull, delete, embed, load, or unload.", action)),
-                };
+                            "list_models" => list_ollama_models_full().await.map(|r| {
+                                serde_json::to_string_pretty(&r)
+                                    .unwrap_or_else(|_| "[]".to_string())
+                            }),
+                            "version" => get_ollama_version().await.map(|r| r.version),
+                            "running" => list_ollama_running_models().await.map(|r| {
+                                serde_json::to_string_pretty(&r)
+                                    .unwrap_or_else(|_| "[]".to_string())
+                            }),
+                            "pull" => {
+                                let parts: Vec<&str> = rest.split_whitespace().collect();
+                                let model =
+                                    parts.first().map(|s| (*s).to_string()).unwrap_or_default();
+                                let stream = parts.get(1).map(|s| *s == "true").unwrap_or(true);
+                                if model.is_empty() {
+                                    Err("OLLAMA_API pull requires a model name.".to_string())
+                                } else {
+                                    pull_ollama_model(model, stream)
+                                        .await
+                                        .map(|_| "Pull completed.".to_string())
+                                }
+                            }
+                            "delete" => {
+                                let model = rest.to_string();
+                                if model.is_empty() {
+                                    Err("OLLAMA_API delete requires a model name.".to_string())
+                                } else {
+                                    delete_ollama_model(model)
+                                        .await
+                                        .map(|_| "Model deleted.".to_string())
+                                }
+                            }
+                            "embed" => {
+                                let parts: Vec<&str> = rest.splitn(2, ' ').map(str::trim).collect();
+                                if parts.len() < 2 || parts[1].is_empty() {
+                                    Err("OLLAMA_API embed requires: embed <model> <text>."
+                                        .to_string())
+                                } else {
+                                    let model = parts[0].to_string();
+                                    let input = serde_json::Value::String(parts[1].to_string());
+                                    ollama_embeddings(model, input, None).await.map(|r| {
+                                        serde_json::to_string_pretty(&r)
+                                            .unwrap_or_else(|_| "{}".to_string())
+                                    })
+                                }
+                            }
+                            "load" => {
+                                let parts: Vec<&str> =
+                                    rest.splitn(2, char::is_whitespace).map(str::trim).collect();
+                                let model =
+                                    parts.first().map(|s| (*s).to_string()).unwrap_or_default();
+                                let keep_alive = parts
+                                    .get(1)
+                                    .filter(|s| !s.is_empty())
+                                    .map(|s| (*s).to_string());
+                                if model.is_empty() {
+                                    Err("OLLAMA_API load requires a model name.".to_string())
+                                } else {
+                                    load_ollama_model(model, keep_alive)
+                                        .await
+                                        .map(|_| "Model loaded.".to_string())
+                                }
+                            }
+                            "unload" => {
+                                let model = rest.to_string();
+                                if model.is_empty() {
+                                    Err("OLLAMA_API unload requires a model name.".to_string())
+                                } else {
+                                    unload_ollama_model(model)
+                                        .await
+                                        .map(|_| "Model unloaded.".to_string())
+                                }
+                            }
+                            _ => Err(format!(
+                                "Unknown OLLAMA_API action: {}. Use list_models, version, running, pull, delete, embed, load, or unload.",
+                                action
+                            )),
+                        };
                         match result {
-                    Ok(msg) => format!("Ollama API result:\n\n{}\n\nUse this to answer the user's question.", msg),
-                    Err(e) => format!("OLLAMA_API failed: {}. Answer without this result.", e),
-                }
+                            Ok(msg) => format!(
+                                "Ollama API result:\n\n{}\n\nUse this to answer the user's question.",
+                                msg
+                            ),
+                            Err(e) => {
+                                format!("OLLAMA_API failed: {}. Answer without this result.", e)
+                            }
+                        }
                     }
                     "TASK_APPEND" => {
                         let (path_or_id, content) = match arg.find(' ') {
@@ -4361,7 +5153,11 @@ pub fn answer_with_ollama_and_fetch(
                                     let content_to_append = if let Some(raw) =
                                         last_run_cmd_raw_output.take()
                                     {
-                                        info!("Agent router: TASK_APPEND using full RUN_CMD output ({} chars) for task '{}'", raw.chars().count(), task_label);
+                                        info!(
+                                            "Agent router: TASK_APPEND using full RUN_CMD output ({} chars) for task '{}'",
+                                            raw.chars().count(),
+                                            task_label
+                                        );
                                         raw
                                     } else {
                                         content.to_string()
@@ -4451,7 +5247,10 @@ pub fn answer_with_ollama_and_fetch(
                                 Ok(path) => {
                                     current_task_path = Some(path.clone());
                                     let name = crate::task::task_file_name(&path);
-                                    format!("Task created: {}. Use TASK_APPEND: {} or TASK_APPEND: <id> <content> and TASK_STATUS to update.", name, name)
+                                    format!(
+                                        "Task created: {}. Use TASK_APPEND: {} or TASK_APPEND: <id> <content> and TASK_STATUS to update.",
+                                        name, name
+                                    )
                                 }
                                 Err(e) => format!("TASK_CREATE failed: {}.", e),
                             }
@@ -4561,7 +5360,10 @@ pub fn answer_with_ollama_and_fetch(
                                             &format!("Paused until {}.", until_str),
                                         );
                                     }
-                                    format!("Task paused until {}. It will resume automatically after that time.", until_str)
+                                    format!(
+                                        "Task paused until {}. It will resume automatically after that time.",
+                                        until_str
+                                    )
                                 }
                                 Err(e) => format!("TASK_SLEEP failed: {}.", e),
                             }
@@ -4644,16 +5446,19 @@ pub fn answer_with_ollama_and_fetch(
                                             result.len()
                                         );
                                         format!(
-                                    "MCP tool \"{}\" result:\n\n{}\n\nUse this to answer the user's question.",
-                                    mcp_tool_name, result
-                                )
+                                            "MCP tool \"{}\" result:\n\n{}\n\nUse this to answer the user's question.",
+                                            mcp_tool_name, result
+                                        )
                                     }
                                     Err(e) => {
                                         info!(
                                             "Agent router: MCP tool {} failed: {}",
                                             mcp_tool_name, e
                                         );
-                                        format!("MCP tool \"{}\" failed: {}. Answer the user without this result.", mcp_tool_name, e)
+                                        format!(
+                                            "MCP tool \"{}\" failed: {}. Answer the user without this result.",
+                                            mcp_tool_name, e
+                                        )
                                     }
                                 }
                             }
@@ -4686,7 +5491,10 @@ pub fn answer_with_ollama_and_fetch(
                                 .and_then(|r| r)
                                 {
                                     Ok(output) => {
-                                        info!("Agent router: CURSOR_AGENT completed ({} chars output)", output.len());
+                                        info!(
+                                            "Agent router: CURSOR_AGENT completed ({} chars output)",
+                                            output.len()
+                                        );
                                         let truncated = if output.chars().count() > 4000 {
                                             let half = 1800;
                                             let start: String = output.chars().take(half).collect();
@@ -4703,13 +5511,16 @@ pub fn answer_with_ollama_and_fetch(
                                             output
                                         };
                                         format!(
-                                    "Cursor Agent result:\n\n{}\n\nUse this to answer the user's question.",
-                                    truncated
-                                )
+                                            "Cursor Agent result:\n\n{}\n\nUse this to answer the user's question.",
+                                            truncated
+                                        )
                                     }
                                     Err(e) => {
                                         info!("Agent router: CURSOR_AGENT failed: {}", e);
-                                        format!("CURSOR_AGENT failed: {}. Answer the user without this result.", e)
+                                        format!(
+                                            "CURSOR_AGENT failed: {}. Answer the user without this result.",
+                                            e
+                                        )
                                     }
                                 }
                             }
@@ -4877,7 +5688,10 @@ pub fn answer_with_ollama_and_fetch(
                             match result {
                                 Ok(path) => {
                                     info!("Agent router: MEMORY_APPEND wrote to {:?}", path);
-                                    format!("Memory updated ({}). The lesson will be included in future prompts.", path.display())
+                                    format!(
+                                        "Memory updated ({}). The lesson will be included in future prompts.",
+                                        path.display()
+                                    )
                                 }
                                 Err(e) => {
                                     info!("Agent router: MEMORY_APPEND failed: {}", e);
@@ -4938,18 +5752,31 @@ pub fn answer_with_ollama_and_fetch(
                 }
             }
 
-            if done_claimed.is_some() {
-                exited_via_done = true;
+            let user_message = tool_results.join("\n\n---\n\n");
+            if let Some(blocked_reply) =
+                grounded_redmine_time_entries_failure_reply(&request_for_verification, &user_message)
+            {
+                info!("Agent router: returning grounded Redmine blocked-state reply");
+                response_content = blocked_reply;
                 break;
             }
-            let user_message = tool_results.join("\n\n---\n\n");
             if !question_explicitly_requests_json(question) {
                 if let Some(summary) = extract_redmine_time_entries_summary_for_reply(&user_message)
                 {
                     info!("Agent router: returning direct Redmine time-entry summary");
                     response_content = summary;
+                    if done_claimed.is_some() {
+                        exited_via_done = true;
+                    }
                     break;
                 }
+            }
+            if done_claimed.is_some() {
+                if !user_message.trim().is_empty() {
+                    response_content = final_reply_from_tool_results(question, &user_message);
+                }
+                exited_via_done = true;
+                break;
             }
 
             messages.push(crate::ollama::ChatMessage {
@@ -4987,7 +5814,9 @@ pub fn answer_with_ollama_and_fetch(
                         || raw.starts_with("Search results")
                         || raw.starts_with("Discord API")
                     {
-                        info!("Agent router: Ollama returned empty after tool success — using raw tool output as response");
+                        info!(
+                            "Agent router: Ollama returned empty after tool success — using raw tool output as response"
+                        );
                         // Strip the instruction suffix we appended for the model
                         let cleaned = raw
                             .replace("\n\nUse this to answer the user's question.", "")
@@ -5073,12 +5902,15 @@ pub fn answer_with_ollama_and_fetch(
         }
 
         // Heuristic guard: screenshot requested but no attachment
-        let plan_mentions_screenshot = recommendation.to_uppercase().contains("BROWSER_SCREENSHOT");
-        let user_asked_screenshot = user_explicitly_asked_for_screenshot(question);
-        if (user_asked_screenshot || plan_mentions_screenshot) && attachment_paths.is_empty() {
+        let user_asked_screenshot = user_explicitly_asked_for_screenshot(&request_for_verification);
+        if (user_asked_screenshot || screenshot_requested_by_tool_run)
+            && attachment_paths.is_empty()
+        {
             response_content
                 .push_str("\n\nNote: A screenshot was requested but none was attached.");
-            info!("Agent router: heuristic guard — screenshot requested but no attachment, appended note");
+            info!(
+                "Agent router: heuristic guard — screenshot requested but no attachment, appended note"
+            );
         }
 
         // Completion verification: one short Ollama call; if not satisfied, retry once (A2) or append disclaimer
@@ -5090,7 +5922,7 @@ pub fn answer_with_ollama_and_fetch(
             attachment_paths.len()
         );
         match verify_completion(
-            question,
+            &request_for_verification,
             &response_content,
             &attachment_paths,
             success_criteria.as_deref(),
@@ -5104,8 +5936,11 @@ pub fn answer_with_ollama_and_fetch(
                 // Use only the user's question for memory search — not the verification reason.
                 // The reason contains generic words ("request", "verified", "assistant", "tools") that
                 // match unrelated memory (e.g. GitLab/Redmine) and confuse the retry.
-                let memory_snippet =
-                    search_memory_for_request(question, None, discord_reply_channel_id);
+                let memory_snippet = search_memory_for_request(
+                    &request_for_verification,
+                    None,
+                    discord_reply_channel_id,
+                );
                 if retry_on_verification_no {
                     let retry_base = reason
                     .as_deref()
@@ -5132,58 +5967,78 @@ pub fn answer_with_ollama_and_fetch(
                     let reason_about_json_format = reason_lower.contains("json format")
                         || reason_lower.contains("not in json")
                         || (reason_lower.contains("response") && reason_lower.contains("json"));
+                    let reason_about_news_sourcing = reason_lower.contains("source")
+                        || reason_lower.contains("date")
+                        || reason_lower.contains("publication")
+                        || reason_lower.contains("credible");
                     let response_has_ticket_summary = response_content.len() > 150
                         && (response_content.contains("Subject")
                             || response_content.contains("Description")
                             || response_content.contains("Status")
                             || response_content.contains("Redmine"));
-                    let retry_base_with_hint = if is_redmine_review_or_summarize_only(question)
+                    let retry_base_with_hint = if is_redmine_time_entries_request(
+                        &request_for_verification,
+                    ) {
+                        let (from, to) = redmine_time_entries_range(&request_for_verification);
+                        format!(
+                            "This is a Redmine time-entry list/report request. Stay in that domain only. Do not use BROWSER_*, FETCH_URL, RUN_CMD, TASK_*, or single-issue endpoints like /issues/{{id}}.json unless the user explicitly asks for them. Base the answer only on the actual Redmine time-entry data already fetched, or re-fetch the same period with REDMINE_API: GET /time_entries.json?from={}&to={}&limit=100 if needed. If the result is empty, say no time entries or worked tickets were found for that period. Do not mention screenshots or attachments. Do not return raw tool directives as the final user answer.\n\n{}",
+                            from, to, retry_base
+                        )
+                    } else if is_redmine_review_or_summarize_only(&request_for_verification)
                         && response_has_ticket_summary
                     {
                         "The request was only to review/summarize. A summary was already provided. Reply with a brief confirmation and DONE: success; do not update or close the ticket.".to_string()
                     } else if reason_about_json_format {
                         format!(
-                        "Success criteria require a response in JSON format. Reply with **valid JSON only** (e.g. total hours, project breakdown, user contributions); do not reply with prose or markdown lists.\n\n{}",
-                        retry_base
-                    )
-                    } else if reason_about_time_or_data
-                        && (question.to_lowercase().contains("redmine")
-                            || question.to_lowercase().contains("time")
-                            || question.to_lowercase().contains("spent"))
+                            "Success criteria require a response in JSON format. Reply with **valid JSON only** (e.g. total hours, project breakdown, user contributions); do not reply with prose or markdown lists.\n\n{}",
+                            retry_base
+                        )
+                    } else if is_news_query(&request_for_verification) && reason_about_news_sourcing
                     {
                         format!(
-                        "Use the correct Redmine API for time entries: REDMINE_API: GET /time_entries.json with from= and to= for the requested period (for example 2026-03-01..2026-03-31 for this month, or the same day for today) and include limit=100 so the results are not truncated. Omit optional filters like user_id or project_id unless the user explicitly asked for them. Do not use /search.json for time entries. Then reply with the data or a clear summary.\n\n{}",
-                        retry_base
-                    )
+                            "This is a news-summary request. Stay in search-and-summary mode only. Re-run PERPLEXITY_SEARCH with a refined query if needed, but do **not** browse generic homepages, do **not** open BBC/CNN/NYTimes landing pages, and do **not** use screenshots or attachments. Reply with 3 concise bullet points. Each bullet must include: headline/topic, source name, publication date, and one-sentence factual summary. Prefer article-like results; if only hub/landing pages are available, say that clearly.\n\n{}",
+                            retry_base
+                        )
+                    } else if reason_about_time_or_data
+                        && (request_for_verification.to_lowercase().contains("redmine")
+                            || request_for_verification.to_lowercase().contains("time")
+                            || request_for_verification.to_lowercase().contains("spent"))
+                    {
+                        format!(
+                            "Use the correct Redmine API for time entries: REDMINE_API: GET /time_entries.json with from= and to= for the requested period (for example 2026-03-01..2026-03-31 for this month, or the same day for today) and include limit=100 so the results are not truncated. Omit optional filters like user_id or project_id unless the user explicitly asked for them. Do not use /search.json for time entries. Then reply with the data or a clear summary.\n\n{}",
+                            retry_base
+                        )
                     } else if !attachment_paths.is_empty() && reason_about_attachments {
                         let n = attachment_paths.len();
                         format!(
-                        "The app already attached {} file(s) to this reply. If the only missing item was screenshots/attachments, \
+                            "The app already attached {} file(s) to this reply. If the only missing item was screenshots/attachments, \
                          reply with a brief summary of what was done and end with **DONE: success**. \
                          Do not invoke AGENT: orchestrator and do not create new tasks.\n\n{}",
-                        n, retry_base
-                    )
+                            n, retry_base
+                        )
                     } else if attachment_paths.is_empty()
-                        && user_explicitly_asked_for_screenshot(question)
+                        && user_explicitly_asked_for_screenshot(&request_for_verification)
                         && reason_lower.contains("screenshot")
                     {
                         format!(
-                        "Screenshots could not be attached to this reply. Reply with a brief summary of what was done (e.g. screenshot taken and saved), state that the app could not attach it to Discord, and end with **DONE: no**. \
+                            "Screenshots could not be attached to this reply. Reply with a brief summary of what was done (e.g. screenshot taken and saved), state that the app could not attach it to Discord, and end with **DONE: no**. \
                          Do not invoke AGENT: orchestrator and do not create new tasks.\n\n{}",
-                        retry_base
-                    )
+                            retry_base
+                        )
                     } else if reason_lower.contains("cookie")
                         || (reason_lower.contains("consent") && reason_lower.contains("banner"))
                     {
                         format!(
-                        "Original request: \"{}\". Verification said the cookie consent banner was not addressed. A screenshot may already have been taken. Complete the remaining step: dismiss the cookie banner (BROWSER_CLICK on the consent button using the Elements list) then BROWSER_SCREENSHOT: current if needed, or reply with a brief summary and **DONE: no** if the browser session is no longer available.\n\n{}",
-                        question.trim(),
-                        retry_base
-                    )
+                            "Original request: \"{}\". Verification said the cookie consent banner was not addressed. A screenshot may already have been taken. Complete the remaining step: dismiss the cookie banner (BROWSER_CLICK on the consent button using the Elements list) then BROWSER_SCREENSHOT: current if needed, or reply with a brief summary and **DONE: no** if the browser session is no longer available.\n\n{}",
+                            request_for_verification.trim(),
+                            retry_base
+                        )
                     } else {
                         retry_base
                     };
-                    let retry_question = if let Some(ref from_memory) = memory_snippet {
+                    let retry_question = if is_news_query(&request_for_verification) {
+                        retry_base_with_hint
+                    } else if let Some(ref from_memory) = memory_snippet {
                         format!(
                             "From memory (possibly relevant):\n{}\n\n{}",
                             from_memory, retry_base_with_hint
@@ -5191,7 +6046,11 @@ pub fn answer_with_ollama_and_fetch(
                     } else {
                         retry_base_with_hint
                     };
-                    info!("Agent router [{}]: verification said not satisfied, retrying once with: {}...", request_id, retry_question.chars().take(60).collect::<String>());
+                    info!(
+                        "Agent router [{}]: verification said not satisfied, retrying once with: {}...",
+                        request_id,
+                        retry_question.chars().take(60).collect::<String>()
+                    );
                     let mut updated_history: Vec<crate::ollama::ChatMessage> =
                         conversation_history.clone();
                     updated_history.push(crate::ollama::ChatMessage {
@@ -5224,6 +6083,8 @@ pub fn answer_with_ollama_and_fetch(
                         None,              // don't re-send attachment images on retry
                         pass_intermediate, // format reply as Intermediate + Final when returning to Discord
                         true,              // is_verification_retry: keep context, skip NEW_TOPIC
+                        Some(request_for_verification.clone()),
+                        success_criteria.clone(),
                     )
                     .await;
                 }
@@ -5250,9 +6111,9 @@ pub fn answer_with_ollama_and_fetch(
                     );
                 }
                 info!(
-                "Agent router: verification said not satisfied, appended disclaimer (reason: {}...)",
-                reason_preview
-            );
+                    "Agent router: verification said not satisfied, appended disclaimer (reason: {}...)",
+                    reason_preview
+                );
             }
             Ok((true, _)) => {
                 info!("Agent router: verification passed (satisfied)");
@@ -5269,9 +6130,9 @@ pub fn answer_with_ollama_and_fetch(
             let same = is_final_same_as_intermediate(inter, &response_content);
             if same {
                 format!(
-                "--- Intermediate answer:\n\n{}\n\n---\n\nFinal answer is the same as intermediate.",
-                inter.trim()
-            )
+                    "--- Intermediate answer:\n\n{}\n\n---\n\nFinal answer is the same as intermediate.",
+                    inter.trim()
+                )
             } else {
                 format!(
                     "--- Intermediate answer:\n\n{}\n\n---\n\n--- Final answer:\n\n{}\n\n---",
@@ -6620,8 +7481,7 @@ pub async fn ollama_chat_continue_with_result(
 
     let follow_up_message = format!(
         "I have executed your last codeblocks and the result is: {}\n\nCan you now answer the original question: {}?",
-        execution_result,
-        original_question
+        execution_result, original_question
     );
 
     // Build messages array with conversation history
@@ -6716,7 +7576,9 @@ pub async fn ollama_chat_continue_with_result(
         if is_code_assistant {
             info!("Ollama Chat Continue: Detected another code-assistant response (ping-pong)");
         } else {
-            info!("Ollama Chat Continue: Detected JavaScript code pattern (ping-pong, fallback detection)");
+            info!(
+                "Ollama Chat Continue: Detected JavaScript code pattern (ping-pong, fallback detection)"
+            );
         }
 
         // Extract code
@@ -6814,11 +7676,16 @@ pub async fn ollama_chat_continue_with_result(
 #[cfg(test)]
 mod tests {
     use super::{
-        build_agent_runtime_context, build_perplexity_verbose_summary, extract_last_prefixed_argument,
-        parse_agent_tool_from_response, parse_all_tools_from_response,
-        parse_tool_from_response,
-        redmine_direct_fallback_hint,
-        redmine_time_entries_range_for_date,
+        build_agent_runtime_context, build_perplexity_verbose_summary,
+        extract_last_prefixed_argument, final_reply_from_tool_results,
+        grounded_redmine_time_entries_failure_reply,
+        is_likely_article_like_result, original_request_for_retry, parse_agent_tool_from_response,
+        parse_all_tools_from_response, parse_tool_from_response, redmine_direct_fallback_hint,
+        redmine_request_for_routing, redmine_time_entries_range_for_date,
+        is_grounded_redmine_time_entries_blocked_reply,
+        sanitize_success_criteria, score_search_result_for_news,
+        shape_perplexity_results_for_question, summarize_response_for_verification,
+        truncate_text_on_line_boundaries,
     };
 
     #[test]
@@ -6898,8 +7765,7 @@ mod tests {
             ),
             Some((
                 "REDMINE_API".to_string(),
-                "GET /time_entries.json?from=2026-03-06&to=2026-03-06&limit=100"
-                    .to_string()
+                "GET /time_entries.json?from=2026-03-06&to=2026-03-06&limit=100".to_string()
             ))
         );
     }
@@ -6914,8 +7780,7 @@ mod tests {
                 ("RUN_CMD".to_string(), "date +%Y-%m-%d".to_string()),
                 (
                     "REDMINE_API".to_string(),
-                    "GET /time_entries.json?from=2026-03-06&to=2026-03-06&limit=100"
-                        .to_string()
+                    "GET /time_entries.json?from=2026-03-06&to=2026-03-06&limit=100".to_string()
                 )
             ]
         );
@@ -6945,8 +7810,7 @@ mod tests {
             ),
             Some((
                 "REDMINE_API".to_string(),
-                "GET /time_entries.json?from=2026-03-06&to=2026-03-06&limit=100"
-                    .to_string()
+                "GET /time_entries.json?from=2026-03-06&to=2026-03-06&limit=100".to_string()
             ))
         );
     }
@@ -6987,11 +7851,260 @@ mod tests {
     }
 
     #[test]
+    fn truncate_text_on_line_boundaries_does_not_cut_mid_line() {
+        let text = "line one\nline two is longer\nline three";
+        assert_eq!(
+            truncate_text_on_line_boundaries(text, 12),
+            "line one\n[truncated]"
+        );
+    }
+
+    #[test]
+    fn summarize_response_for_verification_prefers_structured_redmine_summary() {
+        let response = "Redmine API result:\n\nDerived Redmine time-entry summary\nRange: 2026-03-06..2026-03-06\nFetched 1 time entry (total available: 1). Total hours: 2.00\n\nTickets worked:\n- #7209 Fix login — 2.00h across 1 entry (project: Core; users: Ralf; activities: Development)\n\nEntry details:\n- 2026-03-06 | entry 1 | #7209 Fix login | 2.00h | Development | project: Core | user: Ralf\n\nUse this data to answer the user's question.";
+        let summary = summarize_response_for_verification(
+            "Provide me the list of redmine tickets work on today.",
+            response,
+            0,
+        );
+        assert!(summary.contains("Derived Redmine time-entry summary"));
+        assert!(summary.contains("#7209 Fix login"));
+        assert!(!summary.contains("Entry details:"));
+    }
+
+    #[test]
+    fn final_reply_from_tool_results_uses_redmine_summary_not_raw_tool_wrapper() {
+        let tool_result = "Redmine API result:\n\nDerived Redmine time-entry summary\nRange: 2026-03-06..2026-03-06\nFetched 0 time entries (total available: 0). Total hours: 0.00\n\nTickets worked:\n- None found in these time entries.\n\nUse this data to answer the user's question.";
+        let reply = final_reply_from_tool_results(
+            "Provide me the list of redmine tickets work on today.",
+            tool_result,
+        );
+        assert!(reply.starts_with("Derived Redmine time-entry summary"));
+        assert!(!reply.starts_with("Redmine API result:"));
+    }
+
+    #[test]
+    fn grounded_redmine_time_entries_failure_reply_for_dns_blocker_is_user_facing() {
+        let reply = grounded_redmine_time_entries_failure_reply(
+            "Provide me the list of redmine tickets work on today.",
+            "Redmine API failed: Redmine request failed: error sending request for url (https://example.invalid/time_entries.json?from=2026-03-07&to=2026-03-07&limit=100): client error (Connect): dns error: failed to lookup address information. Answer without this result.",
+        )
+        .expect("expected grounded failure reply");
+
+        assert!(reply.contains("Could not retrieve Redmine time entries for 2026-03-07"));
+        assert!(reply.contains("configured Redmine host could not be resolved"));
+        assert!(reply.contains("No Redmine data was fetched"));
+        assert!(!reply.contains("no time entries were found"));
+    }
+
+    #[test]
+    fn verification_accepts_grounded_redmine_blocked_reply() {
+        assert!(is_grounded_redmine_time_entries_blocked_reply(
+            "Provide me the list of redmine tickets work on today.",
+            "Could not retrieve Redmine time entries for 2026-03-07 because the configured Redmine host could not be resolved. No Redmine data was fetched. Fix the Redmine configuration or connectivity, then retry."
+        ));
+    }
+
+    #[test]
     fn redmine_direct_fallback_hint_for_today_avoids_user_id_me() {
-        let hint = redmine_direct_fallback_hint("List redmine tickets that have been worked on today");
+        let hint =
+            redmine_direct_fallback_hint("List redmine tickets that have been worked on today");
         assert!(hint.contains("/time_entries.json?from="));
         assert!(hint.contains("&to="));
         assert!(hint.contains("&limit=100"));
         assert!(!hint.contains("user_id=me"));
+    }
+
+    #[test]
+    fn redmine_request_for_routing_prefers_original_request_on_retry() {
+        assert_eq!(
+            redmine_request_for_routing(
+                "Verification said we didn't fully complete. Re-fetch the same period if needed.",
+                "Provide me the list of redmine tickets work on today.",
+                true,
+            ),
+            "Provide me the list of redmine tickets work on today."
+        );
+    }
+
+    #[test]
+    fn redmine_request_for_routing_keeps_today_window_on_retry() {
+        let routed = redmine_request_for_routing(
+            "Verification said we didn't fully complete. Re-fetch the same period if needed.",
+            "Provide me the list of redmine tickets work on today.",
+            true,
+        );
+        let today = chrono::NaiveDate::from_ymd_opt(2026, 3, 7).unwrap();
+        assert_eq!(
+            redmine_time_entries_range_for_date(routed, today),
+            ("2026-03-07".to_string(), "2026-03-07".to_string())
+        );
+    }
+
+    #[test]
+    fn original_request_for_retry_uses_last_real_user_message() {
+        let history = vec![
+            crate::ollama::ChatMessage {
+                role: "user".to_string(),
+                content: "Original request".to_string(),
+                images: None,
+            },
+            crate::ollama::ChatMessage {
+                role: "assistant".to_string(),
+                content: "Intermediate reply".to_string(),
+                images: None,
+            },
+        ];
+        let retry_prompt = "Verification said we didn't fully complete the task.";
+        assert_eq!(
+            original_request_for_retry(retry_prompt, Some(&history), true),
+            "Original request".to_string()
+        );
+    }
+
+    #[test]
+    fn original_request_for_retry_ignores_history_when_not_retrying() {
+        let history = vec![crate::ollama::ChatMessage {
+            role: "user".to_string(),
+            content: "Older request".to_string(),
+            images: None,
+        }];
+        assert_eq!(
+            original_request_for_retry("Current request", Some(&history), false),
+            "Current request".to_string()
+        );
+    }
+
+    #[test]
+    fn sanitize_success_criteria_removes_invented_last_30_days_window() {
+        let criteria = vec![
+            "reliable news sources cited".to_string(),
+            "recent articles (last 30 days)".to_string(),
+            "source name and publication date included".to_string(),
+        ];
+        assert_eq!(
+            sanitize_success_criteria(
+                "Can you look on the Internet for news involving Barcelona? Mention sources and dates.",
+                criteria
+            ),
+            vec![
+                "reliable news sources cited".to_string(),
+                "recent news items were summarized".to_string(),
+                "source name and publication date included".to_string(),
+            ]
+        );
+    }
+
+    #[test]
+    fn sanitize_success_criteria_removes_invented_named_source_examples() {
+        let criteria = vec![
+            "articles from credible sources like BBC or CNN".to_string(),
+            "dates of the news articles".to_string(),
+        ];
+        assert_eq!(
+            sanitize_success_criteria(
+                "Can you look on the Internet for news involving Barcelona? Mention sources and dates.",
+                criteria
+            ),
+            vec![
+                "credible named sources cited".to_string(),
+                "dates of the news articles".to_string(),
+            ]
+        );
+    }
+
+    #[test]
+    fn score_search_result_for_news_prefers_article_like_pages() {
+        let article_score = score_search_result_for_news(
+            "Barcelona opens new civic center",
+            "https://example.com/news/barcelona-opens-new-civic-center",
+            "Barcelona opened a new civic center on March 6.",
+        );
+        let hub_score = score_search_result_for_news(
+            "FC Barcelona News | Top Stories",
+            "https://www.newsnow.com/us/Sports/Soccer/La+Liga/Barcelona",
+            "Top stories and transfer rumors View on X",
+        );
+        assert!(article_score > hub_score);
+    }
+
+    #[test]
+    fn shape_perplexity_results_for_question_limits_repeated_domains_for_news() {
+        let results = vec![
+            crate::commands::perplexity::PerplexitySearchResult {
+                title: "Hub page".to_string(),
+                url: "https://www.newsnow.com/us/Sports/Soccer/La+Liga/Barcelona".to_string(),
+                snippet: "Top stories and rumors".to_string(),
+                date: Some("2026-03-06".to_string()),
+                last_updated: None,
+            },
+            crate::commands::perplexity::PerplexitySearchResult {
+                title: "Article one".to_string(),
+                url: "https://example.com/news/barcelona-culture-update".to_string(),
+                snippet: "Culture update from Barcelona.".to_string(),
+                date: Some("2026-03-06".to_string()),
+                last_updated: None,
+            },
+            crate::commands::perplexity::PerplexitySearchResult {
+                title: "Article two".to_string(),
+                url: "https://example.com/news/barcelona-transit-update".to_string(),
+                snippet: "Transit update from Barcelona.".to_string(),
+                date: Some("2026-03-05".to_string()),
+                last_updated: None,
+            },
+            crate::commands::perplexity::PerplexitySearchResult {
+                title: "Article three".to_string(),
+                url: "https://example.com/news/barcelona-housing-update".to_string(),
+                snippet: "Housing update from Barcelona.".to_string(),
+                date: Some("2026-03-04".to_string()),
+                last_updated: None,
+            },
+        ];
+        let (shaped, _, filtered_any) = shape_perplexity_results_for_question(
+            "Show me recent Barcelona news with sources and dates.",
+            results,
+            280,
+        );
+        let example_count = shaped
+            .iter()
+            .filter(|r| r.url.contains("example.com"))
+            .count();
+        assert!(filtered_any);
+        assert_eq!(example_count, 2);
+        assert_eq!(
+            shaped.first().map(|r| r.title.as_str()),
+            Some("Article one")
+        );
+    }
+
+    #[test]
+    fn shape_perplexity_results_for_question_preserves_hub_only_fallback() {
+        let results = vec![
+            crate::commands::perplexity::PerplexitySearchResult {
+                title: "Catalan News | News in English from Barcelona & Catalonia".to_string(),
+                url: "https://www.catalannews.com".to_string(),
+                snippet: "### International Women's Day in Barcelona\nMore headlines".to_string(),
+                date: Some("2026-03-06".to_string()),
+                last_updated: None,
+            },
+            crate::commands::perplexity::PerplexitySearchResult {
+                title: "FC Barcelona News | Barça News & Top Stories".to_string(),
+                url: "https://www.newsnow.com/us/Sports/Soccer/La+Liga/Barcelona".to_string(),
+                snippet: "Top stories and transfer rumors View on X".to_string(),
+                date: Some("2026-03-06".to_string()),
+                last_updated: None,
+            },
+        ];
+        let (shaped, _, _) = shape_perplexity_results_for_question(
+            "Can you look on the Internet for news involving Barcelona? Mention sources and dates.",
+            results,
+            280,
+        );
+        assert_eq!(shaped.len(), 2);
+        assert!(
+            shaped
+                .iter()
+                .all(|r| !is_likely_article_like_result(&r.title, &r.url, &r.snippet))
+        );
     }
 }

@@ -605,9 +605,3 @@ grep ERROR ~/.mac-stats/debug.log | tail -20
 ```
 
 ---
-
-## Open tasks:
-
-- **Questionable logic**: None identified
-- **Missing features**: None identified
-- **Pending items**: None identified

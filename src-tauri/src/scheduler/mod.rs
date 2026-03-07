@@ -378,7 +378,7 @@ async fn execute_task(entry: &ScheduleEntry) -> Option<(String, bool)> {
     );
     match crate::commands::ollama::answer_with_ollama_and_fetch(
         task, None, None, None, None, None, None, None, None, false, None, false, true, true, None,
-        None, false,
+        None, false, None, None,
     )
     .await
     {

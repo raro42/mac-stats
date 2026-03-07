@@ -58,8 +58,3 @@ Whenever Ollama is asked to decide which agent to use, the app sends the complet
 - Task agent: `docs/013_task_agent.md`
 - LLM agents / AGENT tool: `docs/017_llm_agents.md`
 - Review loop (scheduler/default): `src-tauri/src/task/review.rs`
-
-## Open tasks:
-- Investigate why macOS Gatekeeper blocks the app.
-- Improve the prompt guidance for planning and task creation.
-- Review the task creation and deduplication logic for potential edge cases.

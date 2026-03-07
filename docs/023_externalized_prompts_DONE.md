@@ -98,8 +98,3 @@ The code that assembles this is in `commands/ollama.rs` → `answer_with_ollama_
 - **Defaults source**: `src-tauri/defaults/`
 - **Agent defaults**: `docs/017_llm_agents.md` (default agents table)
 - **All agents**: `docs/100_all_agents.md`
-
-## Open tasks:
-- Investigate why some users report issues with the `save_prompt_file` command.
-- Improve the user experience for editing prompt files.
-- Consider adding a feature to automatically update the `soul.md` file when the user's preferences change.

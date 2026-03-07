@@ -52,8 +52,4 @@ At startup, `ensure_defaults()` runs. For **prompt files** (`~/.mac-stats/prompt
 - If the file **exists**, it is **merged** with the bundled default: the file is split into paragraphs (by `\n\n`); each default paragraph is identified by its first-line key (trimmed, up to 80 chars). Any default paragraph whose key is not already present in the file is **appended**. User content is never overwritten; new sections from repo defaults are added automatically.
 
 ## Open tasks:
-- Investigate why Gatekeeper blocks the app.
-- Implement a more robust way to handle tool agent invocation.
 - Add more documentation for the `ensure_defaults()` function.
-- Review the `fetch_page_content()` function for performance improvements.
-- Consider adding a feature to automatically update the `BRAVE_API_KEY` environment variable.

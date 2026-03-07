@@ -81,8 +81,3 @@ This guarantees that “Use the Chrome browser, goto https://www.amvara.de and c
 | Planning step | None; model calls tools directly | Keep; add tool-first rule + pre-route |
 | “Wrong RECOMMEND” | N/A (no planner) | Mitigate with rule + deterministic pre-route for screenshot+URL |
 | Routing | Config bindings (channel/account → agent) | Model recommends plan; we bias plan toward tools when obvious |
-
-## Open tasks:
-- Review the planning prompt and pre-route to ensure they are correctly implemented.
-- Consider implementing the single-phase model for a more streamlined experience.
-- Investigate ways to improve the tool presentation and session pruning mechanisms.

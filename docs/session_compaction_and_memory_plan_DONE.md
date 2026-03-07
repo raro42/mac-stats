@@ -128,10 +128,3 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 | On-request compaction | Every request with ≥ 8 messages | Global (and optionally agent if override) | Replaced with 1 system message (summary) |
 | 30-min compaction (active session) | Every 30 min, session has ≥ N messages, last_activity within 30 min | Global (and optionally agent if mapped) | Replaced with 1 system message (summary) |
 | 30-min compaction (inactive session) | Every 30 min, session has ≥ N messages, last_activity older than 30 min | Global (and optionally agent if mapped) | **Cleared** (removed from store; optional file prune) |
-
-## Open tasks:
-- Review the current implementation and identify any questionable logic or missing features.
-- Consider adding a periodic flush of session lessons into long-term memory and clearing inactive sessions after compressing them.
-- Define the behavior for writing compaction lessons to the “respective agent” and implement the necessary logic.
-- Review and update the config constants to reflect the desired behavior.
-- Test the updated implementation thoroughly to ensure it meets the requirements.

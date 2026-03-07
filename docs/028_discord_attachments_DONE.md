@@ -89,12 +89,3 @@ Two call sites need to be able to send an attachment:
 | 2a | `discord/mod.rs` (event handler) | After getting the reply, if attachment_paths non-empty, send message with file(s) via Serenity (e.g. `CreateMessage` + `CreateAttachment`). |
 | 2b | `discord/mod.rs` | Add `send_message_to_channel_with_attachments(channel_id, content, paths)` using multipart POST for REST-only callers. |
 | 3 | Optional | Restrict attachment paths to a whitelist (e.g. under `~/.mac-stats/screenshots/`). |
-
-## Open tasks:
-- Questionable logic:
-  - Is the current implementation of `send_message_to_channel_with_attachments` correct?
-- Missing features:
-  - Is there a way to send multiple attachments in a single message?
-- Pending items:
-  - Implement the `DISCORD_API` tool with multipart support
-  - Validate attachment paths to ensure they are under `~/.mac-stats/screenshots/`

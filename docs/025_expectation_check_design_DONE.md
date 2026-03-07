@@ -136,14 +136,3 @@ Screenshot-heavy flows (e.g. “screenshot of page containing Y”) benefit most
 - **Hermes:** `run_agent.py` (completed = final_response + under max_iterations); `agent_loop.py` (“No tool calls — model is done”).
 
 ---
-
-## Open tasks:
-- Questionable logic:
-  - Is the heuristic guard necessary?
-  - Is the vision model necessary for all screenshot tasks?
-- Missing features:
-  - Implement vision-in-the-loop for browser tasks
-  - Add more escalation patterns
-- Pending items:
-  - Review and refine the expectation check at the end of the tool-chain
-  - Review and refine the user escalation system

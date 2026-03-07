@@ -95,7 +95,6 @@ This handles the common case where the model appends plan commentary to the comm
 
 ## Open tasks:
 
-*   Investigate the `xattr -rd com.apple.quarantine` workaround for Gatekeeper blocking the app.
 *   Improve the retry loop for better error handling and user experience.
 *   Consider adding more features to the RUNCMD agent, such as support for more commands or improved path validation.
 *   Review the security measures in place to prevent unauthorized access to the app's data and functionality.

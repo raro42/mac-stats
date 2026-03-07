@@ -46,18 +46,13 @@ The fix for “orchestrator recommends AGENT instead of tool” is **implemented
   - **Tool-first routing:** Pre-route “screenshot + URL” requests to BROWSER_SCREENSHOT (skip planner). Default planning prompt now includes a tool-first rule: when one base tool fits the request, recommend that tool instead of AGENT. See `docs/031_orchestrator_tool_first_proposal_DONE.md`.
 
 ### Step 5 — Document custom planning prompt (optional)
-- [ ] In the proposal doc or in a short “merge defaults” note: if you use a custom `~/.mac-stats/prompts/planning_prompt.md`, add the tool-first paragraph from `defaults/prompts/planning_prompt.md` so the planner prefers tools over AGENT when the request clearly matches one tool.
+- Optional future extension: in the proposal doc or in a short “merge defaults” note, explain that custom `~/.mac-stats/prompts/planning_prompt.md` files should include the tool-first paragraph from `defaults/prompts/planning_prompt.md` so the planner prefers tools over AGENT when the request clearly matches one tool.
 
 ### Step 6 — Append tool-first rule when loading (optional)
-- [ ] In `Config::load_planning_prompt()`: if the loaded content does not contain `"Tool-first"` (or a chosen marker), append the default tool-first paragraph so custom prompts still get the rule without manual edit. Decide whether to append always or only when file is user-provided (e.g. path exists and content differs from default).
+- Optional future extension: in `Config::load_planning_prompt()`, if the loaded content does not contain `"Tool-first"` (or a chosen marker), append the default tool-first paragraph so custom prompts still get the rule without manual edit. Decide whether to append always or only when file is user-provided (e.g. path exists and content differs from default).
 
 ### Step 7 — Reduce planning context (optional, proposal §3)
-- [ ] For the planning step only, either send no conversation history or only the last user message (or a short summary of recent turns) so prior “no tool used” replies don’t bias the planner toward AGENT. Requires changing what `answer_with_ollama_and_fetch` passes into the planning messages.
+- Optional future extension: for the planning step only, either send no conversation history or only the last user message (or a short summary of recent turns) so prior “no tool used” replies do not bias the planner toward AGENT. This would require changing what `answer_with_ollama_and_fetch` passes into the planning messages.
 
 ### Step 8 — Pre-route FETCH_URL + URL (optional)
-- [ ] Add `extract_fetch_url_recommendation(question)` (or similar): if the question clearly asks to “fetch/get/open this page” and contains a URL, return `FETCH_URL: <url>` and skip planning. Wire it into the same pre-route chain (e.g. after screenshot, before RUN_CMD).
-
-## Open tasks:
-- Review Step 5 and 6 for optional implementation.
-- Investigate Step 7 for planning context reduction.
-- Implement Step 8 for FETCH_URL + URL pre-route.
+- Optional future extension: add `extract_fetch_url_recommendation(question)` (or similar) so that if the question clearly asks to “fetch/get/open this page” and contains a URL, the router returns `FETCH_URL: <url>` and skips planning. Wire it into the same pre-route chain (e.g. after screenshot, before RUN_CMD).

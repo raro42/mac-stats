@@ -305,8 +305,8 @@ A: No. These are performance-only optimizations. All features unchanged.
 | Testing procedures | 
 | Checklist | 
 
-## Open tasks:
+## Cross-Cutting Follow-Ups
 
-- Questionable logic in Phase 1
-- Missing features in Phase 2
-- Pending items for Phase 3 and 4
+- Investigate the macOS Gatekeeper / quarantine friction for DMG installs and first launch.
+- Keep reviewing browser automation and screenshot routing so single-tool requests do not drift into unrelated tool chains.
+- Continue trimming stale `Open tasks` sections from historical docs so active backlog items live in one obvious place.

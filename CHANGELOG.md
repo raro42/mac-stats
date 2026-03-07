@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Request-local retry guards for Discord/Ollama runs** — Verification retries now carry the original user request and sanitized success criteria explicitly so unrelated prior task context does not leak into fresh requests.
+- **News/search result shaping** — News-style Perplexity results are now ranked, deduplicated by domain, annotated as `article-like` vs `hub/landing page`, and retried with a refined query when the first pass only returns weak landing pages.
+- **Browser search fallback tests** — Added focused coverage for plain-text fallback matching so `BROWSER_SEARCH_PAGE` can return useful results or a clean “no matches found” response instead of failing internally.
+
+### Changed
+- **Session memory normalization** — Discord/session history now stores only conversational user/final-assistant content, filtering out intermediate answer wrappers and other internal execution artifacts before persistence or reload.
+- **News verification behavior** — News completion checks now avoid inventing source-brand requirements or attachment requirements that the user never asked for, and retry prompts stay in search-and-summary mode instead of drifting into unrelated browser work.
+- **Documentation refresh** — Updated the current plan/docs set to reflect the request-isolation work, browser/search behavior, and recent agent/router changes.
+
+### Fixed
+- **Barcelona/news retry contamination** — Generic news requests no longer reuse stale Redmine-style success criteria during verification retries, which removes the earlier cross-topic retry failure mode.
+- **`BROWSER_SEARCH_PAGE` no-value failure** — When the JS walker returns no structured payload, the browser agent now falls back to plain page text search and returns either contextual matches or a normal “no matches found” result rather than aborting the browser run.
+- **Amvara browser review flow** — Live testing against `www.amvara.de` now reaches the `About` page reliably and reports the actual current finding: the “videos” entry is present, but no confirmed playable video content is exposed there.
+
 ## [0.1.31] - 2026-03-06
 
 ### Fixed

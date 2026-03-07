@@ -112,8 +112,3 @@ Defaults in `defaults/agents/*/agent.json` can be updated to use `thinking` for 
 
 4. **Docs**
    - Update `docs/100_all_agents.md` or agent docs to list `model_role` options (code, general, small, vision, thinking, cheap, expensive) and how they map to capabilities.
-
-## Open tasks:
-- Extend capabilities and roles to include vision, thinking/reasoning, and explicit cheap/expensive.
-- Implement the recommended mapping for assigning agents to roles.
-- Update documentation to reflect the new model roles and capabilities.

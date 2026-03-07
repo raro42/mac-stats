@@ -99,18 +99,3 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 ### Phase 4 (Optional): HTTP-only "browser" Fallback (no Chromium) — **Implemented**
 
 - When CDP/Chrome is not available: BROWSER_NAVIGATE/CLICK/INPUT/EXTRACT fall back to HTTP fetch + `scraper` (links, forms, body text). BROWSER_CLICK follows links or submits forms; BROWSER_INPUT fills form fields. No JS execution. State in `browser_agent::http_fallback`.
-
-## Open tasks:
-
-- Questionable logic:
-  - How to handle CAPTCHAs?
-  - How to handle forms with many fields?
-  - How to handle forms with complex logic?
-- Missing features:
-  - Support for more types of forms (e.g. dropdowns, checkboxes)
-  - Support for more types of buttons (e.g. submit, reset)
-  - Support for more types of input fields (e.g. textareas, password fields)
-- Pending items:
-  - Implement Phase 2 (CDP to user's Chrome)
-  - Implement Phase 3 (Smarter parsing and robustness)
-  - Implement Phase 4 (HTTP-only "browser" fallback)

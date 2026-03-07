@@ -38,7 +38,6 @@ For the Coder to edit files in this repo directly:
 3. Do **not** produce patches or ask for permission; edit files directly.
 
 ## Open tasks:
-- Investigate why Gatekeeper blocks the app.
 - Improve the documentation for tool agents and their invocations.
 - Consider implementing a more robust patching system for the Coder agent.
 - Review the Brave Search API usage and ensure it complies with the Brave API key requirements.

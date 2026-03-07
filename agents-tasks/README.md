@@ -30,6 +30,8 @@ See `scan-log.md` for per-run details (scan time, tasks created, notes).
 | task-002 | URL validation FETCH_URL     | done — extract_first_url, validate_fetch_url, IDN message. |
 | task-004 | Scheduler log churn          | done — "loaded N entries" at DEBUG. |
 | task-005 | Session compaction log       | done — "keeping full history (N messages)". |
+| task-007 | Discord read attachments     | done — image attachments downloaded, base64 passed to Ollama vision path. |
+| task-008 | Overnight plan: request isolation, search hardening, compaction safety | plan — phased worklist for retries, memory separation, sourced search answers, compaction, and observability. |
 
 ## Task format
 

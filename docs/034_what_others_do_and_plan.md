@@ -117,6 +117,3 @@ Whenever Ollama is asked to decide which agent to use, the app sends the complet
 ---
 
 *Sources: exelban/stats (README), browser-use (README, docs.browser-use.com), ollama/ollama (README), Tauri system tray guide. Doc created 2026-03-02.*
-
-## Open tasks:
-- Review logic and check for missing features/updates.

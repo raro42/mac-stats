@@ -84,6 +84,8 @@ pub async fn run_task_until_finished(
             None,
             None,
             false,
+            None,
+            None,
         )
         .await?;
         last_reply = reply.text;
