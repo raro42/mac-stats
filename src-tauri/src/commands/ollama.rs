@@ -16,9 +16,9 @@ use std::path::PathBuf;
 use std::pin::Pin;
 use std::process::Command;
 use std::str::FromStr;
+use std::sync::atomic::Ordering;
 use std::sync::Mutex;
 use std::sync::OnceLock;
-use std::sync::atomic::Ordering;
 
 /// Tool instructions appended to soul for non-agent chat (code execution + FETCH_URL).
 const NON_AGENT_TOOL_INSTRUCTIONS: &str = "\n\nYou are a general purpose AI. If you are asked for actual data like day or weather information, or flight information or stock information. Then we need to compile that information using specially crafted clients for doing so. You will put \"[variable-name]\" into the answer to signal that we need to go another step and ask an agent to fulfil the answer.\n\nWhenever asked with \"[variable-name]\", you must provide a javascript snippet to be executed in the browser console to retrieve that information. Mark the answer to be executed as javascript. Do not put any other words around it. Do not insert formatting. Only return the code to be executed. This is needed for the next AI to understand and execute the same. When answering, use the role: code-assistant in the response. When you return executable code:\n- Start the response with: ROLE=code-assistant\n- On the next line, output ONLY executable JavaScript\n- Do not add explanations or formatting\n\nFor web pages: To fetch a page and use its content (e.g. \"navigate to X and get Y\"), reply with exactly one line: FETCH_URL: <full URL> (e.g. FETCH_URL: https://www.example.com). The app will fetch the page and give you the text; then answer the user based on that.";
@@ -800,7 +800,7 @@ const AGENT_DESCRIPTIONS_BASE: &str = r#"We have 10 base tools available:
 
 3. **BROWSER_SCREENSHOT**: Take a screenshot of the **current page only**. Use BROWSER_SCREENSHOT: current (or BROWSER_SCREENSHOT: with no arg). **You must navigate first**: use BROWSER_NAVIGATE: <url>, then optionally BROWSER_CLICK through links, then BROWSER_SCREENSHOT: current. Never use BROWSER_SCREENSHOT: <url> — that is invalid. For \"screenshot this URL\" use BROWSER_NAVIGATE: <url> then BROWSER_SCREENSHOT: current.
 
-4. **BROWSER_NAVIGATE**, **BROWSER_CLICK**, **BROWSER_INPUT**, **BROWSER_SCROLL**, **BROWSER_EXTRACT**, **BROWSER_SEARCH_PAGE** (lightweight browser): Use for multi-step browser tasks. **Browser mode**: user says \"headless\" → no visible window. User says \"browser\" or default → visible Chrome. BROWSER_NAVIGATE: <url> — open URL and return current page state with numbered elements. BROWSER_CLICK: <index> — click the element at that index (1-based). BROWSER_INPUT: <index> <text> — type text into the element at that index. BROWSER_SCROLL: <direction> — scroll: \"down\", \"up\", \"bottom\", \"top\", or pixels. BROWSER_EXTRACT — return full visible text of current page. BROWSER_SEARCH_PAGE: <pattern> — search page text for a pattern (like grep); returns matches with context. Use to find specific text (e.g. a name) without reading the whole page. For \"find X on this site\": BROWSER_NAVIGATE to start URL, BROWSER_CLICK through links (Team, Contact, etc.), BROWSER_SEARCH_PAGE: \"X\" to check if found, repeat until found, then BROWSER_SCREENSHOT: current. After each action you get \"Current page: ...\" and an Elements list. **If the Elements list shows cookie consent** (e.g. \"Rechazar todo\", \"Aceptar todo\", \"Accept all\", \"Reject all\"), **click the accept button first** (use the index of \"Aceptar todo\" or \"Accept all\") before typing in search boxes or submitting. Reply with exactly one line per tool (e.g. BROWSER_NAVIGATE: https://google.com then BROWSER_CLICK: 27 for Aceptar todo, then BROWSER_INPUT: 10 <query> then BROWSER_CLICK: 9 for the search button).
+4. **BROWSER_NAVIGATE**, **BROWSER_CLICK**, **BROWSER_INPUT**, **BROWSER_SCROLL**, **BROWSER_EXTRACT**, **BROWSER_SEARCH_PAGE** (lightweight browser): Use for multi-step browser tasks. **Browser mode**: user says \"headless\" → no visible window. User says \"browser\" or default → visible Chrome. BROWSER_NAVIGATE: <url> — open URL and return current page state with numbered elements. BROWSER_CLICK: <index> — click the element at that index (1-based). BROWSER_INPUT: <index> <text> — type text into the element at that index. BROWSER_SCROLL: <direction> — scroll: \"down\", \"up\", \"bottom\", \"top\", or pixels. BROWSER_EXTRACT — return full visible text of current page. BROWSER_SEARCH_PAGE: <pattern> — search page text for a pattern (like grep); returns matches with context. Use to find specific text (e.g. a name) without reading the whole page. For \"find X on this site\": BROWSER_NAVIGATE to start URL, BROWSER_CLICK through links (Team, Contact, etc.), BROWSER_SEARCH_PAGE: \"X\" to check if found, repeat until found, then BROWSER_SCREENSHOT: current. After each action you get \"Current page: ...\" and an Elements list. **Every browser action must use a concrete grounded argument**: only navigate to an actual URL already provided by the user or returned by browser/search output, and only click/type using indices from the latest Elements list. Do not write prose such as `BROWSER_NAVIGATE to the video URL`, do not reuse stale indices after a failed retry, and do not blame the site for browser-action arguments invented by the agent. **If the Elements list shows cookie consent** (e.g. \"Rechazar todo\", \"Aceptar todo\", \"Accept all\", \"Reject all\"), **click the accept button first** (use the index of \"Aceptar todo\" or \"Accept all\") before typing in search boxes or submitting. Reply with exactly one line per tool (e.g. BROWSER_NAVIGATE: https://google.com then BROWSER_CLICK: 27 for Aceptar todo, then BROWSER_INPUT: 10 <query> then BROWSER_CLICK: 9 for the search button).
 
 5. **BRAVE_SEARCH**: Web search via Brave Search API. Use for: finding current info, facts, multiple sources. To invoke: reply with exactly one line: BRAVE_SEARCH: <search query>. The app will return search results.
 
@@ -2678,6 +2678,106 @@ fn explicit_no_playable_video_finding(response_summary: &str) -> bool {
         && (lower.contains("video") || lower.contains("videos"))
 }
 
+fn is_browser_navigation_target_token(token: &str) -> bool {
+    let candidate = token.trim().trim_end_matches(['.', ',', ';', ':']);
+    if candidate.is_empty() || candidate.contains(char::is_whitespace) {
+        return false;
+    }
+    let lower = candidate.to_ascii_lowercase();
+    if matches!(
+        lower.as_str(),
+        "to" | "the"
+            | "a"
+            | "an"
+            | "current"
+            | "current-page"
+            | "page"
+            | "url"
+            | "link"
+            | "video"
+            | "videos"
+    ) {
+        return false;
+    }
+    if lower.starts_with("http://")
+        || lower.starts_with("https://")
+        || lower.starts_with("www.")
+        || lower == "localhost"
+        || lower.starts_with("localhost:")
+        || lower.starts_with("127.0.0.1")
+    {
+        return true;
+    }
+    let host = lower
+        .split(['/', '?', '#'])
+        .next()
+        .unwrap_or(lower.as_str());
+    host.contains('.')
+        && host
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '_' | ':' | '[' | ']'))
+}
+
+fn extract_browser_navigation_target(arg: &str) -> Option<String> {
+    let trimmed = arg.trim();
+    let first = trimmed.split_whitespace().next()?;
+    if is_browser_navigation_target_token(first) {
+        Some(first.trim_end_matches(['.', ',', ';', ':']).to_string())
+    } else {
+        None
+    }
+}
+
+fn append_latest_browser_state_guidance(message: &str) -> String {
+    let base = format!(
+        "{} Use the latest browser `Current page` / `Elements` output for the next step; do not reuse stale indices or invent a new URL.",
+        message.trim_end()
+    );
+    if let Some(snapshot) = crate::browser_agent::get_last_browser_state_snapshot() {
+        format!("{}\n\nLatest browser state:\n{}", base, snapshot.trim_end())
+    } else {
+        base
+    }
+}
+
+fn browser_retry_grounding_prompt(request: &str, retry_base: &str) -> String {
+    let mut prompt = format!(
+        "Original request: \"{}\". Continue from the latest real browser state already returned in this conversation. Reuse the most recent `Current page` / `Elements` list, do not reuse stale indices, and do not invent a URL or claim a site error from an agent-generated browser argument. If the page already shows in-page content, inspect that content or click a real listed element. If no grounded browser action is available, reply with a brief limitation and **DONE: no**.\n\n{}",
+        request.trim(),
+        retry_base
+    );
+    if let Some(snapshot) = crate::browser_agent::get_last_browser_state_snapshot() {
+        prompt.push_str("\n\nLatest browser state:\n");
+        prompt.push_str(snapshot.trim_end());
+    }
+    prompt
+}
+
+fn is_browser_task_request(question: &str) -> bool {
+    let q = question.to_lowercase();
+    q.contains("browser")
+        || q.contains("screenshot")
+        || q.contains("click ")
+        || q.contains("navigate ")
+        || q.contains("open ")
+        || q.contains("cookie")
+        || q.contains("consent")
+        || q.contains("video")
+}
+
+fn should_use_http_fallback_after_browser_action_error(tool: &str, err: &str) -> bool {
+    let trimmed = err.trim();
+    if trimmed.starts_with(tool)
+        || trimmed.contains("index out of range")
+        || trimmed.contains("requires a numeric index")
+        || trimmed.contains("must be >=")
+        || trimmed.contains("current page is a new tab")
+    {
+        return false;
+    }
+    true
+}
+
 /// Build a short summary of the last N turns (user/assistant pairs) for the new-topic check.
 /// Each message content is truncated to avoid blowing context.
 fn summarize_last_turns(messages: &[crate::ollama::ChatMessage], max_turns: usize) -> String {
@@ -3194,7 +3294,7 @@ pub fn answer_with_ollama_and_fetch(
                 "Agent router: review/summarize-only Redmine request — overriding success criteria to summary-only"
             );
             Some(vec![
-                "Summary of ticket content provided to the user.".to_string(),
+                "Summary of ticket content provided to the user.".to_string()
             ])
         } else if is_redmine_time_entries_request(&request_for_verification) {
             info!(
@@ -4089,11 +4189,11 @@ pub fn answer_with_ollama_and_fetch(
                         }
                     }
                     "BROWSER_NAVIGATE" => {
-                        let url_arg = arg.trim().to_string();
-                        send_status(&format!("🧭 Navigating to {}…", url_arg));
-                        if url_arg.is_empty() {
+                        let raw_arg = arg.trim().to_string();
+                        if raw_arg.is_empty() {
                             "BROWSER_NAVIGATE requires a URL (e.g. BROWSER_NAVIGATE: https://www.example.com). Please try again with a URL.".to_string()
-                        } else {
+                        } else if let Some(url_arg) = extract_browser_navigation_target(&raw_arg) {
+                            send_status(&format!("🧭 Navigating to {}…", url_arg));
                             info!(
                                 "Agent router [{}]: BROWSER_NAVIGATE: URL sent to CDP: {}",
                                 request_id, url_arg
@@ -4151,6 +4251,11 @@ pub fn answer_with_ollama_and_fetch(
                                 }
                                 Err(e) => format!("BROWSER_NAVIGATE task error: {}", e),
                             }
+                        } else {
+                            append_latest_browser_state_guidance(&format!(
+                                "BROWSER_NAVIGATE requires a concrete URL. The step {:?} was not executed because it did not contain a grounded browser target. This was an agent planning/parsing issue, not evidence about the site.",
+                                raw_arg
+                            ))
                         }
                     }
                     "BROWSER_CLICK" => {
@@ -4180,17 +4285,27 @@ pub fn answer_with_ollama_and_fetch(
                         info!("BROWSER_CLICK: index {}", idx);
                         match tokio::task::spawn_blocking(move || crate::browser_agent::click_by_index(idx)).await {
                             Ok(Ok(state_str)) => state_str,
-                            Ok(Err(_cdp_err)) => {
-                                match tokio::task::spawn_blocking(move || crate::browser_agent::click_http(idx)).await {
-                                    Ok(Ok(state_str)) => state_str,
-                                    Ok(Err(e)) => format!("BROWSER_CLICK failed: {}", e),
-                                    Err(e) => format!("BROWSER_CLICK task error: {}", e),
+                            Ok(Err(cdp_err)) => {
+                                if should_use_http_fallback_after_browser_action_error(
+                                    "BROWSER_CLICK",
+                                    &cdp_err,
+                                ) {
+                                    match tokio::task::spawn_blocking(move || crate::browser_agent::click_http(idx)).await {
+                                        Ok(Ok(state_str)) => state_str,
+                                        Ok(Err(e)) => append_latest_browser_state_guidance(&format!("BROWSER_CLICK failed: {}", e)),
+                                        Err(e) => format!("BROWSER_CLICK task error: {}", e),
+                                    }
+                                } else {
+                                    append_latest_browser_state_guidance(&format!(
+                                        "BROWSER_CLICK failed: {}",
+                                        cdp_err
+                                    ))
                                 }
                             }
-                            Err(e) => format!("BROWSER_CLICK task error: {}", e),
+                            Err(e) => append_latest_browser_state_guidance(&format!("BROWSER_CLICK task error: {}", e)),
                         }
                     }
-                    None => "BROWSER_CLICK requires a numeric index (e.g. BROWSER_CLICK: 3). Use the index from the Current page Elements list.".to_string(),
+                    None => append_latest_browser_state_guidance("BROWSER_CLICK requires a numeric index (e.g. BROWSER_CLICK: 3). Use the index from the Current page Elements list."),
                 }
                     }
                     "BROWSER_INPUT" => {
@@ -4224,17 +4339,27 @@ pub fn answer_with_ollama_and_fetch(
                         let text_clone = text.clone();
                         match tokio::task::spawn_blocking(move || crate::browser_agent::input_by_index(idx, &text_clone)).await {
                             Ok(Ok(state_str)) => state_str,
-                            Ok(Err(_cdp_err)) => {
-                                match tokio::task::spawn_blocking(move || crate::browser_agent::input_http(idx, &text)).await {
+                            Ok(Err(cdp_err)) => {
+                                if should_use_http_fallback_after_browser_action_error(
+                                    "BROWSER_INPUT",
+                                    &cdp_err,
+                                ) {
+                                    match tokio::task::spawn_blocking(move || crate::browser_agent::input_http(idx, &text)).await {
                                     Ok(Ok(state_str)) => state_str,
-                                    Ok(Err(e)) => format!("BROWSER_INPUT failed: {}", e),
+                                    Ok(Err(e)) => append_latest_browser_state_guidance(&format!("BROWSER_INPUT failed: {}", e)),
                                     Err(e) => format!("BROWSER_INPUT task error: {}", e),
                                 }
+                                } else {
+                                    append_latest_browser_state_guidance(&format!(
+                                        "BROWSER_INPUT failed: {}",
+                                        cdp_err
+                                    ))
+                                }
                             }
-                            Err(e) => format!("BROWSER_INPUT task error: {}", e),
+                            Err(e) => append_latest_browser_state_guidance(&format!("BROWSER_INPUT task error: {}", e)),
                         }
                     }
-                    None => "BROWSER_INPUT requires a numeric index and text (e.g. BROWSER_INPUT: 4 search query). Use the index from the Current page Elements list.".to_string(),
+                    None => append_latest_browser_state_guidance("BROWSER_INPUT requires a numeric index and text (e.g. BROWSER_INPUT: 4 search query). Use the index from the Current page Elements list."),
                 }
                     }
                     "BROWSER_SCROLL" => {
@@ -6130,6 +6255,15 @@ pub fn answer_with_ollama_and_fetch(
                             request_for_verification.trim(),
                             retry_base
                         )
+                    } else if is_browser_task_request(&request_for_verification)
+                        && (last_browser_extract.is_some()
+                            || response_content.contains("Current page:")
+                            || reason_lower.contains("browser")
+                            || reason_lower.contains("click")
+                            || reason_lower.contains("video")
+                            || reason_lower.contains("screenshot"))
+                    {
+                        browser_retry_grounding_prompt(&request_for_verification, &retry_base)
                     } else {
                         retry_base
                     };
@@ -6587,7 +6721,6 @@ fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String,
             if tool_name == "FETCH_URL"
                 || tool_name == "BRAVE_SEARCH"
                 || tool_name == "BROWSER_SCREENSHOT"
-                || tool_name == "BROWSER_NAVIGATE"
                 || tool_name == "BROWSER_SEARCH_PAGE"
                 || tool_name == "PERPLEXITY_SEARCH"
             {
@@ -6595,10 +6728,7 @@ fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String,
                     arg = arg[..idx].trim().to_string();
                 }
             }
-            if tool_name == "FETCH_URL"
-                || tool_name == "BROWSER_SCREENSHOT"
-                || tool_name == "BROWSER_NAVIGATE"
-            {
+            if tool_name == "FETCH_URL" || tool_name == "BROWSER_SCREENSHOT" {
                 if let Some(first_space) = arg.find(' ') {
                     arg = arg[..first_space].trim().to_string();
                 }
@@ -7773,9 +7903,11 @@ pub async fn ollama_chat_continue_with_result(
 #[cfg(test)]
 mod tests {
     use super::{
-        build_agent_runtime_context, build_perplexity_verbose_summary,
-        explicit_no_playable_video_finding, extract_last_prefixed_argument,
+        browser_retry_grounding_prompt, build_agent_runtime_context,
+        build_perplexity_verbose_summary, explicit_no_playable_video_finding,
+        extract_browser_navigation_target, extract_last_prefixed_argument,
         final_reply_from_tool_results, grounded_redmine_time_entries_failure_reply,
+        is_browser_navigation_target_token, is_browser_task_request,
         is_grounded_redmine_time_entries_blocked_reply, is_likely_article_like_result,
         original_request_for_retry, parse_agent_tool_from_response, parse_all_tools_from_response,
         parse_tool_from_response, redmine_direct_fallback_hint, redmine_request_for_routing,
@@ -7909,6 +8041,46 @@ mod tests {
                 "GET /time_entries.json?from=2026-03-06&to=2026-03-06&limit=100".to_string()
             ))
         );
+    }
+
+    #[test]
+    fn browser_navigation_target_accepts_real_urls() {
+        assert!(is_browser_navigation_target_token(
+            "https://www.amvara.de/about"
+        ));
+        assert!(is_browser_navigation_target_token("www.example.com"));
+        assert_eq!(
+            extract_browser_navigation_target("https://www.amvara.de/about and inspect videos"),
+            Some("https://www.amvara.de/about".to_string())
+        );
+    }
+
+    #[test]
+    fn browser_navigation_target_rejects_placeholder_words() {
+        assert!(!is_browser_navigation_target_token("to"));
+        assert!(!is_browser_navigation_target_token("video"));
+        assert_eq!(extract_browser_navigation_target("to the video URL"), None);
+    }
+
+    #[test]
+    fn browser_retry_prompt_keeps_browser_grounding_rules() {
+        let prompt = browser_retry_grounding_prompt(
+            "Use browser to review www.amvara.de, click on about and review videos.",
+            "Verification said the task was incomplete.",
+        );
+        assert!(prompt.contains("latest real browser state"));
+        assert!(prompt.contains("do not reuse stale indices"));
+        assert!(prompt.contains("do not invent a URL"));
+    }
+
+    #[test]
+    fn browser_task_request_detects_browser_style_questions() {
+        assert!(is_browser_task_request(
+            "Use browser to review www.amvara.de, click on about and review videos."
+        ));
+        assert!(!is_browser_task_request(
+            "Provide me the list of redmine tickets work on today."
+        ));
     }
 
     #[test]
@@ -8263,10 +8435,8 @@ mod tests {
             280,
         );
         assert_eq!(shaped.len(), 2);
-        assert!(
-            shaped
-                .iter()
-                .all(|r| !is_likely_article_like_result(&r.title, &r.url, &r.snippet))
-        );
+        assert!(shaped
+            .iter()
+            .all(|r| !is_likely_article_like_result(&r.title, &r.url, &r.snippet)));
     }
 }

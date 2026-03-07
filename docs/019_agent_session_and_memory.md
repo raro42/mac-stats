@@ -84,14 +84,18 @@ So: **session context** = the list of prior messages in the **main** conversatio
 
 ## Behaviour after Changes
 
-- **Discord**: Each request sees the last N messages in that channel (from in-memory, and after restart optionally from the latest session file). The model can refer to what was said earlier in the channel.
-- **CPU window**: Unchanged; frontend continues to send conversation_history; optionally cap in the backend.
+- **Discord**: Each request sees the last **20** messages in that channel (from in-memory, and after restart optionally from the latest session file). The model can refer to what was said earlier in the channel.
+- **CPU window**: Unchanged; frontend continues to send `conversation_history`; the backend applies the same cap before planning/execution.
 - **AGENT: calls**: Specialist still gets only the task string and its own prompt; no change unless you add an optional context snippet later.
+
+## Current Implementation Notes
+
+- The main router currently caps `conversation_history` to the last **20** messages before planning/execution.
+- Discord loads prior turns from in-memory session storage first and falls back to the latest persisted session file after restart.
+- Session compaction and session replacement are already wired into the main router path; the remaining work here is review/tuning, not first-time implementation.
 
 ## Open tasks:
 
 - Review whether the `session_memory` implementation is correct and efficient.
-- Verify that `answer_with_ollama_and_fetch` and `run_agent_ollama_session` handle `conversation_history` consistently.
-- Define the plan for handling the `conversation_history` cap.
 - Review whether the current conversation-history storage structure should be optimized.
 - Consider adding a mechanism for users to manually edit or update their long-term memory.

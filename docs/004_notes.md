@@ -89,43 +89,24 @@ Whenever Ollama is asked to decide which agent to use, the app sends the complet
 
 ### Known Issues / TODOs
 
-1. **Security Module**
-	* `list_credentials()` function needs proper Keychain API implementation to extract account names
-	* Currently returns empty vector - needs implementation using Keychain Services API
-2. **Plugin System**
+1. **Plugin System**
 	* Timeout handling not fully implemented (std::process::Command doesn't have timeout)
 	* Should use tokio or crossbeam for proper timeout handling
 	* Plugin script execution could be improved with better error messages
-3. **Monitor System**
-	* Monitor state persistence not implemented (in-memory only)
-	* Should persist to disk (JSON/TOML config file)
-	* Monitor scheduling/background checking not implemented yet
-4. **Alert System**
+2. **Alert System**
 	* Alert channel registration not exposed via Tauri commands
 	* Need to add commands for registering Telegram/Slack/Mastodon channels
 	* Alert evaluation needs to be called periodically (background task)
-5. **Ollama Integration**
+3. **Ollama Integration**
 	* Stream support not implemented (currently only non-streaming chat)
 	* Could add streaming for better UX
-6. **UI Implementation**
-	* Frontend UI not yet updated to show new dashboard
-	* Need to create:
-		+ 3 core gauges (Temperature, CPU Usage, CPU Frequency)
-		+ Battery & Power status strip
-		+ Collapsible External/Monitors section
-		+ Settings UI for adding monitors, configuring alerts
-		+ Ollama chat interface
+4. **UI Implementation**
+	* Settings UI for adding monitors and configuring alerts could still be improved
 
 ## Open tasks:
 
-### Security Module
-* Implement `list_credentials()` function using Keychain Services API
-
 ### Plugin System
 * Implement proper timeout handling using tokio or crossbeam
-
-### Monitor System
-* Implement monitor state persistence using JSON/TOML config file
 
 ### Alert System
 * Add commands for registering Telegram/Slack/Mastodon channels
@@ -134,9 +115,4 @@ Whenever Ollama is asked to decide which agent to use, the app sends the complet
 * Implement stream support for better UX
 
 ### UI Implementation
-* Update frontend UI to show new dashboard
-* Implement 3 core gauges with SVG
-* Add battery/power status strip
-* Create collapsible sections for external monitors
-* Implement settings UI for adding monitors, configuring alerts
-* Implement Ollama chat interface
+* Improve the settings UI for adding monitors and configuring alerts

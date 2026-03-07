@@ -51,5 +51,8 @@ At startup, `ensure_defaults()` runs. For **prompt files** (`~/.mac-stats/prompt
 - If the file **does not exist**, the default is written (unchanged).
 - If the file **exists**, it is **merged** with the bundled default: the file is split into paragraphs (by `\n\n`); each default paragraph is identified by its first-line key (trimmed, up to 80 chars). Any default paragraph whose key is not already present in the file is **appended**. User content is never overwritten; new sections from repo defaults are added automatically.
 
-## Open tasks:
-- Add more documentation for the `ensure_defaults()` function.
+## What `ensure_defaults()` covers
+
+- Creates missing bundled defaults such as prompts, shared soul content, and default agent files/directories.
+- Merges bundled prompt updates into existing local prompt files instead of overwriting user edits.
+- Preserves user customizations by appending only missing default content blocks.

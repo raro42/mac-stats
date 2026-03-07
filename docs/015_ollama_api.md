@@ -116,6 +116,12 @@ All commands require Ollama to be **configured** (`configure_ollama`). They use 
 | `unload_ollama_model` | `model: String` | `()` |
 | `load_ollama_model` | `model: String`, `keep_alive?: String` | `()` |
 
+## Failure Behavior
+
+- If the Ollama client is not configured yet, these commands return a clear error such as `Ollama not configured` instead of attempting the API call.
+- If the Ollama server is reachable but a model action fails (for example deleting a missing model), the Tauri command returns the backend error text from the Ollama request path so the caller sees the actual failure instead of a silent no-op.
+- The `OLLAMA_API` tool in the agent loop surfaces the same backend result text back to the model/user.
+
 ## Code Locations
 
 - **Types and client:** `src-tauri/src/ollama/mod.rs` — `ListResponse`, `ModelSummary`, `VersionResponse`, `PsResponse`, `EmbedInput`, `EmbedRequest`, `EmbedResponse`; `OllamaClient::list_models_full`, `get_version`, `list_running_models`, `pull_model`, `delete_model`, `generate_embeddings`, `unload_model`, `load_model`.
@@ -130,7 +136,5 @@ All commands require Ollama to be **configured** (`configure_ollama`). They use 
 
 ## Open tasks:
 
-- Document how the app behaves when the Ollama API is not configured.
-- Document what happens when the user tries to pull or delete a model that does not exist.
 - Improve the user interface for model management and configuration.
 - Consider support for more advanced model-management features such as fine-tuning or export.

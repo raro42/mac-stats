@@ -43,6 +43,12 @@ This document describes how mac-stats uses **per-model context window size**, **
 - **Behaviour:** The app parses the message in `discord/mod.rs` (`parse_discord_ollama_overrides`). If a model override is present, it is validated against `GET /api/tags` (model must exist). Then `answer_with_ollama_and_fetch` uses that model for that request only; the global client config is unchanged.
 - **Rust:** `commands/ollama.rs` → `answer_with_ollama_and_fetch(..., model_override, ...)` and `send_ollama_chat_messages(messages, model_override, options_override)`.
 
+### When Model Data Is Missing or the Override Is Invalid
+
+- If a request selects a model override that does not exist, validation fails before the main run and the request returns a user-facing error instead of silently falling back to a different model.
+- If `/api/show` does not provide a usable context size, the backend falls back to a safe default context budget rather than aborting the request.
+- Context-size lookups are cached per `(endpoint, model)` so once the backend learns a model's window, later requests reuse it.
+
 ### Model Parameters (Temperature, Context Window Size)
 
 - **Ollama API:** `POST /api/chat` accepts an `options` object with e.g. `temperature` and `num_ctx`.
@@ -52,6 +58,12 @@ This document describes how mac-stats uses **per-model context window size**, **
   - `num_ctx: 8192` or `num_ctx=8192`
   - Or one line: `params: temperature=0.7 num_ctx=8192`
 - **Rust:** `ollama/mod.rs` → `ChatOptions { temperature, num_ctx }` and `ChatRequest.options`. `send_ollama_chat_messages` merges config defaults with per-request overrides.
+
+### Custom Overrides in Skill/Context Flows
+
+- Skill-based requests still use the same per-request model/options pipeline as normal chat.
+- A Discord request can combine `model:`, `temperature:`, `num_ctx:`, and `skill:` headers; the backend strips those headers, resolves the selected skill, and applies the override/options only to that request.
+- Config-level defaults remain the baseline; request-level overrides win when present.
 
 ### Context-Aware Content Reduction (FETCH_URL)
 
@@ -71,7 +83,7 @@ This document describes how mac-stats uses **per-model context window size**, **
 
 ### Ollama Agent at Startup
 
-- **Behaviour:** The app no longer requires the user to open the CPU window for the Ollama agent to be available. On startup, `ensure_ollama_agent_ready_at_startup()` runs in a background task: if the client is not configured, it applies the default endpoint (`http://localhost:11434`) and model (`llama2`), then checks the connection and fetches model info (context size) for the default model. Discord, the scheduler, and the CPU window can then use the agent immediately when needed.
+- **Behaviour:** The app no longer requires the user to open the CPU window for the Ollama agent to be available. On startup, `ensure_ollama_agent_ready_at_startup()` runs in a background task: if the client is not configured, it applies the default endpoint (`http://localhost:11434`) and auto-detects the first available model (respecting any configured model override), then checks the connection and fetches model info (context size) for the effective model. Discord, the scheduler, and the CPU window can then use the agent immediately when needed.
 
 ## References
 
@@ -82,7 +94,5 @@ This document describes how mac-stats uses **per-model context window size**, **
 
 ## Open tasks:
 
-- Document how the app behaves when the selected model is unavailable or its context size is unknown.
-- Document how custom model and configuration overrides should work in the skill/context flow.
 - Improve Ollama error handling in the skill/context pipeline.
 - Improve `FETCH_URL` content reduction performance.

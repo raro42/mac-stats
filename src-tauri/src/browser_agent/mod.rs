@@ -13,16 +13,16 @@ mod http_fallback;
 pub use http_fallback::{click_http, extract_http, input_http, navigate_http};
 
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::OnceLock;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 
-use headless_chrome::Browser;
-use headless_chrome::LaunchOptions;
 use headless_chrome::protocol::cdp::Page::CaptureScreenshotFormatOption;
 use headless_chrome::types::Bounds;
+use headless_chrome::Browser;
+use headless_chrome::LaunchOptions;
 use regex::Regex;
 use serde::Deserialize;
 use std::path::PathBuf;
@@ -445,9 +445,15 @@ static BROWSER_SESSION: OnceLock<Mutex<Option<(Browser, Instant, bool)>>> = Once
 
 /// Last page's element list (index, label) for status messages. Set after each navigate/click/input so "Clicking element 7 (Accept all)…" can show the label.
 static LAST_ELEMENT_LABELS: OnceLock<Mutex<Option<Vec<(u32, String)>>>> = OnceLock::new();
+/// Last browser state text shown to the model. Used to re-ground retries after browser-step failures.
+static LAST_BROWSER_STATE_SNAPSHOT: OnceLock<Mutex<Option<String>>> = OnceLock::new();
 
 fn last_element_labels() -> &'static Mutex<Option<Vec<(u32, String)>>> {
     LAST_ELEMENT_LABELS.get_or_init(|| Mutex::new(None))
+}
+
+fn last_browser_state_snapshot() -> &'static Mutex<Option<String>> {
+    LAST_BROWSER_STATE_SNAPSHOT.get_or_init(|| Mutex::new(None))
 }
 
 fn element_label_for_status(i: &Interactable) -> String {
@@ -474,6 +480,12 @@ pub(crate) fn set_last_element_labels(labels: Vec<(u32, String)>) {
     }
 }
 
+pub(crate) fn set_last_browser_state_snapshot(snapshot: String) {
+    if let Ok(mut g) = last_browser_state_snapshot().lock() {
+        *g = Some(snapshot);
+    }
+}
+
 /// Get the label for element at 1-based index from the last cached page state. Used for status message context.
 pub fn get_last_element_label(index: u32) -> Option<String> {
     last_element_labels().lock().ok().and_then(|g| {
@@ -484,6 +496,13 @@ pub fn get_last_element_label(index: u32) -> Option<String> {
                 .map(|(_, l)| l.clone())
         })
     })
+}
+
+pub fn get_last_browser_state_snapshot() -> Option<String> {
+    last_browser_state_snapshot()
+        .lock()
+        .ok()
+        .and_then(|g| g.clone())
 }
 
 /// User said "headless" → true (no visible window). User said "browser" or default → false (visible desktop app).
@@ -700,6 +719,7 @@ fn navigate_and_get_state_inner(url: &str) -> Result<String, String> {
     let state = get_browser_state(&tab).inspect_err(|e| {
         clear_browser_session_on_error(e);
     })?;
+    let snapshot = format_browser_state_for_llm(&state);
     set_last_element_labels(
         state
             .interactables
@@ -707,7 +727,8 @@ fn navigate_and_get_state_inner(url: &str) -> Result<String, String> {
             .map(|i| (i.index, element_label_for_status(i)))
             .collect(),
     );
-    Ok(format_browser_state_for_llm(&state))
+    set_last_browser_state_snapshot(snapshot.clone());
+    Ok(snapshot)
 }
 
 /// Click the Nth interactive element (1-based index). Returns updated browser state string.
@@ -767,6 +788,7 @@ fn click_by_index_inner(index: u32) -> Result<String, String> {
     let state = get_browser_state(&tab).inspect_err(|e| {
         clear_browser_session_on_error(e);
     })?;
+    let snapshot = format_browser_state_for_llm(&state);
     set_last_element_labels(
         state
             .interactables
@@ -774,7 +796,8 @@ fn click_by_index_inner(index: u32) -> Result<String, String> {
             .map(|i| (i.index, element_label_for_status(i)))
             .collect(),
     );
-    Ok(format_browser_state_for_llm(&state))
+    set_last_browser_state_snapshot(snapshot.clone());
+    Ok(snapshot)
 }
 
 /// Type text into the Nth interactive element (1-based index). Returns updated browser state string.
@@ -846,6 +869,7 @@ fn input_by_index_inner(index: u32, text: &str) -> Result<String, String> {
     let state = get_browser_state(&tab).inspect_err(|e| {
         clear_browser_session_on_error(e);
     })?;
+    let snapshot = format_browser_state_for_llm(&state);
     set_last_element_labels(
         state
             .interactables
@@ -853,7 +877,8 @@ fn input_by_index_inner(index: u32, text: &str) -> Result<String, String> {
             .map(|i| (i.index, element_label_for_status(i)))
             .collect(),
     );
-    Ok(format_browser_state_for_llm(&state))
+    set_last_browser_state_snapshot(snapshot.clone());
+    Ok(snapshot)
 }
 
 /// Scroll the current page. Arg: "down", "up", "bottom", "top", or pixels (e.g. "500"). Returns updated browser state.
@@ -896,7 +921,9 @@ fn scroll_page_inner(arg: &str) -> Result<String, String> {
     let state = get_browser_state(&tab).inspect_err(|e| {
         clear_browser_session_on_error(e);
     })?;
-    Ok(format_browser_state_for_llm(&state))
+    let snapshot = format_browser_state_for_llm(&state);
+    set_last_browser_state_snapshot(snapshot.clone());
+    Ok(snapshot)
 }
 
 /// Search current page for a text pattern (like grep). Returns matches with surrounding context. Zero LLM cost.

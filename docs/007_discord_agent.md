@@ -213,7 +213,6 @@ Requires **Ollama** running and configured (env `OLLAMA_HOST` or `~/.mac-stats/.
 
 ## Open tasks:
 
-- Investigate why `SCHEDULE` and `REMOVE_SCHEDULE` commands don't work as expected.
 - Improve the documentation for `~/.mac-stats/schedules.json` and `~/.mac-stats/user-info.json`.
 - Consider adding a feature to automatically update `~/.mac-stats/user-info.json` when a user's display name changes.
 - Look into using a more robust caching mechanism for `~/.mac-stats/user-info.json`.

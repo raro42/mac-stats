@@ -76,9 +76,6 @@ Ollama can invoke these tools by replying with `TOOL_NAME: <argument>`. The **SC
 
 ## Open tasks:
 
-- **Incomplete documentation**:  
-  - `RUN_JS` and `PERPLEXITY_SEARCH` implementations are missing.  
-  - `RUN_CMD` lacks details.  
 - **Performance**: Investigate optimizations for sequential execution.  
 - **Parallel execution**: Explore feasibility of multi-tool per turn or parallel agent runs.  
 - **Documentation**: Update for clarity and completeness.  

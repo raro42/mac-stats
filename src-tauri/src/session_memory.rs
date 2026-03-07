@@ -87,7 +87,11 @@ fn topic_slug(content: &str, max_len: usize) -> String {
         })
         .collect();
     let s = s.trim().replace(' ', "-").trim_matches('-').to_lowercase();
-    if s.is_empty() { "chat".to_string() } else { s }
+    if s.is_empty() {
+        "chat".to_string()
+    } else {
+        s
+    }
 }
 
 /// Built-in fallback phrases when ~/.mac-stats/agents/session_reset_phrases.md is missing or empty.

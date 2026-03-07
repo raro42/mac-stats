@@ -74,5 +74,4 @@ The PYTHON_SCRIPT agent lets Ollama create and run Python scripts. The app write
 
 - Investigate why some users report issues with the Python script agent.
 - Improve the documentation for the Python script agent to make it more user-friendly.
-- Consider adding more tool agents to the list.
 - Review the security of the app to ensure it is robust against potential vulnerabilities.

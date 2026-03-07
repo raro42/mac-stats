@@ -77,6 +77,11 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 ### Cookie consent and screenshots
 When the user asks to remove or dismiss a cookie consent banner and take a screenshot, the planning prompt instructs the model to include **BROWSER_CLICK** on the consent button (using the Elements list from BROWSER_NAVIGATE) **before** BROWSER_SCREENSHOT. Pre-routing to NAVIGATE + SCREENSHOT is skipped when the question mentions cookie/consent/banner so the planner can add the click step.
 
+### Grounded browser retries
+- `BROWSER_NAVIGATE` must receive a concrete URL. Natural-language filler such as `BROWSER_NAVIGATE to the video URL` is rejected and treated as an agent-side planning/parsing failure, not as evidence about the website.
+- After `BROWSER_NAVIGATE`, `BROWSER_CLICK`, or `BROWSER_INPUT`, mac-stats caches the latest `Current page` and `Elements` output. Retries should reuse that latest state instead of stale indices from an earlier page.
+- If the browser is already on the relevant page and the content is inline, the next retry should inspect that page or click a real listed element. It should not invent a new target URL unless the browser output already exposed one.
+
 ### Summary
 | Requirement | What mac-stats does |
 |------------|----------------------|
@@ -87,4 +92,3 @@ When the user asks to remove or dismiss a cookie consent banner and take a scree
 ## Open tasks:
 - Investigate why some users are unable to launch Chrome on port 9222.
 - Improve the documentation for BROWSER_* tools to better explain the connection process.
-- Consider adding a feature to automatically launch Chrome if it's not already running on port 9222.

@@ -85,7 +85,5 @@ Whenever Ollama is asked to decide which agent to use, the app sends the complet
    When the plan is **AGENT: general-purpose-mommy** (or similar) and the user message clearly matches a single tool (e.g. “screenshot” + URL), the router could **additionally try** the matching tool (e.g. BROWSER_SCREENSHOT) and append that result, or heuristically suggest re-planning with “prefer BROWSER_SCREENSHOT for screenshot + URL requests”.
 
 ## Open tasks:
-- Review planning prompt / tool priority to ensure correct tool invocation.
 - Investigate session memory for planning to reduce bias towards delegation.
 - Examine global memory for planning to minimize its impact on tool choice.
-- Implement fallback logic for single-tool requests.

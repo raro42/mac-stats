@@ -116,15 +116,10 @@ So we already clear conversation history when the plan contains REDMINE_API to a
 
 ---
 
-## Implementation checklist (Option B)
+## Historical implementation checklist (Option B)
 
-- [ ] In `ollama_chat_with_execution` (or shared helper):
-  - [ ] Call `extract_ticket_id(question)` and check for redmine/ticket/issue/review keywords.
-  - [ ] If ID present and `redmine::is_configured()`: call `redmine::redmine_api_request("GET", format!("/issues/{}.json?include=journals,attachments", id), None)`.
-  - [ ] On success: inject “Redmine issue data (use only this): …” + instruction (summary, status, missing, final thoughts) into the first user message (or a dedicated system/user block).
-  - [ ] On failure: inject “Redmine API failed: … Do not invent ticket content.”
-- [ ] Optionally: add a short note in soul or default prompt that “For Redmine ticket reviews, the app may inject the ticket data; use only that data.”
-- [ ] Test: “review redmine ticket 7209” from CPU window → answer must reflect real issue JSON (and fail clearly if API is down).
+- This checklist reflects the original Option B proposal that motivated later router/Redmine changes.
+- Do not treat it as the current canonical backlog without first comparing it to the implemented Redmine flow in `src-tauri/src/commands/ollama.rs` and `docs/025_redmine_api_skill.md`.
 
 ---
 

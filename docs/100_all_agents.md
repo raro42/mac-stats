@@ -38,6 +38,11 @@ Gatekeeper may show "damaged" or block the unsigned app—the file is fine. Righ
 | **MCP** | Run a tool from the configured MCP server (any server on the internet via HTTP/SSE). | `mcp/` or `commands/mcp.rs` → list tools, `call_tool()`. Requires `MCP_SERVER_URL` (env or `.config.env`). |
 | **AGENT** | Run a specialized LLM agent (its own model and prompt: soul + mood + skill). | `agents/mod.rs` → `load_agents()`, `find_agent_by_id_or_name()`; `commands/ollama.rs` → `run_agent_ollama_session()`. Only listed when `~/.mac-stats/agents/` has at least one enabled `agent-<id>/`. |
 
+### Notes on FETCH_URL and RUN_CMD
+
+- `FETCH_URL` is a server-side `reqwest` fetch, not a browser-side fetch. That means normal browser CORS restrictions do not apply; failures are typically due to network, auth, redirects, invalid URLs, or the remote site itself.
+- `RUN_CMD` is intentionally restricted: commands are allowlisted, file access is limited to `~/.mac-stats` where applicable, and the tool is designed for read-only local inspection rather than arbitrary shell execution.
+
 ## Entry-Point Agents (Who Calls Ollama and How)
 
 ### 2.1 Discord Agent (Gateway Bot)
@@ -50,7 +55,6 @@ Gatekeeper may show "damaged" or block the unsigned app—the file is fine. Righ
 - **Rust:** `discord/mod.rs` (EventHandler) → `commands::ollama::answer_with_ollama_and_fetch(question, ..., model_override, options_override, skill_content)`. Token from env, `.config.env`, or Keychain (see 007).
 
 ## Open tasks:
-- Document how `fetch_page_content` behaves around CORS-related user expectations.
 - Review whether `run_local_command` is sufficiently hardened against shell-injection-style misuse.
 - Consider support for more advanced Python-script execution workflows.
 - Consider whether additional external tool integrations belong in the agent layer.

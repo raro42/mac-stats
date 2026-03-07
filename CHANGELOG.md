@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.33] - 2026-03-07
+
+### Added
+- **Grounded browser retry coverage** — Added focused tests for browser navigation target parsing, browser-task detection, and retry prompt grounding so browser regressions around invented URLs and stale element indices are easier to catch.
+
+### Changed
+- **Browser retry grounding** — Browser retries now carry the latest real `Current page` / `Elements` snapshot back into the prompt so follow-up browser steps stay grounded in actual page state instead of drifting into invented navigation targets.
+- **Documentation refresh** — Updated active docs to better reflect the current Redmine, browser automation, Ollama context, session memory, and defaults-merge behavior while trimming older stale backlog notes.
+
+### Fixed
+- **Browser action fallback behavior** — `BROWSER_CLICK` and `BROWSER_INPUT` no longer fall through to weaker HTTP fallbacks for agent-generated argument mistakes like stale indices or missing numeric targets; those errors now return grounded guidance tied to the latest browser state.
+- **Browser navigation argument parsing** — `BROWSER_NAVIGATE` handling now rejects placeholder tokens like `to` or `video` and only accepts concrete URL-like targets, which avoids fake site failures caused by model-invented navigation arguments.
+
 ## [0.1.32] - 2026-03-06
 
 ### Changed

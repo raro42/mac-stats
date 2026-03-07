@@ -20,8 +20,8 @@ use serenity::model::gateway::GatewayIntents;
 use serenity::model::id::UserId;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use std::sync::RwLock;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::RwLock;
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::UNIX_EPOCH;
 use tokio::sync::mpsc;
@@ -997,7 +997,11 @@ async fn having_fun_background_loop(ctx: Context) {
                                 >= std::time::Duration::from_secs(
                                     state.next_idle_thought_after_secs,
                                 );
-                        if idle { Some(*id) } else { None }
+                        if idle {
+                            Some(*id)
+                        } else {
+                            None
+                        }
                     } else {
                         None
                     }
