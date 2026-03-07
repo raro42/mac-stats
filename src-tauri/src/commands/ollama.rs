@@ -3134,7 +3134,6 @@ pub fn answer_with_ollama_and_fetch(
     let mut conversation_history = conversation_history.map(|v| v.to_vec());
     let attachment_images_base64 = attachment_images_base64.map(|v| v.to_vec());
     let discord_intermediate = discord_intermediate.map(|s| s.to_string());
-    let is_verification_retry = is_verification_retry;
     let original_user_request = original_user_request.map(|s| s.to_string());
     let success_criteria_override = success_criteria_override.map(|v| v.to_vec());
     Box::pin(async move {
@@ -3171,7 +3170,7 @@ pub fn answer_with_ollama_and_fetch(
             {
                 if conversation_history
                     .as_ref()
-                    .map_or(false, |h| !h.is_empty())
+                    .is_some_and(|h| !h.is_empty())
                 {
                     info!(
                         "Agent router: clearing history for Discord screenshot-send request (focus on current task)"
@@ -3598,13 +3597,14 @@ pub fn answer_with_ollama_and_fetch(
                             || redmine_request_lower.contains("post a comment")
                             || redmine_request_lower.contains("write ")
                             || redmine_request_lower.contains("put ");
-                        if ticket_id.is_some()
-                            && (redmine_request_lower.contains("ticket")
-                                || redmine_request_lower.contains("issue")
-                                || redmine_request_lower.contains("redmine"))
-                            && !wants_update
+                        if let Some(id) = ticket_id
+                            .filter(|_| {
+                                redmine_request_lower.contains("ticket")
+                                    || redmine_request_lower.contains("issue")
+                                    || redmine_request_lower.contains("redmine")
+                            })
+                            .filter(|_| !wants_update)
                         {
-                            let id = ticket_id.unwrap();
                             let rec = format!(
                                 "REDMINE_API: GET /issues/{}.json?include=journals,attachments",
                                 id
@@ -3644,13 +3644,14 @@ pub fn answer_with_ollama_and_fetch(
                         || redmine_request_lower.contains("post a comment")
                         || redmine_request_lower.contains("write ")
                         || redmine_request_lower.contains("put ");
-                    if ticket_id.is_some()
-                        && (redmine_request_lower.contains("ticket")
-                            || redmine_request_lower.contains("issue")
-                            || redmine_request_lower.contains("redmine"))
-                        && !wants_update
+                    if let Some(id) = ticket_id
+                        .filter(|_| {
+                            redmine_request_lower.contains("ticket")
+                                || redmine_request_lower.contains("issue")
+                                || redmine_request_lower.contains("redmine")
+                        })
+                        .filter(|_| !wants_update)
                     {
-                        let id = ticket_id.unwrap();
                         let rec = format!(
                             "REDMINE_API: GET /issues/{}.json?include=journals,attachments",
                             id
