@@ -93,6 +93,7 @@ So: **session context** = the list of prior messages in the **main** conversatio
 - The main router currently caps `conversation_history` to the last **20** messages before planning/execution.
 - Discord loads prior turns from in-memory session storage first and falls back to the latest persisted session file after restart.
 - Session compaction and session replacement are already wired into the main router path; the remaining work here is review/tuning, not first-time implementation.
+- For Discord **having_fun** channels, session compaction uses a fixed minimal context (no LLM call) so compacted CONTEXT never invents task or platform themes from casual chat.
 
 ## Open tasks:
 

@@ -76,6 +76,20 @@ fn time_awareness_for_having_fun() -> String {
     format!("[Current time: {} — {}. {}]", date, period_name, guidance)
 }
 
+/// True if the message content looks like an agent/LLM failure notice (e.g. "Agent failed before reply",
+/// "LLM request timed out", "Something went wrong on my side", "Logs: openclaw"). Used so we do not
+/// inject these into having_fun channel history or idle-thought context (log-review 03-01 window).
+fn is_agent_failure_notice(content: &str) -> bool {
+    let lower = content.trim().to_lowercase();
+    lower.contains("agent failed")
+        || lower.contains("failed before reply")
+        || lower.contains("llm request timed out")
+        || lower.contains("request timed out")
+        || lower.contains("something went wrong on my side")
+        || lower.contains("logs: openclaw")
+        || lower.contains("openclaw logs")
+}
+
 /// If the message content looks like a long image-fetch 404 error, return a short user-facing line
 /// so we don't forward raw error paragraphs to the model (log-004).
 fn sanitize_image_error_content(content: &str) -> String {
@@ -572,6 +586,11 @@ fn count_configured_having_fun_channels() -> usize {
         .unwrap_or(0)
 }
 
+/// True if the given Discord channel is configured as having_fun. Used by session compactor to avoid inventing task/platform context for casual chat.
+pub fn is_discord_channel_having_fun(channel_id: u64) -> bool {
+    configured_having_fun_channel_ids().contains(&channel_id)
+}
+
 /// Channel IDs configured as having_fun. Used to ensure state exists so we can show next response/idle countdown.
 fn configured_having_fun_channel_ids() -> Vec<u64> {
     ensure_channel_config_loaded();
@@ -1052,46 +1071,25 @@ async fn having_fun_respond(
     ctx: &Context,
 ) -> Option<u64> {
     let chan = channel_settings(channel_id);
-    let (system_content, model_override) = if let Some(ref agent_selector) = chan.agent {
-        let agents = crate::agents::load_agents();
-        if let Some(agent) = crate::agents::find_agent_by_id_or_name(&agents, agent_selector) {
-            let mut system = String::new();
-            system.push_str(HAVING_FUN_CASUAL_CONTEXT);
-            system.push_str("\n\n");
-            system.push_str(&agent.combined_prompt);
-            system.push_str("\n\n");
-            system.push_str(&time_awareness_for_having_fun());
-            system.push_str("\n\n");
-            system.push_str(&crate::metrics::format_metrics_for_ai_context());
-            (system, agent.model.clone())
-        } else {
-            // Agent not found: use casual context only (no global soul) so we never mix work/Redmine/language from other channel types.
-            let mut system = String::new();
-            system.push_str(HAVING_FUN_CASUAL_CONTEXT);
-            if let Some(ref prompt) = chan.prompt {
-                system.push_str("\n\n");
-                system.push_str(prompt);
-            }
-            system.push_str("\n\n");
-            system.push_str(&time_awareness_for_having_fun());
-            system.push_str("\n\n");
-            system.push_str(&crate::metrics::format_metrics_for_ai_context());
-            (system, chan.model.clone())
-        }
-    } else {
-        // No channel agent: use having_fun-specific context only (no global soul) so persona stays casual.
-        let mut system = String::new();
-        system.push_str(HAVING_FUN_CASUAL_CONTEXT);
-        if let Some(ref prompt) = chan.prompt {
-            system.push_str("\n\n");
-            system.push_str(prompt);
-        }
+    // Having_fun channels always use casual-only context; we never inject agent/work soul (e.g. Redmine)
+    // so the persona stays consistent. Channel agent override is ignored for having_fun replies.
+    if chan.agent.is_some() {
+        debug!(
+            "Discord: having_fun channel {} has agent override; using casual-only prompt (agent soul not used for having_fun)",
+            channel_id
+        );
+    }
+    let mut system = String::new();
+    system.push_str(HAVING_FUN_CASUAL_CONTEXT);
+    if let Some(ref prompt) = chan.prompt {
         system.push_str("\n\n");
-        system.push_str(&time_awareness_for_having_fun());
-        system.push_str("\n\n");
-        system.push_str(&crate::metrics::format_metrics_for_ai_context());
-        (system, chan.model.clone())
-    };
+        system.push_str(prompt);
+    }
+    system.push_str("\n\n");
+    system.push_str(&time_awareness_for_having_fun());
+    system.push_str("\n\n");
+    system.push_str(&crate::metrics::format_metrics_for_ai_context());
+    let (system_content, model_override) = (system, chan.model.clone());
 
     let mut prior = crate::session_memory::get_messages("discord", channel_id);
     if prior.is_empty() {
@@ -1120,7 +1118,13 @@ async fn having_fun_respond(
     });
 
     const HISTORY_CAP: usize = 20;
-    for (role, content) in prior.into_iter().rev().take(HISTORY_CAP).rev() {
+    for (role, content) in prior
+        .into_iter()
+        .rev()
+        .take(HISTORY_CAP)
+        .rev()
+        .filter(|(_, content)| !is_agent_failure_notice(content))
+    {
         ollama_msgs.push(crate::ollama::ChatMessage {
             role,
             content,
@@ -1133,12 +1137,14 @@ async fn having_fun_respond(
     let new_context: String = if latest.is_empty() {
         messages
             .iter()
+            .filter(|m| !is_agent_failure_notice(&m.content))
             .map(|m| format!("{}: {}", m.author_name, m.content))
             .collect::<Vec<_>>()
             .join("\n")
     } else {
         latest
             .into_iter()
+            .filter(|(_, content)| !is_agent_failure_notice(content))
             .map(|(author, content)| format!("{}: {}", author, content))
             .collect::<Vec<_>>()
             .join("\n")
@@ -1180,7 +1186,7 @@ async fn having_fun_respond(
             last_msg_id
         }
         Err(e) => {
-            debug!(
+            error!(
                 "Having fun: Ollama failed for channel {}: {}",
                 channel_id, e
             );
@@ -1192,46 +1198,25 @@ async fn having_fun_respond(
 /// Generate and post a random thought when the channel has been quiet.
 async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
     let chan = channel_settings(channel_id);
-    let (system_content, model_override) = if let Some(ref agent_selector) = chan.agent {
-        let agents = crate::agents::load_agents();
-        if let Some(agent) = crate::agents::find_agent_by_id_or_name(&agents, agent_selector) {
-            let mut system = String::new();
-            system.push_str(HAVING_FUN_CASUAL_CONTEXT);
-            system.push_str("\n\n");
-            system.push_str(&agent.combined_prompt);
-            system.push_str("\n\n");
-            system.push_str(&time_awareness_for_having_fun());
-            system.push_str("\n\n");
-            system.push_str(&crate::metrics::format_metrics_for_ai_context());
-            (system, agent.model.clone())
-        } else {
-            // Agent not found: use casual context only (no global soul) so we never mix work/Redmine/language from other channel types.
-            let mut system = String::new();
-            system.push_str(HAVING_FUN_CASUAL_CONTEXT);
-            if let Some(ref prompt) = chan.prompt {
-                system.push_str("\n\n");
-                system.push_str(prompt);
-            }
-            system.push_str("\n\n");
-            system.push_str(&time_awareness_for_having_fun());
-            system.push_str("\n\n");
-            system.push_str(&crate::metrics::format_metrics_for_ai_context());
-            (system, chan.model.clone())
-        }
-    } else {
-        // No channel agent: use having_fun-specific context only (no global soul) so persona stays casual.
-        let mut system = String::new();
-        system.push_str(HAVING_FUN_CASUAL_CONTEXT);
-        if let Some(ref prompt) = chan.prompt {
-            system.push_str("\n\n");
-            system.push_str(prompt);
-        }
+    // Having_fun idle thoughts always use casual-only context; we never inject agent/work soul (e.g. Redmine).
+    // Channel agent override is ignored so having_fun stays casual (log-review 2026-03-07).
+    if chan.agent.is_some() {
+        debug!(
+            "Discord: having_fun idle thought channel {} has agent override; using casual-only prompt (agent soul not used)",
+            channel_id
+        );
+    }
+    let mut system = String::new();
+    system.push_str(HAVING_FUN_CASUAL_CONTEXT);
+    if let Some(ref prompt) = chan.prompt {
         system.push_str("\n\n");
-        system.push_str(&time_awareness_for_having_fun());
-        system.push_str("\n\n");
-        system.push_str(&crate::metrics::format_metrics_for_ai_context());
-        (system, chan.model.clone())
-    };
+        system.push_str(prompt);
+    }
+    system.push_str("\n\n");
+    system.push_str(&time_awareness_for_having_fun());
+    system.push_str("\n\n");
+    system.push_str(&crate::metrics::format_metrics_for_ai_context());
+    let (system_content, model_override) = (system, chan.model.clone());
 
     let mut prior = crate::session_memory::get_messages("discord", channel_id);
     if prior.is_empty() {
@@ -1259,7 +1244,13 @@ async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
     });
 
     const HISTORY_CAP: usize = 10;
-    for (role, content) in prior.into_iter().rev().take(HISTORY_CAP).rev() {
+    for (role, content) in prior
+        .into_iter()
+        .rev()
+        .take(HISTORY_CAP)
+        .rev()
+        .filter(|(_, content)| !is_agent_failure_notice(content))
+    {
         ollama_msgs.push(crate::ollama::ChatMessage {
             role,
             content,
@@ -1276,9 +1267,31 @@ async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
     let channel = serenity::model::id::ChannelId::new(channel_id);
     let _ = channel.broadcast_typing(&ctx).await;
 
-    match crate::commands::ollama::send_ollama_chat_messages(ollama_msgs, model_override, None)
-        .await
-    {
+    const IDLE_RETRY_DELAY_SECS: u64 = 2;
+    let mut result = crate::commands::ollama::send_ollama_chat_messages(
+        ollama_msgs.clone(),
+        model_override.clone(),
+        None,
+    )
+    .await;
+    // One extra retry for idle thought on timeout (non-critical; reduces visible failures).
+    if let Err(ref e) = result {
+        let err_lower = e.to_string().to_lowercase();
+        if err_lower.contains("timed out") || err_lower.contains("timeout") {
+            info!(
+                "Having fun: idle thought timeout for channel {}, retrying once in {}s",
+                channel_id, IDLE_RETRY_DELAY_SECS
+            );
+            tokio::time::sleep(tokio::time::Duration::from_secs(IDLE_RETRY_DELAY_SECS)).await;
+            result = crate::commands::ollama::send_ollama_chat_messages(
+                ollama_msgs,
+                model_override,
+                None,
+            )
+            .await;
+        }
+    }
+    match result {
         Ok(response) => {
             let reply = strip_leading_label(response.message.content.trim());
             if reply.is_empty() {
@@ -1296,7 +1309,7 @@ async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
             crate::session_memory::add_message("discord", channel_id, "assistant", &reply);
         }
         Err(e) => {
-            debug!(
+            error!(
                 "Having fun: idle thought failed for channel {}: {}",
                 channel_id, e
             );
@@ -1719,12 +1732,20 @@ impl EventHandler for Handler {
                     chan_id,
                     crate::logging::ellipse(&content, 100)
                 );
-                crate::session_memory::add_message(
-                    "discord",
-                    chan_id,
-                    "user",
-                    &format!("{}: {}", author_name, content),
-                );
+                // Do not store bot failure/error notices in session so they never appear in idle-thought context.
+                if !(is_bot && is_agent_failure_notice(&content)) {
+                    crate::session_memory::add_message(
+                        "discord",
+                        chan_id,
+                        "user",
+                        &format!("{}: {}", author_name, content),
+                    );
+                } else {
+                    info!(
+                        "Discord: having_fun channel {} — not storing failure notice in session (idle-thought context kept casual)",
+                        chan_id
+                    );
+                }
                 let answer_asap = mentions_bot || !is_bot;
                 buffer_having_fun_message(chan_id, author_name, content, is_bot, answer_asap);
                 return;
@@ -1984,16 +2005,25 @@ impl EventHandler for Handler {
                         "Discord: Failed to generate reply (channel {}): {}",
                         channel_id_u64, e
                     );
-                    let err_lower = e.to_string().to_lowercase();
-                    let hint = if err_lower.contains("timed out") || err_lower.contains("timeout") {
-                        "Request timed out — Ollama may be busy; try again in a moment."
+                    // In having_fun channels, do not post technical errors or CLI hints; use a short user-friendly message only.
+                    let (reply_text, attachments) = if mode == ChannelMode::HavingFun {
+                        (
+                            "Something went wrong on my side — try again in a bit.".to_string(),
+                            Vec::new(),
+                        )
                     } else {
-                        "Is Ollama configured?"
+                        let err_lower = e.to_string().to_lowercase();
+                        let hint = if err_lower.contains("timed out") || err_lower.contains("timeout") {
+                            "Request timed out — Ollama may be busy; try again in a moment."
+                        } else {
+                            "Is Ollama configured?"
+                        };
+                        (
+                            format!("Sorry, I couldn't generate a reply: {}. ({})", e, hint),
+                            Vec::new(),
+                        )
                     };
-                    (
-                        format!("Sorry, I couldn't generate a reply: {}. ({})", e, hint),
-                        Vec::new(),
-                    )
+                    (reply_text, attachments)
                 }
             };
 
@@ -2029,13 +2059,41 @@ impl EventHandler for Handler {
                     chunk
                 );
             }
-            if let Err(e) = new_message.channel_id.say(&ctx, chunk).await {
-                error!(
-                    "Discord: Failed to send reply (part {}/{}): {}",
-                    i + 1,
-                    chunks.len(),
-                    e
-                );
+            let mut say_result = new_message.channel_id.say(&ctx, chunk).await;
+            if say_result.is_err() {
+                if let Err(ref e) = say_result {
+                    let err_str = e.to_string();
+                    error!(
+                        "Discord: Failed to send reply (part {}/{}): {}",
+                        i + 1,
+                        chunks.len(),
+                        err_str
+                    );
+                    let lower = err_str.to_lowercase();
+                    if lower.contains("permission") || lower.contains("missing permissions") {
+                        info!(
+                            "Discord: missing permissions for channel {} — ensure bot has Send Messages and View Channel in this channel (and in server invite: bot scope with these permissions)",
+                            channel_id_u64
+                        );
+                    }
+                }
+                // One retry on transient/rate errors
+                tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+                say_result = new_message.channel_id.say(&ctx, chunk).await;
+            }
+            if let Err(e) = say_result {
+                let err_str = e.to_string();
+                let is_permission = err_str.to_lowercase().contains("permission");
+                let fallback = if is_permission {
+                    "Reply could not be sent to this channel (missing permissions). Check bot permissions for this channel."
+                } else {
+                    "Reply could not be sent to this channel. Check bot permissions or try again later."
+                };
+                if let Err(e2) = new_message.channel_id.say(&ctx, fallback).await {
+                    error!("Discord: could not send fallback message either: {}", e2);
+                } else {
+                    info!("Discord: sent fallback message to channel {} (reply send failed: {})", channel_id_u64, err_str);
+                }
                 break;
             }
             if chunks.len() > 1 && i < chunks.len() - 1 {
@@ -2088,11 +2146,26 @@ impl EventHandler for Handler {
                 let builder = CreateMessage::new()
                     .content("Screenshot(s) as requested:")
                     .add_files(attachments);
-                if let Err(e) = new_message.channel_id.send_message(&ctx, builder).await {
+                let send_result = new_message.channel_id.send_message(&ctx, builder).await;
+                if let Err(ref e) = send_result {
+                    let err_str = e.to_string();
                     error!(
                         "Discord: Failed to send attachment(s) to channel {}: {}",
-                        channel_id_u64, e
+                        channel_id_u64, err_str
                     );
+                    let lower = err_str.to_lowercase();
+                    if lower.contains("permission") || lower.contains("missing permissions") {
+                        info!(
+                            "Discord: missing permissions for channel {} (attachments) — ensure bot has Send Messages and Attach Files in this channel",
+                            channel_id_u64
+                        );
+                    }
+                }
+                if let Err(_e) = send_result {
+                    let fallback = "Could not send attachment(s) to this channel (check bot permissions: Send Messages, Attach Files).";
+                    if let Err(e2) = new_message.channel_id.say(&ctx, fallback).await {
+                        error!("Discord: could not send fallback message for attachment failure: {}", e2);
+                    }
                 } else {
                     info!(
                         "Discord: sent {} attachment(s) to channel {}",

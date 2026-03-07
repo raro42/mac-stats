@@ -84,7 +84,7 @@ User (e.g. Discord)
 
 ## References
 
-- **Tool loop**: `commands/ollama.rs` → `answer_with_ollama_and_fetch`, `parse_tool_from_response`, and the `while tool_count < max_tool_iterations` loop.
+- **Tool loop**: `commands/ollama.rs` → `answer_with_ollama_and_fetch`, `parse_tool_from_response`, `parse_all_tools_from_response`, and the `while tool_count < max_tool_iterations` loop. Plans like `RUN_CMD: date then REDMINE_API GET /time_entries.json?...` are normalized and split into separate steps so each tool runs in sequence (not one RUN_CMD with the whole chain).
 - **Sub-agent run (no tools)**: `run_agent_ollama_session` in `commands/ollama.rs` (single request, no tool list).
 - **Router API snippet for orchestrator**: `docs/agent_000_router_commands_snippet.md`, `docs/017_llm_agents.md`.
 

@@ -44,7 +44,8 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 ### Current State
 ### Session Compaction (on request)
 - **Trigger**: When handling a request (Discord, scheduler, etc.), if the conversation history has **≥ 8 messages**, we compact before calling the model.
-- **What happens**: `compact_conversation_history()` sends the last 20 messages to a “small” model; it returns:
+- **Discord having_fun**: For channels configured as having_fun, compaction does **not** call the LLM; it stores a fixed minimal CONTEXT so we never invent themes from casual chat. Log: `Session compaction: Discord having_fun channel <id> — using fixed minimal context (no LLM)`.
+- **What happens** (non–having_fun): `compact_conversation_history()` sends the last 20 messages to a “small” model; it returns:
   - **CONTEXT**: short summary (max ~300 words) of verified facts and outcomes.
   - **LESSONS**: bullet points of lessons learned (tools that worked, corrections, mistakes to avoid).
 - **Where it goes**:

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.36] - 2026-03-07
+
+### Added
+- **Discord having_fun: casual-only prompt** — Having_fun channels always use the casual-only system prompt; channel `agent` override in `discord_channels.json` is ignored for having_fun so the persona stays consistent (no work/Redmine soul). Optional channel `prompt` and time-of-day guidance still apply.
+- **Session compaction for having_fun** — For Discord having_fun channels, compaction skips the LLM and returns a fixed minimal context so we never invent task or platform themes (e.g. "language learning") from casual chat. Exposes `is_discord_channel_having_fun(channel_id)` for the compactor.
+- **Planning: current date and multi-tool sequence** — Planning prompt now includes current date (UTC). Plans like `RUN_CMD: date then REDMINE_API GET /time_entries.json?...` are normalized and executed as separate steps in sequence (not one RUN_CMD with the whole chain).
+- **Discord: filter failure notices from history** — Agent/LLM failure notices (e.g. "Agent failed before reply", "Something went wrong on my side") are filtered out of having_fun channel history and idle-thought context so the model is never asked to "reply" to an error line.
+
+### Changed
+- **Discord docs** — Bot permissions (Send Messages, View Channel, Attach Files) and having_fun behavior (casual-only, error filtering, no agent override) documented in `docs/007_discord_agent.md`. Tool loop and multi-tool sequencing in `docs/021_router_and_agents.md`. Planning prompt and session compaction docs updated.
+
 ## [0.1.35] - 2026-03-07
 
 ### Changed

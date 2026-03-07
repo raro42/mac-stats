@@ -41,6 +41,7 @@ mac-stats can run a Discord bot that connects via the **Gateway** and responds t
    - **In-app (Keychain)**: Open the CPU window → Settings (gear) → under **Discord bot** paste your token and click **Save token**. Stored in macOS Keychain; gateway connects right away.
    - Or from devtools: `invoke('configure_discord', { token: 'YOUR_TOKEN' })`.
 5. **Clearing the token**: Use **Clear token** in Settings (removes from Keychain). Env and .config.env are not cleared by the app. To fully disconnect, restart mac-stats.
+6. **Bot permissions for sending replies**: In each channel where the bot should reply, it needs **Send Messages** and **View Channel**. When inviting the bot to a server, use the OAuth2 URL with scope `bot` and enable **Send Messages** and **View Channel** (and **Attach Files** if you use screenshot/attachment replies). If the bot lacks these permissions, you will see "Missing Permissions" in logs and the app will try to post a short fallback message ("Reply could not be sent to this channel (missing permissions)..."). See `~/.mac-stats/debug.log` for the exact permission hint (channel id and suggested scopes).
 
 ## 3. Tauri commands
 
@@ -55,6 +56,7 @@ mac-stats can run a Discord bot that connects via the **Gateway** and responds t
 - Ignores the bot’s own messages and messages that don’t mention it (in guilds).
 - Replies using the **“answer with Ollama + tools”** pipeline: planning step (RECOMMEND) then execution with FETCH_URL, BRAVE_SEARCH, RUN_CMD, MCP, **DISCORD_API**, etc. (see `docs/100_all_agents.md`).
 - When you message the bot, it records your **display name** and tells Ollama “You are talking to **&lt;name&gt;** (user id: …)” so replies can be personalized. Names are cached for reuse in the session.
+- **Having_fun channels:** Replies and idle thoughts always use a **casual-only** system prompt (no work/Redmine soul). If a channel is configured with an `agent` override in `discord_channels.json`, that override is **ignored** for having_fun so the persona stays consistent; the optional channel `prompt` and time-of-day guidance are still applied. On LLM timeout or failure (e.g. Ollama busy), the bot posts a short user-friendly message only (e.g. “Something went wrong on my side — try again in a bit.”). Technical errors and CLI hints are never sent to the channel; the real error is logged to `~/.mac-stats/debug.log`. Idle thoughts retry once on timeout before giving up. Agent failure notices (e.g. that message or "Agent failed before reply") are **not** stored in the channel's session memory and are **filtered out** when building the idle-thought or reply context, so the model is never asked to "reply" to an error line and the casual tone is preserved.
 
 ## 5. Faster model for Discord (optional)
 

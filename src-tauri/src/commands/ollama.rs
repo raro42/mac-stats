@@ -1811,14 +1811,30 @@ fn parse_agent_tool_from_response(content: &str) -> Option<(String, String)> {
 /// Minimum number of messages before session compaction triggers.
 const COMPACTION_THRESHOLD: usize = 8;
 
+/// Fixed CONTEXT for casual/having_fun sessions so the compactor never invents task or platform context.
+const COMPACTOR_CASUAL_CONTEXT: &str =
+    "Casual conversation; no task or verified outcome. Not needed for this request.";
+
 /// Compact a long conversation history into a concise summary using a fast model.
 /// Extracts verified facts, successful outcomes, and user intent; drops failures and hallucinations.
 /// Also extracts lessons learned (returned separately for memory.md).
+/// For Discord having_fun channels, skips the model and returns minimal CONTEXT so we never invent themes (e.g. "language learning platform").
 async fn compact_conversation_history(
     messages: &[crate::ollama::ChatMessage],
     current_question: &str,
+    discord_channel_id: Option<u64>,
 ) -> Result<(String, Option<String>), String> {
     use tracing::info;
+
+    if let Some(channel_id) = discord_channel_id {
+        if crate::discord::is_discord_channel_having_fun(channel_id) {
+            info!(
+                "Session compaction: Discord having_fun channel {} — using fixed minimal context (no LLM)",
+                channel_id
+            );
+            return Ok((COMPACTOR_CASUAL_CONTEXT.to_string(), None));
+        }
+    }
 
     let small_model = crate::ollama::models::get_global_catalog()
         .and_then(|c| c.resolve_role("small").map(|m| m.name.clone()));
@@ -1839,6 +1855,7 @@ async fn compact_conversation_history(
 
 ## CONTEXT
 A concise summary (max 300 words) of ONLY verified facts and successful outcomes **relevant to the user's current question**. Rules:
+- **Purely social/casual:** If the conversation has no tool results, no task IDs, no API confirmations (just chat, jokes, or off-topic banter), output ONLY: "Casual conversation; no task or verified outcome. Not needed for this request." and in LESSONS write "None." Do NOT infer themes (e.g. "language learning", "platform", "digital learning") from casual wording.
 - If the conversation spans **multiple unrelated topics**, summarize ONLY what is relevant to the **current question** (see below). If the current question is clearly a **new topic** (unrelated to most of the history), output exactly: "Previous context covered different topics; not needed for this request." and keep CONTEXT to that one sentence.
 - KEEP: IDs confirmed by API responses (guild IDs, channel IDs, user IDs), successful API calls and their actual results, user preferences and standing instructions, established context the user built up — but only if relevant to the current question.
 - DROP: Failed attempts (401 errors, wrong tool usage, timeouts), hallucinated or unverified claims (assistant saying something happened without API confirmation), apologies, suggestions that weren't followed, repeated back-and-forth about the same error.
@@ -1961,7 +1978,12 @@ pub async fn run_periodic_session_compaction() {
             }
         }
 
-        let compact_result = compact_conversation_history(&messages, &actual_question).await;
+        let discord_ch = if entry.source == "discord" {
+            Some(entry.session_id)
+        } else {
+            None
+        };
+        let compact_result = compact_conversation_history(&messages, &actual_question, discord_ch).await;
         let compact_result = match compact_result {
             Ok(ok) => Ok(ok),
             Err(e) => {
@@ -1972,7 +1994,7 @@ pub async fn run_periodic_session_compaction() {
                     e
                 );
                 tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-                compact_conversation_history(&messages, &actual_question).await
+                compact_conversation_history(&messages, &actual_question, discord_ch).await
             }
         };
         match compact_result {
@@ -3396,7 +3418,7 @@ pub fn answer_with_ollama_and_fetch(
                 raw_history.len(),
                 COMPACTION_THRESHOLD
             );
-            match compact_conversation_history(&raw_history, question).await {
+            match compact_conversation_history(&raw_history, question, discord_reply_channel_id).await {
                 Ok((context, lessons)) => {
                     if let Some(ref lesson_text) = lessons {
                         let memory_path = discord_reply_channel_id
@@ -3697,11 +3719,16 @@ pub fn answer_with_ollama_and_fetch(
                 planning_messages.push(msg.clone());
             }
             let model_hint = model_override.as_ref().map(|m| format!("\n\nFor this request the user selected Ollama model: {}. The app will use that model for the reply; recommend answering the question (or using an agent) with that in mind.", m)).unwrap_or_default();
+            let today_utc = chrono::Utc::now().format("%Y-%m-%d");
+            info!(
+                "Agent router [{}]: planning RECOMMEND with current date (UTC) {}",
+                request_id, today_utc
+            );
             planning_messages.push(crate::ollama::ChatMessage {
                 role: "user".to_string(),
                 content: format!(
-                    "Current user question: {}{}\n\nReply with RECOMMEND: your plan.",
-                    question_for_plan_and_exec, model_hint
+                    "Current date (UTC): {}.\n\nCurrent user question: {}{}\n\nReply with RECOMMEND: your plan.",
+                    today_utc, question_for_plan_and_exec, model_hint
                 ),
                 images: attachment_images_base64.clone(),
             });
@@ -3814,11 +3841,20 @@ pub fn answer_with_ollama_and_fetch(
         // directly instead of asking Ollama a second time to regurgitate the same tool line.
         let direct_tool = parse_tool_from_response(&recommendation);
         let (mut messages, mut response_content) = if let Some((ref tool, ref arg)) = direct_tool {
-            info!(
-                "Agent router: plan contains direct tool call {}:{} — skipping execution Ollama call",
-                tool,
-                crate::logging::ellipse(arg, 60)
-            );
+            let all_tools = parse_all_tools_from_response(&normalized_recommendation);
+            if all_tools.len() > 1 {
+                info!(
+                    "Agent router: plan contains {} direct tools, will run in sequence: {} — skipping execution Ollama call",
+                    all_tools.len(),
+                    all_tools.iter().map(|(t, _)| t.as_str()).collect::<Vec<_>>().join(", ")
+                );
+            } else {
+                info!(
+                    "Agent router: plan contains direct tool call {}:{} — skipping execution Ollama call",
+                    tool,
+                    crate::logging::ellipse(arg, 60)
+                );
+            }
             let memory_block = load_memory_block_for_request(discord_reply_channel_id);
             let execution_system_content = match &skill_content {
                 Some(skill) => format!(
@@ -3856,8 +3892,14 @@ pub fn answer_with_ollama_and_fetch(
                 content: question_for_plan_and_exec.clone(),
                 images: attachment_images_base64.clone(),
             });
-            // Preserve normalized multi-tool chains so the executor can run them step by step.
-            let synthetic = if normalized_recommendation.contains('\n') {
+            // Preserve multi-tool chains so the executor runs them step by step (not one RUN_CMD with the whole chain).
+            let synthetic = if all_tools.len() > 1 {
+                all_tools
+                    .iter()
+                    .map(|(t, a)| format!("{}: {}", t, a))
+                    .collect::<Vec<_>>()
+                    .join("\n")
+            } else if normalized_recommendation.contains('\n') {
                 normalized_recommendation.clone()
             } else {
                 format!("{}: {}", tool, arg)
@@ -6238,7 +6280,8 @@ pub fn answer_with_ollama_and_fetch(
                     let reason_about_news_sourcing = reason_lower.contains("source")
                         || reason_lower.contains("date")
                         || reason_lower.contains("publication")
-                        || reason_lower.contains("credible");
+                        || reason_lower.contains("credible")
+                        || reason_lower.contains("article");
                     let response_has_ticket_summary = response_content.len() > 150
                         && (response_content.contains("Subject")
                             || response_content.contains("Description")
@@ -6263,6 +6306,9 @@ pub fn answer_with_ollama_and_fetch(
                         )
                     } else if is_news_query(&request_for_verification) && reason_about_news_sourcing
                     {
+                        info!(
+                            "Agent router: verification NO for news (article-grade/sourcing); retrying with PERPLEXITY_SEARCH hint"
+                        );
                         format!(
                             "This is a news-summary request. Stay in search-and-summary mode only. Re-run PERPLEXITY_SEARCH with a refined query if needed, but do **not** browse generic homepages, do **not** open BBC/CNN/NYTimes landing pages, and do **not** use screenshots or attachments. Reply with 3 concise bullet points. Each bullet must include: headline/topic, source name, publication date, and one-sentence factual summary. Prefer article-like results; if only hub/landing pages are available, say that clearly.\n\n{}",
                             retry_base
@@ -6739,6 +6785,12 @@ fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String,
                 tool_name.len()
             };
             let mut arg = search[arg_start..].trim().to_string();
+            // RUN_CMD: never pass a trailing tool chain (e.g. "date then REDMINE_API GET ...") as the command.
+            if tool_name.eq_ignore_ascii_case("RUN_CMD") {
+                if let Some(pos) = arg.find(" then ").or_else(|| arg.find(" and ")) {
+                    arg = arg[..pos].trim().to_string();
+                }
+            }
             if arg.is_empty()
                 && prefix != "TASK_LIST:"
                 && prefix != "TASK_SHOW:"
@@ -6883,7 +6935,7 @@ fn normalize_inline_tool_sequences(content: &str) -> String {
     static INLINE_TOOL_CHAIN_RE: OnceLock<regex::Regex> = OnceLock::new();
     let re = INLINE_TOOL_CHAIN_RE.get_or_init(|| {
         regex::Regex::new(
-            r"(?i)(?:\b(?:then|and then|after that|afterward|afterwards|next|finally)\b|;|->)\s+(FETCH_URL|BRAVE_SEARCH|BROWSER_SCREENSHOT|BROWSER_NAVIGATE|BROWSER_CLICK|BROWSER_INPUT|BROWSER_SCROLL|BROWSER_EXTRACT|BROWSER_SEARCH_PAGE|PERPLEXITY_SEARCH|RUN_JS|SKILL|AGENT|RUN_CMD|SCHEDULE|SCHEDULER|REMOVE_SCHEDULE|LIST_SCHEDULES|TASK_LIST|TASK_SHOW|TASK_APPEND|TASK_STATUS|TASK_CREATE|TASK_ASSIGN|TASK_SLEEP|OLLAMA_API|MCP|PYTHON_SCRIPT|DISCORD_API|CURSOR_AGENT|REDMINE_API|MEMORY_APPEND|MASTODON_POST|DONE)(?::)?\s+",
+            r"(?i)(?:\b(?:then|and then|and|after that|afterward|afterwards|next|finally)\b|;|->)\s+(FETCH_URL|BRAVE_SEARCH|BROWSER_SCREENSHOT|BROWSER_NAVIGATE|BROWSER_CLICK|BROWSER_INPUT|BROWSER_SCROLL|BROWSER_EXTRACT|BROWSER_SEARCH_PAGE|PERPLEXITY_SEARCH|RUN_JS|SKILL|AGENT|RUN_CMD|SCHEDULE|SCHEDULER|REMOVE_SCHEDULE|LIST_SCHEDULES|TASK_LIST|TASK_SHOW|TASK_APPEND|TASK_STATUS|TASK_CREATE|TASK_ASSIGN|TASK_SLEEP|OLLAMA_API|MCP|PYTHON_SCRIPT|DISCORD_API|CURSOR_AGENT|REDMINE_API|MEMORY_APPEND|MASTODON_POST|DONE)(?::)?\s+",
         )
         .expect("inline tool chain regex must compile")
     });
@@ -8069,6 +8121,22 @@ mod tests {
             ),
             vec![
                 ("RUN_CMD".to_string(), "date".to_string()),
+                (
+                    "REDMINE_API".to_string(),
+                    "GET /time_entries.json?from=2026-03-06&to=2026-03-06&limit=100".to_string()
+                )
+            ]
+        );
+    }
+
+    #[test]
+    fn parse_all_tools_from_response_splits_inline_and_chain() {
+        assert_eq!(
+            parse_all_tools_from_response(
+                "RUN_CMD: date +%Y-%m-%d and REDMINE_API GET /time_entries.json?from=2026-03-06&to=2026-03-06&limit=100"
+            ),
+            vec![
+                ("RUN_CMD".to_string(), "date +%Y-%m-%d".to_string()),
                 (
                     "REDMINE_API".to_string(),
                     "GET /time_entries.json?from=2026-03-06&to=2026-03-06&limit=100".to_string()
