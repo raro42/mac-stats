@@ -118,6 +118,6 @@
 
 ## Open Tasks:
 - **RUN_CMD Allowlist:** Add note in 100_all_agents or 011 about expanded allowlist  
-- **Stale Branch:** Remove or update CLAUDE.md line about "feat/theming" branch  
+- ~~**Stale Branch:** Remove or update CLAUDE.md line about "feat/theming" branch~~ — Done (see Fixes Applied).  
 - **Discord Headless Logic:** Verify `prefer_headless` behavior in edge cases  
 - **Docs Sync:** Ensure 100_all_agents reflects RUN_CMD allowlist updates

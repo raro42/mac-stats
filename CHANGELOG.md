@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **006-feature-coder** — Feature-coder workflow and FEAT backlog notes (`006-feature-coder/FEATURE-CODER.md`).
 - **Discord platform formatting** — When replying in Discord, the system prompt includes "Platform formatting (Discord)": no markdown tables (use bullet lists), wrap links in `<>` to suppress embeds. Keeps messages readable and reduces embed clutter.
 - **Discord group channel guidance** — For guild channels (having_fun, all_messages, mention_only): when to speak, at most one substantive reply per message (no triple-tap), and do not expose the user's private context in the channel. Documented in `docs/007_discord_agent.md`.
 - **REACT: emoji in having_fun** — When the model replies with only `REACT: <emoji>` (e.g. `REACT: 👍`), the bot adds that emoji as a reaction to the last user message and does not send text. One reaction per message; group-chat guidance explains when to use it.
@@ -16,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Daily log rotation** — Once per calendar day (UTC), `debug.log` is copied to `debug.log_sic` and truncated. Last rotation date stored in `~/.mac-stats/.debug_log_last_rotated`. Config paths: `Config::debug_log_sic_path()`, `Config::debug_log_last_rotated_path()`.
 
 ### Changed
+- **Docs 033** — Mark "Stale Branch" open task as done in `docs/033_docs_vs_code_review.md`.
 - **Ollama HTTP client reuse** — `send_ollama_chat_messages` now uses the stored `OllamaClient`'s HTTP client (with app timeout from `Config::ollama_chat_timeout_secs()`) instead of creating a new `reqwest::Client` per request. `OllamaConfig` supports optional `timeout_secs`; configure_ollama passes it when building the client. See `docs/006_roadmap_ai_tasks.md`.
 - **Session reset instruction** — Session startup text now says "greet the user briefly" instead of "respond to the user" for a shorter first reply.
 - **Having_fun group-chat guidance** — Having_fun (and idle thoughts) now include explicit guidance: know when to speak, one response per message, use REACT when a full reply isn't needed, participate without dominating.
