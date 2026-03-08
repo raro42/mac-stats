@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Session reset instruction** — Session startup text now says "greet the user briefly" instead of "respond to the user" for a shorter first reply.
 - **Having_fun group-chat guidance** — Having_fun (and idle thoughts) now include explicit guidance: know when to speak, one response per message, use REACT when a full reply isn't needed, participate without dominating.
 - **Docs 007, 022, 006** — 007: user-info auto-update and maxSchedules customization described; open tasks marked done. 022: closing review (§9) with integration checklist, F1–F10 notes, smoke test, D1/D4. FEATURE-CODER: user-info auto-update and SCHEDULE/REMOVE_SCHEDULE customization backlog rows marked done.
+- **Docs backlog trim** — Trimmed completed open tasks from 007; FEATURE-CODER backlog: "Trim stale Open tasks" done, 006 points to FEATURE-CODER; docs README notes trim and single backlog location.
 
 ## [0.1.38] - 2026-03-08
 

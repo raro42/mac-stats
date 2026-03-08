@@ -232,10 +232,8 @@ Example: `./target/release/mac_stats agent test redmine` runs the Redmine agentâ
 ## Open tasks:
 
 - Improve the documentation for `~/.mac-stats/schedules.json` and `~/.mac-stats/user-info.json`.
-- ~~Consider adding a feature to automatically update `~/.mac-stats/user-info.json` when a user's display name changes.~~ **Done:** on each Discord message the app updates the stored `display_name` for that user when it differs (or adds a minimal entry if the user was not in the file).
 - Look into using a more robust caching mechanism for `~/.mac-stats/user-info.json`.
 - Investigate the possibility of using a more efficient data structure for `~/.mac-stats/schedules.json`.
-- ~~Consider adding a feature to allow users to customize the behavior of the `SCHEDULE` and `REMOVE_SCHEDULE` commands.~~ **Done:** `maxSchedules` in `~/.mac-stats/config.json` caps the number of schedules; when at cap, new SCHEDULE adds are rejected with a clear message.
 - Improve the error handling for cases where the Discord API is unavailable.
 - Investigate the possibility of using a more secure method for storing the Discord bot token.
 - Consider adding a feature to allow users to view the logs for the Discord bot.

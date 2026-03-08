@@ -321,4 +321,4 @@ A: No. These are performance-only optimizations. All features unchanged.
 
 - Investigate the macOS Gatekeeper / quarantine friction for DMG installs and first launch.
 - Keep reviewing browser automation and screenshot routing so single-tool requests do not drift into unrelated tool chains.
-- Continue trimming stale `Open tasks` sections from historical docs so active backlog items live in one obvious place.
+- Trimmed (2025-03): removed completed items from `007_discord_agent.md`, added FEATURE-CODER pointer in `006_roadmap_ai_tasks.md`. Continue trimming other docs as needed so active backlog lives in **006-feature-coder/FEATURE-CODER.md**.
