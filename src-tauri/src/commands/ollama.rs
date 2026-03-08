@@ -2893,6 +2893,34 @@ fn verification_news_hub_only_block(news_search_was_hub_only: Option<bool>, ques
     }
 }
 
+/// Builds the suffix appended to PERPLEXITY_SEARCH tool result when is_news_query and results are non-empty.
+/// When search_had_article_like is false, includes the "Article-grade results were not found" warning.
+pub(crate) fn build_perplexity_news_tool_suffix(
+    search_had_article_like: bool,
+    refined_query_used: Option<&str>,
+    filtered_any: bool,
+) -> String {
+    const HUB_ONLY_LINE: &str = "\n\n**Article-grade results were not found;** only hub/landing/tag/standings pages are listed below. Do not present these as a complete news answer; state that concrete article links were not found or run another search.";
+    const NEWS_GUIDANCE: &str = "\n\nFor news requests, prefer concrete article/report results over homepages, hub pages, standings pages, rumor indexes, or official landing pages. If a result looks like a hub, use it only as fallback and say so clearly.";
+    let mut s = String::new();
+    if !search_had_article_like {
+        s.push_str(HUB_ONLY_LINE);
+    }
+    s.push_str(NEWS_GUIDANCE);
+    if let Some(refined) = refined_query_used {
+        s.push_str(&format!(
+            "\nRefined search query used to find article-like results: {}.",
+            refined
+        ));
+    }
+    if filtered_any {
+        s.push_str(
+            "\nFiltered to higher-signal results and limited repeated domains where possible.",
+        );
+    }
+    s
+}
+
 /// Returns (satisfied, optional reason when not satisfied).
 /// When we have image attachment(s) and a local vision model, sends the first image and asks "Does this image satisfy the request?"; otherwise text-only verification.
 /// When page_content_from_browser is Some (e.g. from BROWSER_EXTRACT), it is included so the verifier can check requested text against JS-rendered content (SPAs).
@@ -4641,25 +4669,11 @@ pub fn answer_with_ollama_and_fetch(
                                     )
                                 };
                                 if is_news_query && !results.is_empty() {
-                                    if !search_had_article_like {
-                                        result_text.push_str(
-                                            "\n\n**Article-grade results were not found;** only hub/landing/tag/standings pages are listed below. Do not present these as a complete news answer; state that concrete article links were not found or run another search.",
-                                        );
-                                    }
-                                    result_text.push_str(
-                                        "\n\nFor news requests, prefer concrete article/report results over homepages, hub pages, standings pages, rumor indexes, or official landing pages. If a result looks like a hub, use it only as fallback and say so clearly.",
-                                    );
-                                    if let Some(ref refined_query) = refined_query_used {
-                                        result_text.push_str(&format!(
-                                            "\nRefined search query used to find article-like results: {}.",
-                                            refined_query
-                                        ));
-                                    }
-                                    if filtered_any {
-                                        result_text.push_str(
-                                            "\nFiltered to higher-signal results and limited repeated domains where possible.",
-                                        );
-                                    }
+                                    result_text.push_str(&build_perplexity_news_tool_suffix(
+                                        search_had_article_like,
+                                        refined_query_used.as_deref(),
+                                        filtered_any,
+                                    ));
                                 }
                                 if want_screenshots && !urls.is_empty() {
                                     info!(
@@ -8002,14 +8016,14 @@ pub async fn ollama_chat_continue_with_result(
 mod tests {
     use super::{
         browser_retry_grounding_prompt, build_agent_runtime_context,
-        build_perplexity_verbose_summary, explicit_no_playable_video_finding,
-        extract_browser_navigation_target, extract_last_prefixed_argument,
-        final_reply_from_tool_results, grounded_redmine_time_entries_failure_reply,
-        is_browser_navigation_target_token, is_browser_task_request,
-        is_grounded_redmine_time_entries_blocked_reply, is_likely_article_like_result,
-        original_request_for_retry, parse_agent_tool_from_response, parse_all_tools_from_response,
-        parse_tool_from_response, redmine_direct_fallback_hint, redmine_request_for_routing,
-        redmine_time_entries_range_for_date, sanitize_success_criteria,
+        build_perplexity_news_tool_suffix, build_perplexity_verbose_summary,
+        explicit_no_playable_video_finding, extract_browser_navigation_target,
+        extract_last_prefixed_argument, final_reply_from_tool_results,
+        grounded_redmine_time_entries_failure_reply, is_browser_navigation_target_token,
+        is_browser_task_request, is_grounded_redmine_time_entries_blocked_reply,
+        is_likely_article_like_result, original_request_for_retry, parse_agent_tool_from_response,
+        parse_all_tools_from_response, parse_tool_from_response, redmine_direct_fallback_hint,
+        redmine_request_for_routing, redmine_time_entries_range_for_date, sanitize_success_criteria,
         score_search_result_for_news, shape_perplexity_results_for_question,
         summarize_response_for_verification, truncate_text_on_line_boundaries,
         verification_news_hub_only_block,
@@ -8580,6 +8594,29 @@ mod tests {
         assert_eq!(
             verification_news_hub_only_block(None, "latest headlines"),
             ""
+        );
+    }
+
+    /// Hub-only path: when search had no article-like results, tool suffix must include the warning.
+    #[test]
+    fn build_perplexity_news_tool_suffix_includes_hub_only_warning_when_no_article_like() {
+        let suffix =
+            build_perplexity_news_tool_suffix(false, None, false);
+        assert!(
+            suffix.contains("Article-grade results were not found"),
+            "hub-only suffix must contain Article-grade warning, got: {:?}",
+            suffix
+        );
+        assert!(suffix.contains("hub/landing/tag/standings"));
+    }
+
+    #[test]
+    fn build_perplexity_news_tool_suffix_no_hub_only_warning_when_article_like() {
+        let suffix =
+            build_perplexity_news_tool_suffix(true, None, false);
+        assert!(
+            !suffix.contains("Article-grade results were not found"),
+            "when search had article-like results, suffix must not contain hub-only warning"
         );
     }
 }
