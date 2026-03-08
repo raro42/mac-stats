@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **maxSchedules config** — Optional cap on number of schedule entries via `maxSchedules` in `~/.mac-stats/config.json` (1–1000; omit or 0 = no limit). When at cap, new SCHEDULE adds are rejected with a message to remove some or increase the limit. See `Config::max_schedules()`, `docs/007_discord_agent.md` (§ Customizing SCHEDULE behavior).
 - **user-info.json display_name auto-sync** — When a user messages in Discord, the app updates (or adds) their `display_name` in `~/.mac-stats/user-info.json` so the file stays in sync with Discord; new users get a minimal entry. See `docs/007_discord_agent.md` and `user_info::maybe_update_display_name_from_discord`.
 - **006-feature-coder** — Feature-coder workflow and FEAT backlog notes (`006-feature-coder/FEATURE-CODER.md`).
 - **Discord platform formatting** — When replying in Discord, the system prompt includes "Platform formatting (Discord)": no markdown tables (use bullet lists), wrap links in `<>` to suppress embeds. Keeps messages readable and reduces embed clutter.
@@ -23,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Ollama HTTP client reuse** — `send_ollama_chat_messages` now uses the stored `OllamaClient`'s HTTP client (with app timeout from `Config::ollama_chat_timeout_secs()`) instead of creating a new `reqwest::Client` per request. `OllamaConfig` supports optional `timeout_secs`; configure_ollama passes it when building the client. See `docs/006_roadmap_ai_tasks.md`.
 - **Session reset instruction** — Session startup text now says "greet the user briefly" instead of "respond to the user" for a shorter first reply.
 - **Having_fun group-chat guidance** — Having_fun (and idle thoughts) now include explicit guidance: know when to speak, one response per message, use REACT when a full reply isn't needed, participate without dominating.
-- **Docs 007, 022, 006** — 007: user-info auto-update described; open task marked done. 022: closing review (§9) with integration checklist, F1–F10 notes, smoke test, D1/D4. FEATURE-CODER: user-info auto-update backlog row marked done.
+- **Docs 007, 022, 006** — 007: user-info auto-update and maxSchedules customization described; open tasks marked done. 022: closing review (§9) with integration checklist, F1–F10 notes, smoke test, D1/D4. FEATURE-CODER: user-info auto-update and SCHEDULE/REMOVE_SCHEDULE customization backlog rows marked done.
 
 ## [0.1.38] - 2026-03-08
 

@@ -19,7 +19,7 @@
 //! leak secrets.
 //!
 //! **JSON config reload (no restart needed):**
-//! - `config.json` — read on every access (window decorations, scheduler interval, ollamaChatTimeoutSecs, browserViewportWidth/Height, perplexityMaxResults, perplexitySnippetMaxChars).
+//! - `config.json` — read on every access (window decorations, scheduler interval, maxSchedules, ollamaChatTimeoutSecs, browserViewportWidth/Height, perplexityMaxResults, perplexitySnippetMaxChars).
 //! - `schedules.json` — scheduler checks file mtime each loop and reloads when changed.
 //! - `discord_channels.json` — Discord loop checks mtime every tick and reloads when changed.
 
@@ -233,6 +233,23 @@ impl Config {
             std::fs::create_dir_all(parent)?;
         }
         Ok(())
+    }
+
+    /// Maximum number of schedule entries allowed. When set, SCHEDULE adds are rejected when at cap.
+    /// Config: config.json `maxSchedules` (optional number). If missing or 0, no limit. Clamped to 1..=1000.
+    pub fn max_schedules() -> Option<u32> {
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(n) = json.get("maxSchedules").and_then(|v| v.as_u64()) {
+                    let capped = n.clamp(1, 1000);
+                    if capped > 0 {
+                        return Some(capped as u32);
+                    }
+                }
+            }
+        }
+        None
     }
 
     /// Scheduler check interval in seconds: how often to reload schedules from disk.

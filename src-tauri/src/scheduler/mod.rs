@@ -533,6 +533,15 @@ pub fn add_schedule(
         }
     };
 
+    if let Some(cap) = Config::max_schedules() {
+        if file_data.schedules.len() >= cap as usize {
+            return Err(format!(
+                "Maximum number of schedules ({}) reached. Remove some with REMOVE_SCHEDULE or increase maxSchedules in ~/.mac-stats/config.json.",
+                cap
+            ));
+        }
+    }
+
     let task_norm = task_normalized_for_dedup(&task);
     let is_duplicate = file_data.schedules.iter().any(|e| {
         e.cron.as_deref() == Some(cron_str.as_str())
@@ -586,6 +595,15 @@ pub fn add_schedule_at(
             schedules: Vec::new(),
         }
     };
+
+    if let Some(cap) = Config::max_schedules() {
+        if file_data.schedules.len() >= cap as usize {
+            return Err(format!(
+                "Maximum number of schedules ({}) reached. Remove some with REMOVE_SCHEDULE or increase maxSchedules in ~/.mac-stats/config.json.",
+                cap
+            ));
+        }
+    }
 
     file_data.schedules.push(ScheduleEntryRaw {
         id: Some(id.clone()),

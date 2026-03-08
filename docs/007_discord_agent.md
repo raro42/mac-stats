@@ -114,6 +114,10 @@ To remove a schedule, the user can say e.g. **"Remove schedule: discord-17706488
 
 - **Remove:** `REMOVE_SCHEDULE: <schedule-id>` — e.g. `REMOVE_SCHEDULE: discord-1770648842`. The agent invokes this when the user asks to remove, delete, or cancel a schedule and provides the ID (or the user said e.g. "Remove schedule: discord-1770648842").
 
+### Customizing SCHEDULE behavior
+
+You can cap how many schedules are allowed by setting **maxSchedules** in `~/.mac-stats/config.json` (e.g. `"maxSchedules": 20`). When the number of entries in `~/.mac-stats/schedules.json` reaches this limit, new SCHEDULE requests are rejected with a message asking the user to remove some or increase the limit. If maxSchedules is omitted or 0, there is no limit. Value is clamped to 1–1000.
+
 ## 9. Understanding servers, users, channels, guilds
 
 - **Servers (guilds)**  
@@ -231,7 +235,7 @@ Example: `./target/release/mac_stats agent test redmine` runs the Redmine agent�
 - ~~Consider adding a feature to automatically update `~/.mac-stats/user-info.json` when a user's display name changes.~~ **Done:** on each Discord message the app updates the stored `display_name` for that user when it differs (or adds a minimal entry if the user was not in the file).
 - Look into using a more robust caching mechanism for `~/.mac-stats/user-info.json`.
 - Investigate the possibility of using a more efficient data structure for `~/.mac-stats/schedules.json`.
-- Consider adding a feature to allow users to customize the behavior of the `SCHEDULE` and `REMOVE_SCHEDULE` commands.
+- ~~Consider adding a feature to allow users to customize the behavior of the `SCHEDULE` and `REMOVE_SCHEDULE` commands.~~ **Done:** `maxSchedules` in `~/.mac-stats/config.json` caps the number of schedules; when at cap, new SCHEDULE adds are rejected with a clear message.
 - Improve the error handling for cases where the Discord API is unavailable.
 - Investigate the possibility of using a more secure method for storing the Discord bot token.
 - Consider adding a feature to allow users to view the logs for the Discord bot.
