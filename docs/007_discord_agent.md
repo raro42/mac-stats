@@ -236,7 +236,7 @@ Example: `./target/release/mac_stats agent test redmine` runs the Redmine agentâ
 - Investigate the possibility of using a more efficient data structure for `~/.mac-stats/schedules.json`.
 - Improve the error handling for cases where the Discord API is unavailable.
 - Investigate the possibility of using a more secure method for storing the Discord bot token.
-- Consider adding a feature to allow users to view the logs for the Discord bot.
+- ~~Consider adding a feature to allow users to view the logs for the Discord bot.~~ **Done:** Settings â†’ Discord bot section has a **View logs** button that opens `~/.mac-stats/debug.log` in the default app (macOS). Commands: `get_debug_log_path`, `open_debug_log`.
 - Improve the documentation for the `test_discord_connect` binary.
 - Investigate the possibility of using a more efficient method for testing the Discord connection.
 - Consider adding a feature to allow users to customize the behavior of the `test_discord_connect` binary.

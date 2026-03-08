@@ -219,6 +219,8 @@ fn run_internal(open_cpu_window: bool) {
             // Logging commands
             commands::logging::log_from_js,
             commands::logging::set_chat_verbosity,
+            commands::logging::get_debug_log_path,
+            commands::logging::open_debug_log,
             // Window commands (e.g. from chat reserved words)
             commands::window::toggle_cpu_window,
             // Agent commands

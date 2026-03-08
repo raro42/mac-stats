@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **View logs in Settings** — Discord/Settings section has a **View logs** button that opens `~/.mac-stats/debug.log` in the default app (macOS). Tauri commands: `get_debug_log_path`, `open_debug_log`. See `docs/007_discord_agent.md` and FEATURE-CODER backlog.
 - **maxSchedules config** — Optional cap on number of schedule entries via `maxSchedules` in `~/.mac-stats/config.json` (1–1000; omit or 0 = no limit). When at cap, new SCHEDULE adds are rejected with a message to remove some or increase the limit. See `Config::max_schedules()`, `docs/007_discord_agent.md` (§ Customizing SCHEDULE behavior).
 - **user-info.json display_name auto-sync** — When a user messages in Discord, the app updates (or adds) their `display_name` in `~/.mac-stats/user-info.json` so the file stays in sync with Discord; new users get a minimal entry. See `docs/007_discord_agent.md` and `user_info::maybe_update_display_name_from_discord`.
 - **006-feature-coder** — Feature-coder workflow and FEAT backlog notes (`006-feature-coder/FEATURE-CODER.md`).
