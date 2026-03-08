@@ -36,5 +36,6 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 | docs/009_scheduler_agent.md | ~~Clarify cron/at = local time or UTC~~ | **Done:** documented in data_files_reference.md |
 | docs/006_roadmap_ai_tasks.md | ~~Review and refine AI tasks roadmap~~ | **Done:** tools list, Phase 1 done, open tasks trimmed |
 | docs/README.md | ~~Trim stale Open tasks in historical docs~~ | **Done:** 007 trimmed, 006 points to this backlog |
+| docs/007_discord_agent.md | ~~Improve docs for test_discord_connect binary~~ | **Done:** §12 expanded (token resolution, env file format, behavior, failure) |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.

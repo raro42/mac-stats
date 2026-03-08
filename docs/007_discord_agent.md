@@ -173,18 +173,48 @@ You can put **optional leading lines** in your message to override model, parame
 
 ## 12. Testing the Discord connection
 
-To verify the token without running the full app, use the test binary (reads from `.config.env` or `DISCORD_BOT_TOKEN`):
+The **test_discord_connect** binary checks that your Discord bot token works without starting the full app (no menu bar, no Keychain). It connects to the Gateway, prints connection status, then exits after about 15 seconds.
+
+### How to run
+
+From the repo (so the default env path resolves):
 
 ```bash
 cd src-tauri && cargo run --bin test_discord_connect
 ```
 
-With a valid token you should see in the output:
+With a custom env file path:
+
+```bash
+cargo run --bin test_discord_connect -- path/to/.config.env
+```
+
+### Token resolution
+
+The binary resolves the token in this order:
+
+1. **Environment:** `DISCORD_BOT_TOKEN` (if set).
+2. **Env file:** First line in the given file that starts with `DISCORD-USER1-TOKEN=` or `DISCORD-USER2-TOKEN=`; the value after `=` is used. Default file path is `.config.env` in the current working directory.
+
+Keychain is **not** used; this binary is for quick token checks (e.g. from a `.config.env` or CI). The main app uses Keychain when no env token is set.
+
+### Success output
+
+With a valid token you should see on stderr:
+
 - `Discord: Connecting to Discord Gateway (discord.com)…`
 - `Discord: Gateway client built, starting connection…`
 - `Discord: Bot connected as <YourBotName> (id: …)`
 
-You can pass a custom env file path: `cargo run --bin test_discord_connect -- path/to/.config.env`.
+The process then runs for ~15 seconds and exits (the binary deliberately aborts the connection after 15s).
+
+### No token / failure
+
+If no token is found, the binary prints to stderr:
+
+`No token: set DISCORD_BOT_TOKEN or put DISCORD-USER1-TOKEN=... in <path>`
+
+and exits with code 1. Ensure the env file exists and contains a line like `DISCORD-USER1-TOKEN=your_bot_token` (or use `DISCORD_BOT_TOKEN` in the environment).
 
 ## 13. Debugging “Save token”
 
@@ -237,6 +267,6 @@ Example: `./target/release/mac_stats agent test redmine` runs the Redmine agent�
 - Improve the error handling for cases where the Discord API is unavailable.
 - Investigate the possibility of using a more secure method for storing the Discord bot token.
 - ~~Consider adding a feature to allow users to view the logs for the Discord bot.~~ **Done:** Settings → Discord bot section has a **View logs** button that opens `~/.mac-stats/debug.log` in the default app (macOS). Commands: `get_debug_log_path`, `open_debug_log`.
-- Improve the documentation for the `test_discord_connect` binary.
+- ~~Improve the documentation for the `test_discord_connect` binary.~~ **Done:** §12 expanded with token resolution, env file format (DISCORD-USER1/USER2-TOKEN), behavior, and failure message.
 - Investigate the possibility of using a more efficient method for testing the Discord connection.
 - Consider adding a feature to allow users to customize the behavior of the `test_discord_connect` binary.

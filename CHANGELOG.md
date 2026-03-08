@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Daily log rotation** — Once per calendar day (UTC), `debug.log` is copied to `debug.log_sic` and truncated. Last rotation date stored in `~/.mac-stats/.debug_log_last_rotated`. Config paths: `Config::debug_log_sic_path()`, `Config::debug_log_last_rotated_path()`.
 
 ### Changed
+- **Docs 007 and FEATURE-CODER** — §12 test_discord_connect expanded (token resolution, env file format DISCORD-USER1/USER2-TOKEN, success/failure output); open task and FEATURE-CODER backlog row marked done.
 - **Docs 033** — Mark "Stale Branch" open task as done in `docs/033_docs_vs_code_review.md`.
 - **Docs 033 / 006-feature-coder** — RUN_CMD allowlist documented in 033 Fixes; open tasks cleaned (stale branch, docs sync done); FEATURE-CODER backlog table: removed completed "Stale Branch" row.
 - **Ollama HTTP client reuse** — `send_ollama_chat_messages` now uses the stored `OllamaClient`'s HTTP client (with app timeout from `Config::ollama_chat_timeout_secs()`) instead of creating a new `reqwest::Client` per request. `OllamaConfig` supports optional `timeout_secs`; configure_ollama passes it when building the client. See `docs/006_roadmap_ai_tasks.md`.
