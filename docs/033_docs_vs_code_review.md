@@ -103,6 +103,7 @@
 - 100_all_agents: Max tool iterations → 15  
 - Removed stale branch line from CLAUDE.md  
 - CPU idle line aligned with CLAUDE  
+- RUN_CMD allowlist: 100_all_agents and 011_local_cmd_agent already document full list (ps, wc, uptime, cursor-agent).  
 
 ---
 
@@ -117,7 +118,4 @@
 ---
 
 ## Open Tasks:
-- **RUN_CMD Allowlist:** Add note in 100_all_agents or 011 about expanded allowlist  
-- ~~**Stale Branch:** Remove or update CLAUDE.md line about "feat/theming" branch~~ — Done (see Fixes Applied).  
 - **Discord Headless Logic:** Verify `prefer_headless` behavior in edge cases  
-- **Docs Sync:** Ensure 100_all_agents reflects RUN_CMD allowlist updates

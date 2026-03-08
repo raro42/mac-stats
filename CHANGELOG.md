@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Docs 033** — Mark "Stale Branch" open task as done in `docs/033_docs_vs_code_review.md`.
+- **Docs 033 / 006-feature-coder** — RUN_CMD allowlist documented in 033 Fixes; open tasks cleaned (stale branch, docs sync done); FEATURE-CODER backlog table: removed completed "Stale Branch" row.
 - **Ollama HTTP client reuse** — `send_ollama_chat_messages` now uses the stored `OllamaClient`'s HTTP client (with app timeout from `Config::ollama_chat_timeout_secs()`) instead of creating a new `reqwest::Client` per request. `OllamaConfig` supports optional `timeout_secs`; configure_ollama passes it when building the client. See `docs/006_roadmap_ai_tasks.md`.
 - **Session reset instruction** — Session startup text now says "greet the user briefly" instead of "respond to the user" for a shorter first reply.
 - **Having_fun group-chat guidance** — Having_fun (and idle thoughts) now include explicit guidance: know when to speak, one response per message, use REACT when a full reply isn't needed, participate without dominating.
