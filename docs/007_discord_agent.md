@@ -129,7 +129,7 @@ To remove a schedule, the user can say e.g. **"Remove schedule: discord-17706488
   The bot records the display name of users who message it and passes it to Ollama. Ollama can also call `GET /users/{user_id}` for full user details (username, global_name, etc.).
 
 - **User details (user-info.json)**  
-  You can add per-user details in `~/.mac-stats/user-info.json` (many users, keyed by Discord user id). The file is read when handling a message; if the author’s id is present, the bot adds "User details: …" to the context (notes, timezone, extra fields). Example:
+  You can add per-user details in `~/.mac-stats/user-info.json` (many users, keyed by Discord user id). The file is read when handling a message; if the author’s id is present, the bot adds "User details: …" to the context (notes, timezone, extra fields). When a user messages the bot, their **display name** from Discord is written into the file if it differs from the stored value (or a minimal entry is added if the user was not yet in the file). Example:
 
   ```json
   {
@@ -228,7 +228,7 @@ Example: `./target/release/mac_stats agent test redmine` runs the Redmine agent�
 ## Open tasks:
 
 - Improve the documentation for `~/.mac-stats/schedules.json` and `~/.mac-stats/user-info.json`.
-- Consider adding a feature to automatically update `~/.mac-stats/user-info.json` when a user's display name changes.
+- ~~Consider adding a feature to automatically update `~/.mac-stats/user-info.json` when a user's display name changes.~~ **Done:** on each Discord message the app updates the stored `display_name` for that user when it differs (or adds a minimal entry if the user was not in the file).
 - Look into using a more robust caching mechanism for `~/.mac-stats/user-info.json`.
 - Investigate the possibility of using a more efficient data structure for `~/.mac-stats/schedules.json`.
 - Consider adding a feature to allow users to customize the behavior of the `SCHEDULE` and `REMOVE_SCHEDULE` commands.

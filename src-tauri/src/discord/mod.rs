@@ -1948,6 +1948,7 @@ impl EventHandler for Handler {
             .unwrap_or(&new_message.author.name)
             .to_string();
         set_discord_user_name(author_id_u64, display_name.clone());
+        crate::user_info::maybe_update_display_name_from_discord(author_id_u64, &display_name);
 
         // Channel for status updates. Only posted to Discord when verbose mode is on;
         // otherwise they are only logged internally to keep the channel clean for other bots.

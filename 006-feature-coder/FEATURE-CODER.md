@@ -29,7 +29,7 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 
 | Source | Task | Notes |
 |--------|------|--------|
-| docs/007_discord_agent.md | user-info.json auto-update on display name change | Consider when touching Discord |
+| docs/007_discord_agent.md | ~~user-info.json auto-update on display name change~~ | **Done** |
 | docs/007_discord_agent.md | Customize SCHEDULE/REMOVE_SCHEDULE behavior | Config/UX |
 | docs/006_roadmap_ai_tasks.md | Review and refine AI tasks roadmap | Doc only |
 | docs/README.md | Trim stale Open tasks in historical docs | Doc cleanup |

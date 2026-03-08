@@ -248,6 +248,36 @@ See `CHANGELOG.md` (0.1.14) and `docs/023_externalized_prompts_DONE.md` for deta
 
 ---
 
+## 9. Closing review (2026-03-08)
+
+**Integration**
+- [x] `cargo check` passes.
+- [x] `cargo clippy` passes (40 style/refactor warnings only; no errors).
+- [x] `src/ollama.js` and `src-tauri/dist/ollama.js` are in sync (diff empty).
+- [x] `toggle_cpu_window` and `set_chat_verbosity` are in `tauri::generate_handler![]` in `lib.rs`.
+- [x] `run_due_monitor_checks()` is called from `lib.rs` in a background thread every 30s.
+
+**Code review (F1–F10)**
+- **F1**: `get_messages()` is called in Discord before the current user message is added; ordering correct. `load_messages_from_latest_session_file()` uses prefix `session-memory-{id}-` — old format `session-memory-{topic}-{id}-{ts}` does not match (see D1).
+- **F2**: `rev().take(20).rev()` at `ollama.rs` 3502–3508 keeps last 20 messages in chronological order. History cap 20 is consistent (CONVERSATION_HISTORY_CAP and Discord HISTORY_CAP).
+- **F3/F4**: Soul path and router injection — not re-verified in this pass; doc says resolved.
+- **F5**: Dedup in `task/mod.rs` — slug and `## Topic:`/`## Id:` matching present; D2 (finished task) still open.
+- **F6**: Prompt guidance text present in agent descriptions.
+- **F7**: `ellipse()`: all call sites use `max_len` ≥ 20; edge case `max_len` < 3 could panic (first_count 0, last_count negative) — consider `max_len.max(SEP_LEN + 1)` for robustness.
+- **F8**: Reserved words `--cpu` and `-v`/`-vv`/`-vvv` in `ollama.js` return before `addToHistory()` — not added to conversation history.
+- **F9**: `toggle_cpu_window` in `commands/window.rs`; `run_on_main_thread` used; behaviour (close visible → recreate) as doc.
+- **F10**: Background monitor checks wired; `try_lock()` used (skip if busy).
+
+**Smoke test**
+- [x] `cargo build --release` succeeds.
+- [x] `./target/release/mac_stats --cpu -vv` starts; menu bar ready, Discord/Ollama init in logs. Manual checks (menu bar click, `--cpu`/`-vv` in chat) left to human.
+
+**Decisions (from §6)**
+- **D1**: Session file format — old files won’t load; add backward compat, accept break, or migrate (unchanged).
+- **D4**: `run_due_monitor_checks` — confirmed wired in `lib.rs` (no longer dead code).
+
+---
+
 ## Open tasks:
 
 - Verify whether `try_lock()` in `run_due_monitor_checks()` is the right behavior or whether it should use `lock()`.
