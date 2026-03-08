@@ -278,8 +278,14 @@ See `CHANGELOG.md` (0.1.14) and `docs/023_externalized_prompts_DONE.md` for deta
 
 ---
 
+## Testing (2026-03-08)
+
+- **Integration:** `cargo check` and `cargo clippy` pass (warnings only). `src/ollama.js` and `dist/ollama.js` in sync. `toggle_cpu_window`, `set_chat_verbosity` in handler; `run_due_monitor_checks()` called from `lib.rs` every 30s.
+- **Smoke:** `cargo build --release` and `./target/release/mac_stats --cpu -vv` — app starts, menu bar ready, Discord/Ollama/scheduler init in logs.
+- **Open items addressed:** `ellipse()` now guards with `max_len.max(sep_len + 1)` so very small `max_len` cannot produce negative last_count. `VERBOSITY`: `set_chat_verbosity` calls `set_verbosity()`, same atomic used by CLI and all logging — consistent. `try_lock()` in `run_due_monitor_checks`: intentional (skip if busy, retry next 30s); no change.
+
+---
+
 ## Open tasks:
 
-- Verify whether `try_lock()` in `run_due_monitor_checks()` is the right behavior or whether it should use `lock()`.
-- Verify that the `VERBOSITY` atomic used by CLI flags and `set_chat_verbosity` is consistent across all logging macros.
 - Review `docs/023_externalized_prompts_DONE.md` and merge any missing details back into this plan if needed.

@@ -46,6 +46,7 @@
 
 ### Configuration
 - **File path:** `$HOME/.mac-stats/schedules.json`
+- **Full reference:** See **docs/data_files_reference.md** for JSON structure, fields, time interpretation (cron and `at` = local time), and examples.
 - **Format:**
   ```json
   {
@@ -83,7 +84,7 @@
 - Add a scheduler UI for creating and editing schedules instead of relying on manual `schedules.json` edits.
 - Consider support for multiple API keys in scheduler-driven tool flows.
 - Improve error handling for scheduler tool invocations.
-- Clarify whether cron expressions should be interpreted in local time or UTC.
+- ~~Clarify whether cron expressions should be interpreted in local time or UTC.~~ **Done:** documented in **docs/data_files_reference.md** (cron and `at` = local time).
 - Review deduplication behavior for identical `cron` + `task` pairs.
 
 ---

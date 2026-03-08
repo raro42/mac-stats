@@ -133,7 +133,7 @@ You can cap how many schedules are allowed by setting **maxSchedules** in `~/.ma
   The bot records the display name of users who message it and passes it to Ollama. Ollama can also call `GET /users/{user_id}` for full user details (username, global_name, etc.).
 
 - **User details (user-info.json)**  
-  You can add per-user details in `~/.mac-stats/user-info.json` (many users, keyed by Discord user id). The file is read when handling a message; if the author’s id is present, the bot adds "User details: …" to the context (notes, timezone, extra fields). When a user messages the bot, their **display name** from Discord is written into the file if it differs from the stored value (or a minimal entry is added if the user was not yet in the file). Example:
+  You can add per-user details in `~/.mac-stats/user-info.json` (many users, keyed by Discord user id). The file is read when handling a message; if the author’s id is present, the bot adds "User details: …" to the context (notes, timezone, extra fields). When a user messages the bot, their **display name** from Discord is written into the file if it differs from the stored value (or a minimal entry is added if the user was not yet in the file). For full field reference and examples, see **docs/data_files_reference.md**. Example:
 
   ```json
   {
@@ -231,7 +231,7 @@ Example: `./target/release/mac_stats agent test redmine` runs the Redmine agent�
 
 ## Open tasks:
 
-- Improve the documentation for `~/.mac-stats/schedules.json` and `~/.mac-stats/user-info.json`.
+- ~~Improve the documentation for `~/.mac-stats/schedules.json` and `~/.mac-stats/user-info.json`.~~ **Done:** see **docs/data_files_reference.md**.
 - Look into using a more robust caching mechanism for `~/.mac-stats/user-info.json`.
 - Investigate the possibility of using a more efficient data structure for `~/.mac-stats/schedules.json`.
 - Improve the error handling for cases where the Discord API is unavailable.

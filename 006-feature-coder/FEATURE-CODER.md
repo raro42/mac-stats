@@ -31,6 +31,8 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 |--------|------|--------|
 | docs/007_discord_agent.md | ~~user-info.json auto-update on display name change~~ | **Done** |
 | docs/007_discord_agent.md | ~~Customize SCHEDULE/REMOVE_SCHEDULE behavior~~ | **Done:** maxSchedules in config.json |
+| docs/007_discord_agent.md | ~~Improve docs for schedules.json and user-info.json~~ | **Done:** docs/data_files_reference.md |
+| docs/009_scheduler_agent.md | ~~Clarify cron/at = local time or UTC~~ | **Done:** documented in data_files_reference.md |
 | docs/006_roadmap_ai_tasks.md | ~~Review and refine AI tasks roadmap~~ | **Done:** tools list, Phase 1 done, open tasks trimmed |
 | docs/README.md | ~~Trim stale Open tasks in historical docs~~ | **Done:** 007 trimmed, 006 points to this backlog |
 

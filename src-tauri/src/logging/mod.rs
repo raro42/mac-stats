@@ -47,9 +47,11 @@ pub use legacy::{
 /// Ellipse a string for display: first half + "..." + last half (no truncation of one end).
 /// If `s` has ≤ `max_len` chars, returns `s` unchanged. Otherwise returns
 /// `s[0..first_n] + "..." + s[last_n..]` where first_n + 3 + last_n ≤ max_len.
+/// Ensures `max_len >= sep_len + 1` so first_count/last_count are never negative.
 pub fn ellipse(s: &str, max_len: usize) -> String {
     const SEP: &str = "...";
     let sep_len = 3;
+    let max_len = max_len.max(sep_len + 1);
     let chars: Vec<char> = s.chars().collect();
     let n = chars.len();
     if n <= max_len {

@@ -27,6 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Docs 007, 022, 006** — 007: user-info auto-update and maxSchedules customization described; open tasks marked done. 022: closing review (§9) with integration checklist, F1–F10 notes, smoke test, D1/D4. FEATURE-CODER: user-info auto-update and SCHEDULE/REMOVE_SCHEDULE customization backlog rows marked done.
 - **Docs backlog trim** — Trimmed completed open tasks from 007; FEATURE-CODER backlog: "Trim stale Open tasks" done, 006 points to FEATURE-CODER; docs README notes trim and single backlog location.
 - **006 roadmap and FEATURE-CODER** — Open tasks in `docs/006_roadmap_ai_tasks.md` point to single FEAT backlog in `006-feature-coder/FEATURE-CODER.md`; backlog table and remaining items (Mail, WhatsApp, Google Docs) updated.
+- **Data files reference** — New `docs/data_files_reference.md` documents `schedules.json` and `user-info.json` (paths, JSON structure, fields, local-time interpretation for cron/at). 007 and 009 open tasks for docs and cron timezone marked done.
+
+### Fixed
+- **ellipse() edge case** — `logging::ellipse()` enforces `max_len >= sep_len + 1` so first_count/last_count never go negative for very small `max_len`.
 
 ## [0.1.38] - 2026-03-08
 
