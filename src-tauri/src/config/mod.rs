@@ -366,6 +366,30 @@ impl Config {
         3600
     }
 
+    /// Maximum navigation wait timeout in seconds for BROWSER_NAVIGATE and BROWSER_GO_BACK. Slow or stuck navigations fail with a clear message instead of hanging. Config: config.json `browserNavigationTimeoutSecs`. Env: `MAC_STATS_BROWSER_NAVIGATION_TIMEOUT_SECS`. Default 30, clamped to 5..=120.
+    pub fn browser_navigation_timeout_secs() -> u64 {
+        const DEFAULT: u64 = 30;
+        const MIN: u64 = 5;
+        const MAX: u64 = 120;
+        if let Ok(s) = std::env::var("MAC_STATS_BROWSER_NAVIGATION_TIMEOUT_SECS") {
+            if let Ok(n) = s.parse::<u64>() {
+                return n.clamp(MIN, MAX);
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(n) = json
+                    .get("browserNavigationTimeoutSecs")
+                    .and_then(|v| v.as_u64())
+                {
+                    return n.clamp(MIN, MAX);
+                }
+            }
+        }
+        DEFAULT
+    }
+
     /// Browser viewport width in pixels (CDP/headless window size). Config: config.json `browserViewportWidth`.
     /// Default 1800. Clamped to 800..=3840.
     pub fn browser_viewport_width() -> u32 {

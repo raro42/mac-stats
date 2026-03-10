@@ -525,6 +525,9 @@ fn fetch_page_and_extract_phones_with_browser(
 /// Cached browser session: (Browser, last_used, was_headless). Dropped when idle longer than browser_idle_timeout_secs.
 static BROWSER_SESSION: OnceLock<Mutex<Option<(Browser, Instant, bool)>>> = OnceLock::new();
 
+/// Index of the current tab for BROWSER_* actions (0 = first tab). Updated when BROWSER_NAVIGATE is used with new_tab.
+static CURRENT_TAB_INDEX: OnceLock<Mutex<usize>> = OnceLock::new();
+
 /// Mutex held for the entire "create new browser" path so only one thread can launch at a time (avoids multiple Chrome PIDs from races).
 static LAUNCH_MUTEX: OnceLock<Mutex<()>> = OnceLock::new();
 
@@ -819,15 +822,19 @@ fn normalize_url_for_screenshot(url: &str) -> String {
 
 const PORT: u16 = 9222;
 
-/// Get the current tab from BROWSER_SESSION. Fails if no browser or no tab.
+fn current_tab_index() -> &'static Mutex<usize> {
+    CURRENT_TAB_INDEX.get_or_init(|| Mutex::new(0))
+}
+
+/// Get the current tab from BROWSER_SESSION. Uses CURRENT_TAB_INDEX when set (e.g. after new-tab navigate).
 /// Ensures tab window bounds are at least VIEWPORT_WIDTH x VIEWPORT_HEIGHT (e.g. when connecting to existing Chrome).
 fn get_current_tab() -> Result<(Browser, Arc<headless_chrome::Tab>), String> {
     let browser = get_or_create_browser(PORT)?;
     let tabs = browser.get_tabs().lock().map_err(|e| e.to_string())?;
-    let tab = tabs
-        .first()
-        .cloned()
-        .ok_or_else(|| "No tab in browser".to_string())?;
+    let idx = *current_tab_index().lock().map_err(|e| e.to_string())?;
+    let len = tabs.len();
+    let idx = if len == 0 { 0 } else { idx.min(len.saturating_sub(1)) };
+    let tab = tabs.get(idx).cloned().ok_or_else(|| "No tab in browser".to_string())?;
     drop(tabs);
     let bounds = Bounds::Normal {
         left: None,
@@ -848,26 +855,70 @@ fn get_current_tab() -> Result<(Browser, Arc<headless_chrome::Tab>), String> {
 
 /// Navigate to URL and return formatted browser state for the LLM. Used by BROWSER_NAVIGATE.
 pub fn navigate_and_get_state(url: &str) -> Result<String, String> {
-    with_connection_retry(|| navigate_and_get_state_inner(url))
+    navigate_and_get_state_with_options(url, false)
 }
 
-fn navigate_and_get_state_inner(url: &str) -> Result<String, String> {
+/// Navigate to URL, optionally in a new tab. When `new_tab` is true, opens URL in a new tab and switches focus to it.
+pub fn navigate_and_get_state_with_options(url: &str, new_tab: bool) -> Result<String, String> {
+    with_connection_retry(|| navigate_and_get_state_inner(url, new_tab))
+}
+
+fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<String, String> {
     let url_normalized = normalize_url_for_screenshot(url);
-    info!("Browser agent [CDP]: BROWSER_NAVIGATE: {}", url_normalized);
-    let (_, tab) = get_current_tab().inspect_err(|e| {
-        clear_browser_session_on_error(e);
-    })?;
+    let nav_timeout_secs = crate::config::Config::browser_navigation_timeout_secs();
+    info!(
+        "Browser agent [CDP]: BROWSER_NAVIGATE: {} (new_tab={})",
+        url_normalized, new_tab
+    );
+    let (_browser, tab) = if new_tab {
+        let browser = get_or_create_browser(PORT).inspect_err(|e| clear_browser_session_on_error(e))?;
+        let new_tab = browser.new_tab().map_err(|e| {
+            let s = format!("New tab failed: {}", e);
+            clear_browser_session_on_error(&s);
+            s
+        })?;
+        let tabs = browser.get_tabs().lock().map_err(|e| e.to_string())?;
+        let idx = tabs
+            .iter()
+            .position(|t| std::sync::Arc::ptr_eq(t, &new_tab))
+            .unwrap_or(tabs.len().saturating_sub(1));
+        drop(tabs);
+        if let Ok(mut guard) = current_tab_index().lock() {
+            *guard = idx;
+        }
+        new_tab.bring_to_front().ok();
+        (browser, new_tab)
+    } else {
+        get_current_tab().inspect_err(|e| clear_browser_session_on_error(e))?
+    };
+    tab.set_default_timeout(Duration::from_secs(nav_timeout_secs));
     tab.navigate_to(&url_normalized).map_err(|e| {
-        let s = format!("Navigate: {}", e);
+        let msg = format!("{}", e);
+        let s = if msg.to_lowercase().contains("net::") || msg.contains("404") || msg.contains("failed") {
+            format!("Navigation failed: {}", msg.trim_start_matches("Navigate failed: "))
+        } else {
+            format!("Navigation failed: {}", msg)
+        };
         clear_browser_session_on_error(&s);
         s
     })?;
-    if let Err(e) = tab.wait_until_navigated() {
-        warn!(
-            "Browser agent [CDP]: wait_until_navigated failed (SPA/hash?): {} — continuing after delay",
-            e
-        );
-        std::thread::sleep(Duration::from_secs(2));
+    match tab.wait_until_navigated() {
+        Ok(_) => {}
+        Err(e) => {
+            let err_str = e.to_string();
+            if err_str.to_lowercase().contains("timeout") {
+                debug!("Browser agent [CDP]: navigation wait timed out after {}s", nav_timeout_secs);
+                return Err(format!(
+                    "Navigation failed: timeout after {}s",
+                    nav_timeout_secs
+                ));
+            }
+            warn!(
+                "Browser agent [CDP]: wait_until_navigated failed (SPA/hash?): {} — continuing after delay",
+                e
+            );
+            std::thread::sleep(Duration::from_secs(2));
+        }
     }
     std::thread::sleep(Duration::from_millis(1500));
     let mut state = get_browser_state(&tab).inspect_err(|e| {
@@ -893,6 +944,55 @@ fn navigate_and_get_state_inner(url: &str) -> Result<String, String> {
             .collect(),
     );
     set_last_browser_state_snapshot(snapshot.clone());
+    Ok(snapshot)
+}
+
+/// Go back one step in the current tab's history and return the new page state. Use when the agent should return to the previous page without re-entering the URL.
+pub fn go_back() -> Result<String, String> {
+    with_connection_retry(go_back_inner)
+}
+
+fn go_back_inner() -> Result<String, String> {
+    let (_, tab) = get_current_tab().inspect_err(|e| clear_browser_session_on_error(e))?;
+    let url = tab.get_url();
+    if is_new_tab_or_blank(url.as_str()) {
+        return Err("No page to go back from. Use BROWSER_NAVIGATE first.".to_string());
+    }
+    let nav_timeout_secs = crate::config::Config::browser_navigation_timeout_secs();
+    tab.set_default_timeout(Duration::from_secs(nav_timeout_secs));
+    info!("Browser agent [CDP]: BROWSER_GO_BACK");
+    tab.evaluate("window.history.back()", false)
+        .map_err(|e| format!("Go back failed: {}", e))?;
+    std::thread::sleep(Duration::from_millis(300));
+    match tab.wait_until_navigated() {
+        Ok(_) => {}
+        Err(e) => {
+            let err_str = e.to_string();
+            if err_str.to_lowercase().contains("timeout") {
+                return Err(format!(
+                    "Go back failed: timeout after {}s",
+                    nav_timeout_secs
+                ));
+            }
+            warn!(
+                "Browser agent [CDP]: go_back wait_until_navigated failed: {} — continuing",
+                e
+            );
+            std::thread::sleep(Duration::from_secs(2));
+        }
+    }
+    std::thread::sleep(Duration::from_millis(500));
+    let state = get_browser_state(&tab).inspect_err(|e| clear_browser_session_on_error(e))?;
+    let snapshot = format_browser_state_for_llm(&state);
+    set_last_element_labels(
+        state
+            .interactables
+            .iter()
+            .map(|i| (i.index, element_label_for_status(i)))
+            .collect(),
+    );
+    set_last_browser_state_snapshot(snapshot.clone());
+    info!("Browser agent [CDP]: went back to {}", state.current_url);
     Ok(snapshot)
 }
 

@@ -804,7 +804,7 @@ const AGENT_DESCRIPTIONS_BASE: &str = r#"We have 10 base tools available:
 
 3. **BROWSER_SCREENSHOT**: Take a screenshot of the **current page only**. Use BROWSER_SCREENSHOT: current (or BROWSER_SCREENSHOT: with no arg). **You must navigate first**: use BROWSER_NAVIGATE: <url>, then optionally BROWSER_CLICK through links, then BROWSER_SCREENSHOT: current. Never use BROWSER_SCREENSHOT: <url> — that is invalid. For \"screenshot this URL\" use BROWSER_NAVIGATE: <url> then BROWSER_SCREENSHOT: current.
 
-4. **BROWSER_NAVIGATE**, **BROWSER_CLICK**, **BROWSER_INPUT**, **BROWSER_SCROLL**, **BROWSER_EXTRACT**, **BROWSER_SEARCH_PAGE** (lightweight browser): Use for multi-step browser tasks. **Browser mode**: user says \"headless\" → no visible window. User says \"browser\" or default → visible Chrome. BROWSER_NAVIGATE: <url> — open URL and return current page state with numbered elements. BROWSER_CLICK: <index> — click the element at that index (1-based). BROWSER_INPUT: <index> <text> — type text into the element at that index. BROWSER_SCROLL: <direction> — scroll: \"down\", \"up\", \"bottom\", \"top\", or pixels. BROWSER_EXTRACT — return full visible text of current page. BROWSER_SEARCH_PAGE: <pattern> — search page text for a pattern (like grep); returns matches with context. Use to find specific text (e.g. a name) without reading the whole page. For \"find X on this site\": BROWSER_NAVIGATE to start URL, BROWSER_CLICK through links (Team, Contact, etc.), BROWSER_SEARCH_PAGE: \"X\" to check if found, repeat until found, then BROWSER_SCREENSHOT: current. After each action you get \"Current page: ...\" and an Elements list. **Every browser action must use a concrete grounded argument**: only navigate to an actual URL already provided by the user or returned by browser/search output, and only click/type using indices from the latest Elements list. Do not write prose such as `BROWSER_NAVIGATE to the video URL`, do not reuse stale indices after a failed retry, and do not blame the site for browser-action arguments invented by the agent. **If the Elements list shows cookie consent** (e.g. \"Rechazar todo\", \"Aceptar todo\", \"Accept all\", \"Reject all\"), **click the accept button first** (use the index of \"Aceptar todo\" or \"Accept all\") before typing in search boxes or submitting. Reply with exactly one line per tool (e.g. BROWSER_NAVIGATE: https://google.com then BROWSER_CLICK: 27 for Aceptar todo, then BROWSER_INPUT: 10 <query> then BROWSER_CLICK: 9 for the search button).
+4. **BROWSER_NAVIGATE**, **BROWSER_GO_BACK**, **BROWSER_CLICK**, **BROWSER_INPUT**, **BROWSER_SCROLL**, **BROWSER_EXTRACT**, **BROWSER_SEARCH_PAGE** (lightweight browser): Use for multi-step browser tasks. **Browser mode**: user says \"headless\" → no visible window. User says \"browser\" or default → visible Chrome. BROWSER_NAVIGATE: <url> — open URL and return current page state with numbered elements; add \"new_tab\" (e.g. BROWSER_NAVIGATE: https://example.com new_tab) to open in a new tab and switch focus to it. BROWSER_GO_BACK — go back one step in the current tab's history; use when you need to return to the previous page without re-entering the URL. BROWSER_CLICK: <index> — click the element at that index (1-based). BROWSER_INPUT: <index> <text> — type text into the element at that index. BROWSER_SCROLL: <direction> — scroll: \"down\", \"up\", \"bottom\", \"top\", or pixels. BROWSER_EXTRACT — return full visible text of current page. BROWSER_SEARCH_PAGE: <pattern> — search page text for a pattern (like grep); returns matches with context. Use to find specific text (e.g. a name) without reading the whole page. For \"find X on this site\": BROWSER_NAVIGATE to start URL, BROWSER_CLICK through links (Team, Contact, etc.), BROWSER_SEARCH_PAGE: \"X\" to check if found, repeat until found, then BROWSER_SCREENSHOT: current. After each action you get \"Current page: ...\" and an Elements list. **Every browser action must use a concrete grounded argument**: only navigate to an actual URL already provided by the user or returned by browser/search output, and only click/type using indices from the latest Elements list. Do not write prose such as `BROWSER_NAVIGATE to the video URL`, do not reuse stale indices after a failed retry, and do not blame the site for browser-action arguments invented by the agent. **If the Elements list shows cookie consent** (e.g. \"Rechazar todo\", \"Aceptar todo\", \"Accept all\", \"Reject all\"), **click the accept button first** (use the index of \"Aceptar todo\" or \"Accept all\") before typing in search boxes or submitting. Reply with exactly one line per tool (e.g. BROWSER_NAVIGATE: https://google.com then BROWSER_CLICK: 27 for Aceptar todo, then BROWSER_INPUT: 10 <query> then BROWSER_CLICK: 9 for the search button).
 
 5. **BRAVE_SEARCH**: Web search via Brave Search API. Use for: finding current info, facts, multiple sources. To invoke: reply with exactly one line: BRAVE_SEARCH: <search query>. The app will return search results.
 
@@ -4377,14 +4377,22 @@ pub fn answer_with_ollama_and_fetch(
                         if raw_arg.is_empty() {
                             "BROWSER_NAVIGATE requires a URL (e.g. BROWSER_NAVIGATE: https://www.example.com). Please try again with a URL.".to_string()
                         } else if let Some(url_arg) = extract_browser_navigation_target(&raw_arg) {
-                            send_status(&format!("🧭 Navigating to {}…", url_arg));
+                            let new_tab = raw_arg
+                                .split_whitespace()
+                                .any(|w| w.eq_ignore_ascii_case("new_tab"));
+                            send_status(&format!(
+                                "🧭 Navigating to {}…{}",
+                                url_arg,
+                                if new_tab { " (new tab)" } else { "" }
+                            ));
                             info!(
-                                "Agent router [{}]: BROWSER_NAVIGATE: URL sent to CDP: {}",
-                                request_id, url_arg
+                                "Agent router [{}]: BROWSER_NAVIGATE: URL sent to CDP: {} new_tab={}",
+                                request_id, url_arg, new_tab
                             );
                             match tokio::task::spawn_blocking({
                                 let u = url_arg.clone();
-                                move || crate::browser_agent::navigate_and_get_state(&u)
+                                let new_tab = new_tab;
+                                move || crate::browser_agent::navigate_and_get_state_with_options(&u, new_tab)
                             })
                             .await
                             {
@@ -4401,7 +4409,8 @@ pub fn answer_with_ollama_and_fetch(
                                     .ok();
                                     match tokio::task::spawn_blocking({
                                         let u = url_arg.clone();
-                                        move || crate::browser_agent::navigate_and_get_state(&u)
+                                        let new_tab = new_tab;
+                                        move || crate::browser_agent::navigate_and_get_state_with_options(&u, new_tab)
                                     })
                                     .await
                                     {
@@ -4440,6 +4449,18 @@ pub fn answer_with_ollama_and_fetch(
                                 "BROWSER_NAVIGATE requires a concrete URL. The step {:?} was not executed because it did not contain a grounded browser target. This was an agent planning/parsing issue, not evidence about the site.",
                                 raw_arg
                             ))
+                        }
+                    }
+                    "BROWSER_GO_BACK" => {
+                        send_status("🔙 Going back…");
+                        info!("Agent router [{}]: BROWSER_GO_BACK", request_id);
+                        match tokio::task::spawn_blocking(|| crate::browser_agent::go_back()).await {
+                            Ok(Ok(state_str)) => state_str,
+                            Ok(Err(e)) => append_latest_browser_state_guidance(&format!(
+                                "BROWSER_GO_BACK failed: {}",
+                                e
+                            )),
+                            Err(e) => format!("BROWSER_GO_BACK task error: {}", e),
                         }
                     }
                     "BROWSER_CLICK" => {
@@ -6900,6 +6921,7 @@ fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String,
         "BRAVE_SEARCH:",
         "BROWSER_SCREENSHOT:",
         "BROWSER_NAVIGATE:",
+        "BROWSER_GO_BACK:",
         "BROWSER_CLICK:",
         "BROWSER_INPUT:",
         "BROWSER_SCROLL:",
@@ -6945,6 +6967,12 @@ fn parse_one_tool_at_line(lines: &[&str], line_index: usize) -> Option<((String,
     if line.eq_ignore_ascii_case("BROWSER_EXTRACT") {
         return Some((
             ("BROWSER_EXTRACT".to_string(), String::new()),
+            line_index + 1,
+        ));
+    }
+    if line.eq_ignore_ascii_case("BROWSER_GO_BACK") {
+        return Some((
+            ("BROWSER_GO_BACK".to_string(), String::new()),
             line_index + 1,
         ));
     }
@@ -7133,7 +7161,7 @@ fn normalize_inline_tool_sequences(content: &str) -> String {
     static INLINE_TOOL_CHAIN_RE: OnceLock<regex::Regex> = OnceLock::new();
     let re = INLINE_TOOL_CHAIN_RE.get_or_init(|| {
         regex::Regex::new(
-            r"(?i)(?:\b(?:then|and then|and|after that|afterward|afterwards|next|finally)\b|;|->)\s+(FETCH_URL|BRAVE_SEARCH|BROWSER_SCREENSHOT|BROWSER_NAVIGATE|BROWSER_CLICK|BROWSER_INPUT|BROWSER_SCROLL|BROWSER_EXTRACT|BROWSER_SEARCH_PAGE|PERPLEXITY_SEARCH|RUN_JS|SKILL|AGENT|RUN_CMD|SCHEDULE|SCHEDULER|REMOVE_SCHEDULE|LIST_SCHEDULES|TASK_LIST|TASK_SHOW|TASK_APPEND|TASK_STATUS|TASK_CREATE|TASK_ASSIGN|TASK_SLEEP|OLLAMA_API|MCP|PYTHON_SCRIPT|DISCORD_API|CURSOR_AGENT|REDMINE_API|MEMORY_APPEND|MASTODON_POST|DONE)(?::)?\s+",
+            r"(?i)(?:\b(?:then|and then|and|after that|afterward|afterwards|next|finally)\b|;|->)\s+(FETCH_URL|BRAVE_SEARCH|BROWSER_SCREENSHOT|BROWSER_NAVIGATE|BROWSER_GO_BACK|BROWSER_CLICK|BROWSER_INPUT|BROWSER_SCROLL|BROWSER_EXTRACT|BROWSER_SEARCH_PAGE|PERPLEXITY_SEARCH|RUN_JS|SKILL|AGENT|RUN_CMD|SCHEDULE|SCHEDULER|REMOVE_SCHEDULE|LIST_SCHEDULES|TASK_LIST|TASK_SHOW|TASK_APPEND|TASK_STATUS|TASK_CREATE|TASK_ASSIGN|TASK_SLEEP|OLLAMA_API|MCP|PYTHON_SCRIPT|DISCORD_API|CURSOR_AGENT|REDMINE_API|MEMORY_APPEND|MASTODON_POST|DONE)(?::)?\s+",
         )
         .expect("inline tool chain regex must compile")
     });

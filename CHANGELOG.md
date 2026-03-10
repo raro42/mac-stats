@@ -34,6 +34,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **ellipse() edge case** — `logging::ellipse()` enforces `max_len >= sep_len + 1` so first_count/last_count never go negative for very small `max_len`.
 
+## [0.1.39] - 2026-03-10
+
+### Added
+- **Browser navigation timeout** — Maximum wait for BROWSER_NAVIGATE and BROWSER_GO_BACK is configurable: `config.json` key `browserNavigationTimeoutSecs` (default 30, range 5–120) or env `MAC_STATS_BROWSER_NAVIGATION_TIMEOUT_SECS`. Slow or stuck navigations fail with a clear message (e.g. "Navigation failed: timeout after 30s") instead of hanging.
+- **BROWSER_NAVIGATE new_tab** — Add `new_tab` after the URL (e.g. `BROWSER_NAVIGATE: https://example.com new_tab`) to open the URL in a new tab and switch focus to it; subsequent BROWSER_CLICK / BROWSER_SCREENSHOT apply to that tab.
+- **BROWSER_GO_BACK** — New agent tool: go back one step in the current tab's history and return the new page state. Use when returning to the previous page without re-entering the URL.
+
+### Changed
+- **Docs 029** — Navigation timeout, new tab, and BROWSER_GO_BACK documented in `docs/029_browser_automation.md`.
+
 ## [0.1.38] - 2026-03-08
 
 ### Added
