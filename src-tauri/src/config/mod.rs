@@ -390,6 +390,34 @@ impl Config {
         DEFAULT
     }
 
+    /// Optional shorter navigation wait timeout in seconds for same-domain navigations (BROWSER_NAVIGATE when target host equals current page host). When `None`, same-domain uses the same timeout as cross-domain. Config: config.json `browserSameDomainNavigationTimeoutSecs`. Env: `MAC_STATS_BROWSER_SAME_DOMAIN_NAVIGATION_TIMEOUT_SECS`. When set, clamped to 1..=120. Typical value 5 (or 3 to mirror browser-use).
+    pub fn browser_same_domain_navigation_timeout_secs() -> Option<u64> {
+        const MIN: u64 = 1;
+        const MAX: u64 = 120;
+        if let Ok(s) = std::env::var("MAC_STATS_BROWSER_SAME_DOMAIN_NAVIGATION_TIMEOUT_SECS") {
+            if let Ok(n) = s.parse::<u64>() {
+                if n > 0 {
+                    return Some(n.clamp(MIN, MAX));
+                }
+                return None;
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(n) = json
+                    .get("browserSameDomainNavigationTimeoutSecs")
+                    .and_then(|v| v.as_u64())
+                {
+                    if n > 0 {
+                        return Some(n.clamp(MIN, MAX));
+                    }
+                }
+            }
+        }
+        None
+    }
+
     /// Browser viewport width in pixels (CDP/headless window size). Config: config.json `browserViewportWidth`.
     /// Default 1800. Clamped to 800..=3840.
     pub fn browser_viewport_width() -> u32 {

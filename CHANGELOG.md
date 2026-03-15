@@ -34,6 +34,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **ellipse() edge case** — `logging::ellipse()` enforces `max_len >= sep_len + 1` so first_count/last_count never go negative for very small `max_len`.
 
+## [0.1.40] - 2026-03-15
+
+### Added
+- **Same-domain navigation timeout (optional)** — When the navigation target is on the same domain as the current page (e.g. in-site link or SPA), a shorter wait can be used. Config: `config.json` key `browserSameDomainNavigationTimeoutSecs` or env `MAC_STATS_BROWSER_SAME_DOMAIN_NAVIGATION_TIMEOUT_SECS`. When set, same-domain BROWSER_NAVIGATE uses this timeout; cross-domain and BROWSER_GO_BACK use `browserNavigationTimeoutSecs`. Range 1–120s; when not set, all use the single navigation timeout.
+
+### Changed
+- **Docs 029** — Same-domain shorter timeout for BROWSER_NAVIGATE documented in `docs/029_browser_automation.md`.
+
 ## [0.1.39] - 2026-03-10
 
 ### Added

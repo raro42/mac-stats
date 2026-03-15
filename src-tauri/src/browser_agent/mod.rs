@@ -25,6 +25,7 @@ use headless_chrome::Browser;
 use headless_chrome::LaunchOptions;
 use regex::Regex;
 use serde::Deserialize;
+use url::Url;
 use std::path::PathBuf;
 use tracing::{debug, info, warn};
 
@@ -820,6 +821,33 @@ fn normalize_url_for_screenshot(url: &str) -> String {
     }
 }
 
+/// Returns true if both URLs are valid HTTP(S) and have the same host (domain). Used to apply a shorter wait timeout for same-domain navigations. Invalid or non-http(s) URLs return false.
+fn is_same_domain(current_url: &str, target_url: &str) -> bool {
+    let current = match Url::parse(current_url) {
+        Ok(u) => u,
+        Err(_) => return false,
+    };
+    let target = match Url::parse(target_url) {
+        Ok(u) => u,
+        Err(_) => return false,
+    };
+    let scheme_ok = |u: &Url| {
+        u.scheme() == "http" || u.scheme() == "https"
+    };
+    if !scheme_ok(&current) || !scheme_ok(&target) {
+        return false;
+    }
+    let host_current = match current.host_str() {
+        Some(h) => h.to_lowercase(),
+        None => return false,
+    };
+    let host_target = match target.host_str() {
+        Some(h) => h.to_lowercase(),
+        None => return false,
+    };
+    host_current == host_target
+}
+
 const PORT: u16 = 9222;
 
 fn current_tab_index() -> &'static Mutex<usize> {
@@ -866,6 +894,7 @@ pub fn navigate_and_get_state_with_options(url: &str, new_tab: bool) -> Result<S
 fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<String, String> {
     let url_normalized = normalize_url_for_screenshot(url);
     let nav_timeout_secs = crate::config::Config::browser_navigation_timeout_secs();
+    let same_domain_timeout_secs = crate::config::Config::browser_same_domain_navigation_timeout_secs();
     info!(
         "Browser agent [CDP]: BROWSER_NAVIGATE: {} (new_tab={})",
         url_normalized, new_tab
@@ -891,7 +920,21 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<String, Stri
     } else {
         get_current_tab().inspect_err(|e| clear_browser_session_on_error(e))?
     };
-    tab.set_default_timeout(Duration::from_secs(nav_timeout_secs));
+    let current_url = tab.get_url();
+    let actual_timeout_secs = if let Some(same_secs) = same_domain_timeout_secs {
+        if is_same_domain(current_url.as_str(), &url_normalized) {
+            debug!(
+                "Browser agent [CDP]: same-domain navigation, using {}s timeout",
+                same_secs
+            );
+            same_secs
+        } else {
+            nav_timeout_secs
+        }
+    } else {
+        nav_timeout_secs
+    };
+    tab.set_default_timeout(Duration::from_secs(actual_timeout_secs));
     tab.navigate_to(&url_normalized).map_err(|e| {
         let msg = format!("{}", e);
         let s = if msg.to_lowercase().contains("net::") || msg.contains("404") || msg.contains("failed") {
@@ -907,10 +950,10 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<String, Stri
         Err(e) => {
             let err_str = e.to_string();
             if err_str.to_lowercase().contains("timeout") {
-                debug!("Browser agent [CDP]: navigation wait timed out after {}s", nav_timeout_secs);
+                debug!("Browser agent [CDP]: navigation wait timed out after {}s", actual_timeout_secs);
                 return Err(format!(
                     "Navigation failed: timeout after {}s",
-                    nav_timeout_secs
+                    actual_timeout_secs
                 ));
             }
             warn!(
