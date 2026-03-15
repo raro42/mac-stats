@@ -38,5 +38,6 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 | docs/README.md | ~~Trim stale Open tasks in historical docs~~ | **Done:** 007 trimmed, 006 points to this backlog |
 | docs/007_discord_agent.md | ~~Improve docs for test_discord_connect binary~~ | **Done:** §12 expanded (token resolution, env file format, behavior, failure) |
 | docs/029_browser_automation.md | ~~Improve docs for BROWSER_* tools (connection process)~~ | **Done:** added § "Connection process (step-by-step)" in 029 |
+| docs/007_discord_agent.md | ~~Improve error handling when Discord API is unavailable~~ | **Done:** user-facing message + one retry (2s) on connection/timeout/5xx in api.rs; send_message paths use same in mod.rs |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.

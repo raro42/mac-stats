@@ -4,10 +4,29 @@
 //! when the request originates from Discord. Token and base URL are shared with the Gateway.
 
 use std::sync::atomic::Ordering;
-use tracing::debug;
+use std::time::Duration;
+use tracing::{debug, info};
 
 const BASE_URL: &str = "https://discord.com/api/v10";
 const MAX_RESPONSE_CHARS: usize = 8000;
+const RETRY_DELAY_SECS: u64 = 2;
+
+/// Map a reqwest::Error from a Discord API request to a short user-facing message when the API
+/// is unavailable (connection refused, timeout). Used by discord_api_request and send_message_*.
+pub fn user_message_for_discord_request_error(e: &reqwest::Error) -> String {
+    if e.is_connect() || e.is_timeout() {
+        return "Discord API is temporarily unavailable (connection or timeout). Try again in a moment.".to_string();
+    }
+    let s = e.to_string();
+    let lower = s.to_lowercase();
+    if lower.contains("connection refused")
+        || lower.contains("timed out")
+        || lower.contains("connection reset")
+    {
+        return "Discord API is temporarily unavailable (connection or timeout). Try again in a moment.".to_string();
+    }
+    format!("Request failed: {}", e)
+}
 
 /// If the error looks like a Discord scope/permission failure, return a short user-facing message
 /// so we don't echo technical errors into the conversation (log-005).
@@ -80,38 +99,72 @@ pub async fn discord_api_request(
         .build()
         .map_err(|e| format!("HTTP client: {}", e))?;
 
-    // Do not log request/response headers or bodies that may contain credentials.
-    let mut req = client
-        .request(
-            method_upper
-                .parse()
-                .map_err(|e| format!("Invalid method: {}", e))?,
-            &url,
-        )
-        .header("Authorization", format!("Bot {}", token))
-        .header("User-Agent", &user_agent);
-
-    if method_upper == "POST" && body.is_some() {
+    let body_json_opt: Option<serde_json::Value> = if method_upper == "POST" && body.is_some() {
         let body_str = body.unwrap_or("{}").trim();
         if crate::logging::VERBOSITY.load(Ordering::Relaxed) >= 3 {
             debug!("Discord API request body (decoded): {}", body_str);
         }
-        let body_json: serde_json::Value =
-            serde_json::from_str(body_str).map_err(|e| format!("Invalid JSON body: {}", e))?;
-        req = req
-            .header("Content-Type", "application/json")
-            .json(&body_json);
-    }
+        Some(
+            serde_json::from_str(body_str).map_err(|e| format!("Invalid JSON body: {}", e))?,
+        )
+    } else {
+        None
+    };
 
-    let resp = req
-        .send()
-        .await
-        .map_err(|e| format!("Request failed: {}", e))?;
+    for attempt in 0..2 {
+        let mut req = client
+            .request(
+                method_upper
+                    .parse()
+                    .map_err(|e| format!("Invalid method: {}", e))?,
+                &url,
+            )
+            .header("Authorization", format!("Bot {}", token))
+            .header("User-Agent", &user_agent);
 
-    let status = resp.status();
-    let body_text = resp.text().await.unwrap_or_default();
+        if let Some(ref body_json) = body_json_opt {
+            req = req
+                .header("Content-Type", "application/json")
+                .json(body_json);
+        }
 
-    if !status.is_success() {
+        let resp = match req.send().await {
+            Ok(r) => r,
+            Err(e) => {
+                let retryable = e.is_connect() || e.is_timeout();
+                if retryable && attempt < 1 {
+                    info!(
+                        "Discord API request failed (connection/timeout), retrying in {}s (attempt {})",
+                        RETRY_DELAY_SECS,
+                        attempt + 1
+                    );
+                    tokio::time::sleep(Duration::from_secs(RETRY_DELAY_SECS)).await;
+                    continue;
+                }
+                return Err(user_message_for_discord_request_error(&e));
+            }
+        };
+
+        let status = resp.status();
+        let body_text = resp.text().await.unwrap_or_default();
+
+        if status.is_success() {
+            return if body_text.chars().count() > MAX_RESPONSE_CHARS {
+                Ok(crate::logging::ellipse(&body_text, MAX_RESPONSE_CHARS))
+            } else {
+                Ok(body_text)
+            };
+        }
+
+        if status.is_server_error() && attempt < 1 {
+            info!(
+                "Discord API {} {} (attempt {}), retrying in {}s",
+                method_upper, path, attempt + 1, RETRY_DELAY_SECS
+            );
+            tokio::time::sleep(Duration::from_secs(RETRY_DELAY_SECS)).await;
+            continue;
+        }
+
         debug!("Discord API {} {}: {}", method_upper, path, status);
         return Err(format!(
             "Discord API {}: {}",
@@ -120,11 +173,7 @@ pub async fn discord_api_request(
         ));
     }
 
-    if body_text.chars().count() > MAX_RESPONSE_CHARS {
-        Ok(crate::logging::ellipse(&body_text, MAX_RESPONSE_CHARS))
-    } else {
-        Ok(body_text)
-    }
+    Err("Discord API is temporarily unavailable. Try again in a moment.".to_string())
 }
 
 /// Fetch guild and channel metadata for the given channel via the Discord API.

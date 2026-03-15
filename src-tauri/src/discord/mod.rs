@@ -2382,7 +2382,7 @@ pub async fn send_message_to_channel_with_attachments(
         .multipart(form)
         .send()
         .await
-        .map_err(|e| format!("Request failed: {}", e))?;
+        .map_err(|e| crate::discord::api::user_message_for_discord_request_error(&e))?;
     if !resp.status().is_success() {
         let status = resp.status();
         let body = resp.text().await.unwrap_or_default();
@@ -2426,7 +2426,7 @@ pub async fn send_message_to_channel(channel_id: u64, content: &str) -> Result<(
         .json(&serde_json::json!({ "content": content }))
         .send()
         .await
-        .map_err(|e| format!("Request failed: {}", e))?;
+        .map_err(|e| crate::discord::api::user_message_for_discord_request_error(&e))?;
     if !resp.status().is_success() {
         let status = resp.status();
         let body = resp.text().await.unwrap_or_default();

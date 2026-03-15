@@ -35,6 +35,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **ellipse() edge case** — `logging::ellipse()` enforces `max_len >= sep_len + 1` so first_count/last_count never go negative for very small `max_len`.
 
+## [0.1.41] - 2026-03-16
+
+### Changed
+- **Discord API error handling** — When the Discord API is unavailable (connection/timeout/5xx), the app returns a short user-facing message ("Discord API is temporarily unavailable (connection or timeout). Try again in a moment.") and retries once after 2s in `discord_api_request`; `send_message_to_channel` and multipart send use the same message. See `discord/api.rs`, `discord/mod.rs`, and `docs/007_discord_agent.md`.
+
 ## [0.1.40] - 2026-03-15
 
 ### Added

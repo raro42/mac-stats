@@ -264,7 +264,7 @@ Example: `./target/release/mac_stats agent test redmine` runs the Redmine agent�
 - ~~Improve the documentation for `~/.mac-stats/schedules.json` and `~/.mac-stats/user-info.json`.~~ **Done:** see **docs/data_files_reference.md**.
 - Look into using a more robust caching mechanism for `~/.mac-stats/user-info.json`.
 - Investigate the possibility of using a more efficient data structure for `~/.mac-stats/schedules.json`.
-- Improve the error handling for cases where the Discord API is unavailable.
+- ~~Improve the error handling for cases where the Discord API is unavailable.~~ **Done:** connection/timeout errors return a short user-facing message ("Discord API is temporarily unavailable (connection or timeout). Try again in a moment."); one retry after 2s on connection/timeout or 5xx in `discord_api_request`; `send_message_to_channel` and multipart send use the same message for request failures. See `discord/api.rs` and `discord/mod.rs`.
 - Investigate the possibility of using a more secure method for storing the Discord bot token.
 - ~~Consider adding a feature to allow users to view the logs for the Discord bot.~~ **Done:** Settings → Discord bot section has a **View logs** button that opens `~/.mac-stats/debug.log` in the default app (macOS). Commands: `get_debug_log_path`, `open_debug_log`.
 - ~~Improve the documentation for the `test_discord_connect` binary.~~ **Done:** §12 expanded with token resolution, env file format (DISCORD-USER1/USER2-TOKEN), behavior, and failure message.
