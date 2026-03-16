@@ -44,5 +44,6 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 | docs/agent_workflow.md | ~~Improve docs for tool agents and their invocations~~ | **Done:** "How invocations work" section, full tool table (invocation + purpose + implementation), See also (README, 007, 100_all_agents). |
 | docs/007_discord_agent.md | ~~Customize test_discord_connect behavior (duration)~~ | **Done:** env `TEST_DISCORD_CONNECT_SECS` (1–300), CLI second arg or single numeric arg; §12 updated. |
 | docs/007_discord_agent.md | ~~More robust caching for user-info.json~~ | **Done:** in-memory cache + mtime invalidation in `user_info/mod.rs`; external edits trigger reload. |
+| docs/033_docs_vs_code_review.md | ~~Verify prefer_headless behavior in edge cases~~ | **Done:** § "prefer_headless — Edge cases and verification" (scenarios table, session reuse, retries, ensure_chrome_on_port, verification checklist). |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.

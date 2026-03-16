@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Docs 005, 006, 022, 033** — OpenClaw re-verification §16 (005-openclaw-reviewer); FEATURE-CODER backlog row for 033 prefer_headless verification done (006); 022 testing note 2026-03-16 (integration/smoke); 033 prefer_headless edge cases and verification section plus open task closed.
 - **user-info.json caching** — In-memory cache with file mtime invalidation in `user_info/mod.rs`: reads use cache when file unchanged; writes refresh cache so next read sees new data; external edits to the file trigger reload. Open task in `docs/007_discord_agent.md` and FEATURE-CODER backlog marked done; `docs/data_files_reference.md` and 022 testing note (2026-03-16) updated. OpenClaw re-verification (§15) added in `005-openclaw-reviewer/005-openclaw-reviewer.md`.
 - **test_discord_connect duration** — Run duration configurable via env `TEST_DISCORD_CONNECT_SECS` (1–300) or CLI (second arg, or single numeric arg for default path + duration); default 15s. Docs: §12 in `docs/007_discord_agent.md`; FEATURE-CODER backlog and 007 open task marked done. OpenClaw re-verification (§14) and 022 testing note (2026-03-16) added.
 
