@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Docs 005, 006, 002, 022** — OpenClaw re-verification §19 (005); FEATURE-CODER backlog row for 002 fetch_page_content verification done (006); 002 § on fetch_page_content/main-thread blocking verified (frontend uses fetch_page + spawn_blocking); 022 testing note 2026-03-16 (integration/smoke closing).
 - **Brave Search API** — API compliance and error-handling/edge-cases documented in `docs/008_brave_agent.md`; empty-query guard in `brave_web_search` (trim, reject empty/whitespace); FEATURE-CODER and agent_workflow open tasks marked done. OpenClaw §18 re-verification (005) and 022 testing note (2026-03-16) added.
 - **Docs 005 (§17), 006, 022** — OpenClaw re-verification §17 (005); FEATURE-CODER backlog row for 022/023 merge done (006); 022 §8 "Externalized prompts (F11) — summary from 023" and open task closed.
 - **Docs 005, 006, 022, 033** — OpenClaw re-verification §16 (005-openclaw-reviewer); FEATURE-CODER backlog row for 033 prefer_headless verification done (006); 022 testing note 2026-03-16 (integration/smoke); 033 prefer_headless edge cases and verification section plus open task closed.

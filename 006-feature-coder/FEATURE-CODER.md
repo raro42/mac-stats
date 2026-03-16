@@ -47,5 +47,6 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 | docs/033_docs_vs_code_review.md | ~~Verify prefer_headless behavior in edge cases~~ | **Done:** § "prefer_headless — Edge cases and verification" (scenarios table, session reuse, retries, ensure_chrome_on_port, verification checklist). |
 | docs/022_feature_review_plan.md | ~~Review 023 and merge missing details into this plan~~ | **Done:** §8 "Externalized prompts (F11) — summary from 023" added (files, {{AGENTS}}, defaults, assembly order, Tauri commands, editing notes); 023 remains full reference. |
 | docs/008_brave_agent.md + agent_workflow.md | ~~Brave Search API: compliance review, docs, error handling~~ | **Done:** API compliance § in 008; error-handling/edge-cases § (empty query, 429, timeout, no results); empty-query guard in `brave_web_search`; agent_workflow open task marked done. |
+| docs/002_task_optimize_frontend.md | ~~Verify fetch_page_content blocks main thread in frontend path~~ | **Done:** documented in 002 § "fetch_page_content and main-thread blocking"; frontend uses `fetch_page` (spawn_blocking), so main thread not blocked. |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.
