@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Plugin script timeout** — Plugin execution now respects `timeout_secs`: script runs in a thread, main thread waits with `recv_timeout`; on timeout the process is killed (Unix) and a clear error is returned. See `plugins/mod.rs`; docs/004_notes.md and FEATURE-CODER backlog updated.
 - **test_discord_connect --quick / -q** — `--quick` or `-q` runs for 2 seconds (enough to see "Bot connected" then exit). Docs: §12 in `docs/007_discord_agent.md`; FEATURE-CODER backlog and 007 open task marked done. OpenClaw re-verification §22 (005); 022 testing note 2026-03-16 (closing reviewer).
 - **Process list DOM (CPU window)** — In `dist/cpu.js`: use `replaceChildren()` instead of `innerHTML = ""`; single click listener on list (event delegation) instead of per-row listeners; skip DOM update when process list data unchanged (`lastProcessListKey`). Docs 002 task and FEATURE-CODER backlog marked done; OpenClaw §21 (005); 022 testing note 2026-03-16.
 - **Theme switch animation** — 200ms fade-out on body before theme navigation in `cpu-ui.js` (ensureThemeSwitchStyle + transitionend/250ms fallback); no extra ongoing CPU. Open task in docs/002 and FEATURE-CODER backlog marked done; OpenClaw re-verification §20 (005); 022 closing testing note (2026-03-16).

@@ -8,6 +8,8 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
+use std::sync::mpsc;
+use std::time::Duration;
 
 /// Plugin configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -100,10 +102,49 @@ impl Plugin {
         cmd.stdout(Stdio::piped());
         cmd.stderr(Stdio::piped());
 
-        // Execute with timeout using spawn and wait with timeout
-        // Note: std::process::Command doesn't have timeout, so we'll handle it differently
-        // For now, just execute without timeout (can be improved with tokio or crossbeam)
-        let output = cmd.output().context("Failed to execute plugin script")?;
+        let child = cmd.spawn().context("Failed to execute plugin script")?;
+        #[cfg(unix)]
+        let pid = child.id();
+        let timeout_duration = Duration::from_secs(self.timeout_secs.max(1));
+        let (tx, rx) = mpsc::channel();
+        let child_handle = std::thread::spawn(move || {
+            let _ = tx.send(child.wait_with_output());
+        });
+
+        let output = match rx.recv_timeout(timeout_duration) {
+            Ok(Ok(out)) => out,
+            Ok(Err(e)) => return Err(e).context("Plugin process wait failed"),
+            Err(mpsc::RecvTimeoutError::Timeout) => {
+                #[cfg(unix)]
+                {
+                    // SAFETY: pid is our child process; we kill it on timeout. libc::kill is async-signal-safe.
+                    unsafe { libc::kill(pid as i32, libc::SIGKILL); }
+                }
+                let _ = rx.recv(); // Let the thread receive wait_with_output result and exit.
+                let _ = child_handle.join();
+                let execution_time_ms = start_time.elapsed().as_millis() as u64;
+                return Ok(PluginResult {
+                    plugin_id: self.id.clone(),
+                    output: PluginOutput {
+                        status: "error".to_string(),
+                        message: Some(format!(
+                            "Plugin script timed out after {}s",
+                            self.timeout_secs
+                        )),
+                        data: None,
+                        metrics: None,
+                        timestamp: Utc::now(),
+                    },
+                    execution_time_ms,
+                });
+            }
+            Err(mpsc::RecvTimeoutError::Disconnected) => {
+                let _ = child_handle.join();
+                return Err(anyhow::anyhow!("Plugin wait thread disconnected"));
+            }
+        };
+
+        let _ = child_handle.join();
 
         let execution_time_ms = start_time.elapsed().as_millis() as u64;
 
