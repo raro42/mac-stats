@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **005-openclaw-reviewer** — OpenClaw docs/code/defaults review (`005-openclaw-reviewer/005-openclaw-reviewer.md`): scope, doc/code/defaults verdicts, recommendations.
+- **Heise schedule script** — `scripts/add-heise-schedule.sh` and `scripts/heise-schedule-entry.json` to add a daily Heise.de summary schedule to `~/.mac-stats/schedules.json`.
 - **Scheduler failure → Discord** — When a scheduled task fails (FETCH_URL, BRAVE_SEARCH, Ollama, or TASK run), the scheduler sends a short failure message to the schedule’s Discord channel when `reply_to_channel_id` is set. `execute_task` now returns `Result<Option<(String, bool)>, String>`; loop handles `Err(msg)` and posts to Discord. See `docs/009_scheduler_agent.md`, `scheduler/mod.rs`.
 - **View logs in Settings** — Discord/Settings section has a **View logs** button that opens `~/.mac-stats/debug.log` in the default app (macOS). Tauri commands: `get_debug_log_path`, `open_debug_log`. See `docs/007_discord_agent.md` and FEATURE-CODER backlog.
 - **maxSchedules config** — Optional cap on number of schedule entries via `maxSchedules` in `~/.mac-stats/config.json` (1–1000; omit or 0 = no limit). When at cap, new SCHEDULE adds are rejected with a message to remove some or increase the limit. See `Config::max_schedules()`, `docs/007_discord_agent.md` (§ Customizing SCHEDULE behavior).
@@ -21,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Daily log rotation** — Once per calendar day (UTC), `debug.log` is copied to `debug.log_sic` and truncated. Last rotation date stored in `~/.mac-stats/.debug_log_last_rotated`. Config paths: `Config::debug_log_sic_path()`, `Config::debug_log_last_rotated_path()`.
 
 ### Changed
+- **Agent workflow docs** — `docs/agent_workflow.md`: "How invocations work" section, full tool table (invocation, purpose, implementation), See also links (README, 007, 100_all_agents). FEATURE-CODER backlog row marked done.
+- **022 feature review** — `docs/022_feature_review_plan.md`: closing testing note (2026-03-16) with integration and smoke check summary.
 - **Scheduler deduplication** — One-shot schedules (`at` + task) now deduplicate like cron: adding the same `at` and same task (normalized) returns `AlreadyExists` and is not added. See `add_schedule_at`, `docs/data_files_reference.md`, `docs/009_scheduler_agent.md`.
 - **Docs 007 and FEATURE-CODER** — §12 test_discord_connect expanded (token resolution, env file format DISCORD-USER1/USER2-TOKEN, success/failure output); open task and FEATURE-CODER backlog row marked done.
 - **Docs 033** — Mark "Stale Branch" open task as done in `docs/033_docs_vs_code_review.md`.

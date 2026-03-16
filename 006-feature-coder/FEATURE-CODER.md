@@ -41,5 +41,6 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 | docs/007_discord_agent.md | ~~Improve error handling when Discord API is unavailable~~ | **Done:** user-facing message + one retry (2s) on connection/timeout/5xx in api.rs; send_message paths use same in mod.rs |
 | docs/009_scheduler_agent.md | ~~Improve error handling for scheduler tool invocations~~ | **Done:** on task failure (FETCH_URL, BRAVE_SEARCH, Ollama, TASK run), scheduler sends failure message to schedule’s Discord channel when reply_to_channel_id is set (scheduler/mod.rs). |
 | docs/009_scheduler_agent.md | ~~Review deduplication behavior for identical cron+task pairs~~ | **Done:** cron and one-shot (at+task) both deduplicate in add_schedule/add_schedule_at; data_files_reference updated. |
+| docs/agent_workflow.md | ~~Improve docs for tool agents and their invocations~~ | **Done:** "How invocations work" section, full tool table (invocation + purpose + implementation), See also (README, 007, 100_all_agents). |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.

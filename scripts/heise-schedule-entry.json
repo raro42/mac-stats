@@ -1,0 +1,5 @@
+{
+  "id": "heise-summary",
+  "cron": "0 0 8 * * *",
+  "task": "Use FETCH_URL to fetch https://www.heise.de. Then summarize the first three articles on the page: for each article give the headline and a one- or two-sentence summary in English."
+}
