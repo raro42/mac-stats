@@ -97,6 +97,11 @@ impl AlertManager {
         self.channels.insert(channel_id, channel);
     }
 
+    /// Remove an alert channel by id (used by Tauri command remove_alert_channel).
+    pub fn remove_channel(&mut self, channel_id: &str) {
+        self.channels.remove(channel_id);
+    }
+
     /// Evaluate all alerts against context
     pub fn evaluate(&mut self, context: AlertContext) -> Result<Vec<String>> {
         let mut triggered_alerts = Vec::new();

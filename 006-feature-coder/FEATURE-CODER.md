@@ -56,5 +56,6 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 | docs/029_browser_automation.md | ~~Investigate why some users are unable to launch Chrome on port 9222~~ | **Done:** § "Troubleshooting: Chrome won't start or connect on 9222" (default path, port in use, spawn failures, connection timing, firewall, headless fallback, debug log). |
 | docs/007_discord_agent.md | ~~More efficient data structure for schedules.json~~ | **Done:** investigation documented in data_files_reference.md (§ "Data structure and performance"); array kept; O(n) acceptable for typical N. |
 | docs/007_discord_agent.md | ~~More secure method for storing Discord bot token~~ | **Done:** Keychain already used; §11 "Secure token storage (recommended)" added (Keychain via Settings for production; env/.config.env for dev/CI). Open task marked done. |
+| docs/004_notes.md | ~~Add commands for registering Telegram/Slack/Mastodon channels~~ | **Done:** `register_telegram_channel`, `register_slack_channel`, `register_mastodon_channel`, `remove_alert_channel` in `commands/alerts.rs`; AlertManager `remove_channel` in `alerts/mod.rs`. |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.

@@ -1,5 +1,6 @@
 //! Alert Tauri commands
 
+use crate::alerts::channels::{MastodonChannel, SlackChannel, TelegramChannel};
 use crate::alerts::{Alert, AlertContext, AlertManager};
 use std::sync::Mutex;
 use std::sync::OnceLock;
@@ -40,4 +41,47 @@ pub fn evaluate_alerts(context: AlertContext) -> Result<Vec<String>, String> {
         .map_err(|e| e.to_string())?
         .evaluate(context)
         .map_err(|e| e.to_string())
+}
+
+/// Register a Telegram channel for alerts. Store the bot token in Keychain under `telegram_bot_{id}`.
+#[tauri::command]
+pub fn register_telegram_channel(id: String, chat_id: String) -> Result<(), String> {
+    let channel = TelegramChannel::new(id.clone(), chat_id);
+    get_alert_manager()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .register_channel(id, Box::new(channel));
+    Ok(())
+}
+
+/// Register a Slack channel for alerts. Store the webhook URL in Keychain under `slack_webhook_{id}`.
+#[tauri::command]
+pub fn register_slack_channel(id: String) -> Result<(), String> {
+    let channel = SlackChannel::new(id.clone());
+    get_alert_manager()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .register_channel(id, Box::new(channel));
+    Ok(())
+}
+
+/// Register a Mastodon channel for alerts. Store the API token in Keychain under `mastodon_alert_{id}`.
+#[tauri::command]
+pub fn register_mastodon_channel(id: String, instance_url: String) -> Result<(), String> {
+    let channel = MastodonChannel::new(id.clone(), instance_url);
+    get_alert_manager()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .register_channel(id, Box::new(channel));
+    Ok(())
+}
+
+/// Remove an alert channel by id (Telegram, Slack, or Mastodon).
+#[tauri::command]
+pub fn remove_alert_channel(channel_id: String) -> Result<(), String> {
+    get_alert_manager()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .remove_channel(&channel_id);
+    Ok(())
 }

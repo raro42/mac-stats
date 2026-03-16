@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Alert channel commands** — Tauri commands to register/unregister alert channels: `register_telegram_channel(id, chat_id)`, `register_slack_channel(id)`, `register_mastodon_channel(id, instance_url)`, `remove_alert_channel(channel_id)`. Credentials via Keychain (telegram_bot_{id}, slack_webhook_{id}, mastodon_alert_{id}). See `commands/alerts.rs`; docs/004_notes.md and FEATURE-CODER backlog updated.
+
 ### Changed
 - **Discord token storage (docs)** — `docs/007_discord_agent.md` §11: added "Secure token storage (recommended)" (Keychain via Settings for production; env/.config.env for dev/CI). Open task and FEATURE-CODER backlog marked done.
 - **Docs 006, 007, 022, data_files_reference** — FEATURE-CODER backlog: schedules.json data-structure investigation done (006); 007 open task marked done, linked to data_files_reference § "Data structure and performance" (array kept, O(n) acceptable); 022 closing testing note (2026-03-16 reviewer run); data_files_reference: new § "Data structure and performance" for schedules.json.

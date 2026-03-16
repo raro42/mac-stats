@@ -182,6 +182,10 @@ fn run_internal(open_cpu_window: bool) {
             commands::alerts::add_alert,
             commands::alerts::remove_alert,
             commands::alerts::evaluate_alerts,
+            commands::alerts::register_telegram_channel,
+            commands::alerts::register_slack_channel,
+            commands::alerts::register_mastodon_channel,
+            commands::alerts::remove_alert_channel,
             // Plugin commands
             commands::plugins::add_plugin,
             commands::plugins::remove_plugin,
