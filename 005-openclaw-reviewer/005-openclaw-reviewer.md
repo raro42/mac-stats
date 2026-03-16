@@ -376,3 +376,21 @@ All §7 checks re-run against current repo (line numbers as of this run):
 | Default phrases header | `src-tauri/defaults/session_reset_phrases.md` L4 | "Like OpenClaw's session.resetTriggers …" — present. |
 
 **Outcome:** Review confirmed. No discrepancies. No code or doc changes required.
+
+---
+
+## 24. Re-verification (2026-03-16, agent run)
+
+All §7 checks re-run against current repo (line numbers as of this run):
+
+| Check | Location | Result |
+|-------|----------|--------|
+| README attribution | `README.md` L131 | "Inspired by … [OpenClaw](https://github.com/openclaw/openclaw) …" — present. |
+| agents sibling | `AGENTS.md` L439 | "OpenClaw: `../openclaw` … see docs/035" — present. |
+| 035 sibling | `docs/035_memory_and_topic_handling.md` L99 | "OpenClaw = `../openclaw`" — present. |
+| docs/031, 025, 032, 034, docs/README | 031 L41,43,79; 025 L53,135; 032 L40; 034 L59; docs/README L307 | OpenClaw mentions match §2 table. |
+| `is_agent_failure_notice` | `src-tauri/src/discord/mod.rs` L93–101 | Checks `"logs: openclaw"` L99, `"openclaw logs"` L100; used at L1143, 1157, 1164, 1295, 1779. |
+| `session_reset_phrases_path` comment | `src-tauri/src/config/mod.rs` L593–594 | "like OpenClaw's resetTriggers, but in an MD file" — present. |
+| Default phrases header | `src-tauri/defaults/session_reset_phrases.md` L4 | "Like OpenClaw's session.resetTriggers …" — present. |
+
+**Outcome:** Review confirmed. No discrepancies. No code or doc changes required.

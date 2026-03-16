@@ -52,5 +52,6 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 | docs/002_task_optimize_frontend.md | ~~Further optimize process list DOM updates~~ | **Done:** replaceChildren(), event delegation for row clicks, skip update when list unchanged (lastProcessListKey) in `dist/cpu.js`. |
 | docs/007_discord_agent.md | ~~More efficient method for testing Discord connection~~ | **Done:** `--quick` / `-q` flag in test_discord_connect (2s run); §12 updated. |
 | docs/004_notes.md | ~~Plugin script timeout handling~~ | **Done:** thread + `mpsc::recv_timeout(timeout_secs)` + kill on timeout (Unix) in `plugins/mod.rs`; 004 open task and Known Issues updated. |
+| docs/004_notes.md | ~~Improve plugin script error messages~~ | **Done:** plugin_id and script path in all errors; JSON parse shows stdout snippet; non-zero exit shows exit code and trimmed stderr; tracing::warn on failures. |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.
