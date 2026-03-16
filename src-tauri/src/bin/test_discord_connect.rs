@@ -2,13 +2,33 @@
 //! Run from project root: ./scripts/run_with_discord_token.sh then in another terminal
 //!   cd src-tauri && cargo run --bin test_discord_connect
 //! Or with token from file: cargo run --bin test_discord_connect -- [path/to/.config.env]
+//! Optional second arg or env TEST_DISCORD_CONNECT_SECS (1–300) sets run duration in seconds (default 15).
 //!
 //! Logs "Discord: Connecting...", "Gateway client built...", "Discord: Bot connected as X"
-//! on success; runs ~15s then exits.
+//! on success; runs for the configured duration then exits.
+
+fn env_duration_secs() -> u64 {
+    std::env::var("TEST_DISCORD_CONNECT_SECS")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .map(|n: u64| n.clamp(1, 300))
+        .unwrap_or(15)
+}
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let path = args.get(1).map(|s| s.as_str()).unwrap_or(".config.env");
+    let (path, duration_secs) = if let Some(a1) = args.get(1) {
+        if let Ok(n) = a1.parse::<u64>() {
+            (".config.env", n.clamp(1, 300))
+        } else if let Some(a2) = args.get(2) {
+            let n = a2.parse().ok().map(|n: u64| n.clamp(1, 300)).unwrap_or(15);
+            (a1.as_str(), n)
+        } else {
+            (a1.as_str(), env_duration_secs())
+        }
+    } else {
+        (".config.env", env_duration_secs())
+    };
 
     let token = if let Ok(t) = std::env::var("DISCORD_BOT_TOKEN") {
         t.trim().to_string()
@@ -49,7 +69,7 @@ fn main() {
     rt.block_on(async {
         let token = token.clone();
         let task = tokio::spawn(async move { mac_stats::discord::run_discord_client(token).await });
-        tokio::time::sleep(std::time::Duration::from_secs(15)).await;
+        tokio::time::sleep(std::time::Duration::from_secs(duration_secs)).await;
         task.abort();
         let _ = task.await;
     });

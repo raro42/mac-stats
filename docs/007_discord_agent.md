@@ -173,7 +173,7 @@ You can put **optional leading lines** in your message to override model, parame
 
 ## 12. Testing the Discord connection
 
-The **test_discord_connect** binary checks that your Discord bot token works without starting the full app (no menu bar, no Keychain). It connects to the Gateway, prints connection status, then exits after about 15 seconds.
+The **test_discord_connect** binary checks that your Discord bot token works without starting the full app (no menu bar, no Keychain). It connects to the Gateway, prints connection status, then exits after a configurable duration (default 15 seconds).
 
 ### How to run
 
@@ -188,6 +188,13 @@ With a custom env file path:
 ```bash
 cargo run --bin test_discord_connect -- path/to/.config.env
 ```
+
+To customize how long the binary stays connected before exiting (default 15s, range 1–300):
+
+- **Environment:** `TEST_DISCORD_CONNECT_SECS=30` (e.g. `TEST_DISCORD_CONNECT_SECS=30 cargo run --bin test_discord_connect`).
+- **CLI:** Optional second argument (seconds), or a single numeric argument to use default path and that duration:
+  - `cargo run --bin test_discord_connect -- .config.env 30` — env file `.config.env`, run 30 seconds.
+  - `cargo run --bin test_discord_connect -- 30` — default path `.config.env`, run 30 seconds.
 
 ### Token resolution
 
@@ -206,7 +213,7 @@ With a valid token you should see on stderr:
 - `Discord: Gateway client built, starting connection…`
 - `Discord: Bot connected as <YourBotName> (id: …)`
 
-The process then runs for ~15 seconds and exits (the binary deliberately aborts the connection after 15s).
+The process then runs for the configured duration (default 15s, see above) and exits (the binary deliberately aborts the connection after that).
 
 ### No token / failure
 
@@ -269,4 +276,4 @@ Example: `./target/release/mac_stats agent test redmine` runs the Redmine agent�
 - ~~Consider adding a feature to allow users to view the logs for the Discord bot.~~ **Done:** Settings → Discord bot section has a **View logs** button that opens `~/.mac-stats/debug.log` in the default app (macOS). Commands: `get_debug_log_path`, `open_debug_log`.
 - ~~Improve the documentation for the `test_discord_connect` binary.~~ **Done:** §12 expanded with token resolution, env file format (DISCORD-USER1/USER2-TOKEN), behavior, and failure message.
 - Investigate the possibility of using a more efficient method for testing the Discord connection.
-- Consider adding a feature to allow users to customize the behavior of the `test_discord_connect` binary.
+- ~~Consider adding a feature to allow users to customize the behavior of the `test_discord_connect` binary.~~ **Done:** run duration is configurable via env `TEST_DISCORD_CONNECT_SECS` (1–300) or CLI (second arg, or single numeric arg for default path + duration). See §12.

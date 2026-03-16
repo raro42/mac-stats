@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **test_discord_connect duration** — Run duration configurable via env `TEST_DISCORD_CONNECT_SECS` (1–300) or CLI (second arg, or single numeric arg for default path + duration); default 15s. Docs: §12 in `docs/007_discord_agent.md`; FEATURE-CODER backlog and 007 open task marked done. OpenClaw re-verification (§14) and 022 testing note (2026-03-16) added.
+
 ### Added
 - **005-openclaw-reviewer** — OpenClaw docs/code/defaults review (`005-openclaw-reviewer/005-openclaw-reviewer.md`): scope, doc/code/defaults verdicts, recommendations.
 - **Heise schedule script** — `scripts/add-heise-schedule.sh` and `scripts/heise-schedule-entry.json` to add a daily Heise.de summary schedule to `~/.mac-stats/schedules.json`.
