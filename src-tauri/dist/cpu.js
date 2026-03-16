@@ -191,6 +191,7 @@ function updateChipInfo(chipInfo, uptimeSecs) {
 let refreshInterval = null;
 let invoke = null;
 let lastProcessUpdate = 0;
+let lastProcessListKey = "";
 let isWaitingForData = false; // Track if we're waiting for real data (non-zero usage)
 
 // Make refresh available globally for refresh button
@@ -709,16 +710,28 @@ async function refresh() {
       window._forceProcessUpdate = false; // Reset flag after use
       
       const list = document.getElementById("process-list");
+      if (!list) return;
       
-      // STEP 7: Use document fragment to batch all DOM updates
-      // This reduces WebKit reflows from multiple appendChild calls
+      // Skip DOM update when process list unchanged (avoids reflows and listener churn)
+      const processes = data.top_processes && data.top_processes.length > 0
+        ? data.top_processes.slice(0, 8)
+        : [];
+      const processKey = processes.length > 0
+        ? processes.map((p) => `${p.pid}:${p.cpu.toFixed(1)}:${p.name}`).join("|")
+        : "empty";
+      if (!forceUpdate && !isInitialLoad && processKey === lastProcessListKey) {
+        return;
+      }
+      lastProcessListKey = processKey;
+      
+      // Use document fragment to batch all DOM updates and reduce reflows
       const fragment = document.createDocumentFragment();
       
-      if (data.top_processes && data.top_processes.length > 0) {
-        data.top_processes.slice(0, 8).forEach((proc) => {
+      if (processes.length > 0) {
+        processes.forEach((proc) => {
           const row = document.createElement("div");
           row.className = "process-row";
-          row.setAttribute("data-pid", proc.pid);
+          row.setAttribute("data-pid", String(proc.pid));
           row.style.cursor = "pointer";
           row.title = "Click for details";
           
@@ -746,16 +759,9 @@ async function refresh() {
           
           row.appendChild(name);
           row.appendChild(usage);
-          
-          // Add click handler for process details
-          row.addEventListener("click", () => {
-            showProcessDetails(proc.pid);
-          });
-          
           fragment.appendChild(row);
         });
       } else {
-        // No processes available (window might be closed, saving CPU)
         const emptyMsg = document.createElement("div");
         emptyMsg.className = "process-empty";
         emptyMsg.textContent = "No process data available";
@@ -765,9 +771,19 @@ async function refresh() {
         fragment.appendChild(emptyMsg);
       }
       
-      // STEP 7: Batch the innerHTML clear and fragment append in one DOM update
+      // Single click listener on list (event delegation) instead of per-row listeners
       scheduleDOMUpdate(() => {
-        list.innerHTML = "";
+        if (!list.dataset.processClickDelegation) {
+          list.dataset.processClickDelegation = "true";
+          list.addEventListener("click", (e) => {
+            const row = e.target.closest(".process-row");
+            if (row) {
+              const pid = row.getAttribute("data-pid");
+              if (pid) showProcessDetails(parseInt(pid, 10));
+            }
+          });
+        }
+        list.replaceChildren();
         list.appendChild(fragment);
       });
     }

@@ -49,5 +49,6 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 | docs/008_brave_agent.md + agent_workflow.md | ~~Brave Search API: compliance review, docs, error handling~~ | **Done:** API compliance § in 008; error-handling/edge-cases § (empty query, 429, timeout, no results); empty-query guard in `brave_web_search`; agent_workflow open task marked done. |
 | docs/002_task_optimize_frontend.md | ~~Verify fetch_page_content blocks main thread in frontend path~~ | **Done:** documented in 002 § "fetch_page_content and main-thread blocking"; frontend uses `fetch_page` (spawn_blocking), so main thread not blocked. |
 | docs/002_task_optimize_frontend.md | ~~Improve theme switching animation (no extra CPU)~~ | **Done:** 200ms fade-out before theme navigation in `cpu-ui.js` (ensureThemeSwitchStyle + transitionend/250ms fallback). |
+| docs/002_task_optimize_frontend.md | ~~Further optimize process list DOM updates~~ | **Done:** replaceChildren(), event delegation for row clicks, skip update when list unchanged (lastProcessListKey) in `dist/cpu.js`. |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.
