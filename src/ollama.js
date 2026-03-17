@@ -610,14 +610,19 @@ async function executeCodeAndContinue(response, originalQuestion, systemPrompt, 
         // Final answer received
         console.log(`[Ollama] Final answer received after ${iteration + 1} iteration(s)`);
         
-        // Remove intermediate message and show final answer
+        // Remove intermediate message and show answer(s)
         if (lastMessage && lastMessage.textContent.includes('Getting response')) {
           messagesContainer.removeChild(lastMessage);
         }
         
-        addChatMessage('assistant', continueResponse.final_answer);
-        // Add assistant response to history
-        addToHistory('assistant', continueResponse.final_answer);
+        // Show both intermediate and final when we have both (so user can see if intermediate was correct)
+        const intermediate = (response.intermediate_response || '').trim();
+        const finalText = (continueResponse.final_answer || '').trim();
+        const displayText = intermediate
+          ? `--- Intermediate answer ---\n\n${intermediate}\n\n--- Final answer ---\n\n${finalText}`
+          : finalText;
+        addChatMessage('assistant', displayText);
+        addToHistory('assistant', displayText);
       } else {
         // Unexpected response format
         console.warn('[Ollama] Unexpected continue response format:', continueResponse);
@@ -794,15 +799,19 @@ Can you now answer the original question: ${originalMessage}?`;
         }
       });
       
-      // Display the final answer
-      const finalAnswer = followUpResponse.message.content;
+      // Display both intermediate and final so user can see if intermediate was correct
+      const finalAnswer = (followUpResponse.message.content || '').trim();
+      const intermediateContent = (responseContent || '').trim();
+      const displayText = intermediateContent
+        ? `--- Intermediate answer ---\n\n${intermediateContent}\n\n--- Final answer ---\n\n${finalAnswer}`
+        : finalAnswer;
       
-      // Remove the intermediate message and add the final answer
+      // Remove the intermediate message and add the combined answer(s)
       if (lastMessage && lastMessage.textContent.includes('Getting final answer')) {
         messagesContainer.removeChild(lastMessage);
       }
       
-      addChatMessage('assistant', finalAnswer);
+      addChatMessage('assistant', displayText);
       
     } catch (error) {
       console.error('[Ollama JS Execution] ERROR executing code:', error);

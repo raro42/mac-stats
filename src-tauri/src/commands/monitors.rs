@@ -491,6 +491,22 @@ pub fn list_monitors() -> Result<Vec<String>, String> {
     Ok(monitors.keys().cloned().collect())
 }
 
+/// List all monitors with details (id, name, url, type) for Settings UI.
+#[tauri::command]
+pub fn list_monitors_with_details() -> Result<Vec<MonitorDetails>, String> {
+    let configs = get_monitor_configs().lock().map_err(|e| e.to_string())?;
+
+    Ok(configs
+        .iter()
+        .map(|(_, pm)| MonitorDetails {
+            id: pm.id.clone(),
+            name: pm.name.clone(),
+            url: Some(pm.url.clone()),
+            monitor_type: pm.monitor_type.clone(),
+        })
+        .collect())
+}
+
 /// Remove a monitor
 #[tauri::command]
 pub fn remove_monitor(monitor_id: String) -> Result<(), String> {
@@ -556,7 +572,7 @@ pub struct MonitorDetails {
     pub monitor_type: String,
 }
 
-/// Get monitor details including URL
+/// Get monitor details including URL and name from config.
 #[tauri::command]
 pub fn get_monitor_details(monitor_id: String) -> Result<MonitorDetails, String> {
     let monitors = get_monitors().lock().map_err(|e| e.to_string())?;
@@ -565,18 +581,26 @@ pub fn get_monitor_details(monitor_id: String) -> Result<MonitorDetails, String>
         .get(&monitor_id)
         .ok_or_else(|| format!("Monitor not found: {}", monitor_id))?;
 
-    // Get URL from separate storage
+    let configs = get_monitor_configs().lock().map_err(|e| e.to_string())?;
+    let name = configs
+        .get(&monitor_id)
+        .map(|pm| pm.name.clone())
+        .unwrap_or_else(|| monitor_id.clone());
     let url = get_monitor_urls()
         .lock()
         .map_err(|e| e.to_string())?
         .get(&monitor_id)
         .cloned();
+    let monitor_type = configs
+        .get(&monitor_id)
+        .map(|pm| pm.monitor_type.clone())
+        .unwrap_or_else(|| "Website".to_string());
 
     Ok(MonitorDetails {
         id: monitor_id.clone(),
-        name: monitor_id, // We don't have name stored separately, use ID for now
+        name,
         url,
-        monitor_type: "Website".to_string(), // Assume website for now
+        monitor_type,
     })
 }
 

@@ -85,3 +85,12 @@ pub fn remove_alert_channel(channel_id: String) -> Result<(), String> {
         .remove_channel(&channel_id);
     Ok(())
 }
+
+/// List registered alert channel IDs (for Settings UI).
+#[tauri::command]
+pub fn list_alert_channels() -> Result<Vec<String>, String> {
+    Ok(get_alert_manager()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .list_channel_ids())
+}

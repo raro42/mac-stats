@@ -12,6 +12,7 @@ let ollamaCollapsed = false;
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
+    setupSettingsModalListeners();
     startUpdates();
     // Initialize Ollama after a short delay to ensure ollama.js is loaded
     setTimeout(() => {
@@ -234,15 +235,15 @@ async function loadMonitors() {
     monitorsList.innerHTML = '';
 
     try {
-        const monitorIds = await invoke('list_monitors');
-        
-        for (const monitorId of monitorIds) {
+        const detailsList = await invoke('list_monitors_with_details');
+        for (const d of detailsList) {
             try {
-                const status = await invoke('check_monitor', { monitorId });
-                const monitorItem = createMonitorItem(monitorId, status);
+                const status = await invoke('get_monitor_status', { monitorId: d.id });
+                const s = status || { is_up: false, response_time_ms: null, error: 'Not checked yet' };
+                const monitorItem = createMonitorItem(d.id, s, d.name);
                 monitorsList.appendChild(monitorItem);
             } catch (err) {
-                console.error(`Failed to load monitor ${monitorId}:`, err);
+                console.error(`Failed to load monitor ${d.id}:`, err);
             }
         }
     } catch (err) {
@@ -250,10 +251,11 @@ async function loadMonitors() {
     }
 }
 
-function createMonitorItem(monitorId, status) {
+function createMonitorItem(monitorId, status, displayName) {
+    const name = displayName != null ? displayName : monitorId;
     const item = document.createElement('div');
     item.className = 'monitor-item';
-    
+
     const statusIndicator = document.createElement('div');
     statusIndicator.className = 'status-indicator';
     if (!status.is_up) {
@@ -263,16 +265,16 @@ function createMonitorItem(monitorId, status) {
     const info = document.createElement('div');
     info.className = 'monitor-info';
     info.innerHTML = `
-        <div>${monitorId}</div>
+        <div>${escapeHtml(name)}</div>
         <div style="font-size: 12px; color: rgba(255,255,255,0.6);">
             ${status.response_time_ms ? `${status.response_time_ms}ms` : '--'}
-            ${status.error ? ` · ${status.error}` : ''}
+            ${status.error ? ` · ${escapeHtml(status.error)}` : ''}
         </div>
     `;
 
     item.appendChild(statusIndicator);
     item.appendChild(info);
-    
+
     return item;
 }
 
@@ -286,35 +288,198 @@ function createMonitorItem(monitorId, status) {
 // ============================================================================
 
 function showAddMonitorDialog() {
-    // Simple prompt for now - can be enhanced with a proper modal
-    const url = prompt('Enter website URL to monitor:');
-    if (url) {
-        const id = `monitor_${Date.now()}`;
-        const name = new URL(url).hostname;
-        
-        invoke('add_website_monitor', {
-            request: {
-                id,
-                name,
-                url,
-                timeout_secs: 10,
-                check_interval_secs: 60,
-                verify_ssl: true
-            }
-        })
-        .then(() => {
-            loadMonitors();
-            updateMonitorsSummary();
-        })
-        .catch(err => {
-            alert(`Failed to add monitor: ${err}`);
-        });
+    // Open Settings modal on Monitors tab so user can add via the form
+    showSettingsDialog('monitors');
+}
+
+function showSettingsDialog(openTab) {
+    const modal = document.getElementById('settings-modal');
+    modal.setAttribute('aria-hidden', 'false');
+    const tab = openTab || 'monitors';
+    switchSettingsTab(tab);
+    loadSettingsMonitors();
+    loadSettingsAlertChannels();
+    setupAlertChannelTypeVisibility();
+}
+
+function hideSettingsDialog() {
+    document.getElementById('settings-modal').setAttribute('aria-hidden', 'true');
+}
+
+function switchSettingsTab(tabName) {
+    document.querySelectorAll('.settings-tab').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+    document.querySelectorAll('.settings-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === `settings-${tabName}`);
+    });
+}
+
+async function loadSettingsMonitors() {
+    const listEl = document.getElementById('settings-monitors-list');
+    listEl.innerHTML = '';
+    try {
+        const monitors = await invoke('list_monitors_with_details');
+        if (monitors.length === 0) {
+            listEl.innerHTML = '<p class="settings-empty">No monitors. Add one below.</p>';
+            return;
+        }
+        for (const m of monitors) {
+            const item = document.createElement('div');
+            item.className = 'settings-list-item';
+            item.innerHTML = `
+                <div>
+                    <span class="label">${escapeHtml(m.name)}</span>
+                    <div class="sublabel">${escapeHtml(m.url || m.id)}</div>
+                </div>
+                <button type="button" class="btn-remove" data-monitor-id="${escapeHtml(m.id)}">Remove</button>
+            `;
+            item.querySelector('.btn-remove').addEventListener('click', () => removeMonitorFromSettings(m.id));
+            listEl.appendChild(item);
+        }
+    } catch (err) {
+        listEl.innerHTML = `<p class="settings-error">Failed to load: ${escapeHtml(String(err))}</p>`;
     }
 }
 
-function showSettingsDialog() {
-    // Placeholder - can be enhanced with a proper settings modal
-    alert('Settings dialog - To be implemented\n\nFeatures:\n- Configure monitors\n- Set up alert channels\n- Manage credentials\n- Configure Ollama');
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+async function removeMonitorFromSettings(monitorId) {
+    try {
+        await invoke('remove_monitor', { monitorId });
+        loadSettingsMonitors();
+        if (!monitorsCollapsed) {
+            loadMonitors();
+            updateMonitorsSummary();
+        }
+    } catch (err) {
+        alert(`Failed to remove monitor: ${err}`);
+    }
+}
+
+function setupSettingsModalListeners() {
+    document.getElementById('settings-modal-close').addEventListener('click', hideSettingsDialog);
+    document.getElementById('settings-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'settings-modal') hideSettingsDialog();
+    });
+    document.querySelectorAll('.settings-tab').forEach(btn => {
+        btn.addEventListener('click', () => switchSettingsTab(btn.dataset.tab));
+    });
+    document.getElementById('settings-add-monitor-btn').addEventListener('click', addMonitorFromSettings);
+    document.getElementById('settings-add-alert-btn').addEventListener('click', addAlertChannelFromSettings);
+    document.getElementById('alert-channel-type').addEventListener('change', setupAlertChannelTypeVisibility);
+}
+
+function setupAlertChannelTypeVisibility() {
+    const type = document.getElementById('alert-channel-type').value;
+    document.getElementById('alert-row-chat-id').style.display = type === 'telegram' ? 'block' : 'none';
+    document.getElementById('alert-row-instance').style.display = type === 'mastodon' ? 'block' : 'none';
+}
+
+async function addMonitorFromSettings() {
+    const name = document.getElementById('monitor-name').value.trim();
+    const url = document.getElementById('monitor-url').value.trim();
+    if (!url) {
+        alert('Please enter a URL.');
+        return;
+    }
+    const id = `monitor_${Date.now()}`;
+    const displayName = name || new URL(url).hostname || id;
+    const timeoutSecs = parseInt(document.getElementById('monitor-timeout').value, 10) || 10;
+    const intervalSecs = parseInt(document.getElementById('monitor-interval').value, 10) || 60;
+    const verifySsl = document.getElementById('monitor-verify-ssl').checked;
+    try {
+        await invoke('add_website_monitor', {
+            request: {
+                id,
+                name: displayName,
+                url,
+                timeout_secs: timeoutSecs,
+                check_interval_secs: intervalSecs,
+                verify_ssl: verifySsl
+            }
+        });
+        document.getElementById('monitor-name').value = '';
+        document.getElementById('monitor-url').value = '';
+        loadSettingsMonitors();
+        if (!monitorsCollapsed) {
+            loadMonitors();
+            updateMonitorsSummary();
+        }
+    } catch (err) {
+        alert(`Failed to add monitor: ${err}`);
+    }
+}
+
+async function loadSettingsAlertChannels() {
+    const listEl = document.getElementById('settings-alerts-list');
+    listEl.innerHTML = '';
+    try {
+        const channelIds = await invoke('list_alert_channels');
+        if (channelIds.length === 0) {
+            listEl.innerHTML = '<p class="settings-empty">No alert channels. Add one below.</p>';
+            return;
+        }
+        for (const id of channelIds) {
+            const item = document.createElement('div');
+            item.className = 'settings-list-item';
+            item.innerHTML = `
+                <div><span class="label">${escapeHtml(id)}</span></div>
+                <button type="button" class="btn-remove" data-channel-id="${escapeHtml(id)}">Remove</button>
+            `;
+            item.querySelector('.btn-remove').addEventListener('click', () => removeAlertChannelFromSettings(id));
+            listEl.appendChild(item);
+        }
+    } catch (err) {
+        listEl.innerHTML = `<p class="settings-error">Failed to load: ${escapeHtml(String(err))}</p>`;
+    }
+}
+
+async function removeAlertChannelFromSettings(channelId) {
+    try {
+        await invoke('remove_alert_channel', { channelId });
+        loadSettingsAlertChannels();
+    } catch (err) {
+        alert(`Failed to remove channel: ${err}`);
+    }
+}
+
+async function addAlertChannelFromSettings() {
+    const type = document.getElementById('alert-channel-type').value;
+    const id = document.getElementById('alert-channel-id').value.trim();
+    if (!id) {
+        alert('Please enter a channel ID.');
+        return;
+    }
+    try {
+        if (type === 'telegram') {
+            const chatId = document.getElementById('alert-telegram-chat-id').value.trim();
+            if (!chatId) {
+                alert('Please enter the Telegram chat ID.');
+                return;
+            }
+            await invoke('register_telegram_channel', { id, chatId });
+        } else if (type === 'slack') {
+            await invoke('register_slack_channel', { id });
+        } else if (type === 'mastodon') {
+            const instanceUrl = document.getElementById('alert-mastodon-instance').value.trim();
+            if (!instanceUrl) {
+                alert('Please enter the Mastodon instance URL.');
+                return;
+            }
+            await invoke('register_mastodon_channel', { id, instanceUrl });
+        }
+        document.getElementById('alert-channel-id').value = '';
+        document.getElementById('alert-telegram-chat-id').value = '';
+        document.getElementById('alert-mastodon-instance').value = '';
+        loadSettingsAlertChannels();
+    } catch (err) {
+        alert(`Failed to add channel: ${err}`);
+    }
 }
 
 // Cleanup on page unload

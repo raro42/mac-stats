@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Dashboard Settings modal** — Settings modal (Monitors / Alert channels tabs): list monitors with name, URL, type via `list_monitors_with_details`; add website monitor (name, URL, timeout, interval, verify SSL); list and add alert channels (Telegram/Slack/Mastodon). Backend: `list_monitors_with_details`, `list_alert_channels`; `get_monitor_details` returns name and monitor_type from config. "Add monitor" opens Settings on Monitors tab. See `src/dashboard.html`, `src/dashboard.js`, `commands/monitors.rs`, `commands/alerts.rs`.
+
 ### Changed
 - **FETCH_URL content reduction** — `reduce_fetched_content_to_fit`: fast path via byte-length heuristic when body fits; when over limit by ≤25%, truncate only (no summarization) to avoid extra Ollama call; truncation at last newline/space via `truncate_at_boundary` for readability. See `commands/ollama.rs`; FEATURE-CODER and docs/012 open task marked done.
 - **Discord skill-not-found** — When user requests a missing skill (e.g. `skill: 99`), Discord replies with "Skill \"X\" not found. Available: 1-summarize, 2-code." and returns early; `parse_discord_ollama_overrides` returns `requested_skill_selector` so handler can detect not-found. FEATURE-CODER and docs/012 open task marked done. See `discord/mod.rs`.

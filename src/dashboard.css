@@ -344,3 +344,232 @@ body {
   background: rgba(255, 255, 255, 0.15);
   transform: scale(1.05);
 }
+
+/* Settings modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-overlay[aria-hidden="false"] {
+  display: flex;
+}
+
+.settings-modal {
+  background: rgba(30, 30, 35, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  max-width: 480px;
+  width: 90%;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.modal-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.settings-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.settings-tab {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.settings-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.settings-tab.active {
+  background: rgba(33, 150, 243, 0.25);
+  border-color: rgba(33, 150, 243, 0.5);
+  color: #fff;
+}
+
+.settings-panel {
+  display: none;
+}
+
+.settings-panel.active {
+  display: block;
+}
+
+.settings-panel h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.settings-panel h5 {
+  margin: 12px 0 8px 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.settings-hint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 12px 0;
+}
+
+.settings-list {
+  margin-bottom: 12px;
+  min-height: 24px;
+}
+
+.settings-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.settings-list-item .label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.settings-list-item .sublabel {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.settings-list-item .btn-remove {
+  background: rgba(244, 67, 54, 0.2);
+  border: 1px solid rgba(244, 67, 54, 0.4);
+  color: #f44336;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.settings-list-item .btn-remove:hover {
+  background: rgba(244, 67, 54, 0.35);
+}
+
+.settings-form .form-row {
+  margin-bottom: 10px;
+}
+
+.settings-form .form-row label {
+  display: block;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 4px;
+}
+
+.settings-form .form-row input[type="text"],
+.settings-form .form-row input[type="url"],
+.settings-form .form-row input[type="number"],
+.settings-form .form-row select {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+}
+
+.settings-form .form-row input:focus,
+.settings-form .form-row select:focus {
+  outline: none;
+  border-color: rgba(33, 150, 243, 0.6);
+}
+
+.form-row-inline {
+  display: inline-block;
+  margin-right: 16px;
+  margin-bottom: 8px;
+}
+
+.form-row-inline input {
+  width: 80px;
+}
+
+.form-row-inline label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+}
+
+.btn-primary {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: rgba(33, 150, 243, 0.8);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: rgba(33, 150, 243, 1);
+}
+
+.settings-empty,
+.settings-error {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  padding: 8px 0;
+}
+
+.settings-error {
+  color: rgba(244, 67, 54, 0.9);
+}

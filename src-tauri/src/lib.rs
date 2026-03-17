@@ -175,6 +175,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::monitors::add_mastodon_monitor,
             commands::monitors::check_monitor,
             commands::monitors::list_monitors,
+            commands::monitors::list_monitors_with_details,
             commands::monitors::remove_monitor,
             commands::monitors::get_monitor_details,
             commands::monitors::get_monitor_status,
@@ -186,6 +187,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::alerts::register_slack_channel,
             commands::alerts::register_mastodon_channel,
             commands::alerts::remove_alert_channel,
+            commands::alerts::list_alert_channels,
             // Plugin commands
             commands::plugins::add_plugin,
             commands::plugins::remove_plugin,

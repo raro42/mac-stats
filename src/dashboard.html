@@ -95,6 +95,80 @@
       <button class="settings-btn" id="settings-btn">⚙️</button>
     </main>
 
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal" aria-hidden="true">
+      <div class="modal settings-modal">
+        <div class="modal-header">
+          <h3>Settings</h3>
+          <button type="button" class="modal-close" id="settings-modal-close" aria-label="Close">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="settings-tabs">
+            <button type="button" class="settings-tab active" data-tab="monitors">Monitors</button>
+            <button type="button" class="settings-tab" data-tab="alerts">Alert channels</button>
+          </div>
+
+          <section class="settings-panel active" id="settings-monitors">
+            <h4>Website monitors</h4>
+            <div class="settings-list" id="settings-monitors-list"></div>
+            <div class="settings-form">
+              <h5>Add website monitor</h5>
+              <div class="form-row">
+                <label for="monitor-name">Name</label>
+                <input type="text" id="monitor-name" placeholder="e.g. My API" />
+              </div>
+              <div class="form-row">
+                <label for="monitor-url">URL</label>
+                <input type="url" id="monitor-url" placeholder="https://example.com" />
+              </div>
+              <div class="form-row form-row-inline">
+                <label for="monitor-timeout">Timeout (s)</label>
+                <input type="number" id="monitor-timeout" min="1" max="120" value="10" />
+              </div>
+              <div class="form-row form-row-inline">
+                <label for="monitor-interval">Interval (s)</label>
+                <input type="number" id="monitor-interval" min="10" max="3600" value="60" />
+              </div>
+              <div class="form-row form-row-inline">
+                <label><input type="checkbox" id="monitor-verify-ssl" checked /> Verify SSL</label>
+              </div>
+              <button type="button" class="btn-primary" id="settings-add-monitor-btn">Add monitor</button>
+            </div>
+          </section>
+
+          <section class="settings-panel" id="settings-alerts">
+            <h4>Alert channels</h4>
+            <p class="settings-hint">Store bot token (Telegram) or webhook/API credentials in Settings → Credentials. Then register the channel here.</p>
+            <div class="settings-list" id="settings-alerts-list"></div>
+            <div class="settings-form">
+              <h5>Add alert channel</h5>
+              <div class="form-row">
+                <label for="alert-channel-type">Type</label>
+                <select id="alert-channel-type">
+                  <option value="telegram">Telegram</option>
+                  <option value="slack">Slack</option>
+                  <option value="mastodon">Mastodon</option>
+                </select>
+              </div>
+              <div class="form-row" id="alert-row-id">
+                <label for="alert-channel-id">Channel ID</label>
+                <input type="text" id="alert-channel-id" placeholder="e.g. my-telegram" />
+              </div>
+              <div class="form-row" id="alert-row-chat-id">
+                <label for="alert-telegram-chat-id">Chat ID</label>
+                <input type="text" id="alert-telegram-chat-id" placeholder="Telegram chat ID" />
+              </div>
+              <div class="form-row" id="alert-row-instance">
+                <label for="alert-mastodon-instance">Instance URL</label>
+                <input type="url" id="alert-mastodon-instance" placeholder="https://mastodon.social" />
+              </div>
+              <button type="button" class="btn-primary" id="settings-add-alert-btn">Add channel</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
     <script src="tauri-logger.js"></script>
     <script type="module" src="ollama.js"></script>
     <script type="module" src="dashboard.js"></script>

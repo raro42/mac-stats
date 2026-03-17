@@ -99,7 +99,7 @@ Whenever Ollama is asked to decide which agent to use, the app sends the complet
 3. **Ollama Integration**
 	* ~~Stream support not implemented~~ **Done:** streaming in `send_ollama_chat_messages_streaming` (NDJSON chunks), `ollama-chat-chunk` events, frontend appends to assistant message when `window.__TAURI__.event.listen` is available; `stream: true` default in `OllamaChatWithExecutionRequest`.
 4. **UI Implementation**
-	* Settings UI for adding monitors and configuring alerts could still be improved
+	* ~~Settings UI for adding monitors and configuring alerts could still be improved~~ **Done:** Settings modal (gear button) with Monitors tab (list with remove, add-website form: name, URL, timeout, interval, verify SSL) and Alert channels tab (list with remove, add Telegram/Slack/Mastodon). Add-monitor "+" opens Settings on Monitors tab.
 
 ## Open tasks
 

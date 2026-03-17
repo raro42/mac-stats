@@ -102,6 +102,11 @@ impl AlertManager {
         self.channels.remove(channel_id);
     }
 
+    /// List registered alert channel IDs (for Settings UI).
+    pub fn list_channel_ids(&self) -> Vec<String> {
+        self.channels.keys().cloned().collect()
+    }
+
     /// Evaluate all alerts against context
     pub fn evaluate(&mut self, context: AlertContext) -> Result<Vec<String>> {
         let mut triggered_alerts = Vec::new();
