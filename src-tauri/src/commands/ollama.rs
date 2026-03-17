@@ -60,9 +60,27 @@ fn load_channel_memory_block(channel_id: u64) -> String {
     )
 }
 
+/// Load main-session (in-app) memory (~/.mac-stats/agents/memory-main.md). Returns empty if missing.
+/// Used when the request is from the CPU window (no Discord channel) so the main session has per-context memory.
+fn load_main_session_memory_block() -> String {
+    let path = Config::memory_file_path_for_main_session();
+    let content = match std::fs::read_to_string(&path) {
+        Ok(s) => s.trim().to_string(),
+        Err(_) => return String::new(),
+    };
+    if content.is_empty() {
+        return String::new();
+    }
+    format!(
+        "\n\n## Memory (main session — follow these)\n\n{}\n\n",
+        content
+    )
+}
+
 /// Load memory for the current request.
 /// Global memory (personal/long-term) is only loaded in main session (in-app, or Discord DM).
 /// In Discord guild channels and having_fun, only per-channel memory is loaded to avoid leaking personal context.
+/// When there is no Discord channel (in-app), main-session memory (memory-main.md) is also loaded.
 fn load_memory_block_for_request(
     discord_channel_id: Option<u64>,
     load_global_memory: bool,
@@ -74,7 +92,13 @@ fn load_memory_block_for_request(
     };
     let channel = discord_channel_id
         .map(load_channel_memory_block)
-        .unwrap_or_default();
+        .unwrap_or_else(|| {
+            if load_global_memory {
+                load_main_session_memory_block()
+            } else {
+                String::new()
+            }
+        });
     if channel.is_empty() {
         global
     } else {
@@ -93,9 +117,9 @@ fn words_for_search(text: &str) -> Vec<String> {
         .collect()
 }
 
-/// Search memory (global + optional Discord channel) for lines relevant to the request.
+/// Search memory (global + optional Discord channel or main-session) for lines relevant to the request.
 /// Returns at most 5 matching lines, or None if no matches. When discord_channel_id is Some,
-/// channel memory is merged with global so we search both.
+/// channel memory is merged with global; when None (in-app), main-session memory is included.
 fn search_memory_for_request(
     question: &str,
     reason: Option<&str>,
@@ -108,7 +132,11 @@ fn search_memory_for_request(
         .and_then(|id| {
             std::fs::read_to_string(Config::memory_file_path_for_discord_channel(id)).ok()
         })
-        .unwrap_or_default();
+        .unwrap_or_else(|| {
+            std::fs::read_to_string(Config::memory_file_path_for_main_session())
+                .ok()
+                .unwrap_or_default()
+        });
     let content = format!("{}\n{}", global.trim(), channel.trim())
         .trim()
         .to_string();

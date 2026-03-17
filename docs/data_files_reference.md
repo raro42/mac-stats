@@ -118,6 +118,19 @@ Schedules are stored as a **JSON array** for simplicity, human readability, and 
 
 ---
 
+## Memory files (agents)
+
+**Paths:**  
+- **Global:** `$HOME/.mac-stats/agents/memory.md` — loaded only in main session (in-app CPU window or Discord DM).  
+- **Main session:** `$HOME/.mac-stats/agents/memory-main.md` — loaded when the request is from the in-app CPU window (no Discord channel), so the main session has its own persistent memory like Discord channels.  
+- **Per-channel (Discord):** `$HOME/.mac-stats/agents/memory-discord-{channel_id}.md` — loaded when replying in that Discord channel or DM.
+
+**Purpose:** Inject lessons and context into the agent. Global memory is personal/long-term; main and per-channel memory keep context separate (in-app vs each Discord channel). Memory search (“From past sessions”) uses global + main when in-app, or global + channel when Discord.
+
+**See:** **docs/035_memory_and_topic_handling.md**.
+
+---
+
 ## See also
 
 - **docs/007_discord_agent.md** — SCHEDULE/REMOVE_SCHEDULE, user-info in context, maxSchedules.

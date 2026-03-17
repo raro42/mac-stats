@@ -573,6 +573,13 @@ impl Config {
         Self::agents_dir().join(format!("memory-discord-{}.md", channel_id))
     }
 
+    /// Path to main-session (in-app) memory: `$HOME/.mac-stats/agents/memory-main.md`
+    /// Loaded when the request is from the in-app CPU window (no Discord channel), so the main
+    /// session has its own persistent memory like Discord channels have memory-discord-{id}.md.
+    pub fn memory_file_path_for_main_session() -> PathBuf {
+        Self::agents_dir().join("memory-main.md")
+    }
+
     /// Path to Discord channel config: `$HOME/.mac-stats/discord_channels.json`
     pub fn discord_channels_path() -> PathBuf {
         if let Ok(home) = std::env::var("HOME") {

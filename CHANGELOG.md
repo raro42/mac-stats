@@ -83,6 +83,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **ellipse() edge case** — `logging::ellipse()` enforces `max_len >= sep_len + 1` so first_count/last_count never go negative for very small `max_len`.
 
+## [0.1.43] - 2026-03-18
+
+### Added
+- **Main-session memory (in-app)** — `~/.mac-stats/agents/memory-main.md` for the CPU window chat (no Discord channel). Loaded and searched like per-channel Discord memory so the main session has persistent context. `Config::memory_file_path_for_main_session()`; `load_main_session_memory_block()` and integration in `load_memory_block_for_request` and `search_memory_for_request` in `commands/ollama.rs`. Docs: 035 memory injection §, data_files_reference § "Memory files (agents)".
+
+### Changed
+- **Docs 005, 006, 022, 035, data_files_reference** — OpenClaw §41 re-verification (005); FEATURE-CODER backlog: per-channel memory in non-Discord contexts and new-topic/compaction items done (006); 022 testing note (2026-03-18); 035 main-session memory in memory injection §; data_files_reference new § "Memory files (agents)".
+
 ## [0.1.42] - 2026-03-17
 
 ### Added

@@ -84,7 +84,8 @@ The Coder currently edits this repo **in place** (yolo mode) via the mac-stats-a
 | docs/012_ollama_context_skills.md | ~~Improve FETCH_URL content reduction performance~~ | **Done:** fast path (byte heuristic), truncate-only when slightly over (no summarization), truncate_at_boundary for readability. |
 | docs/agent_workflow.md | ~~More robust patching system for Coder agent~~ | **Done:** design documented in this file (§ "Design: More robust patching system"). |
 | docs/035_memory_and_topic_handling.md | ~~Memory pruning docs~~ | **Done:** § "Memory pruning and compaction" in 035 (caps, on-request/periodic compaction, having_fun, performance, refs). |
-| docs/035_memory_and_topic_handling.md | Per-channel memory in non-Discord contexts; new-topic detection; compaction performance | Remaining 035 items; see 035. |
+| docs/035_memory_and_topic_handling.md | ~~Per-channel memory in non-Discord contexts~~ | **Done:** `memory-main.md` for in-app (main) session; loaded and searched when no Discord channel (config, ollama.rs, data_files_reference, 035). |
+| docs/035_memory_and_topic_handling.md | ~~New-topic detection; compaction performance~~ | **Done:** new-topic (NEW_TOPIC/SAME_TOPIC) and compaction (on-request, periodic, having_fun) already implemented and documented in 035. |
 | docs/022_feature_review_plan.md | ~~D2: TASK_CREATE duplicate — suggest new id in error message~~ | **Done:** error in task/mod.rs now says "or use a different id to create a new task"; D2 resolved (option c). |
 | docs/004_notes.md | ~~Alert evaluation needs to be called periodically (background task)~~ | **Done:** background thread in lib.rs every 60s; `run_periodic_alert_evaluation()` in commands/alerts.rs; `get_monitor_statuses_snapshot()` in commands/monitors.rs; 004 Known Issues updated. |
 

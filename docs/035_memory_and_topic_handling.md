@@ -61,9 +61,10 @@ git clone https://github.com/raro42/mac-stats.git && cd mac-stats && ./run
    - Phrases: "clear session", "new topic", "reset" (multi-language)  
    - Clears session for the channel; the next message gets a **Session Startup** instruction plus current date/time (UTC) so the agent reloads soul, user-info, daily memory (today/yesterday), and in main session MEMORY (see Session Startup in docs/019).  
 
-3. **Memory injection**  
-   - **Global memory:** `~/.mac-stats/agents/memory.md` — injected **only in main session** (in-app chat or Discord DM). Never loaded in Discord guild channels or having_fun, to avoid leaking personal context.  
-   - **Discord per-channel:** `memory-discord-{channel_id}.md` — injected for that channel when present.  
+3. **Memory injection**
+   - **Global memory:** `~/.mac-stats/agents/memory.md` — injected **only in main session** (in-app chat or Discord DM). Never loaded in Discord guild channels or having_fun, to avoid leaking personal context.
+   - **Main-session (in-app):** `~/.mac-stats/agents/memory-main.md` — injected when the request is from the CPU window (no Discord channel), so the main session has per-context memory like Discord channels.
+   - **Discord per-channel:** `memory-discord-{channel_id}.md` — injected for that channel when present.
 
 4. **New-topic detection (local only)**  
    - If 2+ prior messages: LLM check for "NEW_TOPIC" → no prior context  
