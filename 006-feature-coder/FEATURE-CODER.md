@@ -74,5 +74,6 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 | docs/agent_workflow.md | More robust patching system for Coder agent | Consider / design. |
 | docs/035_memory_and_topic_handling.md | ~~Memory pruning docs~~ | **Done:** § "Memory pruning and compaction" in 035 (caps, on-request/periodic compaction, having_fun, performance, refs). |
 | docs/035_memory_and_topic_handling.md | Per-channel memory in non-Discord contexts; new-topic detection; compaction performance | Remaining 035 items; see 035. |
+| docs/022_feature_review_plan.md | ~~D2: TASK_CREATE duplicate — suggest new id in error message~~ | **Done:** error in task/mod.rs now says "or use a different id to create a new task"; D2 resolved (option c). |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.

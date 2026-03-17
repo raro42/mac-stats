@@ -108,7 +108,7 @@ The diff on top of the last commit (844c4bc) contains **10 distinct features/imp
 **Review checklist:**
 - [ ] Verify slug generation is deterministic (same topic always gives same slug).
 - [ ] Verify the dedup check matches by `## Topic:` (as slug) and `## Id:` in file content.
-- [ ] Edge case: what if the existing task is `finished` or `unsuccessful`? Should creating a new task with the same topic+id be allowed? Currently it is not — decide if this is intentional.
+- [x] Edge case: existing task `finished`/`unsuccessful` — we block and suggest: error message says "or use a different id to create a new task" (D2 resolved, option c).
 - [ ] Verify the error message is informative enough for Ollama to switch to TASK_APPEND.
 
 ### F6: Prompt guidance for agent chats
@@ -213,7 +213,7 @@ The diff on top of the last commit (844c4bc) contains **10 distinct features/imp
 | # | Decision | Options |
 |---|----------|---------|
 | D1 | **Session file format change** — old files won't load after restart | (a) Add backward compat to also search old naming, (b) Accept break (users lose old session context), (c) Write migration |
-| D2 | **Finished task dedup** — should `TASK_CREATE` be allowed when an existing task with same topic+id is `finished`? | (a) Allow (re-create), (b) Block (current behaviour), (c) Block but suggest a new id |
+| D2 | **Finished task dedup** — should `TASK_CREATE` be allowed when an existing task with same topic+id is `finished`? | **RESOLVED (c):** Block and suggest: error message now says "Use TASK_APPEND or TASK_STATUS to update it, or use a different id to create a new task." (task/mod.rs) |
 | D3 | **`ellipse()` in FETCH_URL`** — changes truncation marker from `[truncated]` to `...` | (a) Keep `...` (cleaner), (b) Use `... [content truncated]` (clearer for LLM) |
 | D4 | **`run_due_monitor_checks` wiring** — is it called? | (a) Wire to background thread, (b) Remove if premature |
 | D5 | **Soul path naming** — `agent/` vs `agents/` was confusing | RESOLVED: consolidated to `~/.mac-stats/agents/soul.md` only |
@@ -271,7 +271,7 @@ See `CHANGELOG.md` (0.1.14) and `docs/023_externalized_prompts_DONE.md` for deta
 - **F1**: `get_messages()` is called in Discord before the current user message is added; ordering correct. `load_messages_from_latest_session_file()` uses prefix `session-memory-{id}-` — old format `session-memory-{topic}-{id}-{ts}` does not match (see D1).
 - **F2**: `rev().take(20).rev()` at `ollama.rs` 3502–3508 keeps last 20 messages in chronological order. History cap 20 is consistent (CONVERSATION_HISTORY_CAP and Discord HISTORY_CAP).
 - **F3/F4**: Soul path and router injection — not re-verified in this pass; doc says resolved.
-- **F5**: Dedup in `task/mod.rs` — slug and `## Topic:`/`## Id:` matching present; D2 (finished task) still open.
+- **F5**: Dedup in `task/mod.rs` — slug and `## Topic:`/`## Id:` matching present; D2 resolved (block + suggest new id in error message).
 - **F6**: Prompt guidance text present in agent descriptions.
 - **F7**: `ellipse()`: all call sites use `max_len` ≥ 20; edge case `max_len` < 3 could panic (first_count 0, last_count negative) — consider `max_len.max(SEP_LEN + 1)` for robustness.
 - **F8**: Reserved words `--cpu` and `-v`/`-vv`/`-vvv` in `ollama.js` return before `addToHistory()` — not added to conversation history.
@@ -435,6 +435,11 @@ See `CHANGELOG.md` (0.1.14) and `docs/023_externalized_prompts_DONE.md` for deta
 
 - **Integration:** `cargo check` and `cargo clippy` pass (44 warnings; no errors). `diff src/ollama.js src-tauri/dist/ollama.js` empty (in sync). `toggle_cpu_window`, `set_chat_verbosity` in `tauri::generate_handler![]` in `lib.rs` (L227, L236); `run_due_monitor_checks()` called from `lib.rs` (L371, background thread, 30s).
 - **Smoke:** `cargo build --release` succeeded (v0.1.42). `./target/release/mac_stats --cpu -vv` started in background; `pgrep -fl mac_stats` confirmed process (pid 61014); `~/.mac-stats/debug.log`: verbosity 2, 4 monitors loaded from disk, Discord token + gateway, Scheduler (2 entries) and task review thread spawned, Ollama configuration and connection successful, Discord bot connected (Werner_Amvara), CPU window created and shown; background monitor checks running (mix-online, prod.cometa, app-monitor, amvara UP). Manual checks (menu bar click, `--cpu`/`-vv` in chat) left to human.
+
+## Testing (2026-03-17) — closing reviewer “Start testing now. Do your job.” (agent run)
+
+- **Integration:** `cargo check` and `cargo clippy` pass (44 warnings; no errors). `diff src/ollama.js src-tauri/dist/ollama.js` empty (in sync). `toggle_cpu_window`, `set_chat_verbosity` in `tauri::generate_handler![]` in `lib.rs` (L227, L236); `run_due_monitor_checks()` in `lib.rs` (L371, background thread, 30s).
+- **Smoke:** `pkill -f mac_stats` then `./target/release/mac_stats --cpu -vv` started in background; `pgrep -fl mac_stats` confirmed process (pid 90211); `~/.mac-stats/debug.log`: Discord gateway, Task review thread, Scheduler (2 entries), agents with shared soul, Discord bot connected (Werner_Amvara), CPU window created and shown, Ollama configuration and connection successful, having_fun channels. Manual checks (menu bar click, `--cpu`/`-vv` in chat) left to human.
 
 ---
 

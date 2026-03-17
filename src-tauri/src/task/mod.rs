@@ -117,7 +117,7 @@ pub fn create_task(
     let id_safe = sanitize_id(id);
     if let Some(existing) = existing_task_with_topic_id(&topic_slug, &id_safe) {
         return Err(format!(
-            "A task with this topic and id already exists: {:?}. Use TASK_APPEND or TASK_STATUS to update it.",
+            "A task with this topic and id already exists: {:?}. Use TASK_APPEND or TASK_STATUS to update it, or use a different id to create a new task.",
             existing
         ));
     }
