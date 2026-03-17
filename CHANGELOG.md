@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Scheduler UI** — Settings → Schedules tab: list schedules (id, cron/at, task preview, next run); add recurring (cron) or one-shot (at datetime) with optional Discord reply channel; remove by id. Backend: `list_schedules`, `add_schedule`, `add_schedule_at`, `remove_schedule`; scheduler `list_schedules_for_ui`, `ScheduleForUi`. See `commands/scheduler.rs`, `src/dashboard.html`, `src/dashboard.js`; FEATURE-CODER backlog done.
 - **Dashboard Settings modal** — Settings modal (Monitors / Alert channels tabs): list monitors with name, URL, type via `list_monitors_with_details`; add website monitor (name, URL, timeout, interval, verify SSL); list and add alert channels (Telegram/Slack/Mastodon). Backend: `list_monitors_with_details`, `list_alert_channels`; `get_monitor_details` returns name and monitor_type from config. "Add monitor" opens Settings on Monitors tab. See `src/dashboard.html`, `src/dashboard.js`, `commands/monitors.rs`, `commands/alerts.rs`.
 
 ### Changed

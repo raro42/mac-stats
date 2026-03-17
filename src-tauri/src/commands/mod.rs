@@ -13,5 +13,6 @@ pub mod perplexity;
 pub mod plugins;
 pub mod python_agent;
 pub mod run_cmd;
+pub mod scheduler;
 pub mod security;
 pub mod window;

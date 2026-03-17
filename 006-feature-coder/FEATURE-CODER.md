@@ -66,7 +66,7 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 | Source | Task | Notes |
 |--------|------|--------|
 | docs/004_notes.md | ~~Improve settings UI for adding monitors and configuring alerts~~ | **Done:** Settings modal with Monitors (list + add form + remove) and Alert channels (list + add Telegram/Slack/Mastodon + remove); + button opens Settings → Monitors; list_monitors_with_details, list_alert_channels, get_monitor_details name from config. |
-| docs/009_scheduler_agent.md | Add scheduler UI for creating and editing schedules | Instead of manual schedules.json edits. |
+| docs/009_scheduler_agent.md | ~~Add scheduler UI for creating and editing schedules~~ | **Done:** Settings → Schedules tab: list, add (cron or one-shot), remove; Tauri commands `list_schedules`, `add_schedule`, `add_schedule_at`, `remove_schedule`; scheduler `list_schedules_for_ui`, `ScheduleForUi`. |
 | docs/009_scheduler_agent.md | Consider support for multiple API keys in scheduler-driven flows | Investigation / design. |
 | docs/012_ollama_context_skills.md | ~~Improve Ollama error handling in skill/context pipeline~~ | **Done:** when user requests a missing skill (e.g. `skill: 99`), Discord replies with "Skill \"X\" not found. Available: 1-summarize, 2-code." and returns early; parser returns `requested_skill_selector` so handler can detect not-found. |
 | docs/012_ollama_context_skills.md | ~~Improve FETCH_URL content reduction performance~~ | **Done:** fast path (byte heuristic), truncate-only when slightly over (no summarization), truncate_at_boundary for readability. |

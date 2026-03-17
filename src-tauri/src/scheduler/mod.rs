@@ -154,6 +154,83 @@ fn load_schedules() -> Vec<ScheduleEntry> {
     entries
 }
 
+/// UI-facing schedule entry (id, cron/at strings, task, optional reply channel, next run).
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ScheduleForUi {
+    pub id: Option<String>,
+    pub cron: Option<String>,
+    pub at: Option<String>,
+    pub task: String,
+    pub reply_to_channel_id: Option<String>,
+    pub next_run: Option<String>,
+}
+
+/// Compute next run time for a raw entry (for UI display). Returns None if one-shot already past or invalid.
+fn next_run_from_raw(raw: &ScheduleEntryRaw) -> Option<String> {
+    let now = Local::now();
+    if let Some(ref cron_str) = raw.cron {
+        if let Ok(schedule) = Schedule::from_str(cron_str) {
+            return schedule
+                .after(&now)
+                .next()
+                .map(|t| t.format("%Y-%m-%d %H:%M:%S").to_string());
+        }
+    }
+    if let Some(ref at_str) = raw.at {
+        let at_dt = chrono::DateTime::parse_from_rfc3339(at_str)
+            .map(|dt| dt.with_timezone(&Local))
+            .or_else(|_| {
+                chrono::NaiveDateTime::parse_from_str(at_str, "%Y-%m-%dT%H:%M:%S").map(|n| {
+                    Local
+                        .from_local_datetime(&n)
+                        .single()
+                        .unwrap_or(n.and_utc().with_timezone(&Local))
+                })
+            });
+        if let Ok(dt) = at_dt {
+            if dt > now {
+                return Some(dt.format("%Y-%m-%d %H:%M:%S").to_string());
+            }
+        }
+    }
+    None
+}
+
+/// List schedules with next-run for Settings UI.
+pub fn list_schedules_for_ui() -> Vec<ScheduleForUi> {
+    let _ = Config::ensure_schedules_directory();
+    let path = Config::schedules_file_path();
+
+    if !path.exists() {
+        return Vec::new();
+    }
+
+    let content = match std::fs::read_to_string(&path) {
+        Ok(c) => c,
+        Err(_) => return Vec::new(),
+    };
+
+    let file_data: SchedulesFile = match serde_json::from_str(&content) {
+        Ok(d) => d,
+        Err(_) => return Vec::new(),
+    };
+
+    file_data
+        .schedules
+        .into_iter()
+        .filter(|raw| !raw.task.is_empty())
+        .filter(|raw| raw.cron.is_some() != raw.at.is_some())
+        .map(|raw| ScheduleForUi {
+            next_run: next_run_from_raw(&raw),
+            id: raw.id,
+            cron: raw.cron,
+            at: raw.at,
+            task: raw.task,
+            reply_to_channel_id: raw.reply_to_channel_id,
+        })
+        .collect()
+}
+
 /// Returns a human-readable list of active schedules (id, cron/at, task preview, next run).
 /// Used when the user or agent asks to "list schedules".
 pub fn list_schedules_formatted() -> String {

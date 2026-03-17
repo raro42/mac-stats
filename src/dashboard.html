@@ -106,6 +106,7 @@
           <div class="settings-tabs">
             <button type="button" class="settings-tab active" data-tab="monitors">Monitors</button>
             <button type="button" class="settings-tab" data-tab="alerts">Alert channels</button>
+            <button type="button" class="settings-tab" data-tab="schedules">Schedules</button>
           </div>
 
           <section class="settings-panel active" id="settings-monitors">
@@ -163,6 +164,39 @@
                 <input type="url" id="alert-mastodon-instance" placeholder="https://mastodon.social" />
               </div>
               <button type="button" class="btn-primary" id="settings-add-alert-btn">Add channel</button>
+            </div>
+          </section>
+
+          <section class="settings-panel" id="settings-schedules">
+            <h4>Scheduled tasks</h4>
+            <p class="settings-hint">Recurring (cron) or one-shot tasks run by the scheduler. Times are local.</p>
+            <div class="settings-list" id="settings-schedules-list"></div>
+            <div class="settings-form">
+              <h5>Add schedule</h5>
+              <div class="form-row">
+                <label for="schedule-type">Type</label>
+                <select id="schedule-type">
+                  <option value="cron">Recurring (cron)</option>
+                  <option value="at">One-shot (at datetime)</option>
+                </select>
+              </div>
+              <div class="form-row" id="schedule-row-cron">
+                <label for="schedule-cron">Cron (6 fields: sec min hour day month dow)</label>
+                <input type="text" id="schedule-cron" placeholder="0 0 9 * * *" />
+              </div>
+              <div class="form-row" id="schedule-row-at" style="display: none;">
+                <label for="schedule-at">Date & time (local)</label>
+                <input type="text" id="schedule-at" placeholder="2025-03-17T09:00:00" />
+              </div>
+              <div class="form-row">
+                <label for="schedule-task">Task</label>
+                <input type="text" id="schedule-task" placeholder="e.g. Check weather and summarize" />
+              </div>
+              <div class="form-row">
+                <label for="schedule-reply-channel">Reply to Discord channel ID (optional)</label>
+                <input type="text" id="schedule-reply-channel" placeholder="Leave empty unless posting to Discord" />
+              </div>
+              <button type="button" class="btn-primary" id="settings-add-schedule-btn">Add schedule</button>
             </div>
           </section>
         </div>

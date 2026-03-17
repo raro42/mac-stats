@@ -227,6 +227,11 @@ fn run_internal(open_cpu_window: bool) {
             commands::logging::set_chat_verbosity,
             commands::logging::get_debug_log_path,
             commands::logging::open_debug_log,
+            // Scheduler UI commands
+            commands::scheduler::list_schedules,
+            commands::scheduler::add_schedule,
+            commands::scheduler::add_schedule_at,
+            commands::scheduler::remove_schedule,
             // Window commands (e.g. from chat reserved words)
             commands::window::toggle_cpu_window,
             // Agent commands

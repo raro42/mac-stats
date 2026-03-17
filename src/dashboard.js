@@ -299,7 +299,9 @@ function showSettingsDialog(openTab) {
     switchSettingsTab(tab);
     loadSettingsMonitors();
     loadSettingsAlertChannels();
+    loadSettingsSchedules();
     setupAlertChannelTypeVisibility();
+    setupScheduleTypeVisibility();
 }
 
 function hideSettingsDialog() {
@@ -371,7 +373,96 @@ function setupSettingsModalListeners() {
     });
     document.getElementById('settings-add-monitor-btn').addEventListener('click', addMonitorFromSettings);
     document.getElementById('settings-add-alert-btn').addEventListener('click', addAlertChannelFromSettings);
+    document.getElementById('settings-add-schedule-btn').addEventListener('click', addScheduleFromSettings);
     document.getElementById('alert-channel-type').addEventListener('change', setupAlertChannelTypeVisibility);
+    document.getElementById('schedule-type').addEventListener('change', setupScheduleTypeVisibility);
+}
+
+function setupScheduleTypeVisibility() {
+    const type = document.getElementById('schedule-type').value;
+    document.getElementById('schedule-row-cron').style.display = type === 'cron' ? 'block' : 'none';
+    document.getElementById('schedule-row-at').style.display = type === 'at' ? 'block' : 'none';
+}
+
+async function loadSettingsSchedules() {
+    const listEl = document.getElementById('settings-schedules-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    try {
+        const schedules = await invoke('list_schedules');
+        if (schedules.length === 0) {
+            listEl.innerHTML = '<p class="settings-empty">No schedules. Add one below.</p>';
+            return;
+        }
+        for (const s of schedules) {
+            const id = s.id || '(no id)';
+            const when = s.cron ? `cron: ${s.cron}` : (s.at ? `at: ${s.at}` : '—');
+            const next = s.next_run ? `Next: ${s.next_run}` : '';
+            const item = document.createElement('div');
+            item.className = 'settings-list-item';
+            item.innerHTML = `
+                <div>
+                    <span class="label">${escapeHtml(id)}</span>
+                    <div class="sublabel">${escapeHtml(when)} ${escapeHtml(next)}</div>
+                    <div class="sublabel">${escapeHtml(s.task.slice(0, 60))}${s.task.length > 60 ? '…' : ''}</div>
+                </div>
+                <button type="button" class="btn-remove" data-schedule-id="${escapeHtml(id)}">Remove</button>
+            `;
+            item.querySelector('.btn-remove').addEventListener('click', () => removeScheduleFromSettings(id));
+            listEl.appendChild(item);
+        }
+    } catch (err) {
+        listEl.innerHTML = `<p class="settings-error">Failed to load: ${escapeHtml(String(err))}</p>`;
+    }
+}
+
+async function removeScheduleFromSettings(scheduleId) {
+    try {
+        await invoke('remove_schedule', { scheduleId });
+        loadSettingsSchedules();
+    } catch (err) {
+        alert(`Failed to remove schedule: ${err}`);
+    }
+}
+
+async function addScheduleFromSettings() {
+    const type = document.getElementById('schedule-type').value;
+    const task = document.getElementById('schedule-task').value.trim();
+    if (!task) {
+        alert('Please enter a task.');
+        return;
+    }
+    const replyToChannelId = document.getElementById('schedule-reply-channel').value.trim() || null;
+    try {
+        if (type === 'cron') {
+            const cron = document.getElementById('schedule-cron').value.trim();
+            if (!cron) {
+                alert('Please enter a cron expression (e.g. 0 0 9 * * * for daily at 09:00).');
+                return;
+            }
+            const result = await invoke('add_schedule', { cron, task, replyToChannelId });
+            if (result.status === 'AlreadyExists') {
+                alert('A schedule with the same cron and task already exists.');
+                return;
+            }
+        } else {
+            const at = document.getElementById('schedule-at').value.trim();
+            if (!at) {
+                alert('Please enter date and time (e.g. 2025-03-17T09:00:00).');
+                return;
+            }
+            const result = await invoke('add_schedule_at', { at, task, replyToChannelId });
+            if (result.status === 'AlreadyExists') {
+                alert('A one-shot schedule with the same time and task already exists.');
+                return;
+            }
+        }
+        document.getElementById('schedule-task').value = '';
+        document.getElementById('schedule-reply-channel').value = '';
+        loadSettingsSchedules();
+    } catch (err) {
+        alert(`Failed to add schedule: ${err}`);
+    }
 }
 
 function setupAlertChannelTypeVisibility() {
