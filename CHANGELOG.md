@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Docs backlog centralization** — OpenClaw §30 re-verification (005); FEATURE-CODER backlog: active open tasks centralized in 006-feature-coder/FEATURE-CODER.md; 007, 008, 012, 022, 029, 002, 035, agent_workflow, docs/README now point to it; 022 testing note 2026-03-17 (closing reviewer).
 - **Docs 005, 022** — OpenClaw §29 re-verification (005); 022 testing note (2026-03-17, closing reviewer).
 - **Docs 004, 005, 006, 009, 022** — OpenClaw §28 re-verification (005); FEATURE-CODER "Remaining open" table (006); open tasks in 004 and 009 consolidated to FEATURE-CODER; 022 testing note (2026-03-17).
 - **Docs 004, 005, 006, 022** — Known Issues §2 Alert System: channel registration items marked done (004); FEATURE-CODER backlog row for sync (006). OpenClaw §27 re-verification (005); 022 closing testing note (2026-03-16).

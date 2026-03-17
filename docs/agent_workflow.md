@@ -79,7 +79,6 @@ For the Coder to edit files in this repo directly:
 2. That workspace includes both **mac-stats** and **mac-stats-reviewer**, so the Coder can edit files here in place.
 3. Do **not** produce patches or ask for permission; edit files directly.
 
-## Open tasks:
-- ~~Improve the documentation for tool agents and their invocations.~~ **Done:** added "How invocations work", full tool table with invocation syntax, and See also links (007, README, 100_all_agents).
-- Consider implementing a more robust patching system for the Coder agent.
-- ~~Review the Brave Search API usage and ensure it complies with the Brave API key requirements.~~ **Done:** compliance documented in docs/008_brave_agent.md (§ API compliance); empty-query guard and error handling documented and implemented in commands/brave.rs.
+## Open tasks
+
+Tool-agent and Coder open tasks (e.g. more robust patching system) are tracked in **006-feature-coder/FEATURE-CODER.md**.

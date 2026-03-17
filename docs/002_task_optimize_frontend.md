@@ -101,8 +101,6 @@ This achieves the goal of "minimizing CPU usage to the absolute max" while maint
 
 **Answer: No.** The frontend does not call `fetch_page_content` directly. It invokes the Tauri command **`fetch_page`** (`commands/browser.rs`). That command is `async` and runs the synchronous `fetch_page_content` inside `tokio::task::spawn_blocking(...)`, so the blocking HTTP work runs on a thread-pool task, not on the main (UI) thread. Other callers (Ollama FETCH_URL flow, scheduler, browser_agent) run in background threads or async contexts, not on the main thread. No change required for frontend-triggered paths.
 
-### Open tasks:
+### Open tasks
 
-- ~~Verify whether `fetch_page_content` blocks the main thread in any frontend-triggered path.~~ **Done:** frontend uses `fetch_page` Tauri command with `spawn_blocking`; see § above.
-- ~~Improve the theme switching animation if it can be done without increasing CPU usage.~~ **Done:** 200ms fade-out on body before navigation in `cpu-ui.js` (injected style, transitionend + 250ms fallback); no extra ongoing CPU.
-- ~~Further optimize process list DOM updates.~~ **Done:** `cpu.js` process list now uses `replaceChildren()` instead of `innerHTML = ""`, a single click listener on the list (event delegation) instead of per-row listeners, and skips DOM update when the process list data is unchanged (`lastProcessListKey`).
+Frontend-optimization open tasks are tracked in **006-feature-coder/FEATURE-CODER.md**.

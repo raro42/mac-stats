@@ -268,14 +268,6 @@ To run a single agent with prompts from its `testing.md` (no Discord, no router)
 
 Example: `./target/release/mac_stats agent test redmine` runs the Redmine agent’s test prompts from `~/.mac-stats/agents/agent-006-redmine/testing.md`. Each prompt is limited by a **per-prompt timeout** (default 45s); if the model doesn’t respond in time, the run fails with a clear message instead of hanging. Override: env `MAC_STATS_AGENT_TEST_TIMEOUT_SECS` or config.json `agentTestTimeoutSecs` (5–300). Useful as a regression check after changes to agents or Ollama integration.
 
-## Open tasks:
+## Open tasks
 
-- ~~Improve the documentation for `~/.mac-stats/schedules.json` and `~/.mac-stats/user-info.json`.~~ **Done:** see **docs/data_files_reference.md**.
-- ~~Look into using a more robust caching mechanism for `~/.mac-stats/user-info.json`.~~ **Done:** in-memory cache with file mtime invalidation in `user_info/mod.rs`; reads use cache when file unchanged, writes refresh cache so next read sees new data; external edits to the file are detected and trigger reload.
-- ~~Investigate the possibility of using a more efficient data structure for `~/.mac-stats/schedules.json`.~~ **Done:** documented in **docs/data_files_reference.md** (§ schedules.json → "Data structure and performance"): array kept for simplicity and compatibility; O(n) acceptable for typical N; options for future O(1) by id noted.
-- ~~Improve the error handling for cases where the Discord API is unavailable.~~ **Done:** connection/timeout errors return a short user-facing message ("Discord API is temporarily unavailable (connection or timeout). Try again in a moment."); one retry after 2s on connection/timeout or 5xx in `discord_api_request`; `send_message_to_channel` and multipart send use the same message for request failures. See `discord/api.rs` and `discord/mod.rs`.
-- ~~Investigate the possibility of using a more secure method for storing the Discord bot token.~~ **Done:** Keychain is the recommended secure method; §11 documents it (Keychain via Settings for production; env/.config.env for dev/CI).
-- ~~Consider adding a feature to allow users to view the logs for the Discord bot.~~ **Done:** Settings → Discord bot section has a **View logs** button that opens `~/.mac-stats/debug.log` in the default app (macOS). Commands: `get_debug_log_path`, `open_debug_log`.
-- ~~Improve the documentation for the `test_discord_connect` binary.~~ **Done:** §12 expanded with token resolution, env file format (DISCORD-USER1/USER2-TOKEN), behavior, and failure message.
-- ~~Investigate the possibility of using a more efficient method for testing the Discord connection.~~ **Done:** `--quick` / `-q` flag runs for 2 seconds (enough to confirm "Bot connected"); see §12.
-- ~~Consider adding a feature to allow users to customize the behavior of the `test_discord_connect` binary.~~ **Done:** run duration is configurable via env `TEST_DISCORD_CONNECT_SECS` (1–300) or CLI (second arg, or single numeric arg for default path + duration). See §12.
+Discord-related open tasks and completed items are tracked in **006-feature-coder/FEATURE-CODER.md** (table “Remaining open” and “Current FEAT backlog”).

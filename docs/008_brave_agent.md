@@ -132,7 +132,6 @@ The Brave Search API uses a 1-second sliding window and returns rate limit info 
 *   **Key resolution**: `get_brave_api_key()` — env, then `.config.env` (cwd, then `~/.mac-stats/.config.env`).
 *   **Search**: `brave_web_search(query, api_key)` — trims query, rejects empty; async HTTP request, parses `web.results` (title, url, description), returns formatted text for Ollama.
 
-## Open tasks:
+## Open tasks
 
-*   ~~Improve the Brave Search API documentation for better user experience.~~ **Done:** API compliance subsection and error-handling/edge-cases subsection added above.
-*   ~~Review Brave-search-specific error handling and edge cases.~~ **Done:** documented in “Error handling and edge cases” and implemented (empty-query guard in `brave_web_search`).
+Brave Search open tasks are tracked in **006-feature-coder/FEATURE-CODER.md**.

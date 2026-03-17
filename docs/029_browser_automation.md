@@ -148,6 +148,6 @@ If BROWSER_* tools fail with "Chrome isn't running on port 9222" or launch error
 
 If the problem persists, check `~/.mac-stats/debug.log` for lines like `Browser agent [CDP]: ...` or `Launch Chrome: ...` to see the exact error.
 
-## Open tasks:
-- ~~Investigate why some users are unable to launch Chrome on port 9222.~~ **Done:** added § "Troubleshooting: Chrome won't start or connect on 9222" above (default path, port in use, spawn failures, connection timing, firewall, headless fallback, debug log).
-- ~~Improve the documentation for BROWSER_* tools to better explain the connection process.~~ **Done:** added § "Connection process (step-by-step)" above (session lookup, port check, connect/launch, session clear on error, idle timeout).
+## Open tasks
+
+Browser-automation open tasks are tracked in **006-feature-coder/FEATURE-CODER.md**.

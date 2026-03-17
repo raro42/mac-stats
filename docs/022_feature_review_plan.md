@@ -396,8 +396,13 @@ See `CHANGELOG.md` (0.1.14) and `docs/023_externalized_prompts_DONE.md` for deta
 - **Integration:** `cargo check` and `cargo clippy` pass (43 warnings; no errors). `diff src/ollama.js src-tauri/dist/ollama.js` empty (in sync). `toggle_cpu_window`, `set_chat_verbosity` in `tauri::generate_handler![]` in `lib.rs` (L225, L229); `run_due_monitor_checks()` called from `lib.rs` (L364, background thread, 30s).
 - **Smoke:** `cargo build --release` succeeded (v0.1.41). `./target/release/mac_stats --cpu -vv` started via nohup; `pgrep -fl mac_stats` confirmed process; `~/.mac-stats/debug.log`: verbosity 2, 4 monitors loaded from disk, Discord token + gateway, Scheduler thread spawned (2 entries), Task review thread spawned, Ollama configuration successful + connection successful, 8 agents loaded with shared soul present, Discord bot connected (Werner_Amvara), CPU window created and shown. Manual checks (menu bar click, `--cpu`/`-vv` in chat) left to human.
 
+## Testing (2026-03-17) — closing reviewer "Start testing now. Do your job." (agent run)
+
+- **Integration:** `cargo check` and `cargo clippy` pass (43 warnings; no errors). `diff src/ollama.js src-tauri/dist/ollama.js` empty (in sync). `toggle_cpu_window`, `set_chat_verbosity` in `tauri::generate_handler![]` in `lib.rs` (L225, L229); `run_due_monitor_checks()` called from `lib.rs` (L364, background thread, 30s).
+- **Smoke:** `cargo build --release` succeeded (v0.1.41). `./target/release/mac_stats --cpu -vv` started in background; `pgrep -fl mac_stats` confirmed process; `~/.mac-stats/debug.log`: verbosity 2, 4 monitors loaded from disk, status bar setup, Discord token + gateway, Scheduler (2 entries) and task review thread, Ollama configuration successful + connection successful, agents with shared soul present, CPU window created successfully. Manual checks (menu bar click, `--cpu`/`-vv` in chat) left to human.
+
 ---
 
-## Open tasks:
+## Open tasks
 
-- ~~Review `docs/023_externalized_prompts_DONE.md` and merge any missing details back into this plan if needed.~~ **Done:** §8 now includes a short "Externalized prompts (F11) — summary from 023" (files, placeholder, defaults, assembly order, Tauri commands, editing notes); 023 remains the full reference.
+Open tasks for this plan are tracked in **006-feature-coder/FEATURE-CODER.md**.

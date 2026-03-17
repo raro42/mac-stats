@@ -89,11 +89,8 @@ git clone https://github.com/raro42/mac-stats.git && cd mac-stats && ./run
 
 ---
 
-## Open tasks:  
-- [ ] Implement per-channel memory in non-Discord contexts  
-- [ ] Add explicit "new topic" detection for non-local models  
-- [ ] Clarify memory pruning logic in documentation  
-- [ ] Expand multi-language support for reset phrases  
-- [ ] Optimize compaction performance for large histories  
+## Open tasks
+
+Memory/topic open tasks (per-channel memory, new-topic detection, pruning docs, multi-language reset, compaction) are tracked in **006-feature-coder/FEATURE-CODER.md**.
 
 *Sibling repos: OpenClaw = `../openclaw`, Hermes = `../hermes-agent`*

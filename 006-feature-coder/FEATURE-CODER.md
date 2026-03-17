@@ -58,6 +58,7 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 | docs/007_discord_agent.md | ~~More secure method for storing Discord bot token~~ | **Done:** Keychain already used; §11 "Secure token storage (recommended)" added (Keychain via Settings for production; env/.config.env for dev/CI). Open task marked done. |
 | docs/004_notes.md | ~~Add commands for registering Telegram/Slack/Mastodon channels~~ | **Done:** `register_telegram_channel`, `register_slack_channel`, `register_mastodon_channel`, `remove_alert_channel` in `commands/alerts.rs`; AlertManager `remove_channel` in `alerts/mod.rs`. |
 | docs/004_notes.md | ~~Sync Known Issues with Open tasks (alert channel registration)~~ | **Done:** Known Issues §2 Alert System updated: channel registration items marked done to match Open tasks. |
+| docs/README.md | ~~Trim other docs so active backlog lives here~~ | **Done:** 007, 022, 029, 002, agent_workflow, 008, 012, 035 now point to this file; README Cross-Cutting updated. |
 
 ### Remaining open (pick next FEAT here)
 
@@ -71,6 +72,5 @@ This folder and doc define how to pick and implement **FEAT** (feature) tasks in
 | docs/012_ollama_context_skills.md | Improve FETCH_URL content reduction performance | reduce_fetched_content_to_fit / trimming. |
 | docs/agent_workflow.md | More robust patching system for Coder agent | Consider / design. |
 | docs/035_memory_and_topic_handling.md | Per-channel memory in non-Discord contexts; new-topic detection; memory pruning docs; multi-language reset phrases; compaction performance | Several items; see 035. |
-| docs/README.md | Trim other docs so active backlog lives here | Point Open tasks in other docs to this file. **Done for:** 004_notes.md, 009_scheduler_agent.md. |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.

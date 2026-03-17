@@ -92,7 +92,6 @@ This document describes how mac-stats uses **per-model context window size**, **
 - **Ollama API (list, version, pull, delete, embeddings, load/unload):** `docs/015_ollama_api.md`
 - **Code:** `src-tauri/src/ollama/mod.rs` (ModelInfo, ChatOptions, get_model_info), `src-tauri/src/commands/ollama.rs` (answer_with_ollama_and_fetch, reduce_fetched_content_to_fit, send_ollama_chat_messages), `src-tauri/src/discord/mod.rs` (parse_discord_ollama_overrides), `src-tauri/src/skills.rs` (load_skills, find_skill_by_number_or_topic), `src-tauri/src/config/mod.rs` (skills_dir).
 
-## Open tasks:
+## Open tasks
 
-- Improve Ollama error handling in the skill/context pipeline.
-- Improve `FETCH_URL` content reduction performance.
+Ollama/skills open tasks (error handling, FETCH_URL content reduction) are tracked in **006-feature-coder/FEATURE-CODER.md**.
