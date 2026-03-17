@@ -2,6 +2,7 @@
 
 use crate::alerts::channels::{MastodonChannel, SlackChannel, TelegramChannel};
 use crate::alerts::{Alert, AlertContext, AlertManager};
+use std::collections::HashMap;
 use std::sync::Mutex;
 use std::sync::OnceLock;
 
@@ -93,4 +94,50 @@ pub fn list_alert_channels() -> Result<Vec<String>, String> {
         .lock()
         .map_err(|e| e.to_string())?
         .list_channel_ids())
+}
+
+/// Run alert evaluation in the background. Builds context from current metrics and monitor
+/// statuses, then evaluates all alerts. Called periodically from a background thread so
+/// SiteDown, BatteryLow, TemperatureHigh, CpuHigh etc. can fire without user action.
+pub fn run_periodic_alert_evaluation() {
+    use tracing::debug;
+
+    // Build context data without holding the alert manager lock (metrics can be slow)
+    let system_metrics = Some(crate::metrics::get_metrics());
+    let cpu_details = Some(crate::metrics::get_cpu_details());
+    let monitor_snapshot = crate::commands::monitors::get_monitor_statuses_snapshot();
+
+    let mut manager = match get_alert_manager().try_lock() {
+        Ok(m) => m,
+        Err(_) => {
+            debug!("Alert: skip periodic evaluation (lock busy)");
+            return;
+        }
+    };
+
+    // System-only context for BatteryLow, TemperatureHigh, CpuHigh
+    let ctx_system = AlertContext {
+        monitor_id: None,
+        monitor_status: None,
+        system_metrics: system_metrics.clone(),
+        cpu_details: cpu_details.clone(),
+        custom_data: HashMap::new(),
+    };
+    if let Err(e) = manager.evaluate(ctx_system) {
+        debug!("Alert: periodic system evaluation failed: {}", e);
+    }
+
+    // Per-monitor context for SiteDown and similar rules
+    for (monitor_id, status) in monitor_snapshot {
+        let ctx = AlertContext {
+            monitor_id: Some(monitor_id.clone()),
+            monitor_status: Some(status),
+            system_metrics: system_metrics.clone(),
+            cpu_details: cpu_details.clone(),
+            custom_data: HashMap::new(),
+        };
+        if let Err(e) = manager.evaluate(ctx) {
+            debug!("Alert: periodic evaluation failed for monitor {}: {}", monitor_id, e);
+        }
+    }
 }

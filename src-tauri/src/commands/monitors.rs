@@ -305,6 +305,25 @@ pub fn run_due_monitor_checks() {
     }
 }
 
+/// Snapshot of (monitor_id, status) for each monitor that has a last_status.
+/// Used by periodic alert evaluation to run SiteDown and similar rules per monitor.
+pub fn get_monitor_statuses_snapshot(
+) -> Vec<(String, crate::monitors::MonitorStatus)> {
+    let stats = match get_monitor_stats().try_lock() {
+        Ok(s) => s,
+        Err(_) => return Vec::new(),
+    };
+    stats
+        .iter()
+        .filter_map(|(id, s)| {
+            s.last_status
+                .as_ref()
+                .cloned()
+                .map(|status| (id.clone(), status))
+        })
+        .collect()
+}
+
 /// Add a website monitor
 #[tauri::command]
 pub fn add_website_monitor(request: AddWebsiteMonitorRequest) -> Result<Monitor, String> {

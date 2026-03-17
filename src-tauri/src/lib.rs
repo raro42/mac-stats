@@ -372,6 +372,16 @@ fn run_internal(open_cpu_window: bool) {
                 }
             });
 
+            // Run alert evaluation periodically so SiteDown, BatteryLow, TemperatureHigh, CpuHigh
+            // etc. can fire without user action. Wakes every 60s and evaluates all alerts against
+            // current metrics and monitor statuses.
+            std::thread::spawn(|| {
+                loop {
+                    std::thread::sleep(std::time::Duration::from_secs(60));
+                    commands::alerts::run_periodic_alert_evaluation();
+                }
+            });
+
             // For automatic updates, we'll use a simple approach:
             // The background update loop stores updates in MENU_BAR_TEXT
             // We'll process them in the click handler (which works)

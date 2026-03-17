@@ -95,7 +95,7 @@ Whenever Ollama is asked to decide which agent to use, the app sends the complet
 2. **Alert System**
 	* ~~Alert channel registration not exposed via Tauri commands~~ **Done:** see Open tasks (register_telegram_channel, register_slack_channel, register_mastodon_channel, remove_alert_channel in `commands/alerts.rs`).
 	* ~~Need to add commands for registering Telegram/Slack/Mastodon channels~~ **Done:** see Open tasks.
-	* Alert evaluation needs to be called periodically (background task)
+	* ~~Alert evaluation needs to be called periodically (background task)~~ **Done:** background thread in `lib.rs` runs every 60s; `run_periodic_alert_evaluation()` in `commands/alerts.rs` builds context from metrics and monitor statuses and evaluates all alerts (SiteDown, BatteryLow, TemperatureHigh, CpuHigh). See `commands/monitors.rs` `get_monitor_statuses_snapshot()`.
 3. **Ollama Integration**
 	* ~~Stream support not implemented~~ **Done:** streaming in `send_ollama_chat_messages_streaming` (NDJSON chunks), `ollama-chat-chunk` events, frontend appends to assistant message when `window.__TAURI__.event.listen` is available; `stream: true` default in `OllamaChatWithExecutionRequest`.
 4. **UI Implementation**
@@ -106,5 +106,5 @@ Whenever Ollama is asked to decide which agent to use, the app sends the complet
 Open tasks for plugins, alerts, Ollama, and UI are tracked in **006-feature-coder/FEATURE-CODER.md** (table “Remaining open”). Completed items:
 
 - **Plugin system:** timeout handling (std thread + `mpsc::recv_timeout` + kill on timeout in `plugins/mod.rs`); improved plugin script error messages (plugin_id, script path, stdout snippet, exit code, stderr).
-- **Alert system:** Tauri commands for registering Telegram/Slack/Mastodon channels and removing alert channels (`commands/alerts.rs`).
+- **Alert system:** Tauri commands for registering Telegram/Slack/Mastodon channels and removing alert channels (`commands/alerts.rs`); periodic alert evaluation in background thread every 60s (`run_periodic_alert_evaluation`, `get_monitor_statuses_snapshot`).
 - **Ollama:** Stream support for chat: backend `send_ollama_chat_messages_streaming`, `ollama-chat-chunk` events; frontend listens and appends to assistant message when Tauri event API is available.
