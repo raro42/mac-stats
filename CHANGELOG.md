@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Docs 005, 006, 022** — OpenClaw §40 re-verification (005); FEATURE-CODER: design § "More robust patching system (Coder agent)" (dry-run, atomic apply, patch files, audit trail; current choice in-place), backlog row done (006); 022 testing note (2026-03-17 closing reviewer).
 - **Docs 005, 006, 009, 022** — OpenClaw §39 re-verification (005); FEATURE-CODER backlog: scheduler multiple API keys design done (006); 009 new § "Multiple API keys / endpoints (design)" (current behaviour, options; no code); 022 testing note (2026-03-17 closing reviewer).
 
 ### Added
