@@ -21,6 +21,7 @@ pub mod agents;
 mod alerts;
 pub mod browser_agent;
 mod commands;
+mod search_result_shaping;
 pub mod config;
 pub mod discord;
 mod ffi;

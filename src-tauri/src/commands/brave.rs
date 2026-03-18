@@ -158,29 +158,61 @@ pub async fn brave_web_search(query: &str, api_key: &str) -> Result<String, Stri
         .and_then(|r| r.as_array())
         .ok_or_else(|| "Brave API: no web.results in response".to_string())?;
 
-    let mut lines = Vec::with_capacity(results.len().min(10));
-    for (i, r) in results.iter().take(10).enumerate() {
-        let title = r
-            .get("title")
-            .and_then(|t| t.as_str())
-            .unwrap_or("(no title)");
-        let url = r.get("url").and_then(|u| u.as_str()).unwrap_or("");
-        let desc = r.get("description").and_then(|d| d.as_str()).unwrap_or("");
-        lines.push(format!("{}. {} | {}\n   {}", i + 1, title, url, desc));
-    }
-    let text = if lines.is_empty() {
+    let shapable: Vec<crate::search_result_shaping::ShapableSearchResult> = results
+        .iter()
+        .map(|r| {
+            let title = r
+                .get("title")
+                .and_then(|t| t.as_str())
+                .unwrap_or("(no title)")
+                .to_string();
+            let url = r.get("url").and_then(|u| u.as_str()).unwrap_or("").to_string();
+            let snippet = r
+                .get("description")
+                .and_then(|d| d.as_str())
+                .unwrap_or("")
+                .to_string();
+            let date = r.get("age").and_then(|a| a.as_str()).map(String::from);
+            crate::search_result_shaping::ShapableSearchResult {
+                title,
+                url,
+                snippet,
+                date,
+            }
+        })
+        .collect();
+
+    const SNIPPET_MAX_CHARS: usize = 280;
+    const MAX_RESULTS: usize = 10;
+    const MAX_PER_DOMAIN: usize = 2;
+    const MAX_BLOB_CHARS: usize = 12_000;
+
+    let shaped = crate::search_result_shaping::shape_search_results(
+        shapable,
+        SNIPPET_MAX_CHARS,
+        MAX_RESULTS,
+        MAX_PER_DOMAIN,
+    );
+
+    let heading = format!(
+        "Brave Search results for \"{}\" ({} items). Use these to answer the user's question. Cite source number, title or URL, and date when given.",
+        query,
+        shaped.len()
+    );
+    let text = if shaped.is_empty() {
         "No web results found.".to_string()
     } else {
-        format!(
-            "Brave Search results for \"{}\":\n\n{}",
-            query,
-            lines.join("\n\n")
+        crate::search_result_shaping::format_search_results_blob(
+            &shaped,
+            &heading,
+            MAX_BLOB_CHARS,
         )
     };
     info!(
-        "Brave agent: got {} results for \"{}\"",
+        "Brave agent: got {} results for \"{}\" (shaped to {})",
         results.len(),
-        query
+        query,
+        shaped.len()
     );
     Ok(text)
 }
