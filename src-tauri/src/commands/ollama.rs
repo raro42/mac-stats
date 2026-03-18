@@ -6611,7 +6611,18 @@ pub fn answer_with_ollama_and_fetch(
                             }
                         }
                     }
-                    _ => continue,
+                    _ => {
+                        let msg = format!(
+                            "Unknown tool \"{}\". Use one of the available tools from the agent list (e.g. FETCH_URL, BRAVE_SEARCH, BROWSER_NAVIGATE, DONE) or reply with your answer.",
+                            tool
+                        );
+                        tracing::warn!(
+                            "Agent router: unknown tool \"{}\" (arg: {} chars), sending hint to model",
+                            tool,
+                            arg.chars().count()
+                        );
+                        msg
+                    }
                 };
 
                 let result_len = user_message.chars().count();
