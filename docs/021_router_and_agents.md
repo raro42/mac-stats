@@ -107,6 +107,16 @@ User (e.g. Discord)
 
 **Limitation**: Specialists cannot call FETCH_URL, TASK_*, SCHEDULE, or another AGENT. If the task requires tools or multi-step work, the orchestrator must run the tool (or another agent) and use the result in the main conversation.
 
+## Agent initialization and model resolution
+
+Agents are **loaded from disk on each use** (`agents::load_agents()`): no in-memory cache of the list. Each call reads `~/.mac-stats/agents/`, discovers `agent-<id>` directories, and for each loads `agent.json` and `skill.md` (required), plus optional `soul.md`, `mood.md`, and memory files. Default agents are written by `Config::ensure_defaults()` at startup (agent.json only if missing; skill/testing overwritten from bundle).
+
+**Model resolution** runs when a **ModelCatalog** is available. The catalog is built at startup by `ensure_ollama_agent_ready_at_startup()` (async): it fetches Ollama `/api/tags`, classifies models (general, code, small, vision, etc.), and caches the catalog. When `load_agents()` runs, it calls `resolve_agent_models(agents, catalog)` if the catalog is set; that resolves each agent’s `model_role` (e.g. `"general"`, `"code"`) to an actual model name. If the catalog is **not** set yet (e.g. Ollama still starting or first request before startup task completed), model resolution is skipped and agents with only `model_role` (no explicit `model`) keep `model = None` until the next load after the catalog is ready. The app logs: `Agents: model catalog not yet available, model_role resolution skipped (Ollama may still be starting)` when this happens.
+
+**Startup order**: `ensure_defaults()` runs synchronously; then `ensure_ollama_agent_ready_at_startup()` is spawned (async). So the first few requests (e.g. Discord or CPU window) might call `load_agents()` before the catalog exists. In practice the startup task usually completes within seconds. If Ollama is down or slow, agents may temporarily have no resolved model; once the catalog is set, every subsequent `load_agents()` will resolve correctly.
+
+**Failure modes** that prevent an agent from loading (and are logged): missing or unreadable `agent.json`, invalid JSON in `agent.json`, missing or empty `skill.md`. Disabled agents (`enabled: false`) are skipped with a debug log.
+
 ## References
 
 - **Tool loop**: `commands/ollama.rs` → `answer_with_ollama_and_fetch`, `parse_tool_from_response`, `parse_all_tools_from_response`, and the `while tool_count < max_tool_iterations` loop. Plans like `RUN_CMD: date then REDMINE_API GET /time_entries.json?...` are normalized and split into separate steps so each tool runs in sequence (not one RUN_CMD with the whole chain).
@@ -114,6 +124,6 @@ User (e.g. Discord)
 - **Router API snippet for orchestrator**: `docs/agent_000_router_commands_snippet.md`, `docs/017_llm_agents.md`.
 
 ## Open tasks:
-- Investigate why some agents are not being properly initialized.
+- ~~Investigate why some agents are not being properly initialized.~~ **Done:** § "Agent initialization and model resolution" above (load from disk each time; model resolution depends on ModelCatalog from `ensure_ollama_agent_ready_at_startup`; race when catalog not yet set; failure modes logged). Added log when catalog missing in `agents/mod.rs`.
 - ~~Improve the documentation for specialist agents.~~ **Done:** § "Specialist agents" above (definition, invocation, what they receive, where they live, default table, limitation).
 - Consider adding support for more advanced tool commands.

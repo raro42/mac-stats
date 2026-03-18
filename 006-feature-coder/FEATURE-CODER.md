@@ -89,5 +89,6 @@ The Coder currently edits this repo **in place** (yolo mode) via the mac-stats-a
 | docs/022_feature_review_plan.md | ~~D2: TASK_CREATE duplicate — suggest new id in error message~~ | **Done:** error in task/mod.rs now says "or use a different id to create a new task"; D2 resolved (option c). |
 | docs/004_notes.md | ~~Alert evaluation needs to be called periodically (background task)~~ | **Done:** background thread in lib.rs every 60s; `run_periodic_alert_evaluation()` in commands/alerts.rs; `get_monitor_statuses_snapshot()` in commands/monitors.rs; 004 Known Issues updated. |
 | docs/021_router_and_agents.md | ~~Improve the documentation for specialist agents~~ | **Done:** new § "Specialist agents" (definition, invocation, what they receive, where they live, default table, limitation); 021 open task marked done. |
+| docs/021_router_and_agents.md | ~~Investigate why some agents are not being properly initialized~~ | **Done:** § "Agent initialization and model resolution" in 021 (load from disk each time; ModelCatalog from startup; race when catalog not set; failure modes). Log when catalog missing in `agents/mod.rs`. |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.

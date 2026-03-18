@@ -127,6 +127,10 @@ pub fn load_agents() -> Vec<Agent> {
     // Auto-resolve model assignments from cached catalog (if available)
     if let Some(catalog) = crate::ollama::models::get_global_catalog() {
         resolve_agent_models(&mut agents, &catalog);
+    } else if !agents.is_empty() {
+        info!(
+            "Agents: model catalog not yet available, model_role resolution skipped (Ollama may still be starting)"
+        );
     }
 
     agents
