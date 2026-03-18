@@ -4536,6 +4536,8 @@ pub fn answer_with_ollama_and_fetch(
         let mut browser_tool_count: u32 = 0;
         // Set when we skip a browser tool due to cap; used to append a user-facing note to the reply.
         let mut browser_tool_cap_reached: bool = false;
+        // Repetition detection: refuse duplicate consecutive browser action (same NAVIGATE URL or same CLICK index).
+        let mut last_browser_tool_arg: Option<(String, String)> = None;
         // For news requests: if the last PERPLEXITY_SEARCH returned only hub/landing/tag/standings pages, verification must not accept a confident news answer.
         let mut last_news_search_was_hub_only: Option<bool> = None;
 
@@ -4568,6 +4570,8 @@ pub fn answer_with_ollama_and_fetch(
                     break;
                 }
                 tool_count += 1;
+                // Set when we execute a browser tool this iteration; used to update last_browser_tool_arg after the match.
+                let mut executed_browser_tool_arg: Option<(String, String)> = None;
                 // When the plan puts the whole chain in one line (e.g. PERPLEXITY_SEARCH: spanish newspapers then BROWSER_NAVIGATE...), pass only the search query to PERPLEXITY/BRAVE.
                 let arg = if tool == "PERPLEXITY_SEARCH" || tool == "BRAVE_SEARCH" {
                     truncate_search_query_arg(&arg)
@@ -4599,6 +4603,17 @@ pub fn answer_with_ollama_and_fetch(
                         | "BROWSER_SCREENSHOT"
                 );
                 if is_browser_tool {
+                    let normalized_arg = normalize_browser_tool_arg(&tool, &arg);
+                    // Repetition detection: same action as previous step → skip and tell model (032).
+                    if last_browser_tool_arg.as_ref() == Some(&(tool.clone(), normalized_arg.clone())) {
+                        let msg = "Same browser action as previous step; use a different action or reply with DONE.".to_string();
+                        tool_results.push(msg);
+                        info!(
+                            "Agent router: duplicate browser action skipped ({} with same arg)",
+                            tool
+                        );
+                        continue;
+                    }
                     if browser_tool_count >= MAX_BROWSER_TOOLS_PER_RUN {
                         browser_tool_cap_reached = true;
                         let msg = format!(
@@ -4613,6 +4628,7 @@ pub fn answer_with_ollama_and_fetch(
                         continue;
                     }
                     browser_tool_count += 1;
+                    executed_browser_tool_arg = Some((tool.clone(), normalized_arg));
                     info!(
                         "Agent router: browser tool #{}/{} this run",
                         browser_tool_count, MAX_BROWSER_TOOLS_PER_RUN
@@ -6638,6 +6654,9 @@ pub fn answer_with_ollama_and_fetch(
                 let is_multi_tool_run_cmd_error = tool == "RUN_CMD"
                     && user_message.starts_with("RUN_CMD failed in a multi-step plan");
                 tool_results.push(user_message);
+                if let Some(pair) = executed_browser_tool_arg {
+                    last_browser_tool_arg = Some(pair);
+                }
                 if is_browser_error || is_multi_tool_run_cmd_error {
                     info!(
                         "Agent router: {} returned an error, aborting remaining tools in this turn",
@@ -7605,6 +7624,21 @@ fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
 
 /// Max browser tools (NAVIGATE, CLICK, INPUT, SCROLL, EXTRACT, SEARCH_PAGE, SCREENSHOT) per run. Prevents runaway loops.
 const MAX_BROWSER_TOOLS_PER_RUN: u32 = 15;
+
+/// Normalize (tool, arg) for repetition detection: same NAVIGATE URL or same CLICK index in a row → refuse duplicate (032).
+fn normalize_browser_tool_arg(tool: &str, arg: &str) -> String {
+    let a = arg.trim();
+    match tool {
+        "BROWSER_NAVIGATE" => a.to_lowercase(),
+        "BROWSER_CLICK" => a.split_whitespace().next().unwrap_or(a).to_string(),
+        "BROWSER_INPUT" => a.split_whitespace().next().unwrap_or(a).to_string(),
+        "BROWSER_SCROLL" => a.to_lowercase(),
+        "BROWSER_EXTRACT" => "extract".to_string(),
+        "BROWSER_SEARCH_PAGE" => a.to_lowercase(),
+        "BROWSER_SCREENSHOT" => a.to_lowercase(),
+        _ => a.to_string(),
+    }
+}
 
 /// Parse all tool invocations from a response (e.g. BROWSER_CLICK and BROWSER_SCREENSHOT on consecutive lines).
 /// Returns up to 5 per response so one model reply can trigger multiple actions (fixes screenshot-after-click).
