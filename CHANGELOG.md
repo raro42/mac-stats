@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Optional post-run agent judge** — When enabled (`agentJudgeEnabled` in config.json or `MAC_STATS_AGENT_JUDGE_ENABLED`), after each agent run (Discord reply or scheduler task) the app calls an LLM to evaluate whether the task was satisfied and logs the verdict (and optional reasoning) to `~/.mac-stats/debug.log`. For testing or quality logging only; does not change the agent loop or user-facing replies. New module `commands/judge.rs`; config `Config::agent_judge_enabled()`; docs/007_discord_agent.md §15.
+
 ### Changed
 - **Session compaction hardening (task-008 Phase 5)** — Skip compaction when session has no real conversational value: `count_conversational_messages()` in `session_memory.rs`; compactor and periodic job require at least 2 conversational messages; compactor prompt preserves first system/task instructions and most recent assistant/tool outcome; clear logs for skipped vs failed; periodic job does not retry on skip. Docs 005 §50, 006, 022, agents-tasks Phase 5 done.
 - **News/current-events format and verification** — `is_news_query` extended with "today" and "this week"; new `verification_news_format_note()` so verifier accepts concise/bullet answers and requires 2+ named sources and dates when available; success criteria and system reminder for news requests (short bullet list, 2 sources, dates). Docs 005, 006, 022.

@@ -8,6 +8,7 @@ pub mod cursor_agent;
 pub mod discord;
 pub mod logging;
 pub mod monitors;
+pub mod judge;
 pub mod ollama;
 pub mod perplexity;
 pub mod plugins;

@@ -2133,6 +2133,15 @@ impl EventHandler for Handler {
         // Wait for the status task to finish so all status messages are sent before we send the final reply.
         let _ = status_task.await;
 
+        // Optional agent judge: when enabled, evaluate run and log verdict to debug log (no user impact).
+        crate::commands::judge::run_judge_if_enabled(
+            &question_for_ollama,
+            &reply_text,
+            &attachment_paths,
+            None,
+        )
+        .await;
+
         // Log full reply if ≤500 chars (or always in -vv), else first 500 + ellipsis.
         const RECV_LOG_MAX: usize = 500;
         let reply = strip_leading_label(reply_text.trim());

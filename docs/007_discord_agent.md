@@ -258,7 +258,15 @@ cd src-tauri
 
 Requires **Ollama** running and configured (env `OLLAMA_HOST` or `~/.mac-stats/.config.env`). The app ensures defaults and initializes the Ollama client before running. Reply and any attachment paths (e.g. screenshots under `~/.mac-stats/screenshots/`) are printed to stdout. Logs: `~/.mac-stats/debug.log` (e.g. `grep -E "headless|BROWSER_NAVIGATE|screenshot" ~/.mac-stats/debug.log`).
 
-## 15. Agent test (regression path)
+## 15. Optional post-run agent judge
+
+When enabled, after each agent run completes (Discord reply or scheduler task), the app calls an LLM once to evaluate whether the task was satisfied and logs the verdict (and optional reasoning) to `~/.mac-stats/debug.log`. This is for **testing or quality logging** only; it does not change the agent loop or user-facing replies.
+
+- **Config:** `~/.mac-stats/config.json` — set `"agentJudgeEnabled": true`. Or set env `MAC_STATS_AGENT_JUDGE_ENABLED=true` (or `1` / `yes`). Default is **false** (judge off).
+- **Behaviour:** After the run, the judge receives: original task (truncated), final reply (truncated), step summaries (if any), and paths to the last 10 screenshots. It returns a structured verdict (success/failure, optional score, reasoning, impossible_task, reached_captcha). Parse failures are logged and treated as "unknown".
+- **Cost:** One extra LLM call per run when enabled. Leave disabled in production unless you need quality metrics or test assertions.
+
+## 16. Agent test (regression path)
 
 To run a single agent with prompts from its `testing.md` (no Discord, no router):
 

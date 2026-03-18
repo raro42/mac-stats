@@ -469,6 +469,13 @@ async fn execute_task(entry: &ScheduleEntry) -> Result<Option<(String, bool)>, S
                 id_info,
                 reply.text.chars().count()
             );
+            crate::commands::judge::run_judge_if_enabled(
+                task,
+                &reply.text,
+                &reply.attachment_paths,
+                None,
+            )
+            .await;
             Ok(Some((reply.text, false)))
         }
         Err(e) => {

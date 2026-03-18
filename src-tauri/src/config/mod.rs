@@ -326,6 +326,30 @@ impl Config {
         DEFAULT_SECS
     }
 
+    /// Optional post-run agent judge: when true, after an agent run (e.g. Discord reply) we call an LLM
+    /// to evaluate whether the task was satisfied and log the verdict. Off by default.
+    /// Config: config.json `agentJudgeEnabled` (boolean); override: env `MAC_STATS_AGENT_JUDGE_ENABLED` (true/1/yes).
+    pub fn agent_judge_enabled() -> bool {
+        if let Ok(s) = std::env::var("MAC_STATS_AGENT_JUDGE_ENABLED") {
+            let lower = s.to_lowercase();
+            if lower == "true" || lower == "1" || lower == "yes" {
+                return true;
+            }
+            if lower == "false" || lower == "0" || lower == "no" {
+                return false;
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(b) = json.get("agentJudgeEnabled").and_then(|v| v.as_bool()) {
+                    return b;
+                }
+            }
+        }
+        false
+    }
+
     /// Get the user-info file path
     ///
     /// Returns a path in the user's home directory: `$HOME/.mac-stats/user-info.json`
