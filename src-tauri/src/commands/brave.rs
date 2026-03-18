@@ -209,10 +209,11 @@ pub async fn brave_web_search(query: &str, api_key: &str) -> Result<String, Stri
         )
     };
     info!(
-        "Brave agent: got {} results for \"{}\" (shaped to {})",
+        "Brave agent: got {} results for \"{}\" (shaped to {}, blob {} bytes)",
         results.len(),
         query,
-        shaped.len()
+        shaped.len(),
+        text.len()
     );
     Ok(text)
 }

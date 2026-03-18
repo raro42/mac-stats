@@ -3784,7 +3784,11 @@ pub fn answer_with_ollama_and_fetch(
         };
         let criteria_status = match &success_criteria {
             Some(c) if !c.is_empty() => {
-                info!("Agent router: extracted {} success criteria", c.len());
+                info!(
+                    "Agent router [{}]: extracted {} success criteria",
+                    request_id,
+                    c.len()
+                );
                 truncate_status(&c.join("; "), 200)
             }
             _ => {
@@ -3803,27 +3807,37 @@ pub fn answer_with_ollama_and_fetch(
         // 6.A New-topic check: one short LLM call when we have history and use a local model.
         // Skip when using a cloud model to minimize cost (only when cloud do we care about extra calls).
         // Skip on verification retry so the model keeps context (original request, cookie consent, etc.).
-        if !is_verification_retry && !crate::ollama::models::is_cloud_model(&effective_model) {
-            if let Some(ref hist) = conversation_history {
-                const NEW_TOPIC_MIN_HISTORY: usize = 2;
-                if hist.len() >= NEW_TOPIC_MIN_HISTORY {
-                    send_status("Checking if new topic…");
-                    let summary = summarize_last_turns(hist, 3);
-                    match detect_new_topic(question, &summary, &effective_model).await {
-                        Ok(true) => {
-                            info!(
-                                "Agent router [{}]: NEW_TOPIC — using no prior context; any verification retry will use only request-local criteria",
-                                request_id
-                            );
-                            is_new_topic = true;
-                        }
-                        Ok(false) => {}
-                        Err(e) => {
-                            tracing::debug!(
-                                "Agent router: new-topic check failed (keeping history): {}",
-                                e
-                            );
-                        }
+        if is_verification_retry || crate::ollama::models::is_cloud_model(&effective_model) {
+            tracing::debug!(
+                request_id = %request_id,
+                verification_retry = is_verification_retry,
+                "skipping new-topic check (retry or cloud model)"
+            );
+        } else if let Some(ref hist) = conversation_history {
+            const NEW_TOPIC_MIN_HISTORY: usize = 2;
+            if hist.len() >= NEW_TOPIC_MIN_HISTORY {
+                send_status("Checking if new topic…");
+                let summary = summarize_last_turns(hist, 3);
+                match detect_new_topic(question, &summary, &effective_model).await {
+                    Ok(true) => {
+                        info!(
+                            "Agent router [{}]: NEW_TOPIC — using no prior context; any verification retry will use only request-local criteria",
+                            request_id
+                        );
+                        is_new_topic = true;
+                    }
+                    Ok(false) => {
+                        info!(
+                            "Agent router [{}]: SAME_TOPIC — keeping prior context",
+                            request_id
+                        );
+                    }
+                    Err(e) => {
+                        tracing::debug!(
+                            request_id = %request_id,
+                            "new-topic check failed (keeping history): {}",
+                            e
+                        );
                     }
                 }
             }
@@ -3837,6 +3851,16 @@ pub fn answer_with_ollama_and_fetch(
             .take(CONVERSATION_HISTORY_CAP)
             .rev()
             .collect();
+        if raw_history.is_empty() {
+            info!("Agent router [{}]: no prior session", request_id);
+        } else {
+            info!(
+                "Agent router [{}]: prior session {} messages (capped at {})",
+                request_id,
+                raw_history.len(),
+                CONVERSATION_HISTORY_CAP
+            );
+        }
 
         let conversation_history: Vec<crate::ollama::ChatMessage> = if raw_history.len()
             >= COMPACTION_THRESHOLD
@@ -3849,8 +3873,8 @@ pub fn answer_with_ollama_and_fetch(
             let conversational = crate::session_memory::count_conversational_messages(&pairs);
             if conversational < MIN_CONVERSATIONAL_FOR_COMPACTION {
                 info!(
-                    "Session compaction: skipped (no real conversational value: {} conversational messages, need at least {}); keeping full history ({} messages)",
-                    conversational, MIN_CONVERSATIONAL_FOR_COMPACTION, raw_history.len()
+                    "Session compaction [{}]: skipped (no real conversational value: {} conversational messages, need at least {}); keeping full history ({} messages)",
+                    request_id, conversational, MIN_CONVERSATIONAL_FOR_COMPACTION, raw_history.len()
                 );
                 raw_history
                     .into_iter()
@@ -3864,12 +3888,19 @@ pub fn answer_with_ollama_and_fetch(
             } else {
             send_status("Compacting session memory…");
             info!(
-                "Session compaction: {} messages exceed threshold ({}), compacting",
+                "Session compaction [{}]: {} messages exceed threshold ({}), compacting",
+                request_id,
                 raw_history.len(),
                 COMPACTION_THRESHOLD
             );
             match compact_conversation_history(&raw_history, question, discord_reply_channel_id).await {
                 Ok((context, lessons)) => {
+                    info!(
+                        "Session compaction [{}]: produced context ({} chars), lessons: {}",
+                        request_id,
+                        context.len(),
+                        lessons.as_ref().map(|_| "present").unwrap_or("none")
+                    );
                     if let Some(ref lesson_text) = lessons {
                         let memory_path = discord_reply_channel_id
                             .map(crate::config::Config::memory_file_path_for_discord_channel)
@@ -3881,7 +3912,7 @@ pub fn answer_with_ollama_and_fetch(
                                 let _ = append_to_file(&memory_path, &entry);
                             }
                         }
-                        info!("Session compaction: wrote lessons to {:?}", memory_path);
+                        info!("Session compaction [{}]: wrote lessons to {:?}", request_id, memory_path);
                     }
                     let context_lower = context.to_lowercase();
                     let not_needed = context_lower.contains("not needed for this request")
@@ -5219,6 +5250,12 @@ pub fn answer_with_ollama_and_fetch(
                                 urls.len()
                             ));
                                 }
+                                info!(
+                                    "Agent router [{}]: PERPLEXITY_SEARCH returned {} results, blob {} bytes",
+                                    request_id,
+                                    num_results,
+                                    result_text.len()
+                                );
                                 result_text
                             }
                             Err(e) => {

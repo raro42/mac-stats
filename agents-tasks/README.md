@@ -31,7 +31,7 @@ See `scan-log.md` for per-run details (scan time, tasks created, notes).
 | task-004 | Scheduler log churn          | done — "loaded N entries" at DEBUG. |
 | task-005 | Session compaction log       | done — "keeping full history (N messages)". |
 | task-007 | Discord read attachments     | done — image attachments downloaded, base64 passed to Ollama vision path. |
-| task-008 | Overnight plan: request isolation, search hardening, compaction safety | plan — Phase 1 done (RequestRunContext, request_id_override, retry_count). Phase 2 done (session memory: internal artifacts not persisted/filtered on load). Phase 3 done (search_result_shaping.rs + Brave uses it). Phase 4 done (news-aware answering and verification). Phase 5 done (compaction hardening: skip when no conversational value, preserve first/latest in prompt, clear skip/fail logs). Phases 6–7 in worklist. |
+| task-008 | Overnight plan: request isolation, search hardening, compaction safety | plan — Phase 1–5 done. Phase 6 (retry/failover taxonomy) open. Phase 7 observability done (request_id, topic, prior session, criteria, search blob size, compaction logs); regression coverage optional. |
 
 ## Task format
 

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Agent router observability (task-008 Phase 7)** — request_id on all agent-router logs (criteria, new-topic, prior session, compaction); SAME_TOPIC log when keeping history; prior session message count and cap; compaction decision/result with request_id and context/lessons; Brave and Perplexity search result count and blob size in logs. Docs 005 §51, 006 Phase 7 done, agents-tasks task-008 Phase 7 done, 022 testing note (2026-03-18).
+
 ### Added
 - **Optional post-run agent judge** — When enabled (`agentJudgeEnabled` in config.json or `MAC_STATS_AGENT_JUDGE_ENABLED`), after each agent run (Discord reply or scheduler task) the app calls an LLM to evaluate whether the task was satisfied and logs the verdict (and optional reasoning) to `~/.mac-stats/debug.log`. For testing or quality logging only; does not change the agent loop or user-facing replies. New module `commands/judge.rs`; config `Config::agent_judge_enabled()`; docs/007_discord_agent.md §15.
 
