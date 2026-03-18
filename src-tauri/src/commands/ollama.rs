@@ -1659,6 +1659,8 @@ fn is_news_query(question: &str) -> bool {
         || q.contains("recent")
         || q.contains("headlines")
         || q.contains("current events")
+        || q.contains("today")
+        || q.contains("this week")
 }
 
 fn normalized_search_result_domain(url: &str) -> String {
@@ -3182,6 +3184,16 @@ fn verification_news_hub_only_block(news_search_was_hub_only: Option<bool>, ques
     }
 }
 
+/// For news/current-events requests: tell verifier to accept concise/bullet answers and only require 2+ sources and dates when available.
+fn verification_news_format_note(question: &str) -> &'static str {
+    const NOTE: &str = "For this news/current-events request: reply YES if the answer has at least 2 named sources and includes dates when available in the results; do not reply NO only because the answer is short or in bullet form.\n\n";
+    if is_news_query(question) {
+        NOTE
+    } else {
+        ""
+    }
+}
+
 /// Builds the suffix appended to PERPLEXITY_SEARCH tool result when is_news_query and results are non-empty.
 /// When search_had_article_like is false, includes the "Article-grade results were not found" warning.
 pub(crate) fn build_perplexity_news_tool_suffix(
@@ -3270,16 +3282,18 @@ async fn verify_completion(
     };
     let news_hub_only_block =
         verification_news_hub_only_block(news_search_was_hub_only, question);
+    let news_format_note = verification_news_format_note(question);
     let verification_tail = if screenshot_requested {
         "Did we fully satisfy the request (including any requested screenshot/file attachment)? Reply YES or NO. If NO, on the next line add one sentence: what's missing."
     } else {
         "Did we fully satisfy the request? Reply YES or NO. If NO, on the next line add one sentence: what's missing."
     };
     let user_text = format!(
-        "Original request: {}\n\n{}{}What we did (summary): {}\n\n{}{}{}",
+        "Original request: {}\n\n{}{}{}What we did (summary): {}\n\n{}{}{}",
         question.chars().take(500).collect::<String>(),
         criteria_block,
         news_hub_only_block,
+        news_format_note,
         response_summary,
         browser_content_block,
         attachment_block,
@@ -3354,10 +3368,11 @@ async fn verify_completion(
                     crate::ollama::ChatMessage {
                         role: "user".to_string(),
                         content: format!(
-                            "Original request: {}\n\n{}{}What we did (summary): {}\n\n{}Did we fully satisfy the request? Reply YES or NO. If NO, on the next line add one sentence: what's missing.",
+                            "Original request: {}\n\n{}{}{}What we did (summary): {}\n\n{}Did we fully satisfy the request? Reply YES or NO. If NO, on the next line add one sentence: what's missing.",
                             question.chars().take(500).collect::<String>(),
                             criteria_block,
                             news_hub_only_block,
+                            news_format_note,
                             response_summary,
                             if screenshot_requested {
                                 "Attachments sent: yes.\n\n"
@@ -3703,6 +3718,15 @@ pub fn answer_with_ollama_and_fetch(
                 "Actual Redmine time entries for the requested period were fetched.".to_string(),
                 "A clear summary of hours or worked tickets was provided from that Redmine data."
                     .to_string(),
+            ])
+        } else if is_news_query(&request_for_verification) {
+            info!(
+                "Agent router: news/current-events request — using news success criteria"
+            );
+            Some(vec![
+                "At least 2 named sources (publication or site name).".to_string(),
+                "Dates included when available in the search results.".to_string(),
+                "Short factual summary or bullet list (concise is OK).".to_string(),
             ])
         } else {
             extract_success_criteria(
@@ -4210,6 +4234,12 @@ pub fn answer_with_ollama_and_fetch(
                 ""
             }
         };
+        // News/current-events: instruct model to answer with short bullet list, at least 2 named sources, dates when available.
+        let news_format_reminder = if is_news_query(question) {
+            "\n\n**News/current events:** Reply with a short bullet list or compact summary. Include at least 2 named sources (publication or site) and dates when available in the search results. Concise answers are OK."
+        } else {
+            ""
+        };
 
         let normalized_recommendation = normalize_inline_tool_sequences(&recommendation);
 
@@ -4235,18 +4265,19 @@ pub fn answer_with_ollama_and_fetch(
                 load_memory_block_for_request(discord_reply_channel_id, load_global_memory);
             let execution_system_content = match &skill_content {
                 Some(skill) => format!(
-                    "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}{}{}{}{}",
+                    "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}{}{}{}{}{}",
                     discord_user_context,
                     skill,
                     execution_prompt,
                     metrics_for_system,
                     discord_screenshot_reminder,
                     redmine_howto_reminder,
+                    news_format_reminder,
                     discord_platform_formatting,
                     model_identity
                 ),
                 None => format!(
-                    "{}{}{}{}{}{}{}{}{}",
+                    "{}{}{}{}{}{}{}{}{}{}",
                     router_soul,
                     memory_block,
                     discord_user_context,
@@ -4254,6 +4285,7 @@ pub fn answer_with_ollama_and_fetch(
                     metrics_for_system,
                     discord_screenshot_reminder,
                     redmine_howto_reminder,
+                    news_format_reminder,
                     discord_platform_formatting,
                     model_identity
                 ),
@@ -4293,19 +4325,20 @@ pub fn answer_with_ollama_and_fetch(
                 load_memory_block_for_request(discord_reply_channel_id, load_global_memory);
             let execution_system_content = match &skill_content {
                 Some(skill) => format!(
-                    "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}{}{}{}\n\nYour plan: {}{}",
+                    "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}{}{}{}{}\n\nYour plan: {}{}",
                     discord_user_context,
                     skill,
                     execution_prompt,
                     metrics_for_system,
                     discord_screenshot_reminder,
                     redmine_howto_reminder,
+                    news_format_reminder,
                     discord_platform_formatting,
                     recommendation,
                     model_identity
                 ),
                 None => format!(
-                    "{}{}{}{}{}{}{}{}\n\nYour plan: {}{}",
+                    "{}{}{}{}{}{}{}{}{}\n\nYour plan: {}{}",
                     router_soul,
                     memory_block,
                     discord_user_context,
@@ -4313,6 +4346,7 @@ pub fn answer_with_ollama_and_fetch(
                     metrics_for_system,
                     discord_screenshot_reminder,
                     redmine_howto_reminder,
+                    news_format_reminder,
                     discord_platform_formatting,
                     recommendation,
                     model_identity
