@@ -55,6 +55,15 @@ fn is_internal_artifact(role: &str, content: &str) -> bool {
     false
 }
 
+/// Count messages that are normal conversation (not internal artifacts).
+/// Used by session compactor to skip compaction when there is no real conversational value (task-008 Phase 5).
+pub fn count_conversational_messages(messages: &[(String, String)]) -> usize {
+    messages
+        .iter()
+        .filter(|(role, content)| !is_internal_artifact(role, content))
+        .count()
+}
+
 fn extract_assistant_final_answer(content: &str) -> Option<String> {
     let trimmed = content.trim();
     if trimmed.is_empty() {

@@ -2068,6 +2068,8 @@ fn parse_agent_tool_from_response(content: &str) -> Option<(String, String)> {
 
 /// Minimum number of messages before session compaction triggers.
 const COMPACTION_THRESHOLD: usize = 8;
+/// Minimum conversational (non-internal) messages to run compaction; fewer means skip (task-008 Phase 5).
+const MIN_CONVERSATIONAL_FOR_COMPACTION: usize = 2;
 
 /// Fixed CONTEXT for casual/having_fun sessions so the compactor never invents task or platform context.
 const COMPACTOR_CASUAL_CONTEXT: &str =
@@ -2094,6 +2096,19 @@ async fn compact_conversation_history(
         }
     }
 
+    // Skip compaction when session has no real conversational value (only internal/synthetic entries).
+    let pairs: Vec<(String, String)> = messages
+        .iter()
+        .map(|m| (m.role.clone(), m.content.clone()))
+        .collect();
+    let conversational = crate::session_memory::count_conversational_messages(&pairs);
+    if conversational < MIN_CONVERSATIONAL_FOR_COMPACTION {
+        return Err(format!(
+            "session has no real conversational value ({} conversational messages, need at least {})",
+            conversational, MIN_CONVERSATIONAL_FOR_COMPACTION
+        ));
+    }
+
     let small_model = crate::ollama::models::get_global_catalog()
         .and_then(|c| c.resolve_role("small").map(|m| m.name.clone()));
 
@@ -2113,9 +2128,10 @@ async fn compact_conversation_history(
 
 ## CONTEXT
 A concise summary (max 300 words) of ONLY verified facts and successful outcomes **relevant to the user's current question**. Rules:
+- **PRESERVE in CONTEXT:** (1) The **first system or task-setting instructions** (initial 1–2 messages that set task/context) — include their gist or key points so active work and standing instructions survive. (2) The **most recent assistant reply or tool outcome** (the last substantive answer or result) — include it so the current turn's result is not lost.
 - **Purely social/casual:** If the conversation has no tool results, no task IDs, no API confirmations (just chat, jokes, or off-topic banter), output ONLY: "Casual conversation; no task or verified outcome. Not needed for this request." and in LESSONS write "None." Do NOT infer themes (e.g. "language learning", "platform", "digital learning") from casual wording.
 - If the conversation spans **multiple unrelated topics**, summarize ONLY what is relevant to the **current question** (see below). If the current question is clearly a **new topic** (unrelated to most of the history), output exactly: "Previous context covered different topics; not needed for this request." and keep CONTEXT to that one sentence.
-- KEEP: IDs confirmed by API responses (guild IDs, channel IDs, user IDs), successful API calls and their actual results, user preferences and standing instructions, established context the user built up — but only if relevant to the current question.
+- KEEP: IDs confirmed by API responses (guild IDs, channel IDs, user IDs), successful API calls and their actual results, user preferences and standing instructions, established context the user built up — but only if relevant to the current question. Preserve open decisions and concrete results so active work survives summarization.
 - DROP: Failed attempts (401 errors, wrong tool usage, timeouts), hallucinated or unverified claims (assistant saying something happened without API confirmation), apologies, suggestions that weren't followed, repeated back-and-forth about the same error.
 - If the assistant claimed an action succeeded but there's no API result confirming it, mark it as UNVERIFIED.
 - Write as a factual briefing, not a conversation recap.
@@ -2220,6 +2236,19 @@ pub async fn run_periodic_session_compaction() {
         if messages.len() < PERIODIC_COMPACTION_MIN_MESSAGES {
             continue;
         }
+        // Skip when session has no real conversational value (task-008 Phase 5).
+        let pairs: Vec<(String, String)> = messages
+            .iter()
+            .map(|m| (m.role.clone(), m.content.clone()))
+            .collect();
+        let conversational = crate::session_memory::count_conversational_messages(&pairs);
+        if conversational < MIN_CONVERSATIONAL_FOR_COMPACTION {
+            info!(
+                "Periodic session compaction: skipped for {} {} (no real conversational value: {} conversational messages, need at least {})",
+                entry.source, entry.session_id, conversational, MIN_CONVERSATIONAL_FOR_COMPACTION
+            );
+            continue;
+        }
         info!(
             "Periodic session compaction: {} {} ({} messages, last_activity {:?})",
             entry.source,
@@ -2227,7 +2256,7 @@ pub async fn run_periodic_session_compaction() {
             messages.len(),
             entry.last_activity
         );
-        // task-001: retry once on failure
+        // task-001: retry once on failure (do not retry when skipped for no conversational value)
         let mut actual_question = "Periodic session compaction.".to_string();
         for msg in messages.iter().rev() {
             if msg.role == "user" {
@@ -2245,6 +2274,14 @@ pub async fn run_periodic_session_compaction() {
         let compact_result = match compact_result {
             Ok(ok) => Ok(ok),
             Err(e) => {
+                let err_s = e.to_string();
+                if err_s.contains("no real conversational value") {
+                    info!(
+                        "Periodic session compaction: skipped for {} {}: {}",
+                        entry.source, entry.session_id, err_s
+                    );
+                    continue;
+                }
                 tracing::warn!(
                     "Periodic session compaction failed for {} {}: {}, retrying once in 3s",
                     entry.source,
@@ -2298,12 +2335,20 @@ pub async fn run_periodic_session_compaction() {
                 }
             }
             Err(e) => {
-                tracing::warn!(
-                    "Periodic session compaction failed for {} {}: {}",
-                    entry.source,
-                    entry.session_id,
-                    e
-                );
+                let err_s = e.to_string();
+                if err_s.contains("no real conversational value") {
+                    info!(
+                        "Periodic session compaction: skipped for {} {}: {}",
+                        entry.source, entry.session_id, err_s
+                    );
+                } else {
+                    tracing::warn!(
+                        "Periodic session compaction failed for {} {}: {} (session unchanged; will retry next cycle)",
+                        entry.source,
+                        entry.session_id,
+                        e
+                    );
+                }
             }
         }
     }
@@ -3796,6 +3841,27 @@ pub fn answer_with_ollama_and_fetch(
         let conversation_history: Vec<crate::ollama::ChatMessage> = if raw_history.len()
             >= COMPACTION_THRESHOLD
         {
+            // Skip compaction when session has no real conversational value (task-008 Phase 5).
+            let pairs: Vec<(String, String)> = raw_history
+                .iter()
+                .map(|m| (m.role.clone(), m.content.clone()))
+                .collect();
+            let conversational = crate::session_memory::count_conversational_messages(&pairs);
+            if conversational < MIN_CONVERSATIONAL_FOR_COMPACTION {
+                info!(
+                    "Session compaction: skipped (no real conversational value: {} conversational messages, need at least {}); keeping full history ({} messages)",
+                    conversational, MIN_CONVERSATIONAL_FOR_COMPACTION, raw_history.len()
+                );
+                raw_history
+                    .into_iter()
+                    .map(|mut msg| {
+                        if msg.role == "assistant" && looks_like_discord_401_confusion(&msg.content) {
+                            msg.content.push_str("\n\n[SYSTEM CORRECTION: The above 401 was from FETCH_URL (no token). Use DISCORD_API instead.]");
+                        }
+                        msg
+                    })
+                    .collect()
+            } else {
             send_status("Compacting session memory…");
             info!(
                 "Session compaction: {} messages exceed threshold ({}), compacting",
@@ -3851,20 +3917,29 @@ pub fn answer_with_ollama_and_fetch(
                 }
                 Err(e) => {
                     let n = raw_history.len();
-                    let msg = if e.to_string().to_lowercase().contains("unauthorized")
-                        || e.to_string().contains("401")
-                    {
-                        format!(
-                            "Session compaction failed: {} (use a local model for compaction; cloud models may require auth). Keeping full history ({} messages) for this request.",
-                            e, n
-                        )
+                    let err_s = e.to_string();
+                    let is_skip = err_s.contains("no real conversational value");
+                    if is_skip {
+                        info!(
+                            "Session compaction skipped: {}; keeping full history ({} messages)",
+                            err_s, n
+                        );
                     } else {
-                        format!(
-                            "Session compaction failed: {}; keeping full history ({} messages) for this request.",
-                            e, n
-                        )
-                    };
-                    tracing::warn!("{}", msg);
+                        let msg = if err_s.to_lowercase().contains("unauthorized")
+                            || err_s.contains("401")
+                        {
+                            format!(
+                                "Session compaction failed: {} (use a local model for compaction; cloud models may require auth). Keeping full history ({} messages) for this request.",
+                                e, n
+                            )
+                        } else {
+                            format!(
+                                "Session compaction failed: {}; keeping full history ({} messages) for this request.",
+                                e, n
+                            )
+                        };
+                        tracing::warn!("{}", msg);
+                    }
                     raw_history
                     .into_iter()
                     .map(|mut msg| {
@@ -3875,6 +3950,7 @@ pub fn answer_with_ollama_and_fetch(
                     })
                     .collect()
                 }
+            }
             }
         } else if is_new_topic {
             vec![]
