@@ -479,7 +479,7 @@ See `CHANGELOG.md` (0.1.14) and `docs/023_externalized_prompts_DONE.md` for deta
 ## Testing (2026-03-18) — closing reviewer "Start testing now. Do your job." (agent run)
 
 - **Integration:** `cargo check` and `cargo clippy` pass (45 warnings; no errors). `diff src/ollama.js src-tauri/dist/ollama.js` empty (in sync). `toggle_cpu_window`, `set_chat_verbosity` in `tauri::generate_handler![]` in `lib.rs` (L227, L236); `run_due_monitor_checks()` in `lib.rs` (L371, background thread, 30s).
-- **Smoke:** `cargo build --release` succeeded (v0.1.43). `pkill -f mac_stats` then `./target/release/mac_stats --cpu -vv` started in background; `pgrep -fl mac_stats` confirmed process. `~/.mac-stats/debug.log`: Discord token + gateway, Task review thread spawned, Scheduler (2 entries), Ollama configuration successful, Discord bot connected (Werner_Amvara), CPU window created and shown. Manual checks (menu bar click, `--cpu`/`-vv` in chat) left to human.
+- **Smoke:** `cargo build --release` succeeded (v0.1.43). `pkill -f mac_stats` then `./target/release/mac_stats --cpu -vv` started in background; `pgrep -fl mac_stats` confirmed process (pid 62165). `~/.mac-stats/debug.log`: Ollama configuration successful, connection successful, monitor checks (e.g. prod.cometa.rocks UP). Manual checks (menu bar click, `--cpu`/`-vv` in chat) left to human.
 
 ---
 

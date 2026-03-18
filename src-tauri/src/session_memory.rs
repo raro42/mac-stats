@@ -5,6 +5,11 @@
 //!
 //! Callers can use `get_messages()` for in-memory history and
 //! `load_messages_from_latest_session_file()` to resume from disk (e.g. after restart).
+//!
+//! **Conversation vs internal artifacts (task-008 Phase 2):** Only normal conversation is
+//! persisted — user turns and final assistant replies. Internal execution artifacts
+//! (completion-verifier prompts, criteria extraction, tool dumps, correction prompts) are
+//! not written and are filtered out when loading so they never appear in prior context.
 
 use crate::config::Config;
 use std::collections::HashMap;
@@ -14,6 +19,41 @@ use std::sync::OnceLock;
 use tracing::debug;
 
 const PERSIST_THRESHOLD: usize = 3;
+
+/// Returns true if this (role, content) looks like an internal execution artifact rather than
+/// normal conversation. Such messages are not persisted and are filtered out when loading.
+fn is_internal_artifact(role: &str, content: &str) -> bool {
+    let t = content.trim();
+    if t.is_empty() {
+        return true;
+    }
+    // Completion-verifier / criteria-extraction prompts (we inject these; never store as conversation).
+    if t.contains("extracts success criteria")
+        || t.contains("Success criteria (from user request)")
+        || t.contains("Reply with YES or NO")
+        || t.contains("Does the following response satisfy")
+        || t.contains("Success criteria require a response in JSON format")
+    {
+        return true;
+    }
+    // Escalation / correction prompt we inject (internal, not user-facing).
+    if t.contains("The user is not satisfied and wants the task actually completed") {
+        return true;
+    }
+    // Tool result wrappers: message that is predominantly a raw tool dump, not the model's answer.
+    if role == "assistant" {
+        let first_line = t.lines().next().unwrap_or("").trim();
+        if first_line.starts_with("REDMINE_API result (")
+            || first_line.starts_with("FETCH_URL result")
+            || first_line.starts_with("PERPLEXITY_SEARCH result")
+            || first_line.starts_with("BRAVE_SEARCH result")
+            || first_line.starts_with("Tool result:")
+        {
+            return true;
+        }
+    }
+    false
+}
 
 fn extract_assistant_final_answer(content: &str) -> Option<String> {
     let trimmed = content.trim();
@@ -143,10 +183,15 @@ pub fn session_reset_instruction_with_date_utc() -> String {
 
 /// Add a message to the session and persist to disk when we have more than 3 messages.
 /// `source` e.g. "discord", `session_id` e.g. Discord channel id.
+/// Internal artifacts (verifier prompts, criteria, tool dumps) are not persisted.
 pub fn add_message(source: &str, session_id: u64, role: &str, content: &str) {
     let Some(content) = normalize_conversational_message(role, content) else {
         return;
     };
+    if is_internal_artifact(role, &content) {
+        debug!("Session memory: skipping internal artifact (not persisted)");
+        return;
+    }
     let key = format!("{}-{}", source, session_id);
     let mut store = match session_store().lock() {
         Ok(g) => g,
@@ -258,7 +303,11 @@ pub fn replace_session(source: &str, session_id: u64, new_messages: Vec<(String,
     let normalized_messages: Vec<(String, String)> = new_messages
         .into_iter()
         .filter_map(|(role, content)| {
-            normalize_conversational_message(&role, &content).map(|normalized| (role, normalized))
+            let normalized = normalize_conversational_message(&role, &content)?;
+            if is_internal_artifact(&role, &normalized) {
+                return None;
+            }
+            Some((role, normalized))
         })
         .collect();
     let now = chrono::Local::now();
@@ -333,8 +382,11 @@ pub fn get_messages(source: &str, session_id: u64) -> Vec<(String, String)> {
                 .messages
                 .iter()
                 .filter_map(|(role, content)| {
-                    normalize_conversational_message(role, content)
-                        .map(|normalized| (role.clone(), normalized))
+                    let normalized = normalize_conversational_message(role, content)?;
+                    if is_internal_artifact(role, &normalized) {
+                        return None;
+                    }
+                    Some((role.clone(), normalized))
                 })
                 .collect()
         })
@@ -397,7 +449,9 @@ fn parse_session_file(path: &Path) -> Vec<(String, String)> {
             continue;
         };
         if let Some(normalized) = normalize_conversational_message(role, body) {
-            out.push((role.to_string(), normalized));
+            if !is_internal_artifact(role, &normalized) {
+                out.push((role.to_string(), normalized));
+            }
         }
     }
     out
@@ -405,7 +459,30 @@ fn parse_session_file(path: &Path) -> Vec<(String, String)> {
 
 #[cfg(test)]
 mod tests {
-    use super::{extract_assistant_final_answer, normalize_conversational_message};
+    use super::{
+        add_message, clear_session, extract_assistant_final_answer, get_messages,
+        normalize_conversational_message,
+    };
+
+    #[test]
+    fn internal_artifacts_not_persisted() {
+        // Use a unique session id so we don't collide with real sessions.
+        let sid = 99999_u64;
+        clear_session("discord", sid);
+        add_message("discord", sid, "user", "Hello");
+        add_message(
+            "discord",
+            sid,
+            "assistant",
+            "You are an assistant that extracts success criteria. Reply with 1 to 3 concrete success criteria.",
+        );
+        let msgs = get_messages("discord", sid);
+        // Only the user message should be present; the internal criteria prompt must not be stored.
+        assert_eq!(msgs.len(), 1);
+        assert_eq!(msgs[0].0, "user");
+        assert_eq!(msgs[0].1, "Hello");
+        clear_session("discord", sid);
+    }
 
     #[test]
     fn extract_assistant_final_answer_prefers_final_section() {

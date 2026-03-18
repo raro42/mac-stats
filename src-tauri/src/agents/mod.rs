@@ -426,6 +426,7 @@ mod tests {
             orchestrator: false,
             enabled: true,
             combined_prompt: String::new(),
+            combined_prompt_without_memory: String::new(),
             max_tool_iterations: 15,
         }];
         assert!(find_agent_by_id_or_name(&agents, "generalist").is_some());
@@ -443,6 +444,7 @@ mod tests {
             orchestrator: false,
             enabled: true,
             combined_prompt: String::new(),
+            combined_prompt_without_memory: String::new(),
             max_tool_iterations: 15,
         }];
         assert!(find_agent_by_id_or_name(&agents, "001").is_some());
