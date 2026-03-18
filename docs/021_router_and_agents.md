@@ -123,7 +123,18 @@ Agents are **loaded from disk on each use** (`agents::load_agents()`): no in-mem
 - **Sub-agent run (no tools)**: `run_agent_ollama_session` in `commands/ollama.rs` (single request, no tool list).
 - **Router API snippet for orchestrator**: `docs/agent_000_router_commands_snippet.md`, `docs/017_llm_agents.md`.
 
+## More advanced tool commands (future)
+
+Current tools use a single-line form `TOOL_NAME: <argument>`. Possible future improvements (for consideration; not scheduled):
+
+- **Structured or multi-argument tools**: Allow key-value or JSON-style arguments (e.g. `FETCH_URL: {"url":"...","max_bytes":50000}`) for tools that need more than one parameter, with clear parsing and backward compatibility.
+- **Tool result streaming**: For long-running or large results (e.g. FETCH_URL of a big page), stream chunks into the conversation instead of one large injection.
+- **Compound or batch hints**: Let the model request multiple tools in one turn with a defined order (e.g. "run A then B") while still executing one tool per step for safety and clarity; or explicit "batch" syntax for read-only tools.
+- **Tool schema in prompt**: Expose a minimal schema (name, description, argument shape) so the model can choose tools more reliably; keep the prompt size manageable (see `docs/034_tool_prompt_scaling.md`).
+
+Implementation would live in `commands/ollama.rs` (parsing, tool loop) and possibly in agent prompts (router snippet). No code change in this FEAT; this section records scope for future work.
+
 ## Open tasks:
 - ~~Investigate why some agents are not being properly initialized.~~ **Done:** § "Agent initialization and model resolution" above (load from disk each time; model resolution depends on ModelCatalog from `ensure_ollama_agent_ready_at_startup`; race when catalog not yet set; failure modes logged). Added log when catalog missing in `agents/mod.rs`.
 - ~~Improve the documentation for specialist agents.~~ **Done:** § "Specialist agents" above (definition, invocation, what they receive, where they live, default table, limitation).
-- Consider adding support for more advanced tool commands.
+- ~~Consider adding support for more advanced tool commands.~~ **Done:** § "More advanced tool commands (future)" above (options: structured args, result streaming, compound/batch hints, tool schema; scope for future implementation).

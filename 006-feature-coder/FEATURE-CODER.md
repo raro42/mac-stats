@@ -90,5 +90,6 @@ The Coder currently edits this repo **in place** (yolo mode) via the mac-stats-a
 | docs/004_notes.md | ~~Alert evaluation needs to be called periodically (background task)~~ | **Done:** background thread in lib.rs every 60s; `run_periodic_alert_evaluation()` in commands/alerts.rs; `get_monitor_statuses_snapshot()` in commands/monitors.rs; 004 Known Issues updated. |
 | docs/021_router_and_agents.md | ~~Improve the documentation for specialist agents~~ | **Done:** new § "Specialist agents" (definition, invocation, what they receive, where they live, default table, limitation); 021 open task marked done. |
 | docs/021_router_and_agents.md | ~~Investigate why some agents are not being properly initialized~~ | **Done:** § "Agent initialization and model resolution" in 021 (load from disk each time; ModelCatalog from startup; race when catalog not set; failure modes). Log when catalog missing in `agents/mod.rs`. |
+| docs/021_router_and_agents.md | ~~Consider adding support for more advanced tool commands~~ | **Done:** § "More advanced tool commands (future)" in 021 (options: structured args, result streaming, compound/batch hints, tool schema; scope for future implementation; no code change). |
 
-Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.
+Start with the first FEAT you can complete end-to-end (code or doc), then move to the next. When all rows above are done, check **docs/006_roadmap_ai_tasks.md** (Mail, WhatsApp, Google Docs) or other docs’ "Open tasks" for new candidates.
