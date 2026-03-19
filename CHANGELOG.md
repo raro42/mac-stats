@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Settings → Skills tab** — Dashboard Settings: new Skills tab lists loaded skills (number, topic, path) via `list_skills` Tauri command; hint to ~/.mac-stats/agents/skills/ and docs/016. Backend: `commands/skills.rs`, `SkillForUi`, `list_skills_for_ui()` in skills.rs. Docs: 005 OpenClaw §72 re-verification, 006 FEATURE-CODER and 016 open task "Improve the user interface for managing skills" done, 022 testing note 2026-03-19.
+
 ### Changed
 - **Docs 005 §71, 006, 022, 033** — OpenClaw re-verification §71 (005); FEATURE-CODER backlog row for 033 RUN_CMD allowlist note done (006); 033 resolution: full allowlist in 011 and 100, no further change; 022 testing note wording (smoke log details).
 - **Docs 005 §70, 006, 011, 022, 100** — OpenClaw re-verification §70 (005); FEATURE-CODER backlog row for 011 shell-injection review done (006); docs/011_local_cmd_agent.md new § "Shell injection considerations" (full stage to `sh -c`, first token allowlisted, path validation, trust boundary and mitigations, strict-mode option as future); 100 open task run_local_command hardening review done; 022 testing note 2026-03-19 (closing reviewer).

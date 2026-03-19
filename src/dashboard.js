@@ -300,6 +300,7 @@ function showSettingsDialog(openTab) {
     loadSettingsMonitors();
     loadSettingsAlertChannels();
     loadSettingsSchedules();
+    loadSettingsSkills();
     setupAlertChannelTypeVisibility();
     setupScheduleTypeVisibility();
 }
@@ -382,6 +383,32 @@ function setupScheduleTypeVisibility() {
     const type = document.getElementById('schedule-type').value;
     document.getElementById('schedule-row-cron').style.display = type === 'cron' ? 'block' : 'none';
     document.getElementById('schedule-row-at').style.display = type === 'at' ? 'block' : 'none';
+}
+
+async function loadSettingsSkills() {
+    const listEl = document.getElementById('settings-skills-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    try {
+        const skills = await invoke('list_skills');
+        if (skills.length === 0) {
+            listEl.innerHTML = '<p class="settings-empty">No skills loaded. Add <code>skill-&lt;number&gt;-&lt;topic&gt;.md</code> files to ~/.mac-stats/agents/skills/ (see docs/016_skill_agent.md).</p>';
+            return;
+        }
+        for (const s of skills) {
+            const item = document.createElement('div');
+            item.className = 'settings-list-item';
+            item.innerHTML = `
+                <div>
+                    <span class="label">${escapeHtml(String(s.number))}-${escapeHtml(s.topic)}</span>
+                    <div class="sublabel">${escapeHtml(s.path)}</div>
+                </div>
+            `;
+            listEl.appendChild(item);
+        }
+    } catch (err) {
+        listEl.innerHTML = `<p class="settings-error">Failed to load: ${escapeHtml(String(err))}</p>`;
+    }
 }
 
 async function loadSettingsSchedules() {

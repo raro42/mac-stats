@@ -79,5 +79,5 @@ See `~/.mac-stats/debug.log` after a run (e.g. open CPU window and trigger a ski
 ## Open tasks:
 
 *   ~~Investigate why the app sometimes fails to load skills.~~ **Done:** Diagnostics added in `skills.rs` (warn when filename format invalid, info when empty; log path and doc pointer when no valid skills). Doc path corrected to `~/.mac-stats/agents/skills/` and "Troubleshooting: skills not loading" added.
-*   Improve the user interface for managing skills.
+*   ~~Improve the user interface for managing skills.~~ **Done:** Settings → Skills tab (dashboard): lists loaded skills (number, topic, path) via `list_skills` Tauri command; hint and path from docs/016.
 *   Add support for more advanced skill features, such as conditional logic and user-defined variables.

@@ -233,6 +233,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::scheduler::add_schedule,
             commands::scheduler::add_schedule_at,
             commands::scheduler::remove_schedule,
+            commands::skills::list_skills,
             // Window commands (e.g. from chat reserved words)
             commands::window::toggle_cpu_window,
             // Agent commands

@@ -107,6 +107,7 @@
             <button type="button" class="settings-tab active" data-tab="monitors">Monitors</button>
             <button type="button" class="settings-tab" data-tab="alerts">Alert channels</button>
             <button type="button" class="settings-tab" data-tab="schedules">Schedules</button>
+            <button type="button" class="settings-tab" data-tab="skills">Skills</button>
           </div>
 
           <section class="settings-panel active" id="settings-monitors">
@@ -198,6 +199,12 @@
               </div>
               <button type="button" class="btn-primary" id="settings-add-schedule-btn">Add schedule</button>
             </div>
+          </section>
+
+          <section class="settings-panel" id="settings-skills">
+            <h4>Skills</h4>
+            <p class="settings-hint">Markdown files in <code>~/.mac-stats/agents/skills/</code> (e.g. <code>skill-1-summarize.md</code>). Used as system-prompt overlays; invoke via <code>SKILL: &lt;number or topic&gt;</code> in chat or Discord.</p>
+            <div class="settings-list" id="settings-skills-list"></div>
           </section>
         </div>
       </div>

@@ -4,6 +4,7 @@
 //! Any future code that creates or modifies skill files should also log and consider notifying the user (e.g. status or Tauri event).
 
 use crate::config::Config;
+use serde::Serialize;
 use tracing::{info, warn};
 
 /// One skill: number and topic from filename, content from file.
@@ -12,6 +13,14 @@ pub struct Skill {
     pub number: u32,
     pub topic: String,
     pub content: String,
+}
+
+/// Skill summary for UI (Settings → Skills): number, topic, and file path.
+#[derive(Debug, Clone, Serialize)]
+pub struct SkillForUi {
+    pub number: u32,
+    pub topic: String,
+    pub path: String,
 }
 
 /// Default skills created when the skills directory is empty (planned "two agent skills": summarize, code).
@@ -153,6 +162,23 @@ pub fn load_skills() -> Vec<Skill> {
     }
 
     skills
+}
+
+/// Return loaded skills for the Settings UI (number, topic, path). Path is full filesystem path.
+pub fn list_skills_for_ui() -> Vec<SkillForUi> {
+    let skills = load_skills();
+    let dir = Config::skills_dir();
+    skills
+        .into_iter()
+        .map(|s| {
+            let path = dir.join(format!("skill-{}-{}.md", s.number, s.topic));
+            SkillForUi {
+                number: s.number,
+                topic: s.topic.clone(),
+                path: path.display().to_string(),
+            }
+        })
+        .collect()
 }
 
 /// Parse "skill-123-topic-name" into (123, "topic-name").
