@@ -170,6 +170,16 @@ impl Config {
         std::env::temp_dir().join("mac-stats-config.json")
     }
 
+    /// Path for persisted list of Keychain credential account names: `$HOME/.mac-stats/credential_accounts.json`.
+    /// Used by the security module to list accounts without Keychain attribute enumeration.
+    pub fn credential_accounts_file_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            let home_path = PathBuf::from(home);
+            return home_path.join(".mac-stats").join("credential_accounts.json");
+        }
+        std::env::temp_dir().join("mac-stats-credential_accounts.json")
+    }
+
     /// Read window decorations preference from config file
     ///
     /// Returns true (show decorations) by default if file doesn't exist or can't be read.

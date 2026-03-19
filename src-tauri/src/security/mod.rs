@@ -2,16 +2,19 @@
 //!
 //! Provides secure storage for API keys, tokens, and passwords using macOS Keychain.
 //! All credentials are stored securely and never exposed in logs, UI, or files.
+//! Account names are persisted in `~/.mac-stats/credential_accounts.json` so we can
+//! list them without relying on Keychain attribute enumeration (which security_framework
+//! does not expose for generic password items).
 //!
 //! **No-logging rule:** Do not log credential values or any buffer that might contain them
 //! (e.g. request/response headers or bodies). Use `mask_credential` for safe display only.
 
 use anyhow::{Context, Result};
-use security_framework::item::{ItemClass, ItemSearchOptions, SearchResult};
 use security_framework::passwords::delete_generic_password;
 use security_framework::passwords::get_generic_password;
 use security_framework::passwords::set_generic_password;
 use security_framework_sys::base::errSecItemNotFound;
+use std::fs;
 use std::sync::Mutex;
 
 // Service name for Keychain items (unique identifier for our app)
@@ -54,6 +57,7 @@ pub fn store_credential(account: &str, password: &str) -> Result<()> {
         account,
         KEYCHAIN_SERVICE
     );
+    add_credential_account_to_list(account)?;
     Ok(())
 }
 
@@ -102,11 +106,13 @@ pub fn delete_credential(account: &str) -> Result<()> {
     match delete_generic_password(KEYCHAIN_SERVICE, account) {
         Ok(()) => {
             tracing::debug!("Credential deleted for account: {}", account);
+            remove_credential_account_from_list(account)?;
             Ok(())
         }
         Err(e) => {
             if e.code() == errSecItemNotFound {
-                // Not an error if it doesn't exist
+                // Not an error if it doesn't exist; still sync list in case it was present
+                let _ = remove_credential_account_from_list(account);
                 Ok(())
             } else {
                 Err(anyhow::anyhow!("Failed to delete credential: {:?}", e))
@@ -121,6 +127,8 @@ pub fn delete_credential(account: &str) -> Result<()> {
 /// Account names plus get_credential would allow enumeration and theft of all
 /// stored credentials from the renderer.
 ///
+/// Reads the persisted list at `~/.mac-stats/credential_accounts.json` (updated on store/delete).
+///
 /// # Returns
 /// Vector of account names stored in Keychain
 pub fn list_credentials() -> Result<Vec<String>> {
@@ -128,38 +136,51 @@ pub fn list_credentials() -> Result<Vec<String>> {
         .lock()
         .map_err(|e| anyhow::anyhow!("Keychain lock poisoned: {:?}", e))?;
 
-    let mut accounts = Vec::new();
+    read_credential_accounts_list()
+}
 
-    // Search for all generic passwords with our service name
-    let mut search_options = ItemSearchOptions::new();
-    search_options.class(ItemClass::generic_password());
-    search_options.service(KEYCHAIN_SERVICE);
+fn credential_accounts_path() -> std::path::PathBuf {
+    crate::config::Config::credential_accounts_file_path()
+}
 
-    let results = search_options.search()?;
-
-    for result in results {
-        if let SearchResult::Ref(item_ref) = result {
-            // Extract account name from the item
-            // Note: This is a simplified approach - in production, you'd want to
-            // properly extract attributes from the SecKeychainItem
-            if let Ok(Some(account)) = get_account_from_item(&item_ref) {
-                accounts.push(account);
-            }
-        }
+/// Read the persisted list of credential account names.
+fn read_credential_accounts_list() -> Result<Vec<String>> {
+    let path = credential_accounts_path();
+    if !path.exists() {
+        return Ok(Vec::new());
     }
-
+    let content = fs::read_to_string(&path)
+        .context("Failed to read credential accounts file")?;
+    let accounts: Vec<String> = serde_json::from_str(&content)
+        .context("Failed to parse credential_accounts.json")?;
     Ok(accounts)
 }
 
-/// Helper function to extract account name from Keychain item
-/// This is a simplified implementation - in production, use proper Keychain API
-fn get_account_from_item(
-    _item_ref: &security_framework::item::Reference,
-) -> Result<Option<String>> {
-    // TODO: Implement proper account extraction from Keychain item
-    // For now, we'll use a different approach: store account names separately
-    // or use a different Keychain API that provides account names
-    Ok(None)
+/// Ensure parent directory exists and write the accounts list (JSON array).
+fn write_credential_accounts_list(accounts: &[String]) -> Result<()> {
+    let path = credential_accounts_path();
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).context("Failed to create .mac-stats directory")?;
+    }
+    let content = serde_json::to_string_pretty(accounts).context("Failed to serialize accounts list")?;
+    fs::write(&path, content).context("Failed to write credential_accounts.json")?;
+    Ok(())
+}
+
+fn add_credential_account_to_list(account: &str) -> Result<()> {
+    let mut accounts = read_credential_accounts_list()?;
+    if !accounts.contains(&account.to_string()) {
+        accounts.push(account.to_string());
+        write_credential_accounts_list(&accounts)?;
+    }
+    Ok(())
+}
+
+fn remove_credential_account_from_list(account: &str) -> Result<()> {
+    let mut accounts = read_credential_accounts_list()?;
+    accounts.retain(|a| a != account);
+    write_credential_accounts_list(&accounts)?;
+    Ok(())
 }
 
 /// Mask a credential for safe display only (shows only first/last few characters).

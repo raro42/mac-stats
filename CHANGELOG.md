@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Keychain credential list via persisted file (security)** — `list_credentials()` no longer relies on Keychain attribute enumeration (security_framework does not expose it for generic password items). Account names are persisted in `~/.mac-stats/credential_accounts.json`; `store_credential`/`delete_credential` update the file. New `Config::credential_accounts_file_path()`; docs data_files_reference § credential_accounts.json, 022 testing note 2026-03-19, 005/006.
 - **Docs 005 §74, 006, 020, 022, README** — OpenClaw re-verification §74 (005); FEATURE-CODER backlog row for 020 "Documentation: Update for clarity and completeness" done (006); docs/020 tool table completed (RUN_JS, PERPLEXITY_SEARCH, RUN_CMD implementation details), See also for full list; RUN_JS row in docs/README.md fixed (was truncated); 022 testing note 2026-03-19 (closing reviewer).
 
 ### Added

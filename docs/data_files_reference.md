@@ -131,6 +131,13 @@ Schedules are stored as a **JSON array** for simplicity, human readability, and 
 
 ---
 
+## credential_accounts.json
+
+**Path:** `$HOME/.mac-stats/credential_accounts.json`  
+**Purpose:** Persisted list of Keychain credential account names (e.g. `discord_bot_token`, `mastodon_api_key`). The security module updates this file on store/delete so `list_credentials()` can return account names without Keychain attribute enumeration. **Do not edit by hand**; the app maintains it. Format: JSON array of strings.
+
+---
+
 ## See also
 
 - **docs/007_discord_agent.md** — SCHEDULE/REMOVE_SCHEDULE, user-info in context, maxSchedules.
