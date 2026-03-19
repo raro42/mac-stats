@@ -154,8 +154,8 @@ The diff on top of the last commit (844c4bc) contains **10 distinct features/imp
 - New `commands/window.rs` exposes it as a Tauri command (uses `run_on_main_thread`).
 
 **Review checklist:**
-- [ ] Verify `toggle_cpu_window` logic: close visible → recreate is the same behaviour as before (no regression).
-- [ ] The function always recreates the window after closing — verify this is intentional (it means "toggle" always ends with the window open if it was hidden but existed; the only way to close is if it was visible).
+- [x] Verify `toggle_cpu_window` logic: close visible → recreate is the same behaviour as before (no regression).
+- [x] The function always recreates the window after closing — **verified intentional.** In `status_bar.rs`, after closing the window (whether it was visible or hidden), the code checks `if app_handle.get_window("cpu").is_none()` and then calls `create_cpu_window(app_handle)`. So every click ends with the window existing and open; there is no path that leaves the window closed. Effectively this is "show CPU window (create if needed)" rather than a strict toggle. To allow "close and leave closed" we would skip the final create when the window was visible before close.
 - [ ] Verify `run_on_main_thread` is safe here — Tauri docs say it may block; confirm the Tauri command is async enough to not hang the frontend.
 
 ### F10: Background monitor checks
@@ -534,6 +534,7 @@ See `CHANGELOG.md` (0.1.14) and `docs/023_externalized_prompts_DONE.md` for deta
 ## Testing (2026-03-19) — closing reviewer "Start testing now. Do your job." (agent run)
 
 - **Integration:** `cargo check` and `cargo clippy` pass (44 warnings; no errors). `diff src/ollama.js src-tauri/dist/ollama.js` empty (in sync). `toggle_cpu_window`, `set_chat_verbosity` in `tauri::generate_handler![]` in `lib.rs` (L228, L237); `run_due_monitor_checks()` in `lib.rs` (L372, background thread, 30s).
+- **Smoke:** `cargo build --release` succeeded (v0.1.44). `pkill -f mac_stats` then `nohup ./src-tauri/target/release/mac_stats --cpu -vv` started in background; `pgrep -fl mac_stats` confirmed process (pid 99141). `~/.mac-stats/debug.log`: verbosity 2, 4 monitors loaded from disk, Scheduler (2 entries) and Task review thread spawned, Discord skipped (no token), 8 agents loaded with shared soul present, CPU window created and shown, Ollama configuration and connection successful; background monitor checks running (UP). Manual checks (menu bar click, `--cpu`/`-vv` in chat) left to human.
 
 ---
 
