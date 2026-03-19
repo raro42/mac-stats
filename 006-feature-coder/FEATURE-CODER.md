@@ -109,5 +109,8 @@ The Coder currently edits this repo **in place** (yolo mode) via the mac-stats-a
 | docs/022_feature_review_plan.md | ~~Verify toggle_cpu_window always-recreate behaviour (intentional?)~~ | **Done:** Verified in status_bar.rs: after close we always call create_cpu_window when get_window("cpu").is_none(); doc checklist updated with verification note (022 § F9). |
 | docs/019_agent_session_and_memory.md | ~~Document manual edit of long-term memory as future consideration~~ | **Done:** § "Manual edit of long-term memory (future)" in 019 (current behaviour, possible enhancements a/b/c, out of scope); Open task marked done. |
 | docs/011_local_cmd_agent.md | ~~Update documentation to reflect current RUN_CMD implementation~~ | **Done:** 011 updated: shell execution, allowlist case-insensitive, pipelines, duplicate detection, TASK_APPEND full output, RUN_CMD naming, retry count, tool iterations; Open task marked done. |
+| docs/011_local_cmd_agent.md | ~~Review security measures for RUN_CMD~~ | **Done:** § "Security review (measures in place)" in 011 (allowlist, path validation, shell scope, cursor-agent caveat, ALLOW_LOCAL_CMD); 011 Open tasks point to this backlog. |
+| docs/011_local_cmd_agent.md | Improve RUN_CMD retry loop (error handling / UX) | Optional: clearer messages or one more retry path when AI fix suggestion fails to parse. |
+| docs/011_local_cmd_agent.md | Consider more RUN_CMD features (more commands, path validation) | Doc/design only; no code required. |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next. When all rows above are done, check **docs/006_roadmap_ai_tasks.md** (Mail, WhatsApp, Google Docs) or other docs’ "Open tasks" for new candidates.

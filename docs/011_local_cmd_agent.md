@@ -85,6 +85,18 @@ This handles the common case where the model appends plan commentary to the comm
 *   Path validation ensures no escape from `~/.mac-stats` (canonical path check).
 *   Execution is via `sh -c "<stage>"`; the first token (command) must be in the allowlist and path-like tokens are validated to be under `~/.mac-stats`.
 
+### Security review (measures in place)
+
+| Measure | Purpose |
+|--------|--------|
+| **Allowlist** | Only commands from orchestrator `skill.md` (§ RUN_CMD allowlist) or built-in default (`cat`, `head`, `tail`, `ls`, `grep`, `date`, `whoami`, `ps`, `wc`, `uptime`, `cursor-agent`) can run. No arbitrary binaries. |
+| **Path validation** | For path-required commands (`cat`, `head`, `tail`, `grep`), any path-like argument is canonicalized and must be under `~/.mac-stats`. Prevents reading or escaping outside app data. |
+| **Shell scope** | `sh -c` runs only the user/agent-provided string; no extra shell profile or global env beyond what the app has. Pipelines and redirects are allowed but each stage's first token must be allowlisted. |
+| **cursor-agent caveat** | `cursor-agent` is allowlisted but its arguments are not path-validated; it runs user/agent-controlled prompts in the user environment. To lock down, remove it from the allowlist in the orchestrator's `skill.md`. |
+| **ALLOW_LOCAL_CMD** | Set to `0` / `false` / `no` (env or `.config.env`) to disable RUN_CMD entirely in locked-down setups. |
+
+Together these prevent unauthorized access to files outside `~/.mac-stats` and limit execution to a fixed set of commands; the main residual risk is abuse of `cursor-agent` if left on the allowlist.
+
 ## Where it’s Used
 
 *   **Discord bot**: When RUN_CMD is enabled, Ollama can output `RUN_CMD: <command> [args]`. The app runs it and gives the result back to Ollama.
@@ -96,9 +108,9 @@ This handles the common case where the model appends plan commentary to the comm
 *   **Code:** `src-tauri/src/commands/run_cmd.rs`, `src-tauri/src/commands/ollama.rs` (tool loop, agent descriptions)
 *   **All agents:** `docs/100_all_agents.md`
 
-## Open tasks:
+## Open tasks
 
-*   Improve the retry loop for better error handling and user experience.
-*   Consider adding more features to the RUN_CMD agent, such as support for more commands or improved path validation.
-*   Review the security measures in place to prevent unauthorized access to the app's data and functionality.
+RUN_CMD open tasks are tracked in **006-feature-coder/FEATURE-CODER.md**. Completed:
+
 *   ~~Update the documentation to better reflect the current implementation and usage of the RUN_CMD agent.~~ **Done:** doc updated to match code (shell execution, allowlist section case-insensitive, pipelines, duplicate detection, TASK_APPEND full output, RUN_CMD naming, retry count, tool iterations).
+*   ~~Review the security measures in place to prevent unauthorized access to the app's data and functionality.~~ **Done:** § "Security review (measures in place)" above (allowlist, path validation, shell scope, cursor-agent caveat, ALLOW_LOCAL_CMD).
