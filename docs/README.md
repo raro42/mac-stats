@@ -22,7 +22,7 @@ Gatekeeper may show "damaged" or block the unsigned app—the file is fine. Righ
 
 - **Menu bar** — CPU, GPU, RAM, disk at a glance; click to open the details window.
 - **AI chat** — Ollama in the app or via Discord; FETCH_URL, BRAVE_SEARCH, PERPLEXITY_SEARCH, RUN_CMD, code execution, MCP.
-- **Discord**
+- **Discord bot** — Responds to DMs and @mentions; replies via Ollama + tools (fetch, search, SCHEDULE, DISCORD_API, etc.); per-channel session and reset phrases. Full description: [007_discord_agent.md](007_discord_agent.md).
 
 ## Tool Agents (what Ollama can invoke)
 

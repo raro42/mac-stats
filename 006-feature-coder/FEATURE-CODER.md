@@ -114,5 +114,6 @@ The Coder currently edits this repo **in place** (yolo mode) via the mac-stats-a
 | docs/011_local_cmd_agent.md | ~~Consider more RUN_CMD features (more commands, path validation)~~ | **Done:** § "More RUN_CMD features (design only)" in 011 (candidate commands table, path validation current + possible improvements); doc only. |
 | docs/025_redmine_api_skill.md | ~~Improve the documentation for the REDMINE_API command~~ | **Done:** Configuration, Error handling (table), Implementation sections in 025. |
 | docs/025_redmine_api_skill.md | ~~Implement a more robust way to handle Redmine API errors~~ | **Done:** 401/404/422 and generic status get clear user-facing messages in `redmine_api_request` (redmine/mod.rs). |
+| docs/020_agent_task_flow_analysis.md | ~~Complete description of Discord bot functionality~~ | **Done:** 007 §2 "Bot functionality at a glance" (triggers, reply pipeline, personalization, session/memory, scheduling, optional); docs/README At a Glance one-line Discord bot summary with link to 007. |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next. When all rows above are done, check **docs/006_roadmap_ai_tasks.md** (Mail, WhatsApp, Google Docs) or other docs’ "Open tasks" for new candidates.

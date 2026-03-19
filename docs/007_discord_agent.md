@@ -29,6 +29,16 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 
 mac-stats can run a Discord bot that connects via the **Gateway** and responds to **DMs** and **@mentions**. Replies use the Ollama agent pipeline and can call the **Discord HTTP API** (list servers, channels, members, get user info, send messages). The bot records the message author’s display name and passes it to Ollama so it can address the user by name.
 
+
+### Bot functionality at a glance
+
+- **Triggers:** Responds to direct messages and to messages that @mention the bot in guild channels.
+- **Reply pipeline:** Ollama + tools (FETCH_URL, BRAVE_SEARCH, RUN_CMD, BROWSER_SCREENSHOT, DISCORD_API, SCHEDULE, MCP, etc.); planning step then execution; platform formatting for Discord (bullets, link wrapping).
+- **Personalization:** Records your display name per channel; tells Ollama who it is talking to.
+- **Session and memory:** Per-channel session files; say a reset phrase (any language) to clear context and start fresh.
+- **Scheduling:** SCHEDULE (cron or one-shot) and REMOVE_SCHEDULE; schedule ID returned so you can cancel later.
+- **Optional:** having_fun channels (casual-only persona); DISCORD_API for listing servers/channels/members and sending messages; View logs in Settings.
+
 ## Setup
 
 1. **Create a Discord application** at [Discord Developer Portal](https://discord.com/developers/applications) → New Application.

@@ -79,4 +79,4 @@ Ollama can invoke these tools by replying with `TOOL_NAME: <argument>`. The **SC
 - **Performance**: Investigate optimizations for sequential execution.  
 - **Parallel execution**: Explore feasibility of multi-tool per turn or parallel agent runs.  
 - **Documentation**: Update for clarity and completeness.  
-- **Discord integration**: Complete description of bot functionality.
+- ~~**Discord integration**: Complete description of bot functionality.~~ **Done:** [007_discord_agent.md](007_discord_agent.md) §2 has "Bot functionality at a glance" (triggers, reply pipeline, personalization, session/memory, scheduling, optional features); [docs/README.md](README.md) At a Glance has a one-line Discord bot summary with link to 007.
