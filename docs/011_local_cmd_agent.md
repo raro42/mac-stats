@@ -42,7 +42,7 @@ The RUN_CMD agent lets Ollama read app data by running restricted local commands
 
 *   **Agent name**: RUN_CMD  
 *   **Invocation**: Ollama replies with one line: `RUN_CMD: <command> [args]` (e.g. `RUN_CMD: cat ~/.mac-stats/schedules.json`, `RUN_CMD: date`, `RUN_CMD: whoami`, or `RUN_CMD: ls ~/.mac-stats`).  
-*   The app runs the command (no shell), validates that any path arguments are under `~/.mac-stats`, and injects stdout (or an error message) back into the conversation.
+*   The app runs the command via a shell (`sh -c`) so that redirects (`>`, `>>`), pipes (`|`), and semicolons (`;`) work. Path-like arguments are validated to be under `~/.mac-stats` where applicable. Stdout (or an error message) is injected back into the conversation.
 
 ## Setup
 
@@ -51,25 +51,28 @@ The RUN_CMD agent lets Ollama read app data by running restricted local commands
 
 ## Allowlist and Path Rules
 
-*   **Allowlist source**: The list of allowed commands is read from the **first enabled orchestrator** agent’s `skill.md` (section `## RUN_CMD allowlist`). One line, comma- or newline-separated (e.g. `cat, head, tail, ls, grep, date, whoami, ps, wc, uptime, cursor-agent`). If that section is missing or empty, the built-in default is used (same list). Edit `~/.mac-stats/agents/agent-000/skill.md` (or whichever agent is your orchestrator) to add or remove commands.
+*   **Allowlist source**: The list of allowed commands is read from the **first enabled orchestrator** agent’s `skill.md` (section `## RUN_CMD allowlist`, case-insensitive). One line, comma- or newline-separated (e.g. `cat, head, tail, ls, grep, date, whoami, ps, wc, uptime, cursor-agent`). If that section is missing or empty, the built-in default is used (same list). Edit `~/.mac-stats/agents/agent-000/skill.md` (or whichever agent is your orchestrator) to add or remove commands.
 *   **Path-required commands**: Only `cat`, `head`, `tail`, and `grep` require a path argument under `~/.mac-stats`. All other allowed commands (e.g. `date`, `whoami`, `ps`, `cursor-agent`) can be run with no path.
-*   **Security — cursor-agent**: `cursor-agent` in the allowlist runs user/ or agent-controlled prompts in the user environment; its arguments are not path-validated. It is a privileged capability. To lock down, remove `cursor-agent` from the RUNCMD allowlist in your orchestrator’s `skill.md` (see `## RUNCMD allowlist`).
+*   **Security — cursor-agent**: `cursor-agent` in the allowlist runs user/ or agent-controlled prompts in the user environment; its arguments are not path-validated. It is a privileged capability. To lock down, remove `cursor-agent` from the RUN_CMD allowlist in your orchestrator’s `skill.md` (see `## RUN_CMD allowlist`).
 *   **Paths**: Any argument that looks like a path (contains `/` or starts with `~`) must resolve to a location under `~/.mac-stats`. Paths are expanded (`~` → `$HOME`) and validated (canonical form must be under the permitted base). Paths outside `~/.mac-stats` are rejected with "Path not allowed (must be under ~/.mac-stats)."
 *   **Shell execution**: The app runs each pipeline stage with `sh -c "<stage>"` so that redirects, pipes, and semicolons are interpreted. The first token of each stage must be in the allowlist; path-like arguments are validated to be under `~/.mac-stats`.
-*   **`ls` with no path**: If the user invokes `RUNCMD: ls` with no arguments, the app runs `ls` with the permitted base directory (`~/.mac-stats`) so only that directory is listed. **`date` and `whoami`** need no path; use e.g. `RUNCMD: date` or `RUNCMD: whoami`.
+*   **`ls` with no path**: If the user invokes `RUN_CMD: ls` with no arguments, the app runs `ls` (no path), and the shell will run it from the current working directory; for listing app data use e.g. `RUN_CMD: ls ~/.mac-stats`. **`date` and `whoami`** need no path; use e.g. `RUN_CMD: date` or `RUN_CMD: whoami`.
+*   **Pipelines**: Commands can be chained with `|` (e.g. `RUN_CMD: ps aux | grep tail`). Each stage runs via `sh -c`; the first token of each stage must be in the allowlist; path-like arguments in each stage must be under `~/.mac-stats`.
 
 ## Behaviour
 
-*   When RUNCMD is enabled, the agent list sent to Ollama in the planning and execution steps includes RUNCMD (as agent 5 when MCP is not configured, or 5 with MCP as 6).
-*   Ollama can reply with `RUNCMD: cat ~/.mac-stats/schedules.json`. The app runs the command, validates paths, and injects the result (or an error) into the conversation.
-*   The tool loop (Discord, scheduler, and when wired CPU-window flow) supports RUNCMD like other tools; each RUNCMD call counts as one tool iteration (max 5).
+*   When RUN_CMD is enabled, the agent list sent to Ollama in the planning and execution steps includes RUN_CMD (position depends on agent order; MCP if configured appears after).
+*   Ollama invokes with `RUN_CMD: <command> [args]` (e.g. `RUN_CMD: cat ~/.mac-stats/schedules.json`). The app runs the command via shell, validates paths where required, and injects the result (or an error) into the conversation.
+*   The tool loop (Discord, scheduler, CPU-window flow) supports RUN_CMD like other tools; each RUN_CMD call counts as one tool iteration (subject to the agent's max tool iterations).
+*   **Duplicate detection**: If the model sends the same RUN_CMD argument as the previous run, the app skips execution and tells the model to use the result already in the conversation (avoids loops).
+*   **TASK_APPEND after RUN_CMD**: When the model runs RUN_CMD then TASK_APPEND, the app appends the full command output to the task file (not a summary), so task files get the actual data.
 
 ## Retry Loop (AI-assisted error correction)
 
 When a command fails (non-zero exit code), the app does **not** give up immediately. Instead it enters a retry loop (up to 3 retries):
 
-1.  The error message (e.g. `cat: to: No such file or directory`) is sent to Ollama in a focused, minimal prompt: *"The command `<cmd>` failed with error: `<error>`. Reply with ONLY the corrected command: `RUNCMD: <corrected command>`."*
-2.  Ollama returns the corrected command (e.g. `RUNCMD: cat ~/.mac-stats/schedules.json`).
+1.  The error message (e.g. `cat: to: No such file or directory`) is sent to Ollama in a focused, minimal prompt: *"The command `<cmd>` failed with error: `<error>`. Reply with ONLY the corrected command: `RUN_CMD: <corrected command>`."*
+2.  Ollama returns the corrected command (e.g. `RUN_CMD: cat ~/.mac-stats/schedules.json`).
 3.  The corrected command is extracted via `parse_tool_from_response` and executed.
 4.  If it succeeds, the output is used. If it fails again, the loop repeats (up to 3 retries).
 5.  If all retries fail, the last error is returned.
@@ -84,9 +87,9 @@ This handles the common case where the model appends plan commentary to the comm
 
 ## Where it’s Used
 
-*   **Discord bot**: When RUNCMD is enabled, Ollama can output `RUNCMD: <command> [args]`. The app runs it and gives the result back to Ollama.
-*   **Scheduler**: Same pipeline; scheduled tasks that go through Ollama can use RUNCMD.
-*   **CPU window chat**: When the CPU-window flow uses the same tool loop, RUNCMD is available there too.
+*   **Discord bot**: When RUN_CMD is enabled, Ollama can output `RUN_CMD: <command> [args]`. The app runs it and gives the result back to Ollama.
+*   **Scheduler**: Same pipeline; scheduled tasks that go through Ollama can use RUN_CMD.
+*   **CPU window chat**: When the CPU-window flow uses the same tool loop, RUN_CMD is available there too.
 
 ## References
 
@@ -96,6 +99,6 @@ This handles the common case where the model appends plan commentary to the comm
 ## Open tasks:
 
 *   Improve the retry loop for better error handling and user experience.
-*   Consider adding more features to the RUNCMD agent, such as support for more commands or improved path validation.
+*   Consider adding more features to the RUN_CMD agent, such as support for more commands or improved path validation.
 *   Review the security measures in place to prevent unauthorized access to the app's data and functionality.
-*   Update the documentation to better reflect the current implementation and usage of the RUNCMD agent.
+*   ~~Update the documentation to better reflect the current implementation and usage of the RUN_CMD agent.~~ **Done:** doc updated to match code (shell execution, allowlist section case-insensitive, pipelines, duplicate detection, TASK_APPEND full output, RUN_CMD naming, retry count, tool iterations).
