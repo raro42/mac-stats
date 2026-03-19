@@ -97,6 +97,21 @@ This handles the common case where the model appends plan commentary to the comm
 
 Together these prevent unauthorized access to files outside `~/.mac-stats` and limit execution to a fixed set of commands; the main residual risk is abuse of `cursor-agent` if left on the allowlist.
 
+### Shell injection considerations
+
+The full pipeline stage string is passed to `sh -c "<stage>"`. Only the **first token** is allowlisted and path-like tokens are validated; the rest of the stage is not parsed for further commands. So shell metacharacters in the same stage can run additional commands:
+
+- Example: `RUN_CMD: cat ~/.mac-stats/x; echo pwned` — first token `cat` is allowed, path `~/.mac-stats/x` is valid; the shell then also runs `echo pwned`.
+- Same applies to `&&`, `||`, command substitution (backticks or `$(...)`), and newlines within the stage.
+
+**Intentional design:** Pipelines and redirects are supported (e.g. `cat file | grep x`, `date > out`), so the app does not strip or reject shell syntax. The trust boundary is the source of the RUN_CMD line (Ollama model or user). Mitigations in place:
+
+- Allowlist restricts which *leading* command can run (no arbitrary binaries).
+- Path validation restricts which files can be read (under `~/.mac-stats`).
+- Disable RUN_CMD via `ALLOW_LOCAL_CMD=0` or remove `cursor-agent` from the allowlist for strict lock-down.
+
+A future "strict mode" could run only the first token plus path-validated arguments via `Command::new(cmd).args(...)` without a shell, at the cost of breaking pipelines and redirects; not implemented.
+
 ## Where it’s Used
 
 *   **Discord bot**: When RUN_CMD is enabled, Ollama can output `RUN_CMD: <command> [args]`. The app runs it and gives the result back to Ollama.
