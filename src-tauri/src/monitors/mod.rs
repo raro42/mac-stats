@@ -11,6 +11,7 @@ pub mod website;
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// Monitor type enumeration
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -39,6 +40,9 @@ pub struct MonitorStatus {
     pub response_time_ms: Option<u64>,
     pub error: Option<String>,
     pub checked_at: DateTime<Utc>,
+    /// Extensible data bag for monitor-specific values (e.g. mention timestamps for social monitors).
+    #[serde(default)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 /// Monitor result from a check

@@ -97,6 +97,7 @@ impl MonitorCheck for WebsiteMonitor {
                         Some(format!("Unexpected status code: {}", status_code))
                     },
                     checked_at,
+                    extra: Default::default(),
                 })
             }
             Err(e) => {
@@ -107,6 +108,7 @@ impl MonitorCheck for WebsiteMonitor {
                     response_time_ms: Some(elapsed_ms),
                     error: Some(format!("Request failed: {}", e)),
                     checked_at,
+                    extra: Default::default(),
                 })
             }
         }

@@ -2,6 +2,7 @@
 
 use super::AlertContext;
 use anyhow::Result;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 /// Alert rule types
@@ -51,9 +52,23 @@ impl AlertRule {
                 }
                 Ok(false)
             }
-            AlertRule::NewMentions { count: _, hours: _ } => {
-                // TODO: Implement mention counting logic
-                // This would require tracking mention history
+            AlertRule::NewMentions { count, hours } => {
+                if let Some(ref status) = context.monitor_status {
+                    if let Some(ts_val) = status.extra.get("mention_timestamps") {
+                        let cutoff = Utc::now() - chrono::Duration::hours(*hours as i64);
+                        let recent = ts_val
+                            .as_array()
+                            .map(|arr| {
+                                arr.iter()
+                                    .filter_map(|v| v.as_str())
+                                    .filter_map(|s| s.parse::<DateTime<Utc>>().ok())
+                                    .filter(|dt| *dt >= cutoff)
+                                    .count() as u64
+                            })
+                            .unwrap_or(0);
+                        return Ok(recent >= *count);
+                    }
+                }
                 Ok(false)
             }
             AlertRule::BatteryLow { threshold } => {

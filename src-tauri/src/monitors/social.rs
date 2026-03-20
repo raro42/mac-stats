@@ -5,6 +5,7 @@ use crate::security;
 use anyhow::{Context, Result};
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// Mastodon monitor configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -41,18 +42,19 @@ impl MastodonMonitor {
         security::get_credential(&account)?.context("Mastodon API token not found in Keychain")
     }
 
-    /// Check for new mentions
-    pub fn check_mentions(&self) -> Result<u64> {
+    /// Check for new mentions. Returns (count, list of created_at ISO timestamps).
+    pub fn check_mentions(&self) -> Result<(u64, Vec<String>)> {
         let token = self.get_api_token()?;
 
-        // Mastodon API: GET /api/v1/notifications
-        let url = format!("{}/api/v1/notifications", self.instance_url);
+        let url = format!(
+            "{}/api/v1/notifications?types[]=mention&limit=40",
+            self.instance_url
+        );
 
         let client = reqwest::blocking::Client::builder()
             .timeout(std::time::Duration::from_secs(10))
             .build()?;
 
-        // Do not log request/response headers or bodies that may contain credentials.
         let response = client
             .get(&url)
             .header("Authorization", format!("Bearer {}", token))
@@ -60,13 +62,13 @@ impl MastodonMonitor {
 
         if response.status().is_success() {
             let notifications: Vec<serde_json::Value> = response.json()?;
-            // Count mentions (type: "mention")
-            let mention_count = notifications
+            let timestamps: Vec<String> = notifications
                 .iter()
                 .filter(|n| n.get("type").and_then(|t| t.as_str()) == Some("mention"))
-                .count() as u64;
-
-            Ok(mention_count)
+                .filter_map(|n| n.get("created_at").and_then(|t| t.as_str()).map(String::from))
+                .collect();
+            let count = timestamps.len() as u64;
+            Ok((count, timestamps))
         } else {
             Err(anyhow::anyhow!("Mastodon API error: {}", response.status()))
         }
@@ -87,15 +89,31 @@ impl MonitorCheck for MastodonMonitor {
         );
 
         match self.check_mentions() {
-            Ok(mention_count) => {
+            Ok((mention_count, timestamps)) => {
                 info!("Monitor: Mastodon check successful - ID: {}, Instance: {}, Account: {}, Mentions: {}", 
                       self.id, self.instance_url, self.account_username, mention_count);
+
+                let mut extra: HashMap<String, serde_json::Value> = HashMap::new();
+                extra.insert(
+                    "mention_count".into(),
+                    serde_json::Value::Number(mention_count.into()),
+                );
+                extra.insert(
+                    "mention_timestamps".into(),
+                    serde_json::Value::Array(
+                        timestamps
+                            .into_iter()
+                            .map(serde_json::Value::String)
+                            .collect(),
+                    ),
+                );
 
                 Ok(MonitorStatus {
                     is_up: true,
                     response_time_ms: None,
                     error: None,
                     checked_at: Utc::now(),
+                    extra,
                 })
             }
             Err(e) => {
@@ -108,6 +126,7 @@ impl MonitorCheck for MastodonMonitor {
                     response_time_ms: None,
                     error: Some(format!("Failed to check mentions: {}", e)),
                     checked_at: Utc::now(),
+                    extra: Default::default(),
                 })
             }
         }
@@ -165,6 +184,7 @@ impl MonitorCheck for TwitterMonitor {
             response_time_ms: None,
             error: Some("Twitter/X API requires paid access and is not implemented".to_string()),
             checked_at: Utc::now(),
+            extra: Default::default(),
         })
     }
 }
