@@ -72,6 +72,8 @@ pub struct ProcessDetails {
     pub total_cpu_time: u64, // Total CPU time in milliseconds
 }
 
+/// Real-time CPU/system snapshot returned by `get_cpu_details()`.
+/// Rate-limited; see state.rs. Full API contract (fields, types, semantics, consumers): `docs/data-poster-charts-backend.md` § get_cpu_details() API contract.
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct CpuDetails {
     pub usage: f32,

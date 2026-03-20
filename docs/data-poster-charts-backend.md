@@ -77,4 +77,31 @@ pub struct CpuDetails {
 - ~~Investigate why the frontend is not utilizing the historical data buffer effectively.~~ **Done:** Root cause: the Data Poster theme (and others) had history-section canvases (`temperature-history-chart`, etc.) but did not load `history.js`. The backend exposes `get_metrics_history` (adaptive tiered buffer in `metrics/history.rs`); `history.js` calls it and draws the history charts. Fix: Data Poster theme now loads `../../history.js` in `themes/data-poster/cpu.html`, so the history section uses the backend buffer. Real-time bar/line charts still use `poster-charts.js` + frontend buffer from `get_cpu_details()` (unchanged). See 006-feature-coder/FEATURE-CODER.md.
 - ~~Implement chart-specific refresh rates for each metric.~~ **Done:** Temperature updates every 3s (DOM + ring + theme charts in `cpu.js`; history chart redraw in `history.js`); usage and frequency stay at 1s. See 006-feature-coder/FEATURE-CODER.md.
 - ~~Consider adding data smoothing to reduce noise in charts.~~ **Done:** Frontend moving average (window 5) in Data Poster theme `poster-charts.js`; bar and line charts use smoothed series for display only (raw values still drive scale). See 006-feature-coder/FEATURE-CODER.md.
-- Review and refactor the `get_cpu_details()` API response to improve performance and consistency.
+- ~~Review and refactor the `get_cpu_details()` API response to improve performance and consistency.~~ **Done:** API contract documented below; struct doc comment added in `metrics/mod.rs`. Future refactors can use this as the single reference.
+
+### get_cpu_details() API contract
+
+**Definition:** `src-tauri/src/metrics/mod.rs` — `get_cpu_details() -> CpuDetails`. Rate-limited; returns cached values when called too frequently (see `state.rs` rate limiter).
+
+| Field | Type | Semantics | Consumers |
+|-------|------|-----------|-----------|
+| `usage` | f32 | CPU usage 0–100 (%) | CPU window (ring, charts), dashboard |
+| `temperature` | f32 | °C; 0 if unreadable | CPU window, Data Poster / history charts |
+| `frequency` | f32 | GHz; combined or P-core | CPU window, charts |
+| `p_core_frequency` | f32 | GHz; 0 if N/A | CPU window (frequency subtext) |
+| `e_core_frequency` | f32 | GHz; 0 if N/A | CPU window (frequency subtext) |
+| `cpu_power` | f32 | Watts; 0 if N/A | CPU window, dashboard, alerts, history buffer |
+| `gpu_power` | f32 | Watts; 0 if N/A | CPU window, dashboard, history buffer |
+| `load_1`, `load_5`, `load_15` | f64 | Load averages | CPU window (load display) |
+| `uptime_secs` | u64 | System uptime seconds | CPU window (chip/uptime) |
+| `top_processes` | Vec&lt;ProcessUsage&gt; | Top N by CPU; cached ~30s | CPU window (process list), alerts |
+| `chip_info` | String | e.g. "Apple M3 · 16 cores" | CPU window |
+| `can_read_temperature` | bool | Whether SMC/IOReport temp is available | CPU window (hints, chart visibility) |
+| `can_read_frequency` | bool | Whether IOReport freq is available | CPU window (hints) |
+| `can_read_cpu_power` | bool | Whether power read succeeded | CPU window (power section visibility) |
+| `can_read_gpu_power` | bool | Whether power read succeeded | CPU window (power section visibility) |
+| `battery_level` | f32 | 0–100 or **-1.0** if no battery | CPU window, dashboard, alerts (BatteryLow) |
+| `is_charging` | bool | True if charging | CPU window, dashboard |
+| `has_battery` | bool | True if device has battery | CPU window, dashboard, alerts |
+
+**Consistency notes:** `battery_level` uses -1.0 for “not available”; power and frequency use 0. All `can_read_*` flags reflect capability/access, not just “value &gt; 0”. For historical data (e.g. Data Poster), the frontend uses `get_metrics_history` (separate API) for history; `get_cpu_details()` is the real-time snapshot only.
