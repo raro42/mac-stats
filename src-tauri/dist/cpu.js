@@ -66,6 +66,10 @@ const failedAttempts = {
 // Number of consecutive failures before showing the hint
 const FAILED_ATTEMPTS_THRESHOLD = 3;
 
+// Chart-specific refresh: temperature updates every 3s (changes slowly); usage/frequency every 1s
+const TEMPERATURE_UPDATE_INTERVAL_MS = 3000;
+let lastTemperatureUpdateMs = 0;
+
 // SVG Ring Gauge Animation
 const ringAnimations = new Map();
 const CIRCUMFERENCE = 2 * Math.PI * 42; // radius = 42
@@ -237,137 +241,127 @@ async function refresh() {
     // Update chip info with uptime
     updateChipInfo(data.chip_info, data.uptime_secs);
     
-    // Update temperature
+    // Update temperature (chart-specific refresh: only every 3s; usage/frequency stay at 1s)
+    const nowMs = Date.now();
+    const shouldUpdateTemperature = lastTemperatureUpdateMs === 0 || (nowMs - lastTemperatureUpdateMs >= TEMPERATURE_UPDATE_INTERVAL_MS);
+    if (shouldUpdateTemperature) {
+      lastTemperatureUpdateMs = nowMs;
+    }
     const tempEl = document.getElementById("temperature-value");
     const tempHint = document.getElementById("temperature-hint");
     const tempSubtext = document.getElementById("temperature-subtext");
     const newTemp = Math.round(data.temperature);
     
-    if (!data.can_read_temperature) {
-      failedAttempts.temperature++;
-      const currentDisplay = tempEl.textContent.replace(/°C/g, "").trim();
-      if (currentDisplay !== "—") {
-        scheduleDOMUpdate(() => {
-          tempEl.innerHTML = "—";
-          tempSubtext.textContent = "—";
-        });
-      }
-      // Only show hint after multiple failed attempts
-      const shouldShowHint = failedAttempts.temperature >= FAILED_ATTEMPTS_THRESHOLD;
-      if (tempHint.style.display !== (shouldShowHint ? "block" : "none")) {
-        scheduleDOMUpdate(() => {
-          tempHint.style.display = shouldShowHint ? "block" : "none";
-        });
-      }
-    } else {
-      failedAttempts.temperature = 0;
-      if (tempHint.style.display !== "none") {
-        scheduleDOMUpdate(() => {
-          tempHint.style.display = "none";
-        });
-      }
-      // Show temperature even if it's 0.0 (might be unsupported Mac model)
-      // But show "—" if temperature is exactly 0.0 and we've been trying for a while
-      if (newTemp === 0 && data.temperature === 0.0) {
-        // Temperature is 0.0 - might be unsupported Mac model
-        // Still show it as "0°C" to indicate we're trying to read it
-        const numberText = "0";
-        const currentText = tempEl.textContent.match(/^\d+/) ? tempEl.textContent.match(/^\d+/)[0] : "";
-        
-        if (currentText !== numberText) {
+    if (shouldUpdateTemperature) {
+      if (!data.can_read_temperature) {
+        failedAttempts.temperature++;
+        const currentDisplay = tempEl.textContent.replace(/°C/g, "").trim();
+        if (currentDisplay !== "—") {
           scheduleDOMUpdate(() => {
-            // OPTIMIZATION Phase 2: Update first text node instead of innerHTML rebuild
-            if (tempEl.firstChild && tempEl.firstChild.nodeType === 3) {
-              tempEl.firstChild.textContent = numberText;
-            } else {
-              tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
-            }
+            tempEl.innerHTML = "—";
+            tempSubtext.textContent = "—";
           });
-          previousValues.temperature = 0;
         }
-        if (tempSubtext.textContent !== "SMC: No data") {
+        // Only show hint after multiple failed attempts
+        const shouldShowHint = failedAttempts.temperature >= FAILED_ATTEMPTS_THRESHOLD;
+        if (tempHint.style.display !== (shouldShowHint ? "block" : "none")) {
           scheduleDOMUpdate(() => {
-            tempSubtext.textContent = "SMC: No data";
+            tempHint.style.display = shouldShowHint ? "block" : "none";
           });
         }
       } else {
-        const numberText = `${newTemp}`;
-        // Get current number by extracting digits from textContent (ignoring °C)
-        const currentText = tempEl.textContent.match(/^\d+/) ? tempEl.textContent.match(/^\d+/)[0] : "";
-        
-        if (currentText !== numberText) {
+        failedAttempts.temperature = 0;
+        if (tempHint.style.display !== "none") {
           scheduleDOMUpdate(() => {
-            // OPTIMIZATION Phase 2: Update first text node instead of innerHTML rebuild
-            if (tempEl.firstChild && tempEl.firstChild.nodeType === 3) {
-              tempEl.firstChild.textContent = numberText;
-            } else {
-              tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
-            }
+            tempHint.style.display = "none";
           });
-          previousValues.temperature = newTemp;
         }
-        // Thermal state subtext (only update if changed)
-        let thermalText = "Thermal: Nominal";
-        if (data.temperature >= 85) {
-          thermalText = "Thermal: Critical";
-        } else if (data.temperature >= 70) {
-          thermalText = "Thermal: Serious";
-        } else if (data.temperature >= 50) {
-          thermalText = "Thermal: Fair";
-        }
-        if (tempSubtext.textContent !== thermalText) {
-          scheduleDOMUpdate(() => {
-            tempSubtext.textContent = thermalText;
-          });
+        // Show temperature even if it's 0.0 (might be unsupported Mac model)
+        // But show "—" if temperature is exactly 0.0 and we've been trying for a while
+        if (newTemp === 0 && data.temperature === 0.0) {
+          // Temperature is 0.0 - might be unsupported Mac model
+          // Still show it as "0°C" to indicate we're trying to read it
+          const numberText = "0";
+          const currentText = tempEl.textContent.match(/^\d+/) ? tempEl.textContent.match(/^\d+/)[0] : "";
+          
+          if (currentText !== numberText) {
+            scheduleDOMUpdate(() => {
+              // OPTIMIZATION Phase 2: Update first text node instead of innerHTML rebuild
+              if (tempEl.firstChild && tempEl.firstChild.nodeType === 3) {
+                tempEl.firstChild.textContent = numberText;
+              } else {
+                tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
+              }
+            });
+            previousValues.temperature = 0;
+          }
+          if (tempSubtext.textContent !== "SMC: No data") {
+            scheduleDOMUpdate(() => {
+              tempSubtext.textContent = "SMC: No data";
+            });
+          }
+        } else {
+          const numberText = `${newTemp}`;
+          // Get current number by extracting digits from textContent (ignoring °C)
+          const currentText = tempEl.textContent.match(/^\d+/) ? tempEl.textContent.match(/^\d+/)[0] : "";
+          
+          if (currentText !== numberText) {
+            scheduleDOMUpdate(() => {
+              // OPTIMIZATION Phase 2: Update first text node instead of innerHTML rebuild
+              if (tempEl.firstChild && tempEl.firstChild.nodeType === 3) {
+                tempEl.firstChild.textContent = numberText;
+              } else {
+                tempEl.innerHTML = `${numberText}<span class="metric-unit">°C</span>`;
+              }
+            });
+            previousValues.temperature = newTemp;
+          }
+          // Thermal state subtext (only update if changed)
+          let thermalText = "Thermal: Nominal";
+          if (data.temperature >= 85) {
+            thermalText = "Thermal: Critical";
+          } else if (data.temperature >= 70) {
+            thermalText = "Thermal: Serious";
+          } else if (data.temperature >= 50) {
+            thermalText = "Thermal: Fair";
+          }
+          if (tempSubtext.textContent !== thermalText) {
+            scheduleDOMUpdate(() => {
+              tempSubtext.textContent = thermalText;
+            });
+          }
         }
       }
-    }
-    // Always update ring gauge (it handles first paint and change detection internally)
-    updateRingGauge("temperature-ring-progress", Math.min(100, data.temperature), 'temperature');
-    
-    // Update data-poster charts if available
-    if (window.posterCharts && data.can_read_temperature && data.temperature > 0) {
-      window.posterCharts.updateTemperature(data.temperature);
-    }
-    
-    // Update dark theme history charts if available
-    if (window.darkHistory && data.can_read_temperature && data.temperature > 0) {
-      window.darkHistory.updateTemperature(data.temperature);
-    }
-    
-    // Update light theme history charts if available
-    if (window.lightHistory && data.can_read_temperature && data.temperature > 0) {
-      window.lightHistory.updateTemperature(data.temperature);
-    }
-    
-    // Update futuristic theme history charts if available
-    if (window.futuristicHistory && data.can_read_temperature && data.temperature > 0) {
-      window.futuristicHistory.updateTemperature(data.temperature);
-    }
-    
-    // Update material theme history charts if available
-    if (window.materialHistory && data.can_read_temperature && data.temperature > 0) {
-      window.materialHistory.updateTemperature(data.temperature);
-    }
-    
-    // Update neon theme history charts if available
-    if (window.neonHistory && data.can_read_temperature && data.temperature > 0) {
-      window.neonHistory.updateTemperature(data.temperature);
-    }
-    
-    // Update swiss theme history charts if available
-    if (window.swissHistory && data.can_read_temperature && data.temperature > 0) {
-      window.swissHistory.updateTemperature(data.temperature);
-    }
-    
-    // Update architect theme history charts if available
-    if (window.architectHistory && data.can_read_temperature && data.temperature > 0) {
-      window.architectHistory.updateTemperature(data.temperature);
-    }
-    
-    // Update apple theme history charts if available
-    if (window.appleHistory && data.can_read_temperature && data.temperature > 0) {
-      window.appleHistory.updateTemperature(data.temperature);
+      // Ring gauge and theme charts only when we refresh temperature
+      updateRingGauge("temperature-ring-progress", Math.min(100, data.temperature), 'temperature');
+      
+      if (window.posterCharts && data.can_read_temperature && data.temperature > 0) {
+        window.posterCharts.updateTemperature(data.temperature);
+      }
+      if (window.darkHistory && data.can_read_temperature && data.temperature > 0) {
+        window.darkHistory.updateTemperature(data.temperature);
+      }
+      if (window.lightHistory && data.can_read_temperature && data.temperature > 0) {
+        window.lightHistory.updateTemperature(data.temperature);
+      }
+      if (window.futuristicHistory && data.can_read_temperature && data.temperature > 0) {
+        window.futuristicHistory.updateTemperature(data.temperature);
+      }
+      if (window.materialHistory && data.can_read_temperature && data.temperature > 0) {
+        window.materialHistory.updateTemperature(data.temperature);
+      }
+      if (window.neonHistory && data.can_read_temperature && data.temperature > 0) {
+        window.neonHistory.updateTemperature(data.temperature);
+      }
+      if (window.swissHistory && data.can_read_temperature && data.temperature > 0) {
+        window.swissHistory.updateTemperature(data.temperature);
+      }
+      if (window.architectHistory && data.can_read_temperature && data.temperature > 0) {
+        window.architectHistory.updateTemperature(data.temperature);
+      }
+      if (window.appleHistory && data.can_read_temperature && data.temperature > 0) {
+        window.appleHistory.updateTemperature(data.temperature);
+      }
     }
 
     // Update CPU usage

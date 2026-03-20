@@ -127,6 +127,8 @@ The Coder currently edits this repo **in place** (yolo mode) via the mac-stats-a
 | security/mod.rs (codebase) | ~~Keychain list_credentials: proper account list~~ | **Done:** Persisted list at `~/.mac-stats/credential_accounts.json`; updated on store_credential/delete_credential; list_credentials reads from file. Removed TODO and Keychain search (security_framework does not expose account attribute for generic password items). Config::credential_accounts_file_path() added. |
 | docs/data-poster-charts-backend.md | ~~Investigate why frontend is not utilizing historical data buffer effectively~~ | **Done:** Data Poster had history canvases but did not load `history.js`; backend buffer (`get_metrics_history`) was unused. Added `history.js` to `themes/data-poster/cpu.html` so history section uses backend buffer; doc updated. |
 | docs/016_skill_agent.md | ~~Clarify advanced skill features open task as future/backlog~~ | **Done:** Open task bullet in 016 now labeled "Future/backlog" and points to this file for FEAT backlog; advanced features (conditional logic, user-defined variables) remain out of current scope. |
+| docs/data-poster-charts-backend.md | ~~Implement chart-specific refresh rates for each metric~~ | **Done:** Temperature: 3s (throttle in cpu.js for DOM/ring/theme charts; throttle in history.js for temperature chart redraw). Usage and frequency: 1s unchanged. |
+| docs/data-poster-charts-backend.md | ~~Consider adding data smoothing to reduce noise in charts~~ | **Done:** Moving average (window 5) in Data Poster theme `poster-charts.js`; bar and line charts use smoothed series for display only (raw values still drive scale). |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.
 

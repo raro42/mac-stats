@@ -38,6 +38,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Unknown-tool handling in tool loop (032)** — In `ollama.rs` tool loop, the catch-all for unknown tools no longer silently skips; unknown tools now produce a user-facing hint ("Unknown tool \"X\". Use one of the available tools...") and `tracing::warn!` so the model gets feedback and logs are traceable. Docs 005 §56 re-verification, 006 FEATURE-CODER and 032 open task marked done, 022 smoke note.
 - **Session memory parser fix (019)** — `parse_session_file` in `session_memory.rs` now trims leading `## ` from each block so the first User/Assistant block is recognized when loading session files. Docs 019 implementation review done, 005 §57 re-verification, 006 FEATURE-CODER backlog, 022 testing note (2026-03-18).
 
+## [0.1.46] - 2026-03-20
+
+### Changed
+- **Data Poster CPU: temperature cadence + chart backlog closed (005 §78–§79, 006, 022)** — `cpu.js`: temperature DOM, ring gauge, `posterCharts`, and per-theme `*History.updateTemperature` calls run only on the 3s temperature tick (usage/frequency remain 1s). OpenClaw re-verification §78–§79 (005); FEATURE-CODER rows done for chart-specific refresh rates and display smoothing (`poster-charts.js` moving average); `docs/data-poster-charts-backend.md` open tasks closed; 022 testing notes 2026-03-20.
+
 ## [0.1.45] - 2026-03-19
 
 ### Changed
