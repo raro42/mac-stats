@@ -59,4 +59,4 @@ Gatekeeper may show "damaged" or block the unsigned app—the file is fine. Righ
 - Consider support for more advanced Python-script execution workflows.
 - Consider whether additional external tool integrations belong in the agent layer.
 - ~~Implement more robust handling for MCP server errors.~~ **Done:** Error-handling § in docs/010_mcp_agent.md; one retry for transient errors in mcp/mod.rs (list_tools, call_tool). See 006-feature-coder/FEATURE-CODER.md.
-- Improve the user interface for scheduling tasks.
+- ~~Improve the user interface for scheduling tasks.~~ **Done:** Settings → Schedules tab (list, add cron or one-shot, remove); Tauri commands `list_schedules`, `add_schedule`, `add_schedule_at`, `remove_schedule`. See docs/009_scheduler_agent.md and 006-feature-coder/FEATURE-CODER.md.
