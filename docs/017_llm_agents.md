@@ -161,10 +161,102 @@ mac_stats agent test <selector> [path]
 
 ---
 
-## Open tasks:
+## testing.md format
+
+Each agent directory (`~/.mac-stats/agents/agent-<id>/`) contains a `testing.md` file with test prompts for the `mac_stats agent test` CLI command.
+
+### File structure
+
+The file uses Markdown `## ` headers to delimit test sections. Each section is one test prompt:
+
+```markdown
+## Test: short description
+The actual prompt text sent to the agent.
+Can span multiple lines.
+
+## Test: another scenario
+Another prompt.
+```
+
+**Parsing rules** (implementation: `agents/cli.rs` → `parse_testing_md`):
+
+1. The file is split on `## ` boundaries.
+2. For each section, the **first line** (the header text) is discarded — only the **body** (everything after the first newline) is sent as the prompt.
+3. If the file contains no `## ` headers, the entire file content is treated as a single prompt.
+4. Empty sections (header with no body) are skipped.
+
+### Conventions
+
+- **Header naming**: Use `## Test: <description>` for consistency (not required by the parser, but makes the file scannable).
+- **Expected behavior**: Optionally include an `Expected:` line in the body to document what the agent should do. The line is part of the prompt sent to the agent but serves as documentation for humans reviewing test results.
+- **Keep prompts focused**: Each section should test one behavior. For orchestrators, test delegation; for specialists, test their domain.
+
+### Running tests
+
+```bash
+mac_stats agent test <selector>                 # Uses agent's testing.md
+mac_stats agent test <selector> /path/to/file   # Uses custom test file
+```
+
+- **Timeout**: 45 seconds per prompt (default). Override with `MAC_STATS_AGENT_TEST_TIMEOUT_SECS` env var or `agentTestTimeoutSecs` in `config.json` (range: 5–300).
+- **Selector**: Agent ID (`000`), slug (`orchestrator`), or name (`Orchestrator`).
+- **Output**: Each prompt logs response length; final line reports pass/fail count. Full output in `~/.mac-stats/debug.log`.
+
+### Example: specialist agent (Redmine)
+
+```markdown
+## Test: review ticket
+Review Redmine ticket 7209.
+Expected: REDMINE_API: GET /issues/7209.json?include=journals,attachments then summary.
+
+## Test: search issues
+Search Redmine for "monitoring".
+Expected: REDMINE_API: GET /search.json?q=monitoring&issues=1&limit=100 then summarize.
+```
+
+### Example: orchestrator
+
+```markdown
+## Test: delegation
+I need a Python function that returns the first N Fibonacci numbers. Delegate to the coder agent.
+Expected: AGENT: senior-coder <task> or AGENT: 002 <task>.
+
+## Test: direct answer
+What is 2 + 2? Answer in one word.
+Expected: Direct answer (no delegation needed for trivial questions).
+```
+
+---
+
+## Orchestrator routing examples
+
+The orchestrator (`agent-000`) delegates requests to specialist agents using `AGENT: <selector> [task]`. Below are routing patterns the orchestrator should follow.
+
+### Routing table
+
+| User request pattern | Expected routing | Rationale |
+|----------------------|-----------------|-----------|
+| Code generation / refactoring | `AGENT: senior-coder <task>` | Coder agent (002) has code-oriented model and prompt. |
+| Discord API queries (find user, list channels) | `AGENT: discord-expert <task>` | Discord expert (004) has bot token and API access. |
+| Redmine tickets (review, search, create, update) | `AGENT: redmine <task>` | Redmine agent (006) uses REDMINE_API tool. |
+| Task/schedule management | `AGENT: scheduler <task>` | Task runner (005) handles TASK_* and SCHEDULE commands. |
+| General Q&A, trivia, quick facts | Direct answer | No delegation needed for simple questions. |
+| Web research (summarize page, search) | Direct answer using FETCH_URL / BRAVE_SEARCH | Orchestrator can invoke tools directly for one-shot fetches. |
+
+### Multi-step routing
+
+When a request involves multiple domains (e.g. "Create a Redmine ticket for the Discord bot bug"), the orchestrator should delegate to the **primary** specialist (Redmine in this case) and include the full context in the task description. The specialist handles tool invocation within its domain.
+
+### Fallback
+
+If no specialist matches, the orchestrator answers directly using its own model. For general questions, this avoids unnecessary delegation overhead.
+
+---
+
+## Open tasks
 - ~~Clarify `model_role` resolution logic~~ **Done:** § "model_role resolution logic" above (when it runs, per-agent order, catalog-not-ready, role→pick rules, cloud models). Tracked in 006-feature-coder/FEATURE-CODER.md.
 - ~~Add documentation for `AGENT: <selector> [task]` syntax~~ **Done:** § "AGENT: \<selector\> [task] syntax" above (invocation, selector resolution order, optional task, cursor-agent proxy, behaviour). Tracked in 006-feature-coder/FEATURE-CODER.md.
-- Implement missing `orchestrator` routing examples
+- ~~Implement missing orchestrator routing examples~~ **Done:** § "Orchestrator routing examples" above (routing table, multi-step, fallback). Tracked in 006-feature-coder/FEATURE-CODER.md.
+- ~~Document `testing.md` format requirements~~ **Done:** § "testing.md format" above (file structure, parsing rules, conventions, timeout, examples). Tracked in 006-feature-coder/FEATURE-CODER.md.
 - Define fallback behavior for cloud model roles
 - Add CLI command for agent reset/defaults
-- Document `testing.md` format requirements

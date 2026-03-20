@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Docs 005 §85, 006, 017, 022** — OpenClaw re-verification §85 (005); docs/017_llm_agents.md new §§ "testing.md format" (file structure, parsing rules, conventions, timeout, examples) and "Orchestrator routing examples" (routing table, multi-step, fallback), two open tasks marked done; FEATURE-CODER backlog rows for 017 testing.md and orchestrator routing done, two new open items added (006); 022 closing reviewer testing note 2026-03-20 (smoke).
 - **Docs 005 §84, 006, 017, 022** — OpenClaw re-verification §84 (005); FEATURE-CODER backlog row for 017 "AGENT: <selector> [task] syntax" done (006); docs/017_llm_agents.md new § "AGENT: <selector> [task] syntax" (invocation, selector resolution order, optional task, cursor-agent proxy, behaviour) and open task marked done; 022 testing note 2026-03-20 (closing reviewer).
 - **Docs 005 §83, 006, 017, 022** — OpenClaw re-verification §83 (005); FEATURE-CODER backlog row for 017 model_role resolution done (006); docs/017_llm_agents.md new § "model_role resolution logic" and open task marked done; 022 testing note 2026-03-20 (closing reviewer).
 - **Docs 005 §82, 006, 022, 100** — OpenClaw re-verification §82 (005); FEATURE-CODER backlog row for 100 "Improve the user interface for scheduling tasks" done (006): scheduler UI already in Settings → Schedules tab; 100_all_agents open task marked done; 022 testing note 2026-03-20 (closing reviewer).
