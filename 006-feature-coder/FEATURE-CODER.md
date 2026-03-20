@@ -130,6 +130,7 @@ The Coder currently edits this repo **in place** (yolo mode) via the mac-stats-a
 | docs/data-poster-charts-backend.md | ~~Implement chart-specific refresh rates for each metric~~ | **Done:** Temperature: 3s (throttle in cpu.js for DOM/ring/theme charts; throttle in history.js for temperature chart redraw). Usage and frequency: 1s unchanged. |
 | docs/data-poster-charts-backend.md | ~~Consider adding data smoothing to reduce noise in charts~~ | **Done:** Moving average (window 5) in Data Poster theme `poster-charts.js`; bar and line charts use smoothed series for display only (raw values still drive scale). |
 | docs/data-poster-charts-backend.md | ~~Review and refactor get_cpu_details() API response~~ | **Done:** API contract documented in data-poster-charts-backend.md (§ get_cpu_details() API contract); `CpuDetails` struct doc comment in metrics/mod.rs points to it. |
+| docs/014_python_agent.md | ~~Review the security of the app (Python script agent)~~ | **Done:** § "Security review (measures in place)" in 014 (no shell, filename sanitization, fixed directory, same uid, ALLOW_PYTHON_SCRIPT; trust boundary and caveats). |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.
 

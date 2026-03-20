@@ -94,6 +94,18 @@ print(total)
 - **Paths**: Scripts are only written under `~/.mac-stats/scripts/`. Id and topic are sanitized so the filename cannot contain `/` or `..`.
 - **Privileges**: Scripts run with the same user and permissions as the app (no root).
 
+### Security review (measures in place)
+
+| Measure | Purpose |
+|--------|--------|
+| **No shell** | Execution is `Command::new("python3").arg(script_path)`; id and topic are not passed to a shell, so injection via id/topic is not possible. |
+| **Filename sanitization** | `sanitize_filename_part()` keeps only `[a-zA-Z0-9_-]`; `/`, `..`, and other characters become `_`, so the script path cannot escape `~/.mac-stats/scripts/`. |
+| **Fixed script directory** | Scripts are written only to `Config::scripts_dir()` (`~/.mac-stats/scripts/` or temp fallback); no user-controlled path. |
+| **Same uid** | Scripts run as the same user as the app; no privilege escalation. |
+| **ALLOW_PYTHON_SCRIPT** | Set to `0` / `false` / `no` (env or `.config.env`) to disable PYTHON_SCRIPT entirely in locked-down setups. |
+
+**Trust boundary:** The script *body* is provided by the model (Ollama) based on user requests. The app does not sandbox Python execution: scripts can read/write anywhere the app’s user can, use the network, spawn processes, and run indefinitely (no timeout). This is intentional so that data processing and local scripts work; the risk is accepted in the same way as RUN_CMD (agent-controlled code runs with user privileges). Mitigations: disable the agent via `ALLOW_PYTHON_SCRIPT=0` when not needed; run the app in a restricted environment if you want to limit script capabilities.
+
 ### Troubleshooting
 
 | Issue | What to check |
@@ -108,4 +120,4 @@ print(total)
 
 - ~~Investigate why some users report issues with the Python script agent.~~ **Done:** Improved diagnostics: script path in user-facing error; on failure and on spawn failure, `tracing::warn!` logs script path, exit code, and stderr preview (500 chars) to `~/.mac-stats/debug.log` for easier debugging.
 - ~~Improve the documentation for the Python script agent to make it more user-friendly.~~ **Done:** When to use, setup (config precedence), invocation examples, behaviour (path, no timeout, tool cap), security, troubleshooting table.
-- Review the security of the app to ensure it is robust against potential vulnerabilities.
+- ~~Review the security of the app to ensure it is robust against potential vulnerabilities.~~ **Done:** § "Security review (measures in place)" above (no shell, filename sanitization, fixed directory, same uid, ALLOW_PYTHON_SCRIPT; trust boundary and caveats). Open task tracked in 006-feature-coder/FEATURE-CODER.md.
