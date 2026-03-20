@@ -133,6 +133,7 @@ The Coder currently edits this repo **in place** (yolo mode) via the mac-stats-a
 | docs/014_python_agent.md | ~~Review the security of the app (Python script agent)~~ | **Done:** § "Security review (measures in place)" in 014 (no shell, filename sanitization, fixed directory, same uid, ALLOW_PYTHON_SCRIPT; trust boundary and caveats). |
 | docs/100_all_agents.md | ~~Improve the user interface for scheduling tasks~~ | **Done:** Scheduler UI already implemented (Settings → Schedules tab); marked done in 100_all_agents Open tasks with pointer to 009 and this backlog. |
 | docs/017_llm_agents.md | ~~Clarify model_role resolution logic~~ | **Done:** § "model_role resolution logic" in 017 (when it runs, per-agent order, catalog-not-ready, role→pick rules, cloud models). |
+| docs/017_llm_agents.md | ~~Add documentation for AGENT: <selector> [task] syntax~~ | **Done:** § "AGENT: \<selector\> [task] syntax" in 017 (invocation, selector resolution order, optional task, cursor-agent proxy, behaviour). |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.
 

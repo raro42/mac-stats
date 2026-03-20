@@ -96,6 +96,39 @@ Each agent has:
 
 ---
 
+## AGENT: \<selector\> [task] syntax
+
+The **AGENT** tool lets the entry-point model (e.g. orchestrator) delegate work to a specialized LLM agent or to the Cursor Agent CLI. Only the model in the router tool loop can invoke it; sub-agents cannot call AGENT (see **docs/021_router_and_agents.md**).
+
+**Invocation** (exactly one line in the model’s reply):
+
+```text
+AGENT: <selector> [task]
+```
+
+- **\<selector\>**: Identifies the agent. Resolved in this order (implementation: `agents/mod.rs` → `find_agent_by_id_or_name`):
+  1. **Slug** (case-insensitive), e.g. `discord-expert`, `senior-coder`
+  2. **Name** (case-insensitive), e.g. `General Assistant`, `Orchestrator`
+  3. **Id** (exact), e.g. `000`, `002`
+  4. **Id with prefix** `agent-`, e.g. `agent-000`
+- **[task]**: Optional. If present, everything after the first space is the task message sent to the agent. If omitted, the **current user question** is used.
+
+**Examples:**
+
+| Reply line | Effect |
+|------------|--------|
+| `AGENT: 002` | Run agent 002 (Coder) with the current user question as the task. |
+| `AGENT: discord-expert list channels in server X` | Run discord-expert with task "list channels in server X". |
+| `AGENT: senior-coder refactor this function` | Run agent whose slug is senior-coder with the given task. |
+
+**Special case — cursor-agent:**  
+If the selector is `cursor-agent` or `cursor_agent` and the `cursor-agent` CLI is on PATH, the router runs the CLI with the task (or user question) as the prompt and injects its output. This is a proxy agent (no Ollama); see **docs/031_cursor_agent_handoff.md**.
+
+**Behaviour:**  
+The router runs the chosen agent in a **single** Ollama request (that agent’s model and prompt; no tool list). The sub-agent’s reply is injected back into the entry-point conversation. Sub-agents cannot use FETCH_URL, TASK_*, SCHEDULE, or another AGENT.
+
+---
+
 ## Default Agents
 Pre-installed agents (editable by user):
 | ID         | Name               | Role                     |
@@ -130,7 +163,7 @@ mac_stats agent test <selector> [path]
 
 ## Open tasks:
 - ~~Clarify `model_role` resolution logic~~ **Done:** § "model_role resolution logic" above (when it runs, per-agent order, catalog-not-ready, role→pick rules, cloud models). Tracked in 006-feature-coder/FEATURE-CODER.md.
-- Add documentation for `AGENT: <selector> [task]` syntax
+- ~~Add documentation for `AGENT: <selector> [task]` syntax~~ **Done:** § "AGENT: \<selector\> [task] syntax" above (invocation, selector resolution order, optional task, cursor-agent proxy, behaviour). Tracked in 006-feature-coder/FEATURE-CODER.md.
 - Implement missing `orchestrator` routing examples
 - Define fallback behavior for cloud model roles
 - Add CLI command for agent reset/defaults
