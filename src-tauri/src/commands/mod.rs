@@ -15,6 +15,7 @@ pub mod ollama_models;
 pub mod perplexity;
 pub mod plugins;
 pub mod python_agent;
+pub mod redmine_helpers;
 pub mod run_cmd;
 pub mod scheduler;
 pub mod security;
