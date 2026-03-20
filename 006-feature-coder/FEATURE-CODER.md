@@ -137,8 +137,9 @@ The Coder currently edits this repo **in place** (yolo mode) via the mac-stats-a
 
 | docs/017_llm_agents.md | ~~Document `testing.md` format requirements~~ | **Done:** § "testing.md format" in 017 (file structure, section parsing rules, `Expected:` convention, timeout, path override, examples). |
 | docs/017_llm_agents.md | ~~Implement missing orchestrator routing examples~~ | **Done:** § "Orchestrator routing examples" in 017 (delegation table, direct-answer case, multi-step); orchestrator testing.md updated with routing test prompts. |
-| docs/017_llm_agents.md | Define fallback behavior for cloud model roles | Doc/code: what happens when a cloud model is set as default but agent has model_role? |
-| docs/017_llm_agents.md | Add CLI command for agent reset/defaults | Code: CLI subcommand to reset agents to defaults |
+| docs/017_llm_agents.md | ~~Define fallback behavior for cloud model roles~~ | **Done:** § "Cloud model as default — fallback behavior" in 017 (scenario table: cloud default + role/explicit/none; entry-point prefers local; sub-agent uses default; improved warning log in agents/mod.rs when only cloud models exist). |
+| docs/017_llm_agents.md | ~~Add CLI command for agent reset/defaults~~ | **Done:** `mac_stats agent reset-defaults [id]` CLI subcommand; `Config::reset_agent_defaults()` force-overwrites all bundled default files (agent.json, skill.md, testing.md, soul.md); optional single-agent filter by id. |
+| docs (multiple) | ~~Trim stale open tasks, point docs to FEATURE-CODER backlog~~ | **Done:** docs/004, 012, 015, 020, 100 — stale/vague open tasks marked deferred or done; each doc now points to 006-feature-coder/FEATURE-CODER.md for the active backlog. |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.
 

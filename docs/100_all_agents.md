@@ -55,8 +55,11 @@ Gatekeeper may show "damaged" or block the unsigned app—the file is fine. Righ
 - **Rust:** `discord/mod.rs` (EventHandler) → `commands::ollama::answer_with_ollama_and_fetch(question, ..., model_override, options_override, skill_content)`. Token from env, `.config.env`, or Keychain (see 007).
 
 ## Open tasks:
+
+See **006-feature-coder/FEATURE-CODER.md** for the current FEAT backlog.
+
 - ~~Review whether `run_local_command` is sufficiently hardened against shell-injection-style misuse.~~ **Done:** § "Shell injection considerations" in docs/011_local_cmd_agent.md (full stage passed to `sh -c`; first token allowlisted, path validation; trust boundary and mitigations; strict-mode option documented as future).
-- Consider support for more advanced Python-script execution workflows.
-- Consider whether additional external tool integrations belong in the agent layer.
+- ~~Consider support for more advanced Python-script execution workflows.~~ Deferred: future/backlog (current PYTHON_SCRIPT tool is functional; advanced workflows tracked in FEATURE-CODER when scoped).
+- ~~Consider whether additional external tool integrations belong in the agent layer.~~ Deferred: future/backlog (current tools cover web, search, code execution, browser, Redmine, MCP; new integrations added as needed).
 - ~~Implement more robust handling for MCP server errors.~~ **Done:** Error-handling § in docs/010_mcp_agent.md; one retry for transient errors in mcp/mod.rs (list_tools, call_tool). See 006-feature-coder/FEATURE-CODER.md.
 - ~~Improve the user interface for scheduling tasks.~~ **Done:** Settings → Schedules tab (list, add cron or one-shot, remove); Tauri commands `list_schedules`, `add_schedule`, `add_schedule_at`, `remove_schedule`. See docs/009_scheduler_agent.md and 006-feature-coder/FEATURE-CODER.md.

@@ -91,6 +91,9 @@ Right now cursor-agent always runs in **one** workspace (from config). There is 
 | Per-task or per-invocation workspace | Not implemented; optional enhancement. |
 
 ## Open tasks:
-- Ensure that the model uses CURSOR_AGENT for coding tasks by default.
-- Implement workspace per task.
-- Add a task file convention to hint the model to use CURSOR_AGENT.
+
+See **006-feature-coder/FEATURE-CODER.md** for the current FEAT backlog.
+
+- ~~Ensure that the model uses CURSOR_AGENT for coding tasks by default.~~ Deferred: future/backlog (model delegation depends on prompt quality; orchestrator skill.md can be tuned to prefer CURSOR_AGENT for code).
+- ~~Implement workspace per task.~~ Deferred: future/backlog (would require task-specific directory management; not needed for current single-workspace usage).
+- ~~Add a task file convention to hint the model to use CURSOR_AGENT.~~ Deferred: future/backlog (task files can include a "tool hint" field when this is scoped).

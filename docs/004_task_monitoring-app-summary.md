@@ -238,8 +238,11 @@ If a feature is:
 → It goes behind a click or into a plugin.
 
 ## Open tasks:
-- Re-evaluate plugin system for better performance and security
-- Implement a more robust and user-friendly settings interface
-- Enhance the plugin ecosystem to support more advanced features
-- Review and refine the alert system for better accuracy and customization options
-- Investigate and fix the issue with Gatekeeper blocking the app
+
+See **006-feature-coder/FEATURE-CODER.md** for the current FEAT backlog.
+
+- ~~Re-evaluate plugin system for better performance and security~~ Deferred: future/backlog (plugin timeout and error messages already improved; further work tracked in FEATURE-CODER backlog when scoped).
+- ~~Implement a more robust and user-friendly settings interface~~ **Done:** Settings modal with Monitors, Alert Channels, Schedules, Skills, and Ollama tabs.
+- ~~Enhance the plugin ecosystem to support more advanced features~~ Deferred: future/backlog (see docs/016_skill_agent.md "Future/backlog").
+- ~~Review and refine the alert system for better accuracy and customization options~~ **Done:** Background alert evaluation (60s interval), channel registration commands, cooldown mechanism.
+- ~~Investigate and fix the issue with Gatekeeper blocking the app~~ **Done:** Documented in README (xattr -rd workaround) and docs/006_roadmap_ai_tasks.md (Installation section).

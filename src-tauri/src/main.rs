@@ -93,6 +93,12 @@ enum AgentCmd {
         /// Path to a markdown file with test prompts. If omitted, uses ~/.mac-stats/agents/agent-<id>/testing.md
         path: Option<PathBuf>,
     },
+    /// Reset agent files to bundled defaults (overwrites agent.json, skill.md, testing.md).
+    /// Without arguments, resets all default agents. With an id, resets only that agent.
+    ResetDefaults {
+        /// Optional agent id to reset (e.g. 000, 001). If omitted, resets all default agents.
+        id: Option<String>,
+    },
 }
 
 fn main() {
@@ -154,6 +160,23 @@ fn main() {
                         .map(|_| 0)
                         .unwrap_or_else(|c| c)
                 })
+            }
+            MainCmd::Agent(AgentCmd::ResetDefaults { id }) => {
+                let reset = mac_stats::config::Config::reset_agent_defaults(id.as_deref());
+                if reset.is_empty() {
+                    if let Some(ref filter_id) = id {
+                        eprintln!("No default agent found with id '{}'", filter_id);
+                    } else {
+                        eprintln!("No default agents to reset");
+                    }
+                    1
+                } else {
+                    for name in &reset {
+                        println!("Reset: {}", name);
+                    }
+                    println!("Done. {} agent(s) reset to defaults.", reset.len());
+                    0
+                }
             }
             MainCmd::Discord(DiscordCmd::Send {
                 channel_id,

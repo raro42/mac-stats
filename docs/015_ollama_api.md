@@ -136,5 +136,7 @@ All commands require Ollama to be **configured** (`configure_ollama`). They use 
 
 ## Open tasks:
 
+See **006-feature-coder/FEATURE-CODER.md** for the current FEAT backlog.
+
 - ~~Improve the user interface for model management and configuration.~~ **Done:** Settings → Ollama tab in the dashboard (endpoint URL, model dropdown via Refresh models, Apply). Backend: `get_ollama_config`, `list_ollama_models_at_endpoint` (see 006-feature-coder/FEATURE-CODER.md).
-- Consider support for more advanced model-management features such as fine-tuning or export.
+- ~~Consider support for more advanced model-management features such as fine-tuning or export.~~ Deferred: future/backlog (fine-tuning and export are Ollama CLI features, not in scope for mac-stats).

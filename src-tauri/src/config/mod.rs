@@ -901,6 +901,38 @@ impl Config {
         }
     }
 
+    /// Reset all default agent files to bundled defaults (force overwrite).
+    /// Unlike `ensure_defaults`, this overwrites agent.json, skill.md, testing.md, and soul.md
+    /// for every default agent. Optionally reset only a single agent by id (e.g. "000").
+    /// Returns the list of agent directory names that were reset.
+    pub fn reset_agent_defaults(agent_id_filter: Option<&str>) -> Vec<String> {
+        let agents_dir = Self::agents_dir();
+        let _ = std::fs::create_dir_all(&agents_dir);
+
+        let mut reset = Vec::new();
+        for (dir_name, files) in Self::DEFAULT_AGENT_IDS {
+            if let Some(filter) = agent_id_filter {
+                let entry_id = dir_name.strip_prefix("agent-").unwrap_or(dir_name);
+                if entry_id != filter {
+                    continue;
+                }
+            }
+            let dir = agents_dir.join(dir_name);
+            let _ = std::fs::create_dir_all(&dir);
+            for (file_name, content) in *files {
+                Self::write_agent_file(&dir.join(file_name), content);
+            }
+            reset.push(dir_name.to_string());
+        }
+
+        // Also reset shared soul.md when resetting all agents
+        if agent_id_filter.is_none() {
+            let _ = std::fs::write(agents_dir.join("soul.md"), Self::DEFAULT_SOUL);
+        }
+
+        reset
+    }
+
     /// Load soul from ~/.mac-stats/agents/soul.md. If missing, write default and return it.
     pub fn load_soul_content() -> String {
         let path = Self::soul_file_path();

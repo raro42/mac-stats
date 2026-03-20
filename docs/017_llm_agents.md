@@ -90,6 +90,23 @@ Each agent has:
    - **Unknown role**: treated as `general` (with a warning in logs).
 5. **Cloud models**: Never chosen by role resolution. They are used only when the user sets an explicit `model` in agent.json or configures a cloud model as the default Ollama model.
 
+**Cloud model as default — fallback behavior** (implementation: `commands/ollama.rs` → entry-point model selection, `agents/mod.rs` → `resolve_agent_models`):
+
+When the user configures a cloud model (e.g. `qwen3.5:cloud`) as the default Ollama model, the following rules apply:
+
+| Scenario | Agent config | Behavior |
+|----------|-------------|----------|
+| Cloud default + `model_role` set + local models exist | `model_role: "general"` | Role resolves to best local model (cloud excluded). Agent uses local model. |
+| Cloud default + `model_role` set + **no** local models | `model_role: "general"` | Role resolution finds nothing (all cloud). Agent warned; `model` stays `None`. At chat time, entry-point path prefers first local model; if none, uses cloud default. |
+| Cloud default + explicit `model` set (cloud) | `model: "gpt-4o"` | Used as-is if available in catalog. No role resolution needed. |
+| Cloud default + explicit `model` set (local) | `model: "qwen3:latest"` | Used as-is if available. Falls to `model_role` if not found. |
+| Cloud default + no `model` or `model_role` | (empty) | Entry-point (`answer_with_ollama_and_fetch`): prefers first local model when default is cloud (lines 3731–3739 in ollama.rs). Agent delegation (`run_agent_ollama_session`): uses global default (cloud). |
+
+**Key points:**
+- The entry-point (Discord, scheduler, in-app chat) always prefers a local model over a cloud default to avoid requiring ollama.com authentication for automated flows.
+- Sub-agent calls via `AGENT: <selector>` use the agent's resolved `model` (usually local from role resolution). When `model` is `None`, the global default (possibly cloud) is used directly — no local-preference override.
+- When role resolution silently fails because only cloud models exist, a warning is logged: "no model found for role 'X', leaving unset; cloud default will be used at chat time".
+
 **Orchestrator Agents**:
 - Delegate tasks to specialized agents via `AGENT: <id>`  
 - Must include "Router API Commands" in `skill.md`
@@ -149,6 +166,21 @@ mac_stats agent test <selector> [path]
 - Resolves agent by ID/name/slug
 - Uses `testing.md` for prompts
 - Simulates `AGENT:` tool invocation
+
+## Agent Reset
+
+Reset agent files to bundled defaults (overwrites agent.json, skill.md, testing.md, soul.md):
+
+```bash
+mac_stats agent reset-defaults          # Reset all default agents
+mac_stats agent reset-defaults 000      # Reset only agent 000 (Orchestrator)
+mac_stats agent reset-defaults 002      # Reset only agent 002 (Coder)
+```
+
+- Overwrites **all** files for the agent (including agent.json, which `ensure_defaults` normally preserves)
+- When resetting all agents, also resets the shared `soul.md`
+- User-created agents (ids not in the bundled defaults) are not affected
+- User-created files like `mood.md` or `memory.md` are not touched (only bundled files are written)
 
 ---
 
@@ -258,5 +290,5 @@ If no specialist matches, the orchestrator answers directly using its own model.
 - ~~Add documentation for `AGENT: <selector> [task]` syntax~~ **Done:** § "AGENT: \<selector\> [task] syntax" above (invocation, selector resolution order, optional task, cursor-agent proxy, behaviour). Tracked in 006-feature-coder/FEATURE-CODER.md.
 - ~~Implement missing orchestrator routing examples~~ **Done:** § "Orchestrator routing examples" above (routing table, multi-step, fallback). Tracked in 006-feature-coder/FEATURE-CODER.md.
 - ~~Document `testing.md` format requirements~~ **Done:** § "testing.md format" above (file structure, parsing rules, conventions, timeout, examples). Tracked in 006-feature-coder/FEATURE-CODER.md.
-- Define fallback behavior for cloud model roles
-- Add CLI command for agent reset/defaults
+- ~~Define fallback behavior for cloud model roles~~ **Done:** § "Cloud model as default — fallback behavior" above (scenario table, entry-point vs sub-agent, local-preference, warning log). Tracked in 006-feature-coder/FEATURE-CODER.md.
+- ~~Add CLI command for agent reset/defaults~~ **Done:** § "Agent Reset" above; `mac_stats agent reset-defaults [id]` CLI subcommand; `Config::reset_agent_defaults()` force-overwrites bundled default files. Tracked in 006-feature-coder/FEATURE-CODER.md.

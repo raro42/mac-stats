@@ -78,7 +78,9 @@ For the full tool list (all agents, invocation, and implementation), see **docs/
 
 ## Open tasks:
 
-- **Performance**: Investigate optimizations for sequential execution.  
-- **Parallel execution**: Explore feasibility of multi-tool per turn or parallel agent runs.  
+See **006-feature-coder/FEATURE-CODER.md** for the current FEAT backlog.
+
+- ~~**Performance**: Investigate optimizations for sequential execution.~~ Deferred: future/backlog (current sequential tool loop is simple and correct; optimization tracked in FEATURE-CODER when profiling shows a bottleneck).
+- ~~**Parallel execution**: Explore feasibility of multi-tool per turn or parallel agent runs.~~ Deferred: future/backlog (Ollama returns one tool per reply; parallel agents would require significant router changes).
 - ~~**Documentation**: Update for clarity and completeness.~~ **Done:** Tool table above completed (RUN_JS, PERPLEXITY_SEARCH, RUN_CMD implementation details); See also added for full list. See 006-feature-coder/FEATURE-CODER.md.
 - ~~**Discord integration**: Complete description of bot functionality.~~ **Done:** [007_discord_agent.md](007_discord_agent.md) §2 has "Bot functionality at a glance" (triggers, reply pipeline, personalization, session/memory, scheduling, optional features); [docs/README.md](README.md) At a Glance has a one-line Discord bot summary with link to 007.

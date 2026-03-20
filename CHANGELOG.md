@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **CLI: `agent reset-defaults [id]`** — New subcommand to force-overwrite bundled default agent files (agent.json, skill.md, testing.md, soul.md). Optional id filter to reset a single agent. `Config::reset_agent_defaults()` in config/mod.rs.
+
 ### Changed
+- **Cloud model role resolution warning** — `resolve_agent_models` in agents/mod.rs: when role resolution fails because all catalog models are cloud, the warning now says "cloud default will be used at chat time (no local models available)" instead of the generic message.
+- **Docs 017: cloud model fallback + agent reset** — New §§ "Cloud model as default — fallback behavior" (scenario table, entry-point vs sub-agent, local-preference override, warning log) and "Agent Reset" (CLI usage, overwrite semantics, user-file safety). Two open tasks marked done.
+- **Docs housekeeping (004, 012, 015, 020, 100)** — Stale/vague open tasks marked deferred or done across five docs; each now points to 006-feature-coder/FEATURE-CODER.md for the active backlog.
+- **FEATURE-CODER backlog** — Rows for cloud model roles, agent reset CLI, and docs open-task trim marked done; new "Trim stale open tasks" row added and closed.
+- **022 testing note** — Closing reviewer smoke test 2026-03-20 (cargo build, debug.log, 8 agents, 15 models, 4 monitors UP).
 - **Docs 005 §85, 006, 017, 022** — OpenClaw re-verification §85 (005); docs/017_llm_agents.md new §§ "testing.md format" (file structure, parsing rules, conventions, timeout, examples) and "Orchestrator routing examples" (routing table, multi-step, fallback), two open tasks marked done; FEATURE-CODER backlog rows for 017 testing.md and orchestrator routing done, two new open items added (006); 022 closing reviewer testing note 2026-03-20 (smoke).
 - **Docs 005 §84, 006, 017, 022** — OpenClaw re-verification §84 (005); FEATURE-CODER backlog row for 017 "AGENT: <selector> [task] syntax" done (006); docs/017_llm_agents.md new § "AGENT: <selector> [task] syntax" (invocation, selector resolution order, optional task, cursor-agent proxy, behaviour) and open task marked done; 022 testing note 2026-03-20 (closing reviewer).
 - **Docs 005 §83, 006, 017, 022** — OpenClaw re-verification §83 (005); FEATURE-CODER backlog row for 017 model_role resolution done (006); docs/017_llm_agents.md new § "model_role resolution logic" and open task marked done; 022 testing note 2026-03-20 (closing reviewer).

@@ -386,10 +386,21 @@ pub fn resolve_agent_models(agents: &mut [Agent], catalog: &crate::ollama::model
                 agent.model = Some(resolved.name.clone());
                 continue;
             }
-            warn!(
-                "Model resolution: {} -> no model found for role '{}', leaving unset",
-                agent_label, role
-            );
+            let has_only_cloud = catalog
+                .models
+                .iter()
+                .all(|m| m.is_cloud);
+            if has_only_cloud {
+                warn!(
+                    "Model resolution: {} -> no model found for role '{}', leaving unset; cloud default will be used at chat time (no local models available)",
+                    agent_label, role
+                );
+            } else {
+                warn!(
+                    "Model resolution: {} -> no model found for role '{}', leaving unset",
+                    agent_label, role
+                );
+            }
             agent.model = None;
             continue;
         }
