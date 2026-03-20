@@ -132,6 +132,7 @@ The Coder currently edits this repo **in place** (yolo mode) via the mac-stats-a
 | docs/data-poster-charts-backend.md | ~~Review and refactor get_cpu_details() API response~~ | **Done:** API contract documented in data-poster-charts-backend.md (§ get_cpu_details() API contract); `CpuDetails` struct doc comment in metrics/mod.rs points to it. |
 | docs/014_python_agent.md | ~~Review the security of the app (Python script agent)~~ | **Done:** § "Security review (measures in place)" in 014 (no shell, filename sanitization, fixed directory, same uid, ALLOW_PYTHON_SCRIPT; trust boundary and caveats). |
 | docs/100_all_agents.md | ~~Improve the user interface for scheduling tasks~~ | **Done:** Scheduler UI already implemented (Settings → Schedules tab); marked done in 100_all_agents Open tasks with pointer to 009 and this backlog. |
+| docs/017_llm_agents.md | ~~Clarify model_role resolution logic~~ | **Done:** § "model_role resolution logic" in 017 (when it runs, per-agent order, catalog-not-ready, role→pick rules, cloud models). |
 
 Start with the first FEAT you can complete end-to-end (code or doc), then move to the next.
 

@@ -71,6 +71,25 @@ Each agent has:
 | `thinking` | Reasoning model (DeepSeek, etc) |
 | `expensive`| Largest/local model             |
 
+**model_role resolution logic** (implementation: `agents/mod.rs` → `resolve_agent_models`, `ollama/models.rs` → `ModelCatalog::resolve_role`):
+
+1. **When resolution runs**: At startup, after Ollama is ready, the app fetches `/api/tags`, builds a `ModelCatalog` (classified by capability and size), and caches it. `load_agents()` then calls `resolve_agent_models(agents, catalog)` so each agent gets an effective `model` when possible.
+2. **Per-agent order**:
+   - If `model` is set in agent.json and that model is **available** in the catalog → use it (explicit override).
+   - If `model` is set but **not available** → log warning, then resolve from `model_role` (if set).
+   - If `model_role` is set → resolve via catalog (see role→pick rules below). Only **local** (non-cloud) models are chosen; models above 15B params are excluded from auto-selection except for `expensive`.
+   - If neither `model` nor `model_role` is set → agent keeps `model: None`; the **global default** (Ollama config) is used at chat time.
+3. **Catalog not ready**: If the catalog is not yet populated (e.g. Ollama not reachable at startup), `load_agents()` logs that `model_role` resolution was skipped; agents keep their `model_role` but `model` may stay unset until the next load after the catalog is set.
+4. **Role → model choice** (local, ≤15B only unless noted):
+   - `code`: best code-capable model, preferring medium size; else general.
+   - `general`: best general-capable medium, then general any, then any local; else smallest local above cap.
+   - `small` / `cheap`: smallest local model (first in sorted-by-size list).
+   - `vision`: best vision-capable local; else general.
+   - `thinking` / `reasoning`: best reasoning-capable medium, then any reasoning; else general.
+   - `expensive`: largest local (last in sorted list); may use a model above 15B if no smaller local.
+   - **Unknown role**: treated as `general` (with a warning in logs).
+5. **Cloud models**: Never chosen by role resolution. They are used only when the user sets an explicit `model` in agent.json or configures a cloud model as the default Ollama model.
+
 **Orchestrator Agents**:
 - Delegate tasks to specialized agents via `AGENT: <id>`  
 - Must include "Router API Commands" in `skill.md`
@@ -110,7 +129,7 @@ mac_stats agent test <selector> [path]
 ---
 
 ## Open tasks:
-- Clarify `model_role` resolution logic
+- ~~Clarify `model_role` resolution logic~~ **Done:** § "model_role resolution logic" above (when it runs, per-agent order, catalog-not-ready, role→pick rules, cloud models). Tracked in 006-feature-coder/FEATURE-CODER.md.
 - Add documentation for `AGENT: <selector> [task]` syntax
 - Implement missing `orchestrator` routing examples
 - Define fallback behavior for cloud model roles

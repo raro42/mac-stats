@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Docs 005 §83, 006, 017, 022** — OpenClaw re-verification §83 (005); FEATURE-CODER backlog row for 017 model_role resolution done (006); docs/017_llm_agents.md new § "model_role resolution logic" and open task marked done; 022 testing note 2026-03-20 (closing reviewer).
 - **Docs 005 §82, 006, 022, 100** — OpenClaw re-verification §82 (005); FEATURE-CODER backlog row for 100 "Improve the user interface for scheduling tasks" done (006): scheduler UI already in Settings → Schedules tab; 100_all_agents open task marked done; 022 testing note 2026-03-20 (closing reviewer).
 - **Docs 005 §81, 006, 014, 022** — OpenClaw re-verification §81 (005); FEATURE-CODER backlog row for 014 Python agent security review done (006); docs/014_python_agent.md new § "Security review (measures in place)" and open task marked done; 022 testing note 2026-03-20 (closing reviewer).
 - **Docs 005 §80, 006, 022; get_cpu_details() API contract** — OpenClaw re-verification §80 (005); FEATURE-CODER backlog row for data-poster-charts-backend "Review and refactor get_cpu_details() API response" done (006): API contract documented in docs/data-poster-charts-backend.md (§ get_cpu_details() API contract); `CpuDetails` struct doc comment in metrics/mod.rs points to it. 022 testing note 2026-03-20 (closing reviewer).

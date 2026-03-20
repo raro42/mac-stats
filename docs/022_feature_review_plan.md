@@ -640,6 +640,12 @@ See `CHANGELOG.md` (0.1.14) and `docs/023_externalized_prompts_DONE.md` for deta
 - **Integration:** `cargo check` and `cargo clippy` pass (44 warnings; no errors). `diff src/ollama.js src-tauri/dist/ollama.js` empty (in sync). `set_chat_verbosity` and `toggle_cpu_window` in `tauri::generate_handler![]` in `lib.rs` (L230, L240); `run_due_monitor_checks()` in `lib.rs` (L375, background thread, 30s).
 - **Smoke:** `cargo build --release` succeeded (v0.1.46). `pkill -f mac_stats` then `nohup ./target/release/mac_stats --cpu -vv` from `src-tauri/`; `pgrep -fl mac_stats` confirmed process (pid 81622). `~/.mac-stats/debug.log`: verbosity 2, Discord gateway + Task review + Scheduler (2 entries), 8 agents loaded with shared soul present, Discord bot connected (Werner_Amvara), CPU window created and shown, Ollama configuration and connection successful (15 models), Monitor checks (mix-online, prod.cometa, app-monitor, amvara UP). Manual checks (menu bar click, `--cpu`/`-vv` in chat) left to human.
 
+## Testing (2026-03-20) — closing reviewer "Start testing now. Do your job." (004 prompt; this run)
+
+- **Note:** `004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md` not in repo; checklist executed from **§9** and integration/smoke pattern above.
+- **Integration:** `cargo check` and `cargo clippy` pass (44 warnings; no errors). `diff src/ollama.js src-tauri/dist/ollama.js` empty (in sync). `set_chat_verbosity` and `toggle_cpu_window` in `tauri::generate_handler![]` in `lib.rs` (L230, L240); `run_due_monitor_checks()` in `lib.rs` (L375, background thread, 30s).
+- **Smoke:** `cargo build --release` succeeded (v0.1.46). `pkill -f mac_stats` then `nohup ./target/release/mac_stats --cpu -vv` from `src-tauri/`; `pgrep -fl mac_stats` confirmed process (pid 13863). `~/.mac-stats/debug.log`: verbosity 2, 4 monitors loaded from disk, Discord token + gateway, Scheduler (2 entries), Task review thread spawned, Ollama configuration and connection successful, 8 agents loaded with shared soul present, ModelCatalog 15 models, Monitor checks (prod.cometa, app-monitor, mix-online, amvara UP). Manual checks (menu bar click, `--cpu`/`-vv` in chat) left to human.
+
 ---
 
 ## Open tasks
