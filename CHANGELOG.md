@@ -11,10 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **NewMentions alert rule implementation** — `NewMentions::evaluate` now filters Mastodon mention timestamps by configured `hours` window and fires when recent count >= threshold. `MonitorStatus` gains `extra: HashMap<String, Value>` (`#[serde(default)]`) for monitor-specific data. `MastodonMonitor::check_mentions()` returns timestamps + count; Mastodon API query now filters `types[]=mention&limit=40`. Website monitor satisfies new field with `Default::default()`. Previously the NewMentions rule always returned false. (`alerts/rules.rs`, `monitors/mod.rs`, `monitors/social.rs`, `monitors/website.rs`)
 
 ### Changed
+- **Chrome lean flags (visible + headless)** — Visible Chrome (`launch_chrome_on_port()`, both macOS and non-macOS) now adds 6 lean flags: `--disable-extensions`, `--disable-background-networking`, `--disable-sync`, `--disable-default-apps`, `--disable-background-timer-throttling`, `--disable-renderer-backgrounding`. Headless Chrome (`launch_via_headless_chrome()`) adds `--disable-software-rasterizer`, `--mute-audio` via `LaunchOptions::args()`. Reduces helper process CPU when Chrome is launched for automation. (`browser_agent/mod.rs`)
+- **Configurable browser idle timeout** — `Config::browser_idle_timeout_secs()` default lowered from 3600 (1 hour) to 300 (5 minutes). Now reads from env `MAC_STATS_BROWSER_IDLE_TIMEOUT_SECS` and config.json `browserIdleTimeoutSecs`, clamped to 30..=3600. (`config/mod.rs`)
+- **Docs 032: Chrome helper processes plan — implementation complete** — All plan items marked implemented: lean flags, headless args, configurable idle timeout, documentation. Sign-off section replaced with implementation status checklist.
 - **Zero clippy warnings** — Fixed all 44 clippy warnings across 12 source files: `strip_prefix()` instead of manual `starts_with()` + slice indexing (`task/mod.rs`, `session_memory.rs`, `mcp/mod.rs`); `.values()` instead of `.iter().map(|(_, v)| …)` (`monitors.rs`); `.rfind()` instead of `.filter().next_back()` (`ollama/models.rs`); `&Path` instead of `&PathBuf` (`task/runner.rs`); collapsed `if` blocks (`logging/mod.rs`, `commands/ollama.rs`); removed redundant variable rebindings; `#[allow(clippy::too_many_arguments)]` on two functions; function pointer instead of closure (`commands/ollama.rs`); `.is_none_or()` instead of `.map_or()` (`commands/ollama.rs`); `.trim()` before `.split_whitespace()` removed (`browser_agent/mod.rs`); doc-comment continuation lines indented (`commands/ollama.rs`). No behavioral changes.
-- **Docs: OpenClaw §87 re-verification** — All §7 checks re-run; no discrepancies found (`005-openclaw-reviewer`).
-- **FEATURE-CODER backlog** — Clippy clean builds row marked done (`006-feature-coder`).
-- **022 testing note** — Closing reviewer smoke test 2026-03-20 (clippy pass, cargo build, debug.log, 8 agents, 15 models, 4 monitors UP).
+- **Docs: OpenClaw §87–§88 re-verification** — All §7 checks re-run; no discrepancies found (`005-openclaw-reviewer`).
+- **FEATURE-CODER backlog** — Clippy clean builds and Chrome lean flags rows marked done (`006-feature-coder`).
+- **022 testing note** — Closing reviewer smoke test 2026-03-20 (Chrome lean flags, configurable idle timeout, cargo build, debug.log, 8 agents, 15 models, 4 monitors UP).
 
 ## [0.1.47] - 2026-03-20
 

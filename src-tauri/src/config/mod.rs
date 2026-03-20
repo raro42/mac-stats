@@ -19,7 +19,7 @@
 //! leak secrets.
 //!
 //! **JSON config reload (no restart needed):**
-//! - `config.json` — read on every access (window decorations, scheduler interval, maxSchedules, ollamaChatTimeoutSecs, browserViewportWidth/Height, perplexityMaxResults, perplexitySnippetMaxChars).
+//! - `config.json` — read on every access (window decorations, scheduler interval, maxSchedules, ollamaChatTimeoutSecs, browserViewportWidth/Height, browserIdleTimeoutSecs, perplexityMaxResults, perplexitySnippetMaxChars).
 //! - `schedules.json` — scheduler checks file mtime each loop and reloads when changed.
 //! - `discord_channels.json` — Discord loop checks mtime every tick and reloads when changed.
 
@@ -395,9 +395,30 @@ impl Config {
         }
     }
 
-    /// Idle timeout in seconds for the CDP browser session. If the browser is not used for this long, it is closed. Default: 3600 (1 hour).
+    /// Idle timeout in seconds for the CDP browser session. If the browser is not used for this long, it is closed.
+    /// Default: 300 (5 minutes). Config: config.json `browserIdleTimeoutSecs`.
+    /// Env override: `MAC_STATS_BROWSER_IDLE_TIMEOUT_SECS`. Clamped to 30..=3600.
     pub fn browser_idle_timeout_secs() -> u64 {
-        3600
+        const DEFAULT: u64 = 300;
+        const MIN: u64 = 30;
+        const MAX: u64 = 3600;
+        if let Ok(s) = std::env::var("MAC_STATS_BROWSER_IDLE_TIMEOUT_SECS") {
+            if let Ok(n) = s.parse::<u64>() {
+                return n.clamp(MIN, MAX);
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(n) = json
+                    .get("browserIdleTimeoutSecs")
+                    .and_then(|v| v.as_u64())
+                {
+                    return n.clamp(MIN, MAX);
+                }
+            }
+        }
+        DEFAULT
     }
 
     /// Maximum navigation wait timeout in seconds for BROWSER_NAVIGATE and BROWSER_GO_BACK. Slow or stuck navigations fail with a clear message instead of hanging. Config: config.json `browserNavigationTimeoutSecs`. Env: `MAC_STATS_BROWSER_NAVIGATION_TIMEOUT_SECS`. Default 30, clamped to 5..=120.

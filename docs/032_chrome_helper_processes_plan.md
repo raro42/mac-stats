@@ -86,7 +86,7 @@ So we are **launching a new Chrome process very often** instead of reusing one.
 
 **Where:** `src-tauri/src/browser_agent/mod.rs` → `launch_chrome_on_port()` (macOS and non-macOS).
 
-**What:** When we spawn Chrome for the debugging port, add a minimal set of flags to reduce background work and helper process load, while keeping CDP and basic page rendering working:
+**Implemented:** Added lean flags to both macOS and non-macOS `launch_chrome_on_port()`:
 
 - `--disable-extensions`
 - `--disable-background-networking`
@@ -94,14 +94,10 @@ So we are **launching a new Chrome process very often** instead of reusing one.
 - `--disable-default-apps`
 - `--no-first-run` (already present)
 - `--no-default-browser-check` (already present)
-- Optionally: `--disable-background-timer-throttling`, `--disable-renderer-backgrounding` (often used in automation to avoid throttling).
+- `--disable-background-timer-throttling`
+- `--disable-renderer-backgrounding`
 
-**Avoid (for visible mode):**
-
-- `--disable-gpu` in visible mode can make the window sluggish or cause odd rendering; leave GPU on for visible Chrome unless we see high CPU from GPU process and decide otherwise.
-- `--headless` — not used here; this path is for visible Chrome.
-
-**Risk:** Some sites or features might rely on extensions or sync; we use this Chrome only for automation (navigate, click, screenshot), so disabling extensions and sync is acceptable.
+GPU left enabled for visible mode (avoids sluggish rendering). Only used for automation, so disabling extensions/sync is safe.
 
 ---
 
@@ -109,15 +105,12 @@ So we are **launching a new Chrome process very often** instead of reusing one.
 
 **Where:** `src-tauri/src/browser_agent/mod.rs` → `launch_via_headless_chrome()`.
 
-**What:** The crate already adds many lean defaults. We can add a few extra args via `LaunchOptions::default_builder().args([...])` to further reduce load, e.g.:
+**Implemented:** Added extra args via `LaunchOptions::default_builder().args()`:
 
 - `--disable-software-rasterizer`
-- `--disable-dev-shm-usage` (often already in crate’s DEFAULT_ARGS)
 - `--mute-audio`
 
-We will only add flags that are supported and that we can verify don’t break navigate/click/screenshot.
-
-**Optional:** Consider `sandbox(false)` to get `--no-sandbox` and slightly fewer isolation processes (security trade-off; many automation setups use it). Document the choice.
+Sandbox left enabled (security default). `--disable-dev-shm-usage` already in crate defaults.
 
 ---
 
@@ -125,28 +118,22 @@ We will only add flags that are supported and that we can verify don’t break n
 
 **Where:**  
 - `src-tauri/src/config/mod.rs` → `browser_idle_timeout_secs()`  
-- Optionally `config.json` and env (e.g. `MAC_STATS_BROWSER_IDLE_TIMEOUT_SECS`).
+- `config.json` key: `browserIdleTimeoutSecs`  
+- Env override: `MAC_STATS_BROWSER_IDLE_TIMEOUT_SECS`
 
-**What:**
+**Implemented:**
 
-- Make idle timeout **configurable** (e.g. from `config.json` and/or env), with a **lower default** so we don’t keep Chrome around for an hour when unused.
-- Suggested default: **300** (5 minutes) or **600** (10 minutes). Current 3600 (1 hour) keeps helper processes alive much longer than needed for typical “run a few browser steps then stop” usage.
+- Default lowered from 3600 (1 hour) to **300** (5 minutes).
+- Configurable via `config.json` (`browserIdleTimeoutSecs`) and env (`MAC_STATS_BROWSER_IDLE_TIMEOUT_SECS`).
+- Clamped to 30..=3600.
 
-**Behaviour:** After the last BROWSER_* use, if there is no activity for `browser_idle_timeout_secs`, we drop the cached session and the Chrome process exits (when we launched it). Next BROWSER_* will reconnect or relaunch.
+After the last BROWSER_* use, if there is no activity for `browser_idle_timeout_secs`, the cached session is dropped and Chrome exits. Next BROWSER_* reconnects or relaunches.
 
 ---
 
 ### 4. Documentation and config
 
-**Where:**  
-- `docs/` (e.g. existing browser/CDP docs or a short “browser automation” note).  
-- `config` / `Config` if we add new keys.
-
-**What:**
-
-- Document that mac-stats-launched Chrome (visible and headless) is started with lean flags to reduce CPU.
-- Document the new config key and env for browser idle timeout and the new default.
-- Mention that if the user starts Chrome themselves on 9222, we don’t change its flags.
+**Implemented:** This plan document updated to reflect implementation status for all items. Config key `browserIdleTimeoutSecs` and env `MAC_STATS_BROWSER_IDLE_TIMEOUT_SECS` documented in config/mod.rs doc comments and in this plan. If the user starts Chrome on 9222 themselves, we connect to it and do not change its flags (no change from before).
 
 ---
 
@@ -170,14 +157,12 @@ We will only add flags that are supported and that we can verify don’t break n
 
 ---
 
-## Sign-off
+## Implementation status
 
-If you’re happy with this plan, we can implement in this order:
+All items from this plan are now implemented:
 
-1. **Single Chrome process:** Serialize browser creation so only one thread can launch at a time; prevent races and duplicate launches (fix for multiple Chrome PIDs seen in debug.log).
-2. Config: make `browser_idle_timeout_secs` configurable and lower default (e.g. 300 or 600).
-3. Visible Chrome: add lean flags in `launch_chrome_on_port()`.
-4. Headless Chrome: optionally add extra `.args()` in `launch_via_headless_chrome()`.
-5. Docs and any config schema notes.
-
-Please confirm or adjust (e.g. default timeout value, or which flags to include/avoid) and we can proceed.
+1. **Single Chrome process** (item 0): ✅ `LAUNCH_MUTEX` + `kill_orphaned_browser_processes()`
+2. **Visible Chrome lean flags** (item 1): ✅ 6 lean flags added to `launch_chrome_on_port()`
+3. **Headless Chrome extra args** (item 2): ✅ `--disable-software-rasterizer`, `--mute-audio`
+4. **Configurable idle timeout** (item 3): ✅ Default 300s; `browserIdleTimeoutSecs` / `MAC_STATS_BROWSER_IDLE_TIMEOUT_SECS`
+5. **Docs and config** (item 4): ✅ This document and config/mod.rs updated

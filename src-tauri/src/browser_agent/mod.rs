@@ -5,7 +5,7 @@
 //! 2. Or let mac-stats launch Chrome on 9222 when nothing is listening (requires Chrome installed).
 //!
 //! Supports BROWSER_NAVIGATE / BROWSER_CLICK / BROWSER_INPUT / BROWSER_SCROLL / BROWSER_EXTRACT (index-based state). Session is kept
-//! until idle longer than Config::browser_idle_timeout_secs() (default 1 hour).
+//! until idle longer than Config::browser_idle_timeout_secs() (default 5 minutes; configurable).
 //! When CDP is unavailable, HTTP fallback (fetch + scraper) provides NAVIGATE/CLICK/INPUT/EXTRACT without Chrome.
 
 mod http_fallback;
@@ -138,6 +138,12 @@ fn launch_chrome_on_port(port: u16) -> Result<(), String> {
         ))
         .arg("--no-first-run")
         .arg("--no-default-browser-check")
+        .arg("--disable-extensions")
+        .arg("--disable-background-networking")
+        .arg("--disable-sync")
+        .arg("--disable-default-apps")
+        .arg("--disable-background-timer-throttling")
+        .arg("--disable-renderer-backgrounding")
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
@@ -149,7 +155,7 @@ fn launch_chrome_on_port(port: u16) -> Result<(), String> {
             )
         })?;
     info!(
-        "Browser agent [CDP]: launched Chrome on port {} (detached)",
+        "Browser agent [CDP]: launched Chrome on port {} (detached, lean flags)",
         port
     );
     Ok(())
@@ -167,6 +173,12 @@ fn launch_chrome_on_port(port: u16) -> Result<(), String> {
         ))
         .arg("--no-first-run")
         .arg("--no-default-browser-check")
+        .arg("--disable-extensions")
+        .arg("--disable-background-networking")
+        .arg("--disable-sync")
+        .arg("--disable-default-apps")
+        .arg("--disable-background-timer-throttling")
+        .arg("--disable-renderer-backgrounding")
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null())
@@ -178,7 +190,7 @@ fn launch_chrome_on_port(port: u16) -> Result<(), String> {
             )
         })?;
     info!(
-        "Browser agent [CDP]: launched Chrome on port {} (detached)",
+        "Browser agent [CDP]: launched Chrome on port {} (detached, lean flags)",
         port
     );
     Ok(())
@@ -186,8 +198,13 @@ fn launch_chrome_on_port(port: u16) -> Result<(), String> {
 
 /// Launch Chrome via headless_chrome crate (fallback when we cannot launch on a fixed port).
 fn launch_via_headless_chrome() -> Result<Browser, String> {
+    let extra_args: Vec<&std::ffi::OsStr> = vec![
+        std::ffi::OsStr::new("--disable-software-rasterizer"),
+        std::ffi::OsStr::new("--mute-audio"),
+    ];
     let opts = LaunchOptions::default_builder()
         .window_size(Some((viewport_width(), viewport_height())))
+        .args(extra_args)
         .build()
         .map_err(|e| format!("Launch options: {}", e))?;
     let b = Browser::new(opts).map_err(|e| format!("Launch Chrome: {}", e))?;
@@ -1492,7 +1509,7 @@ fn take_screenshot_current_page_inner() -> Result<PathBuf, String> {
 /// Take a screenshot of the given URL using CDP (reuses session if within idle timeout, else connects or launches).
 /// When url is empty or "current", screenshots the current tab (use after BROWSER_NAVIGATE + BROWSER_CLICK).
 /// Saves PNG to ~/.mac-stats/screenshots/<timestamp>_<domain>.png and returns the path.
-/// Browser session is kept until unused for Config::browser_idle_timeout_secs() (default 1 hour).
+/// Browser session is kept until unused for Config::browser_idle_timeout_secs() (default 5 min; configurable).
 pub fn take_screenshot(url: &str) -> Result<PathBuf, String> {
     with_connection_retry(|| take_screenshot_inner(url))
 }
