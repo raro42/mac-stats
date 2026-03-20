@@ -996,16 +996,13 @@ fn run_internal(open_cpu_window: bool) {
                                         // Note: macsmc may not have direct key reading, so we'll limit all_data() usage
                                         // Only call all_data() if we absolutely need to, and limit iteration
                                         if let Ok(data_iter) = smc.all_data() {
-                                            // CRITICAL: Break early once we find our key - don't iterate all keys
-                                            for dbg_result in data_iter {
-                                                if let Ok(dbg) = dbg_result {
-                                                    if dbg.key == key_name {
-                                                        if let Ok(Some(macsmc::DataValue::Float(val))) = dbg.value {
-                                                            if val > 0.0 {
-                                                                temp = val as f64;
-                                                                debug3!("Temperature read from cached M3 key {}: {:.1}°C", key_name, temp);
-                                                                break; // Early exit
-                                                            }
+                                            for dbg in data_iter.flatten() {
+                                                if dbg.key == key_name {
+                                                    if let Ok(Some(macsmc::DataValue::Float(val))) = dbg.value {
+                                                        if val > 0.0 {
+                                                            temp = val as f64;
+                                                            debug3!("Temperature read from cached M3 key {}: {:.1}°C", key_name, temp);
+                                                            break;
                                                         }
                                                     }
                                                 }
@@ -1017,21 +1014,16 @@ fn run_internal(open_cpu_window: bool) {
                                         // Try known M3 Max temperature keys (same as exelban/stats uses)
                                         let m3_keys = ["Tf04", "Tf09", "Tf0A", "Tf0B", "Tf0D", "Tf0E"];
                                         if let Ok(data_iter) = smc.all_data() {
-                                            // CRITICAL: Break early once we find a working key
-                                            for dbg_result in data_iter {
-                                                if let Ok(dbg) = dbg_result {
-                                                    // Check if this is one of our target M3 keys
-                                                    if m3_keys.contains(&dbg.key.as_str()) {
-                                                        if let Ok(Some(macsmc::DataValue::Float(val))) = dbg.value {
-                                                            if val > 0.0 {
-                                                                temp = val as f64;
-                                                                // Cache this key for future use
-                                                                if let Ok(mut cached) = M3_TEMP_KEY.lock() {
-                                                                    *cached = Some(dbg.key.clone());
-                                                                    debug3!("Discovered working M3 temperature key: {} = {:.1}°C", dbg.key, temp);
-                                                                }
-                                                                break; // Early exit - use first valid temperature found
+                                            for dbg in data_iter.flatten() {
+                                                if m3_keys.contains(&dbg.key.as_str()) {
+                                                    if let Ok(Some(macsmc::DataValue::Float(val))) = dbg.value {
+                                                        if val > 0.0 {
+                                                            temp = val as f64;
+                                                            if let Ok(mut cached) = M3_TEMP_KEY.lock() {
+                                                                *cached = Some(dbg.key.clone());
+                                                                debug3!("Discovered working M3 temperature key: {} = {:.1}°C", dbg.key, temp);
                                                             }
+                                                            break;
                                                         }
                                                     }
                                                 }

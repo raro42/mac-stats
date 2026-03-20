@@ -564,7 +564,7 @@ pub fn kill_orphaned_browser_processes() {
             return;
         }
         let stdout = String::from_utf8_lossy(&output.stdout);
-        let pids: Vec<&str> = stdout.trim().split_whitespace().collect();
+        let pids: Vec<&str> = stdout.split_whitespace().collect();
         for pid_str in pids {
             if let Ok(pid) = pid_str.parse::<i32>() {
                 if pid > 0 {

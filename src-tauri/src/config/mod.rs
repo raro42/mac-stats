@@ -805,7 +805,7 @@ impl Config {
                 if let Ok(entries) = std::fs::read_dir(&old_skills) {
                     for e in entries.flatten() {
                         let p = e.path();
-                        if p.extension().map_or(false, |e| e == "md") {
+                        if p.extension().is_some_and(|e| e == "md") {
                             let name = p.file_name().and_then(|n| n.to_str()).unwrap_or("");
                             let dest = skills.join(name);
                             if !dest.exists() {

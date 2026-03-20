@@ -132,7 +132,7 @@ const DISCORD_IMAGE_ONLY_PROMPT: &str =
 fn is_image_attachment(att: &serenity::model::channel::Attachment) -> bool {
     att.content_type
         .as_deref()
-        .map_or(false, |c| c.starts_with("image/"))
+        .is_some_and(|c| c.starts_with("image/"))
         || att.filename.to_lowercase().ends_with(".png")
         || att.filename.to_lowercase().ends_with(".jpg")
         || att.filename.to_lowercase().ends_with(".jpeg")
@@ -213,18 +213,18 @@ impl Default for HavingFunParams {
     }
 }
 
+type ChannelConfigCache = Option<(
+    Option<std::time::SystemTime>,
+    ChannelSettings,
+    HashMap<u64, ChannelSettings>,
+    HavingFunParams,
+    bool,
+    bool,
+)>;
+
 /// Cached channel config, reloaded when `discord_channels.json` mtime changes.
 /// Holds (file mtime, default, overrides, having_fun params, default_verbose_dm, default_verbose_channel).
-static CHANNEL_CONFIG: RwLock<
-    Option<(
-        Option<std::time::SystemTime>,
-        ChannelSettings,
-        HashMap<u64, ChannelSettings>,
-        HavingFunParams,
-        bool,
-        bool,
-    )>,
-> = RwLock::new(None);
+static CHANNEL_CONFIG: RwLock<ChannelConfigCache> = RwLock::new(None);
 
 fn discord_channels_file_mtime() -> Option<std::time::SystemTime> {
     let path = crate::config::Config::discord_channels_path();
@@ -1483,6 +1483,7 @@ fn extract_model_switch_from_question(question: &str) -> Option<(String, String)
 /// `requested_skill_selector`: Some if user wrote "skill: X" (so caller can detect "skill not found" when skill_content is None).
 /// `verbose`: None = not set (use default from config: DM vs channel), Some(true/false) = explicit.
 /// When verbose is false, status/thinking messages are suppressed in the channel.
+#[allow(clippy::type_complexity)]
 fn parse_discord_ollama_overrides(
     content: &str,
 ) -> (

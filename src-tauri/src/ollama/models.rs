@@ -233,7 +233,7 @@ impl ModelCatalog {
             );
             return Some(best);
         }
-        if let Some(best) = self.models.iter().filter(|m| !m.is_cloud).next_back() {
+        if let Some(best) = self.models.iter().rfind(|m| !m.is_cloud) {
             warn!(
                 "ModelCatalog: role=expensive -> {} (above cap, local only)",
                 best.name
@@ -259,9 +259,7 @@ impl ModelCatalog {
             return Some(*best);
         }
         if let Some(best) = local
-            .iter()
-            .filter(|m| m.capability == ModelCapability::Code)
-            .next_back()
+            .iter().rfind(|m| m.capability == ModelCapability::Code)
         {
             debug!(
                 "ModelCatalog: role=code -> {} (code/any, {:.1}B)",
@@ -289,9 +287,7 @@ impl ModelCatalog {
             return Some(*best);
         }
         if let Some(best) = local
-            .iter()
-            .filter(|m| m.capability == ModelCapability::General)
-            .next_back()
+            .iter().rfind(|m| m.capability == ModelCapability::General)
         {
             debug!(
                 "ModelCatalog: role=general -> {} (general/any, {:.1}B)",

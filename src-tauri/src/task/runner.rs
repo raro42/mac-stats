@@ -1,7 +1,7 @@
 //! Run a task file until status is finished. Used by the review loop and scheduler.
 //! When the request came from Discord (or a schedule with reply_to_channel_id), sends the finished task summary back to that channel.
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tracing::{error, info};
 
 /// Result of running a task: (summary_text, already_sent_to_discord).
@@ -139,7 +139,7 @@ pub async fn run_task_until_finished(
 
 /// If we have a Discord channel (from caller or from task file ## Reply-to: discord <id>), send the finished summary. Returns true if sent.
 async fn send_finished_summary_if_channel(
-    task_path: &PathBuf,
+    task_path: &Path,
     reply_to_override: Option<u64>,
     message_prefix: &Option<String>,
     summary: &str,

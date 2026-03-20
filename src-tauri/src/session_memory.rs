@@ -450,10 +450,10 @@ fn parse_session_file(path: &Path) -> Vec<(String, String)> {
         if block.is_empty() {
             continue;
         }
-        let (role, body) = if block.starts_with("User\n") {
-            ("user", block["User\n".len()..].trim())
-        } else if block.starts_with("Assistant\n") {
-            ("assistant", block["Assistant\n".len()..].trim())
+        let (role, body) = if let Some(rest) = block.strip_prefix("User\n") {
+            ("user", rest.trim())
+        } else if let Some(rest) = block.strip_prefix("Assistant\n") {
+            ("assistant", rest.trim())
         } else {
             continue;
         };

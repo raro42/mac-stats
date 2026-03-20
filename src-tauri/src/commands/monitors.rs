@@ -515,9 +515,7 @@ pub fn list_monitors() -> Result<Vec<String>, String> {
 pub fn list_monitors_with_details() -> Result<Vec<MonitorDetails>, String> {
     let configs = get_monitor_configs().lock().map_err(|e| e.to_string())?;
 
-    Ok(configs
-        .iter()
-        .map(|(_, pm)| MonitorDetails {
+    Ok(configs.values().map(|pm| MonitorDetails {
             id: pm.id.clone(),
             name: pm.name.clone(),
             url: Some(pm.url.clone()),

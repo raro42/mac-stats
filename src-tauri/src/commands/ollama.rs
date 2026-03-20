@@ -2535,12 +2535,12 @@ fn looks_like_discord_401_confusion(content: &str) -> bool {
 /// Shared API for Discord (and other agents): ask Ollama how to solve, then run agents (FETCH_URL, BRAVE_SEARCH, RUN_JS).
 /// 1) Planning: send user question + agent list, get RECOMMEND: plan.
 /// 2) Execution: send plan + "now answer using agents", loop on FETCH_URL / BRAVE_SEARCH / RUN_JS (max 5 tool calls).
-/// If `status_tx` is provided (e.g. from Discord), short status messages are sent so the user sees we're still working.
-/// If `discord_reply_channel_id` is set (when the request came from Discord), SCHEDULE will store it so the scheduler can post results to that channel (DM or mention channel).
-/// When `discord_user_id` and `discord_user_name` are set (from Discord message author), the prompt is prefixed with "You are talking to Discord user **{name}** (user id: {id})."
-/// When set, `model_override` and `options_override` apply only to this request (e.g. from Discord "model: llama3" line).
-/// Extract a URL from the question for pre-routing (e.g. screenshot). Prefers https?:// then www.
-/// Strips trailing punctuation from the URL.
+///    If `status_tx` is provided (e.g. from Discord), short status messages are sent so the user sees we're still working.
+///    If `discord_reply_channel_id` is set (when the request came from Discord), SCHEDULE will store it so the scheduler can post results to that channel (DM or mention channel).
+///    When `discord_user_id` and `discord_user_name` are set (from Discord message author), the prompt is prefixed with "You are talking to Discord user **{name}** (user id: {id})."
+///    When set, `model_override` and `options_override` apply only to this request (e.g. from Discord "model: llama3" line).
+///    Extract a URL from the question for pre-routing (e.g. screenshot). Prefers https?:// then www.
+///    Strips trailing punctuation from the URL.
 fn extract_url_from_question(text: &str) -> Option<String> {
     let lower = text.to_lowercase();
     for prefix in ["https://", "http://"] {
@@ -3012,10 +3012,10 @@ fn sanitize_success_criteria(question: &str, criteria: Vec<String>) -> Vec<Strin
             }
             continue;
         }
-        if generic_news_request && !explicit_football_request {
-            if lower.contains("football club")
+        if generic_news_request && !explicit_football_request
+            && (lower.contains("football club")
                 || lower.contains("sports website")
-                || lower.contains("related to the team")
+                || lower.contains("related to the team"))
             {
                 let replacement = if lower.contains("sports website") {
                     "credible named sources cited".to_string()
@@ -3029,7 +3029,6 @@ fn sanitize_success_criteria(question: &str, criteria: Vec<String>) -> Vec<Strin
                 }
                 continue;
             }
-        }
         if generic_news_request
             && !explicit_named_sources
             && (lower.contains("bbc") || lower.contains("cnn") || lower.contains("reuters"))
@@ -3331,6 +3330,7 @@ pub(crate) fn build_perplexity_news_tool_suffix(
 /// When we have image attachment(s) and a local vision model, sends the first image and asks "Does this image satisfy the request?"; otherwise text-only verification.
 /// When page_content_from_browser is Some (e.g. from BROWSER_EXTRACT), it is included so the verifier can check requested text against JS-rendered content (SPAs).
 /// When news_search_was_hub_only is Some(true), the verifier must not accept an answer that presents hub/landing/tag/standings pages as complete recent news.
+#[allow(clippy::too_many_arguments)]
 async fn verify_completion(
     question: &str,
     response_content: &str,
@@ -3562,6 +3562,7 @@ fn original_request_for_retry(
 /// When `retry_on_verification_no` is true and verification says we didn't satisfy the request, we run one retry with a "complete the remaining steps" prompt; the retry run is called with `retry_on_verification_no: false` so we don't retry indefinitely.
 /// When `from_remote` is true (Discord, scheduler, task runner), browser runs default to headless (no visible window) unless the question explicitly asks to see the browser (e.g. "visible", "show me").
 /// Returns a boxed future to allow one level of async recursion (retry path).
+#[allow(clippy::too_many_arguments)]
 pub fn answer_with_ollama_and_fetch(
     question: &str,
     status_tx: Option<tokio::sync::mpsc::UnboundedSender<String>>,
@@ -3595,7 +3596,7 @@ pub fn answer_with_ollama_and_fetch(
     // 0 = first run; 1 = verification retry. Logged for request tracing.
     retry_count: u32,
 ) -> Pin<Box<dyn Future<Output = Result<OllamaReply, String>> + Send>> {
-    let load_global_memory = discord_is_dm.map_or(true, |dm| dm);
+    let load_global_memory = discord_is_dm.is_none_or(|dm| dm);
     if discord_is_dm == Some(false) {
         tracing::info!(
             "Agent router: Discord guild channel — not loading global memory (main-session only)"
@@ -3607,7 +3608,6 @@ pub fn answer_with_ollama_and_fetch(
     let discord_intermediate = discord_intermediate.map(|s| s.to_string());
     let original_user_request = original_user_request.map(|s| s.to_string());
     let success_criteria_override = success_criteria_override.map(|v| v.to_vec());
-    let request_id_override = request_id_override.map(String::from);
     Box::pin(async move {
         use tracing::info;
         let question = question.as_str();
@@ -3668,8 +3668,7 @@ pub fn answer_with_ollama_and_fetch(
             let q = question.to_lowercase();
             if q.contains("screenshot")
                 && (q.contains("send") || q.contains("here") || q.contains("discord"))
-            {
-                if conversation_history
+                && conversation_history
                     .as_ref()
                     .is_some_and(|h| !h.is_empty())
                 {
@@ -3678,7 +3677,6 @@ pub fn answer_with_ollama_and_fetch(
                     );
                     conversation_history = Some(vec![]);
                 }
-            }
         }
 
         let (model_override, skill_content, mut max_tool_iterations) =
@@ -4873,7 +4871,6 @@ pub fn answer_with_ollama_and_fetch(
                             );
                             match tokio::task::spawn_blocking({
                                 let u = url_arg.clone();
-                                let new_tab = new_tab;
                                 move || crate::browser_agent::navigate_and_get_state_with_options(&u, new_tab)
                             })
                             .await
@@ -4891,7 +4888,6 @@ pub fn answer_with_ollama_and_fetch(
                                     .ok();
                                     match tokio::task::spawn_blocking({
                                         let u = url_arg.clone();
-                                        let new_tab = new_tab;
                                         move || crate::browser_agent::navigate_and_get_state_with_options(&u, new_tab)
                                     })
                                     .await
@@ -4936,7 +4932,7 @@ pub fn answer_with_ollama_and_fetch(
                     "BROWSER_GO_BACK" => {
                         send_status("🔙 Going back…");
                         info!("Agent router [{}]: BROWSER_GO_BACK", request_id);
-                        match tokio::task::spawn_blocking(|| crate::browser_agent::go_back()).await {
+                        match tokio::task::spawn_blocking(crate::browser_agent::go_back).await {
                             Ok(Ok(state_str)) => state_str,
                             Ok(Err(e)) => append_latest_browser_state_guidance(&format!(
                                 "BROWSER_GO_BACK failed: {}",
@@ -5536,9 +5532,7 @@ pub fn answer_with_ollama_and_fetch(
                                     info!(
                                         "Agent router: skipping repeated AGENT: orchestrator (loop breaker)"
                                     );
-                                    format!(
-                                        "The orchestrator already replied above. Reply with a one-sentence summary for the user and **DONE: success** or **DONE: no**. Do not output AGENT: orchestrator again."
-                                    )
+                                    "The orchestrator already replied above. Reply with a one-sentence summary for the user and **DONE: success** or **DONE: no**. Do not output AGENT: orchestrator again.".to_string()
                                 } else {
                                     let mut user_msg: String = if task_message.is_empty() {
                                         question.to_string()
@@ -5547,13 +5541,13 @@ pub fn answer_with_ollama_and_fetch(
                                     };
                                     // When invoking discord-expert from Discord, fetch guild/channel metadata via API and inject so the agent has current context.
                                     let is_discord_expert =
-                                        agent.slug.as_deref().map_or(false, |s| {
+                                        agent.slug.as_deref().is_some_and(|s| {
                                             s.eq_ignore_ascii_case("discord-expert")
                                         }) || agent.id == "004";
                                     let is_redmine_agent = agent
                                         .slug
                                         .as_deref()
-                                        .map_or(false, |s| s.eq_ignore_ascii_case("redmine"))
+                                        .is_some_and(|s| s.eq_ignore_ascii_case("redmine"))
                                         || agent.id == "006";
                                     if is_discord_expert {
                                         if let Some(channel_id) = discord_reply_channel_id {
@@ -6560,8 +6554,7 @@ pub fn answer_with_ollama_and_fetch(
                                             msg.push_str(
                                         "\n\nThe user asked only to review/summarize. Do NOT update the ticket or add a comment. Reply with your summary and DONE: success.",
                                     );
-                                        } else {
-                                            if path.contains("time_entries") {
+                                        } else if path.contains("time_entries") {
                                                 msg.push_str(
                                             "\n\nUse this data to answer. If the user asked for tickets worked, list the actual issue ids and subjects from the derived summary. If the user asked for \"this month\", use from/to for the current month. If success criteria require JSON format, reply with valid JSON only (e.g. total hours, ticket list, project breakdown).",
                                         );
@@ -6585,7 +6578,6 @@ pub fn answer_with_ollama_and_fetch(
                                             ));
                                                 }
                                             }
-                                        }
                                     }
                                     msg
                                 }
@@ -7681,7 +7673,7 @@ fn truncate_search_query_arg(arg: &str) -> String {
         " and then ",
     ]
     .iter()
-    .filter_map(|sep| arg_lower.find(sep).map(|i| i))
+    .filter_map(|sep| arg_lower.find(sep))
     .min();
     let base = earliest.map(|i| arg[..i].trim()).unwrap_or(arg);
     base.chars()

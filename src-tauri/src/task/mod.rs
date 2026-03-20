@@ -192,8 +192,8 @@ pub fn get_assignee(path: &Path) -> Result<String, String> {
     let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
     for line in content.lines() {
         let line = line.trim();
-        if line.starts_with(ASSIGNED_HEADER) {
-            let agent = line[ASSIGNED_HEADER.len()..].trim();
+        if let Some(agent) = line.strip_prefix(ASSIGNED_HEADER) {
+            let agent = agent.trim();
             return Ok(if agent.is_empty() {
                 "default".to_string()
             } else {
@@ -209,8 +209,8 @@ pub fn get_topic_from_file(path: &Path) -> Result<Option<String>, String> {
     let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
     for line in content.lines() {
         let line = line.trim();
-        if line.starts_with(TOPIC_HEADER) {
-            let t = line[TOPIC_HEADER.len()..].trim();
+        if let Some(t) = line.strip_prefix(TOPIC_HEADER) {
+            let t = t.trim();
             return Ok(Some(if t.is_empty() {
                 "task".to_string()
             } else {
@@ -226,8 +226,8 @@ pub fn get_id_from_file(path: &Path) -> Result<Option<String>, String> {
     let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
     for line in content.lines() {
         let line = line.trim();
-        if line.starts_with(ID_HEADER) {
-            let id = line[ID_HEADER.len()..].trim();
+        if let Some(id) = line.strip_prefix(ID_HEADER) {
+            let id = id.trim();
             return Ok(Some(if id.is_empty() {
                 "1".to_string()
             } else {
@@ -243,8 +243,8 @@ pub fn get_reply_to_discord_channel(path: &Path) -> Option<u64> {
     let content = fs::read_to_string(path).ok()?;
     for line in content.lines() {
         let line = line.trim();
-        if line.starts_with(REPLY_TO_HEADER) {
-            let rest = line[REPLY_TO_HEADER.len()..].trim();
+        if let Some(rest) = line.strip_prefix(REPLY_TO_HEADER) {
+            let rest = rest.trim();
             if let Some(suffix) = rest.strip_prefix("discord") {
                 let id = suffix.trim();
                 if !id.is_empty() && id.chars().all(|c| c.is_ascii_digit()) {
@@ -302,8 +302,8 @@ pub fn get_paused_until(path: &Path) -> Result<Option<String>, String> {
     let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
     for line in content.lines() {
         let line = line.trim();
-        if line.starts_with(PAUSED_UNTIL_HEADER) {
-            let s = line[PAUSED_UNTIL_HEADER.len()..].trim();
+        if let Some(s) = line.strip_prefix(PAUSED_UNTIL_HEADER) {
+            let s = s.trim();
             return Ok(if s.is_empty() {
                 None
             } else {
@@ -322,8 +322,8 @@ pub fn get_depends_on(path: &Path) -> Result<Vec<String>, String> {
     let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
     for line in content.lines() {
         let line = line.trim();
-        if line.starts_with(DEPENDS_HEADER) {
-            let rest = line[DEPENDS_HEADER.len()..].trim();
+        if let Some(rest) = line.strip_prefix(DEPENDS_HEADER) {
+            let rest = rest.trim();
             let ids: Vec<String> = rest
                 .split(',')
                 .map(|s| s.trim().to_string())
@@ -343,8 +343,8 @@ pub fn get_sub_tasks(path: &Path) -> Result<Vec<String>, String> {
     let content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
     for line in content.lines() {
         let line = line.trim();
-        if line.starts_with(SUB_TASKS_HEADER) {
-            let rest = line[SUB_TASKS_HEADER.len()..].trim();
+        if let Some(rest) = line.strip_prefix(SUB_TASKS_HEADER) {
+            let rest = rest.trim();
             let ids: Vec<String> = rest
                 .split(',')
                 .map(|s| s.trim().to_string())

@@ -194,10 +194,10 @@ fn parse_one_sse_event(buf: &str) -> Option<(Option<String>, Option<String>, &st
     let mut event = None;
     let mut data_lines = Vec::new();
     for line in block.lines() {
-        if line.starts_with("event:") {
-            event = Some(line[6..].trim().to_string());
-        } else if line.starts_with("data:") {
-            data_lines.push(line[5..].trim());
+        if let Some(rest) = line.strip_prefix("event:") {
+            event = Some(rest.trim().to_string());
+        } else if let Some(rest) = line.strip_prefix("data:") {
+            data_lines.push(rest.trim());
         }
     }
     let data = if data_lines.is_empty() {

@@ -21,11 +21,10 @@ fn rotate_debug_log_if_due(log_path: &std::path::Path) {
     if already_rotated {
         return;
     }
-    if log_path.exists() {
-        if std::fs::copy(log_path, &sic_path).is_err() {
+    if log_path.exists()
+        && std::fs::copy(log_path, &sic_path).is_err() {
             return;
         }
-    }
     if let Ok(f) = std::fs::OpenOptions::new()
         .write(true)
         .truncate(true)

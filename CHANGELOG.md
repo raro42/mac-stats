@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **NewMentions alert rule implementation** — `NewMentions::evaluate` now filters Mastodon mention timestamps by configured `hours` window and fires when recent count >= threshold. `MonitorStatus` gains `extra: HashMap<String, Value>` (`#[serde(default)]`) for monitor-specific data. `MastodonMonitor::check_mentions()` returns timestamps + count; Mastodon API query now filters `types[]=mention&limit=40`. Website monitor satisfies new field with `Default::default()`. Previously the NewMentions rule always returned false. (`alerts/rules.rs`, `monitors/mod.rs`, `monitors/social.rs`, `monitors/website.rs`)
 
+### Changed
+- **Zero clippy warnings** — Fixed all 44 clippy warnings across 12 source files: `strip_prefix()` instead of manual `starts_with()` + slice indexing (`task/mod.rs`, `session_memory.rs`, `mcp/mod.rs`); `.values()` instead of `.iter().map(|(_, v)| …)` (`monitors.rs`); `.rfind()` instead of `.filter().next_back()` (`ollama/models.rs`); `&Path` instead of `&PathBuf` (`task/runner.rs`); collapsed `if` blocks (`logging/mod.rs`, `commands/ollama.rs`); removed redundant variable rebindings; `#[allow(clippy::too_many_arguments)]` on two functions; function pointer instead of closure (`commands/ollama.rs`); `.is_none_or()` instead of `.map_or()` (`commands/ollama.rs`); `.trim()` before `.split_whitespace()` removed (`browser_agent/mod.rs`); doc-comment continuation lines indented (`commands/ollama.rs`). No behavioral changes.
+- **Docs: OpenClaw §87 re-verification** — All §7 checks re-run; no discrepancies found (`005-openclaw-reviewer`).
+- **FEATURE-CODER backlog** — Clippy clean builds row marked done (`006-feature-coder`).
+- **022 testing note** — Closing reviewer smoke test 2026-03-20 (clippy pass, cargo build, debug.log, 8 agents, 15 models, 4 monitors UP).
+
 ## [0.1.47] - 2026-03-20
 
 ### Fixed
