@@ -299,3 +299,12 @@ Open tasks for this plan are tracked in **006-feature-coder/FEATURE-CODER.md**.
 - [x] `cargo test` — 114 tests pass.
 - [x] `cargo build --release` succeeds.
 - [x] `./target/release/mac_stats -vv` starts; monitors UP, agents loaded, Discord/Ollama init, scheduler running in logs.
+
+### Closing reviewer smoke test 2026-03-21 (task_tool_handlers extraction)
+
+- [x] `cargo check` — zero errors.
+- [x] `cargo clippy` — zero warnings.
+- [x] `cargo test` — 114 tests pass.
+- [x] `cargo build --release` succeeds.
+- [x] `./target/release/mac_stats -vv` starts; 4 monitors UP (mix-online 202ms, amvara 307ms, cometa 361ms, app-monitor 184ms), 8 agents loaded, 15 models classified, Ollama connected (qwen3:latest, 40960 ctx), scheduler running (2 entries). Zero errors/warnings/panics in log.
+- [x] Code review: 10 handler functions extracted to `task_tool_handlers.rs` (505 lines). Each takes only required params. All 10 call sites in `ollama.rs` wired correctly. Unused `schedule_helpers` import removed. `ollama.rs` 3502→3145 lines (357 extracted). No behavioral changes.

@@ -35,4 +35,5 @@ pub mod pre_routing;
 pub mod tool_parsing;
 pub mod verification;
 pub mod agent_session;
+pub mod task_tool_handlers;
 pub mod window;

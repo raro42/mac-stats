@@ -247,6 +247,7 @@ mac-stats/
 │   │   │   ├── logging.rs        ← Generic JS console logging bridge
 │   │   │   ├── plugins.rs        ← Plugin system commands
 │   │   │   ├── pre_routing.rs    ← Deterministic pre-routing (screenshot, RUN_CMD, REDMINE)
+│   │   │   ├── task_tool_handlers.rs ← TASK_* and SCHEDULE tool handlers
 │   │   │   └── tool_parsing.rs   ← Tool invocation parsing from model responses
 │   │   │
 │   │   ├── metrics/              ← System metrics collection
