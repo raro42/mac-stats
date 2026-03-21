@@ -27,4 +27,6 @@ pub mod agent_descriptions;
 pub mod browser_helpers;
 pub mod schedule_helpers;
 pub mod tool_parsing;
+pub mod verification;
+pub mod agent_session;
 pub mod window;

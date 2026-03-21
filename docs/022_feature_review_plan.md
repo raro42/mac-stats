@@ -725,6 +725,14 @@ See `CHANGELOG.md` (0.1.14) and `docs/023_externalized_prompts_DONE.md` for deta
 
 ---
 
+## Testing (2026-03-21) — closing reviewer smoke test (verification + agent_session extraction, 114 tests pass)
+
+- **Uncommitted changes:** 5 modified + 2 untracked — `commands/verification.rs` (new, 770 lines; verification pipeline, success criteria, completion checking, OllamaReply, RequestRunContext extracted from `ollama.rs`), `commands/agent_session.rs` (new, 291 lines; agent session runner with tool-call loop + runtime context builder extracted from `ollama.rs`), `commands/ollama.rs` (-1035 lines, now 5523 lines; pure extraction, no behavioral changes), `commands/mod.rs` (+2 pub mod lines: `verification`, `agent_session`), `005-openclaw-reviewer.md` (§95 re-verification), `006-feature-coder/FEATURE-CODER.md` (+1 line), `src-tauri/Cargo.lock` (version bump).
+- **Integration:** `cargo check` passes (0 errors). `cargo clippy` passes (0 warnings, 0 errors). `cargo test`: **114 passed, 0 failed**. `diff src/ollama.js src-tauri/dist/ollama.js` empty (in sync). New modules properly exported in `commands/mod.rs`; `OllamaReply` re-exported via `pub use` in `ollama.rs`, `run_agent_ollama_session` and `normalize_discord_api_path` re-exported via `pub(crate) use`. No new Tauri commands (internal helper modules only). `tauri::generate_handler![]` unchanged.
+- **Smoke:** `cargo build --release` succeeded (v0.1.48, 23s). `./src-tauri/target/release/mac_stats --cpu -vv` started; process confirmed running. `debug.log`: verbosity 2, 4 monitors loaded from disk (mix-online, cometa, app-monitor, amvara), Scheduler thread spawned (2 entries), Task review thread spawned (every 1 min, WIP timeout 30 min), Agents watch started, Ollama agent model qwen3:latest (40960 ctx), ModelCatalog 15 models classified, 8 agents loaded (orchestrator, general-purpose-mommy, senior-coder, humble-generalist, discord-expert, scheduler, redmine, abliterated) with shared soul present, Ollama configuration and connection successful, CPU window created and shown. Discord: no token, skipping gateway. Background monitor checks confirmed (mix-online UP, prod.cometa UP, app-monitor UP, amvara UP). 0 errors, 0 warnings in log. Manual checks (menu bar click, `--cpu`/`-vv` in chat) left to human.
+
+---
+
 ## Open tasks
 
 Open tasks for this plan are tracked in **006-feature-coder/FEATURE-CODER.md**.

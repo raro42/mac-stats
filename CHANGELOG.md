@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Extract verification pipeline and agent session runner from `ollama.rs`** — Moved verification pipeline (`OllamaReply`, `RequestRunContext`, `verify_completion`, `extract_success_criteria`, `sanitize_success_criteria`, `detect_new_topic`, `summarize_last_turns`, `first_image_as_base64`, `original_request_for_retry`, `user_explicitly_asked_for_screenshot`, `truncate_text_on_line_boundaries`, `summarize_response_for_verification` + 12 tests) into `commands/verification.rs` (770 lines); agent session runner (`run_agent_ollama_session`, `execute_agent_tool_call`, `parse_agent_tool_from_response`, `build_agent_runtime_context`, `normalize_discord_api_path` + 4 tests) into `commands/agent_session.rs` (291 lines). `ollama.rs` 6543→5523 lines (1020 extracted). No behavioral changes; zero clippy warnings, 114 tests pass. (`commands/verification.rs`, `commands/agent_session.rs`, `commands/mod.rs`, `commands/ollama.rs`)
+- **Docs: OpenClaw §95 re-verification** — All §7 checks re-run; no discrepancies found (`005-openclaw-reviewer`).
+- **FEATURE-CODER backlog** — Verification + agent session extraction row marked done (`006-feature-coder`).
+- **022 testing note** — Closing reviewer smoke test 2026-03-21 (verification + agent_session extraction; cargo build, 114 tests pass, debug.log, agents, monitors UP).
+
 ## [0.1.48] - 2026-03-21
 
 ### Added
