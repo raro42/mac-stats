@@ -38,4 +38,6 @@ pub mod tool_parsing;
 pub mod verification;
 pub mod agent_session;
 pub mod task_tool_handlers;
+pub mod network_tool_dispatch;
+pub mod delegation_tool_dispatch;
 pub mod window;

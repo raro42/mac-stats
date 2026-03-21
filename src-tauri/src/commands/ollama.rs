@@ -13,20 +13,15 @@ pub use crate::commands::ollama_config::{
     ensure_ollama_agent_ready_at_startup, get_default_ollama_model_name,
 };
 pub use crate::commands::ollama_chat::send_ollama_chat_messages;
-use crate::commands::content_reduction::{
-    reduce_fetched_content_to_fit, run_skill_ollama_session, run_js_via_node,
-    CHARS_PER_TOKEN,
-};
 use crate::commands::ollama_models::list_ollama_models;
 use crate::commands::redmine_helpers::{
     extract_redmine_time_entries_summary_for_reply,
     grounded_redmine_time_entries_failure_reply,
     is_redmine_review_or_summarize_only, is_redmine_time_entries_request,
-    question_explicitly_requests_json, redmine_direct_fallback_hint,
-    redmine_time_entries_range,
+    question_explicitly_requests_json, redmine_time_entries_range,
 };
 use crate::commands::reply_helpers::{
-    append_to_file, final_reply_from_tool_results, is_agent_unavailable_error,
+    append_to_file, final_reply_from_tool_results,
     is_bare_done_plan, is_final_same_as_intermediate, looks_like_discord_401_confusion,
 };
 use crate::commands::pre_routing::compute_pre_routed_recommendation;
@@ -39,7 +34,6 @@ use crate::commands::ollama_memory::{
 use crate::commands::perplexity_helpers::is_news_query;
 use crate::commands::tool_parsing::{
     normalize_browser_tool_arg, normalize_inline_tool_sequences, parse_all_tools_from_response,
-    parse_python_script_from_response,
     parse_tool_from_response, truncate_search_query_arg, MAX_BROWSER_TOOLS_PER_RUN,
 };
 use crate::commands::verification::{
@@ -48,9 +42,7 @@ use crate::commands::verification::{
     verify_completion, RequestRunContext,
 };
 pub use crate::commands::verification::OllamaReply;
-pub(crate) use crate::commands::agent_session::{
-    normalize_discord_api_path, run_agent_ollama_session,
-};
+pub(crate) use crate::commands::agent_session::run_agent_ollama_session;
 
 use crate::commands::agent_descriptions::{
     build_agent_descriptions, DISCORD_GROUP_CHANNEL_GUIDANCE, DISCORD_PLATFORM_FORMATTING,
@@ -1132,95 +1124,22 @@ pub fn answer_with_ollama_and_fetch(
                         String::new()
                     }
                     "FETCH_URL" if arg.contains("discord.com") => {
-                        let path = if let Some(pos) = arg.find("/api/v10") {
-                            arg[pos + "/api/v10".len()..].to_string()
-                        } else if let Some(pos) = arg.find("/api/") {
-                            arg[pos + "/api".len()..].to_string()
-                        } else {
-                            String::new()
-                        };
-                        if !path.is_empty() {
-                            info!(
-                                "Agent router: redirecting FETCH_URL discord.com -> DISCORD_API GET {}",
-                                path
-                            );
-                            send_status(&format!("Discord API: GET {}", path));
-                            match crate::discord::api::discord_api_request("GET", &path, None).await
-                            {
-                                Ok(result) => format!(
-                                    "Discord API result (GET {}):\n\n{}\n\nUse this to answer the user's question.",
-                                    path, result
-                                ),
-                                Err(e) => format!(
-                                    "Discord API failed (GET {}): {}. Try DISCORD_API: GET {} or delegate to AGENT: discord-expert.",
-                                    path, e, path
-                                ),
-                            }
-                        } else {
-                            info!(
-                                "Agent router: blocked FETCH_URL for discord.com (no API path). Redirecting to discord-expert."
-                            );
-                            "Cannot fetch discord.com pages directly. Discord requires authenticated API access. Use AGENT: discord-expert for all Discord tasks, or use DISCORD_API: GET <path> with the correct API endpoint.".to_string()
-                        }
+                        crate::commands::network_tool_dispatch::handle_fetch_url_discord_redirect(
+                            &arg, status_tx.as_ref(),
+                        ).await
                     }
                     "FETCH_URL" => {
-                        send_status(&format!(
-                            "🌐 Fetching page at {}…",
-                            crate::logging::ellipse(&arg, 45)
-                        ));
-                        info!("Discord/Ollama: FETCH_URL requested: {}", arg);
-                        let url = arg.to_string();
-                        let fetch_result = tokio::task::spawn_blocking(move || {
-                            crate::commands::browser::fetch_page_content(&url)
-                        })
-                        .await
-                        .map_err(|e| format!("Fetch task: {}", e))?
-                        .map_err(|e| format!("Fetch page failed: {}", e));
-                        match fetch_result {
-                            Ok(body) => {
-                                let estimated_used =
-                                    (messages.iter().map(|m| m.content.len()).sum::<usize>()
-                                        + agent_descriptions.len())
-                                        / CHARS_PER_TOKEN
-                                        + 50;
-                                let body_fit = reduce_fetched_content_to_fit(
-                                    &body,
-                                    model_info.context_size_tokens,
-                                    estimated_used as u32,
-                                    model_override.clone(),
-                                    options_override.clone(),
-                                )
-                                .await?;
-                                format!(
-                                    "Here is the page content:\n\n{}\n\nPlease answer the user's question based on this content.",
-                                    body_fit
-                                )
-                            }
-                            Err(e) => {
-                                if e.contains("401") {
-                                    info!(
-                                        "Discord/Ollama: Fetch returned 401 Unauthorized, stopping"
-                                    );
-                                    "That URL returned 401 Unauthorized. Do not try another URL. Answer based on what you know.".to_string()
-                                } else {
-                                    info!(
-                                        "Discord/Ollama: FETCH_URL failed: {}",
-                                        crate::logging::ellipse(&e, 300)
-                                    );
-                                    let url_lower = arg.to_lowercase();
-                                    let redmine_hint = if url_lower.contains("redmine")
-                                        || url_lower.contains("/issues/")
-                                    {
-                                        " For Redmine tickets use REDMINE_API or say \"review ticket <id>\"."
-                                    } else {
-                                        ""
-                                    };
-                                    format!(
-                                        "That URL could not be fetched (connection or server error).{redmine_hint} Answer without that page."
-                                    )
-                                }
-                            }
-                        }
+                        let estimated_used =
+                            messages.iter().map(|m| m.content.len()).sum::<usize>()
+                                + agent_descriptions.len();
+                        crate::commands::network_tool_dispatch::handle_fetch_url(
+                            &arg,
+                            estimated_used,
+                            model_info.context_size_tokens,
+                            model_override.clone(),
+                            options_override.clone(),
+                            status_tx.as_ref(),
+                        ).await?
                     }
                     "BROWSER_SCREENSHOT" => {
                         let result = crate::commands::browser_tool_dispatch::handle_browser_screenshot(
@@ -1266,21 +1185,9 @@ pub fn answer_with_ollama_and_fetch(
                         ).await
                     }
                     "BRAVE_SEARCH" => {
-                        send_status(&format!(
-                            "🌐 Searching the web for \"{}\"…",
-                            crate::logging::ellipse(&arg, 35)
-                        ));
-                        info!("Discord/Ollama: BRAVE_SEARCH requested: {}", arg);
-                        match crate::commands::brave::get_brave_api_key() {
-                    Some(api_key) => match crate::commands::brave::brave_web_search(&arg, &api_key).await {
-                        Ok(results) => format!(
-                            "Brave Search results:\n\n{}\n\nUse these to answer the user's question.",
-                            results
-                        ),
-                        Err(e) => format!("Brave Search failed: {}. Answer without search results.", e),
-                    },
-                    None => "Brave Search is not configured (no BRAVE_API_KEY in env or .config.env). Answer without search results.".to_string(),
-                }
+                        crate::commands::network_tool_dispatch::handle_brave_search(
+                            &arg, status_tx.as_ref(),
+                        ).await
                     }
                     "PERPLEXITY_SEARCH" => {
                         let result = crate::commands::perplexity_helpers::handle_perplexity_search(
@@ -1296,304 +1203,31 @@ pub fn answer_with_ollama_and_fetch(
                         }
                         result.text
                     }
-                    // RUN_JS: agent-triggered; runs with process privileges via run_js_via_node.
-                    // Treat agent output as untrusted code. Audit log code length + hash only (no full body).
                     "RUN_JS" => {
-                        const CODE_PREVIEW_LEN: usize = 50;
-                        let code_preview: String = arg
-                            .trim()
-                            .lines()
-                            .next()
-                            .unwrap_or(arg.trim())
-                            .chars()
-                            .take(CODE_PREVIEW_LEN)
-                            .collect();
-                        let code_label = if arg.trim().chars().count() > CODE_PREVIEW_LEN {
-                            format!("{}…", code_preview.trim())
-                        } else {
-                            code_preview.trim().to_string()
-                        };
-                        let code_ref = if code_label.is_empty() {
-                            "…"
-                        } else {
-                            &code_label
-                        };
-                        send_status(&format!("Running code: {}…", code_ref));
-                        // Audit: code length + content hash only (no full code in logs).
-                        let code_len = arg.chars().count();
-                        let code_hash = {
-                            use std::hash::{Hash, Hasher};
-                            let mut h = std::collections::hash_map::DefaultHasher::new();
-                            arg.hash(&mut h);
-                            h.finish()
-                        };
-                        info!(
-                            "RUN_JS audit: len={} hash_hex={:016x} preview={}",
-                            code_len, code_hash, code_ref
-                        );
-                        match run_js_via_node(&arg) {
-                            Ok(result) => format!(
-                                "JavaScript result:\n\n{}\n\nUse this to answer the user's question.",
-                                result
-                            ),
-                            Err(e) => {
-                                info!("Discord/Ollama: RUN_JS failed: {}", e);
-                                format!(
-                                    "JavaScript execution failed: {}. Answer the user's question without running code.",
-                                    e
-                                )
-                            }
-                        }
+                        crate::commands::delegation_tool_dispatch::handle_run_js(
+                            &arg, status_tx.as_ref(),
+                        )
                     }
                     "SKILL" => {
-                        send_status("Using skill…");
-                        let arg = arg.trim();
-                        let (selector, task_message) = if let Some(space_idx) = arg.find(' ') {
-                            let (sel, rest) = arg.split_at(space_idx);
-                            (sel.trim(), rest.trim())
-                        } else {
-                            (arg, "")
-                        };
-                        let skills = crate::skills::load_skills();
-                        match crate::skills::find_skill_by_number_or_topic(&skills, selector) {
-                            Some(skill) => {
-                                send_status(&format!(
-                                    "Using skill {}-{}…",
-                                    skill.number, skill.topic
-                                ));
-                                info!(
-                                    "Agent router: using skill {} ({}) — new session (no main context)",
-                                    skill.number, skill.topic
-                                );
-                                let user_msg = if task_message.is_empty() {
-                                    question
-                                } else {
-                                    task_message
-                                };
-                                match run_skill_ollama_session(
-                                    &skill.content,
-                                    user_msg,
-                                    model_override.clone(),
-                                    options_override.clone(),
-                                )
-                                .await
-                                {
-                                    Ok(result) => format!(
-                                        "Skill \"{}-{}\" result:\n\n{}\n\nUse this to answer the user's question.",
-                                        skill.number, skill.topic, result
-                                    ),
-                                    Err(e) => {
-                                        info!("Agent router: SKILL session failed: {}", e);
-                                        format!(
-                                            "Skill \"{}-{}\" failed: {}. Answer without this result.",
-                                            skill.number, skill.topic, e
-                                        )
-                                    }
-                                }
-                            }
-                            None => {
-                                info!(
-                                    "Agent router: SKILL unknown selector \"{}\" (available: {:?})",
-                                    selector,
-                                    skills
-                                        .iter()
-                                        .map(|s| format!("{}-{}", s.number, s.topic))
-                                        .collect::<Vec<_>>()
-                                );
-                                format!(
-                                    "Unknown skill \"{}\". Available skills: {}. Answer without using a skill.",
-                                    selector,
-                                    skills
-                                        .iter()
-                                        .map(|s| format!("{}-{}", s.number, s.topic))
-                                        .collect::<Vec<_>>()
-                                        .join(", ")
-                                )
-                            }
-                        }
+                        crate::commands::delegation_tool_dispatch::handle_skill(
+                            &arg, question, model_override.clone(),
+                            options_override.clone(), status_tx.as_ref(),
+                        ).await
                     }
                     "AGENT" => {
-                        let arg = arg.trim();
-                        let (selector, task_message) = if let Some(space_idx) = arg.find(' ') {
-                            let (sel, rest) = arg.split_at(space_idx);
-                            (sel.trim(), rest.trim())
-                        } else {
-                            (arg, "")
-                        };
-                        // Proxy agent: cursor-agent runs the CLI instead of Ollama (handoff when local model isn't enough).
-                        let selector_lower = selector.to_lowercase();
-                        if (selector_lower == "cursor-agent" || selector_lower == "cursor_agent")
-                            && crate::commands::cursor_agent::is_cursor_agent_available()
-                        {
-                            let prompt = if task_message.is_empty() {
-                                question.to_string()
-                            } else {
-                                task_message.to_string()
-                            };
-                            send_status("Running Cursor Agent…");
-                            info!(
-                                "Agent router: AGENT cursor-agent proxy (prompt {} chars)",
-                                prompt.len()
-                            );
-                            let prompt_clone = prompt.clone();
-                            match tokio::task::spawn_blocking(move || {
-                                crate::commands::cursor_agent::run_cursor_agent(&prompt_clone)
-                            })
-                            .await
-                            .map_err(|e| format!("Cursor Agent task: {}", e))
-                            .and_then(|r| r)
-                            {
-                                Ok(result) => {
-                                    info!(
-                                        "Agent router: cursor-agent proxy completed ({} chars)",
-                                        result.len()
-                                    );
-                                    format!(
-                                        "Cursor Agent (proxy) result:\n\n{}\n\nUse this to answer the user's question.",
-                                        result.trim()
-                                    )
-                                }
-                                Err(e) => {
-                                    info!("Agent router: cursor-agent proxy failed: {}", e);
-                                    format!(
-                                        "AGENT cursor-agent failed: {}. Answer without this result.",
-                                        e
-                                    )
-                                }
-                            }
-                        } else if selector_lower == "cursor-agent"
-                            || selector_lower == "cursor_agent"
-                        {
-                            "Cursor Agent is not available (cursor-agent CLI not on PATH). Answer without it.".to_string()
-                        } else {
-                        let agents = crate::agents::load_agents();
-                        match crate::agents::find_agent_by_id_or_name(&agents, selector) {
-                            Some(agent) => {
-                                // Break out of AGENT: orchestrator loop when the last message was already
-                                // an orchestrator result (model keeps re-invoking instead of replying).
-                                let is_orchestrator = agent.id == "000";
-                                let last_is_orchestrator_result = messages
-                                    .last()
-                                    .filter(|m| m.role == "user")
-                                    .map(|m| m.content.starts_with("Agent \"Orchestrator\""))
-                                    .unwrap_or(false);
-                                if is_orchestrator && last_is_orchestrator_result {
-                                    info!(
-                                        "Agent router: skipping repeated AGENT: orchestrator (loop breaker)"
-                                    );
-                                    "The orchestrator already replied above. Reply with a one-sentence summary for the user and **DONE: success** or **DONE: no**. Do not output AGENT: orchestrator again.".to_string()
-                                } else {
-                                    let mut user_msg: String = if task_message.is_empty() {
-                                        question.to_string()
-                                    } else {
-                                        task_message.to_string()
-                                    };
-                                    // When invoking discord-expert from Discord, fetch guild/channel metadata via API and inject so the agent has current context.
-                                    let is_discord_expert =
-                                        agent.slug.as_deref().is_some_and(|s| {
-                                            s.eq_ignore_ascii_case("discord-expert")
-                                        }) || agent.id == "004";
-                                    let is_redmine_agent = agent
-                                        .slug
-                                        .as_deref()
-                                        .is_some_and(|s| s.eq_ignore_ascii_case("redmine"))
-                                        || agent.id == "006";
-                                    if is_discord_expert {
-                                        if let Some(channel_id) = discord_reply_channel_id {
-                                            send_status("Fetching Discord guild/channel context…");
-                                            match crate::discord::api::fetch_guild_channel_metadata(
-                                                channel_id,
-                                            )
-                                            .await
-                                            {
-                                                Ok(meta) => {
-                                                    user_msg = format!(
-                                                        "Current Discord context (use these IDs in DISCORD_API calls):\n{}\n\nUser request: {}",
-                                                        meta, user_msg
-                                                    );
-                                                    info!(
-                                                        "Agent router: injected Discord guild/channel metadata for discord-expert (channel {})",
-                                                        channel_id
-                                                    );
-                                                }
-                                                Err(e) => {
-                                                    tracing::debug!(
-                                                        "Agent router: Discord metadata fetch failed (channel {}): {}",
-                                                        channel_id,
-                                                        e
-                                                    );
-                                                }
-                                            }
-                                        }
-                                    }
-                                    const STATUS_MSG_MAX: usize = 120;
-                                    let preview: String =
-                                        user_msg.chars().take(STATUS_MSG_MAX).collect();
-                                    let status_text = if user_msg.chars().count() > STATUS_MSG_MAX {
-                                        format!("{}…", preview)
-                                    } else {
-                                        preview
-                                    };
-                                    send_status(&format!(
-                                        "{} -> Ollama: {}",
-                                        agent.name, status_text
-                                    ));
-                                    match run_agent_ollama_session(
-                                        agent,
-                                        &user_msg,
-                                        status_tx.as_ref(),
-                                        load_global_memory,
-                                    )
-                                    .await
-                                    {
-                                        Ok(result) => {
-                                            let label = format!("{} ({})", agent.name, agent.id);
-                                            agent_conversation
-                                                .push((label.clone(), result.trim().to_string()));
-                                            format!(
-                                                "Agent \"{}\" ({}) result:\n\n{}\n\nUse this to answer the user's question.",
-                                                agent.name, agent.id, result
-                                            )
-                                        }
-                                        Err(e) => {
-                                            info!("Agent router: AGENT session failed: {}", e);
-                                            if is_redmine_agent && is_agent_unavailable_error(&e) {
-                                                format!(
-                                                    "Agent \"{}\" ({}) failed: {}.\n\nRe-plan this request without AGENT: redmine. {} Do not use FETCH_URL and do not reply with only another RUN_CMD.",
-                                                    agent.name,
-                                                    agent.id,
-                                                    e,
-                                                    redmine_direct_fallback_hint(question)
-                                                )
-                                            } else {
-                                                format!(
-                                                    "Agent \"{}\" ({}) failed: {}. Answer without this result.",
-                                                    agent.name, agent.id, e
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            None => {
-                                let list: String = agents
-                                    .iter()
-                                    .map(|a| {
-                                        a.slug.as_deref().unwrap_or(a.name.as_str()).to_string()
-                                    })
-                                    .collect::<Vec<_>>()
-                                    .join(", ");
-                                info!(
-                                    "Agent router: AGENT unknown selector \"{}\" (available: {})",
-                                    selector, list
-                                );
-                                format!(
-                                    "Unknown agent \"{}\". Available agents: {}. Answer without using an agent.",
-                                    selector, list
-                                )
-                            }
+                        let last_user_content = messages
+                            .last()
+                            .filter(|m| m.role == "user")
+                            .map(|m| m.content.as_str());
+                        let result = crate::commands::delegation_tool_dispatch::handle_agent(
+                            &arg, question, discord_reply_channel_id,
+                            status_tx.as_ref(), load_global_memory,
+                            last_user_content,
+                        ).await;
+                        if let Some(entry) = result.agent_conversation_entry {
+                            agent_conversation.push(entry);
                         }
-                        }
+                        result.message
                     }
                     "SCHEDULE" => {
                         crate::commands::task_tool_handlers::handle_schedule(
@@ -1615,228 +1249,29 @@ pub fn answer_with_ollama_and_fetch(
                         )
                     }
                     "RUN_CMD" => {
-                        info!(
-                            "Agent router: RUN_CMD requested: {}",
-                            crate::logging::ellipse(&arg, 120)
-                        );
-                        if !crate::commands::run_cmd::is_local_cmd_allowed() {
-                            "RUN_CMD is not available (disabled by ALLOW_LOCAL_CMD=0). Answer without running local commands.".to_string()
-                        } else if last_run_cmd_arg.as_deref() == Some(arg.as_str()) {
-                            info!(
-                                "Agent router: RUN_CMD duplicate (same arg as last run), skipping execution"
-                            );
-                            "You already ran this command; the result is in the message above. Do not run RUN_CMD again. Reply with TASK_APPEND then TASK_STATUS as the task instructs.".to_string()
-                        } else {
-                            const MAX_CMD_RETRIES: u32 = 3;
-                            let mut current_cmd = arg.to_string();
-                            let mut last_output = String::new();
-
-                            for attempt in 0..=MAX_CMD_RETRIES {
-                                send_status(&format!(
-                                    "Running local command{}: {}",
-                                    if attempt > 0 {
-                                        format!(" (retry {})", attempt)
-                                    } else {
-                                        String::new()
-                                    },
-                                    current_cmd
-                                ));
-                                info!("Agent router: RUN_CMD attempt {}: {}", attempt, current_cmd);
-                                match tokio::task::spawn_blocking({
-                                    let cmd = current_cmd.clone();
-                                    move || crate::commands::run_cmd::run_local_command(&cmd)
-                                })
-                                .await
-                                .map_err(|e| format!("RUN_CMD task: {}", e))
-                                .and_then(|r| r)
-                                {
-                                    Ok(output) => {
-                                        last_run_cmd_raw_output = Some(output.clone());
-                                        info!(
-                                            "Agent router: RUN_CMD completed, stored output for next TASK_APPEND ({} chars)",
-                                            output.len()
-                                        );
-                                        last_output = format!(
-                                            "Here is the command output:\n\n{}\n\nUse this to answer the user's question.",
-                                            output
-                                        );
-                                        break;
-                                    }
-                                    Err(e) => {
-                                        info!(
-                                            "Agent router: RUN_CMD failed (attempt {}): {}",
-                                            attempt, e
-                                        );
-                                        if multi_tool_turn {
-                                            last_output = format!(
-                                                "RUN_CMD failed in a multi-step plan: {}.\n\nRe-plan the full task from here. Keep the request in the correct tool domain. If Redmine data is still needed, use REDMINE_API directly with concrete parameters. Do not reply with only another RUN_CMD.",
-                                                e
-                                            );
-                                            break;
-                                        }
-                                        if attempt >= MAX_CMD_RETRIES {
-                                            last_output = format!(
-                                                "RUN_CMD failed after {} retries: {}.\n\nAnswer the user's question only (e.g. explain that the export or command failed). Do not include Redmine time entries, summaries, or other tool output that is unrelated to this request.",
-                                                MAX_CMD_RETRIES, e
-                                            );
-                                            break;
-                                        }
-                                        // Ask Ollama to fix the command (up to 2 attempts: full prompt, then format-only if parse fails)
-                                        let allowed =
-                                            crate::commands::run_cmd::allowed_commands().join(", ");
-                                        let mut fix_prompt = format!(
-                                            "The command `{}` failed with error:\n{}\n\nReply with ONLY the corrected command on a single line, in this exact format:\nRUN_CMD: <corrected command>\n\nAllowed commands: {}. Paths must be under ~/.mac-stats.",
-                                            current_cmd, e, allowed
-                                        );
-                                        let mut fix_parse_retried = false;
-                                        loop {
-                                            let fix_messages = vec![crate::ollama::ChatMessage {
-                                                role: "user".to_string(),
-                                                content: fix_prompt.clone(),
-                                                images: None,
-                                            }];
-                                            match send_ollama_chat_messages(
-                                                fix_messages,
-                                                model_override.clone(),
-                                                options_override.clone(),
-                                            )
-                                            .await
-                                            {
-                                                Ok(resp) => {
-                                                    let fixed = resp.message.content.trim().to_string();
-                                                    info!(
-                                                        "Agent router: RUN_CMD fix suggestion: {}",
-                                                        crate::logging::ellipse(&fixed, 120)
-                                                    );
-                                                    match parse_tool_from_response(&fixed) {
-                                                        Some((tool, new_arg)) if tool == "RUN_CMD" => {
-                                                            current_cmd = new_arg;
-                                                            break;
-                                                        }
-                                                        _ => {
-                                                            if !fix_parse_retried {
-                                                                fix_parse_retried = true;
-                                                                fix_prompt = format!(
-                                                                    "Your previous reply was not in the required format. Reply with exactly one line: RUN_CMD: <command>. No other text, no explanation.\n\nOriginal error: {}\nFailed command: {}",
-                                                                    e, current_cmd
-                                                                );
-                                                                continue;
-                                                            }
-                                                            info!(
-                                                                "Agent router: RUN_CMD fix suggestion not parseable as RUN_CMD (after format retry)"
-                                                            );
-                                                            last_output = format!(
-                                                                "RUN_CMD failed: {}. The model's corrected command was not in the required format (exactly one line: RUN_CMD: <command>). Answer the user's question only; do not include Redmine or other unrelated tool output.",
-                                                                e
-                                                            );
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                                Err(ollama_err) => {
-                                                    info!(
-                                                        "Agent router: RUN_CMD fix Ollama call failed: {}",
-                                                        ollama_err
-                                                    );
-                                                    last_output = format!(
-                                                        "RUN_CMD failed: {}. Could not get a corrected command from the model. Answer the user's question only; do not include Redmine or other unrelated tool output.",
-                                                        e
-                                                    );
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        if !last_output.is_empty() {
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            last_output
+                        let result = crate::commands::delegation_tool_dispatch::handle_run_cmd(
+                            &arg, last_run_cmd_arg.as_deref(), multi_tool_turn,
+                            model_override.clone(), options_override.clone(),
+                            status_tx.as_ref(),
+                        ).await;
+                        if let Some(raw) = result.raw_output {
+                            last_run_cmd_raw_output = Some(raw);
                         }
+                        result.message
                     }
                     "PYTHON_SCRIPT" => {
-                        if !crate::commands::python_agent::is_python_script_allowed() {
-                            "PYTHON_SCRIPT is not available (disabled by ALLOW_PYTHON_SCRIPT=0). Answer without running Python.".to_string()
-                        } else {
-                            match parse_python_script_from_response(&response_content) {
-                        Some((id, topic, script_body)) => {
-                            let script_label = format!("{} ({})", id, topic);
-                            send_status(&format!("Running Python script '{}'…", script_label));
-                            info!("Agent router: PYTHON_SCRIPT running script '{}' (id={}, topic={}, body {} chars)", script_label, id, topic, script_body.len());
-                            match tokio::task::spawn_blocking({
-                                let id = id.clone();
-                                let topic = topic.clone();
-                                let script_body = script_body.clone();
-                                move || crate::commands::python_agent::run_python_script(&id, &topic, &script_body)
-                            })
-                            .await
-                            .map_err(|e| format!("PYTHON_SCRIPT task: {}", e))
-                            .and_then(|r| r)
-                            {
-                                Ok(stdout) => format!(
-                                    "Python script result:\n\n{}\n\nUse this to answer the user's question.",
-                                    stdout
-                                ),
-                                Err(e) => format!(
-                                    "PYTHON_SCRIPT failed: {}. Answer without this result.",
-                                    e
-                                ),
-                            }
-                        }
-                        None => "PYTHON_SCRIPT requires: PYTHON_SCRIPT: <id> <topic> and then the Python code on the next lines or in a ```python block.".to_string(),
-                    }
-                        }
+                        crate::commands::delegation_tool_dispatch::handle_python_script(
+                            &arg, &response_content, status_tx.as_ref(),
+                        ).await
                     }
                     "DISCORD_API" => {
-                        let arg = arg.trim();
-                        let (method, rest) = match arg.find(' ') {
-                            Some(i) => (arg[..i].trim().to_string(), arg[i..].trim()),
-                            None => ("GET".to_string(), arg),
-                        };
-                        let (path_raw, body) = if let Some(idx) = rest.find(" {") {
-                            let (p, b) = rest.split_at(idx);
-                            (p.trim().to_string(), Some(b.trim().to_string()))
-                        } else {
-                            (rest.to_string(), None)
-                        };
-                        let path = normalize_discord_api_path(&path_raw);
-                        if path.is_empty() {
-                            "DISCORD_API requires: DISCORD_API: <METHOD> <path> or DISCORD_API: POST <path> {\"content\":\"...\"}.".to_string()
-                        } else if last_successful_discord_call
-                            .as_ref()
-                            .map(|(m, p)| m == &method && p == &path)
-                            .unwrap_or(false)
-                        {
-                            "You already received the data for this endpoint above. Format it for the user and reply; do not call DISCORD_API again for the same path.".to_string()
-                        } else {
-                            let status_msg = format!("Calling Discord API: {} {}", method, path);
-                            send_status(&status_msg);
-                            info!("Discord API: {} {}", method, path);
-                            match crate::discord::api::discord_api_request(
-                                &method,
-                                &path,
-                                body.as_deref(),
-                            )
-                            .await
-                            {
-                                Ok(result) => {
-                                    last_successful_discord_call =
-                                        Some((method.clone(), path.clone()));
-                                    format!(
-                                        "Discord API result:\n\n{}\n\nUse this to answer the user's question.",
-                                        result
-                                    )
-                                }
-                                Err(e) => {
-                                    let msg = crate::discord::api::sanitize_discord_api_error(&e);
-                                    format!(
-                                        "Discord API failed: {}. Answer without this result.",
-                                        msg
-                                    )
-                                }
-                            }
+                        let result = crate::commands::network_tool_dispatch::handle_discord_api(
+                            &arg, last_successful_discord_call.as_ref(), status_tx.as_ref(),
+                        ).await;
+                        if let Some(call) = result.successful_call {
+                            last_successful_discord_call = Some(call);
                         }
+                        result.message
                     }
                     "OLLAMA_API" => {
                         crate::commands::misc_tool_dispatch::handle_ollama_api(
@@ -1902,82 +1337,9 @@ pub fn answer_with_ollama_and_fetch(
                         ).await
                     }
                     "REDMINE_API" => {
-                        let arg = arg.trim();
-                        let (method, rest) = match arg.find(' ') {
-                            Some(i) => (arg[..i].trim().to_string(), arg[i..].trim()),
-                            None => ("GET".to_string(), arg),
-                        };
-                        let (path, body) = if let Some(idx) = rest.find(" {") {
-                            let (p, b) = rest.split_at(idx);
-                            (p.trim().to_string(), Some(b.trim().to_string()))
-                        } else {
-                            (rest.to_string(), None)
-                        };
-                        if path.is_empty() {
-                            "REDMINE_API requires: REDMINE_API: GET /issues/1234.json?include=journals,attachments".to_string()
-                        } else {
-                            send_status(&format!("Querying Redmine: {} {}", method, path));
-                            info!(
-                                "Agent router [{}]: REDMINE_API {} {}",
-                                request_id, method, path
-                            );
-                            match crate::redmine::redmine_api_request(
-                                &method,
-                                &path,
-                                body.as_deref(),
-                            )
-                            .await
-                            {
-                                Ok(result) => {
-                                    let mut msg = if path.contains("time_entries") {
-                                        format!(
-                                            "Redmine API result:\n\n{}\n\nUse this data to answer the user's question. The derived summary above already lists the actual tickets worked (if any), totals, users, projects, and entry details. Use that instead of inventing ticket ids or subjects.",
-                                            result
-                                        )
-                                    } else {
-                                        format!(
-                                            "Redmine API result:\n\n{}\n\nUse this data to answer the user's question. Summarize the issue clearly: subject, description quality, what's missing, status, assignee, and key comments.",
-                                            result
-                                        )
-                                    };
-                                    if method.to_uppercase() == "GET" {
-                                        if is_redmine_review_or_summarize_only(question) {
-                                            msg.push_str(
-                                        "\n\nThe user asked only to review/summarize. Do NOT update the ticket or add a comment. Reply with your summary and DONE: success.",
-                                    );
-                                        } else if path.contains("time_entries") {
-                                                msg.push_str(
-                                            "\n\nUse this data to answer. If the user asked for tickets worked, list the actual issue ids and subjects from the derived summary. If the user asked for \"this month\", use from/to for the current month. If success criteria require JSON format, reply with valid JSON only (e.g. total hours, ticket list, project breakdown).",
-                                        );
-                                            } else {
-                                                let id = path
-                                                    .trim_start_matches('/')
-                                                    .strip_prefix("issues/")
-                                                    .map(|s| {
-                                                        s.split(['.', '?'])
-                                                            .next()
-                                                            .unwrap_or("")
-                                                            .to_string()
-                                                    })
-                                                    .unwrap_or_default();
-                                                if !id.is_empty()
-                                                    && id.chars().all(|c| c.is_ascii_digit())
-                                                {
-                                                    msg.push_str(&format!(
-                                                "\n\nIf the user asked to **update** this ticket or **add a comment**, your next reply MUST be exactly one line: REDMINE_API: PUT /issues/{}.json {{\"issue\":{{\"notes\":\"<your comment text>\"}}}}. Do not reply with only a summary.",
-                                                id
-                                            ));
-                                                }
-                                            }
-                                    }
-                                    msg
-                                }
-                                Err(e) => format!(
-                                    "Redmine API failed: {}. Answer without this result.",
-                                    e
-                                ),
-                            }
-                        }
+                        crate::commands::network_tool_dispatch::handle_redmine_api(
+                            &arg, question, &request_id, status_tx.as_ref(),
+                        ).await
                     }
                     "MASTODON_POST" => {
                         crate::commands::misc_tool_dispatch::handle_mastodon_post(
