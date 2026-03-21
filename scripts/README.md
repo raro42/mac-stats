@@ -420,4 +420,4 @@ Use these scripts alongside the optimization documentation:
 
 - Performance measurement: `agents.md` (Performance Measurement & Optimization section)
 - Optimization tasks: See `docs/` directory
-- Architecture: `CLAUDE.md`
+- Architecture: `agents.md`

@@ -301,8 +301,7 @@ A: No. These are performance-only optimizations. All features unchanged.
 
 ## Related Documentation
 
-- **Architecture Overview**: [`../CLAUDE.md`](../CLAUDE.md)
-- **Project Principles**: [`../agents.md`](../agents.md)
+- **Project instructions & architecture**: [`../agents.md`](../agents.md)
 - **README**: [`../README.md`](../README.md)
 - **Docs vs code review**: [`033_docs_vs_code_review.md`](033_docs_vs_code_review.md)
 - **What others do & plan**: [`034_what_others_do_and_plan.md`](034_what_others_do_and_plan.md) — research and proposed priorities

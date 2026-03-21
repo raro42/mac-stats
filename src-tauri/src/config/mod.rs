@@ -360,6 +360,27 @@ impl Config {
         false
     }
 
+    /// Ratio (0.0–1.0) at which a budget warning is injected into the agent tool loop.
+    /// When (tool_count + 1) / max_tool_iterations >= this ratio, a warning is appended telling
+    /// the model to consolidate results. Set to 0.0 or 1.0 to disable. Default 0.75.
+    /// Config: config.json `toolBudgetWarningRatio` (number); override: env `MAC_STATS_TOOL_BUDGET_WARNING_RATIO`.
+    pub fn tool_budget_warning_ratio() -> f64 {
+        if let Ok(s) = std::env::var("MAC_STATS_TOOL_BUDGET_WARNING_RATIO") {
+            if let Ok(v) = s.parse::<f64>() {
+                return v.clamp(0.0, 1.0);
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(v) = json.get("toolBudgetWarningRatio").and_then(|v| v.as_f64()) {
+                    return v.clamp(0.0, 1.0);
+                }
+            }
+        }
+        0.75
+    }
+
     /// Get the user-info file path
     ///
     /// Returns a path in the user's home directory: `$HOME/.mac-stats/user-info.json`

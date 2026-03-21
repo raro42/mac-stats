@@ -286,6 +286,16 @@ To run a single agent with prompts from its `testing.md` (no Discord, no router)
 
 Example: `./target/release/mac_stats agent test redmine` runs the Redmine agent’s test prompts from `~/.mac-stats/agents/agent-006-redmine/testing.md`. Each prompt is limited by a **per-prompt timeout** (default 45s); if the model doesn’t respond in time, the run fails with a clear message instead of hanging. Override: env `MAC_STATS_AGENT_TEST_TIMEOUT_SECS` or config.json `agentTestTimeoutSecs` (5–300). Useful as a regression check after changes to agents or Ollama integration.
 
+## 17. Tool budget warning and last-iteration guidance
+
+When the agent approaches the tool iteration cap (`max_tool_iterations`), the system can inject a warning message into the conversation so the model consolidates results instead of starting another tool chain that would be cut off. Inspired by browser-use's step budget warning.
+
+- **Config:** `~/.mac-stats/config.json` — set `"toolBudgetWarningRatio": 0.75` (default). Or env `MAC_STATS_TOOL_BUDGET_WARNING_RATIO`. Value 0.0–1.0; set to 0.0 or 1.0 to disable.
+- **Budget warning:** When `tool_count / max_tool_iterations >= ratio` (and it is not the last iteration), a system message is injected: "BUDGET WARNING: You have used X/Y tool iterations (Z%). N remaining. Consolidate results or call DONE. Partial results are far more valuable than exhausting all iterations with nothing saved."
+- **Last-iteration guidance:** When `tool_count + 1 == max_tool_iterations`, a stronger system message is injected: "LAST ITERATION WARNING: This is your LAST tool iteration. Reply with your final answer now." The tool list/schema is unchanged; this is guidance only.
+- **Scope:** Only applies in the agent tool loop (Discord, scheduler, run-ollama). No new tools are added.
+- **Disabling:** Set ratio to 0.0 or 1.0 to preserve current behaviour (no warnings injected).
+
 ## Open tasks
 
 Discord-related open tasks and completed items are tracked in **006-feature-coder/FEATURE-CODER.md** (table “Remaining open” and “Current FEAT backlog”).

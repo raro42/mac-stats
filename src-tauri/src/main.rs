@@ -226,6 +226,13 @@ fn main() {
                             for p in &reply.attachment_paths {
                                 println!("Attachment: {}", p.display());
                             }
+                            mac_stats::run_judge_if_enabled(
+                                &question,
+                                &reply.text,
+                                &reply.attachment_paths,
+                                None,
+                            )
+                            .await;
                             0
                         }
                         Err(e) => {

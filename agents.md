@@ -1,7 +1,40 @@
-# agents.md — Project Instructions for Cursor
+# agents.md — Project instructions (Cursor, Claude Code, and other assistants)
+
+## Audience
+
+This is the **single** project-instructions file for **Cursor**, **Claude Code** (claude.ai/code), and similar tools. Read it before making changes. Do **not** add `Co-authored-by:`, `Signed-off-by:`, or IDE/agent attribution to commit messages (see Coding Principles).
 
 ## Goal
+
 Build a polished macOS (Apple Silicon) stats app (Rust + Tauri) that reads CPU/process metrics and presents them in a clean "macOS glass" UI. Favor correctness, safety, and maintainability over hacks.
+
+## Project overview (at a glance)
+
+**mac-stats** is a lightweight system monitor for macOS (Rust + Tauri). It shows real-time CPU, GPU, RAM, and disk usage in the menu bar with low overhead (on the order of ~0.5% idle, under 1% with the CPU window open). It includes real-time metrics, temperature (SMC), CPU frequency (IOReport), a process list, themes, idle optimizations, and Ollama chat with code execution, **FETCH_URL** (server-side fetch, no CORS), and **BROWSER_SCREENSHOT** (CDP: PNG under `~/.mac-stats/screenshots/`, attachable in Discord when requested).
+
+## Build and run
+
+```bash
+# Development (hot reload where applicable)
+./run dev
+# or
+cd src-tauri && cargo run
+
+# Release build
+./run
+# or
+cd src-tauri && cargo build --release
+
+# CPU window (testing)
+./target/release/mac_stats --cpu
+
+# Verbosity: default is -vv. Use -vvv for maximum, -v for minimal.
+./target/release/mac_stats
+./target/release/mac_stats -vvv
+
+# Detailed frequency / IOReport logging
+./target/release/mac_stats --frequency
+```
 
 ## Tech Stack
 - Rust (core logic + FFI)
@@ -434,6 +467,57 @@ mac-stats/
 - All Ollama code lives in `src/ollama.js` (frontend) and `src-tauri/src/commands/ollama.rs` + `src-tauri/src/ollama/mod.rs` (backend)
 - Conversation history managed in JavaScript, passed to Rust
 - Code execution handled in JavaScript, results sent back to Rust for follow-up
+
+---
+
+## Backend runtime and performance (summary)
+
+High-level behavior that complements the directory tree above:
+
+- **main.rs**: CLI entry (verbosity, `--cpu`, `--frequency`).
+- **lib.rs**: Tauri setup, background metrics and menu bar; IOReport subscriptions and SMC. **Expensive metrics** (temperature, frequency) are emphasized when the **CPU window is visible** to limit idle cost. Careful CoreFoundation retain/release.
+- **metrics/mod.rs**: Cached `SystemMetrics`, `CpuDetails`, process list (~30s cache), etc.
+- **state.rs**: Shared state (`Mutex` / `OnceLock`): sysinfo, disks, status item, app handle, caches, IOReport handles.
+- **ui/status_bar.rs**: Menu bar item; `build_status_text`; `create_cpu_window` on demand. **Click handler** applies pending menu bar updates (workaround for unreliable Tauri main-thread callbacks).
+- **ffi/**: IOReport (frequency), Objective-C bridge; aligns with [FFI Safety Rules](#ffi-safety-rules-critical).
+- **logging**: `tracing` with `debug1!` / `debug2!` / `debug3!` by verbosity; logs under `~/.mac-stats/debug.log`.
+
+### Why CPU usage stays low
+
+1. **Lazy** CPU window creation (not at startup).
+2. **Selective reads**: temperature about every 20s when the window is visible; frequency about every 30s via IOReport; SMC/IOReport subscriptions cleared when the window closes.
+3. **SMC**: M3 temperature keys cached after first discovery; prefer direct key reads over scanning all keys.
+4. **Menu bar**: background thread prepares text; user click drains updates to the UI.
+5. **Process list** cached ~30s.
+
+### Key technical choices
+
+- **IOReport lifecycle**: Subscribe when the CPU window opens (expensive); reuse for frequency reads; tear down on close (similar in spirit to exelban/stats, with correct CF retain/release).
+- **M3/M4 temperature**: Try the standard path (M1/M2); fall back to M3-specific keys (e.g. Tf04, Tf09, Tf0A); cache the first working key.
+- **Memory / threads**: Respect CF ownership; globals and thread-local patterns match Tauri and main-thread UI constraints; SMC may use thread-local where `Send` is an issue.
+
+### Development notes
+
+- Features grew iteratively; some code is pragmatic rather than textbook Rust.
+- **Automated tests**: No large formal suite; still add parsing/unit tests where practical (see Output & Formatting).
+- **Tauri**: Prefer the documented menu-bar click workaround over assuming all main-thread hooks behave the same everywhere.
+
+### Testing and debugging (quick commands)
+
+```bash
+./target/release/mac_stats        # default -vv
+./target/release/mac_stats -vvv
+./target/release/mac_stats -v
+./target/release/mac_stats --frequency
+./target/release/mac_stats --cpu
+tail -f ~/.mac-stats/debug.log
+```
+
+When debugging: **CPU window visibility** drives expensive reads; temperature may read 0 if SMC is unavailable or no M3 key was found; **frequency** needs an active IOReport subscription (window visible); menu bar text may update on **click**, not continuously.
+
+### Version management
+
+**Single source of truth**: `src-tauri/Cargo.toml` `version` only. Rust exposes `get_app_version()` via `env!("CARGO_PKG_VERSION")` / `Config`; the frontend loads it at runtime (e.g. CPU UI). HTML templates may contain placeholder version strings replaced by JavaScript—avoid hardcoding the version in many places.
 
 ---
 

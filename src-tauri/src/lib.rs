@@ -120,6 +120,7 @@ pub use metrics::{
 pub use commands::ollama::{
     answer_with_ollama_and_fetch, ensure_ollama_agent_ready_at_startup, OllamaReply,
 };
+pub use commands::judge::run_judge_if_enabled;
 
 // UI functions are now in ui module
 use ui::status_bar::{

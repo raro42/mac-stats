@@ -84,8 +84,8 @@
 | Doc Claim                          | Code Reality                          | Severity |
 |------------------------------------|---------------------------------------|----------|
 | `src/main.js`, `src/index.html`    | Exist                                | OK       |
-| CPU idle: <0.1%                    | ~0.5% (CLAUDE.md)                    | Low      |
-**Resolution:** Updated CPU line to match CLAUDE.
+| CPU idle: <0.1%                    | ~0.5% (agents.md)                    | Low      |
+**Resolution:** Updated CPU line to match agents.md.
 
 ---
 
@@ -98,11 +98,11 @@
 ---
 
 ## Fixes Applied
-- CLAUDE.md: Temperature 20s, frequency 30s  
+- agents.md (formerly CLAUDE.md): Temperature 20s, frequency 30s  
 - AGENTS.md: Updated directory structure  
 - 100_all_agents: Max tool iterations → 15  
-- Removed stale branch line from CLAUDE.md  
-- CPU idle line aligned with CLAUDE  
+- Removed stale branch line from project instructions doc  
+- CPU idle line aligned with agents.md  
 - RUN_CMD allowlist: 100_all_agents and 011_local_cmd_agent already document full list (ps, wc, uptime, cursor-agent).  
 
 ---

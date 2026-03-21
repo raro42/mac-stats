@@ -7,24 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.49] - 2026-03-21
+
 ### Added
+- **Tool budget warning / last-iteration guidance** — When the agent approaches its tool iteration cap, budget warnings and last-iteration guidance are injected into the conversation to encourage result consolidation instead of starting new tool chains that would be cut off. Configurable via `toolBudgetWarningRatio` in config.json or env `MAC_STATS_TOOL_BUDGET_WARNING_RATIO` (0.0–1.0, default 0.75; 0.0 or 1.0 disables). (`commands/ollama.rs`, `config/mod.rs`)
+- **Sequence-terminating navigation** — After a page-changing browser action (`BROWSER_NAVIGATE`, `BROWSER_GO_BACK`) in a multi-tool turn, remaining browser tools are skipped because element indices are stale. Non-browser tools still execute. The model receives the new page state and plans new actions in the next turn. (`commands/ollama.rs`)
+- **Judge hook for CLI `--run-ollama`** — `run_judge_if_enabled()` now runs after `--run-ollama` completions. (`main.rs`, `lib.rs`)
 - **Redmine query utility scripts** — `scripts/redmine_query.py` (Python, grouped time entry reports by ticket and day) and `scripts/redmine_query.sh` (curl wrapper). Both read credentials from `.config.env`.
 
 ### Removed
+- **CLAUDE.md deleted** — Standalone `CLAUDE.md` removed; all content consolidated into `agents.md` as the single project instructions file.
 - **Cleanup: old agent definition files** — Removed `005-openclaw-reviewer/005-openclaw-reviewer.md` and `006-feature-coder/FEATURE-CODER.md` (agent definitions now live in `~/.mac-stats/agents/`).
 - **Cleanup: stale release notes** — Removed `release_notes_0.1.18.md`.
 - **Cleanup: repetitive testing sections in `docs/022_feature_review_plan.md`** — Trimmed ~460 lines of duplicate closing-reviewer smoke test logs (content preserved in git history).
 
 ### Changed
+- **agents.md expanded** — Added audience note, project overview at a glance, build/run section, backend runtime and performance summary (why CPU stays low, key technical choices, development notes, testing/debugging quick commands), and version management section. Now the single authoritative instructions file for Cursor, Claude Code, and similar tools.
+- **Doc references updated** — All references to `CLAUDE.md` replaced with `agents.md` across `docs/README.md`, `scripts/README.md`, `docs/033_docs_vs_code_review.md`.
+- **Docs: tool budget warning** — Documented in `007_discord_agent.md` §17 (config, behavior, disabling).
+- **Docs: sequence-terminating navigation** — Documented in `029_browser_automation.md`.
 - **Extract verification pipeline and agent session runner from `ollama.rs`** — Moved verification pipeline (`OllamaReply`, `RequestRunContext`, `verify_completion`, `extract_success_criteria`, `sanitize_success_criteria`, `detect_new_topic`, `summarize_last_turns`, `first_image_as_base64`, `original_request_for_retry`, `user_explicitly_asked_for_screenshot`, `truncate_text_on_line_boundaries`, `summarize_response_for_verification` + 12 tests) into `commands/verification.rs` (770 lines); agent session runner (`run_agent_ollama_session`, `execute_agent_tool_call`, `parse_agent_tool_from_response`, `build_agent_runtime_context`, `normalize_discord_api_path` + 4 tests) into `commands/agent_session.rs` (291 lines). `ollama.rs` 6543→5523 lines (1020 extracted). No behavioral changes; zero clippy warnings, 114 tests pass. (`commands/verification.rs`, `commands/agent_session.rs`, `commands/mod.rs`, `commands/ollama.rs`)
 - **Extract Ollama config/startup and reply helpers from `ollama.rs`** — Moved Ollama configuration, startup, and env-variable resolution (`get_ollama_client`, `configure_ollama`, `get_ollama_config`, `list_ollama_models_at_endpoint`, `check_ollama_connection`, `ensure_ollama_agent_ready_at_startup`, `default_non_agent_system_prompt`, `get_default_ollama_system_prompt`, `ChatRequest`, `OllamaConfigRequest`, `OllamaConfigResponse` + env helpers) into `commands/ollama_config.rs` (513 lines); reply-routing helpers (`final_reply_from_tool_results`, `get_mastodon_config`, `mastodon_post`, `append_to_file`, `looks_like_discord_401_confusion`, `extract_url_from_question`, `extract_screenshot_recommendation`, `extract_last_prefixed_argument`, `is_bare_done_plan`, `is_final_same_as_intermediate`, `is_agent_unavailable_error` + tests) into `commands/reply_helpers.rs` (375 lines). `ollama.rs` 5523→4634 lines (889 extracted). No behavioral changes; zero clippy warnings, 114 tests pass. (`commands/ollama_config.rs`, `commands/reply_helpers.rs`, `commands/mod.rs`, `commands/ollama.rs`, `commands/agent_descriptions.rs`, `commands/compaction.rs`, `commands/ollama_models.rs`, `lib.rs`)
-- **Docs: OpenClaw §95–§96 re-verification** — All §7 checks re-run; no discrepancies found (`005-openclaw-reviewer`).
-- **FEATURE-CODER backlog** — Verification + agent session extraction and ollama_config + reply_helpers extraction rows marked done (`006-feature-coder`).
-- **022 testing note** — Closing reviewer smoke tests 2026-03-21 (verification + agent_session extraction; ollama_config + reply_helpers extraction; cargo build, 114 tests pass, debug.log, agents, monitors UP).
 - **Extract chat transport, frontend chat commands, and content reduction from `ollama.rs`** — Moved chat transport (`merge_chat_options`, `deduplicate_consecutive_messages`, `send_ollama_chat_messages`, streaming variant, `ollama_chat` Tauri command + 2 stream structs) into `commands/ollama_chat.rs` (351 lines); frontend chat Tauri commands (`ollama_chat_with_execution`, `ollama_chat_continue_with_result`, `ensure_cpu_window_open` + 3 structs) into `commands/ollama_frontend_chat.rs` (372 lines); content reduction + skill/JS execution (`CHARS_PER_TOKEN`, `truncate_at_boundary`, `reduce_fetched_content_to_fit`, `run_skill_ollama_session`, `run_js_via_node`) into `commands/content_reduction.rs` (190 lines). `ollama.rs` 4634→3744 lines (890 extracted). No behavioral changes; zero clippy warnings, 114 tests pass. (`commands/content_reduction.rs`, `commands/ollama_chat.rs`, `commands/ollama_frontend_chat.rs`, `commands/mod.rs`, `commands/ollama.rs`, `lib.rs`)
-- **Docs: OpenClaw §97 re-verification** — All §7 checks re-run; no discrepancies found (`005-openclaw-reviewer`).
-- **FEATURE-CODER backlog** — Chat transport/frontend chat/content reduction extraction row marked done (`006-feature-coder`).
-- **022 testing note** — Closing reviewer smoke test 2026-03-21 (ollama_chat + content_reduction + ollama_frontend_chat extraction; 114 tests pass, cargo build, debug.log, agents, monitors UP).
 
 ## [0.1.48] - 2026-03-21
 

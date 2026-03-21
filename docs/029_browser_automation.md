@@ -113,6 +113,11 @@ When the user asks to remove or dismiss a cookie consent banner and take a scree
 - After `BROWSER_NAVIGATE`, `BROWSER_CLICK`, or `BROWSER_INPUT`, mac-stats caches the latest `Current page` and `Elements` output. Retries should reuse that latest state instead of stale indices from an earlier page.
 - If the browser is already on the relevant page and the content is inline, the next retry should inspect that page or click a real listed element. It should not invent a new target URL unless the browser output already exposed one.
 
+### Sequence-terminating navigation
+When the model returns multiple tools in one turn, page-changing browser actions (`BROWSER_NAVIGATE`, `BROWSER_GO_BACK`) **terminate the browser sequence** for that turn. After one of these actions completes successfully, any remaining browser tools (BROWSER_CLICK, BROWSER_INPUT, BROWSER_SCROLL, BROWSER_EXTRACT, BROWSER_SEARCH_PAGE, BROWSER_SCREENSHOT) from the same response are skipped. The model receives the new page state and a note that remaining browser actions were skipped due to stale indices. Non-browser tools (FETCH_URL, BRAVE_SEARCH, RUN_CMD, etc.) in the same response still run.
+
+This prevents wrong clicks or inputs caused by stale element indices from the previous page. The model can emit new browser actions in the next turn using the fresh state.
+
 ### Summary
 | Requirement | What mac-stats does |
 |------------|----------------------|

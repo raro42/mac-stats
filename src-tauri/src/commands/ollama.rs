@@ -1120,6 +1120,7 @@ pub fn answer_with_ollama_and_fetch(
         let mut last_browser_tool_arg: Option<(String, String)> = None;
         // For news requests: if the last PERPLEXITY_SEARCH returned only hub/landing/tag/standings pages, verification must not accept a confident news answer.
         let mut last_news_search_was_hub_only: Option<bool> = None;
+        let budget_warning_ratio = crate::config::Config::tool_budget_warning_ratio();
 
         while tool_count < max_tool_iterations {
             let tools = parse_all_tools_from_response(&response_content);
@@ -1145,6 +1146,9 @@ pub fn answer_with_ollama_and_fetch(
             let multi_tool_turn = tools.len() > 1;
             let mut done_claimed: Option<bool> = None;
             let mut tool_results: Vec<String> = Vec::with_capacity(tools.len());
+            // Sequence-terminating: after a page-changing browser action (NAVIGATE, GO_BACK),
+            // remaining browser tools in the same turn use stale indices and must be skipped.
+            let mut page_changed_this_turn = false;
             for (tool, arg) in tools {
                 if tool_count >= max_tool_iterations {
                     break;
@@ -1204,6 +1208,17 @@ pub fn answer_with_ollama_and_fetch(
                         info!(
                             "Agent router: browser tool cap reached ({}), skipping {}",
                             MAX_BROWSER_TOOLS_PER_RUN, tool
+                        );
+                        continue;
+                    }
+                    if page_changed_this_turn {
+                        tool_results.push(format!(
+                            "Page changed by a previous navigation; {} was skipped because element indices are stale. Current page state is above — use it to plan new actions in the next turn.",
+                            tool
+                        ));
+                        info!(
+                            "Agent router: terminates-sequence — skipping {} after page-changing action this turn",
+                            tool
                         );
                         continue;
                     }
@@ -3257,6 +3272,21 @@ pub fn answer_with_ollama_and_fetch(
 
                 let is_multi_tool_run_cmd_error = tool == "RUN_CMD"
                     && user_message.starts_with("RUN_CMD failed in a multi-step plan");
+
+                // Sequence-terminating: after a successful BROWSER_NAVIGATE or BROWSER_GO_BACK,
+                // subsequent browser tools in this turn use stale indices and must be skipped.
+                if multi_tool_turn
+                    && !is_browser_error
+                    && (tool == "BROWSER_NAVIGATE" || tool == "BROWSER_GO_BACK")
+                    && !user_message.starts_with("BROWSER_NAVIGATE requires")
+                {
+                    page_changed_this_turn = true;
+                    info!(
+                        "Agent router: {} terminates sequence — remaining browser actions this turn will be skipped",
+                        tool
+                    );
+                }
+
                 tool_results.push(user_message);
                 if let Some(pair) = executed_browser_tool_arg {
                     last_browser_tool_arg = Some(pair);
@@ -3313,6 +3343,41 @@ pub fn answer_with_ollama_and_fetch(
                 content: user_message,
                 images: None,
             });
+
+            // Budget warning / last-iteration guidance (inspired by browser-use step budget).
+            if max_tool_iterations > 1 && budget_warning_ratio > 0.0 && budget_warning_ratio < 1.0 {
+                let ratio = (tool_count as f64) / (max_tool_iterations as f64);
+                if tool_count + 1 == max_tool_iterations {
+                    let msg = format!(
+                        "LAST ITERATION WARNING: You have used {}/{} tool iterations. This is your LAST tool iteration. \
+                         Reply with your final answer now. Summarize everything you have found so far. \
+                         Do NOT start a new tool chain — respond with your best answer or call DONE with your results.",
+                        tool_count, max_tool_iterations
+                    );
+                    info!("Agent router: injecting last-iteration guidance (tool_count={}/{})", tool_count, max_tool_iterations);
+                    messages.push(crate::ollama::ChatMessage {
+                        role: "system".to_string(),
+                        content: msg,
+                        images: None,
+                    });
+                } else if ratio >= budget_warning_ratio {
+                    let remaining = max_tool_iterations - tool_count;
+                    let pct = (ratio * 100.0) as u32;
+                    let msg = format!(
+                        "BUDGET WARNING: You have used {}/{} tool iterations ({}%). {} iterations remaining. \
+                         If the task cannot be completed in the remaining iterations, prioritize: \
+                         (1) consolidate your results so far, (2) reply with what you have or call DONE. \
+                         Partial results are far more valuable than exhausting all iterations with nothing saved.",
+                        tool_count, max_tool_iterations, pct, remaining
+                    );
+                    info!("Agent router: injecting budget warning (tool_count={}/{}, ratio={:.2}, threshold={:.2})", tool_count, max_tool_iterations, ratio, budget_warning_ratio);
+                    messages.push(crate::ollama::ChatMessage {
+                        role: "system".to_string(),
+                        content: msg,
+                        images: None,
+                    });
+                }
+            }
 
             let follow_up = send_ollama_chat_messages(
                 messages.clone(),
