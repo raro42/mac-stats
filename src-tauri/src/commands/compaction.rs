@@ -8,6 +8,12 @@ pub(crate) const COMPACTION_THRESHOLD: usize = 8;
 /// Minimum conversational (non-internal) messages to run compaction; fewer means skip (task-008 Phase 5).
 pub(crate) const MIN_CONVERSATIONAL_FOR_COMPACTION: usize = 2;
 
+/// Hard cap on the CONTEXT section produced by the compaction LLM.
+/// 12 000 bytes ≈ ~3 000 tokens — leaves headroom for system prompt, tools,
+/// user question and model reply in a 32 K–40 K context window.
+const MAX_COMPACTION_CONTEXT_BYTES: usize = 12_000;
+const TRUNCATION_MARKER: &str = " [summary truncated]";
+
 /// Fixed CONTEXT for casual/having_fun sessions so the compactor never invents task or platform context.
 const COMPACTOR_CASUAL_CONTEXT: &str =
     "Casual conversation; no task or verified outcome. Not needed for this request.";
@@ -16,6 +22,24 @@ const COMPACTOR_CASUAL_CONTEXT: &str =
 const PERIODIC_COMPACTION_MIN_MESSAGES: usize = 4;
 /// Sessions with no activity for this long are considered inactive; after compacting they are cleared.
 const INACTIVE_THRESHOLD_MINUTES: i64 = 30;
+
+/// Truncate `text` to at most `MAX_COMPACTION_CONTEXT_BYTES`, cutting at the
+/// last sentence boundary (`.` / `!` / `?`) within budget to keep the summary
+/// coherent for the model.  Uses `floor_char_boundary` so multi-byte UTF-8
+/// content never causes a panic.
+fn cap_context(text: &str) -> String {
+    let budget = MAX_COMPACTION_CONTEXT_BYTES.saturating_sub(TRUNCATION_MARKER.len());
+    if text.len() <= MAX_COMPACTION_CONTEXT_BYTES {
+        return text.to_string();
+    }
+    let safe_budget = text.floor_char_boundary(budget);
+    let slice = &text[..safe_budget];
+    let cut = slice
+        .rfind(['.', '!', '?'])
+        .map(|i| i + 1) // keep the punctuation
+        .unwrap_or(safe_budget);
+    format!("{}{}", &text[..cut], TRUNCATION_MARKER)
+}
 
 /// Compact a long conversation history into a concise summary using a fast model.
 /// Extracts verified facts, successful outcomes, and user intent; drops failures and hallucinations.
@@ -116,7 +140,19 @@ Output ONLY these two sections, nothing else."#;
     let response = super::ollama::send_ollama_chat_messages(msgs, model, None).await?;
     let output = response.message.content.trim().to_string();
 
-    let (context, lessons) = parse_compaction_output(&output);
+    let (raw_context, lessons) = parse_compaction_output(&output);
+    let context = if raw_context.len() > MAX_COMPACTION_CONTEXT_BYTES {
+        let capped = cap_context(&raw_context);
+        tracing::warn!(
+            "Session compaction: CONTEXT exceeded cap ({} bytes > {}); truncated to {} bytes",
+            raw_context.len(),
+            MAX_COMPACTION_CONTEXT_BYTES,
+            capped.len()
+        );
+        capped
+    } else {
+        raw_context
+    };
     info!(
         "Session compaction: produced context ({} chars), lessons: {}",
         context.len(),
@@ -285,5 +321,131 @@ pub async fn run_periodic_session_compaction() {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cap_context_short_text_unchanged() {
+        let short = "This is a short summary.";
+        assert_eq!(cap_context(short), short);
+    }
+
+    #[test]
+    fn cap_context_exactly_at_limit() {
+        let text = "a".repeat(MAX_COMPACTION_CONTEXT_BYTES);
+        assert_eq!(cap_context(&text), text);
+    }
+
+    #[test]
+    fn cap_context_truncates_at_sentence_boundary() {
+        let first = "a".repeat(11_950);
+        let text = format!("{}. This part should be cut off because the total is over 12000 bytes.", first);
+        assert!(text.len() > MAX_COMPACTION_CONTEXT_BYTES);
+
+        let capped = cap_context(&text);
+        assert!(capped.len() <= MAX_COMPACTION_CONTEXT_BYTES);
+        assert!(capped.ends_with(TRUNCATION_MARKER));
+        assert!(capped.contains(&first));
+    }
+
+    #[test]
+    fn cap_context_no_sentence_boundary_cuts_at_budget() {
+        let text = "a".repeat(MAX_COMPACTION_CONTEXT_BYTES + 500);
+        let capped = cap_context(&text);
+        assert!(capped.len() <= MAX_COMPACTION_CONTEXT_BYTES);
+        assert!(capped.ends_with(TRUNCATION_MARKER));
+    }
+
+    #[test]
+    fn cap_context_preserves_sentence_punctuation() {
+        let prefix = "a".repeat(11_950);
+        let text = format!("{}. And then more text follows that pushes us well over the twelve thousand byte limit easily and without doubt.", prefix);
+        assert!(text.len() > MAX_COMPACTION_CONTEXT_BYTES);
+
+        let capped = cap_context(&text);
+        assert!(capped.ends_with(TRUNCATION_MARKER));
+        let before_marker = &capped[..capped.len() - TRUNCATION_MARKER.len()];
+        assert!(
+            before_marker.ends_with('.'),
+            "Expected cut after sentence-ending dot, got: ...{}",
+            &before_marker[before_marker.len().saturating_sub(20)..]
+        );
+    }
+
+    #[test]
+    fn cap_context_multibyte_utf8_near_boundary() {
+        let prefix = "a".repeat(11_970);
+        // each '—' (em-dash) is 3 bytes; place several near the budget boundary
+        let text = format!("{}. Summary—with—em—dashes—that—push—past—the—limit—and—keep—going.", prefix);
+        assert!(text.len() > MAX_COMPACTION_CONTEXT_BYTES);
+
+        let capped = cap_context(&text);
+        assert!(capped.len() <= MAX_COMPACTION_CONTEXT_BYTES);
+        assert!(capped.ends_with(TRUNCATION_MARKER));
+        assert!(capped.is_char_boundary(capped.len()), "result must be valid UTF-8");
+    }
+
+    #[test]
+    fn cap_context_emoji_near_boundary() {
+        let prefix = "a".repeat(11_975);
+        // each emoji is 4 bytes
+        let text = format!("{}🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥", prefix);
+        assert!(text.len() > MAX_COMPACTION_CONTEXT_BYTES);
+
+        let capped = cap_context(&text);
+        assert!(capped.len() <= MAX_COMPACTION_CONTEXT_BYTES);
+        assert!(capped.ends_with(TRUNCATION_MARKER));
+    }
+
+    #[test]
+    fn parse_compaction_output_basic() {
+        let input = "## CONTEXT\nSome context here.\n\n## LESSONS\n- Lesson one\n- Lesson two";
+        let (ctx, lessons) = parse_compaction_output(input);
+        assert_eq!(ctx, "Some context here.");
+        assert!(lessons.is_some());
+        assert!(lessons.unwrap().contains("Lesson one"));
+    }
+
+    #[test]
+    fn parse_compaction_output_no_lessons() {
+        let input = "## CONTEXT\nJust context, no lessons header.";
+        let (ctx, lessons) = parse_compaction_output(input);
+        assert_eq!(ctx, "Just context, no lessons header.");
+        assert!(lessons.is_none());
+    }
+
+    #[test]
+    fn parse_compaction_output_lessons_none() {
+        let input = "## CONTEXT\nSome context.\n\n## LESSONS\nNone.";
+        let (_, lessons) = parse_compaction_output(input);
+        assert!(lessons.is_none());
+    }
+
+    #[test]
+    fn parse_compaction_output_no_headers() {
+        let input = "Just raw text with no markdown headers at all.";
+        let (ctx, lessons) = parse_compaction_output(input);
+        assert_eq!(ctx, input);
+        assert!(lessons.is_none());
+    }
+
+    #[test]
+    fn parse_compaction_output_mixed_case_headers() {
+        let input = "## Context\nMixed case context.\n\n## Lessons\n- lesson A";
+        let (ctx, lessons) = parse_compaction_output(input);
+        assert_eq!(ctx, "Mixed case context.");
+        assert!(lessons.is_some());
+        assert!(lessons.unwrap().contains("lesson A"));
+    }
+
+    #[test]
+    fn parse_compaction_output_empty_string() {
+        let (ctx, lessons) = parse_compaction_output("");
+        assert_eq!(ctx, "");
+        assert!(lessons.is_none());
     }
 }
