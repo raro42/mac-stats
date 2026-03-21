@@ -1,7 +1,6 @@
 //! Ollama Tauri commands — orchestrator (`answer_with_ollama_and_fetch`) and re-exports.
 
 use std::future::Future;
-use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::atomic::Ordering;
 
@@ -15,13 +14,9 @@ pub use crate::commands::ollama_config::{
 pub use crate::commands::ollama_chat::send_ollama_chat_messages;
 use crate::commands::ollama_models::list_ollama_models;
 use crate::commands::redmine_helpers::{
-    extract_redmine_time_entries_summary_for_reply,
-    grounded_redmine_time_entries_failure_reply,
     is_redmine_review_or_summarize_only, is_redmine_time_entries_request,
-    question_explicitly_requests_json,
 };
 use crate::commands::reply_helpers::{
-    final_reply_from_tool_results,
     is_bare_done_plan, is_final_same_as_intermediate,
 };
 use crate::commands::pre_routing::compute_pre_routed_recommendation;
@@ -30,8 +25,8 @@ use crate::commands::ollama_memory::{
 };
 use crate::commands::perplexity_helpers::is_news_query;
 use crate::commands::tool_parsing::{
-    normalize_browser_tool_arg, normalize_inline_tool_sequences, parse_all_tools_from_response,
-    parse_tool_from_response, truncate_search_query_arg, MAX_BROWSER_TOOLS_PER_RUN,
+    normalize_inline_tool_sequences, parse_all_tools_from_response,
+    parse_tool_from_response, MAX_BROWSER_TOOLS_PER_RUN,
 };
 use crate::commands::verification::{
     detect_new_topic, extract_success_criteria, original_request_for_retry,
@@ -697,7 +692,7 @@ pub fn answer_with_ollama_and_fetch(
         // Fast path: if the recommendation already contains a parseable tool call, execute it
         // directly instead of asking Ollama a second time to regurgitate the same tool line.
         let direct_tool = parse_tool_from_response(&recommendation);
-        let (mut messages, mut response_content) = if let Some((ref tool, ref arg)) = direct_tool {
+        let (mut messages, response_content) = if let Some((ref tool, ref arg)) = direct_tool {
             let all_tools = parse_all_tools_from_response(&normalized_recommendation);
             if all_tools.len() > 1 {
                 info!(
@@ -809,613 +804,46 @@ pub fn answer_with_ollama_and_fetch(
             }
         };
 
-        let mut tool_count: u32 = 0;
-        // Browser mode: "headless" in question → no visible window. From Discord/scheduler/task (from_remote) → headless unless user explicitly asks to see the browser (so retries stay headless).
+        // Browser mode: "headless" in question -> no visible window. From Discord/scheduler/task (from_remote) -> headless unless user explicitly asks to see the browser (so retries stay headless).
         let prefer_headless = if from_remote {
             !wants_visible_browser(question)
         } else {
             question.to_lowercase().contains("headless")
         };
         crate::browser_agent::set_prefer_headless_for_run(prefer_headless);
-        // Paths to attach when replying on Discord (e.g. BROWSER_SCREENSHOT); only under ~/.mac-stats/screenshots/.
-        let mut attachment_paths: Vec<PathBuf> = Vec::new();
-        let mut screenshot_requested_by_tool_run = false;
-        // Collect (agent_name, reply) for each AGENT call so we can append a conversation transcript when multiple agents participated.
-        let mut agent_conversation: Vec<(String, String)> = Vec::new();
-        // Dedupe repeated identical DISCORD_API calls so the model can't loop on the same request.
-        let mut last_successful_discord_call: Option<(String, String)> = None;
-        // Dedupe repeated identical RUN_CMD so the model can't loop (e.g. task says run once then TASK_APPEND/TASK_STATUS).
-        let mut last_run_cmd_arg: Option<String> = None;
-        // When the model does TASK_APPEND right after RUN_CMD, use this so the task file gets the full command output (not a summary).
-        let mut last_run_cmd_raw_output: Option<String> = None;
-        // Track the task file we're working on so we can append the full conversation at the end.
-        let mut current_task_path: Option<std::path::PathBuf> = None;
-        // When the model calls DONE we break the tool loop; strip the DONE line from the final reply.
-        let mut exited_via_done: bool = false;
-        // Last BROWSER_EXTRACT result (JS-rendered page text) for completion verification so we check against real content, not FETCH_URL HTML.
-        let mut last_browser_extract: Option<String> = None;
-        // Cap browser tools per run to prevent runaway NAVIGATE/CLICK loops (see docs/032_browser_loop_and_status_fix_plan.md).
-        let mut browser_tool_count: u32 = 0;
-        // Set when we skip a browser tool due to cap; used to append a user-facing note to the reply.
-        let mut browser_tool_cap_reached: bool = false;
-        // Repetition detection: refuse duplicate consecutive browser action (same NAVIGATE URL or same CLICK index).
-        let mut last_browser_tool_arg: Option<(String, String)> = None;
-        // For news requests: if the last PERPLEXITY_SEARCH returned only hub/landing/tag/standings pages, verification must not accept a confident news answer.
-        let mut last_news_search_was_hub_only: Option<bool> = None;
-        let budget_warning_ratio = crate::config::Config::tool_budget_warning_ratio();
-        let mut loop_guard = crate::commands::loop_guard::ToolLoopGuard::new();
 
-        while tool_count < max_tool_iterations {
-            let tools = parse_all_tools_from_response(&response_content);
-            if tools.is_empty() {
-                info!(
-                    "Agent router: no tool call in response ({} chars), treating as final answer: {}",
-                    response_content.chars().count(),
-                    log_content(&response_content)
-                );
-                break;
-            }
-            if tools.len() > 1 {
-                info!(
-                    "Agent router: running {} tools in one turn: {}",
-                    tools.len(),
-                    tools
-                        .iter()
-                        .map(|(t, _)| t.as_str())
-                        .collect::<Vec<_>>()
-                        .join(", ")
-                );
-            }
-            let multi_tool_turn = tools.len() > 1;
-            let mut done_claimed: Option<bool> = None;
-            let mut tool_results: Vec<String> = Vec::with_capacity(tools.len());
-            // Sequence-terminating: after a page-changing browser action (NAVIGATE, GO_BACK),
-            // remaining browser tools in the same turn use stale indices and must be skipped.
-            let mut page_changed_this_turn = false;
-            for (tool, arg) in tools {
-                if tool_count >= max_tool_iterations {
-                    break;
-                }
-                tool_count += 1;
-                // Set when we execute a browser tool this iteration; used to update last_browser_tool_arg after the match.
-                let mut executed_browser_tool_arg: Option<(String, String)> = None;
-                // When the plan puts the whole chain in one line (e.g. PERPLEXITY_SEARCH: spanish newspapers then BROWSER_NAVIGATE...), pass only the search query to PERPLEXITY/BRAVE.
-                let arg = if tool == "PERPLEXITY_SEARCH" || tool == "BRAVE_SEARCH" {
-                    truncate_search_query_arg(&arg)
-                } else {
-                    arg
-                };
-                let arg_preview: String = arg.chars().take(80).collect();
-                if arg.chars().count() > 80 {
-                    info!(
-                        "Agent router: running tool {}/{} — {} (arg: {}...)",
-                        tool_count, max_tool_iterations, tool, arg_preview
-                    );
-                } else {
-                    info!(
-                        "Agent router: running tool {}/{} — {} (arg: {})",
-                        tool_count, max_tool_iterations, tool, arg_preview
-                    );
-                }
+        let tool_loop_params = crate::commands::tool_loop::ToolLoopParams {
+            question: question.to_string(),
+            request_id: request_id.clone(),
+            max_tool_iterations,
+            model_override: model_override.clone(),
+            options_override: options_override.clone(),
+            status_tx: status_tx.clone(),
+            discord_reply_channel_id,
+            allow_schedule,
+            load_global_memory,
+            agent_descriptions_len: agent_descriptions.len(),
+            model_context_size_tokens: model_info.context_size_tokens,
+            budget_warning_ratio: crate::config::Config::tool_budget_warning_ratio(),
+        };
+        let tool_loop_result = crate::commands::tool_loop::run_tool_loop(
+            &tool_loop_params,
+            &mut messages,
+            response_content,
+        )
+        .await?;
+        let mut response_content = tool_loop_result.response_content;
+        let tool_loop_state = tool_loop_result.state;
+        let tool_count = tool_loop_state.tool_count;
+        let attachment_paths = tool_loop_state.attachment_paths;
+        let screenshot_requested_by_tool_run = tool_loop_state.screenshot_requested_by_tool_run;
+        let agent_conversation = tool_loop_state.agent_conversation;
+        let current_task_path = tool_loop_state.current_task_path;
+        let last_browser_extract = tool_loop_state.last_browser_extract;
+        let browser_tool_cap_reached = tool_loop_state.browser_tool_cap_reached;
+        let last_news_search_was_hub_only = tool_loop_state.last_news_search_was_hub_only;
 
-                // General loop guard: detect repeated tool calls and cycles across all tools.
-                if tool != "DONE" {
-                    if let Some(reason) = loop_guard.record_and_check(&tool, &arg) {
-                        info!(
-                            "Agent router: loop guard blocked {} — {}",
-                            tool, reason
-                        );
-                        tool_results.push(reason);
-                        continue;
-                    }
-                }
-
-                // Cap browser tools per run to prevent runaway loops (032_browser_loop_and_status_fix_plan).
-                let is_browser_tool = matches!(
-                    tool.as_str(),
-                    "BROWSER_NAVIGATE"
-                        | "BROWSER_CLICK"
-                        | "BROWSER_INPUT"
-                        | "BROWSER_SCROLL"
-                        | "BROWSER_EXTRACT"
-                        | "BROWSER_SEARCH_PAGE"
-                        | "BROWSER_SCREENSHOT"
-                );
-                if is_browser_tool {
-                    let normalized_arg = normalize_browser_tool_arg(&tool, &arg);
-                    // Repetition detection: same action as previous step → skip and tell model (032).
-                    if last_browser_tool_arg.as_ref() == Some(&(tool.clone(), normalized_arg.clone())) {
-                        let msg = "Same browser action as previous step; use a different action or reply with DONE.".to_string();
-                        tool_results.push(msg);
-                        info!(
-                            "Agent router: duplicate browser action skipped ({} with same arg)",
-                            tool
-                        );
-                        continue;
-                    }
-                    if browser_tool_count >= MAX_BROWSER_TOOLS_PER_RUN {
-                        browser_tool_cap_reached = true;
-                        let msg = format!(
-                            "Maximum browser actions per run reached ({}). Reply with your answer or DONE: success / DONE: no.",
-                            MAX_BROWSER_TOOLS_PER_RUN
-                        );
-                        tool_results.push(msg);
-                        info!(
-                            "Agent router: browser tool cap reached ({}), skipping {}",
-                            MAX_BROWSER_TOOLS_PER_RUN, tool
-                        );
-                        continue;
-                    }
-                    if page_changed_this_turn {
-                        tool_results.push(format!(
-                            "Page changed by a previous navigation; {} was skipped because element indices are stale. Current page state is above — use it to plan new actions in the next turn.",
-                            tool
-                        ));
-                        info!(
-                            "Agent router: terminates-sequence — skipping {} after page-changing action this turn",
-                            tool
-                        );
-                        continue;
-                    }
-                    browser_tool_count += 1;
-                    executed_browser_tool_arg = Some((tool.clone(), normalized_arg));
-                    info!(
-                        "Agent router: browser tool #{}/{} this run",
-                        browser_tool_count, MAX_BROWSER_TOOLS_PER_RUN
-                    );
-                }
-                if tool == "BROWSER_SCREENSHOT" {
-                    screenshot_requested_by_tool_run = true;
-                }
-
-                let user_message = match tool.as_str() {
-                    "DONE" => {
-                        let arg_lower = arg.trim().to_lowercase();
-                        let claimed_success = arg_lower.is_empty()
-                            || arg_lower.contains("success")
-                            || arg_lower.contains("yes")
-                            || arg_lower.contains("true");
-                        done_claimed = Some(claimed_success);
-                        send_status(if claimed_success {
-                            "✅ Task marked done (success)."
-                        } else {
-                            "⏹️ Task marked done (could not complete)."
-                        });
-                        info!(
-                            "Agent router: model called DONE (success={}), exiting tool loop",
-                            claimed_success
-                        );
-                        String::new()
-                    }
-                    "FETCH_URL" if arg.contains("discord.com") => {
-                        crate::commands::network_tool_dispatch::handle_fetch_url_discord_redirect(
-                            &arg, status_tx.as_ref(),
-                        ).await
-                    }
-                    "FETCH_URL" => {
-                        let estimated_used =
-                            messages.iter().map(|m| m.content.len()).sum::<usize>()
-                                + agent_descriptions.len();
-                        crate::commands::network_tool_dispatch::handle_fetch_url(
-                            &arg,
-                            estimated_used,
-                            model_info.context_size_tokens,
-                            model_override.clone(),
-                            options_override.clone(),
-                            status_tx.as_ref(),
-                        ).await?
-                    }
-                    "BROWSER_SCREENSHOT" => {
-                        let result = crate::commands::browser_tool_dispatch::handle_browser_screenshot(
-                            &arg, &request_id, status_tx.as_ref(),
-                        ).await;
-                        if let Some(path) = result.attachment_path {
-                            attachment_paths.push(path);
-                        }
-                        result.message
-                    }
-                    "BROWSER_NAVIGATE" => {
-                        crate::commands::browser_tool_dispatch::handle_browser_navigate(
-                            &arg, &request_id, status_tx.as_ref(),
-                        ).await
-                    }
-                    "BROWSER_GO_BACK" => {
-                        crate::commands::browser_tool_dispatch::handle_browser_go_back(
-                            &request_id, status_tx.as_ref(),
-                        ).await
-                    }
-                    "BROWSER_CLICK" => {
-                        crate::commands::browser_tool_dispatch::handle_browser_click(
-                            &arg, status_tx.as_ref(),
-                        ).await
-                    }
-                    "BROWSER_INPUT" => {
-                        crate::commands::browser_tool_dispatch::handle_browser_input(
-                            &arg, status_tx.as_ref(),
-                        ).await
-                    }
-                    "BROWSER_SCROLL" => {
-                        crate::commands::browser_tool_dispatch::handle_browser_scroll(
-                            &arg, status_tx.as_ref(),
-                        ).await
-                    }
-                    "BROWSER_EXTRACT" => {
-                        send_status("📄 Extracting page text…");
-                        crate::commands::browser_tool_dispatch::handle_browser_extract().await
-                    }
-                    "BROWSER_SEARCH_PAGE" => {
-                        crate::commands::browser_tool_dispatch::handle_browser_search_page(
-                            &arg, status_tx.as_ref(),
-                        ).await
-                    }
-                    "BRAVE_SEARCH" => {
-                        crate::commands::network_tool_dispatch::handle_brave_search(
-                            &arg, status_tx.as_ref(),
-                        ).await
-                    }
-                    "PERPLEXITY_SEARCH" => {
-                        let result = crate::commands::perplexity_helpers::handle_perplexity_search(
-                            question,
-                            &arg,
-                            status_tx.as_ref(),
-                            &request_id,
-                        )
-                        .await;
-                        attachment_paths.extend(result.new_attachment_paths);
-                        if let Some(hub_only) = result.news_search_was_hub_only {
-                            last_news_search_was_hub_only = Some(hub_only);
-                        }
-                        result.text
-                    }
-                    "RUN_JS" => {
-                        crate::commands::delegation_tool_dispatch::handle_run_js(
-                            &arg, status_tx.as_ref(),
-                        )
-                    }
-                    "SKILL" => {
-                        crate::commands::delegation_tool_dispatch::handle_skill(
-                            &arg, question, model_override.clone(),
-                            options_override.clone(), status_tx.as_ref(),
-                        ).await
-                    }
-                    "AGENT" => {
-                        let last_user_content = messages
-                            .last()
-                            .filter(|m| m.role == "user")
-                            .map(|m| m.content.as_str());
-                        let result = crate::commands::delegation_tool_dispatch::handle_agent(
-                            &arg, question, discord_reply_channel_id,
-                            status_tx.as_ref(), load_global_memory,
-                            last_user_content,
-                        ).await;
-                        if let Some(entry) = result.agent_conversation_entry {
-                            agent_conversation.push(entry);
-                        }
-                        result.message
-                    }
-                    "SCHEDULE" => {
-                        crate::commands::task_tool_handlers::handle_schedule(
-                            &arg,
-                            allow_schedule,
-                            discord_reply_channel_id,
-                            &status_tx,
-                        )
-                    }
-                    "REMOVE_SCHEDULE" => {
-                        crate::commands::task_tool_handlers::handle_remove_schedule(
-                            &arg,
-                            &status_tx,
-                        )
-                    }
-                    "LIST_SCHEDULES" => {
-                        crate::commands::task_tool_handlers::handle_list_schedules(
-                            &status_tx,
-                        )
-                    }
-                    "RUN_CMD" => {
-                        let result = crate::commands::delegation_tool_dispatch::handle_run_cmd(
-                            &arg, last_run_cmd_arg.as_deref(), multi_tool_turn,
-                            model_override.clone(), options_override.clone(),
-                            status_tx.as_ref(),
-                        ).await;
-                        if let Some(raw) = result.raw_output {
-                            last_run_cmd_raw_output = Some(raw);
-                        }
-                        result.message
-                    }
-                    "PYTHON_SCRIPT" => {
-                        crate::commands::delegation_tool_dispatch::handle_python_script(
-                            &arg, &response_content, status_tx.as_ref(),
-                        ).await
-                    }
-                    "DISCORD_API" => {
-                        let result = crate::commands::network_tool_dispatch::handle_discord_api(
-                            &arg, last_successful_discord_call.as_ref(), status_tx.as_ref(),
-                        ).await;
-                        if let Some(call) = result.successful_call {
-                            last_successful_discord_call = Some(call);
-                        }
-                        result.message
-                    }
-                    "OLLAMA_API" => {
-                        crate::commands::misc_tool_dispatch::handle_ollama_api(
-                            &arg, status_tx.as_ref(),
-                        ).await
-                    }
-                    "TASK_APPEND" => {
-                        crate::commands::task_tool_handlers::handle_task_append(
-                            &arg,
-                            &mut current_task_path,
-                            &mut last_run_cmd_raw_output,
-                            &status_tx,
-                        )
-                    }
-                    "TASK_STATUS" => {
-                        crate::commands::task_tool_handlers::handle_task_status(
-                            &arg,
-                            &mut current_task_path,
-                        )
-                    }
-                    "TASK_CREATE" => {
-                        crate::commands::task_tool_handlers::handle_task_create(
-                            &arg,
-                            discord_reply_channel_id,
-                            &mut current_task_path,
-                        )
-                    }
-                    "TASK_SHOW" => {
-                        crate::commands::task_tool_handlers::handle_task_show(
-                            &arg,
-                            &mut current_task_path,
-                            &status_tx,
-                        )
-                    }
-                    "TASK_ASSIGN" => {
-                        crate::commands::task_tool_handlers::handle_task_assign(
-                            &arg,
-                            &mut current_task_path,
-                            &status_tx,
-                        )
-                    }
-                    "TASK_SLEEP" => {
-                        crate::commands::task_tool_handlers::handle_task_sleep(
-                            &arg,
-                            &mut current_task_path,
-                            &status_tx,
-                        )
-                    }
-                    "TASK_LIST" => {
-                        crate::commands::task_tool_handlers::handle_task_list(
-                            &arg,
-                            &status_tx,
-                        )
-                    }
-                    "MCP" => {
-                        crate::commands::misc_tool_dispatch::handle_mcp(
-                            &arg, status_tx.as_ref(),
-                        ).await
-                    }
-                    "CURSOR_AGENT" => {
-                        crate::commands::misc_tool_dispatch::handle_cursor_agent(
-                            &arg, status_tx.as_ref(),
-                        ).await
-                    }
-                    "REDMINE_API" => {
-                        crate::commands::network_tool_dispatch::handle_redmine_api(
-                            &arg, question, &request_id, status_tx.as_ref(),
-                        ).await
-                    }
-                    "MASTODON_POST" => {
-                        crate::commands::misc_tool_dispatch::handle_mastodon_post(
-                            &arg, status_tx.as_ref(),
-                        ).await
-                    }
-                    "MEMORY_APPEND" => {
-                        crate::commands::misc_tool_dispatch::handle_memory_append(
-                            &arg, discord_reply_channel_id,
-                        )
-                    }
-                    _ => {
-                        let msg = format!(
-                            "Unknown tool \"{}\". Use one of the available tools from the agent list (e.g. FETCH_URL, BRAVE_SEARCH, BROWSER_NAVIGATE, DONE) or reply with your answer.",
-                            tool
-                        );
-                        tracing::warn!(
-                            "Agent router: unknown tool \"{}\" (arg: {} chars), sending hint to model",
-                            tool,
-                            arg.chars().count()
-                        );
-                        msg
-                    }
-                };
-
-                let result_len = user_message.chars().count();
-                info!(
-                    "Agent router: tool {} completed, sending result back to Ollama ({} chars): {}",
-                    tool,
-                    result_len,
-                    log_content(&user_message)
-                );
-
-                if tool == "RUN_CMD" && user_message.starts_with("Here is the command output") {
-                    last_run_cmd_arg = Some(arg.clone());
-                } else if tool != "RUN_CMD" {
-                    last_run_cmd_arg = None;
-                }
-                // Only clear stored RUN_CMD output when we run something other than RUN_CMD or TASK_APPEND
-                // (so it stays set for the next TASK_APPEND after RUN_CMD).
-                if tool != "TASK_APPEND" && tool != "RUN_CMD" {
-                    last_run_cmd_raw_output = None;
-                }
-                if tool == "BROWSER_EXTRACT"
-                    && !user_message.is_empty()
-                    && !user_message.contains("BROWSER_EXTRACT failed")
-                {
-                    last_browser_extract = Some(user_message.clone());
-                }
-
-                let is_browser_error = if tool == "BROWSER_SCREENSHOT" {
-                    user_message.starts_with("Screenshot of current page failed")
-                        || user_message.starts_with("Screenshot task error")
-                } else if tool.starts_with("BROWSER_") {
-                    user_message.starts_with(&format!("{} failed", tool))
-                        || user_message.starts_with(&format!("{} task error", tool))
-                        || user_message.starts_with(&format!("{} HTTP fallback task error", tool))
-                        || user_message.starts_with(&format!("{} CDP retry task error", tool))
-                } else {
-                    false
-                };
-
-                let is_multi_tool_run_cmd_error = tool == "RUN_CMD"
-                    && user_message.starts_with("RUN_CMD failed in a multi-step plan");
-
-                // Sequence-terminating: after a successful BROWSER_NAVIGATE or BROWSER_GO_BACK,
-                // subsequent browser tools in this turn use stale indices and must be skipped.
-                if multi_tool_turn
-                    && !is_browser_error
-                    && (tool == "BROWSER_NAVIGATE" || tool == "BROWSER_GO_BACK")
-                    && !user_message.starts_with("BROWSER_NAVIGATE requires")
-                {
-                    page_changed_this_turn = true;
-                    info!(
-                        "Agent router: {} terminates sequence — remaining browser actions this turn will be skipped",
-                        tool
-                    );
-                }
-
-                tool_results.push(user_message);
-                if let Some(pair) = executed_browser_tool_arg {
-                    last_browser_tool_arg = Some(pair);
-                }
-                if is_browser_error || is_multi_tool_run_cmd_error {
-                    info!(
-                        "Agent router: {} returned an error, aborting remaining tools in this turn",
-                        tool
-                    );
-                    break;
-                }
-            }
-
-            let user_message = tool_results.join("\n\n---\n\n");
-            if let Some(blocked_reply) = grounded_redmine_time_entries_failure_reply(
-                &request_for_verification,
-                &user_message,
-            ) {
-                info!("Agent router: returning grounded Redmine blocked-state reply");
-                response_content = blocked_reply;
-                break;
-            }
-            if !question_explicitly_requests_json(question) {
-                if let Some(summary) = extract_redmine_time_entries_summary_for_reply(&user_message)
-                {
-                    info!("Agent router: returning direct Redmine time-entry summary");
-                    response_content = summary;
-                    if done_claimed.is_some() {
-                        exited_via_done = true;
-                    }
-                    break;
-                }
-            }
-            if done_claimed.is_some() {
-                if !user_message.trim().is_empty() {
-                    response_content = final_reply_from_tool_results(question, &user_message);
-                }
-                exited_via_done = true;
-                break;
-            }
-
-            messages.push(crate::ollama::ChatMessage {
-                role: "assistant".to_string(),
-                content: response_content.clone(),
-                images: None,
-            });
-            let tool_result_role = if user_message.starts_with("Here is the command output") {
-                "system"
-            } else {
-                "user"
-            };
-            messages.push(crate::ollama::ChatMessage {
-                role: tool_result_role.to_string(),
-                content: user_message,
-                images: None,
-            });
-
-            // Budget warning / last-iteration guidance (inspired by browser-use step budget).
-            if max_tool_iterations > 1 && budget_warning_ratio > 0.0 && budget_warning_ratio < 1.0 {
-                let ratio = (tool_count as f64) / (max_tool_iterations as f64);
-                if tool_count + 1 == max_tool_iterations {
-                    let msg = format!(
-                        "LAST ITERATION WARNING: You have used {}/{} tool iterations. This is your LAST tool iteration. \
-                         Reply with your final answer now. Summarize everything you have found so far. \
-                         Do NOT start a new tool chain — respond with your best answer or call DONE with your results.",
-                        tool_count, max_tool_iterations
-                    );
-                    info!("Agent router: injecting last-iteration guidance (tool_count={}/{})", tool_count, max_tool_iterations);
-                    messages.push(crate::ollama::ChatMessage {
-                        role: "system".to_string(),
-                        content: msg,
-                        images: None,
-                    });
-                } else if ratio >= budget_warning_ratio {
-                    let remaining = max_tool_iterations - tool_count;
-                    let pct = (ratio * 100.0) as u32;
-                    let msg = format!(
-                        "BUDGET WARNING: You have used {}/{} tool iterations ({}%). {} iterations remaining. \
-                         If the task cannot be completed in the remaining iterations, prioritize: \
-                         (1) consolidate your results so far, (2) reply with what you have or call DONE. \
-                         Partial results are far more valuable than exhausting all iterations with nothing saved.",
-                        tool_count, max_tool_iterations, pct, remaining
-                    );
-                    info!("Agent router: injecting budget warning (tool_count={}/{}, ratio={:.2}, threshold={:.2})", tool_count, max_tool_iterations, ratio, budget_warning_ratio);
-                    messages.push(crate::ollama::ChatMessage {
-                        role: "system".to_string(),
-                        content: msg,
-                        images: None,
-                    });
-                }
-            }
-
-            let follow_up = send_ollama_chat_messages(
-                messages.clone(),
-                model_override.clone(),
-                options_override.clone(),
-            )
-            .await?;
-            response_content = follow_up.message.content.clone();
-
-            // Fallback: if Ollama returned empty after a successful tool result, use the raw
-            // tool output directly so the user at least sees what the tool produced.
-            if response_content.trim().is_empty() {
-                if let Some(last_msg) = messages.last() {
-                    let raw = &last_msg.content;
-                    if raw.starts_with("Here is the command output")
-                        || raw.starts_with("Here is the page content")
-                        || raw.starts_with("MCP tool")
-                        || raw.starts_with("Search results")
-                        || raw.starts_with("Discord API")
-                    {
-                        info!(
-                            "Agent router: Ollama returned empty after tool success — using raw tool output as response"
-                        );
-                        // Strip the instruction suffix we appended for the model
-                        let cleaned = raw
-                            .replace("\n\nUse this to answer the user's question.", "")
-                            .replace("Here is the command output:\n\n", "")
-                            .replace("Here is the page content:\n\n", "");
-                        response_content = cleaned;
-                    }
-                }
-            }
-
-            if tool_count >= max_tool_iterations {
-                info!(
-                    "Agent router: max tool iterations reached ({}), using last response as final",
-                    max_tool_iterations
-                );
-            }
-        }
-
-        if exited_via_done {
+        if tool_loop_state.exited_via_done {
             let lines: Vec<&str> = response_content.lines().collect();
             if let Some(last) = lines.last() {
                 let t = last.trim();
