@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Extract pre-routing into `commands/pre_routing.rs`** — Moved deterministic pre-routing logic (screenshot→BROWSER_SCREENSHOT, "run …"→RUN_CMD, ticket→REDMINE_API) from `ollama.rs` into `commands/pre_routing.rs` (107 lines). Deduplicated Redmine pre-routing code that was copy-pasted in two branches. No behavioral changes; zero clippy warnings, 114 tests pass. (`commands/pre_routing.rs`, `commands/mod.rs`, `commands/ollama.rs`)
+- **Extract PERPLEXITY_SEARCH handler into `perplexity_helpers.rs`** — Moved the entire PERPLEXITY_SEARCH tool handler (~200 lines: search, result formatting, auto-screenshot) from `ollama.rs` into `perplexity_helpers.rs` as `handle_perplexity_search()`, `format_search_results_markdown()`, and `auto_screenshot_urls()`. Returns `PerplexitySearchHandlerResult` struct. `ollama.rs` 3809→3502 lines (307 extracted). No behavioral changes; zero clippy warnings, 114 tests pass. (`commands/perplexity_helpers.rs`, `commands/ollama.rs`)
+
 ## [0.1.49] - 2026-03-21
 
 ### Added

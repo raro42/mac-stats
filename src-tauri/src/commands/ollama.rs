@@ -23,28 +23,25 @@ use crate::commands::ollama_models::{
     unload_ollama_model,
 };
 use crate::commands::redmine_helpers::{
-    extract_redmine_time_entries_summary_for_reply, extract_ticket_id,
+    extract_redmine_time_entries_summary_for_reply,
     grounded_redmine_time_entries_failure_reply,
     is_redmine_review_or_summarize_only, is_redmine_time_entries_request,
     question_explicitly_requests_json, redmine_direct_fallback_hint,
-    redmine_request_for_routing, redmine_time_entries_range,
+    redmine_time_entries_range,
 };
 use crate::commands::reply_helpers::{
-    append_to_file, extract_last_prefixed_argument, extract_screenshot_recommendation,
-    final_reply_from_tool_results, is_agent_unavailable_error,
+    append_to_file, final_reply_from_tool_results, is_agent_unavailable_error,
     is_bare_done_plan, is_final_same_as_intermediate, looks_like_discord_401_confusion,
     mastodon_post,
 };
+use crate::commands::pre_routing::compute_pre_routed_recommendation;
 use crate::commands::compaction::{
     compact_conversation_history, COMPACTION_THRESHOLD, MIN_CONVERSATIONAL_FOR_COMPACTION,
 };
 use crate::commands::ollama_memory::{
     load_memory_block_for_request, load_soul_content, search_memory_for_request,
 };
-use crate::commands::perplexity_helpers::{
-    build_perplexity_news_tool_suffix, build_perplexity_verbose_summary, is_likely_article_like_result,
-    is_news_query, search_perplexity_with_news_fallback,
-};
+use crate::commands::perplexity_helpers::is_news_query;
 use crate::commands::tool_parsing::{
     normalize_browser_tool_arg, normalize_inline_tool_sequences, parse_all_tools_from_response,
     parse_python_script_from_response,
@@ -657,122 +654,11 @@ pub fn answer_with_ollama_and_fetch(
         };
 
         // --- Pre-routing: deterministic tool dispatch for unambiguous patterns ---
-        // Screenshot + URL → BROWSER_SCREENSHOT; "run <command>" → RUN_CMD; ticket → REDMINE_API.
-        let pre_routed_recommendation = extract_screenshot_recommendation(question).or_else(|| {
-            if crate::commands::run_cmd::is_local_cmd_allowed() {
-                let q = question.trim();
-                let q_lower = q.to_lowercase();
-                let cmd_rest = if let Some(cmd) = extract_last_prefixed_argument(q, "RUN_CMD:") {
-                    cmd
-                } else if q_lower.starts_with("run command:") {
-                    q[12..].trim().to_string() // "run command:".len() == 12
-                } else if q_lower.starts_with("run ") {
-                    q[4..].trim().to_string() // "run ".len() == 4
-                } else {
-                    String::new()
-                };
-                if !cmd_rest.is_empty() {
-                    let rec = format!("RUN_CMD: {}", cmd_rest);
-                    info!(
-                        "Agent router: pre-routed to RUN_CMD (run command): {}",
-                        crate::logging::ellipse(&cmd_rest, 60)
-                    );
-                    Some(rec)
-                } else if crate::redmine::is_configured() {
-                    let redmine_request = redmine_request_for_routing(
-                        q,
-                        &request_for_verification,
-                        is_verification_retry,
-                    );
-                    let redmine_request_lower = redmine_request.to_lowercase();
-                    if is_redmine_time_entries_request(redmine_request) {
-                        let (from, to) = redmine_time_entries_range(redmine_request);
-                        let rec = format!(
-                            "REDMINE_API: GET /time_entries.json?from={}&to={}&limit=100",
-                            from, to
-                        );
-                        info!(
-                            "Agent router: pre-routed to REDMINE_API for time entries ({}..{})",
-                            from, to
-                        );
-                        Some(rec)
-                    } else {
-                        let ticket_id = extract_ticket_id(&redmine_request_lower);
-                        let wants_update = redmine_request_lower.contains("update")
-                            || redmine_request_lower.contains("add comment")
-                            || redmine_request_lower.contains("with the next steps")
-                            || redmine_request_lower.contains("post a comment")
-                            || redmine_request_lower.contains("write ")
-                            || redmine_request_lower.contains("put ");
-                        if let Some(id) = ticket_id
-                            .filter(|_| {
-                                redmine_request_lower.contains("ticket")
-                                    || redmine_request_lower.contains("issue")
-                                    || redmine_request_lower.contains("redmine")
-                            })
-                            .filter(|_| !wants_update)
-                        {
-                            let rec = format!(
-                                "REDMINE_API: GET /issues/{}.json?include=journals,attachments",
-                                id
-                            );
-                            info!("Agent router: pre-routed to REDMINE_API for ticket #{}", id);
-                            Some(rec)
-                        } else {
-                            None
-                        }
-                    }
-                } else {
-                    None
-                }
-            } else if crate::redmine::is_configured() {
-                let redmine_request = redmine_request_for_routing(
-                    question,
-                    &request_for_verification,
-                    is_verification_retry,
-                );
-                let redmine_request_lower = redmine_request.to_lowercase();
-                if is_redmine_time_entries_request(redmine_request) {
-                    let (from, to) = redmine_time_entries_range(redmine_request);
-                    let rec = format!(
-                        "REDMINE_API: GET /time_entries.json?from={}&to={}&limit=100",
-                        from, to
-                    );
-                    info!(
-                        "Agent router: pre-routed to REDMINE_API for time entries ({}..{})",
-                        from, to
-                    );
-                    Some(rec)
-                } else {
-                    let ticket_id = extract_ticket_id(&redmine_request_lower);
-                    let wants_update = redmine_request_lower.contains("update")
-                        || redmine_request_lower.contains("add comment")
-                        || redmine_request_lower.contains("with the next steps")
-                        || redmine_request_lower.contains("post a comment")
-                        || redmine_request_lower.contains("write ")
-                        || redmine_request_lower.contains("put ");
-                    if let Some(id) = ticket_id
-                        .filter(|_| {
-                            redmine_request_lower.contains("ticket")
-                                || redmine_request_lower.contains("issue")
-                                || redmine_request_lower.contains("redmine")
-                        })
-                        .filter(|_| !wants_update)
-                    {
-                        let rec = format!(
-                            "REDMINE_API: GET /issues/{}.json?include=journals,attachments",
-                            id
-                        );
-                        info!("Agent router: pre-routed to REDMINE_API for ticket #{}", id);
-                        Some(rec)
-                    } else {
-                        None
-                    }
-                }
-            } else {
-                None
-            }
-        });
+        let pre_routed_recommendation = compute_pre_routed_recommendation(
+            question,
+            &request_for_verification,
+            is_verification_retry,
+        );
 
         // --- Planning step: ask Ollama how it would solve the question (skip if pre-routed) ---
         let mut recommendation = if let Some(pre_routed) = pre_routed_recommendation {
@@ -1678,211 +1564,18 @@ pub fn answer_with_ollama_and_fetch(
                 }
                     }
                     "PERPLEXITY_SEARCH" => {
-                        send_status(&format!(
-                            "🔎 Searching (Perplexity) for \"{}\"…",
-                            crate::logging::ellipse(&arg, 35)
-                        ));
-                        info!("Discord/Ollama: PERPLEXITY_SEARCH requested: {}", arg);
-                        let q_lower = question.to_lowercase();
-                        let is_news_query = is_news_query(question);
-                        let snippet_max = crate::config::Config::perplexity_snippet_max_chars();
-                        let max_results = crate::config::Config::perplexity_max_results();
-                        match search_perplexity_with_news_fallback(
+                        let result = crate::commands::perplexity_helpers::handle_perplexity_search(
                             question,
                             &arg,
-                            max_results,
-                            snippet_max,
+                            status_tx.as_ref(),
+                            &request_id,
                         )
-                        .await
-                        {
-                            Ok((shaped_results, urls, filtered_any, refined_query_used)) => {
-                                let want_screenshots = (q_lower.contains("screenshot")
-                                    || q_lower.contains("screen shot"))
-                                    && (q_lower.contains("visit")
-                                        || q_lower.contains("url")
-                                        || q_lower.contains(" 5 ")
-                                        || q_lower.contains(" 3 ")
-                                        || q_lower.contains("send me")
-                                        || q_lower.contains("send the")
-                                        || q_lower.contains("in discord")
-                                        || q_lower.contains(" here "));
-                                let urls: Vec<String> = urls
-                                    .into_iter()
-                                    .filter(|url| {
-                                        url.starts_with("http://") || url.starts_with("https://")
-                                    })
-                                    .take(5)
-                                    .collect();
-                                // In verbose mode (Discord): brief feedback that results were received before next step.
-                                const MAX_PERPLEXITY_SUMMARY_CHARS: usize = 380;
-                                if status_tx.is_some() {
-                                    let n = shaped_results.len();
-                                    let titles: String = shaped_results
-                                        .iter()
-                                        .take(5)
-                                        .map(|r| r.title.trim().to_string())
-                                        .filter(|t| !t.is_empty())
-                                        .collect::<Vec<_>>()
-                                        .join(", ");
-                                    let summary = build_perplexity_verbose_summary(
-                                        n,
-                                        titles,
-                                        MAX_PERPLEXITY_SUMMARY_CHARS,
-                                    );
-                                    send_status(&summary);
-                                }
-                                let num_results = shaped_results.len();
-                                let search_had_article_like = is_news_query
-                                    && shaped_results
-                                        .iter()
-                                        .any(|r| {
-                                            is_likely_article_like_result(
-                                                &r.title,
-                                                &r.url,
-                                                &r.snippet,
-                                            )
-                                        });
-                                if is_news_query {
-                                    last_news_search_was_hub_only = Some(!search_had_article_like);
-                                    if !search_had_article_like {
-                                        info!(
-                                            "Agent router: news search returned only hub/landing pages; completion verification will require article-grade evidence"
-                                        );
-                                    }
-                                }
-                                // Structured markdown: numbered results with explicit Title/URL/Date/Snippet so the model parses and cites reliably.
-                                let results: String = shaped_results
-                                    .into_iter()
-                                    .enumerate()
-                                    .map(|(i, r)| {
-                                        let date_str = r
-                                            .date
-                                            .as_deref()
-                                            .or(r.last_updated.as_deref())
-                                            .unwrap_or("")
-                                            .trim();
-                                        let date_line = if date_str.is_empty() {
-                                            String::new()
-                                        } else {
-                                            format!("- **Date:** {}\n", date_str)
-                                        };
-                                        let page_type = if is_news_query
-                                            && is_likely_article_like_result(
-                                                &r.title, &r.url, &r.snippet,
-                                            ) {
-                                            "- **Page type:** article-like\n"
-                                        } else if is_news_query {
-                                            "- **Page type:** hub/landing page\n"
-                                        } else {
-                                            ""
-                                        };
-                                        format!(
-                                            "### {}. {}\n- **URL:** {}\n{}{}- **Snippet:** {}",
-                                            i + 1,
-                                            r.title,
-                                            r.url,
-                                            date_line,
-                                            page_type,
-                                            r.snippet
-                                        )
-                                    })
-                                    .collect::<Vec<_>>()
-                                    .join("\n\n");
-                                let mut result_text = if results.is_empty() {
-                                    "Perplexity search returned no results. Answer from general knowledge.".to_string()
-                                } else {
-                                    format!(
-                                        "## Perplexity Search Results ({} items)\n\n{}\n\nUse these to answer the user's question. Cite source number, title or URL, and date when given.",
-                                        num_results, results
-                                    )
-                                };
-                                if is_news_query && !results.is_empty() {
-                                    result_text.push_str(&build_perplexity_news_tool_suffix(
-                                        search_had_article_like,
-                                        refined_query_used.as_deref(),
-                                        filtered_any,
-                                    ));
-                                }
-                                if want_screenshots && !urls.is_empty() {
-                                    info!(
-                                        "Agent router: auto-visit and screenshot for {} URLs (user asked for screenshots)",
-                                        urls.len()
-                                    );
-                                    for (i, url) in urls.iter().enumerate() {
-                                        send_status(&format!(
-                                            "🧭 Visiting {} of {}…",
-                                            i + 1,
-                                            urls.len()
-                                        ));
-                                        let nav_result = tokio::task::spawn_blocking({
-                                            let u = url.clone();
-                                            move || crate::browser_agent::navigate_and_get_state(&u)
-                                        })
-                                        .await;
-                                        match nav_result {
-                                            Ok(Ok(_)) => {
-                                                send_status(&format!(
-                                                    "📸 Taking screenshot {} of {}…",
-                                                    i + 1,
-                                                    urls.len()
-                                                ));
-                                                let shot_result = tokio::task::spawn_blocking(crate::browser_agent::take_screenshot_current_page).await;
-                                                if let Ok(Ok(path)) = shot_result {
-                                                    attachment_paths.push(path.clone());
-                                                    if let Some(ref tx) = status_tx {
-                                                        let _ = tx.send(format!(
-                                                            "ATTACH:{}",
-                                                            path.display()
-                                                        ));
-                                                    }
-                                                    info!(
-                                                        "Agent router: auto-screenshot {} saved to {:?}",
-                                                        i + 1,
-                                                        path
-                                                    );
-                                                }
-                                            }
-                                            Ok(Err(e)) => {
-                                                info!(
-                                                    "Agent router: auto-navigate {} failed: {}",
-                                                    url,
-                                                    crate::logging::ellipse(&e, 80)
-                                                );
-                                            }
-                                            Err(e) => {
-                                                info!(
-                                                    "Agent router: auto-navigate task error: {}",
-                                                    e
-                                                );
-                                            }
-                                        }
-                                    }
-                                    result_text.push_str(&format!(
-                                "\n\nI navigated to and took screenshots of {} page(s). The app will attach them in Discord.",
-                                urls.len()
-                            ));
-                                }
-                                info!(
-                                    "Agent router [{}]: PERPLEXITY_SEARCH returned {} results, blob {} bytes",
-                                    request_id,
-                                    num_results,
-                                    result_text.len()
-                                );
-                                result_text
-                            }
-                            Err(e) => {
-                                if status_tx.is_some() {
-                                    send_status(&format!(
-                                        "Perplexity search failed: {}",
-                                        crate::logging::ellipse(&e.to_string(), 120)
-                                    ));
-                                }
-                                format!(
-                                    "Perplexity search failed: {}. Answer without search results.",
-                                    e
-                                )
-                            }
+                        .await;
+                        attachment_paths.extend(result.new_attachment_paths);
+                        if let Some(hub_only) = result.news_search_was_hub_only {
+                            last_news_search_was_hub_only = Some(hub_only);
                         }
+                        result.text
                     }
                     // RUN_JS: agent-triggered; runs with process privileges via run_js_via_node.
                     // Treat agent output as untrusted code. Audit log code length + hash only (no full body).

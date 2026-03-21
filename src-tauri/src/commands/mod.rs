@@ -31,6 +31,7 @@ pub mod agent_descriptions;
 pub mod browser_helpers;
 pub mod schedule_helpers;
 pub mod ollama_frontend_chat;
+pub mod pre_routing;
 pub mod tool_parsing;
 pub mod verification;
 pub mod agent_session;

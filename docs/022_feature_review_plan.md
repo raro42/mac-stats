@@ -291,3 +291,11 @@ See `CHANGELOG.md` (0.1.14) and `docs/023_externalized_prompts_DONE.md` for deta
 ## Open tasks
 
 Open tasks for this plan are tracked in **006-feature-coder/FEATURE-CODER.md**.
+
+### Closing reviewer smoke test 2026-03-21 (pre-routing + PERPLEXITY_SEARCH extraction)
+
+- [x] `cargo check` — zero warnings.
+- [x] `cargo clippy` — zero warnings.
+- [x] `cargo test` — 114 tests pass.
+- [x] `cargo build --release` succeeds.
+- [x] `./target/release/mac_stats -vv` starts; monitors UP, agents loaded, Discord/Ollama init, scheduler running in logs.

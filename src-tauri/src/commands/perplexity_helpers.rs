@@ -1,8 +1,243 @@
 //! Perplexity and news search helper functions.
 //!
 //! Extracted from `ollama.rs` for cohesion: news-query detection,
-//! search-result scoring/shaping, Perplexity fallback logic, and
-//! tool-suffix/summary formatting.
+//! search-result scoring/shaping, Perplexity fallback logic,
+//! tool-suffix/summary formatting, and the PERPLEXITY_SEARCH tool handler.
+
+use std::path::PathBuf;
+use tracing::info;
+
+/// Result of the PERPLEXITY_SEARCH tool handler.
+pub(crate) struct PerplexitySearchHandlerResult {
+    pub text: String,
+    pub new_attachment_paths: Vec<PathBuf>,
+    /// `Some(true)` when the search returned only hub/landing pages (no article-like results).
+    pub news_search_was_hub_only: Option<bool>,
+}
+
+/// Execute the PERPLEXITY_SEARCH tool: search, format results, optionally auto-screenshot.
+pub(crate) async fn handle_perplexity_search(
+    question: &str,
+    search_arg: &str,
+    status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
+    request_id: &str,
+) -> PerplexitySearchHandlerResult {
+    let send_status = |msg: &str| {
+        if let Some(tx) = status_tx {
+            let _ = tx.send(msg.to_string());
+        }
+    };
+    send_status(&format!(
+        "🔎 Searching (Perplexity) for \"{}\"…",
+        crate::logging::ellipse(search_arg, 35)
+    ));
+    info!("Discord/Ollama: PERPLEXITY_SEARCH requested: {}", search_arg);
+
+    let q_lower = question.to_lowercase();
+    let is_news = is_news_query(question);
+    let snippet_max = crate::config::Config::perplexity_snippet_max_chars();
+    let max_results = crate::config::Config::perplexity_max_results();
+
+    match search_perplexity_with_news_fallback(question, search_arg, max_results, snippet_max).await
+    {
+        Ok((shaped_results, urls, filtered_any, refined_query_used)) => {
+            let want_screenshots = (q_lower.contains("screenshot")
+                || q_lower.contains("screen shot"))
+                && (q_lower.contains("visit")
+                    || q_lower.contains("url")
+                    || q_lower.contains(" 5 ")
+                    || q_lower.contains(" 3 ")
+                    || q_lower.contains("send me")
+                    || q_lower.contains("send the")
+                    || q_lower.contains("in discord")
+                    || q_lower.contains(" here "));
+            let urls: Vec<String> = urls
+                .into_iter()
+                .filter(|url| url.starts_with("http://") || url.starts_with("https://"))
+                .take(5)
+                .collect();
+
+            const MAX_PERPLEXITY_SUMMARY_CHARS: usize = 380;
+            if status_tx.is_some() {
+                let n = shaped_results.len();
+                let titles: String = shaped_results
+                    .iter()
+                    .take(5)
+                    .map(|r| r.title.trim().to_string())
+                    .filter(|t| !t.is_empty())
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                let summary =
+                    build_perplexity_verbose_summary(n, titles, MAX_PERPLEXITY_SUMMARY_CHARS);
+                send_status(&summary);
+            }
+
+            let num_results = shaped_results.len();
+            let search_had_article_like = is_news
+                && shaped_results
+                    .iter()
+                    .any(|r| is_likely_article_like_result(&r.title, &r.url, &r.snippet));
+
+            let news_search_was_hub_only = if is_news {
+                if !search_had_article_like {
+                    info!("Agent router: news search returned only hub/landing pages; completion verification will require article-grade evidence");
+                }
+                Some(!search_had_article_like)
+            } else {
+                None
+            };
+
+            let results: String = format_search_results_markdown(&shaped_results, is_news);
+            let mut result_text = if results.is_empty() {
+                "Perplexity search returned no results. Answer from general knowledge.".to_string()
+            } else {
+                format!(
+                    "## Perplexity Search Results ({} items)\n\n{}\n\nUse these to answer the user's question. Cite source number, title or URL, and date when given.",
+                    num_results, results
+                )
+            };
+            if is_news && !results.is_empty() {
+                result_text.push_str(&build_perplexity_news_tool_suffix(
+                    search_had_article_like,
+                    refined_query_used.as_deref(),
+                    filtered_any,
+                ));
+            }
+
+            let mut new_attachment_paths: Vec<PathBuf> = Vec::new();
+            if want_screenshots && !urls.is_empty() {
+                auto_screenshot_urls(&urls, status_tx, &mut new_attachment_paths).await;
+                result_text.push_str(&format!(
+                    "\n\nI navigated to and took screenshots of {} page(s). The app will attach them in Discord.",
+                    urls.len()
+                ));
+            }
+
+            info!(
+                "Agent router [{}]: PERPLEXITY_SEARCH returned {} results, blob {} bytes",
+                request_id,
+                num_results,
+                result_text.len()
+            );
+            PerplexitySearchHandlerResult {
+                text: result_text,
+                new_attachment_paths,
+                news_search_was_hub_only,
+            }
+        }
+        Err(e) => {
+            if status_tx.is_some() {
+                send_status(&format!(
+                    "Perplexity search failed: {}",
+                    crate::logging::ellipse(&e.to_string(), 120)
+                ));
+            }
+            PerplexitySearchHandlerResult {
+                text: format!(
+                    "Perplexity search failed: {}. Answer without search results.",
+                    e
+                ),
+                new_attachment_paths: Vec::new(),
+                news_search_was_hub_only: None,
+            }
+        }
+    }
+}
+
+/// Format shaped search results into structured markdown for the model.
+fn format_search_results_markdown(
+    results: &[crate::commands::perplexity::PerplexitySearchResult],
+    is_news: bool,
+) -> String {
+    results
+        .iter()
+        .enumerate()
+        .map(|(i, r)| {
+            let date_str = r
+                .date
+                .as_deref()
+                .or(r.last_updated.as_deref())
+                .unwrap_or("")
+                .trim();
+            let date_line = if date_str.is_empty() {
+                String::new()
+            } else {
+                format!("- **Date:** {}\n", date_str)
+            };
+            let page_type = if is_news && is_likely_article_like_result(&r.title, &r.url, &r.snippet) {
+                "- **Page type:** article-like\n"
+            } else if is_news {
+                "- **Page type:** hub/landing page\n"
+            } else {
+                ""
+            };
+            format!(
+                "### {}. {}\n- **URL:** {}\n{}{}- **Snippet:** {}",
+                i + 1,
+                r.title,
+                r.url,
+                date_line,
+                page_type,
+                r.snippet
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n\n")
+}
+
+/// Navigate to each URL and take a screenshot, collecting attachment paths.
+async fn auto_screenshot_urls(
+    urls: &[String],
+    status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
+    attachment_paths: &mut Vec<PathBuf>,
+) {
+    let send_status = |msg: &str| {
+        if let Some(tx) = status_tx {
+            let _ = tx.send(msg.to_string());
+        }
+    };
+    info!(
+        "Agent router: auto-visit and screenshot for {} URLs (user asked for screenshots)",
+        urls.len()
+    );
+    for (i, url) in urls.iter().enumerate() {
+        send_status(&format!("🧭 Visiting {} of {}…", i + 1, urls.len()));
+        let nav_result = tokio::task::spawn_blocking({
+            let u = url.clone();
+            move || crate::browser_agent::navigate_and_get_state(&u)
+        })
+        .await;
+        match nav_result {
+            Ok(Ok(_)) => {
+                send_status(&format!("📸 Taking screenshot {} of {}…", i + 1, urls.len()));
+                let shot_result =
+                    tokio::task::spawn_blocking(crate::browser_agent::take_screenshot_current_page)
+                        .await;
+                if let Ok(Ok(path)) = shot_result {
+                    attachment_paths.push(path.clone());
+                    if let Some(tx) = status_tx {
+                        let _ = tx.send(format!("ATTACH:{}", path.display()));
+                    }
+                    info!(
+                        "Agent router: auto-screenshot {} saved to {:?}",
+                        i + 1,
+                        path
+                    );
+                }
+            }
+            Ok(Err(e)) => {
+                info!(
+                    "Agent router: auto-navigate {} failed: {}",
+                    url,
+                    crate::logging::ellipse(&e, 80)
+                );
+            }
+            Err(e) => {
+                info!("Agent router: auto-navigate task error: {}", e);
+            }
+        }
+    }
+}
 
 pub(crate) fn is_news_query(question: &str) -> bool {
     let q = question.to_lowercase();
