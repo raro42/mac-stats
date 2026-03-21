@@ -316,18 +316,51 @@ mac-stats/
 │   │   │
 │   │   ├── commands/             ← Tauri commands (exposed to frontend)
 │   │   │   ├── mod.rs            ← Command module exports
-│   │   │   ├── ollama.rs         ← Ollama AI chat commands (chat, code execution, FETCH_URL, BROWSER_SCREENSHOT)
+│   │   │   ├── ollama.rs         ← Ollama orchestrator (planning, execution, tool dispatch coordinator)
+│   │   │   ├── ollama_config.rs  ← Ollama configuration, startup, env resolution
+│   │   │   ├── ollama_chat.rs    ← Chat transport (send messages, streaming, dedup)
+│   │   │   ├── ollama_frontend_chat.rs ← Frontend chat Tauri commands (chat with execution, continue)
 │   │   │   ├── ollama_models.rs  ← Ollama model management (list, pull, delete, embed, load/unload)
 │   │   │   ├── ollama_logging.rs ← Ollama JS execution logging bridge
-│   │   │   ├── browser.rs        ← fetch_page for Ollama web tasks (no CORS)
+│   │   │   ├── ollama_memory.rs  ← Memory/soul loading for Ollama sessions
+│   │   │   ├── tool_loop.rs      ← Tool execution loop (parse, dispatch, dedup, budget)
+│   │   │   ├── tool_parsing.rs   ← Tool invocation parsing from model responses
+│   │   │   ├── loop_guard.rs     ← Cross-tool cycle and repetition detection
+│   │   │   ├── pre_routing.rs    ← Deterministic pre-routing (screenshot, RUN_CMD, REDMINE)
+│   │   │   ├── agent_descriptions.rs ← Agent/tool description building for prompts
+│   │   │   ├── agent_session.rs  ← Agent session runner (sub-agent Ollama calls)
+│   │   │   ├── browser.rs        ← fetch_page, SSRF validation for Ollama web tasks
+│   │   │   ├── browser_helpers.rs ← Browser task detection, retry prompts, navigation checks
+│   │   │   ├── browser_tool_dispatch.rs ← Browser tool handlers (screenshot, navigate, click, etc.)
+│   │   │   ├── network_tool_dispatch.rs ← FETCH_URL, BRAVE_SEARCH, DISCORD_API, REDMINE_API handlers
+│   │   │   ├── delegation_tool_dispatch.rs ← AGENT, SKILL, RUN_JS, RUN_CMD, PYTHON_SCRIPT handlers
+│   │   │   ├── misc_tool_dispatch.rs ← OLLAMA_API, MCP, CURSOR_AGENT, MASTODON_POST, MEMORY_APPEND
+│   │   │   ├── task_tool_handlers.rs ← TASK_* and SCHEDULE tool handlers
+│   │   │   ├── verification.rs   ← Verification pipeline (OllamaReply, success criteria, retry)
+│   │   │   ├── content_reduction.rs ← Content truncation, skill/JS execution helpers
+│   │   │   ├── compaction.rs     ← Periodic session compaction
+│   │   │   ├── session_history.rs ← Session history preparation (cap, compaction, annotations)
+│   │   │   ├── prompt_assembly.rs ← Execution system prompt assembly
+│   │   │   ├── reply_helpers.rs  ← Reply routing, final-reply extraction, Mastodon helpers
+│   │   │   ├── redmine_helpers.rs ← Redmine request parsing, time entries, ticket extraction
+│   │   │   ├── perplexity_helpers.rs ← PERPLEXITY_SEARCH handler, result formatting
+│   │   │   ├── schedule_helpers.rs ← Schedule parsing (cron/at)
 │   │   │   ├── monitors.rs       ← Monitor management (add, remove, check)
 │   │   │   ├── alerts.rs         ← Alert management
 │   │   │   ├── security.rs       ← Keychain/credential management
 │   │   │   ├── logging.rs        ← Generic JS console logging bridge
 │   │   │   ├── plugins.rs        ← Plugin system commands
-│   │   │   ├── pre_routing.rs    ← Deterministic pre-routing (screenshot, RUN_CMD, REDMINE)
-│   │   │   ├── task_tool_handlers.rs ← TASK_* and SCHEDULE tool handlers
-│   │   │   └── tool_parsing.rs   ← Tool invocation parsing from model responses
+│   │   │   ├── brave.rs          ← Brave Search API commands
+│   │   │   ├── run_cmd.rs        ← RUN_CMD allowlisted command execution
+│   │   │   ├── python_agent.rs   ← PYTHON_SCRIPT execution
+│   │   │   ├── cursor_agent.rs   ← Cursor-agent proxy commands
+│   │   │   ├── judge.rs          ← Judge hook for completion quality
+│   │   │   ├── perplexity.rs     ← Perplexity Search API commands
+│   │   │   ├── agents.rs         ← Agent listing/prompt Tauri commands
+│   │   │   ├── discord.rs        ← Discord-related Tauri commands
+│   │   │   ├── scheduler.rs      ← Scheduler Tauri commands
+│   │   │   ├── skills.rs         ← Skill listing
+│   │   │   └── window.rs         ← CPU window toggle command
 │   │   │
 │   │   ├── metrics/              ← System metrics collection
 │   │   │   └── mod.rs            ← CPU, RAM, GPU, disk, temperature, frequency

@@ -54,5 +54,5 @@ The fix for “orchestrator recommends AGENT instead of tool” is **implemented
 ### Step 7 — Reduce planning context (optional, proposal §3)
 - Optional future extension: for the planning step only, either send no conversation history or only the last user message (or a short summary of recent turns) so prior “no tool used” replies do not bias the planner toward AGENT. This would require changing what `answer_with_ollama_and_fetch` passes into the planning messages.
 
-### Step 8 — Pre-route FETCH_URL + URL (optional)
-- Optional future extension: add `extract_fetch_url_recommendation(question)` (or similar) so that if the question clearly asks to “fetch/get/open this page” and contains a URL, the router returns `FETCH_URL: <url>` and skips planning. Wire it into the same pre-route chain (e.g. after screenshot, before RUN_CMD).
+### Step 8 — Pre-route FETCH_URL + URL (done)
+- [x] **Done:** `try_pre_route_fetch_url()` in `commands/pre_routing.rs` detects explicit `FETCH_URL:` prefix and keyword-based patterns ("fetch", "get the page/content/html", "read the page/url/site", "what's on", "summarize the/this page/url/site") combined with a URL. Browser/navigate/screenshot patterns are excluded. Wired into the pre-route chain after RUN_CMD, before Redmine. 17 tests.

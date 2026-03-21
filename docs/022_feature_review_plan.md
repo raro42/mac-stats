@@ -330,3 +330,26 @@ Open tasks for this plan are tracked in **006-feature-coder/FEATURE-CODER.md**.
 - [x] `cargo build --release` succeeds.
 - [x] `./target/release/mac_stats -vv` starts; 4 monitors loaded, 8 agents loaded, 15 models classified, Ollama connected (qwen3:latest, 40960 ctx), Discord connected, scheduler running (2 entries). Zero errors/warnings/panics in log.
 - [x] Code review: `OllamaRequest` struct replaces 24 positional parameters on `answer_with_ollama_and_fetch`. `#[derive(Default)]` so all fields default to `None`/`false`/`0`. All 5 call sites updated: recursive retry (`ollama.rs`), Discord (`discord/mod.rs`), CLI (`main.rs`), scheduler (`scheduler/mod.rs`), task runner (`task/runner.rs`). Re-exported from `lib.rs`. No behavioral changes.
+
+### Closing reviewer smoke test 2026-03-21 (full [Unreleased] review + OpenClaw §95)
+
+- [x] `cargo check` — zero errors.
+- [x] `cargo clippy` — zero warnings.
+- [x] `cargo test` — 139 tests pass.
+- [x] `./target/release/mac_stats -vv` running (PID 83236); 4 monitors loaded, 8 agents loaded, Ollama connected (qwen3:latest), Discord connected. 21 WARN/ERROR entries in log (6 expected SSRF blocks for localhost, 3 Chrome idle timeouts, rest HTTP/2 GoAway trace noise — all benign).
+- [x] [Unreleased] CHANGELOG code verification:
+  - ToolLoopGuard: PASS (10 tests, cycle detection len 2–4, wired via tool_loop.rs).
+  - SSRF protection: PASS with nits (15 tests not 14; IPv4-mapped broadcast not checked; redirect DNS-fail path follows instead of blocking).
+  - OllamaRequest: PASS (22 fields not 24 — minor numeric mismatch; all 5 call sites use struct init).
+  - Auto-dismiss JS dialogs: PASS (event listener, HashSet idempotency, session reset clear, all three call sites).
+  - Discord 429 rate-limit: present in discord/api.rs (not re-verified in detail).
+  - All extraction line counts consistent with CHANGELOG claims; `ollama.rs` now 1138 lines (from 9408+ pre-extraction).
+- [x] AGENTS.md `commands/` directory listing updated from 13 to 45 files (was stale after extractions).
+- [x] OpenClaw §95 re-verification: 7 checks against AGENTS.md vs code. Discrepancies found (all doc-only, no code bugs): stale channel paths (`src/telegram` etc. → `extensions/`), missing `src/provider-web.ts`, `pnpm format` script mismatch, branch coverage 55% not 70%, 5 extensions weakly documented.
+
+### Closing reviewer smoke test 2026-03-21 (FETCH_URL pre-routing)
+
+- [x] `cargo check` — zero errors.
+- [x] `cargo clippy` — zero warnings.
+- [x] `cargo test` — 156 tests pass (17 new).
+- [x] Code review: `try_pre_route_fetch_url()` in `commands/pre_routing.rs` (56 lines). Detects explicit `FETCH_URL:` prefix and keyword patterns ("fetch", "get the page/content/html", "read the page/url/site", "what's on", "summarize the/this page/url/site") combined with a URL. Browser/navigate/screenshot/click patterns excluded. Wired into pre-route chain after RUN_CMD, before Redmine. No behavioral changes to existing pre-routes.
