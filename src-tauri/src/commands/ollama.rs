@@ -18,16 +18,13 @@ use crate::commands::redmine_helpers::{
     extract_redmine_time_entries_summary_for_reply,
     grounded_redmine_time_entries_failure_reply,
     is_redmine_review_or_summarize_only, is_redmine_time_entries_request,
-    question_explicitly_requests_json, redmine_time_entries_range,
+    question_explicitly_requests_json,
 };
 use crate::commands::reply_helpers::{
-    append_to_file, final_reply_from_tool_results,
-    is_bare_done_plan, is_final_same_as_intermediate, looks_like_discord_401_confusion,
+    final_reply_from_tool_results,
+    is_bare_done_plan, is_final_same_as_intermediate,
 };
 use crate::commands::pre_routing::compute_pre_routed_recommendation;
-use crate::commands::compaction::{
-    compact_conversation_history, COMPACTION_THRESHOLD, MIN_CONVERSATIONAL_FOR_COMPACTION,
-};
 use crate::commands::ollama_memory::{
     load_memory_block_for_request, load_soul_content, search_memory_for_request,
 };
@@ -47,14 +44,10 @@ pub(crate) use crate::commands::agent_session::run_agent_ollama_session;
 use crate::commands::agent_descriptions::{
     build_agent_descriptions, DISCORD_GROUP_CHANNEL_GUIDANCE, DISCORD_PLATFORM_FORMATTING,
 };
-use crate::commands::browser_helpers::{
-    browser_retry_grounding_prompt,
-    is_browser_task_request,
-    wants_visible_browser,
-};
-
-
-
+use crate::commands::browser_helpers::wants_visible_browser;
+use crate::commands::prompt_assembly::build_execution_system_content;
+use crate::commands::session_history::{prepare_conversation_history, CONVERSATION_HISTORY_CAP};
+use crate::commands::verification::build_verification_retry_hint;
 
 
 
@@ -405,7 +398,6 @@ pub fn answer_with_ollama_and_fetch(
             }
         }
 
-        const CONVERSATION_HISTORY_CAP: usize = 20;
         let raw_history: Vec<crate::ollama::ChatMessage> = conversation_history
             .unwrap_or_default()
             .into_iter()
@@ -424,140 +416,15 @@ pub fn answer_with_ollama_and_fetch(
             );
         }
 
-        let conversation_history: Vec<crate::ollama::ChatMessage> = if raw_history.len()
-            >= COMPACTION_THRESHOLD
-        {
-            // Skip compaction when session has no real conversational value (task-008 Phase 5).
-            let pairs: Vec<(String, String)> = raw_history
-                .iter()
-                .map(|m| (m.role.clone(), m.content.clone()))
-                .collect();
-            let conversational = crate::session_memory::count_conversational_messages(&pairs);
-            if conversational < MIN_CONVERSATIONAL_FOR_COMPACTION {
-                info!(
-                    "Session compaction [{}]: skipped (no real conversational value: {} conversational messages, need at least {}); keeping full history ({} messages)",
-                    request_id, conversational, MIN_CONVERSATIONAL_FOR_COMPACTION, raw_history.len()
-                );
-                raw_history
-                    .into_iter()
-                    .map(|mut msg| {
-                        if msg.role == "assistant" && looks_like_discord_401_confusion(&msg.content) {
-                            msg.content.push_str("\n\n[SYSTEM CORRECTION: The above 401 was from FETCH_URL (no token). Use DISCORD_API instead.]");
-                        }
-                        msg
-                    })
-                    .collect()
-            } else {
-            send_status("Compacting session memory…");
-            info!(
-                "Session compaction [{}]: {} messages exceed threshold ({}), compacting",
-                request_id,
-                raw_history.len(),
-                COMPACTION_THRESHOLD
-            );
-            match compact_conversation_history(&raw_history, question, discord_reply_channel_id).await {
-                Ok((context, lessons)) => {
-                    info!(
-                        "Session compaction [{}]: produced context ({} chars), lessons: {}",
-                        request_id,
-                        context.len(),
-                        lessons.as_ref().map(|_| "present").unwrap_or("none")
-                    );
-                    if let Some(ref lesson_text) = lessons {
-                        let memory_path = discord_reply_channel_id
-                            .map(crate::config::Config::memory_file_path_for_discord_channel)
-                            .unwrap_or_else(crate::config::Config::memory_file_path);
-                        for line in lesson_text.lines() {
-                            let line = line.trim().trim_start_matches("- ").trim();
-                            if !line.is_empty() && line.len() > 5 {
-                                let entry = format!("- {}\n", line);
-                                let _ = append_to_file(&memory_path, &entry);
-                            }
-                        }
-                        info!("Session compaction [{}]: wrote lessons to {:?}", request_id, memory_path);
-                    }
-                    let context_lower = context.to_lowercase();
-                    let not_needed = context_lower.contains("not needed for this request")
-                        || context_lower.contains("covered different topics");
-                    if let Some(channel_id) = discord_reply_channel_id {
-                        let compacted = vec![
-                            ("system".to_string(), context.clone()),
-                            ("user".to_string(), question.to_string()),
-                        ];
-                        crate::session_memory::replace_session("discord", channel_id, compacted);
-                    }
-                    if is_new_topic || not_needed {
-                        info!(
-                            "Session compaction: prior context not relevant to current question (new topic), using no prior context"
-                        );
-                        vec![]
-                    } else {
-                        info!(
-                            "Session compaction: replaced {} messages with summary ({} chars)",
-                            raw_history.len(),
-                            context.len()
-                        );
-                        vec![crate::ollama::ChatMessage {
-                            role: "system".to_string(),
-                            content: format!(
-                                "Previous session context (compacted from {} messages):\n\n{}",
-                                raw_history.len(),
-                                context
-                            ),
-                            images: None,
-                        }]
-                    }
-                }
-                Err(e) => {
-                    let n = raw_history.len();
-                    let err_s = e.to_string();
-                    let is_skip = err_s.contains("no real conversational value");
-                    if is_skip {
-                        info!(
-                            "Session compaction skipped: {}; keeping full history ({} messages)",
-                            err_s, n
-                        );
-                    } else {
-                        let msg = if err_s.to_lowercase().contains("unauthorized")
-                            || err_s.contains("401")
-                        {
-                            format!(
-                                "Session compaction failed: {} (use a local model for compaction; cloud models may require auth). Keeping full history ({} messages) for this request.",
-                                e, n
-                            )
-                        } else {
-                            format!(
-                                "Session compaction failed: {}; keeping full history ({} messages) for this request.",
-                                e, n
-                            )
-                        };
-                        tracing::warn!("{}", msg);
-                    }
-                    raw_history
-                    .into_iter()
-                    .map(|mut msg| {
-                        if msg.role == "assistant" && looks_like_discord_401_confusion(&msg.content) {
-                            msg.content.push_str("\n\n[SYSTEM CORRECTION: The above 401 was from FETCH_URL (no token). Use DISCORD_API instead.]");
-                        }
-                        msg
-                    })
-                    .collect()
-                }
-            }
-            }
-        } else if is_new_topic {
-            vec![]
-        } else {
-            raw_history
-            .into_iter()
-            .map(|mut msg| {
-                if msg.role == "assistant" && looks_like_discord_401_confusion(&msg.content) {
-                    msg.content.push_str("\n\n[SYSTEM CORRECTION: The above 401 was from FETCH_URL (no token). Use DISCORD_API instead.]");
-                }
-                msg
-            })
-            .collect()
-        };
+        send_status("Compacting session memory…");
+        let conversation_history = prepare_conversation_history(
+            raw_history,
+            question,
+            is_new_topic,
+            discord_reply_channel_id,
+            &request_id,
+        )
+        .await;
         if !conversation_history.is_empty() {
             info!(
                 "Agent router: using {} prior messages as context",
@@ -821,36 +688,16 @@ pub fn answer_with_ollama_and_fetch(
             }
             let memory_block =
                 load_memory_block_for_request(discord_reply_channel_id, load_global_memory);
-            let execution_system_content = match &skill_content {
-                Some(skill) => format!(
-                    "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}{}{}{}{}{}",
-                    discord_user_context,
-                    skill,
-                    execution_prompt,
-                    metrics_for_system,
-                    discord_screenshot_reminder,
-                    redmine_howto_reminder,
-                    news_format_reminder,
-                    discord_platform_formatting,
-                    model_identity
-                ),
-                None => format!(
-                    "{}{}{}{}{}{}{}{}{}{}",
-                    router_soul,
-                    memory_block,
-                    discord_user_context,
-                    execution_prompt,
-                    metrics_for_system,
-                    discord_screenshot_reminder,
-                    redmine_howto_reminder,
-                    news_format_reminder,
-                    discord_platform_formatting,
-                    model_identity
-                ),
-            };
+            let prompt = build_execution_system_content(
+                &router_soul, &memory_block, &discord_user_context,
+                skill_content.as_deref(), &execution_prompt, &metrics_for_system,
+                discord_screenshot_reminder, redmine_howto_reminder,
+                news_format_reminder, &discord_platform_formatting,
+                &model_identity, None,
+            );
             let mut msgs: Vec<crate::ollama::ChatMessage> = vec![crate::ollama::ChatMessage {
                 role: "system".to_string(),
-                content: execution_system_content,
+                content: prompt.content,
                 images: None,
             }];
             for msg in &conversation_history {
@@ -881,38 +728,16 @@ pub fn answer_with_ollama_and_fetch(
             );
             let memory_block =
                 load_memory_block_for_request(discord_reply_channel_id, load_global_memory);
-            let execution_system_content = match &skill_content {
-                Some(skill) => format!(
-                    "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}{}{}{}{}\n\nYour plan: {}{}",
-                    discord_user_context,
-                    skill,
-                    execution_prompt,
-                    metrics_for_system,
-                    discord_screenshot_reminder,
-                    redmine_howto_reminder,
-                    news_format_reminder,
-                    discord_platform_formatting,
-                    recommendation,
-                    model_identity
-                ),
-                None => format!(
-                    "{}{}{}{}{}{}{}{}{}\n\nYour plan: {}{}",
-                    router_soul,
-                    memory_block,
-                    discord_user_context,
-                    execution_prompt,
-                    metrics_for_system,
-                    discord_screenshot_reminder,
-                    redmine_howto_reminder,
-                    news_format_reminder,
-                    discord_platform_formatting,
-                    recommendation,
-                    model_identity
-                ),
-            };
+            let prompt = build_execution_system_content(
+                &router_soul, &memory_block, &discord_user_context,
+                skill_content.as_deref(), &execution_prompt, &metrics_for_system,
+                discord_screenshot_reminder, redmine_howto_reminder,
+                news_format_reminder, &discord_platform_formatting,
+                &model_identity, Some(&recommendation),
+            );
             let mut msgs: Vec<crate::ollama::ChatMessage> = vec![crate::ollama::ChatMessage {
                 role: "system".to_string(),
-                content: execution_system_content,
+                content: prompt.content,
                 images: None,
             }];
             for msg in &conversation_history {
@@ -1674,109 +1499,14 @@ pub fn answer_with_ollama_and_fetch(
                     .as_deref()
                     .map(|r| format!("Verification said we didn't fully complete: {}. Complete the remaining steps now, then reply.", r.trim()))
                     .unwrap_or_else(|| "Verification said we didn't fully complete. Complete the remaining steps now, then reply.".to_string());
-                    // When verifier said no and the reason mentions screenshots/attachments, steer the
-                    // model to reply with a summary and DONE — do not invoke AGENT: orchestrator or
-                    // create tasks, which can lead to unrelated actions (e.g. organize ~/tmp).
-                    let reason_lower = reason
-                        .as_deref()
-                        .map(|r| r.to_lowercase())
-                        .unwrap_or_default();
-                    let reason_about_attachments = reason_lower.contains("screenshot")
-                        || reason_lower.contains("attachment")
-                        || (reason_lower.contains("missing")
-                            && (reason_lower.contains("upload") || reason_lower.contains("sent")));
-                    let reason_about_time_or_data = reason_lower.contains("time")
-                        || reason_lower.contains("actual data")
-                        || reason_lower.contains("spent time")
-                        || reason_lower.contains("project parameter")
-                        || (reason_lower.contains("missing")
-                            && (reason_lower.contains("data")
-                                || reason_lower.contains("parameter")));
-                    let reason_about_json_format = reason_lower.contains("json format")
-                        || reason_lower.contains("not in json")
-                        || (reason_lower.contains("response") && reason_lower.contains("json"));
-                    let reason_about_news_sourcing = reason_lower.contains("source")
-                        || reason_lower.contains("date")
-                        || reason_lower.contains("publication")
-                        || reason_lower.contains("credible")
-                        || reason_lower.contains("article");
-                    let response_has_ticket_summary = response_content.len() > 150
-                        && (response_content.contains("Subject")
-                            || response_content.contains("Description")
-                            || response_content.contains("Status")
-                            || response_content.contains("Redmine"));
-                    let retry_base_with_hint = if is_redmine_time_entries_request(
+                    let retry_base_with_hint = build_verification_retry_hint(
                         &request_for_verification,
-                    ) {
-                        let (from, to) = redmine_time_entries_range(&request_for_verification);
-                        format!(
-                            "This is a Redmine time-entry list/report request. Stay in that domain only. Do not use BROWSER_*, FETCH_URL, RUN_CMD, TASK_*, or single-issue endpoints like /issues/{{id}}.json unless the user explicitly asks for them. Base the answer only on the actual Redmine time-entry data already fetched, or re-fetch the same period with REDMINE_API: GET /time_entries.json?from={}&to={}&limit=100 if needed. If the result is empty, say no time entries or worked tickets were found for that period. Do not mention screenshots or attachments. Do not return raw tool directives as the final user answer.\n\n{}",
-                            from, to, retry_base
-                        )
-                    } else if is_redmine_review_or_summarize_only(&request_for_verification)
-                        && response_has_ticket_summary
-                    {
-                        "The request was only to review/summarize. A summary was already provided. Reply with a brief confirmation and DONE: success; do not update or close the ticket.".to_string()
-                    } else if reason_about_json_format {
-                        format!(
-                            "Success criteria require a response in JSON format. Reply with **valid JSON only** (e.g. total hours, project breakdown, user contributions); do not reply with prose or markdown lists.\n\n{}",
-                            retry_base
-                        )
-                    } else if is_news_query(&request_for_verification) && reason_about_news_sourcing
-                    {
-                        info!(
-                            "Agent router: verification NO for news (article-grade/sourcing); retrying with PERPLEXITY_SEARCH hint"
-                        );
-                        format!(
-                            "This is a news-summary request. Stay in search-and-summary mode only. Re-run PERPLEXITY_SEARCH with a refined query if needed, but do **not** browse generic homepages, do **not** open BBC/CNN/NYTimes landing pages, and do **not** use screenshots or attachments. Reply with 3 concise bullet points. Each bullet must include: headline/topic, source name, publication date, and one-sentence factual summary. Prefer article-like results; if only hub/landing pages are available, say that clearly.\n\n{}",
-                            retry_base
-                        )
-                    } else if reason_about_time_or_data
-                        && (request_for_verification.to_lowercase().contains("redmine")
-                            || request_for_verification.to_lowercase().contains("time")
-                            || request_for_verification.to_lowercase().contains("spent"))
-                    {
-                        format!(
-                            "Use the correct Redmine API for time entries: REDMINE_API: GET /time_entries.json with from= and to= for the requested period (for example 2026-03-01..2026-03-31 for this month, or the same day for today) and include limit=100 so the results are not truncated. Omit optional filters like user_id or project_id unless the user explicitly asked for them. Do not use /search.json for time entries. Then reply with the data or a clear summary.\n\n{}",
-                            retry_base
-                        )
-                    } else if !attachment_paths.is_empty() && reason_about_attachments {
-                        let n = attachment_paths.len();
-                        format!(
-                            "The app already attached {} file(s) to this reply. If the only missing item was screenshots/attachments, \
-                         reply with a brief summary of what was done and end with **DONE: success**. \
-                         Do not invoke AGENT: orchestrator and do not create new tasks.\n\n{}",
-                            n, retry_base
-                        )
-                    } else if attachment_paths.is_empty()
-                        && user_explicitly_asked_for_screenshot(&request_for_verification)
-                        && reason_lower.contains("screenshot")
-                    {
-                        format!(
-                            "Screenshots could not be attached to this reply. Reply with a brief summary of what was done (e.g. screenshot taken and saved), state that the app could not attach it to Discord, and end with **DONE: no**. \
-                         Do not invoke AGENT: orchestrator and do not create new tasks.\n\n{}",
-                            retry_base
-                        )
-                    } else if reason_lower.contains("cookie")
-                        || (reason_lower.contains("consent") && reason_lower.contains("banner"))
-                    {
-                        format!(
-                            "Original request: \"{}\". Verification said the cookie consent banner was not addressed. A screenshot may already have been taken. Complete the remaining step: dismiss the cookie banner (BROWSER_CLICK on the consent button using the Elements list) then BROWSER_SCREENSHOT: current if needed, or reply with a brief summary and **DONE: no** if the browser session is no longer available.\n\n{}",
-                            request_for_verification.trim(),
-                            retry_base
-                        )
-                    } else if is_browser_task_request(&request_for_verification)
-                        && (last_browser_extract.is_some()
-                            || response_content.contains("Current page:")
-                            || reason_lower.contains("browser")
-                            || reason_lower.contains("click")
-                            || reason_lower.contains("video")
-                            || reason_lower.contains("screenshot"))
-                    {
-                        browser_retry_grounding_prompt(&request_for_verification, &retry_base)
-                    } else {
-                        retry_base
-                    };
+                        reason.as_deref(),
+                        &retry_base,
+                        &response_content,
+                        &attachment_paths,
+                        last_browser_extract.as_deref(),
+                    );
                     let retry_question = if is_news_query(&request_for_verification) {
                         retry_base_with_hint
                     } else if let Some(ref from_memory) = memory_snippet {

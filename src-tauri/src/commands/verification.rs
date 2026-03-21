@@ -1,5 +1,5 @@
 //! Verification pipeline: success criteria extraction, completion checking,
-//! topic detection, and response summarization helpers.
+//! topic detection, response summarization helpers, and retry hint building.
 
 use base64::Engine;
 use std::path::{Path, PathBuf};
@@ -8,9 +8,13 @@ use crate::commands::ollama::send_ollama_chat_messages;
 use crate::commands::perplexity_helpers::is_news_query;
 use crate::commands::redmine_helpers::{
     extract_redmine_time_entries_summary_for_reply, is_grounded_redmine_time_entries_blocked_reply,
-    is_redmine_time_entries_request,
+    is_redmine_time_entries_request, is_redmine_review_or_summarize_only,
+    redmine_time_entries_range,
 };
-use crate::commands::browser_helpers::{explicit_no_playable_video_finding, is_video_review_request};
+use crate::commands::browser_helpers::{
+    browser_retry_grounding_prompt, explicit_no_playable_video_finding, is_browser_task_request,
+    is_video_review_request,
+};
 
 /// Reply from the agent: text plus optional attachment paths (e.g. screenshots) for Discord.
 #[derive(Debug, Clone)]
@@ -581,6 +585,122 @@ pub(crate) async fn verify_completion(
         None
     };
     Ok((satisfied, reason))
+}
+
+/// Build a domain-specific retry hint when verification says the request wasn't satisfied.
+///
+/// Examines the verification reason and original request to produce targeted retry guidance
+/// (e.g. Redmine-specific, news-specific, screenshot-specific, browser-grounding) so the
+/// model doesn't wander off into unrelated tool chains on retry.
+pub(crate) fn build_verification_retry_hint(
+    request_for_verification: &str,
+    reason: Option<&str>,
+    retry_base: &str,
+    response_content: &str,
+    attachment_paths: &[PathBuf],
+    last_browser_extract: Option<&str>,
+) -> String {
+    let reason_lower = reason
+        .map(|r| r.to_lowercase())
+        .unwrap_or_default();
+
+    let reason_about_attachments = reason_lower.contains("screenshot")
+        || reason_lower.contains("attachment")
+        || (reason_lower.contains("missing")
+            && (reason_lower.contains("upload") || reason_lower.contains("sent")));
+
+    let reason_about_time_or_data = reason_lower.contains("time")
+        || reason_lower.contains("actual data")
+        || reason_lower.contains("spent time")
+        || reason_lower.contains("project parameter")
+        || (reason_lower.contains("missing")
+            && (reason_lower.contains("data") || reason_lower.contains("parameter")));
+
+    let reason_about_json_format = reason_lower.contains("json format")
+        || reason_lower.contains("not in json")
+        || (reason_lower.contains("response") && reason_lower.contains("json"));
+
+    let reason_about_news_sourcing = reason_lower.contains("source")
+        || reason_lower.contains("date")
+        || reason_lower.contains("publication")
+        || reason_lower.contains("credible")
+        || reason_lower.contains("article");
+
+    let response_has_ticket_summary = response_content.len() > 150
+        && (response_content.contains("Subject")
+            || response_content.contains("Description")
+            || response_content.contains("Status")
+            || response_content.contains("Redmine"));
+
+    if is_redmine_time_entries_request(request_for_verification) {
+        let (from, to) = redmine_time_entries_range(request_for_verification);
+        format!(
+            "This is a Redmine time-entry list/report request. Stay in that domain only. Do not use BROWSER_*, FETCH_URL, RUN_CMD, TASK_*, or single-issue endpoints like /issues/{{id}}.json unless the user explicitly asks for them. Base the answer only on the actual Redmine time-entry data already fetched, or re-fetch the same period with REDMINE_API: GET /time_entries.json?from={}&to={}&limit=100 if needed. If the result is empty, say no time entries or worked tickets were found for that period. Do not mention screenshots or attachments. Do not return raw tool directives as the final user answer.\n\n{}",
+            from, to, retry_base
+        )
+    } else if is_redmine_review_or_summarize_only(request_for_verification)
+        && response_has_ticket_summary
+    {
+        "The request was only to review/summarize. A summary was already provided. Reply with a brief confirmation and DONE: success; do not update or close the ticket.".to_string()
+    } else if reason_about_json_format {
+        format!(
+            "Success criteria require a response in JSON format. Reply with **valid JSON only** (e.g. total hours, project breakdown, user contributions); do not reply with prose or markdown lists.\n\n{}",
+            retry_base
+        )
+    } else if is_news_query(request_for_verification) && reason_about_news_sourcing {
+        tracing::info!(
+            "Agent router: verification NO for news (article-grade/sourcing); retrying with PERPLEXITY_SEARCH hint"
+        );
+        format!(
+            "This is a news-summary request. Stay in search-and-summary mode only. Re-run PERPLEXITY_SEARCH with a refined query if needed, but do **not** browse generic homepages, do **not** open BBC/CNN/NYTimes landing pages, and do **not** use screenshots or attachments. Reply with 3 concise bullet points. Each bullet must include: headline/topic, source name, publication date, and one-sentence factual summary. Prefer article-like results; if only hub/landing pages are available, say that clearly.\n\n{}",
+            retry_base
+        )
+    } else if reason_about_time_or_data
+        && (request_for_verification.to_lowercase().contains("redmine")
+            || request_for_verification.to_lowercase().contains("time")
+            || request_for_verification.to_lowercase().contains("spent"))
+    {
+        format!(
+            "Use the correct Redmine API for time entries: REDMINE_API: GET /time_entries.json with from= and to= for the requested period (for example 2026-03-01..2026-03-31 for this month, or the same day for today) and include limit=100 so the results are not truncated. Omit optional filters like user_id or project_id unless the user explicitly asked for them. Do not use /search.json for time entries. Then reply with the data or a clear summary.\n\n{}",
+            retry_base
+        )
+    } else if !attachment_paths.is_empty() && reason_about_attachments {
+        let n = attachment_paths.len();
+        format!(
+            "The app already attached {} file(s) to this reply. If the only missing item was screenshots/attachments, \
+             reply with a brief summary of what was done and end with **DONE: success**. \
+             Do not invoke AGENT: orchestrator and do not create new tasks.\n\n{}",
+            n, retry_base
+        )
+    } else if attachment_paths.is_empty()
+        && user_explicitly_asked_for_screenshot(request_for_verification)
+        && reason_lower.contains("screenshot")
+    {
+        format!(
+            "Screenshots could not be attached to this reply. Reply with a brief summary of what was done (e.g. screenshot taken and saved), state that the app could not attach it to Discord, and end with **DONE: no**. \
+             Do not invoke AGENT: orchestrator and do not create new tasks.\n\n{}",
+            retry_base
+        )
+    } else if reason_lower.contains("cookie")
+        || (reason_lower.contains("consent") && reason_lower.contains("banner"))
+    {
+        format!(
+            "Original request: \"{}\". Verification said the cookie consent banner was not addressed. A screenshot may already have been taken. Complete the remaining step: dismiss the cookie banner (BROWSER_CLICK on the consent button using the Elements list) then BROWSER_SCREENSHOT: current if needed, or reply with a brief summary and **DONE: no** if the browser session is no longer available.\n\n{}",
+            request_for_verification.trim(),
+            retry_base
+        )
+    } else if is_browser_task_request(request_for_verification)
+        && (last_browser_extract.is_some()
+            || response_content.contains("Current page:")
+            || reason_lower.contains("browser")
+            || reason_lower.contains("click")
+            || reason_lower.contains("video")
+            || reason_lower.contains("screenshot"))
+    {
+        browser_retry_grounding_prompt(request_for_verification, retry_base)
+    } else {
+        retry_base.to_string()
+    }
 }
 
 #[cfg(test)]

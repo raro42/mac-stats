@@ -40,4 +40,6 @@ pub mod agent_session;
 pub mod task_tool_handlers;
 pub mod network_tool_dispatch;
 pub mod delegation_tool_dispatch;
+pub mod prompt_assembly;
+pub mod session_history;
 pub mod window;
