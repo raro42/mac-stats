@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.48] - 2026-03-21
+
 ### Added
 - **NewMentions alert rule implementation** — `NewMentions::evaluate` now filters Mastodon mention timestamps by configured `hours` window and fires when recent count >= threshold. `MonitorStatus` gains `extra: HashMap<String, Value>` (`#[serde(default)]`) for monitor-specific data. `MastodonMonitor::check_mentions()` returns timestamps + count; Mastodon API query now filters `types[]=mention&limit=40`. Website monitor satisfies new field with `Default::default()`. Previously the NewMentions rule always returned false. (`alerts/rules.rs`, `monitors/mod.rs`, `monitors/social.rs`, `monitors/website.rs`)
 - **Redmine time entry creation (POST /time_entries.json)** — `is_allowed_post_path` extended to accept `time_entries.json`/`time_entries.xml`; new `parse_time_entry_activities()` fetches activity IDs into Redmine create context; agent description updated with POST /time_entries.json syntax and "log time" documentation; `wants_create_or_update` triggers on "log time/hours/book time/book hours/time entry"; date-sensitive tests fixed to use `chrono::Utc::now()` instead of hardcoded dates; tests for path allowlist and activity parsing. (`redmine/mod.rs`, `commands/ollama.rs`)
@@ -35,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Docs: OpenClaw §94 re-verification** — All §7 checks re-run; no discrepancies found (`005-openclaw-reviewer`).
 - **FEATURE-CODER backlog** — Perplexity/memory/compaction extraction row marked done (`006-feature-coder`).
 - **022 testing note** — Closing reviewer smoke test 2026-03-21 (Perplexity/memory/compaction extraction; cargo build, 114 tests pass, debug.log, agents, monitors UP).
+- **Extract agent descriptions, browser helpers, and schedule parsing from `ollama.rs`** — Moved agent/tool description building (9 constants + 5 functions: `AGENT_DESCRIPTIONS_BASE`, `SCHEDULE_CRON_EXAMPLES`, `format_run_cmd_description`, `build_skill_agent_description`, `build_agent_agent_description`, etc.) into `commands/agent_descriptions.rs` (246 lines); browser task helpers (10 functions + 6 tests) into `commands/browser_helpers.rs` (213 lines); schedule parsing (1 enum + 2 functions) into `commands/schedule_helpers.rs` (152 lines). `ollama.rs` 7136→6543 lines (593 extracted). No behavioral changes; zero clippy warnings, 114 tests pass. (`commands/agent_descriptions.rs`, `commands/browser_helpers.rs`, `commands/schedule_helpers.rs`, `commands/mod.rs`, `commands/ollama.rs`)
+- **FEATURE-CODER backlog** — Agent descriptions/browser helpers/schedule parsing extraction row marked done (`006-feature-coder`).
 
 ## [0.1.47] - 2026-03-20
 

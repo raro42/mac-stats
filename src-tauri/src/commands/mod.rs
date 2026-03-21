@@ -23,5 +23,8 @@ pub mod run_cmd;
 pub mod scheduler;
 pub mod security;
 pub mod skills;
+pub mod agent_descriptions;
+pub mod browser_helpers;
+pub mod schedule_helpers;
 pub mod tool_parsing;
 pub mod window;
