@@ -192,7 +192,7 @@ pub(crate) async fn build_agent_descriptions(from_discord: bool, question: Optio
         }
         num += 1;
     }
-    if super::ollama::get_mastodon_config().is_some() {
+    if super::reply_helpers::get_mastodon_config().is_some() {
         base.push_str(&format!(
             "\n\n{}. **MASTODON_POST**: Post a status (toot) to Mastodon. To invoke: reply with exactly one line: MASTODON_POST: <text to post>. Default visibility is public. Optional visibility prefix: MASTODON_POST: unlisted: <text>, MASTODON_POST: private: <text>, MASTODON_POST: direct: <text>. Keep posts concise (<500 chars). The post URL is returned on success.",
             num

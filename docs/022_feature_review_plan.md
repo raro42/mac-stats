@@ -733,6 +733,14 @@ See `CHANGELOG.md` (0.1.14) and `docs/023_externalized_prompts_DONE.md` for deta
 
 ---
 
+## Testing (2026-03-21) — closing reviewer smoke test (ollama_config + reply_helpers extraction, 114 tests pass)
+
+- **Uncommitted changes:** 8 modified + 2 untracked — `commands/ollama_config.rs` (new, 513 lines; Ollama config/startup/env helpers extracted from `ollama.rs`), `commands/reply_helpers.rs` (new, 375 lines; reply-routing helpers extracted from `ollama.rs`), `commands/ollama.rs` (shrunk to ~4634 lines), `commands/mod.rs` (+2 pub mod lines), `commands/agent_descriptions.rs`, `commands/compaction.rs`, `commands/ollama_models.rs`, `005-openclaw-reviewer.md`, `006-feature-coder/FEATURE-CODER.md`, `lib.rs`.
+- **Integration:** `cargo check` passes (0 errors). `cargo clippy` passes (0 warnings, 0 errors). `cargo test`: **114 passed, 0 failed**. `diff src/ollama.js src-tauri/dist/ollama.js` empty (in sync). `set_chat_verbosity` (L233), `ollama_chat_with_execution` (L221) in `tauri::generate_handler![]`; `run_due_monitor_checks()` in `lib.rs` (L378, background thread, 30s). New modules (`ollama_config`, `reply_helpers`) properly exported in `commands/mod.rs`.
+- **Smoke:** `cargo build --release` succeeded (v0.1.48, 21s). `./src-tauri/target/release/mac_stats --cpu -vv` started; process confirmed (pid 87902). `debug.log`: verbosity 2, 4 monitors loaded (mix-online, cometa, app-monitor, amvara), status bar setup, Discord token + gateway, Discord bot connected (Werner_Amvara), Scheduler (2 entries), Task review thread, Ollama agent model qwen3:latest (40960 ctx), ModelCatalog 15 models classified, 8 agents loaded (orchestrator, general-purpose-mommy, senior-coder, humble-generalist, discord-expert, scheduler, redmine, abliterated) with shared soul present, Ollama configuration and connection successful, CPU window created. having_fun configured. 0 errors, 0 warnings in log. Manual checks (menu bar click, `--cpu`/`-vv` in chat) left to human.
+
+---
+
 ## Open tasks
 
 Open tasks for this plan are tracked in **006-feature-coder/FEATURE-CODER.md**.

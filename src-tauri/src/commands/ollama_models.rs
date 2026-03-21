@@ -3,7 +3,7 @@
 use crate::ollama::{EmbedInput, EmbedResponse, ListResponse, OllamaClient, PsResponse, VersionResponse};
 use serde::{Deserialize, Serialize};
 
-use super::ollama::get_ollama_client;
+use super::ollama_config::get_ollama_client;
 
 /// List available Ollama models (async, non-blocking)
 #[tauri::command]

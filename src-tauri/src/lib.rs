@@ -195,11 +195,13 @@ fn run_internal(open_cpu_window: bool) {
             commands::plugins::execute_plugin,
             commands::plugins::list_plugins,
             commands::plugins::run_due_plugins,
-            // Ollama commands
-            commands::ollama::configure_ollama,
-            commands::ollama::get_ollama_config,
-            commands::ollama::list_ollama_models_at_endpoint,
-            commands::ollama::check_ollama_connection,
+            // Ollama config commands
+            commands::ollama_config::configure_ollama,
+            commands::ollama_config::get_ollama_config,
+            commands::ollama_config::list_ollama_models_at_endpoint,
+            commands::ollama_config::check_ollama_connection,
+            commands::ollama_config::get_default_ollama_system_prompt,
+            // Ollama chat commands
             commands::ollama::ollama_chat,
             // Ollama model management commands
             commands::ollama_models::list_ollama_models,
@@ -218,7 +220,6 @@ fn run_internal(open_cpu_window: bool) {
             commands::ollama_logging::log_ollama_js_no_blocks,
             commands::ollama::ollama_chat_with_execution,
             commands::ollama::ollama_chat_continue_with_result,
-            commands::ollama::get_default_ollama_system_prompt,
             // Perplexity Search
             commands::perplexity::perplexity_search,
             commands::perplexity::is_perplexity_configured,

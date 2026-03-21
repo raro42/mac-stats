@@ -54,7 +54,7 @@ pub(crate) async fn compact_conversation_history(
         .and_then(|c| c.resolve_role("small").map(|m| m.name.clone()));
 
     let model = small_model.or_else(|| {
-        let guard = super::ollama::get_ollama_client().lock().ok()?;
+        let guard = super::ollama_config::get_ollama_client().lock().ok()?;
         let client = guard.as_ref()?;
         Some(client.config.model.clone())
     });
@@ -240,7 +240,7 @@ pub async fn run_periodic_session_compaction() {
                         let line = line.trim().trim_start_matches("- ").trim();
                         if !line.is_empty() && line.len() > 5 {
                             let entry_line = format!("- {}\n", line);
-                            let _ = super::ollama::append_to_file(&memory_path, &entry_line);
+                            let _ = super::reply_helpers::append_to_file(&memory_path, &entry_line);
                         }
                     }
                     info!(
