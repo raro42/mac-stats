@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Docs: OpenClaw §95–§96 re-verification** — All §7 checks re-run; no discrepancies found (`005-openclaw-reviewer`).
 - **FEATURE-CODER backlog** — Verification + agent session extraction and ollama_config + reply_helpers extraction rows marked done (`006-feature-coder`).
 - **022 testing note** — Closing reviewer smoke tests 2026-03-21 (verification + agent_session extraction; ollama_config + reply_helpers extraction; cargo build, 114 tests pass, debug.log, agents, monitors UP).
+- **Extract chat transport, frontend chat commands, and content reduction from `ollama.rs`** — Moved chat transport (`merge_chat_options`, `deduplicate_consecutive_messages`, `send_ollama_chat_messages`, streaming variant, `ollama_chat` Tauri command + 2 stream structs) into `commands/ollama_chat.rs` (351 lines); frontend chat Tauri commands (`ollama_chat_with_execution`, `ollama_chat_continue_with_result`, `ensure_cpu_window_open` + 3 structs) into `commands/ollama_frontend_chat.rs` (372 lines); content reduction + skill/JS execution (`CHARS_PER_TOKEN`, `truncate_at_boundary`, `reduce_fetched_content_to_fit`, `run_skill_ollama_session`, `run_js_via_node`) into `commands/content_reduction.rs` (190 lines). `ollama.rs` 4634→3744 lines (890 extracted). No behavioral changes; zero clippy warnings, 114 tests pass. (`commands/content_reduction.rs`, `commands/ollama_chat.rs`, `commands/ollama_frontend_chat.rs`, `commands/mod.rs`, `commands/ollama.rs`, `lib.rs`)
+- **Docs: OpenClaw §97 re-verification** — All §7 checks re-run; no discrepancies found (`005-openclaw-reviewer`).
+- **FEATURE-CODER backlog** — Chat transport/frontend chat/content reduction extraction row marked done (`006-feature-coder`).
+- **022 testing note** — Closing reviewer smoke test 2026-03-21 (ollama_chat + content_reduction + ollama_frontend_chat extraction; 114 tests pass, cargo build, debug.log, agents, monitors UP).
 
 ## [0.1.48] - 2026-03-21
 

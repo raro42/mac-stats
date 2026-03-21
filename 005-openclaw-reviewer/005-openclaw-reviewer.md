@@ -69,7 +69,7 @@ Review of all **OpenClaw-related** references in mac-stats: docs, code, and defa
 
 ## 6. Status
 
-- **Review date:** 2026-03-08 (initial); re-verified 2026-03-18 (§55, §56, §57); 2026-03-19 (§58–§75); 2026-03-20 (§76–§93); 2026-03-21 (§94–§96).  
+- **Review date:** 2026-03-08 (initial); re-verified 2026-03-18 (§55, §56, §57); 2026-03-19 (§58–§75); 2026-03-20 (§76–§93); 2026-03-21 (§94–§97).  
 - **Result:** All OpenClaw-related references are consistent and correct. No bugs found; no code changes required.
 
 ---
@@ -1729,4 +1729,24 @@ All §7 checks re-run against current repo (line numbers as of this run):
 | `CHANGELOG.md` | 59 matches | All changelog mentions are log entries of prior re-verifications; no new substantive claims about OpenClaw. |
 
 **Outcome:** Review confirmed. No discrepancies. Minor change from §95: `docs/022_feature_review_plan.md` gained L730 (verification/agent_session extraction review mention); `CHANGELOG.md` OpenClaw matches 58 → 59 (new changelog entry from prior run). All code references and discord/mod.rs line numbers unchanged. No code or doc changes required.
+
+---
+
+## 97. Re-verification (2026-03-21, agent run)
+
+All §7 checks re-run against current repo (line numbers as of this run):
+
+| Check | Location | Result |
+|-------|----------|--------|
+| README attribution | `README.md` L131 | "Inspired by … [OpenClaw](https://github.com/openclaw/openclaw) …" — present. |
+| agents sibling | `AGENTS.md` L442 | "OpenClaw: `../openclaw` … see docs/035" — present. |
+| 035 sibling | `docs/035_memory_and_topic_handling.md` L132 | "OpenClaw = `../openclaw`" (sibling repos line) — present. |
+| docs/031, 025, 032, 034, docs/README, data_files_reference | 031 L41,43,79; 025 L53,135; 032 L40; 034 L59; docs/README L309; data_files_reference L105 | OpenClaw mentions match §2 table. |
+| Other `docs/` | `docs/022_feature_review_plan.md` L691, L698, L704, L710, L716, L722, L730, L738 | Mentions `005-openclaw-reviewer.md` in feature review context — doc-only, no new claims. |
+| `is_agent_failure_notice` | `src-tauri/src/discord/mod.rs` L90–102 | Doc L90–92; fn L93–102; checks `"logs: openclaw"` L100, `"openclaw logs"` L101; used at L1143, 1157, 1164, 1295, 1787. |
+| `session_reset_phrases_path` comment | `src-tauri/src/config/mod.rs` L656 | "like OpenClaw's resetTriggers, but in an MD file" — present. |
+| Default phrases header | `src-tauri/defaults/session_reset_phrases.md` L4 | "Like OpenClaw's session.resetTriggers …" — present. |
+| `CHANGELOG.md` | 59 matches | All changelog mentions are log entries of prior re-verifications; no new substantive claims about OpenClaw. |
+
+**Outcome:** Review confirmed. No discrepancies. Minor change from §96: `docs/022_feature_review_plan.md` gained L738 (ollama_config + reply_helpers extraction review mention). `CHANGELOG.md` OpenClaw matches unchanged at 59. All code references and discord/mod.rs line numbers unchanged. No code or doc changes required.
 
