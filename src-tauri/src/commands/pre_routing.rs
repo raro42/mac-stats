@@ -2,7 +2,9 @@
 //!
 //! Screenshot + URL → BROWSER_SCREENSHOT; "run <command>" → RUN_CMD;
 //! "fetch <URL>" → FETCH_URL; "search <query>" → BRAVE_SEARCH / PERPLEXITY_SEARCH;
-//! ticket → REDMINE_API.
+//! ticket → REDMINE_API; "list schedules" → LIST_SCHEDULES;
+//! "list tasks" → TASK_LIST; "show task <id>" → TASK_SHOW;
+//! "list models" → OLLAMA_API: list_models.
 
 use tracing::info;
 
@@ -35,6 +37,10 @@ pub(crate) fn compute_pre_routed_recommendation(
         let search_rec = try_pre_route_web_search(question);
         if search_rec.is_some() {
             return search_rec;
+        }
+        let mgmt_rec = try_pre_route_management_commands(question);
+        if mgmt_rec.is_some() {
+            return mgmt_rec;
         }
         try_pre_route_redmine(question, request_for_verification, is_verification_retry)
     })
@@ -254,6 +260,194 @@ fn extract_search_query(q_lower: &str, q_original: &str) -> Option<(String, bool
             return None;
         }
     }
+    None
+}
+
+/// Management commands: LIST_SCHEDULES, TASK_LIST, TASK_SHOW, OLLAMA_API list_models.
+///
+/// These are simple, unambiguous commands that don't need LLM planning.
+fn try_pre_route_management_commands(question: &str) -> Option<String> {
+    let q = question.trim();
+    let q_lower = q.to_lowercase();
+
+    // Skip multi-step / compound requests that need LLM planning.
+    if q_lower.contains("and then ")
+        || q_lower.contains("after that ")
+        || q_lower.contains("send to ")
+        || q_lower.contains("post to ")
+    {
+        return None;
+    }
+
+    // Explicit prefixes always win.
+    if q_lower.starts_with("list_schedules") {
+        info!("Agent router: pre-routed to LIST_SCHEDULES (explicit prefix)");
+        return Some("LIST_SCHEDULES:".to_string());
+    }
+    if q_lower.starts_with("task_list") {
+        let arg = if q.len() > "TASK_LIST:".len() {
+            q["TASK_LIST:".len()..].trim()
+        } else {
+            ""
+        };
+        info!("Agent router: pre-routed to TASK_LIST (explicit prefix)");
+        return Some(format!("TASK_LIST: {arg}"));
+    }
+    if let Some(arg) = extract_last_prefixed_argument(q, "TASK_SHOW:") {
+        let arg = arg.trim().to_string();
+        if !arg.is_empty() {
+            info!(
+                "Agent router: pre-routed to TASK_SHOW (explicit prefix): {}",
+                crate::logging::ellipse(&arg, 40)
+            );
+            return Some(format!("TASK_SHOW: {arg}"));
+        }
+    }
+    if let Some(arg) = extract_last_prefixed_argument(q, "OLLAMA_API:") {
+        let arg = arg.trim().to_string();
+        if !arg.is_empty() {
+            info!(
+                "Agent router: pre-routed to OLLAMA_API (explicit prefix): {}",
+                crate::logging::ellipse(&arg, 40)
+            );
+            return Some(format!("OLLAMA_API: {arg}"));
+        }
+    }
+
+    // Keyword-based detection for schedules.
+    if let Some(rec) = try_pre_route_list_schedules(&q_lower) {
+        return Some(rec);
+    }
+
+    // Keyword-based detection for tasks.
+    if let Some(rec) = try_pre_route_task_commands(&q_lower, q) {
+        return Some(rec);
+    }
+
+    // Keyword-based detection for Ollama model management.
+    try_pre_route_ollama_api(&q_lower)
+}
+
+/// "list schedules", "show schedules", "what's scheduled" → LIST_SCHEDULES.
+fn try_pre_route_list_schedules(q_lower: &str) -> Option<String> {
+    let is_list_schedules = q_lower == "list schedules"
+        || q_lower == "show schedules"
+        || q_lower == "show my schedules"
+        || q_lower == "list my schedules"
+        || q_lower.starts_with("what's scheduled")
+        || q_lower.starts_with("what is scheduled")
+        || q_lower.starts_with("what are my schedules")
+        || q_lower == "schedules"
+        || q_lower == "my schedules";
+
+    if is_list_schedules {
+        info!("Agent router: pre-routed to LIST_SCHEDULES (keyword)");
+        return Some("LIST_SCHEDULES:".to_string());
+    }
+    None
+}
+
+/// "list tasks", "show tasks", "show task <id>" → TASK_LIST or TASK_SHOW.
+fn try_pre_route_task_commands(q_lower: &str, q_original: &str) -> Option<String> {
+    // TASK_LIST: "list tasks", "show tasks", "tasks", etc.
+    let is_task_list = q_lower == "list tasks"
+        || q_lower == "show tasks"
+        || q_lower == "list my tasks"
+        || q_lower == "show my tasks"
+        || q_lower == "tasks"
+        || q_lower == "my tasks"
+        || q_lower == "open tasks"
+        || q_lower == "list open tasks"
+        || q_lower == "all tasks"
+        || q_lower == "list all tasks";
+
+    if is_task_list {
+        let arg = if q_lower.contains("all") { "all" } else { "" };
+        info!("Agent router: pre-routed to TASK_LIST (keyword)");
+        return Some(format!("TASK_LIST: {arg}"));
+    }
+
+    // TASK_SHOW: "show task <id>", "task <id>" when <id> is a number or path-like string.
+    let show_prefixes: &[&str] = &["show task ", "show me task ", "task details "];
+    for prefix in show_prefixes {
+        if let Some(rest) = q_lower.strip_prefix(prefix) {
+            let arg = q_original[q_original.len() - rest.len()..].trim();
+            if !arg.is_empty() {
+                info!(
+                    "Agent router: pre-routed to TASK_SHOW (keyword): {}",
+                    crate::logging::ellipse(arg, 40)
+                );
+                return Some(format!("TASK_SHOW: {arg}"));
+            }
+        }
+    }
+
+    None
+}
+
+/// "list models", "what models", "ollama models" → OLLAMA_API: list_models.
+/// "pull model <name>" → OLLAMA_API: pull <name>.
+/// "unload model <name>" → OLLAMA_API: unload <name>.
+fn try_pre_route_ollama_api(q_lower: &str) -> Option<String> {
+    let is_list_models = q_lower == "list models"
+        || q_lower == "list ollama models"
+        || q_lower == "show models"
+        || q_lower == "show ollama models"
+        || q_lower == "ollama models"
+        || q_lower == "what models are available"
+        || q_lower == "what models are installed"
+        || q_lower == "which models are available"
+        || q_lower == "which models are installed"
+        || q_lower == "what models do i have"
+        || q_lower == "installed models"
+        || q_lower == "available models";
+
+    if is_list_models {
+        info!("Agent router: pre-routed to OLLAMA_API: list_models (keyword)");
+        return Some("OLLAMA_API: list_models".to_string());
+    }
+
+    // "pull model <name>" / "pull <name>"
+    let pull_prefixes: &[&str] = &["pull model ", "pull ollama model ", "ollama pull "];
+    for prefix in pull_prefixes {
+        if let Some(rest) = q_lower.strip_prefix(prefix) {
+            let model = rest.trim();
+            if !model.is_empty() {
+                info!(
+                    "Agent router: pre-routed to OLLAMA_API: pull (keyword): {}",
+                    model
+                );
+                return Some(format!("OLLAMA_API: pull {model}"));
+            }
+        }
+    }
+
+    // "unload model <name>" / "unload <name>"
+    let unload_prefixes: &[&str] = &["unload model ", "unload ollama model ", "ollama unload "];
+    for prefix in unload_prefixes {
+        if let Some(rest) = q_lower.strip_prefix(prefix) {
+            let model = rest.trim();
+            if !model.is_empty() {
+                info!(
+                    "Agent router: pre-routed to OLLAMA_API: unload (keyword): {}",
+                    model
+                );
+                return Some(format!("OLLAMA_API: unload {model}"));
+            }
+        }
+    }
+
+    // "running models" / "loaded models"
+    if q_lower == "running models"
+        || q_lower == "loaded models"
+        || q_lower == "what models are running"
+        || q_lower == "which models are running"
+        || q_lower == "which models are loaded"
+    {
+        info!("Agent router: pre-routed to OLLAMA_API: running (keyword)");
+        return Some("OLLAMA_API: running".to_string());
+    }
+
     None
 }
 
@@ -588,5 +782,269 @@ mod tests {
             "search for Rust Async Patterns",
         );
         assert_eq!(r, Some(("Rust Async Patterns".to_string(), false)));
+    }
+
+    // --- LIST_SCHEDULES pre-route tests ---
+
+    #[test]
+    fn list_schedules_exact() {
+        assert_eq!(
+            try_pre_route_list_schedules("list schedules"),
+            Some("LIST_SCHEDULES:".to_string())
+        );
+    }
+
+    #[test]
+    fn list_schedules_show() {
+        assert_eq!(
+            try_pre_route_list_schedules("show schedules"),
+            Some("LIST_SCHEDULES:".to_string())
+        );
+    }
+
+    #[test]
+    fn list_schedules_whats_scheduled() {
+        assert_eq!(
+            try_pre_route_list_schedules("what's scheduled"),
+            Some("LIST_SCHEDULES:".to_string())
+        );
+    }
+
+    #[test]
+    fn list_schedules_what_is_scheduled() {
+        assert_eq!(
+            try_pre_route_list_schedules("what is scheduled"),
+            Some("LIST_SCHEDULES:".to_string())
+        );
+    }
+
+    #[test]
+    fn list_schedules_my_schedules() {
+        assert_eq!(
+            try_pre_route_list_schedules("my schedules"),
+            Some("LIST_SCHEDULES:".to_string())
+        );
+    }
+
+    #[test]
+    fn list_schedules_bare_word() {
+        assert_eq!(
+            try_pre_route_list_schedules("schedules"),
+            Some("LIST_SCHEDULES:".to_string())
+        );
+    }
+
+    #[test]
+    fn list_schedules_no_match() {
+        assert_eq!(
+            try_pre_route_list_schedules("schedule a task for tomorrow"),
+            None
+        );
+    }
+
+    // --- TASK_LIST / TASK_SHOW pre-route tests ---
+
+    #[test]
+    fn task_list_exact() {
+        assert_eq!(
+            try_pre_route_task_commands("list tasks", "list tasks"),
+            Some("TASK_LIST: ".to_string())
+        );
+    }
+
+    #[test]
+    fn task_list_show_tasks() {
+        assert_eq!(
+            try_pre_route_task_commands("show tasks", "show tasks"),
+            Some("TASK_LIST: ".to_string())
+        );
+    }
+
+    #[test]
+    fn task_list_bare_tasks() {
+        assert_eq!(
+            try_pre_route_task_commands("tasks", "tasks"),
+            Some("TASK_LIST: ".to_string())
+        );
+    }
+
+    #[test]
+    fn task_list_all() {
+        assert_eq!(
+            try_pre_route_task_commands("all tasks", "all tasks"),
+            Some("TASK_LIST: all".to_string())
+        );
+    }
+
+    #[test]
+    fn task_list_list_all() {
+        assert_eq!(
+            try_pre_route_task_commands("list all tasks", "list all tasks"),
+            Some("TASK_LIST: all".to_string())
+        );
+    }
+
+    #[test]
+    fn task_list_open_tasks() {
+        assert_eq!(
+            try_pre_route_task_commands("open tasks", "open tasks"),
+            Some("TASK_LIST: ".to_string())
+        );
+    }
+
+    #[test]
+    fn task_show_by_id() {
+        assert_eq!(
+            try_pre_route_task_commands("show task 42", "show task 42"),
+            Some("TASK_SHOW: 42".to_string())
+        );
+    }
+
+    #[test]
+    fn task_show_by_name() {
+        assert_eq!(
+            try_pre_route_task_commands("show task research", "show task research"),
+            Some("TASK_SHOW: research".to_string())
+        );
+    }
+
+    #[test]
+    fn task_show_me_task() {
+        assert_eq!(
+            try_pre_route_task_commands("show me task 7", "show me task 7"),
+            Some("TASK_SHOW: 7".to_string())
+        );
+    }
+
+    #[test]
+    fn task_no_match() {
+        assert_eq!(
+            try_pre_route_task_commands("create a task about testing", "create a task about testing"),
+            None
+        );
+    }
+
+    // --- OLLAMA_API pre-route tests ---
+
+    #[test]
+    fn ollama_list_models() {
+        assert_eq!(
+            try_pre_route_ollama_api("list models"),
+            Some("OLLAMA_API: list_models".to_string())
+        );
+    }
+
+    #[test]
+    fn ollama_show_models() {
+        assert_eq!(
+            try_pre_route_ollama_api("show models"),
+            Some("OLLAMA_API: list_models".to_string())
+        );
+    }
+
+    #[test]
+    fn ollama_models_installed() {
+        assert_eq!(
+            try_pre_route_ollama_api("what models are installed"),
+            Some("OLLAMA_API: list_models".to_string())
+        );
+    }
+
+    #[test]
+    fn ollama_available_models() {
+        assert_eq!(
+            try_pre_route_ollama_api("available models"),
+            Some("OLLAMA_API: list_models".to_string())
+        );
+    }
+
+    #[test]
+    fn ollama_which_models() {
+        assert_eq!(
+            try_pre_route_ollama_api("which models are available"),
+            Some("OLLAMA_API: list_models".to_string())
+        );
+    }
+
+    #[test]
+    fn ollama_pull_model() {
+        assert_eq!(
+            try_pre_route_ollama_api("pull model llama3"),
+            Some("OLLAMA_API: pull llama3".to_string())
+        );
+    }
+
+    #[test]
+    fn ollama_pull_model_with_tag() {
+        assert_eq!(
+            try_pre_route_ollama_api("pull model qwen3:latest"),
+            Some("OLLAMA_API: pull qwen3:latest".to_string())
+        );
+    }
+
+    #[test]
+    fn ollama_unload_model() {
+        assert_eq!(
+            try_pre_route_ollama_api("unload model llama3"),
+            Some("OLLAMA_API: unload llama3".to_string())
+        );
+    }
+
+    #[test]
+    fn ollama_running_models() {
+        assert_eq!(
+            try_pre_route_ollama_api("running models"),
+            Some("OLLAMA_API: running".to_string())
+        );
+    }
+
+    #[test]
+    fn ollama_what_running() {
+        assert_eq!(
+            try_pre_route_ollama_api("what models are running"),
+            Some("OLLAMA_API: running".to_string())
+        );
+    }
+
+    #[test]
+    fn ollama_no_match() {
+        assert_eq!(
+            try_pre_route_ollama_api("tell me about llama3"),
+            None
+        );
+    }
+
+    // --- Management commands compound / skip tests ---
+
+    #[test]
+    fn management_multi_step_skipped() {
+        assert_eq!(
+            try_pre_route_management_commands("list schedules and then remove the first one"),
+            None
+        );
+    }
+
+    #[test]
+    fn management_explicit_list_schedules_prefix() {
+        let r = try_pre_route_management_commands("LIST_SCHEDULES:");
+        assert_eq!(r, Some("LIST_SCHEDULES:".to_string()));
+    }
+
+    #[test]
+    fn management_explicit_task_list_prefix() {
+        let r = try_pre_route_management_commands("TASK_LIST: all");
+        assert_eq!(r, Some("TASK_LIST: all".to_string()));
+    }
+
+    #[test]
+    fn management_explicit_task_show_prefix() {
+        let r = try_pre_route_management_commands("TASK_SHOW: 42");
+        assert_eq!(r, Some("TASK_SHOW: 42".to_string()));
+    }
+
+    #[test]
+    fn management_explicit_ollama_api_prefix() {
+        let r = try_pre_route_management_commands("OLLAMA_API: list_models");
+        assert_eq!(r, Some("OLLAMA_API: list_models".to_string()));
     }
 }

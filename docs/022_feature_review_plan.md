@@ -362,3 +362,12 @@ Open tasks for this plan are tracked in **006-feature-coder/FEATURE-CODER.md**.
 - [x] `cargo build --release` succeeds.
 - [x] `./target/release/mac_stats -vv` starts; 4 monitors loaded, 8 agents loaded, 15 models classified, Ollama connected (qwen3:latest), Discord connected, scheduler running. Zero errors/warnings/panics in log.
 - [x] Code review: `try_pre_route_web_search()` and `extract_search_query()` in `commands/pre_routing.rs`. Detects explicit prefixes (`BRAVE_SEARCH:`, `PERPLEXITY_SEARCH:`) and keyword patterns ("search for", "google", "look up", "web search", "search the web for", "search online for", "research"). Routes to BRAVE_SEARCH (default) or PERPLEXITY_SEARCH ("research" prefers Perplexity). Multi-step exclusions (browser, "and then", "send to"). Gated on API key availability. Fall-through prevention: empty query after keyword match returns `None` instead of matching shorter patterns. Wired into pre-route chain after FETCH_URL, before Redmine. No behavioral changes to existing pre-routes.
+
+### Closing reviewer smoke test 2026-03-21 (management command pre-routing)
+
+- [x] `cargo check` — zero errors.
+- [x] `cargo clippy` — zero warnings.
+- [x] `cargo test` — 210 tests pass (33 new).
+- [x] `cargo build --release` succeeds.
+- [x] `./target/release/mac_stats -vv` starts; 8 agents loaded, 15 models classified, Ollama connected, Discord connected. Zero errors/warnings/panics in log.
+- [x] Code review: `try_pre_route_management_commands()` with sub-functions `try_pre_route_list_schedules()`, `try_pre_route_task_commands()`, `try_pre_route_ollama_api()` in `commands/pre_routing.rs`. Explicit prefixes (LIST_SCHEDULES:, TASK_LIST:, TASK_SHOW:, OLLAMA_API:) always pre-route. Keyword patterns for schedules ("list schedules", "show schedules", "what's scheduled", "schedules"), tasks ("list tasks", "show tasks", "tasks", "open tasks", "all tasks", "show task <id>"), and Ollama API ("list models", "show models", "what models are installed", "available models", "pull model <name>", "unload model <name>", "running models"). Multi-step exclusion ("and then", "after that", "send to", "post to"). Wired into pre-route chain after web search, before Redmine. No behavioral changes to existing pre-routes.
