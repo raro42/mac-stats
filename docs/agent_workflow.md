@@ -59,7 +59,7 @@ Ollama invokes tools by replying with **exactly one line** in the form `TOOL_NAM
 | **REDMINE_API** | `REDMINE_API: GET/POST/PUT <path> [body]` | Redmine issues, time entries, search. | `redmine/`. When configured. |
 | **SKILL** | `SKILL: <number or topic> [task]` | Run skill in separate Ollama session; result injected back. | `skills/`, `commands/ollama.rs`. When skills exist. |
 | **AGENT** | `AGENT: <slug or id> [task]` | Run specialized LLM agent. | `agents/`, `commands/ollama.rs`. When agents exist. |
-| **MCP** | `MCP: <tool_name> <args>` | Run tool from configured MCP server. | `mcp/`. When `MCP_SERVER_URL` set. |
+| **MCP** | `MCP: <tool_name> <args>` | Run tool from configured MCP server. | `mcp/`. When `MCP_SERVER_URL` or `MCP_SERVER_STDIO` set. |
 | **MEMORY_APPEND** | `MEMORY_APPEND: <lesson>` or `MEMORY_APPEND: agent:<id> <lesson>` | Save lesson for future sessions (channel or agent). | `commands/ollama.rs`. |
 | **MASTODON_POST** | `MASTODON_POST: [visibility:] <text>` | Post status to Mastodon. | When Mastodon configured. |
 | **DONE** | `DONE: success` or `DONE: no` | Signal task completed or could not complete; stops tool loop. | Parsed in tool loop. |

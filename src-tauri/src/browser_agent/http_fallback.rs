@@ -7,7 +7,7 @@ use std::sync::Mutex;
 use std::sync::OnceLock;
 
 use scraper::{Html, Selector};
-use tracing::info;
+use crate::mac_stats_info;
 use url::Url;
 
 use crate::commands::browser::fetch_page_content;
@@ -185,7 +185,11 @@ pub fn navigate_http(url: &str) -> Result<String, String> {
     } else {
         url.to_string()
     };
-    info!("Browser agent [HTTP fallback]: BROWSER_NAVIGATE: {}", url);
+    mac_stats_info!(
+        "browser/http_fallback",
+        "Browser agent [HTTP fallback]: BROWSER_NAVIGATE: {}",
+        url
+    );
     let html = fetch_page_content(&url)?;
     let (interactables, body_text) = parse_html(&html, &url);
     let mut state = http_state().lock().map_err(|e| e.to_string())?;
@@ -249,7 +253,11 @@ fn submit_http_form(
         url_with_params.query_pairs_mut().append_pair(k, v);
     }
     let target = url_with_params.to_string();
-    info!("Browser agent [HTTP fallback]: form submit GET {}", target);
+    mac_stats_info!(
+        "browser/http_fallback",
+        "Browser agent [HTTP fallback]: form submit GET {}",
+        target
+    );
     let html = fetch_page_content(&target)?;
     let (interactables, body_text) = parse_html(&html, &target);
     let mut state = http_state().lock().map_err(|e| e.to_string())?;

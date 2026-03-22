@@ -4,7 +4,15 @@
 //! It replaces the hand-rolled logging system with proper structured logging.
 
 use std::path::PathBuf;
-use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+use std::sync::Arc;
+use tracing::Metadata;
+use tracing_subscriber::filter::FilterFn;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::Layer;
+use tracing_subscriber::{fmt, EnvFilter};
+
+pub mod subsystem;
 
 /// If we haven't rotated today (UTC), copy debug.log to debug.log_sic and truncate debug.log.
 /// State is stored in ~/.mac-stats/.debug_log_last_rotated (YYYY-MM-DD). Called once at init.
@@ -85,12 +93,30 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
     // Build subscriber with console and file output
     let registry = tracing_subscriber::registry().with(filter);
 
+    // Console-only subsystem filter: when `MAC_STATS_LOG` is set, stderr shows only matching targets.
+    let parsed_allow = subsystem::parse_subsystem_allowlist_from_env();
+    if let Some(ref names) = parsed_allow {
+        eprintln!(
+            "mac-stats: MAC_STATS_LOG is set — stderr shows only mac_stats:: targets: {}",
+            names.join(", ")
+        );
+    }
+    let subsystem_allow: Option<Arc<Vec<String>>> = parsed_allow.map(Arc::new);
+    let console_subsystem_filter = FilterFn::new({
+        let subsystem_allow = subsystem_allow.clone();
+        move |meta: &Metadata<'_>| match &subsystem_allow {
+            None => true,
+            Some(list) => subsystem::target_matches_allowlist(meta.target(), list.as_slice()),
+        }
+    });
+
     // Add console layer (stderr)
     let console_layer = fmt::layer()
         .with_writer(std::io::stderr)
-        .with_target(false)
+        .with_target(subsystem_allow.is_some())
         .with_thread_ids(false)
-        .with_thread_names(false);
+        .with_thread_names(false)
+        .with_filter(console_subsystem_filter);
 
     // Add file layer if path is provided
     if let Some(log_path) = log_file_path {

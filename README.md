@@ -97,7 +97,7 @@ Binary name `mac_stats`; app shows as **mac-stats**. From repo root unless noted
 - **Discord bot** — Optional. @mentions, DMs, or having_fun mode (your Mac chats with other bots when bored); per-channel model/agent. Full Ollama + tools.
 - **Tasks** — `~/.mac-stats/task/` with **TASK_LIST**, **TASK_CREATE**, **TASK_STATUS**, assignees, scheduler loop.
 - **Scheduler** — Cron or one-shot (`~/.mac-stats/schedules.json`); tasks through Ollama; optional Discord reply channel.
-- **MCP** — Tools from any MCP server (HTTP/SSE or stdio).
+- **MCP** — Tools from any MCP server (HTTP/SSE or stdio). [Ori Mnemos](docs/038_ori_mnemos_mcp.md) vault via `MCP_SERVER_STDIO`.
 - **Agents** — Multiple LLM agents under `~/.mac-stats/agents/` (orchestrator, coder, Discord expert, etc.); **AGENT:** delegates. Local models by role; cloud only when you configure it ([design](docs/030_agent_model_assignment_plan_DONE.md)). Editable prompts in `~/.mac-stats/agents/prompts/` and `soul.md` in `agents/`.
 - **cursor-agent** — When the [Cursor Agent CLI](https://cursor.com) is on PATH, agents can delegate via **CURSOR_AGENT:** or **RUN_CMD: cursor-agent**; see [docs/012_cursor_agent_tasks.md](docs/012_cursor_agent_tasks.md).
 - **PYTHON_SCRIPT** — Ollama can run Python under `~/.mac-stats/scripts/` (disable with `ALLOW_PYTHON_SCRIPT=0`).

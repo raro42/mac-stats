@@ -11,6 +11,7 @@ pub mod monitors;
 pub mod judge;
 pub mod compaction;
 pub mod content_reduction;
+pub mod discord_draft_stream;
 pub mod ollama;
 pub mod ollama_chat;
 pub mod ollama_config;

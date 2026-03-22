@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.53] - 2026-03-22
+
+### Added
+- **Discord draft message while tools run** — Full agent router posts a placeholder (“Processing…”), then throttled in-place edits (e.g. `Running FETCH_URL…`) until the final reply; the first chunk replaces the placeholder, extra chunks use new messages as before. Config `discord_draft_throttle_ms` or env `MAC_STATS_DISCORD_DRAFT_THROTTLE_MS` (default 1500 ms, clamped 200–60_000). If the placeholder send fails, falls back to reply-only mode. (`discord/mod.rs`, `commands/discord_draft_stream.rs`, `commands/tool_loop.rs`, `commands/ollama.rs`, `config/mod.rs`, `docs/007_discord_agent.md`)
+- **`MAC_STATS_LOG` stderr filter** — Comma-separated subsystem allowlist (e.g. `browser,ollama`); console shows only events whose `tracing` target is `mac_stats::<name>` or a child path. File log (`~/.mac-stats/debug.log`) is unchanged. (`logging/subsystem.rs`, `logging/mod.rs`, `docs/039_mac_stats_log_subsystems.md`)
+- **Subsystem `tracing` targets** — Ollama HTTP client, agent-router chat logs, and browser agent (CDP + HTTP fallback) use `mac_stats_*!` macros so they participate in `MAC_STATS_LOG`. (`ollama/mod.rs`, `commands/ollama.rs`, `browser_agent/mod.rs`, `browser_agent/http_fallback.rs`)
+
+### Changed
+- **MCP stdio errors** — Tool failures append short troubleshooting hints (PATH, timeouts, init/tools errors) pointing to `docs/038_ori_mnemos_mcp.md`; “not configured” mentions `MCP_SERVER_STDIO`. (`misc_tool_dispatch.rs`)
+- **Docs** — Ori Mnemos MCP setup (`docs/038_ori_mnemos_mcp.md`); log subsystems reference (`docs/039_mac_stats_log_subsystems.md`); MCP agent doc, agent index/workflow, `README.md`, and `agents.md` cross-links.
+
 ## [0.1.52] - 2026-03-22
 
 ### Added

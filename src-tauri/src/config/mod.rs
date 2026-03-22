@@ -19,7 +19,7 @@
 //! leak secrets.
 //!
 //! **JSON config reload (no restart needed):**
-//! - `config.json` — read on every access (window decorations, scheduler interval, maxSchedules, ollamaChatTimeoutSecs, browserViewportWidth/Height, browserIdleTimeoutSecs, perplexityMaxResults, perplexitySnippetMaxChars).
+//! - `config.json` — read on every access (window decorations, scheduler interval, maxSchedules, ollamaChatTimeoutSecs, browserViewportWidth/Height, browserIdleTimeoutSecs, perplexityMaxResults, perplexitySnippetMaxChars, discord_draft_throttle_ms).
 //! - `schedules.json` — scheduler checks file mtime each loop and reloads when changed.
 //! - `discord_channels.json` — Discord loop checks mtime every tick and reloads when changed.
 
@@ -334,6 +334,33 @@ impl Config {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
                 if let Some(n) = json.get("discord_debounce_ms").and_then(|v| v.as_u64()) {
                     return n.min(MAX_MS);
+                }
+            }
+        }
+        DEFAULT_MS
+    }
+
+    /// Minimum milliseconds between Discord **draft** message edits while the agent router runs tools.
+    /// Default 1500. Config: `discord_draft_throttle_ms`; override: env `MAC_STATS_DISCORD_DRAFT_THROTTLE_MS`.
+    /// Clamped to 200..=60_000.
+    pub fn discord_draft_throttle_ms() -> u64 {
+        const DEFAULT_MS: u64 = 1500;
+        const MIN_MS: u64 = 200;
+        const MAX_MS: u64 = 60_000;
+        let from_env = std::env::var("MAC_STATS_DISCORD_DRAFT_THROTTLE_MS")
+            .ok()
+            .and_then(|s| s.parse::<u64>().ok());
+        if let Some(ms) = from_env {
+            return ms.clamp(MIN_MS, MAX_MS);
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(n) = json
+                    .get("discord_draft_throttle_ms")
+                    .and_then(|v| v.as_u64())
+                {
+                    return n.clamp(MIN_MS, MAX_MS);
                 }
             }
         }

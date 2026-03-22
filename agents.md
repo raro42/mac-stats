@@ -10,7 +10,7 @@ Build a polished macOS (Apple Silicon) stats app (Rust + Tauri) that reads CPU/p
 
 ## Project overview (at a glance)
 
-**mac-stats** is a lightweight system monitor for macOS (Rust + Tauri). It shows real-time CPU, GPU, RAM, and disk usage in the menu bar with low overhead (on the order of ~0.5% idle, under 1% with the CPU window open). It includes real-time metrics, temperature (SMC), CPU frequency (IOReport), a process list, themes, idle optimizations, and Ollama chat with code execution, **FETCH_URL** (server-side fetch, no CORS), and **BROWSER_SCREENSHOT** (CDP: PNG under `~/.mac-stats/screenshots/`, attachable in Discord when requested).
+**mac-stats** is a lightweight system monitor for macOS (Rust + Tauri). It shows real-time CPU, GPU, RAM, and disk usage in the menu bar with low overhead (on the order of ~0.5% idle, under 1% with the CPU window open). It includes real-time metrics, temperature (SMC), CPU frequency (IOReport), a process list, themes, idle optimizations, and Ollama chat with code execution, **FETCH_URL** (server-side fetch, no CORS), and **BROWSER_SCREENSHOT** (CDP: PNG under `~/.mac-stats/screenshots/`, attachable in Discord when requested). MCP setup: [docs/010_mcp_agent.md](docs/010_mcp_agent.md); **Ori Mnemos** memory vault: [docs/038_ori_mnemos_mcp.md](docs/038_ori_mnemos_mcp.md).
 
 ## Build and run
 

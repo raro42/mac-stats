@@ -116,6 +116,10 @@ Ollama will reply with something like `MCP: airbnb_search {"location":"Paris, Fr
 
 When adding a new server, ensure it supports the transport you use (HTTP/SSE for internet, stdio for local).
 
+### Ori Mnemos (local markdown vault + MCP)
+
+[Ori Mnemos](https://github.com/aayoawoyemi/Ori-Mnemos) exposes many memory tools over **stdio** MCP. mac-stats uses the same **`MCP_SERVER_STDIO`** mechanism as the Airbnb example above. Full operator runbook (single-server caveat, stdio spawn behaviour, memory doctrine vs `memory.md`, JSON args, troubleshooting, benchmark template): **[038_ori_mnemos_mcp.md](038_ori_mnemos_mcp.md)**.
+
 ## Error handling
 
 When the MCP server is unreachable or a call fails, the app behaves as follows:
@@ -123,7 +127,7 @@ When the MCP server is unreachable or a call fails, the app behaves as follows:
 | Situation | What happens | What the user / model sees |
 |------------|--------------|-----------------------------|
 | **tools/list fails** (e.g. server down, timeout, bad URL) | MCP is omitted from the agent list for that request. A log line is written: `MCP list_tools failed (...), omitting MCP from agent list`. | Ollama does not see MCP in the tool list; it will not try to use MCP. No user-facing error unless they check logs. |
-| **MCP not configured** (no `MCP_SERVER_URL` / `MCP_SERVER_STDIO`) | MCP is not offered. If the model outputs `MCP: ...`, the tool loop returns a fixed message. | "MCP is not configured (set MCP_SERVER_URL in env or .config.env). Answer without using MCP." |
+| **MCP not configured** (no `MCP_SERVER_URL` / `MCP_SERVER_STDIO`) | MCP is not offered. If the model outputs `MCP: ...`, the tool loop returns a fixed message. | "MCP is not configured (set MCP_SERVER_URL or MCP_SERVER_STDIO in env or ~/.mac-stats/.config.env). Answer without using MCP." |
 | **tools/call fails** (timeout, server error, tool returned error) | The error string is pushed into the conversation and the tool loop continues. | "MCP tool \"&lt;name&gt;\" failed: &lt;error&gt;. Answer the user without this result." The model can still reply using other context. |
 | **Transient failures** (connection refused, timeout, network) | The client retries **once** for `list_tools` and `tools/call`; if the retry fails, the above behaviour applies. | Same as above after the retry fails. |
 

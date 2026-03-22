@@ -35,7 +35,7 @@ Gatekeeper may show "damaged" or block the unsigned app—the file is fine. Righ
 | **TASK** | Create/update task files under ~/.mac-stats/task/ (append feedback, set status open/wip/finished). | `task/mod.rs` (helpers), `commands/ollama.rs` (tool loop). |
 | **PYTHON_SCRIPT** | Write script to ~/.mac-stats/scripts/python-script-<id>-<topic>.py, run with python3, return stdout or error. | `commands/python_agent.rs` → `run_python_script()`. Disabled when `ALLOW_PYTHON_SCRIPT=0`. |
 | **OLLAMA_API** | List models (full), get version, list running models, pull/delete/load/unload models, generate embeddings. Actions: list_models, version, running, pull, delete, embed, load, unload. | `commands/ollama.rs` (tool loop). |
-| **MCP** | Run a tool from the configured MCP server (any server on the internet via HTTP/SSE). | `mcp/` or `commands/mcp.rs` → list tools, `call_tool()`. Requires `MCP_SERVER_URL` (env or `.config.env`). |
+| **MCP** | Run a tool from the configured MCP server (HTTP/SSE or stdio subprocess). | `mcp/` → list tools, `call_tool()`. Requires `MCP_SERVER_URL` or `MCP_SERVER_STDIO` (env or `.config.env`). See [010_mcp_agent.md](010_mcp_agent.md), [038_ori_mnemos_mcp.md](038_ori_mnemos_mcp.md) for Ori. |
 | **AGENT** | Run a specialized LLM agent (its own model and prompt: soul + mood + skill). | `agents/mod.rs` → `load_agents()`, `find_agent_by_id_or_name()`; `commands/ollama.rs` → `run_agent_ollama_session()`. Only listed when `~/.mac-stats/agents/` has at least one enabled `agent-<id>/`. |
 
 ### Notes on FETCH_URL and RUN_CMD

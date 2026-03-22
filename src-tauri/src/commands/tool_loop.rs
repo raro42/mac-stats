@@ -8,6 +8,7 @@ use std::path::PathBuf;
 use tokio::sync::mpsc::UnboundedSender;
 use tracing::info;
 
+use crate::commands::discord_draft_stream::DiscordDraftHandle;
 use crate::commands::loop_guard::ToolLoopGuard;
 use crate::commands::ollama_chat::send_ollama_chat_messages;
 use crate::commands::redmine_helpers::{
@@ -29,6 +30,7 @@ pub(crate) struct ToolLoopParams {
     pub model_override: Option<String>,
     pub options_override: Option<ChatOptions>,
     pub status_tx: Option<UnboundedSender<String>>,
+    pub discord_draft: Option<DiscordDraftHandle>,
     pub discord_reply_channel_id: Option<u64>,
     pub allow_schedule: bool,
     pub load_global_memory: bool,
@@ -186,6 +188,10 @@ pub(crate) async fn run_tool_loop(
                     "Agent router: running tool {}/{} — {} (arg: {})",
                     state.tool_count, params.max_tool_iterations, tool, arg_preview
                 );
+            }
+
+            if let Some(ref draft) = params.discord_draft {
+                draft.update(format!("Running {}…", tool));
             }
 
             // General loop guard: detect repeated tool calls and cycles across all tools.

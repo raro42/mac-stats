@@ -18,6 +18,27 @@ fn send_status(tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>, msg: &st
     }
 }
 
+/// Short, non-leaky hints when stdio MCP fails (e.g. missing `ori`, timeouts).
+fn mcp_stdio_troubleshooting_hint(server_url: &str, err: &str) -> &'static str {
+    if !server_url.starts_with("stdio:") {
+        return "";
+    }
+    let lower = err.to_lowercase();
+    if lower.contains("mcp stdio spawn") || lower.contains("no such file") {
+        return " Hint: ensure the MCP command is on PATH when mac-stats starts, or use an absolute path in MCP_SERVER_STDIO. For Ori, run `ori health` in Terminal. See docs/038_ori_mnemos_mcp.md.";
+    }
+    if lower.contains("timeout") {
+        return " Hint: stdio MCP starts a new process per call; slow servers or large vaults may time out. See docs/038_ori_mnemos_mcp.md.";
+    }
+    if lower.contains("initialize error")
+        || lower.contains("tools/list error")
+        || lower.contains("tools/call error")
+    {
+        return " Hint: check MCP_SERVER_STDIO and vault path; see docs/038_ori_mnemos_mcp.md troubleshooting.";
+    }
+    ""
+}
+
 pub(crate) async fn handle_ollama_api(
     arg: &str,
     status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
@@ -171,16 +192,17 @@ pub(crate) async fn handle_mcp(
                         "Agent router: MCP tool {} failed: {}",
                         mcp_tool_name, e
                     );
+                    let hint = mcp_stdio_troubleshooting_hint(&server_url, &e);
                     format!(
-                        "MCP tool \"{}\" failed: {}. Answer the user without this result.",
-                        mcp_tool_name, e
+                        "MCP tool \"{}\" failed: {}. Answer the user without this result.{}",
+                        mcp_tool_name, e, hint
                     )
                 }
             }
         }
         None => {
-            info!("Agent router: MCP not configured (no MCP_SERVER_URL)");
-            "MCP is not configured (set MCP_SERVER_URL in env or .config.env). Answer without using MCP.".to_string()
+            info!("Agent router: MCP not configured (no MCP_SERVER_URL or MCP_SERVER_STDIO)");
+            "MCP is not configured (set MCP_SERVER_URL for HTTP/SSE or MCP_SERVER_STDIO for a local server in env or ~/.mac-stats/.config.env). Answer without using MCP.".to_string()
         }
     }
 }

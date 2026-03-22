@@ -43,6 +43,7 @@ use crate::commands::browser_helpers::wants_visible_browser;
 use crate::commands::prompt_assembly::build_execution_system_content;
 use crate::commands::session_history::{prepare_conversation_history, CONVERSATION_HISTORY_CAP};
 use crate::commands::verification::build_verification_retry_hint;
+use crate::{mac_stats_debug, mac_stats_info};
 
 /// All parameters for an `answer_with_ollama_and_fetch` invocation.
 ///
@@ -89,6 +90,8 @@ pub struct OllamaRequest {
     pub request_id_override: Option<String>,
     /// 0 = first run; 1 = verification retry.
     pub retry_count: u32,
+    /// When set (Discord agent path), tool loop updates this message with throttled edits until flush.
+    pub discord_draft: Option<crate::commands::discord_draft_stream::DiscordDraftHandle>,
 }
 
 /// Main orchestrator: plan → execute tools → verify → optionally retry.
@@ -119,15 +122,15 @@ pub fn answer_with_ollama_and_fetch(
         discord_is_dm,
         request_id_override,
         retry_count,
+        discord_draft,
     } = req;
     let load_global_memory = discord_is_dm.is_none_or(|dm| dm);
     if discord_is_dm == Some(false) {
-        tracing::info!(
+        mac_stats_info!("ollama/chat", 
             "Agent router: Discord guild channel — not loading global memory (main-session only)"
         );
     }
     Box::pin(async move {
-        use tracing::info;
         let question = question.as_str();
         let request_for_verification = original_user_request.clone().unwrap_or_else(|| {
             original_request_for_retry(
@@ -157,20 +160,20 @@ pub fn answer_with_ollama_and_fetch(
         };
 
         if run_ctx.retry_count > 0 {
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router [{}]: session start (verification retry {}, request-local criteria only) — {}",
                 run_ctx.request_id,
                 run_ctx.retry_count,
                 crate::config::Config::version_display()
             );
         } else {
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router [{}]: session start — {}",
                 run_ctx.request_id,
                 crate::config::Config::version_display()
             );
         }
-        tracing::debug!(
+        mac_stats_debug!("ollama/chat", 
             request_id = %run_ctx.request_id,
             retry_count = run_ctx.retry_count,
             channel_id = ?run_ctx.discord_channel_id,
@@ -190,7 +193,7 @@ pub fn answer_with_ollama_and_fetch(
                     .as_ref()
                     .is_some_and(|h| !h.is_empty())
                 {
-                    info!(
+                    mac_stats_info!("ollama/chat", 
                         "Agent router: clearing history for Discord screenshot-send request (focus on current task)"
                     );
                     conversation_history = Some(vec![]);
@@ -213,7 +216,7 @@ pub fn answer_with_ollama_and_fetch(
             };
         if escalation {
             max_tool_iterations = max_tool_iterations.saturating_add(10);
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router: escalation mode — max_tool_iterations raised to {}",
                 max_tool_iterations
             );
@@ -285,14 +288,14 @@ pub fn answer_with_ollama_and_fetch(
 
         let q_preview: String = question.chars().take(120).collect();
         if question.len() > 120 {
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router [{}]: starting (question: {}... [{} chars])",
                 request_id,
                 q_preview,
                 question.len()
             );
         } else {
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router [{}]: starting (question: {})",
                 request_id, q_preview
             );
@@ -315,7 +318,7 @@ pub fn answer_with_ollama_and_fetch(
         // Criteria at start: extract 1–3 success criteria to feed into end verification
         send_status("Extracting success criteria…");
         let success_criteria = if let Some(criteria) = success_criteria_override.clone() {
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router [{}]: reusing {} request-local success criteria",
                 request_id,
                 criteria.len()
@@ -325,14 +328,14 @@ pub fn answer_with_ollama_and_fetch(
                 criteria,
             ))
         } else if is_redmine_review_or_summarize_only(&request_for_verification) {
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router: review/summarize-only Redmine request — overriding success criteria to summary-only"
             );
             Some(vec![
                 "Summary of ticket content provided to the user.".to_string()
             ])
         } else if is_redmine_time_entries_request(&request_for_verification) {
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router: Redmine time-entries request — overriding success criteria to Redmine data-only"
             );
             Some(vec![
@@ -341,7 +344,7 @@ pub fn answer_with_ollama_and_fetch(
                     .to_string(),
             ])
         } else if is_news_query(&request_for_verification) {
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router: news/current-events request — using news success criteria"
             );
             Some(vec![
@@ -360,7 +363,7 @@ pub fn answer_with_ollama_and_fetch(
         };
         let criteria_status = match &success_criteria {
             Some(c) if !c.is_empty() => {
-                info!(
+                mac_stats_info!("ollama/chat", 
                     "Agent router [{}]: extracted {} success criteria",
                     request_id,
                     c.len()
@@ -368,7 +371,7 @@ pub fn answer_with_ollama_and_fetch(
                 truncate_status(&c.join("; "), 200)
             }
             _ => {
-                tracing::debug!(
+                mac_stats_debug!("ollama/chat", 
                     "Agent router: no success criteria extracted (verification will use request summary only)"
                 );
                 "(none)".to_string()
@@ -384,7 +387,7 @@ pub fn answer_with_ollama_and_fetch(
         // Skip when using a cloud model to minimize cost (only when cloud do we care about extra calls).
         // Skip on verification retry so the model keeps context (original request, cookie consent, etc.).
         if is_verification_retry || crate::ollama::models::is_cloud_model(&effective_model) {
-            tracing::debug!(
+            mac_stats_debug!("ollama/chat", 
                 request_id = %request_id,
                 verification_retry = is_verification_retry,
                 "skipping new-topic check (retry or cloud model)"
@@ -396,20 +399,20 @@ pub fn answer_with_ollama_and_fetch(
                 let summary = summarize_last_turns(hist, 3);
                 match detect_new_topic(question, &summary, &effective_model).await {
                     Ok(true) => {
-                        info!(
+                        mac_stats_info!("ollama/chat", 
                             "Agent router [{}]: NEW_TOPIC — using no prior context; any verification retry will use only request-local criteria",
                             request_id
                         );
                         is_new_topic = true;
                     }
                     Ok(false) => {
-                        info!(
+                        mac_stats_info!("ollama/chat", 
                             "Agent router [{}]: SAME_TOPIC — keeping prior context",
                             request_id
                         );
                     }
                     Err(e) => {
-                        tracing::debug!(
+                        mac_stats_debug!("ollama/chat", 
                             request_id = %request_id,
                             "new-topic check failed (keeping history): {}",
                             e
@@ -427,9 +430,9 @@ pub fn answer_with_ollama_and_fetch(
             .rev()
             .collect();
         if raw_history.is_empty() {
-            info!("Agent router [{}]: no prior session", request_id);
+            mac_stats_info!("ollama/chat", "Agent router [{}]: no prior session", request_id);
         } else {
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router [{}]: prior session {} messages (capped at {})",
                 request_id,
                 raw_history.len(),
@@ -447,7 +450,7 @@ pub fn answer_with_ollama_and_fetch(
         )
         .await;
         if !conversation_history.is_empty() {
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router: using {} prior messages as context",
                 conversation_history.len()
             );
@@ -455,7 +458,7 @@ pub fn answer_with_ollama_and_fetch(
 
         let from_discord = discord_reply_channel_id.is_some();
         let discord_platform_formatting: String = if from_discord {
-            info!("Agent router: Discord reply — injecting platform formatting (no tables, wrap links in <>)");
+            mac_stats_info!("ollama/chat", "Agent router: Discord reply — injecting platform formatting (no tables, wrap links in <>)");
             if discord_is_dm == Some(false) {
                 format!(
                     "{}{}",
@@ -469,7 +472,7 @@ pub fn answer_with_ollama_and_fetch(
             String::new()
         };
         let agent_descriptions = build_agent_descriptions(from_discord, Some(question)).await;
-        info!(
+        mac_stats_info!("ollama/chat", 
             "Agent router: agent list built ({} chars)",
             agent_descriptions.len()
         );
@@ -535,10 +538,10 @@ pub fn answer_with_ollama_and_fetch(
 
         // --- Planning step: ask Ollama how it would solve the question (skip if pre-routed) ---
         let mut recommendation = if let Some(pre_routed) = pre_routed_recommendation {
-            info!("Agent router: skipping LLM planning (pre-routed)");
+            mac_stats_info!("ollama/chat", "Agent router: skipping LLM planning (pre-routed)");
             pre_routed
         } else {
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router [{}]: planning step — asking Ollama for RECOMMEND",
                 request_id
             );
@@ -564,7 +567,7 @@ pub fn answer_with_ollama_and_fetch(
             let planning_cap = crate::config::Config::planning_history_cap();
             let planning_history: &[crate::ollama::ChatMessage] =
                 if planning_cap > 0 && conversation_history.len() > planning_cap {
-                    info!(
+                    mac_stats_info!("ollama/chat", 
                         "Agent router [{}]: capping planning history from {} to {} messages",
                         request_id,
                         conversation_history.len(),
@@ -572,7 +575,7 @@ pub fn answer_with_ollama_and_fetch(
                     );
                     &conversation_history[conversation_history.len() - planning_cap..]
                 } else if planning_cap == 0 && !conversation_history.is_empty() {
-                    info!(
+                    mac_stats_info!("ollama/chat", 
                         "Agent router [{}]: planning history disabled (cap=0), skipping {} messages",
                         request_id,
                         conversation_history.len()
@@ -586,7 +589,7 @@ pub fn answer_with_ollama_and_fetch(
             }
             let model_hint = model_override.as_ref().map(|m| format!("\n\nFor this request the user selected Ollama model: {}. The app will use that model for the reply; recommend answering the question (or using an agent) with that in mind.", m)).unwrap_or_default();
             let today_utc = chrono::Utc::now().format("%Y-%m-%d");
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router [{}]: planning RECOMMEND with current date (UTC) {}",
                 request_id, today_utc
             );
@@ -621,14 +624,14 @@ pub fn answer_with_ollama_and_fetch(
         if is_bare_done_plan(&recommendation) {
             let q = question.to_lowercase();
             if q.contains("could not be attached") || q.contains("could not attach") {
-                info!(
+                mac_stats_info!("ollama/chat", 
                     "Agent router [{}]: planner returned bare DONE plan but question indicates attachment failure; using synthetic summary instruction",
                     request_id
                 );
                 recommendation = "Reply with a brief summary of what was done and that the app could not attach the file(s) to Discord, then end with **DONE: no**. Do not run further tools.".to_string();
             }
         }
-        info!(
+        mac_stats_info!("ollama/chat", 
             "Agent router [{}]: understood plan — {}",
             request_id,
             recommendation.chars().take(200).collect::<String>()
@@ -644,7 +647,7 @@ pub fn answer_with_ollama_and_fetch(
         let rec_upper = recommendation.to_uppercase();
         let needs_fresh_session = fresh_session_tools.iter().any(|t| rec_upper.contains(t));
         let conversation_history = if needs_fresh_session && !conversation_history.is_empty() {
-            info!("Agent router: clearing conversation history for fresh-session tool");
+            mac_stats_info!("ollama/chat", "Agent router: clearing conversation history for fresh-session tool");
             Vec::new()
         } else {
             conversation_history
@@ -715,13 +718,13 @@ pub fn answer_with_ollama_and_fetch(
         let (mut messages, response_content) = if let Some((ref tool, ref arg)) = direct_tool {
             let all_tools = parse_all_tools_from_response(&normalized_recommendation);
             if all_tools.len() > 1 {
-                info!(
+                mac_stats_info!("ollama/chat", 
                     "Agent router: plan contains {} direct tools, will run in sequence: {} — skipping execution Ollama call",
                     all_tools.len(),
                     all_tools.iter().map(|(t, _)| t.as_str()).collect::<Vec<_>>().join(", ")
                 );
             } else {
-                info!(
+                mac_stats_info!("ollama/chat", 
                     "Agent router: plan contains direct tool call {}:{} — skipping execution Ollama call",
                     tool,
                     crate::logging::ellipse(arg, 60)
@@ -763,7 +766,7 @@ pub fn answer_with_ollama_and_fetch(
             };
             (msgs, synthetic)
         } else {
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router: execution step — sending plan + question, starting tool loop (max {} tools)",
                 max_tool_iterations
             );
@@ -808,7 +811,7 @@ pub fn answer_with_ollama_and_fetch(
                             &mut msgs, max_chars,
                         );
                     if n > 0 {
-                        info!(
+                        mac_stats_info!("ollama/chat", 
                             "Agent router: context overflow on first execution call — truncated {} tool result(s) to {} chars, retrying",
                             n, max_chars
                         );
@@ -834,7 +837,7 @@ pub fn answer_with_ollama_and_fetch(
             };
             let content = response.message.content.clone();
             let n = content.chars().count();
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router: first response received ({} chars): {}",
                 n,
                 log_content(&content)
@@ -848,7 +851,7 @@ pub fn answer_with_ollama_and_fetch(
                     } else {
                         format!("{}: {}", tool, arg)
                     };
-                    info!(
+                    mac_stats_info!("ollama/chat", 
                         "Agent router: empty response — falling back to tool from recommendation: {}",
                         crate::logging::ellipse(&synthetic, 80)
                     );
@@ -876,6 +879,7 @@ pub fn answer_with_ollama_and_fetch(
             model_override: model_override.clone(),
             options_override: options_override.clone(),
             status_tx: status_tx.clone(),
+            discord_draft: discord_draft.clone(),
             discord_reply_channel_id,
             allow_schedule,
             load_global_memory,
@@ -912,7 +916,7 @@ pub fn answer_with_ollama_and_fetch(
         }
 
         let final_len = response_content.chars().count();
-        info!(
+        mac_stats_info!("ollama/chat", 
             "Agent router: done after {} tool(s), returning final response ({} chars): {}",
             tool_count,
             final_len,
@@ -948,18 +952,18 @@ pub fn answer_with_ollama_and_fetch(
                 if let Err(e) =
                     crate::task::append_conversation_block(path, question, &response_content)
                 {
-                    info!(
+                    mac_stats_info!("ollama/chat", 
                         "Agent router: could not append conversation to task file: {}",
                         e
                     );
                 } else {
-                    info!(
+                    mac_stats_info!("ollama/chat", 
                         "Agent router: appended conversation to task {}",
                         crate::task::task_file_name(path)
                     );
                 }
             } else {
-                info!(
+                mac_stats_info!("ollama/chat", 
                     "Agent router: skipped appending conversation (task runner turn) for {}",
                     crate::task::task_file_name(path)
                 );
@@ -973,7 +977,7 @@ pub fn answer_with_ollama_and_fetch(
         {
             response_content
                 .push_str("\n\nNote: A screenshot was requested but none was attached.");
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router: heuristic guard — screenshot requested but no attachment, appended note"
             );
         }
@@ -984,14 +988,14 @@ pub fn answer_with_ollama_and_fetch(
                 "\n\nNote: Browser action limit ({} per run) was reached; some actions were skipped.",
                 MAX_BROWSER_TOOLS_PER_RUN
             ));
-            info!(
+            mac_stats_info!("ollama/chat", 
                 "Agent router: browser tool cap was reached, appended user-facing note"
             );
         }
 
         // Completion verification: one short Ollama call; if not satisfied, retry once (A2) or append disclaimer
         let criteria_count = success_criteria.as_ref().map(|c| c.len()).unwrap_or(0);
-        info!(
+        mac_stats_info!("ollama/chat", 
             "Agent router [{}]: running completion verification ({} criteria, {} attachment(s))",
             request_id,
             criteria_count,
@@ -1041,7 +1045,7 @@ pub fn answer_with_ollama_and_fetch(
                     } else {
                         retry_base_with_hint
                     };
-                    info!(
+                    mac_stats_info!("ollama/chat", 
                         "Agent router [{}]: verification said not satisfied, retrying once with: {}...",
                         request_id,
                         retry_question.chars().take(60).collect::<String>()
@@ -1075,6 +1079,7 @@ pub fn answer_with_ollama_and_fetch(
                         escalation,
                         retry_on_verification_no: false,
                         from_remote,
+                        attachment_images_base64,
                         discord_intermediate: pass_intermediate,
                         is_verification_retry: true,
                         original_user_request: Some(request_for_verification.clone()),
@@ -1082,6 +1087,7 @@ pub fn answer_with_ollama_and_fetch(
                         discord_is_dm,
                         request_id_override: Some(request_id.clone()),
                         retry_count: 1,
+                        discord_draft,
                         ..Default::default()
                     })
                     .await;
@@ -1094,7 +1100,7 @@ pub fn answer_with_ollama_and_fetch(
                 let try_cursor_agent_handoff =
                     crate::commands::cursor_agent::is_cursor_agent_available();
                 if try_cursor_agent_handoff {
-                    info!(
+                    mac_stats_info!("ollama/chat", 
                         "Agent router: verification not satisfied, handing off to Cursor Agent (general fallback)"
                     );
                     let request_clone = request_for_verification.clone();
@@ -1106,7 +1112,7 @@ pub fn answer_with_ollama_and_fetch(
                     .and_then(|r| r)
                     {
                         Ok(cursor_result) => {
-                            info!(
+                            mac_stats_info!("ollama/chat", 
                                 "Agent router: cursor-agent handoff completed ({} chars)",
                                 cursor_result.len()
                             );
@@ -1117,7 +1123,7 @@ pub fn answer_with_ollama_and_fetch(
                             response_content.push_str(cursor_result.trim());
                         }
                         Err(e) => {
-                            info!("Agent router: cursor-agent handoff failed: {}", e);
+                            mac_stats_info!("ollama/chat", "Agent router: cursor-agent handoff failed: {}", e);
                             let disclaimer = reason
                                 .map(|r| {
                                     format!(
@@ -1146,21 +1152,21 @@ pub fn answer_with_ollama_and_fetch(
                 }
                 // Do not append "From past sessions" memory dump to the user-visible reply — it creates a messy mix and confuses Discord users.
                 if let Some(ref from_memory) = memory_snippet {
-                    info!(
+                    mac_stats_info!("ollama/chat", 
                         "Agent router: memory search found {} chars (not appended to reply)",
                         from_memory.len()
                     );
                 }
-                info!(
+                mac_stats_info!("ollama/chat", 
                     "Agent router: verification said not satisfied, appended disclaimer (reason: {}...)",
                     reason_preview
                 );
             }
             Ok((true, _)) => {
-                info!("Agent router: verification passed (satisfied)");
+                mac_stats_info!("ollama/chat", "Agent router: verification passed (satisfied)");
             }
             Err(e) => {
-                tracing::debug!("Agent router: verification failed (ignored): {}", e);
+                mac_stats_debug!("ollama/chat", "Agent router: verification failed (ignored): {}", e);
             }
         }
 

@@ -1930,6 +1930,27 @@ pub(super) async fn run_discord_ollama_router(
     const EDIT_PREFIX: &str = "EDIT:";
     const ATTACH_PREFIX: &str = "ATTACH:";
     const CRITERIA_PROGRESS: &str = "Extracting success criteria…";
+    // Placeholder message edited in-place while tools run (throttled); flushed with the final reply.
+    let throttle_ms = crate::config::Config::discord_draft_throttle_ms();
+    let discord_draft = match new_message
+        .channel_id
+        .say(&ctx, "Processing…")
+        .await
+    {
+        Ok(placeholder) => Some(crate::commands::discord_draft_stream::spawn_discord_draft_editor(
+            ctx.clone(),
+            placeholder,
+            std::time::Duration::from_millis(throttle_ms),
+        )),
+        Err(e) => {
+            debug!(
+                "Discord: draft placeholder send failed (using reply-only mode): {}",
+                e
+            );
+            None
+        }
+    };
+
     let status_task = tokio::spawn(async move {
         let mut last_criteria_message: Option<Message> = None;
         while let Some(msg) = status_rx.recv().await {
@@ -2029,6 +2050,7 @@ pub(super) async fn run_discord_ollama_router(
                 from_remote: true,
                 attachment_images_base64: attachment_images_for_ollama,
                 discord_is_dm: Some(is_dm),
+                discord_draft: discord_draft.clone(),
                 ..Default::default()
             },
         )
@@ -2095,11 +2117,28 @@ pub(super) async fn run_discord_ollama_router(
     }
 
     let chunks = split_message_for_discord(&reply);
-    for (i, chunk) in chunks.iter().enumerate() {
+    if let Some(draft) = discord_draft.as_ref() {
+        if !chunks.is_empty() {
+            draft.flush(&chunks[0]).await;
+        }
+    }
+
+    let send_chunks: &[_] = if discord_draft.is_some() {
+        &chunks[1..]
+    } else {
+        &chunks[..]
+    };
+
+    for (si, chunk) in send_chunks.iter().enumerate() {
+        let part_no = if discord_draft.is_some() {
+            si + 2
+        } else {
+            si + 1
+        };
         if verbosity >= 3 {
             debug!(
                 "Discord outbound (decoded) reply part {}/{}: {}",
-                i + 1,
+                part_no,
                 chunks.len(),
                 chunk
             );
@@ -2110,7 +2149,7 @@ pub(super) async fn run_discord_ollama_router(
                 let err_str = e.to_string();
                 error!(
                     "Discord: Failed to send reply (part {}/{}): {}",
-                    i + 1,
+                    part_no,
                     chunks.len(),
                     err_str
                 );
@@ -2141,7 +2180,7 @@ pub(super) async fn run_discord_ollama_router(
             }
             break;
         }
-        if chunks.len() > 1 && i < chunks.len() - 1 {
+        if send_chunks.len() > 1 && si < send_chunks.len() - 1 {
             tokio::time::sleep(tokio::time::Duration::from_millis(300)).await;
         }
     }
