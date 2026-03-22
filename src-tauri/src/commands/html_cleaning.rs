@@ -204,6 +204,12 @@ fn collapse_whitespace(text: &str) -> String {
                 // Unicode-sample HTML can glue Latin tokens. U+055A (ARMENIAN APOSTROPHE) and U+055B
                 // (EMPHASIS MARK, Po) are omitted—apostrophe- or stress-like marks can sit word-internally
                 // in Armenian (same spirit as omitting U+2019 for Latin contractions).
+                // Devanagari danda / double danda (U+0964, U+0965, Po) are not Rust whitespace; mixed
+                // Latin–Devanagari or Unicode-sample HTML can place them between Latin tokens without ASCII space.
+                // Thai PAIYANNOI / FONGMAN / ANGKHANKHU / KHOMUT (U+0E2F, U+0E4F, U+0E5A, U+0E5B, Po), Lao
+                // ELLIPSIS (U+0EAF, Po), and Myanmar LITTLE SECTION / SECTION (U+104A–U+104B, Po) are not Rust
+                // whitespace; Southeast Asian–Latin bilingual or Unicode-sample HTML can glue Latin tokens without
+                // ASCII space. Thai MAIYAMOK (U+0E46, Lm) stays unmapped—modifier-like, can repeat word-internally.
                 // Arabic number signs / ayah markers (U+0600–U+0605, U+06DD, U+08E2), Arabic
                 // Extended-A currency format marks (U+0890–U+0891, pound/piastre mark above), and
                 // Syriac abbreviation mark (U+070F) are Cf and not Rust whitespace; RTL scholarly
@@ -244,8 +250,11 @@ fn collapse_whitespace(text: &str) -> String {
                 // (U+30A0, Pd), and fullwidth low line (U+FF3F, Pc) are not Rust whitespace either;
                 // mixed CJK / romanization HTML can do the same. Hebrew maqaf (U+05BE, Pd), paseq (U+05C0, Po), and sof pasuq
                 // (U+05C3, Po; sentence end like a colon) are not Rust whitespace. Georgian paragraph separator (U+10FB, Po) is
-                // not Rust whitespace; mixed Latin–Georgian or Unicode-sample HTML can glue tokens without ASCII space. Tibetan mark intersyllabic tsheg (U+0F0B, Po) and Ethiopic full stop
-                // (U+1362, Po) are not Rust whitespace; mixed-script HTML can glue Latin tokens.
+                // not Rust whitespace; mixed Latin–Georgian or Unicode-sample HTML can glue tokens without ASCII space. Tibetan yig mgo
+                // and shad marks (U+0F04–U+0F12, Po), gter tsheg (U+0F14, Po), corner brackets (U+0F3A–U+0F3D, Ps/Pe), paluta (U+0F85,
+                // Po), and astrological / editorial marks (U+0FD0–U+0FD4, U+0FD9–U+0FDA, Po) are not Rust whitespace—only intersyllabic
+                // tsheg (U+0F0B) was covered before; mixed Tibetan–Latin or Unicode-sample HTML can otherwise glue Latin tokens. U+0F13
+                // (caret So) stays unmapped. Ethiopic full stop (U+1362, Po) is not Rust whitespace; mixed-script HTML can glue Latin tokens.
                 // Unicode dash punctuation (U+2010–U+2015, Pd)—hyphen, non-breaking hyphen, figure
                 // dash, en dash, em dash, horizontal bar—are not Rust whitespace; typographic HTML or
                 // pasted Office copy often uses them between Latin tokens without ASCII space.
@@ -364,7 +373,20 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{055C}'..='\u{055F}'
                 | '\u{0589}'
                 | '\u{058A}'
-                | '\u{0F0B}'
+                | '\u{0964}'
+                | '\u{0965}'
+                | '\u{0E2F}'
+                | '\u{0E4F}'
+                | '\u{0E5A}'
+                | '\u{0E5B}'
+                | '\u{0EAF}'
+                | '\u{104A}'..='\u{104B}'
+                | '\u{0F04}'..='\u{0F12}'
+                | '\u{0F14}'
+                | '\u{0F3A}'..='\u{0F3D}'
+                | '\u{0F85}'
+                | '\u{0FD0}'..='\u{0FD4}'
+                | '\u{0FD9}'..='\u{0FDA}'
                 | '\u{1362}'
                 | '\u{2010}'..='\u{2015}'
                 | '\u{2016}'..='\u{2018}'
@@ -1204,6 +1226,49 @@ mod tests {
     }
 
     #[test]
+    fn devanagari_danda_double_danda_separate_words() {
+        // U+0964 (DEVANAGARI DANDA) and U+0965 (DEVANAGARI DOUBLE DANDA), both Po; not Rust
+        // whitespace—mixed Latin–Devanagari or Unicode-sample HTML can glue tokens without ASCII space.
+        for sep in ['\u{0964}', '\u{0965}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn thai_lao_myanmar_sentence_punctuation_separate_words() {
+        // Thai: U+0E2F PAIYANNOI, U+0E4F FONGMAN, U+0E5A ANGKHANKHU, U+0E5B KHOMUT (Po). Lao: U+0EAF ELLIPSIS
+        // (Po). Myanmar: U+104A LITTLE SECTION, U+104B SECTION (Po). None are Rust whitespace.
+        for cp in [0x0E2Fu32, 0x0E4F, 0x0E5A, 0x0E5B, 0x0EAF].into_iter().chain(0x104A..=0x104B) {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
     fn hebrew_sof_pasuq_georgian_paragraph_separator_separate_words() {
         // U+05C3 (Hebrew sof pasuq, Po) and U+10FB (Georgian paragraph separator, Po); not Rust
         // whitespace—RTL or mixed-script HTML can sit Latin tokens on either side without ASCII space.
@@ -1242,6 +1307,33 @@ mod tests {
                 !cleaned.contains(sep),
                 "cleaned output still contains {:?}",
                 sep
+            );
+        }
+    }
+
+    #[test]
+    fn tibetan_shad_head_marks_brackets_astro_separate_words() {
+        // U+0F04–U+0F12 (yig mgo + tsheg + delimiter + shad stack), U+0F14, U+0F3A–U+0F3D, U+0F85,
+        // U+0FD0–U+0FD4, U+0FD9–U+0FDA: Po/Ps/Pe, not Rust whitespace; U+0F13 (So) omitted.
+        let mut seps: Vec<char> = (0x0F04..=0x0F12).filter_map(char::from_u32).collect();
+        seps.push('\u{0F14}');
+        seps.extend('\u{0F3A}'..='\u{0F3D}');
+        seps.push('\u{0F85}');
+        seps.extend((0x0FD0..=0x0FD4).filter_map(char::from_u32));
+        seps.extend((0x0FD9..=0x0FDA).filter_map(char::from_u32));
+        for sep in seps {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
             );
         }
     }
