@@ -2,6 +2,7 @@
 //!
 //! When a session has more than 3 messages, the conversation is written to
 //! `~/.mac-stats/session/session-memory-<sessionid>-<timestamp>-<topic>.md`.
+//! Older builds used `session-memory-<topic>-<sessionid>-<timestamp>.md`; loading accepts both.
 //!
 //! Callers can use `get_messages()` for in-memory history and
 //! `load_messages_from_latest_session_file()` to resume from disk (e.g. after restart).
@@ -12,6 +13,7 @@
 //! not written and are filtered out when loading so they never appear in prior context.
 
 use crate::config::Config;
+use regex::Regex;
 use std::collections::HashMap;
 use std::path::Path;
 use std::sync::Mutex;
@@ -19,6 +21,41 @@ use std::sync::OnceLock;
 use tracing::debug;
 
 const PERSIST_THRESHOLD: usize = 3;
+
+/// Current layout: `session-memory-{session_id}-{YYYYMMDD-HHMMSS}-{topic_slug}.md`
+static SESSION_FILE_NEW: OnceLock<Regex> = OnceLock::new();
+/// Legacy layout (pre topic-last reorder): `session-memory-{topic_slug}-{session_id}-{YYYYMMDD-HHMMSS}.md`
+static SESSION_FILE_OLD: OnceLock<Regex> = OnceLock::new();
+
+fn session_file_new_re() -> &'static Regex {
+    SESSION_FILE_NEW.get_or_init(|| {
+        Regex::new(r"^session-memory-(\d+)-(\d{8}-\d{6})-(.+)\.md$").expect("valid regex")
+    })
+}
+
+fn session_file_old_re() -> &'static Regex {
+    SESSION_FILE_OLD.get_or_init(|| {
+        Regex::new(r"^session-memory-(.+)-(\d+)-(\d{8}-\d{6})\.md$").expect("valid regex")
+    })
+}
+
+/// True if this session file name belongs to `session_id` (new or legacy filename pattern).
+fn session_filename_matches_id(name: &str, session_id: u64) -> bool {
+    if !name.starts_with("session-memory-") || !name.ends_with(".md") {
+        return false;
+    }
+    if let Some(caps) = session_file_new_re().captures(name) {
+        if caps[1].parse::<u64>().ok() == Some(session_id) {
+            return true;
+        }
+    }
+    if let Some(caps) = session_file_old_re().captures(name) {
+        if caps[2].parse::<u64>().ok() == Some(session_id) {
+            return true;
+        }
+    }
+    false
+}
 
 /// Returns true if this (role, content) looks like an internal execution artifact rather than
 /// normal conversation. Such messages are not persisted and are filtered out when loading.
@@ -412,7 +449,6 @@ pub fn load_messages_from_latest_session_file(
     if !dir.is_dir() {
         return Vec::new();
     }
-    let prefix = format!("session-memory-{}-", session_id);
     let mut entries: Vec<_> = match std::fs::read_dir(&dir) {
         Ok(rd) => rd
             .filter_map(|e| e.ok())
@@ -420,7 +456,7 @@ pub fn load_messages_from_latest_session_file(
                 e.path()
                     .file_name()
                     .and_then(|n| n.to_str())
-                    .is_some_and(|n| n.starts_with(&prefix))
+                    .is_some_and(|n| session_filename_matches_id(n, session_id))
             })
             .collect(),
         Err(_) => return Vec::new(),
@@ -470,7 +506,7 @@ fn parse_session_file(path: &Path) -> Vec<(String, String)> {
 mod tests {
     use super::{
         add_message, clear_session, extract_assistant_final_answer, get_messages,
-        normalize_conversational_message,
+        normalize_conversational_message, session_filename_matches_id,
     };
 
     #[test]
@@ -514,5 +550,35 @@ mod tests {
     #[test]
     fn normalize_conversational_message_discards_empty_content() {
         assert_eq!(normalize_conversational_message("assistant", "   "), None);
+    }
+
+    #[test]
+    fn session_filename_matches_new_layout() {
+        assert!(session_filename_matches_id(
+            "session-memory-42-20260320-153045-my-topic.md",
+            42
+        ));
+        assert!(!session_filename_matches_id(
+            "session-memory-42-20260320-153045-my-topic.md",
+            99
+        ));
+    }
+
+    #[test]
+    fn session_filename_matches_legacy_layout() {
+        assert!(session_filename_matches_id(
+            "session-memory-my-topic-42-20260320-153045.md",
+            42
+        ));
+        assert!(!session_filename_matches_id(
+            "session-memory-my-topic-42-20260320-153045.md",
+            7
+        ));
+    }
+
+    #[test]
+    fn session_filename_rejects_non_session_files() {
+        assert!(!session_filename_matches_id("other-42-20260320-153045.md", 42));
+        assert!(!session_filename_matches_id("session-memory-42-20260320-153045.md", 42));
     }
 }

@@ -72,31 +72,6 @@ fn path_matches_selected(rest: &str, selected: &str) -> bool {
             || rest.as_bytes().get(selected.len()).copied() == Some(b'/'))
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn allowlist_parent_includes_child() {
-        let allow = vec!["ollama".to_string()];
-        assert!(target_matches_allowlist("mac_stats::ollama", &allow));
-        assert!(target_matches_allowlist("mac_stats::ollama/api", &allow));
-        assert!(!target_matches_allowlist("mac_stats::ollama_legacy", &allow));
-    }
-
-    #[test]
-    fn non_mac_stats_targets_never_match() {
-        let allow = vec!["browser".to_string()];
-        assert!(!target_matches_allowlist("hyper::client", &allow));
-    }
-
-    #[test]
-    fn subsystem_enum_matches_mac_stats_log_names() {
-        assert_eq!(Subsystem::Browser.as_str(), "browser");
-        assert_eq!(Subsystem::Ollama.as_str(), "ollama");
-    }
-}
-
 /// `tracing::info!(target: mac_stats_target!("browser/cdp"), ...)` — use inside `mac_stats_*` macros only.
 #[macro_export]
 macro_rules! mac_stats_target {
@@ -131,4 +106,29 @@ macro_rules! mac_stats_warn {
     ($path:literal, $($arg:tt)*) => {
         ::tracing::warn!(target: $crate::mac_stats_target!($path), $($arg)*)
     };
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn allowlist_parent_includes_child() {
+        let allow = vec!["ollama".to_string()];
+        assert!(target_matches_allowlist("mac_stats::ollama", &allow));
+        assert!(target_matches_allowlist("mac_stats::ollama/api", &allow));
+        assert!(!target_matches_allowlist("mac_stats::ollama_legacy", &allow));
+    }
+
+    #[test]
+    fn non_mac_stats_targets_never_match() {
+        let allow = vec!["browser".to_string()];
+        assert!(!target_matches_allowlist("hyper::client", &allow));
+    }
+
+    #[test]
+    fn subsystem_enum_matches_mac_stats_log_names() {
+        assert_eq!(Subsystem::Browser.as_str(), "browser");
+        assert_eq!(Subsystem::Ollama.as_str(), "ollama");
+    }
 }

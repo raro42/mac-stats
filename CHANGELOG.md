@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **`logging/subsystem.rs` test placement** — `#[cfg(test)] mod tests` now follows the exported `mac_stats_*` macros so `cargo clippy` stays warning-free (`items_after_test_module`). (`logging/subsystem.rs`)
+
+### Fixed
+- **Session resume after restart (legacy filenames)** — `load_messages_from_latest_session_file` now picks up both the current layout `session-memory-{id}-{timestamp}-{topic}.md` and the older `session-memory-{topic}-{id}-{timestamp}.md` files, so Discord/session context can load after upgrading from pre-reorder naming. Filename matching uses explicit new/legacy patterns (with unit tests) instead of a simple `session-memory-{id}-` prefix. (`session_memory.rs`)
+
 ## [0.1.53] - 2026-03-22
 
 ### Added

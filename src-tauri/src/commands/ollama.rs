@@ -1088,7 +1088,6 @@ pub fn answer_with_ollama_and_fetch(
                         request_id_override: Some(request_id.clone()),
                         retry_count: 1,
                         discord_draft,
-                        ..Default::default()
                     })
                     .await;
                 }
