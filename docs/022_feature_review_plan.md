@@ -145,7 +145,7 @@ The diff on top of the last commit (844c4bc) contains **10 distinct features/imp
 **Review checklist:**
 - [x] Verify reserved words are NOT added to conversation history (the `return` before `addToHistory` is correct). — `sendChatMessage` handles `--cpu` / `-v*` before `addChatMessage` / `addToHistory` (`src/ollama.js`, FEAT-D16); run `scripts/sync-dist.sh` for `dist/`.
 - [x] Verify `set_chat_verbosity` updates the same `VERBOSITY` atomic used by logging macros. — `commands/logging.rs` tests (FEAT-D11).
-- [ ] Verify `toggle_cpu_window` works from the CPU window chat (meta: toggling from within the window you're in — should it close itself? Is that the desired UX?).
+- [x] Verify `toggle_cpu_window` works from the CPU window chat (meta: toggling from within the window you're in — should it close itself? Is that the desired UX?). — **Resolved:** Same close-then-recreate path as the menu bar; chat `--cpu` tears down the WebView and opens a fresh CPU window (intentional “always visible” semantics, not in-place hide). Rustdoc on `commands/window.rs` and `ui/status_bar::toggle_cpu_window` (FEAT-D31).
 - [x] Check that `src/ollama.js` changes are synced to `src-tauri/dist/ollama.js` before testing. — `scripts/sync-dist.sh`; AGENTS.md documents sync.
 
 ### F9: Toggle CPU window refactor
@@ -157,7 +157,7 @@ The diff on top of the last commit (844c4bc) contains **10 distinct features/imp
 **Review checklist:**
 - [x] Verify `toggle_cpu_window` logic: close visible → recreate is the same behaviour as before (no regression).
 - [x] The function always recreates the window after closing — **verified intentional.** In `status_bar.rs`, after closing the window (whether it was visible or hidden), the code checks `if app_handle.get_window("cpu").is_none()` and then calls `create_cpu_window(app_handle)`. So every click ends with the window existing and open; there is no path that leaves the window closed. Effectively this is "show CPU window (create if needed)" rather than a strict toggle. To allow "close and leave closed" we would skip the final create when the window was visible before close.
-- [ ] Verify `run_on_main_thread` is safe here — Tauri docs say it may block; confirm the Tauri command is async enough to not hang the frontend.
+- [x] Verify `run_on_main_thread` is safe here — Tauri docs say it may block; confirm the Tauri command is async enough to not hang the frontend. — Rustdoc on `commands/window.rs::toggle_cpu_window`: command thread blocks until the main-thread closure completes; closure is bounded (CPU window close/recreate); WebView stays on the main run loop (FEAT-D30).
 
 ### F10: Background monitor checks
 
@@ -269,12 +269,12 @@ See `CHANGELOG.md` (0.1.14) and `docs/023_externalized_prompts_DONE.md` for deta
 - [x] `run_due_monitor_checks()` is called from `lib.rs` in a background thread every 30s.
 
 **Code review (F1–F10)**
-- **F1**: `get_messages()` is called in Discord before the current user message is added; ordering correct. `load_messages_from_latest_session_file()` uses prefix `session-memory-{id}-` — old format `session-memory-{topic}-{id}-{ts}` does not match (see D1).
+- **F1**: `get_messages()` is called in Discord before the current user message is added; ordering correct. `load_messages_from_latest_session_file()` matches new layout `session-memory-{id}-{ts}-{topic}.md` and legacy `session-memory-{topic}-{id}-{ts}.md` (FEAT-D1 / FEAT-D14 tests; D1 resolved in code).
 - **F2**: `rev().take(20).rev()` at `ollama.rs` 3502–3508 keeps last 20 messages in chronological order. History cap 20 is consistent (CONVERSATION_HISTORY_CAP and Discord HISTORY_CAP).
 - **F3/F4**: Soul path and router injection — not re-verified in this pass; doc says resolved.
 - **F5**: Dedup in `task/mod.rs` — slug and `## Topic:`/`## Id:` matching present; D2 resolved (block + suggest new id in error message).
 - **F6**: Prompt guidance text present in agent descriptions.
-- **F7**: `ellipse()`: all call sites use `max_len` ≥ 20; edge case `max_len` < 3 could panic (first_count 0, last_count negative) — consider `max_len.max(SEP_LEN + 1)` for robustness.
+- **F7**: `ellipse()` clamps `max_len` to at least `sep_len + 1` before splitting (`logging/mod.rs`); unit tests include `ellipse_max_len_*_clamped` (FEAT-D23). Call sites typically pass `max_len` ≥ 20.
 - **F8**: Reserved words `--cpu` and `-v`/`-vv`/`-vvv` in `ollama.js` return before `addToHistory()` — not added to conversation history.
 - **F9**: `toggle_cpu_window` in `commands/window.rs`; `run_on_main_thread` used; behaviour (close visible → recreate) as doc.
 - **F10**: Background monitor checks wired; `try_lock()` used (skip if busy).

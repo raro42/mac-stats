@@ -406,8 +406,12 @@ pub fn setup_status_item() {
     }
 }
 
-/// Toggle the CPU window: if visible, close it; otherwise create or show it.
-/// Must be called on the main thread (e.g. from menu bar click or via run_on_main_thread).
+/// CPU window control for menu bar / chat: closes any existing `cpu` window, then creates one if none remains.
+///
+/// Effect is always a visible CPU window after return (not a strict “close and stay closed” toggle).
+/// When the user triggers this from chat inside the CPU window (`--cpu`), the WebView is destroyed and
+/// recreated like a menu-bar click—not a soft dismiss of the same surface.
+/// Must be called on the main thread (e.g. menu bar click or `AppHandle::run_on_main_thread`).
 pub fn toggle_cpu_window(app_handle: &AppHandle) {
     if let Some(window) = app_handle.get_window("cpu") {
         let is_visible = window.is_visible().unwrap_or(false);
