@@ -201,6 +201,16 @@ fn collapse_whitespace(text: &str) -> String {
                 // (U+30FB, Po), and halfwidth Katakana middle dot (U+FF65, Po) are not Rust
                 // whitespace; European / Greek / Japanese typography often uses them as word
                 // separators, so pasted HTML can glue Latin tokens for `split_whitespace()`.
+                // Bullet (U+2022, Po), bullet operator (U+2219, Sm), and dot operator (U+22C5, Sm)
+                // are not Rust whitespace; list-heavy or MathML-style HTML can place them between
+                // Latin tokens without ASCII space. One dot leader / two dot leader / horizontal
+                // ellipsis / hyphenation point (U+2024–U+2027, Po) are not Rust whitespace either;
+                // TOC-style leaders or UI copy like "more…" can glue Latin tokens without ASCII space.
+                // Supplemental Punctuation U+2E31–U+2E33 (word separator middle dot, three-dot
+                // punctuation, raised dot; all Po) are not Rust whitespace; typography and Unicode
+                // names use them as word dividers. Aegean word separator line / dot (U+10100–U+10101,
+                // Po) and Phoenician word separator (U+1091F, Po) are not Rust whitespace; scholarly
+                // or mixed-script HTML can place them between Latin tokens without ASCII space.
                 // Ethiopic wordspace (U+1361, Po) and Braille pattern blank (U+2800, So) are not Rust
                 // whitespace. Duployan thick letter selector / double mark (U+1BC9D–U+1BC9E, Mn) and
                 // shorthand format overlap / step (U+1BCA0–U+1BCA3, Cf) are not Rust whitespace.
@@ -242,6 +252,13 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{0387}'
                 | '\u{30FB}'
                 | '\u{FF65}'
+                | '\u{2022}'
+                | '\u{2024}'..='\u{2027}'
+                | '\u{2E31}'..='\u{2E33}'
+                | '\u{10100}'..='\u{10101}'
+                | '\u{1091F}'
+                | '\u{2219}'
+                | '\u{22C5}'
                 | '\u{1361}'
                 | '\u{2800}'
                 | '\u{1BC9D}'..='\u{1BC9E}'
@@ -660,6 +677,74 @@ mod tests {
     fn middle_dot_punctuation_separates_words() {
         // U+00B7 / U+0387 / U+30FB / U+FF65: middle-dot punctuation (Po) is not Rust whitespace.
         for sep in ['\u{00B7}', '\u{0387}', '\u{30FB}', '\u{FF65}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {:?} normalized before collapse, got {:?}",
+                sep,
+                cleaned
+            );
+            assert!(!cleaned.contains(sep), "cleaned output still contains {:?}", sep);
+        }
+    }
+
+    #[test]
+    fn supplemental_punctuation_word_separator_dots_separate_words() {
+        // U+2E31 / U+2E32 / U+2E33: Supplemental Punctuation (Po); not Rust whitespace.
+        for sep in ['\u{2E31}', '\u{2E32}', '\u{2E33}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {:?} normalized before collapse, got {:?}",
+                sep,
+                cleaned
+            );
+            assert!(!cleaned.contains(sep), "cleaned output still contains {:?}", sep);
+        }
+    }
+
+    #[test]
+    fn aegean_and_phoenician_word_separator_marks_separate_words() {
+        // U+10100 / U+10101 (Aegean word separator line/dot, Po) and U+1091F (Phoenician word
+        // separator, Po) are not Rust whitespace.
+        for sep in ['\u{10100}', '\u{10101}', '\u{1091F}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {:?} normalized before collapse, got {:?}",
+                sep,
+                cleaned
+            );
+            assert!(!cleaned.contains(sep), "cleaned output still contains {:?}", sep);
+        }
+    }
+
+    #[test]
+    fn bullet_and_dot_operators_separate_words() {
+        // U+2022 (BULLET, Po), U+2219 (BULLET OPERATOR, Sm), U+22C5 (DOT OPERATOR, Sm): not Rust
+        // whitespace; list or math-heavy HTML can glue Latin tokens for `split_whitespace()`.
+        for sep in ['\u{2022}', '\u{2219}', '\u{22C5}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {:?} normalized before collapse, got {:?}",
+                sep,
+                cleaned
+            );
+            assert!(!cleaned.contains(sep), "cleaned output still contains {:?}", sep);
+        }
+    }
+
+    #[test]
+    fn dot_leaders_ellipsis_and_hyphenation_point_separate_words() {
+        // U+2024 (ONE DOT LEADER), U+2025 (TWO DOT LEADER), U+2026 (HORIZONTAL ELLIPSIS), U+2027
+        // (HYPHENATION POINT): all Po, not Rust whitespace; TOC / UI typography can sit between
+        // Latin tokens without ASCII space.
+        for sep in ['\u{2024}', '\u{2025}', '\u{2026}', '\u{2027}'] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
