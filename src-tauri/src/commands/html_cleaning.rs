@@ -272,6 +272,15 @@ fn collapse_whitespace(text: &str) -> String {
                 // not Rust whitespace; Unicode-sample or Philippine-script HTML can glue Latin tokens without ASCII space.
                 // Sundanese Supplement bindu punctuation (U+1CC0–U+1CC7, Po; bindu surya through bindu pameneng) are
                 // not Rust whitespace; Sundanese–Latin or Unicode-sample HTML can glue Latin tokens without ASCII space.
+                // Kayah Li signs cwi and shya (U+A92E, U+A92F, Po) and Rejang section mark (U+A95F, Po) are not Rust
+                // whitespace; Myanmar-extended / Sumatra-script HTML or Unicode samples can glue Latin tokens without ASCII space.
+                // Lisu punctuation comma / full stop (U+A4FE, U+A4FF, Po) and Vai comma / full stop / question / exclamation
+                // (U+A60C–U+A60F, Po) are not Rust whitespace; Fraser- or Vai–Latin bilingual or Unicode-sample HTML can glue
+                // Latin tokens without ASCII space.
+                // Canadian Syllabics full stop (U+166E, Po) is not Rust whitespace; U+166D CHI SIGN (So) stays unmapped—
+                // syllabics-internal risk. Bamum sentence punctuation (U+A6F2–U+A6F7, Po), Mro danda / double danda
+                // (U+16A6E–U+16A6F, Po), and New Tai Lue signs lae / laev (U+19DE–U+19DF, So) are not Rust whitespace;
+                // Aboriginal / Bamum / Mro / New Tai Lue–Latin or Unicode-sample HTML can glue Latin tokens without ASCII space.
                 // Buginese pallawa and end-of-section (U+1A1E, U+1A1F, Po) are not Rust whitespace; Buginese–Latin or
                 // Unicode-sample HTML can glue Latin tokens without ASCII space. Tai Tham signs wiang through reversed
                 // rotated rana (U+1AA0–U+1AA6, Po) and kaan through caang (U+1AA8–U+1AAD, Po) are not Rust whitespace;
@@ -416,6 +425,15 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{1AA0}'..='\u{1AA6}'
                 | '\u{1AA8}'..='\u{1AAD}'
                 | '\u{1CC0}'..='\u{1CC7}'
+                | '\u{A4FE}'..='\u{A4FF}'
+                | '\u{A60C}'..='\u{A60F}'
+                | '\u{166E}'
+                | '\u{A6F2}'..='\u{A6F7}'
+                | '\u{16A6E}'..='\u{16A6F}'
+                | '\u{19DE}'..='\u{19DF}'
+                | '\u{A92E}'
+                | '\u{A92F}'
+                | '\u{A95F}'
                 | '\u{0F04}'..='\u{0F12}'
                 | '\u{0F14}'
                 | '\u{0F3A}'..='\u{0F3D}'
@@ -1483,6 +1501,73 @@ mod tests {
     fn sundanese_supplement_bindu_punctuation_separate_words() {
         // U+1CC0–U+1CC7 SUNDANESE PUNCTUATION BINDU SURYA through BINDU PAMENENG (Po). None are Rust whitespace.
         for sep in '\u{1CC0}'..='\u{1CC7}' {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn canadian_syllabics_full_stop_bamum_mro_and_new_tai_lue_signs_separate_words() {
+        // U+166E CANADIAN SYLLABICS FULL STOP (Po). Bamum U+A6F2 NJAEMLI through U+A6F7 QUESTION MARK (Po).
+        // Mro U+16A6E DANDA, U+16A6F DOUBLE DANDA (Po). New Tai Lue U+19DE SIGN LAE, U+19DF SIGN LAEV (So). None are Rust whitespace.
+        let mut seps: Vec<char> = vec!['\u{166E}'];
+        seps.extend('\u{A6F2}'..='\u{A6F7}');
+        seps.extend('\u{16A6E}'..='\u{16A6F}');
+        seps.extend('\u{19DE}'..='\u{19DF}');
+        for sep in seps {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn lisu_comma_full_stop_and_vai_sentence_punctuation_separate_words() {
+        // Lisu U+A4FE PUNCTUATION COMMA, U+A4FF PUNCTUATION FULL STOP (Po). Vai U+A60C COMMA through U+A60F EXCLAMATION MARK (Po).
+        let mut seps: Vec<char> = ('\u{A4FE}'..='\u{A4FF}').collect();
+        seps.extend('\u{A60C}'..='\u{A60F}');
+        for sep in seps {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn kayah_li_cwi_shya_and_rejang_section_mark_separate_words() {
+        // Kayah Li U+A92E SIGN CWI, U+A92F SIGN SHYA (Po). Rejang U+A95F SECTION MARK (Po). None are Rust whitespace.
+        for sep in ['\u{A92E}', '\u{A92F}', '\u{A95F}'] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
