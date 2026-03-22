@@ -6,6 +6,9 @@ Agent-facing backlog for mac-stats. Pick an open row, implement, run `cargo chec
 
 | ID | Item | Notes |
 |----|------|--------|
+| FEAT-D103 | HTML `clean_html`: Old Uyghur U+10F86–U+10F89 as word separators | All Po (punctuation bar through four dots). U+10F82–U+10F85 combining dots (Mn) omitted. `collapse_whitespace()` maps to ASCII space; test `old_uyghur_punctuation_separate_words` in `commands/html_cleaning.rs`. |
+| FEAT-D102 | HTML `clean_html`: Psalter Pahlavi U+10B99–U+10B9C + Sogdian U+10F55–U+10F59 as word separators | All Po. `collapse_whitespace()` maps to ASCII space; test `psalter_pahlavi_and_sogdian_punctuation_separate_words` in `commands/html_cleaning.rs`. |
+| FEAT-D101 | HTML `clean_html`: Kharoshthi U+10A50–U+10A58 + Avestan U+10B39–U+10B3F as word separators | All Po. `collapse_whitespace()` maps to ASCII space; test `kharoshthi_and_avestan_punctuation_separate_words` in `commands/html_cleaning.rs`. |
 | FEAT-D100 | HTML `clean_html`: Cuneiform punctuation U+12470–U+12474 + Cypro-Minoan U+12FF1–U+12FF2 as word separators | All Po. `collapse_whitespace()` maps to ASCII space; test `cuneiform_punctuation_and_cypro_minoan_po_signs_separate_words` in `commands/html_cleaning.rs`. |
 | FEAT-D99 | HTML `clean_html`: Kawi U+11F43–U+11F4F + Tamil Supplement U+11FFF (END OF TEXT) as word separators | All Po. `collapse_whitespace()` maps to ASCII space; test `kawi_sentence_punctuation_and_tamil_end_of_text_separate_words` in `commands/html_cleaning.rs`. |
 | FEAT-D98 | HTML `clean_html`: Zanabazar Square U+11A3F–U+11A46 + Soyombo U+11A9A–U+11A9C / U+11A9E–U+11AA2 as word separators | All Po. U+11A9D MARK PLUTA (Lo) omitted. `collapse_whitespace()` maps to ASCII space; test `zanabazar_square_and_soyombo_sentence_punctuation_separate_words` in `commands/html_cleaning.rs`. |

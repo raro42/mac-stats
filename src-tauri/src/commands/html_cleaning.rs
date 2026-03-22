@@ -385,6 +385,17 @@ fn collapse_whitespace(text: &str) -> String {
                 // tokens without ASCII space.
                 // Cypro-Minoan signs CM301 / CM302 (U+12FF1–U+12FF2, Po) are not Rust whitespace;
                 // epigraphic or Unicode-sample HTML can glue Latin tokens without ASCII space.
+                // Kharoshthi punctuation dot through lines (U+10A50–U+10A58, Po) are not Rust
+                // whitespace; Gandharan / Unicode-sample HTML can glue Latin tokens without ASCII space.
+                // Avestan abbreviation mark and dot/ring punctuation (U+10B39–U+10B3F, Po) are not
+                // Rust whitespace; Zoroastrian scholarly or Unicode-sample HTML can glue Latin tokens.
+                // Psalter Pahlavi section marks (U+10B99–U+10B9C, Po) are not Rust whitespace;
+                // manuscript or Unicode-sample HTML can glue Latin tokens without ASCII space.
+                // Sogdian punctuation (U+10F55–U+10F59, Po) are not Rust whitespace; Silk Road /
+                // Unicode-sample HTML can glue Latin tokens without ASCII space.
+                // Old Uyghur punctuation bar through four dots (U+10F86–U+10F89, Po) are not Rust
+                // whitespace; Turfan / Unicode-sample HTML can glue Latin tokens without ASCII space.
+                // U+10F82–U+10F85 combining dots (Mn) stay unmapped—word-internal risk.
                 '\u{0600}'..='\u{0605}'
                 | '\u{06DD}'
                 | '\u{0700}'..='\u{070D}'
@@ -525,6 +536,11 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{16EB}'..='\u{16ED}'
                 | '\u{10100}'..='\u{10101}'
                 | '\u{1091F}'
+                | '\u{10A50}'..='\u{10A58}'
+                | '\u{10B39}'..='\u{10B3F}'
+                | '\u{10B99}'..='\u{10B9C}'
+                | '\u{10F55}'..='\u{10F59}'
+                | '\u{10F86}'..='\u{10F89}'
                 | '\u{2219}'
                 | '\u{22C5}'
                 | '\u{1361}'
@@ -2144,6 +2160,71 @@ mod tests {
         // Kawi U+11F43 DANDA through U+11F4F CLOSING SPIRAL (all Po); Tamil Supplement U+11FFF END OF
         // TEXT (Po).
         for cp in (0x11F43u32..=0x11F4F).chain(std::iter::once(0x11FFF)) {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn old_uyghur_punctuation_separate_words() {
+        // Old Uyghur U+10F86 PUNCTUATION BAR through U+10F89 PUNCTUATION FOUR DOTS (all Po).
+        for cp in 0x10F86..=0x10F89 {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn psalter_pahlavi_and_sogdian_punctuation_separate_words() {
+        // Psalter Pahlavi U+10B99 SECTION MARK through U+10B9C FOUR DOTS WITH DOT (all Po); Sogdian
+        // U+10F55 TWO VERTICAL BARS through U+10F59 HALF CIRCLE WITH DOT (all Po).
+        for cp in (0x10B99u32..=0x10B9C).chain(0x10F55..=0x10F59) {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn kharoshthi_and_avestan_punctuation_separate_words() {
+        // Kharoshthi U+10A50 PUNCTUATION DOT through U+10A58 PUNCTUATION LINES (all Po); Avestan
+        // U+10B39 ABBREVIATION MARK through U+10B3F LARGE ONE RING OVER TWO RINGS PUNCTUATION (all Po).
+        for cp in (0x10A50u32..=0x10A58).chain(0x10B39..=0x10B3F) {
             let sep = char::from_u32(cp).expect("valid scalar");
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
