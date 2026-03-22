@@ -103,6 +103,14 @@ pub(crate) const DISCORD_GROUP_CHANNEL_GUIDANCE: &str = r#"
 
 **Group channel:** You are in a shared channel. Reply when you're mentioned or asked, or when you add real value; stay silent for casual banter or when someone else already answered. At most one substantive reply per message (no triple-tap). Do not expose the user's private context (memory, DMs) here."#;
 
+/// TASK tool paragraph for the dynamic agent list (022 §F6: orchestrator for agent chats, dedup → TASK_APPEND/TASK_STATUS).
+pub(crate) fn format_task_agent_description(num: u32) -> String {
+    format!(
+        "\n\n{}. **TASK** (task files under ~/.mac-stats/task/): Use when working on a task file or when the user asks for tasks. When the user wants agents to chat or have a conversation, invoke AGENT: orchestrator (or the right agent) so the conversation runs; do not only create a task. TASK_LIST: default is open and WIP only (reply: TASK_LIST or TASK_LIST: ). TASK_LIST: all — list all tasks grouped by status (reply: TASK_LIST: all when the user asks for all tasks). TASK_SHOW: <path or id> — show that task's content and status to the user. TASK_APPEND: append feedback (reply: TASK_APPEND: <path or task id> <content>). TASK_STATUS: set status (reply: TASK_STATUS: <path or task id> wip|finished|unsuccessful). When the user says \"close the task\", \"finish\", \"mark done\", or \"cancel\" a task, reply TASK_STATUS: <path or id> finished or unsuccessful. TASK_CREATE: create a new task (reply: TASK_CREATE: <topic> <id> <initial content>). Put the **full** user request into the initial content, including duration (e.g. \"research for 15 minutes\"), scope, and topic — the whole content is stored. For cursor-agent tasks follow your skill (section Cursor-agent tasks). If a task with that topic and id already exists, use TASK_APPEND or TASK_STATUS instead. For TASK_APPEND/TASK_STATUS use the task file name (e.g. task-20250222-120000-open) or the short id or topic (e.g. 1, research). TASK_ASSIGN: <path or id> <agent_id> — use scheduler, discord, cpu, or default (CURSOR_AGENT is normalized to scheduler). Paths must be under ~/.mac-stats/task.",
+        num
+    )
+}
+
 /// Build agent descriptions string: base, optional SKILL (when skills exist), optional RUN_CMD, then MCP when configured.
 /// When from_discord is true and Discord is configured, appends DISCORD_API agent and endpoint list.
 /// When question is provided and Redmine is configured, create-context (projects, trackers, etc.) is only appended if the question suggests create/update.
@@ -121,10 +129,7 @@ pub(crate) async fn build_agent_descriptions(from_discord: bool, question: Optio
         base.push_str(" When the user asks you to run a command, organize files, or use cursor-agent, use RUN_CMD or CURSOR_AGENT (if listed below); do not refuse by saying you cannot run external commands.");
         num += 1;
     }
-    base.push_str(&format!(
-        "\n\n{}. **TASK** (task files under ~/.mac-stats/task/): Use when working on a task file or when the user asks for tasks. When the user wants agents to chat or have a conversation, invoke AGENT: orchestrator (or the right agent) so the conversation runs; do not only create a task. TASK_LIST: default is open and WIP only (reply: TASK_LIST or TASK_LIST: ). TASK_LIST: all — list all tasks grouped by status (reply: TASK_LIST: all when the user asks for all tasks). TASK_SHOW: <path or id> — show that task's content and status to the user. TASK_APPEND: append feedback (reply: TASK_APPEND: <path or task id> <content>). TASK_STATUS: set status (reply: TASK_STATUS: <path or task id> wip|finished|unsuccessful). When the user says \"close the task\", \"finish\", \"mark done\", or \"cancel\" a task, reply TASK_STATUS: <path or id> finished or unsuccessful. TASK_CREATE: create a new task (reply: TASK_CREATE: <topic> <id> <initial content>). Put the **full** user request into the initial content, including duration (e.g. \"research for 15 minutes\"), scope, and topic — the whole content is stored. For cursor-agent tasks follow your skill (section Cursor-agent tasks). If a task with that topic and id already exists, use TASK_APPEND or TASK_STATUS instead. For TASK_APPEND/TASK_STATUS use the task file name (e.g. task-20250222-120000-open) or the short id or topic (e.g. 1, research). TASK_ASSIGN: <path or id> <agent_id> — use scheduler, discord, cpu, or default (CURSOR_AGENT is normalized to scheduler). Paths must be under ~/.mac-stats/task.",
-        num
-    ));
+    base.push_str(&format_task_agent_description(num));
     num += 1;
     base.push_str(&format!(
         "\n\n{}. **OLLAMA_API** (Ollama model management): List models (with details), get server version, list running models, pull/delete/load/unload models, generate embeddings. Use when the user asks what models are installed, to pull or delete a model, to free memory (unload), or to get embeddings for text. To invoke: reply with exactly one line: OLLAMA_API: <action> [args]. Actions: list_models (no args), version (no args), running (no args), pull <model> [stream true|false], delete <model>, embed <model> <text>, load <model> [keep_alive e.g. 5m], unload <model>. Results are returned as JSON or text.",
@@ -242,5 +247,37 @@ pub(crate) async fn build_agent_descriptions(from_discord: bool, question: Optio
             );
             base
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::format_task_agent_description;
+
+    #[test]
+    fn task_description_includes_f6_orchestrator_guidance() {
+        let s = format_task_agent_description(99);
+        assert!(
+            s.contains("invoke AGENT: orchestrator"),
+            "expected orchestrator guidance: {s}"
+        );
+        assert!(
+            s.contains("do not only create a task"),
+            "expected anti-TASK_CREATE-only hint: {s}"
+        );
+    }
+
+    #[test]
+    fn task_description_includes_f6_duplicate_task_guidance() {
+        let s = format_task_agent_description(1);
+        assert!(
+            s.contains("If a task with that topic and id already exists, use TASK_APPEND or TASK_STATUS instead"),
+            "expected dedup → TASK_APPEND/TASK_STATUS: {s}"
+        );
+    }
+
+    #[test]
+    fn task_description_includes_numbered_prefix() {
+        assert!(format_task_agent_description(7).starts_with("\n\n7. **TASK**"));
     }
 }

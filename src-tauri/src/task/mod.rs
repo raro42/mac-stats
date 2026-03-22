@@ -818,6 +818,31 @@ fn expand_tilde(s: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::Mutex;
+
+    /// `create_task` tests override `MAC_STATS_TASK_DIR`; serialize so env does not race.
+    static TASK_DIR_TEST_LOCK: Mutex<()> = Mutex::new(());
+
+    struct TaskDirOverride {
+        previous: Option<String>,
+    }
+
+    impl TaskDirOverride {
+        fn set(path: &std::path::Path) -> Self {
+            let previous = std::env::var("MAC_STATS_TASK_DIR").ok();
+            std::env::set_var("MAC_STATS_TASK_DIR", path.as_os_str());
+            Self { previous }
+        }
+    }
+
+    impl Drop for TaskDirOverride {
+        fn drop(&mut self) {
+            match &self.previous {
+                Some(v) => std::env::set_var("MAC_STATS_TASK_DIR", v),
+                None => std::env::remove_var("MAC_STATS_TASK_DIR"),
+            }
+        }
+    }
 
     #[test]
     fn test_status_from_path() {
@@ -836,6 +861,41 @@ mod tests {
     fn test_slug() {
         assert_eq!(slug("Hello World"), "hello-world");
         assert!(!slug("x").is_empty());
+    }
+
+    #[test]
+    fn test_slug_deterministic() {
+        let t = "Same Topic Here";
+        assert_eq!(slug(t), slug(t));
+        // Casing and spacing normalize to the same slug (dedup matches file ## Topic: vs create topic).
+        assert_eq!(slug("My Topic"), slug("my topic"));
+    }
+
+    #[test]
+    fn create_task_duplicate_topic_id_errors_with_task_append_hint() {
+        let _guard = TASK_DIR_TEST_LOCK.lock().expect("task dir test lock");
+        let base = std::env::temp_dir().join(format!(
+            "mac-stats-task-dedup-test-{}",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&base);
+        fs::create_dir_all(&base).expect("mkdir task test dir");
+        let _override = TaskDirOverride::set(&base);
+
+        let first = create_task("Research Alpha", "42", "initial", None, None).expect("first create");
+        assert!(first.exists());
+
+        let err = create_task("research alpha", "42", "second", None, None).expect_err("duplicate");
+        assert!(
+            err.contains("TASK_APPEND"),
+            "expected TASK_APPEND in error: {err}"
+        );
+        assert!(
+            err.contains("TASK_STATUS") || err.contains("different id"),
+            "expected guidance in error: {err}"
+        );
+
+        let _ = fs::remove_dir_all(&base);
     }
 
     #[test]

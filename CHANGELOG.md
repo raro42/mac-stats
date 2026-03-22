@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Chat verbosity ↔ legacy atomic (022 §F8)** — Unit tests assert `set_chat_verbosity` updates `logging::VERBOSITY` (same atomic as `-v`/`-vv`/`-vvv` and `ellipse`-gated request logs) and clamps levels above 3. Mutex-serialized with restore. (`commands/logging.rs`)
+- **TASK prompt contract tests (022 §F6)** — `format_task_agent_description()` holds the **TASK** tool paragraph for the dynamic agent list; three unit tests assert orchestrator-vs-TASK_CREATE guidance and duplicate-task → TASK_APPEND/TASK_STATUS wording. (`commands/agent_descriptions.rs`)
+- **`MAC_STATS_TASK_DIR`** — Optional override for the task file directory (defaults unchanged: `$HOME/.mac-stats/task/`). Used by unit tests; also available for isolated runs. (`config/mod.rs`)
+- **TASK_CREATE deduplication tests** — `test_slug_deterministic` and `create_task_duplicate_topic_id_errors_with_task_append_hint` in `task/mod.rs` document 022 §3 F5 (slug stability, duplicate topic+id error mentions `TASK_APPEND` / alternate id). (`task/mod.rs`)
+
+### Changed
+- **TASK agent paragraph helper** — **TASK** block in `build_agent_descriptions` moved to `format_task_agent_description()` for unit testing; wording unchanged. (`commands/agent_descriptions.rs`)
+
+### Documentation
+- **022 review & FEATURE-CODER backlog** — F5 checklist items marked complete with test pointers; new FEAT-D9–D11 rows in the coder backlog. (`docs/022_feature_review_plan.md`, `006-feature-coder/FEATURE-CODER.md`)
+
 ## [0.1.54] - 2026-03-22
 
 ### Added

@@ -752,7 +752,16 @@ impl Config {
 
     /// Task directory for task files: `$HOME/.mac-stats/task/`
     /// Files: task-<date-time>-<open|wip|finished|unsuccessful>.md (topic and id stored in-file)
+    ///
+    /// When `MAC_STATS_TASK_DIR` is set to a non-empty path, that directory is used instead
+    /// (tests and isolated runs; must exist or `ensure_task_directory` will create it).
     pub fn task_dir() -> PathBuf {
+        if let Ok(override_dir) = std::env::var("MAC_STATS_TASK_DIR") {
+            let t = override_dir.trim();
+            if !t.is_empty() {
+                return PathBuf::from(t);
+            }
+        }
         if let Ok(home) = std::env::var("HOME") {
             PathBuf::from(home).join(".mac-stats").join("task")
         } else {

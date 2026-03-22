@@ -106,10 +106,10 @@ The diff on top of the last commit (844c4bc) contains **10 distinct features/imp
 - `task/mod.rs`: Before creating a task, `existing_task_with_topic_id()` scans `~/.mac-stats/task/` and reads `## Topic:` and `## Id:` from each task file; if any file has the same topic (slug) and id, `create_task()` returns an error. (Filenames are `task-<date-time>-<status>.md`.)
 
 **Review checklist:**
-- [ ] Verify slug generation is deterministic (same topic always gives same slug).
-- [ ] Verify the dedup check matches by `## Topic:` (as slug) and `## Id:` in file content.
+- [x] Verify slug generation is deterministic (same topic always gives same slug). — `test_slug_deterministic` in `task/mod.rs`.
+- [x] Verify the dedup check matches by `## Topic:` (as slug) and `## Id:` in file content. — `create_task_duplicate_topic_id_errors_with_task_append_hint` (second create with different topic casing, same id).
 - [x] Edge case: existing task `finished`/`unsuccessful` — we block and suggest: error message says "or use a different id to create a new task" (D2 resolved, option c).
-- [ ] Verify the error message is informative enough for Ollama to switch to TASK_APPEND.
+- [x] Verify the error message is informative enough for Ollama to switch to TASK_APPEND. — same test asserts `TASK_APPEND` / `TASK_STATUS` or `different id` in error string.
 
 ### F6: Prompt guidance for agent chats
 

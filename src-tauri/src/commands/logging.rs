@@ -78,3 +78,32 @@ pub fn open_debug_log() -> Result<(), String> {
         Err("Open log file is supported only on macOS".to_string())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::set_chat_verbosity;
+    use crate::logging::VERBOSITY;
+    use std::sync::atomic::Ordering;
+    use std::sync::Mutex;
+
+    /// Serialize tests that mutate the global verbosity atomic.
+    static VERBOSITY_TEST_LOCK: Mutex<()> = Mutex::new(());
+
+    #[test]
+    fn set_chat_verbosity_updates_legacy_verbosity_atomic() {
+        let _g = VERBOSITY_TEST_LOCK.lock().unwrap();
+        let saved = VERBOSITY.load(Ordering::Relaxed);
+        set_chat_verbosity(2).unwrap();
+        assert_eq!(VERBOSITY.load(Ordering::Relaxed), 2);
+        crate::logging::set_verbosity(saved);
+    }
+
+    #[test]
+    fn set_chat_verbosity_clamps_above_three() {
+        let _g = VERBOSITY_TEST_LOCK.lock().unwrap();
+        let saved = VERBOSITY.load(Ordering::Relaxed);
+        set_chat_verbosity(255).unwrap();
+        assert_eq!(VERBOSITY.load(Ordering::Relaxed), 3);
+        crate::logging::set_verbosity(saved);
+    }
+}
