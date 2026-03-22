@@ -206,7 +206,22 @@ fn collapse_whitespace(text: &str) -> String {
                 // Latin tokens without ASCII space. Fraction slash (U+2044, Sm), division slash
                 // (U+2215, Sm), and fullwidth solidus (U+FF0F, Po) are not Rust whitespace either;
                 // math fractions, MathML, or CJK fullwidth paths can use them between Latin tokens
-                // without ASCII space. One dot leader / two dot leader / horizontal
+                // without ASCII space. Ideographic comma / full stop (U+3001, U+3002, Po) and
+                // fullwidth ASCII-like punctuation (U+FF0C comma, U+FF1A colon, U+FF1B semicolon,
+                // U+FF01 exclamation, U+FF1F question; all Po) are not Rust whitespace; CJK or
+                // mixed-layout HTML often places them between Latin tokens without ASCII space.
+                // Vertical Forms compatibility punctuation (U+FE10–U+FE19, Po/Ps/Pe/Pc) is not
+                // Rust whitespace. Hebrew maqaf (U+05BE, Pd) and paseq (U+05C0, Po) are not Rust
+                // whitespace. Tibetan mark intersyllabic tsheg (U+0F0B, Po) and Ethiopic full stop
+                // (U+1362, Po) are not Rust whitespace; mixed-script HTML can glue Latin tokens.
+                // Unicode dash punctuation (U+2010–U+2015, Pd)—hyphen, non-breaking hyphen, figure
+                // dash, en dash, em dash, horizontal bar—are not Rust whitespace; typographic HTML or
+                // pasted Office copy often uses them between Latin tokens without ASCII space.
+                // Per mille / per ten thousand (U+2030–U+2031, Po), prime marks (U+2032–U+2037, Po),
+                // caret (U+2038, Po), single guillemets (U+2039–U+203A, Pi/Pf), and reference mark
+                // (U+203B, Po) are not Rust whitespace; measurements, foot/inch notation, or European
+                // typography in HTML can place them between Latin tokens without ASCII space.
+                // One dot leader / two dot leader / horizontal
                 // ellipsis / hyphenation point (U+2024–U+2027, Po) are not Rust whitespace either;
                 // TOC-style leaders or UI copy like "more…" can glue Latin tokens without ASCII space.
                 // Supplemental Punctuation U+2E00–U+2E5D (editorial / transcription brackets and
@@ -265,7 +280,21 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{2044}'
                 | '\u{2215}'
                 | '\u{FF0F}'
+                | '\u{3001}'
+                | '\u{3002}'
+                | '\u{FF0C}'
+                | '\u{FF1A}'
+                | '\u{FF1B}'
+                | '\u{FF01}'
+                | '\u{FF1F}'
+                | '\u{FE10}'..='\u{FE19}'
+                | '\u{05BE}'
+                | '\u{05C0}'
+                | '\u{0F0B}'
+                | '\u{1362}'
+                | '\u{2010}'..='\u{2015}'
                 | '\u{2024}'..='\u{2027}'
+                | '\u{2030}'..='\u{203B}'
                 | '\u{2E00}'..='\u{2E5D}'
                 | '\u{16EB}'..='\u{16ED}'
                 | '\u{10100}'..='\u{10101}'
@@ -776,6 +805,110 @@ mod tests {
         // U+2022 (BULLET, Po), U+2219 (BULLET OPERATOR, Sm), U+22C5 (DOT OPERATOR, Sm): not Rust
         // whitespace; list or math-heavy HTML can glue Latin tokens for `split_whitespace()`.
         for sep in ['\u{2022}', '\u{2219}', '\u{22C5}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {:?} normalized before collapse, got {:?}",
+                sep,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {:?}",
+                sep
+            );
+        }
+    }
+
+    #[test]
+    fn unicode_dash_punctuation_u2010_through_u2015_separate_words() {
+        // U+2010 HYPHEN, U+2011 NON-BREAKING HYPHEN, U+2012 FIGURE DASH, U+2013 EN DASH, U+2014 EM
+        // DASH, U+2015 HORIZONTAL BAR (all Pd)—not Rust whitespace. Em/en dashes in body copy can
+        // sit between Latin tokens without ASCII space.
+        for sep in [
+            '\u{2010}',
+            '\u{2011}',
+            '\u{2012}',
+            '\u{2013}',
+            '\u{2014}',
+            '\u{2015}',
+        ] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "sep {:?} should separate words, got {:?}",
+                sep,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
+    fn general_punctuation_u2030_through_u203b_separate_words() {
+        // U+2030 PER MILLE through U+203B REFERENCE MARK (Po / Pi / Pf)—not Rust whitespace.
+        // Primes, per-mille signs, guillemets, or reference marks in body copy can glue Latin tokens.
+        for cp in 0x2030u32..=0x203B {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "U+{:04X} should separate words, got {:?}",
+                cp,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
+    fn cjk_fullwidth_and_vertical_forms_punctuation_separate_words() {
+        // U+3001/U+3002 (ideographic comma / full stop), U+FF0C/FF1A/FF1B/FF01/FF1F (fullwidth
+        // comma, colon, semicolon, exclamation, question), U+FE10–U+FE19 (Vertical Forms
+        // compatibility punctuation): Po/Ps/Pe/Pc—not Rust whitespace. Mixed CJK / Latin HTML
+        // or vertical-layout compatibility text can sit between Latin tokens without ASCII space.
+        for sep in [
+            '\u{3001}',
+            '\u{3002}',
+            '\u{FF0C}',
+            '\u{FF1A}',
+            '\u{FF1B}',
+            '\u{FF01}',
+            '\u{FF1F}',
+            '\u{FE10}',
+            '\u{FE11}',
+            '\u{FE12}',
+            '\u{FE13}',
+            '\u{FE14}',
+            '\u{FE15}',
+            '\u{FE16}',
+            '\u{FE17}',
+            '\u{FE18}',
+            '\u{FE19}',
+        ] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {:?} normalized before collapse, got {:?}",
+                sep,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {:?}",
+                sep
+            );
+        }
+    }
+
+    #[test]
+    fn hebrew_maqaf_paseq_tibetan_tsheg_ethiopic_stop_separate_words() {
+        // U+05BE (Hebrew maqaf, Pd), U+05C0 (Hebrew paseq, Po), U+0F0B (Tibetan tsheg, Po),
+        // U+1362 (Ethiopic full stop, Po)—none are Rust whitespace; RTL or Ethiopic-layout HTML
+        // can glue Latin tokens for `split_whitespace()` without ASCII space.
+        for sep in ['\u{05BE}', '\u{05C0}', '\u{0F0B}', '\u{1362}'] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
