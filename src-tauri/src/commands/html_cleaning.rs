@@ -257,6 +257,22 @@ fn collapse_whitespace(text: &str) -> String {
                 // fullwidth ASCII-like punctuation (U+FF0C comma, U+FF1A colon, U+FF1B semicolon,
                 // U+FF01 exclamation, U+FF1F question; all Po) are not Rust whitespace; CJK or
                 // mixed-layout HTML often places them between Latin tokens without ASCII space.
+                // Other Halfwidth and Fullwidth Forms delimiters—U+FF03 number sign, U+FF04 dollar,
+                // U+FF05 percent, U+FF06 ampersand, U+FF08/U+FF09 parens, U+FF0A asterisk, U+FF0B plus,
+                // U+FF0D hyphen-minus, U+FF0E full stop, U+FF1C–U+FF1E relations, U+FF20 commercial at,
+                // U+FF3B–U+FF3D brackets and reverse solidus, U+FF5B–U+FF5D braces, U+FF5C vertical line
+                // (Po/Ps/Pe/Sm/Pd/Sc as assigned)—are not Rust whitespace either. U+FF07 FULLWIDTH
+                // APOSTROPHE (Po) stays unmapped—typographic apostrophe risk. U+FF5E FULLWIDTH TILDE (Sm)
+                // stays unmapped—Japanese range notation (e.g. 3～5). U+FF40 FULLWIDTH GRAVE (Po) stays
+                // unmapped—modifier-like, word-internal risk. Fullwidth white parentheses (U+FF5F, U+FF60,
+                // Ps/Pe), halfwidth ideographic full stop / corner brackets / ideographic comma
+                // (U+FF61–U+FF64, Po/Ps/Pe; U+FF65 middle dot is on the middle-dot arm), and fullwidth
+                // cent / pound / not sign / broken bar / yen / won (U+FFE0–U+FFE2, U+FFE4–U+FFE6,
+                // Sc/Sm/So) are not Rust whitespace either. U+FFE3 FULLWIDTH MACRON (Sk) stays
+                // unmapped—overline-like, word-internal risk. Halfwidth forms light vertical (U+FFE8,
+                // So), halfwidth arrows (U+FFE9–U+FFEC, Sm), and halfwidth black square / white circle
+                // (U+FFED–U+FFEE, So) are not Rust whitespace either; JIS / compat HTML can glue Latin
+                // tokens without ASCII space.
                 // CJK Symbols and Punctuation: ditto mark (U+3003, Po), JIS symbol (U+3004, So),
                 // ideographic closing mark (U+3006, Lo), CJK brackets and postal/geta marks
                 // (U+3008–U+301B, Ps/Pe/So), wave dash (U+301C, Pd), reversed/double-prime quotes
@@ -549,6 +565,37 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{FF1B}'
                 | '\u{FF01}'
                 | '\u{FF1F}'
+                | '\u{FF03}'
+                | '\u{FF04}'
+                | '\u{FF05}'
+                | '\u{FF06}'
+                | '\u{FF08}'
+                | '\u{FF09}'
+                | '\u{FF0A}'
+                | '\u{FF0B}'
+                | '\u{FF0D}'
+                | '\u{FF0E}'
+                | '\u{FF1C}'..='\u{FF1E}'
+                | '\u{FF20}'
+                | '\u{FF3B}'
+                | '\u{FF3C}'
+                | '\u{FF3D}'
+                | '\u{FF5B}'
+                | '\u{FF5C}'
+                | '\u{FF5D}'
+                | '\u{FF5F}'
+                | '\u{FF60}'
+                | '\u{FF61}'
+                | '\u{FF62}'
+                | '\u{FF63}'
+                | '\u{FF64}'
+                | '\u{FFE0}'
+                | '\u{FFE1}'
+                | '\u{FFE2}'
+                | '\u{FFE4}'
+                | '\u{FFE5}'
+                | '\u{FFE6}'
+                | '\u{FFE8}'..='\u{FFEE}'
                 | '\u{FE10}'..='\u{FE19}'
                 | '\u{FE50}'..='\u{FE52}'
                 | '\u{FE54}'..='\u{FE66}'
@@ -1824,6 +1871,111 @@ mod tests {
                 !cleaned.contains(sep),
                 "cleaned output still contains {:?}",
                 sep
+            );
+        }
+    }
+
+    #[test]
+    fn fullwidth_delimiters_operators_and_brackets_separate_words() {
+        // U+FF03 NUMBER SIGN, U+FF04 DOLLAR SIGN, U+FF05 PERCENT, U+FF06 AMPERSAND, U+FF08/U+FF09
+        // PARENS, U+FF0A ASTERISK, U+FF0B PLUS, U+FF0D HYPHEN-MINUS, U+FF0E FULL STOP,
+        // U+FF1C–U+FF1E LESS/EQUALS/GREATER, U+FF20 COMMERCIAL AT, U+FF3B–U+FF3D BRACKETS/SOLIDUS,
+        // U+FF5B–U+FF5D CURLY BRACES, U+FF5C VERTICAL LINE—not Rust whitespace; fullwidth
+        // typography HTML can glue Latin tokens without ASCII space. U+FF07 apostrophe, U+FF5E tilde,
+        // U+FF40 grave intentionally omitted (see `collapse_whitespace` comment).
+        for sep in [
+            '\u{FF03}',
+            '\u{FF04}',
+            '\u{FF05}',
+            '\u{FF06}',
+            '\u{FF08}',
+            '\u{FF09}',
+            '\u{FF0A}',
+            '\u{FF0B}',
+            '\u{FF0D}',
+            '\u{FF0E}',
+            '\u{FF1C}',
+            '\u{FF1D}',
+            '\u{FF1E}',
+            '\u{FF20}',
+            '\u{FF3B}',
+            '\u{FF3C}',
+            '\u{FF3D}',
+            '\u{FF5B}',
+            '\u{FF5C}',
+            '\u{FF5D}',
+        ] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn fullwidth_white_parens_halfwidth_cjk_punct_and_fullwidth_currency_separate_words() {
+        // U+FF5F/U+FF60 WHITE PARENTHESIS (Ps/Pe), U+FF61 HALFWIDTH IDEOGRAPHIC FULL STOP,
+        // U+FF62/U+FF63 CORNER BRACKETS (Ps/Pe), U+FF64 HALFWIDTH IDEOGRAPHIC COMMA (Po)—not Rust
+        // whitespace; U+FF65 KATAKANA MIDDLE DOT stays on the middle-dot arm. U+FFE0–U+FFE2 cent /
+        // pound / not (Sc/Sm), U+FFE4 broken bar (So), U+FFE5–U+FFE6 yen / won (Sc)—not Rust
+        // whitespace. U+FFE3 FULLWIDTH MACRON (Sk) intentionally omitted (overline / word-internal risk).
+        for sep in [
+            '\u{FF5F}',
+            '\u{FF60}',
+            '\u{FF61}',
+            '\u{FF62}',
+            '\u{FF63}',
+            '\u{FF64}',
+            '\u{FFE0}',
+            '\u{FFE1}',
+            '\u{FFE2}',
+            '\u{FFE4}',
+            '\u{FFE5}',
+            '\u{FFE6}',
+        ] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn halfwidth_forms_light_vertical_arrows_square_circle_separate_words() {
+        // U+FFE8 HALFWIDTH FORMS LIGHT VERTICAL (So), U+FFE9–U+FFEC halfwidth arrows (Sm), U+FFED /
+        // U+FFEE halfwidth black square / white circle (So)—not Rust whitespace; U+FFE3 FULLWIDTH
+        // MACRON (Sk) stays unmapped (between U+FFE2 and U+FFE4 in the block, not in this arm).
+        for sep in ['\u{FFE8}', '\u{FFE9}', '\u{FFEA}', '\u{FFEB}', '\u{FFEC}', '\u{FFED}', '\u{FFEE}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
             );
         }
     }
