@@ -874,15 +874,14 @@ mod tests {
     #[test]
     fn create_task_duplicate_topic_id_errors_with_task_append_hint() {
         let _guard = TASK_DIR_TEST_LOCK.lock().expect("task dir test lock");
-        let base = std::env::temp_dir().join(format!(
-            "mac-stats-task-dedup-test-{}",
-            std::process::id()
-        ));
+        let base =
+            std::env::temp_dir().join(format!("mac-stats-task-dedup-test-{}", std::process::id()));
         let _ = fs::remove_dir_all(&base);
         fs::create_dir_all(&base).expect("mkdir task test dir");
         let _override = TaskDirOverride::set(&base);
 
-        let first = create_task("Research Alpha", "42", "initial", None, None).expect("first create");
+        let first =
+            create_task("Research Alpha", "42", "initial", None, None).expect("first create");
         assert!(first.exists());
 
         let err = create_task("research alpha", "42", "second", None, None).expect_err("duplicate");

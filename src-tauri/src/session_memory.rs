@@ -716,11 +716,8 @@ mod tests {
         let path = base.join(format!(
             "session-memory-{sid}-20260322-120000-resume-topic.md"
         ));
-        std::fs::write(
-            &path,
-            "## User\n\nfrom disk\n\n## Assistant\n\nack\n",
-        )
-        .expect("write session file");
+        std::fs::write(&path, "## User\n\nfrom disk\n\n## Assistant\n\nack\n")
+            .expect("write session file");
 
         let loaded = load_messages_from_latest_session_file("test", sid);
         assert_eq!(loaded.len(), 2);
@@ -773,14 +770,10 @@ mod tests {
         let _override = SessionDirOverride::set(&base);
 
         let sid = 55_u64;
-        let older = base.join(format!(
-            "session-memory-{sid}-20260101-000000-first.md"
-        ));
+        let older = base.join(format!("session-memory-{sid}-20260101-000000-first.md"));
         std::fs::write(&older, "## User\n\nolder\n\n## Assistant\n\na\n").expect("older");
         std::thread::sleep(Duration::from_millis(1100));
-        let newer = base.join(format!(
-            "session-memory-{sid}-20260202-000000-second.md"
-        ));
+        let newer = base.join(format!("session-memory-{sid}-20260202-000000-second.md"));
         std::fs::write(&newer, "## User\n\nnewer\n\n## Assistant\n\nb\n").expect("newer");
 
         let loaded = load_messages_from_latest_session_file("test", sid);

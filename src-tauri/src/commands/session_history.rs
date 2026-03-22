@@ -297,14 +297,9 @@ mod tests {
                 images: None,
             },
         ];
-        let out = prepare_conversation_history(
-            raw,
-            "fresh question",
-            true,
-            None,
-            "test-req-new-topic",
-        )
-        .await;
+        let out =
+            prepare_conversation_history(raw, "fresh question", true, None, "test-req-new-topic")
+                .await;
         assert!(out.is_empty());
     }
 
@@ -316,14 +311,9 @@ mod tests {
             content: confused.to_string(),
             images: None,
         }];
-        let out = prepare_conversation_history(
-            raw,
-            "follow-up",
-            false,
-            None,
-            "test-req-401-annotate",
-        )
-        .await;
+        let out =
+            prepare_conversation_history(raw, "follow-up", false, None, "test-req-401-annotate")
+                .await;
         assert_eq!(out.len(), 1);
         assert!(out[0].content.contains(confused));
         assert!(out[0].content.contains(SYSTEM_CORRECTION_401));

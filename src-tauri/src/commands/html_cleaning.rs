@@ -160,10 +160,13 @@ fn collapse_whitespace(text: &str) -> String {
         let normalized: String = line
             .chars()
             .map(|c| match c {
-                // ZWSP / BOM-as-ZWNBSP / soft hyphen: not treated as whitespace by
-                // `split_whitespace()` but used as invisible break opportunities in HTML
-                // (`&shy;`, zero-width breaks); map so words do not glue for the LLM.
-                '\u{200B}' | '\u{FEFF}' | '\u{00AD}' => ' ',
+                // HTML / copied text often inserts break or bidi format controls that
+                // `split_whitespace()` leaves inside one token (e.g. U+034F, U+061C, LRM/RLM,
+                // U+2066–U+2069). ZWSP, ZWNJ, ZWJ, WJ, BOM-in-text, SHY, and NBSP get the same
+                // treatment so FETCH_URL bodies tokenize cleanly for the LLM.
+                '\u{200B}' | '\u{200C}' | '\u{200D}' | '\u{2060}' | '\u{FEFF}' | '\u{00AD}'
+                | '\u{00A0}' | '\u{034F}' | '\u{061C}' | '\u{200E}' | '\u{200F}' | '\u{2066}'
+                | '\u{2067}' | '\u{2068}' | '\u{2069}' => ' ',
                 _ => c,
             })
             .collect();
@@ -287,6 +290,66 @@ mod tests {
             cleaned
         );
         assert!(!cleaned.contains('\u{00AD}'));
+    }
+
+    #[test]
+    fn nbsp_separates_words() {
+        // U+00A0 (NO-BREAK SPACE) from `&nbsp;` is not Unicode whitespace for
+        // `split_whitespace()`, so "hello\u{00A0}world" would stay one token.
+        let html = "<html><body><p>hello\u{00A0}world</p></body></html>";
+        let cleaned = clean_html(html);
+        assert!(
+            cleaned.contains("hello world"),
+            "expected NBSP normalized before collapse, got {:?}",
+            cleaned
+        );
+        assert!(!cleaned.contains('\u{00A0}'));
+    }
+
+    #[test]
+    fn bidi_and_grapheme_joiner_separate_words() {
+        // CGJ, ALM, LRM/RLM, directional isolates: `split_whitespace()` keeps them inside a token.
+        for sep in [
+            '\u{034F}',
+            '\u{061C}',
+            '\u{200E}',
+            '\u{200F}',
+            '\u{2066}',
+            '\u{2067}',
+            '\u{2068}',
+            '\u{2069}',
+        ] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {sep:?} normalized before collapse, got {:?}",
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {sep:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn zero_width_joiners_separate_words() {
+        // U+200C ZWNJ, U+200D ZWJ, U+2060 WORD JOINER: format controls that Rust does not
+        // treat as whitespace; they can appear between letters in copied HTML or emoji text.
+        for sep in ['\u{200C}', '\u{200D}', '\u{2060}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {sep:?} normalized before collapse, got {:?}",
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {sep:?}"
+            );
+        }
     }
 
     #[test]

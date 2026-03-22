@@ -465,10 +465,7 @@ mod tests {
     #[test]
     fn shared_soul_file_nonempty_true_when_file_has_text() {
         let _guard = HOME_FOR_AGENTS_TEST_LOCK.lock().expect("home test lock");
-        let base = std::env::temp_dir().join(format!(
-            "mac-stats-soul-test-{}",
-            std::process::id()
-        ));
+        let base = std::env::temp_dir().join(format!("mac-stats-soul-test-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&base);
         std::fs::create_dir_all(base.join(".mac-stats/agents")).unwrap();
         let _home = HomeOverride::set(&base);
@@ -479,10 +476,8 @@ mod tests {
     #[test]
     fn shared_soul_file_nonempty_false_when_empty_or_whitespace() {
         let _guard = HOME_FOR_AGENTS_TEST_LOCK.lock().expect("home test lock");
-        let base = std::env::temp_dir().join(format!(
-            "mac-stats-soul-empty-test-{}",
-            std::process::id()
-        ));
+        let base =
+            std::env::temp_dir().join(format!("mac-stats-soul-empty-test-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&base);
         std::fs::create_dir_all(base.join(".mac-stats/agents")).unwrap();
         let _home = HomeOverride::set(&base);
@@ -550,11 +545,7 @@ mod tests {
     #[test]
     fn agent_soul_or_shared_prefers_per_agent() {
         assert_eq!(
-            agent_soul_or_shared(
-                Some("only me".to_string()),
-                "shared soul".to_string()
-            )
-            .as_deref(),
+            agent_soul_or_shared(Some("only me".to_string()), "shared soul".to_string()).as_deref(),
             Some("only me")
         );
     }
@@ -574,6 +565,9 @@ mod tests {
     #[test]
     fn agent_soul_or_shared_none_when_no_soul() {
         assert_eq!(agent_soul_or_shared(None, String::new()), None);
-        assert_eq!(agent_soul_or_shared(Some(String::new()), String::new()), None);
+        assert_eq!(
+            agent_soul_or_shared(Some(String::new()), String::new()),
+            None
+        );
     }
 }

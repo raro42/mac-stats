@@ -492,12 +492,7 @@ pub fn answer_with_ollama_and_fetch(
 
         // When no agent/skill override, prepend soul (~/.mac-stats/agents/soul.md) so Ollama gets personality/vibe in context.
         let router_soul = skill_content.as_ref().map_or_else(
-            || {
-                format_router_soul_block(
-                    &load_soul_content(),
-                    &crate::config::Config::version(),
-                )
-            },
+            || format_router_soul_block(&load_soul_content(), &crate::config::Config::version()),
             |_| String::new(),
         );
 
@@ -579,28 +574,27 @@ pub fn answer_with_ollama_and_fetch(
                     images: None,
                 }];
             let planning_cap = crate::config::Config::planning_history_cap();
-            let planning_history: &[crate::ollama::ChatMessage] = if planning_cap > 0
-                && conversation_history.len() > planning_cap
-            {
-                mac_stats_info!(
-                    "ollama/chat",
-                    "Agent router [{}]: capping planning history from {} to {} messages",
-                    request_id,
-                    conversation_history.len(),
-                    planning_cap
-                );
-                &conversation_history[conversation_history.len() - planning_cap..]
-            } else if planning_cap == 0 && !conversation_history.is_empty() {
-                mac_stats_info!(
+            let planning_history: &[crate::ollama::ChatMessage] =
+                if planning_cap > 0 && conversation_history.len() > planning_cap {
+                    mac_stats_info!(
+                        "ollama/chat",
+                        "Agent router [{}]: capping planning history from {} to {} messages",
+                        request_id,
+                        conversation_history.len(),
+                        planning_cap
+                    );
+                    &conversation_history[conversation_history.len() - planning_cap..]
+                } else if planning_cap == 0 && !conversation_history.is_empty() {
+                    mac_stats_info!(
                     "ollama/chat",
                     "Agent router [{}]: planning history disabled (cap=0), skipping {} messages",
                     request_id,
                     conversation_history.len()
                 );
-                &[]
-            } else {
-                &conversation_history
-            };
+                    &[]
+                } else {
+                    &conversation_history
+                };
             for msg in planning_history {
                 planning_messages.push(msg.clone());
             }
