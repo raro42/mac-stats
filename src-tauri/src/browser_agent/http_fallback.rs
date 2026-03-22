@@ -210,9 +210,7 @@ fn parse_html(html: &str, base_url: &str) -> Result<(Vec<HttpInteractable>, Vec<
         let name = el.value().attr("name").map(str::to_string);
         let is_submit = is_submit_control(&tag, &input_type);
 
-        let text = if tag == "button" {
-            el.text().collect::<String>().trim().to_string()
-        } else if tag == "textarea" {
+        let text = if tag == "button" || tag == "textarea" {
             el.text().collect::<String>().trim().to_string()
         } else {
             el.value().attr("placeholder").unwrap_or("").to_string()
@@ -221,9 +219,7 @@ fn parse_html(html: &str, base_url: &str) -> Result<(Vec<HttpInteractable>, Vec<
 
         let default_value = if tag == "textarea" {
             Some(el.text().collect::<String>())
-        } else if tag == "input" {
-            el.value().attr("value").map(str::to_string)
-        } else if tag == "button" {
+        } else if tag == "input" || tag == "button" {
             el.value().attr("value").map(str::to_string)
         } else {
             None

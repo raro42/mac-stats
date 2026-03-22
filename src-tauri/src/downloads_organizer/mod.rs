@@ -173,8 +173,8 @@ pub fn parse_rules_markdown(content: &str) -> Result<ParsedRules, String> {
 
     for (i, line) in content.lines().enumerate() {
         let t = line.trim();
-        if t.starts_with("## ") {
-            let title = t[3..].trim().to_lowercase();
+        if let Some(rest) = t.strip_prefix("## ") {
+            let title = rest.trim().to_lowercase();
             if title.starts_with("settings") {
                 if block == Some("rule") {
                     flush_rule(&buf, &mut rules, i + 1)?;
@@ -653,7 +653,7 @@ mod tests {
         let p = parse_rules_markdown(md).unwrap();
         assert_eq!(
             first_matching_destination(&p, "x.txt"),
-            Some("A".as_ref())
+            Some("A")
         );
     }
 
