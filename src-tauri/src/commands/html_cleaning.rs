@@ -250,11 +250,19 @@ fn collapse_whitespace(text: &str) -> String {
                 // Dagger / double dagger / bullet / triangular bullet (U+2020–U+2023, Po) sit
                 // between the curly-quote arm and dot-leader arm; U+2019 between them is omitted
                 // (apostrophe). None are Rust whitespace; footnote-style or list HTML can glue
-                // Latin tokens without ASCII space. Bullet operator (U+2219, Sm) and dot operator
-                // (U+22C5, Sm) are not Rust whitespace either; MathML-style HTML can do the same. Fraction slash (U+2044, Sm), division slash
-                // (U+2215, Sm), and fullwidth solidus (U+FF0F, Po) are not Rust whitespace either;
-                // math fractions, MathML, or CJK fullwidth paths can use them between Latin tokens
-                // without ASCII space. Ideographic comma / full stop (U+3001, U+3002, Po) and
+                // Latin tokens without ASCII space. Mathematical Operators U+2200–U+22FF (mostly Sm;
+                // some Mn / Me) are not Rust whitespace; MathML can place ∀, ∈, integrals, bullet
+                // operator U+2219, dot operator U+22C5, division slash U+2215, etc. between Latin
+                // tokens without ASCII space (one contiguous range arm). Miscellaneous Technical
+                // U+2300–U+23FF (mostly So / Sm / Po) are not Rust whitespace; electrotechnical symbols,
+                // APL operators, dice faces, or Unicode-sample HTML can sit between Latin tokens without
+                // ASCII space (contiguous range arm). Control Pictures U+2400–U+243F (all So) are not Rust
+                // whitespace; terminal / legacy or Unicode-sample HTML can place control-picture glyphs between
+                // Latin tokens without ASCII space (contiguous range arm). U+2440+ Optical Character Recognition
+                // is a separate arm (FEAT-D130). Fraction slash (U+2044, Sm)
+                // and fullwidth solidus (U+FF0F, Po) are not Rust whitespace either; math fractions,
+                // MathML, or CJK fullwidth paths can use them between Latin tokens without ASCII space.
+                // Ideographic comma / full stop (U+3001, U+3002, Po) and
                 // fullwidth ASCII-like punctuation (U+FF0C comma, U+FF1A colon, U+FF1B semicolon,
                 // U+FF01 exclamation, U+FF1F question; all Po) are not Rust whitespace; CJK or
                 // mixed-layout HTML often places them between Latin tokens without ASCII space.
@@ -349,6 +357,19 @@ fn collapse_whitespace(text: &str) -> String {
                 // Currency Symbols U+20A0–U+20BF (all Sc) are not Rust whitespace; multilingual
                 // price copy or Unicode-sample HTML can place euro, rupee, bitcoin, etc. between
                 // Latin tokens without ASCII space. U+20C0–U+20CF are unassigned and stay unmapped.
+                // Number Forms U+2150–U+2182 and U+2185–U+218B (vulgar fractions, Roman
+                // numerals, turned digit two/three; all No / Nl / So) are not Rust whitespace;
+                // typography or Unicode-sample HTML can place ⅓, Ⅷ, vulgar fraction zero thirds
+                // (U+2189), turned digits, etc. between Latin tokens
+                // without ASCII space. U+2183 ROMAN NUMERAL REVERSED ONE HUNDRED (Lu) and U+2184
+                // LATIN SMALL LETTER REVERSED C (Ll) stay unmapped—letter-like, word-internal risk.
+                // U+218C–U+218F are unassigned and stay unmapped.
+                // Arrows U+2190–U+21FF (mostly Sm) are not Rust whitespace; MathML, diagram, or
+                // Unicode-sample HTML can place arrows between Latin tokens without ASCII space.
+                // Number Forms fractions / Roman numerals (U+2150–U+2182, U+2185–U+218B; includes U+2189) sit
+                // after Currency Symbols and before Arrows; U+2183/U+2184 letter-like scalars stay unmapped.
+                // Mathematical Operators U+2200–U+22FF, Miscellaneous Technical U+2300–U+23FF, and Control Pictures U+2400–U+243F
+                // are mapped in the following contiguous range arms.
                 // Unicode dash punctuation (U+2010–U+2015, Pd)—hyphen, non-breaking hyphen, figure
                 // dash, en dash, em dash, horizontal bar—are not Rust whitespace; typographic HTML or
                 // pasted Office copy often uses them between Latin tokens without ASCII space.
@@ -583,7 +604,6 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{0387}'
                 | '\u{30FB}'
                 | '\u{FF65}'
-                | '\u{2215}'
                 | '\u{FF0F}'
                 | '\u{3001}'
                 | '\u{3002}'
@@ -654,6 +674,12 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{00A7}'
                 | '\u{00B6}'
                 | '\u{20A0}'..='\u{20BF}'
+                | '\u{2150}'..='\u{2182}'
+                | '\u{2185}'..='\u{218B}'
+                | '\u{2190}'..='\u{21FF}'
+                | '\u{2200}'..='\u{22FF}'
+                | '\u{2300}'..='\u{23FF}'
+                | '\u{2400}'..='\u{243F}'
                 | '\u{037E}'
                 | '\u{0609}'
                 | '\u{060A}'
@@ -769,8 +795,6 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{11BE1}'
                 | '\u{16AF5}'
                 | '\u{16D6D}'..='\u{16D6F}'
-                | '\u{2219}'
-                | '\u{22C5}'
                 | '\u{1361}'
                 | '\u{2440}'..='\u{245F}'
                 | '\u{2460}'..='\u{24FF}'
@@ -1300,6 +1324,133 @@ mod tests {
                 !cleaned.contains(sep),
                 "cleaned output still contains U+{:04X}",
                 sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn number_forms_fractions_romans_and_turned_digits_separate_words() {
+        // U+2150–U+2182, U+2185–U+218B: vulgar fractions, Roman numerals, late forms, vulgar fraction
+        // zero thirds (U+2189), turned digits (No / Nl / So); not Rust whitespace. U+2183 (Lu) / U+2184 (Ll) omitted in implementation.
+        let cps = (0x2150u32..=0x2182).chain(0x2185..=0x218B);
+        for cp in cps {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn number_forms_reversed_roman_c_and_reversed_c_letter_stay_unmapped() {
+        // U+2183 / U+2184 are Lu/Ll—letter-like; must not force a word break like vulgar fractions.
+        for cp in [0x2183u32, 0x2184] {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} should not map to ASCII space between Latin tokens, got {:?}",
+                cp,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
+    fn arrows_u2190_through_u21ff_separate_words() {
+        // Arrows U+2190–U+21FF (mostly Sm); not Rust whitespace—MathML / diagram / Unicode-sample HTML
+        // can glue Latin tokens without ASCII space.
+        for cp in 0x2190u32..=0x21FF {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn mathematical_operators_u2200_through_u22ff_separate_words() {
+        // Mathematical Operators U+2200–U+22FF (mostly Sm); not Rust whitespace—MathML or Unicode-sample
+        // HTML can glue Latin tokens without ASCII space.
+        for cp in 0x2200u32..=0x22FF {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn miscellaneous_technical_u2300_through_u23ff_separate_words() {
+        // Miscellaneous Technical U+2300–U+23FF (mostly So / Sm / Po); not Rust whitespace—technical,
+        // APL, or Unicode-sample HTML can glue Latin tokens without ASCII space.
+        for cp in 0x2300u32..=0x23FF {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn control_pictures_u2400_through_u243f_separate_words() {
+        // Control Pictures U+2400–U+243F (all So); not Rust whitespace—terminal dumps, legacy copy, or Unicode-sample HTML
+        // can glue Latin tokens without ASCII space. U+2440+ OCR block is covered by `ocr_symbols_separate_words`.
+        for cp in 0x2400u32..=0x243F {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
             );
         }
     }
