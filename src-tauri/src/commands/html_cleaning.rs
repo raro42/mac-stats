@@ -351,7 +351,27 @@ fn collapse_whitespace(text: &str) -> String {
                 // U+111CD, Po) are not Rust whitespace; Sharada–Latin or Unicode-sample HTML can glue
                 // Latin tokens without ASCII space. Khojki danda through abbreviation sign (U+11238–
                 // U+1123D, Po) are not Rust whitespace; Khojki–Latin or Unicode-sample HTML can glue
-                // Latin tokens without ASCII space.
+                // Latin tokens without ASCII space. Mahajani abbreviation / section marks (U+11174–
+                // U+11175, Po) are not Rust whitespace; U+11173 SIGN NUKTA (Mn) stays unmapped.
+                // Multani section mark (U+112A9, Po) is not Rust whitespace—the block has no second
+                // Po danda in the standard. Tulu-Tigalari danda / double danda and om / shrii
+                // pushpika (U+113D4–U+113D5, U+113D7–U+113D8, Po) are not Rust whitespace; U+113D6
+                // is unassigned. Newa danda through abbreviation (U+1144B–U+1144F, Po), double comma /
+                // placeholder / insertion (U+1145A, U+1145B, U+1145D, Po) are not Rust whitespace;
+                // U+1145C is unassigned. Tirhuta abbreviation sign (U+114C6, Po) is not Rust
+                // whitespace; U+114C7 OM (Lo) stays unmapped. Modi danda / double danda /
+                // abbreviation (U+11641–U+11643, Po) are not Rust whitespace. Khudawadi has no Po
+                // sentence punctuation in the chart (virama / nukta are Mn); omitted like other
+                // virama risks. Ahom small section / section / rulai (U+1173C–U+1173E, Po) are not
+                // Rust whitespace. Dogra abbreviation sign (U+1183B, Po) is not Rust whitespace.
+                // Dives Akuru double danda / gap filler / end of text (U+11944–U+11946, Po) are not
+                // Rust whitespace. Nandinagari sign siddham (U+119E2, Po) is not Rust whitespace.
+                // Bhaiksuki danda / double danda / word separator / gap fillers (U+11C41–U+11C45, Po)
+                // are not Rust whitespace; Unicode-sample or mixed-script HTML can glue Latin tokens.
+                // Marchen head mark and shad (U+11C70–U+11C71, Po) are not Rust whitespace; Zhang-
+                // Zhung / Unicode-sample HTML can glue Latin tokens without ASCII space.
+                // Makasar passimbang and end of section (U+11EF7–U+11EF8, Po) are not Rust whitespace;
+                // Sulawesi-script or Unicode-sample HTML can glue Latin tokens without ASCII space.
                 '\u{0600}'..='\u{0605}'
                 | '\u{06DD}'
                 | '\u{0700}'..='\u{070D}'
@@ -508,6 +528,23 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{111C5}'..='\u{111C8}'
                 | '\u{111CD}'
                 | '\u{11238}'..='\u{1123D}'
+                | '\u{11174}'..='\u{11175}'
+                | '\u{112A9}'
+                | '\u{113D4}'..='\u{113D5}'
+                | '\u{113D7}'..='\u{113D8}'
+                | '\u{1144B}'..='\u{1144F}'
+                | '\u{1145A}'
+                | '\u{1145B}'
+                | '\u{1145D}'
+                | '\u{114C6}'
+                | '\u{11641}'..='\u{11643}'
+                | '\u{1173C}'..='\u{1173E}'
+                | '\u{1183B}'
+                | '\u{11944}'..='\u{11946}'
+                | '\u{119E2}'
+                | '\u{11C41}'..='\u{11C45}'
+                | '\u{11C70}'..='\u{11C71}'
+                | '\u{11EF7}'..='\u{11EF8}'
                 | '\u{13430}'..='\u{13455}'
                 | '\u{2FF0}'..='\u{2FFB}'
                 | '\u{1D173}'..='\u{1D17A}'
@@ -1990,6 +2027,85 @@ mod tests {
             .chain(0x111C5..=0x111C8)
             .chain(std::iter::once(0x111CD))
             .chain(0x11238..=0x1123D)
+        {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn ahom_dogra_dives_akuru_nandinagari_bhaiksuki_sentence_punctuation_separate_words() {
+        // Ahom U+1173C–U+1173E; Dogra U+1183B; Dives Akuru U+11944–U+11946; Nandinagari U+119E2;
+        // Bhaiksuki U+11C41–U+11C45 (all Po).
+        for cp in (0x1173Cu32..=0x1173E)
+            .chain(std::iter::once(0x1183B))
+            .chain(0x11944..=0x11946)
+            .chain(std::iter::once(0x119E2))
+            .chain(0x11C41..=0x11C45)
+        {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn marchen_and_makasar_sentence_punctuation_separate_words() {
+        // Marchen U+11C70 HEAD MARK, U+11C71 MARK SHAD; Makasar U+11EF7 PASSIMBANG, U+11EF8 END OF
+        // SECTION (all Po).
+        for cp in (0x11C70u32..=0x11C71).chain(0x11EF7..=0x11EF8) {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn mahajani_multani_tulu_tigalari_newa_tirhuta_modi_sentence_punctuation_separate_words() {
+        // Mahajani U+11174–U+11175; Multani U+112A9; Tulu-Tigalari U+113D4–U+113D5, U+113D7–U+113D8;
+        // Newa U+1144B–U+1144F, U+1145A, U+1145B, U+1145D; Tirhuta U+114C6; Modi U+11641–U+11643 (all Po).
+        for cp in (0x11174u32..=0x11175)
+            .chain(std::iter::once(0x112A9))
+            .chain(0x113D4..=0x113D5)
+            .chain(0x113D7..=0x113D8)
+            .chain(0x1144B..=0x1144F)
+            .chain([0x1145Au32, 0x1145B, 0x1145D])
+            .chain(std::iter::once(0x114C6))
+            .chain(0x11641..=0x11643)
         {
             let sep = char::from_u32(cp).expect("valid scalar");
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
