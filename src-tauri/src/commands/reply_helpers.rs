@@ -375,4 +375,32 @@ mod tests {
         assert!(reply.starts_with("Derived Redmine time-entry summary"));
         assert!(!reply.starts_with("Redmine API result:"));
     }
+
+    #[test]
+    fn looks_like_discord_401_confusion_true_when_unauthorized_token_and_discord() {
+        assert!(looks_like_discord_401_confusion(
+            "Got 401 Unauthorized: bad bearer token calling Discord API."
+        ));
+    }
+
+    #[test]
+    fn looks_like_discord_401_confusion_true_for_guild_channel_credential_wording() {
+        assert!(looks_like_discord_401_confusion(
+            "UNAUTHORIZED: invalid credentials for this guild channel endpoint."
+        ));
+    }
+
+    #[test]
+    fn looks_like_discord_401_confusion_false_without_discord_context() {
+        assert!(!looks_like_discord_401_confusion(
+            "401 Unauthorized: missing or invalid API token."
+        ));
+    }
+
+    #[test]
+    fn looks_like_discord_401_confusion_false_without_auth_signal() {
+        assert!(!looks_like_discord_401_confusion(
+            "Could not list channels in the Discord server."
+        ));
+    }
 }

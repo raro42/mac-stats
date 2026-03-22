@@ -166,3 +166,45 @@ pub fn set_verbosity(level: u8) {
         eprintln!("Debug verbosity level set to: {}", level);
     }
 }
+
+#[cfg(test)]
+mod shorten_path_tests {
+    use super::shorten_file_path_internal;
+
+    #[test]
+    fn strips_src_tauri_src_prefix() {
+        assert_eq!(
+            shorten_file_path_internal("src-tauri/src/commands/ollama.rs"),
+            "commands/ollama.rs"
+        );
+    }
+
+    #[test]
+    fn strips_top_level_src_prefix() {
+        assert_eq!(
+            shorten_file_path_internal("src/dashboard.js"),
+            "dashboard.js"
+        );
+    }
+
+    #[test]
+    fn falls_back_to_last_src_slash() {
+        assert_eq!(
+            shorten_file_path_internal("/build/out/src-tauri/src/metrics/mod.rs"),
+            "metrics/mod.rs"
+        );
+    }
+
+    #[test]
+    fn unchanged_when_no_known_prefix() {
+        assert_eq!(
+            shorten_file_path_internal("vendor/dep/lib.rs"),
+            "vendor/dep/lib.rs"
+        );
+    }
+
+    #[test]
+    fn empty_path() {
+        assert_eq!(shorten_file_path_internal(""), "");
+    }
+}

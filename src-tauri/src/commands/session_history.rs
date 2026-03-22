@@ -13,6 +13,8 @@ pub(crate) const CONVERSATION_HISTORY_CAP: usize = 20;
 /// Prior-turn cap for Discord `having_fun` **idle thought** only (smaller than [`CONVERSATION_HISTORY_CAP`]).
 pub(crate) const HAVING_FUN_IDLE_HISTORY_CAP: usize = 10;
 
+const _: () = assert!(HAVING_FUN_IDLE_HISTORY_CAP < CONVERSATION_HISTORY_CAP);
+
 /// Build agent-router **execution** messages: system prompt, then prior turns, then the current user message.
 ///
 /// Order matches `docs/022_feature_review_plan.md` §F2 (history after system, before the current question).
@@ -264,8 +266,8 @@ mod tests {
     #[test]
     fn conversation_history_caps_match_discord_contract() {
         // docs/022_feature_review_plan.md §F1: router and Discord having_fun reply share CONVERSATION_HISTORY_CAP.
+        // Ordering idle < conversation is enforced at compile time (const assert above).
         assert_eq!(CONVERSATION_HISTORY_CAP, 20);
         assert_eq!(HAVING_FUN_IDLE_HISTORY_CAP, 10);
-        assert!(HAVING_FUN_IDLE_HISTORY_CAP < CONVERSATION_HISTORY_CAP);
     }
 }
