@@ -254,7 +254,14 @@ fn collapse_whitespace(text: &str) -> String {
                 // and shad marks (U+0F04–U+0F12, Po), gter tsheg (U+0F14, Po), corner brackets (U+0F3A–U+0F3D, Ps/Pe), paluta (U+0F85,
                 // Po), and astrological / editorial marks (U+0FD0–U+0FD4, U+0FD9–U+0FDA, Po) are not Rust whitespace—only intersyllabic
                 // tsheg (U+0F0B) was covered before; mixed Tibetan–Latin or Unicode-sample HTML can otherwise glue Latin tokens. U+0F13
-                // (caret So) stays unmapped. Ethiopic full stop (U+1362, Po) is not Rust whitespace; mixed-script HTML can glue Latin tokens.
+                // (caret So) stays unmapped. Sinhala kunddaliya (U+0DF4, Po), Limbu tokma / exclamation / question (U+1940, U+1944,
+                // U+1945, Po), and Meetei Mayek cheikhei / ahang khuda (U+AAF0, U+AAF1, Po) are not Rust whitespace; mixed-script or
+                // Unicode-sample HTML can glue Latin tokens without ASCII space. Ethiopic full stop (U+1362, Po) is not Rust whitespace;
+                // mixed-script HTML can glue Latin tokens. Khmer signs khan through koomuut (U+17D4–U+17DA, Po) are not Rust whitespace;
+                // Javanese pada / section marks (U+A9C1–U+A9CF, Po) are not Rust whitespace—U+A9C0 PANGKON (Cf, virama) stays unmapped as
+                // word-internal risk alongside U+17B4/U+17B5 inherent vowels already mapped as format controls.
+                // Balinese carik through pamengkeb (U+1B5A–U+1B60, Po) are not Rust whitespace; Balinese–Latin or Unicode-sample HTML can glue
+                // Latin tokens without ASCII space.
                 // Unicode dash punctuation (U+2010–U+2015, Pd)—hyphen, non-breaking hyphen, figure
                 // dash, en dash, em dash, horizontal bar—are not Rust whitespace; typographic HTML or
                 // pasted Office copy often uses them between Latin tokens without ASCII space.
@@ -311,6 +318,9 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{00A0}'
                 | '\u{17B4}'
                 | '\u{17B5}'
+                | '\u{17D4}'..='\u{17DA}'
+                | '\u{A9C1}'..='\u{A9CF}'
+                | '\u{1B5A}'..='\u{1B60}'
                 | '\u{034F}'
                 | '\u{061C}'
                 | '\u{200E}'
@@ -387,6 +397,12 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{0F85}'
                 | '\u{0FD0}'..='\u{0FD4}'
                 | '\u{0FD9}'..='\u{0FDA}'
+                | '\u{0DF4}'
+                | '\u{1940}'
+                | '\u{1944}'
+                | '\u{1945}'
+                | '\u{AAF0}'
+                | '\u{AAF1}'
                 | '\u{1362}'
                 | '\u{2010}'..='\u{2015}'
                 | '\u{2016}'..='\u{2018}'
@@ -1307,6 +1323,77 @@ mod tests {
                 !cleaned.contains(sep),
                 "cleaned output still contains {:?}",
                 sep
+            );
+        }
+    }
+
+    #[test]
+    fn khmer_sentence_signs_and_javanese_pada_separate_words() {
+        // Khmer U+17D4 SIGN KHAN through U+17DA SIGN KOOMUUT (Po). Javanese U+A9C1 LEFT RERENGGAN through U+A9CF SECTION SIGN (Po).
+        // U+A9C0 PANGKON (Cf) omitted. None of the mapped code points are Rust whitespace.
+        let mut seps: Vec<char> = (0x17D4..=0x17DA).filter_map(char::from_u32).collect();
+        seps.extend('\u{A9C1}'..='\u{A9CF}');
+        for sep in seps {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn balinese_carik_through_pamengkeb_separate_words() {
+        // U+1B5A CARIK SIKI through U+1B60 PAMENGKEB (Po)—sentence / section punctuation; not Rust whitespace.
+        for sep in '\u{1B5A}'..='\u{1B60}' {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn sinhala_limbu_meetei_sentence_punctuation_separate_words() {
+        // U+0DF4 SINHALA PUNCTUATION KUNDDALIYA (Po). Limbu U+1940 SIGN TOKMA, U+1944 EXCLAMATION MARK, U+1945 QUESTION MARK (Po).
+        // Meetei Mayek U+AAF0 CHEIKHEI, U+AAF1 AHANG KHUDA (Po). None are Rust whitespace.
+        for sep in [
+            '\u{0DF4}',
+            '\u{1940}',
+            '\u{1944}',
+            '\u{1945}',
+            '\u{AAF0}',
+            '\u{AAF1}',
+        ] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
             );
         }
     }
