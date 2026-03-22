@@ -504,6 +504,27 @@ fn collapse_whitespace(text: &str) -> String {
                 // Supplemental Symbols and Pictographs U+1F900–U+1F9FF (mostly So / emoji presentation; Typikon
                 // crosses, hand gestures, food, objects, etc.); not Rust whitespace. The block is fully assigned as of
                 // Unicode 14.0+. Emoji or Unicode-sample HTML can place these between Latin tokens without ASCII space.
+                // Chess Symbols: U+1FA00–U+1FA57 and U+1FA60–U+1FA6D (mostly So); not Rust whitespace. Gaps U+1FA58–U+1FA5F
+                // and U+1FA6E–U+1FA6F unassigned—excluded. Unicode-sample or game-notation HTML can place chess / xiangqi
+                // glyphs between Latin tokens without ASCII space.
+                // Symbols and Pictographs Extended-A: assigned subranges U+1FA70–U+1FA7C, U+1FA80–U+1FA8A, U+1FA8E–U+1FA8F,
+                // U+1FA90–U+1FAC6, U+1FAC8, U+1FACD–U+1FACF, U+1FAD0–U+1FADC, U+1FADF, U+1FAE0–U+1FAEA, U+1FAEF,
+                // U+1FAF0–U+1FAF8 (mostly So / emoji presentation); not Rust whitespace. Gaps U+1FA7D–U+1FA7F, U+1FA8B–U+1FA8D,
+                // U+1FAC7, U+1FAC9–U+1FACC, U+1FADD–U+1FADE, U+1FAEB–U+1FAEE, U+1FAF9–U+1FAFF unassigned—excluded.
+                // Symbols for Legacy Computing: assigned So U+1FB00–U+1FB92 and U+1FB94–U+1FBEF (PETSCII / block graphics,
+                // box-drawing diagonals, stick figures, etc.); not Rust whitespace. U+1FB93 unassigned—excluded. U+1FBF0–U+1FBF9
+                // SEGMENTED DIGIT ZERO–NINE (Nd)—excluded (numeric / word-internal risk). U+1FBFA–U+1FBFF unassigned—excluded.
+                // BMP Greek Extended U+1FB0–U+1FBF (Ll/Lu/Lt/Sk) is unrelated to supplementary-plane U+1FB00+ and stays unmapped.
+                // Symbols for Legacy Computing Supplement: assigned So U+1CC00–U+1CCFC, U+1CD00–U+1CEB3, U+1CEBA–U+1CEBF (Unicode 17
+                // block; game sprites, schematics, octants, outlined Latin/digits as So, etc.); not Rust whitespace. Sundanese
+                // Supplement U+1CC0–U+1CC7 (Po) stays on its own arm—distinct from supplementary-plane U+1CC00+. Gaps U+1CCFD–U+1CCFF
+                // and U+1CEB4–U+1CEB9 unassigned—excluded.
+                // Miscellaneous Symbols Supplement (Unicode 17 block U+1CEC0–U+1CEFF): assigned So U+1CEC0–U+1CED0 (asteroid
+                // symbols), U+1CEE0–U+1CEEF (geomantic figures), U+1CEF0 (medium small white circle with horizontal bar); not Rust
+                // whitespace. Gaps U+1CED1–U+1CEDF and U+1CEF1–U+1CEFF unassigned—excluded.
+                // Byzantine Musical Symbols U+1D000–U+1D0F5 (all So as assigned); not Rust whitespace. Scholarly or Unicode-sample
+                // HTML can place psili, neumes, kentimata, etc. between Latin tokens without ASCII space. Tail U+1D0F6–U+1D0FF
+                // unassigned—excluded. Western Musical Symbols U+1D100+ and format controls U+1D173–U+1D17A (Cf) are separate arms.
                 // Box Drawing (U+2500–U+257F), Block Elements (U+2580–U+259F), and Geometric Shapes (U+25A0–U+25FF;
                 // mostly So) are not Rust whitespace; ASCII-art tables, UI mockups, or Unicode-sample HTML can place
                 // light horizontal / shaded blocks / filled squares between Latin tokens without ASCII space.
@@ -876,6 +897,28 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{1F890}'..='\u{1F8AD}'
                 | '\u{1F8B0}'..='\u{1F8B1}'
                 | '\u{1F900}'..='\u{1F9FF}'
+                | '\u{1FA00}'..='\u{1FA57}'
+                | '\u{1FA60}'..='\u{1FA6D}'
+                | '\u{1FA70}'..='\u{1FA7C}'
+                | '\u{1FA80}'..='\u{1FA8A}'
+                | '\u{1FA8E}'..='\u{1FA8F}'
+                | '\u{1FA90}'..='\u{1FAC6}'
+                | '\u{1FAC8}'
+                | '\u{1FACD}'..='\u{1FACF}'
+                | '\u{1FAD0}'..='\u{1FADC}'
+                | '\u{1FADF}'
+                | '\u{1FAE0}'..='\u{1FAEA}'
+                | '\u{1FAEF}'
+                | '\u{1FAF0}'..='\u{1FAF8}'
+                | '\u{1FB00}'..='\u{1FB92}'
+                | '\u{1FB94}'..='\u{1FBEF}'
+                | '\u{1CC00}'..='\u{1CCFC}'
+                | '\u{1CD00}'..='\u{1CEB3}'
+                | '\u{1CEBA}'..='\u{1CEBF}'
+                | '\u{1CEC0}'..='\u{1CED0}'
+                | '\u{1CEE0}'..='\u{1CEEF}'
+                | '\u{1CEF0}'
+                | '\u{1D000}'..='\u{1D0F5}'
                 | '\u{2500}'..='\u{25FF}'
                 | '\u{2600}'..='\u{26FF}'
                 | '\u{2700}'..='\u{27BF}'
@@ -3313,6 +3356,250 @@ mod tests {
                 !cleaned.contains(sep),
                 "cleaned output still contains U+{:04X}",
                 cp
+            );
+        }
+    }
+
+    #[test]
+    fn chess_symbols_assigned_subranges_separate_words() {
+        // Unicode Chess Symbols: U+1FA00–U+1FA57 and U+1FA60–U+1FA6D (mostly So); not Rust whitespace.
+        let cps = (0x1FA00u32..=0x1FA57).chain(0x1FA60..=0x1FA6D);
+        for cp in cps {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn chess_symbols_unassigned_gaps_stay_unmapped() {
+        for cp in [0x1FA58_u32, 0x1FA5F, 0x1FA6E, 0x1FA6F] {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} should not map to ASCII space between Latin tokens, got {:?}",
+                cp,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
+    fn symbols_and_pictographs_extended_a_assigned_subranges_separate_words() {
+        // Symbols and Pictographs Extended-A: assigned subranges (mostly So / emoji presentation); not Rust whitespace.
+        let cps = (0x1FA70u32..=0x1FA7C)
+            .chain(0x1FA80..=0x1FA8A)
+            .chain(0x1FA8E..=0x1FA8F)
+            .chain(0x1FA90..=0x1FAC6)
+            .chain(std::iter::once(0x1FAC8))
+            .chain(0x1FACD..=0x1FACF)
+            .chain(0x1FAD0..=0x1FADC)
+            .chain(std::iter::once(0x1FADF))
+            .chain(0x1FAE0..=0x1FAEA)
+            .chain(std::iter::once(0x1FAEF))
+            .chain(0x1FAF0..=0x1FAF8);
+        for cp in cps {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn symbols_and_pictographs_extended_a_unassigned_gaps_stay_unmapped() {
+        for cp in [
+            0x1FA7D_u32, 0x1FA8B, 0x1FAC7, 0x1FAC9, 0x1FADD, 0x1FAEB, 0x1FAF9,
+        ] {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} should not map to ASCII space between Latin tokens, got {:?}",
+                cp,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
+    fn symbols_for_legacy_computing_assigned_so_subranges_separate_words() {
+        // Symbols for Legacy Computing: So U+1FB00–U+1FB92 and U+1FB94–U+1FBEF; not Rust whitespace.
+        let cps = (0x1FB00u32..=0x1FB92).chain(0x1FB94..=0x1FBEF);
+        for cp in cps {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn symbols_for_legacy_computing_unassigned_gap_nd_and_tail_stay_unmapped() {
+        for cp in [
+            0x1FB93_u32,
+            0x1FBF0,
+            0x1FBF5,
+            0x1FBF9,
+            0x1FBFA,
+            0x1FBFF,
+        ] {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} should not map to ASCII space between Latin tokens, got {:?}",
+                cp,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
+    fn symbols_for_legacy_computing_supplement_assigned_subranges_separate_words() {
+        // Symbols for Legacy Computing Supplement: So U+1CC00–U+1CCFC, U+1CD00–U+1CEB3, U+1CEBA–U+1CEBF; not Rust whitespace.
+        let cps = (0x1CC00u32..=0x1CCFC)
+            .chain(0x1CD00..=0x1CEB3)
+            .chain(0x1CEBA..=0x1CEBF);
+        for cp in cps {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn symbols_for_legacy_computing_supplement_unassigned_gaps_stay_unmapped() {
+        for cp in [0x1CCFD_u32, 0x1CCFE, 0x1CCFF, 0x1CEB5, 0x1CEB8] {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} should not map to ASCII space between Latin tokens, got {:?}",
+                cp,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
+    fn miscellaneous_symbols_supplement_assigned_subranges_separate_words() {
+        // Miscellaneous Symbols Supplement: So U+1CEC0–U+1CED0, U+1CEE0–U+1CEEF, U+1CEF0; not Rust whitespace.
+        let cps = (0x1CEC0u32..=0x1CED0)
+            .chain(0x1CEE0..=0x1CEEF)
+            .chain(std::iter::once(0x1CEF0));
+        for cp in cps {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn miscellaneous_symbols_supplement_unassigned_gaps_stay_unmapped() {
+        for cp in [0x1CED1_u32, 0x1CEDF, 0x1CEF1, 0x1CEFF] {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} should not map to ASCII space between Latin tokens, got {:?}",
+                cp,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
+    fn byzantine_musical_symbols_assigned_subrange_separate_words() {
+        // Byzantine Musical Symbols: So U+1D000–U+1D0F5; not Rust whitespace.
+        for cp in 0x1D000u32..=0x1D0F5 {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn byzantine_musical_symbols_unassigned_tail_stays_unmapped() {
+        for cp in [0x1D0F6_u32, 0x1D0FA, 0x1D0FF] {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} should not map to ASCII space between Latin tokens, got {:?}",
+                cp,
+                cleaned
             );
         }
     }

@@ -30,6 +30,8 @@ Cross-check **OpenClaw** `AGENTS.md` against the **openclaw** repository (siblin
 3. Fix the format section: format **check** = `pnpm format:check`; format **write** = `pnpm format` or `pnpm format:fix`.
 4. Fix testing thresholds: **branches 55%**, other metrics 70% (or reword to “70% with lower branch threshold”).
 
+**Applied in OpenClaw:** `../openclaw/AGENTS.md` updated on 2026-03-22 to match the above (re-verified against `package.json`, `vitest.config.ts`, and `src/` layout).
+
 ---
 
 ## Scope (standing)
