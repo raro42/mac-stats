@@ -325,9 +325,17 @@ fn collapse_whitespace(text: &str) -> String {
                 // U+2E30 and U+2E3C–U+2E5D are now included in one range. Runic single /
                 // multiple / cross punctuation (U+16EB–U+16ED, Po) are not Rust whitespace; epigraphic
                 // or Unicode-sample HTML can glue Latin tokens for `split_whitespace()`. Aegean word
-                // separator line / dot (U+10100–U+10101, Po) and Phoenician word separator (U+1091F,
+                // separator line / dot / check mark (U+10100–U+10102, Po) and Phoenician word separator (U+1091F,
                 // Po) are not Rust whitespace; scholarly or mixed-script HTML can place them between
-                // Latin tokens without ASCII space.
+                // Latin tokens without ASCII space. Ugaritic word divider (U+1039F), Old Persian word
+                // divider (U+103D0), Caucasian Albanian citation mark (U+1056F), Imperial Aramaic section
+                // sign (U+10857), Lydian triangular mark (U+1093F), Old South Arabian numeric indicator
+                // (U+10A7F), and Manichaean punctuation star through line filler (U+10AF0–U+10AF6, Po)
+                // are not Rust whitespace; epigraphic or Unicode-sample HTML can glue Latin tokens without ASCII space.
+                // Palmyrene left- and right-pointing fleurons (U+10877, U+10878, So) are not Rust whitespace;
+                // epigraphic Palmyrene–Latin or Unicode-sample HTML can place them between tokens without ASCII space.
+                // Pahawh Hmong clause and sentence signs (U+16B37–U+16B3B, U+16B44, Po) are not Rust whitespace;
+                // U+16B30–U+16B36 (Mn), U+16B40–U+16B43 (Lm), and U+16B3C–U+16B3F / U+16B45 (So) stay unmapped.
                 // Ethiopic wordspace (U+1361, Po) and Braille pattern blank (U+2800, So) are not Rust
                 // whitespace. Duployan thick letter selector / double mark (U+1BC9D–U+1BC9E, Mn) and
                 // shorthand format overlap / step (U+1BCA0–U+1BCA3, Cf) are not Rust whitespace.
@@ -406,6 +414,9 @@ fn collapse_whitespace(text: &str) -> String {
                 // whitespace; vertical Mongolian typography or Unicode-sample HTML can glue Latin
                 // tokens without ASCII space—distinct from Basic Mongolian script U+1800–U+180E
                 // already mapped in one arm.
+                // Takri abbreviation sign, double danda, danda, section mark (U+116B9–U+116BC, Po)
+                // are not Rust whitespace; U+116B8 LETTER SSA (Lo) stays unmapped. Himachal /
+                // Unicode-sample HTML can glue Latin tokens without ASCII space.
                 '\u{0600}'..='\u{0605}'
                 | '\u{06DD}'
                 | '\u{0700}'..='\u{070D}'
@@ -518,6 +529,8 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{166E}'
                 | '\u{A6F2}'..='\u{A6F7}'
                 | '\u{16A6E}'..='\u{16A6F}'
+                | '\u{16B37}'..='\u{16B3B}'
+                | '\u{16B44}'
                 | '\u{19DE}'..='\u{19DF}'
                 | '\u{A92E}'
                 | '\u{A92F}'
@@ -544,8 +557,17 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{203C}'..='\u{205E}'
                 | '\u{2E00}'..='\u{2E5D}'
                 | '\u{16EB}'..='\u{16ED}'
-                | '\u{10100}'..='\u{10101}'
+                | '\u{10100}'..='\u{10102}'
+                | '\u{1039F}'
+                | '\u{103D0}'
+                | '\u{1056F}'
+                | '\u{10857}'
+                | '\u{10877}'
+                | '\u{10878}'
                 | '\u{1091F}'
+                | '\u{1093F}'
+                | '\u{10A7F}'
+                | '\u{10AF0}'..='\u{10AF6}'
                 | '\u{10A50}'..='\u{10A58}'
                 | '\u{10B39}'..='\u{10B3F}'
                 | '\u{10B99}'..='\u{10B9C}'
@@ -581,6 +603,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{115C1}'..='\u{115D7}'
                 | '\u{11641}'..='\u{11643}'
                 | '\u{11660}'..='\u{1166C}'
+                | '\u{116B9}'..='\u{116BC}'
                 | '\u{1173C}'..='\u{1173E}'
                 | '\u{1183B}'
                 | '\u{11944}'..='\u{11946}'
@@ -1237,9 +1260,9 @@ mod tests {
 
     #[test]
     fn aegean_and_phoenician_word_separator_marks_separate_words() {
-        // U+10100 / U+10101 (Aegean word separator line/dot, Po) and U+1091F (Phoenician word
+        // U+10100 / U+10101 / U+10102 (Aegean word separator line/dot/check mark, Po) and U+1091F (Phoenician word
         // separator, Po) are not Rust whitespace.
-        for sep in ['\u{10100}', '\u{10101}', '\u{1091F}'] {
+        for sep in ['\u{10100}', '\u{10101}', '\u{10102}', '\u{1091F}'] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
@@ -1252,6 +1275,66 @@ mod tests {
                 !cleaned.contains(sep),
                 "cleaned output still contains {:?}",
                 sep
+            );
+        }
+    }
+
+    #[test]
+    fn palmyrene_fleurons_and_pahawh_hmong_clause_signs_separate_words() {
+        // Palmyrene U+10877 / U+10878 (left/right-pointing fleuron, So). Pahawh Hmong U+16B37–U+16B3B and
+        // U+16B44 (clause/sentence signs, Po). None are Rust whitespace.
+        for sep in [
+            '\u{10877}',
+            '\u{10878}',
+            '\u{16B37}',
+            '\u{16B38}',
+            '\u{16B39}',
+            '\u{16B3A}',
+            '\u{16B3B}',
+            '\u{16B44}',
+        ] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {:?} normalized before collapse, got {:?}",
+                sep,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {:?}",
+                sep
+            );
+        }
+    }
+
+    #[test]
+    fn ancient_word_dividers_and_manichaean_punctuation_separate_words() {
+        // Ugaritic U+1039F; Old Persian U+103D0; Caucasian Albanian U+1056F; Imperial Aramaic U+10857;
+        // Lydian U+1093F; Old South Arabian U+10A7F; Manichaean U+10AF0 PUNCTUATION STAR through
+        // U+10AF6 PUNCTUATION LINE FILLER (all Po).
+        for cp in std::iter::once(0x1039Fu32)
+            .chain(std::iter::once(0x103D0))
+            .chain(std::iter::once(0x1056F))
+            .chain(std::iter::once(0x10857))
+            .chain(std::iter::once(0x1093F))
+            .chain(std::iter::once(0x10A7F))
+            .chain(0x10AF0..=0x10AF6)
+        {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
             );
         }
     }
@@ -2125,6 +2208,28 @@ mod tests {
         // Mongolian Supplement U+11660 BIRGA WITH ORNAMENT through U+1166C TURNED SWIRL BIRGA WITH
         // DOUBLE ORNAMENT (all Po). Distinct from Basic Mongolian U+1800–U+180E arm.
         for cp in 0x11660u32..=0x1166C {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn takri_sentence_punctuation_separate_words() {
+        // Takri U+116B9 ABBREVIATION SIGN through U+116BC SECTION MARK (all Po). U+116B8 LETTER SSA
+        // (Lo) omitted.
+        for cp in 0x116B9u32..=0x116BC {
             let sep = char::from_u32(cp).expect("valid scalar");
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
