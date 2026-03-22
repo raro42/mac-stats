@@ -211,9 +211,18 @@ fn collapse_whitespace(text: &str) -> String {
                 // whitespace; Southeast Asian–Latin bilingual or Unicode-sample HTML can glue Latin tokens without
                 // ASCII space. Thai MAIYAMOK (U+0E46, Lm) stays unmapped—modifier-like, can repeat word-internally.
                 // Arabic number signs / ayah markers (U+0600–U+0605, U+06DD, U+08E2), Arabic
-                // Extended-A currency format marks (U+0890–U+0891, pound/piastre mark above), and
-                // Syriac abbreviation mark (U+070F) are Cf and not Rust whitespace; RTL scholarly
-                // or financial HTML can place them between scripts without a real space. Mongolian
+                // Extended-A currency format marks (U+0890–U+0891, pound/piastre mark above), Syriac
+                // end of paragraph (U+0700, Bk) and sentence punctuation (U+0701–U+070D, Po), and
+                // Syriac abbreviation mark (U+070F) are not Rust whitespace (070F is Cf); RTL scholarly
+                // or financial HTML can place them between scripts without a real space. NKo GBAKURUNEN
+                // symbol / comma / exclamation (U+07F7–U+07F9, Po) are not Rust whitespace; U+07FA
+                // LAJANYALAN (Lm) omitted—modifier-like, word-internal risk. Samaritan punctuation
+                // marks (U+0830–U+083E, Po) are not Rust whitespace; Hebrew/Samaritan scholarly or
+                // Unicode-sample HTML can glue Latin tokens without ASCII space. Nyiakeng Puachue
+                // Hmong exclamation / question (U+16FE2, U+16FE3, Po) are not Rust whitespace;
+                // U+16FE0–U+16FE1 (Lo/Lm) and U+16FE4 LOGOGRAM NYIAM (Lo) stay unmapped. Wancho
+                // comma / full stop (U+1E2FE–U+1E2FF, Po) are not Rust whitespace; Northeast-Indian
+                // script or Unicode-sample HTML can glue Latin tokens without ASCII space. Mongolian
                 // U+1800–U+180E (BIRGA through vowel separator) are Po/Pd/Mn/Cf and not Rust
                 // whitespace—sentence punctuation (U+1800–U+1805, U+1807–U+180A), TODO soft hyphen
                 // (U+1806, Pd), free variation selectors (U+180B–U+180D, Mn), vowel separator
@@ -330,7 +339,13 @@ fn collapse_whitespace(text: &str) -> String {
                 // tokens.
                 '\u{0600}'..='\u{0605}'
                 | '\u{06DD}'
+                | '\u{0700}'..='\u{070D}'
                 | '\u{070F}'
+                | '\u{07F7}'..='\u{07F9}'
+                | '\u{0830}'..='\u{083E}'
+                | '\u{16FE2}'
+                | '\u{16FE3}'
+                | '\u{1E2FE}'..='\u{1E2FF}'
                 | '\u{08E2}'
                 | '\u{0890}'..='\u{0891}'
                 | '\u{200B}'
@@ -804,6 +819,78 @@ mod tests {
             assert!(
                 !cleaned.contains(sep),
                 "cleaned output still contains {sep:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn syriac_paragraph_end_and_sentence_punctuation_separate_words() {
+        // U+0700 (END OF PARAGRAPH, Bk) and U+0701–U+070D (supralinear/sublinear stops, colons,
+        // dots, Harklean marks; Po)—not Rust whitespace; Syriac–Latin or Unicode-sample HTML can glue
+        // Latin tokens for `split_whitespace()`. U+070E unassigned; U+070F tested in
+        // `arabic_and_syriac_edition_format_separate_words`.
+        for cp in 0x0700u32..=0x070D {
+            let sep = char::from_u32(cp).unwrap();
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn nko_sentence_punctuation_and_samaritan_punctuation_separate_words() {
+        // NKo U+07F7–U+07F9 (SYMBOL GBAKURUNEN, COMMA, EXCLAMATION MARK; Po)—not Rust whitespace.
+        // Samaritan U+0830–U+083E (punctuation marks through ANNAAU; Po)—not Rust whitespace.
+        // U+083F unassigned. U+07FA LAJANYALAN (Lm) omitted.
+        for cp in [0x07F7u32, 0x07F8, 0x07F9]
+            .into_iter()
+            .chain(0x0830u32..=0x083E)
+        {
+            let sep = char::from_u32(cp).unwrap();
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn wancho_comma_full_stop_and_nyiakeng_sentence_punctuation_separate_words() {
+        // Wancho U+1E2FE–U+1E2FF (COMMA, FULL STOP; Po)—not Rust whitespace.
+        // Nyiakeng Puachue Hmong U+16FE2–U+16FE3 (EXCLAMATION MARK, QUESTION MARK; Po)—not Rust whitespace.
+        for cp in [0x16FE2u32, 0x16FE3].into_iter().chain(0x1E2FEu32..=0x1E2FF) {
+            let sep = char::from_u32(cp).unwrap();
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
             );
         }
     }
