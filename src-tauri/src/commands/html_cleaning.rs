@@ -189,6 +189,14 @@ fn collapse_whitespace(text: &str) -> String {
                 // tag characters (U+E0000–U+E007F) get the same treatment so FETCH_URL bodies
                 // tokenize cleanly. Khmer inherent vowels (U+17B4, U+17B5) are Cf and not Rust
                 // whitespace, so Khmer-layout HTML can otherwise glue adjacent Latin tokens.
+                // Latin-1 inverted exclamation / question (U+00A1, U+00BF) and double angle quotes
+                // (U+00AB, U+00BB, Pi/Pf) are not Rust whitespace; Spanish / French typography in
+                // HTML can place them between Latin tokens without ASCII space. Greek question mark
+                // (U+037E, Po; erotimatiko) is not Rust whitespace and is distinct from Greek ano
+                // teleia (U+0387) mapped with middle-dot punctuation. Arabic comma / semicolon /
+                // question / full stop (U+060C, U+061B, U+061F, U+06D4, Po) and Arabic percent /
+                // decimal / thousands separators (U+066A–U+066C, Po) are not Rust whitespace; RTL or
+                // bilingual numeric HTML can glue Latin tokens for `split_whitespace()`.
                 // Arabic number signs / ayah markers (U+0600–U+0605, U+06DD, U+08E2), Arabic
                 // Extended-A currency format marks (U+0890–U+0891, pound/piastre mark above), and
                 // Syriac abbreviation mark (U+070F) are Cf and not Rust whitespace; RTL scholarly
@@ -212,8 +220,22 @@ fn collapse_whitespace(text: &str) -> String {
                 // fullwidth ASCII-like punctuation (U+FF0C comma, U+FF1A colon, U+FF1B semicolon,
                 // U+FF01 exclamation, U+FF1F question; all Po) are not Rust whitespace; CJK or
                 // mixed-layout HTML often places them between Latin tokens without ASCII space.
+                // CJK Symbols and Punctuation: ditto mark (U+3003, Po), JIS symbol (U+3004, So),
+                // ideographic closing mark (U+3006, Lo), CJK brackets and postal/geta marks
+                // (U+3008–U+301B, Ps/Pe/So), wave dash (U+301C, Pd), reversed/double-prime quotes
+                // (U+301D–U+301F), postal mark face (U+3020, So), vertical kana repeat marks
+                // (U+3031–U+3036, Lm), masu mark (U+303C, Lo), ideographic variation indicator /
+                // half fill space (U+303E–U+303F, So) are not Rust whitespace. Omitted on purpose:
+                // iteration marks U+3005 / U+303B (Lm), ideographic zero U+3007 and Hangzhou numerals
+                // U+3021–U+3029 / U+3038–U+303A (Nl), and ideographic tone marks U+302A–U+302F (Mn/Mc).
                 // Vertical Forms compatibility punctuation (U+FE10–U+FE19, Po/Ps/Pe/Pc) is not
-                // Rust whitespace. Hebrew maqaf (U+05BE, Pd) and paseq (U+05C0, Po) are not Rust
+                // Rust whitespace. Small Form Variants (U+FE50–U+FE52, U+FE54–U+FE66, U+FE68–U+FE6B;
+                // Po / Pd / Ps / Pe / Sm / Sc as assigned—skips unassigned U+FE53, U+FE67, U+FE6C–U+FE6F)
+                // are not Rust whitespace; compatibility typography HTML can glue Latin tokens without
+                // ASCII space. Wavy dash (U+3030, Pd), ideographic telegraph line-feed separator
+                // (U+3037, So), part alternation mark (U+303D, Po), Katakana-Hiragana double hyphen
+                // (U+30A0, Pd), and fullwidth low line (U+FF3F, Pc) are not Rust whitespace either;
+                // mixed CJK / romanization HTML can do the same. Hebrew maqaf (U+05BE, Pd) and paseq (U+05C0, Po) are not Rust
                 // whitespace. Tibetan mark intersyllabic tsheg (U+0F0B, Po) and Ethiopic full stop
                 // (U+1362, Po) are not Rust whitespace; mixed-script HTML can glue Latin tokens.
                 // Unicode dash punctuation (U+2010–U+2015, Pd)—hyphen, non-breaking hyphen, figure
@@ -290,14 +312,43 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{FF0F}'
                 | '\u{3001}'
                 | '\u{3002}'
+                | '\u{3003}'
+                | '\u{3004}'
+                | '\u{3006}'
+                | '\u{3008}'..='\u{301B}'
+                | '\u{301C}'
+                | '\u{301D}'..='\u{301F}'
+                | '\u{3020}'
+                | '\u{3031}'..='\u{3036}'
+                | '\u{303C}'
+                | '\u{303E}'
+                | '\u{303F}'
                 | '\u{FF0C}'
                 | '\u{FF1A}'
                 | '\u{FF1B}'
                 | '\u{FF01}'
                 | '\u{FF1F}'
                 | '\u{FE10}'..='\u{FE19}'
+                | '\u{FE50}'..='\u{FE52}'
+                | '\u{FE54}'..='\u{FE66}'
+                | '\u{FE68}'..='\u{FE6B}'
+                | '\u{3030}'
+                | '\u{3037}'
+                | '\u{303D}'
+                | '\u{30A0}'
+                | '\u{FF3F}'
                 | '\u{05BE}'
                 | '\u{05C0}'
+                | '\u{00A1}'
+                | '\u{00BF}'
+                | '\u{00AB}'
+                | '\u{00BB}'
+                | '\u{037E}'
+                | '\u{060C}'
+                | '\u{061B}'
+                | '\u{061F}'
+                | '\u{06D4}'
+                | '\u{066A}'..='\u{066C}'
                 | '\u{0F0B}'
                 | '\u{1362}'
                 | '\u{2010}'..='\u{2015}'
@@ -662,6 +713,40 @@ mod tests {
     }
 
     #[test]
+    fn latin1_greek_and_arabic_script_punctuation_separate_words() {
+        // U+00A1 / U+00BF (inverted ! / ?), U+00AB / U+00BB (guillemets), U+037E (Greek question
+        // mark), U+060C / U+061B / U+061F / U+06D4 (Arabic comma, semicolon, question, full stop),
+        // U+066A–U+066C (Arabic percent, decimal sep, thousands sep): Po / Pi / Pf; not Rust
+        // whitespace—mixed European, Greek, or Arabic/Latin HTML can glue tokens without ASCII space.
+        for sep in [
+            '\u{00A1}',
+            '\u{00BF}',
+            '\u{00AB}',
+            '\u{00BB}',
+            '\u{037E}',
+            '\u{060C}',
+            '\u{061B}',
+            '\u{061F}',
+            '\u{06D4}',
+            '\u{066A}',
+            '\u{066B}',
+            '\u{066C}',
+        ] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {sep:?} normalized before collapse, got {:?}",
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {sep:?}"
+            );
+        }
+    }
+
+    #[test]
     fn khmer_inherent_vowel_format_separates_words() {
         // U+17B4/U+17B5 (Khmer vowel inherent AQ / AA) are Cf; Rust `split_whitespace()` does not
         // treat them as whitespace, so mixed Khmer/Latin or pasted layout text can glue tokens.
@@ -950,6 +1035,34 @@ mod tests {
     }
 
     #[test]
+    fn cjk_symbols_brackets_ditto_wave_vertical_repeat_masu_half_fill_separate_words() {
+        // U+3003 / U+3004 / U+3006; U+3008–U+301B; U+301C; U+301D–U+301F; U+3020; U+3031–U+3036;
+        // U+303C; U+303E–U+303F: not Rust whitespace (see `collapse_whitespace` comment). Mixed
+        // CJK-layout or romanized HTML can otherwise glue Latin tokens for `split_whitespace()`.
+        for sep in (0x3003u32..=0x301B)
+            .filter(|&cp| cp != 0x3005 && cp != 0x3007)
+            .chain(0x301C..=0x3020)
+            .chain(0x3031..=0x3036)
+            .chain([0x303C, 0x303E, 0x303F])
+            .filter_map(char::from_u32)
+        {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
     fn cjk_fullwidth_and_vertical_forms_punctuation_separate_words() {
         // U+3001/U+3002 (ideographic comma / full stop), U+FF0C/FF1A/FF1B/FF01/FF1F (fullwidth
         // comma, colon, semicolon, exclamation, question), U+FE10–U+FE19 (Vertical Forms
@@ -986,6 +1099,54 @@ mod tests {
                 !cleaned.contains(sep),
                 "cleaned output still contains {:?}",
                 sep
+            );
+        }
+    }
+
+    #[test]
+    fn small_form_variants_fe50_fe52_fe54_fe66_fe68_fe6b_separate_words() {
+        // U+FE50–U+FE52, U+FE54–U+FE66, U+FE68–U+FE6B (Small Form Variants; skips unassigned
+        // U+FE53, U+FE67, U+FE6C–U+FE6F)—not Rust whitespace; compatibility punctuation can glue
+        // Latin tokens in pasted HTML.
+        for cp in (0xFE50u32..=0xFE52)
+            .chain(0xFE54..=0xFE66)
+            .chain(0xFE68..=0xFE6B)
+        {
+            let sep = char::from_u32(cp).expect("valid BMP scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn cjk_compat_wavy_dash_telegraph_sep_pam_double_hyphen_fullwidth_low_line_separate_words() {
+        // U+3030 WAVY DASH, U+3037 IDEOGRAPHIC TELEGRAPH LINE FEED SEPARATOR SYMBOL, U+303D PART
+        // ALTERNATION MARK, U+30A0 KATAKANA-HIRAGANA DOUBLE HYPHEN, U+FF3F FULLWIDTH LOW LINE—not
+        // Rust whitespace; CJK / romanization HTML can glue Latin tokens without ASCII space.
+        for sep in ['\u{3030}', '\u{3037}', '\u{303D}', '\u{30A0}', '\u{FF3F}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
             );
         }
     }
