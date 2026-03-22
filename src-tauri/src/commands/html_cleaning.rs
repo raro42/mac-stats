@@ -197,15 +197,23 @@ fn collapse_whitespace(text: &str) -> String {
                 // whitespace—sentence punctuation (U+1800–U+1805, U+1807–U+180A), TODO soft hyphen
                 // (U+1806, Pd), free variation selectors (U+180B–U+180D, Mn), vowel separator
                 // (U+180E, Cf)—so mixed or pasted Mongolian/Manchu HTML can glue Latin tokens.
+                // Middle dot (U+00B7, Po), Greek ano teleia (U+0387, Po), Katakana middle dot
+                // (U+30FB, Po), and halfwidth Katakana middle dot (U+FF65, Po) are not Rust
+                // whitespace; European / Greek / Japanese typography often uses them as word
+                // separators, so pasted HTML can glue Latin tokens for `split_whitespace()`.
                 // Ethiopic wordspace (U+1361, Po) and Braille pattern blank (U+2800, So) are not Rust
                 // whitespace. Duployan thick letter selector / double mark (U+1BC9D–U+1BC9E, Mn) and
                 // shorthand format overlap / step (U+1BCA0–U+1BCA3, Cf) are not Rust whitespace.
                 // Kaithi number signs (U+110BD, U+110CD, Cf) are not Rust whitespace; Indic numeral
                 // layout HTML can place them between scripts without an ASCII space. Egyptian
-                // hieroglyph format joiners / segment markers (U+13430–U+13438, Cf) and musical
+                // hieroglyph format joiners / segment markers (U+13430–U+13455, Cf) and musical
                 // symbol begin/end beam–tie–slur–phrase (U+1D173–
                 // U+1D17A, Cf) are not Rust whitespace; scholarly or MusicXML-derived HTML can place
-                // them between scripts without an ASCII space.
+                // them between scripts without an ASCII space. Brahmi number joiner (U+1107F, Mn) is
+                // not Rust whitespace; Indic numeral layout can sit between scripts without ASCII
+                // space. Ideographic description characters (U+2FF0–U+2FFB, So) are not Rust
+                // whitespace; Han-component notation or pasted CJK-scholarly HTML can glue Latin
+                // tokens.
                 '\u{0600}'..='\u{0605}'
                 | '\u{06DD}'
                 | '\u{070F}'
@@ -230,13 +238,19 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{1160}'
                 | '\u{3164}'
                 | '\u{FFA0}'
+                | '\u{00B7}'
+                | '\u{0387}'
+                | '\u{30FB}'
+                | '\u{FF65}'
                 | '\u{1361}'
                 | '\u{2800}'
                 | '\u{1BC9D}'..='\u{1BC9E}'
                 | '\u{1BCA0}'..='\u{1BCA3}'
+                | '\u{1107F}'
                 | '\u{110BD}'
                 | '\u{110CD}'
-                | '\u{13430}'..='\u{13438}'
+                | '\u{13430}'..='\u{13455}'
+                | '\u{2FF0}'..='\u{2FFB}'
                 | '\u{1D173}'..='\u{1D17A}'
                 | '\u{FE00}'..='\u{FE0F}'
                 | '\u{E0100}'..='\u{E01EF}'
@@ -624,7 +638,10 @@ mod tests {
         // U+115F/U+1160 Hangul choseong/jungseong fillers; U+3164 Hangul filler; U+FFA0 halfwidth
         // Hangul filler: not Unicode whitespace in Rust, so they glue tokens in `split_whitespace()`
         // without normalization. (U+1800–U+180A punctuation: `mongolian_punctuation_separates_words`.)
-        for sep in ['\u{180B}', '\u{180C}', '\u{180D}', '\u{180E}', '\u{115F}', '\u{1160}', '\u{3164}', '\u{FFA0}'] {
+        for sep in [
+            '\u{180B}', '\u{180C}', '\u{180D}', '\u{180E}', '\u{115F}', '\u{1160}', '\u{3164}',
+            '\u{FFA0}',
+        ] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
@@ -636,6 +653,22 @@ mod tests {
                 !cleaned.contains(sep),
                 "cleaned output still contains {sep:?}"
             );
+        }
+    }
+
+    #[test]
+    fn middle_dot_punctuation_separates_words() {
+        // U+00B7 / U+0387 / U+30FB / U+FF65: middle-dot punctuation (Po) is not Rust whitespace.
+        for sep in ['\u{00B7}', '\u{0387}', '\u{30FB}', '\u{FF65}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {:?} normalized before collapse, got {:?}",
+                sep,
+                cleaned
+            );
+            assert!(!cleaned.contains(sep), "cleaned output still contains {:?}", sep);
         }
     }
 
@@ -669,9 +702,10 @@ mod tests {
 
     #[test]
     fn egyptian_hieroglyph_format_controls_separate_words() {
-        // U+13430–U+13438: Egyptian hieroglyph joiners and segment markers are Cf and not Rust
-        // whitespace, so mixed or transliterated HTML can glue Latin tokens.
-        for cp in 0x13430u32..=0x13438 {
+        // U+13430–U+13455: Egyptian hieroglyph format controls (joiners, segment markers, extended
+        // quadrat / area / insert controls) are Cf and not Rust whitespace, so mixed or
+        // transliterated HTML can glue Latin tokens.
+        for cp in 0x13430u32..=0x13455 {
             let sep = char::from_u32(cp).expect("valid scalar");
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
@@ -717,6 +751,42 @@ mod tests {
         // shorthand format overlap / step (Cf). None are Rust whitespace. (U+1BC9F is Po—visible
         // punctuation; not mapped.)
         for cp in (0x1BC9Du32..=0x1BC9E).chain(0x1BCA0..=0x1BCA3) {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn brahmi_number_joiner_separates_words() {
+        // U+1107F BRAHMI NUMBER JOINER is Mn, not Rust whitespace; Brahmi numeral HTML can glue
+        // adjacent Latin tokens for `split_whitespace()`.
+        let html = "<html><body><p>hello\u{1107F}world</p></body></html>";
+        let cleaned = clean_html(html);
+        assert!(
+            cleaned.contains("hello world"),
+            "expected Brahmi number joiner normalized before collapse, got {:?}",
+            cleaned
+        );
+        assert!(!cleaned.contains('\u{1107F}'));
+    }
+
+    #[test]
+    fn ideographic_description_characters_separate_words() {
+        // U+2FF0–U+2FFB: ideographic description characters are So, not Rust whitespace; rare
+        // mixed or pedagogical HTML can place them between Latin letters without an ASCII space.
+        for cp in 0x2FF0u32..=0x2FFB {
             let sep = char::from_u32(cp).expect("valid scalar");
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
