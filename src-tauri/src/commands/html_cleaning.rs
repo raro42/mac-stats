@@ -197,8 +197,11 @@ fn collapse_whitespace(text: &str) -> String {
                 // (U+037E, Po; erotimatiko) is not Rust whitespace and is distinct from Greek ano
                 // teleia (U+0387) mapped with middle-dot punctuation. Arabic comma / semicolon /
                 // question / full stop (U+060C, U+061B, U+061F, U+06D4, Po) and Arabic percent /
-                // decimal / thousands separators (U+066A–U+066C, Po) are not Rust whitespace; RTL or
-                // bilingual numeric HTML can glue Latin tokens for `split_whitespace()`.
+                // decimal / thousands / five-pointed-star (U+066A–U+066D, Po) are not Rust whitespace; RTL or
+                // bilingual numeric HTML can glue Latin tokens for `split_whitespace()`. Arabic-indic per mille /
+                // per ten thousand (U+0609, U+060A, Po), Afghani sign (U+060B, Sc), date separator (U+060D, Po),
+                // and triple-dot punctuation (U+061E, Po) are not Rust whitespace either; RTL financial or
+                // editorial HTML can glue Latin tokens without ASCII space.
                 // Armenian exclamation / comma / question / abbreviation mark (U+055C–U+055F, Po) and
                 // full stop / hyphen (U+0589–U+058A, Po/Pd) are not Rust whitespace; bilingual or
                 // Unicode-sample HTML can glue Latin tokens. U+055A (ARMENIAN APOSTROPHE) and U+055B
@@ -305,6 +308,10 @@ fn collapse_whitespace(text: &str) -> String {
                 // stays unmapped—letter-like, word-internal risk.
                 // Myanmar Extended-A Aiton exclamation / one / two (U+AA77–U+AA79, So) are not Rust whitespace; Khamti /
                 // Aiton or Unicode-sample HTML can glue Latin tokens without ASCII space.
+                // Coptic full stop and morphological divider (U+2CFE, U+2CFF, Po) are not Rust whitespace; Coptic–Latin or
+                // Unicode-sample HTML can glue Latin tokens without ASCII space.
+                // Linear B word separator dot / small / medium / large (U+10079–U+1007C, Po) are not Rust whitespace;
+                // Mycenaean transliteration or Unicode-sample HTML can glue Latin tokens without ASCII space.
                 // Lisu punctuation comma / full stop (U+A4FE, U+A4FF, Po) and Vai comma / full stop / question / exclamation
                 // (U+A60C–U+A60F, Po) are not Rust whitespace; Fraser- or Vai–Latin bilingual or Unicode-sample HTML can glue
                 // Latin tokens without ASCII space.
@@ -342,7 +349,13 @@ fn collapse_whitespace(text: &str) -> String {
                 // scholarly HTML without ASCII space. Earlier arms covered only U+2E31–U+2E3B; U+2E00–
                 // U+2E30 and U+2E3C–U+2E5D are now included in one range. Runic single /
                 // multiple / cross punctuation (U+16EB–U+16ED, Po) are not Rust whitespace; epigraphic
-                // or Unicode-sample HTML can glue Latin tokens for `split_whitespace()`. Aegean word
+                // or Unicode-sample HTML can glue Latin tokens for `split_whitespace()`. Ogham feather
+                // mark and reversed feather mark (U+169B, U+169C, Ps/Pe) are not Rust whitespace;
+                // epigraphic Ogham–Latin or Unicode-sample HTML can glue Latin tokens without ASCII space.
+                // Duployan CHINOOK FULL STOP (U+1BC9F, Po) is visible sentence punctuation, not Rust
+                // whitespace; shorthand HTML can glue Latin tokens (U+1BC9D–U+1BC9E Mn and U+1BCA0–U+1BCA3
+                // Cf are mapped separately). Tifinagh separator mark (U+2D70, Po) is not Rust whitespace;
+                // Berber / Unicode-sample HTML can glue Latin tokens without ASCII space. Aegean word
                 // separator line / dot / check mark (U+10100–U+10102, Po) and Phoenician word separator (U+1091F,
                 // Po) are not Rust whitespace; scholarly or mixed-script HTML can place them between
                 // Latin tokens without ASCII space. Ugaritic word divider (U+1039F), Old Persian word
@@ -389,8 +402,9 @@ fn collapse_whitespace(text: &str) -> String {
                 // Kirat Rai sign yupi, danda, double danda (U+16D6D–U+16D6F, Po) are not Rust whitespace;
                 // U+16D6B SIGN VIRAMA and U+16D6C SIGN SAAT (Lm) stay unmapped—modifier-like, word-internal risk.
                 // Ethiopic wordspace (U+1361, Po) and Braille pattern blank (U+2800, So) are not Rust
-                // whitespace. Duployan thick letter selector / double mark (U+1BC9D–U+1BC9E, Mn) and
-                // shorthand format overlap / step (U+1BCA0–U+1BCA3, Cf) are not Rust whitespace.
+                // whitespace. Duployan thick letter selector / double mark (U+1BC9D–U+1BC9E, Mn), CHINOOK FULL
+                // STOP (U+1BC9F, Po), and shorthand format overlap / step (U+1BCA0–U+1BCA3, Cf) are not Rust
+                // whitespace (Mn/Cf mapped with other controls; U+1BC9F mapped as visible Po).
                 // Kaithi number signs (U+110BD, U+110CD, Cf) are not Rust whitespace; Indic numeral
                 // layout HTML can place them between scripts without an ASCII space. Kaithi
                 // abbreviation / enumeration and section marks through double danda (U+110BB, U+110BC,
@@ -555,11 +569,16 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{00A7}'
                 | '\u{00B6}'
                 | '\u{037E}'
+                | '\u{0609}'
+                | '\u{060A}'
+                | '\u{060B}'
                 | '\u{060C}'
+                | '\u{060D}'
                 | '\u{061B}'
+                | '\u{061E}'
                 | '\u{061F}'
                 | '\u{06D4}'
-                | '\u{066A}'..='\u{066C}'
+                | '\u{066A}'..='\u{066D}'
                 | '\u{055C}'..='\u{055F}'
                 | '\u{0589}'
                 | '\u{058A}'
@@ -624,7 +643,10 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{2030}'..='\u{203B}'
                 | '\u{203C}'..='\u{205E}'
                 | '\u{2E00}'..='\u{2E5D}'
+                | '\u{169B}'
+                | '\u{169C}'
                 | '\u{16EB}'..='\u{16ED}'
+                | '\u{10079}'..='\u{1007C}'
                 | '\u{10100}'..='\u{10102}'
                 | '\u{1039F}'
                 | '\u{103D0}'
@@ -665,7 +687,10 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{22C5}'
                 | '\u{1361}'
                 | '\u{2800}'
+                | '\u{2CFE}'..='\u{2CFF}'
+                | '\u{2D70}'
                 | '\u{1BC9D}'..='\u{1BC9E}'
+                | '\u{1BC9F}'
                 | '\u{1BCA0}'..='\u{1BCA3}'
                 | '\u{1107F}'
                 | '\u{11047}'..='\u{1104D}'
@@ -1186,7 +1211,7 @@ mod tests {
     fn latin1_greek_and_arabic_script_punctuation_separate_words() {
         // U+00A1 / U+00BF (inverted ! / ?), U+00AB / U+00BB (guillemets), U+037E (Greek question
         // mark), U+060C / U+061B / U+061F / U+06D4 (Arabic comma, semicolon, question, full stop),
-        // U+066A–U+066C (Arabic percent, decimal sep, thousands sep): Po / Pi / Pf; not Rust
+        // U+066A–U+066D (Arabic percent, decimal sep, thousands sep, five pointed star): Po / Pi / Pf; not Rust
         // whitespace—mixed European, Greek, or Arabic/Latin HTML can glue tokens without ASCII space.
         for sep in [
             '\u{00A1}',
@@ -1201,6 +1226,7 @@ mod tests {
             '\u{066A}',
             '\u{066B}',
             '\u{066C}',
+            '\u{066D}',
         ] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
@@ -1900,6 +1926,80 @@ mod tests {
     }
 
     #[test]
+    fn ogham_feather_marks_and_duployan_chinook_full_stop_separate_words() {
+        // Ogham U+169B FEATHER MARK (Ps), U+169C REVERSED FEATHER MARK (Pe). Duployan U+1BC9F CHINOOK FULL
+        // STOP (Po). None are Rust whitespace.
+        for sep in ['\u{169B}', '\u{169C}', '\u{1BC9F}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn tifinagh_separator_and_arabic_supplementary_punctuation_separate_words() {
+        // Tifinagh U+2D70 SEPARATOR MARK (Po). Arabic U+0609 / U+060A per mille / per ten thousand (Po),
+        // U+060B AFGHANI SIGN (Sc), U+060D DATE SEPARATOR (Po), U+061E TRIPLE DOT PUNCTUATION (Po),
+        // U+066D FIVE POINTED STAR (Po). None are Rust whitespace.
+        for sep in [
+            '\u{2D70}',
+            '\u{0609}',
+            '\u{060A}',
+            '\u{060B}',
+            '\u{060D}',
+            '\u{061E}',
+            '\u{066D}',
+        ] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn coptic_full_stop_morphological_divider_and_linear_b_word_separators_separate_words() {
+        // Coptic U+2CFE FULL STOP, U+2CFF MORPHOLOGICAL DIVIDER (Po). Linear B U+10079–U+1007C word separator dot /
+        // small / medium / large (Po). None are Rust whitespace.
+        let mut seps: Vec<char> = ('\u{2CFE}'..='\u{2CFF}').collect();
+        seps.extend('\u{10079}'..='\u{1007C}');
+        for sep in seps {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
     fn bengali_oriya_tamil_malayalam_issher_abbrev_and_financial_signs_separate_words() {
         // Bengali U+09FA ISSHAR (So), U+09FD ABBREVIATION SIGN (Po); Oriya U+0B70 ISSHAR (So); Tamil U+0BF3–U+0BFA
         // (day/month/year/debit/credit/as above/rupee/number; So/Sc); Malayalam U+0D4F SIGN PARA, U+0D79 DATE MARK
@@ -2425,8 +2525,8 @@ mod tests {
     #[test]
     fn duployan_selectors_and_shorthand_format_separate_words() {
         // U+1BC9D–U+1BC9E: Duployan thick letter selector / double mark (Mn). U+1BCA0–U+1BCA3:
-        // shorthand format overlap / step (Cf). None are Rust whitespace. (U+1BC9F is Po—visible
-        // punctuation; not mapped.)
+        // shorthand format overlap / step (Cf). None are Rust whitespace. U+1BC9F CHINOOK FULL STOP
+        // (Po) is covered by `ogham_feather_marks_and_duployan_chinook_full_stop_separate_words`.
         for cp in (0x1BC9Du32..=0x1BC9E).chain(0x1BCA0..=0x1BCA3) {
             let sep = char::from_u32(cp).expect("valid scalar");
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
