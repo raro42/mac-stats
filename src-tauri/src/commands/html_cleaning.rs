@@ -201,9 +201,11 @@ fn collapse_whitespace(text: &str) -> String {
                 // (U+30FB, Po), and halfwidth Katakana middle dot (U+FF65, Po) are not Rust
                 // whitespace; European / Greek / Japanese typography often uses them as word
                 // separators, so pasted HTML can glue Latin tokens for `split_whitespace()`.
-                // Bullet (U+2022, Po), bullet operator (U+2219, Sm), and dot operator (U+22C5, Sm)
-                // are not Rust whitespace; list-heavy or MathML-style HTML can place them between
-                // Latin tokens without ASCII space. Fraction slash (U+2044, Sm), division slash
+                // Dagger / double dagger / bullet / triangular bullet (U+2020–U+2023, Po) sit
+                // between the curly-quote arm and dot-leader arm; U+2019 between them is omitted
+                // (apostrophe). None are Rust whitespace; footnote-style or list HTML can glue
+                // Latin tokens without ASCII space. Bullet operator (U+2219, Sm) and dot operator
+                // (U+22C5, Sm) are not Rust whitespace either; MathML-style HTML can do the same. Fraction slash (U+2044, Sm), division slash
                 // (U+2215, Sm), and fullwidth solidus (U+FF0F, Po) are not Rust whitespace either;
                 // math fractions, MathML, or CJK fullwidth paths can use them between Latin tokens
                 // without ASCII space. Ideographic comma / full stop (U+3001, U+3002, Po) and
@@ -217,10 +219,18 @@ fn collapse_whitespace(text: &str) -> String {
                 // Unicode dash punctuation (U+2010–U+2015, Pd)—hyphen, non-breaking hyphen, figure
                 // dash, en dash, em dash, horizontal bar—are not Rust whitespace; typographic HTML or
                 // pasted Office copy often uses them between Latin tokens without ASCII space.
+                // Double vertical line / double low line (U+2016–U+2017, Po) and single/double
+                // quotation marks U+2018, U+201A–U+201F (Pi/Pf/Ps) are not Rust whitespace; curly-quote
+                // HTML can glue Latin tokens without ASCII space. U+2019 RIGHT SINGLE QUOTATION MARK is
+                // omitted: it is the usual typographic apostrophe inside contractions (`don't`).
                 // Per mille / per ten thousand (U+2030–U+2031, Po), prime marks (U+2032–U+2037, Po),
                 // caret (U+2038, Po), single guillemets (U+2039–U+203A, Pi/Pf), and reference mark
                 // (U+203B, Po) are not Rust whitespace; measurements, foot/inch notation, or European
                 // typography in HTML can place them between Latin tokens without ASCII space.
+                // U+203C–U+205E (double exclamation through punctuation boundary; includes fraction
+                // slash U+2044, undertie, Tironian et, reversed pilcrow, four-dot punctuation, etc.;
+                // Po/Pc/Ps/Pe/Sm) are not Rust whitespace—U+205F (medium mathematical space) is, so it
+                // stops before U+2061. Pasted UI copy or scholarly HTML can glue Latin tokens here.
                 // One dot leader / two dot leader / horizontal
                 // ellipsis / hyphenation point (U+2024–U+2027, Po) are not Rust whitespace either;
                 // TOC-style leaders or UI copy like "more…" can glue Latin tokens without ASCII space.
@@ -276,8 +286,6 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{0387}'
                 | '\u{30FB}'
                 | '\u{FF65}'
-                | '\u{2022}'
-                | '\u{2044}'
                 | '\u{2215}'
                 | '\u{FF0F}'
                 | '\u{3001}'
@@ -293,8 +301,12 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{0F0B}'
                 | '\u{1362}'
                 | '\u{2010}'..='\u{2015}'
+                | '\u{2016}'..='\u{2018}'
+                | '\u{201A}'..='\u{201F}'
+                | '\u{2020}'..='\u{2023}'
                 | '\u{2024}'..='\u{2027}'
                 | '\u{2030}'..='\u{203B}'
+                | '\u{203C}'..='\u{205E}'
                 | '\u{2E00}'..='\u{2E5D}'
                 | '\u{16EB}'..='\u{16ED}'
                 | '\u{10100}'..='\u{10101}'
@@ -822,6 +834,27 @@ mod tests {
     }
 
     #[test]
+    fn general_punctuation_u2020_through_u2023_separate_words() {
+        // U+2020 DAGGER, U+2021 DOUBLE DAGGER, U+2022 BULLET, U+2023 TRIANGULAR BULLET (all Po)—not
+        // Rust whitespace; they fall between U+201F and U+2024, with U+2019 omitted as apostrophe.
+        for sep in ['\u{2020}', '\u{2021}', '\u{2022}', '\u{2023}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
     fn unicode_dash_punctuation_u2010_through_u2015_separate_words() {
         // U+2010 HYPHEN, U+2011 NON-BREAKING HYPHEN, U+2012 FIGURE DASH, U+2013 EN DASH, U+2014 EM
         // DASH, U+2015 HORIZONTAL BAR (all Pd)—not Rust whitespace. Em/en dashes in body copy can
@@ -846,10 +879,64 @@ mod tests {
     }
 
     #[test]
+    fn general_punctuation_u2016_u2018_and_u201a_through_u201f_separate_words() {
+        // U+2016 DOUBLE VERTICAL LINE, U+2017 DOUBLE LOW LINE, U+2018 LEFT SINGLE QUOTATION MARK,
+        // U+201A–U+201F (low-9 / reversed-9 / double quotation marks)—Pi/Pf/Ps/Po; not Rust
+        // whitespace. U+2019 is excluded (see `typographic_apostrophe_u2019_does_not_split_contractions`).
+        for cp in (0x2016u32..=0x2018).chain(0x201Au32..=0x201F) {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "U+{:04X} should separate words, got {:?}",
+                cp,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
+    fn typographic_apostrophe_u2019_does_not_split_contractions() {
+        // U+2019 is the usual curly apostrophe in "don't"; it must not become a word separator.
+        let html = "<html><body><p>don\u{2019}t stop</p></body></html>";
+        let cleaned = clean_html(html);
+        assert!(
+            cleaned.contains("don't stop") || cleaned.contains("don\u{2019}t stop"),
+            "expected contraction preserved, got {:?}",
+            cleaned
+        );
+        assert!(
+            !cleaned.contains("don t stop"),
+            "U+2019 must not split contractions: {:?}",
+            cleaned
+        );
+    }
+
+    #[test]
     fn general_punctuation_u2030_through_u203b_separate_words() {
         // U+2030 PER MILLE through U+203B REFERENCE MARK (Po / Pi / Pf)—not Rust whitespace.
         // Primes, per-mille signs, guillemets, or reference marks in body copy can glue Latin tokens.
         for cp in 0x2030u32..=0x203B {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "U+{:04X} should separate words, got {:?}",
+                cp,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
+    fn general_punctuation_u203c_through_u205e_separate_words() {
+        // U+203C DOUBLE EXCLAMATION through U+205E VERTICAL FOUR DOTS (Po/Pc/Ps/Pe/Sm)—not Rust
+        // whitespace. U+205F MEDIUM MATHEMATICAL SPACE is Unicode whitespace (Rust splits on it).
+        // Includes U+2044 FRACTION SLASH (previously a dedicated arm). Interrobang, undertie,
+        // Tironian et, or four-dot punctuation in pasted HTML can glue Latin tokens.
+        for cp in 0x203Cu32..=0x205E {
             let sep = char::from_u32(cp).expect("valid scalar");
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
