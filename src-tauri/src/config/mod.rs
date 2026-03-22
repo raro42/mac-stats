@@ -19,7 +19,7 @@
 //! leak secrets.
 //!
 //! **JSON config reload (no restart needed):**
-//! - `config.json` — read on every access (window decorations, scheduler interval, maxSchedules, ollamaChatTimeoutSecs, browserViewportWidth/Height, browserIdleTimeoutSecs, perplexityMaxResults, perplexitySnippetMaxChars, discord_draft_throttle_ms).
+//! - `config.json` — read on every access (window decorations, scheduler interval, maxSchedules, ollamaChatTimeoutSecs, browserViewportWidth/Height, browserIdleTimeoutSecs, perplexityMaxResults, perplexitySnippetMaxChars, discord_draft_throttle_ms, downloadsOrganizer*).
 //! - `schedules.json` — scheduler checks file mtime each loop and reloads when changed.
 //! - `discord_channels.json` — Discord loop checks mtime every tick and reloads when changed.
 
@@ -506,6 +506,34 @@ impl Config {
         true
     }
 
+    /// When true (default), FETCH_URL / BROWSER_EXTRACT / HTTP-fallback page text is passed
+    /// through Unicode homoglyph normalization (fullwidth ASCII → ASCII; confusable angle
+    /// brackets → `<` / `>`) before it enters the tool loop. Disable for rollback:
+    /// config.json `normalizeUntrustedHomoglyphs`: false; env `MAC_STATS_NORMALIZE_UNTRUSTED_HOMOGLYPHS`: 0/false/off.
+    pub fn normalize_untrusted_homoglyphs_enabled() -> bool {
+        if let Ok(s) = std::env::var("MAC_STATS_NORMALIZE_UNTRUSTED_HOMOGLYPHS") {
+            let lower = s.to_lowercase();
+            if matches!(lower.as_str(), "0" | "false" | "no" | "off") {
+                return false;
+            }
+            if matches!(lower.as_str(), "1" | "true" | "yes" | "on") {
+                return true;
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(b) = json
+                    .get("normalizeUntrustedHomoglyphs")
+                    .and_then(|v| v.as_bool())
+                {
+                    return b;
+                }
+            }
+        }
+        true
+    }
+
     /// Maximum character length a single tool-result message is allowed after
     /// truncation during context-overflow recovery. Larger results are cut to
     /// this size plus a "[truncated]" marker. Default: 4096.
@@ -867,6 +895,138 @@ impl Config {
         Self::agents_dir().join("cookie_reject_patterns.md")
     }
 
+    /// User-editable rules for the Downloads organizer: `$HOME/.mac-stats/agents/downloads-organizer-rules.md`
+    pub fn downloads_organizer_rules_path() -> PathBuf {
+        Self::agents_dir().join("downloads-organizer-rules.md")
+    }
+
+    /// Persisted last-run summary for the Downloads organizer: `$HOME/.mac-stats/downloads-organizer-state.json`
+    pub fn downloads_organizer_state_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            PathBuf::from(home)
+                .join(".mac-stats")
+                .join("downloads-organizer-state.json")
+        } else {
+            std::env::temp_dir().join("mac-stats-downloads-organizer-state.json")
+        }
+    }
+
+    /// When true, the background loop may run the Downloads organizer (still respects interval and `off`).
+    /// Config: `downloadsOrganizerEnabled` (bool). Env: `MAC_STATS_DOWNLOADS_ORGANIZER_ENABLED` (true/false/1/0).
+    pub fn downloads_organizer_enabled() -> bool {
+        if let Ok(s) = std::env::var("MAC_STATS_DOWNLOADS_ORGANIZER_ENABLED") {
+            let l = s.to_lowercase();
+            if matches!(l.as_str(), "1" | "true" | "yes" | "on") {
+                return true;
+            }
+            if matches!(l.as_str(), "0" | "false" | "no" | "off") {
+                return false;
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(b) = json
+                    .get("downloadsOrganizerEnabled")
+                    .and_then(|v| v.as_bool())
+                {
+                    return b;
+                }
+            }
+        }
+        false
+    }
+
+    /// `hourly`, `daily`, or `off`. Config: `downloadsOrganizerInterval`. Env: `MAC_STATS_DOWNLOADS_ORGANIZER_INTERVAL`.
+    pub fn downloads_organizer_interval() -> String {
+        if let Ok(s) = std::env::var("MAC_STATS_DOWNLOADS_ORGANIZER_INTERVAL") {
+            let l = s.to_lowercase();
+            if l == "hourly" || l == "daily" || l == "off" {
+                return l;
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(v) = json
+                    .get("downloadsOrganizerInterval")
+                    .and_then(|v| v.as_str())
+                {
+                    let l = v.to_lowercase();
+                    if l == "hourly" || l == "daily" || l == "off" {
+                        return l;
+                    }
+                }
+            }
+        }
+        "off".to_string()
+    }
+
+    /// Local time of day for `daily` interval (`HH:MM`, 24h). Config: `downloadsOrganizerDailyAtLocal`. Default 09:00 when missing/invalid.
+    pub fn downloads_organizer_daily_at_local() -> (u32, u32) {
+        let config_path = Self::config_file_path();
+        let default_pair = (9u32, 0u32);
+        let Ok(content) = std::fs::read_to_string(&config_path) else {
+            return default_pair;
+        };
+        let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) else {
+            return default_pair;
+        };
+        let raw = json
+            .get("downloadsOrganizerDailyAtLocal")
+            .and_then(|v| v.as_str())
+            .unwrap_or("09:00");
+        parse_hhmm_local(raw).unwrap_or(default_pair)
+    }
+
+    /// Override Downloads root (expand `~/...`). Empty = `~/Downloads`. Config: `downloadsOrganizerPath`. Env: `MAC_STATS_DOWNLOADS_ORGANIZER_PATH`.
+    pub fn downloads_organizer_path_raw() -> String {
+        if let Ok(s) = std::env::var("MAC_STATS_DOWNLOADS_ORGANIZER_PATH") {
+            if !s.trim().is_empty() {
+                return s;
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(v) = json
+                    .get("downloadsOrganizerPath")
+                    .and_then(|v| v.as_str())
+                {
+                    if !v.trim().is_empty() {
+                        return v.to_string();
+                    }
+                }
+            }
+        }
+        String::new()
+    }
+
+    /// Log planned moves only; no renames. Default **true** (safe). Config: `downloadsOrganizerDryRun`. Env: `MAC_STATS_DOWNLOADS_ORGANIZER_DRY_RUN`.
+    pub fn downloads_organizer_dry_run() -> bool {
+        if let Ok(s) = std::env::var("MAC_STATS_DOWNLOADS_ORGANIZER_DRY_RUN") {
+            let l = s.to_lowercase();
+            if matches!(l.as_str(), "1" | "true" | "yes" | "on") {
+                return true;
+            }
+            if matches!(l.as_str(), "0" | "false" | "no" | "off") {
+                return false;
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(b) = json
+                    .get("downloadsOrganizerDryRun")
+                    .and_then(|v| v.as_bool())
+                {
+                    return b;
+                }
+            }
+        }
+        true
+    }
+
     /// Prompts directory: `$HOME/.mac-stats/agents/prompts/`
     pub fn prompts_dir() -> PathBuf {
         Self::agents_dir().join("prompts")
@@ -922,6 +1082,8 @@ impl Config {
         include_str!("../../defaults/session_reset_phrases.md");
     const DEFAULT_COOKIE_REJECT_PATTERNS: &str =
         include_str!("../../defaults/cookie_reject_patterns.md");
+    pub const DEFAULT_DOWNLOADS_ORGANIZER_RULES: &str =
+        include_str!("../../defaults/downloads-organizer-rules.md");
 
     /// Write a default file if the target path does not exist (never overwrites user edits).
     fn write_default_if_missing(path: &std::path::Path, content: &str) {
@@ -1110,6 +1272,11 @@ impl Config {
             Self::DEFAULT_COOKIE_REJECT_PATTERNS,
         );
 
+        Self::write_default_if_missing(
+            &Self::downloads_organizer_rules_path(),
+            Self::DEFAULT_DOWNLOADS_ORGANIZER_RULES,
+        );
+
         // Default agents: loop over DEFAULT_AGENT_IDS. agent.json only if missing; skill.md and testing.md overwritten from bundle.
         for (dir_name, files) in Self::DEFAULT_AGENT_IDS {
             let dir = agents.join(dir_name);
@@ -1285,6 +1452,21 @@ impl Config {
                 default.trim().to_string()
             }
         }
+    }
+}
+
+fn parse_hhmm_local(raw: &str) -> Option<(u32, u32)> {
+    let raw = raw.trim();
+    let mut parts = raw.split(':');
+    let h: u32 = parts.next()?.trim().parse().ok()?;
+    let m: u32 = parts.next()?.trim().parse().ok()?;
+    if parts.next().is_some() {
+        return None;
+    }
+    if h < 24 && m < 60 {
+        Some((h, m))
+    } else {
+        None
     }
 }
 

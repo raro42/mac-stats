@@ -301,6 +301,7 @@ function showSettingsDialog(openTab) {
     loadSettingsAlertChannels();
     loadSettingsSchedules();
     loadSettingsSkills();
+    loadSettingsDownloads();
     loadSettingsOllama();
     setupAlertChannelTypeVisibility();
     setupScheduleTypeVisibility();
@@ -382,6 +383,25 @@ function setupSettingsModalListeners() {
     if (refreshModelsBtn) refreshModelsBtn.addEventListener('click', refreshOllamaModels);
     const ollamaApplyBtn = document.getElementById('ollama-apply-btn');
     if (ollamaApplyBtn) ollamaApplyBtn.addEventListener('click', applyOllamaConfig);
+
+    const doApply = document.getElementById('do-apply-btn');
+    if (doApply) doApply.addEventListener('click', applyDownloadsOrganizerSettings);
+    const doRun = document.getElementById('do-run-now-btn');
+    if (doRun) doRun.addEventListener('click', runDownloadsOrganizerNow);
+    const doEdit = document.getElementById('do-edit-rules-btn');
+    if (doEdit) doEdit.addEventListener('click', openDownloadsRulesEditor);
+    const drClose = document.getElementById('downloads-rules-modal-close');
+    if (drClose) drClose.addEventListener('click', closeDownloadsRulesModal);
+    const drCancel = document.getElementById('downloads-rules-cancel-btn');
+    if (drCancel) drCancel.addEventListener('click', closeDownloadsRulesModal);
+    const drSave = document.getElementById('downloads-rules-save-btn');
+    if (drSave) drSave.addEventListener('click', saveDownloadsRulesFromModal);
+    const drModal = document.getElementById('downloads-rules-modal');
+    if (drModal) {
+        drModal.addEventListener('click', (e) => {
+            if (e.target.id === 'downloads-rules-modal') closeDownloadsRulesModal();
+        });
+    }
 }
 
 function setupScheduleTypeVisibility() {
@@ -413,6 +433,125 @@ async function loadSettingsSkills() {
         }
     } catch (err) {
         listEl.innerHTML = `<p class="settings-error">Failed to load: ${escapeHtml(String(err))}</p>`;
+    }
+}
+
+async function loadSettingsDownloads() {
+    const pathHint = document.getElementById('do-rules-path-hint');
+    const lastRun = document.getElementById('do-last-run');
+    const lastSum = document.getElementById('do-last-summary');
+    const errRow = document.getElementById('do-rules-error-row');
+    const errEl = document.getElementById('do-rules-error');
+    const enabled = document.getElementById('do-enabled');
+    const interval = document.getElementById('do-interval');
+    const daily = document.getElementById('do-daily');
+    const dry = document.getElementById('do-dry-run');
+    const pathEl = document.getElementById('do-path');
+    const statusEl = document.getElementById('do-apply-status');
+    if (!enabled || !interval) return;
+    if (statusEl) statusEl.textContent = '';
+    try {
+        const s = await invoke('get_downloads_organizer_status');
+        enabled.checked = !!s.enabled;
+        interval.value = s.interval || 'off';
+        if (daily) daily.value = s.dailyAtLocal || '09:00';
+        if (dry) dry.checked = !!s.dryRun;
+        if (pathEl) pathEl.value = s.pathRaw || '';
+        if (pathHint) {
+            pathHint.innerHTML = `Rules file: <code>${escapeHtml(s.rulesPath || '')}</code>`;
+        }
+        if (lastRun) {
+            lastRun.textContent = s.lastRunUtc
+                ? `Last run (UTC): ${escapeHtml(s.lastRunUtc)}`
+                : 'Last run: never';
+        }
+        if (lastSum) {
+            const dr = s.lastDryRun ? 'yes' : 'no';
+            lastSum.textContent = `Last result: moved ${s.moved}, skipped ${s.skipped}, failed ${s.failed} (dry-run was ${dr})`;
+        }
+        if (s.rulesError) {
+            if (errRow) errRow.style.display = 'block';
+            if (errEl) errEl.textContent = `Rules error: ${escapeHtml(s.rulesError)}`;
+        } else {
+            if (errRow) errRow.style.display = 'none';
+            if (errEl) errEl.textContent = '';
+        }
+    } catch (err) {
+        if (lastRun) lastRun.textContent = `Failed to load status: ${escapeHtml(String(err))}`;
+    }
+}
+
+async function applyDownloadsOrganizerSettings() {
+    const statusEl = document.getElementById('do-apply-status');
+    const enabled = document.getElementById('do-enabled');
+    const interval = document.getElementById('do-interval');
+    const daily = document.getElementById('do-daily');
+    const dry = document.getElementById('do-dry-run');
+    const pathEl = document.getElementById('do-path');
+    if (!enabled || !interval || !dry) return;
+    const patch = {
+        enabled: enabled.checked,
+        interval: interval.value,
+        dailyAtLocal: daily ? daily.value.trim() : undefined,
+        dryRun: dry.checked
+    };
+    const pr = pathEl ? pathEl.value.trim() : '';
+    if (pr) patch.path = pr;
+    if (statusEl) statusEl.textContent = 'Saving…';
+    try {
+        await invoke('set_downloads_organizer_settings', { patch });
+        if (statusEl) statusEl.textContent = 'Saved. Config is read on each run (no restart needed).';
+        loadSettingsDownloads();
+    } catch (err) {
+        if (statusEl) statusEl.textContent = `Failed: ${escapeHtml(String(err))}`;
+    }
+}
+
+async function runDownloadsOrganizerNow() {
+    const statusEl = document.getElementById('do-apply-status');
+    if (statusEl) statusEl.textContent = 'Running organizer…';
+    try {
+        const msg = await invoke('run_downloads_organizer_now');
+        if (statusEl) statusEl.textContent = escapeHtml(String(msg));
+        loadSettingsDownloads();
+    } catch (err) {
+        if (statusEl) statusEl.textContent = `Failed: ${escapeHtml(String(err))}`;
+    }
+}
+
+function openDownloadsRulesEditor() {
+    const modal = document.getElementById('downloads-rules-modal');
+    const ta = document.getElementById('downloads-rules-textarea');
+    const st = document.getElementById('downloads-rules-save-status');
+    if (st) st.textContent = '';
+    if (!modal || !ta) return;
+    invoke('read_downloads_organizer_rules')
+        .then((text) => {
+            ta.value = text;
+            modal.setAttribute('aria-hidden', 'false');
+        })
+        .catch((err) => {
+            alert(`Could not load rules: ${err}`);
+        });
+}
+
+function closeDownloadsRulesModal() {
+    const modal = document.getElementById('downloads-rules-modal');
+    if (modal) modal.setAttribute('aria-hidden', 'true');
+}
+
+async function saveDownloadsRulesFromModal() {
+    const ta = document.getElementById('downloads-rules-textarea');
+    const st = document.getElementById('downloads-rules-save-status');
+    if (!ta) return;
+    if (st) st.textContent = 'Saving…';
+    try {
+        await invoke('save_downloads_organizer_rules', { content: ta.value });
+        if (st) st.textContent = 'Saved.';
+        closeDownloadsRulesModal();
+        loadSettingsDownloads();
+    } catch (err) {
+        if (st) st.textContent = `Failed: ${escapeHtml(String(err))}`;
     }
 }
 

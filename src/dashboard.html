@@ -109,6 +109,7 @@
             <button type="button" class="settings-tab" data-tab="schedules">Schedules</button>
             <button type="button" class="settings-tab" data-tab="skills">Skills</button>
             <button type="button" class="settings-tab" data-tab="ollama">Ollama</button>
+            <button type="button" class="settings-tab" data-tab="downloads">Downloads</button>
           </div>
 
           <section class="settings-panel active" id="settings-monitors">
@@ -208,6 +209,51 @@
             <div class="settings-list" id="settings-skills-list"></div>
           </section>
 
+          <section class="settings-panel" id="settings-downloads">
+            <h4>Downloads organizer</h4>
+            <p class="settings-hint">Sorts files in your Downloads folder (top-level only) into subfolders using rules in <code>~/.mac-stats/agents/downloads-organizer-rules.md</code>. Default is dry-run (log only). See docs/024_downloads_organizer.md.</p>
+            <p class="settings-hint" id="do-rules-path-hint"></p>
+            <div class="settings-form">
+              <div class="form-row form-row-inline">
+                <label><input type="checkbox" id="do-enabled" /> Enable organizer</label>
+              </div>
+              <div class="form-row">
+                <label for="do-interval">Interval</label>
+                <select id="do-interval">
+                  <option value="off">Off</option>
+                  <option value="hourly">Hourly</option>
+                  <option value="daily">Daily (local time)</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label for="do-daily">Daily at (HH:MM, local)</label>
+                <input type="text" id="do-daily" placeholder="09:00" />
+              </div>
+              <div class="form-row form-row-inline">
+                <label><input type="checkbox" id="do-dry-run" /> Dry run (log planned moves only, no moves)</label>
+              </div>
+              <div class="form-row">
+                <label for="do-path">Downloads folder (optional, default ~/Downloads)</label>
+                <input type="text" id="do-path" placeholder="Leave empty for ~/Downloads" />
+              </div>
+              <div class="form-row">
+                <span class="settings-hint" id="do-last-run"></span>
+              </div>
+              <div class="form-row">
+                <span class="settings-hint" id="do-last-summary"></span>
+              </div>
+              <div class="form-row" id="do-rules-error-row" style="display: none;">
+                <span class="settings-error" id="do-rules-error"></span>
+              </div>
+              <div class="form-row form-row-inline">
+                <button type="button" class="btn-primary" id="do-apply-btn">Save settings</button>
+                <button type="button" class="btn-secondary" id="do-run-now-btn">Run now</button>
+                <button type="button" class="btn-secondary" id="do-edit-rules-btn">Edit rules…</button>
+              </div>
+              <p class="settings-hint" id="do-apply-status"></p>
+            </div>
+          </section>
+
           <section class="settings-panel" id="settings-ollama">
             <h4>Ollama (AI chat)</h4>
             <p class="settings-hint">Endpoint and model used for AI chat and Discord agent. Change here or in the CPU window; both use the same backend config.</p>
@@ -229,6 +275,23 @@
               </div>
             </div>
           </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="downloads-rules-modal" aria-hidden="true">
+      <div class="modal settings-modal">
+        <div class="modal-header">
+          <h3>Downloads organizer rules</h3>
+          <button type="button" class="modal-close" id="downloads-rules-modal-close" aria-label="Close">×</button>
+        </div>
+        <div class="modal-body">
+          <textarea id="downloads-rules-textarea" rows="22" style="width: 100%; font-family: monospace; font-size: 12px; box-sizing: border-box;"></textarea>
+          <div class="form-row form-row-inline" style="margin-top: 12px;">
+            <button type="button" class="btn-primary" id="downloads-rules-save-btn">Save rules</button>
+            <button type="button" class="btn-secondary" id="downloads-rules-cancel-btn">Cancel</button>
+          </div>
+          <p class="settings-hint" id="downloads-rules-save-status"></p>
         </div>
       </div>
     </div>

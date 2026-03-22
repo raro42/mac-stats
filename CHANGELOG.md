@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.55] - 2026-03-22
+
+### Added
+- **Downloads organizer** — Moves top-level files in `~/Downloads` (or a configured path) into subfolders using markdown rules (`~/.mac-stats/agents/downloads-organizer-rules.md`); ships default rules; Tauri commands and dashboard settings; background check every 60s when enabled (`hourly` / `daily` / `off`, dry-run default). (`downloads_organizer/`, `commands/downloads_organizer.rs`, `config/mod.rs`, `lib.rs`, `dashboard.html` / `dashboard.js`, `docs/024_downloads_organizer.md`.)
+
+### Changed
+- **Browser agent (CDP)** — Clearer navigation failures: detects `chrome-error://` after navigate, skips cookie-banner logic on error documents, logs host-only + compact error class, sanitizes errors for tools/LLM (path redaction, length cap). (`browser_agent/mod.rs`, `http_fallback.rs`.)
+- **Server-side fetch** — `fetch_page_post_form_urlencoded` for `application/x-www-form-urlencoded` POST with the same SSRF, redirect, timeout, and body truncation as GET. Optional homoglyph normalization for untrusted page text via `normalizeUntrustedHomoglyphs` / `MAC_STATS_NORMALIZE_UNTRUSTED_HOMOGLYPHS`. (`commands/browser.rs`, `commands/text_normalize.rs`, tool dispatch paths, `config/mod.rs`.)
+
 ## [Unreleased]
 
 ### Added

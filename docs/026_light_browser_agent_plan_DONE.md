@@ -98,4 +98,4 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 
 ### Phase 4 (Optional): HTTP-only "browser" Fallback (no Chromium) — **Implemented**
 
-- When CDP/Chrome is not available: BROWSER_NAVIGATE/CLICK/INPUT/EXTRACT fall back to HTTP fetch + `scraper` (links, forms, body text). BROWSER_CLICK follows links or submits forms; BROWSER_INPUT fills form fields. No JS execution. State in `browser_agent::http_fallback`.
+- When CDP/Chrome is not available: BROWSER_NAVIGATE/CLICK/INPUT/EXTRACT fall back to HTTP fetch + `scraper` (links, forms, body text). BROWSER_CLICK follows links or submits forms; BROWSER_INPUT fills form fields. Form submit uses the owning `<form>`’s resolved `action`, `method` (GET query string vs POST body), and includes hidden inputs plus named controls in that form only; POST uses `application/x-www-form-urlencoded` via `commands/browser.rs` with the same SSRF checks and redirect policy as `fetch_page_content`. `multipart/form-data` is rejected with a clear error (use CDP for file uploads). No JS execution. State in `browser_agent/http_fallback.rs`.

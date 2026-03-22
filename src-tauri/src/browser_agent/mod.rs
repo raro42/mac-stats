@@ -237,14 +237,22 @@ pub fn navigate(browser: &Browser, url: &str) -> Result<Arc<headless_chrome::Tab
         .cloned()
         .ok_or_else(|| "No tab in browser".to_string())?;
     drop(tabs);
-    tab.navigate_to(url)
-        .map_err(|e| format!("Navigate to {}: {}", url, e))?;
+    tab.navigate_to(url).map_err(|e| {
+        let msg = e.to_string();
+        let detail = navigate_failed_detail_from_display(&msg);
+        log_navigation_cdp_failure(url, &detail);
+        format_navigation_failed_for_tool(url, &detail)
+    })?;
     if let Err(e) = tab.wait_until_navigated() {
         mac_stats_warn!("browser",
             "Browser agent: wait_until_navigated failed (SPA/hash nav?): {} — continuing after short delay",
             e
         );
         std::thread::sleep(Duration::from_secs(2));
+    }
+    let final_u = tab.get_url();
+    if let Some(msg) = post_navigate_load_failure_message(url, final_u.as_str()) {
+        return Err(msg);
     }
     mac_stats_info!("browser", "Browser agent: navigated to {}", url);
     Ok(tab)
@@ -324,6 +332,13 @@ pub fn get_interactables(tab: &headless_chrome::Tab) -> Result<Vec<Interactable>
 /// Patterns are loaded from ~/.mac-stats/agents/cookie_reject_patterns.md (user-editable for translation or extra sites).
 /// Returns true if a matching element was clicked, false otherwise. Logs at INFO (and DEBUG for details) so it is visible in logs and verbose mode.
 fn try_dismiss_cookie_banner(tab: &headless_chrome::Tab) -> Result<bool, String> {
+    if is_chrome_internal_error_document_url(tab.get_url().as_str()) {
+        mac_stats_debug!(
+            "browser/cdp",
+            "Browser agent [CDP]: skip cookie banner on chrome-error document"
+        );
+        return Ok(false);
+    }
     let patterns = crate::config::Config::load_cookie_reject_patterns();
     let interactables = get_interactables(tab)?;
     let label_lower = |i: &Interactable| -> String {
@@ -519,8 +534,12 @@ fn fetch_page_and_extract_phones_with_browser(
     let tab = tabs.first().cloned().ok_or_else(|| "No tab".to_string())?;
     drop(tabs);
     mac_stats_info!("browser", "Browser agent: navigating to {}", url);
-    tab.navigate_to(url)
-        .map_err(|e| format!("Navigate: {}", e))?;
+    tab.navigate_to(url).map_err(|e| {
+        let msg = e.to_string();
+        let detail = navigate_failed_detail_from_display(&msg);
+        log_navigation_cdp_failure(url, &detail);
+        format_navigation_failed_for_tool(url, &detail)
+    })?;
     if let Err(e) = tab.wait_until_navigated() {
         mac_stats_warn!(
             "browser",
@@ -528,6 +547,10 @@ fn fetch_page_and_extract_phones_with_browser(
             e
         );
         std::thread::sleep(Duration::from_secs(2));
+    }
+    let final_u = tab.get_url();
+    if let Some(msg) = post_navigate_load_failure_message(url, final_u.as_str()) {
+        return Err(msg);
     }
     std::thread::sleep(Duration::from_secs(2));
     // Scroll to bottom to trigger footer/lazy content
@@ -782,6 +805,106 @@ fn is_new_tab_or_blank(url: &str) -> bool {
         || u.eq_ignore_ascii_case("about:blank")
         || u.starts_with("chrome://newtab")
         || u == "chrome://newtab/"
+}
+
+/// Chrome internal error document (load failure). Cookie-banner heuristics must not run here.
+fn is_chrome_internal_error_document_url(url: &str) -> bool {
+    url.trim()
+        .to_ascii_lowercase()
+        .starts_with("chrome-error://")
+}
+
+/// Host only for logs (no path/query) so tokens in URLs are not written to debug.log.
+fn host_for_navigation_log(url: &str) -> String {
+    Url::parse(url)
+        .ok()
+        .and_then(|u| u.host_str().map(std::string::ToString::to_string))
+        .unwrap_or_else(|| "(no-host)".to_string())
+}
+
+/// First token / short prefix of Chrome `errorText` for compact debug lines (e.g. `net::ERR_…`).
+fn navigation_error_class(error_text: &str) -> String {
+    let t = error_text.trim();
+    if t.is_empty() {
+        return "(empty)".to_string();
+    }
+    if let Some(pos) = t.find(|c: char| c.is_whitespace()) {
+        t[..pos].chars().take(80).collect()
+    } else {
+        t.chars().take(80).collect()
+    }
+}
+
+/// LLM-facing navigation error: trim, cap length, redact obvious local path segments.
+fn sanitize_navigation_error_for_llm(error_text: &str) -> String {
+    let re_pathy = Regex::new(r"(?i)(/Users/[^\s]+|/home/[^\s]+|file://[^\s]+)")
+        .expect("static regex");
+    let mut s = error_text.trim().to_string();
+    s = re_pathy.replace_all(&s, "[path]").to_string();
+    const MAX: usize = 400;
+    if s.chars().count() > MAX {
+        return s.chars().take(MAX).collect::<String>() + "…";
+    }
+    s
+}
+
+fn log_navigation_cdp_failure(requested_url: &str, raw_error_text: &str) {
+    let host = host_for_navigation_log(requested_url);
+    let class = navigation_error_class(raw_error_text);
+    mac_stats_debug!(
+        "browser/cdp",
+        "Browser agent [CDP]: navigation failure host={} error_class={}",
+        host,
+        class
+    );
+    mac_stats_debug!(
+        "browser/cdp",
+        "Browser agent [CDP]: navigation failure full errorText={}",
+        raw_error_text
+    );
+}
+
+/// Tool result when CDP `Page.navigate` reported failure (`errorText`) or equivalent.
+fn format_navigation_failed_for_tool(requested_url: &str, chrome_detail: &str) -> String {
+    let sanitized = sanitize_navigation_error_for_llm(chrome_detail);
+    format!(
+        "Navigation failed: the target page did not load. Chrome reported: {}\nDo not treat the tab as having loaded the requested site. Requested URL: {}",
+        sanitized, requested_url
+    )
+}
+
+fn navigate_failed_detail_from_display(err_msg: &str) -> String {
+    const PREFIX: &str = "Navigate failed: ";
+    err_msg
+        .strip_prefix(PREFIX)
+        .unwrap_or(err_msg)
+        .to_string()
+}
+
+/// After `navigate_to` returns Ok, Chrome may still show an error document without `errorText` on the navigate response.
+fn post_navigate_load_failure_message(requested_url: &str, final_url: &str) -> Option<String> {
+    if is_chrome_internal_error_document_url(final_url) {
+        log_navigation_cdp_failure(requested_url, "chrome-error document (no errorText on navigate)");
+        return Some(format_navigation_failed_for_tool(
+            requested_url,
+            "internal error page (chrome-error://); the network request did not succeed",
+        ));
+    }
+    let requested_http = Url::parse(requested_url)
+        .ok()
+        .is_some_and(|u| matches!(u.scheme(), "http" | "https"));
+    if requested_http && is_new_tab_or_blank(final_url) {
+        mac_stats_debug!(
+            "browser/cdp",
+            "Browser agent [CDP]: heuristic navigation failure host={} final_url=blank-after-http",
+            host_for_navigation_log(requested_url)
+        );
+        return Some(
+            "Navigation may have failed: an HTTP(S) URL was requested but the tab URL is still blank; Chrome did not return errorText on Page.navigate. Do not assume the page loaded."
+                .to_string(),
+        );
+    }
+    None
 }
 
 const SESSION_RESET_MSG: &str = "Browser session was reset; current page is a new tab. Use BROWSER_NAVIGATE: <your target URL> first to reopen the page, then retry.";
@@ -1081,18 +1204,10 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<String, Stri
     };
     tab.set_default_timeout(Duration::from_secs(actual_timeout_secs));
     tab.navigate_to(&url_normalized).map_err(|e| {
-        let msg = format!("{}", e);
-        let s = if msg.to_lowercase().contains("net::")
-            || msg.contains("404")
-            || msg.contains("failed")
-        {
-            format!(
-                "Navigation failed: {}",
-                msg.trim_start_matches("Navigate failed: ")
-            )
-        } else {
-            format!("Navigation failed: {}", msg)
-        };
+        let msg = e.to_string();
+        let detail = navigate_failed_detail_from_display(&msg);
+        log_navigation_cdp_failure(&url_normalized, &detail);
+        let s = format_navigation_failed_for_tool(&url_normalized, &detail);
         clear_browser_session_on_error(&s);
         s
     })?;
@@ -1117,6 +1232,12 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<String, Stri
             );
             std::thread::sleep(Duration::from_secs(2));
         }
+    }
+    let final_after_wait = tab.get_url();
+    if let Some(msg) =
+        post_navigate_load_failure_message(url_normalized.as_str(), final_after_wait.as_str())
+    {
+        return Err(msg);
     }
     std::thread::sleep(Duration::from_millis(1500));
     let mut state = get_browser_state(&tab).inspect_err(|e| {
@@ -1610,7 +1731,7 @@ fn extract_page_text_inner() -> Result<String, String> {
     } else {
         text
     };
-    Ok(out)
+    Ok(crate::commands::text_normalize::apply_untrusted_homoglyph_normalization(out))
 }
 
 /// Take a screenshot of the current CDP tab (no navigation). Use after BROWSER_NAVIGATE + BROWSER_CLICK.
@@ -1689,30 +1810,25 @@ fn take_screenshot_inner(url: &str) -> Result<PathBuf, String> {
         crate::commands::browser::validate_url_no_ssrf(&parsed, &allowed)?;
     }
 
-    let port = 9222u16;
-    let browser = get_or_create_browser(port).inspect_err(|e| {
+    // URL screenshots must respect CURRENT_TAB_INDEX (same tab as get_current_tab / BROWSER_NAVIGATE),
+    // not tabs.first(), so multi-tab sessions navigate and capture the focused tab.
+    let (_browser, tab) = get_current_tab().inspect_err(|e| {
         clear_browser_session_on_error(e);
     })?;
-    let tabs = browser.get_tabs().lock().map_err(|e| {
-        let s = e.to_string();
-        clear_browser_session_on_error(&s);
-        s
-    })?;
-    let tab = tabs.first().cloned().ok_or_else(|| "No tab".to_string())?;
-    drop(tabs);
-    register_dialog_auto_dismiss(&tab);
+    mac_stats_debug!(
+        "browser/cdp",
+        "Browser agent [CDP]: take_screenshot URL path: using focused tab (get_current_tab / CURRENT_TAB_INDEX)"
+    );
     mac_stats_info!(
         "browser/cdp",
         "Browser agent [CDP]: navigating to: {}",
         url_normalized
     );
     tab.navigate_to(&url_normalized).map_err(|e| {
-        let s = format!("Navigate: {}", e);
-        mac_stats_warn!(
-            "browser/cdp",
-            "Browser agent [CDP]: navigate_to failed: {}",
-            e
-        );
+        let msg = e.to_string();
+        let detail = navigate_failed_detail_from_display(&msg);
+        log_navigation_cdp_failure(&url_normalized, &detail);
+        let s = format_navigation_failed_for_tool(&url_normalized, &detail);
         clear_browser_session_on_error(&s);
         s
     })?;
@@ -1724,6 +1840,11 @@ fn take_screenshot_inner(url: &str) -> Result<PathBuf, String> {
         std::thread::sleep(Duration::from_secs(2));
     }
     let final_url = tab.get_url();
+    if let Some(msg) =
+        post_navigate_load_failure_message(url_normalized.as_str(), final_url.as_str())
+    {
+        return Err(msg);
+    }
     mac_stats_info!(
         "browser/cdp",
         "Browser agent [CDP]: navigated; final tab URL: {}",
@@ -1804,5 +1925,35 @@ mod tests {
         .unwrap();
         assert!(result.contains("Found 1 match"));
         assert!(result.contains("Amvara's videos"));
+    }
+
+    #[test]
+    fn navigate_failed_detail_strips_headless_chrome_prefix() {
+        assert_eq!(
+            navigate_failed_detail_from_display("Navigate failed: net::ERR_NAME_NOT_RESOLVED"),
+            "net::ERR_NAME_NOT_RESOLVED"
+        );
+    }
+
+    #[test]
+    fn chrome_error_url_detected_case_insensitive() {
+        assert!(is_chrome_internal_error_document_url("chrome-error://chromewebdata/"));
+    }
+
+    #[test]
+    fn post_navigate_detects_chrome_error_document() {
+        let m = post_navigate_load_failure_message(
+            "https://example.com",
+            "chrome-error://chromewebdata/",
+        );
+        assert!(m.is_some());
+        assert!(m.unwrap().contains("Navigation failed"));
+    }
+
+    #[test]
+    fn sanitize_navigation_error_redacts_user_path() {
+        let s = sanitize_navigation_error_for_llm("net::ERR_FAILED /Users/alice/secret/file");
+        assert!(!s.contains("/Users/alice"));
+        assert!(s.contains("[path]"));
     }
 }

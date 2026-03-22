@@ -23,6 +23,7 @@ pub mod browser_agent;
 mod commands;
 pub mod config;
 pub mod discord;
+pub mod downloads_organizer;
 mod ffi;
 mod logging;
 mod mcp;
@@ -239,6 +240,11 @@ fn run_internal(open_cpu_window: bool) {
             commands::scheduler::add_schedule,
             commands::scheduler::add_schedule_at,
             commands::scheduler::remove_schedule,
+            commands::downloads_organizer::read_downloads_organizer_rules,
+            commands::downloads_organizer::save_downloads_organizer_rules,
+            commands::downloads_organizer::get_downloads_organizer_status,
+            commands::downloads_organizer::set_downloads_organizer_settings,
+            commands::downloads_organizer::run_downloads_organizer_now,
             commands::skills::list_skills,
             // Window commands (e.g. from chat reserved words)
             commands::window::toggle_cpu_window,
@@ -387,6 +393,14 @@ fn run_internal(open_cpu_window: bool) {
                 loop {
                     std::thread::sleep(std::time::Duration::from_secs(60));
                     commands::alerts::run_periodic_alert_evaluation();
+                }
+            });
+
+            // Downloads organizer: every 60s, run if enabled and hourly/daily schedule is due.
+            std::thread::spawn(|| {
+                loop {
+                    std::thread::sleep(std::time::Duration::from_secs(60));
+                    downloads_organizer::run_if_due();
                 }
             });
 

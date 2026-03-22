@@ -82,6 +82,10 @@ User (e.g. Discord)
 - **Specialist agents (001, 002, 003)** only need to do their job in one turn; they cannot schedule, create tasks, or call other agents via the router. If a specialist “needs” to do that, the orchestrator must do it (e.g. orchestrator calls 002, gets result, then orchestrator does TASK_APPEND or SCHEDULE).
 - There is no “agent calling the router as an API” in a separate request: the router is the loop that drives the entry-point. So “explicitly call the router” = the entry-point outputting tool lines in that same conversation.
 
+## Untrusted web text (homoglyphs)
+
+Text from **FETCH_URL** (after HTML cleaning), **BROWSER_EXTRACT** (CDP `innerText`), and the HTTP browser fallback’s assembled body text is still **attacker-controlled**. Before it enters the router tool loop, mac-stats can normalize Unicode homoglyphs: fullwidth ASCII (Halfwidth and Fullwidth Forms) maps to plain ASCII, and common “angle” confusables (guillemets, CJK angle quotes, mathematical angle brackets, fullwidth `<` / `>`) map to ASCII `<` and `>`. Implementation: `commands/text_normalize.rs`, applied at those boundaries only (not the user’s own typed messages). This is defence in depth for delimiter spoofing; it does **not** replace random boundary IDs or guarantee safety. Default **on**; set `config.json` `normalizeUntrustedHomoglyphs` to `false` or env `MAC_STATS_NORMALIZE_UNTRUSTED_HOMOGLYPHS=false` to disable.
+
 ## Specialist agents
 
 **Definition**: Any agent that is **not** the entry-point is a specialist from the router’s perspective. The entry-point (e.g. agent-000) is the only one in the tool loop; all others are invoked via `AGENT: <id or slug or name> <task>` and run in a **single** Ollama request with **no** tool list.
@@ -119,7 +123,7 @@ Agents are **loaded from disk on each use** (`agents::load_agents()`): no in-mem
 
 ## References
 
-- **Tool loop**: `commands/ollama.rs` → `answer_with_ollama_and_fetch`, `parse_tool_from_response`, `parse_all_tools_from_response`, and the `while tool_count < max_tool_iterations` loop. Plans like `RUN_CMD: date then REDMINE_API GET /time_entries.json?...` are normalized and split into separate steps so each tool runs in sequence (not one RUN_CMD with the whole chain).
+- **Tool loop**: `commands/ollama.rs` → `answer_with_ollama_and_fetch`, `parse_tool_from_response`, `parse_all_tools_from_response`, and the `while tool_count < max_tool_iterations` loop. **FETCH_URL** body path: `commands/network_tool_dispatch.rs` → `html_cleaning::clean_html` → `text_normalize::apply_untrusted_homoglyph_normalization`. Plans like `RUN_CMD: date then REDMINE_API GET /time_entries.json?...` are normalized and split into separate steps so each tool runs in sequence (not one RUN_CMD with the whole chain).
 - **Sub-agent run (no tools)**: `run_agent_ollama_session` in `commands/ollama.rs` (single request, no tool list).
 - **Router API snippet for orchestrator**: `docs/agent_000_router_commands_snippet.md`, `docs/017_llm_agents.md`.
 

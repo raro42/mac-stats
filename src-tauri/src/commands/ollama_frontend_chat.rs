@@ -173,7 +173,7 @@ pub async fn ollama_chat_with_execution(
         let page_content = if page_content.trim().is_empty() {
             "Page fetched but no readable text content found (page may require JavaScript rendering). Try BROWSER_NAVIGATE instead.".to_string()
         } else {
-            page_content
+            crate::commands::text_normalize::apply_untrusted_homoglyph_normalization(page_content)
         };
 
         let mut follow_up_messages = messages.clone();

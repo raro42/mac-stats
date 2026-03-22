@@ -95,7 +95,7 @@ pub(crate) async fn handle_fetch_url(
             let body_for_llm = if cleaned.trim().is_empty() {
                 "Page fetched but no readable text content found (page may require JavaScript rendering). Try BROWSER_NAVIGATE instead.".to_string()
             } else {
-                cleaned
+                crate::commands::text_normalize::apply_untrusted_homoglyph_normalization(cleaned)
             };
             let body_fit = reduce_fetched_content_to_fit(
                 &body_for_llm,

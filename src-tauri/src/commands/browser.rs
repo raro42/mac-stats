@@ -264,6 +264,72 @@ pub fn fetch_page_content(url: &str) -> Result<String, String> {
     Ok(body)
 }
 
+/// POST `application/x-www-form-urlencoded` to a URL and return the response body as text.
+/// Same validation, SSRF policy, redirect handling, timeout, and truncation as [`fetch_page_content`].
+pub fn fetch_page_post_form_urlencoded(
+    url: &str,
+    pairs: &[(String, String)],
+) -> Result<String, String> {
+    let raw = url.trim();
+    let url_str = extract_first_url(raw).ok_or_else(|| {
+        "Invalid URL for POST: no http:// or https:// URL found. Provide a single URL only.".to_string()
+    })?;
+    let parsed = validate_fetch_url(&url_str)?;
+    let allowed_hosts = crate::config::Config::ssrf_allowed_hosts();
+    validate_url_no_ssrf(&parsed, &allowed_hosts)?;
+    let url = parsed.as_str();
+
+    let mut ser = url::form_urlencoded::Serializer::new(String::new());
+    for (k, v) in pairs {
+        ser.append_pair(k, v);
+    }
+    let body = ser.finish();
+
+    info!(
+        "Fetch page: POST {} ({} urlencoded field(s), {} bytes body)",
+        url,
+        pairs.len(),
+        body.len()
+    );
+
+    let client = reqwest::blocking::Client::builder()
+        .timeout(Duration::from_secs(15))
+        .danger_accept_invalid_certs(true)
+        .redirect(ssrf_redirect_policy(allowed_hosts))
+        .build()
+        .map_err(|e| format!("HTTP client: {}", e))?;
+
+    let resp = client
+        .post(url)
+        .header("User-Agent", USER_AGENT)
+        .header(
+            "Accept",
+            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        )
+        .header("Accept-Language", "en-US,en;q=0.9")
+        .header(
+            "Content-Type",
+            "application/x-www-form-urlencoded; charset=UTF-8",
+        )
+        .body(body)
+        .send()
+        .map_err(|e| format!("Request failed: {}", e))?;
+
+    let status = resp.status();
+    if !status.is_success() {
+        let code = status.as_u16();
+        let reason = status.canonical_reason().unwrap_or("");
+        warn!("Fetch page POST failed: {} {} for URL {}", code, reason, url);
+        return Err(format!("HTTP {}: {}", code, reason));
+    }
+
+    let body = resp.text().map_err(|e| format!("Read body: {}", e))?;
+    let body = truncate_fetch_body_if_needed(body);
+    let n = body.chars().count();
+    info!("Fetch page: POST fetched {} chars from {}", n, url);
+    Ok(body)
+}
+
 /// Tauri command: fetch a URL and return body as text (for frontend or tools).
 #[tauri::command]
 pub async fn fetch_page(url: String) -> Result<String, String> {
