@@ -332,8 +332,11 @@ fn collapse_whitespace(text: &str) -> String {
                 // (U+17D4–U+17DA, Po) are not Rust whitespace;
                 // Javanese pada / section marks (U+A9C1–U+A9CF, Po) are not Rust whitespace—U+A9C0 PANGKON (Cf, virama) stays unmapped as
                 // word-internal risk alongside U+17B4/U+17B5 inherent vowels already mapped as format controls.
-                // Balinese carik through pamengkeb (U+1B5A–U+1B60, Po) are not Rust whitespace; Balinese–Latin or Unicode-sample HTML can glue
-                // Latin tokens without ASCII space.
+                // Balinese inverted carik (U+1B4E–U+1B4F, Po), carik through pamengkeb (U+1B5A–U+1B60, Po), musical pitch
+                // names dong through dang gede (U+1B61–U+1B6A, So), hand / drum notation (U+1B74–U+1B7C, So), and lantang / bawak
+                // punctuation (U+1B7D–U+1B7F, Po) are not Rust whitespace; Balinese–Latin or Unicode-sample HTML can glue Latin
+                // tokens without ASCII space. Digits U+1B50–U+1B59 (Nd) and combining musical marks U+1B6B–U+1B73 (Mn) stay unmapped—
+                // numeric / word-internal risk (same spirit as Western Musical Symbols Mc/Mn in FEAT-D162).
                 // Batak bindu symbols (U+1BFC–U+1BFF, Po), Lepcha punctuation ta-rol through tshook (U+1C3B–U+1C3F, Po), and Ol Chiki mucaad /
                 // double mucaad (U+1C7E–U+1C7F, Po) are not Rust whitespace; Batak–Latin, Lepcha–Latin, Ol Chiki–Latin, or Unicode-sample HTML
                 // can glue Latin tokens without ASCII space. Cham spiral and danda marks (U+AA5C–U+AA5F, Po) are not Rust whitespace;
@@ -434,8 +437,11 @@ fn collapse_whitespace(text: &str) -> String {
                 // Roman metrological and ASCIA So U+10190–U+1019C and GREEK SYMBOL TAU RHO U+101A0; not Rust
                 // whitespace. Unassigned gaps U+1019D–U+1019F and U+101A1–U+101CF (UnicodeData Cn) stay unmapped.
                 // Phaistos Disc logograms U+101D0–U+101FC (all So) are not Rust whitespace; U+101FD COMBINING
-                // OBLIQUE STROKE (Mn) and U+101FE–U+101FF (Cn) stay unmapped. Distinct from Ancient Greek Numbers
-                // U+10140–U+1018E (No/So mix; numeric risk for No) and Aegean U+10100–U+10102 above.
+                // OBLIQUE STROKE (Mn) and U+101FE–U+101FF (Cn) stay unmapped. Ancient Greek Numbers (Unicode block
+                // U+10140–U+1018E): metrological / currency `So` U+10179–U+10189 and U+1018C–U+1018E are not Rust
+                // whitespace; scholarly HTML can place them between Latin tokens without ASCII space. Acrophonic and
+                // tally `Nl` U+10140–U+10174, fraction `No` U+10175–U+10178, and `No` zero / quarter U+1018A–U+1018B
+                // stay unmapped—numeric risk. Unassigned U+1018F (Cn) stays unmapped. Aegean U+10100–U+10102 above.
                 // Ugaritic word divider (U+1039F), Old Persian word
                 // divider (U+103D0), Caucasian Albanian citation mark (U+1056F), Imperial Aramaic section
                 // sign (U+10857), Lydian triangular mark (U+1093F), Old South Arabian numeric indicator
@@ -572,6 +578,16 @@ fn collapse_whitespace(text: &str) -> String {
                 // Yijing Hexagram Symbols U+4DC0–U+4DFF (all So as assigned); not Rust whitespace. I Ching / Unicode-sample HTML
                 // can place the 64 hexagram glyphs between Latin tokens without ASCII space. CJK Unified Ideographs Extension A
                 // U+3400–U+4DBF (Lo) immediately before this block and CJK Unified U+4E00+ after—excluded (word-internal risk).
+                // Yi Radicals U+A490–U+A4C6 (all So as assigned); not Rust whitespace. Yi-script indexes or Unicode-sample HTML
+                // can place radical glyphs between Latin tokens without ASCII space. Unassigned tail U+A4C7–U+A4CF (Cn) and Lisu
+                // letters U+A4D0+ (Lo)—excluded.
+                // Cyrillic Extended-B: Slavonic asterisk U+A673 and Cyrillic kavyka U+A67E (Po); not Rust whitespace. Church
+                // Slavonic or Unicode-sample HTML can place them between Latin tokens without ASCII space. Combining marks
+                // U+A672 (Me), U+A674 / U+A67D (Mn), and letter modifier U+A67F (Lm)—excluded.
+                // Syloti Nagri poetry marks U+A828–U+A82B (all So); not Rust whitespace. Syloti Nagri letters U+A800+ and
+                // combining / Mc vowel signs before U+A828—excluded.
+                // North Indic Number Forms: quarter / placeholder / quantity marks U+A836–U+A837 / U+A839 (So) and rupee mark
+                // U+A838 (Sc); not Rust whitespace. Fraction numerics U+A830–U+A835 (No) and unassigned U+A83A–U+A83F (Cn)—excluded.
                 // Mathematical Alphanumeric Symbols U+1D400–U+1D7FF: almost all Lu / Ll / Nd (styled math letters and digits)—excluded
                 // (word-internal / numeric risk, like the rest of the block). Only ten Sm scalars—MATHEMATICAL * NABLA and * PARTIAL
                 // DIFFERENTIAL in bold / italic / sans-serif faces (U+1D6C1, U+1D6DB, U+1D6FB, U+1D715, U+1D735, U+1D74F, U+1D76F,
@@ -648,8 +664,10 @@ fn collapse_whitespace(text: &str) -> String {
                 // Sulawesi-script or Unicode-sample HTML can glue Latin tokens without ASCII space.
                 // Kawi danda through closing spiral (U+11F43–U+11F4F, Po) are not Rust whitespace;
                 // Indonesian / Unicode-sample HTML can glue Latin tokens without ASCII space.
-                // Tamil Supplement END OF TEXT (U+11FFF, Po) is not Rust whitespace; mixed Tamil–Latin
-                // or Unicode-sample HTML can glue Latin tokens without ASCII space.
+                // Tamil Supplement metrological / land / currency signs (U+11FD5–U+11FF1, So/Sc) are
+                // not Rust whitespace; U+11FD0–U+11FD4 fraction numerics (No) and unassigned
+                // U+11FF2–U+11FFE (Cn) stay unmapped. END OF TEXT (U+11FFF, Po) is not Rust
+                // whitespace; mixed Tamil–Latin or Unicode-sample HTML can glue Latin tokens without ASCII space.
                 // Cuneiform punctuation Old Assyrian word divider through diagonal quadcolon (U+12470–
                 // U+12474, Po) are not Rust whitespace; transliterated scholarly HTML can glue Latin
                 // tokens without ASCII space.
@@ -703,7 +721,10 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{17B5}'
                 | '\u{17D4}'..='\u{17DA}'
                 | '\u{A9C1}'..='\u{A9CF}'
+                | '\u{1B4E}'..='\u{1B4F}'
                 | '\u{1B5A}'..='\u{1B60}'
+                | '\u{1B61}'..='\u{1B6A}'
+                | '\u{1B74}'..='\u{1B7F}'
                 | '\u{1BFC}'..='\u{1BFF}'
                 | '\u{1C3B}'..='\u{1C3F}'
                 | '\u{1C7E}'..='\u{1C7F}'
@@ -906,6 +927,8 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{16EB}'..='\u{16ED}'
                 | '\u{10079}'..='\u{1007C}'
                 | '\u{10100}'..='\u{10102}'
+                | '\u{10179}'..='\u{10189}'
+                | '\u{1018C}'..='\u{1018E}'
                 | '\u{10190}'..='\u{1019C}'
                 | '\u{101A0}'
                 | '\u{101D0}'..='\u{101FC}'
@@ -1001,6 +1024,11 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{1D200}'..='\u{1D245}'
                 | '\u{1D300}'..='\u{1D356}'
                 | '\u{4DC0}'..='\u{4DFF}'
+                | '\u{A490}'..='\u{A4C6}'
+                | '\u{A673}'
+                | '\u{A67E}'
+                | '\u{A828}'..='\u{A82B}'
+                | '\u{A836}'..='\u{A839}'
                 | '\u{1D6C1}'
                 | '\u{1D6DB}'
                 | '\u{1D6FB}'
@@ -1067,6 +1095,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{11C70}'..='\u{11C71}'
                 | '\u{11EF7}'..='\u{11EF8}'
                 | '\u{11F43}'..='\u{11F4F}'
+                | '\u{11FD5}'..='\u{11FF1}'
                 | '\u{11FFF}'
                 | '\u{12470}'..='\u{12474}'
                 | '\u{12FF1}'..='\u{12FF2}'
@@ -2781,9 +2810,14 @@ mod tests {
     }
 
     #[test]
-    fn balinese_carik_through_pamengkeb_separate_words() {
-        // U+1B5A CARIK SIKI through U+1B60 PAMENGKEB (Po)—sentence / section punctuation; not Rust whitespace.
-        for sep in '\u{1B5A}'..='\u{1B60}' {
+    fn balinese_inverted_carik_sentence_po_musical_so_and_lantang_separate_words() {
+        // Po U+1B4E–U+1B4F, U+1B5A–U+1B60, U+1B7D–U+1B7F; So U+1B61–U+1B6A, U+1B74–U+1B7C. Not Rust whitespace.
+        let seps: Vec<char> = ('\u{1B4E}'..='\u{1B4F}')
+            .chain('\u{1B5A}'..='\u{1B60}')
+            .chain('\u{1B61}'..='\u{1B6A}')
+            .chain('\u{1B74}'..='\u{1B7F}')
+            .collect();
+        for sep in seps {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
@@ -2796,6 +2830,22 @@ mod tests {
                 !cleaned.contains(sep),
                 "cleaned output still contains U+{:04X}",
                 sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn balinese_digits_and_combining_musical_marks_stay_unmapped() {
+        // Nd U+1B50–U+1B59; Mn U+1B6B–U+1B73 (combining tegeh through gong).
+        for cp in (0x1B50_u32..=0x1B59).chain(0x1B6B..=0x1B73) {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} should not map to ASCII space between Latin tokens, got {:?}",
+                cp,
+                cleaned
             );
         }
     }
@@ -4150,6 +4200,86 @@ mod tests {
     }
 
     #[test]
+    fn yi_radicals_u_a490_through_u_a4c6_all_so_separate_words() {
+        // Yi Radicals: UnicodeData So U+A490–U+A4C6 (55 assigned scalars); not Rust whitespace.
+        for cp in 0xA490_u32..=0xA4C6 {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn yi_radicals_unassigned_tail_and_neighbor_lisu_stay_unmapped() {
+        // Tail U+A4C7–U+A4CF (Cn); Lisu U+A4D0 LETTER BA (Lo)—must not split Latin tokens.
+        for cp in [0xA4C7_u32, 0xA4CF, 0xA4D0] {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} should not map to ASCII space between Latin tokens, got {:?}",
+                cp,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
+    fn slavonic_asterisk_kavyka_syloti_poetry_north_indic_marks_separate_words() {
+        // Cyrillic Extended-B Po U+A673 / U+A67E; Syloti Nagri So U+A828–U+A82B; North Indic So/Sc U+A836–U+A839.
+        let cps = [0xA673_u32, 0xA67E]
+            .into_iter()
+            .chain(0xA828..=0xA82B)
+            .chain(0xA836..=0xA839);
+        for cp in cps {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn slavonic_kavyka_syloti_north_indic_fractions_and_letter_neighbors_stay_unmapped() {
+        // Cyrillic Ext-B Me/Mn/Lm; Syloti Lo/Mc; North Indic fraction numerics (No)—must not split Latin tokens.
+        for cp in [
+            0xA672_u32, 0xA674, 0xA67F, 0xA800, 0xA827, 0xA830, 0xA835,
+        ] {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} should not map to ASCII space between Latin tokens, got {:?}",
+                cp,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
     fn yijing_neighbors_cjk_ext_a_and_unified_stay_unmapped() {
         // CJK Extension A ends at U+4DBF (Lo); CJK Unified starts at U+4E00 (Lo)—must not split Latin tokens.
         for cp in [0x4DBF_u32, 0x4E00] {
@@ -4201,6 +4331,44 @@ mod tests {
             0x101FE,
             0x101FF,
         ] {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} should not map to ASCII space between Latin tokens, got {:?}",
+                cp,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
+    fn ancient_greek_numbers_metrological_so_subranges_separate_words() {
+        // Ancient Greek Numbers: UnicodeData So U+10179–U+10189 and U+1018C–U+1018E; not Rust whitespace.
+        let cps = (0x10179_u32..=0x10189).chain(0x1018C..=0x1018E);
+        for cp in cps {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn ancient_greek_numbers_nl_no_and_unassigned_gap_stay_unmapped() {
+        // Nl acrophonic U+10140; No fractions U+10175–U+10178; No zero / quarter U+1018A–U+1018B; unassigned U+1018F.
+        for cp in [0x10140_u32, 0x10175, 0x10178, 0x1018A, 0x1018B, 0x1018F] {
             let sep = char::from_u32(cp).expect("valid scalar");
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
@@ -4738,6 +4906,43 @@ mod tests {
                 !cleaned.contains(sep),
                 "cleaned output still contains U+{:04X}",
                 cp
+            );
+        }
+    }
+
+    #[test]
+    fn tamil_supplement_metrological_and_currency_so_sc_separate_words() {
+        // Tamil Supplement U+11FD5 TAMIL SIGN NEL through U+11FF1 TAMIL SIGN VAKAIYARAA (all So/Sc).
+        for cp in 0x11FD5..=0x11FF1 {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn tamil_supplement_fraction_numerics_and_unassigned_gap_stay_unmapped() {
+        // No U+11FD0–U+11FD4; unassigned tail U+11FF2–U+11FFE (Cn)—must not split Latin tokens.
+        for cp in (0x11FD0..=0x11FD4).chain(0x11FF2..=0x11FFE) {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} should not map to ASCII space between Latin tokens, got {:?}",
+                cp,
+                cleaned
             );
         }
     }
