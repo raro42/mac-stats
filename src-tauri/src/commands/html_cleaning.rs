@@ -162,11 +162,14 @@ fn collapse_whitespace(text: &str) -> String {
             .map(|c| match c {
                 // HTML / copied text often inserts break or bidi format controls that
                 // `split_whitespace()` leaves inside one token (e.g. U+034F, U+061C, LRM/RLM,
-                // U+2066–U+2069). ZWSP, ZWNJ, ZWJ, WJ, BOM-in-text, SHY, and NBSP get the same
-                // treatment so FETCH_URL bodies tokenize cleanly for the LLM.
+                // U+2061–U+206F invisible math + bidi/shaping controls). ZWSP, ZWNJ, ZWJ, WJ,
+                // BOM-in-text, SHY, NBSP, Mongolian vowel separator, Hangul / halfwidth filler
+                // jamo, interlinear annotation markers, and object replacement (U+FFF9–U+FFFC)
+                // get the same treatment so FETCH_URL bodies tokenize cleanly.
                 '\u{200B}' | '\u{200C}' | '\u{200D}' | '\u{2060}' | '\u{FEFF}' | '\u{00AD}'
-                | '\u{00A0}' | '\u{034F}' | '\u{061C}' | '\u{200E}' | '\u{200F}' | '\u{2066}'
-                | '\u{2067}' | '\u{2068}' | '\u{2069}' => ' ',
+                | '\u{00A0}' | '\u{034F}' | '\u{061C}' | '\u{200E}' | '\u{200F}'
+                | '\u{180E}' | '\u{115F}' | '\u{1160}' | '\u{3164}' | '\u{FFA0}'
+                | '\u{2061}'..='\u{206F}' | '\u{FFF9}'..='\u{FFFC}' => ' ',
                 _ => c,
             })
             .collect();
@@ -319,6 +322,69 @@ mod tests {
             '\u{2068}',
             '\u{2069}',
         ] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {sep:?} normalized before collapse, got {:?}",
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {sep:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn invisible_math_and_bidi_format_separate_words() {
+        // U+2061–U+206F: function application (2061), invisible times/separator/plus (2062–4),
+        // unassigned slot, bidi isolates (2066–9), and symmetric-swapping / Arabic shaping /
+        // digit-shape format chars — all Cf, not Rust whitespace, so they would glue tokens
+        // without normalization.
+        for cp in 0x2061u32..=0x206F {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn interlinear_annotation_and_object_replacement_separate_words() {
+        // U+FFF9–U+FFFB (interlinear annotation anchor/separator/terminator) and U+FFFC
+        // (object replacement) are Cf and not Rust whitespace; they can appear in copied HTML.
+        for sep in ['\u{FFF9}', '\u{FFFA}', '\u{FFFB}', '\u{FFFC}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {sep:?} normalized before collapse, got {:?}",
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {sep:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn invisible_fillers_separate_words() {
+        // U+180E Mongolian vowel separator; U+115F/U+1160 Hangul choseong/jungseong fillers;
+        // U+3164 Hangul filler; U+FFA0 halfwidth Hangul filler: not Unicode whitespace in Rust,
+        // so they glue tokens in `split_whitespace()` without normalization.
+        for sep in ['\u{180E}', '\u{115F}', '\u{1160}', '\u{3164}', '\u{FFA0}'] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
