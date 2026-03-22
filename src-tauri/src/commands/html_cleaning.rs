@@ -40,6 +40,7 @@ const BLOCK_TAGS: &[&str] = &[
 /// - Links as `[text](href)` (absolute hrefs only, relative are text-only)
 /// - List items as `- text`
 /// - Table rows as pipe-separated values
+/// - `<img>` elements with non-empty `alt` or `title` as inline `[Image: …]` text
 /// - Block element boundaries as newlines
 ///
 /// Returns the cleaned text. Callers should check for empty output (page was
@@ -67,6 +68,7 @@ fn walk_node(element: &ElementRef, out: &mut String) {
     let is_tr = tag == "tr";
     let is_br = tag == "br";
     let is_hr = tag == "hr";
+    let is_img = tag == "img";
 
     if is_br {
         out.push('\n');
@@ -74,6 +76,23 @@ fn walk_node(element: &ElementRef, out: &mut String) {
     }
     if is_hr {
         out.push_str("\n---\n");
+        return;
+    }
+    if is_img {
+        let alt = element.value().attr("alt").unwrap_or("").trim();
+        let title = element.value().attr("title").unwrap_or("").trim();
+        let desc = if !alt.is_empty() {
+            alt
+        } else if !title.is_empty() {
+            title
+        } else {
+            ""
+        };
+        if !desc.is_empty() {
+            out.push_str("[Image: ");
+            out.push_str(desc);
+            out.push(']');
+        }
         return;
     }
 
@@ -170,14 +189,19 @@ fn collapse_whitespace(text: &str) -> String {
                 // tag characters (U+E0000–U+E007F) get the same treatment so FETCH_URL bodies
                 // tokenize cleanly. Khmer inherent vowels (U+17B4, U+17B5) are Cf and not Rust
                 // whitespace, so Khmer-layout HTML can otherwise glue adjacent Latin tokens.
-                // Arabic number signs / ayah markers (U+0600–U+0605, U+06DD, U+08E2) and Syriac
-                // abbreviation mark (U+070F) are Cf and not Rust whitespace; RTL scholarly HTML
-                // can place them between scripts without a real space. Mongolian U+1806 (TODO SOFT
+                // Arabic number signs / ayah markers (U+0600–U+0605, U+06DD, U+08E2), Arabic
+                // Extended-A currency format marks (U+0890–U+0891, pound/piastre mark above), and
+                // Syriac abbreviation mark (U+070F) are Cf and not Rust whitespace; RTL scholarly
+                // or financial HTML can place them between scripts without a real space. Mongolian U+1806 (TODO SOFT
                 // HYPHEN) and U+180A (NIRUGU) are Cf but lie outside U+180B–U+180E (FVS / vowel sep).
+                // Ethiopic wordspace (U+1361, Po) and Braille pattern blank (U+2800, So) are not Rust
+                // whitespace. Duployan shorthand format overlap / step (U+1BCA0–U+1BCA3, Cf) are not
+                // Rust whitespace either.
                 '\u{0600}'..='\u{0605}'
                 | '\u{06DD}'
                 | '\u{070F}'
                 | '\u{08E2}'
+                | '\u{0890}'..='\u{0891}'
                 | '\u{200B}'
                 | '\u{200C}'
                 | '\u{200D}'
@@ -199,6 +223,9 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{1160}'
                 | '\u{3164}'
                 | '\u{FFA0}'
+                | '\u{1361}'
+                | '\u{2800}'
+                | '\u{1BCA0}'..='\u{1BCA3}'
                 | '\u{FE00}'..='\u{FE0F}'
                 | '\u{E0100}'..='\u{E01EF}'
                 | '\u{E0000}'..='\u{E007F}'
@@ -272,6 +299,57 @@ mod tests {
         assert!(cleaned.contains("- One"));
         assert!(cleaned.contains("- Two"));
         assert!(cleaned.contains("- Three"));
+    }
+
+    #[test]
+    fn img_alt_emitted_as_readable_text() {
+        let html = r#"<html><body><p>Before <img src="/x.png" alt="Company logo"> after</p></body></html>"#;
+        let cleaned = clean_html(html);
+        assert!(
+            cleaned.contains("[Image: Company logo]"),
+            "expected img alt in output, got {:?}",
+            cleaned
+        );
+        assert!(cleaned.contains("Before"));
+        assert!(cleaned.contains("after"));
+    }
+
+    #[test]
+    fn img_title_used_when_alt_empty() {
+        let html =
+            r#"<html><body><p><img src="/c.svg" alt="" title="Revenue chart"></p></body></html>"#;
+        let cleaned = clean_html(html);
+        assert!(
+            cleaned.contains("[Image: Revenue chart]"),
+            "expected title fallback, got {:?}",
+            cleaned
+        );
+    }
+
+    #[test]
+    fn img_alt_preferred_over_title() {
+        let html =
+            r#"<html><body><img src="/d.png" alt="Short" title="Longer tooltip"></body></html>"#;
+        let cleaned = clean_html(html);
+        assert!(
+            cleaned.contains("[Image: Short]"),
+            "expected alt to win over title, got {:?}",
+            cleaned
+        );
+        assert!(!cleaned.contains("Longer tooltip"));
+    }
+
+    #[test]
+    fn img_without_alt_or_title_emits_nothing() {
+        let html = r#"<html><body><p>Text <img src="/z.gif"> more</p></body></html>"#;
+        let cleaned = clean_html(html);
+        assert!(
+            !cleaned.contains("[Image:"),
+            "decorative img should not add placeholder, got {:?}",
+            cleaned
+        );
+        assert!(cleaned.contains("Text"));
+        assert!(cleaned.contains("more"));
     }
 
     #[test]
@@ -447,6 +525,24 @@ mod tests {
     }
 
     #[test]
+    fn arabic_extended_a_currency_format_marks_separate_words() {
+        // U+0890 / U+0891 (Arabic pound mark above / piastre mark above): Cf, not Rust whitespace.
+        for sep in ['\u{0890}', '\u{0891}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {sep:?} normalized before collapse, got {:?}",
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {sep:?}"
+            );
+        }
+    }
+
+    #[test]
     fn arabic_and_syriac_edition_format_separate_words() {
         // U+0600–U+0605 (Arabic number sign / edition marks), U+06DD (end of ayah), U+08E2
         // (disputed end of ayah), U+070F (Syriac abbreviation mark): Cf, not Rust whitespace.
@@ -507,6 +603,56 @@ mod tests {
             assert!(
                 !cleaned.contains(sep),
                 "cleaned output still contains {sep:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn ethiopic_wordspace_separates_words() {
+        // U+1361 ETHIOPIC WORDSPACE is Po, not Rust whitespace; Ethiopic-layout HTML can sit between
+        // Latin tokens without a real ASCII space.
+        let html = "<html><body><p>hello\u{1361}world</p></body></html>";
+        let cleaned = clean_html(html);
+        assert!(
+            cleaned.contains("hello world"),
+            "expected Ethiopic wordspace normalized before collapse, got {:?}",
+            cleaned
+        );
+        assert!(!cleaned.contains('\u{1361}'));
+    }
+
+    #[test]
+    fn braille_pattern_blank_separates_words() {
+        // U+2800 BRAILLE PATTERN BLANK is So, not Rust whitespace; used as a visible “empty” cell
+        // and sometimes as a spacing hack in plain text.
+        let html = "<html><body><p>hello\u{2800}world</p></body></html>";
+        let cleaned = clean_html(html);
+        assert!(
+            cleaned.contains("hello world"),
+            "expected Braille blank normalized before collapse, got {:?}",
+            cleaned
+        );
+        assert!(!cleaned.contains('\u{2800}'));
+    }
+
+    #[test]
+    fn duployan_shorthand_format_separates_words() {
+        // U+1BCA0–U+1BCA3: Duployan shorthand format overlap / step controls are Cf and not Rust
+        // whitespace.
+        for cp in 0x1BCA0u32..=0x1BCA3 {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
             );
         }
     }
