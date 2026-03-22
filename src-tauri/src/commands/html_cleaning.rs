@@ -343,11 +343,24 @@ fn collapse_whitespace(text: &str) -> String {
                 // Latin tokens without ASCII space.
                 // Hanifi Rohingya signs tana / penda / dotted variants / jaha (U+10D29–U+10D2D, Po) are not Rust
                 // whitespace; U+10D2E SIGN VIRAMA (Mn) stays unmapped—word-internal risk.
+                // Garay hyphen (U+10D6E, Pd) and Garay plus / minus (U+10D8E–U+10D8F, Sm) are not Rust whitespace;
+                // Senegalese Garay typography or Unicode-sample HTML can place them between Latin tokens without ASCII space.
+                // Arabic Biblical end of verse (U+10ED0, Po) is not Rust whitespace; scholarly Arabic Extended-C HTML
+                // can place it between Latin tokens without ASCII space. U+10ED1–U+10ED8 honorific ligatures (So) stay
+                // unmapped—multi-letter units, not general clause punctuation.
+                // SignWriting comma through parenthesis (U+1DA87–U+1DA8B, Po) are not Rust whitespace; Sutton
+                // SignWriting–Latin or Unicode-sample HTML can glue Latin tokens without ASCII space.
+                // Ol Onal abbreviation sign (U+1E5FF, Po) is not Rust whitespace; Unicode-sample or mixed-script HTML
+                // can glue Latin tokens without ASCII space.
                 // Warang Citi danda through section mark (U+118C8–U+118CF, Po) are not Rust whitespace; Austroasiatic
                 // or Unicode-sample HTML can glue Latin tokens without ASCII space. U+118D0 NUMBER ZERO (Nl) starts
                 // the numeric subrange and is not included.
+                // Devanagari Extended-A head marks and bhale signs (U+11B00–U+11B09, Po) are not Rust whitespace;
+                // editorial Devanagari–Latin or Unicode-sample HTML can glue Latin tokens without ASCII space.
                 // Sunuwar sign pvo (U+11BE1, Po) is not Rust whitespace; Nepal–Unicode-sample HTML can glue Latin
                 // tokens without ASCII space.
+                // Bassa Vah full stop (U+16AF5, Po) is not Rust whitespace; Liberian / Unicode-sample HTML can glue
+                // Latin tokens without ASCII space.
                 // Kirat Rai sign yupi, danda, double danda (U+16D6D–U+16D6F, Po) are not Rust whitespace;
                 // U+16D6B SIGN VIRAMA and U+16D6C SIGN SAAT (Lm) stay unmapped—modifier-like, word-internal risk.
                 // Ethiopic wordspace (U+1361, Po) and Braille pattern blank (U+2800, So) are not Rust
@@ -590,10 +603,18 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{10B99}'..='\u{10B9C}'
                 | '\u{10F55}'..='\u{10F59}'
                 | '\u{10F86}'..='\u{10F89}'
+                | '\u{10ED0}'
+                | '\u{1DA87}'..='\u{1DA8B}'
+                | '\u{1E5FF}'
                 | '\u{10FF5}'
                 | '\u{10D29}'..='\u{10D2D}'
+                | '\u{10D6E}'
+                | '\u{10D8E}'
+                | '\u{10D8F}'
                 | '\u{118C8}'..='\u{118CF}'
+                | '\u{11B00}'..='\u{11B09}'
                 | '\u{11BE1}'
+                | '\u{16AF5}'
                 | '\u{16D6D}'..='\u{16D6F}'
                 | '\u{2219}'
                 | '\u{22C5}'
@@ -1306,6 +1327,70 @@ mod tests {
         // Hanifi Rohingya U+10D29–U+10D2D (tana / penda / dotted / jaha, all Po). U+10D2E VIRAMA (Mn) omitted.
         // Warang Citi U+118C8–U+118CF (danda through section mark, all Po).
         for sep in (0x10D29u32..=0x10D2D).chain(0x118C8..=0x118CF) {
+            let sep = char::from_u32(sep).expect("valid test scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {:?} normalized before collapse, got {:?}",
+                sep,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {:?}",
+                sep
+            );
+        }
+    }
+
+    #[test]
+    fn garay_hyphen_plus_and_minus_separate_words() {
+        // Garay U+10D6E HYPHEN (Pd). Garay U+10D8E PLUS SIGN / U+10D8F MINUS SIGN (Sm).
+        for sep in [0x10D6Eu32, 0x10D8E, 0x10D8F] {
+            let sep = char::from_u32(sep).expect("valid test scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {:?} normalized before collapse, got {:?}",
+                sep,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {:?}",
+                sep
+            );
+        }
+    }
+
+    #[test]
+    fn arabic_biblical_end_of_verse_signwriting_and_ol_onal_punctuation_separate_words() {
+        // Arabic Extended-C U+10ED0 END OF VERSE (Po). SignWriting U+1DA87–U+1DA8B (Po). Ol Onal U+1E5FF (Po).
+        let mut seps: Vec<char> = vec![char::from_u32(0x10ED0).unwrap(), char::from_u32(0x1E5FF).unwrap()];
+        seps.extend('\u{1DA87}'..='\u{1DA8B}');
+        for sep in seps {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {:?} normalized before collapse, got {:?}",
+                sep,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {:?}",
+                sep
+            );
+        }
+    }
+
+    #[test]
+    fn devanagari_extended_a_and_bassa_vah_sentence_punctuation_separate_words() {
+        // Devanagari Extended-A U+11B00 HEAD MARK through U+11B09 SIGN MINDU (all Po). Bassa Vah U+16AF5 FULL STOP (Po).
+        for sep in (0x11B00u32..=0x11B09).chain(std::iter::once(0x16AF5)) {
             let sep = char::from_u32(sep).expect("valid test scalar");
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
