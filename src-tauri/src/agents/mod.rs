@@ -170,6 +170,17 @@ pub fn get_agent_dir(id: &str) -> Option<std::path::PathBuf> {
     }
 }
 
+/// Per-agent `soul.md` wins when non-empty; otherwise use shared `~/.mac-stats/agents/soul.md`.
+/// Empty per-agent file or missing file → shared fallback. Locks 022 §F3 (no double soul).
+fn agent_soul_or_shared(per_agent_trimmed: Option<String>, shared_soul: String) -> Option<String> {
+    let fallback = if shared_soul.is_empty() {
+        None
+    } else {
+        Some(shared_soul)
+    };
+    per_agent_trimmed.filter(|s| !s.is_empty()).or(fallback)
+}
+
 fn load_one_agent(dir: &Path, id: &str) -> Option<Agent> {
     let config_path = dir.join("agent.json");
     let content = std::fs::read_to_string(&config_path)
@@ -194,26 +205,25 @@ fn load_one_agent(dir: &Path, id: &str) -> Option<Agent> {
 
     // Soul: per-agent soul.md if present, else shared ~/.mac-stats/agents/soul.md. Always include in context when available.
     let soul_path = dir.join("soul.md");
-    let soul = std::fs::read_to_string(&soul_path)
+    let trimmed_per_agent = std::fs::read_to_string(&soul_path)
         .ok()
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty())
-        .inspect(|_s| {
+        .map(|s| s.trim().to_string());
+    let had_nonempty_per_agent = trimmed_per_agent
+        .as_ref()
+        .map(|s| !s.is_empty())
+        .unwrap_or(false);
+    let soul = agent_soul_or_shared(trimmed_per_agent, Config::load_soul_content());
+    if soul.is_some() {
+        if had_nonempty_per_agent {
             debug!("Agents: agent {} using soul from {:?}", id, soul_path);
-        })
-        .or_else(|| {
-            let shared = Config::load_soul_content();
-            if shared.is_empty() {
-                None
-            } else {
-                debug!(
-                    "Agents: agent {} using shared soul from {:?}",
-                    id,
-                    Config::soul_file_path()
-                );
-                Some(shared)
-            }
-        });
+        } else {
+            debug!(
+                "Agents: agent {} using shared soul from {:?}",
+                id,
+                Config::soul_file_path()
+            );
+        }
+    }
     let mood = std::fs::read_to_string(dir.join("mood.md"))
         .ok()
         .map(|s| s.trim().to_string())
@@ -456,5 +466,35 @@ mod tests {
             max_tool_iterations: 15,
         }];
         assert!(find_agent_by_id_or_name(&agents, "001").is_some());
+    }
+
+    #[test]
+    fn agent_soul_or_shared_prefers_per_agent() {
+        assert_eq!(
+            agent_soul_or_shared(
+                Some("only me".to_string()),
+                "shared soul".to_string()
+            )
+            .as_deref(),
+            Some("only me")
+        );
+    }
+
+    #[test]
+    fn agent_soul_or_shared_ignores_empty_per_agent() {
+        assert_eq!(
+            agent_soul_or_shared(Some(String::new()), "shared".to_string()).as_deref(),
+            Some("shared")
+        );
+        assert_eq!(
+            agent_soul_or_shared(None, "shared".to_string()).as_deref(),
+            Some("shared")
+        );
+    }
+
+    #[test]
+    fn agent_soul_or_shared_none_when_no_soul() {
+        assert_eq!(agent_soul_or_shared(None, String::new()), None);
+        assert_eq!(agent_soul_or_shared(Some(String::new()), String::new()), None);
     }
 }

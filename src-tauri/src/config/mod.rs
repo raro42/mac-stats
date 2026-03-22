@@ -543,7 +543,16 @@ impl Config {
     }
 
     /// Session directory for persisted chat memory: `$HOME/.mac-stats/session/`
+    ///
+    /// When `MAC_STATS_SESSION_DIR` is set to a non-empty path, that directory is used instead
+    /// (unit tests and isolated runs; caller should create it before writing session files).
     pub fn session_dir() -> PathBuf {
+        if let Ok(override_dir) = std::env::var("MAC_STATS_SESSION_DIR") {
+            let t = override_dir.trim();
+            if !t.is_empty() {
+                return PathBuf::from(t);
+            }
+        }
         if let Ok(home) = std::env::var("HOME") {
             PathBuf::from(home).join(".mac-stats").join("session")
         } else {

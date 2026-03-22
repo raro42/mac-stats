@@ -402,13 +402,10 @@ async function sendChatMessage() {
   console.log('[Ollama] Message:', message);
   console.log('[Ollama] Conversation history length:', conversationHistory.length);
 
-  // Add user message to chat
-  addChatMessage('user', message);
   input.value = '';
 
-  // Reserved words: change app behaviour without sending to Ollama (do not add to history)
-  const trimmed = message.trim();
-  if (trimmed === '--cpu') {
+  // Reserved words: meta-commands only — no user bubble, no history, no Ollama (022 §F8).
+  if (message === '--cpu') {
     try {
       await invoke('toggle_cpu_window');
       addChatMessage('assistant', 'CPU window toggled.');
@@ -417,8 +414,8 @@ async function sendChatMessage() {
     }
     return;
   }
-  if (trimmed === '-v' || trimmed === '-vv' || trimmed === '-vvv') {
-    const level = trimmed.length - 1; // -v=1, -vv=2, -vvv=3
+  if (message === '-v' || message === '-vv' || message === '-vvv') {
+    const level = message.length - 1; // -v=1, -vv=2, -vvv=3
     try {
       await invoke('set_chat_verbosity', { level });
       const labels = { 1: 'warn (-v)', 2: 'debug (-vv)', 3: 'trace (-vvv)' };
@@ -429,7 +426,7 @@ async function sendChatMessage() {
     return;
   }
 
-  // Add user message to conversation history (non-reserved messages only)
+  addChatMessage('user', message);
   addToHistory('user', message);
 
   const systemPrompt = getSystemPrompt();

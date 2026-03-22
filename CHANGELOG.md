@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Agent soul vs shared soul (022 §F3)** — `agent_soul_or_shared()` in `agents/mod.rs` implements per-agent `soul.md` vs shared `agents/soul.md` selection; three unit tests document no double soul when per-agent text is present and fallback when it is empty or absent. (`agents/mod.rs`; FEAT-D15.)
+- **`MAC_STATS_SESSION_DIR`** — Optional override for the persisted session directory (defaults unchanged: `$HOME/.mac-stats/session/`). Used by `session_memory` unit tests for `load_messages_from_latest_session_file` without touching the real home layout; same pattern as `MAC_STATS_TASK_DIR`. Three tests: new filename layout, legacy layout, newest mtime wins when two files match the session id. (`config/mod.rs`, `session_memory.rs`; FEAT-D14, 022 §3 F1 disk resume.)
 - **Router soul prefix + F4 tests (022 §F4)** — `format_router_soul_block()` in `ollama_memory.rs` centralizes shared-soul + app identity lines for agent-router planning; three unit tests cover empty/non-empty soul text and empty prefix when `skill_content` is present (same branch as agent `combined_prompt`). Call site unchanged aside from helper. (`commands/ollama_memory.rs`, `commands/ollama.rs`; FEAT-D13.)
 - **Chat verbosity ↔ legacy atomic (022 §F8)** — Unit tests assert `set_chat_verbosity` updates `logging::VERBOSITY` (same atomic as `-v`/`-vv`/`-vvv` and `ellipse`-gated request logs) and clamps levels above 3. Mutex-serialized with restore. (`commands/logging.rs`)
 - **TASK prompt contract tests (022 §F6)** — `format_task_agent_description()` holds the **TASK** tool paragraph for the dynamic agent list; three unit tests assert orchestrator-vs-TASK_CREATE guidance and duplicate-task → TASK_APPEND/TASK_STATUS wording. (`commands/agent_descriptions.rs`)
@@ -15,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TASK_CREATE deduplication tests** — `test_slug_deterministic` and `create_task_duplicate_topic_id_errors_with_task_append_hint` in `task/mod.rs` document 022 §3 F5 (slug stability, duplicate topic+id error mentions `TASK_APPEND` / alternate id). (`task/mod.rs`)
 
 ### Changed
+- **CPU window chat: reserved words (022 §F8)** — `--cpu` and `-v`/`-vv`/`-vvv` are handled before any user chat bubble is added, so meta-commands stay out of the visible transcript as well as conversation history. Input is cleared immediately; only the assistant status line is shown. (`src/ollama.js`, synced to `src-tauri/dist/ollama.js`; FEAT-D16.)
 - **Agent-router execution messages (022 §F2)** — Both execution paths in `answer_with_ollama_and_fetch` now use `build_execution_message_stack()` (`session_history.rs`) for system → history → current user; two unit tests lock the ordering contract. No change to wire format or model payloads. (`commands/session_history.rs`, `commands/ollama.rs`)
 - **TASK agent paragraph helper** — **TASK** block in `build_agent_descriptions` moved to `format_task_agent_description()` for unit testing; wording unchanged. (`commands/agent_descriptions.rs`)
 

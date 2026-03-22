@@ -531,8 +531,35 @@ fn parse_session_file(path: &Path) -> Vec<(String, String)> {
 mod tests {
     use super::{
         add_message, clear_session, extract_assistant_final_answer, get_messages,
-        normalize_conversational_message, parse_session_markdown, session_filename_matches_id,
+        load_messages_from_latest_session_file, normalize_conversational_message,
+        parse_session_markdown, session_filename_matches_id,
     };
+    use std::sync::Mutex;
+    use std::time::Duration;
+
+    /// Tests override `MAC_STATS_SESSION_DIR`; serialize so env does not race.
+    static SESSION_DIR_TEST_LOCK: Mutex<()> = Mutex::new(());
+
+    struct SessionDirOverride {
+        previous: Option<String>,
+    }
+
+    impl SessionDirOverride {
+        fn set(path: &std::path::Path) -> Self {
+            let previous = std::env::var("MAC_STATS_SESSION_DIR").ok();
+            std::env::set_var("MAC_STATS_SESSION_DIR", path.as_os_str());
+            Self { previous }
+        }
+    }
+
+    impl Drop for SessionDirOverride {
+        fn drop(&mut self) {
+            match &self.previous {
+                Some(v) => std::env::set_var("MAC_STATS_SESSION_DIR", v),
+                None => std::env::remove_var("MAC_STATS_SESSION_DIR"),
+            }
+        }
+    }
 
     #[test]
     fn get_messages_before_add_user_excludes_current_turn() {
@@ -671,5 +698,96 @@ mod tests {
         let v = parse_session_markdown(md);
         assert_eq!(v.len(), 1);
         assert_eq!(v[0].1, "Hi");
+    }
+
+    /// Disk resume for session id 77 with current filename layout (022 §3 F1).
+    #[test]
+    fn load_messages_from_latest_session_file_new_layout() {
+        let _guard = SESSION_DIR_TEST_LOCK.lock().expect("session dir test lock");
+        let base = std::env::temp_dir().join(format!(
+            "mac-stats-session-load-test-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&base);
+        std::fs::create_dir_all(&base).expect("mkdir session test dir");
+        let _override = SessionDirOverride::set(&base);
+
+        let sid = 77_u64;
+        let path = base.join(format!(
+            "session-memory-{sid}-20260322-120000-resume-topic.md"
+        ));
+        std::fs::write(
+            &path,
+            "## User\n\nfrom disk\n\n## Assistant\n\nack\n",
+        )
+        .expect("write session file");
+
+        let loaded = load_messages_from_latest_session_file("test", sid);
+        assert_eq!(loaded.len(), 2);
+        assert_eq!(loaded[0].0, "user");
+        assert_eq!(loaded[0].1, "from disk");
+        assert_eq!(loaded[1].0, "assistant");
+        assert_eq!(loaded[1].1, "ack");
+
+        let _ = std::fs::remove_dir_all(&base);
+    }
+
+    /// Legacy `session-memory-{topic}-{id}-{ts}.md` still loads (022 §3 F1 / D1).
+    #[test]
+    fn load_messages_from_latest_session_file_legacy_layout() {
+        let _guard = SESSION_DIR_TEST_LOCK.lock().expect("session dir test lock");
+        let base = std::env::temp_dir().join(format!(
+            "mac-stats-session-legacy-load-test-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&base);
+        std::fs::create_dir_all(&base).expect("mkdir session test dir");
+        let _override = SessionDirOverride::set(&base);
+
+        let sid = 88_u64;
+        let path = base.join("session-memory-old-topic-88-20260321-090000.md");
+        std::fs::write(
+            &path,
+            "## User\n\nlegacy file\n\n## Assistant\n\nlegacy reply\n",
+        )
+        .expect("write legacy session file");
+
+        let loaded = load_messages_from_latest_session_file("test", sid);
+        assert_eq!(loaded.len(), 2);
+        assert_eq!(loaded[0].1, "legacy file");
+        assert_eq!(loaded[1].1, "legacy reply");
+
+        let _ = std::fs::remove_dir_all(&base);
+    }
+
+    /// When two files match the session id, the one with newer `modified()` wins.
+    #[test]
+    fn load_messages_from_latest_session_file_prefers_newer_mtime() {
+        let _guard = SESSION_DIR_TEST_LOCK.lock().expect("session dir test lock");
+        let base = std::env::temp_dir().join(format!(
+            "mac-stats-session-mtime-test-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&base);
+        std::fs::create_dir_all(&base).expect("mkdir session test dir");
+        let _override = SessionDirOverride::set(&base);
+
+        let sid = 55_u64;
+        let older = base.join(format!(
+            "session-memory-{sid}-20260101-000000-first.md"
+        ));
+        std::fs::write(&older, "## User\n\nolder\n\n## Assistant\n\na\n").expect("older");
+        std::thread::sleep(Duration::from_millis(1100));
+        let newer = base.join(format!(
+            "session-memory-{sid}-20260202-000000-second.md"
+        ));
+        std::fs::write(&newer, "## User\n\nnewer\n\n## Assistant\n\nb\n").expect("newer");
+
+        let loaded = load_messages_from_latest_session_file("test", sid);
+        assert_eq!(loaded.len(), 2);
+        assert_eq!(loaded[0].1, "newer");
+        assert_eq!(loaded[1].1, "b");
+
+        let _ = std::fs::remove_dir_all(&base);
     }
 }
