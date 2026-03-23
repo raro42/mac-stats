@@ -118,6 +118,28 @@ pub(crate) async fn reduce_fetched_content_to_fit(
     }
 }
 
+/// True if `needle` appears in `haystack` with no ASCII alnum / `_` immediately before or after.
+/// Avoids treating `context_length_exceeded` as present inside `old_context_length_exceeded`.
+fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
+    fn ident_continue(c: char) -> bool {
+        c.is_ascii_alphanumeric() || c == '_'
+    }
+    for (i, _) in haystack.match_indices(needle) {
+        let before_ok = haystack[..i]
+            .chars()
+            .last()
+            .is_none_or(|c| !ident_continue(c));
+        let after_ok = haystack[i + needle.len()..]
+            .chars()
+            .next()
+            .is_none_or(|c| !ident_continue(c));
+        if before_ok && after_ok {
+            return true;
+        }
+    }
+    false
+}
+
 /// Check whether an Ollama error string indicates a context-window overflow.
 pub(crate) fn is_context_overflow_error(err: &str) -> bool {
     let lower = err.to_lowercase();
@@ -149,6 +171,14 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         || lower.contains("beyond the context window")
         || lower.contains("over the context window")
         || lower.contains("ran out of context")
+        || lower.contains("running out of context")
+        || (lower.contains("context budget")
+            && (lower.contains("exceed")
+                || lower.contains("overflow")
+                || lower.contains("full")))
+        || (lower.contains("conversation")
+            && lower.contains("too long")
+            && lower.contains("context"))
         || lower.contains("context size exceeded")
         || lower.contains("exceeded context size")
         || lower.contains("prompt has more tokens than")
@@ -169,11 +199,11 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         || lower.contains("insufficient context")
         || lower.contains("prompt exceeds the context")
         || (lower.contains("greater than") && lower.contains("context"))
-        || (lower.contains("n_ctx")
+        || (contains_bounded_token(&lower, "n_ctx")
             && (lower.contains("exceed")
                 || lower.contains("overflow")
                 || lower.contains("too small")))
-        || (lower.contains("num_ctx")
+        || (contains_bounded_token(&lower, "num_ctx")
             && (lower.contains("exceed")
                 || lower.contains("larger")
                 || lower.contains("greater")
@@ -244,32 +274,32 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
             && (lower.contains("exceed")
                 || lower.contains("overflow")
                 || lower.contains("too long")))
-        || (lower.contains("max_context")
+        || (contains_bounded_token(&lower, "max_context")
             && (lower.contains("exceed")
                 || lower.contains("overflow")
                 || lower.contains("too long")
                 || lower.contains("too large")
                 || lower.contains("larger")
                 || lower.contains("greater")))
-        || (lower.contains("context_length")
+        || (contains_bounded_token(&lower, "context_length")
             && (lower.contains("exceed")
                 || lower.contains("overflow")
                 || lower.contains("too long")
                 || lower.contains("too large")))
         // camelCase JSON / gateway errors (to_lowercase → "maxcontext" / "contextlength")
-        || (lower.contains("maxcontext")
+        || (contains_bounded_token(&lower, "maxcontext")
             && (lower.contains("exceed")
                 || lower.contains("overflow")
                 || lower.contains("too long")
                 || lower.contains("too large")
                 || lower.contains("larger")
                 || lower.contains("greater")))
-        || (lower.contains("contextlength")
+        || (contains_bounded_token(&lower, "contextlength")
             && (lower.contains("exceed")
                 || lower.contains("overflow")
                 || lower.contains("too long")
                 || lower.contains("too large")))
-        || (lower.contains("n_ctx_per_seq")
+        || (contains_bounded_token(&lower, "n_ctx_per_seq")
             && (lower.contains("exceed")
                 || lower.contains("overflow")
                 || lower.contains("too long")
@@ -278,7 +308,7 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
                 || lower.contains("greater")
                 || lower.contains("too small")))
         // snake_case JSON / config (distinct from prose "context window")
-        || (lower.contains("context_window")
+        || (contains_bounded_token(&lower, "context_window")
             && (lower.contains("exceed")
                 || lower.contains("overflow")
                 || lower.contains("too long")
@@ -286,12 +316,12 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
                 || lower.contains("larger")
                 || lower.contains("greater")
                 || lower.contains("too small")))
-        || (lower.contains("context_limit")
+        || (contains_bounded_token(&lower, "context_limit")
             && (lower.contains("exceed")
                 || lower.contains("overflow")
                 || lower.contains("too long")
                 || lower.contains("too large")))
-        || (lower.contains("contextlimit")
+        || (contains_bounded_token(&lower, "contextlimit")
             && (lower.contains("exceed")
                 || lower.contains("overflow")
                 || lower.contains("too long")
@@ -317,6 +347,65 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
                 || lower.contains("too large")
                 || lower.contains("larger")
                 || lower.contains("greater")))
+        // "allowed" between max/imum and context breaks contiguous `maximum context` / `max context` substrings.
+        || (lower.contains("maximum allowed context")
+            && (lower.contains("exceed")
+                || lower.contains("overflow")
+                || lower.contains("too long")
+                || lower.contains("too large")
+                || lower.contains("larger")
+                || lower.contains("greater")))
+        || (lower.contains("max allowed context")
+            && (lower.contains("exceed")
+                || lower.contains("overflow")
+                || lower.contains("too long")
+                || lower.contains("too large")
+                || lower.contains("larger")
+                || lower.contains("greater")))
+        || (lower.contains("context length limit")
+            && (lower.contains("exceed")
+                || lower.contains("overflow")
+                || lower.contains("too long")
+                || lower.contains("too large")
+                || lower.contains("larger")
+                || lower.contains("greater")))
+        // OpenAI-style / JSON `code` values and similar (bounded so `old_context_length_exceeded` etc. do not match)
+        || contains_bounded_token(&lower, "context_budget_exceeded")
+        || contains_bounded_token(&lower, "context_length_exceeded")
+        || contains_bounded_token(&lower, "max_context_length_exceeded")
+        || contains_bounded_token(&lower, "context_window_exceeded")
+        || contains_bounded_token(&lower, "max_context_exceeded")
+        // Demonstrative phrasing (distinct from `the model's` already covered above)
+        || lower.contains("exceeds this model's context")
+        || lower.contains("exceeded this model's context")
+        || lower.contains("exceed this model's context")
+        // Chat-completions style: "messages exceed …" without "total tokens" wording.
+        // Require explicit context-slot phrases (not bare `model`) so lines like
+        // "status messages exceed limits (no model context)" do not match.
+        || ((lower.contains("messages exceed") || lower.contains("messages exceeded"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")))
+        // "message/input … too long" (distinct from `prompt too long` already handled above).
+        // Same context-slot guard as `messages exceed` (FEAT-D295) so incidental `model context`
+        // copy does not match non-slot errors.
+        || ((lower.contains("message is too long")
+            || lower.contains("messages are too long")
+            || lower.contains("message was too long")
+            || lower.contains("messages were too long")
+            || lower.contains("input is too long")
+            || lower.contains("input was too long"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")))
 }
 
 /// Check whether an Ollama error indicates message role/ordering conflict.
@@ -827,6 +916,69 @@ mod tests {
         assert!(is_context_overflow_error(
             "API error: encoded prompt is too large for max context"
         ));
+        assert!(is_context_overflow_error(
+            "llama runner: running out of context during decode"
+        ));
+        assert!(is_context_overflow_error(
+            "error: context budget exceeded for this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: conversation is too long for the model context window"
+        ));
+        assert!(is_context_overflow_error(
+            "openai error: invalid_request_error (context_length_exceeded)"
+        ));
+        assert!(is_context_overflow_error(
+            "{\"error\":{\"code\":\"max_context_length_exceeded\",\"message\":\"...\"}}"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: type invalid_request_error code context_window_exceeded"
+        ));
+        assert!(is_context_overflow_error(
+            "llama.cpp: inference failed: max_context_exceeded"
+        ));
+        assert!(is_context_overflow_error(
+            "error: exceeds this model's context (8192 tokens)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: exceeded this model's context window during prefill"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: cannot exceed this model's context limit"
+        ));
+        assert!(is_context_overflow_error(
+            "API error: messages exceed the model's context window"
+        ));
+        assert!(is_context_overflow_error(
+            "openai: messages exceeded maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: messages exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: the message is too long for the model's context window"
+        ));
+        assert!(is_context_overflow_error(
+            "error: messages are too long for maximum context on this model"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: input is too long for context length 8192"
+        ));
+        assert!(is_context_overflow_error(
+            "request failed: message was too long; exceeds available context"
+        ));
+        assert!(is_context_overflow_error(
+            "error: request exceeds your maximum allowed context for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: cannot exceed max allowed context on this endpoint"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: context length limit exceeded for the chat completion"
+        ));
+        assert!(is_context_overflow_error(
+            "openai error: invalid_request_error (context_budget_exceeded)"
+        ));
     }
 
     #[test]
@@ -920,6 +1072,39 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "hint: tune max context in Modelfile for longer threads (no error)"
+        ));
+        assert!(!is_context_overflow_error(
+            "running out of patience while waiting for the API"
+        ));
+        assert!(!is_context_overflow_error(
+            "note: context budget is 1M tokens on the enterprise plan (informational)"
+        ));
+        assert!(!is_context_overflow_error(
+            "UI: conversation is too long to display; click to expand"
+        ));
+        assert!(!is_context_overflow_error(
+            "migration: dropped column old_context_length_exceeded from analytics"
+        ));
+        assert!(!is_context_overflow_error(
+            "refactor: rename old_max_context_exceeded flag to overflow_seen"
+        ));
+        assert!(!is_context_overflow_error(
+            "status messages exceed rate limits (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "discord: message is too long (max 2000 characters)"
+        ));
+        assert!(!is_context_overflow_error(
+            "form error: the input is too long (max 500 chars)"
+        ));
+        assert!(!is_context_overflow_error(
+            "docs: maximum allowed context is 128000 tokens (informational)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: context length limit is 8192 (startup ok)"
+        ));
+        assert!(!is_context_overflow_error(
+            "migration: dropped column old_context_budget_exceeded from events"
         ));
     }
 
