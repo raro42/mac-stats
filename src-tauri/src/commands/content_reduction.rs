@@ -382,6 +382,8 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         // Chat-completions style: "messages exceed …" without "total tokens" wording.
         // Require explicit context-slot phrases (not bare `model`) so lines like
         // "status messages exceed limits (no model context)" do not match.
+        // Possessive `model's context` is a slot (e.g. "too long for this model's context") and
+        // does not substring-match bare `model context` in "(no model context configured)".
         || ((lower.contains("messages exceed") || lower.contains("messages exceeded"))
             && (lower.contains("context window")
                 || lower.contains("context length")
@@ -389,23 +391,62 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
                 || lower.contains("context size")
                 || lower.contains("max context")
                 || lower.contains("maximum context")
-                || lower.contains("available context")))
-        // "message/input … too long" (distinct from `prompt too long` already handled above).
-        // Same context-slot guard as `messages exceed` (FEAT-D295) so incidental `model context`
-        // copy does not match non-slot errors.
-        || ((lower.contains("message is too long")
-            || lower.contains("messages are too long")
-            || lower.contains("message was too long")
-            || lower.contains("messages were too long")
-            || lower.contains("input is too long")
-            || lower.contains("input was too long"))
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Singular "message exceed(s/ed)" (parallel to plural `messages exceed`, FEAT-D298).
+        || ((lower.contains("message exceeds") || lower.contains("message exceeded"))
             && (lower.contains("context window")
                 || lower.contains("context length")
                 || lower.contains("context limit")
                 || lower.contains("context size")
                 || lower.contains("max context")
                 || lower.contains("maximum context")
-                || lower.contains("available context")))
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural "inputs exceed …" (present / past). Wording like `inputs exceed the context window`
+        // does not contain the substring `exceeds the context window` (bare `exceed` before the slot).
+        // Same context-slot guard as `messages exceed` (FEAT-D295).
+        || ((lower.contains("inputs exceed") || lower.contains("inputs exceeded"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Singular "input exceed(s/ed)" (parallel to plural `inputs exceed`, FEAT-D300).
+        // `input exceed` matches present/past via `exceed` prefix of `exceeds` / `exceeded`.
+        // Does not substring-match `inputs exceed` (letter `s` between `input` and `exceed`).
+        || (lower.contains("input exceed")
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // "message/input(s) … too long" (distinct from `prompt too long` already handled above).
+        // Same context-slot guard as `messages exceed` (FEAT-D295) so incidental `model context`
+        // copy does not match non-slot errors. Plural `inputs are/were` (FEAT-D302) parallels
+        // `messages are/were` and does not substring-match singular `input is/was`.
+        || ((lower.contains("message is too long")
+            || lower.contains("messages are too long")
+            || lower.contains("message was too long")
+            || lower.contains("messages were too long")
+            || lower.contains("input is too long")
+            || lower.contains("input was too long")
+            || lower.contains("inputs are too long")
+            || lower.contains("inputs were too long"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
 }
 
 /// Check whether an Ollama error indicates message role/ordering conflict.
@@ -956,10 +997,22 @@ mod tests {
             "gateway: messages exceed available context on this request"
         ));
         assert!(is_context_overflow_error(
+            "API error: message exceeds the model's context window"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: your message exceeded maximum context for this model"
+        ));
+        assert!(is_context_overflow_error(
             "API: the message is too long for the model's context window"
         ));
         assert!(is_context_overflow_error(
             "error: messages are too long for maximum context on this model"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: inputs are too long for the model's context window"
+        ));
+        assert!(is_context_overflow_error(
+            "API: inputs were too long; exceeded available context on this request"
         ));
         assert!(is_context_overflow_error(
             "validation: input is too long for context length 8192"
@@ -978,6 +1031,30 @@ mod tests {
         ));
         assert!(is_context_overflow_error(
             "openai error: invalid_request_error (context_budget_exceeded)"
+        ));
+        assert!(is_context_overflow_error(
+            "API error: inputs exceed the model's context window"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: inputs exceeded available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: inputs exceed context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "API: input exceeded available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: input exceed the model's context window"
+        ));
+        assert!(is_context_overflow_error(
+            "your message is too long for this model's context"
+        ));
+        assert!(is_context_overflow_error(
+            "chat: messages exceed the model's context on this turn"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: inputs exceeded the model's context"
         ));
     }
 
@@ -1092,10 +1169,28 @@ mod tests {
             "status messages exceed rate limits (no model context configured)"
         ));
         assert!(!is_context_overflow_error(
+            "UI: error message exceeds 80 characters (display limit)"
+        ));
+        assert!(!is_context_overflow_error(
             "discord: message is too long (max 2000 characters)"
         ));
         assert!(!is_context_overflow_error(
+            "form validation: inputs are too long (max 10 text fields)"
+        ));
+        assert!(!is_context_overflow_error(
             "form error: the input is too long (max 500 chars)"
+        ));
+        assert!(!is_context_overflow_error(
+            "API: inputs exceed rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "validation: inputs exceeded the maximum attachment size"
+        ));
+        assert!(!is_context_overflow_error(
+            "API: input exceed rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "validation: input exceeded the maximum attachment size"
         ));
         assert!(!is_context_overflow_error(
             "docs: maximum allowed context is 128000 tokens (informational)"
