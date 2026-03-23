@@ -488,6 +488,77 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
                 || lower.contains("maximum context")
                 || lower.contains("available context")
                 || lower.contains("model's context")))
+        // Plural / singular "quer(y/ies) exceed(s/ed)" (FEAT-D308). Parallel to `requests exceed` /
+        // `inputs exceed`. `query exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `queries exceed` (no `query` + ` exceed`
+        // inside the word `queries`).
+        || ((lower.contains("queries exceed")
+            || lower.contains("queries exceeded")
+            || lower.contains("query exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "call(s) exceed(s/ed)" (FEAT-D309). Parallel to `queries exceed` /
+        // `requests exceed`. `call exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `calls exceed` (the `s` after `call`).
+        || ((lower.contains("calls exceed")
+            || lower.contains("calls exceeded")
+            || lower.contains("call exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "batch(es) exceed(s/ed)" (FEAT-D310). Parallel to `calls exceed` /
+        // `queries exceed`. `batch exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `batches exceed` (the `es` after `batch`).
+        || ((lower.contains("batches exceed")
+            || lower.contains("batches exceeded")
+            || lower.contains("batch exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "token(s) exceed(s/ed)" (FEAT-D311). Parallel to `batches exceed` /
+        // `batch exceed`. `token exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `tokens exceed` (the `s` after `token`).
+        || ((lower.contains("tokens exceed")
+            || lower.contains("tokens exceeded")
+            || lower.contains("token exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "item(s) exceed(s/ed)" (FEAT-D312). Parallel to `tokens exceed` /
+        // `token exceed`. `item exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `items exceed` (the `s` after `item`).
+        || ((lower.contains("items exceed")
+            || lower.contains("items exceeded")
+            || lower.contains("item exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
         // "message/input(s) … too long" (distinct from `prompt too long` already handled above).
         // Same context-slot guard as `messages exceed` (FEAT-D295) so incidental `model context`
         // copy does not match non-slot errors. Plural `inputs are/were` (FEAT-D302) parallels
@@ -1177,6 +1248,66 @@ mod tests {
         assert!(is_context_overflow_error(
             "gateway: request exceeded the context window"
         ));
+        assert!(is_context_overflow_error(
+            "API: queries exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: queries exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: query exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: query exceeded the context window"
+        ));
+        assert!(is_context_overflow_error(
+            "API: calls exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: calls exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: call exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: call exceeded the context window"
+        ));
+        assert!(is_context_overflow_error(
+            "API: batches exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: batches exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: batch exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: batch exceeded the context window"
+        ));
+        assert!(is_context_overflow_error(
+            "API: tokens exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: tokens exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: token exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: token exceeded the context window"
+        ));
+        assert!(is_context_overflow_error(
+            "API: items exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: items exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: item exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: item exceeded the context window"
+        ));
     }
 
     #[test]
@@ -1225,6 +1356,30 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "HTTP: requests exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: queries exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: calls exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: batches exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: tokens exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: items exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: tokens exceeded daily usage cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: items exceeded daily usage cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "database: queries exceeded the allowed execution time"
         ));
         assert!(!is_context_overflow_error(
             "survey requests exceed the allowed quota for this form"
