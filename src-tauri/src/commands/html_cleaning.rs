@@ -219,8 +219,28 @@ fn collapse_whitespace(text: &str) -> String {
                 // (U+00B2, U+00B3, U+00B9, No) and MASCULINE ORDINAL INDICATOR (U+00BA, Ll) stay unmapped—numeric /
                 // word-internal risk. Spacing Modifier Letters modifier letter plus / minus (U+02D6, U+02D7, Sk) are not
                 // Rust whitespace; IPA, phonetic, or Unicode-sample HTML can sit them between Latin tokens without ASCII
-                // space (same spirit as Latin-1 PLUS-MINUS U+00B1, Sm). Neighboring Sk scalars U+02D8 BREVE through U+02DD
-                // DOUBLE ACUTE ACCENT stay unmapped—legacy spacing-accent / word-internal risk.
+                // space (same spirit as Latin-1 PLUS-MINUS U+00B1, Sm). Modifier-letter arrowheads U+02C2 LEFT through
+                // U+02C5 DOWN ARROWHEAD (`Sk`), plus centred half-rings U+02D2 / U+02D3 and up/down tack U+02D4 / U+02D5 (`Sk`),
+                // are not Rust whitespace; IPA or Unicode-sample HTML can sit them between Latin tokens without ASCII space.
+                // U+02C6 MODIFIER LETTER CIRCUMFLEX ACCENT and U+02C7 CARON are `Lm` in UnicodeData (not `Sk`)—they stay
+                // unmapped like stress / length marks. U+02C8 VERTICAL LINE through U+02D1 HALF TRIANGULAR COLON (`Lm`) stay
+                // unmapped—word-internal risk. Neighboring Sk scalars U+02D8 BREVE through U+02DD
+                // DOUBLE ACUTE ACCENT, U+02DE RHOTIC HOOK, and U+02DF CROSS ACCENT stay unmapped—legacy spacing-accent /
+                // hook / cross-accent word-internal risk. Contiguous tone-bar / tone-mark / contour Sk subranges U+02E5
+                // EXTRA-HIGH TONE BAR through U+02EB YANG DEPARTING TONE MARK, U+02ED UNASPIRATED, and U+02EF LOW DOWN
+                // ARROWHEAD through U+02FF LOW LEFT ARROW are not Rust whitespace; IPA / Chin Wu / Unicode-sample HTML
+                // can sit them between Latin tokens without ASCII space. U+02EC MODIFIER LETTER VOICING (Lm) and U+02EE
+                // MODIFIER LETTER DOUBLE APOSTROPHE (Lm) stay unmapped—letter- / apostrophe-like, word-internal risk.
+                // Superscript letters U+02E0 SMALL GAMMA through U+02E4 REVERSED GLOTTAL STOP (Lm) stay unmapped.
+                // Latin Extended-D (Unicode block U+A720–U+A7FF): four spacing `Sk` scalars—MODIFIER LETTER STRESS AND HIGH
+                // TONE (U+A720), STRESS AND LOW TONE (U+A721), COLON (U+A789), SHORT EQUALS SIGN (U+A78A)—are not Rust
+                // whitespace; phonetic or Unicode-sample HTML can sit them between Latin tokens without ASCII space. All
+                // other assigned code points in the block are letters (Lu/Ll) or modifier letters (Lm)—excluded (word-internal risk).
+                // Latin Extended-E (Unicode block U+AB30–U+AB6F): three spacing `Sk` scalars—MODIFIER BREVE WITH INVERTED BREVE
+                // (U+AB5B), MODIFIER LETTER LEFT TACK (U+AB6A), MODIFIER LETTER RIGHT TACK (U+AB6B)—are not Rust whitespace;
+                // phonetic or Unicode-sample HTML can sit them between Latin tokens without ASCII space. Neighbors such as
+                // U+AB5A LATIN SMALL LETTER Y WITH SHORT RIGHT LEG (`Ll`) and U+AB5C MODIFIER LETTER SMALL HENG (`Lm`) stay
+                // unmapped—word-internal risk. Tail U+AB6C–U+AB6F are unassigned (`Cn`).
                 // Section sign (U+00A7)
                 // and pilcrow (U+00B6, Po) are not Rust whitespace either; legal or editorial HTML
                 // often uses them between Latin tokens without ASCII space. Greek question mark
@@ -968,8 +988,20 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{00B0}'
                 | '\u{00AC}'
                 | '\u{00B1}'
+                | '\u{02C2}'..='\u{02C5}'
+                | '\u{02D2}'..='\u{02D5}'
                 | '\u{02D6}'
                 | '\u{02D7}'
+                | '\u{02E5}'..='\u{02EB}'
+                | '\u{02ED}'
+                | '\u{02EF}'..='\u{02FF}'
+                | '\u{A720}'
+                | '\u{A721}'
+                | '\u{A789}'
+                | '\u{A78A}'
+                | '\u{AB5B}'
+                | '\u{AB6A}'
+                | '\u{AB6B}'
                 | '\u{00D7}'
                 | '\u{00F7}'
                 | '\u{00BC}'
@@ -1710,8 +1742,7 @@ mod tests {
         // Adlam U+1E95E–U+1E95F (INITIAL EXCLAMATION / QUESTION; Po)—not Rust whitespace.
         // Medefaidrin U+16E97–U+16E9A (COMMA, FULL STOP, SYMBOL AIVA, EXCLAMATION OH; Po)—not Rust
         // whitespace (FEAT-D204 extends FEAT-D92 contiguous run).
-        for cp in (0x16E97u32..=0x16E9A).chain(0x1E95Eu32..=0x1E95F)
-        {
+        for cp in (0x16E97u32..=0x16E9A).chain(0x1E95Eu32..=0x1E95F) {
             let sep = char::from_u32(cp).unwrap();
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
@@ -1852,13 +1883,7 @@ mod tests {
         // U+00B0 DEGREE SIGN (So); U+00AC NOT SIGN, U+00B1 PLUS-MINUS, U+00D7 MULTIPLICATION, U+00F7 DIVISION
         // (all Sm); not Rust whitespace—scientific or pasted math HTML can glue Latin tokens without ASCII space
         // (FEAT-D225; outside U+2200–U+22FF Mathematical Operators arm).
-        for sep in [
-            '\u{00B0}',
-            '\u{00AC}',
-            '\u{00B1}',
-            '\u{00D7}',
-            '\u{00F7}',
-        ] {
+        for sep in ['\u{00B0}', '\u{00AC}', '\u{00B1}', '\u{00D7}', '\u{00F7}'] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
@@ -1870,6 +1895,65 @@ mod tests {
                 !cleaned.contains(sep),
                 "cleaned output still contains {:?}",
                 sep
+            );
+        }
+    }
+
+    #[test]
+    fn spacing_modifier_arrowheads_sk_u02c2_through_u02c5_and_tacks_u02d2_through_u02d5_separate_words() {
+        // U+02C2–U+02C5: modifier-letter arrowheads (`Sk`); U+02D2–U+02D5: centred half-rings and tacks (`Sk`); not Rust
+        // whitespace—IPA or Unicode-sample HTML can glue Latin tokens without ASCII space (FEAT-D239 arm narrowed in FEAT-D240:
+        // U+02C6/U+02C7 are `Lm`, not `Sk`).
+        let seps: Vec<char> = ('\u{02C2}'..='\u{02C5}')
+            .chain('\u{02D2}'..='\u{02D5}')
+            .collect();
+        assert_eq!(seps.len(), 4 + 4);
+        for sep in seps {
+            let s = format!("foo{sep}bar");
+            let t = collapse_whitespace(&s);
+            let w: Vec<&str> = t.split_whitespace().collect();
+            assert_eq!(
+                w,
+                vec!["foo", "bar"],
+                "U+{:04X} Sk should separate words, got {:?}",
+                sep as u32,
+                w
+            );
+        }
+    }
+
+    #[test]
+    fn spacing_modifier_circumflex_and_caron_lm_u02c6_u02c7_stay_unmapped() {
+        // U+02C6 MODIFIER LETTER CIRCUMFLEX ACCENT and U+02C7 CARON are `Lm` in UnicodeData—IPA superscript diacritics;
+        // must not split like arrowhead `Sk` U+02C2–U+02C5 (FEAT-D240; corrects historical FEAT-D239 miscategorization).
+        for sep in ['\u{02C6}', '\u{02C7}'] {
+            let s = format!("foo{sep}bar");
+            let t = collapse_whitespace(&s);
+            let w: Vec<&str> = t.split_whitespace().collect();
+            assert_eq!(
+                w,
+                vec![s.as_str()],
+                "U+{:04X} Lm should not split tokens, got {:?}",
+                sep as u32,
+                w
+            );
+        }
+    }
+
+    #[test]
+    fn spacing_modifier_stress_marks_lm_u02c8_and_u02d0_stay_unmapped() {
+        // U+02C8 VERTICAL LINE and U+02D0 TRIANGULAR COLON are `Lm` between unmapped Lm U+02C6/U+02C7 and mapped Sk U+02D2—stress / length,
+        // not word separators like arrowheads or tacks.
+        for sep in ['\u{02C8}', '\u{02D0}'] {
+            let s = format!("foo{sep}bar");
+            let t = collapse_whitespace(&s);
+            let w: Vec<&str> = t.split_whitespace().collect();
+            assert_eq!(
+                w,
+                vec![s.as_str()],
+                "U+{:04X} Lm should not split tokens, got {:?}",
+                sep as u32,
+                w
             );
         }
     }
@@ -1890,6 +1974,132 @@ mod tests {
                 !cleaned.contains(sep),
                 "cleaned output still contains {:?}",
                 sep
+            );
+        }
+    }
+
+    #[test]
+    fn spacing_modifier_tone_contour_sk_u02e5_through_u02eb_u02ed_u02ef_through_u02ff_separate_words(
+    ) {
+        // U+02E5–U+02EB, U+02ED, U+02EF–U+02FF: tone bars, departing marks, unaspirated, arrowheads, shelves (`Sk`);
+        // not Rust whitespace.
+        let seps: Vec<char> = ('\u{02E5}'..='\u{02EB}')
+            .chain(std::iter::once('\u{02ED}'))
+            .chain('\u{02EF}'..='\u{02FF}')
+            .collect();
+        assert_eq!(seps.len(), 7 + 1 + 17);
+        for sep in seps {
+            let s = format!("foo{sep}bar");
+            let t = collapse_whitespace(&s);
+            let w: Vec<&str> = t.split_whitespace().collect();
+            assert_eq!(
+                w,
+                vec!["foo", "bar"],
+                "U+{:04X} Sk should separate words, got {:?}",
+                sep as u32,
+                w
+            );
+        }
+    }
+
+    #[test]
+    fn spacing_modifier_voicing_lm_u02ec_and_double_apostrophe_lm_u02ee_stay_unmapped() {
+        // U+02EC VOICING and U+02EE DOUBLE APOSTROPHE are `Lm`—must not split like neighboring Sk tone contours.
+        for sep in ['\u{02EC}', '\u{02EE}'] {
+            let s = format!("foo{sep}bar");
+            let t = collapse_whitespace(&s);
+            let w: Vec<&str> = t.split_whitespace().collect();
+            assert_eq!(
+                w,
+                vec![s.as_str()],
+                "U+{:04X} Lm should not split tokens, got {:?}",
+                sep as u32,
+                w
+            );
+        }
+    }
+
+    #[test]
+    fn spacing_modifier_superscript_letter_lm_u02e1_stays_unmapped() {
+        // U+02E1 MODIFIER LETTER SMALL L sits between unmapped Sk hooks (U+02DF) and mapped tone bars (U+02E5)—`Lm`.
+        let sep = '\u{02E1}';
+        let s = format!("foo{sep}bar");
+        let t = collapse_whitespace(&s);
+        let w: Vec<&str> = t.split_whitespace().collect();
+        assert_eq!(
+            w,
+            vec![s.as_str()],
+            "U+02E1 Lm should not split tokens, got {:?}",
+            w
+        );
+    }
+
+    #[test]
+    fn latin_extended_d_modifier_letters_sk_a720_a721_a789_a78a_separate_words() {
+        // Latin Extended-D: sole `Sk` scalars U+A720/U+A721 (stress / high-low tone) and U+A789/U+A78A (colon / short equals);
+        // not Rust whitespace (FEAT-D241).
+        for sep in ['\u{A720}', '\u{A721}', '\u{A789}', '\u{A78A}'] {
+            let s = format!("foo{sep}bar");
+            let t = collapse_whitespace(&s);
+            let w: Vec<&str> = t.split_whitespace().collect();
+            assert_eq!(
+                w,
+                vec!["foo", "bar"],
+                "U+{:04X} Sk should separate words, got {:?}",
+                sep as u32,
+                w
+            );
+        }
+    }
+
+    #[test]
+    fn latin_extended_d_modifier_letter_lm_a788_and_letter_ll_a723_stay_unmapped() {
+        // U+A788 MODIFIER LETTER LOW CIRCUMFLEX ACCENT (`Lm`); U+A723 LATIN SMALL LETTER EGYPTOLOGICAL ALEF (`Ll`)—spot-check.
+        for sep in ['\u{A788}', '\u{A723}'] {
+            let s = format!("foo{sep}bar");
+            let t = collapse_whitespace(&s);
+            let w: Vec<&str> = t.split_whitespace().collect();
+            assert_eq!(
+                w,
+                vec![s.as_str()],
+                "U+{:04X} should not split tokens, got {:?}",
+                sep as u32,
+                w
+            );
+        }
+    }
+
+    #[test]
+    fn latin_extended_e_modifier_letters_sk_ab5b_ab6a_ab6b_separate_words() {
+        // Latin Extended-E: sole `Sk` scalars U+AB5B (modifier breve with inverted breve), U+AB6A (left tack), U+AB6B (right tack);
+        // not Rust whitespace (FEAT-D242).
+        for sep in ['\u{AB5B}', '\u{AB6A}', '\u{AB6B}'] {
+            let s = format!("foo{sep}bar");
+            let t = collapse_whitespace(&s);
+            let w: Vec<&str> = t.split_whitespace().collect();
+            assert_eq!(
+                w,
+                vec!["foo", "bar"],
+                "U+{:04X} Sk should separate words, got {:?}",
+                sep as u32,
+                w
+            );
+        }
+    }
+
+    #[test]
+    fn latin_extended_e_letter_ll_ab5a_and_modifier_lm_ab5c_stay_unmapped() {
+        // U+AB5A LATIN SMALL LETTER Y WITH SHORT RIGHT LEG (`Ll`); U+AB5C MODIFIER LETTER SMALL HENG (`Lm`)—spot-check.
+        for sep in ['\u{AB5A}', '\u{AB5C}'] {
+            let s = format!("foo{sep}bar");
+            let t = collapse_whitespace(&s);
+            let w: Vec<&str> = t.split_whitespace().collect();
+            assert_eq!(
+                w,
+                vec![s.as_str()],
+                "U+{:04X} should not split tokens, got {:?}",
+                sep as u32,
+                w
             );
         }
     }
@@ -2017,7 +2227,10 @@ mod tests {
         // U+0001–U+0008, U+000E–U+001F, U+007F (Cc); not Unicode White_Space—binary-pasted or legacy
         // control bytes in FETCH_URL bodies should still tokenize (FEAT-D228). U+0000 is dropped by
         // the HTML parser in text nodes; U+0009–U+000D are White_Space and omitted from the match arm.
-        for cp in (0x1u32..=0x8).chain(0xE..=0x1F).chain(std::iter::once(0x7F)) {
+        for cp in (0x1u32..=0x8)
+            .chain(0xE..=0x1F)
+            .chain(std::iter::once(0x7F))
+        {
             let sep = char::from_u32(cp).unwrap();
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
@@ -2310,15 +2523,8 @@ mod tests {
         // extend FEAT-D72; not Rust whitespace. U+055A apostrophe and U+055B emphasis
         // stay unmapped (word-internal risk, like U+2019).
         for sep in [
-            '\u{055C}',
-            '\u{055D}',
-            '\u{055E}',
-            '\u{055F}',
-            '\u{0589}',
-            '\u{058A}',
-            '\u{058D}',
-            '\u{058E}',
-            '\u{058F}',
+            '\u{055C}', '\u{055D}', '\u{055E}', '\u{055F}', '\u{0589}', '\u{058A}', '\u{058D}',
+            '\u{058E}', '\u{058F}',
         ] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
@@ -2347,7 +2553,10 @@ mod tests {
             "U+0559 Lm should not split tokens like eternity/dram signs, got {:?}",
             cleaned
         );
-        assert!(cleaned.contains(sep), "expected raw U+0559 preserved in output");
+        assert!(
+            cleaned.contains(sep),
+            "expected raw U+0559 preserved in output"
+        );
     }
 
     #[test]
@@ -2358,27 +2567,9 @@ mod tests {
         // U+0888 (Arabic raised round dot, Sk), U+066A–U+066D (Arabic percent, decimal sep, thousands sep, five pointed star; Po / Pi / Pf / So); not Rust
         // whitespace—mixed European, Greek, or Arabic/Latin HTML can glue tokens without ASCII space.
         for sep in [
-            '\u{00A1}',
-            '\u{00BF}',
-            '\u{00AB}',
-            '\u{00BB}',
-            '\u{037E}',
-            '\u{0384}',
-            '\u{0385}',
-            '\u{03D6}',
-            '\u{03F6}',
-            '\u{060C}',
-            '\u{060E}',
-            '\u{060F}',
-            '\u{061B}',
-            '\u{061D}',
-            '\u{061F}',
-            '\u{0888}',
-            '\u{06D4}',
-            '\u{066A}',
-            '\u{066B}',
-            '\u{066C}',
-            '\u{066D}',
+            '\u{00A1}', '\u{00BF}', '\u{00AB}', '\u{00BB}', '\u{037E}', '\u{0384}', '\u{0385}',
+            '\u{03D6}', '\u{03F6}', '\u{060C}', '\u{060E}', '\u{060F}', '\u{061B}', '\u{061D}',
+            '\u{061F}', '\u{0888}', '\u{06D4}', '\u{066A}', '\u{066B}', '\u{066C}', '\u{066D}',
         ] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
@@ -2405,7 +2596,10 @@ mod tests {
             "U+08C9 Lm should not split tokens like U+0888, got {:?}",
             cleaned
         );
-        assert!(cleaned.contains(sep), "expected raw U+08C9 preserved in output");
+        assert!(
+            cleaned.contains(sep),
+            "expected raw U+08C9 preserved in output"
+        );
     }
 
     #[test]
@@ -3574,17 +3768,8 @@ mod tests {
         // U+060B AFGHANI SIGN (Sc), U+060D DATE SEPARATOR (Po), U+060E POETIC VERSE SIGN / U+060F SIGN MISRA (So), U+061D END OF TEXT MARK (Po), U+061E TRIPLE DOT PUNCTUATION (Po),
         // U+0888 ARABIC RAISED ROUND DOT (Sk), U+066D FIVE POINTED STAR (Po). None are Rust whitespace.
         for sep in [
-            '\u{2D70}',
-            '\u{0609}',
-            '\u{060A}',
-            '\u{060B}',
-            '\u{060D}',
-            '\u{060E}',
-            '\u{060F}',
-            '\u{061D}',
-            '\u{061E}',
-            '\u{0888}',
-            '\u{066D}',
+            '\u{2D70}', '\u{0609}', '\u{060A}', '\u{060B}', '\u{060D}', '\u{060E}', '\u{060F}',
+            '\u{061D}', '\u{061E}', '\u{0888}', '\u{066D}',
         ] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
@@ -4627,12 +4812,7 @@ mod tests {
         // Meetei Mayek Extensions U+AAF0 CHEIKHAN, U+AAF1 AHANG KHUDAM (Po). None are Rust whitespace.
         // U+AAF2 MEETEI MAYEK ANJI is `Lo`—see `meetei_mayek_anji_lo_u_aaf2_stays_unmapped`.
         for sep in [
-            '\u{0DF4}',
-            '\u{1940}',
-            '\u{1944}',
-            '\u{1945}',
-            '\u{AAF0}',
-            '\u{AAF1}',
+            '\u{0DF4}', '\u{1940}', '\u{1944}', '\u{1945}', '\u{AAF0}', '\u{AAF1}',
         ] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
@@ -4806,7 +4986,11 @@ mod tests {
                 sep as u32,
                 cleaned
             );
-            assert!(cleaned.contains(sep), "expected raw U+{:04X} preserved in output", sep as u32);
+            assert!(
+                cleaned.contains(sep),
+                "expected raw U+{:04X} preserved in output",
+                sep as u32
+            );
         }
     }
 
