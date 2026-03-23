@@ -152,7 +152,16 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// `counterparagraphs exceed`, and `paragraph exceed` does not match inside
 /// `counterparagraph exceed`, `sentences exceed` does not match inside
 /// `microsentences exceed`, and `sentence exceed` does not match inside
-/// `microsentence exceed`).
+/// `microsentence exceed`, `words exceed` does not match inside
+/// `buzzwords exceed` / `keywords exceed`, and `word exceed` does not match inside
+/// `buzzword exceed`; `characters exceed` does not match inside `megacharacters exceed` /
+/// `metacharacters exceed`, and `character exceed` does not match inside `noncharacter exceed`;
+/// `bytes exceed` does not match inside `megabytes exceed` / `kilobytes exceed`, and
+/// `byte exceed` does not match inside `kilobyte exceed`; `bits exceed` does not match inside
+/// `megabits exceed` / `kilobits exceed`, and `bit exceed` does not match inside `kilobit exceed`
+/// or as a substring of `rabbit exceed` (left-boundary rejects the inner `bit`); `fields exceed`
+/// does not match inside `battlefields exceed` / `cornfields exceed`, and `field exceed` does not
+/// match inside `afield exceed` / `subfield exceed`.
 fn contains_phrase_after_ident_boundary(haystack: &str, phrase: &str) -> bool {
     fn ident_continue(c: char) -> bool {
         c.is_ascii_alphanumeric() || c == '_'
@@ -802,6 +811,84 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         || ((contains_phrase_after_ident_boundary(&lower, "sentences exceed")
             || contains_phrase_after_ident_boundary(&lower, "sentences exceeded")
             || contains_phrase_after_ident_boundary(&lower, "sentence exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "word(s) exceed(s/ed)" (FEAT-D328). Parallel to `sentences exceed` /
+        // `sentence exceed`. `word exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `words exceed` (the `s` after `word`).
+        // Ident-boundary so `buzzwords exceed` / `keywords exceed` / `buzzword exceed` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "words exceed")
+            || contains_phrase_after_ident_boundary(&lower, "words exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "word exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "character(s) exceed(s/ed)" (FEAT-D329). Parallel to `words exceed` /
+        // `word exceed`. `character exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `characters exceed` (the `s` after `character`).
+        // Ident-boundary so `megacharacters exceed` / `metacharacters exceed` / `noncharacter exceed`
+        // do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "characters exceed")
+            || contains_phrase_after_ident_boundary(&lower, "characters exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "character exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "byte(s) exceed(s/ed)" (FEAT-D330). Parallel to `characters exceed` /
+        // `character exceed`. `byte exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `bytes exceed` (the `s` after `byte`).
+        // Ident-boundary so `megabytes exceed` / `kilobytes exceed` / `kilobyte exceed` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "bytes exceed")
+            || contains_phrase_after_ident_boundary(&lower, "bytes exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "byte exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "bit(s) exceed(s/ed)" (FEAT-D331). Parallel to `bytes exceed` /
+        // `byte exceed`. `bit exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `bits exceed` (the `s` after `bit`).
+        // Ident-boundary so `megabits exceed` / `kilobits exceed` / `kilobit exceed` and
+        // `rabbit exceed` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "bits exceed")
+            || contains_phrase_after_ident_boundary(&lower, "bits exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "bit exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "field(s) exceed(s/ed)" (FEAT-D332). Parallel to `bits exceed` /
+        // `bit exceed`. `field exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `fields exceed` (the `s` after `field`).
+        // Ident-boundary so `battlefields exceed` / `cornfields exceed` / `afield exceed` /
+        // `subfield exceed` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "fields exceed")
+            || contains_phrase_after_ident_boundary(&lower, "fields exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "field exceed"))
             && (lower.contains("context window")
                 || lower.contains("context length")
                 || lower.contains("context limit")
@@ -1967,6 +2054,168 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "layout: microsentence exceed display width (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: words exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: words exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: word exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: word exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: words exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: words exceeded daily usage cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "NLP: word exceed max syllables per token (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "lexicon: buzzwords exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "SEO: keywords exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "puzzles: crosswords exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "RAG: microwords exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "glossary: buzzword exceed display width (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: characters exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: characters exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: character exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: character exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: characters exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: characters exceeded daily usage cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "UI: character exceed max field width in pixels (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "RAG: megacharacters exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "regex: metacharacters exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: noncharacter exceed token class limit (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: bytes exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: bytes exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: byte exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: byte exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: bytes exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: bytes exceeded daily upload cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "storage: byte exceed max object size on this bucket (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "RAG: megabytes exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "transfer: kilobytes exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "codec: kilobyte exceed frame size cap (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: bits exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: bits exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: bit exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: bit exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: bits exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: bits exceeded daily transfer cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "codec: bit exceed max frame size on this stream (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "RAG: megabits exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "transfer: kilobits exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "codec: kilobit exceed symbol size cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: rabbit exceed max nesting depth (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: fields exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: fields exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: field exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: field exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: fields exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: fields exceeded daily write cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: field exceed max string length on this column (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "RAG: battlefields exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "geo: cornfields exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: afield exceed display width cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: subfield exceed nesting depth (no model context configured)"
         ));
         assert!(!is_context_overflow_error(
             "microcolumns exceed the model's context window on this request"

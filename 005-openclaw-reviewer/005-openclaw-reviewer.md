@@ -8,11 +8,11 @@ Cross-check **OpenClaw** `AGENTS.md` against the **openclaw** repository (siblin
 **OpenClaw `HEAD`:** `95ae8aabb77a99bed6747698fe810f6b8e34490b` (short: `95ae8aa`)  
 **References:** `AGENTS.md` (repo guidelines), `package.json` (scripts), `vitest.config.ts` (coverage; `vitest.unit.config.ts` extends it for `pnpm test:coverage`).
 
-**Independent re-run:** `2026-03-23T09:47:10Z` (reviewer agent) — same `HEAD` (`95ae8aabb77a99bed6747698fe810f6b8e34490b`); `src/channel-web.ts` present, no `src/provider-web.ts`; `src/cli`, `src/commands`, `src/infra`, `src/media`, `src/channels/`, `src/routing/`, `src/plugins/`, and `extensions/*` present; no bogus top-level `src/telegram`; `package.json` `check` chain still includes `format:check` → `pnpm tsgo` (no `"tsgo"` script key in `scripts`; binary from `@typescript/native-preview` `7.0.0-dev.20260322.1`) → …; `format` / `format:fix` / `format:check` match doc; `vitest.config.ts` thresholds still 70/70/55/70; `vitest.unit.config.ts` still extends base; table below unchanged (no drift vs `AGENTS.md`).
+**Independent re-run:** `2026-03-23T10:04:56Z` (reviewer agent) — same `HEAD` (`95ae8aabb77a99bed6747698fe810f6b8e34490b`); `src/channel-web.ts` present, no `src/provider-web.ts`; `src/cli`, `src/commands`, `src/infra`, `src/media`, `src/channels/`, `src/routing/`, `src/plugins/`, and `extensions/*` present; no bogus top-level `src/telegram`; `package.json` `check` chain still includes `format:check` → `pnpm tsgo` (no `"tsgo"` script key in `scripts`; binary from `@typescript/native-preview` `7.0.0-dev.20260322.1`) → …; `format` / `format:fix` / `format:check` match doc; `vitest.config.ts` thresholds still 70/70/55/70; `vitest.unit.config.ts` still extends base; table below unchanged (no drift vs `AGENTS.md`).
 
-**Prior re-run (same day):** `2026-03-23T09:26:07Z` — identical `HEAD` and conclusions.
+**Prior re-run (same day):** `2026-03-23T09:47:10Z` — identical `HEAD` and conclusions.
 
-**Earlier same day:** `2026-03-23T09:10:04Z` and `2026-03-23T08:53:39Z` — identical `HEAD` and conclusions.
+**Earlier same day:** `2026-03-23T09:26:07Z`, `2026-03-23T09:10:04Z`, and `2026-03-23T08:53:39Z` — identical `HEAD` and conclusions.
 
 ### §7-style checks (doc vs code)
 
