@@ -142,8 +142,17 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 
 /// True if `phrase` appears in `haystack` and is not immediately preceded by ASCII alnum / `_`
 /// (so `rows exceed` does not match inside `arrows exceed` / `throws exceed`, `columns exceed`
-/// does not match inside `microcolumns exceed`, and `tables exceed` does not match inside
-/// `constables exceed`; `table exceed` does not match inside `stable exceed`).
+/// does not match inside `microcolumns exceed`, `tables exceed` does not match inside
+/// `constables exceed`, `table exceed` does not match inside `stable exceed`, `blocks exceed`
+/// does not match inside `roadblocks exceed`, `block exceed` does not match inside
+/// `roadblock exceed` / `sunblock exceed`, `segments exceed` does not match inside
+/// `microsegments exceed`, `segment exceed` does not match inside `multisegment exceeds`,
+/// `sections exceed` does not match inside `subsections exceed`, and `section exceed` does not
+/// match inside `intersection exceed`, `paragraphs exceed` does not match inside
+/// `counterparagraphs exceed`, and `paragraph exceed` does not match inside
+/// `counterparagraph exceed`, `sentences exceed` does not match inside
+/// `microsentences exceed`, and `sentence exceed` does not match inside
+/// `microsentence exceed`).
 fn contains_phrase_after_ident_boundary(haystack: &str, phrase: &str) -> bool {
     fn ident_continue(c: char) -> bool {
         c.is_ascii_alphanumeric() || c == '_'
@@ -718,6 +727,81 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         || ((contains_phrase_after_ident_boundary(&lower, "tables exceed")
             || contains_phrase_after_ident_boundary(&lower, "tables exceeded")
             || contains_phrase_after_ident_boundary(&lower, "table exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "block(s) exceed(s/ed)" (FEAT-D323). Parallel to `tables exceed` /
+        // `table exceed`. `block exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `blocks exceed` (the `s` after `block`).
+        // Ident-boundary so `roadblocks exceed` / `roadblock exceed` / `sunblock exceed` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "blocks exceed")
+            || contains_phrase_after_ident_boundary(&lower, "blocks exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "block exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "segment(s) exceed(s/ed)" (FEAT-D324). Parallel to `blocks exceed` /
+        // `block exceed`. `segment exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `segments exceed` (the `s` after `segment`).
+        // Ident-boundary so `microsegments exceed` / `multisegment exceeds` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "segments exceed")
+            || contains_phrase_after_ident_boundary(&lower, "segments exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "segment exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "section(s) exceed(s/ed)" (FEAT-D325). Parallel to `segments exceed` /
+        // `segment exceed`. `section exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `sections exceed` (the `s` after `section`).
+        // Ident-boundary so `subsections exceed` / `intersection exceed` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "sections exceed")
+            || contains_phrase_after_ident_boundary(&lower, "sections exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "section exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "paragraph(s) exceed(s/ed)" (FEAT-D326). Parallel to `sections exceed` /
+        // `section exceed`. `paragraph exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `paragraphs exceed` (the `s` after `paragraph`).
+        // Ident-boundary so `counterparagraphs exceed` / `counterparagraph exceed` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "paragraphs exceed")
+            || contains_phrase_after_ident_boundary(&lower, "paragraphs exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "paragraph exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "sentence(s) exceed(s/ed)" (FEAT-D327). Parallel to `paragraphs exceed` /
+        // `paragraph exceed`. `sentence exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `sentences exceed` (the `s` after `sentence`).
+        // Ident-boundary so `microsentences exceed` / `microsentence exceed` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "sentences exceed")
+            || contains_phrase_after_ident_boundary(&lower, "sentences exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "sentence exceed"))
             && (lower.contains("context window")
                 || lower.contains("context length")
                 || lower.contains("context limit")
@@ -1745,6 +1829,144 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "layout: stable exceed viewport width (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: blocks exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: blocks exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: block exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: block exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: blocks exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: blocks exceeded daily usage cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "storage: block exceed max object size (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "traffic: roadblocks exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "safety: roadblock exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "skincare: sunblock exceed SPF labeling limits (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: segments exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: segments exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: segment exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: segment exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: segments exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: segments exceeded daily usage cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "video: segment exceed max GOP duration (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "RAG: microsegments exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: multisegment exceeds max track width (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: sections exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: sections exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: section exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: section exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: sections exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: sections exceeded daily usage cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: section exceed max heading depth (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "docs: subsections exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "geometry: intersection exceed tolerance (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: paragraphs exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: paragraphs exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: paragraph exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: paragraph exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: paragraphs exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: paragraphs exceeded daily usage cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: paragraph exceed max width in twips (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "legal: counterparagraphs exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "brief: counterparagraph exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: sentences exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: sentences exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: sentence exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: sentence exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: sentences exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: sentences exceeded daily usage cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "NLP: sentence exceed max tokens per span (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "RAG: microsentences exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: microsentence exceed display width (no model context configured)"
         ));
         assert!(!is_context_overflow_error(
             "microcolumns exceed the model's context window on this request"
