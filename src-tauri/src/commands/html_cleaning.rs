@@ -192,7 +192,13 @@ fn collapse_whitespace(text: &str) -> String {
                 // whitespace, so Khmer-layout HTML can otherwise glue adjacent Latin tokens.
                 // Latin-1 inverted exclamation / question (U+00A1, U+00BF) and double angle quotes
                 // (U+00AB, U+00BB, Pi/Pf) are not Rust whitespace; Spanish / French typography in
-                // HTML can place them between Latin tokens without ASCII space. Section sign (U+00A7)
+                // HTML can place them between Latin tokens without ASCII space. Cent / pound /
+                // generic currency / yen signs (U+00A2–U+00A5, all Sc) are not Rust whitespace;
+                // legacy Western price copy or entity-encoded HTML can glue Latin tokens without ASCII
+                // space (distinct from block Currency Symbols U+20A0+). U+00A6 BROKEN BAR (Sm) and
+                // U+00A8 DIAERESIS (Sk) stay unmapped—math-typography or combining-like risk. COPYRIGHT SIGN
+                // (U+00A9, So) and REGISTERED SIGN (U+00AE, So) are not Rust whitespace; legal or trademark HTML
+                // often places them between Latin tokens without ASCII space. Section sign (U+00A7)
                 // and pilcrow (U+00B6, Po) are not Rust whitespace either; legal or editorial HTML
                 // often uses them between Latin tokens without ASCII space. Greek question mark
                 // (U+037E, Po; erotimatiko) is not Rust whitespace and is distinct from Greek ano
@@ -434,9 +440,11 @@ fn collapse_whitespace(text: &str) -> String {
                 // rotated rana (U+1AA0–U+1AA6, Po) and kaan through caang (U+1AA8–U+1AAD, Po) are not Rust whitespace;
                 // Lanna–Latin or Unicode-sample HTML can glue Latin tokens without ASCII space. U+1AA7 MAI YAMOK (Lm) is
                 // omitted—modifier-like, word-internal risk (same spirit as Thai U+0E46).
-                // Currency Symbols U+20A0–U+20BF (all Sc) are not Rust whitespace; multilingual
-                // price copy or Unicode-sample HTML can place euro, rupee, bitcoin, etc. between
-                // Latin tokens without ASCII space. U+20C0–U+20CF are unassigned and stay unmapped.
+                // Currency Symbols U+20A0–U+20C1 (all Sc) are not Rust whitespace; multilingual
+                // price copy or Unicode-sample HTML can place euro, rupee, bitcoin, som (U+20C0,
+                // Unicode 14), Saudi riyal (U+20C1, Unicode 17), etc. between Latin tokens without
+                // ASCII space. Extends FEAT-D141 (formerly U+20A0–U+20BF only). U+20C2–U+20CF are
+                // unassigned (`Cn`) and stay unmapped.
                 // Letterlike Symbols U+2100–U+214F: only So/Sm subranges (account-of, degree signs,
                 // numero, prescription take, trade mark, sans-serif math symbols, per sign, etc.);
                 // not Rust whitespace. Lu/Ll/Lo mathematical letters (e.g. U+2102, U+210E–U+2113,
@@ -911,12 +919,15 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{05C6}'
                 | '\u{10FB}'
                 | '\u{00A1}'
+                | '\u{00A2}'..='\u{00A5}'
+                | '\u{00A9}'
+                | '\u{00AE}'
                 | '\u{00BF}'
                 | '\u{00AB}'
                 | '\u{00BB}'
                 | '\u{00A7}'
                 | '\u{00B6}'
-                | '\u{20A0}'..='\u{20BF}'
+                | '\u{20A0}'..='\u{20C1}'
                 | '\u{2100}'..='\u{2101}'
                 | '\u{2103}'..='\u{2106}'
                 | '\u{2108}'..='\u{2109}'
@@ -1759,6 +1770,80 @@ mod tests {
     }
 
     #[test]
+    fn latin1_currency_signs_u00a2_through_u00a5_separate_words() {
+        // U+00A2 CENT through U+00A5 YEN SIGN (all Sc); not Rust whitespace—Western price copy or
+        // Unicode-sample HTML can glue Latin tokens without ASCII space (FEAT-D223).
+        for sep in '\u{00A2}'..='\u{00A5}' {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn latin1_copyright_and_registered_signs_so_u00a9_u00ae_separate_words() {
+        // U+00A9 COPYRIGHT SIGN and U+00AE REGISTERED SIGN (both So); not Rust whitespace—legal or
+        // trademark HTML can glue Latin tokens without ASCII space (FEAT-D224).
+        for sep in ['\u{00A9}', '\u{00AE}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {sep:?} normalized before collapse, got {:?}",
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {:?}",
+                sep
+            );
+        }
+    }
+
+    #[test]
+    fn latin1_feminine_ordinal_ll_u00aa_stays_unmapped() {
+        // U+00AA FEMININE ORDINAL INDICATOR (Ll) sits between mapped Latin-1 scalars; letter-like,
+        // word-internal risk—must not get the So treatment of U+00A9 / U+00AE (FEAT-D224).
+        let sep = '\u{00AA}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            !cleaned.contains("hello world"),
+            "U+00AA must stay unmapped, got {:?}",
+            cleaned
+        );
+        assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
+    }
+
+    #[test]
+    fn latin1_broken_bar_sm_u00a6_and_diaeresis_sk_u00a8_stay_unmapped() {
+        // U+00A6 BROKEN BAR (Sm) and U+00A8 DIAERESIS (Sk) are not contiguous `Sc` with U+00A2–U+00A5;
+        // Sm/Sk stay unmapped—math bar or spacing-mark semantics, not general currency word breaks.
+        for cp in [0x00A6u32, 0x00A8] {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} must stay unmapped, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
+        }
+    }
+
+    #[test]
     fn latin1_section_sign_and_pilcrow_separate_words() {
         // U+00A7 SECTION SIGN, U+00B6 PILCROW SIGN (Po); not Rust whitespace—legal or editorial HTML
         // can place them between Latin tokens without ASCII space.
@@ -1774,10 +1859,11 @@ mod tests {
     }
 
     #[test]
-    fn currency_symbols_u20a0_through_u20bf_separate_words() {
-        // Currency Symbols U+20A0–U+20BF (all Sc); not Rust whitespace—price or Unicode-sample HTML
-        // can glue Latin tokens without ASCII space.
-        for sep in '\u{20A0}'..='\u{20BF}' {
+    fn currency_symbols_u20a0_through_u20c1_separate_words() {
+        // Currency Symbols U+20A0–U+20C1 (all Sc); not Rust whitespace—price or Unicode-sample HTML
+        // can glue Latin tokens without ASCII space. U+20C0 SOM SIGN (Unicode 14), U+20C1 SAUDI RIYAL
+        // SIGN (Unicode 17) extend FEAT-D141 contiguous block tail.
+        for sep in '\u{20A0}'..='\u{20C1}' {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
@@ -1790,6 +1876,23 @@ mod tests {
                 !cleaned.contains(sep),
                 "cleaned output still contains U+{:04X}",
                 sep as u32
+            );
+        }
+    }
+
+    #[test]
+    fn currency_symbols_unassigned_tail_u20c2_through_u20cf_stay_unmapped() {
+        // Currency Symbols block tail U+20C2–U+20CF: UnicodeData unassigned (`Cn`)—must not widen
+        // the contiguous `Sc` arm past U+20C1 (FEAT-D222).
+        for cp in 0x20C2u32..=0x20CF {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} is unassigned and must not split words, got {:?}",
+                cp,
+                cleaned
             );
         }
     }
