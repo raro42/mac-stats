@@ -199,6 +199,20 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// does not match inside `subobservation exceed` (left-boundary rejects `preobservation exceed`);
 /// `events exceed` does not match inside `microevents exceed` / `metaevents exceed`, and
 /// `event exceed` does not match inside `subevent exceed` (left-boundary rejects `preevent exceed`);
+/// `traces exceed` does not match inside `microtraces exceed` / `metatraces exceed`, and
+/// `trace exceed` does not match inside `subtrace exceed` (left-boundary rejects `pretrace exceed`
+/// and `retrace exceed`);
+/// `spans exceed` does not match inside `microspans exceed` / `metaspans exceed`, and
+/// `span exceed` does not match inside `subspan exceed` (left-boundary rejects `prespan exceed`
+/// and `respan exceed`);
+/// `attributes exceed` does not match inside `microattributes exceed` / `metaattributes exceed`, and
+/// `attribute exceed` does not match inside `subattribute exceed` (left-boundary rejects
+/// `preattribute exceed` and `reattribute exceed`);
+/// `links exceed` does not match inside `microlinks exceed` / `metalinks exceed`, and
+/// `link exceed` does not match inside `sublink exceed` (left-boundary rejects `prelink exceed`
+/// and `relink exceed`);
+/// `requests exceed` does not match inside `microrequests exceed` / `metarequests exceed`, and
+/// `request exceed` does not match inside `subrequest exceed` (left-boundary rejects `prerequest exceed`);
 /// `records exceed` does not match inside `microrecords exceed` / `metarecords exceed`, and
 /// `record exceed` does not match inside `subrecord exceed` (left-boundary rejects `rerecord exceed`
 /// and `prerecord exceed`).
@@ -555,12 +569,14 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
                 || lower.contains("maximum context")
                 || lower.contains("available context")
                 || lower.contains("model's context")))
-        // Plural / singular "request(s) exceed(s/ed)" (FEAT-D307). Parallel to `responses exceed` /
-        // `inputs exceed`. `request exceed` matches present/past via `exceed` prefix of `exceeds` /
-        // `exceeded` and does not substring-match `requests exceed` (the `s` after `request`).
-        || ((lower.contains("requests exceed")
-            || lower.contains("requests exceeded")
-            || lower.contains("request exceed"))
+        // Plural / singular "request(s) exceed(s/ed)" (FEAT-D307; ident-boundary FEAT-D353). Parallel
+        // to `responses exceed` / `inputs exceed`. `request exceed` matches present/past via `exceed`
+        // prefix of `exceeds` / `exceeded` and does not substring-match `requests exceed` (the `s`
+        // after `request`). Ident-boundary so `microrequests exceed` / `metarequests exceed` /
+        // `subrequest exceed` do not false-positive; `prerequest exceed` is rejected the same way.
+        || ((contains_phrase_after_ident_boundary(&lower, "requests exceed")
+            || contains_phrase_after_ident_boundary(&lower, "requests exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "request exceed"))
             && (lower.contains("context window")
                 || lower.contains("context length")
                 || lower.contains("context limit")
@@ -1237,6 +1253,71 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         || ((contains_phrase_after_ident_boundary(&lower, "events exceed")
             || contains_phrase_after_ident_boundary(&lower, "events exceeded")
             || contains_phrase_after_ident_boundary(&lower, "event exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "trace(s) exceed(s/ed)" (FEAT-D354). Parallel to `events exceed` /
+        // `event exceed`. `trace exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `traces exceed` (the `s` after `trace`).
+        // Ident-boundary so `microtraces exceed` / `metatraces exceed` / `subtrace exceed` do not
+        // false-positive; `pretrace exceed` and `retrace exceed` are rejected the same way.
+        || ((contains_phrase_after_ident_boundary(&lower, "traces exceed")
+            || contains_phrase_after_ident_boundary(&lower, "traces exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "trace exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "span(s) exceed(s/ed)" (FEAT-D355). Parallel to `traces exceed` /
+        // `trace exceed`. `span exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `spans exceed` (the `s` after `span`).
+        // Ident-boundary so `microspans exceed` / `metaspans exceed` / `subspan exceed` do not
+        // false-positive; `prespan exceed` and `respan exceed` are rejected the same way.
+        || ((contains_phrase_after_ident_boundary(&lower, "spans exceed")
+            || contains_phrase_after_ident_boundary(&lower, "spans exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "span exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "attribute(s) exceed(s/ed)" (FEAT-D356). Parallel to `spans exceed` /
+        // `span exceed`. `attribute exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `attributes exceed` (the `s` after
+        // `attribute`). Ident-boundary so `microattributes exceed` / `metaattributes exceed` /
+        // `subattribute exceed` do not false-positive; `preattribute exceed` and `reattribute exceed`
+        // are rejected the same way.
+        || ((contains_phrase_after_ident_boundary(&lower, "attributes exceed")
+            || contains_phrase_after_ident_boundary(&lower, "attributes exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "attribute exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "link(s) exceed(s/ed)" (FEAT-D357). Parallel to `attributes exceed` /
+        // `attribute exceed`. `link exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `links exceed` (the `s` after `link`).
+        // Ident-boundary so `microlinks exceed` / `metalinks exceed` / `sublink exceed` do not
+        // false-positive; `prelink exceed` and `relink exceed` are rejected the same way.
+        || ((contains_phrase_after_ident_boundary(&lower, "links exceed")
+            || contains_phrase_after_ident_boundary(&lower, "links exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "link exceed"))
             && (lower.contains("context window")
                 || lower.contains("context length")
                 || lower.contains("context limit")
@@ -2150,6 +2231,21 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "HTTP: requests exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microrequests exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metarequests exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "routing: subrequest exceed header cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "storage: prerequest exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "http: request exceed max allowed size on this route (no model context configured)"
         ));
         assert!(!is_context_overflow_error(
             "HTTP: queries exceed per-client rate limits for this endpoint"
@@ -3161,6 +3257,150 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "workflow: prevent exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: traces exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: traces exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: trace exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "proxy: trace exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: traces exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: traces exceeded max span count on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "http: trace exceed max allowed depth on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microtraces exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metatraces exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "otel: subtrace exceed span cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "storage: pretrace exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "debug: retrace exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: spans exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: spans exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: span exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "proxy: span exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: spans exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: spans exceeded max attribute count on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "http: span exceed max allowed depth on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microspans exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaspans exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "otel: subspan exceed link cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "storage: prespan exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "debug: respan exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: attributes exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: attributes exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: attribute exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "proxy: attribute exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: attributes exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: attributes exceeded max key count on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "http: attribute exceed max allowed size on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microattributes exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaattributes exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "otel: subattribute exceed tag cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "storage: preattribute exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "debug: reattribute exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: links exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: links exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: link exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "proxy: link exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: links exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: links exceeded max per-span cap on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "http: link exceed max allowed count on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microlinks exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metalinks exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "otel: sublink exceed span cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "storage: prelink exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "debug: relink exceed the model's context window on this request"
         ));
         assert!(!is_context_overflow_error(
             "config: microrecords exceed the model's context window on this request"
