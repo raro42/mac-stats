@@ -405,7 +405,7 @@ fn collapse_whitespace(text: &str) -> String {
                 // U+FFFD REPLACEMENT CHARACTER (So, same block) is not Rust whitespace either;
                 // transcoding or mojibake HTML can insert it between Latin tokens without ASCII space.
                 // CJK Symbols and Punctuation: ditto mark (U+3003, Po), JIS symbol (U+3004, So),
-                // ideographic closing mark (U+3006, Lo), CJK brackets and postal/geta marks
+                // ideographic closing mark (U+3006, Po), CJK brackets and postal/geta marks
                 // (U+3008–U+301B, Ps/Pe/So), wave dash (U+301C, Pd), reversed/double-prime quotes
                 // (U+301D–U+301F), postal mark face (U+3020, So), vertical kana repeat marks
                 // (U+3031–U+3036, Lm), masu mark (U+303C, Lo), ideographic variation indicator /
@@ -480,8 +480,10 @@ fn collapse_whitespace(text: &str) -> String {
                 // Cham–Latin or Unicode-sample HTML can glue Latin tokens without ASCII space. Tai Viet HO HOI / KOI KOI
                 // (U+AADE–U+AADF, Po) are not Rust whitespace; Tai Viet–Latin or Unicode-sample HTML can glue Latin tokens without ASCII space.
                 // U+AADB KON and U+AADC NUENG are Lo; U+AADD SAM is Lm—omitted (word-internal risk, like Thai U+0E46).
-                // Philippine single / double / triple punctuation (U+1734–U+1736, Po; Hanunoo / Buhid / Tagbanwa) are
-                // not Rust whitespace; Unicode-sample or Philippine-script HTML can glue Latin tokens without ASCII space.
+                // Philippine single / double punctuation (U+1735–U+1736, Po; Buhid / Tagbanwa) are not Rust whitespace;
+                // Unicode-sample or Philippine-script HTML can glue Latin tokens without ASCII space. U+1734 HANUNOO
+                // SIGN PAMUDPOD is `Mn` in UnicodeData—stays unmapped (combining / word-internal risk; FEAT-D83 assumed
+                // a contiguous Po triple with 1734–1736).
                 // Sundanese Supplement bindu punctuation (U+1CC0–U+1CC7, Po; bindu surya through bindu pameneng) are
                 // not Rust whitespace; Sundanese–Latin or Unicode-sample HTML can glue Latin tokens without ASCII space.
                 // Kayah Li signs cwi and shya (U+A92E, U+A92F, Po) and Rejang section mark (U+A95F, Po) are not Rust
@@ -573,12 +575,15 @@ fn collapse_whitespace(text: &str) -> String {
                 // One dot leader / two dot leader / horizontal
                 // ellipsis / hyphenation point (U+2024–U+2027, Po) are not Rust whitespace either;
                 // TOC-style leaders or UI copy like "more…" can glue Latin tokens without ASCII space.
-                // Supplemental Punctuation U+2E00–U+2E5D (editorial / transcription brackets and
+                // Supplemental Punctuation U+2E00–U+2E5D except U+2E2F (editorial / transcription brackets and
                 // marks, word-separator dots, dashes, stenographic and medieval punctuation, Tironian
-                // et, specialized brackets, oblique hyphen; Po / Pd / Pi / Pf / Ps / Pe / Lm / So as
-                // assigned) are not Rust whitespace—the full block can sit between Latin tokens in
-                // scholarly HTML without ASCII space. Earlier arms covered only U+2E31–U+2E3B; U+2E00–
-                // U+2E30 and U+2E3C–U+2E5D are now included in one range. Runic single /
+                // et, specialized brackets, oblique hyphen; Po / Pd / Pi / Pf / Ps / Pe / So as assigned)
+                // are not Rust whitespace—scholarly HTML can sit them between Latin tokens without ASCII space.
+                // U+2E2F VERTICAL TILDE is `Lm` in UnicodeData; it stays unmapped—modifier-letter / word-internal risk
+                // (FEAT-D255). Earlier arms covered only U+2E31–U+2E3B; U+2E00–U+2E2E and U+2E30–U+2E5D are now two
+                // match ranges around U+2E2F. Block tail U+2E5E–U+2E7F is unassigned (`Cn`) as of Unicode 17—do not widen
+                // the separator arms to the block end; future assignments need explicit category review (FEAT-D256).
+                // Runic single /
                 // multiple / cross punctuation (U+16EB–U+16ED, Po) are not Rust whitespace; epigraphic
                 // or Unicode-sample HTML can glue Latin tokens for `split_whitespace()`. Ogham feather
                 // mark and reversed feather mark (U+169B, U+169C, Ps/Pe) are not Rust whitespace;
@@ -617,8 +622,10 @@ fn collapse_whitespace(text: &str) -> String {
                 // Old North Arabian word divider (U+10A9D, Po) is not Rust whitespace; U+10A9E / U+10A9F (Nl) stay
                 // unmapped. Elymaic U+10FF5 is LETTER TAW (`Lo`), not punctuation; it stays unmapped so Elymaic script
                 // text is not split like Latin tokens (FEAT-D213; historical FEAT-D110 called it a section mark `Po`).
-                // Hanifi Rohingya signs tana / penda / dotted variants / jaha (U+10D29–U+10D2D, Po) are not Rust
-                // whitespace; U+10D2E SIGN VIRAMA (Mn) stays unmapped—word-internal risk.
+                // Hanifi Rohingya: UnicodeData leaves U+10D28–U+10D2F unassigned (`Cn`) between U+10D27 SIGN TASSI (`Mn`)
+                // and digit numerics U+10D30+ (`Nd`); historical FEAT-D111 matched U+10D29–U+10D2D as sentence `Po` (stale).
+                // FEAT-D254 removed that arm—reserved scalars must not be word separators. Combining signs U+10D24–U+10D27 (`Mn`)
+                // and letters / marks U+10D22–U+10D23 (`Lo`) stay unmapped—word-internal risk.
                 // Garay hyphen (U+10D6E, Pd) and Garay plus / minus (U+10D8E–U+10D8F, Sm) are not Rust whitespace;
                 // Senegalese Garay typography or Unicode-sample HTML can place them between Latin tokens without ASCII space.
                 // Arabic Biblical end of verse (U+10ED0, Po) is not Rust whitespace; scholarly Arabic Extended-C HTML
@@ -1141,7 +1148,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{0EDF}'
                 | '\u{104A}'..='\u{104F}'
                 | '\u{109E}'..='\u{109F}'
-                | '\u{1734}'..='\u{1736}'
+                | '\u{1735}'..='\u{1736}'
                 | '\u{1A1E}'..='\u{1A1F}'
                 | '\u{1AA0}'..='\u{1AA6}'
                 | '\u{1AA8}'..='\u{1AAD}'
@@ -1187,7 +1194,8 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{203C}'..='\u{205E}'
                 | '\u{207A}'..='\u{207E}'
                 | '\u{208A}'..='\u{208E}'
-                | '\u{2E00}'..='\u{2E5D}'
+                | '\u{2E00}'..='\u{2E2E}'
+                | '\u{2E30}'..='\u{2E5D}'
                 | '\u{169B}'
                 | '\u{169C}'
                 | '\u{16EB}'..='\u{16ED}'
@@ -1226,7 +1234,6 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{1ED2E}'
                 | '\u{1EEF0}'
                 | '\u{1EEF1}'
-                | '\u{10D29}'..='\u{10D2D}'
                 | '\u{10D6E}'
                 | '\u{10D8E}'
                 | '\u{10D8F}'
@@ -3069,10 +3076,11 @@ mod tests {
 
     #[test]
     fn supplemental_punctuation_u2e00_through_u2e5d_separate_words() {
-        // U+2E00–U+2E5D: full assigned Supplemental Punctuation block (Po/Pd/Pi/Pf/Ps/Pe/Lm/So); not
+        // U+2E00–U+2E5D except U+2E2F: assigned Supplemental Punctuation (Po/Pd/Pi/Pf/Ps/Pe/So); not
         // Rust whitespace—critical edition / transcription HTML can glue Latin tokens for
-        // `split_whitespace()` without normalization.
-        for cp in 0x2E00u32..=0x2E5D {
+        // `split_whitespace()` without normalization. U+2E2F VERTICAL TILDE (`Lm`) is excluded—see
+        // `supplemental_punctuation_vertical_tilde_lm_u2e2f_stays_unmapped`.
+        for cp in (0x2E00u32..=0x2E2E).chain(0x2E30u32..=0x2E5D) {
             let sep = char::from_u32(cp).expect("valid scalar");
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
@@ -3085,6 +3093,47 @@ mod tests {
             assert!(
                 !cleaned.contains(sep),
                 "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn supplemental_punctuation_vertical_tilde_lm_u2e2f_stays_unmapped() {
+        // U+2E2F VERTICAL TILDE (`Lm`) must not be treated like Supplemental Punctuation `Po` neighbors.
+        let sep = '\u{2E2F}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            cleaned.contains(sep),
+            "expected vertical tilde to remain in output, got {:?}",
+            cleaned
+        );
+        assert!(
+            !cleaned.contains("hello world"),
+            "Lm vertical tilde must not become ASCII space between tokens, got {:?}",
+            cleaned
+        );
+    }
+
+    #[test]
+    fn supplemental_punctuation_reserved_tail_u2e5e_through_u2e7f_stay_unmapped() {
+        // Unicode 17: Supplemental Punctuation ends at U+2E7F; scalars U+2E5E–U+2E7F are unassigned (`Cn`).
+        // They must not be folded into a widened `U+2E30..=U+2E7F` word-separator arm—future standard versions
+        // could assign them with categories that need separate handling.
+        for cp in 0x2E5Eu32..=0x2E7F {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains(sep),
+                "reserved U+{:04X} must pass through clean_html, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains("hello world"),
+                "reserved U+{:04X} must not become ASCII space between tokens",
                 cp
             );
         }
@@ -3153,24 +3202,49 @@ mod tests {
     }
 
     #[test]
-    fn hanifi_rohingya_sentence_marks_separate_words() {
-        // Hanifi Rohingya U+10D29–U+10D2D (tana / penda / dotted / jaha, all Po). U+10D2E VIRAMA (Mn) omitted.
-        for sep in 0x10D29u32..=0x10D2D {
-            let sep = char::from_u32(sep).expect("valid test scalar");
+    fn hanifi_rohingya_unassigned_gap_u10d28_through_u10d2f_stays_unmapped() {
+        // UnicodeData: U+10D27 SIGN TASSI (`Mn`) then U+10D30 DIGIT ZERO (`Nd`); U+10D28–U+10D2F are unassigned (`Cn`).
+        for cp in 0x10D28u32..=0x10D2F {
+            let sep = char::from_u32(cp).expect("valid test scalar");
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
-                cleaned.contains("hello world"),
-                "expected {:?} normalized before collapse, got {:?}",
-                sep,
+                !cleaned.contains("hello world"),
+                "U+{:04X} Cn must stay unmapped, got {:?}",
+                cp,
                 cleaned
             );
-            assert!(
-                !cleaned.contains(sep),
-                "cleaned output still contains {:?}",
-                sep
-            );
+            assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
         }
+    }
+
+    #[test]
+    fn hanifi_rohingya_combining_signs_mn_u10d24_through_u10d27_stay_unmapped() {
+        for cp in [0x10D24u32, 0x10D25, 0x10D26, 0x10D27] {
+            let sep = char::from_u32(cp).expect("valid test scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} Mn must stay unmapped, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
+        }
+    }
+
+    #[test]
+    fn hanifi_rohingya_digit_nd_u10d30_stays_unmapped() {
+        let sep = '\u{10D30}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            !cleaned.contains("hello world"),
+            "Hanifi digit Nd must stay unmapped, got {:?}",
+            cleaned
+        );
+        assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
     }
 
     #[test]
@@ -3610,8 +3684,9 @@ mod tests {
 
     #[test]
     fn cjk_symbols_brackets_ditto_wave_vertical_repeat_masu_half_fill_separate_words() {
-        // U+3003 / U+3004 / U+3006; U+3008–U+301B; U+301C; U+301D–U+301F; U+3020; U+3031–U+3036;
-        // U+303C; U+303E–U+303F: not Rust whitespace (see `collapse_whitespace` comment). Mixed
+        // U+3003 / U+3004 / U+3006 (3006 is `Po` in UnicodeData, not a letter); U+3008–U+301B;
+        // U+301C; U+301D–U+301F; U+3020; U+3031–U+3036; U+303C; U+303E–U+303F: not Rust whitespace
+        // (see `collapse_whitespace` comment). Mixed
         // CJK-layout or romanized HTML can otherwise glue Latin tokens for `split_whitespace()`.
         for sep in (0x3003u32..=0x301B)
             .filter(|&cp| cp != 0x3005 && cp != 0x3007)
@@ -4963,9 +5038,9 @@ mod tests {
     }
 
     #[test]
-    fn philippine_single_double_triple_punctuation_separate_words() {
-        // U+1734 PHILIPPINE SINGLE PUNCTUATION, U+1735 DOUBLE, U+1736 TRIPLE (Po). None are Rust whitespace.
-        for sep in '\u{1734}'..='\u{1736}' {
+    fn philippine_single_double_punctuation_separate_words() {
+        // U+1735 PHILIPPINE SINGLE PUNCTUATION, U+1736 PHILIPPINE DOUBLE PUNCTUATION (Po). None are Rust whitespace.
+        for sep in '\u{1735}'..='\u{1736}' {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
@@ -4980,6 +5055,23 @@ mod tests {
                 sep as u32
             );
         }
+    }
+
+    #[test]
+    fn hanunoo_sign_pamudpod_mn_u1734_stays_unmapped() {
+        // U+1734 HANUNOO SIGN PAMUDPOD (`Mn`); not a Philippine sentence Po—must not be folded to ASCII space.
+        let sep = '\u{1734}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            cleaned.contains(sep),
+            "expected U+1734 to remain in cleaned output, got {:?}",
+            cleaned
+        );
+        assert!(
+            !cleaned.contains("hello world"),
+            "combining mark U+1734 must not insert a word boundary between Latin tokens"
+        );
     }
 
     #[test]
