@@ -382,7 +382,8 @@ fn collapse_whitespace(text: &str) -> String {
                 // is a separate arm (FEAT-D130). Fraction slash (U+2044, Sm)
                 // and fullwidth solidus (U+FF0F, Po) are not Rust whitespace either; math fractions,
                 // MathML, or CJK fullwidth paths can use them between Latin tokens without ASCII space.
-                // Ideographic comma / full stop (U+3001, U+3002, Po) and
+                // IDEOGRAPHIC COMMA (U+3001, Po) and IDEOGRAPHIC FULL STOP (U+3002, Po; colloquially
+                // “ideographic comma / full stop” for both) and
                 // fullwidth ASCII-like punctuation (U+FF0C comma, U+FF1A colon, U+FF1B semicolon,
                 // U+FF01 exclamation, U+FF02 quotation, U+FF1F question; all Po) are not Rust whitespace; CJK or
                 // mixed-layout HTML often places them between Latin tokens without ASCII space.
@@ -406,16 +407,26 @@ fn collapse_whitespace(text: &str) -> String {
                 // whitespace either; JIS / compat HTML can glue Latin tokens without ASCII space.
                 // U+FFFD REPLACEMENT CHARACTER (So, same block) is not Rust whitespace either;
                 // transcoding or mojibake HTML can insert it between Latin tokens without ASCII space.
-                // CJK Symbols and Punctuation: ditto mark (U+3003, Po), JIS symbol (U+3004, So),
-                // ideographic closing mark (U+3006, Lo in UnicodeData—not `Po`; FEAT-D257 misread the
-                // category), CJK brackets and postal/geta marks
-                // (U+3008–U+301B, Ps/Pe/So), wave dash (U+301C, Pd), reversed/double-prime quotation
-                // marks—REVERSED DOUBLE PRIME (U+301D, Ps), DOUBLE PRIME and LOW DOUBLE PRIME (U+301E–U+301F, Pe;
-                // both `Pe` in UnicodeData, not a Ps/Pe pair by adjacent code points), postal mark face (U+3020, So), vertical kana repeat marks
-                // (U+3031–U+3035, Lm), CIRCLED POSTAL MARK (U+3036, So; same contiguous arm), masu mark
-                // (U+303C, So), ideographic variation indicator /
-                // half fill space (U+303E–U+303F, So) are not Rust whitespace. Omitted on purpose:
-                // iteration marks U+3005 / U+303B (Lm), ideographic zero U+3007 and Hangzhou numerals
+                // CJK Symbols and Punctuation: DITTO MARK (U+3003, Po), JAPANESE INDUSTRIAL STANDARD SYMBOL
+                // (U+3004, So; colloquially “JIS symbol”),
+                // IDEOGRAPHIC CLOSING MARK (U+3006, Lo in UnicodeData—not `Po`; FEAT-D257 misread the
+                // category), CJK brackets and postal/geta marks (official `UnicodeData.txt` names):
+                // LEFT ANGLE BRACKET (U+3008, Ps) / RIGHT ANGLE BRACKET (U+3009, Pe) / LEFT DOUBLE ANGLE
+                // BRACKET (U+300A, Ps) / RIGHT DOUBLE ANGLE BRACKET (U+300B, Pe) / LEFT CORNER BRACKET
+                // (U+300C, Ps) / RIGHT CORNER BRACKET (U+300D, Pe) / LEFT WHITE CORNER BRACKET (U+300E, Ps) /
+                // RIGHT WHITE CORNER BRACKET (U+300F, Pe) / LEFT BLACK LENTICULAR BRACKET (U+3010, Ps) /
+                // RIGHT BLACK LENTICULAR BRACKET (U+3011, Pe), POSTAL MARK (U+3012, So), GETA MARK (U+3013, So),
+                // LEFT TORTOISE SHELL BRACKET (U+3014, Ps) / RIGHT TORTOISE SHELL BRACKET (U+3015, Pe) /
+                // LEFT WHITE LENTICULAR BRACKET (U+3016, Ps) / RIGHT WHITE LENTICULAR BRACKET (U+3017, Pe) /
+                // LEFT WHITE TORTOISE SHELL BRACKET (U+3018, Ps) / RIGHT WHITE TORTOISE SHELL BRACKET (U+3019, Pe) /
+                // LEFT WHITE SQUARE BRACKET (U+301A, Ps) / RIGHT WHITE SQUARE BRACKET (U+301B, Pe). WAVE DASH (U+301C, Pd), reversed/double-prime quotation
+                // marks—REVERSED DOUBLE PRIME QUOTATION MARK (U+301D, Ps), DOUBLE PRIME QUOTATION MARK and LOW DOUBLE PRIME QUOTATION MARK (U+301E–U+301F, Pe;
+                // both `Pe` in UnicodeData, not a Ps/Pe pair by adjacent code points), POSTAL MARK FACE (U+3020, So), vertical kana repeat marks
+                // (U+3031–U+3035, Lm), CIRCLED POSTAL MARK (U+3036, So; same contiguous arm), MASU MARK
+                // (U+303C, So), IDEOGRAPHIC VARIATION INDICATOR /
+                // IDEOGRAPHIC HALF FILL SPACE (U+303E–U+303F, So) are not Rust whitespace. Omitted on purpose:
+                // iteration marks U+3005 / U+303B (Lm), IDEOGRAPHIC NUMBER ZERO (U+3007, Nl; colloquially
+                // “ideographic zero”) and Hangzhou numerals
                 // U+3021–U+3029 / U+3038–U+303A (Nl), and ideographic tone marks U+302A–U+302F (Mn/Mc).
                 // Vertical Forms compatibility punctuation (U+FE10–U+FE19, Po/Ps/Pe/Pc) is not
                 // Rust whitespace. CJK Compatibility Forms U+FE30–U+FE4F (vertical presentation for
@@ -425,9 +436,9 @@ fn collapse_whitespace(text: &str) -> String {
                 // Half Marks U+FE20–U+FE2F (Mn) stay unmapped—word-internal combining risk. Small Form Variants (U+FE50–U+FE52, U+FE54–U+FE66, U+FE68–U+FE6B;
                 // Po / Pd / Ps / Pe / Sm / Sc as assigned—skips unassigned U+FE53, U+FE67, U+FE6C–U+FE6F)
                 // are not Rust whitespace; compatibility typography HTML can glue Latin tokens without
-                // ASCII space. Wavy dash (U+3030, Pd), ideographic telegraph line-feed separator
-                // (U+3037, So), part alternation mark (U+303D, Po), Katakana-Hiragana double hyphen
-                // (U+30A0, Pd), and fullwidth low line (U+FF3F, Pc) are not Rust whitespace either;
+                // ASCII space. WAVY DASH (U+3030, Pd), IDEOGRAPHIC TELEGRAPH LINE FEED SEPARATOR SYMBOL
+                // (U+3037, So), PART ALTERNATION MARK (U+303D, Po), KATAKANA-HIRAGANA DOUBLE HYPHEN
+                // (U+30A0, Pd), and FULLWIDTH LOW LINE (U+FF3F, Pc) are not Rust whitespace either;
                 // mixed CJK / romanization HTML can do the same. CJK Radicals Supplement (Unicode block U+2E80–U+2EFF):
                 // assigned So U+2E80–U+2E99 and U+2E9B–U+2EF3; not Rust whitespace. Unassigned U+2E9A and tail U+2EF4–U+2EFF
                 // (Cn) stay unmapped. Kangxi Radicals (Unicode block U+2F00–U+2FDF): assigned So U+2F00–U+2FD5 (214 radicals);
@@ -3704,10 +3715,12 @@ mod tests {
 
     #[test]
     fn cjk_symbols_brackets_ditto_wave_vertical_repeat_masu_half_fill_separate_words() {
-        // U+3003 / U+3004 / U+3006 (3006 is `Lo` in UnicodeData; FEAT-D257 wrongly said `Po`—still mapped
-        // as a non–Rust-whitespace separator); U+3008–U+301B;
-        // U+301C; U+301D (`Ps`) and U+301E–U+301F (both `Pe` in UnicodeData); U+3020; U+3031–U+3035 (`Lm`); U+3036 CIRCLED POSTAL MARK (`So`); U+303C MASU MARK (`So`); U+303E–U+303F: not Rust whitespace
-        // (see `collapse_whitespace` comment). Mixed
+        // U+3003 DITTO MARK (`Po`) / U+3004 JAPANESE INDUSTRIAL STANDARD SYMBOL (`So`) / U+3006 IDEOGRAPHIC CLOSING MARK (`Lo`
+        // in UnicodeData; FEAT-D257 wrongly said `Po`—still mapped as a non–Rust-whitespace separator);
+        // U+3007 IDEOGRAPHIC NUMBER ZERO (`Nl`) stays unmapped with iteration marks U+3005 / U+303B (see filter below);
+        // U+3008–U+3011 / U+3014–U+301B: bracket `Ps`/`Pe` pairs per UnicodeData; U+3012 POSTAL MARK / U+3013 GETA MARK (`So`);
+        // U+301C WAVE DASH (`Pd`); U+301D / U+301E–U+301F (UnicodeData: REVERSED DOUBLE PRIME QUOTATION MARK `Ps`, DOUBLE PRIME QUOTATION MARK / LOW DOUBLE PRIME QUOTATION MARK `Pe`); U+3020 POSTAL MARK FACE (`So`); U+3031–U+3035 (`Lm`); U+3036 CIRCLED POSTAL MARK (`So`); U+303C MASU MARK (`So`); U+303E IDEOGRAPHIC VARIATION INDICATOR / U+303F IDEOGRAPHIC HALF FILL SPACE (`So`): not Rust whitespace
+        // (see `collapse_whitespace` comment; FEAT-D271 / FEAT-D272 official scalar names). Mixed
         // CJK-layout or romanized HTML can otherwise glue Latin tokens for `split_whitespace()`.
         for sep in (0x3003u32..=0x301B)
             .filter(|&cp| cp != 0x3005 && cp != 0x3007)
@@ -3734,7 +3747,8 @@ mod tests {
 
     #[test]
     fn cjk_fullwidth_and_vertical_forms_punctuation_separate_words() {
-        // U+3001/U+3002 (ideographic comma / full stop), U+FF0C/FF1A/FF1B/FF01/FF02/FF1F (fullwidth
+        // U+3001 IDEOGRAPHIC COMMA / U+3002 IDEOGRAPHIC FULL STOP (`Po` in UnicodeData; colloquial
+        // “ideographic comma / full stop”), U+FF0C/FF1A/FF1B/FF01/FF02/FF1F (fullwidth
         // comma, colon, semicolon, exclamation, quotation, question), U+FE10–U+FE19 (Vertical Forms
         // compatibility punctuation): Po/Ps/Pe/Pc—not Rust whitespace. Mixed CJK / Latin HTML
         // or vertical-layout compatibility text can sit between Latin tokens without ASCII space.
