@@ -171,7 +171,16 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// `holoschemas exceed`, and `schema exceed` does not match inside `subschema exceed`;
 /// `parameters exceed` does not match inside `microparameters exceed` /
 /// `metaparameters exceed`, and `parameter exceed` does not match inside
-/// `subparameter exceed`.
+/// `subparameter exceed`; `arguments exceed` does not match inside
+/// `microarguments exceed` / `metaarguments exceed`, and `argument exceed` does not match inside
+/// `subargument exceed`; `variables exceed` does not match inside `metavariables exceed` /
+/// `hypervariables exceed`, and `variable exceed` does not match inside `multivariable exceed` /
+/// `subvariable exceed`; `headers exceed` does not match inside `microheaders exceed` /
+/// `metaheaders exceed`, and `header exceed` does not match inside `subheader exceed`;
+/// `cookies exceed` does not match inside `microcookies exceed` / `metacookies exceed`, and
+/// `cookie exceed` does not match inside `subcookie exceed`; `bodies exceed` does not match
+/// inside `microbodies exceed` / `metabodies exceed`, and `body exceed` does not match inside
+/// `subbody exceed`.
 fn contains_phrase_after_ident_boundary(haystack: &str, phrase: &str) -> bool {
     fn ident_continue(c: char) -> bool {
         c.is_ascii_alphanumeric() || c == '_'
@@ -979,6 +988,86 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         || ((contains_phrase_after_ident_boundary(&lower, "parameters exceed")
             || contains_phrase_after_ident_boundary(&lower, "parameters exceeded")
             || contains_phrase_after_ident_boundary(&lower, "parameter exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "argument(s) exceed(s/ed)" (FEAT-D338). Parallel to `parameters exceed` /
+        // `parameter exceed`. `argument exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `arguments exceed` (the `s` after
+        // `argument`). Ident-boundary so `microarguments exceed` / `metaarguments exceed` /
+        // `subargument exceed` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "arguments exceed")
+            || contains_phrase_after_ident_boundary(&lower, "arguments exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "argument exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "variable(s) exceed(s/ed)" (FEAT-D339). Parallel to `arguments exceed` /
+        // `argument exceed`. `variable exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `variables exceed` (the `s` after
+        // `variable`). Ident-boundary so `metavariables exceed` / `hypervariables exceed` /
+        // `multivariable exceed` / `subvariable exceed` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "variables exceed")
+            || contains_phrase_after_ident_boundary(&lower, "variables exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "variable exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "header(s) exceed(s/ed)" (FEAT-D340). Parallel to `variables exceed` /
+        // `variable exceed`. `header exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `headers exceed` (the `s` after `header`).
+        // Ident-boundary so `microheaders exceed` / `metaheaders exceed` / `subheader exceed` do not
+        // false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "headers exceed")
+            || contains_phrase_after_ident_boundary(&lower, "headers exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "header exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "cookie(s) exceed(s/ed)" (FEAT-D341). Parallel to `headers exceed` /
+        // `header exceed`. `cookie exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `cookies exceed` (the `s` after `cookie`).
+        // Ident-boundary so `microcookies exceed` / `metacookies exceed` / `subcookie exceed` do not
+        // false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "cookies exceed")
+            || contains_phrase_after_ident_boundary(&lower, "cookies exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "cookie exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "bod(y/ies) exceed(s/ed)" (FEAT-D342). Parallel to `cookies exceed` /
+        // `cookie exceed`. `body exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `bodies exceed` (the `s` after `body`).
+        // Ident-boundary so `microbodies exceed` / `metabodies exceed` / `subbody exceed` do not
+        // false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "bodies exceed")
+            || contains_phrase_after_ident_boundary(&lower, "bodies exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "body exceed"))
             && (lower.contains("context window")
                 || lower.contains("context length")
                 || lower.contains("context limit")
@@ -2456,6 +2545,159 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "layout: subparameter exceed display cap (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: arguments exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: arguments exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: argument exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: argument exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: arguments exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: arguments exceeded daily compile cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "graphql: argument exceed max list depth on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microarguments exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaarguments exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: subargument exceed display cap (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "GraphQL: variables exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: variables exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: variable exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: variable exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: variables exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: variables exceeded daily compile cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "template: variable exceed max substitution depth on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: metavariables exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: hypervariables exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: multivariable exceed display cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: subvariable exceed display cap (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: headers exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: headers exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: header exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "proxy: header exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: headers exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: headers exceeded daily compile cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "http: header exceed max allowed total size on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microheaders exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaheaders exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: subheader exceed display cap (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: cookies exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: cookies exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: cookie exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "proxy: cookie exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: cookies exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: cookies exceeded daily compile cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "http: cookie exceed max allowed total count on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microcookies exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metacookies exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: subcookie exceed display cap (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: bodies exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: bodies exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: body exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "proxy: body exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: bodies exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: bodies exceeded max upload size on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "http: body exceed max allowed total size on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microbodies exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metabodies exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: subbody exceed display cap (no model context configured)"
         ));
         assert!(!is_context_overflow_error(
             "microcolumns exceed the model's context window on this request"
