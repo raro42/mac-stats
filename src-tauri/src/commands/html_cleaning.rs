@@ -213,8 +213,11 @@ fn collapse_whitespace(text: &str) -> String {
                 // whitespace; weather or scientific HTML can glue Latin tokens without ASCII space. Latin-1 math
                 // symbols NOT SIGN (U+00AC), PLUS-MINUS SIGN (U+00B1), MULTIPLICATION SIGN (U+00D7), and DIVISION
                 // SIGN (U+00F7) are Sm and not Rust whitespace; they sit outside the U+2200–U+22FF Mathematical
-                // Operators arm. Superscript digit numerics (U+00B2, U+00B3, U+00B9, No) and MASCULINE ORDINAL
-                // INDICATOR (U+00BA, Ll) stay unmapped—numeric / word-internal risk. Section sign (U+00A7)
+                // Operators arm. Vulgar fractions one quarter / one half / three quarters (U+00BC, U+00BD, U+00BE, No)
+                // are not Rust whitespace; recipe, price, or legacy Latin-1 HTML can place them between Latin tokens
+                // without ASCII space (same spirit as Number Forms U+2150+, FEAT-D146). Superscript digit numerics
+                // (U+00B2, U+00B3, U+00B9, No) and MASCULINE ORDINAL INDICATOR (U+00BA, Ll) stay unmapped—numeric /
+                // word-internal risk. Section sign (U+00A7)
                 // and pilcrow (U+00B6, Po) are not Rust whitespace either; legal or editorial HTML
                 // often uses them between Latin tokens without ASCII space. Greek question mark
                 // (U+037E, Po; erotimatiko) is not Rust whitespace and is distinct from Greek ano
@@ -387,7 +390,9 @@ fn collapse_whitespace(text: &str) -> String {
                 // telegraph-era labels, etc.); not Rust whitespace. JIS / carrier or Unicode-sample HTML can place them between
                 // Latin tokens without ASCII space. CJK Unified Ideographs Extension A U+3400+ (Lo) immediately after—excluded.
                 // Hebrew maqaf (U+05BE, Pd), paseq (U+05C0, Po), sof pasuq (U+05C3, Po; sentence end like a colon), and
-                // nun hafukha (U+05C6, Po) are not Rust whitespace. U+05F3 GERESH and U+05F4 GERSHAYIM (Po) stay unmapped—
+                // nun hafukha (U+05C6, Po) are not Rust whitespace. Alphabetic Presentation Forms U+FB29 HEBREW LETTER
+                // ALTERNATIVE PLUS SIGN (`Sm`) is not Rust whitespace—Hebrew typography or Unicode-sample HTML can sit it
+                // between Latin tokens without ASCII space. U+05F3 GERESH and U+05F4 GERSHAYIM (Po) stay unmapped—
                 // apostrophe- / abbreviation-like, word-internal risk (same spirit as U+2019). Georgian paragraph separator (U+10FB, Po) is
                 // not Rust whitespace; mixed Latin–Georgian or Unicode-sample HTML can glue tokens without ASCII space. Tibetan yig mgo
                 // and shad marks (U+0F04–U+0F12, Po), gter tsheg (U+0F14, Po), corner brackets (U+0F3A–U+0F3D, Ps/Pe), paluta (U+0F85,
@@ -462,10 +467,13 @@ fn collapse_whitespace(text: &str) -> String {
                 // ASCII space. Extends FEAT-D141 (formerly U+20A0–U+20BF only). U+20C2–U+20CF are
                 // unassigned (`Cn`) and stay unmapped.
                 // Letterlike Symbols U+2100–U+214F: only So/Sm subranges (account-of, degree signs,
-                // numero, prescription take, trade mark, sans-serif math symbols, per sign, etc.);
+                // EULER CONSTANT (U+2107, So) with degree Celsius / scruple / Fahrenheit, numero,
+                // prescription take, trade mark, sans-serif math symbols, per sign, etc.);
                 // not Rust whitespace. Lu/Ll/Lo mathematical letters (e.g. U+2102, U+210E–U+2113,
                 // U+2115, U+2119–U+2124, U+2126, U+212A–U+212D, U+212F–U+2134, U+2135–U+2138,
-                // U+2139, U+213C–U+213F, U+2145–U+2149, U+214E) stay unmapped—word-internal risk.
+                // U+2139, U+213C–U+213E, U+2145–U+2149, U+214E) stay unmapped—word-internal risk.
+                // U+213F DOUBLE-STRUCK N-ARY SUMMATION (`Sm`) maps—not Rust whitespace; sits between
+                // turned sans-serif So U+213A–U+213B and double-struck Pi / empty-set So U+2140–U+2144.
                 // U+20D0–U+20FF combining marks for symbols stay unmapped—combining / enclosing risk.
                 // Number Forms U+2150–U+2182 and U+2185–U+218B (vulgar fractions, Roman
                 // numerals, turned digit two/three; all No / Nl / So) are not Rust whitespace;
@@ -937,6 +945,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{05C0}'
                 | '\u{05C3}'
                 | '\u{05C6}'
+                | '\u{FB29}'
                 | '\u{10FB}'
                 | '\u{00A1}'
                 | '\u{00A2}'..='\u{00A5}'
@@ -948,6 +957,9 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{00B1}'
                 | '\u{00D7}'
                 | '\u{00F7}'
+                | '\u{00BC}'
+                | '\u{00BD}'
+                | '\u{00BE}'
                 | '\u{00BF}'
                 | '\u{00AB}'
                 | '\u{00BB}'
@@ -955,8 +967,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{00B6}'
                 | '\u{20A0}'..='\u{20C1}'
                 | '\u{2100}'..='\u{2101}'
-                | '\u{2103}'..='\u{2106}'
-                | '\u{2108}'..='\u{2109}'
+                | '\u{2103}'..='\u{2109}'
                 | '\u{2114}'
                 | '\u{2116}'..='\u{2118}'
                 | '\u{211E}'..='\u{2123}'
@@ -964,6 +975,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{2127}'
                 | '\u{2129}'
                 | '\u{212E}'
+                | '\u{213F}'
                 | '\u{213A}'..='\u{213B}'
                 | '\u{2140}'..='\u{2144}'
                 | '\u{214A}'..='\u{214D}'
@@ -1844,9 +1856,26 @@ mod tests {
     }
 
     #[test]
+    fn latin1_vulgar_fractions_no_u00bc_u00bd_u00be_separate_words() {
+        // U+00BC VULGAR FRACTION ONE QUARTER, U+00BD ONE HALF, U+00BE THREE QUARTERS (all No); not Rust
+        // whitespace—extends Number Forms spirit (FEAT-D146) into Latin-1 Supplement (FEAT-D229).
+        for sep in ['\u{00BC}', '\u{00BD}', '\u{00BE}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {:?} to separate words, got {:?}",
+                sep,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
     fn latin1_superscript_digits_no_and_masculine_ordinal_ll_stay_unmapped() {
         // U+00B2, U+00B3, U+00B9 (No) and U+00BA MASCULINE ORDINAL INDICATOR (Ll) sit near mapped Latin-1
-        // scalars; numeric / ordinal semantics—must not split like U+00B0 / U+00B1 (FEAT-D225).
+        // scalars; numeric / ordinal semantics—must not split like U+00B0 / U+00B1 (FEAT-D225). Vulgar
+        // fractions U+00BC–U+00BE map as word separators (FEAT-D229).
         for cp in [0x00B2u32, 0x00B3, 0x00B9, 0x00BA] {
             let sep = char::from_u32(cp).expect("valid scalar");
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
@@ -2070,11 +2099,11 @@ mod tests {
 
     #[test]
     fn letterlike_symbol_subranges_separate_words() {
-        // Letterlike Symbols: So/Sm only (FEAT-D147); not Rust whitespace.
+        // Letterlike Symbols: So/Sm only (FEAT-D147; U+2103..=U+2109 includes U+2107 EULER CONSTANT, FEAT-D230;
+        // U+213F n-ary summation `Sm`, FEAT-D231); not Rust whitespace.
         let runs: &[(u32, u32)] = &[
             (0x2100, 0x2101),
-            (0x2103, 0x2106),
-            (0x2108, 0x2109),
+            (0x2103, 0x2109),
             (0x2114, 0x2114),
             (0x2116, 0x2118),
             (0x211E, 0x2123),
@@ -2082,6 +2111,7 @@ mod tests {
             (0x2127, 0x2127),
             (0x2129, 0x2129),
             (0x212E, 0x212E),
+            (0x213F, 0x213F),
             (0x213A, 0x213B),
             (0x2140, 0x2144),
             (0x214A, 0x214D),
@@ -2116,6 +2146,8 @@ mod tests {
             0x2115,    // DOUBLE-STRUCK CAPITAL N (Lu)
             0x2126,    // OHM SIGN (Lu)
             0x2135,    // ALEF SYMBOL (Lo)
+            0x213C,    // DOUBLE-STRUCK SMALL GAMMA (Ll)
+            0x213E,    // DOUBLE-STRUCK CAPITAL PI (Lu)
             0x2146,    // DOUBLE-STRUCK ITALIC SMALL D (Ll)
         ] {
             let sep = char::from_u32(cp).expect("valid scalar");
@@ -4039,6 +4071,24 @@ mod tests {
                 sep
             );
         }
+    }
+
+    #[test]
+    fn hebrew_alternative_plus_sign_sm_fb29_separate_words() {
+        // U+FB29 HEBREW LETTER ALTERNATIVE PLUS SIGN (`Sm`); not Rust whitespace (FEAT-D232).
+        let sep = '\u{FB29}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            cleaned.contains("hello world"),
+            "expected U+FB29 normalized before collapse, got {:?}",
+            cleaned
+        );
+        assert!(
+            !cleaned.contains(sep),
+            "cleaned output still contains U+FB29, got {:?}",
+            cleaned
+        );
     }
 
     #[test]
