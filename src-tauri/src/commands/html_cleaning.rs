@@ -188,17 +188,33 @@ fn collapse_whitespace(text: &str) -> String {
                 // markers, object replacement (U+FFF9–U+FFFC), replacement character (U+FFFD, So),
                 // and deprecated Unicode language
                 // tag characters (U+E0000–U+E007F) get the same treatment so FETCH_URL bodies
-                // tokenize cleanly. Khmer inherent vowels (U+17B4, U+17B5) are Cf and not Rust
+                // tokenize cleanly. C1 control characters (U+0080–U+009F, Cc) are not Rust
+                // whitespace; garbled 8-bit, Windows-1252 mis-decodes, or binary-pasted HTML can
+                // inject them into text nodes and glue tokens for `split_whitespace()`.
+                // C0 ASCII / ISO control characters U+0001–U+0008, U+000E–U+001F, and U+007F DELETE (Cc)
+                // are not Unicode White_Space—Rust `char::is_whitespace` is false—so legacy device controls
+                // or binary-pasted HTML can glue Latin tokens the same way C1 does. U+0000 NULL is omitted:
+                // HTML5 tree construction drops NUL from text nodes before we see them (so `clean_html` cannot
+                // exercise NUL end-to-end). TAB (U+0009), LF / VT / FF / CR (U+000A–U+000D) stay unmapped
+                // here—they are White_Space and already tokenize with `split_whitespace()`.
+                // Khmer inherent vowels (U+17B4, U+17B5) are Cf and not Rust
                 // whitespace, so Khmer-layout HTML can otherwise glue adjacent Latin tokens.
                 // Latin-1 inverted exclamation / question (U+00A1, U+00BF) and double angle quotes
                 // (U+00AB, U+00BB, Pi/Pf) are not Rust whitespace; Spanish / French typography in
                 // HTML can place them between Latin tokens without ASCII space. Cent / pound /
                 // generic currency / yen signs (U+00A2–U+00A5, all Sc) are not Rust whitespace;
                 // legacy Western price copy or entity-encoded HTML can glue Latin tokens without ASCII
-                // space (distinct from block Currency Symbols U+20A0+). U+00A6 BROKEN BAR (Sm) and
-                // U+00A8 DIAERESIS (Sk) stay unmapped—math-typography or combining-like risk. COPYRIGHT SIGN
+                // space (distinct from block Currency Symbols U+20A0+). BROKEN BAR (U+00A6, Sm) is not Rust
+                // whitespace; legacy ISO 8859-1 / entity-encoded HTML often uses it as a tall pipe between
+                // tokens (distinct from ASCII VERTICAL LINE U+007C). U+00A8 DIAERESIS (Sk) stays unmapped—
+                // spacing-mark / combining-like risk. COPYRIGHT SIGN
                 // (U+00A9, So) and REGISTERED SIGN (U+00AE, So) are not Rust whitespace; legal or trademark HTML
-                // often places them between Latin tokens without ASCII space. Section sign (U+00A7)
+                // often places them between Latin tokens without ASCII space. DEGREE SIGN (U+00B0, So) is not Rust
+                // whitespace; weather or scientific HTML can glue Latin tokens without ASCII space. Latin-1 math
+                // symbols NOT SIGN (U+00AC), PLUS-MINUS SIGN (U+00B1), MULTIPLICATION SIGN (U+00D7), and DIVISION
+                // SIGN (U+00F7) are Sm and not Rust whitespace; they sit outside the U+2200–U+22FF Mathematical
+                // Operators arm. Superscript digit numerics (U+00B2, U+00B3, U+00B9, No) and MASCULINE ORDINAL
+                // INDICATOR (U+00BA, Ll) stay unmapped—numeric / word-internal risk. Section sign (U+00A7)
                 // and pilcrow (U+00B6, Po) are not Rust whitespace either; legal or editorial HTML
                 // often uses them between Latin tokens without ASCII space. Greek question mark
                 // (U+037E, Po; erotimatiko) is not Rust whitespace and is distinct from Greek ano
@@ -808,6 +824,10 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{2060}'
                 | '\u{FEFF}'
                 | '\u{00AD}'
+                | '\u{0001}'..='\u{0008}'
+                | '\u{000E}'..='\u{001F}'
+                | '\u{007F}'
+                | '\u{0080}'..='\u{009F}'
                 | '\u{00A0}'
                 | '\u{17B4}'
                 | '\u{17B5}'
@@ -920,8 +940,14 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{10FB}'
                 | '\u{00A1}'
                 | '\u{00A2}'..='\u{00A5}'
+                | '\u{00A6}'
                 | '\u{00A9}'
                 | '\u{00AE}'
+                | '\u{00B0}'
+                | '\u{00AC}'
+                | '\u{00B1}'
+                | '\u{00D7}'
+                | '\u{00F7}'
                 | '\u{00BF}'
                 | '\u{00AB}'
                 | '\u{00BB}'
@@ -1791,6 +1817,51 @@ mod tests {
     }
 
     #[test]
+    fn latin1_degree_sign_so_u00b0_and_math_sm_u00ac_u00b1_u00d7_u00f7_separate_words() {
+        // U+00B0 DEGREE SIGN (So); U+00AC NOT SIGN, U+00B1 PLUS-MINUS, U+00D7 MULTIPLICATION, U+00F7 DIVISION
+        // (all Sm); not Rust whitespace—scientific or pasted math HTML can glue Latin tokens without ASCII space
+        // (FEAT-D225; outside U+2200–U+22FF Mathematical Operators arm).
+        for sep in [
+            '\u{00B0}',
+            '\u{00AC}',
+            '\u{00B1}',
+            '\u{00D7}',
+            '\u{00F7}',
+        ] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {sep:?} normalized before collapse, got {:?}",
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {:?}",
+                sep
+            );
+        }
+    }
+
+    #[test]
+    fn latin1_superscript_digits_no_and_masculine_ordinal_ll_stay_unmapped() {
+        // U+00B2, U+00B3, U+00B9 (No) and U+00BA MASCULINE ORDINAL INDICATOR (Ll) sit near mapped Latin-1
+        // scalars; numeric / ordinal semantics—must not split like U+00B0 / U+00B1 (FEAT-D225).
+        for cp in [0x00B2u32, 0x00B3, 0x00B9, 0x00BA] {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} must stay unmapped, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
+        }
+    }
+
+    #[test]
     fn latin1_copyright_and_registered_signs_so_u00a9_u00ae_separate_words() {
         // U+00A9 COPYRIGHT SIGN and U+00AE REGISTERED SIGN (both So); not Rust whitespace—legal or
         // trademark HTML can glue Latin tokens without ASCII space (FEAT-D224).
@@ -1826,20 +1897,81 @@ mod tests {
     }
 
     #[test]
-    fn latin1_broken_bar_sm_u00a6_and_diaeresis_sk_u00a8_stay_unmapped() {
-        // U+00A6 BROKEN BAR (Sm) and U+00A8 DIAERESIS (Sk) are not contiguous `Sc` with U+00A2–U+00A5;
-        // Sm/Sk stay unmapped—math bar or spacing-mark semantics, not general currency word breaks.
-        for cp in [0x00A6u32, 0x00A8] {
-            let sep = char::from_u32(cp).expect("valid scalar");
+    fn latin1_broken_bar_sm_u00a6_separate_words() {
+        // U+00A6 BROKEN BAR (Sm); not Rust whitespace—legacy HTML can glue Latin tokens without ASCII space
+        // (FEAT-D226; ISO 8859-1 pipe substitute, distinct from ASCII U+007C).
+        let sep = '\u{00A6}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            cleaned.contains("hello world"),
+            "expected {sep:?} normalized before collapse, got {:?}",
+            cleaned
+        );
+        assert!(
+            !cleaned.contains(sep),
+            "cleaned output still contains {:?}",
+            sep
+        );
+    }
+
+    #[test]
+    fn latin1_diaeresis_sk_u00a8_stays_unmapped() {
+        // U+00A8 DIAERESIS (Sk) is not contiguous `Sc` with U+00A2–U+00A5; spacing-mark semantics—stay
+        // unmapped (FEAT-D223 spirit; FEAT-D226 maps U+00A6 only).
+        let sep = '\u{00A8}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            !cleaned.contains("hello world"),
+            "U+00A8 must stay unmapped, got {:?}",
+            cleaned
+        );
+        assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
+    }
+
+    #[test]
+    fn c0_controls_u0001_through_u0008_u000e_through_u001f_and_del_separate_words() {
+        // U+0001–U+0008, U+000E–U+001F, U+007F (Cc); not Unicode White_Space—binary-pasted or legacy
+        // control bytes in FETCH_URL bodies should still tokenize (FEAT-D228). U+0000 is dropped by
+        // the HTML parser in text nodes; U+0009–U+000D are White_Space and omitted from the match arm.
+        for cp in (0x1u32..=0x8).chain(0xE..=0x1F).chain(std::iter::once(0x7F)) {
+            let sep = char::from_u32(cp).unwrap();
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
-                !cleaned.contains("hello world"),
-                "U+{:04X} must stay unmapped, got {:?}",
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized, got {:?}",
                 cp,
                 cleaned
             );
-            assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn c1_controls_u0080_through_u009f_separate_words() {
+        // U+0080–U+009F (Cc); not Rust whitespace—C1 noise in FETCH_URL bodies should still
+        // tokenize (FEAT-D227). Spot-check NEL (U+0085) and a high C1 (U+009F).
+        for cp in 0x80u32..=0x9F {
+            let sep = char::from_u32(cp).unwrap();
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
         }
     }
 
