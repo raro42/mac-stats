@@ -161,7 +161,17 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// `megabits exceed` / `kilobits exceed`, and `bit exceed` does not match inside `kilobit exceed`
 /// or as a substring of `rabbit exceed` (left-boundary rejects the inner `bit`); `fields exceed`
 /// does not match inside `battlefields exceed` / `cornfields exceed`, and `field exceed` does not
-/// match inside `afield exceed` / `subfield exceed`.
+/// match inside `afield exceed` / `subfield exceed`; `values exceed` does not match inside
+/// `eigenvalues exceed` / `meanvalues exceed`, and `value exceed` does not match inside
+/// `devalue exceed` / `overvalue exceed`; `keys exceed` does not match inside
+/// `hotkeys exceed` / `turnkeys exceed`, and `key exceed` does not match inside
+/// `monkey exceed` / `passkey exceed`; `properties exceed` does not match inside
+/// `microproperties exceed`, and `property exceed` does not match inside
+/// `subproperty exceed`; `schemas exceed` does not match inside `microschemas exceed` /
+/// `holoschemas exceed`, and `schema exceed` does not match inside `subschema exceed`;
+/// `parameters exceed` does not match inside `microparameters exceed` /
+/// `metaparameters exceed`, and `parameter exceed` does not match inside
+/// `subparameter exceed`.
 fn contains_phrase_after_ident_boundary(haystack: &str, phrase: &str) -> bool {
     fn ident_continue(c: char) -> bool {
         c.is_ascii_alphanumeric() || c == '_'
@@ -889,6 +899,86 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         || ((contains_phrase_after_ident_boundary(&lower, "fields exceed")
             || contains_phrase_after_ident_boundary(&lower, "fields exceeded")
             || contains_phrase_after_ident_boundary(&lower, "field exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "value(s) exceed(s/ed)" (FEAT-D333). Parallel to `fields exceed` /
+        // `field exceed`. `value exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `values exceed` (the `s` after `value`).
+        // Ident-boundary so `eigenvalues exceed` / `meanvalues exceed` / `devalue exceed` /
+        // `overvalue exceed` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "values exceed")
+            || contains_phrase_after_ident_boundary(&lower, "values exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "value exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "key(s) exceed(s/ed)" (FEAT-D334). Parallel to `values exceed` /
+        // `value exceed`. `key exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `keys exceed` (the `s` after `key`).
+        // Ident-boundary so `hotkeys exceed` / `turnkeys exceed` / `monkey exceed` /
+        // `passkey exceed` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "keys exceed")
+            || contains_phrase_after_ident_boundary(&lower, "keys exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "key exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "propert(y/ies) exceed(s/ed)" (FEAT-D335). Parallel to `keys exceed` /
+        // `key exceed`. `property exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `properties exceed` (the `s` after
+        // `property`). Ident-boundary so `microproperties exceed` / `subproperty exceed` do not
+        // false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "properties exceed")
+            || contains_phrase_after_ident_boundary(&lower, "properties exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "property exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "schema(s) exceed(s/ed)" (FEAT-D336). Parallel to `properties exceed` /
+        // `property exceed`. `schema exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `schemas exceed` (the `s` after `schema`).
+        // Ident-boundary so `microschemas exceed` / `holoschemas exceed` / `subschema exceed` do not
+        // false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "schemas exceed")
+            || contains_phrase_after_ident_boundary(&lower, "schemas exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "schema exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "parameter(s) exceed(s/ed)" (FEAT-D337). Parallel to `schemas exceed` /
+        // `schema exceed`. `parameter exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `parameters exceed` (the `s` after
+        // `parameter`). Ident-boundary so `microparameters exceed` / `metaparameters exceed` /
+        // `subparameter exceed` do not false-positive.
+        || ((contains_phrase_after_ident_boundary(&lower, "parameters exceed")
+            || contains_phrase_after_ident_boundary(&lower, "parameters exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "parameter exceed"))
             && (lower.contains("context window")
                 || lower.contains("context length")
                 || lower.contains("context limit")
@@ -2216,6 +2306,156 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "config: subfield exceed nesting depth (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: values exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: values exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: value exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: value exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: values exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: values exceeded daily write cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: value exceed max numeric range on this column (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "stats: eigenvalues exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "solver: meanvalues exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "finance: devalue exceed policy threshold (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "pricing: overvalue exceed display cap (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: keys exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: keys exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: key exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: key exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: keys exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: keys exceeded daily write cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: key exceed max name length on this column (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "UI: hotkeys exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "property: turnkeys exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "zoo: monkey exceed feeding schedule cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "auth: passkey exceed device binding limit (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: properties exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: properties exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: property exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: property exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: properties exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: properties exceeded daily write cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: property exceed max nesting depth on this object (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microproperties exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: subproperty exceed display cap (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: schemas exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: schemas exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: schema exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: schema exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: schemas exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: schemas exceeded daily compile cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "registry: schema exceed max $ref depth on this object (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microschemas exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: subschema exceed display cap (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: parameters exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: parameters exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: parameter exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: parameter exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: parameters exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: parameters exceeded daily compile cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "openapi: parameter exceed max in-path segments on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microparameters exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaparameters exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "layout: subparameter exceed display cap (no model context configured)"
         ));
         assert!(!is_context_overflow_error(
             "microcolumns exceed the model's context window on this request"
