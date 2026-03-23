@@ -196,7 +196,11 @@ fn collapse_whitespace(text: &str) -> String {
                 // and pilcrow (U+00B6, Po) are not Rust whitespace either; legal or editorial HTML
                 // often uses them between Latin tokens without ASCII space. Greek question mark
                 // (U+037E, Po; erotimatiko) is not Rust whitespace and is distinct from Greek ano
-                // teleia (U+0387) mapped with middle-dot punctuation. Arabic comma / semicolon /
+                // teleia (U+0387) mapped with middle-dot punctuation. Greek reversed lunate epsilon
+                // symbol (U+03F6, Sm) is not Rust whitespace; MathML or Greek math typography can sit
+                // between Latin tokens without ASCII space (outside the U+2200–U+22FF Mathematical
+                // Operators arm). U+03F5 GREEK LUNATE EPSILON SYMBOL (Ll) stays unmapped—letter-like,
+                // word-internal risk. Arabic comma / semicolon /
                 // question / full stop (U+060C, U+061B, U+061F, U+06D4, Po) and Arabic percent /
                 // decimal / thousands / five-pointed-star (U+066A–U+066D, Po) are not Rust whitespace; RTL or
                 // bilingual numeric HTML can glue Latin tokens for `split_whitespace()`. Arabic-indic per mille /
@@ -253,7 +257,11 @@ fn collapse_whitespace(text: &str) -> String {
                 // word-internal risk. Syriac Supplement letters U+0860–U+086A (Lo) stay unmapped.
                 // Nyiakeng Puachue
                 // Hmong exclamation / question (U+16FE2, U+16FE3, Po) are not Rust whitespace;
-                // U+16FE0–U+16FE1 (Lo/Lm) and U+16FE4 LOGOGRAM NYIAM (Lo) stay unmapped. Wancho
+                // U+16FE0–U+16FE1 (Lo/Lm) and U+16FE4 LOGOGRAM NYIAM (Lo) stay unmapped. Nyiakeng
+                // Puachue Hmong block tail CIRCLED CA (U+1E14F, So) is not Rust whitespace; Unicode-
+                // sample or Hmong–Latin HTML can glue Latin tokens without ASCII space. Digits
+                // U+1E140–U+1E149 (Nd) and category signs / syllable lengthener Lm U+1E137–U+1E13D stay
+                // unmapped—numeric / word-internal risk. Wancho
                 // comma / full stop (U+1E2FE–U+1E2FF, Po) are not Rust whitespace; Northeast-Indian
                 // script or Unicode-sample HTML can glue Latin tokens without ASCII space. Adlam
                 // initial exclamation / question (U+1E95E, U+1E95F, Po) are not Rust whitespace;
@@ -344,8 +352,9 @@ fn collapse_whitespace(text: &str) -> String {
                 // CJK Compatibility (Unicode block U+3300–U+33FF): all 256 assigned scalars are So (squared katakana words,
                 // telegraph-era labels, etc.); not Rust whitespace. JIS / carrier or Unicode-sample HTML can place them between
                 // Latin tokens without ASCII space. CJK Unified Ideographs Extension A U+3400+ (Lo) immediately after—excluded.
-                // Hebrew maqaf (U+05BE, Pd), paseq (U+05C0, Po), and sof pasuq
-                // (U+05C3, Po; sentence end like a colon) are not Rust whitespace. Georgian paragraph separator (U+10FB, Po) is
+                // Hebrew maqaf (U+05BE, Pd), paseq (U+05C0, Po), sof pasuq (U+05C3, Po; sentence end like a colon), and
+                // nun hafukha (U+05C6, Po) are not Rust whitespace. U+05F3 GERESH and U+05F4 GERSHAYIM (Po) stay unmapped—
+                // apostrophe- / abbreviation-like, word-internal risk (same spirit as U+2019). Georgian paragraph separator (U+10FB, Po) is
                 // not Rust whitespace; mixed Latin–Georgian or Unicode-sample HTML can glue tokens without ASCII space. Tibetan yig mgo
                 // and shad marks (U+0F04–U+0F12, Po), gter tsheg (U+0F14, Po), corner brackets (U+0F3A–U+0F3D, Ps/Pe), paluta (U+0F85,
                 // Po), and astrological / editorial marks (U+0FD0–U+0FD4, U+0FD9–U+0FDA, Po) are not Rust whitespace—only intersyllabic
@@ -355,6 +364,8 @@ fn collapse_whitespace(text: &str) -> String {
                 // Rust whitespace; mixed-script or Unicode-sample HTML can glue Latin tokens without ASCII space. Ethiopic full stop
                 // (U+1362, Po) is not Rust whitespace; mixed-script HTML can glue Latin tokens. Khmer signs khan through koomuut
                 // (U+17D4–U+17DA, Po) and KHMER CURRENCY SYMBOL RIEL (U+17DB, Sc) are not Rust whitespace;
+                // Khmer Symbols PATHAMASAT through DAP-PRAM ROC (U+19E0–U+19FF, So) are not Rust whitespace;
+                // Khmer digits U+17E0–U+17E9 (Nd) and LEK ATTAK numerics U+17F0–U+17F9 (No) stay unmapped—numeric-internal risk.
                 // Javanese pada / section marks (U+A9C1–U+A9CF, Po) are not Rust whitespace—U+A9C0 PANGKON (Cf, virama) stays unmapped as
                 // word-internal risk alongside U+17B4/U+17B5 inherent vowels already mapped as format controls. Khmer SIGN
                 // AVAKRAHASANYA (U+17DC, Lo) and SIGN ATTHACAN (U+17DD, Mn) stay unmapped—letter- / combining-internal risk.
@@ -458,9 +469,10 @@ fn collapse_whitespace(text: &str) -> String {
                 // unmapped. CHINOOK FULL STOP (U+1BC9F, Po) is visible sentence punctuation (U+1BC9D–U+1BC9E Mn
                 // and U+1BCA0–U+1BCA3 Cf are mapped separately). Tifinagh separator mark (U+2D70, Po) is not Rust whitespace;
                 // Berber / Unicode-sample HTML can glue Latin tokens without ASCII space. Aegean word
-                // separator line / dot / check mark (U+10100–U+10102, Po) and Phoenician word separator (U+1091F,
-                // Po) are not Rust whitespace; scholarly or mixed-script HTML can place them between
-                // Latin tokens without ASCII space. Ancient Symbols (Unicode block U+10190–U+101CF): assigned
+                // separator line / dot / check mark (U+10100–U+10102, Po), weight / measure signs (U+10137–U+1013F,
+                // So), and Phoenician word separator (U+1091F, Po) are not Rust whitespace; scholarly or Unicode-sample
+                // HTML can place them between Latin tokens without ASCII space. Unassigned gap U+10134–U+10136 (Cn) and
+                // Aegean number forms U+10107–U+10133 (No) stay unmapped—numeric / unassigned risk. Ancient Symbols (Unicode block U+10190–U+101CF): assigned
                 // Roman metrological and ASCIA So U+10190–U+1019C and GREEK SYMBOL TAU RHO U+101A0; not Rust
                 // whitespace. Unassigned gaps U+1019D–U+1019F and U+101A1–U+101CF (UnicodeData Cn) stay unmapped.
                 // Phaistos Disc logograms U+101D0–U+101FC (all So) are not Rust whitespace; U+101FD COMBINING
@@ -468,7 +480,8 @@ fn collapse_whitespace(text: &str) -> String {
                 // U+10140–U+1018E): metrological / currency `So` U+10179–U+10189 and U+1018C–U+1018E are not Rust
                 // whitespace; scholarly HTML can place them between Latin tokens without ASCII space. Acrophonic and
                 // tally `Nl` U+10140–U+10174, fraction `No` U+10175–U+10178, and `No` zero / quarter U+1018A–U+1018B
-                // stay unmapped—numeric risk. Unassigned U+1018F (Cn) stays unmapped. Aegean U+10100–U+10102 above.
+                // stay unmapped—numeric risk. Unassigned U+1018F (Cn) stays unmapped. Aegean U+10100–U+10102 and
+                // U+10137–U+1013F (`So`) above.
                 // Ugaritic word divider (U+1039F), Old Persian word
                 // divider (U+103D0), Caucasian Albanian citation mark (U+1056F), Imperial Aramaic section
                 // sign (U+10857), Lydian triangular mark (U+1093F), Old South Arabian numeric indicator
@@ -744,6 +757,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{085E}'
                 | '\u{16FE2}'
                 | '\u{16FE3}'
+                | '\u{1E14F}'
                 | '\u{1E2FE}'..='\u{1E2FF}'
                 | '\u{16E97}'
                 | '\u{16E98}'
@@ -762,6 +776,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{17B5}'
                 | '\u{17D4}'..='\u{17DA}'
                 | '\u{17DB}'
+                | '\u{19E0}'..='\u{19FF}'
                 | '\u{A9C1}'..='\u{A9CF}'
                 | '\u{1B4E}'..='\u{1B4F}'
                 | '\u{1B5A}'..='\u{1B60}'
@@ -862,6 +877,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{05BE}'
                 | '\u{05C0}'
                 | '\u{05C3}'
+                | '\u{05C6}'
                 | '\u{10FB}'
                 | '\u{00A1}'
                 | '\u{00BF}'
@@ -891,6 +907,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{2300}'..='\u{23FF}'
                 | '\u{2400}'..='\u{243F}'
                 | '\u{037E}'
+                | '\u{03F6}'
                 | '\u{0609}'
                 | '\u{060A}'
                 | '\u{060B}'
@@ -984,6 +1001,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{16EB}'..='\u{16ED}'
                 | '\u{10079}'..='\u{1007C}'
                 | '\u{10100}'..='\u{10102}'
+                | '\u{10137}'..='\u{1013F}'
                 | '\u{10179}'..='\u{10189}'
                 | '\u{1018C}'..='\u{1018E}'
                 | '\u{10190}'..='\u{1019C}'
@@ -1608,8 +1626,10 @@ mod tests {
     fn wancho_comma_full_stop_and_nyiakeng_sentence_punctuation_separate_words() {
         // Wancho U+1E2FE–U+1E2FF (COMMA, FULL STOP; Po)—not Rust whitespace.
         // Nyiakeng Puachue Hmong U+16FE2–U+16FE3 (EXCLAMATION MARK, QUESTION MARK; Po)—not Rust whitespace.
+        // Nyiakeng Puachue Hmong U+1E14F CIRCLED CA (So)—not Rust whitespace; extends FEAT-D91 arm.
         for cp in [0x16FE2u32, 0x16FE3]
             .into_iter()
+            .chain(std::iter::once(0x1E14F))
             .chain(0x1E2FEu32..=0x1E2FF)
         {
             let sep = char::from_u32(cp).unwrap();
@@ -1626,6 +1646,23 @@ mod tests {
                 "cleaned output still contains U+{:04X}",
                 cp
             );
+        }
+    }
+
+    #[test]
+    fn nyiakeng_puachue_hmong_digit_nd_and_category_lm_stay_unmapped() {
+        // U+1E140 DIGIT ZERO (Nd) and U+1E13D SYLLABLE LENGTHENER (Lm) must not split tokens like U+1E14F `So`.
+        for cp in [0x1E140u32, 0x1E13D] {
+            let sep = char::from_u32(cp).expect("valid test scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} must stay unmapped, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
         }
     }
 
@@ -1881,12 +1918,24 @@ mod tests {
     #[test]
     fn latin1_greek_and_arabic_script_punctuation_separate_words() {
         // U+00A1 / U+00BF (inverted ! / ?), U+00AB / U+00BB (guillemets), U+037E (Greek question
-        // mark), U+060C / U+061B / U+061F / U+06D4 (Arabic comma, semicolon, question, full stop),
+        // mark), U+03F6 (Greek reversed lunate epsilon symbol, Sm), U+060C / U+061B / U+061F / U+06D4 (Arabic comma, semicolon, question, full stop),
         // U+066A–U+066D (Arabic percent, decimal sep, thousands sep, five pointed star): Po / Pi / Pf; not Rust
         // whitespace—mixed European, Greek, or Arabic/Latin HTML can glue tokens without ASCII space.
         for sep in [
-            '\u{00A1}', '\u{00BF}', '\u{00AB}', '\u{00BB}', '\u{037E}', '\u{060C}', '\u{061B}',
-            '\u{061F}', '\u{06D4}', '\u{066A}', '\u{066B}', '\u{066C}', '\u{066D}',
+            '\u{00A1}',
+            '\u{00BF}',
+            '\u{00AB}',
+            '\u{00BB}',
+            '\u{037E}',
+            '\u{03F6}',
+            '\u{060C}',
+            '\u{061B}',
+            '\u{061F}',
+            '\u{06D4}',
+            '\u{066A}',
+            '\u{066B}',
+            '\u{066C}',
+            '\u{066D}',
         ] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
@@ -1900,6 +1949,20 @@ mod tests {
                 "cleaned output still contains {sep:?}"
             );
         }
+    }
+
+    #[test]
+    fn greek_lunate_epsilon_letter_ll_u03f5_stays_unmapped() {
+        // U+03F5 (Ll) is a Greek letter symbol—must not split like the adjacent Sm U+03F6.
+        let sep = '\u{03F5}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            !cleaned.contains("hello world"),
+            "Greek lunate epsilon U+03F5 (Ll) must stay unmapped, got {:?}",
+            cleaned
+        );
+        assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
     }
 
     #[test]
@@ -2034,9 +2097,12 @@ mod tests {
 
     #[test]
     fn aegean_and_phoenician_word_separator_marks_separate_words() {
-        // U+10100 / U+10101 / U+10102 (Aegean word separator line/dot/check mark, Po) and U+1091F (Phoenician word
-        // separator, Po) are not Rust whitespace.
-        for sep in ['\u{10100}', '\u{10101}', '\u{10102}', '\u{1091F}'] {
+        // U+10100 / U+10101 / U+10102 (Aegean word separator line/dot/check mark, Po); U+10137–U+1013F (Aegean
+        // weight/measure `So`); and U+1091F (Phoenician word separator, Po) are not Rust whitespace.
+        for sep in (0x10137u32..=0x1013F)
+            .chain([0x10100, 0x10101, 0x10102, 0x1091F])
+            .map(|cp| char::from_u32(cp).expect("valid test scalar"))
+        {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
@@ -2050,6 +2116,23 @@ mod tests {
                 "cleaned output still contains {:?}",
                 sep
             );
+        }
+    }
+
+    #[test]
+    fn aegean_number_no_and_unassigned_gap_stay_unmapped() {
+        // Aegean NUMBER ONE (U+10107, No) and unassigned U+10134 (Cn) must not split tokens like the adjacent `So` arm.
+        for cp in [0x10107u32, 0x10134] {
+            let sep = char::from_u32(cp).expect("valid test scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} must stay unmapped, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
         }
     }
 
@@ -3362,10 +3445,10 @@ mod tests {
 
     #[test]
     fn hebrew_maqaf_paseq_tibetan_tsheg_ethiopic_stop_separate_words() {
-        // U+05BE (Hebrew maqaf, Pd), U+05C0 (Hebrew paseq, Po), U+0F0B (Tibetan tsheg, Po),
-        // U+1362 (Ethiopic full stop, Po)—none are Rust whitespace; RTL or Ethiopic-layout HTML
+        // U+05BE (Hebrew maqaf, Pd), U+05C0 (Hebrew paseq, Po), U+05C6 (Hebrew nun hafukha, Po),
+        // U+0F0B (Tibetan tsheg, Po), U+1362 (Ethiopic full stop, Po)—none are Rust whitespace; RTL or Ethiopic-layout HTML
         // can glue Latin tokens for `split_whitespace()` without ASCII space.
-        for sep in ['\u{05BE}', '\u{05C0}', '\u{0F0B}', '\u{1362}'] {
+        for sep in ['\u{05BE}', '\u{05C0}', '\u{05C6}', '\u{0F0B}', '\u{1362}'] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
             assert!(
@@ -3380,6 +3463,41 @@ mod tests {
                 sep
             );
         }
+    }
+
+    #[test]
+    fn hebrew_geresh_gershayim_po_u05f3_u05f4_stay_unmapped() {
+        // U+05F3 GERESH and U+05F4 GERSHAYIM (Po) are omitted from `collapse_whitespace()`—apostrophe- /
+        // abbreviation-like, word-internal risk (same spirit as U+2019).
+        for sep in ['\u{05F3}', '\u{05F4}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                !cleaned.contains("hello world"),
+                "U+{:04X} must stay unmapped, got {:?}",
+                sep as u32,
+                cleaned
+            );
+            assert!(
+                cleaned.contains(sep),
+                "expected U+{:04X} to remain in output, got {:?}",
+                sep as u32,
+                cleaned
+            );
+        }
+    }
+
+    #[test]
+    fn hebrew_letter_aleph_lo_u05d0_stay_unmapped() {
+        let sep = '\u{05D0}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            !cleaned.contains("hello world"),
+            "Hebrew letter U+05D0 (Lo) must stay unmapped, got {:?}",
+            cleaned
+        );
+        assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
     }
 
     #[test]
@@ -3426,6 +3544,50 @@ mod tests {
     fn khmer_sign_avakrahasanya_lo_and_atthacan_mn_stay_unmapped() {
         // U+17DC KHMER SIGN AVAKRAHASANYA (Lo) and U+17DD KHMER SIGN ATTHACAN (Mn) must not widen the Khmer Po/Sc arms.
         for cp in [0x17DCu32, 0x17DD] {
+            let c = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{c}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains(c),
+                "U+{:04X} should pass through collapse_whitespace, got {:?}",
+                cp,
+                cleaned
+            );
+            assert_eq!(
+                cleaned.split_whitespace().count(),
+                1,
+                "U+{:04X} must not become a word break",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn khmer_symbols_so_u19e0_through_u19ff_separate_words() {
+        // Unicode block U+19E0–U+19FF: all 32 assigned scalars are So (PATHAMASAT, KOET/ROC lunar abbreviations, etc.);
+        // not Rust whitespace. Distinct from Khmer script U+1780+ and currency U+17DB (FEAT-D196).
+        for cp in 0x19E0u32..=0x19FF {
+            let sep = char::from_u32(cp).expect("valid scalar");
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected U+{:04X} normalized before collapse, got {:?}",
+                cp,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains U+{:04X}",
+                cp
+            );
+        }
+    }
+
+    #[test]
+    fn khmer_digit_nd_and_lek_attak_no_stay_unmapped() {
+        // U+17E0 KHMER DIGIT ZERO (Nd) and U+17F0 KHMER SYMBOL LEK ATTAK SON (No) must not widen the Khmer Po/Sc/So arms.
+        for cp in [0x17E0u32, 0x17F0] {
             let c = char::from_u32(cp).expect("valid scalar");
             let html = format!("<html><body><p>hello{c}world</p></body></html>");
             let cleaned = clean_html(&html);

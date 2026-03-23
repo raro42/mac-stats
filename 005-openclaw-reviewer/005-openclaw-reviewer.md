@@ -8,7 +8,7 @@ Cross-check **OpenClaw** `AGENTS.md` against the **openclaw** repository (siblin
 **OpenClaw `HEAD`:** `95ae8aabb77a99bed6747698fe810f6b8e34490b` (short: `95ae8aa`)  
 **References:** `AGENTS.md` (repo guidelines), `package.json` (scripts), `vitest.config.ts` (coverage).
 
-Re-ran layout, `package.json` scripts, and Vitest coverage thresholds on this `HEAD`; results match the table below (no doc or config drift vs `AGENTS.md`).
+**Independent re-run:** `2026-03-23T00:05Z` (reviewer agent) — same `HEAD`; layout, `package.json` scripts (`pnpm check` chain: `format:check` → `tsgo` → …), format aliases, Vitest thresholds, and `src/` paths rechecked; table below unchanged (no doc or config drift vs `AGENTS.md`).
 
 ### §7-style checks (doc vs code)
 
@@ -25,6 +25,7 @@ Re-ran layout, `package.json` scripts, and Vitest coverage thresholds on this `H
 - **`format:fix`** and **`format`** remain redundant aliases (`oxfmt --write`); harmless.
 - No OpenClaw code issues surfaced; this pass is doc↔config/layout consistency only.
 - Confirmed on disk: `src/cli`, `src/commands`, `src/channel-web.ts`, `src/infra`, `src/media`, `src/channels/`, `src/routing/`, `src/plugins/`; no `src/provider-web.ts`.
+- **`@typescript/native-preview`** in root `package.json` is `7.0.0-dev.20260322.1` (devDependency; `pnpm tsgo` uses the binary from `.bin` after install). Not spelled out in `AGENTS.md`; no doc change required.
 
 ### Historical (2026-03-22 morning)
 
