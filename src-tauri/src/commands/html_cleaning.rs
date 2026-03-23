@@ -362,6 +362,9 @@ fn collapse_whitespace(text: &str) -> String {
                 // (U+30FB, Po), and halfwidth Katakana middle dot (U+FF65, Po) are not Rust
                 // whitespace; European / Greek / Japanese typography often uses them as word
                 // separators, so pasted HTML can glue Latin tokens for `split_whitespace()`.
+                // Katakana-Hiragana voiced sound mark (U+309B, Sk) and semi-voiced sound mark (U+309C, Sk)
+                // are not Rust whitespace; romaji–kana or Unicode-sample HTML can place ﾞ/ﾟ between Latin
+                // tokens without ASCII space. Hiragana / Katakana letters (Lo) stay unmapped.
                 // Dagger / double dagger / bullet / triangular bullet (U+2020–U+2023, Po) sit
                 // between the curly-quote arm and dot-leader arm; U+2019 between them is omitted
                 // (apostrophe). None are Rust whitespace; footnote-style or list HTML can glue
@@ -379,7 +382,7 @@ fn collapse_whitespace(text: &str) -> String {
                 // MathML, or CJK fullwidth paths can use them between Latin tokens without ASCII space.
                 // Ideographic comma / full stop (U+3001, U+3002, Po) and
                 // fullwidth ASCII-like punctuation (U+FF0C comma, U+FF1A colon, U+FF1B semicolon,
-                // U+FF01 exclamation, U+FF1F question; all Po) are not Rust whitespace; CJK or
+                // U+FF01 exclamation, U+FF02 quotation, U+FF1F question; all Po) are not Rust whitespace; CJK or
                 // mixed-layout HTML often places them between Latin tokens without ASCII space.
                 // Other Halfwidth and Fullwidth Forms delimiters—U+FF03 number sign, U+FF04 dollar,
                 // U+FF05 percent, U+FF06 ampersand, U+FF08/U+FF09 parens, U+FF0A asterisk, U+FF0B plus,
@@ -387,8 +390,10 @@ fn collapse_whitespace(text: &str) -> String {
                 // U+FF3B–U+FF3D brackets and reverse solidus, U+FF5B–U+FF5D braces, U+FF5C vertical line
                 // (Po/Ps/Pe/Sm/Pd/Sc as assigned)—are not Rust whitespace either. U+FF07 FULLWIDTH
                 // APOSTROPHE (Po) stays unmapped—typographic apostrophe risk. U+FF5E FULLWIDTH TILDE (Sm)
-                // stays unmapped—Japanese range notation (e.g. 3～5). U+FF40 FULLWIDTH GRAVE (Po) stays
-                // unmapped—modifier-like, word-internal risk. Fullwidth white parentheses (U+FF5F, U+FF60,
+                // stays unmapped—Japanese range notation (e.g. 3～5). U+FF3E FULLWIDTH CIRCUMFLEX ACCENT (Sk)
+                // is not Rust whitespace—fullwidth typography can glue Latin tokens like ASCII U+005E (FEAT-D247);
+                // maps to ASCII space (FEAT-D249). U+FF40 FULLWIDTH GRAVE ACCENT (Sk) stays unmapped—modifier-like,
+                // word-internal risk (FEAT-D125). Fullwidth white parentheses (U+FF5F, U+FF60,
                 // Ps/Pe), halfwidth ideographic full stop / corner brackets / ideographic comma
                 // (U+FF61–U+FF64, Po/Ps/Pe; U+FF65 middle dot is on the middle-dot arm), and fullwidth
                 // cent / pound / not sign / broken bar / yen / won (U+FFE0–U+FFE2, U+FFE4–U+FFE6,
@@ -517,13 +522,17 @@ fn collapse_whitespace(text: &str) -> String {
                 // ASCII space. Extends FEAT-D141 (formerly U+20A0–U+20BF only). U+20C2–U+20CF are
                 // unassigned (`Cn`) and stay unmapped.
                 // Letterlike Symbols U+2100–U+214F: only So/Sm subranges (account-of, degree signs,
-                // EULER CONSTANT (U+2107, So) with degree Celsius / scruple / Fahrenheit, numero,
-                // prescription take, trade mark, sans-serif math symbols, per sign, etc.);
-                // not Rust whitespace. Lu/Ll/Lo mathematical letters (e.g. U+2102, U+210E–U+2113,
+                // degree Celsius / care / cada una / scruple / Fahrenheit (U+2103–U+2106, U+2108–U+2109, So);
+                // U+2107 EULER CONSTANT is `Lu` in UnicodeData—stays unmapped (FEAT-D252; FEAT-D230 assumed `So`).
+                // Numero, prescription take, trade mark, sans-serif math symbols, per sign, etc.;
+                // not Rust whitespace. Lu/Ll/Lo mathematical letters (e.g. U+2102, U+2107, U+210E–U+2113,
                 // U+2115, U+2119–U+2124, U+2126, U+212A–U+212D, U+212F–U+2134, U+2135–U+2138,
-                // U+2139, U+213C–U+213E, U+2145–U+2149, U+214E) stay unmapped—word-internal risk.
+                // U+213C–U+213E, U+2145–U+2149, U+214E) stay unmapped—word-internal risk.
+                // INFORMATION SOURCE (U+2139, `So`) is not Rust whitespace—UI / accessibility copy or
+                // Unicode-sample HTML can place ⓘ between Latin tokens without ASCII space; maps with
+                // turned sans-serif So U+213A–U+213B (FEAT-D251).
                 // DOUBLE-STRUCK N-ARY SUMMATION (U+2140, `Sm`) maps—not Rust whitespace; extends turned
-                // sans-serif So U+213A–U+213B into double-struck Pi / empty-set So U+2140–U+2144. U+213F
+                // sans-serif So U+2139–U+213B into double-struck Pi / empty-set So U+2140–U+2144. U+213F
                 // DOUBLE-STRUCK CAPITAL PI is `Lu` in UnicodeData—stays unmapped (FEAT-D246; historical FEAT-D231
                 // assumed n-ary summation at U+213F).
                 // U+20D0–U+20FF combining marks for symbols stay unmapped—combining / enclosing risk.
@@ -924,6 +933,8 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{00B7}'
                 | '\u{0387}'
                 | '\u{30FB}'
+                | '\u{309B}'
+                | '\u{309C}'
                 | '\u{FF65}'
                 | '\u{FF0F}'
                 | '\u{3001}'
@@ -956,6 +967,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{FF1A}'
                 | '\u{FF1B}'
                 | '\u{FF01}'
+                | '\u{FF02}'
                 | '\u{FF1F}'
                 | '\u{FF03}'
                 | '\u{FF04}'
@@ -972,6 +984,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{FF3B}'
                 | '\u{FF3C}'
                 | '\u{FF3D}'
+                | '\u{FF3E}'
                 | '\u{FF5B}'
                 | '\u{FF5C}'
                 | '\u{FF5D}'
@@ -1049,7 +1062,8 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{00B6}'
                 | '\u{20A0}'..='\u{20C1}'
                 | '\u{2100}'..='\u{2101}'
-                | '\u{2103}'..='\u{2109}'
+                | '\u{2103}'..='\u{2106}'
+                | '\u{2108}'..='\u{2109}'
                 | '\u{2114}'
                 | '\u{2116}'..='\u{2118}'
                 | '\u{211E}'..='\u{2123}'
@@ -1057,7 +1071,7 @@ fn collapse_whitespace(text: &str) -> String {
                 | '\u{2127}'
                 | '\u{2129}'
                 | '\u{212E}'
-                | '\u{213A}'..='\u{213B}'
+                | '\u{2139}'..='\u{213B}'
                 | '\u{2140}'..='\u{2144}'
                 | '\u{214A}'..='\u{214D}'
                 | '\u{214F}'
@@ -2388,6 +2402,72 @@ mod tests {
     }
 
     #[test]
+    fn fullwidth_quotation_mark_po_ff02_separate_words() {
+        // U+FF02 FULLWIDTH QUOTATION MARK (`Po`); not Rust whitespace—CJK or mixed-layout HTML can glue
+        // Latin tokens without ASCII space (fills gap between U+FF01 and U+FF03 on the fullwidth arm).
+        let sep = '\u{FF02}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            cleaned.contains("hello world"),
+            "expected {sep:?} normalized before collapse, got {:?}",
+            cleaned
+        );
+        assert!(
+            !cleaned.contains(sep),
+            "cleaned output still contains {:?}",
+            sep
+        );
+    }
+
+    #[test]
+    fn fullwidth_apostrophe_po_ff07_stays_unmapped() {
+        // U+FF07 FULLWIDTH APOSTROPHE (`Po`) stays unmapped—typographic apostrophe / word-internal risk (FEAT-D125).
+        let sep = '\u{FF07}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            !cleaned.contains("hello world"),
+            "U+FF07 must stay unmapped, got {:?}",
+            cleaned
+        );
+        assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
+    }
+
+    #[test]
+    fn fullwidth_circumflex_sk_ff3e_separate_words() {
+        // U+FF3E FULLWIDTH CIRCUMFLEX ACCENT (`Sk`); not Rust whitespace—JIS / fullwidth typography can glue
+        // Latin tokens without ASCII space (extends FEAT-D247 U+005E).
+        let sep = '\u{FF3E}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            cleaned.contains("hello world"),
+            "expected {sep:?} normalized before collapse, got {:?}",
+            cleaned
+        );
+        assert!(
+            !cleaned.contains(sep),
+            "cleaned output still contains {:?}",
+            sep
+        );
+    }
+
+    #[test]
+    fn fullwidth_grave_sk_ff40_stays_unmapped() {
+        // U+FF40 FULLWIDTH GRAVE ACCENT (`Sk`) stays unmapped—modifier-like, word-internal risk (FEAT-D125).
+        let sep = '\u{FF40}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            !cleaned.contains("hello world"),
+            "U+FF40 must stay unmapped, got {:?}",
+            cleaned
+        );
+        assert!(cleaned.contains(sep), "expected {:?} in {:?}", sep, cleaned);
+    }
+
+    #[test]
     fn c0_controls_u0001_through_u0008_u000e_through_u001f_and_del_separate_words() {
         // U+0001–U+0008, U+000E–U+001F, U+007F (Cc); not Unicode White_Space—binary-pasted or legacy
         // control bytes in FETCH_URL bodies should still tokenize (FEAT-D228). U+0000 is dropped by
@@ -2530,11 +2610,13 @@ mod tests {
 
     #[test]
     fn letterlike_symbol_subranges_separate_words() {
-        // Letterlike Symbols: So/Sm only (FEAT-D147; U+2103..=U+2109 includes U+2107 EULER CONSTANT, FEAT-D230;
-        // U+2140 DOUBLE-STRUCK N-ARY SUMMATION `Sm` through U+2144; U+213F is `Lu` (FEAT-D246). Not Rust whitespace.
+        // Letterlike Symbols: So/Sm only (FEAT-D147; U+2103..=U+2106 and U+2108..=U+2109; U+2107 EULER CONSTANT is `Lu`,
+        // FEAT-D252); U+2139 INFORMATION SOURCE `So` with U+213A–U+213B, FEAT-D251; U+2140 DOUBLE-STRUCK N-ARY SUMMATION `Sm`
+        // through U+2144; U+213F is `Lu` (FEAT-D246). Not Rust whitespace.
         let runs: &[(u32, u32)] = &[
             (0x2100, 0x2101),
-            (0x2103, 0x2109),
+            (0x2103, 0x2106),
+            (0x2108, 0x2109),
             (0x2114, 0x2114),
             (0x2116, 0x2118),
             (0x211E, 0x2123),
@@ -2542,7 +2624,7 @@ mod tests {
             (0x2127, 0x2127),
             (0x2129, 0x2129),
             (0x212E, 0x212E),
-            (0x213A, 0x213B),
+            (0x2139, 0x213B),
             (0x2140, 0x2144),
             (0x214A, 0x214D),
             (0x214F, 0x214F),
@@ -2572,6 +2654,7 @@ mod tests {
         // Lu/Ll/Lo in Letterlike Symbols—must not split Latin tokens like mapped So/Sm.
         for cp in [
             0x2102u32, // DOUBLE-STRUCK CAPITAL C (Lu)
+            0x2107,    // EULER CONSTANT (Lu; FEAT-D252)
             0x210E,    // PLANCK CONSTANT (Ll)
             0x2115,    // DOUBLE-STRUCK CAPITAL N (Lu)
             0x2126,    // OHM SIGN (Lu)
@@ -2944,6 +3027,44 @@ mod tests {
                 sep
             );
         }
+    }
+
+    #[test]
+    fn katakana_hiragana_voiced_semi_voiced_sound_marks_sk_separate_words() {
+        // U+309B / U+309C: Katakana-Hiragana voiced / semi-voiced sound marks (`Sk`); not Rust whitespace.
+        for sep in ['\u{309B}', '\u{309C}'] {
+            let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+            let cleaned = clean_html(&html);
+            assert!(
+                cleaned.contains("hello world"),
+                "expected {:?} normalized before collapse, got {:?}",
+                sep,
+                cleaned
+            );
+            assert!(
+                !cleaned.contains(sep),
+                "cleaned output still contains {:?}",
+                sep
+            );
+        }
+    }
+
+    #[test]
+    fn hiragana_letter_lo_u3042_stays_unmapped() {
+        // U+3042 HIRAGANA LETTER A (`Lo`) must not be treated like spacing `Sk` U+309B/U+309C.
+        let sep = '\u{3042}';
+        let html = format!("<html><body><p>hello{sep}world</p></body></html>");
+        let cleaned = clean_html(&html);
+        assert!(
+            cleaned.contains(sep),
+            "expected hiragana letter to remain in output, got {:?}",
+            cleaned
+        );
+        assert!(
+            !cleaned.contains("hello world"),
+            "hiragana letter must not become ASCII space between tokens, got {:?}",
+            cleaned
+        );
     }
 
     #[test]
@@ -3517,14 +3638,14 @@ mod tests {
 
     #[test]
     fn cjk_fullwidth_and_vertical_forms_punctuation_separate_words() {
-        // U+3001/U+3002 (ideographic comma / full stop), U+FF0C/FF1A/FF1B/FF01/FF1F (fullwidth
-        // comma, colon, semicolon, exclamation, question), U+FE10–U+FE19 (Vertical Forms
+        // U+3001/U+3002 (ideographic comma / full stop), U+FF0C/FF1A/FF1B/FF01/FF02/FF1F (fullwidth
+        // comma, colon, semicolon, exclamation, quotation, question), U+FE10–U+FE19 (Vertical Forms
         // compatibility punctuation): Po/Ps/Pe/Pc—not Rust whitespace. Mixed CJK / Latin HTML
         // or vertical-layout compatibility text can sit between Latin tokens without ASCII space.
         for sep in [
-            '\u{3001}', '\u{3002}', '\u{FF0C}', '\u{FF1A}', '\u{FF1B}', '\u{FF01}', '\u{FF1F}',
-            '\u{FE10}', '\u{FE11}', '\u{FE12}', '\u{FE13}', '\u{FE14}', '\u{FE15}', '\u{FE16}',
-            '\u{FE17}', '\u{FE18}', '\u{FE19}',
+            '\u{3001}', '\u{3002}', '\u{FF0C}', '\u{FF1A}', '\u{FF1B}', '\u{FF01}', '\u{FF02}',
+            '\u{FF1F}', '\u{FE10}', '\u{FE11}', '\u{FE12}', '\u{FE13}', '\u{FE14}', '\u{FE15}',
+            '\u{FE16}', '\u{FE17}', '\u{FE18}', '\u{FE19}',
         ] {
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
             let cleaned = clean_html(&html);
@@ -3582,14 +3703,16 @@ mod tests {
 
     #[test]
     fn fullwidth_delimiters_operators_and_brackets_separate_words() {
-        // U+FF03 NUMBER SIGN, U+FF04 DOLLAR SIGN, U+FF05 PERCENT, U+FF06 AMPERSAND, U+FF08/U+FF09
-        // PARENS, U+FF0A ASTERISK, U+FF0B PLUS, U+FF0D HYPHEN-MINUS, U+FF0E FULL STOP,
+        // U+FF02 QUOTATION MARK, U+FF03 NUMBER SIGN, U+FF04 DOLLAR SIGN, U+FF05 PERCENT, U+FF06
+        // AMPERSAND, U+FF08/U+FF09 PARENS, U+FF0A ASTERISK, U+FF0B PLUS, U+FF0D HYPHEN-MINUS,
+        // U+FF0E FULL STOP,
         // U+FF1C–U+FF1E LESS/EQUALS/GREATER, U+FF20 COMMERCIAL AT, U+FF3B–U+FF3D BRACKETS/SOLIDUS,
         // U+FF5B–U+FF5D CURLY BRACES, U+FF5C VERTICAL LINE—not Rust whitespace; fullwidth
         // typography HTML can glue Latin tokens without ASCII space. U+FF07 apostrophe, U+FF5E tilde,
         // U+FF40 grave intentionally omitted (see `collapse_whitespace` comment).
         for sep in [
-            '\u{FF03}', '\u{FF04}', '\u{FF05}', '\u{FF06}', '\u{FF08}', '\u{FF09}', '\u{FF0A}',
+            '\u{FF02}', '\u{FF03}', '\u{FF04}', '\u{FF05}', '\u{FF06}', '\u{FF08}', '\u{FF09}',
+            '\u{FF0A}',
             '\u{FF0B}', '\u{FF0D}', '\u{FF0E}', '\u{FF1C}', '\u{FF1D}', '\u{FF1E}', '\u{FF20}',
             '\u{FF3B}', '\u{FF3C}', '\u{FF3D}', '\u{FF5B}', '\u{FF5C}', '\u{FF5D}',
         ] {
