@@ -188,7 +188,9 @@ fn collapse_whitespace(text: &str) -> String {
                 // markers, object replacement (U+FFF9–U+FFFC), replacement character (U+FFFD, So),
                 // and deprecated Unicode language
                 // tag characters (U+E0000–U+E007F) get the same treatment so FETCH_URL bodies
-                // tokenize cleanly. C1 control characters (U+0080–U+009F, Cc) are not Rust
+                // tokenize cleanly. NBSP (U+00A0, Zs) is also mapped to ASCII U+0020 so cleaned text
+                // uses plain spaces even though Rust `split_whitespace` already treats it as a separator.
+                // C1 control characters (U+0080–U+009F, Cc) are not Rust
                 // whitespace; garbled 8-bit, Windows-1252 mis-decodes, or binary-pasted HTML can
                 // inject them into text nodes and glue tokens for `split_whitespace()`.
                 // C0 ASCII / ISO control characters U+0001–U+0008, U+000E–U+001F, and U+007F DELETE (Cc)
@@ -408,7 +410,8 @@ fn collapse_whitespace(text: &str) -> String {
                 // ideographic closing mark (U+3006, Po), CJK brackets and postal/geta marks
                 // (U+3008–U+301B, Ps/Pe/So), wave dash (U+301C, Pd), reversed/double-prime quotes
                 // (U+301D–U+301F), postal mark face (U+3020, So), vertical kana repeat marks
-                // (U+3031–U+3036, Lm), masu mark (U+303C, Lo), ideographic variation indicator /
+                // (U+3031–U+3035, Lm), CIRCLED POSTAL MARK (U+3036, So; same contiguous arm), masu mark
+                // (U+303C, So), ideographic variation indicator /
                 // half fill space (U+303E–U+303F, So) are not Rust whitespace. Omitted on purpose:
                 // iteration marks U+3005 / U+303B (Lm), ideographic zero U+3007 and Hangzhou numerals
                 // U+3021–U+3029 / U+3038–U+303A (Nl), and ideographic tone marks U+302A–U+302F (Mn/Mc).
@@ -534,9 +537,14 @@ fn collapse_whitespace(text: &str) -> String {
                 // Unicode-sample HTML can place ⓘ between Latin tokens without ASCII space; maps with
                 // turned sans-serif So U+213A–U+213B (FEAT-D251).
                 // DOUBLE-STRUCK N-ARY SUMMATION (U+2140, `Sm`) maps—not Rust whitespace; extends turned
-                // sans-serif So U+2139–U+213B into double-struck Pi / empty-set So U+2140–U+2144. U+213F
-                // DOUBLE-STRUCK CAPITAL PI is `Lu` in UnicodeData—stays unmapped (FEAT-D246; historical FEAT-D231
+                // sans-serif `So` U+2139–U+213B into double-struck `Sm` U+2140–U+2144 (n-ary summation,
+                // DOUBLE-STRUCK DIGIT TWO–FOUR, TURNED SANS-SERIF CAPITAL G; all `Sm` in UnicodeData—not `So`).
+                // U+213F DOUBLE-STRUCK CAPITAL PI is `Lu` in UnicodeData—stays unmapped (FEAT-D246; historical FEAT-D231
                 // assumed n-ary summation at U+213F).
+                // U+214A PROPERTY LINE (`So`), U+214B TURNED AMPERSAND (`Sm`), U+214C PER SIGN (`So`),
+                // U+214D AKTIESELSKAB (`So`), and U+214F SYMBOL FOR SAMARITAN SOURCE (`So`) map on dedicated
+                // match arms—Letterlike gap between U+2144 and Number Forms U+2150+; not Rust whitespace (FEAT-D262).
+                // U+214E TURNED SMALL F (`Ll`) stays unmapped—letter-like, word-internal risk.
                 // U+20D0–U+20FF combining marks for symbols stay unmapped—combining / enclosing risk.
                 // Number Forms U+2150–U+2182 and U+2185–U+218B (vulgar fractions, Roman
                 // numerals, turned digit two/three; all No / Nl / So) are not Rust whitespace;
@@ -1560,8 +1568,9 @@ mod tests {
 
     #[test]
     fn nbsp_separates_words() {
-        // U+00A0 (NO-BREAK SPACE) from `&nbsp;` is not Unicode whitespace for
-        // `split_whitespace()`, so "hello\u{00A0}world" would stay one token.
+        // U+00A0 (NO-BREAK SPACE) from `&nbsp;` is Unicode Zs; Rust `split_whitespace` already splits
+        // on it. `collapse_whitespace` still maps it to ASCII U+0020 so cleaned FETCH_URL text is
+        // plain-space–only and never retains U+00A0.
         let html = "<html><body><p>hello\u{00A0}world</p></body></html>";
         let cleaned = clean_html(html);
         assert!(
@@ -2618,8 +2627,9 @@ mod tests {
     #[test]
     fn letterlike_symbol_subranges_separate_words() {
         // Letterlike Symbols: So/Sm only (FEAT-D147; U+2103..=U+2106 and U+2108..=U+2109; U+2107 EULER CONSTANT is `Lu`,
-        // FEAT-D252); U+2139 INFORMATION SOURCE `So` with U+213A–U+213B, FEAT-D251; U+2140 DOUBLE-STRUCK N-ARY SUMMATION `Sm`
-        // through U+2144; U+213F is `Lu` (FEAT-D246). Not Rust whitespace.
+        // FEAT-D252); U+2139 INFORMATION SOURCE `So` with U+213A–U+213B, FEAT-D251; U+2140–U+2144 are all `Sm` (FEAT-D261;
+        // `collapse_whitespace` narrative once called this run `So` by mistake); U+213F is `Lu` (FEAT-D246). Tail U+214A–U+214D
+        // (`So`/`Sm`/`So`/`So`) and U+214F (`So`) are documented on the `collapse_whitespace` block comment (FEAT-D262)—not Rust whitespace.
         let runs: &[(u32, u32)] = &[
             (0x2100, 0x2101),
             (0x2103, 0x2106),
@@ -2670,6 +2680,7 @@ mod tests {
             0x213E,    // DOUBLE-STRUCK CAPITAL GAMMA (Lu)
             0x213F,    // DOUBLE-STRUCK CAPITAL PI (Lu)
             0x2146,    // DOUBLE-STRUCK ITALIC SMALL D (Ll)
+            0x214E,    // TURNED SMALL F (Ll; FEAT-D262—mapped tail is U+214A–U+214D / U+214F only)
         ] {
             let sep = char::from_u32(cp).expect("valid scalar");
             let html = format!("<html><body><p>hello{sep}world</p></body></html>");
@@ -3685,7 +3696,7 @@ mod tests {
     #[test]
     fn cjk_symbols_brackets_ditto_wave_vertical_repeat_masu_half_fill_separate_words() {
         // U+3003 / U+3004 / U+3006 (3006 is `Po` in UnicodeData, not a letter); U+3008–U+301B;
-        // U+301C; U+301D–U+301F; U+3020; U+3031–U+3036; U+303C; U+303E–U+303F: not Rust whitespace
+        // U+301C; U+301D–U+301F; U+3020; U+3031–U+3035 (`Lm`); U+3036 CIRCLED POSTAL MARK (`So`); U+303C MASU MARK (`So`); U+303E–U+303F: not Rust whitespace
         // (see `collapse_whitespace` comment). Mixed
         // CJK-layout or romanized HTML can otherwise glue Latin tokens for `split_whitespace()`.
         for sep in (0x3003u32..=0x301B)
