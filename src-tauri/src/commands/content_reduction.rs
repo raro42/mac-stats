@@ -277,6 +277,21 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// `vertices exceed` does not match inside `microvertices exceed` / `metavertices exceed`, and
 /// `vertex exceed` does not match inside `subvertex exceed` (left-boundary rejects `prevertex exceed`
 /// and `revertex exceed`);
+/// `faces exceed` does not match inside `microfaces exceed` / `metafaces exceed`, and
+/// `face exceed` does not match inside `subface exceed` (left-boundary rejects `preface exceed`
+/// and `reface exceed`);
+/// `triangles exceed` does not match inside `microtriangles exceed` / `metatriangles exceed`, and
+/// `triangle exceed` does not match inside `subtriangle exceed` (left-boundary rejects
+/// `pretriangle exceed` and `retriangle exceed`);
+/// `polygons exceed` does not match inside `micropolygons exceed` / `metapolygons exceed`, and
+/// `polygon exceed` does not match inside `subpolygon exceed` (left-boundary rejects
+/// `prepolygon exceed` and `repolygon exceed`);
+/// `meshes exceed` does not match inside `micromeshes exceed` / `metameshes exceed`, and
+/// `mesh exceed` does not match inside `submesh exceed` (left-boundary rejects `premesh exceed`
+/// and `remesh exceed`);
+/// `voxels exceed` does not match inside `microvoxels exceed` / `metavoxels exceed`, and
+/// `voxel exceed` does not match inside `subvoxel exceed` (left-boundary rejects `prevoxel exceed`
+/// and `revoxel exceed`);
 /// `messages exceed` does not match inside `micromessages exceed` / `metamessages exceed`, and
 /// `message exceed` does not match inside `submessage exceed` (left-boundary rejects `premessage exceed`
 /// and `remessage exceed`);
@@ -1417,6 +1432,61 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         || ((contains_phrase_after_ident_boundary(&lower, "vertices exceed")
             || contains_phrase_after_ident_boundary(&lower, "vertices exceeded")
             || contains_phrase_after_ident_boundary(&lower, "vertex exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "face(s) exceed(s/ed)" (FEAT-D399). Parallel to `vertices exceed` /
+        // `vertex exceed`. `face exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `faces exceed` (the `s` after `face`).
+        // Ident-boundary so `microfaces exceed` / `metafaces exceed` / `subface exceed` do not
+        // false-positive; `preface exceed` and `reface exceed` are rejected the same way. Same
+        // explicit context-slot phrases as `messages exceed`. Negatives: HTTP `faces exceed` rate
+        // limits, mesh / polygon caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "faces exceed")
+            || contains_phrase_after_ident_boundary(&lower, "faces exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "face exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "triangle(s) exceed(s/ed)" (FEAT-D400). Parallel to `faces exceed` /
+        // `face exceed`. `triangle exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `triangles exceed` (the `s` after `triangle`).
+        // Ident-boundary so `microtriangles exceed` / `metatriangles exceed` / `subtriangle exceed`
+        // do not false-positive; `pretriangle exceed` and `retriangle exceed` are rejected the same
+        // way. Same explicit context-slot phrases as `messages exceed`. Negatives: HTTP `triangles
+        // exceed` rate limits, mesh / index caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "triangles exceed")
+            || contains_phrase_after_ident_boundary(&lower, "triangles exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "triangle exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "polygon(s) exceed(s/ed)" (FEAT-D401). Parallel to `triangles exceed` /
+        // `triangle exceed`. `polygon exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `polygons exceed` (the `s` after `polygon`).
+        // Ident-boundary so `micropolygons exceed` / `metapolygons exceed` / `subpolygon exceed`
+        // do not false-positive; `prepolygon exceed` and `repolygon exceed` are rejected the same
+        // way. Same explicit context-slot phrases as `messages exceed`. Negatives: HTTP `polygons
+        // exceed` rate limits, GIS / mesh ring caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "polygons exceed")
+            || contains_phrase_after_ident_boundary(&lower, "polygons exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "polygon exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "mesh(es) exceed(s/ed)" (FEAT-D402). Parallel to `polygons exceed` /
+        // `polygon exceed`. `mesh exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `meshes exceed` (the `s` after `mesh`).
+        // Ident-boundary so `micromeshes exceed` / `metameshes exceed` / `submesh exceed` do not
+        // false-positive; `premesh exceed` and `remesh exceed` are rejected the same way. Same
+        // explicit context-slot phrases as `messages exceed`. Negatives: HTTP `meshes exceed` rate
+        // limits, per-scene / draw-call caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "meshes exceed")
+            || contains_phrase_after_ident_boundary(&lower, "meshes exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "mesh exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "voxel(s) exceed(s/ed)" (FEAT-D403). Parallel to `meshes exceed` /
+        // `mesh exceed`. `voxel exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `voxels exceed` (the `s` after `voxel`).
+        // Ident-boundary so `microvoxels exceed` / `metavoxels exceed` / `subvoxel exceed` do not
+        // false-positive; `prevoxel exceed` and `revoxel exceed` are rejected the same way. Same
+        // explicit context-slot phrases as `messages exceed`. Negatives: HTTP `voxels exceed` rate
+        // limits, per-chunk / grid-resolution caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "voxels exceed")
+            || contains_phrase_after_ident_boundary(&lower, "voxels exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "voxel exceed"))
             && explicit_context_slot_after_ident_boundary(&lower))
         // "message/input(s) … too long" (distinct from `prompt too long` already handled above).
         // Same context-slot guard as `messages exceed` (FEAT-D295) so incidental `model context`
@@ -3261,6 +3331,171 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "supervertex exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: faces exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: faces exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: face exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: face exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: faces exceed per-mesh polygon limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: faces exceeded daily geometry cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: face exceed max facet count on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microfaces exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metafaces exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subface exceed facet budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "surface exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: triangles exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: triangles exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: triangle exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: triangle exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: triangles exceed per-mesh primitive limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: triangles exceeded daily geometry cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: triangle exceed max strip count on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microtriangles exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metatriangles exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subtriangle exceed strip budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "supertriangle exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: polygons exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: polygons exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: polygon exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: polygon exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: polygons exceed per-layer ring limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: polygons exceeded daily geometry cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: polygon exceed max hole count on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: micropolygons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metapolygons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subpolygon exceed ring budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superpolygon exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: meshes exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: meshes exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: mesh exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: mesh exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: meshes exceed per-draw mesh limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: meshes exceeded daily geometry cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: mesh exceed max submesh count on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: micromeshes exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metameshes exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: submesh exceed LOD budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "supermesh exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: voxels exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: voxels exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: voxel exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: voxel exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: voxels exceed per-chunk grid limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: voxels exceeded daily volume cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: voxel exceed max brick count on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microvoxels exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metavoxels exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subvoxel exceed LOD budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "supervoxel exceed the model's context window on this request"
         ));
         assert!(is_context_overflow_error(
             "API: bytes exceed the model's context window on this request"
