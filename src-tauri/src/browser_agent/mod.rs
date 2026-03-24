@@ -1737,8 +1737,8 @@ fn parse_browser_keys_chord(arg: &str) -> Result<(Vec<ModifierKey>, String), Str
     }
     let n = parts.len();
     let mut mod_mask: u32 = 0;
-    for i in 0..n.saturating_sub(1) {
-        let bit = match parts[i].to_ascii_lowercase().as_str() {
+    for part in parts.iter().take(n.saturating_sub(1)) {
+        let bit = match part.to_ascii_lowercase().as_str() {
             "meta" => ModifierKey::Meta as u32,
             "ctrl" | "control" => ModifierKey::Ctrl as u32,
             "alt" => ModifierKey::Alt as u32,
