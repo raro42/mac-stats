@@ -265,6 +265,9 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// `inputs exceed` does not match inside `microinputs exceed` / `metainputs exceed`, and
 /// `input exceed` does not match inside `subinput exceed` (left-boundary rejects `preinput exceed`
 /// and `reinput exceed`);
+/// `contents exceed` does not match inside `microcontents exceed` / `metacontents exceed`, and
+/// `content exceed` does not match inside `subcontent exceed` (left-boundary rejects `precontent exceed`
+/// and `recontent exceed`);
 /// `outputs exceed` does not match inside `microoutputs exceed` / `metaoutputs exceed`, and
 /// `output exceed` does not match inside `suboutput exceed` (left-boundary rejects `preoutput exceed`
 /// and `reoutput exceed`);
@@ -273,6 +276,8 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// and `reresponse exceed`);
 /// `requests exceed` does not match inside `microrequests exceed` / `metarequests exceed`, and
 /// `request exceed` does not match inside `subrequest exceed` (left-boundary rejects `prerequest exceed`);
+/// `queries exceed` does not match inside `microqueries exceed` / `metaqueries exceed`, and
+/// `query exceed` does not match inside `subquery exceed` (left-boundary rejects `prequery exceed` and `requery exceed`);
 /// `records exceed` does not match inside `microrecords exceed` / `metarecords exceed`, and
 /// `record exceed` does not match inside `subrecord exceed` (left-boundary rejects `rerecord exceed`
 /// and `prerecord exceed`);
@@ -283,7 +288,15 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// nor when the preceding ident token is a compound ending in `total` (e.g. `micrototal prompt tokens exceed`);
 /// `input tokens exceed` does not match inside `subinput tokens exceed` / `preinput tokens exceed`;
 /// plural `tokens exceed` / `tokens exceeded` skip matches whose preceding token is `prompt`, `input`,
-/// or `total` (so `micrototal prompt tokens exceed` is not matched on the `tokens exceed` arm).
+/// or `total` (so `micrototal prompt tokens exceed` is not matched on the `tokens exceed` arm);
+/// `sequence length exceeds` does not match inside `subsequence length exceeds`;
+/// `exceeds maximum sequence length` does not match inside `microexceeds maximum sequence length`;
+/// `maximum sequence length exceeded` does not match inside `micromaximum sequence length exceeded`;
+/// `input sequence is too long` does not match inside `microinput sequence is too long`;
+/// `prompt length exceeds` does not match inside `microprompt length exceeds`;
+/// `prompt too long` / `prompt is too long` do not match inside `microprompt too long` / `microprompt is too long`;
+/// `prompt has more tokens than` does not match inside `microprompt has more tokens than`;
+/// `prompt exceeds the context` does not match inside `microprompt exceeds the context`.
 fn contains_phrase_after_ident_boundary(haystack: &str, phrase: &str) -> bool {
     fn ident_continue(c: char) -> bool {
         c.is_ascii_alphanumeric() || c == '_'
@@ -378,8 +391,8 @@ fn contains_tokens_exceed_subphrase_at_boundary(haystack: &str, phrase: &str) ->
 pub(crate) fn is_context_overflow_error(err: &str) -> bool {
     let lower = err.to_lowercase();
     lower.contains("context overflow")
-        || lower.contains("prompt too long")
-        || lower.contains("prompt is too long")
+        || contains_phrase_after_ident_boundary(&lower, "prompt too long")
+        || contains_phrase_after_ident_boundary(&lower, "prompt is too long")
         || lower.contains("context length exceeded")
         || lower.contains("maximum context length")
         || lower.contains("exceeds the model's context window")
@@ -423,7 +436,7 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
             && lower.contains("context"))
         || lower.contains("context size exceeded")
         || lower.contains("exceeded context size")
-        || lower.contains("prompt has more tokens than")
+        || contains_phrase_after_ident_boundary(&lower, "prompt has more tokens than")
         || lower.contains("exceeds available context")
         || lower.contains("context limit exceeded")
         || lower.contains("exceeds context length")
@@ -439,7 +452,7 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         || lower.contains("exceeds maximum context")
         || lower.contains("maximum context exceeded")
         || lower.contains("insufficient context")
-        || lower.contains("prompt exceeds the context")
+        || contains_phrase_after_ident_boundary(&lower, "prompt exceeds the context")
         || (lower.contains("greater than") && lower.contains("context"))
         || (contains_bounded_token(&lower, "n_ctx")
             && (lower.contains("exceed")
@@ -450,17 +463,17 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
                 || lower.contains("larger")
                 || lower.contains("greater")
                 || lower.contains("longer")))
-        || lower.contains("exceeds maximum sequence length")
-        || lower.contains("maximum sequence length exceeded")
-        || lower.contains("sequence length exceeds")
-        || lower.contains("input sequence is too long")
+        || contains_phrase_after_ident_boundary(&lower, "exceeds maximum sequence length")
+        || contains_phrase_after_ident_boundary(&lower, "maximum sequence length exceeded")
+        || contains_phrase_after_ident_boundary(&lower, "sequence length exceeds")
+        || contains_phrase_after_ident_boundary(&lower, "input sequence is too long")
         || (contains_phrase_after_ident_boundary(&lower, "total tokens exceed")
             && (lower.contains("context")
                 || lower.contains("model")
                 || lower.contains("maximum")
                 || lower.contains("sequence")
                 || lower.contains("n_ctx")))
-        || lower.contains("prompt length exceeds")
+        || contains_phrase_after_ident_boundary(&lower, "prompt length exceeds")
         || (lower.contains("too many tokens") && lower.contains("context"))
         || lower.contains("max context exceeded")
         || lower.contains("exceeds max context")
@@ -681,11 +694,16 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
                 || lower.contains("maximum context")
                 || lower.contains("available context")
                 || lower.contains("model's context")))
-        // Plural / singular "content(s) exceed(s/ed)" (FEAT-D303). Wording like
-        // `contents exceed the context window` does not substring-match `exceeds the context window`.
-        // `content exceed` covers singular `exceeds` / `exceeded` without matching `contents exceed`
-        // (the `s` after `content` breaks the substring). Same context-slot guard as `inputs exceed`.
-        || ((lower.contains("contents exceed") || lower.contains("content exceed"))
+        // Plural / singular "content(s) exceed(s/ed)" (FEAT-D303; ident-boundary FEAT-D379). Parallel
+        // to `inputs exceed` / `outputs exceed`. `content exceed` matches present/past via `exceed`
+        // prefix of `exceeds` / `exceeded` and does not substring-match plural `contents exceed` (the
+        // `s` after `content` breaks `content` + space + `exceed`). Ident-boundary so
+        // `microcontents exceed` / `metacontents exceed` / `subcontent exceed` do not false-positive;
+        // `precontent exceed` and `recontent exceed` are rejected the same way. Same context-slot
+        // guard as `inputs exceed`.
+        || ((contains_phrase_after_ident_boundary(&lower, "contents exceed")
+            || contains_phrase_after_ident_boundary(&lower, "contents exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "content exceed"))
             && (lower.contains("context window")
                 || lower.contains("context length")
                 || lower.contains("context limit")
@@ -744,13 +762,15 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
                 || lower.contains("maximum context")
                 || lower.contains("available context")
                 || lower.contains("model's context")))
-        // Plural / singular "quer(y/ies) exceed(s/ed)" (FEAT-D308). Parallel to `requests exceed` /
-        // `inputs exceed`. `query exceed` matches present/past via `exceed` prefix of `exceeds` /
-        // `exceeded` and does not substring-match plural `queries exceed` (no `query` + ` exceed`
-        // inside the word `queries`).
-        || ((lower.contains("queries exceed")
-            || lower.contains("queries exceeded")
-            || lower.contains("query exceed"))
+        // Plural / singular "quer(y/ies) exceed(s/ed)" (FEAT-D308; ident-boundary FEAT-D380). Parallel
+        // to `requests exceed` / `inputs exceed`. `query exceed` matches present/past via `exceed`
+        // prefix of `exceeds` / `exceeded` and does not substring-match plural `queries exceed` (no
+        // `query` + ` exceed` inside the word `queries`). Ident-boundary so `microqueries exceed` /
+        // `metaqueries exceed` / `subquery exceed` do not false-positive; `prequery exceed` and
+        // `requery exceed` are rejected the same way.
+        || ((contains_phrase_after_ident_boundary(&lower, "queries exceed")
+            || contains_phrase_after_ident_boundary(&lower, "queries exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "query exceed"))
             && (lower.contains("context window")
                 || lower.contains("context length")
                 || lower.contains("context limit")
@@ -2667,6 +2687,48 @@ mod tests {
             "storage: prerequest exceed the model's context window on this request"
         ));
         assert!(!is_context_overflow_error(
+            "config: microqueries exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaqueries exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "routing: subquery exceed header cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "storage: prequery exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "queue: requery exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "bioinfo: subsequence length exceeds alignment window (not llm context)"
+        ));
+        assert!(!is_context_overflow_error(
+            "kernel: microexceeds maximum sequence length in fused op (not context)"
+        ));
+        assert!(!is_context_overflow_error(
+            "lint: micromaximum sequence length exceeded in synthetic fixture"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: microinput sequence is too long for amino-acid field (pipeline limit)"
+        ));
+        assert!(!is_context_overflow_error(
+            "templating: microprompt length exceeds macro substitution depth (not context)"
+        ));
+        assert!(!is_context_overflow_error(
+            "forms: microprompt too long for field schema (pipeline limit)"
+        ));
+        assert!(!is_context_overflow_error(
+            "macros: microprompt is too long for expansion buffer (not llm)"
+        ));
+        assert!(!is_context_overflow_error(
+            "templates: microprompt has more tokens than the lexer allows (not model window)"
+        ));
+        assert!(!is_context_overflow_error(
+            "ui: microprompt exceeds the context menu width (layout)"
+        ));
+        assert!(!is_context_overflow_error(
             "config: micromessages exceed the model's context window on this request"
         ));
         assert!(!is_context_overflow_error(
@@ -2695,6 +2757,21 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "queue: reinput exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microcontents exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metacontents exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "routing: subcontent exceed header cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "storage: precontent exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "queue: recontent exceed the model's context window on this request"
         ));
         assert!(!is_context_overflow_error(
             "config: microoutputs exceed the model's context window on this request"
