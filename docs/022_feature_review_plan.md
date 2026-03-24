@@ -566,3 +566,39 @@ Open tasks for this plan are tracked in **006-feature-coder/FEATURE-CODER.md**.
 - [x] Runtime smoke: **no second `mac_stats` started** — `pgrep -fl mac_stats` showed existing `./target/release/mac_stats -vv` (**PID 41093**). Tail **`~/.mac-stats/debug.log`**: **4 monitors** UP/saved, scheduler **2** entries, Discord/session/task idle noise — consistent with healthy long-running instance. **Restart** mac-stats to load this commit’s **`content_reduction.rs`** into the running binary.
 - [x] Code review (`content_reduction.rs`): five new `||` groups **FEAT-D414** (`leptons` / `lepton exceed`) through **FEAT-D418** (`excitons` / `exciton exceed`), each **`contains_phrase_after_ident_boundary`** + **`explicit_context_slot_after_ident_boundary`** (same FEAT-D295 explicit context-slot list as prior particle rows). Rustdoc comments parallel prior rows. Positives: API/batch/validation/gateway with model-context phrasing. Negatives: HTTP/billing/schema without slot, **`micro*`**/**`meta*`**/**`sub*`** compounds, **`superlepton`** … **`superexciton exceed`**.
 - [x] Docs alignment: **`005-openclaw-reviewer/005-openclaw-reviewer.md`** independent re-run **2026-03-24T22:45:25Z** (OpenClaw `HEAD` **d25b4a2**, doc-only; **Prior** line preserves **22:16:48Z** stamp).
+
+### Feature coder 2026-03-25 (`006-feature-coder/FEATURE-CODER.md` — FEAT-D419)
+
+- [x] **`is_context_overflow_error`** — **`polarons exceed`** / **`polarons exceeded`** / **`polaron exceed`** + **`explicit_context_slot_after_ident_boundary`** (FEAT-D295 slot list); rustdoc + **`does_not_match_unrelated_errors`** positives/negatives in **`content_reduction.rs`**.
+- [x] **`CHANGELOG.md`** **[0.1.58]** **Changed** bullet **FEAT-D419**; **Agent workflow docs** line **FEAT-D389–D419**; **`006-feature-coder/FEATURE-CODER.md`** **Recently closed** head row **FEAT-D419**, **When empty** **FEAT-D420+**.
+
+### Feature coder 2026-03-25 (`006-feature-coder/FEATURE-CODER.md` — FEAT-D420)
+
+- [x] **`is_context_overflow_error`** — **`plasmons exceed`** / **`plasmons exceeded`** / **`plasmon exceed`** + **`explicit_context_slot_after_ident_boundary`** (FEAT-D295 slot list); rustdoc + **`does_not_match_unrelated_errors`** positives/negatives in **`content_reduction.rs`**.
+- [x] **`CHANGELOG.md`** **[0.1.58]** **Changed** bullet **FEAT-D420**; **Agent workflow docs** line **FEAT-D389–D420**; **`006-feature-coder/FEATURE-CODER.md`** **Recently closed** head row **FEAT-D420**, **When empty** **FEAT-D421+**.
+
+### Feature coder 2026-03-25 (`006-feature-coder/FEATURE-CODER.md` — FEAT-D421)
+
+- [x] **`is_context_overflow_error`** — **`solitons exceed`** / **`solitons exceeded`** / **`soliton exceed`** + **`explicit_context_slot_after_ident_boundary`** (FEAT-D295 slot list); rustdoc + **`does_not_match_unrelated_errors`** positives/negatives in **`content_reduction.rs`**.
+- [x] **`CHANGELOG.md`** **[0.1.58]** **Added** bullet **FEAT-D421**; **Agent workflow docs** line **FEAT-D389–D421**; **`006-feature-coder/FEATURE-CODER.md`** **Recently closed** head row **FEAT-D421**, **When empty** **FEAT-D422+**.
+
+### Feature coder 2026-03-25 (`006-feature-coder/FEATURE-CODER.md` — FEAT-D422)
+
+- [x] **`is_context_overflow_error`** — **`instantons exceed`** / **`instantons exceeded`** / **`instanton exceed`** + **`explicit_context_slot_after_ident_boundary`** (FEAT-D295 slot list); rustdoc + **`does_not_match_unrelated_errors`** positives/negatives in **`content_reduction.rs`**.
+- [x] **`CHANGELOG.md`** **[0.1.58]** **Added** bullet **FEAT-D422**; **Agent workflow docs** line **FEAT-D389–D422**; **`006-feature-coder/FEATURE-CODER.md`** **Recently closed** head row **FEAT-D422**, **When empty** **FEAT-D423+**.
+
+### Feature coder 2026-03-25 (`006-feature-coder/FEATURE-CODER.md` — FEAT-D423)
+
+- [x] **`is_context_overflow_error`** — **`skyrmions exceed`** / **`skyrmions exceeded`** / **`skyrmion exceed`** + **`explicit_context_slot_after_ident_boundary`** (FEAT-D295 slot list); rustdoc + **`does_not_match_unrelated_errors`** positives/negatives in **`content_reduction.rs`**.
+- [x] **`CHANGELOG.md`** **[0.1.58]** **Added** bullet **FEAT-D423**; **Agent workflow docs** line **FEAT-D389–D423**; **`006-feature-coder/FEATURE-CODER.md`** **Recently closed** head row **FEAT-D423**, **When empty** **FEAT-D424+**.
+
+### Closing reviewer smoke test 2026-03-25 (`004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md` — FEAT-D419–D423)
+
+- [x] Entry: **`004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md`** — §9 integration checklist; bar matched latest prior block: `cargo check`, `cargo clippy --all-targets -- -D warnings`, `cargo test`, `cargo build --release`; **`git diff`** reconciled with **`CHANGELOG.md`** **[0.1.58]** (**Changed** **FEAT-D419–D420**, **Added** **FEAT-D421–D423**), **`006-feature-coder/FEATURE-CODER.md`** (**Recently closed** through **FEAT-D423**, **When empty** **FEAT-D424+**), **`005-openclaw-reviewer/005-openclaw-reviewer.md`** (independent re-run **2026-03-24T23:11:50Z**, OpenClaw `HEAD` **d25b4a2**, doc-only). **Doc fix:** **`docs/022_feature_review_plan.md`** — inserted missing **FEAT-D421** feature-coder subsection and ordered **D422** before **D423**. No **`pkill -f mac_stats`** (**AGENTS.md** uptime rule).
+- [x] `cargo check` — zero errors.
+- [x] `cargo clippy --all-targets -- -D warnings` — zero warnings.
+- [x] `cargo test` — **685** tests pass (`mac_stats` lib); **1** test ignored in a separate target. New overflow work extends existing **`does_not_match_unrelated_errors`** / positive cases only — **no new `#[test]` functions**, count unchanged vs. prior closing block.
+- [x] `cargo build --release` succeeds (**v0.1.58**).
+- [x] Runtime smoke: **no second `mac_stats` started** — `pgrep -fl mac_stats` showed existing `./target/release/mac_stats -vv` (**PID 41093**). Tail **`~/.mac-stats/debug.log`**: **4 monitors** UP/saved. **Restart** mac-stats to load uncommitted **`content_reduction.rs`** into the long-running binary.
+- [x] Code review (`content_reduction.rs`): five new `||` groups **FEAT-D419** (`polarons` / `polaron exceed`) through **FEAT-D423** (`skyrmions` / `skyrmion exceed`), each **`contains_phrase_after_ident_boundary`** + **`explicit_context_slot_after_ident_boundary`**; module rustdoc extended; negatives **`superpolaron`** … **`superskyrmion exceed`** in **`does_not_match_unrelated_errors`**. User-facing overflow sanitization unchanged in intent.
+- [x] **`005-openclaw-reviewer/005-openclaw-reviewer.md`** — **Latest verification** date **2026-03-25**; **Prior** line preserves **2026-03-24T22:45:25Z** stamp.

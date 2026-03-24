@@ -337,6 +337,21 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// `excitons exceed` does not match inside `microexcitons exceed` / `metaexcitons exceed`, and
 /// `exciton exceed` does not match inside `subexciton exceed` (left-boundary rejects
 /// `preexciton exceed` and `reexciton exceed`);
+/// `polarons exceed` does not match inside `micropolarons exceed` / `metapolarons exceed`, and
+/// `polaron exceed` does not match inside `subpolaron exceed` (left-boundary rejects
+/// `prepolaron exceed` and `repolaron exceed`);
+/// `plasmons exceed` does not match inside `microplasmons exceed` / `metaplasmons exceed`, and
+/// `plasmon exceed` does not match inside `subplasmon exceed` (left-boundary rejects
+/// `preplasmon exceed` and `replasmon exceed`);
+/// `solitons exceed` does not match inside `microsolitons exceed` / `metasolitons exceed`, and
+/// `soliton exceed` does not match inside `subsoliton exceed` (left-boundary rejects
+/// `presoliton exceed` and `resoliton exceed`);
+/// `instantons exceed` does not match inside `microinstantons exceed` / `metainstantons exceed`, and
+/// `instanton exceed` does not match inside `subinstanton exceed` (left-boundary rejects
+/// `preinstanton exceed` and `reinstanton exceed`);
+/// `skyrmions exceed` does not match inside `microskyrmions exceed` / `metaskyrmions exceed`, and
+/// `skyrmion exceed` does not match inside `subskyrmion exceed` (left-boundary rejects
+/// `preskyrmion exceed` and `reskyrmion exceed`);
 /// `messages exceed` does not match inside `micromessages exceed` / `metamessages exceed`, and
 /// `message exceed` does not match inside `submessage exceed` (left-boundary rejects `premessage exceed`
 /// and `remessage exceed`);
@@ -1698,6 +1713,61 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         || ((contains_phrase_after_ident_boundary(&lower, "excitons exceed")
             || contains_phrase_after_ident_boundary(&lower, "excitons exceeded")
             || contains_phrase_after_ident_boundary(&lower, "exciton exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "polaron(s) exceed(s/ed)" (FEAT-D419). Parallel to `excitons exceed` /
+        // `exciton exceed`. `polaron exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `polarons exceed` (the `s` after `polaron`).
+        // Ident-boundary so `micropolarons exceed` / `metapolarons exceed` / `subpolaron exceed` do not
+        // false-positive; `prepolaron exceed` and `repolaron exceed` are rejected the same way. Same
+        // explicit context-slot phrases as `messages exceed`. Negatives: HTTP `polarons exceed` rate
+        // limits, per-lattice / deformation caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "polarons exceed")
+            || contains_phrase_after_ident_boundary(&lower, "polarons exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "polaron exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "plasmon(s) exceed(s/ed)" (FEAT-D420). Parallel to `polarons exceed` /
+        // `polaron exceed`. `plasmon exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `plasmons exceed` (the `s` after `plasmon`).
+        // Ident-boundary so `microplasmons exceed` / `metaplasmons exceed` / `subplasmon exceed` do not
+        // false-positive; `preplasmon exceed` and `replasmon exceed` are rejected the same way. Same
+        // explicit context-slot phrases as `messages exceed`. Negatives: HTTP `plasmons exceed` rate
+        // limits, per-mode / near-field caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "plasmons exceed")
+            || contains_phrase_after_ident_boundary(&lower, "plasmons exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "plasmon exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "soliton(s) exceed(s/ed)" (FEAT-D421). Parallel to `plasmons exceed` /
+        // `plasmon exceed`. `soliton exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `solitons exceed` (the `s` after `soliton`).
+        // Ident-boundary so `microsolitons exceed` / `metasolitons exceed` / `subsoliton exceed` do not
+        // false-positive; `presoliton exceed` and `resoliton exceed` are rejected the same way. Same
+        // explicit context-slot phrases as `messages exceed`. Negatives: HTTP `solitons exceed` rate
+        // limits, per-pulse / nonlinear-mode caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "solitons exceed")
+            || contains_phrase_after_ident_boundary(&lower, "solitons exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "soliton exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "instanton(s) exceed(s/ed)" (FEAT-D422). Parallel to `solitons exceed` /
+        // `soliton exceed`. `instanton exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `instantons exceed` (the `s` after `instanton`).
+        // Ident-boundary so `microinstantons exceed` / `metainstantons exceed` / `subinstanton exceed` do not
+        // false-positive; `preinstanton exceed` and `reinstanton exceed` are rejected the same way. Same
+        // explicit context-slot phrases as `messages exceed`. Negatives: HTTP `instantons exceed` rate
+        // limits, per-sector / gauge-orbit caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "instantons exceed")
+            || contains_phrase_after_ident_boundary(&lower, "instantons exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "instanton exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "skyrmion(s) exceed(s/ed)" (FEAT-D423). Parallel to `instantons exceed` /
+        // `instanton exceed`. `skyrmion exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `skyrmions exceed` (the `s` after `skyrmion`).
+        // Ident-boundary so `microskyrmions exceed` / `metaskyrmions exceed` / `subskyrmion exceed` do not
+        // false-positive; `preskyrmion exceed` and `reskyrmion exceed` are rejected the same way. Same
+        // explicit context-slot phrases as `messages exceed`. Negatives: HTTP `skyrmions exceed` rate
+        // limits, per-track / topological-charge caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "skyrmions exceed")
+            || contains_phrase_after_ident_boundary(&lower, "skyrmions exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "skyrmion exceed"))
             && explicit_context_slot_after_ident_boundary(&lower))
         // "message/input(s) … too long" (distinct from `prompt too long` already handled above).
         // Same context-slot guard as `messages exceed` (FEAT-D295) so incidental `model context`
@@ -4205,6 +4275,171 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "superexciton exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: polarons exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: polarons exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: polaron exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: polaron exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: polarons exceed per-target rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: polarons exceeded daily lattice-deformation cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: polaron exceed max coupling budget on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: micropolarons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metapolarons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subpolaron exceed deformation budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superpolaron exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: plasmons exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: plasmons exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: plasmon exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: plasmon exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: plasmons exceed per-target rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: plasmons exceeded daily near-field mode cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: plasmon exceed max dispersion budget on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microplasmons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaplasmons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subplasmon exceed coupling budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superplasmon exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: solitons exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: solitons exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: soliton exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: soliton exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: solitons exceed per-target rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: solitons exceeded daily nonlinear-mode cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: soliton exceed max pulse budget on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microsolitons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metasolitons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subsoliton exceed dispersion budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "supersoliton exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: instantons exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: instantons exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: instanton exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: instanton exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: instantons exceed per-target rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: instantons exceeded daily gauge-orbit cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: instanton exceed max tunneling budget on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microinstantons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metainstantons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subinstanton exceed sector budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superinstanton exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: skyrmions exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: skyrmions exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: skyrmion exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: skyrmion exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: skyrmions exceed per-target rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: skyrmions exceeded daily track cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: skyrmion exceed max topological-charge budget on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microskyrmions exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaskyrmions exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subskyrmion exceed winding budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superskyrmion exceed the model's context window on this request"
         ));
         assert!(is_context_overflow_error(
             "API: bytes exceed the model's context window on this request"
