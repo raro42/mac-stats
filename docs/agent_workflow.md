@@ -36,8 +36,11 @@ Ollama invokes tools by replying with **exactly one line** in the form `TOOL_NAM
 | **BROWSER_SCREENSHOT** | `BROWSER_SCREENSHOT: current` | Screenshot of current page only. Navigate first with BROWSER_NAVIGATE. | `browser_agent/`; PNG saved to `~/.mac-stats/screenshots/`. |
 | **BROWSER_NAVIGATE** | `BROWSER_NAVIGATE: <url>` | Open URL; returns page state with numbered elements. | CDP or HTTP fallback; optional `new_tab` for new tab. |
 | **BROWSER_GO_BACK** | `BROWSER_GO_BACK` | Go back one step in tab history. | `browser_agent/`. |
+| **BROWSER_GO_FORWARD** | `BROWSER_GO_FORWARD` | Go forward one step in tab history (same focused tab). | `browser_agent/`. |
+| **BROWSER_RELOAD** | `BROWSER_RELOAD` or `BROWSER_RELOAD: hard` | Reload current page; optional `nocache` / `hard` for cache bypass. | `browser_agent/` (CDP `Page.reload`). |
 | **BROWSER_CLICK** | `BROWSER_CLICK: <index>` | Click element at 1-based index from Elements list. | `browser_agent/`. |
 | **BROWSER_INPUT** | `BROWSER_INPUT: <index> <text>` | Type text into element at index. | `browser_agent/`. |
+| **BROWSER_KEYS** | `BROWSER_KEYS: <chord>` | Allowlisted keyboard chord to the focused page (CDP only); e.g. `Escape`, `Meta+f`. | `browser_agent/`. |
 | **BROWSER_SCROLL** | `BROWSER_SCROLL: <direction>` | Scroll (down, up, bottom, top, or pixels). | `browser_agent/`. |
 | **BROWSER_EXTRACT** | `BROWSER_EXTRACT` | Return full visible text of current page. | `browser_agent/`. |
 | **BROWSER_SEARCH_PAGE** | `BROWSER_SEARCH_PAGE: <pattern>` | Search page text for pattern (grep-like). | `browser_agent/`. |

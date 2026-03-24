@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.58] - 2026-03-24
+
+### Added
+- **Browser tools: forward, reload, and keyboard chords** — **`BROWSER_GO_FORWARD`** (one history step forward in the focused tab, same semantics as **`BROWSER_GO_BACK`**), **`BROWSER_RELOAD`** (CDP `Page.reload`; optional **`nocache`** / **`hard`** / **`bypass`** for cache-bypass), and **`BROWSER_KEYS`** (allowlisted CDP key chords to the **page** only via `Input.dispatchKeyEvent`; **`+`**-joined modifiers + key, e.g. `Meta+f`, `Escape`; no HTTP fallback). Wired through `browser_tool_dispatch`, `tool_loop` (sequence-terminating for navigate/back/forward/reload like existing navigation tools), `tool_parsing`, and agent prompts. (`browser_agent/mod.rs`, `commands/browser_tool_dispatch.rs`, `tool_loop.rs`, `tool_parsing.rs`, `agent_descriptions.rs`, `config/mod.rs`; `docs/029_browser_automation.md`, `docs/agent_workflow.md`.)
+
+### Changed
+- **Browser agent (CDP)** — When Chrome is connected but has **no open page tabs**, the agent creates one **`about:blank`** tab, brings it forward, updates the focused tab index, and registers the dialog auto-dismiss hook so **BROWSER_NAVIGATE** / **BROWSER_CLICK** / etc. recover without a manual tab. Failure logs at **warn** and returns a clear error. (`browser_agent/mod.rs`, `docs/029_browser_automation.md`.)
+- **Browser agent (CDP)** — **`/json/version`** discovery uses short per-request HTTP timeouts with **retries** so a flaky probe does not immediately fall through to launching Chrome; after WebSocket connect, **polls until tab listing succeeds** with at least one tab (bounded wait) before treating the session as ready. Session reuse skips the readiness poll; docs describe default **5-minute** CDP idle timeout (`browserIdleTimeoutSecs`). (`browser_agent/mod.rs`, `docs/029_browser_automation.md`.)
+- **Ollama errors** — `is_context_overflow_error` recognizes plural **`probabilities exceed`** / **`probabilities exceeded`** and singular **`probability exceed`** (present/past via the same **`exceed`** prefix as **`logit exceed`**) when paired with the same explicit context-slot phrases as **`messages exceed`** / **`logits exceed`**, with ASCII alnum/`_` left-boundary guards (FEAT-D373). (`commands/content_reduction.rs`.)
+- **Agent workflow docs** — OpenClaw reviewer re-run timestamp (`005-openclaw-reviewer/005-openclaw-reviewer.md`); FEATURE-CODER backlog and “When empty” through FEAT-D373 (`006-feature-coder/FEATURE-CODER.md`).
+
 ## [0.1.55] - 2026-03-22
 
 ### Added

@@ -12,8 +12,12 @@ pub(crate) const TOOL_LINE_PREFIXES: &[&str] = &[
     "BRAVE_SEARCH:",
     "BROWSER_SCREENSHOT:",
     "BROWSER_NAVIGATE:",
+    "BROWSER_GO_BACK:",
+    "BROWSER_GO_FORWARD:",
+    "BROWSER_RELOAD:",
     "BROWSER_CLICK:",
     "BROWSER_INPUT:",
+    "BROWSER_KEYS:",
     "BROWSER_SCROLL:",
     "BROWSER_EXTRACT:",
     "BROWSER_SEARCH_PAGE:",
@@ -43,7 +47,7 @@ pub(crate) const TOOL_LINE_PREFIXES: &[&str] = &[
     "DONE:",
 ];
 
-/// Max browser tools (NAVIGATE, CLICK, INPUT, SCROLL, EXTRACT, SEARCH_PAGE, SCREENSHOT) per run.
+/// Max browser tools (NAVIGATE, GO_BACK, GO_FORWARD, RELOAD, CLICK, INPUT, KEYS, SCROLL, EXTRACT, SEARCH_PAGE, SCREENSHOT) per run.
 pub(crate) const MAX_BROWSER_TOOLS_PER_RUN: u32 = 15;
 
 /// Max tool invocations parsed from a single model response.
@@ -93,8 +97,11 @@ pub(crate) fn parse_one_tool_at_line(
         "BROWSER_SCREENSHOT:",
         "BROWSER_NAVIGATE:",
         "BROWSER_GO_BACK:",
+        "BROWSER_GO_FORWARD:",
+        "BROWSER_RELOAD:",
         "BROWSER_CLICK:",
         "BROWSER_INPUT:",
+        "BROWSER_KEYS:",
         "BROWSER_SCROLL:",
         "BROWSER_EXTRACT:",
         "BROWSER_SEARCH_PAGE:",
@@ -147,6 +154,15 @@ pub(crate) fn parse_one_tool_at_line(
             line_index + 1,
         ));
     }
+    if line.eq_ignore_ascii_case("BROWSER_GO_FORWARD") {
+        return Some((
+            ("BROWSER_GO_FORWARD".to_string(), String::new()),
+            line_index + 1,
+        ));
+    }
+    if line.eq_ignore_ascii_case("BROWSER_RELOAD") {
+        return Some((("BROWSER_RELOAD".to_string(), String::new()), line_index + 1));
+    }
     if line.eq_ignore_ascii_case("BROWSER_SCREENSHOT") {
         return Some((
             ("BROWSER_SCREENSHOT".to_string(), "current".to_string()),
@@ -194,6 +210,9 @@ pub(crate) fn parse_one_tool_at_line(
                 && prefix != "LIST_SCHEDULES:"
                 && prefix != "BROWSER_EXTRACT:"
                 && prefix != "BROWSER_SCREENSHOT:"
+                && prefix != "BROWSER_GO_BACK:"
+                && prefix != "BROWSER_GO_FORWARD:"
+                && prefix != "BROWSER_RELOAD:"
                 && prefix != "DONE:"
             {
                 continue;
@@ -258,6 +277,9 @@ pub(crate) fn parse_one_tool_at_line(
                 || tool_name == "LIST_SCHEDULES"
                 || tool_name == "BROWSER_EXTRACT"
                 || tool_name == "BROWSER_SCREENSHOT"
+                || tool_name == "BROWSER_GO_BACK"
+                || tool_name == "BROWSER_GO_FORWARD"
+                || tool_name == "BROWSER_RELOAD"
                 || (tool_name == "TASK_SLEEP" && !arg.is_empty())
             {
                 return Some(((tool_name, arg), next_line));
@@ -297,7 +319,7 @@ pub(crate) fn normalize_inline_tool_sequences(content: &str) -> String {
     static INLINE_TOOL_CHAIN_RE: OnceLock<regex::Regex> = OnceLock::new();
     let re = INLINE_TOOL_CHAIN_RE.get_or_init(|| {
         regex::Regex::new(
-            r"(?i)(?:\b(?:then|and then|and|after that|afterward|afterwards|next|finally)\b|;|->)\s+(FETCH_URL|BRAVE_SEARCH|BROWSER_SCREENSHOT|BROWSER_NAVIGATE|BROWSER_GO_BACK|BROWSER_CLICK|BROWSER_INPUT|BROWSER_SCROLL|BROWSER_EXTRACT|BROWSER_SEARCH_PAGE|PERPLEXITY_SEARCH|RUN_JS|SKILL|AGENT|RUN_CMD|SCHEDULE|SCHEDULER|REMOVE_SCHEDULE|LIST_SCHEDULES|TASK_LIST|TASK_SHOW|TASK_APPEND|TASK_STATUS|TASK_CREATE|TASK_ASSIGN|TASK_SLEEP|OLLAMA_API|MCP|PYTHON_SCRIPT|DISCORD_API|CURSOR_AGENT|REDMINE_API|MEMORY_APPEND|MASTODON_POST|DONE)(?::)?\s+",
+            r"(?i)(?:\b(?:then|and then|and|after that|afterward|afterwards|next|finally)\b|;|->)\s+(FETCH_URL|BRAVE_SEARCH|BROWSER_SCREENSHOT|BROWSER_NAVIGATE|BROWSER_GO_BACK|BROWSER_GO_FORWARD|BROWSER_RELOAD|BROWSER_CLICK|BROWSER_INPUT|BROWSER_KEYS|BROWSER_SCROLL|BROWSER_EXTRACT|BROWSER_SEARCH_PAGE|PERPLEXITY_SEARCH|RUN_JS|SKILL|AGENT|RUN_CMD|SCHEDULE|SCHEDULER|REMOVE_SCHEDULE|LIST_SCHEDULES|TASK_LIST|TASK_SHOW|TASK_APPEND|TASK_STATUS|TASK_CREATE|TASK_ASSIGN|TASK_SLEEP|OLLAMA_API|MCP|PYTHON_SCRIPT|DISCORD_API|CURSOR_AGENT|REDMINE_API|MEMORY_APPEND|MASTODON_POST|DONE)(?::)?\s+",
         )
         .expect("inline tool chain regex must compile")
     });
@@ -321,10 +343,17 @@ pub(crate) fn normalize_browser_tool_arg(tool: &str, arg: &str) -> String {
         "BROWSER_NAVIGATE" => a.to_lowercase(),
         "BROWSER_CLICK" => a.split_whitespace().next().unwrap_or(a).to_string(),
         "BROWSER_INPUT" => a.split_whitespace().next().unwrap_or(a).to_string(),
+        "BROWSER_KEYS" => a.to_ascii_lowercase(),
         "BROWSER_SCROLL" => a.to_lowercase(),
         "BROWSER_EXTRACT" => "extract".to_string(),
         "BROWSER_SEARCH_PAGE" => a.to_lowercase(),
         "BROWSER_SCREENSHOT" => a.to_lowercase(),
+        "BROWSER_GO_BACK" | "BROWSER_GO_FORWARD" => String::new(),
+        "BROWSER_RELOAD" => a
+            .split_whitespace()
+            .next()
+            .unwrap_or("")
+            .to_ascii_lowercase(),
         _ => a.to_string(),
     }
 }

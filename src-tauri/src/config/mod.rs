@@ -625,7 +625,7 @@ impl Config {
         DEFAULT
     }
 
-    /// Maximum navigation wait timeout in seconds for BROWSER_NAVIGATE and BROWSER_GO_BACK. Slow or stuck navigations fail with a clear message instead of hanging. Config: config.json `browserNavigationTimeoutSecs`. Env: `MAC_STATS_BROWSER_NAVIGATION_TIMEOUT_SECS`. Default 30, clamped to 5..=120.
+    /// Maximum navigation wait timeout in seconds for BROWSER_NAVIGATE, BROWSER_GO_BACK, BROWSER_GO_FORWARD, and BROWSER_RELOAD. Slow or stuck navigations fail with a clear message instead of hanging. Config: config.json `browserNavigationTimeoutSecs`. Env: `MAC_STATS_BROWSER_NAVIGATION_TIMEOUT_SECS`. Default 30, clamped to 5..=120.
     pub fn browser_navigation_timeout_secs() -> u64 {
         const DEFAULT: u64 = 30;
         const MIN: u64 = 5;

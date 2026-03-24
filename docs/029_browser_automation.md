@@ -79,23 +79,26 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 When you invoke a BROWSER_* tool (e.g. BROWSER_NAVIGATE, BROWSER_SCREENSHOT), the app does the following:
 
 1. **Session lookup**  
-   mac-stats keeps a single cached CDP (Chrome DevTools Protocol) session. If a session already exists and was used recently (within the idle timeout, default 1 hour), that connection is reused and the tool runs immediately.
+   mac-stats keeps a single cached CDP (Chrome DevTools Protocol) session. If a session already exists and was used recently (within the idle timeout, default 5 minutes), that connection is reused and the tool runs immediately. **No** post-connect readiness poll runs on reuse.
 
 2. **No session or session expired**  
    The app needs a live Chrome to talk to:
-   - **Port check:** It requests `http://127.0.0.1:9222/json/version` to see if Chrome is already running with remote debugging. If that succeeds, it reads the WebSocket URL from the response and connects to that Chrome (your manually started one or an existing mac-stats-launched one).
-   - **Connect:** It opens a CDP connection over WebSocket. That connection is then cached as the "session" for subsequent BROWSER_* calls.
+   - **Port check:** It requests `http://127.0.0.1:9222/json/version` (short per-request timeout) up to a few times with brief pauses between attempts, so a single flaky failure does not immediately trigger a new Chrome launch while Chrome is still starting or right after a restart. If a probe succeeds, it reads the WebSocket URL and connects. Logs `CDP discovery succeeded on retry` when a later attempt succeeds after an initial miss (visible in `-vv` logs).
+   - **Connect:** It opens a CDP connection over WebSocket, then **polls** (up to ~8 seconds, ~200 ms between tries) until listing tabs succeeds with at least one tab—so a successful handshake alone is not treated as “browser ready” (mirrors attach timing on macOS user Chrome). Failed probes log at **debug** (`browser/cdp`, attach readiness). If the deadline passes, the connection is dropped and the tool returns a clear error (approve any Chrome debugging prompt, keep Chrome open, retry). Only then is the session cached for subsequent BROWSER_* calls.
 
 3. **Nothing on port 9222**  
-   If nothing is listening on 9222:
+   If discovery gives up (no response after the bounded retries):
    - **Visible Chrome (default):** mac-stats starts Chrome with `--remote-debugging-port=9222`, waits about 3 seconds for it to be ready, then connects. No manual step needed if Chrome is installed in the default location.
    - **Headless:** If the run is configured for headless mode, mac-stats uses the headless_chrome crate to launch a separate Chrome process (no port 9222). That session is still cached the same way.
 
 4. **Session cleared on error**  
    If a CDP call fails with a connection error (e.g. Chrome closed, network error), mac-stats clears the cached session. The next BROWSER_* use goes back to step 1 and will either reconnect to 9222 or relaunch Chrome (or headless) as needed.
 
+4b. **No open tabs after connect**  
+   If CDP is connected but Chrome has **zero** page tabs (e.g. every tab was closed), the browser agent creates a single **`about:blank`** tab via CDP, brings it to the front, and continues—so **BROWSER_NAVIGATE**, **BROWSER_CLICK**, and similar tools do not fail with “no tab” until the user can open a tab manually. This does **not** bypass SSRF or navigation policy: only the internal blank page is created automatically; navigations to real URLs still go through the same validation as today. If automatic tab creation fails, the tool returns a clear error (logged at **warn** under `browser/cdp`).
+
 5. **Idle timeout**  
-   If no BROWSER_* tool is used for longer than the configured idle timeout (default 1 hour), the session is dropped. The next use follows steps 2–3 again.
+   If no BROWSER_* tool is used for longer than the configured idle timeout (default 5 minutes), the session is dropped. The next use follows steps 2–3 again.
 
 So: **first use** or **after an error/timeout** → check 9222 → connect or launch → cache session. **Later uses** → reuse cached session until idle too long or an error occurs.
 
@@ -103,11 +106,20 @@ So: **first use** or **after an error/timeout** → check 9222 → connect or la
 When the user asks to remove or dismiss a cookie consent banner and take a screenshot, the planning prompt instructs the model to include **BROWSER_CLICK** on the consent button (using the Elements list from BROWSER_NAVIGATE) **before** BROWSER_SCREENSHOT. Pre-routing to NAVIGATE + SCREENSHOT is skipped when the question mentions cookie/consent/banner so the planner can add the click step.
 
 ### Navigation timeout, new tab, and go back
-- **Navigation timeout:** Maximum wait for BROWSER_NAVIGATE (and BROWSER_GO_BACK) is configurable: `config.json` key `browserNavigationTimeoutSecs` (default 30, range 5–120) or env `MAC_STATS_BROWSER_NAVIGATION_TIMEOUT_SECS`. Slow or stuck navigations fail with a clear message (e.g. "Navigation failed: timeout after 30s") instead of hanging.
-- **Same-domain shorter timeout (optional):** When the navigation target is on the same domain as the current page (e.g. in-site link or SPA transition), a shorter wait can be used so in-site navigations don’t wait the full timeout. Set `config.json` key `browserSameDomainNavigationTimeoutSecs` (e.g. 5) or env `MAC_STATS_BROWSER_SAME_DOMAIN_NAVIGATION_TIMEOUT_SECS`. When set, same-domain navigations use this value for the post-navigate wait; cross-domain and BROWSER_GO_BACK still use `browserNavigationTimeoutSecs`. When not set, all navigations use the single navigation timeout. Debug log line "same-domain navigation, using Ns timeout" confirms when the shorter timeout is applied.
+- **Navigation timeout:** Maximum wait for BROWSER_NAVIGATE, BROWSER_GO_BACK, BROWSER_GO_FORWARD, and BROWSER_RELOAD is configurable: `config.json` key `browserNavigationTimeoutSecs` (default 30, range 5–120) or env `MAC_STATS_BROWSER_NAVIGATION_TIMEOUT_SECS`. Slow or stuck navigations fail with a clear message (e.g. "Navigation failed: timeout after 30s") instead of hanging.
+- **Same-domain shorter timeout (optional):** When the navigation target is on the same domain as the current page (e.g. in-site link or SPA transition), a shorter wait can be used so in-site navigations don’t wait the full timeout. Set `config.json` key `browserSameDomainNavigationTimeoutSecs` (e.g. 5) or env `MAC_STATS_BROWSER_SAME_DOMAIN_NAVIGATION_TIMEOUT_SECS`. When set, same-domain navigations use this value for the post-navigate wait; cross-domain, BROWSER_GO_BACK, BROWSER_GO_FORWARD, and BROWSER_RELOAD still use `browserNavigationTimeoutSecs`. When not set, all navigations use the single navigation timeout. Debug log line "same-domain navigation, using Ns timeout" confirms when the shorter timeout is applied.
 - **New tab:** Add `new_tab` after the URL (e.g. `BROWSER_NAVIGATE: https://example.com new_tab`) to open the URL in a new tab and switch focus to it; subsequent BROWSER_CLICK / BROWSER_SCREENSHOT apply to that tab.
 - **Screenshot with URL:** `BROWSER_SCREENSHOT: https://…` navigates and captures the **focused** tab (the same internal tab index as `BROWSER_NAVIGATE` and `new_tab`), not the first tab in the Chrome window.
 - **BROWSER_GO_BACK:** Use `BROWSER_GO_BACK` (no argument) to go back one step in the current tab's history and get the new page state. Use when returning to the previous page without re-entering the URL.
+- **BROWSER_GO_FORWARD:** Use `BROWSER_GO_FORWARD` (no argument) to go forward one step in the **same** tab’s history (after `BROWSER_GO_BACK`). No new URL; operates on the focused tab only.
+- **BROWSER_RELOAD:** Use `BROWSER_RELOAD` (no argument) for a normal refresh of the current page, or `BROWSER_RELOAD: nocache` / `BROWSER_RELOAD: hard` for cache-bypass (Shift+reload style). No new URL is supplied—SSRF allowlist is unchanged; the session must already be on a real page.
+
+### BROWSER_KEYS (keyboard chords, CDP only)
+- **Purpose:** Send **allowlisted** key chords to the **web page** (in-page find, Escape to close dialogs, F5 reload, etc.). This is **not** for Chrome’s own menu bar or UI outside the page.
+- **Format:** `BROWSER_KEYS: <chord>` where `<chord>` uses **`+` between tokens with no spaces**, modifiers first: `Meta`, `Ctrl` (or `Control`), `Alt`, `Shift`, then the key.
+- **Allowlisted keys:** `Enter`, `Escape` (or `Esc`), `Tab`, `Backspace`, `F5`, or a **single letter `a`–`z`** only when **at least one** modifier is present (e.g. `Meta+f` / `Ctrl+f` for in-page find).
+- **Implementation:** CDP `Input.dispatchKeyEvent` via **headless_chrome** (`Tab::press_key_with_modifiers`). **No HTTP fallback** — if Chrome/CDP is unavailable, the tool fails with guidance to use CDP.
+- **After dispatch:** Returns the same **Current page** / **Elements** snapshot as other browser tools so the Ollama loop stays grounded.
 
 ### Hard navigation failures (Chrome `errorText` and error pages)
 CDP **`Page.navigate`** can return an **`errorText`** field (e.g. `net::ERR_NAME_NOT_RESOLVED`, TLS errors). The **headless_chrome** crate surfaces that as a failed `navigate_to` call. **BROWSER_NAVIGATE** and **BROWSER_SCREENSHOT** (with a URL) turn that into an explicit tool error: the message states that the page did **not** load, includes a **sanitized** Chrome error string (paths such as `/Users/...` are redacted for the model), and tells the model not to treat the tab as the requested site.
@@ -120,11 +132,11 @@ Debug logging (`browser/cdp`): one line with **host only** (no path/query) plus 
 
 ### Grounded browser retries
 - `BROWSER_NAVIGATE` must receive a concrete URL. Natural-language filler such as `BROWSER_NAVIGATE to the video URL` is rejected and treated as an agent-side planning/parsing failure, not as evidence about the website.
-- After `BROWSER_NAVIGATE`, `BROWSER_CLICK`, or `BROWSER_INPUT`, mac-stats caches the latest `Current page` and `Elements` output. Retries should reuse that latest state instead of stale indices from an earlier page.
+- After `BROWSER_NAVIGATE`, `BROWSER_CLICK`, `BROWSER_INPUT`, or `BROWSER_KEYS`, mac-stats caches the latest `Current page` and `Elements` output. Retries should reuse that latest state instead of stale indices from an earlier page.
 - If the browser is already on the relevant page and the content is inline, the next retry should inspect that page or click a real listed element. It should not invent a new target URL unless the browser output already exposed one.
 
 ### Sequence-terminating navigation
-When the model returns multiple tools in one turn, page-changing browser actions (`BROWSER_NAVIGATE`, `BROWSER_GO_BACK`) **terminate the browser sequence** for that turn. After one of these actions completes successfully, any remaining browser tools (BROWSER_CLICK, BROWSER_INPUT, BROWSER_SCROLL, BROWSER_EXTRACT, BROWSER_SEARCH_PAGE, BROWSER_SCREENSHOT) from the same response are skipped. The model receives the new page state and a note that remaining browser actions were skipped due to stale indices. Non-browser tools (FETCH_URL, BRAVE_SEARCH, RUN_CMD, etc.) in the same response still run.
+When the model returns multiple tools in one turn, page-changing browser actions (`BROWSER_NAVIGATE`, `BROWSER_GO_BACK`, `BROWSER_GO_FORWARD`, `BROWSER_RELOAD`) **terminate the browser sequence** for that turn. After one of these actions completes successfully, any remaining browser tools (BROWSER_CLICK, BROWSER_INPUT, BROWSER_KEYS, BROWSER_SCROLL, BROWSER_EXTRACT, BROWSER_SEARCH_PAGE, BROWSER_SCREENSHOT) from the same response are skipped. The model receives the new page state and a note that remaining browser actions were skipped due to stale indices. Non-browser tools (FETCH_URL, BRAVE_SEARCH, RUN_CMD, etc.) in the same response still run.
 
 This prevents wrong clicks or inputs caused by stale element indices from the previous page. The model can emit new browser actions in the next turn using the fresh state.
 

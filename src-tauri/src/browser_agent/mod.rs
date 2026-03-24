@@ -4,8 +4,9 @@
 //! 1. Start Chrome yourself: `Google Chrome --remote-debugging-port=9222`
 //! 2. Or let mac-stats launch Chrome on 9222 when nothing is listening (requires Chrome installed).
 //!
-//! Supports BROWSER_NAVIGATE / BROWSER_CLICK / BROWSER_INPUT / BROWSER_SCROLL / BROWSER_EXTRACT (index-based state). Session is kept
+//! Supports BROWSER_NAVIGATE / BROWSER_GO_BACK / BROWSER_GO_FORWARD / BROWSER_RELOAD / BROWSER_CLICK / BROWSER_INPUT / BROWSER_KEYS / BROWSER_SCROLL / BROWSER_EXTRACT (index-based state). Session is kept
 //! until idle longer than Config::browser_idle_timeout_secs() (default 5 minutes; configurable).
+//! On a **new** CDP attach (not session reuse), the agent polls until tab targets are enumerable (~8s max, ~200ms interval) so the WebSocket being up does not imply automation-ready.
 //! When CDP is unavailable, HTTP fallback (fetch + scraper) provides NAVIGATE/CLICK/INPUT/EXTRACT without Chrome.
 
 mod http_fallback;
@@ -21,6 +22,7 @@ use std::sync::OnceLock;
 use std::time::{Duration, Instant};
 
 use crate::{mac_stats_debug, mac_stats_info, mac_stats_warn};
+use headless_chrome::browser::tab::ModifierKey;
 use headless_chrome::protocol::cdp::types::Event;
 use headless_chrome::protocol::cdp::Page::CaptureScreenshotFormatOption;
 use headless_chrome::protocol::cdp::Page::DialogType;
@@ -33,7 +35,7 @@ use std::path::PathBuf;
 use url::Url;
 
 // ---------------------------------------------------------------------------
-// Browser state for BROWSER_NAVIGATE / BROWSER_CLICK / BROWSER_INPUT
+// Browser state for BROWSER_NAVIGATE / history / reload / BROWSER_CLICK / BROWSER_INPUT
 // ---------------------------------------------------------------------------
 
 /// One interactive element (link, button, input) with 1-based index for the LLM.
@@ -68,11 +70,18 @@ struct InteractableRow {
     input_type: Option<String>,
 }
 
+/// How many times we hit `/json/version` before deciding nothing is listening (transient false negatives on loopback).
+const CDP_DISCOVERY_ATTEMPTS: u32 = 4;
+/// Pause between discovery attempts (~1s total backoff across retries).
+const CDP_DISCOVERY_RETRY_SLEEP_MS: u64 = 225;
+/// Per-attempt HTTP timeout for discovery: dead ports fail fast; reliability comes from repeated tries.
+const CDP_DISCOVERY_HTTP_TIMEOUT: Duration = Duration::from_secs(1);
+
 /// Fetch WebSocket debugger URL from Chrome running with --remote-debugging-port.
-fn get_ws_url(port: u16) -> Result<String, String> {
+fn get_ws_url_with_timeout(port: u16, timeout: Duration) -> Result<String, String> {
     let url = format!("http://127.0.0.1:{}/json/version", port);
     let client = reqwest::blocking::Client::builder()
-        .timeout(Duration::from_secs(5))
+        .timeout(timeout)
         .build()
         .map_err(|e| format!("HTTP client: {}", e))?;
     let resp = client
@@ -92,6 +101,104 @@ fn get_ws_url(port: u16) -> Result<String, String> {
     Ok(ws.to_string())
 }
 
+fn get_ws_url(port: u16) -> Result<String, String> {
+    get_ws_url_with_timeout(port, Duration::from_secs(5))
+}
+
+/// Probe loopback CDP with bounded retries before treating the port as free (avoids duplicate Chrome launch on flaky first probe).
+fn try_discover_cdp_ws_url(port: u16) -> Result<String, String> {
+    let mut last_err = String::new();
+    for attempt in 0..CDP_DISCOVERY_ATTEMPTS {
+        if attempt > 0 {
+            std::thread::sleep(Duration::from_millis(CDP_DISCOVERY_RETRY_SLEEP_MS));
+        }
+        match get_ws_url_with_timeout(port, CDP_DISCOVERY_HTTP_TIMEOUT) {
+            Ok(ws) => {
+                if attempt > 0 {
+                    mac_stats_info!(
+                        "browser/cdp",
+                        "Browser agent [CDP]: CDP discovery succeeded on retry (attempt {}/{})",
+                        attempt + 1,
+                        CDP_DISCOVERY_ATTEMPTS
+                    );
+                }
+                return Ok(ws);
+            }
+            Err(e) => last_err = e,
+        }
+    }
+    Err(last_err)
+}
+
+/// After the CDP WebSocket handshake, wait until targets are enumerable (macOS user Chrome can expose the port before tabs are ready).
+const CDP_ATTACH_READY_TIMEOUT: Duration = Duration::from_secs(8);
+const CDP_ATTACH_READY_POLL: Duration = Duration::from_millis(200);
+
+/// Poll until `get_tabs` succeeds with at least one tab, or timeout. Only for fresh CDP attach (not cached session reuse).
+fn wait_for_cdp_targets_ready_after_attach(browser: &Browser) -> Result<(), String> {
+    let deadline = Instant::now() + CDP_ATTACH_READY_TIMEOUT;
+    let mut attempt: u32 = 0;
+    loop {
+        attempt += 1;
+        if Instant::now() >= deadline {
+            break;
+        }
+        match browser.get_tabs().lock() {
+            Ok(tabs) => {
+                if !tabs.is_empty() {
+                    mac_stats_debug!(
+                        "browser/cdp",
+                        "Browser agent [CDP]: attach readiness OK after {} probe(s), {} tab(s)",
+                        attempt,
+                        tabs.len()
+                    );
+                    return Ok(());
+                }
+                mac_stats_debug!(
+                    "browser/cdp",
+                    "Browser agent [CDP]: attach readiness probe {} — tab list empty (waiting)",
+                    attempt
+                );
+            }
+            Err(e) => {
+                let msg = e.to_string();
+                let short = if msg.len() > 160 {
+                    format!("{}…", &msg[..160])
+                } else {
+                    msg
+                };
+                mac_stats_debug!(
+                    "browser/cdp",
+                    "Browser agent [CDP]: attach readiness probe {} failed: {}",
+                    attempt,
+                    short
+                );
+            }
+        }
+        let remaining = deadline
+            .checked_duration_since(Instant::now())
+            .unwrap_or_default();
+        let sleep_for = CDP_ATTACH_READY_POLL.min(remaining);
+        if sleep_for.is_zero() {
+            break;
+        }
+        std::thread::sleep(sleep_for);
+    }
+    Err(
+        "Chrome debugging port accepted a connection, but page targets were not ready in time. \
+If Chrome showed a prompt to allow remote debugging, approve it; keep Chrome running and retry."
+            .to_string(),
+    )
+}
+
+/// Open a CDP session from a WebSocket URL and wait until tab targets are ready (attach path only).
+fn connect_browser_to_ws_url(ws_url: &str) -> Result<Browser, String> {
+    let browser = Browser::connect_with_timeout(ws_url.to_string(), Duration::from_secs(60))
+        .map_err(|e| format!("CDP connect: {}", e))?;
+    wait_for_cdp_targets_ready_after_attach(&browser)?;
+    Ok(browser)
+}
+
 /// Connect to Chrome at the given debugging port.
 pub fn connect_cdp(port: u16) -> Result<Browser, String> {
     let ws_url = get_ws_url(port)?;
@@ -100,8 +207,7 @@ pub fn connect_cdp(port: u16) -> Result<Browser, String> {
         "Browser agent: connecting to CDP at port {}",
         port
     );
-    Browser::connect_with_timeout(ws_url, Duration::from_secs(60))
-        .map_err(|e| format!("CDP connect: {}", e))
+    connect_browser_to_ws_url(&ws_url)
 }
 
 /// Ensure Chrome is listening on port (launch if not). Call before retrying CDP when it failed.
@@ -110,7 +216,7 @@ pub fn ensure_chrome_on_port(port: u16) {
     if prefer_headless_for_run() {
         return;
     }
-    if get_ws_url(port).is_ok() {
+    if try_discover_cdp_ws_url(port).is_ok() {
         return;
     }
     if launch_chrome_on_port(port).is_ok() {
@@ -1014,13 +1120,13 @@ fn get_or_create_browser(port: u16) -> Result<Browser, String> {
             "Browser agent [CDP]: user requested headless — launching headless Chrome (no visible window)"
         );
         launch_via_headless_chrome()?
-    } else if get_ws_url(port).is_ok() {
+    } else if let Ok(ws_url) = try_discover_cdp_ws_url(port) {
         mac_stats_info!(
             "browser/cdp",
             "Browser agent [CDP]: connecting to Chrome on port {} (visible)",
             port
         );
-        connect_cdp(port)?
+        connect_browser_to_ws_url(&ws_url)?
     } else {
         mac_stats_info!(
             "browser/cdp",
@@ -1101,22 +1207,52 @@ fn current_tab_index() -> &'static Mutex<usize> {
 }
 
 /// Get the current tab from BROWSER_SESSION. Uses CURRENT_TAB_INDEX when set (e.g. after new-tab navigate).
+/// If Chrome has no page tabs (e.g. user closed every tab), creates one `about:blank` tab once per call (OpenClaw-style bootstrap).
 /// Ensures tab window bounds are at least VIEWPORT_WIDTH x VIEWPORT_HEIGHT (e.g. when connecting to existing Chrome).
 fn get_current_tab() -> Result<(Browser, Arc<headless_chrome::Tab>), String> {
     let browser = get_or_create_browser(PORT)?;
-    let tabs = browser.get_tabs().lock().map_err(|e| e.to_string())?;
-    let idx = *current_tab_index().lock().map_err(|e| e.to_string())?;
-    let len = tabs.len();
-    let idx = if len == 0 {
-        0
-    } else {
-        idx.min(len.saturating_sub(1))
+    let tab = {
+        let tabs = browser.get_tabs().lock().map_err(|e| e.to_string())?;
+        let len = tabs.len();
+        if len == 0 {
+            drop(tabs);
+            mac_stats_info!(
+                "browser/cdp",
+                "Browser agent [CDP]: no open tabs; bootstrapping about:blank page tab"
+            );
+            let new_tab = browser.new_tab().map_err(|e| {
+                let e_str = e.to_string();
+                mac_stats_warn!(
+                    "browser/cdp",
+                    "Browser agent [CDP]: empty-browser bootstrap new_tab failed: {}",
+                    e_str
+                );
+                let s = format!(
+                    "Chrome has no open tabs and automatic tab creation failed: {}. Open a tab manually or use BROWSER_NAVIGATE with new_tab.",
+                    e_str
+                );
+                clear_browser_session_on_error(&s);
+                s
+            })?;
+            let tabs = browser.get_tabs().lock().map_err(|e| e.to_string())?;
+            let idx = tabs
+                .iter()
+                .position(|t| std::sync::Arc::ptr_eq(t, &new_tab))
+                .unwrap_or(0);
+            drop(tabs);
+            if let Ok(mut guard) = current_tab_index().lock() {
+                *guard = idx;
+            }
+            new_tab.bring_to_front().ok();
+            new_tab
+        } else {
+            let idx = *current_tab_index().lock().map_err(|e| e.to_string())?;
+            let idx = idx.min(len.saturating_sub(1));
+            tabs.get(idx)
+                .cloned()
+                .ok_or_else(|| "No tab in browser".to_string())?
+        }
     };
-    let tab = tabs
-        .get(idx)
-        .cloned()
-        .ok_or_else(|| "No tab in browser".to_string())?;
-    drop(tabs);
     let bounds = Bounds::Normal {
         left: None,
         top: None,
@@ -1321,6 +1457,117 @@ fn go_back_inner() -> Result<String, String> {
     Ok(snapshot)
 }
 
+/// Go forward one step in the current tab's history and return the new page state.
+pub fn go_forward() -> Result<String, String> {
+    with_connection_retry(go_forward_inner)
+}
+
+fn go_forward_inner() -> Result<String, String> {
+    let (_, tab) = get_current_tab().inspect_err(|e| clear_browser_session_on_error(e))?;
+    let url = tab.get_url();
+    if is_new_tab_or_blank(url.as_str()) {
+        return Err("No page to go forward from. Use BROWSER_NAVIGATE first.".to_string());
+    }
+    let nav_timeout_secs = crate::config::Config::browser_navigation_timeout_secs();
+    tab.set_default_timeout(Duration::from_secs(nav_timeout_secs));
+    mac_stats_info!("browser/cdp", "Browser agent [CDP]: BROWSER_GO_FORWARD");
+    tab.evaluate("window.history.forward()", false)
+        .map_err(|e| format!("Go forward failed: {}", e))?;
+    std::thread::sleep(Duration::from_millis(300));
+    match tab.wait_until_navigated() {
+        Ok(_) => {}
+        Err(e) => {
+            let err_str = e.to_string();
+            if err_str.to_lowercase().contains("timeout") {
+                return Err(format!(
+                    "Go forward failed: timeout after {}s",
+                    nav_timeout_secs
+                ));
+            }
+            mac_stats_warn!(
+                "browser/cdp",
+                "Browser agent [CDP]: go_forward wait_until_navigated failed: {} — continuing",
+                e
+            );
+            std::thread::sleep(Duration::from_secs(2));
+        }
+    }
+    std::thread::sleep(Duration::from_millis(500));
+    let state = get_browser_state(&tab).inspect_err(|e| clear_browser_session_on_error(e))?;
+    let snapshot = format_browser_state_for_llm(&state);
+    set_last_element_labels(
+        state
+            .interactables
+            .iter()
+            .map(|i| (i.index, element_label_for_status(i)))
+            .collect(),
+    );
+    set_last_browser_state_snapshot(snapshot.clone());
+    mac_stats_info!(
+        "browser/cdp",
+        "Browser agent [CDP]: went forward to {}",
+        state.current_url
+    );
+    Ok(snapshot)
+}
+
+/// Reload the current tab via CDP `Page.reload`. When `ignore_cache` is true, bypass cache (Shift+reload style).
+pub fn reload_current_tab(ignore_cache: bool) -> Result<String, String> {
+    with_connection_retry(|| reload_current_tab_inner(ignore_cache))
+}
+
+fn reload_current_tab_inner(ignore_cache: bool) -> Result<String, String> {
+    let (_, tab) = get_current_tab().inspect_err(|e| clear_browser_session_on_error(e))?;
+    if is_new_tab_or_blank(tab.get_url().as_str()) {
+        return Err(SESSION_RESET_MSG.to_string());
+    }
+    let nav_timeout_secs = crate::config::Config::browser_navigation_timeout_secs();
+    tab.set_default_timeout(Duration::from_secs(nav_timeout_secs));
+    mac_stats_info!(
+        "browser/cdp",
+        "Browser agent [CDP]: BROWSER_RELOAD (ignore_cache={})",
+        ignore_cache
+    );
+    tab.reload(ignore_cache, None)
+        .map_err(|e| format!("Reload failed: {}", e))?;
+    std::thread::sleep(Duration::from_millis(300));
+    match tab.wait_until_navigated() {
+        Ok(_) => {}
+        Err(e) => {
+            let err_str = e.to_string();
+            if err_str.to_lowercase().contains("timeout") {
+                return Err(format!(
+                    "Reload failed: timeout after {}s",
+                    nav_timeout_secs
+                ));
+            }
+            mac_stats_warn!(
+                "browser/cdp",
+                "Browser agent [CDP]: reload wait_until_navigated failed: {} — continuing",
+                e
+            );
+            std::thread::sleep(Duration::from_secs(2));
+        }
+    }
+    std::thread::sleep(Duration::from_millis(500));
+    let state = get_browser_state(&tab).inspect_err(|e| clear_browser_session_on_error(e))?;
+    let snapshot = format_browser_state_for_llm(&state);
+    set_last_element_labels(
+        state
+            .interactables
+            .iter()
+            .map(|i| (i.index, element_label_for_status(i)))
+            .collect(),
+    );
+    set_last_browser_state_snapshot(snapshot.clone());
+    mac_stats_info!(
+        "browser/cdp",
+        "Browser agent [CDP]: reloaded, current URL {}",
+        state.current_url
+    );
+    Ok(snapshot)
+}
+
 /// Click the Nth interactive element (1-based index). Returns updated browser state string.
 pub fn click_by_index(index: u32) -> Result<String, String> {
     with_connection_retry(|| click_by_index_inner(index))
@@ -1459,6 +1706,132 @@ fn input_by_index_inner(index: u32, text: &str) -> Result<String, String> {
     let state = get_browser_state(&tab).inspect_err(|e| {
         clear_browser_session_on_error(e);
     })?;
+    let snapshot = format_browser_state_for_llm(&state);
+    set_last_element_labels(
+        state
+            .interactables
+            .iter()
+            .map(|i| (i.index, element_label_for_status(i)))
+            .collect(),
+    );
+    set_last_browser_state_snapshot(snapshot.clone());
+    Ok(snapshot)
+}
+
+/// Parse `BROWSER_KEYS` chord: `+`-separated tokens, modifiers first. Allowlisted only (no arbitrary strings).
+fn parse_browser_keys_chord(arg: &str) -> Result<(Vec<ModifierKey>, String), String> {
+    let raw = arg.trim();
+    if raw.is_empty() {
+        return Err(
+            "BROWSER_KEYS requires a chord (e.g. BROWSER_KEYS: Escape or BROWSER_KEYS: Meta+f)."
+                .to_string(),
+        );
+    }
+    let parts: Vec<&str> = raw
+        .split('+')
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .collect();
+    if parts.is_empty() {
+        return Err("BROWSER_KEYS: empty chord.".to_string());
+    }
+    let n = parts.len();
+    let mut mod_mask: u32 = 0;
+    for i in 0..n.saturating_sub(1) {
+        let bit = match parts[i].to_ascii_lowercase().as_str() {
+            "meta" => ModifierKey::Meta as u32,
+            "ctrl" | "control" => ModifierKey::Ctrl as u32,
+            "alt" => ModifierKey::Alt as u32,
+            "shift" => ModifierKey::Shift as u32,
+            other => {
+                return Err(format!(
+                    "BROWSER_KEYS: unknown modifier '{}'. Use Meta, Ctrl, Alt, or Shift (join with +, no spaces inside the chord).",
+                    other
+                ));
+            }
+        };
+        mod_mask |= bit;
+    }
+    let mut modifiers = Vec::new();
+    if mod_mask & (ModifierKey::Alt as u32) != 0 {
+        modifiers.push(ModifierKey::Alt);
+    }
+    if mod_mask & (ModifierKey::Ctrl as u32) != 0 {
+        modifiers.push(ModifierKey::Ctrl);
+    }
+    if mod_mask & (ModifierKey::Meta as u32) != 0 {
+        modifiers.push(ModifierKey::Meta);
+    }
+    if mod_mask & (ModifierKey::Shift as u32) != 0 {
+        modifiers.push(ModifierKey::Shift);
+    }
+
+    let key_raw = parts[n - 1];
+    let key_lower = key_raw.to_ascii_lowercase();
+    let main_key = match key_lower.as_str() {
+        "enter" => "Enter".to_string(),
+        "escape" | "esc" => "Escape".to_string(),
+        "tab" => "Tab".to_string(),
+        "backspace" => "Backspace".to_string(),
+        "f5" => "F5".to_string(),
+        _ => {
+            if key_raw.len() == 1 {
+                let c = key_raw.chars().next().unwrap();
+                if c.is_ascii_alphabetic() {
+                    if modifiers.is_empty() {
+                        return Err(
+                            "BROWSER_KEYS: a single letter requires at least one modifier (e.g. Meta+f) or use a named key (Enter, Escape, Tab, Backspace, F5)."
+                                .to_string(),
+                        );
+                    }
+                    c.to_ascii_lowercase().to_string()
+                } else {
+                    return Err(format!(
+                        "BROWSER_KEYS: key '{}' is not allowlisted.",
+                        key_raw
+                    ));
+                }
+            } else {
+                return Err(format!(
+                    "BROWSER_KEYS: unknown key '{}'. Allowed: Enter, Escape, Tab, Backspace, F5, or one letter a–z with Meta/Ctrl/Alt/Shift.",
+                    key_raw
+                ));
+            }
+        }
+    };
+    Ok((modifiers, main_key))
+}
+
+/// Dispatch a keyboard chord on the **focused page** via CDP (no HTTP fallback). Returns formatted browser state.
+pub fn dispatch_browser_keys(chord_spec: &str) -> Result<String, String> {
+    with_connection_retry(|| dispatch_browser_keys_inner(chord_spec))
+}
+
+fn dispatch_browser_keys_inner(chord_spec: &str) -> Result<String, String> {
+    let (modifiers, main_key) = parse_browser_keys_chord(chord_spec)?;
+    let (_, tab) = get_current_tab().inspect_err(|e| clear_browser_session_on_error(e))?;
+    if is_new_tab_or_blank(tab.get_url().as_str()) {
+        return Err(SESSION_RESET_MSG.to_string());
+    }
+    mac_stats_info!(
+        "browser/cdp",
+        "Browser agent [CDP]: BROWSER_KEYS main_key={} modifier_count={}",
+        main_key,
+        modifiers.len()
+    );
+    let mod_slice = if modifiers.is_empty() {
+        None
+    } else {
+        Some(modifiers.as_slice())
+    };
+    tab.press_key_with_modifiers(main_key.as_str(), mod_slice)
+        .map_err(|e| {
+            let s = format!("BROWSER_KEYS failed: {}", e);
+            clear_browser_session_on_error(&s);
+            s
+        })?;
+    std::thread::sleep(Duration::from_millis(250));
+    let state = get_browser_state(&tab).inspect_err(|e| clear_browser_session_on_error(e))?;
     let snapshot = format_browser_state_for_llm(&state);
     set_last_element_labels(
         state
@@ -1957,5 +2330,25 @@ mod tests {
         let s = sanitize_navigation_error_for_llm("net::ERR_FAILED /Users/alice/secret/file");
         assert!(!s.contains("/Users/alice"));
         assert!(s.contains("[path]"));
+    }
+
+    #[test]
+    fn parse_browser_keys_accepts_escape_and_meta_f() {
+        let (m, k) = parse_browser_keys_chord("Escape").unwrap();
+        assert!(m.is_empty());
+        assert_eq!(k, "Escape");
+        let (m, k) = parse_browser_keys_chord("Meta+f").unwrap();
+        assert_eq!(m.len(), 1);
+        assert_eq!(k, "f");
+        let (m, k) = parse_browser_keys_chord("Ctrl+Shift+Enter").unwrap();
+        assert_eq!(m.len(), 2);
+        assert_eq!(k, "Enter");
+    }
+
+    #[test]
+    fn parse_browser_keys_rejects_plain_letter_and_unknown() {
+        assert!(parse_browser_keys_chord("f").is_err());
+        assert!(parse_browser_keys_chord("Meta+F12").is_err());
+        assert!(parse_browser_keys_chord("Win+f").is_err());
     }
 }

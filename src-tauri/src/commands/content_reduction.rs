@@ -253,6 +253,12 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// `logits exceed` does not match inside `micrologits exceed` / `metalogits exceed`, and
 /// `logit exceed` does not match inside `sublogit exceed` (left-boundary rejects `prelogit exceed`
 /// and `relogit exceed`);
+/// `probabilities exceed` does not match inside `microprobabilities exceed` /
+/// `metaprobabilities exceed`, and `probability exceed` does not match inside `subprobability exceed`
+/// (left-boundary rejects `preprobability exceed` and `reprobability exceed`);
+/// `logprobs exceed` does not match inside `micrologprobs exceed` / `metalogprobs exceed`, and
+/// `logprob exceed` does not match inside `sublogprob exceed` (left-boundary rejects `prelogprob exceed`
+/// and `relogprob exceed`);
 /// `messages exceed` does not match inside `micromessages exceed` / `metamessages exceed`, and
 /// `message exceed` does not match inside `submessage exceed` (left-boundary rejects `premessage exceed`
 /// and `remessage exceed`);
@@ -1605,6 +1611,40 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
                 || lower.contains("maximum context")
                 || lower.contains("available context")
                 || lower.contains("model's context")))
+        // Plural / singular "probabilit(y|ies) exceed(s/ed)" (FEAT-D373). Parallel to `logits exceed` /
+        // `logit exceed`. `probability exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `probabilities exceed` (no `probability` + space
+        // + `exceed` inside that spelling). Ident-boundary so
+        // `microprobabilities exceed` / `metaprobabilities exceed` / `subprobability exceed` do not
+        // false-positive; `preprobability exceed` and `reprobability exceed` are rejected the same way.
+        || ((contains_phrase_after_ident_boundary(&lower, "probabilities exceed")
+            || contains_phrase_after_ident_boundary(&lower, "probabilities exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "probability exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
+        // Plural / singular "logprob(s) exceed(s/ed)" (FEAT-D374). Parallel to `probabilities exceed` /
+        // `probability exceed`. `logprob exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `logprobs exceed` (the `s` after
+        // `logprob`). Ident-boundary so `micrologprobs exceed` / `metalogprobs exceed` /
+        // `sublogprob exceed` do not false-positive; `prelogprob exceed` and `relogprob exceed`
+        // are rejected the same way.
+        || ((contains_phrase_after_ident_boundary(&lower, "logprobs exceed")
+            || contains_phrase_after_ident_boundary(&lower, "logprobs exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "logprob exceed"))
+            && (lower.contains("context window")
+                || lower.contains("context length")
+                || lower.contains("context limit")
+                || lower.contains("context size")
+                || lower.contains("max context")
+                || lower.contains("maximum context")
+                || lower.contains("available context")
+                || lower.contains("model's context")))
         // "message/input(s) … too long" (distinct from `prompt too long` already handled above).
         // Same context-slot guard as `messages exceed` (FEAT-D295) so incidental `model context`
         // copy does not match non-slot errors. Plural `inputs are/were` (FEAT-D302) parallels
@@ -1861,7 +1901,9 @@ mod tests {
         assert!(is_context_overflow_error(
             "llama runner: cannot exceed the context limit for this model"
         ));
-        assert!(is_context_overflow_error("input exceeds the context window"));
+        assert!(is_context_overflow_error(
+            "input exceeds the context window"
+        ));
         assert!(is_context_overflow_error(
             "error: prompt does not fit in the context window"
         ));
@@ -4200,6 +4242,78 @@ mod tests {
         assert!(!is_context_overflow_error(
             "index: relogit exceed cache budget (no model context configured)"
         ));
+        assert!(is_context_overflow_error(
+            "gateway: probabilities exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: probabilities exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: probability exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "proxy: probability exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: probabilities exceed rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: probabilities exceeded max softmax width on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "http: probability exceed max sampling dim on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microprobabilities exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaprobabilities exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "graph: subprobability exceed op cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "storage: preprobability exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "index: reprobability exceed cache budget (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: logprobs exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: logprobs exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: logprob exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "proxy: logprob exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: logprobs exceed rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: logprobs exceeded max return-n on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "http: logprob exceed max top-k on this route (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: micrologprobs exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metalogprobs exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "graph: sublogprob exceed op cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "storage: prelogprob exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "index: relogprob exceed cache budget (no model context configured)"
+        ));
         assert!(!is_context_overflow_error(
             "config: microrecords exceed the model's context window on this request"
         ));
@@ -4481,9 +4595,8 @@ mod tests {
 
     #[test]
     fn sanitize_fit_in_the_context_phrase() {
-        let msg = sanitize_ollama_error_for_user(
-            "error: prompt does not fit in the context window",
-        );
+        let msg =
+            sanitize_ollama_error_for_user("error: prompt does not fit in the context window");
         let text = msg.expect("fit-in-context phrase should sanitize");
         assert!(
             text.contains("context window") && text.contains("new topic"),
@@ -4493,9 +4606,8 @@ mod tests {
 
     #[test]
     fn sanitize_context_size_exceeded_phrase() {
-        let msg = sanitize_ollama_error_for_user(
-            "llama runner: context size exceeded (n_ctx=8192)",
-        );
+        let msg =
+            sanitize_ollama_error_for_user("llama runner: context size exceeded (n_ctx=8192)");
         let text = msg.expect("context size exceeded should sanitize");
         assert!(
             text.contains("context window") && text.contains("new topic"),

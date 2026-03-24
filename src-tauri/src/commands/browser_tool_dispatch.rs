@@ -175,6 +175,52 @@ pub(crate) async fn handle_browser_go_back(
     }
 }
 
+pub(crate) async fn handle_browser_go_forward(
+    request_id: &str,
+    status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
+) -> String {
+    send_status(status_tx, "⏩ Going forward…");
+    info!("Agent router [{}]: BROWSER_GO_FORWARD", request_id);
+    match tokio::task::spawn_blocking(crate::browser_agent::go_forward).await {
+        Ok(Ok(state_str)) => state_str,
+        Ok(Err(e)) => {
+            append_latest_browser_state_guidance(&format!("BROWSER_GO_FORWARD failed: {}", e))
+        }
+        Err(e) => format!("BROWSER_GO_FORWARD task error: {}", e),
+    }
+}
+
+/// Optional arg: `nocache` or `hard` (case-insensitive) for cache-bypass reload; empty for normal refresh.
+pub(crate) async fn handle_browser_reload(
+    arg: &str,
+    request_id: &str,
+    status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
+) -> String {
+    let tok = arg.split_whitespace().next().unwrap_or("").to_ascii_lowercase();
+    let ignore_cache = matches!(tok.as_str(), "nocache" | "hard" | "bypass");
+    let status_msg = if ignore_cache {
+        "🔄 Reloading page (cache bypass)…"
+    } else {
+        "🔄 Reloading page…"
+    };
+    send_status(status_tx, status_msg);
+    info!(
+        "Agent router [{}]: BROWSER_RELOAD ignore_cache={}",
+        request_id, ignore_cache
+    );
+    match tokio::task::spawn_blocking(move || {
+        crate::browser_agent::reload_current_tab(ignore_cache)
+    })
+    .await
+    {
+        Ok(Ok(state_str)) => state_str,
+        Ok(Err(e)) => {
+            append_latest_browser_state_guidance(&format!("BROWSER_RELOAD failed: {}", e))
+        }
+        Err(e) => format!("BROWSER_RELOAD task error: {}", e),
+    }
+}
+
 pub(crate) async fn handle_browser_click(
     arg: &str,
     status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
@@ -316,6 +362,33 @@ pub(crate) async fn handle_browser_input(
         None => append_latest_browser_state_guidance(
             "BROWSER_INPUT requires a numeric index and text (e.g. BROWSER_INPUT: 4 search query). Use the index from the Current page Elements list.",
         ),
+    }
+}
+
+pub(crate) async fn handle_browser_keys(
+    arg: &str,
+    status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
+) -> String {
+    let chord = arg.trim().to_string();
+    if chord.is_empty() {
+        return append_latest_browser_state_guidance(
+            "BROWSER_KEYS requires a chord: use + between parts, no spaces inside (e.g. BROWSER_KEYS: Escape, BROWSER_KEYS: Meta+f, BROWSER_KEYS: Ctrl+Enter). Allowlisted keys: Enter, Escape, Tab, Backspace, F5, or one letter a–z with at least one of Meta, Ctrl, Alt, Shift. Sends keys to the **page** only (not Chrome chrome UI). CDP required — no HTTP fallback.",
+        );
+    }
+    send_status(
+        status_tx,
+        &format!("⌨️ Keys: {}…", crate::logging::ellipse(&chord, 40)),
+    );
+    info!("BROWSER_KEYS: {}", crate::logging::ellipse(&chord, 80));
+    let chord_clone = chord.clone();
+    match tokio::task::spawn_blocking(move || {
+        crate::browser_agent::dispatch_browser_keys(&chord_clone)
+    })
+    .await
+    {
+        Ok(Ok(state_str)) => state_str,
+        Ok(Err(e)) => append_latest_browser_state_guidance(&format!("BROWSER_KEYS failed: {}", e)),
+        Err(e) => append_latest_browser_state_guidance(&format!("BROWSER_KEYS task error: {}", e)),
     }
 }
 

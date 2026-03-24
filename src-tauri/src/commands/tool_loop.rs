@@ -205,8 +205,12 @@ pub(crate) async fn run_tool_loop(
             let is_browser_tool = matches!(
                 tool.as_str(),
                 "BROWSER_NAVIGATE"
+                    | "BROWSER_GO_BACK"
+                    | "BROWSER_GO_FORWARD"
+                    | "BROWSER_RELOAD"
                     | "BROWSER_CLICK"
                     | "BROWSER_INPUT"
+                    | "BROWSER_KEYS"
                     | "BROWSER_SCROLL"
                     | "BROWSER_EXTRACT"
                     | "BROWSER_SEARCH_PAGE"
@@ -311,7 +315,10 @@ pub(crate) async fn run_tool_loop(
 
             if multi_tool_turn
                 && !is_browser_error
-                && (tool == "BROWSER_NAVIGATE" || tool == "BROWSER_GO_BACK")
+                && (tool == "BROWSER_NAVIGATE"
+                    || tool == "BROWSER_GO_BACK"
+                    || tool == "BROWSER_GO_FORWARD"
+                    || tool == "BROWSER_RELOAD")
                 && !user_message.starts_with("BROWSER_NAVIGATE requires")
             {
                 page_changed_this_turn = true;
@@ -590,6 +597,21 @@ async fn dispatch_tool(
             )
             .await
         }
+        "BROWSER_GO_FORWARD" => {
+            crate::commands::browser_tool_dispatch::handle_browser_go_forward(
+                &params.request_id,
+                params.status_tx.as_ref(),
+            )
+            .await
+        }
+        "BROWSER_RELOAD" => {
+            crate::commands::browser_tool_dispatch::handle_browser_reload(
+                arg,
+                &params.request_id,
+                params.status_tx.as_ref(),
+            )
+            .await
+        }
         "BROWSER_CLICK" => {
             crate::commands::browser_tool_dispatch::handle_browser_click(
                 arg,
@@ -599,6 +621,13 @@ async fn dispatch_tool(
         }
         "BROWSER_INPUT" => {
             crate::commands::browser_tool_dispatch::handle_browser_input(
+                arg,
+                params.status_tx.as_ref(),
+            )
+            .await
+        }
+        "BROWSER_KEYS" => {
+            crate::commands::browser_tool_dispatch::handle_browser_keys(
                 arg,
                 params.status_tx.as_ref(),
             )
