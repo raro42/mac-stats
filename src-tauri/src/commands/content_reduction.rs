@@ -394,6 +394,23 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// `grains exceed` does not match inside `micrograins exceed` / `metagrains exceed`, and
 /// `grain exceed` does not match inside `subgrain exceed` (left-boundary rejects
 /// `pregrain exceed` and `regrain exceed`);
+/// `phases exceed` does not match inside `microphases exceed` / `metaphases exceed`, and
+/// `phase exceed` does not match inside `subphase exceed` (left-boundary rejects
+/// `prephase exceed` and `rephase exceed`);
+/// `crystals exceed` does not match inside `microcrystals exceed` / `metacrystals exceed`, and
+/// `crystal exceed` does not match inside `subcrystal exceed` (left-boundary rejects
+/// `precrystal exceed` and `recrystal exceed`);
+/// `unit cells exceed` does not match inside `microunitcells exceed` / `metaunitcells exceed`, and
+/// `unit cell exceed` does not match inside `subunitcell exceed` (left-boundary rejects
+/// `preunitcell exceed` and `reunitcell exceed`);
+/// `primitive cells exceed` does not match inside `microprimitivecells exceed` / `metaprimitivecells exceed`, and
+/// `primitive cell exceed` does not match inside `subprimitivecell exceed` (left-boundary rejects
+/// `preprimitivecell exceed` and `reprimitivecell exceed`; no space between `primitive` and `cells`
+/// so `microprimitivecells` does not embed the phrase `primitive cells`);
+/// `supercells exceed` does not match inside `microsupercells exceed` / `metasupercells exceed`, and
+/// `supercell exceed` does not match inside `subsupercell exceed` (left-boundary rejects
+/// `presupercell exceed` and `resupercell exceed`; no space inside `supercells`, so `microsupercells`
+/// does not embed the phrase `supercells exceed` as a spaced token sequence);
 /// `messages exceed` does not match inside `micromessages exceed` / `metamessages exceed`, and
 /// `message exceed` does not match inside `submessage exceed` (left-boundary rejects `premessage exceed`
 /// and `remessage exceed`);
@@ -1983,6 +2000,82 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         || ((contains_phrase_after_ident_boundary(&lower, "grains exceed")
             || contains_phrase_after_ident_boundary(&lower, "grains exceeded")
             || contains_phrase_after_ident_boundary(&lower, "grain exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "phases / phase exceed(s/ed)" (FEAT-D438). Parallel to
+        // `grains exceed` / `grain exceed`. `phase exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `phases exceed` (the `s` after `phase` breaks `phase` + space + `exceed`).
+        // Ident-boundary so `microphases exceed` / `metaphases exceed` / `subphase exceed` do not
+        // false-positive; `prephase exceed` and `rephase exceed` are rejected the same way; embedded
+        // `phase exceed` inside `superphase exceed` does not match. Same explicit context-slot phrases
+        // as `messages exceed`. Negatives: HTTP `phases exceed` rate limits, per-sample / phase-fraction
+        // or coexistence caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "phases exceed")
+            || contains_phrase_after_ident_boundary(&lower, "phases exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "phase exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "crystals / crystal exceed(s/ed)" (FEAT-D439). Parallel to
+        // `phases exceed` / `phase exceed`. `crystal exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `crystals exceed` (the `s` after `crystal` breaks `crystal` + space + `exceed`).
+        // Ident-boundary so `microcrystals exceed` / `metacrystals exceed` / `subcrystal exceed` do not
+        // false-positive; `precrystal exceed` and `recrystal exceed` are rejected the same way; embedded
+        // `crystal exceed` inside `supercrystal exceed` does not match. Same explicit context-slot phrases
+        // as `messages exceed`. Negatives: HTTP `crystals exceed` rate limits, per-unit-cell / lattice
+        // caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "crystals exceed")
+            || contains_phrase_after_ident_boundary(&lower, "crystals exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "crystal exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "unit cells / unit cell exceed(s/ed)" (FEAT-D440). Parallel to
+        // `crystals exceed` / `crystal exceed`. `unit cell exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `unit cells exceed` (the `s` in `cells` prevents the singular `cell` + space + `exceed`
+        // path from aligning inside the plural phrase).
+        // Ident-boundary at `unit` so `microunitcells exceed` / `metaunitcells exceed` /
+        // `subunitcell exceed` do not false-positive (`microunit cells …` is not listed: a space
+        // before `cells` would match the separate `cells exceed` arm). `preunitcell exceed` and
+        // `reunitcell exceed` are rejected the same way; embedded `unit cell exceed` inside
+        // `superunitcell exceed` does not match. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `unit cells exceed` rate limits, per-lattice /
+        // basis-vector caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "unit cells exceed")
+            || contains_phrase_after_ident_boundary(&lower, "unit cells exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "unit cell exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "primitive cells / primitive cell exceed(s/ed)" (FEAT-D441). Parallel to
+        // `unit cells exceed` / `unit cell exceed`. `primitive cell exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `primitive cells exceed` (the `s` in `cells` prevents the singular `cell` + space + `exceed`
+        // path from aligning inside the plural phrase).
+        // Ident-boundary at `primitive` so `microprimitivecells exceed` / `metaprimitivecells exceed` /
+        // `subprimitivecell exceed` do not false-positive (no space inside `primitivecells`, so the
+        // phrase `primitive cells exceed` is absent; a spaced form `micro primitive cells …` still
+        // matches at the word boundary before `primitive`). `preprimitivecell exceed` and
+        // `reprimitivecell exceed` are rejected the same way; embedded `primitive cell exceed` inside
+        // `superprimitivecell exceed` does not match. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `primitive cells exceed` rate limits, per-basis /
+        // Wigner–Seitz caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "primitive cells exceed")
+            || contains_phrase_after_ident_boundary(&lower, "primitive cells exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "primitive cell exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "supercells / supercell exceed(s/ed)" (FEAT-D442). Parallel to
+        // `primitive cells exceed` / `primitive cell exceed`. `supercell exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `supercells exceed` (the `s` in `cells` prevents the singular `cell` + space + `exceed`
+        // path from aligning inside the plural phrase).
+        // Ident-boundary at the start of `supercells` / `supercell` so `microsupercells exceed` /
+        // `metasupercells exceed` / `subsupercell exceed` do not false-positive (no space inside
+        // `supercells`, so the contiguous phrase `supercells exceed` is absent there; a spaced form
+        // `micro supercells …` still matches at the boundary before `supercells`). `presupercell exceed` and
+        // `resupercell exceed` are rejected the same way; embedded `supercell exceed` inside
+        // `supersupercell exceed` does not match. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `supercells exceed` rate limits, per-k-point /
+        // replica-exchange caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "supercells exceed")
+            || contains_phrase_after_ident_boundary(&lower, "supercells exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "supercell exceed"))
             && explicit_context_slot_after_ident_boundary(&lower))
         // "message/input(s) … too long" (distinct from `prompt too long` already handled above).
         // Same context-slot guard as `messages exceed` (FEAT-D295) so incidental `model context`
@@ -5132,6 +5225,201 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "regrain exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: phases exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: phases exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: phase exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: phase exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: phases exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: phases exceeded daily coexistence cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: phase exceed max phase-fraction budget on this mesh field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microphases exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaphases exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subphase exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superphase exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "prephase exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "rephase exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: crystals exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: crystals exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: crystal exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: crystal exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: crystals exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: crystals exceeded daily unit-cell cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: crystal exceed max lattice budget on this mesh field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microcrystals exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metacrystals exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subcrystal exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "supercrystal exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "precrystal exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "recrystal exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: unit cells exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: unit cells exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: unit cell exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: unit cell exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: unit cells exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: unit cells exceeded daily Bravais-lattice cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: unit cell exceed max basis budget on this mesh field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microunitcells exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaunitcells exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subunitcell exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superunitcell exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "preunitcell exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "reunitcell exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: primitive cells exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: primitive cells exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: primitive cell exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: primitive cell exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: primitive cells exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: primitive cells exceeded daily Wigner–Seitz cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: primitive cell exceed max basis budget on this mesh field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microprimitivecells exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaprimitivecells exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subprimitivecell exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superprimitivecell exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "preprimitivecell exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "reprimitivecell exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: supercells exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: supercells exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: supercell exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: supercell exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: supercells exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: supercells exceeded daily k-point mesh cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: supercell exceed max replica budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microsupercells exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metasupercells exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subsupercell exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "supersupercell exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "presupercell exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "resupercell exceed the model's context window on this request"
         ));
         assert!(is_context_overflow_error(
             "API: bytes exceed the model's context window on this request"
