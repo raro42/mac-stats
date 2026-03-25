@@ -454,6 +454,36 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// rejects `prespherical gaussian exceed` and `respherical gaussian exceed`; embedded `spherical gaussian exceed`
 /// inside `superspherical gaussian exceed` does not match; no space inside `sphericalgaussians`, so the
 /// contiguous phrase `spherical gaussians exceed` is absent there);
+/// `cartesian gaussians exceed` does not match inside `microcartesian gaussians exceed` / `metacartesian gaussians exceed`, and
+/// `cartesian gaussian exceed` does not match inside `subcartesian gaussian exceed` (left-boundary at `cartesian`
+/// rejects `precartesian gaussian exceed` and `recartesian gaussian exceed`; embedded `cartesian gaussian exceed`
+/// inside `supercartesian gaussian exceed` does not match; no space inside `cartesiangaussians`, so the
+/// contiguous phrase `cartesian gaussians exceed` is absent there);
+/// `gaussian shells exceed` does not match inside `microgaussian shells exceed` / `metagaussian shells exceed`, and
+/// `gaussian shell exceed` does not match inside `subgaussian shell exceed` (left-boundary at `gaussian`
+/// rejects `pregaussian shell exceed` and `regaussian shell exceed`; embedded `gaussian shell exceed`
+/// inside `supergaussian shell exceed` does not match; no space inside `gaussianshells`, so the
+/// contiguous phrase `gaussian shells exceed` is absent there);
+/// `density matrices exceed` does not match inside `microdensity matrices exceed` / `metadensity matrices exceed`, and
+/// `density matrix exceed` does not match inside `subdensity matrix exceed` (left-boundary at `density`
+/// rejects `predensity matrix exceed` and `redensity matrix exceed`; embedded `density matrix exceed`
+/// inside `superdensity matrix exceed` does not match; no space inside `densitymatrices`, so the
+/// contiguous phrase `density matrices exceed` is absent there);
+/// `molecular orbitals exceed` does not match inside `micromolecularorbitals exceed` / `metamolecularorbitals exceed`, and
+/// `molecular orbital exceed` does not match inside `submolecular orbital exceed` (left-boundary at `molecular`
+/// rejects `premolecular orbital exceed` and `remolecular orbital exceed`; embedded `molecular orbital exceed`
+/// inside `supermolecularorbital exceed` does not match; no space inside `molecularorbitals`, so the
+/// contiguous phrase `molecular orbitals exceed` is absent there; a spaced `micromolecular orbitals exceed`
+/// is not listed here because the generic `orbitals exceed` arm can match at the boundary before `orbitals`;
+/// similarly `supermolecular orbital exceed` / `premolecular orbital exceed` are not listed because the generic
+/// `orbital exceed` arm matches at the boundary before `orbital` when a context slot is present);
+/// `atomic orbitals exceed` does not match inside `microatomicorbitals exceed` / `metaatomicorbitals exceed`, and
+/// `atomic orbital exceed` does not match inside `subatomic orbital exceed` (left-boundary at `atomic`
+/// rejects `preatomic orbital exceed` and `reatomic orbital exceed`; embedded `atomic orbital exceed`
+/// inside `superatomicorbital exceed` does not match; no space inside `atomicorbitals`, so the
+/// contiguous phrase `atomic orbitals exceed` is absent there; a spaced `micro atomic orbitals exceed`
+/// is not listed here because the generic `orbitals exceed` arm can match at the boundary before `orbitals`;
+/// `subatomic …` is rejected at the boundary before `atomic` (the `b` in `sub` is an ident continuation).
 /// `electrons exceed` does not match inside `microelectrons exceed` / `metaelectrons exceed`, and
 /// `electron exceed` does not match inside `subelectron exceed` (left-boundary rejects
 /// `preelectron exceed` and `reelectron exceed`; embedded `electron exceed` inside `superelectron exceed`
@@ -2263,6 +2293,91 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
             || contains_phrase_after_ident_boundary(&lower, "spherical gaussians exceeded")
             || contains_phrase_after_ident_boundary(&lower, "spherical gaussian exceed"))
             && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "cartesian gaussians / cartesian gaussian exceed(s/ed)" (FEAT-D453). Parallel to
+        // `spherical gaussians exceed` / `spherical gaussian exceed`. `cartesian gaussian exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `cartesian gaussians exceed` (the `s` in `gaussians` prevents the singular `gaussian` + space +
+        // `exceed` path from aligning inside the plural phrase).
+        // Ident-boundary at `cartesian` so `microcartesian gaussians exceed` / `metacartesian gaussians exceed` /
+        // `subcartesian gaussian exceed` do not false-positive (no space inside `cartesiangaussians`, so the
+        // phrase `cartesian gaussians exceed` is absent there; a spaced form `micro cartesian gaussians …`
+        // still matches at the boundary before `cartesian`). `precartesian gaussian exceed` and
+        // `recartesian gaussian exceed` are rejected the same way; embedded `cartesian gaussian exceed` inside
+        // `supercartesian gaussian exceed` does not match. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `cartesian gaussians exceed` rate limits, per-center / Cartesian-GTO caps,
+        // etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "cartesian gaussians exceed")
+            || contains_phrase_after_ident_boundary(&lower, "cartesian gaussians exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "cartesian gaussian exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "gaussian shells / gaussian shell exceed(s/ed)" (FEAT-D454). Parallel to
+        // `cartesian gaussians exceed` / `cartesian gaussian exceed`. `gaussian shell exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `gaussian shells exceed` (the `s` in `shells` prevents the singular `shell` + space +
+        // `exceed` path from aligning inside the plural phrase).
+        // Ident-boundary at `gaussian` so `microgaussian shells exceed` / `metagaussian shells exceed` /
+        // `subgaussian shell exceed` do not false-positive (no space inside `gaussianshells`, so the
+        // phrase `gaussian shells exceed` is absent there; a spaced form `micro gaussian shells …`
+        // still matches at the boundary before `gaussian`). `pregaussian shell exceed` and
+        // `regaussian shell exceed` are rejected the same way; embedded `gaussian shell exceed` inside
+        // `supergaussian shell exceed` does not match. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `gaussian shells exceed` rate limits, per-angular-momentum /
+        // shell-block caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "gaussian shells exceed")
+            || contains_phrase_after_ident_boundary(&lower, "gaussian shells exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "gaussian shell exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "density matrices / density matrix exceed(s/ed)" (FEAT-D455). Parallel to
+        // `gaussian shells exceed` / `gaussian shell exceed`. `density matrix exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `density matrices exceed` (the `s` in `matrices` prevents the singular `matrix` + space +
+        // `exceed` path from aligning inside the plural phrase).
+        // Ident-boundary at `density` so `microdensity matrices exceed` / `metadensity matrices exceed` /
+        // `subdensity matrix exceed` do not false-positive (no space inside `densitymatrices`, so the
+        // phrase `density matrices exceed` is absent there; a spaced form `micro density matrices …`
+        // still matches at the boundary before `density`). `predensity matrix exceed` and
+        // `redensity matrix exceed` are rejected the same way; embedded `density matrix exceed` inside
+        // `superdensity matrix exceed` does not match. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `density matrices exceed` rate limits, per-orbital /
+        // N-representability caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "density matrices exceed")
+            || contains_phrase_after_ident_boundary(&lower, "density matrices exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "density matrix exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "molecular orbitals / molecular orbital exceed(s/ed)" (FEAT-D456). Parallel to
+        // `density matrices exceed` / `density matrix exceed`. `molecular orbital exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `molecular orbitals exceed` (the `s` in `orbitals` prevents the singular `orbital` + space +
+        // `exceed` path from aligning inside the plural phrase).
+        // Ident-boundary at `molecular` so `submolecular orbital exceed` does not false-positive (no space inside
+        // `molecularorbitals`, so the phrase `molecular orbitals exceed` is absent in `micromolecularorbitals exceed` /
+        // `metamolecularorbitals exceed`, which also avoids the generic `orbitals exceed` arm; a spaced
+        // `micro molecular orbitals …` still matches at the boundary before `molecular`). `premolecular orbital exceed` and
+        // `remolecular orbital exceed` are rejected the same way; embedded `molecular orbital exceed` inside
+        // `supermolecularorbital exceed` does not match. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `molecular orbitals exceed` rate limits, active-space /
+        // MO-basis caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "molecular orbitals exceed")
+            || contains_phrase_after_ident_boundary(&lower, "molecular orbitals exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "molecular orbital exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "atomic orbitals / atomic orbital exceed(s/ed)" (FEAT-D457). Parallel to
+        // `molecular orbitals exceed` / `molecular orbital exceed`. `atomic orbital exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `atomic orbitals exceed` (the `s` in `orbitals` prevents the singular `orbital` + space +
+        // `exceed` path from aligning inside the plural phrase).
+        // Ident-boundary at `atomic` so `subatomic orbital exceed` does not false-positive (no space inside
+        // `atomicorbitals`, so the phrase `atomic orbitals exceed` is absent in `microatomicorbitals exceed` /
+        // `metaatomicorbitals exceed`, which also avoids the generic `orbitals exceed` arm; a spaced
+        // `micro atomic orbitals …` still matches at the boundary before `atomic`). `preatomic orbital exceed` and
+        // `reatomic orbital exceed` are rejected the same way; embedded `atomic orbital exceed` inside
+        // `superatomicorbital exceed` does not match. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `atomic orbitals exceed` rate limits, AO-basis /
+        // valence-shell caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "atomic orbitals exceed")
+            || contains_phrase_after_ident_boundary(&lower, "atomic orbitals exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "atomic orbital exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
         // "message/input(s) … too long" (distinct from `prompt too long` already handled above).
         // Same context-slot guard as `messages exceed` (FEAT-D295) so incidental `model context`
         // copy does not match non-slot errors. Plural `inputs are/were` (FEAT-D302) parallels
@@ -2861,6 +2976,21 @@ mod tests {
         ));
         assert!(is_context_overflow_error(
             "gateway: spherical gaussians exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: cartesian gaussians exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: gaussian shells exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: density matrices exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: molecular orbitals exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: atomic orbitals exceed available context on this request"
         ));
         assert!(is_context_overflow_error(
             "gateway: electrons exceed available context on this request"
@@ -5981,6 +6111,201 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "respherical gaussian exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: cartesian gaussians exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: cartesian gaussians exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: cartesian gaussian exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: cartesian gaussian exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: cartesian gaussians exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: cartesian gaussians exceeded Cartesian-GTO center cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: cartesian gaussian exceed max exponent budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microcartesian gaussians exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metacartesian gaussians exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subcartesian gaussian exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "supercartesian gaussian exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "precartesian gaussian exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "recartesian gaussian exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: gaussian shells exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: gaussian shells exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: gaussian shell exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: gaussian shell exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: gaussian shells exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: gaussian shells exceeded per-L / shell-block cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: gaussian shell exceed max contraction budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microgaussian shells exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metagaussian shells exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subgaussian shell exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "supergaussian shell exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "pregaussian shell exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "regaussian shell exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: density matrices exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: density matrices exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: density matrix exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: density matrix exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: density matrices exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: density matrices exceeded per-orbital / N-representability cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: density matrix exceed max rank budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microdensity matrices exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metadensity matrices exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subdensity matrix exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superdensity matrix exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "predensity matrix exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "redensity matrix exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: molecular orbitals exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: molecular orbitals exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: molecular orbital exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: molecular orbital exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: molecular orbitals exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: molecular orbitals exceeded active-space / MO-basis cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: molecular orbital exceed max active-space budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: micromolecularorbitals exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metamolecularorbitals exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: submolecular orbital exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "supermolecularorbital exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "premolecularorbital exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "remolecularorbital exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: atomic orbitals exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: atomic orbitals exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: atomic orbital exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: atomic orbital exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: atomic orbitals exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: atomic orbitals exceeded AO-basis / valence-shell cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: atomic orbital exceed max valence budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microatomicorbitals exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaatomicorbitals exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subatomic orbital exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superatomicorbital exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "preatomicorbital exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "reatomicorbital exceed the model's context window on this request"
         ));
         assert!(is_context_overflow_error(
             "API: electrons exceed the model's context window on this request"
