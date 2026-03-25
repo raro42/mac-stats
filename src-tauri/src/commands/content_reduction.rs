@@ -434,6 +434,30 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// rejects `prebasis function exceed` and `rebasis function exceed`; embedded `basis function exceed`
 /// inside `superbasis function exceed` does not match; no space inside `basisfunctions`, so the
 /// contiguous phrase `basis functions exceed` is absent there);
+/// `auxiliary functions exceed` does not match inside `microauxiliary functions exceed` / `metaauxiliary functions exceed`, and
+/// `auxiliary function exceed` does not match inside `subauxiliary function exceed` (left-boundary at `auxiliary`
+/// rejects `preauxiliary function exceed` and `reauxiliary function exceed`; embedded `auxiliary function exceed`
+/// inside `superauxiliary function exceed` does not match; no space inside `auxiliaryfunctions`, so the
+/// contiguous phrase `auxiliary functions exceed` is absent there);
+/// `primitive gaussians exceed` does not match inside `microprimitive gaussians exceed` / `metaprimitive gaussians exceed`, and
+/// `primitive gaussian exceed` does not match inside `subprimitive gaussian exceed` (left-boundary at `primitive`
+/// rejects `preprimitive gaussian exceed` and `reprimitive gaussian exceed`; embedded `primitive gaussian exceed`
+/// inside `superprimitive gaussian exceed` does not match; no space inside `primitivegaussians`, so the
+/// contiguous phrase `primitive gaussians exceed` is absent there);
+/// `contracted gaussians exceed` does not match inside `microcontracted gaussians exceed` / `metacontracted gaussians exceed`, and
+/// `contracted gaussian exceed` does not match inside `subcontracted gaussian exceed` (left-boundary at `contracted`
+/// rejects `precontracted gaussian exceed` and `recontracted gaussian exceed`; embedded `contracted gaussian exceed`
+/// inside `supercontracted gaussian exceed` does not match; no space inside `contractedgaussians`, so the
+/// contiguous phrase `contracted gaussians exceed` is absent there);
+/// `spherical gaussians exceed` does not match inside `microspherical gaussians exceed` / `metaspherical gaussians exceed`, and
+/// `spherical gaussian exceed` does not match inside `subspherical gaussian exceed` (left-boundary at `spherical`
+/// rejects `prespherical gaussian exceed` and `respherical gaussian exceed`; embedded `spherical gaussian exceed`
+/// inside `superspherical gaussian exceed` does not match; no space inside `sphericalgaussians`, so the
+/// contiguous phrase `spherical gaussians exceed` is absent there);
+/// `electrons exceed` does not match inside `microelectrons exceed` / `metaelectrons exceed`, and
+/// `electron exceed` does not match inside `subelectron exceed` (left-boundary rejects
+/// `preelectron exceed` and `reelectron exceed`; embedded `electron exceed` inside `superelectron exceed`
+/// does not match);
 /// `messages exceed` does not match inside `micromessages exceed` / `metamessages exceed`, and
 /// `message exceed` does not match inside `submessage exceed` (left-boundary rejects `premessage exceed`
 /// and `remessage exceed`);
@@ -2171,6 +2195,74 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
             || contains_phrase_after_ident_boundary(&lower, "basis functions exceeded")
             || contains_phrase_after_ident_boundary(&lower, "basis function exceed"))
             && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "auxiliary functions / auxiliary function exceed(s/ed)" (FEAT-D449). Parallel to
+        // `basis functions exceed` / `basis function exceed`. `auxiliary function exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `auxiliary functions exceed` (the `s` in `functions` prevents the singular `function` + space +
+        // `exceed` path from aligning inside the plural phrase).
+        // Ident-boundary at `auxiliary` so `microauxiliary functions exceed` / `metaauxiliary functions exceed` /
+        // `subauxiliary function exceed` do not false-positive (no space inside `auxiliaryfunctions`, so the
+        // phrase `auxiliary functions exceed` is absent there; a spaced form `micro auxiliary functions …`
+        // still matches at the boundary before `auxiliary`). `preauxiliary function exceed` and
+        // `reauxiliary function exceed` are rejected the same way; embedded `auxiliary function exceed` inside
+        // `superauxiliary function exceed` does not match. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `auxiliary functions exceed` rate limits, per-RI / JK-density caps,
+        // etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "auxiliary functions exceed")
+            || contains_phrase_after_ident_boundary(&lower, "auxiliary functions exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "auxiliary function exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "primitive gaussians / primitive gaussian exceed(s/ed)" (FEAT-D450). Parallel to
+        // `auxiliary functions exceed` / `auxiliary function exceed`. `primitive gaussian exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `primitive gaussians exceed` (the `s` in `gaussians` prevents the singular `gaussian` + space +
+        // `exceed` path from aligning inside the plural phrase).
+        // Ident-boundary at `primitive` so `microprimitive gaussians exceed` / `metaprimitive gaussians exceed` /
+        // `subprimitive gaussian exceed` do not false-positive (no space inside `primitivegaussians`, so the
+        // phrase `primitive gaussians exceed` is absent there; a spaced form `micro primitive gaussians …`
+        // still matches at the boundary before `primitive`). `preprimitive gaussian exceed` and
+        // `reprimitive gaussian exceed` are rejected the same way; embedded `primitive gaussian exceed` inside
+        // `superprimitive gaussian exceed` does not match. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `primitive gaussians exceed` rate limits, per-shell / PGF-basis caps,
+        // etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "primitive gaussians exceed")
+            || contains_phrase_after_ident_boundary(&lower, "primitive gaussians exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "primitive gaussian exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "contracted gaussians / contracted gaussian exceed(s/ed)" (FEAT-D451). Parallel to
+        // `primitive gaussians exceed` / `primitive gaussian exceed`. `contracted gaussian exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `contracted gaussians exceed` (the `s` in `gaussians` prevents the singular `gaussian` + space +
+        // `exceed` path from aligning inside the plural phrase).
+        // Ident-boundary at `contracted` so `microcontracted gaussians exceed` / `metacontracted gaussians exceed` /
+        // `subcontracted gaussian exceed` do not false-positive (no space inside `contractedgaussians`, so the
+        // phrase `contracted gaussians exceed` is absent there; a spaced form `micro contracted gaussians …`
+        // still matches at the boundary before `contracted`). `precontracted gaussian exceed` and
+        // `recontracted gaussian exceed` are rejected the same way; embedded `contracted gaussian exceed` inside
+        // `supercontracted gaussian exceed` does not match. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `contracted gaussians exceed` rate limits, per-shell / CGF-basis caps,
+        // etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "contracted gaussians exceed")
+            || contains_phrase_after_ident_boundary(&lower, "contracted gaussians exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "contracted gaussian exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "spherical gaussians / spherical gaussian exceed(s/ed)" (FEAT-D452). Parallel to
+        // `contracted gaussians exceed` / `contracted gaussian exceed`. `spherical gaussian exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `spherical gaussians exceed` (the `s` in `gaussians` prevents the singular `gaussian` + space +
+        // `exceed` path from aligning inside the plural phrase).
+        // Ident-boundary at `spherical` so `microspherical gaussians exceed` / `metaspherical gaussians exceed` /
+        // `subspherical gaussian exceed` do not false-positive (no space inside `sphericalgaussians`, so the
+        // phrase `spherical gaussians exceed` is absent there; a spaced form `micro spherical gaussians …`
+        // still matches at the boundary before `spherical`). `prespherical gaussian exceed` and
+        // `respherical gaussian exceed` are rejected the same way; embedded `spherical gaussian exceed` inside
+        // `superspherical gaussian exceed` does not match. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `spherical gaussians exceed` rate limits, per-shell / SGF-basis caps,
+        // etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "spherical gaussians exceed")
+            || contains_phrase_after_ident_boundary(&lower, "spherical gaussians exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "spherical gaussian exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
         // "message/input(s) … too long" (distinct from `prompt too long` already handled above).
         // Same context-slot guard as `messages exceed` (FEAT-D295) so incidental `model context`
         // copy does not match non-slot errors. Plural `inputs are/were` (FEAT-D302) parallels
@@ -2757,6 +2849,21 @@ mod tests {
         ));
         assert!(is_context_overflow_error(
             "gateway: basis functions exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: auxiliary functions exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: primitive gaussians exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: contracted gaussians exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: spherical gaussians exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: electrons exceed available context on this request"
         ));
         assert!(is_context_overflow_error(
             "API error: message exceeds the model's context window"
@@ -5718,6 +5825,201 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "rebasis function exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: auxiliary functions exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: auxiliary functions exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: auxiliary function exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: auxiliary function exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: auxiliary functions exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: auxiliary functions exceeded RI-JK shell cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: auxiliary function exceed max density-fitting budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microauxiliary functions exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaauxiliary functions exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subauxiliary function exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superauxiliary function exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "preauxiliary function exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "reauxiliary function exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: primitive gaussians exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: primitive gaussians exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: primitive gaussian exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: primitive gaussian exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: primitive gaussians exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: primitive gaussians exceeded PGF shell cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: primitive gaussian exceed max contracted-primitive budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microprimitive gaussians exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaprimitive gaussians exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subprimitive gaussian exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superprimitive gaussian exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "preprimitive gaussian exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "reprimitive gaussian exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: contracted gaussians exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: contracted gaussians exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: contracted gaussian exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: contracted gaussian exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: contracted gaussians exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: contracted gaussians exceeded CGF shell cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: contracted gaussian exceed max contraction-depth budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microcontracted gaussians exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metacontracted gaussians exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subcontracted gaussian exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "supercontracted gaussian exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "precontracted gaussian exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "recontracted gaussian exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: spherical gaussians exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: spherical gaussians exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: spherical gaussian exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: spherical gaussian exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: spherical gaussians exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: spherical gaussians exceeded SGF shell cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: spherical gaussian exceed max angular-momentum budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microspherical gaussians exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaspherical gaussians exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subspherical gaussian exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superspherical gaussian exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "prespherical gaussian exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "respherical gaussian exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: electrons exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: electrons exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: electron exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: electron exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: electrons exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: electrons exceeded shell-occupancy cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: electron exceed max valence budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microelectrons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaelectrons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subelectron exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superelectron exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "preelectron exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "reelectron exceed the model's context window on this request"
         ));
         assert!(is_context_overflow_error(
             "API: bytes exceed the model's context window on this request"
