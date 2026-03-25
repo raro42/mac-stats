@@ -352,6 +352,21 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// `skyrmions exceed` does not match inside `microskyrmions exceed` / `metaskyrmions exceed`, and
 /// `skyrmion exceed` does not match inside `subskyrmion exceed` (left-boundary rejects
 /// `preskyrmion exceed` and `reskyrmion exceed`);
+/// `magnons exceed` does not match inside `micromagnons exceed` / `metamagnons exceed`, and
+/// `magnon exceed` does not match inside `submagnon exceed` (left-boundary rejects
+/// `premagnon exceed` and `remagnon exceed`);
+/// `rotons exceed` does not match inside `microrotons exceed` / `metarotons exceed`, and
+/// `roton exceed` does not match inside `subroton exceed` (left-boundary rejects
+/// `preroton exceed` and `reroton exceed`);
+/// `anyons exceed` does not match inside `microanyons exceed` / `metaanyons exceed`, and
+/// `anyon exceed` does not match inside `subanyon exceed` (left-boundary rejects
+/// `preanyon exceed` and `reanyon exceed`);
+/// `fluxons exceed` does not match inside `microfluxons exceed` / `metafluxons exceed`, and
+/// `fluxon exceed` does not match inside `subfluxon exceed` (left-boundary rejects
+/// `prefluxon exceed` and `refluxon exceed`);
+/// `vortices exceed` does not match inside `microvortices exceed` / `metavortices exceed`, and
+/// `vortex exceed` does not match inside `subvortex exceed` (left-boundary rejects
+/// `prevortex exceed` and `revortex exceed`);
 /// `messages exceed` does not match inside `micromessages exceed` / `metamessages exceed`, and
 /// `message exceed` does not match inside `submessage exceed` (left-boundary rejects `premessage exceed`
 /// and `remessage exceed`);
@@ -1768,6 +1783,63 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
         || ((contains_phrase_after_ident_boundary(&lower, "skyrmions exceed")
             || contains_phrase_after_ident_boundary(&lower, "skyrmions exceeded")
             || contains_phrase_after_ident_boundary(&lower, "skyrmion exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "magnon(s) exceed(s/ed)" (FEAT-D424). Parallel to `skyrmions exceed` /
+        // `skyrmion exceed`. `magnon exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `magnons exceed` (the `s` after `magnon`).
+        // Ident-boundary so `micromagnons exceed` / `metamagnons exceed` / `submagnon exceed` do not
+        // false-positive; `premagnon exceed` and `remagnon exceed` are rejected the same way. Same
+        // explicit context-slot phrases as `messages exceed`. Negatives: HTTP `magnons exceed` rate
+        // limits, per-branch / spin-wave caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "magnons exceed")
+            || contains_phrase_after_ident_boundary(&lower, "magnons exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "magnon exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "roton(s) exceed(s/ed)" (FEAT-D425). Parallel to `magnons exceed` /
+        // `magnon exceed`. `roton exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `rotons exceed` (the `s` after `roton`).
+        // Ident-boundary so `microrotons exceed` / `metarotons exceed` / `subroton exceed` do not
+        // false-positive; `preroton exceed` and `reroton exceed` are rejected the same way. Same
+        // explicit context-slot phrases as `messages exceed`. Negatives: HTTP `rotons exceed` rate
+        // limits, per-branch / Landau-level caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "rotons exceed")
+            || contains_phrase_after_ident_boundary(&lower, "rotons exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "roton exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "anyon(s) exceed(s/ed)" (FEAT-D426). Parallel to `rotons exceed` /
+        // `roton exceed`. `anyon exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `anyons exceed` (the `s` after `anyon`).
+        // Ident-boundary so `microanyons exceed` / `metaanyons exceed` / `subanyon exceed` do not
+        // false-positive; `preanyon exceed` and `reanyon exceed` are rejected the same way; `canyon
+        // exceed` does not match `anyon exceed` (the `c` before `anyon` breaks the boundary). Same
+        // explicit context-slot phrases as `messages exceed`. Negatives: HTTP `anyons exceed` rate
+        // limits, per-braid / fusion-rule caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "anyons exceed")
+            || contains_phrase_after_ident_boundary(&lower, "anyons exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "anyon exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "fluxon(s) exceed(s/ed)" (FEAT-D427). Parallel to `anyons exceed` /
+        // `anyon exceed`. `fluxon exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `fluxons exceed` (the `s` after `fluxon`).
+        // Ident-boundary so `microfluxons exceed` / `metafluxons exceed` / `subfluxon exceed` do not
+        // false-positive; `prefluxon exceed` and `refluxon exceed` are rejected the same way.
+        // Same explicit context-slot phrases as `messages exceed`. Negatives: HTTP `fluxons exceed`
+        // rate limits, per-Josephson / flux-quantum caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "fluxons exceed")
+            || contains_phrase_after_ident_boundary(&lower, "fluxons exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "fluxon exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "vortices / vortex exceed(s/ed)" (FEAT-D428). Parallel to `fluxons exceed` /
+        // `fluxon exceed`. `vortex exceed` matches present/past via `exceed` prefix of `exceeds` /
+        // `exceeded` and does not substring-match plural `vortices exceed` (the plural is `vortices`,
+        // not `vortex`). Ident-boundary so `microvortices exceed`
+        // / `metavortices exceed` / `subvortex exceed` do not false-positive; `prevortex exceed` and
+        // `revortex exceed` are rejected the same way. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `vortices exceed` rate limits, per-cell / circulation
+        // caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "vortices exceed")
+            || contains_phrase_after_ident_boundary(&lower, "vortices exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "vortex exceed"))
             && explicit_context_slot_after_ident_boundary(&lower))
         // "message/input(s) … too long" (distinct from `prompt too long` already handled above).
         // Same context-slot guard as `messages exceed` (FEAT-D295) so incidental `model context`
@@ -4440,6 +4512,174 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "superskyrmion exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: magnons exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: magnons exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: magnon exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: magnon exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: magnons exceed per-target rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: magnons exceeded daily spin-wave cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: magnon exceed max k-space budget on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: micromagnons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metamagnons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: submagnon exceed branch budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "supermagnon exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: rotons exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: rotons exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: roton exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: roton exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: rotons exceed per-target rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: rotons exceeded daily Landau-level cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: roton exceed max dispersion budget on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microrotons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metarotons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subroton exceed branch budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superroton exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: anyons exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: anyons exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: anyon exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: anyon exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: anyons exceed per-braid rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: anyons exceeded daily fusion-channel cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: anyon exceed max braiding budget on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microanyons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaanyons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subanyon exceed charge budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superanyon exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "geology: canyon exceed maximum depth on this survey (no model context configured)"
+        ));
+        assert!(is_context_overflow_error(
+            "API: fluxons exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: fluxons exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: fluxon exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: fluxon exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: fluxons exceed per-array rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: fluxons exceeded daily SQUID cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: fluxon exceed max shunt budget on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microfluxons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metafluxons exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subfluxon exceed bias budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superfluxon exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: vortices exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: vortices exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: vortex exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: vortex exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: vortices exceed per-mesh rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: vortices exceeded daily circulation cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: vortex exceed max swirl budget on this graph field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microvortices exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metavortices exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subvortex exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "supervortex exceed the model's context window on this request"
         ));
         assert!(is_context_overflow_error(
             "API: bytes exceed the model's context window on this request"

@@ -8,7 +8,9 @@ Cross-check **OpenClaw** `AGENTS.md` against the **openclaw** repository (siblin
 **OpenClaw `HEAD`:** `d25b4a29438b2f4f33ac113e14e661c4eca309e2` (short: `d25b4a2`)  
 **References:** `AGENTS.md` (repo guidelines), `package.json` (scripts), `vitest.config.ts` (coverage; `vitest.unit.config.ts` extends it for `pnpm test:coverage`).
 
-**Independent re-run:** `2026-03-24T23:11:50Z` — same `HEAD` `d25b4a2`; `src/channel-web.ts` present, no `src/provider-web.ts`; `src/cli`, `src/commands`, `src/infra`, `src/media`, `src/channels/`, `src/routing/`, `src/plugins/`, and `extensions/*` present; no bogus top-level `src/telegram`; `package.json` `check` chain still includes `format:check` → `pnpm tsgo` (no `"tsgo"` script key; `@typescript/native-preview` `7.0.0-dev.20260322.1`) → …; `pnpm format` / `format:fix` / `format:check` match `AGENTS.md`; `vitest.config.ts` thresholds 70/70/55/70; `vitest.unit.config.ts` still extends base; §7 table unchanged (**Aligned**).
+**Independent re-run:** `2026-03-24T23:40:37Z` — same `HEAD` `d25b4a2`; `src/channel-web.ts` present, no `src/provider-web.ts`; `src/cli`, `src/commands`, `src/infra`, `src/media`, `src/channels/`, `src/routing/`, `src/plugins/`, and `extensions/*` present; no bogus top-level `src/telegram`; `package.json` `check` chain still includes `format:check` → `pnpm tsgo` (no `"tsgo"` script key; `@typescript/native-preview` `7.0.0-dev.20260322.1`) → …; `pnpm format` / `format:fix` / `format:check` match `AGENTS.md`; `vitest.config.ts` thresholds 70/70/55/70; `vitest.unit.config.ts` still extends base; §7 table unchanged (**Aligned**).
+
+**Prior:** `2026-03-24T23:11:50Z` — same `HEAD` `d25b4a2`; identical conclusions.
 
 **Prior:** `2026-03-24T22:45:25Z` — same `HEAD` `d25b4a2`; identical conclusions.
 
