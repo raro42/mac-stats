@@ -411,6 +411,29 @@ fn contains_bounded_token(haystack: &str, needle: &str) -> bool {
 /// `supercell exceed` does not match inside `subsupercell exceed` (left-boundary rejects
 /// `presupercell exceed` and `resupercell exceed`; no space inside `supercells`, so `microsupercells`
 /// does not embed the phrase `supercells exceed` as a spaced token sequence);
+/// `k-points exceed` does not match inside `microk-points exceed` / `metak-points exceed` when the
+/// prior character before `k` is alphanumeric (`microk` / `metak` runs), and
+/// `k-point exceed` does not match inside `subk-point exceed` (left-boundary rejects
+/// `prek-point exceed` and `rek-point exceed`; embedded `k-point exceed` inside `superk-point exceed`
+/// does not match);
+/// `q-points exceed` does not match inside `microq-points exceed` / `metaq-points exceed` when the
+/// prior character before `q` is alphanumeric (`microq` / `metaq` runs), and
+/// `q-point exceed` does not match inside `subq-point exceed` (left-boundary rejects
+/// `preq-point exceed` and `req-point exceed`; embedded `q-point exceed` inside `superq-point exceed`
+/// does not match);
+/// `bands exceed` does not match inside `microbands exceed` / `metabands exceed`, and
+/// `band exceed` does not match inside `subband exceed` (left-boundary rejects
+/// `preband exceed` and `reband exceed`; embedded `band exceed` inside `superband exceed`
+/// does not match);
+/// `orbitals exceed` does not match inside `microorbitals exceed` / `metaorbitals exceed`, and
+/// `orbital exceed` does not match inside `suborbital exceed` (left-boundary rejects
+/// `preorbital exceed` and `reorbital exceed`; embedded `orbital exceed` inside `superorbital exceed`
+/// does not match);
+/// `basis functions exceed` does not match inside `microbasis functions exceed` / `metabasis functions exceed`, and
+/// `basis function exceed` does not match inside `subbasis function exceed` (left-boundary at `basis`
+/// rejects `prebasis function exceed` and `rebasis function exceed`; embedded `basis function exceed`
+/// inside `superbasis function exceed` does not match; no space inside `basisfunctions`, so the
+/// contiguous phrase `basis functions exceed` is absent there);
 /// `messages exceed` does not match inside `micromessages exceed` / `metamessages exceed`, and
 /// `message exceed` does not match inside `submessage exceed` (left-boundary rejects `premessage exceed`
 /// and `remessage exceed`);
@@ -2077,6 +2100,77 @@ pub(crate) fn is_context_overflow_error(err: &str) -> bool {
             || contains_phrase_after_ident_boundary(&lower, "supercells exceeded")
             || contains_phrase_after_ident_boundary(&lower, "supercell exceed"))
             && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "k-points / k-point exceed(s/ed)" (FEAT-D443). Parallel to
+        // `supercells exceed` / `supercell exceed`. `k-point exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `k-points exceed` (the `s` after `k-point` in `k-points` breaks the singular path).
+        // Ident-boundary before `k` so `microk-points exceed` / `metak-points exceed` /
+        // `subk-point exceed` do not false-positive (hyphenated `micro k-points …` still matches).
+        // `prek-point exceed` and `rek-point exceed` are rejected the same way; embedded
+        // `k-point exceed` inside `superk-point exceed` does not match. Same explicit context-slot
+        // phrases as `messages exceed`. Negatives: HTTP `k-points exceed` rate limits, per-mesh /
+        // Monkhorst–Pack caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "k-points exceed")
+            || contains_phrase_after_ident_boundary(&lower, "k-points exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "k-point exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "q-points / q-point exceed(s/ed)" (FEAT-D444). Parallel to
+        // `k-points exceed` / `k-point exceed`. `q-point exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `q-points exceed` (the `s` after `q-point` in `q-points` breaks the singular path).
+        // Ident-boundary before `q` so `microq-points exceed` / `metaq-points exceed` /
+        // `subq-point exceed` do not false-positive (hyphenated `micro q-points …` still matches).
+        // `preq-point exceed` and `req-point exceed` are rejected the same way; embedded
+        // `q-point exceed` inside `superq-point exceed` does not match. Same explicit context-slot
+        // phrases as `messages exceed`. Negatives: HTTP `q-points exceed` rate limits, per-mesh /
+        // phonon-branch caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "q-points exceed")
+            || contains_phrase_after_ident_boundary(&lower, "q-points exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "q-point exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "bands / band exceed(s/ed)" (FEAT-D445). Parallel to
+        // `q-points exceed` / `q-point exceed`. `band exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `bands exceed` (the `s` after `band` breaks `band` + space + `exceed`).
+        // Ident-boundary at `bands` / `band` so `microbands exceed` / `metabands exceed` /
+        // `subband exceed` do not false-positive; `preband exceed` and `reband exceed` are rejected
+        // the same way; embedded `band exceed` inside `superband exceed` does not match. Same
+        // explicit context-slot phrases as `messages exceed`. Negatives: HTTP `bands exceed` rate
+        // limits, per-k-path / empty-state caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "bands exceed")
+            || contains_phrase_after_ident_boundary(&lower, "bands exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "band exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "orbitals / orbital exceed(s/ed)" (FEAT-D446). Parallel to
+        // `bands exceed` / `band exceed`. `orbital exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `orbitals exceed` (the `s` after `orbital` breaks `orbital` + space + `exceed`).
+        // Ident-boundary at `orbitals` / `orbital` so `microorbitals exceed` / `metaorbitals exceed` /
+        // `suborbital exceed` do not false-positive; `preorbital exceed` and `reorbital exceed` are rejected
+        // the same way; embedded `orbital exceed` inside `superorbital exceed` does not match. Same
+        // explicit context-slot phrases as `messages exceed`. Negatives: HTTP `orbitals exceed` rate
+        // limits, per-basis-set / active-space caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "orbitals exceed")
+            || contains_phrase_after_ident_boundary(&lower, "orbitals exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "orbital exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
+        // Plural / singular "basis functions / basis function exceed(s/ed)" (FEAT-D447). Parallel to
+        // `orbitals exceed` / `orbital exceed`. `basis function exceed` matches present/past via
+        // `exceed` prefix of `exceeds` / `exceeded` and does not substring-match plural
+        // `basis functions exceed` (the `s` in `functions` prevents the singular `function` + space +
+        // `exceed` path from aligning inside the plural phrase).
+        // Ident-boundary at `basis` so `microbasis functions exceed` / `metabasis functions exceed` /
+        // `subbasis function exceed` do not false-positive (no space inside `basisfunctions`, so the
+        // phrase `basis functions exceed` is absent there; a spaced form `micro basis functions …`
+        // still matches at the boundary before `basis`). `prebasis function exceed` and
+        // `rebasis function exceed` are rejected the same way; embedded `basis function exceed` inside
+        // `superbasis function exceed` does not match. Same explicit context-slot phrases as
+        // `messages exceed`. Negatives: HTTP `basis functions exceed` rate limits, per-zeta /
+        // auxiliary-basis caps, etc. without slot wording.
+        || ((contains_phrase_after_ident_boundary(&lower, "basis functions exceed")
+            || contains_phrase_after_ident_boundary(&lower, "basis functions exceeded")
+            || contains_phrase_after_ident_boundary(&lower, "basis function exceed"))
+            && explicit_context_slot_after_ident_boundary(&lower))
         // "message/input(s) … too long" (distinct from `prompt too long` already handled above).
         // Same context-slot guard as `messages exceed` (FEAT-D295) so incidental `model context`
         // copy does not match non-slot errors. Plural `inputs are/were` (FEAT-D302) parallels
@@ -2654,6 +2748,15 @@ mod tests {
         ));
         assert!(is_context_overflow_error(
             "gateway: messages exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: bands exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: orbitals exceed available context on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: basis functions exceed available context on this request"
         ));
         assert!(is_context_overflow_error(
             "API error: message exceeds the model's context window"
@@ -5420,6 +5523,201 @@ mod tests {
         ));
         assert!(!is_context_overflow_error(
             "resupercell exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: k-points exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: k-points exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: k-point exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: k-point exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: k-points exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: k-points exceeded Monkhorst–Pack mesh cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: k-point exceed max irreducible-zone budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microk-points exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metak-points exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subk-point exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superk-point exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "prek-point exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "rek-point exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: q-points exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: q-points exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: q-point exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: q-point exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: q-points exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: q-points exceeded phonon-branch mesh cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: q-point exceed max Brillouin-zone q-path budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microq-points exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaq-points exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subq-point exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superq-point exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "preq-point exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "req-point exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: bands exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: bands exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: band exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: band exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: bands exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: bands exceeded daily empty-state cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: band exceed max k-path band budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microbands exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metabands exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subband exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superband exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "preband exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "reband exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: orbitals exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: orbitals exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: orbital exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: orbital exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: orbitals exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: orbitals exceeded active-space cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: orbital exceed max Gaussian-type basis budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microorbitals exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metaorbitals exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: suborbital exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superorbital exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "preorbital exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "reorbital exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "API: basis functions exceed the model's context window on this request"
+        ));
+        assert!(is_context_overflow_error(
+            "batch: basis functions exceeded available context for the completion"
+        ));
+        assert!(is_context_overflow_error(
+            "validation: basis function exceed maximum context length for this model"
+        ));
+        assert!(is_context_overflow_error(
+            "gateway: basis function exceeded the context window"
+        ));
+        assert!(!is_context_overflow_error(
+            "HTTP: basis functions exceed per-client rate limits for this endpoint"
+        ));
+        assert!(!is_context_overflow_error(
+            "billing: basis functions exceeded auxiliary-basis cap (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "schema: basis function exceed max contracted-Gaussian budget on this field (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "config: microbasis functions exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "tuning: metabasis functions exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "parser: subbasis function exceed core budget (no model context configured)"
+        ));
+        assert!(!is_context_overflow_error(
+            "superbasis function exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "prebasis function exceed the model's context window on this request"
+        ));
+        assert!(!is_context_overflow_error(
+            "rebasis function exceed the model's context window on this request"
         ));
         assert!(is_context_overflow_error(
             "API: bytes exceed the model's context window on this request"
