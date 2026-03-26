@@ -8,7 +8,9 @@ Cross-check **OpenClaw** `AGENTS.md` against the **openclaw** repository (siblin
 **OpenClaw `HEAD`:** `55dc6a8bb28dd9b6f4c4c1a8e8497fa48f7cc254` (short: `55dc6a8bb28d`)  
 **References:** `AGENTS.md` (repo guidelines), `package.json` (scripts), `vitest.config.ts` (coverage; `vitest.unit.config.ts` extends it for `pnpm test:coverage`).
 
-**Independent re-run:** `2026-03-26T15:50:38Z` — `HEAD` `55dc6a8bb28d` (unchanged); `src/channel-web.ts` present, no `src/provider-web.ts`; `src/cli`, `src/commands`, `src/infra`, `src/media`, `src/channels/`, `src/routing/`, `src/plugins/`, and `extensions/*` present; no bogus top-level `src/telegram`; `package.json` `check` chain still includes `format:check` → `pnpm tsgo` (no `"tsgo"` script key; `@typescript/native-preview` `7.0.0-dev.20260322.1`) → …; `pnpm format` / `format:fix` / `format:check` match `AGENTS.md`; `vitest.config.ts` thresholds 70/70/55/70; `vitest.unit.config.ts` still extends base; §7 table unchanged (**Aligned**).
+**Independent re-run:** `2026-03-26T15:57:50Z` — `HEAD` `55dc6a8bb28d` (unchanged); `src/channel-web.ts` present, no `src/provider-web.ts`; `src/cli`, `src/commands`, `src/infra`, `src/media`, `src/channels/`, `src/routing/`, `src/plugins/`, and `extensions/*` present; no bogus top-level `src/telegram`; `package.json` `check` chain still includes `format:check` → `pnpm tsgo` (no `"tsgo"` script key; `@typescript/native-preview` `7.0.0-dev.20260322.1`) → …; `pnpm format` / `format:fix` / `format:check` match `AGENTS.md`; `vitest.config.ts` thresholds 70/70/55/70; `vitest.unit.config.ts` still extends base; §7 table unchanged (**Aligned**).
+
+**Prior:** `2026-03-26T15:50:38Z` — `HEAD` `55dc6a8bb28d` (unchanged); `src/channel-web.ts` present, no `src/provider-web.ts`; `src/cli`, `src/commands`, `src/infra`, `src/media`, `src/channels/`, `src/routing/`, `src/plugins/`, and `extensions/*` present; no bogus top-level `src/telegram`; `package.json` `check` chain still includes `format:check` → `pnpm tsgo` (no `"tsgo"` script key; `@typescript/native-preview` `7.0.0-dev.20260322.1`) → …; `pnpm format` / `format:fix` / `format:check` match `AGENTS.md`; `vitest.config.ts` thresholds 70/70/55/70; `vitest.unit.config.ts` still extends base; §7 table unchanged (**Aligned**).
 
 **Prior:** `2026-03-26T15:43:47Z` — `HEAD` `55dc6a8bb2` (unchanged since prior check); `src/channel-web.ts` present, no `src/provider-web.ts`; `src/cli`, `src/commands`, `src/infra`, `src/media`, `src/channels/`, `src/routing/`, `src/plugins/`, and `extensions/*` present; no bogus top-level `src/telegram`; `package.json` `check` chain still includes `format:check` → `pnpm tsgo` (no `"tsgo"` script key; `@typescript/native-preview` `7.0.0-dev.20260322.1`) → …; `pnpm format` / `format:fix` / `format:check` match `AGENTS.md`; `vitest.config.ts` thresholds 70/70/55/70; `vitest.unit.config.ts` still extends base; §7 table unchanged (**Aligned**).
 
@@ -143,7 +145,7 @@ Cross-check **OpenClaw** `AGENTS.md` against the **openclaw** repository (siblin
 
 Earlier the same day, `AGENTS.md` had stale paths (`provider-web.ts`, old channel dirs), wrong format wording, and wrong branch threshold. Those were corrected upstream; the table above confirms the current tree matches the doc.
 
-**Upstream status:** `../openclaw/AGENTS.md` matches `package.json`, `vitest.config.ts`, and `src/` as of 2026-03-26 (`55dc6a8bb28d`; last check `2026-03-26T15:50:38Z`).
+**Upstream status:** `../openclaw/AGENTS.md` matches `package.json`, `vitest.config.ts`, and `src/` as of 2026-03-26 (`55dc6a8bb28d`; last check `2026-03-26T15:57:50Z`).
 
 ---
 
