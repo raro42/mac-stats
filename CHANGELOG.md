@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.62] - 2026-03-26
 
 ### Changed
-- **OpenClaw reviewer** — Independent re-run **`2026-03-26T19:35:59Z`** (`HEAD` unchanged **`55dc6a8bb28d`**); same checks as prior run (layout, `pnpm check` / `tsgo`, Vitest, §7 **Aligned**). (`005-openclaw-reviewer/005-openclaw-reviewer.md`.)
+- **OpenClaw reviewer** — Independent re-run **`2026-03-26T19:42:25Z`** (`HEAD` unchanged **`55dc6a8bb28d`**); same checks as prior run (layout, `pnpm check` / `tsgo`, Vitest, §7 **Aligned**). (`005-openclaw-reviewer/005-openclaw-reviewer.md`.)
 
 ## [0.1.61] - 2026-03-26
 
