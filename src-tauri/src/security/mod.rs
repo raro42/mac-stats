@@ -81,6 +81,12 @@ pub fn get_credential(account: &str) -> Result<Option<String>> {
         Ok(password_bytes) => {
             let password = String::from_utf8(password_bytes)
                 .context("Failed to convert credential to UTF-8 string")?;
+            tracing::trace!(
+                target: "mac_stats::security",
+                "Keychain: retrieved credential for account '{}' (preview {})",
+                account,
+                mask_credential(&password)
+            );
             Ok(Some(password))
         }
         Err(e) => {

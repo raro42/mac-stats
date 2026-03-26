@@ -369,10 +369,20 @@ function getConversationHistory() {
 }
 
 /**
- * Add message to conversation history
+ * Add message to conversation history.
+ * @param {string} role - 'user' | 'assistant'
+ * @param {string} content - message text
+ * @param {string[]|null|undefined} attachmentPaths - optional screenshot paths; recorded as `[screenshot: …]` lines (same convention as agent router)
  */
-function addToHistory(role, content) {
-  conversationHistory.push({ role, content });
+function addToHistory(role, content, attachmentPaths) {
+  let stored = content;
+  if (attachmentPaths && attachmentPaths.length > 0) {
+    const lines = attachmentPaths.map((p) => `[screenshot: ${p}]`).join('\n');
+    const sep =
+      stored && !stored.endsWith('\n') ? '\n\n' : stored ? '\n' : '';
+    stored = `${stored}${sep}${lines}`;
+  }
+  conversationHistory.push({ role, content: stored });
   // Limit history to last 20 messages to avoid token limits
   if (conversationHistory.length > 20) {
     conversationHistory = conversationHistory.slice(-20);
@@ -485,7 +495,7 @@ async function sendChatMessage() {
       await executeCodeAndContinue(response, message, systemPrompt, 0);
     } else if (response.final_answer) {
       if (!useStreaming) addChatMessage('assistant', response.final_answer);
-      addToHistory('assistant', response.final_answer);
+      addToHistory('assistant', response.final_answer, response.attachment_paths);
     } else {
       if (!useStreaming) addChatMessage('assistant', 'Received unexpected response format');
       else addChatMessage('assistant', 'Received unexpected response format');
@@ -619,7 +629,7 @@ async function executeCodeAndContinue(response, originalQuestion, systemPrompt, 
           ? `--- Intermediate answer ---\n\n${intermediate}\n\n--- Final answer ---\n\n${finalText}`
           : finalText;
         addChatMessage('assistant', displayText);
-        addToHistory('assistant', displayText);
+        addToHistory('assistant', displayText, continueResponse.attachment_paths);
       } else {
         // Unexpected response format
         console.warn('[Ollama] Unexpected continue response format:', continueResponse);
@@ -963,6 +973,59 @@ function escapeHtml(text) {
 /**
  * Initialize Ollama chat event listeners
  */
+let compactionStatusDismissTimer = null;
+
+function setChatCompactionStatus(html, showSpinner) {
+  const el = document.getElementById('chat-compaction-status');
+  if (!el) return;
+  if (!html) {
+    el.hidden = true;
+    el.innerHTML = '';
+    return;
+  }
+  el.hidden = false;
+  if (showSpinner) {
+    el.innerHTML = `<span class="compaction-spinner" aria-hidden="true"></span><span>${html}</span>`;
+  } else {
+    el.innerHTML = `<span>${html}</span>`;
+  }
+}
+
+async function setupCompactionStatusListener() {
+  const listenFn = getListen();
+  if (!listenFn) return;
+  try {
+    await listenFn('mac-stats-compaction', (event) => {
+      const data = event?.payload?.data;
+      if (!data || typeof data !== 'object') return;
+      const phase = data.phase;
+      if (phase === 'start') {
+        if (compactionStatusDismissTimer) {
+          clearTimeout(compactionStatusDismissTimer);
+          compactionStatusDismissTimer = null;
+        }
+        setChatCompactionStatus('Compacting context…', true);
+      } else if (phase === 'end') {
+        if (compactionStatusDismissTimer) {
+          clearTimeout(compactionStatusDismissTimer);
+          compactionStatusDismissTimer = null;
+        }
+        if (data.ok === true) {
+          setChatCompactionStatus('Context compacted', false);
+          compactionStatusDismissTimer = setTimeout(() => {
+            setChatCompactionStatus('', false);
+            compactionStatusDismissTimer = null;
+          }, 4000);
+        } else {
+          setChatCompactionStatus('', false);
+        }
+      }
+    });
+  } catch (e) {
+    console.warn('[Ollama] mac-stats-compaction listener failed:', e?.message || e);
+  }
+}
+
 function initOllamaChatListeners() {
   const chatInput = document.getElementById('chat-input');
   const chatSendBtn = document.getElementById('chat-send-btn');
@@ -971,6 +1034,8 @@ function initOllamaChatListeners() {
     console.warn('[Ollama] Chat input or send button not found');
     return;
   }
+
+  void setupCompactionStatusListener();
   
   // Send button click
   chatSendBtn.addEventListener('click', () => {

@@ -1,0 +1,23 @@
+# Bundled default navigation blocklist for BROWSER_* CDP / HTTP fallback.
+# Replace entirely by creating ~/.mac-stats/browser-security-blocklist.txt (one host or glob per line).
+# Additional entries: BROWSER_BLOCKED_DOMAINS in env or ~/.mac-stats/.config.env (comma-separated).
+# Lines starting with # are ignored.
+
+localhost
+127.0.0.1
+::1
+*.local
+
+# Common cloud operator consoles
+console.aws.amazon.com
+*.console.aws.amazon.com
+portal.azure.com
+console.cloud.google.com
+
+# Representative high-risk / sensitive site patterns (extend via config)
+chase.com
+*.chase.com
+bankofamerica.com
+*.bankofamerica.com
+wellsfargo.com
+*.wellsfargo.com

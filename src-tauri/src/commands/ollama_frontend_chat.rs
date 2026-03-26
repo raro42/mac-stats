@@ -3,12 +3,20 @@
 //! These commands handle the in-app chat UI: `ollama_chat_with_execution` and
 //! `ollama_chat_continue_with_result`. Extracted from `ollama.rs`.
 
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
+use crate::commands::context_assembler::{
+    fragments, ContextAssembler, FrontendContextAssembler,
+};
 use crate::commands::ollama_chat::{
-    ollama_chat, send_ollama_chat_messages, send_ollama_chat_messages_streaming,
+    ollama_chat, send_ollama_chat_messages, send_ollama_chat_messages_streaming, OllamaHttpQueue,
 };
 use crate::commands::ollama_config::{default_non_agent_system_prompt, ChatRequest};
+use crate::commands::content_reduction::CHARS_PER_TOKEN;
+use crate::commands::session_history::{
+    prepare_conversation_history, CompactionLifecycleContext, CONVERSATION_HISTORY_CAP,
+};
 use crate::commands::tool_parsing::parse_fetch_url_from_response;
 
 /// Primary in-app chat should see what the scheduler already posted to Discord (authoritative log + this block).
@@ -43,6 +51,9 @@ pub struct OllamaChatWithExecutionResponse {
     pub final_answer: Option<String>,
     pub error: Option<String>,
     pub context_message: Option<String>,
+    /// Paths the app would attach on remote/Discord-style runs (CPU chat path is usually empty).
+    #[serde(default)]
+    pub attachment_paths: Vec<String>,
 }
 
 /// If the CPU window is not open, schedule opening or showing it on the main thread so the user can see the chat.
@@ -92,19 +103,36 @@ fn ensure_cpu_window_open() {
 pub async fn ollama_chat_with_execution(
     request: OllamaChatWithExecutionRequest,
 ) -> Result<OllamaChatWithExecutionResponse, String> {
-    use crate::metrics::format_metrics_for_ai_context;
     use tracing::info;
 
     ensure_cpu_window_open();
+
+    let coord_ui = crate::commands::turn_lifecycle::coordination_key(None);
+    let ui_event_ts = Utc::now();
+    let ui_event_id = format!(
+        "cpu-ui-{}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0)
+    );
+    if crate::commands::abort_cutoff::should_skip(coord_ui, &ui_event_id, ui_event_ts) {
+        return Err(
+            "Chat request skipped (stale vs a recent abort on the non-Discord session slot)."
+                .to_string(),
+        );
+    }
 
     info!(
         "Ollama Chat with Execution: Starting for question: {}",
         request.question
     );
 
+    let token_budget =
+        crate::commands::context_assembler::resolve_default_chat_context_token_budget().await;
+
     // Include gathered metrics so the model can answer accurately when the user asks about CPU, RAM, etc.
-    let metrics_block = format_metrics_for_ai_context();
-    let context_message = format!("{}\n\nUser question: {}", metrics_block, request.question);
+    let context_message = fragments::cpu_window_user_turn_with_metrics(&request.question);
 
     // Get system prompt: use soul.md (~/.mac-stats/agents/soul.md or bundled default) + tools when not overridden
     let system_prompt = augment_cpu_system_with_scheduler_awareness(
@@ -113,44 +141,71 @@ pub async fn ollama_chat_with_execution(
             .unwrap_or_else(default_non_agent_system_prompt),
     );
 
-    // Build messages array with conversation history
-    let mut messages = vec![crate::ollama::ChatMessage {
-        role: "system".to_string(),
-        content: system_prompt.clone(),
-        images: None,
-    }];
-
-    // Add conversation history if provided (exclude system messages - we already have one)
-    if let Some(ref history) = request.conversation_history {
-        for msg in history {
-            if msg.role == "user" || msg.role == "assistant" {
-                messages.push(msg.clone());
-            }
-        }
-        info!(
-            "Ollama Chat with Execution: Added {} messages from conversation history",
-            history
-                .iter()
+    let raw_prior: Vec<crate::ollama::ChatMessage> = request
+        .conversation_history
+        .as_ref()
+        .map(|h| {
+            h.iter()
                 .filter(|m| m.role == "user" || m.role == "assistant")
-                .count()
-        );
-    }
+                .cloned()
+                .collect()
+        })
+        .unwrap_or_default();
+    let raw_prior = ContextAssembler::compact(&FrontendContextAssembler, raw_prior);
 
-    // Add current user message
-    messages.push(crate::ollama::ChatMessage {
-        role: "user".to_string(),
-        content: context_message.clone(),
-        images: None,
-    });
+    let request_id = format!(
+        "cpu-chat-{:08x}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis() as u64
+            & 0xFFFF_FFFF
+    );
+
+    let compacted_prior = prepare_conversation_history(
+        raw_prior,
+        &request.question,
+        false,
+        None,
+        &request_id,
+        CompactionLifecycleContext {
+            hook_source: "cpu".to_string(),
+            hook_session_id: 0,
+            emit_cpu_compaction_ui: true,
+        },
+    )
+    .await;
+
+    info!(
+        "Ollama Chat with Execution: prior turns after prepare ({} messages, cap {})",
+        compacted_prior.len(),
+        CONVERSATION_HISTORY_CAP
+    );
+
+    let mut messages = ContextAssembler::assemble(
+        &FrontendContextAssembler,
+        &compacted_prior,
+        &system_prompt,
+        crate::ollama::ChatMessage {
+            role: "user".to_string(),
+            content: context_message.clone(),
+            images: None,
+        },
+        token_budget,
+    );
 
     info!(
         "Ollama Chat with Execution: Sending initial request to Ollama (stream={})",
         request.stream
     );
+    let cpu_q = OllamaHttpQueue::Acquire {
+        key: "cpu_ui".to_string(),
+        wait_hook: None,
+    };
     let mut response = if request.stream {
-        send_ollama_chat_messages_streaming(messages.clone(), None, None).await
+        send_ollama_chat_messages_streaming(messages.clone(), None, None, cpu_q.clone()).await
     } else {
-        send_ollama_chat_messages(messages.clone(), None, None).await
+        send_ollama_chat_messages(messages.clone(), None, None, cpu_q).await
     }
     .map_err(|e| {
         crate::commands::content_reduction::sanitize_ollama_error_for_user(&e)
@@ -170,7 +225,7 @@ pub async fn ollama_chat_with_execution(
         fetch_count += 1;
         info!("Ollama Chat with Execution: FETCH_URL requested: {}", url);
 
-        let raw_content = crate::commands::browser::fetch_page_content(&url)
+        let raw_content = crate::commands::browser::fetch_page_content_for_agent(&url)
             .map_err(|e| format!("Fetch page failed: {}", e))?;
         let original_len = raw_content.len();
         let page_content = crate::commands::html_cleaning::clean_html(&raw_content);
@@ -188,17 +243,21 @@ pub async fn ollama_chat_with_execution(
             crate::commands::text_normalize::apply_untrusted_homoglyph_normalization(page_content)
         };
 
+        crate::commands::suspicious_patterns::log_untrusted_suspicious_scan("fetched-page", &page_content);
+
         let mut follow_up_messages = messages.clone();
         follow_up_messages.push(crate::ollama::ChatMessage {
             role: "assistant".to_string(),
-            content: response_content.clone(),
+            content: crate::commands::directive_tags::strip_inline_directive_tags_for_display(
+                &response_content,
+            ),
             images: None,
         });
         follow_up_messages.push(crate::ollama::ChatMessage {
             role: "user".to_string(),
             content: format!(
                 "Here is the page content:\n\n{}\n\nPlease answer the user's question based on this content.",
-                page_content
+                crate::commands::untrusted_content::wrap_untrusted_content("fetched-page", &page_content)
             ),
             images: None,
         });
@@ -226,6 +285,8 @@ pub async fn ollama_chat_with_execution(
     // Process response content - handle escaped newlines
     let mut processed_content = response_content.replace("\\n", "\n");
     processed_content = processed_content.replace("javascript\n", "");
+    processed_content =
+        crate::commands::directive_tags::strip_inline_directive_tags_for_display(&processed_content);
 
     if let Some(code) =
         crate::commands::tool_parsing::detect_and_extract_js_code(&processed_content)
@@ -244,6 +305,7 @@ pub async fn ollama_chat_with_execution(
                 final_answer: None,
                 error: Some("No code found in code-assistant response".to_string()),
                 context_message: Some(context_message),
+                attachment_paths: vec![],
             });
         }
 
@@ -254,6 +316,7 @@ pub async fn ollama_chat_with_execution(
             final_answer: None,
             error: None,
             context_message: Some(context_message),
+            attachment_paths: vec![],
         });
     }
 
@@ -266,6 +329,7 @@ pub async fn ollama_chat_with_execution(
         final_answer: Some(processed_content),
         error: None,
         context_message: Some(context_message),
+        attachment_paths: vec![],
     })
 }
 
@@ -276,6 +340,8 @@ pub struct OllamaChatContinueResponse {
     pub intermediate_response: Option<String>,
     pub final_answer: Option<String>,
     pub context_message: Option<String>,
+    #[serde(default)]
+    pub attachment_paths: Vec<String>,
 }
 
 /// Continue Ollama chat after code execution
@@ -300,6 +366,9 @@ pub async fn ollama_chat_continue_with_result(
         execution_result
     );
 
+    let token_budget =
+        crate::commands::context_assembler::resolve_default_chat_context_token_budget().await;
+
     let system_prompt = augment_cpu_system_with_scheduler_awareness(
         system_prompt.unwrap_or_else(default_non_agent_system_prompt),
     );
@@ -308,36 +377,61 @@ pub async fn ollama_chat_continue_with_result(
         "I have executed your last codeblocks and the result is: {}\n\nCan you now answer the original question: {}?",
         execution_result, original_question
     );
+    let tail_extra_tokens = intermediate_response.chars().count() / CHARS_PER_TOKEN
+        + follow_up_message.chars().count() / CHARS_PER_TOKEN
+        + 128;
+    let assemble_budget = token_budget.saturating_sub(tail_extra_tokens);
 
-    // Build messages array with conversation history
-    let mut messages = vec![crate::ollama::ChatMessage {
-        role: "system".to_string(),
-        content: system_prompt.clone(),
-        images: None,
-    }];
-
-    // Add conversation history if provided (exclude system messages - we already have one)
-    if let Some(ref history) = conversation_history {
-        for msg in history {
-            if msg.role == "user" || msg.role == "assistant" {
-                messages.push(msg.clone());
-            }
-        }
-        info!(
-            "Ollama Chat Continue: Added {} messages from conversation history",
-            history
-                .iter()
+    let raw_prior: Vec<crate::ollama::ChatMessage> = conversation_history
+        .as_ref()
+        .map(|h| {
+            h.iter()
                 .filter(|m| m.role == "user" || m.role == "assistant")
-                .count()
-        );
-    }
+                .cloned()
+                .collect()
+        })
+        .unwrap_or_default();
+    let raw_prior = ContextAssembler::compact(&FrontendContextAssembler, raw_prior);
 
-    // Add the conversation flow for this code execution cycle
-    messages.push(crate::ollama::ChatMessage {
-        role: "user".to_string(),
-        content: context_message.clone(),
-        images: None,
-    });
+    let request_id = format!(
+        "cpu-continue-{:08x}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis() as u64
+            & 0xFFFF_FFFF
+    );
+
+    let compacted_prior = prepare_conversation_history(
+        raw_prior,
+        &original_question,
+        false,
+        None,
+        &request_id,
+        CompactionLifecycleContext {
+            hook_source: "cpu".to_string(),
+            hook_session_id: 0,
+            emit_cpu_compaction_ui: true,
+        },
+    )
+    .await;
+
+    info!(
+        "Ollama Chat Continue: prior turns after prepare ({} messages)",
+        compacted_prior.len()
+    );
+
+    let mut messages = ContextAssembler::assemble(
+        &FrontendContextAssembler,
+        &compacted_prior,
+        &system_prompt,
+        crate::ollama::ChatMessage {
+            role: "user".to_string(),
+            content: context_message.clone(),
+            images: None,
+        },
+        assemble_budget.max(512),
+    );
     messages.push(crate::ollama::ChatMessage {
         role: "assistant".to_string(),
         content: intermediate_response.clone(),
@@ -366,6 +460,8 @@ pub async fn ollama_chat_continue_with_result(
     // Process response content - handle escaped newlines
     let mut processed_content = response_content.replace("\\n", "\n");
     processed_content = processed_content.replace("javascript\n", "");
+    processed_content =
+        crate::commands::directive_tags::strip_inline_directive_tags_for_display(&processed_content);
 
     if let Some(code) =
         crate::commands::tool_parsing::detect_and_extract_js_code(&processed_content)
@@ -383,6 +479,7 @@ pub async fn ollama_chat_continue_with_result(
                 intermediate_response: Some(processed_content),
                 final_answer: None,
                 context_message: Some(context_message),
+                attachment_paths: vec![],
             });
         }
 
@@ -392,6 +489,7 @@ pub async fn ollama_chat_continue_with_result(
             intermediate_response: Some(processed_content),
             final_answer: None,
             context_message: Some(context_message),
+            attachment_paths: vec![],
         });
     }
 
@@ -403,5 +501,6 @@ pub async fn ollama_chat_continue_with_result(
         intermediate_response: None,
         final_answer: Some(processed_content),
         context_message: Some(context_message),
+        attachment_paths: vec![],
     })
 }

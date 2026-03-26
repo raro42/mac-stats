@@ -95,6 +95,40 @@ pub fn get_brave_api_key() -> Option<String> {
     None
 }
 
+/// Single-result query to verify the subscription token (feature health; short timeout).
+pub(crate) async fn ping_brave_search_api(api_key: &str) -> Result<(), String> {
+    const PING_Q: &str = "mac-stats-health-check";
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(3))
+        .build()
+        .map_err(|e| format!("Brave HTTP client: {}", e))?;
+
+    let resp = client
+        .get(BRAVE_WEB_SEARCH_URL)
+        .query(&[("q", PING_Q), ("count", "1")])
+        .header("Accept", "application/json")
+        .header("X-Subscription-Token", api_key.trim())
+        .send()
+        .await
+        .map_err(|e| format!("Brave ping failed: {}", e))?;
+
+    let status = resp.status();
+    log_brave_rate_limit_headers(&resp);
+    if !status.is_success() {
+        let body = resp.text().await.unwrap_or_default();
+        return Err(format!(
+            "Brave ping HTTP {}: {}",
+            status.as_u16(),
+            if body.is_empty() {
+                status.canonical_reason().unwrap_or("").to_string()
+            } else {
+                body.chars().take(200).collect::<String>()
+            }
+        ));
+    }
+    Ok(())
+}
+
 /// Run a web search via Brave Search API. Returns a formatted string of results for Ollama.
 /// Rejects empty or whitespace-only queries to avoid unnecessary API calls.
 pub async fn brave_web_search(query: &str, api_key: &str) -> Result<String, String> {

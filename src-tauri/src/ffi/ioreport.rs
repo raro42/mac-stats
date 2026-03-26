@@ -118,6 +118,32 @@ pub fn copy_channels_in_group(
     }
 }
 
+/// Startup health probe: whether IOReport exposes CPU performance-state channels (same group as frequency sampling).
+#[cfg(target_os = "macos")]
+pub fn probe_cpu_performance_channels_available() -> bool {
+    use core_foundation::base::CFRelease;
+    match copy_channels_in_group(
+        "CPU Stats",
+        "CPU Core Performance States",
+        false,
+        false,
+        false,
+    ) {
+        Ok(dict) => {
+            unsafe {
+                CFRelease(dict as core_foundation::base::CFTypeRef);
+            }
+            true
+        }
+        Err(_) => false,
+    }
+}
+
+#[cfg(not(target_os = "macos"))]
+pub fn probe_cpu_performance_channels_available() -> bool {
+    false
+}
+
 /// Safe wrapper for IOReportMergeChannels
 /// Currently unused - kept for future FFI migration.
 #[allow(dead_code)]

@@ -96,7 +96,11 @@ pub(crate) async fn handle_perplexity_search(
             } else {
                 format!(
                     "## Perplexity Search Results ({} items)\n\n{}\n\nUse these to answer the user's question. Cite source number, title or URL, and date when given.",
-                    num_results, results
+                    num_results,
+                    crate::commands::untrusted_content::wrap_untrusted_content(
+                        "perplexity-search-results",
+                        &results,
+                    )
                 )
             };
             if is_news && !results.is_empty() {

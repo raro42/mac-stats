@@ -1,6 +1,6 @@
 [package]
 name = "mac_stats"
-version = "0.1.60"
+version = "0.1.61"
 description = "Local AI agent for macOS (Rust + Tauri): Ollama chat, Discord bot, task runner, scheduler, MCP—all on your Mac. No cloud, no telemetry. Menu bar shows CPU/GPU/RAM/disk when you need it; website monitoring and alerts. Built for minimal CPU overhead."
 authors = ["raro42"]
 edition = "2021"
@@ -67,11 +67,20 @@ url = "2.5"
 anyhow = "1.0"
 base64 = "0.22"
 toml = "0.8"
+totp-rs = "5"
 serenity = { version = "0.12", default-features = false, features = ["client", "gateway", "http", "model", "utils", "rustls_backend"] }
 futures-util = "0.3"
 notify = "6"
 tokio-util = "0.7.18"
 headless_chrome = "1.0"
+tungstenite = { version = "0.28", default-features = true }
 regex = "1"
 scraper = "0.19"
+sha2 = "0.10"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp"] }
+imageproc = "0.25"
+ab_glyph = "0.2"
 
+# Patched vendored copy: adds `Tab::reset_fetch_auth_challenge_response_to_default` for CDP Fetch proxy vs server auth (see `vendor/headless_chrome`).
+[patch.crates-io]
+headless_chrome = { path = "vendor/headless_chrome" }

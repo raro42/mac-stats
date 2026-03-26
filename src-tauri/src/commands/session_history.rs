@@ -5,7 +5,13 @@
 use crate::commands::compaction::{
     compact_conversation_history, COMPACTION_THRESHOLD, MIN_CONVERSATIONAL_FOR_COMPACTION,
 };
+use crate::commands::compaction_hooks::{
+    emit_mac_stats_compaction_event, run_after_compaction_fire_and_forget,
+    run_before_compaction_fire_and_forget,
+};
 use crate::commands::reply_helpers::{append_to_file, looks_like_discord_401_confusion};
+
+pub use crate::commands::compaction_hooks::CompactionLifecycleContext;
 use crate::ollama::ChatMessage;
 
 pub(crate) const CONVERSATION_HISTORY_CAP: usize = 20;
@@ -45,6 +51,9 @@ pub(crate) fn cap_tail_chronological<T>(items: Vec<T>, cap: usize) -> Vec<T> {
 }
 
 fn annotate_discord_401(mut msg: ChatMessage) -> ChatMessage {
+    msg.content = crate::commands::directive_tags::strip_inline_directive_tags_for_display(
+        &msg.content,
+    );
     if msg.role == "assistant" && looks_like_discord_401_confusion(&msg.content) {
         msg.content.push_str(
             "\n\n[SYSTEM CORRECTION: The above 401 was from FETCH_URL (no token). Use DISCORD_API instead.]",
@@ -61,6 +70,7 @@ pub(crate) async fn prepare_conversation_history(
     is_new_topic: bool,
     discord_reply_channel_id: Option<u64>,
     request_id: &str,
+    lifecycle: CompactionLifecycleContext,
 ) -> Vec<ChatMessage> {
     use tracing::info;
 
@@ -85,8 +95,45 @@ pub(crate) async fn prepare_conversation_history(
             raw_history.len(),
             COMPACTION_THRESHOLD
         );
+
+        let hook_src = lifecycle.hook_source.as_str();
+        let hook_sid = lifecycle.hook_session_id;
+        let msg_count_before = raw_history.len();
+
+        run_before_compaction_fire_and_forget(hook_src, hook_sid, &pairs, request_id);
+
+        if lifecycle.emit_cpu_compaction_ui {
+            emit_mac_stats_compaction_event("start", false, request_id, None);
+        }
+
         match compact_conversation_history(&raw_history, question, discord_reply_channel_id).await {
             Ok((context, lessons)) => {
+                if lifecycle.emit_cpu_compaction_ui {
+                    emit_mac_stats_compaction_event("end", false, request_id, Some(true));
+                }
+
+                let lessons_written = lessons
+                    .as_ref()
+                    .map(|s| !s.trim().is_empty())
+                    .unwrap_or(false);
+                let skip_after_for_having_fun = discord_reply_channel_id.is_some_and(|ch| {
+                    crate::discord::is_discord_channel_having_fun(ch)
+                });
+                if !skip_after_for_having_fun {
+                    run_after_compaction_fire_and_forget(
+                        hook_src,
+                        hook_sid,
+                        msg_count_before,
+                        lessons_written,
+                        request_id,
+                    );
+                } else {
+                    tracing::debug!(
+                        target: "mac_stats::compaction",
+                        "after_compaction hook skipped (Discord having_fun fixed context)"
+                    );
+                }
+
                 info!(
                     "Session compaction [{}]: produced context ({} chars), lessons: {}",
                     request_id,
@@ -109,6 +156,13 @@ pub(crate) async fn prepare_conversation_history(
                         request_id, memory_path
                     );
                 }
+                crate::commands::ori_lifecycle::maybe_capture_compaction_fire_and_forget(
+                    lessons.as_deref(),
+                    hook_src,
+                    hook_sid,
+                    request_id,
+                    discord_reply_channel_id,
+                );
                 let context_lower = context.to_lowercase();
                 let not_needed = context_lower.contains("not needed for this request")
                     || context_lower.contains("covered different topics");
@@ -142,6 +196,10 @@ pub(crate) async fn prepare_conversation_history(
                 }
             }
             Err(e) => {
+                if lifecycle.emit_cpu_compaction_ui {
+                    emit_mac_stats_compaction_event("end", false, request_id, Some(false));
+                }
+
                 let n = raw_history.len();
                 let err_s = e.to_string();
                 let is_skip = err_s.contains("no real conversational value");
@@ -180,7 +238,7 @@ pub(crate) async fn prepare_conversation_history(
 mod tests {
     use super::{
         build_execution_message_stack, cap_tail_chronological, prepare_conversation_history,
-        CONVERSATION_HISTORY_CAP, HAVING_FUN_IDLE_HISTORY_CAP,
+        CompactionLifecycleContext, CONVERSATION_HISTORY_CAP, HAVING_FUN_IDLE_HISTORY_CAP,
     };
     use crate::commands::compaction::COMPACTION_THRESHOLD;
     use crate::ollama::ChatMessage;
@@ -297,9 +355,15 @@ mod tests {
                 images: None,
             },
         ];
-        let out =
-            prepare_conversation_history(raw, "fresh question", true, None, "test-req-new-topic")
-                .await;
+        let out = prepare_conversation_history(
+            raw,
+            "fresh question",
+            true,
+            None,
+            "test-req-new-topic",
+            CompactionLifecycleContext::default(),
+        )
+        .await;
         assert!(out.is_empty());
     }
 
@@ -311,9 +375,15 @@ mod tests {
             content: confused.to_string(),
             images: None,
         }];
-        let out =
-            prepare_conversation_history(raw, "follow-up", false, None, "test-req-401-annotate")
-                .await;
+        let out = prepare_conversation_history(
+            raw,
+            "follow-up",
+            false,
+            None,
+            "test-req-401-annotate",
+            CompactionLifecycleContext::default(),
+        )
+        .await;
         assert_eq!(out.len(), 1);
         assert!(out[0].content.contains(confused));
         assert!(out[0].content.contains(SYSTEM_CORRECTION_401));

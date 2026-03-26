@@ -30,12 +30,12 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 
 ## 2. Discord Agent (Gateway + HTTP API)
 
-mac-stats can run a Discord bot that connects via the **Gateway** and responds to **DMs** and **@mentions**. Replies use the Ollama agent pipeline and can call the **Discord HTTP API** (list servers, channels, members, get user info, send messages). The bot records the message author’s display name and passes it to Ollama so it can address the user by name.
+mac-stats can run a Discord bot that connects via the **Gateway** and responds to **DMs** and **@mentions**. In guild channels configured as **`mention_only`**, a **reply** to the bot’s last message (without toggling the mention ping) also counts as addressing the bot—the handler treats a **message reference** to a message authored by the bot like an @mention. Replies use the Ollama agent pipeline and can call the **Discord HTTP API** (list servers, channels, members, get user info, send messages). The bot records the message author’s display name and passes it to Ollama so it can address the user by name.
 
 
 ### Bot functionality at a glance
 
-- **Triggers:** Responds to direct messages and to messages that @mention the bot in guild channels.
+- **Triggers:** Responds to direct messages; in guild channels, to messages that **@mention** the bot, or (for **`mention_only`** channels) to **replies** to the bot’s own messages even when the reply does not include a literal `<@id>` mention.
 - **Reply pipeline:** Ollama + tools (FETCH_URL, BRAVE_SEARCH, RUN_CMD, BROWSER_SCREENSHOT, DISCORD_API, SCHEDULE, MCP, etc.); planning step then execution; platform formatting for Discord (bullets, link wrapping).
 - **Personalization:** Records your display name per channel; tells Ollama who it is talking to.
 - **Session and memory:** Per-channel session files; say a reset phrase (any language) to clear context and start fresh.
@@ -67,10 +67,12 @@ mac-stats can run a Discord bot that connects via the **Gateway** and responds t
 
 - **Inbound debounce (full router only):** Rapid messages in the **same channel** that use the full Ollama agent router (not having_fun’s casual buffer) are merged into **one** Ollama run after a short quiet period. Default wait is **2000 ms** in `~/.mac-stats/config.json` as **`discord_debounce_ms`** (0 = disable debouncing). Override with env **`MAC_STATS_DISCORD_DEBOUNCE_MS`**. Per-channel: in `discord_channels.json`, on a channel object set **`debounce_ms`** (milliseconds, 0 = immediate) or **`immediate_ollama`:** `true`. **Bypass debouncing** (handled immediately): any message with **attachments**, content starting with **`/`**, **`new session:`** / session-reset phrases, or image payloads for vision. On app disconnect, any **still-queued** batch is **discarded** and logged (no flush).
 - **Draft reply (progress while tools run):** For the full agent router path, the bot posts **“Processing…”** immediately, then **edits that same message** with throttled updates such as **“Running FETCH_URL…”** while tools execute. When the final answer is ready, the bot **replaces** the draft with the first chunk of the reply (up to Discord’s 2000-character limit); any additional chunks are sent as normal follow-up messages. Configure the minimum interval between draft edits with **`discord_draft_throttle_ms`** in `config.json` (default **1500** ms; clamped 200–60000) or env **`MAC_STATS_DISCORD_DRAFT_THROTTLE_MS`**. Logs for edits use target **`discord/draft`**. If the placeholder message cannot be sent, the bot falls back to the previous behaviour (typing indicator only, then new messages for the full reply). Implementation: `commands/discord_draft_stream.rs`, `discord/mod.rs`, `commands/tool_loop.rs`, `commands/ollama.rs`.
+- **Ordered outbound pipeline:** Final text is split in `commands/outbound_pipeline.rs` (Discord limit **2000** characters; optional paragraph-aware splitting when the model uses **`[[split_long]]`**). Chunks are sent **one after another** with a short pause between messages, a **per-send wall-clock timeout** (default **10** seconds per chunk; override with env **`MAC_STATS_OUTBOUND_SEND_TIMEOUT_SECS`**, clamped 1–120), and **deduplication** so identical chunk payloads are not sent twice in the same reply. On timeout, remaining chunks are skipped and a short user-visible line may be sent. The same splitter and timeouts apply to **having_fun** and **idle thought** multi-chunk replies. Logs may include tracing target **`outbound_pipeline`**.
 - **Outbound file attachments:** File paths returned by the agent (e.g. **BROWSER_SCREENSHOT**) are attached only if they resolve under the **shared outbound allowlist** after canonicalization: **`~/.mac-stats/screenshots/`**, **`~/.mac-stats/pdfs/`**, and **`~/.mac-stats/browser-downloads/`** (each tree is honored only once that directory exists on disk). To widen sources deliberately, add **`extraAttachmentRoots`** to `config.json` — a JSON array of directory paths (`~/…`, absolute, or relative to `$HOME`). Each entry must resolve under canonical **`$HOME/.mac-stats`** or **`$HOME`** (symlinks are followed); anything else is ignored with a log line. Arbitrary paths from tool output cannot be attached. Code: `security/attachment_roots.rs`, `discord/mod.rs` (`send_message_to_channel_with_attachments` and the gateway path use the same check).
+- **Outbound circuit breaker:** Discord **HTTP** sends (`send_message_to_channel`, `send_message_to_channel_with_attachments`, and **DISCORD_API** `POST /channels/{id}/messages`) share a per-service breaker (threshold **3**, reset **30s**): repeated **5xx** or connection-class transport failures open the circuit so attempts fail fast with a log; **429** still uses Retry-After retries and does **not** advance the breaker. Gateway/WebSocket `say` paths are unchanged. Transition lines use tracing target **`mac_stats::circuit`** (see `docs/039_mac_stats_log_subsystems.md`).
 - **Platform formatting:** When the reply is sent to Discord, the system prompt includes **Platform formatting (Discord)** so the model avoids markdown tables (uses bullet lists instead) and wraps links in `<>` to suppress embeds (e.g. `<https://example.com>`). This keeps messages readable and reduces embed clutter in the channel.
-- Listens for **direct messages** to the bot and for **messages that @mention the bot** in guilds.
-- Ignores the bot’s own messages and messages that don’t mention it (in guilds).
+- Listens for **direct messages** to the bot and for **messages that @mention the bot** in guilds (and, in **`mention_only`** mode, replies that reference the bot’s message).
+- Ignores the bot’s own messages. In **`mention_only`** guild channels, ignores messages that neither @mention the bot nor reply to a message authored by the bot.
 - Replies using the **“answer with Ollama + tools”** pipeline: planning step (RECOMMEND) then execution with FETCH_URL, BRAVE_SEARCH, RUN_CMD, MCP, **DISCORD_API**, etc. (see `docs/100_all_agents.md`).
 - When you message the bot, it records your **display name** and tells Ollama “You are talking to **&lt;name&gt;** (user id: …)” so replies can be personalized. Names are cached for reuse in the session.
 - **Having_fun channels:** Replies and idle thoughts always use a **casual-only** system prompt (no work/Redmine soul). If a channel is configured with an `agent` override in `discord_channels.json`, that override is **ignored** for having_fun so the persona stays consistent; the optional channel `prompt` and time-of-day guidance are still applied. On LLM timeout or failure (e.g. Ollama busy), the bot posts a short user-friendly message only (e.g. “Something went wrong on my side — try again in a bit.”). Technical errors and CLI hints are never sent to the channel; the real error is logged to `~/.mac-stats/debug.log`. Idle thoughts retry once on timeout before giving up. Agent failure notices (e.g. that message or "Agent failed before reply") are **not** stored in the channel's session memory and are **filtered out** when building the idle-thought or reply context, so the model is never asked to "reply" to an error line and the casual tone is preserved. **Group-chat guidance** is also included for having_fun: know when to speak; one response per message (no triple-tap); use **REACT: &lt;emoji&gt;** (e.g. `REACT: 👍`) when a full reply isn't needed — the bot will add that emoji as a reaction and not send text; participate without dominating.
@@ -113,6 +115,8 @@ Ollama invokes the Discord API by replying with exactly one line:
   The path and optional JSON body are on the same line (body after a space and `{`).
 
 Only **GET** is allowed for general read endpoints. **POST** is allowed only for `/channels/{channel_id}/messages`. All Discord HTTP calls honour **429 rate limits**: on a 429 the app parses `Retry-After` (header or JSON body), waits that duration plus jitter, and retries up to 3 times. Each 429 is logged at warn level. Heavy use may still hit Discord’s rate limits; see [Discord rate limits](https://discord.com/developers/docs/topics/rate-limits).
+
+**Safe vs unsafe retries (outbound messages):** Sending a message is not idempotent. The app retries only when failure likely happened *before* Discord accepted the message (e.g. connection refused, DNS failure) or on explicit **429** rate limits (Gateway replies use a longer backoff for rate-limit errors). It does **not** retry on request timeouts, connection reset, or similar ambiguous cases where the first attempt may already have been delivered—this avoids duplicate posts. The same principle applies to any future non-idempotent outbound channel (e.g. Telegram). Implementation: `discord/api.rs` (`is_safe_to_retry_discord_*`), Gateway send path in `discord/mod.rs`, and HTTP `send_message_to_channel*`.
 
 ## 8. SCHEDULE and REMOVE_SCHEDULE (reminders and recurring tasks)
 
@@ -301,6 +305,32 @@ When the agent approaches the tool iteration cap (`max_tool_iterations`), the sy
 - **Last-iteration guidance:** When `tool_count + 1 == max_tool_iterations`, a stronger system message is injected: "LAST ITERATION WARNING: This is your LAST tool iteration. Reply with your final answer now." The tool list/schema is unchanged; this is guidance only.
 - **Scope:** Only applies in the agent tool loop (Discord, scheduler, run-ollama). No new tools are added.
 - **Disabling:** Set ratio to 0.0 or 1.0 to preserve current behaviour (no warnings injected).
+
+## 18. Optional tool-loop repeat detection (OpenClaw-style)
+
+When **disabled** (default), the agent tool loop still uses the **legacy** guard: the same tool with the same argument is blocked after **3** invocations, and short **ping-pong** patterns (e.g. A→B→A→B with at least two distinct tool signatures) are blocked before the tool runs.
+
+When **enabled**, the legacy same-call limit is **replaced** by hash-based tracking:
+
+- **History:** Up to `historySize` recent invocations (default **25**, clamped 10–60), keyed by tool name and **SHA-256** of **normalized** arguments (for common URL tools: lowercase host, strip trailing slashes on the path, preserve query/fragment).
+- **Warning:** If the same tool+argument signature appears at least `warningThreshold` times in that window (default **8**), a short **`[SYSTEM]`** note is appended to that tool’s result so the model sees it on the next turn.
+- **Critical:** If the count reaches `criticalThreshold` (default **12**, always kept above the warning threshold), the run **stops** and the user sees: *“Same action was repeated too many times in this session. Try rephrasing your request or starting a new topic.”*
+- **Ping-pong:** Before each tool runs, the same cycle detection as legacy applies, but **pure** repeats (AAAA…) are **not** treated as cycles; those are handled only by the repeat counter.
+
+**Config:** `~/.mac-stats/config.json` — object `toolLoopDetection`:
+
+```json
+"toolLoopDetection": {
+  "enabled": true,
+  "historySize": 25,
+  "warningThreshold": 8,
+  "criticalThreshold": 12
+}
+```
+
+**Env:** `MAC_STATS_TOOL_LOOP_DETECTION_ENABLED` — `true` / `1` / `yes` forces enable (still uses JSON sizes/thresholds when present); `false` / `0` / `no` forces **off** even if JSON has `"enabled": true`.
+
+**Scope:** Discord bot, scheduler, and `run-ollama` agent path (`commands/tool_loop.rs`). No new tools are added.
 
 ## Open tasks
 

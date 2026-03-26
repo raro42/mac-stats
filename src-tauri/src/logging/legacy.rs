@@ -26,9 +26,10 @@ fn format_timestamp() -> String {
 pub fn write_log_entry(level_str: &str, message: &str) {
     let timestamp = format_timestamp();
     let log_line = format!("[{}] [{}] {}", timestamp, level_str, message);
+    let safe_line = crate::logging::redact_secrets(&log_line);
 
     // Write to terminal (stderr)
-    eprintln!("{}", log_line);
+    eprintln!("{}", safe_line);
 
     // Write to log file using config module
     use crate::config::Config;
@@ -39,7 +40,7 @@ pub fn write_log_entry(level_str: &str, message: &str) {
         .open(&log_path)
     {
         use std::io::Write;
-        let _ = writeln!(file, "{}", log_line);
+        let _ = writeln!(file, "{}", safe_line);
     }
 }
 
@@ -94,19 +95,22 @@ pub fn write_structured_log_with_verbosity(
     {
         use std::io::Write;
         if let Ok(json_str) = serde_json::to_string(&log_data) {
-            let _ = writeln!(file, "{}", json_str);
+            let safe = crate::logging::redact_secrets(&json_str);
+            let _ = writeln!(file, "{}", safe);
         }
     }
 
     // Also write human-readable version to terminal
     let timestamp = format_timestamp();
     if hypothesis_id.is_empty() {
-        eprintln!("[{}] [DEBUG] {}: {}", timestamp, location, message);
+        let line = format!("[{}] [DEBUG] {}: {}", timestamp, location, message);
+        eprintln!("{}", crate::logging::redact_secrets(&line));
     } else {
-        eprintln!(
+        let line = format!(
             "[{}] [DEBUG] {}: {} (hypothesis: {})",
             timestamp, location, message, hypothesis_id
         );
+        eprintln!("{}", crate::logging::redact_secrets(&line));
     }
 }
 

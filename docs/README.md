@@ -25,6 +25,7 @@ Gatekeeper may show "damaged" or block the unsigned app—the file is fine. Righ
 - **Menu bar** — CPU, GPU, RAM, disk at a glance; click to open the details window.
 - **AI chat** — Ollama in the app or via Discord; FETCH_URL, BRAVE_SEARCH, PERPLEXITY_SEARCH, RUN_CMD, code execution, MCP.
 - **Discord bot** — Responds to DMs and @mentions; replies via Ollama + tools (fetch, search, SCHEDULE, DISCORD_API, etc.); per-channel session and reset phrases. Full description: [007_discord_agent.md](007_discord_agent.md).
+- **Feature health (backend)** — After startup, structured probes for Ollama, Discord, browser/CDP, Brave, Redmine, SMC, IOReport, and scheduler; logged under `feature_health:` in `debug.log`; Tauri command `get_feature_health`. See [040_feature_health_dashboard.md](040_feature_health_dashboard.md).
 
 ## Tool Agents (what Ollama can invoke)
 
@@ -34,7 +35,7 @@ Whenever Ollama is asked to decide which agent to use (planning step in Discord 
 |-------|------------|---------|----------------|
 | **FETCH_URL** | `FETCH_URL: <full URL>` | Fetch a web page’s body as text (server-side, no CORS). | `commands/browser.rs` → `fetch_page_content()` (reqwest blocking client, 15s timeout). Used by Discord pipeline and by CPU-window chat (`ollama_chat_with_execution`). |
 | **BRAVE_SEARCH** | `BRAVE_SEARCH: <search query>` | Web search via Brave Search API; results (titles, URLs, snippets) are injected back for Ollama to summarize. | `commands/brave.rs` → `brave_web_search()`. Requires `BRAVE_API_KEY` (env or `.config.env`). Used by Discord and (when wired) CPU-window agent flow. |
-| **RUN_JS** | `RUN_JS: <JavaScript code>` | Execute JavaScript (e.g. in CPU window). | CPU window: frontend runs code in app context; Discord/agent: `commands/ollama.rs` → `run_js_via_node` (Node.js). In some contexts JS is not executed and a message is returned instead. |
+| **RUN_JS** | `RUN_JS: <JavaScript code>` | Execute JavaScript on the host via Node (agent/tool loop). | CPU window: frontend may run code in WebView; Discord/agent: `run_js_via_node` unless `runJsEnabled` is **false** in `~/.mac-stats/config.json` (then a stable refusal, no Node). Orthogonal to `browserToolsEnabled`. |
 
 For the full tool list (all agents), see **docs/agent_workflow.md** (Tool list) and **docs/020_agent_task_flow_analysis.md**.
 

@@ -259,6 +259,36 @@ body {
   margin-top: 12px;
 }
 
+.chat-compaction-status {
+  display: none;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  padding: 4px 8px 8px;
+  margin-top: -4px;
+}
+
+.chat-compaction-status:not([hidden]) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-compaction-status .compaction-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: rgba(147, 197, 253, 0.9);
+  border-radius: 50%;
+  animation: compaction-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes compaction-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .chat-messages {
   max-height: 300px;
   overflow-y: auto;

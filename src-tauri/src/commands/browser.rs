@@ -5,8 +5,13 @@
 
 use std::net::{IpAddr, Ipv6Addr, ToSocketAddrs};
 use std::time::Duration;
+use regex::Regex;
 use tracing::{info, warn};
 use url::Url;
+
+/// Prefix for allowlist entries that match when the hostname **contains** the suffix (case-insensitive).
+/// Plain entries without `*` remain **exact** hostname match for backward compatibility.
+const SSRF_ALLOWLIST_CONTAINS_PREFIX: &str = "contains:";
 
 /// Max response body size (chars) to avoid huge strings (e.g. 500 KB of text).
 const MAX_BODY_CHARS: usize = 500_000;
@@ -101,6 +106,81 @@ fn is_ipv6_unique_local(addr: &Ipv6Addr) -> bool {
     (addr.segments()[0] & 0xfe00) == 0xfc00
 }
 
+/// Whether `host` matches one `ssrfAllowedHosts` entry. Matching is always against the **hostname**
+/// only (never the full URL). Semantics align with OpenClaw-style config: trim the entry; empty → no
+/// match; `contains:` prefix → case-insensitive substring; `*` / `**` in the entry → glob converted
+/// to a regex (other characters escaped, `*` and `**` each → `.*`); otherwise → case-insensitive
+/// equality. Patterns are anchored to the full hostname so e.g. `*.corp.test` does not match
+/// `evil.corp.test.evil.com`.
+pub(crate) fn host_matches_ssrf_allowlist(host: &str, entry: &str) -> bool {
+    let entry = entry.trim();
+    if entry.is_empty() {
+        return false;
+    }
+    let host_lower = host.to_ascii_lowercase();
+
+    if let Some(needle) = entry.strip_prefix(SSRF_ALLOWLIST_CONTAINS_PREFIX) {
+        let needle = needle.trim();
+        if needle.is_empty() {
+            return false;
+        }
+        return host_lower.contains(&needle.to_ascii_lowercase());
+    }
+
+    let pat_lower = entry.to_ascii_lowercase();
+    if pat_lower.contains('*') {
+        return host_glob_regex_matches(&host_lower, &pat_lower);
+    }
+
+    host_lower == pat_lower
+}
+
+fn host_glob_regex_matches(host_lower: &str, pattern_lower: &str) -> bool {
+    let regex_src = host_glob_hostname_to_regex(pattern_lower);
+    let Ok(re) = Regex::new(&regex_src) else {
+        warn!(
+            "SSRF allowlist: could not compile regex from glob {:?}, ignoring",
+            pattern_lower
+        );
+        return false;
+    };
+    re.is_match(host_lower)
+}
+
+/// Build `^...$` regex: literal segments regex-escaped; each `*` run (including `**`) becomes `.*`.
+fn host_glob_hostname_to_regex(pattern_lower: &str) -> String {
+    let mut out = String::with_capacity(pattern_lower.len().saturating_mul(2));
+    out.push('^');
+    let mut literal = String::new();
+    let mut chars = pattern_lower.chars().peekable();
+    let flush = |lit: &mut String, o: &mut String| {
+        if !lit.is_empty() {
+            o.push_str(&regex::escape(lit));
+            lit.clear();
+        }
+    };
+    while let Some(c) = chars.next() {
+        if c == '*' {
+            flush(&mut literal, &mut out);
+            if chars.peek() == Some(&'*') {
+                chars.next();
+            }
+            out.push_str(".*");
+        } else {
+            literal.push(c);
+        }
+    }
+    flush(&mut literal, &mut out);
+    out.push('$');
+    out
+}
+
+fn host_on_ssrf_allowlist(host: &str, allowed_hosts: &[String]) -> bool {
+    allowed_hosts
+        .iter()
+        .any(|e| host_matches_ssrf_allowlist(host, e))
+}
+
 /// Validate that a URL does not target a private/loopback/link-local/metadata network.
 /// Rejects URLs with userinfo (credentials). Resolves the hostname to IPs and rejects if
 /// any resolved IP is on the blocklist. Hosts listed in `allowed_hosts` bypass the IP check.
@@ -109,9 +189,9 @@ pub fn validate_url_no_ssrf(url: &Url, allowed_hosts: &[String]) -> Result<(), S
         return Err("URL contains credentials (userinfo) and was blocked for security".to_string());
     }
     let host = url.host_str().ok_or("URL has no host")?;
-    if allowed_hosts.iter().any(|h| h.eq_ignore_ascii_case(host)) {
+    if host_on_ssrf_allowlist(host, allowed_hosts) {
         info!(
-            "SSRF guard: host '{}' is in ssrfAllowedHosts, skipping IP check",
+            "SSRF guard: host '{}' matches ssrfAllowedHosts, skipping IP check",
             host
         );
         return Ok(());
@@ -147,6 +227,95 @@ pub fn validate_url_no_ssrf(url: &Url, allowed_hosts: &[String]) -> Result<(), S
     Ok(())
 }
 
+// ---------------------------------------------------------------------------
+// Proxy env vs DNS-based SSRF (egress semantic gap)
+// ---------------------------------------------------------------------------
+
+/// Environment variable names commonly honored by reqwest, curl, and Chrome for HTTP(S) proxies.
+const PROXY_ENV_VARS: &[&str] = &[
+    "HTTP_PROXY",
+    "HTTPS_PROXY",
+    "ALL_PROXY",
+    "http_proxy",
+    "https_proxy",
+    "all_proxy",
+];
+
+/// True when a standard HTTP(S) proxy environment variable is set to a non-empty value.
+///
+/// In that situation, [`validate_url_no_ssrf`] (direct DNS in Rust) may not describe how
+/// [`reqwest`] or Chrome actually connects, so operator-facing behaviour should warn or block.
+pub fn proxy_env_likely_active() -> bool {
+    PROXY_ENV_VARS.iter().any(|key| {
+        std::env::var(key)
+            .map(|v| !v.trim().is_empty())
+            .unwrap_or(false)
+    })
+}
+
+pub(crate) fn strict_ssrf_proxy_env_rejection(tool_label: &str) -> String {
+    format!(
+        "{} refused: HTTP_PROXY, HTTPS_PROXY, or ALL_PROXY (or lowercase variants) is set. \
+DNS-based SSRF checks in mac-stats may not match actual egress: reqwest and Chrome can forward or re-resolve targets via the proxy. \
+Unset those variables for the mac-stats process, or disable strict mode by setting strictSsrfRejectWhenProxyEnv to false in ~/.mac-stats/config.json (or MAC_STATS_STRICT_SSRF_REJECT_WHEN_PROXY_ENV=0).",
+        tool_label
+    )
+}
+
+/// If proxy env is active: when [`crate::config::Config::strict_ssrf_reject_when_proxy_env`] is on,
+/// returns `Err` before outbound work. Otherwise returns `Ok(Some(line))` to prepend to tool output
+/// (and logs once at `info` for this call). Returns `Ok(None)` when no proxy vars are set.
+pub fn ssrf_proxy_env_notice_for_tool(tool_label: &str) -> Result<Option<String>, String> {
+    if !proxy_env_likely_active() {
+        return Ok(None);
+    }
+    if crate::config::Config::strict_ssrf_reject_when_proxy_env() {
+        return Err(strict_ssrf_proxy_env_rejection(tool_label));
+    }
+    info!(
+        target: "browser/security",
+        "SSRF/proxy: env proxy vars set during {}; DNS SSRF pre-check may not match reqwest/Chrome egress",
+        tool_label
+    );
+    Ok(Some(format!(
+        "[SSRF / proxy] HTTP(S) proxy environment variables are set. DNS-based SSRF validation may not match how this request reaches the host via reqwest or Chrome. Unset HTTP_PROXY/HTTPS_PROXY/ALL_PROXY for the mac-stats process if you need strict SSRF semantics.\n"
+    )))
+}
+
+/// Whether to inject model-facing proxy warnings for a server-side HTTP fetch.
+#[derive(Clone, Copy, Debug)]
+pub(crate) enum FetchProxyContext {
+    /// Scheduler, generic Tauri `fetch_page`, etc.: apply strict fail-closed only; no log, no prepend.
+    Background,
+    /// Agent `FETCH_URL` (Discord/router/UI tool loop): strict block, else log + optional prepend.
+    AgentTool,
+}
+
+fn ssrf_proxy_policy_for_http_fetch(
+    context: FetchProxyContext,
+    post: bool,
+) -> Result<Option<String>, String> {
+    match context {
+        FetchProxyContext::Background => {
+            if proxy_env_likely_active()
+                && crate::config::Config::strict_ssrf_reject_when_proxy_env()
+            {
+                Err(strict_ssrf_proxy_env_rejection("FETCH_URL"))
+            } else {
+                Ok(None)
+            }
+        }
+        FetchProxyContext::AgentTool => {
+            let label = if post {
+                "FETCH_URL (POST)"
+            } else {
+                "FETCH_URL"
+            };
+            ssrf_proxy_env_notice_for_tool(label)
+        }
+    }
+}
+
 /// Validate a redirect target the same way as the initial URL: resolve host and reject
 /// blocklist IPs, empty resolution, or DNS failure. Does not follow redirects we cannot verify.
 fn check_redirect_target_ssrf(url: &Url, allowed_hosts: &[String]) -> Result<(), std::io::Error> {
@@ -159,7 +328,7 @@ fn check_redirect_target_ssrf(url: &Url, allowed_hosts: &[String]) -> Result<(),
     let Some(host) = url.host_str() else {
         return Ok(());
     };
-    if allowed_hosts.iter().any(|h| h.eq_ignore_ascii_case(host)) {
+    if host_on_ssrf_allowlist(host, allowed_hosts) {
         return Ok(());
     }
     let port = url
@@ -217,8 +386,22 @@ fn ssrf_redirect_policy(allowed_hosts: Vec<String>) -> reqwest::redirect::Policy
 
 /// Fetch a URL and return the response body as text.
 /// Extracts first URL from arg (task-002), validates, uses same timeout/SSL policy as website monitors.
-/// Used by Ollama FETCH_URL flow and by the fetch_page Tauri command.
+/// Used by schedulers and internal callers; does **not** prepend the agent SSRF/proxy notice (see
+/// [`fetch_page_content_for_agent`]).
 pub fn fetch_page_content(url: &str) -> Result<String, String> {
+    fetch_page_content_with_proxy_context(url, FetchProxyContext::Background)
+}
+
+/// Same as [`fetch_page_content`], but for model-facing **FETCH_URL** tool paths: when proxy env vars
+/// are set and strict mode is off, logs at `browser/security` and prepends a one-line notice to the body.
+pub fn fetch_page_content_for_agent(url: &str) -> Result<String, String> {
+    fetch_page_content_with_proxy_context(url, FetchProxyContext::AgentTool)
+}
+
+fn fetch_page_content_with_proxy_context(
+    url: &str,
+    proxy_ctx: FetchProxyContext,
+) -> Result<String, String> {
     let raw = url.trim();
     let url_str = extract_first_url(raw).ok_or_else(|| {
         "Invalid URL for FETCH_URL: no http:// or https:// URL found. Provide a single URL only.".to_string()
@@ -226,6 +409,7 @@ pub fn fetch_page_content(url: &str) -> Result<String, String> {
     let parsed = validate_fetch_url(&url_str)?;
     let allowed_hosts = crate::config::Config::ssrf_allowed_hosts();
     validate_url_no_ssrf(&parsed, &allowed_hosts)?;
+    let proxy_note = ssrf_proxy_policy_for_http_fetch(proxy_ctx, false)?;
     let url = parsed.as_str();
 
     info!("Fetch page: GET {}", url);
@@ -261,7 +445,10 @@ pub fn fetch_page_content(url: &str) -> Result<String, String> {
     let body = truncate_fetch_body_if_needed(body);
     let n = body.chars().count();
     info!("Fetch page: fetched {} chars from {}", n, url);
-    Ok(body)
+    Ok(match proxy_note {
+        Some(prefix) => format!("{}{}", prefix, body),
+        None => body,
+    })
 }
 
 /// POST `application/x-www-form-urlencoded` to a URL and return the response body as text.
@@ -269,6 +456,21 @@ pub fn fetch_page_content(url: &str) -> Result<String, String> {
 pub fn fetch_page_post_form_urlencoded(
     url: &str,
     pairs: &[(String, String)],
+) -> Result<String, String> {
+    fetch_page_post_form_urlencoded_with_context(url, pairs, FetchProxyContext::Background)
+}
+
+pub(crate) fn fetch_page_post_form_urlencoded_for_agent(
+    url: &str,
+    pairs: &[(String, String)],
+) -> Result<String, String> {
+    fetch_page_post_form_urlencoded_with_context(url, pairs, FetchProxyContext::AgentTool)
+}
+
+fn fetch_page_post_form_urlencoded_with_context(
+    url: &str,
+    pairs: &[(String, String)],
+    proxy_ctx: FetchProxyContext,
 ) -> Result<String, String> {
     let raw = url.trim();
     let url_str = extract_first_url(raw).ok_or_else(|| {
@@ -278,6 +480,7 @@ pub fn fetch_page_post_form_urlencoded(
     let parsed = validate_fetch_url(&url_str)?;
     let allowed_hosts = crate::config::Config::ssrf_allowed_hosts();
     validate_url_no_ssrf(&parsed, &allowed_hosts)?;
+    let proxy_note = ssrf_proxy_policy_for_http_fetch(proxy_ctx, true)?;
     let url = parsed.as_str();
 
     let mut ser = url::form_urlencoded::Serializer::new(String::new());
@@ -331,7 +534,10 @@ pub fn fetch_page_post_form_urlencoded(
     let body = truncate_fetch_body_if_needed(body);
     let n = body.chars().count();
     info!("Fetch page: POST fetched {} chars from {}", n, url);
-    Ok(body)
+    Ok(match proxy_note {
+        Some(prefix) => format!("{}{}", prefix, body),
+        None => body,
+    })
 }
 
 /// Tauri command: fetch a URL and return body as text (for frontend or tools).
@@ -346,6 +552,14 @@ pub async fn fetch_page(url: String) -> Result<String, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn strict_ssrf_proxy_env_rejection_mentions_config() {
+        let s = strict_ssrf_proxy_env_rejection("FETCH_URL");
+        assert!(s.starts_with("FETCH_URL refused:"));
+        assert!(s.contains("strictSsrfRejectWhenProxyEnv"));
+        assert!(s.contains("MAC_STATS_STRICT_SSRF_REJECT_WHEN_PROXY_ENV"));
+    }
 
     #[test]
     fn ssrf_blocks_loopback_ipv4() {
@@ -415,6 +629,68 @@ mod tests {
         let url = Url::parse("http://MyLocalService:8080/").unwrap();
         let allowed = vec!["mylocalservice".to_string()];
         assert!(validate_url_no_ssrf(&url, &allowed).is_ok());
+    }
+
+    #[test]
+    fn ssrf_allowlist_wildcard_subdomain_corp_test() {
+        let url = Url::parse("http://a.corp.test/path").unwrap();
+        let allowed = vec!["*.corp.test".to_string()];
+        assert!(validate_url_no_ssrf(&url, &allowed).is_ok());
+        assert!(host_matches_ssrf_allowlist("a.corp.test", "*.corp.test"));
+        assert!(!host_matches_ssrf_allowlist(
+            "evil.corp.test.evil.com",
+            "*.corp.test"
+        ));
+    }
+
+    #[test]
+    fn host_matches_ssrf_allowlist_internal_prefix_pattern() {
+        assert!(host_matches_ssrf_allowlist(
+            "internal-app1.local",
+            "internal-*"
+        ));
+        assert!(!host_matches_ssrf_allowlist("app1.internal", "internal-*"));
+    }
+
+    #[test]
+    fn ssrf_allowlist_wildcard_loopback_octet() {
+        let url = Url::parse("http://127.0.0.1:8080/").unwrap();
+        let allowed = vec!["127.0.*".to_string()];
+        assert!(validate_url_no_ssrf(&url, &allowed).is_ok());
+    }
+
+    #[test]
+    fn ssrf_allowlist_contains_prefix_bypass_private_ip_host() {
+        let url = Url::parse("http://127.0.0.1:9999/").unwrap();
+        let allowed = vec!["contains:127.0".to_string()];
+        assert!(validate_url_no_ssrf(&url, &allowed).is_ok());
+    }
+
+    #[test]
+    fn ssrf_redirect_check_wildcard_allowlist() {
+        let url = Url::parse("http://127.0.0.1/").unwrap();
+        let allowed = vec!["127.*".to_string()];
+        assert!(check_redirect_target_ssrf(&url, &allowed).is_ok());
+    }
+
+    #[test]
+    fn host_matches_ssrf_allowlist_empty_entry_no_match() {
+        assert!(!host_matches_ssrf_allowlist("a.example.com", ""));
+        assert!(!host_matches_ssrf_allowlist("a.example.com", "   "));
+        assert!(!host_matches_ssrf_allowlist("a.example.com", "contains:"));
+        assert!(!host_matches_ssrf_allowlist("a.example.com", "contains:  "));
+    }
+
+    #[test]
+    fn host_matches_ssrf_allowlist_glob_star_matches_any_label() {
+        assert!(host_matches_ssrf_allowlist("anything", "*"));
+        assert!(host_matches_ssrf_allowlist("x.y.z", "*"));
+    }
+
+    #[test]
+    fn host_matches_ssrf_allowlist_exact_still_not_substring() {
+        assert!(!host_matches_ssrf_allowlist("notlocalhost", "localhost"));
+        assert!(host_matches_ssrf_allowlist("localhost", "localhost"));
     }
 
     #[test]

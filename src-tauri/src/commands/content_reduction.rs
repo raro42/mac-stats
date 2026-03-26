@@ -5,10 +5,14 @@
 use std::io::Write;
 use std::process::Command;
 
-use crate::commands::ollama_chat::send_ollama_chat_messages;
+use crate::commands::ollama_chat::{send_ollama_chat_messages, OllamaHttpQueue};
 
 /// Heuristic: chars to tokens (conservative).
 pub(crate) const CHARS_PER_TOKEN: usize = 4;
+
+/// Same margin as [`crate::commands::context_assembler::CONTEXT_ASSEMBLER_SAFETY_TOKENS`]
+/// — duplicated here to avoid a `content_reduction` ↔ `context_assembler` import cycle.
+const PROACTIVE_CTX_SAFETY_TOKENS: u32 = 512;
 
 /// Reserve tokens for model reply and wrapper text.
 const RESERVE_TOKENS: u32 = 512;
@@ -93,7 +97,13 @@ pub(crate) async fn reduce_fetched_content_to_fit(
         },
     ];
 
-    match send_ollama_chat_messages(summarization_messages, model_override, options_override).await
+    match send_ollama_chat_messages(
+        summarization_messages,
+        model_override,
+        options_override,
+        OllamaHttpQueue::Nested,
+    )
+    .await
     {
         Ok(resp) => {
             let summary = resp.message.content.trim().to_string();
@@ -2672,6 +2682,194 @@ pub(crate) fn sanitize_ollama_error_for_user(raw: &str) -> Option<String> {
     friendly
 }
 
+#[inline]
+fn tool_result_truncation_eligible(index: usize, msg: &crate::ollama::ChatMessage) -> bool {
+    !(index == 0 && msg.role == "system")
+}
+
+/// Token estimate per message — keep aligned with `context_assembler::estimate_message_tokens`
+/// (cannot import: `context_assembler` depends on this module for `CHARS_PER_TOKEN`).
+fn estimate_message_tokens_for_budget(m: &crate::ollama::ChatMessage) -> usize {
+    let mut n = m.content.chars().count() / CHARS_PER_TOKEN;
+    if let Some(imgs) = m.images.as_ref() {
+        for b64 in imgs {
+            n = n.saturating_add(b64.len() / CHARS_PER_TOKEN);
+        }
+    }
+    n.saturating_add(4)
+}
+
+fn estimate_messages_token_total_local(messages: &[crate::ollama::ChatMessage]) -> usize {
+    messages.iter().map(estimate_message_tokens_for_budget).sum()
+}
+
+#[inline]
+fn context_token_budget_local(context_size_tokens: u32) -> usize {
+    context_size_tokens
+        .saturating_sub(PROACTIVE_CTX_SAFETY_TOKENS)
+        .max(256) as usize
+}
+
+#[derive(Clone, Copy)]
+enum ToolResultTruncationReason {
+    ContextOverflowRetry,
+    ProactiveContextBudget,
+}
+
+/// Truncate one message to at most `max_chars` body (word/line boundary), with a reason-specific
+/// trailer. Returns whether the message was changed.
+fn apply_tool_result_truncate(
+    msg: &mut crate::ollama::ChatMessage,
+    max_chars: usize,
+    reason: ToolResultTruncationReason,
+) -> bool {
+    let char_count = msg.content.chars().count();
+    if char_count <= max_chars {
+        return false;
+    }
+    let truncated_body = truncate_at_boundary(&msg.content, max_chars);
+    let trimmed = truncated_body.trim_end();
+    let suffix = match reason {
+        ToolResultTruncationReason::ContextOverflowRetry => format!(
+            "\n\n[truncated from {} to {} chars due to context limit]",
+            char_count, max_chars
+        ),
+        ToolResultTruncationReason::ProactiveContextBudget => format!(
+            "\n\n[compacted proactively for context budget: {} → {} chars]",
+            char_count, max_chars
+        ),
+    };
+    msg.content = format!("{trimmed}{suffix}");
+    true
+}
+
+/// Inner logic for tests and tuning; production uses [`proactively_compact_tool_results_for_context_budget`].
+pub(crate) fn proactively_compact_tool_results_for_context_budget_impl(
+    messages: &mut [crate::ollama::ChatMessage],
+    context_size_tokens: u32,
+    headroom_ratio: f64,
+    max_chars: usize,
+) -> usize {
+    let budget_tokens = context_token_budget_local(context_size_tokens);
+    let headroom = headroom_ratio.clamp(0.05_f64, 0.45_f64);
+    let threshold = ((budget_tokens as f64) * (1.0_f64 - headroom)).floor() as usize;
+    let threshold = threshold.max(256);
+    const MIN_BODY: usize = 256;
+    let mut total = 0usize;
+
+    for _ in 0..64 {
+        let est = estimate_messages_token_total_local(messages);
+        if est <= threshold {
+            break;
+        }
+        // Phase A — oldest message still over `max_chars` (typical huge FETCH/BROWSER payload).
+        let mut idx_phase_a: Option<usize> = None;
+        for (i, msg) in messages.iter().enumerate() {
+            if !tool_result_truncation_eligible(i, msg) {
+                continue;
+            }
+            if msg.content.chars().count() > max_chars {
+                idx_phase_a = Some(match idx_phase_a {
+                    None => i,
+                    Some(j) => j.min(i),
+                });
+            }
+        }
+        if let Some(i) = idx_phase_a {
+            if apply_tool_result_truncate(
+                &mut messages[i],
+                max_chars,
+                ToolResultTruncationReason::ProactiveContextBudget,
+            ) {
+                tracing::info!(
+                    target: "mac_stats::context_budget",
+                    "Proactive context budget: compacted message index {} to {} chars (est_tokens={} threshold={})",
+                    i,
+                    max_chars,
+                    est,
+                    threshold
+                );
+                total += 1;
+            }
+            continue;
+        }
+        // Phase B — no message above `max_chars`; shave oldest eligible body still above MIN_BODY.
+        let mut pick: Option<usize> = None;
+        for (i, msg) in messages.iter().enumerate() {
+            if !tool_result_truncation_eligible(i, msg) {
+                continue;
+            }
+            let c = msg.content.chars().count();
+            if c <= MIN_BODY {
+                continue;
+            }
+            pick = Some(match pick {
+                None => i,
+                Some(j) => j.min(i),
+            });
+        }
+        let Some(i) = pick else {
+            tracing::debug!(
+                target: "mac_stats::context_budget",
+                "Proactive context budget: still over threshold (est_tokens={} > {}) but no further eligible messages to shrink",
+                est,
+                threshold
+            );
+            break;
+        };
+        let c = messages[i].content.chars().count();
+        let target = (c * 4 / 5).max(MIN_BODY).min(c.saturating_sub(1));
+        if target >= c {
+            break;
+        }
+        if apply_tool_result_truncate(
+            &mut messages[i],
+            target,
+            ToolResultTruncationReason::ProactiveContextBudget,
+        ) {
+            tracing::info!(
+                target: "mac_stats::context_budget",
+                "Proactive context budget: shaved message index {} to {} chars (est_tokens={} threshold={})",
+                i,
+                target,
+                est,
+                threshold
+            );
+            total += 1;
+        }
+    }
+    total
+}
+
+/// Before an Ollama chat call, optionally compact tool-style messages when the estimated token
+/// total exceeds a headroom threshold below the model context budget (OpenClaw-style proactive
+/// guard). Reactive overflow truncation remains as a safety net.
+pub(crate) fn proactively_compact_tool_results_for_context_budget(
+    messages: &mut [crate::ollama::ChatMessage],
+    context_size_tokens: u32,
+) -> usize {
+    if !crate::config::Config::proactive_tool_result_context_budget_enabled() {
+        return 0;
+    }
+    if !crate::config::Config::context_overflow_truncate_enabled() {
+        return 0;
+    }
+    let n = proactively_compact_tool_results_for_context_budget_impl(
+        messages,
+        context_size_tokens,
+        crate::config::Config::proactive_context_budget_headroom_ratio(),
+        crate::config::Config::proactive_context_max_result_chars(),
+    );
+    if n > 0 {
+        tracing::info!(
+            target: "mac_stats::context_budget",
+            "Proactive tool-result context budget: completed {} compaction step(s)",
+            n
+        );
+    }
+    n
+}
+
 /// Truncate oversized tool-result messages in the conversation to `max_chars_per_result`.
 ///
 /// Only truncates assistant/user/system messages whose content exceeds `max_chars_per_result`
@@ -2685,22 +2883,16 @@ pub(crate) fn truncate_oversized_tool_results(
 ) -> usize {
     let mut truncated_count = 0usize;
     for (i, msg) in messages.iter_mut().enumerate() {
-        // Skip the first message (system prompt) — it contains the agent instructions.
-        if i == 0 && msg.role == "system" {
+        if !tool_result_truncation_eligible(i, msg) {
             continue;
         }
-        let char_count = msg.content.chars().count();
-        if char_count <= max_chars_per_result {
-            continue;
+        if apply_tool_result_truncate(
+            msg,
+            max_chars_per_result,
+            ToolResultTruncationReason::ContextOverflowRetry,
+        ) {
+            truncated_count += 1;
         }
-        let truncated_body = truncate_at_boundary(&msg.content, max_chars_per_result);
-        msg.content = format!(
-            "{}\n\n[truncated from {} to {} chars due to context limit]",
-            truncated_body.trim_end(),
-            char_count,
-            max_chars_per_result
-        );
-        truncated_count += 1;
     }
     truncated_count
 }
@@ -2712,6 +2904,7 @@ pub(crate) async fn run_skill_ollama_session(
     user_message: &str,
     model_override: Option<String>,
     options_override: Option<crate::ollama::ChatOptions>,
+    ollama_http_queue: OllamaHttpQueue,
 ) -> Result<String, String> {
     use tracing::info;
     let messages = vec![
@@ -2730,7 +2923,13 @@ pub(crate) async fn run_skill_ollama_session(
         "Agent router: SKILL session request (user message {} chars)",
         user_message.chars().count()
     );
-    let response = send_ollama_chat_messages(messages, model_override, options_override).await?;
+    let response = send_ollama_chat_messages(
+        messages,
+        model_override,
+        options_override,
+        ollama_http_queue,
+    )
+    .await?;
     Ok(response.message.content.trim().to_string())
 }
 
@@ -8581,6 +8780,56 @@ mod tests {
         assert_eq!(n, 2);
         assert!(msgs[1].content.contains("[truncated from 5000 to 1000"));
         assert!(msgs[3].content.contains("[truncated from 8000 to 1000"));
+    }
+
+    #[test]
+    fn proactive_impl_compacts_oldest_huge_message_first() {
+        let mut msgs = vec![
+            make_msg("system", "sys"),
+            make_msg("user", &"u".repeat(20_000)),
+        ];
+        let n = proactively_compact_tool_results_for_context_budget_impl(
+            &mut msgs,
+            1024,
+            0.12,
+            4096,
+        );
+        assert!(n > 0, "expected at least one compaction step");
+        assert!(
+            msgs[1].content.contains("compacted proactively for context budget"),
+            "marker: {}",
+            &msgs[1].content[msgs[1].content.len().saturating_sub(120)..]
+        );
+        assert!(msgs[1].content.chars().count() < 20_000);
+    }
+
+    #[test]
+    fn proactive_impl_phase_b_shaves_when_each_under_max_chars() {
+        let chunk = "word ".repeat(800);
+        let mut msgs = vec![make_msg("system", "p")];
+        for _ in 0..12 {
+            msgs.push(make_msg("user", &chunk));
+        }
+        let n = proactively_compact_tool_results_for_context_budget_impl(
+            &mut msgs,
+            2048,
+            0.12,
+            8192,
+        );
+        assert!(n > 0, "expected phase-B shrink steps, got {}", n);
+        assert!(msgs[1].content.contains("compacted proactively"));
+    }
+
+    #[test]
+    fn overflow_retry_marker_distinct_from_proactive() {
+        let mut msgs = vec![
+            make_msg("system", "p"),
+            make_msg("user", &"z".repeat(6000)),
+        ];
+        let n = truncate_oversized_tool_results(&mut msgs, 1000);
+        assert_eq!(n, 1);
+        assert!(msgs[1].content.contains("due to context limit"));
+        assert!(!msgs[1].content.contains("compacted proactively"));
     }
 
     #[test]

@@ -40,10 +40,12 @@ Ollama invokes tools by replying with **exactly one line** in the form `TOOL_NAM
 | **BROWSER_RELOAD** | `BROWSER_RELOAD` or `BROWSER_RELOAD: hard` | Reload current page; optional `nocache` / `hard` for cache bypass. | `browser_agent/` (CDP `Page.reload`). |
 | **BROWSER_CLICK** | `BROWSER_CLICK: <index>` | Click element at 1-based index from Elements list. | `browser_agent/`. |
 | **BROWSER_INPUT** | `BROWSER_INPUT: <index> <text>` | Type text into element at index. | `browser_agent/`. |
+| **BROWSER_UPLOAD** | `BROWSER_UPLOAD: <index> <path>` | Set file on nearest `<input type=file>` via CDP `DOM.setFileInputFiles`; path must be under `~/.mac-stats/uploads/` or `~/.mac-stats/screenshots/`. | `browser_agent/`. |
 | **BROWSER_KEYS** | `BROWSER_KEYS: <chord>` | Allowlisted keyboard chord to the focused page (CDP only); e.g. `Escape`, `Meta+f`. | `browser_agent/`. |
 | **BROWSER_SCROLL** | `BROWSER_SCROLL: <direction>` | Scroll (down, up, bottom, top, or pixels). | `browser_agent/`. |
-| **BROWSER_EXTRACT** | `BROWSER_EXTRACT` | Return full visible text of current page. | `browser_agent/`. |
-| **BROWSER_SEARCH_PAGE** | `BROWSER_SEARCH_PAGE: <pattern>` | Search page text for pattern (grep-like). | `browser_agent/`. |
+| **BROWSER_EXTRACT** | `BROWSER_EXTRACT` [optional `: no_images`] | Return current page as markdown (links, tables, images by default); falls back to visible text. | `browser_agent/`. |
+| **BROWSER_SEARCH_PAGE** | `BROWSER_SEARCH_PAGE: <pattern>` [css_scope=…] | Search page text for pattern (grep-like); optional CSS subtree scope; DOM path per match. | `browser_agent/`. |
+| **BROWSER_QUERY** | `BROWSER_QUERY: <CSS>` [attrs=…] | `querySelectorAll` summary (tag, text, children, attrs); `href`/`src` absolute. | `browser_agent/`. |
 | **SCHEDULE** | `SCHEDULE: every N minutes <task>`, `SCHEDULE: <cron> <task>`, `SCHEDULE: at <datetime> <task>` | Add recurring or one-shot task to `schedules.json`. | `scheduler/`; returns schedule ID. |
 | **REMOVE_SCHEDULE** | `REMOVE_SCHEDULE: <schedule-id>` | Remove a schedule by ID. | `commands/ollama.rs` (tool loop). |
 | **LIST_SCHEDULES** | `LIST_SCHEDULES` or `LIST_SCHEDULES:` | List active schedules (id, type, next run, task). | `commands/ollama.rs`. |

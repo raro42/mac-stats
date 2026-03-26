@@ -20,9 +20,13 @@
 pub mod agents;
 mod alerts;
 pub mod browser_agent;
+pub mod browser_doctor;
 mod commands;
+pub mod circuit_breaker;
 pub mod config;
 pub mod discord;
+pub mod events;
+pub mod feature_health;
 pub mod downloads_organizer;
 mod ffi;
 mod logging;
@@ -30,8 +34,10 @@ mod mcp;
 mod metrics;
 mod monitors;
 mod ollama;
+mod ollama_queue;
 mod perplexity;
 mod plugins;
+mod prompts;
 pub mod redmine;
 mod scheduler;
 mod search_result_shaping;
@@ -121,7 +127,11 @@ pub use metrics::{
 pub use commands::judge::run_judge_if_enabled;
 pub use commands::ollama::{
     answer_with_ollama_and_fetch, ensure_ollama_agent_ready_at_startup, OllamaReply, OllamaRequest,
+    with_run_error_boundary,
 };
+pub use commands::ollama_run_error::OllamaRunError;
+pub use commands::untrusted_content::wrap_untrusted_content;
+pub use commands::suspicious_patterns::log_untrusted_suspicious_scan;
 
 // UI functions are now in ui module
 use ui::status_bar::{
@@ -263,6 +273,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::ollama_logging::log_ollama_js_check,
             commands::ollama_logging::log_ollama_js_extraction,
             commands::ollama_logging::log_ollama_js_no_blocks,
+            commands::ollama_run_error::get_ollama_run_error_metrics,
             commands::ollama_frontend_chat::ollama_chat_with_execution,
             commands::ollama_frontend_chat::ollama_chat_continue_with_result,
             // Perplexity Search
@@ -306,13 +317,27 @@ fn run_internal(open_cpu_window: bool) {
             // Prompt file commands
             commands::agents::list_prompt_files,
             commands::agents::save_prompt_file,
+            feature_health::get_feature_health,
         ])
         .setup(move |app| {
             // Write default prompt/agent files if missing (first launch or after update)
             crate::config::Config::ensure_defaults();
 
+            std::thread::spawn(|| {
+                std::thread::sleep(std::time::Duration::from_secs(3));
+                crate::browser_doctor::maybe_log_startup_cdp_unreachable();
+            });
+
+            crate::events::register_default_handlers();
+
             // Kill orphaned headless Chrome processes from previous runs or races (keeps browser usage lean)
             crate::browser_agent::kill_orphaned_browser_processes();
+
+            crate::commands::screenshot_lifecycle::prune_old_screenshots();
+
+            crate::browser_agent::cdp_downloads::prune_old_browser_downloads(
+                std::time::Duration::from_secs(24 * 3600),
+            );
 
             // Load persistent monitors on startup
             use crate::commands::monitors;
@@ -387,6 +412,16 @@ fn run_internal(open_cpu_window: bool) {
             println!("Happy monitoring! 🚀");
             println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
+            // Ollama warmup completes before Discord/scheduler/heartbeat so the first inbound message
+            // or due job does not race default config, /api/tags, or ModelCatalog (OpenClaw-style ordering).
+            tauri::async_runtime::block_on(async {
+                commands::ollama_config::ensure_ollama_agent_ready_at_startup().await;
+            });
+            tracing::debug!(
+                target: "mac_stats_startup",
+                "Ollama startup warmup finished (gate open); spawning Discord, scheduler, heartbeat, and task review"
+            );
+
             // Start Discord gateway in a background thread. Token is read from DISCORD_BOT_TOKEN
             // env, .config.env, or Keychain (no Keychain write here, so no blocking).
             std::thread::spawn(|| {
@@ -395,6 +430,9 @@ fn run_internal(open_cpu_window: bool) {
 
             // Start scheduler agent: reads ~/.mac-stats/schedules.json and runs due tasks (Ollama + tools).
             scheduler::spawn_scheduler_thread();
+
+            // Optional heartbeat: periodic checklist turn + HEARTBEAT_OK ack (config.json `heartbeat`).
+            scheduler::heartbeat::spawn_heartbeat_thread();
 
             // Start task review: every 10 min, close WIP tasks older than 30 min as unsuccessful, work on one open task.
             task::review::spawn_review_thread();
@@ -415,11 +453,8 @@ fn run_internal(open_cpu_window: bool) {
             // Watch agent and skills directories so file edits are picked up (emit events for frontend).
             agents::watch::spawn_agents_and_skills_watcher();
 
-            // Ensure Ollama agent is ready at startup (default endpoint) so Discord, scheduler, and CPU window
-            // can use it without requiring the user to open the CPU window first.
-            tauri::async_runtime::spawn(async {
-                commands::ollama::ensure_ollama_agent_ready_at_startup().await;
-            });
+            // Subsystem health report (structured probes, logged after short delay for Discord/Ollama).
+            feature_health::spawn_startup_feature_health_probe();
 
             // Run website monitor checks in the background so monitors are checked even when the CPU window
             // is not open. Wakes every 30s and runs checks for any monitor that is due (by its interval).
@@ -528,7 +563,10 @@ fn run_internal(open_cpu_window: bool) {
                         continue; // Skip this update cycle
                     }
 
-                    let text = build_status_text(&metrics);
+                    let mut text = build_status_text(&metrics);
+                    if ollama::ollama_http_circuit_is_open_for_menu() {
+                        text.push_str("\nOllama ✕");
+                    }
 
                     // Store update in static variable
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {
@@ -1596,8 +1634,13 @@ fn run_internal(open_cpu_window: bool) {
             });
             Ok(())
         })
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|_app_handle, event| {
+            if matches!(event, tauri::RunEvent::Exit) {
+                crate::browser_agent::close_browser_session();
+            }
+        });
 
     // Log off from Discord on app shutdown so the user appears offline.
     discord::disconnect_discord();

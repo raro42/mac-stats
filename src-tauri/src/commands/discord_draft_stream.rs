@@ -11,7 +11,7 @@ use serenity::model::channel::Message;
 use tokio::sync::{mpsc, oneshot};
 use tracing::{debug, info, warn};
 
-const DISCORD_CONTENT_MAX_CHARS: usize = 2000;
+use crate::commands::outbound_pipeline::DISCORD_CONTENT_MAX_CHARS;
 
 #[derive(Debug)]
 enum Cmd {

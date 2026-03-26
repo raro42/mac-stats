@@ -1,6 +1,6 @@
-# Data files reference: schedules.json, user-info.json, session_reset_phrases.md
+# Data files reference: schedules.json, config heartbeat, user-info.json, session_reset_phrases.md
 
-Short reference for key data files under `~/.mac-stats/` used by the scheduler, Discord agent, and session memory. For usage (SCHEDULE tool, Discord, session reset) see **docs/007_discord_agent.md**, **docs/009_scheduler_agent.md**, and **docs/019_agent_session_and_memory.md**.
+Short reference for key data files under `~/.mac-stats/` used by the scheduler, Discord agent, optional heartbeat, and session memory. For usage (SCHEDULE tool, Discord, session reset) see **docs/007_discord_agent.md**, **docs/009_scheduler_agent.md**, and **docs/019_agent_session_and_memory.md**.
 
 ---
 
@@ -52,7 +52,45 @@ Short reference for key data files under `~/.mac-stats/` used by the scheduler, 
 - **Deduplication:** Adding a schedule with the same `cron` (or same `at` for one-shot) and same task (after normalizing whitespace) as an existing entry is treated as duplicate and not added again.
 - **Empty task:** Entries with empty `task` are skipped at load time.
 
-### Data structure and performance
+---
+
+## config.json — `heartbeat` (optional)
+
+**Path:** `$HOME/.mac-stats/config.json` (fragment; other keys unchanged)  
+**Purpose:** Enable a periodic **heartbeat** agent turn (checklist + `HEARTBEAT_OK` silent ack). Independent of `schedules.json`.
+
+### JSON shape
+
+Top-level object key `heartbeat` (optional):
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `enabled` | boolean | `false` | When true, the heartbeat thread runs. |
+| `intervalSecs` | number | `1800` | Seconds between runs (clamped 60–86400). Overridden by env `MAC_STATS_HEARTBEAT_INTERVAL_SECS` when set. |
+| `checklistPath` | string | omit | Path to markdown checklist (`~/…` allowed). If missing or unreadable, `checklistPrompt` or a built-in default is used. |
+| `checklistPrompt` | string | omit | Inline checklist text when no file or as fallback after file read failure. |
+| `replyToChannelId` | string | omit | Discord channel snowflake for non-ack replies. Omit or empty = log only (no Discord post). |
+| `ackMaxChars` | number | `300` | If the reply starts or ends with `HEARTBEAT_OK` and the remaining text (trimmed) is at most this many characters, the reply is treated as a silent ack (no delivery). Clamped 0–2000. |
+
+### Example
+
+```json
+{
+  "heartbeat": {
+    "enabled": true,
+    "intervalSecs": 1800,
+    "checklistPath": "~/.mac-stats/HEARTBEAT.md",
+    "replyToChannelId": "1234567890123456789",
+    "ackMaxChars": 300
+  }
+}
+```
+
+**Operator checklist:** Put short, actionable bullets in `HEARTBEAT.md` (e.g. email, calendar, mentions). Instruct the model to only surface real alerts; otherwise `HEARTBEAT_OK`.
+
+---
+
+### Data structure and performance (schedules.json)
 
 Schedules are stored as a **JSON array** for simplicity, human readability, and backward compatibility. Operations that look up by `id` (e.g. REMOVE_SCHEDULE) or check for duplicates (add_schedule / add_schedule_at) do a single pass over the array (O(n)). Typical usage keeps N small (tens of schedules, capped by maxSchedules). For that scale, O(n) is acceptable and no in-memory index or file-format change is required. If we ever need O(1) lookup by id at larger scale, options would be: (a) build a HashMap by id after parsing and use it only in memory, or (b) migrate the file format to an object keyed by id, with a one-time migration for existing array files. No change is implemented at this time.
 
@@ -131,6 +169,65 @@ Only after Discord accepts the final user-visible message for that run (schedule
 
 - **docs/019_agent_session_and_memory.md** — Session Startup, session reset behavior.
 - **docs/035_memory_and_topic_handling.md** — Memory and topic handling overview.
+
+---
+
+## Before-reset transcript export (optional)
+
+**Purpose:** Immediately before a **user-triggered** Discord session clear (same triggers as `session_reset_phrases.md` or a leading `new session:` / `new session ` prefix), mac-stats can write the current conversational history to a JSONL file and optionally run a shell hook. This mirrors OpenClaw’s “before reset” idea for backups, memory extraction, or custom tooling—without blocking the reset.
+
+### Configuration
+
+- **`beforeResetTranscriptPath`** in `~/.mac-stats/config.json` — non-empty path for the JSONL file (`~/...` allowed). Env override: **`MAC_STATS_BEFORE_RESET_TRANSCRIPT_PATH`**.
+- **`beforeResetHook`** in `config.json` — optional shell command run **after** a successful write, in a **background thread** (does not delay the bot). The transcript’s absolute path is **`$1`** and is also in env **`MAC_STATS_BEFORE_RESET_TRANSCRIPT`**. Additional env: **`MAC_STATS_BEFORE_RESET_REASON`** (`new_session_prefix` or `session_reset_phrase`), **`MAC_STATS_BEFORE_RESET_SOURCE`**, **`MAC_STATS_BEFORE_RESET_SESSION_ID`**. Env override: **`MAC_STATS_BEFORE_RESET_HOOK`**.
+- If only the hook is set (no transcript path), the file defaults to **`$HOME/.mac-stats/agents/last_session_before_reset.jsonl`**.
+
+### File format (JSONL)
+
+- First line: metadata object with `"kind":"before_reset_meta"`, `source`, `session_id`, `reason`, `exported_at_utc` (RFC3339 UTC), `message_count`.
+- Following lines: one JSON object per message: `{"role":"user"|"assistant","content":"..."}` (same conversational filtering as session memory; internal artifacts omitted).
+
+Writes are best-effort: failures are logged; the session still clears. The hook is invoked as `/bin/sh -c '<your command> \"$1\"' _ <absolute-path>`.
+
+### See also
+
+- **docs/035_memory_and_topic_handling.md** — User-initiated reset behavior.
+
+---
+
+## Compaction hooks and before-compaction transcript (optional)
+
+**Purpose:** Around each **session compaction** run (on-request router path, in-app CPU Ollama chat when history ≥ 8, and the 30-minute periodic pass), mac-stats can write a JSONL snapshot **before** the compactor runs and/or run **fire-and-forget** shell commands. After a **successful** compaction, an optional **after** hook runs (not on failure or skip). Hooks do not block compaction; failures are logged only—same spirit as before-reset export.
+
+### Configuration (`~/.mac-stats/config.json` and env)
+
+| Key | Env override |
+|-----|----------------|
+| **`beforeCompactionTranscriptPath`** | **`MAC_STATS_BEFORE_COMPACTION_TRANSCRIPT_PATH`** |
+| **`beforeCompactionHook`** | **`MAC_STATS_BEFORE_COMPACTION_HOOK`** |
+| **`afterCompactionHook`** | **`MAC_STATS_AFTER_COMPACTION_HOOK`** |
+
+If **`beforeCompactionHook`** is set but no transcript path is configured, the default file is **`$HOME/.mac-stats/agents/last_session_before_compaction.jsonl`**.
+
+### Before hook
+
+- Invoked as `/bin/sh -c '<command> \"$1\"' _ <absolute-transcript-path>` after a successful write (same pattern as before-reset).
+- Env: **`MAC_STATS_BEFORE_COMPACTION_TRANSCRIPT`**, **`MAC_STATS_BEFORE_COMPACTION_SOURCE`**, **`MAC_STATS_BEFORE_COMPACTION_SESSION_ID`**, **`MAC_STATS_BEFORE_COMPACTION_MESSAGE_COUNT`**, **`MAC_STATS_BEFORE_COMPACTION_REQUEST_ID`**.
+
+JSONL first line metadata: `"kind":"before_compaction_meta"`, `source`, `session_id`, `request_id`, `exported_at_utc`, `message_count`; following lines are `role` / `content` objects for the messages about to be compacted.
+
+### After hook (success only)
+
+- No file argument; command runs with env only: **`MAC_STATS_AFTER_COMPACTION_SOURCE`**, **`MAC_STATS_AFTER_COMPACTION_SESSION_ID`**, **`MAC_STATS_AFTER_COMPACTION_MESSAGE_COUNT_BEFORE`**, **`MAC_STATS_AFTER_COMPACTION_LESSONS_WRITTEN`** (`true` / `false`), **`MAC_STATS_AFTER_COMPACTION_REQUEST_ID`**.
+- Not invoked for **Discord having_fun** channels (fixed minimal context, no LLM compaction), so casual chat does not trigger post-compaction scripts. The **before** hook still runs for those sessions when configured.
+
+### CPU window UI
+
+The in-app chat listens for the Tauri event **`mac-stats-compaction`** (payload shape `{ "stream": "compaction", "data": { "phase": "start"|"end", "willRetry", "requestId", "ok"? } }`) to show a short “Compacting context…” / “Context compacted” line. **Discord** does not use this indicator.
+
+### See also
+
+- **docs/035_memory_and_topic_handling.md** — When compaction runs.
 
 ---
 

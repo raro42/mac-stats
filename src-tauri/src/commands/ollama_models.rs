@@ -10,10 +10,9 @@ use super::ollama_config::get_ollama_client;
 /// List available Ollama models (async, non-blocking)
 #[tauri::command]
 pub async fn list_ollama_models() -> Result<Vec<String>, String> {
-    use serde_json;
-    use tracing::{debug, info};
+    use tracing::info;
 
-    info!("Ollama: Listing available models...");
+    info!("Ollama: Listing available models (cached /api/tags)...");
 
     let (endpoint, api_key) = {
         let client_guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
@@ -28,77 +27,38 @@ pub async fn list_ollama_models() -> Result<Vec<String>, String> {
         )
     };
 
-    let temp_client = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(10))
-        .build()
-        .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
+    let resolved_key = api_key
+        .as_ref()
+        .and_then(|acc| crate::security::get_credential(acc).ok().flatten());
 
-    let url = format!("{}/api/tags", endpoint);
-    info!("Ollama: Using endpoint: {}", url);
-    let mut request = temp_client.get(&url);
+    let list = crate::ollama::model_list_cache::fetch_tags_cached(
+        &endpoint,
+        resolved_key.as_deref(),
+    )
+    .await?;
 
-    if let Some(keychain_account) = &api_key {
-        if let Ok(Some(api_key_value)) = crate::security::get_credential(keychain_account) {
-            let masked = crate::security::mask_credential(&api_key_value);
-            request = request.header("Authorization", format!("Bearer {}", api_key_value));
-            debug!(
-                "Ollama: Using API key for model listing (masked: {})",
-                masked
-            );
-        }
-    }
-
-    let response: serde_json::Value = request
-        .send()
-        .await
-        .map_err(|e| {
-            debug!("Ollama: Failed to request models: {}", e);
-            format!("Failed to request models: {}", e)
-        })?
-        .json()
-        .await
-        .map_err(|e| {
-            debug!("Ollama: Failed to parse models response: {}", e);
-            format!("Failed to parse models response: {}", e)
-        })?;
-
-    let response_json = serde_json::to_string_pretty(&response)
-        .unwrap_or_else(|_| "Failed to serialize response".to_string());
-    info!(
-        "Ollama: Received models list HTTP response JSON:\n{}",
-        response_json
-    );
-
-    let models: Vec<String> = response
-        .get("models")
-        .and_then(|m| m.as_array())
-        .map(|arr| {
-            arr.iter()
-                .filter_map(|m| {
-                    m.get("name")
-                        .and_then(|n| n.as_str())
-                        .map(|s| s.to_string())
-                })
-                .collect()
-        })
-        .unwrap_or_default();
-
-    info!("Ollama: Extracted {} models from response", models.len());
+    let models: Vec<String> = list.models.into_iter().map(|m| m.name).collect();
+    info!("Ollama: Model list has {} names", models.len());
     Ok(models)
 }
 
 /// List available Ollama models with full details (GET /api/tags).
 #[tauri::command]
 pub async fn list_ollama_models_full() -> Result<ListResponse, String> {
-    let config = {
+    let (endpoint, api_key) = {
         let guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
         let client = guard
             .as_ref()
             .ok_or_else(|| "Ollama not configured".to_string())?;
-        client.config.clone()
+        (
+            client.config.endpoint.clone(),
+            client.config.api_key.clone(),
+        )
     };
-    let client = OllamaClient::new(config).map_err(|e| e.to_string())?;
-    client.list_models_full().await.map_err(|e| e.to_string())
+    let resolved_key = api_key
+        .as_ref()
+        .and_then(|acc| crate::security::get_credential(acc).ok().flatten());
+    crate::ollama::model_list_cache::fetch_tags_cached(&endpoint, resolved_key.as_deref()).await
 }
 
 /// Get Ollama server version (GET /api/version).

@@ -12,7 +12,10 @@ use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::Layer;
 use tracing_subscriber::{fmt, EnvFilter};
 
+pub mod redact;
 pub mod subsystem;
+
+pub use redact::redact_secrets;
 
 /// If we haven't rotated today (UTC), copy debug.log to debug.log_sic and truncate debug.log.
 /// State is stored in ~/.mac-stats/.debug_log_last_rotated (YYYY-MM-DD). Called once at init.
@@ -75,6 +78,9 @@ pub fn ellipse(s: &str, max_len: usize) -> String {
 /// The log file path will be determined by the config module (when available).
 /// For now, uses a temporary path that will be replaced in Phase 3.
 pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
+    redact::init_from_env();
+    let redact_logs = redact::redaction_active();
+
     // Convert verbosity level (0-3) to tracing level.
     // -v (1): warn only. -vv (2): info + mac_stats=debug (no HTTP client noise). -vvv (3): full trace.
     let filter = match verbosity {
@@ -109,9 +115,9 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
         }
     });
 
-    // Add console layer (stderr)
+    // Add console layer (stderr); optional secret redaction on full lines
     let console_layer = fmt::layer()
-        .with_writer(std::io::stderr)
+        .with_writer(move || redact::RedactingLineWriter::new(std::io::stderr(), redact_logs))
         .with_target(subsystem_allow.is_some())
         .with_thread_ids(false)
         .with_thread_names(false)
@@ -148,8 +154,9 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
             .ok();
 
         if let Some(file) = file {
+            let file_mk = redact::RedactingFileMakeWriter::new(file, redact_logs);
             let file_layer = fmt::layer()
-                .with_writer(file)
+                .with_writer(file_mk)
                 .with_target(false)
                 .with_thread_ids(false)
                 .with_thread_names(false)
@@ -164,6 +171,16 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
         // Console only
         registry.with(console_layer).init();
     }
+
+    tracing::info!(
+        target: "mac_stats::logging",
+        "Log secret redaction: {} (set LOG_REDACTION=0 in env or ~/.mac-stats/.config.env for raw output)",
+        if redact::redaction_active() {
+            "enabled"
+        } else {
+            "disabled"
+        }
+    );
 }
 
 /// Set verbosity level (compatibility function)

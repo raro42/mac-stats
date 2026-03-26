@@ -7,7 +7,7 @@ use tracing::info;
 
 use crate::commands::agent_session::run_agent_ollama_session;
 use crate::commands::content_reduction::run_skill_ollama_session;
-use crate::commands::ollama::send_ollama_chat_messages;
+use crate::commands::ollama::{send_ollama_chat_messages, OllamaHttpQueue};
 use crate::commands::redmine_helpers::redmine_direct_fallback_hint;
 use crate::commands::reply_helpers::is_agent_unavailable_error;
 use crate::commands::tool_parsing::{parse_python_script_from_response, parse_tool_from_response};
@@ -190,7 +190,14 @@ pub(crate) async fn handle_agent(
         &format!("{} -> Ollama: {}", agent.name, status_text),
     );
 
-    match run_agent_ollama_session(agent, &user_msg, status_tx, load_global_memory).await {
+            match run_agent_ollama_session(
+                agent,
+                &user_msg,
+                status_tx,
+                load_global_memory,
+                OllamaHttpQueue::Nested,
+            )
+            .await {
         Ok(result) => {
             let label = format!("{} ({})", agent.name, agent.id);
             let entry = Some((label.clone(), result.trim().to_string()));
@@ -265,6 +272,7 @@ pub(crate) async fn handle_skill(
                 user_msg,
                 model_override,
                 options_override,
+                OllamaHttpQueue::Nested,
             )
             .await
             {
@@ -305,11 +313,24 @@ pub(crate) async fn handle_skill(
 
 // ── RUN_JS ───────────────────────────────────────────────────────────────
 
+static RUN_JS_DISABLED_LOGGED: std::sync::atomic::AtomicBool =
+    std::sync::atomic::AtomicBool::new(false);
+
 pub(crate) fn handle_run_js(
     arg: &str,
     status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
 ) -> String {
     use crate::commands::content_reduction::run_js_via_node;
+    use std::sync::atomic::Ordering;
+
+    if !crate::config::Config::run_js_enabled() {
+        if !RUN_JS_DISABLED_LOGGED.swap(true, Ordering::SeqCst) {
+            info!(
+                "RUN_JS disabled in config (runJsEnabled=false); tool calls return refusal without invoking Node"
+            );
+        }
+        return "runJsEnabled=false: RUN_JS refused. Answer without executing JavaScript.".to_string();
+    }
 
     const CODE_PREVIEW_LEN: usize = 50;
     let code_preview: String = arg
@@ -432,7 +453,7 @@ pub(crate) async fn handle_run_cmd(
                 );
                 last_output = format!(
                     "Here is the command output:\n\n{}\n\nUse this to answer the user's question.",
-                    output
+                    crate::commands::untrusted_content::wrap_untrusted_content("run-cmd-output", &output)
                 );
                 break;
             }
@@ -468,6 +489,7 @@ pub(crate) async fn handle_run_cmd(
                         fix_messages,
                         model_override.clone(),
                         options_override.clone(),
+                        OllamaHttpQueue::Nested,
                     )
                     .await
                     {

@@ -16,9 +16,10 @@ use crate::config::Config;
 use regex::Regex;
 use std::collections::HashMap;
 use std::path::Path;
+use std::path::PathBuf;
 use std::sync::Mutex;
 use std::sync::OnceLock;
-use tracing::debug;
+use tracing::{debug, info, warn};
 
 const PERSIST_THRESHOLD: usize = 3;
 
@@ -216,6 +217,125 @@ pub fn user_wants_session_reset(message: &str) -> bool {
     iter.any(|phrase| normalized.contains(&phrase.to_lowercase()))
 }
 
+/// Best-effort export immediately **before** a user-triggered session clear (Discord: reset phrases or `new session:` prefix).
+/// When `beforeResetTranscriptPath` or `MAC_STATS_BEFORE_RESET_TRANSCRIPT_PATH` is set, writes JSONL (meta line + one object per message).
+/// When only **`beforeResetHook`** / **`MAC_STATS_BEFORE_RESET_HOOK`** is set, writes to `~/.mac-stats/agents/last_session_before_reset.jsonl` by default.
+/// Optional hook runs in a background thread via `/bin/sh -c '<hook> \"$1\"' _ <path>`; does not block the reset. Failures are logged only.
+/// See `docs/data_files_reference.md` (before-reset export).
+pub fn before_session_reset_export(source: &str, session_id: u64, reason: &str) {
+    let hook_raw = Config::before_reset_hook_raw();
+    let hook_configured = !hook_raw.trim().is_empty();
+    let path_configured = !Config::before_reset_transcript_path_raw().trim().is_empty();
+
+    if !hook_configured && !path_configured {
+        return;
+    }
+
+    let transcript_path: PathBuf = if path_configured {
+        match Config::before_reset_transcript_path_resolved() {
+            Some(p) => p,
+            None => {
+                warn!(
+                    "Session memory: before_reset transcript path set but could not resolve (~ requires HOME); skipping export"
+                );
+                return;
+            }
+        }
+    } else {
+        Config::default_before_reset_transcript_path()
+    };
+
+    let mut messages = get_messages(source, session_id);
+    if messages.is_empty() {
+        messages = load_messages_from_latest_session_file(source, session_id);
+    }
+
+    let ts = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
+    let meta = serde_json::json!({
+        "kind": "before_reset_meta",
+        "source": source,
+        "session_id": session_id,
+        "reason": reason,
+        "exported_at_utc": ts,
+        "message_count": messages.len(),
+    });
+    let mut body = String::new();
+    body.push_str(&meta.to_string());
+    body.push('\n');
+    for (role, content) in &messages {
+        let line = serde_json::json!({ "role": role, "content": content });
+        body.push_str(&line.to_string());
+        body.push('\n');
+    }
+
+    if let Some(parent) = transcript_path.parent() {
+        if let Err(e) = std::fs::create_dir_all(parent) {
+            warn!(
+                "Session memory: before_reset could not create parent dir {}: {}",
+                parent.display(),
+                e
+            );
+        }
+    }
+
+    match std::fs::write(&transcript_path, &body) {
+        Ok(()) => info!(
+            "Session memory: before_reset wrote {} ({} messages, reason={})",
+            transcript_path.display(),
+            messages.len(),
+            reason
+        ),
+        Err(e) => {
+            warn!(
+                "Session memory: before_reset write failed {}: {}",
+                transcript_path.display(),
+                e
+            );
+            return;
+        }
+    }
+
+    if !hook_configured {
+        return;
+    }
+
+    let hook_cmd = hook_raw.trim().to_string();
+    let path_for_thread = transcript_path.clone();
+    let reason_owned = reason.to_string();
+    let source_owned = source.to_string();
+    std::thread::spawn(move || {
+        let path_str = path_for_thread.to_string_lossy().into_owned();
+        let script = format!("{} \"$1\"", hook_cmd);
+        let status = std::process::Command::new("/bin/sh")
+            .arg("-c")
+            .arg(&script)
+            .arg("_")
+            .arg(&path_str)
+            .env("MAC_STATS_BEFORE_RESET_TRANSCRIPT", &path_str)
+            .env("MAC_STATS_BEFORE_RESET_REASON", &reason_owned)
+            .env("MAC_STATS_BEFORE_RESET_SOURCE", &source_owned)
+            .env(
+                "MAC_STATS_BEFORE_RESET_SESSION_ID",
+                format!("{}", session_id),
+            )
+            .status();
+        match status {
+            Ok(s) if s.success() => {
+                debug!("Session memory: before_reset hook finished successfully");
+            }
+            Ok(s) => {
+                warn!(
+                    "Session memory: before_reset hook exited with status {:?}",
+                    s.code()
+                );
+            }
+            Err(e) => {
+                warn!("Session memory: before_reset hook spawn failed: {}", e);
+            }
+        }
+    });
+}
+
 /// Returns the Session Startup instruction plus current date/time (UTC) to inject after a session reset.
 /// Used so the agent knows to run Session Startup and which daily memory files (if any) to read.
 pub fn session_reset_instruction_with_date_utc() -> String {
@@ -314,17 +434,30 @@ fn persist_session(source: &str, session_id: u64) -> std::io::Result<()> {
 /// Clear in-memory session history. Persists current messages to disk first (if any).
 pub fn clear_session(source: &str, session_id: u64) {
     let key = format!("{}-{}", source, session_id);
+    let mut snapshot: Option<Vec<(String, String)>> = None;
     {
         let store = match session_store().lock() {
             Ok(g) => g,
             Err(_) => return,
         };
-        let has_messages = store.get(&key).is_some_and(|s| !s.messages.is_empty());
+        if let Some(state) = store.get(&key) {
+            if !state.messages.is_empty() {
+                snapshot = Some(state.messages.clone());
+            }
+        }
+        let has_messages = snapshot.is_some();
         if has_messages {
             drop(store);
             let _ = persist_session(source, session_id);
         }
     }
+    if let Some(msgs) = snapshot {
+        let conv = count_conversational_messages(&msgs);
+        crate::commands::ori_lifecycle::maybe_capture_before_session_reset_fire_and_forget(
+            source, session_id, msgs, conv,
+        );
+    }
+    crate::commands::ori_lifecycle::on_session_cleared(source, session_id);
     if let Ok(mut store) = session_store().lock() {
         store.remove(&key);
     }

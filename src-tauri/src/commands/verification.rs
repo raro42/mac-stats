@@ -8,7 +8,7 @@ use crate::commands::browser_helpers::{
     browser_retry_grounding_prompt, explicit_no_playable_video_finding, is_browser_task_request,
     is_video_review_request,
 };
-use crate::commands::ollama::send_ollama_chat_messages;
+use crate::commands::ollama::{send_ollama_chat_messages, OllamaHttpQueue};
 use crate::commands::perplexity_helpers::is_news_query;
 use crate::commands::redmine_helpers::{
     extract_redmine_time_entries_summary_for_reply, is_grounded_redmine_time_entries_blocked_reply,
@@ -17,10 +17,16 @@ use crate::commands::redmine_helpers::{
 };
 
 /// Reply from the agent: text plus optional attachment paths (e.g. screenshots) for Discord.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct OllamaReply {
     pub text: String,
     pub attachment_paths: Vec<PathBuf>,
+    /// Model asked to reply in-thread on Discord (`[[thread_reply]]`).
+    pub directive_thread_reply: bool,
+    /// Model asked to attach the latest screenshot (`[[attach_screenshot]]`); path may already be in `attachment_paths`.
+    pub directive_attach_screenshot: bool,
+    /// Model asked for paragraph-oriented multi-message split on Discord (`[[split_long]]`).
+    pub directive_split_long: bool,
 }
 
 /// Request-local execution context for a single Discord/Ollama run (task-008 Phase 1).
@@ -109,6 +115,14 @@ pub(crate) fn first_image_as_base64(paths: &[PathBuf]) -> Option<String> {
     };
     for path in paths {
         if ext_ok(path) {
+            if crate::browser_agent::artifact_limits::stat_path_within_browser_artifact_cap(
+                path.as_path(),
+                "verification image",
+            )
+            .is_err()
+            {
+                continue;
+            }
             if let Ok(bytes) = std::fs::read(path) {
                 return Some(base64::engine::general_purpose::STANDARD.encode(&bytes));
             }
@@ -321,7 +335,13 @@ pub(crate) async fn extract_success_criteria(
             images: None,
         },
     ];
-    let response = match send_ollama_chat_messages(messages, model_override, options_override).await
+    let response = match send_ollama_chat_messages(
+        messages,
+        model_override,
+        options_override,
+        OllamaHttpQueue::Nested,
+    )
+    .await
     {
         Ok(r) => r,
         Err(e) => {
@@ -372,7 +392,13 @@ pub(crate) async fn detect_new_topic(
             images: None,
         },
     ];
-    let response = send_ollama_chat_messages(messages, Some(model.to_string()), None).await?;
+    let response = send_ollama_chat_messages(
+        messages,
+        Some(model.to_string()),
+        None,
+        OllamaHttpQueue::Nested,
+    )
+    .await?;
     let text = response.message.content.trim().to_uppercase();
     if text.contains("NEW_TOPIC") {
         Ok(true)
@@ -465,7 +491,13 @@ pub(crate) async fn verify_completion(
         verification_tail
     );
 
-    let image_b64 = first_image_as_base64(attachment_paths);
+    crate::browser_agent::set_last_llm_screenshot_pixel_dims_for_coord_scaling(None);
+    let (prep_b64, llm_dims) =
+        crate::commands::llm_screenshot::prepare_first_attachment_image_for_vision(attachment_paths);
+    let image_b64 = prep_b64.or_else(|| first_image_as_base64(attachment_paths));
+    if image_b64.is_some() {
+        crate::browser_agent::set_last_llm_screenshot_pixel_dims_for_coord_scaling(llm_dims);
+    }
     let vision_model = model_override
         .as_ref()
         .filter(|m| is_vision_capable(m))
@@ -512,6 +544,7 @@ pub(crate) async fn verify_completion(
         messages,
         verification_model.clone(),
         options_override.clone(),
+        OllamaHttpQueue::Nested,
     )
     .await
     {
@@ -550,6 +583,7 @@ pub(crate) async fn verify_completion(
                     messages_text,
                     model_override,
                     options_override.clone(),
+                    OllamaHttpQueue::Nested,
                 )
                 .await
                 {

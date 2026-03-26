@@ -134,6 +134,10 @@ pub async fn run_agent_test(selector: &str, path: Option<&Path>) -> Result<(), i
                 &prompt_for_run,
                 None,
                 true, // include_global_memory: CLI is main session
+                crate::commands::ollama::OllamaHttpQueue::Acquire {
+                    key: "agent_cli".to_string(),
+                    wait_hook: None,
+                },
             )
             .await
         })

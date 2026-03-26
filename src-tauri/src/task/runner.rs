@@ -14,12 +14,14 @@ pub type RunTaskResult = Result<(String, bool), String>;
 /// When reply_to_discord_channel is Some (from scheduler or from task file ## Reply-to: discord <id>), sends the finished task summary to that channel.
 /// message_prefix is prepended when sending (e.g. "[Schedule: id] "). Caller should pass None if not from scheduler.
 /// When `scheduler_delivery_awareness` is Some and Discord send succeeds, records an entry for CPU chat awareness (scheduler-initiated delivery only).
+/// When `partial_progress_capture` is set (e.g. scheduler wall-clock timeout), tool-step summaries are shared with the parent run.
 pub async fn run_task_until_finished(
     task_path: PathBuf,
     max_iterations: u32,
     reply_to_discord_channel: Option<u64>,
     message_prefix: Option<String>,
     scheduler_delivery_awareness: Option<(String, Option<String>)>,
+    partial_progress_capture: Option<crate::commands::partial_progress::PartialProgressCapture>,
 ) -> RunTaskResult {
     let task_name = task_path
         .file_name()
@@ -58,9 +60,14 @@ pub async fn run_task_until_finished(
             crate::task::get_assignee(&current_path).unwrap_or_else(|_| "default".to_string());
         let agents = crate::agents::load_agents();
         let agent_override = crate::agents::find_agent_by_id_or_name(&agents, &assignee).cloned();
+        crate::commands::suspicious_patterns::log_untrusted_suspicious_scan("task-file-content", &content);
+        let wrapped_content = crate::commands::untrusted_content::wrap_untrusted_content(
+            "task-file-content",
+            &content,
+        );
         let question = format!(
             "Current task file content:\n\n{}\n\nDecide the next step. For implement/refactor/add-feature/code tasks: use CURSOR_AGENT: <instruction> to have the editor apply changes, then TASK_APPEND with the result and TASK_STATUS when done. Otherwise use TASK_APPEND to add feedback and TASK_STATUS to set wip or finished. Reply with your action (CURSOR_AGENT, TASK_APPEND, TASK_STATUS, or a final summary).",
-            content
+            wrapped_content
         );
         info!(
             "Task loop: iteration {}/{} for task '{}' (assignee: {})",
@@ -75,10 +82,15 @@ pub async fn run_task_until_finished(
                 agent_override,
                 retry_on_verification_no: true,
                 from_remote: true,
+                discord_reply_channel_id: reply_to_discord_channel,
+                compaction_hook_source: Some("task_runner".to_string()),
+                partial_progress_capture: partial_progress_capture.clone(),
+                ollama_queue_key: Some("scheduler".to_string()),
                 ..Default::default()
             },
         )
-        .await?;
+        .await
+        .map_err(|e| e.to_string())?;
         last_reply = reply.text;
         if let Some(ref p) = crate::task::find_current_path(&current_path) {
             current_path = p.clone();

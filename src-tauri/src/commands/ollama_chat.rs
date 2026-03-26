@@ -3,11 +3,47 @@
 //! Extracted from `ollama.rs` to keep the file focused on the orchestrator (`answer_with_ollama_and_fetch`).
 
 use serde::Deserialize;
-use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicBool, Ordering};
+use tauri::Manager;
 
+/// One process-wide extra retry for cold-start style /api/chat failures (first automation turn parity).
+static OLLAMA_POST_START_COLD_CHAT_RETRY: AtomicBool = AtomicBool::new(true);
+
+use crate::commands::conversation_sanitize::sanitize_conversation_history;
 use crate::commands::ollama_config::{
     get_ollama_client, read_ollama_api_key_from_env_or_config, ChatRequest,
 };
+use crate::commands::outbound_pipeline::ReplyDedupState;
+use crate::mac_stats_info;
+pub use crate::ollama_queue::OllamaHttpQueue;
+use crate::ollama_queue::with_ollama_http_queue;
+
+fn flush_stream_ui_chunk(
+    app_handle: &tauri::AppHandle,
+    dedup: &mut ReplyDedupState,
+    pending: &mut String,
+    verbosity: u8,
+    label: &'static str,
+) {
+    use tracing::debug;
+    if pending.is_empty() {
+        return;
+    }
+    if !dedup.register_if_new(pending.as_str(), None) {
+        if verbosity >= 3 {
+            debug!(
+                target: "outbound_pipeline",
+                "Ollama CPU stream: skipped duplicate {} emit ({} chars)",
+                label,
+                pending.chars().count()
+            );
+        }
+        pending.clear();
+        return;
+    }
+    let chunk = std::mem::take(pending);
+    let _ = app_handle.emit_all("ollama-chat-chunk", serde_json::json!({ "content": chunk }));
+}
 
 /// Merge config defaults with per-request options. Request override wins.
 fn merge_chat_options(
@@ -52,10 +88,50 @@ pub async fn send_ollama_chat_messages(
     messages: Vec<crate::ollama::ChatMessage>,
     model_override: Option<String>,
     options_override: Option<crate::ollama::ChatOptions>,
+    queue: OllamaHttpQueue,
+) -> Result<crate::ollama::ChatResponse, String> {
+    with_ollama_http_queue(queue, || async move {
+        if let Err(e) = crate::ollama::ollama_http_circuit_allow() {
+            return Err(e);
+        }
+        let messages_retry = messages.clone();
+        let mo = model_override.clone();
+        let oo = options_override.clone();
+        let mut out =
+            send_ollama_chat_messages_inner(messages, model_override, options_override).await;
+        if let Err(ref msg) = out {
+            if crate::ollama::ollama_error_suggests_transient_cold_start(msg)
+                && OLLAMA_POST_START_COLD_CHAT_RETRY.swap(false, Ordering::SeqCst)
+            {
+                tracing::info!(
+                    target: "ollama/api",
+                    "Ollama: post-start cold-start retry for /api/chat after: {}",
+                    msg
+                );
+                tokio::time::sleep(std::time::Duration::from_millis(400)).await;
+                out = send_ollama_chat_messages_inner(messages_retry, mo, oo).await;
+            }
+        }
+        match &out {
+            Ok(_) => crate::ollama::ollama_http_circuit_record_success(),
+            Err(msg) => crate::ollama::ollama_http_circuit_record_failure(
+                crate::ollama::ollama_chat_error_should_trip(msg),
+            ),
+        }
+        out
+    })
+    .await
+}
+
+async fn send_ollama_chat_messages_inner(
+    messages: Vec<crate::ollama::ChatMessage>,
+    model_override: Option<String>,
+    options_override: Option<crate::ollama::ChatOptions>,
 ) -> Result<crate::ollama::ChatResponse, String> {
     use tracing::{debug, info};
 
     let messages = deduplicate_consecutive_messages(messages);
+    let messages = sanitize_conversation_history(messages);
 
     let (endpoint, model, api_key, config_temp, config_num_ctx, http_client) = {
         let client_guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
@@ -183,7 +259,17 @@ pub async fn send_ollama_chat_messages(
                     continue;
                 }
                 if is_timeout {
-                    return Err("Ollama is busy or unavailable; try again in a moment.".to_string());
+                    let secs = crate::config::Config::ollama_chat_timeout_secs();
+                    mac_stats_info!(
+                        "ollama/api",
+                        "Ollama /api/chat: limit=ollama_per_request_timeout ({}s) after retries",
+                        secs
+                    );
+                    return Err(format!(
+                        "Limit: Ollama per-request timeout — each /api/chat call exceeded the HTTP timeout ({}s, `ollamaChatTimeoutSecs`). \
+                         Ollama may be overloaded or the model is slow; try again, use a smaller/faster model, or raise `ollamaChatTimeoutSecs`.",
+                        secs
+                    ));
                 }
                 return Err(format!("Failed to send chat request: {}", e));
             }
@@ -211,6 +297,49 @@ pub async fn send_ollama_chat_messages_streaming(
     messages: Vec<crate::ollama::ChatMessage>,
     model_override: Option<String>,
     options_override: Option<crate::ollama::ChatOptions>,
+    queue: OllamaHttpQueue,
+) -> Result<crate::ollama::ChatResponse, String> {
+    with_ollama_http_queue(queue, || async move {
+        if let Err(e) = crate::ollama::ollama_http_circuit_allow() {
+            return Err(e);
+        }
+        let messages_retry = messages.clone();
+        let mo = model_override.clone();
+        let oo = options_override.clone();
+        let mut out = send_ollama_chat_messages_streaming_inner(
+            messages,
+            model_override,
+            options_override,
+        )
+        .await;
+        if let Err(ref msg) = out {
+            if crate::ollama::ollama_error_suggests_transient_cold_start(msg)
+                && OLLAMA_POST_START_COLD_CHAT_RETRY.swap(false, Ordering::SeqCst)
+            {
+                tracing::info!(
+                    target: "ollama/api",
+                    "Ollama: post-start cold-start retry for /api/chat (stream) after: {}",
+                    msg
+                );
+                tokio::time::sleep(std::time::Duration::from_millis(400)).await;
+                out = send_ollama_chat_messages_streaming_inner(messages_retry, mo, oo).await;
+            }
+        }
+        match &out {
+            Ok(_) => crate::ollama::ollama_http_circuit_record_success(),
+            Err(msg) => crate::ollama::ollama_http_circuit_record_failure(
+                crate::ollama::ollama_chat_error_should_trip(msg),
+            ),
+        }
+        out
+    })
+    .await
+}
+
+async fn send_ollama_chat_messages_streaming_inner(
+    messages: Vec<crate::ollama::ChatMessage>,
+    model_override: Option<String>,
+    options_override: Option<crate::ollama::ChatOptions>,
 ) -> Result<crate::ollama::ChatResponse, String> {
     use crate::state::APP_HANDLE;
     use futures_util::StreamExt;
@@ -218,6 +347,7 @@ pub async fn send_ollama_chat_messages_streaming(
     use tracing::{debug, info};
 
     let messages = deduplicate_consecutive_messages(messages);
+    let messages = sanitize_conversation_history(messages);
 
     let (endpoint, model, api_key, config_temp, config_num_ctx, http_client) = {
         let client_guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
@@ -279,52 +409,118 @@ pub async fn send_ollama_chat_messages_streaming(
 
     let app_handle = APP_HANDLE
         .get()
-        .ok_or_else(|| "App handle not available for streaming".to_string())?;
+        .ok_or_else(|| "App handle not available for streaming".to_string())?
+        .clone();
     let mut stream = resp.bytes_stream();
     let mut buf = Vec::<u8>::new();
     let mut full_content = String::new();
 
-    while let Some(chunk_result) = stream.next().await {
-        let chunk = chunk_result.map_err(|e| format!("Stream read error: {}", e))?;
-        buf.extend_from_slice(&chunk);
-        // Process complete lines (NDJSON)
-        while let Some(pos) = buf.iter().position(|&b| b == b'\n') {
-            let line = std::mem::take(&mut buf);
-            let (line_bytes, rest) = line.split_at(pos);
-            buf = rest[1..].to_vec();
-            let line_str = match std::str::from_utf8(line_bytes) {
-                Ok(s) => s.trim(),
-                Err(_) => continue,
-            };
-            if line_str.is_empty() {
-                continue;
+    let ui_policy = crate::commands::outbound_pipeline::SurfaceChunkPolicy::tauri_ui_default();
+    let coalesce_ms = ui_policy.coalesce_idle_ms;
+    let mut pending_emit = String::new();
+    let mut dedup = ReplyDedupState::new();
+
+    loop {
+        let next_item = if coalesce_ms > 0 && !pending_emit.is_empty() {
+            tokio::time::timeout(
+                tokio::time::Duration::from_millis(coalesce_ms),
+                stream.next(),
+            )
+            .await
+        } else {
+            Ok(stream.next().await)
+        };
+
+        match next_item {
+            Err(_) => {
+                flush_stream_ui_chunk(
+                    &app_handle,
+                    &mut dedup,
+                    &mut pending_emit,
+                    verbosity,
+                    "coalesced",
+                );
             }
-            let parsed: OllamaStreamLine = match serde_json::from_str(line_str) {
-                Ok(p) => p,
-                Err(_) => continue,
-            };
-            if let Some(delta) = parsed.message.content {
-                full_content.push_str(&delta);
-                let _ = app_handle
-                    .emit_all("ollama-chat-chunk", serde_json::json!({ "content": delta }));
+            Ok(None) => {
+                flush_stream_ui_chunk(
+                    &app_handle,
+                    &mut dedup,
+                    &mut pending_emit,
+                    verbosity,
+                    "tail",
+                );
+                break;
             }
-            if parsed.done {
-                let response = crate::ollama::ChatResponse {
-                    message: crate::ollama::ChatMessage {
-                        role: "assistant".to_string(),
-                        content: full_content.clone(),
-                        images: None,
-                    },
-                    done: true,
-                };
-                if verbosity >= 2 {
-                    let n = full_content.chars().count();
-                    info!("Ollama ← Stream done ({} chars)", n);
+            Ok(Some(Err(e))) => return Err(format!("Stream read error: {}", e)),
+            Ok(Some(Ok(chunk))) => {
+                buf.extend_from_slice(&chunk);
+                while let Some(pos) = buf.iter().position(|&b| b == b'\n') {
+                    let line = std::mem::take(&mut buf);
+                    let (line_bytes, rest) = line.split_at(pos);
+                    buf = rest[1..].to_vec();
+                    let line_str = match std::str::from_utf8(line_bytes) {
+                        Ok(s) => s.trim(),
+                        Err(_) => continue,
+                    };
+                    if line_str.is_empty() {
+                        continue;
+                    }
+                    let parsed: OllamaStreamLine = match serde_json::from_str(line_str) {
+                        Ok(p) => p,
+                        Err(_) => continue,
+                    };
+                    if let Some(delta) = parsed.message.content {
+                        full_content.push_str(&delta);
+                        if coalesce_ms == 0 {
+                            if dedup.register_if_new(&delta, None) {
+                                let _ = app_handle.emit_all(
+                                    "ollama-chat-chunk",
+                                    serde_json::json!({ "content": delta }),
+                                );
+                            } else if verbosity >= 3 {
+                                debug!(
+                                    target: "outbound_pipeline",
+                                    "Ollama CPU stream: skipped duplicate token emit"
+                                );
+                            }
+                        } else {
+                            pending_emit.push_str(&delta);
+                        }
+                    }
+                    if parsed.done {
+                        flush_stream_ui_chunk(
+                            &app_handle,
+                            &mut dedup,
+                            &mut pending_emit,
+                            verbosity,
+                            "final",
+                        );
+                        let response = crate::ollama::ChatResponse {
+                            message: crate::ollama::ChatMessage {
+                                role: "assistant".to_string(),
+                                content: full_content.clone(),
+                                images: None,
+                            },
+                            done: true,
+                        };
+                        if verbosity >= 2 {
+                            let n = full_content.chars().count();
+                            info!("Ollama ← Stream done ({} chars)", n);
+                        }
+                        return Ok(response);
+                    }
                 }
-                return Ok(response);
             }
         }
     }
+
+    flush_stream_ui_chunk(
+        &app_handle,
+        &mut dedup,
+        &mut pending_emit,
+        verbosity,
+        "eof",
+    );
 
     // Stream ended without done: true; return what we have
     let response = crate::ollama::ChatResponse {
@@ -347,5 +543,14 @@ pub async fn ollama_chat(request: ChatRequest) -> Result<crate::ollama::ChatResp
         .unwrap_or_else(|_| "Failed to serialize request".to_string());
     info!("Ollama: Chat request JSON:\n{}", request_json);
 
-    send_ollama_chat_messages(request.messages, None, None).await
+    send_ollama_chat_messages(
+        request.messages,
+        None,
+        None,
+        OllamaHttpQueue::Acquire {
+            key: "cpu_ui".to_string(),
+            wait_hook: None,
+        },
+    )
+    .await
 }

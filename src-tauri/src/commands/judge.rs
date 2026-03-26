@@ -121,7 +121,16 @@ pub async fn run_judge(
         },
     ];
     let response =
-        match crate::commands::ollama::send_ollama_chat_messages(messages, None, None).await {
+        match crate::commands::ollama::send_ollama_chat_messages(
+            messages,
+            None,
+            None,
+            crate::commands::ollama::OllamaHttpQueue::Acquire {
+                key: "judge".to_string(),
+                wait_hook: None,
+            },
+        )
+        .await {
             Ok(r) => r,
             Err(e) => {
                 warn!("Agent judge: LLM call failed: {}", e);

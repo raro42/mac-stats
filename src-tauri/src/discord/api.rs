@@ -2,6 +2,12 @@
 //!
 //! Allows Ollama to call Discord's REST API (GET for read, POST only for sending messages)
 //! when the request originates from Discord. Token and base URL are shared with the Gateway.
+//!
+//! **Non-idempotent sends** (POST message, Gateway `say`): retries only on errors that likely
+//! occurred *before* Discord accepted the message (pre-connect / DNS / connection refused) or on
+//! explicit rate limits. We do **not** retry on request timeouts, connection reset, or ambiguous
+//! network errors where the first attempt may already have delivered the message. The same rule
+//! should apply to any future outbound channel (e.g. Telegram `sendMessage`).
 
 use std::sync::atomic::Ordering;
 use std::time::Duration;
@@ -41,6 +47,93 @@ pub fn sanitize_discord_api_error(err: &str) -> String {
         return "Message could not be sent (permission missing). Check bot permissions (e.g. operator.read scope).".to_string();
     }
     err.to_string()
+}
+
+/// Whether a failed **non-idempotent** Discord outbound send (HTTP or Gateway) may be retried
+/// without a material risk of posting the same user-visible message twice.
+///
+/// Safe: rate limit (429), DNS / name resolution failures, connection refused, unreachable host
+/// (request likely never reached Discord). Unsafe: timeouts, connection reset / broken pipe, and
+/// other ambiguous cases where the server may already have stored the message.
+pub fn is_safe_to_retry_discord_outbound_error_message(err_str: &str) -> bool {
+    let lower = err_str.to_lowercase();
+    if lower.contains("429")
+        || lower.contains("rate limit")
+        || lower.contains("too many requests")
+    {
+        return true;
+    }
+    // Timeouts may fire after the request body was accepted — do not retry the same content.
+    if lower.contains("timed out")
+        || lower.contains("timeout")
+        || lower.contains("deadline")
+    {
+        return false;
+    }
+    if lower.contains("connection reset")
+        || lower.contains("connection aborted")
+        || lower.contains("broken pipe")
+        || lower.contains("econnreset")
+        || lower.contains("epipe")
+        || lower.contains("etimedout")
+    {
+        return false;
+    }
+    lower.contains("connection refused")
+        || lower.contains("econnrefused")
+        || lower.contains("could not resolve")
+        || lower.contains("failed to resolve")
+        || lower.contains("failed to lookup")
+        || lower.contains("nodename nor servname")
+        || lower.contains("name or service not known")
+        || lower.contains("dns")
+        || lower.contains("enotfound")
+        || lower.contains("eai_again")
+        || lower.contains("network is unreachable")
+        || lower.contains("enetunreach")
+        || lower.contains("no route to host")
+        || lower.contains("ehostunreach")
+        || lower.contains("host unreachable")
+}
+
+/// Sleep duration before a single safe retry for Gateway / string-classified errors.
+/// Rate limits get a longer backoff; other safe errors keep a short delay.
+pub fn discord_outbound_safe_retry_sleep_duration(err_str: &str) -> Duration {
+    let lower = err_str.to_lowercase();
+    if lower.contains("429")
+        || lower.contains("rate limit")
+        || lower.contains("too many requests")
+    {
+        return Duration::from_millis(2000 + jitter_millis());
+    }
+    Duration::from_millis(500)
+}
+
+/// `reqwest` transport errors for Discord HTTP sends: retry only when the failure was likely
+/// before the API accepted the request (see module comment).
+pub fn is_safe_to_retry_discord_send_transport_error(e: &reqwest::Error) -> bool {
+    if e.is_timeout() {
+        return false;
+    }
+    if e.is_connect() {
+        return true;
+    }
+    is_safe_to_retry_discord_outbound_error_message(&e.to_string())
+}
+
+/// Whether a terminal (non-retrying) transport error should advance the outbound send circuit breaker.
+/// Rate-limit style failures are excluded elsewhere; 429 does not use this path for tripping.
+pub(crate) fn discord_outbound_transport_terminal_should_trip(e: &reqwest::Error) -> bool {
+    if e.is_timeout() || e.is_connect() {
+        return true;
+    }
+    let s = e.to_string().to_lowercase();
+    s.contains("connection reset")
+        || s.contains("broken pipe")
+        || s.contains("unreachable")
+        || s.contains("resolve")
+        || s.contains("lookup")
+        || s.contains("dns")
 }
 
 /// Extract retry-after seconds from the Retry-After header value and/or the JSON body's
@@ -171,6 +264,17 @@ pub async fn discord_api_request(
         None
     };
 
+    let track_outbound_circuit = method_upper == "POST";
+    if track_outbound_circuit {
+        if let Err(e) = crate::discord::discord_http_send_allow() {
+            warn!(
+                "Discord API POST {}: outbound send skipped (circuit): {}",
+                path, e
+            );
+            return Err(e);
+        }
+    }
+
     let mut conn_attempt: u32 = 0;
     let mut rate_limit_retries: u32 = 0;
     let route = format!("{} {}", method_upper, path);
@@ -195,15 +299,26 @@ pub async fn discord_api_request(
         let resp = match req.send().await {
             Ok(r) => r,
             Err(e) => {
-                let retryable = e.is_connect() || e.is_timeout();
+                let retryable = is_safe_to_retry_discord_send_transport_error(&e);
                 if retryable && conn_attempt < 1 {
                     conn_attempt += 1;
                     info!(
-                        "Discord API request failed (connection/timeout), retrying in {}s (attempt {})",
+                        "Discord API request failed (safe-to-retry transport), retrying in {}s (attempt {})",
                         RETRY_DELAY_SECS, conn_attempt
                     );
                     tokio::time::sleep(Duration::from_secs(RETRY_DELAY_SECS)).await;
                     continue;
+                }
+                if !retryable {
+                    warn!(
+                        "Discord API request failed with unsafe-to-retry transport error, not retrying to avoid duplicate: {}",
+                        e
+                    );
+                }
+                if track_outbound_circuit {
+                    crate::discord::discord_http_send_record_failure(
+                        discord_outbound_transport_terminal_should_trip(&e),
+                    );
                 }
                 return Err(user_message_for_discord_request_error(&e));
             }
@@ -220,6 +335,9 @@ pub async fn discord_api_request(
         }
 
         if status.is_success() {
+            if track_outbound_circuit {
+                crate::discord::discord_http_send_record_success();
+            }
             return if body_text.chars().count() > MAX_RESPONSE_CHARS {
                 Ok(crate::logging::ellipse(&body_text, MAX_RESPONSE_CHARS))
             } else {
@@ -227,17 +345,30 @@ pub async fn discord_api_request(
             };
         }
 
-        if status.is_server_error() && conn_attempt < 1 {
-            conn_attempt += 1;
-            info!(
-                "Discord API {} (attempt {}), retrying in {}s",
-                route, conn_attempt, RETRY_DELAY_SECS
-            );
-            tokio::time::sleep(Duration::from_secs(RETRY_DELAY_SECS)).await;
-            continue;
+        // 5xx after a full request/response may mean the message was processed; only retry for idempotent GETs.
+        if status.is_server_error() {
+            let retry_5xx = method_upper == "GET" && conn_attempt < 1;
+            if retry_5xx {
+                conn_attempt += 1;
+                info!(
+                    "Discord API {} (5xx, GET retry attempt {}), retrying in {}s",
+                    route, conn_attempt, RETRY_DELAY_SECS
+                );
+                tokio::time::sleep(Duration::from_secs(RETRY_DELAY_SECS)).await;
+                continue;
+            }
+            if method_upper == "POST" {
+                warn!(
+                    "Discord API {} returned {} — not retrying POST to avoid possible duplicate message",
+                    route, status
+                );
+            }
         }
 
         debug!("Discord API {}: {}", route, status);
+        if track_outbound_circuit {
+            crate::discord::discord_http_send_record_failure(status.is_server_error());
+        }
         return Err(format!(
             "Discord API {}: {}",
             status,
@@ -336,4 +467,40 @@ pub async fn fetch_guild_channel_metadata(channel_id: u64) -> Result<String, Str
     }
 
     Ok(lines.join("\n"))
+}
+
+#[cfg(test)]
+mod outbound_retry_tests {
+    use super::*;
+
+    #[test]
+    fn outbound_safe_errors_include_rate_limit_and_preconnect() {
+        assert!(is_safe_to_retry_discord_outbound_error_message("HTTP 429 Too Many Requests"));
+        assert!(is_safe_to_retry_discord_outbound_error_message("We are being rate limited"));
+        assert!(is_safe_to_retry_discord_outbound_error_message(
+            "error sending request: connection refused"
+        ));
+        assert!(is_safe_to_retry_discord_outbound_error_message(
+            "failed to resolve host 'discord.com'"
+        ));
+    }
+
+    #[test]
+    fn outbound_unsafe_errors_reject_retry() {
+        assert!(!is_safe_to_retry_discord_outbound_error_message(
+            "operation timed out"
+        ));
+        assert!(!is_safe_to_retry_discord_outbound_error_message(
+            "Connection reset by peer"
+        ));
+        assert!(!is_safe_to_retry_discord_outbound_error_message("broken pipe"));
+    }
+
+    #[test]
+    fn rate_limit_retry_uses_longer_delay() {
+        let d_short = discord_outbound_safe_retry_sleep_duration("connection refused");
+        let d_rl = discord_outbound_safe_retry_sleep_duration("429 rate limited");
+        assert!(d_rl >= Duration::from_millis(2000));
+        assert!(d_short < Duration::from_millis(1500));
+    }
 }

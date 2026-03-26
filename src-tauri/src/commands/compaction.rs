@@ -137,7 +137,13 @@ Output ONLY these two sections, nothing else."#;
         model
     );
 
-    let response = super::ollama::send_ollama_chat_messages(msgs, model, None).await?;
+    let response = super::ollama::send_ollama_chat_messages(
+        msgs,
+        model,
+        None,
+        super::ollama::OllamaHttpQueue::Nested,
+    )
+    .await?;
     let output = response.message.content.trim().to_string();
 
     let (raw_context, lessons) = parse_compaction_output(&output);
@@ -227,6 +233,17 @@ pub async fn run_periodic_session_compaction() {
             messages.len(),
             entry.last_activity
         );
+        let pairs_for_hook: Vec<(String, String)> = messages
+            .iter()
+            .map(|m| (m.role.clone(), m.content.clone()))
+            .collect();
+        let periodic_rid = format!("periodic-{}-{}", entry.source, entry.session_id);
+        crate::commands::compaction_hooks::run_before_compaction_fire_and_forget(
+            &entry.source,
+            entry.session_id,
+            &pairs_for_hook,
+            &periodic_rid,
+        );
         let mut actual_question = "Periodic session compaction.".to_string();
         for msg in messages.iter().rev() {
             if msg.role == "user" {
@@ -265,6 +282,26 @@ pub async fn run_periodic_session_compaction() {
         };
         match compact_result {
             Ok((context, lessons)) => {
+                let lessons_written = lessons
+                    .as_ref()
+                    .map(|s| !s.trim().is_empty())
+                    .unwrap_or(false);
+                let skip_after_having_fun = entry.source == "discord"
+                    && crate::discord::is_discord_channel_having_fun(entry.session_id);
+                if !skip_after_having_fun {
+                    crate::commands::compaction_hooks::run_after_compaction_fire_and_forget(
+                        &entry.source,
+                        entry.session_id,
+                        messages.len(),
+                        lessons_written,
+                        &periodic_rid,
+                    );
+                } else {
+                    tracing::debug!(
+                        target: "mac_stats::compaction",
+                        "after_compaction hook skipped (periodic, Discord having_fun fixed context)"
+                    );
+                }
                 if let Some(ref lesson_text) = lessons {
                     let memory_path = if entry.source == "discord" {
                         crate::config::Config::memory_file_path_for_discord_channel(
@@ -285,6 +322,13 @@ pub async fn run_periodic_session_compaction() {
                         memory_path
                     );
                 }
+                crate::commands::ori_lifecycle::maybe_capture_compaction_fire_and_forget(
+                    lessons.as_deref(),
+                    &entry.source,
+                    entry.session_id,
+                    &periodic_rid,
+                    discord_ch,
+                );
                 let inactive = entry.last_activity < inactive_cutoff;
                 if inactive {
                     crate::session_memory::clear_session(&entry.source, entry.session_id);

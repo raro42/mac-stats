@@ -55,6 +55,14 @@ This document describes the **Ollama HTTP API** operations exposed by mac-stats 
 
 Frontend can use `list_ollama_models_full` for model management UIs (size, family, quantization).
 
+**Caching:** Per-endpoint `GET /api/tags` results go through `ollama/model_list_cache.rs`: **5-minute TTL**, **stale-while-revalidate** (after expiry, callers get the last good list immediately while a background refresh runs), **one shared in-flight fetch** per endpoint for concurrent callers, and **no poisoned cache**—empty responses or fetch errors do not overwrite a previous non-empty list. Warnings are logged under `ollama/model_cache` when a stale list is served. Changing Ollama settings clears the cache.
+
+**Circuit breaker:** Ollama HTTP for **`/api/chat`** (all agent/UI/Discord paths via `commands/ollama_chat.rs`) and **`/api/tags`** (`OllamaClient::list_models_full`, `model_list_cache` refresh, connection checks) shares one breaker (`circuit_breaker.rs`, `ollama/mod.rs`): after **3** consecutive infra-style failures (timeouts, connection errors, HTTP 5xx), further calls fail fast until a **30s** reset window allows a single probe. Client-style errors (e.g. `Ollama error: model not found`, HTTP 4xx) do not advance the breaker. Transitions are logged under `mac_stats::circuit`. When the breaker is fully **open**, the menu bar appends a line **`Ollama ✕`**.
+
+**Startup ordering (menu bar app):** `ensure_ollama_agent_ready_at_startup` in `commands/ollama_config.rs` runs to completion on the Tauri async runtime **before** the Discord gateway, scheduler, heartbeat, and task-review threads are spawned (`lib.rs` setup). That avoids racing the first inbound Discord message or due scheduled job against default Ollama config, `GET /api/tags`, and `ModelCatalog` population. Operators can confirm ordering in `~/.mac-stats/debug.log` with target `mac_stats_startup` (e.g. `Ollama startup warmup finished (gate open); spawning Discord…`). Warmup failures are **non-fatal**: one **`WARN`** per failure class (endpoint/model in the message) and automation continues. The first `/api/chat` after process start may perform **one** extra 400 ms cold-start retry when the error looks like a still-starting Ollama (connection refused, model not yet available, etc.); see `ollama::ollama_error_suggests_transient_cold_start` and `OLLAMA_POST_START_COLD_CHAT_RETRY` in `commands/ollama_chat.rs`.
+
+**CPU-window streaming (`stream: true` on `ollama_chat_with_execution`):** NDJSON deltas are coalesced with a short idle window (default **50** ms in `SurfaceChunkPolicy::tauri_ui_default` in `commands/outbound_pipeline.rs`) before emitting **`ollama-chat-chunk`**, reducing event spam. Identical consecutive emitted payloads in the same reply are skipped (dedup). Discord’s ordered outbound behaviour is documented in **`docs/007_discord_agent.md`**.
+
 ## Version and Running Models
 
 | Command | API | Description |

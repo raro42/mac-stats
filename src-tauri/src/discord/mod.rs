@@ -1,6 +1,6 @@
 //! Discord Gateway integration for mac-stats.
 //!
-//! Connects to Discord as a bot, listens for DMs and @mentions,
+//! Connects to Discord as a bot, listens for DMs and @mentions (and reply-to-bot as implicit mention in MentionOnly),
 //! and can reply using a shared pipeline (Ollama / browser agent).
 //! Token is resolved (in order) from: DISCORD_BOT_TOKEN env, .config.env file, Keychain.
 //! Token is never logged or exposed.
@@ -16,6 +16,7 @@ pub mod api;
 mod message_debounce;
 
 use base64::Engine;
+use crate::circuit_breaker::CircuitBreaker;
 use chrono::Timelike;
 use serenity::builder::EditMessage;
 use serenity::client::{Client, Context, EventHandler};
@@ -28,10 +29,13 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::RwLock;
 use std::sync::{Arc, Mutex, OnceLock};
-use std::time::UNIX_EPOCH;
+use std::time::{Instant, UNIX_EPOCH};
 use tokio::sync::mpsc;
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, warn};
 
+use crate::commands::outbound_pipeline::{
+    self, ReplyDedupState, DISCORD_CONTENT_MAX_CHARS, DISCORD_INTER_CHUNK_DELAY_MS,
+};
 use crate::commands::session_history::{
     cap_tail_chronological, CONVERSATION_HISTORY_CAP, HAVING_FUN_IDLE_HISTORY_CAP,
 };
@@ -172,10 +176,6 @@ async fn download_discord_image_attachments(
     out
 }
 
-/// Discord API limit for message content (characters). Messages longer than this must be split.
-/// See https://discord.com/developers/docs/resources/channel#create-message: content max 2000.
-const DISCORD_MESSAGE_MAX_CHARS: usize = 2000;
-
 /// Per-channel listen mode loaded from `~/.mac-stats/discord_channels.json`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(super) enum ChannelMode {
@@ -236,6 +236,30 @@ type ChannelConfigCache = Option<(
 /// Cached channel config, reloaded when `discord_channels.json` mtime changes.
 /// Holds (file mtime, default, overrides, having_fun params, default_verbose_dm, default_verbose_channel).
 static CHANNEL_CONFIG: RwLock<ChannelConfigCache> = RwLock::new(None);
+
+fn discord_outbound_circuit() -> &'static Mutex<CircuitBreaker> {
+    static CB: OnceLock<Mutex<CircuitBreaker>> = OnceLock::new();
+    CB.get_or_init(|| Mutex::new(CircuitBreaker::new_discord_sends()))
+}
+
+pub(crate) fn discord_http_send_allow() -> Result<(), String> {
+    let mut g = discord_outbound_circuit()
+        .lock()
+        .map_err(|_| "Discord outbound circuit lock poisoned".to_string())?;
+    g.allow_request()
+}
+
+pub(crate) fn discord_http_send_record_success() {
+    if let Ok(mut g) = discord_outbound_circuit().lock() {
+        g.record_success();
+    }
+}
+
+pub(crate) fn discord_http_send_record_failure(should_trip: bool) {
+    if let Ok(mut g) = discord_outbound_circuit().lock() {
+        g.record_failure(should_trip);
+    }
+}
 
 fn discord_channels_file_mtime() -> Option<std::time::SystemTime> {
     let path = crate::config::Config::discord_channels_path();
@@ -1202,8 +1226,16 @@ async fn having_fun_respond(
     let channel = serenity::model::id::ChannelId::new(channel_id);
     let _ = channel.broadcast_typing(ctx).await;
 
-    match crate::commands::ollama::send_ollama_chat_messages(ollama_msgs, model_override, None)
-        .await
+    match crate::commands::ollama::send_ollama_chat_messages(
+        ollama_msgs,
+        model_override,
+        None,
+        crate::commands::ollama::OllamaHttpQueue::Acquire {
+            key: format!("discord:{}", channel_id),
+            wait_hook: None,
+        },
+    )
+    .await
     {
         Ok(response) => {
             let reply = strip_leading_label(response.message.content.trim());
@@ -1239,11 +1271,41 @@ async fn having_fun_respond(
                 reply.len(),
                 crate::logging::ellipse(&reply, 200)
             );
-            let chunks = split_message_for_discord(&reply);
+            let chunks = outbound_pipeline::split_discord_reply(&reply, false);
+            let send_timeout = outbound_pipeline::per_send_timeout();
+            let mut dedup = ReplyDedupState::new();
             let mut last_msg_id: Option<u64> = None;
-            for chunk in &chunks {
-                if let Ok(msg) = channel.say(ctx, chunk).await {
-                    last_msg_id = Some(msg.id.get());
+            for (i, chunk) in chunks.iter().enumerate() {
+                if !dedup.register_if_new(chunk.as_str(), None) {
+                    debug!(
+                        target: "outbound_pipeline",
+                        "Discord having_fun: skipped duplicate chunk {}/{}",
+                        i + 1,
+                        chunks.len()
+                    );
+                    continue;
+                }
+                match tokio::time::timeout(send_timeout, channel.say(ctx, chunk)).await {
+                    Ok(Ok(msg)) => last_msg_id = Some(msg.id.get()),
+                    Ok(Err(e)) => {
+                        error!(
+                            "Having fun: failed to send chunk {}/{}: {}",
+                            i + 1,
+                            chunks.len(),
+                            e
+                        );
+                        break;
+                    }
+                    Err(_) => {
+                        outbound_pipeline::log_send_timeout("discord_having_fun", i + 1, chunks.len());
+                        break;
+                    }
+                }
+                if chunks.len() > 1 && i < chunks.len() - 1 {
+                    tokio::time::sleep(tokio::time::Duration::from_millis(
+                        DISCORD_INTER_CHUNK_DELAY_MS,
+                    ))
+                    .await;
                 }
             }
             crate::session_memory::add_message("discord", channel_id, "assistant", &reply);
@@ -1333,6 +1395,10 @@ async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
         ollama_msgs.clone(),
         model_override.clone(),
         None,
+        crate::commands::ollama::OllamaHttpQueue::Acquire {
+            key: format!("discord:{}", channel_id),
+            wait_hook: None,
+        },
     )
     .await;
     // One extra retry for idle thought on timeout (non-critical; reduces visible failures).
@@ -1348,6 +1414,10 @@ async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
                 ollama_msgs,
                 model_override,
                 None,
+                crate::commands::ollama::OllamaHttpQueue::Acquire {
+                    key: format!("discord:{}", channel_id),
+                    wait_hook: None,
+                },
             )
             .await;
         }
@@ -1363,9 +1433,30 @@ async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
                 channel_id,
                 crate::logging::ellipse(&reply, 200)
             );
-            let chunks = split_message_for_discord(&reply);
-            for chunk in &chunks {
-                let _ = channel.say(&ctx, chunk).await;
+            let chunks = outbound_pipeline::split_discord_reply(&reply, false);
+            let send_timeout = outbound_pipeline::per_send_timeout();
+            let mut dedup = ReplyDedupState::new();
+            for (i, chunk) in chunks.iter().enumerate() {
+                if !dedup.register_if_new(chunk.as_str(), None) {
+                    continue;
+                }
+                let _ = match tokio::time::timeout(send_timeout, channel.say(&ctx, chunk)).await {
+                    Ok(r) => r,
+                    Err(_) => {
+                        outbound_pipeline::log_send_timeout(
+                            "discord_idle_thought",
+                            i + 1,
+                            chunks.len(),
+                        );
+                        break;
+                    }
+                };
+                if chunks.len() > 1 && i < chunks.len() - 1 {
+                    tokio::time::sleep(tokio::time::Duration::from_millis(
+                        DISCORD_INTER_CHUNK_DELAY_MS,
+                    ))
+                    .await;
+                }
             }
             crate::session_memory::add_message("discord", channel_id, "assistant", &reply);
         }
@@ -1403,38 +1494,6 @@ fn strip_leading_label(text: &str) -> String {
         }
     }
     t.to_string()
-}
-
-/// Split text into chunks of at most DISCORD_MESSAGE_MAX_CHARS. Prefer splitting at newlines.
-fn split_message_for_discord(text: &str) -> Vec<String> {
-    let mut out = Vec::new();
-    let mut remaining = text.to_string();
-    while !remaining.is_empty() {
-        let nchars = remaining.chars().count();
-        if nchars <= DISCORD_MESSAGE_MAX_CHARS {
-            out.push(remaining.clone());
-            break;
-        }
-        let byte_pos = remaining
-            .char_indices()
-            .take(DISCORD_MESSAGE_MAX_CHARS)
-            .last()
-            .map(|(i, c)| i + c.len_utf8())
-            .unwrap_or(0);
-        let (head, tail) = remaining.split_at(byte_pos);
-        let split_at = head.rfind('\n').map(|i| i + 1).unwrap_or(byte_pos);
-        let (chunk, put_back) = if split_at > 0 && split_at < byte_pos {
-            (
-                head[..split_at].to_string(),
-                format!("{}{}", &head[split_at..], tail),
-            )
-        } else {
-            (head.to_string(), tail.to_string())
-        };
-        out.push(chunk);
-        remaining = put_back;
-    }
-    out
 }
 
 /// If the question starts with "switch your model to: X" or "switch model to: X" or "use model X",
@@ -1699,6 +1758,9 @@ pub const DISCORD_TOKEN_KEYCHAIN_ACCOUNT: &str = "discord_bot_token";
 /// Bot user id (set on Ready, used to filter self and mentions).
 static BOT_USER_ID: OnceLock<UserId> = OnceLock::new();
 
+/// Last time the gateway fired `Ready` (used for health / reconnect messaging).
+static DISCORD_LAST_READY_AT: Mutex<Option<Instant>> = Mutex::new(None);
+
 /// Cache of Discord user id -> display name for reuse in prompts. Updated on each message.
 static DISCORD_USER_NAMES: OnceLock<Mutex<HashMap<u64, String>>> = OnceLock::new();
 
@@ -1726,6 +1788,84 @@ fn effective_discord_debounce_ms(chan: &ChannelSettings) -> u64 {
         .unwrap_or_else(crate::config::Config::discord_debounce_ms)
 }
 
+/// Referenced message id -> whether that message's author is our bot (avoids repeat HTTP GET in bursty threads).
+static DISCORD_REF_REPLY_CACHE: OnceLock<Mutex<HashMap<u64, bool>>> = OnceLock::new();
+
+fn discord_ref_reply_cache() -> &'static Mutex<HashMap<u64, bool>> {
+    DISCORD_REF_REPLY_CACHE.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
+const DISCORD_REF_REPLY_CACHE_MAX: usize = 512;
+
+/// True if the message @mentions the bot, or replies (message reference) to a message authored by the bot.
+/// Logs at **debug** when activation is via reference only (see `~/.mac-stats/debug.log`).
+async fn discord_mentions_bot_effective(ctx: &Context, msg: &Message, bot_id: UserId) -> bool {
+    if msg.mentions.iter().any(|u| u.id == bot_id) {
+        return true;
+    }
+    let Some(ref_data) = msg.message_reference.as_ref() else {
+        return false;
+    };
+    let channel_id = ref_data.channel_id;
+    let ref_msg_id_opt = ref_data.message_id;
+
+    if let Some(ref boxed) = msg.referenced_message {
+        let is_bot_author = boxed.author.id == bot_id;
+        if is_bot_author {
+            debug!(
+                "Discord: MentionOnly activation via message reference (reply to bot), not literal mention"
+            );
+        }
+        if let Ok(mut g) = discord_ref_reply_cache().lock() {
+            if g.len() >= DISCORD_REF_REPLY_CACHE_MAX {
+                g.clear();
+            }
+            g.insert(boxed.id.get(), is_bot_author);
+        }
+        return is_bot_author;
+    }
+
+    let Some(ref_msg_id) = ref_msg_id_opt else {
+        return false;
+    };
+    let mid = ref_msg_id.get();
+    if let Ok(cache) = discord_ref_reply_cache().lock() {
+        if let Some(&cached) = cache.get(&mid) {
+            if cached {
+                debug!(
+                    "Discord: MentionOnly activation via message reference (reply to bot), not literal mention"
+                );
+            }
+            return cached;
+        }
+    }
+
+    match ctx.http.get_message(channel_id, ref_msg_id).await {
+        Ok(referenced) => {
+            let is_bot_author = referenced.author.id == bot_id;
+            if is_bot_author {
+                debug!(
+                    "Discord: MentionOnly activation via message reference (reply to bot), not literal mention"
+                );
+            }
+            if let Ok(mut g) = discord_ref_reply_cache().lock() {
+                if g.len() >= DISCORD_REF_REPLY_CACHE_MAX {
+                    g.clear();
+                }
+                g.insert(mid, is_bot_author);
+            }
+            is_bot_author
+        }
+        Err(e) => {
+            debug!(
+                "Discord: could not resolve referenced message for implicit mention (message_id={}): {}",
+                mid, e
+            );
+            false
+        }
+    }
+}
+
 /// Full agent-router path for a Discord message (possibly debounced merge in `content`).
 pub(super) async fn run_discord_ollama_router(
     ctx: Context,
@@ -1742,7 +1882,8 @@ pub(super) async fn run_discord_ollama_router(
         }
     };
     let is_dm = new_message.guild_id.is_none();
-    let mentions_bot = new_message.mentions.iter().any(|u| u.id == bot_id);
+    let mentions_bot_effective =
+        discord_mentions_bot_effective(&ctx, &new_message, bot_id).await;
     let chan = channel_settings(new_message.channel_id.get());
 
     let (
@@ -1815,7 +1956,7 @@ pub(super) async fn run_discord_ollama_router(
 
     let trigger = if is_dm {
         "DM"
-    } else if mentions_bot {
+    } else if mentions_bot_effective {
         "mention"
     } else {
         "all_messages"
@@ -1827,26 +1968,21 @@ pub(super) async fn run_discord_ollama_router(
 
     let channel_id_u64 = new_message.channel_id.get();
 
-    // "New session:" prefix clears conversation history so the model starts fresh.
-    let question = {
-        let lower = question.trim().to_lowercase();
-        if lower.starts_with("new session:") || lower.starts_with("new session ") {
-            crate::session_memory::clear_session("discord", channel_id_u64);
-            info!(
-                "Discord: new session requested, cleared history for channel {}",
-                channel_id_u64
-            );
-            let stripped = question.trim();
-            let colon_pos = stripped.find(':').or_else(|| stripped.find(' '));
-            match colon_pos {
-                Some(i) if stripped[..i].to_lowercase().trim() == "new session" => {
-                    stripped[i + 1..].trim().to_string()
-                }
-                _ => stripped.replacen("new session", "", 1).trim().to_string(),
+    // "New session:" prefix strips the prefix from the question; actual clear runs once below with phrase-based reset.
+    let lower_for_prefix = question.trim().to_lowercase();
+    let via_new_session_prefix = lower_for_prefix.starts_with("new session:")
+        || lower_for_prefix.starts_with("new session ");
+    let question = if via_new_session_prefix {
+        let stripped = question.trim();
+        let colon_pos = stripped.find(':').or_else(|| stripped.find(' '));
+        match colon_pos {
+            Some(i) if stripped[..i].to_lowercase().trim() == "new session" => {
+                stripped[i + 1..].trim().to_string()
             }
-        } else {
-            question.to_string()
+            _ => stripped.replacen("new session", "", 1).trim().to_string(),
         }
+    } else {
+        question.to_string()
     };
 
     const LOG_MAX: usize = 800;
@@ -1862,13 +1998,28 @@ pub(super) async fn run_discord_ollama_router(
     info!("Discord→Ollama: sending: {}", to_ollama);
 
     // Load prior conversation (in-memory, or from latest session file after restart) before adding this turn.
-    // If the user asks to clear/new session (any language), clear session and start fresh (see docs/035).
-    let did_session_reset = crate::session_memory::user_wants_session_reset(&content);
-    let prior = if did_session_reset {
+    // If the user asks to clear/new session (any language) or uses the "new session:" prefix, clear once (see docs/035).
+    let did_session_reset_phrase = crate::session_memory::user_wants_session_reset(&content);
+    let should_reset = via_new_session_prefix || did_session_reset_phrase;
+    let prior = if should_reset {
+        let reason = if via_new_session_prefix {
+            "new_session_prefix"
+        } else {
+            "session_reset_phrase"
+        };
+        crate::session_memory::before_session_reset_export("discord", channel_id_u64, reason);
         crate::session_memory::clear_session("discord", channel_id_u64);
-        tracing::info!(
-            "Discord: user requested session reset (e.g. clear session / new session), starting fresh"
-        );
+        crate::commands::abort_cutoff::clear_cutoff(channel_id_u64);
+        if via_new_session_prefix {
+            info!(
+                "Discord: new session requested, cleared history for channel {}",
+                channel_id_u64
+            );
+        } else {
+            tracing::info!(
+                "Discord: user requested session reset (e.g. clear session / new session), starting fresh"
+            );
+        }
         vec![]
     } else {
         let mut p = crate::session_memory::get_messages("discord", channel_id_u64);
@@ -1895,16 +2046,42 @@ pub(super) async fn run_discord_ollama_router(
         )
     };
     // After session reset, inject Session Startup instruction + current date so the agent knows which memory to read (see Session Startup in docs).
-    let question_for_ollama = if did_session_reset {
+    crate::commands::suspicious_patterns::log_untrusted_suspicious_scan(
+        "discord-user-message",
+        &question,
+    );
+    let wrapped_user_question = crate::commands::untrusted_content::wrap_untrusted_content(
+        "discord-user-message",
+        &question,
+    );
+    let question_for_ollama = if should_reset {
         tracing::info!("Discord: injected Session Startup + current date (session reset)");
         format!(
             "{}\n\n{}",
             crate::session_memory::session_reset_instruction_with_date_utc(),
-            question
+            wrapped_user_question
         )
     } else {
-        question.clone()
+        wrapped_user_question
     };
+    let coord_abort = crate::commands::turn_lifecycle::coordination_key(Some(channel_id_u64));
+    let inbound_ts_abort = chrono::DateTime::<chrono::Utc>::from_timestamp(
+        new_message.timestamp.unix_timestamp(),
+        0,
+    )
+    .unwrap_or_else(chrono::Utc::now);
+    let inbound_mid_abort = new_message.id.get().to_string();
+    if crate::commands::abort_cutoff::should_skip(coord_abort, &inbound_mid_abort, inbound_ts_abort)
+    {
+        debug!(
+            target: "mac_stats::ollama/chat",
+            channel_id = channel_id_u64,
+            message_id = %inbound_mid_abort,
+            ts = %inbound_ts_abort,
+            "Discord: inbound message dropped (abort cutoff, stale event)"
+        );
+        return;
+    }
     // Short-term memory: add user message when we receive the request (store original content)
     crate::session_memory::add_message("discord", channel_id_u64, "user", &content);
 
@@ -1958,6 +2135,14 @@ pub(super) async fn run_discord_ollama_router(
                 if crate::security::attachment_roots::is_allowed_outbound_attachment_path(&path) {
                     use serenity::builder::CreateAttachment;
                     use serenity::builder::CreateMessage;
+                    if crate::browser_agent::artifact_limits::stat_path_within_browser_artifact_cap(
+                        path.as_path(),
+                        "Discord verbose status attach",
+                    )
+                    .is_err()
+                    {
+                        continue;
+                    }
                     if let Ok(att) = CreateAttachment::path(&path).await {
                         let builder = CreateMessage::new()
                             .content("Screenshot:")
@@ -1996,6 +2181,16 @@ pub(super) async fn run_discord_ollama_router(
     // then every 8s (indicator lasts ~10s server-side). Cancelled when reply is ready.
     let typing_ctx = ctx.clone();
     let typing_channel = new_message.channel_id;
+    let queue_typing_ctx = typing_ctx.clone();
+    let queue_typing_channel = typing_channel;
+    let ollama_queue_wait_hook: Option<std::sync::Arc<dyn Fn() + Send + Sync>> =
+        Some(std::sync::Arc::new(move || {
+            let c = queue_typing_ctx.clone();
+            let ch = queue_typing_channel;
+            tokio::spawn(async move {
+                let _ = ch.broadcast_typing(&c).await;
+            });
+        }));
     let typing_cancel = tokio_util::sync::CancellationToken::new();
     let typing_token = typing_cancel.clone();
     let typing_task = tokio::spawn(async move {
@@ -2026,61 +2221,106 @@ pub(super) async fn run_discord_ollama_router(
         channel_id_u64,
         crate::config::Config::version_display()
     );
-    let (reply_text, attachment_paths) =
-        match crate::commands::ollama::answer_with_ollama_and_fetch(
-            crate::commands::ollama::OllamaRequest {
-                question: question_for_ollama.clone(),
-                status_tx: Some(status_tx),
-                discord_reply_channel_id: Some(channel_id_u64),
-                discord_user_id: Some(author_id_u64),
-                discord_user_name: Some(display_name),
-                model_override,
-                options_override,
-                skill_content,
-                agent_override,
-                allow_schedule: true,
-                conversation_history,
-                escalation,
-                retry_on_verification_no: true,
-                from_remote: true,
-                attachment_images_base64: attachment_images_for_ollama,
-                discord_is_dm: Some(is_dm),
-                discord_draft: discord_draft.clone(),
-                ..Default::default()
-            },
-        )
-        .await
-        {
-            Ok(r) => (r.text, r.attachment_paths),
-            Err(e) => {
+    let partial_progress = crate::commands::partial_progress::PartialProgressCapture::new();
+    let mut directive_thread_reply = false;
+    let mut directive_split_long = false;
+    let ollama_router_result = crate::commands::ollama::answer_with_ollama_and_fetch(
+        crate::commands::ollama::OllamaRequest {
+            question: question_for_ollama.clone(),
+            status_tx: Some(status_tx),
+            discord_reply_channel_id: Some(channel_id_u64),
+            discord_user_id: Some(author_id_u64),
+            discord_user_name: Some(display_name),
+            model_override,
+            options_override,
+            skill_content,
+            agent_override,
+            allow_schedule: true,
+            conversation_history,
+            escalation,
+            retry_on_verification_no: true,
+            from_remote: true,
+            attachment_images_base64: attachment_images_for_ollama,
+            discord_is_dm: Some(is_dm),
+            discord_draft: discord_draft.clone(),
+            partial_progress_capture: Some(partial_progress.clone()),
+            ollama_queue_key: Some(format!("discord:{}", channel_id_u64)),
+            ollama_queue_wait_hook,
+            ..Default::default()
+        },
+    )
+    .await;
+    if let Err(ref e) = ollama_router_result {
+        if matches!(
+            e,
+            crate::commands::ollama_run_error::OllamaRunError::StaleInboundAfterAbort
+        ) {
+            debug!(
+                target: "mac_stats::ollama/chat",
+                channel_id = channel_id_u64,
+                "Discord: router skipped (stale inbound after abort cutoff)"
+            );
+            typing_cancel.cancel();
+            let _ = typing_task.await;
+            let _ = status_task.await;
+            return;
+        }
+    }
+    let (reply_text, attachment_paths) = match ollama_router_result {
+        Ok(r) => {
+            directive_thread_reply = r.directive_thread_reply;
+            directive_split_long = r.directive_split_long;
+            (r.text, r.attachment_paths)
+        }
+        Err(e) => {
                 error!(
-                    "Discord: Failed to generate reply (channel {}): {}",
-                    channel_id_u64, e
+                    "Discord: Failed to generate reply (channel {}): [{}] {}",
+                    channel_id_u64,
+                    e.code(),
+                    e
                 );
+                let timeout_like = matches!(
+                    e.code(),
+                    "TIMEOUT" | "SERVICE_UNAVAILABLE"
+                );
+                let partial_extra = timeout_like
+                    .then(|| partial_progress.format_user_summary())
+                    .flatten();
+                if let Some(ref s) = partial_extra {
+                    info!(
+                        "Discord: partial progress on timeout/error reply (channel {}):\n{}",
+                        channel_id_u64, s
+                    );
+                }
                 let (reply_text, attachments) = if mode == ChannelMode::HavingFun {
-                    (
-                        "Something went wrong on my side — try again in a bit.".to_string(),
-                        Vec::new(),
-                    )
-                } else if let Some(friendly) =
-                    crate::commands::content_reduction::sanitize_ollama_error_for_user(&e)
-                {
-                    (friendly, Vec::new())
+                    let mut t = e.user_message();
+                    if t.is_empty() {
+                        t = "Something went wrong on my side — try again in a bit.".to_string();
+                    }
+                    if let Some(ref s) = partial_extra {
+                        t.push_str("\n\n");
+                        t.push_str(s);
+                    }
+                    (t, Vec::new())
                 } else {
-                    let err_lower = e.to_string().to_lowercase();
-                    let hint = if err_lower.contains("timed out") || err_lower.contains("timeout") {
-                        "Request timed out — Ollama may be busy; try again in a moment."
-                    } else {
-                        "Is Ollama configured?"
+                    let mut friendly = match &e {
+                        crate::commands::ollama_run_error::OllamaRunError::InternalError {
+                            message,
+                        } => crate::commands::content_reduction::sanitize_ollama_error_for_user(
+                            message,
+                        )
+                        .unwrap_or_else(|| e.user_message()),
+                        _ => e.user_message(),
                     };
-                    (
-                        format!("Sorry, I couldn't generate a reply: {}. ({})", e, hint),
-                        Vec::new(),
-                    )
+                    if let Some(ref s) = partial_extra {
+                        friendly.push_str("\n\n");
+                        friendly.push_str(s);
+                    }
+                    (friendly, Vec::new())
                 };
                 (reply_text, attachments)
             }
-        };
+    };
 
     typing_cancel.cancel();
     let _ = typing_task.await;
@@ -2113,7 +2353,7 @@ pub(super) async fn run_discord_ollama_router(
         );
     }
 
-    let chunks = split_message_for_discord(&reply);
+    let chunks = outbound_pipeline::split_discord_reply(&reply, directive_split_long);
     if let Some(draft) = discord_draft.as_ref() {
         if !chunks.is_empty() {
             draft.flush(&chunks[0]).await;
@@ -2126,12 +2366,32 @@ pub(super) async fn run_discord_ollama_router(
         &chunks[..]
     };
 
+    if directive_thread_reply {
+        info!(
+            "Discord: [[thread_reply]] — first outbound chunk will use message reference to the user message"
+        );
+    }
+
+    use serenity::builder::CreateMessage;
+
+    let send_timeout = outbound_pipeline::per_send_timeout();
+    let mut dedup = ReplyDedupState::new();
+
     for (si, chunk) in send_chunks.iter().enumerate() {
         let part_no = if discord_draft.is_some() {
             si + 2
         } else {
             si + 1
         };
+        if !dedup.register_if_new(chunk.as_str(), None) {
+            debug!(
+                target: "outbound_pipeline",
+                "Discord: skipping duplicate outbound chunk (part {}/{})",
+                part_no,
+                chunks.len()
+            );
+            continue;
+        }
         if verbosity >= 3 {
             debug!(
                 "Discord outbound (decoded) reply part {}/{}: {}",
@@ -2140,27 +2400,85 @@ pub(super) async fn run_discord_ollama_router(
                 chunk
             );
         }
-        let mut say_result = new_message.channel_id.say(&ctx, chunk).await;
-        if say_result.is_err() {
-            if let Err(ref e) = say_result {
-                let err_str = e.to_string();
-                error!(
-                    "Discord: Failed to send reply (part {}/{}): {}",
-                    part_no,
-                    chunks.len(),
-                    err_str
-                );
-                let lower = err_str.to_lowercase();
-                if lower.contains("permission") || lower.contains("missing permissions") {
-                    info!(
-                        "Discord: missing permissions for channel {} — ensure bot has Send Messages and View Channel in this channel (and in server invite: bot scope with these permissions)",
-                        channel_id_u64
-                    );
-                }
+
+        let send_primary = async {
+            if directive_thread_reply && si == 0 {
+                new_message
+                    .channel_id
+                    .send_message(
+                        &ctx,
+                        CreateMessage::new()
+                            .content(chunk.as_str())
+                            .reference_message(&new_message),
+                    )
+                    .await
+            } else {
+                new_message.channel_id.say(&ctx, chunk).await
             }
-            // One retry on transient/rate errors
-            tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
-            say_result = new_message.channel_id.say(&ctx, chunk).await;
+        };
+
+        let mut say_result = match tokio::time::timeout(send_timeout, send_primary).await {
+            Ok(r) => r,
+            Err(_) => {
+                outbound_pipeline::log_send_timeout("discord_reply", part_no, chunks.len());
+                let _ = tokio::time::timeout(
+                    send_timeout,
+                    new_message
+                        .channel_id
+                        .say(&ctx, "Reply could not be sent in time (per-send timeout)."),
+                )
+                .await;
+                break;
+            }
+        };
+
+        if say_result.is_err() {
+            let err_str = match &say_result {
+                Err(e) => e.to_string(),
+                Ok(_) => String::new(),
+            };
+            error!(
+                "Discord: Failed to send reply (part {}/{}): {}",
+                part_no, chunks.len(), err_str
+            );
+            let lower = err_str.to_lowercase();
+            if lower.contains("permission") || lower.contains("missing permissions") {
+                info!(
+                    "Discord: missing permissions for channel {} — ensure bot has Send Messages and View Channel in this channel (and in server invite: bot scope with these permissions)",
+                    channel_id_u64
+                );
+            }
+            if crate::discord::api::is_safe_to_retry_discord_outbound_error_message(&err_str) {
+                let delay = crate::discord::api::discord_outbound_safe_retry_sleep_duration(&err_str);
+                tokio::time::sleep(delay).await;
+                let send_retry = async {
+                    if directive_thread_reply && si == 0 {
+                        new_message
+                            .channel_id
+                            .send_message(
+                                &ctx,
+                                CreateMessage::new()
+                                    .content(chunk.as_str())
+                                    .reference_message(&new_message),
+                            )
+                            .await
+                    } else {
+                        new_message.channel_id.say(&ctx, chunk).await
+                    }
+                };
+                say_result = match tokio::time::timeout(send_timeout, send_retry).await {
+                    Ok(r) => r,
+                    Err(_) => {
+                        outbound_pipeline::log_send_timeout("discord_reply_retry", part_no, chunks.len());
+                        break;
+                    }
+                };
+            } else {
+                warn!(
+                    "Discord send failed with unsafe-to-retry error, not retrying to avoid duplicate (part {}/{}): {}",
+                    part_no, chunks.len(), err_str
+                );
+            }
         }
         if let Err(e) = say_result {
             let err_str = e.to_string();
@@ -2170,18 +2488,30 @@ pub(super) async fn run_discord_ollama_router(
             } else {
                 "Reply could not be sent to this channel. Check bot permissions or try again later."
             };
-            if let Err(e2) = new_message.channel_id.say(&ctx, fallback).await {
-                error!("Discord: could not send fallback message either: {}", e2);
-            } else {
-                info!(
-                    "Discord: sent fallback message to channel {} (reply send failed: {})",
-                    channel_id_u64, err_str
-                );
+            match tokio::time::timeout(send_timeout, new_message.channel_id.say(&ctx, fallback)).await {
+                Ok(Ok(_)) => {
+                    info!(
+                        "Discord: sent fallback message to channel {} (reply send failed: {})",
+                        channel_id_u64, err_str
+                    );
+                }
+                Ok(Err(e2)) => {
+                    error!("Discord: could not send fallback message either: {}", e2);
+                }
+                Err(_) => {
+                    warn!(
+                        "Discord: timed out sending fallback to channel {} after failed part {}/{}",
+                        channel_id_u64, part_no, chunks.len()
+                    );
+                }
             }
             break;
         }
         if send_chunks.len() > 1 && si < send_chunks.len() - 1 {
-            tokio::time::sleep(tokio::time::Duration::from_millis(300)).await;
+            tokio::time::sleep(tokio::time::Duration::from_millis(
+                DISCORD_INTER_CHUNK_DELAY_MS,
+            ))
+            .await;
         }
     }
 
@@ -2217,6 +2547,14 @@ pub(super) async fn run_discord_ollama_router(
         use serenity::builder::CreateMessage;
         let mut attachments = Vec::with_capacity(allowed.len());
         for path in &allowed {
+            if crate::browser_agent::artifact_limits::stat_path_within_browser_artifact_cap(
+                path.as_path(),
+                "Discord outbound",
+            )
+            .is_err()
+            {
+                continue;
+            }
             match CreateAttachment::path(path).await {
                 Ok(att) => attachments.push(att),
                 Err(e) => {
@@ -2229,12 +2567,20 @@ pub(super) async fn run_discord_ollama_router(
             }
         }
         if !attachments.is_empty() {
-            let builder = CreateMessage::new()
-                .content("Screenshot(s) as requested:")
-                .add_files(attachments);
-            let send_result = new_message.channel_id.send_message(&ctx, builder).await;
-            if let Err(ref e) = send_result {
-                let err_str = e.to_string();
+            let mut send_result = new_message
+                .channel_id
+                .send_message(
+                    &ctx,
+                    CreateMessage::new()
+                        .content("Screenshot(s) as requested:")
+                        .add_files(attachments),
+                )
+                .await;
+            if send_result.is_err() {
+                let err_str = match &send_result {
+                    Err(e) => e.to_string(),
+                    Ok(_) => String::new(),
+                };
                 error!(
                     "Discord: Failed to send attachment(s) to channel {}: {}",
                     channel_id_u64, err_str
@@ -2244,6 +2590,48 @@ pub(super) async fn run_discord_ollama_router(
                     info!(
                         "Discord: missing permissions for channel {} (attachments) — ensure bot has Send Messages and Attach Files in this channel",
                         channel_id_u64
+                    );
+                }
+                if crate::discord::api::is_safe_to_retry_discord_outbound_error_message(&err_str) {
+                    let delay =
+                        crate::discord::api::discord_outbound_safe_retry_sleep_duration(&err_str);
+                    tokio::time::sleep(delay).await;
+                    let mut attachments_retry = Vec::with_capacity(allowed.len());
+                    for path in &allowed {
+                        if crate::browser_agent::artifact_limits::stat_path_within_browser_artifact_cap(
+                            path.as_path(),
+                            "Discord outbound retry",
+                        )
+                        .is_err()
+                        {
+                            continue;
+                        }
+                        match CreateAttachment::path(path).await {
+                            Ok(att) => attachments_retry.push(att),
+                            Err(e) => {
+                                error!(
+                                    "Discord: failed to read attachment {} (retry): {}",
+                                    path.display(),
+                                    e
+                                );
+                            }
+                        }
+                    }
+                    if !attachments_retry.is_empty() {
+                        send_result = new_message
+                            .channel_id
+                            .send_message(
+                                &ctx,
+                                CreateMessage::new()
+                                    .content("Screenshot(s) as requested:")
+                                    .add_files(attachments_retry),
+                            )
+                            .await;
+                    }
+                } else {
+                    warn!(
+                        "Discord send (attachments) failed with unsafe-to-retry error, not retrying to avoid duplicate: {}",
+                        err_str
                     );
                 }
             }
@@ -2281,6 +2669,9 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, data_about_bot: serenity::model::gateway::Ready) {
         let id = data_about_bot.user.id;
         let _ = BOT_USER_ID.set(id);
+        if let Ok(mut g) = DISCORD_LAST_READY_AT.lock() {
+            *g = Some(Instant::now());
+        }
         info!(
             "Discord: Bot connected as {} (id: {})",
             data_about_bot.user.name, id
@@ -2304,6 +2695,8 @@ impl EventHandler for Handler {
 
         let is_dm = new_message.guild_id.is_none();
         let mentions_bot = new_message.mentions.iter().any(|u| u.id == bot_id);
+        let mentions_bot_effective =
+            discord_mentions_bot_effective(&ctx, &new_message, bot_id).await;
         let is_bot = new_message.author.bot;
         let chan_id = new_message.channel_id.get();
         let chan = channel_settings(chan_id);
@@ -2329,7 +2722,7 @@ impl EventHandler for Handler {
             if mode != ChannelMode::HavingFun {
                 return;
             }
-        } else if !is_dm && !mentions_bot && mode == ChannelMode::MentionOnly {
+        } else if !is_dm && !mentions_bot_effective && mode == ChannelMode::MentionOnly {
             return;
         }
 
@@ -2446,6 +2839,41 @@ pub fn disconnect_discord() {
     info!("Discord: Gateway shut down (user offline)");
 }
 
+/// Bot token is configured (env, `.config.env`, or Keychain). Does not log which source (used for health probes).
+pub fn discord_bot_token_configured() -> bool {
+    if let Ok(t) = std::env::var("DISCORD_BOT_TOKEN") {
+        if !t.trim().is_empty() {
+            return true;
+        }
+    }
+    if let Ok(cwd) = std::env::current_dir() {
+        let p = cwd.join(".config.env");
+        if p.is_file() && token_from_config_env_file(&p).is_some() {
+            return true;
+        }
+    }
+    if let Ok(home) = std::env::var("HOME") {
+        let p = Path::new(&home).join(".mac-stats").join(".config.env");
+        if p.is_file() && token_from_config_env_file(&p).is_some() {
+            return true;
+        }
+    }
+    matches!(
+        crate::security::get_credential(DISCORD_TOKEN_KEYCHAIN_ACCOUNT),
+        Ok(Some(t)) if !t.trim().is_empty()
+    )
+}
+
+/// Gateway received Discord `Ready` (bot session active).
+pub fn discord_bot_gateway_ready() -> bool {
+    BOT_USER_ID.get().is_some()
+}
+
+/// Instant of the last `Ready` event, if the bot connected at least once this process.
+pub fn discord_last_ready_at() -> Option<Instant> {
+    DISCORD_LAST_READY_AT.lock().ok().and_then(|g| *g)
+}
+
 /// Read Discord token from a .config.env-style file (DISCORD_BOT_TOKEN= or DISCORD-USER1/2-TOKEN=).
 fn token_from_config_env_file(path: &Path) -> Option<String> {
     // Do not log file content or path; file may contain secrets.
@@ -2465,6 +2893,7 @@ fn token_from_config_env_file(path: &Path) -> Option<String> {
 /// Send a message to a Discord channel with optional file attachments (e.g. screenshots).
 /// Paths must be under configured outbound attachment roots (`security::attachment_roots`); others are skipped.
 /// Respects Discord 429 rate limits (up to 3 retries with Retry-After + jitter).
+/// One safe transport retry for multipart POST (same rules as [`send_message_to_channel`]).
 pub async fn send_message_to_channel_with_attachments(
     channel_id: u64,
     content: &str,
@@ -2479,13 +2908,19 @@ pub async fn send_message_to_channel_with_attachments(
         .filter(|p| {
             crate::security::attachment_roots::is_allowed_outbound_attachment_path(p)
         })
+        .filter(|p| {
+            crate::browser_agent::artifact_limits::stat_path_within_browser_artifact_cap(
+                p.as_path(),
+                "Discord HTTP multipart",
+            )
+            .is_ok()
+        })
         .collect();
     if allowed.is_empty() {
         return send_message_to_channel(channel_id, content).await;
     }
-    const MAX_LEN: usize = 2000;
-    let content = if content.chars().count() > MAX_LEN {
-        crate::logging::ellipse(content, MAX_LEN)
+    let content = if content.chars().count() > DISCORD_CONTENT_MAX_CHARS {
+        crate::logging::ellipse(content, DISCORD_CONTENT_MAX_CHARS)
     } else {
         content.to_string()
     };
@@ -2499,7 +2934,12 @@ pub async fn send_message_to_channel_with_attachments(
         .map_err(|e| format!("HTTP client: {}", e))?;
 
     let route = format!("send_message_with_attachments({})", channel_id);
+    if let Err(e) = discord_http_send_allow() {
+        warn!("Discord {}: outbound send skipped (circuit): {}", route, e);
+        return Err(e);
+    }
     let mut rate_limit_retries: u32 = 0;
+    let mut conn_attempt: u32 = 0;
 
     loop {
         let mut form = reqwest::multipart::Form::new().text("content", content.clone());
@@ -2519,13 +2959,37 @@ pub async fn send_message_to_channel_with_attachments(
             );
         }
 
-        let resp = client
+        let resp = match client
             .post(&url)
             .header("Authorization", format!("Bot {}", token))
             .multipart(form)
             .send()
             .await
-            .map_err(|e| crate::discord::api::user_message_for_discord_request_error(&e))?;
+        {
+            Ok(r) => r,
+            Err(e) => {
+                let safe = crate::discord::api::is_safe_to_retry_discord_send_transport_error(&e);
+                if safe && conn_attempt < 1 {
+                    conn_attempt += 1;
+                    info!(
+                        "Discord {}: safe-to-retry transport error, retrying once: {}",
+                        route, e
+                    );
+                    tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                    continue;
+                }
+                if !safe {
+                    warn!(
+                        "Discord {} failed with unsafe-to-retry transport error, not retrying to avoid duplicate: {}",
+                        route, e
+                    );
+                }
+                discord_http_send_record_failure(
+                    crate::discord::api::discord_outbound_transport_terminal_should_trip(&e),
+                );
+                return Err(crate::discord::api::user_message_for_discord_request_error(&e));
+            }
+        };
 
         let status = resp.status();
         if status == reqwest::StatusCode::TOO_MANY_REQUESTS {
@@ -2543,8 +3007,10 @@ pub async fn send_message_to_channel_with_attachments(
 
         if !status.is_success() {
             let body = resp.text().await.unwrap_or_default();
+            discord_http_send_record_failure(status.is_server_error());
             return Err(format!("Discord API {}: {}", status, body));
         }
+        discord_http_send_record_success();
         return Ok(());
     }
 }
@@ -2552,14 +3018,14 @@ pub async fn send_message_to_channel_with_attachments(
 /// Send a message to a Discord channel (DM or guild channel). Used by the scheduler to post task results.
 /// Requires the bot token; uses Discord HTTP API so it works from any thread/runtime.
 /// Respects Discord 429 rate limits (up to 3 retries with Retry-After + jitter).
+/// One safe transport retry (connection/DNS-style failures only) — no retry on timeout/reset.
 pub async fn send_message_to_channel(channel_id: u64, content: &str) -> Result<(), String> {
-    const MAX_LEN: usize = 2000;
     let token = match get_discord_token() {
         Some(t) => t,
         None => return Err("Discord not configured (no token)".to_string()),
     };
-    let content = if content.chars().count() > MAX_LEN {
-        crate::logging::ellipse(content, MAX_LEN)
+    let content = if content.chars().count() > DISCORD_CONTENT_MAX_CHARS {
+        crate::logging::ellipse(content, DISCORD_CONTENT_MAX_CHARS)
     } else {
         content.to_string()
     };
@@ -2579,17 +3045,46 @@ pub async fn send_message_to_channel(channel_id: u64, content: &str) -> Result<(
         .map_err(|e| format!("HTTP client: {}", e))?;
 
     let route = format!("send_message_to_channel({})", channel_id);
+    if let Err(e) = discord_http_send_allow() {
+        warn!("Discord {}: outbound send skipped (circuit): {}", route, e);
+        return Err(e);
+    }
     let mut rate_limit_retries: u32 = 0;
+    let mut conn_attempt: u32 = 0;
 
     loop {
-        let resp = client
+        let resp = match client
             .post(&url)
             .header("Authorization", format!("Bot {}", token))
             .header("Content-Type", "application/json")
             .json(&serde_json::json!({ "content": content }))
             .send()
             .await
-            .map_err(|e| crate::discord::api::user_message_for_discord_request_error(&e))?;
+        {
+            Ok(r) => r,
+            Err(e) => {
+                let safe = crate::discord::api::is_safe_to_retry_discord_send_transport_error(&e);
+                if safe && conn_attempt < 1 {
+                    conn_attempt += 1;
+                    info!(
+                        "Discord {}: safe-to-retry transport error, retrying once: {}",
+                        route, e
+                    );
+                    tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                    continue;
+                }
+                if !safe {
+                    warn!(
+                        "Discord {} failed with unsafe-to-retry transport error, not retrying to avoid duplicate: {}",
+                        route, e
+                    );
+                }
+                discord_http_send_record_failure(
+                    crate::discord::api::discord_outbound_transport_terminal_should_trip(&e),
+                );
+                return Err(crate::discord::api::user_message_for_discord_request_error(&e));
+            }
+        };
 
         let status = resp.status();
         if status == reqwest::StatusCode::TOO_MANY_REQUESTS {
@@ -2607,8 +3102,10 @@ pub async fn send_message_to_channel(channel_id: u64, content: &str) -> Result<(
 
         if !status.is_success() {
             let body = resp.text().await.unwrap_or_default();
+            discord_http_send_record_failure(status.is_server_error());
             return Err(format!("Discord API {}: {}", status, body));
         }
+        discord_http_send_record_success();
         return Ok(());
     }
 }

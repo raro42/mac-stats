@@ -2,10 +2,12 @@
 
 use std::future::Future;
 use std::pin::Pin;
-use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
+use std::time::Duration;
 
 pub(crate) use crate::commands::agent_session::run_agent_ollama_session;
-pub use crate::commands::ollama_chat::send_ollama_chat_messages;
+pub use crate::commands::ollama_chat::{send_ollama_chat_messages, OllamaHttpQueue};
 pub use crate::commands::ollama_config::{
     ensure_ollama_agent_ready_at_startup, get_default_ollama_model_name,
 };
@@ -39,13 +41,24 @@ use crate::commands::agent_descriptions::{
     build_agent_descriptions, DISCORD_GROUP_CHANNEL_GUIDANCE, DISCORD_PLATFORM_FORMATTING,
 };
 use crate::commands::browser_helpers::wants_visible_browser;
-use crate::commands::prompt_assembly::build_execution_system_content;
+use crate::commands::context_assembler::{
+    fragments, AgentContextAssembler, ContextAssembler, context_token_budget,
+};
+use crate::commands::prompt_assembly::{append_heartbeat_section, build_execution_system_content};
 use crate::commands::session_history::{
-    build_execution_message_stack, cap_tail_chronological, prepare_conversation_history,
-    CONVERSATION_HISTORY_CAP,
+    prepare_conversation_history, CompactionLifecycleContext, CONVERSATION_HISTORY_CAP,
 };
 use crate::commands::verification::build_verification_retry_hint;
 use crate::{mac_stats_debug, mac_stats_info};
+
+use crate::commands::ollama_run_error::{record_error_code, OllamaRunError};
+
+fn finish_router_failure(e: OllamaRunError, record_metrics: bool) -> OllamaRunError {
+    if record_metrics {
+        record_error_code(e.code());
+    }
+    e
+}
 
 /// All parameters for an `answer_with_ollama_and_fetch` invocation.
 ///
@@ -59,7 +72,7 @@ use crate::{mac_stats_debug, mac_stats_info};
 ///     ..Default::default()
 /// }).await?;
 /// ```
-#[derive(Default)]
+#[derive(Clone)]
 pub struct OllamaRequest {
     pub question: String,
     pub status_tx: Option<tokio::sync::mpsc::UnboundedSender<String>>,
@@ -94,13 +107,89 @@ pub struct OllamaRequest {
     pub retry_count: u32,
     /// When set (Discord agent path), tool loop updates this message with throttled edits until flush.
     pub discord_draft: Option<crate::commands::discord_draft_stream::DiscordDraftHandle>,
+    /// When set, appended under `## Heartbeat` in the execution system prompt (e.g. periodic heartbeat runs).
+    pub heartbeat_system_append: Option<String>,
+    /// Override compaction hook `source` label (default: `discord` when `discord_reply_channel_id` is set, else `agent_router`).
+    pub compaction_hook_source: Option<String>,
+    /// Session id for compaction hooks when not inferrable from Discord channel id.
+    pub compaction_hook_session_id: Option<u64>,
+    /// Emit `mac-stats-compaction` Tauri events for the CPU window chat indicator (in-app chat only).
+    pub emit_compaction_cpu_ui: bool,
+    /// Optional sink for tool names / short args and last assistant snippet (scheduler timeout, Discord errors).
+    pub partial_progress_capture: Option<crate::commands::partial_progress::PartialProgressCapture>,
+    /// Shared wall-clock deadline for this logical user turn (verification retries use the same instant).
+    pub turn_deadline: Option<std::time::Instant>,
+    /// Override full-turn wall-clock budget in seconds (`None` = choose from Discord vs UI vs remote defaults).
+    pub turn_timeout_secs: Option<u64>,
+    /// Internal: set after one automatic `BrowserSessionLost` / `ServiceUnavailable` retry.
+    pub run_error_boundary_retry_done: bool,
+    /// When true, do not increment `get_ollama_run_error_metrics` for this invocation (parent will record).
+    pub skip_ollama_run_error_metrics: bool,
+    /// When true, do not acquire the Ollama HTTP queue (recursive / nested router calls).
+    pub skip_ollama_queue: bool,
+    /// Per-source queue key, e.g. `discord:<channel_id>`, `scheduler`, `cpu_ui`.
+    pub ollama_queue_key: Option<String>,
+    /// Optional hook when this request starts waiting in the per-key queue (e.g. Discord typing).
+    pub ollama_queue_wait_hook: Option<std::sync::Arc<dyn Fn() + Send + Sync>>,
+    /// When set, drop this invocation if older than the session abort cutoff (scheduler due time, heartbeat tick, etc.).
+    pub inbound_stale_guard: Option<crate::commands::abort_cutoff::InboundStaleGuard>,
+}
+
+impl Default for OllamaRequest {
+    fn default() -> Self {
+        Self {
+            question: String::new(),
+            status_tx: None,
+            discord_reply_channel_id: None,
+            discord_user_id: None,
+            discord_user_name: None,
+            model_override: None,
+            options_override: None,
+            skill_content: None,
+            agent_override: None,
+            allow_schedule: false,
+            conversation_history: None,
+            escalation: false,
+            retry_on_verification_no: false,
+            from_remote: false,
+            attachment_images_base64: None,
+            discord_intermediate: None,
+            is_verification_retry: false,
+            original_user_request: None,
+            success_criteria_override: None,
+            discord_is_dm: None,
+            request_id_override: None,
+            retry_count: 0,
+            discord_draft: None,
+            heartbeat_system_append: None,
+            compaction_hook_source: None,
+            compaction_hook_session_id: None,
+            emit_compaction_cpu_ui: false,
+            partial_progress_capture: None,
+            turn_deadline: None,
+            turn_timeout_secs: None,
+            run_error_boundary_retry_done: false,
+            skip_ollama_run_error_metrics: false,
+            skip_ollama_queue: false,
+            ollama_queue_key: None,
+            ollama_queue_wait_hook: None,
+            inbound_stale_guard: None,
+        }
+    }
 }
 
 /// Main orchestrator: plan → execute tools → verify → optionally retry.
 /// Returns a boxed future to allow one level of async recursion (retry path).
 pub fn answer_with_ollama_and_fetch(
     req: OllamaRequest,
-) -> Pin<Box<dyn Future<Output = Result<OllamaReply, String>> + Send>> {
+) -> Pin<Box<dyn Future<Output = Result<OllamaReply, crate::commands::ollama_run_error::OllamaRunError>> + Send>>
+{
+    let req_for_retry = req.clone();
+    let run_error_boundary_retry_done = req.run_error_boundary_retry_done;
+    let skip_ollama_run_error_metrics = req.skip_ollama_run_error_metrics;
+    let skip_ollama_queue_flag = req.skip_ollama_queue;
+    let ollama_queue_key_req = req.ollama_queue_key.clone();
+    let ollama_queue_wait_hook_req = req.ollama_queue_wait_hook.clone();
     let OllamaRequest {
         question,
         status_tx,
@@ -125,6 +214,19 @@ pub fn answer_with_ollama_and_fetch(
         request_id_override,
         retry_count,
         discord_draft,
+        heartbeat_system_append,
+        compaction_hook_source,
+        compaction_hook_session_id,
+        emit_compaction_cpu_ui,
+        partial_progress_capture,
+        turn_deadline,
+        turn_timeout_secs,
+        run_error_boundary_retry_done: _,
+        skip_ollama_run_error_metrics: _,
+        skip_ollama_queue: _,
+        ollama_queue_key: _,
+        ollama_queue_wait_hook: _,
+        inbound_stale_guard,
     } = req;
     let load_global_memory = discord_is_dm.is_none_or(|dm| dm);
     if discord_is_dm == Some(false) {
@@ -134,6 +236,27 @@ pub fn answer_with_ollama_and_fetch(
         );
     }
     Box::pin(async move {
+        let coord_for_stale = crate::commands::turn_lifecycle::coordination_key(discord_reply_channel_id);
+        if let Some(ref guard) = inbound_stale_guard {
+            if crate::commands::abort_cutoff::should_skip(
+                coord_for_stale,
+                &guard.message_id,
+                guard.timestamp_utc,
+            ) {
+                mac_stats_debug!(
+                    "ollama/chat",
+                    coord_key = coord_for_stale,
+                    msg_id = %guard.message_id,
+                    ts = %guard.timestamp_utc,
+                    "abort_cutoff: inbound event dropped (stale vs session cutoff)"
+                );
+                return Err(crate::commands::ollama_run_error::OllamaRunError::StaleInboundAfterAbort);
+            }
+        }
+
+        let forward_substantive_output = Arc::new(AtomicBool::new(false));
+        let forward_for_tool_loop = forward_substantive_output.clone();
+
         let question = question.as_str();
         let request_for_verification = original_user_request.clone().unwrap_or_else(|| {
             original_request_for_retry(
@@ -152,6 +275,22 @@ pub fn answer_with_ollama_and_fetch(
                     & 0xFFFF_FFFF
             )
         });
+
+        let hook_session_id = compaction_hook_session_id
+            .or(discord_reply_channel_id)
+            .unwrap_or(0);
+        let hook_source = compaction_hook_source.clone().unwrap_or_else(|| {
+            if discord_reply_channel_id.is_some() {
+                "discord".to_string()
+            } else {
+                "agent_router".to_string()
+            }
+        });
+        let compaction_lifecycle = CompactionLifecycleContext {
+            hook_source,
+            hook_session_id,
+            emit_cpu_compaction_ui: emit_compaction_cpu_ui,
+        };
 
         let run_ctx = RequestRunContext {
             request_id: request_id.clone(),
@@ -187,6 +326,9 @@ pub fn answer_with_ollama_and_fetch(
             "request run context"
         );
 
+        // Per-request: BROWSER_CLICK coordinate scaling for LLM image space must not leak from a prior run.
+        crate::browser_agent::set_last_llm_screenshot_pixel_dims_for_coord_scaling(None);
+
         // When Discord user asks for screenshots to be sent here, focus on current task only (no prior chat).
         // Skip clearing on verification retry so the model keeps context (e.g. original request, cookie consent retry).
         if !is_verification_retry && discord_reply_channel_id.is_some() {
@@ -213,7 +355,10 @@ pub fn answer_with_ollama_and_fetch(
                 (
                     model_override,
                     skill_content,
-                    15u32, // default when no agent override
+                    crate::commands::agent_session_limits::default_max_tool_iterations_for_router(
+                        discord_reply_channel_id,
+                        from_remote,
+                    ),
                 )
             };
         if escalation {
@@ -225,27 +370,47 @@ pub fn answer_with_ollama_and_fetch(
             );
         }
 
+        let mut model_not_in_catalog_note: Option<String> = None;
         if let Some(ref model) = model_override {
             let available = list_ollama_models()
                 .await
-                .map_err(|e| format!("Could not list models: {}", e))?;
+                .map_err(|e| {
+                    finish_router_failure(
+                        OllamaRunError::classify(&format!("Could not list models: {}", e)),
+                        !skip_ollama_run_error_metrics,
+                    )
+                })?;
             let found = available
                 .iter()
                 .any(|m| m == model || m.starts_with(&format!("{}:", model)));
             if !found {
-                return Err(format!(
-                    "Model '{}' not found. Available: {}",
-                    model,
-                    available.join(", ")
+                mac_stats_info!(
+                    "ollama/chat",
+                    "Model '{}' not in local Ollama catalog — continuing (Ollama /api/chat will validate if missing)",
+                    model
+                );
+                model_not_in_catalog_note = Some(format!(
+                    "⚠ Model '{}' not in local list — attempting anyway.\n\n",
+                    model
                 ));
             }
         }
 
         let (endpoint, effective_model, api_key) = {
-            let guard = get_ollama_client().lock().map_err(|e| e.to_string())?;
-            let client = guard
-                .as_ref()
-                .ok_or_else(|| "Ollama not configured".to_string())?;
+            let guard = get_ollama_client()
+                .lock()
+                .map_err(|e| {
+                    finish_router_failure(
+                        OllamaRunError::classify(&e.to_string()),
+                        !skip_ollama_run_error_metrics,
+                    )
+                })?;
+            let client = guard.as_ref().ok_or_else(|| {
+                finish_router_failure(
+                    OllamaRunError::classify("Ollama not configured"),
+                    !skip_ollama_run_error_metrics,
+                )
+            })?;
             let effective = model_override.clone().unwrap_or_else(|| {
                 read_ollama_fast_model_from_env_or_config()
                     .unwrap_or_else(|| client.config.model.clone())
@@ -269,12 +434,77 @@ pub fn answer_with_ollama_and_fetch(
         };
         // Use resolved model (local when default was cloud) for all chat calls in this request.
         let model_override = Some(effective_model.clone());
-        let model_info =
-            crate::ollama::get_model_info(&endpoint, &effective_model, api_key.as_deref())
-                .await
-                .unwrap_or_else(|_| crate::ollama::ModelInfo::default());
+        let (model_info, ctx_budget_source) = crate::ollama::resolve_model_context_budget(
+            &endpoint,
+            &effective_model,
+            api_key.as_deref(),
+        )
+        .await;
+        let token_budget = context_token_budget(model_info.context_size_tokens);
+        mac_stats_debug!(
+            "ollama/chat",
+            request_id = %request_id,
+            model = %effective_model,
+            context_size = model_info.context_size_tokens,
+            context_source = ctx_budget_source.as_str(),
+            token_budget,
+            "context_assembler: agent router effective context budget"
+        );
 
+        let turn_budget_secs = crate::commands::turn_lifecycle::resolve_turn_budget_secs(
+            discord_reply_channel_id,
+            from_remote,
+            turn_timeout_secs,
+        );
+        mac_stats_debug!(
+            "ollama/chat",
+            request_id = %request_id,
+            ollama_chat_timeout_secs = crate::config::Config::ollama_chat_timeout_secs(),
+            agent_session_wall_clock_secs = turn_budget_secs,
+            max_tool_iterations = max_tool_iterations,
+            entry = if discord_reply_channel_id.is_some() {
+                "discord"
+            } else if from_remote {
+                "remote"
+            } else {
+                "ui"
+            },
+            "agent session limits (per-request Ollama HTTP vs full-turn wall-clock vs tool iterations)"
+        );
+        let deadline_std = match turn_deadline {
+            Some(d) => d,
+            None => {
+                std::time::Instant::now() + std::time::Duration::from_secs(turn_budget_secs)
+            }
+        };
+        let coord_key = crate::commands::turn_lifecycle::coordination_key(discord_reply_channel_id);
+        crate::commands::turn_lifecycle::register(coord_key, &request_id);
+        let output_gate = crate::commands::turn_lifecycle::new_output_gate_open();
+        let request_id_for_timeout = request_id.clone();
+        let discord_draft_for_timeout = discord_draft.clone();
+        let partial_for_timeout = partial_progress_capture.clone();
+
+        let ollama_http_q = if skip_ollama_queue_flag {
+            crate::ollama_queue::OllamaHttpQueue::Nested
+        } else {
+            crate::ollama_queue::OllamaHttpQueue::Acquire {
+                key: ollama_queue_key_req.unwrap_or_else(|| "default".to_string()),
+                wait_hook: ollama_queue_wait_hook_req,
+            }
+        };
+
+        let model_not_in_catalog_note_for_turn = model_not_in_catalog_note.clone();
+        let turn_body = {
+            let og = output_gate.clone();
+            let forward_for_tool_loop = forward_for_tool_loop.clone();
+            let qspec = ollama_http_q;
+            let model_note_for_reply = model_not_in_catalog_note_for_turn.clone();
+            async move {
+        crate::ollama_queue::with_ollama_http_queue(qspec, || async move {
         let send_status = |msg: &str| {
+            if !crate::commands::turn_lifecycle::gate_allows_send(&og) {
+                return;
+            }
             if let Some(ref tx) = status_tx {
                 let _ = tx.send(msg.to_string());
             }
@@ -432,9 +662,9 @@ pub fn answer_with_ollama_and_fetch(
             }
         }
 
-        let raw_history: Vec<crate::ollama::ChatMessage> = cap_tail_chronological(
+        let raw_history = ContextAssembler::compact(
+            &AgentContextAssembler,
             conversation_history.unwrap_or_default(),
-            CONVERSATION_HISTORY_CAP,
         );
         if raw_history.is_empty() {
             mac_stats_info!(
@@ -453,12 +683,14 @@ pub fn answer_with_ollama_and_fetch(
         }
 
         send_status("Compacting session memory…");
+        let hook_source_for_ori = compaction_lifecycle.hook_source.clone();
         let conversation_history = prepare_conversation_history(
             raw_history,
             question,
             is_new_topic,
             discord_reply_channel_id,
             &request_id,
+            compaction_lifecycle,
         )
         .await;
         if !conversation_history.is_empty() {
@@ -467,6 +699,23 @@ pub fn answer_with_ollama_and_fetch(
                 "Agent router: using {} prior messages as context",
                 conversation_history.len()
             );
+        }
+
+        let ori_vault = crate::commands::ori_lifecycle::resolved_vault_root();
+        let mut ori_orient_section = String::new();
+        if let Some(ref v) = ori_vault {
+            if let Some(s) = crate::commands::ori_lifecycle::maybe_build_orient_section(
+                v,
+                &hook_source_for_ori,
+                hook_session_id,
+                conversation_history.is_empty(),
+            ) {
+                crate::commands::ori_lifecycle::mark_session_oriented(
+                    &hook_source_for_ori,
+                    hook_session_id,
+                );
+                ori_orient_section = s;
+            }
         }
 
         let from_discord = discord_reply_channel_id.is_some();
@@ -567,12 +816,6 @@ pub fn answer_with_ollama_and_fetch(
                     discord_platform_formatting
                 ),
             };
-            let mut planning_messages: Vec<crate::ollama::ChatMessage> =
-                vec![crate::ollama::ChatMessage {
-                    role: "system".to_string(),
-                    content: planning_system_content,
-                    images: None,
-                }];
             let planning_cap = crate::config::Config::planning_history_cap();
             let planning_history: &[crate::ollama::ChatMessage] =
                 if planning_cap > 0 && conversation_history.len() > planning_cap {
@@ -595,9 +838,6 @@ pub fn answer_with_ollama_and_fetch(
                 } else {
                     &conversation_history
                 };
-            for msg in planning_history {
-                planning_messages.push(msg.clone());
-            }
             let model_hint = model_override.as_ref().map(|m| format!("\n\nFor this request the user selected Ollama model: {}. The app will use that model for the reply; recommend answering the question (or using an agent) with that in mind.", m)).unwrap_or_default();
             let today_utc = chrono::Utc::now().format("%Y-%m-%d");
             mac_stats_info!(
@@ -606,18 +846,26 @@ pub fn answer_with_ollama_and_fetch(
                 request_id,
                 today_utc
             );
-            planning_messages.push(crate::ollama::ChatMessage {
+            let planning_user = crate::ollama::ChatMessage {
                 role: "user".to_string(),
                 content: format!(
                     "Current date (UTC): {}.\n\nCurrent user question: {}{}\n\nReply with RECOMMEND: your plan.",
                     today_utc, question_for_plan_and_exec, model_hint
                 ),
                 images: attachment_images_base64.clone(),
-            });
+            };
+            let planning_messages = ContextAssembler::assemble(
+                &AgentContextAssembler,
+                planning_history,
+                &planning_system_content,
+                planning_user,
+                token_budget,
+            );
             let plan_response = send_ollama_chat_messages(
                 planning_messages,
                 model_override.clone(),
                 options_override.clone(),
+                OllamaHttpQueue::Nested,
             )
             .await?;
             let mut rec = plan_response.message.content.trim().to_string();
@@ -687,8 +935,7 @@ pub fn answer_with_ollama_and_fetch(
         };
 
         // Include current system metrics so the model can answer accurately when the user asks about CPU, RAM, disk, etc.
-        let metrics_block = crate::metrics::format_metrics_for_ai_context();
-        let metrics_for_system = format!("\n\n{}", metrics_block);
+        let metrics_for_system = fragments::live_metrics_execution_system_section();
         let model_identity = format!(
             "\n\nYou are replying as the Ollama model: **{}**. If the user asks which model you are (or what model you run on), name this model.",
             effective_model
@@ -729,6 +976,18 @@ pub fn answer_with_ollama_and_fetch(
 
         let normalized_recommendation = normalize_inline_tool_sequences(&recommendation);
 
+        let ori_prefetch_section = match &ori_vault {
+            Some(v) => crate::commands::ori_lifecycle::maybe_run_prefetch_section(
+                v,
+                &hook_source_for_ori,
+                hook_session_id,
+                question,
+            )
+            .await
+            .unwrap_or_default(),
+            None => String::new(),
+        };
+
         // Fast path: if the recommendation already contains a parseable tool call, execute it
         // directly instead of asking Ollama a second time to regurgitate the same tool line.
         let direct_tool = parse_tool_from_response(&recommendation);
@@ -749,7 +1008,7 @@ pub fn answer_with_ollama_and_fetch(
             }
             let memory_block =
                 load_memory_block_for_request(discord_reply_channel_id, load_global_memory);
-            let prompt = build_execution_system_content(
+            let mut prompt = build_execution_system_content(
                 &router_soul,
                 &memory_block,
                 &discord_user_context,
@@ -762,19 +1021,24 @@ pub fn answer_with_ollama_and_fetch(
                 &discord_platform_formatting,
                 &model_identity,
                 None,
+                &ori_orient_section,
+                &ori_prefetch_section,
             );
-            let msgs = build_execution_message_stack(
-                crate::ollama::ChatMessage {
-                    role: "system".to_string(),
-                    content: prompt.content,
-                    images: None,
-                },
+            prompt
+                .content
+                .push_str(crate::commands::directive_tags::EXECUTION_SYSTEM_SECTION);
+            append_heartbeat_section(&mut prompt, heartbeat_system_append.as_deref());
+            let exec_user = crate::ollama::ChatMessage {
+                role: "user".to_string(),
+                content: question_for_plan_and_exec.clone(),
+                images: attachment_images_base64.clone(),
+            };
+            let msgs = ContextAssembler::assemble(
+                &AgentContextAssembler,
                 &conversation_history,
-                crate::ollama::ChatMessage {
-                    role: "user".to_string(),
-                    content: question_for_plan_and_exec.clone(),
-                    images: attachment_images_base64.clone(),
-                },
+                &prompt.content,
+                exec_user,
+                token_budget,
             );
             // Preserve multi-tool chains so the executor runs them step by step (not one RUN_CMD with the whole chain).
             let synthetic = if all_tools.len() > 1 {
@@ -796,7 +1060,7 @@ pub fn answer_with_ollama_and_fetch(
             );
             let memory_block =
                 load_memory_block_for_request(discord_reply_channel_id, load_global_memory);
-            let prompt = build_execution_system_content(
+            let mut prompt = build_execution_system_content(
                 &router_soul,
                 &memory_block,
                 &discord_user_context,
@@ -809,24 +1073,42 @@ pub fn answer_with_ollama_and_fetch(
                 &discord_platform_formatting,
                 &model_identity,
                 Some(&recommendation),
+                &ori_orient_section,
+                &ori_prefetch_section,
             );
-            let mut msgs = build_execution_message_stack(
-                crate::ollama::ChatMessage {
-                    role: "system".to_string(),
-                    content: prompt.content,
-                    images: None,
-                },
+            prompt
+                .content
+                .push_str(crate::commands::directive_tags::EXECUTION_SYSTEM_SECTION);
+            append_heartbeat_section(&mut prompt, heartbeat_system_append.as_deref());
+            let exec_user = crate::ollama::ChatMessage {
+                role: "user".to_string(),
+                content: question_for_plan_and_exec.clone(),
+                images: attachment_images_base64.clone(),
+            };
+            let mut msgs = ContextAssembler::assemble(
+                &AgentContextAssembler,
                 &conversation_history,
-                crate::ollama::ChatMessage {
-                    role: "user".to_string(),
-                    content: question_for_plan_and_exec.clone(),
-                    images: attachment_images_base64.clone(),
-                },
+                &prompt.content,
+                exec_user,
+                token_budget,
             );
+            let n_proactive =
+                crate::commands::content_reduction::proactively_compact_tool_results_for_context_budget(
+                    msgs.as_mut_slice(),
+                    model_info.context_size_tokens,
+                );
+            if n_proactive > 0 {
+                mac_stats_info!(
+                    "ollama/chat",
+                    "Agent router: proactive context budget — {} tool-result compaction step(s) before first execution Ollama call",
+                    n_proactive
+                );
+            }
             let response = match send_ollama_chat_messages(
                 msgs.clone(),
                 model_override.clone(),
                 options_override.clone(),
+                OllamaHttpQueue::Nested,
             )
             .await
             {
@@ -848,6 +1130,7 @@ pub fn answer_with_ollama_and_fetch(
                             msgs.clone(),
                             model_override.clone(),
                             options_override.clone(),
+                            OllamaHttpQueue::Nested,
                         )
                         .await?
                     } else {
@@ -894,6 +1177,10 @@ pub fn answer_with_ollama_and_fetch(
             }
         };
 
+        if let Some(ref cap) = partial_progress_capture {
+            cap.set_last_assistant_text(&response_content);
+        }
+
         // Browser mode: "headless" in question -> no visible window. From Discord/scheduler/task (from_remote) -> headless unless user explicitly asks to see the browser (so retries stay headless).
         let prefer_headless = if from_remote {
             !wants_visible_browser(question)
@@ -916,6 +1203,11 @@ pub fn answer_with_ollama_and_fetch(
             agent_descriptions_len: agent_descriptions.len(),
             model_context_size_tokens: model_info.context_size_tokens,
             budget_warning_ratio: crate::config::Config::tool_budget_warning_ratio(),
+            loop_detection: crate::config::Config::tool_loop_detection_config(),
+            max_consecutive_failures: crate::config::Config::max_consecutive_tool_failures(),
+            partial_progress_capture: partial_progress_capture.clone(),
+            output_gate: Some(og.clone()),
+            forward_substantive_output: Some(forward_for_tool_loop),
         };
         let tool_loop_result = crate::commands::tool_loop::run_tool_loop(
             &tool_loop_params,
@@ -924,17 +1216,22 @@ pub fn answer_with_ollama_and_fetch(
         )
         .await?;
         let mut response_content = tool_loop_result.response_content;
+        if let Some(footer) = tool_loop_result.user_visible_footer {
+            response_content.push_str(&footer);
+        }
         let tool_loop_state = tool_loop_result.state;
+        let last_browser_screenshot_path = tool_loop_state.last_browser_screenshot_path.clone();
         let tool_count = tool_loop_state.tool_count;
-        let attachment_paths = tool_loop_state.attachment_paths;
+        let mut attachment_paths = tool_loop_state.attachment_paths;
         let screenshot_requested_by_tool_run = tool_loop_state.screenshot_requested_by_tool_run;
         let agent_conversation = tool_loop_state.agent_conversation;
         let current_task_path = tool_loop_state.current_task_path;
         let last_browser_extract = tool_loop_state.last_browser_extract;
         let browser_tool_cap_reached = tool_loop_state.browser_tool_cap_reached;
         let last_news_search_was_hub_only = tool_loop_state.last_news_search_was_hub_only;
+        let exited_via_done = tool_loop_state.exited_via_done;
 
-        if tool_loop_state.exited_via_done {
+        if exited_via_done {
             let lines: Vec<&str> = response_content.lines().collect();
             if let Some(last) = lines.last() {
                 let t = last.trim();
@@ -1027,6 +1324,11 @@ pub fn answer_with_ollama_and_fetch(
                 "Agent router: browser tool cap was reached, appended user-facing note"
             );
         }
+
+        crate::commands::screenshot_lifecycle::append_screenshot_path_markers_dedup(
+            &mut response_content,
+            &attachment_paths,
+        );
 
         // Completion verification: one short Ollama call; if not satisfied, retry once (A2) or append disclaimer
         let criteria_count = success_criteria.as_ref().map(|c| c.len()).unwrap_or(0);
@@ -1124,8 +1426,20 @@ pub fn answer_with_ollama_and_fetch(
                         request_id_override: Some(request_id.clone()),
                         retry_count: 1,
                         discord_draft,
+                        heartbeat_system_append: heartbeat_system_append.clone(),
+                        compaction_hook_source,
+                        compaction_hook_session_id,
+                        emit_compaction_cpu_ui,
+                        partial_progress_capture: partial_progress_capture.clone(),
+                        turn_deadline: Some(deadline_std),
+                        turn_timeout_secs: None,
+                        run_error_boundary_retry_done: false,
+                        skip_ollama_run_error_metrics: true,
+                        skip_ollama_queue: true,
+                        ..Default::default()
                     })
-                    .await;
+                    .await
+                    .map_err(|e| e.raw_detail());
                 }
                 let reason_preview = reason
                     .as_deref()
@@ -1239,9 +1553,124 @@ pub fn answer_with_ollama_and_fetch(
             response_content
         };
 
+        let (mut final_text, directive_flags) =
+            crate::commands::directive_tags::parse_and_strip_directive_tags(&final_text);
+        if directive_flags.attach_screenshot {
+            if let Some(ref p) = last_browser_screenshot_path {
+                if !attachment_paths.iter().any(|x| x == p) {
+                    mac_stats_info!(
+                        "ollama/chat",
+                        "Directive [[attach_screenshot]]: attaching latest screenshot {:?}",
+                        p
+                    );
+                    attachment_paths.push(p.clone());
+                }
+            }
+        }
+        if directive_flags.thread_reply
+            || directive_flags.attach_screenshot
+            || directive_flags.split_long
+        {
+            mac_stats_info!(
+                "ollama/chat",
+                "Directive tags resolved: thread_reply={} attach_screenshot={} split_long={}",
+                directive_flags.thread_reply,
+                directive_flags.attach_screenshot,
+                directive_flags.split_long
+            );
+        }
+
+        crate::commands::screenshot_lifecycle::append_screenshot_path_markers_dedup(
+            &mut final_text,
+            &attachment_paths,
+        );
+
+        if let Some(note) = model_note_for_reply.as_ref() {
+            final_text = format!("{}{}", note, final_text);
+        }
+
         Ok(OllamaReply {
             text: final_text,
             attachment_paths,
+            directive_thread_reply: directive_flags.thread_reply,
+            directive_attach_screenshot: directive_flags.attach_screenshot,
+            directive_split_long: directive_flags.split_long,
         })
+        })
+        .await
+            }
+        };
+
+        let tok_deadline = tokio::time::Instant::from_std(deadline_std);
+        let string_result = match tokio::time::timeout_at(tok_deadline, turn_body).await {
+            Ok(inner) => {
+                crate::commands::turn_lifecycle::unregister_if_matches(
+                    coord_key,
+                    &request_id_for_timeout,
+                );
+                inner
+            }
+            Err(_) => {
+                crate::commands::turn_lifecycle::gate_close(&output_gate);
+                crate::commands::turn_lifecycle::finalize_turn_timeout(
+                    coord_key,
+                    &request_id_for_timeout,
+                    turn_budget_secs,
+                    discord_draft_for_timeout.as_ref(),
+                    partial_for_timeout.as_ref(),
+                )
+                .await
+            }
+        };
+
+        match string_result {
+            Ok(reply) => Ok(reply),
+            Err(raw) => {
+                let classified = OllamaRunError::classify(&raw);
+                if run_error_boundary_retry_done {
+                    return Err(finish_router_failure(
+                        classified,
+                        !skip_ollama_run_error_metrics,
+                    ));
+                }
+                if forward_substantive_output.load(Ordering::Acquire) {
+                    return Err(finish_router_failure(
+                        classified,
+                        !skip_ollama_run_error_metrics,
+                    ));
+                }
+                match &classified {
+                    OllamaRunError::BrowserSessionLost { .. }
+                    | OllamaRunError::ServiceUnavailable { .. } => {
+                        mac_stats_info!(
+                            "ollama/chat",
+                            "Agent router: run_error_boundary retry once (code={}, request_id={})",
+                            classified.code(),
+                            request_id_for_timeout
+                        );
+                        if matches!(&classified, OllamaRunError::BrowserSessionLost { .. }) {
+                            crate::browser_agent::invalidate_cached_browser_session_for_retry(
+                                "OllamaRunError::BrowserSessionLost retry",
+                            );
+                        }
+                        if matches!(&classified, OllamaRunError::ServiceUnavailable { .. }) {
+                            tokio::time::sleep(Duration::from_secs(2)).await;
+                        }
+                        let mut retry_req = req_for_retry.clone();
+                        retry_req.run_error_boundary_retry_done = true;
+                        retry_req.skip_ollama_queue = true;
+                        retry_req.inbound_stale_guard = None;
+                        return answer_with_ollama_and_fetch(retry_req).await;
+                    }
+                    _ => Err(finish_router_failure(
+                        classified,
+                        !skip_ollama_run_error_metrics,
+                    )),
+                }
+            }
+        }
     })
 }
+
+/// OpenClaw-style name: same entry as [`answer_with_ollama_and_fetch`] (classification, metrics, one-shot retry).
+pub use answer_with_ollama_and_fetch as with_run_error_boundary;

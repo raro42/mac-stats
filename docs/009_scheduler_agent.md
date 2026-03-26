@@ -72,6 +72,15 @@
 - Supports deduplication by `cron` + `task` (whitespace-normalized)
 - **Main chat awareness:** When a run **successfully** posts to Discord via `reply_to_channel_id`, the app records a short entry in `~/.mac-stats/scheduler_delivery_awareness.json` (deduped by a per-run `context_key`) and injects the latest entries into the **CPU window** Ollama **system** prompt on subsequent turns. Discord remains the source of truth for what was posted; the file + injection avoid split-brain when you later chat in-app. See **docs/data_files_reference.md** (scheduler_delivery_awareness.json). Settings → Schedules lists recent deliveries for operators.
 
+### Heartbeat (optional, OpenClaw-style)
+
+Separate from `schedules.json`: an optional **heartbeat** loop in `~/.mac-stats/config.json` under key `heartbeat`. When `enabled` is true, mac-stats runs one agent turn on a fixed interval with a **checklist** (file path, inline prompt, or built-in default). The model is instructed to reply **`HEARTBEAT_OK`** only when nothing needs the user’s attention; those replies are **not** posted to Discord. If the reply is substantive or omits the ack pattern, it can be delivered to a Discord channel when `replyToChannelId` is set; otherwise the text is only logged.
+
+- **Config fields:** See **docs/data_files_reference.md** (`config.json` → heartbeat).
+- **Timeout:** Same wall-clock cap as scheduler tasks (`schedulerTaskTimeoutSecs` / `MAC_STATS_SCHEDULER_TASK_TIMEOUT_SECS`).
+- **Logs:** Subsystem target `mac_stats::scheduler/heartbeat` (see **docs/039_mac_stats_log_subsystems.md**).
+- **Code:** `src-tauri/src/scheduler/heartbeat.rs`, `Config::heartbeat_settings()` in `config/mod.rs`, execution prompt hook in `commands/ollama.rs` / `prompt_assembly.rs` / `prompts/mod.rs`.
+
 ### Multiple API keys / endpoints (design)
 
 **Current behaviour:** The scheduler uses a single, app-wide configuration for all schedules:
@@ -97,7 +106,7 @@ No code change in this FEAT; this section records the investigation and design o
 ---
 
 ## 📄 References
-- **Code:** `src-tauri/src/scheduler/mod.rs`
+- **Code:** `src-tauri/src/scheduler/mod.rs`, `src-tauri/src/scheduler/heartbeat.rs`
 - **List schedules:** `LIST_SCHEDULES` agent tool (see `commands/ollama.rs`)
 - **Config:** `Config::schedules_file_path()`, `Config::scheduler_check_interval_secs()`
 

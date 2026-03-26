@@ -6,6 +6,7 @@
 use tracing::info;
 
 use crate::commands::content_reduction::{reduce_fetched_content_to_fit, CHARS_PER_TOKEN};
+use crate::commands::untrusted_content::wrap_untrusted_content;
 use crate::commands::redmine_helpers::is_redmine_review_or_summarize_only;
 
 fn send_status(tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>, msg: &str) {
@@ -43,7 +44,8 @@ pub(crate) async fn handle_fetch_url_discord_redirect(
         match crate::discord::api::discord_api_request("GET", &path, None).await {
             Ok(result) => format!(
                 "Discord API result (GET {}):\n\n{}\n\nUse this to answer the user's question.",
-                path, result
+                path,
+                wrap_untrusted_content("discord-api-response", &result)
             ),
             Err(e) => format!(
                 "Discord API failed (GET {}): {}. Try DISCORD_API: GET {} or delegate to AGENT: discord-expert.",
@@ -75,7 +77,9 @@ pub(crate) async fn handle_fetch_url(
     info!("Discord/Ollama: FETCH_URL requested: {}", arg);
     let url = arg.to_string();
     let fetch_result =
-        tokio::task::spawn_blocking(move || crate::commands::browser::fetch_page_content(&url))
+        tokio::task::spawn_blocking(move || {
+            crate::commands::browser::fetch_page_content_for_agent(&url)
+        })
             .await
             .map_err(|e| format!("Fetch task: {}", e))?
             .map_err(|e| format!("Fetch page failed: {}", e));
@@ -105,9 +109,13 @@ pub(crate) async fn handle_fetch_url(
                 options_override,
             )
             .await?;
+            crate::commands::suspicious_patterns::log_untrusted_suspicious_scan(
+                "fetched-page",
+                &body_fit,
+            );
             Ok(format!(
                 "Here is the page content:\n\n{}\n\nPlease answer the user's question based on this content.",
-                body_fit
+                wrap_untrusted_content("fetched-page", &body_fit)
             ))
         }
         Err(e) => {
@@ -152,7 +160,7 @@ pub(crate) async fn handle_brave_search(
         Some(api_key) => match crate::commands::brave::brave_web_search(arg, &api_key).await {
             Ok(results) => format!(
                 "Brave Search results:\n\n{}\n\nUse these to answer the user's question.",
-                results
+                wrap_untrusted_content("brave-search-results", &results)
             ),
             Err(e) => format!(
                 "Brave Search failed: {}. Answer without search results.",
@@ -206,7 +214,7 @@ pub(crate) async fn handle_discord_api(
         Ok(result) => DiscordApiResult {
             message: format!(
                 "Discord API result:\n\n{}\n\nUse this to answer the user's question.",
-                result
+                wrap_untrusted_content("discord-api-response", &result)
             ),
             successful_call: Some((method, path)),
         },
@@ -253,15 +261,16 @@ pub(crate) async fn handle_redmine_api(
 
     match crate::redmine::redmine_api_request(&method, &path, body.as_deref()).await {
         Ok(result) => {
+            let wrapped = wrap_untrusted_content("redmine-api-response", &result);
             let mut msg = if path.contains("time_entries") {
                 format!(
                     "Redmine API result:\n\n{}\n\nUse this data to answer the user's question. The derived summary above already lists the actual tickets worked (if any), totals, users, projects, and entry details. Use that instead of inventing ticket ids or subjects.",
-                    result
+                    wrapped
                 )
             } else {
                 format!(
                     "Redmine API result:\n\n{}\n\nUse this data to answer the user's question. Summarize the issue clearly: subject, description quality, what's missing, status, assignee, and key comments.",
-                    result
+                    wrapped
                 )
             };
             if method.to_uppercase() == "GET" {

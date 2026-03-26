@@ -124,6 +124,21 @@ On **session reset** (user says "new topic", "reset", etc.), the app clears the 
 - **Current:** Long-term context is loaded from files under `~/.mac-stats/` (e.g. `agents/memory.md`, `session/*.md`). Users can edit these files directly on disk; the app does not provide an in-app or Discord UI to edit them.
 - **Possible enhancement:** A mechanism for users to manually edit or update long-term memory could include: (a) a Tauri command or Settings UI to append/update entries in a designated memory file; (b) a Discord command or keyword (e.g. "remember: …") that appends a fact to the main session memory file; or (c) a "Memory" tab in Settings that lists and edits the same files the agent loads. Out of scope for the current rollout; implement when users request it or when semantic long-term memory is added.
 
+## Agent router time limits (Tauri / menu-bar defaults vs long runs)
+
+The mac-stats agent is a **Tauri menu-bar app**: defaults favour responsive turns (short per-call HTTP timeouts and modest full-run wall clocks). That differs from a 48-hour “session until I stop it” style stack unless you opt in via config.
+
+**Two different clocks:**
+
+1. **`ollamaChatTimeoutSecs`** — caps **one** Ollama `/api/chat` HTTP request (planning, a follow-up after tools, verification, etc.). A long multi-tool run performs **many** such calls; each must finish within this limit.
+2. **`agentRouterTurnTimeoutSecsDiscord` / `Ui` / `Remote`** — caps the **entire** `answer_with_ollama_and_fetch` turn (criteria + planning + tool loop + verification) for that entry path. This is the **session wall-clock** for one logical agent reply. You may raise it up to **48 hours** (`172800` seconds) for unattended jobs; defaults stay at **300s** (Discord/remote) or **180s** (in-app) so the UI and channels do not hang.
+
+**Tool rounds:** When no per-agent override is used, default **max tool iterations** are configurable per path: `agentRouterMaxToolIterationsDiscord`, `agentRouterMaxToolIterationsUi`, `agentRouterMaxToolIterationsRemote` (default **15** each). An agent’s `max_tool_iterations` in `agent.json` overrides these for that agent.
+
+**Other limits** (browser idle, scheduler task timeout, consecutive failure budget, optional tool-loop detection) stack independently; see the matrix in `src-tauri/src/commands/agent_session_limits.rs`.
+
+**User-visible errors** usually name the limit (e.g. per-request timeout vs session wall-clock vs tool iteration cap) so operators can tell which knob to turn.
+
 ## Open tasks:
 
 - ~~Review whether the `session_memory` implementation is correct and efficient.~~ **Done:** see "Session memory implementation review" above; parser fix for first block in `session_memory.rs`.

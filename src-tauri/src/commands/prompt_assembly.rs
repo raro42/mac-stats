@@ -1,11 +1,15 @@
 //! System prompt assembly for the execution step.
 //!
-//! Consolidates the duplicated prompt building logic that was in `ollama.rs`
-//! (direct-tool path and LLM-execution path).
+//! Composable section order and static-prefix invariants live in [`crate::prompts`].
+
+use crate::prompts::build_execution_system_prompt;
 
 /// Assembled execution system content ready for the Ollama messages array.
 pub(crate) struct ExecutionSystemPrompt {
     pub content: String,
+    /// Byte length of the stable prefix (soul/tools/platform/model before memory/metrics/plan).
+    #[allow(dead_code)] // Exposed for diagnostics; logged once when built in this module.
+    pub static_prefix_len: usize,
 }
 
 /// Build the execution system prompt content. Called by both the direct-tool fast path
@@ -24,40 +28,44 @@ pub(crate) fn build_execution_system_content(
     discord_platform_formatting: &str,
     model_identity: &str,
     plan_suffix: Option<&str>,
+    ori_briefing_section: &str,
+    ori_prefetch_section: &str,
 ) -> ExecutionSystemPrompt {
-    let plan_block = plan_suffix
-        .map(|p| format!("\n\nYour plan: {}", p))
-        .unwrap_or_default();
+    let built = build_execution_system_prompt(
+        router_soul,
+        memory_block,
+        discord_user_context,
+        skill_content,
+        execution_prompt,
+        metrics_for_system,
+        discord_screenshot_reminder,
+        redmine_howto_reminder,
+        news_format_reminder,
+        discord_platform_formatting,
+        model_identity,
+        plan_suffix,
+        ori_briefing_section,
+        ori_prefetch_section,
+    );
+    crate::mac_stats_debug!(
+        "ollama/chat",
+        "Execution system prompt assembled: {} bytes total, {}-byte static prefix (composable sections)",
+        built.content.len(),
+        built.static_prefix_len
+    );
+    ExecutionSystemPrompt {
+        content: built.content,
+        static_prefix_len: built.static_prefix_len,
+    }
+}
 
-    let content = match skill_content {
-        Some(skill) => format!(
-            "{}Additional instructions from skill:\n\n{}\n\n---\n\n{}{}{}{}{}{}{}{}",
-            discord_user_context,
-            skill,
-            execution_prompt,
-            metrics_for_system,
-            discord_screenshot_reminder,
-            redmine_howto_reminder,
-            news_format_reminder,
-            discord_platform_formatting,
-            plan_block,
-            model_identity,
-        ),
-        None => format!(
-            "{}{}{}{}{}{}{}{}{}{}{}",
-            router_soul,
-            memory_block,
-            discord_user_context,
-            execution_prompt,
-            metrics_for_system,
-            discord_screenshot_reminder,
-            redmine_howto_reminder,
-            news_format_reminder,
-            discord_platform_formatting,
-            plan_block,
-            model_identity,
-        ),
-    };
-
-    ExecutionSystemPrompt { content }
+/// Append optional heartbeat instructions to the execution system prompt (periodic check runs).
+pub(crate) fn append_heartbeat_section(
+    prompt: &mut ExecutionSystemPrompt,
+    extra: Option<&str>,
+) {
+    if let Some(h) = extra.map(str::trim).filter(|s| !s.is_empty()) {
+        prompt.content.push_str("\n\n## Heartbeat\n\n");
+        prompt.content.push_str(h);
+    }
 }

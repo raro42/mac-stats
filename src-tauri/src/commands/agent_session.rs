@@ -1,7 +1,7 @@
 //! Agent session runner: run a specialist agent as an Ollama session with
 //! tool-call loop (DISCORD_API, REDMINE_API) and runtime context injection.
 
-use crate::commands::ollama::send_ollama_chat_messages;
+use crate::commands::ollama::{send_ollama_chat_messages, OllamaHttpQueue};
 use crate::commands::redmine_helpers::{
     extract_redmine_time_entries_summary_for_reply, question_explicitly_requests_json,
 };
@@ -31,6 +31,7 @@ pub(crate) async fn run_agent_ollama_session(
     user_message: &str,
     status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
     include_global_memory: bool,
+    ollama_http_queue: OllamaHttpQueue,
 ) -> Result<String, String> {
     let runtime_context = build_agent_runtime_context(chrono::Local::now().fixed_offset());
     let system_prompt = if include_global_memory {
@@ -70,8 +71,13 @@ pub(crate) async fn run_agent_ollama_session(
     let max_iters = agent.max_tool_iterations;
     let mut iteration = 0u32;
     loop {
-        let response =
-            send_ollama_chat_messages(messages.clone(), agent.model.clone(), None).await?;
+        let response = send_ollama_chat_messages(
+            messages.clone(),
+            agent.model.clone(),
+            None,
+            ollama_http_queue.clone(),
+        )
+        .await?;
         let out = response.message.content.trim().to_string();
         info!(
             "Agent: {} ({}) iter {} returned ({} chars)",

@@ -50,6 +50,13 @@ struct Args {
     )]
     changelog: bool,
 
+    /// Print CDP / BROWSER_* readiness (effective config + /json/version probe) and exit
+    #[arg(
+        long = "browser-doctor",
+        help = "Show browser CDP diagnostics (config + loopback /json/version probe) and exit"
+    )]
+    browser_doctor: bool,
+
     /// Subcommands: task (add, list, show, ...) or agent (test). Run and exit without starting the app.
     #[command(subcommand)]
     cmd: Option<MainCmd>,
@@ -145,6 +152,12 @@ fn main() {
         }
     }
 
+    if args.browser_doctor {
+        mac_stats::config::Config::ensure_defaults();
+        let code = mac_stats::browser_doctor::run_browser_doctor_stdio();
+        std::process::exit(code);
+    }
+
     // If a subcommand is used, run it and exit
     if let Some(cmd) = args.cmd {
         let code = match cmd {
@@ -201,11 +214,14 @@ fn main() {
                 rt.block_on(async {
                     mac_stats::config::Config::ensure_defaults();
                     mac_stats::ensure_ollama_agent_ready_at_startup().await;
+                    mac_stats::log_untrusted_suspicious_scan("cli-user-question", &question);
                     match mac_stats::answer_with_ollama_and_fetch(mac_stats::OllamaRequest {
-                        question: question.clone(),
+                        question: mac_stats::wrap_untrusted_content("cli-user-question", &question),
                         allow_schedule: true,
                         retry_on_verification_no: true,
                         from_remote: true,
+                        compaction_hook_source: Some("cli".to_string()),
+                        ollama_queue_key: Some("cli".to_string()),
                         ..Default::default()
                     })
                     .await

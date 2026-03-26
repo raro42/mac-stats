@@ -8,15 +8,9 @@ use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 use std::sync::OnceLock;
 
-use crate::commands::ollama_memory::load_soul_content;
-
-/// Tool instructions appended to soul for non-agent chat (code execution + FETCH_URL).
-const NON_AGENT_TOOL_INSTRUCTIONS: &str = "\n\nYou are a general purpose AI. If you are asked for actual data like day or weather information, or flight information or stock information. Then we need to compile that information using specially crafted clients for doing so. You will put \"[variable-name]\" into the answer to signal that we need to go another step and ask an agent to fulfil the answer.\n\nWhenever asked with \"[variable-name]\", you must provide a javascript snippet to be executed in the browser console to retrieve that information. Mark the answer to be executed as javascript. Do not put any other words around it. Do not insert formatting. Only return the code to be executed. This is needed for the next AI to understand and execute the same. When answering, use the role: code-assistant in the response. When you return executable code:\n- Start the response with: ROLE=code-assistant\n- On the next line, output ONLY executable JavaScript\n- Do not add explanations or formatting\n\nFor web pages: To fetch a page and use its content (e.g. \"navigate to X and get Y\"), reply with exactly one line: FETCH_URL: <full URL> (e.g. FETCH_URL: https://www.example.com). The app will fetch the page and give you the text; then answer the user based on that.";
-
 /// Default system prompt for non-agent Ollama chat: soul (from file or bundled) + tool instructions.
 pub fn default_non_agent_system_prompt() -> String {
-    let soul = load_soul_content();
-    format!("{}{}", soul, NON_AGENT_TOOL_INSTRUCTIONS)
+    crate::commands::context_assembler::fragments::default_non_agent_system_prompt_text()
 }
 
 /// Tauri command: return the default system prompt (soul + tools) for non-agent Ollama chat.
@@ -99,6 +93,9 @@ pub fn configure_ollama(config: OllamaConfigRequest) -> Result<(), String> {
         "Ollama: Configuration successful with endpoint: {}",
         endpoint
     );
+    tauri::async_runtime::spawn(async {
+        crate::ollama::model_list_cache::clear_all().await;
+    });
     Ok(())
 }
 
@@ -123,36 +120,13 @@ pub async fn list_ollama_models_at_endpoint(endpoint: String) -> Result<Vec<Stri
     if endpoint.is_empty() {
         return Err("Endpoint URL is required".to_string());
     }
-    let url = format!("{}/api/tags", endpoint);
-    let client = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(10))
-        .build()
-        .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
-    let response: serde_json::Value = client
-        .get(&url)
-        .send()
+    let list = crate::ollama::model_list_cache::fetch_tags_cached(&endpoint, None)
         .await
         .map_err(|e| {
             debug!("Ollama: list_ollama_models_at_endpoint failed: {}", e);
-            format!("Failed to request models: {}", e)
-        })?
-        .json()
-        .await
-        .map_err(|e| format!("Failed to parse response: {}", e))?;
-    let models: Vec<String> = response
-        .get("models")
-        .and_then(|m| m.as_array())
-        .map(|arr| {
-            arr.iter()
-                .filter_map(|m| {
-                    m.get("name")
-                        .and_then(|n| n.as_str())
-                        .map(|s| s.to_string())
-                })
-                .collect()
-        })
-        .unwrap_or_default();
-    Ok(models)
+            e
+        })?;
+    Ok(list.models.into_iter().map(|m| m.name).collect())
 }
 
 /// Check Ollama connection (async, non-blocking)
@@ -213,7 +187,7 @@ pub async fn check_ollama_connection() -> Result<bool, String> {
 /// configures with default endpoint and auto-detects the first available model from Ollama.
 /// Also builds and caches a ModelCatalog so agents can resolve model_role at load time.
 pub async fn ensure_ollama_agent_ready_at_startup() {
-    use tracing::{debug, info};
+    use tracing::info;
 
     const DEFAULT_ENDPOINT: &str = "http://localhost:11434";
 
@@ -240,90 +214,147 @@ pub async fn ensure_ollama_agent_ready_at_startup() {
             num_ctx: None,
         };
         if let Err(e) = configure_ollama(default) {
-            debug!(
-                "Ollama agent: default config failed (endpoint may be down): {}",
+            tracing::warn!(
+                "Ollama startup warmup: default configure failed (endpoint={} model pending): {}",
+                DEFAULT_ENDPOINT,
                 e
             );
             return;
         }
     }
 
-    match check_ollama_connection().await {
-        Ok(true) => {
-            info!("Ollama agent: ready at startup (endpoint reachable)");
-            let (endpoint, model, api_key_account) = {
-                let guard = match get_ollama_client().lock() {
-                    Ok(g) => g,
-                    Err(_) => return,
-                };
-                match guard.as_ref() {
-                    Some(c) => (
-                        c.config.endpoint.clone(),
-                        c.config.model.clone(),
-                        c.config.api_key.clone(),
-                    ),
-                    None => return,
-                }
-            };
-            let api_key = api_key_account
-                .as_ref()
-                .and_then(|acc| crate::security::get_credential(acc).ok().flatten());
-            if let Ok(info) =
-                crate::ollama::get_model_info(&endpoint, &model, api_key.as_deref()).await
-            {
-                info!(
-                    "Ollama agent: model {} context size {} tokens",
-                    model, info.context_size_tokens
-                );
-            }
+    let (endpoint_for_log, model_for_log) = {
+        let guard = match get_ollama_client().lock() {
+            Ok(g) => g,
+            Err(_) => return,
+        };
+        match guard.as_ref() {
+            Some(c) => (c.config.endpoint.clone(), c.config.model.clone()),
+            None => return,
+        }
+    };
 
-            build_and_cache_model_catalog(&endpoint, api_key.as_deref()).await;
+    let mut connected = false;
+    for attempt in 0..2 {
+        if attempt > 0 {
+            tokio::time::sleep(std::time::Duration::from_millis(400)).await;
+            tracing::debug!(
+                target: "mac_stats_startup",
+                "Ollama startup: retrying /api/tags reachability after cold-start delay"
+            );
         }
-        Ok(false) => {
-            debug!("Ollama agent: endpoint not reachable at startup (will retry when used)")
+        match check_ollama_connection().await {
+            Ok(true) => {
+                connected = true;
+                break;
+            }
+            Ok(false) => {}
+            Err(e) => {
+                tracing::warn!(
+                    "Ollama startup warmup: connection check error (endpoint={} model={}): {}",
+                    endpoint_for_log,
+                    model_for_log,
+                    e
+                );
+                return;
+            }
         }
-        Err(e) => debug!("Ollama agent: startup check failed: {}", e),
     }
+
+    if !connected {
+        tracing::warn!(
+            "Ollama startup warmup: endpoint not reachable after transient retries (endpoint={} model={}); automation will degrade until Ollama is up",
+            endpoint_for_log,
+            model_for_log
+        );
+        return;
+    }
+
+    info!("Ollama agent: ready at startup (endpoint reachable)");
+    let (endpoint, model, api_key_account) = {
+        let guard = match get_ollama_client().lock() {
+            Ok(g) => g,
+            Err(_) => return,
+        };
+        match guard.as_ref() {
+            Some(c) => (
+                c.config.endpoint.clone(),
+                c.config.model.clone(),
+                c.config.api_key.clone(),
+            ),
+            None => return,
+        }
+    };
+    let api_key = api_key_account
+        .as_ref()
+        .and_then(|acc| crate::security::get_credential(acc).ok().flatten());
+
+    let mut info_res = crate::ollama::get_model_info(&endpoint, &model, api_key.as_deref()).await;
+    if let Err(ref e) = info_res {
+        if crate::ollama::ollama_error_suggests_transient_cold_start(e) {
+            tokio::time::sleep(std::time::Duration::from_millis(400)).await;
+            tracing::debug!(
+                target: "mac_stats_startup",
+                "Ollama startup: retrying POST /api/show after transient error: {}",
+                e
+            );
+            info_res = crate::ollama::get_model_info(&endpoint, &model, api_key.as_deref()).await;
+        }
+    }
+    match info_res {
+        Ok(info) => {
+            info!(
+                "Ollama agent: model {} context size {} tokens",
+                model, info.context_size_tokens
+            );
+        }
+        Err(e) => {
+            tracing::warn!(
+                "Ollama startup warmup: model info unavailable (endpoint={} model={}): {}",
+                endpoint,
+                model,
+                e
+            );
+        }
+    }
+
+    build_and_cache_model_catalog(&endpoint, api_key.as_deref()).await;
 }
 
 /// Fetch the full model list from Ollama, build a ModelCatalog, and cache it globally.
 /// Subsequent calls to load_agents() will use this catalog to resolve model_role fields.
 async fn build_and_cache_model_catalog(endpoint: &str, api_key: Option<&str>) {
-    use tracing::{info, warn};
+    use tracing::{debug, info, warn};
 
-    let url = format!("{}/api/tags", endpoint.trim_end_matches('/'));
-    let client = match reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(10))
-        .build()
+    let mut list = match crate::ollama::model_list_cache::fetch_tags_cached(endpoint, api_key).await
     {
-        Ok(c) => c,
-        Err(e) => {
-            warn!("ModelCatalog: failed to create HTTP client: {}", e);
-            return;
-        }
-    };
-    let mut req = client.get(&url);
-    if let Some(key) = api_key {
-        req = req.header("Authorization", format!("Bearer {}", key));
-    }
-    let resp = match req.send().await {
-        Ok(r) if r.status().is_success() => r,
-        Ok(r) => {
-            warn!("ModelCatalog: /api/tags returned {}", r.status());
-            return;
-        }
-        Err(e) => {
-            warn!("ModelCatalog: /api/tags request failed: {}", e);
-            return;
-        }
-    };
-    let list: crate::ollama::ListResponse = match resp.json().await {
         Ok(l) => l,
         Err(e) => {
-            warn!("ModelCatalog: failed to parse /api/tags: {}", e);
+            warn!("ModelCatalog: could not fetch /api/tags: {}", e);
             return;
         }
     };
+
+    if list.models.is_empty() {
+        debug!(
+            target: "mac_stats_startup",
+            "ModelCatalog: empty /api/tags on first read; cold-start retry after 400ms"
+        );
+        tokio::time::sleep(std::time::Duration::from_millis(400)).await;
+        crate::ollama::model_list_cache::clear_all().await;
+        list = match crate::ollama::model_list_cache::fetch_tags_cached(endpoint, api_key).await {
+            Ok(l) => l,
+            Err(e) => {
+                warn!("ModelCatalog: retry fetch /api/tags failed: {}", e);
+                return;
+            }
+        };
+    }
+
+    if list.models.is_empty() {
+        warn!("ModelCatalog: empty model list from Ollama; keeping previous global catalog if any");
+        return;
+    }
 
     let catalog = crate::ollama::models::ModelCatalog::from_model_list(&list.models);
     info!(

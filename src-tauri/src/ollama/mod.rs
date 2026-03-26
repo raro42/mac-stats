@@ -5,14 +5,33 @@
 //! Sub-module `models` provides role-based model classification and resolution.
 
 pub mod models;
+pub(crate) mod model_list_cache;
 
+use crate::circuit_breaker::CircuitBreaker;
 use crate::security;
 use crate::{mac_stats_debug, mac_stats_info};
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
+use std::time::{Duration, Instant};
 use url::Url;
+
+/// How long successful `POST /api/show` context lookups stay in the in-memory cache.
+const MODEL_INFO_CACHE_TTL: Duration = Duration::from_secs(600);
+
+/// Whether an error string often means Ollama was still starting (transport or model not ready yet).
+/// Used for one-shot post-start retries in chat and startup warmup — keep narrow to avoid masking real failures.
+pub(crate) fn ollama_error_suggests_transient_cold_start(msg: &str) -> bool {
+    let m = msg.to_lowercase();
+    m.contains("connection refused")
+        || m.contains("actively refused")
+        || m.contains("failed to connect")
+        || m.contains("connection reset")
+        || m.contains("broken pipe")
+        || m.contains("error sending request")
+        || (m.contains("model") && (m.contains("not found") || m.contains("not available")))
+}
 
 /// Ollama configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -232,36 +251,128 @@ pub struct EmbedResponse {
 /// Model metadata from POST /api/show (context size for prompt fitting).
 #[derive(Debug, Clone)]
 pub struct ModelInfo {
-    /// Context window size in tokens (from num_ctx or model default). Default 4096 if unknown.
+    /// Context window size in tokens (from num_ctx or model default). Default 8192 if unknown.
     pub context_size_tokens: u32,
 }
 
 impl Default for ModelInfo {
     fn default() -> Self {
         Self {
-            context_size_tokens: 4096,
+            context_size_tokens: 8192,
         }
     }
 }
 
+/// Where the effective context token budget came from (for debug logs).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModelContextBudgetSource {
+    /// Valid cached `/api/show` result (within TTL).
+    Cache,
+    ParsedFromShow,
+    /// `/api/show` succeeded but had no `num_ctx` / `context_length`; used name heuristics.
+    HeuristicFromShow,
+    /// `/api/show` succeeded but had no context hints; used [`ModelInfo::default`].
+    DefaultFromShow,
+    /// `/api/show` failed; used name heuristics.
+    HeuristicFallback,
+    /// `/api/show` failed; used [`ModelInfo::default`].
+    DefaultFallback,
+}
+
+impl ModelContextBudgetSource {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Cache => "cache",
+            Self::ParsedFromShow => "api_show",
+            Self::HeuristicFromShow => "heuristic_from_show",
+            Self::DefaultFromShow => "default_from_show",
+            Self::HeuristicFallback => "heuristic_fallback",
+            Self::DefaultFallback => "default_fallback",
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct CachedModelInfoEntry {
+    info: ModelInfo,
+    inserted_at: Instant,
+}
+
 /// Cache key: (endpoint, model_name).
-fn model_info_cache() -> &'static Mutex<HashMap<(String, String), ModelInfo>> {
-    static CACHE: OnceLock<Mutex<HashMap<(String, String), ModelInfo>>> = OnceLock::new();
+fn model_info_cache() -> &'static Mutex<HashMap<(String, String), CachedModelInfoEntry>> {
+    static CACHE: OnceLock<Mutex<HashMap<(String, String), CachedModelInfoEntry>>> = OnceLock::new();
     CACHE.get_or_init(|| Mutex::new(HashMap::new()))
 }
 
-/// Fetch model info from Ollama POST /api/show and cache it.
-/// Returns cached value if present; otherwise fetches and stores.
-pub async fn get_model_info(
+/// Conservative context estimate from the model tag when `/api/show` omits or fails to supply `num_ctx`.
+pub fn estimate_context_tokens_from_model_name(model_name: &str) -> Option<u32> {
+    let m = model_name.to_lowercase();
+    if m.contains("mistral") || m.contains("qwen") {
+        return Some(32768);
+    }
+    if m.contains("llama") || m.contains("gemma") {
+        return Some(8192);
+    }
+    None
+}
+
+fn context_tokens_from_show_or_name(
+    response: &serde_json::Value,
+    model_name: &str,
+) -> (u32, ModelContextBudgetSource) {
+    if let Some(n) = parse_context_size_from_show(response) {
+        return (n, ModelContextBudgetSource::ParsedFromShow);
+    }
+    if let Some(n) = estimate_context_tokens_from_model_name(model_name) {
+        return (n, ModelContextBudgetSource::HeuristicFromShow);
+    }
+    let d = ModelInfo::default().context_size_tokens;
+    (d, ModelContextBudgetSource::DefaultFromShow)
+}
+
+/// Fetch from `/api/show` when possible; on failure use name heuristics or [`ModelInfo::default`].
+/// Used for chat context budgeting so a transient Ollama slowdown does not force a tiny 4k window.
+pub async fn resolve_model_context_budget(
     endpoint: &str,
     model_name: &str,
     api_key: Option<&str>,
-) -> Result<ModelInfo, String> {
+) -> (ModelInfo, ModelContextBudgetSource) {
+    match fetch_model_info_for_cache(endpoint, model_name, api_key).await {
+        Ok((info, src)) => (info, src),
+        Err(e) => {
+            mac_stats_debug!(
+                "ollama/api",
+                "resolve_model_context_budget: show failed for model={}: {}",
+                model_name,
+                e
+            );
+            if let Some(n) = estimate_context_tokens_from_model_name(model_name) {
+                (
+                    ModelInfo {
+                        context_size_tokens: n,
+                    },
+                    ModelContextBudgetSource::HeuristicFallback,
+                )
+            } else {
+                (ModelInfo::default(), ModelContextBudgetSource::DefaultFallback)
+            }
+        }
+    }
+}
+
+async fn fetch_model_info_for_cache(
+    endpoint: &str,
+    model_name: &str,
+    api_key: Option<&str>,
+) -> Result<(ModelInfo, ModelContextBudgetSource), String> {
     let key = (endpoint.to_string(), model_name.to_string());
     {
-        let guard = model_info_cache().lock().map_err(|e| e.to_string())?;
-        if let Some(info) = guard.get(&key) {
-            return Ok(info.clone());
+        let mut guard = model_info_cache().lock().map_err(|e| e.to_string())?;
+        if let Some(entry) = guard.get(&key) {
+            if entry.inserted_at.elapsed() < MODEL_INFO_CACHE_TTL {
+                return Ok((entry.info.clone(), ModelContextBudgetSource::Cache));
+            }
+            guard.remove(&key);
         }
     }
 
@@ -279,24 +390,59 @@ pub async fn get_model_info(
         request = request.header("Authorization", format!("Bearer {}", key));
     }
 
-    let response: serde_json::Value = request
+    let http = request
         .send()
         .await
-        .map_err(|e| format!("Show model request failed: {}", e))?
-        .json()
+        .map_err(|e| format!("Show model request failed: {}", e))?;
+    let status = http.status();
+    let body_text = http
+        .text()
         .await
-        .map_err(|e| format!("Show model response parse: {}", e))?;
+        .map_err(|e| format!("Show model response body: {}", e))?;
+    if !status.is_success() {
+        return Err(format!(
+            "Show model HTTP {} {}",
+            status,
+            body_text.chars().take(240).collect::<String>()
+        ));
+    }
 
-    let context_size_tokens = parse_context_size_from_show(&response).unwrap_or(4096);
+    let response: serde_json::Value = serde_json::from_str(&body_text)
+        .map_err(|e| format!("Show model JSON parse: {}", e))?;
+
+    if let Some(err) = response.get("error").and_then(|e| e.as_str()) {
+        if !err.trim().is_empty() {
+            return Err(format!("Ollama show: {}", err));
+        }
+    }
+
+    let (context_size_tokens, src) = context_tokens_from_show_or_name(&response, model_name);
     let info = ModelInfo {
         context_size_tokens,
     };
 
     {
         let mut guard = model_info_cache().lock().map_err(|e| e.to_string())?;
-        guard.insert(key.clone(), info.clone());
+        guard.insert(
+            key,
+            CachedModelInfoEntry {
+                info: info.clone(),
+                inserted_at: Instant::now(),
+            },
+        );
     }
 
+    Ok((info, src))
+}
+
+/// Fetch model info from Ollama POST /api/show and cache it (10-minute TTL per entry).
+/// Returns `Err` if the HTTP call fails or Ollama returns an error payload (strict callers, e.g. startup).
+pub async fn get_model_info(
+    endpoint: &str,
+    model_name: &str,
+    api_key: Option<&str>,
+) -> Result<ModelInfo, String> {
+    let (info, _) = fetch_model_info_for_cache(endpoint, model_name, api_key).await?;
     Ok(info)
 }
 
@@ -325,13 +471,15 @@ fn parse_context_size_from_show(response: &serde_json::Value) -> Option<u32> {
     None
 }
 
-/// Get cached model info or default (4096). Does not fetch.
+/// Get cached model info or default (8192). Does not fetch; respects TTL.
 #[allow(dead_code)]
 pub fn get_model_info_cached(endpoint: &str, model_name: &str) -> ModelInfo {
     let key = (endpoint.to_string(), model_name.to_string());
     if let Ok(guard) = model_info_cache().lock() {
-        if let Some(info) = guard.get(&key) {
-            return info.clone();
+        if let Some(entry) = guard.get(&key) {
+            if entry.inserted_at.elapsed() < MODEL_INFO_CACHE_TTL {
+                return entry.info.clone();
+            }
         }
     }
     ModelInfo::default()
@@ -370,6 +518,14 @@ impl OllamaClient {
     /// Check if Ollama is available
     #[allow(dead_code)] // May be used in future or via direct client access
     pub async fn check_connection(&self) -> Result<bool> {
+        if let Err(e) = ollama_http_circuit_allow() {
+            mac_stats_debug!(
+                "ollama/api",
+                "Ollama: connection check skipped (circuit): {}",
+                e
+            );
+            return Ok(false);
+        }
         let url = format!("{}/api/tags", self.config.endpoint);
         mac_stats_debug!("ollama/api", "Ollama: Checking connection to {}", url);
 
@@ -390,12 +546,14 @@ impl OllamaClient {
             Ok(response) => {
                 let success = response.status().is_success();
                 if success {
+                    ollama_http_circuit_record_success();
                     mac_stats_info!(
                         "ollama/api",
                         "Ollama: Connection successful to {}",
                         self.config.endpoint
                     );
                 } else {
+                    ollama_http_circuit_record_failure(response.status().is_server_error());
                     mac_stats_debug!(
                         "ollama/api",
                         "Ollama: Connection failed - HTTP status: {}",
@@ -406,6 +564,7 @@ impl OllamaClient {
             }
             Err(e) => {
                 mac_stats_debug!("ollama/api", "Ollama: Connection error: {}", e);
+                ollama_http_circuit_record_failure(true);
                 Ok(false)
             }
         }
@@ -494,6 +653,7 @@ impl OllamaClient {
 
     /// List available models with full details (GET /api/tags).
     pub async fn list_models_full(&self) -> Result<ListResponse> {
+        ollama_http_circuit_allow().map_err(|e| anyhow::anyhow!(e))?;
         let url = format!("{}/api/tags", self.config.endpoint.trim_end_matches('/'));
         mac_stats_debug!("ollama/api", "Ollama: GET {}", url);
         let mut request = self.client.get(&url);
@@ -501,13 +661,31 @@ impl OllamaClient {
             request = request.header("Authorization", format!("Bearer {}", api_key));
             mac_stats_debug!("ollama/api", "Ollama: Using API key for tags");
         }
-        let response = request
-            .send()
-            .await
-            .context("Failed to request /api/tags")?
-            .json::<ListResponse>()
-            .await
-            .context("Failed to parse /api/tags response")?;
+        let http = match request.send().await {
+            Ok(r) => r,
+            Err(e) => {
+                ollama_http_circuit_record_failure(true);
+                return Err(e).context("Failed to request /api/tags");
+            }
+        };
+        let status = http.status();
+        if !status.is_success() {
+            ollama_http_circuit_record_failure(status.is_server_error());
+            let text = http.text().await.unwrap_or_default();
+            anyhow::bail!(
+                "Ollama /api/tags HTTP {} {}",
+                status,
+                text.chars().take(240).collect::<String>()
+            );
+        }
+        let response = match http.json::<ListResponse>().await {
+            Ok(r) => r,
+            Err(e) => {
+                ollama_http_circuit_record_failure(false);
+                return Err(e).context("Failed to parse /api/tags response");
+            }
+        };
+        ollama_http_circuit_record_success();
         mac_stats_info!(
             "ollama/api",
             "Ollama: list_models_full returned {} models",
@@ -703,6 +881,74 @@ impl OllamaClient {
     }
 }
 
+// --- Per-endpoint HTTP circuit (shared by /api/chat and /api/tags) ---
+
+fn ollama_http_circuit() -> &'static Mutex<CircuitBreaker> {
+    static CB: OnceLock<Mutex<CircuitBreaker>> = OnceLock::new();
+    CB.get_or_init(|| Mutex::new(CircuitBreaker::new_ollama()))
+}
+
+/// Gate Ollama HTTP calls (`/api/chat`, `/api/tags`, etc.).
+pub fn ollama_http_circuit_allow() -> Result<(), String> {
+    let mut g = ollama_http_circuit()
+        .lock()
+        .map_err(|_| "Ollama circuit lock poisoned".to_string())?;
+    g.allow_request()
+}
+
+pub fn ollama_http_circuit_record_success() {
+    if let Ok(mut g) = ollama_http_circuit().lock() {
+        g.record_success();
+    }
+}
+
+pub fn ollama_http_circuit_record_failure(should_trip: bool) {
+    if let Ok(mut g) = ollama_http_circuit().lock() {
+        g.record_failure(should_trip);
+    }
+}
+
+/// When true, menu bar may show a short "Ollama ✕" hint (circuit fully open).
+pub fn ollama_http_circuit_is_open_for_menu() -> bool {
+    ollama_http_circuit()
+        .lock()
+        .ok()
+        .is_some_and(|g| g.is_open_blocking())
+}
+
+/// Classify chat/transport error strings for circuit trip (infra vs client/model errors).
+pub fn ollama_chat_error_should_trip(msg: &str) -> bool {
+    if msg.contains("circuit open") {
+        return false;
+    }
+    if msg.starts_with("Ollama error:") {
+        return false;
+    }
+    let lower = msg.to_lowercase();
+    if lower.contains("ollama http 4") || lower.contains("http 400") && lower.contains("ollama") {
+        return false;
+    }
+    if lower.contains("http 5")
+        || lower.contains("503")
+        || lower.contains("502")
+        || lower.contains("504")
+    {
+        return true;
+    }
+    if lower.contains("failed to send chat request")
+        || lower.contains("failed to read response body")
+        || lower.contains("stream read error")
+        || lower.contains("ollama is busy or unavailable")
+        || lower.contains("timed out")
+        || lower.contains("timeout")
+        || lower.contains("connection refused")
+        || lower.contains("connection reset")
+    {
+        return true;
+    }
+    false
+}
+
 /// Parse NDJSON from /api/pull response and return the last "status" value.
 fn parse_pull_ndjson(body: &[u8]) -> Result<String> {
     let mut last = "unknown".to_string();
@@ -718,4 +964,38 @@ fn parse_pull_ndjson(body: &[u8]) -> Result<String> {
         }
     }
     Ok(last)
+}
+
+#[cfg(test)]
+mod model_context_estimate_tests {
+    use super::*;
+
+    #[test]
+    fn estimate_mistral_and_qwen() {
+        assert_eq!(
+            estimate_context_tokens_from_model_name("mistral:7b"),
+            Some(32768)
+        );
+        assert_eq!(
+            estimate_context_tokens_from_model_name("Qwen2.5:latest"),
+            Some(32768)
+        );
+    }
+
+    #[test]
+    fn estimate_llama_and_gemma() {
+        assert_eq!(
+            estimate_context_tokens_from_model_name("llama3.2:latest"),
+            Some(8192)
+        );
+        assert_eq!(
+            estimate_context_tokens_from_model_name("gemma2:2b"),
+            Some(8192)
+        );
+    }
+
+    #[test]
+    fn default_model_info_is_8192() {
+        assert_eq!(ModelInfo::default().context_size_tokens, 8192);
+    }
 }

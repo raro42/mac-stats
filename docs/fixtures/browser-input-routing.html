@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>mac-stats BROWSER_INPUT routing fixture</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; }
+    label { display: block; margin-top: 1rem; font-weight: 600; }
+    #ce { border: 1px solid #ccc; min-height: 4rem; padding: 0.5rem; margin-top: 0.25rem; }
+    output { display: block; margin-top: 1.5rem; padding: 1rem; background: #f4f4f4; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Form controls (BROWSER_INPUT test)</h1>
+  <p>Open this file via <code>file://</code> or serve locally, then <strong>BROWSER_NAVIGATE</strong> to it and use indices from <strong>Elements</strong>.</p>
+
+  <form id="f">
+    <label for="fruit">Select</label>
+    <select id="fruit" name="fruit">
+      <option value="">—</option>
+      <option value="a">Apple</option>
+      <option value="b">Banana</option>
+      <option value="c">Cherry</option>
+    </select>
+
+    <label for="d">Date</label>
+    <input id="d" name="d" type="date" />
+
+    <label for="rich">Contenteditable</label>
+    <div id="rich" contenteditable="true" data-testid="ce"></div>
+
+    <button type="button" id="show" style="margin-top:1rem;">Read values</button>
+  </form>
+
+  <output id="out" aria-live="polite"></output>
+  <script>
+    document.getElementById('show').onclick = function () {
+      var s = document.getElementById('fruit');
+      var d = document.getElementById('d');
+      var ce = document.getElementById('rich');
+      document.getElementById('out').textContent =
+        'select value: ' + JSON.stringify(s.value) + '\n' +
+        'select selected text: ' + JSON.stringify(s.options[s.selectedIndex] ? s.options[s.selectedIndex].text : '') + '\n' +
+        'date value: ' + JSON.stringify(d.value) + '\n' +
+        'contenteditable innerText: ' + JSON.stringify(ce.innerText.trim());
+    };
+  </script>
+</body>
+</html>

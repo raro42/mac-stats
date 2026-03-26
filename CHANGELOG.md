@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.61] - 2026-03-26
+
+### Added
+- **Browser (CDP) & automation** — Proxy **Fetch** auth (`browserCdpProxyUsername` / `browserCdpProxyPassword`), **`browserCdpHttpTimeoutSecs`** / **`browserCdpWsConnectTimeoutSecs`**, SSRF awareness when HTTP(S) proxy env vars are set (`strictSsrfRejectWhenProxyEnv`), configurable Chromium port/binary/user-data-dir, vendored **`headless_chrome`** patch (`Tab::reset_fetch_auth_challenge_response_to_default`). CDP downloads, trace archive, cookie storage, DOM snapshot, screenshot annotation, URL filter, target-crash listener, permissions helper, artifact limits, **`browser_doctor`**, **`circuit_breaker`**; deps **`totp-rs`**, **`tungstenite`**, **`sha2`**, **`image`** / **`imageproc`** / **`ab_glyph`**.
+- **Ollama, Discord, scheduler** — **`ollama_queue`**, model list cache, log **redaction**, run-error metrics, modular tool/command pipeline (registry, turn/ori lifecycle, outbound pipeline, session limits, compaction hooks, context assembler, untrusted content, LLM screenshot lifecycle, etc.). Discord/session-memory **before-reset** JSONL + optional shell hook; scheduler **heartbeat**; **`feature_health`** and dashboard/docs (**`docs/040_feature_health_dashboard.md`**). Dashboard / **`ollama.js`** updates.
+
+### Changed
+- **`BROWSER_SCROLL`** (viewport-based steps), **`BROWSER_EXTRACT`** (markdown from DOM), post-launch **`/json/version`** polling; expanded **`config.json`** and agent prompts; documentation refresh across browser, agents, memory, and logging references.
+
 ## [0.1.60] - 2026-03-25
 
 ### Added

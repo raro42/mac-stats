@@ -5,7 +5,8 @@
 //! and re-reads the file whenever it changes (mtime poll) or after each run.
 
 use crate::config::Config;
-use chrono::{DateTime, Local, TimeZone};
+use crate::mac_stats_info;
+use chrono::{DateTime, Local, TimeZone, Utc};
 use cron::Schedule;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
@@ -13,6 +14,7 @@ use std::time::Duration;
 use tracing::{debug, error, info, warn};
 
 pub mod delivery_awareness;
+pub mod heartbeat;
 
 pub use delivery_awareness::DeliveryAwarenessEntry;
 
@@ -165,6 +167,11 @@ fn load_schedules() -> Vec<ScheduleEntry> {
     entries
 }
 
+/// Number of valid schedule entries in `schedules.json` (for feature health dashboard).
+pub fn schedule_entry_count() -> usize {
+    load_schedules().len()
+}
+
 /// UI-facing schedule entry (id, cron/at strings, task, optional reply channel, next run).
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ScheduleForUi {
@@ -304,7 +311,11 @@ fn next_run(entry: &ScheduleEntry, after: DateTime<Local>) -> Option<DateTime<Lo
 /// - Ok(Some(success)): success with optional reply to send from the scheduler loop.
 /// - Ok(None): task ran but produced no user-visible Discord outcome (e.g. FETCH_URL/BRAVE_SEARCH internal-only).
 /// - Err(msg): task failed; msg is a short user-facing error for Discord when reply_to_channel_id is set.
-async fn execute_task(entry: &ScheduleEntry) -> Result<Option<ScheduleExecuteSuccess>, String> {
+async fn execute_task(
+    entry: &ScheduleEntry,
+    due_time_local: DateTime<Local>,
+    partial_capture: Option<crate::commands::partial_progress::PartialProgressCapture>,
+) -> Result<Option<ScheduleExecuteSuccess>, String> {
     let id_info = entry.id.as_deref().unwrap_or("(no id)");
     let delivery_context_key = delivery_awareness::new_context_key_for_schedule(id_info);
     let task = entry.task.trim();
@@ -444,6 +455,7 @@ async fn execute_task(entry: &ScheduleEntry) -> Result<Option<ScheduleExecuteSuc
                     reply_to_channel,
                     prefix,
                     scheduler_awareness,
+                    partial_capture.clone(),
                 )
                 .await
                 {
@@ -481,11 +493,33 @@ async fn execute_task(entry: &ScheduleEntry) -> Result<Option<ScheduleExecuteSuc
         id_info,
         task.chars().take(60).collect::<String>()
     );
+    let due_utc = due_time_local.with_timezone(&Utc);
+    let reply_to_ch = entry
+        .reply_to_channel_id
+        .as_ref()
+        .and_then(|s| s.parse::<u64>().ok());
+    let stale_mid = format!(
+        "scheduler-due:{}:{}",
+        id_info,
+        due_utc.timestamp_millis()
+    );
+    crate::commands::suspicious_patterns::log_untrusted_suspicious_scan("scheduler-task", task);
     match crate::commands::ollama::answer_with_ollama_and_fetch(
         crate::commands::ollama::OllamaRequest {
-            question: task.to_string(),
+            question: crate::commands::untrusted_content::wrap_untrusted_content(
+                "scheduler-task",
+                task,
+            ),
             retry_on_verification_no: true,
             from_remote: true,
+            discord_reply_channel_id: reply_to_ch,
+            inbound_stale_guard: Some(crate::commands::abort_cutoff::InboundStaleGuard {
+                message_id: stale_mid,
+                timestamp_utc: due_utc,
+            }),
+            compaction_hook_source: Some("scheduler".to_string()),
+            partial_progress_capture: partial_capture.clone(),
+            ollama_queue_key: Some("scheduler".to_string()),
             ..Default::default()
         },
     )
@@ -511,6 +545,17 @@ async fn execute_task(entry: &ScheduleEntry) -> Result<Option<ScheduleExecuteSuc
             }))
         }
         Err(e) => {
+            if matches!(
+                &e,
+                crate::commands::ollama_run_error::OllamaRunError::StaleInboundAfterAbort
+            ) {
+                debug!(
+                    target: "mac_stats::ollama/chat",
+                    schedule_id = id_info,
+                    "Scheduler: Ollama run skipped (stale vs abort cutoff)"
+                );
+                return Ok(None);
+            }
             error!("Scheduler: Ollama failed (id={}): {}", id_info, e);
             Err(e.to_string())
         }
@@ -590,14 +635,31 @@ async fn scheduler_loop() {
                 "Scheduler: executing task id={} (timeout={}s)",
                 id_label, timeout_secs
             );
-            let result = match tokio::time::timeout(timeout_dur, execute_task(entry)).await {
+            let partial = crate::commands::partial_progress::PartialProgressCapture::new();
+            let result = match tokio::time::timeout(
+                timeout_dur,
+                execute_task(entry, next_time, Some(partial.clone())),
+            )
+            .await
+            {
                 Ok(inner) => inner,
                 Err(_elapsed) => {
                     error!(
                         "Scheduler: task id={} timed out after {}s",
                         id_label, timeout_secs
                     );
-                    Err(format!("task timed out after {}s", timeout_secs))
+                    let mut err = format!("task timed out after {}s", timeout_secs);
+                    if let Some(summary) = partial.format_user_summary() {
+                        mac_stats_info!(
+                            "scheduler",
+                            "Scheduler: partial progress after timeout (id={}):\n{}",
+                            id_label,
+                            summary
+                        );
+                        err.push_str("\n\n");
+                        err.push_str(&summary);
+                    }
+                    Err(err)
                 }
             };
             match result {

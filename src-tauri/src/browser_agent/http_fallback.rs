@@ -4,6 +4,7 @@
 
 use std::collections::{HashMap, HashSet};
 
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use std::sync::OnceLock;
 
@@ -11,7 +12,9 @@ use crate::mac_stats_info;
 use scraper::{ElementRef, Html, Selector};
 use url::Url;
 
-use crate::commands::browser::{fetch_page_content, fetch_page_post_form_urlencoded};
+use crate::commands::browser::{
+    fetch_page_content_for_agent, fetch_page_post_form_urlencoded_for_agent,
+};
 
 /// One interactive element for the LLM (1-based index). Same idea as CDP Interactable.
 #[derive(Debug, Clone)]
@@ -52,6 +55,22 @@ struct HttpBrowserState {
 fn http_state() -> &'static Mutex<HttpBrowserState> {
     static STATE: OnceLock<Mutex<HttpBrowserState>> = OnceLock::new();
     STATE.get_or_init(|| Mutex::new(HttpBrowserState::default()))
+}
+
+/// When true, the agent's last successful browser steps used this HTTP fetch path (not live Chrome).
+/// CDP-only tools such as **BROWSER_SAVE_PDF** must refuse while this is set.
+static LAST_BROWSER_SESSION_USED_HTTP_FALLBACK: AtomicBool = AtomicBool::new(false);
+
+pub(crate) fn mark_browser_session_http_fallback() {
+    LAST_BROWSER_SESSION_USED_HTTP_FALLBACK.store(true, Ordering::SeqCst);
+}
+
+pub(crate) fn mark_browser_session_cdp() {
+    LAST_BROWSER_SESSION_USED_HTTP_FALLBACK.store(false, Ordering::SeqCst);
+}
+
+pub(crate) fn browser_session_was_http_fallback() -> bool {
+    LAST_BROWSER_SESSION_USED_HTTP_FALLBACK.load(Ordering::SeqCst)
 }
 
 /// Resolve href against base URL; return None if invalid or non-http(s).
@@ -290,6 +309,7 @@ fn format_http_state_for_llm(
         s.push_str(note);
         s.push('\n');
     }
+    s.push_str("Source: static HTML parse\nScroll: (unknown)\n");
     s.push_str("Elements:\n");
     for i in interactables {
         let kind = if i.tag == "a" {
@@ -318,6 +338,8 @@ fn format_http_state_for_llm(
     if interactables.is_empty() {
         s.push_str("(no interactive elements found)\n");
     }
+    s.push_str("Recent JS dialogs: (not available in HTTP fallback mode)\n");
+    super::credentials::append_available_credentials_hint(url, &mut s);
     s
 }
 
@@ -392,13 +414,14 @@ fn collect_form_submission_pairs(
 
 fn apply_form_submission(spec: &FormSpec, pairs: &[(String, String)]) -> Result<String, String> {
     let html = if spec.method_is_post {
+        super::url_filter::require_navigation_allowed(&spec.action_url)?;
         mac_stats_info!(
             "browser/http_fallback",
             "Browser agent [HTTP fallback]: form submit POST {} ({} field(s))",
             spec.action_url,
             pairs.len()
         );
-        fetch_page_post_form_urlencoded(&spec.action_url, pairs)?
+        fetch_page_post_form_urlencoded_for_agent(&spec.action_url, pairs)?
     } else {
         let url_parsed =
             Url::parse(&spec.action_url).map_err(|e| format!("URL parse for form GET: {}", e))?;
@@ -407,12 +430,13 @@ fn apply_form_submission(spec: &FormSpec, pairs: &[(String, String)]) -> Result<
             url_with_params.query_pairs_mut().append_pair(k, v);
         }
         let target = url_with_params.to_string();
+        super::url_filter::require_navigation_allowed(&target)?;
         mac_stats_info!(
             "browser/http_fallback",
             "Browser agent [HTTP fallback]: form submit GET {}",
             target
         );
-        fetch_page_content(&target)?
+        fetch_page_content_for_agent(&target)?
     };
 
     Ok(html)
@@ -426,12 +450,13 @@ pub fn navigate_http(url: &str) -> Result<String, String> {
     } else {
         url.to_string()
     };
+    super::url_filter::require_navigation_allowed(&url)?;
     mac_stats_info!(
         "browser/http_fallback",
         "Browser agent [HTTP fallback]: BROWSER_NAVIGATE: {}",
         url
     );
-    let html = fetch_page_content(&url)?;
+    let html = fetch_page_content_for_agent(&url)?;
     let (interactables, forms, body_text) = parse_html(&html, &url)?;
     let mut state = http_state().lock().map_err(|e| e.to_string())?;
     state.current_url = url.clone();
@@ -446,6 +471,7 @@ pub fn navigate_http(url: &str) -> Result<String, String> {
             .map(|i| (i.index, http_interactable_label(i)))
             .collect(),
     );
+    mark_browser_session_http_fallback();
     Ok(format_http_state_for_llm(&url, &interactables, None))
 }
 
@@ -536,6 +562,7 @@ fn submit_http_form(
     } else {
         None
     };
+    mark_browser_session_http_fallback();
     Ok(format_http_state_for_llm(
         &final_url,
         &interactables_new,
@@ -564,12 +591,14 @@ pub fn input_http(index: u32, text: &str) -> Result<String, String> {
     if el.is_submit {
         return Err("BROWSER_INPUT: use BROWSER_CLICK to submit; element is a button".to_string());
     }
+    let url = state.current_url.clone();
+    let text = super::credentials::substitute_secret_tags_in_input(&url, text)?;
     state
         .form_values
-        .insert((el.form_id, name), text.to_string());
+        .insert((el.form_id, name), text);
     let interactables = state.interactables.clone();
-    let url = state.current_url.clone();
     drop(state);
+    mark_browser_session_http_fallback();
     Ok(format_http_state_for_llm(&url, &interactables, None))
 }
 

@@ -33,7 +33,7 @@ This document describes how mac-stats uses **per-model context window size**, **
 ### Context Window Size per Model
 
 - **Source:** Ollama exposes model details via `POST /api/show` with body `{"name": "model_name"}`. The response includes `parameters` (e.g. `num_ctx 4096`) or `model_info` (e.g. `context_length`).
-- **Implementation:** `ollama/mod.rs` defines `ModelInfo { context_size_tokens }` and `get_model_info(endpoint, model_name, api_key)`, which calls `/api/show` and parses context size. Results are **cached** per `(endpoint, model)` so we don’t re-fetch on every request.
+- **Implementation:** `ollama/mod.rs` defines `ModelInfo { context_size_tokens }` (default **8192** tokens when unknown), `get_model_info` for strict `/api/show` calls (e.g. startup), and **`resolve_model_context_budget`** for chat: it uses `/api/show` when possible, **caches successes for 10 minutes** per `(endpoint, model)`, and if the response omits `num_ctx` / `context_length` or the request fails, applies **name heuristics** (e.g. Mistral/Qwen → 32768, Llama/Gemma → 8192) before falling back to the default.
 - **Startup:** When the app starts, `ensure_ollama_agent_ready_at_startup()` configures the default Ollama client (if not already configured) and calls `get_model_info` for the current model so the context size is known before the first chat.
 - **Usage:** The agent pipeline uses this to decide how much content can be injected (e.g. after FETCH_URL) and when to summarize or truncate.
 
@@ -45,9 +45,9 @@ This document describes how mac-stats uses **per-model context window size**, **
 
 ### When Model Data Is Missing or the Override Is Invalid
 
-- If a request selects a model override that does not exist, validation fails before the main run and the request returns a user-facing error instead of silently falling back to a different model.
-- If `/api/show` does not provide a usable context size, the backend falls back to a safe default context budget rather than aborting the request.
-- Context-size lookups are cached per `(endpoint, model)` so once the backend learns a model's window, later requests reuse it.
+- For the **agent router** (`answer_with_ollama_and_fetch`), if the model tag is **not** in the local `list_ollama_models()` result, the app **logs a warning**, **still runs the turn**, prepends a short **⚠ … attempting anyway** line to the assistant reply, and lets Ollama’s `/api/chat` reject unknown models if needed.
+- If `/api/show` fails or omits a usable context size, **`resolve_model_context_budget`** applies heuristics or the 8192-token default so the request is not blocked and history truncation stays reasonable.
+- Successful `/api/show` parses are **cached for 10 minutes** per `(endpoint, model)` to cut latency; debug logs include `context_source` (`api_show`, `cache`, `heuristic_*`, `default_*`) when resolving the token budget.
 
 ### Model Parameters (Temperature, Context Window Size)
 
