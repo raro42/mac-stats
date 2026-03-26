@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.63] - 2026-03-26
+
+### Changed
+- **OpenClaw reviewer** — Independent re-run **`2026-03-26T20:43:54Z`** (`HEAD` unchanged **`55dc6a8bb28d`**); prior **`2026-03-26T20:36:56Z`** / **`20:30:41Z`** / **`20:14:22Z`** / **`20:02:32Z`** / **`19:55:40Z`**; same checks (layout, `pnpm check` / `tsgo`, Vitest, §7 **Aligned**). (`005-openclaw-reviewer/005-openclaw-reviewer.md`.)
+
 ## [0.1.62] - 2026-03-26
 
 ### Changed
