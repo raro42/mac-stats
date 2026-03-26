@@ -8,7 +8,9 @@ Cross-check **OpenClaw** `AGENTS.md` against the **openclaw** repository (siblin
 **OpenClaw `HEAD`:** `55dc6a8bb28dd9b6f4c4c1a8e8497fa48f7cc254` (short: `55dc6a8bb28d`)  
 **References:** `AGENTS.md` (repo guidelines), `package.json` (scripts), `vitest.config.ts` (coverage; `vitest.unit.config.ts` extends it for `pnpm test:coverage`).
 
-**Independent re-run:** `2026-03-26T18:32:27Z` — `HEAD` `55dc6a8bb28d` (unchanged); re-checked layout (`src/channel-web.ts`, no `provider-web.ts`, expected dirs, no bogus `src/telegram`), `pnpm check` chain (`format:check` → `pnpm tsgo`, no `"tsgo"` script key), format aliases vs `AGENTS.md`, Vitest thresholds 70/70/55/70 and unit config extends base; §7 table (**Aligned**).
+**Independent re-run:** `2026-03-26T18:38:42Z` — `HEAD` `55dc6a8bb28d` (unchanged); re-checked layout (`src/channel-web.ts`, no `provider-web.ts`, expected dirs, no bogus `src/telegram`), `pnpm check` chain (`format:check` → `pnpm tsgo`, no `"tsgo"` script key), format aliases vs `AGENTS.md`, Vitest thresholds 70/70/55/70 and unit config extends base; §7 table (**Aligned**).
+
+**Prior:** `2026-03-26T18:32:27Z` — `HEAD` `55dc6a8bb28d` (unchanged); identical conclusions (**Aligned**).
 
 **Prior:** `2026-03-26T18:15:58Z` — `HEAD` `55dc6a8bb28d` (unchanged); identical conclusions (**Aligned**).
 
@@ -183,7 +185,7 @@ Cross-check **OpenClaw** `AGENTS.md` against the **openclaw** repository (siblin
 
 Earlier the same day, `AGENTS.md` had stale paths (`provider-web.ts`, old channel dirs), wrong format wording, and wrong branch threshold. Those were corrected upstream; the table above confirms the current tree matches the doc.
 
-**Upstream status:** `../openclaw/AGENTS.md` matches `package.json`, `vitest.config.ts`, and `src/` as of 2026-03-26 (`55dc6a8bb28d`; last check `2026-03-26T18:32:27Z`).
+**Upstream status:** `../openclaw/AGENTS.md` matches `package.json`, `vitest.config.ts`, and `src/` as of 2026-03-26 (`55dc6a8bb28d`; last check `2026-03-26T18:38:42Z`).
 
 ---
 
