@@ -84,3 +84,21 @@ rg -n "scale_click_coords_from_llm_screenshot_space|browser_llm_screenshot_size|
 **Criterios:** La verificación definida en el cuerpo de la tarea **cumple**. Sin prueba manual E2E CDP/visión en esta pasada.
 
 **Notas:** Resultado `CLOSED-` tras esta corrida.
+
+## Test report
+
+**When:** 2026-03-27 (local operator date; exact wall clock not captured in this run)
+
+**Preflight:** `tasks/UNTESTED-20260308-2230-browser-use-llm-screenshot-resize-and-coord-scale.md` was **not present** in the working tree. The task file existed as `CLOSED-*`; it was renamed `CLOSED-…` → `TESTING-…` for this run per `003-tester/TESTER.md`. No other `UNTESTED-*` file was used.
+
+**Commands:**
+
+| Command | Result |
+|--------|--------|
+| `cd src-tauri && cargo check` | **pass** |
+| `cd src-tauri && cargo test scale_click_coords --lib -- --nocapture` | **pass** (2 tests: `scale_click_coords_scales_from_llm_image_to_viewport`, `scale_click_coords_pass_through_when_no_llm_resize_dims`) |
+| `rg -n "scale_click_coords_from_llm_screenshot_space|browser_llm_screenshot_size|prepare_first_attachment_image_for_vision" src-tauri/src` | **pass** (matches in `browser_agent/mod.rs`, `config/mod.rs`, `browser_tool_dispatch.rs`, `verification.rs`, `llm_screenshot.rs`) |
+
+**Criteria:** Automated verification from the task body **passes**. No manual E2E with Chrome/CDP or a live vision model in this run.
+
+**Outcome:** Renamed to `CLOSED-…` — all listed checks passed.

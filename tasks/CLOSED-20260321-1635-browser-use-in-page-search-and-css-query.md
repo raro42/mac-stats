@@ -95,3 +95,19 @@ rg -n "fn search_page_text|pub fn browser_query" src-tauri/src/browser_agent/mod
 - `browser_agent/mod.rs`: `search_page_text`, `browser_query` present.
 
 **Outcome:** All acceptance criteria satisfied. Renamed `TESTING-…` → **`CLOSED-20260321-1635-browser-use-in-page-search-and-css-query.md`** (not `WIP-`). Live CDP end-to-end not run in this pass.
+
+### Test report (2026-03-27, local)
+
+**Preflight:** `tasks/UNTESTED-20260321-1635-browser-use-in-page-search-and-css-query.md` was not in the workspace. Per `003-tester/TESTER.md`, `tasks/CLOSED-20260321-1635-browser-use-in-page-search-and-css-query.md` was renamed to `tasks/TESTING-20260321-1635-browser-use-in-page-search-and-css-query.md` for this verification pass only. No other `UNTESTED-*` task was used.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test` — **pass** (854 passed, 0 failed in `mac_stats` library tests; 1 doc-test ignored)
+
+**Static spot-check (`rg`)**
+
+- `browser_tool_dispatch.rs`: `parse_browser_search_page_arg`, `parse_browser_query_arg`, `handle_browser_search_page`, `handle_browser_query` present; parsing/unit tests in-module.
+- `browser_agent/mod.rs`: `search_page_text`, `browser_query` present.
+
+**Outcome:** All acceptance criteria satisfied. Renamed `TESTING-…` → **`CLOSED-20260321-1635-browser-use-in-page-search-and-css-query.md`** (not `WIP-`). Live CDP end-to-end not run in this pass.

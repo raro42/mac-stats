@@ -90,3 +90,19 @@ rg -n "not replacing cached|not updating cache|empty model list|MCACHE_LOG_TAG" 
 **Notes:** No live Ollama daemon exercised for empty/error responses; verification matches task acceptance criteria.
 
 **Outcome:** All acceptance criteria satisfied → `CLOSED-20260321-1855-openclaw-poisoned-cache-prevention.md`.
+
+## Test report
+
+**Date:** 2026-03-27 (local workspace time; not UTC).
+
+**Preflight:** `tasks/UNTESTED-20260321-1855-openclaw-poisoned-cache-prevention.md` was not present; `003-tester/TESTER.md` step 2 was applied by renaming `tasks/CLOSED-20260321-1855-openclaw-poisoned-cache-prevention.md` → `tasks/TESTING-20260321-1855-openclaw-poisoned-cache-prevention.md`. No other `UNTESTED-*` task was used.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test` — **pass** (854 passed, 0 failed in `mac_stats` library tests; 1 doc-test ignored)
+- `rg -n "not replacing cached|not updating cache|empty model list|MCACHE_LOG_TAG" src-tauri/src/ollama/model_list_cache.rs` — **pass** (matches `MCACHE_LOG_TAG`, empty-list “not replacing cached data”, fetch-error “not updating cache”)
+
+**Notes:** No live Ollama daemon exercised for empty/error HTTP responses; scope matches task acceptance criteria.
+
+**Outcome:** All acceptance criteria satisfied → `CLOSED-20260321-1855-openclaw-poisoned-cache-prevention.md`.
