@@ -71,6 +71,21 @@ Optional: `cargo test` (full run) if time permits.
 
 ## Test report
 
+**Date:** 2026-03-27 (hora local del host del workspace).
+
+**Preflight:** El operador citó `tasks/UNTESTED-20260322-2245-openclaw-bounded-console-page-error-diagnostics.md`; en el workspace solo existía `CLOSED-…` con el mismo sufijo (no había `UNTESTED-…`). Se aplicó `CLOSED-…` → `TESTING-…` para la pasada de verificación; no se abrió ningún otro `UNTESTED-*`.
+
+| Paso | Comando | Resultado |
+|------|---------|-----------|
+| Símbolos / cableado | `rg "try_attach_bounded_cdp_page_diagnostics|DIAG_MAX_CONSOLE_LINES|push_bounded_dedup|format_bounded_page_diagnostics_tool_section|browser_include_diagnostics_in_state" src-tauri/src/browser_agent/mod.rs src-tauri/src/config/mod.rs` | **pass** |
+| Compilación | `cd src-tauri && cargo check` | **pass** |
+| Binarios de test | `cd src-tauri && cargo test --no-run` | **pass** |
+| Tests lib (opcional) | `cd src-tauri && cargo test -p mac_stats --lib` | **pass** — 854 passed, 0 failed |
+
+**Outcome:** **CLOSED** — verificación del cuerpo de la tarea y `cargo test --lib` en verde.
+
+## Test report
+
 **Date:** 2026-03-27 (local time, workspace host).
 
 **Preflight:** `tasks/UNTESTED-20260322-2245-openclaw-bounded-console-page-error-diagnostics.md` was **not** on disk; the task file was `CLOSED-20260322-2245-openclaw-bounded-console-page-error-diagnostics.md`. Per `003-tester/TESTER.md` and operator instruction to test only that basename, it was renamed `CLOSED-…` → `TESTING-…` for this run. No other `UNTESTED-*` file was used.

@@ -101,3 +101,18 @@ Optional: manual Discord — MentionOnly channel, reply to the bot’s last mess
 
 **Outcome:** **CLOSED** — criterios 1–4 del task cumplen; sin bloqueos.
 
+### Test report — 2026-03-27 (TESTER; verificación repetida, hora local macOS)
+
+**Preflight:** `tasks/UNTESTED-20260325-1128-discord-reply-to-bot-implicit-mention.md` **no existía**; se probó la misma tarea renombrando `CLOSED-…` → `TESTING-…`. No se usó ningún otro archivo `UNTESTED-*`.
+
+| Paso | Comando | Resultado |
+|------|---------|-----------|
+| Compilación | `cd src-tauri && cargo check` | **pass** |
+| Test unitario | `cd src-tauri && cargo test outbound_attachment_path_allowlist -- --nocapture` | **pass** (`discord::tests::outbound_attachment_path_allowlist`) |
+| Cableado | `rg` `discord_mentions_bot_effective` / `mentions_bot_effective` en `discord/mod.rs` | **pass** (1852, 1956, 2016, 2787–2788, 2814) |
+| Observabilidad | `MentionOnly activation via message reference` / `could not resolve referenced message for implicit mention` | **pass** (~1867, 1888, 1901, 1915) |
+
+**Manual Discord:** no ejecutada (opcional).
+
+**Outcome:** **CLOSED** — criterios 1–4 cumplen.
+

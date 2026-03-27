@@ -111,3 +111,19 @@ rg -n "fn search_page_text|pub fn browser_query" src-tauri/src/browser_agent/mod
 - `browser_agent/mod.rs`: `search_page_text`, `browser_query` present.
 
 **Outcome:** All acceptance criteria satisfied. Renamed `TESTING-…` → **`CLOSED-20260321-1635-browser-use-in-page-search-and-css-query.md`** (not `WIP-`). Live CDP end-to-end not run in this pass.
+
+## Test report (2026-03-27, local)
+
+**Preflight:** El archivo pedido `tasks/UNTESTED-20260321-1635-browser-use-in-page-search-and-css-query.md` no existía en el repo; la tarea estaba como `CLOSED-…`. Para cumplir `003-tester/TESTER.md` se renombró `CLOSED-…` → `TESTING-…` antes de la verificación. No se usó ningún otro `UNTESTED-*`.
+
+**Comandos**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test` — **pass** (854 passed, 0 failed en la librería `mac_stats`; 1 doc-test ignorado)
+
+**Comprobación estática (`rg`)**
+
+- `browser_tool_dispatch.rs`: `parse_browser_search_page_arg`, `parse_browser_query_arg`, `handle_browser_search_page`, `handle_browser_query` y tests de parsing.
+- `browser_agent/mod.rs`: `search_page_text`, `browser_query`.
+
+**Resultado:** Criterios de aceptación cumplidos. Tras el informe, el archivo pasa de `TESTING-…` a **`CLOSED-20260321-1635-browser-use-in-page-search-and-css-query.md`** (no `WIP-`). CDP en vivo no ejecutado en esta pasada.
