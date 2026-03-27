@@ -43,9 +43,7 @@ pub fn resolve_turn_budget_secs(
 }
 
 pub fn register(coord_key: u64, request_id: &str) {
-    let mut g = active_map()
-        .lock()
-        .unwrap_or_else(|e| e.into_inner());
+    let mut g = active_map().lock().unwrap_or_else(|e| e.into_inner());
     g.insert(coord_key, request_id.to_string());
     mac_stats_info!(
         "ollama/chat",
@@ -56,9 +54,7 @@ pub fn register(coord_key: u64, request_id: &str) {
 }
 
 pub fn unregister_if_matches(coord_key: u64, request_id: &str) {
-    let mut g = active_map()
-        .lock()
-        .unwrap_or_else(|e| e.into_inner());
+    let mut g = active_map().lock().unwrap_or_else(|e| e.into_inner());
     if g.get(&coord_key).map(|s| s.as_str()) == Some(request_id) {
         g.remove(&coord_key);
         mac_stats_info!(
@@ -71,9 +67,7 @@ pub fn unregister_if_matches(coord_key: u64, request_id: &str) {
 }
 
 fn peek_matches(coord_key: u64, request_id: &str) -> bool {
-    let g = active_map()
-        .lock()
-        .unwrap_or_else(|e| e.into_inner());
+    let g = active_map().lock().unwrap_or_else(|e| e.into_inner());
     g.get(&coord_key).map(|s| s.as_str()) == Some(request_id)
 }
 
@@ -114,7 +108,8 @@ pub async fn finalize_turn_timeout(
         chrono::Utc::now(),
     );
 
-    let grace = Duration::from_secs(crate::config::Config::agent_router_turn_timeout_cleanup_grace_secs());
+    let grace =
+        Duration::from_secs(crate::config::Config::agent_router_turn_timeout_cleanup_grace_secs());
     let still_owner = peek_matches(coord_key, request_id);
     if still_owner {
         let coord_key_copy = coord_key;

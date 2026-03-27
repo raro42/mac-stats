@@ -9,7 +9,7 @@ use regex::Regex;
 use std::io::{self, Write};
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Mutex, MutexGuard};
+use std::sync::{Arc, Mutex, MutexGuard};
 use tracing_subscriber::fmt::writer::MakeWriter;
 
 static REDACTION_ENABLED: AtomicBool = AtomicBool::new(true);
@@ -37,10 +37,7 @@ impl RedactRules {
         out = self
             .bearer
             .replace_all(&out, |c: &Captures| {
-                format!(
-                    "Bearer {}",
-                    mask_secret(c.get(1).unwrap().as_str())
-                )
+                format!("Bearer {}", mask_secret(c.get(1).unwrap().as_str()))
             })
             .into_owned();
         out = self
@@ -150,7 +147,10 @@ fn read_config_key_from_env_files(key: &str) -> Option<String> {
         let content = std::fs::read_to_string(path).ok()?;
         for line in content.lines() {
             let t = line.trim();
-            if let Some(rest) = t.strip_prefix(&key_eq).or_else(|| t.strip_prefix(&key_dash_eq)) {
+            if let Some(rest) = t
+                .strip_prefix(&key_eq)
+                .or_else(|| t.strip_prefix(&key_dash_eq))
+            {
                 return Some(rest.trim().to_string());
             }
         }
@@ -345,16 +345,21 @@ impl Write for FileMutexWriter<'_> {
 
 /// [`MakeWriter`] that locks the shared log file and wraps it with [`RedactingLineWriter`].
 pub struct RedactingFileMakeWriter {
-    file: Mutex<std::fs::File>,
+    file: Arc<Mutex<std::fs::File>>,
     enabled: bool,
 }
 
 impl RedactingFileMakeWriter {
     pub fn new(file: std::fs::File, enabled: bool) -> Self {
         Self {
-            file: Mutex::new(file),
+            file: Arc::new(Mutex::new(file)),
             enabled,
         }
+    }
+
+    /// Same underlying file as tracing writes to — for `flush` / `sync_all` on shutdown.
+    pub fn shared_file(&self) -> Arc<Mutex<std::fs::File>> {
+        Arc::clone(&self.file)
     }
 }
 
@@ -362,10 +367,7 @@ impl<'a> MakeWriter<'a> for RedactingFileMakeWriter {
     type Writer = RedactingLineWriter<FileMutexWriter<'a>>;
 
     fn make_writer(&'a self) -> Self::Writer {
-        let guard = self
-            .file
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let guard = self.file.lock().unwrap_or_else(|e| e.into_inner());
         RedactingLineWriter::new(FileMutexWriter { guard }, self.enabled)
     }
 }

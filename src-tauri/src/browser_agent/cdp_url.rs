@@ -84,7 +84,14 @@ pub(crate) fn rewrite_ws_debugger_host_for_discovery(ws_url: &str, discovery_hos
 fn sensitive_query_key(key: &str) -> bool {
     matches!(
         key.to_ascii_lowercase().as_str(),
-        "token" | "key" | "auth" | "apikey" | "api_key" | "secret" | "password" | "access_token"
+        "token"
+            | "key"
+            | "auth"
+            | "apikey"
+            | "api_key"
+            | "secret"
+            | "password"
+            | "access_token"
             | "refresh_token"
     )
 }
@@ -126,8 +133,9 @@ fn best_effort_redact_raw(s: &str) -> String {
         .replace_all(s, "${scheme}")
         .into_owned();
     // Mask token=value in query-ish suffix without full URL parse
-    let token_re = Regex::new(r"(?i)([?&])(token|key|auth|apikey|api_key|secret|password)=([^&\s#]+)")
-        .expect("token redact regex");
+    let token_re =
+        Regex::new(r"(?i)([?&])(token|key|auth|apikey|api_key|secret|password)=([^&\s#]+)")
+            .expect("token redact regex");
     out = token_re
         .replace_all(&out, |caps: &regex::Captures| {
             format!("{}{}=redacted", &caps[1], &caps[2])
@@ -147,10 +155,8 @@ mod tests {
 
     #[test]
     fn http_base_from_ws_devtools_browser_path() {
-        let base = cdp_http_base_from_endpoint(
-            "ws://127.0.0.1:9222/devtools/browser/abc-def-000",
-        )
-        .unwrap();
+        let base = cdp_http_base_from_endpoint("ws://127.0.0.1:9222/devtools/browser/abc-def-000")
+            .unwrap();
         assert_eq!(base.as_str(), "http://127.0.0.1:9222/");
     }
 
@@ -172,7 +178,10 @@ mod tests {
 
     #[test]
     fn rewrite_ipv6_unspecified_host() {
-        let out = rewrite_ws_debugger_host_for_discovery("ws://[::]:9222/devtools/browser/x", "127.0.0.1");
+        let out = rewrite_ws_debugger_host_for_discovery(
+            "ws://[::]:9222/devtools/browser/x",
+            "127.0.0.1",
+        );
         assert!(out.contains("127.0.0.1"));
         assert!(!out.contains("[::]"));
     }

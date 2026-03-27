@@ -3,8 +3,9 @@
 //! This module provides structured logging using the `tracing` crate.
 //! It replaces the hand-rolled logging system with proper structured logging.
 
+use std::io::Write;
 use std::path::PathBuf;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex, OnceLock};
 use tracing::Metadata;
 use tracing_subscriber::filter::FilterFn;
 use tracing_subscriber::layer::SubscriberExt;
@@ -47,6 +48,19 @@ fn rotate_debug_log_if_due(log_path: &std::path::Path) {
 
 mod legacy;
 
+/// Handle to `~/.mac-stats/debug.log` when file logging is enabled (for shutdown flush).
+static DEBUG_LOG_FILE: OnceLock<Arc<Mutex<std::fs::File>>> = OnceLock::new();
+
+/// Flush and sync the debug log file so shutdown lines survive abrupt process teardown.
+pub fn sync_debug_log_best_effort() {
+    if let Some(arc) = DEBUG_LOG_FILE.get() {
+        if let Ok(mut g) = arc.lock() {
+            let _ = g.flush();
+            let _ = g.sync_all();
+        }
+    }
+}
+
 // Re-export legacy logging for compatibility during migration
 pub use legacy::{
     set_verbosity, shorten_file_path_internal, write_structured_log,
@@ -82,11 +96,15 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
     let redact_logs = redact::redaction_active();
 
     // Convert verbosity level (0-3) to tracing level.
-    // -v (1): warn only. -vv (2): info + mac_stats=debug (no HTTP client noise). -vvv (3): full trace.
+    // -v (1): warn + discord/draft=info (draft placeholder/edits visible in debug.log for reviewers).
+    // -vv (2): info + mac_stats=debug + ollama/untrusted=debug (untrusted wrap trace; no HTTP noise). -vvv (3): full trace.
     let filter = match verbosity {
         0 => EnvFilter::new("error"),
-        1 => EnvFilter::new("warn"),
-        2 => EnvFilter::try_new("info,mac_stats=debug").unwrap_or_else(|_| EnvFilter::new("debug")),
+        1 => {
+            EnvFilter::try_new("warn,discord/draft=info").unwrap_or_else(|_| EnvFilter::new("warn"))
+        }
+        2 => EnvFilter::try_new("info,mac_stats=debug,ollama/untrusted=debug,discord/draft=info")
+            .unwrap_or_else(|_| EnvFilter::new("debug")),
         3 => EnvFilter::new("trace"),
         _ => EnvFilter::new("trace"),
     };
@@ -94,6 +112,7 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
     // CRITICAL: Always use command-line verbosity, ignore RUST_LOG environment variable
     // This ensures that -v flags control logging, not environment variables.
     // At -vv we enable mac_stats=debug but not reqwest/hyper, so monitor checks stay compact.
+    // `ollama/untrusted` and `discord/draft` are custom tracing targets (not under mac_stats::); include them explicitly so those lines appear in debug.log.
 
     // Build subscriber with console and file output
     let registry = tracing_subscriber::registry().with(filter);
@@ -155,6 +174,7 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
 
         if let Some(file) = file {
             let file_mk = redact::RedactingFileMakeWriter::new(file, redact_logs);
+            let _ = DEBUG_LOG_FILE.set(file_mk.shared_file());
             let file_layer = fmt::layer()
                 .with_writer(file_mk)
                 .with_target(false)
@@ -295,5 +315,13 @@ mod tests {
 
         let result_odd = ellipse("abcdefghij", 9);
         assert_eq!(result_odd, "abc...hij");
+    }
+
+    /// Regression: `wrap_untrusted_content` uses target `ollama/untrusted`, which is not under `mac_stats::`.
+    #[test]
+    fn vv_env_filter_accepts_ollama_untrusted_directive() {
+        let s = "info,mac_stats=debug,ollama/untrusted=debug";
+        let _ = EnvFilter::try_new(s)
+            .expect("vv filter must include ollama/untrusted for untrusted wrap logs");
     }
 }

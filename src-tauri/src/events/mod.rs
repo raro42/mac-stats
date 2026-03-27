@@ -7,14 +7,16 @@ use std::collections::HashMap;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex, OnceLock, RwLock};
+use std::sync::{Arc, Mutex, Once, OnceLock, RwLock};
 
 use tokio::sync::mpsc::UnboundedSender;
 
 /// Payload for [`emit`]. Extend with new variants as more events are wired.
 #[derive(Clone, Debug)]
 pub enum EventPayload {
-    ScreenshotSaved { path: PathBuf },
+    ScreenshotSaved {
+        path: PathBuf,
+    },
     OllamaTurnComplete {
         model: String,
         tokens_used: u64,
@@ -25,8 +27,14 @@ pub enum EventPayload {
         success: bool,
         duration_ms: u128,
     },
-    DiscordMessageReceived { channel: String, user: String },
-    MonitorCheckComplete { monitor_id: String, status: String },
+    DiscordMessageReceived {
+        channel: String,
+        user: String,
+    },
+    MonitorCheckComplete {
+        monitor_id: String,
+        status: String,
+    },
 }
 
 type Handler = Box<dyn Fn(EventPayload) + Send + Sync + 'static>;
@@ -45,10 +53,7 @@ pub struct AgentStatusTxGuard {
 }
 
 impl AgentStatusTxGuard {
-    fn swap_in(
-        tx: Option<UnboundedSender<String>>,
-        gate: Option<Arc<AtomicBool>>,
-    ) -> Self {
+    fn swap_in(tx: Option<UnboundedSender<String>>, gate: Option<Arc<AtomicBool>>) -> Self {
         let mut g = AGENT_STATUS_TX.lock().unwrap_or_else(|e| e.into_inner());
         let previous = g.take();
         *g = tx;
@@ -87,17 +92,13 @@ where
     F: Fn(EventPayload) + Send + Sync + 'static,
 {
     let key = event_key.into();
-    let mut map = handlers_map()
-        .write()
-        .unwrap_or_else(|e| e.into_inner());
+    let mut map = handlers_map().write().unwrap_or_else(|e| e.into_inner());
     map.entry(key).or_default().push(Box::new(handler));
 }
 
 /// Deliver `payload` to all subscribers of `event_key`. Never panics to callers; handler panics are logged.
 pub fn emit(event_key: &str, payload: EventPayload) {
-    let map = handlers_map()
-        .read()
-        .unwrap_or_else(|e| e.into_inner());
+    let map = handlers_map().read().unwrap_or_else(|e| e.into_inner());
     let Some(list) = map.get(event_key) else {
         return;
     };
@@ -114,49 +115,59 @@ pub fn emit(event_key: &str, payload: EventPayload) {
     }
 }
 
-/// Subscribe built-in handlers (screenshot log + Discord ATTACH, tool observability).
-pub fn register_default_handlers() {
-    subscribe("screenshot:saved", |p| {
-        let EventPayload::ScreenshotSaved { path } = p else {
-            return;
-        };
-        crate::mac_stats_info!(
-            "events/screenshot",
-            "internal event screenshot:saved path={}",
-            path.display()
-        );
-        let msg = format!("ATTACH:{}", path.display());
-        let allow = match AGENT_STATUS_GATE.lock() {
-            Ok(gg) => gg
-                .as_ref()
-                .map(|gate| gate.load(Ordering::Acquire))
-                .unwrap_or(true),
-            Err(_) => true,
-        };
-        if !allow {
-            return;
-        }
-        let g = AGENT_STATUS_TX.lock().unwrap_or_else(|e| e.into_inner());
-        if let Some(tx) = g.as_ref() {
-            let _ = tx.send(msg);
-        }
-    });
+static DEFAULT_HANDLERS: Once = Once::new();
 
-    subscribe("tool:invoked", |p| {
-        let EventPayload::ToolInvoked {
-            tool_name,
-            success,
-            duration_ms,
-        } = p
-        else {
-            return;
-        };
-        crate::mac_stats_debug!(
-            "events/tool",
-            "internal event tool:invoked tool={} success={} duration_ms={}",
-            tool_name,
-            success,
-            duration_ms
+/// Subscribe built-in handlers (screenshot log + Discord ATTACH, tool observability).
+/// Safe to call from Tauri setup and from CLI orchestrator entry: runs once per process.
+pub fn register_default_handlers() {
+    DEFAULT_HANDLERS.call_once(|| {
+        subscribe("screenshot:saved", |p| {
+            let EventPayload::ScreenshotSaved { path } = p else {
+                return;
+            };
+            crate::mac_stats_info!(
+                "events/screenshot",
+                "internal event screenshot:saved path={}",
+                path.display()
+            );
+            let msg = format!("ATTACH:{}", path.display());
+            let allow = match AGENT_STATUS_GATE.lock() {
+                Ok(gg) => gg
+                    .as_ref()
+                    .map(|gate| gate.load(Ordering::Acquire))
+                    .unwrap_or(true),
+                Err(_) => true,
+            };
+            if !allow {
+                return;
+            }
+            let g = AGENT_STATUS_TX.lock().unwrap_or_else(|e| e.into_inner());
+            if let Some(tx) = g.as_ref() {
+                let _ = tx.send(msg);
+            }
+        });
+
+        subscribe("tool:invoked", |p| {
+            let EventPayload::ToolInvoked {
+                tool_name,
+                success,
+                duration_ms,
+            } = p
+            else {
+                return;
+            };
+            crate::mac_stats_debug!(
+                "events/tool",
+                "internal event tool:invoked tool={} success={} duration_ms={}",
+                tool_name,
+                success,
+                duration_ms
+            );
+        });
+
+        crate::mac_stats_info!(
+            "events",
+            "internal event bus: default handlers registered (screenshot:saved, tool:invoked)"
         );
     });
 }

@@ -31,11 +31,9 @@ pub async fn list_ollama_models() -> Result<Vec<String>, String> {
         .as_ref()
         .and_then(|acc| crate::security::get_credential(acc).ok().flatten());
 
-    let list = crate::ollama::model_list_cache::fetch_tags_cached(
-        &endpoint,
-        resolved_key.as_deref(),
-    )
-    .await?;
+    let list =
+        crate::ollama::model_list_cache::fetch_tags_cached(&endpoint, resolved_key.as_deref())
+            .await?;
 
     let models: Vec<String> = list.models.into_iter().map(|m| m.name).collect();
     info!("Ollama: Model list has {} names", models.len());

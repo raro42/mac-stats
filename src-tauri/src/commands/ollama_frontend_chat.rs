@@ -5,15 +5,14 @@
 
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
+use tracing::debug;
 
-use crate::commands::context_assembler::{
-    fragments, ContextAssembler, FrontendContextAssembler,
-};
+use crate::commands::content_reduction::CHARS_PER_TOKEN;
+use crate::commands::context_assembler::{fragments, ContextAssembler, FrontendContextAssembler};
 use crate::commands::ollama_chat::{
     ollama_chat, send_ollama_chat_messages, send_ollama_chat_messages_streaming, OllamaHttpQueue,
 };
 use crate::commands::ollama_config::{default_non_agent_system_prompt, ChatRequest};
-use crate::commands::content_reduction::CHARS_PER_TOKEN;
 use crate::commands::session_history::{
     prepare_conversation_history, CompactionLifecycleContext, CONVERSATION_HISTORY_CAP,
 };
@@ -25,6 +24,11 @@ fn augment_cpu_system_with_scheduler_awareness(base: String) -> String {
     if block.is_empty() {
         base
     } else {
+        debug!(
+            target: "mac_stats::scheduler/delivery_awareness",
+            block_chars = block.chars().count(),
+            "CPU chat: prepending scheduler→Discord delivery awareness to system prompt"
+        );
         format!("{}\n\n{}", base, block)
     }
 }
@@ -107,6 +111,15 @@ pub async fn ollama_chat_with_execution(
 
     ensure_cpu_window_open();
 
+    let q_lower = request.question.to_lowercase();
+    let via_new_session_prefix = q_lower.trim_start().starts_with("new session:");
+    let did_session_reset_phrase =
+        crate::session_memory::user_wants_session_reset(&request.question);
+    if via_new_session_prefix || did_session_reset_phrase {
+        let coord_reset = crate::commands::turn_lifecycle::coordination_key(None);
+        crate::commands::abort_cutoff::clear_cutoff(coord_reset);
+    }
+
     let coord_ui = crate::commands::turn_lifecycle::coordination_key(None);
     let ui_event_ts = Utc::now();
     let ui_event_id = format!(
@@ -123,6 +136,7 @@ pub async fn ollama_chat_with_execution(
         );
     }
 
+    crate::keyed_queue::run_serial("ui-chat", async move {
     info!(
         "Ollama Chat with Execution: Starting for question: {}",
         request.question
@@ -243,7 +257,10 @@ pub async fn ollama_chat_with_execution(
             crate::commands::text_normalize::apply_untrusted_homoglyph_normalization(page_content)
         };
 
-        crate::commands::suspicious_patterns::log_untrusted_suspicious_scan("fetched-page", &page_content);
+        crate::commands::suspicious_patterns::log_untrusted_suspicious_scan(
+            "fetched-page",
+            &page_content,
+        );
 
         let mut follow_up_messages = messages.clone();
         follow_up_messages.push(crate::ollama::ChatMessage {
@@ -285,8 +302,9 @@ pub async fn ollama_chat_with_execution(
     // Process response content - handle escaped newlines
     let mut processed_content = response_content.replace("\\n", "\n");
     processed_content = processed_content.replace("javascript\n", "");
-    processed_content =
-        crate::commands::directive_tags::strip_inline_directive_tags_for_display(&processed_content);
+    processed_content = crate::commands::directive_tags::strip_inline_directive_tags_for_display(
+        &processed_content,
+    );
 
     if let Some(code) =
         crate::commands::tool_parsing::detect_and_extract_js_code(&processed_content)
@@ -331,6 +349,8 @@ pub async fn ollama_chat_with_execution(
         context_message: Some(context_message),
         attachment_paths: vec![],
     })
+    })
+    .await
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -361,6 +381,7 @@ pub async fn ollama_chat_continue_with_result(
 
     ensure_cpu_window_open();
 
+    crate::keyed_queue::run_serial("ui-chat", async move {
     info!(
         "Ollama Chat Continue: Code executed, result: {}",
         execution_result
@@ -460,8 +481,9 @@ pub async fn ollama_chat_continue_with_result(
     // Process response content - handle escaped newlines
     let mut processed_content = response_content.replace("\\n", "\n");
     processed_content = processed_content.replace("javascript\n", "");
-    processed_content =
-        crate::commands::directive_tags::strip_inline_directive_tags_for_display(&processed_content);
+    processed_content = crate::commands::directive_tags::strip_inline_directive_tags_for_display(
+        &processed_content,
+    );
 
     if let Some(code) =
         crate::commands::tool_parsing::detect_and_extract_js_code(&processed_content)
@@ -503,4 +525,6 @@ pub async fn ollama_chat_continue_with_result(
         context_message: Some(context_message),
         attachment_paths: vec![],
     })
+    })
+    .await
 }

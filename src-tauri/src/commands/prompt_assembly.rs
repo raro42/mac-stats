@@ -60,10 +60,7 @@ pub(crate) fn build_execution_system_content(
 }
 
 /// Append optional heartbeat instructions to the execution system prompt (periodic check runs).
-pub(crate) fn append_heartbeat_section(
-    prompt: &mut ExecutionSystemPrompt,
-    extra: Option<&str>,
-) {
+pub(crate) fn append_heartbeat_section(prompt: &mut ExecutionSystemPrompt, extra: Option<&str>) {
     if let Some(h) = extra.map(str::trim).filter(|s| !s.is_empty()) {
         prompt.content.push_str("\n\n## Heartbeat\n\n");
         prompt.content.push_str(h);

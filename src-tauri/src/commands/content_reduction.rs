@@ -680,10 +680,16 @@ fn contains_prompt_tokens_exceed_after_boundary_excluding_compound_total(haystac
         c.is_ascii_alphanumeric() || c == '_'
     }
     for (i, _) in haystack.match_indices(PHRASE) {
-        if i > 0 && haystack[..i].chars().next_back().is_some_and(ident_continue) {
+        if i > 0
+            && haystack[..i]
+                .chars()
+                .next_back()
+                .is_some_and(ident_continue)
+        {
             continue;
         }
-        if preceding_ascii_ident_token(haystack, i).is_some_and(|t| t != "total" && t.ends_with("total"))
+        if preceding_ascii_ident_token(haystack, i)
+            .is_some_and(|t| t != "total" && t.ends_with("total"))
         {
             continue;
         }
@@ -704,7 +710,12 @@ fn contains_tokens_exceed_subphrase_at_boundary(haystack: &str, phrase: &str) ->
             .any(|root| t.ends_with(*root))
     }
     for (i, _) in haystack.match_indices(phrase) {
-        if i > 0 && haystack[..i].chars().next_back().is_some_and(ident_continue) {
+        if i > 0
+            && haystack[..i]
+                .chars()
+                .next_back()
+                .is_some_and(ident_continue)
+        {
             continue;
         }
         if preceding_ascii_ident_token(haystack, i).is_some_and(skip_prev_token_for_tokens_arm) {
@@ -2700,7 +2711,10 @@ fn estimate_message_tokens_for_budget(m: &crate::ollama::ChatMessage) -> usize {
 }
 
 fn estimate_messages_token_total_local(messages: &[crate::ollama::ChatMessage]) -> usize {
-    messages.iter().map(estimate_message_tokens_for_budget).sum()
+    messages
+        .iter()
+        .map(estimate_message_tokens_for_budget)
+        .sum()
 }
 
 #[inline]
@@ -3731,15 +3745,24 @@ mod tests {
         let s1 = "fixture: submessage is too long (pipeline note)";
         let l1 = s1.to_lowercase();
         assert!(l1.contains("message is too long"));
-        assert!(!contains_phrase_after_ident_boundary(&l1, "message is too long"));
+        assert!(!contains_phrase_after_ident_boundary(
+            &l1,
+            "message is too long"
+        ));
 
         let l2 = "micromessage is too long".to_lowercase();
         assert!(l2.contains("message is too long"));
-        assert!(!contains_phrase_after_ident_boundary(&l2, "message is too long"));
+        assert!(!contains_phrase_after_ident_boundary(
+            &l2,
+            "message is too long"
+        ));
 
         let l3 = "metainputs are too long".to_lowercase();
         assert!(l3.contains("inputs are too long"));
-        assert!(!contains_phrase_after_ident_boundary(&l3, "inputs are too long"));
+        assert!(!contains_phrase_after_ident_boundary(
+            &l3,
+            "inputs are too long"
+        ));
 
         assert!(!is_context_overflow_error(s1));
     }
@@ -8788,15 +8811,13 @@ mod tests {
             make_msg("system", "sys"),
             make_msg("user", &"u".repeat(20_000)),
         ];
-        let n = proactively_compact_tool_results_for_context_budget_impl(
-            &mut msgs,
-            1024,
-            0.12,
-            4096,
-        );
+        let n =
+            proactively_compact_tool_results_for_context_budget_impl(&mut msgs, 1024, 0.12, 4096);
         assert!(n > 0, "expected at least one compaction step");
         assert!(
-            msgs[1].content.contains("compacted proactively for context budget"),
+            msgs[1]
+                .content
+                .contains("compacted proactively for context budget"),
             "marker: {}",
             &msgs[1].content[msgs[1].content.len().saturating_sub(120)..]
         );
@@ -8810,22 +8831,15 @@ mod tests {
         for _ in 0..12 {
             msgs.push(make_msg("user", &chunk));
         }
-        let n = proactively_compact_tool_results_for_context_budget_impl(
-            &mut msgs,
-            2048,
-            0.12,
-            8192,
-        );
+        let n =
+            proactively_compact_tool_results_for_context_budget_impl(&mut msgs, 2048, 0.12, 8192);
         assert!(n > 0, "expected phase-B shrink steps, got {}", n);
         assert!(msgs[1].content.contains("compacted proactively"));
     }
 
     #[test]
     fn overflow_retry_marker_distinct_from_proactive() {
-        let mut msgs = vec![
-            make_msg("system", "p"),
-            make_msg("user", &"z".repeat(6000)),
-        ];
+        let mut msgs = vec![make_msg("system", "p"), make_msg("user", &"z".repeat(6000))];
         let n = truncate_oversized_tool_results(&mut msgs, 1000);
         assert_eq!(n, 1);
         assert!(msgs[1].content.contains("due to context limit"));

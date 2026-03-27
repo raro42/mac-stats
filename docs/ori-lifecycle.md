@@ -16,7 +16,7 @@ mac-stats can integrate with a local [Ori Mnemos](https://github.com/aayoawoyemi
 
 ## Prompt section order (execution step, router soul path)
 
-When skill/agent overlay is **not** active, dynamic sections are ordered:
+When skill/agent overlay is **not** active, the execution system prompt is built as in `src-tauri/src/prompts/mod.rs`: **identity / soul** and tools live in the static prefix first, then dynamic sections in this order:
 
 1. mac-stats markdown memory (`load_memory_block_for_request`)
 2. **Ori session briefing** (vault `self/` + `ops/` markdown excerpts)

@@ -42,6 +42,7 @@ pub(crate) fn is_browser_navigation_target_token(token: &str) -> bool {
     }
     if lower.starts_with("http://")
         || lower.starts_with("https://")
+        || lower.starts_with("file://")
         || lower.starts_with("www.")
         || lower == "localhost"
         || lower.starts_with("localhost:")
@@ -141,6 +142,12 @@ pub(crate) fn should_use_http_fallback_after_browser_action_error(tool: &str, er
     true
 }
 
+/// True when CDP navigation exceeded the configured wait (`navigation_timeout_error_with_proxy_hint` in browser_agent).
+/// In that case we must not run HTTP `navigate_http`, which would mask a real CDP stall with a separate fetch result.
+pub(crate) fn is_cdp_navigation_timeout_error(err: &str) -> bool {
+    err.contains("Navigation failed: timeout after")
+}
+
 /// True if the question explicitly asks for a visible browser (e.g. "show me the browser", "visible", "I want to see").
 pub(crate) fn wants_visible_browser(question: &str) -> bool {
     let q = question.to_lowercase();
@@ -164,6 +171,19 @@ mod tests {
         assert_eq!(
             extract_browser_navigation_target("https://www.amvara.de/about and inspect videos"),
             Some("https://www.amvara.de/about".to_string())
+        );
+    }
+
+    #[test]
+    fn browser_navigation_target_accepts_file_url() {
+        assert!(is_browser_navigation_target_token(
+            "file:///tmp/browser-input-routing.html"
+        ));
+        assert_eq!(
+            extract_browser_navigation_target(
+                "file:///Users/example/mac-stats/docs/fixtures/browser-input-routing.html then test"
+            ),
+            Some("file:///Users/example/mac-stats/docs/fixtures/browser-input-routing.html".to_string())
         );
     }
 
@@ -211,5 +231,15 @@ mod tests {
         assert!(is_coding_like_request("Use cursor-agent to add tests"));
         assert!(!is_coding_like_request("What's the weather today?"));
         assert!(!is_coding_like_request("List Redmine tickets"));
+    }
+
+    #[test]
+    fn cdp_navigation_timeout_detection_matches_tool_errors() {
+        assert!(is_cdp_navigation_timeout_error(
+            "Navigation failed: timeout after 5s. If Chrome uses a proxy"
+        ));
+        assert!(!is_cdp_navigation_timeout_error(
+            "Navigation failed: the target page did not load."
+        ));
     }
 }

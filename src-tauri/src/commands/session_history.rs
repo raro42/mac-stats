@@ -51,9 +51,8 @@ pub(crate) fn cap_tail_chronological<T>(items: Vec<T>, cap: usize) -> Vec<T> {
 }
 
 fn annotate_discord_401(mut msg: ChatMessage) -> ChatMessage {
-    msg.content = crate::commands::directive_tags::strip_inline_directive_tags_for_display(
-        &msg.content,
-    );
+    msg.content =
+        crate::commands::directive_tags::strip_inline_directive_tags_for_display(&msg.content);
     if msg.role == "assistant" && looks_like_discord_401_confusion(&msg.content) {
         msg.content.push_str(
             "\n\n[SYSTEM CORRECTION: The above 401 was from FETCH_URL (no token). Use DISCORD_API instead.]",
@@ -116,9 +115,8 @@ pub(crate) async fn prepare_conversation_history(
                     .as_ref()
                     .map(|s| !s.trim().is_empty())
                     .unwrap_or(false);
-                let skip_after_for_having_fun = discord_reply_channel_id.is_some_and(|ch| {
-                    crate::discord::is_discord_channel_having_fun(ch)
-                });
+                let skip_after_for_having_fun = discord_reply_channel_id
+                    .is_some_and(|ch| crate::discord::is_discord_channel_having_fun(ch));
                 if !skip_after_for_having_fun {
                     run_after_compaction_fire_and_forget(
                         hook_src,

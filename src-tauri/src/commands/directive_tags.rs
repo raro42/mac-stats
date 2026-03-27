@@ -32,8 +32,7 @@ pub struct DirectiveDeliveryFlags {
 fn directive_tag_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
-        Regex::new(r"\[\[([a-zA-Z0-9_]+)(?::[^\]]*)?\]\]")
-            .expect("directive tag regex")
+        Regex::new(r"\[\[([a-zA-Z0-9_]+)(?::[^\]]*)?\]\]").expect("directive tag regex")
     })
 }
 

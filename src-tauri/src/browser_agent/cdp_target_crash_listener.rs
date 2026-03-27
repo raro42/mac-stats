@@ -41,10 +41,11 @@ fn run_side_listener(ws_url: String, session_token: u64) {
     };
     set_tcp_read_timeout(socket.get_mut(), Some(Duration::from_millis(400)));
 
+    // Omit optional `filter` — Chrome 146+ rejects `"filter": null` (expects array or absent key).
     let cmd = json!({
         "id": 1,
         "method": "Target.setDiscoverTargets",
-        "params": { "discover": true, "filter": null }
+        "params": { "discover": true }
     });
     if let Err(e) = socket.send(Message::Text(cmd.to_string().into())) {
         mac_stats_debug!(
@@ -70,6 +71,11 @@ fn run_side_listener(ws_url: String, session_token: u64) {
                             "browser/cdp",
                             "CDP target-crash side listener: CDP error response: {}",
                             crate::logging::ellipse(t.as_str(), 200)
+                        );
+                    } else if v.get("id").and_then(|x| x.as_u64()) == Some(1) {
+                        mac_stats_debug!(
+                            "browser/cdp",
+                            "CDP target-crash side listener: Target.setDiscoverTargets ok (listening for Target.targetCrashed)"
                         );
                     }
                     continue;

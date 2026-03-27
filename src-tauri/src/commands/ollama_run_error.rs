@@ -49,23 +49,34 @@ pub struct OllamaRunErrorMetrics {
 
 #[tauri::command]
 pub fn get_ollama_run_error_metrics() -> OllamaRunErrorMetrics {
-    let counts = counts_map()
-        .lock()
-        .map(|g| g.clone())
-        .unwrap_or_default();
+    let counts = counts_map().lock().map(|g| g.clone()).unwrap_or_default();
     OllamaRunErrorMetrics { counts }
 }
 
 /// Typed router failure with a stable `code` for metrics and branching.
 #[derive(Debug, Clone)]
 pub enum OllamaRunError {
-    Timeout { message: String },
-    ServiceUnavailable { message: String },
-    ModelNotFound { message: String },
-    ToolDenied { message: String },
-    BrowserSessionLost { message: String },
-    ContextOverflow { message: String },
-    InternalError { message: String },
+    Timeout {
+        message: String,
+    },
+    ServiceUnavailable {
+        message: String,
+    },
+    ModelNotFound {
+        message: String,
+    },
+    ToolDenied {
+        message: String,
+    },
+    BrowserSessionLost {
+        message: String,
+    },
+    ContextOverflow {
+        message: String,
+    },
+    InternalError {
+        message: String,
+    },
     /// Inbound work dropped: event is older than the session abort cutoff (no user-facing text).
     StaleInboundAfterAbort,
 }
@@ -97,6 +108,24 @@ impl OllamaRunError {
             | OllamaRunError::InternalError { message } => message.clone(),
             OllamaRunError::StaleInboundAfterAbort => {
                 "dropped stale inbound after abort cutoff".to_string()
+            }
+        }
+    }
+
+    /// Append partial-progress summary on failure (Discord, etc.) when the failure looks like a
+    /// timeout or transport stall. Covers [`InternalError`](Self::InternalError) whose text still
+    /// mentions timeout after classification gaps, in addition to [`Timeout`](Self::Timeout) /
+    /// [`ServiceUnavailable`](Self::ServiceUnavailable).
+    pub fn should_attach_partial_progress(&self) -> bool {
+        match self {
+            OllamaRunError::Timeout { .. } | OllamaRunError::ServiceUnavailable { .. } => true,
+            OllamaRunError::StaleInboundAfterAbort => false,
+            _ => {
+                let blob = format!("{}|{}", self.raw_detail(), self.user_message()).to_lowercase();
+                blob.contains("timed out")
+                    || blob.contains("timeout")
+                    || blob.contains("time out")
+                    || blob.contains("deadline exceeded")
             }
         }
     }
@@ -141,9 +170,9 @@ impl OllamaRunError {
                 }
             }
             OllamaRunError::ContextOverflow { message } => {
-                if let Some(s) = crate::commands::content_reduction::sanitize_ollama_error_for_user(
-                    message,
-                ) {
+                if let Some(s) =
+                    crate::commands::content_reduction::sanitize_ollama_error_for_user(message)
+                {
                     s
                 } else {
                     "This conversation is too large for the model context — start a new topic or use a larger context model.".to_string()
@@ -265,7 +294,9 @@ mod tests {
 
     #[test]
     fn classify_browser() {
-        let e = OllamaRunError::classify("Browser unresponsive: Chrome child process 123 is no longer running");
+        let e = OllamaRunError::classify(
+            "Browser unresponsive: Chrome child process 123 is no longer running",
+        );
         assert_eq!(e.code(), "BROWSER_SESSION_LOST");
     }
 
@@ -273,5 +304,30 @@ mod tests {
     fn classify_context_overflow() {
         let e = OllamaRunError::classify("Ollama error: context length exceeded");
         assert_eq!(e.code(), "CONTEXT_OVERFLOW");
+    }
+
+    #[test]
+    fn should_attach_partial_progress_codes() {
+        let t = OllamaRunError::Timeout {
+            message: String::new(),
+        };
+        assert!(t.should_attach_partial_progress());
+        let s = OllamaRunError::ServiceUnavailable {
+            message: String::new(),
+        };
+        assert!(s.should_attach_partial_progress());
+    }
+
+    #[test]
+    fn should_attach_partial_progress_internal_timeout_shaped() {
+        let e = OllamaRunError::InternalError {
+            message: "upstream: request timed out waiting for response".to_string(),
+        };
+        assert!(e.should_attach_partial_progress());
+    }
+
+    #[test]
+    fn should_attach_partial_progress_skips_stale_inbound() {
+        assert!(!OllamaRunError::StaleInboundAfterAbort.should_attach_partial_progress());
     }
 }

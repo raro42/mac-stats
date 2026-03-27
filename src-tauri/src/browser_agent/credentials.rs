@@ -16,9 +16,7 @@ use crate::mac_stats_debug;
 
 fn secret_tag_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| {
-        Regex::new(r"(?i)<secret>([^<]+)</secret>").expect("secret tag regex")
-    })
+    RE.get_or_init(|| Regex::new(r"(?i)<secret>([^<]+)</secret>").expect("secret tag regex"))
 }
 
 fn host_matches_pattern(host: &str, pattern: &str) -> bool {
@@ -98,7 +96,9 @@ fn merged_credentials_for_url(current_url: &str) -> HashMap<String, String> {
 
 /// Placeholder names available for the current page URL (no secret values).
 pub fn get_available_placeholders(current_url: &str) -> Vec<String> {
-    let mut names: Vec<String> = merged_credentials_for_url(current_url).into_keys().collect();
+    let mut names: Vec<String> = merged_credentials_for_url(current_url)
+        .into_keys()
+        .collect();
     names.sort();
     names.dedup();
     names
@@ -131,10 +131,9 @@ fn totp_code_from_base32(secret_b32: &str) -> Result<String, String> {
     let bytes = Secret::Encoded(cleaned)
         .to_bytes()
         .map_err(|e| format!("TOTP secret (base32): {}", e))?;
-    let totp = TOTP::new(Algorithm::SHA1, 6, 1, 30, bytes)
-        .map_err(|e| format!("TOTP init: {}", e))?;
-    totp
-        .generate_current()
+    let totp =
+        TOTP::new(Algorithm::SHA1, 6, 1, 30, bytes).map_err(|e| format!("TOTP init: {}", e))?;
+    totp.generate_current()
         .map_err(|e| format!("TOTP generate: {}", e))
 }
 

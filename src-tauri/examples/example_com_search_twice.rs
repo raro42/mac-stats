@@ -7,9 +7,8 @@ use mac_stats::browser_agent::{self, navigate_and_get_state};
 fn main() {
     let _ = tracing_subscriber::fmt()
         .with_env_filter(
-            tracing_subscriber::EnvFilter::try_new("warn,mac_stats=info").unwrap_or_else(|_| {
-                tracing_subscriber::EnvFilter::new("warn")
-            }),
+            tracing_subscriber::EnvFilter::try_new("warn,mac_stats=info")
+                .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("warn")),
         )
         .try_init();
 

@@ -250,7 +250,8 @@
                         "flowto",
                         "labelledby",
                         "owns",
-                        "url"
+                        "url",
+                        "uninteresting"
                     ]
                 },
                 {

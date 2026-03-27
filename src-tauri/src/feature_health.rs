@@ -4,6 +4,7 @@
 
 use chrono::{SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
+use serenity::gateway::ConnectionStage;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 use tokio::sync::oneshot;
@@ -79,9 +80,9 @@ async fn probe_cdp_http_reachable() -> bool {
 
 fn model_in_tags(configured: &str, tag_names: &[String]) -> bool {
     let base = configured.split(':').next().unwrap_or(configured);
-    tag_names.iter().any(|n| {
-        n == configured || n.starts_with(&format!("{base}:")) || n == base
-    })
+    tag_names
+        .iter()
+        .any(|n| n == configured || n.starts_with(&format!("{base}:")) || n == base)
 }
 
 async fn probe_ollama() -> FeatureHealth {
@@ -96,9 +97,13 @@ async fn probe_ollama() -> FeatureHealth {
                 );
             }
         };
-        guard
-            .as_ref()
-            .map(|c| (c.config.endpoint.clone(), c.config.model.clone(), c.config.api_key.clone()))
+        guard.as_ref().map(|c| {
+            (
+                c.config.endpoint.clone(),
+                c.config.model.clone(),
+                c.config.api_key.clone(),
+            )
+        })
     };
     let Some((endpoint, model, api_key_acct)) = client_info else {
         return entry(
@@ -208,24 +213,93 @@ fn probe_discord() -> FeatureHealth {
             Some("no bot token (env, .config.env, or Keychain)".into()),
         );
     }
-    if crate::discord::discord_bot_gateway_ready() {
-        entry(
+
+    let had_ready = crate::discord::discord_bot_gateway_ready();
+    let stage = crate::discord::discord_last_shard_stage();
+    let started = crate::discord::discord_gateway_client_started_at();
+
+    if had_ready {
+        if let Some(s) = stage {
+            if s.is_connecting() {
+                return entry(
+                    "Discord",
+                    HealthStatus::Degraded,
+                    Some(
+                        "token present; gateway reconnecting (handshake or resume in progress)"
+                            .into(),
+                    ),
+                );
+            }
+            if s == ConnectionStage::Disconnected {
+                return entry(
+                    "Discord",
+                    HealthStatus::Degraded,
+                    Some("token present; gateway disconnected (reconnect expected)".into()),
+                );
+            }
+        }
+        return entry(
             "Discord",
             HealthStatus::Ok,
             Some("token present; gateway ready".into()),
-        )
-    } else {
-        let msg = match crate::discord::discord_last_ready_at() {
-            Some(t) if t.elapsed() < Duration::from_secs(120) => {
-                "token present; gateway handshake in progress (Ready not received yet)".to_string()
+        );
+    }
+
+    match stage {
+        Some(s) if s.is_connecting() => entry(
+            "Discord",
+            HealthStatus::Degraded,
+            Some("token present; gateway handshake in progress (Ready not received yet)".into()),
+        ),
+        Some(ConnectionStage::Connected) => entry(
+            "Discord",
+            HealthStatus::Degraded,
+            Some("token present; connected to gateway, awaiting Ready".into()),
+        ),
+        Some(ConnectionStage::Disconnected) => {
+            let recent = started
+                .map(|t| t.elapsed() < Duration::from_secs(45))
+                .unwrap_or(false);
+            if recent {
+                entry(
+                    "Discord",
+                    HealthStatus::Degraded,
+                    Some("token present; gateway connecting".into()),
+                )
+            } else {
+                entry(
+                    "Discord",
+                    HealthStatus::Degraded,
+                    Some(
+                        "token present; gateway not ready (connection stalled, failed, or reconnecting)"
+                            .into(),
+                    ),
+                )
             }
-            Some(_) => {
-                "token present; gateway not ready (was connected this session; may be reconnecting)"
-                    .to_string()
+        }
+        Some(_) => entry(
+            "Discord",
+            HealthStatus::Degraded,
+            Some("token present; gateway state uncertain (awaiting Ready)".into()),
+        ),
+        None => {
+            if started
+                .map(|t| t.elapsed() < Duration::from_secs(120))
+                .unwrap_or(false)
+            {
+                entry(
+                    "Discord",
+                    HealthStatus::Degraded,
+                    Some("token present; gateway client starting (Ready not received yet)".into()),
+                )
+            } else {
+                entry(
+                    "Discord",
+                    HealthStatus::Degraded,
+                    Some("token present; gateway not ready yet or connection failed".into()),
+                )
             }
-            None => "token present; gateway not ready yet or connection failed".to_string(),
-        };
-        entry("Discord", HealthStatus::Degraded, Some(msg))
+        }
     }
 }
 
@@ -312,11 +386,7 @@ async fn probe_brave() -> FeatureHealth {
                     }
                 }
             }
-            entry(
-                "Brave Search",
-                HealthStatus::Unavailable,
-                Some(err),
-            )
+            entry("Brave Search", HealthStatus::Unavailable, Some(err))
         }
     }
 }
@@ -338,13 +408,10 @@ async fn probe_redmine() -> FeatureHealth {
         }
     };
     let url = format!("{}/users/current.json", base.trim_end_matches('/'));
-    let req = client
-        .get(&url)
-        .header("X-Redmine-API-Key", &key)
-        .header(
-            "User-Agent",
-            format!("mac-stats/{}", crate::config::Config::version()),
-        );
+    let req = client.get(&url).header("X-Redmine-API-Key", &key).header(
+        "User-Agent",
+        format!("mac-stats/{}", crate::config::Config::version()),
+    );
     match tokio::time::timeout(PROBE_TIMEOUT, req.send()).await {
         Ok(Ok(r)) if r.status().is_success() => {
             entry("Redmine", HealthStatus::Ok, Some("reachable".into()))
@@ -354,11 +421,7 @@ async fn probe_redmine() -> FeatureHealth {
             HealthStatus::Degraded,
             Some(format!("HTTP {}", r.status())),
         ),
-        Ok(Err(e)) => entry(
-            "Redmine",
-            HealthStatus::Unavailable,
-            Some(e.to_string()),
-        ),
+        Ok(Err(e)) => entry("Redmine", HealthStatus::Unavailable, Some(e.to_string())),
         Err(_) => entry("Redmine", HealthStatus::Unavailable, Some("timeout".into())),
     }
 }
@@ -381,11 +444,7 @@ async fn probe_smc_blocking() -> FeatureHealth {
             HealthStatus::Ok,
             Some("SMC driver reachable".into()),
         ),
-        Ok(Ok(Err(e))) => entry(
-            "SMC (temperature)",
-            HealthStatus::Unavailable,
-            Some(e),
-        ),
+        Ok(Ok(Err(e))) => entry("SMC (temperature)", HealthStatus::Unavailable, Some(e)),
         Ok(Err(_)) => entry(
             "SMC (temperature)",
             HealthStatus::Unavailable,
@@ -402,9 +461,10 @@ async fn probe_smc_blocking() -> FeatureHealth {
 async fn probe_ioreport_blocking() -> FeatureHealth {
     let (tx, rx) = oneshot::channel::<bool>();
     std::thread::spawn(move || {
-        let ok = std::thread::spawn(|| crate::ffi::ioreport::probe_cpu_performance_channels_available())
-            .join()
-            .unwrap_or(false);
+        let ok =
+            std::thread::spawn(|| crate::ffi::ioreport::probe_cpu_performance_channels_available())
+                .join()
+                .unwrap_or(false);
         let _ = tx.send(ok);
     });
     match tokio::time::timeout(PROBE_TIMEOUT, rx).await {
@@ -452,16 +512,7 @@ pub async fn collect_feature_health() -> Vec<FeatureHealth> {
     let ioreport = probe_ioreport_blocking();
     let (s, i) = tokio::join!(smc, ioreport);
 
-    vec![
-        o,
-        probe_discord(),
-        b,
-        br,
-        r,
-        s,
-        i,
-        probe_scheduler(),
-    ]
+    vec![o, probe_discord(), b, br, r, s, i, probe_scheduler()]
 }
 
 pub fn store_report(report: &[FeatureHealth]) {
@@ -475,7 +526,10 @@ pub fn store_report(report: &[FeatureHealth]) {
 
 /// Log one info line per feature for `debug.log` scanning.
 pub fn log_feature_health_summary(report: &[FeatureHealth]) {
-    tracing::info!("feature_health: ─── subsystem health ({} entries) ───", report.len());
+    tracing::info!(
+        "feature_health: ─── subsystem health ({} entries) ───",
+        report.len()
+    );
     for h in report {
         let msg = h.message.as_deref().unwrap_or("-");
         tracing::info!(

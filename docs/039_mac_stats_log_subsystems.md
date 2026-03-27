@@ -27,9 +27,10 @@ Aligned with `Subsystem` in `src-tauri/src/logging/subsystem.rs`: `metrics`, `ol
 |------|------|
 | `browser`, `browser/cdp`, `browser/http_fallback` | CDP agent, HTTP fallback |
 | `ollama/api` | Ollama HTTP client (`ollama/mod.rs`) |
-| `circuit` | Per-service circuit breaker state transitions (Ollama `/api/chat` + `/api/tags`, Discord outbound HTTP sends): `Circuit opened for … after N consecutive failures` (warn), `Circuit closed for … — service recovered` (info) (`circuit_breaker.rs`) |
+| `circuit` | Per-service circuit breaker state transitions (Ollama `/api/chat` + `/api/tags`, Discord outbound HTTP sends): `Circuit opened for … after N consecutive failures` (warn), `Circuit closed for … — service recovered` (info) (`circuit_breaker.rs`). When **`MAC_STATS_DEBUG_FORCE_OPEN_OLLAMA_CIRCUIT`** is set, one info line notes debug gating for Ollama (`ollama/mod.rs`). |
 | `ollama/chat` | Agent router / `answer_with_ollama_and_fetch` (`commands/ollama.rs`); typed `OllamaRunError` codes and per-code counters (`commands/ollama_run_error.rs`), with `get_ollama_run_error_metrics` for debugging |
 | `scheduler/heartbeat` | Periodic heartbeat checklist + HEARTBEAT_OK handling (`scheduler/heartbeat.rs`) |
+| `events` | Internal event bus: one-time INFO when default handlers register (`internal event bus: default handlers registered`) |
 | `events/screenshot`, `events/tool` | Internal event bus handlers (`src-tauri/src/events/mod.rs`): screenshot saved path, tool invocation telemetry |
 
 Other modules still use default `tracing` targets (often the Rust module path). Until migrated, those lines appear on the console when `MAC_STATS_LOG` is **unset**; when it **is** set, they are hidden from stderr but remain in the log file.

@@ -71,10 +71,7 @@ fn load_checklist_body(settings: &HeartbeatSettings) -> String {
         );
         return inline.clone();
     }
-    mac_stats_info!(
-        "scheduler/heartbeat",
-        "Using built-in default checklist"
-    );
+    mac_stats_info!("scheduler/heartbeat", "Using built-in default checklist");
     DEFAULT_CHECKLIST.to_string()
 }
 
@@ -137,34 +134,42 @@ async fn run_one_beat(settings: &HeartbeatSettings) {
         settings.ack_max_chars
     );
     let partial = crate::commands::partial_progress::PartialProgressCapture::new();
+    let partial_outer = partial.clone();
     let reply_ch = settings
         .reply_to_channel_id
         .as_ref()
         .and_then(|s| s.parse::<u64>().ok());
+    let session_key = reply_ch
+        .map(|id| format!("discord:{}", id))
+        .unwrap_or_else(|| "heartbeat".to_string());
+    let ollama_k = session_key.clone();
     let hb_tick_ts = Utc::now();
     let hb_mid = format!("heartbeat:{}", hb_tick_ts.timestamp_millis());
-    let result = tokio::time::timeout(
-        timeout_dur,
-        crate::commands::ollama::answer_with_ollama_and_fetch(
-            crate::commands::ollama::OllamaRequest {
-                question,
-                retry_on_verification_no: true,
-                from_remote: true,
-                allow_schedule: false,
-                conversation_history: None,
-                discord_reply_channel_id: reply_ch,
-                inbound_stale_guard: Some(crate::commands::abort_cutoff::InboundStaleGuard {
-                    message_id: hb_mid,
-                    timestamp_utc: hb_tick_ts,
-                }),
-                heartbeat_system_append: Some(HEARTBEAT_SYSTEM_APPEND.to_string()),
-                compaction_hook_source: Some("heartbeat".to_string()),
-                partial_progress_capture: Some(partial.clone()),
-                ollama_queue_key: Some("scheduler".to_string()),
-                ..Default::default()
-            },
-        ),
-    )
+    let result = crate::keyed_queue::run_serial(session_key, async move {
+        tokio::time::timeout(
+            timeout_dur,
+            crate::commands::ollama::answer_with_ollama_and_fetch(
+                crate::commands::ollama::OllamaRequest {
+                    question,
+                    retry_on_verification_no: true,
+                    from_remote: true,
+                    allow_schedule: false,
+                    conversation_history: None,
+                    discord_reply_channel_id: reply_ch,
+                    inbound_stale_guard: Some(crate::commands::abort_cutoff::InboundStaleGuard {
+                        message_id: hb_mid,
+                        timestamp_utc: hb_tick_ts,
+                    }),
+                    heartbeat_system_append: Some(HEARTBEAT_SYSTEM_APPEND.to_string()),
+                    compaction_hook_source: Some("heartbeat".to_string()),
+                    partial_progress_capture: Some(partial),
+                    ollama_queue_key: Some(ollama_k),
+                    ..Default::default()
+                },
+            ),
+        )
+        .await
+    })
     .await;
     let reply = match result {
         Ok(Ok(r)) => r,
@@ -183,11 +188,13 @@ async fn run_one_beat(settings: &HeartbeatSettings) {
             return;
         }
         Err(_) => {
-            error!(
-                "Heartbeat: Ollama run timed out after {}s",
+            mac_stats_warn!(
+                "scheduler/heartbeat",
+                "Heartbeat: Ollama run timed out after {}s (scheduler_task_timeout_secs)",
                 timeout_secs
             );
-            if let Some(summary) = partial.format_user_summary() {
+            error!("Heartbeat: Ollama run timed out after {}s", timeout_secs);
+            if let Some(summary) = partial_outer.format_user_summary() {
                 mac_stats_info!(
                     "scheduler/heartbeat",
                     "Heartbeat timeout partial progress:\n{}",

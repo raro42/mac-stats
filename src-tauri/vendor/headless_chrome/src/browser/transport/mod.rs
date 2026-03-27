@@ -19,7 +19,7 @@ use web_socket_connection::WebSocketConnection;
 
 use crate::protocol::cdp::{Target, types::Event, types::Method};
 
-use crate::types::{CallId, Message, parse_raw_message, parse_response};
+use crate::types::{CallId, Message, Response, parse_raw_message, parse_response};
 
 use crate::util;
 
@@ -117,15 +117,14 @@ impl Transport {
         self.call_id_counter.fetch_add(1, Ordering::SeqCst)
     }
 
-    pub fn call_method<C>(
+    fn call_method_response<C>(
         &self,
         method: C,
         destination: MethodDestination,
-    ) -> Result<C::ReturnObject>
+    ) -> Result<Response>
     where
         C: Method + serde::Serialize,
     {
-        // TODO: use get_mut to get exclusive access for entire block... maybe.
         if !self.open.load(Ordering::SeqCst) {
             return Err(ConnectionClosed {}.into());
         }
@@ -174,7 +173,31 @@ impl Transport {
         let response_result = util::Wait::new(self.idle_browser_timeout, Duration::from_millis(5))
             .until(|| response_rx.try_recv().ok());
         trace!("received response for: {} {:?}", &call_id, params_string);
-        parse_response::<C::ReturnObject>((response_result?)?)
+        Ok((response_result?)?)
+    }
+
+    pub fn call_method<C>(
+        &self,
+        method: C,
+        destination: MethodDestination,
+    ) -> Result<C::ReturnObject>
+    where
+        C: Method + serde::Serialize,
+    {
+        parse_response::<C::ReturnObject>(self.call_method_response(method, destination)?)
+    }
+
+    /// Same as [`Self::call_method`], but returns the raw `result` object as JSON (for CDP payloads
+    /// that use signed sentinels or evolve faster than generated structs).
+    pub fn call_method_json<C>(
+        &self,
+        method: C,
+        destination: MethodDestination,
+    ) -> Result<serde_json::Value>
+    where
+        C: Method + serde::Serialize,
+    {
+        parse_response::<serde_json::Value>(self.call_method_response(method, destination)?)
     }
 
     pub fn call_method_on_target<C>(
@@ -187,6 +210,17 @@ impl Transport {
     {
         // TODO: remove clone
         self.call_method(method, MethodDestination::Target(session_id))
+    }
+
+    pub fn call_method_json_on_target<C>(
+        &self,
+        session_id: SessionId,
+        method: C,
+    ) -> Result<serde_json::Value>
+    where
+        C: Method + serde::Serialize,
+    {
+        self.call_method_json(method, MethodDestination::Target(session_id))
     }
 
     pub fn call_method_on_browser<C>(&self, method: C) -> Result<C::ReturnObject>

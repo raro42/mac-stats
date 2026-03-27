@@ -57,17 +57,12 @@ pub fn sanitize_discord_api_error(err: &str) -> String {
 /// other ambiguous cases where the server may already have stored the message.
 pub fn is_safe_to_retry_discord_outbound_error_message(err_str: &str) -> bool {
     let lower = err_str.to_lowercase();
-    if lower.contains("429")
-        || lower.contains("rate limit")
-        || lower.contains("too many requests")
+    if lower.contains("429") || lower.contains("rate limit") || lower.contains("too many requests")
     {
         return true;
     }
     // Timeouts may fire after the request body was accepted — do not retry the same content.
-    if lower.contains("timed out")
-        || lower.contains("timeout")
-        || lower.contains("deadline")
-    {
+    if lower.contains("timed out") || lower.contains("timeout") || lower.contains("deadline") {
         return false;
     }
     if lower.contains("connection reset")
@@ -100,9 +95,7 @@ pub fn is_safe_to_retry_discord_outbound_error_message(err_str: &str) -> bool {
 /// Rate limits get a longer backoff; other safe errors keep a short delay.
 pub fn discord_outbound_safe_retry_sleep_duration(err_str: &str) -> Duration {
     let lower = err_str.to_lowercase();
-    if lower.contains("429")
-        || lower.contains("rate limit")
-        || lower.contains("too many requests")
+    if lower.contains("429") || lower.contains("rate limit") || lower.contains("too many requests")
     {
         return Duration::from_millis(2000 + jitter_millis());
     }
@@ -359,7 +352,7 @@ pub async fn discord_api_request(
             }
             if method_upper == "POST" {
                 warn!(
-                    "Discord API {} returned {} — not retrying POST to avoid possible duplicate message",
+                    "Discord API {} returned {} — unsafe-to-retry for POST, not retrying to avoid duplicate message",
                     route, status
                 );
             }
@@ -475,8 +468,12 @@ mod outbound_retry_tests {
 
     #[test]
     fn outbound_safe_errors_include_rate_limit_and_preconnect() {
-        assert!(is_safe_to_retry_discord_outbound_error_message("HTTP 429 Too Many Requests"));
-        assert!(is_safe_to_retry_discord_outbound_error_message("We are being rate limited"));
+        assert!(is_safe_to_retry_discord_outbound_error_message(
+            "HTTP 429 Too Many Requests"
+        ));
+        assert!(is_safe_to_retry_discord_outbound_error_message(
+            "We are being rate limited"
+        ));
         assert!(is_safe_to_retry_discord_outbound_error_message(
             "error sending request: connection refused"
         ));
@@ -493,7 +490,9 @@ mod outbound_retry_tests {
         assert!(!is_safe_to_retry_discord_outbound_error_message(
             "Connection reset by peer"
         ));
-        assert!(!is_safe_to_retry_discord_outbound_error_message("broken pipe"));
+        assert!(!is_safe_to_retry_discord_outbound_error_message(
+            "broken pipe"
+        ));
     }
 
     #[test]

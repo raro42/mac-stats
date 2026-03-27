@@ -52,91 +52,104 @@ pub async fn run_task_until_finished(
         }
         _ => {}
     }
-    let mut current_path = task_path;
-    let mut last_reply = String::new();
-    for iteration in 0..max_iterations {
-        let content = crate::task::read_task(&current_path).map_err(|e| e.clone())?;
-        let assignee =
-            crate::task::get_assignee(&current_path).unwrap_or_else(|_| "default".to_string());
-        let agents = crate::agents::load_agents();
-        let agent_override = crate::agents::find_agent_by_id_or_name(&agents, &assignee).cloned();
-        crate::commands::suspicious_patterns::log_untrusted_suspicious_scan("task-file-content", &content);
-        let wrapped_content = crate::commands::untrusted_content::wrap_untrusted_content(
-            "task-file-content",
-            &content,
-        );
-        let question = format!(
+    let channel_for_key =
+        reply_to_discord_channel.or_else(|| crate::task::get_reply_to_discord_channel(&task_path));
+    let session_key = channel_for_key
+        .map(|id| format!("discord:{}", id))
+        .unwrap_or_else(|| format!("task:{}", task_name));
+    let ollama_k = session_key.clone();
+    crate::keyed_queue::run_serial(session_key, async move {
+        let mut current_path = task_path;
+        let mut last_reply = String::new();
+        for iteration in 0..max_iterations {
+            let content = crate::task::read_task(&current_path).map_err(|e| e.clone())?;
+            let assignee =
+                crate::task::get_assignee(&current_path).unwrap_or_else(|_| "default".to_string());
+            let agents = crate::agents::load_agents();
+            let agent_override =
+                crate::agents::find_agent_by_id_or_name(&agents, &assignee).cloned();
+            crate::commands::suspicious_patterns::log_untrusted_suspicious_scan(
+                "task-file-content",
+                &content,
+            );
+            let wrapped_content = crate::commands::untrusted_content::wrap_untrusted_content(
+                "task-file-content",
+                &content,
+            );
+            let question = format!(
             "Current task file content:\n\n{}\n\nDecide the next step. For implement/refactor/add-feature/code tasks: use CURSOR_AGENT: <instruction> to have the editor apply changes, then TASK_APPEND with the result and TASK_STATUS when done. Otherwise use TASK_APPEND to add feedback and TASK_STATUS to set wip or finished. Reply with your action (CURSOR_AGENT, TASK_APPEND, TASK_STATUS, or a final summary).",
             wrapped_content
         );
-        info!(
-            "Task loop: iteration {}/{} for task '{}' (assignee: {})",
-            iteration + 1,
-            max_iterations,
-            task_name,
-            assignee
-        );
-        let reply = crate::commands::ollama::answer_with_ollama_and_fetch(
-            crate::commands::ollama::OllamaRequest {
-                question: question.clone(),
-                agent_override,
-                retry_on_verification_no: true,
-                from_remote: true,
-                discord_reply_channel_id: reply_to_discord_channel,
-                compaction_hook_source: Some("task_runner".to_string()),
-                partial_progress_capture: partial_progress_capture.clone(),
-                ollama_queue_key: Some("scheduler".to_string()),
-                ..Default::default()
-            },
-        )
-        .await
-        .map_err(|e| e.to_string())?;
-        last_reply = reply.text;
-        if let Some(ref p) = crate::task::find_current_path(&current_path) {
-            current_path = p.clone();
-        }
-        if crate::task::status_from_path(&current_path).as_deref() == Some("finished") {
-            info!("Task loop: task '{}' finished", task_name);
-            let sent = send_finished_summary_if_channel(
-                &current_path,
-                reply_to_discord_channel,
-                &message_prefix,
-                &last_reply,
-                scheduler_delivery_awareness.as_ref(),
+            info!(
+                "Task loop: iteration {}/{} for task '{}' (assignee: {})",
+                iteration + 1,
+                max_iterations,
+                task_name,
+                assignee
+            );
+            let reply = crate::commands::ollama::answer_with_ollama_and_fetch(
+                crate::commands::ollama::OllamaRequest {
+                    question: question.clone(),
+                    agent_override,
+                    retry_on_verification_no: true,
+                    from_remote: true,
+                    discord_reply_channel_id: reply_to_discord_channel,
+                    compaction_hook_source: Some("task_runner".to_string()),
+                    partial_progress_capture: partial_progress_capture.clone(),
+                    ollama_queue_key: Some(ollama_k.clone()),
+                    ..Default::default()
+                },
             )
-            .await;
-            return Ok((last_reply, sent));
-        }
-    }
-    info!(
-        "Task loop: max iterations ({}) reached for task '{}'",
-        max_iterations, task_name
-    );
-    if let Some(ref p) = crate::task::find_current_path(&current_path) {
-        let status = crate::task::status_from_path(p).unwrap_or_default();
-        if status != "finished" && status != "unsuccessful" {
-            if let Ok(new_path) = crate::task::set_task_status(p, "unsuccessful") {
-                let _ = crate::task::append_to_task(
-                    &new_path,
-                    "Max iterations reached; closed as unsuccessful.",
-                );
+            .await
+            .map_err(|e| e.to_string())?;
+            last_reply = reply.text;
+            if let Some(ref p) = crate::task::find_current_path(&current_path) {
+                current_path = p.clone();
+            }
+            if crate::task::status_from_path(&current_path).as_deref() == Some("finished") {
+                info!("Task loop: task '{}' finished", task_name);
+                let sent = send_finished_summary_if_channel(
+                    &current_path,
+                    reply_to_discord_channel,
+                    &message_prefix,
+                    &last_reply,
+                    scheduler_delivery_awareness.as_ref(),
+                )
+                .await;
+                return Ok((last_reply, sent));
             }
         }
-    }
-    let summary = format!(
-        "Max iterations ({}) reached. Last reply: {}",
-        max_iterations,
-        last_reply.chars().take(500).collect::<String>()
-    );
-    let sent = send_finished_summary_if_channel(
-        &current_path,
-        reply_to_discord_channel,
-        &message_prefix,
-        &summary,
-        scheduler_delivery_awareness.as_ref(),
-    )
-    .await;
-    Ok((summary, sent))
+        info!(
+            "Task loop: max iterations ({}) reached for task '{}'",
+            max_iterations, task_name
+        );
+        if let Some(ref p) = crate::task::find_current_path(&current_path) {
+            let status = crate::task::status_from_path(p).unwrap_or_default();
+            if status != "finished" && status != "unsuccessful" {
+                if let Ok(new_path) = crate::task::set_task_status(p, "unsuccessful") {
+                    let _ = crate::task::append_to_task(
+                        &new_path,
+                        "Max iterations reached; closed as unsuccessful.",
+                    );
+                }
+            }
+        }
+        let summary = format!(
+            "Max iterations ({}) reached. Last reply: {}",
+            max_iterations,
+            last_reply.chars().take(500).collect::<String>()
+        );
+        let sent = send_finished_summary_if_channel(
+            &current_path,
+            reply_to_discord_channel,
+            &message_prefix,
+            &summary,
+            scheduler_delivery_awareness.as_ref(),
+        )
+        .await;
+        Ok((summary, sent))
+    })
+    .await
 }
 
 /// If we have a Discord channel (from caller or from task file ## Reply-to: discord <id>), send the finished summary. Returns true if sent.

@@ -70,7 +70,7 @@
 - Reloads schedules every **60 seconds** (configurable via `config.json` or `MAC_STATS_SCHEDULER_CHECK_SECS`)
 - Executes tasks using Ollama + tools or direct tool calls
 - Supports deduplication by `cron` + `task` (whitespace-normalized)
-- **Main chat awareness:** When a run **successfully** posts to Discord via `reply_to_channel_id`, the app records a short entry in `~/.mac-stats/scheduler_delivery_awareness.json` (deduped by a per-run `context_key`) and injects the latest entries into the **CPU window** Ollama **system** prompt on subsequent turns. Discord remains the source of truth for what was posted; the file + injection avoid split-brain when you later chat in-app. See **docs/data_files_reference.md** (scheduler_delivery_awareness.json). Settings → Schedules lists recent deliveries for operators.
+- **Main chat awareness:** When a run **successfully** posts to Discord via `reply_to_channel_id`, the app records a short entry in `~/.mac-stats/scheduler_delivery_awareness.json` (deduped by a per-run `context_key`) and injects the latest entries into the **CPU window** Ollama **system** prompt on subsequent turns. Discord remains the source of truth for what was posted; the file + injection avoid split-brain when you later chat in-app. See **docs/data_files_reference.md** (scheduler_delivery_awareness.json). Settings → Schedules lists recent deliveries for operators. With **`-vv`**, each CPU chat turn that prepends this block logs under target **`mac_stats::scheduler/delivery_awareness`** (`CPU chat: prepending scheduler→Discord delivery awareness…`).
 
 ### Heartbeat (optional, OpenClaw-style)
 

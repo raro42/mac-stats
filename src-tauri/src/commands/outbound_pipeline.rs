@@ -224,7 +224,9 @@ mod tests {
         let s = "a".repeat(2500);
         let chunks = split_discord_reply(&s, false);
         assert!(chunks.len() >= 2);
-        assert!(chunks.iter().all(|c| c.chars().count() <= DISCORD_CONTENT_MAX_CHARS));
+        assert!(chunks
+            .iter()
+            .all(|c| c.chars().count() <= DISCORD_CONTENT_MAX_CHARS));
     }
 
     #[test]

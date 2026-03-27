@@ -593,9 +593,7 @@ pub fn input_http(index: u32, text: &str) -> Result<String, String> {
     }
     let url = state.current_url.clone();
     let text = super::credentials::substitute_secret_tags_in_input(&url, text)?;
-    state
-        .form_values
-        .insert((el.form_id, name), text);
+    state.form_values.insert((el.form_id, name), text);
     let interactables = state.interactables.clone();
     drop(state);
     mark_browser_session_http_fallback();

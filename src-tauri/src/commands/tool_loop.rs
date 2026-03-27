@@ -13,7 +13,6 @@ use tracing::info;
 
 use crate::commands::discord_draft_stream::DiscordDraftHandle;
 use crate::commands::loop_guard::{ToolLoopAfterResult, ToolLoopGuard};
-use crate::commands::turn_lifecycle::TurnOutputGate;
 use crate::commands::ollama_chat::{send_ollama_chat_messages, OllamaHttpQueue};
 use crate::commands::redmine_helpers::{
     extract_redmine_time_entries_summary_for_reply, grounded_redmine_time_entries_failure_reply,
@@ -24,6 +23,7 @@ use crate::commands::tool_parsing::{
     normalize_browser_tool_arg, parse_all_tools_from_response, truncate_search_query_arg,
     MAX_BROWSER_TOOLS_PER_RUN,
 };
+use crate::commands::turn_lifecycle::TurnOutputGate;
 use crate::ollama::{ChatMessage, ChatOptions};
 
 /// One executed (or skipped) tool invocation in the agent router for observability and summaries.
@@ -70,8 +70,16 @@ pub(crate) fn tool_dispatch_message_is_error(tool: &str, message: &str) -> bool 
     if tool == "DONE" {
         return false;
     }
-    if tool == "FETCH_URL" && message.trim_start().starts_with("FETCH_URL error:") {
-        return true;
+    // FETCH_URL: `handle_fetch_url` usually returns Ok() with user-facing text; only rare paths use
+    // `FETCH_URL error:` (e.g. `reduce_fetched_content_to_fit` Err). SSRF blocks and HTTP failures
+    // surface as "That URL could not be fetched…" — those must count toward the failure budget.
+    if tool == "FETCH_URL" {
+        let m = message.trim_start();
+        return m.starts_with("FETCH_URL error:")
+            || m.starts_with("That URL could not be fetched")
+            || m.starts_with("That URL returned 401 Unauthorized")
+            || m.starts_with("Discord API failed")
+            || m.starts_with("Cannot fetch discord.com pages directly");
     }
     if tool == "RUN_CMD"
         && (message.starts_with("RUN_CMD failed")
@@ -116,6 +124,21 @@ fn summarize_result(message: &str) -> String {
     } else {
         t
     }
+}
+
+/// After a page-changing browser action in a multi-tool turn, later tools in the batch are skipped
+/// so the model cannot use stale element indices — except **screenshot** and **save PDF**, which
+/// only read the current document and remain valid on the post-navigation page.
+pub(crate) fn stale_batch_guard_should_skip_tool(
+    multi_tool_turn: bool,
+    page_changed_this_turn: bool,
+    batch_idx: usize,
+    tool: &str,
+) -> bool {
+    multi_tool_turn
+        && page_changed_this_turn
+        && batch_idx > 0
+        && !matches!(tool, "BROWSER_SCREENSHOT" | "BROWSER_SAVE_PDF")
 }
 
 /// Immutable parameters for the tool loop, set once before the loop starts.
@@ -212,11 +235,7 @@ pub(crate) struct ToolLoopResult {
     pub user_visible_footer: Option<String>,
 }
 
-fn send_status(
-    gate: Option<&TurnOutputGate>,
-    tx: Option<&UnboundedSender<String>>,
-    msg: &str,
-) {
+fn send_status(gate: Option<&TurnOutputGate>, tx: Option<&UnboundedSender<String>>, msg: &str) {
     if let Some(g) = gate {
         if !crate::commands::turn_lifecycle::gate_allows_send(g) {
             return;
@@ -283,8 +302,8 @@ pub(crate) async fn run_tool_loop(
         let mut failure_budget_break = false;
 
         let bump_failure_budget = |state: &mut ToolLoopState,
-                                       tool_results: &[String],
-                                       response_content: &mut String|
+                                   tool_results: &[String],
+                                   response_content: &mut String|
          -> bool {
             if state.consecutive_failures < params.max_consecutive_failures {
                 return false;
@@ -358,8 +377,14 @@ pub(crate) async fn run_tool_loop(
             };
 
             // Stale target guard (browser-use style): after a successful navigation in this batch,
-            // skip all remaining tools so the model is re-invoked with fresh state.
-            if multi_tool_turn && page_changed_this_turn && batch_idx > 0 {
+            // skip remaining index-based browser tools so the model is re-invoked with fresh state.
+            // Screenshot / PDF export still run — they capture the page as it is after navigation.
+            if stale_batch_guard_should_skip_tool(
+                multi_tool_turn,
+                page_changed_this_turn,
+                batch_idx,
+                &tool,
+            ) {
                 let msg = format!(
                     "Skipped ({tool}): browser page or target changed earlier in this batch; continue in the next model turn with updated state instead of chaining more tools here."
                 );
@@ -398,11 +423,9 @@ pub(crate) async fn run_tool_loop(
             }
 
             if let Some(ref draft) = params.discord_draft {
-                if params
-                    .output_gate
-                    .as_ref()
-                    .map_or(true, |g| crate::commands::turn_lifecycle::gate_allows_send(g))
-                {
+                if params.output_gate.as_ref().map_or(true, |g| {
+                    crate::commands::turn_lifecycle::gate_allows_send(g)
+                }) {
                     draft.update(format!("Running {}…", tool));
                 }
             }
@@ -559,8 +582,8 @@ pub(crate) async fn run_tool_loop(
                 state.last_browser_extract = Some(user_message.clone());
             }
 
-            let is_browser_error = is_browser_tool
-                && tool_dispatch_message_is_error(&tool, &user_message);
+            let is_browser_error =
+                is_browser_tool && tool_dispatch_message_is_error(&tool, &user_message);
             let is_multi_tool_run_cmd_error = tool == "RUN_CMD"
                 && user_message.starts_with("RUN_CMD failed in a multi-step plan");
 
@@ -576,7 +599,7 @@ pub(crate) async fn run_tool_loop(
             {
                 page_changed_this_turn = true;
                 info!(
-                    "Agent router: {} terminates sequence — remaining tools this batch will be skipped (stale guard)",
+                    "Agent router: {} completed — stale-batch guard applies to later index-based browser tools this batch (BROWSER_SCREENSHOT / BROWSER_SAVE_PDF still run)",
                     tool
                 );
             }
@@ -740,10 +763,11 @@ pub(crate) async fn run_tool_loop(
             params.budget_warning_ratio,
         );
 
-        let n_proactive = crate::commands::content_reduction::proactively_compact_tool_results_for_context_budget(
-            messages.as_mut_slice(),
-            params.model_context_size_tokens,
-        );
+        let n_proactive =
+            crate::commands::content_reduction::proactively_compact_tool_results_for_context_budget(
+                messages.as_mut_slice(),
+                params.model_context_size_tokens,
+            );
         if n_proactive > 0 {
             info!(
                 "Agent router: proactive context budget — {} tool-result compaction step(s) before follow-up Ollama call",
@@ -827,9 +851,7 @@ pub(crate) async fn run_tool_loop(
                         .unwrap_or_else(|| e.clone());
                 info!(
                     "Agent router: follow-up LLM call failed (consecutive_failures={}/{}): {}",
-                    state.consecutive_failures,
-                    params.max_consecutive_failures,
-                    sanitized
+                    state.consecutive_failures, params.max_consecutive_failures, sanitized
                 );
                 if state.consecutive_failures >= params.max_consecutive_failures {
                     state.stopped_due_to_failure_budget = true;
@@ -923,10 +945,8 @@ fn build_tool_run_footer(state: &ToolLoopState) -> Option<String> {
         .collect();
     names.sort_unstable();
     names.dedup();
-    let relevant = state.stopped_due_to_failure_budget
-        || state.hit_max_tool_iterations
-        || n >= 2
-        || fails > 0;
+    let relevant =
+        state.stopped_due_to_failure_budget || state.hit_max_tool_iterations || n >= 2 || fails > 0;
     if !relevant {
         return None;
     }
@@ -1399,13 +1419,69 @@ async fn dispatch_tool(
 
 #[cfg(test)]
 mod tool_step_tests {
-    use super::tool_dispatch_message_is_error;
+    use super::{stale_batch_guard_should_skip_tool, tool_dispatch_message_is_error};
+
+    #[test]
+    fn stale_batch_skips_click_after_navigate_in_multi_tool_turn() {
+        assert!(stale_batch_guard_should_skip_tool(
+            true,
+            true,
+            1,
+            "BROWSER_CLICK"
+        ));
+    }
+
+    #[test]
+    fn stale_batch_allows_screenshot_after_navigate_in_multi_tool_turn() {
+        assert!(!stale_batch_guard_should_skip_tool(
+            true,
+            true,
+            1,
+            "BROWSER_SCREENSHOT"
+        ));
+    }
+
+    #[test]
+    fn stale_batch_allows_save_pdf_after_navigate_in_multi_tool_turn() {
+        assert!(!stale_batch_guard_should_skip_tool(
+            true,
+            true,
+            1,
+            "BROWSER_SAVE_PDF"
+        ));
+    }
+
+    #[test]
+    fn stale_batch_first_tool_never_skipped_by_guard() {
+        assert!(!stale_batch_guard_should_skip_tool(
+            true,
+            true,
+            0,
+            "BROWSER_CLICK"
+        ));
+    }
 
     #[test]
     fn fetch_url_error_prefix_is_failure() {
         assert!(tool_dispatch_message_is_error(
             "FETCH_URL",
             "FETCH_URL error: connection refused"
+        ));
+    }
+
+    #[test]
+    fn fetch_url_user_visible_soft_fail_counts() {
+        assert!(tool_dispatch_message_is_error(
+            "FETCH_URL",
+            "That URL could not be fetched (connection or server error). Answer without that page."
+        ));
+    }
+
+    #[test]
+    fn fetch_url_401_short_circuit_counts() {
+        assert!(tool_dispatch_message_is_error(
+            "FETCH_URL",
+            "That URL returned 401 Unauthorized. Do not try another URL. Answer based on what you know."
         ));
     }
 

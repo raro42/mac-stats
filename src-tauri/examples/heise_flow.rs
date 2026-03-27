@@ -76,9 +76,8 @@ fn first_article_link_index(snapshot: &str) -> Option<u32> {
 fn main() {
     let _ = tracing_subscriber::fmt()
         .with_env_filter(
-            tracing_subscriber::EnvFilter::try_new("info,mac_stats=debug").unwrap_or_else(|_| {
-                tracing_subscriber::EnvFilter::new("info")
-            }),
+            tracing_subscriber::EnvFilter::try_new("info,mac_stats=debug")
+                .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info")),
         )
         .try_init();
 
@@ -103,7 +102,9 @@ fn main() {
                         eprintln!("article click: {e}");
                     }
                 } else {
-                    eprintln!("Could not pick a headline link; trying snapshot from post-OK state.");
+                    eprintln!(
+                        "Could not pick a headline link; trying snapshot from post-OK state."
+                    );
                     eprintln!("---\n{snap2}\n---");
                 }
             }

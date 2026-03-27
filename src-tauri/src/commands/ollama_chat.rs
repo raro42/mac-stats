@@ -15,8 +15,8 @@ use crate::commands::ollama_config::{
 };
 use crate::commands::outbound_pipeline::ReplyDedupState;
 use crate::mac_stats_info;
-pub use crate::ollama_queue::OllamaHttpQueue;
 use crate::ollama_queue::with_ollama_http_queue;
+pub use crate::ollama_queue::OllamaHttpQueue;
 
 fn flush_stream_ui_chunk(
     app_handle: &tauri::AppHandle,
@@ -306,12 +306,9 @@ pub async fn send_ollama_chat_messages_streaming(
         let messages_retry = messages.clone();
         let mo = model_override.clone();
         let oo = options_override.clone();
-        let mut out = send_ollama_chat_messages_streaming_inner(
-            messages,
-            model_override,
-            options_override,
-        )
-        .await;
+        let mut out =
+            send_ollama_chat_messages_streaming_inner(messages, model_override, options_override)
+                .await;
         if let Err(ref msg) = out {
             if crate::ollama::ollama_error_suggests_transient_cold_start(msg)
                 && OLLAMA_POST_START_COLD_CHAT_RETRY.swap(false, Ordering::SeqCst)
@@ -514,13 +511,7 @@ async fn send_ollama_chat_messages_streaming_inner(
         }
     }
 
-    flush_stream_ui_chunk(
-        &app_handle,
-        &mut dedup,
-        &mut pending_emit,
-        verbosity,
-        "eof",
-    );
+    flush_stream_ui_chunk(&app_handle, &mut dedup, &mut pending_emit, verbosity, "eof");
 
     // Stream ended without done: true; return what we have
     let response = crate::ollama::ChatResponse {

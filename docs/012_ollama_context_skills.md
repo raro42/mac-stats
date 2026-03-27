@@ -40,7 +40,8 @@ This document describes how mac-stats uses **per-model context window size**, **
 ### Load Different Models via Discord
 
 - **Convention:** In a Discord message, use a leading line `model: <name>` or `model=<name>` (case-insensitive). The rest of the message is the question. Example: `model: llama3.2\nWhat is 2+2?`
-- **Behaviour:** The app parses the message in `discord/mod.rs` (`parse_discord_ollama_overrides`). If a model override is present, it is validated against `GET /api/tags` (model must exist). Then `answer_with_ollama_and_fetch` uses that model for that request only; the global client config is unchanged.
+- **Behaviour:** The app parses the message in `discord/mod.rs` (`parse_discord_ollama_overrides`). If a model override is present, the router **prefers** the local `GET /api/tags` list: a missing tag **logs a warning**, **still runs the turn**, and prepends a short **⚠ … attempting anyway** line to the reply; Ollama’s `/api/chat` is the final arbiter if the model does not exist. Then `answer_with_ollama_and_fetch` uses that model for that request only; the global client config is unchanged.
+- **CLI:** `mac_stats discord run-ollama` uses the **same preamble parsing** (see `src/main.rs` and `parse_discord_ollama_overrides`), so you can test list-miss / model override behaviour without Discord, e.g. `model: definitely-not-in-list:zzz` then a newline and the question.
 - **Rust:** `commands/ollama.rs` → `answer_with_ollama_and_fetch(..., model_override, ...)` and `send_ollama_chat_messages(messages, model_override, options_override)`.
 
 ### When Model Data Is Missing or the Override Is Invalid
@@ -90,7 +91,7 @@ This document describes how mac-stats uses **per-model context window size**, **
 - **All agents overview:** `docs/100_all_agents.md`
 - **Discord agent:** `docs/007_discord_agent.md`
 - **Ollama API (list, version, pull, delete, embeddings, load/unload):** `docs/015_ollama_api.md`
-- **Code:** `src-tauri/src/ollama/mod.rs` (ModelInfo, ChatOptions, get_model_info), `src-tauri/src/commands/ollama.rs` (answer_with_ollama_and_fetch, reduce_fetched_content_to_fit, send_ollama_chat_messages), `src-tauri/src/discord/mod.rs` (parse_discord_ollama_overrides), `src-tauri/src/skills.rs` (load_skills, find_skill_by_number_or_topic), `src-tauri/src/config/mod.rs` (skills_dir).
+- **Code:** `src-tauri/src/ollama/mod.rs` (ModelInfo, ChatOptions, get_model_info), `src-tauri/src/commands/ollama.rs` (answer_with_ollama_and_fetch, reduce_fetched_content_to_fit, send_ollama_chat_messages), `src-tauri/src/discord/mod.rs` (parse_discord_ollama_overrides), `src-tauri/src/main.rs` (CLI `discord run-ollama` preamble), `src-tauri/src/skills.rs` (load_skills, find_skill_by_number_or_topic), `src-tauri/src/config/mod.rs` (skills_dir).
 
 ## Open tasks
 

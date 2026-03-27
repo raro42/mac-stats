@@ -46,10 +46,7 @@ pub fn canonical_outbound_attachment_root_dirs() -> Vec<PathBuf> {
     for p in Config::extra_attachment_roots() {
         if let Ok(c) = p.canonicalize() {
             if !c.is_dir() {
-                tracing::debug!(
-                    "extraAttachmentRoots: skip non-directory {}",
-                    c.display()
-                );
+                tracing::debug!("extraAttachmentRoots: skip non-directory {}", c.display());
                 continue;
             }
             let allowed_base = match (&mac_stats_canon, &home_canon) {

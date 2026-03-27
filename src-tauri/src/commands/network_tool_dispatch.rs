@@ -6,8 +6,8 @@
 use tracing::info;
 
 use crate::commands::content_reduction::{reduce_fetched_content_to_fit, CHARS_PER_TOKEN};
-use crate::commands::untrusted_content::wrap_untrusted_content;
 use crate::commands::redmine_helpers::is_redmine_review_or_summarize_only;
+use crate::commands::untrusted_content::wrap_untrusted_content;
 
 fn send_status(tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>, msg: &str) {
     if let Some(tx) = tx {
@@ -76,13 +76,12 @@ pub(crate) async fn handle_fetch_url(
     );
     info!("Discord/Ollama: FETCH_URL requested: {}", arg);
     let url = arg.to_string();
-    let fetch_result =
-        tokio::task::spawn_blocking(move || {
-            crate::commands::browser::fetch_page_content_for_agent(&url)
-        })
-            .await
-            .map_err(|e| format!("Fetch task: {}", e))?
-            .map_err(|e| format!("Fetch page failed: {}", e));
+    let fetch_result = tokio::task::spawn_blocking(move || {
+        crate::commands::browser::fetch_page_content_for_agent(&url)
+    })
+    .await
+    .map_err(|e| format!("Fetch task: {}", e))?
+    .map_err(|e| format!("Fetch page failed: {}", e));
 
     match fetch_result {
         Ok(body) => {

@@ -172,10 +172,7 @@ fn aux_download_session(
                         if guid.is_empty() {
                             continue;
                         }
-                        let state = params
-                            .get("state")
-                            .and_then(|g| g.as_str())
-                            .unwrap_or("");
+                        let state = params.get("state").and_then(|g| g.as_str()).unwrap_or("");
                         let received = params
                             .get("receivedBytes")
                             .and_then(|x| x.as_f64())
@@ -254,10 +251,7 @@ pub fn apply_browser_download_behavior_best_effort(ws_url: &str, download_dir: &
             "eventsEnabled": true
         }
     });
-    if socket
-        .send(Message::Text(cmd.to_string().into()))
-        .is_err()
-    {
+    if socket.send(Message::Text(cmd.to_string().into())).is_err() {
         return;
     }
     for _ in 0..20 {
@@ -327,7 +321,11 @@ pub fn merge_with_directory_diff(
     let post = download_dir_file_snapshot(download_dir);
     let mut out: Vec<PathBuf> = cdp_paths.to_vec();
     for p in post.difference(pre) {
-        if is_partial_download_name(&p.file_name().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default()) {
+        if is_partial_download_name(
+            &p.file_name()
+                .map(|s| s.to_string_lossy().into_owned())
+                .unwrap_or_default(),
+        ) {
             continue;
         }
         if let Some(c) = normalize_download_path(p, download_dir) {
@@ -348,11 +346,7 @@ pub fn format_download_attachment_note(paths: &[PathBuf]) -> String {
     let mut s = String::from("\n**Download:** ");
     for p in paths {
         let sz = fs::metadata(p).map(|m| m.len()).unwrap_or(0);
-        s.push_str(&format!(
-            "{} ({}) ",
-            p.display(),
-            human_bytes(sz)
-        ));
+        s.push_str(&format!("{} ({}) ", p.display(), human_bytes(sz)));
     }
     s.push_str("\n");
     for p in paths {
@@ -394,9 +388,10 @@ pub fn prune_old_browser_downloads(max_age: Duration) {
         }
     }
     if removed > 0 {
+        // Bracket tag: file layer uses with_target(false), so grep debug.log for `[browser/downloads]`.
         crate::mac_stats_info!(
             "browser/downloads",
-            "Pruned {} browser download file(s), freed {} bytes (older than {:?})",
+            "[browser/downloads] Pruned {} browser download file(s), freed {} bytes (older than {:?})",
             removed,
             freed,
             max_age

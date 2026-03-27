@@ -3,9 +3,10 @@
 //! Provides server-side page fetch (no CORS). Used by the Ollama tool protocol
 //! (FETCH_URL) and can be invoked from the frontend.
 
-use std::net::{IpAddr, Ipv6Addr, ToSocketAddrs};
-use std::time::Duration;
 use regex::Regex;
+use std::net::{IpAddr, Ipv6Addr, ToSocketAddrs};
+use std::path::PathBuf;
+use std::time::Duration;
 use tracing::{info, warn};
 use url::Url;
 
@@ -225,6 +226,70 @@ pub fn validate_url_no_ssrf(url: &Url, allowed_hosts: &[String]) -> Result<(), S
         }
     }
     Ok(())
+}
+
+/// Validate a `file:` URL for **BROWSER_NAVIGATE** / CDP navigation. Only local `.html` / `.htm`
+/// files are allowed; the path is canonicalized so symlink tricks cannot bypass the suffix check.
+pub fn validate_file_url_for_browser_navigation(url: &Url) -> Result<PathBuf, String> {
+    if !url.scheme().eq_ignore_ascii_case("file") {
+        return Err("internal: expected file: URL".to_string());
+    }
+    let path = url
+        .to_file_path()
+        .map_err(|_| "file URL could not be converted to a local path".to_string())?;
+    let meta =
+        std::fs::metadata(&path).map_err(|e| format!("file URL path not accessible: {}", e))?;
+    if !meta.is_file() {
+        return Err("file navigation only allows a regular file (not a directory)".to_string());
+    }
+    let canon = std::fs::canonicalize(&path)
+        .map_err(|e| format!("could not canonicalize file URL path: {}", e))?;
+    let ext = canon
+        .extension()
+        .and_then(|s| s.to_str())
+        .map(|s| s.to_ascii_lowercase());
+    match ext.as_deref() {
+        Some("html") | Some("htm") => Ok(canon),
+        _ => Err(
+            "file navigation is limited to .html or .htm files (after resolving symlinks)"
+                .to_string(),
+        ),
+    }
+}
+
+/// Normalize the operator/model URL string and run pre-navigation checks for CDP (`Page.navigate`).
+///
+/// - Adds `https://` when no scheme is present (existing behaviour).
+/// - Preserves `file://` URLs; [`validate_file_url_for_browser_navigation`] applies.
+/// - **http/https:** [`validate_url_no_ssrf`].
+pub fn normalize_and_validate_cdp_navigation_url(url: &str) -> Result<String, String> {
+    let u = url.trim();
+    if u.is_empty() {
+        return Err("Navigation URL is empty".to_string());
+    }
+    let normalized = if u.len() >= 7 && u[..7].eq_ignore_ascii_case("file://") {
+        u.to_string()
+    } else if u.starts_with("http://") || u.starts_with("https://") {
+        u.to_string()
+    } else {
+        format!("https://{}", u)
+    };
+    match Url::parse(&normalized) {
+        Ok(parsed) if parsed.scheme().eq_ignore_ascii_case("file") => {
+            let canon = validate_file_url_for_browser_navigation(&parsed)?;
+            Url::from_file_path(&canon)
+                .map(|u| u.to_string())
+                .map_err(|()| {
+                    "file navigation: could not encode canonical path as file URL".to_string()
+                })
+        }
+        Ok(parsed) => {
+            let allowed = crate::config::Config::ssrf_allowed_hosts();
+            validate_url_no_ssrf(&parsed, &allowed)?;
+            Ok(normalized)
+        }
+        Err(_) => Ok(normalized),
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -453,6 +518,7 @@ fn fetch_page_content_with_proxy_context(
 
 /// POST `application/x-www-form-urlencoded` to a URL and return the response body as text.
 /// Same validation, SSRF policy, redirect handling, timeout, and truncation as [`fetch_page_content`].
+#[allow(dead_code)] // Public API for embedders; in-crate callers use `fetch_page_post_form_urlencoded_for_agent`.
 pub fn fetch_page_post_form_urlencoded(
     url: &str,
     pairs: &[(String, String)],
@@ -848,5 +914,29 @@ mod tests {
             "unexpected message: {}",
             msg
         );
+    }
+
+    #[test]
+    fn cdp_nav_url_accepts_existing_html_file() {
+        let dir = std::env::temp_dir().join(format!("mac_stats_nav_test_{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let p = dir.join("t.html");
+        std::fs::write(&p, "<html><body>x</body></html>").unwrap();
+        let url = Url::from_file_path(&p).unwrap().to_string();
+        let out = normalize_and_validate_cdp_navigation_url(&url).unwrap();
+        assert!(out.starts_with("file:///"), "{}", out);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn cdp_nav_url_rejects_non_html_file() {
+        let dir =
+            std::env::temp_dir().join(format!("mac_stats_nav_test_txt_{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let p = dir.join("x.txt");
+        std::fs::write(&p, "nope").unwrap();
+        let url = Url::from_file_path(&p).unwrap().to_string();
+        assert!(normalize_and_validate_cdp_navigation_url(&url).is_err());
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

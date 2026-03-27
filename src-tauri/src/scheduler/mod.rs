@@ -443,12 +443,8 @@ async fn execute_task(
                     .id
                     .as_deref()
                     .map(|sid| format!("[Schedule: {}] ", sid));
-                let scheduler_awareness = reply_to_channel.map(|_| {
-                    (
-                        delivery_context_key.clone(),
-                        entry.id.clone(),
-                    )
-                });
+                let scheduler_awareness =
+                    reply_to_channel.map(|_| (delivery_context_key.clone(), entry.id.clone()));
                 match crate::task::runner::run_task_until_finished(
                     path,
                     10,
@@ -498,68 +494,74 @@ async fn execute_task(
         .reply_to_channel_id
         .as_ref()
         .and_then(|s| s.parse::<u64>().ok());
-    let stale_mid = format!(
-        "scheduler-due:{}:{}",
-        id_info,
-        due_utc.timestamp_millis()
-    );
+    let session_key = reply_to_ch
+        .map(|id| format!("discord:{}", id))
+        .unwrap_or_else(|| format!("scheduler:{}", id_info));
+    let stale_mid = format!("scheduler-due:{}:{}", id_info, due_utc.timestamp_millis());
     crate::commands::suspicious_patterns::log_untrusted_suspicious_scan("scheduler-task", task);
-    match crate::commands::ollama::answer_with_ollama_and_fetch(
-        crate::commands::ollama::OllamaRequest {
-            question: crate::commands::untrusted_content::wrap_untrusted_content(
-                "scheduler-task",
-                task,
-            ),
-            retry_on_verification_no: true,
-            from_remote: true,
-            discord_reply_channel_id: reply_to_ch,
-            inbound_stale_guard: Some(crate::commands::abort_cutoff::InboundStaleGuard {
-                message_id: stale_mid,
-                timestamp_utc: due_utc,
-            }),
-            compaction_hook_source: Some("scheduler".to_string()),
-            partial_progress_capture: partial_capture.clone(),
-            ollama_queue_key: Some("scheduler".to_string()),
-            ..Default::default()
-        },
-    )
-    .await
-    {
-        Ok(reply) => {
-            info!(
-                "Scheduler: Ollama completed (id={}, {} chars)",
-                id_info,
-                reply.text.chars().count()
-            );
-            crate::commands::judge::run_judge_if_enabled(
-                task,
-                &reply.text,
-                &reply.attachment_paths,
-                None,
-            )
-            .await;
-            Ok(Some(ScheduleExecuteSuccess {
-                reply_text: reply.text,
-                already_sent_to_discord: false,
-                delivery_context_key,
-            }))
-        }
-        Err(e) => {
-            if matches!(
-                &e,
-                crate::commands::ollama_run_error::OllamaRunError::StaleInboundAfterAbort
-            ) {
-                debug!(
-                    target: "mac_stats::ollama/chat",
-                    schedule_id = id_info,
-                    "Scheduler: Ollama run skipped (stale vs abort cutoff)"
+    let ollama_k = session_key.clone();
+    let task_body = task.to_string();
+    let schedule_id_log = id_info.to_string();
+    let delivery_ck = delivery_context_key.clone();
+    crate::keyed_queue::run_serial(session_key, async move {
+        match crate::commands::ollama::answer_with_ollama_and_fetch(
+            crate::commands::ollama::OllamaRequest {
+                question: crate::commands::untrusted_content::wrap_untrusted_content(
+                    "scheduler-task",
+                    &task_body,
+                ),
+                retry_on_verification_no: true,
+                from_remote: true,
+                discord_reply_channel_id: reply_to_ch,
+                inbound_stale_guard: Some(crate::commands::abort_cutoff::InboundStaleGuard {
+                    message_id: stale_mid,
+                    timestamp_utc: due_utc,
+                }),
+                compaction_hook_source: Some("scheduler".to_string()),
+                partial_progress_capture: partial_capture.clone(),
+                ollama_queue_key: Some(ollama_k),
+                ..Default::default()
+            },
+        )
+        .await
+        {
+            Ok(reply) => {
+                info!(
+                    "Scheduler: Ollama completed (id={}, {} chars)",
+                    schedule_id_log,
+                    reply.text.chars().count()
                 );
-                return Ok(None);
+                crate::commands::judge::run_judge_if_enabled(
+                    &task_body,
+                    &reply.text,
+                    &reply.attachment_paths,
+                    None,
+                )
+                .await;
+                Ok(Some(ScheduleExecuteSuccess {
+                    reply_text: reply.text,
+                    already_sent_to_discord: false,
+                    delivery_context_key: delivery_ck,
+                }))
             }
-            error!("Scheduler: Ollama failed (id={}): {}", id_info, e);
-            Err(e.to_string())
+            Err(e) => {
+                if matches!(
+                    &e,
+                    crate::commands::ollama_run_error::OllamaRunError::StaleInboundAfterAbort
+                ) {
+                    debug!(
+                        target: "mac_stats::ollama/chat",
+                        schedule_id = %schedule_id_log,
+                        "Scheduler: Ollama run skipped (stale vs abort cutoff)"
+                    );
+                    return Ok(None);
+                }
+                error!("Scheduler: Ollama failed (id={}): {}", schedule_id_log, e);
+                Err(e.to_string())
+            }
         }
-    }
+    })
+    .await
 }
 
 async fn scheduler_loop() {

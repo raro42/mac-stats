@@ -10,7 +10,7 @@ use tracing::info;
 
 use crate::commands::browser_helpers::{
     append_latest_browser_state_guidance, extract_browser_navigation_target,
-    should_use_http_fallback_after_browser_action_error,
+    is_cdp_navigation_timeout_error, should_use_http_fallback_after_browser_action_error,
 };
 use crate::config::Config;
 
@@ -41,14 +41,55 @@ fn browser_click_coord_y_re() -> &'static Regex {
 
 fn browser_search_css_scope_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| {
-        Regex::new(r"(?i)\bcss_scope\s*[:=]\s*(.+)$").expect("css_scope regex")
-    })
+    RE.get_or_init(|| Regex::new(r"(?i)\bcss_scope\s*[:=]\s*(.+)$").expect("css_scope regex"))
+}
+
+/// Models sometimes fuse several `TOOL: arg` fragments into one line, e.g.
+/// `Example css_scope=h1 BROWSER_QUERY: a attrs=href` or `… DONE: success`.
+/// Truncate at the first whitespace-delimited known `NAME:` tool prefix so
+/// `css_scope` / `attrs` values do not swallow the next invocation.
+fn truncate_browser_dispatch_arg_at_embedded_tools(s: &str) -> &str {
+    let s = s.trim_end();
+    let bytes = s.as_bytes();
+    let mut search_from = 0usize;
+    while search_from < bytes.len() {
+        let Some(rel_ws) = s[search_from..].find(|c: char| c.is_ascii_whitespace()) else {
+            break;
+        };
+        let end_ws = search_from + rel_ws;
+        let mut j = end_ws;
+        while j < bytes.len() && bytes[j].is_ascii_whitespace() {
+            j += 1;
+        }
+        if j >= bytes.len() {
+            break;
+        }
+        if !bytes[j].is_ascii_uppercase() {
+            search_from = end_ws + 1;
+            continue;
+        }
+        let name_start = j;
+        j += 1;
+        while j < bytes.len()
+            && (bytes[j].is_ascii_uppercase() || bytes[j].is_ascii_digit() || bytes[j] == b'_')
+        {
+            j += 1;
+        }
+        if j < bytes.len() && bytes[j] == b':' {
+            let name = &s[name_start..j];
+            let prefix = format!("{}:", name);
+            if crate::commands::tool_registry::is_known_tool_prefix(&prefix) {
+                return s.get(..end_ws).unwrap_or("").trim_end();
+            }
+        }
+        search_from = end_ws + 1;
+    }
+    s
 }
 
 /// Text pattern and optional subtree selector for `BROWSER_SEARCH_PAGE`.
 fn parse_browser_search_page_arg(arg: &str) -> (String, Option<String>) {
-    let trimmed = arg.trim();
+    let trimmed = truncate_browser_dispatch_arg_at_embedded_tools(arg.trim());
     if let Some(caps) = browser_search_css_scope_re().captures(trimmed) {
         let scope = caps.get(1).and_then(|m| {
             let t = m.as_str().trim();
@@ -73,7 +114,7 @@ fn browser_query_attrs_re() -> &'static Regex {
 
 /// CSS selector and optional comma-separated attribute names for `BROWSER_QUERY`.
 fn parse_browser_query_arg(arg: &str) -> (String, Option<String>) {
-    let trimmed = arg.trim();
+    let trimmed = truncate_browser_dispatch_arg_at_embedded_tools(arg.trim());
     if let Some(caps) = browser_query_attrs_re().captures(trimmed) {
         let attrs = caps.get(1).and_then(|m| {
             let t = m.as_str().trim();
@@ -167,10 +208,9 @@ fn append_browser_readiness_context(
     cdp_used: bool,
     nav_url_changed: Option<bool>,
 ) -> String {
-    if let Some(ctx) = crate::browser_agent::format_last_browser_error_context(
-        cdp_used,
-        nav_url_changed,
-    ) {
+    if let Some(ctx) =
+        crate::browser_agent::format_last_browser_error_context(cdp_used, nav_url_changed)
+    {
         crate::mac_stats_debug!(
             "browser/tools",
             "Browser tool error context: {}",
@@ -339,7 +379,9 @@ pub(crate) async fn handle_browser_navigate(
         );
         match tokio::task::spawn_blocking({
             let u = url_arg.clone();
-            move || crate::browser_agent::navigate_and_get_state_with_options_and_downloads(&u, new_tab)
+            move || {
+                crate::browser_agent::navigate_and_get_state_with_options_and_downloads(&u, new_tab)
+            }
         })
         .await
         {
@@ -354,46 +396,67 @@ pub(crate) async fn handle_browser_navigate(
                 tokio::task::spawn_blocking(move || {
                     crate::browser_agent::ensure_chrome_on_port(cdp_port)
                 })
-                    .await
-                    .ok();
+                .await
+                .ok();
                 match tokio::task::spawn_blocking({
                     let u = url_arg.clone();
-                    move || crate::browser_agent::navigate_and_get_state_with_options_and_downloads(&u, new_tab)
+                    move || {
+                        crate::browser_agent::navigate_and_get_state_with_options_and_downloads(
+                            &u, new_tab,
+                        )
+                    }
                 })
                 .await
                 {
                     Ok(Ok((state_str, dls))) => (state_str, dls),
                     Ok(Err(cdp_err2)) => {
-                        info!(
-                            "BROWSER_NAVIGATE CDP retry failed, trying HTTP fallback: {}",
-                            crate::logging::ellipse(&cdp_err2, 120)
-                        );
-                        match tokio::task::spawn_blocking(move || {
-                            crate::browser_agent::navigate_http(&url_arg)
-                        })
-                        .await
-                        {
-                            Ok(Ok(state_str)) => (state_str, vec![]),
-                            Ok(Err(http_err)) => {
-                                let nav_url_changed =
-                                    nav_url_changed_hint_if_navigation_timeout(&cdp_err2);
-                                let base = format!(
-                                    "BROWSER_NAVIGATE failed (CDP: {}). HTTP fallback also failed: {}",
-                                    crate::logging::ellipse(&cdp_err2, 80),
-                                    http_err
-                                );
-                                (
-                                    append_browser_readiness_context(base, false, nav_url_changed),
-                                    vec![],
-                                )
-                            }
-                            Err(e) => (
-                                format!("BROWSER_NAVIGATE HTTP fallback task error: {}", e),
+                        if is_cdp_navigation_timeout_error(&cdp_err2) {
+                            crate::mac_stats_debug!(
+                                "browser/tools",
+                                "BROWSER_NAVIGATE: CDP navigation timeout after retry; skipping HTTP fallback so tool error is not masked by fetch success"
+                            );
+                            let nav_url_changed =
+                                nav_url_changed_hint_if_navigation_timeout(&cdp_err2);
+                            let base = format!("BROWSER_NAVIGATE failed: {}", cdp_err2);
+                            (
+                                append_browser_readiness_context(base, true, nav_url_changed),
                                 vec![],
-                            ),
+                            )
+                        } else {
+                            info!(
+                                "BROWSER_NAVIGATE CDP retry failed, trying HTTP fallback: {}",
+                                crate::logging::ellipse(&cdp_err2, 120)
+                            );
+                            match tokio::task::spawn_blocking(move || {
+                                crate::browser_agent::navigate_http(&url_arg)
+                            })
+                            .await
+                            {
+                                Ok(Ok(state_str)) => (state_str, vec![]),
+                                Ok(Err(http_err)) => {
+                                    let nav_url_changed =
+                                        nav_url_changed_hint_if_navigation_timeout(&cdp_err2);
+                                    let base = format!(
+                                        "BROWSER_NAVIGATE failed (CDP: {}). HTTP fallback also failed: {}",
+                                        crate::logging::ellipse(&cdp_err2, 80),
+                                        http_err
+                                    );
+                                    (
+                                        append_browser_readiness_context(base, false, nav_url_changed),
+                                        vec![],
+                                    )
+                                }
+                                Err(e) => (
+                                    format!("BROWSER_NAVIGATE HTTP fallback task error: {}", e),
+                                    vec![],
+                                ),
+                            }
                         }
                     }
-                    Err(e) => (format!("BROWSER_NAVIGATE CDP retry task error: {}", e), vec![]),
+                    Err(e) => (
+                        format!("BROWSER_NAVIGATE CDP retry task error: {}", e),
+                        vec![],
+                    ),
                 }
             }
             Err(e) => (format!("BROWSER_NAVIGATE task error: {}", e), vec![]),
@@ -461,7 +524,11 @@ pub(crate) async fn handle_browser_reload(
         return msg;
     }
 
-    let tok = arg.split_whitespace().next().unwrap_or("").to_ascii_lowercase();
+    let tok = arg
+        .split_whitespace()
+        .next()
+        .unwrap_or("")
+        .to_ascii_lowercase();
     let ignore_cache = matches!(tok.as_str(), "nocache" | "hard" | "bypass");
     let status_msg = if ignore_cache {
         "🔄 Reloading page (cache bypass)…"
@@ -517,15 +584,20 @@ pub(crate) async fn handle_browser_switch_tab(
         return msg;
     }
 
-    let trimmed = arg.trim();
-    let index = match trimmed.parse::<usize>() {
-        Ok(i) => i,
-        Err(_) => {
+    let (index, had_trailing) = match parse_browser_tab_index_arg(arg) {
+        Ok(v) => v,
+        Err(()) => {
             return append_latest_browser_state_guidance(
                 "BROWSER_SWITCH_TAB requires a 0-based tab index matching the Tabs line in the latest browser state (e.g. BROWSER_SWITCH_TAB: 0).",
             );
         }
     };
+    if had_trailing {
+        info!(
+            "Agent router [{}]: BROWSER_SWITCH_TAB using first token only (trailing text ignored)",
+            request_id
+        );
+    }
     send_status(status_tx, &format!("🗂️ Switching to tab {}…", index));
     info!(
         "Agent router [{}]: BROWSER_SWITCH_TAB index={}",
@@ -553,22 +625,26 @@ pub(crate) async fn handle_browser_close_tab(
         return msg;
     }
 
-    let trimmed = arg.trim();
-    let index = match trimmed.parse::<usize>() {
-        Ok(i) => i,
-        Err(_) => {
+    let (index, had_trailing) = match parse_browser_tab_index_arg(arg) {
+        Ok(v) => v,
+        Err(()) => {
             return append_latest_browser_state_guidance(
                 "BROWSER_CLOSE_TAB requires a 0-based tab index matching the Tabs line (e.g. BROWSER_CLOSE_TAB: 1). Cannot close the last remaining tab.",
             );
         }
     };
+    if had_trailing {
+        info!(
+            "Agent router [{}]: BROWSER_CLOSE_TAB using first token only (trailing text ignored)",
+            request_id
+        );
+    }
     send_status(status_tx, &format!("🗑️ Closing tab {}…", index));
     info!(
         "Agent router [{}]: BROWSER_CLOSE_TAB index={}",
         request_id, index
     );
-    match tokio::task::spawn_blocking(move || crate::browser_agent::close_tab_at_index(index))
-        .await
+    match tokio::task::spawn_blocking(move || crate::browser_agent::close_tab_at_index(index)).await
     {
         Ok(Ok(state_str)) => state_str,
         Ok(Err(e)) => {
@@ -580,8 +656,23 @@ pub(crate) async fn handle_browser_close_tab(
     }
 }
 
+/// Tab index from the first whitespace-separated token only, so compound model lines
+/// (e.g. `0 BROWSER_CLOSE_TAB: 1`) still work; extra tokens are ignored.
+fn parse_browser_tab_index_arg(arg: &str) -> Result<(usize, bool), ()> {
+    let trimmed = arg.trim();
+    let mut it = trimmed.split_whitespace();
+    let token = it.next().ok_or(())?;
+    if token.is_empty() {
+        return Err(());
+    }
+    let index = token.parse::<usize>().map_err(|_| ())?;
+    let had_trailing_tokens = it.next().is_some();
+    Ok((index, had_trailing_tokens))
+}
+
 fn parse_browser_hover_arg(arg: &str) -> Result<u32, String> {
-    let first = arg.trim().split_whitespace().next().unwrap_or("");
+    let line = arg.trim().lines().next().unwrap_or("").trim();
+    let first = line.split_whitespace().next().unwrap_or("");
     let idx = first.parse::<u32>().map_err(|_| {
         "BROWSER_HOVER requires a 1-based element index (e.g. BROWSER_HOVER: 4).".to_string()
     })?;
@@ -592,7 +683,8 @@ fn parse_browser_hover_arg(arg: &str) -> Result<u32, String> {
 }
 
 fn parse_browser_drag_arg(arg: &str) -> Result<(u32, u32), String> {
-    let mut it = arg.trim().split_whitespace();
+    let line = arg.trim().lines().next().unwrap_or("").trim();
+    let mut it = line.split_whitespace();
     let a = it.next().ok_or_else(|| {
         "BROWSER_DRAG requires two 1-based indices: BROWSER_DRAG: <from_index> <to_index>."
             .to_string()
@@ -755,10 +847,7 @@ pub(crate) async fn handle_browser_hover(
             (append_latest_browser_state_guidance(&base), vec![])
         }
         Err(e) => (
-            append_latest_browser_state_guidance(&format!(
-                "BROWSER_HOVER task error: {}",
-                e
-            )),
+            append_latest_browser_state_guidance(&format!("BROWSER_HOVER task error: {}", e)),
             vec![],
         ),
     }
@@ -809,10 +898,7 @@ pub(crate) async fn handle_browser_drag(
             (append_latest_browser_state_guidance(&base), vec![])
         }
         Err(e) => (
-            append_latest_browser_state_guidance(&format!(
-                "BROWSER_DRAG task error: {}",
-                e
-            )),
+            append_latest_browser_state_guidance(&format!("BROWSER_DRAG task error: {}", e)),
             vec![],
         ),
     }
@@ -973,10 +1059,9 @@ pub(crate) async fn handle_browser_upload(
             let base = append_browser_readiness_context(base, true, None);
             append_latest_browser_state_guidance(&base)
         }
-        Err(e) => append_latest_browser_state_guidance(&format!(
-            "BROWSER_UPLOAD task error: {}",
-            e
-        )),
+        Err(e) => {
+            append_latest_browser_state_guidance(&format!("BROWSER_UPLOAD task error: {}", e))
+        }
     }
 }
 
@@ -1083,7 +1168,10 @@ pub(crate) async fn handle_browser_extract(raw_arg: &str) -> String {
     .await
     {
         Ok(Ok(text)) => {
-            crate::commands::suspicious_patterns::log_untrusted_suspicious_scan("browser-extract", &text);
+            crate::commands::suspicious_patterns::log_untrusted_suspicious_scan(
+                "browser-extract",
+                &text,
+            );
             crate::commands::untrusted_content::wrap_untrusted_content("browser-extract", &text)
         }
         Ok(Err(_cdp_err)) => {
@@ -1118,6 +1206,16 @@ pub(crate) async fn handle_browser_search_page(
         return msg;
     }
 
+    let arg_trim = arg.trim();
+    let truncated = truncate_browser_dispatch_arg_at_embedded_tools(arg_trim);
+    if truncated.len() < arg_trim.len() {
+        crate::mac_stats_debug!(
+            "browser/tools",
+            "BROWSER_SEARCH_PAGE: truncated fused tool tokens in model arg before parse ({})",
+            crate::logging::ellipse(arg_trim, 160)
+        );
+    }
+
     let (pattern, css_scope) = parse_browser_search_page_arg(arg);
     if pattern.is_empty() {
         return "BROWSER_SEARCH_PAGE requires a search pattern (e.g. BROWSER_SEARCH_PAGE: Ralf Röber). Optional: css_scope=<CSS selector> to search only inside that subtree (e.g. BROWSER_SEARCH_PAGE: price css_scope=main).".to_string();
@@ -1145,10 +1243,7 @@ pub(crate) async fn handle_browser_search_page(
     let pattern_clone = pattern.clone();
     let scope_clone = css_scope.clone();
     match tokio::task::spawn_blocking(move || {
-        crate::browser_agent::search_page_text(
-            &pattern_clone,
-            scope_clone.as_deref(),
-        )
+        crate::browser_agent::search_page_text(&pattern_clone, scope_clone.as_deref())
     })
     .await
     {
@@ -1176,16 +1271,23 @@ pub(crate) async fn handle_browser_query(
         return msg;
     }
 
+    let arg_trim = arg.trim();
+    let truncated = truncate_browser_dispatch_arg_at_embedded_tools(arg_trim);
+    if truncated.len() < arg_trim.len() {
+        crate::mac_stats_debug!(
+            "browser/tools",
+            "BROWSER_QUERY: truncated fused tool tokens in model arg before parse ({})",
+            crate::logging::ellipse(arg_trim, 160)
+        );
+    }
+
     let (selector, attrs) = parse_browser_query_arg(arg);
     if selector.is_empty() {
         return "BROWSER_QUERY requires a CSS selector (e.g. BROWSER_QUERY: nav a). Optional: attrs=href,id,class (comma-separated).".to_string();
     }
     send_status(
         status_tx,
-        &format!(
-            "🧩 CSS query {}…",
-            crate::logging::ellipse(&selector, 40)
-        ),
+        &format!("🧩 CSS query {}…", crate::logging::ellipse(&selector, 40)),
     );
     info!(
         "BROWSER_QUERY: selector={} attrs={}",
@@ -1204,10 +1306,7 @@ pub(crate) async fn handle_browser_query(
     {
         Ok(Ok(result)) => result,
         Ok(Err(e)) => {
-            info!(
-                "BROWSER_QUERY failed: {}",
-                crate::logging::ellipse(&e, 200)
-            );
+            info!("BROWSER_QUERY failed: {}", crate::logging::ellipse(&e, 200));
             let base = format!(
                 "BROWSER_QUERY failed: {}. (Navigate to a page first with BROWSER_NAVIGATE.)",
                 e
@@ -1222,8 +1321,20 @@ pub(crate) async fn handle_browser_query(
 mod browser_arg_parse_tests {
     use super::{
         parse_browser_click_arg, parse_browser_query_arg, parse_browser_search_page_arg,
-        BrowserClickTarget,
+        parse_browser_tab_index_arg, BrowserClickTarget,
     };
+
+    #[test]
+    fn tab_index_first_token_only() {
+        assert_eq!(parse_browser_tab_index_arg("0"), Ok((0, false)));
+        assert_eq!(
+            parse_browser_tab_index_arg("0 BROWSER_CLOSE_TAB: 1"),
+            Ok((0, true))
+        );
+        assert_eq!(parse_browser_tab_index_arg("  2  "), Ok((2, false)));
+        assert!(parse_browser_tab_index_arg("").is_err());
+        assert!(parse_browser_tab_index_arg("x").is_err());
+    }
 
     #[test]
     fn parses_index() {
@@ -1267,5 +1378,30 @@ mod browser_arg_parse_tests {
         let (sel, a) = parse_browser_query_arg("nav.main a attrs=href, id");
         assert_eq!(sel, "nav.main a");
         assert_eq!(a.as_deref(), Some("href, id"));
+    }
+
+    /// Regression: css_scope regex used `.+$` to EOL; fused `BROWSER_QUERY:` must not become part of scope.
+    #[test]
+    fn parses_search_page_css_scope_stops_at_fused_browser_query() {
+        let (p, s) = parse_browser_search_page_arg(
+            "Example css_scope=h1 BROWSER_QUERY: a attrs=href DONE: success",
+        );
+        assert_eq!(p, "Example");
+        assert_eq!(s.as_deref(), Some("h1"));
+    }
+
+    #[test]
+    fn parses_browser_query_stops_at_fused_done() {
+        let (sel, a) = parse_browser_query_arg("a attrs=href DONE: success");
+        assert_eq!(sel, "a");
+        assert_eq!(a.as_deref(), Some("href"));
+    }
+
+    #[test]
+    fn parses_search_page_stops_at_duplicate_search_invocation() {
+        let (p, s) =
+            parse_browser_search_page_arg("Example BROWSER_SEARCH_PAGE: Other css_scope=main");
+        assert_eq!(p, "Example");
+        assert_eq!(s, None);
     }
 }

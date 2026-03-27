@@ -21,14 +21,15 @@ pub mod agents;
 mod alerts;
 pub mod browser_agent;
 pub mod browser_doctor;
-mod commands;
 pub mod circuit_breaker;
+mod commands;
 pub mod config;
 pub mod discord;
+pub mod downloads_organizer;
 pub mod events;
 pub mod feature_health;
-pub mod downloads_organizer;
 mod ffi;
+pub mod keyed_queue;
 mod logging;
 mod mcp;
 mod metrics;
@@ -126,12 +127,12 @@ pub use metrics::{
 // Re-export for CLI (e.g. discord run-ollama)
 pub use commands::judge::run_judge_if_enabled;
 pub use commands::ollama::{
-    answer_with_ollama_and_fetch, ensure_ollama_agent_ready_at_startup, OllamaReply, OllamaRequest,
-    with_run_error_boundary,
+    answer_with_ollama_and_fetch, ensure_ollama_agent_ready_at_startup, with_run_error_boundary,
+    OllamaReply, OllamaRequest,
 };
 pub use commands::ollama_run_error::OllamaRunError;
-pub use commands::untrusted_content::wrap_untrusted_content;
 pub use commands::suspicious_patterns::log_untrusted_suspicious_scan;
+pub use commands::untrusted_content::wrap_untrusted_content;
 
 // UI functions are now in ui module
 use ui::status_bar::{
@@ -168,6 +169,11 @@ pub fn run() {
     run_internal(false)
 }
 
+/// Holds `~/.mac-stats/single-instance.lock` open for the process lifetime so `flock(LOCK_EX)`
+/// stays acquired until exit (dropping the `File` at end of a short block would release the lock).
+#[cfg(unix)]
+static SINGLE_INSTANCE_LOCK_FILE: std::sync::OnceLock<std::fs::File> = std::sync::OnceLock::new();
+
 fn run_internal(open_cpu_window: bool) {
     // Single-instance guard (fail-fast): prevents concurrent Discord/scheduler/CDP startup that
     // would otherwise cause duplicated local I/O and confusing logs.
@@ -180,7 +186,7 @@ fn run_internal(open_cpu_window: bool) {
             .map(|p| p.join("single-instance.lock"))
             .unwrap_or_else(|| std::path::PathBuf::from("single-instance.lock"));
 
-        let _instance_lock_guard: Option<std::fs::File> = match std::fs::OpenOptions::new()
+        match std::fs::OpenOptions::new()
             .create(true)
             .truncate(true)
             .read(true)
@@ -197,7 +203,23 @@ fn run_internal(open_cpu_window: bool) {
                     eprintln!("mac-stats: already running; exiting this launch.");
                     std::process::exit(0);
                 }
-                Some(lock_file)
+                match SINGLE_INSTANCE_LOCK_FILE.set(lock_file) {
+                    Ok(()) => {
+                        tracing::debug!(
+                            target: "mac_stats::single_instance",
+                            path = %lock_path.display(),
+                            "single-instance lock acquired; holding until process exit"
+                        );
+                    }
+                    Err(dup) => {
+                        // Extremely rare: run_internal invoked twice in one process; release extra fd.
+                        drop(dup);
+                        tracing::warn!(
+                            target: "mac_stats::single_instance",
+                            "single-instance lock file set twice in-process; dropped duplicate handle"
+                        );
+                    }
+                }
             }
             Err(e) => {
                 // If we cannot create/take the lock, fall back to legacy behavior rather than crashing.
@@ -207,7 +229,6 @@ fn run_internal(open_cpu_window: bool) {
                     lock_path,
                     e
                 );
-                None
             }
         };
     }

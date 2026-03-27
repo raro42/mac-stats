@@ -85,7 +85,10 @@ pub(crate) fn parse_one_tool_at_line(
         ));
     }
     if line.eq_ignore_ascii_case("BROWSER_RELOAD") {
-        return Some((("BROWSER_RELOAD".to_string(), String::new()), line_index + 1));
+        return Some((
+            ("BROWSER_RELOAD".to_string(), String::new()),
+            line_index + 1,
+        ));
     }
     if line.eq_ignore_ascii_case("BROWSER_CLEAR_COOKIES") {
         return Some((

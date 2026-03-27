@@ -493,7 +493,9 @@ pub(crate) async fn verify_completion(
 
     crate::browser_agent::set_last_llm_screenshot_pixel_dims_for_coord_scaling(None);
     let (prep_b64, llm_dims) =
-        crate::commands::llm_screenshot::prepare_first_attachment_image_for_vision(attachment_paths);
+        crate::commands::llm_screenshot::prepare_first_attachment_image_for_vision(
+            attachment_paths,
+        );
     let image_b64 = prep_b64.or_else(|| first_image_as_base64(attachment_paths));
     if image_b64.is_some() {
         crate::browser_agent::set_last_llm_screenshot_pixel_dims_for_coord_scaling(llm_dims);

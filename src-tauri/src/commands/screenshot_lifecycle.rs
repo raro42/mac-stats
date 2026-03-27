@@ -20,7 +20,8 @@ pub(crate) fn parse_screenshot_filename_timestamp(stem: &str) -> Option<DateTime
     if !date.chars().all(|c| c.is_ascii_digit()) || !time.chars().all(|c| c.is_ascii_digit()) {
         return None;
     }
-    let naive = NaiveDateTime::parse_from_str(&format!("{}_{}", date, time), "%Y%m%d_%H%M%S").ok()?;
+    let naive =
+        NaiveDateTime::parse_from_str(&format!("{}_{}", date, time), "%Y%m%d_%H%M%S").ok()?;
     Some(naive.and_utc())
 }
 
@@ -131,12 +132,8 @@ pub fn prune_old_screenshots() {
     if max_total_bytes > 0 {
         let mut entries = collect_screenshot_entries(&dir);
         entries.sort_by(|a, b| {
-            let ta = a
-                .name_ts
-                .unwrap_or_else(|| system_time_to_utc(a.mtime));
-            let tb = b
-                .name_ts
-                .unwrap_or_else(|| system_time_to_utc(b.mtime));
+            let ta = a.name_ts.unwrap_or_else(|| system_time_to_utc(a.mtime));
+            let tb = b.name_ts.unwrap_or_else(|| system_time_to_utc(b.mtime));
             ta.cmp(&tb).then_with(|| a.path.cmp(&b.path))
         });
 

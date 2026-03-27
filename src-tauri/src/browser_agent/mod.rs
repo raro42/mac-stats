@@ -13,27 +13,27 @@
 //! there is no child PID owned by mac-stats, so process-exit invalidation does not apply until the next
 //! mac-stats-owned launch.
 
-mod cdp_url;
+mod artifact_atomic;
+pub mod artifact_limits;
 pub(crate) mod cdp_downloads;
 mod cdp_fetch_proxy_auth;
 mod cdp_grant_permissions;
-mod cdp_trace_archive;
 mod cdp_target_crash_listener;
+mod cdp_trace_archive;
+mod cdp_url;
 mod cookie_storage;
 mod credentials;
 mod dom_snapshot;
 mod http_fallback;
-pub mod artifact_limits;
-mod artifact_atomic;
 mod screenshot_annotate;
 pub mod url_filter;
 
 pub use http_fallback::{click_http, extract_http, input_http, navigate_http};
 
 use std::collections::{HashMap, HashSet, VecDeque};
-use std::sync::mpsc;
 use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
+use std::sync::mpsc;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::OnceLock;
@@ -44,21 +44,22 @@ use headless_chrome::browser::tab::point::Point;
 use headless_chrome::browser::tab::ModifierKey;
 use headless_chrome::protocol::cdp::types::Event;
 use headless_chrome::protocol::cdp::Accessibility;
-use headless_chrome::protocol::cdp::DOM;
 use headless_chrome::protocol::cdp::DOMDebugger;
 use headless_chrome::protocol::cdp::Emulation;
+use headless_chrome::protocol::cdp::Input;
 use headless_chrome::protocol::cdp::Network;
 use headless_chrome::protocol::cdp::Page;
 use headless_chrome::protocol::cdp::Page::CaptureScreenshotFormatOption;
 use headless_chrome::protocol::cdp::Page::DialogType;
-use headless_chrome::protocol::cdp::Input;
 use headless_chrome::protocol::cdp::Runtime;
-use headless_chrome::Element;
+use headless_chrome::protocol::cdp::DOM;
 use headless_chrome::types::Bounds;
 use headless_chrome::Browser;
+use headless_chrome::Element;
 use headless_chrome::LaunchOptions;
 use regex::Regex;
 use serde::Deserialize;
+use serde_json::Value as JsonValue;
 use std::path::{Path, PathBuf};
 use tokio::sync::oneshot;
 use url::Url;
@@ -163,6 +164,181 @@ fn push_bounded_dedup(queue: &mut VecDeque<String>, item: String, max_len: usize
     queue.push_back(item);
     while queue.len() > max_len {
         queue.pop_front();
+    }
+}
+
+/// CDP `Log` / `Runtime` events → bounded diagnostic queues (shared by navigate + extract).
+fn push_cdp_diagnostic_event(
+    event: &Event,
+    console_buf: &Arc<Mutex<VecDeque<String>>>,
+    exc_buf: &Arc<Mutex<VecDeque<String>>>,
+) {
+    match event {
+        Event::LogEntryAdded(ev) => {
+            let level = &ev.params.entry.level;
+            let prefix = match level {
+                headless_chrome::protocol::cdp::Log::LogEntryLevel::Error => Some("error"),
+                headless_chrome::protocol::cdp::Log::LogEntryLevel::Warning => Some("warning"),
+                _ => None,
+            };
+            let Some(prefix) = prefix else {
+                return;
+            };
+            let raw_text = ev.params.entry.text.trim();
+            if raw_text.is_empty() {
+                return;
+            }
+            let normalized = normalize_diagnostic_text(raw_text, DIAG_MAX_CONSOLE_CHARS_PER_LINE);
+            if normalized.is_empty() {
+                return;
+            }
+            let line = format!("[{}] {}", prefix, normalized);
+            if let Ok(mut q) = console_buf.lock() {
+                push_bounded_dedup(&mut q, line, DIAG_MAX_CONSOLE_LINES);
+            }
+        }
+        Event::RuntimeExceptionThrown(ev) => {
+            let details = &ev.params.exception_details;
+            let raw_text = if !details.text.trim().is_empty() {
+                details.text.as_str()
+            } else {
+                details
+                    .stack_trace
+                    .as_ref()
+                    .and_then(|st| st.description.as_deref())
+                    .unwrap_or("")
+            };
+            let raw_text = raw_text.trim();
+            if raw_text.is_empty() {
+                return;
+            }
+            let normalized = normalize_diagnostic_text(
+                raw_text,
+                DIAG_MAX_UNCAUGHT_EXC_CHARS_PER_MESSAGE,
+            );
+            if normalized.is_empty() {
+                return;
+            }
+            let msg = format!("Uncaught exception: {}", normalized);
+            if let Ok(mut q) = exc_buf.lock() {
+                push_bounded_dedup(&mut q, msg, DIAG_MAX_UNCAUGHT_EXC_MESSAGES);
+            }
+        }
+        _ => {}
+    }
+}
+
+type CdpDiagListenerWeak =
+    std::sync::Weak<dyn headless_chrome::browser::tab::EventListener<Event> + Send + Sync>;
+
+/// Enable CDP Log + Runtime, register bounded diagnostic listener. Caller must remove listener and disable domains when done.
+fn try_attach_bounded_cdp_page_diagnostics(
+    tab: &headless_chrome::Tab,
+) -> Option<(
+    Arc<Mutex<VecDeque<String>>>,
+    Arc<Mutex<VecDeque<String>>>,
+    CdpDiagListenerWeak,
+)> {
+    let console_buf: Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
+    let exc_buf: Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
+    let c = Arc::clone(&console_buf);
+    let e = Arc::clone(&exc_buf);
+    let listener = Arc::new(move |event: &Event| push_cdp_diagnostic_event(event, &c, &e));
+
+    if let Err(e) = tab.enable_log().and_then(|t| t.enable_runtime()) {
+        mac_stats_warn!(
+            "browser/cdp",
+            "Browser agent [CDP]: failed to enable diagnostics log/runtime: {} (continuing)",
+            e
+        );
+        return None;
+    }
+
+    match tab.add_event_listener(listener) {
+        Ok(w) => Some((console_buf, exc_buf, w)),
+        Err(e) => {
+            mac_stats_warn!(
+                "browser/cdp",
+                "Browser agent [CDP]: failed to register diagnostics event listener: {} (continuing)",
+                e
+            );
+            let _ = tab.disable_runtime();
+            let _ = tab.disable_log();
+            None
+        }
+    }
+}
+
+fn detach_bounded_cdp_page_diagnostics(tab: &headless_chrome::Tab, weak: &CdpDiagListenerWeak) {
+    let _ = tab.remove_event_listener(weak);
+    let _ = tab.disable_runtime();
+    let _ = tab.disable_log();
+}
+
+/// `## Page diagnostics` block for tool results, or empty when there is nothing to show.
+fn format_bounded_page_diagnostics_tool_section(
+    console_buf: &Arc<Mutex<VecDeque<String>>>,
+    exc_buf: &Arc<Mutex<VecDeque<String>>>,
+) -> String {
+    let console_vec = console_buf
+        .lock()
+        .map(|q| q.iter().cloned().collect::<Vec<_>>())
+        .unwrap_or_default();
+    let exc_vec = exc_buf
+        .lock()
+        .map(|q| q.iter().cloned().collect::<Vec<_>>())
+        .unwrap_or_default();
+    if console_vec.is_empty() && exc_vec.is_empty() {
+        return String::new();
+    }
+    let mut s = String::from("\n## Page diagnostics\n");
+    if !console_vec.is_empty() {
+        s.push_str("Console (error/warning):\n");
+        for l in console_vec {
+            s.push_str(&format!("- {}\n", l));
+        }
+    }
+    if !exc_vec.is_empty() {
+        s.push_str("Uncaught exceptions:\n");
+        for m in exc_vec {
+            s.push_str(&format!("- {}\n", m));
+        }
+    }
+    s
+}
+
+/// Short tail wait so `console.*` fired right after `Runtime.evaluate` can reach the CDP listener.
+const DIAG_EXTRACT_TAIL_WAIT: Duration = Duration::from_millis(100);
+
+/// RAII: bounded CDP diagnostics during **BROWSER_EXTRACT** (same caps as navigate; fresh buffers per extract).
+struct TabExtractDiagnosticsSession {
+    tab: Arc<headless_chrome::Tab>,
+    listener: Option<CdpDiagListenerWeak>,
+    console: Arc<Mutex<VecDeque<String>>>,
+    exc: Arc<Mutex<VecDeque<String>>>,
+}
+
+impl TabExtractDiagnosticsSession {
+    fn try_start(tab: Arc<headless_chrome::Tab>) -> Option<Self> {
+        let (console, exc, w) = try_attach_bounded_cdp_page_diagnostics(tab.as_ref())?;
+        Some(Self {
+            tab,
+            listener: Some(w),
+            console,
+            exc,
+        })
+    }
+
+    fn section(&self) -> String {
+        format_bounded_page_diagnostics_tool_section(&self.console, &self.exc)
+    }
+}
+
+impl Drop for TabExtractDiagnosticsSession {
+    fn drop(&mut self) {
+        if let Some(w) = self.listener.take() {
+            detach_bounded_cdp_page_diagnostics(self.tab.as_ref(), &w);
+        }
     }
 }
 
@@ -390,7 +566,8 @@ fn try_discover_cdp_ws_url(port: u16) -> Result<String, String> {
 /// Per attempt uses the configured HTTP discovery timeout (`browserCdpHttpTimeoutSecs`); overall wait is bounded by config (default ~15s).
 #[allow(unused_assignments)] // `last_err` seed is unused if the first probe succeeds immediately
 fn wait_for_cdp_http_after_visible_launch(port: u16) -> Result<(), String> {
-    let max_wait = Duration::from_secs(crate::config::Config::browser_cdp_post_launch_max_wait_secs());
+    let max_wait =
+        Duration::from_secs(crate::config::Config::browser_cdp_post_launch_max_wait_secs());
     let poll_interval =
         Duration::from_millis(crate::config::Config::browser_cdp_post_launch_poll_interval_ms());
     let deadline = Instant::now() + max_wait;
@@ -452,7 +629,7 @@ fn wait_for_cdp_http_after_visible_launch(port: u16) -> Result<(), String> {
 }
 
 /// After the CDP WebSocket handshake, wait until targets are enumerable (macOS user Chrome can expose the port before tabs are ready).
-const CDP_ATTACH_READY_TIMEOUT: Duration = Duration::from_secs(8);
+const CDP_ATTACH_READY_TIMEOUT: Duration = Duration::from_secs(15);
 const CDP_ATTACH_READY_POLL: Duration = Duration::from_millis(200);
 
 // ---------------------------------------------------------------------------
@@ -504,7 +681,11 @@ const BROWSER_PHONE_EXTRACT_POST_NAV: Duration = Duration::from_secs(2);
 /// Phone-extract flow: pause after scroll-to-bottom before reading DOM.
 const BROWSER_PHONE_EXTRACT_POST_SCROLL: Duration = Duration::from_secs(2);
 
-/// Poll until `get_tabs` succeeds with at least one tab, or timeout. Only for fresh CDP attach (not cached session reuse).
+/// Poll until `get_tabs` lock succeeds and targets are usable, or timeout. Only for fresh CDP attach (not cached session reuse).
+///
+/// Chrome may report **zero** page tabs when the user closed every tab or briefly during startup. In that case we still treat
+/// attach as ready so [`get_current_tab`] can bootstrap `about:blank` (OpenClaw-style). After one successful empty read we do a
+/// short follow-up poll so transient startup empties can populate before we accept zero tabs.
 fn wait_for_cdp_targets_ready_after_attach(browser: &Browser) -> Result<(), String> {
     let deadline = Instant::now() + CDP_ATTACH_READY_TIMEOUT;
     let mut attempt: u32 = 0;
@@ -524,11 +705,55 @@ fn wait_for_cdp_targets_ready_after_attach(browser: &Browser) -> Result<(), Stri
                     );
                     return Ok(());
                 }
+                drop(tabs);
                 mac_stats_debug!(
                     "browser/cdp",
-                    "Browser agent [CDP]: attach readiness probe {} — tab list empty (waiting)",
+                    "Browser agent [CDP]: attach readiness probe {} — tab list empty (follow-up probe for transient startup)",
                     attempt
                 );
+                let remaining = deadline
+                    .checked_duration_since(Instant::now())
+                    .unwrap_or_default();
+                let sleep_for = CDP_ATTACH_READY_POLL.min(remaining);
+                if !sleep_for.is_zero() {
+                    std::thread::sleep(sleep_for);
+                }
+                match browser.get_tabs().lock() {
+                    Ok(tabs2) => {
+                        if !tabs2.is_empty() {
+                            mac_stats_debug!(
+                                "browser/cdp",
+                                "Browser agent [CDP]: attach readiness OK after {} probe(s), {} tab(s) (after empty-list follow-up)",
+                                attempt,
+                                tabs2.len()
+                            );
+                            return Ok(());
+                        }
+                        mac_stats_info!(
+                            "browser/cdp",
+                            "Browser agent [CDP]: attach readiness OK with 0 page tabs (get_current_tab will bootstrap about:blank if needed)"
+                        );
+                        return Ok(());
+                    }
+                    Err(e) => {
+                        let msg = e.to_string();
+                        let short = if msg.len() > 160 {
+                            format!("{}…", &msg[..160])
+                        } else {
+                            msg
+                        };
+                        mac_stats_debug!(
+                            "browser/cdp",
+                            "Browser agent [CDP]: attach readiness follow-up probe failed: {}",
+                            short
+                        );
+                        mac_stats_info!(
+                            "browser/cdp",
+                            "Browser agent [CDP]: attach readiness OK with 0 page tabs (follow-up lock failed; get_current_tab will bootstrap about:blank if needed)"
+                        );
+                        return Ok(());
+                    }
+                }
             }
             Err(e) => {
                 let msg = e.to_string();
@@ -561,7 +786,8 @@ If Chrome showed a prompt to allow remote debugging, approve it; keep Chrome run
     )
 }
 
-/// Open a CDP session from a WebSocket URL and wait until tab targets are ready (attach path only).
+/// Open a CDP session from a WebSocket URL and wait until tab enumeration is reliable (attach path only).
+/// Zero page tabs are allowed; [`get_current_tab`] bootstraps `about:blank` when needed.
 fn connect_browser_to_ws_url(ws_url: &str) -> Result<Browser, String> {
     let inferred_port = Url::parse(ws_url)
         .ok()
@@ -947,7 +1173,8 @@ pub fn navigate(browser: &Browser, url: &str) -> Result<Arc<headless_chrome::Tab
         cdp_validate_redirect_chain_from_rws_buffer(&redirect_rws_buf, url)?;
     }
     let final_u = tab.get_url();
-    if let Some(msg) = post_navigate_load_failure_message(url, final_u.as_str(), Some(tab.as_ref())) {
+    if let Some(msg) = post_navigate_load_failure_message(url, final_u.as_str(), Some(tab.as_ref()))
+    {
         return Err(msg);
     }
     assert_final_document_url_ssrf_post_check(final_u.as_str(), Some(url))?;
@@ -1074,6 +1301,44 @@ function __macStatsInteractableNodes() {
 
   collectInteractablesInRoot(document, 0);
   return ordered;
+}
+"#;
+
+/// `Runtime.callFunctionOn` with `this` = the interactables node array: returns the same JSON envelope as
+/// [`get_interactables_eval_js`] so row metadata matches element `objectId`s resolved from that array.
+const INTERACTABLE_NODES_METADATA_BATCH_FN: &str = r#"
+function(){
+  var nodes = this;
+  var out = [];
+  for (var i = 0; i < nodes.length; i++) {
+    var el = nodes[i];
+    var tag = el.tagName.toLowerCase();
+    var inputType = el.type ? String(el.type).toLowerCase() : null;
+    var text;
+    if (tag === 'input' && inputType === 'password') {
+      text = (el.placeholder ? el.placeholder : '').trim().slice(0, 200);
+    } else {
+      text = (el.innerText || el.textContent || el.value || el.placeholder || '').trim().slice(0, 200);
+    }
+    var href = el.href ? el.href : null;
+    var placeholder = el.placeholder ? el.placeholder : null;
+    var domName = null;
+    try { if (el.name) domName = String(el.name); } catch (e0) {}
+    var ariaLabel = null;
+    try { ariaLabel = el.getAttribute('aria-label'); } catch (e1) {}
+    var ce = !!el.isContentEditable;
+    var clsRaw = el.className ? String(el.className) : '';
+    var cls = clsRaw.toLowerCase();
+    var dpAttr = null;
+    try { dpAttr = el.getAttribute('data-provide'); } catch (e2) {}
+    var dpa = dpAttr ? String(dpAttr).toLowerCase() : '';
+    var datepickerLike = cls.indexOf('datepicker') >= 0 || cls.indexOf('date-picker') >= 0 || dpa.indexOf('datepicker') >= 0;
+    var br = el.getBoundingClientRect();
+    var annot_bounds = [br.left, br.top, br.width, br.height];
+    out.push({ tag_name: tag, text: text, href: href, placeholder: placeholder, input_type: inputType, contenteditable: ce, datepicker_like: datepickerLike, dom_name: domName, aria_label: ariaLabel, annot_bounds: annot_bounds });
+  }
+  var dpr = (typeof window.devicePixelRatio === 'number' && isFinite(window.devicePixelRatio) && window.devicePixelRatio > 0) ? window.devicePixelRatio : 1;
+  return JSON.stringify({ dpr: dpr, nodes: out });
 }
 "#;
 
@@ -1478,12 +1743,11 @@ struct InteractablesJsEnvelope {
 fn parse_interactables_json_envelope(json_str: &str) -> Result<Vec<InteractableRow>, String> {
     let trimmed = json_str.trim_start();
     if trimmed.starts_with('[') {
-        return serde_json::from_str::<Vec<InteractableRow>>(json_str).map_err(|e| {
-            format!("Parse interactables JSON (legacy array): {}", e)
-        });
+        return serde_json::from_str::<Vec<InteractableRow>>(json_str)
+            .map_err(|e| format!("Parse interactables JSON (legacy array): {}", e));
     }
-    let env: InteractablesJsEnvelope = serde_json::from_str(json_str)
-        .map_err(|e| format!("Parse interactables JSON: {}", e))?;
+    let env: InteractablesJsEnvelope =
+        serde_json::from_str(json_str).map_err(|e| format!("Parse interactables JSON: {}", e))?;
     Ok(env.nodes)
 }
 
@@ -1687,6 +1951,113 @@ fn interactable_element_eval_for_index(index: u32) -> String {
     s
 }
 
+fn cdp_runtime_call_function_on(
+    tab: &headless_chrome::Tab,
+    object_id: &str,
+    function_declaration: &str,
+    arguments: Vec<serde_json::Value>,
+    return_by_value: bool,
+    await_promise: bool,
+) -> Result<Runtime::RemoteObject, String> {
+    let args = if arguments.is_empty() {
+        None
+    } else {
+        Some(
+            arguments
+                .into_iter()
+                .map(|v| Runtime::CallArgument {
+                    value: Some(v),
+                    unserializable_value: None,
+                    object_id: None,
+                })
+                .collect(),
+        )
+    };
+    let res = tab
+        .call_method(Runtime::CallFunctionOn {
+            function_declaration: function_declaration.to_string(),
+            object_id: Some(object_id.to_string()),
+            arguments: args,
+            return_by_value: Some(return_by_value),
+            generate_preview: Some(false),
+            silent: Some(false),
+            await_promise: Some(await_promise),
+            user_gesture: None,
+            execution_context_id: None,
+            object_group: None,
+            throw_on_side_effect: None,
+            serialization_options: None,
+            unique_context_id: None,
+        })
+        .map_err(|e| format!("Runtime.callFunctionOn: {}", e))?;
+    if res.exception_details.is_some() {
+        return Err("Runtime.callFunctionOn: exception".to_string());
+    }
+    Ok(res.result)
+}
+
+/// Main-document interactables: one `Runtime.evaluate` retains the node array; metadata and each `objectId`
+/// are derived from that same handle so indices cannot drift between JSON and CDP on busy pages.
+fn collect_main_world_interactable_rows_and_object_ids(
+    tab: &headless_chrome::Tab,
+) -> Result<(Vec<InteractableRow>, Vec<String>), String> {
+    let nodes_expr = format!(
+        "(function() {{ {} return __macStatsInteractableNodes(); }})()",
+        INTERACTABLE_NODES_BUILDER
+    );
+    let arr_ro = tab
+        .evaluate(&nodes_expr, false)
+        .map_err(|e| format!("interactables nodes array evaluate: {}", e))?;
+    let array_oid = arr_ro.object_id.ok_or_else(|| {
+        "interactables nodes array: DevTools returned no object handle (null or non-object result)"
+            .to_string()
+    })?;
+
+    let meta_ro = cdp_runtime_call_function_on(
+        tab,
+        &array_oid,
+        INTERACTABLE_NODES_METADATA_BATCH_FN,
+        vec![],
+        true,
+        false,
+    )
+    .map_err(|e| format!("interactables metadata batch: {}", e))?;
+    let meta_str = meta_ro
+        .value
+        .as_ref()
+        .and_then(|v| v.as_str().map(std::string::ToString::to_string))
+        .ok_or_else(|| "interactables metadata: expected JSON string value".to_string())?;
+    let rows = parse_interactables_json_envelope(&meta_str)?;
+
+    mac_stats_debug!(
+        "browser/cdp",
+        "Browser agent [CDP]: interactables main-world snapshot rows={} (atomic node array + batch metadata)",
+        rows.len()
+    );
+
+    let mut object_ids = Vec::with_capacity(rows.len());
+    for i in 0..rows.len() {
+        let el_ro = cdp_runtime_call_function_on(
+            tab,
+            &array_oid,
+            "function(i){ return this[Number(i)]; }",
+            vec![serde_json::json!(i)],
+            false,
+            false,
+        )
+        .map_err(|e| format!("interactable object id [{}]: {}", i + 1, e))?;
+        let oid = el_ro.object_id.ok_or_else(|| {
+            format!(
+                "interactable object id [{}]: DevTools returned no object handle",
+                i + 1
+            )
+        })?;
+        object_ids.push(oid);
+    }
+
+    Ok((rows, object_ids))
+}
+
 fn dom_suggests_datepicker(class_attr: Option<&str>, data_provide: Option<&str>) -> bool {
     let c = class_attr.unwrap_or("").to_lowercase();
     if c.contains("datepicker") || c.contains("date-picker") {
@@ -1756,41 +2127,51 @@ fn interactable_row_from_element(el: &Element<'_>) -> Result<InteractableRow, St
     })
 }
 
-fn ax_value_to_opt_string(v: &Accessibility::AXValue) -> Option<String> {
-    let j = v.value.as_ref()?;
-    if let Some(s) = j.as_str() {
-        return Some(s.to_string());
-    }
-    j.as_object()
-        .and_then(|o| o.get("value"))
-        .and_then(|x| x.as_str().map(std::string::ToString::to_string))
-}
-
 fn compact_ax_label(s: &str) -> String {
     let t = s.split_whitespace().collect::<Vec<_>>().join(" ");
     t.chars().take(200).collect()
 }
 
-fn merge_ax_nodes_into_map(
-    nodes: Vec<Accessibility::AXNode>,
+/// Extract label/role text from a CDP `AXValue` object without deserializing into generated structs
+/// (Chrome may add fields or enum values that break strict parsing).
+fn ax_label_from_ax_json(axv: &JsonValue) -> Option<String> {
+    let inner = axv.get("value")?;
+    let raw = if let Some(s) = inner.as_str() {
+        s.to_string()
+    } else {
+        inner
+            .as_object()
+            .and_then(|o| o.get("value"))
+            .and_then(|x| x.as_str())
+            .map(std::string::ToString::to_string)?
+    };
+    let t = compact_ax_label(&raw);
+    (!t.is_empty()).then_some(t)
+}
+
+fn merge_ax_nodes_json_into_map(
+    root: &JsonValue,
     out: &mut HashMap<DOM::BackendNodeId, (Option<String>, Option<String>)>,
 ) {
+    let Some(nodes) = root.get("nodes").and_then(|n| n.as_array()) else {
+        return;
+    };
     for n in nodes {
-        let Some(bid) = n.backend_dom_node_id else {
+        let raw_bid = match n.get("backendDOMNodeId") {
+            Some(v) => v,
+            None => continue,
+        };
+        let u = raw_bid
+            .as_u64()
+            .or_else(|| raw_bid.as_i64().map(|i| i as u64));
+        let Some(u) = u else {
             continue;
         };
-        let name = n
-            .name
-            .as_ref()
-            .and_then(ax_value_to_opt_string)
-            .map(|s| compact_ax_label(&s))
-            .filter(|s| !s.is_empty());
-        let role = n
-            .role
-            .as_ref()
-            .and_then(ax_value_to_opt_string)
-            .map(|s| compact_ax_label(&s))
-            .filter(|s| !s.is_empty());
+        let Ok(bid) = DOM::BackendNodeId::try_from(u) else {
+            continue;
+        };
+        let name = n.get("name").and_then(ax_label_from_ax_json);
+        let role = n.get("role").and_then(ax_label_from_ax_json);
         if name.is_none() && role.is_none() {
             continue;
         }
@@ -1805,13 +2186,15 @@ fn merge_ax_nodes_into_map(
 }
 
 /// `Accessibility.getFullAXTree` for the focused page (main frame + subframes). Best-effort; returns empty on failure.
-fn fetch_merged_ax_backend_map(tab: &headless_chrome::Tab) -> HashMap<DOM::BackendNodeId, (Option<String>, Option<String>)> {
+fn fetch_merged_ax_backend_map(
+    tab: &headless_chrome::Tab,
+) -> HashMap<DOM::BackendNodeId, (Option<String>, Option<String>)> {
     let mut map: HashMap<DOM::BackendNodeId, (Option<String>, Option<String>)> = HashMap::new();
-    match tab.call_method(Accessibility::GetFullAXTree {
+    match tab.call_method_json(Accessibility::GetFullAXTree {
         depth: None,
         frame_id: None,
     }) {
-        Ok(r) => merge_ax_nodes_into_map(r.nodes, &mut map),
+        Ok(r) => merge_ax_nodes_json_into_map(&r, &mut map),
         Err(e) => {
             mac_stats_debug!(
                 "browser/cdp",
@@ -1838,11 +2221,11 @@ fn fetch_merged_ax_backend_map(tab: &headless_chrome::Tab) -> HashMap<DOM::Backe
         if depth == 0 {
             continue;
         }
-        match tab.call_method(Accessibility::GetFullAXTree {
+        match tab.call_method_json(Accessibility::GetFullAXTree {
             depth: None,
             frame_id: Some(frame.id.clone()),
         }) {
-            Ok(r) => merge_ax_nodes_into_map(r.nodes, &mut map),
+            Ok(r) => merge_ax_nodes_json_into_map(&r, &mut map),
             Err(e) => {
                 mac_stats_debug!(
                     "browser/cdp",
@@ -1860,7 +2243,10 @@ fn fetch_merged_ax_backend_map(tab: &headless_chrome::Tab) -> HashMap<DOM::Backe
     map
 }
 
-pub(crate) fn backend_id_for_object_id(tab: &headless_chrome::Tab, object_id: &str) -> Result<DOM::BackendNodeId, String> {
+pub(crate) fn backend_id_for_object_id(
+    tab: &headless_chrome::Tab,
+    object_id: &str,
+) -> Result<DOM::BackendNodeId, String> {
     let node = tab
         .call_method(DOM::DescribeNode {
             node_id: None,
@@ -1918,7 +2304,10 @@ fn interactables_identity_match(expected: &Interactable, candidate: &Interactabl
 }
 
 /// After a DOM reorder, find the unique new 1-based index for `expected` (from the last snapshot). Used by BROWSER_CLICK / BROWSER_INPUT remapping.
-fn find_unique_identity_match(expected: &Interactable, fresh: &[Interactable]) -> Result<u32, String> {
+fn find_unique_identity_match(
+    expected: &Interactable,
+    fresh: &[Interactable],
+) -> Result<u32, String> {
     let matches: Vec<&Interactable> = fresh
         .iter()
         .filter(|c| interactables_identity_match(expected, c))
@@ -2118,7 +2507,8 @@ fn collect_cross_origin_frame_interactables(
             continue;
         }
 
-        let json_ro = match runtime_evaluate_in_context(tab, ctx, &eval_interactables, true, false) {
+        let json_ro = match runtime_evaluate_in_context(tab, ctx, &eval_interactables, true, false)
+        {
             Ok(ro) => ro,
             Err(e) => {
                 mac_stats_debug!(
@@ -2139,7 +2529,8 @@ fn collect_cross_origin_frame_interactables(
                 continue;
             }
         };
-        let mut frame_rows: Vec<InteractableRow> = match parse_interactables_json_envelope(json_str) {
+        let mut frame_rows: Vec<InteractableRow> = match parse_interactables_json_envelope(json_str)
+        {
             Ok(v) => v,
             Err(e) => {
                 mac_stats_debug!(
@@ -2306,7 +2697,10 @@ fn quad_doc_center(q: &[f64]) -> Option<(f64, f64)> {
     if q.len() < 8 {
         return None;
     }
-    Some(((q[0] + q[2] + q[4] + q[6]) / 4.0, (q[1] + q[3] + q[5] + q[7]) / 4.0))
+    Some((
+        (q[0] + q[2] + q[4] + q[6]) / 4.0,
+        (q[1] + q[3] + q[5] + q[7]) / 4.0,
+    ))
 }
 
 fn quad_area(q: &[f64]) -> f64 {
@@ -2371,7 +2765,10 @@ fn pick_viewport_click_point_from_content_quads(
     best2.map(|(_, vx, vy)| (vx, vy))
 }
 
-fn viewport_midpoint_via_js(tab: &headless_chrome::Tab, object_id: &str) -> Result<(f64, f64), String> {
+fn viewport_midpoint_via_js(
+    tab: &headless_chrome::Tab,
+    object_id: &str,
+) -> Result<(f64, f64), String> {
     let res = tab
         .call_method(Runtime::CallFunctionOn {
             function_declaration: "function(){ var r=this.getBoundingClientRect(); return {x:r.left+r.width*0.5,y:r.top+r.height*0.5,w:r.width,h:r.height}; }".to_string(),
@@ -2396,12 +2793,8 @@ fn viewport_midpoint_via_js(tab: &headless_chrome::Tab, object_id: &str) -> Resu
         .result
         .value
         .ok_or_else(|| "getBoundingClientRect: no value".to_string())?;
-    let x = v["x"]
-        .as_f64()
-        .ok_or_else(|| "bbox x".to_string())?;
-    let y = v["y"]
-        .as_f64()
-        .ok_or_else(|| "bbox y".to_string())?;
+    let x = v["x"].as_f64().ok_or_else(|| "bbox x".to_string())?;
+    let y = v["y"].as_f64().ok_or_else(|| "bbox y".to_string())?;
     let w = v["w"].as_f64().unwrap_or(0.0);
     let h = v["h"].as_f64().unwrap_or(0.0);
     if w < 1.0 || h < 1.0 {
@@ -2447,11 +2840,7 @@ fn cdp_element_from_point_covers_target(
     if res.exception_details.is_some() {
         return Ok(false);
     }
-    Ok(res
-        .result
-        .value
-        .and_then(|v| v.as_bool())
-        .unwrap_or(false))
+    Ok(res.result.value.and_then(|v| v.as_bool()).unwrap_or(false))
 }
 
 fn cdp_js_click_element(tab: &headless_chrome::Tab, object_id: &str) -> Result<(), String> {
@@ -2475,12 +2864,7 @@ fn cdp_js_click_element(tab: &headless_chrome::Tab, object_id: &str) -> Result<(
     if res.exception_details.is_some() {
         return Err("JS click: exceptionDetails".to_string());
     }
-    let ok = res
-        .result
-        .value
-        .as_ref()
-        .and_then(|v| v.as_str())
-        == Some("clicked");
+    let ok = res.result.value.as_ref().and_then(|v| v.as_str()) == Some("clicked");
     if !ok {
         return Err(format!(
             "JS click: unexpected result {:?}",
@@ -2490,11 +2874,7 @@ fn cdp_js_click_element(tab: &headless_chrome::Tab, object_id: &str) -> Result<(
     Ok(())
 }
 
-fn cdp_scroll_into_view_if_needed_warn(
-    tab: &headless_chrome::Tab,
-    object_id: &str,
-    context: &str,
-) {
+fn cdp_scroll_into_view_if_needed_warn(tab: &headless_chrome::Tab, object_id: &str, context: &str) {
     if let Err(e) = tab.call_method(DOM::ScrollIntoViewIfNeeded {
         node_id: None,
         backend_node_id: None,
@@ -2610,11 +2990,7 @@ fn cdp_hover_by_object_id(tab: &headless_chrome::Tab, object_id: &str) -> Result
     Ok(())
 }
 
-fn cdp_dispatch_mouse_pressed(
-    tab: &headless_chrome::Tab,
-    x: f64,
-    y: f64,
-) -> Result<(), String> {
+fn cdp_dispatch_mouse_pressed(tab: &headless_chrome::Tab, x: f64, y: f64) -> Result<(), String> {
     tab.call_method(Input::DispatchMouseEvent {
         Type: Input::DispatchMouseEventTypeOption::MousePressed,
         x,
@@ -2637,11 +3013,7 @@ fn cdp_dispatch_mouse_pressed(
     Ok(())
 }
 
-fn cdp_dispatch_mouse_released(
-    tab: &headless_chrome::Tab,
-    x: f64,
-    y: f64,
-) -> Result<(), String> {
+fn cdp_dispatch_mouse_released(tab: &headless_chrome::Tab, x: f64, y: f64) -> Result<(), String> {
     tab.call_method(Input::DispatchMouseEvent {
         Type: Input::DispatchMouseEventTypeOption::MouseReleased,
         x,
@@ -2721,7 +3093,10 @@ fn cdp_drag_between_object_ids(
     Ok(())
 }
 
-fn resolve_interactable_object_id(tab: &headless_chrome::Tab, index: u32) -> Result<String, String> {
+fn resolve_interactable_object_id(
+    tab: &headless_chrome::Tab,
+    index: u32,
+) -> Result<String, String> {
     if let Ok(g) = last_interactable_object_ids().lock() {
         if let Some(id) = g.get(index as usize - 1) {
             return Ok(id.clone());
@@ -2743,9 +3118,9 @@ fn resolve_interactable_object_id(tab: &headless_chrome::Tab, index: u32) -> Res
     let el_ro = tab
         .evaluate(&expr, false)
         .map_err(|e| format!("resolve interactable element: {}", e))?;
-    el_ro.object_id.ok_or_else(|| {
-        "element handle missing (stale index or detached node)".to_string()
-    })
+    el_ro
+        .object_id
+        .ok_or_else(|| "element handle missing (stale index or detached node)".to_string())
 }
 
 fn resolve_interactable_for_action(
@@ -2753,10 +3128,10 @@ fn resolve_interactable_for_action(
     index: u32,
     tool: &str,
 ) -> Result<String, String> {
-    let expected_entry = last_interactables_snapshot()
-        .lock()
-        .ok()
-        .and_then(|g| g.as_ref().and_then(|v| v.get(index.saturating_sub(1) as usize).cloned()));
+    let expected_entry = last_interactables_snapshot().lock().ok().and_then(|g| {
+        g.as_ref()
+            .and_then(|v| v.get(index.saturating_sub(1) as usize).cloned())
+    });
 
     match resolve_interactable_object_id(tab, index) {
         Ok(oid) => {
@@ -2834,30 +3209,7 @@ fn remap_interactable_action(
 
 /// Get visible interactive elements from the page via JS. Returns 1-based indices. Used for BROWSER_NAVIGATE state.
 pub fn get_interactables(tab: &headless_chrome::Tab) -> Result<Vec<Interactable>, String> {
-    let result = tab
-        .evaluate(&get_interactables_eval_js(), false)
-        .map_err(|e| format!("Evaluate get_interactables: {}", e))?;
-    let json_str = result
-        .value
-        .as_ref()
-        .and_then(|v| v.as_str())
-        .ok_or_else(|| "get_interactables JS did not return a string".to_string())?;
-    let mut rows: Vec<InteractableRow> = parse_interactables_json_envelope(json_str)?;
-
-    let mut object_ids: Vec<String> = Vec::with_capacity(rows.len());
-    for i in 1..=rows.len() as u32 {
-        let expr = interactable_element_eval_for_index(i);
-        let ro = tab
-            .evaluate(&expr, false)
-            .map_err(|e| format!("interactable object id [{}]: {}", i, e))?;
-        let oid = ro.object_id.ok_or_else(|| {
-            format!(
-                "interactable object id [{}]: DevTools returned no object handle",
-                i
-            )
-        })?;
-        object_ids.push(oid);
-    }
+    let (mut rows, mut object_ids) = collect_main_world_interactable_rows_and_object_ids(tab)?;
 
     let extra_rows = collect_cross_origin_frame_interactables(tab).unwrap_or_else(|e| {
         mac_stats_debug!(
@@ -2905,9 +3257,7 @@ pub fn get_interactables(tab: &headless_chrome::Tab) -> Result<Vec<Interactable>
             dom_name: row.dom_name,
             aria_label: row.aria_label,
             bounds_css: row.bounds_css,
-            annot_bounds_css: row
-                .annot_bounds
-                .map(|[x, y, w, h]| (x, y, w, h)),
+            annot_bounds_css: row.annot_bounds.map(|[x, y, w, h]| (x, y, w, h)),
             from_subframe: row.from_subframe,
             covered: row.covered,
         });
@@ -3219,12 +3569,7 @@ fn format_browser_state_for_llm_impl(
             .unwrap_or("-");
         let bbox = i
             .bounds_css
-            .map(|(x, y, w, h)| {
-                format!(
-                    "{:.0},{:.0},{:.0},{:.0}",
-                    x, y, w, h
-                )
-            })
+            .map(|(x, y, w, h)| format!("{:.0},{:.0},{:.0},{:.0}", x, y, w, h))
             .unwrap_or_else(|| "-".to_string());
         let covered = if i.covered { "yes" } else { "no" };
         s.push_str(&format!(
@@ -3248,10 +3593,7 @@ pub fn format_browser_state_for_llm(state: &BrowserState) -> String {
 
 /// Full LLM snapshot including `Tabs:` line when CDP session is available.
 fn format_browser_state_snapshot(browser: &Browser, state: &BrowserState) -> String {
-    let cur = current_tab_index()
-        .lock()
-        .map(|g| *g)
-        .unwrap_or(0);
+    let cur = current_tab_index().lock().map(|g| *g).unwrap_or(0);
     format_browser_state_for_llm_impl(state, Some((browser, cur)))
 }
 
@@ -3269,10 +3611,7 @@ fn new_tabs_opened_notice(browser: &Browser, previous_len: usize) -> Option<Stri
             .unwrap_or_default();
         parts.push(format!("[{}] {} \"{}\"", i, url, title));
     }
-    Some(format!(
-        "Note: A new tab opened: {}\n",
-        parts.join(" | ")
-    ))
+    Some(format!("Note: A new tab opened: {}\n", parts.join(" | ")))
 }
 
 fn new_focus_index_after_close(current: usize, close_idx: usize, new_len: usize) -> usize {
@@ -3339,7 +3678,10 @@ fn try_enforce_browser_tab_limit(browser: &Browser, keep: &Arc<headless_chrome::
         let tabs_guard = match browser.get_tabs().lock() {
             Ok(t) => t,
             Err(e) => {
-                warn_browser_tab_limit_enforcement_skipped(&format!("get_tabs lock poisoned: {}", e));
+                warn_browser_tab_limit_enforcement_skipped(&format!(
+                    "get_tabs lock poisoned: {}",
+                    e
+                ));
                 break;
             }
         };
@@ -3389,11 +3731,7 @@ fn try_enforce_browser_tab_limit(browser: &Browser, keep: &Arc<headless_chrome::
             new_len
         );
     }
-    let after = browser
-        .get_tabs()
-        .lock()
-        .map(|t| t.len())
-        .unwrap_or(before);
+    let after = browser.get_tabs().lock().map(|t| t.len()).unwrap_or(before);
     if closed_total > 0 {
         mac_stats_debug!(
             "browser/cdp",
@@ -3434,8 +3772,7 @@ fn switch_tab_to_index_inner(index: usize) -> Result<String, String> {
     }
     let tab = {
         let tabs = browser.get_tabs().lock().map_err(|e| e.to_string())?;
-        tabs
-            .get(index)
+        tabs.get(index)
             .cloned()
             .ok_or_else(|| "BROWSER_SWITCH_TAB: tab disappeared".to_string())?
     };
@@ -3508,8 +3845,7 @@ fn close_tab_at_index_inner(index: usize) -> Result<String, String> {
     };
     let tab = {
         let tabs = browser.get_tabs().lock().map_err(|e| e.to_string())?;
-        tabs
-            .get(index)
+        tabs.get(index)
             .cloned()
             .ok_or_else(|| "BROWSER_CLOSE_TAB: tab disappeared".to_string())?
     };
@@ -3524,11 +3860,7 @@ fn close_tab_at_index_inner(index: usize) -> Result<String, String> {
         index,
         n
     );
-    let new_len = browser
-        .get_tabs()
-        .lock()
-        .map_err(|e| e.to_string())?
-        .len();
+    let new_len = browser.get_tabs().lock().map_err(|e| e.to_string())?.len();
     let new_idx = new_focus_index_after_close(current, index, new_len);
     if let Ok(mut g) = current_tab_index().lock() {
         *g = new_idx;
@@ -3649,8 +3981,7 @@ fn fetch_page_and_extract_phones_with_browser(
     })?;
     cdp_validate_redirect_chain_from_rws_buffer(&redirect_rws_buf, url)?;
     let final_u = tab.get_url();
-    if let Some(msg) =
-        post_navigate_load_failure_message(url, final_u.as_str(), Some(tab.as_ref()))
+    if let Some(msg) = post_navigate_load_failure_message(url, final_u.as_str(), Some(tab.as_ref()))
     {
         return Err(msg);
     }
@@ -3841,6 +4172,14 @@ pub fn kill_orphaned_browser_processes() {
 /// - **Visible / user Chrome** (`was_headless == false`): only drop the handle (closes the WebSocket);
 ///   never kills the browser process.
 pub fn close_browser_session() {
+    struct SyncDebugLog;
+    impl Drop for SyncDebugLog {
+        fn drop(&mut self) {
+            crate::logging::sync_debug_log_best_effort();
+        }
+    }
+    let _sync_debug_log = SyncDebugLog;
+
     BROWSER_INTENTIONAL_STOP.store(true, Ordering::SeqCst);
     clear_owned_visible_chrome_child_pid();
     cdp_target_crash_listener::invalidate_listener_generation();
@@ -3879,10 +4218,7 @@ pub fn close_browser_session() {
     #[cfg(unix)]
     if was_headless {
         if let Some(pid) = headless_pid.filter(|p| *p > 0) {
-            match Command::new("kill")
-                .arg(pid.to_string())
-                .status()
-            {
+            match Command::new("kill").arg(pid.to_string()).status() {
                 Ok(status) if status.success() => {
                     mac_stats_debug!(
                         "browser",
@@ -3910,10 +4246,7 @@ pub fn close_browser_session() {
         }
     }
 
-    mac_stats_info!(
-        "browser",
-        "Browser session closed on shutdown"
-    );
+    mac_stats_info!("browser", "Browser session closed on shutdown");
 }
 
 /// Last page's element list (index → label) for status messages. Set after each navigate/click/input so "Clicking element 7 (Accept all)…" can show the label.
@@ -3935,11 +4268,11 @@ struct BrowserHealthSnapshot {
     /// Configured CDP port (even if current transport is headless/HTTP-only).
     cdp_port: u16,
     /// Result of the most recent `/json/version` probe (get_ws_url attempt).
-    cdp_http_ok: Option<bool>,            // None => not used (e.g. headless transport)
+    cdp_http_ok: Option<bool>, // None => not used (e.g. headless transport)
     cdp_http_err_summary: Option<String>, // truncated summary
     /// Result of the most recent CDP attach attempt (connect + ready poll).
-    ws_ok: Option<bool>,            // None => not used (e.g. headless transport)
-    ws_err_summary: Option<String>, // truncated summary
+    ws_ok: Option<bool>, // None => not used (e.g. headless transport)
+    ws_err_summary: Option<String>,       // truncated summary
     /// Whether the currently cached session was reused from idle cache vs created for this tool call.
     session_created_this_turn: Option<bool>,
     /// Elapsed time since session creation (if known).
@@ -4199,15 +4532,14 @@ pub(crate) fn format_last_browser_error_context(
     if !cdp_used {
         let mut s = "context: cdp=not_used".to_string();
         if let Some(changed) = nav_url_changed {
-            s.push_str(&format!(
-                " navchg={}",
-                if changed { 1 } else { 0 }
-            ));
+            s.push_str(&format!(" navchg={}", if changed { 1 } else { 0 }));
         }
         return Some(s);
     }
     let guard = last_browser_health().lock().ok()?;
-    guard.as_ref().map(|h| format_context_suffix_from_health(h, nav_url_changed, 190))
+    guard
+        .as_ref()
+        .map(|h| format_context_suffix_from_health(h, nav_url_changed, 190))
 }
 
 fn element_label_for_status(i: &Interactable) -> String {
@@ -4364,12 +4696,10 @@ fn is_connection_error(err_msg: &str) -> bool {
 }
 
 /// True if the current tab is a new-tab or blank page (e.g. after session reset). Caller should ask user to BROWSER_NAVIGATE first.
+/// Aligns with [`is_new_tab_page_url`] so `chrome://new-tab-page` is treated like `chrome://newtab`.
 fn is_new_tab_or_blank(url: &str) -> bool {
     let u = url.trim();
-    u.is_empty()
-        || u.eq_ignore_ascii_case("about:blank")
-        || u.starts_with("chrome://newtab")
-        || u == "chrome://newtab/"
+    u.is_empty() || is_new_tab_page_url(u)
 }
 
 /// Same URL set as browser-use `is_new_tab_page`: `about:blank`, `chrome://new-tab-page` /
@@ -4721,12 +5051,12 @@ fn evaluate_one_plus_one_blocking_timeout(tab: Arc<headless_chrome::Tab>) -> Res
             "Browser unresponsive (JavaScript engine not responding): {}",
             e
         )),
-        Err(mpsc::RecvTimeoutError::Timeout) => Err(
-            "Browser unresponsive: health check timed out after 2s".to_string(),
-        ),
-        Err(mpsc::RecvTimeoutError::Disconnected) => Err(
-            "Browser unresponsive: health check thread ended unexpectedly".to_string(),
-        ),
+        Err(mpsc::RecvTimeoutError::Timeout) => {
+            Err("Browser unresponsive: health check timed out after 2s".to_string())
+        }
+        Err(mpsc::RecvTimeoutError::Disconnected) => {
+            Err("Browser unresponsive: health check thread ended unexpectedly".to_string())
+        }
     }
 }
 
@@ -4749,9 +5079,7 @@ fn tab_document_ready_liveness(tab: &Arc<headless_chrome::Tab>) -> Result<(), St
         }
         Err(mpsc::RecvTimeoutError::Timeout) => {
             clear_cached_browser_session("tab liveness (document.readyState timed out)");
-            Err(
-                "Tab liveness failed: document.readyState timed out after 3s".to_string(),
-            )
+            Err("Tab liveness failed: document.readyState timed out after 3s".to_string())
         }
         Err(mpsc::RecvTimeoutError::Disconnected) => {
             clear_cached_browser_session("tab liveness (evaluate thread ended)");
@@ -4779,13 +5107,18 @@ fn check_browser_alive(browser: &Browser, tab: &Arc<headless_chrome::Tab>) -> Re
 
     let tab = Arc::clone(tab);
     let eval_result = if let Ok(handle) = tokio::runtime::Handle::try_current() {
-        match handle.block_on(tokio::time::timeout(
-            BROWSER_CDP_HEALTH_CHECK_TIMEOUT,
-            evaluate_one_plus_one_oneshot(tab),
-        )) {
-            Ok(inner) => inner,
-            Err(_) => Err("Browser unresponsive: health check timed out after 2s".to_string()),
-        }
+        // `block_on` on a Tokio worker thread deadlocks that worker (nested scheduling).
+        // Heartbeat / scheduler threads run `answer_with_ollama_and_fetch` on their own runtime;
+        // CDP health checks must not stall the executor. `block_in_place` hands off this worker.
+        tokio::task::block_in_place(|| {
+            match handle.block_on(tokio::time::timeout(
+                BROWSER_CDP_HEALTH_CHECK_TIMEOUT,
+                evaluate_one_plus_one_oneshot(tab),
+            )) {
+                Ok(inner) => inner,
+                Err(_) => Err("Browser unresponsive: health check timed out after 2s".to_string()),
+            }
+        })
     } else {
         evaluate_one_plus_one_blocking_timeout(tab)
     };
@@ -4793,7 +5126,7 @@ fn check_browser_alive(browser: &Browser, tab: &Arc<headless_chrome::Tab>) -> Re
     if let Err(ref e) = eval_result {
         mac_stats_warn!(
             "browser/cdp",
-            "Browser agent [CDP]: {} — clearing session for reconnect",
+            "Browser agent [CDP]: {} — clearing cached browser session",
             e
         );
         clear_browser_session_on_error(e);
@@ -4802,8 +5135,10 @@ fn check_browser_alive(browser: &Browser, tab: &Arc<headless_chrome::Tab>) -> Re
 }
 
 fn should_retry_cdp_after_clearing_session(err_msg: &str) -> bool {
+    // `check_browser_alive` already clears the session on "Browser unresponsive"; a second
+    // `with_connection_retry` pass would reconnect to a fresh/blank tab and surface
+    // SESSION_RESET_MSG instead of the health-check error (slow and confusing for the LLM).
     is_connection_error(err_msg)
-        || err_msg.contains("Browser unresponsive")
         || err_msg.contains("Tab liveness failed")
         || err_msg.contains("Browser tab renderer crashed")
 }
@@ -4829,6 +5164,12 @@ where
         Ok(v) => Ok(v),
         Err(e) => {
             if !should_retry_cdp_after_clearing_session(&e) {
+                if e.contains("Browser unresponsive") {
+                    mac_stats_info!(
+                        "browser/cdp",
+                        "Browser agent [CDP]: no CDP reconnect retry after health failure (session already cleared; failing fast)"
+                    );
+                }
                 return Err(e);
             }
             if BROWSER_INTENTIONAL_STOP.load(Ordering::SeqCst) {
@@ -5092,6 +5433,9 @@ fn normalize_url_for_screenshot(url: &str) -> String {
     if u.is_empty() {
         return "page".to_string();
     }
+    if u.len() >= 7 && u[..7].eq_ignore_ascii_case("file://") {
+        return u.to_string();
+    }
     if !u.starts_with("http://") && !u.starts_with("https://") {
         format!("https://{}", u)
     } else {
@@ -5175,7 +5519,9 @@ fn cdp_attach_redirect_chain_rws_listener(
 
 struct CdpRedirectRwsListenerGuard<'a> {
     tab: &'a headless_chrome::Tab,
-    weak: Option<std::sync::Weak<dyn headless_chrome::browser::tab::EventListener<Event> + Send + Sync>>,
+    weak: Option<
+        std::sync::Weak<dyn headless_chrome::browser::tab::EventListener<Event> + Send + Sync>,
+    >,
 }
 
 impl Drop for CdpRedirectRwsListenerGuard<'_> {
@@ -5190,30 +5536,29 @@ impl Drop for CdpRedirectRwsListenerGuard<'_> {
 fn cdp_attach_network_in_flight_listener(
     tab: &headless_chrome::Tab,
     in_flight: Arc<Mutex<HashSet<String>>>,
-) -> Option<std::sync::Weak<dyn headless_chrome::browser::tab::EventListener<Event> + Send + Sync>> {
+) -> Option<std::sync::Weak<dyn headless_chrome::browser::tab::EventListener<Event> + Send + Sync>>
+{
     let b = Arc::clone(&in_flight);
-    let listener = Arc::new(move |event: &Event| {
-        match event {
-            Event::NetworkRequestWillBeSent(ev) => {
-                let id = ev.params.request_id.clone();
-                if let Ok(mut g) = b.lock() {
-                    g.insert(id);
-                }
+    let listener = Arc::new(move |event: &Event| match event {
+        Event::NetworkRequestWillBeSent(ev) => {
+            let id = ev.params.request_id.clone();
+            if let Ok(mut g) = b.lock() {
+                g.insert(id);
             }
-            Event::NetworkLoadingFinished(ev) => {
-                let id = ev.params.request_id.clone();
-                if let Ok(mut g) = b.lock() {
-                    g.remove(&id);
-                }
-            }
-            Event::NetworkLoadingFailed(ev) => {
-                let id = ev.params.request_id.clone();
-                if let Ok(mut g) = b.lock() {
-                    g.remove(&id);
-                }
-            }
-            _ => {}
         }
+        Event::NetworkLoadingFinished(ev) => {
+            let id = ev.params.request_id.clone();
+            if let Ok(mut g) = b.lock() {
+                g.remove(&id);
+            }
+        }
+        Event::NetworkLoadingFailed(ev) => {
+            let id = ev.params.request_id.clone();
+            if let Ok(mut g) = b.lock() {
+                g.remove(&id);
+            }
+        }
+        _ => {}
     });
     match tab.add_event_listener(listener) {
         Ok(w) => Some(w),
@@ -5230,7 +5575,9 @@ fn cdp_attach_network_in_flight_listener(
 
 struct CdpNetworkIdleInFlightGuard<'a> {
     tab: &'a headless_chrome::Tab,
-    weak: Option<std::sync::Weak<dyn headless_chrome::browser::tab::EventListener<Event> + Send + Sync>>,
+    weak: Option<
+        std::sync::Weak<dyn headless_chrome::browser::tab::EventListener<Event> + Send + Sync>,
+    >,
 }
 
 impl Drop for CdpNetworkIdleInFlightGuard<'_> {
@@ -5250,23 +5597,13 @@ fn prepare_post_nav_network_idle_tracking(
     CdpNetworkIdleInFlightGuard<'_>,
 ) {
     if !crate::config::Config::browser_post_navigate_network_idle_enabled() {
-        return (
-            None,
-            CdpNetworkIdleInFlightGuard { tab, weak: None },
-        );
+        return (None, CdpNetworkIdleInFlightGuard { tab, weak: None });
     }
     cdp_enable_network_for_redirect_chain_capture(tab);
     let flight = Arc::new(Mutex::new(HashSet::new()));
     let weak = cdp_attach_network_in_flight_listener(tab, Arc::clone(&flight));
-    let flight_opt = if weak.is_some() {
-        Some(flight)
-    } else {
-        None
-    };
-    (
-        flight_opt,
-        CdpNetworkIdleInFlightGuard { tab, weak },
-    )
+    let flight_opt = if weak.is_some() { Some(flight) } else { None };
+    (flight_opt, CdpNetworkIdleInFlightGuard { tab, weak })
 }
 
 /// After `wait_until_navigated` (and any non-timeout SPA/hash fallback sleep), apply configurable
@@ -5377,7 +5714,17 @@ fn cdp_redirect_chain_first_hop_matches_request(first_hop: &str, requested: &str
     if h1 != h2 {
         return false;
     }
-    if u1.port_or_known_default() != u2.port_or_known_default() {
+    let s1 = u1.scheme().to_ascii_lowercase();
+    let s2 = u2.scheme().to_ascii_lowercase();
+    let p1 = u1.port_or_known_default();
+    let p2 = u2.port_or_known_default();
+    let ports_align = p1 == p2
+        || (matches!(s1.as_str(), "http" | "https") && matches!(s2.as_str(), "http" | "https")
+            && matches!(
+                (p1, p2),
+                (Some(80), Some(443)) | (Some(443), Some(80))
+            ));
+    if !ports_align {
         return false;
     }
     let p1 = if u1.path().is_empty() { "/" } else { u1.path() };
@@ -5404,10 +5751,7 @@ fn cdp_extract_document_redirect_chain_from_rws_buffer(
             chain.push(buf[j].1.clone());
             j += 1;
         }
-        let take = best
-            .as_ref()
-            .map(|b| chain.len() > b.len())
-            .unwrap_or(true);
+        let take = best.as_ref().map(|b| chain.len() > b.len()).unwrap_or(true);
         if take {
             best = Some(chain);
         }
@@ -5480,8 +5824,7 @@ fn cdp_validate_redirect_chain_from_rws_buffer(
         .lock()
         .map(|q| q.iter().cloned().collect())
         .unwrap_or_default();
-    let Some(chain) =
-        cdp_extract_document_redirect_chain_from_rws_buffer(&snapshot, requested_url)
+    let Some(chain) = cdp_extract_document_redirect_chain_from_rws_buffer(&snapshot, requested_url)
     else {
         mac_stats_debug!(
             "browser/cdp",
@@ -5512,10 +5855,12 @@ fn cdp_validate_redirect_chain_from_rws_buffer(
 /// - **http / https:** Same resolution-based check as pre-navigation — [`crate::commands::browser::validate_url_no_ssrf`]
 ///   with `ssrfAllowedHosts` / config allowlist.
 /// - **Explicitly allowed non-network documents:** `about:blank` and `about:srcdoc` only (including trivial fragments).
-///   Do not extend this casually to `file:` / `javascript:` / other opaque schemes.
+/// - **`file:`** — allowed only when it passes the same local `.html`/`.htm` checks as pre-navigation
+///   ([`crate::commands::browser::validate_file_url_for_browser_navigation`]).
+///   Do not extend casually to `javascript:` or other opaque schemes.
 /// - **Browser-internal (no IP resolution):** `chrome-error:`, `devtools:`, `chrome:`, `edge:`, `brave:` — same class as
 ///   OpenClaw’s post-navigate handling; the LLM snapshot already adds hints for chrome-error / new-tab pages.
-/// - **blob:** / **data:** — skipped here (no DNS); `file:` and `javascript:` are rejected.
+/// - **blob:** / **data:** — skipped here (no DNS); `javascript:` is rejected.
 fn assert_final_document_url_ssrf_post_check(
     final_url: &str,
     requested_url_for_log: Option<&str>,
@@ -5533,7 +5878,10 @@ fn assert_final_document_url_ssrf_post_check(
     let scheme = parsed.scheme().to_ascii_lowercase();
     match scheme.as_str() {
         "http" | "https" => {
-            if let Some(req) = requested_url_for_log.map(str::trim).filter(|s| !s.is_empty()) {
+            if let Some(req) = requested_url_for_log
+                .map(str::trim)
+                .filter(|s| !s.is_empty())
+            {
                 mac_stats_debug!(
                     "browser/cdp",
                     "Browser agent [CDP]: post-navigate SSRF recheck requested_url={} final_url={}",
@@ -5573,7 +5921,15 @@ fn assert_final_document_url_ssrf_post_check(
         }
         "chrome-error" | "devtools" | "chrome" | "edge" | "brave" => Ok(()),
         "blob" | "data" => Ok(()),
-        "file" | "javascript" => Err(format!(
+        "file" => crate::commands::browser::validate_file_url_for_browser_navigation(&parsed)
+            .map(|_| ())
+            .map_err(|e| {
+                format!(
+                    "After navigation, the tab `file:` URL failed local safety checks: {}",
+                    e
+                )
+            }),
+        "javascript" => Err(format!(
             "After navigation, the tab URL uses disallowed scheme `{}:` (SSRF guard)",
             scheme
         )),
@@ -5602,7 +5958,10 @@ fn is_allowed_about_document_for_ssrf(raw: &str, parsed: &Url) -> bool {
 
 /// After navigation (redirect, click, history), if the tab landed on a blocked http(s) URL, reset to `about:blank`.
 /// Returns a prefix line for the tool result when a reset was performed.
-fn enforce_tab_url_navigation_policy(tab: &headless_chrome::browser::tab::Tab, context: &str) -> Result<Option<String>, String> {
+fn enforce_tab_url_navigation_policy(
+    tab: &headless_chrome::browser::tab::Tab,
+    context: &str,
+) -> Result<Option<String>, String> {
     let url = tab.get_url();
     let url_str = url.as_str();
     if !url_filter::url_scheme_subject_to_domain_policy(url_str) {
@@ -5711,9 +6070,8 @@ fn synchronize_tab_after_cdp_navigation(
             let seen = buf
                 .lock()
                 .map(|q| {
-                    q.iter().any(|n| {
-                        n == "networkIdle" || n == "networkAlmostIdle"
-                    })
+                    q.iter()
+                        .any(|n| n == "networkIdle" || n == "networkAlmostIdle")
                 })
                 .unwrap_or(false);
             if seen {
@@ -5925,11 +6283,7 @@ fn try_save_printed_pdf(tab: &headless_chrome::Tab, download_dir: &Path) -> Opti
         chrono::Utc::now().format("%Y%m%d_%H%M%S")
     );
     let path = artifact_atomic::write_bytes_atomic_same_dir(download_dir, &name, &bytes).ok()?;
-    mac_stats_info!(
-        "browser/cdp",
-        "Page.printToPDF saved {}",
-        path.display()
-    );
+    mac_stats_info!("browser/cdp", "Page.printToPDF saved {}", path.display());
     Some(path)
 }
 
@@ -6224,6 +6578,97 @@ fn apply_cdp_emulation_to_tab(tab: &headless_chrome::Tab) {
     }
 }
 
+/// When [`CURRENT_TAB_INDEX`] points at `about:blank` or a Chrome new-tab surface but another tab has navigable content,
+/// refocus automation (stored TargetID, then matching host, then first non-ephemeral tab). Reduces false
+/// "Browser session was reset" errors after CDP reconnect or tab-order drift while a real page stays open.
+fn maybe_recover_focus_from_ephemeral_blank_tab(
+    browser: &Browser,
+    tab: Arc<headless_chrome::Tab>,
+) -> Result<Arc<headless_chrome::Tab>, String> {
+    let url = tab.get_url();
+    if !is_new_tab_or_blank(url.as_str()) {
+        return Ok(tab);
+    }
+    let tabs_guard = browser.get_tabs().lock().map_err(|e| e.to_string())?;
+    if tabs_guard.len() <= 1 {
+        drop(tabs_guard);
+        return Ok(tab);
+    }
+    if let Ok(g) = active_tab_target_id_store().lock() {
+        if let Some(ref sid) = *g {
+            if let Some((idx, t)) = tabs_guard
+                .iter()
+                .enumerate()
+                .find(|(_, x)| x.get_target_id().as_str() == sid.as_str())
+            {
+                if !is_new_tab_or_blank(t.get_url().as_str()) {
+                    let t = t.clone();
+                    drop(tabs_guard);
+                    if let Ok(mut g) = current_tab_index().lock() {
+                        *g = idx;
+                    }
+                    t.bring_to_front()
+                        .map_err(|e| format!("bring_to_front (blank-tab recovery): {}", e))?;
+                    mac_stats_info!(
+                        "browser/cdp",
+                        "Browser agent [CDP]: focused tab was blank/new-tab; refocused tab index {} (stored automation TargetID)",
+                        idx
+                    );
+                    return Ok(t);
+                }
+            }
+        }
+    }
+    if let Ok(hg) = active_automation_tab_url_host_store().lock() {
+        if let Some(ref want_host) = *hg {
+            if want_host != "(no-host)" && want_host != "(unknown)" {
+                for (idx, t) in tabs_guard.iter().enumerate() {
+                    let u = t.get_url();
+                    if is_new_tab_or_blank(u.as_str()) {
+                        continue;
+                    }
+                    if host_for_navigation_log(u.as_str()) == *want_host {
+                        let t = t.clone();
+                        drop(tabs_guard);
+                        if let Ok(mut g) = current_tab_index().lock() {
+                            *g = idx;
+                        }
+                        t.bring_to_front()
+                            .map_err(|e| format!("bring_to_front (blank-tab recovery): {}", e))?;
+                        mac_stats_info!(
+                            "browser/cdp",
+                            "Browser agent [CDP]: focused tab was blank/new-tab; refocused tab index {} (matched automation host {})",
+                            idx,
+                            want_host
+                        );
+                        return Ok(t);
+                    }
+                }
+            }
+        }
+    }
+    for (idx, t) in tabs_guard.iter().enumerate() {
+        let u = t.get_url();
+        if !is_new_tab_or_blank(u.as_str()) {
+            let t = t.clone();
+            drop(tabs_guard);
+            if let Ok(mut g) = current_tab_index().lock() {
+                *g = idx;
+            }
+            t.bring_to_front()
+                .map_err(|e| format!("bring_to_front (blank-tab recovery): {}", e))?;
+            mac_stats_info!(
+                "browser/cdp",
+                "Browser agent [CDP]: focused tab was blank/new-tab; refocused tab index {} (first non-blank tab)",
+                idx
+            );
+            return Ok(t);
+        }
+    }
+    drop(tabs_guard);
+    Ok(tab)
+}
+
 /// Get the current tab from BROWSER_SESSION. Uses CURRENT_TAB_INDEX when set (e.g. after new-tab navigate).
 /// If Chrome has no page tabs (e.g. user closed every tab), creates one `about:blank` tab once per call (OpenClaw-style bootstrap).
 /// Ensures tab window bounds are at least VIEWPORT_WIDTH x VIEWPORT_HEIGHT (e.g. when connecting to existing Chrome).
@@ -6274,6 +6719,7 @@ fn get_current_tab() -> Result<(Browser, Arc<headless_chrome::Tab>), String> {
                 .ok_or_else(|| "No tab in browser".to_string())?
         }
     };
+    let tab = maybe_recover_focus_from_ephemeral_blank_tab(&browser, tab)?;
     let tab = reconcile_active_automation_tab(&browser, tab)?;
     let bounds = Bounds::Normal {
         left: None,
@@ -6319,15 +6765,21 @@ pub(crate) fn navigate_and_get_state_with_options_and_downloads(
     with_connection_retry(|| navigate_and_get_state_inner(url, new_tab))
 }
 
-fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec<PathBuf>), String> {
-    let url_normalized = normalize_url_for_screenshot(url);
-
-    // SSRF guard: block private/loopback/link-local URLs before CDP navigation
-    if let Ok(parsed) = Url::parse(&url_normalized) {
-        let allowed = crate::config::Config::ssrf_allowed_hosts();
-        crate::commands::browser::validate_url_no_ssrf(&parsed, &allowed)?;
+fn navigate_and_get_state_inner(
+    url: &str,
+    new_tab: bool,
+) -> Result<(String, Vec<PathBuf>), String> {
+    let navigate_target = crate::commands::browser::normalize_and_validate_cdp_navigation_url(url)?;
+    if Url::parse(&navigate_target)
+        .ok()
+        .is_some_and(|u| u.scheme().eq_ignore_ascii_case("file"))
+    {
+        mac_stats_debug!(
+            "browser/security",
+            "Browser agent [CDP]: BROWSER_NAVIGATE file:// precheck passed (local html)"
+        );
     }
-    if let Some(msg) = url_filter::navigation_precheck_error(&url_normalized) {
+    if let Some(msg) = url_filter::navigation_precheck_error(&navigate_target) {
         return Err(msg);
     }
     // After SSRF + domain precheck so we do not log strict/warn when the URL was already rejected.
@@ -6340,12 +6792,12 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec
     mac_stats_info!(
         "browser/cdp",
         "Browser agent [CDP]: BROWSER_NAVIGATE: {} (new_tab={})",
-        url_normalized,
+        navigate_target,
         new_tab
     );
     let (browser, tab) = if new_tab {
-        let browser =
-            get_or_create_browser(cdp_debug_port()).inspect_err(|e| clear_browser_session_on_error(e))?;
+        let browser = get_or_create_browser(cdp_debug_port())
+            .inspect_err(|e| clear_browser_session_on_error(e))?;
         let new_tab = browser.new_tab().map_err(|e| {
             let s = format!("New tab failed: {}", e);
             clear_browser_session_on_error(&s);
@@ -6382,7 +6834,7 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec
     };
     let current_url = tab.get_url();
     let actual_timeout_secs = if let Some(same_secs) = same_domain_timeout_secs {
-        if is_same_domain(current_url.as_str(), &url_normalized) {
+        if is_same_domain(current_url.as_str(), &navigate_target) {
             mac_stats_debug!(
                 "browser/cdp",
                 "Browser agent [CDP]: same-domain navigation, using {}s timeout",
@@ -6401,96 +6853,13 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec
     let include_diag = crate::config::Config::browser_include_diagnostics_in_state();
     let mut diag_console_lines: Option<Arc<Mutex<VecDeque<String>>>> = None;
     let mut diag_uncaught_excs: Option<Arc<Mutex<VecDeque<String>>>> = None;
-    let mut diag_listener_weak = None;
-    let mut diag_enabled = false;
+    let mut diag_listener_weak: Option<CdpDiagListenerWeak> = None;
     if include_diag {
-        let console_buf: Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
-        let exc_buf: Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
-
-        // Enable only when we need them; failures should never break navigation.
-        if let Err(e) = tab.enable_log().and_then(|t| t.enable_runtime()) {
-            mac_stats_warn!(
-                "browser/cdp",
-                "Browser agent [CDP]: failed to enable diagnostics log/runtime: {} (continuing)",
-                e
-            );
-        } else {
-            diag_enabled = true;
-            let console_buf_clone = Arc::clone(&console_buf);
-            let exc_buf_clone = Arc::clone(&exc_buf);
-            let listener = Arc::new(move |event: &Event| match event {
-                Event::LogEntryAdded(ev) => {
-                    let level = &ev.params.entry.level;
-                    let prefix = match level {
-                        headless_chrome::protocol::cdp::Log::LogEntryLevel::Error => {
-                            Some("error")
-                        }
-                        headless_chrome::protocol::cdp::Log::LogEntryLevel::Warning => {
-                            Some("warning")
-                        }
-                        _ => None,
-                    };
-                    let Some(prefix) = prefix else {
-                        return;
-                    };
-                    let raw_text = ev.params.entry.text.trim();
-                    if raw_text.is_empty() {
-                        return;
-                    }
-                    let normalized =
-                        normalize_diagnostic_text(raw_text, DIAG_MAX_CONSOLE_CHARS_PER_LINE);
-                    if normalized.is_empty() {
-                        return;
-                    }
-                    let line = format!("[{}] {}", prefix, normalized);
-                    if let Ok(mut q) = console_buf_clone.lock() {
-                        push_bounded_dedup(&mut q, line, DIAG_MAX_CONSOLE_LINES);
-                    }
-                }
-                Event::RuntimeExceptionThrown(ev) => {
-                    let details = &ev.params.exception_details;
-                    let raw_text = if !details.text.trim().is_empty() {
-                        details.text.as_str()
-                    } else {
-                        details
-                            .stack_trace
-                            .as_ref()
-                            .and_then(|st| st.description.as_deref())
-                            .unwrap_or("")
-                    };
-                    let raw_text = raw_text.trim();
-                    if raw_text.is_empty() {
-                        return;
-                    }
-                    let normalized =
-                        normalize_diagnostic_text(raw_text, DIAG_MAX_UNCAUGHT_EXC_CHARS_PER_MESSAGE);
-                    if normalized.is_empty() {
-                        return;
-                    }
-                    let msg = format!("Uncaught exception: {}", normalized);
-                    if let Ok(mut q) = exc_buf_clone.lock() {
-                        push_bounded_dedup(&mut q, msg, DIAG_MAX_UNCAUGHT_EXC_MESSAGES);
-                    }
-                }
-                _ => {}
-            });
-
-            match tab.add_event_listener(listener) {
-                Ok(w) => {
-                    diag_listener_weak = Some(w);
-                    diag_console_lines = Some(console_buf);
-                    diag_uncaught_excs = Some(exc_buf);
-                }
-                Err(e) => {
-                    mac_stats_warn!(
-                        "browser/cdp",
-                        "Browser agent [CDP]: failed to register diagnostics event listener: {} (continuing)",
-                        e
-                    );
-                    let _ = tab.disable_runtime();
-                    let _ = tab.disable_log();
-                }
-            }
+        if let Some((console_buf, exc_buf, w)) = try_attach_bounded_cdp_page_diagnostics(tab.as_ref())
+        {
+            diag_listener_weak = Some(w);
+            diag_console_lines = Some(console_buf);
+            diag_uncaught_excs = Some(exc_buf);
         }
     }
 
@@ -6542,11 +6911,7 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec
             let _ = tab.remove_event_listener(&w);
         }
         if let Some(w) = diag_listener_weak.take() {
-            let _ = tab.remove_event_listener(&w);
-        }
-        if diag_enabled {
-            let _ = tab.disable_runtime();
-            let _ = tab.disable_log();
+            detach_bounded_cdp_page_diagnostics(tab.as_ref(), &w);
         }
     };
 
@@ -6574,11 +6939,11 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec
         prepare_post_nav_network_idle_tracking(tab.as_ref());
     let nav_start = Instant::now();
     let pre_navigate_target_id = tab.get_target_id().clone();
-    let nav_res = tab.navigate_to(&url_normalized).map_err(|e| {
+    let nav_res = tab.navigate_to(&navigate_target).map_err(|e| {
         let msg = e.to_string();
         let detail = navigate_failed_detail_from_display(&msg);
-        log_navigation_cdp_failure(&url_normalized, &detail);
-        let s = navigation_tool_result_for_failed_navigate(&url_normalized, &detail);
+        log_navigation_cdp_failure(&navigate_target, &detail);
+        let s = navigation_tool_result_for_failed_navigate(&navigate_target, &detail);
         clear_browser_session_on_error(&s);
         s
     });
@@ -6591,12 +6956,12 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec
     let sync_res = synchronize_tab_after_cdp_navigation(
         &tab,
         current_url.as_str(),
-        url_normalized.as_str(),
+        navigate_target.as_str(),
         lifecycle_buf_for_sync,
         nav_start,
         Duration::from_secs(actual_timeout_secs),
         actual_timeout_secs,
-        Some(url_normalized.as_str()),
+        Some(navigate_target.as_str()),
         post_nav_net_flight.as_ref(),
     );
     drop(post_nav_net_guard);
@@ -6606,7 +6971,7 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec
         return Err(e);
     }
     if let Err(e) =
-        cdp_validate_redirect_chain_from_rws_buffer(&redirect_rws_buf, url_normalized.as_str())
+        cdp_validate_redirect_chain_from_rws_buffer(&redirect_rws_buf, navigate_target.as_str())
     {
         stop_download_aux_listener(&aux_holder);
         cleanup_nav();
@@ -6614,7 +6979,7 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec
     }
     let final_after_wait = tab.get_url();
     if let Some(msg) = post_navigate_load_failure_message(
-        url_normalized.as_str(),
+        navigate_target.as_str(),
         final_after_wait.as_str(),
         Some(tab.as_ref()),
     ) {
@@ -6623,7 +6988,7 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec
         return Err(msg);
     }
     if let Err(e) =
-        run_spa_blank_page_retry_if_needed(&tab, actual_timeout_secs, url_normalized.as_str())
+        run_spa_blank_page_retry_if_needed(&tab, actual_timeout_secs, navigate_target.as_str())
     {
         stop_download_aux_listener(&aux_holder);
         cleanup_nav();
@@ -6631,7 +6996,7 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec
     }
     if let Err(e) = assert_final_document_url_ssrf_post_check(
         tab.get_url().as_str(),
-        Some(url_normalized.as_str()),
+        Some(navigate_target.as_str()),
     ) {
         stop_download_aux_listener(&aux_holder);
         cleanup_nav();
@@ -6651,14 +7016,15 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec
             return Err(e);
         }
     };
-    let post_nav_warn = match enforce_tab_url_navigation_policy(&tab, "BROWSER_NAVIGATE (redirect or final URL)") {
-        Ok(w) => w.unwrap_or_default(),
-        Err(e) => {
-            stop_download_aux_listener(&aux_holder);
-            cleanup_nav();
-            return Err(e);
-        }
-    };
+    let post_nav_warn =
+        match enforce_tab_url_navigation_policy(&tab, "BROWSER_NAVIGATE (redirect or final URL)") {
+            Ok(w) => w.unwrap_or_default(),
+            Err(e) => {
+                stop_download_aux_listener(&aux_holder);
+                cleanup_nav();
+                return Err(e);
+            }
+        };
     let mut state = match get_browser_state(&tab) {
         Ok(s) => s,
         Err(e) => {
@@ -6672,7 +7038,7 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec
     mac_stats_debug!(
         "browser/cdp",
         "Browser agent [CDP]: checking for cookie banner after navigate to {}",
-        url_normalized
+        navigate_target
     );
     if let Ok(true) = try_dismiss_cookie_banner(&tab) {
         std::thread::sleep(BROWSER_STATE_REFRESH_AFTER_UI_MS);
@@ -6681,46 +7047,24 @@ fn navigate_and_get_state_inner(url: &str, new_tab: bool) -> Result<(String, Vec
         }
     }
 
-    let mut diagnostics_section = String::new();
-    if include_diag {
-        let console_vec = if let Some(buf) = &diag_console_lines {
-            buf.lock()
-                .map(|q| q.iter().cloned().collect::<Vec<_>>())
-                .unwrap_or_default()
-        } else {
-            Vec::new()
-        };
-        let exc_vec = if let Some(buf) = &diag_uncaught_excs {
-            buf.lock()
-                .map(|q| q.iter().cloned().collect::<Vec<_>>())
-                .unwrap_or_default()
-        } else {
-            Vec::new()
-        };
-
-        mac_stats_debug!(
-            "browser/cdp",
-            "Browser agent [CDP]: captured diagnostics console_lines={} uncaught_exceptions={}",
-            console_vec.len(),
-            exc_vec.len()
-        );
-
-        if !console_vec.is_empty() || !exc_vec.is_empty() {
-            diagnostics_section.push_str("\n## Page diagnostics\n");
-            if !console_vec.is_empty() {
-                diagnostics_section.push_str("Console (error/warning):\n");
-                for l in console_vec {
-                    diagnostics_section.push_str(&format!("- {}\n", l));
-                }
+    let diagnostics_section =
+        if include_diag {
+            if let (Some(c), Some(e)) = (&diag_console_lines, &diag_uncaught_excs) {
+                let n_c = c.lock().map(|q| q.len()).unwrap_or(0);
+                let n_e = e.lock().map(|q| q.len()).unwrap_or(0);
+                mac_stats_debug!(
+                    "browser/cdp",
+                    "Browser agent [CDP]: captured diagnostics console_lines={} uncaught_exceptions={}",
+                    n_c,
+                    n_e
+                );
+                format_bounded_page_diagnostics_tool_section(c, e)
+            } else {
+                String::new()
             }
-            if !exc_vec.is_empty() {
-                diagnostics_section.push_str("Uncaught exceptions:\n");
-                for m in exc_vec {
-                    diagnostics_section.push_str(&format!("- {}\n", m));
-                }
-            }
-        }
-    }
+        } else {
+            String::new()
+        };
 
     cleanup_nav();
 
@@ -6986,11 +7330,7 @@ fn click_by_index_inner(index: u32) -> Result<(String, Vec<PathBuf>), String> {
     let (browser, tab) = get_current_tab().inspect_err(|e| {
         clear_browser_session_on_error(e);
     })?;
-    let n_before = browser
-        .get_tabs()
-        .lock()
-        .map(|t| t.len())
-        .unwrap_or(0);
+    let n_before = browser.get_tabs().lock().map(|t| t.len()).unwrap_or(0);
     if is_new_tab_or_blank(tab.get_url().as_str()) {
         return Err(SESSION_RESET_MSG.to_string());
     }
@@ -7032,11 +7372,7 @@ fn click_by_index_inner(index: u32) -> Result<(String, Vec<PathBuf>), String> {
         return Err(s);
     }
     std::thread::sleep(BROWSER_AFTER_CLICK_OR_COORD_SETTLE);
-    let n_after = browser
-        .get_tabs()
-        .lock()
-        .map(|t| t.len())
-        .unwrap_or(0);
+    let n_after = browser.get_tabs().lock().map(|t| t.len()).unwrap_or(0);
     if n_after > n_before {
         if let Ok(mut g) = current_tab_index().lock() {
             *g = n_after.saturating_sub(1);
@@ -7073,7 +7409,10 @@ fn click_by_index_inner(index: u32) -> Result<(String, Vec<PathBuf>), String> {
     if url_filter::url_scheme_subject_to_domain_policy(state.current_url.as_str())
         && !url_filter::is_navigation_allowed(state.current_url.as_str())
     {
-        prefix = match enforce_tab_url_navigation_policy(&tab, "BROWSER_CLICK (e.g. new tab or redirect)") {
+        prefix = match enforce_tab_url_navigation_policy(
+            &tab,
+            "BROWSER_CLICK (e.g. new tab or redirect)",
+        ) {
             Ok(w) => w.unwrap_or_default(),
             Err(e) => {
                 stop_download_aux_listener(&aux_holder);
@@ -7128,11 +7467,7 @@ fn hover_by_index_inner(index: u32) -> Result<(String, Vec<PathBuf>), String> {
     let (browser, tab) = get_current_tab().inspect_err(|e| {
         clear_browser_session_on_error(e);
     })?;
-    let n_before = browser
-        .get_tabs()
-        .lock()
-        .map(|t| t.len())
-        .unwrap_or(0);
+    let n_before = browser.get_tabs().lock().map(|t| t.len()).unwrap_or(0);
     if is_new_tab_or_blank(tab.get_url().as_str()) {
         return Err(SESSION_RESET_MSG.to_string());
     }
@@ -7153,11 +7488,7 @@ fn hover_by_index_inner(index: u32) -> Result<(String, Vec<PathBuf>), String> {
         return Err(s);
     }
     std::thread::sleep(BROWSER_AFTER_HOVER_SETTLE);
-    let n_after = browser
-        .get_tabs()
-        .lock()
-        .map(|t| t.len())
-        .unwrap_or(0);
+    let n_after = browser.get_tabs().lock().map(|t| t.len()).unwrap_or(0);
     if n_after > n_before {
         if let Ok(mut g) = current_tab_index().lock() {
             *g = n_after.saturating_sub(1);
@@ -7233,11 +7564,7 @@ fn drag_by_indices_inner(from_index: u32, to_index: u32) -> Result<(String, Vec<
     let (browser, tab) = get_current_tab().inspect_err(|e| {
         clear_browser_session_on_error(e);
     })?;
-    let n_before = browser
-        .get_tabs()
-        .lock()
-        .map(|t| t.len())
-        .unwrap_or(0);
+    let n_before = browser.get_tabs().lock().map(|t| t.len()).unwrap_or(0);
     if is_new_tab_or_blank(tab.get_url().as_str()) {
         return Err(SESSION_RESET_MSG.to_string());
     }
@@ -7247,11 +7574,12 @@ fn drag_by_indices_inner(from_index: u32, to_index: u32) -> Result<(String, Vec<
         from_index,
         to_index
     );
-    let from_id = resolve_interactable_for_action(&tab, from_index, "BROWSER_DRAG").map_err(|e| {
-        let s = format!("BROWSER_DRAG: {}", e);
-        clear_browser_session_on_error(&s);
-        s
-    })?;
+    let from_id =
+        resolve_interactable_for_action(&tab, from_index, "BROWSER_DRAG").map_err(|e| {
+            let s = format!("BROWSER_DRAG: {}", e);
+            clear_browser_session_on_error(&s);
+            s
+        })?;
     let to_id = resolve_interactable_for_action(&tab, to_index, "BROWSER_DRAG").map_err(|e| {
         let s = format!("BROWSER_DRAG: {}", e);
         clear_browser_session_on_error(&s);
@@ -7285,11 +7613,7 @@ fn drag_by_indices_inner(from_index: u32, to_index: u32) -> Result<(String, Vec<
         return Err(s);
     }
     std::thread::sleep(BROWSER_AFTER_CLICK_OR_COORD_SETTLE);
-    let n_after = browser
-        .get_tabs()
-        .lock()
-        .map(|t| t.len())
-        .unwrap_or(0);
+    let n_after = browser.get_tabs().lock().map(|t| t.len()).unwrap_or(0);
     if n_after > n_before {
         if let Ok(mut g) = current_tab_index().lock() {
             *g = n_after.saturating_sub(1);
@@ -7384,11 +7708,7 @@ fn click_at_viewport_coordinates_inner(x: f64, y: f64) -> Result<(String, Vec<Pa
     let (browser, tab) = get_current_tab().inspect_err(|e| {
         clear_browser_session_on_error(e);
     })?;
-    let n_before = browser
-        .get_tabs()
-        .lock()
-        .map(|t| t.len())
-        .unwrap_or(0);
+    let n_before = browser.get_tabs().lock().map(|t| t.len()).unwrap_or(0);
     if is_new_tab_or_blank(tab.get_url().as_str()) {
         return Err(SESSION_RESET_MSG.to_string());
     }
@@ -7426,11 +7746,7 @@ fn click_at_viewport_coordinates_inner(x: f64, y: f64) -> Result<(String, Vec<Pa
         return Err(s);
     }
     std::thread::sleep(BROWSER_AFTER_CLICK_OR_COORD_SETTLE);
-    let n_after = browser
-        .get_tabs()
-        .lock()
-        .map(|t| t.len())
-        .unwrap_or(0);
+    let n_after = browser.get_tabs().lock().map(|t| t.len()).unwrap_or(0);
     if n_after > n_before {
         if let Ok(mut g) = current_tab_index().lock() {
             *g = n_after.saturating_sub(1);
@@ -7549,12 +7865,23 @@ fn wait_for_browser_download_inner(timeout_secs: u64) -> Result<(String, Vec<Pat
     let cdp_paths = aux_out.lock().map(|g| g.clone()).unwrap_or_default();
     let found = cdp_downloads::merge_with_directory_diff(&download_dir, &pre_dl, &cdp_paths);
     let msg = if found.is_empty() {
+        mac_stats_info!(
+            "browser/cdp",
+            "BROWSER_DOWNLOAD: timeout after {}s (no new completed file under {})",
+            cap,
+            download_dir.display()
+        );
         format!(
             "BROWSER_DOWNLOAD: no completed download within {}s (watching {}).",
             cap,
             download_dir.display()
         )
     } else {
+        mac_stats_info!(
+            "browser/cdp",
+            "BROWSER_DOWNLOAD: {} completed file(s) for attachment pipeline",
+            found.len()
+        );
         format!(
             "BROWSER_DOWNLOAD: {} file(s) ready.{}",
             found.len(),
@@ -7782,7 +8109,10 @@ fn input_by_index_inner(index: u32, text: &str) -> Result<String, String> {
             return Err("BROWSER_INPUT: invalid element handle.".to_string());
         }
         other => {
-            return Err(format!("BROWSER_INPUT: unexpected script result {:?}", other));
+            return Err(format!(
+                "BROWSER_INPUT: unexpected script result {:?}",
+                other
+            ));
         }
     }
     std::thread::sleep(BROWSER_POST_INPUT_SETTLE);
@@ -7840,8 +8170,8 @@ pub fn resolve_browser_upload_source_path(path_arg: &str) -> Result<PathBuf, Str
     let canon = path
         .canonicalize()
         .map_err(|e| format!("cannot access file (does it exist?): {}", e))?;
-    let meta = std::fs::metadata(&canon)
-        .map_err(|e| format!("cannot read file metadata: {}", e))?;
+    let meta =
+        std::fs::metadata(&canon).map_err(|e| format!("cannot read file metadata: {}", e))?;
     if !meta.is_file() {
         return Err("path is not a regular file".to_string());
     }
@@ -8180,16 +8510,10 @@ fn scroll_page_inner(arg: &str) -> Result<String, String> {
         "window.scrollTo(0, 0); 'scrolled to top'".to_string()
     } else if arg == "down" {
         let step = browser_scroll_step_px_from_layout_metrics(tab.as_ref());
-        format!(
-            "window.scrollBy(0, {}); 'scrolled down {}px'",
-            step, step
-        )
+        format!("window.scrollBy(0, {}); 'scrolled down {}px'", step, step)
     } else if arg == "up" {
         let step = browser_scroll_step_px_from_layout_metrics(tab.as_ref());
-        format!(
-            "window.scrollBy(0, -{}); 'scrolled up {}px'",
-            step, step
-        )
+        format!("window.scrollBy(0, -{}); 'scrolled up {}px'", step, step)
     } else if let Ok(pixels) = arg.parse::<i32>() {
         let px = pixels.clamp(-10000, 10000);
         if px >= 0 {
@@ -8199,10 +8523,7 @@ fn scroll_page_inner(arg: &str) -> Result<String, String> {
         }
     } else {
         let step = browser_scroll_step_px_from_layout_metrics(tab.as_ref());
-        format!(
-            "window.scrollBy(0, {}); 'scrolled down {}px'",
-            step, step
-        )
+        format!("window.scrollBy(0, {}); 'scrolled down {}px'", step, step)
     };
     tab.evaluate(&scroll_js, false).map_err(|e| {
         let s = format!("Scroll evaluate: {}", e);
@@ -8307,7 +8628,8 @@ fn search_page_text_inner(pattern: &str, css_scope: Option<&str>) -> Result<Stri
     const CONTEXT_CHARS: i32 = 80;
     const MAX_RESULTS: i32 = 20;
     let scope_init = if let Some(sel) = css_scope.map(str::trim).filter(|s| !s.is_empty()) {
-        let sel_json = serde_json::to_string(sel).map_err(|e| format!("css_scope encode: {}", e))?;
+        let sel_json =
+            serde_json::to_string(sel).map_err(|e| format!("css_scope encode: {}", e))?;
         format!(
             r#"var scopeRoot = document.querySelector({});
   if (!scopeRoot) return {{ error: 'css_scope matched no element', matches: [], total: 0 }};"#,
@@ -8365,12 +8687,7 @@ fn search_page_text_inner(pattern: &str, css_scope: Option<&str>) -> Result<Stri
   return {{ matches: matches, total: totalFound, has_more: totalFound > {} }};
 }})()
 "#,
-        scope_init,
-        pattern_escaped,
-        MAX_RESULTS,
-        CONTEXT_CHARS,
-        CONTEXT_CHARS,
-        MAX_RESULTS
+        scope_init, pattern_escaped, MAX_RESULTS, CONTEXT_CHARS, CONTEXT_CHARS, MAX_RESULTS
     );
     let result = tab.evaluate(&js, false).map_err(|e| {
         let s = format!("Search page evaluate: {}", e);
@@ -8634,6 +8951,11 @@ fn extract_page_text_inner(include_images: bool) -> Result<String, String> {
             None
         }
     };
+    let extract_diag = if crate::config::Config::browser_include_diagnostics_in_state() {
+        TabExtractDiagnosticsSession::try_start(Arc::clone(&tab))
+    } else {
+        None
+    };
     const MAX_EXTRACT_CHARS: usize = 30_000;
     let js = build_page_markdown_extract_js(include_images);
     let eval_result = tab.evaluate(&js, false).map_err(|e| {
@@ -8711,7 +9033,27 @@ fn extract_page_text_inner(include_images: bool) -> Result<String, String> {
     text = truncate_markdown_at_blocks(&text, MAX_EXTRACT_CHARS);
 
     if elements > 20 && text_chars < elements.saturating_mul(5) {
-        text.push_str("\n\nNote: this page may still be loading (many elements, very little text).");
+        text.push_str(
+            "\n\nNote: this page may still be loading (many elements, very little text).",
+        );
+    }
+
+    if extract_diag.is_some() {
+        std::thread::sleep(DIAG_EXTRACT_TAIL_WAIT);
+    }
+    let diag_section = extract_diag
+        .as_ref()
+        .map(|d| d.section())
+        .unwrap_or_default();
+    if let Some(ref d) = extract_diag {
+        let n_c = d.console.lock().map(|q| q.len()).unwrap_or(0);
+        let n_e = d.exc.lock().map(|q| q.len()).unwrap_or(0);
+        mac_stats_debug!(
+            "browser/cdp",
+            "Browser agent [CDP]: BROWSER_EXTRACT diagnostics console_lines={} uncaught_exceptions={}",
+            n_c,
+            n_e
+        );
     }
 
     let mut out = String::new();
@@ -8719,6 +9061,7 @@ fn extract_page_text_inner(include_images: bool) -> Result<String, String> {
         out.push_str(p);
     }
     out.push_str(&crate::commands::text_normalize::apply_untrusted_homoglyph_normalization(text));
+    out.push_str(&diag_section);
     Ok(out)
 }
 
@@ -8769,7 +9112,10 @@ fn take_screenshot_current_page_inner() -> Result<PathBuf, String> {
             clear_browser_session_on_error(&s);
             s
         })?;
-    artifact_limits::ensure_buffer_within_browser_artifact_cap(png_data.len(), "BROWSER_SCREENSHOT PNG")?;
+    artifact_limits::ensure_buffer_within_browser_artifact_cap(
+        png_data.len(),
+        "BROWSER_SCREENSHOT PNG",
+    )?;
     let dir = crate::config::Config::screenshots_dir();
     std::fs::create_dir_all(&dir).map_err(|e| format!("Create screenshots dir: {}", e))?;
     let ts = chrono::Utc::now().format("%Y%m%d_%H%M%S");
@@ -8893,28 +9239,29 @@ fn take_screenshot_inner(url: &str) -> Result<PathBuf, String> {
         "Browser agent [CDP]: take_screenshot called with url (raw): {:?}",
         url
     );
-    let url_normalized = normalize_url_for_screenshot(url_trimmed);
+    let url_normalized =
+        crate::commands::browser::normalize_and_validate_cdp_navigation_url(url_trimmed)?;
     mac_stats_info!(
         "browser/cdp",
         "Browser agent [CDP]: normalized URL: {}",
         url_normalized
     );
 
-    // SSRF guard: block private/loopback/link-local URLs before CDP navigation
-    if let Ok(parsed) = Url::parse(&url_normalized) {
-        let allowed = crate::config::Config::ssrf_allowed_hosts();
-        crate::commands::browser::validate_url_no_ssrf(&parsed, &allowed)?;
-    }
-    crate::commands::browser::ssrf_proxy_env_notice_for_tool("BROWSER_SCREENSHOT (URL)")?; // after SSRF precheck
+    crate::commands::browser::ssrf_proxy_env_notice_for_tool("BROWSER_SCREENSHOT (URL)")?; // after URL precheck
 
     // URL screenshots must respect CURRENT_TAB_INDEX (same tab as get_current_tab / BROWSER_NAVIGATE),
     // not tabs.first(), so multi-tab sessions navigate and capture the focused tab.
     let (browser, tab) = get_current_tab().inspect_err(|e| {
         clear_browser_session_on_error(e);
     })?;
+    let focused_tab_index = current_tab_index()
+        .lock()
+        .map(|g| *g)
+        .unwrap_or(0);
     mac_stats_debug!(
         "browser/cdp",
-        "Browser agent [CDP]: take_screenshot URL path: using focused tab (get_current_tab / CURRENT_TAB_INDEX)"
+        "Browser agent [CDP]: take_screenshot URL path: using focused tab index {} (get_current_tab / CURRENT_TAB_INDEX)",
+        focused_tab_index
     );
     mac_stats_info!(
         "browser/cdp",
@@ -9014,7 +9361,10 @@ fn take_screenshot_inner(url: &str) -> Result<PathBuf, String> {
             clear_browser_session_on_error(&s);
             s
         })?;
-    artifact_limits::ensure_buffer_within_browser_artifact_cap(png_data.len(), "BROWSER_SCREENSHOT PNG")?;
+    artifact_limits::ensure_buffer_within_browser_artifact_cap(
+        png_data.len(),
+        "BROWSER_SCREENSHOT PNG",
+    )?;
     let dir = crate::config::Config::screenshots_dir();
     std::fs::create_dir_all(&dir).map_err(|e| format!("Create screenshots dir: {}", e))?;
     let host_segment = url_normalized
@@ -9136,6 +9486,58 @@ mod tests {
     }
 
     #[test]
+    fn redirect_chain_first_hop_matches_http_https_equivalent() {
+        assert!(cdp_redirect_chain_first_hop_matches_request(
+            "https://example.com/start",
+            "http://example.com/start"
+        ));
+        assert!(!cdp_redirect_chain_first_hop_matches_request(
+            "https://example.com/other",
+            "http://example.com/start"
+        ));
+    }
+
+    #[test]
+    fn redirect_chain_extract_groups_same_loader_id() {
+        let buf = vec![
+            ("L1".to_string(), "https://a.example/start".to_string()),
+            ("L1".to_string(), "https://b.example/next".to_string()),
+            ("L2".to_string(), "https://c.example/".to_string()),
+        ];
+        let chain =
+            cdp_extract_document_redirect_chain_from_rws_buffer(&buf, "http://a.example/start");
+        assert_eq!(chain.as_ref().map(|c| c.len()), Some(2));
+        assert!(chain.unwrap()[1].contains("b.example"));
+    }
+
+    #[test]
+    fn redirect_chain_validate_blocks_private_hop_after_public_first() {
+        let buf = Mutex::new(VecDeque::new());
+        {
+            let mut q = buf.lock().unwrap();
+            q.push_back(("L9".to_string(), "https://example.com/start".to_string()));
+            q.push_back(("L9".to_string(), "http://127.0.0.1/secret".to_string()));
+        }
+        let r = cdp_validate_redirect_chain_from_rws_buffer(&buf, "https://example.com/start");
+        let err = r.expect_err("loopback hop must fail SSRF");
+        assert!(
+            err.contains("redirect hop") && err.contains("SSRF"),
+            "unexpected error: {err}"
+        );
+    }
+
+    #[test]
+    fn redirect_chain_uncorrelated_buffer_skips_hop_validation() {
+        let buf = Mutex::new(VecDeque::new());
+        {
+            let mut q = buf.lock().unwrap();
+            q.push_back(("L1".to_string(), "https://other.example/".to_string()));
+        }
+        assert!(cdp_validate_redirect_chain_from_rws_buffer(&buf, "https://nope.example/")
+            .is_ok());
+    }
+
+    #[test]
     fn new_tab_page_url_matches_browser_use_set() {
         assert!(is_new_tab_page_url("about:blank"));
         assert!(is_new_tab_page_url("chrome://new-tab-page"));
@@ -9176,6 +9578,26 @@ mod tests {
         let out = format_browser_state_for_llm(&state);
         assert!(out.starts_with("Warning: Chrome error or TLS interstitial"));
         assert!(out.contains("Current page: chrome-error://"));
+    }
+
+    #[test]
+    fn scale_click_coords_scales_from_llm_image_to_viewport() {
+        set_last_llm_screenshot_pixel_dims_for_coord_scaling(None);
+        record_viewport_css_for_llm_coord_scaling(1920, 1080);
+        set_last_llm_screenshot_pixel_dims_for_coord_scaling(Some((1400, 850)));
+        let (vx, vy) = scale_click_coords_from_llm_screenshot_space(700.0, 425.0);
+        assert!((vx - 960.0).abs() < 0.01, "vx={vx}");
+        assert!((vy - 540.0).abs() < 0.01, "vy={vy}");
+        set_last_llm_screenshot_pixel_dims_for_coord_scaling(None);
+        record_viewport_css_for_llm_coord_scaling(0, 0);
+    }
+
+    #[test]
+    fn scale_click_coords_pass_through_when_no_llm_resize_dims() {
+        set_last_llm_screenshot_pixel_dims_for_coord_scaling(None);
+        record_viewport_css_for_llm_coord_scaling(1920, 1080);
+        let (x, y) = scale_click_coords_from_llm_screenshot_space(123.0, 456.0);
+        assert_eq!((x, y), (123.0, 456.0));
     }
 
     #[test]

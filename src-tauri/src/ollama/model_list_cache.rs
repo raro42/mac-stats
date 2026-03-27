@@ -53,6 +53,17 @@ pub async fn clear_all() {
     g.inflight.clear();
 }
 
+/// Drop cache for one endpoint only (e.g. cold-start retry without flushing other hosts).
+pub async fn clear_endpoint(endpoint: &str) {
+    let ep = norm_endpoint(endpoint);
+    if ep.is_empty() {
+        return;
+    }
+    let mut g = cache().lock().await;
+    g.endpoints.remove(&ep);
+    g.inflight.remove(&ep);
+}
+
 async fn fetch_tags_http(endpoint: &str, api_key: Option<&str>) -> FetchResult {
     if let Err(e) = crate::ollama::ollama_http_circuit_allow() {
         return Err(e);
@@ -210,7 +221,9 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
                     "Ollama returned empty model list ({} entries); not replacing cached data",
                     list.models.len()
                 );
-                if let Some((age_start, stale)) = g.endpoints.get(&ep).and_then(|e| e.last_success.as_ref()) {
+                if let Some((age_start, stale)) =
+                    g.endpoints.get(&ep).and_then(|e| e.last_success.as_ref())
+                {
                     let age = Instant::now().duration_since(*age_start);
                     mac_stats_warn!(
                         "ollama/model_cache",
@@ -229,7 +242,9 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
                     "Model list fetch failed: {}; not updating cache",
                     e
                 );
-                if let Some((age_start, stale)) = g.endpoints.get(&ep).and_then(|e| e.last_success.as_ref()) {
+                if let Some((age_start, stale)) =
+                    g.endpoints.get(&ep).and_then(|e| e.last_success.as_ref())
+                {
                     let age = Instant::now().duration_since(*age_start);
                     mac_stats_warn!(
                         "ollama/model_cache",

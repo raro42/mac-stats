@@ -80,7 +80,9 @@ pub fn run_before_compaction_fire_and_forget(
     request_id: &str,
 ) {
     let hook_raw = Config::before_compaction_hook_raw();
-    let path_configured = !Config::before_compaction_transcript_path_raw().trim().is_empty();
+    let path_configured = !Config::before_compaction_transcript_path_raw()
+        .trim()
+        .is_empty();
     let hook_configured = !hook_raw.trim().is_empty();
 
     if !hook_configured && !path_configured {

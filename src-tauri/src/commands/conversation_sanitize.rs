@@ -8,8 +8,7 @@ use crate::commands::tool_parsing::parse_all_tools_from_response;
 use crate::debug2;
 use crate::ollama::ChatMessage;
 
-const SYNTHETIC_TOOL_RESULT: &str =
-    "[tool result unavailable — execution was interrupted]";
+const SYNTHETIC_TOOL_RESULT: &str = "[tool result unavailable — execution was interrupted]";
 
 /// True if the assistant content includes at least one parsed tool other than `DONE`.
 fn assistant_has_executable_tools(content: &str) -> bool {
@@ -37,12 +36,7 @@ fn segment_looks_like_tool_result(seg: &str) -> bool {
     if s.is_empty() {
         return false;
     }
-    let head = s
-        .lines()
-        .next()
-        .map(str::trim)
-        .unwrap_or("")
-        .to_uppercase();
+    let head = s.lines().next().map(str::trim).unwrap_or("").to_uppercase();
 
     const STARTS: &[&str] = &[
         "HERE IS THE COMMAND OUTPUT",
@@ -131,11 +125,10 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
     let mut out: Vec<ChatMessage> = Vec::with_capacity(messages.len().saturating_add(4));
     let mut i = 0usize;
 
-        while i < messages.len() {
+    while i < messages.len() {
         let mut msg = messages[i].clone();
-        msg.content = crate::commands::directive_tags::strip_inline_directive_tags_for_display(
-            &msg.content,
-        );
+        msg.content =
+            crate::commands::directive_tags::strip_inline_directive_tags_for_display(&msg.content);
 
         if matches!(msg.role.as_str(), "user" | "system") && i > 0 {
             let prev = &messages[i - 1];
@@ -216,10 +209,7 @@ mod tests {
 
     #[test]
     fn keeps_paired_fetch_and_result() {
-        let page = format!(
-            "Here is the page content:\n\n{}",
-            "x".repeat(900)
-        );
+        let page = format!("Here is the page content:\n\n{}", "x".repeat(900));
         let hist = vec![
             ChatMessage {
                 role: "assistant".into(),

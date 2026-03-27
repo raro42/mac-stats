@@ -129,7 +129,8 @@ pub fn get_downloads_organizer_status() -> DownloadsOrganizerStatus {
 pub fn set_downloads_organizer_settings(
     patch: DownloadsOrganizerSettingsPatch,
 ) -> Result<(), String> {
-    let mut v = read_config_value();
+    let before = read_config_value();
+    let mut v = before.clone();
     if let Some(b) = patch.enabled {
         v["downloadsOrganizerEnabled"] = json!(b);
     }
@@ -156,6 +157,7 @@ pub fn set_downloads_organizer_settings(
     if let Some(b) = patch.dry_run {
         v["downloadsOrganizerDryRun"] = json!(b);
     }
+    crate::config::reject_if_protected_config_json_changed(&before, &v)?;
     write_config_value(&v)
 }
 

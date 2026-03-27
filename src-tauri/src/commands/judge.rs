@@ -120,23 +120,23 @@ pub async fn run_judge(
             images: None,
         },
     ];
-    let response =
-        match crate::commands::ollama::send_ollama_chat_messages(
-            messages,
-            None,
-            None,
-            crate::commands::ollama::OllamaHttpQueue::Acquire {
-                key: "judge".to_string(),
-                wait_hook: None,
-            },
-        )
-        .await {
-            Ok(r) => r,
-            Err(e) => {
-                warn!("Agent judge: LLM call failed: {}", e);
-                return JudgeVerdict::default();
-            }
-        };
+    let response = match crate::commands::ollama::send_ollama_chat_messages(
+        messages,
+        None,
+        None,
+        crate::commands::ollama::OllamaHttpQueue::Acquire {
+            key: "judge".to_string(),
+            wait_hook: None,
+        },
+    )
+    .await
+    {
+        Ok(r) => r,
+        Err(e) => {
+            warn!("Agent judge: LLM call failed: {}", e);
+            return JudgeVerdict::default();
+        }
+    };
     let raw = response.message.content.trim();
     // Try to extract JSON from the response (model might wrap in markdown).
     let json_str = if let Some(start) = raw.find('{') {

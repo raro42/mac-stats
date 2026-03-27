@@ -304,10 +304,7 @@ pub(crate) async fn maybe_run_prefetch_section(
     let results = v.get("data")?.get("results")?.as_array()?;
     let mut lines: Vec<String> = Vec::new();
     for r in results.iter().take(limit as usize) {
-        let title = r
-            .get("title")
-            .and_then(|x| x.as_str())
-            .unwrap_or("note");
+        let title = r.get("title").and_then(|x| x.as_str()).unwrap_or("note");
         let score = r.get("score").and_then(|x| x.as_f64());
         let line = if let Some(s) = score {
             format!("- **{}** (score {:.3})", title, s)
@@ -442,7 +439,8 @@ pub(crate) fn maybe_capture_compaction_fire_and_forget(
     if excerpt.trim().len() < 20 {
         return;
     }
-    if mode.as_str() == "excerpt_to_ori" && should_dedupe_capture(hook_source, session_id, &excerpt) {
+    if mode.as_str() == "excerpt_to_ori" && should_dedupe_capture(hook_source, session_id, &excerpt)
+    {
         debug!(
             target: ORI_TARGET,
             hook_source,
@@ -460,8 +458,8 @@ pub(crate) fn maybe_capture_compaction_fire_and_forget(
     let title_owned = title;
     let body_owned = excerpt;
     let rid = request_id.to_string();
-    std::thread::spawn(move || {
-        match write_inbox_capture(&vault, &title_owned, &body_owned) {
+    std::thread::spawn(
+        move || match write_inbox_capture(&vault, &title_owned, &body_owned) {
             Ok(p) => {
                 info!(
                     target: ORI_TARGET,
@@ -473,8 +471,8 @@ pub(crate) fn maybe_capture_compaction_fire_and_forget(
             Err(e) => {
                 warn!(target: ORI_TARGET, "Ori compaction capture failed: {}", e);
             }
-        }
-    });
+        },
+    );
 }
 
 /// Before `clear_session` removes state: best-effort capture in a background thread.
@@ -504,7 +502,10 @@ pub(crate) fn maybe_capture_before_session_reset_fire_and_forget(
     for (role, content) in messages.iter().rev().take(24).rev() {
         transcript.push_str(&format!("[{}]: {}\n\n", role, content));
     }
-    let transcript = transcript.chars().take(Config::ori_reset_capture_max_chars()).collect::<String>();
+    let transcript = transcript
+        .chars()
+        .take(Config::ori_reset_capture_max_chars())
+        .collect::<String>();
     let transcript = strip_secretish_lines(&transcript);
     if transcript.trim().len() < 20 {
         return;
@@ -515,8 +516,8 @@ pub(crate) fn maybe_capture_before_session_reset_fire_and_forget(
         chrono::Utc::now().format("%Y-%m-%d %H%M UTC")
     );
     let source_owned = source.to_string();
-    std::thread::spawn(move || {
-        match write_inbox_capture(&vault, &title, &transcript) {
+    std::thread::spawn(
+        move || match write_inbox_capture(&vault, &title, &transcript) {
             Ok(p) => {
                 info!(
                     target: ORI_TARGET,
@@ -529,6 +530,6 @@ pub(crate) fn maybe_capture_before_session_reset_fire_and_forget(
             Err(e) => {
                 warn!(target: ORI_TARGET, "Ori before-reset capture failed: {}", e);
             }
-        }
-    });
+        },
+    );
 }

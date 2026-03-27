@@ -17,30 +17,23 @@ fn image_path_filter(path: &Path) -> bool {
 /// Encode image bytes for a vision request. When `browserLlmScreenshotWidth/Height` are set, resizes with
 /// Lanczos3 to that exact size and returns `Some((rw, rh))` for coordinate scaling; otherwise returns
 /// PNG bytes at original resolution (re-encoded) and `None` for dims.
-pub fn encode_image_bytes_for_llm_vision(bytes: &[u8]) -> Result<(String, Option<(u32, u32)>), String> {
+pub fn encode_image_bytes_for_llm_vision(
+    bytes: &[u8],
+) -> Result<(String, Option<(u32, u32)>), String> {
     let img = image::load_from_memory(bytes).map_err(|e| e.to_string())?;
     let (orig_w, orig_h) = (img.width(), img.height());
 
     let Some((tw, th)) = Config::browser_llm_screenshot_size() else {
         let mut buf = Vec::new();
-        img.write_to(
-            &mut std::io::Cursor::new(&mut buf),
-            image::ImageFormat::Png,
-        )
-        .map_err(|e| e.to_string())?;
-        return Ok((
-            base64::engine::general_purpose::STANDARD.encode(&buf),
-            None,
-        ));
+        img.write_to(&mut std::io::Cursor::new(&mut buf), image::ImageFormat::Png)
+            .map_err(|e| e.to_string())?;
+        return Ok((base64::engine::general_purpose::STANDARD.encode(&buf), None));
     };
 
     let resized = img.resize_exact(tw, th, image::imageops::FilterType::Lanczos3);
     let mut buf = Vec::new();
     resized
-        .write_to(
-            &mut std::io::Cursor::new(&mut buf),
-            image::ImageFormat::Png,
-        )
+        .write_to(&mut std::io::Cursor::new(&mut buf), image::ImageFormat::Png)
         .map_err(|e| e.to_string())?;
 
     tracing::info!(

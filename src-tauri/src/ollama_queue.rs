@@ -77,6 +77,11 @@ async fn acquire_key_then_global(
         }
     };
     if let Some(rx) = rx {
+        debug2!(
+            "ollama/queue: blocked waiting for key slot key={} per_key_waiters_ahead={}",
+            key,
+            per_key_depth
+        );
         if let Some(h) = wait_hook {
             (h)();
         }
@@ -133,6 +138,141 @@ where
             drop(permit);
             release_key(&state, &key).await;
             out
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::sync::Arc;
+    use tokio::sync::Mutex;
+
+    /// Single test body so the process-wide queue singleton is not stressed by parallel tests.
+    #[tokio::test]
+    async fn ollama_http_queue_serializes_and_fires_wait_hook() {
+        // Different keys, global concurrency 1: inner work for B only after A releases global permit.
+        {
+            let (tx, rx) = tokio::sync::oneshot::channel();
+            let log: Arc<Mutex<Vec<&'static str>>> = Arc::new(Mutex::new(Vec::new()));
+            let l1 = log.clone();
+            let l2 = log.clone();
+            let h1 = tokio::spawn(async move {
+                with_ollama_http_queue(
+                    OllamaHttpQueue::Acquire {
+                        key: "unit_dk1".to_string(),
+                        wait_hook: None,
+                    },
+                    || async {
+                        let _ = tx.send(());
+                        l1.lock().await.push("A_in");
+                        tokio::time::sleep(std::time::Duration::from_millis(40)).await;
+                        l1.lock().await.push("A_out");
+                    },
+                )
+                .await
+            });
+            rx.await.expect("A should signal from inside queue");
+            let h2 = tokio::spawn(async move {
+                with_ollama_http_queue(
+                    OllamaHttpQueue::Acquire {
+                        key: "unit_dk2".to_string(),
+                        wait_hook: None,
+                    },
+                    || async {
+                        l2.lock().await.push("B_in");
+                    },
+                )
+                .await
+            });
+            let _ = tokio::join!(h1, h2);
+            assert_eq!(
+                *log.lock().await,
+                vec!["A_in", "A_out", "B_in"],
+                "global limit should serialize different keys"
+            );
+        }
+
+        // Same key: second acquire waits on per-key FIFO (still ordered after first completes).
+        {
+            let (tx, rx) = tokio::sync::oneshot::channel();
+            let log: Arc<Mutex<Vec<&'static str>>> = Arc::new(Mutex::new(Vec::new()));
+            let l1 = log.clone();
+            let l2 = log.clone();
+            let h1 = tokio::spawn(async move {
+                with_ollama_http_queue(
+                    OllamaHttpQueue::Acquire {
+                        key: "unit_same".to_string(),
+                        wait_hook: None,
+                    },
+                    || async {
+                        let _ = tx.send(());
+                        l1.lock().await.push("S1_in");
+                        tokio::time::sleep(std::time::Duration::from_millis(40)).await;
+                        l1.lock().await.push("S1_out");
+                    },
+                )
+                .await
+            });
+            rx.await.expect("S1 signal");
+            let h2 = tokio::spawn(async move {
+                with_ollama_http_queue(
+                    OllamaHttpQueue::Acquire {
+                        key: "unit_same".to_string(),
+                        wait_hook: None,
+                    },
+                    || async {
+                        l2.lock().await.push("S2_in");
+                    },
+                )
+                .await
+            });
+            let _ = tokio::join!(h1, h2);
+            assert_eq!(
+                *log.lock().await,
+                vec!["S1_in", "S1_out", "S2_in"],
+                "same-key FIFO"
+            );
+        }
+
+        // wait_hook runs when the caller blocks on the per-key queue.
+        {
+            let (tx, rx) = tokio::sync::oneshot::channel();
+            let fired = Arc::new(AtomicBool::new(false));
+            let hook_f = fired.clone();
+            let wait_hook: Arc<dyn Fn() + Send + Sync> = Arc::new(move || {
+                hook_f.store(true, Ordering::SeqCst);
+            });
+            let h1 = tokio::spawn(async move {
+                with_ollama_http_queue(
+                    OllamaHttpQueue::Acquire {
+                        key: "unit_hook".to_string(),
+                        wait_hook: None,
+                    },
+                    || async {
+                        let _ = tx.send(());
+                        tokio::time::sleep(std::time::Duration::from_millis(40)).await;
+                    },
+                )
+                .await
+            });
+            rx.await.expect("hook test A");
+            let h2 = tokio::spawn(async move {
+                with_ollama_http_queue(
+                    OllamaHttpQueue::Acquire {
+                        key: "unit_hook".to_string(),
+                        wait_hook: Some(wait_hook),
+                    },
+                    || async {},
+                )
+                .await
+            });
+            let _ = tokio::join!(h1, h2);
+            assert!(
+                fired.load(Ordering::SeqCst),
+                "wait_hook should run when second request queues on same key"
+            );
         }
     }
 }

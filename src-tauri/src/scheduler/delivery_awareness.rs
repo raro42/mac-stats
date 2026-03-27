@@ -75,7 +75,10 @@ pub fn record_if_new(
         match std::fs::read_to_string(&path) {
             Ok(s) => serde_json::from_str(&s).unwrap_or_default(),
             Err(e) => {
-                warn!("Scheduler delivery awareness: read {:?} failed: {}", path, e);
+                warn!(
+                    "Scheduler delivery awareness: read {:?} failed: {}",
+                    path, e
+                );
                 DeliveryAwarenessFile::default()
             }
         }
@@ -171,4 +174,102 @@ pub fn format_for_chat_context() -> String {
         ));
     }
     lines.join("\n")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::Config;
+    use std::path::Path;
+    use std::sync::Mutex;
+
+    fn awareness_json_path() -> std::path::PathBuf {
+        Config::schedules_file_path()
+            .parent()
+            .expect("schedules path has parent")
+            .join("scheduler_delivery_awareness.json")
+    }
+
+    static HOME_DELIVERY_AWARENESS_TEST_LOCK: Mutex<()> = Mutex::new(());
+
+    struct HomeOverride {
+        previous: Option<String>,
+    }
+
+    impl HomeOverride {
+        fn set(home: &Path) -> Self {
+            let previous = std::env::var("HOME").ok();
+            std::env::set_var("HOME", home.as_os_str());
+            Self { previous }
+        }
+    }
+
+    impl Drop for HomeOverride {
+        fn drop(&mut self) {
+            match &self.previous {
+                Some(v) => std::env::set_var("HOME", v),
+                None => std::env::remove_var("HOME"),
+            }
+        }
+    }
+
+    #[test]
+    fn new_context_key_has_stable_prefix() {
+        let k = new_context_key_for_schedule("morning-job");
+        assert!(k.starts_with("sched:morning-job:"));
+        assert!(k.len() > "sched:morning-job:".len());
+    }
+
+    #[test]
+    fn record_if_new_skips_duplicate_context_key() {
+        let _guard = HOME_DELIVERY_AWARENESS_TEST_LOCK
+            .lock()
+            .expect("home test lock");
+        let base = std::env::temp_dir().join(format!(
+            "mac-stats-delivery-awareness-test-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&base);
+        std::fs::create_dir_all(base.join(".mac-stats")).unwrap();
+        let _home = HomeOverride::set(&base);
+
+        let path = awareness_json_path();
+
+        record_if_new("dup-key-test", Some("sched-a"), 999001, "first body");
+        record_if_new("dup-key-test", Some("sched-a"), 999001, "second body ignored");
+
+        let raw = std::fs::read_to_string(&path).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&raw).unwrap();
+        let arr = v["entries"].as_array().unwrap();
+        assert_eq!(arr.len(), 1);
+        assert_eq!(arr[0]["summary"], "first body");
+
+        let ctx = format_for_chat_context();
+        assert!(ctx.contains("[Scheduler → Discord:"));
+        assert!(ctx.contains("first body"));
+        assert!(!ctx.contains("second body ignored"));
+    }
+
+    #[test]
+    fn list_entries_newest_first_order() {
+        let _guard = HOME_DELIVERY_AWARENESS_TEST_LOCK
+            .lock()
+            .expect("home test lock");
+        let base = std::env::temp_dir().join(format!(
+            "mac-stats-delivery-awareness-order-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&base);
+        std::fs::create_dir_all(base.join(".mac-stats")).unwrap();
+        let _home = HomeOverride::set(&base);
+
+        record_if_new("order-key-a", None, 1, "older");
+        std::thread::sleep(std::time::Duration::from_millis(5));
+        record_if_new("order-key-b", None, 1, "newer");
+
+        let rows = list_entries_newest_first();
+        assert_eq!(rows.len(), 2);
+        assert!(rows[0].summary.contains("newer"), "{rows:?}");
+        assert!(rows[1].summary.contains("older"), "{rows:?}");
+    }
 }

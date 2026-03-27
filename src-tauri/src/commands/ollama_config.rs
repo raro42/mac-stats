@@ -341,7 +341,7 @@ async fn build_and_cache_model_catalog(endpoint: &str, api_key: Option<&str>) {
             "ModelCatalog: empty /api/tags on first read; cold-start retry after 400ms"
         );
         tokio::time::sleep(std::time::Duration::from_millis(400)).await;
-        crate::ollama::model_list_cache::clear_all().await;
+        crate::ollama::model_list_cache::clear_endpoint(endpoint).await;
         list = match crate::ollama::model_list_cache::fetch_tags_cached(endpoint, api_key).await {
             Ok(l) => l,
             Err(e) => {

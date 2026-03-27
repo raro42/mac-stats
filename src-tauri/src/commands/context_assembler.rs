@@ -7,6 +7,7 @@
 use crate::commands::content_reduction::CHARS_PER_TOKEN;
 use crate::commands::session_history::{build_execution_message_stack, cap_tail_chronological};
 use crate::ollama::ChatMessage;
+use crate::{mac_stats_debug, mac_stats_info};
 
 /// Tokens reserved below configured `num_ctx` / model context (reply + API overhead).
 pub(crate) const CONTEXT_ASSEMBLER_SAFETY_TOKENS: u32 = 512;
@@ -100,10 +101,27 @@ pub(crate) async fn resolve_default_chat_context_token_budget() -> usize {
     let (endpoint, effective, api_key): (String, String, Option<String>) = {
         let guard = match get_ollama_client().lock() {
             Ok(g) => g,
-            Err(_) => return context_token_budget(crate::ollama::ModelInfo::default().context_size_tokens),
+            Err(_) => {
+                let b =
+                    context_token_budget(crate::ollama::ModelInfo::default().context_size_tokens);
+                mac_stats_debug!(
+                    "ollama/chat",
+                    token_budget = b,
+                    reason = "ollama_client_lock_poisoned",
+                    "context_assembler: CPU chat token budget fallback (default context)"
+                );
+                return b;
+            }
         };
         let Some(client) = guard.as_ref() else {
-            return context_token_budget(crate::ollama::ModelInfo::default().context_size_tokens);
+            let b = context_token_budget(crate::ollama::ModelInfo::default().context_size_tokens);
+            mac_stats_debug!(
+                "ollama/chat",
+                token_budget = b,
+                reason = "no_ollama_client",
+                "context_assembler: CPU chat token budget fallback (default context)"
+            );
+            return b;
         };
         let effective = read_ollama_fast_model_from_env_or_config()
             .unwrap_or_else(|| client.config.model.clone());
@@ -113,18 +131,15 @@ pub(crate) async fn resolve_default_chat_context_token_budget() -> usize {
             .as_ref()
             .and_then(|acc| get_credential(acc).ok().flatten())
             .or_else(read_ollama_api_key_from_env_or_config);
-        (
-            client.config.endpoint.clone(),
-            effective,
-            api_key,
-        )
+        (client.config.endpoint.clone(), effective, api_key)
     };
 
     let (info, ctx_src) =
-        crate::ollama::resolve_model_context_budget(&endpoint, &effective, api_key.as_deref()).await;
+        crate::ollama::resolve_model_context_budget(&endpoint, &effective, api_key.as_deref())
+            .await;
     let b = context_token_budget(info.context_size_tokens);
-    tracing::info!(
-        target: "ollama/chat",
+    mac_stats_info!(
+        "ollama/chat",
         model = %effective,
         context_size = info.context_size_tokens,
         context_source = ctx_src.as_str(),
@@ -157,7 +172,10 @@ pub struct AgentContextAssembler;
 
 impl ContextAssembler for FrontendContextAssembler {
     fn compact(&self, history: Vec<ChatMessage>) -> Vec<ChatMessage> {
-        cap_tail_chronological(history, crate::commands::session_history::CONVERSATION_HISTORY_CAP)
+        cap_tail_chronological(
+            history,
+            crate::commands::session_history::CONVERSATION_HISTORY_CAP,
+        )
     }
 
     fn assemble(
@@ -179,7 +197,10 @@ impl ContextAssembler for FrontendContextAssembler {
 
 impl ContextAssembler for AgentContextAssembler {
     fn compact(&self, history: Vec<ChatMessage>) -> Vec<ChatMessage> {
-        cap_tail_chronological(history, crate::commands::session_history::CONVERSATION_HISTORY_CAP)
+        cap_tail_chronological(
+            history,
+            crate::commands::session_history::CONVERSATION_HISTORY_CAP,
+        )
     }
 
     fn assemble(
@@ -212,8 +233,8 @@ fn assemble_impl(
     let before = history.len();
     let trimmed = trim_history_oldest_first_to_token_budget(history.to_vec(), max_hist);
     if trimmed.len() < before {
-        tracing::info!(
-            target: "ollama/chat",
+        mac_stats_info!(
+            "ollama/chat",
             surface,
             before,
             after = trimmed.len(),
@@ -262,12 +283,7 @@ mod tests {
         let mut v = Vec::new();
         for i in 0..(CONVERSATION_HISTORY_CAP + 3) {
             v.push(ChatMessage {
-                role: if i % 2 == 0 {
-                    "user"
-                } else {
-                    "assistant"
-                }
-                .to_string(),
+                role: if i % 2 == 0 { "user" } else { "assistant" }.to_string(),
                 content: format!("m{i}"),
                 images: None,
             });
@@ -288,13 +304,8 @@ mod tests {
             content: "new".to_string(),
             images: None,
         };
-        let out = ContextAssembler::assemble(
-            &AgentContextAssembler,
-            &hist,
-            "SYS",
-            user.clone(),
-            100_000,
-        );
+        let out =
+            ContextAssembler::assemble(&AgentContextAssembler, &hist, "SYS", user.clone(), 100_000);
         assert_eq!(out.len(), 3);
         assert_eq!(out[0].role, "system");
         assert_eq!(out[0].content, "SYS");

@@ -663,8 +663,8 @@ fn parse_session_file(path: &Path) -> Vec<(String, String)> {
 #[cfg(test)]
 mod tests {
     use super::{
-        add_message, clear_session, extract_assistant_final_answer, get_messages,
-        load_messages_from_latest_session_file, normalize_conversational_message,
+        add_message, before_session_reset_export, clear_session, extract_assistant_final_answer,
+        get_messages, load_messages_from_latest_session_file, normalize_conversational_message,
         parse_session_markdown, session_filename_matches_id,
     };
     use std::sync::Mutex;
@@ -690,6 +690,41 @@ mod tests {
             match &self.previous {
                 Some(v) => std::env::set_var("MAC_STATS_SESSION_DIR", v),
                 None => std::env::remove_var("MAC_STATS_SESSION_DIR"),
+            }
+        }
+    }
+
+    /// Serialize with other session_memory tests; `before_reset` reads env vars.
+    struct BeforeResetEnvGuard {
+        prev_transcript: Option<String>,
+        prev_hook: Option<String>,
+    }
+
+    impl BeforeResetEnvGuard {
+        fn set_transcript_only(path: &std::path::Path) -> Self {
+            let prev_transcript = std::env::var("MAC_STATS_BEFORE_RESET_TRANSCRIPT_PATH").ok();
+            let prev_hook = std::env::var("MAC_STATS_BEFORE_RESET_HOOK").ok();
+            std::env::remove_var("MAC_STATS_BEFORE_RESET_HOOK");
+            std::env::set_var(
+                "MAC_STATS_BEFORE_RESET_TRANSCRIPT_PATH",
+                path.to_str().expect("utf-8 temp path"),
+            );
+            Self {
+                prev_transcript,
+                prev_hook,
+            }
+        }
+    }
+
+    impl Drop for BeforeResetEnvGuard {
+        fn drop(&mut self) {
+            match &self.prev_transcript {
+                Some(v) => std::env::set_var("MAC_STATS_BEFORE_RESET_TRANSCRIPT_PATH", v),
+                None => std::env::remove_var("MAC_STATS_BEFORE_RESET_TRANSCRIPT_PATH"),
+            }
+            match &self.prev_hook {
+                Some(v) => std::env::set_var("MAC_STATS_BEFORE_RESET_HOOK", v),
+                None => std::env::remove_var("MAC_STATS_BEFORE_RESET_HOOK"),
             }
         }
     }
@@ -914,6 +949,91 @@ mod tests {
         assert_eq!(loaded[0].1, "newer");
         assert_eq!(loaded[1].1, "b");
 
+        let _ = std::fs::remove_dir_all(&base);
+    }
+
+    #[test]
+    fn before_session_reset_export_writes_jsonl_from_memory() {
+        let _guard = SESSION_DIR_TEST_LOCK.lock().expect("session dir test lock");
+        let sid = 100_001_u64;
+        clear_session("discord", sid);
+        add_message("discord", sid, "user", "hello export");
+        add_message("discord", sid, "assistant", "hi there");
+
+        let out = std::env::temp_dir().join(format!(
+            "mac-stats-before-reset-unit-{}.jsonl",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_file(&out);
+        let _env = BeforeResetEnvGuard::set_transcript_only(&out);
+
+        before_session_reset_export("discord", sid, "session_reset_phrase");
+
+        let text = std::fs::read_to_string(&out).expect("export file");
+        let mut lines = text.lines();
+        let meta: serde_json::Value =
+            serde_json::from_str(lines.next().expect("meta line")).expect("meta json");
+        assert_eq!(meta["kind"], "before_reset_meta");
+        assert_eq!(meta["source"], "discord");
+        assert_eq!(meta["session_id"], sid);
+        assert_eq!(meta["reason"], "session_reset_phrase");
+        assert_eq!(meta["message_count"], 2);
+
+        let u: serde_json::Value =
+            serde_json::from_str(lines.next().expect("user line")).expect("user json");
+        assert_eq!(u["role"], "user");
+        assert_eq!(u["content"], "hello export");
+        let a: serde_json::Value =
+            serde_json::from_str(lines.next().expect("asst line")).expect("asst json");
+        assert_eq!(a["role"], "assistant");
+        assert_eq!(a["content"], "hi there");
+        assert!(lines.next().is_none());
+
+        let _ = std::fs::remove_file(&out);
+        clear_session("discord", sid);
+    }
+
+    /// When in-memory history is empty (e.g. after restart), export still includes the latest session markdown.
+    #[test]
+    fn before_session_reset_export_loads_from_session_file_when_memory_empty() {
+        let _guard = SESSION_DIR_TEST_LOCK.lock().expect("session dir test lock");
+        let base = std::env::temp_dir().join(format!(
+            "mac-stats-before-reset-disk-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&base);
+        std::fs::create_dir_all(&base).expect("mkdir");
+        let _session_dir = SessionDirOverride::set(&base);
+
+        let sid = 100_003_u64;
+        clear_session("discord", sid);
+        let path = base.join(format!(
+            "session-memory-{sid}-20260327-120000-disk-topic.md"
+        ));
+        std::fs::write(
+            &path,
+            "## User\n\nfrom file\n\n## Assistant\n\nfile reply\n",
+        )
+        .expect("write session md");
+
+        let out = std::env::temp_dir().join(format!(
+            "mac-stats-before-reset-disk-out-{}.jsonl",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_file(&out);
+        let _env = BeforeResetEnvGuard::set_transcript_only(&out);
+
+        before_session_reset_export("discord", sid, "new_session_prefix");
+
+        let text = std::fs::read_to_string(&out).expect("read export");
+        let mut lines = text.lines();
+        let meta: serde_json::Value =
+            serde_json::from_str(lines.next().expect("meta")).expect("meta");
+        assert_eq!(meta["message_count"], 2);
+        let u: serde_json::Value = serde_json::from_str(lines.next().expect("u")).expect("u");
+        assert_eq!(u["content"], "from file");
+
+        let _ = std::fs::remove_file(&out);
         let _ = std::fs::remove_dir_all(&base);
     }
 }

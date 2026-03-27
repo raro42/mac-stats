@@ -42,7 +42,7 @@ use crate::commands::agent_descriptions::{
 };
 use crate::commands::browser_helpers::wants_visible_browser;
 use crate::commands::context_assembler::{
-    fragments, AgentContextAssembler, ContextAssembler, context_token_budget,
+    context_token_budget, fragments, AgentContextAssembler, ContextAssembler,
 };
 use crate::commands::prompt_assembly::{append_heartbeat_section, build_execution_system_content};
 use crate::commands::session_history::{
@@ -182,8 +182,14 @@ impl Default for OllamaRequest {
 /// Returns a boxed future to allow one level of async recursion (retry path).
 pub fn answer_with_ollama_and_fetch(
     req: OllamaRequest,
-) -> Pin<Box<dyn Future<Output = Result<OllamaReply, crate::commands::ollama_run_error::OllamaRunError>> + Send>>
-{
+) -> Pin<
+    Box<
+        dyn Future<Output = Result<OllamaReply, crate::commands::ollama_run_error::OllamaRunError>>
+            + Send,
+    >,
+> {
+    // CLI and tests skip Tauri `.setup()`; ensure internal hook handlers exist (idempotent).
+    crate::events::register_default_handlers();
     let req_for_retry = req.clone();
     let run_error_boundary_retry_done = req.run_error_boundary_retry_done;
     let skip_ollama_run_error_metrics = req.skip_ollama_run_error_metrics;
@@ -236,7 +242,8 @@ pub fn answer_with_ollama_and_fetch(
         );
     }
     Box::pin(async move {
-        let coord_for_stale = crate::commands::turn_lifecycle::coordination_key(discord_reply_channel_id);
+        let coord_for_stale =
+            crate::commands::turn_lifecycle::coordination_key(discord_reply_channel_id);
         if let Some(ref guard) = inbound_stale_guard {
             if crate::commands::abort_cutoff::should_skip(
                 coord_for_stale,
@@ -250,7 +257,9 @@ pub fn answer_with_ollama_and_fetch(
                     ts = %guard.timestamp_utc,
                     "abort_cutoff: inbound event dropped (stale vs session cutoff)"
                 );
-                return Err(crate::commands::ollama_run_error::OllamaRunError::StaleInboundAfterAbort);
+                return Err(
+                    crate::commands::ollama_run_error::OllamaRunError::StaleInboundAfterAbort,
+                );
             }
         }
 
@@ -372,14 +381,12 @@ pub fn answer_with_ollama_and_fetch(
 
         let mut model_not_in_catalog_note: Option<String> = None;
         if let Some(ref model) = model_override {
-            let available = list_ollama_models()
-                .await
-                .map_err(|e| {
-                    finish_router_failure(
-                        OllamaRunError::classify(&format!("Could not list models: {}", e)),
-                        !skip_ollama_run_error_metrics,
-                    )
-                })?;
+            let available = list_ollama_models().await.map_err(|e| {
+                finish_router_failure(
+                    OllamaRunError::classify(&format!("Could not list models: {}", e)),
+                    !skip_ollama_run_error_metrics,
+                )
+            })?;
             let found = available
                 .iter()
                 .any(|m| m == model || m.starts_with(&format!("{}:", model)));
@@ -397,14 +404,12 @@ pub fn answer_with_ollama_and_fetch(
         }
 
         let (endpoint, effective_model, api_key) = {
-            let guard = get_ollama_client()
-                .lock()
-                .map_err(|e| {
-                    finish_router_failure(
-                        OllamaRunError::classify(&e.to_string()),
-                        !skip_ollama_run_error_metrics,
-                    )
-                })?;
+            let guard = get_ollama_client().lock().map_err(|e| {
+                finish_router_failure(
+                    OllamaRunError::classify(&e.to_string()),
+                    !skip_ollama_run_error_metrics,
+                )
+            })?;
             let client = guard.as_ref().ok_or_else(|| {
                 finish_router_failure(
                     OllamaRunError::classify("Ollama not configured"),
@@ -473,9 +478,7 @@ pub fn answer_with_ollama_and_fetch(
         );
         let deadline_std = match turn_deadline {
             Some(d) => d,
-            None => {
-                std::time::Instant::now() + std::time::Duration::from_secs(turn_budget_secs)
-            }
+            None => std::time::Instant::now() + std::time::Duration::from_secs(turn_budget_secs),
         };
         let coord_key = crate::commands::turn_lifecycle::coordination_key(discord_reply_channel_id);
         crate::commands::turn_lifecycle::register(coord_key, &request_id);
@@ -500,7 +503,7 @@ pub fn answer_with_ollama_and_fetch(
             let qspec = ollama_http_q;
             let model_note_for_reply = model_not_in_catalog_note_for_turn.clone();
             async move {
-        crate::ollama_queue::with_ollama_http_queue(qspec, || async move {
+                crate::ollama_queue::with_ollama_http_queue(qspec, || async move {
         let send_status = |msg: &str| {
             if !crate::commands::turn_lifecycle::gate_allows_send(&og) {
                 return;

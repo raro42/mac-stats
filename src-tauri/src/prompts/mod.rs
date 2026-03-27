@@ -371,4 +371,30 @@ mod tests {
             static_prefix_bytes(&b.content, b.static_prefix_len)
         );
     }
+
+    #[test]
+    fn ori_briefing_and_prefetch_follow_memory_before_metrics() {
+        let built = build_execution_system_prompt(
+            "SOUL\n\n",
+            "\n\n<<MEMORY_BLOCK>>\n\n",
+            "",
+            None,
+            "EXEC\n",
+            "\n\n<<METRICS>>\n\n",
+            "",
+            "",
+            "",
+            "",
+            "\n\nMODEL",
+            None,
+            "\n\n## Ori session briefing\n\nBRIEF\n",
+            "\n\n## Possibly relevant vault notes\n\nPREF\n",
+        );
+        let c = &built.content;
+        let i_mem = c.find("<<MEMORY_BLOCK>>").expect("memory");
+        let i_brief = c.find("## Ori session briefing").expect("brief");
+        let i_pref = c.find("## Possibly relevant vault notes").expect("prefetch");
+        let i_met = c.find("<<METRICS>>").expect("metrics");
+        assert!(i_mem < i_brief && i_brief < i_pref && i_pref < i_met);
+    }
 }

@@ -11,7 +11,8 @@ pub fn list_schedules() -> Result<Vec<scheduler::ScheduleForUi>, String> {
 
 /// Recent successful scheduler → Discord deliveries (newest first), for Settings / operator verification.
 #[tauri::command]
-pub fn list_scheduler_delivery_awareness() -> Result<Vec<scheduler::DeliveryAwarenessEntry>, String> {
+pub fn list_scheduler_delivery_awareness() -> Result<Vec<scheduler::DeliveryAwarenessEntry>, String>
+{
     Ok(scheduler::list_scheduler_delivery_awareness())
 }
 

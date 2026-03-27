@@ -525,6 +525,16 @@ impl Tab {
         result
     }
 
+    /// CDP call with JSON result (see [`Transport::call_method_json_on_target`]).
+    pub fn call_method_json<C>(&self, method: C) -> Result<Json>
+    where
+        C: Method + serde::Serialize + std::fmt::Debug,
+    {
+        trace!("Calling method (json): {method:?}");
+        self.transport
+            .call_method_json_on_target(self.session_id.clone(), method)
+    }
+
     pub fn wait_until_navigated(&self) -> Result<&Self> {
         let navigating = Arc::clone(&self.navigating);
         let timeout = *self.default_timeout.read().unwrap();

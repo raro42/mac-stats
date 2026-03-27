@@ -29,6 +29,10 @@
 
 use std::path::PathBuf;
 
+mod protected_mutation;
+
+pub use protected_mutation::reject_if_protected_config_json_changed;
+
 /// Build one default-agent entry from an id. Add new agents by creating defaults/agents/agent-<id>/ and adding default_agent_entry!("<id>") to DEFAULT_AGENT_IDS.
 macro_rules! default_agent_entry {
     ($id:literal) => {
@@ -513,10 +517,7 @@ impl Config {
         let config_path = Self::config_file_path();
         if let Ok(content) = std::fs::read_to_string(&config_path) {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
-                if let Some(n) = json
-                    .get("ollamaGlobalConcurrency")
-                    .and_then(|v| v.as_u64())
-                {
+                if let Some(n) = json.get("ollamaGlobalConcurrency").and_then(|v| v.as_u64()) {
                     return (n as u32).clamp(MIN_N, MAX_N);
                 }
             }
@@ -834,7 +835,10 @@ impl Config {
         if let Ok(content) = std::fs::read_to_string(&config_path) {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
                 if let Some(obj) = json.get("toolLoopDetection") {
-                    enabled = obj.get("enabled").and_then(|v| v.as_bool()).unwrap_or(false);
+                    enabled = obj
+                        .get("enabled")
+                        .and_then(|v| v.as_bool())
+                        .unwrap_or(false);
                     if let Some(n) = obj.get("historySize").and_then(|v| v.as_u64()) {
                         history_size = n as usize;
                     }
@@ -1105,7 +1109,10 @@ impl Config {
         let config_path = Self::config_file_path();
         if let Ok(content) = std::fs::read_to_string(&config_path) {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
-                if let Some(n) = json.get("screenshotPruneMaxAgeDays").and_then(|v| v.as_u64()) {
+                if let Some(n) = json
+                    .get("screenshotPruneMaxAgeDays")
+                    .and_then(|v| v.as_u64())
+                {
                     return (n as u32).min(MAX_DAYS);
                 }
             }
@@ -1126,7 +1133,10 @@ impl Config {
         let config_path = Self::config_file_path();
         if let Ok(content) = std::fs::read_to_string(&config_path) {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
-                if let Some(n) = json.get("screenshotPruneMaxTotalBytes").and_then(|v| v.as_u64()) {
+                if let Some(n) = json
+                    .get("screenshotPruneMaxTotalBytes")
+                    .and_then(|v| v.as_u64())
+                {
                     return n;
                 }
             }
@@ -1200,10 +1210,7 @@ impl Config {
         let config_path = Self::config_file_path();
         if let Ok(content) = std::fs::read_to_string(&config_path) {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
-                if let Some(b) = json
-                    .get("browserCdpTraceEnabled")
-                    .and_then(|v| v.as_bool())
-                {
+                if let Some(b) = json.get("browserCdpTraceEnabled").and_then(|v| v.as_bool()) {
                     return b;
                 }
             }
@@ -1305,10 +1312,7 @@ impl Config {
         let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) else {
             return Vec::new();
         };
-        let Some(arr) = json
-            .get("extraAttachmentRoots")
-            .and_then(|v| v.as_array())
-        else {
+        let Some(arr) = json.get("extraAttachmentRoots").and_then(|v| v.as_array()) else {
             return Vec::new();
         };
         let mut out = Vec::new();
@@ -1531,7 +1535,12 @@ impl Config {
             return Vec::new();
         };
         arr.iter()
-            .filter_map(|v| v.as_str().map(str::trim).filter(|s| !s.is_empty()).map(str::to_string))
+            .filter_map(|v| {
+                v.as_str()
+                    .map(str::trim)
+                    .filter(|s| !s.is_empty())
+                    .map(str::to_string)
+            })
             .collect()
     }
 
@@ -1627,10 +1636,7 @@ impl Config {
         let config_path = Self::config_file_path();
         if let Ok(content) = std::fs::read_to_string(&config_path) {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
-                if let Some(s) = json
-                    .get("browserCdpProxyUsername")
-                    .and_then(|v| v.as_str())
-                {
+                if let Some(s) = json.get("browserCdpProxyUsername").and_then(|v| v.as_str()) {
                     let t = s.trim();
                     if !t.is_empty() {
                         return Some(t.to_string());
@@ -1655,10 +1661,7 @@ impl Config {
         let config_path = Self::config_file_path();
         if let Ok(content) = std::fs::read_to_string(&config_path) {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
-                if let Some(s) = json
-                    .get("browserCdpProxyPassword")
-                    .and_then(|v| v.as_str())
-                {
+                if let Some(s) = json.get("browserCdpProxyPassword").and_then(|v| v.as_str()) {
                     let t = s.trim();
                     if !t.is_empty() {
                         return Some(t.to_string());
@@ -1671,7 +1674,10 @@ impl Config {
 
     /// True when both CDP proxy username and password are configured with non-empty values.
     pub fn browser_cdp_proxy_credentials_active() -> bool {
-        match (Self::browser_cdp_proxy_username(), Self::browser_cdp_proxy_password()) {
+        match (
+            Self::browser_cdp_proxy_username(),
+            Self::browser_cdp_proxy_password(),
+        ) {
             (Some(u), Some(p)) => !u.trim().is_empty() && !p.trim().is_empty(),
             _ => false,
         }
@@ -1748,9 +1754,11 @@ impl Config {
 
     /// Minimum time (seconds) to wait after `wait_until_navigated` completes on the CDP path,
     /// before returning page state (in addition to optional network-idle wait). Mirrors browser-use
-    /// `minimum_wait_page_load_time`; keeps a short default so SPAs can paint after the load event.
+    /// `minimum_wait_page_load_time`; default **0.25s** keeps latency low while absorbing late
+    /// paint/hydration after the load event (raise in config if a site needs more settle time; SPA
+    /// retry still applies separately — see `browserSpaRetryEnabled`).
     ///
-    /// Default **0.25** (≈ former fixed 250ms post-nav settle). Config: `browserPostNavigateMinDwellSecs`.
+    /// Default **0.25**. Config: `browserPostNavigateMinDwellSecs`.
     /// Env: `MAC_STATS_BROWSER_POST_NAV_MIN_DWELL_SECS`. Clamped to `0.0..=10.0`.
     ///
     /// Applies uniformly (same-domain shorter **navigation timeout** does not skip this dwell).
@@ -1946,10 +1954,7 @@ impl Config {
         let config_path = Self::config_file_path();
         if let Ok(content) = std::fs::read_to_string(&config_path) {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
-                if let Some(n) = json
-                    .get("browserMaxPageTabs")
-                    .and_then(|v| v.as_u64())
-                {
+                if let Some(n) = json.get("browserMaxPageTabs").and_then(|v| v.as_u64()) {
                     return (n as usize).min(MAX);
                 }
             }
@@ -1958,7 +1963,7 @@ impl Config {
     }
 
     /// Whether to include bounded CDP console and page-level JavaScript error diagnostics
-    /// in `BROWSER_NAVIGATE` tool results (and optionally other browser tool results).
+    /// in `BROWSER_NAVIGATE` and `BROWSER_EXTRACT` tool results.
     ///
     /// Off by default to preserve existing context size and tool output stability.
     /// Config: config.json `browserIncludeDiagnosticsInState` (boolean);
@@ -2002,10 +2007,7 @@ impl Config {
         let config_path = Self::config_file_path();
         if let Ok(content) = std::fs::read_to_string(&config_path) {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
-                if let Some(b) = json
-                    .get("browserSpaRetryEnabled")
-                    .and_then(|v| v.as_bool())
-                {
+                if let Some(b) = json.get("browserSpaRetryEnabled").and_then(|v| v.as_bool()) {
                     return b;
                 }
             }
@@ -2126,24 +2128,20 @@ impl Config {
         let config_path = Self::config_file_path();
         let (w_cfg, h_cfg) = if let Ok(content) = std::fs::read_to_string(&config_path) {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
-                let w = json
-                    .get("browserCdpEmulateViewportWidth")
-                    .and_then(|v| {
-                        if v.is_null() {
-                            None
-                        } else {
-                            v.as_u64().map(|n| n as u32)
-                        }
-                    });
-                let h = json
-                    .get("browserCdpEmulateViewportHeight")
-                    .and_then(|v| {
-                        if v.is_null() {
-                            None
-                        } else {
-                            v.as_u64().map(|n| n as u32)
-                        }
-                    });
+                let w = json.get("browserCdpEmulateViewportWidth").and_then(|v| {
+                    if v.is_null() {
+                        None
+                    } else {
+                        v.as_u64().map(|n| n as u32)
+                    }
+                });
+                let h = json.get("browserCdpEmulateViewportHeight").and_then(|v| {
+                    if v.is_null() {
+                        None
+                    } else {
+                        v.as_u64().map(|n| n as u32)
+                    }
+                });
                 (w, h)
             } else {
                 (None, None)
@@ -2267,35 +2265,18 @@ impl Config {
             });
 
         let config_path = Self::config_file_path();
-        let (lat_cfg, lon_cfg, acc_cfg) = if let Ok(content) = std::fs::read_to_string(&config_path) {
+        let (lat_cfg, lon_cfg, acc_cfg) = if let Ok(content) = std::fs::read_to_string(&config_path)
+        {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
                 let lat = json
                     .get("browserCdpEmulateGeolocationLatitude")
-                    .and_then(|v| {
-                        if v.is_null() {
-                            None
-                        } else {
-                            v.as_f64()
-                        }
-                    });
+                    .and_then(|v| if v.is_null() { None } else { v.as_f64() });
                 let lon = json
                     .get("browserCdpEmulateGeolocationLongitude")
-                    .and_then(|v| {
-                        if v.is_null() {
-                            None
-                        } else {
-                            v.as_f64()
-                        }
-                    });
+                    .and_then(|v| if v.is_null() { None } else { v.as_f64() });
                 let acc = json
                     .get("browserCdpEmulateGeolocationAccuracy")
-                    .and_then(|v| {
-                        if v.is_null() {
-                            None
-                        } else {
-                            v.as_f64()
-                        }
-                    });
+                    .and_then(|v| if v.is_null() { None } else { v.as_f64() });
                 (lat, lon, acc)
             } else {
                 (None, None, None)
@@ -2318,7 +2299,9 @@ impl Config {
                 }
                 let la = la.clamp(MIN_LAT, MAX_LAT);
                 let lo = lo.clamp(MIN_LON, MAX_LON);
-                let acc_opt = acc.filter(|a| a.is_finite()).map(|a| a.clamp(MIN_ACC, MAX_ACC));
+                let acc_opt = acc
+                    .filter(|a| a.is_finite())
+                    .map(|a| a.clamp(MIN_ACC, MAX_ACC));
                 Some((la, lo, acc_opt))
             }
             (None, None) => None,
@@ -2341,10 +2324,7 @@ impl Config {
         let config_path = Self::config_file_path();
         if let Ok(content) = std::fs::read_to_string(&config_path) {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
-                if let Some(n) = json
-                    .get("browserArtifactMaxBytes")
-                    .and_then(|v| v.as_u64())
-                {
+                if let Some(n) = json.get("browserArtifactMaxBytes").and_then(|v| v.as_u64()) {
                     return n.clamp(MIN, MAX);
                 }
             }
@@ -2700,10 +2680,7 @@ impl Config {
         let config_path = Self::config_file_path();
         if let Ok(content) = std::fs::read_to_string(&config_path) {
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
-                if let Some(v) = json
-                    .get("beforeCompactionHook")
-                    .and_then(|v| v.as_str())
-                {
+                if let Some(v) = json.get("beforeCompactionHook").and_then(|v| v.as_str()) {
                     if !v.trim().is_empty() {
                         return v.to_string();
                     }
@@ -2779,8 +2756,11 @@ impl Config {
         if !Self::ori_lifecycle_enabled() {
             return false;
         }
-        Self::ori_env_bool("MAC_STATS_ORI_HOOK_ORIENT", "ORI_HOOK_ORIENT_ON_SESSION_START")
-            .unwrap_or(false)
+        Self::ori_env_bool(
+            "MAC_STATS_ORI_HOOK_ORIENT",
+            "ORI_HOOK_ORIENT_ON_SESSION_START",
+        )
+        .unwrap_or(false)
     }
 
     /// Push compaction lessons to Ori inbox. Env: `MAC_STATS_ORI_HOOK_CAPTURE_COMPACTION` or `ORI_HOOK_CAPTURE_ON_COMPACTION`.

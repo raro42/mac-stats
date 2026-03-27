@@ -33,6 +33,7 @@ Whenever Ollama is asked to decide which agent to use, the app sends the complet
 
 * **CPU window**: Frontend sends `conversation_history` to `ollama_chat_with_execution`; the main chat has multi-turn context within the request.
 * **Discord**: **Session history is now passed into Ollama.** Before each request we call `session_memory::get_messages("discord", channel_id)` (and if empty, `load_messages_from_latest_session_file` to resume from the latest session file after restart). That history is converted to `ChatMessage` and passed as `conversation_history` into `answer_with_ollama_and_fetch`, so the model sees prior turns and can resolve "there", "it", "El Masnou", etc. Capped at 20 messages. Messages are still stored with `add_message` and persisted when > 3.
+* **Per-conversation serialization (`keyed_queue.rs`):** Full agent-router turns (and having_fun Ollama replies that touch the same channel memory) run under `keyed_queue::run_serial` with key `discord:<channel_id>`. Concurrent messages in the same channel are processed one after another so session history and tool loops cannot interleave. Scheduler runs and task-runner loops that target a Discord channel use the same `discord:<id>` key (and the matching `ollama_queue_key`) so scheduled work and live chat do not race. In-app CPU chat uses the fixed key `ui-chat`. This is separate from the global Ollama HTTP queue in `ollama_queue.rs` (API concurrency vs. whole-turn session correctness). Logs: `session/keyed_queue` at debug for acquire / entered / cleanup.
 
 ### Session Context (Who Sees What)
 

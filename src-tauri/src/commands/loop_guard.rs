@@ -85,7 +85,12 @@ impl ToolLoopGuard {
     }
 
     /// After the tool result is known (optional mode only).
-    pub fn after_tool_result(&mut self, tool: &str, arg: &str, result: &str) -> ToolLoopAfterResult {
+    pub fn after_tool_result(
+        &mut self,
+        tool: &str,
+        arg: &str,
+        result: &str,
+    ) -> ToolLoopAfterResult {
         match &mut self.inner {
             ToolLoopGuardInner::Legacy(_) => ToolLoopAfterResult::None,
             ToolLoopGuardInner::Optional(s) => s.after_result(tool, arg, result),
@@ -225,10 +230,7 @@ fn normalize_arg_for_loop_detection(tool: &str, arg: &str) -> String {
         if let Ok(u) = url::Url::parse(s) {
             let scheme = u.scheme().to_lowercase();
             if scheme == "http" || scheme == "https" {
-                let host = u
-                    .host_str()
-                    .map(|h| h.to_lowercase())
-                    .unwrap_or_default();
+                let host = u.host_str().map(|h| h.to_lowercase()).unwrap_or_default();
                 let mut path = u.path().to_string();
                 while path.len() > 1 && path.ends_with('/') {
                     path.pop();
@@ -463,9 +465,13 @@ mod tests {
     #[test]
     fn optional_cycle_still_blocks() {
         let mut guard = ToolLoopGuard::new(Some(optional_cfg(10, 20)));
-        assert!(guard.before_tool_execute("FETCH_URL", "https://a.com").is_none());
+        assert!(guard
+            .before_tool_execute("FETCH_URL", "https://a.com")
+            .is_none());
         assert!(guard.before_tool_execute("BRAVE_SEARCH", "q").is_none());
-        assert!(guard.before_tool_execute("FETCH_URL", "https://a.com").is_none());
+        assert!(guard
+            .before_tool_execute("FETCH_URL", "https://a.com")
+            .is_none());
         let r = guard.before_tool_execute("BRAVE_SEARCH", "q");
         assert!(r.is_some());
         assert!(r.unwrap().contains("Cycle detected"));

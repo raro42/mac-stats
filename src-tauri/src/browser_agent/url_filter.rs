@@ -16,9 +16,11 @@ use url::Url;
 const DEFAULT_BLOCKLIST: &str = include_str!("data/default_browser_blocklist.txt");
 
 fn home_mac_stats_blocklist_path() -> Option<PathBuf> {
-    std::env::var("HOME")
-        .ok()
-        .map(|h| Path::new(&h).join(".mac-stats").join("browser-security-blocklist.txt"))
+    std::env::var("HOME").ok().map(|h| {
+        Path::new(&h)
+            .join(".mac-stats")
+            .join("browser-security-blocklist.txt")
+    })
 }
 
 fn parse_domain_list_line(line: &str) -> Option<String> {
@@ -30,9 +32,7 @@ fn parse_domain_list_line(line: &str) -> Option<String> {
 }
 
 fn split_comma_patterns(s: &str) -> Vec<String> {
-    s.split(',')
-        .filter_map(parse_domain_list_line)
-        .collect()
+    s.split(',').filter_map(parse_domain_list_line).collect()
 }
 
 fn read_key_from_config_env(path: &Path, key: &str) -> Option<String> {
@@ -309,10 +309,7 @@ pub fn navigation_precheck_error(url: &str) -> Option<String> {
         "Browser navigation security: blocked request to host {}",
         host
     );
-    Some(format!(
-        "Navigation to {} blocked by security policy",
-        host
-    ))
+    Some(format!("Navigation to {} blocked by security policy", host))
 }
 
 /// Used by HTTP fallback and CDP after redirects / clicks.

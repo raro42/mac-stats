@@ -1,10 +1,14 @@
 //! `DOMSnapshot.captureSnapshot` for layout bounds (CSS px, DPR-scaled), whitelisted computed
 //! styles, and paint-order occlusion filtering layered on the JS interactable collector.
+//!
+//! Chrome sometimes emits **`-1`** string-table indices in snapshot arrays; generated CDP structs
+//! use `u32`, so we deserialize the capture result as **JSON** and coerce sentinels locally.
 
 use std::collections::HashMap;
 
-use headless_chrome::protocol::cdp::DOM;
 use headless_chrome::protocol::cdp::DOMSnapshot;
+use headless_chrome::protocol::cdp::DOM;
+use serde_json::Value as Json;
 
 use super::{backend_id_for_object_id, InteractableRow};
 use crate::{mac_stats_debug, mac_stats_info};
@@ -61,10 +65,7 @@ fn rect_contains_outer(outer: (f64, f64, f64, f64), inner: (f64, f64, f64, f64))
     const EPS: f64 = 0.5;
     let (ox, oy, ow, oh) = outer;
     let (ix, iy, iw, ih) = inner;
-    ix + EPS >= ox
-        && iy + EPS >= oy
-        && ix + iw <= ox + ow + EPS
-        && iy + ih <= oy + oh + EPS
+    ix + EPS >= ox && iy + EPS >= oy && ix + iw <= ox + ow + EPS && iy + ih <= oy + oh + EPS
 }
 
 fn rects_intersect(a: (f64, f64, f64, f64), b: (f64, f64, f64, f64)) -> bool {
@@ -96,11 +97,20 @@ fn occlusion_flags(
     (fully, partial && !fully)
 }
 
-fn strings_get(strings: &[String], idx: u32) -> String {
+fn json_number_to_i64(v: &Json) -> Option<i64> {
+    v.as_i64()
+        .or_else(|| v.as_u64().map(|u| u as i64))
+        .or_else(|| v.as_f64().map(|f| f as i64))
+}
+
+fn strings_get(strings: &[String], idx: i64) -> String {
+    if idx < 0 {
+        return String::new();
+    }
     strings.get(idx as usize).cloned().unwrap_or_default()
 }
 
-fn style_hit_flags(strings: &[String], indices: &[u32]) -> (bool, bool) {
+fn style_hit_flags(strings: &[String], indices: &[i64]) -> (bool, bool) {
     let mut pointer_events_none = false;
     let mut not_visible_hit = false;
     for (i, &si) in indices.iter().enumerate() {
@@ -140,61 +150,106 @@ fn style_hit_flags(strings: &[String], indices: &[u32]) -> (bool, bool) {
     (pointer_events_none, not_visible_hit)
 }
 
-fn build_context_from_document(
-    doc: &DOMSnapshot::DocumentSnapshot,
+fn paint_order_at(paint_orders: Option<&Vec<i64>>, li: usize) -> u32 {
+    let Some(po) = paint_orders else {
+        return 0;
+    };
+    let v = po.get(li).copied().unwrap_or(0);
+    v.max(0) as u32
+}
+
+fn bounds_row_from_json(v: &Json) -> Option<Vec<f64>> {
+    let arr = v.as_array()?;
+    let mut out = Vec::with_capacity(arr.len());
+    for x in arr {
+        let n = x
+            .as_f64()
+            .or_else(|| json_number_to_i64(x).map(|i| i as f64))?;
+        out.push(n);
+    }
+    Some(out)
+}
+
+fn backend_id_from_json(v: &Json) -> Option<DOM::BackendNodeId> {
+    let u = v
+        .as_u64()
+        .or_else(|| json_number_to_i64(v).map(|i| i as u64))?;
+    u.try_into().ok()
+}
+
+/// Parses the first document of a `DOMSnapshot.captureSnapshot` **JSON** result.
+fn build_paint_context_from_json_doc(
+    doc: &Json,
     strings: &[String],
     dpr: f64,
 ) -> Option<PaintContext> {
-    let nlayout = doc.layout.node_index.len();
+    let layout = doc.get("layout")?;
+    let node_index = layout.get("nodeIndex")?.as_array()?;
+    let bounds_arr = layout.get("bounds")?.as_array()?;
+    let styles_arr = layout.get("styles")?.as_array()?;
+    let nlayout = node_index.len();
     if nlayout == 0 {
         return None;
     }
-    let paint_orders_present = doc
-        .layout
-        .paint_orders
+
+    let paint_orders: Option<Vec<i64>> = layout
+        .get("paintOrders")
+        .and_then(|p| p.as_array())
+        .map(|arr| arr.iter().filter_map(json_number_to_i64).collect());
+
+    let paint_orders_present = paint_orders
         .as_ref()
         .map(|p| !p.is_empty())
         .unwrap_or(false);
-    let paint_orders = doc.layout.paint_orders.as_deref();
+
+    let nodes = doc.get("nodes")?;
+    let node_count = nodes
+        .get("backendNodeId")
+        .and_then(|v| v.as_array())
+        .map(|a| a.len())
+        .or_else(|| {
+            nodes
+                .get("parentIndex")
+                .and_then(|v| v.as_array())
+                .map(|a| a.len())
+        })
+        .unwrap_or(0);
+
+    let backend_ids: Option<&Vec<Json>> = nodes.get("backendNodeId").and_then(|v| v.as_array());
+
     let mut layers: Vec<(u32, f64, f64, f64, f64)> = Vec::with_capacity(nlayout);
     let mut by_backend: HashMap<DOM::BackendNodeId, NodeSnapInfo> = HashMap::new();
 
-    let node_count = doc
-        .nodes
-        .parent_index
-        .as_ref()
-        .map(|v| v.len())
-        .or_else(|| doc.nodes.backend_node_id.as_ref().map(|v| v.len()))
-        .unwrap_or(0);
-
     for li in 0..nlayout {
-        let dom_idx = *doc.layout.node_index.get(li)? as usize;
+        let dom_idx_i = json_number_to_i64(node_index.get(li)?)?;
+        if dom_idx_i < 0 {
+            continue;
+        }
+        let dom_idx = dom_idx_i as usize;
         if dom_idx >= node_count {
             continue;
         }
-        let raw_bounds = doc.layout.bounds.get(li)?;
-        let raw: Vec<f64> = raw_bounds.iter().map(|x| *x as f64).collect();
-        let Some(bounds) = parse_bounds_css(&raw, dpr) else {
+        let raw_bounds = bounds_row_from_json(bounds_arr.get(li)?)?;
+        let Some(bounds) = parse_bounds_css(
+            &raw_bounds.iter().map(|x| *x as f64).collect::<Vec<_>>(),
+            dpr,
+        ) else {
             continue;
         };
-        let po = paint_orders
-            .and_then(|p| p.get(li).copied())
-            .unwrap_or(0);
-        let (pointer_events_none, not_visible_hit) = doc
-            .layout
-            .styles
+        let po = paint_order_at(paint_orders.as_ref(), li);
+        let style_indices: Vec<i64> = styles_arr
             .get(li)
-            .map(|ix| style_hit_flags(strings, ix))
-            .unwrap_or((false, false));
+            .and_then(|row| row.as_array())
+            .map(|row| row.iter().filter_map(json_number_to_i64).collect())
+            .unwrap_or_default();
+        let (pointer_events_none, not_visible_hit) = style_hit_flags(strings, &style_indices);
 
         layers.push((po, bounds.0, bounds.1, bounds.2, bounds.3));
 
-        let Some(backend) = doc
-            .nodes
-            .backend_node_id
-            .as_ref()
-            .and_then(|v| v.get(dom_idx).copied())
-        else {
+        let Some(backend_arr) = backend_ids else {
+            continue;
+        };
+        let Some(bid) = backend_arr.get(dom_idx).and_then(backend_id_from_json) else {
             continue;
         };
         let area = bounds.2 * bounds.3;
@@ -204,12 +259,12 @@ fn build_context_from_document(
             pointer_events_none,
             not_visible_hit,
         };
-        let replace = match by_backend.get(&backend) {
+        let replace = match by_backend.get(&bid) {
             None => true,
             Some(e) => area > e.bounds.2 * e.bounds.3,
         };
         if replace {
-            by_backend.insert(backend, entry);
+            by_backend.insert(bid, entry);
         }
     }
 
@@ -224,7 +279,7 @@ fn try_capture_paint_context(tab: &headless_chrome::Tab) -> Option<PaintContext>
     let _ = tab.call_method(DOMSnapshot::Enable(None));
     let dpr = tab_device_pixel_ratio(tab);
     let cap = tab
-        .call_method(DOMSnapshot::CaptureSnapshot {
+        .call_method_json(DOMSnapshot::CaptureSnapshot {
             computed_styles: STYLE_ORDER.iter().map(|s| s.to_string()).collect(),
             include_paint_order: Some(true),
             include_dom_rects: None,
@@ -240,8 +295,17 @@ fn try_capture_paint_context(tab: &headless_chrome::Tab) -> Option<PaintContext>
             e
         })
         .ok()?;
-    let main = cap.documents.first()?;
-    let ctx = build_context_from_document(main, &cap.strings, dpr)?;
+
+    let strings: Vec<String> = cap
+        .get("strings")
+        .and_then(|s| serde_json::from_value(s.clone()).ok())
+        .unwrap_or_default();
+
+    let doc = cap
+        .get("documents")
+        .and_then(|d| d.as_array())
+        .and_then(|a| a.first())?;
+    let ctx = build_paint_context_from_json_doc(doc, &strings, dpr)?;
     mac_stats_info!(
         "browser/cdp",
         "Browser agent [CDP]: DOMSnapshot paint context — layout_boxes={} backend_map={} dpr={:.3} paint_order={}",

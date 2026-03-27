@@ -57,11 +57,7 @@ pub fn write_bytes_atomic_same_dir(
     }
     let final_path = dest_dir.join(final_filename);
     let seq = ATOMIC_WRITE_SEQ.fetch_add(1, Ordering::Relaxed);
-    let tmp_name = format!(
-        ".mac-stats-artifact.{}.{}.part",
-        std::process::id(),
-        seq
-    );
+    let tmp_name = format!(".mac-stats-artifact.{}.{}.part", std::process::id(), seq);
     let tmp_path = dest_dir.join(tmp_name);
 
     let write_result = (|| -> Result<(), String> {
@@ -71,8 +67,10 @@ pub fn write_bytes_atomic_same_dir(
             .truncate(true)
             .open(&tmp_path)
             .map_err(|e| format!("open temp artifact: {}", e))?;
-        f.write_all(bytes).map_err(|e| format!("write temp artifact: {}", e))?;
-        f.sync_all().map_err(|e| format!("sync temp artifact: {}", e))?;
+        f.write_all(bytes)
+            .map_err(|e| format!("write temp artifact: {}", e))?;
+        f.sync_all()
+            .map_err(|e| format!("sync temp artifact: {}", e))?;
         drop(f);
         std::fs::rename(&tmp_path, &final_path)
             .map_err(|e| format!("finalize artifact rename: {}", e))?;
@@ -116,10 +114,7 @@ mod tests {
 
     #[test]
     fn sanitize_basename_maps_separators() {
-        assert_eq!(
-            sanitize_untrusted_basename("a:b/c?x", "page"),
-            "a_b_c_x"
-        );
+        assert_eq!(sanitize_untrusted_basename("a:b/c?x", "page"), "a_b_c_x");
     }
 
     #[test]

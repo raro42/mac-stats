@@ -190,14 +190,15 @@ pub(crate) async fn handle_agent(
         &format!("{} -> Ollama: {}", agent.name, status_text),
     );
 
-            match run_agent_ollama_session(
-                agent,
-                &user_msg,
-                status_tx,
-                load_global_memory,
-                OllamaHttpQueue::Nested,
-            )
-            .await {
+    match run_agent_ollama_session(
+        agent,
+        &user_msg,
+        status_tx,
+        load_global_memory,
+        OllamaHttpQueue::Nested,
+    )
+    .await
+    {
         Ok(result) => {
             let label = format!("{} ({})", agent.name, agent.id);
             let entry = Some((label.clone(), result.trim().to_string()));
@@ -329,7 +330,8 @@ pub(crate) fn handle_run_js(
                 "RUN_JS disabled in config (runJsEnabled=false); tool calls return refusal without invoking Node"
             );
         }
-        return "runJsEnabled=false: RUN_JS refused. Answer without executing JavaScript.".to_string();
+        return "runJsEnabled=false: RUN_JS refused. Answer without executing JavaScript."
+            .to_string();
     }
 
     const CODE_PREVIEW_LEN: usize = 50;
@@ -453,7 +455,10 @@ pub(crate) async fn handle_run_cmd(
                 );
                 last_output = format!(
                     "Here is the command output:\n\n{}\n\nUse this to answer the user's question.",
-                    crate::commands::untrusted_content::wrap_untrusted_content("run-cmd-output", &output)
+                    crate::commands::untrusted_content::wrap_untrusted_content(
+                        "run-cmd-output",
+                        &output
+                    )
                 );
                 break;
             }

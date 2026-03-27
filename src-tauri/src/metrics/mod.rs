@@ -1241,6 +1241,7 @@ pub fn get_window_decorations() -> bool {
 #[tauri::command]
 pub fn set_window_decorations(decorations: bool) -> Result<(), String> {
     use crate::config::Config;
+    use serde_json::{json, Value};
 
     // Update Rust state
     use crate::state::WINDOW_DECORATIONS;
@@ -1256,19 +1257,38 @@ pub fn set_window_decorations(decorations: bool) -> Result<(), String> {
         }
     }
 
-    let config = serde_json::json!({
-        "windowDecorations": decorations
-    });
+    let before: Value = std::fs::read_to_string(&config_path)
+        .ok()
+        .and_then(|s| serde_json::from_str(&s).ok())
+        .unwrap_or_else(|| json!({}));
+
+    let mut after = before.clone();
+    match after.as_object_mut() {
+        Some(obj) => {
+            obj.insert("windowDecorations".to_string(), json!(decorations));
+        }
+        None => {
+            after = json!({ "windowDecorations": decorations });
+        }
+    }
+
+    if let Err(e) = crate::config::reject_if_protected_config_json_changed(&before, &after) {
+        tracing::warn!(
+            "set_window_decorations: protected-config guard blocked merge: {}",
+            e
+        );
+        return Err(e);
+    }
 
     if let Err(e) = std::fs::write(
         &config_path,
-        serde_json::to_string_pretty(&config).unwrap_or_else(|_| config.to_string()),
+        serde_json::to_string_pretty(&after).unwrap_or_else(|_| after.to_string()),
     ) {
         return Err(format!("Failed to write config file: {}", e));
     }
 
     crate::debug3!(
-        "Window decorations preference set to: {} (saved to config file)",
+        "Window decorations preference set to: {} (saved to config file, merged with existing JSON)",
         decorations
     );
     Ok(())

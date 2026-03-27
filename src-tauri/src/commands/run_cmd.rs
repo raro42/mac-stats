@@ -113,14 +113,10 @@ pub(crate) fn validate_run_cmd_stage_shape(stage: &str) -> Result<(), String> {
                     );
                 }
                 if c == '<' && i + 1 < chars.len() && chars[i + 1] == '(' {
-                    return Err(
-                        "RUN_CMD: process substitution <(...) is not allowed.".to_string(),
-                    );
+                    return Err("RUN_CMD: process substitution <(...) is not allowed.".to_string());
                 }
                 if c == '>' && i + 1 < chars.len() && chars[i + 1] == '(' {
-                    return Err(
-                        "RUN_CMD: process substitution >(...) is not allowed.".to_string(),
-                    );
+                    return Err("RUN_CMD: process substitution >(...) is not allowed.".to_string());
                 }
                 if c == ';' {
                     return Err(

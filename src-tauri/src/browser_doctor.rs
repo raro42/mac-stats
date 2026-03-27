@@ -48,8 +48,7 @@ pub fn probe_loopback_json_version() -> Result<Value, String> {
     if !status.is_success() {
         return Err(format!("{} returned HTTP {}", url, status));
     }
-    resp.json()
-        .map_err(|e| format!("JSON from {}: {}", url, e))
+    resp.json().map_err(|e| format!("JSON from {}: {}", url, e))
 }
 
 fn print_failure_hints(port: u16) {
@@ -105,9 +104,14 @@ pub fn run_browser_doctor_stdio() -> i32 {
             acc.map(|a| format!("{:.1} m", a))
                 .unwrap_or_else(|| "(default)".to_string())
         ),
-        None => println!("  CDP emulate geolocation:        (off — set both Latitude and Longitude)"),
+        None => {
+            println!("  CDP emulate geolocation:        (off — set both Latitude and Longitude)")
+        }
     }
-    println!("  chromium executable (resolved): {}", chrome_path.display());
+    println!(
+        "  chromium executable (resolved): {}",
+        chrome_path.display()
+    );
     println!("  browserChromiumExecutable set: {}", chrome_explicit);
     println!("  browserChromiumUserDataDir:     {}", user_data);
     println!("  headless vs visible Chrome:     chosen per agent run (e.g. remote/Discord often headless; UI chat often visible). See docs/029_browser_automation.md.");
@@ -115,7 +119,10 @@ pub fn run_browser_doctor_stdio() -> i32 {
 
     match probe_loopback_json_version() {
         Ok(json) => {
-            let has_ws = json.get("webSocketDebuggerUrl").and_then(|v| v.as_str()).is_some();
+            let has_ws = json
+                .get("webSocketDebuggerUrl")
+                .and_then(|v| v.as_str())
+                .is_some();
             let browser = json
                 .get("Browser")
                 .and_then(|v| v.as_str())

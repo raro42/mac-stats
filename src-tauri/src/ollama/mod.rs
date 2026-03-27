@@ -4,8 +4,8 @@
 //! Includes model info (context size) via POST /api/show and cache.
 //! Sub-module `models` provides role-based model classification and resolution.
 
-pub mod models;
 pub(crate) mod model_list_cache;
+pub mod models;
 
 use crate::circuit_breaker::CircuitBreaker;
 use crate::security;
@@ -13,6 +13,7 @@ use crate::{mac_stats_debug, mac_stats_info};
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, Instant};
 use url::Url;
@@ -300,7 +301,8 @@ struct CachedModelInfoEntry {
 
 /// Cache key: (endpoint, model_name).
 fn model_info_cache() -> &'static Mutex<HashMap<(String, String), CachedModelInfoEntry>> {
-    static CACHE: OnceLock<Mutex<HashMap<(String, String), CachedModelInfoEntry>>> = OnceLock::new();
+    static CACHE: OnceLock<Mutex<HashMap<(String, String), CachedModelInfoEntry>>> =
+        OnceLock::new();
     CACHE.get_or_init(|| Mutex::new(HashMap::new()))
 }
 
@@ -354,7 +356,10 @@ pub async fn resolve_model_context_budget(
                     ModelContextBudgetSource::HeuristicFallback,
                 )
             } else {
-                (ModelInfo::default(), ModelContextBudgetSource::DefaultFallback)
+                (
+                    ModelInfo::default(),
+                    ModelContextBudgetSource::DefaultFallback,
+                )
             }
         }
     }
@@ -407,8 +412,8 @@ async fn fetch_model_info_for_cache(
         ));
     }
 
-    let response: serde_json::Value = serde_json::from_str(&body_text)
-        .map_err(|e| format!("Show model JSON parse: {}", e))?;
+    let response: serde_json::Value =
+        serde_json::from_str(&body_text).map_err(|e| format!("Show model JSON parse: {}", e))?;
 
     if let Some(err) = response.get("error").and_then(|e| e.as_str()) {
         if !err.trim().is_empty() {
@@ -883,6 +888,20 @@ impl OllamaClient {
 
 // --- Per-endpoint HTTP circuit (shared by /api/chat and /api/tags) ---
 
+static OLLAMA_CIRCUIT_DEBUG_FORCE_LOGGED: AtomicBool = AtomicBool::new(false);
+
+/// When `MAC_STATS_DEBUG_FORCE_OPEN_OLLAMA_CIRCUIT` is `1`/`true`/`yes`, Ollama HTTP is blocked
+/// and the menu bar shows **Ollama ✕** without needing a real outage (manual QA only).
+fn ollama_http_circuit_debug_force_open() -> bool {
+    match std::env::var("MAC_STATS_DEBUG_FORCE_OPEN_OLLAMA_CIRCUIT") {
+        Ok(v) => {
+            let t = v.trim();
+            t == "1" || t.eq_ignore_ascii_case("true") || t.eq_ignore_ascii_case("yes")
+        }
+        Err(_) => false,
+    }
+}
+
 fn ollama_http_circuit() -> &'static Mutex<CircuitBreaker> {
     static CB: OnceLock<Mutex<CircuitBreaker>> = OnceLock::new();
     CB.get_or_init(|| Mutex::new(CircuitBreaker::new_ollama()))
@@ -890,6 +909,17 @@ fn ollama_http_circuit() -> &'static Mutex<CircuitBreaker> {
 
 /// Gate Ollama HTTP calls (`/api/chat`, `/api/tags`, etc.).
 pub fn ollama_http_circuit_allow() -> Result<(), String> {
+    if ollama_http_circuit_debug_force_open() {
+        if !OLLAMA_CIRCUIT_DEBUG_FORCE_LOGGED.swap(true, Ordering::SeqCst) {
+            mac_stats_info!(
+                "circuit",
+                "Ollama circuit: MAC_STATS_DEBUG_FORCE_OPEN_OLLAMA_CIRCUIT is set — blocking Ollama HTTP (debug QA only)"
+            );
+        }
+        return Err(
+            "Ollama is temporarily unavailable (circuit open, will retry in 30s)".to_string(),
+        );
+    }
     let mut g = ollama_http_circuit()
         .lock()
         .map_err(|_| "Ollama circuit lock poisoned".to_string())?;
@@ -910,6 +940,9 @@ pub fn ollama_http_circuit_record_failure(should_trip: bool) {
 
 /// When true, menu bar may show a short "Ollama ✕" hint (circuit fully open).
 pub fn ollama_http_circuit_is_open_for_menu() -> bool {
+    if ollama_http_circuit_debug_force_open() {
+        return true;
+    }
     ollama_http_circuit()
         .lock()
         .ok()

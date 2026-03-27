@@ -106,7 +106,14 @@ fn draw_dashed_segment(
     }
 }
 
-fn draw_dashed_rect(img: &mut RgbImage, left: f32, top: f32, right: f32, bottom: f32, color: Rgb<u8>) {
+fn draw_dashed_rect(
+    img: &mut RgbImage,
+    left: f32,
+    top: f32,
+    right: f32,
+    bottom: f32,
+    color: Rgb<u8>,
+) {
     let w = right - left;
     let h = bottom - top;
     let dash = (4.0 + 0.08 * w.min(h)).clamp(4.0, 14.0);
@@ -135,7 +142,16 @@ fn draw_label_with_outline(
     fg: Rgb<u8>,
     outline: Rgb<u8>,
 ) {
-    for (ox, oy) in [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, -1), (-1, 1), (1, 1)] {
+    for (ox, oy) in [
+        (-1, 0),
+        (1, 0),
+        (0, -1),
+        (0, 1),
+        (-1, -1),
+        (1, -1),
+        (-1, 1),
+        (1, 1),
+    ] {
         draw_text_mut(img, outline, x + ox, y + oy, scale, font, text);
     }
     draw_text_mut(img, fg, x, y, scale, font, text);
@@ -198,7 +214,16 @@ pub(crate) fn write_annotated_screenshot_copy(
             if lx < 2 {
                 lx = 2;
             }
-            draw_label_with_outline(&mut rgb, lx, ly, scale, font, &label, Rgb([255, 255, 255]), Rgb([0, 0, 0]));
+            draw_label_with_outline(
+                &mut rgb,
+                lx,
+                ly,
+                scale,
+                font,
+                &label,
+                Rgb([255, 255, 255]),
+                Rgb([0, 0, 0]),
+            );
         }
         drawn += 1;
     }
@@ -215,12 +240,12 @@ pub(crate) fn write_annotated_screenshot_copy(
     let dyn_img = DynamicImage::ImageRgb8(rgb);
     let mut encoded = Vec::new();
     dyn_img
-        .write_to(
-            &mut std::io::Cursor::new(&mut encoded),
-            ImageFormat::Png,
-        )
+        .write_to(&mut std::io::Cursor::new(&mut encoded), ImageFormat::Png)
         .map_err(|e| format!("encode annotated screenshot PNG: {}", e))?;
-    super::artifact_limits::ensure_buffer_within_browser_artifact_cap(encoded.len(), "annotated PNG")?;
+    super::artifact_limits::ensure_buffer_within_browser_artifact_cap(
+        encoded.len(),
+        "annotated PNG",
+    )?;
     let out = super::artifact_atomic::write_bytes_atomic_same_dir(parent, &out_name, &encoded)
         .map_err(|e| format!("write annotated screenshot: {}", e))?;
 
@@ -249,7 +274,13 @@ pub(crate) fn try_annotate_screenshot(
     dpr: f64,
     viewport_width_css: f64,
 ) -> PathBuf {
-    match write_annotated_screenshot_copy(raw_png_path, png_bytes, interactables, dpr, viewport_width_css) {
+    match write_annotated_screenshot_copy(
+        raw_png_path,
+        png_bytes,
+        interactables,
+        dpr,
+        viewport_width_css,
+    ) {
         Ok(p) => p,
         Err(e) => {
             mac_stats_warn!(

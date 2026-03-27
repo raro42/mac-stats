@@ -85,8 +85,9 @@ enum DiscordCmd {
         message: String,
     },
     /// Run the same Ollama+tools pipeline as a Discord DM (headless browser, no Discord). For testing.
+    /// Leading lines are parsed like Discord: `model: …`, `skill: …`, `agent: …`, `temperature:`, `num_ctx:`.
     RunOllama {
-        #[arg(help = "Question to run (same flow as Discord DM)")]
+        #[arg(help = "Question (optional leading model:/skill:/agent: lines like Discord DM)")]
         question: String,
     },
 }
@@ -214,39 +215,100 @@ fn main() {
                 rt.block_on(async {
                     mac_stats::config::Config::ensure_defaults();
                     mac_stats::ensure_ollama_agent_ready_at_startup().await;
-                    mac_stats::log_untrusted_suspicious_scan("cli-user-question", &question);
-                    match mac_stats::answer_with_ollama_and_fetch(mac_stats::OllamaRequest {
-                        question: mac_stats::wrap_untrusted_content("cli-user-question", &question),
-                        allow_schedule: true,
-                        retry_on_verification_no: true,
-                        from_remote: true,
-                        compaction_hook_source: Some("cli".to_string()),
-                        ollama_queue_key: Some("cli".to_string()),
-                        ..Default::default()
-                    })
-                    .await
-                    {
-                        Ok(reply) => {
-                            println!(
-                                "Reply ({} chars):\n{}",
-                                reply.text.chars().count(),
-                                reply.text
-                            );
-                            for p in &reply.attachment_paths {
-                                println!("Attachment: {}", p.display());
+                    let (
+                        mut question_body,
+                        mut model_override,
+                        options_override,
+                        skill_content,
+                        requested_skill_selector,
+                        agent_selector,
+                        _verbose_cli,
+                    ) = mac_stats::discord::parse_discord_ollama_overrides(&question);
+                    if requested_skill_selector.is_some() && skill_content.is_none() {
+                        let selector = requested_skill_selector.as_deref().unwrap_or("?");
+                        eprintln!(
+                            "{}",
+                            mac_stats::discord::format_skill_not_found_error(selector)
+                        );
+                        1
+                    } else {
+                        if model_override.is_none() {
+                            if let Some((model, rest)) =
+                                mac_stats::discord::extract_model_switch_from_question(
+                                    &question_body,
+                                )
+                            {
+                                model_override = Some(model);
+                                if !rest.is_empty() {
+                                    question_body = rest;
+                                }
                             }
-                            mac_stats::run_judge_if_enabled(
-                                &question,
-                                &reply.text,
-                                &reply.attachment_paths,
-                                None,
-                            )
-                            .await;
-                            0
                         }
-                        Err(e) => {
-                            eprintln!("Run failed: {}", e);
-                            1
+                        let agents = mac_stats::agents::load_agents();
+                        let agent_override = agent_selector.as_ref().and_then(|sel| {
+                            mac_stats::agents::find_agent_by_id_or_name(&agents, sel).cloned()
+                        });
+                        if let Some(ref mo) = model_override {
+                            mac_stats::mac_stats_info!(
+                                "cli/run-ollama",
+                                "preamble model_override={}",
+                                mo
+                            );
+                        }
+                        if agent_override.is_some() {
+                            mac_stats::mac_stats_info!(
+                                "cli/run-ollama",
+                                "preamble agent override set"
+                            );
+                        }
+                        mac_stats::log_untrusted_suspicious_scan(
+                            "cli-user-question",
+                            &question_body,
+                        );
+                        let question_for_judge = question_body.clone();
+                        match mac_stats::keyed_queue::run_serial("cli", async move {
+                            mac_stats::answer_with_ollama_and_fetch(mac_stats::OllamaRequest {
+                                question: mac_stats::wrap_untrusted_content(
+                                    "cli-user-question",
+                                    &question_body,
+                                ),
+                                model_override,
+                                options_override,
+                                skill_content,
+                                agent_override,
+                                allow_schedule: true,
+                                retry_on_verification_no: true,
+                                from_remote: true,
+                                compaction_hook_source: Some("cli".to_string()),
+                                ollama_queue_key: Some("cli".to_string()),
+                                ..Default::default()
+                            })
+                            .await
+                        })
+                        .await
+                        {
+                            Ok(reply) => {
+                                println!(
+                                    "Reply ({} chars):\n{}",
+                                    reply.text.chars().count(),
+                                    reply.text
+                                );
+                                for p in &reply.attachment_paths {
+                                    println!("Attachment: {}", p.display());
+                                }
+                                mac_stats::run_judge_if_enabled(
+                                    &question_for_judge,
+                                    &reply.text,
+                                    &reply.attachment_paths,
+                                    None,
+                                )
+                                .await;
+                                0
+                            }
+                            Err(e) => {
+                                eprintln!("Run failed: {}", e);
+                                1
+                            }
                         }
                     }
                 })

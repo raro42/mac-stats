@@ -131,11 +131,7 @@ impl TraceSocket {
         ))
     }
 
-    fn read_stream_to_vec(
-        &mut self,
-        handle: &str,
-        max_bytes: u64,
-    ) -> Result<Vec<u8>, String> {
+    fn read_stream_to_vec(&mut self, handle: &str, max_bytes: u64) -> Result<Vec<u8>, String> {
         let mut out: Vec<u8> = Vec::new();
         let max_us = max_bytes as usize;
         let mut offset: u64 = 0;
@@ -370,7 +366,12 @@ pub(crate) fn stop_and_persist_best_effort(ws_url_hint: Option<&str>, reason: &s
     set_tcp_read_timeout(ts.socket.get_mut(), Some(Duration::from_secs(120)));
     let end_id = ts.next_cmd_id();
     if let Err(e) = ts.send_cmd(end_id, "Tracing.end", json!({})) {
-        mac_stats_warn!("browser/cdp", "CDP trace: Tracing.end send failed ({}): {}", reason, e);
+        mac_stats_warn!(
+            "browser/cdp",
+            "CDP trace: Tracing.end send failed ({}): {}",
+            reason,
+            e
+        );
         let _ = ts.socket.close(None);
         return;
     }
