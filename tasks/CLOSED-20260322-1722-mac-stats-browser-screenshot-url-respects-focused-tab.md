@@ -31,3 +31,16 @@ rg -n "focused tab|BROWSER_SCREENSHOT.*URL" src/commands/browser_tool_dispatch.r
 | Symbols | `rg -n` patterns from «Verification (automated)» (`cwd` `src-tauri/`) | **pass** — matches in `browser_agent/mod.rs`, `browser_tool_dispatch.rs`, `agent_descriptions.rs` |
 
 - **Outcome:** Acceptance criteria 1–3 satisfied → **`CLOSED-…`**.
+
+### Test report — 2026-03-27 (follow-up run, TESTER.md)
+
+- **Date:** 2026-03-27, local time of the environment where commands ran.
+- **Preflight:** `tasks/UNTESTED-20260322-1722-mac-stats-browser-screenshot-url-respects-focused-tab.md` was **not present** (only `CLOSED-20260322-1722-mac-stats-browser-screenshot-url-respects-focused-tab.md` exists). Per operator instruction, **no other** `UNTESTED-*` file was selected. The `UNTESTED-…` → `TESTING-…` rename could not be applied to a missing path; verification below is against this task’s acceptance criteria and automated checks.
+
+| Step | Command | Result |
+|------|---------|--------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed |
+| Symbols | `rg` patterns from «Verification (automated)» (`browser_agent/mod.rs`, `browser_tool_dispatch.rs`, `agent_descriptions.rs`) | **pass** — focused-tab URL screenshot path and user-facing copy present |
+
+- **Outcome:** All checks pass; task remains **`CLOSED-20260322-1722-mac-stats-browser-screenshot-url-respects-focused-tab.md`** (no `WIP-` needed).

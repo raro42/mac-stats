@@ -42,3 +42,19 @@ rg -n "not replacing cached|not updating cache|empty model list|MCACHE_LOG_TAG" 
 **Notes:** No dedicated unit tests target `model_list_cache.rs`; verification is build + suite + static read of branches in `fetch_tags_cached` / `run_bg_refresh`. Live Ollama empty/error responses against a running daemon were not exercised in this run.
 
 **Outcome:** All acceptance criteria satisfied → closed.
+
+## Test report
+
+**Date:** 2026-03-27 (local workspace time; not UTC).
+
+**Preflight:** `tasks/UNTESTED-20260321-1855-openclaw-poisoned-cache-prevention.md` was not on disk; this cycle started from `tasks/CLOSED-20260321-1855-openclaw-poisoned-cache-prevention.md`, renamed to `TESTING-20260321-1855-openclaw-poisoned-cache-prevention.md` per `003-tester/TESTER.md` step 2 (UNTESTED→TESTING). No other `UNTESTED-*` task was used.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test` — **pass** (854 passed, 0 failed in `mac_stats` library; 1 doc-test ignored)
+- `rg -n "not replacing cached|not updating cache|empty model list|MCACHE_LOG_TAG" src-tauri/src/ollama/model_list_cache.rs` — **pass**
+
+**Notes:** Same scope as prior report: no live Ollama daemon exercised for empty/error responses.
+
+**Outcome:** All acceptance criteria satisfied → `CLOSED-20260321-1855-openclaw-poisoned-cache-prevention.md`.

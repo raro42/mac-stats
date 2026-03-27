@@ -1,0 +1,50 @@
+# Browser-use LLM screenshot resize and coordinate scaling
+
+## Goal
+
+Optional resize of the first screenshot sent to the vision verification model (`browserLlmScreenshotWidth` / `browserLlmScreenshotHeight` in `config.json`), with linear mapping from LLM image pixel coordinates back to viewport CSS pixels for `BROWSER_CLICK` coordinate mode.
+
+## Acceptance criteria
+
+1. `Config::browser_llm_screenshot_size()` returns `Some((w,h))` only when both keys are set; partial config is ignored with a clear log (see `config/mod.rs`).
+2. `commands/llm_screenshot.rs` resizes with Lanczos3 when configured and exposes dimensions for coord scaling.
+3. `commands/verification.rs` resets/sets `set_last_llm_screenshot_pixel_dims_for_coord_scaling` around vision prep.
+4. `browser_agent::scale_click_coords_from_llm_screenshot_space` maps LLM image space to recorded viewport when resize dims are set; pass-through when unset.
+5. `format_browser_state_for_llm` records layout viewport for coord scaling when CDP layout metrics are available (see `browser_agent/mod.rs`).
+
+## Verification
+
+From repo root:
+
+```bash
+cd src-tauri && cargo check
+cd src-tauri && cargo test scale_click_coords --lib -- --nocapture
+```
+
+Optional grep (sanity):
+
+```bash
+rg -n "scale_click_coords_from_llm_screenshot_space|browser_llm_screenshot_size|prepare_first_attachment_image_for_vision" src-tauri/src
+```
+
+## References
+
+- `docs/029_browser_automation.md` — “Optional LLM screenshot resize”, “BROWSER_CLICK with pixel coordinates”.
+
+## Test report
+
+**When:** 2026-03-27 20:10:14 UTC
+
+**Preflight:** El path `tasks/UNTESTED-20260308-2230-browser-use-llm-screenshot-resize-and-coord-scale.md` **no estaba** en el árbol de trabajo al inicio de esta corrida. Se creó el cuerpo de la tarea a partir de `docs/029_browser_automation.md` y del código en `src-tauri/`, se renombró `UNTESTED-…` → `TESTING-…` según `003-tester/TESTER.md`. No se usó ningún otro `UNTESTED-*`.
+
+**Comandos:**
+
+| Comando | Resultado |
+|--------|-----------|
+| `cd src-tauri && cargo check` | **pass** |
+| `cd src-tauri && cargo test scale_click_coords --lib -- --nocapture` | **pass** (2 tests: `scale_click_coords_scales_from_llm_image_to_viewport`, `scale_click_coords_pass_through_when_no_llm_resize_dims`) |
+| `rg -n "scale_click_coords_from_llm_screenshot_space|browser_llm_screenshot_size|prepare_first_attachment_image_for_vision" src-tauri/src` | **pass** (símbolos presentes en `browser_agent`, `config`, `llm_screenshot`, `verification`, `browser_tool_dispatch`) |
+
+**Criterios:** Los criterios automatizables (compilación + tests unitarios de escalado de coordenadas + presencia de integración en verificación y dispatch) **cumplen**. No se ejecutó prueba manual end-to-end con Chrome/CDP ni envío real a un modelo de visión en esta corrida.
+
+**Notas:** Cierre `CLOSED-` porque la verificación definida en el cuerpo de la tarea terminó sin fallos.

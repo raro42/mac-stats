@@ -454,7 +454,30 @@ async fn run_mcp_stdio_rpc(
     };
 
     drop(stdin);
-    let _ = child.wait().await;
+    // Many stdio MCP servers stay alive after one response; waiting for exit would block forever
+    // and wedge agent-router turns (heartbeat shares the app Tokio runtime).
+    const STDIO_CHILD_REAP_SECS: u64 = 3;
+    match tokio::time::timeout(Duration::from_secs(STDIO_CHILD_REAP_SECS), child.wait()).await {
+        Ok(Ok(_status)) => {}
+        Ok(Err(e)) => {
+            tracing::debug!(
+                target: "mac_stats::mcp",
+                "MCP stdio: child.wait after {}: {}",
+                method,
+                e
+            );
+        }
+        Err(_) => {
+            let _ = child.kill().await;
+            let _ = tokio::time::timeout(Duration::from_secs(2), child.wait()).await;
+            tracing::debug!(
+                target: "mac_stats::mcp",
+                "MCP stdio: killed child after {} (did not exit within {}s)",
+                method,
+                STDIO_CHILD_REAP_SECS
+            );
+        }
+    }
     Ok(rpc_response)
 }
 

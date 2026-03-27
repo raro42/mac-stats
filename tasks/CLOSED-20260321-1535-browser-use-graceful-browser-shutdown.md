@@ -45,3 +45,16 @@ rg -n "pub fn close_browser_session" src-tauri/src/browser_agent/mod.rs
 - `src-tauri/src/browser_agent/mod.rs`: `pub fn close_browser_session` present at line ~4267.
 
 **Outcome:** All acceptance criteria satisfied for this verification pass. End-to-end “quit app with live CDP session” was not exercised in automation here (manual/operator smoke if desired).
+
+### Tester run — 2026-03-27 (local)
+
+**Note:** Operator asked to test `tasks/UNTESTED-20260321-1535-browser-use-graceful-browser-shutdown.md`; that path was absent. The same task existed as `CLOSED-20260321-1535-browser-use-graceful-browser-shutdown.md`; workflow followed by renaming `CLOSED-` → `TESTING-`, re-running verification, appending this report, then renaming back to `CLOSED-`.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test` — **pass** (854 passed, 0 failed, 0 ignored in `mac_stats` lib tests; 1 doc-test ignored)
+- `rg -n "close_browser_session|RunEvent::Exit|ctrlc::set_handler" src-tauri/src/lib.rs` — **pass** (matches at lines 236–239, 1681–1686)
+- `rg -n "pub fn close_browser_session" src-tauri/src/browser_agent/mod.rs` — **pass** (line 4266)
+
+**Outcome:** All acceptance criteria satisfied. **Final filename:** `CLOSED-20260321-1535-browser-use-graceful-browser-shutdown.md`.

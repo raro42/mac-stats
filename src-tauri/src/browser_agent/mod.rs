@@ -61,7 +61,6 @@ use regex::Regex;
 use serde::Deserialize;
 use serde_json::Value as JsonValue;
 use std::path::{Path, PathBuf};
-use tokio::sync::oneshot;
 use url::Url;
 
 // ---------------------------------------------------------------------------
@@ -5062,6 +5061,11 @@ const SESSION_RESET_MSG: &str = "Browser session was reset; current page is a ne
 /// Max wait for `Runtime.evaluate("1+1")` during CDP health checks (unresponsive browser / hung tab).
 const BROWSER_CDP_HEALTH_CHECK_TIMEOUT: Duration = Duration::from_secs(2);
 
+/// Wall-clock cap for `Browser::new_tab` when Chrome reports zero page tabs (empty-browser bootstrap).
+/// `headless_chrome` already waits up to 20s for target attach; this bounds **stuck** `CreateTarget` /
+/// WebSocket paths that would otherwise block the tool indefinitely (e.g. confused external Chrome on CDP).
+const BROWSER_NEW_TAB_BOOTSTRAP_TIMEOUT: Duration = Duration::from_secs(25);
+
 /// Max wait for `Runtime.evaluate("document.readyState")` before screenshot capture.
 const BROWSER_DOCUMENT_READY_LIVENESS_TIMEOUT: Duration = Duration::from_secs(3);
 
@@ -5111,27 +5115,8 @@ fn clear_browser_session_on_error(err_msg: &str) {
     }
 }
 
-/// `Runtime.evaluate("1+1")` on a worker thread; result delivered via oneshot for `tokio::time::timeout`.
-async fn evaluate_one_plus_one_oneshot(tab: Arc<headless_chrome::Tab>) -> Result<(), String> {
-    let (tx, rx) = oneshot::channel();
-    std::thread::spawn(move || {
-        let r = tab
-            .evaluate("1+1", false)
-            .map(|_| ())
-            .map_err(|e| e.to_string());
-        let _ = tx.send(r);
-    });
-    match rx.await {
-        Ok(Ok(())) => Ok(()),
-        Ok(Err(e)) => Err(format!(
-            "Browser unresponsive (JavaScript engine not responding): {}",
-            e
-        )),
-        Err(_) => Err("Browser unresponsive: health check channel closed".to_string()),
-    }
-}
-
-/// Same as [`evaluate_one_plus_one_oneshot`] when no Tokio runtime is available (sync callers).
+/// `Runtime.evaluate("1+1")` on a worker thread with `recv_timeout` — safe from any caller
+/// (no nested Tokio `block_on`; see [`check_browser_alive`]).
 fn evaluate_one_plus_one_blocking_timeout(tab: Arc<headless_chrome::Tab>) -> Result<(), String> {
     let (tx, rx) = mpsc::channel();
     std::thread::spawn(move || {
@@ -5185,7 +5170,7 @@ fn tab_document_ready_liveness(tab: &Arc<headless_chrome::Tab>) -> Result<(), St
 }
 
 /// Fast fail when Chrome is hung or dead but the WebSocket is still open: optional `kill -0` on our child PID,
-/// then `Runtime.evaluate("1+1")` under a 2-second cap (`tokio::time::timeout` when a runtime handle exists).
+/// then `Runtime.evaluate("1+1")` on a worker thread with `recv_timeout` (never nested Tokio `block_on`).
 fn check_browser_alive(browser: &Browser, tab: &Arc<headless_chrome::Tab>) -> Result<(), String> {
     #[cfg(unix)]
     if let Some(pid) = browser.get_process_id() {
@@ -5202,22 +5187,13 @@ fn check_browser_alive(browser: &Browser, tab: &Arc<headless_chrome::Tab>) -> Re
     }
 
     let tab = Arc::clone(tab);
-    let eval_result = if let Ok(handle) = tokio::runtime::Handle::try_current() {
-        // `block_on` on a Tokio worker thread deadlocks that worker (nested scheduling).
-        // Heartbeat / scheduler threads run `answer_with_ollama_and_fetch` on their own runtime;
-        // CDP health checks must not stall the executor. `block_in_place` hands off this worker.
-        tokio::task::block_in_place(|| {
-            match handle.block_on(tokio::time::timeout(
-                BROWSER_CDP_HEALTH_CHECK_TIMEOUT,
-                evaluate_one_plus_one_oneshot(tab),
-            )) {
-                Ok(inner) => inner,
-                Err(_) => Err("Browser unresponsive: health check timed out after 2s".to_string()),
-            }
-        })
-    } else {
-        evaluate_one_plus_one_blocking_timeout(tab)
-    };
+    // Never use `Handle::block_on` + `tokio::time::timeout` here: on **current-thread** Tokio
+    // runtimes (Tauri menu-bar async runtime is often single-threaded), nested `block_on` stalls
+    // the only executor thread — timers never fire and remote paths (heartbeat, scheduler on
+    // shared runtime) hang past `schedulerTaskTimeoutSecs` with no timeout log (see task
+    // CLOSED-20260308-1640-openclaw-heartbeat-periodic-check). CDP evaluate already runs on a plain `std::thread` inside
+    // `evaluate_one_plus_one_blocking_timeout`.
+    let eval_result = evaluate_one_plus_one_blocking_timeout(tab);
 
     if let Err(ref e) = eval_result {
         mac_stats_warn!(
@@ -5696,7 +5672,8 @@ fn apply_configured_post_nav_stabilization(
     in_flight: Option<&Arc<Mutex<HashSet<String>>>>,
     context: &'static str,
 ) {
-    let min_s = crate::config::Config::browser_post_navigate_min_dwell_secs();
+    let (min_s, min_dwell_source) =
+        crate::config::Config::browser_post_navigate_min_dwell_secs_resolved();
     let min_dwell = Duration::from_secs_f64(min_s);
     if !min_dwell.is_zero() {
         let t0 = Instant::now();
@@ -5704,10 +5681,11 @@ fn apply_configured_post_nav_stabilization(
         let slept_ms = t0.elapsed().as_millis();
         mac_stats_debug!(
             "browser/cdp",
-            "Browser agent [CDP]: post_nav_stabilization {} min_dwell_applied_ms≈{} (configured {:.3}s)",
+            "Browser agent [CDP]: post_nav_stabilization {} min_dwell_applied_ms≈{} (configured {:.3}s, source={})",
             context,
             slept_ms,
-            min_s
+            min_s,
+            min_dwell_source
         );
     }
 
@@ -6751,6 +6729,32 @@ fn maybe_recover_focus_from_ephemeral_blank_tab(
     Ok(tab)
 }
 
+/// `Browser::new_tab` on a worker thread with `recv_timeout` — avoids indefinite stalls when CDP never answers
+/// during empty-browser bootstrap (same “no nested `block_on`” rationale as [`evaluate_one_plus_one_blocking_timeout`]).
+fn new_tab_with_bootstrap_timeout(browser: &Browser) -> Result<Arc<headless_chrome::Tab>, String> {
+    let browser = browser.clone();
+    let (tx, rx) = mpsc::channel();
+    std::thread::spawn(move || {
+        let r = browser.new_tab().map_err(|e| e.to_string());
+        let _ = tx.send(r);
+    });
+    match rx.recv_timeout(BROWSER_NEW_TAB_BOOTSTRAP_TIMEOUT) {
+        Ok(Ok(tab)) => Ok(tab),
+        Ok(Err(e)) => Err(e),
+        Err(mpsc::RecvTimeoutError::Timeout) => {
+            let msg = format!(
+                "Browser unresponsive: empty-browser tab bootstrap timed out after {}s (CreateTarget or target attach stalled)",
+                BROWSER_NEW_TAB_BOOTSTRAP_TIMEOUT.as_secs()
+            );
+            mac_stats_warn!("browser/cdp", "Browser agent [CDP]: {}", msg);
+            Err(msg)
+        }
+        Err(mpsc::RecvTimeoutError::Disconnected) => Err(
+            "Browser unresponsive: tab bootstrap thread ended unexpectedly".to_string(),
+        ),
+    }
+}
+
 /// Get the current tab from BROWSER_SESSION. Uses CURRENT_TAB_INDEX when set (e.g. after new-tab navigate).
 /// If Chrome has no page tabs (e.g. user closed every tab), creates one `about:blank` tab once per call (OpenClaw-style bootstrap).
 /// Ensures tab window bounds are at least VIEWPORT_WIDTH x VIEWPORT_HEIGHT (e.g. when connecting to existing Chrome).
@@ -6768,18 +6772,23 @@ fn get_current_tab() -> Result<(Browser, Arc<headless_chrome::Tab>), String> {
                 "browser/cdp",
                 "Browser agent [CDP]: no open tabs; bootstrapping about:blank page tab"
             );
-            let new_tab = browser.new_tab().map_err(|e| {
-                let e_str = e.to_string();
+            let new_tab = new_tab_with_bootstrap_timeout(&browser).map_err(|e| {
                 mac_stats_warn!(
                     "browser/cdp",
                     "Browser agent [CDP]: empty-browser bootstrap new_tab failed: {}",
-                    e_str
+                    e
                 );
-                let s = format!(
-                    "Chrome has no open tabs and automatic tab creation failed: {}. Open a tab manually or use BROWSER_NAVIGATE with new_tab.",
-                    e_str
-                );
-                clear_browser_session_on_error(&s);
+                let s = if e.contains("Browser unresponsive") {
+                    clear_browser_session_on_error(&e);
+                    e
+                } else {
+                    let s = format!(
+                        "Chrome has no open tabs and automatic tab creation failed: {}. Open a tab manually or use BROWSER_NAVIGATE with new_tab.",
+                        e
+                    );
+                    clear_browser_session_on_error(&s);
+                    s
+                };
                 s
             })?;
             let tabs = browser.get_tabs().lock().map_err(|e| e.to_string())?;
@@ -6884,9 +6893,15 @@ fn navigate_and_get_state_inner(
     let (browser, tab) = if new_tab {
         let browser = get_or_create_browser(cdp_debug_port())
             .inspect_err(|e| clear_browser_session_on_error(e))?;
-        let new_tab = browser.new_tab().map_err(|e| {
-            let s = format!("New tab failed: {}", e);
-            clear_browser_session_on_error(&s);
+        let new_tab = new_tab_with_bootstrap_timeout(&browser).map_err(|e| {
+            let s = if e.contains("Browser unresponsive") {
+                clear_browser_session_on_error(&e);
+                e
+            } else {
+                let s = format!("New tab failed: {}", e);
+                clear_browser_session_on_error(&s);
+                s
+            };
             s
         })?;
         let tabs = browser.get_tabs().lock().map_err(|e| e.to_string())?;
@@ -9497,6 +9512,17 @@ fn take_screenshot_inner(url: &str) -> Result<PathBuf, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::{Mutex, OnceLock};
+
+    /// `scale_click_coords_*` and related globals are process-wide; serialize those tests.
+    static LLM_COORD_STATE_TEST_MUTEX: OnceLock<Mutex<()>> = OnceLock::new();
+
+    fn llm_coord_state_lock() -> std::sync::MutexGuard<'static, ()> {
+        LLM_COORD_STATE_TEST_MUTEX
+            .get_or_init(|| Mutex::new(()))
+            .lock()
+            .expect("llm coord state test mutex poisoned")
+    }
 
     #[test]
     fn test_extract_phones() {
@@ -9684,6 +9710,7 @@ mod tests {
 
     #[test]
     fn scale_click_coords_scales_from_llm_image_to_viewport() {
+        let _g = llm_coord_state_lock();
         set_last_llm_screenshot_pixel_dims_for_coord_scaling(None);
         record_viewport_css_for_llm_coord_scaling(1920, 1080);
         set_last_llm_screenshot_pixel_dims_for_coord_scaling(Some((1400, 850)));
@@ -9696,6 +9723,7 @@ mod tests {
 
     #[test]
     fn scale_click_coords_pass_through_when_no_llm_resize_dims() {
+        let _g = llm_coord_state_lock();
         set_last_llm_screenshot_pixel_dims_for_coord_scaling(None);
         record_viewport_css_for_llm_coord_scaling(1920, 1080);
         let (x, y) = scale_click_coords_from_llm_screenshot_space(123.0, 456.0);

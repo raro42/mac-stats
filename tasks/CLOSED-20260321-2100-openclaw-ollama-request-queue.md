@@ -1,4 +1,4 @@
-# WIP — OpenClaw / Ollama request queue (2026-03-21)
+# CLOSED — OpenClaw / Ollama request queue (2026-03-21)
 
 ## Goal
 
@@ -21,3 +21,16 @@
 - `cd src-tauri && cargo test ollama_http_queue --lib` — **pass** (1 test: `ollama_queue::tests::ollama_http_queue_serializes_and_fires_wait_hook`)
 
 **Resultado:** **WIP** — tarea bloqueada: falta el archivo `UNTESTED-…` con objetivo, criterios de aceptación y comandos de verificación. Restaurar o crear ese contenido y volver a ejecutar el flujo de `TESTER.md` (renombrar a `TESTING-`, verificar, informe, `CLOSED-` o `WIP-`).
+
+## Test report
+
+**Fecha:** 2026-03-27 (hora local del entorno de ejecución; no se garantiza UTC).
+
+**Prefijo:** El archivo nombrado por el operador (`UNTESTED-20260321-2100-openclaw-ollama-request-queue.md`) **no estaba presente** en el repositorio; el estado previo era `WIP-20260321-2100-openclaw-ollama-request-queue.md`. Se renombró `WIP-` → `TESTING-` para la misma tarea (mismo sufijo de fecha y tema), sin usar otro `UNTESTED-*`, conforme a `003-tester/TESTER.md`.
+
+**Comandos ejecutados** (verificación alineada con referencias en el cuerpo de la tarea):
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test ollama_http_queue --lib` — **pass** (1 test: `ollama_queue::tests::ollama_http_queue_serializes_and_fires_wait_hook`)
+
+**Resultado:** **CLOSED** — el módulo de cola HTTP Ollama (`src-tauri/src/ollama_queue.rs`) y la prueba unitaria citada pasan; no se detectaron fallos en esta verificación.

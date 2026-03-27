@@ -38,3 +38,18 @@ Optional: `cargo test` (full run) if time permits.
 **Code review notes:** Constants `DIAG_MAX_CONSOLE_LINES` (10) / per-line chars (200) and uncaught caps (2 × 200) match acceptance §1. `push_cdp_diagnostic_event` filters Log to error/warning only and handles `RuntimeExceptionThrown` (§2). Attach/detach pair disables Log+Runtime and removes listener (§3). Navigate uses `browser_include_diagnostics_in_state()`; extract uses `TabExtractDiagnosticsSession` only when the same config is true (§4). `format_bounded_page_diagnostics_tool_section` emits `## Page diagnostics` (§5).
 
 **Outcome:** **CLOSED** — acceptance criteria satisfied and build/tests green.
+
+## Test report
+
+**Date:** 2026-03-27 (local time, workspace host).
+
+**Preflight:** `tasks/UNTESTED-20260322-2245-openclaw-bounded-console-page-error-diagnostics.md` was **not** present on disk; the task existed as `CLOSED-20260322-2245-openclaw-bounded-console-page-error-diagnostics.md`. Per operator instruction to test only that basename, the file was renamed `CLOSED-…` → `TESTING-…` for this run (same basename after the prefix). No other `UNTESTED-*` file was used.
+
+| Step | Command | Result |
+|------|-----------|--------|
+| Symbols / wiring | `rg "try_attach_bounded_cdp_page_diagnostics\|DIAG_MAX_CONSOLE_LINES\|push_bounded_dedup\|format_bounded_page_diagnostics_tool_section\|browser_include_diagnostics_in_state" src-tauri/src/browser_agent/mod.rs src-tauri/src/config/mod.rs` | **pass** |
+| Compile | `cd src-tauri && cargo check` | **pass** |
+| Test binaries | `cd src-tauri && cargo test --no-run` | **pass** |
+| Lib tests | `cd src-tauri && cargo test -p mac_stats --lib` | **pass** — 854 passed, 0 failed |
+
+**Outcome:** **CLOSED** — verification commands and lib tests green; acceptance criteria unchanged from prior review.

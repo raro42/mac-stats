@@ -48,3 +48,21 @@ rg -n "DEFAULT_SECS: u64 = (300|180)" src-tauri/src/config/mod.rs | head
 - `Config::ollama_chat_timeout_secs` and `agent_router_turn_timeout_secs_{discord,ui,remote}` default `DEFAULT_SECS` lines at 300 / 300 / 180 / 300 respectively (spot-check via `rg`).
 
 **Outcome:** All acceptance criteria satisfied for this verification pass. Live Discord/Ollama long-turn behaviour was not exercised end-to-end here.
+
+### Test report — tester follow-up (2026-03-27, local; not UTC)
+
+**Preflight:** Operator asked to run `003-tester/TESTER.md` against `tasks/UNTESTED-20260322-1805-openclaw-agent-session-timeout-alignment.md`. That `UNTESTED-…` path was **not present** in the workspace (task already lives as `CLOSED-20260322-1805-openclaw-agent-session-timeout-alignment.md`), so the `UNTESTED → TESTING` rename could not be applied without inventing a duplicate filename. No other `UNTESTED-*` task was substituted.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test` — **pass** (854 tests in `mac_stats` library; 0 failed; 1 doc-test ignored)
+
+**Optional spot-checks**
+
+- `rg` on `docs/019_agent_session_and_memory.md`: **Two different clocks** section still documents `ollamaChatTimeoutSecs` vs `agentRouterTurnTimeoutSecs*` with 300s per-request and 300s Discord/remote vs 180s in-app wall-clock, 48h cap.
+- `rg` on `config/mod.rs`: `DEFAULT_SECS` 300 / 300 / 180 / 300 for the aligned timeout fields (matches prior pass).
+
+**Static alignment:** `agent_session_limits.rs` limit matrix (300s HTTP; Discord 300s / in-app 180s / remote 300s; 15 tool iterations) unchanged and consistent with `docs/019` and `Config` defaults.
+
+**Outcome:** All acceptance criteria still satisfied. Filename left **`CLOSED-…`** (no `WIP-` rename).

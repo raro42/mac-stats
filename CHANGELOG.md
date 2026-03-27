@@ -24,6 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Scheduler heartbeat** — **`turn_timeout_secs`** passed into the Ollama run matches the outer wall-clock band (clamped to **`AGENT_ROUTER_SESSION_WALL_CLOCK_MAX_SECS`**). Extra **abort_cutoff** debug on stale heartbeat events. (`scheduler/heartbeat.rs`.)
 - **Interactables / clicks** — Scan **`[contenteditable]`** nodes; viewport click uses **`DOM.getBoxModel`** when **`GetContentQuads`** yields no in-viewport point. (`browser_agent/mod.rs`.)
 - **Model list cache, delivery awareness, prompts, docs** — Minor logging and copy updates; browser automation and related agent docs refreshed; OpenClaw reviewer timestamp in **`005-openclaw-reviewer/005-openclaw-reviewer.md`**.
+- **Post-nav min dwell logging** — CDP post-nav stabilization debug line includes whether the dwell value came from **env**, **`config.json`**, or **default** (`browser_post_navigate_min_dwell_secs_resolved`). (`config/mod.rs`, `browser_agent/mod.rs`.)
+- **Scheduler heartbeat comment** — Documents that CDP tab health must not nest `block_on` on the app runtime (`scheduler/heartbeat.rs`).
+- **Tasks / docs** — Additional **CLOSED** notes under **`tasks/`**; WIP items for ollama queue / draft stream moved to **CLOSED**; **`docs/029_browser_automation.md`** nits; OpenClaw reviewer timestamp refresh.
+
+### Fixed
+- **CDP health check vs current-thread Tokio** — `check_browser_alive` no longer uses `Handle::block_on` + `tokio::time::timeout` on the app runtime; `Runtime.evaluate("1+1")` always runs on a worker thread with `recv_timeout` so **current-thread** Tauri executors cannot deadlock (timers never fire) during scheduler heartbeat or other shared-runtime work. (`browser_agent/mod.rs`; task **`CLOSED-20260308-1640-openclaw-heartbeat-periodic-check`**.)
+- **Empty-browser / `new_tab` bootstrap** — `Browser::new_tab` for about:blank bootstrap and **`BROWSER_NAVIGATE`** `new_tab` runs on a worker thread with a **25s** wall-clock cap so stuck **CreateTarget** / target attach cannot block tools indefinitely. (`browser_agent/mod.rs`.)
+- **MCP stdio child reap** — After a stdio RPC, `child.wait()` is bounded (**3s**); servers that stay alive are **killed** so the shared Tokio runtime is not wedged forever. (`mcp/mod.rs`.)
 
 ## [0.1.65] - 2026-03-27
 

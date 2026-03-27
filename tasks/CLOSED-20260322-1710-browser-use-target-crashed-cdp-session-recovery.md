@@ -34,3 +34,17 @@ Optional smoke (requires browser tools enabled + reachable Chrome on debug port)
 
 - **Smoke CLI (`--browser-debug-crash-tab`):** se lanzó `target/release/mac_stats --browser-debug-crash-tab -vv`; en consola y en `~/.mac-stats/debug.log` apareció `CDP target-crash side listener: Target.setDiscoverTargets ok (listening for Target.targetCrashed)`. El proceso **no** llegó a imprimir el mensaje final de `Page.crash` / no quedó traza de `Target.targetCrashed` en el log en el tiempo observado (proceso detenido manualmente tras espera prolongada). Se considera **opcional** y **no bloqueante** frente a los criterios 1–4.
 - **Outcome:** Criterios de compilación, tests de librería y presencia del cableado CDP/CLI cumplidos → **CLOSED**.
+
+## Test report (2026-03-27, segunda pasada — `003-tester/TESTER.md`)
+
+- **Fecha / zona:** 2026-03-27, hora local del entorno donde se ejecutaron los comandos (no UTC fijada).
+- **Preflight:** No existía `tasks/UNTESTED-20260322-1710-browser-use-target-crashed-cdp-session-recovery.md` en el árbol; la tarea estaba como `CLOSED-…`. Se aplicó el flujo renombrando **`CLOSED-…` → `TESTING-…`** (mismo basename). No se tocó ningún otro archivo `UNTESTED-*`.
+
+| Step | Command | Result |
+|------|---------|--------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed |
+| Symbols | `rg` sobre `cdp_target_crash_listener.rs`, `browser_agent/mod.rs`, `main.rs` con los patrones de «Verification (automated)» | **pass** |
+
+- **Smoke CLI:** No ejecutado en esta pasada (sigue siendo opcional según el cuerpo de la tarea).
+- **Outcome:** Criterios 1–4 cumplidos → renombrar **`TESTING-…` → `CLOSED-…`**.

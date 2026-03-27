@@ -47,3 +47,19 @@ rg -n "fn search_page_text|pub fn browser_query" src-tauri/src/browser_agent/mod
 - `browser_agent/mod.rs`: `search_page_text` (~8631), `browser_query` (~8847), plus `search_page_text_from_plain_text_*` unit tests.
 
 **Outcome:** All acceptance criteria satisfied for this verification pass. Live CDP search/query against real pages was not exercised end-to-end in this automated run (operator may run `cargo run --example example_com_search_twice` optionally).
+
+### Re-verification (2026-03-27, local)
+
+**Rename step:** `tasks/UNTESTED-20260321-1635-browser-use-in-page-search-and-css-query.md` was **not** in the workspace; the task already existed as `tasks/CLOSED-20260321-1635-browser-use-in-page-search-and-css-query.md`. Per `003-tester/TESTER.md`, no `UNTESTED-→TESTING-` rename was performed. No other `UNTESTED-*` task was used.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test` — **pass** (854 passed, 0 failed; 1 doc-test ignored)
+
+**Static spot-check (`rg`)**
+
+- `browser_tool_dispatch.rs`: `parse_browser_search_page_arg`, `parse_browser_query_arg`, `handle_browser_search_page`, `handle_browser_query` present.
+- `browser_agent/mod.rs`: `search_page_text`, `browser_query` present.
+
+**Outcome:** Acceptance criteria still satisfied. Filename remains **`CLOSED-20260321-1635-browser-use-in-page-search-and-css-query.md`** (no `WIP-`).

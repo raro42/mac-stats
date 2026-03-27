@@ -39,3 +39,19 @@ rg -n "format_for_chat_context|record_if_new" src-tauri/src/scheduler src-tauri/
 **Notes:** End-to-end Discord delivery was not exercised in this run (no live bot); acceptance is satisfied by code review + unit tests + grep wiring. Manual spot-check: trigger a scheduled task with `reply_to_channel_id`, confirm `~/.mac-stats/scheduler_delivery_awareness.json` grows and CPU chat debug log shows scheduler awareness prepended when block non-empty.
 
 **Outcome:** **CLOSED** — all listed acceptance criteria and automated verification passed.
+
+## Test report (re-run)
+
+**Preflight:** `tasks/UNTESTED-20260325-1016-openclaw-scheduler-isolated-delivery-main-session-awareness.md` was **not** in the tree; the task file was already `CLOSED-*`. Per `003-tester/TESTER.md`, it was renamed `CLOSED-…` → `TESTING-…` for this run, verification executed, then renamed back to `CLOSED-…` on success. No other `UNTESTED-*` file was used.
+
+**Date:** 2026-03-27 (local, America-friendly note: same calendar day as prior report).
+
+| Step | Command | Result |
+|------|---------|--------|
+| Compile | `cd src-tauri && cargo check` | **pass** |
+| Unit tests | `cd src-tauri && cargo test delivery_awareness -- --nocapture` | **pass** (3 tests) |
+| Wiring | `rg -n "format_for_chat_context|record_if_new" src-tauri/src` | **pass** — `ollama_frontend_chat.rs`, `delivery_awareness.rs`, `scheduler/mod.rs`, `task/runner.rs` |
+
+**Notes:** Live Discord / E2E not re-run; automated criteria unchanged.
+
+**Outcome:** **CLOSED** — all verification steps passed.

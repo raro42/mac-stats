@@ -45,3 +45,21 @@ cd src-tauri && cargo run --example example_com_history_reload_smoke
 
 - **Criterios:** 1, 2 y 4 **cumplidos** por comprobación automática. Criterio 3 (**ejecución end-to-end del smoke**) **no verificado** en este entorno.
 - **Outcome:** **`WIP-…`** — repetir el ejemplo con Chromium/CDP estable y red hacia `https://example.com/`, o investigar el bloqueo en la primera navegación (logs en `Step 1`).
+
+### Test report — segunda pasada (2026-03-27)
+
+- **Fecha:** 2026-03-27, hora local del entorno de ejecución (no UTC fijada).
+- **Preflight:** El operador pidió `tasks/UNTESTED-20260323-0130-browser-history-forward-reload-tools.md`; ese path **no existe** en el árbol (la tarea estaba como `WIP-…`). Se aplicó `003-tester/TESTER.md` sobre el mismo id de tarea: `WIP-…` → `TESTING-…` → verificación → informe → `WIP-…` / `CLOSED-…`.
+
+| Paso | Comando | Resultado |
+|------|---------|------------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed |
+| Handlers | `rg` `handle_browser_go_back\|forward\|reload` en `browser_tool_dispatch.rs` | **pass** (líneas ~534, 555, 577) |
+| Agent API | `rg` `go_back\|go_forward\|reload_current_tab` en `browser_agent/mod.rs` | **pass** (~7232, ~7290, ~7348) |
+| Wiring | `rg` `BROWSER_GO_*` / `BROWSER_RELOAD` en `tool_parsing.rs`, `tool_registry.rs` | **pass** |
+| Ejemplo compila | `cd src-tauri && cargo build --example example_com_history_reload_smoke` | **pass** |
+| Integración (opcional) | `timeout 20 cargo run --example example_com_history_reload_smoke` | **inconcluso** — conecta a 9222, `BROWSER_NAVIGATE`, bootstrap `about:blank`, luego sin progreso hasta timeout; no aparece `DONE: history + reload smoke completed` |
+
+- **Criterios:** 1, 2 y 4 **cumplidos**. Criterio 3: el ejemplo **existe, documenta el flujo y compila**; la **ejecución E2E completa** sigue **sin verificar** en este entorno (bloqueo tras Step 1 / navegación).
+- **Outcome:** **`WIP-…`** — mismo bloqueo que la pasada anterior; hace falta CDP estable, red a example.com, o depurar el hang post-bootstrap.

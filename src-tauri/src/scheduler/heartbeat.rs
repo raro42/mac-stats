@@ -296,8 +296,9 @@ pub(crate) async fn heartbeat_loop() {
 
 /// Background task on the **app** Tokio runtime (Tauri): when `config.json` → `heartbeat.enabled` is true,
 /// runs checklist turns on `intervalSecs`. Uses the same runtime as the rest of mac-stats so Ollama queue
-/// waits, `tokio::time` deadlines, and browser CDP health checks (`block_in_place` + `block_on`) cannot
-/// deadlock on an isolated per-thread runtime (see task WIP-20260308-1640).
+/// waits and `tokio::time` deadlines. CDP tab health (`check_browser_alive`) must not nest
+/// `Handle::block_on` on the app runtime (current-thread Tauri would wedge all timers; see task
+/// CLOSED-20260308-1640-openclaw-heartbeat-periodic-check).
 pub fn spawn_heartbeat_thread() {
     tauri::async_runtime::spawn(async {
         mac_stats_info!(

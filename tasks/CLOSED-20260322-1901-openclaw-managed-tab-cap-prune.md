@@ -44,3 +44,21 @@ Skip or note **blocked** if no CDP browser is available; automated criteria 1–
 | Opcional CDP | `MAC_STATS_BROWSER_MAX_PAGE_TABS=3 cargo run --example managed_tab_cap_smoke` | **no completado** — tras ~120s sin salida adicional tras el arranque CDP (bootstrap `about:blank`); proceso detenido manualmente. No bloquea cierre: los criterios automatizados 1–4 cumplen. |
 
 - **Outcome:** Criterios de aceptación 1–4 satisfechos → **`CLOSED-…`**.
+
+---
+
+### Test report — corrida TESTER (2026-03-27, hora local del entorno)
+
+- **Preflight:** No existía `tasks/UNTESTED-20260322-1901-openclaw-managed-tab-cap-prune.md` en el árbol; el fichero estaba como `CLOSED-…`. Se renombró a `TESTING-…` y se ejecutó la verificación (misma tarea, sin otro `UNTESTED-*`).
+
+| Paso | Comando | Resultado |
+|------|---------|-----------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed |
+| Símbolo `fn` | `rg -n "fn try_enforce_browser_tab_limit" src/browser_agent/mod.rs` (desde repo) | **pass** — línea 3715 |
+| Llamadas | `rg -n "try_enforce_browser_tab_limit\\(" src/browser_agent/mod.rs` | **pass** — 7 coincidencias |
+| Criterio 2 | `Config::browser_max_page_tabs` en `src/config/mod.rs` | **pass** — ~1987 |
+| Criterio 3 | `examples/managed_tab_cap_smoke.rs` | **pass** — presente |
+| Opcional CDP | `MAC_STATS_BROWSER_MAX_PAGE_TABS=3 cargo run --example managed_tab_cap_smoke` | **omitido** (no solicitado para cierre; criterios 1–4 automatizados cumplen) |
+
+- **Outcome:** Criterios 1–4 OK → renombrar a **`CLOSED-…`**.

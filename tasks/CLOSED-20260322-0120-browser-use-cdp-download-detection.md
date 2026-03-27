@@ -34,3 +34,17 @@ Optional manual: trigger a real download via **BROWSER_NAVIGATE** / **BROWSER_CL
 
 - **Manual CDP / descarga real:** no ejecutado en esta corrida (opcional en la tarea).
 - **Outcome:** Criterios automatizados y presencia del cableado CDP/diff cumplidos → **CLOSED**.
+
+### Test report — 2026-03-27 (local)
+
+- **Prefijo solicitado:** `tasks/UNTESTED-20260322-0120-browser-use-cdp-download-detection.md` **no existía** en el árbol; el archivo activo era `CLOSED-…`, renombrado a `TESTING-…` para esta corrida según `003-tester/TESTER.md`.
+- **Criterios 1–3:** `cdp_downloads.rs` contiene `Browser.setDownloadBehavior`, `spawn_download_aux_listener`, `Browser.downloadProgress` / `downloadWillBegin`; `merge_with_directory_diff` en el mismo módulo; `mod.rs` referencia `spawn_download_aux_listener` y `merge_with_directory_diff` (verificación por lectura + `rg`).
+
+| Step | Command | Result |
+|------|---------|--------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed |
+| Symbols | `rg -n "Browser\.downloadProgress\|merge_with_directory_diff\|spawn_download_aux_listener" src/browser_agent/cdp_downloads.rs src/browser_agent/mod.rs` | **pass** |
+
+- **Manual CDP / descarga real:** no ejecutado (opcional).
+- **Outcome:** Todos los criterios de aceptación automatizados cumplidos → **CLOSED**.

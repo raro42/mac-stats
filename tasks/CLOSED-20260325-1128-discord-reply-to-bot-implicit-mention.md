@@ -43,3 +43,17 @@ Optional: manual Discord — MentionOnly channel, reply to the bot’s last mess
 **Notes:** Prueba manual en Discord con bot real **no** ejecutada en esta corrida.
 
 **Outcome:** **CLOSED** — criterios de aceptación cubiertos por revisión de código + `cargo check` + grep; verificación automatizada del task pasó.
+
+### Test report — 2026-03-27 (re-run, local macOS)
+
+**Preflight:** El operador pidió `UNTESTED-20260325-1128-discord-reply-to-bot-implicit-mention.md`; en el árbol solo existía `CLOSED-20260325-1128-discord-reply-to-bot-implicit-mention.md`. Se renombró ese archivo a `TESTING-…` para esta corrida (misma tarea, sin elegir otro `UNTESTED-*`).
+
+| Step | Command | Result |
+|------|---------|--------|
+| Compile | `cd src-tauri && cargo check` | **pass** |
+| Unit test | `cd src-tauri && cargo test outbound_attachment_path_allowlist -- --nocapture` | **pass** (1 test) |
+| Wiring | `rg -n 'discord_mentions_bot_effective|mentions_bot_effective' src-tauri/src/discord/mod.rs` | **pass** (líneas 1852, 1956, 2016, 2787–2788, 2814) |
+
+**Manual Discord:** no ejecutada (opcional).
+
+**Outcome:** **CLOSED** — todos los criterios automatizados del task pasan.

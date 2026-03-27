@@ -1790,13 +1790,19 @@ impl Config {
     /// Env: `MAC_STATS_BROWSER_POST_NAV_MIN_DWELL_SECS`. Clamped to `0.0..=10.0`.
     ///
     /// Applies uniformly (same-domain shorter **navigation timeout** does not skip this dwell).
-    pub fn browser_post_navigate_min_dwell_secs() -> f64 {
+    ///
+    /// Second return value is a short label for logs (`env …`, `config.json …`, or `default`) so
+    /// operators can tell why a non-default dwell (e.g. **0.25**) appears when they expected **1.5**.
+    pub fn browser_post_navigate_min_dwell_secs_resolved() -> (f64, &'static str) {
         const DEFAULT: f64 = 1.5;
         const MAX: f64 = 10.0;
         if let Ok(s) = std::env::var("MAC_STATS_BROWSER_POST_NAV_MIN_DWELL_SECS") {
             if let Ok(n) = s.trim().parse::<f64>() {
                 if n.is_finite() {
-                    return n.clamp(0.0, MAX);
+                    return (
+                        n.clamp(0.0, MAX),
+                        "env MAC_STATS_BROWSER_POST_NAV_MIN_DWELL_SECS",
+                    );
                 }
             }
         }
@@ -1810,13 +1816,20 @@ impl Config {
                         .or_else(|| v.as_i64().map(|i| i as f64));
                     if let Some(n) = n {
                         if n.is_finite() {
-                            return n.clamp(0.0, MAX);
+                            return (
+                                n.clamp(0.0, MAX),
+                                "config.json browserPostNavigateMinDwellSecs",
+                            );
                         }
                     }
                 }
             }
         }
-        DEFAULT
+        (DEFAULT, "default")
+    }
+
+    pub fn browser_post_navigate_min_dwell_secs() -> f64 {
+        Self::browser_post_navigate_min_dwell_secs_resolved().0
     }
 
     /// When true, after the minimum dwell mac-stats waits until **Network** CDP shows no in-flight
