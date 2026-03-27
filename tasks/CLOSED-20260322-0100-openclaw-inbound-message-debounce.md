@@ -84,3 +84,21 @@ rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_b
 - `rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_batches_on_shutdown" src-tauri/src/discord/mod.rs` — coincidencias para `enqueue_or_run_router` y `discard_pending_batches_on_shutdown`. El identificador `discord_message_bypasses_debounce` no aparece por nombre en `mod.rs` (sí en `message_debounce.rs` en la ruta de debounce).
 
 **Outcome:** Compilación y suite de tests OK. Criterio estático (3): dos de tres cadenas en `mod.rs` por `rg`; el bypass sigue encapsulado en `message_debounce.rs`, coherente con informes previos. Renombrar de vuelta a **`CLOSED-`**.
+
+## Test report
+
+**Date:** 2026-03-27, hora local del entorno del operador (fecha de pared explícita).
+
+**Preflight / rename (TESTER.md):** `tasks/UNTESTED-20260322-0100-openclaw-inbound-message-debounce.md` **no existía**. Se aplicó el paso equivalente renombrando `tasks/CLOSED-20260322-0100-openclaw-inbound-message-debounce.md` → `tasks/TESTING-20260322-0100-openclaw-inbound-message-debounce.md` antes de la verificación. No se tocó ningún otro `UNTESTED-*`.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test merge_empty` — **pass** (`discord::message_debounce::merge_tests::merge_empty`)
+- `cd src-tauri && cargo test` — **pass** (854 tests en la librería `mac_stats`; 0 failed; 1 doc-test ignored)
+
+**Static spot-check**
+
+- `rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_batches_on_shutdown" src-tauri/src/discord/mod.rs` — coincidencias en `mod.rs` para `enqueue_or_run_router` y `discard_pending_batches_on_shutdown`. `discord_message_bypasses_debounce` no aparece por nombre en `mod.rs` (definido y usado en `message_debounce.rs`), alineado con informes anteriores.
+
+**Outcome:** Criterios 1 y 2 cumplidos. Criterio 3: spot-check literal de tres identificadores en `mod.rs` solo encuentra dos; el bypass sigue en el módulo de debounce. Se mantiene **`CLOSED-`** (mismo criterio que en cierres previos del task).

@@ -49,3 +49,20 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 - `cd src-tauri && cargo test --no-fail-fast` — **pass** (854 passed, 0 failed en el crate lib)
 
 **Outcome:** Criterios de aceptación siguen cumplidos — el fichero de tarea permanece **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** (sin cambio a `WIP-`).
+
+---
+
+## Test report
+
+**Fecha:** 2026-03-27 21:17 UTC
+
+**Flujo TESTER.md:** El operador pidió `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; ese path **no existe** en el repo (solo `tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`). No se aplicó renombre `UNTESTED-` → `TESTING-` por ausencia del prefijo. No se probó ningún otro fichero `UNTESTED-*`.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (854 passed, 0 failed en crate lib; demás targets 0 tests o ignored doc-test)
+
+**Outcome:** Criterios de aceptación verificados de nuevo — el fichero permanece **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.

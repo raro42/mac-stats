@@ -62,3 +62,17 @@ Optional smoke (requires browser tools enabled + reachable Chrome on debug port)
 
 - **Smoke CLI (`--browser-debug-crash-tab`):** not run (optional per task body).
 - **Outcome:** Acceptance criteria 1–4 satisfied → **`CLOSED-…`**.
+
+## Test report (2026-03-27 — `003-tester/TESTER.md`, corrida solicitada por operador)
+
+- **Fecha / zona:** 2026-03-27, hora local del entorno donde se ejecutaron los comandos (no UTC fijada).
+- **Preflight:** No existía `tasks/UNTESTED-20260322-1710-browser-use-target-crashed-cdp-session-recovery.md` en el árbol (la tarea estaba como `CLOSED-…`). Se renombró **`CLOSED-…` → `TESTING-…`** para esta verificación. No se tocó ningún otro archivo `UNTESTED-*`.
+
+| Step | Command | Result |
+|------|---------|--------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed |
+| Symbols | `rg -n "targetCrashed\|notify_target_renderer_crashed_side\|spawn_target_crash_side_listener\|debug_page_crash_current_automation_tab"` sobre `src/browser_agent/cdp_target_crash_listener.rs`, `src/browser_agent/mod.rs`, `src/main.rs` (cwd `src-tauri/`) | **pass** |
+
+- **Smoke CLI (`--browser-debug-crash-tab`):** no ejecutado (opcional según el cuerpo de la tarea).
+- **Outcome:** Criterios de aceptación 1–4 cumplidos → renombrar **`TESTING-…` → `CLOSED-…`**.

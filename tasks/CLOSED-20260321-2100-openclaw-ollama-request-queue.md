@@ -47,3 +47,16 @@
 - `cd src-tauri && cargo test ollama_http_queue --lib` — **pass** (1 test: `ollama_queue::tests::ollama_http_queue_serializes_and_fires_wait_hook`)
 
 **Resultado:** **CLOSED** — criterios verificables de la tarea (cola HTTP Ollama + prueba unitaria citada) pasan; sin bloqueos.
+
+## Test report
+
+**Fecha:** 2026-03-27 (hora local del entorno de ejecución; no se garantiza UTC).
+
+**Prefijo:** El operador indicó `tasks/UNTESTED-20260321-2100-openclaw-ollama-request-queue.md`; **no hay** archivo con prefijo `UNTESTED-` para este slug (solo `TESTING-`/`CLOSED-` histórico). No se usó otro `UNTESTED-*`. Para aplicar `003-tester/TESTER.md` a esta tarea concreta: `CLOSED-…` → `TESTING-…`, verificación, informe, y de nuevo `CLOSED-…`.
+
+**Comandos ejecutados** (según referencias en el cuerpo de la tarea):
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test ollama_http_queue --lib` — **pass** (1 test: `ollama_queue::tests::ollama_http_queue_serializes_and_fires_wait_hook`)
+
+**Resultado:** **CLOSED** — verificación reproducible OK; sin fallos ni bloqueos en esta corrida.

@@ -82,3 +82,21 @@ cd src-tauri && cargo run --example example_com_history_reload_smoke
 
 - **Criteria:** 1, 2 (including `tool_loop`), and 4 **satisfied** by automated checks. Criterion 3: example **exists, documents the flow, and compiles**; **full E2E completion** still **not verified** here (hang after first navigation step).
 - **Outcome:** **`WIP-…`** — repeat with stable Chromium/CDP and network to example.com, or debug the post-bootstrap navigation stall.
+
+### Test report — cuarta pasada (2026-03-27)
+
+- **Fecha:** 2026-03-27, hora local del entorno de ejecución (no fijada a UTC).
+- **Preflight:** El operador indicó `tasks/UNTESTED-20260323-0130-browser-history-forward-reload-tools.md`; ese path **no existe** (la tarea estaba como `WIP-…`). Siguiendo `003-tester/TESTER.md` sobre el mismo id: `WIP-…` → `TESTING-…` → verificación → este informe. No se tocó ningún otro `UNTESTED-*`.
+
+| Paso | Comando | Resultado |
+|------|---------|-----------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed |
+| Dispatch | `rg` `handle_browser_go_back\|handle_browser_go_forward\|handle_browser_reload` en `src/commands/browser_tool_dispatch.rs` | **pass** — líneas 534, 555, 577 |
+| Agent API | `rg` `pub fn go_back\|go_forward\|reload_current_tab` en `src/browser_agent/mod.rs` | **pass** — líneas 7232, 7290, 7348 |
+| Wiring | `BROWSER_GO_BACK` / `BROWSER_GO_FORWARD` / `BROWSER_RELOAD` en `tool_parsing.rs`, `tool_registry.rs`, `tool_loop.rs` | **pass** |
+| Ejemplo | `cd src-tauri && cargo build --example example_com_history_reload_smoke` | **pass** |
+| Integración (opcional) | `cargo run --example example_com_history_reload_smoke` con ventana ~15 s (timeout del shell) | **inconcluso** — conecta a CDP :9222, imprime Step 1 `BROWSER_NAVIGATE`, bootstrap `about:blank`, `Target.setDiscoverTargets ok`; sin más progreso ni `DONE: history + reload smoke completed` en la ventana |
+
+- **Criterios:** 1, 2 y 4 **cumplidos**. Criterio 3: el ejemplo **existe, documenta el flujo y compila**; la **corrida E2E completa** sigue **sin verificar** en este entorno (bloqueo tras el primer paso de navegación).
+- **Outcome:** **`WIP-…`** — repetir con Chromium/CDP estable y red hacia example.com, o depurar el cuello de botella post-bootstrap.
