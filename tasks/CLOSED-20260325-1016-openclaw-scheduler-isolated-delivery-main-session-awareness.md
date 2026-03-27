@@ -55,3 +55,19 @@ rg -n "format_for_chat_context|record_if_new" src-tauri/src/scheduler src-tauri/
 **Notes:** Live Discord / E2E not re-run; automated criteria unchanged.
 
 **Outcome:** **CLOSED** — all verification steps passed.
+
+## Test report (2026-03-27, Cursor tester run)
+
+**Preflight:** El operador pidió `tasks/UNTESTED-20260325-1016-openclaw-scheduler-isolated-delivery-main-session-awareness.md`; **no existía** en el árbol (el archivo estaba como `CLOSED-*`). Siguiendo `003-tester/TESTER.md` para esta tarea concreta: `CLOSED-…` → `TESTING-…`, verificación, informe, y tras éxito `TESTING-…` → `CLOSED-…`. No se tocó ningún otro `UNTESTED-*`.
+
+**Date:** 2026-03-27, hora local (macOS).
+
+| Step | Command | Result |
+|------|---------|--------|
+| Compile | `cd src-tauri && cargo check` | **pass** |
+| Unit tests | `cd src-tauri && cargo test delivery_awareness -- --nocapture` | **pass** (3 tests) |
+| Wiring | `rg -n "format_for_chat_context|record_if_new" src-tauri/src/scheduler src-tauri/src/commands/ollama_frontend_chat.rs src-tauri/src/task/runner.rs` | **pass** |
+
+**Notes:** Discord / E2E no ejecutado; criterios automatizados y cableado verificados.
+
+**Outcome:** **CLOSED** — todos los pasos de verificación pasaron.

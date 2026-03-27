@@ -70,3 +70,22 @@ rg -n "abort_cutoff::|StaleInboundAfterAbort" src-tauri/src/discord/mod.rs src-t
 - `rg -n "abort_cutoff::|StaleInboundAfterAbort"` on `discord/mod.rs`, `scheduler/mod.rs`, `scheduler/heartbeat.rs`, `commands/ollama.rs` — **pass** (matches for `clear_cutoff`, `should_skip`, `InboundStaleGuard`, `StaleInboundAfterAbort`).
 
 **Outcome:** All acceptance criteria satisfied. Filename remains `CLOSED-20260321-2335-openclaw-abort-cutoff-stale-events.md`. Live Discord/scheduler abort ordering against Ollama was not exercised here.
+
+## Test report
+
+**Date:** 2026-03-27 (local operator environment, macOS).
+
+**Rename chain:** At run start, `tasks/UNTESTED-20260321-2335-openclaw-abort-cutoff-stale-events.md` was not on disk (only `CLOSED-*` existed). Per `003-tester/TESTER.md`, the file was renamed `CLOSED-*` → `UNTESTED-*` (header updated) → `TESTING-*` so the `UNTESTED → TESTING` step could be applied without touching any other `UNTESTED-*` task.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test abort_cutoff` — **pass** (4 tests in `commands::abort_cutoff::tests`, also covered in full suite)
+- `cd src-tauri && cargo test` — **pass** (854 passed, 0 failed; 1 doc-test ignored)
+
+**Static spot-check**
+
+- `rg -n "abort_cutoff::|StaleInboundAfterAbort"` on `discord/mod.rs`, `scheduler/mod.rs`, `scheduler/heartbeat.rs`, `commands/ollama.rs` — **pass** (`clear_cutoff`, `should_skip`, `InboundStaleGuard`, `StaleInboundAfterAbort` present as expected).
+
+**Outcome:** All acceptance criteria satisfied. Renamed `TESTING-*` → `CLOSED-*`. Live Discord/scheduler abort and retry ordering against a real Ollama instance was not exercised in this run.
+

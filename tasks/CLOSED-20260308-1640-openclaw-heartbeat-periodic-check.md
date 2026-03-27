@@ -33,3 +33,18 @@ cd src-tauri && cargo check && cargo test scheduler::heartbeat --no-fail-fast
 - `rg 'block_on|evaluate_one_plus_one_blocking_timeout' src-tauri/src/browser_agent/mod.rs | head` — **pass** (comentario explícito prohibiendo `Handle::block_on` + `tokio::time::timeout` en health check; uso de `evaluate_one_plus_one_blocking_timeout`)
 
 **Outcome:** Todos los criterios de aceptación verificados — **CLOSED**.
+
+---
+
+### Run: 2026-03-27 20:43 UTC
+
+**Preflight:** No existía `tasks/UNTESTED-20260308-1640-openclaw-heartbeat-periodic-check.md` en el árbol; el task ya estaba como `CLOSED-…`. Para seguir `003-tester/TESTER.md` se renombró `CLOSED-…` → `TESTING-…`, se volvieron a ejecutar las verificaciones y se cierra de nuevo como `CLOSED-…`.
+
+**Commands run**
+
+- `rg 'spawn_heartbeat_thread|async_runtime::spawn|heartbeat_loop' src-tauri/src/lib.rs src-tauri/src/scheduler/heartbeat.rs` — **pass** (`spawn_heartbeat_thread` usa `tauri::async_runtime::spawn` y `heartbeat_loop().await`; `lib.rs` invoca `scheduler::heartbeat::spawn_heartbeat_thread()` tras el gate de warmup de Ollama en el mismo bloque async).
+- `rg 'block_on|check_browser_alive|evaluate_one_plus_one_blocking_timeout' src-tauri/src/browser_agent/mod.rs | head` — **pass** (comentarios y `evaluate_one_plus_one_blocking_timeout`; sin `Handle::block_on` anidado en el health check).
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test scheduler::heartbeat --no-fail-fast` — **pass** (5 tests)
+
+**Outcome:** Criterios de aceptación cumplidos — **CLOSED**.

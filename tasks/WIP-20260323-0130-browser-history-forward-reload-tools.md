@@ -63,3 +63,22 @@ cd src-tauri && cargo run --example example_com_history_reload_smoke
 
 - **Criterios:** 1, 2 y 4 **cumplidos**. Criterio 3: el ejemplo **existe, documenta el flujo y compila**; la **ejecución E2E completa** sigue **sin verificar** en este entorno (bloqueo tras Step 1 / navegación).
 - **Outcome:** **`WIP-…`** — mismo bloqueo que la pasada anterior; hace falta CDP estable, red a example.com, o depurar el hang post-bootstrap.
+
+### Test report — tercera pasada (2026-03-27)
+
+- **Date:** 2026-03-27, local time of the execution environment (not fixed to UTC).
+- **Preflight:** Operator asked for `tasks/UNTESTED-20260323-0130-browser-history-forward-reload-tools.md`; that path **does not exist** (task was `WIP-…`). Per `003-tester/TESTER.md`, the same task id was used: `WIP-…` → `TESTING-…` → verification → this report → `WIP-…` / `CLOSED-…`. No other `UNTESTED-*` file was touched.
+
+| Step | Command | Result |
+|------|---------|--------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed |
+| Dispatch handlers | `rg -n "handle_browser_go_back\|handle_browser_go_forward\|handle_browser_reload" src/commands/browser_tool_dispatch.rs` (cwd `src-tauri`) | **pass** — lines 534, 555, 577 |
+| Agent API | `rg -n "pub fn go_back\|pub fn go_forward\|pub fn reload_current_tab" src/browser_agent/mod.rs` | **pass** — lines 7232, 7290, 7348 |
+| Tool wiring | `rg` for `BROWSER_GO_BACK`, `BROWSER_GO_FORWARD`, `BROWSER_RELOAD` in `src/commands/tool_parsing.rs`, `src/commands/tool_registry.rs` | **pass** |
+| tool_loop | `rg` same tool names in `src/commands/tool_loop.rs` | **pass** (dispatch matches at ~1090–1104) |
+| Example build | `cd src-tauri && cargo build --example example_com_history_reload_smoke` | **pass** |
+| Integration (optional) | `cargo run --example example_com_history_reload_smoke` with wall-clock stop after ~12s | **inconclusive** — connects to CDP :9222, prints Step 1 `BROWSER_NAVIGATE` to example.com, bootstraps `about:blank`, then no further progress / no `DONE: history + reload smoke completed` within the window |
+
+- **Criteria:** 1, 2 (including `tool_loop`), and 4 **satisfied** by automated checks. Criterion 3: example **exists, documents the flow, and compiles**; **full E2E completion** still **not verified** here (hang after first navigation step).
+- **Outcome:** **`WIP-…`** — repeat with stable Chromium/CDP and network to example.com, or debug the post-bootstrap navigation stall.

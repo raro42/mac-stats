@@ -48,3 +48,21 @@ rg -n "scale_click_coords_from_llm_screenshot_space|browser_llm_screenshot_size|
 **Criterios:** Los criterios automatizables (compilación + tests unitarios de escalado de coordenadas + presencia de integración en verificación y dispatch) **cumplen**. No se ejecutó prueba manual end-to-end con Chrome/CDP ni envío real a un modelo de visión en esta corrida.
 
 **Notas:** Cierre `CLOSED-` porque la verificación definida en el cuerpo de la tarea terminó sin fallos.
+
+## Test report
+
+**When:** 2026-03-27 20:45:26 UTC (local: 2026-03-27 21:45:26 CET)
+
+**Preflight:** El archivo `tasks/UNTESTED-20260308-2230-browser-use-llm-screenshot-resize-and-coord-scale.md` **no existía** en el repositorio (solo la variante `CLOSED-*` / renombrada a `TESTING-*` para esta corrida). Se siguió `003-tester/TESTER.md` únicamente sobre esta tarea; no se eligió otro `UNTESTED-*`.
+
+**Comandos:**
+
+| Comando | Resultado |
+|--------|-----------|
+| `cd src-tauri && cargo check` | **pass** |
+| `cd src-tauri && cargo test scale_click_coords --lib -- --nocapture` | **pass** (2 tests) |
+| `rg -n "scale_click_coords_from_llm_screenshot_space|browser_llm_screenshot_size|prepare_first_attachment_image_for_vision" src-tauri/src` | **pass** |
+
+**Criterios:** La verificación definida en el cuerpo de la tarea **cumple** (misma conclusión que la corrida anterior: sin E2E CDP/visión en esta pasada).
+
+**Notas:** Resultado `CLOSED-` tras esta corrida.

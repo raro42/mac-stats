@@ -62,3 +62,32 @@ rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/com
 | Criterio manual opcional (Discord en vivo con herramientas) | **No ejecutado** (fuera del alcance de esta pasada automatizada) |
 
 **Conclusión:** **CLOSED** — criterios de aceptación verificados por compilación, pruebas unitarias del módulo y comprobación estática de cableado; la prueba manual en Discord queda como seguimiento operativo si se desea.
+
+### Test report — TESTER.md pass (2026-03-27)
+
+**Date:** 2026-03-27, local (shell en el workspace mac-stats).
+
+**Workflow**
+
+- **UNTESTED → TESTING:** `tasks/UNTESTED-20260322-0105-openclaw-draft-stream-throttled-reply.md` no existía en el repo; la misma tarea estaba como `CLOSED-*`. Para seguir `003-tester/TESTER.md` se renombró `CLOSED-…` → `TESTING-…`, se ejecutó la verificación y se vuelve a `CLOSED-…` al cerrar (solo este ID de tarea, sin otro `UNTESTED-*`).
+
+**Comandos ejecutados**
+
+```bash
+cd src-tauri && cargo check
+cd src-tauri && cargo test discord_draft_stream::
+rg -n "spawn_discord_draft_editor" src-tauri/src/discord/mod.rs
+rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/commands/turn_lifecycle.rs src-tauri/src/commands/ollama.rs
+```
+
+**Resultados**
+
+| Comprobación | Resultado |
+|--------------|-----------|
+| `cargo check` | **Pass** |
+| `cargo test discord_draft_stream::` (2 tests) | **Pass** |
+| `spawn_discord_draft_editor` en `discord/mod.rs` (L2172) | **Pass** |
+| `DiscordDraftHandle` en `tool_loop.rs`, `turn_lifecycle.rs`, `ollama.rs` | **Pass** |
+| Manual opcional (Discord en vivo) | **No ejecutado** |
+
+**Conclusión:** **CLOSED** — criterios automatizados cumplidos.
