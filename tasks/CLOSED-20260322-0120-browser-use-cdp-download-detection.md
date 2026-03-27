@@ -116,3 +116,16 @@ Optional manual: trigger a real download via **BROWSER_NAVIGATE** / **BROWSER_CL
 
 - **Manual CDP / descarga real:** no ejecutado (opcional en la tarea).
 - **Outcome:** Criterios de aceptación 1–4 cumplidos → **CLOSED**.
+
+### Test report — 2026-03-28 (local; TESTER.md, única tarea pedida)
+
+- **Archivo pedido:** `tasks/UNTESTED-20260322-0120-browser-use-cdp-download-detection.md` **no existe** en el árbol; la tarea está solo como `tasks/CLOSED-20260322-0120-browser-use-cdp-download-detection.md`. No se aplicó **UNTESTED → TESTING** (no hay prefijo `UNTESTED-`); no se tocó ningún otro `UNTESTED-*`.
+
+| Step | Command | Result |
+|------|---------|--------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed |
+| Symbols | `rg -n "Browser\.downloadProgress\|merge_with_directory_diff\|spawn_download_aux_listener" src/browser_agent/cdp_downloads.rs src/browser_agent/mod.rs` | **pass** |
+
+- **Manual CDP / descarga real:** no ejecutado (opcional en la tarea).
+- **Outcome:** Criterios de aceptación 1–4 (automatizados) cumplidos; el nombre del archivo sigue siendo **CLOSED-…** (ya cerrado).

@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.67] - 2026-03-28
 
 ### Changed
-- **Tasks / docs** — Further expanded **CLOSED** task notes under **`tasks/`** (browser/CDP health, SPA dwell, graceful shutdown, click fallbacks, in-page search, OpenClaw queue/debounce/draft/keyed queue, downloads, Ori Mnemos, CDP crash recovery, focused-tab screenshot, session timeout, managed-tab cap, diagnostics, scheduler main-session awareness, Discord reply-to-bot mention); WIP browser history forward/reload tool notes.
-- **OpenClaw reviewer** — Independent re-run **`2026-03-27T22:42:12Z`** (prior **`2026-03-27T22:12:58Z`**); **`HEAD`** unchanged **`55dc6a8bb28d`** (**Aligned**). (`005-openclaw-reviewer/005-openclaw-reviewer.md`.)
+- **Tasks / docs** — Further expanded **CLOSED** task notes under **`tasks/`** (browser/CDP health, SPA dwell, graceful shutdown, click fallbacks, in-page search, OpenClaw queue/debounce/draft/keyed queue, downloads, Ori Mnemos, CDP crash recovery, focused-tab screenshot, session timeout, managed-tab cap, diagnostics, scheduler main-session awareness, Discord reply-to-bot mention); WIP browser history forward/reload tool notes — additional per-file workflow/outcome detail.
+- **OpenClaw reviewer** — Independent re-run **`2026-03-27T23:10:18Z`** (prior **`2026-03-27T22:42:12Z`** / **`2026-03-27T22:12:58Z`**); **`HEAD`** unchanged **`55dc6a8bb28d`** (**Aligned**). Latest verification header **2026-03-28**. (`005-openclaw-reviewer/005-openclaw-reviewer.md`.)
 
 ## [0.1.66] - 2026-03-27
 
