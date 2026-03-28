@@ -208,3 +208,22 @@ cd src-tauri && cargo check
 **Runtime (opcional):** `pgrep -fl mac_stats` — **`target/release/mac_stats -vv`** (PID **64001**); sin **`pkill`** (**AGENTS.md**). Marca UTC **2026-03-28T18:30:55Z**.
 
 **Outcome:** **`CLOSED-`**.
+
+### Run: 2026-03-28 (closing reviewer — verify #11, agent)
+
+**Alcance / prefijo:** El operador pidió trabajar solo en **`tasks/TESTING-20260322-1920-openclaw-ollama-warmup-before-channels.md`**. Para cumplir ese path literal, esta corrida hizo **`git mv tasks/CLOSED-… tasks/TESTING-…`**, ejecutó la barra de **`004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md`** y, al pasar todo, **`git mv tasks/TESTING-… tasks/CLOSED-…`** de nuevo (**`CLOSED-`** = criterio cumplido; no **`TESTED-`**, no atascado en **`TESTING-`**).
+
+**Commands run**
+
+- `rg -n 'ensure_ollama_agent_ready_at_startup|Ollama startup warmup finished' src-tauri/src/lib.rs` — **pass** (`block_on` **L460–L462** + `ensure_ollama_agent_ready_at_startup().await` **L461**; log `mac_stats_startup` **L463–L466** con texto *Discord, scheduler, heartbeat, and task review*).
+- `rg -n 'spawn_discord_if_configured|spawn_scheduler_thread|spawn_heartbeat_thread' src-tauri/src/lib.rs` — **pass** (Discord **L471**, scheduler **L475**, heartbeat **L478**; **después** del warmup; `spawn_review_thread` **L481**).
+- `cd src-tauri && cargo check` — **pass**.
+- `cd src-tauri && cargo clippy --all-targets -- -D warnings` — **pass**.
+- `cd src-tauri && cargo test` — **pass** (**871** tests en crate `mac_stats` lib; **1** doc-test ignorado).
+- `cd src-tauri && cargo build --release` — **pass** (**v0.1.70**).
+
+**`git diff` / `CHANGELOG.md` [0.1.70] / `006-feature-coder/FEATURE-CODER.md`:** `git diff --stat` del workspace — cambios en otras tareas **`tasks/CLOSED-*.md`** y **`005-openclaw-reviewer/005-openclaw-reviewer.md`**; el **`git mv`** de esta tarea aparece en el índice; sin **FEAT-D\*** nuevos ni cambios en `lib.rs` atribuibles solo al gate Ollama.
+
+**Runtime (opcional):** `pgrep -fl mac_stats` — **`target/release/mac_stats -vv`** (PID **64001**); sin **`pkill`** (**AGENTS.md**). Marca UTC **2026-03-28T18:44:15Z**.
+
+**Outcome:** restaurar prefijo en disco **`CLOSED-20260322-1920-openclaw-ollama-warmup-before-channels.md`**.

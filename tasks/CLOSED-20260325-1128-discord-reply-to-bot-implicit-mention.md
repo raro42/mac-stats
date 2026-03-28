@@ -331,3 +331,29 @@ In **MentionOnly** channels, a human message that **replies** to a message autho
 **E2E manual Discord** (pasos 1–8 de la tarea: canal `mention_only`, reply sin @, mensaje plano, `rg` en `~/.mac-stats/debug.log`): **no ejecutado** en este entorno.
 
 **Resultado global:** **PASS** (criterios numerados + preflight). **Renombrado final:** se mantiene **`CLOSED-20260325-1128-discord-reply-to-bot-implicit-mention.md`** (criterio del operador: `TESTED-` solo ante fallo de verificación automatizada/revisión de código).
+
+---
+
+## Test report
+
+**Date:** 2026-03-28 UTC (tester run; `003-tester/TESTER.md`; operator path `tasks/UNTESTED-20260325-1128-discord-reply-to-bot-implicit-mention.md`)
+
+**Rename `UNTESTED→TESTING`:** **Skipped** — `tasks/UNTESTED-20260325-1128-discord-reply-to-bot-implicit-mention.md` does not exist in this workspace. The same slug is only present as `tasks/CLOSED-20260325-1128-discord-reply-to-bot-implicit-mention.md`. No other `UNTESTED-*` file was used.
+
+**Commands run**
+
+- `cd /Users/raro42/projects/mac-stats/src-tauri && cargo check` → **pass** (dev profile, 0 errors).
+- `cargo test outbound_attachment_path_allowlist -- --nocapture` → **pass** (`discord::tests::outbound_attachment_path_allowlist`).
+- `rg -n 'discord_mentions_bot_effective|mentions_bot_effective' src-tauri/src/discord/mod.rs` → lines 1852, 1956, 2016, 2796–2797, 2823.
+- `rg -n 'MentionOnly activation via message reference|could not resolve referenced message for implicit mention' src-tauri/src/discord/mod.rs` → lines 1867, 1888, 1901, 1915; `debug!` uses `target: "mac_stats::discord"` (confirmed in source).
+
+**Acceptance criteria**
+
+1. **PASS** — `discord_mentions_bot_effective`: literal mention; `referenced_message`; cache; `get_message` fallback; failure logs `could not resolve referenced message for implicit mention`.
+2. **PASS** — MentionOnly gate uses `!mentions_bot_effective` at ≈2823.
+3. **PASS** — Observability strings present; `mac_stats::discord` target on `debug!` (log text includes leading `Discord:` before `MentionOnly activation…`).
+4. **PASS** — `cargo check` succeeds.
+
+**Manual Discord E2E** (task steps 1–8): **not executed** in this environment (no live Discord session).
+
+**Overall:** **PASS** (numbered criteria + preflight). **Outcome rename:** keep **`CLOSED-20260325-1128-discord-reply-to-bot-implicit-mention.md`**. Per `003-tester/TESTER.md`, a blocked or failed run would use **`WIP-`** prefix (not `TESTED-`).
