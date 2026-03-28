@@ -198,3 +198,16 @@ rg -n "find_unique_identity_match|cdp_js_click_element" src-tauri/src/browser_ag
 - `rg -n "find_unique_identity_match|cdp_js_click_element" src-tauri/src/browser_agent/mod.rs` — **pass**
 
 **Outcome:** Todos los criterios de aceptación cumplidos. Renombrar `TESTING-…` → `CLOSED-…` tras este informe. Flujos CDP / HTTP click end-to-end no ejecutados en esta pasada.
+
+## Test report — 2026-03-28 (local, macOS) — `003-tester/TESTER.md` (solo este task)
+
+**Preflight:** El path `tasks/UNTESTED-20260321-1620-browser-use-click-fallback-and-element-discovery.md` no existía; el task estaba como `CLOSED-…`. Se aplicó el flujo equivalente: `CLOSED-…` → `TESTING-…` antes de la verificación. No se usó ningún otro archivo `UNTESTED-*`.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test` — **pass** (biblioteca `mac_stats`: 854 passed, 0 failed, 0 ignored; doc-tests: 1 ignored)
+- `rg -n "should_use_http_fallback_after_browser_action_error|click_http" src-tauri/src/commands/browser_tool_dispatch.rs` — **pass** (coincidencias en L13, L834, L839, L1041)
+- `rg -n "find_unique_identity_match|cdp_js_click_element" src-tauri/src/browser_agent/mod.rs` — **pass** (`find_unique_identity_match` L2320, L3239, tests L9877+; `cdp_js_click_element` L2883, L3011)
+
+**Outcome:** Todos los criterios de aceptación cumplidos. Renombrar `TESTING-…` → `CLOSED-…` tras este informe. Flujos CDP / HTTP click end-to-end no ejecutados en esta pasada.

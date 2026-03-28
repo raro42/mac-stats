@@ -228,3 +228,21 @@ rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_b
 - `rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_batches_on_shutdown" src-tauri/src/discord/mod.rs` — matches for `enqueue_or_run_router` (line 2868) and `discard_pending_batches_on_shutdown` (line 2918). `discord_message_bypasses_debounce` is not named in `mod.rs` (defined/used in `message_debounce.rs`), same as prior reports.
 
 **Outcome:** Acceptance criteria 1–2 pass. Criterion 3: two direct references in `mod.rs`; bypass remains in `message_debounce.rs`. Task file rename result: **`CLOSED-`** (not WIP).
+
+## Test report (2026-03-28 — Cursor agent / TESTER.md)
+
+**Date:** 2026-03-28, local wall-clock (workspace `user_info` calendar date: Saturday 2026-03-28).
+
+**Preflight / rename (TESTER.md step 2):** `tasks/UNTESTED-20260322-0100-openclaw-inbound-message-debounce.md` was **not** on disk. Applied the equivalent step: `tasks/CLOSED-20260322-0100-openclaw-inbound-message-debounce.md` → `tasks/TESTING-20260322-0100-openclaw-inbound-message-debounce.md` before verification. No other `UNTESTED-*` file was used.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test merge_empty` — **pass** (`discord::message_debounce::merge_tests::merge_empty`)
+- `cd src-tauri && cargo test` — **pass** (854 tests in `mac_stats` library crate; 0 failed; 0 ignored in lib suite per `test result` line)
+
+**Static spot-check**
+
+- `rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_batches_on_shutdown" src-tauri/src/discord/mod.rs` — matches for `enqueue_or_run_router` (line 2868) and `discard_pending_batches_on_shutdown` (line 2918). `discord_message_bypasses_debounce` is not named in `mod.rs` (defined/used in `message_debounce.rs`), consistent with prior reports.
+
+**Outcome:** Acceptance criteria 1–2 pass. Criterion 3: literal `rg` for all three names in `mod.rs` finds two; bypass remains encapsulated in `message_debounce.rs`. Task file rename result: **`CLOSED-`** (not WIP).

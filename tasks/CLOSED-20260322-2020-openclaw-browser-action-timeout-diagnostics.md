@@ -206,3 +206,19 @@ rg -n "format_last_browser_error_context|navchg=|navigation_timeout_error_with_p
 **Notes:** Live CDP navigation timeouts and manual `mac_stats --browser-doctor` were not exercised; acceptance per task body is build + unit tests + static diagnostic paths.
 
 **Outcome:** All acceptance criteria satisfied → file prefix **`CLOSED-`**.
+
+## Test report
+
+**Date:** 2026-03-28 (local workspace time).
+
+**Preflight:** Operator-named path `tasks/UNTESTED-20260322-2020-openclaw-browser-action-timeout-diagnostics.md` was **not** on disk. Per `003-tester/TESTER.md` for this task only: renamed existing `CLOSED-…` → `TESTING-…` (same basename), ran verification from the task body, appended this report, then rename to `CLOSED-…`. No other `UNTESTED-*` file was used in this run.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test` — **pass** (854 passed, 0 failed in `mac_stats` library crate; 1 doc-test ignored)
+- Optional `rg` spot-check (symbols per task body in `browser_agent/mod.rs`, `browser_tool_dispatch.rs`, `browser_helpers.rs`, `browser_doctor.rs`) — **pass**
+
+**Notes:** Live CDP navigation timeouts against a real Chrome instance and manual `mac_stats --browser-doctor` were not exercised; acceptance per task body is build + unit tests + static diagnostic paths.
+
+**Outcome:** All acceptance criteria satisfied → file prefix **`CLOSED-`**.
