@@ -341,3 +341,18 @@ Optional: manual Discord — MentionOnly channel, reply to the bot’s last mess
 
 **Outcome:** **CLOSED** — acceptance criteria 1–4 satisfied; file renamed back to `CLOSED-…` after this report.
 
+### Test report — 2026-03-28 (TESTER; hora local macOS, corrida actual)
+
+**Preflight:** El operador indicó `tasks/UNTESTED-20260325-1128-discord-reply-to-bot-implicit-mention.md`; ese archivo **no existía** en el working tree (solo `CLOSED-20260325-1128-discord-reply-to-bot-implicit-mention.md` con la misma tarea). Se aplicó `003-tester/TESTER.md` **únicamente** sobre esta tarea: `CLOSED-…` → `TESTING-…` para esta corrida; **no** se eligió ningún otro archivo `UNTESTED-*`.
+
+| Paso | Comando | Resultado |
+|------|---------|-----------|
+| Compilación | `cd src-tauri && cargo check` | **pass** (`Finished dev profile` ~0.20s) |
+| Test unitario | `cd src-tauri && cargo test outbound_attachment_path_allowlist -- --nocapture` | **pass** — `discord::tests::outbound_attachment_path_allowlist` (1 passed; 853 filtered en lib `mac_stats`) |
+| Cableado | `rg -n 'discord_mentions_bot_effective\|mentions_bot_effective' src-tauri/src/discord/mod.rs` | **pass** — 1852, 1956, 2016, 2787–2788, 2814 |
+| Observabilidad (criterio 3) | `rg` cadenas `MentionOnly activation via message reference` y `could not resolve referenced message for implicit mention` en `discord/mod.rs` | **pass** — 1867, 1888, 1901, 1915 |
+
+**Manual Discord:** no ejecutada (opcional; token en vivo).
+
+**Outcome:** **CLOSED** — criterios de aceptación 1–4 cumplen; archivo renombrado de `TESTING-…` a `CLOSED-…` tras este informe.
+
