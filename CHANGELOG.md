@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.67] - 2026-03-28
 
 ### Changed
+- **Tasks / OpenClaw reviewer** — Additive edits on **CLOSED** / **WIP** task notes under **`tasks/`** (~**+431** lines: workflow, verification, failure modes, operator guidance). Independent reviewer re-run **`2026-03-28T08:01:50Z`**; **OpenClaw** **`HEAD`** unchanged **`55dc6a8bb28d`** (**Aligned**). (`tasks/`, `005-openclaw-reviewer/005-openclaw-reviewer.md`.)
 - **Tasks / OpenClaw reviewer** — Additive edits on **CLOSED** / **WIP** task notes under **`tasks/`** (~**+412** lines: workflow, verification, failure modes, operator guidance). Independent reviewer re-run **`2026-03-28T07:41:24Z`**; **OpenClaw** **`HEAD`** unchanged **`55dc6a8bb28d`** (**Aligned**). (`tasks/`, `005-openclaw-reviewer/005-openclaw-reviewer.md`.)
 - **Tasks / OpenClaw reviewer** — Additive pass on **CLOSED** / **WIP** task notes under **`tasks/`** (~**+453** lines: workflow, verification, failure modes, operator guidance). Independent reviewer re-run **`2026-03-28T07:21:26Z`**; **`HEAD`** unchanged **`55dc6a8bb28d`** (**Aligned**). (`tasks/`, `005-openclaw-reviewer/005-openclaw-reviewer.md`.)
 - **Tasks / OpenClaw reviewer** — Further additive edits on the same **CLOSED** / **WIP** task files under **`tasks/`** (~**+436** lines: workflow, verification, failure modes, operator guidance). Independent reviewer re-run **`2026-03-28T07:00:06Z`**; **`HEAD`** unchanged **`55dc6a8bb28d`** (**Aligned**). (`tasks/`, `005-openclaw-reviewer/005-openclaw-reviewer.md`.)
