@@ -10,7 +10,7 @@ use std::sync::OnceLock;
 fn pattern_table() -> &'static [(Regex, &'static str, bool)] {
     static TABLE: OnceLock<Vec<(Regex, &'static str, bool)>> = OnceLock::new();
     TABLE.get_or_init(|| {
-        const RAW: &[(&str, &'static str, bool)] = &[
+        const RAW: &[(&str, &str, bool)] = &[
             (
                 r"(?i)ignore\s+(all\s+)?(previous|prior|above)\s+(instructions|rules|directives)",
                 "instruction-override",

@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::mpsc;
@@ -349,6 +350,34 @@ impl Browser {
             }
 
             previous_target_id = target_id;
+        }
+    }
+
+    /// Drop tab handles whose targets are no longer reported by [`GetTargets`] (page targets only,
+    /// same filter as [`Self::register_missing_tabs`]). Use after closes when `TargetDestroyed` is
+    /// delayed so the next `Tab::close` does not hit **`-32602` No session with given id** on a stale `Arc<Tab>`.
+    pub fn prune_stale_tabs(&self) {
+        let targets = match self.call_method(GetTargets { filter: None }) {
+            Ok(t) => t,
+            Err(e) => {
+                warn!("prune_stale_tabs: GetTargets failed: {e}");
+                return;
+            }
+        };
+
+        let live_ids: HashSet<String> = targets
+            .target_infos
+            .into_iter()
+            .filter(|target| target.Type == "page" && !target.url.starts_with("devtools://"))
+            .map(|target| target.target_id)
+            .collect();
+
+        let mut tabs_lock = self.inner.tabs.lock().unwrap();
+        let before = tabs_lock.len();
+        tabs_lock.retain(|t| live_ids.contains(t.get_target_id()));
+        let removed = before.saturating_sub(tabs_lock.len());
+        if removed > 0 {
+            trace!("prune_stale_tabs: removed {removed} stale tab handle(s)");
         }
     }
 

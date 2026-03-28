@@ -71,3 +71,29 @@ In **MentionOnly** channels, a human message that **replies** to a message autho
 **Manual Discord E2E** (task steps 1–8: reply without @, plain message, `debug.log` grep during live traffic): **not executed** in this run (no live Discord session). Operator smoke-test still recommended.
 
 **Overall:** **PASS** (numbered acceptance criteria + preflight). Outcome: **CLOSED**.
+
+---
+
+## Test report
+
+**Date:** 2026-03-28 UTC (tester run; Cursor agent)
+
+**Path note:** Operator requested `tasks/UNTESTED-20260325-1128-discord-reply-to-bot-implicit-mention.md`. That filename is **not present** in this workspace; the same slug exists as `tasks/CLOSED-20260325-1128-discord-reply-to-bot-implicit-mention.md`. Renaming `UNTESTED→TESTING` was **skipped** (no `UNTESTED-*` file to rename). Verification and this report were applied to the existing `CLOSED-*` task file.
+
+**Commands run**
+
+- `cd /Users/raro42/projects/mac-stats/src-tauri && cargo check` → **pass**
+- `cargo test outbound_attachment_path_allowlist -- --nocapture` → **pass** (`discord::tests::outbound_attachment_path_allowlist`)
+- `rg -n 'discord_mentions_bot_effective|mentions_bot_effective' src-tauri/src/discord/mod.rs` → hits at 1852, 1956–2016, 2796–2823
+- `rg -n 'MentionOnly activation via message reference|could not resolve referenced message for implicit mention' src-tauri/src/discord/mod.rs` → present with `target: "mac_stats::discord"` on `debug!` calls (e.g. 1865–1917)
+
+**Acceptance criteria (automated / code review)**
+
+1. **PASS** — `discord_mentions_bot_effective`: literal mention; `referenced_message` path; cache; `get_message` fallback; failure logs `could not resolve referenced message for implicit mention`.
+2. **PASS** — MentionOnly gate uses `mentions_bot_effective` (≈2823).
+3. **PASS** — Distinct debug strings and `mac_stats::discord` target present.
+4. **PASS** — `cargo check` succeeds.
+
+**Manual Discord E2E** (steps 1–8 in task body): **not executed** (no live Discord in this environment).
+
+**Outcome:** **PASS** on implementation + preflight. Filename already **CLOSED-**; no rename to `TESTED-` or `WIP-`.

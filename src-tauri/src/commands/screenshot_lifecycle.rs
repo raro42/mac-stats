@@ -64,7 +64,7 @@ fn collect_screenshot_entries(dir: &Path) -> Vec<ScreenshotEntry> {
             continue;
         };
         let name_ts = parse_screenshot_filename_timestamp(&stem);
-        let mtime = meta.modified().unwrap_or_else(|_| SystemTime::UNIX_EPOCH);
+        let mtime = meta.modified().unwrap_or(SystemTime::UNIX_EPOCH);
         out.push(ScreenshotEntry {
             path,
             size: meta.len(),

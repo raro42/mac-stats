@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.69] - 2026-03-28
+
+### Fixed
+- **`--browser-debug-crash-tab` CLI hang** — After **`Page.crash`**, the smoke path no longer blocks on the main CDP command reply (often absent once the renderer is dead) or on dropping **`Tab`/`Browser`** after the side listener clears the session; it uses a short settle sleep, fires **`Page.crash`** on a worker thread, **`mem::forget`** of the local handles, then exits **0** with the expected stdout line. (`browser_agent/mod.rs`; see **`docs/029_browser_automation.md`**.)
+- **Managed tab cap vs stale CDP sessions** — Vendored **`Browser::prune_stale_tabs`** reconciles **`Arc<Tab>`** handles with live **`Target.getTargets`** page IDs; **`try_enforce_browser_tab_limit`** prunes / **`register_missing_tabs`** and retries on **`-32602`** / “no session with given id” when **`TargetDestroyed`** lags. (`vendor/headless_chrome`, `browser_agent/mod.rs`.)
+
+### Added
+- **Tests** — **`http_only_browser_error_context_uses_cdp_not_used_label`** for HTTP-only / combined-failure browser tool text (**`cdp=not_used`**). (`commands/browser_helpers.rs`.)
+
+### Changed
+- **Discord** — Draft first flush uses **“(No reply text.)”** when the routed reply is empty after trim (**`discord/draft`** info). (`discord/mod.rs`.)
+- **`BROWSER_NAVIGATE`** — **info** when CDP retry and HTTP fallback both fail (operator grep **`cdp=not_used`**). (`commands/browser_tool_dispatch.rs`.)
+- **Agent router / tool loop** — **`discord/draft`** info when queuing per-tool draft progress while the output gate allows send. (`commands/tool_loop.rs`.)
+- **CDP trace archive** — Recorder holds **`Box<TraceSocket>`** in **`RecorderState`** to keep the global mutex payload smaller. (`browser_agent/cdp_trace_archive.rs`.)
+- **Ori lifecycle** — Prefetch limits use **`clamp`**. (`commands/ori_lifecycle.rs`.)
+- **Internals** — **`derive(Default)`** for **`OllamaRequest`**, model-list **`CacheInner`**, and Ollama queue **`KeyWaiters`**; assorted clippy/style cleanups (**`ollama_chat`**, **`model_list_cache`**, **`turn_lifecycle`**, DOMSnapshot bounds, **`feature_health`**, **`screenshot_annotate`** allow, **`suspicious_patterns`**, **`browser` SSRF notice string**). (`commands/`, `ollama/`, `ollama_queue.rs`.)
+- **Tasks / docs** — **`tasks/CLOSED-20260322-1920-openclaw-ollama-warmup-before-channels.md`** replaces prior **`TESTED`** name; trim redundant **`UNTESTED`** draft/diagnostics stubs; additive **CLOSED** task edits; Discord agent, feature review, and browser automation doc touch-ups. (`tasks/`, `docs/007_discord_agent.md`, `docs/022_feature_review_plan.md`, `docs/029_browser_automation.md`.)
+
 ## [0.1.68] - 2026-03-28
 
 ### Fixed

@@ -254,7 +254,7 @@ mod tests {
         };
         let s = "First sentence. Second sentence is longer and should split here.";
         let v = split_text_for_policy(s, &p);
-        assert!(v.len() >= 1);
+        assert!(!v.is_empty());
         let p2 = SurfaceChunkPolicy {
             max_chars: 20,
             coalesce_idle_ms: 0,

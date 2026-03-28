@@ -27,18 +27,10 @@ struct EndpointEntry {
     bg_refreshing: bool,
 }
 
+#[derive(Default)]
 struct CacheInner {
     endpoints: HashMap<String, EndpointEntry>,
     inflight: HashMap<String, SharedFetch>,
-}
-
-impl Default for CacheInner {
-    fn default() -> Self {
-        Self {
-            endpoints: HashMap::new(),
-            inflight: HashMap::new(),
-        }
-    }
 }
 
 fn cache() -> &'static Mutex<CacheInner> {
@@ -54,11 +46,7 @@ fn norm_endpoint(endpoint: &str) -> String {
 fn merge_tags_fetch_result(fetched: FetchResult, prior: Option<ListResponse>) -> FetchResult {
     match fetched {
         Ok(list) if !list.models.is_empty() => Ok(list),
-        Ok(list) => Ok(
-            prior
-                .filter(|p| !p.models.is_empty())
-                .unwrap_or(list),
-        ),
+        Ok(list) => Ok(prior.filter(|p| !p.models.is_empty()).unwrap_or(list)),
         Err(e) => prior
             .filter(|p| !p.models.is_empty())
             .map(Ok)
@@ -85,9 +73,7 @@ pub async fn clear_endpoint(endpoint: &str) {
 }
 
 async fn fetch_tags_http(endpoint: &str, api_key: Option<&str>) -> FetchResult {
-    if let Err(e) = crate::ollama::ollama_http_circuit_allow() {
-        return Err(e);
-    }
+    crate::ollama::ollama_http_circuit_allow()?;
     let url = format!("{}/api/tags", endpoint.trim_end_matches('/'));
     let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(10))

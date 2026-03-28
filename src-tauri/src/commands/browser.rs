@@ -286,7 +286,8 @@ fn cdp_internal_navigation_url_pass_through(url_trim: &str) -> Option<String> {
     }
     const CHROME_PREFIX: &[u8] = b"chrome://";
     let b = u.as_bytes();
-    if b.len() >= CHROME_PREFIX.len() && b[..CHROME_PREFIX.len()].eq_ignore_ascii_case(CHROME_PREFIX)
+    if b.len() >= CHROME_PREFIX.len()
+        && b[..CHROME_PREFIX.len()].eq_ignore_ascii_case(CHROME_PREFIX)
     {
         let rest = u[CHROME_PREFIX.len()..].to_ascii_lowercase();
         if matches!(
@@ -314,9 +315,10 @@ pub fn normalize_and_validate_cdp_navigation_url(url: &str) -> Result<String, St
     if let Some(pass) = cdp_internal_navigation_url_pass_through(u) {
         return Ok(pass);
     }
-    let normalized = if u.len() >= 7 && u[..7].eq_ignore_ascii_case("file://") {
-        u.to_string()
-    } else if u.starts_with("http://") || u.starts_with("https://") {
+    let normalized = if (u.len() >= 7 && u[..7].eq_ignore_ascii_case("file://"))
+        || u.starts_with("http://")
+        || u.starts_with("https://")
+    {
         u.to_string()
     } else {
         format!("https://{}", u)
@@ -389,9 +391,7 @@ pub fn ssrf_proxy_env_notice_for_tool(tool_label: &str) -> Result<Option<String>
         "SSRF/proxy: env proxy vars set during {}; DNS SSRF pre-check may not match reqwest/Chrome egress",
         tool_label
     );
-    Ok(Some(format!(
-        "[SSRF / proxy] HTTP(S) proxy environment variables are set. DNS-based SSRF validation may not match how this request reaches the host via reqwest or Chrome. Unset HTTP_PROXY/HTTPS_PROXY/ALL_PROXY for the mac-stats process if you need strict SSRF semantics.\n"
-    )))
+    Ok(Some("[SSRF / proxy] HTTP(S) proxy environment variables are set. DNS-based SSRF validation may not match how this request reaches the host via reqwest or Chrome. Unset HTTP_PROXY/HTTPS_PROXY/ALL_PROXY for the mac-stats process if you need strict SSRF semantics.\n".to_string()))
 }
 
 /// Whether to inject model-facing proxy warnings for a server-side HTTP fetch.

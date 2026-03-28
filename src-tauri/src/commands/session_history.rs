@@ -116,7 +116,7 @@ pub(crate) async fn prepare_conversation_history(
                     .map(|s| !s.trim().is_empty())
                     .unwrap_or(false);
                 let skip_after_for_having_fun = discord_reply_channel_id
-                    .is_some_and(|ch| crate::discord::is_discord_channel_having_fun(ch));
+                    .is_some_and(crate::discord::is_discord_channel_having_fun);
                 if !skip_after_for_having_fun {
                     run_after_compaction_fire_and_forget(
                         hook_src,

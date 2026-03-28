@@ -228,14 +228,16 @@ fn push_cdp_diagnostic_event(
 type CdpDiagListenerWeak =
     std::sync::Weak<dyn headless_chrome::browser::tab::EventListener<Event> + Send + Sync>;
 
-/// Enable CDP Log + Runtime, register bounded diagnostic listener. Caller must remove listener and disable domains when done.
-fn try_attach_bounded_cdp_page_diagnostics(
-    tab: &headless_chrome::Tab,
-) -> Option<(
+type CdpPageDiagnosticsHandles = (
     Arc<Mutex<VecDeque<String>>>,
     Arc<Mutex<VecDeque<String>>>,
     CdpDiagListenerWeak,
-)> {
+);
+
+/// Enable CDP Log + Runtime, register bounded diagnostic listener. Caller must remove listener and disable domains when done.
+fn try_attach_bounded_cdp_page_diagnostics(
+    tab: &headless_chrome::Tab,
+) -> Option<CdpPageDiagnosticsHandles> {
     let console_buf: Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
     let exc_buf: Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
     let c = Arc::clone(&console_buf);
@@ -792,7 +794,7 @@ fn connect_browser_to_ws_url(ws_url: &str) -> Result<Browser, String> {
     let inferred_port = Url::parse(ws_url)
         .ok()
         .and_then(|u| u.port())
-        .unwrap_or_else(|| crate::config::Config::browser_cdp_port());
+        .unwrap_or_else(crate::config::Config::browser_cdp_port);
     let ws_redacted = cdp_url::redact_cdp_url(ws_url);
 
     let cdp_transport_idle =
@@ -2802,7 +2804,7 @@ fn cdp_viewport_click_point_from_box_model(
     if o.model.content.len() < 8 {
         return None;
     }
-    let q: Vec<f64> = o.model.content.iter().map(|x| *x as f64).collect();
+    let q: Vec<f64> = o.model.content.to_vec();
     pick_viewport_click_point_from_content_quads(std::slice::from_ref(&q), sx, sy, vw, vh)
 }
 
@@ -2951,11 +2953,7 @@ fn cdp_viewport_point_for_object_id(
         object_id: Some(object_id.to_string()),
     }) {
         if !o.quads.is_empty() {
-            let quads: Vec<Vec<f64>> = o
-                .quads
-                .iter()
-                .map(|q| q.iter().map(|x| *x as f64).collect())
-                .collect();
+            let quads: Vec<Vec<f64>> = o.quads.iter().map(|q| q.to_vec()).collect();
             pt = pick_viewport_click_point_from_content_quads(&quads, sx, sy, vw, vh);
         }
     }
@@ -3189,7 +3187,7 @@ fn resolve_interactable_for_action(
             if let Some(ref exp) = expected_entry {
                 if let Some(stored) = exp.backend_dom_node_id {
                     match backend_id_for_object_id(tab, &oid) {
-                        Ok(cur) if cur == stored => return Ok(oid),
+                        Ok(cur) if cur == stored => Ok(oid),
                         Ok(_) => {
                             mac_stats_info!(
                                 "browser/cdp",
@@ -3197,7 +3195,7 @@ fn resolve_interactable_for_action(
                                 tool,
                                 index
                             );
-                            return remap_interactable_action(tab, tool, index, exp);
+                            remap_interactable_action(tab, tool, index, exp)
                         }
                         Err(e) => {
                             mac_stats_debug!(
@@ -3206,11 +3204,11 @@ fn resolve_interactable_for_action(
                                 tool,
                                 e
                             );
-                            return Ok(oid);
+                            Ok(oid)
                         }
                     }
                 } else {
-                    return Ok(oid);
+                    Ok(oid)
                 }
             } else {
                 Ok(oid)
@@ -3754,7 +3752,12 @@ fn try_enforce_browser_tab_limit(browser: &Browser, keep: &Arc<headless_chrome::
         truncate_target_id_for_log(keep_id_str)
     );
     let mut closed_total: u32 = 0;
+    // After a close, TargetDestroyed can lag; stale Arc<Tab> handles then yield -32602 on the next close.
+    const MAX_STALE_SESSION_RETRIES: u32 = 32;
+    let mut stale_session_strikes: u32 = 0;
     loop {
+        browser.prune_stale_tabs();
+        browser.register_missing_tabs();
         let tabs_guard = match browser.get_tabs().lock() {
             Ok(t) => t,
             Err(e) => {
@@ -3792,10 +3795,33 @@ fn try_enforce_browser_tab_limit(browser: &Browser, keep: &Arc<headless_chrome::
             break;
         };
         if let Err(e) = tclose.close(false) {
-            warn_browser_tab_limit_enforcement_skipped(&e.to_string());
+            let msg = e.to_string();
+            let stale_session =
+                msg.contains("-32602") || msg.to_lowercase().contains("no session with given id");
+            if stale_session {
+                stale_session_strikes = stale_session_strikes.saturating_add(1);
+                mac_stats_debug!(
+                    "browser/cdp",
+                    "Browser agent [CDP]: managed tab cap: close got stale CDP session ({}); pruning tab list and retrying (attempt {}/{})",
+                    msg,
+                    stale_session_strikes,
+                    MAX_STALE_SESSION_RETRIES
+                );
+                browser.prune_stale_tabs();
+                browser.register_missing_tabs();
+                if stale_session_strikes >= MAX_STALE_SESSION_RETRIES {
+                    warn_browser_tab_limit_enforcement_skipped(&msg);
+                    break;
+                }
+                continue;
+            }
+            warn_browser_tab_limit_enforcement_skipped(&msg);
             break;
         }
+        stale_session_strikes = 0;
         closed_total = closed_total.saturating_add(1);
+        browser.prune_stale_tabs();
+        browser.register_missing_tabs();
         let new_len = browser
             .get_tabs()
             .lock()
@@ -4162,10 +4188,7 @@ pub(super) fn notify_target_renderer_crashed_side(crashed_target_id: &str) {
         let Ok(g) = active_tab_target_id_store().lock() else {
             return;
         };
-        match g.as_deref() {
-            Some(s) if s == crashed_target_id => true,
-            _ => false,
-        }
+        matches!(g.as_deref(), Some(s) if s == crashed_target_id)
     };
     if !is_active {
         return;
@@ -4205,12 +4228,12 @@ fn truncate_target_id_for_log(id: &str) -> String {
 /// listener, **`browser/cdp`** WARN, session clear. Callers should **wait briefly** before process exit
 /// so the side WebSocket thread can handle the event and flush logs.
 pub fn debug_page_crash_current_automation_tab() -> Result<String, String> {
-    with_connection_retry(|| debug_page_crash_current_automation_tab_inner())
+    with_connection_retry(debug_page_crash_current_automation_tab_inner)
 }
 
 fn debug_page_crash_current_automation_tab_inner() -> Result<String, String> {
     // Use `get_current_tab` so empty Chrome gets `about:blank` bootstrap (same as BROWSER_* tools).
-    let (_browser, tab) = get_current_tab()?;
+    let (browser, tab) = get_current_tab()?;
     let tid = tab.get_target_id().clone();
     let tid_log = truncate_target_id_for_log(&tid);
     mac_stats_info!(
@@ -4218,12 +4241,33 @@ fn debug_page_crash_current_automation_tab_inner() -> Result<String, String> {
         "Browser agent [CDP]: debug smoke — sending Page.crash for automation tab target_id={}",
         tid_log
     );
-    tab.call_method(Page::Crash(None))
-        .map_err(|e| format!("Page.crash: {}", e))?;
-    Ok(format!(
+    let tab_for_crash = Arc::clone(&tab);
+    std::thread::spawn(move || {
+        if let Err(e) = tab_for_crash.call_method(Page::Crash(None)) {
+            mac_stats_warn!(
+                "browser/cdp",
+                "Browser agent [CDP]: debug smoke — Page.crash worker finished with error (session may already be cleared): {}",
+                e
+            );
+        }
+    });
+    std::thread::sleep(DEBUG_PAGE_CRASH_SMOKE_SETTLE);
+    let msg = format!(
         "Page.crash sent for automation tab target_id={} (check ~/.mac-stats/debug.log for browser/cdp WARN Target.targetCrashed; wait ~1s before exit so the side listener can run)",
         tid_log
-    ))
+    );
+    // After a renderer crash, `clear_cached_browser_session` drops the session `Browser` on the side
+    // listener thread. Dropping our local `Tab` / `Browser` clones often blocks inside headless_chrome
+    // (wedged CDP I/O) — including on a **spawned** drop thread, which could still interact badly with
+    // tracing / internal locks before `main` prints and `process::exit(0)`. This CLI path exits the
+    // process immediately after a short sleep; leak the handles intentionally (OS reaps Chrome).
+    std::mem::forget(tab);
+    std::mem::forget(browser);
+    mac_stats_debug!(
+        "browser/cdp",
+        "Browser agent [CDP]: debug smoke — Page.crash fired on worker thread; skipped Tab/Browser drop (mem::forget; process exits next)"
+    );
+    Ok(msg)
 }
 
 fn launch_mutex() -> &'static Mutex<()> {
@@ -5102,6 +5146,12 @@ const BROWSER_CDP_HEALTH_CHECK_TIMEOUT: Duration = Duration::from_secs(2);
 /// `headless_chrome` already waits up to 20s for target attach; this bounds **stuck** `CreateTarget` /
 /// WebSocket paths that would otherwise block the tool indefinitely (e.g. confused external Chrome on CDP).
 const BROWSER_NEW_TAB_BOOTSTRAP_TIMEOUT: Duration = Duration::from_secs(25);
+
+/// Wall-clock pause after firing **`Page.crash`** on a worker thread so **`Target.targetCrashed`**
+/// reaches the side listener and session clear runs before the CLI prints and exits.
+/// We intentionally **do not** wait for the main CDP transport’s **`Page.crash`** command response: after
+/// the renderer dies it may never arrive, which would hang a `recv_timeout` / `call_method` wait forever.
+const DEBUG_PAGE_CRASH_SMOKE_SETTLE: Duration = Duration::from_millis(900);
 
 /// Max wait for `Runtime.evaluate("document.readyState")` before screenshot capture.
 const BROWSER_DOCUMENT_READY_LIVENESS_TIMEOUT: Duration = Duration::from_secs(3);
@@ -6137,6 +6187,7 @@ fn resource_timing_resource_count(tab: &headless_chrome::Tab) -> Option<u32> {
 ///
 /// `post_nav_network_in_flight`: when `Some`, caller must have attached the listener **before**
 /// starting navigation (see [`prepare_post_nav_network_idle_tracking`]).
+#[allow(clippy::too_many_arguments)]
 fn synchronize_tab_after_cdp_navigation(
     tab: &headless_chrome::Tab,
     prev_url: &str,
@@ -6527,7 +6578,7 @@ fn reconcile_post_navigate_tab_focus(
     if n == 1 {
         let tabs_guard = browser.get_tabs().lock().map_err(|e| e.to_string())?;
         let t = tabs_guard
-            .get(0)
+            .first()
             .cloned()
             .ok_or_else(|| "No tab in browser".to_string())?;
         drop(tabs_guard);
@@ -6786,9 +6837,9 @@ fn new_tab_with_bootstrap_timeout(browser: &Browser) -> Result<Arc<headless_chro
             mac_stats_warn!("browser/cdp", "Browser agent [CDP]: {}", msg);
             Err(msg)
         }
-        Err(mpsc::RecvTimeoutError::Disconnected) => Err(
-            "Browser unresponsive: tab bootstrap thread ended unexpectedly".to_string(),
-        ),
+        Err(mpsc::RecvTimeoutError::Disconnected) => {
+            Err("Browser unresponsive: tab bootstrap thread ended unexpectedly".to_string())
+        }
     }
 }
 
@@ -7646,9 +7697,7 @@ fn hover_by_index_inner(index: u32) -> Result<(String, Vec<PathBuf>), String> {
         }
     };
     let new_tab_note = new_tabs_opened_notice(&browser, n_before);
-    if let Err(e) = assert_final_document_url_ssrf_post_check(tab.get_url().as_str(), None) {
-        return Err(e);
-    }
+    assert_final_document_url_ssrf_post_check(tab.get_url().as_str(), None)?;
     let mut state = match get_browser_state(&tab) {
         Ok(s) => s,
         Err(e) => {

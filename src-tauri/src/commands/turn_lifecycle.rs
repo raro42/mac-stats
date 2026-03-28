@@ -135,7 +135,7 @@ pub async fn finalize_turn_timeout(
                 ),
             }
         });
-        match tokio::time::timeout(grace, async { cleanup.await }).await {
+        match tokio::time::timeout(grace, cleanup).await {
             Ok(Ok(())) => {}
             Ok(Err(e)) => mac_stats_warn!(
                 "ollama/chat",

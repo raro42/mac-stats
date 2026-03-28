@@ -72,9 +72,7 @@ fn segment_looks_like_tool_result(seg: &str) -> bool {
 fn content_looks_like_tool_bundle(content: &str) -> bool {
     let t = content.trim();
     if t.contains("\n\n---\n\n") {
-        return t
-            .split("\n\n---\n\n")
-            .any(|seg| segment_looks_like_tool_result(seg));
+        return t.split("\n\n---\n\n").any(segment_looks_like_tool_result);
     }
     segment_looks_like_tool_result(t)
 }

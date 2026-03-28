@@ -13,18 +13,10 @@ use crate::config::Config;
 use crate::debug2;
 use crate::mac_stats_info;
 
+#[derive(Default)]
 struct KeyWaiters {
     busy: bool,
     waiters: VecDeque<tokio::sync::oneshot::Sender<()>>,
-}
-
-impl Default for KeyWaiters {
-    fn default() -> Self {
-        Self {
-            busy: false,
-            waiters: VecDeque::new(),
-        }
-    }
 }
 
 struct OllamaQueueState {

@@ -72,7 +72,7 @@ fn finish_router_failure(e: OllamaRunError, record_metrics: bool) -> OllamaRunEr
 ///     ..Default::default()
 /// }).await?;
 /// ```
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct OllamaRequest {
     pub question: String,
     pub status_tx: Option<tokio::sync::mpsc::UnboundedSender<String>>,
@@ -133,49 +133,6 @@ pub struct OllamaRequest {
     pub ollama_queue_wait_hook: Option<std::sync::Arc<dyn Fn() + Send + Sync>>,
     /// When set, drop this invocation if older than the session abort cutoff (scheduler due time, heartbeat tick, etc.).
     pub inbound_stale_guard: Option<crate::commands::abort_cutoff::InboundStaleGuard>,
-}
-
-impl Default for OllamaRequest {
-    fn default() -> Self {
-        Self {
-            question: String::new(),
-            status_tx: None,
-            discord_reply_channel_id: None,
-            discord_user_id: None,
-            discord_user_name: None,
-            model_override: None,
-            options_override: None,
-            skill_content: None,
-            agent_override: None,
-            allow_schedule: false,
-            conversation_history: None,
-            escalation: false,
-            retry_on_verification_no: false,
-            from_remote: false,
-            attachment_images_base64: None,
-            discord_intermediate: None,
-            is_verification_retry: false,
-            original_user_request: None,
-            success_criteria_override: None,
-            discord_is_dm: None,
-            request_id_override: None,
-            retry_count: 0,
-            discord_draft: None,
-            heartbeat_system_append: None,
-            compaction_hook_source: None,
-            compaction_hook_session_id: None,
-            emit_compaction_cpu_ui: false,
-            partial_progress_capture: None,
-            turn_deadline: None,
-            turn_timeout_secs: None,
-            run_error_boundary_retry_done: false,
-            skip_ollama_run_error_metrics: false,
-            skip_ollama_queue: false,
-            ollama_queue_key: None,
-            ollama_queue_wait_hook: None,
-            inbound_stale_guard: None,
-        }
-    }
 }
 
 /// Main orchestrator: plan → execute tools → verify → optionally retry.

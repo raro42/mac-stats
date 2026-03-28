@@ -242,4 +242,17 @@ mod tests {
             "Navigation failed: the target page did not load."
         ));
     }
+
+    /// HTTP-fallback-only / combined-failure paths pass `cdp_used=false` so the model is not told a WS existed.
+    #[test]
+    fn http_only_browser_error_context_uses_cdp_not_used_label() {
+        assert_eq!(
+            crate::browser_agent::format_last_browser_error_context(false, None).as_deref(),
+            Some("context: cdp=not_used")
+        );
+        assert_eq!(
+            crate::browser_agent::format_last_browser_error_context(false, Some(false)).as_deref(),
+            Some("context: cdp=not_used navchg=0")
+        );
+    }
 }

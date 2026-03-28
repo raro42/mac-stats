@@ -132,6 +132,7 @@ fn should_draw_index_label(i: &Interactable) -> bool {
     visible_label_text(i).chars().count() <= 3
 }
 
+#[allow(clippy::too_many_arguments)]
 fn draw_label_with_outline(
     img: &mut RgbImage,
     x: i32,

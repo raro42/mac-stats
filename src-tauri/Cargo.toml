@@ -1,6 +1,6 @@
 [package]
 name = "mac_stats"
-version = "0.1.68"
+version = "0.1.69"
 description = "Local AI agent for macOS (Rust + Tauri): Ollama chat, Discord bot, task runner, scheduler, MCP—all on your Mac. No cloud, no telemetry. Menu bar shows CPU/GPU/RAM/disk when you need it; website monitoring and alerts. Built for minimal CPU overhead."
 authors = ["raro42"]
 edition = "2021"

@@ -230,10 +230,7 @@ fn build_paint_context_from_json_doc(
             continue;
         }
         let raw_bounds = bounds_row_from_json(bounds_arr.get(li)?)?;
-        let Some(bounds) = parse_bounds_css(
-            &raw_bounds.iter().map(|x| *x as f64).collect::<Vec<_>>(),
-            dpr,
-        ) else {
+        let Some(bounds) = parse_bounds_css(&raw_bounds.to_vec(), dpr) else {
             continue;
         };
         let po = paint_order_at(paint_orders.as_ref(), li);

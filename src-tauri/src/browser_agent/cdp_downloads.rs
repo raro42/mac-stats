@@ -348,7 +348,7 @@ pub fn format_download_attachment_note(paths: &[PathBuf]) -> String {
         let sz = fs::metadata(p).map(|m| m.len()).unwrap_or(0);
         s.push_str(&format!("{} ({}) ", p.display(), human_bytes(sz)));
     }
-    s.push_str("\n");
+    s.push('\n');
     for p in paths {
         s.push_str(&format!("[download: {}]\n", p.display()));
     }

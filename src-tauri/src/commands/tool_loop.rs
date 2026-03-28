@@ -423,10 +423,19 @@ pub(crate) async fn run_tool_loop(
             }
 
             if let Some(ref draft) = params.discord_draft {
-                if params.output_gate.as_ref().map_or(true, |g| {
-                    crate::commands::turn_lifecycle::gate_allows_send(g)
-                }) {
-                    draft.update(format!("Running {}…", tool));
+                if params
+                    .output_gate
+                    .as_ref()
+                    .is_none_or(crate::commands::turn_lifecycle::gate_allows_send)
+                {
+                    let progress = format!("Running {}…", tool);
+                    info!(
+                        target: "discord/draft",
+                        tool = %tool,
+                        chars = progress.chars().count(),
+                        "draft tool progress queued"
+                    );
+                    draft.update(progress);
                 }
             }
 

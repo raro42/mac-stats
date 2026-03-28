@@ -461,10 +461,9 @@ async fn probe_smc_blocking() -> FeatureHealth {
 async fn probe_ioreport_blocking() -> FeatureHealth {
     let (tx, rx) = oneshot::channel::<bool>();
     std::thread::spawn(move || {
-        let ok =
-            std::thread::spawn(|| crate::ffi::ioreport::probe_cpu_performance_channels_available())
-                .join()
-                .unwrap_or(false);
+        let ok = std::thread::spawn(crate::ffi::ioreport::probe_cpu_performance_channels_available)
+            .join()
+            .unwrap_or(false);
         let _ = tx.send(ok);
     });
     match tokio::time::timeout(PROBE_TIMEOUT, rx).await {

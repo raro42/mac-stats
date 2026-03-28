@@ -256,8 +256,8 @@ pub(crate) async fn maybe_run_prefetch_section(
     }
     let q: String = q.chars().take(500).collect();
     let bin = Config::ori_binary();
-    let limit = Config::ori_prefetch_top_k().max(1).min(20);
-    let timeout = Duration::from_secs(Config::ori_prefetch_timeout_secs().max(1).min(60));
+    let limit = Config::ori_prefetch_top_k().clamp(1, 20);
+    let timeout = Duration::from_secs(Config::ori_prefetch_timeout_secs().clamp(1, 60));
 
     let vault_owned = vault.to_path_buf();
     let out = tokio::time::timeout(
@@ -414,7 +414,7 @@ pub(crate) fn maybe_capture_compaction_fire_and_forget(
     if ori_skip_automation_sources(hook_source) {
         return;
     }
-    if discord_channel_id.is_some_and(|ch| crate::discord::is_discord_channel_having_fun(ch)) {
+    if discord_channel_id.is_some_and(crate::discord::is_discord_channel_having_fun) {
         return;
     }
     let mode = Config::ori_compaction_capture_mode();
@@ -427,7 +427,7 @@ pub(crate) fn maybe_capture_compaction_fire_and_forget(
 
     let excerpt = match mode.as_str() {
         "full_lessons_duplicate" => lesson_text.to_string(),
-        "excerpt_to_ori" | _ => {
+        _ => {
             let capped = lesson_text.chars().take(6000).collect::<String>();
             format!(
                 "mac-stats compaction excerpt (request {})\n\n{}",

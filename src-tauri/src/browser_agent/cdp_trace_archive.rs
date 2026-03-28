@@ -221,7 +221,7 @@ impl TraceSocket {
 
 enum RecorderState {
     Idle,
-    Recording(TraceSocket),
+    Recording(Box<TraceSocket>),
 }
 
 static RECORDER: OnceLock<Mutex<RecorderState>> = OnceLock::new();
@@ -347,7 +347,7 @@ pub(crate) fn maybe_start_recording_after_cdp_session_ready() {
         "CDP trace: Tracing.start OK (session_id={}, ReturnAsStream json); will finalize on browser session end or idle eviction",
         sid
     );
-    *guard = RecorderState::Recording(ts);
+    *guard = RecorderState::Recording(Box::new(ts));
 }
 
 /// Stop tracing, persist under `~/.mac-stats/traces/`, prune retention; best-effort (logs on failure).
@@ -357,10 +357,11 @@ pub(crate) fn stop_and_persist_best_effort(ws_url_hint: Option<&str>, reason: &s
         Ok(g) => g,
         Err(_) => return,
     };
-    let RecorderState::Recording(mut ts) = std::mem::replace(&mut *guard, RecorderState::Idle)
+    let RecorderState::Recording(ts_box) = std::mem::replace(&mut *guard, RecorderState::Idle)
     else {
         return;
     };
+    let mut ts = *ts_box;
     drop(guard);
 
     set_tcp_read_timeout(ts.socket.get_mut(), Some(Duration::from_secs(120)));

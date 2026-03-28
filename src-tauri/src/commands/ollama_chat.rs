@@ -91,9 +91,7 @@ pub async fn send_ollama_chat_messages(
     queue: OllamaHttpQueue,
 ) -> Result<crate::ollama::ChatResponse, String> {
     with_ollama_http_queue(queue, || async move {
-        if let Err(e) = crate::ollama::ollama_http_circuit_allow() {
-            return Err(e);
-        }
+        crate::ollama::ollama_http_circuit_allow()?;
         let messages_retry = messages.clone();
         let mo = model_override.clone();
         let oo = options_override.clone();
@@ -300,9 +298,7 @@ pub async fn send_ollama_chat_messages_streaming(
     queue: OllamaHttpQueue,
 ) -> Result<crate::ollama::ChatResponse, String> {
     with_ollama_http_queue(queue, || async move {
-        if let Err(e) = crate::ollama::ollama_http_circuit_allow() {
-            return Err(e);
-        }
+        crate::ollama::ollama_http_circuit_allow()?;
         let messages_retry = messages.clone();
         let mo = model_override.clone();
         let oo = options_override.clone();

@@ -2422,9 +2422,18 @@ async fn run_discord_ollama_router_locked(
 
     let chunks = outbound_pipeline::split_discord_reply(&reply, directive_split_long);
     if let Some(draft) = discord_draft.as_ref() {
-        if !chunks.is_empty() {
-            draft.flush(&chunks[0]).await;
-        }
+        const EMPTY_REPLY_FALLBACK: &str = "(No reply text.)";
+        let first_chunk = chunks.first().map(|s| s.as_str()).unwrap_or("");
+        let first = if first_chunk.trim().is_empty() {
+            info!(
+                target: "discord/draft",
+                "draft flush using empty-reply fallback (trimmed reply was empty)"
+            );
+            EMPTY_REPLY_FALLBACK
+        } else {
+            first_chunk
+        };
+        draft.flush(first).await;
     }
 
     let send_chunks: &[_] = if discord_draft.is_some() {

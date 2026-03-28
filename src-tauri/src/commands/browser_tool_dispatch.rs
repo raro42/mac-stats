@@ -491,6 +491,10 @@ pub(crate) async fn handle_browser_navigate(
                                 Ok(Err(http_err)) => {
                                     let nav_url_changed =
                                         nav_url_changed_hint_if_navigation_timeout(&cdp_err2);
+                                    crate::mac_stats_info!(
+                                        "browser/tools",
+                                        "BROWSER_NAVIGATE: CDP failed after retry and HTTP fallback also failed (combined failure; operator grep: cdp=not_used in tool text)"
+                                    );
                                     let base = format!(
                                         "BROWSER_NAVIGATE failed (CDP: {}). HTTP fallback also failed: {}",
                                         crate::logging::ellipse(&cdp_err2, 80),
