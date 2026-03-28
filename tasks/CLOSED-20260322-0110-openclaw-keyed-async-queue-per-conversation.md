@@ -192,3 +192,15 @@ rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs
 - `rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs` — líneas 1143, 1347, 1934 (`run_serial`) y 2310 (`ollama_queue_key` con `discord:{}`).
 
 **Outcome:** Criterios de aceptación cumplidos. Archivo renombrado **TESTING- → CLOSED-** tras este informe. Discord en vivo no probado.
+
+## Test report (corrida — agente Cursor, segundo pase 2026-03-28)
+
+**Date:** 2026-03-28, hora local del sistema donde se ejecutó `cargo` (sin UTC explícito).
+
+**Preflight / nombres:** Tarea pedida: `tasks/UNTESTED-20260322-0110-openclaw-keyed-async-queue-per-conversation.md` (sin otro `UNTESTED-*`). Solo existía `CLOSED-…`; cadena **CLOSED → UNTESTED → TESTING** para cumplir `003-tester/TESTER.md`.
+
+**Commands run:** `cargo check`, `cargo test keyed_queue`, `cargo test` en `src-tauri/` — **pass** (854 tests en el crate de biblioteca `mac_stats`; 1 doc-test ignorado).
+
+**Static spot-check:** `rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs` — **pass** (1143, 1347, 1934, 2310).
+
+**Outcome:** Criterios cumplidos; archivo **TESTING- → CLOSED-** tras este informe. Discord en vivo no probado.

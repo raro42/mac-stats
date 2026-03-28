@@ -158,3 +158,18 @@ Optional: `cargo test` (full run) if time permits.
 | Tests lib (opcional) | `cd src-tauri && cargo test -p mac_stats --lib` | **pass** — 854 passed, 0 failed |
 
 **Outcome:** **CLOSED** — criterios de aceptación sin cambios; verificación y tests en verde.
+
+## Test report
+
+**Date:** 2026-03-28 (hora local del host del workspace).
+
+**Preflight:** El operador citó `tasks/UNTESTED-20260322-2245-openclaw-bounded-console-page-error-diagnostics.md`; en disco solo existía `CLOSED-20260322-2245-openclaw-bounded-console-page-error-diagnostics.md`. Para cumplir `003-tester/TESTER.md` (transición `UNTESTED→TESTING`), se renombró `CLOSED-…` → `UNTESTED-…` → `TESTING-…`. No se usó ningún otro `UNTESTED-*` en esta ejecución.
+
+| Paso | Comando | Resultado |
+|------|---------|-----------|
+| Símbolos / cableado | `rg "try_attach_bounded_cdp_page_diagnostics|DIAG_MAX_CONSOLE_LINES|push_bounded_dedup|format_bounded_page_diagnostics_tool_section|browser_include_diagnostics_in_state" src-tauri/src/browser_agent/mod.rs src-tauri/src/config/mod.rs` | **pass** |
+| Compilación | `cd src-tauri && cargo check` | **pass** |
+| Binarios de test | `cd src-tauri && cargo test --no-run` | **pass** |
+| Tests lib (opcional) | `cd src-tauri && cargo test -p mac_stats --lib` | **pass** — 854 passed, 0 failed |
+
+**Outcome:** **CLOSED** — criterios de aceptación sin cambios; verificación y tests en verde.

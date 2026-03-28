@@ -192,3 +192,21 @@ rg -n "DEFAULT_SECS: u64 = (300|180)" src-tauri/src/config/mod.rs | head
 **Static alignment:** `agent_session_limits.rs` matrix (Ollama HTTP 300s; wall-clock Discord 300s / in-app 180s / remote 300s; max 48h in doc; 15 tool iterations) matches `docs/019` and `Config` defaults.
 
 **Outcome:** All acceptance criteria satisfied. File renamed **`TESTING-…` → `CLOSED-…`** after this report.
+
+### Test report — 2026-03-28 (003-tester; local; not UTC)
+
+**Preflight:** El operador indicó solo `tasks/UNTESTED-20260322-1805-openclaw-agent-session-timeout-alignment.md`. Ese path **no existía** en el workspace; la tarea estaba como `CLOSED-20260322-1805-openclaw-agent-session-timeout-alignment.md`. Se aplicó **`CLOSED-…` → `TESTING-…`** como fase en curso según `003-tester/TESTER.md`. No se usó ningún otro archivo `UNTESTED-*`.
+
+**Commands run** (esta sesión)
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test` — **pass** (854 passed; 0 failed; 1 doc-test ignored en el crate `mac_stats`)
+
+**Optional spot-checks**
+
+- `docs/019_agent_session_and_memory.md`: sección **Two different clocks** — `ollamaChatTimeoutSecs` vs `agentRouterTurnTimeoutSecs*`; 300s por petición; 300s Discord/remote y 180s in-app; tope **48h** (`172800` s).
+- `src-tauri/src/config/mod.rs`: `DEFAULT_SECS` **300** (`ollama_chat_timeout_secs`, ~484), **300 / 180 / 300** (`agent_router_turn_timeout_secs_discord` / `_ui` / `_remote`, ~533 / ~560 / ~587).
+
+**Static alignment:** La tabla en `agent_session_limits.rs` (Ollama HTTP 300s; wall-clock Discord 300s, in-app 180s, remote 300s; 15 iteraciones de herramientas; doc con cap 48h) coincide con `docs/019` y los valores por defecto de `Config`.
+
+**Outcome:** Todos los criterios de aceptación cumplidos. No se probó Discord/Ollama de extremo a extremo. Archivo renombrado **`TESTING-…` → `CLOSED-…`** tras este informe.

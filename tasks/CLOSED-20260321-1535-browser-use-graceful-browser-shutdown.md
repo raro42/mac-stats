@@ -153,3 +153,16 @@ rg -n "pub fn close_browser_session" src-tauri/src/browser_agent/mod.rs
 - `rg` on `src-tauri/src/browser_agent/mod.rs` (`pub fn close_browser_session`) — **pass** (line 4266)
 
 **Outcome:** All acceptance criteria satisfied. **Final filename:** `CLOSED-20260321-1535-browser-use-graceful-browser-shutdown.md`.
+
+### Tester run — 2026-03-28 (UTC)
+
+**Note:** El operador pidió probar solo `tasks/UNTESTED-20260321-1535-browser-use-graceful-browser-shutdown.md`; ese archivo no existe en el workspace (la tarea estaba como `CLOSED-20260321-1535-browser-use-graceful-browser-shutdown.md`). Según `003-tester/TESTER.md`: se renombró `CLOSED-` → `TESTING-`, se ejecutó la verificación, se añade este informe y se vuelve a `CLOSED-` si todo pasa.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test` — **pass** (854 passed, 0 failed en tests de la librería `mac_stats`; 1 doc-test ignored)
+- `rg` en `src-tauri/src/lib.rs` (`close_browser_session`, `RunEvent::Exit`, `ctrlc::set_handler`) — **pass** (líneas 236–239, 1681–1686)
+- `rg` en `src-tauri/src/browser_agent/mod.rs` (`pub fn close_browser_session`) — **pass** (línea 4266)
+
+**Outcome:** Todos los criterios de aceptación satisfechos. **Nombre final:** `CLOSED-20260321-1535-browser-use-graceful-browser-shutdown.md`.
