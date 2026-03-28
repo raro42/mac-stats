@@ -231,16 +231,16 @@ Optional smoke (requires browser tools enabled + reachable Chrome on debug port)
 - **Smoke CLI (`--browser-debug-crash-tab`):** no ejecutado (opcional según el cuerpo de la tarea).
 - **Outcome:** Criterios 1–4 cumplidos → **`TESTING-…` → `CLOSED-…`**.
 
-## Test report (2026-03-28 — `003-tester/TESTER.md`, corrida: `UNTESTED-20260322-1710-…` nombrado; verificación re-ejecutada)
+## Test report (2026-03-28 — `003-tester/TESTER.md`, agente Cursor; única tarea `UNTESTED-20260322-1710-…`)
 
 - **Fecha / zona:** 2026-03-28, hora local del entorno donde se ejecutaron los comandos (no UTC fijada).
-- **Preflight:** `tasks/UNTESTED-20260322-1710-browser-use-target-crashed-cdp-session-recovery.md` **no existía**; el archivo estaba como `CLOSED-…`. **`CLOSED-…` → `TESTING-…`** antes de los comandos. Ningún otro `UNTESTED-*` en esta corrida.
+- **Preflight:** `tasks/UNTESTED-20260322-1710-browser-use-target-crashed-cdp-session-recovery.md` **no existía**; el archivo estaba como `CLOSED-…`. Se aplicó **`CLOSED-…` → `TESTING-…`**, verificación, informe y cierre. No se usó ningún otro `UNTESTED-*`.
 
 | Step | Command | Result |
 |------|---------|--------|
 | Check | `cd src-tauri && cargo check` | **pass** — `Finished dev profile … in 0.20s` |
-| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed; finished in 1.16s |
-| Symbols | Búsqueda `rg` de `targetCrashed`, `notify_target_renderer_crashed_side`, `spawn_target_crash_side_listener`, `debug_page_crash_current_automation_tab` en `cdp_target_crash_listener.rs`, `browser_agent/mod.rs`, `main.rs` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed; finished in 1.77s (wall; resultado de test 1.16s) |
+| Symbols | `rg` / búsqueda de `targetCrashed`, `notify_target_renderer_crashed_side`, `spawn_target_crash_side_listener`, `debug_page_crash_current_automation_tab` en `src/browser_agent/cdp_target_crash_listener.rs`, `src/browser_agent/mod.rs`, `src/main.rs` | **pass** |
 
 - **Smoke CLI (`--browser-debug-crash-tab`):** no ejecutado (opcional según el cuerpo de la tarea).
-- **Outcome:** Criterios 1–4 cumplidos → **`TESTING-…` → `CLOSED-…`**.
+- **Outcome:** Criterios de aceptación 1–4 cumplidos → **`TESTING-…` → `CLOSED-…`**.
