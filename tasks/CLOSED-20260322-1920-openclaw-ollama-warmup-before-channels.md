@@ -58,3 +58,20 @@ cd src-tauri && cargo check
 **`git diff` / `CHANGELOG.md` [0.1.69] / `006-feature-coder/FEATURE-CODER.md`:** sin **FEAT-D\*** nuevos atribuibles solo a esta tarea de orden de arranque Ollama; re-verificación mecánica del gate.
 
 **Outcome:** Sigue **`CLOSED-`**.
+
+### Run: 2026-03-28 (closing reviewer — verify #3, agent)
+
+**Alcance:** Petición **`tasks/TESTING-20260322-1920-openclaw-ollama-warmup-before-channels.md`** = misma tarea por slug; ese path **`TESTING-`** no existe en el árbol. Con **`cargo check`**, **clippy `-D warnings`**, **`cargo test`** y **`cargo build --release`** en verde → el prefijo correcto sigue siendo **`CLOSED-`** (no **`TESTED-`**, no atascado en **`TESTING-`**).
+
+**Commands run**
+
+- `rg -n 'ensure_ollama_agent_ready_at_startup|Ollama startup warmup finished' src-tauri/src/lib.rs` — **pass** (`block_on` + `ensure_ollama_agent_ready_at_startup().await` en L460–L462; log `mac_stats_startup` en L463–L466).
+- `rg -n 'spawn_discord_if_configured|spawn_scheduler_thread|spawn_heartbeat_thread' src-tauri/src/lib.rs` — **pass** (Discord L471, scheduler L475, heartbeat L478; **después** del warmup; task review `spawn_review_thread` L481).
+- `cd src-tauri && cargo check` — **pass**.
+- `cd src-tauri && cargo clippy --all-targets -- -D warnings` — **pass**.
+- `cd src-tauri && cargo test` — **pass** (**871** tests en `mac_stats` lib; **1** doc-test ignorado).
+- `cd src-tauri && cargo build --release` — **pass** (**v0.1.69**).
+
+**Runtime (opcional):** `pgrep -fl mac_stats` — **`target/release/mac_stats -vv`** en ejecución; sin **`pkill`** (**AGENTS.md**).
+
+**Outcome:** **`CLOSED-`** sin cambios de prefijo.

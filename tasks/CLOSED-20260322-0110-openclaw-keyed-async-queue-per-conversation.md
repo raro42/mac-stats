@@ -781,3 +781,21 @@ rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs
 - `rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs` — **pass** (lines 1143, 1347, 1934 `run_serial`; 2310 `ollama_queue_key` with `discord:{}`)
 
 **Outcome:** All acceptance criteria met. Renaming **TESTING- → CLOSED-** after this report. Live Discord not exercised.
+
+## Test report (corrida — agente Cursor, 2026-03-28, sesión adicional)
+
+**Date:** 2026-03-28, hora local del sistema donde se ejecutó `cargo` (no UTC explícito).
+
+**Preflight / nombres:** Tarea única: `tasks/UNTESTED-20260322-0110-openclaw-keyed-async-queue-per-conversation.md` (sin otro `UNTESTED-*`). Al inicio no existía ese path; el fichero era `CLOSED-20260322-0110-…`. Cadena **CLOSED → UNTESTED → TESTING** (mismo basename) según `003-tester/TESTER.md`. H1 **TESTING** durante `cargo`, restaurado a **CLOSED** antes de **TESTING- → CLOSED-**.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test keyed_queue` — **pass** (2 passed, 869 filtered)
+- `cd src-tauri && cargo test` — **pass** (871 passed, 0 failed; 1 doc-test ignored)
+
+**Static spot-check**
+
+- `rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs` — **pass** (1143, 1347, 1934, 2310 con `discord:{}`).
+
+**Outcome:** Criterios cumplidos; **TESTING- → CLOSED-** tras este informe. Discord en vivo no probado.
