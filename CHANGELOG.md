@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CDP `Target.targetCrashed` side listener** — WebSocket read loop no longer exits on **`WouldBlock`** / **`TimedOut`** from the **~400ms** TCP read timeout; exiting there could stop the listener shortly after the last CDP message and miss a later tab crash (e.g. **`--browser-debug-crash-tab`** smoke). (`browser_agent/cdp_target_crash_listener.rs`.)
 
 ### Changed
+- **Tasks / OpenClaw reviewer** — Additive **CLOSED** task notes under **`tasks/`** (~**+434** lines, **27** files: test reports, preflight, `cargo check` / targeted `cargo test`, `rg` wire checks, operator guidance). Independent reviewer re-run **`2026-03-28T11:02:41Z`**; **OpenClaw** **`HEAD`** unchanged **`55dc6a8bb28d`** (**Aligned**). (`tasks/`, `005-openclaw-reviewer/005-openclaw-reviewer.md`.)
 - **Scheduler / heartbeat agent router** — When **`heartbeat_system_append`** is present, skip the extra LLM call for success-criteria extraction and omit **MCP `tools/list`** when building agent descriptions (**`skip_mcp_tool_list`**), reducing subprocess/SSE work on the shared runtime during heartbeat turns. (`commands/ollama.rs`, `commands/agent_descriptions.rs`.)
 - **Browser agent** — **`BROWSER_NAVIGATE` `file://`** precheck debug line clarifies validated local HTML path. (`browser_agent/mod.rs`.)
 - **Docs** — Scheduler agent and browser automation notes. (`docs/009_scheduler_agent.md`, `docs/029_browser_automation.md`.)
