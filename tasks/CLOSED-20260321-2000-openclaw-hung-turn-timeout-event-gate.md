@@ -36,3 +36,13 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
   - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches in `ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`
 - **Acceptance criteria:** All satisfied (unchanged from prior report).
 - **Outcome:** **PASS** (filename unchanged: `CLOSED-…`)
+
+### Re-verify — 2026-03-28 (UTC)
+
+- **Operator target:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` — **not present**; only `tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` exists. Per `003-tester/TESTER.md`, no other `UNTESTED-*` file was selected. **Skipped** `UNTESTED` → `TESTING` rename (nothing to rename).
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (library crate: **871** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches in `ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs` (task body lists `src/`; Rust sources live under `src-tauri/src` in this repo)
+- **Acceptance criteria:** All satisfied.
+- **Outcome:** **PASS** — filename remains `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.

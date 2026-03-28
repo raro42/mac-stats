@@ -97,3 +97,29 @@ In **MentionOnly** channels, a human message that **replies** to a message autho
 **Manual Discord E2E** (steps 1–8 in task body): **not executed** (no live Discord in this environment).
 
 **Outcome:** **PASS** on implementation + preflight. Filename already **CLOSED-**; no rename to `TESTED-` or `WIP-`.
+
+---
+
+## Test report
+
+**Date:** 2026-03-28 UTC (tester run; operator path `tasks/UNTESTED-20260325-1128-discord-reply-to-bot-implicit-mention.md`)
+
+**Rename `UNTESTED→TESTING`:** **Skipped** — no `tasks/UNTESTED-20260325-1128-discord-reply-to-bot-implicit-mention.md` in this workspace. Same slug is `tasks/CLOSED-20260325-1128-discord-reply-to-bot-implicit-mention.md`; verification applied here.
+
+**Commands run**
+
+- `cd /Users/raro42/projects/mac-stats/src-tauri && cargo check` → **pass** (dev profile, 0 errors).
+- `cargo test outbound_attachment_path_allowlist -- --nocapture` → **pass** (`discord::tests::outbound_attachment_path_allowlist`).
+- `rg -n 'discord_mentions_bot_effective|mentions_bot_effective' src-tauri/src/discord/mod.rs` → lines 1852, 1956, 2016, 2796–2797, 2823 (router + MentionOnly gate).
+- `rg -n 'MentionOnly activation via message reference|could not resolve referenced message for implicit mention' src-tauri/src/discord/mod.rs` → lines 1867, 1888, 1901, 1915; `debug!` uses `target: "mac_stats::discord"`.
+
+**Acceptance criteria**
+
+1. **PASS** — `discord_mentions_bot_effective`: `referenced_message`, cache, `get_message` fallback, failure log string.
+2. **PASS** — MentionOnly path uses `mentions_bot_effective` (≈2823).
+3. **PASS** — Observability strings + `mac_stats::discord` target.
+4. **PASS** — `cargo check` succeeds.
+
+**Manual Discord E2E** (task steps 1–8): **not executed** in this environment.
+
+**Outcome rename:** **CLOSED-** retained (all numbered acceptance criteria + preflight pass). No `TESTED-`/`WIP-` rename.

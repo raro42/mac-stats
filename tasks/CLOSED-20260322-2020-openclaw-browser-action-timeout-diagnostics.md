@@ -2,7 +2,7 @@
 ## Triage summary (TOP)
 
 - **Coder (UTC):** 2026-03-28 — Implementación ya presente en `browser_agent/mod.rs`, `commands/browser_tool_dispatch.rs`, `commands/browser_helpers.rs`, `browser_doctor.rs`: mensajes de timeout CDP con pista de proxy, `context:` compacto con `navchg=0|1`, omisión de HTTP fallback cuando `is_cdp_navigation_timeout_error`, y `mac_stats --browser-doctor` para sondas CDP. Verificación local: `cargo check` y `cargo test` en `src-tauri/`. *(En el árbol no existe `002-coder-backend/CODER.md`; backlog de features: `006-feature-coder/FEATURE-CODER.md`.)*
-- **Next step:** Tester ejecuta **§4 Testing instructions**. El archivo `tasks/CLOSED-20260322-2020-openclaw-browser-action-timeout-diagnostics.md` queda solo como histórico repetido de ejecuciones anteriores; el ciclo actual es este `UNTESTED-*`.
+- **Next step:** Ninguno; última verificación tester: 2026-03-28 (automated §3 + rg §4).
 ---
 
 # OpenClaw-style browser action timeout diagnostics
@@ -118,3 +118,38 @@ rg -n "format_last_browser_error_context|navchg=|navigation_timeout_error_with_p
 ### Notes
 
 - Manual / smoke steps in §4.3 were **not** executed (optional per task); automated criteria §3.1–§3.3 are satisfied.
+
+---
+
+## Test report (follow-up run)
+
+- **Date:** 2026-03-28 (local, tester run; workspace: mac-stats)
+- **Preflight:** El nombre pedido `UNTESTED-20260322-2020-…` no existía en el árbol; la tarea estaba en `CLOSED-…`. Se aplicó el ciclo TESTER renombrando `CLOSED-` → `TESTING-` para esta ejecución.
+- **Outcome:** Pass (criterios automatizados §3.1–§3.3)
+
+### Commands run
+
+```bash
+cd src-tauri && cargo check
+cd src-tauri && cargo test
+```
+
+Spot-check estático (§4):
+
+```bash
+rg -n "format_last_browser_error_context|navchg=|navigation_timeout_error_with_proxy_hint|is_cdp_navigation_timeout_error|run_browser_doctor_stdio" \
+  src-tauri/src/browser_agent/mod.rs \
+  src-tauri/src/commands/browser_tool_dispatch.rs \
+  src-tauri/src/commands/browser_helpers.rs \
+  src-tauri/src/browser_doctor.rs
+```
+
+### Results
+
+- `cargo check`: exit 0.
+- `cargo test`: exit 0 — `871` passed, `0` failed; `commands::browser_helpers::tests::cdp_navigation_timeout_detection_matches_tool_errors` **ok**.
+- `rg` spot-check: símbolos presentes en los cuatro archivos listados.
+
+### Notes
+
+- Pasos manuales §4.3 **no** ejecutados (opcionales). Resultado final del archivo: `CLOSED-` (todos los criterios de aceptación automatizados cumplidos).

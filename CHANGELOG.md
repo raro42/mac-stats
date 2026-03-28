@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **Tasks / docs** — Additive **CLOSED** task notes (CDP health ping, in-page search/CSS query, hung-turn event gate, draft stream throttle, keyed async queue, Ori Mnemos lifecycle, Ollama warmup before channels, browser action timeout diagnostics, Discord reply-to-bot implicit mention) and a small **`docs/022_feature_review_plan.md`** touch-up.
+
 ## [0.1.69] - 2026-03-28
 
 ### Fixed

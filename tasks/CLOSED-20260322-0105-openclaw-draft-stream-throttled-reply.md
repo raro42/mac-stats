@@ -57,3 +57,14 @@ rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/com
   - `rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/commands/turn_lifecycle.rs src-tauri/src/commands/ollama.rs` — matches in all three files (import/struct/parameter as listed in grep output).
 - **Result:** **Pass** — automated acceptance criteria satisfied per task **Pass/fail criteria** (optional live Discord / throttle-override checks not run this run).
 - **Notes:** Throttle config/clamp in `config/mod.rs` and full draft behaviour were not re-validated end-to-end against Discord in this pass; only compile, unit tests, and static wiring as specified in **Verification**.
+
+### Tester run (2026-03-28 UTC, follow-up)
+
+- **Note:** On disk the task was already `CLOSED-*` (no `UNTESTED-*` with this slug); renamed `CLOSED` → `TESTING` to follow TESTER.md flow, then back to `CLOSED` after verification.
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass.
+  - `cd src-tauri && cargo test discord_draft_stream::` — pass (2 tests).
+  - `rg -n "spawn_discord_draft_editor" src-tauri/src/discord/mod.rs` — match at line 2172.
+  - `rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/commands/turn_lifecycle.rs src-tauri/src/commands/ollama.rs` — matches in all three files.
+- **Config:** `Config::discord_draft_throttle_ms()` in `config/mod.rs` documents clamp **200..=60_000** and env `MAC_STATS_DISCORD_DRAFT_THROTTLE_MS` / key `discord_draft_throttle_ms`.
+- **Result:** **Pass** — automated acceptance criteria satisfied; optional live Discord checks not run this pass.
