@@ -333,3 +333,11 @@ Skip or note **blocked** if no CDP browser is available; automated criteria 1–
 | Opcional CDP | `MAC_STATS_BROWSER_MAX_PAGE_TABS=3 cargo run --example managed_tab_cap_smoke` | **omitido** (sin Chromium/CDP en esta corrida; no bloquea criterios 1–4) |
 
 - **Outcome:** Criterios de aceptación 1–4 satisfechos → renombrar **`TESTING-…` → `CLOSED-…`**.
+
+---
+
+### Test report — corrida TESTER (2026-03-28, hora local; no UTC fijo; tarea pedida como `tasks/UNTESTED-20260322-1901-openclaw-managed-tab-cap-prune.md`)
+
+- **Preflight:** Esa ruta **no existe** (solo `CLOSED-…` en repo). Equivalente operativo: **`CLOSED-…` → `TESTING-…`**, verificación, luego **`TESTING-…` → `CLOSED-…`**. Ningún otro `UNTESTED-*` en esta corrida.
+- **Comandos:** `cargo check` y `cargo test --lib` en `src-tauri/` → **pass** (854 passed, 0 failed, ~1.16s). `rg` sobre `try_enforce_browser_tab_limit` en `src/browser_agent/mod.rs` → **pass** (def. L3715, 7 coincidencias con llamadas). `Config::browser_max_page_tabs` L1987, `examples/managed_tab_cap_smoke.rs` presente → **pass**. Ejemplo CDP opcional → **omitido** (sin Chromium/CDP; no bloquea 1–4).
+- **Outcome:** Criterios 1–4 OK → **`CLOSED-20260322-1901-openclaw-managed-tab-cap-prune.md`**.

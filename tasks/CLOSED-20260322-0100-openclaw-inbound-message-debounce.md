@@ -318,3 +318,19 @@ rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_b
 - `rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_batches_on_shutdown" src-tauri/src/discord/mod.rs` — coincidencias para `enqueue_or_run_router` (línea 2868) y `discard_pending_batches_on_shutdown` (línea 2918). `discord_message_bypasses_debounce` no aparece por nombre en `mod.rs` (definido y usado en `message_debounce.rs`), coherente con informes previos.
 
 **Outcome:** Criterios 1 y 2 cumplidos. Criterio 3: el `rg` literal de los tres identificadores en `mod.rs` encuentra dos; el bypass sigue en `message_debounce.rs`. Renombrado final del archivo de tarea: **`CLOSED-`** (no WIP).
+
+## Test report
+
+**Date:** 2026-03-28, hora local del host (fecha de pared: sábado 2026-03-28 según `user_info`).
+
+**Preflight / rename (TESTER.md paso 2):** `tasks/UNTESTED-20260322-0100-openclaw-inbound-message-debounce.md` **no existía**. Solo esta tarea; ningún otro `UNTESTED-*`. Equivalente al paso 2: `tasks/CLOSED-20260322-0100-openclaw-inbound-message-debounce.md` → `tasks/TESTING-20260322-0100-openclaw-inbound-message-debounce.md` antes de la verificación.
+
+**Commands run**
+
+- `cd src-tauri && cargo check && cargo test merge_empty && cargo test` — **pass** (`merge_empty`: `discord::message_debounce::merge_tests::merge_empty`; suite librería `mac_stats`: 854 passed, 0 failed; doc-tests: 1 ignored)
+
+**Static spot-check**
+
+- Búsqueda en `src-tauri/src/discord/mod.rs` de `enqueue_or_run_router`, `discord_message_bypasses_debounce`, `discard_pending_batches_on_shutdown` — coincidencias en **2868** (`enqueue_or_run_router`) y **2918** (`discard_pending_batches_on_shutdown`). `discord_message_bypasses_debounce` no aparece por nombre en `mod.rs` (definido/usado en `message_debounce.rs`), alineado con informes anteriores.
+
+**Outcome:** Criterios de compilación y tests cumplidos. Criterio estático literal en `mod.rs`: 2/3 identificadores; sin cambios de código. Tras este informe: renombrar **`TESTING-`** → **`CLOSED-`** (no **WIP-**).

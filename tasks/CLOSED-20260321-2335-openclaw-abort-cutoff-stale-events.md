@@ -322,3 +322,21 @@ rg -n "abort_cutoff::|StaleInboundAfterAbort" src-tauri/src/discord/mod.rs src-t
 
 **Outcome:** Todos los criterios de aceptación cumplidos. Tras este informe: `TESTING-*` → `CLOSED-*`. No se ejercitó en vivo el orden abort/retry Discord o scheduler frente a una instancia real de Ollama.
 
+## Test report
+
+**Date:** 2026-03-28 (local wall-clock; `user_info` Saturday Mar 28, 2026). Stated as local time; not normalized to UTC.
+
+**Rename (`003-tester/TESTER.md`):** `tasks/UNTESTED-20260321-2335-openclaw-abort-cutoff-stale-events.md` was not on disk. The task existed only as `CLOSED-20260321-2335-openclaw-abort-cutoff-stale-events.md`; it was renamed to `TESTING-20260321-2335-openclaw-abort-cutoff-stale-events.md` and the title set to `# TESTING —` for the active verification step. No other `UNTESTED-*` task file was used.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test abort_cutoff` — **pass** (4 tests in `commands::abort_cutoff::tests`)
+- `cd src-tauri && cargo test` — **pass** (854 passed, 0 failed in `mac_stats` lib; 1 doc-test ignored in another target)
+
+**Static spot-check**
+
+- `rg -n "abort_cutoff::|StaleInboundAfterAbort"` on `discord/mod.rs`, `scheduler/mod.rs`, `scheduler/heartbeat.rs`, `commands/ollama.rs` — **pass** (`clear_cutoff`, `should_skip`, `InboundStaleGuard`, `StaleInboundAfterAbort` present as expected).
+
+**Outcome:** All acceptance criteria satisfied. After this report: `TESTING-*` → `CLOSED-*`. Live Discord/scheduler abort ordering against a real Ollama instance was not exercised in this run.
+

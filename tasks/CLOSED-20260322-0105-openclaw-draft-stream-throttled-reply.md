@@ -481,3 +481,36 @@ rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/com
 | Manual opcional (Discord en vivo con herramientas) | **No ejecutado** |
 
 **Conclusión:** **CLOSED** — verificación automatizada y cableado según el bloque **Verification**; el archivo se renombra de nuevo a prefijo `CLOSED-…`.
+
+### Test report — TESTER.md pass (2026-03-28, Cursor agent; operator named UNTESTED-20260322-0105)
+
+**Date:** 2026-03-28, local (workspace mac-stats, agent shell).
+
+**Workflow**
+
+- **UNTESTED → TESTING:** `tasks/UNTESTED-20260322-0105-openclaw-draft-stream-throttled-reply.md` was **not present** in the repo; no other `UNTESTED-*` task was selected. The task file was `CLOSED-…`; it was renamed to `TESTING-…` for this pass (same id `20260322-0105`), then renamed back to `CLOSED-…` after verification.
+
+**Commands run**
+
+```bash
+cd src-tauri && cargo check
+cd src-tauri && cargo test discord_draft_stream::
+rg -n "spawn_discord_draft_editor" src-tauri/src/discord/mod.rs
+rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/commands/turn_lifecycle.rs src-tauri/src/commands/ollama.rs
+```
+
+**Results**
+
+| Check | Result |
+|-------|--------|
+| `cargo check` (src-tauri) | **Pass** (`Finished dev profile` in 0.20s) |
+| `cargo test discord_draft_stream::` | **Pass** — 2 tests: `clamp_under_limit_unchanged`, `clamp_truncates_with_ellipsis` |
+| `spawn_discord_draft_editor` in `discord/mod.rs` | **Pass** (line 2172) |
+| `DiscordDraftHandle` in `tool_loop.rs` | **Pass** (lines 14, 152) |
+| `DiscordDraftHandle` in `turn_lifecycle.rs` | **Pass** (lines 10, 95) |
+| `DiscordDraftHandle` in `ollama.rs` | **Pass** (line 109) |
+| Acceptance: `src-tauri/src/commands/discord_draft_stream.rs` | **Pass** (present) |
+| Acceptance: `discord_draft_throttle_ms()` / `MAC_STATS_DISCORD_DRAFT_THROTTLE_MS`, clamp `200..=60_000` | **Pass** (`config/mod.rs` lines 456–477) |
+| Optional manual (live Discord with tools) | **Not run** |
+
+**Conclusion:** **CLOSED** — automated acceptance and wiring checks pass; filename restored to `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md`.
