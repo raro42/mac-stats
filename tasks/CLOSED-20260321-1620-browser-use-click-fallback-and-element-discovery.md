@@ -498,3 +498,16 @@ rg -n "find_unique_identity_match|cdp_js_click_element" src-tauri/src/browser_ag
 - `rg` spot-check en `browser_tool_dispatch.rs` y `browser_agent/mod.rs` (mismos patrones que en el task) — **pass** (coincidencias: L13, L834, L839, L1041; L2320, L2883, L3011, L3239, L9877+)
 
 **Resultado:** Cumplen los tres criterios de aceptación. Tras este informe: `TESTING-…` → `CLOSED-…`. CDP / HTTP click end-to-end no probados en esta pasada.
+
+## Test report — 2026-03-28 (hora local del entorno; no UTC) — `003-tester/TESTER.md` (solo el task nombrado)
+
+**Preflight:** `tasks/UNTESTED-20260321-1620-browser-use-click-fallback-and-element-discovery.md` no existía; el archivo en disco era `CLOSED-…` y se renombró a `TESTING-20260321-1620-browser-use-click-fallback-and-element-discovery.md` antes de la verificación (mismo basename tras el prefijo). No se usó ningún otro archivo `UNTESTED-*`.
+
+**Comandos ejecutados**
+
+- `cd src-tauri && cargo check` — **pass** (`Finished dev profile … in 0.20s`)
+- `cd src-tauri && cargo test` — **pass** (biblioteca `mac_stats`: 854 passed, 0 failed, 0 ignored, ~1.16s; doc-tests: 1 ignored)
+- `rg -n "should_use_http_fallback_after_browser_action_error|click_http" src-tauri/src/commands/browser_tool_dispatch.rs` — **pass** (L13, L834, L839, L1041)
+- `rg -n "find_unique_identity_match|cdp_js_click_element" src-tauri/src/browser_agent/mod.rs` — **pass** (L2320, L2883, L3011, L3239, tests L9877+)
+
+**Resultado:** Cumplen los tres criterios de aceptación (build, tests, verificación estática). Tras este informe: `TESTING-…` → `CLOSED-…`. Flujos CDP / HTTP click end-to-end no ejecutados en esta pasada.
