@@ -710,3 +710,21 @@ rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_b
 - `rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_batches_on_shutdown" src-tauri/src/discord/mod.rs` — matches at **2868** (`enqueue_or_run_router`) and **2918** (`discard_pending_batches_on_shutdown`). `discord_message_bypasses_debounce` is not named in `mod.rs` (defined/used in `message_debounce.rs`), consistent with prior reports and criterion 3 as wiring from `discord/mod.rs` into the debounce module.
 
 **Outcome:** Acceptance criteria 1–2 pass. Criterion 3: literal `rg` finds two of three symbol names in `mod.rs`; bypass remains in `message_debounce.rs`. After this report: rename **`TESTING-`** → **`CLOSED-`** (not **WIP-**). Live Discord debounce not exercised.
+
+## Test report
+
+**Date:** 2026-03-28, local wall-clock on the agent host (Saturday 2026-03-28 per workspace `user_info`); not pinned to a single timezone.
+
+**Preflight / rename (TESTER.md step 2):** `tasks/UNTESTED-20260322-0100-openclaw-inbound-message-debounce.md` was **not** on disk. Only this named task; **no** other `UNTESTED-*` file was used. Equivalent to UNTESTED→TESTING: renamed `tasks/CLOSED-20260322-0100-openclaw-inbound-message-debounce.md` → `tasks/TESTING-20260322-0100-openclaw-inbound-message-debounce.md` at the start of this run.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test merge_empty` — **pass** (`discord::message_debounce::merge_tests::merge_empty`)
+- `cd src-tauri && cargo test` — **pass** (854 passed in `mac_stats` library tests; 0 failed; 0 ignored in lib `test result`; doc-tests: 1 ignored)
+
+**Static spot-check**
+
+- `rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_batches_on_shutdown" src-tauri/src/discord/mod.rs` — matches at **2868** (`enqueue_or_run_router`) and **2918** (`discard_pending_batches_on_shutdown`). `discord_message_bypasses_debounce` is not named in `mod.rs` (defined/used in `message_debounce.rs`), same as prior reports.
+
+**Outcome:** All acceptance criteria satisfied for this run. Rename **`TESTING-`** → **`CLOSED-`** (not **WIP-**). Live Discord timing not exercised.

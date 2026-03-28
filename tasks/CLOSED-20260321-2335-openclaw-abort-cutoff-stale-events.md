@@ -700,3 +700,21 @@ rg -n "abort_cutoff::|StaleInboundAfterAbort" src-tauri/src/discord/mod.rs src-t
 
 **Outcome:** Criterios de aceptación cumplidos → `CLOSED-20260321-2335-openclaw-abort-cutoff-stale-events.md`. Sin prueba en vivo de orden abort/retry con Discord, scheduler u Ollama real.
 
+## Test report
+
+**Date:** 2026-03-28 (hora local del entorno del agente, macOS; no convertida a UTC).
+
+**Rename (`003-tester/TESTER.md`):** El archivo estaba como `CLOSED-20260321-2335-openclaw-abort-cutoff-stale-events.md` (no existía la ruta nombrada `UNTESTED-*`). Solo esta tarea: `CLOSED-*` → `UNTESTED-*` (cabecera `# UNTESTED —`) → `TESTING-*` (cabecera `# TESTING —`). No se usó ningún otro archivo `UNTESTED-*`.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test abort_cutoff` — **pass** (4 tests en `commands::abort_cutoff::tests`)
+- `cd src-tauri && cargo test` — **pass** (854 passed, 0 failed en lib `mac_stats`; 1 doc-test ignored)
+
+**Static spot-check**
+
+- `rg -n "abort_cutoff::|StaleInboundAfterAbort"` en `discord/mod.rs`, `scheduler/mod.rs`, `scheduler/heartbeat.rs`, `commands/ollama.rs` — **pass** (`clear_cutoff`, `should_skip`, `InboundStaleGuard`, `StaleInboundAfterAbort`).
+
+**Outcome:** Todos los criterios de aceptación cumplidos → archivo renombrado `TESTING-*` → `CLOSED-*` tras este informe. No se ejercitó en vivo el orden abort/retry contra Discord, scheduler u Ollama real.
+
