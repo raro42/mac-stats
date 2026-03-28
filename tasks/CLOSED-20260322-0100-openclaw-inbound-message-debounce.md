@@ -460,3 +460,21 @@ rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_b
 - `rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_batches_on_shutdown" src-tauri/src/discord/mod.rs` — matches at lines **2868** (`enqueue_or_run_router`) and **2918** (`discard_pending_batches_on_shutdown`). `discord_message_bypasses_debounce` is not named in `mod.rs` (defined/used in `message_debounce.rs`), same as prior reports.
 
 **Outcome:** All acceptance criteria satisfied. Renamed **`TESTING-`** → **`CLOSED-`** after this report (not **WIP-**).
+
+## Test report
+
+**Date:** 2026-03-28, hora local del entorno donde corrió el agente (fecha de pared explícita).
+
+**Preflight / rename (TESTER.md paso 2):** `tasks/UNTESTED-20260322-0100-openclaw-inbound-message-debounce.md` **no existía** en disco. Solo se trató esta tarea; **no** se eligió ningún otro `UNTESTED-*`. Equivalente al paso UNTESTED→TESTING: `tasks/CLOSED-20260322-0100-openclaw-inbound-message-debounce.md` → `tasks/TESTING-20260322-0100-openclaw-inbound-message-debounce.md` al inicio de esta ejecución.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test merge_empty` — **pass** (`discord::message_debounce::merge_tests::merge_empty`)
+- `cd src-tauri && cargo test` — **pass** (854 tests en el crate librería `mac_stats`; 0 failed; 1 doc-test ignored)
+
+**Static spot-check**
+
+- `rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_batches_on_shutdown" src-tauri/src/discord/mod.rs` — coincidencias en **2868** (`enqueue_or_run_router`) y **2918** (`discard_pending_batches_on_shutdown`). `discord_message_bypasses_debounce` no aparece por nombre en `mod.rs` (definido/usado en `message_debounce.rs`), coherente con informes previos.
+
+**Outcome:** Criterios de aceptación cumplidos. Tras este informe: **`TESTING-`** → **`CLOSED-`** (no **WIP-**).
