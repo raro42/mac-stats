@@ -1024,3 +1024,20 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 
 **Outcome:** Criterios de aceptación y comandos de verificación del cuerpo de la tarea cumplidos — renombrar a **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
 
+---
+
+## Test report
+
+**Date:** 2026-03-28 19:15 UTC (UTC via `date -u` on host).
+
+**TESTER.md name flow:** Operator requested `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; that path is **not in the repo**. The task with the same slug was **`CLOSED-…`**; renamed **`CLOSED-` → `TESTING-`** for this run (functional equivalent to `UNTESTED-` → `TESTING-` when no `UNTESTED-*` file exists). No other `UNTESTED-*` task was tested. On failure, operator asked for **`TESTED-`** prefix (`003-tester/TESTER.md` uses **`WIP-`**); this run passed → **`CLOSED-`**.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (`check_browser_alive` documents avoiding `Handle::block_on` + `tokio::time::timeout`; `evaluate_one_plus_one_blocking_timeout` documents no nested Tokio `block_on`)
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (871 passed, 0 failed in `mac_stats` lib crate; other bins 0 tests; 1 doc-test ignored)
+
+**Outcome:** All acceptance criteria and task-body verification commands passed — rename file to **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+

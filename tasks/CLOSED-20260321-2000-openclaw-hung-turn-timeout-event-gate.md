@@ -160,3 +160,15 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Acceptance criteria:** All satisfied (`TurnOutputGate` / `gate_allows_send` in `tool_loop.rs`; `finalize_turn_timeout` text starts `**Turn timed out**` with budget seconds in `turn_lifecycle.rs`; router string `closing output gate after turn wall-clock timeout` in `ollama.rs`; turn-lifecycle warn strings `turn wall-clock timeout` / `closing output gate and running cleanup`; `cargo check` / `cargo test` green).
 - **Outcome naming (`003-tester/TESTER.md`):** pass → `CLOSED-…`; fail/block → `WIP-…` (not `TESTED-…` per repo procedure).
 - **Outcome:** **PASS** — file restored to `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
+
+### Re-verify — 2026-03-28 UTC (`003-tester/TESTER.md`, operator-named `UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only)
+
+- **Rename UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` was **not present**; the task on disk was `CLOSED-…`. To honor the TESTING phase without touching any other `UNTESTED-*`, the file was renamed **`CLOSED-…` → `TESTING-…`**, verification was run, then renamed back to **`CLOSED-…`** on pass.
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (library crate: **871** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches in `ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`
+  - Task body also lists `rg … src/`; top-level `src/` (JS) has no matches; Rust lives under `src-tauri/src/`.
+- **Acceptance criteria:** All satisfied (`TurnOutputGate` / `gate_allows_send`; `finalize_turn_timeout` prefix `**Turn timed out**` with budget seconds; log strings in `ollama.rs` / `turn_lifecycle.rs`; `cargo check` / `cargo test` green).
+- **Outcome naming:** Operator asked for `TESTED-` on fail; `003-tester/TESTER.md` specifies `WIP-` — not applicable (pass).
+- **Outcome:** **PASS** — final filename: `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
