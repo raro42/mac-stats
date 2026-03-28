@@ -341,3 +341,21 @@ Skip or note **blocked** if no CDP browser is available; automated criteria 1–
 - **Preflight:** Esa ruta **no existe** (solo `CLOSED-…` en repo). Equivalente operativo: **`CLOSED-…` → `TESTING-…`**, verificación, luego **`TESTING-…` → `CLOSED-…`**. Ningún otro `UNTESTED-*` en esta corrida.
 - **Comandos:** `cargo check` y `cargo test --lib` en `src-tauri/` → **pass** (854 passed, 0 failed, ~1.16s). `rg` sobre `try_enforce_browser_tab_limit` en `src/browser_agent/mod.rs` → **pass** (def. L3715, 7 coincidencias con llamadas). `Config::browser_max_page_tabs` L1987, `examples/managed_tab_cap_smoke.rs` presente → **pass**. Ejemplo CDP opcional → **omitido** (sin Chromium/CDP; no bloquea 1–4).
 - **Outcome:** Criterios 1–4 OK → **`CLOSED-20260322-1901-openclaw-managed-tab-cap-prune.md`**.
+
+---
+
+### Test report — corrida TESTER (2026-03-28, hora local del entorno; no UTC fijo)
+
+- **Preflight:** La ruta solicitada `tasks/UNTESTED-20260322-1901-openclaw-managed-tab-cap-prune.md` **no existe** en el árbol; el fichero estaba como `CLOSED-…` y se renombró a **`TESTING-…`** para esta corrida según `003-tester/TESTER.md` (equivalente operativo a UNTESTED→TESTING). No se usó ningún otro `UNTESTED-*`.
+
+| Paso | Comando | Resultado |
+|------|---------|-----------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed; finished in 1.16s |
+| Símbolo `fn` | `rg -n "fn try_enforce_browser_tab_limit" src/browser_agent/mod.rs` (cwd `src-tauri`) | **pass** — línea 3715 |
+| Llamadas | `rg -n "try_enforce_browser_tab_limit\\(" src/browser_agent/mod.rs` | **pass** — 7 coincidencias (definición + 6 usos) |
+| Criterio 2 | `Config::browser_max_page_tabs` en `src/config/mod.rs` | **pass** — línea 1987 |
+| Criterio 3 | `examples/managed_tab_cap_smoke.rs` | **pass** — presente |
+| Opcional CDP | `MAC_STATS_BROWSER_MAX_PAGE_TABS=3 cargo run --example managed_tab_cap_smoke` | **omitido** (sin Chromium/CDP en esta corrida; no bloquea criterios 1–4) |
+
+- **Outcome:** Criterios de aceptación 1–4 satisfechos → renombrar **`TESTING-…` → `CLOSED-…`**.
