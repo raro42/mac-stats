@@ -172,3 +172,15 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Acceptance criteria:** All satisfied (`TurnOutputGate` / `gate_allows_send`; `finalize_turn_timeout` prefix `**Turn timed out**` with budget seconds; log strings in `ollama.rs` / `turn_lifecycle.rs`; `cargo check` / `cargo test` green).
 - **Outcome naming:** Operator asked for `TESTED-` on fail; `003-tester/TESTER.md` specifies `WIP-` — not applicable (pass).
 - **Outcome:** **PASS** — final filename: `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
+
+### Re-verify — 2026-03-28 UTC (`003-tester/TESTER.md`, objetivo operador `UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` únicamente)
+
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**; no se tocó ningún otro `UNTESTED-*`. Para la fase TESTING se renombró **`CLOSED-…` → `TESTING-…`**, se ejecutó la verificación y, al pasar, se devuelve el nombre a **`CLOSED-…`**.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (crate biblioteca: **871** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`
+  - Cuerpo de la tarea lista `rg … src/`; en la raíz `src/` (JS) no hay coincidencias Rust; implementación en `src-tauri/src/`.
+- **Criterios de aceptación:** Cumplidos (`TurnOutputGate` / `gate_allows_send`; `finalize_turn_timeout` con prefijo `**Turn timed out**` y presupuesto en segundos; cadenas de log en `ollama.rs` / `turn_lifecycle.rs`; `cargo check` / `cargo test` en verde).
+- **Nomenclatura de resultado:** El operador pidió `TESTED-` en fallo; `003-tester/TESTER.md` indica `WIP-` — no aplica (pass).
+- **Resultado:** **PASS** — nombre final tras este run: `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.

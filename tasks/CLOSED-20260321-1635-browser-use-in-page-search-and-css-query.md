@@ -896,3 +896,15 @@ rg -n "fn search_page_text|pub fn browser_query" src-tauri/src/browser_agent/mod
 
 **Resultado:** **PASS** — criterios de aceptación 1–3 cumplidos. Tras este informe: `TESTING-…` → **`CLOSED-20260321-1635-browser-use-in-page-search-and-css-query.md`**. (En fallo habría sido `TESTED-…` según la instrucción del operador; `003-tester/TESTER.md` usa `WIP-` para bloqueos.) CDP en vivo extremo a extremo no ejecutado en esta pasada.
 
+### Test report (2026-03-28, hora local; `003-tester/TESTER.md`, ejecución actual)
+
+**Preflight:** `tasks/UNTESTED-20260321-1635-browser-use-in-page-search-and-css-query.md` no estaba en el workspace. Solo esta tarea (mismo id): `tasks/CLOSED-20260321-1635-browser-use-in-page-search-and-css-query.md` → `tasks/TESTING-20260321-1635-browser-use-in-page-search-and-css-query.md` al inicio (equivalente al paso UNTESTED→TESTING). El título del markdown se actualizó a `# TESTING — …` durante la pasada. No se usó ningún otro archivo `UNTESTED-*`.
+
+**Comandos ejecutados**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test` — **pass** (871 passed, 0 failed en tests de la librería `mac_stats`; 1 doc-test ignorado en `Doc-tests mac_stats`)
+- Spot-check `rg` (comandos opcionales del cuerpo de la tarea sobre `browser_tool_dispatch.rs` y `browser_agent/mod.rs`) — **pass**
+
+**Resultado:** **PASS** — criterios de aceptación 1–3 cumplidos. Renombrado final del archivo: `TESTING-…` → **`CLOSED-20260321-1635-browser-use-in-page-search-and-css-query.md`**. (En caso de fallo habría correspondido `TESTED-…` según instrucción del operador.) CDP en vivo extremo a extremo no ejecutado en esta pasada.
+
