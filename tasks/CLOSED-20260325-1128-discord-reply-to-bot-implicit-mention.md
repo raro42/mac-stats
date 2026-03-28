@@ -253,3 +253,29 @@ In **MentionOnly** channels, a human message that **replies** to a message autho
 **Manual Discord E2E** (task steps 1–8): **not executed** in this environment.
 
 **Outcome rename:** **CLOSED-** retained (preflight + numbered criteria pass). No rename to `TESTED-` (would apply on failure per operator convention).
+
+---
+
+## Test report
+
+**Date:** 2026-03-28 UTC (tester run; `003-tester/TESTER.md`; operator path `tasks/UNTESTED-20260325-1128-discord-reply-to-bot-implicit-mention.md`)
+
+**Rename `UNTESTED→TESTING`:** **Omitido** — en este workspace no existe `tasks/UNTESTED-20260325-1128-discord-reply-to-bot-implicit-mention.md`. La misma tarea está solo como `tasks/CLOSED-20260325-1128-discord-reply-to-bot-implicit-mention.md`. No se tocó ningún otro `UNTESTED-*`.
+
+**Comandos ejecutados**
+
+- `cd /Users/raro42/projects/mac-stats/src-tauri && cargo check` → **pass** (perfil dev, 0 errores).
+- `cargo test outbound_attachment_path_allowlist -- --nocapture` → **pass** (`discord::tests::outbound_attachment_path_allowlist`).
+- `rg -n 'discord_mentions_bot_effective|mentions_bot_effective' src-tauri/src/discord/mod.rs` → líneas 1852, 1956, 2016, 2796–2797, 2823.
+- `rg -n 'MentionOnly activation via message reference|could not resolve referenced message for implicit mention' src-tauri/src/discord/mod.rs` → líneas 1867, 1888, 1901, 1915; `debug!` con `target: "mac_stats::discord"` (verificado en fuente).
+
+**Criterios de aceptación**
+
+1. **PASS** — `discord_mentions_bot_effective`: `referenced_message`, caché, `get_message`, log de fallo.
+2. **PASS** — MentionOnly usa `!mentions_bot_effective` en ≈2823.
+3. **PASS** — Cadenas de observabilidad + target `mac_stats::discord`.
+4. **PASS** — `cargo check` OK.
+
+**E2E manual Discord** (pasos 1–8 del cuerpo de la tarea): **no ejecutado** en este entorno.
+
+**Resultado / renombrado:** **PASS** en criterios numerados + preflight. El archivo ya es **CLOSED-**; no hay renombrado final (TESTER.md: **WIP-** ante fallo; convención del operador: **TESTED-** ante fallo — no aplica).

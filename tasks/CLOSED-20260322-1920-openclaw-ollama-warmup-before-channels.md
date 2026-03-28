@@ -151,3 +151,22 @@ cd src-tauri && cargo check
 **Runtime (opcional):** `pgrep -fl mac_stats` — **`target/release/mac_stats -vv`** (PID **64001**); sin **`pkill`** (**AGENTS.md**). Marca UTC **2026-03-28T17:54:42Z**.
 
 **Outcome:** **`CLOSED-`**.
+
+### Run: 2026-03-28 (closing reviewer — verify #8, agent)
+
+**Alcance:** Petición **`tasks/TESTING-20260322-1920-openclaw-ollama-warmup-before-channels.md`** = misma tarea por slug; ese path **`TESTING-`** sigue sin existir en el árbol (el artefacto es **`tasks/CLOSED-20260322-1920-openclaw-ollama-warmup-before-channels.md`**). Barra **`004-closing-reviewer/CLOSING-REVIEWER-PROMPT.md`** (`cargo check`, **clippy** `-D warnings`, **`cargo test`**, **`cargo build --release`**) en verde → prefijo **`CLOSED-`** (no **`TESTED-`**, no atascado en **`TESTING-`**).
+
+**Commands run**
+
+- `rg -n 'ensure_ollama_agent_ready_at_startup|Ollama startup warmup finished' src-tauri/src/lib.rs` — **pass** (`ensure_ollama_agent_ready_at_startup().await` **L461**; log `mac_stats_startup` **L465** con texto *Discord, scheduler, heartbeat, and task review*).
+- `rg -n 'spawn_discord_if_configured|spawn_scheduler_thread|spawn_heartbeat_thread' src-tauri/src/lib.rs` — **pass** (Discord **L471**, scheduler **L475**, heartbeat **L478**; **después** del warmup; `spawn_review_thread` **L481**).
+- `cd src-tauri && cargo check` — **pass**.
+- `cd src-tauri && cargo clippy --all-targets -- -D warnings` — **pass**.
+- `cd src-tauri && cargo test` — **pass** (**871** tests en crate `mac_stats` lib; **1** doc-test ignorado en el workspace).
+- `cd src-tauri && cargo build --release` — **pass** (**v0.1.70**).
+
+**`git diff` / `CHANGELOG.md` / `006-feature-coder/FEATURE-CODER.md`:** el diff de trabajo actual no toca `lib.rs` ni el gate Ollama (cambios en otras tareas / `005-openclaw-reviewer.md` según `git diff --stat`); sin **FEAT-D\*** nuevos atribuibles solo a esta tarea.
+
+**Runtime (opcional):** `pgrep -fl mac_stats` — **`target/release/mac_stats -vv`** (PID **64001**); sin **`pkill`** (**AGENTS.md**).
+
+**Outcome:** **`CLOSED-`**.
