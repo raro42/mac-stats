@@ -232,3 +232,15 @@ cd src-tauri && cargo test prompts:: --no-fail-fast
 | Prompt tests | `cd src-tauri && cargo test prompts:: --no-fail-fast` | **pass** — 5 passed (incl. `ori_briefing_and_prefetch_follow_memory_before_metrics`), 0 failed; 849 tests filtrados en el binario `lib` del crate |
 
 - **Outcome:** Criterios de aceptación cumplidos → **CLOSED**.
+
+## Test report
+
+- **Date:** 2026-03-28, hora local del entorno de ejecución (macOS; no UTC fijada).
+- **Note:** Corrida `003-tester/TESTER.md` para `tasks/UNTESTED-20260322-0145-mac-stats-ori-mnemos-lifecycle-prompt.md` (inexistente en el árbol). Solo esta tarea: `CLOSED-*` → `TESTING-*`, `cargo check` y `cargo test prompts:: --no-fail-fast` ejecutados en esta sesión; un `replace_all` previo duplicó informes — se restauró `CLOSED-*` desde `git checkout HEAD`, se borró `TESTING-*` corrupto y se repitió el flujo con **un** apéndice al final. No se usó ningún otro archivo `UNTESTED-*`.
+
+| Step | Command | Result |
+|------|---------|--------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Prompt tests | `cd src-tauri && cargo test prompts:: --no-fail-fast` | **pass** — 5 passed (incl. `ori_briefing_and_prefetch_follow_memory_before_metrics`), 0 failed; 849 filtered en `lib` |
+
+- **Outcome:** Criterios de aceptación cumplidos → **CLOSED**.

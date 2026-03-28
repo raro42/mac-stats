@@ -352,3 +352,21 @@ rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_b
 - `rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_batches_on_shutdown" src-tauri/src/discord/mod.rs` — coincidencias para `enqueue_or_run_router` (línea 2868) y `discard_pending_batches_on_shutdown` (línea 2918). `discord_message_bypasses_debounce` no aparece por nombre en `mod.rs` (definido y usado en `message_debounce.rs`), coherente con informes previos.
 
 **Outcome:** Criterios 1 y 2 cumplidos. Criterio 3: el `rg` literal de los tres identificadores en `mod.rs` encuentra dos; el bypass sigue en `message_debounce.rs`. Renombrado final del archivo de tarea: **`CLOSED-`** (no WIP).
+
+## Test report
+
+**Fecha:** 2026-03-28, hora local del host (America/Mexico_City; `user_info`: sábado 2026-03-28). Ejecución TESTER.md (Cursor).
+
+**Preflight / rename (TESTER.md paso 2):** `tasks/UNTESTED-20260322-0100-openclaw-inbound-message-debounce.md` **no existía**. Solo esta tarea; ningún otro `UNTESTED-*`. Equivalente UNTESTED→TESTING: `tasks/CLOSED-20260322-0100-openclaw-inbound-message-debounce.md` → `tasks/TESTING-20260322-0100-openclaw-inbound-message-debounce.md` antes de la verificación.
+
+**Comandos ejecutados**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test merge_empty` — **pass** (`discord::message_debounce::merge_tests::merge_empty`; 853 filtered en esa invocación)
+- `cd src-tauri && cargo test` — **pass** (854 tests en la librería `mac_stats`; 0 failed; 0 ignored en lib; doc-tests: 1 ignored)
+
+**Static spot-check**
+
+- `rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_batches_on_shutdown" src-tauri/src/discord/mod.rs` — líneas **2868** (`enqueue_or_run_router`) y **2918** (`discard_pending_batches_on_shutdown`). `discord_message_bypasses_debounce` no aparece por nombre en `mod.rs` (definido y usado en `message_debounce.rs`), coherente con informes previos.
+
+**Outcome:** Criterios de aceptación 1 y 2 cumplidos. Criterio 3 (spot-check): dos de tres cadenas en `mod.rs`; el bypass permanece encapsulado. Tras este informe: renombrar **`TESTING-`** → **`CLOSED-`** (no **WIP-**).

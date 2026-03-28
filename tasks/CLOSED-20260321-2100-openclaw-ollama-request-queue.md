@@ -242,3 +242,16 @@
 - `cd src-tauri && cargo test ollama_http_queue --lib` — **pass** (1 test: `ollama_queue::tests::ollama_http_queue_serializes_and_fires_wait_hook`)
 
 **Resultado:** **CLOSED** — cola HTTP Ollama y prueba unitaria citada OK; sin bloqueos.
+
+## Test report
+
+**Fecha:** 2026-03-28 (hora local del entorno del agente; no garantizado UTC).
+
+**Prefijo:** El operador indicó `tasks/UNTESTED-20260321-2100-openclaw-ollama-request-queue.md`; ese path **no existe** en el repositorio (no se usó otro `UNTESTED-*`). No fue posible el renombrado literal `UNTESTED-` → `TESTING-`. Mismo slug: `CLOSED-…` → `TESTING-…` al inicio de esta corrida, verificación según referencias del cuerpo, este informe y `CLOSED-…` al pasar todo.
+
+**Comandos ejecutados:**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test ollama_http_queue --lib` — **pass** (1 test: `ollama_queue::tests::ollama_http_queue_serializes_and_fires_wait_hook`)
+
+**Resultado:** **CLOSED** — cola HTTP Ollama y prueba unitaria citada OK; sin bloqueos.
