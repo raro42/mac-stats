@@ -554,9 +554,24 @@ pub fn answer_with_ollama_and_fetch(
             truncate_status(question, DISCORD_STATUS_QUESTION_MAX)
         ));
 
+        // Heartbeat turns: skip the extra /api/chat for success criteria and skip MCP tools/list so the
+        // beat stays on one executor with fewer blocking edges (see openclaw heartbeat periodic check).
+        let heartbeat_fast_preamble = heartbeat_system_append.is_some();
+
         // Criteria at start: extract 1–3 success criteria to feed into end verification
-        send_status("Extracting success criteria…");
-        let success_criteria = if let Some(criteria) = success_criteria_override.clone() {
+        if heartbeat_fast_preamble {
+            send_status("Heartbeat: skipping LLM success-criteria extraction…");
+        } else {
+            send_status("Extracting success criteria…");
+        }
+        let success_criteria = if heartbeat_fast_preamble {
+            mac_stats_info!(
+                "ollama/chat",
+                "Agent router [{}]: heartbeat mode — skipping success-criteria extraction LLM call",
+                request_id
+            );
+            None
+        } else if let Some(criteria) = success_criteria_override.clone() {
             mac_stats_info!(
                 "ollama/chat",
                 "Agent router [{}]: reusing {} request-local success criteria",
@@ -735,7 +750,12 @@ pub fn answer_with_ollama_and_fetch(
         } else {
             String::new()
         };
-        let agent_descriptions = build_agent_descriptions(from_discord, Some(question)).await;
+        let agent_descriptions = build_agent_descriptions(
+            from_discord,
+            Some(question),
+            heartbeat_fast_preamble,
+        )
+        .await;
         mac_stats_info!(
             "ollama/chat",
             "Agent router: agent list built ({} chars)",

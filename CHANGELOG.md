@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.68] - 2026-03-28
+
+### Fixed
+- **CDP `Target.targetCrashed` side listener** — WebSocket read loop no longer exits on **`WouldBlock`** / **`TimedOut`** from the **~400ms** TCP read timeout; exiting there could stop the listener shortly after the last CDP message and miss a later tab crash (e.g. **`--browser-debug-crash-tab`** smoke). (`browser_agent/cdp_target_crash_listener.rs`.)
+
+### Changed
+- **Scheduler / heartbeat agent router** — When **`heartbeat_system_append`** is present, skip the extra LLM call for success-criteria extraction and omit **MCP `tools/list`** when building agent descriptions (**`skip_mcp_tool_list`**), reducing subprocess/SSE work on the shared runtime during heartbeat turns. (`commands/ollama.rs`, `commands/agent_descriptions.rs`.)
+- **Browser agent** — **`BROWSER_NAVIGATE` `file://`** precheck debug line clarifies validated local HTML path. (`browser_agent/mod.rs`.)
+- **Docs** — Scheduler agent and browser automation notes. (`docs/009_scheduler_agent.md`, `docs/029_browser_automation.md`.)
+- **Tasks / OpenClaw reviewer** — Additive edits on **CLOSED** task notes under **`tasks/`** (workflow, verification, failure modes, operator guidance across the same browser/OpenClaw CLOSED set). Independent reviewer re-run **`2026-03-28T09:47:53Z`**; **OpenClaw** **`HEAD`** unchanged **`55dc6a8bb28d`** (**Aligned**). (`tasks/`, `005-openclaw-reviewer/005-openclaw-reviewer.md`.)
+
 ## [0.1.67] - 2026-03-28
 
 ### Changed

@@ -435,3 +435,16 @@ rg -n "focused tab|BROWSER_SCREENSHOT.*URL" src/commands/browser_tool_dispatch.r
 | Symbols | `rg -n` con los patrones de «Verification (automated)» (`cwd` `src-tauri/`, `src/browser_agent/mod.rs`, `src/commands/browser_tool_dispatch.rs`, `src/commands/agent_descriptions.rs`) | **pass** — log `take_screenshot URL path: using focused tab` / `get_current_tab()` / `CURRENT_TAB_INDEX`; mensajes de pestaña enfocada y URL en dispatch y agent_descriptions |
 
 - **Outcome:** Criterios de aceptación 1–3 cumplidos → renombrar **`TESTING-…` → `CLOSED-20260322-1722-mac-stats-browser-screenshot-url-respects-focused-tab.md`**.
+
+### Test report — 2026-03-28 (TESTER.md, Cursor: solo tarea UNTESTED nombrada)
+
+- **Date:** 2026-03-28, hora local del entorno donde se ejecutaron los comandos (no UTC fija).
+- **Preflight:** `tasks/UNTESTED-20260322-1722-mac-stats-browser-screenshot-url-respects-focused-tab.md` **no existía**; se renombró **`CLOSED-…` → `TESTING-…`** al inicio (equivalente a UNTESTED→TESTING en `003-tester/TESTER.md`). No se usó ningún otro archivo `UNTESTED-*`.
+
+| Paso | Comando | Resultado |
+|------|---------|-----------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed; finished in 1.16s |
+| Symbols | Patrones `rg` de «Verification (automated)» con `cwd` `src-tauri/` sobre `src/browser_agent/mod.rs`, `src/commands/browser_tool_dispatch.rs`, `src/commands/agent_descriptions.rs` | **pass** — comentario y log ~9353–9361 (`take_screenshot URL path: using focused tab`, `get_current_tab()`, `CURRENT_TAB_INDEX`); copy de pestaña enfocada / **BROWSER_SCREENSHOT** con URL en dispatch (~286–311) y `agent_descriptions.rs` (~14) |
+
+- **Outcome:** Criterios de aceptación 1–3 cumplidos → **`CLOSED-20260322-1722-mac-stats-browser-screenshot-url-respects-focused-tab.md`**.

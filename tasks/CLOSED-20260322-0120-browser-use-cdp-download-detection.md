@@ -465,3 +465,17 @@ Optional manual: trigger a real download via **BROWSER_NAVIGATE** / **BROWSER_CL
 
 - **Manual CDP / real download:** not run (optional).
 - **Outcome:** Automated acceptance criteria 1–4 satisfied → **CLOSED** (`TESTING-…` → `CLOSED-…` after this report).
+
+### Test report — 2026-03-28 (local; `003-tester/TESTER.md`, corrida Cursor)
+
+- **Archivo pedido:** `tasks/UNTESTED-20260322-0120-browser-use-cdp-download-detection.md` **no existe** en el árbol; al inicio de esta corrida: `CLOSED-20260322-0120-browser-use-cdp-download-detection.md` → `TESTING-20260322-0120-browser-use-cdp-download-detection.md` (equivalente al paso UNTESTED→TESTING para la misma tarea). No se eligió otro `UNTESTED-*`.
+- **Fecha:** 2026-03-28, hora local del entorno donde se ejecutaron los comandos (no UTC fijada).
+
+| Step | Command | Result |
+|------|---------|--------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed; finished in 1.16s |
+| Symbols | `cd src-tauri && rg -n "Browser\\.downloadProgress|merge_with_directory_diff|spawn_download_aux_listener" src/browser_agent/cdp_downloads.rs src/browser_agent/mod.rs` | **pass** (el snippet de la tarea con `\\|` no coincide en `rg`; se usó `|` como alternancia) |
+
+- **Manual CDP / descarga real:** no ejecutado (opcional en la tarea).
+- **Outcome:** Criterios de aceptación 1–4 (automatizados) cumplidos → **CLOSED** (archivo renombrado `TESTING-…` → `CLOSED-…` tras este informe).

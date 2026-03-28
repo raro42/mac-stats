@@ -6871,7 +6871,7 @@ fn navigate_and_get_state_inner(
     {
         mac_stats_debug!(
             "browser/security",
-            "Browser agent [CDP]: BROWSER_NAVIGATE file:// precheck passed (local html)"
+            "BROWSER_NAVIGATE file:// precheck passed (local html, validated path)"
         );
     }
     if let Some(msg) = url_filter::navigation_precheck_error(&navigate_target) {

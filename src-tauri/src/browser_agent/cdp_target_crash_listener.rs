@@ -4,13 +4,14 @@
 //! trace noise; mac-stats needs an immediate signal to invalidate the cached session when the
 //! focused page renderer dies while the browser process stays up.
 
+use std::io;
 use std::net::TcpStream;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
 use serde_json::{json, Value};
 use tungstenite::stream::MaybeTlsStream;
-use tungstenite::{connect, Message};
+use tungstenite::{connect, Error as WsError, Message};
 
 use crate::{mac_stats_debug, mac_stats_warn};
 
@@ -39,6 +40,9 @@ fn run_side_listener(ws_url: String, session_token: u64) {
             return;
         }
     };
+    // Short timeout so we re-check `LISTENER_GEN` while idle; must **not** exit the loop on
+    // `TimedOut` / `WouldBlock` — otherwise the thread dies ~400ms after the last CDP message and
+    // misses `Target.targetCrashed` when the tab crashes later (smoke: `--browser-debug-crash-tab`).
     set_tcp_read_timeout(socket.get_mut(), Some(Duration::from_millis(400)));
 
     // Omit optional `filter` — Chrome 146+ rejects `"filter": null` (expects array or absent key).
@@ -94,8 +98,24 @@ fn run_side_listener(ws_url: String, session_token: u64) {
             Ok(Message::Ping(p)) => {
                 let _ = socket.send(Message::Pong(p));
             }
-            Ok(Message::Close(_)) | Err(_) => break,
+            Ok(Message::Close(_)) => break,
             Ok(_) => {}
+            Err(e) => {
+                if matches!(
+                    &e,
+                    WsError::Io(ioe)
+                        if ioe.kind() == io::ErrorKind::WouldBlock
+                            || ioe.kind() == io::ErrorKind::TimedOut
+                ) {
+                    continue;
+                }
+                mac_stats_debug!(
+                    "browser/cdp",
+                    "CDP target-crash side listener: read ended ({})",
+                    e
+                );
+                break;
+            }
         }
     }
     let _ = socket.close(None);

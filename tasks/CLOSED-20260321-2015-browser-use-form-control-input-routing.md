@@ -534,3 +534,20 @@ Optional manual: with CDP Chrome, `BROWSER_NAVIGATE` to `file://…/docs/fixture
 | Manual CDP / fixture | — | **not run** (optional per task) |
 
 - **Outcome:** Automated acceptance criteria satisfied → **`CLOSED-`**.
+
+### Test report — run 2026-03-28 (`003-tester/TESTER.md`, corrida agente Auto — operador UNTESTED)
+
+- **Date:** 2026-03-28, hora local del entorno de ejecución (no fijada a UTC).
+- **Note:** El operador indicó `tasks/UNTESTED-20260321-2015-browser-use-form-control-input-routing.md`, que **no existe** en el repo; la tarea estaba como `CLOSED-…` antes de esta corrida. Flujo `TESTER.md` para **solo esta tarea**: **`CLOSED-` → `TESTING-`**, verificación del cuerpo de la tarea, este informe, **`TESTING-` → `CLOSED-`**. No se probó ningún otro `UNTESTED-*`.
+
+| Step | Command | Result |
+|------|---------|--------|
+| Check | `cd src-tauri && cargo check` | **pass** |
+| Lib tests | `cd src-tauri && cargo test --lib` | **pass** — 854 passed, 0 failed; finished in 1.15s |
+| Routing symbols | `rg -n "ok_select\|ok_native\|ok_datepicker\|ok_contenteditable" src/browser_agent/mod.rs` (desde `src-tauri/`) | **pass** — líneas 8018, 8025, 8048, 8175–8176 |
+| Criterio 1 (logs / rutas) | `route_hint` (~8078), `path=datepicker_heuristic` (~8179) en `mod.rs` | **pass** (revisión estática) |
+| Criterio 2 (InteractableRow / snapshot) | `input_type`, `contenteditable`, `datepicker_like` en struct y snapshot JS | **pass** (revisión estática) |
+| Criterio 3 (fixture) | `test -f docs/fixtures/browser-input-routing.html` | **pass** |
+| Manual CDP / fixture | — | **no ejecutado** (opcional en la tarea) |
+
+- **Outcome:** Criterios de aceptación automatizados cumplidos → **`CLOSED-`**.

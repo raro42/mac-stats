@@ -114,7 +114,12 @@ pub(crate) fn format_task_agent_description(num: u32) -> String {
 /// Build agent descriptions string: base, optional SKILL (when skills exist), optional RUN_CMD, then MCP when configured.
 /// When from_discord is true and Discord is configured, appends DISCORD_API agent and endpoint list.
 /// When question is provided and Redmine is configured, create-context (projects, trackers, etc.) is only appended if the question suggests create/update.
-pub(crate) async fn build_agent_descriptions(from_discord: bool, question: Option<&str>) -> String {
+/// When `skip_mcp_tool_list` is true (heartbeat turns), MCP `tools/list` is not called — avoids subprocess/SSE work on the shared Tauri runtime and keeps beats bounded.
+pub(crate) async fn build_agent_descriptions(
+    from_discord: bool,
+    question: Option<&str>,
+    skip_mcp_tool_list: bool,
+) -> String {
     use tracing::info;
     let skills = crate::skills::load_skills();
     let mut base = crate::commands::tool_registry::tool_descriptions_for_prompt();
@@ -248,6 +253,12 @@ pub(crate) async fn build_agent_descriptions(from_discord: bool, question: Optio
             cursor_agent_available,
         ));
         num += 1;
+    }
+    if skip_mcp_tool_list {
+        info!(
+            "Agent router: omitting MCP tools/list (skip_mcp_tool_list; heartbeat-style fast path)"
+        );
+        return base;
     }
     let Some(server_url) = crate::mcp::get_mcp_server_url() else {
         return base;
