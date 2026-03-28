@@ -622,3 +622,21 @@ rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_b
 - `rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_batches_on_shutdown" src-tauri/src/discord/mod.rs` — coincidencias en **2868** (`enqueue_or_run_router`) y **2918** (`discard_pending_batches_on_shutdown`). `discord_message_bypasses_debounce` no aparece por nombre en `mod.rs` (definido y usado en `message_debounce.rs`), coherente con el criterio 3 del task y informes previos.
 
 **Outcome:** Criterios de aceptación cumplidos. Renombrar **`TESTING-`** → **`CLOSED-`** (no **WIP-**). Debounce en vivo contra Discord no probado.
+
+## Test report
+
+**Fecha:** 2026-03-28, hora local del host del agente (sábado 2026-03-28 según `user_info` del workspace). **UTC:** misma ventana calendario (fecha de pared explícita).
+
+**Preflight / rename (TESTER.md paso 2):** `tasks/UNTESTED-20260322-0100-openclaw-inbound-message-debounce.md` **no existía** en disco. Solo se trató esta tarea (**no** se eligió ningún otro `UNTESTED-*`). Equivalente al paso UNTESTED→TESTING: `tasks/CLOSED-20260322-0100-openclaw-inbound-message-debounce.md` → `tasks/TESTING-20260322-0100-openclaw-inbound-message-debounce.md` al inicio de esta ejecución (Cursor).
+
+**Comandos ejecutados**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test merge_empty` — **pass** (`discord::message_debounce::merge_tests::merge_empty`)
+- `cd src-tauri && cargo test` — **pass** (854 tests en la librería `mac_stats`; 0 failed; 0 ignored en lib; doc-tests: 1 ignored)
+
+**Verificación estática**
+
+- `rg -n "enqueue_or_run_router|discord_message_bypasses_debounce|discard_pending_batches_on_shutdown" src-tauri/src/discord/mod.rs` — coincidencias en **2868** (`enqueue_or_run_router`) y **2918** (`discard_pending_batches_on_shutdown`). `discord_message_bypasses_debounce` no aparece por nombre en `mod.rs` (definido y usado en `message_debounce.rs`), coherente con el criterio 3 del task e informes previos.
+
+**Outcome:** Criterios de aceptación cumplidos. Tras este informe: renombrar **`TESTING-`** → **`CLOSED-`** (no **WIP-**). Debounce en vivo contra Discord no probado.

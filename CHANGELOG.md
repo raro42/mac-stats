@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Browser agent** — **`BROWSER_NAVIGATE` `file://`** precheck debug line clarifies validated local HTML path. (`browser_agent/mod.rs`.)
 - **Docs** — Scheduler agent and browser automation notes. (`docs/009_scheduler_agent.md`, `docs/029_browser_automation.md`.)
 - **Tasks / OpenClaw reviewer** — Additive edits on **CLOSED** task notes under **`tasks/`** (workflow, verification, failure modes, operator guidance across the same browser/OpenClaw CLOSED set). Independent reviewer re-run **`2026-03-28T09:47:53Z`**; **OpenClaw** **`HEAD`** unchanged **`55dc6a8bb28d`** (**Aligned**). (`tasks/`, `005-openclaw-reviewer/005-openclaw-reviewer.md`.)
+- **Tasks / OpenClaw reviewer** — Further additive pass on the same **CLOSED** task files under **`tasks/`** (checkpoints, regression notes, operator guidance). Independent reviewer re-run **`2026-03-28T10:18:25Z`**; **OpenClaw** **`HEAD`** unchanged **`55dc6a8bb28d`** (**Aligned**). **`Cargo.lock`** — `mac_stats` package entry aligned with **`0.1.68`**. (`tasks/`, `005-openclaw-reviewer/005-openclaw-reviewer.md`, `src-tauri/Cargo.lock`.)
 
 ## [0.1.67] - 2026-03-28
 

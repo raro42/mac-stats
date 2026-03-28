@@ -746,3 +746,28 @@ rg -n "run_spa_blank_page_retry_if_needed|browser_spa_retry_enabled|SPA readines
 **Outcome:** Pass → `TESTING-…` → `CLOSED-…`.
 
 **Notes:** Sin prueba manual con Chrome/CDP en esta corrida.
+
+---
+
+## Test report
+
+**Date:** 2026-03-28 (local host time; not UTC).
+
+**Prerequisite:** The operator asked to test only `tasks/UNTESTED-20260321-1530-browser-use-spa-blank-page-retry.md`; that path did not exist (no other `UNTESTED-*` was used). The task file on disk was `tasks/CLOSED-20260321-1530-browser-use-spa-blank-page-retry.md`. Per `003-tester/TESTER.md`, **`CLOSED` → `TESTING`** was used as the functional equivalent of **UNTESTED → TESTING** for this single task.
+
+**Commands run**
+
+- `mv tasks/CLOSED-20260321-1530-browser-use-spa-blank-page-retry.md → tasks/TESTING-20260321-1530-browser-use-spa-blank-page-retry.md` — pass
+- `cd src-tauri && cargo check && cargo test` — pass (`cargo check` clean; lib `mac_stats`: 854 passed, 0 failed, finished in 1.16s; auxiliary bins 0 tests; doc-tests: 1 ignored)
+- `rg -n "run_spa_blank_page_retry_if_needed|browser_spa_retry_enabled|SPA readiness" ../src-tauri/src/browser_agent/mod.rs ../src-tauri/src/config/mod.rs ../docs/029_browser_automation.md` (cwd `src-tauri/`, as in task **Verification**) — pass
+
+**Acceptance criteria**
+
+1. `run_spa_blank_page_retry_if_needed` present and invoked after `BROWSER_NAVIGATE` (post-stabilization) — pass (`browser_agent/mod.rs`, call ~7093)
+2. `Config::browser_spa_retry_enabled()` (env, `config.json`, default true) — pass (`config/mod.rs` ~2037)
+3. Docs and `SPA readiness` at `-vv` — pass (`docs/029_browser_automation.md`, logs in `browser_agent/mod.rs`)
+4. `cargo check` / `cargo test` — pass
+
+**Outcome:** Pass → rename `TESTING-…` to `CLOSED-…`.
+
+**Notes:** No manual Chrome/CDP run in this pass.
