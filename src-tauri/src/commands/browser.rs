@@ -257,15 +257,62 @@ pub fn validate_file_url_for_browser_navigation(url: &Url) -> Result<PathBuf, St
     }
 }
 
+/// Browser-internal document URLs valid for CDP `Page.navigate` without HTTP SSRF checks.
+///
+/// Keep aligned with the browser agent post-navigate policy: allowed `about:` documents and the same
+/// `chrome://` new-tab surfaces (`new-tab-page` / `newtab`) as blank/new-tab detection there.
+fn cdp_internal_navigation_url_pass_through(url_trim: &str) -> Option<String> {
+    let u = url_trim;
+    if u.is_empty() {
+        return None;
+    }
+    let lower = u.to_ascii_lowercase();
+    if lower == "about:blank"
+        || lower.starts_with("about:blank#")
+        || lower.starts_with("about:blank?")
+        || lower == "about:srcdoc"
+        || lower.starts_with("about:srcdoc#")
+        || lower.starts_with("about:srcdoc?")
+    {
+        return Some(u.to_string());
+    }
+    if let Ok(parsed) = Url::parse(u) {
+        if parsed.scheme().eq_ignore_ascii_case("about") {
+            let p = parsed.path().to_ascii_lowercase();
+            if p == "blank" || p == "srcdoc" {
+                return Some(u.to_string());
+            }
+        }
+    }
+    const CHROME_PREFIX: &[u8] = b"chrome://";
+    let b = u.as_bytes();
+    if b.len() >= CHROME_PREFIX.len() && b[..CHROME_PREFIX.len()].eq_ignore_ascii_case(CHROME_PREFIX)
+    {
+        let rest = u[CHROME_PREFIX.len()..].to_ascii_lowercase();
+        if matches!(
+            rest.as_str(),
+            "new-tab-page" | "new-tab-page/" | "newtab" | "newtab/"
+        ) {
+            return Some(u.to_string());
+        }
+    }
+    None
+}
+
 /// Normalize the operator/model URL string and run pre-navigation checks for CDP (`Page.navigate`).
 ///
 /// - Adds `https://` when no scheme is present (existing behaviour).
 /// - Preserves `file://` URLs; [`validate_file_url_for_browser_navigation`] applies.
 /// - **http/https:** [`validate_url_no_ssrf`].
+/// - **Internal documents:** `about:blank` / `about:srcdoc` (incl. trivial query/fragment) and the
+///   same `chrome://` new-tab URLs as elsewhere in the browser agent — passed through unchanged, no SSRF.
 pub fn normalize_and_validate_cdp_navigation_url(url: &str) -> Result<String, String> {
     let u = url.trim();
     if u.is_empty() {
         return Err("Navigation URL is empty".to_string());
+    }
+    if let Some(pass) = cdp_internal_navigation_url_pass_through(u) {
+        return Ok(pass);
     }
     let normalized = if u.len() >= 7 && u[..7].eq_ignore_ascii_case("file://") {
         u.to_string()
@@ -938,5 +985,34 @@ mod tests {
         let url = Url::from_file_path(&p).unwrap().to_string();
         assert!(normalize_and_validate_cdp_navigation_url(&url).is_err());
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn cdp_nav_url_about_blank_not_https_prefixed() {
+        let out = normalize_and_validate_cdp_navigation_url("about:blank").unwrap();
+        assert_eq!(out, "about:blank");
+        assert!(
+            !out.starts_with("https://"),
+            "must not become https://about:blank (invalid for CDP Page.navigate): {}",
+            out
+        );
+    }
+
+    #[test]
+    fn cdp_nav_url_about_blank_fragment_and_query_preserved() {
+        assert_eq!(
+            normalize_and_validate_cdp_navigation_url("about:blank#frag").unwrap(),
+            "about:blank#frag"
+        );
+        assert_eq!(
+            normalize_and_validate_cdp_navigation_url("about:blank?q=1").unwrap(),
+            "about:blank?q=1"
+        );
+    }
+
+    #[test]
+    fn cdp_nav_url_schemeless_still_gets_https() {
+        let out = normalize_and_validate_cdp_navigation_url("example.com/path").unwrap();
+        assert_eq!(out, "https://example.com/path");
     }
 }

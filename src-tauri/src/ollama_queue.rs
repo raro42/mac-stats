@@ -11,6 +11,7 @@ use tokio::sync::{Mutex, OwnedSemaphorePermit, Semaphore};
 
 use crate::config::Config;
 use crate::debug2;
+use crate::mac_stats_info;
 
 struct KeyWaiters {
     busy: bool,
@@ -131,6 +132,12 @@ where
             let global_avail_after = state.global.available_permits();
             debug2!(
                 "ollama/queue: acquired global permit key={} global_available_permits_after={}",
+                key,
+                global_avail_after
+            );
+            mac_stats_info!(
+                "ollama/queue",
+                "Ollama HTTP queue: global permit acquired (key={}, global_available_permits_after={})",
                 key,
                 global_avail_after
             );

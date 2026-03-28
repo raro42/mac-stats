@@ -29,6 +29,7 @@ Aligned with `Subsystem` in `src-tauri/src/logging/subsystem.rs`: `metrics`, `ol
 | `ollama/api` | Ollama HTTP client (`ollama/mod.rs`) |
 | `circuit` | Per-service circuit breaker state transitions (Ollama `/api/chat` + `/api/tags`, Discord outbound HTTP sends): `Circuit opened for … after N consecutive failures` (warn), `Circuit closed for … — service recovered` (info) (`circuit_breaker.rs`). When **`MAC_STATS_DEBUG_FORCE_OPEN_OLLAMA_CIRCUIT`** is set, one info line notes debug gating for Ollama (`ollama/mod.rs`). |
 | `ollama/chat` | Agent router / `answer_with_ollama_and_fetch` (`commands/ollama.rs`); typed `OllamaRunError` codes and per-code counters (`commands/ollama_run_error.rs`), with `get_ollama_run_error_metrics` for debugging |
+| `ollama/queue` | Global + per-key Ollama HTTP slot (`ollama_queue.rs`); e.g. `Ollama HTTP queue: global permit acquired (key=…)` when a turn holds the semaphore |
 | `scheduler/heartbeat` | Periodic heartbeat checklist + HEARTBEAT_OK handling (`scheduler/heartbeat.rs`); startup: `Heartbeat loop started (app async runtime; same Tokio as Tauri)` |
 | `events` | Internal event bus: one-time INFO when default handlers register (`internal event bus: default handlers registered`) |
 | `events/screenshot`, `events/tool` | Internal event bus handlers (`src-tauri/src/events/mod.rs`): screenshot saved path, tool invocation telemetry |

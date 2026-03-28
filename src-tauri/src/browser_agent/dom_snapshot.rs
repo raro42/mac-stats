@@ -347,6 +347,7 @@ pub(crate) fn apply_snapshot_paint_filter(
             out_oids.push(oid);
             continue;
         };
+        row.cached_backend_node_id = Some(bid);
         let Some(info) = ctx.by_backend.get(&bid) else {
             out_rows.push(row);
             out_oids.push(oid);

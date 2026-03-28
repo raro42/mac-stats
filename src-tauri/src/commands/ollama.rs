@@ -1355,25 +1355,34 @@ pub fn answer_with_ollama_and_fetch(
 
         // Completion verification: one short Ollama call; if not satisfied, retry once (A2) or append disclaimer
         let criteria_count = success_criteria.as_ref().map(|c| c.len()).unwrap_or(0);
-        mac_stats_info!(
-            "ollama/chat",
-            "Agent router [{}]: running completion verification ({} criteria, {} attachment(s))",
-            request_id,
-            criteria_count,
-            attachment_paths.len()
-        );
-        match verify_completion(
-            &request_for_verification,
-            &response_content,
-            &attachment_paths,
-            success_criteria.as_deref(),
-            last_browser_extract.as_deref(),
-            last_news_search_was_hub_only,
-            model_override.clone(),
-            options_override.clone(),
-        )
-        .await
-        {
+        let verification_result = if heartbeat_fast_preamble {
+            mac_stats_info!(
+                "ollama/chat",
+                "Agent router [{}]: heartbeat mode — skipping completion verification LLM call",
+                request_id
+            );
+            Ok((true, None))
+        } else {
+            mac_stats_info!(
+                "ollama/chat",
+                "Agent router [{}]: running completion verification ({} criteria, {} attachment(s))",
+                request_id,
+                criteria_count,
+                attachment_paths.len()
+            );
+            verify_completion(
+                &request_for_verification,
+                &response_content,
+                &attachment_paths,
+                success_criteria.as_deref(),
+                last_browser_extract.as_deref(),
+                last_news_search_was_hub_only,
+                model_override.clone(),
+                options_override.clone(),
+            )
+            .await
+        };
+        match verification_result {
             Ok((false, reason)) => {
                 // Use only the user's question for memory search — not the verification reason.
                 // The reason contains generic words ("request", "verified", "assistant", "tools") that

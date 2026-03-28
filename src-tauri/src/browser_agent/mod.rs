@@ -431,6 +431,9 @@ pub(crate) struct InteractableRow {
     /// Set for cross-origin iframe rows; screenshot annotation skips these.
     #[serde(skip, default)]
     pub(crate) from_subframe: bool,
+    /// Filled by `DOMSnapshot` paint filter after `DOM.describeNode` so AX merge skips a second describe per row.
+    #[serde(skip, default)]
+    pub(crate) cached_backend_node_id: Option<DOM::BackendNodeId>,
 }
 
 /// JSON from `SPA_READINESS_JS` (`Runtime.evaluate` string result).
@@ -2137,6 +2140,7 @@ fn interactable_row_from_element(el: &Element<'_>) -> Result<InteractableRow, St
         covered: false,
         annot_bounds: None,
         from_subframe: false,
+        cached_backend_node_id: None,
     })
 }
 
@@ -3284,8 +3288,14 @@ pub fn get_interactables(tab: &headless_chrome::Tab) -> Result<Vec<Interactable>
 
     let ax_map = fetch_merged_ax_backend_map(tab);
     let mut interactables: Vec<Interactable> = Vec::with_capacity(rows.len());
+    let mut ax_backend_reuse: u32 = 0;
     for (i, (row, oid)) in rows.into_iter().zip(object_ids.into_iter()).enumerate() {
-        let backend = backend_id_for_object_id(tab, &oid).ok();
+        let backend = if let Some(bid) = row.cached_backend_node_id {
+            ax_backend_reuse += 1;
+            Some(bid)
+        } else {
+            backend_id_for_object_id(tab, &oid).ok()
+        };
         let (ax_name, ax_role) = backend
             .and_then(|b| ax_map.get(&b).cloned())
             .unwrap_or((None, None));
@@ -3308,6 +3318,13 @@ pub fn get_interactables(tab: &headless_chrome::Tab) -> Result<Vec<Interactable>
             from_subframe: row.from_subframe,
             covered: row.covered,
         });
+    }
+    if ax_backend_reuse > 0 {
+        mac_stats_debug!(
+            "browser/cdp",
+            "Browser agent [CDP]: interactables AX merge reused backendNodeId for {} rows (skipped duplicate DOM.describeNode)",
+            ax_backend_reuse
+        );
     }
     Ok(interactables)
 }

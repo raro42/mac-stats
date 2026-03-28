@@ -1,16 +1,12 @@
 //! Operator-facing CDP readiness diagnostics (OpenClaw-style `doctor-browser` analogue).
 //!
-//! Used by `mac_stats --browser-doctor` and optional rate-limited startup logging.
+//! Used by `mac_stats --browser-doctor`.
 
 use crate::config::Config;
 use serde_json::Value;
-use std::sync::Mutex;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 const TRUNCATE_DISPLAY: usize = 72;
-const STARTUP_HINT_COOLDOWN: Duration = Duration::from_secs(60 * 60);
-
-static LAST_STARTUP_CDP_HINT_AT: Mutex<Option<Instant>> = Mutex::new(None);
 
 fn truncate_display(s: &str) -> String {
     let t = s.trim();
@@ -159,35 +155,4 @@ pub fn run_browser_doctor_stdio() -> i32 {
             1
         }
     }
-}
-
-/// If browser tools are enabled and loopback CDP is not reachable, log a single **info** line
-/// (rate-limited to at most once per hour per process) pointing operators at `--browser-doctor`.
-pub fn maybe_log_startup_cdp_unreachable() {
-    if !Config::browser_tools_enabled() {
-        return;
-    }
-    if probe_loopback_json_version().is_ok() {
-        return;
-    }
-    let now = Instant::now();
-    let mut guard = match LAST_STARTUP_CDP_HINT_AT.lock() {
-        Ok(g) => g,
-        Err(_) => return,
-    };
-    if let Some(prev) = *guard {
-        if now.duration_since(prev) < STARTUP_HINT_COOLDOWN {
-            return;
-        }
-    }
-    *guard = Some(now);
-    drop(guard);
-
-    let port = Config::browser_cdp_port();
-    tracing::info!(
-        target: "browser/doctor",
-        "Browser CDP not reachable on 127.0.0.1:{} while browser tools are enabled. Start Chromium with --remote-debugging-port={} or run `mac_stats --browser-doctor` for details.",
-        port,
-        port
-    );
 }

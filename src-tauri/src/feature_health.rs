@@ -320,7 +320,7 @@ async fn probe_browser() -> FeatureHealth {
             "Browser (CDP)",
             HealthStatus::Degraded,
             Some(format!(
-                "Chromium binary present but nothing on port {} (CDP tools may use HTTP fallback)",
+                "Chromium binary present; port {} idle until first BROWSER_* use (mac-stats can launch on demand); HTTP fallback may apply",
                 port
             )),
         ),

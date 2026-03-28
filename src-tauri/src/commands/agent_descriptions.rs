@@ -115,6 +115,7 @@ pub(crate) fn format_task_agent_description(num: u32) -> String {
 /// When from_discord is true and Discord is configured, appends DISCORD_API agent and endpoint list.
 /// When question is provided and Redmine is configured, create-context (projects, trackers, etc.) is only appended if the question suggests create/update.
 /// When `skip_mcp_tool_list` is true (heartbeat turns), MCP `tools/list` is not called — avoids subprocess/SSE work on the shared Tauri runtime and keeps beats bounded.
+/// Redmine **create-context** HTTP fetches are also skipped: the synthetic heartbeat prompt contains words like "write" (response contract) and would otherwise false-trigger the create/update heuristic.
 pub(crate) async fn build_agent_descriptions(
     from_discord: bool,
     question: Option<&str>,
@@ -224,7 +225,7 @@ pub(crate) async fn build_agent_descriptions(
                     || q_lower.contains("time entry")
             })
             .unwrap_or(false);
-        if wants_create_or_update {
+        if wants_create_or_update && !skip_mcp_tool_list {
             if let Some(ctx) = crate::redmine::get_redmine_create_context().await {
                 base.push_str("\n\n");
                 base.push_str(&ctx);

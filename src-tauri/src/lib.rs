@@ -364,11 +364,6 @@ fn run_internal(open_cpu_window: bool) {
             // Write default prompt/agent files if missing (first launch or after update)
             crate::config::Config::ensure_defaults();
 
-            std::thread::spawn(|| {
-                std::thread::sleep(std::time::Duration::from_secs(3));
-                crate::browser_doctor::maybe_log_startup_cdp_unreachable();
-            });
-
             crate::events::register_default_handlers();
 
             // Kill orphaned headless Chrome processes from previous runs or races (keeps browser usage lean)
