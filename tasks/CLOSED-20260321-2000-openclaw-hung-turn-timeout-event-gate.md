@@ -1153,3 +1153,14 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
   - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches in `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
 - **Acceptance criteria:** All satisfied (`TurnOutputGate` as `Arc<AtomicBool>`; `gate_allows_send` in tool loop; `finalize_turn_timeout` returns text starting `**Turn timed out**` with budget seconds; router string `closing output gate after turn wall-clock timeout`; turn-lifecycle warns include `turn wall-clock timeout` / `closing output gate and running cleanup`; `cargo check` / `cargo test` green).
 - **Outcome:** **PASS** — restore **`TESTING-…` → `CLOSED-…`**: `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
+
+### Re-verify — 2026-03-29T23:55:06Z UTC (`003-tester/TESTER.md`, operator path `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only)
+
+- **Date / time:** 2026-03-29T23:55:06Z (UTC); calendario del operador 2026-03-30 (local).
+- **Rename UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**; no se usó ningún otro `UNTESTED-*`. Fase TESTING: `tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` → **`TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** antes de verificar; este bloque se añadió con el prefijo **`TESTING-…`**. Criterio del operador: pass → **`CLOSED-…`**; fallo de implementación → **`TESTED-…`**; instrucciones / entorno defectuosos → **`TESTPLAN-…`**. `003-tester/TESTER.md` del repo: bloqueo/fallo genérico → **`WIP-…`**.
+- **Commands run:**
+  - `cd src-tauri && cargo check && cargo test` — pass (`cargo test`: crate de librería **874** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` (raíz del repo) — sin coincidencias (el cuerpo de la tarea lista `src/`; el Rust está en `src-tauri/src/`)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+- **Acceptance criteria:** Cumplidos (`TurnOutputGate` = `Arc<AtomicBool>`; `gate_allows_send` en tool loop; `finalize_turn_timeout` con texto `**Turn timed out**` y presupuesto en segundos; log del router `closing output gate after turn wall-clock timeout`; warns en `turn_lifecycle` con `turn wall-clock timeout` y `closing output gate and running cleanup`; `cargo check` / `cargo test` en verde).
+- **Outcome:** **PASS** — restaurar **`TESTING-…` → `CLOSED-…`**: `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.

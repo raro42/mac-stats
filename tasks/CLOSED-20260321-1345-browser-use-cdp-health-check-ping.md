@@ -2912,3 +2912,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Criterios de aceptación (1)–(3) del alcance CDP:** siguen verificables por `rg` y el código en `browser_agent/mod.rs`; **no** hay regresión atribuible a esta tarea.
 
 **Outcome (convención del operador):** **TESTPLAN-** — el bloque de verificación de la tarea exige `cargo test --no-fail-fast` completo; aquí falla un test ajeno al CDP (acoplamiento a entorno/`pdfs_dir`), no un fallo de implementación del health-check. Renombrar `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+
+---
+
+## Test report
+
+**Date:** local 2026-03-30 (operator calendar); **2026-03-29T23:54:30Z (UTC)** (`date -u`).
+
+**TESTER.md flow:** Se solicitó `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; **no existe** en el árbol. El único fichero con ese slug era `TESTPLAN-…`; se renombró **`TESTPLAN-` → `TESTING-`** al inicio de esta ejecución (mismo basename tras el prefijo). **No se probó ningún otro `UNTESTED-*`.**
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (comentario en `check_browser_alive` que prohíbe `Handle::block_on` + `tokio::time::timeout`; documentación en `evaluate_one_plus_one_blocking_timeout` sobre no anidar Tokio `block_on`)
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (874 passed, 0 failed en crate lib `mac_stats`; otros bins 0 tests; 1 doc-test ignored)
+
+**Acceptance criteria (1)–(3):** cumplidos según los `rg` del cuerpo de la tarea y revisión de `browser_agent/mod.rs` (`evaluate_one_plus_one_blocking_timeout` + `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)`, `check_browser_alive` con comentario anti–`block_on`, `clear_browser_session_on_error` y `should_retry_cdp_after_clearing_session` documentando que el health-check no debe reintentarse como reconnect genérico).
+
+**Outcome (operator convention):** **CLOSED-** — todos los criterios y comandos de verificación pasan en este entorno. Renombrar `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
