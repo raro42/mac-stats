@@ -52,6 +52,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** — append **`003-tester`** **Test report** (**2026-03-29T18:12:04Z** UTC): `rg` on `browser_agent/mod.rs` (health-check / `block_on` guards), **`cargo check`**, **`cargo test --no-fail-fast`** (**874** lib tests; TESTING→CLOSED rename per **`TESTER.md`**).
+- **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** — **Re-verify** (**2026-03-29T18:12:41Z** UTC): **`cargo check`** / **`cargo test`** (**874** lib tests); `rg` for **`TurnOutputGate`** / **`finalize_turn_timeout`** under **`src-tauri/src`** (top-level **`src/`** empty as expected).
 - **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** — append **`003-tester`** **Test report** (**2026-03-29T18:04:57Z** UTC): `rg` on `browser_agent/mod.rs`, `cargo check`, **`cargo test --no-fail-fast`** (**874** lib tests).
 - **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** — **Re-verify** block (**2026-03-29T18:05:44Z** UTC): `cargo check` / **`cargo test`**, `rg` for `TurnOutputGate` / `finalize_turn_timeout` under **`src-tauri/src`**.
 - **Build** — **`src-tauri/Cargo.lock`** — **`mac_stats`** package version aligned with **`Cargo.toml`** (**0.1.76**).
