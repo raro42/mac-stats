@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.76] - 2026-03-29
+
+### Added
+- **Ollama / Discord** — **`OllamaRequest::silent_user_output`** (OpenClaw-style silent-expected): suppresses **`status_tx`**, per-tool Discord draft/progress, typing, and several user-only reply appendices; tool loop still sets **`forward_substantive_output`** after merging tool results so error-boundary retry works. **`OllamaReply::silent_user_output`** surfaces the flag to the outbound path.
+- **Discord** — **`DiscordDraftHandle::abandon_silent`** / draft editor **`AbandonSilent`** command: delete the **“Processing…”** placeholder when the final reply is empty under silent mode (no **`(No reply text.)`** flush).
+- **Dev** — Debug builds: **`MAC_STATS_DEV_SILENT_DISCORD_OLLAMA=1`** exercises the silent Discord path (documented in **`docs/021_router_and_agents.md`**).
+
+### Changed
+- **Scheduler** — Heartbeat Ollama runs set **`silent_user_output: true`** so they are not treated like live chat turns.
+
 ## [0.1.75] - 2026-03-29
 
 ### Fixed

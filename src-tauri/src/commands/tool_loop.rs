@@ -742,6 +742,8 @@ pub(crate) async fn run_tool_loop(
             break;
         }
 
+        // Set after tool results are merged into the chat for the next model turn. Applies to
+        // `silent_user_output` invocations too so error-boundary retry does not treat substantive tool work as an empty pipeline.
         if let Some(f) = params.forward_substantive_output.as_ref() {
             f.store(true, Ordering::Release);
         }

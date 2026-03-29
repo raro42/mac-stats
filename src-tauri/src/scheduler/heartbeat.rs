@@ -179,6 +179,8 @@ async fn run_one_beat(settings: &HeartbeatSettings) {
                     // Match scheduler/heartbeat outer cap so the agent-router wall-clock fires in band
                     // with `schedulerTaskTimeoutSecs` instead of the shorter remote default alone.
                     turn_timeout_secs: Some(turn_wall_secs),
+                    // OpenClaw-style silent-expected: no user-visible status/draft hooks (heartbeat is not a live chat turn).
+                    silent_user_output: true,
                     ..Default::default()
                 },
             ),

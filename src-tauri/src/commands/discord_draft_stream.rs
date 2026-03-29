@@ -20,6 +20,10 @@ enum Cmd {
         text: String,
         reply: oneshot::Sender<()>,
     },
+    /// Delete the placeholder message (silent-expected empty final; no `(No reply text.)`).
+    AbandonSilent {
+        reply: oneshot::Sender<()>,
+    },
     Stop,
 }
 
@@ -57,6 +61,20 @@ impl DiscordDraftHandle {
 
     pub fn stop(&self) {
         let _ = self.tx.send(Cmd::Stop);
+    }
+
+    /// Delete the Discord placeholder message (used when `silent_user_output` and the final text is empty).
+    pub async fn abandon_silent(&self) {
+        let (reply_tx, reply_rx) = oneshot::channel();
+        if self
+            .tx
+            .send(Cmd::AbandonSilent { reply: reply_tx })
+            .is_err()
+        {
+            debug!(target: "discord/draft", "silent abandon dropped (editor stopped)");
+            return;
+        }
+        let _ = reply_rx.await;
     }
 }
 
@@ -114,6 +132,21 @@ pub fn spawn_discord_draft_editor(
         while let Some(cmd) = rx.recv().await {
             match cmd {
                 Cmd::Stop => break,
+                Cmd::AbandonSilent { reply } => {
+                    match message.delete(&ctx.http).await {
+                        Ok(()) => info!(
+                            target: "discord/draft",
+                            "silent abandon: placeholder message deleted"
+                        ),
+                        Err(e) => warn!(
+                            target: "discord/draft",
+                            "silent abandon: delete placeholder failed: {}",
+                            e
+                        ),
+                    }
+                    let _ = reply.send(());
+                    return;
+                }
                 Cmd::Flush { text, reply } => {
                     let _ = apply_edit(&ctx, &mut message, &text, "draft flush").await;
                     let _ = reply.send(());
@@ -124,6 +157,30 @@ pub fn spawn_discord_draft_editor(
                     loop {
                         match rx.try_recv() {
                             Ok(Cmd::Update(t)) => latest = t,
+                            Ok(Cmd::AbandonSilent { reply }) => {
+                                if clamp_discord_content(&latest) != last_sent {
+                                    let wait =
+                                        next_allowed.saturating_duration_since(Instant::now());
+                                    if !wait.is_zero() {
+                                        tokio::time::sleep(wait).await;
+                                    }
+                                    let _ = apply_edit(&ctx, &mut message, &latest, "draft update")
+                                        .await;
+                                }
+                                match message.delete(&ctx.http).await {
+                                    Ok(()) => info!(
+                                        target: "discord/draft",
+                                        "silent abandon: placeholder message deleted (coalesced)"
+                                    ),
+                                    Err(e) => warn!(
+                                        target: "discord/draft",
+                                        "silent abandon: delete failed (coalesced): {}",
+                                        e
+                                    ),
+                                }
+                                let _ = reply.send(());
+                                return;
+                            }
                             Ok(Cmd::Flush { text, reply }) => {
                                 if clamp_discord_content(&latest) != last_sent {
                                     let wait =

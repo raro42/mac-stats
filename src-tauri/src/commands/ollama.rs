@@ -133,6 +133,11 @@ pub struct OllamaRequest {
     pub ollama_queue_wait_hook: Option<std::sync::Arc<dyn Fn() + Send + Sync>>,
     /// When set, drop this invocation if older than the session abort cutoff (scheduler due time, heartbeat tick, etc.).
     pub inbound_stale_guard: Option<crate::commands::abort_cutoff::InboundStaleGuard>,
+    /// When true, suppress user-visible Discord emissions for this invocation: no `status_tx` lines, no draft
+    /// updates, no typing (Discord caller), no `(No reply text.)` flush, and skip a few user-only reply appendices.
+    /// Tool work still runs; `forward_substantive_output` is set when the tool loop merges results (error-boundary
+    /// retry still follows substantive work). Default **false** preserves existing behaviour.
+    pub silent_user_output: bool,
 }
 
 /// Main orchestrator: plan → execute tools → verify → optionally retry.
@@ -190,6 +195,7 @@ pub fn answer_with_ollama_and_fetch(
         ollama_queue_key: _,
         ollama_queue_wait_hook: _,
         inbound_stale_guard,
+        silent_user_output,
     } = req;
     let load_global_memory = discord_is_dm.is_none_or(|dm| dm);
     if discord_is_dm == Some(false) {
@@ -441,7 +447,11 @@ pub fn answer_with_ollama_and_fetch(
         crate::commands::turn_lifecycle::register(coord_key, &request_id);
         let output_gate = crate::commands::turn_lifecycle::new_output_gate_open();
         let request_id_for_timeout = request_id.clone();
-        let discord_draft_for_timeout = discord_draft.clone();
+        let discord_draft_for_timeout = if silent_user_output {
+            None
+        } else {
+            discord_draft.clone()
+        };
         let partial_for_timeout = partial_progress_capture.clone();
 
         let ollama_http_q = if skip_ollama_queue_flag {
@@ -461,7 +471,22 @@ pub fn answer_with_ollama_and_fetch(
             let model_note_for_reply = model_not_in_catalog_note_for_turn.clone();
             async move {
                 crate::ollama_queue::with_ollama_http_queue(qspec, || async move {
+        if silent_user_output {
+            mac_stats_debug!(
+                "ollama/chat",
+                request_id = %request_id,
+                "silent_user_output: suppressing user-visible status/draft hooks for this turn"
+            );
+        }
+        let (status_for_tool_loop, discord_draft_for_tool_loop) = if silent_user_output {
+            (None, None)
+        } else {
+            (status_tx.clone(), discord_draft.clone())
+        };
         let send_status = |msg: &str| {
+            if silent_user_output {
+                return;
+            }
             if !crate::commands::turn_lifecycle::gate_allows_send(&og) {
                 return;
             }
@@ -1175,8 +1200,8 @@ pub fn answer_with_ollama_and_fetch(
             max_tool_iterations,
             model_override: model_override.clone(),
             options_override: options_override.clone(),
-            status_tx: status_tx.clone(),
-            discord_draft: discord_draft.clone(),
+            status_tx: status_for_tool_loop,
+            discord_draft: discord_draft_for_tool_loop,
             discord_reply_channel_id,
             allow_schedule,
             load_global_memory,
@@ -1232,7 +1257,7 @@ pub fn answer_with_ollama_and_fetch(
         );
 
         // When multiple agents participated, ensure the user sees the conversation: append a transcript if we have 2+ agent turns and the final reply is short (so we don't hide a long model summary).
-        if agent_conversation.len() >= 2 {
+        if !silent_user_output && agent_conversation.len() >= 2 {
             const SHORT_REPLY_THRESHOLD: usize = 500;
             if response_content.chars().count() < SHORT_REPLY_THRESHOLD
                 || response_content.contains("Thank you for providing")
@@ -1283,7 +1308,8 @@ pub fn answer_with_ollama_and_fetch(
 
         // Heuristic guard: screenshot requested but no attachment
         let user_asked_screenshot = user_explicitly_asked_for_screenshot(&request_for_verification);
-        if (user_asked_screenshot || screenshot_requested_by_tool_run)
+        if !silent_user_output
+            && (user_asked_screenshot || screenshot_requested_by_tool_run)
             && attachment_paths.is_empty()
         {
             response_content
@@ -1294,7 +1320,7 @@ pub fn answer_with_ollama_and_fetch(
         }
 
         // User-facing note when browser action limit was reached (032_browser_loop_and_status_fix_plan).
-        if browser_tool_cap_reached {
+        if !silent_user_output && browser_tool_cap_reached {
             response_content.push_str(&format!(
                 "\n\nNote: Browser action limit ({} per run) was reached; some actions were skipped.",
                 MAX_BROWSER_TOOLS_PER_RUN
@@ -1425,6 +1451,7 @@ pub fn answer_with_ollama_and_fetch(
                         run_error_boundary_retry_done: false,
                         skip_ollama_run_error_metrics: true,
                         skip_ollama_queue: true,
+                        silent_user_output,
                         ..Default::default()
                     })
                     .await
@@ -1575,7 +1602,9 @@ pub fn answer_with_ollama_and_fetch(
         );
 
         if let Some(note) = model_note_for_reply.as_ref() {
-            final_text = format!("{}{}", note, final_text);
+            if !silent_user_output {
+                final_text = format!("{}{}", note, final_text);
+            }
         }
 
         Ok(OllamaReply {
@@ -1584,6 +1613,7 @@ pub fn answer_with_ollama_and_fetch(
             directive_thread_reply: directive_flags.thread_reply,
             directive_attach_screenshot: directive_flags.attach_screenshot,
             directive_split_long: directive_flags.split_long,
+            silent_user_output,
         })
         })
         .await
@@ -1627,6 +1657,9 @@ pub fn answer_with_ollama_and_fetch(
                         !skip_ollama_run_error_metrics,
                     ));
                 }
+                // `forward_substantive_output` is set when the tool loop merges tool results into the chat.
+                // That includes `silent_user_output` turns (OpenClaw-style silent-expected): internal tool work
+                // must not take the "empty pipeline" BrowserSessionLost / ServiceUnavailable retry branch.
                 if forward_substantive_output.load(Ordering::Acquire) {
                     return Err(finish_router_failure(
                         classified,
@@ -1668,3 +1701,22 @@ pub fn answer_with_ollama_and_fetch(
 
 /// OpenClaw-style name: same entry as [`answer_with_ollama_and_fetch`] (classification, metrics, one-shot retry).
 pub use answer_with_ollama_and_fetch as with_run_error_boundary;
+
+#[cfg(test)]
+mod silent_user_output_tests {
+    use super::OllamaRequest;
+
+    #[test]
+    fn ollama_request_defaults_silent_user_output_false() {
+        assert!(!OllamaRequest::default().silent_user_output);
+    }
+
+    #[test]
+    fn ollama_request_silent_can_be_enabled() {
+        let r = OllamaRequest {
+            silent_user_output: true,
+            ..Default::default()
+        };
+        assert!(r.silent_user_output);
+    }
+}

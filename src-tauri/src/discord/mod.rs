@@ -2151,9 +2151,27 @@ async fn run_discord_ollama_router_locked(
     set_discord_user_name(author_id_u64, display_name.clone());
     crate::user_info::maybe_update_display_name_from_discord(author_id_u64, &display_name);
 
+    // Debug-only: set MAC_STATS_DEV_SILENT_DISCORD_OLLAMA=1 to exercise silent_user_output on the Discord path (no typing, no draft, no status lines, empty final deletes placeholder).
+    let dev_silent_discord = cfg!(debug_assertions)
+        && matches!(
+            std::env::var("MAC_STATS_DEV_SILENT_DISCORD_OLLAMA").as_deref(),
+            Ok("1") | Ok("true") | Ok("TRUE")
+        );
+    if dev_silent_discord {
+        info!(
+            target: "ollama/chat",
+            "MAC_STATS_DEV_SILENT_DISCORD_OLLAMA: silent_user_output enabled for this Discord turn"
+        );
+    }
+
     // Channel for status updates. Only posted to Discord when verbose mode is on;
     // otherwise they are only logged internally to keep the channel clean for other bots.
     let (status_tx, mut status_rx) = mpsc::unbounded_channel::<String>();
+    let status_for_ollama = if dev_silent_discord {
+        None
+    } else {
+        Some(status_tx.clone())
+    };
     let ctx_send = ctx.clone();
     let channel_id = new_message.channel_id;
     const EDIT_PREFIX: &str = "EDIT:";
@@ -2161,28 +2179,36 @@ async fn run_discord_ollama_router_locked(
     const CRITERIA_PROGRESS: &str = "Extracting success criteria…";
     // Placeholder message edited in-place while tools run (throttled); flushed with the final reply.
     let throttle_ms = crate::config::Config::discord_draft_throttle_ms();
-    let discord_draft = match new_message.channel_id.say(&ctx, "Processing…").await {
-        Ok(placeholder) => {
-            info!(
-                target: "discord/draft",
-                "placeholder sent, draft editor started (throttle_ms={})",
-                throttle_ms
-            );
-            Some(
-                crate::commands::discord_draft_stream::spawn_discord_draft_editor(
-                    ctx.clone(),
-                    placeholder,
-                    std::time::Duration::from_millis(throttle_ms),
-                ),
-            )
-        }
-        Err(e) => {
-            warn!(
-                target: "discord/draft",
-                "placeholder send failed (reply-only mode): {}",
-                e
-            );
-            None
+    let discord_draft = if dev_silent_discord {
+        info!(
+            target: "discord/draft",
+            "silent_user_output: skipping Processing… placeholder and draft editor"
+        );
+        None
+    } else {
+        match new_message.channel_id.say(&ctx, "Processing…").await {
+            Ok(placeholder) => {
+                info!(
+                    target: "discord/draft",
+                    "placeholder sent, draft editor started (throttle_ms={})",
+                    throttle_ms
+                );
+                Some(
+                    crate::commands::discord_draft_stream::spawn_discord_draft_editor(
+                        ctx.clone(),
+                        placeholder,
+                        std::time::Duration::from_millis(throttle_ms),
+                    ),
+                )
+            }
+            Err(e) => {
+                warn!(
+                    target: "discord/draft",
+                    "placeholder send failed (reply-only mode): {}",
+                    e
+                );
+                None
+            }
         }
     };
 
@@ -2246,25 +2272,33 @@ async fn run_discord_ollama_router_locked(
     let typing_channel = new_message.channel_id;
     let queue_typing_ctx = typing_ctx.clone();
     let queue_typing_channel = typing_channel;
-    let ollama_queue_wait_hook: Option<std::sync::Arc<dyn Fn() + Send + Sync>> =
+    let ollama_queue_wait_hook: Option<std::sync::Arc<dyn Fn() + Send + Sync>> = if dev_silent_discord
+    {
+        None
+    } else {
         Some(std::sync::Arc::new(move || {
             let c = queue_typing_ctx.clone();
             let ch = queue_typing_channel;
             tokio::spawn(async move {
                 let _ = ch.broadcast_typing(&c).await;
             });
-        }));
+        }))
+    };
     let typing_cancel = tokio_util::sync::CancellationToken::new();
-    let typing_token = typing_cancel.clone();
-    let typing_task = tokio::spawn(async move {
-        loop {
-            let _ = typing_channel.broadcast_typing(&typing_ctx).await;
-            tokio::select! {
-                _ = tokio::time::sleep(std::time::Duration::from_secs(8)) => {}
-                _ = typing_token.cancelled() => break,
+    let typing_task = if dev_silent_discord {
+        None
+    } else {
+        let typing_token = typing_cancel.clone();
+        Some(tokio::spawn(async move {
+            loop {
+                let _ = typing_channel.broadcast_typing(&typing_ctx).await;
+                tokio::select! {
+                    _ = tokio::time::sleep(std::time::Duration::from_secs(8)) => {}
+                    _ = typing_token.cancelled() => break,
+                }
             }
-        }
-    });
+        }))
+    };
 
     let attachment_images_for_ollama = if attachment_images_base64.is_empty() {
         None
@@ -2287,10 +2321,11 @@ async fn run_discord_ollama_router_locked(
     let partial_progress = crate::commands::partial_progress::PartialProgressCapture::new();
     let mut directive_thread_reply = false;
     let mut directive_split_long = false;
+    let mut ollama_silent_user_output = dev_silent_discord;
     let ollama_router_result = crate::commands::ollama::answer_with_ollama_and_fetch(
         crate::commands::ollama::OllamaRequest {
             question: question_for_ollama.clone(),
-            status_tx: Some(status_tx),
+            status_tx: status_for_ollama,
             discord_reply_channel_id: Some(channel_id_u64),
             discord_user_id: Some(author_id_u64),
             discord_user_name: Some(display_name),
@@ -2309,10 +2344,12 @@ async fn run_discord_ollama_router_locked(
             partial_progress_capture: Some(partial_progress.clone()),
             ollama_queue_key: Some(format!("discord:{}", channel_id_u64)),
             ollama_queue_wait_hook,
+            silent_user_output: dev_silent_discord,
             ..Default::default()
         },
     )
     .await;
+    drop(status_tx);
     if let Err(ref e) = ollama_router_result {
         if matches!(
             e,
@@ -2331,13 +2368,16 @@ async fn run_discord_ollama_router_locked(
                 d.stop();
             }
             typing_cancel.cancel();
-            let _ = typing_task.await;
+            if let Some(t) = typing_task {
+                let _ = t.await;
+            }
             let _ = status_task.await;
             return;
         }
     }
     let (reply_text, attachment_paths) = match ollama_router_result {
         Ok(r) => {
+            ollama_silent_user_output = r.silent_user_output;
             directive_thread_reply = r.directive_thread_reply;
             directive_split_long = r.directive_split_long;
             (r.text, r.attachment_paths)
@@ -2390,7 +2430,9 @@ async fn run_discord_ollama_router_locked(
     };
 
     typing_cancel.cancel();
-    let _ = typing_task.await;
+    if let Some(t) = typing_task {
+        let _ = t.await;
+    }
 
     // Sender was moved into answer_with_ollama_and_fetch and is dropped when it returns, so status_rx gets None.
     // Wait for the status task to finish so all status messages are sent before we send the final reply.
@@ -2424,16 +2466,23 @@ async fn run_discord_ollama_router_locked(
     if let Some(draft) = discord_draft.as_ref() {
         const EMPTY_REPLY_FALLBACK: &str = "(No reply text.)";
         let first_chunk = chunks.first().map(|s| s.as_str()).unwrap_or("");
-        let first = if first_chunk.trim().is_empty() {
-            info!(
-                target: "discord/draft",
-                "draft flush using empty-reply fallback (trimmed reply was empty)"
-            );
-            EMPTY_REPLY_FALLBACK
+        if first_chunk.trim().is_empty() {
+            if ollama_silent_user_output {
+                info!(
+                    target: "discord/draft",
+                    "silent_user_output: empty final — deleting draft placeholder (no fallback text)"
+                );
+                draft.abandon_silent().await;
+            } else {
+                info!(
+                    target: "discord/draft",
+                    "draft flush using empty-reply fallback (trimmed reply was empty)"
+                );
+                draft.flush(EMPTY_REPLY_FALLBACK).await;
+            }
         } else {
-            first_chunk
-        };
-        draft.flush(first).await;
+            draft.flush(first_chunk).await;
+        }
     }
 
     let send_chunks: &[_] = if discord_draft.is_some() {

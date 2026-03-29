@@ -27,6 +27,8 @@ pub struct OllamaReply {
     pub directive_attach_screenshot: bool,
     /// Model asked for paragraph-oriented multi-message split on Discord (`[[split_long]]`).
     pub directive_split_long: bool,
+    /// When true, this invocation suppressed user-visible Discord hooks (status/draft/typing) and empty-reply placeholders.
+    pub silent_user_output: bool,
 }
 
 /// Request-local execution context for a single Discord/Ollama run (task-008 Phase 1).
