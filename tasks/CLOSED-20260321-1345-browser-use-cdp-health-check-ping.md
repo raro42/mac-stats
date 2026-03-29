@@ -2874,3 +2874,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Acceptance criteria (task scope):** (1)–(3) for CDP ping / `clear_browser_session_on_error` / anti–`block_on` — **pass** per `rg` and existing `browser_agent/mod.rs` (not invalidated by unrelated test failures).
 
 **Outcome (operator naming):** **TESTPLAN-** — prescribed full `cargo test` gate fails in this environment due to unrelated modules and home-directory test coupling, not due to a regression in the CDP health-check implementation. Rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+
+---
+
+## Test report
+
+**Fecha:** 2026-03-30 (calendario del operador); **2026-03-29T23:36:46Z (UTC)** (`date -u` al cerrar la ejecución)
+
+**Flujo TESTER.md / operador:** Se pidió `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; **no existe** en el repo. El único fichero con ese slug era `TESTPLAN-…`; se renombró **`TESTPLAN-` → `TESTING-`** para este ciclo (mismo basename tras el prefijo). **No se probó ningún otro `UNTESTED-*`.**
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (874 passed, 0 failed en crate lib `mac_stats`; otros bins 0 tests; 1 doc-test ignored)
+
+**Criterios de aceptación (1)–(3):** verificados con los `rg` del cuerpo de la tarea y el código en `browser_agent/mod.rs` (`evaluate_one_plus_one_blocking_timeout` + `recv_timeout`, comentario anti–`Handle::block_on` en `check_browser_alive`, `clear_browser_session_on_error` + documentación en `should_retry_cdp_after_clearing_session`).
+
+**Outcome (convención del operador):** **CLOSED-** — todos los criterios y comandos de verificación pasan. Renombrar `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
