@@ -2797,3 +2797,23 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 
 **Outcome (operator naming):** **CLOSED-** — rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
 
+
+---
+
+## Test report
+
+**Date:** 2026-03-29T22:43:19Z (UTC)
+
+**TESTER.md flow:** Operator requested `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` — **not present** in the repo (only this slug as `CLOSED-…` before this run). Renamed **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md` → `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md`** for this run (same basename after prefix; equivalent to `UNTESTED-` → `TESTING-` when the task was already closed). **No other `UNTESTED-*` file was tested.**
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (comment in `check_browser_alive` forbids `Handle::block_on` + `tokio::time::timeout`; `evaluate_one_plus_one_blocking_timeout` documents no nested Tokio `block_on`)
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (874 passed, 0 failed in crate lib `mac_stats`; other bins 0 tests; 1 doc-test ignored)
+
+**Acceptance criteria:** (1) blocking health ping with `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)` and **Browser unresponsive** where applicable, (2) `check_browser_alive` + explicit anti–nested-`block_on` comment, (3) `clear_browser_session_on_error` for unresponsive / `is_connection_error`, `should_retry_cdp_after_clearing_session` documents health vs retry — **pass** (verified via `rg` + `browser_agent/mod.rs`).
+
+**Outcome:** All verification passed — rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+
