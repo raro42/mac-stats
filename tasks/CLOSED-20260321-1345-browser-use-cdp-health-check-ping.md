@@ -2454,3 +2454,41 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Criterios de aceptación:** los tres del cuerpo de la tarea — **pass**.
 
 **Outcome:** Todo pasa — renombrar **`TESTING-` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+
+---
+
+## Test report
+
+**Fecha:** 2026-03-29T20:13:28Z (UTC)
+
+**Flujo TESTER.md (`003-tester/TESTER.md`):** El operador citó únicamente `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; ese path **no existe** en el árbol (no hay `UNTESTED-…` con este slug). La tarea viva es `tasks/*-20260321-1345-browser-use-cdp-health-check-ping.md`; al inicio de esta ejecución se renombró **`CLOSED-` → `TESTING-`** como ciclo de prueba equivalente a `UNTESTED-` → `TESTING-`. No se abrió ningún otro fichero `UNTESTED-*`.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (874 passed, 0 failed en crate lib `mac_stats`; otros bins 0 tests; 1 doc-test ignored)
+
+**Criterios de aceptación:** los tres del cuerpo de la tarea — **pass**.
+
+**Outcome:** Todo pasa — renombrar **`TESTING-` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** (no `TESTED-` ni `TESTPLAN-`: la verificación del cuerpo de la tarea es ejecutable y los criterios se cumplen en código).
+
+---
+
+## Test report
+
+**Fecha:** 2026-03-29T20:13:28Z (UTC)
+
+**Flujo TESTER.md (`003-tester/TESTER.md`):** El operador citó únicamente `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; ese path **no existe** en el árbol (no hay `UNTESTED-…` con este slug). La tarea viva es `tasks/*-20260321-1345-browser-use-cdp-health-check-ping.md`; al inicio de esta ejecución se renombró **`CLOSED-` → `TESTING-`** como ciclo de prueba equivalente a `UNTESTED-` → `TESTING-`. No se abrió ningún otro fichero `UNTESTED-*`.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (874 passed, 0 failed en crate lib `mac_stats`; otros bins 0 tests; 1 doc-test ignored)
+
+**Criterios de aceptación:** los tres del cuerpo de la tarea — **pass**.
+
+**Outcome:** Todo pasa — renombrar **`TESTING-` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** (no `TESTED-` ni `TESTPLAN-`: la verificación del cuerpo de la tarea es ejecutable y los criterios se cumplen en código).
