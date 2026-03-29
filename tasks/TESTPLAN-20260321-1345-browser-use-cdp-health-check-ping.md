@@ -2855,3 +2855,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 
 **Outcome (operator naming):** **CLOSED-** (all criteria pass) — rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
 
+
+---
+
+## Test report
+
+**Date:** 2026-03-30 (operator calendar); **2026-03-29T23:19:04Z (UTC)** per `date -u`.
+
+**TESTER.md / operator flow:** Requested `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` — **not present** in the repo. Renamed **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md` → `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md`** for this run (same basename after prefix). **No other `UNTESTED-*` file was tested.**
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (comment in `check_browser_alive` forbids nested `Handle::block_on` + `tokio::time::timeout`; `evaluate_one_plus_one_blocking_timeout` documents no nested Tokio `block_on`)
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **fail** (`--lib`): **871 passed; 3 failed** — `discord::tests::outbound_attachment_path_allowlist` (pdfs_dir allowlist when directory exists), `scheduler::delivery_awareness::tests::list_entries_newest_first_order` (assertion includes real persisted entries under home), `scheduler::delivery_awareness::tests::record_if_new_skips_duplicate_context_key` (`PoisonError` on home test lock). None of these targets `browser_agent` CDP health-check code.
+
+**Acceptance criteria (task scope):** (1)–(3) for CDP ping / `clear_browser_session_on_error` / anti–`block_on` — **pass** per `rg` and existing `browser_agent/mod.rs` (not invalidated by unrelated test failures).
+
+**Outcome (operator naming):** **TESTPLAN-** — prescribed full `cargo test` gate fails in this environment due to unrelated modules and home-directory test coupling, not due to a regression in the CDP health-check implementation. Rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`**.
