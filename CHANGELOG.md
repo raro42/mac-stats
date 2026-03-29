@@ -52,6 +52,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** — append **`003-tester`** **Test report** (**2026-03-29T18:04:57Z** UTC): `rg` on `browser_agent/mod.rs`, `cargo check`, **`cargo test --no-fail-fast`** (**874** lib tests).
+- **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** — **Re-verify** block (**2026-03-29T18:05:44Z** UTC): `cargo check` / **`cargo test`**, `rg` for `TurnOutputGate` / `finalize_turn_timeout` under **`src-tauri/src`**.
+- **Build** — **`src-tauri/Cargo.lock`** — **`mac_stats`** package version aligned with **`Cargo.toml`** (**0.1.76**).
 - **Tasks** — Eight **`tasks/CLOSED-*.md`** browser / OpenClaw / Discord tracks — append **`003-tester`** **Test report** blocks (**verify #74** run, **2026-03-29** ~**10:13Z** UTC): `cargo check`, **`cargo test`** (**872** lib tests), **`rg`** spot-checks where each task specifies.
 - **Tasks / docs** — Ollama startup-gate **`tasks/CLOSED-20260322-1920-openclaw-ollama-warmup-before-channels.md`** — closing reviewer **verify #74**; **`docs/022_feature_review_plan.md`** — checklist **verify #74** (**2026-03-29T10:14:56Z** UTC). Alcance textual **`tasks/TESTING-20260322-1920-…`** vía **`git mv`** ida/vuelta → **`CLOSED-…`** en disco.
 - **Tasks / docs** — Ollama startup-gate **`tasks/CLOSED-20260322-1920-openclaw-ollama-warmup-before-channels.md`** — closing reviewer **verify #73**; **`docs/022_feature_review_plan.md`** — checklist **verify #73** (**2026-03-29T10:01:16Z** UTC). Track rename **`TESTING-20260322-1920-…`** → **`CLOSED-20260322-1920-…`** (restore closed prefix on disk).
