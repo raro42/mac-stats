@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.77] - 2026-03-30
+
+### Changed
+- **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** — append **`003-tester`** **Test report** (**2026-03-29T22:16:06Z** UTC): operator **`UNTESTED-…`** **not present**; **`CLOSED-` → `TESTING-`** cycle; health-check / anti-`block_on` **`rg`** + **`cargo check`** / **`cargo test --no-fail-fast`** (**874** lib tests); **pass** → **`CLOSED-…`**.
+- **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** — **Re-verify** (**2026-03-30** UTC, **`003-tester` / `TESTER.md`**): operator **`UNTESTED-…`** **not present**; **`CLOSED-` → `TESTING-`** cycle; **`cargo check`** / **`cargo test`** (**874** lib tests); **`rg`** in **`src/`** (no matches) vs **`src-tauri/src`** (matches) — **pass** → **`CLOSED-…`**.
+
 ## [0.1.76] - 2026-03-29
 
 ### Added
