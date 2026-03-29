@@ -2701,3 +2701,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 
 **Outcome (operator naming):** **CLOSED-** — rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
 
+---
+
+## Test report
+
+**Date:** 2026-03-29T21:50:41Z (UTC)
+
+**TESTER.md flow:** Operator requested `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` — **not present** in the repo. This run started from `tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`, renamed **`CLOSED-` → `TESTING-`** (same basename after the prefix). **No other `UNTESTED-*` task file was tested.**
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (explicit `Never use Handle::block_on` + `tokio::time::timeout` in `check_browser_alive`; `evaluate_one_plus_one_blocking_timeout` documents no nested Tokio `block_on`)
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (874 passed, 0 failed in crate lib `mac_stats`; other bins 0 tests; 1 doc-test ignored)
+
+**Acceptance criteria:** (1) blocking ping with `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)` and **Browser unresponsive** errors, (2) `check_browser_alive` + comment forbidding nested `block_on`, (3) `clear_browser_session_on_error` / `is_connection_error` / `should_retry_cdp_after_clearing_session` behaviour — **pass** (spot-checked in `browser_agent/mod.rs`).
+
+**Outcome:** **CLOSED-** — rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
+
