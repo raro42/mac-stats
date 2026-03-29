@@ -2510,3 +2510,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 
 **Outcome:** Criterios de aceptación cumplidos — renombrar de vuelta a **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
 
+---
+
+## Test report
+
+**Fecha:** 2026-03-29T20:29:56Z (UTC)
+
+**Flujo TESTER.md (`003-tester/TESTER.md`):** El operador citó solo `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; ese fichero **no existe** en el repo. La tarea con ese slug se renombró **`CLOSED-` → `TESTING-`** para ejecutar el ciclo (equivalente operativo cuando no hay `UNTESTED-`). No se abrió ningún otro `UNTESTED-*`.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (comentario en `check_browser_alive` que prohíbe `Handle::block_on` + `tokio::time::timeout`; doc en `evaluate_one_plus_one_blocking_timeout` sobre `recv_timeout` y no anidar Tokio `block_on`)
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (874 passed, 0 failed en crate lib `mac_stats`; otros bins 0 tests; 1 doc-test ignored)
+
+**Criterios de aceptación (cuerpo de la tarea):** los tres — **pass** (`clear_browser_session_on_error` cubre «Browser unresponsive» y `is_connection_error`; `should_retry_cdp_after_clearing_session` documenta que el camino de health gana sobre el retry).
+
+**Outcome:** Todo pasa — renombrar **`TESTING-` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** (no `TESTED-` ni `TESTPLAN-`).
+

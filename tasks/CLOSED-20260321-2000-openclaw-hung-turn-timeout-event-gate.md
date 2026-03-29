@@ -912,3 +912,14 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
   - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches in `commands/ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`
 - **Acceptance criteria:** All satisfied (`TurnOutputGate` / `gate_allows_send`; `finalize_turn_timeout` with `**Turn timed out**` and budget seconds; router / turn-lifecycle log strings in source; `cargo check` / `cargo test` green).
 - **Outcome:** **PASS** — final filename after this run: `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
+
+### Re-verify — 2026-03-29T20:30:36Z UTC (`003-tester/TESTER.md`, operator target `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only)
+
+- **Date / time:** 2026-03-29T20:30:36Z (UTC).
+- **Rename UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**; el archivo en disco era `tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`. No se usó ningún otro `UNTESTED-*`. Se aplicó **`CLOSED-…` → `TESTING-…`** para la fase TESTING; este bloque se añade bajo **`TESTING-…`**. Tras **PASS**, **`TESTING-…` → `CLOSED-…`** (operador: fallo implementación → `TESTED-…`; instrucciones/spec defectuosas → `TESTPLAN-…`).
+- **Commands run:**
+  - `cd src-tauri && cargo check && cargo test` — pass (`cargo check` ok; library crate: **874** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — no matches, exit code **1** (task body lists top-level `src/`; Rust under `src-tauri/src/`)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches in `commands/ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`
+- **Acceptance criteria:** All satisfied (`TurnOutputGate` / `gate_allows_send`; `finalize_turn_timeout` with `**Turn timed out**` and budget seconds; router / turn-lifecycle log strings in source; `cargo check` / `cargo test` green).
+- **Outcome:** **PASS** — final filename after this run: `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
