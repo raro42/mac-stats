@@ -2893,3 +2893,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Criterios de aceptación (1)–(3):** verificados con los `rg` del cuerpo de la tarea y el código en `browser_agent/mod.rs` (`evaluate_one_plus_one_blocking_timeout` + `recv_timeout`, comentario anti–`Handle::block_on` en `check_browser_alive`, `clear_browser_session_on_error` + documentación en `should_retry_cdp_after_clearing_session`).
 
 **Outcome (convención del operador):** **CLOSED-** — todos los criterios y comandos de verificación pasan. Renombrar `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
+
+---
+
+## Test report
+
+**Fecha:** 2026-03-30 (calendario del operador); **2026-03-29T23:45:39Z (UTC)** (`date -u`).
+
+**Flujo TESTER.md / operador:** Se pidió `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; **no existe** en el repo. El fichero activo con ese slug era `CLOSED-…`; se renombró **`CLOSED-` → `TESTING-`** para este ciclo (equivalente a `UNTESTED-` → `TESTING-` cuando no hay prefijo `UNTESTED-`). **No se probó ningún otro `UNTESTED-*`.**
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (comentario en `check_browser_alive` que prohíbe `Handle::block_on` + `tokio::time::timeout`; documentación en `evaluate_one_plus_one_blocking_timeout` sobre no anidar Tokio `block_on`)
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **fail** en target `--lib`: **873 passed; 1 failed** — `discord::tests::outbound_attachment_path_allowlist` (pánico: «path under pdfs_dir should be allowed when directory exists» en `src/discord/mod.rs:3381`). No está relacionado con `browser_agent` ni el ping CDP `1+1`.
+
+**Criterios de aceptación (1)–(3) del alcance CDP:** siguen verificables por `rg` y el código en `browser_agent/mod.rs`; **no** hay regresión atribuible a esta tarea.
+
+**Outcome (convención del operador):** **TESTPLAN-** — el bloque de verificación de la tarea exige `cargo test --no-fail-fast` completo; aquí falla un test ajeno al CDP (acoplamiento a entorno/`pdfs_dir`), no un fallo de implementación del health-check. Renombrar `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`**.
