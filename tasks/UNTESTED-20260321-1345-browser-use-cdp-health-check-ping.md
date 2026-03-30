@@ -1,6 +1,6 @@
 # Browser use — CDP health check ping (`1+1`)
 
-> **Queue file:** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` — testers rename **`UNTESTED-` → `TESTING-`** to execute. **Testing instructions** were revised **2026-03-30** (post-**TESTPLAN** pass): executive summary + macOS preflight; **`--no-fail-fast`** does not widen the **`cdp_retry_`** filter; step map (**1–3** script, **4** editor); prior fixes retained (narrow gate, **`rg -m`**, cwd / manifest table, no **`\|`** in **`rg`** alternation).
+> **Queue file:** **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`**. Testers rename **`UNTESTED-` → `TESTING-`** to execute. **If your copy is still `TESTPLAN-…` for this slug:** instructions are **draft** — do **not** rename to **`TESTING-`** until a coder publishes **`UNTESTED-…`** (**`TESTPLAN-` → `UNTESTED-`**). **Testing instructions** revised **2026-03-30** (retest after **TESTPLAN**): executive summary; **`rg` + `set -e`** behavior; **`cdp_retry_` must not follow `--`**; optional **`PWD`** echo in the gate script; diagnostic **`-- --list`**; **`--no-fail-fast`** still does **not** widen the **`cdp_retry_`** filter; steps **1–3** script / **4** editor; cwd / manifest table; **`rg -m`** (no **`| head`**); no **`\|`** inside **`rg`** alternation strings.
 
 ## Goal
 
@@ -53,10 +53,13 @@ The bash block under **Copy-paste — full gate** runs **steps 1–3** only. **S
 
 **Filter semantics (step 3):** **`cdp_retry_`** is Cargo’s **test-name filter** (substring). Only tests whose names match run. **`--no-fail-fast`** affects whether Cargo stops after the first failure **among those matched tests**; it does **not** remove the filter or run the whole **`--lib`** suite.
 
+**Token position (step 3):** **`cdp_retry_`** is a **Cargo** positional filter. It must appear **before** any **`--`** that starts **test-binary** arguments. Wrong: `cargo test … --lib -- cdp_retry_` or `cargo test … -- --list cdp_retry_` — the gate will **not** run the intended filter. Right: `cargo test … --lib cdp_retry_ --no-fail-fast` (and for listing: `cargo test … --lib cdp_retry_ -- --list`).
+
 ### Before step 1 (queue file + tools)
 
 - **Queue filename:** You must be executing from **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** (rename **`UNTESTED-` → `TESTING-`** per operator runbook). If the only file on disk for this slug is **`TESTPLAN-…`**, instructions are still under revision — do **not** run this gate; wait for **`TESTPLAN-` → `UNTESTED-`**.
 - **`rg` and `cargo`:** `command -v rg` and `command -v cargo` must succeed on `PATH` before steps **1–3**.
+- **`set -e` + `rg`:** In the **Copy-paste — full gate** block, **`set -e`** is intentional. **`rg` exits 1 when there are zero matches**; the script then stops at that line. That is **not** a spurious failure — fix **cwd**, **file path** (see **Paths by cwd**), or restore missing symbols. Do **not** “fix” the script by removing **`set -e`** or piping **`rg … \| true`** for the required static review.
 
 ### Paths by cwd (pick one column; regexes = copy-paste block only)
 
@@ -81,7 +84,7 @@ If you mix columns (e.g. root paths while cwd is `src-tauri/`), you get empty **
 ### Tester TL;DR (pass/fail)
 
 1. **Cwd:** repo root **or** `src-tauri/` — follow **Environment** (including “already in `src-tauri/`” and **no** root `Cargo.toml`).
-2. **Gate:** steps **1–4** only. Step **3** must be exactly the **`cdp_retry_`** lib test command (substring visible on the command line).
+2. **Gate:** steps **1–4** only. Step **3** must be exactly the **`cdp_retry_`** lib test command (substring visible on the command line, and **`cdp_retry_` before any `--`**).
 3. **Ignore** any **`cargo test`** that does **not** include the substring **`cdp_retry_`** on the command line — including **`cargo test -p mac_stats --lib --no-fail-fast`** (runs the **entire** lib suite, hundreds of tests) and **`cargo test -p mac_stats --no-fail-fast`**. Those are **diagnostics only**, not acceptance.
 4. **Step 4** is a **manual** read in the editor — it is **not** included in the bash copy-paste block.
 5. **Report:** paste the **exact** step **3** command you ran and Cargo lines showing **`running N tests`** with **N ≥ 1** and **`test result: ok`** (see **Report evidence**).
@@ -91,7 +94,7 @@ If you mix columns (e.g. root paths while cwd is `src-tauri/`), you get empty **
 | Symptom | Likely cause | Fix |
 |--------|----------------|-----|
 | `could not find Cargo.toml` (or similar) when running **cargo** from repo root | Invoked **cargo** without `--manifest-path src-tauri/Cargo.toml` | Use the **preferred** commands from root, or `cd src-tauri` and use **alternate** form **without** `--manifest-path`. |
-| `running 0 tests` for step **3** | Wrong cwd/manifest, wrong `-p`, or filter typo (`cdp_retry` vs `cdp_retry_`) | Run `cargo test … --lib cdp_retry_ -- --list` (same manifest/cwd as step **3**); expect **≥ 1** listed test. |
+| `running 0 tests` for step **3** | Wrong cwd/manifest, wrong `-p`, filter typo (`cdp_retry` vs `cdp_retry_`), or **`cdp_retry_` placed after `--`** (test-binary args, not Cargo’s filter) | Re-run with **`cdp_retry_` before `--`**: `cargo test … --lib cdp_retry_ --no-fail-fast`. Diagnostic: `cargo test … --lib cdp_retry_ -- --list` (same manifest/cwd); expect **≥ 1** line containing **`cdp_retry_`**. |
 | First **`rg`** prints nothing or exits **1** | Wrong directory or wrong path (`src/browser_agent/...` from root instead of `src-tauri/src/...`) | `pwd`; from root paths **must** start with `src-tauri/src/browser_agent/mod.rs`. |
 | Second **`rg`** prints nothing | Same cwd/path issue | Same as above. |
 | Second **`rg`** pipeline fails with **`set -e` / `pipefail`** though matches exist | Historically `rg \| head`; **`head`** closes the pipe → **`rg`** can exit non-zero | Use **`rg -n -m 20 '…'`** as in the copy-paste block (no ` \| head`). |
@@ -118,6 +121,7 @@ Mistakes that produced **TESTPLAN-** while the CDP implementation was fine:
 3. **Wrong cwd / manifest:** Running **cargo** from repo root **without** `--manifest-path src-tauri/Cargo.toml`, or running **`cd src-tauri`** when already inside **`src-tauri/`**, or using **`rg`** paths that omit the **`src-tauri/`** prefix from repo root — yields “no manifest”, **`cd` errors**, **0 tests**, or empty **`rg`** output. Treat as **instruction/environment execution**, not a code regression.
 4. **Wrong optional-suite snippet:** The diagnostic **`cargo test -p mac_stats --no-fail-fast`** for “already in **`src-tauri/`**” must **not** be prefixed with **`cd src-tauri &&`** (that directory only exists **from repo root**). Same rule as steps **2–3**.
 5. **Copied `rg` from a markdown table with `\|`:** alternation in **`rg`** must use a **single** pipe `|` between alternatives inside the quoted pattern. Escaped `\|` is **not** the same regex and can yield false “no matches” static-review failures.
+6. **Filter after `--`:** placing **`cdp_retry_`** after **`--`** sends it to the test binary instead of Cargo’s name filter → **`running 0 tests`** or wrong listing. Keep **`cdp_retry_` before `--`** (see **Token position** under **Executive summary**).
 
 **Fix for retest:** Use **`UNTESTED-…`** from the branch you test; run steps **1–4** using the **bash block** and **1) Static review** for `rg` (see **Paths by cwd** for the path column only); ignore unfiltered suite results for pass/fail.
 
@@ -154,6 +158,7 @@ set -e
 set -o pipefail
 test -f src-tauri/Cargo.toml || { echo >&2 "ERROR: run from mac-stats repo root (missing src-tauri/Cargo.toml)."; exit 1; }
 test -f src-tauri/src/browser_agent/mod.rs || { echo >&2 "ERROR: missing src-tauri/src/browser_agent/mod.rs"; exit 1; }
+echo ">>> PWD (expect mac-stats repo root): $(pwd)"
 rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs
 rg -n -m 20 'Never use.*Handle::block_on|recv_timeout\(BROWSER_CDP_HEALTH_CHECK_TIMEOUT\)' src-tauri/src/browser_agent/mod.rs
 cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats
@@ -218,13 +223,13 @@ cd src-tauri && cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast
 
 **Alternate — cwd already `src-tauri/`:** `cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast` (do **not** prefix `cd src-tauri`).
 
-**Pass:** Cargo **runs** the `cdp_retry_`-filtered lib tests and reports a **non-zero** count. Expect **at least 2** tests (current names below). If Cargo reports **0** tests executed, **fail** this step and verify: (1) cwd + invocation match one of the two forms above (from root you **must** use `--manifest-path src-tauri/Cargo.toml`; there is no `Cargo.toml` at repo root), (2) the filter is exactly `cdp_retry_`, not `cdp_retry`, (3) the package is `-p mac_stats`. Optional diagnostic from repo root:
+**Pass:** Cargo **runs** the `cdp_retry_`-filtered lib tests and reports a **non-zero** count. Expect **at least 2** tests (current names below). If Cargo reports **0** tests executed, **fail** this step and verify: (1) cwd + invocation match one of the two forms above (from root you **must** use `--manifest-path src-tauri/Cargo.toml`; there is no `Cargo.toml` at repo root), (2) the filter is exactly `cdp_retry_`, not `cdp_retry`, (3) the package is `-p mac_stats`. Optional diagnostic from repo root (confirms Cargo is applying the **name** filter, not passing stray args after **`--`**):
 
 ```bash
 cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ -- --list
 ```
 
-You should see lines containing `cdp_retry_` before re-running the full test command.
+You should see **≥ 1** line containing **`cdp_retry_`** (typically two tests) before re-running the full test command. If **no** listed test name contains **`cdp_retry_`**, your **`cargo test`** invocation does not match step **3** (wrong manifest, wrong `-p`, or filter placed after **`--`**).
 
 - `browser_agent::tests::cdp_retry_skipped_when_health_error_also_looks_like_connection_error`
 - `browser_agent::tests::cdp_retry_allowed_for_plain_connection_error_without_health_prefix`
@@ -267,4 +272,4 @@ While instructions are edited, the task may temporarily live as **`TESTPLAN-2026
 
 If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
 
-**This revision:** **`TESTPLAN-…` → `UNTESTED-…`** published **2026-03-30** — ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+**This revision:** **`TESTPLAN-…` → `UNTESTED-…`** published **2026-03-30** (retest handoff: **`rg`/`set -e`**, **`cdp_retry_` vs `--`**, **`PWD`** echo, **`--list`** diagnostic) — ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).

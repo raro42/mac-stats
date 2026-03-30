@@ -30,19 +30,31 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 
 ### Tester quick gate (read first)
 
-0. **Pick the verification block from your actual cwd** (run this **before** copying **A1**/**A2**/**B**; no `set -e` required):
+0. **Pick the verification block** (run this **before** copying **A1**/**A2**/**B**; no `set -e` required). This probe works from the **repo root**, from **`src-tauri/`**, and from **any subdirectory** of a git clone (e.g. `tasks/`) — the old one-line check only looked at `./src-tauri/Cargo.toml` and wrongly printed **BLOCK: none** when your shell was not already at repo root.
 
 ```bash
-if test -f src-tauri/Cargo.toml; then echo "BLOCK: A1 or A2 (mac-stats repo root). Do not use B."
-elif test -f Cargo.toml && test -f src/commands/turn_lifecycle.rs; then echo "BLOCK: B (src-tauri crate root). Do not use A1/A2."
-else echo "BLOCK: none — cd to mac-stats repo root or to src-tauri/ first."
+GIT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || GIT_ROOT=""
+if test -n "$GIT_ROOT" && test -f "$GIT_ROOT/src-tauri/Cargo.toml"; then
+  if test -f src-tauri/Cargo.toml; then
+    echo "BLOCK: A1 or A2 (cwd is mac-stats repo root). Do not use B."
+  elif test -f Cargo.toml && test -f src/commands/turn_lifecycle.rs; then
+    echo "BLOCK: B (cwd is src-tauri/ crate root). Do not use A1/A2."
+  else
+    echo "BLOCK: A1 or A2 — cwd is inside the clone but not repo root or src-tauri/. Before pasting A1/A2 run: cd $(printf %q "$GIT_ROOT")"
+  fi
+elif test -f src-tauri/Cargo.toml; then
+  echo "BLOCK: A1 or A2 (cwd is mac-stats repo root; no usable git root). Do not use B."
+elif test -f Cargo.toml && test -f src/commands/turn_lifecycle.rs; then
+  echo "BLOCK: B (cwd is src-tauri/ crate root). Do not use A1/A2."
+else
+  echo "BLOCK: none — cd to mac-stats repo root (folder containing src-tauri/) or into src-tauri/, then run this probe again."
 fi
 ```
 
-If the script prints **BLOCK: none**, `cd` to the directory that contains **`src-tauri/Cargo.toml`** (repo root) or into **`src-tauri/`**, then run it again.
+If the script prints **BLOCK: none**, `cd` as indicated and re-run step **0**. If it tells you to **`cd '…'`** (quoted path), run that **`cd`** before pasting **A1** or **A2** (those blocks assume repo root for relative paths).
 
 1. **Queue file per [`003-tester/TESTER.md`](../003-tester/TESTER.md):** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only. The tester rename chain is **`UNTESTED-…` → `TESTING-…` → (`CLOSED-…` or `WIP-…`)**. Testers **must not** rename **`TESTPLAN-…` → `TESTING-…`** (wait for **`UNTESTED-…`** first).
-2. **Host and toolchain:** Run on **macOS** with **`cargo`**, **`rustc`**, and **`rg`** on your `PATH`. Criterion **4** requires a full **`cargo check`** + **`cargo test`** for **`mac_stats`** to exit **0** on this platform. If you only have Linux (or CI images without the macOS toolchain), **stop** and report **environment blocked** — do **not** file **`TESTPLAN-…`** for linker or platform-only failures.
+2. **Host and toolchain:** Run on **macOS** with **`cargo`**, **`rustc`**, and **`rg`** on your `PATH`. Criterion **4** requires a full **`cargo check`** + **`cargo test`** for **`mac_stats`** to exit **0** on this platform. If you only have Linux (or CI images without the macOS toolchain), **stop**: append **environment blocked** to the test report and rename the queue file per [`003-tester/TESTER.md`](../003-tester/TESTER.md) (typically **`WIP-…`**). That is **not** a product failure and **not** a reason to bounce the task to **`TESTPLAN-…`**. The **TESTPLAN-** prefix is for bad *instructions* in this task file, not for missing macOS or toolchain.
 3. **Inventory (optional sanity check):** from mac-stats repo root,  
    `ls tasks/*20260321-2000*openclaw-hung-turn-timeout-event-gate.md 2>/dev/null || true`  
    For a normal queued run you should see **`UNTESTED-…`** (and may also see **`CLOSED-…`** as history). If **only** **`CLOSED-…`** appears, **stop** — restore or fetch **`UNTESTED-…`**; do **not** treat **`CLOSED-…`** as the queue file.
@@ -53,7 +65,7 @@ If the script prints **BLOCK: none**, `cd` to the directory that contains **`src
 
 - **Executable queue file for a real run:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only. At run start, rename **`UNTESTED-` → `TESTING-`**, run **Verification commands**, then apply outcome naming per **TESTER.md**.
 - **Missing `UNTESTED-…` at repo tip:** **Stop.** Do **not** verify from **`CLOSED-…`** alone or invent **`TESTING-…`** from **`CLOSED-…`** unless your operator runbook explicitly allows it. Sync/pull for **`UNTESTED-…`**, or return a **queue / handoff defect** to the coder.
-- **Emit `TESTPLAN-` only for instruction or environment-spec defects** (wrong paths, wrong queue file, ambiguous `cargo` cwd). Do **not** use **`TESTPLAN-`** because **`rg`** on top-level **`src/`** returns no matches — that is a **tester path mistake**, not a bad test plan (see **Two different directories named `src`** below).
+- **Emit `TESTPLAN-` only when this markdown is wrong** (wrong paths, wrong queue rules, ambiguous `cargo` cwd wording). Do **not** use **`TESTPLAN-`** because **`rg`** on top-level **`src/`** returns no matches — that is a **tester path mistake** (see **Two different directories named `src`**). Do **not** use **`TESTPLAN-`** for “no Mac” / Linux-only runs — use **`WIP-…`** plus an environment note (step **2** above).
 - **[`003-tester/TESTER.md`](../003-tester/TESTER.md)** says to prefer **`cargo check` / `cargo test` in `src-tauri/`**. For this task that means **either** block **B** (cwd = `src-tauri/`) **or** blocks **A1**/**A2** (repo root + **`--manifest-path src-tauri/Cargo.toml -p mac_stats`**). It does **not** mean “run plain **`cargo test`** from repo root without a manifest” — that will fail on mac-stats (no root **`Cargo.toml`**).
 
 ### Task-file identity (stamp `20260321-2000`, slug `openclaw-hung-turn-timeout-event-gate`)
@@ -78,7 +90,8 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 
 ### Shell compatibility
 
-- The blocks below use **`bash`** syntax (`set -e`, `$(…)`). On macOS, **Terminal.app** defaults to **zsh**, which understands these snippets as written.
+- **Preferred:** paste blocks **A1**/**A2**/**B** into **`bash`** (macOS: `/bin/bash` or `bash -lc '…'`) so **`set -e`** aborts the same way as in CI. **zsh** usually runs these snippets correctly; if a failing command does **not** stop the script, re-run the block under **`bash`** before filing a failure.
+- The blocks below use **`bash`** syntax (`set -e`, `$(…)`). On macOS, **Terminal.app** defaults to **zsh**.
 - **Quote the `**Turn timed out**` pattern for `rg`:** the verification blocks use **single quotes** around the fixed string so no shell treats `**` as a glob. If you type the command by hand, use **`rg -n -F '**Turn timed out**' …`** (do not unquote the pattern).
 - If your login shell is **fish** (or another non-POSIX shell), run the block explicitly with Bash, for example:  
   `bash -lc 'set -e; REPO_ROOT="$(git rev-parse --show-toplevel)"; …'`  
@@ -120,6 +133,7 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 6. **Using the `git rev-parse` block when `.git` is missing** — use **Verification commands → A2** (full no-git block), not a partial edit of **A1**.
 7. **`rg: command not found`** — install [ripgrep](https://github.com/BurntSushi/ripgrep) or search your editor for the **exact** substrings under **`src-tauri/src/`**; the acceptance literals must still be located in the files named in criteria 3.
 8. **Unquoted `**Turn timed out**` in the shell** — some shells glob `**`; always run **`rg -n -F '**Turn timed out**' …`** as in the verification blocks.
+9. **Quick gate from `tasks/` (or any subdir) with the old probe** — `./src-tauri/Cargo.toml` is missing from subdirectories, so **BLOCK: none** was a false signal. Use **Tester quick gate** step **0** as written here (git-aware), then **`cd`** to repo root if instructed before **A1**/**A2**.
 
 ### Preflight (required)
 
@@ -161,8 +175,8 @@ command -v rg >/dev/null && echo "OK: rg" || echo "WARN: install ripgrep or sear
 
 Do **not** mix **A1**/**A2** path prefixes (repo root + `src-tauri/…`) with **B** path prefixes (crate root + `src/…`) in one run.
 
-1. Run **Tester quick gate** step **0** (directory probe) and **Preflight (required)** for git (**A1-style**) or no-git (**A2-style**).
-2. Paste **one** of **A1**, **A2**, or **B** **in full** from **Verification commands** (same terminal; **`set -e`** should still be active).
+1. Run **Tester quick gate** step **0** (directory probe). If the output includes **`cd '/path/to/mac-stats'`** (or similar), run that **`cd`** so **A1**/**A2** relative paths resolve. Then run **Preflight (required)** for git (**A1-style**) or no-git (**A2-style**).
+2. Paste **one** of **A1**, **A2**, or **B** **in full** from **Verification commands** (same terminal; **`set -e`** should still be active; use **`bash`** if unsure — see **Shell compatibility**).
 3. If **`cargo`** fails with **`could not find Cargo.toml`**, you are not using **A1**/**A2**/**B** correctly — re-read **Environment** and **Common instruction defects**.
 
 ### Optional runtime check
@@ -170,6 +184,8 @@ Do **not** mix **A1**/**A2** path prefixes (repo root + `src-tauri/…`) with **
 To see log lines in a real run, reproduce or simulate a turn timeout and grep **`~/.mac-stats/debug.log`** for the same substrings. This is **not** required if static `rg` + `cargo` checks pass.
 
 ## Verification commands
+
+Use **`bash`** for the blocks below unless you have confirmed **`set -e`** behaves correctly in your shell (see **Shell compatibility**).
 
 Paste **one** complete block (**A1**, **A2**, or **B**) in a single shot. Do **not** split a block halfway; **`set -e`** must stop the script if cwd or paths are wrong. Do **not** cherry-pick only the **`cargo`** or only the **`rg`** lines — the initial **`cd`** + **`test -f`** lines establish the correct cwd.
 
