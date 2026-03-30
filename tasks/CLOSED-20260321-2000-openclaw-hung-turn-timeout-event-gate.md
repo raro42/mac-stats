@@ -1941,3 +1941,16 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Criterios de aceptación (1–4):** Cumplidos — `TurnOutputGate` / `gate_allows_send`; `finalize_turn_timeout` con `**Turn timed out**` y presupuesto en segundos; cadenas de log en fuente; `cargo check` / `cargo test` OK.
 - **Nomenclatura (operador):** pass → **`CLOSED-`**; fallo implementación → **`TESTED-`**; plan/entorno defectuoso → **`TESTPLAN-`**.
 - **Resultado:** **PASS** — **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** tras este informe.
+
+### Re-verify — 2026-03-30T11:39:09Z UTC (`003-tester/TESTER.md`; objetivo operador `UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` únicamente — corrida agente)
+
+- **Fecha:** 2026-03-30T11:39:09Z UTC (fecha local operador: 2026-03-30).
+- **Renombre:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía** en el árbol; la tarea activa era `tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`. No se eligió otro `UNTESTED-*`. Fase TESTING: **`CLOSED-…` → `TESTING-…`** al inicio de esta corrida.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (crate biblioteca: **875** passed, 0 failed; doc-tests: 1 ignored)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` (según bloque de verificación de la tarea) — **sin coincidencias** (el frontend JS vive bajo `src/`; el Rust está en `src-tauri/src/`)
+- **Criterios de aceptación (1–4):** Cumplidos — `TurnOutputGate` (`Arc<AtomicBool>`); `gate_allows_send` en bucle de herramientas; `finalize_turn_timeout` con texto que empieza por `**Turn timed out**` y presupuesto en segundos; logs `closing output gate after turn wall-clock timeout` y avisos `turn wall-clock timeout` / `closing output gate and running cleanup` en fuente; `cargo check` / `cargo test` OK.
+- **Nomenclatura (instrucción operador):** pass → **`CLOSED-`**; fallo de implementación → **`TESTED-`**; instrucciones de prueba / especificación de entorno defectuosas → **`TESTPLAN-`**.
+- **Resultado:** **PASS** — tras este informe: **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
