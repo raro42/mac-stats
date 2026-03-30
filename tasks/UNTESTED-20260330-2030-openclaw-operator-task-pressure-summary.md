@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`**. **`tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md`** was **not present**; workflow used **`UNTESTED-…` → `WIP-…` → `UNTESTED-…`** (equivalent to **FEAT → WIP → UNTESTED**). **Artifact:** `tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`. Implementation verified in-tree: `task::format_operator_task_pressure_summary`, `context_assembler::fragments::live_metrics_execution_system_section`, `task/review.rs` constants; **no code changes** this run. **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** — **pass**. **Section 6 — Testing instructions** present (run **Section 5** first).
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`**. **`tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md`** was **not present** in the tree; applied workflow **`UNTESTED-…` → `WIP-…` → `UNTESTED-…`** (equivalent to **FEAT → WIP → UNTESTED** for this run). **Final artifact:** `tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`. Implementation verified in-tree: `task::format_operator_task_pressure_summary`, `context_assembler::fragments::live_metrics_execution_system_section` (wired from `commands/ollama.rs`), `task/review.rs` constants; **no code changes** this pass. **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** — **pass** (`task::tests::operator_task_pressure_summary_empty_dir`). **Section 6 — Testing instructions** updated (quick checklist + Section 5 first).
 - **Next step:** Tester runs **Section 6** (after **Section 5**) on **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
@@ -60,6 +60,15 @@ rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_secti
 ---
 
 ## 6. Testing instructions
+
+**Required order:** run **Section 5 — Verification (automated)** first, then manual or optional runtime steps below.
+
+### Quick checklist (tester)
+
+- [ ] `cd src-tauri && cargo check` succeeds.
+- [ ] `cargo test operator_task_pressure` (or `cargo test task::tests::operator_task_pressure_summary_empty_dir -- --exact`) passes.
+- [ ] (Optional) full `cargo test` for acceptance criterion 3.
+- [ ] Manual or runtime: execution system prompt shows **`## Task backlog (operator)`** after live metrics; counts match `~/.mac-stats/task/`; **CPU:** / **Load** lines unchanged above the new block.
 
 Run **Section 5 — Verification (automated)** first; use the subsections below for manual or optional runtime checks.
 

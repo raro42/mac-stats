@@ -1444,3 +1444,14 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Outcome naming:** Operator message: pass → **`CLOSED-…`**; implementation fail → **`TESTED-…`**; defective test plan / environment spec → **`TESTPLAN-…`**. Repo `003-tester/TESTER.md` also maps fail/block to **`WIP-…`** — not applicable here.
 - **Outcome:** **PASS** — restore **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** after this append.
 
+### Re-verify — 2026-03-30 (UTC) (`003-tester/TESTER.md`; único objetivo lógico `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`)
+
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía** en el árbol; el archivo canónico era `CLOSED-…` y se renombró a **`TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** al inicio de este run. No se usó ningún otro `UNTESTED-*`.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check && cargo test` — pass (crate librería: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — sin coincidencias (el bloque del task lista `src/`; el Rust está en `src-tauri/src/`)
+  - mismo patrón en `src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+- **Criterios de aceptación:** Cumplidos (`TurnOutputGate` = `Arc<AtomicBool>`; `gate_allows_send` en tool loop; `finalize_turn_timeout` con texto que empieza por `**Turn timed out**` y presupuesto en segundos; `turn wall-clock timeout` / `closing output gate and running cleanup` en `turn_lifecycle.rs`; `closing output gate after turn wall-clock timeout` en `ollama.rs`; build y tests en verde).
+- **Nomenclatura de resultado (mensaje operador):** pass → **`CLOSED-…`**. No aplica **`TESTED-`** ni **`TESTPLAN-`**. `003-tester/TESTER.md` del repo: fallo/bloqueo genérico → **`WIP-…`**.
+- **Resultado:** **PASS** — renombrar **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** tras este append.
+
