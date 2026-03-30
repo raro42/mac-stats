@@ -4004,3 +4004,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 
 **Outcome (convención del operador):** **CLOSED-** (pass) — renombrar **`TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
 
+---
+
+## Test report
+
+**Fecha / hora:** 2026-03-30T10:54:47Z (UTC).
+
+**Flujo TESTER.md (`003-tester/TESTER.md`):** El operador citó `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`, que **no existe** en el árbol; la tarea con el mismo slug estaba como **`CLOSED-…`**. Para esta corrida se renombró **`CLOSED-` → `TESTING-`** (equivalente a `UNTESTED-` → `TESTING-` cuando el prefijo `UNTESTED-` ya no está presente). No se probó ningún otro fichero `UNTESTED-*`.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (875 passed, 0 failed en crate lib `mac_stats`; otros bins 0 tests; 1 doc-test ignored)
+
+**Acceptance criteria (1)–(3):** pass.
+
+**Outcome:** **CLOSED-** (pass) — renombrar **`TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+
