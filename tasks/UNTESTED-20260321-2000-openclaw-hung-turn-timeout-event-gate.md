@@ -13,9 +13,16 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 3. **Log strings (static check):** The following literals appear in **mac-stats** Rust sources as written below (copy/paste safe; use the verification `rg` commands). A live Discord timeout repro is **optional**, not required for pass.
    - Substring **`closing output gate after turn wall-clock timeout`** — in **`src-tauri/src/commands/ollama.rs`** (router path when the wall-clock limit fires).
    - Substrings **`turn wall-clock timeout`** and **`closing output gate and running cleanup`** — both appear inside the **same** `tracing::warn!` format string in **`src-tauri/src/commands/turn_lifecycle.rs`** (`finalize_turn_timeout`). **Expected:** the two `rg` lines in block **A**/**B** may report the **same line number** twice; that still counts as pass.
-4. `cargo check` and `cargo test` run from **`src-tauri/`** succeed on the verification host (this project targets **macOS**; use a Mac for verification so results match maintainer expectations). Linux CI or a non-macOS checkout may fail link steps or skip platform tests — that environment mismatch is **not** a product failure for this task; rerun on macOS.
+4. **`cargo check`** and **`cargo test`** for the **`mac_stats`** package succeed (exit **0**, zero failing tests). Equivalent ways to satisfy this: run **Verification commands** block **A** (repo root + `--manifest-path src-tauri/Cargo.toml -p mac_stats`) or block **B** (cwd **`src-tauri/`** + `cargo check` / `cargo test` with **`-p mac_stats`** or default package). This project targets **macOS**; use a Mac so results match maintainer expectations. Linux CI or a non-macOS checkout may fail link steps or skip platform tests — that mismatch is **not** a product failure; rerun on macOS.
 
 ## Testing instructions
+
+### Operator filename (`003-tester/TESTER.md`)
+
+- **If this file is named `TESTPLAN-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`:** testing instructions are **under repair**. Testers **must not** rename **`TESTPLAN-` → `TESTING-`** or execute the gate. Wait for a coder to publish **`UNTESTED-…`** (same stamp + slug: **`TESTPLAN-` → `UNTESTED-`**).
+- **Executable queue file for a real run:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only. At run start, rename **`UNTESTED-` → `TESTING-`**, run **Verification commands**, then apply outcome naming per **TESTER.md**.
+- **Missing `UNTESTED-…` at repo tip:** **Stop.** Do **not** verify from **`CLOSED-…`** alone or invent **`TESTING-…`** from **`CLOSED-…`** unless your operator runbook explicitly allows it. Sync/pull for **`UNTESTED-…`**, or return a **queue / handoff defect** to the coder.
+- **Emit `TESTPLAN-` only for instruction or environment-spec defects** (wrong paths, wrong queue file, ambiguous `cargo` cwd). Do **not** use **`TESTPLAN-`** because **`rg`** on top-level **`src/`** returns no matches — that is a **tester path mistake**, not a bad test plan (see **Two different directories named `src`** below).
 
 ### Task-file identity (stamp `20260321-2000`, slug `openclaw-hung-turn-timeout-event-gate`)
 
@@ -46,10 +53,11 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 
 ### Environment
 
-- **Repository:** **mac-stats** only (directory that contains **`src-tauri/Cargo.toml`**, plus top-level `src/` and `src-tauri/`).
-- **Host:** **macOS** + stable **Rust** toolchain (`cargo` / `rustc` on `PATH`) + **[ripgrep](https://github.com/BurntSushi/ripgrep)** (`rg` on `PATH`). If `rg` is missing, install it or use your editor’s search; the patterns below are the exact substrings to find.
-- **Working directory:** You must end up with **`src-tauri/Cargo.toml`** resolvable from your chosen cwd (see blocks **A** and **B** below). Do **not** assume a successful run if you never confirmed that path exists.
-- **Wrong repo:** If `cd` / `git rev-parse` lands in a tree **without** `src-tauri/Cargo.toml` at the expected place, stop — you are not in mac-stats (or not at repo root). Fix cwd before `cargo` or `rg`.
+- **Repository:** **mac-stats** only (directory that contains **`src-tauri/Cargo.toml`**, plus top-level `src/` and `src-tauri/`). There is **no** workspace **`Cargo.toml`** at the repository root — the Rust package is **`mac_stats`** under **`src-tauri/`** only.
+- **Host:** **macOS** + stable **Rust** (`cargo` / `rustc` on `PATH`) + **[ripgrep](https://github.com/BurntSushi/ripgrep)** (`rg` on `PATH`). If `rg` is missing, install it or use your editor’s search; the patterns below are the exact substrings to find.
+- **Preferred `cargo` cwd (block **A**):** stay at **repo root** and use **`cargo … --manifest-path src-tauri/Cargo.toml -p mac_stats`**. That avoids the common mistake of running **`cargo test`** from repo root **without** a manifest (Cargo errors or wrong package) and avoids relying on a subshell **`cd src-tauri`**.
+- **Alternate `cargo` cwd (block **B**):** **`src-tauri/`** (crate root). There, use **`cargo check -p mac_stats`** / **`cargo test -p mac_stats`** (or plain **`cargo check`** / **`cargo test`** since this directory is a single-package manifest).
+- **Wrong repo:** If `git rev-parse` / `test -f src-tauri/Cargo.toml` fails, stop — fix cwd before **`cargo`** or **`rg`** paths that assume repo root.
 
 ### Two different directories named `src` (critical)
 
@@ -64,6 +72,13 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 
 - Do **not** treat zero matches under top-level **`src/`** as a failure.
 - Do **not** verify in **`../openclaw`** or any other repo.
+
+### Common instruction defects (typical `TESTPLAN-` causes)
+
+1. **`rg … src/` from repo root** — searches the **frontend** tree only; Rust lives under **`src-tauri/src/`**. Use block **A** or **B** paths exactly.
+2. **`cargo check` / `cargo test` from repo root without `--manifest-path`** — often fails or targets the wrong manifest. Use block **A** (`--manifest-path src-tauri/Cargo.toml -p mac_stats`) or **`cd src-tauri`** then block **B**.
+3. **Fish (or non-bash) pasted script** — `set -e` / `$(…)` differ; use **`bash -lc '…'`** or run **zsh** with the block as written.
+4. **Treating `CLOSED-…` verification snippets as authoritative** — historical reports may use wrong paths; follow **this** file’s **Verification commands** only.
 
 ### Preflight (required)
 
@@ -97,7 +112,7 @@ command -v rg >/dev/null && echo "OK: rg" || echo "WARN: install ripgrep or sear
 | Check | Pass |
 |--------|------|
 | Preflight | Both `test -f` lines succeed; you know your repo root path. |
-| `cargo check` + `cargo test` in `src-tauri/` | Exit **0**; **zero** failing tests. |
+| `cargo check` + `cargo test` for **`mac_stats`** | Exit **0**; **zero** failing tests — via block **A** (`--manifest-path … -p mac_stats`) **or** block **B** (cwd **`src-tauri/`**, `-p mac_stats` or default). |
 | `rg` for gate symbols | At least one match for each **distinct** pattern in block **A** or **B** (see paths for your cwd). For **`turn_lifecycle.rs`**, the two log-string `rg` lines may both hit the **same** source line — that is still pass. |
 | Top-level `src/` | May show **no** matches for Rust gate strings — **not** a failure. |
 
@@ -113,12 +128,15 @@ Use **bash** or **zsh** (or `bash -lc '…'` from fish). Copy the whole block. *
 
 **Git prerequisite:** Run from **inside** the mac-stats clone so `git rev-parse --show-toplevel` prints the mac-stats root (the folder that directly contains `src-tauri/`). Starting in `src-tauri/` is OK: git still returns the repo root. If you have **no** `.git`, do **not** use the `git rev-parse` lines — use the **Tarball / no `.git`** preflight, `cd` to mac-stats root manually, then run from `test -f src-tauri/Cargo.toml` downward (same commands as below with the first two lines replaced by `cd`).
 
+**Why `--manifest-path`:** mac-stats has **no** `Cargo.toml` at repo root. Invoking **`cargo test`** from root without **`--manifest-path`** is a frequent false failure; the lines below pin the **`mac_stats`** package explicitly.
+
 ```bash
 set -e
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
 test -f src-tauri/Cargo.toml
-( cd src-tauri && cargo check && cargo test )
+cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats
+cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats
 
 rg -n "TurnOutputGate|gate_allows_send|finalize_turn_timeout" src-tauri/src
 
@@ -131,6 +149,8 @@ rg -n "closing output gate and running cleanup" src-tauri/src/commands/turn_life
 ```
 
 **Not in a git checkout?** Replace the first three lines with a manual `cd /path/to/mac-stats` (the directory containing `src-tauri/`), then run from `test -f src-tauri/Cargo.toml` onward.
+
+**Alternate (equivalent) cargo one-liner:** `( cd src-tauri && cargo check -p mac_stats && cargo test -p mac_stats )` after `cd "$REPO_ROOT"` — same package as **`--manifest-path`** above; use only if you prefer a subshell **`cd`**.
 
 **Why two files for log strings:** The router line with **`closing output gate after`** is only in **`ollama.rs`**. The **`turn wall-clock timeout`** / **`closing output gate and running cleanup`** pair is in **`turn_lifecycle.rs`** inside **one** format string — **both `rg` commands may print the same line** (same line number twice). Optional single check:  
 `rg -n "turn wall-clock timeout|closing output gate and running cleanup" src-tauri/src/commands/turn_lifecycle.rs`  
@@ -148,7 +168,8 @@ Use this block **only** when `pwd` is the directory that contains **`Cargo.toml`
 set -e
 test -f Cargo.toml
 test -f src/commands/turn_lifecycle.rs
-cargo check && cargo test
+cargo check -p mac_stats
+cargo test -p mac_stats
 
 rg -n "TurnOutputGate|gate_allows_send|finalize_turn_timeout" src
 
@@ -162,7 +183,7 @@ rg -n "closing output gate and running cleanup" src/commands/turn_lifecycle.rs
 
 **Do not** mix A and B path styles in one shell session: from repo root, **never** pass bare `src/` to `rg` for this task (that is the frontend tree). From **`src-tauri/`**, **never** pass `src-tauri/src` (there is no such path below the crate root).
 
-**Slow tests:** `cargo test --no-fail-fast` is fine; requirement is **zero failing tests** for this crate.
+**Slow tests:** `cargo test --no-fail-fast` (with the same **`-p mac_stats`** / **`--manifest-path`** as your block) is fine; requirement is **zero failing tests** for this crate.
 
 ## Test report
 

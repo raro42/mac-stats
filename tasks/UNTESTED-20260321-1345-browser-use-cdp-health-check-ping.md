@@ -32,6 +32,27 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 
 ## Testing instructions
 
+### Authoritative automated test command (step 3 — paste exactly)
+
+The **only** `cargo test` invocation that counts toward pass/fail for this task is the **library** run with the **`cdp_retry_`** name filter (substring, trailing underscore):
+
+```bash
+cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast
+```
+
+**From `src-tauri/`:** `cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast`
+
+Your report **must** show this filter (the literal substring `cdp_retry_`) on the test command line. If the command you ran has no `cdp_retry_` token, you have **not** executed the gate — run step **3** again before choosing an outcome.
+
+### What went wrong in the last TESTPLAN cycle (instruction defect, not product)
+
+Two separate mistakes produced **TESTPLAN-** while the CDP implementation was fine:
+
+1. **Wrong test bar:** Some runs used **`cd src-tauri && cargo test --no-fail-fast`** (entire crate, **no** `cdp_retry_` filter). That command is **not** in steps **1–4** and is **never** the acceptance gate for this slug. Failures there (Discord `pdfs_dir`, scheduler tests touching the real home directory, etc.) are **environment / unrelated suite** noise.
+2. **Wrong queue file:** **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** was missing at repo tip; testers retitled **`CLOSED-…`** or **`TESTPLAN-…`** to **`TESTING-…`** instead of waiting for **`UNTESTED-…`**. That bypassed this document’s narrow gate and invited runbook confusion.
+
+**Fix for retest:** Use **`UNTESTED-…`** from the branch you test; run steps **1–4** verbatim; ignore unfiltered suite results for pass/fail.
+
 ### Pass/fail scope (read first)
 
 - **Required for a pass on this task:** steps **1–4** below (static review, compile, **targeted lib tests**, spot-check). All required commands must succeed.
@@ -39,6 +60,15 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 - **Authoritative gate:** steps **1–4** override any older checklist that treated **unfiltered** crate tests as mandatory for this task. Failures in unrelated modules **do not** invalidate a pass when steps **1–4** succeed.
 - **Checklist conflict:** Never rename to **TESTPLAN-** solely because an unfiltered `cargo test` failed while the **`cdp_retry_`** command in step **3** passed.
 - **Not required:** a full **`cargo test -p mac_stats --no-fail-fast`** over the entire crate. Other tests can fail in some environments; those failures are **out of scope** unless the failing test is one of the **`cdp_retry_`** tests in step 3 or clearly implicates `evaluate_one_plus_one_blocking_timeout` / `check_browser_alive` / `clear_browser_session_on_error`.
+
+### Wrong command vs gate (quick reference)
+
+| Situation | Pass/fail for this task? |
+|-----------|---------------------------|
+| `cargo test … -p mac_stats --lib cdp_retry_ --no-fail-fast` — all match tests pass | **Required** — this is step **3** |
+| `cargo test … -p mac_stats --no-fail-fast` (no `cdp_retry_`, not limited to those tests) | **Informational only** — **do not** fail the task or emit **TESTPLAN-** based solely on this |
+| `cd src-tauri && cargo test --no-fail-fast` (historical shorthand in old reports) | Same as row above — **not** the gate |
+| Step **3** passes; optional full suite fails in `discord::`, `scheduler::`, etc. | **Pass** steps **1–4**; note unrelated failures separately in the report |
 
 ### Copy-paste — full gate (from repository root)
 
@@ -52,6 +82,7 @@ test -f src-tauri/src/browser_agent/mod.rs || { echo >&2 "ERROR: missing src-tau
 rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs
 rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20
 cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats
+echo ">>> STEP 3 GATE: lib tests filtered by cdp_retry_ only (NOT the full crate suite)"
 cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast
 ```
 
