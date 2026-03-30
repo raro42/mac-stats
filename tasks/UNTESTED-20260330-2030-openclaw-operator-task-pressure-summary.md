@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — Cycled **FEAT → WIP → UNTESTED** per **FEATURE-CODER**; implementation verified in-tree (`format_operator_task_pressure_summary`, `live_metrics_execution_system_section`, **`task/review.rs`** `pub(crate)` constants); **`cargo check`** and **`cargo test operator_task_pressure`** green.
+- **Coder (UTC):** 2026-03-30 — Cycled **FEAT → WIP → UNTESTED** per **FEATURE-CODER**; implementation verified in-tree (`format_operator_task_pressure_summary`, `live_metrics_execution_system_section`, **`task/review.rs`** `pub(crate)` constants); **`cargo check`** and **`cargo test operator_task_pressure`** green; **§6 Testing instructions** updated (automated-first note).
 - **Next step:** **UNTESTED** — tester runs **§6 Testing instructions** (manual / optional runtime).
 ---
 
@@ -54,6 +54,8 @@ rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_secti
 ---
 
 ## 6. Testing instructions
+
+Run **§5 Verification (automated)** first; use the subsections below for manual or optional runtime checks.
 
 ### What to verify
 
