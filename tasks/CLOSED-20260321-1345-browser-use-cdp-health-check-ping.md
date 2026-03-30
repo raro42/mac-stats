@@ -4517,3 +4517,23 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Acceptance criteria (1)–(3):** **pass** — matches `src-tauri/src/browser_agent/mod.rs` (`clear_browser_session_on_error` for Browser unresponsive + `is_connection_error`; `should_retry_cdp_after_clearing_session` documents health over retry).
 
 **Outcome:** **CLOSED-** (all criteria pass) — rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
+
+---
+
+## Test report
+
+**Date:** 2026-03-30 (local America-friendly note: operator date Monday 2026-03-30; timestamps below UTC)
+
+**TESTER.md flow:** The operator requested `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`, which **does not exist** in the repo; the task slug exists as `tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`. Applied **`CLOSED-` → `TESTING-`** for this run (equivalent to `UNTESTED-` → `TESTING-` when the task is already closed). No other `UNTESTED-*` file was used.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (explicit comment forbidding `Handle::block_on` + `tokio::time::timeout` in `check_browser_alive`; `evaluate_one_plus_one_blocking_timeout` documents no nested Tokio `block_on`)
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (875 passed, 0 failed in crate `mac_stats` lib tests; other targets 0 tests; 1 doc-test ignored)
+
+**Acceptance criteria (spot-check):** (1) `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)` on worker-thread ping path present; (2) `check_browser_alive` documents nested-`block_on` prohibition; (3) `clear_browser_session_on_error` / `should_retry_cdp_after_clearing_session` handle **Browser unresponsive** vs `is_connection_error` as specified — **pass**.
+
+**Outcome:** All criteria pass — rename file back to **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+
