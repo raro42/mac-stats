@@ -1,8 +1,8 @@
 # OpenClaw: hung turn wall-clock timeout + output event gate
 
-**On-disk name (this revision):** **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** — must be this name on the tester queue. If you see **`TESTPLAN-…`** with the same stamp and slug, the coder is still fixing **Testing instructions**; wait for **`TESTPLAN-…` → `UNTESTED-…`** before starting [`003-tester/TESTER.md`](../003-tester/TESTER.md). **No** mac-stats product code change is required for this task file.
+**On-disk name:** **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** is the only name that belongs on the tester queue. While the filename is **`TESTPLAN-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**, the coder is revising **Testing instructions** only — **do not** start [`003-tester/TESTER.md`](../003-tester/TESTER.md) until the coder renames **`TESTPLAN-…` → `UNTESTED-…`**. **No** mac-stats product code change is required for this task file.
 
-**Instruction revision:** A prior run flagged **Testing instructions** or the **stated environment** as defective (not a mac-stats implementation failure). This body is the only authoritative spec: follow **Verification commands** below exactly, not snippets copied from **`CLOSED-*`** history (those may use wrong paths such as top-level **`src/`**). **Latest repair:** make explicit that **Preflight** can pass from **`tasks/`** while **`cargo --manifest-path src-tauri/Cargo.toml`** still requires **`pwd`** at **repo root** (full **A1**/**A2** paste, including **`cd`**); inventory text now distinguishes **`TESTPLAN-…`** (coder repair, not queued) from **`UNTESTED-…`**.
+**Instruction revision:** A prior run flagged **Testing instructions** or the **stated environment** as defective (not a mac-stats implementation failure). This body is the only authoritative spec: follow **Verification commands** below exactly, not snippets copied from **`CLOSED-*`** history (those may use wrong paths such as top-level **`src/`**). **Latest repair:** (1) **`BLOCK: A1 or A2`** means **pick exactly one** block — **A1** *or* **A2**, never both in one run (both are repo-root variants; **A1** = git `cd`, **A2** = manual absolute `cd`). (2) After step **0** tells you to **`cd`** to repo root, run a one-line **`test -f src-tauri/Cargo.toml`** before pasting **A1**/**A2**. (3) Restate **Preflight** vs **`cargo --manifest-path`**: preflight can pass from **`tasks/`**; **`cargo`** still needs **`pwd`** at repo root unless you use block **B** from **`src-tauri/`**.
 
 **Coder handoff:** For another repair pass, rename **`UNTESTED-…` → `TESTPLAN-…`**, edit **Testing instructions** / clarity wording only, then **`TESTPLAN-…` → `UNTESTED-…`**. Testers **only** start from **`UNTESTED-…`** — **not** **`TESTPLAN-…`**.
 
@@ -31,10 +31,12 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 | 2 | **Repo:** You are in the **mac-stats** tree (folder that contains **`src-tauri/Cargo.toml`**). Do **not** search **`../openclaw`** or top-level **`src/`** for Rust gate strings. |
 | 3 | **Shell:** Paste verification blocks in **`bash`** (or zsh with `set -e` behaving as documented). **fish** → use `bash -lc '…'`. |
 | 4 | **Block choice:** Run **Tester quick gate** step **0** below; obey the printed **BLOCK:** (A1/A2 vs B). Never mix path styles from different blocks in one paste. |
-| 5 | **One paste:** Run **one** of **A1**, **A2**, or **B** from **`set -e` through the last `rg`** without changing directory mid-block. |
-| 6 | **`--manifest-path` vs Preflight:** **Preflight** uses **`$REPO_ROOT`** absolute paths, so it can succeed from **`tasks/`** or any subfolder. **`cargo --manifest-path src-tauri/Cargo.toml`** is resolved **relative to `pwd`**. If you run **only** the **`cargo`** / **`rg`** lines from **A1**/**A2** while cwd is still a subdirectory, Cargo looks for **`…/tasks/src-tauri/Cargo.toml`** (missing) → **false failure**. Always paste the **entire** block, including the **`cd`** that establishes repo root (or use **B** from **`src-tauri/`**). |
+| 5 | **A1 vs A2:** If the probe says **A1 or A2**, choose **A1** when you have a **`.git`** directory (normal clone) and **`git rev-parse --show-toplevel`** works. Choose **A2** when there is **no** `.git` (tarball/export) or **`git rev-parse` fails**. **Do not** run **A1** and then **A2** in the same session — one successful block is enough. |
+| 6 | **One paste:** Run **exactly one** of **A1**, **A2**, or **B** from **`set -e` through the last `rg`** without changing directory mid-block. |
+| 7 | **After step 0 says `cd …`:** Run that **`cd`**, then **`test -f src-tauri/Cargo.toml`** (expect success) **before** pasting **A1** or **A2**. If that **`test`** fails, you are not at mac-stats **repo root** yet — fix **`cd`** and retry. |
+| 8 | **`--manifest-path` vs Preflight:** **Preflight** uses **`$REPO_ROOT`** absolute paths, so it can succeed from **`tasks/`** or any subfolder. **`cargo --manifest-path src-tauri/Cargo.toml`** is resolved **relative to `pwd`**. If you run **only** the **`cargo`** / **`rg`** lines from **A1**/**A2** while cwd is still a subdirectory, Cargo looks for **`…/tasks/src-tauri/Cargo.toml`** (missing) → **false failure**. Always paste the **entire** block, including the **`cd`** that establishes repo root (or use **B** from **`src-tauri/`**). |
 
-**Fast path (experienced testers, repo root, git clone, macOS):** run **Tester quick gate** step **0** → if it says **A1 or A2**, run **Preflight (required)** git variant → paste **Verification commands → A1** in full (do **not** skip the **`cd "$REPO_ROOT"`** lines). **Pass** = every command exits **0** and every `rg` prints at least one line.
+**Fast path (experienced testers, repo root, git clone, macOS):** run **Tester quick gate** step **0** → if it says **A1 or A2**, run **Preflight (required)** git variant → paste **Verification commands → A1** in full (do **not** skip the **`cd "$REPO_ROOT"`** lines). If you have **no** `.git`, use **A2** instead of **A1** (edit the absolute **`cd`** line first). **Pass** = every command exits **0** and every `rg` prints at least one line.
 
 ### Coder publication after TESTPLAN repair
 
@@ -64,9 +66,11 @@ else
 fi
 ```
 
-If the script prints **BLOCK: none**, `cd` as indicated and re-run step **0**. If it tells you to **`cd '…'`** (quoted path), run that **`cd`** before pasting **A1** or **A2** (those blocks assume repo root for relative paths).
+If the script prints **BLOCK: none**, `cd` as indicated and re-run step **0**. If it tells you to **`cd '…'`** (quoted path), run that **`cd`** before pasting **A1** or **A2** (those blocks assume repo root for relative paths). Immediately after that **`cd`**, run **`test -f src-tauri/Cargo.toml && echo "OK: repo root"`**; if it fails, do **not** paste **A1**/**A2** yet.
 
 **Why step 0 matters:** From a subdirectory (e.g. **`tasks/`**), a naive `test -f src-tauri/Cargo.toml` fails even though you are inside the clone. Step **0** uses **`$GIT_ROOT`** so it can tell you to **`cd`** to the real repo root before **A1**/**A2**.
+
+**`BLOCK: A1 or A2` is not two blocks:** It means “you must end up at **repo root** before **`cargo --manifest-path src-tauri/Cargo.toml`**.” Use **A1** *or* **A2** to get there — whichever matches your tree (**git** vs **no git**), then stop.
 
 1. **Queue file per [`003-tester/TESTER.md`](../003-tester/TESTER.md):** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only. The tester rename chain is **`UNTESTED-…` → `TESTING-…` → (`CLOSED-…` or `WIP-…`)**. Testers **must not** rename **`TESTPLAN-…` → `TESTING-…`** (wait for **`UNTESTED-…`** first).
 2. **Host and toolchain:** Run on **macOS** with **`cargo`**, **`rustc`**, and **`rg`** on your `PATH`. Criterion **4** requires a full **`cargo check`** + **`cargo test`** for **`mac_stats`** to exit **0** on this platform. If you only have Linux (or CI images without the macOS toolchain), **stop**: append **environment blocked** to the test report and rename the queue file per [`003-tester/TESTER.md`](../003-tester/TESTER.md) (typically **`WIP-…`**). That is **not** a product failure and **not** a reason to bounce the task to **`TESTPLAN-…`**. The **TESTPLAN-** prefix is for bad *instructions* in this task file, not for missing macOS or toolchain.
@@ -194,8 +198,8 @@ command -v rg >/dev/null && echo "OK: rg" || echo "WARN: install ripgrep or sear
 
 Do **not** mix **A1**/**A2** path prefixes (repo root + `src-tauri/…`) with **B** path prefixes (crate root + `src/…`) in one run.
 
-1. Run **Tester quick gate** step **0** (directory probe). If the output includes **`cd '/path/to/mac-stats'`** (or similar), run that **`cd`** so **A1**/**A2** relative paths resolve. Then run **Preflight (required)** for git (**A1-style**) or no-git (**A2-style**).
-2. Paste **one** of **A1**, **A2**, or **B** **in full** from **Verification commands** (same terminal; **`set -e`** should still be active; use **`bash`** if unsure — see **Shell compatibility**).
+1. Run **Tester quick gate** step **0** (directory probe). If the output includes **`cd '/path/to/mac-stats'`** (or similar), run that **`cd`** so **A1**/**A2** relative paths resolve, then **`test -f src-tauri/Cargo.toml`**. Then run **Preflight (required)** for git (**A1-style**) or no-git (**A2-style**).
+2. Paste **exactly one** of **A1**, **A2**, or **B** **in full** from **Verification commands** (same terminal; **`set -e`** should still be active; use **`bash`** if unsure — see **Shell compatibility**). Prefer **A1** if `.git` exists, else **A2**; use **B** only when step **0** says so.
 3. If **`cargo`** fails with **`could not find Cargo.toml`**, you are not using **A1**/**A2**/**B** correctly — re-read **Environment** and **Common instruction defects**.
 
 ### Optional runtime check
@@ -206,7 +210,7 @@ To see log lines in a real run, reproduce or simulate a turn timeout and grep **
 
 Use **`bash`** for the blocks below unless you have confirmed **`set -e`** behaves correctly in your shell (see **Shell compatibility**).
 
-Paste **one** complete block (**A1**, **A2**, or **B**) in a single shot. Do **not** split a block halfway; **`set -e`** must stop the script if cwd or paths are wrong. Do **not** cherry-pick only the **`cargo`** or only the **`rg`** lines — the initial **`cd`** + **`test -f`** lines establish the correct cwd. **`cargo --manifest-path src-tauri/Cargo.toml`** is always relative to **`pwd`**; from **`tasks/`** it fails unless you **`cd`** to repo root first (even if **Preflight** already passed).
+Paste **one** complete block (**A1** *xor* **A2** *xor* **B**) in a single shot. **A1** and **A2** are mutually exclusive ways to reach the same cwd (repo root); running both is redundant and can confuse the report. Do **not** split a block halfway; **`set -e`** must stop the script if cwd or paths are wrong. Do **not** cherry-pick only the **`cargo`** or only the **`rg`** lines — the initial **`cd`** + **`test -f`** lines establish the correct cwd. **`cargo --manifest-path src-tauri/Cargo.toml`** is always relative to **`pwd`**; from **`tasks/`** it fails unless you **`cd`** to repo root first (even if **Preflight** already passed).
 
 **Anti-pattern (common false “failure”):** Running **`cargo check`** / **`cargo test`** from repo **root** without **`--manifest-path src-tauri/Cargo.toml -p mac_stats`**, or running **`rg`** with bare **`src/`** paths while cwd is **repo root** (that tree is the **frontend**, not the Rust crate). Use the **full** block chosen in **Tester quick gate** step **0**.
 
@@ -218,6 +222,8 @@ Paste **one** complete block (**A1**, **A2**, or **B**) in a single shot. Do **n
 | **B** | `test -f src/commands/turn_lifecycle.rs` | `test -f src-tauri/Cargo.toml` succeeds from **`pwd`** — you are at **repo root**; use **A1**/**A2**, not **B**. |
 
 ### A1 — Recommended: repo root, **with** `.git`
+
+Use **A1** when this is a **git** checkout and **`git rev-parse --show-toplevel`** returns the mac-stats root. If you already used **A2** successfully, **do not** also run **A1**.
 
 Use **bash** or **zsh** (or `bash -lc '…'` from fish). **`set -e`** stops on the first failing command — do **not** append `|| true` to `cd` or `git rev-parse` here; a wrong directory must **fail** the script.
 
@@ -247,7 +253,7 @@ rg -n "closing output gate and running cleanup" src-tauri/src/commands/turn_life
 
 ### A2 — Recommended: repo root, **no** `.git` (tarball / export)
 
-Use this when **`git rev-parse` fails** or the tree has no `.git` directory. **Replace** **`/ABSOLUTE/PATH/TO/mac-stats`** on the **`cd`** line with the **absolute path** to your mac-stats root (the directory that **directly** contains **`src-tauri/`** — not `src-tauri/` itself, not a parent that only contains the zip name). **Edit that line before pasting**; leaving the placeholder verbatim will **`cd`** to a non-existent path and fail. After editing, **`test -f src-tauri/Cargo.toml`** must succeed; if it fails, the path is wrong.
+Use **A2** when **`git rev-parse` fails** or the tree has no `.git` directory — **not** when **A1** already worked. **Replace** **`/ABSOLUTE/PATH/TO/mac-stats`** on the **`cd`** line with the **absolute path** to your mac-stats root (the directory that **directly** contains **`src-tauri/`** — not `src-tauri/` itself, not a parent that only contains the zip name). **Edit that line before pasting**; leaving the placeholder verbatim will **`cd`** to a non-existent path and fail. After editing, **`test -f src-tauri/Cargo.toml`** must succeed; if it fails, the path is wrong.
 
 ```bash
 set -e
