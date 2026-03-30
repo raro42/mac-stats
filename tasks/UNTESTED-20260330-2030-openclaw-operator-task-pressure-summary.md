@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`** (operator request: `tasks/FEAT-20260330-2030-…`; **cycle `FEAT-…` → `WIP-…` → `UNTESTED-…`** completed on this run). **Artifact:** `tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`. Implementation in-tree (`task/mod.rs`, `task/review.rs`, `commands/context_assembler.rs`). **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** — **pass on this run**. **Section 6 — Testing instructions** present (run **Section 5** first).
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`** (operator request: `tasks/FEAT-20260330-2030-…`). **Cycle:** **`FEAT-…` → `WIP-…` → `UNTESTED-…`** completed on this run. **Artifact:** `tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`. Implementation in-tree (`task/mod.rs`, `task/review.rs`, `commands/context_assembler.rs`). **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** — **pass on this run**. **Section 6 — Testing instructions** present (run **Section 5** first).
 - **Next step:** Tester runs **Section 6** (after **Section 5**) on **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
