@@ -4575,3 +4575,23 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Acceptance criteria (1)–(3):** **pass**
 
 **Outcome:** **CLOSED-** (all verification passed; file is `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`).
+
+
+---
+
+## Test report
+
+**Date:** 2026-03-30 UTC (Cursor agent run; wall clock aligned with user session “Monday Mar 30, 2026”).
+
+**TESTER.md workflow:** Operator path `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` is **not present** on disk (task already tracked as `CLOSED-…`). Applied **`CLOSED-` → `TESTING-`** as the queue equivalent, ran task-body verification, append this report, then **`TESTING-` → `CLOSED-`**. No other `UNTESTED-*` file was tested.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (`mac_stats` lib: **875** passed, 0 failed; other binary targets 0 tests; 1 doc-test ignored)
+
+**Acceptance criteria (1)–(3):** **pass** (CDP health ping path, `check_browser_alive` anti-`block_on` comment, session clear behavior unchanged vs prior closes).
+
+**Outcome:** **CLOSED-** — rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
