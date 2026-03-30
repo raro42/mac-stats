@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): on-disk rename chain **`tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md` → `WIP-…` → `UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`** (this file). Implementation in **`src-tauri`**: `task/mod.rs` (`format_operator_task_pressure_summary`, `count_tasks_by_status`), `task/review.rs` (review-loop constants), `commands/context_assembler.rs` (`live_metrics_execution_system_section`), `commands/ollama.rs` (`metrics_for_system` via shared fragment). **Verification (this run):** `cd src-tauri && cargo check && cargo test operator_task_pressure` — pass (`task::tests::operator_task_pressure_summary_empty_dir`). **Section 6 — Testing instructions** is the canonical tester handoff.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): on-disk rename chain **`FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md` → `WIP-…` → `UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`** (this file). Implementation in **`src-tauri`**: `task/mod.rs` (`format_operator_task_pressure_summary`, `count_tasks_by_status`), `task/review.rs` (review-loop constants), `commands/context_assembler.rs` (`live_metrics_execution_system_section`), `commands/ollama.rs` (`metrics_for_system` via shared fragment). **Verification (this run):** `cd src-tauri && cargo check && cargo test operator_task_pressure` — pass (`task::tests::operator_task_pressure_summary_empty_dir`). **Section 6 — Testing instructions** is the canonical tester handoff.
 - **Next step:** Tester runs **Section 6** (after **Section 5**) on **`UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
@@ -62,7 +62,7 @@ rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_secti
 
 ## 6. Testing instructions
 
-**Canonical handoff:** esta sección es la fuente de verdad para el tester tras el renombrado **`WIP → UNTESTED`** (no eliminar al cambiar prefijos del archivo).
+**Canonical handoff:** this section is the source of truth for the tester after the **`WIP → UNTESTED`** rename (do not remove it when changing task-file prefixes).
 
 **FEATURE-CODER:** After the coder run (**on-disk `FEAT-…` → `WIP-…` → `UNTESTED-…`**), the **tester** owns this section. Run **Section 5** before manual checks. **Coder:** leave reproducible smoke, checklist, and pass/fail criteria below; do not strip this section when renaming task-file prefixes.
 
