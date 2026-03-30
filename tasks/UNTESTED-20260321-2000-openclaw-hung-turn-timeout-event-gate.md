@@ -1,6 +1,11 @@
 # OpenClaw: hung turn wall-clock timeout + output event gate
 
-**Filename = queue state:** The **leading prefix** on this file (`TESTPLAN-…` vs `UNTESTED-…`) is authoritative. **If you opened `UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** (this queue name), follow [`003-tester/TESTER.md`](../003-tester/TESTER.md): rename **`UNTESTED-…` → `TESTING-…`** at run start, then run **Verification commands**. **If you opened `TESTPLAN-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**, you are **not** on the tester queue — **do not** run **TESTER.md** or rename to **`TESTING-…`**; wait for the coder to publish **`UNTESTED-…`** (same stamp + slug). Sections that refer to the “queue file” mean **`UNTESTED-…`** once that filename exists on disk.
+**Filename = queue state:** The **leading prefix** on this file (`TESTPLAN-…` vs `UNTESTED-…`) is authoritative — read the **basename**, not the IDE tab title.
+
+- **If the basename starts with `TESTPLAN-…`:** **Coder repair / instruction draft.** **Testers:** **do not** run [`003-tester/TESTER.md`](../003-tester/TESTER.md), **do not** rename to **`TESTING-…`**, **do not** run **Verification commands** as the queued task — wait until the coder renames this file to **`UNTESTED-…`** (same stamp + slug).
+- **If the basename starts with `UNTESTED-…`:** **Tester queue.** Follow **TESTER.md**: rename **`UNTESTED-…` → `TESTING-…`** at run start, then run **Verification commands** below.
+
+Sections that refer to the “queue file” mean **`UNTESTED-…`** once that filename exists on disk.
 
 **On-disk name (this file):** Same stamp `20260321-2000` and slug `openclaw-hung-turn-timeout-event-gate`; the **leading prefix** is what matters:
 
@@ -9,7 +14,7 @@
 
 **No** mac-stats product code change is required for this task file.
 
-**Instruction revision note:** A prior run flagged **Testing instructions** or the **stated environment** as defective (not a mac-stats implementation failure). This markdown body is the only authoritative spec: follow **Verification commands** below exactly, not snippets copied from **`CLOSED-*`** history (those may use wrong paths such as top-level **`src/`**). **Latest repair (2026-03-30, third pass — instruction clarity):** (1) **Post-probe list:** Markdown **`1.`…`5.`** after the **Tester quick gate** script looked like “steps 1–5” of the paste chain and collided with **Copy-paste order** step **1 = Preflight**. Those items are now **bullets** under **Queue and environment policy** with an explicit note that they are **not** bash lines to run after step **0**. (2) **TESTPLAN vs UNTESTED:** while the on-disk name is **`TESTPLAN-…`**, there is **no** tester queue slot — **do not** run **TESTER.md** rename on **`TESTPLAN-…`**. (3) **Preflight vs block A2:** the **no-git Preflight** snippet is **not** **Verification commands → A2**. (4) **Ordered gate:** **0 → 0b → Preflight → one full A1/A2/B block** in one session. (5) Retained: symlink **`cd`**, queue conflict (**never** both **TESTPLAN** and **UNTESTED**), **toolchain/network → `WIP-` not `TESTPLAN`**, **Preflight vs `--manifest-path`**, **A1 xor A2**, **IDE partial-selection**, **expected `rg`** (same line twice in **`turn_lifecycle.rs`**).
+**Instruction revision note:** A prior run flagged **Testing instructions** or the **stated environment** as defective (not a mac-stats implementation failure). This markdown body is the only authoritative spec: follow **Verification commands** below exactly, not snippets copied from **`CLOSED-*`** history (those may use wrong paths such as top-level **`src/`**). **Latest repair (2026-03-30, fourth pass — instruction clarity):** (1) **Queue header:** Rules are ordered by **`TESTPLAN-` vs `UNTESTED-` basename** so testers who open **`TESTPLAN-…`** see “stop” first. (2) **Happy path / closure:** Renamed the post-bash phase so it is **not** labeled “step **3**” (only **Copy-paste order** uses **0 / 0b / 1 / 2** for shell). (3) **Testing instructions → Start here:** Explicit “mac-stats only” and “one terminal session” before the long prose. (4) **Fish:** Multiline `set -e` blocks must run under **`bash`** (or `bash -lc`), not pasted raw into **fish**. (5) Retained: post-probe bullets under **Queue and environment policy** (not numbered paste steps), **Preflight ≠ A2**, **0 → 0b → 1 → 2** order, symlink **`cd`**, queue conflict, **toolchain → `WIP-`**, **A1 xor A2**, **IDE partial-selection**, **expected `rg`** (same line twice in **`turn_lifecycle.rs`**).
 
 **Coder handoff (future):** **`UNTESTED-…` → `TESTPLAN-…`** for another instruction repair, edit **Testing instructions** / clarity wording only, then **`TESTPLAN-…` → `UNTESTED-…`**. Testers **only** start from **`UNTESTED-…`** — **not** **`TESTPLAN-…`**.
 
@@ -30,6 +35,12 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 
 ## Testing instructions
 
+### Start here (read before any shell)
+
+- **Repository:** All commands target **this checkout: mac-stats** (the tree that contains **`src-tauri/Cargo.toml`**). The title says “OpenClaw” for **product behavior** only — **do not** `cd` to **`../openclaw`**, **do not** search or build there; that is **out of scope** and will fail.
+- **Queue:** If the task file basename is **`TESTPLAN-…`**, you are **not** on the tester queue — **stop** (see header above). If it is **`UNTESTED-…`**, follow **TESTER.md** rename rules, then run the shell sequence below in **one** terminal session (same shell for **0 → 0b → 1 → 2**).
+- **Single source of truth for shell order:** Only the **Copy-paste order** table defines steps **0**, **0b**, **1**, **2**. Lists labeled “TL;DR”, “Before you run anything”, or “Minimal run order” are **checklists or narrative** — they are **not** extra numbered bash steps after **2**.
+
 **Canonical step numbers:** Only the **Copy-paste order** table (**0**, **0b**, **1**, **2**) defines the command sequence. Other sections use bullets or headings — they are explanations or policy, **not** additional numbered steps to interleave with **0**/**1**/**2**.
 
 ### Copy-paste order (mandatory)
@@ -41,11 +52,13 @@ Run these **in order** in **one terminal** (bash or zsh per **Shell compatibilit
 | **0** | **Tester quick gate** probe (below) — **no** `set -e` required. |
 | **0b** | If the probe prints **`cd '…'`**, run that **`cd`**, then **`test -f src-tauri/Cargo.toml && echo OK`** (for **A1**/**A2**). If probe says **BLOCK: B**, **do not** use **A1**/**A2**. |
 | **1** | **Preflight (required)** — **git** variant (from any directory under mac-stats) **or** **no-git** variant (only after your **`pwd`** is already mac-stats **repo root**). |
-| **2** | Paste **exactly one** of **Verification commands → A1**, **A2**, or **B** from the first **`set -e`** through the **last `rg`**. |
+| **2** | Paste **exactly one** of **Verification commands → A1**, **A2**, or **B** from the first **`set -e`** through the **last `rg`**. **Do not** insert **Preflight** again inside this paste — step **1** already ran it once. |
 
 **Naming note:** **Block A2** (verification) always includes **`cd /ABSOLUTE/PATH/TO/mac-stats`** — you edit that line. The **no-git Preflight** is only two `test -f` lines plus `echo`; it does **not** replace block **A2**.
 
 ### TL;DR (static gate)
+
+**These six lines are a skimmable summary.** For the exact paste sequence, use **Copy-paste order** (**0**, **0b**, **1**, **2**) only.
 
 1. **mac-stats** repo only — not `../openclaw`. Rust paths are under **`src-tauri/src/`** (from repo root) or **`src/`** (only when cwd is **`src-tauri/`** — block **B**).
 2. **Terminal cwd:** In Cursor/VS Code (or any **multi-root** setup), confirm **`pwd`** is **inside** the mac-stats tree before step **0**. If **`pwd`** is only a **parent** monorepo folder, **`cd`** into **`…/mac-stats`** (the folder that **contains** **`src-tauri/`**) first — otherwise step **0** prints **`BLOCK: none`** even though the project is open in the IDE.
@@ -72,7 +85,7 @@ Run these **in order** in **one terminal** (bash or zsh per **Shell compatibilit
 
 **Fast path (experienced testers, macOS):** **Tester quick gate** step **0** → if **BLOCK: B**, paste **B** only. If **A1 or A2**, **`cd`** if instructed → **Preflight** (git variant if `.git` exists, else no-git) → paste **Verification commands → A1** or **A2** in full (never skip the **`cd`** / **`test -f src-tauri/Cargo.toml`** lines inside the block). **Tarball / broken git:** **A2** with a real absolute path on the **`cd`** line. **Pass** = every command exits **0** and every `rg` prints at least one line.
 
-**Happy path (ordered):** **0** Tester quick gate → **0b** optional **`cd`** + **`test -f src-tauri/Cargo.toml`** (when using **A1**/**A2**) → **1** Preflight (**git** or **no-git** variant — not the same as verification block **A2**) → **2** one full block **A1** or **A2** or **B** → **3** closure checklist (**TESTER.md** paperwork only; not another bash paste — only after the queue file is **`UNTESTED-…`** and you renamed to **`TESTING-…`** per **TESTER.md**).
+**Happy path (ordered):** **0** Tester quick gate → **0b** optional **`cd`** + **`test -f src-tauri/Cargo.toml`** (when using **A1**/**A2**) → **1** Preflight (**git** or **no-git** variant — not the same as verification block **A2**) → **2** one full block **A1** or **A2** or **B** → **after bash succeeds:** **Closure checklist** (**TESTER.md** paperwork only — **not** “step 3” of the shell table; **not** another bash paste). Use the checklist only when the queue file is **`UNTESTED-…`** and you already renamed **`UNTESTED-…` → `TESTING-…`** per **TESTER.md**.
 
 ### Coder publication after TESTPLAN repair
 
@@ -164,6 +177,7 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 ### Shell compatibility
 
 - **Preferred:** paste blocks **A1**/**A2**/**B** into **`bash`** (macOS: `/bin/bash` or `bash -lc '…'`) so **`set -e`** aborts the same way as in CI. **zsh** usually runs these snippets correctly; if a failing command does **not** stop the script, re-run the block under **`bash`** before filing a failure.
+- **fish (or other non-POSIX shells):** **Do not** paste multiline **`set -e`** blocks directly into **fish** — open **`bash`** first, or wrap the **entire** block in **`bash -lc '…'`** (see the next bullet). The **Tester quick gate** and **Preflight** snippets use **`bash`/`zsh`** syntax too.
 - The blocks below use **`bash`** syntax (`set -e`, `$(…)`). On macOS, **Terminal.app** defaults to **zsh**.
 - **Quote the `**Turn timed out**` pattern for `rg`:** the verification blocks use **single quotes** around the fixed string so no shell treats `**` as a glob. If you type the command by hand, use **`rg -n -F '**Turn timed out**' …`** (do not unquote the pattern).
 - If your login shell is **fish** (or another non-POSIX shell), run the block explicitly with Bash, for example:  
@@ -257,11 +271,13 @@ command -v rg >/dev/null && echo "OK: rg" || echo "WARN: install ripgrep or sear
 
 ### Minimal run order (single shell session)
 
+This section repeats **Copy-paste order** in prose. **Shell step numbers are still only 0 / 0b / 1 / 2** in the table above — the items below are **not** “steps 3+” of that table.
+
 Do **not** mix **A1**/**A2** path prefixes (repo root + `src-tauri/…`) with **B** path prefixes (crate root + `src/…`) in one run.
 
-1. Run **Tester quick gate** step **0** (directory probe). If the output includes **`cd '/path/to/mac-stats'`** (or similar), run that **`cd`** so **A1**/**A2** relative paths resolve, then **`test -f src-tauri/Cargo.toml`**. Then run **Preflight (required)**: the **git** snippet if you have a `.git` tree (can run from **`tasks/`** etc.), **or** the **no-git** snippet after you have manually **`cd`'d** to repo root — **not** the full **Verification commands → A2** block.
-2. Paste **exactly one** of **A1**, **A2**, or **B** **in full** from **Verification commands** (same terminal; **`set -e`** should still be active; use **`bash`** if unsure — see **Shell compatibility**). Prefer **A1** if `.git` exists and **BLOCK** is **A1 or A2**, else **A2** when you need an explicit absolute **`cd`** line; use **B** only when step **0** says **BLOCK: B**.
-3. If **`cargo`** fails with **`could not find Cargo.toml`**, you are not using **A1**/**A2**/**B** correctly — re-read **Environment** and **Common instruction defects**.
+1. **(Same as table 0 / 0b / 1.)** Run **Tester quick gate** step **0** (directory probe). If the output includes **`cd '/path/to/mac-stats'`** (or similar), run that **`cd`** so **A1**/**A2** relative paths resolve, then **`test -f src-tauri/Cargo.toml`**. Then run **Preflight (required)**: the **git** snippet if you have a `.git` tree (can run from **`tasks/`** etc.), **or** the **no-git** snippet after you have manually **`cd`'d** to repo root — **not** the full **Verification commands → A2** block.
+2. **(Same as table 2.)** Paste **exactly one** of **A1**, **A2**, or **B** **in full** from **Verification commands** (same terminal; **`set -e`** should still be active; use **`bash`** if unsure — see **Shell compatibility**). Prefer **A1** if `.git` exists and **BLOCK** is **A1 or A2**, else **A2** when you need an explicit absolute **`cd`** line; use **B** only when step **0** says **BLOCK: B**.
+3. **Troubleshooting (not a paste step):** If **`cargo`** fails with **`could not find Cargo.toml`**, you are not using **A1**/**A2**/**B** correctly — re-read **Environment** and **Common instruction defects**.
 
 ### Closure checklist (tick before outcome naming)
 

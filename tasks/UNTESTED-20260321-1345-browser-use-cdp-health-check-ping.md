@@ -10,7 +10,7 @@
 >
 > **Scope:** **mac-stats** repository only. All paths refer to **`src-tauri/src/browser_agent/mod.rs`** in that clone. Running these steps in a **different repo** (e.g. a sibling **openclaw** tree) is **out of scope** and invalid — use the mac-stats checkout that contains this `tasks/` file.
 >
-> **Testing instructions** revised **2026-03-30** (k): **(j)** plus **forbidden queue shortcuts** (**never** **`TESTPLAN-` → `TESTING-`** or **`CLOSED-` → `TESTING-`**); **`TESTER.md` last-line override** (unfiltered **`cargo test`** is not Step 3 for this slug); **archive copy-paste** warning (**do not** take verification commands from **`CLOSED-…`** history); **language priority** (English Steps 1–4 beat any summary that implied a full-suite gate).
+> **Testing instructions** revised **2026-03-30** (l): **(k)** plus **zero-ambiguity gate** (minimal pass list + explicit “never the gate” one-liner at top of **Testing instructions**); **wrong-command → procedure error** table (symptom = you ran the wrong `cargo test`); **TESTPLAN vs UNTESTED** reminder on this basename while under coder edit.
 
 ## Goal
 
@@ -62,6 +62,23 @@ The **Phase 0** table is the short decision guide; the bullets below spell out t
 
 ## Testing instructions
 
+### Zero-ambiguity gate (read this block first)
+
+**While this file is named `TESTPLAN-…` on disk:** instructions are **under coder revision**. **Do not** run the gate, **do not** rename **`TESTPLAN-` → `TESTING-`**. Wait until the repo contains **`UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** (same stamp/slug), then execute from that file.
+
+**After `TESTPLAN-` → `UNTESTED-` publication, a pass requires all of:**
+
+1. **Queue:** You started from **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** and renamed **`UNTESTED-` → `TESTING-`** per **`TESTER.md`** (not from **`CLOSED-…`** or **`TESTPLAN-…`** stand-ins).
+2. **Repo + cwd:** **mac-stats** tree; `test -f src-tauri/Cargo.toml && test -f src-tauri/src/browser_agent/mod.rs` succeeds from **repository root** (or you used the **`src-tauri/`** column in **Paths by cwd** consistently).
+3. **Automated gate:** Run the bash block **Copy-paste — full gate** (covers **Steps 1–3**) exactly as written for your cwd column, then **Step 4** in the editor (manual — **not** in the script).
+4. **Step 3 shape:** The `cargo test` you treat as mandatory includes **`--lib`**, the literal filter token **`cdp_retry_`** (underscore **required**), and **`--no-fail-fast`**, with **`cdp_retry_` before any `--`** that starts test-binary args. Cargo must print **`running N tests`** with **N ≥ 1** and **`test result: ok`** for **that** command.
+
+**Never the pass/fail bar:** any single `cargo test` invocation whose command line does **not** contain the substring **`cdp_retry_`**. That includes unfiltered **`cargo test --no-fail-fast`**, **`cargo test -p mac_stats --no-fail-fast`**, **`cargo test -p mac_stats --lib --no-fail-fast`**, and **`cd src-tauri && cargo test --no-fail-fast`** — run those only under **Optional — full crate tests**, and **never** as the reason for **fail** or **`TESTPLAN-`** if the **`cdp_retry_`** Step 3 above **passed**.
+
+**Wrong command ⇒ procedure error (not a mac-stats defect):** If the **only** failing command in your notes is a `cargo test` **without** **`cdp_retry_`**, you did **not** complete the gate — re-run **Step 3** from **Authoritative automated test command** or **Copy-paste — full gate**, then decide pass/fail.
+
+---
+
 **One-line gate recap (memorize this):** From **mac-stats repo root**, run the **Copy-paste — full gate** bash block (Steps **1–3**), then **Step 4** in the editor. **Step 3** is **only** `cargo test … -p mac_stats --lib cdp_retry_ --no-fail-fast` (literal substring **`cdp_retry_`** on that line). Anything else is optional or diagnostic.
 
 **Single-sentence gate rule:** This task **never** requires `cargo test` / `cargo test --no-fail-fast` **without** the substring **`cdp_retry_`** on the **same** command line. If **TESTER.md** (or a translated runbook) lists only `cd src-tauri && cargo test --no-fail-fast` as the final verification line, that line is **not** the acceptance bar for this slug — **Step 3** below replaces it. A failing unfiltered suite **does not** override a passing **Step 3**.
@@ -97,7 +114,7 @@ The **Phase 0** table is the short decision guide; the bullets below spell out t
 
 **If `TESTER.md` still lists an unfiltered crate test as a mandatory step for this slug:** treat that line as **obsolete for pass/fail** — run **Step 3** (`cdp_retry_`) from **this** file instead; you may run the full suite **only** under **Optional — full crate tests** and **must not** fail the task based solely on that optional result.
 
-**Naming rule:** **Preflight** items are **`PF-0` … `PF-4`** (`PF-0` optional walk-up; **`PF-1` … `PF-4`** otherwise). **Gate** items are **`Step 1` … `Step 4`** (static review, compile, filtered tests, manual spot-check). **Do not** confuse **PF-3** (fingerprint / self-check) with **Step 3** (the actual `cargo test` command).
+**Naming rule:** **Preflight** items are **`PF-0` … `PF-4`** (`PF-0` optional walk-up; **`PF-1` … `PF-4`** otherwise). **Gate** items are **`Step 1` … `Step 4`** (static review, compile, filtered tests, manual spot-check). **Do not** confuse **PF-3** (fingerprint / self-check — read the table **before** you type Step 3) with **Step 3** (the **actual** `cargo test` command you run in the shell — **PF-3** is not a substitute command).
 
 ### Start here (preflight — before Step 1)
 
@@ -398,4 +415,4 @@ While instructions are edited, the task lives as **`TESTPLAN-20260321-1345-brows
 
 If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
 
-**This revision (k):** Coder **`TESTPLAN-…` → `UNTESTED-…`** for retest — **forbidden** **`TESTPLAN-` → `TESTING-`** / **`CLOSED-` → `TESTING-`** shortcuts; **`TESTER.md`** unfiltered **`cargo test`** explicitly **not** Step 3; **archive** **`CLOSED-…`** copy-paste warning; **English** Steps 1–4 override summaries that implied a full-suite mandatory gate. Carries forward **(j)**. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+**This revision (l):** Coder **`TESTPLAN-…` → `UNTESTED-…`** for retest — **zero-ambiguity gate** block at top of **Testing instructions**; **PF-3 vs Step 3** clarified (read vs run); **`cdp_retry_` underscore** called out; **wrong `cargo test` ⇒ procedure error** one-liner. Carries forward **(k)**. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
