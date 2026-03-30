@@ -14,7 +14,7 @@ Sections that refer to the “queue file” mean **`UNTESTED-…`** once that fi
 
 **No** mac-stats product code change is required for this task file.
 
-**Instruction revision note:** A prior run flagged **Testing instructions** or the **stated environment** as defective (not a mac-stats implementation failure). This markdown body is the only authoritative spec: follow **Verification commands** below exactly, not snippets copied from **`CLOSED-*`** history (those may use wrong paths such as top-level **`src/`** or a shortened **`rg`** that omits required literals). **Latest repair (2026-03-30, ninth pass — coder):** Added **Self-check before step 2 (one command each)** so testers confirm **`pwd`** matches the chosen block **after Preflight**; fixed **Happy path** so **step 0b** explicitly **skips** the repo-root **`test -f src-tauri/Cargo.toml`** when the probe printed **`BLOCK: B`**; added **Retest quickstart** (minimal decision path); **Common instruction defects** item **14** (running **`CLOSED-*`** or stale task snippets instead of this file’s **Verification commands**). **Prior (eighth pass):** **Execution recipe**; **Preflight never `cd`s**; **BLOCK: B** stays in **`src-tauri/`**; defect **13**.
+**Instruction revision note:** A prior run flagged **Testing instructions** or the **stated environment** as defective (not a mac-stats implementation failure). This markdown body is the only authoritative spec: follow **Verification commands** below exactly, not snippets copied from **`CLOSED-*`** history (those may use wrong paths such as top-level **`src/`** or a shortened **`rg`** that omits required literals). **Latest repair (2026-03-30, tenth pass — coder):** **Happy path (ordered)** now states **Preflight** variant by **BLOCK** (**`BLOCK: B`** → **git Preflight only**; **`BLOCK: A1 or A2`** → **git or no-git** per **Preflight (required)**). Added **Preflight variant chooser** (one table) immediately under **Retest quickstart**. **Tester quick gate** + **Shell compatibility**: explicit **fish** warning — run step **0** (probe) in **`bash`** or **`zsh`**, not raw **fish**. **Common instruction defects** item **15** (probe pasted into **fish**). **Prior (ninth pass):** **Self-check before step 2**; **step 0b** skips repo-root **`test`** when **`BLOCK: B`**; **Retest quickstart**; defect **14**.
 
 **Coder handoff (future):** **`UNTESTED-…` → `TESTPLAN-…`** for another instruction repair, edit **Testing instructions** / clarity wording only, then **`TESTPLAN-…` → `UNTESTED-…`**. Testers **only** start from **`UNTESTED-…`** — **not** **`TESTPLAN-…`**.
 
@@ -37,11 +37,18 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 
 ### Retest quickstart (read first — minimal decision)
 
-1. Open **one** terminal whose **`pwd`** is **anywhere inside** the mac-stats checkout (if unsure, **`cd`** to the folder that **contains** **`src-tauri/`** first).
+1. Open **one** terminal whose **`pwd`** is **anywhere inside** the mac-stats checkout (if unsure, **`cd`** to the folder that **contains** **`src-tauri/`** first). If your shell is **fish**, start **`bash`** for steps **0–2** (see **Tester quick gate** → **Shell for step 0**).
 2. Run **Tester quick gate** (step **0** below). Read the printed **`BLOCK:`** line — it is the **only** selector for step **2**.
 3. **Step 0b:** If the probe printed **`BLOCK: B`**, **do not** run **`test -f src-tauri/Cargo.toml`** (that path is wrong from **`src-tauri/`** crate root). If the probe printed **`BLOCK: A1 or A2`** and included a **`cd '…'`** line, run that **`cd`**, then run **`test -f src-tauri/Cargo.toml && echo OK`**.
 4. Run **Preflight** (step **1**) once — **git** variant from any subdir **including** **`src-tauri/`** when **`BLOCK: B`**; **no-git** variant **only** when **`pwd`** is mac-stats **repo root** (never from crate root alone).
 5. Run **Self-check before step 2** (table below), then paste **exactly one** full block **A1**, **A2**, or **B** from **Verification commands** — **not** the shortened commands in **`tasks/CLOSED-*`** for this stamp.
+
+### Preflight variant chooser (after step 0 — before step 1)
+
+| Step **0** printed | Paste for step **1** (**Preflight (required)**) |
+|--------------------|---------------------------------------------------|
+| **`BLOCK: B`** | **Git variant only** (walk-up / `$REPO_ROOT`). **Do not** paste the **no-git** snippet while **`pwd`** is **`src-tauri/`** — it will fail on **`test -f src-tauri/Cargo.toml`**. |
+| **`BLOCK: A1 or A2`** | **Git** variant **or** **no-git** variant, per **Preflight (required)** — **no-git** is allowed **only** when **`pwd`** is already mac-stats **repo root** (after step **0b** if the probe printed a **`cd`**). |
 
 **Invariant: step 1 always —** After **Tester quick gate** (step **0**), you **must** run **Preflight** (step **1**) once before **Verification commands** (step **2**), **for every** printed **BLOCK** (**A1**/**A2** **or** **B**). **Do not** paste block **A1**, **A2**, or **B** immediately after the probe, even if a summary section says “experienced testers.” Skipping Preflight is an **invalid** run.
 
@@ -153,7 +160,7 @@ Use this when **Copy-paste order** step **0** is done and you are choosing step 
 
 **Fast path (experienced testers, macOS):** Same **0 → 0b → 1 → 2** as **Copy-paste order** — **no** shortcuts. **Tester quick gate** step **0** → step **0b** when **A1**/**A2** (repo-root **`test -f`**) → step **1** **Preflight** always (**git** variant if **`.git`** exists or when **`BLOCK: B`**; **no-git** only at repo root and **never** from **`src-tauri/`** alone) → step **2** paste **one** full block **A1**, **A2**, or **B** (never skip leading **`cd`** / **`test -f`** lines inside the block). **Tarball / broken git:** **A2** with a real absolute path on the **`cd`** line. **Pass** = every command exits **0** and every **`rg`** prints at least one line.
 
-**Happy path (ordered):** **0** Tester quick gate → **0b** — if **`BLOCK: A1 or A2`**: run printed **`cd`** if any, then **`test -f src-tauri/Cargo.toml`**; if **`BLOCK: B`**: **skip** that repo-root **`test`** (you stay at **`src-tauri/`**; see **Copy-paste order**) → **1** Preflight (**git** or **no-git** variant — not the same as verification block **A2**) → **Self-check before step 2** → **2** one full block **A1** or **A2** or **B** → **after bash succeeds:** **Closure checklist** (**TESTER.md** paperwork only — **not** “step 3” of the shell table; **not** another bash paste). Use the checklist only when the queue file is **`UNTESTED-…`** and you already renamed **`UNTESTED-…` → `TESTING-…`** per **TESTER.md**.
+**Happy path (ordered):** **0** Tester quick gate → **0b** — if **`BLOCK: A1 or A2`**: run printed **`cd`** if any, then **`test -f src-tauri/Cargo.toml`**; if **`BLOCK: B`**: **skip** that repo-root **`test`** (you stay at **`src-tauri/`**; see **Copy-paste order**) → **1** Preflight — if **`BLOCK: B`**: **git variant only**; if **`BLOCK: A1 or A2`**: **git or no-git** per **Preflight (required)** (**not** the same paste as verification block **A2**) → **Self-check before step 2** → **2** one full block **A1** or **A2** or **B** → **after bash succeeds:** **Closure checklist** (**TESTER.md** paperwork only — **not** “step 3” of the shell table; **not** another bash paste). Use the checklist only when the queue file is **`UNTESTED-…`** and you already renamed **`UNTESTED-…` → `TESTING-…`** per **TESTER.md**.
 
 ### Coder publication after TESTPLAN repair
 
@@ -163,6 +170,8 @@ Use this when **Copy-paste order** step **0** is done and you are choosing step 
 ### Tester quick gate (read first)
 
 **This subsection is Copy-paste order step 0** (directory probe only — **not** Preflight, **not** block **A1**/**A2**/**B**).
+
+**Shell for step 0:** Paste the probe into **`bash`** or **`zsh`**. **Do not** paste it into **fish** (or other non-POSIX shells): the script uses **`$(dirname "$d")`** and **`if …; then …; else …; fi`**, which **fish** parses differently and can yield a **wrong `BLOCK:`** or a syntax error. Open **`bash`** first, or run **`bash -lc '…'`** with the probe body inside the quotes.
 
 **Pick the verification block** by running the script below **before** copying **A1**/**A2**/**B**. **No** `set -e` required. This probe **does not require `git`**: it detects **`src-tauri/`** crate root vs mac-stats **repo root** by walking **up** from **`pwd`** until it finds **`src-tauri/Cargo.toml`** + **`src-tauri/src/commands/turn_lifecycle.rs`**, or prints **BLOCK: none**. That fixes false **BLOCK: none** from **`tasks/`** and avoids assuming **`git rev-parse --show-toplevel`** equals the mac-stats folder (parent monorepos).
 
@@ -298,6 +307,7 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 12. **Skipping Preflight after the probe (especially `BLOCK: B`)** — **Copy-paste order** is **0 → 0b (if needed) → 1 → 2**. Older summaries that said “paste **B** only” after the probe were **wrong**; you **must** run **Preflight** (step **1**) before **any** **A1**/**A2**/**B** paste.
 13. **`BLOCK: B` + `cd` to repo root after Preflight** — Preflight prints **`OK: mac-stats repo root = …`** but **does not** change **`pwd`**. If you **`cd` to that path** and then paste block **B**, **`test -f Cargo.toml`** at repo root **fails** (mac-stats has **no** root **`Cargo.toml`**). **Stay in `src-tauri/`** for block **B** (or use **A1**/**A2** from repo root instead of **B**).
 14. **Using `tasks/CLOSED-*` (or chat logs) as the command source** — archived **`CLOSED-*`** files for this stamp may list **`rg … src/`** or omit required **`rg`** lines / **`-p mac_stats`**. That yields false “missing code” or incomplete verification. **Only** the **Verification commands** section **in this file** is authoritative for **`rg`** paths and **`cargo`** invocations.
+15. **Pasting the step 0 probe into fish** — the **Tester quick gate** script is **bash/zsh** syntax. In **fish**, you may get errors or nonsense **`BLOCK:`** output. Run **`bash`** (or **`bash -lc '…'`**) for step **0**, then continue in the same **`bash`** session for steps **0b–2** if your default shell is **fish**.
 
 ### Preflight (required)
 
