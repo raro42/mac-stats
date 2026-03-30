@@ -4,6 +4,8 @@
 `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast`.  
 This task **does not** require unfiltered **`cargo test --no-fail-fast`**, **`cd src-tauri && cargo test --no-fail-fast`**, or **`cargo test -p mac_stats --no-fail-fast`** without **`cdp_retry_`** on the **same** line. If **TESTER.md** (or a translated runbook) lists only that full-suite line as “verification,” that line is **wrong for acceptance** for this slug; **Step 3** in **Testing instructions** replaces it. A **TESTPLAN-** outcome that cites only full-suite failure while **Step 3** was never run (or passed) is an **instruction / procedure** defect, not a mac-stats CDP regression.
 
+**Spec vs archive (read once):** **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** is a **report archive**. Older blocks under “Commands run” often show **`cd src-tauri && cargo test --no-fail-fast`** with **no** **`cdp_retry_`** — that reflects **historical operator habit**, **not** the current gate. **Never** treat **`CLOSED-…`** (or a Discord/summary line in any language that says the task “requires” a **complete** / **full** **`cargo test --no-fail-fast`** without **`cdp_retry_`**) as overriding **this** file. For a new pass, **only** **Steps 1–4** here count; the mandatory **`cargo test`** is **exactly** the **`cdp_retry_`** **`--lib`** line in **Step 3**.
+
 > **Read your basename first.** The **only** rename into **`TESTING-`** that starts a valid run for this slug is **`UNTESTED-` → `TESTING-`**. Renaming **`TESTPLAN-` → `TESTING-`** or **`CLOSED-` → `TESTING-`** because the queue slot “was missing” is **invalid** for this task and produced false **TESTPLAN-** outcomes in archived reports (operators treated **`TESTER.md`**’s unfiltered **`cargo test`** as the bar).
 >
 > **Filename on disk (read the basename):**
@@ -16,7 +18,7 @@ This task **does not** require unfiltered **`cargo test --no-fail-fast`**, **`cd
 >
 > **Roles (same stamp/slug):** **`TESTPLAN-…`** on disk = **coder revision** — testers **do not** run the gate or rename to **`TESTING-`**. **`UNTESTED-…`** = **published queue** — testers rename **`UNTESTED-` → `TESTING-`** and run **Testing instructions**. **`CLOSED-…`** = **archive** for new passes (see **Phase 0**). **At most one** of **`TESTPLAN-…`** or **`UNTESTED-…`** should exist at repo tip; if **both** appear, fix handoff or merge conflict before any test run.
 >
-> **Testing instructions** revised **2026-03-30** (o): **(n)** carried forward; **Retest at a glance** (post-`UNTESTED-` publication) with a **single-line Step 3** copy target; **`-p mac_stats`** (underscore) vs **`mac-stats`** (hyphen) pitfall; **symptom-table** row for wrong package flag; reminder that **TESTER.md** full-suite lines remain **optional** for this slug.
+> **Testing instructions** revised **2026-03-30** (p): **(o)** carried forward; **Spec vs archive** — **`CLOSED-…`** “Commands run” / translated summaries **do not** define pass/fail; **forbidden vs Step 3** quick table under **Zero-ambiguity gate**; **`-p mac_stats`** vs **`mac-stats`** unchanged.
 
 ### Retest at a glance (003-tester — only after `UNTESTED-…` is on disk)
 
@@ -97,7 +99,14 @@ The **Phase 0** table is the short decision guide; the bullets below spell out t
 
 **After `TESTPLAN-` → `UNTESTED-` publication, a pass requires all of:**
 
-**Misread that triggered recent TESTPLAN- reports:** Some notes claimed this task’s verification block *requires* a **complete** `cargo test --no-fail-fast` over the whole crate (because **TESTER.md** or habit says so). **False for this slug.** The **only** mandatory `cargo test` is **Step 3** below — the **`cdp_retry_`**-filtered **`--lib`** command. Full-suite failures (e.g. `discord::` `pdfs_dir`, scheduler tests tied to `$HOME`) **do not** fail this task when **Step 3** passes.
+**Misread that triggered recent TESTPLAN- reports:** Some notes claimed this task’s verification block *requires* a **complete** `cargo test --no-fail-fast` over the whole crate (because **TESTER.md**, **`CLOSED-…`** history, or habit says so). **False for this slug.** The **only** mandatory `cargo test` is **Step 3** below — the **`cdp_retry_`**-filtered **`--lib`** command. Full-suite failures (e.g. `discord::` `pdfs_dir`, scheduler tests tied to `$HOME`) **do not** fail this task when **Step 3** passes.
+
+| You typed or copied (typical mistake) | **Step 3** for this slug? |
+|----------------------------------------|---------------------------|
+| `cd src-tauri && cargo test --no-fail-fast` | **No** — missing **`--lib`**, missing filter **`cdp_retry_`**; runs the **whole** lib suite |
+| `cargo test -p mac_stats --lib --no-fail-fast` | **No** — still runs **all** `#[cfg(test)]` in the lib (~800+); filter token **`cdp_retry_`** must appear on the **same** line |
+| `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast` (repo root) | **Yes** |
+| `cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast` (cwd = `src-tauri/`) | **Yes** |
 
 1. **Queue:** You started from **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** and renamed **`UNTESTED-` → `TESTING-`** per **`TESTER.md`** (not from **`CLOSED-…`** or **`TESTPLAN-…`** stand-ins).
 2. **Repo + cwd:** **mac-stats** tree; `test -f src-tauri/Cargo.toml && test -f src-tauri/src/browser_agent/mod.rs` succeeds from **repository root** (or you used the **`src-tauri/`** column in **Paths by cwd** consistently).
@@ -451,4 +460,4 @@ While instructions are edited, the task lives as **`TESTPLAN-20260321-1345-brows
 
 If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
 
-**This revision (o):** Coder **`TESTPLAN-…` → `UNTESTED-…`** for retest — **Retest at a glance**; **`-p mac_stats`** vs **`mac-stats`** pitfall (**Environment**, **symptom table**, pitfall **11**); **(n)** content retained. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+**This revision (p):** Coder **`TESTPLAN-…` → `UNTESTED-…`** for retest — **Spec vs archive** ( **`CLOSED-…`** / translated “full suite required” summaries); **forbidden vs Step 3** table in **Zero-ambiguity gate**; **(o)** retained. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).

@@ -14,7 +14,7 @@ Sections that refer to the “queue file” mean **`UNTESTED-…`** once that fi
 
 **No** mac-stats product code change is required for this task file.
 
-**Instruction revision note:** A prior run flagged **Testing instructions** or the **stated environment** as defective (not a mac-stats implementation failure). This markdown body is the only authoritative spec: follow **Verification commands** below exactly, not snippets copied from **`CLOSED-*`** history (those may use wrong paths such as top-level **`src/`**). **Latest repair (2026-03-30, seventh pass — tester retest):** **Fast path vs mandatory sequence:** **Before you run anything → Fast path** wrongly said “if **`BLOCK: B`**, paste **B** only,” which **skipped step 1 (Preflight)** and contradicted **Copy-paste order** (**0 → 0b → 1 → 2**). **Preflight is mandatory for every outcome**, including **`BLOCK: B`** (use **git** Preflight from **`src-tauri/`**, then block **B**). Added **Invariant: step 1 always** under **Testing instructions**; corrected **Fast path** and **TL;DR** line **4**. **Prior (sixth pass):** **BLOCK: B + no-git Preflight** trap; **Probe → Preflight → verification** table; **At a glance** / **Copy-paste order** / **Common instruction defects** item **11**.
+**Instruction revision note:** A prior run flagged **Testing instructions** or the **stated environment** as defective (not a mac-stats implementation failure). This markdown body is the only authoritative spec: follow **Verification commands** below exactly, not snippets copied from **`CLOSED-*`** history (those may use wrong paths such as top-level **`src/`**). **Latest repair (2026-03-30, eighth pass — coder):** Added **Execution recipe (mandatory order)** with explicit **BLOCK: A1/A2** vs **BLOCK: B** flows; stated that **Preflight never `cd`s** your shell (so **`pwd` after step 1 is unchanged**); warned **not** to **`cd` to `$REPO_ROOT` after Preflight when the probe said `BLOCK: B`** (block **B** must run from **`src-tauri/`** crate root); fixed **Before step 2 (A1 or A2)** so it matches **A1**’s walk-up from subdirs (e.g. **`tasks/`**); **Common instruction defects** item **13** (`BLOCK: B` + mistaken **`cd` to repo root**). **Prior (seventh pass):** **Fast path** / **TL;DR** aligned with **0 → 0b → 1 → 2**; **Preflight mandatory** including **`BLOCK: B`**. **Prior (sixth pass):** **BLOCK: B + no-git Preflight** trap; decision table; **Common instruction defects** item **11**.
 
 **Coder handoff (future):** **`UNTESTED-…` → `TESTPLAN-…`** for another instruction repair, edit **Testing instructions** / clarity wording only, then **`TESTPLAN-…` → `UNTESTED-…`**. Testers **only** start from **`UNTESTED-…`** — **not** **`TESTPLAN-…`**.
 
@@ -37,6 +37,26 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 
 **Invariant: step 1 always —** After **Tester quick gate** (step **0**), you **must** run **Preflight** (step **1**) once before **Verification commands** (step **2**), **for every** printed **BLOCK** (**A1**/**A2** **or** **B**). **Do not** paste block **A1**, **A2**, or **B** immediately after the probe, even if a summary section says “experienced testers.” Skipping Preflight is an **invalid** run.
 
+**Preflight does not change directory:** Neither Preflight snippet runs **`cd`**. After step **1**, your shell’s **`pwd`** is the **same** as before Preflight unless **you** ran a **`cd`** in step **0b**. Block **A1**/**A2** performs the repo-root **`cd`** inside the pasted block; block **B** assumes you are **still** at **`src-tauri/`** crate root after step **0**/**1**.
+
+### Execution recipe (mandatory order)
+
+Use this subsection when the longer text feels contradictory. It restates **Copy-paste order** (**0 → 0b → 1 → 2**) only.
+
+**When step 0 prints `BLOCK: A1 or A2` (you will use verification block A1 or A2):**
+
+1. **0** — Paste **Tester quick gate** (probe).  
+2. **0b** — If the probe printed **`cd '…'`**, run that **`cd`**, then run **`test -f src-tauri/Cargo.toml && echo OK`**. If the probe said you are **already** at repo root (no **`cd`** line), still run **`test -f src-tauri/Cargo.toml && echo OK`** from **`pwd`** before step **2**.  
+3. **1** — Paste **Preflight**: **git** variant (works from repo root or any subdir under mac-stats, including **`tasks/`**) **or** **no-git** variant (**only** when **`pwd`** is mac-stats **repo root** — **never** from **`src-tauri/`** alone).  
+4. **2** — Paste **one** full block **A1** *or* **A2** from **Verification commands** (from **`set -e`** through the **last `rg`**). **Do not** skip the opening lines: they **`cd`** to repo root even if Preflight already printed **`$REPO_ROOT`**. **If `pwd` is still `tasks/`** after Preflight, you **must** either have run step **0b**’s **`cd`** or rely on block **A1**’s walk-up + **`cd "$REPO_ROOT"`** — **do not** run **`cargo --manifest-path src-tauri/Cargo.toml`** from **`tasks/`** without that **`cd`**.
+
+**When step 0 prints `BLOCK: B` (you will use verification block B):**
+
+1. **0** — Paste **Tester quick gate** (probe). Your **`pwd`** should be **`src-tauri/`** crate root.  
+2. **0b** — **Skip** the repo-root check **`test -f src-tauri/Cargo.toml`** (from crate root it fails **by design**; see **Copy-paste order** step **0b**).  
+3. **1** — Paste **git** Preflight **only** (walk-up still finds mac-stats root for **`test -f`**). **Do not** use the **no-git** Preflight while **`pwd`** is **`src-tauri/`**.  
+4. **2** — Paste block **B** in full **without** leaving **`src-tauri/`**. **Do not** **`cd` to `$REPO_ROOT` or the path Preflight printed** before block **B** — block **B**’s **`rg`** paths are **crate-relative** (`src/commands/…`), not repo-root **`src-tauri/src/…`**.
+
 ### At a glance (shell order — read this first)
 
 This list is the **same** sequence as **Copy-paste order**; use it when the longer sections feel ambiguous.
@@ -46,7 +66,7 @@ This list is the **same** sequence as **Copy-paste order**; use it when the long
 - **Step 1 — Preflight:** Paste **exactly one** of the two snippets under **Preflight (required)** (git variant **or** no-git variant). Each snippet starts with **`set -e`**. This is **not** verification block **A2** (Preflight has **no** `cargo` / `rg`). **If step 0 printed `BLOCK: B`** (cwd is **`src-tauri/`**), use **only the git Preflight** — **do not** use the no-git snippet until **`pwd`** is mac-stats **repo root** (see **Preflight (required)**).
 - **Step 2 — Verification:** Paste **exactly one** complete block **A1**, **A2**, or **B** from **Verification commands**, from the first **`set -e`** through the **last `rg`**, **without** re-running Preflight inside that paste.
 
-**Before step 2 (A1 or A2 only):** Your **`pwd`** must be the **mac-stats repository root** — the directory that **contains** a **`src-tauri/`** subdirectory (so **`test -f src-tauri/Cargo.toml`** succeeds). If your **`pwd`** is **`…/mac-stats/src-tauri`**, you are **not** at repo root: either **`cd ..`** and use **A1**/**A2**, or stay put and use block **B** (crate root) instead.
+**Before step 2 (A1 or A2 only):** **`test -f src-tauri/Cargo.toml`** should succeed **from `pwd`** after step **0b** (repo root) **or** you paste **A1** in full from a **subdirectory** of mac-stats — **A1** walks **up** from **`$PWD`** to locate **`REPO_ROOT`** and then **`cd`s**. **A2** still needs its opening **`cd /ABSOLUTE/.../mac-stats`** to be correct (subdirs like **`tasks/`** are fine **if** that **`cd`** lands on repo root). If **`pwd`** is **`…/mac-stats/src-tauri`** (crate root), you are **not** on repo root: **`cd ..`** for **A1**/**A2**, or stay put and use block **B**.
 
 **Before step 2 (block B only):** Your **`pwd`** must be the **`src-tauri/`** crate root — where **`test -f Cargo.toml`** and **`test -f src/commands/turn_lifecycle.rs`** both succeed.
 
@@ -79,7 +99,7 @@ Use this when **Copy-paste order** step **0** is done and you are choosing step 
 
 | Step **0** printed | Your cwd after step **0b** (if any) | Preflight (step **1**) | Verification (step **2**) |
 |--------------------|-------------------------------------|-------------------------|---------------------------|
-| **`BLOCK: B`** | **`src-tauri/`** (crate root) — step **0b** skipped | **Git variant** only (walk-up resolves `$REPO_ROOT`; **Preflight does not `cd` you**) | Paste block **B** **without** leaving **`src-tauri/`** (you should still be at crate root). |
+| **`BLOCK: B`** | **`src-tauri/`** (crate root) — step **0b** skipped | **Git variant** only (walk-up resolves `$REPO_ROOT`; **Preflight does not `cd` you** — **stay** at crate root; **do not** `cd` into `$REPO_ROOT` before block **B**) | Paste block **B** **without** leaving **`src-tauri/`** (you should still be at crate root). |
 | **`BLOCK: A1 or A2`** (at repo root) | Repo root | **Git** or **no-git** | **A1** or **A2** (one paste). |
 | **`BLOCK: A1 or A2`** (subdir; you ran printed **`cd`**) | Repo root | **Git** or **no-git** | **A1** or **A2** (one paste). |
 
@@ -257,6 +277,7 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 10. **Preflight OK from a subdir, then only `cargo`/`rg` lines from A1/A2** — Preflight uses **`$REPO_ROOT`**-absolute **`test -f`** checks; **A1**/**A2** **`cargo --manifest-path src-tauri/Cargo.toml`** does **not**. You **must** paste the full block (including **`cd`**) or **`cd`** to repo root yourself before **`cargo`**.
 11. **`BLOCK: B` + no-git Preflight from `src-tauri/`** — the no-git snippet’s first **`test -f src-tauri/Cargo.toml`** fails at crate root; use **git** Preflight (step **1**) and stay in **`src-tauri/`** for block **B** (step **2**), or **`cd ..`**, run no-git Preflight, then **`cd src-tauri`** before block **B**.
 12. **Skipping Preflight after the probe (especially `BLOCK: B`)** — **Copy-paste order** is **0 → 0b (if needed) → 1 → 2**. Older summaries that said “paste **B** only” after the probe were **wrong**; you **must** run **Preflight** (step **1**) before **any** **A1**/**A2**/**B** paste.
+13. **`BLOCK: B` + `cd` to repo root after Preflight** — Preflight prints **`OK: mac-stats repo root = …`** but **does not** change **`pwd`**. If you **`cd` to that path** and then paste block **B**, **`test -f Cargo.toml`** at repo root **fails** (mac-stats has **no** root **`Cargo.toml`**). **Stay in `src-tauri/`** for block **B** (or use **A1**/**A2** from repo root instead of **B**).
 
 ### Preflight (required)
 
