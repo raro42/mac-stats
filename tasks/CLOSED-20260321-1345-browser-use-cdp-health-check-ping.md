@@ -2950,3 +2950,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Acceptance criteria (1)–(3):** met (CDP `1+1` ping with `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)`, `check_browser_alive` + anti-`block_on` comment, `clear_browser_session_on_error` / `should_retry_cdp_after_clearing_session` behaviour as specified).
 
 **Outcome:** **CLOSED-** — all criteria and verification commands pass. Rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
+
+---
+
+## Test report
+
+**Fecha:** calendario local del operador 2026-03-30; **2026-03-30T00:21:55Z (UTC)** (`date -u`).
+
+**Flujo TESTER.md:** Se pidió `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; **no existe** en el repo. El fichero con ese slug estaba como `CLOSED-…`; se renombró **`CLOSED-` → `TESTING-`** al inicio de esta ejecución (mismo basename tras el prefijo; equivalente funcional a `UNTESTED-` → `TESTING-`). **No se probó ningún otro `UNTESTED-*`.**
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (comentario en `check_browser_alive` que prohíbe `Handle::block_on` + `tokio::time::timeout`; documentación en `evaluate_one_plus_one_blocking_timeout` sobre no anidar Tokio `block_on`)
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (875 passed, 0 failed en crate lib `mac_stats`; otros bins 0 tests; 1 doc-test ignored)
+
+**Criterios de aceptación (1)–(3):** cumplidos según los `rg` y el código en `browser_agent/mod.rs`.
+
+**Outcome (convención del operador):** **CLOSED-** — todos los criterios y comandos de verificación pasan. Renombrar `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.

@@ -29,7 +29,11 @@ pub mod fragments {
     /// Metrics block formatted for the agent-router execution system prompt (leading newlines).
     #[inline]
     pub fn live_metrics_execution_system_section() -> String {
-        format!("\n\n{}", live_metrics_for_prompt())
+        format!(
+            "\n\n{}\n\n{}",
+            live_metrics_for_prompt(),
+            crate::task::format_operator_task_pressure_summary()
+        )
     }
 
     /// Default CPU / non-agent system prompt: soul file + shared tool instructions.

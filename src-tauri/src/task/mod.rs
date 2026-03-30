@@ -727,6 +727,28 @@ pub fn count_tasks_by_status() -> Result<(usize, usize, usize, usize, usize), St
     Ok((open, wip, paused, finished, unsuccessful))
 }
 
+/// Compact task backlog and review-loop limits for agent execution system prompts (alongside live metrics).
+pub fn format_operator_task_pressure_summary() -> String {
+    use crate::task::review::{
+        TASK_REVIEW_INTERVAL_SECS, TASK_REVIEW_MAX_OPEN_PER_CYCLE, TASK_WIP_STALE_TIMEOUT_SECS,
+    };
+    let review_hint = format!(
+        "Review loop: every {} s, up to {} open task(s) started per cycle; WIP with no updates for {} min may be closed as unsuccessful.",
+        TASK_REVIEW_INTERVAL_SECS,
+        TASK_REVIEW_MAX_OPEN_PER_CYCLE,
+        TASK_WIP_STALE_TIMEOUT_SECS / 60,
+    );
+    match count_tasks_by_status() {
+        Ok((open, wip, paused, finished, unsuccessful)) => format!(
+            "## Task backlog (operator)\n\
+Counts: open={}, wip={}, paused={}, finished={}, unsuccessful={}.\n\
+{}",
+            open, wip, paused, finished, unsuccessful, review_hint
+        ),
+        Err(e) => format!("## Task backlog (operator)\n(unavailable: {})", e),
+    }
+}
+
 /// List all task files (any status) with modification time.
 /// Returns (path, status, mtime). Used for "all tasks" view.
 pub fn list_all_tasks() -> Result<Vec<(PathBuf, String, SystemTime)>, String> {
@@ -925,5 +947,33 @@ mod tests {
             task_file_name(Path::new("/foo/task-20260222-140215-open.md")),
             "task-20260222-140215-open.md"
         );
+    }
+
+    #[test]
+    fn operator_task_pressure_summary_empty_dir() {
+        let _guard = TASK_DIR_TEST_LOCK.lock().expect("task dir test lock");
+        let base = std::env::temp_dir().join(format!(
+            "mac-stats-task-pressure-test-{}",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&base);
+        fs::create_dir_all(&base).expect("mkdir task test dir");
+        let _override = TaskDirOverride::set(&base);
+
+        let s = format_operator_task_pressure_summary();
+        assert!(
+            s.contains("## Task backlog (operator)"),
+            "expected header: {s}"
+        );
+        assert!(
+            s.contains("open=0") && s.contains("wip=0"),
+            "expected zero counts: {s}"
+        );
+        assert!(
+            s.contains("Review loop: every 60 s"),
+            "expected review interval hint: {s}"
+        );
+
+        let _ = fs::remove_dir_all(&base);
     }
 }

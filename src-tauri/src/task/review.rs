@@ -1,4 +1,4 @@
-//! Task review loop: every 10 minutes, list open/wip tasks, close WIP older than 30 min as unsuccessful,
+//! Task review loop: every minute, list open/wip tasks, close WIP older than 30 min as unsuccessful,
 //! and start working on one open task.
 
 use std::time::{Duration, SystemTime};
@@ -6,10 +6,13 @@ use std::time::{Duration, SystemTime};
 use chrono::TimeZone;
 use tracing::{error, info, warn};
 
-const REVIEW_INTERVAL_SECS: u64 = 60; // 1 minute (tasks looked at at least once per minute)
-const WIP_TIMEOUT_SECS: u64 = 30 * 60; // 30 minutes
+/// Review loop sleep between cycles (operator prompt text must stay in sync).
+pub(crate) const TASK_REVIEW_INTERVAL_SECS: u64 = 60;
+/// WIP files with no writes for this long are closed as unsuccessful.
+pub(crate) const TASK_WIP_STALE_TIMEOUT_SECS: u64 = 30 * 60;
 const MAX_ITERATIONS_PER_TASK: u32 = 20;
-const MAX_TASKS_PER_CYCLE: u32 = 3;
+/// Max open tasks started per review cycle (operator prompt text must stay in sync).
+pub(crate) const TASK_REVIEW_MAX_OPEN_PER_CYCLE: u32 = 3;
 
 /// Close WIP tasks whose file was last modified more than 30 minutes ago.
 /// Sets status to "unsuccessful" and appends a note.
@@ -22,7 +25,7 @@ fn close_stale_wips() {
         }
     };
     let now = SystemTime::now();
-    let timeout = Duration::from_secs(WIP_TIMEOUT_SECS);
+    let timeout = Duration::from_secs(TASK_WIP_STALE_TIMEOUT_SECS);
     for (path, status, mtime) in list {
         if status != "wip" {
             continue;
@@ -140,7 +143,7 @@ fn resume_paused_tasks() {
     }
 }
 
-/// Run one review cycle: close stale WIPs, resume due paused tasks, then work on up to MAX_TASKS_PER_CYCLE open tasks.
+/// Run one review cycle: close stale WIPs, resume due paused tasks, then work on up to TASK_REVIEW_MAX_OPEN_PER_CYCLE open tasks.
 async fn run_review_once() {
     if let Ok((open, wip, paused, finished, unsuccessful)) = crate::task::count_tasks_by_status() {
         info!(
@@ -151,7 +154,7 @@ async fn run_review_once() {
     close_stale_wips();
     resume_paused_tasks();
     let mut count = 0u32;
-    while count < MAX_TASKS_PER_CYCLE {
+    while count < TASK_REVIEW_MAX_OPEN_PER_CYCLE {
         let path = match pick_one_open_task() {
             Some(p) => p,
             None => {
@@ -166,7 +169,7 @@ async fn run_review_once() {
             "Task review: starting work on open task '{}' ({}/{} this cycle)",
             name,
             count + 1,
-            MAX_TASKS_PER_CYCLE
+            TASK_REVIEW_MAX_OPEN_PER_CYCLE
         );
         match crate::task::runner::run_task_until_finished(
             path.clone(),
@@ -196,15 +199,15 @@ async fn run_review_once() {
     }
 }
 
-/// Async loop: every REVIEW_INTERVAL_SECS run a review cycle (default 1 minute).
+/// Async loop: every TASK_REVIEW_INTERVAL_SECS run a review cycle (default 1 minute).
 async fn review_loop() {
     loop {
-        tokio::time::sleep(Duration::from_secs(REVIEW_INTERVAL_SECS)).await;
+        tokio::time::sleep(Duration::from_secs(TASK_REVIEW_INTERVAL_SECS)).await;
         run_review_once().await;
     }
 }
 
-/// Spawn the task review thread. Runs every REVIEW_INTERVAL_SECS (e.g. 1 min): close WIP > 30 min as unsuccessful, work on open tasks.
+/// Spawn the task review thread. Runs every TASK_REVIEW_INTERVAL_SECS (e.g. 1 min): close WIP > 30 min as unsuccessful, work on open tasks.
 pub fn spawn_review_thread() {
     std::thread::spawn(|| {
         let rt = match tokio::runtime::Runtime::new() {
@@ -216,8 +219,8 @@ pub fn spawn_review_thread() {
         };
         info!(
             "Task review: thread spawned (every {} min, WIP timeout {} min)",
-            REVIEW_INTERVAL_SECS / 60,
-            WIP_TIMEOUT_SECS / 60
+            TASK_REVIEW_INTERVAL_SECS / 60,
+            TASK_WIP_STALE_TIMEOUT_SECS / 60
         );
         rt.block_on(review_loop());
     });
