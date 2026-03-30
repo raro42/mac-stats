@@ -1433,3 +1433,14 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Nomenclatura (mensaje operador):** pass → **`CLOSED-…`**. No aplica **`TESTED-`** (fallo de implementación) ni **`TESTPLAN-`** (instrucciones / entorno defectuosos).
 - **Resultado:** **PASS** — renombrar **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** tras este append.
 
+### Re-verify — 2026-03-30 UTC (`003-tester/TESTER.md`; operator target `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only)
+
+- **Rename UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` was **not present**; canonical file was **`CLOSED-…`** and was renamed to **`TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** at the start of this run. No other `UNTESTED-*` file was used.
+- **Commands run:**
+  - `cd src-tauri && cargo check && cargo test` — pass (library crate: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches in `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - same pattern on top-level `src/` — no matches (task body lists `src/`; Rust lives under `src-tauri/src/`)
+- **Acceptance criteria:** All satisfied (`TurnOutputGate` = `Arc<AtomicBool>`; `gate_allows_send` in tool loop / draft paths; `finalize_turn_timeout` builds text starting `**Turn timed out**` with budget seconds; router warn `closing output gate after turn wall-clock timeout` and turn-lifecycle warn `turn wall-clock timeout` / `closing output gate and running cleanup` in source).
+- **Outcome naming:** Operator message: pass → **`CLOSED-…`**; implementation fail → **`TESTED-…`**; defective test plan / environment spec → **`TESTPLAN-…`**. Repo `003-tester/TESTER.md` also maps fail/block to **`WIP-…`** — not applicable here.
+- **Outcome:** **PASS** — restore **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** after this append.
+
