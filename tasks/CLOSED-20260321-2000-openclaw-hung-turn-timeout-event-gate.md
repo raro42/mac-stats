@@ -1314,3 +1314,14 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
   - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — no matches (task verification block lists `src/`; top-level `src/` is frontend JS; Rust lives under `src-tauri/src/`)
 - **Acceptance criteria:** All satisfied (`TurnOutputGate` = `Arc<AtomicBool>`; `gate_allows_send` in tool loop; `finalize_turn_timeout` returns text starting `**Turn timed out**` with budget seconds; router log string `closing output gate after turn wall-clock timeout` in `ollama.rs`; turn-lifecycle strings `turn wall-clock timeout` / `closing output gate and running cleanup` in `turn_lifecycle.rs`; `cargo check` / `cargo test` green).
 - **Outcome:** **PASS** — **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**. Not `TESTED-` (implementation fail) or `TESTPLAN-` (bad instructions/environment).
+
+### Re-verify — 2026-03-30 (UTC), `003-tester/TESTER.md`; objetivo único `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`
+
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**. Para la fase TESTING se renombró **`CLOSED-…` → `TESTING-…`** (mismo basename). No se eligió otro `UNTESTED-*`.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (crate librería: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — sin coincidencias (el bloque de verificación del task lista `src/`; ahí está el frontend; el Rust está en `src-tauri/src/`)
+- **Criterios de aceptación:** Cumplidos.
+- **Resultado:** **PASS** — **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**. No aplica `TESTED-` ni `TESTPLAN-`. (`003-tester/TESTER.md` en repo: fallo genérico sería `WIP-…`.)
