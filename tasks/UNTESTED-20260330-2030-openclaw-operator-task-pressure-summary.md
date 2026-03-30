@@ -1,8 +1,8 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): tarea **`20260330-2030-openclaw-operator-task-pressure-summary`**. Flujo archivo completado: **`FEAT → WIP → UNTESTED`** (el árbol solo tenía **`UNTESTED-*`** al inicio; se renombró **`UNTESTED → FEAT → WIP`** para alinear con la ruta solicitada **`tasks/FEAT-…`**, luego **`WIP → UNTESTED`**). Implementación en **`src-tauri`** (**§2** / **§4**); sin cambios Rust en esta corrida. **`cargo check`** y **`cargo test operator_task_pressure`** — **OK**. **Section 6 — Testing instructions** conservada (no se eliminó smoke ni checklist al renombrar prefijos).
-- **Next step:** Tester ejecuta **Section 6** (tras **Section 5**) en este archivo **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`**. File workflow: **`FEAT → WIP → UNTESTED`**. Implementation in **`src-tauri`** (§2 / §4) verified; **`cargo check`** and **`cargo test operator_task_pressure`** OK. **Section 6 — Testing instructions** filled for handoff to tester.
+- **Next step:** Tester runs **Section 6** (after **Section 5**) on **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
 # UNTESTED: OpenClaw parity — operator task pressure summary in execution context
