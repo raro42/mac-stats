@@ -1,6 +1,6 @@
 # Browser use — CDP health check ping (`1+1`)
 
-> **Queue file:** **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`**. Testers rename **`UNTESTED-` → `TESTING-`** to execute. **If your copy is still `TESTPLAN-…` for this slug:** instructions are **draft** — do **not** rename to **`TESTING-`** until a coder publishes **`UNTESTED-…`** (**`TESTPLAN-` → `UNTESTED-`**). **Testing instructions** revised **2026-03-30** (c): **explicit override** for **`TESTER.md`** / templates that still mandate **unfiltered** `cargo test --no-fail-fast`; **closure = steps 1–4 only**; executive summary; **`rg` + `set -e`**; **`cdp_retry_` before `--`**; **`PWD`** echo; diagnostic **`-- --list`**; steps **1–3** script / **4** editor; cwd / manifest table; **`rg -m`** (no **`| head`**); no **`\|`** inside **`rg`** alternation strings.
+> **Queue file:** **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`**. Testers rename **`UNTESTED-` → `TESTING-`** to execute. **If your copy is still `TESTPLAN-…` for this slug:** instructions are **draft** — do **not** rename to **`TESTING-`** until a coder publishes **`UNTESTED-…`** (**`TESTPLAN-` → `UNTESTED-`**). **Testing instructions** revised **2026-03-30** (d): **preflight** (`pwd` + `test -f src-tauri/Cargo.toml`); **gate fingerprint** (wrong vs right `cargo test` one-liners); **IDE cwd** pitfall (`tasks/`, `src/`); same **stale runbook** override (**closure = steps 1–4**; **`cdp_retry_`** filter); **`rg` + `set -e`**; **`cdp_retry_` before `--`**; **`rg -m`** (no **`| head`**); no **`\|`** inside **`rg`** alternation strings.
 
 ## Goal
 
@@ -25,6 +25,7 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 
 - **Host:** **macOS** with a normal mac-stats dev toolchain (`cargo`, `rustc` on `PATH`). This crate is a **macOS** app; if you are **not** on macOS and **`cargo check -p mac_stats`** fails for linker or Apple-framework reasons, **stop** — record **environment blocked** in your notes. That is **not** a defect in this task’s **Testing instructions** and is **not** grounds for **`TESTPLAN-…`** by itself.
 - **Checkout:** mac-stats repository root (directory that contains `src-tauri/`). This repo has **no** workspace `Cargo.toml` at the repository root — the package lives under **`src-tauri/`** only.
+- **IDE / terminal cwd:** Many editors open a terminal in `tasks/`, `src/`, or `src-tauri/` by default. **That is not the repo root.** If `test -f src-tauri/Cargo.toml` fails, `cd` up to the directory that **contains** `src-tauri/` (run `pwd` after `cd` so your report states the actual cwd).
 - **Sanity check (once per session):** from repo root, `test -f src-tauri/Cargo.toml && test -f src-tauri/src/browser_agent/mod.rs` must succeed before the gate. If this fails, you are in the wrong directory (e.g. `tasks/`, another clone, or inside `src-tauri/` with wrong relative paths for `rg`) — `cd` to the repo root first.
 - **From `src-tauri/` instead:** if your shell cwd is already **`…/mac-stats/src-tauri`**, use **`test -f Cargo.toml && test -f src/browser_agent/mod.rs`** before running **alternate** commands. Do **not** run `cd src-tauri` when you are already inside `src-tauri/` (that `cd` fails). For **`rg`**, either `cd` back to repo root and keep paths `src-tauri/src/...`, or run `rg … src/browser_agent/mod.rs` from `src-tauri/` (no `src-tauri/` prefix).
 - **Hard footgun — no manifest at repo root:** this tree has **no** `Cargo.toml` at the repository root. Running plain `cargo check` or `cargo test` **without** `--manifest-path src-tauri/Cargo.toml` from root typically errors (e.g. *could not find `Cargo.toml`* or picks up the wrong workspace). That is **not** a product failure — fix the invocation.
@@ -37,6 +38,30 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 - **Rust:** stable toolchain able to build `mac_stats` (same as normal mac-stats development).
 
 ## Testing instructions
+
+### Start here (preflight — before step 1)
+
+1. **Confirm repo root** (must print `OK: mac-stats repo root`):
+
+   ```bash
+   pwd
+   test -f src-tauri/Cargo.toml && test -f src-tauri/src/browser_agent/mod.rs && echo "OK: mac-stats repo root"
+   ```
+
+   If that fails, you are not at the repository root (common: terminal started in `tasks/`, `src/`, or only inside `src-tauri/`). `cd` to the clone root — the folder whose **direct child** is `src-tauri/`.
+
+2. **Queue file for a real run:** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` (rename **`UNTESTED-` → `TESTING-`** per runbook). If only **`TESTPLAN-…`** exists for this slug, **stop** — wait for **`TESTPLAN-` → `UNTESTED-`**.
+
+3. **Step 3 command fingerprint** — the automated gate is **not** “any” `cargo test`. Your step **3** command line **must** include the substring **`cdp_retry_`** as Cargo’s **test-name filter** (a **positional** argument after `--lib`, **before** any `--` that starts test-binary args). Self-check after typing the command: you should see the three tokens **`--lib`**, **`cdp_retry_`**, and **`--no-fail-fast`** in that order (with only other `cargo` flags between them as in the copy-paste block).
+
+   | You ran | Gate? |
+   |--------|--------|
+   | `cargo test … -p mac_stats --lib cdp_retry_ --no-fail-fast` | **Yes** — step **3** |
+   | `cargo test … -p mac_stats --lib --no-fail-fast` | **No** — runs **all** lib tests (~800+); **never** the acceptance bar |
+   | `cargo test … -p mac_stats --no-fail-fast` (no `cdp_retry_`) | **No** |
+   | `cd src-tauri && cargo test --no-fail-fast` (no `cdp_retry_`) | **No** — stale runbook |
+
+4. **Order:** run **Copy-paste — full gate** (steps **1–3**), then **step 4** in the editor. **Do not** substitute an unfiltered full-suite `cargo test` from an old checklist and treat its failure as this task failing.
 
 ### Stale runbook override (read before any `cargo test`)
 
@@ -290,4 +315,4 @@ While instructions are edited, the task may temporarily live as **`TESTPLAN-2026
 
 If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
 
-**This revision:** **`TESTPLAN-…` → `UNTESTED-…`** published **2026-03-30** (c): **stale runbook override** (unfiltered `cargo test` ≠ gate); **`TESTPLAN-`** only for broken instructions/handoff, not for optional-suite noise when step **3** passes — ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+**This revision:** **`TESTPLAN-…` → `UNTESTED-…`** published **2026-03-30** (d): **preflight** + **step 3 fingerprint** table + **IDE cwd** note; **stale runbook override** unchanged (unfiltered `cargo test` ≠ gate); **`TESTPLAN-`** only for broken instructions/handoff, not for optional-suite noise when step **3** passes — ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
