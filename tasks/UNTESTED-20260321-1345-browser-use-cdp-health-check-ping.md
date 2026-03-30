@@ -16,7 +16,20 @@ This task **does not** require unfiltered **`cargo test --no-fail-fast`**, **`cd
 >
 > **Roles (same stamp/slug):** **`TESTPLAN-…`** on disk = **coder revision** — testers **do not** run the gate or rename to **`TESTING-`**. **`UNTESTED-…`** = **published queue** — testers rename **`UNTESTED-` → `TESTING-`** and run **Testing instructions**. **`CLOSED-…`** = **archive** for new passes (see **Phase 0**). **At most one** of **`TESTPLAN-…`** or **`UNTESTED-…`** should exist at repo tip; if **both** appear, fix handoff or merge conflict before any test run.
 >
-> **Testing instructions** revised **2026-03-30** (n): **(m)** plus **roles / single-queue rule** (TESTPLAN vs UNTESTED vs CLOSED); **Quick path — testers** (four bullets: Phase 0 → cwd → copy-paste gate → Step 4); **Step 4 echo** after the bash gate so the script reminds testers the run is incomplete without the manual spot-check; **hard fail** note when Step 3 prints **`running 0 tests`**.
+> **Testing instructions** revised **2026-03-30** (o): **(n)** carried forward; **Retest at a glance** (post-`UNTESTED-` publication) with a **single-line Step 3** copy target; **`-p mac_stats`** (underscore) vs **`mac-stats`** (hyphen) pitfall; **symptom-table** row for wrong package flag; reminder that **TESTER.md** full-suite lines remain **optional** for this slug.
+
+### Retest at a glance (003-tester — only after `UNTESTED-…` is on disk)
+
+Skip entirely if the **only** queue file for this slug is **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`** — wait for **`TESTPLAN-` → `UNTESTED-`**.
+
+1. **Queue:** Rename **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** → **`TESTING-…`** per **`TESTER.md`**.
+2. **Repo root:** `test -f src-tauri/Cargo.toml && test -f src-tauri/src/browser_agent/mod.rs` must succeed (else **PF-0** / **PF-1**).
+3. **Step 3 — copy this one line exactly** (from repo root):  
+   `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast`  
+   - **`-p mac_stats`** is spelled with an **underscore**. **`-p mac-stats`** (hyphen) is **wrong** and typically produces *package ID specification `mac-stats` did not match any packages* — treat that as an **invocation typo**, not a mac-stats code failure.  
+   - **Pass:** output includes **`running N tests`** with **N ≥ 1** (current tree: **2**) and **`test result: ok`** for **this** command.
+4. **Full scripted gate:** Run **Copy-paste — full gate** (adds the two **`rg`** lines + **`cargo check`** + the same Step 3). Then **Step 4** manually in the editor (**§ 4) Spot-check**) — the script’s final **`echo`** does **not** replace opening the file.
+5. **Not the bar:** Any **`cargo test`** line **without** the substring **`cdp_retry_`** (including unfiltered **`cargo test --no-fail-fast`** from **TESTER.md**) is **diagnostic only** for this slug.
 
 ### Quick path — testers after publication (`UNTESTED-…` on disk)
 
@@ -70,6 +83,7 @@ The **Phase 0** table is the short decision guide; the bullets below spell out t
 - **Preferred cwd for the gate:** stay at **repository root** for the whole copy-paste block. Use **`cargo … --manifest-path src-tauri/Cargo.toml`** so you never depend on `cd src-tauri` (a common source of “0 tests” when someone runs `cargo test` from root without a manifest).
 - **Alternate cwd:** you may instead `cd` to **`src-tauri/`** once (from repo root) and run `cargo check -p mac_stats` / `cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast` with **no** `--manifest-path`. If you do, stay in `src-tauri/` for those **cargo** commands; use the path rules above for **`rg`** (either return to repo root for `src-tauri/src/browser_agent/mod.rs`, or use `src/browser_agent/mod.rs` from inside `src-tauri/`).
 - **Already in `src-tauri/`:** run **`cargo … -p mac_stats`** with **no** leading `cd src-tauri` (that path does not exist inside `src-tauri/`). Same for **`rg`**: paths are **`src/browser_agent/mod.rs`**, not `src-tauri/src/...`.
+- **`-p` spelling (common typo):** This task’s commands use **`-p mac_stats`** (underscore — Cargo **package** name). The repo / product name **mac-stats** (hyphen) is **not** valid for **`-p`**. If Cargo reports that a package spec **did not match any packages**, re-check **underscore vs hyphen** before filing **TESTPLAN-** or **fail** against the product.
 - **Shell / pipelines:** The copy-paste block is written for **bash**. **zsh** on macOS also supports `set -o pipefail` (or use `setopt pipefail`). **fish** has different pipeline semantics — run the block via `bash -lc '…'` (use **single quotes** around the whole script so fish does not expand `$(pwd)` / `$()` before bash sees it) or paste the block into a `bash` subshell. Static review uses **`rg -m 20`** (no `| head`) so **`set -o pipefail` does not** turn a successful search into a pipeline failure (**SIGPIPE** when `head` stops reading).
 - **`rg`:** ripgrep must be available on `PATH` (same as other task files).
 - **No live Chrome / CDP session** is required for **Steps 1–4** (static review, compile, lib unit tests, spot-check).
@@ -232,7 +246,7 @@ If you mix columns (e.g. root paths while cwd is `src-tauri/`), you get empty **
 
 1. **Phase 0:** **`UNTESTED-…`** on disk before you start; **never** run the gate from **`TESTPLAN-…`**.
 2. **Cwd:** repo root **or** `src-tauri/` — follow **Environment** (including “already in `src-tauri/`” and **no** root `Cargo.toml`). Confirm **mac-stats** (this repo), not another project.
-3. **Gate:** **Steps 1–4** only. **Step 3** must be exactly the **`cdp_retry_`** lib test command (substring visible on the command line, and **`cdp_retry_` before any `--`**). Read **PF-3** before you run **Step 3** so you do not copy the wrong `cargo test` line.
+3. **Gate:** **Steps 1–4** only. **Step 3** must be exactly the **`cdp_retry_`** lib test command (substring visible on the command line, and **`cdp_retry_` before any `--`**), with **`-p mac_stats`** (**underscore** — not **`-p mac-stats`**). Read **PF-3** before you run **Step 3** so you do not copy the wrong `cargo test` line.
 4. **Ignore** any **`cargo test`** that does **not** include the substring **`cdp_retry_`** on the command line — including **`cargo test -p mac_stats --lib --no-fail-fast`** (runs the **entire** lib suite, hundreds of tests) and **`cargo test -p mac_stats --no-fail-fast`**. Those are **diagnostics only**, not acceptance.
 5. **Step 4** is a **manual** read in the editor — it is **not** included in the bash copy-paste block.
 6. **Report:** paste the **exact** **Step 3** command you ran and Cargo lines showing **`running N tests`** with **N ≥ 1** and **`test result: ok`** (see **Report evidence**).
@@ -243,6 +257,7 @@ If you mix columns (e.g. root paths while cwd is `src-tauri/`), you get empty **
 |--------|----------------|-----|
 | `could not find Cargo.toml` (or similar) when running **cargo** from repo root | Invoked **cargo** without `--manifest-path src-tauri/Cargo.toml` | Use the **preferred** commands from root, or `cd src-tauri` and use **alternate** form **without** `--manifest-path`. |
 | `running 0 tests` for **Step 3** | Wrong cwd/manifest, wrong `-p`, filter typo (`cdp_retry` vs `cdp_retry_`), or **`cdp_retry_` placed after `--`** (test-binary args, not Cargo’s filter) | Re-run with **`cdp_retry_` before `--`**: `cargo test … --lib cdp_retry_ --no-fail-fast`. Diagnostic: `cargo test … --lib cdp_retry_ -- --list` (same manifest/cwd); expect **≥ 1** line containing **`cdp_retry_`**. |
+| Cargo: *package ID specification `mac-stats` did not match any packages* (or similar) | **`-p mac-stats`** (hyphen) instead of **`-p mac_stats`** (underscore) | Replace with **`-p mac_stats`** on every **`cargo check`** / **`cargo test`** line in this task. |
 | First **`rg`** prints nothing or exits **1** | Wrong directory or wrong path (`src/browser_agent/...` from root instead of `src-tauri/src/...`) | `pwd`; from root paths **must** start with `src-tauri/src/browser_agent/mod.rs`. |
 | Second **`rg`** prints nothing | Same cwd/path issue | Same as above. |
 | Second **`rg`** pipeline fails with **`set -e` / `pipefail`** though matches exist | Historically `rg \| head`; **`head`** closes the pipe → **`rg`** can exit non-zero | Use **`rg -n -m 20 '…'`** as in the copy-paste block (no ` \| head`). |
@@ -275,6 +290,7 @@ Mistakes that produced **TESTPLAN-** while the CDP implementation was fine:
 8. **Equating “task verification” with TESTER.md’s last `cargo test` line:** Some runbooks end with **`cd src-tauri && cargo test --no-fail-fast`** and **no** filter. That command is **not** Step 3 for this slug. **Pass/fail** is **only** Steps 1–4 **in this file**; do **not** emit **`TESTPLAN-`** because that unfiltered line failed if **Step 3** (`cdp_retry_`) **passed**.
 9. **fish + `bash -lc`:** Passing the gate script in **double quotes** (or unquoted) lets **fish** expand **`$(pwd)`** and other **`$(…)`** before **bash** runs, so the script does not behave like the copy-paste block. Use **single-quoted** `bash -lc '…'`, a heredoc, or a small **`*.sh`** file.
 10. **`TESTPLAN-` → `TESTING-`:** When **`UNTESTED-…`** was absent, some operators renamed **`TESTPLAN-…`** (or **`CLOSED-…`**) to **`TESTING-…`** and then followed **`TESTER.md`**’s unfiltered **`cargo test`**. That bypasses this file’s **Step 3** (the **`cdp_retry_`** filter) and is **not** a valid run for this slug — record **handoff defect** or wait for **`TESTPLAN-` → `UNTESTED-`**, then **`UNTESTED-` → `TESTING-`**.
+11. **Wrong `-p` spelling:** Copying the product name **mac-stats** into **`-p mac-stats`**. Cargo expects **`-p mac_stats`**. The error looks like a missing package, not a CDP regression — fix the flag and re-run **Step 3**.
 
 **Fix for retest:** Use **`UNTESTED-…`** from the branch you test; run **Steps 1–4** using the **bash block** and **1) Static review** for `rg` (see **Paths by cwd** for the path column only); ignore unfiltered suite results for pass/fail.
 
@@ -435,4 +451,4 @@ While instructions are edited, the task lives as **`TESTPLAN-20260321-1345-brows
 
 If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
 
-**This revision (n):** Coder **`TESTPLAN-…` → `UNTESTED-…`** for retest — **roles + at-most-one queue file** (TESTPLAN vs UNTESTED vs CLOSED); **Quick path** for published **`UNTESTED-…`**; **Step 4** reminder **`echo`** after the bash gate; explicit **hard stop** when Step 3 shows **`running 0 tests`**. Carries forward **(m)**. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+**This revision (o):** Coder **`TESTPLAN-…` → `UNTESTED-…`** for retest — **Retest at a glance**; **`-p mac_stats`** vs **`mac-stats`** pitfall (**Environment**, **symptom table**, pitfall **11**); **(n)** content retained. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
