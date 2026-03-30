@@ -13,21 +13,25 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 ## Operator filename (TESTER.md / 003-tester)
 
 - **Pick up this path only:** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`. Rename **`UNTESTED-` → `TESTING-`** while you execute the steps below, then follow your runbook for **`TESTING-` → `CLOSED-`** or failure naming.
-- If **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` is missing**, treat that as a **defective task queue / handoff** (wrong filename in the tree or coder did not publish `UNTESTED-` yet). **Do not** infer pass/fail of the CDP health-check feature from a substitute file unless your operator guide explicitly allows it.
-- **`TESTPLAN-`** (same stamp and slug) means the **testing instructions** are under revision; it is **not** the normal operator pickup name. After the coder finishes, the file must be renamed to **`UNTESTED-`** for the next test run.
+- If **`UNTESTED-…` is missing** but **`tasks/TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md` exists:** the task is **not** queued for execution — **testing instructions are under revision**. Do **not** rename `TESTPLAN-` to `TESTING-` for a normal run; wait for the coder to rename **`TESTPLAN-` → `UNTESTED-`**, then pick up **`UNTESTED-…`** as usual.
+- If **neither** `UNTESTED-…` **nor** `TESTPLAN-…` exists for this slug, treat that as a **defective task queue / handoff**. **Do not** infer pass/fail of the CDP health-check feature from a substitute file (e.g. `CLOSED-…` renamed to `TESTING-`) unless your operator guide explicitly allows it.
+- **`TESTER.md` / templates** that still mandate a **full** `cargo test` / `cargo test --no-fail-fast` with **no** `cdp_retry_` filter for this slug are **superseded** by **steps 1–4** in this file for pass/fail (see **Pass/fail scope** below).
 
 ## Environment
 
 - **Checkout:** mac-stats repository root (directory that contains `src-tauri/`).
 - Run every command below from **repository root** unless `cd src-tauri` is shown.
 - **`rg`:** ripgrep must be available on `PATH` (same as other task files).
+- **No live Chrome / CDP session** is required for steps **1–4** (static review, compile, lib unit tests, spot-check).
+- **Rust:** stable toolchain able to build `mac_stats` (same as normal mac-stats development).
 
 ## Testing instructions
 
 ### Pass/fail scope (read first)
 
 - **Required for a pass on this task:** steps **1–4** below (static review, compile, **targeted** lib tests, spot-check). All required commands must succeed.
-- **Not required:** a full **`cargo test -p mac_stats --no-fail-fast`** over the whole crate. Other tests can fail in some environments (home-directory layout, `pdfs_dir`, scheduler persistence, etc.); those failures are **out of scope** and **must not** be used to fail this task unless the failing test is one of the **`cdp_retry_`** tests in step 3 or clearly implicates `evaluate_one_plus_one_blocking_timeout` / `check_browser_alive` / `clear_browser_session_on_error`.
+- **Authoritative gate:** these four steps override any older checklist that treated **unfiltered** `cargo test` / `cargo test --no-fail-fast` / `cargo test -p mac_stats --no-fail-fast` as mandatory for this task. Failures in unrelated modules (e.g. Discord `pdfs_dir`, scheduler home-directory persistence) **do not** invalidate a pass when steps **1–4** succeed.
+- **Not required:** a full **`cargo test -p mac_stats --no-fail-fast`** (or whole-workspace test) over the entire crate. Other tests can fail in some environments (home-directory layout, `pdfs_dir`, scheduler persistence, etc.); those failures are **out of scope** and **must not** be used to fail this task unless the failing test is one of the **`cdp_retry_`** tests in step 3 or clearly implicates `evaluate_one_plus_one_blocking_timeout` / `check_browser_alive` / `clear_browser_session_on_error`.
 
 ### 1) Static review (required)
 
@@ -36,13 +40,15 @@ rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALT
 rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20
 ```
 
-**Pass:** the first command lists matches in `browser_agent/mod.rs`; the second shows the anti-`block_on` comment / doc near `check_browser_alive` and `evaluate_one_plus_one_blocking_timeout`.
+**Pass:** the first command lists matches in `browser_agent/mod.rs`; the second’s first lines (up to **20** shown) include the anti-`block_on` comment / doc near `check_browser_alive` and `evaluate_one_plus_one_blocking_timeout`. If you need more context, re-run the second command without `| head -n 20`.
 
 ### 2) Compile (required)
 
 ```bash
 cd src-tauri && cargo check -p mac_stats
 ```
+
+From `src-tauri/`, `cargo check` alone is **acceptable** if it builds the `mac_stats` package in your checkout (explicit `-p mac_stats` avoids ambiguity in multi-package workspaces).
 
 ### 3) Targeted unit tests (required)
 
@@ -52,12 +58,14 @@ Use **only** this filter (do **not** require the entire lib test suite for this 
 cd src-tauri && cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast
 ```
 
-**Pass:** Cargo runs the `cdp_retry_`-filtered lib tests (typically **2** tests); **all** of them pass, including at least:
+**Pass:** Cargo **runs** the `cdp_retry_`-filtered lib tests and reports a **non-zero** count. Expect **at least 2** tests (current names below). If Cargo reports **0** tests executed, **fail** this step (wrong directory, typo in filter, or renamed tests — escalate).
 
 - `browser_agent::tests::cdp_retry_skipped_when_health_error_also_looks_like_connection_error`
 - `browser_agent::tests::cdp_retry_allowed_for_plain_connection_error_without_health_prefix`
 
-If additional tests ever share the `cdp_retry_` name prefix, they are in scope too — **every** test executed by this command must pass.
+**All** executed tests must pass. If additional tests share the `cdp_retry_` name prefix, they are in scope too — **every** test run by this exact command must pass.
+
+**Copy/paste note:** the filter is the substring `cdp_retry_` (underscore at the end), not `cdp_retry` alone.
 
 ### 4) Spot-check — acceptance criterion 3 (required)
 
@@ -69,7 +77,9 @@ In `src-tauri/src/browser_agent/mod.rs`, locate `should_retry_cdp_after_clearing
 cd src-tauri && cargo test -p mac_stats --no-fail-fast
 ```
 
-If this fails, **do not** fail the task **unless** the failure is in the **`cdp_retry_`** tests from step 3 or clearly tied to the health-check symbols in step 1. Otherwise record it as **environment / unrelated suite** in your report, not as a regression for this task.
+This is **diagnostic noise tolerance** only. **Do not** use this command as the **required** pass/fail bar for this task.
+
+If it fails, **do not** fail the task **unless** the failure is in the **`cdp_retry_`** tests from step 3 or clearly tied to the health-check symbols in step 1. Otherwise record it as **environment / unrelated suite** in your report, not as a regression for this task.
 
 ## Canonical history
 
