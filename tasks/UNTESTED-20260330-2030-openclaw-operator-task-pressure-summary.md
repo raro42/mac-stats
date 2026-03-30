@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): ciclo **`FEAT → WIP → UNTESTED`** para **`20260330-2030-openclaw-operator-task-pressure-summary`**. Entrada en disco: **`UNTESTED-…`** → renombrado a **`FEAT-…`** → **`WIP-…`** → **`UNTESTED-…`**. §4 en **`src-tauri`** (`task/mod.rs`, `task/review.rs`, `commands/context_assembler.rs`, `commands/ollama.rs`). **`cd src-tauri && cargo check && cargo test operator_task_pressure`**: OK (`task::tests::operator_task_pressure_summary_empty_dir`). **§6 — Testing instructions** conservada para el tester.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): ciclo **`FEAT → WIP → UNTESTED`** para **`20260330-2030-openclaw-operator-task-pressure-summary`**. Archivo **`FEAT-…`** → **`WIP-…`** → **`UNTESTED-…`**. Implementación en **`src-tauri`**: `task/mod.rs` (`format_operator_task_pressure_summary`, `count_tasks_by_status`), `task/review.rs` (constantes públicas del review loop), `commands/context_assembler.rs` (`live_metrics_execution_system_section`), `commands/ollama.rs` (`metrics_for_system` vía fragmento compartido). Verificación coder: **`cd src-tauri && cargo check && cargo test operator_task_pressure`**: OK (`task::tests::operator_task_pressure_summary_empty_dir`). **§6 — Testing instructions** lista para el tester.
 - **Next step:** El tester ejecuta **§6** (después de **§5**) en **`UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
@@ -55,7 +55,7 @@ cd src-tauri && cargo test
 ```
 
 ```bash
-rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_section" src-tauri/src/task/mod.rs src-tauri/src/commands/context_assembler.rs
+rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_section" src-tauri/src/task/mod.rs src-tauri/src/commands/context_assembler.rs src-tauri/src/commands/ollama.rs
 ```
 
 ---
@@ -76,7 +76,7 @@ cd src-tauri && cargo check && cargo test operator_task_pressure
 
 Optional full suite (acceptance criterion 3): `cd src-tauri && cargo test`
 
-Optional ripgrep sanity: `rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_section" src-tauri/src/task/mod.rs src-tauri/src/commands/context_assembler.rs`
+Optional ripgrep sanity: `rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_section" src-tauri/src/task/mod.rs src-tauri/src/commands/context_assembler.rs src-tauri/src/commands/ollama.rs`
 
 ### Quick checklist (tester)
 
