@@ -1661,3 +1661,15 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Acceptance criteria:** All satisfied (`TurnOutputGate` / `gate_allows_send` in tool loop; `finalize_turn_timeout` returns text starting `**Turn timed out**` with budget seconds; router warn `closing output gate after turn wall-clock timeout` and turn-lifecycle `turn wall-clock timeout` / `closing output gate and running cleanup` in source; `cargo check` / `cargo test` green).
 
 - **Outcome:** **PASS** — after this append, filename set to `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
+
+### Re-verify — 2026-03-30 UTC (Cursor; `003-tester/TESTER.md`; solo `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`)
+
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**; no se usó ningún otro `UNTESTED-*`. **Fase TESTING:** al inicio de este run el archivo estaba como `CLOSED-…` y se renombró a `TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` antes de la verificación.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (crate biblioteca: **875** passed, 0 failed; bins 0 tests; doc-tests: 0 passed, 1 ignored)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - Bloque de la tarea `rg … src/` (raíz): sin coincidencias (el Rust vive en `src-tauri/src/`, no en `src/` del front)
+- **Criterios de aceptación:** Cumplidos (`TurnOutputGate` = `Arc<AtomicBool>`, `gate_allows_send` en tool loop; `finalize_turn_timeout` con `**Turn timed out**` y presupuesto en segundos; logs `closing output gate after turn wall-clock timeout` y `turn wall-clock timeout` / `closing output gate and running cleanup` en fuente).
+- **Nomenclatura (mensaje operador):** pass → **`CLOSED-…`**; fallo implementación → `TESTED-…`; instrucciones/entorno → `TESTPLAN-…`. `003-tester/TESTER.md`: `WIP-…` en fallo genérico — no aplica.
+- **Resultado:** **PASS** — tras este append, renombrar **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.

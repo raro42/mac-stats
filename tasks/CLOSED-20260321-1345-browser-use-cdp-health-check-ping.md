@@ -3717,3 +3717,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Criterios de aceptación (1)–(3):** cumplidos.
 
 **Outcome (convención del operador):** **CLOSED-** (pass) — renombrar **`TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+
+---
+
+## Test report
+
+**Date / time:** 2026-03-30 07:13 UTC.
+
+**TESTER.md name flow:** Operator requested `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; that path is **not present** in the repo. The task was `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`; at the start of this run it was renamed **`CLOSED-` → `TESTING-`** (stand-in when no `UNTESTED-*` exists). No other `UNTESTED-*` task file was tested.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (875 passed, 0 failed in `mac_stats` lib tests; other bins 0 tests; 1 doc-test ignored)
+
+**Acceptance criteria (1)–(3):** satisfied.
+
+**Outcome:** **CLOSED-** (pass) — rename **`TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
