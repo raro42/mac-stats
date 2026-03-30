@@ -968,3 +968,16 @@ rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/com
 - **Result:** **Pass** — automated **Verification** satisfied; optional live Discord / throttle-override steps not run.
 - **Outcome filename:** `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md`.
 
+### Tester run (2026-03-30 UTC, `003-tester/TESTER.md` — re-run, same UNTESTED path)
+
+- **Date:** 2026-03-30 UTC.
+- **Note:** `tasks/UNTESTED-20260322-0105-openclaw-draft-stream-throttled-reply.md` still absent; `CLOSED-*` → `TESTING-*` for this run; no other `UNTESTED-*` opened.
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass (`Finished dev profile [unoptimized + debuginfo] target(s) in 0.58s`).
+  - `cd src-tauri && cargo test discord_draft_stream::` — pass (2 tests; `Finished test profile [unoptimized + debuginfo] target(s) in 12.80s`; exit code 0).
+  - `rg -n "spawn_discord_draft_editor" src-tauri/src/discord/mod.rs` — line **2197**.
+  - `rg -n "DiscordDraftHandle"` in `tool_loop.rs`, `turn_lifecycle.rs`, `ollama.rs` — matches (same wiring as prior reports).
+- **Config:** `discord_draft_throttle_ms` / `MAC_STATS_DISCORD_DRAFT_THROTTLE_MS`, clamp **200..=60_000** — confirmed in `config/mod.rs` (`discord_draft_throttle_ms()`).
+- **Result:** **Pass** — automated criteria satisfied; optional Discord live steps not run.
+- **Outcome filename:** `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md`.
+

@@ -17,23 +17,38 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 
 ## Testing instructions
 
+### Operator queue / filename (avoid handoff confusion)
+
+- **This slug’s retest queue file in-repo:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` (the file you are reading after a **TESTPLAN → UNTESTED** rename).
+- **If that path is missing** but you have **`CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** or **`TESTPLAN-…`** for the same stamp/slug, follow **`003-tester/TESTER.md`** for renames — **the verification shell commands below do not depend** on which of those filenames you started from. Missing **`UNTESTED-…`** alone is a **queue/handoff** issue, not evidence that the Rust gate is absent.
+
 ### Environment
 
-- **Repository:** **mac-stats** only (directory that contains **`src-tauri/Cargo.toml`** at `src-tauri/Cargo.toml`, plus top-level `src/` and `src-tauri/`).
+- **Repository:** **mac-stats** only (directory that contains **`src-tauri/Cargo.toml`**, plus top-level `src/` and `src-tauri/`).
 - **Host:** **macOS** + stable **Rust** toolchain + **[ripgrep](https://github.com/BurntSushi/ripgrep)** (`rg` on `PATH`). If `rg` is missing, install it or use your editor’s search; the patterns below are the exact substrings to find.
-- **Working directory:** Open a terminal and **`cd` to the mac-stats repo root** (the folder that contains `src-tauri/`). Every shell command below assumes **current working directory = that repo root** unless noted.
+- **Working directory:** Open a terminal and **`cd` to the mac-stats repo root** (the folder that contains `src-tauri/`). The **primary** verification block below assumes **current working directory = that repo root**.
+
+### Two different directories named `src` (critical)
+
+| Path from repo root | What it is |
+|---------------------|------------|
+| **`src/`** | Frontend (HTML/JS/CSS). **No** `TurnOutputGate` / turn-timeout Rust strings here. |
+| **`src-tauri/src/`** | Rust crate (**all** static checks for this task). |
+
+**Common false failure:** From repo root, running `rg "TurnOutputGate" src` searches **only** the frontend tree and prints **no matches**. That does **not** mean the feature is missing — you searched the wrong tree. Always use **`src-tauri/src`** in path arguments when your shell’s cwd is the **repo root**.
 
 ### What *not* to do
 
-- Do **not** treat missing matches under top-level **`src/`** (the web UI) as a failure — implementation lives under **`src-tauri/src/`**.
+- Do **not** treat zero matches under top-level **`src/`** as a failure.
 - Do **not** verify in **`../openclaw`** or any other repo.
 
 ### Preflight
 
-From repo root:
+From **repo root**:
 
 ```bash
 test -f src-tauri/Cargo.toml && echo "OK: repo root"
+test -f src-tauri/src/commands/turn_lifecycle.rs && echo "OK: Rust tree"
 command -v rg >/dev/null && echo "OK: rg" || echo "WARN: install ripgrep or search manually"
 ```
 
@@ -43,10 +58,13 @@ To see log lines in a real run, reproduce or simulate a turn timeout and grep **
 
 ## Verification commands
 
-Run from **mac-stats repo root** (copy the whole block; `set -e` stops on first failure):
+### A — Recommended: repo root as cwd
+
+Shell: **bash** or **zsh**. Copy the whole block; `set -e` stops on the first failing command.
 
 ```bash
 set -e
+cd "$(git rev-parse --show-toplevel 2>/dev/null)" || true
 test -f src-tauri/Cargo.toml
 ( cd src-tauri && cargo check && cargo test )
 
@@ -60,9 +78,28 @@ rg -n "turn wall-clock timeout" src-tauri/src/commands/turn_lifecycle.rs
 rg -n "closing output gate and running cleanup" src-tauri/src/commands/turn_lifecycle.rs
 ```
 
-**Why two files for log strings:** The router line with **`closing output gate after`** is only in **`ollama.rs`**. The **`turn wall-clock timeout`** / **`closing output gate and running cleanup`** pair lives in **`turn_lifecycle.rs`**. A single `rg` over the whole tree also works, but the commands above make expected locations obvious.
+**Why two files for log strings:** The router line with **`closing output gate after`** is only in **`ollama.rs`**. The **`turn wall-clock timeout`** / **`closing output gate and running cleanup`** pair lives in **`turn_lifecycle.rs`**. A single `rg` over **`src-tauri/src`** also works; the file-scoped lines above make expected locations obvious.
 
-**If you already `cd src-tauri`:** Run `cargo check` and `cargo test` there, then run `rg` patterns against **`src/`** (not `src-tauri/src/`) — e.g. `rg -n "TurnOutputGate" src`.
+### B — Alternate: your cwd is already `src-tauri/` (crate root)
+
+Use this block **only** when `pwd` is the directory that contains **`Cargo.toml`** and a **`src/`** subdirectory (that **`src/`** is **Rust**, not the repo’s top-level frontend `src/`).
+
+```bash
+set -e
+test -f Cargo.toml
+cargo check && cargo test
+
+rg -n "TurnOutputGate|gate_allows_send|finalize_turn_timeout" src
+
+rg -n '\*\*Turn timed out\*\*' src/commands/turn_lifecycle.rs
+
+rg -n "closing output gate after turn wall-clock timeout" src/commands/ollama.rs
+
+rg -n "turn wall-clock timeout" src/commands/turn_lifecycle.rs
+rg -n "closing output gate and running cleanup" src/commands/turn_lifecycle.rs
+```
+
+**Do not** mix A and B path styles in one shell session: from repo root, **never** pass bare `src/` to `rg` for this task (that is the frontend tree). From **`src-tauri/`**, **never** pass `src-tauri/src` (there is no such path below the crate root).
 
 **Slow tests:** `cargo test --no-fail-fast` is fine; requirement is **zero failing tests** for this crate.
 
