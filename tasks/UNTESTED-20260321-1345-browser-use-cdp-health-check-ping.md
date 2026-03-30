@@ -12,11 +12,11 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 
 ## Operator filename (TESTER.md / 003-tester)
 
-- **Pick up this path only:** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`. Rename **`UNTESTED-` → `TESTING-`** while you execute the steps below, then follow your runbook for **`TESTING-` → `CLOSED-`** or failure naming.
-- If **`UNTESTED-…` is missing** but **`tasks/TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md` exists:** the task is **not** queued for execution — **testing instructions are under revision**. Do **not** rename `TESTPLAN-` to `TESTING-` for a normal run; wait for the coder to rename **`TESTPLAN-` → `UNTESTED-`**, then pick up **`UNTESTED-…`** as usual.
-- If **neither** `UNTESTED-…` **nor** `TESTPLAN-…` exists for this slug, treat that as a **defective task queue / handoff**. **Do not** infer pass/fail of the CDP health-check feature from a substitute file (e.g. `CLOSED-…` renamed to `TESTING-`) unless your operator guide explicitly allows it.
-- **`TESTER.md` / templates** that still mandate a **full** `cargo test` / `cargo test --no-fail-fast` with **no** `cdp_retry_` filter for this slug are **superseded** by **steps 1–4** in this file for pass/fail (see **Pass/fail scope** below).
-- **Outcome:** if steps **1–4** all pass, the task **passes** for this slug even when an **optional** unfiltered `cargo test -p mac_stats --no-fail-fast` would fail (Discord, scheduler, home-directory coupling, etc.). Use **TESTPLAN-** only when **testing instructions** or **queue filenames** are wrong — **not** when the narrow gate passes but the broad suite fails.
+- **Executable queue file (only this name):** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`. At the start of a normal test run, rename **`UNTESTED-` → `TESTING-`**, execute the steps below, then follow your runbook for **`TESTING-` → `CLOSED-`** or failure naming.
+- **Handoff defect — do not substitute other prefixes for this slug:** If **`UNTESTED-…` is missing** at repo tip, **stop**. Do **not** rename `CLOSED-…` or `TESTPLAN-…` to `TESTING-…` to “run” this task unless your operator guide **explicitly** authorizes that exception. Typical fix: pull/sync to a revision where the coder published **`UNTESTED-…`** (after **`TESTPLAN-` → `UNTESTED-`**), or file a handoff defect. Treating historical **`CLOSED-…`** as the live test target caused false **TESTPLAN-** outcomes (full-suite noise) and bypassed the narrow gate below.
+- If **`tasks/TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md` exists** (and **`UNTESTED-…` is absent**): testing instructions are **under revision**. Do **not** rename `TESTPLAN-` → `TESTING-` for execution; wait for **`TESTPLAN-` → `UNTESTED-`**, then pick up **`UNTESTED-…`**.
+- **`TESTER.md` / templates** that still mandate an **unfiltered** `cargo test` / `cargo test --no-fail-fast` / `cargo test -p mac_stats --no-fail-fast` with **no** `cdp_retry_` filter for this slug are **stale for pass/fail**. **Closure** for this slug depends **only** on **steps 1–4** in **Testing instructions** (see **Pass/fail scope**).
+- **Outcome:** If steps **1–4** all pass, the task **passes** for this slug even when an **optional** unfiltered `cargo test -p mac_stats --no-fail-fast` would fail (Discord `pdfs_dir`, scheduler home-directory coupling, etc.). Use **TESTPLAN-** only when **testing instructions** or **queue filenames/handoff** are wrong — **not** when the narrow gate passes but the broad suite fails.
 
 ## Environment
 
@@ -31,10 +31,24 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 
 ### Pass/fail scope (read first)
 
-- **Required for a pass on this task:** steps **1–4** below (static review, compile, **targeted** lib tests, spot-check). All required commands must succeed.
-- **Authoritative gate:** these four steps override any older checklist that treated **unfiltered** `cargo test` / `cargo test --no-fail-fast` / `cargo test -p mac_stats --no-fail-fast` as mandatory for this task. Failures in unrelated modules (e.g. Discord `pdfs_dir`, scheduler home-directory persistence) **do not** invalidate a pass when steps **1–4** succeed.
-- **Checklist conflict:** if your runbook prints a **mandatory** unfiltered `cargo test` line for this slug, treat it as **stale for pass/fail**. You may still run it for curiosity or logs, but **closure** depends only on steps **1–4**. Never rename to **TESTPLAN-** solely because that unfiltered command failed while step **3** (`cdp_retry_`) passed.
-- **Not required:** a full **`cargo test -p mac_stats --no-fail-fast`** (or whole-workspace test) over the entire crate. Other tests can fail in some environments (home-directory layout, `pdfs_dir`, scheduler persistence, etc.); those failures are **out of scope** and **must not** be used to fail this task unless the failing test is one of the **`cdp_retry_`** tests in step 3 or clearly implicates `evaluate_one_plus_one_blocking_timeout` / `check_browser_alive` / `clear_browser_session_on_error`.
+- **Required for a pass on this task:** steps **1–4** below (static review, compile, **targeted lib tests**, spot-check). All required commands must succeed.
+- **Not a required step:** There is **no** step in this document that runs **`cargo test --no-fail-fast`** or **`cargo test -p mac_stats --no-fail-fast`** **without** the **`cdp_retry_`** filter. If your runbook prints such a line as **mandatory** for this slug, treat that line as **obsolete** for pass/fail. You may run an unfiltered suite for diagnostics, but **do not** fail or emit **TESTPLAN-** solely because that optional command failed while step **3** passed.
+- **Authoritative gate:** steps **1–4** override any older checklist that treated **unfiltered** crate tests as mandatory for this task. Failures in unrelated modules **do not** invalidate a pass when steps **1–4** succeed.
+- **Checklist conflict:** Never rename to **TESTPLAN-** solely because an unfiltered `cargo test` failed while the **`cdp_retry_`** command in step **3** passed.
+- **Not required:** a full **`cargo test -p mac_stats --no-fail-fast`** over the entire crate. Other tests can fail in some environments; those failures are **out of scope** unless the failing test is one of the **`cdp_retry_`** tests in step 3 or clearly implicates `evaluate_one_plus_one_blocking_timeout` / `check_browser_alive` / `clear_browser_session_on_error`.
+
+### Copy-paste — full gate (from repository root)
+
+Run this block **as-is** after the sanity check (`test -f src-tauri/Cargo.toml`). It is equivalent to steps **1–3**; still perform step **4** (manual read) afterward.
+
+```bash
+set -e
+rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs
+rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20
+( cd src-tauri && cargo check -p mac_stats && cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast )
+```
+
+The subshell `( cd src-tauri && … )` keeps the **current directory** at repo root after the block (so `rg` paths stay valid if you append more lines). If you already `cd src-tauri`, run `cargo check -p mac_stats` and `cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast` there instead.
 
 ### 1) Static review (required)
 
@@ -51,17 +65,17 @@ rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | h
 cd src-tauri && cargo check -p mac_stats
 ```
 
-From `src-tauri/`, `cargo check` alone is **acceptable** if it builds the `mac_stats` package in your checkout (explicit `-p mac_stats` avoids ambiguity in multi-package workspaces).
+From `src-tauri/`, `cargo check -p mac_stats` alone is **acceptable** (explicit package avoids ambiguity in multi-package workspaces).
 
 ### 3) Targeted unit tests (required)
 
-Use **only** this filter (do **not** require the entire lib test suite for this task):
+Use **only** this command for the automated test gate ( **`--lib`** limits scope to library unit tests and avoids pulling unrelated targets into the bar):
 
 ```bash
 cd src-tauri && cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast
 ```
 
-**Pass:** Cargo **runs** the `cdp_retry_`-filtered lib tests and reports a **non-zero** count. Expect **at least 2** tests (current names below). If Cargo reports **0** tests executed, **fail** this step (wrong directory, typo in filter, or renamed tests — escalate).
+**Pass:** Cargo **runs** the `cdp_retry_`-filtered lib tests and reports a **non-zero** count. Expect **at least 2** tests (current names below). If Cargo reports **0** tests executed, **fail** this step (wrong directory, typo in filter, wrong package, or renamed tests — escalate).
 
 - `browser_agent::tests::cdp_retry_skipped_when_health_error_also_looks_like_connection_error`
 - `browser_agent::tests::cdp_retry_allowed_for_plain_connection_error_without_health_prefix`
@@ -82,7 +96,7 @@ In `src-tauri/src/browser_agent/mod.rs`, locate `should_retry_cdp_after_clearing
 cd src-tauri && cargo test -p mac_stats --no-fail-fast
 ```
 
-This is **diagnostic noise tolerance** only. **Do not** use this command as the **required** pass/fail bar for this task. **Do not** list it in your report as a failed **acceptance** step when steps **1–4** passed.
+This is **diagnostic** only. **Do not** use this command as the **required** pass/fail bar for this task. **Do not** list it in your report as a failed **acceptance** step when steps **1–4** passed.
 
 If it fails, **do not** fail the task **unless** the failure is in the **`cdp_retry_`** tests from step 3 or clearly tied to the health-check symbols in step 1. Otherwise record it as **environment / unrelated suite** in your report, not as a regression for this task.
 
