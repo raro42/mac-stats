@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **OpenClaw reviewer** — **`Last check`** **`2026-03-30T21:35:00Z`**; **independent re-run** **`2026-03-30T21:35:00Z`**: pre-built digest **Generated (UTC)** **`2026-03-30 09:03:21`**, `DIGEST_SHA256=dcec900f82bef747af1c4ab4cd572980000e9a614869669de20f17598d5e2164`, range **`9670bd0823..926693e993`** (**1 commit**, **1 path**): **`fix(ci):`** restore docs formatting (`docs/automation/cron-vs-heartbeat.md`; **`git show --stat`** only that file; subject mentions slack test typing) — **no** root **`AGENTS.md`**, root **`package.json`**, or **`vitest.config.ts`**. **`origin/main`** **`926693e993`**; local **`HEAD`** **`de25a3afc7`** still **diverged** at **`0b16443fa4`**. §7 spot checks **Aligned**. **No** new **`FEAT-*`**. (`005-openclaw-reviewer/005-openclaw-reviewer.md`.)
+- **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**: append **`003-tester`** test report (**2026-03-30 09:14** UTC): operator **`UNTESTED-…`** path missing; **`CLOSED-` → `TESTING-`**; health-check / anti-`block_on` **`rg`** + **`cargo check`** / **`cargo test --no-fail-fast`** (**875** lib tests) — pass → **`CLOSED-…`**.
+- **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**: **Re-verify** subsection (**2026-03-30** UTC, **`003-tester` / `TESTER.md`**, operator **`UNTESTED-…`** only, **Cursor agent**): **`CLOSED-` → `TESTING-`**; **`cargo check`** / **`cargo test`** (**875** lib tests); turn-gate **`rg`** in **`src-tauri/src`** — pass → **`CLOSED-…`**.
+- **Tasks** — **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**: triage (**TOP**) — coder block en español (ciclo **`FEAT → WIP → UNTESTED`**, paths **`src-tauri`**); **`cargo check`** / **`cargo test operator_task_pressure`**; **Next step** en español.
+
 ## [0.1.79] - 2026-03-30
 
 ### Changed

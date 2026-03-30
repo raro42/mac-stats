@@ -1,8 +1,8 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): completed **`FEAT → WIP → UNTESTED`** for **`20260330-2030-openclaw-operator-task-pressure-summary`**. Pick-up filename was **`UNTESTED-…`**; renamed **`UNTESTED → FEAT → WIP`** to satisfy the FEAT step, then **`WIP → UNTESTED`** after verification. §4 already implemented in **`src-tauri`** (no code changes this run). **`cd src-tauri && cargo check && cargo test operator_task_pressure`** passed (`task::tests::operator_task_pressure_summary_empty_dir`). **§6 — Testing instructions** retained for the tester.
-- **Next step:** Tester runs **§6** (after **§5**) on **`UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): ciclo **`FEAT → WIP → UNTESTED`** para **`20260330-2030-openclaw-operator-task-pressure-summary`**. Entrada en disco: **`UNTESTED-…`** → renombrado a **`FEAT-…`** → **`WIP-…`** → **`UNTESTED-…`**. §4 en **`src-tauri`** (`task/mod.rs`, `task/review.rs`, `commands/context_assembler.rs`, `commands/ollama.rs`). **`cd src-tauri && cargo check && cargo test operator_task_pressure`**: OK (`task::tests::operator_task_pressure_summary_empty_dir`). **§6 — Testing instructions** conservada para el tester.
+- **Next step:** El tester ejecuta **§6** (después de **§5**) en **`UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
 # UNTESTED: OpenClaw parity — operator task pressure summary in execution context
