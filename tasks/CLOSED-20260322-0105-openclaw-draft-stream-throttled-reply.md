@@ -1031,3 +1031,16 @@ rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/com
 - **Result:** **Pass** — automated verification satisfied; optional live Discord steps not run.
 - **Outcome filename:** `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md`.
 
+### Tester run (2026-03-30 UTC, `003-tester/TESTER.md` — operator-named `tasks/UNTESTED-20260322-0105-openclaw-draft-stream-throttled-reply.md`)
+
+- **Date:** 2026-03-30 UTC (local workspace date per user_info: Monday 2026-03-30).
+- **Rename step 2:** `tasks/UNTESTED-20260322-0105-openclaw-draft-stream-throttled-reply.md` was not on disk; the task file was already `TESTING-20260322-0105-openclaw-draft-stream-throttled-reply.md`, so no `UNTESTED`→`TESTING` rename was applied. No other `UNTESTED-*` file was used.
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass (`Finished dev profile [unoptimized + debuginfo] target(s) in 6.21s`).
+  - `cd src-tauri && cargo test discord_draft_stream::` — pass (2 tests: `clamp_under_limit_unchanged`, `clamp_truncates_with_ellipsis`; 873 filtered in `lib`; exit 0; test build ~11.18s).
+  - `rg -n "spawn_discord_draft_editor" src-tauri/src/discord/mod.rs` — match at line **2197**.
+  - `rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/commands/turn_lifecycle.rs src-tauri/src/commands/ollama.rs` — matches in all three (`tool_loop.rs` 14, 152; `turn_lifecycle.rs` 10, 95; `ollama.rs` 109).
+- **Acceptance (automated):** `discord_draft_stream.rs` present; wiring and `clamp_discord_content` tests pass; throttle config/clamp **200..=60_000** documented in `config/mod.rs` (`discord_draft_throttle_ms` / `MAC_STATS_DISCORD_DRAFT_THROTTLE_MS`) — spot-checked in prior runs; not re-opened this pass beyond task criteria.
+- **Result:** **Pass** — `cargo check`, `cargo test discord_draft_stream::`, and static `rg` wiring checks succeed per task **Verification** / **Pass/fail criteria**; optional live Discord / throttle-override steps not run.
+- **Outcome filename:** `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md`.
+

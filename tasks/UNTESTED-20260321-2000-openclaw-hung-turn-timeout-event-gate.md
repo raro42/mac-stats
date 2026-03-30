@@ -1,5 +1,7 @@
 # OpenClaw: hung turn wall-clock timeout + output event gate
 
+**Instruction revision (TESTPLAN-phase fix):** A prior run flagged **Testing instructions** / environment wording as defective (not a product regression). This body is the authoritative spec; follow **Verification commands** here, not snippets copied from **`CLOSED-*`** history.
+
 Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Discord status/draft/ATTACH spam), user-visible **Turn timed out** reply, optional `about:blank` cleanup only if the timed-out `request_id` still owns the coordination slot.
 
 **Scope (read this first):** The words “OpenClaw” / “agent router” in the title describe **product behavior** that is implemented in **this repository (mac-stats)**, not in the sibling checkout at `../openclaw`. For verification you only search and build **mac-stats**. Searching `../openclaw` or expecting symbols there will fail and is **out of scope** for this task.
@@ -10,17 +12,21 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 
 1. `TurnOutputGate` is defined as `pub type TurnOutputGate = Arc<AtomicBool>` in `commands/turn_lifecycle.rs`. The tool loop (`commands/tool_loop.rs` and related paths) calls `gate_allows_send` so sends are suppressed after the gate is closed.
 2. `finalize_turn_timeout` in `commands/turn_lifecycle.rs` returns `OllamaReply` whose `text` starts with `**Turn timed out**` and includes the budget in seconds (see the `format!` that builds the user message).
-3. **Log strings (static check):** The following literals appear in **mac-stats** Rust sources as written below (copy/paste safe; use the verification `rg` commands). A live Discord timeout repro is **optional**, not required for pass.
+3. **Log strings (static check):** The following literals appear in **mac-stats** Rust sources as written below. Use the **Verification commands** `rg` lines verbatim (**`-F`**, and **single quotes** around `**Turn timed out**` so the shell does not glob). A live Discord timeout repro is **optional**, not required for pass.
    - Substring **`closing output gate after turn wall-clock timeout`** — in **`src-tauri/src/commands/ollama.rs`** (router path when the wall-clock limit fires).
    - Substrings **`turn wall-clock timeout`** and **`closing output gate and running cleanup`** — both appear inside the **same** `tracing::warn!` format string in **`src-tauri/src/commands/turn_lifecycle.rs`** (`finalize_turn_timeout`). **Expected:** the two `rg` lines in blocks **A1**/**A2**/**B** may report the **same line number** twice; that still counts as pass.
 4. **`cargo check`** and **`cargo test`** for the **`mac_stats`** package succeed (exit **0**, zero failing tests). The Cargo **package** name is **`mac_stats`** (underscore), declared in **`src-tauri/Cargo.toml`**; pass **`-p mac_stats`** whenever you use **`--manifest-path src-tauri/Cargo.toml`**. Equivalent ways to satisfy this: run **Verification commands** block **A1**/**A2** (repo root + `--manifest-path src-tauri/Cargo.toml -p mac_stats`) or block **B** (cwd **`src-tauri/`** + `cargo check` / `cargo test` with **`-p mac_stats`** or default package). This project targets **macOS**; use a Mac so results match maintainer expectations. Linux CI or a non-macOS checkout may fail link steps or skip platform tests — that mismatch is **not** a product failure; rerun on macOS.
 
 ## Testing instructions
 
+### Coder publication after TESTPLAN repair
+
+- If the task file on disk is **`tasks/TESTPLAN-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**, fix **Testing instructions** / wording in that file, then **rename** it to **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** (same stamp `20260321-2000` and slug `openclaw-hung-turn-timeout-event-gate`). **Do not** change the stamp or slug.
+- **Retest queue name is always `UNTESTED-…`**. Testers start from **`UNTESTED-…`**, not **`TESTPLAN-…`**.
+
 ### Tester quick gate (read first)
 
-1. **Queue file per [`003-tester/TESTER.md`](../003-tester/TESTER.md):** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only. The rename chain is **`UNTESTED-…` → `TESTING-…` → (`CLOSED-…` or `WIP-…`)**. There is **no** approved **`TESTPLAN-…` → `TESTING-…`** shortcut.
-2. **If the filename starts with `TESTPLAN-…`:** instructions are **under coder repair**. Testers **must not** run verification or rename to **`TESTING-…`**. Wait until a coder publishes **`UNTESTED-…`** (same stamp + slug).
+1. **Queue file per [`003-tester/TESTER.md`](../003-tester/TESTER.md):** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only. The tester rename chain is **`UNTESTED-…` → `TESTING-…` → (`CLOSED-…` or `WIP-…`)**. Testers **must not** rename **`TESTPLAN-…` → `TESTING-…`** (wait for **`UNTESTED-…`** first).
 3. **Inventory (optional sanity check):** from mac-stats repo root,  
    `ls tasks/*20260321-2000*openclaw-hung-turn-timeout-event-gate.md 2>/dev/null || true`  
    For a normal queued run you should see **`UNTESTED-…`** (and may also see **`CLOSED-…`** as history). If **only** **`CLOSED-…`** appears, **stop** — restore or fetch **`UNTESTED-…`**; do **not** treat **`CLOSED-…`** as the queue file.
@@ -30,6 +36,7 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 - **Executable queue file for a real run:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only. At run start, rename **`UNTESTED-` → `TESTING-`**, run **Verification commands**, then apply outcome naming per **TESTER.md**.
 - **Missing `UNTESTED-…` at repo tip:** **Stop.** Do **not** verify from **`CLOSED-…`** alone or invent **`TESTING-…`** from **`CLOSED-…`** unless your operator runbook explicitly allows it. Sync/pull for **`UNTESTED-…`**, or return a **queue / handoff defect** to the coder.
 - **Emit `TESTPLAN-` only for instruction or environment-spec defects** (wrong paths, wrong queue file, ambiguous `cargo` cwd). Do **not** use **`TESTPLAN-`** because **`rg`** on top-level **`src/`** returns no matches — that is a **tester path mistake**, not a bad test plan (see **Two different directories named `src`** below).
+- **[`003-tester/TESTER.md`](../003-tester/TESTER.md)** says to prefer **`cargo check` / `cargo test` in `src-tauri/`**. For this task that means **either** block **B** (cwd = `src-tauri/`) **or** blocks **A1**/**A2** (repo root + **`--manifest-path src-tauri/Cargo.toml -p mac_stats`**). It does **not** mean “run plain **`cargo test`** from repo root without a manifest” — that will fail on mac-stats (no root **`Cargo.toml`**).
 
 ### Task-file identity (stamp `20260321-2000`, slug `openclaw-hung-turn-timeout-event-gate`)
 
@@ -54,6 +61,7 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 ### Shell compatibility
 
 - The blocks below use **`bash`** syntax (`set -e`, `$(…)`). On macOS, **Terminal.app** defaults to **zsh**, which understands these snippets as written.
+- **Quote the `**Turn timed out**` pattern for `rg`:** the verification blocks use **single quotes** around the fixed string so no shell treats `**` as a glob. If you type the command by hand, use **`rg -n -F '**Turn timed out**' …`** (do not unquote the pattern).
 - If your login shell is **fish** (or another non-POSIX shell), run the block explicitly with Bash, for example:  
   `bash -lc 'set -e; REPO_ROOT="$(git rev-parse --show-toplevel)"; …'`  
   or paste the block after running **`bash`** interactively. **Do not** run the same script verbatim in **fish**; `set -e` and `$(…)` differ.
@@ -90,6 +98,7 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 4. **Treating `CLOSED-…` verification snippets as authoritative** — historical reports may use wrong paths; follow **this** file’s **Verification commands** only.
 5. **Using the `git rev-parse` block when `.git` is missing** — use **Verification commands → A2** (full no-git block), not a partial edit of **A1**.
 6. **`rg: command not found`** — install [ripgrep](https://github.com/BurntSushi/ripgrep) or search your editor for the **exact** substrings under **`src-tauri/src/`**; the acceptance literals must still be located in the files named in criteria 3.
+7. **Unquoted `**Turn timed out**` in the shell** — some shells glob `**`; always run **`rg -n -F '**Turn timed out**' …`** as in the verification blocks.
 
 ### Preflight (required)
 
@@ -127,6 +136,14 @@ command -v rg >/dev/null && echo "OK: rg" || echo "WARN: install ripgrep or sear
 | `rg` for gate symbols | At least one match for each **distinct** pattern in block **A1**/**A2** or **B** (see paths for your cwd). For **`turn_lifecycle.rs`**, the two log-string `rg` lines may both hit the **same** source line — that is still pass. |
 | Top-level `src/` | May show **no** matches for Rust gate strings — **not** a failure. |
 
+### Minimal run order (single shell session)
+
+Do **not** mix block **A** path prefixes with block **B** path prefixes in one run.
+
+1. Run **Preflight (required)** for git (**A1-style**) or no-git (**A2-style**).
+2. Paste **one** of **A1**, **A2**, or **B** **in full** from **Verification commands** (same terminal; **`set -e`** should still be active).
+3. If **`cargo`** fails with **`could not find Cargo.toml`**, you are not using **A1**/**A2**/**B** correctly — re-read **Environment** and **Common instruction defects**.
+
 ### Optional runtime check
 
 To see log lines in a real run, reproduce or simulate a turn timeout and grep **`~/.mac-stats/debug.log`** for the same substrings. This is **not** required if static `rg` + `cargo` checks pass.
@@ -153,7 +170,7 @@ cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats
 
 rg -n "TurnOutputGate|gate_allows_send|finalize_turn_timeout" src-tauri/src
 
-rg -n -F "**Turn timed out**" src-tauri/src/commands/turn_lifecycle.rs
+rg -n -F '**Turn timed out**' src-tauri/src/commands/turn_lifecycle.rs
 
 rg -n "closing output gate after turn wall-clock timeout" src-tauri/src/commands/ollama.rs
 
@@ -163,18 +180,18 @@ rg -n "closing output gate and running cleanup" src-tauri/src/commands/turn_life
 
 ### A2 — Recommended: repo root, **no** `.git` (tarball / export)
 
-Use this when **`git rev-parse` fails** or the tree has no `.git` directory. Edit the **`cd`** line to your mac-stats root (the directory that contains **`src-tauri/`**).
+Use this when **`git rev-parse` fails** or the tree has no `.git` directory. **Replace** the placeholder on the **`cd`** line with the **absolute path** to your mac-stats root (the directory that **directly** contains **`src-tauri/`** — not `src-tauri/` itself, not a parent that only contains the zip name). After editing, **`test -f src-tauri/Cargo.toml`** must succeed; if it fails, the path is wrong.
 
 ```bash
 set -e
-cd /path/to/mac-stats
+cd /ABSOLUTE/PATH/TO/mac-stats
 test -f src-tauri/Cargo.toml
 cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats
 cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats
 
 rg -n "TurnOutputGate|gate_allows_send|finalize_turn_timeout" src-tauri/src
 
-rg -n -F "**Turn timed out**" src-tauri/src/commands/turn_lifecycle.rs
+rg -n -F '**Turn timed out**' src-tauri/src/commands/turn_lifecycle.rs
 
 rg -n "closing output gate after turn wall-clock timeout" src-tauri/src/commands/ollama.rs
 
@@ -206,7 +223,7 @@ cargo test -p mac_stats
 
 rg -n "TurnOutputGate|gate_allows_send|finalize_turn_timeout" src
 
-rg -n -F "**Turn timed out**" src/commands/turn_lifecycle.rs
+rg -n -F '**Turn timed out**' src/commands/turn_lifecycle.rs
 
 rg -n "closing output gate after turn wall-clock timeout" src/commands/ollama.rs
 
