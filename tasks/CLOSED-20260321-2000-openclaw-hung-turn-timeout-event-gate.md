@@ -1281,3 +1281,14 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
   - Task body also lists `rg … src/` — no matches under top-level `src/` (frontend JS only; Rust under `src-tauri/src/`)
 - **Acceptance criteria:** All satisfied (`TurnOutputGate` / `gate_allows_send`; `finalize_turn_timeout` with `**Turn timed out**` and budget seconds; `closing output gate after turn wall-clock timeout` in `ollama.rs`; `turn wall-clock timeout` / `closing output gate and running cleanup` in `turn_lifecycle.rs`; `cargo check` / `cargo test` green).
 - **Outcome:** **PASS** — restore **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**. Per `003-tester/TESTER.md`, fail/block would be `WIP-…` (operator message `TESTED-` / `TESTPLAN-` not used here).
+
+### Re-verify — 2026-03-30 (UTC), `003-tester/TESTER.md` (objetivo: `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` — sin otro `UNTESTED-*`)
+
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**; al inicio de este run el archivo canónico se renombró **`CLOSED-…` → `TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**. No se usó ningún otro `UNTESTED-*`.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (crate librería: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — sin coincidencias (el bloque de verificación del task lista `src/`; el frontend JS no contiene esas cadenas; el Rust está en `src-tauri/src/`)
+- **Criterios de aceptación:** Cumplidos (`TurnOutputGate` = `Arc<AtomicBool>`; `gate_allows_send` en tool loop; `finalize_turn_timeout` con texto que empieza por `**Turn timed out**` y presupuesto en segundos en `turn_lifecycle.rs`; `closing output gate after turn wall-clock timeout` en `ollama.rs`; `turn wall-clock timeout` / `closing output gate and running cleanup` en `turn_lifecycle.rs`; `cargo check` / `cargo test` en verde).
+- **Resultado:** **PASS** — **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**. No aplica `TESTED-` ni `TESTPLAN-`.

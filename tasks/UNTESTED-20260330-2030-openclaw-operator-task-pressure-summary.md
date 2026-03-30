@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** cycle **`FEAT-20260330-2030-…` → `WIP-…` → `UNTESTED-…`**: Implementation confirmed in-tree; **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** green. **Section 6 — Testing instructions** includes automated-first flow, **`cargo test task::tests::operator_task_pressure_summary_empty_dir -- --exact`**, manual/runtime checks.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** cycle **`FEAT-20260330-2030-…` → `WIP-…` → `UNTESTED-…`**: Implementation in-tree; **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** green. **Section 6 — Testing instructions** includes automated-first flow, **`cargo test task::tests::operator_task_pressure_summary_empty_dir -- --exact`**, manual/optional runtime checks.
 - **Next step:** **UNTESTED** — tester runs **Section 6 — Testing instructions** (manual / optional runtime after automated).
 ---
 
