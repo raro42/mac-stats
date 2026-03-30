@@ -8,7 +8,7 @@
 >
 > **Scope:** **mac-stats** repository only. All paths refer to **`src-tauri/src/browser_agent/mod.rs`** in that clone. Running these steps in a **different repo** (e.g. a sibling **openclaw** tree) is **out of scope** and invalid — use the mac-stats checkout that contains this `tasks/` file.
 >
-> **Testing instructions** revised **2026-03-30** (g): **(f)** plus **authority / language** (this file overrides translated runbooks for pass/fail); **`--lib` vs whole-package** `cargo test` callout; **retest preflight strip** (four checks before any `cargo`); **report must name** the task filename used; **integration / extra targets** row in wrong-command table.
+> **Testing instructions** revised **2026-03-30** (h): **(g)** plus **one canonical Step 3 one-liner** (copy-paste) with explicit “**not** Step 3” list; **TESTER.md vs this file** (unfiltered `cargo test` lines in templates are **not** the gate); **TESTPLAN-** only for instruction/handoff defects — **not** when an optional unfiltered suite fails but Step 3 passed; **Spanish/EN runbooks** — same English gate text is authoritative.
 
 ## Goal
 
@@ -62,6 +62,10 @@ The **Phase 0** table is the short decision guide; the bullets below spell out t
 
 **Closure bar — pass/fail for this slug depends only on this table:**
 
+**Single automated test bar (non‑negotiable):** The **only** `cargo test` command that can **fail** this task is **Step 3** — a **library** run whose command line contains **both** `--lib` and the substring **`cdp_retry_`** (as Cargo’s test-name filter, **before** any `--`). If you ran **`cd src-tauri && cargo test --no-fail-fast`**, **`cargo test -p mac_stats --no-fail-fast`**, or **`cargo test -p mac_stats --lib --no-fail-fast`** **without** the token **`cdp_retry_`** on that same line, you did **not** run Step 3; any failure there is **out of scope** for pass/fail (run Step 3 from **Authoritative automated test command** or the copy-paste block).
+
+**TESTER.md / translated checklists:** If your operator template lists **`cargo test --no-fail-fast`** (or **`cd src-tauri && cargo test …`**) **without** **`cdp_retry_`** as a **mandatory** line for this slug, that line is **obsolete for acceptance** — do **not** treat it as “the task verification block.” Replace it mentally (and in your notes) with **Step 3** below. Filing **`TESTPLAN-`** because that unfiltered command failed **while Step 3 passed** is a **procedure error**, not an instruction defect.
+
 | Required for **pass** | **Never** the pass/fail bar by itself |
 |------------------------|----------------------------------------|
 | **Steps 1–4** below (including **Step 3** with **`--lib`** and literal **`cdp_retry_`** on the **same** `cargo test` line) | **`cargo test` / `cargo test --no-fail-fast` / `cd src-tauri && cargo test --no-fail-fast`** with **no** **`--lib cdp_retry_`** gate shape on that same command |
@@ -77,7 +81,7 @@ The **Phase 0** table is the short decision guide; the bullets below spell out t
 
 **Authority / language:** Pass/fail for this slug is defined **only** by this task file (English). **TESTER.md**, localized templates, or Discord/summary text that contradict **Steps 1–4** here are **stale for acceptance** — follow **this** file, not a translated or abbreviated checklist.
 
-**Why the last cycle was `TESTPLAN-` (instruction defect):** Testers followed a **stale** bar (**unfiltered** `cargo test --no-fail-fast`) and/or ran from a tree where **`UNTESTED-…`** was absent and used **`CLOSED-…`** / **`TESTPLAN-…`** as a stand-in. Neither matches **this** document. **Implementation** of the CDP health-check was **not** implicated.
+**Why the last cycle was `TESTPLAN-` (instruction defect):** Testers followed a **stale** bar (**unfiltered** `cargo test --no-fail-fast` — sometimes copied from **TESTER.md** or an older task body — and misread it as “the mandatory verification block”) and/or ran from a tree where **`UNTESTED-…`** was absent and used **`CLOSED-…`** / **`TESTPLAN-…`** as a stand-in. Neither matches **this** document. **Implementation** of the CDP health-check was **not** implicated.
 
 **If `TESTER.md` still lists an unfiltered crate test as a mandatory step for this slug:** treat that line as **obsolete for pass/fail** — run **Step 3** (`cdp_retry_`) from **this** file instead; you may run the full suite **only** under **Optional — full crate tests** and **must not** fail the task based solely on that optional result.
 
@@ -211,6 +215,7 @@ Mistakes that produced **TESTPLAN-** while the CDP implementation was fine:
 5. **Copied `rg` from a markdown table with `\|`:** alternation in **`rg`** must use a **single** pipe `|` between alternatives inside the quoted pattern. Escaped `\|` is **not** the same regex and can yield false “no matches” static-review failures.
 6. **Filter after `--`:** placing **`cdp_retry_`** after **`--`** sends it to the test binary instead of Cargo’s name filter → **`running 0 tests`** or wrong listing. Keep **`cdp_retry_` before `--`** (see **Token position** under **Executive summary**).
 7. **Omitted `--lib` on Step 3:** `cargo test -p mac_stats --no-fail-fast` **without** `--lib` and **without** `cdp_retry_` is **not** Step 3 — it pulls in **more than library unit tests** and is a common source of unrelated failures.
+8. **Equating “task verification” with TESTER.md’s last `cargo test` line:** Some runbooks end with **`cd src-tauri && cargo test --no-fail-fast`** and **no** filter. That command is **not** Step 3 for this slug. **Pass/fail** is **only** Steps 1–4 **in this file**; do **not** emit **`TESTPLAN-`** because that unfiltered line failed if **Step 3** (`cdp_retry_`) **passed**.
 
 **Fix for retest:** Use **`UNTESTED-…`** from the branch you test; run **Steps 1–4** using the **bash block** and **1) Static review** for `rg` (see **Paths by cwd** for the path column only); ignore unfiltered suite results for pass/fail.
 
@@ -232,6 +237,7 @@ Mistakes that produced **TESTPLAN-** while the CDP implementation was fine:
 | **Step 3** passes; optional full suite fails in `discord::`, `scheduler::`, etc. | **Pass** **Steps 1–4**; note unrelated failures separately in the report |
 | `cargo test … -p mac_stats --lib --no-fail-fast` (**no** `cdp_retry_` token) | **Not** the gate — runs **all** lib tests (~800+); failures there do **not** override a passing **Step 3** |
 | `cargo test … -p mac_stats --no-fail-fast` (**no** `--lib`, **no** `cdp_retry_`) | **Not** the gate — runs **lib plus other test targets** (e.g. integration / binary tests) as Cargo discovers them; failures there are **often environmental** and do **not** override **Step 3** |
+| **`TESTER.md` (or template) `cargo test` line with no `cdp_retry_` token** | **Not** the gate — **Step 3** in **this** file replaces that line for pass/fail |
 
 ### Report evidence (include in tester notes)
 
@@ -363,4 +369,4 @@ While instructions are edited, the task lives as **`TESTPLAN-20260321-1345-brows
 
 If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
 
-**This revision (g):** **`TESTPLAN-…` → `UNTESTED-…`** — **Basename-agnostic** header; **retest preflight strip**; **authority / language**; **`--lib` + `cdp_retry_`** both mandatory on Step 3; **report: task basename**; **whole-package** `cargo test` row + item **7** in “what went wrong”; wrong-command table row for **`--no-fail-fast`** without **`--lib`**. Prior **(f):** closure bar, Phase 0 **`CLOSED-` without `UNTESTED-`**, **TESTER.md** unfiltered line override. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+**This revision (h):** **`TESTPLAN-…` → `UNTESTED-…`** — **Single automated test bar** callout (forbidden vs Step 3); **TESTER.md / translation** misread as mandatory gate; item **8** in “what went wrong”; **`TESTPLAN-`** only for real instruction/handoff defects. Prior **(g):** basename-agnostic header, preflight strip, authority, `--lib` + `cdp_retry_`, report basename, wrong-command rows. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
