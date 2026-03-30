@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.78] - 2026-03-30
+
+### Changed
+- **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**: append **`003-tester`** test report (**2026-03-30 ~02:43Z** UTC): Spanish **`TESTER.md`** flow; operator **`UNTESTED-…`** path absent; **`CLOSED-` → `TESTING-`**; health-check / anti-`block_on` **`rg`** + **`cargo check`** / **`cargo test --no-fail-fast`** (**875** lib tests) — pass → **`CLOSED-…`**.
+- **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**: re-verify (**2026-03-30** UTC, **`003-tester` / `TESTER.md`**, only **`UNTESTED-…`** target): path absent; **`cargo check`** / **`cargo test`** (**875** lib tests); turn-gate **`rg`** in **`src-tauri/src`** vs **`src/`** — pass → **`CLOSED-…`**.
+- **Tasks** — **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**: triage (**TOP**) — Coder line paths and **FEATURE-CODER** wording; **Next step** points testers at **Section 6** (start with **Section 5**).
+
 ## [0.1.77] - 2026-03-30
 
 ### Added
