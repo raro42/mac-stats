@@ -1,10 +1,10 @@
 # OpenClaw: hung turn wall-clock timeout + output event gate
 
-**On-disk name (this revision):** **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** — tester queue; instructions were repaired under **`TESTPLAN-…`** and renamed here (same stamp `20260321-2000`, slug `openclaw-hung-turn-timeout-event-gate`). **No** mac-stats code change is required for this task file.
+**On-disk name (this revision):** **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** — must be this name on the tester queue. If you see **`TESTPLAN-…`** with the same stamp and slug, the coder is still fixing **Testing instructions**; wait for **`TESTPLAN-…` → `UNTESTED-…`** before starting [`003-tester/TESTER.md`](../003-tester/TESTER.md). **No** mac-stats code change is required for this task file.
 
-**Instruction revision (TESTPLAN-phase fix):** A prior run flagged **Testing instructions** / environment wording as defective (not a product regression). This body is the authoritative spec; follow **Verification commands** here, not snippets copied from **`CLOSED-*`** history.
+**Instruction revision:** A prior run flagged **Testing instructions** / stated environment as defective (not a mac-stats implementation failure). This body is the authoritative spec; follow **Verification commands** here, not snippets copied from **`CLOSED-*`** history.
 
-**Coder handoff:** If instructions need another repair pass, rename **`UNTESTED-…` → `TESTPLAN-…`**, edit, then **`TESTPLAN-…` → `UNTESTED-…`** again per project runbook. Testers **only** start from **`UNTESTED-…`** per **Tester quick gate** below — **not** **`TESTPLAN-…`**.
+**Coder handoff:** For another repair pass, rename **`UNTESTED-…` → `TESTPLAN-…`**, edit **Testing instructions** / wording only, then **`TESTPLAN-…` → `UNTESTED-…`** (same stamp `20260321-2000`, slug `openclaw-hung-turn-timeout-event-gate`). Testers **only** start from **`UNTESTED-…`** — **not** **`TESTPLAN-…`**.
 
 Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Discord status/draft/ATTACH spam), user-visible **Turn timed out** reply, optional `about:blank` cleanup only if the timed-out `request_id` still owns the coordination slot.
 
@@ -30,12 +30,24 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 
 ### Tester quick gate (read first)
 
+0. **Pick the verification block from your actual cwd** (run this **before** copying **A1**/**A2**/**B**; no `set -e` required):
+
+```bash
+if test -f src-tauri/Cargo.toml; then echo "BLOCK: A1 or A2 (mac-stats repo root). Do not use B."
+elif test -f Cargo.toml && test -f src/commands/turn_lifecycle.rs; then echo "BLOCK: B (src-tauri crate root). Do not use A1/A2."
+else echo "BLOCK: none — cd to mac-stats repo root or to src-tauri/ first."
+fi
+```
+
+If the script prints **BLOCK: none**, `cd` to the directory that contains **`src-tauri/Cargo.toml`** (repo root) or into **`src-tauri/`**, then run it again.
+
 1. **Queue file per [`003-tester/TESTER.md`](../003-tester/TESTER.md):** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only. The tester rename chain is **`UNTESTED-…` → `TESTING-…` → (`CLOSED-…` or `WIP-…`)**. Testers **must not** rename **`TESTPLAN-…` → `TESTING-…`** (wait for **`UNTESTED-…`** first).
-2. **Host and toolchain:** Run on **macOS** with **`cargo`**, **`rustc`**, and **`rg`** on your `PATH`. Criterion **4** requires a full **`cargo check`** + **`cargo test`** for **`mac_stats`** to exit **0** on this platform. If you only have Linux (or CI images without the macOS toolchain), **stop** and return **environment blocked** — do **not** file **`TESTPLAN-…`** for linker or platform-only failures.
+2. **Host and toolchain:** Run on **macOS** with **`cargo`**, **`rustc`**, and **`rg`** on your `PATH`. Criterion **4** requires a full **`cargo check`** + **`cargo test`** for **`mac_stats`** to exit **0** on this platform. If you only have Linux (or CI images without the macOS toolchain), **stop** and report **environment blocked** — do **not** file **`TESTPLAN-…`** for linker or platform-only failures.
 3. **Inventory (optional sanity check):** from mac-stats repo root,  
    `ls tasks/*20260321-2000*openclaw-hung-turn-timeout-event-gate.md 2>/dev/null || true`  
    For a normal queued run you should see **`UNTESTED-…`** (and may also see **`CLOSED-…`** as history). If **only** **`CLOSED-…`** appears, **stop** — restore or fetch **`UNTESTED-…`**; do **not** treat **`CLOSED-…`** as the queue file.
-4. **Run one verification block in one paste:** Choose **A1**, **A2**, or **B** in **Verification commands** and execute that block **from the first line through the last `rg`** without changing directory between lines. Mixing repo-root paths (`src-tauri/src/…`) with crate-root paths (`src/…`) in the same session causes false failures (see **Two different directories named `src`**).
+4. **Run one verification block in one paste:** Choose **A1**, **A2**, or **B** in **Verification commands** and execute that block **from the first `set -e` through the last `rg`** without changing directory between lines. **Do not** run only the **`cargo`** lines or only the **`rg`** lines, and **do not** mix lines from different blocks. Mixing repo-root paths (`src-tauri/src/…`) with crate-root paths (`src/…`) in the same session causes false failures (see **Two different directories named `src`**).
+5. **`rg` and `set -e`:** With **`set -e`**, **`rg` exits 1** when a pattern has **no** matches and the script **stops** — that means **fail** for this task. All patterns in the block are required to match somewhere in the given paths (except the documented “same line twice” case for **`turn_lifecycle.rs`**).
 
 ### Operator filename (`003-tester/TESTER.md`)
 
@@ -62,7 +74,7 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 - **Operator names `UNTESTED-…` but only `CLOSED-…` exists** — Do **not** “verify against CLOSED.” Update your tree, restore **`UNTESTED-…`** from git, or bounce the task to the coder. Appending new results into **`CLOSED-…`** without a live **`UNTESTED-…`**/`TESTING-…` step is out of procedure.
 - **Only `TESTPLAN-…` is present** — Instructions are still in repair; wait for **`TESTPLAN-…` → `UNTESTED-…`** before starting the **TESTER.md** rename chain.
 
-**Current handoff:** This file **is** on the tester queue as **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** (post-**TESTPLAN** repair).
+**Current handoff:** After the coder renames **`TESTPLAN-…` → `UNTESTED-…`**, this spec is on the tester queue as **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**. If the filename on disk is still **`TESTPLAN-…`**, do **not** start **TESTER.md** — wait for the **`UNTESTED-…`** rename.
 
 ### Shell compatibility
 
@@ -78,6 +90,7 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 - **Host:** **macOS** + stable **Rust** (`cargo` / `rustc` on `PATH`) + **[ripgrep](https://github.com/BurntSushi/ripgrep)** (`rg` on `PATH`). If `rg` is missing, install it or use your editor’s search; the patterns below are the exact substrings to find.
 - **Preferred `cargo` cwd (blocks **A1** / **A2**):** stay at **repo root** and use **`cargo … --manifest-path src-tauri/Cargo.toml -p mac_stats`**. That avoids the common mistake of running **`cargo test`** from repo root **without** a manifest (Cargo errors or wrong package) and avoids relying on a subshell **`cd src-tauri`**.
 - **Alternate `cargo` cwd (block **B**):** **`src-tauri/`** (crate root). There, use **`cargo check -p mac_stats`** / **`cargo test -p mac_stats`** (or plain **`cargo check`** / **`cargo test`** since this directory is a single-package manifest).
+- **Block B from repo root:** At repo root, **`test -f Cargo.toml`** (first line of block **B**) **fails** because mac-stats has **no** root **`Cargo.toml`**. That is **not** a broken task — you picked the wrong block; use **A1** or **A2**.
 - **Wrong repo:** If `git rev-parse` / `test -f src-tauri/Cargo.toml` fails, stop — fix cwd before **`cargo`** or **`rg`** paths that assume repo root.
 - **Typo trap:** the **repo folder** is often **`mac-stats`** (hyphen). The **Cargo package** is **`mac_stats`** (underscore). Do not drop **`-p mac_stats`** when using **`--manifest-path`** from repo root.
 - **`--manifest-path` is relative to the shell cwd (critical):** Blocks **A1** / **A2** assume **`pwd`** is the **repo root** (the directory that **contains** `src-tauri/`). After `cd "$REPO_ROOT"` (A1) or `cd /ABSOLUTE/.../mac-stats` (A2), **`test -f src-tauri/Cargo.toml`** must succeed. If your cwd is already **`…/mac-stats/src-tauri`**, the path **`src-tauri/Cargo.toml`** points at a **non-existent** `src-tauri/src-tauri/Cargo.toml` — **do not** paste **A1**/**A2** there. Either **`cd ..`** to the repo root and use **A1**/**A2**, or stay in **`src-tauri/`** and use block **B** only (`cargo check` / `cargo test` without `src-tauri/` prefix on paths).
@@ -148,7 +161,7 @@ command -v rg >/dev/null && echo "OK: rg" || echo "WARN: install ripgrep or sear
 
 Do **not** mix **A1**/**A2** path prefixes (repo root + `src-tauri/…`) with **B** path prefixes (crate root + `src/…`) in one run.
 
-1. Run **Preflight (required)** for git (**A1-style**) or no-git (**A2-style**).
+1. Run **Tester quick gate** step **0** (directory probe) and **Preflight (required)** for git (**A1-style**) or no-git (**A2-style**).
 2. Paste **one** of **A1**, **A2**, or **B** **in full** from **Verification commands** (same terminal; **`set -e`** should still be active).
 3. If **`cargo`** fails with **`could not find Cargo.toml`**, you are not using **A1**/**A2**/**B** correctly — re-read **Environment** and **Common instruction defects**.
 
@@ -159,6 +172,8 @@ To see log lines in a real run, reproduce or simulate a turn timeout and grep **
 ## Verification commands
 
 Paste **one** complete block (**A1**, **A2**, or **B**) in a single shot. Do **not** split a block halfway; **`set -e`** must stop the script if cwd or paths are wrong. Do **not** cherry-pick only the **`cargo`** or only the **`rg`** lines — the initial **`cd`** + **`test -f`** lines establish the correct cwd.
+
+**Anti-pattern (common false “failure”):** Running **`cargo check`** / **`cargo test`** from repo **root** without **`--manifest-path src-tauri/Cargo.toml -p mac_stats`**, or running **`rg`** with bare **`src/`** paths while cwd is **repo root** (that tree is the **frontend**, not the Rust crate). Use the **full** block chosen in **Tester quick gate** step **0**.
 
 **Pick a block by where you will stand after `cd`:**
 

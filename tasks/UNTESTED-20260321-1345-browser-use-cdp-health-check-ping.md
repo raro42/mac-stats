@@ -1,6 +1,6 @@
 # Browser use — CDP health check ping (`1+1`)
 
-> **Queue file:** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` — testers rename **`UNTESTED-` → `TESTING-`** to execute. **Testing instructions** were revised **2026-03-30** (coder pass): (a) the gate was mis-read as an **unfiltered** crate `cargo test`, which fails for **unrelated** tests — **not** a CDP regression; (b) the **optional** full-suite snippet wrongly said “from `src-tauri/`” but still used `cd src-tauri` (always wrong there); (c) `rg … | head` under `set -o pipefail` can fail with a **non-zero** pipeline exit when `head` closes the pipe (**SIGPIPE**), producing a **false** static-review failure — use **`rg -m 20`** instead; (d) a **markdown table** tried to escape `|` as `\|` so columns would render — copying that into the shell breaks **`rg`** alternation (matches nothing / wrong pattern). Use the **Copy-paste — full gate** `rg` lines only. The **only** automated test gate remains step **3** with the literal filter **`cdp_retry_`**.
+> **Queue file:** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` — testers rename **`UNTESTED-` → `TESTING-`** to execute. **Testing instructions** were revised **2026-03-30** (post-**TESTPLAN** pass): executive summary + macOS preflight; **`--no-fail-fast`** does not widen the **`cdp_retry_`** filter; step map (**1–3** script, **4** editor); prior fixes retained (narrow gate, **`rg -m`**, cwd / manifest table, no **`\|`** in **`rg`** alternation).
 
 ## Goal
 
@@ -23,6 +23,7 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 
 ## Environment
 
+- **Host:** **macOS** with a normal mac-stats dev toolchain (`cargo`, `rustc` on `PATH`). This crate is a **macOS** app; if you are **not** on macOS and **`cargo check -p mac_stats`** fails for linker or Apple-framework reasons, **stop** — record **environment blocked** in your notes. That is **not** a defect in this task’s **Testing instructions** and is **not** grounds for **`TESTPLAN-…`** by itself.
 - **Checkout:** mac-stats repository root (directory that contains `src-tauri/`). This repo has **no** workspace `Cargo.toml` at the repository root — the package lives under **`src-tauri/`** only.
 - **Sanity check (once per session):** from repo root, `test -f src-tauri/Cargo.toml && test -f src-tauri/src/browser_agent/mod.rs` must succeed before the gate. If this fails, you are in the wrong directory (e.g. `tasks/`, another clone, or inside `src-tauri/` with wrong relative paths for `rg`) — `cd` to the repo root first.
 - **From `src-tauri/` instead:** if your shell cwd is already **`…/mac-stats/src-tauri`**, use **`test -f Cargo.toml && test -f src/browser_agent/mod.rs`** before running **alternate** commands. Do **not** run `cd src-tauri` when you are already inside `src-tauri/` (that `cd` fails). For **`rg`**, either `cd` back to repo root and keep paths `src-tauri/src/...`, or run `rg … src/browser_agent/mod.rs` from `src-tauri/` (no `src-tauri/` prefix).
@@ -37,6 +38,21 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 
 ## Testing instructions
 
+### Executive summary (default run)
+
+Use this unless you have a documented reason to use the **`src-tauri/`** cwd column in **Paths by cwd**.
+
+| Step | What you do | Pass hint |
+|------|-------------|-----------|
+| **1** | Static review: two **`rg`** lines (see **Copy-paste — full gate** or **1) Static review**) | Non-empty matches from `browser_agent/mod.rs`; second **`rg`** shows the “no **`Handle::block_on`** …” comment and/or **`recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)`** |
+| **2** | **`cargo check … -p mac_stats`** (with **`--manifest-path`** from repo root) | Exits **0** |
+| **3** | **`cargo test … --lib cdp_retry_ --no-fail-fast`** — command line **must** contain the literal substring **`cdp_retry_`** | **`running N tests`** with **N ≥ 1** and **`test result: ok`** |
+| **4** | Manual: open **`src-tauri/src/browser_agent/mod.rs`**, find **`should_retry_cdp_after_clearing_session`**, confirm health / “Browser unresponsive” vs generic retry semantics | Matches acceptance criterion **3** in this file |
+
+The bash block under **Copy-paste — full gate** runs **steps 1–3** only. **Step 4** is **never** in that script.
+
+**Filter semantics (step 3):** **`cdp_retry_`** is Cargo’s **test-name filter** (substring). Only tests whose names match run. **`--no-fail-fast`** affects whether Cargo stops after the first failure **among those matched tests**; it does **not** remove the filter or run the whole **`--lib`** suite.
+
 ### Before step 1 (queue file + tools)
 
 - **Queue filename:** You must be executing from **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** (rename **`UNTESTED-` → `TESTING-`** per operator runbook). If the only file on disk for this slug is **`TESTPLAN-…`**, instructions are still under revision — do **not** run this gate; wait for **`TESTPLAN-` → `UNTESTED-`**.
@@ -46,7 +62,7 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 
 Markdown tables cannot safely embed `rg` alternation patterns (`a|b|c`). **Do not copy `rg` regexes from any table that used escaped pipes** — they are wrong in the shell.
 
-Use **one** column end-to-end for **steps 1–3**. The **authoritative** `rg` command lines are **only** the two `rg` lines in **Copy-paste — full gate** (or **§ 1**); substitute **only** the file path:
+Use **one** column end-to-end for **steps 1–3**. The **authoritative** `rg` command lines are **only** the two `rg` lines in **Copy-paste — full gate** (or **1) Static review** below); substitute **only** the file path:
 
 | Your shell `cwd` | Use this path as the **last argument** to both `rg` commands |
 |------------------|--------------------------------------------------------------|
@@ -103,7 +119,7 @@ Mistakes that produced **TESTPLAN-** while the CDP implementation was fine:
 4. **Wrong optional-suite snippet:** The diagnostic **`cargo test -p mac_stats --no-fail-fast`** for “already in **`src-tauri/`**” must **not** be prefixed with **`cd src-tauri &&`** (that directory only exists **from repo root**). Same rule as steps **2–3**.
 5. **Copied `rg` from a markdown table with `\|`:** alternation in **`rg`** must use a **single** pipe `|` between alternatives inside the quoted pattern. Escaped `\|` is **not** the same regex and can yield false “no matches” static-review failures.
 
-**Fix for retest:** Use **`UNTESTED-…`** from the branch you test; run steps **1–4** using the **bash block** and **§ 1** for `rg` (see **Paths by cwd** for the path column only); ignore unfiltered suite results for pass/fail.
+**Fix for retest:** Use **`UNTESTED-…`** from the branch you test; run steps **1–4** using the **bash block** and **1) Static review** for `rg` (see **Paths by cwd** for the path column only); ignore unfiltered suite results for pass/fail.
 
 ### Pass/fail scope (read first)
 
@@ -251,4 +267,4 @@ While instructions are edited, the task may temporarily live as **`TESTPLAN-2026
 
 If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
 
-**This revision:** applied **in place** on **`UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** — ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+**This revision:** **`TESTPLAN-…` → `UNTESTED-…`** published **2026-03-30** — ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
