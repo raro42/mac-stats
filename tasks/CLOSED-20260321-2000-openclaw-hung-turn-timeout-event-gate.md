@@ -1478,3 +1478,15 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Outcome naming (operator):** pass → **`CLOSED-…`**; implementation fail → **`TESTED-…`**; defective test plan / environment → **`TESTPLAN-…`**. Repo `003-tester/TESTER.md` fail/block → **`WIP-…`** — not applicable.
 - **Outcome:** **PASS** — rename **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** after this append.
 
+### Re-verify — 2026-03-30 (UTC), `003-tester/TESTER.md` (operator target `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only; Cursor agent run)
+
+- **Rename UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` was **not present**. The task file was **`CLOSED-…` → `TESTING-…`** for this verification pass; no other `UNTESTED-*` file was used.
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (library crate: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — no matches (task body lists `src/`; Rust under `src-tauri/src/`)
+  - same pattern on `src-tauri/src` — matches in `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+- **Acceptance criteria:** All satisfied (`TurnOutputGate` / `gate_allows_send`; `finalize_turn_timeout` with `**Turn timed out**` and budget; log strings in source; `cargo check` / `cargo test` green).
+- **Outcome naming (operator):** pass → **`CLOSED-…`**; implementation fail → **`TESTED-…`**; defective test instructions / environment spec → **`TESTPLAN-…`** — not applicable.
+- **Outcome:** **PASS** — rename **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** after this append.
+
