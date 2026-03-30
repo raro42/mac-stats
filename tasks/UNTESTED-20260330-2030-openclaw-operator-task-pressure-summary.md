@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`**. File workflow: **`FEAT → WIP → UNTESTED`**. Implementation in **`src-tauri`** (§4) matches §2; **`cargo check`** and **`cargo test operator_task_pressure`** passed in this coder run. **§6 — Testing instructions** is filled for the tester.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`**. File workflow: **`FEAT → WIP → UNTESTED`** (completed this run). Implementation in **`src-tauri`** (§4) matches §2; **`cargo check`** and **`cargo test operator_task_pressure`** passed. **§6 — Testing instructions** is filled for the tester.
 - **Next step:** Tester runs **§6** (after **§5**) on **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
