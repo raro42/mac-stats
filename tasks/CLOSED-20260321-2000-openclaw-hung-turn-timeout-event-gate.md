@@ -1538,3 +1538,15 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Nomenclatura de resultado (operador):** pass → **`CLOSED-…`**; fallo de implementación → **`TESTED-…`**; instrucciones de prueba / entorno defectuosos → **`TESTPLAN-…`** — no aplica.
 - **Resultado:** **PASS** — tras este append, renombrar **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
 
+### Re-verify — 2026-03-30 05:42 UTC (`003-tester/TESTER.md`, operator path `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only)
+
+- **Rename UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` was **not present**; no other `UNTESTED-*` file was used. **TESTING phase:** `tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` → `tasks/TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` at the start of this run.
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (library crate: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — no matches (task verification block lists `src/`; Rust sources are under `src-tauri/src/`)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches in `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+- **Acceptance criteria:** All satisfied (`TurnOutputGate` = `Arc<AtomicBool>`; `gate_allows_send` in tool loop; `finalize_turn_timeout` text starts `**Turn timed out**` with wall-clock budget in seconds; router string `closing output gate after turn wall-clock timeout`; turn-lifecycle `turn wall-clock timeout` / `closing output gate and running cleanup`).
+- **Outcome naming (operator):** pass → **`CLOSED-…`**; implementation fail → **`TESTED-…`**; defective test plan / environment spec → **`TESTPLAN-…`**. Repo `003-tester/TESTER.md` uses **`WIP-…`** for generic fail/block — not applicable.
+- **Outcome:** **PASS** — rename **`TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** after this append.
+

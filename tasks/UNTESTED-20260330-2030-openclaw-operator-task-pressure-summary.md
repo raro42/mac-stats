@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): workflow **`FEAT → WIP → UNTESTED`** applied to **`tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md`** (in-tree the backlog file was **`UNTESTED-*`**; this run renamed **`UNTESTED → FEAT → WIP`**, then **`WIP → UNTESTED`** after verification). **Acceptance (section 2):** verified in-tree — `live_metrics_execution_system_section` appends `format_operator_task_pressure_summary()` after `live_metrics_for_prompt()`; review constants from `task/review.rs`; error path uses `(unavailable: …)` without panic; unit test `task::tests::operator_task_pressure_summary_empty_dir` with empty `MAC_STATS_TASK_DIR`. **Rust this run:** no code edits; **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** — **pass**.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): workflow **`FEAT → WIP → UNTESTED`** on **`tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md`**. En el árbol solo existía **`UNTESTED-*`**; esta corrida renombró **`UNTESTED → FEAT → WIP`**, verificó criterios y **Section 6 — Testing instructions**, luego **`WIP → UNTESTED`**. **Aceptación (§2):** en código — `live_metrics_execution_system_section` concatena `live_metrics_for_prompt()` y `format_operator_task_pressure_summary()`; constantes de revisión en `task/review.rs`; rama `Err` → `(unavailable: …)` sin panic; test `task::tests::operator_task_pressure_summary_empty_dir` con `MAC_STATS_TASK_DIR` vacío. **Rust:** sin cambios de implementación en esta corrida; **`cd src-tauri && cargo check`** y **`cargo test operator_task_pressure`** — **OK**.
 - **Next step:** Tester runs **Section 6** (after **Section 5**) on **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
@@ -84,8 +84,6 @@ Optional ripgrep sanity: `rg -n "format_operator_task_pressure_summary|live_metr
 - [ ] `cargo test operator_task_pressure` (or `cargo test task::tests::operator_task_pressure_summary_empty_dir -- --exact`) passes.
 - [ ] (Optional) full `cargo test` for acceptance criterion 3.
 - [ ] Manual or runtime: execution system prompt shows **`## Task backlog (operator)`** after live metrics; counts match `~/.mac-stats/task/`; **CPU:** / **Load** lines unchanged above the new block.
-
-Run **Section 5 — Verification (automated)** first; use the subsections below for manual or optional runtime checks.
 
 ### What to verify
 
