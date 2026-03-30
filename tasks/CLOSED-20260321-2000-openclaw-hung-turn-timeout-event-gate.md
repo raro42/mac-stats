@@ -1398,3 +1398,14 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Nomenclatura de resultado (mensaje operador):** pass → **`CLOSED-…`**. No aplica **`TESTED-`** ni **`TESTPLAN-`**. `003-tester/TESTER.md` del repo: fallo/bloqueo genérico → **`WIP-…`**.
 - **Resultado:** **PASS** — restaurar **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** tras este append.
 
+### Re-verify — 2026-03-30T03:34:54Z UTC (`003-tester/TESTER.md`; operator target `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only)
+
+- **Rename:** `UNTESTED-…` **not present**. Started from `CLOSED-…` → **`TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** for this run. No other `UNTESTED-*` file used.
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (library crate: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — no matches (task body lists `src/`; Rust is under `src-tauri/src/`)
+  - same `rg` on `src-tauri/src` — matches in `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+- **Acceptance criteria:** All satisfied.
+- **Outcome:** **PASS** → rename **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** after this append.
+
