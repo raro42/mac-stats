@@ -4174,3 +4174,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
   4. `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast` — **`running 2 tests`**, **`test result: ok. 2 passed`** (873 filtered out).
 - **Step 4 (manual spot-check):** Opened `src-tauri/src/browser_agent/mod.rs`; `should_retry_cdp_after_clearing_session` documents that `check_browser_alive` already clears session on “Browser unresponsive” and that compound connection-shaped messages must not get generic CDP reconnect retry (health wins).
 - **Outcome:** **PASS** — all acceptance steps 1–4 satisfied; renamed `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
+
+---
+
+## Test report
+
+**Date:** 2026-03-30 (local time, America-friendly label; host: `darwin`).
+
+**TESTER.md / operator path:** Operator asked for `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; that filename is **not present** in the repo (task already carried slug `20260321-1345-browser-use-cdp-health-check-ping`). This run applied **`CLOSED-` → `TESTING-`** at start (same basename), then verification, then this report, then **`TESTING-` → `CLOSED-`** on pass. No other `UNTESTED-*` task was touched.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass** (matches present; health-check symbols in `browser_agent/mod.rs`).
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (anti–nested-`block_on` comment in `check_browser_alive`; doc on `evaluate_one_plus_one_blocking_timeout`).
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (`mac_stats` lib: **875** passed, 0 failed; other targets 0 tests; 1 doc-test ignored)
+
+**Acceptance criteria (1)–(3):** **pass** — `evaluate_one_plus_one_blocking_timeout` uses worker thread + `tab.evaluate("1+1", false)` + `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)`; `check_browser_alive` calls it with explicit no–`Handle::block_on` rationale; `clear_browser_session_on_error` clears on “Browser unresponsive” and `is_connection_error`; `should_retry_cdp_after_clearing_session` documents health-over-retry.
+
+**Outcome:** **CLOSED-** — rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
