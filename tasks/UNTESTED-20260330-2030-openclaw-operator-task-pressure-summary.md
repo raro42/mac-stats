@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): **`tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md`** (materializado **`UNTESTED-* → FEAT-*`**), **`FEAT → WIP → UNTESTED`**; **§2** verificado en árbol; **Section 6** con instrucciones de prueba (smoke, checklist, pass/fail). **Código:** `live_metrics_execution_system_section` ← `live_metrics_for_prompt()` + `format_operator_task_pressure_summary()`; `task/review.rs`; `Err` → `(unavailable: …)`; test `operator_task_pressure_summary_empty_dir`. **`cargo check`** / **`cargo test operator_task_pressure`** — **OK** (sin cambios Rust en esta corrida).
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): tarea **`20260330-2030-openclaw-operator-task-pressure-summary`** (referencia usuario: `tasks/FEAT-…`; en disco no había `FEAT-*`, solo `UNTESTED-*`). Flujo archivo: **`UNTESTED → WIP` (trabajo) → `UNTESTED` (entrega)**; equivalencia al esquema **`FEAT → WIP → UNTESTED`** cuando el backlog entra como `FEAT-*`. **§2** verificado en árbol; **Section 6** conserva smoke, checklist y pass/fail. **Código:** `live_metrics_execution_system_section` ← `live_metrics_for_prompt()` + `format_operator_task_pressure_summary()`; `task/review.rs` (`TASK_REVIEW_*`); `Err` → `(unavailable: …)`; test `operator_task_pressure_summary_empty_dir`. **`cargo check`** y **`cargo test operator_task_pressure`** — **OK** en esta corrida (sin cambios Rust).
 - **Next step:** Tester ejecuta **Section 6** (tras **Section 5**) en **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
