@@ -771,3 +771,11 @@ _(Tester: append results only on the **queue** file **`UNTESTED-…` → `TESTIN
 - **Commands run:** `cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats`; `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats` (full output, not **`-q`**); five **`rg`** lines exactly as **A1** (`TurnOutputGate|gate_allows_send|finalize_turn_timeout` on **`src-tauri/src`**; `-F '**Turn timed out**'` on **`turn_lifecycle.rs`**; **`closing output gate after turn wall-clock timeout`** in **`ollama.rs`**; **`turn wall-clock timeout`** and **`closing output gate and running cleanup`** in **`turn_lifecycle.rs`** — same source line **100** twice, expected per acceptance **§3**).
 - **Result:** **PASS** — `cargo check` exit **0**; `cargo test` exit **0** (**875** passed, **0** failed); every required **`rg`** ≥1 match. Acceptance criteria **1–4** satisfied (static gate).
 - **Outcome filename:** **`TESTING-…` → `CLOSED-…`** (pass). Not **`TESTED-…`**. Not **`TESTPLAN-…`**.
+
+### 2026-03-31 (UTC) — tester run (Cursor; [`003-tester/TESTER.md`](../003-tester/TESTER.md))
+
+- **Queue:** Operator named **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** only; that path was **missing** (only **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** existed). **`mv CLOSED-… → TESTING-…`** at run start (same stamp + slug). **Did not** choose another **`UNTESTED-*`** file.
+- **Host:** macOS darwin 25.3.0; repo root **`/Users/raro42/projects/mac-stats`**; **`bash`**.
+- **Sequence:** Tester quick gate → **BLOCK: A1 or A2**; step **0b** `test -f src-tauri/Cargo.toml && echo OK`; git **Preflight**; Self-check row A1/A2; **Verification commands → block A1** (`set -e` through last **`rg`**). **`cargo test`** with **`--manifest-path src-tauri/Cargo.toml -p mac_stats -q`** (quiet output only).
+- **Result:** **PASS** — `cargo check` exit **0**; `cargo test` exit **0** (**875** passed, **0** failed); every required **`rg`** ≥1 match; **`turn_lifecycle.rs`** pair matched line **100** twice (expected).
+- **Outcome:** **`TESTING-…` → `CLOSED-…`** (pass). Not **`TESTED-…`**. Not **`TESTPLAN-…`**.
