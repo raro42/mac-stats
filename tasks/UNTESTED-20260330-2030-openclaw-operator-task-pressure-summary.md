@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): on-disk rename chain **`UNTESTED-…` → `FEAT-…` → `WIP-…` → `UNTESTED-…`** (stem `20260330-2030-openclaw-operator-task-pressure-summary`). **mac-stats:** `task/mod.rs` (`format_operator_task_pressure_summary`, `count_tasks_by_status`), `task/review.rs` (`TASK_REVIEW_INTERVAL_SECS`, `TASK_REVIEW_MAX_OPEN_PER_CYCLE`, `TASK_WIP_STALE_TIMEOUT_SECS`), `commands/context_assembler.rs` (`live_metrics_execution_system_section`), `commands/ollama.rs` (`metrics_for_system` ← `fragments::live_metrics_execution_system_section`). **Verification (coder run):** `cd src-tauri && cargo check && cargo test operator_task_pressure` — **pass** (`task::tests::operator_task_pressure_summary_empty_dir`). **Section 6** = tester handoff.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): on-disk rename chain **`FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md` → `WIP-20260330-2030-openclaw-operator-task-pressure-summary.md` → `UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`** (stem `20260330-2030-openclaw-operator-task-pressure-summary`). **mac-stats:** `task/mod.rs` (`format_operator_task_pressure_summary`, `count_tasks_by_status`), `task/review.rs` (`TASK_REVIEW_INTERVAL_SECS`, `TASK_REVIEW_MAX_OPEN_PER_CYCLE`, `TASK_WIP_STALE_TIMEOUT_SECS`), `commands/context_assembler.rs` (`live_metrics_execution_system_section`), `commands/ollama.rs` (`metrics_for_system` ← `fragments::live_metrics_execution_system_section`). **Verification (this run):** `cd src-tauri && cargo check && cargo test operator_task_pressure` — **pass** (`task::tests::operator_task_pressure_summary_empty_dir`). **Section 6** = tester handoff.
 - **Next step:** Tester runs **Section 6** (after **Section 5**) on this file.
 ---
 
@@ -110,3 +110,7 @@ Optional: `cd src-tauri && cargo clippy` (same as Section 5).
 
 - **Pass:** Automated tests green; manual or optional runtime check shows the dual block in the execution system path; having_fun behaviour unchanged.
 - **Fail:** Missing section, wrong counts vs filesystem, metrics section broken, or panic on unreadable task dir.
+
+### Record results (tester)
+
+Note **date**, **mac-stats version** (`src-tauri/Cargo.toml` or in-app version string), and **pass/fail** for each **Quick checklist** item; attach log snippets if runtime checks fail.
