@@ -1,8 +1,8 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`**. Filename workflow **`UNTESTED → FEAT → WIP`** (align with requested **`FEAT-…`** name), then **`WIP → UNTESTED`** on completion. **`src-tauri`** matches §2/§4; **`cargo check`** and **`cargo test operator_task_pressure`** passed on this run (unit test asserts review-interval, max-open-per-cycle, and stale-WIP wording). **§6 — Testing instructions** is ready for the tester; final filename **`UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
-- **Next step:** Tester runs **§6** (after **§5**) on this file.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`**. Filename workflow **`FEAT → WIP → UNTESTED`** completed on this run. Implementation matches §2/§4 in **`src-tauri`**; **`cargo check`** and **`cargo test operator_task_pressure`** passed (`task::tests::operator_task_pressure_summary_empty_dir`). **§6 — Testing instructions** is ready for the tester; file prefix **`UNTESTED-`**.
+- **Next step:** Tester runs **§6** (after **§5**) on **`UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
 # UNTESTED: OpenClaw parity — operator task pressure summary in execution context

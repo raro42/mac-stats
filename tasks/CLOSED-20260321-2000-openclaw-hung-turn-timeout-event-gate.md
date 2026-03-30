@@ -1708,3 +1708,15 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Criterios de aceptación:** Cumplidos.
 - **Nomenclatura (operador):** pass → **`CLOSED-…`**.
 - **Resultado:** **PASS** — renombrar **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
+
+### Re-verify — 2026-03-30 UTC (`003-tester/TESTER.md`; solo `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`)
+
+- **Renombre UNTESTED → TESTING:** El archivo `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía** en el repo; no se eligió otro `UNTESTED-*`. Fase TESTING: el fichero canónico estaba como `CLOSED-…` y se renombró a **`TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** antes de ejecutar la verificación.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (crate biblioteca `mac_stats`: **875** passed, 0 failed; doc-tests: 1 ignored)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - El bloque de la tarea lista `rg … src/`; en `src/` (frontend JS) no hay esas cadenas; la implementación Rust está en `src-tauri/src/`.
+- **Criterios de aceptación:** Cumplidos (`TurnOutputGate` como `Arc<AtomicBool>`; `gate_allows_send` en tool loop; `finalize_turn_timeout` con prefijo `**Turn timed out**` y presupuesto en segundos; logs `closing output gate after turn wall-clock timeout` y `turn wall-clock timeout` / `closing output gate and running cleanup` en fuente).
+- **Nomenclatura de resultado (instrucción operador):** pass → **`CLOSED-…`**; fallo de implementación → `TESTED-…`; instrucciones/entorno defectuosos → `TESTPLAN-…`. **`003-tester/TESTER.md`** en repo indica `WIP-…` si hay bloqueo/fallo (no `TESTED-`).
+- **Resultado:** **PASS** — renombrar **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
