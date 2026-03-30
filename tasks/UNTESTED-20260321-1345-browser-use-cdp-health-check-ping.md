@@ -1,6 +1,17 @@
 # Browser use — CDP health check ping (`1+1`)
 
-> **Non-negotiable — what “verify” means for this slug:** The **only** mandatory `cargo test` is the **`--lib`** run whose command line contains the substring **`cdp_retry_`**. This document **never** requires an **unfiltered** full-crate `cargo test` / `cargo test --no-fail-fast` (with **no** `cdp_retry_`). If a checklist (including **TESTER.md** or a non-English runbook) says otherwise for this slug, **that checklist line is superseded by Step 3 below**. Filing **TESTPLAN-** because the full suite failed **after** Step 3 passed is a **procedure error**, not an instruction defect. Filing **TESTPLAN-** because you only ran the full suite and **never** ran Step 3 is **incomplete execution**, not proof that this task “mandates” the full suite.
+## Verification at a glance (read before any `cargo test`)
+
+| Question | Answer |
+|----------|--------|
+| **Only** mandatory `cargo test` for pass/fail? | A **single** **`--lib`** invocation whose command line contains the literal substring **`cdp_retry_`** (see **Step 3** / **Copy-paste — full gate**). |
+| Is **`cd src-tauri && cargo test --no-fail-fast`** (or any `cargo test` **without** **`cdp_retry_`**) required? | **No.** Those are **optional / diagnostic** only. They are **not** listed in **Steps 1–4** as acceptance steps. |
+| **Outcome if Step 3 passed** but an unfiltered full-crate test run **failed**? | **Pass** this slug (**CLOSED-**) when **Steps 1–4** all succeeded — including Step 3 evidence (**`running N tests`**, **N ≥ 1**, **`test result: ok`**). Do **not** emit **TESTPLAN-** for “full suite failed” in that situation; that names the **wrong bar**, not defective instructions. |
+| Valid queue file to start a run? | **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** after coder publication (**`UNTESTED-` → `TESTING-`**). If that file is **missing** at repo tip, **stop** — do **not** treat **`CLOSED-…`** or **`TESTPLAN-…`** as a substitute queue name without an **explicit** operator exception (see **Phase 0**). |
+
+**Note for non-English runbooks:** El único `cargo test` obligatorio para este slug es la línea de **Step 3** con el filtro **`cdp_retry_`**. Un `cargo test --no-fail-fast` **sin** ese token **no** define aceptación ni justifica **TESTPLAN-** si **Step 3** pasó.
+
+> **Non-negotiable — what “verify” means for this slug:** The **only** mandatory `cargo test` is the **`--lib`** run whose command line contains the substring **`cdp_retry_`**. This document **never** requires an **unfiltered** full-crate `cargo test` / `cargo test --no-fail-fast` (with **no** `cdp_retry_`). If a checklist (including **TESTER.md** or a non-English runbook) says otherwise for this slug, **that checklist line is superseded by Step 3 below** and by the table above. Filing **TESTPLAN-** because the full suite failed **after** Step 3 passed is **mis-applied outcome naming** (wrong bar), **not** an instruction defect. Filing **TESTPLAN-** because you only ran the full suite and **never** ran Step 3 is **incomplete execution**, not proof that this task “mandates” the full suite.
 
 **Automated test bar (read before any `cargo test`):** Pass/fail uses **one** test invocation: library tests filtered by the substring **`cdp_retry_`** — e.g. from repo root  
 `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast`.  
@@ -20,7 +31,9 @@ This task **does not** require unfiltered **`cargo test --no-fail-fast`**, **`cd
 >
 > **Roles (same stamp/slug):** **`TESTPLAN-…`** on disk = **coder revision** — testers **do not** run the gate or rename to **`TESTING-`**. **`UNTESTED-…`** = **published queue** — testers rename **`UNTESTED-` → `TESTING-`** and run **Testing instructions**. **`CLOSED-…`** = **archive** for new passes (see **Phase 0**). **At most one** of **`TESTPLAN-…`** or **`UNTESTED-…`** should exist at repo tip; if **both** appear, fix handoff or merge conflict before any test run.
 >
-> **Testing instructions** revised **2026-03-30** (r): **(q)** carried forward; **Non-negotiable** callout under title (full-suite `cargo test` is **not** mandatory; supersede stale checklists); acceptance criterion **4** states the automated bar explicitly.
+> **Testing instructions** revised **2026-03-30** (s): **Verification at a glance** table + bilingual one-liner; **Non-negotiable** aligned with table (full-suite failure after passing Step 3 ⇒ **CLOSED-**, not **TESTPLAN-**); **(r)** retained.
+
+**Branch handoff (publishers / integrators):** Before assigning **003-tester**, the branch under test **must** contain **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`**. If testers only see **`CLOSED-…`** for this slug, they **cannot** validly fake the queue by renaming **`CLOSED-` → `TESTING-`** unless their runbook **explicitly** allows that exception — default is **handoff defect** or wait for this **`UNTESTED-…`** file on tip. Absence of **`UNTESTED-…`** is an **environment/handoff** problem, not evidence that the CDP health-check implementation failed.
 
 ### Retest at a glance (003-tester — only after `UNTESTED-…` is on disk)
 
@@ -487,6 +500,8 @@ While instructions are edited, the task lives as **`TESTPLAN-20260321-1345-brows
 
 If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
 
-**This revision (r):** Coder **`TESTPLAN-…` → `UNTESTED-…`** for retest — **Non-negotiable** callout; **Checklist conflict resolver**; acceptance criterion **4** (verification scope). Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+**This revision (s):** Coder **`TESTPLAN-…` → `UNTESTED-…`** for retest — **Verification at a glance**; **branch handoff** note for missing **`UNTESTED-…`**; **Non-negotiable** outcome clarification (full suite vs Step 3). Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+
+**Prior revision (r):** **Non-negotiable** callout; **Checklist conflict resolver**; acceptance criterion **4** (verification scope).
 
 **Prior revision (q):** **Runbook maintainer** one-liner + **Suggested “Commands run”**; **Step 4 — Spot-check** naming; **(p)** retained.

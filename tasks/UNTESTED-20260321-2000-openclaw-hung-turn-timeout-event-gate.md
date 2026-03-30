@@ -14,7 +14,7 @@ Sections that refer to the “queue file” mean **`UNTESTED-…`** once that fi
 
 **No** mac-stats product code change is required for this task file.
 
-**Instruction revision note:** A prior run flagged **Testing instructions** or the **stated environment** as defective (not a mac-stats implementation failure). This markdown body is the only authoritative spec: follow **Verification commands** below exactly, not snippets copied from **`CLOSED-*`** history (those may use wrong paths such as top-level **`src/`** or a shortened **`rg`** that omits required literals). **Latest repair (2026-03-30, tenth pass — coder):** **Happy path (ordered)** now states **Preflight** variant by **BLOCK** (**`BLOCK: B`** → **git Preflight only**; **`BLOCK: A1 or A2`** → **git or no-git** per **Preflight (required)**). Added **Preflight variant chooser** (one table) immediately under **Retest quickstart**. **Tester quick gate** + **Shell compatibility**: explicit **fish** warning — run step **0** (probe) in **`bash`** or **`zsh`**, not raw **fish**. **Common instruction defects** item **15** (probe pasted into **fish**). **Prior (ninth pass):** **Self-check before step 2**; **step 0b** skips repo-root **`test`** when **`BLOCK: B`**; **Retest quickstart**; defect **14**.
+**Instruction revision note:** A prior run flagged **Testing instructions** or the **stated environment** as defective (not a mac-stats implementation failure). This markdown body is the only authoritative spec: follow **Verification commands** below exactly, not snippets copied from **`CLOSED-*`** history (those may use wrong paths such as top-level **`src/`** or a shortened **`rg`** that omits required literals). **Latest repair (2026-03-30, eleventh pass — coder):** Added **Tester cheat sheet** (shell + **BLOCK: B** vs **A1/A2** in one screen). **TL;DR** bullet **3** now splits **BLOCK: B** (no repo-root **`test -f src-tauri/…`**) vs **A1/A2**. **Retest quickstart** uses **Phase R1–R5** (avoids “step 3” confusion with **Copy-paste order** **0/0b/1/2**). **Preflight (git)** note: **`echo "OK: … = $REPO_ROOT"`** may show a path **different** from **`pwd`** (e.g. you ran from **`tasks/`** or **`src-tauri/`**) — that is **expected**; do **not** **`cd`** to that path before block **B**. **Common instruction defects** item **16** (TL;DR / quickstart misread as requiring repo-root test after **BLOCK: B**). **Prior (tenth pass):** **Preflight variant chooser**; **fish** + step **0**; defect **15**.
 
 **Coder handoff (future):** **`UNTESTED-…` → `TESTPLAN-…`** for another instruction repair, edit **Testing instructions** / clarity wording only, then **`TESTPLAN-…` → `UNTESTED-…`**. Testers **only** start from **`UNTESTED-…`** — **not** **`TESTPLAN-…`**.
 
@@ -35,15 +35,29 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 
 ## Testing instructions
 
-### Retest quickstart (read first — minimal decision)
+### Tester cheat sheet (read this block first)
 
-1. Open **one** terminal whose **`pwd`** is **anywhere inside** the mac-stats checkout (if unsure, **`cd`** to the folder that **contains** **`src-tauri/`** first). If your shell is **fish**, start **`bash`** for steps **0–2** (see **Tester quick gate** → **Shell for step 0**).
-2. Run **Tester quick gate** (step **0** below). Read the printed **`BLOCK:`** line — it is the **only** selector for step **2**.
-3. **Step 0b:** If the probe printed **`BLOCK: B`**, **do not** run **`test -f src-tauri/Cargo.toml`** (that path is wrong from **`src-tauri/`** crate root). If the probe printed **`BLOCK: A1 or A2`** and included a **`cd '…'`** line, run that **`cd`**, then run **`test -f src-tauri/Cargo.toml && echo OK`**.
-4. Run **Preflight** (step **1**) once — **git** variant from any subdir **including** **`src-tauri/`** when **`BLOCK: B`**; **no-git** variant **only** when **`pwd`** is mac-stats **repo root** (never from crate root alone).
-5. Run **Self-check before step 2** (table below), then paste **exactly one** full block **A1**, **A2**, or **B** from **Verification commands** — **not** the shortened commands in **`tasks/CLOSED-*`** for this stamp.
+| Rule | **BLOCK: A1 or A2** (repo-root verification) | **BLOCK: B** (`src-tauri/` crate root) |
+|------|-----------------------------------------------|----------------------------------------|
+| **Shell** | Use **`bash`** (or **`zsh`**) for **every** pasted script — **not** **fish** (see **Shell compatibility**). | Same |
+| **After probe** | If the probe prints a **`cd '…'`** line, run it, then **`test -f src-tauri/Cargo.toml && echo OK`**. | **Do not** run **`test -f src-tauri/Cargo.toml`** — you stay in **`src-tauri/`**; that path would mean `src-tauri/src-tauri/…` and **fails by design**. |
+| **Preflight (step 1)** | **Git** or **no-git** variant (no-git **only** if **`pwd`** is already mac-stats **repo root**). | **Git variant only** (walk-up still finds the root for **`test -f "$REPO_ROOT/…"`**). **Never** no-git from crate root. |
+| **Before verification paste** | Run **Self-check** row **A1/A2** in **Self-check before step 2**. | Run **Self-check** row **B** ( **`Cargo.toml`** + **`src/commands/turn_lifecycle.rs`** at crate root). |
+| **Step 2** | Paste block **A1** *or* **A2** in full. | Paste block **B** in full **without** **`cd`** to repo root — **`rg`** paths are **`src/…`**, not **`src-tauri/src/…`**. |
 
-### Preflight variant chooser (after step 0 — before step 1)
+**Hard rule:** Do **not** run **`cargo`** or **`rg`** from **Verification commands** until **Preflight** (step **1**) has succeeded in the **same** terminal — **even** when the probe said **`BLOCK: B`**.
+
+### Retest quickstart (minimal decision — phases R1–R5)
+
+These **R** phases map to **Copy-paste order** **0 / 0b / 1 / 2**; they are **not** extra shell steps beyond that table.
+
+- **R1 — Terminal:** Open **one** terminal with **`pwd`** **anywhere inside** the mac-stats checkout (if unsure, **`cd`** to the folder that **contains** **`src-tauri/`**). If your shell is **fish**, start **`bash`** first and stay in **`bash`** for **R2–R5** (see **Tester quick gate** → **Shell for step 0**).
+- **R2 — Probe:** Paste **Tester quick gate** (**Copy-paste order** step **0**). The printed **`BLOCK:`** line is the **only** selector for which block you paste in **R5**.
+- **R3 — Align cwd (Copy-paste order step 0b):** If **`BLOCK: B`** — **skip** **`test -f src-tauri/Cargo.toml`**; you remain at **`src-tauri/`** for **R4–R5**. If **`BLOCK: A1 or A2`** and the probe printed **`cd '…'`**, run that **`cd`**, then **`test -f src-tauri/Cargo.toml && echo OK`** (required before **A1**/**A2**).
+- **R4 — Preflight:** Run **Preflight** (step **1**) once — **git** variant whenever **`BLOCK: B`** or from any subdir under mac-stats; **no-git** variant **only** when **`pwd`** is mac-stats **repo root** (never from **`src-tauri/`** alone).
+- **R5 — Verify:** Run **Self-check before step 2** (one row), then paste **exactly one** full block **A1**, **A2**, or **B** from **Verification commands** — **not** snippets from **`tasks/CLOSED-*`** for this stamp.
+
+### Preflight variant chooser (after probe R2 / step 0 — before Preflight R4 / step 1)
 
 | Step **0** printed | Paste for step **1** (**Preflight (required)**) |
 |--------------------|---------------------------------------------------|
@@ -137,7 +151,7 @@ Use this when **Copy-paste order** step **0** is done and you are choosing step 
 
 1. **mac-stats** repo only — not `../openclaw`. Rust paths are under **`src-tauri/src/`** (from repo root) or **`src/`** (only when cwd is **`src-tauri/`** — block **B**).
 2. **Terminal cwd:** In Cursor/VS Code (or any **multi-root** setup), confirm **`pwd`** is **inside** the mac-stats tree before step **0**. If **`pwd`** is only a **parent** monorepo folder, **`cd`** into **`…/mac-stats`** (the folder that **contains** **`src-tauri/`**) first — otherwise step **0** prints **`BLOCK: none`** even though the project is open in the IDE.
-3. Run **Tester quick gate** step **0** (walk-up probe; **no** `git` required) → **`cd`** if told → **`test -f src-tauri/Cargo.toml`** before **A1**/**A2**.
+3. Run **Tester quick gate** step **0** (walk-up probe; **no** `git` required). **If** the probe says **`BLOCK: A1 or A2`:** **`cd`** if told, then **`test -f src-tauri/Cargo.toml`** before **A1**/**A2**. **If** it says **`BLOCK: B`:** **do not** run that repo-root **`test`** — stay in **`src-tauri/`** for Preflight + block **B**.
 4. Run **Preflight** once in the **same terminal** (**mandatory** after step **0**, including when step **0** said **`BLOCK: B`** — never go probe → block **B** with no Preflight): **git** variant (walk-up from any subdir, **required when step 0 said `BLOCK: B`**) **or** **no-git** variant (**only** when **`pwd`** is repo root — **not** from **`src-tauri/`**). Preflight is **not** a substitute for **Verification commands → A2**.
 5. Paste **one** complete block **A1** *or* **A2** *or* **B** from the first **`set -e`** through the **last `rg`** — **no** line omitted, **no** mixing blocks, **no** running **`cargo`**/**`rg`** alone from an IDE snippet.
 6. **Pass:** `cargo check` + `cargo test` exit **0**; every **`rg`** in that block prints **≥1 line** (for **`turn_lifecycle.rs`**, two `rg` lines may show the **same** line number — still pass).
@@ -308,6 +322,7 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 13. **`BLOCK: B` + `cd` to repo root after Preflight** — Preflight prints **`OK: mac-stats repo root = …`** but **does not** change **`pwd`**. If you **`cd` to that path** and then paste block **B**, **`test -f Cargo.toml`** at repo root **fails** (mac-stats has **no** root **`Cargo.toml`**). **Stay in `src-tauri/`** for block **B** (or use **A1**/**A2** from repo root instead of **B**).
 14. **Using `tasks/CLOSED-*` (or chat logs) as the command source** — archived **`CLOSED-*`** files for this stamp may list **`rg … src/`** or omit required **`rg`** lines / **`-p mac_stats`**. That yields false “missing code” or incomplete verification. **Only** the **Verification commands** section **in this file** is authoritative for **`rg`** paths and **`cargo`** invocations.
 15. **Pasting the step 0 probe into fish** — the **Tester quick gate** script is **bash/zsh** syntax. In **fish**, you may get errors or nonsense **`BLOCK:`** output. Run **`bash`** (or **`bash -lc '…'`**) for step **0**, then continue in the same **`bash`** session for steps **0b–2** if your default shell is **fish**.
+16. **Running `test -f src-tauri/Cargo.toml` after `BLOCK: B`** — from **`src-tauri/`** crate root that path is **wrong** (nested `src-tauri/`). **TL;DR** §3 and **Retest quickstart R3** explicitly **skip** this when the probe chose block **B**. Run **git** Preflight, **Self-check** row **B**, then paste block **B**.
 
 ### Preflight (required)
 
@@ -329,6 +344,8 @@ test -f "$REPO_ROOT/src-tauri/src/commands/turn_lifecycle.rs"
 echo "OK: mac-stats repo root = $REPO_ROOT"
 command -v rg >/dev/null && echo "OK: rg" || echo "WARN: install ripgrep or search manually"
 ```
+
+**`$REPO_ROOT` vs `pwd`:** The printed **`OK: mac-stats repo root = …`** path may **differ** from your shell’s **`pwd`** (e.g. you ran Preflight from **`tasks/`** or **`src-tauri/`**). That is **normal** — the snippet resolves the mac-stats root for its **`test -f "$REPO_ROOT/…"`** checks only. **Do not** interpret it as “I must **`cd "$REPO_ROOT"`** now”: if the probe said **`BLOCK: B`**, you must **stay** at **`src-tauri/`** for block **B** (see **Execution recipe** / **Tester cheat sheet**).
 
 If the **`test -f`** lines fail, your shell is **not** under a mac-stats checkout — fix **`cd`** or use the **no-git** preflight below (tarball path).
 
