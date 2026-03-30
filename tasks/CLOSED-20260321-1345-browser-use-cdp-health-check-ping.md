@@ -4838,3 +4838,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Acceptance criteria:** (1) `evaluate_one_plus_one_blocking_timeout` + `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)` and **Browser unresponsive** errors — **pass** (spot-checked in `browser_agent/mod.rs`). (2) `check_browser_alive` calls helper + anti-`block_on` comment — **pass**. (3) `clear_browser_session_on_error` / `should_retry_cdp_after_clearing_session` behavior for unresponsive vs connection vs retry — **pass** (code + unit assertions around `should_retry_cdp_after_clearing_session`).
 
 **Outcome:** All criteria pass — rename back to **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+
+---
+
+## Test report
+
+**Date:** 2026-03-30 23:29 UTC
+
+**TESTER.md / operator naming:** Operator requested `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` only; that path **does not exist** in the repo. The same task file was **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**; renamed **`CLOSED-` → `TESTING-`** for this cycle (equivalent to `UNTESTED-` → `TESTING-` when no `UNTESTED-*` exists). No other `UNTESTED-*` task was tested.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (875 passed, 0 failed in crate `mac_stats` lib; other binaries 0 tests; 1 doc-test ignored)
+
+**Acceptance criteria:** (1) blocking `1+1` evaluate + `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)` — **pass** (grep + code present). (2) `check_browser_alive` + no nested `block_on` comment — **pass**. (3) `clear_browser_session_on_error` / health vs retry — **pass** (matches prior spot-checks in this file).
+
+**Outcome (operator naming):** **`CLOSED-`** — all criteria pass; rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
