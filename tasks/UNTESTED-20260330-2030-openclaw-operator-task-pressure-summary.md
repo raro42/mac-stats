@@ -1,8 +1,8 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): workflow **`FEAT → WIP → UNTESTED`** on **`tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md`**. En el árbol solo existía **`UNTESTED-*`**; esta corrida renombró **`UNTESTED → FEAT → WIP`**, verificó criterios y **Section 6 — Testing instructions**, luego **`WIP → UNTESTED`**. **Aceptación (§2):** en código — `live_metrics_execution_system_section` concatena `live_metrics_for_prompt()` y `format_operator_task_pressure_summary()`; constantes de revisión en `task/review.rs`; rama `Err` → `(unavailable: …)` sin panic; test `task::tests::operator_task_pressure_summary_empty_dir` con `MAC_STATS_TASK_DIR` vacío. **Rust:** sin cambios de implementación en esta corrida; **`cd src-tauri && cargo check`** y **`cargo test operator_task_pressure`** — **OK**.
-- **Next step:** Tester runs **Section 6** (after **Section 5**) on **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): **`tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md`** (materializado **`UNTESTED-* → FEAT-*`**), **`FEAT → WIP → UNTESTED`**; **§2** verificado en árbol; **Section 6** con instrucciones de prueba (smoke, checklist, pass/fail). **Código:** `live_metrics_execution_system_section` ← `live_metrics_for_prompt()` + `format_operator_task_pressure_summary()`; `task/review.rs`; `Err` → `(unavailable: …)`; test `operator_task_pressure_summary_empty_dir`. **`cargo check`** / **`cargo test operator_task_pressure`** — **OK** (sin cambios Rust en esta corrida).
+- **Next step:** Tester ejecuta **Section 6** (tras **Section 5**) en **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
 # UNTESTED: OpenClaw parity — operator task pressure summary in execution context
@@ -62,7 +62,7 @@ rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_secti
 
 ## 6. Testing instructions
 
-**FEATURE-CODER:** After the coder run (**`FEAT → WIP → UNTESTED`**), the **tester** owns this section. Run **Section 5** before manual checks.
+**FEATURE-CODER:** After the coder run (**`FEAT → WIP → UNTESTED`**), the **tester** owns this section. Run **Section 5** before manual checks. **Coder:** leave reproducible smoke, checklist, and pass/fail criteria below; do not strip this section when renaming task-file prefixes.
 
 **Required order:** run **Section 5 — Verification (automated)** first, then manual or optional runtime steps below.
 
