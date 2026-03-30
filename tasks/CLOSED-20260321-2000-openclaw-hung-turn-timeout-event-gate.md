@@ -1824,3 +1824,15 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Acceptance criteria:** All satisfied (1–4): `TurnOutputGate` (`Arc<AtomicBool>`) and `gate_allows_send`; `finalize_turn_timeout` text starts `**Turn timed out**` with budget seconds; router / turn-lifecycle log strings in source; `cargo check` / `cargo test` green.
 - **Outcome naming (operator):** pass → **`CLOSED-`**; implementation fail → **`TESTED-`**; defective test plan / environment spec → **`TESTPLAN-`**. `003-tester/TESTER.md` fail/block → **`WIP-`** — not applicable.
 - **Outcome:** **PASS** — rename **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** after this run.
+
+### Re-verify — 2026-03-30 (`003-tester/TESTER.md`; única tarea `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`)
+
+- **Date:** 2026-03-30 local (según `user_info`; hora UTC no registrada por separado).
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**; no se usó ningún otro `UNTESTED-*`. Fase TESTING: **`CLOSED-…` → `TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** al inicio de esta ejecución.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check && cargo test` — pass (`cargo check` sin errores; biblioteca: **875** passed, 0 failed; doc-tests: 1 ignored)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - El bloque de la tarea lista `rg … src/`; en `src/` raíz no hay coincidencias Rust (solo frontend; Rust en `src-tauri/src/`).
+- **Criterios de aceptación:** Cumplidos (1–4): `TurnOutputGate` y `gate_allows_send`; `finalize_turn_timeout` con `**Turn timed out**` y presupuesto en segundos (`turn_lifecycle.rs`); cadenas de log `closing output gate after turn wall-clock timeout` / `turn wall-clock timeout` / `closing output gate and running cleanup` en fuente; `cargo check` / `cargo test` en verde.
+- **Nomenclatura (instrucción operador):** pass → **`CLOSED-`**; fallo implementación → **`TESTED-`**; instrucciones/plan defectuosos → **`TESTPLAN-`**. `003-tester/TESTER.md`: bloqueo → **`WIP-`** — no aplica.
+- **Resultado:** **PASS** — renombrar **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** tras este run.
