@@ -1,6 +1,6 @@
 # Browser use — CDP health check ping (`1+1`)
 
-> **Queue file:** **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`**. Testers rename **`UNTESTED-` → `TESTING-`** to execute. **If your copy is still `TESTPLAN-…` for this slug:** instructions are **draft** — do **not** rename to **`TESTING-`** until a coder publishes **`UNTESTED-…`** (**`TESTPLAN-` → `UNTESTED-`**). **Testing instructions** revised **2026-03-30** (retest after **TESTPLAN**): executive summary; **`rg` + `set -e`** behavior; **`cdp_retry_` must not follow `--`**; optional **`PWD`** echo in the gate script; diagnostic **`-- --list`**; **`--no-fail-fast`** still does **not** widen the **`cdp_retry_`** filter; steps **1–3** script / **4** editor; cwd / manifest table; **`rg -m`** (no **`| head`**); no **`\|`** inside **`rg`** alternation strings.
+> **Queue file:** **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`**. Testers rename **`UNTESTED-` → `TESTING-`** to execute. **If your copy is still `TESTPLAN-…` for this slug:** instructions are **draft** — do **not** rename to **`TESTING-`** until a coder publishes **`UNTESTED-…`** (**`TESTPLAN-` → `UNTESTED-`**). **Testing instructions** revised **2026-03-30** (c): **explicit override** for **`TESTER.md`** / templates that still mandate **unfiltered** `cargo test --no-fail-fast`; **closure = steps 1–4 only**; executive summary; **`rg` + `set -e`**; **`cdp_retry_` before `--`**; **`PWD`** echo; diagnostic **`-- --list`**; steps **1–3** script / **4** editor; cwd / manifest table; **`rg -m`** (no **`| head`**); no **`\|`** inside **`rg`** alternation strings.
 
 ## Goal
 
@@ -38,6 +38,22 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 
 ## Testing instructions
 
+### Stale runbook override (read before any `cargo test`)
+
+Some **`TESTER.md`** (or operator) checklists still print **only**:
+
+- `cd src-tauri && cargo check`, then  
+- `cd src-tauri && cargo test --no-fail-fast` **with no test-name filter**
+
+**That pair is not the pass/fail bar for this slug.** It runs the **entire** crate test surface; failures in `discord::`, `scheduler::`, home-directory fixtures, etc. are **expected in some environments** and **do not** indicate a CDP health-check regression.
+
+**Authoritative bar (closure):** the numbered steps **1–4** in **this** document. In particular, step **3** **must** be a **`cargo test`** invocation whose command line contains the literal substring **`cdp_retry_`** (see **Authoritative automated test command** and **Copy-paste — full gate**).
+
+**Wrong outcomes to avoid:**
+
+- Emitting **`TESTPLAN-`** or **fail** because an **unfiltered** `cargo test --no-fail-fast` failed **while** step **3** (`cdp_retry_` filter) **passed** — that is a **procedure error**, not an instruction defect.
+- Renaming **`CLOSED-…`** or **`TESTPLAN-…`** → **`TESTING-…`** when **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** is missing — use the **`UNTESTED-…`** queue file from the branch under test, or record a **handoff defect** (see **Operator filename**).
+
 ### Executive summary (default run)
 
 Use this unless you have a documented reason to use the **`src-tauri/`** cwd column in **Paths by cwd**.
@@ -48,6 +64,8 @@ Use this unless you have a documented reason to use the **`src-tauri/`** cwd col
 | **2** | **`cargo check … -p mac_stats`** (with **`--manifest-path`** from repo root) | Exits **0** |
 | **3** | **`cargo test … --lib cdp_retry_ --no-fail-fast`** — command line **must** contain the literal substring **`cdp_retry_`** | **`running N tests`** with **N ≥ 1** and **`test result: ok`** |
 | **4** | Manual: open **`src-tauri/src/browser_agent/mod.rs`**, find **`should_retry_cdp_after_clearing_session`**, confirm health / “Browser unresponsive” vs generic retry semantics | Matches acceptance criterion **3** in this file |
+
+**Not a step (ever):** `cargo test … --no-fail-fast` or `cd src-tauri && cargo test --no-fail-fast` **without** **`cdp_retry_`** on the same command line — run only under **Optional — full crate tests**, and **never** as the reason for **`TESTPLAN-`** if step **3** passed.
 
 The bash block under **Copy-paste — full gate** runs **steps 1–3** only. **Step 4** is **never** in that script.
 
@@ -272,4 +290,4 @@ While instructions are edited, the task may temporarily live as **`TESTPLAN-2026
 
 If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
 
-**This revision:** **`TESTPLAN-…` → `UNTESTED-…`** published **2026-03-30** (retest handoff: **`rg`/`set -e`**, **`cdp_retry_` vs `--`**, **`PWD`** echo, **`--list`** diagnostic) — ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+**This revision:** **`TESTPLAN-…` → `UNTESTED-…`** published **2026-03-30** (c): **stale runbook override** (unfiltered `cargo test` ≠ gate); **`TESTPLAN-`** only for broken instructions/handoff, not for optional-suite noise when step **3** passes — ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).

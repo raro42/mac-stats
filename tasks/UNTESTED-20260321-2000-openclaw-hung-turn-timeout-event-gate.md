@@ -1,10 +1,10 @@
 # OpenClaw: hung turn wall-clock timeout + output event gate
 
-**On-disk name (this revision):** **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** — must be this name on the tester queue. If you see **`TESTPLAN-…`** with the same stamp and slug, the coder is still fixing **Testing instructions**; wait for **`TESTPLAN-…` → `UNTESTED-…`** before starting [`003-tester/TESTER.md`](../003-tester/TESTER.md). **No** mac-stats code change is required for this task file.
+**On-disk name (this revision):** **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** — must be this name on the tester queue. If you see **`TESTPLAN-…`** with the same stamp and slug, the coder is still fixing **Testing instructions**; wait for **`TESTPLAN-…` → `UNTESTED-…`** before starting [`003-tester/TESTER.md`](../003-tester/TESTER.md). **No** mac-stats product code change is required for this task file.
 
-**Instruction revision:** A prior run flagged **Testing instructions** / stated environment as defective (not a mac-stats implementation failure). This body is the authoritative spec; follow **Verification commands** here, not snippets copied from **`CLOSED-*`** history.
+**Instruction revision:** A prior run flagged **Testing instructions** or the **stated environment** as defective (not a mac-stats implementation failure). This body is the only authoritative spec: follow **Verification commands** below exactly, not snippets copied from **`CLOSED-*`** history (those may use wrong paths such as top-level **`src/`**).
 
-**Coder handoff:** For another repair pass, rename **`UNTESTED-…` → `TESTPLAN-…`**, edit **Testing instructions** / wording only, then **`TESTPLAN-…` → `UNTESTED-…`** (same stamp `20260321-2000`, slug `openclaw-hung-turn-timeout-event-gate`). Testers **only** start from **`UNTESTED-…`** — **not** **`TESTPLAN-…`**.
+**Coder handoff:** For another repair pass, rename **`UNTESTED-…` → `TESTPLAN-…`**, edit **Testing instructions** / clarity wording only, then **`TESTPLAN-…` → `UNTESTED-…`**. Testers **only** start from **`UNTESTED-…`** — **not** **`TESTPLAN-…`**.
 
 Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Discord status/draft/ATTACH spam), user-visible **Turn timed out** reply, optional `about:blank` cleanup only if the timed-out `request_id` still owns the coordination slot.
 
@@ -16,12 +16,24 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 
 1. `TurnOutputGate` is defined as `pub type TurnOutputGate = Arc<AtomicBool>` in `commands/turn_lifecycle.rs`. The tool loop (`commands/tool_loop.rs` and related paths) calls `gate_allows_send` so sends are suppressed after the gate is closed.
 2. `finalize_turn_timeout` in `commands/turn_lifecycle.rs` returns `OllamaReply` whose `text` starts with `**Turn timed out**` and includes the budget in seconds (see the `format!` that builds the user message).
-3. **Log strings (static check):** The following literals appear in **mac-stats** Rust sources as written below. Use the **Verification commands** `rg` lines verbatim (**`-F`**, and **single quotes** around `**Turn timed out**` so the shell does not glob). A live Discord timeout repro is **optional**, not required for pass.
+3. **Log strings (static check):** The following **substrings** must appear inside **mac-stats** Rust sources (typically inside a longer `format!` / macro string — **`rg` only needs a line-level substring match**, not a whole-line exact copy). Use the **Verification commands** `rg` lines verbatim (**`-F`** only where shown, and **single quotes** around `'**Turn timed out**'` so the shell does not glob `**`). A live Discord timeout repro is **optional**, not required for pass.
    - Substring **`closing output gate after turn wall-clock timeout`** — in **`src-tauri/src/commands/ollama.rs`** (router path when the wall-clock limit fires).
-   - Substrings **`turn wall-clock timeout`** and **`closing output gate and running cleanup`** — both appear inside the **same** `tracing::warn!` format string in **`src-tauri/src/commands/turn_lifecycle.rs`** (`finalize_turn_timeout`). **Expected:** the two `rg` lines in blocks **A1**/**A2**/**B** may report the **same line number** twice; that still counts as pass.
+   - Substrings **`turn wall-clock timeout`** and **`closing output gate and running cleanup`** — both appear inside the **same** `tracing::warn!` format string in **`src-tauri/src/commands/turn_lifecycle.rs`** (`finalize_turn_timeout`). **Expected:** the two separate `rg` lines in blocks **A1**/**A2**/**B** may report the **same line number** twice; that still counts as pass.
 4. **`cargo check`** and **`cargo test`** for the **`mac_stats`** package succeed (exit **0**, zero failing tests). The Cargo **package** name is **`mac_stats`** (underscore), declared in **`src-tauri/Cargo.toml`**; pass **`-p mac_stats`** whenever you use **`--manifest-path src-tauri/Cargo.toml`**. Equivalent ways to satisfy this: run **Verification commands** block **A1**/**A2** (repo root + `--manifest-path src-tauri/Cargo.toml -p mac_stats`) or block **B** (cwd **`src-tauri/`** + `cargo check` / `cargo test` with **`-p mac_stats`** or default package). This project targets **macOS**; use a Mac so results match maintainer expectations. Linux CI or a non-macOS checkout may fail link steps or skip platform tests — that mismatch is **not** a product failure; rerun on macOS.
 
 ## Testing instructions
+
+### Before you run anything (read once)
+
+| Step | Action |
+|------|--------|
+| 1 | **Host:** macOS with `cargo`, `rustc`, and `rg` on `PATH`. Linux-only or missing toolchain → stop, report **environment blocked** per **TESTER.md** (typically **`WIP-…`**), **not** **`TESTPLAN-…`**. |
+| 2 | **Repo:** You are in the **mac-stats** tree (folder that contains **`src-tauri/Cargo.toml`**). Do **not** search **`../openclaw`** or top-level **`src/`** for Rust gate strings. |
+| 3 | **Shell:** Paste verification blocks in **`bash`** (or zsh with `set -e` behaving as documented). **fish** → use `bash -lc '…'`. |
+| 4 | **Block choice:** Run **Tester quick gate** step **0** below; obey the printed **BLOCK:** (A1/A2 vs B). Never mix path styles from different blocks in one paste. |
+| 5 | **One paste:** Run **one** of **A1**, **A2**, or **B** from **`set -e` through the last `rg`** without changing directory mid-block. |
+
+**Fast path (experienced testers, repo root, git clone, macOS):** run **Tester quick gate** step **0** → if it says **A1 or A2**, run **Preflight (required)** git variant → paste **Verification commands → A1** in full. **Pass** = every command exits **0** and every `rg` prints at least one line.
 
 ### Coder publication after TESTPLAN repair
 
@@ -52,6 +64,8 @@ fi
 ```
 
 If the script prints **BLOCK: none**, `cd` as indicated and re-run step **0**. If it tells you to **`cd '…'`** (quoted path), run that **`cd`** before pasting **A1** or **A2** (those blocks assume repo root for relative paths).
+
+**Why step 0 matters:** From a subdirectory (e.g. **`tasks/`**), a naive `test -f src-tauri/Cargo.toml` fails even though you are inside the clone. Step **0** uses **`$GIT_ROOT`** so it can tell you to **`cd`** to the real repo root before **A1**/**A2**.
 
 1. **Queue file per [`003-tester/TESTER.md`](../003-tester/TESTER.md):** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only. The tester rename chain is **`UNTESTED-…` → `TESTING-…` → (`CLOSED-…` or `WIP-…`)**. Testers **must not** rename **`TESTPLAN-…` → `TESTING-…`** (wait for **`UNTESTED-…`** first).
 2. **Host and toolchain:** Run on **macOS** with **`cargo`**, **`rustc`**, and **`rg`** on your `PATH`. Criterion **4** requires a full **`cargo check`** + **`cargo test`** for **`mac_stats`** to exit **0** on this platform. If you only have Linux (or CI images without the macOS toolchain), **stop**: append **environment blocked** to the test report and rename the queue file per [`003-tester/TESTER.md`](../003-tester/TESTER.md) (typically **`WIP-…`**). That is **not** a product failure and **not** a reason to bounce the task to **`TESTPLAN-…`**. The **TESTPLAN-** prefix is for bad *instructions* in this task file, not for missing macOS or toolchain.
@@ -202,6 +216,8 @@ Paste **one** complete block (**A1**, **A2**, or **B**) in a single shot. Do **n
 
 Use **bash** or **zsh** (or `bash -lc '…'` from fish). **`set -e`** stops on the first failing command — do **not** append `|| true` to `cd` or `git rev-parse` here; a wrong directory must **fail** the script.
 
+**If the block dies on `git rev-parse`:** your shell cwd is **not** inside a git working tree (wrong folder, tarball without `.git`, or nested worktree confusion). Fix: **`cd`** into the mac-stats clone and retry **A1**, or use **A2** with an explicit absolute path to the repo root.
+
 **Git prerequisite:** Run from **inside** the mac-stats clone so `git rev-parse --show-toplevel` prints the mac-stats root (the folder that directly contains `src-tauri/`). Starting in `src-tauri/` is OK: git still returns the repo root, and **`cd "$REPO_ROOT"`** moves you to **repo root** before **`cargo`** — required so **`--manifest-path src-tauri/Cargo.toml`** resolves correctly.
 
 **Why `--manifest-path`:** mac-stats has **no** `Cargo.toml` at repo root. Invoking **`cargo test`** from root without **`--manifest-path`** is a frequent false failure; the lines below pin the **`mac_stats`** package explicitly.
@@ -252,7 +268,9 @@ rg -n "closing output gate and running cleanup" src-tauri/src/commands/turn_life
 `rg -n "turn wall-clock timeout|closing output gate and running cleanup" src-tauri/src/commands/turn_lifecycle.rs`  
 You should see **one** line containing both substrings. A single broad `rg` over **`src-tauri/src`** also works; the file-scoped lines above make expected locations obvious.
 
-**Runtime:** `cargo test` for this crate can take several minutes on first run (compilation + tests). A long compile is **not** a hang.
+**Runtime:** `cargo test` for this crate can take several minutes on first run (compilation + tests). A long compile is **not** a hang. First-time dependency download can print network activity; wait for **`cargo`** to exit **0** before interpreting **`rg`** results.
+
+**Exit codes:** With **`set -e`**, any **`cargo`** failure or **`rg`** with **no matches** (exit **1**) aborts the block — treat that as **verification failed** until you fix cwd/block choice. Most such aborts are **wrong directory or wrong block**, not missing Rust code; re-read **Two different directories named `src`** and **Common instruction defects** before using outcome naming in **TESTER.md**.
 
 ### B — Alternate: your cwd is already `src-tauri/` (crate root)
 
