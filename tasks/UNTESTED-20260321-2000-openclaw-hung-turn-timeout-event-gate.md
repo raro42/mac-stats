@@ -11,17 +11,29 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 1. `TurnOutputGate` is defined as `pub type TurnOutputGate = Arc<AtomicBool>` in `commands/turn_lifecycle.rs`. The tool loop (`commands/tool_loop.rs` and related paths) calls `gate_allows_send` so sends are suppressed after the gate is closed.
 2. `finalize_turn_timeout` in `commands/turn_lifecycle.rs` returns `OllamaReply` whose `text` starts with `**Turn timed out**` and includes the budget in seconds (see the `format!` that builds the user message).
 3. **Log strings (static check):** The following literals appear in **mac-stats** Rust sources as written below (copy/paste safe; use the verification `rg` commands). A live Discord timeout repro is **optional**, not required for pass.
-   - Substring **`closing output gate after turn wall-clock timeout`** — emitted from **`src-tauri/src/commands/ollama.rs`** (router path when the wall-clock limit fires).
-   - Substrings **`turn wall-clock timeout`** and **`closing output gate and running cleanup`** — both appear in the **same** warning format string in **`src-tauri/src/commands/turn_lifecycle.rs`** (`finalize_turn_timeout`).
+   - Substring **`closing output gate after turn wall-clock timeout`** — in **`src-tauri/src/commands/ollama.rs`** (router path when the wall-clock limit fires).
+   - Substrings **`turn wall-clock timeout`** and **`closing output gate and running cleanup`** — both appear inside the **same** `tracing::warn!` format string in **`src-tauri/src/commands/turn_lifecycle.rs`** (`finalize_turn_timeout`). **Expected:** the two `rg` lines in block **A**/**B** may report the **same line number** twice; that still counts as pass.
 4. `cargo check` and `cargo test` run from **`src-tauri/`** succeed on the verification host (this project targets **macOS**; use a Mac for verification so results match maintainer expectations).
 
 ## Testing instructions
 
-### Operator queue / filename (avoid handoff confusion)
+### Which task file to follow (avoid defective copy-paste)
 
-- **Canonical queue name after coder handoff:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` (same date stamp and slug).
-- **While instructions are under repair:** the same content may temporarily live as **`TESTPLAN-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**. Treat **stamp + slug** as the task identity, not the prefix alone.
-- **If `UNTESTED-…` is missing** but you have **`CLOSED-…`** or **`TESTPLAN-…`** for **20260321-2000** / **openclaw-hung-turn-timeout-event-gate**, follow **`003-tester/TESTER.md`** for renames. The **shell commands below do not depend** on which of those filenames you opened. Missing **`UNTESTED-…`** alone is a **queue/handoff** issue, not evidence that the Rust gate is absent.
+- **Follow this document’s verification blocks only.** Identity is **stamp `20260321-2000`** + slug **`openclaw-hung-turn-timeout-event-gate`**, regardless of whether the filename prefix is `TESTPLAN-`, `UNTESTED-`, or `TESTING-`.
+- **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` is not a spec.** It is an **append-only archive** of old test reports. Some appended commands used **`rg … src/`** (top-level frontend), which is **wrong** for this feature and produces **false failures**. Do **not** copy verification commands from `CLOSED-*`; use the blocks under **Verification commands** in **this** file.
+- **Tester workflow (`003-tester/TESTER.md`):** The step **rename `UNTESTED-…` → `TESTING-…`** applies to the **queue file**. If the queue still shows **`TESTPLAN-…`**, treat that as **instructions not yet handed back**: ask the coder to finish by renaming **`TESTPLAN-…` → `UNTESTED-…`** (same stamp + slug) before you start testing.
+
+### Operator queue / filename (handoff)
+
+- **Ready for retest:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
+- **Under instruction repair:** `tasks/TESTPLAN-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` (same body; rename to `UNTESTED-…` when the coder is done).
+
+### Shell compatibility
+
+- The blocks below use **`bash`** syntax (`set -e`, `$(…)`). On macOS, **Terminal.app** defaults to **zsh**, which understands these snippets as written.
+- If your login shell is **fish** (or another non-POSIX shell), run the block explicitly with Bash, for example:  
+  `bash -lc 'set -e; REPO_ROOT="$(git rev-parse --show-toplevel)"; …'`  
+  or paste the block after running **`bash`** interactively. **Do not** run the same script verbatim in **fish**; `set -e` and `$(…)` differ.
 
 ### Environment
 
@@ -76,7 +88,7 @@ command -v rg >/dev/null && echo "OK: rg" || echo "WARN: install ripgrep or sear
 |--------|------|
 | Preflight | Both `test -f` lines succeed; you know your repo root path. |
 | `cargo check` + `cargo test` in `src-tauri/` | Exit **0**; **zero** failing tests. |
-| `rg` for gate symbols | At least one match per command in block **A** or **B** (see paths for your cwd). |
+| `rg` for gate symbols | At least one match for each **distinct** pattern in block **A** or **B** (see paths for your cwd). For **`turn_lifecycle.rs`**, the two log-string `rg` lines may both hit the **same** source line — that is still pass. |
 | Top-level `src/` | May show **no** matches for Rust gate strings — **not** a failure. |
 
 ### Optional runtime check
@@ -87,7 +99,7 @@ To see log lines in a real run, reproduce or simulate a turn timeout and grep **
 
 ### A — Recommended: repo root as cwd
 
-Shell: **bash** or **zsh**. Copy the whole block. **`set -e`** stops on the first failing command — do **not** append `|| true` to `cd` or `git rev-parse` here; a wrong directory must **fail** the script.
+Use **bash** or **zsh** (or `bash -lc '…'` from fish). Copy the whole block. **`set -e`** stops on the first failing command — do **not** append `|| true` to `cd` or `git rev-parse` here; a wrong directory must **fail** the script.
 
 ```bash
 set -e
@@ -108,17 +120,20 @@ rg -n "closing output gate and running cleanup" src-tauri/src/commands/turn_life
 
 **Not in a git checkout?** Replace the first three lines with a manual `cd /path/to/mac-stats` (the directory containing `src-tauri/`), then run from `test -f src-tauri/Cargo.toml` onward.
 
-**Why two files for log strings:** The router line with **`closing output gate after`** is only in **`ollama.rs`**. The **`turn wall-clock timeout`** / **`closing output gate and running cleanup`** pair lives in **`turn_lifecycle.rs`**. A single `rg` over **`src-tauri/src`** also works; the file-scoped lines above make expected locations obvious.
+**Why two files for log strings:** The router line with **`closing output gate after`** is only in **`ollama.rs`**. The **`turn wall-clock timeout`** / **`closing output gate and running cleanup`** pair is in **`turn_lifecycle.rs`** inside **one** format string — **both `rg` commands may print the same line** (same line number twice). Optional single check:  
+`rg -n "turn wall-clock timeout|closing output gate and running cleanup" src-tauri/src/commands/turn_lifecycle.rs`  
+You should see **one** line containing both substrings. A single broad `rg` over **`src-tauri/src`** also works; the file-scoped lines above make expected locations obvious.
 
 **Runtime:** `cargo test` for this crate can take several minutes on first run (compilation + tests).
 
 ### B — Alternate: your cwd is already `src-tauri/` (crate root)
 
-Use this block **only** when `pwd` is the directory that contains **`Cargo.toml`** and a **`src/`** subdirectory (that **`src/`** is **Rust**, not the repo’s top-level frontend `src/`).
+Use this block **only** when `pwd` is the directory that contains **`Cargo.toml`** and a **`src/`** subdirectory (that **`src/`** is the **Rust crate source**, not the repo’s top-level frontend **`src/`**). Quick sanity check before `rg`: **`test -f src/commands/turn_lifecycle.rs`** must succeed; if it fails, you are not in `src-tauri/`.
 
 ```bash
 set -e
 test -f Cargo.toml
+test -f src/commands/turn_lifecycle.rs
 cargo check && cargo test
 
 rg -n "TurnOutputGate|gate_allows_send|finalize_turn_timeout" src

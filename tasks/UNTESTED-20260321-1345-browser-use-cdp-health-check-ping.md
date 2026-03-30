@@ -12,7 +12,8 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 
 ## Operator filename (TESTER.md / 003-tester)
 
-- **Executable queue file (only this name):** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`. At the start of a normal test run, rename **`UNTESTED-` → `TESTING-`**, execute the steps below, then follow your runbook for **`TESTING-` → `CLOSED-`** or failure naming.
+- **If the task file on disk is `TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`:** instructions are **under revision**. Testers **must not** rename **`TESTPLAN-` → `TESTING-`** or execute the gate until a coder publishes **`UNTESTED-…`** (same stamp and slug).
+- **Executable queue file (only this name for a real run):** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`. At the start of a normal test run, rename **`UNTESTED-` → `TESTING-`**, execute the steps below, then follow your runbook for **`TESTING-` → `CLOSED-`** or failure naming.
 - **Handoff defect — do not substitute other prefixes for this slug:** If **`UNTESTED-…` is missing** at repo tip, **stop**. Do **not** rename `CLOSED-…` or `TESTPLAN-…` to `TESTING-…` to “run” this task unless your operator guide **explicitly** authorizes that exception. Typical fix: pull/sync to a revision where the coder published **`UNTESTED-…`** (after **`TESTPLAN-` → `UNTESTED-`**), or file a handoff defect. Treating historical **`CLOSED-…`** as the live test target caused false **TESTPLAN-** outcomes (full-suite noise) and bypassed the narrow gate below.
 - If **`tasks/TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md` exists** (and **`UNTESTED-…` is absent**): testing instructions are **under revision**. Do **not** rename `TESTPLAN-` → `TESTING-` for execution; wait for **`TESTPLAN-` → `UNTESTED-`**, then pick up **`UNTESTED-…`**.
 - **`TESTER.md` / templates** that still mandate an **unfiltered** `cargo test` / `cargo test --no-fail-fast` / `cargo test -p mac_stats --no-fail-fast` with **no** `cdp_retry_` filter for this slug are **stale for pass/fail**. **Closure** for this slug depends **only** on **steps 1–4** in **Testing instructions** (see **Pass/fail scope**).
@@ -21,8 +22,9 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 ## Environment
 
 - **Checkout:** mac-stats repository root (directory that contains `src-tauri/`).
-- **Sanity check (once per session):** from that root, `test -f src-tauri/Cargo.toml` must succeed before running the `rg` lines (paths below assume repo root).
-- Run every command below from **repository root** unless `cd src-tauri` is shown.
+- **Sanity check (once per session):** from that root, `test -f src-tauri/Cargo.toml` must succeed before running the `rg` lines (paths below assume repo root). If this fails, you are in the wrong directory (e.g. `tasks/`, `src-tauri/`, or another clone) — `cd` to the repo root first.
+- Run every command below from **repository root** unless `cd src-tauri` is shown. After `cd src-tauri && …`, return to repo root for any following `rg` that uses `src-tauri/…` paths, or use the copy-paste block’s subshell form so cwd stays at root.
+- **Shell / pipelines:** Paste **copy-paste** and **step 1** blocks into **bash**, or enable **pipefail** first (`bash`: `set -o pipefail`; **zsh**: `setopt pipefail`). Without pipefail, `rg … | head` can exit **0** even when `rg` finds **no** lines (false pass).
 - **`rg`:** ripgrep must be available on `PATH` (same as other task files).
 - **No live Chrome / CDP session** is required for steps **1–4** (static review, compile, lib unit tests, spot-check).
 - **Rust:** stable toolchain able to build `mac_stats` (same as normal mac-stats development).
@@ -39,10 +41,12 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 
 ### Copy-paste — full gate (from repository root)
 
-Run this block **as-is** after the sanity check (`test -f src-tauri/Cargo.toml`). It is equivalent to steps **1–3**; still perform step **4** (manual read) afterward.
+Run this block **as-is** in **bash** after the sanity check (`test -f src-tauri/Cargo.toml`). It is equivalent to steps **1–3**; still perform step **4** (manual read) afterward.
 
 ```bash
 set -e
+set -o pipefail
+test -f src-tauri/Cargo.toml || { echo >&2 "ERROR: run from mac-stats repo root (missing src-tauri/Cargo.toml)."; exit 1; }
 rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs
 rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20
 ( cd src-tauri && cargo check -p mac_stats && cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast )
@@ -52,12 +56,15 @@ The subshell `( cd src-tauri && … )` keeps the **current directory** at repo r
 
 ### 1) Static review (required)
 
+From repo root, with **pipefail** enabled (see **Environment**), run:
+
 ```bash
+set -o pipefail
 rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs
 rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20
 ```
 
-**Pass:** the first command lists matches in `browser_agent/mod.rs`; the second’s first lines (up to **20** shown) include the anti-`block_on` comment / doc near `check_browser_alive` and `evaluate_one_plus_one_blocking_timeout`. If you need more context, re-run the second command without `| head -n 20`.
+**Pass:** the first command exits **0** and prints **non-empty** lines from `browser_agent/mod.rs`. If it prints nothing or exits non-zero, **fail** (wrong cwd, wrong path, or symbols removed). The second command exits **0** and its first lines (up to **20** shown) include the anti-`block_on` comment / doc near `check_browser_alive` and `evaluate_one_plus_one_blocking_timeout`. If you need more context, re-run the second command without `| head -n 20`.
 
 ### 2) Compile (required)
 
@@ -69,13 +76,13 @@ From `src-tauri/`, `cargo check -p mac_stats` alone is **acceptable** (explicit 
 
 ### 3) Targeted unit tests (required)
 
-Use **only** this command for the automated test gate ( **`--lib`** limits scope to library unit tests and avoids pulling unrelated targets into the bar):
+Use **only** this command for the automated test gate ( **`--lib`** limits scope to library unit tests and avoids pulling unrelated targets into the bar). The filter is a **substring** of the test name; it must be run from **`src-tauri/`** (or with workspace-aware flags that resolve `mac_stats` the same way).
 
 ```bash
 cd src-tauri && cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast
 ```
 
-**Pass:** Cargo **runs** the `cdp_retry_`-filtered lib tests and reports a **non-zero** count. Expect **at least 2** tests (current names below). If Cargo reports **0** tests executed, **fail** this step (wrong directory, typo in filter, wrong package, or renamed tests — escalate).
+**Pass:** Cargo **runs** the `cdp_retry_`-filtered lib tests and reports a **non-zero** count. Expect **at least 2** tests (current names below). If Cargo reports **0** tests executed, **fail** this step (wrong directory — e.g. running from repo root **without** `cd src-tauri`, typo in filter, wrong package, or renamed tests — escalate).
 
 - `browser_agent::tests::cdp_retry_skipped_when_health_error_also_looks_like_connection_error`
 - `browser_agent::tests::cdp_retry_allowed_for_plain_connection_error_without_health_prefix`
@@ -103,3 +110,7 @@ If it fails, **do not** fail the task **unless** the failure is in the **`cdp_re
 ## Canonical history
 
 Cumulative tester reports and older verification notes: **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** (reference only).
+
+## Publication workflow (TESTPLAN → UNTESTED)
+
+While instructions are edited, the task may temporarily live as **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`**. When ready for **`003-tester`**, the coder renames **`TESTPLAN-` → `UNTESTED-`** (same stamp and slug). **This checkout** uses the published name **`UNTESTED-…`** for retest.
