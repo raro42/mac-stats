@@ -1467,3 +1467,14 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Outcome naming (operator):** pass → **`CLOSED-…`**; implementation fail → **`TESTED-…`**; defective test plan → **`TESTPLAN-…`**. Repo `TESTER.md` fail/block → **`WIP-…`** — not applicable.
 - **Outcome:** **PASS** — rename **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** after this append.
 
+### Re-verify — 2026-03-30 UTC (`003-tester/TESTER.md`; operator target `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only)
+
+- **Rename UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` was **not present**; `tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` was renamed to **`TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** for this run. No other `UNTESTED-*` file was used.
+- **Commands run:**
+  - `cd src-tauri && cargo check && cargo test` — pass (library crate: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — no matches (task verification block lists `src/`; Rust is under `src-tauri/src/`)
+  - same pattern on `src-tauri/src` — matches in `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+- **Acceptance criteria:** All satisfied (`TurnOutputGate` = `Arc<AtomicBool>`; `gate_allows_send` in tool loop; `finalize_turn_timeout` text starts `**Turn timed out**` with budget `**{}s**`; `turn wall-clock timeout` / `closing output gate and running cleanup` in `turn_lifecycle.rs`; `closing output gate after turn wall-clock timeout` in `ollama.rs`).
+- **Outcome naming (operator):** pass → **`CLOSED-…`**; implementation fail → **`TESTED-…`**; defective test plan / environment → **`TESTPLAN-…`**. Repo `003-tester/TESTER.md` fail/block → **`WIP-…`** — not applicable.
+- **Outcome:** **PASS** — rename **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** after this append.
+

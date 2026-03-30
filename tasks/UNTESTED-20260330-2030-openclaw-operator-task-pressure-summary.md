@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`**. **Workflow:** **`FEAT → WIP → UNTESTED`** — backlog filename **`tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md`** was not present at start; replayed naming by **`UNTESTED → FEAT → WIP`**, then verified implementation and closed with **`WIP → UNTESTED`**. **Implementation (mac-stats):** `task::format_operator_task_pressure_summary`, `context_assembler::fragments::live_metrics_execution_system_section` (wired from `commands/ollama.rs`), `task/review.rs` `pub(crate)` review constants. **No Rust changes** this pass (already satisfied acceptance criteria). **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** — **pass** (`task::tests::operator_task_pressure_summary_empty_dir`). **Section 6 — Testing instructions** includes quick checklist (Section 5 first).
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`**. **Workflow:** picked **`tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md`** (restored from prior **`UNTESTED`**), renamed **`FEAT → WIP`**, verified implementation in-tree, added **Section 6 — Testing instructions** (FEATURE-CODER handoff), renamed **`WIP → UNTESTED`**. **Implementation (mac-stats):** `task::format_operator_task_pressure_summary`, `context_assembler::fragments::live_metrics_execution_system_section`, **`commands/ollama.rs`** (`metrics_for_system` → `fragments::live_metrics_execution_system_section()`), `task/review.rs` `pub(crate)` review constants. **No Rust changes** this run (acceptance criteria already met). **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** — **pass** (`task::tests::operator_task_pressure_summary_empty_dir`).
 - **Next step:** Tester runs **Section 6** (after **Section 5**) on **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
@@ -38,6 +38,7 @@ mac-stats already logs `Task scan: open=…` in the review loop, but the **agent
 - **`src-tauri/src/task/review.rs`** — `TASK_REVIEW_INTERVAL_SECS`, `TASK_WIP_STALE_TIMEOUT_SECS`, `TASK_REVIEW_MAX_OPEN_PER_CYCLE` (`pub(crate)`), used by stale-WIP logic and the new summary text.
 - **`src-tauri/src/task/mod.rs`** — `format_operator_task_pressure_summary()`.
 - **`src-tauri/src/commands/context_assembler.rs`** — `live_metrics_execution_system_section()` appends the task block after metrics.
+- **`src-tauri/src/commands/ollama.rs`** — agent-router execution path sets `metrics_for_system` from `fragments::live_metrics_execution_system_section()` so Discord / scheduler / task-runner turns include the task backlog block.
 
 ---
 
@@ -60,6 +61,8 @@ rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_secti
 ---
 
 ## 6. Testing instructions
+
+**FEATURE-CODER:** After the coder run (**`FEAT → WIP → UNTESTED`**), the **tester** owns this section. Run **Section 5** before manual checks.
 
 **Required order:** run **Section 5 — Verification (automated)** first, then manual or optional runtime steps below.
 
