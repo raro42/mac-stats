@@ -1,15 +1,13 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — Implemented **`format_operator_task_pressure_summary`** in **`src-tauri/src/task/mod.rs`**, wired into **`live_metrics_execution_system_section`** in **`src-tauri/src/commands/context_assembler.rs`**; review limits exported as **`pub(crate)`** constants from **`src-tauri/src/task/review.rs`**; unit test **`operator_task_pressure_summary_empty_dir`**. Module doc **`review.rs`** corrected (loop is 60 s, not 10 min).
-- **Coder verify (UTC):** 2026-03-30 — `cd src-tauri && cargo check` and **`cargo test operator_task_pressure`** green on this tree.
-- **Next step:** **UNTESTED** — tester runs **Testing instructions** below (manual grep / optional Discord or CPU-window turn).
+- **Coder (UTC):** 2026-03-30 — Cycled **FEAT → WIP → UNTESTED** per **FEATURE-CODER**; implementation verified in-tree (`format_operator_task_pressure_summary`, `live_metrics_execution_system_section`, **`task/review.rs`** `pub(crate)` constants); **`cargo check`** and **`cargo test operator_task_pressure`** green.
+- **Next step:** **UNTESTED** — tester runs **§6 Testing instructions** (manual / optional runtime).
 ---
 
 # UNTESTED: OpenClaw parity — operator task pressure summary in execution context
 
 **Created (UTC):** 2026-03-30 20:30  
-**Coder handoff (UTC):** 2026-03-30  
 **Source:** OpenClaw vs mac-stats review  
 **Topic:** Give the execution-time model compact task backlog + review-loop limits next to live metrics.
 
@@ -59,16 +57,16 @@ rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_secti
 
 ### What to verify
 
-- Any **agent-router** Ollama execution (Discord agent channel, **TASK_RUN** / scheduler with tools, CPU-window chat that uses the execution stack) receives a system prompt whose metrics section is followed by **`## Task backlog (operator)`**, **`Counts: open=…`**, and **`Review loop: every 60 s, up to 3 open task(s)…`** (numbers must match **`task/review.rs`** if those constants change).
+- Any **agent-router** Ollama execution (Discord agent channel, **TASK_RUN** / scheduler with tools, CPU-window chat that uses the execution stack) receives a system prompt whose **`Current system metrics:`** block is followed by **`## Task backlog (operator)`**, **`Counts: open=…`**, and a **`Review loop:`** line whose numbers match **`task/review.rs`** (`TASK_REVIEW_INTERVAL_SECS`, `TASK_REVIEW_MAX_OPEN_PER_CYCLE`, `TASK_WIP_STALE_TIMEOUT_SECS`). As of this task, expect **`every 60 s`**, **`up to 3 open task(s) started per cycle`**, and **`30 min`** stale WIP wording.
 - With several tasks in **`~/.mac-stats/task/`**, counts in the block match reality (compare to **`mac_stats --task list`** or **`TASK_LIST`**).
 - **Regression:** Live metrics lines (**CPU:**, **Load**, etc.) still appear unchanged above the new block.
 
 ### How to test
 
-1. Run **Verification (automated)** above. The filter **`operator_task_pressure`** runs **`task::tests::operator_task_pressure_summary_empty_dir`**, which sets **`MAC_STATS_TASK_DIR`** to an empty temp directory and asserts the summary contains **`## Task backlog (operator)`**, zero **`open=`** / **`wip=`** counts, and **`Review loop: every 60 s`** (aligned with **`TASK_REVIEW_INTERVAL_SECS`** in **`task/review.rs`**).
-2. **Static inspection:** Open **`context_assembler.rs`** and confirm **`live_metrics_execution_system_section`** calls **`format_operator_task_pressure_summary`** immediately after **`live_metrics_for_prompt`** (metrics block first, then task block).
-3. **Error path (optional):** If the task directory cannot be read, the prompt must still include **`## Task backlog (operator)`** on one line with **`(unavailable:`** and an error hint — no panic. Easiest check is code review of **`format_operator_task_pressure_summary`** in **`task/mod.rs`** (`Err` branch).
-4. **Optional (runtime):** Start mac-stats with `-vvv`, trigger one short Discord or CPU-window message that hits **`answer_with_ollama_and_fetch`**, then search logs for a truncated system prompt or add a temporary `debug3!` if your build already logs assembled prompts — alternatively, use a debugger breakpoint on **`build_execution_system_content`** and inspect **`metrics_for_system`** containing both **Current system metrics** and **Task backlog (operator)**.
+1. Run **§5 Verification (automated)**. The filter **`operator_task_pressure`** runs **`task::tests::operator_task_pressure_summary_empty_dir`**, which sets **`MAC_STATS_TASK_DIR`** to an empty temp directory and asserts the summary contains **`## Task backlog (operator)`**, zero **`open=`** / **`wip=`** counts, and **`Review loop: every 60 s`** (aligned with **`TASK_REVIEW_INTERVAL_SECS`**).
+2. **Static inspection:** In **`context_assembler.rs`**, confirm **`live_metrics_execution_system_section`** formats **`live_metrics_for_prompt()`** first, then **`format_operator_task_pressure_summary()`** (metrics block first, task block second).
+3. **Error path (optional):** If the task directory cannot be read, the prompt must still include **`## Task backlog (operator)`** with **`(unavailable:`** and an error hint — no panic. Code review **`format_operator_task_pressure_summary`** in **`task/mod.rs`** (`Err` branch).
+4. **Optional (runtime):** Start mac-stats with **`-vvv`**, trigger one short Discord or CPU-window turn that uses **`answer_with_ollama_and_fetch`**, then confirm logs or debugger inspection of **`metrics_for_system`** / **`build_execution_system_content`** shows both **Current system metrics** and **Task backlog (operator)** in one string.
 
 ### Pass / fail criteria
 

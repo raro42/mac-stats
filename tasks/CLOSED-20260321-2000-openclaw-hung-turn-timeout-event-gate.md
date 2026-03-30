@@ -1207,3 +1207,15 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Comandos:** `cd src-tauri && cargo check` — pass; `cd src-tauri && cargo test` — pass (**875** tests librería, 0 failed); `rg …` en `src/` — sin matches (Rust en `src-tauri/src/`); `rg … src-tauri/src` — matches en `commands/ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`.
 - **Criterios de aceptación:** Cumplidos.
 - **Resultado:** **PASS** → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
+
+### Re-verify — 2026-03-30 (UTC), `003-tester/TESTER.md` (único objetivo `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`)
+
+- **Fecha / hora:** 2026-03-30 (UTC, ejecución del agente en Cursor).
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía** en el árbol; no se eligió otro `UNTESTED-*`. Fase TESTING: **`CLOSED-…` → `TESTING-…`** al inicio de este run; con **PASS** se restaura **`CLOSED-…`**. Criterio del operador: pass → `CLOSED-`; fallo de implementación → `TESTED-`; instrucciones / entorno defectuosos → `TESTPLAN-`.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (crate de librería: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - El bloque de verificación de la tarea lista `rg … src/`; en `src/` de la raíz (JS) no hay coincidencias Rust; implementación en `src-tauri/src/`.
+- **Criterios de aceptación:** Cumplidos (`TurnOutputGate` como `Arc<AtomicBool>`; `gate_allows_send` en tool loop; `finalize_turn_timeout` con prefijo `**Turn timed out**` y presupuesto en segundos; log del router `closing output gate after turn wall-clock timeout`; warns en turn-lifecycle `turn wall-clock timeout` / `closing output gate and running cleanup`; `cargo check` / `cargo test` en verde).
+- **Resultado:** **PASS** — restaurar **`TESTING-…` → `CLOSED-…`**: `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
