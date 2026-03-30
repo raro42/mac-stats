@@ -14,7 +14,7 @@ Sections that refer to the “queue file” mean **`UNTESTED-…`** once that fi
 
 **No** mac-stats product code change is required for this task file.
 
-**Instruction revision note:** A prior run flagged **Testing instructions** or the **stated environment** as defective (not a mac-stats implementation failure). This markdown body is the only authoritative spec: follow **Verification commands** below exactly, not snippets copied from **`CLOSED-*`** history (those may use wrong paths such as top-level **`src/`**). **Latest repair (2026-03-30, fourth pass — instruction clarity):** (1) **Queue header:** Rules are ordered by **`TESTPLAN-` vs `UNTESTED-` basename** so testers who open **`TESTPLAN-…`** see “stop” first. (2) **Happy path / closure:** Renamed the post-bash phase so it is **not** labeled “step **3**” (only **Copy-paste order** uses **0 / 0b / 1 / 2** for shell). (3) **Testing instructions → Start here:** Explicit “mac-stats only” and “one terminal session” before the long prose. (4) **Fish:** Multiline `set -e` blocks must run under **`bash`** (or `bash -lc`), not pasted raw into **fish**. (5) Retained: post-probe bullets under **Queue and environment policy** (not numbered paste steps), **Preflight ≠ A2**, **0 → 0b → 1 → 2** order, symlink **`cd`**, queue conflict, **toolchain → `WIP-`**, **A1 xor A2**, **IDE partial-selection**, **expected `rg`** (same line twice in **`turn_lifecycle.rs`**).
+**Instruction revision note:** A prior run flagged **Testing instructions** or the **stated environment** as defective (not a mac-stats implementation failure). This markdown body is the only authoritative spec: follow **Verification commands** below exactly, not snippets copied from **`CLOSED-*`** history (those may use wrong paths such as top-level **`src/`**). **Latest repair (2026-03-30, fifth pass — tester retest):** (1) **Shell order cheat-sheet** (new **At a glance** under **Testing instructions**): one numbered list that maps **0 / 0b / 1 / 2** to concrete actions so nothing is mistaken for an extra bash “step 3”. (2) **Probe section:** Removed the nested “**0.**” label under **Tester quick gate** (it duplicated **Copy-paste order** step **0** and confused readers). (3) **Invariant before block A1/A2/B:** Explicit **`pwd`** check — you must be at **mac-stats repo root** (directory whose **child** is `src-tauri/`), not inside `src-tauri/`, before pasting **A1**/**A2**; crate-root workers use **B** only. (4) **Cursor / multi-root:** One-line warning that the **integrated terminal’s cwd** may be the **workspace folder**, not `mac-stats`, even when the repo is open — run the probe from that terminal and obey printed **`cd`**. (5) **A2 placeholder:** Documented that **`$HOME/...`** on the **`cd`** line is valid in **bash** (tilde **`~/...`** also expands). Retained: **Preflight ≠ A2**, **fish → bash**, **toolchain / non-macOS → `WIP-` not `TESTPLAN`**, **A1 xor A2** for verification, **expected `rg`** (same line twice in **`turn_lifecycle.rs`**).
 
 **Coder handoff (future):** **`UNTESTED-…` → `TESTPLAN-…`** for another instruction repair, edit **Testing instructions** / clarity wording only, then **`TESTPLAN-…` → `UNTESTED-…`**. Testers **only** start from **`UNTESTED-…`** — **not** **`TESTPLAN-…`**.
 
@@ -35,11 +35,26 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 
 ## Testing instructions
 
+### At a glance (shell order — read this first)
+
+This list is the **same** sequence as **Copy-paste order**; use it when the longer sections feel ambiguous.
+
+- **Step 0 — Directory probe:** Paste the **bash** script under **Tester quick gate** (the fenced block). **No** `set -e` in this probe. It prints **BLOCK: …** — that chooses **A1**/**A2** vs **B** for step **2** only.
+- **Step 0b — Align `pwd` (when the probe prints a `cd …` line):** Run that **`cd`**, then run **`test -f src-tauri/Cargo.toml && echo OK`**. When the probe says **BLOCK: B**, skip **0b**’s repo-root test — you will run block **B** in step **2** from **`src-tauri/`** (crate root), where **`test -f src-tauri/Cargo.toml`** is **wrong** (that path would mean `src-tauri/src-tauri/…`).
+- **Step 1 — Preflight:** Paste **exactly one** of the two snippets under **Preflight (required)** (git variant **or** no-git variant). Each snippet starts with **`set -e`**. This is **not** verification block **A2** (Preflight has **no** `cargo` / `rg`).
+- **Step 2 — Verification:** Paste **exactly one** complete block **A1**, **A2**, or **B** from **Verification commands**, from the first **`set -e`** through the **last `rg`**, **without** re-running Preflight inside that paste.
+
+**Before step 2 (A1 or A2 only):** Your **`pwd`** must be the **mac-stats repository root** — the directory that **contains** a **`src-tauri/`** subdirectory (so **`test -f src-tauri/Cargo.toml`** succeeds). If your **`pwd`** is **`…/mac-stats/src-tauri`**, you are **not** at repo root: either **`cd ..`** and use **A1**/**A2**, or stay put and use block **B** (crate root) instead.
+
+**Before step 2 (block B only):** Your **`pwd`** must be the **`src-tauri/`** crate root — where **`test -f Cargo.toml`** and **`test -f src/commands/turn_lifecycle.rs`** both succeed.
+
+**Cursor / VS Code:** The integrated terminal often starts in the **workspace root**. If the workspace is a **parent** folder (monorepo) or a different clone path, **`pwd`** may **not** be mac-stats until you **`cd`** — run step **0** in **that** terminal and follow the printed **`cd`**.
+
 ### Start here (read before any shell)
 
 - **Repository:** All commands target **this checkout: mac-stats** (the tree that contains **`src-tauri/Cargo.toml`**). The title says “OpenClaw” for **product behavior** only — **do not** `cd` to **`../openclaw`**, **do not** search or build there; that is **out of scope** and will fail.
 - **Queue:** If the task file basename is **`TESTPLAN-…`**, you are **not** on the tester queue — **stop** (see header above). If it is **`UNTESTED-…`**, follow **TESTER.md** rename rules, then run the shell sequence below in **one** terminal session (same shell for **0 → 0b → 1 → 2**).
-- **Single source of truth for shell order:** Only the **Copy-paste order** table defines steps **0**, **0b**, **1**, **2**. Lists labeled “TL;DR”, “Before you run anything”, or “Minimal run order” are **checklists or narrative** — they are **not** extra numbered bash steps after **2**.
+- **Single source of truth for shell order:** Only the **Copy-paste order** table defines steps **0**, **0b**, **1**, **2**. Lists labeled “TL;DR”, “Before you run anything”, “At a glance”, or “Minimal run order” are **checklists or narrative** — they are **not** extra numbered bash steps after **2**.
 
 **Canonical step numbers:** Only the **Copy-paste order** table (**0**, **0b**, **1**, **2**) defines the command sequence. Other sections use bullets or headings — they are explanations or policy, **not** additional numbered steps to interleave with **0**/**1**/**2**.
 
@@ -50,7 +65,7 @@ Run these **in order** in **one terminal** (bash or zsh per **Shell compatibilit
 | Step | What to run |
 |------|-------------|
 | **0** | **Tester quick gate** probe (below) — **no** `set -e` required. |
-| **0b** | If the probe prints **`cd '…'`**, run that **`cd`**, then **`test -f src-tauri/Cargo.toml && echo OK`** (for **A1**/**A2**). If probe says **BLOCK: B**, **do not** use **A1**/**A2**. |
+| **0b** | If the probe prints **`cd '…'`**, run that **`cd`**, then **`test -f src-tauri/Cargo.toml && echo OK`** (required before **A1**/**A2** in step **2**). If probe says **BLOCK: B**, you will paste block **B** from **`src-tauri/`** in step **2** — **skip** this repo-root **`test -f src-tauri/…`** (from crate root it fails by design). |
 | **1** | **Preflight (required)** — **git** variant (from any directory under mac-stats) **or** **no-git** variant (only after your **`pwd`** is already mac-stats **repo root**). |
 | **2** | Paste **exactly one** of **Verification commands → A1**, **A2**, or **B** from the first **`set -e`** through the **last `rg`**. **Do not** insert **Preflight** again inside this paste — step **1** already ran it once. |
 
@@ -94,7 +109,9 @@ Run these **in order** in **one terminal** (bash or zsh per **Shell compatibilit
 
 ### Tester quick gate (read first)
 
-0. **Pick the verification block** (run this **before** copying **A1**/**A2**/**B**; no `set -e` required). This probe **does not require `git`**: it detects **`src-tauri/`** crate root vs mac-stats **repo root** by walking **up** from **`pwd`** until it finds **`src-tauri/Cargo.toml`** + **`src-tauri/src/commands/turn_lifecycle.rs`**, or prints **BLOCK: none**. That fixes false **BLOCK: none** from **`tasks/`** and avoids assuming **`git rev-parse --show-toplevel`** equals the mac-stats folder (parent monorepos).
+**This subsection is Copy-paste order step 0** (directory probe only — **not** Preflight, **not** block **A1**/**A2**/**B**).
+
+**Pick the verification block** by running the script below **before** copying **A1**/**A2**/**B**. **No** `set -e` required. This probe **does not require `git`**: it detects **`src-tauri/`** crate root vs mac-stats **repo root** by walking **up** from **`pwd`** until it finds **`src-tauri/Cargo.toml`** + **`src-tauri/src/commands/turn_lifecycle.rs`**, or prints **BLOCK: none**. That fixes false **BLOCK: none** from **`tasks/`** and avoids assuming **`git rev-parse --show-toplevel`** equals the mac-stats folder (parent monorepos).
 
 ```bash
 if test -f Cargo.toml && test -f src/commands/turn_lifecycle.rs; then
@@ -347,7 +364,7 @@ rg -n "closing output gate and running cleanup" src-tauri/src/commands/turn_life
 
 ### A2 — Recommended: repo root, **no** `.git` (tarball / export)
 
-Use **A2** when **`git rev-parse` fails** or the tree has no `.git` directory — **not** when **A1** already worked. **Replace** **`/ABSOLUTE/PATH/TO/mac-stats`** on the **`cd`** line with the **absolute path** to your mac-stats root (the directory that **directly** contains **`src-tauri/`** — not `src-tauri/` itself, not a parent that only contains the zip name). **Edit that line before pasting**; leaving the placeholder verbatim will **`cd`** to a non-existent path and fail. After editing, **`test -f src-tauri/Cargo.toml`** must succeed; if it fails, the path is wrong.
+Use **A2** when **`git rev-parse` fails** or the tree has no `.git` directory — **not** when **A1** already worked. **Replace** **`/ABSOLUTE/PATH/TO/mac-stats`** on the **`cd`** line with the **absolute path** to your mac-stats root (the directory that **directly** contains **`src-tauri/`** — not `src-tauri/` itself, not a parent that only contains the zip name). **`bash`** expands **`$HOME/projects/mac-stats`** and **`~/projects/mac-stats`** on the **`cd`** line — both are fine. **Edit that line before pasting**; leaving the placeholder verbatim will **`cd`** to a non-existent path and fail. After editing, **`test -f src-tauri/Cargo.toml`** must succeed; if it fails, the path is wrong.
 
 ```bash
 set -e
