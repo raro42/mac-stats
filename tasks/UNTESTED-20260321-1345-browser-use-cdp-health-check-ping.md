@@ -8,7 +8,7 @@
 >
 > **Scope:** **mac-stats** repository only. All paths refer to **`src-tauri/src/browser_agent/mod.rs`** in that clone. Running these steps in a **different repo** (e.g. a sibling **openclaw** tree) is **out of scope** and invalid — use the mac-stats checkout that contains this `tasks/` file.
 >
-> **Testing instructions** revised **2026-03-30** (h): **(g)** plus **one canonical Step 3 one-liner** (copy-paste) with explicit “**not** Step 3” list; **TESTER.md vs this file** (unfiltered `cargo test` lines in templates are **not** the gate); **TESTPLAN-** only for instruction/handoff defects — **not** when an optional unfiltered suite fails but Step 3 passed; **Spanish/EN runbooks** — same English gate text is authoritative.
+> **Testing instructions** revised **2026-03-30** (i): **(h)** plus **outcome tri-check** (record pass/fail only after Step 3 shape + evidence); **legacy second-`rg`** note (equivalent to older `block_on|Never use` patterns; **no** `| head`); **explicit negation** — this slug **never** requires unfiltered `cargo test` / `cargo test --no-fail-fast` for acceptance; **TESTPLAN-** only for instruction/handoff defects — **not** when Step 3 passed but an optional full suite failed.
 
 ## Goal
 
@@ -59,6 +59,14 @@ The **Phase 0** table is the short decision guide; the bullets below spell out t
 - **Rust:** stable toolchain able to build `mac_stats` (same as normal mac-stats development).
 
 ## Testing instructions
+
+**Single-sentence gate rule:** This task **never** requires `cargo test` / `cargo test --no-fail-fast` **without** the substring **`cdp_retry_`** on the **same** command line. If **TESTER.md** (or a translated runbook) lists only `cd src-tauri && cargo test --no-fail-fast` as the final verification line, that line is **not** the acceptance bar for this slug — **Step 3** below replaces it. A failing unfiltered suite **does not** override a passing **Step 3**.
+
+**Before you name an outcome (tri-check — all must be true for pass):**
+
+1. **Step 3 shape:** The `cargo test` line you treat as mandatory includes **`--lib`**, **`cdp_retry_`**, and **`--no-fail-fast`**, with **`cdp_retry_` before any `--`** (test-binary args).
+2. **Step 3 evidence:** Cargo printed **`running N tests`** with **N ≥ 1** and **`test result: ok`** for that exact command.
+3. **No false TESTPLAN:** You are **not** failing the task or emitting **TESTPLAN-** solely because an **unfiltered** `cargo test --no-fail-fast` failed while **Step 3** passed.
 
 **Closure bar — pass/fail for this slug depends only on this table:**
 
@@ -280,6 +288,8 @@ rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALT
 rg -n -m 20 'Never use.*Handle::block_on|recv_timeout\(BROWSER_CDP_HEALTH_CHECK_TIMEOUT\)' src-tauri/src/browser_agent/mod.rs
 ```
 
+**Legacy equivalent (optional):** Older reports used `rg 'block_on|Never use .Handle::block_on' …` (sometimes with `| head -n 20`). That pattern is **acceptable** if it returns the anti-`block_on` comment, but **do not** pipe **`rg` to `head`** under **`set -o pipefail`** — use **`rg -n -m 20`** as in the copy-paste block. The lines above also require **`recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)`** as an alternate match so the health-check timeout stays visible in static review.
+
 **Pass:** the first command exits **0** and prints **non-empty** lines from `browser_agent/mod.rs`. If it prints nothing or exits non-zero, **fail** (wrong cwd, wrong path, or symbols removed). The second command exits **0** and prints **at least one** line: the in-file comment that forbids nested **`Handle::block_on`** (matches `Never use` … `Handle::block_on`) **and/or** the `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)` call in `evaluate_one_plus_one_blocking_timeout`. If you need more context, re-run the second command with a larger **`-m`** value or omit **`-m`** (may print many lines).
 
 **From `src-tauri/` cwd:** use `src/browser_agent/mod.rs` as the path for both **`rg`** commands (not `src-tauri/src/...`).
@@ -369,4 +379,4 @@ While instructions are edited, the task lives as **`TESTPLAN-20260321-1345-brows
 
 If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
 
-**This revision (h):** **`TESTPLAN-…` → `UNTESTED-…`** — **Single automated test bar** callout (forbidden vs Step 3); **TESTER.md / translation** misread as mandatory gate; item **8** in “what went wrong”; **`TESTPLAN-`** only for real instruction/handoff defects. Prior **(g):** basename-agnostic header, preflight strip, authority, `--lib` + `cdp_retry_`, report basename, wrong-command rows. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+**This revision (i):** **`TESTPLAN-…` → `UNTESTED-…`** — **Single-sentence gate rule** + **outcome tri-check**; **legacy second-`rg`** / no-`head` note; clarifies that **no** acceptance path requires unfiltered `cargo test` (addresses **TESTPLAN-** cycles that cited “full suite required”). Prior **(h):** Step 3 one-liner, **TESTER.md** stale line, item **8**, **TESTPLAN-** scope. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
