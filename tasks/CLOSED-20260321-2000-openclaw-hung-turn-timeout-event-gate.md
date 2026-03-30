@@ -1248,3 +1248,14 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
   - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — no matches (task lists `src/`; frontend JS tree has no Rust strings; implementation under `src-tauri/src/`)
 - **Acceptance criteria:** All satisfied.
 - **Outcome:** **PASS** — restore **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
+
+### Re-verify — 2026-03-30 (UTC), `003-tester/TESTER.md` (solo `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`)
+
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**; no se usó ningún otro `UNTESTED-*`. Fase TESTING: el archivo canónico se renombró **`CLOSED-…` → `TESTING-…`** al inicio de este run. Criterio del operador al cerrar: pass → **`CLOSED-`**; fallo de implementación → **`TESTED-`**; instrucciones de prueba / especificación de entorno defectuosas → **`TESTPLAN-`**. `003-tester/TESTER.md` del repo: fallo o bloqueo genérico → **`WIP-`**.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (crate librería: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — sin coincidencias (el bloque de verificación del task lista `src/`; ahí está el frontend JS; el Rust está en `src-tauri/src/`)
+- **Criterios de aceptación:** Cumplidos (`TurnOutputGate` = `Arc<AtomicBool>`; `gate_allows_send` en tool loop; `finalize_turn_timeout` con texto que empieza por `**Turn timed out**` y presupuesto en segundos; cadenas de log en fuente; `cargo check` / `cargo test` en verde).
+- **Resultado:** **PASS** — **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
