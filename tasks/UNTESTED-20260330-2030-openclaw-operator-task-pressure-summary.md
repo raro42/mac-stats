@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): on-disk rename chain **`FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md` → `WIP-…` → `UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`** (this file). Implementation in **`src-tauri`**: `task/mod.rs` (`format_operator_task_pressure_summary`, `count_tasks_by_status`), `task/review.rs` (review-loop constants), `commands/context_assembler.rs` (`live_metrics_execution_system_section`), `commands/ollama.rs` (`metrics_for_system` via shared fragment). **Verification (this run):** `cd src-tauri && cargo check && cargo test operator_task_pressure` — pass (`task::tests::operator_task_pressure_summary_empty_dir`). **Section 6 — Testing instructions** is the canonical tester handoff.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): on-disk rename chain **`FEAT-…` → `WIP-…` → `UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md` (this file)**. Implementation in **`src-tauri`**: `task/mod.rs` (`format_operator_task_pressure_summary`, `count_tasks_by_status`), `task/review.rs` (review-loop constants), `commands/context_assembler.rs` (`live_metrics_execution_system_section`), `commands/ollama.rs` (`metrics_for_system` via shared fragment). **Verification (this run):** `cd src-tauri && cargo check && cargo test operator_task_pressure` — **pass** (`task::tests::operator_task_pressure_summary_empty_dir`). **Section 6 — Testing instructions** is the canonical tester handoff.
 - **Next step:** Tester runs **Section 6** (after **Section 5**) on **`UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
@@ -58,6 +58,8 @@ cd src-tauri && cargo test
 rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_section" src-tauri/src/task/mod.rs src-tauri/src/commands/context_assembler.rs src-tauri/src/commands/ollama.rs
 ```
 
+Optional (FEATURE-CODER hygiene): `cd src-tauri && cargo clippy`
+
 ---
 
 ## 6. Testing instructions
@@ -79,6 +81,8 @@ cd src-tauri && cargo check && cargo test operator_task_pressure
 Optional full suite (acceptance criterion 3): `cd src-tauri && cargo test`
 
 Optional ripgrep sanity: `rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_section" src-tauri/src/task/mod.rs src-tauri/src/commands/context_assembler.rs src-tauri/src/commands/ollama.rs`
+
+Optional: `cd src-tauri && cargo clippy` (same as Section 5).
 
 ### Quick checklist (tester)
 
