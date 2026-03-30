@@ -1732,3 +1732,17 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Acceptance criteria:** All satisfied.
 - **Outcome naming (operator):** pass → **CLOSED-**; implementation fail → **TESTED-**; defective test plan/env → **TESTPLAN-**. Repo `003-tester/TESTER.md` uses **WIP-** on fail/block.
 - **Outcome:** **PASS** — restore filename to **`CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
+
+### Re-verify — 2026-03-30 UTC (`003-tester/TESTER.md`, operator path `UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only)
+
+- **Rename UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` was **not present**; no other `UNTESTED-*` file was used. **TESTING phase:** renamed **`CLOSED-…` → `TESTING-…`** before verification; after **PASS**, restore **`TESTING-…` → `CLOSED-…`**. (Operator outcomes: `CLOSED-` on pass, `TESTED-` on implementation fail, `TESTPLAN-` on defective test spec — not applicable. Repo `003-tester/TESTER.md` uses `WIP-…` for fail/block — not applicable.)
+
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (library crate: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches in `ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`
+  - Task body lists `rg … src/`; top-level `src/` has no Rust matches for these strings (Rust under `src-tauri/src/`).
+
+- **Acceptance criteria:** All satisfied (`TurnOutputGate` / `gate_allows_send`; `finalize_turn_timeout` with `**Turn timed out**` and budget; log strings in source; `cargo check` / `cargo test` green).
+
+- **Outcome:** **PASS** — final filename after this run: `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
