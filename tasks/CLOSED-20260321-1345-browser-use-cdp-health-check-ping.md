@@ -4158,3 +4158,19 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Acceptance criteria (1)–(3):** **pass**.
 
 **Outcome:** **CLOSED-** (éxito) — renombrar **`TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+
+
+---
+
+## Test report
+
+- **Date:** 2026-03-30 (local; host default timezone).
+- **Queue:** Started from `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; renamed `UNTESTED-` → `TESTING-` per `003-tester/TESTER.md`.
+- **PF-1:** `test -f src-tauri/Cargo.toml && test -f src-tauri/src/browser_agent/mod.rs` — OK from repo root `/Users/raro42/projects/mac-stats`.
+- **Steps 1–3 (Copy-paste — full gate):**
+  1. `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — exit 0, non-empty.
+  2. `rg -n -m 20 'Never use.*Handle::block_on|recv_timeout\(BROWSER_CDP_HEALTH_CHECK_TIMEOUT\)' src-tauri/src/browser_agent/mod.rs` — matched `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)` and anti-`block_on` comment (e.g. lines 5216, 5277).
+  3. `cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats` — exit 0.
+  4. `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast` — **`running 2 tests`**, **`test result: ok. 2 passed`** (873 filtered out).
+- **Step 4 (manual spot-check):** Opened `src-tauri/src/browser_agent/mod.rs`; `should_retry_cdp_after_clearing_session` documents that `check_browser_alive` already clears session on “Browser unresponsive” and that compound connection-shaped messages must not get generic CDP reconnect retry (health wins).
+- **Outcome:** **PASS** — all acceptance steps 1–4 satisfied; renamed `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
