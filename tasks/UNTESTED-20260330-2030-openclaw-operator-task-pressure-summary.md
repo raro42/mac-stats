@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): ciclo **`FEAT → WIP → UNTESTED`** para **`20260330-2030-openclaw-operator-task-pressure-summary`**. Archivo **`FEAT-…`** → **`WIP-…`** → **`UNTESTED-…`**. Implementación en **`src-tauri`**: `task/mod.rs` (`format_operator_task_pressure_summary`, `count_tasks_by_status`), `task/review.rs` (constantes públicas del review loop), `commands/context_assembler.rs` (`live_metrics_execution_system_section`), `commands/ollama.rs` (`metrics_for_system` vía fragmento compartido). Verificación coder: **`cd src-tauri && cargo check && cargo test operator_task_pressure`**: OK (`task::tests::operator_task_pressure_summary_empty_dir`). **§6 — Testing instructions** lista para el tester.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): ciclo **`FEAT → WIP → UNTESTED`** sobre **`20260330-2030-openclaw-operator-task-pressure-summary`**. Archivos: **`tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md`** → **`WIP-…`** → **`UNTESTED-…`** (este archivo). Implementación en **`src-tauri`**: `task/mod.rs` (`format_operator_task_pressure_summary`, `count_tasks_by_status`), `task/review.rs` (constantes del review loop), `commands/context_assembler.rs` (`live_metrics_execution_system_section`), `commands/ollama.rs` (`metrics_for_system` vía fragmento compartido). Verificación coder: **`cd src-tauri && cargo check && cargo test operator_task_pressure`**: OK (`task::tests::operator_task_pressure_summary_empty_dir`). **§6 — Testing instructions** lista para el tester (incluye handoff canónico).
 - **Next step:** El tester ejecuta **§6** (después de **§5**) en **`UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
@@ -61,6 +61,8 @@ rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_secti
 ---
 
 ## 6. Testing instructions
+
+**Canonical handoff:** esta sección es la fuente de verdad para el tester tras el renombrado **`WIP → UNTESTED`** (no eliminar al cambiar prefijos del archivo).
 
 **FEATURE-CODER:** After the coder run (**`FEAT → WIP → UNTESTED`**), the **tester** owns this section. Run **Section 5** before manual checks. **Coder:** leave reproducible smoke, checklist, and pass/fail criteria below; do not strip this section when renaming task-file prefixes.
 

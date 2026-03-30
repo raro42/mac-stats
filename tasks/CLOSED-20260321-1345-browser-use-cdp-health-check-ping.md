@@ -3869,3 +3869,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 
 **Resultado (convención del operador):** **CLOSED-** (pass) — renombrar **`TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
 
+---
+
+## Test report
+
+**Fecha / hora:** 2026-03-30 09:37 UTC.
+
+**Flujo TESTER.md (003-tester):** El operador citó `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; ese fichero **no existe** en el árbol (la tarea estaba como `CLOSED-…`). Se renombró **`CLOSED-` → `TESTING-`** para el ciclo de prueba (equivalente a `UNTESTED-` → `TESTING-` cuando no hay prefijo `UNTESTED-`). No se usó ningún otro `UNTESTED-*`.
+
+**Comandos ejecutados**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (875 passed, 0 failed en crate lib `mac_stats`; otros bins 0 tests; 1 doc-test ignored)
+
+**Criterios de aceptación (1)–(3):** cumplidos (incl. `clear_browser_session_on_error` / **Browser unresponsive** / `is_connection_error` y `should_retry_cdp_after_clearing_session` en `browser_agent/mod.rs`).
+
+**Resultado (convención del operador):** **CLOSED-** (pass) — renombrar **`TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+
