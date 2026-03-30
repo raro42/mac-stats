@@ -1,6 +1,6 @@
 # Browser use — CDP health check ping (`1+1`)
 
-> **Queue file:** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` — testers rename **`UNTESTED-` → `TESTING-`** to execute. **Testing instructions** were revised **2026-03-30** (coder pass): (a) the gate was mis-read as an **unfiltered** crate `cargo test`, which fails for **unrelated** tests — **not** a CDP regression; (b) the **optional** full-suite snippet wrongly said “from `src-tauri/`” but still used `cd src-tauri` (always wrong there); (c) `rg … | head` under `set -o pipefail` can fail with a **non-zero** pipeline exit when `head` closes the pipe (**SIGPIPE**), producing a **false** static-review failure — use **`rg -m 20`** instead. The **only** automated test gate remains step **3** with the literal filter **`cdp_retry_`**.
+> **Queue file:** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` — testers rename **`UNTESTED-` → `TESTING-`** to execute. **Testing instructions** were revised **2026-03-30** (coder pass): (a) the gate was mis-read as an **unfiltered** crate `cargo test`, which fails for **unrelated** tests — **not** a CDP regression; (b) the **optional** full-suite snippet wrongly said “from `src-tauri/`” but still used `cd src-tauri` (always wrong there); (c) `rg … | head` under `set -o pipefail` can fail with a **non-zero** pipeline exit when `head` closes the pipe (**SIGPIPE**), producing a **false** static-review failure — use **`rg -m 20`** instead; (d) a **markdown table** tried to escape `|` as `\|` so columns would render — copying that into the shell breaks **`rg`** alternation (matches nothing / wrong pattern). Use the **Copy-paste — full gate** `rg` lines only. The **only** automated test gate remains step **3** with the literal filter **`cdp_retry_`**.
 
 ## Goal
 
@@ -37,14 +37,26 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 
 ## Testing instructions
 
-### Commands by cwd (pick exactly one column)
+### Before step 1 (queue file + tools)
 
-Use **one** column end-to-end for **steps 1–3** (paths and **cargo** flags must match that cwd).
+- **Queue filename:** You must be executing from **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** (rename **`UNTESTED-` → `TESTING-`** per operator runbook). If the only file on disk for this slug is **`TESTPLAN-…`**, instructions are still under revision — do **not** run this gate; wait for **`TESTPLAN-` → `UNTESTED-`**.
+- **`rg` and `cargo`:** `command -v rg` and `command -v cargo` must succeed on `PATH` before steps **1–3**.
 
-| Step | **Repository root** (directory containing `src-tauri/`) | **Already inside** `…/mac-stats/src-tauri/` |
-|------|--------------------------------------------------------|---------------------------------------------|
-| **1 — first `rg`** | `rg 'evaluate_one_plus_one_blocking_timeout\|check_browser_alive\|BROWSER_CDP_HEALTH_CHECK_TIMEOUT\|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` | `rg '…' src/browser_agent/mod.rs` (same pattern, path **without** `src-tauri/` prefix) |
-| **1 — second `rg`** | `rg -n -m 20 'Never use.*Handle::block_on\|recv_timeout\(BROWSER_CDP_HEALTH_CHECK_TIMEOUT\)' src-tauri/src/browser_agent/mod.rs` | same pattern, path `src/browser_agent/mod.rs` |
+### Paths by cwd (pick one column; regexes = copy-paste block only)
+
+Markdown tables cannot safely embed `rg` alternation patterns (`a|b|c`). **Do not copy `rg` regexes from any table that used escaped pipes** — they are wrong in the shell.
+
+Use **one** column end-to-end for **steps 1–3**. The **authoritative** `rg` command lines are **only** the two `rg` lines in **Copy-paste — full gate** (or **§ 1**); substitute **only** the file path:
+
+| Your shell `cwd` | Use this path as the **last argument** to both `rg` commands |
+|------------------|--------------------------------------------------------------|
+| **Repository root** (directory that contains `src-tauri/`) | `src-tauri/src/browser_agent/mod.rs` |
+| **Already inside** `…/mac-stats/src-tauri/` | `src/browser_agent/mod.rs` |
+
+**Cargo** (same column as above):
+
+| Step | **Repository root** | **Already inside** `src-tauri/` |
+|------|----------------------|----------------------------------|
 | **2 — `cargo check`** | `cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats` | `cargo check -p mac_stats` (**no** `cd src-tauri`) |
 | **3 — gate `cargo test`** | `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast` | `cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast` (**no** `cd src-tauri`) |
 
@@ -89,8 +101,9 @@ Mistakes that produced **TESTPLAN-** while the CDP implementation was fine:
 2. **Wrong queue file:** **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** was missing at repo tip; testers retitled **`CLOSED-…`** or **`TESTPLAN-…`** to **`TESTING-…`** instead of waiting for **`UNTESTED-…`**. That bypassed this document’s narrow gate and invited runbook confusion.
 3. **Wrong cwd / manifest:** Running **cargo** from repo root **without** `--manifest-path src-tauri/Cargo.toml`, or running **`cd src-tauri`** when already inside **`src-tauri/`**, or using **`rg`** paths that omit the **`src-tauri/`** prefix from repo root — yields “no manifest”, **`cd` errors**, **0 tests**, or empty **`rg`** output. Treat as **instruction/environment execution**, not a code regression.
 4. **Wrong optional-suite snippet:** The diagnostic **`cargo test -p mac_stats --no-fail-fast`** for “already in **`src-tauri/`**” must **not** be prefixed with **`cd src-tauri &&`** (that directory only exists **from repo root**). Same rule as steps **2–3**.
+5. **Copied `rg` from a markdown table with `\|`:** alternation in **`rg`** must use a **single** pipe `|` between alternatives inside the quoted pattern. Escaped `\|` is **not** the same regex and can yield false “no matches” static-review failures.
 
-**Fix for retest:** Use **`UNTESTED-…`** from the branch you test; run steps **1–4** verbatim (see **Tester TL;DR** and the symptom table); ignore unfiltered suite results for pass/fail.
+**Fix for retest:** Use **`UNTESTED-…`** from the branch you test; run steps **1–4** using the **bash block** and **§ 1** for `rg` (see **Paths by cwd** for the path column only); ignore unfiltered suite results for pass/fail.
 
 ### Pass/fail scope (read first)
 
@@ -236,4 +249,6 @@ Cumulative tester reports and older verification notes: **`tasks/CLOSED-20260321
 
 While instructions are edited, the task may temporarily live as **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`**. When ready for **`003-tester`**, the coder renames **`TESTPLAN-` → `UNTESTED-`** (same stamp and slug). After that rename, **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** is the only executable queue filename for this slug (see **Operator filename** above).
 
-If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-`** handoff, without an extra rename step.
+If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
+
+**This revision:** applied **in place** on **`UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** — ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).

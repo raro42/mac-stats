@@ -1,8 +1,10 @@
 # OpenClaw: hung turn wall-clock timeout + output event gate
 
+**On-disk name (this revision):** **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** — tester queue; instructions were repaired under **`TESTPLAN-…`** and renamed here (same stamp `20260321-2000`, slug `openclaw-hung-turn-timeout-event-gate`). **No** mac-stats code change is required for this task file.
+
 **Instruction revision (TESTPLAN-phase fix):** A prior run flagged **Testing instructions** / environment wording as defective (not a product regression). This body is the authoritative spec; follow **Verification commands** here, not snippets copied from **`CLOSED-*`** history.
 
-**Coder handoff:** While instructions are under repair, this file may be named **`TESTPLAN-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**. When the instructions are ready for retest, the coder **renames** it to **`UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** (same stamp and slug). Testers **only** pick up **`UNTESTED-…`** per **Tester quick gate** below.
+**Coder handoff:** If instructions need another repair pass, rename **`UNTESTED-…` → `TESTPLAN-…`**, edit, then **`TESTPLAN-…` → `UNTESTED-…`** again per project runbook. Testers **only** start from **`UNTESTED-…`** per **Tester quick gate** below — **not** **`TESTPLAN-…`**.
 
 Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Discord status/draft/ATTACH spam), user-visible **Turn timed out** reply, optional `about:blank` cleanup only if the timed-out `request_id` still owns the coordination slot.
 
@@ -60,7 +62,7 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 - **Operator names `UNTESTED-…` but only `CLOSED-…` exists** — Do **not** “verify against CLOSED.” Update your tree, restore **`UNTESTED-…`** from git, or bounce the task to the coder. Appending new results into **`CLOSED-…`** without a live **`UNTESTED-…`**/`TESTING-…` step is out of procedure.
 - **Only `TESTPLAN-…` is present** — Instructions are still in repair; wait for **`TESTPLAN-…` → `UNTESTED-…`** before starting the **TESTER.md** rename chain.
 
-**Current handoff:** While the coder is revising instructions, the file may be **`tasks/TESTPLAN-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**. When repair is complete, it **must** be renamed to **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** for the tester queue.
+**Current handoff:** This file **is** on the tester queue as **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** (post-**TESTPLAN** repair).
 
 ### Shell compatibility
 
@@ -78,7 +80,8 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 - **Alternate `cargo` cwd (block **B**):** **`src-tauri/`** (crate root). There, use **`cargo check -p mac_stats`** / **`cargo test -p mac_stats`** (or plain **`cargo check`** / **`cargo test`** since this directory is a single-package manifest).
 - **Wrong repo:** If `git rev-parse` / `test -f src-tauri/Cargo.toml` fails, stop — fix cwd before **`cargo`** or **`rg`** paths that assume repo root.
 - **Typo trap:** the **repo folder** is often **`mac-stats`** (hyphen). The **Cargo package** is **`mac_stats`** (underscore). Do not drop **`-p mac_stats`** when using **`--manifest-path`** from repo root.
-- **If `cargo` prints `could not find Cargo.toml`:** you ran **`cargo`** from the **repo root** without **`--manifest-path src-tauri/Cargo.toml`**, or your cwd is not the mac-stats tree. Use block **A1**/**A2** or **`cd src-tauri`** and block **B**.
+- **`--manifest-path` is relative to the shell cwd (critical):** Blocks **A1** / **A2** assume **`pwd`** is the **repo root** (the directory that **contains** `src-tauri/`). After `cd "$REPO_ROOT"` (A1) or `cd /ABSOLUTE/.../mac-stats` (A2), **`test -f src-tauri/Cargo.toml`** must succeed. If your cwd is already **`…/mac-stats/src-tauri`**, the path **`src-tauri/Cargo.toml`** points at a **non-existent** `src-tauri/src-tauri/Cargo.toml` — **do not** paste **A1**/**A2** there. Either **`cd ..`** to the repo root and use **A1**/**A2**, or stay in **`src-tauri/`** and use block **B** only (`cargo check` / `cargo test` without `src-tauri/` prefix on paths).
+- **If `cargo` prints `could not find Cargo.toml`:** you ran **`cargo`** from the **repo root** without **`--manifest-path src-tauri/Cargo.toml`**, your cwd is not the mac-stats tree, or you used **A1**/**A2** while cwd was **`src-tauri/`** (see bullet above). Use block **A1**/**A2** from repo root or **`cd src-tauri`** and block **B**.
 
 ### Two different directories named `src` (critical)
 
@@ -98,11 +101,12 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 
 1. **`rg … src/` from repo root** — searches the **frontend** tree only; Rust lives under **`src-tauri/src/`**. Use block **A1**/**A2** or **B** paths exactly.
 2. **`cargo check` / `cargo test` from repo root without `--manifest-path`** — often fails or targets the wrong manifest. Use block **A1**/**A2** (`--manifest-path src-tauri/Cargo.toml -p mac_stats`) or **`cd src-tauri`** then block **B**.
-3. **Fish (or non-bash) pasted script** — `set -e` / `$(…)` differ; use **`bash -lc '…'`** or run **zsh** with the block as written.
-4. **Treating `CLOSED-…` verification snippets as authoritative** — historical reports may use wrong paths; follow **this** file’s **Verification commands** only.
-5. **Using the `git rev-parse` block when `.git` is missing** — use **Verification commands → A2** (full no-git block), not a partial edit of **A1**.
-6. **`rg: command not found`** — install [ripgrep](https://github.com/BurntSushi/ripgrep) or search your editor for the **exact** substrings under **`src-tauri/src/`**; the acceptance literals must still be located in the files named in criteria 3.
-7. **Unquoted `**Turn timed out**` in the shell** — some shells glob `**`; always run **`rg -n -F '**Turn timed out**' …`** as in the verification blocks.
+3. **Running A1 or A2 while cwd is `src-tauri/`** — **`--manifest-path src-tauri/Cargo.toml`** is resolved relative to cwd, so Cargo looks for **`src-tauri/src-tauri/Cargo.toml`** and fails. **`cd ..`** to repo root, or use block **B** only.
+4. **Fish (or non-bash) pasted script** — `set -e` / `$(…)` differ; use **`bash -lc '…'`** or run **zsh** with the block as written.
+5. **Treating `CLOSED-…` verification snippets as authoritative** — historical reports may use wrong paths; follow **this** file’s **Verification commands** only.
+6. **Using the `git rev-parse` block when `.git` is missing** — use **Verification commands → A2** (full no-git block), not a partial edit of **A1**.
+7. **`rg: command not found`** — install [ripgrep](https://github.com/BurntSushi/ripgrep) or search your editor for the **exact** substrings under **`src-tauri/src/`**; the acceptance literals must still be located in the files named in criteria 3.
+8. **Unquoted `**Turn timed out**` in the shell** — some shells glob `**`; always run **`rg -n -F '**Turn timed out**' …`** as in the verification blocks.
 
 ### Preflight (required)
 
@@ -154,13 +158,20 @@ To see log lines in a real run, reproduce or simulate a turn timeout and grep **
 
 ## Verification commands
 
-Paste **one** complete block (**A1**, **A2**, or **B**) in a single shot. Do **not** split a block halfway; **`set -e`** must stop the script if cwd or paths are wrong.
+Paste **one** complete block (**A1**, **A2**, or **B**) in a single shot. Do **not** split a block halfway; **`set -e`** must stop the script if cwd or paths are wrong. Do **not** cherry-pick only the **`cargo`** or only the **`rg`** lines — the initial **`cd`** + **`test -f`** lines establish the correct cwd.
+
+**Pick a block by where you will stand after `cd`:**
+
+| Block | After the block’s `cd`, this must succeed | Wrong choice if… |
+|-------|-------------------------------------------|------------------|
+| **A1** / **A2** | `test -f src-tauri/Cargo.toml` | You refuse to leave **`src-tauri/`** — use **B** instead. |
+| **B** | `test -f src/commands/turn_lifecycle.rs` | `test -f src-tauri/Cargo.toml` succeeds from **`pwd`** — you are at **repo root**; use **A1**/**A2**, not **B**. |
 
 ### A1 — Recommended: repo root, **with** `.git`
 
 Use **bash** or **zsh** (or `bash -lc '…'` from fish). **`set -e`** stops on the first failing command — do **not** append `|| true` to `cd` or `git rev-parse` here; a wrong directory must **fail** the script.
 
-**Git prerequisite:** Run from **inside** the mac-stats clone so `git rev-parse --show-toplevel` prints the mac-stats root (the folder that directly contains `src-tauri/`). Starting in `src-tauri/` is OK: git still returns the repo root.
+**Git prerequisite:** Run from **inside** the mac-stats clone so `git rev-parse --show-toplevel` prints the mac-stats root (the folder that directly contains `src-tauri/`). Starting in `src-tauri/` is OK: git still returns the repo root, and **`cd "$REPO_ROOT"`** moves you to **repo root** before **`cargo`** — required so **`--manifest-path src-tauri/Cargo.toml`** resolves correctly.
 
 **Why `--manifest-path`:** mac-stats has **no** `Cargo.toml` at repo root. Invoking **`cargo test`** from root without **`--manifest-path`** is a frequent false failure; the lines below pin the **`mac_stats`** package explicitly.
 
@@ -184,7 +195,7 @@ rg -n "closing output gate and running cleanup" src-tauri/src/commands/turn_life
 
 ### A2 — Recommended: repo root, **no** `.git` (tarball / export)
 
-Use this when **`git rev-parse` fails** or the tree has no `.git` directory. **Replace** the placeholder on the **`cd`** line with the **absolute path** to your mac-stats root (the directory that **directly** contains **`src-tauri/`** — not `src-tauri/` itself, not a parent that only contains the zip name). After editing, **`test -f src-tauri/Cargo.toml`** must succeed; if it fails, the path is wrong.
+Use this when **`git rev-parse` fails** or the tree has no `.git` directory. **Replace** **`/ABSOLUTE/PATH/TO/mac-stats`** on the **`cd`** line with the **absolute path** to your mac-stats root (the directory that **directly** contains **`src-tauri/`** — not `src-tauri/` itself, not a parent that only contains the zip name). **Edit that line before pasting**; leaving the placeholder verbatim will **`cd`** to a non-existent path and fail. After editing, **`test -f src-tauri/Cargo.toml`** must succeed; if it fails, the path is wrong.
 
 ```bash
 set -e
