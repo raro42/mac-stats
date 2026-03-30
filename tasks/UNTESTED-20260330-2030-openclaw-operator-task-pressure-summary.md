@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): on-disk rename chain **`UNTESTED-…` → `FEAT-…` → `WIP-…` → `UNTESTED-…`** (same stem); **`tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md`** existed transiently before **`FEAT → WIP`**. **mac-stats:** `task/mod.rs` (`format_operator_task_pressure_summary`, `count_tasks_by_status`), `task/review.rs` (`TASK_REVIEW_INTERVAL_SECS`, `TASK_REVIEW_MAX_OPEN_PER_CYCLE`, `TASK_WIP_STALE_TIMEOUT_SECS`), `commands/context_assembler.rs` (`live_metrics_execution_system_section`: metrics first, then task backlog), `commands/ollama.rs` (`metrics_for_system` ← `fragments::live_metrics_execution_system_section`). **Verification (this run):** `cd src-tauri && cargo check && cargo test operator_task_pressure` — **pass** (`task::tests::operator_task_pressure_summary_empty_dir`). **Section 6** = tester handoff.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): on-disk rename chain **`UNTESTED-…` → `FEAT-…` → `WIP-…` → `UNTESTED-…`** (stem `20260330-2030-openclaw-operator-task-pressure-summary`). **mac-stats:** `task/mod.rs` (`format_operator_task_pressure_summary`, `count_tasks_by_status`), `task/review.rs` (`TASK_REVIEW_INTERVAL_SECS`, `TASK_REVIEW_MAX_OPEN_PER_CYCLE`, `TASK_WIP_STALE_TIMEOUT_SECS`), `commands/context_assembler.rs` (`live_metrics_execution_system_section`), `commands/ollama.rs` (`metrics_for_system` ← `fragments::live_metrics_execution_system_section`). **Verification (coder run):** `cd src-tauri && cargo check && cargo test operator_task_pressure` — **pass** (`task::tests::operator_task_pressure_summary_empty_dir`). **Section 6** = tester handoff.
 - **Next step:** Tester runs **Section 6** (after **Section 5**) on this file.
 ---
 
@@ -63,6 +63,8 @@ Optional (FEATURE-CODER hygiene): `cd src-tauri && cargo clippy`
 ---
 
 ## 6. Testing instructions
+
+**On-disk handoff path:** after the coder **`WIP → UNTESTED`** rename, this task lives at `tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md` (same stem as `FEAT-…` / `WIP-…`).
 
 **Canonical handoff:** this section is the source of truth for the tester after the **`WIP → UNTESTED`** rename (do not remove it when changing task-file prefixes).
 
