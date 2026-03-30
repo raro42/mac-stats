@@ -77,6 +77,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** — append **`003-tester`** **Test report** (**2026-03-30T01:07:16Z** UTC): operator **`UNTESTED-…`** path missing; **`CLOSED-` → `TESTING-`**; health-check / anti-`block_on` **`rg`** + **`cargo check`** / **`cargo test --no-fail-fast`** (**875** lib tests) — **pass** → **`CLOSED-…`**.
+- **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** — **`003-tester`** **Re-verify** (**2026-03-30** UTC, operator **`UNTESTED-…`** only): path missing; **`CLOSED-` → `TESTING-`**; **`cargo check`** / **`cargo test`** (**875** lib tests); turn-gate **`rg`** in **`src-tauri/src`** — **pass** → **`CLOSED-…`**.
+- **Tasks** — **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`** — triage header and **Section 6** testing text: **Section 5 / Section 6** wording (automated-first, cross-links).
 - **Tasks** — CDP health-check ping track: remove standalone **`tasks/TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`**; restore cumulative **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** as the canonical task file.
 - **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** — append **`003-tester`** re-verify (**2026-03-29T23:55:06Z** UTC): **`TESTING-…`** cycle, **`cargo check`** / **`cargo test`** (874 lib tests), **`rg`** in **`src/`** (no matches) vs **`src-tauri/src`** (matches) — pass → **`CLOSED-…`**.
 - **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** — **`003-tester`** re-verify (**2026-03-30** UTC, **`TESTER.md`**): **`TESTING-…`** cycle + **`cargo check`** / **`cargo test`** (**874** lib tests); **`rg`** **`src/`** (no matches) vs **`src-tauri/src`** (matches) — **pass** → **`CLOSED-…`**.

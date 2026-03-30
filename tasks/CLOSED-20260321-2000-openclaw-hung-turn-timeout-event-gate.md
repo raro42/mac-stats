@@ -1230,3 +1230,10 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
   - Task verification block lists `rg … src/`; repo-root `src/` is frontend JS — no Rust matches; Rust implementation is under `src-tauri/src/`.
 - **Acceptance criteria:** All satisfied (`TurnOutputGate` as `Arc<AtomicBool>`; tool loop respects `gate_allows_send`; `finalize_turn_timeout` returns text starting `**Turn timed out**` with budget in seconds; router log string `closing output gate after turn wall-clock timeout`; turn-lifecycle warns include `turn wall-clock timeout` / `closing output gate and running cleanup`; `cargo check` / `cargo test` succeed).
 - **Outcome:** **PASS** — restore **`TESTING-…` → `CLOSED-…`**: `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
+
+### Re-verify — 2026-03-30 (UTC), sesión actual (`003-tester/TESTER.md`; único objetivo `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`)
+
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**; no se usó otro `UNTESTED-*`. Este run comenzó renombrando **`CLOSED-…` → `TESTING-…`** (archivo activo `TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` durante la verificación). Criterio operador al cerrar: pass → **`CLOSED-`**; fallo implementación → **`TESTED-`**; instrucciones/entorno defectuosos → **`TESTPLAN-`**. `003-tester/TESTER.md` del repo: fallo/bloqueo → **`WIP-`**.
+- **Comandos:** `cd src-tauri && cargo check` — pass; `cd src-tauri && cargo test` — pass (**875** tests en crate librería, 0 failed); `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches en `commands/ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`.
+- **Criterios de aceptación:** Cumplidos (incl. `**Turn timed out**` y presupuesto en `finalize_turn_timeout`; cadenas de log en fuente).
+- **Resultado:** **PASS** — **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.

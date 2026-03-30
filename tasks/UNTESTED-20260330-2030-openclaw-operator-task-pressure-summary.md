@@ -1,8 +1,8 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — Cycled **FEAT → WIP → UNTESTED** per **FEATURE-CODER**; implementation verified in-tree (`format_operator_task_pressure_summary`, `live_metrics_execution_system_section`, **`task/review.rs`** `pub(crate)` constants); **`cargo check`** and **`cargo test operator_task_pressure`** green; **§6 Testing instructions** updated (automated-first note).
-- **Next step:** **UNTESTED** — tester runs **§6 Testing instructions** (manual / optional runtime).
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** cycle **`FEAT-…` → `WIP-…` → `UNTESTED-…`** complete for this task; behaviour in mac-stats (`format_operator_task_pressure_summary`, `live_metrics_execution_system_section`, **`task/review.rs`** `pub(crate)` constants). Verified: **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** green; **Section 6 — Testing instructions** updated (Section 5 cross-links, automated-first).
+- **Next step:** **UNTESTED** — tester runs **Section 6 — Testing instructions** (manual / optional runtime after automated).
 ---
 
 # UNTESTED: OpenClaw parity — operator task pressure summary in execution context
@@ -55,7 +55,7 @@ rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_secti
 
 ## 6. Testing instructions
 
-Run **§5 Verification (automated)** first; use the subsections below for manual or optional runtime checks.
+Run **Section 5 — Verification (automated)** first; use the subsections below for manual or optional runtime checks.
 
 ### What to verify
 
@@ -65,7 +65,7 @@ Run **§5 Verification (automated)** first; use the subsections below for manual
 
 ### How to test
 
-1. Run **§5 Verification (automated)**. The filter **`operator_task_pressure`** runs **`task::tests::operator_task_pressure_summary_empty_dir`**, which sets **`MAC_STATS_TASK_DIR`** to an empty temp directory and asserts the summary contains **`## Task backlog (operator)`**, zero **`open=`** / **`wip=`** counts, and **`Review loop: every 60 s`** (aligned with **`TASK_REVIEW_INTERVAL_SECS`**).
+1. Run **Section 5 — Verification (automated)**. The filter **`operator_task_pressure`** runs **`task::tests::operator_task_pressure_summary_empty_dir`**, which sets **`MAC_STATS_TASK_DIR`** to an empty temp directory and asserts the summary contains **`## Task backlog (operator)`**, zero **`open=`** / **`wip=`** counts, and **`Review loop: every 60 s`** (aligned with **`TASK_REVIEW_INTERVAL_SECS`**).
 2. **Static inspection:** In **`context_assembler.rs`**, confirm **`live_metrics_execution_system_section`** formats **`live_metrics_for_prompt()`** first, then **`format_operator_task_pressure_summary()`** (metrics block first, task block second).
 3. **Error path (optional):** If the task directory cannot be read, the prompt must still include **`## Task backlog (operator)`** with **`(unavailable:`** and an error hint — no panic. Code review **`format_operator_task_pressure_summary`** in **`task/mod.rs`** (`Err` branch).
 4. **Optional (runtime):** Start mac-stats with **`-vvv`**, trigger one short Discord or CPU-window turn that uses **`answer_with_ollama_and_fetch`**, then confirm logs or debugger inspection of **`metrics_for_system`** / **`build_execution_system_content`** shows both **Current system metrics** and **Task backlog (operator)** in one string.
