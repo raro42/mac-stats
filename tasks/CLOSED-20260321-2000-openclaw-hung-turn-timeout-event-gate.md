@@ -1421,3 +1421,15 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Nomenclatura:** `003-tester/TESTER.md` del repo: pass → **`CLOSED-…`**; fallo/bloqueo → **`WIP-…`**. No aplica `TESTED-` ni `TESTPLAN-` en este procedimiento.
 - **Resultado:** **PASS** — restaurar **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** tras este append.
 
+### Re-verify — 2026-03-30 UTC (`003-tester/TESTER.md`; único objetivo `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`)
+
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**; el archivo canónico era `CLOSED-…` y se renombró a **`TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** al inicio de este run. No se usó ningún otro `UNTESTED-*`.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (crate librería: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - Bloque del task (`rg … src/`): sin coincidencias en `src/` raíz (JS; Rust en `src-tauri/src/`)
+- **Criterios de aceptación:** Cumplidos (`TurnOutputGate` = `Arc<AtomicBool>`; `gate_allows_send` en tool loop; `finalize_turn_timeout` con `**Turn timed out**` y presupuesto `**{}s**`; `turn wall-clock timeout` / `closing output gate and running cleanup` en `turn_lifecycle.rs`; `closing output gate after turn wall-clock timeout` en `ollama.rs`).
+- **Nomenclatura (mensaje operador):** pass → **`CLOSED-…`**. No aplica **`TESTED-`** (fallo de implementación) ni **`TESTPLAN-`** (instrucciones / entorno defectuosos).
+- **Resultado:** **PASS** — renombrar **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** tras este append.
+
