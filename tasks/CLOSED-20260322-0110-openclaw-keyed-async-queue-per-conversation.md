@@ -2135,3 +2135,24 @@ rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs
 - `rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs` — **pass** (líneas 1143, 1347, 1934 `crate::keyed_queue::run_serial`; línea 2345 `ollama_queue_key` con `discord:{}`; las líneas pueden variar respecto a versiones anteriores del informe)
 
 **Resultado:** **Pass** — criterios de aceptación cumplidos. El nombre del archivo permanece **CLOSED-** (no aplica **TESTED-** ni **TESTPLAN-**). Discord en vivo no probado.
+
+
+## Test report (run — Cursor agent, `003-tester/TESTER.md`, 2026-03-30)
+
+**Date:** 2026-03-30, local system time where `cargo` ran (environment timezone; not fixed to UTC).
+
+**Preflight / names:** Operator specified only `tasks/UNTESTED-20260322-0110-openclaw-keyed-async-queue-per-conversation.md` (no other `UNTESTED-*`). That path was absent at run start; the file on disk was `CLOSED-20260322-0110-…`. Per `003-tester/TESTER.md`, applied rename chain **CLOSED → UNTESTED → TESTING** (same basename) so the **UNTESTED → TESTING** step applies without selecting another task. Document H1 set to **TESTING** during verification.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test keyed_queue` — **pass** (`same_key_runs_sequentially`, `different_keys_may_overlap`; other lib tests filtered out on that invocation)
+- `cd src-tauri && cargo test` — **pass** (875 passed, 0 failed in `mac_stats` lib tests; 1 doc-test ignored in crate)
+
+**Static spot-check**
+
+- `rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs` — **pass** (lines 1143, 1347, 1934 `crate::keyed_queue::run_serial`; line 2345 `ollama_queue_key` with `discord:{}`)
+
+**Outcome:** **Pass** — all acceptance criteria met. After this report: restore H1 to **CLOSED** and rename file **TESTING- → CLOSED-** (per operator: **TESTED-** on implementation fail, **TESTPLAN-** on defective test instructions; neither applies). Live Discord not exercised.
+
+**Note:** An earlier 2026-03-30 report above stated no UNTESTED→TESTING rename; **this** run performed the full rename chain and re-ran verification.
