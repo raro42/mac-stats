@@ -1131,3 +1131,16 @@ rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/com
 - **Result:** **Pass** — automated **Verification** and task **Pass/fail criteria** satisfied; optional live Discord / throttle-override steps not run.
 - **Outcome filename:** `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md`.
 
+### Tester run (2026-03-30 UTC, `003-tester/TESTER.md` — operator: `tasks/UNTESTED-20260322-0105-openclaw-draft-stream-throttled-reply.md` only)
+
+- **Date:** 2026-03-30 UTC (local: Monday 2026-03-30 per workspace `user_info`).
+- **Rename:** Requested `UNTESTED-20260322-0105-openclaw-draft-stream-throttled-reply.md` was not present; the task file was `CLOSED-*`. Per step 2 of `003-tester/TESTER.md`, renamed `CLOSED` → `TESTING` for this run. No other `UNTESTED-*` file was used.
+- **Commands run** (cwd `/Users/raro42/projects/mac-stats`):
+  - `cd src-tauri && cargo check` — pass (`Finished dev profile [unoptimized + debuginfo] target(s) in 5.86s`).
+  - `cd src-tauri && cargo test discord_draft_stream::` — pass (`clamp_under_limit_unchanged`, `clamp_truncates_with_ellipsis`; 2 passed; 873 filtered out in lib; test profile `Finished` in 9.51s).
+  - `rg -n "spawn_discord_draft_editor" src-tauri/src/discord/mod.rs` — match at line **2197**.
+  - `rg -n "DiscordDraftHandle"` in `tool_loop.rs`, `turn_lifecycle.rs`, `ollama.rs` — matches (`tool_loop.rs` 14, 152; `turn_lifecycle.rs` 10, 95; `ollama.rs` 109).
+- **Acceptance (automated):** `discord_draft_stream.rs` + `clamp_discord_content` tests; `Config::discord_draft_throttle_ms()` documents `discord_draft_throttle_ms` / `MAC_STATS_DISCORD_DRAFT_THROTTLE_MS`, clamp **200..=60_000** (`config/mod.rs`).
+- **Result:** **Pass** — all automated **Verification** / **Pass/fail criteria** satisfied; optional live Discord / throttle-override steps not run.
+- **Outcome:** rename `TESTING-*` → `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md` (not `TESTED-*` or `TESTPLAN-*`).
+
