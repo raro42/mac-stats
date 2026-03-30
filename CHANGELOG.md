@@ -8,9 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**: append **`003-tester`** test report (**2026-03-30 06:44** UTC): operator **`UNTESTED-…`** path missing; **`CLOSED-` → `TESTING-`**; health-check / anti-`block_on` **`rg`** + **`cargo check`** / **`cargo test --no-fail-fast`** (**875** lib tests) — pass → **`CLOSED-…`**.
-- **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**: **Re-verify** (**2026-03-30** UTC, **`003-tester` / `TESTER.md`**, operator **`UNTESTED-…`** only): path absent; **`CLOSED-` → `TESTING-`**; **`cargo check`** / **`cargo test`**; turn-gate **`rg`** **`src/`** (none) vs **`src-tauri/src`** (matches); acceptance criteria — pass → **`CLOSED-…`**.
-- **Tasks** — **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**: triage (**TOP**) — coder line notes **`FEAT → WIP → UNTESTED`** completed this run; **`cargo check`** / **`cargo test operator_task_pressure`** wording tightened.
+- **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**: append **`003-tester`** test report (**2026-03-30 06:53** UTC): operator **`UNTESTED-…`** path missing; **`CLOSED-` → `TESTING-`**; health-check / anti-`block_on` **`rg`** + **`cargo check`** / **`cargo test --no-fail-fast`** (**875** lib tests) — pass → **`CLOSED-…`**.
+- **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**: **Re-verify** (**2026-03-30** UTC, Cursor session, **`003-tester` / `TESTER.md`**, operator **`UNTESTED-…`** only): path absent; **`CLOSED-` → `TESTING-`**; **`cargo check`** / **`cargo test`**; turn-gate **`rg`** **`src/`** (none) vs **`src-tauri/src`** (matches); acceptance — pass → **`CLOSED-…`**.
+- **Tasks** — **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**: triage (**TOP**) — coder line: starting **`FEAT-…`** file absent on disk; workflow from existing **`UNTESTED-…`** via **`UNTESTED → FEAT → WIP → UNTESTED`**; **`cargo check`** / **`cargo test operator_task_pressure`** pass; §6 for tester.
 
 ## [0.1.78] - 2026-03-30
 
