@@ -1490,3 +1490,15 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Outcome naming (operator):** pass → **`CLOSED-…`**; implementation fail → **`TESTED-…`**; defective test instructions / environment spec → **`TESTPLAN-…`** — not applicable.
 - **Outcome:** **PASS** — rename **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** after this append.
 
+### Re-verify — 2026-03-30 (UTC), `003-tester/TESTER.md` (operator target `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only)
+
+- **Rename UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` was **not present** in the working tree. The canonical file was **`CLOSED-…` → `TESTING-…`** at the start of this run to satisfy the testing phase without selecting another `UNTESTED-*` file.
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (library crate: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — no matches (task verification block lists `src/`; Rust sources are under `src-tauri/src/`)
+  - same pattern on `src-tauri/src` — matches in `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+- **Acceptance criteria:** All satisfied (`TurnOutputGate` = `Arc<AtomicBool>`; `gate_allows_send` in tool loop; `finalize_turn_timeout` text starts `**Turn timed out**` with budget seconds; router warn `closing output gate after turn wall-clock timeout`; turn-lifecycle `turn wall-clock timeout` / `closing output gate and running cleanup` in `turn_lifecycle.rs`).
+- **Outcome naming (operator):** pass → **`CLOSED-…`**; implementation fail → **`TESTED-…`**; defective test plan / environment spec → **`TESTPLAN-…`**. Repo `003-tester/TESTER.md` maps generic fail/block to **`WIP-…`** — not applicable.
+- **Outcome:** **PASS** — rename **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** after this append.
+
