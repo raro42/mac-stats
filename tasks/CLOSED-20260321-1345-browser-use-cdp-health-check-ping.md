@@ -3141,17 +3141,17 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 
 ## Test report
 
-**Date:** 2026-03-30 UTC (this tester run).
+**Fecha:** 2026-03-30 UTC (esta ejecución del tester).
 
-**TESTER.md flow:** Operator requested `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; that path **does not exist** in the repo. The task with this slug was **`CLOSED-…`**; it was renamed **`CLOSED-` → `TESTING-`** at the start of this run (functional equivalent to `UNTESTED-` → `TESTING-` when no `UNTESTED-*` file exists). **No other `UNTESTED-*` task file was tested.**
+**Flujo TESTER.md:** El operador pidió `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; ese path **no existe** en el repo. La tarea con ese slug estaba como **`CLOSED-…`**; se renombró **`CLOSED-` → `TESTING-`** al inicio de esta ejecución (equivalente funcional a `UNTESTED-` → `TESTING-` cuando no hay fichero `UNTESTED-*`). **No se probó ningún otro `UNTESTED-*`.**
 
 **Commands run**
 
 - `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
-- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (comentario en `check_browser_alive` que prohíbe `Handle::block_on` + `tokio::time::timeout`; doc en `evaluate_one_plus_one_blocking_timeout` sobre no anidar Tokio `block_on`)
 - `cd src-tauri && cargo check` — **pass**
-- `cd src-tauri && cargo test --no-fail-fast` — **pass** (875 passed, 0 failed in crate lib `mac_stats`; other bins 0 tests; 1 doc-test ignored)
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (875 passed, 0 failed en crate lib `mac_stats`; otros bins 0 tests; 1 doc-test ignored)
 
-**Acceptance criteria (1)–(3):** satisfied.
+**Criterios de aceptación (1)–(3):** cumplidos.
 
-**Outcome:** **CLOSED-** — rename **`TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+**Outcome:** **CLOSED-** — renombrar **`TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
