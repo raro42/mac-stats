@@ -973,6 +973,14 @@ mod tests {
             s.contains("Review loop: every 60 s"),
             "expected review interval hint: {s}"
         );
+        assert!(
+            s.contains("up to 3 open task(s) started per cycle"),
+            "expected TASK_REVIEW_MAX_OPEN_PER_CYCLE wording: {s}"
+        );
+        assert!(
+            s.contains("30 min may be closed"),
+            "expected TASK_WIP_STALE_TIMEOUT_SECS wording: {s}"
+        );
 
         let _ = fs::remove_dir_all(&base);
     }
