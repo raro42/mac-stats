@@ -14,7 +14,18 @@ This task **does not** require unfiltered **`cargo test --no-fail-fast`**, **`cd
 >
 > **Scope:** **mac-stats** repository only. All paths refer to **`src-tauri/src/browser_agent/mod.rs`** in that clone. Running these steps in a **different repo** (e.g. a sibling **openclaw** tree) is **out of scope** and invalid — use the mac-stats checkout that contains this `tasks/` file.
 >
-> **Testing instructions** revised **2026-03-30** (m): **(l)** plus **title-level automated bar** (explicit “full `cargo test` is not required” / **TESTER.md** override in one place); **misread callout** in **Zero-ambiguity gate** (operators who filed **TESTPLAN-** believing the task *mandates* complete `cargo test --no-fail-fast`).
+> **Roles (same stamp/slug):** **`TESTPLAN-…`** on disk = **coder revision** — testers **do not** run the gate or rename to **`TESTING-`**. **`UNTESTED-…`** = **published queue** — testers rename **`UNTESTED-` → `TESTING-`** and run **Testing instructions**. **`CLOSED-…`** = **archive** for new passes (see **Phase 0**). **At most one** of **`TESTPLAN-…`** or **`UNTESTED-…`** should exist at repo tip; if **both** appear, fix handoff or merge conflict before any test run.
+>
+> **Testing instructions** revised **2026-03-30** (n): **(m)** plus **roles / single-queue rule** (TESTPLAN vs UNTESTED vs CLOSED); **Quick path — testers** (four bullets: Phase 0 → cwd → copy-paste gate → Step 4); **Step 4 echo** after the bash gate so the script reminds testers the run is incomplete without the manual spot-check; **hard fail** note when Step 3 prints **`running 0 tests`**.
+
+### Quick path — testers after publication (`UNTESTED-…` on disk)
+
+Skip this subsection if the **only** queue file for this slug is **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`** — wait for the coder to rename **`TESTPLAN-` → `UNTESTED-`** (same stamp and slug), then continue.
+
+1. **Phase 0 + queue:** Confirm **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** exists; rename **`UNTESTED-` → `TESTING-`** per **`TESTER.md`**.
+2. **Cwd:** Run **PF-1** (or **PF-0** then **PF-1**) so you are at **mac-stats repo root** (`test -f src-tauri/Cargo.toml` succeeds).
+3. **Steps 1–3:** Run the bash block **Copy-paste — full gate** exactly (static **`rg`**, **`cargo check`**, **`cargo test … --lib cdp_retry_ …`**). **Step 3 must** print **`running N tests`** with **N ≥ 1**. If you see **`running 0 tests`**, you did **not** execute the gate — **stop**; see **PF-3**, **Paths by cwd**, and the **`running 0 tests`** row under **If something looks wrong** (wrong cwd, manifest, or filter placement).
+4. **Step 4 (required, manual):** Open **`src-tauri/src/browser_agent/mod.rs`**, find **`should_retry_cdp_after_clearing_session`**, confirm health / “Browser unresponsive” vs generic retry semantics (**§ 4) Spot-check**). **Pass is impossible** if you skip Step 4 — the bash block alone is not a complete gate.
 
 ## Goal
 
@@ -296,7 +307,7 @@ Mistakes that produced **TESTPLAN-** while the CDP implementation was fine:
 
 ### Copy-paste — full gate (from repository root)
 
-Run this block **as-is** in **bash** after **PF-1** (or **PF-0** then **PF-1**) / the sanity checks. From **fish**, use `bash -lc '…'` with the **entire** script in **single quotes** so fish does not eat `$(pwd)` or other bash syntax. It covers **Steps 1–3** (gate) below (static review, compile, targeted tests). **Step 4** is **only** the manual spot-check in the editor — it is **not** in this script.
+Run this block **as-is** in **bash** after **PF-1** (or **PF-0** then **PF-1**) / the sanity checks. From **fish**, use `bash -lc '…'` with the **entire** script in **single quotes** so fish does not eat `$(pwd)` or other bash syntax. It covers **Steps 1–3** (gate) below (static review, compile, targeted tests). **Step 4** is **only** the manual spot-check in the editor — the final **`echo`** is a **reminder**; you must still open **`mod.rs`** and verify (**§ 4) Spot-check**).
 
 ```bash
 set -e
@@ -309,7 +320,10 @@ rg -n -m 20 'Never use.*Handle::block_on|recv_timeout\(BROWSER_CDP_HEALTH_CHECK_
 cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats
 echo ">>> STEP 3 GATE: lib tests filtered by cdp_retry_ only (NOT the full crate suite)"
 cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast
+echo ">>> STEP 4 (manual, required): open src-tauri/src/browser_agent/mod.rs — verify should_retry_cdp_after_clearing_session (see this task file: 4) Spot-check)"
 ```
+
+**If the Step 3 line prints `running 0 tests`:** Treat as **Step 3 failed** — do not claim pass. Fix cwd (**repository root** + `--manifest-path`, or **`src-tauri/`** + `-p mac_stats` per **Paths by cwd**), filter spelling (**`cdp_retry_`** with trailing underscore, **before** any `--`), then re-run. Optional: `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ -- --list` must list **≥ 1** test name containing **`cdp_retry_`**.
 
 **Why `--manifest-path`:** the crate manifest is only under `src-tauri/`. Using `--manifest-path src-tauri/Cargo.toml` lets **`cargo check` / `cargo test` succeed from repo root** without a subshell `cd`, which avoids accidental “0 tests” runs (e.g. invoking `cargo test` from root without a manifest, or from a directory that resolves to the wrong package).
 
@@ -421,4 +435,4 @@ While instructions are edited, the task lives as **`TESTPLAN-20260321-1345-brows
 
 If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
 
-**This revision (m):** Coder **`TESTPLAN-…` → `UNTESTED-…`** for retest — **title-level** one-screen **automated test bar** (full-suite `cargo test` explicitly **not** required; **TESTER.md** last line override); **Zero-ambiguity gate** adds **misread callout** for operators who treated complete `cargo test --no-fail-fast` as mandatory. Carries forward **(l)**. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+**This revision (n):** Coder **`TESTPLAN-…` → `UNTESTED-…`** for retest — **roles + at-most-one queue file** (TESTPLAN vs UNTESTED vs CLOSED); **Quick path** for published **`UNTESTED-…`**; **Step 4** reminder **`echo`** after the bash gate; explicit **hard stop** when Step 3 shows **`running 0 tests`**. Carries forward **(m)**. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
