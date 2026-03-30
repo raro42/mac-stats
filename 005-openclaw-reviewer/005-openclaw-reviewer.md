@@ -5,9 +5,11 @@ Cross-check **OpenClaw** `AGENTS.md` against the **openclaw** repository (siblin
 ## Latest verification — 2026-03-30
 
 **OpenClaw root:** `../openclaw`  
-**OpenClaw `HEAD`:** `55dc6a8bb28dd9b6f4c4c1a8e8497fa48f7cc254` (short: `55dc6a8bb28d`)  
+**OpenClaw `HEAD`:** `c36fc1bdcc82869a4cd50660b1b589e1b7bb6b94` (short: `c36fc1bdcc`)  
 **References:** `AGENTS.md` (repo guidelines), `package.json` (scripts), `vitest.config.ts` (coverage; `vitest.unit.config.ts` extends it for `pnpm test:coverage`).  
-**Last check:** `2026-03-30T02:30:00Z`
+**Last check:** `2026-03-30T02:40:30Z`
+
+**Independent re-run:** `2026-03-30T02:40:30Z` — Pre-built digest: `../mac-stats-reviewer/agents/.loop-cache/latest/README.md` + table files; **Generated (UTC)** `2026-03-30 02:37:33`, `DIGEST_SHA256=a27e020283275145ba6506f4a1c16b23c9bf62869dd161ba5e115df3c1574eef`. Signals: `NEEDS_OPENCLAW_AGENT=1`, `OPENCLAW_RANGE_COMMITS=4`, `BROWSER_USE_RANGE_COMMITS=0`, `LOG_DIGEST_MATCH_LINES=0`; `gh-mac-stats-issues.txt` **UNAVAILABLE** (`HTTP 401`). Digest `47839d3b9a6..e57b3618fc8d`: SQLite task ledger + audit CLI (#57361), LLM idle timeout (streaming). **Pulled openclaw to `origin/main` then committed doc fix (`c36fc1bdcc`).** `AGENTS.md` wrongly cited `src/provider-web.ts` and top-level per-channel dirs; updated to match tree (`src/channel-web.ts`, `src/channels/`, `src/tasks/`, `extensions/*`), corrected `pnpm format:check` vs format-write scripts and file-ref example. §7 claims **Aligned**. **No new FEAT files** in mac-stats.
 
 **Independent re-run:** `2026-03-30T02:30:00Z` — Pre-built digest: read `../mac-stats-reviewer/agents/.loop-cache/latest/README.md` and only its table files (`signals.txt`, `openclaw-git-summary.txt`, `browser-use-git-summary.txt`, `log-errors-digest.txt`, `gh-mac-stats-issues.txt`); digest **Generated (UTC)** `2026-03-30 02:28:34`, `DIGEST_SHA256=02b86f5bb2e0c5d22e013edbf371f324161fc1da36c4d18d6ec5e14997e17a57`. Signals: `NEEDS_OPENCLAW_AGENT=1`, `OPENCLAW_RANGE_COMMITS=3`, `BROWSER_USE_RANGE_COMMITS=0`, `LOG_DIGEST_MATCH_LINES=0`; `gh-mac-stats-issues.txt` **UNAVAILABLE** (`HTTP 401` / `gh auth login`). Digest range `acf8470f098220892d9cca5f549ed7acf7c6ce86..47839d3b9a6d41c6daee263f781024d618db717a` (**3 commits**, **17 paths**): **`fix(mattermost):`** detect stale websocket after bot disable/enable cycle (#53604, `47839d3b9a`); **`fix(gateway):`** coerce streaming tool-call argument deltas to object in client tools (`c6ded0fa54`); **`fix(matrix):`** source-checkout runtime wrapper (`6fe24a6f2c`) — `extensions/mattermost/src/mattermost/monitor-websocket.ts` + tests, `extensions/matrix/src/plugin-entry.runtime.js`, `src/agents/pi-tool-definition-adapter.ts` + test, `src/agents/skills/*`, `CHANGELOG.md`, misc harness/tests — **no** root `AGENTS.md`, root **`package.json`**, or **`vitest.config.ts`**. **No** full read beyond digest; §7 spot checks on local `../openclaw` (`pnpm check` includes `format:check` → `pnpm tsgo`; `vitest.config.ts` thresholds **70/70/55/70**; `src/channel-web.ts` present): **Aligned**. Local `HEAD` still `55dc6a8bb28d`; **`git merge-base --is-ancestor HEAD 47839d3b9a6d41c6daee263f781024d618db717a`** succeeds — digest tip **`47839d3b9a6d`** ahead of local — **`git pull` in openclaw** for **`47839d3b9a6d41c6daee263f781024d618db717a`**. **browser-use:** `old_sha == new_sha` — not read beyond digest. **mac-stats:** log digest empty (`LOG_DIGEST_MATCH_LINES=0`); **no** new `FEAT-*` under `005-openclaw-reviewer/` or `../mac-stats-reviewer/agents/tasks/` (nothing actionable).
 
@@ -613,7 +615,7 @@ Cross-check **OpenClaw** `AGENTS.md` against the **openclaw** repository (siblin
 |---|-------------------|------------|---------|
 | 1 | WhatsApp web surface: `src/channel-web.ts` (L9) | **`src/channel-web.ts`** present; no `provider-web.ts` | **Aligned** |
 | 2 | Messaging: `docs/channels/`, `src/channels/`, `src/routing`, `src/channel-web.ts`, `src/plugins/…`, `extensions/*` (L18–21) | **`src/channels/`**, **`src/routing/`** (directory), **`src/plugins/`**, **`extensions/*`** present; channel code not misplaced as bogus top-level dirs (e.g. `src/telegram`) | **Aligned** |
-| 3 | Format check vs write (L72–73) | **`pnpm format:check`** → `oxfmt --check --threads=1`; **`pnpm format`** / **`format:fix`** → `oxfmt --write`; **`pnpm check`** includes `format:check` | **Aligned** |
+| 3 | Format check vs write | **`pnpm format:check`** → `oxfmt --check --threads=1`; **`pnpm format`** / **`format:fix`** → `oxfmt --write`; **`pnpm check`** on current `origin/main` does **not** chain `format:check` (formatting is pre-commit `pnpm format` write + explicit `pnpm format:check` when needed) | **Aligned** |
 | 4 | Vitest coverage (L114) | `vitest.config.ts`: lines/functions/statements **70**, branches **55** | **Aligned** |
 | 5 | TypeScript: `pnpm tsgo` (L70) | Doc states `tsgo` comes from **`@typescript/native-preview`** and that **`pnpm check`** invokes it; no separate `"tsgo"` script in `package.json` | **Aligned** |
 
@@ -621,14 +623,14 @@ Cross-check **OpenClaw** `AGENTS.md` against the **openclaw** repository (siblin
 
 - **`format:fix`** and **`format`** remain redundant aliases (`oxfmt --write`); harmless.
 - No OpenClaw code issues surfaced; this pass is doc↔config/layout consistency only.
-- Confirmed on disk: `src/cli`, `src/commands`, `src/channel-web.ts`, `src/infra`, `src/media`, `src/channels/`, `src/routing/`, `src/plugins/`; no `src/provider-web.ts`.
-- **`@typescript/native-preview`** in root `package.json` is `7.0.0-dev.20260322.1` (devDependency; `pnpm tsgo` uses the binary from `.bin` after install). Not spelled out in `AGENTS.md`; no doc change required.
+- Confirmed on disk: `src/cli`, `src/commands`, `src/channel-web.ts`, `src/tasks`, `src/infra`, `src/media`, `src/channels/`, `src/routing/`, `src/plugins/`; no `src/provider-web.ts`.
+- **`@typescript/native-preview`** in root `package.json` is `7.0.0-dev.20260327.2` (devDependency; `pnpm tsgo` uses the binary from `.bin` after install). Not spelled out in `AGENTS.md`; no doc change required.
 
 ### Historical (2026-03-22 morning)
 
 Earlier the same day, `AGENTS.md` had stale paths (`provider-web.ts`, old channel dirs), wrong format wording, and wrong branch threshold. Those were corrected upstream; the table above confirms the current tree matches the doc.
 
-**Upstream status:** `../openclaw/AGENTS.md` matches `package.json`, `vitest.config.ts`, and `src/` layout as verified on local `HEAD` `55dc6a8bb28d` (last check `2026-03-30T02:30:00Z`). Pre-built digest **incremental** range is **3 commits** (`acf8470f0982..47839d3b9a6d`: Mattermost stale-websocket detection after bot disable/enable, gateway streaming tool-call delta coercion for client tools, Matrix source-checkout runtime wrapper — see `openclaw-git-summary.txt` in `../mac-stats-reviewer/agents/.loop-cache/latest/`); local clone remains behind digest tip — **`git pull` in openclaw** refreshes to `47839d3b9a6d41c6daee263f781024d618db717a`; range **not** root `AGENTS.md`, root **`package.json`**, or **`vitest.config.ts`** — §7 spot checks on current local tree remain **Aligned**; no mac-stats FEAT work indicated.
+**Upstream status:** `../openclaw` at `c36fc1bdcc` (local commit on top of `origin/main` doc-align). Latest digest (`a27e020…`, generated `2026-03-30 02:37:33`) spans `47839d3b9a6..e57b3618fc8d` (task SQLite ledger + LLM idle timeout). `AGENTS.md` corrected for layout vs `src/` (no `provider-web.ts`; channels under `src/channels/` + `extensions/*`; `src/tasks/`; format script names). `vitest.config.ts` thresholds remain 70/70/55/70. **No FEAT files** added under mac-stats.
 
 ---
 
