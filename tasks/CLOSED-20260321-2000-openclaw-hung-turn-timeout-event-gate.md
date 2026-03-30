@@ -1928,3 +1928,16 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Acceptance criteria (1–4):** Pass — `TurnOutputGate` as `Arc<AtomicBool>`; `gate_allows_send` respected in `tool_loop` (`send_status` / draft paths); `finalize_turn_timeout` returns text starting `**Turn timed out**` with budget `**{}s**`; `ollama.rs` contains `closing output gate after turn wall-clock timeout`; `turn_lifecycle.rs` warns include `turn wall-clock timeout` and `closing output gate and running cleanup`; `cargo check` / `cargo test` succeed.
 - **Outcome naming (operator):** pass → **`CLOSED-`**; implementation fail → **`TESTED-`**; defective test plan / environment → **`TESTPLAN-`**.
 - **Outcome:** **PASS** — **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
+
+### Re-verify — 2026-03-30 UTC (`003-tester/TESTER.md`; único objetivo `UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` — sesión Cursor)
+
+- **Fecha:** 2026-03-30 UTC (local operador: 2026-03-30).
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**; no se usó otro `UNTESTED-*`. Fase TESTING: **`CLOSED-…` → `TESTING-…`** al inicio de esta corrida.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (crate biblioteca: **875** passed, 0 failed; doc-tests: 1 ignored)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - La tarea lista `rg … src/`; `src/` raíz (JS) sin coincidencias; Rust en `src-tauri/src/`.
+- **Criterios de aceptación (1–4):** Cumplidos — `TurnOutputGate` / `gate_allows_send`; `finalize_turn_timeout` con `**Turn timed out**` y presupuesto en segundos; cadenas de log en fuente; `cargo check` / `cargo test` OK.
+- **Nomenclatura (operador):** pass → **`CLOSED-`**; fallo implementación → **`TESTED-`**; plan/entorno defectuoso → **`TESTPLAN-`**.
+- **Resultado:** **PASS** — **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** tras este informe.
