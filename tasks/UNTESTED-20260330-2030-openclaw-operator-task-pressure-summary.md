@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** cycle **`FEAT-20260330-2030-…` → `WIP-…` → `UNTESTED-…`**: mac-stats implementation validated — `format_operator_task_pressure_summary`, `live_metrics_execution_system_section`, `task/review.rs` `pub(crate)` constants. Verified: **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** green. **Section 6 — Testing instructions** present (automated-first, links to Section 5).
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** cycle **`FEAT-20260330-2030-…` → `WIP-…` → `UNTESTED-…`**: Confirmed mac-stats implementation (`format_operator_task_pressure_summary`, `live_metrics_execution_system_section`, `task/review.rs` `pub(crate)` constants). Re-ran **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** (green). **Section 6 — Testing instructions** retained (automated-first, references Section 5).
 - **Next step:** **UNTESTED** — tester runs **Section 6 — Testing instructions** (manual / optional runtime after automated).
 ---
 
