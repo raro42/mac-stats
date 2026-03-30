@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): workflow **`FEAT → WIP → UNTESTED`** complete; **canonical file:** `tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md` (there is no `tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md` in-tree; intermediate `FEAT-*` / `WIP-*` names were already renamed to this). **§2 acceptance:** verified in-tree — `live_metrics_execution_system_section` appends `format_operator_task_pressure_summary()` after `live_metrics_for_prompt()`; constants aligned with `task/review.rs`; error path returns `(unavailable: …)` without panic; unit test `task::tests::operator_task_pressure_summary_empty_dir` with empty `MAC_STATS_TASK_DIR`. **Rust this run:** none (implementation already merged). **Automated (this run):** `cd src-tauri && cargo check` and `cargo test operator_task_pressure` — **pass**.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): workflow **`FEAT → WIP → UNTESTED`** applied to **`tasks/FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md`** (in-tree the backlog file was **`UNTESTED-*`**; this run renamed **`UNTESTED → FEAT → WIP`**, then **`WIP → UNTESTED`** after verification). **Acceptance (section 2):** verified in-tree — `live_metrics_execution_system_section` appends `format_operator_task_pressure_summary()` after `live_metrics_for_prompt()`; review constants from `task/review.rs`; error path uses `(unavailable: …)` without panic; unit test `task::tests::operator_task_pressure_summary_empty_dir` with empty `MAC_STATS_TASK_DIR`. **Rust this run:** no code edits; **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** — **pass**.
 - **Next step:** Tester runs **Section 6** (after **Section 5**) on **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
@@ -65,6 +65,18 @@ rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_secti
 **FEATURE-CODER:** After the coder run (**`FEAT → WIP → UNTESTED`**), the **tester** owns this section. Run **Section 5** before manual checks.
 
 **Required order:** run **Section 5 — Verification (automated)** first, then manual or optional runtime steps below.
+
+### Minimal smoke (copy-paste)
+
+From the repo root:
+
+```bash
+cd src-tauri && cargo check && cargo test operator_task_pressure
+```
+
+Optional full suite (acceptance criterion 3): `cd src-tauri && cargo test`
+
+Optional ripgrep sanity: `rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_section" src-tauri/src/task/mod.rs src-tauri/src/commands/context_assembler.rs`
 
 ### Quick checklist (tester)
 
