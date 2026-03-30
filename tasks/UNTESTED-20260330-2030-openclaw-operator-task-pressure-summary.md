@@ -1,8 +1,8 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`**. File workflow: **`FEAT → WIP → UNTESTED`** (this run). Starting file **`FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md`** was not present on disk; workflow applied from existing **`UNTESTED-…`** via **`UNTESTED → FEAT → WIP → UNTESTED`** so the prefix sequence matches FEATURE-CODER. Implementation in **`src-tauri`** (§4) matches §2; **`cargo check`** and **`cargo test operator_task_pressure`** passed. **§6 — Testing instructions** is filled for the tester.
-- **Next step:** Tester runs **§6** (after **§5**) on **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`**. Workflow **`FEAT → WIP → UNTESTED`** complete: **`FEAT-…` → `WIP-…` → `UNTESTED-…`**. **`src-tauri`** matches §4/§2; **`cargo check`** and **`cargo test operator_task_pressure`** passed. **§6 — Testing instructions** is ready for the tester.
+- **Next step:** Tester runs **§6** (after **§5**) on this file.
 ---
 
 # UNTESTED: OpenClaw parity — operator task pressure summary in execution context
