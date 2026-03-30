@@ -1,8 +1,8 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** cycle: **`FEAT-…` → `WIP-…` → `UNTESTED-…`**. (This cycle: file on disk was `UNTESTED-…`; renamed `UNTESTED` → `FEAT` → `WIP`, then closed as **`UNTESTED-…`**.) Implementation in-tree (`task/mod.rs`, `task/review.rs`, `commands/context_assembler.rs`). This run: **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** (`task::tests::operator_task_pressure_summary_empty_dir`) — **pass** (1 test). **Section 6 — Testing instructions** is the QA checklist (run automated **Section 5** first).
-- **Next step:** **`UNTESTED`** (filename) — tester runs **Section 6** (start with **Section 5**).
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** cycle: **`FEAT-…` → `WIP-…` → `UNTESTED-…`**. Implementation in-tree (`task/mod.rs`, `task/review.rs`, `commands/context_assembler.rs`). **`cd src-tauri && cargo check`** and **`cargo test operator_task_pressure`** (`task::tests::operator_task_pressure_summary_empty_dir`) — **pass**. **Section 6 — Testing instructions** is the QA checklist (run **Section 5** first).
+- **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
 # UNTESTED: OpenClaw parity — operator task pressure summary in execution context
