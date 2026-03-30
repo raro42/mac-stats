@@ -1902,3 +1902,16 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Acceptance criteria (1–4):** Pass — `TurnOutputGate` / `gate_allows_send`; `finalize_turn_timeout` with `**Turn timed out**` and budget seconds; router / lifecycle log strings in source; `cargo check` / `cargo test` green.
 - **Outcome naming (operator):** pass → **`CLOSED-`**; implementation fail → **`TESTED-`**; defective test plan / environment → **`TESTPLAN-`**. Repo `003-tester/TESTER.md` fail/block → **`WIP-`** — not applicable.
 - **Outcome:** **PASS** — final filename: **`CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
+
+### Re-verify — 2026-03-30 UTC (`003-tester/TESTER.md`; operator target `UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only)
+
+- **Date:** 2026-03-30 UTC.
+- **Rename UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` was **not present**; no other `UNTESTED-*` file was used. **TESTING phase:** renamed **`CLOSED-…` → `TESTING-…`** for this run (canonical task file only).
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (library crate: **875** passed, 0 failed; doc-tests: 1 ignored)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches in `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - Task verification block lists `rg … src/`; top-level `src/` has no Rust matches (frontend JS); Rust under `src-tauri/src/`.
+- **Acceptance criteria (1–4):** Pass — `TurnOutputGate` (`Arc<AtomicBool>`) and `gate_allows_send` in tool loop; `finalize_turn_timeout` returns text starting `**Turn timed out**` with budget seconds; router / lifecycle log strings in source (`closing output gate after turn wall-clock timeout`, `turn wall-clock timeout`, `closing output gate and running cleanup`); `cargo check` / `cargo test` green.
+- **Outcome naming (operator):** pass → **`CLOSED-`**; implementation fail → **`TESTED-`**; defective test plan / environment → **`TESTPLAN-`**. Repo `003-tester/TESTER.md` fail/block → **`WIP-`** — not applicable.
+- **Outcome:** **PASS** — rename **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** after this run.
