@@ -1,5 +1,7 @@
 # Browser use — CDP health check ping (`1+1`)
 
+> **Read your basename first.** The **only** rename into **`TESTING-`** that starts a valid run for this slug is **`UNTESTED-` → `TESTING-`**. Renaming **`TESTPLAN-` → `TESTING-`** or **`CLOSED-` → `TESTING-`** because the queue slot “was missing” is **invalid** for this task and produced false **TESTPLAN-** outcomes in archived reports (operators treated **`TESTER.md`**’s unfiltered **`cargo test`** as the bar).
+>
 > **Filename on disk (read the basename):**
 > - **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`** — **under revision**. Testers **must not** run the gate or rename **`TESTPLAN-` → `TESTING-`**. Wait for the coder to rename **`TESTPLAN-` → `UNTESTED-`** (same stamp and slug).
 > - **`UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** — **executable queue file**. Testers rename **`UNTESTED-` → `TESTING-`** to execute per **`TESTER.md`**.
@@ -8,7 +10,7 @@
 >
 > **Scope:** **mac-stats** repository only. All paths refer to **`src-tauri/src/browser_agent/mod.rs`** in that clone. Running these steps in a **different repo** (e.g. a sibling **openclaw** tree) is **out of scope** and invalid — use the mac-stats checkout that contains this `tasks/` file.
 >
-> **Testing instructions** revised **2026-03-30** (j): **(i)** plus **optional PF-0** (walk up to repo root when the shell started in `tasks/`, `src/`, etc.); **one-line gate recap** immediately under **Testing instructions**; **fish** note that `bash -lc` must receive a **single-quoted** script or heredoc so `$()` / `$(pwd)` are not expanded by fish; **TESTPLAN-** only for instruction/handoff defects — **not** when Step 3 passed but an optional full suite failed.
+> **Testing instructions** revised **2026-03-30** (k): **(j)** plus **forbidden queue shortcuts** (**never** **`TESTPLAN-` → `TESTING-`** or **`CLOSED-` → `TESTING-`**); **`TESTER.md` last-line override** (unfiltered **`cargo test`** is not Step 3 for this slug); **archive copy-paste** warning (**do not** take verification commands from **`CLOSED-…`** history); **language priority** (English Steps 1–4 beat any summary that implied a full-suite gate).
 
 ## Goal
 
@@ -26,7 +28,7 @@ The **Phase 0** table is the short decision guide; the bullets below spell out t
 
 - **If the task file on disk is `TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`:** instructions are **under revision**. Testers **must not** rename **`TESTPLAN-` → `TESTING-`** or execute the gate until a coder publishes **`UNTESTED-…`** (same stamp and slug).
 - **Executable queue file (only this name for a real run):** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`. At the start of a normal test run, rename **`UNTESTED-` → `TESTING-`**, execute the steps below, then follow your runbook for **`TESTING-` → `CLOSED-`** or failure naming.
-- **Handoff defect — do not substitute other prefixes for this slug:** If **`UNTESTED-…` is missing** at repo tip, **stop**. Do **not** rename `CLOSED-…` or `TESTPLAN-…` to `TESTING-…` to “run” this task unless your operator guide **explicitly** authorizes that exception. Typical fix: pull/sync to a revision where the coder published **`UNTESTED-…`** (after **`TESTPLAN-` → `UNTESTED-`**), or file a handoff defect. Treating historical **`CLOSED-…`** as the live test target caused false **TESTPLAN-** outcomes (full-suite noise) and bypassed the narrow gate below.
+- **Handoff defect — do not substitute other prefixes for this slug:** If **`UNTESTED-…` is missing** at repo tip, **stop**. Do **not** rename `CLOSED-…` or `TESTPLAN-…` to `TESTING-…` to “run” this task unless your operator guide **explicitly** authorizes that exception. **`TESTPLAN-` → `TESTING-`** is **never** the correct workaround for a missing **`UNTESTED-…`** file — that skips coder publication and invites the wrong **`cargo test`** bar. Typical fix: pull/sync to a revision where the coder published **`UNTESTED-…`** (after **`TESTPLAN-` → `UNTESTED-`**), or file a handoff defect. Treating historical **`CLOSED-…`** as the live test target caused false **TESTPLAN-** outcomes (full-suite noise) and bypassed the narrow gate below.
 - If **`tasks/TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md` exists** (and **`UNTESTED-…` is absent**): testing instructions are **under revision**. Do **not** rename `TESTPLAN-` → `TESTING-` for execution; wait for **`TESTPLAN-` → `UNTESTED-`**, then pick up **`UNTESTED-…`**.
 - **`TESTER.md` / templates** that still mandate an **unfiltered** `cargo test` / `cargo test --no-fail-fast` / `cargo test -p mac_stats --no-fail-fast` with **no** `cdp_retry_` filter for this slug are **stale for pass/fail**. **Closure** for this slug depends **only** on **Steps 1–4** (gate) in **Testing instructions** (see **Pass/fail scope**).
 - **Outcome:** If **Steps 1–4** all pass, the task **passes** for this slug even when an **optional** unfiltered `cargo test -p mac_stats --no-fail-fast` would fail (Discord `pdfs_dir`, scheduler home-directory coupling, etc.). Use **TESTPLAN-** only when **testing instructions** or **queue filenames/handoff** are wrong — **not** when the narrow gate passes but the broad suite fails.
@@ -35,7 +37,7 @@ The **Phase 0** table is the short decision guide; the bullets below spell out t
 
 | Filename on disk | What you do |
 |------------------|-------------|
-| **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`** | **Stop.** Instructions are **under coder revision** or this copy is **not** yet published to the tester queue. **Do not** rename **`TESTPLAN-` → `TESTING-`**. Wait until the repo contains **`UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** (same stamp/slug), then use that file per your runbook. |
+| **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`** | **Stop.** Instructions are **under coder revision** or this copy is **not** yet published to the tester queue. **Do not** rename **`TESTPLAN-` → `TESTING-`** (that is **not** equivalent to missing **`UNTESTED-…`** — record **handoff / instruction** state, do **not** execute the gate from this basename). Wait until the repo contains **`UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** (same stamp/slug), then use that file per your runbook. |
 | **`UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** | This is the **executable** queue name. Rename **`UNTESTED-` → `TESTING-`** per **`TESTER.md`**, then run **Preflight** + **Steps 1–4** below. |
 | **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md` and no `UNTESTED-…` for this slug** | **`CLOSED-`** is **archive** (reports + history), not the executable queue name for a **new** pass. **Stop** — do not rename **`CLOSED-` → `TESTING-`** to simulate **`UNTESTED-` → `TESTING-`** unless your operator guide **explicitly** allows that exception. Pull/sync to a revision that contains **`UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`**, or file a handoff defect. |
 | **`TESTING-20260321-1345-browser-use-cdp-health-check-ping.md`** | Run in progress per **`TESTER.md`**. |
@@ -89,7 +91,7 @@ The **Phase 0** table is the short decision guide; the bullets below spell out t
 3. **Gate command shape:** **Step 3** is **`… --lib cdp_retry_ --no-fail-fast`** — both **`--lib`** and the substring **`cdp_retry_`** are mandatory on the **same** command line.
 4. **Stale runbooks:** Ignore mandatory lines that run **unfiltered** `cargo test` / `cargo test --no-fail-fast` for this slug; see **Stale runbook override**.
 
-**Authority / language:** Pass/fail for this slug is defined **only** by this task file (English). **TESTER.md**, localized templates, or Discord/summary text that contradict **Steps 1–4** here are **stale for acceptance** — follow **this** file, not a translated or abbreviated checklist.
+**Authority / language:** Pass/fail for this slug is defined **only** by this task file (English). **TESTER.md**, localized templates, or Discord/summary text that contradict **Steps 1–4** here are **stale for acceptance** — follow **this** file, not a translated or abbreviated checklist. If a summary claimed this task “requires” unfiltered **`cargo test --no-fail-fast`** as the **mandatory** verification, that summary is **wrong for this slug** — **Step 3** has always been the **`cdp_retry_`**-filtered **`--lib`** command in **this** document (see **Authoritative automated test command**).
 
 **Why the last cycle was `TESTPLAN-` (instruction defect):** Testers followed a **stale** bar (**unfiltered** `cargo test --no-fail-fast` — sometimes copied from **TESTER.md** or an older task body — and misread it as “the mandatory verification block”) and/or ran from a tree where **`UNTESTED-…`** was absent and used **`CLOSED-…`** / **`TESTPLAN-…`** as a stand-in. Neither matches **this** document. **Implementation** of the CDP health-check was **not** implicated.
 
@@ -238,6 +240,7 @@ Mistakes that produced **TESTPLAN-** while the CDP implementation was fine:
 7. **Omitted `--lib` on Step 3:** `cargo test -p mac_stats --no-fail-fast` **without** `--lib` and **without** `cdp_retry_` is **not** Step 3 — it pulls in **more than library unit tests** and is a common source of unrelated failures.
 8. **Equating “task verification” with TESTER.md’s last `cargo test` line:** Some runbooks end with **`cd src-tauri && cargo test --no-fail-fast`** and **no** filter. That command is **not** Step 3 for this slug. **Pass/fail** is **only** Steps 1–4 **in this file**; do **not** emit **`TESTPLAN-`** because that unfiltered line failed if **Step 3** (`cdp_retry_`) **passed**.
 9. **fish + `bash -lc`:** Passing the gate script in **double quotes** (or unquoted) lets **fish** expand **`$(pwd)`** and other **`$(…)`** before **bash** runs, so the script does not behave like the copy-paste block. Use **single-quoted** `bash -lc '…'`, a heredoc, or a small **`*.sh`** file.
+10. **`TESTPLAN-` → `TESTING-`:** When **`UNTESTED-…`** was absent, some operators renamed **`TESTPLAN-…`** (or **`CLOSED-…`**) to **`TESTING-…`** and then followed **`TESTER.md`**’s unfiltered **`cargo test`**. That bypasses this file’s **Step 3** (the **`cdp_retry_`** filter) and is **not** a valid run for this slug — record **handoff defect** or wait for **`TESTPLAN-` → `UNTESTED-`**, then **`UNTESTED-` → `TESTING-`**.
 
 **Fix for retest:** Use **`UNTESTED-…`** from the branch you test; run **Steps 1–4** using the **bash block** and **1) Static review** for `rg` (see **Paths by cwd** for the path column only); ignore unfiltered suite results for pass/fail.
 
@@ -387,10 +390,12 @@ If it fails, **do not** fail the task **unless** the failure is in the **`cdp_re
 
 Cumulative tester reports and older verification notes: **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** (reference only).
 
+**Do not copy “Commands run” from `CLOSED-…` into a new pass.** Archive blocks often show **`cd src-tauri && cargo test --no-fail-fast`** without **`cdp_retry_`** — that reflects **older operator habit** or **pre-revision** checklists, **not** the current **Steps 1–4** gate. For execution, use **only** this file’s **Copy-paste — full gate** + **Step 4**.
+
 ## Publication workflow (TESTPLAN → UNTESTED)
 
 While instructions are edited, the task lives as **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`**. When ready for **`003-tester`**, the coder renames **`TESTPLAN-` → `UNTESTED-`** (same stamp and slug). After that rename, **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** is the only executable queue filename for this slug (see **Operator filename** and **Phase 0** above).
 
 If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
 
-**This revision (j):** **`TESTPLAN-…` → `UNTESTED-…`** — **PF-0** walk-up for wrong cwd; **one-line gate recap**; **fish** + `bash -lc` quoting; **retest preflight** Phase 0 wording ties **`TESTPLAN-`** stop to missing **`UNTESTED-`**. Carries forward **(i)** tri-check, stale-runbook / **`cdp_retry_`** bar, and **no** unfiltered suite as acceptance. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+**This revision (k):** Coder **`TESTPLAN-…` → `UNTESTED-…`** for retest — **forbidden** **`TESTPLAN-` → `TESTING-`** / **`CLOSED-` → `TESTING-`** shortcuts; **`TESTER.md`** unfiltered **`cargo test`** explicitly **not** Step 3; **archive** **`CLOSED-…`** copy-paste warning; **English** Steps 1–4 override summaries that implied a full-suite mandatory gate. Carries forward **(j)**. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).

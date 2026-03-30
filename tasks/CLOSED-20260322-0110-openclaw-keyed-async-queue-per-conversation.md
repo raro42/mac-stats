@@ -2516,3 +2516,21 @@ rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs
 - `rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs` — **pass** (lines 1143, 1347, 1934 `crate::keyed_queue::run_serial`; line 2345 `ollama_queue_key` with `format!("discord:{}", …)`)
 
 **Outcome:** **Pass** — all acceptance criteria met. Final filename: **CLOSED-** per operator mapping (not **TESTED-** or **TESTPLAN-**). Live Discord not exercised.
+
+## Test report (2026-03-30 — Cursor agent, `003-tester/TESTER.md`)
+
+**Date:** 2026-03-30, local wall clock on the host where `cargo` ran (mac-stats workspace).
+
+**Preflight / names:** Operator required only `tasks/UNTESTED-20260322-0110-openclaw-keyed-async-queue-per-conversation.md` (no other `UNTESTED-*`). At run start only `CLOSED-20260322-0110-…` existed; applied **CLOSED → UNTESTED → TESTING** (same basename) per `003-tester/TESTER.md` so **UNTESTED → TESTING** is satisfied without selecting another task.
+
+**Commands run**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test keyed_queue` — **pass** (`same_key_runs_sequentially`, `different_keys_may_overlap`)
+- `cd src-tauri && cargo test` — **pass** (875 passed, 0 failed in `mac_stats` lib tests; 1 doc-test ignored)
+
+**Static spot-check**
+
+- `rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs` — **pass** (lines 1143, 1347, 1934 `crate::keyed_queue::run_serial`; line 2345 `ollama_queue_key` with `discord:{}`)
+
+**Outcome:** All acceptance criteria pass → **CLOSED-** (not **TESTED-** or **TESTPLAN-**). Renamed **TESTING- → CLOSED-** after this report. Live Discord not exercised.

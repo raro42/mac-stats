@@ -1196,3 +1196,16 @@ rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/com
 - **Result:** **Pass** — automated **Verification** and task **Pass/fail criteria** satisfied; optional live Discord / throttle-override steps not run.
 - **Outcome filename:** `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md` (not `TESTED-*` implementation fail or `TESTPLAN-*` defective instructions).
 
+### Tester run (2026-03-30 UTC, TESTER.md — Cursor agent, operator slug `UNTESTED-20260322-0105-openclaw-draft-stream-throttled-reply.md`)
+
+- **Date:** 2026-03-30 UTC (local workspace date: Monday 2026-03-30).
+- **Note:** The path `tasks/UNTESTED-20260322-0105-openclaw-draft-stream-throttled-reply.md` does not exist; the task was `CLOSED-*` before this run. Per `003-tester/TESTER.md` step 2: renamed `CLOSED-*` → `TESTING-*`, ran verification, appended this report, then `TESTING-*` → `CLOSED-*`. No other `UNTESTED-*` task file was used.
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass (`Finished dev profile [unoptimized + debuginfo] target(s) in 4.41s`).
+  - `cd src-tauri && cargo test discord_draft_stream::` — pass (2 tests: `clamp_under_limit_unchanged`, `clamp_truncates_with_ellipsis`; 873 filtered out in lib crate; test binary compile finished in 6.72s).
+  - `rg -n "spawn_discord_draft_editor" src-tauri/src/discord/mod.rs` — match at line **2197**.
+  - `rg -n "DiscordDraftHandle"` in `src-tauri/src/commands/tool_loop.rs`, `turn_lifecycle.rs`, `ollama.rs` — matches at `tool_loop.rs` 14 and 152; `turn_lifecycle.rs` 10 and 95; `ollama.rs` 109.
+- **Config:** `Config::discord_draft_throttle_ms()` in `config/mod.rs` (~461–480): `discord_draft_throttle_ms`, env `MAC_STATS_DISCORD_DRAFT_THROTTLE_MS`, clamp **200..=60_000** ms.
+- **Result:** **Pass** — automated **Verification** and task **Pass/fail criteria** satisfied; optional live Discord / throttle-override steps not run.
+- **Outcome:** rename `TESTING-*` → `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md` (pass; not `TESTED-*` or `TESTPLAN-*`).
+
