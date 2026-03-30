@@ -1849,3 +1849,16 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Criterios de aceptación:** Cumplidos (1–4): `TurnOutputGate` (`Arc<AtomicBool>`) y `gate_allows_send` en tool loop; `finalize_turn_timeout` con texto que empieza por `**Turn timed out**` y presupuesto en segundos; cadenas de log en fuente (`closing output gate after turn wall-clock timeout`, `turn wall-clock timeout`, `closing output gate and running cleanup`); `cargo check` / `cargo test` correctos.
 - **Nomenclatura (operador):** pass → **`CLOSED-`**; fallo de implementación → **`TESTED-`**; plan de pruebas / spec de entorno defectuoso → **`TESTPLAN-`**. `003-tester/TESTER.md`: bloqueo/fallo → **`WIP-`** — no aplica.
 - **Resultado:** **PASS** — nombre final tras este run: **`CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
+
+### Re-verify — 2026-03-30 UTC (`003-tester/TESTER.md`; solo `UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` — ejecución Cursor)
+
+- **Fecha:** 2026-03-30 UTC.
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**; no se eligió ningún otro `UNTESTED-*`. Fase TESTING: **`CLOSED-…` → `TESTING-…`** al inicio de esta sesión.
+- **Comandos ejecutados (esta sesión):**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (crate biblioteca: **875** passed, 0 failed; doc-tests: 1 ignored)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - El bloque de verificación de la tarea usa `rg … src/`; en `src/` raíz (frontend JS) no hay esas cadenas Rust; la implementación está en `src-tauri/src/`.
+- **Criterios de aceptación (1–4):** Cumplidos (`TurnOutputGate` / `gate_allows_send`; `finalize_turn_timeout` con `**Turn timed out**` y presupuesto en segundos; cadenas de log en fuente; `cargo check` / `cargo test` en verde).
+- **Nomenclatura (instrucción operador):** pass → **`CLOSED-`**; fallo de implementación → **`TESTED-`**; plan/entorno defectuoso → **`TESTPLAN-`**.
+- **Resultado:** **PASS** — restaurar nombre a **`CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
