@@ -1385,3 +1385,16 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Acceptance criteria:** All satisfied (`TurnOutputGate` as `Arc<AtomicBool>`; `gate_allows_send` in tool loop; `finalize_turn_timeout` text starts `**Turn timed out**` with budget seconds; router string `closing output gate after turn wall-clock timeout` in `ollama.rs`; turn-lifecycle warn strings `turn wall-clock timeout` / `closing output gate and running cleanup` in `turn_lifecycle.rs`; `cargo check` / `cargo test` green).
 - **Outcome naming (operator):** pass → **`CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**. Not **`TESTED-`** (implementation fail) or **`TESTPLAN-`** (defective test instructions / environment). Repo `003-tester/TESTER.md` uses **`WIP-…`** for generic blocked/failed runs.
 - **Outcome:** **PASS** — file renamed **`TESTING-…` → `CLOSED-…`** immediately after this append.
+
+### Re-verify — 2026-03-30 UTC (`003-tester/TESTER.md`; objetivo `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` únicamente; sin otro `UNTESTED-*`)
+
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**. Para la fase TESTING se renombró **`CLOSED-…` → `TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** al inicio de este run. No se usó ningún otro `UNTESTED-*`.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (crate librería: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - Bloque del task con `rg … src/`: sin coincidencias en `src/` de primer nivel (solo frontend JS; Rust en `src-tauri/src/`)
+- **Criterios de aceptación:** Cumplidos.
+- **Nomenclatura de resultado (mensaje operador):** pass → **`CLOSED-…`**. No aplica **`TESTED-`** ni **`TESTPLAN-`**. `003-tester/TESTER.md` del repo: fallo/bloqueo genérico → **`WIP-…`**.
+- **Resultado:** **PASS** — restaurar **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** tras este append.
+
