@@ -1598,3 +1598,15 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Nomenclatura de resultado (operador):** pass → **`CLOSED-…`**; fallo de implementación → **`TESTED-…`**; instrucciones de prueba / especificación de entorno defectuosas → **`TESTPLAN-…`**. `003-tester/TESTER.md` usa **`WIP-…`** para fallo/bloqueo genérico — no aplica.
 - **Resultado:** **PASS** — renombrar **`TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** tras este append.
 
+### Re-verify — 2026-03-30 UTC (`003-tester/TESTER.md`; operador pidió `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` únicamente)
+
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no estaba en el árbol**; no se eligió otro `UNTESTED-*`. **Fase TESTING:** `tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` → `tasks/TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` al inicio de este run.
+- **Comandos ejecutados:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (crate biblioteca: **875** passed, 0 failed; bins/doc-tests sin fallos)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — sin coincidencias (el bloque de la tarea cita `src/`; el Rust vive en `src-tauri/src/`)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — coincidencias en `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+- **Criterios de aceptación:** Cumplidos (`TurnOutputGate` / `gate_allows_send`; `finalize_turn_timeout` con `**Turn timed out**` y presupuesto en segundos; cadenas de log en fuente; `cargo check` / `cargo test` en verde).
+- **Nomenclatura de resultado (operador):** pass → **`CLOSED-…`**; fallo de implementación → **`TESTED-…`**; instrucciones / entorno defectuosos → **`TESTPLAN-…`**. `003-tester/TESTER.md`: **`WIP-…`** en fallo/bloqueo genérico — no aplica.
+- **Resultado:** **PASS** — tras este append, renombrar **`TESTING-…` → `CLOSED-…`**.
+
