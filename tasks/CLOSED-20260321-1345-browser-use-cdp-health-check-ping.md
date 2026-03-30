@@ -2988,3 +2988,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Criterios de aceptación (1)–(3):** cumplidos según los `rg` y el código en `browser_agent/mod.rs`.
 
 **Outcome:** **CLOSED-** — todos los criterios y comandos de verificación pasan. El fichero queda como `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md` (renombrado `TESTING-` → `CLOSED-` al finalizar esta corrida).
+
+---
+
+## Test report
+
+**Date:** operator calendar 2026-03-30; **2026-03-30T00:40:38Z (UTC)** (`date -u`).
+
+**TESTER.md flow (`003-tester/TESTER.md`):** Operator named `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; that path **does not exist** in the repo. The task with this slug was **`CLOSED-…`**; renamed **`CLOSED-` → `TESTING-`** at the start of this run (same basename after the prefix; functional equivalent to `UNTESTED-` → `TESTING-`). **Did not test any other `UNTESTED-*` file.**
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (875 passed, 0 failed in crate lib `mac_stats`; other bins 0 tests; 1 doc-test ignored)
+
+**Acceptance criteria (1)–(3):** satisfied per `rg` and `src-tauri/src/browser_agent/mod.rs`.
+
+**Outcome (operator convention):** **CLOSED-** — all acceptance criteria and verification commands pass. Rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.

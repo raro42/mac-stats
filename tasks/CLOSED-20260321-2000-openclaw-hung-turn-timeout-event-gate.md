@@ -1200,3 +1200,10 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
   - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches in `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
 - **Acceptance criteria:** All satisfied (`TurnOutputGate` as `Arc<AtomicBool>`; `gate_allows_send` in tool loop; `finalize_turn_timeout` text starts `**Turn timed out**` with budget seconds; router string `closing output gate after turn wall-clock timeout`; turn-lifecycle warns include `turn wall-clock timeout` / `closing output gate and running cleanup`; `cargo check` / `cargo test` green).
 - **Outcome:** **PASS** — restore **`TESTING-…` → `CLOSED-…`**: `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
+
+### Test report — 2026-03-30 (UTC), sesión Cursor (`003-tester/TESTER.md`)
+
+- **Renombre UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` **no existía**; no se usó otro `UNTESTED-*`. Fase TESTING: **`CLOSED-…` → `TESTING-…`** antes de ejecutar comandos; con **PASS** se restaura **`CLOSED-…`**. Nomenclatura operador: pass → `CLOSED-`; fallo implementación → `TESTED-`; spec de prueba defectuosa → `TESTPLAN-` (el `TESTER.md` del repo usa `WIP-` para bloqueo/fallo genérico).
+- **Comandos:** `cd src-tauri && cargo check` — pass; `cd src-tauri && cargo test` — pass (**875** tests librería, 0 failed); `rg …` en `src/` — sin matches (Rust en `src-tauri/src/`); `rg … src-tauri/src` — matches en `commands/ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`.
+- **Criterios de aceptación:** Cumplidos.
+- **Resultado:** **PASS** → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.

@@ -2,6 +2,7 @@
 ## Triage summary (TOP)
 
 - **Coder (UTC):** 2026-03-30 — Implemented **`format_operator_task_pressure_summary`** in **`src-tauri/src/task/mod.rs`**, wired into **`live_metrics_execution_system_section`** in **`src-tauri/src/commands/context_assembler.rs`**; review limits exported as **`pub(crate)`** constants from **`src-tauri/src/task/review.rs`**; unit test **`operator_task_pressure_summary_empty_dir`**. Module doc **`review.rs`** corrected (loop is 60 s, not 10 min).
+- **Coder verify (UTC):** 2026-03-30 — `cd src-tauri && cargo check` and **`cargo test operator_task_pressure`** green on this tree.
 - **Next step:** **UNTESTED** — tester runs **Testing instructions** below (manual grep / optional Discord or CPU-window turn).
 ---
 
@@ -64,9 +65,10 @@ rg -n "format_operator_task_pressure_summary|live_metrics_execution_system_secti
 
 ### How to test
 
-1. Run **Verification (automated)** above.
-2. **Static inspection:** Open **`context_assembler.rs`** and confirm **`live_metrics_execution_system_section`** calls **`format_operator_task_pressure_summary`** after **`live_metrics_for_prompt`**.
-3. **Optional (runtime):** Start mac-stats with `-vvv`, trigger one short Discord or CPU-window message that hits **`answer_with_ollama_and_fetch`**, then search logs for a truncated system prompt or add a temporary `debug3!` if your build already logs assembled prompts — alternatively, use a debugger breakpoint on **`build_execution_system_content`** and inspect **`metrics_for_system`** containing both **Current system metrics** and **Task backlog (operator)**.
+1. Run **Verification (automated)** above. The filter **`operator_task_pressure`** runs **`task::tests::operator_task_pressure_summary_empty_dir`**, which sets **`MAC_STATS_TASK_DIR`** to an empty temp directory and asserts the summary contains **`## Task backlog (operator)`**, zero **`open=`** / **`wip=`** counts, and **`Review loop: every 60 s`** (aligned with **`TASK_REVIEW_INTERVAL_SECS`** in **`task/review.rs`**).
+2. **Static inspection:** Open **`context_assembler.rs`** and confirm **`live_metrics_execution_system_section`** calls **`format_operator_task_pressure_summary`** immediately after **`live_metrics_for_prompt`** (metrics block first, then task block).
+3. **Error path (optional):** If the task directory cannot be read, the prompt must still include **`## Task backlog (operator)`** on one line with **`(unavailable:`** and an error hint — no panic. Easiest check is code review of **`format_operator_task_pressure_summary`** in **`task/mod.rs`** (`Err` branch).
+4. **Optional (runtime):** Start mac-stats with `-vvv`, trigger one short Discord or CPU-window message that hits **`answer_with_ollama_and_fetch`**, then search logs for a truncated system prompt or add a temporary `debug3!` if your build already logs assembled prompts — alternatively, use a debugger breakpoint on **`build_execution_system_content`** and inspect **`metrics_for_system`** containing both **Current system metrics** and **Task backlog (operator)**.
 
 ### Pass / fail criteria
 
