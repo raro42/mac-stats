@@ -1237,3 +1237,14 @@ rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_ti
 - **Comandos:** `cd src-tauri && cargo check` — pass; `cd src-tauri && cargo test` — pass (**875** tests en crate librería, 0 failed); `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches en `commands/ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`.
 - **Criterios de aceptación:** Cumplidos (incl. `**Turn timed out**` y presupuesto en `finalize_turn_timeout`; cadenas de log en fuente).
 - **Resultado:** **PASS** — **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
+
+### Re-verify — 2026-03-30 (UTC), `003-tester/TESTER.md` (operator target `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only)
+
+- **Rename UNTESTED → TESTING:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` was **not present**; no other `UNTESTED-*` file was used. **TESTING phase:** `CLOSED-…` → `TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` for this run (per prior workflow when the UNTESTED filename is absent). Operator outcome naming: pass → **`CLOSED-…`**; implementation fail → **`TESTED-…`**; defective testing instructions / environment → **`TESTPLAN-…`**. Repo `003-tester/TESTER.md`: generic fail/block → **`WIP-…`**.
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass
+  - `cd src-tauri && cargo test` — pass (library crate: **875** passed, 0 failed)
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src-tauri/src` — matches in `commands/ollama.rs`, `commands/turn_lifecycle.rs`, `commands/tool_loop.rs`
+  - `rg -n "closing output gate after turn wall-clock|TurnOutputGate|finalize_turn_timeout" src/` — no matches (task lists `src/`; frontend JS tree has no Rust strings; implementation under `src-tauri/src/`)
+- **Acceptance criteria:** All satisfied.
+- **Outcome:** **PASS** — restore **`TESTING-…` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
