@@ -1,6 +1,6 @@
 # Browser use — CDP health check ping (`1+1`)
 
-> **Queue file:** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` — testers rename **`UNTESTED-` → `TESTING-`** to execute. **Testing instructions** were revised **2026-03-30** after a **TESTPLAN-** outcome: the previous gate was read as “full `cargo test` for the crate,” which fails in some environments for **unrelated** tests (`discord`/`pdfs_dir`, scheduler home coupling, etc.). That is **not** a CDP health-check regression. The **only** automated test gate is step **3** with the literal filter **`cdp_retry_`**.
+> **Queue file:** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` — testers rename **`UNTESTED-` → `TESTING-`** to execute. **Testing instructions** were revised **2026-03-30** (coder pass): (a) the gate was mis-read as an **unfiltered** crate `cargo test`, which fails for **unrelated** tests — **not** a CDP regression; (b) the **optional** full-suite snippet wrongly said “from `src-tauri/`” but still used `cd src-tauri` (always wrong there); (c) `rg … | head` under `set -o pipefail` can fail with a **non-zero** pipeline exit when `head` closes the pipe (**SIGPIPE**), producing a **false** static-review failure — use **`rg -m 20`** instead. The **only** automated test gate remains step **3** with the literal filter **`cdp_retry_`**.
 
 ## Goal
 
@@ -30,12 +30,25 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 - **Preferred cwd for the gate:** stay at **repository root** for the whole copy-paste block. Use **`cargo … --manifest-path src-tauri/Cargo.toml`** so you never depend on `cd src-tauri` (a common source of “0 tests” when someone runs `cargo test` from root without a manifest).
 - **Alternate cwd:** you may instead `cd` to **`src-tauri/`** once (from repo root) and run `cargo check -p mac_stats` / `cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast` with **no** `--manifest-path`. If you do, stay in `src-tauri/` for those **cargo** commands; use the path rules above for **`rg`** (either return to repo root for `src-tauri/src/browser_agent/mod.rs`, or use `src/browser_agent/mod.rs` from inside `src-tauri/`).
 - **Already in `src-tauri/`:** run **`cargo … -p mac_stats`** with **no** leading `cd src-tauri` (that path does not exist inside `src-tauri/`). Same for **`rg`**: paths are **`src/browser_agent/mod.rs`**, not `src-tauri/src/...`.
-- **Shell / pipelines:** The copy-paste block is written for **bash**. **zsh** on macOS also supports `set -o pipefail` (or use `setopt pipefail`). **fish** has different pipeline semantics — run the block via `bash -lc '…'` or execute each command manually. Without pipefail, `rg … | head` can exit **0** even when `rg` finds **no** lines (false pass).
+- **Shell / pipelines:** The copy-paste block is written for **bash**. **zsh** on macOS also supports `set -o pipefail` (or use `setopt pipefail`). **fish** has different pipeline semantics — run the block via `bash -lc '…'` or execute each command manually. Static review uses **`rg -m 20`** (no `| head`) so **`set -o pipefail` does not** turn a successful search into a pipeline failure (**SIGPIPE** when `head` stops reading).
 - **`rg`:** ripgrep must be available on `PATH` (same as other task files).
 - **No live Chrome / CDP session** is required for steps **1–4** (static review, compile, lib unit tests, spot-check).
 - **Rust:** stable toolchain able to build `mac_stats` (same as normal mac-stats development).
 
 ## Testing instructions
+
+### Commands by cwd (pick exactly one column)
+
+Use **one** column end-to-end for **steps 1–3** (paths and **cargo** flags must match that cwd).
+
+| Step | **Repository root** (directory containing `src-tauri/`) | **Already inside** `…/mac-stats/src-tauri/` |
+|------|--------------------------------------------------------|---------------------------------------------|
+| **1 — first `rg`** | `rg 'evaluate_one_plus_one_blocking_timeout\|check_browser_alive\|BROWSER_CDP_HEALTH_CHECK_TIMEOUT\|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` | `rg '…' src/browser_agent/mod.rs` (same pattern, path **without** `src-tauri/` prefix) |
+| **1 — second `rg`** | `rg -n -m 20 'Never use.*Handle::block_on\|recv_timeout\(BROWSER_CDP_HEALTH_CHECK_TIMEOUT\)' src-tauri/src/browser_agent/mod.rs` | same pattern, path `src/browser_agent/mod.rs` |
+| **2 — `cargo check`** | `cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats` | `cargo check -p mac_stats` (**no** `cd src-tauri`) |
+| **3 — gate `cargo test`** | `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast` | `cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast` (**no** `cd src-tauri`) |
+
+If you mix columns (e.g. root paths while cwd is `src-tauri/`), you get empty **`rg`** output or **`running 0 tests`** — that is an **execution** mistake, not a product failure.
 
 ### Tester TL;DR (pass/fail)
 
@@ -53,6 +66,8 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 | `running 0 tests` for step **3** | Wrong cwd/manifest, wrong `-p`, or filter typo (`cdp_retry` vs `cdp_retry_`) | Run `cargo test … --lib cdp_retry_ -- --list` (same manifest/cwd as step **3**); expect **≥ 1** listed test. |
 | First **`rg`** prints nothing or exits **1** | Wrong directory or wrong path (`src/browser_agent/...` from root instead of `src-tauri/src/...`) | `pwd`; from root paths **must** start with `src-tauri/src/browser_agent/mod.rs`. |
 | Second **`rg`** prints nothing | Same cwd/path issue | Same as above. |
+| Second **`rg`** pipeline fails with **`set -e` / `pipefail`** though matches exist | Historically `rg \| head`; **`head`** closes the pipe → **`rg`** can exit non-zero | Use **`rg -n -m 20 '…'`** as in the copy-paste block (no ` \| head`). |
+| Optional full-suite command errors with **`cd: src-tauri: No such file`** | Copied **“From `src-tauri/`”** block but shell cwd was **already** `src-tauri/` | From **`src-tauri/`**, run **`cargo test -p mac_stats --no-fail-fast`** only — **no** `cd src-tauri`. |
 
 ### Authoritative automated test command (step 3 — paste exactly)
 
@@ -73,6 +88,7 @@ Mistakes that produced **TESTPLAN-** while the CDP implementation was fine:
 1. **Wrong test bar:** Some runs used **`cd src-tauri && cargo test --no-fail-fast`** (entire crate, **no** `cdp_retry_` filter). That command is **not** in steps **1–4** and is **never** the acceptance gate for this slug. Failures there (Discord `pdfs_dir`, scheduler tests touching the real home directory, etc.) are **environment / unrelated suite** noise.
 2. **Wrong queue file:** **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** was missing at repo tip; testers retitled **`CLOSED-…`** or **`TESTPLAN-…`** to **`TESTING-…`** instead of waiting for **`UNTESTED-…`**. That bypassed this document’s narrow gate and invited runbook confusion.
 3. **Wrong cwd / manifest:** Running **cargo** from repo root **without** `--manifest-path src-tauri/Cargo.toml`, or running **`cd src-tauri`** when already inside **`src-tauri/`**, or using **`rg`** paths that omit the **`src-tauri/`** prefix from repo root — yields “no manifest”, **`cd` errors**, **0 tests**, or empty **`rg`** output. Treat as **instruction/environment execution**, not a code regression.
+4. **Wrong optional-suite snippet:** The diagnostic **`cargo test -p mac_stats --no-fail-fast`** for “already in **`src-tauri/`**” must **not** be prefixed with **`cd src-tauri &&`** (that directory only exists **from repo root**). Same rule as steps **2–3**.
 
 **Fix for retest:** Use **`UNTESTED-…`** from the branch you test; run steps **1–4** verbatim (see **Tester TL;DR** and the symptom table); ignore unfiltered suite results for pass/fail.
 
@@ -102,7 +118,7 @@ Mistakes that produced **TESTPLAN-** while the CDP implementation was fine:
 
 ### Copy-paste — full gate (from repository root)
 
-Run this block **as-is** in **bash** (or `bash -lc '…'` from **fish**) after the sanity check. It is equivalent to steps **1–3**; still perform step **4** (manual read) afterward.
+Run this block **as-is** in **bash** (or `bash -lc '…'` from **fish**) after the sanity check. It covers **numbered steps 1–3** below (static review, compile, targeted tests). **Numbered step 4** is **only** the manual spot-check in the editor — it is **not** in this script.
 
 ```bash
 set -e
@@ -110,7 +126,7 @@ set -o pipefail
 test -f src-tauri/Cargo.toml || { echo >&2 "ERROR: run from mac-stats repo root (missing src-tauri/Cargo.toml)."; exit 1; }
 test -f src-tauri/src/browser_agent/mod.rs || { echo >&2 "ERROR: missing src-tauri/src/browser_agent/mod.rs"; exit 1; }
 rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs
-rg -n 'Never use.*Handle::block_on|recv_timeout\(BROWSER_CDP_HEALTH_CHECK_TIMEOUT\)' src-tauri/src/browser_agent/mod.rs | head -n 20
+rg -n -m 20 'Never use.*Handle::block_on|recv_timeout\(BROWSER_CDP_HEALTH_CHECK_TIMEOUT\)' src-tauri/src/browser_agent/mod.rs
 cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats
 echo ">>> STEP 3 GATE: lib tests filtered by cdp_retry_ only (NOT the full crate suite)"
 cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast
@@ -130,10 +146,10 @@ From repo root, with **pipefail** enabled (see **Environment**), run:
 ```bash
 set -o pipefail
 rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs
-rg -n 'Never use.*Handle::block_on|recv_timeout\(BROWSER_CDP_HEALTH_CHECK_TIMEOUT\)' src-tauri/src/browser_agent/mod.rs | head -n 20
+rg -n -m 20 'Never use.*Handle::block_on|recv_timeout\(BROWSER_CDP_HEALTH_CHECK_TIMEOUT\)' src-tauri/src/browser_agent/mod.rs
 ```
 
-**Pass:** the first command exits **0** and prints **non-empty** lines from `browser_agent/mod.rs`. If it prints nothing or exits non-zero, **fail** (wrong cwd, wrong path, or symbols removed). The second command exits **0** and prints **at least one** line: the in-file comment that forbids nested **`Handle::block_on`** (matches `Never use` … `Handle::block_on`) **and/or** the `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)` call in `evaluate_one_plus_one_blocking_timeout`. If you need more context, re-run the second command without `| head -n 20`.
+**Pass:** the first command exits **0** and prints **non-empty** lines from `browser_agent/mod.rs`. If it prints nothing or exits non-zero, **fail** (wrong cwd, wrong path, or symbols removed). The second command exits **0** and prints **at least one** line: the in-file comment that forbids nested **`Handle::block_on`** (matches `Never use` … `Handle::block_on`) **and/or** the `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)` call in `evaluate_one_plus_one_blocking_timeout`. If you need more context, re-run the second command with a larger **`-m`** value or omit **`-m`** (may print many lines).
 
 **From `src-tauri/` cwd:** use `src/browser_agent/mod.rs` as the path for both **`rg`** commands (not `src-tauri/src/...`).
 
@@ -202,10 +218,10 @@ In `src-tauri/src/browser_agent/mod.rs`, locate `should_retry_cdp_after_clearing
 cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --no-fail-fast
 ```
 
-**From `src-tauri/`:**
+**From `src-tauri/`** (cwd is already `…/mac-stats/src-tauri`; **do not** `cd src-tauri`):
 
 ```bash
-cd src-tauri && cargo test -p mac_stats --no-fail-fast
+cargo test -p mac_stats --no-fail-fast
 ```
 
 This is **diagnostic** only. **Do not** use this command as the **required** pass/fail bar for this task. **Do not** list it in your report as a failed **acceptance** step when steps **1–4** passed.

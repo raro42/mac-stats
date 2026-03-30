@@ -2,6 +2,8 @@
 
 **Instruction revision (TESTPLAN-phase fix):** A prior run flagged **Testing instructions** / environment wording as defective (not a product regression). This body is the authoritative spec; follow **Verification commands** here, not snippets copied from **`CLOSED-*`** history.
 
+**Coder handoff:** While instructions are under repair, this file may be named **`TESTPLAN-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**. When the instructions are ready for retest, the coder **renames** it to **`UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** (same stamp and slug). Testers **only** pick up **`UNTESTED-…`** per **Tester quick gate** below.
+
 Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Discord status/draft/ATTACH spam), user-visible **Turn timed out** reply, optional `about:blank` cleanup only if the timed-out `request_id` still owns the coordination slot.
 
 **Scope (read this first):** The words “OpenClaw” / “agent router” in the title describe **product behavior** that is implemented in **this repository (mac-stats)**, not in the sibling checkout at `../openclaw`. For verification you only search and build **mac-stats**. Searching `../openclaw` or expecting symbols there will fail and is **out of scope** for this task.
@@ -27,9 +29,11 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 ### Tester quick gate (read first)
 
 1. **Queue file per [`003-tester/TESTER.md`](../003-tester/TESTER.md):** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only. The tester rename chain is **`UNTESTED-…` → `TESTING-…` → (`CLOSED-…` or `WIP-…`)**. Testers **must not** rename **`TESTPLAN-…` → `TESTING-…`** (wait for **`UNTESTED-…`** first).
+2. **Host and toolchain:** Run on **macOS** with **`cargo`**, **`rustc`**, and **`rg`** on your `PATH`. Criterion **4** requires a full **`cargo check`** + **`cargo test`** for **`mac_stats`** to exit **0** on this platform. If you only have Linux (or CI images without the macOS toolchain), **stop** and return **environment blocked** — do **not** file **`TESTPLAN-…`** for linker or platform-only failures.
 3. **Inventory (optional sanity check):** from mac-stats repo root,  
    `ls tasks/*20260321-2000*openclaw-hung-turn-timeout-event-gate.md 2>/dev/null || true`  
    For a normal queued run you should see **`UNTESTED-…`** (and may also see **`CLOSED-…`** as history). If **only** **`CLOSED-…`** appears, **stop** — restore or fetch **`UNTESTED-…`**; do **not** treat **`CLOSED-…`** as the queue file.
+4. **Run one verification block in one paste:** Choose **A1**, **A2**, or **B** in **Verification commands** and execute that block **from the first line through the last `rg`** without changing directory between lines. Mixing repo-root paths (`src-tauri/src/…`) with crate-root paths (`src/…`) in the same session causes false failures (see **Two different directories named `src`**).
 
 ### Operator filename (`003-tester/TESTER.md`)
 
@@ -56,7 +60,7 @@ The **spec** is this markdown body. **Verification commands** live only in **Ver
 - **Operator names `UNTESTED-…` but only `CLOSED-…` exists** — Do **not** “verify against CLOSED.” Update your tree, restore **`UNTESTED-…`** from git, or bounce the task to the coder. Appending new results into **`CLOSED-…`** without a live **`UNTESTED-…`**/`TESTING-…` step is out of procedure.
 - **Only `TESTPLAN-…` is present** — Instructions are still in repair; wait for **`TESTPLAN-…` → `UNTESTED-…`** before starting the **TESTER.md** rename chain.
 
-**Current handoff:** After coder repair, the queue file **must** be named exactly **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
+**Current handoff:** While the coder is revising instructions, the file may be **`tasks/TESTPLAN-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**. When repair is complete, it **must** be renamed to **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** for the tester queue.
 
 ### Shell compatibility
 
@@ -138,7 +142,7 @@ command -v rg >/dev/null && echo "OK: rg" || echo "WARN: install ripgrep or sear
 
 ### Minimal run order (single shell session)
 
-Do **not** mix block **A** path prefixes with block **B** path prefixes in one run.
+Do **not** mix **A1**/**A2** path prefixes (repo root + `src-tauri/…`) with **B** path prefixes (crate root + `src/…`) in one run.
 
 1. Run **Preflight (required)** for git (**A1-style**) or no-git (**A2-style**).
 2. Paste **one** of **A1**, **A2**, or **B** **in full** from **Verification commands** (same terminal; **`set -e`** should still be active).
@@ -231,7 +235,7 @@ rg -n "turn wall-clock timeout" src/commands/turn_lifecycle.rs
 rg -n "closing output gate and running cleanup" src/commands/turn_lifecycle.rs
 ```
 
-**Do not** mix **A** and **B** path styles in one shell session: from repo root, **never** pass bare `src/` to `rg` for this task (that is the frontend tree). From **`src-tauri/`**, **never** pass `src-tauri/src` (there is no such path below the crate root).
+**Do not** mix **A1**/**A2** and **B** path styles in one shell session: from repo root, **never** pass bare `src/` to `rg` for this task (that is the frontend tree). From **`src-tauri/`**, **never** pass `src-tauri/src` (there is no such path below the crate root).
 
 **Slow tests:** `cargo test --no-fail-fast` (with the same **`-p mac_stats`** / **`--manifest-path`** as your block) is fine; requirement is **zero failing tests** for this crate.
 
