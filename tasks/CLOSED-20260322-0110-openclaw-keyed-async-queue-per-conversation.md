@@ -2116,3 +2116,22 @@ rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs
 - `rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs` — **pass** (lines 1143, 1347, 1934 `crate::keyed_queue::run_serial`; line 2310 `ollama_queue_key` with `discord:{}`)
 
 **Outcome:** **Pass** — all acceptance criteria met. After this report: restore H1 to **CLOSED** and rename file **TESTING- → CLOSED-**. On failure the operator asked for **TESTED-** (TESTER.md lists **WIP-**). Live Discord not exercised.
+
+
+## Test report (corrida — agente Cursor, `003-tester/TESTER.md`, 2026-03-30)
+
+**Fecha:** 2026-03-30, hora local del sistema donde se ejecutó `cargo` (zona horaria del entorno; no se fijó UTC explícitamente).
+
+**Preflight / nombres:** Tarea fijada por el operador: `tasks/UNTESTED-20260322-0110-openclaw-keyed-async-queue-per-conversation.md` (sin elegir otro `UNTESTED-*`). Ese path **no existía** en el repo; la misma tarea está en `tasks/CLOSED-20260322-0110-openclaw-keyed-async-queue-per-conversation.md`. Por tanto **no hubo** renombrado literal `UNTESTED- → TESTING-` sobre el nombre pedido. No se tocó ningún otro archivo `UNTESTED-*`. La verificación se ejecutó según el cuerpo de la tarea (criterios y comandos) sobre el fichero **CLOSED-** existente.
+
+**Comandos ejecutados**
+
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test keyed_queue` — **pass** (`same_key_runs_sequentially`, `different_keys_may_overlap`; 873 tests filtrados en el target de lib)
+- `cd src-tauri && cargo test` — **pass** (875 passed, 0 failed en tests de la lib `mac_stats`; 1 doc-test ignored en el crate)
+
+**Comprobación estática**
+
+- `rg -n "keyed_queue::run_serial|ollama_queue_key" src-tauri/src/discord/mod.rs` — **pass** (líneas 1143, 1347, 1934 `crate::keyed_queue::run_serial`; línea 2345 `ollama_queue_key` con `discord:{}`; las líneas pueden variar respecto a versiones anteriores del informe)
+
+**Resultado:** **Pass** — criterios de aceptación cumplidos. El nombre del archivo permanece **CLOSED-** (no aplica **TESTED-** ni **TESTPLAN-**). Discord en vivo no probado.

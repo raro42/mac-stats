@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Tasks** — Re-run **`003-tester`** notes appended to **`CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md`** and **`CLOSED-20260322-0110-openclaw-keyed-async-queue-per-conversation.md`**; added operator queue specs **`UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** and **`UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
 - **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**: append **`003-tester`** test report (**2026-03-30 11:54 UTC**): operator **`UNTESTED-…`** path missing; **`CLOSED-` → `TESTING-`**; health-check / anti-`block_on` **`rg`** + **`cargo check`** / **`cargo test --no-fail-fast`** (**875** lib tests) — pass → **`CLOSED-…`**.
 - **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**: **Re-verify** (**2026-03-30T11:55:12Z** UTC, **`003-tester`**, operator **`UNTESTED-…`** only): path absent; **`CLOSED-` → `TESTING-`**; **`cargo check`** / **`cargo test`**; turn-gate **`rg`** in **`src-tauri/src`** vs root **`src/`** — pass → **`CLOSED-…`**.
 - **Tasks** — **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**: triage (**TOP**) — coder line uses explicit **`FEAT-…` → `WIP-…` → `UNTESTED-…`** filenames; **“Record results (tester)”** subsection (date, version, checklist, logs).
