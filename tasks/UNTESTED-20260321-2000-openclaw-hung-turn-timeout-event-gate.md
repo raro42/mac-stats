@@ -13,20 +13,29 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 3. **Log strings (static check):** The following literals appear in **mac-stats** Rust sources as written below (copy/paste safe; use the verification `rg` commands). A live Discord timeout repro is **optional**, not required for pass.
    - Substring **`closing output gate after turn wall-clock timeout`** — in **`src-tauri/src/commands/ollama.rs`** (router path when the wall-clock limit fires).
    - Substrings **`turn wall-clock timeout`** and **`closing output gate and running cleanup`** — both appear inside the **same** `tracing::warn!` format string in **`src-tauri/src/commands/turn_lifecycle.rs`** (`finalize_turn_timeout`). **Expected:** the two `rg` lines in block **A**/**B** may report the **same line number** twice; that still counts as pass.
-4. `cargo check` and `cargo test` run from **`src-tauri/`** succeed on the verification host (this project targets **macOS**; use a Mac for verification so results match maintainer expectations).
+4. `cargo check` and `cargo test` run from **`src-tauri/`** succeed on the verification host (this project targets **macOS**; use a Mac for verification so results match maintainer expectations). Linux CI or a non-macOS checkout may fail link steps or skip platform tests — that environment mismatch is **not** a product failure for this task; rerun on macOS.
 
 ## Testing instructions
 
-### Which task file to follow (avoid defective copy-paste)
+### Task-file identity (stamp `20260321-2000`, slug `openclaw-hung-turn-timeout-event-gate`)
 
-- **Follow this document’s verification blocks only.** Identity is **stamp `20260321-2000`** + slug **`openclaw-hung-turn-timeout-event-gate`**, regardless of whether the filename prefix is `TESTPLAN-`, `UNTESTED-`, or `TESTING-`.
-- **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` is not a spec.** It is an **append-only archive** of old test reports. Some appended commands used **`rg … src/`** (top-level frontend), which is **wrong** for this feature and produces **false failures**. Do **not** copy verification commands from `CLOSED-*`; use the blocks under **Verification commands** in **this** file.
-- **Tester workflow (`003-tester/TESTER.md`):** The step **rename `UNTESTED-…` → `TESTING-…`** applies to the **queue file**. If the queue still shows **`TESTPLAN-…`**, treat that as **instructions not yet handed back**: ask the coder to finish by renaming **`TESTPLAN-…` → `UNTESTED-…`** (same stamp + slug) before you start testing.
+The **spec** is this markdown body. **Verification commands** live only in **Verification commands** below — not in chat logs, not in `CLOSED-*` archives.
 
-### Operator queue / filename (handoff)
+| On-disk prefix | Meaning | Who acts |
+|----------------|---------|----------|
+| **`TESTPLAN-…`** | Instructions failed a review; coder is revising **Testing instructions** / wording. | **Coder** renames **`TESTPLAN-…` → `UNTESTED-…`** (same stamp + slug) when ready for retest. |
+| **`UNTESTED-…`** | Ready for the tester queue. | **Tester** follows [`003-tester/TESTER.md`](../003-tester/TESTER.md) (e.g. **`UNTESTED-…` → `TESTING-…`** at run start). |
+| **`TESTING-…`** | A test run is in progress. | Tester finishes per **TESTER.md** and sets the outcome filename. |
+| **`CLOSED-…`** | Append-only history for this stamp. | **Not** the live queue file. **Never** use it as a substitute if **`UNTESTED-…`** is missing. |
 
-- **Ready for retest:** `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`.
-- **Under instruction repair:** `tasks/TESTPLAN-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` (same body; rename to `UNTESTED-…` when the coder is done).
+**Parallel `CLOSED-*` file:** `tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` may exist next to **`UNTESTED-…`** / **`TESTPLAN-…`**. Old appended notes there sometimes used **`rg … src/`** (top-level **frontend** `src/`). For this task that path is **always wrong** and yields **false “missing feature” results**. Do **not** copy commands from **`CLOSED-*`**.
+
+**Queue defects to avoid:**
+
+- **Operator names `UNTESTED-…` but only `CLOSED-…` exists** — Do **not** “verify against CLOSED.” Update your tree, restore **`UNTESTED-…`** from git, or bounce the task to the coder. Appending new results into **`CLOSED-…`** without a live **`UNTESTED-…`**/`TESTING-…` step is out of procedure.
+- **Only `TESTPLAN-…` is present** — Instructions are still in repair; wait for **`TESTPLAN-…` → `UNTESTED-…`** before starting the **TESTER.md** rename chain.
+
+**Current handoff:** After coder repair, the queue file **must** be named exactly **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**.
 
 ### Shell compatibility
 
@@ -38,8 +47,9 @@ Full-turn wall-clock timeout stops a hung agent run: output gate closes (no Disc
 ### Environment
 
 - **Repository:** **mac-stats** only (directory that contains **`src-tauri/Cargo.toml`**, plus top-level `src/` and `src-tauri/`).
-- **Host:** **macOS** + stable **Rust** toolchain + **[ripgrep](https://github.com/BurntSushi/ripgrep)** (`rg` on `PATH`). If `rg` is missing, install it or use your editor’s search; the patterns below are the exact substrings to find.
+- **Host:** **macOS** + stable **Rust** toolchain (`cargo` / `rustc` on `PATH`) + **[ripgrep](https://github.com/BurntSushi/ripgrep)** (`rg` on `PATH`). If `rg` is missing, install it or use your editor’s search; the patterns below are the exact substrings to find.
 - **Working directory:** You must end up with **`src-tauri/Cargo.toml`** resolvable from your chosen cwd (see blocks **A** and **B** below). Do **not** assume a successful run if you never confirmed that path exists.
+- **Wrong repo:** If `cd` / `git rev-parse` lands in a tree **without** `src-tauri/Cargo.toml` at the expected place, stop — you are not in mac-stats (or not at repo root). Fix cwd before `cargo` or `rg`.
 
 ### Two different directories named `src` (critical)
 
@@ -101,6 +111,8 @@ To see log lines in a real run, reproduce or simulate a turn timeout and grep **
 
 Use **bash** or **zsh** (or `bash -lc '…'` from fish). Copy the whole block. **`set -e`** stops on the first failing command — do **not** append `|| true` to `cd` or `git rev-parse` here; a wrong directory must **fail** the script.
 
+**Git prerequisite:** Run from **inside** the mac-stats clone so `git rev-parse --show-toplevel` prints the mac-stats root (the folder that directly contains `src-tauri/`). Starting in `src-tauri/` is OK: git still returns the repo root. If you have **no** `.git`, do **not** use the `git rev-parse` lines — use the **Tarball / no `.git`** preflight, `cd` to mac-stats root manually, then run from `test -f src-tauri/Cargo.toml` downward (same commands as below with the first two lines replaced by `cd`).
+
 ```bash
 set -e
 REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -130,6 +142,8 @@ You should see **one** line containing both substrings. A single broad `rg` over
 
 Use this block **only** when `pwd` is the directory that contains **`Cargo.toml`** and a **`src/`** subdirectory (that **`src/`** is the **Rust crate source**, not the repo’s top-level frontend **`src/`**). Quick sanity check before `rg`: **`test -f src/commands/turn_lifecycle.rs`** must succeed; if it fails, you are not in `src-tauri/`.
 
+**How to tell crate root vs repo root:** If `test -f src-tauri/Cargo.toml` succeeds from `pwd`, you are at **repo root** — use block **A**, not **B**. If `test -f Cargo.toml` succeeds and `test -f src/commands/turn_lifecycle.rs` succeeds, you are at **crate root** — block **B** is OK.
+
 ```bash
 set -e
 test -f Cargo.toml
@@ -152,4 +166,4 @@ rg -n "closing output gate and running cleanup" src/commands/turn_lifecycle.rs
 
 ## Test report
 
-_(Tester: append results after `UNTESTED` → `TESTING` per `003-tester/TESTER.md`.)_
+_(Tester: append results only on the **queue** file **`UNTESTED-…` → `TESTING-…`** per [`003-tester/TESTER.md`](../003-tester/TESTER.md). If the file is still **`TESTPLAN-…`**, that is coder repair — no test report yet.)_

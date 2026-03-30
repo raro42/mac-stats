@@ -21,10 +21,11 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 
 ## Environment
 
-- **Checkout:** mac-stats repository root (directory that contains `src-tauri/`).
-- **Sanity check (once per session):** from that root, `test -f src-tauri/Cargo.toml` must succeed before running the `rg` lines (paths below assume repo root). If this fails, you are in the wrong directory (e.g. `tasks/`, `src-tauri/`, or another clone) — `cd` to the repo root first.
-- Run every command below from **repository root** unless `cd src-tauri` is shown. After `cd src-tauri && …`, return to repo root for any following `rg` that uses `src-tauri/…` paths, or use the copy-paste block’s subshell form so cwd stays at root.
-- **Shell / pipelines:** Paste **copy-paste** and **step 1** blocks into **bash**, or enable **pipefail** first (`bash`: `set -o pipefail`; **zsh**: `setopt pipefail`). Without pipefail, `rg … | head` can exit **0** even when `rg` finds **no** lines (false pass).
+- **Checkout:** mac-stats repository root (directory that contains `src-tauri/`). This repo has **no** workspace `Cargo.toml` at the repository root — the package lives under **`src-tauri/`** only.
+- **Sanity check (once per session):** from repo root, `test -f src-tauri/Cargo.toml && test -f src-tauri/src/browser_agent/mod.rs` must succeed before the gate. If this fails, you are in the wrong directory (e.g. `tasks/`, another clone, or inside `src-tauri/` with wrong relative paths for `rg`) — `cd` to the repo root first.
+- **Preferred cwd for the gate:** stay at **repository root** for the whole copy-paste block. Use **`cargo … --manifest-path src-tauri/Cargo.toml`** so you never depend on `cd src-tauri` (a common source of “0 tests” when someone runs `cargo test` from root without a manifest).
+- **Alternate cwd:** you may instead `cd src-tauri` and run `cargo check -p mac_stats` / `cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast` with **no** `--manifest-path`. If you do, stay in `src-tauri/` for those commands; return to repo root before any `rg` that uses paths like `src-tauri/src/...`.
+- **Shell / pipelines:** The copy-paste block is written for **bash**. **zsh** on macOS also supports `set -o pipefail` (or use `setopt pipefail`). **fish** has different pipeline semantics — run the block via `bash -lc '…'` or execute each command manually. Without pipefail, `rg … | head` can exit **0** even when `rg` finds **no** lines (false pass).
 - **`rg`:** ripgrep must be available on `PATH` (same as other task files).
 - **No live Chrome / CDP session** is required for steps **1–4** (static review, compile, lib unit tests, spot-check).
 - **Rust:** stable toolchain able to build `mac_stats` (same as normal mac-stats development).
@@ -41,18 +42,22 @@ Before CDP browser tools run, mac-stats must detect a hung or dead Chrome while 
 
 ### Copy-paste — full gate (from repository root)
 
-Run this block **as-is** in **bash** after the sanity check (`test -f src-tauri/Cargo.toml`). It is equivalent to steps **1–3**; still perform step **4** (manual read) afterward.
+Run this block **as-is** in **bash** (or `bash -lc '…'` from **fish**) after the sanity check. It is equivalent to steps **1–3**; still perform step **4** (manual read) afterward.
 
 ```bash
 set -e
 set -o pipefail
 test -f src-tauri/Cargo.toml || { echo >&2 "ERROR: run from mac-stats repo root (missing src-tauri/Cargo.toml)."; exit 1; }
+test -f src-tauri/src/browser_agent/mod.rs || { echo >&2 "ERROR: missing src-tauri/src/browser_agent/mod.rs"; exit 1; }
 rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs
 rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20
-( cd src-tauri && cargo check -p mac_stats && cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast )
+cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats
+cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast
 ```
 
-The subshell `( cd src-tauri && … )` keeps the **current directory** at repo root after the block (so `rg` paths stay valid if you append more lines). If you already `cd src-tauri`, run `cargo check -p mac_stats` and `cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast` there instead.
+**Why `--manifest-path`:** the crate manifest is only under `src-tauri/`. Using `--manifest-path src-tauri/Cargo.toml` lets **`cargo check` / `cargo test` succeed from repo root** without a subshell `cd`, which avoids accidental “0 tests” runs (e.g. invoking `cargo test` from root without a manifest, or from a directory that resolves to the wrong package).
+
+**Alternate:** from `src-tauri/`, run `cargo check -p mac_stats` and `cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast` (no `--manifest-path`).
 
 ### 1) Static review (required)
 
@@ -68,21 +73,43 @@ rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | h
 
 ### 2) Compile (required)
 
+**Preferred (repo root):**
+
+```bash
+cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats
+```
+
+**Alternate (`src-tauri/` cwd):**
+
 ```bash
 cd src-tauri && cargo check -p mac_stats
 ```
 
-From `src-tauri/`, `cargo check -p mac_stats` alone is **acceptable** (explicit package avoids ambiguity in multi-package workspaces).
+Explicit **`-p mac_stats`** avoids ambiguity if other manifests appear in the tree.
 
 ### 3) Targeted unit tests (required)
 
-Use **only** this command for the automated test gate ( **`--lib`** limits scope to library unit tests and avoids pulling unrelated targets into the bar). The filter is a **substring** of the test name; it must be run from **`src-tauri/`** (or with workspace-aware flags that resolve `mac_stats` the same way).
+Use **only** this command for the automated test gate (`--lib` limits scope to library unit tests). The filter is a **substring** of the test name: **`cdp_retry_`** (trailing underscore).
+
+**Preferred (repo root):**
+
+```bash
+cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ --no-fail-fast
+```
+
+**Alternate (`src-tauri/` cwd):**
 
 ```bash
 cd src-tauri && cargo test -p mac_stats --lib cdp_retry_ --no-fail-fast
 ```
 
-**Pass:** Cargo **runs** the `cdp_retry_`-filtered lib tests and reports a **non-zero** count. Expect **at least 2** tests (current names below). If Cargo reports **0** tests executed, **fail** this step (wrong directory — e.g. running from repo root **without** `cd src-tauri`, typo in filter, wrong package, or renamed tests — escalate).
+**Pass:** Cargo **runs** the `cdp_retry_`-filtered lib tests and reports a **non-zero** count. Expect **at least 2** tests (current names below). If Cargo reports **0** tests executed, **fail** this step and verify: (1) cwd + invocation match one of the two forms above (from root you **must** use `--manifest-path src-tauri/Cargo.toml`; there is no `Cargo.toml` at repo root), (2) the filter is exactly `cdp_retry_`, not `cdp_retry`, (3) the package is `-p mac_stats`. Optional diagnostic from repo root:
+
+```bash
+cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --lib cdp_retry_ -- --list
+```
+
+You should see lines containing `cdp_retry_` before re-running the full test command.
 
 - `browser_agent::tests::cdp_retry_skipped_when_health_error_also_looks_like_connection_error`
 - `browser_agent::tests::cdp_retry_allowed_for_plain_connection_error_without_health_prefix`
@@ -99,6 +126,14 @@ In `src-tauri/src/browser_agent/mod.rs`, locate `should_retry_cdp_after_clearing
 
 ### Optional — full crate tests (informational only)
 
+**From repo root:**
+
+```bash
+cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats --no-fail-fast
+```
+
+**From `src-tauri/`:**
+
 ```bash
 cd src-tauri && cargo test -p mac_stats --no-fail-fast
 ```
@@ -113,4 +148,4 @@ Cumulative tester reports and older verification notes: **`tasks/CLOSED-20260321
 
 ## Publication workflow (TESTPLAN → UNTESTED)
 
-While instructions are edited, the task may temporarily live as **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`**. When ready for **`003-tester`**, the coder renames **`TESTPLAN-` → `UNTESTED-`** (same stamp and slug). **This checkout** uses the published name **`UNTESTED-…`** for retest.
+While instructions are edited, the task may temporarily live as **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`**. When ready for **`003-tester`**, the coder renames **`TESTPLAN-` → `UNTESTED-`** (same stamp and slug). After that rename, **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** is the only executable queue filename for this slug (see **Operator filename** above).

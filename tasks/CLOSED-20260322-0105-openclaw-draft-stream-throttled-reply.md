@@ -1006,3 +1006,16 @@ rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/com
 - **Result:** **Pass** — automated verification satisfied; optional live Discord steps not run.
 - **Outcome filename:** `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md` (per operator: `TESTED-*` on implementation fail, `TESTPLAN-*` on defective test spec).
 
+### Tester run (2026-03-30 UTC, `003-tester/TESTER.md` — named `tasks/UNTESTED-20260322-0105-openclaw-draft-stream-throttled-reply.md`, this agent run)
+
+- **Date:** 2026-03-30 UTC (operator calendar date: 2026-03-30).
+- **Note:** `tasks/UNTESTED-20260322-0105-openclaw-draft-stream-throttled-reply.md` does not exist; this slug was `CLOSED-*` and was renamed `CLOSED` → `TESTING` for step 2 only. No other `UNTESTED-*` file was used. Outcome naming per operator: pass → `CLOSED-*`; implementation fail → `TESTED-*`; defective testing instructions / environment spec → `TESTPLAN-*`.
+- **Commands run:**
+  - `cd src-tauri && cargo check` — pass (`Finished dev profile [unoptimized + debuginfo] target(s) in 0.64s`).
+  - `cd src-tauri && cargo test discord_draft_stream::` — pass (2 tests: `clamp_under_limit_unchanged`, `clamp_truncates_with_ellipsis`; 873 filtered; exit 0).
+  - `rg -n "spawn_discord_draft_editor" src-tauri/src/discord/mod.rs` — match at line **2197**.
+  - `rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/commands/turn_lifecycle.rs src-tauri/src/commands/ollama.rs` — matches in all three (`tool_loop.rs` lines 14, 152; `turn_lifecycle.rs` lines 10, 95; `ollama.rs` line 109).
+- **Config:** `Config::discord_draft_throttle_ms()` in `config/mod.rs` (lines 460–485): key `discord_draft_throttle_ms`, env `MAC_STATS_DISCORD_DRAFT_THROTTLE_MS`, clamp **200..=60_000**.
+- **Result:** **Pass** — task **Verification** and automated **Acceptance criteria** satisfied; optional live Discord / throttle-override steps not run.
+- **Outcome filename:** `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md`.
+
