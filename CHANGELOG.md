@@ -8,9 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**: append **`003-tester`** test report (**2026-03-30 09:37** UTC): operator **`UNTESTED-…`** path missing; **`CLOSED-` → `TESTING-`** stand-in; health-check / anti-`block_on` **`rg`** + **`cargo check`** / **`cargo test --no-fail-fast`** (**875** lib tests) — pass → **`CLOSED-…`**.
-- **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**: **Re-verify** block (**2026-03-30** UTC, **`003-tester` / `TESTER.md`**, única ruta lógica **`UNTESTED-…`**): path absent; **`CLOSED-` → `TESTING-`**; **`cargo check`** / **`cargo test`**; turn-gate **`rg`** en **`src-tauri/src`** — pass → **`CLOSED-…`**.
-- **Tasks** — **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**: triage (**TOP**) — coder line cita ruta canónica **`tasks/FEAT-…` → `WIP-…` → `UNTESTED-…`**; **§6** añade **canonical handoff** tras **`WIP → UNTESTED`**.
+- **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**: append **`003-tester`** test report (**2026-03-30T09:46:11Z**): operator **`UNTESTED-…`** path missing; **`CLOSED-` → `TESTING-`** stand-in; health-check / anti-`block_on` **`rg`** (incl. `evaluate_one_plus_one_blocking_timeout`, `Handle::block_on` prohibition) + **`cargo check`** / **`cargo test --no-fail-fast`** (**875** lib tests) — pass → **`CLOSED-…`**.
+- **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**: **Re-verify** (**2026-03-30**, **`003-tester` / `TESTER.md`**, operator **`UNTESTED-…`** only): path absent; **`CLOSED-` → `TESTING-`**; **`cargo check`** / **`cargo test`** (**875** lib); turn-gate **`rg`** in **`src-tauri/src`** (`commands/ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`); top-level **`src/`** — no Rust matches — pass → **`CLOSED-…`**.
+- **Tasks** — **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**: triage (**TOP**) — coder line uses ellipsis paths **`FEAT-…` → `WIP-…` → `UNTESTED-…`**; **§6** / handoff wording tightened (**“esta corrida”**, **handoff canónico**).
 
 ## [0.1.80] - 2026-03-30
 
