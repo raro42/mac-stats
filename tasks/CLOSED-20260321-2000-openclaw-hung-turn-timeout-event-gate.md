@@ -603,3 +603,11 @@ _(Tester: append results only on the **queue** file **`UNTESTED-…` → `TESTIN
 - **Commands:** `cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats`; `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats -q`; **`rg`** lines exactly as **A1** (`TurnOutputGate|gate_allows_send|finalize_turn_timeout` on **`src-tauri/src`**; `-F '**Turn timed out**'` on **`turn_lifecycle.rs`** line **163**; **`closing output gate after turn wall-clock timeout`** in **`ollama.rs`** line **1636**; **`turn wall-clock timeout`** and **`closing output gate and running cleanup`** in **`turn_lifecycle.rs`** line **100** twice).
 - **Result:** **PASS** — `cargo check` exit **0**; `cargo test` exit **0** (**875** passed, **0** failed); every required **`rg`** ≥1 match. Acceptance criteria **1–4** satisfied (static gate).
 - **Outcome:** **`TESTING-…` → `CLOSED-…`** (pass). Not **`TESTED-…`**. Not **`TESTPLAN-…`**.
+
+### 2026-03-30 (UTC) — agent run ([`003-tester/TESTER.md`](../003-tester/TESTER.md); operator: `UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only)
+
+- **Queue:** Operator-named **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** was **absent**; **`CLOSED-…` → `UNTESTED-…` → `TESTING-…`** restored the slot (same basename). **Did not** pick another **`UNTESTED-*`** file.
+- **Sequence (bash):** Tester quick gate → **BLOCK: A1 or A2**; step **0b** `test -f src-tauri/Cargo.toml && echo OK`; git **Preflight**; Self-check row A1/A2; **Verification commands → block A1** in full (`set -e` through last **`rg`**), repo **`/Users/raro42/projects/mac-stats`**.
+- **Commands:** `cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats`; `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats -q`; **`rg`** lines exactly as **A1** (same patterns/paths as task §Verification commands **A1**).
+- **Result:** **PASS** — `cargo check` exit **0**; `cargo test` exit **0** (**875** passed, **0** failed); every required **`rg`** ≥1 line; **`turn_lifecycle.rs`** timeout/cleanup pair: **same** line **100** twice (expected).
+- **Outcome:** **`TESTING-…` → `CLOSED-…`** (pass). Not **`TESTED-…`**. Not **`TESTPLAN-…`**. **[`003-tester/TESTER.md`](../003-tester/TESTER.md)** **`WIP-…`** not used.
