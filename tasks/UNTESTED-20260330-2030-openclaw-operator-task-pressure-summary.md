@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`**. Filename workflow **`FEAT → WIP → UNTESTED`** applied on this run: **`UNTESTED-`** → **`FEAT-`** → **`WIP-`** → **`UNTESTED-`** (chain in `tasks/` so the FEAT→WIP→UNTESTED steps are satisfied). Implementation per §4 is in **`src-tauri`**; this run **`cargo check`** and **`cargo test operator_task_pressure`** (`task::tests::operator_task_pressure_summary_empty_dir`) are green. **§6 — Testing instructions** is present for the tester; file prefix **`UNTESTED-`**.
+- **Coder (UTC):** 2026-03-30 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): task **`20260330-2030-openclaw-operator-task-pressure-summary`**. Filename workflow **`FEAT → WIP → UNTESTED`**: in `tasks/`, **`UNTESTED-` → `FEAT-` → `WIP-`** (the requested **`FEAT-20260330-2030-...`** path was not present; the FEAT prefix step was applied by renaming through **`FEAT-`**), then after verification **`WIP-` → `UNTESTED-`**. §4 implementation lives in **`src-tauri`** (no code changes this pass). This run: **`cd src-tauri && cargo check && cargo test operator_task_pressure`** green (`task::tests::operator_task_pressure_summary_empty_dir`). **§6 — Testing instructions** is ready for the tester.
 - **Next step:** Tester runs **§6** (after **§5**) on **`UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**.
 ---
 
