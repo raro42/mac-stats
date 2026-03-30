@@ -489,6 +489,20 @@ body {
   margin: 0 0 12px 0;
 }
 
+.settings-pre {
+  font-size: 11px;
+  line-height: 1.35;
+  margin: 0 0 16px 0;
+  padding: 10px 12px;
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
 .settings-list {
   margin-bottom: 12px;
   min-height: 24px;

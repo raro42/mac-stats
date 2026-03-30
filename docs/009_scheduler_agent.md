@@ -71,6 +71,7 @@
 - Executes tasks using Ollama + tools or direct tool calls
 - Supports deduplication by `cron` + `task` (whitespace-normalized)
 - **Main chat awareness:** When a run **successfully** posts to Discord via `reply_to_channel_id`, the app records a short entry in `~/.mac-stats/scheduler_delivery_awareness.json` (deduped by a per-run `context_key`) and injects the latest entries into the **CPU window / in-app** Ollama **system** prompt on subsequent turns (same Tauri command as the dashboard chat). Discord remains the source of truth for what was posted; the file + injection avoid split-brain when you later chat in-app. See **docs/data_files_reference.md** (scheduler_delivery_awareness.json). Settings → Schedules lists recent deliveries for operators. With **`-vv`**, each chat turn that prepends this block emits a **debug** line from `mac_stats::commands::ollama_frontend_chat`: grep **`prepending scheduler`** or **`delivery awareness`** in `~/.mac-stats/debug.log`. Related **info** lines when a row is persisted use target `mac_stats::scheduler::delivery_awareness` (`Scheduler delivery awareness: recorded …`).
+- **Operator pressure summary:** Settings → Schedules includes a JSON snapshot (`get_operator_task_pressure_summary`) aggregating schedule horizons, Ollama HTTP queue state, session serialization, task-file counts, and cumulative router error codes. See **docs/041_operator_task_pressure.md**; periodic **info** logs use target `mac_stats::operator_task_pressure` when activity is non-trivial.
 
 ### Heartbeat (optional, OpenClaw-style)
 

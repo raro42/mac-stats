@@ -165,9 +165,7 @@ async fn send_finished_summary_if_channel(
     if let Some(channel_id) = channel_id {
         let ack_max = crate::config::Config::heartbeat_settings().ack_max_chars;
         if crate::scheduler::heartbeat::should_skip_discord_for_heartbeat_ack(
-            summary,
-            ack_max,
-            false,
+            summary, ack_max, false,
         ) {
             info!(
                 "Task runner: schedule heartbeat ack — not delivering finished summary to Discord (channel {})",

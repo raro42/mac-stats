@@ -2272,18 +2272,18 @@ async fn run_discord_ollama_router_locked(
     let typing_channel = new_message.channel_id;
     let queue_typing_ctx = typing_ctx.clone();
     let queue_typing_channel = typing_channel;
-    let ollama_queue_wait_hook: Option<std::sync::Arc<dyn Fn() + Send + Sync>> = if dev_silent_discord
-    {
-        None
-    } else {
-        Some(std::sync::Arc::new(move || {
-            let c = queue_typing_ctx.clone();
-            let ch = queue_typing_channel;
-            tokio::spawn(async move {
-                let _ = ch.broadcast_typing(&c).await;
-            });
-        }))
-    };
+    let ollama_queue_wait_hook: Option<std::sync::Arc<dyn Fn() + Send + Sync>> =
+        if dev_silent_discord {
+            None
+        } else {
+            Some(std::sync::Arc::new(move || {
+                let c = queue_typing_ctx.clone();
+                let ch = queue_typing_channel;
+                tokio::spawn(async move {
+                    let _ = ch.broadcast_typing(&c).await;
+                });
+            }))
+        };
     let typing_cancel = tokio_util::sync::CancellationToken::new();
     let typing_task = if dev_silent_discord {
         None

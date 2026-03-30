@@ -37,6 +37,7 @@ pub mod ollama_logging;
 pub mod ollama_memory;
 pub mod ollama_models;
 pub mod ollama_run_error;
+pub mod operator_task_pressure;
 pub mod ori_lifecycle;
 pub mod outbound_pipeline;
 pub mod partial_progress;

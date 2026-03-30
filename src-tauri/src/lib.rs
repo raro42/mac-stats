@@ -36,6 +36,7 @@ mod metrics;
 mod monitors;
 mod ollama;
 mod ollama_queue;
+mod operator_task_pressure;
 mod perplexity;
 mod plugins;
 mod prompts;
@@ -340,6 +341,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::logging::open_debug_log,
             // Scheduler UI commands
             commands::scheduler::list_schedules,
+            commands::operator_task_pressure::get_operator_task_pressure_summary,
             commands::scheduler::list_scheduler_delivery_awareness,
             commands::scheduler::add_schedule,
             commands::scheduler::add_schedule_at,
@@ -499,6 +501,26 @@ fn run_internal(open_cpu_window: bool) {
 
             // Subsystem health report (structured probes, logged after short delay for Discord/Ollama).
             feature_health::spawn_startup_feature_health_probe();
+
+            // Periodic operator pressure line when automation is non-trivial (queues, WIP tasks, imminent schedules).
+            tauri::async_runtime::spawn(async move {
+                let mut tick = tokio::time::interval(std::time::Duration::from_secs(90));
+                tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
+                loop {
+                    tick.tick().await;
+                    let summary = crate::operator_task_pressure::build_operator_task_pressure_summary()
+                        .await;
+                    if summary.is_non_trivial_for_periodic_log() {
+                        let line = summary.compact_log_line();
+                        tracing::info!(
+                            target: "mac_stats::operator_task_pressure",
+                            summary = %line,
+                            "operator automation pressure snapshot"
+                        );
+                        crate::logging::sync_debug_log_best_effort();
+                    }
+                }
+            });
 
             // Run website monitor checks in the background so monitors are checked even when the CPU window
             // is not open. Wakes every 30s and runs checks for any monitor that is due (by its interval).

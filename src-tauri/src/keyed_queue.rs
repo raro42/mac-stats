@@ -65,6 +65,41 @@ where
     output
 }
 
+/// Point-in-time view of per-session serialization (Discord channel, task runner, …).
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SessionQueueSnapshot {
+    pub tracked_session_keys: u32,
+    pub busy_session_keys: u32,
+    /// Up to 16 keys whose session mutex is currently held (another turn may be waiting on the same key).
+    pub busy_key_sample: Vec<String>,
+}
+
+/// Snapshot of keyed session queue: keys still tracked and how many have an active turn (`try_lock` would block).
+/// Does **not** count waiters per key (only “busy or not”).
+pub async fn snapshot_session_queue() -> SessionQueueSnapshot {
+    const MAX_SAMPLE: usize = 16;
+    let map = state().slots.lock().await;
+    let mut tracked_session_keys = 0u32;
+    let mut busy_session_keys = 0u32;
+    let mut busy_key_sample = Vec::new();
+    for (key, arc) in map.iter() {
+        tracked_session_keys += 1;
+        if arc.try_lock().is_err() {
+            busy_session_keys += 1;
+            if busy_key_sample.len() < MAX_SAMPLE {
+                busy_key_sample.push(key.clone());
+            }
+        }
+    }
+    busy_key_sample.sort();
+    SessionQueueSnapshot {
+        tracked_session_keys,
+        busy_session_keys,
+        busy_key_sample,
+    }
+}
+
 /// `true` if `key` is active (mutex held) or queued (entry exists and mutex is taken).
 /// Idle keys may be absent from the map after cleanup.
 pub async fn is_key_busy(key: &str) -> bool {

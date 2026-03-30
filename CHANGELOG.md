@@ -41,6 +41,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**: **Re-verify** (**2026-03-30**, Spanish, **`003-tester` / `TESTER.md`**, única tarea lógica **`UNTESTED-…`**): path absent; **`CLOSED-` → `TESTING-`**; **`cargo check`** / **`cargo test`** (**875** lib); turn-gate **`rg`** in **`src-tauri/src`** (`commands/ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`); top-level **`src/`** — no Rust matches — pass → **`CLOSED-…`**. **Plus** agent-run **Re-verify** subsection (same UTC date, acceptance 1–4, **`rg`** commands). **Plus** **Cursor** **Re-verify** block (solo **`UNTESTED-…`**, **`src-tauri/src`** vs root **`src/`** note, acceptance 1–4).
 - **Tasks** — **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**: triage (**TOP**) — English coder line with explicit on-disk **`FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md` → `WIP-…` → `UNTESTED-…`**; **Section 6** “canonical handoff” line **English** (source of truth after **`WIP → UNTESTED`**, do not strip on prefix renames); **Section 6** FEATURE-CODER wording uses literal **`FEAT-…` → `WIP-…` → `UNTESTED-…`**.
 
+## [0.1.81] - 2026-03-30
+
+### Added
+- **Operator automation pressure** — JSON snapshot command `get_operator_task_pressure_summary` (scheduler horizons, Ollama HTTP queue depth, session keyed-queue state, task-file counts by status, cumulative Ollama router error codes); Settings → Schedules panel in the dashboard; semantics in **`docs/041_operator_task_pressure.md`**; optional **`info`** logs (`mac_stats::operator_task_pressure`).
+
+### Changed
+- **Queues / scheduler** — keyed queue and Ollama queue expose waiter/in-flight style counters for the snapshot; scheduler module and heartbeat carry next-fire / activity context used by the summary.
+- **Discord, UI, tasks** — small Discord path adjustments; status bar and task runner touch-ups for the new instrumentation; **`docs/009_scheduler_agent.md`** cross-reference; appended **`003-tester`** notes on CDP health-check and hung-turn task files.
+
 ## [0.1.80] - 2026-03-30
 
 ### Changed

@@ -185,6 +185,54 @@ pub struct ScheduleForUi {
     pub next_run: Option<String>,
 }
 
+/// Operator-facing scheduler aggregate for pressure summaries (Settings / JSON).  
+/// Point-in-time from `schedules.json` and wall clock; does **not** indicate a run is executing right now,
+/// nor missed fires if the process was down.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SchedulerOperatorSnapshot {
+    pub total_entries: u32,
+    pub entries_with_next_run: u32,
+    pub entries_without_next_run: u32,
+    /// Seconds until the soonest next fire among entries that have one (`None` if no next runs).
+    pub seconds_until_next_fire: Option<u64>,
+    /// Entries whose computed next fire is within the next 120 seconds (local wall clock).
+    pub imminent_fire_within_120s_count: u32,
+}
+
+/// Snapshot of schedule pressure for operator dashboards. Cheap: re-reads and parses `schedules.json`.
+pub fn scheduler_operator_snapshot() -> SchedulerOperatorSnapshot {
+    let entries = load_schedules();
+    let now = Local::now();
+    let total_entries = entries.len() as u32;
+    let mut entries_with_next_run = 0u32;
+    let mut entries_without_next_run = 0u32;
+    let mut seconds_until_next_fire: Option<u64> = None;
+    let mut imminent_fire_within_120s_count = 0u32;
+    let horizon = now + chrono::Duration::seconds(120);
+    for e in &entries {
+        match next_run(e, now) {
+            Some(nr) => {
+                entries_with_next_run += 1;
+                let secs_64 = (nr - now).num_seconds().max(0) as u64;
+                seconds_until_next_fire =
+                    Some(seconds_until_next_fire.map_or(secs_64, |m| m.min(secs_64)));
+                if nr <= horizon {
+                    imminent_fire_within_120s_count += 1;
+                }
+            }
+            None => entries_without_next_run += 1,
+        }
+    }
+    SchedulerOperatorSnapshot {
+        total_entries,
+        entries_with_next_run,
+        entries_without_next_run,
+        seconds_until_next_fire,
+        imminent_fire_within_120s_count,
+    }
+}
+
 /// Compute next run time for a raw entry (for UI display). Returns None if one-shot already past or invalid.
 fn next_run_from_raw(raw: &ScheduleEntryRaw) -> Option<String> {
     let now = Local::now();

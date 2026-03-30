@@ -357,8 +357,20 @@ mod tests {
 
     #[test]
     fn skip_discord_matches_ack_without_attachments() {
-        assert!(should_skip_discord_for_heartbeat_ack("HEARTBEAT_OK", 300, false));
-        assert!(!should_skip_discord_for_heartbeat_ack("HEARTBEAT_OK", 300, true));
-        assert!(!should_skip_discord_for_heartbeat_ack("All good, nothing to report.", 300, false));
+        assert!(should_skip_discord_for_heartbeat_ack(
+            "HEARTBEAT_OK",
+            300,
+            false
+        ));
+        assert!(!should_skip_discord_for_heartbeat_ack(
+            "HEARTBEAT_OK",
+            300,
+            true
+        ));
+        assert!(!should_skip_discord_for_heartbeat_ack(
+            "All good, nothing to report.",
+            300,
+            false
+        ));
     }
 }

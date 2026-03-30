@@ -141,6 +141,46 @@ where
     }
 }
 
+/// One Ollama HTTP queue key: whether a request holds the key slot and how many FIFO waiters are behind it.
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OllamaHttpQueueKeySnapshot {
+    pub key: String,
+    pub busy: bool,
+    pub waiters: u32,
+}
+
+/// Global semaphore + per-key FIFO state for `/api/chat` traffic (see module docs).
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OllamaHttpQueueSnapshot {
+    pub global_total_permits: u32,
+    pub global_available_permits: u32,
+    pub keys: Vec<OllamaHttpQueueKeySnapshot>,
+}
+
+/// Point-in-time view of the Ollama HTTP queue. Does not include work that bypasses the queue (`skip_ollama_queue`).
+pub async fn snapshot_http_queue() -> OllamaHttpQueueSnapshot {
+    let state = queue_state();
+    let available = state.global.available_permits() as u32;
+    let total = Config::ollama_global_concurrency().max(1) as u32;
+    let map = state.keys.lock().await;
+    let mut keys: Vec<OllamaHttpQueueKeySnapshot> = map
+        .iter()
+        .map(|(k, v)| OllamaHttpQueueKeySnapshot {
+            key: k.clone(),
+            busy: v.busy,
+            waiters: v.waiters.len() as u32,
+        })
+        .collect();
+    keys.sort_by(|a, b| a.key.cmp(&b.key));
+    OllamaHttpQueueSnapshot {
+        global_total_permits: total,
+        global_available_permits: available,
+        keys,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

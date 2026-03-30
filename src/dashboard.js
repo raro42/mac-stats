@@ -664,6 +664,19 @@ async function loadSettingsSchedules() {
         listEl.innerHTML = `<p class="settings-error">Failed to load: ${escapeHtml(String(err))}</p>`;
     }
     await loadSettingsSchedulerAwareness();
+    await loadSettingsTaskPressureSummary();
+}
+
+async function loadSettingsTaskPressureSummary() {
+    const el = document.getElementById('settings-task-pressure-summary');
+    if (!el) return;
+    el.textContent = 'Loading…';
+    try {
+        const summary = await invoke('get_operator_task_pressure_summary');
+        el.textContent = JSON.stringify(summary, null, 2);
+    } catch (err) {
+        el.textContent = `Failed to load: ${String(err)}`;
+    }
 }
 
 async function loadSettingsSchedulerAwareness() {
