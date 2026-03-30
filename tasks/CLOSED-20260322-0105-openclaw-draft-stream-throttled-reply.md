@@ -1144,3 +1144,16 @@ rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/com
 - **Result:** **Pass** — all automated **Verification** / **Pass/fail criteria** satisfied; optional live Discord / throttle-override steps not run.
 - **Outcome:** rename `TESTING-*` → `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md` (not `TESTED-*` or `TESTPLAN-*`).
 
+### Tester run (2026-03-30 UTC, `003-tester/TESTER.md` — operator file `tasks/UNTESTED-20260322-0105-openclaw-draft-stream-throttled-reply.md` only)
+
+- **Date:** 2026-03-30 UTC (local calendar per workspace: Monday 2026-03-30).
+- **Rename step 2:** `tasks/UNTESTED-20260322-0105-openclaw-draft-stream-throttled-reply.md` does not exist; the task on disk was `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md`. Renamed `CLOSED` → `TESTING` for this run only. No other `UNTESTED-*` task was opened.
+- **Commands run** (repo root `/Users/raro42/projects/mac-stats`):
+  - `cd src-tauri && cargo check` — pass (`Finished dev profile [unoptimized + debuginfo] target(s) in 7.82s`).
+  - `cd src-tauri && cargo test discord_draft_stream::` — pass (`clamp_under_limit_unchanged`, `clamp_truncates_with_ellipsis`; 2 passed; 873 filtered out in lib test binary; test profile `Finished` in 10.16s).
+  - `rg -n "spawn_discord_draft_editor" src-tauri/src/discord/mod.rs` — match at line **2197**.
+  - `rg -n "DiscordDraftHandle" src-tauri/src/commands/tool_loop.rs src-tauri/src/commands/turn_lifecycle.rs src-tauri/src/commands/ollama.rs` — matches (`tool_loop.rs` 14, 152; `turn_lifecycle.rs` 10, 95; `ollama.rs` 109).
+- **Acceptance (automated):** Matches task **Verification** / **Pass/fail criteria**; optional live Discord and throttle-override steps not executed this run.
+- **Result:** **Pass** — implementation and wiring satisfy automated acceptance criteria.
+- **Outcome filename:** `CLOSED-20260322-0105-openclaw-draft-stream-throttled-reply.md` (`TESTED-*` = implementation fail, `TESTPLAN-*` = defective instructions — not applicable).
+

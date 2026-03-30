@@ -1,10 +1,14 @@
 # Browser use — CDP health check ping (`1+1`)
 
-> **Queue file:** **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`**. Testers rename **`UNTESTED-` → `TESTING-`** to execute. Instructions were **repaired after a tester `TESTPLAN-` report** (defective **testing instructions / environment wording**, not a mac-stats implementation failure). **If your checkout still has only `TESTPLAN-…` for this slug:** do **not** run the gate — wait for **`TESTPLAN-` → `UNTESTED-`** (same stamp and slug).
+> **Filename on disk (read the basename):**
+> - **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`** — **under revision**. Testers **must not** run the gate or rename **`TESTPLAN-` → `TESTING-`**. Wait for the coder to rename **`TESTPLAN-` → `UNTESTED-`** (same stamp and slug).
+> - **`UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** — **executable queue file**. Testers rename **`UNTESTED-` → `TESTING-`** to execute per **`TESTER.md`**.
+>
+> Prior **`TESTPLAN-`** outcomes reflected **defective testing instructions / operator environment** (wrong bar, wrong cwd, wrong queue filename, stale translated runbooks), **not** a mac-stats CDP health-check implementation failure.
 >
 > **Scope:** **mac-stats** repository only. All paths refer to **`src-tauri/src/browser_agent/mod.rs`** in that clone. Running these steps in a **different repo** (e.g. a sibling **openclaw** tree) is **out of scope** and invalid — use the mac-stats checkout that contains this `tasks/` file.
 >
-> **Testing instructions** revised **2026-03-30** (f): same as (e), plus **closure bar** at top of **Testing instructions**; **Phase 0** row for **`CLOSED-` without `UNTESTED-`**; explicit **TESTER.md** “skip the unfiltered `cargo test` line” rule; **why the last TESTPLAN happened** (full-suite bar + missing **`UNTESTED-…`** queue file).
+> **Testing instructions** revised **2026-03-30** (g): **(f)** plus **authority / language** (this file overrides translated runbooks for pass/fail); **`--lib` vs whole-package** `cargo test` callout; **retest preflight strip** (four checks before any `cargo`); **report must name** the task filename used; **integration / extra targets** row in wrong-command table.
 
 ## Goal
 
@@ -60,9 +64,18 @@ The **Phase 0** table is the short decision guide; the bullets below spell out t
 
 | Required for **pass** | **Never** the pass/fail bar by itself |
 |------------------------|----------------------------------------|
-| **Steps 1–4** below (including **Step 3** with literal **`cdp_retry_`** on the `cargo test` line) | **`cargo test` / `cargo test --no-fail-fast` / `cd src-tauri && cargo test --no-fail-fast`** with **no** **`cdp_retry_`** token on that same command |
+| **Steps 1–4** below (including **Step 3** with **`--lib`** and literal **`cdp_retry_`** on the **same** `cargo test` line) | **`cargo test` / `cargo test --no-fail-fast` / `cd src-tauri && cargo test --no-fail-fast`** with **no** **`--lib cdp_retry_`** gate shape on that same command |
 | Queue file **`tasks/UNTESTED-…`** renamed **`UNTESTED-` → `TESTING-`** before you start | Renaming **`CLOSED-…`** or **`TESTPLAN-…`** → **`TESTING-…`** when **`UNTESTED-…`** is missing |
 | Evidence: **Step 3** output shows **`running N tests`** with **N ≥ 1** and **`test result: ok`** | Failing **optional** full-crate tests (Discord `pdfs_dir`, scheduler home fixtures, etc.) while **Step 3** passed |
+
+**Retest preflight (do these before any `cargo` or `rg`):**
+
+1. **Phase 0:** You are holding **`UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** (after coder publication), **not** only **`CLOSED-…`** and **not** **`TESTPLAN-…`**.
+2. **Repo:** **`test -f src-tauri/Cargo.toml`** from **mac-stats** root (see **PF-1**).
+3. **Gate command shape:** **Step 3** is **`… --lib cdp_retry_ --no-fail-fast`** — both **`--lib`** and the substring **`cdp_retry_`** are mandatory on the **same** command line.
+4. **Stale runbooks:** Ignore mandatory lines that run **unfiltered** `cargo test` / `cargo test --no-fail-fast` for this slug; see **Stale runbook override**.
+
+**Authority / language:** Pass/fail for this slug is defined **only** by this task file (English). **TESTER.md**, localized templates, or Discord/summary text that contradict **Steps 1–4** here are **stale for acceptance** — follow **this** file, not a translated or abbreviated checklist.
 
 **Why the last cycle was `TESTPLAN-` (instruction defect):** Testers followed a **stale** bar (**unfiltered** `cargo test --no-fail-fast`) and/or ran from a tree where **`UNTESTED-…`** was absent and used **`CLOSED-…`** / **`TESTPLAN-…`** as a stand-in. Neither matches **this** document. **Implementation** of the CDP health-check was **not** implicated.
 
@@ -197,6 +210,7 @@ Mistakes that produced **TESTPLAN-** while the CDP implementation was fine:
 4. **Wrong optional-suite snippet:** The diagnostic **`cargo test -p mac_stats --no-fail-fast`** for “already in **`src-tauri/`**” must **not** be prefixed with **`cd src-tauri &&`** (that directory only exists **from repo root**). Same rule as **Steps 2–3**.
 5. **Copied `rg` from a markdown table with `\|`:** alternation in **`rg`** must use a **single** pipe `|` between alternatives inside the quoted pattern. Escaped `\|` is **not** the same regex and can yield false “no matches” static-review failures.
 6. **Filter after `--`:** placing **`cdp_retry_`** after **`--`** sends it to the test binary instead of Cargo’s name filter → **`running 0 tests`** or wrong listing. Keep **`cdp_retry_` before `--`** (see **Token position** under **Executive summary**).
+7. **Omitted `--lib` on Step 3:** `cargo test -p mac_stats --no-fail-fast` **without** `--lib` and **without** `cdp_retry_` is **not** Step 3 — it pulls in **more than library unit tests** and is a common source of unrelated failures.
 
 **Fix for retest:** Use **`UNTESTED-…`** from the branch you test; run **Steps 1–4** using the **bash block** and **1) Static review** for `rg` (see **Paths by cwd** for the path column only); ignore unfiltered suite results for pass/fail.
 
@@ -217,10 +231,12 @@ Mistakes that produced **TESTPLAN-** while the CDP implementation was fine:
 | `cd src-tauri && cargo test --no-fail-fast` (historical shorthand in old reports) | Same as row above — **not** the gate |
 | **Step 3** passes; optional full suite fails in `discord::`, `scheduler::`, etc. | **Pass** **Steps 1–4**; note unrelated failures separately in the report |
 | `cargo test … -p mac_stats --lib --no-fail-fast` (**no** `cdp_retry_` token) | **Not** the gate — runs **all** lib tests (~800+); failures there do **not** override a passing **Step 3** |
+| `cargo test … -p mac_stats --no-fail-fast` (**no** `--lib`, **no** `cdp_retry_`) | **Not** the gate — runs **lib plus other test targets** (e.g. integration / binary tests) as Cargo discovers them; failures there are **often environmental** and do **not** override **Step 3** |
 
 ### Report evidence (include in tester notes)
 
-- The **full command line** for **Step 3**, which **must** contain the substring **`cdp_retry_`** (e.g. `cargo test … --lib cdp_retry_ --no-fail-fast`).
+- The **basename of the task file** you executed from (must be **`UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** after publication — if you only had **`CLOSED-…`**, state that as **handoff defect**, not a code fail).
+- The **full command line** for **Step 3**, which **must** contain the substrings **`--lib`** and **`cdp_retry_`** (e.g. `cargo test … --lib cdp_retry_ --no-fail-fast`).
 - Cargo output showing **`running N tests`** with **N ≥ 1** and **`test result: ok`** for that command.
 - If you also ran an unfiltered suite, label it **“optional / diagnostic”** and do **not** use it as the pass/fail bar.
 
@@ -343,8 +359,8 @@ Cumulative tester reports and older verification notes: **`tasks/CLOSED-20260321
 
 ## Publication workflow (TESTPLAN → UNTESTED)
 
-While instructions are edited, the task may temporarily live as **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`**. When ready for **`003-tester`**, the coder renames **`TESTPLAN-` → `UNTESTED-`** (same stamp and slug). After that rename, **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** is the only executable queue filename for this slug (see **Operator filename** and **Phase 0** above).
+While instructions are edited, the task lives as **`TESTPLAN-20260321-1345-browser-use-cdp-health-check-ping.md`**. When ready for **`003-tester`**, the coder renames **`TESTPLAN-` → `UNTESTED-`** (same stamp and slug). After that rename, **`tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`** is the only executable queue filename for this slug (see **Operator filename** and **Phase 0** above).
 
 If the branch already contains **`UNTESTED-…`** (no **`TESTPLAN-…`** file), a coder may **edit `UNTESTED-…` in place** to fix instructions; that is equivalent to publishing a fresh **`UNTESTED-`** after a **`TESTPLAN-` → `UNTESTED-`** rename, without an extra filesystem rename on that branch.
 
-**This revision (f):** **`TESTPLAN-…` → `UNTESTED-…`** — **Closure bar** + **why last TESTPLAN**; **Phase 0** **`CLOSED-` without `UNTESTED-`** row; **PF-2** CLOSED-only stop; **TESTER.md** “skip unfiltered mandatory line” note. Prior revision (e): **PF-1…PF-4** vs **Step 1–4**; **mac-stats-only** scope; unfiltered `cargo test` ≠ gate. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
+**This revision (g):** **`TESTPLAN-…` → `UNTESTED-…`** — **Basename-agnostic** header; **retest preflight strip**; **authority / language**; **`--lib` + `cdp_retry_`** both mandatory on Step 3; **report: task basename**; **whole-package** `cargo test` row + item **7** in “what went wrong”; wrong-command table row for **`--no-fail-fast`** without **`--lib`**. Prior **(f):** closure bar, Phase 0 **`CLOSED-` without `UNTESTED-`**, **TESTER.md** unfiltered line override. Ready for **`003-tester`** (`UNTESTED-` → `TESTING-`).
