@@ -2972,7 +2972,9 @@ pub(crate) fn run_js_via_node(code: &str) -> Result<String, String> {
 
     // Node -e script: read file, eval code, print result (no user code in -e, so no escaping).
     let eval_script = r#"const fs=require('fs');const p=process.argv[1];const c=fs.readFileSync(p,'utf8');try{const r=eval(c);console.log(r!==undefined?String(r):'undefined');}catch(e){console.error(e.message);process.exit(1);}"#;
-    let out = Command::new("node")
+    let mut cmd = Command::new("node");
+    crate::security::host_exec_env::apply_host_exec_env_hardening(&mut cmd);
+    let out = cmd
         .arg("-e")
         .arg(eval_script)
         .arg(path_str)

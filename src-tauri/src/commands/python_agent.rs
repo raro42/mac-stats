@@ -91,7 +91,9 @@ pub fn run_python_script(id: &str, topic: &str, script_body: &str) -> Result<Str
         script_body.len()
     );
 
-    let output = Command::new("python3")
+    let mut cmd = Command::new("python3");
+    crate::security::host_exec_env::apply_host_exec_env_hardening(&mut cmd);
+    let output = cmd
         .arg(&script_path)
         .output()
         .map_err(|e| {

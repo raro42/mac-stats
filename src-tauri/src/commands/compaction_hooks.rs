@@ -166,7 +166,9 @@ pub fn run_before_compaction_fire_and_forget(
     std::thread::spawn(move || {
         let path_str = path_for_thread.to_string_lossy().into_owned();
         let script = format!("{} \"$1\"", hook_cmd);
-        let status = std::process::Command::new("/bin/sh")
+        let mut hook_cmd_builder = std::process::Command::new("/bin/sh");
+        crate::security::host_exec_env::apply_host_exec_env_hardening(&mut hook_cmd_builder);
+        let status = hook_cmd_builder
             .arg("-c")
             .arg(&script)
             .arg("_")
@@ -222,7 +224,9 @@ pub fn run_after_compaction_fire_and_forget(
     let request_owned = request_id.to_string();
     let lw = lessons_written;
     std::thread::spawn(move || {
-        let status = std::process::Command::new("/bin/sh")
+        let mut hook_cmd_builder = std::process::Command::new("/bin/sh");
+        crate::security::host_exec_env::apply_host_exec_env_hardening(&mut hook_cmd_builder);
+        let status = hook_cmd_builder
             .arg("-c")
             .arg(&hook_cmd)
             .env("MAC_STATS_AFTER_COMPACTION_SOURCE", &source_owned)

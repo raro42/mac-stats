@@ -956,6 +956,7 @@ fn launch_chrome_on_port(port: u16) -> Result<Child, String> {
     validate_visible_launch_chromium_executable(&chrome_path)?;
 
     let mut cmd = Command::new(&chrome_path);
+    crate::security::host_exec_env::apply_host_exec_env_hardening(&mut cmd);
     cmd.arg(format!("--remote-debugging-port={}", port))
         .arg(format!(
             "--window-size={},{}",

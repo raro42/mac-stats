@@ -103,6 +103,7 @@ pub fn run_cursor_agent(prompt: &str) -> Result<String, String> {
     );
 
     let mut cmd = Command::new("cursor-agent");
+    crate::security::host_exec_env::apply_host_exec_env_hardening(&mut cmd);
     cmd.arg("--print")
         .arg("--trust")
         .arg("--output-format")

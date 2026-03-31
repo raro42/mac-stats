@@ -346,7 +346,9 @@ fn run_single_command_shell(
             "RUN_CMD: executing via shell: {}",
             crate::logging::ellipse(stage, 120)
         );
-        let mut child = Command::new("sh")
+        let mut cmd = Command::new("sh");
+        crate::security::host_exec_env::apply_host_exec_env_hardening(&mut cmd);
+        let mut child = cmd
             .args(["-c", stage])
             .stdin(if stdin_data.is_some() {
                 Stdio::piped()
@@ -397,7 +399,9 @@ fn run_single_command_shell(
         "RUN_CMD: executing via shell: {}",
         crate::logging::ellipse(stage, 120)
     );
-    let mut child = Command::new("sh")
+    let mut cmd = Command::new("sh");
+    crate::security::host_exec_env::apply_host_exec_env_hardening(&mut cmd);
+    let mut child = cmd
         .args(["-c", stage])
         .stdin(if stdin_data.is_some() {
             Stdio::piped()

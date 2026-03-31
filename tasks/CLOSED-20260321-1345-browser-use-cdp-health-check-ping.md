@@ -5026,3 +5026,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Acceptance criteria:** (1) blocking timeout ping / **Browser unresponsive** — **pass**. (2) `check_browser_alive` comment forbidding nested `block_on` + Tokio timeout — **pass**. (3) `clear_browser_session_on_error` + `should_retry_cdp_after_clearing_session` / connection errors — **pass** (spot-checked in `browser_agent/mod.rs`).
 
 **Outcome:** **CLOSED-** (all criteria pass). Rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
+
+---
+
+## Test report
+
+**Date:** 2026-03-31 01:13 UTC
+
+**TESTER.md workflow:** Operator requested `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; that path is **not** in the repo. This run used only that task slug: renamed **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md` → `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md`** at the start (same as `UNTESTED-` → `TESTING-` when the task is already closed). No other `UNTESTED-*` file was tested.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (`Never use Handle::block_on` + `tokio::time::timeout` in `check_browser_alive`; `evaluate_one_plus_one_blocking_timeout` documents no nested Tokio `block_on`)
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (878 passed, 0 failed in `mac_stats` lib; other binaries 0 tests; 1 doc-test ignored)
+
+**Acceptance criteria:** (1) `evaluate_one_plus_one_blocking_timeout` uses worker thread + `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)` and surfaces **Browser unresponsive** — **pass**. (2) `check_browser_alive` calls helper + explicit anti-`block_on` comment — **pass**. (3) `clear_browser_session_on_error` for unresponsive + connection errors; `should_retry_cdp_after_clearing_session` documents health over retry — **pass**.
+
+**Outcome:** **CLOSED-** (all criteria pass). Rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.

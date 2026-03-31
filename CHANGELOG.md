@@ -160,6 +160,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**: **Re-verify** (**2026-03-30**, Spanish, **`003-tester` / `TESTER.md`**, única tarea lógica **`UNTESTED-…`**): path absent; **`CLOSED-` → `TESTING-`**; **`cargo check`** / **`cargo test`** (**875** lib); turn-gate **`rg`** in **`src-tauri/src`** (`commands/ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`); top-level **`src/`** — no Rust matches — pass → **`CLOSED-…`**. **Plus** agent-run **Re-verify** subsection (same UTC date, acceptance 1–4, **`rg`** commands). **Plus** **Cursor** **Re-verify** block (solo **`UNTESTED-…`**, **`src-tauri/src`** vs root **`src/`** note, acceptance 1–4).
 - **Tasks** — **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**: triage (**TOP**) — English coder line with explicit on-disk **`FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md` → `WIP-…` → `UNTESTED-…`**; **Section 6** “canonical handoff” line **English** (source of truth after **`WIP → UNTESTED`**, do not strip on prefix renames); **Section 6** FEATURE-CODER wording uses literal **`FEAT-…` → `WIP-…` → `UNTESTED-…`**.
 
+## [0.1.85] - 2026-03-31
+
+### Added
+- **Host exec env hardening** — `security::host_exec_env` strips dangerous inherited variables (OpenClaw `blockedKeys` / `blockedPrefixes` parity, plus `BROWSER` / `GIT_*` editor hooks) before agent-adjacent child processes; `std::process::Command` and `tokio::process::Command` helpers; unit tests for `DYLD_INSERT_LIBRARIES`, `PYTHONPATH`, and `LD_LIBRARY_PATH`.
+
+### Changed
+- **Subprocess spawns** — hardening applied to `RUN_CMD` (`sh -c`), `PYTHON_SCRIPT`, `CURSOR_AGENT`, Node skill reduction (`content_reduction`), compaction and session-reset hooks, Ori Mnemos prefetch, MCP stdio servers, plugin scripts, and visible Chromium launch in `browser_agent`.
+- **Tasks** — appended **`003-tester`** reports on **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** and **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**; added **`tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`**.
+
 ## [0.1.84] - 2026-03-31
 
 ### Changed

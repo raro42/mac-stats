@@ -10,6 +10,7 @@
 //! (e.g. request/response headers or bodies). Use `mask_credential` for safe display only.
 
 pub mod attachment_roots;
+pub mod host_exec_env;
 
 use anyhow::{Context, Result};
 use security_framework::passwords::delete_generic_password;

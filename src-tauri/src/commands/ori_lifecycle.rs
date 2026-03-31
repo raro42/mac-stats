@@ -262,16 +262,19 @@ pub(crate) async fn maybe_run_prefetch_section(
     let vault_owned = vault.to_path_buf();
     let out = tokio::time::timeout(
         timeout,
-        TokioCommand::new(&bin)
-            .current_dir(&vault_owned)
-            .arg("query")
-            .arg("similar")
-            .arg(&q)
-            .arg("--limit")
-            .arg(limit.to_string())
-            .stdout(std::process::Stdio::piped())
-            .stderr(std::process::Stdio::null())
-            .output(),
+        {
+            let mut cmd = TokioCommand::new(&bin);
+            crate::security::host_exec_env::apply_host_exec_env_hardening_tokio(&mut cmd);
+            cmd.current_dir(&vault_owned)
+                .arg("query")
+                .arg("similar")
+                .arg(&q)
+                .arg("--limit")
+                .arg(limit.to_string())
+                .stdout(std::process::Stdio::piped())
+                .stderr(std::process::Stdio::null())
+                .output()
+        },
     )
     .await;
 

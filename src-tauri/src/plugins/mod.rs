@@ -105,6 +105,7 @@ impl Plugin {
 
         cmd.stdout(Stdio::piped());
         cmd.stderr(Stdio::piped());
+        crate::security::host_exec_env::apply_host_exec_env_hardening(&mut cmd);
 
         let child = cmd.spawn().with_context(|| {
             format!(

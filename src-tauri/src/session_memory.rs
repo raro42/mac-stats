@@ -306,7 +306,9 @@ pub fn before_session_reset_export(source: &str, session_id: u64, reason: &str) 
     std::thread::spawn(move || {
         let path_str = path_for_thread.to_string_lossy().into_owned();
         let script = format!("{} \"$1\"", hook_cmd);
-        let status = std::process::Command::new("/bin/sh")
+        let mut hook_cmd_builder = std::process::Command::new("/bin/sh");
+        crate::security::host_exec_env::apply_host_exec_env_hardening(&mut hook_cmd_builder);
+        let status = hook_cmd_builder
             .arg("-c")
             .arg(&script)
             .arg("_")

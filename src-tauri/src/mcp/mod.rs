@@ -358,7 +358,9 @@ async fn run_mcp_stdio_rpc(
     use tokio::process::Command;
 
     info!("MCP stdio: spawning {} {:?} for {}", command, args, method);
-    let mut child = Command::new(command)
+    let mut cmd = Command::new(command);
+    crate::security::host_exec_env::apply_host_exec_env_hardening_tokio(&mut cmd);
+    let mut child = cmd
         .args(args)
         .stdin(std::process::Stdio::piped())
         .stdout(std::process::Stdio::piped())
