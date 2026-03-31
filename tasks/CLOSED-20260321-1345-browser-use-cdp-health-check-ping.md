@@ -5522,6 +5522,21 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 
 ---
 
+**Date:** 2026-03-31 06:28 UTC
+
+**TESTER.md flow:** Operator requested `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; that file is **not present** in the repo. The same task slug existed as `tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`; renamed **`CLOSED-` → `TESTING-`** for this verification cycle (stand-in for `UNTESTED-` → `TESTING-`). No other `UNTESTED-*` task file was used.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (878 passed, 0 failed in `mac_stats` lib; other targets 0 tests; 1 doc-test ignored)
+
+**Outcome:** All acceptance criteria pass — rename to **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+
+---
+
 ## Test report
 
 **Date:** 2026-03-31 (local: America/Los_Angeles, same calendar date as UTC for this stamp)
@@ -5570,3 +5585,20 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 - `cd src-tauri && cargo test --no-fail-fast` — **pass** (878 passed, 0 failed in `mac_stats` lib; other binaries 0 tests; 1 doc-test ignored)
 
 **Outcome:** All acceptance criteria pass — rename to **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+
+---
+
+## Test report
+
+**Date:** 2026-03-31 06:28 UTC
+
+**TESTER.md flow:** Operator requested `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; that path is **not in the repo**. The task for the same slug was `tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`; renamed **`CLOSED-` → `TESTING-`** for this run (stand-in for `UNTESTED-` → `TESTING-`). No other `UNTESTED-*` task was tested.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (878 passed, 0 failed in `mac_stats` lib; other targets 0 tests; 1 doc-test ignored)
+
+**Outcome:** All acceptance criteria pass — rename to **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** (pass; not `TESTED-` or `TESTPLAN-`).

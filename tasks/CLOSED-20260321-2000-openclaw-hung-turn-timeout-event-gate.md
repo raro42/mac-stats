@@ -1138,3 +1138,12 @@ _(Tester: append results only on the **queue** file **`UNTESTED-…` → `TESTIN
 - **Commands run:** `cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats`; `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats`; five **`rg`** lines exactly as block **A1** (`TurnOutputGate|gate_allows_send|finalize_turn_timeout` on **`src-tauri/src`**; `rg -n -F '**Turn timed out**' src-tauri/src/commands/turn_lifecycle.rs`; `rg -n "closing output gate after turn wall-clock timeout" src-tauri/src/commands/ollama.rs`; `rg -n "turn wall-clock timeout"` and `rg -n "closing output gate and running cleanup"` on **`turn_lifecycle.rs`** — **same source line 100** twice).
 - **Result:** **PASS** — `cargo check` exit **0**; `cargo test` exit **0** (**878** passed, **0** failed in **`mac_stats`** lib tests; additional test binaries **0** tests; doc-tests **0** run, **1** ignored); every required **`rg`** printed ≥1 match. Acceptance criteria **1–4** satisfied (static gate).
 - **Outcome filename:** **`TESTING-…` → `CLOSED-…`** (pass). Not **`TESTED-…`**. Not **`TESTPLAN-…`**.
+
+### 2026-03-31 (UTC) — agent run (this session; [`003-tester/TESTER.md`](../003-tester/TESTER.md); operator: only `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`)
+
+- **Date / timezone:** 2026-03-31 (UTC). **Host:** macOS darwin 25.3.0; repo `/Users/raro42/projects/mac-stats`; shell **`bash`**.
+- **Queue / rename:** **`UNTESTED-…`** absent at start (**only** **`CLOSED-…`**). **`mv tasks/CLOSED-… tasks/UNTESTED-…`** then **`mv tasks/UNTESTED-… tasks/TESTING-…`** (same stamp + slug). **Did not** pick a different **`UNTESTED-*`** file.
+- **Sequence:** **0** Tester quick gate (**BLOCK: A1 or A2**) → **0b** `test -f src-tauri/Cargo.toml && echo OK` → **1** git Preflight → Self-check A1/A2 → **2** **Verification commands → A1** (`set -e` through last **`rg`**).
+- **Commands run:** `cargo check` / `cargo test` with `--manifest-path src-tauri/Cargo.toml -p mac_stats` (full **`cargo test`**, not **`-q`**); five **`rg`** lines as **A1**; **`turn_lifecycle.rs`** timeout + cleanup **`rg`** lines both hit **line 100**.
+- **Result:** **PASS** — **`cargo check`** / **`cargo test`** exit **0**; **878** passed, **0** failed (**`mac_stats`** lib); all required **`rg`** matches; acceptance **§1–4** satisfied.
+- **Outcome:** **`TESTING-…` → `CLOSED-…`** (operator pass naming). Not **`TESTED-…`**. Not **`TESTPLAN-…`**.
