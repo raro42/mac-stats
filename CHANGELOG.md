@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`:** appended **`## Test report`** (**2026-03-31 01:52 UTC**); operator **`UNTESTED-…`** missing; **`CLOSED-` → `TESTING-`**; CDP **`rg`** gates + anti-**`block_on`**; **`cargo check`** / **`cargo test --no-fail-fast`** — **878** pass; outcome **CLOSED-**.
+- **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`:** appended **`### 2026-03-31 (UTC)`** tester run (formal **`cp`/`mv`** queue when operator **`UNTESTED-…`** absent); **A1** **`cargo check`/`cargo test -q`** + five **`rg`** lines — **PASS** (**878**); **`TESTING-` → `CLOSED-`**.
+- **Tasks** — **`tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`:** triage summary + Section 6 feature-coder lifecycle note; expectations for **`host_exec_env`** / **`pipeline_date_wc`**; pointer to Section 5 for full **`cargo test`**.
 - **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`:** appended **`## Test report`** (**2026-03-31 01:24 UTC**); operator **`UNTESTED-…`** missing; **`CLOSED-` → `TESTING-`**; CDP **`rg`** gates + anti-**`block_on`**; **`cargo check`** / **`cargo test --no-fail-fast`** — **878** pass; outcome **CLOSED-**.
 - **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`:** appended **`### 2026-03-31 (UTC)`** tester run (formal **`CLOSED-` → `UNTESTED-` → `TESTING-`** when operator path missing); **`cargo check`/`cargo test -q`** + **A1** **`rg`** lines — **PASS** (**878**); **`TESTING-` → `CLOSED-`**.
 - **Tasks** — **`tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`:** triage verification adds **`cargo test pipeline_date_wc`**; short note on **`pipeline_date_wc_integration`** (**RUN_CMD** **`sh -c`** path after env hardening).

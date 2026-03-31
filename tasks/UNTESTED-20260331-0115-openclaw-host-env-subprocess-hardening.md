@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): on-disk rename chain **`FEAT-…` → `WIP-…` → `UNTESTED-…`** (stem `20260331-0115-openclaw-host-env-subprocess-hardening`). **Handoff file:** `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`. **mac-stats:** `security/host_exec_env.rs` (`apply_host_exec_env_hardening`, `apply_host_exec_env_hardening_tokio`, unit tests); wired in `commands/run_cmd.rs`, `python_agent.rs`, `cursor_agent.rs`, `content_reduction.rs`, `compaction_hooks.rs`, `ori_lifecycle.rs`, `plugins/mod.rs`, `mcp/mod.rs`, `browser_agent/mod.rs`, `session_memory.rs`. **Verification (this run):** `cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test` — **pass**. **Section 6** = tester handoff.
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): on-disk rename chain **`FEAT-…` → `WIP-…` → `UNTESTED-…`** (stem `20260331-0115-openclaw-host-env-subprocess-hardening`; this run executed that chain from the prior `UNTESTED-…` handoff file). **Handoff file:** `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`. **mac-stats:** `security/host_exec_env.rs` (`apply_host_exec_env_hardening`, `apply_host_exec_env_hardening_tokio`, unit tests); wired in `commands/run_cmd.rs`, `python_agent.rs`, `cursor_agent.rs`, `content_reduction.rs`, `compaction_hooks.rs`, `ori_lifecycle.rs`, `plugins/mod.rs`, `mcp/mod.rs`, `browser_agent/mod.rs`, `session_memory.rs`. **Verification (this run):** `cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test` — **pass** (full `cargo test`: all tests green in `mac_stats` lib). **Section 6** = tester handoff.
 - **Next step:** Tester runs **Section 6** (after **Section 5**) on this file.
 ---
 
@@ -65,6 +65,8 @@ Optional: `cd src-tauri && cargo clippy`
 
 ## 6. Testing instructions
 
+**FEATURE-CODER task-file lifecycle (same stem `20260331-0115-openclaw-host-env-subprocess-hardening`):** `tasks/FEAT-….md` → rename to `WIP-….md` while coding → add/keep this section → rename to `UNTESTED-….md` for tester handoff.
+
 **On-disk handoff path:** after the coder **`WIP → UNTESTED`** rename, this task lives at `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md` (same stem as `FEAT-…` / `WIP-…`).
 
 **Canonical handoff:** this section is the source of truth for the tester after the **`WIP → UNTESTED`** rename (do not remove it when changing task-file prefixes).
@@ -81,7 +83,11 @@ From the repo root:
 cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc
 ```
 
+**Expect:** `host_exec_env` runs **3** unit tests (DYLD / PYTHONPATH / `LD_` prefix); all pass. `pipeline_date_wc` passes.
+
 `pipeline_date_wc` is `commands::run_cmd::run_cmd_stage_validate_tests::pipeline_date_wc_integration`: exercises the hardened **`sh -c`** RUN_CMD path (`date | wc -c`) so PATH and shell execution still work after env stripping.
+
+For the full crate test suite, use **Section 5** (`cargo test` with no filter).
 
 ### Manual / runtime (optional)
 
