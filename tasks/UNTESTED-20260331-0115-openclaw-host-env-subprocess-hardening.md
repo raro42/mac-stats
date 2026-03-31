@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`), user-assigned `tasks/FEAT-20260331-0115-openclaw-host-env-subprocess-hardening.md` (**absent**; same stem). **Flow:** `UNTESTED-…` → **`WIP-…`** (pickup) → confirm §2–§4 in-tree → **`WIP-…` → `UNTESTED-…`** (handoff this run). **Implementation:** `security::host_exec_env` + §4 call sites; §5 `rg` list matches; **no Rust code changes** this run. **§6 Testing instructions:** tester one-liner, minimal smoke, manual optional, pass/fail. **Verification:** `cargo check`; `cargo test host_exec_env` (3); `cargo test pipeline_date_wc` (1); `cargo test --lib` (**878** passed); `cargo test` — **pass** (doc-tests: **1 ignored**). **On disk (after handoff):** `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`.
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`), user-assigned `tasks/FEAT-20260331-0115-openclaw-host-env-subprocess-hardening.md` (**absent**; same stem). **Flow:** `UNTESTED-…` → **`WIP-…`** (pickup) → confirm §2–§4 in-tree → add/keep **§6 Testing** → **`WIP-…` → `UNTESTED-…`** (handoff). **Implementation:** `security::host_exec_env` + §4 call sites; §5 `rg` list matches; **no Rust code changes** this run (already landed). **§6 Testing instructions:** tester one-liner, minimal smoke, manual optional, pass/fail (present below). **Verification (this run):** `cargo check`; `cargo test host_exec_env` (3); `cargo test pipeline_date_wc` (1); `cargo test --lib` (**878** passed); `cargo test` — **pass** (doc-tests: **1 ignored**). **On disk (after handoff):** `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`.
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
@@ -109,7 +109,7 @@ From repo root (same as **Minimal smoke**, plus full suite):
 cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test
 ```
 
-**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including doc-tests — **pass**, 1 ignored). **FEATURE-CODER** re-verified immediately before **`WIP-20260331-0115-openclaw-host-env-subprocess-hardening.md` → `UNTESTED-…`** rename (2026-03-31).
+**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including doc-tests — **pass**, 1 ignored). **FEATURE-CODER** re-verified immediately before **`WIP-20260331-0115-openclaw-host-env-subprocess-hardening.md` → `UNTESTED-…`** rename (2026-03-31, pickup `UNTESTED→WIP` because assigned `FEAT-…` was absent).
 
 ### Tester checklist (quick)
 
