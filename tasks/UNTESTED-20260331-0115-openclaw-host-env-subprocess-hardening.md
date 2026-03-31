@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. User-assigned `tasks/FEAT-20260331-0115-openclaw-host-env-subprocess-hardening.md` **absent on disk**; **pickup** `UNTESTED-…` → `WIP-…` (equivalent to FEAT→WIP). **Implementation:** `security::host_exec_env` + §4 call sites — **already in tree**; re-audited `rg` / sources, **no Rust edits** this run. **Section 6** testing instructions expanded (explicit tester summary). **Verification (this handoff):** `cargo check`; `cargo test host_exec_env` (3); `cargo test pipeline_date_wc` (1); `cargo test --lib` (**878** passed); `cargo test` — **pass** (doc-tests: **1 ignored**). **Handoff:** `WIP-…` → `UNTESTED-…`.
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`), user-assigned `tasks/FEAT-20260331-0115-openclaw-host-env-subprocess-hardening.md` (**absent**; same stem). **Pickup:** `UNTESTED-…` → `WIP-…` → (after verification) `UNTESTED-…`. **Implementation:** §2–§4 satisfied by existing `security::host_exec_env` + §4 call sites; **`rg`** call-site audit matches list in §5; **no Rust changes** this run. **§6 Testing instructions:** present (tester one-liner, smoke, manual optional, pass/fail). **Verification:** `cargo check`; `cargo test host_exec_env` (3); `cargo test pipeline_date_wc` (1); `cargo test --lib` (**878** passed); `cargo test` — **pass** (doc-tests: **1 ignored**). **Handoff:** `WIP-…` → `UNTESTED-…`.
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
@@ -65,6 +65,8 @@ Optional: `cd src-tauri && cargo clippy`
 
 ## 6. Testing instructions
 
+**Primary action for testers:** run the **Tester one-liner** below (or **Minimal smoke** if you only need the hardened-subprocess checks). Use **Pass / fail** at the end of this section to record the outcome.
+
 **Testing instructions (tester-facing summary):**
 
 1. **Automated (required):** From repo root, run the **Tester one-liner** below. All commands must exit 0. Match **Success signals** (test counts and `cargo test --lib` total).
@@ -107,7 +109,7 @@ From repo root (same as **Minimal smoke**, plus full suite):
 cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test
 ```
 
-**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including doc-tests — **pass**, 1 ignored). **FEATURE-CODER** re-verified immediately before **`WIP-20260331-0115-openclaw-host-env-subprocess-hardening.md` → `UNTESTED-…`** rename (2026-03-31).
+**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including doc-tests — **pass**, 1 ignored). **FEATURE-CODER** re-verified immediately before **`WIP-20260331-0115-openclaw-host-env-subprocess-hardening.md` → `UNTESTED-…`** rename (2026-03-31, second pickup cycle).
 
 ### Tester checklist (quick)
 
