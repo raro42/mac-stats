@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. Operator path `tasks/FEAT-20260331-0115-….md` **absent**; executed **`UNTESTED-…` → `WIP-…`** at start, **`WIP-…` → `UNTESTED-…`** at handoff (**FEAT→WIP→UNTESTED** equivalence). **Implementation:** `security::host_exec_env` + §4 call sites already in tree (**no Rust changes** this run). **Section 6** testing instructions present and refreshed. **Verification (this handoff):** `cargo check`, `cargo test host_exec_env` (3), `cargo test pipeline_date_wc` (1), `cargo test --lib` (**878** passed), full `cargo test` — **pass**.
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. `tasks/FEAT-20260331-0115-….md` **absent**; **`UNTESTED-…` → `WIP-…`** at pickup, **`WIP-…` → `UNTESTED-…`** at handoff (**FEAT→WIP→UNTESTED** equivalence). **Implementation:** `security::host_exec_env` + §4 call sites (**no Rust changes** this run; parity verified in tree). **Section 6** testing instructions retained. **Verification:** `cargo check`; `cargo test host_exec_env` (3); `cargo test pipeline_date_wc` (1); `cargo test --lib` (**878** passed); full `cargo test` — **pass** (doc-tests: 1 ignored).
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
@@ -95,7 +95,7 @@ From repo root (same as **Minimal smoke**, plus full suite):
 cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test
 ```
 
-**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` — **pass**; FEATURE-CODER **WIP→UNTESTED** handoff **2026-03-31**).
+**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including doc-tests — **pass**; FEATURE-CODER **WIP→UNTESTED** handoff **2026-03-31**).
 
 ### Tester checklist (quick)
 
