@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`:** appended **`## Test report`** (**2026-03-31 03:27 UTC**); operator **`UNTESTED-…`** path missing; **`CLOSED-` → `TESTING-`** stand-in; CDP **`rg`** + anti-nested **`block_on`**; **`cargo check`** / **`cargo test --no-fail-fast`** — **878** pass; outcome **CLOSED-**.
+- **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`:** appended **`### 2026-03-31 (UTC) — agent run`** (`003-tester`/`TESTER.md`; restored **`UNTESTED-…`** via **`mv CLOSED-…`**, then **`UNTESTED-` → `TESTING-`**); **A1** **`cargo check`/`cargo test`** + five **`rg`** lines — **PASS** (**878**); **`TESTING-` → `CLOSED-`**.
+- **Tasks** — **`tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`:** triage top — **lifecycle** wording (**`UNTESTED-` → `WIP-` → `UNTESTED-`** at handoff vs **FEAT** absent).
 - **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`:** appended **`## Test report`** (**2026-03-31 03:18 UTC**); operator **`UNTESTED-…`** absent; **`CLOSED-` → `TESTING-`**; CDP **`rg`** + anti-nested **`block_on`**; **`cargo check`** / **`cargo test --no-fail-fast`** — **878** pass; outcome **CLOSED-**.
 - **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`:** appended **`### 2026-03-31 (UTC) — agent run`** (`003-tester`/`TESTER.md`; operator **`UNTESTED-…`** only — **absent** → **`CLOSED-` → `TESTING-`**); **A1** **`cargo check`/`cargo test`** + five **`rg`** lines — **PASS** (**878**); **`TESTING-` → `CLOSED-`**.
 - **Tasks** — **`tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`:** triage top — **user-requested** **`FEAT-…`** absent; lifecycle **`UNTESTED-` → `WIP-` → `UNTESTED-`**; expanded §4 call-site list; **no** Rust edits this handoff.
