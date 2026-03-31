@@ -521,6 +521,15 @@ rg -n "closing output gate and running cleanup" src/commands/turn_lifecycle.rs
 
 _(Tester: append results only on the **queue** file **`UNTESTED-…` → `TESTING-…`** per [`003-tester/TESTER.md`](../003-tester/TESTER.md). **While the filename is `TESTPLAN-…`**, there is no queue slot — coder repair only; **no** test report.)_
 
+### 2026-03-31 (UTC)
+
+- **Queue / rename:** At run start, **`tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** was **absent**; only **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** existed. Per operator request (this stamp only), **`CLOSED-…` → `UNTESTED-…` → `TESTING-…`** was applied so **`TESTER.md`** could run on a **`TESTING-…`** queue file, then verification followed **Copy-paste order** **0 / 0b / 1 / 2**.
+- **Host:** macOS (darwin 25.x), repo `/Users/raro42/projects/mac-stats`.
+- **Sequence:** Tester quick gate → **BLOCK: A1 or A2** → step **0b** `test -f src-tauri/Cargo.toml && echo OK` → git **Preflight** → Self-check row A1/A2 → **Verification commands block A1** (full paste from `set -e` through last `rg`).
+- **Commands (excerpt):** `cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats`; `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats`; `rg` lines exactly as in block A1 for `TurnOutputGate|gate_allows_send|finalize_turn_timeout`, `**Turn timed out**`, `closing output gate after turn wall-clock timeout`, `turn wall-clock timeout`, `closing output gate and running cleanup`.
+- **Result:** **PASS** — `cargo check` exit 0; `cargo test` exit 0 (**878** passed, **0** failed); every required `rg` printed ≥1 line (`turn_lifecycle.rs` timeout/cleanup pair matched the **same** line twice, as expected).
+- **Outcome file:** **`TESTING-…` → `CLOSED-…`** (all acceptance criteria satisfied).
+
 ### 2026-03-30 (UTC)
 
 - **Host:** macOS (darwin 25.x), repo `/Users/raro42/projects/mac-stats`.
