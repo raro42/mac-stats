@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. Named path `tasks/FEAT-20260331-0115-….md` **absent**; **pickup** `UNTESTED-…` → `WIP-…`; **handoff** `WIP-…` → `UNTESTED-…` (FEAT→WIP→UNTESTED equivalence). **Implementation:** `security::host_exec_env` + §4 call sites (**unchanged** this run; acceptance criteria satisfied in tree). **Section 6** testing instructions retained/updated. **Verification (this run):** `cargo check`; `cargo test host_exec_env` (3); `cargo test pipeline_date_wc` (1); `cargo test --lib` (**878** passed); `cargo test` — **pass** (doc-tests: **1 ignored**).
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. User-assigned `tasks/FEAT-20260331-0115-openclaw-host-env-subprocess-hardening.md` **absent on disk**; **pickup** `UNTESTED-…` → `WIP-…` (equivalent to FEAT→WIP). **Implementation:** `security::host_exec_env` + §4 call sites — **already in tree**; re-audited `rg` / sources, **no Rust edits** this run. **Section 6** testing instructions expanded (explicit tester summary). **Verification (this handoff):** `cargo check`; `cargo test host_exec_env` (3); `cargo test pipeline_date_wc` (1); `cargo test --lib` (**878** passed); `cargo test` — **pass** (doc-tests: **1 ignored**). **Handoff:** `WIP-…` → `UNTESTED-…`.
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
@@ -65,6 +65,12 @@ Optional: `cd src-tauri && cargo clippy`
 
 ## 6. Testing instructions
 
+**Testing instructions (tester-facing summary):**
+
+1. **Automated (required):** From repo root, run the **Tester one-liner** below. All commands must exit 0. Match **Success signals** (test counts and `cargo test --lib` total).
+2. **Call-site audit (optional):** Run the Section 5 `rg` one-liner to confirm each listed file still calls `apply_host_exec_env_hardening` or `apply_host_exec_env_hardening_tokio`.
+3. **Manual / runtime (optional):** Only if you rely on RUN_CMD, MCP, PYTHON_SCRIPT, compaction hooks, or `before_reset` hooks — follow **Manual / runtime** later in this section.
+
 **What to run (order):**
 
 1. **Section 5 — Verification (automated)** (`cargo check`, `cargo test host_exec_env`, then full `cargo test` if you want the whole crate).
@@ -101,7 +107,7 @@ From repo root (same as **Minimal smoke**, plus full suite):
 cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test
 ```
 
-**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including doc-tests — **pass**, 1 ignored). **FEATURE-CODER** re-verified **2026-03-31** before **`WIP-…` → `UNTESTED-…`** handoff.
+**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including doc-tests — **pass**, 1 ignored). **FEATURE-CODER** re-verified immediately before **`WIP-20260331-0115-openclaw-host-env-subprocess-hardening.md` → `UNTESTED-…`** rename (2026-03-31).
 
 ### Tester checklist (quick)
 
