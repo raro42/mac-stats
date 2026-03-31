@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. **Requested path** `tasks/FEAT-20260331-0115-….md` **was not on disk**; workflow used **`UNTESTED-…` → `WIP-…`** (equivalent to **`FEAT-…` → `WIP-…`**). **Implementation** matches §2 in-tree (`security/host_exec_env.rs` + call sites in §4); no code changes this run. **Section 6** testing instructions retained as tester handoff. **`WIP-…` → `UNTESTED-…`** after verification. **Handoff:** `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`. **`which cursor-agent`** probe in `cursor_agent.rs` remains **un**hardened (§3 optional). **Verification:** `cargo check`, `cargo test host_exec_env`, `cargo test pipeline_date_wc`, full `cargo test` — **pass**.
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. **On-disk lifecycle:** `tasks/UNTESTED-…` → `tasks/FEAT-…` → `tasks/WIP-…` (materialized **`FEAT-…`** for the requested path) → **`WIP-…` → `UNTESTED-…`** after this handoff. **Change this run:** `is_cursor_agent_available` (`which cursor-agent`) now calls **`apply_host_exec_env_hardening`** (parity with other `cursor_agent` spawns; §3 optional item closed). **§2 / §4** otherwise already satisfied in-tree. **Section 6** testing instructions updated with **Coder verification**. **Verification:** `cargo check`, `cargo test host_exec_env`, `cargo test pipeline_date_wc`, full `cargo test` — **pass**.
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
@@ -30,7 +30,7 @@ OpenClaw filters the parent environment before running host-executed commands. m
 ## 3. Notes
 
 - Do **not** strip `HOME` / normal path (OpenClaw base sanitization does not use `blockedOverrideKeys` for inherited env).
-- `which cursor-agent` probe may remain minimal; optional to harden.
+- `which cursor-agent` probe (`is_cursor_agent_available`) uses **`apply_host_exec_env_hardening`** like the main `cursor-agent` spawn.
 - Well-known **`DYLD_*`** / **`LD_*`** library-injection names are also removed unconditionally so variables set only on the `Command` (not present in the parent process) are still stripped.
 
 ---
@@ -39,7 +39,7 @@ OpenClaw filters the parent environment before running host-executed commands. m
 
 - **`src-tauri/src/security/host_exec_env.rs`** — `apply_host_exec_env_hardening` / `apply_host_exec_env_hardening_tokio`: strip `BLOCKED_ENV_KEYS` (OpenClaw `blockedKeys` + `BROWSER` / `GIT_*` editors + common `DYLD_*` / `LD_*` injection keys) and any parent env var whose uppercase name matches `blockedPrefixes` (`DYLD_`, `LD_`, `BASH_FUNC_`).
 - **`src-tauri/src/security/mod.rs`** — `pub mod host_exec_env`.
-- **Call sites:** `commands/run_cmd.rs` (`sh -c` for RUN_CMD), `python_agent.rs`, `cursor_agent.rs`, `content_reduction.rs` (Node), `compaction_hooks.rs`, `session_memory.rs` (hook shells), `commands/ori_lifecycle.rs` (Ori prefetch), `plugins/mod.rs`, `mcp/mod.rs` (stdio MCP), `browser_agent/mod.rs` (visible Chromium launch).
+- **Call sites:** `commands/run_cmd.rs` (`sh -c` for RUN_CMD), `python_agent.rs`, `cursor_agent.rs` (main invocation + `which` availability probe), `content_reduction.rs` (Node), `compaction_hooks.rs`, `session_memory.rs` (hook shells), `commands/ori_lifecycle.rs` (Ori prefetch), `plugins/mod.rs`, `mcp/mod.rs` (stdio MCP), `browser_agent/mod.rs` (visible Chromium launch).
 
 ---
 
@@ -74,6 +74,16 @@ Optional: `cd src-tauri && cargo clippy`
 **FEATURE-CODER:** After the coder run (**on-disk `FEAT-…` → `WIP-…` → `UNTESTED-…`**), the **tester** owns this section. Run **Section 5** before manual checks. **Coder:** leave reproducible smoke, checklist, and pass/fail criteria below; do not strip this section when renaming task-file prefixes.
 
 **Required order:** run **Section 5 — Verification (automated)** first, then manual or optional runtime steps below.
+
+### Coder verification (this run)
+
+From repo root (same as **Minimal smoke**, plus full suite):
+
+```bash
+cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test
+```
+
+**Result:** all passed (`host_exec_env`: 3 tests; `pipeline_date_wc`: 1 test; full `cargo test`: **`mac_stats` lib crate 878** tests passed, other targets 0, as of this run).
 
 ### Tester checklist (quick)
 

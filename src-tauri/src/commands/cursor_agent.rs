@@ -9,8 +9,9 @@ use tracing::info;
 
 /// Check if cursor-agent binary is available on PATH.
 pub fn is_cursor_agent_available() -> bool {
-    Command::new("which")
-        .arg("cursor-agent")
+    let mut cmd = Command::new("which");
+    crate::security::host_exec_env::apply_host_exec_env_hardening(&mut cmd);
+    cmd.arg("cursor-agent")
         .output()
         .map(|o| o.status.success())
         .unwrap_or(false)

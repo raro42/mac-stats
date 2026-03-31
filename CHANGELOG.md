@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Security** — **`CURSOR_AGENT`:** `is_cursor_agent_available` (`which cursor-agent`) applies **`apply_host_exec_env_hardening`** before spawn (`commands/cursor_agent.rs`), matching other agent-adjacent subprocesses.
+- **Tasks** — **`tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`:** FEATURE-CODER handoff (**`UNTESTED-` → `FEAT-` → `WIP-` → `UNTESTED-`**); Section 6 **Coder verification**; triage notes **`which`** hardening.
+- **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`:** appended **`## Test report`** (**2026-03-31 02:39 UTC**); operator **`UNTESTED-…`** path missing; **`CLOSED-` → `TESTING-`**; CDP **`rg`** + anti-nested **`block_on`**; **`cargo check`** / **`cargo test --no-fail-fast`** — **878** pass; outcome **CLOSED-**.
+- **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`:** appended **`### 2026-03-31 (UTC) — agent run`** (`003-tester`/`TESTER.md`; operator-only **`UNTESTED-…`** missing); formal **`CLOSED-` → `UNTESTED-` → `TESTING-`**; **A1** **`cargo check`/`cargo test`** + five **`rg`** lines — **PASS** (**878**); **`TESTING-` → `CLOSED-`**.
 - **Tasks** — **`tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`:** appended **`## Test report`** (**2026-03-31 02:29 UTC**); operator **`UNTESTED-…`** missing; **`CLOSED-` → `TESTING-`**; CDP **`rg`** gates + anti-nested **`block_on`**; **`cargo check`** / **`cargo test --no-fail-fast`** — **878** pass; outcome **CLOSED-**.
 - **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`:** appended **`### 2026-03-31 (local)`** Cursor run (**`CLOSED-` → `TESTING-`** when **`UNTESTED-…`** absent); **A1** **`cargo check`/`cargo test`** + five **`rg`** lines — **PASS** (**878**); **`TESTING-` → `CLOSED-`**.
 - **Tasks** — **`tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`:** triage summary wording (**`FEAT-…`** path / **`WIP-` ↔ `UNTESTED-`** / verification line).
