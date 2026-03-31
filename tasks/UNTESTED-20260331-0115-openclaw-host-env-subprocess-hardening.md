@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. **Requested** `tasks/FEAT-20260331-0115-….md` **was not on disk**; workflow applied as **`UNTESTED-…` → `WIP-…`** (equivalent to picking up the task), implementation **already present** in-tree, **Section 6** refreshed, then **`WIP-…` → `UNTESTED-…`**. **Handoff:** `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`. **mac-stats:** `security/host_exec_env.rs` (`apply_host_exec_env_hardening`, `apply_host_exec_env_hardening_tokio`, 3 unit tests); call sites: `commands/run_cmd.rs`, `python_agent.rs`, `cursor_agent.rs`, `content_reduction.rs`, `compaction_hooks.rs`, `ori_lifecycle.rs`, `plugins/mod.rs`, `mcp/mod.rs`, `browser_agent/mod.rs`, `session_memory.rs`. **Verification:** `cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test` — **pass** (full suite green).
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. **Requested backlog name** `tasks/FEAT-20260331-0115-….md` **was not on disk**; pickup used **`UNTESTED-…` → `WIP-…`** (same as **`FEAT-…` → `WIP-…`** when the FEAT file was never materialized). **Implementation** already satisfied acceptance criteria in-tree (`security/host_exec_env.rs` + call sites); this run **re-verified** builds/tests, **Section 6** tester steps confirmed/extended, then **`WIP-…` → `UNTESTED-…`**. **Handoff:** `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`. **mac-stats:** `security/host_exec_env.rs` (`apply_host_exec_env_hardening`, `apply_host_exec_env_hardening_tokio`, 3 unit tests); call sites: `commands/run_cmd.rs`, `python_agent.rs`, `cursor_agent.rs`, `content_reduction.rs`, `compaction_hooks.rs`, `ori_lifecycle.rs`, `plugins/mod.rs`, `mcp/mod.rs`, `browser_agent/mod.rs`, `session_memory.rs`. **`which cursor-agent`** availability probe in `cursor_agent.rs` is **not** hardened (per §3 optional). **Verification:** `cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test` — **pass** (878 lib tests + bins).
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
@@ -74,6 +74,14 @@ Optional: `cd src-tauri && cargo clippy`
 **FEATURE-CODER:** After the coder run (**on-disk `FEAT-…` → `WIP-…` → `UNTESTED-…`**), the **tester** owns this section. Run **Section 5** before manual checks. **Coder:** leave reproducible smoke, checklist, and pass/fail criteria below; do not strip this section when renaming task-file prefixes.
 
 **Required order:** run **Section 5 — Verification (automated)** first, then manual or optional runtime steps below.
+
+### Tester checklist (quick)
+
+1. Run **Section 5** automated commands from repo root (`cargo check`, `cargo test host_exec_env`, full `cargo test`).
+2. Run **Minimal smoke** below (`host_exec_env` + `pipeline_date_wc`).
+3. Optionally run the **Section 5** `rg` one-liner to confirm all expected call sites still invoke `apply_host_exec_env_hardening` / `_tokio`.
+4. Optionally perform **Manual / runtime** steps if you rely on RUN_CMD, MCP, PYTHON_SCRIPT, or hooks.
+5. Apply **Pass / fail** below and update the task prefix to **`TESTING-`** / **`CLOSED-`** per your tester workflow.
 
 ### Minimal smoke (copy-paste)
 

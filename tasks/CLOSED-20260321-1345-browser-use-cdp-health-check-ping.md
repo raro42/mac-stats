@@ -5122,3 +5122,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 
 **Outcome:** All criteria pass — **`CLOSED-`** per `003-tester/TESTER.md` (operator naming also allows `TESTED-`/`TESTPLAN-` for other cases; not applicable here). Rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
 
+
+---
+
+## Test report
+
+**Date:** 2026-03-31 02:21 UTC (`date -u` on the test host).
+
+**TESTER.md name flow:** Operator requested `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md`; that path **does not exist** in the repo. The task with this slug was `tasks/CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md` at the start of this run; renamed **`CLOSED-` → `TESTING-`** as the functional equivalent of `UNTESTED-` → `TESTING-`. No other `UNTESTED-*` task file was tested.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass**
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (`mac_stats` lib: 878 passed, 0 failed; other binaries 0 tests; 1 doc-test ignored)
+
+**Acceptance criteria:** (1) `evaluate_one_plus_one_blocking_timeout` — worker thread + `tab.evaluate("1+1", false)` + `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)`; errors as **Browser unresponsive** — **pass**. (2) `check_browser_alive` calls helper; comment forbids nested `Handle::block_on` + `tokio::time::timeout` — **pass**. (3) `clear_browser_session_on_error` for unresponsive + `is_connection_error`; `should_retry_cdp_after_clearing_session` documents health wins over retry — **pass** (verified in `src-tauri/src/browser_agent/mod.rs`).
+
+**Outcome:** All criteria pass — rename to **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** (per operator: not `TESTED-` or `TESTPLAN-`).
