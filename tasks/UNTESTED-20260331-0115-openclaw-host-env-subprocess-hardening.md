@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. `tasks/FEAT-20260331-0115-….md` **absent**; **`UNTESTED-…` → `WIP-…`** at pickup, **`WIP-…` → `UNTESTED-…`** at handoff (**FEAT→WIP→UNTESTED** equivalence). **Implementation:** `security::host_exec_env` + §4 call sites (**no Rust changes** this run; parity verified in tree). **Section 6** testing instructions retained. **Verification:** `cargo check`; `cargo test host_exec_env` (3); `cargo test pipeline_date_wc` (1); `cargo test --lib` (**878** passed); full `cargo test` — **pass** (doc-tests: 1 ignored).
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. `tasks/FEAT-20260331-0115-….md` **absent**; lifecycle **`UNTESTED-…` → `WIP-…`** (pickup) → **`WIP-…` → `UNTESTED-…`** (handoff) = **FEAT→WIP→UNTESTED** equivalence. **Implementation:** `security::host_exec_env` + §4 call sites (already in tree; **no code edits** this handoff). **Section 6** testing instructions present below. **Verification (this handoff):** `cargo check`; `cargo test host_exec_env` (3); `cargo test pipeline_date_wc` (1); `cargo test --lib` (**878** passed); `cargo test` — **pass** (doc-tests: **1 ignored**).
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
@@ -65,6 +65,12 @@ Optional: `cd src-tauri && cargo clippy`
 
 ## 6. Testing instructions
 
+**What to run (order):**
+
+1. **Section 5 — Verification (automated)** (`cargo check`, `cargo test host_exec_env`, then full `cargo test` if you want the whole crate).
+2. **Tester one-liner** (below) — same checks plus `pipeline_date_wc` and a full `cargo test` pass in one copy-paste.
+3. **Optional** — Section 5 `rg` call-site scan; **Manual / runtime** if you use RUN_CMD, MCP, hooks in production.
+
 **Tester one-liner (automated only, from repo root):**
 
 ```bash
@@ -95,7 +101,7 @@ From repo root (same as **Minimal smoke**, plus full suite):
 cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test
 ```
 
-**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including doc-tests — **pass**; FEATURE-CODER **WIP→UNTESTED** handoff **2026-03-31**).
+**Result:** all passed on this handoff (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including doc-tests — **pass**, 1 ignored). File renamed **`WIP-…` → `UNTESTED-…`** after verification **2026-03-31**.
 
 ### Tester checklist (quick)
 
