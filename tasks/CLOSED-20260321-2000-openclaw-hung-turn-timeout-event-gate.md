@@ -1165,3 +1165,12 @@ _(Tester: append results only on the **queue** file **`UNTESTED-…` → `TESTIN
 - **Commands run:** `cargo check` / `cargo test` with `--manifest-path src-tauri/Cargo.toml -p mac_stats` (full **`cargo test`**, not **`-q`**); five **`rg`** lines as **A1**; **`turn_lifecycle.rs`** timeout + cleanup **`rg`** lines both hit **line 100**.
 - **Result:** **PASS** — **`cargo check`** / **`cargo test`** exit **0**; **878** passed, **0** failed (**`mac_stats`** lib); all required **`rg`** matches; acceptance **§1–4** satisfied.
 - **Outcome:** **`TESTING-…` → `CLOSED-…`** (operator pass naming). Not **`TESTED-…`**. Not **`TESTPLAN-…`**.
+
+### 2026-03-31 (UTC) — agent run ([`003-tester/TESTER.md`](../003-tester/TESTER.md); operator: `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` only)
+
+- **Date / timezone:** 2026-03-31 (UTC). **Host:** macOS darwin 25.3.0; **`bash`**.
+- **Queue / rename:** Operator-named **`UNTESTED-…`** was **absent** (only **`CLOSED-…`** on disk). Re-queued per **TESTER.md** with **`mv tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**, then **`mv …/UNTESTED-… …/TESTING-…`**. **Did not** use a different **`UNTESTED-*`** task file.
+- **Sequence (Copy-paste order):** **0** Tester quick gate → **BLOCK: A1 or A2** → **0b** `test -f src-tauri/Cargo.toml && echo OK` → **1** git **Preflight** → Self-check row A1/A2 → **2** **Verification commands → block A1** in full (`set -e` through last **`rg`**), repo root **`/Users/raro42/projects/mac-stats`**.
+- **Commands (excerpt):** `cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats`; `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats`; **`rg`** lines exactly as block **A1** (patterns and paths per **Verification commands**).
+- **Result:** **PASS** — `cargo check` exit **0**; `cargo test` exit **0** (**878** passed, **0** failed); every required **`rg`** printed ≥1 line; **`turn_lifecycle.rs`** substrings **`turn wall-clock timeout`** and **`closing output gate and running cleanup`** matched the **same** source line twice (expected).
+- **Outcome filename:** **`TESTING-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` → `CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`** (all acceptance criteria satisfied). Not **`TESTED-…`** (implementation did not fail). Not **`TESTPLAN-…`** (instructions and environment were usable).
