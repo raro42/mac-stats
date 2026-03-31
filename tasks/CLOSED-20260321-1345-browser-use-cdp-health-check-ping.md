@@ -4988,3 +4988,22 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Acceptance criteria:** (1) `evaluate_one_plus_one_blocking_timeout` + `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)` / **Browser unresponsive** — **pass**. (2) `check_browser_alive` + comment forbidding nested `Handle::block_on` + Tokio timeout — **pass**. (3) `clear_browser_session_on_error` vs connection errors and `should_retry_cdp_after_clearing_session` — **pass**.
 
 **Outcome:** **`CLOSED-`** (all criteria pass; not `TESTED-` or `TESTPLAN-`). Rename `TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`.
+
+---
+
+## Test report
+
+**Date:** 2026-03-31 00:44 UTC (from `date -u`)
+
+**TESTER.md / operator path:** `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` is **not present** on disk; the same slug exists as **`CLOSED-…`**. Applied **`CLOSED-` → `TESTING-`** for this run (queue equivalent to **`UNTESTED-` → `TESTING-`**). No other `UNTESTED-*` file was tested.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (explicit `Never use Handle::block_on` + `tokio::time::timeout` comment in `check_browser_alive`; `evaluate_one_plus_one_blocking_timeout` documents no nested Tokio `block_on`)
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (875 passed, 0 failed in `mac_stats` lib tests; other targets 0 tests; 1 doc-test ignored)
+
+**Acceptance spot-check:** `clear_browser_session_on_error` clears on **Browser unresponsive** and `is_connection_error`; `should_retry_cdp_after_clearing_session` documents health wins over retry (verified via `rg` in `browser_agent/mod.rs`).
+
+**Outcome:** All acceptance criteria pass — rename file to **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
