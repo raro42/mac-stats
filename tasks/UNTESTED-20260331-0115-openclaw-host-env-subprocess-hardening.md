@@ -1,8 +1,8 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. **`tasks/FEAT-20260331-0115-….md` was absent** (already past FEAT on disk); this run entered via **`UNTESTED-…` → `WIP-…`**, re-verified implementation, kept **Section 6**, then **`WIP-…` → `UNTESTED-…`**. **Handoff file:** `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`. **mac-stats:** `security/host_exec_env.rs` (`apply_host_exec_env_hardening`, `apply_host_exec_env_hardening_tokio`, unit tests); wired in `commands/run_cmd.rs`, `python_agent.rs`, `cursor_agent.rs`, `content_reduction.rs`, `compaction_hooks.rs`, `ori_lifecycle.rs`, `plugins/mod.rs`, `mcp/mod.rs`, `browser_agent/mod.rs`, `session_memory.rs`. **Verification (this run):** `cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test` — **pass** (full `cargo test` green). **Section 6** = tester handoff.
-- **Next step:** Tester runs **Section 6** (after **Section 5**) on this file.
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. **Requested** `tasks/FEAT-20260331-0115-….md` **was not on disk**; workflow applied as **`UNTESTED-…` → `WIP-…`** (equivalent to picking up the task), implementation **already present** in-tree, **Section 6** refreshed, then **`WIP-…` → `UNTESTED-…`**. **Handoff:** `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`. **mac-stats:** `security/host_exec_env.rs` (`apply_host_exec_env_hardening`, `apply_host_exec_env_hardening_tokio`, 3 unit tests); call sites: `commands/run_cmd.rs`, `python_agent.rs`, `cursor_agent.rs`, `content_reduction.rs`, `compaction_hooks.rs`, `ori_lifecycle.rs`, `plugins/mod.rs`, `mcp/mod.rs`, `browser_agent/mod.rs`, `session_memory.rs`. **Verification:** `cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test` — **pass** (full suite green).
+- **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
 # UNTESTED: OpenClaw parity — host env subprocess hardening (RUN_CMD / agents / MCP)
@@ -65,7 +65,7 @@ Optional: `cd src-tauri && cargo clippy`
 
 ## 6. Testing instructions
 
-**FEATURE-CODER task-file lifecycle (same stem `20260331-0115-openclaw-host-env-subprocess-hardening`):** `tasks/FEAT-….md` → rename to `WIP-….md` while coding → add/keep this section → rename to `UNTESTED-….md` for tester handoff.
+**FEATURE-CODER task-file lifecycle (same stem `20260331-0115-openclaw-host-env-subprocess-hardening`):** `tasks/FEAT-….md` → rename to `WIP-….md` while coding → add/keep this section → rename to `UNTESTED-….md` for tester handoff. If **`FEAT-…` does not exist** but **`UNTESTED-…` does** (coder pickup), rename **`UNTESTED-…` → `WIP-…`** first, then finish work and **`WIP-…` → `UNTESTED-…`** again for handoff.
 
 **On-disk handoff path:** after the coder **`WIP → UNTESTED`** rename, this task lives at `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md` (same stem as `FEAT-…` / `WIP-…`).
 

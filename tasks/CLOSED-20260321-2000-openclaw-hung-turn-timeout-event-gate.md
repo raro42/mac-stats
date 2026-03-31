@@ -914,3 +914,12 @@ _(Tester: append results only on the **queue** file **`UNTESTED-…` → `TESTIN
 - **Commands run:** `cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats`; `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats` (**no** `-q`); five **`rg`** lines exactly as **A1** (`TurnOutputGate|gate_allows_send|finalize_turn_timeout` on **`src-tauri/src`**; `-F '**Turn timed out**'` on **`turn_lifecycle.rs`** line **163**; **`closing output gate after turn wall-clock timeout`** in **`ollama.rs`** line **1636**; **`turn wall-clock timeout`** and **`closing output gate and running cleanup`** in **`turn_lifecycle.rs`** line **100** twice — expected per acceptance **§3**).
 - **Result:** **PASS** — `cargo check` exit **0**; `cargo test` exit **0** (**878** passed, **0** failed in **`mac_stats`** lib test binary; other targets **0** tests; doc-tests **0** run, **1** ignored); every required **`rg`** ≥1 match. Acceptance criteria **1–4** satisfied (static gate).
 - **Outcome filename:** **`TESTING-…` → `CLOSED-…`** (pass). Not **`TESTED-…`**. Not **`TESTPLAN-…`**.
+
+### 2026-03-31 (local) — tester run (Cursor agent; this session)
+
+- **Queue note:** Operator named `tasks/UNTESTED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`; path absent at repo tip. Only `tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md` existed; renamed `CLOSED-…` → `TESTING-…` directly (no other `UNTESTED-*` selected).
+- **Host:** macOS darwin 25.3.0; repo `/Users/raro42/projects/mac-stats`; bash.
+- **Sequence:** Tester quick gate → BLOCK: A1 or A2; step 0b `test -f src-tauri/Cargo.toml && echo OK`; git Preflight; Self-check A1/A2; Verification commands → block A1 (`set -e` through last `rg`).
+- **Commands run:** `cargo check --manifest-path src-tauri/Cargo.toml -p mac_stats`; `cargo test --manifest-path src-tauri/Cargo.toml -p mac_stats`; five `rg` lines as A1 (symbols under `src-tauri/src`; `-F '**Turn timed out**'` in `turn_lifecycle.rs`; `closing output gate after turn wall-clock timeout` in `ollama.rs`; `turn wall-clock timeout` and `closing output gate and running cleanup` in `turn_lifecycle.rs`, same line 100 twice).
+- **Result:** PASS — both cargo exit 0; 878 tests passed, 0 failed; all rg patterns matched at least once. Acceptance criteria 1–4 satisfied.
+- **Outcome:** `TESTING-…` → `CLOSED-…`.
