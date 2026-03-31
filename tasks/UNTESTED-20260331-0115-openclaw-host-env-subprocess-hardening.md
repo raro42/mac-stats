@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`). User-assigned `tasks/FEAT-20260331-0115-openclaw-host-env-subprocess-hardening.md` was **absent**; per task §6 used **`UNTESTED → WIP → UNTESTED`** (same stem). **Implementation:** already on `main` — `security::host_exec_env` + §4 call sites; **no code changes** this run. **§5 `rg`:** all listed files still invoke `apply_host_exec_env_hardening` / `_tokio`. **§6 Testing:** tester one-liner, minimal smoke, manual optional, pass/fail (unchanged). **Verification (this run):** `cargo check`; `cargo test host_exec_env` (**3**); `cargo test pipeline_date_wc` (**1**); `cargo test --lib` (**878** passed); `cargo test` — **pass** (doc-tests: **1 ignored**). **Handoff path:** `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`.
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`). Assigned `tasks/FEAT-20260331-0115-openclaw-host-env-subprocess-hardening.md` **absent**; per §6 used **`UNTESTED → WIP → UNTESTED`** (same stem). **Implementation:** `security::host_exec_env` + §4 call sites (**no code changes** this run). **§5 `rg`:** all listed files invoke `apply_host_exec_env_hardening` / `_tokio`. **§6 Testing:** Section 6 below (tester one-liner, minimal smoke, manual optional, pass/fail). **Verification (this run):** `cargo check`; `cargo test host_exec_env` (**3**); `cargo test pipeline_date_wc` (**1**); `cargo test --lib` (**878** passed); `cargo test` — **pass** (doc-tests: **1** ignored). **Handoff path:** `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`.
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
@@ -109,7 +109,7 @@ From repo root (same as **Minimal smoke**, plus full suite):
 cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test
 ```
 
-**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including doc-tests — **pass**, 1 ignored). Re-verified immediately before **`WIP-…` → `UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`** handoff (FEATURE-CODER run; assigned `FEAT-…` absent, `UNTESTED→WIP→UNTESTED` per task §6).
+**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including doc-tests — **pass**, 1 ignored). Re-verified immediately before **`WIP-…` → `UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`** handoff (FEATURE-CODER; assigned `FEAT-…` absent; `UNTESTED→WIP→UNTESTED` per §6).
 
 ### Tester checklist (quick)
 
