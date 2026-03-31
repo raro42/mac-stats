@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. **Pickup:** `tasks/FEAT-20260331-0115-….md` was **not** on disk; renamed **`UNTESTED-…` → `WIP-…`** per §6, then **`WIP-…` → `UNTESTED-…`** for tester handoff. **Implementation:** already in-tree — `security::host_exec_env` (`apply_host_exec_env_hardening` / `_tokio`), all §4 call sites including **`is_cursor_agent_available`** (`which cursor-agent`). **§2 / §3 / §4** satisfied; no code changes this run. **Section 6** testing instructions retained/confirmed. **Verification:** `cargo check`, `cargo test host_exec_env`, `cargo test pipeline_date_wc`, full `cargo test` — **pass** (**878** `mac_stats` lib tests).
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. **Pickup:** `tasks/FEAT-20260331-0115-….md` **absent**; used **`UNTESTED-…` → `WIP-…` → (verify) → `UNTESTED-…`** per §6. **Implementation:** in-tree — `security::host_exec_env` (`apply_host_exec_env_hardening` / `_tokio`), all §4 call sites including **`is_cursor_agent_available`** (`which cursor-agent`). **§2 / §3 / §4** satisfied; **no Rust code changes** this run. **Section 6** testing instructions present. **Verification (this run):** `cargo check`, `cargo test host_exec_env`, `cargo test pipeline_date_wc`, `cargo test --lib` — **pass** (**878** `mac_stats` lib tests).
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
@@ -39,7 +39,7 @@ OpenClaw filters the parent environment before running host-executed commands. m
 
 - **`src-tauri/src/security/host_exec_env.rs`** — `apply_host_exec_env_hardening` / `apply_host_exec_env_hardening_tokio`: strip `BLOCKED_ENV_KEYS` (OpenClaw `blockedKeys` + `BROWSER` / `GIT_*` editors + common `DYLD_*` / `LD_*` injection keys) and any parent env var whose uppercase name matches `blockedPrefixes` (`DYLD_`, `LD_`, `BASH_FUNC_`).
 - **`src-tauri/src/security/mod.rs`** — `pub mod host_exec_env`.
-- **Call sites:** `commands/run_cmd.rs` (`sh -c` for RUN_CMD), `python_agent.rs`, `cursor_agent.rs` (main invocation + `which` availability probe), `content_reduction.rs` (Node), `compaction_hooks.rs`, `session_memory.rs` (hook shells), `commands/ori_lifecycle.rs` (Ori prefetch), `plugins/mod.rs`, `mcp/mod.rs` (stdio MCP), `browser_agent/mod.rs` (visible Chromium launch).
+- **Call sites:** `commands/run_cmd.rs` (`sh -c` for RUN_CMD), `commands/python_agent.rs`, `commands/cursor_agent.rs` (main invocation + `which` availability probe), `commands/content_reduction.rs` (Node), `commands/compaction_hooks.rs`, `session_memory.rs` (hook shells), `commands/ori_lifecycle.rs` (Ori prefetch), `plugins/mod.rs`, `mcp/mod.rs` (stdio MCP), `browser_agent/mod.rs` (visible Chromium launch).
 
 ---
 
@@ -85,7 +85,7 @@ From repo root (same as **Minimal smoke**, plus full suite):
 cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test
 ```
 
-**Result:** all passed (`host_exec_env`: 3 tests; `pipeline_date_wc`: 1 test; full `cargo test`: `mac_stats` lib crate **878** tests passed, other targets 0, as of FEATURE-CODER re-verify this run).
+**Result:** all passed (`host_exec_env`: 3 tests; `pipeline_date_wc`: 1 test; `cargo test --lib`: **878** tests passed, as of this FEATURE-CODER run). For all targets including bins, use `cd src-tauri && cargo test` (Section 5).
 
 ### Tester checklist (quick)
 
