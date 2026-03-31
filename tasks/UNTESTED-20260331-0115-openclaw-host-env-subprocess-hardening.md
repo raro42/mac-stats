@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. `tasks/FEAT-20260331-0115-….md` **absent**; lifecycle **`UNTESTED-…` → `WIP-…`** (pickup) → **`WIP-…` → `UNTESTED-…`** (handoff) = **FEAT→WIP→UNTESTED** equivalence. **Implementation:** `security::host_exec_env` + §4 call sites (already in tree; **no code edits** this handoff). **Section 6** testing instructions present below. **Verification (this handoff):** `cargo check`; `cargo test host_exec_env` (3); `cargo test pipeline_date_wc` (1); `cargo test --lib` (**878** passed); `cargo test` — **pass** (doc-tests: **1 ignored**).
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. Named path `tasks/FEAT-20260331-0115-….md` **absent**; **pickup** `UNTESTED-…` → `WIP-…`; **handoff** `WIP-…` → `UNTESTED-…` (FEAT→WIP→UNTESTED equivalence). **Implementation:** `security::host_exec_env` + §4 call sites (**unchanged** this run; acceptance criteria satisfied in tree). **Section 6** testing instructions retained/updated. **Verification (this run):** `cargo check`; `cargo test host_exec_env` (3); `cargo test pipeline_date_wc` (1); `cargo test --lib` (**878** passed); `cargo test` — **pass** (doc-tests: **1 ignored**).
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
@@ -101,7 +101,7 @@ From repo root (same as **Minimal smoke**, plus full suite):
 cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test
 ```
 
-**Result:** all passed on this handoff (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including doc-tests — **pass**, 1 ignored). File renamed **`WIP-…` → `UNTESTED-…`** after verification **2026-03-31**.
+**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including doc-tests — **pass**, 1 ignored). **FEATURE-CODER** re-verified **2026-03-31** before **`WIP-…` → `UNTESTED-…`** handoff.
 
 ### Tester checklist (quick)
 
