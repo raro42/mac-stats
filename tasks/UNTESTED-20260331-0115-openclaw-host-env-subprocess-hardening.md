@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. **On-disk lifecycle:** `tasks/UNTESTED-…` → `tasks/FEAT-…` → `tasks/WIP-…` (materialized **`FEAT-…`** for the requested path) → **`WIP-…` → `UNTESTED-…`** after this handoff. **Change this run:** `is_cursor_agent_available` (`which cursor-agent`) now calls **`apply_host_exec_env_hardening`** (parity with other `cursor_agent` spawns; §3 optional item closed). **§2 / §4** otherwise already satisfied in-tree. **Section 6** testing instructions updated with **Coder verification**. **Verification:** `cargo check`, `cargo test host_exec_env`, `cargo test pipeline_date_wc`, full `cargo test` — **pass**.
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. **Pickup:** `tasks/FEAT-20260331-0115-….md` was **not** on disk; renamed **`UNTESTED-…` → `WIP-…`** per §6, then **`WIP-…` → `UNTESTED-…`** for tester handoff. **Implementation:** already in-tree — `security::host_exec_env` (`apply_host_exec_env_hardening` / `_tokio`), all §4 call sites including **`is_cursor_agent_available`** (`which cursor-agent`). **§2 / §3 / §4** satisfied; no code changes this run. **Section 6** testing instructions retained/confirmed. **Verification:** `cargo check`, `cargo test host_exec_env`, `cargo test pipeline_date_wc`, full `cargo test` — **pass** (**878** `mac_stats` lib tests).
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
@@ -67,6 +67,8 @@ Optional: `cd src-tauri && cargo clippy`
 
 **FEATURE-CODER task-file lifecycle (same stem `20260331-0115-openclaw-host-env-subprocess-hardening`):** `tasks/FEAT-….md` → rename to `WIP-….md` while coding → add/keep this section → rename to `UNTESTED-….md` for tester handoff. If **`FEAT-…` does not exist** but **`UNTESTED-…` does** (coder pickup), rename **`UNTESTED-…` → `WIP-…`** first, then finish work and **`WIP-…` → `UNTESTED-…`** again for handoff.
 
+**Assigned `FEAT-…` path missing:** When instructions name `tasks/FEAT-20260331-0115-….md` but that file is absent and `tasks/UNTESTED-….md` exists (same stem), use the **`UNTESTED → WIP → UNTESTED`** flow above — do not substitute a different FEAT task.
+
 **On-disk handoff path:** after the coder **`WIP → UNTESTED`** rename, this task lives at `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md` (same stem as `FEAT-…` / `WIP-…`).
 
 **Canonical handoff:** this section is the source of truth for the tester after the **`WIP → UNTESTED`** rename (do not remove it when changing task-file prefixes).
@@ -83,7 +85,7 @@ From repo root (same as **Minimal smoke**, plus full suite):
 cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test
 ```
 
-**Result:** all passed (`host_exec_env`: 3 tests; `pipeline_date_wc`: 1 test; full `cargo test`: **`mac_stats` lib crate 878** tests passed, other targets 0, as of this run).
+**Result:** all passed (`host_exec_env`: 3 tests; `pipeline_date_wc`: 1 test; full `cargo test`: `mac_stats` lib crate **878** tests passed, other targets 0, as of FEATURE-CODER re-verify this run).
 
 ### Tester checklist (quick)
 
