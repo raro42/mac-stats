@@ -5257,3 +5257,21 @@ cd src-tauri && cargo check && cargo test --no-fail-fast
 **Acceptance criteria:** (1) `evaluate_one_plus_one_blocking_timeout` uses worker-thread evaluate + `recv_timeout(BROWSER_CDP_HEALTH_CHECK_TIMEOUT)`; **Browser unresponsive** path via `check_browser_alive` / `clear_browser_session_on_error` — **pass**. (2) `check_browser_alive` calls the helper; comment forbidding nested `Handle::block_on` + `tokio::time::timeout` — **pass**. (3) `clear_browser_session_on_error` for **Browser unresponsive** and connection-style errors; `should_retry_cdp_after_clearing_session` documents health over retry — **pass**.
 
 **Outcome:** All acceptance criteria pass — rename **`TESTING-20260321-1345-browser-use-cdp-health-check-ping.md` → `CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`** (operator scheme: `CLOSED-` = pass; not `TESTED-` / `TESTPLAN-`). Repo `003-tester/TESTER.md` lists **`CLOSED-`** / **`WIP-`** only; this outcome is **`CLOSED-`**.
+
+---
+
+## Test report
+
+**Date:** 2026-03-31 03:18 UTC
+
+**TESTER.md / operator path:** Requested `tasks/UNTESTED-20260321-1345-browser-use-cdp-health-check-ping.md` — **not present** in the repo; the task with this slug was `CLOSED-…` and was renamed **`CLOSED-` → `TESTING-`** for this run (same basename after the prefix). No other `UNTESTED-*` file was used.
+
+**Commands run**
+
+- `rg 'evaluate_one_plus_one_blocking_timeout|check_browser_alive|BROWSER_CDP_HEALTH_CHECK_TIMEOUT|clear_browser_session_on_error' src-tauri/src/browser_agent/mod.rs` — **pass**
+- `rg 'block_on|Never use .Handle::block_on' src-tauri/src/browser_agent/mod.rs | head -n 20` — **pass** (explicit `Never use Handle::block_on` + `tokio::time::timeout` comment in `check_browser_alive`; `evaluate_one_plus_one_blocking_timeout` documents no nested Tokio `block_on`)
+- `cd src-tauri && cargo check` — **pass**
+- `cd src-tauri && cargo test --no-fail-fast` — **pass** (878 passed, 0 failed in `mac_stats` lib tests; other binaries 0 tests; 1 doc-test ignored)
+
+**Outcome:** Acceptance criteria verified — rename file to **`CLOSED-20260321-1345-browser-use-cdp-health-check-ping.md`**.
+
