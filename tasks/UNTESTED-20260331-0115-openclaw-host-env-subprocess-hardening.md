@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): on-disk rename chain **`FEAT-…` → `WIP-…` → `UNTESTED-…`** (stem `20260331-0115-openclaw-host-env-subprocess-hardening`). **Handoff file:** `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`. **mac-stats:** `security/host_exec_env.rs` (`apply_host_exec_env_hardening`, `apply_host_exec_env_hardening_tokio`, unit tests); wired in `commands/run_cmd.rs`, `python_agent.rs`, `cursor_agent.rs`, `content_reduction.rs`, `compaction_hooks.rs`, `ori_lifecycle.rs`, `plugins/mod.rs`, `mcp/mod.rs`, `browser_agent/mod.rs`, `session_memory.rs`. **Verification (this run):** `cd src-tauri && cargo check && cargo test host_exec_env && cargo test` — **pass** (878 lib tests). **Section 6** = tester handoff.
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): on-disk rename chain **`FEAT-…` → `WIP-…` → `UNTESTED-…`** (stem `20260331-0115-openclaw-host-env-subprocess-hardening`). **Handoff file:** `tasks/UNTESTED-20260331-0115-openclaw-host-env-subprocess-hardening.md`. **mac-stats:** `security/host_exec_env.rs` (`apply_host_exec_env_hardening`, `apply_host_exec_env_hardening_tokio`, unit tests); wired in `commands/run_cmd.rs`, `python_agent.rs`, `cursor_agent.rs`, `content_reduction.rs`, `compaction_hooks.rs`, `ori_lifecycle.rs`, `plugins/mod.rs`, `mcp/mod.rs`, `browser_agent/mod.rs`, `session_memory.rs`. **Verification (this run):** `cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test` — **pass**. **Section 6** = tester handoff.
 - **Next step:** Tester runs **Section 6** (after **Section 5**) on this file.
 ---
 
@@ -80,6 +80,8 @@ From the repo root:
 ```bash
 cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc
 ```
+
+`pipeline_date_wc` is `commands::run_cmd::run_cmd_stage_validate_tests::pipeline_date_wc_integration`: exercises the hardened **`sh -c`** RUN_CMD path (`date | wc -c`) so PATH and shell execution still work after env stripping.
 
 ### Manual / runtime (optional)
 
