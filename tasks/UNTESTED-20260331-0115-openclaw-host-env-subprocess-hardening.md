@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. User-assigned path `tasks/FEAT-20260331-0115-….md` **absent** → **`UNTESTED-…` → `WIP-…`** at start, **`WIP-…` → `UNTESTED-…`** at handoff (**FEAT→WIP→UNTESTED** equivalence). **Implementation** already on `main`: `security::host_exec_env`, §4 call sites wired; **no Rust edits** this run (re-verify only). **Section 6** testing instructions updated. **Verification (this run):** `cargo check`, `cargo test host_exec_env` (3), `cargo test pipeline_date_wc` (1), `cargo test --lib` (**878**), full `cargo test` (all targets) — **pass**.
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. Operator named `tasks/FEAT-20260331-0115-….md` (**absent**); on-disk was **`UNTESTED-…`** → renamed **`WIP-…`** at coder start, **`WIP-…` → `UNTESTED-…`** at handoff (**FEAT→WIP→UNTESTED** equivalence). **Implementation** on `main`: `security::host_exec_env`, §4 call sites — **no Rust changes** this session (re-verify). **Section 6** testing instructions retained (tester source of truth). **Verification (this session):** `cargo check`, `cargo test host_exec_env` (3), `cargo test pipeline_date_wc` (1), `cargo test --lib` (**878**), full `cargo test` — **pass**.
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
@@ -93,7 +93,7 @@ From repo root (same as **Minimal smoke**, plus full suite):
 cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test
 ```
 
-**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` including bin targets — **pass**, FEATURE-CODER run **2026-03-31**).
+**Result:** all passed (`host_exec_env`: 3; `pipeline_date_wc`: 1; `cargo test --lib`: **878**; full `cargo test` — **pass**, FEATURE-CODER handoff run **2026-03-31**).
 
 ### Tester checklist (quick)
 
