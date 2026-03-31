@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. **Pickup:** `tasks/FEAT-20260331-0115-….md` **absent**; used **`UNTESTED-…` → `WIP-…` → (verify) → `UNTESTED-…`** per §6. **Implementation:** in-tree — `security::host_exec_env` (`apply_host_exec_env_hardening` / `_tokio`), all §4 call sites including **`is_cursor_agent_available`** (`which cursor-agent`). **§2 / §3 / §4** satisfied; **no Rust code changes** this run. **Section 6** testing instructions present. **Verification (this run):** `cargo check`, `cargo test host_exec_env`, `cargo test pipeline_date_wc`, `cargo test --lib` — **pass** (**878** `mac_stats` lib tests).
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. **Pickup:** requested `tasks/FEAT-20260331-0115-….md` **absent**; per task §6 / FEATURE-CODER used **`UNTESTED-…` → `WIP-…` → (verify) → `UNTESTED-…`** (equivalent to **FEAT→WIP→UNTESTED** when only UNTESTED existed). **Implementation:** in-tree — `security::host_exec_env` (`apply_host_exec_env_hardening` / `_tokio`), all §4 call sites including **`is_cursor_agent_available`** (`which cursor-agent`). **§2 / §3 / §4** satisfied; **no Rust code changes** this run. **Section 6** testing instructions present. **Verification (this run):** `cargo check`, `cargo test host_exec_env`, `cargo test pipeline_date_wc`, `cargo test --lib` — **pass** (**878** `mac_stats` lib tests).
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
