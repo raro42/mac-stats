@@ -1,7 +1,7 @@
 ---
 ## Triage summary (TOP)
 
-- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. Operator named `tasks/FEAT-20260331-0115-….md` (**absent**); **`UNTESTED-…` → `WIP-…`** at coder start, **`WIP-…` → `UNTESTED-…`** at handoff (**FEAT→WIP→UNTESTED** equivalence). **Implementation:** `security::host_exec_env` + §4 call sites (no code changes this run; **re-verified**). **Section 6** testing instructions present. **Verification (this handoff):** `cargo check`, `cargo test host_exec_env` (3), `cargo test pipeline_date_wc` (1), `cargo test --lib` (**878**), full `cargo test` — **pass**.
+- **Coder (UTC):** 2026-03-31 — **FEATURE-CODER** (`006-feature-coder/FEATURE-CODER.md`): stem `20260331-0115-openclaw-host-env-subprocess-hardening`. Operator path `tasks/FEAT-20260331-0115-….md` **absent**; executed **`UNTESTED-…` → `WIP-…`** at start, **`WIP-…` → `UNTESTED-…`** at handoff (**FEAT→WIP→UNTESTED** equivalence). **Implementation:** `security::host_exec_env` + §4 call sites already in tree (**no Rust changes** this run). **Section 6** testing instructions present and refreshed. **Verification (this handoff):** `cargo check`, `cargo test host_exec_env` (3), `cargo test pipeline_date_wc` (1), `cargo test --lib` (**878** passed), full `cargo test` — **pass**.
 - **Next step:** Tester runs **Section 6** (after **Section 5**).
 ---
 
@@ -70,6 +70,8 @@ Optional: `cd src-tauri && cargo clippy`
 ```bash
 cd src-tauri && cargo check && cargo test host_exec_env && cargo test pipeline_date_wc && cargo test
 ```
+
+**Success signals:** `host_exec_env` — 3 tests; `pipeline_date_wc` — 1 test; `cargo test --lib` — **878** passed (count may drift if unrelated tests are added). Doc-tests: 1 ignored (expected).
 
 Then optionally **Section 5** `rg` and **Manual / runtime** below if you use RUN_CMD / MCP / hooks in production.
 
