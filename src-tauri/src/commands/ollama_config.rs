@@ -53,6 +53,11 @@ pub struct ChatRequest {
 pub struct OllamaConfigResponse {
     pub endpoint: String,
     pub model: String,
+    /// `ollama` | `openai_compatible` | `unknown` — from HTTP probe and/or chat response shape.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detected_backend: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detected_backend_description: Option<String>,
 }
 
 /// Configure Ollama connection
@@ -93,6 +98,29 @@ pub fn configure_ollama(config: OllamaConfigRequest) -> Result<(), String> {
         "Ollama: Configuration successful with endpoint: {}",
         endpoint
     );
+    let ep_probe = config.endpoint.clone();
+    let key_probe = config.api_key_keychain_account.clone();
+    tauri::async_runtime::spawn(async move {
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+        let tc = match reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(5))
+            .build()
+        {
+            Ok(c) => c,
+            Err(_) => return,
+        };
+        let bearer = key_probe
+            .as_ref()
+            .and_then(|a| crate::security::get_credential(a).ok().flatten());
+        let k =
+            crate::ollama::llm_backend::probe_llm_backend_kind(&ep_probe, &tc, bearer.as_deref())
+                .await;
+        if let Ok(g) = get_ollama_client().lock() {
+            if let Some(c) = g.as_ref() {
+                c.set_detected_backend(k);
+            }
+        }
+    });
     tauri::async_runtime::spawn(async {
         crate::ollama::model_list_cache::clear_all().await;
     });
@@ -104,9 +132,23 @@ pub fn configure_ollama(config: OllamaConfigRequest) -> Result<(), String> {
 pub fn get_ollama_config() -> Option<OllamaConfigResponse> {
     let guard = get_ollama_client().lock().ok()?;
     let client = guard.as_ref()?;
+    let (kind, desc) = client
+        .detected_backend
+        .lock()
+        .ok()
+        .and_then(|g| *g)
+        .map(|k| {
+            (
+                Some(k.as_label().to_string()),
+                Some(k.as_description().to_string()),
+            )
+        })
+        .unwrap_or((None, None));
     Some(OllamaConfigResponse {
         endpoint: client.config.endpoint.clone(),
         model: client.config.model.clone(),
+        detected_backend: kind,
+        detected_backend_description: desc,
     })
 }
 
@@ -173,6 +215,21 @@ pub async fn check_ollama_connection() -> Result<bool, String> {
 
         if result {
             info!("Ollama: Connection successful");
+            let api_key_value = api_key
+                .as_ref()
+                .and_then(|acc| crate::security::get_credential(acc).ok().flatten())
+                .or_else(read_ollama_api_key_from_env_or_config);
+            let k = crate::ollama::llm_backend::probe_llm_backend_kind(
+                &endpoint,
+                &temp_client,
+                api_key_value.as_deref(),
+            )
+            .await;
+            if let Ok(g) = get_ollama_client().lock() {
+                if let Some(c) = g.as_ref() {
+                    c.set_detected_backend(k);
+                }
+            }
         } else {
             debug!("Ollama: Connection failed (endpoint not reachable)");
         }

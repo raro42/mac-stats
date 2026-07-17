@@ -263,6 +263,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**: **Re-verify** (**2026-03-30**, Spanish, **`003-tester` / `TESTER.md`**, única tarea lógica **`UNTESTED-…`**): path absent; **`CLOSED-` → `TESTING-`**; **`cargo check`** / **`cargo test`** (**875** lib); turn-gate **`rg`** in **`src-tauri/src`** (`commands/ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`); top-level **`src/`** — no Rust matches — pass → **`CLOSED-…`**. **Plus** agent-run **Re-verify** subsection (same UTC date, acceptance 1–4, **`rg`** commands). **Plus** **Cursor** **Re-verify** block (solo **`UNTESTED-…`**, **`src-tauri/src`** vs root **`src/`** note, acceptance 1–4).
 - **Tasks** — **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**: triage (**TOP**) — English coder line with explicit on-disk **`FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md` → `WIP-…` → `UNTESTED-…`**; **Section 6** “canonical handoff” line **English** (source of truth after **`WIP → UNTESTED`**, do not strip on prefix renames); **Section 6** FEATURE-CODER wording uses literal **`FEAT-…` → `WIP-…` → `UNTESTED-…`**.
 
+## [0.1.86] - 2026-07-17
+
+### Added
+- **Debug Log viewer** — menu-bar icon and collapsible section to read `~/.mac-stats/debug.log` (refresh / open / auto-refresh); `read_debug_log` Tauri command.
+- **Discord status icon** — icon turns green when the Discord gateway is ready (`is_discord_gateway_ready`).
+- **LLM backend helpers** — `ollama/llm_backend.rs` and related Ollama chat/config wiring for local model validation.
+
+### Fixed
+- **CPU window open** — use cached monitor status instead of live HTTP probes; reuse WebView (hide/show) so opening the window no longer hangs.
+- **Remove monitor** — no longer blocked by `check_monitor` mutex or broken `window.confirm` in WKWebView.
+- **Local Ollama chat** — validate configured models against installed tags; fix model string typo in `ollama.js`.
+- **Icon status colors** — monitors (and Discord) SVG icons correctly turn green via `status-good` CSS; Debug Log section fully hidden when collapsed.
+- **Monitor checks** — `check_monitor` clones config and runs HTTP outside the registry lock.
+
 ## [0.1.85] - 2026-03-31
 
 ### Added

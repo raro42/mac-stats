@@ -206,14 +206,15 @@ async function updateMonitorsSummary() {
             return;
         }
 
-        // Check all monitors and aggregate
+        // Cached status only — background thread owns live HTTP checks
         let upCount = 0;
         let totalResponseTime = 0;
         let responseTimeCount = 0;
 
         for (const monitorId of monitorIds) {
             try {
-                const status = await invoke('check_monitor', { monitorId });
+                const status = await invoke('get_monitor_status', { monitorId });
+                if (!status) continue;
                 if (status.is_up) {
                     upCount++;
                 }
@@ -222,7 +223,7 @@ async function updateMonitorsSummary() {
                     responseTimeCount++;
                 }
             } catch (err) {
-                console.error(`Failed to check monitor ${monitorId}:`, err);
+                console.error(`Failed to read monitor status ${monitorId}:`, err);
             }
         }
 
@@ -569,9 +570,15 @@ async function loadSettingsOllama() {
     if (!endpointEl || !modelEl) return;
     try {
         const config = await invoke('get_ollama_config');
+        const detEl = document.getElementById('ollama-detected-backend');
         if (config) {
             endpointEl.value = config.endpoint || 'http://localhost:11434';
             if (statusEl) statusEl.textContent = '';
+            if (detEl) {
+                detEl.textContent = config.detected_backend_description
+                    ? `Detected: ${config.detected_backend} — ${config.detected_backend_description}`
+                    : '';
+            }
             await refreshOllamaModels();
             if (config.model && modelEl.options.length > 0) {
                 const found = Array.from(modelEl.options).find(o => o.value === config.model);
@@ -581,11 +588,14 @@ async function loadSettingsOllama() {
             endpointEl.value = localStorage.getItem('ollama_endpoint') || 'http://localhost:11434';
             modelEl.innerHTML = '<option value="">— Load models first —</option>';
             if (statusEl) statusEl.textContent = 'Not configured. Enter endpoint, refresh models, select model, then Apply.';
+            if (detEl) detEl.textContent = '';
         }
     } catch (err) {
         endpointEl.value = 'http://localhost:11434';
         modelEl.innerHTML = '<option value="">— Load models first —</option>';
         if (statusEl) statusEl.textContent = '';
+        const detEl = document.getElementById('ollama-detected-backend');
+        if (detEl) detEl.textContent = '';
     }
 }
 
@@ -627,6 +637,13 @@ async function applyOllamaConfig() {
         if (window.Ollama?.saveOllamaEndpoint) window.Ollama.saveOllamaEndpoint(endpoint);
         const ok = await invoke('check_ollama_connection');
         if (statusEl) statusEl.textContent = ok ? 'Saved and connected.' : 'Saved; connection check failed.';
+        try {
+            const cfg = await invoke('get_ollama_config');
+            const detEl = document.getElementById('ollama-detected-backend');
+            if (detEl && cfg?.detected_backend_description) {
+                detEl.textContent = `Detected: ${cfg.detected_backend} — ${cfg.detected_backend_description}`;
+            }
+        } catch (_) { /* ignore */ }
         if (window.Ollama?.checkConnection) window.Ollama.checkConnection();
     } catch (err) {
         if (statusEl) statusEl.textContent = `Failed: ${escapeHtml(String(err))}`;

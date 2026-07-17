@@ -207,23 +207,24 @@ async fn send_ollama_chat_messages_inner(
                     );
                     continue;
                 }
-                let response: crate::ollama::ChatResponse = match serde_json::from_str(&body) {
-                    Ok(r) => r,
-                    Err(_) => {
-                        if let Ok(err_payload) =
-                            serde_json::from_str::<crate::ollama::OllamaErrorResponse>(&body)
-                        {
-                            return Err(format!("Ollama error: {}", err_payload.error));
+                let response: crate::ollama::ChatResponse =
+                    match crate::ollama::chat_response_from_api_body(&body) {
+                        Ok(r) => r,
+                        Err(parse_err) => {
+                            if let Ok(err_payload) =
+                                serde_json::from_str::<crate::ollama::OllamaErrorResponse>(&body)
+                            {
+                                return Err(format!("Ollama error: {}", err_payload.error));
+                            }
+                            if !status.is_success() {
+                                return Err(format!("Ollama HTTP {}: {}", status, body.trim()));
+                            }
+                            return Err(format!(
+                                "Ollama returned invalid response: {}",
+                                parse_err
+                            ));
                         }
-                        if !status.is_success() {
-                            return Err(format!("Ollama HTTP {}: {}", status, body.trim()));
-                        }
-                        return Err(format!(
-                            "Ollama returned invalid response (missing message): {}",
-                            body.trim()
-                        ));
-                    }
-                };
+                    };
                 if !status.is_success() {
                     let msg = response.message.content.trim();
                     return Err(format!(
@@ -231,6 +232,11 @@ async fn send_ollama_chat_messages_inner(
                         status,
                         if msg.is_empty() { body.as_str() } else { msg }
                     ));
+                }
+                if let Ok(guard) = get_ollama_client().lock() {
+                    if let Some(client) = guard.as_ref() {
+                        client.merge_backend_kind_from_chat_body(&body);
+                    }
                 }
                 // Success: log and return
                 let content = &response.message.content;
@@ -287,6 +293,34 @@ struct OllamaStreamLine {
 struct OllamaStreamMessage {
     #[serde(default)]
     content: Option<String>,
+}
+
+fn push_stream_text_delta(
+    delta: &str,
+    full_content: &mut String,
+    pending_emit: &mut String,
+    coalesce_ms: u64,
+    app_handle: &tauri::AppHandle,
+    dedup: &mut ReplyDedupState,
+    verbosity: u8,
+) {
+    use tracing::debug;
+    full_content.push_str(delta);
+    if coalesce_ms == 0 {
+        if dedup.register_if_new(delta, None) {
+            let _ = app_handle.emit(
+                "ollama-chat-chunk",
+                serde_json::json!({ "content": delta }),
+            );
+        } else if verbosity >= 3 {
+            debug!(
+                target: "outbound_pipeline",
+                "Ollama CPU stream: skipped duplicate token emit"
+            );
+        }
+    } else {
+        pending_emit.push_str(delta);
+    }
 }
 
 /// Same as send_ollama_chat_messages but with stream: true; emits "ollama-chat-chunk" with
@@ -457,27 +491,110 @@ async fn send_ollama_chat_messages_streaming_inner(
                     if line_str.is_empty() {
                         continue;
                     }
-                    let parsed: OllamaStreamLine = match serde_json::from_str(line_str) {
+                    let json_part = line_str
+                        .strip_prefix("data:")
+                        .map(str::trim)
+                        .unwrap_or(line_str);
+                    if json_part.is_empty() {
+                        continue;
+                    }
+                    if json_part == "[DONE]" {
+                        flush_stream_ui_chunk(
+                            &app_handle,
+                            &mut dedup,
+                            &mut pending_emit,
+                            verbosity,
+                            "openai_done",
+                        );
+                        let response = crate::ollama::ChatResponse {
+                            message: crate::ollama::ChatMessage {
+                                role: "assistant".to_string(),
+                                content: full_content.clone(),
+                                images: None,
+                            },
+                            done: true,
+                        };
+                        if verbosity >= 2 {
+                            let n = full_content.chars().count();
+                            info!("Ollama ← Stream done ({} chars, OpenAI SSE)", n);
+                        }
+                        return Ok(response);
+                    }
+
+                    let Ok(v) = serde_json::from_str::<serde_json::Value>(json_part) else {
+                        continue;
+                    };
+
+                    // OpenAI-compatible NDJSON/SSE (e.g. llama.cpp): choices[].delta.content, finish_reason on last chunk
+                    if v.get("choices").is_some() {
+                        let finish_reason = v
+                            .get("choices")
+                            .and_then(|c| c.as_array())
+                            .and_then(|a| a.first())
+                            .and_then(|ch| ch.get("finish_reason"));
+                        let is_final_chunk = finish_reason.map(|fr| !fr.is_null()).unwrap_or(false);
+
+                        let delta_opt = v
+                            .get("choices")
+                            .and_then(|c| c.as_array())
+                            .and_then(|a| a.first())
+                            .and_then(|ch| ch.get("delta"))
+                            .and_then(|d| d.get("content"))
+                            .and_then(|c| c.as_str());
+
+                        if let Some(delta) = delta_opt {
+                            if !delta.is_empty() {
+                                push_stream_text_delta(
+                                    delta,
+                                    &mut full_content,
+                                    &mut pending_emit,
+                                    coalesce_ms,
+                                    &app_handle,
+                                    &mut dedup,
+                                    verbosity,
+                                );
+                            }
+                        }
+
+                        if is_final_chunk {
+                            flush_stream_ui_chunk(
+                                &app_handle,
+                                &mut dedup,
+                                &mut pending_emit,
+                                verbosity,
+                                "final",
+                            );
+                            let response = crate::ollama::ChatResponse {
+                                message: crate::ollama::ChatMessage {
+                                    role: "assistant".to_string(),
+                                    content: full_content.clone(),
+                                    images: None,
+                                },
+                                done: true,
+                            };
+                            if verbosity >= 2 {
+                                let n = full_content.chars().count();
+                                info!("Ollama ← Stream done ({} chars)", n);
+                            }
+                            return Ok(response);
+                        }
+                        continue;
+                    }
+
+                    let parsed: OllamaStreamLine = match serde_json::from_value(v) {
                         Ok(p) => p,
                         Err(_) => continue,
                     };
                     if let Some(delta) = parsed.message.content {
-                        full_content.push_str(&delta);
-                        if coalesce_ms == 0 {
-                            if dedup.register_if_new(&delta, None) {
-                                let _ = app_handle.emit(
-                                    "ollama-chat-chunk",
-                                    serde_json::json!({ "content": delta }),
-                                );
-                            } else if verbosity >= 3 {
-                                debug!(
-                                    target: "outbound_pipeline",
-                                    "Ollama CPU stream: skipped duplicate token emit"
-                                );
-                            }
-                        } else {
-                            pending_emit.push_str(&delta);
-                        }
+                        push_stream_text_delta(
+                            &delta,
+                            &mut full_content,
+                            &mut pending_emit,
+                            coalesce_ms,
+                            &app_handle,
+                            &mut dedup,
+                            verbosity,
+                        );
                     }
                     if parsed.done {
                         flush_stream_ui_chunk(

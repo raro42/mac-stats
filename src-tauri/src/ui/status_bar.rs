@@ -416,18 +416,23 @@ pub fn toggle_cpu_window(app_handle: &AppHandle) {
     if let Some(window) = app_handle.get_webview_window("cpu") {
         let is_visible = window.is_visible().unwrap_or(false);
         if is_visible {
-            debug1!("CPU window is visible, closing it");
-            let _ = window.close();
+            debug1!("CPU window is visible, hiding it");
+            let _ = window.hide();
         } else {
-            debug1!("CPU window exists but is hidden, closing and recreating");
-            let _ = window.close();
+            // Reuse the existing WebView — recreating it caused multi-second hourglass
+            // (WKWebView init + full JS boot + monitor probes).
+            debug1!("CPU window exists but is hidden, showing it");
+            let _ = window.show();
+            let _ = window.set_focus();
+            let _ = window.unminimize();
+            // Allow an immediate metrics refresh without forcing a full process rescan
+            // every open; cache age logic in get_cpu_details still refreshes when stale.
+            if let Ok(mut last_call) = crate::state::LAST_CPU_DETAILS_CALL.try_lock() {
+                *last_call = None;
+            }
         }
     } else {
         debug1!("CPU window doesn't exist, creating it");
-        create_cpu_window(app_handle);
-    }
-    if app_handle.get_webview_window("cpu").is_none() {
-        debug1!("Creating CPU window after close");
         create_cpu_window(app_handle);
     }
 }
@@ -677,6 +682,19 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             let _ = window.show();
             let _ = window.set_focus();
             let _ = window.unminimize();
+
+            // Title-bar close should hide (keep WebView warm) instead of destroying —
+            // destroying forced a full recreate + JS boot on every menu-bar click.
+            let window_for_close = window.clone();
+            window.on_window_event(move |event| {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    api.prevent_close();
+                    let _ = window_for_close.hide();
+                    debug1!("CPU window close requested — hidden instead of destroyed");
+                }
+            });
+
+            
             debug1!("CPU window shown and focused");
             write_structured_log(
                 "ui/status_bar.rs",

@@ -64,3 +64,9 @@ pub async fn configure_discord(token: Option<String>) -> Result<(), String> {
 pub fn is_discord_configured() -> Result<bool, String> {
     Ok(crate::discord::get_discord_token().is_some())
 }
+
+/// Whether the Discord gateway has connected (Ready) in this process.
+#[tauri::command]
+pub fn is_discord_gateway_ready() -> Result<bool, String> {
+    Ok(crate::discord::discord_bot_gateway_ready())
+}

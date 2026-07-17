@@ -42,14 +42,27 @@ function saveOllamaEndpoint(endpoint) {
 }
 
 async function getDefaultModel() {
+  const saved = localStorage.getItem('ollama_model');
   try {
     const models = await invoke('list_ollama_models');
     if (models && models.length > 0) {
       console.log('[Ollama] Detected models:', models.join(', '));
+      if (saved && models.includes(saved)) {
+        return saved;
+      }
+      if (saved) {
+        console.warn(
+          '[Ollama] Saved model not installed, ignoring:',
+          saved,
+          '→ using',
+          models[0]
+        );
+        localStorage.setItem('ollama_model', models[0]);
+      }
       return models[0];
     }
   } catch (_) { /* Ollama may not be reachable yet */ }
-  return 'llama3.2';
+  return saved || 'gemma4:latest';
 }
 
 /** Returns custom system prompt from localStorage, or null if not set (backend then uses soul.md from ~/.mac-stats/agents/soul.md). */
@@ -277,15 +290,38 @@ async function checkOllamaConnection() {
  */
 async function configureOllama(endpoint, model, apiKeyKeychainAccount = null) {
   try {
+    let resolvedModel = model;
+    if (!resolvedModel || typeof resolvedModel !== 'string') {
+      resolvedModel = await getDefaultModel();
+    } else {
+      // Never leave a missing/stale model configured — chat would fail while
+      // check_ollama_connection still returns true (it only probes /api/tags).
+      try {
+        const models = await invoke('list_ollama_models');
+        if (models && models.length > 0 && !models.includes(resolvedModel)) {
+          console.warn(
+            '[Ollama] Model not installed:',
+            resolvedModel,
+            '→ falling back to',
+            models[0]
+          );
+          resolvedModel = models[0];
+          localStorage.setItem('ollama_model', resolvedModel);
+        }
+      } catch (_) { /* list may fail if endpoint down; keep requested model */ }
+    }
     await invoke('configure_ollama', {
       config: {
         endpoint: endpoint || getOllamaEndpoint(),
-        model: model || getDefaultModel(),
+        model: resolvedModel,
         api_key_keychain_account: apiKeyKeychainAccount
       }
     });
     if (endpoint) {
       saveOllamaEndpoint(endpoint);
+    }
+    if (resolvedModel) {
+      localStorage.setItem('ollama_model', resolvedModel);
     }
     return true;
   } catch (err) {
@@ -1101,6 +1137,7 @@ window.Ollama = {
   // Models
   updateModel: updateOllamaModel,
   loadModels: loadAvailableModels,
+  getDefaultModel: getDefaultModel,
   
   // Chat
   sendMessage: sendChatMessage,

@@ -1,8 +1,10 @@
 //! Logging Tauri commands for forwarding JavaScript console messages to Rust logs,
 //! runtime verbosity control (e.g. from chat reserved words -v, -vv, -vvv),
-//! and exposing the debug log path / opening the log file for the user (e.g. in Settings).
+//! and exposing the debug log path / opening / reading the log for the UI.
 
 use serde::{Deserialize, Serialize};
+use std::fs::File;
+use std::io::{Read, Seek, SeekFrom};
 use std::path::PathBuf;
 use tracing::{debug, error, info, warn};
 
@@ -11,6 +13,15 @@ pub struct LogMessage {
     pub level: String,
     pub message: String,
     pub source: Option<String>,
+}
+
+/// Tail of the debug log for the in-app Logs viewer.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DebugLogTail {
+    pub path: String,
+    pub content: String,
+    pub truncated: bool,
+    pub total_bytes: u64,
 }
 
 /// Log a message from JavaScript console
@@ -53,6 +64,63 @@ pub fn get_debug_log_path() -> Result<String, String> {
     path.into_os_string()
         .into_string()
         .map_err(|_| "Invalid log path".to_string())
+}
+
+/// Read the tail of the debug log for the CPU window Logs panel.
+/// `max_bytes` defaults to 256 KiB (clamped 16 KiB … 2 MiB).
+#[tauri::command]
+pub fn read_debug_log(max_bytes: Option<u64>) -> Result<DebugLogTail, String> {
+    const DEFAULT: u64 = 256 * 1024;
+    const MIN: u64 = 16 * 1024;
+    const MAX: u64 = 2 * 1024 * 1024;
+    let want = max_bytes.unwrap_or(DEFAULT).clamp(MIN, MAX);
+
+    let path = crate::config::Config::log_file_path();
+    let path_str = path
+        .to_str()
+        .ok_or_else(|| "Invalid log path".to_string())?
+        .to_string();
+
+    if !path.exists() {
+        return Ok(DebugLogTail {
+            path: path_str,
+            content: String::new(),
+            truncated: false,
+            total_bytes: 0,
+        });
+    }
+
+    let mut file = File::open(&path).map_err(|e| format!("Failed to open log: {}", e))?;
+    let total = file
+        .metadata()
+        .map_err(|e| format!("Failed to stat log: {}", e))?
+        .len();
+    let truncated = total > want;
+    let start = total.saturating_sub(want);
+    file.seek(SeekFrom::Start(start))
+        .map_err(|e| format!("Failed to seek log: {}", e))?;
+
+    let mut buf = Vec::with_capacity(want as usize);
+    file.read_to_end(&mut buf)
+        .map_err(|e| format!("Failed to read log: {}", e))?;
+
+    // If we started mid-line, drop the partial first line for cleaner display.
+    let content = if truncated {
+        let s = String::from_utf8_lossy(&buf);
+        match s.find('\n') {
+            Some(i) => s[i + 1..].to_string(),
+            None => s.into_owned(),
+        }
+    } else {
+        String::from_utf8_lossy(&buf).into_owned()
+    };
+
+    Ok(DebugLogTail {
+        path: path_str,
+        content,
+        truncated,
+        total_bytes: total,
+    })
 }
 
 /// Open the app debug log file with the system default application (e.g. TextEdit on macOS).

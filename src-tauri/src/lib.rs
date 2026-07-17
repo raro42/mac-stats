@@ -334,10 +334,12 @@ fn run_internal(open_cpu_window: bool) {
             // Discord commands
             commands::discord::configure_discord,
             commands::discord::is_discord_configured,
+            commands::discord::is_discord_gateway_ready,
             // Logging commands
             commands::logging::log_from_js,
             commands::logging::set_chat_verbosity,
             commands::logging::get_debug_log_path,
+            commands::logging::read_debug_log,
             commands::logging::open_debug_log,
             // Scheduler UI commands
             commands::scheduler::list_schedules,

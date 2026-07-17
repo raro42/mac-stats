@@ -1,7 +1,9 @@
 //! Monitor Tauri commands
 
 use crate::config::Config;
-use crate::monitors::{social::MastodonMonitor, website::WebsiteMonitor, Monitor};
+use crate::monitors::{
+    social::MastodonMonitor, website::WebsiteMonitor, Monitor, MonitorCheck,
+};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
@@ -460,12 +462,27 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
     use chrono::Utc;
     use tracing::{debug, trace};
 
-    // Get monitor URL for logging
-    let monitor_url = get_monitor_urls()
-        .lock()
-        .ok()
-        .and_then(|urls| urls.get(&monitor_id).cloned())
-        .unwrap_or_else(|| "unknown".to_string());
+    // Snapshot config under a short lock, then HTTP outside the lock.
+    // Holding `get_monitors()` during reqwest blocked `remove_monitor` for the full
+    // timeout (e.g. 10s on a dead host), so Remove looked like a no-op.
+    let (monitor_url, website) = {
+        let configs = get_monitor_configs()
+            .lock()
+            .map_err(|e| e.to_string())?;
+        let config = configs.get(&monitor_id).ok_or_else(|| {
+            debug!("Monitor: Monitor not found - ID: {}", monitor_id);
+            format!("Monitor not found: {}", monitor_id)
+        })?;
+        let mut wm = crate::monitors::website::WebsiteMonitor::new(
+            config.id.clone(),
+            config.name.clone(),
+            config.url.clone(),
+        );
+        wm.timeout_secs = config.timeout_secs;
+        wm.check_interval_secs = config.check_interval_secs;
+        wm.verify_ssl = config.verify_ssl;
+        (config.url.clone(), wm)
+    };
 
     trace!(
         "Monitor: Checking monitor - ID: {}, URL: {}",
@@ -473,24 +490,13 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
         monitor_url
     );
 
-    let result = {
-        let monitors = get_monitors().lock().map_err(|e| e.to_string())?;
-        let monitor = monitors.get(&monitor_id).ok_or_else(|| {
-            debug!("Monitor: Monitor not found - ID: {}", monitor_id);
-            format!("Monitor not found: {}", monitor_id)
-        })?;
-
-        let start_time = std::time::Instant::now();
-        let result = monitor.check().map_err(|e| {
-            debug!(
-                "Monitor: Check failed - ID: {}, URL: {}, Error: {}",
-                monitor_id, monitor_url, e
-            );
-            e.to_string()
-        })?;
-        let _duration = start_time.elapsed();
-        result
-    };
+    let result = website.check().map_err(|e| {
+        debug!(
+            "Monitor: Check failed - ID: {}, URL: {}, Error: {}",
+            monitor_id, monitor_url, e
+        );
+        e.to_string()
+    })?;
 
     if result.is_up {
         let ms = result.response_time_ms.unwrap_or(0);
@@ -557,7 +563,7 @@ pub fn list_monitors_with_details() -> Result<Vec<MonitorDetails>, String> {
 /// Remove a monitor
 #[tauri::command]
 pub fn remove_monitor(monitor_id: String) -> Result<(), String> {
-    use tracing::{debug, info};
+    use tracing::{debug, info, warn};
 
     // Get monitor URL for logging before removal
     let monitor_url = get_monitor_urls()
@@ -571,38 +577,52 @@ pub fn remove_monitor(monitor_id: String) -> Result<(), String> {
         monitor_id, monitor_url
     );
 
-    get_monitors()
-        .lock()
-        .map_err(|e| e.to_string())?
-        .remove(&monitor_id)
-        .ok_or_else(|| {
-            debug!(
-                "Monitor: Monitor not found for removal - ID: {}",
-                monitor_id
-            );
-            format!("Monitor not found: {}", monitor_id)
-        })?;
+    // Remove from every map even if one entry is already gone (UI retry / partial state).
+    let mut found = false;
+    if let Ok(mut monitors) = get_monitors().lock() {
+        found |= monitors.remove(&monitor_id).is_some();
+    } else {
+        return Err("Failed to lock monitors".to_string());
+    }
+    if let Ok(mut urls) = get_monitor_urls().lock() {
+        found |= urls.remove(&monitor_id).is_some();
+    }
+    if let Ok(mut configs) = get_monitor_configs().lock() {
+        found |= configs.remove(&monitor_id).is_some();
+    }
+    if let Ok(mut stats) = get_monitor_stats().lock() {
+        found |= stats.remove(&monitor_id).is_some();
+    }
 
-    // Also remove URL from storage
-    get_monitor_urls()
-        .lock()
-        .map_err(|e| e.to_string())?
-        .remove(&monitor_id);
+    if !found {
+        debug!(
+            "Monitor: Monitor not found for removal - ID: {}",
+            monitor_id
+        );
+        return Err(format!("Monitor not found: {}", monitor_id));
+    }
 
-    // Remove from configs
-    get_monitor_configs()
-        .lock()
-        .map_err(|e| e.to_string())?
-        .remove(&monitor_id);
-
-    // Remove from stats
-    get_monitor_stats()
-        .lock()
-        .map_err(|e| e.to_string())?
-        .remove(&monitor_id);
-
-    // Save to disk
-    save_monitors().map_err(|e| format!("Failed to save monitors: {}", e))?;
+    // Retry save: concurrent check_monitor may briefly hold try_locks.
+    let mut last_err = None;
+    for attempt in 1..=5 {
+        match save_monitors() {
+            Ok(()) => {
+                last_err = None;
+                break;
+            }
+            Err(e) => {
+                warn!(
+                    "Monitor: save after remove attempt {} failed: {}",
+                    attempt, e
+                );
+                last_err = Some(e);
+                std::thread::sleep(std::time::Duration::from_millis(50 * attempt));
+            }
+        }
+    }
+    if let Some(e) = last_err {
+        return Err(format!("Failed to save monitors: {}", e));
+    }
 
     info!(
         "Monitor: Successfully removed monitor - ID: {}, URL: {}",

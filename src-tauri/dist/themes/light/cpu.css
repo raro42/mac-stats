@@ -1132,6 +1132,19 @@ body {
   opacity: 1;
 }
 
+.icon-line-item.status-good svg {
+  /* Same green treatment as status-good img (monitors / discord SVGs) */
+  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(1234%) hue-rotate(87deg) brightness(95%) contrast(85%);
+  opacity: 1;
+  color: rgba(52, 199, 89, 0.9);
+}
+
+.icon-line-item.status-good:hover svg {
+  filter: brightness(0) saturate(100%) invert(58%) sepia(96%) saturate(1234%) hue-rotate(87deg) brightness(100%) contrast(90%);
+  opacity: 1;
+}
+
+
 .icon-line-item.status-warning {
   color: rgba(255, 159, 10, 0.7);
 }
@@ -2161,4 +2174,18 @@ body {
 
 #chat-send-btn:hover {
   background: rgba(0, 122, 255, 1);
+}
+
+/* Debug Log viewer */
+
+.logs-path-hint{font-size:11px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;margin-left:8px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logs-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.logs-toolbar button{font-size:12px;padding:6px 10px;border-radius:6px;border:1px solid var(--hairline,rgba(128,128,128,.3));background:rgba(128,128,128,.12);color:var(--text,inherit);cursor:pointer}
+.logs-autorefresh{font-size:12px;color:var(--muted,rgba(128,128,128,.8));display:inline-flex;align-items:center;gap:6px;margin-left:auto}
+.logs-viewer{margin:0;padding:12px;max-height:320px;overflow:auto;font-size:11px;line-height:1.45;font-family:ui-monospace,Menlo,monospace;color:var(--text,inherit);background:rgba(0,0,0,.08);border:1px solid var(--hairline,rgba(128,128,128,.3));border-radius:10px;white-space:pre-wrap;word-break:break-word}
+
+
+/* Logs section */
+.logs-section.collapsed {
+  display: none;
 }

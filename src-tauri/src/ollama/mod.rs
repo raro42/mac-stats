@@ -5,6 +5,7 @@
 //! Sub-module `models` provides role-based model classification and resolution.
 
 pub(crate) mod model_list_cache;
+pub mod llm_backend;
 pub mod models;
 
 use crate::circuit_breaker::CircuitBreaker;
@@ -53,7 +54,7 @@ impl Default for OllamaConfig {
     fn default() -> Self {
         Self {
             endpoint: "http://localhost:11434".to_string(),
-            model: "llama2".to_string(),
+            model: "gemma4:latest".to_string(),
             api_key: None,
             temperature: None,
             num_ctx: None,
@@ -126,6 +127,46 @@ pub struct ChatResponse {
 #[derive(Debug, Clone, Deserialize)]
 pub struct OllamaErrorResponse {
     pub error: String,
+}
+
+/// Non-streaming `POST /api/chat`: Ollama returns `{ "message": { "role", "content" }, "done" }`.
+/// **OpenAI-compatible servers** (e.g. llama.cpp) return `{ "choices": [ { "message": ... } ] }` on the same path.
+///
+/// **Automatic selection:** this function picks the parser from the JSON shape (`choices` vs `message`).
+/// Use [`llm_backend::probe_llm_backend_kind`] or [`llm_backend::infer_llm_kind_from_chat_response_body`] to record which family is in use.
+pub fn chat_response_from_api_body(body: &str) -> Result<ChatResponse, String> {
+    let v: serde_json::Value =
+        serde_json::from_str(body).map_err(|e| format!("Chat response JSON: {}", e))?;
+    if v.get("choices").is_some() {
+        let content = v
+            .get("choices")
+            .and_then(|c| c.as_array())
+            .and_then(|a| a.first())
+            .and_then(|ch| ch.get("message"))
+            .and_then(|m| m.get("content"))
+            .and_then(|c| c.as_str())
+            .unwrap_or("")
+            .to_string();
+        let role = v
+            .get("choices")
+            .and_then(|c| c.as_array())
+            .and_then(|a| a.first())
+            .and_then(|ch| ch.get("message"))
+            .and_then(|m| m.get("role"))
+            .and_then(|r| r.as_str())
+            .filter(|s| !s.is_empty())
+            .unwrap_or("assistant")
+            .to_string();
+        return Ok(ChatResponse {
+            message: ChatMessage {
+                role,
+                content,
+                images: None,
+            },
+            done: true,
+        });
+    }
+    serde_json::from_value(v).map_err(|e| format!("Ollama chat response: {}", e))
 }
 
 // --- GET /api/tags (list models with details) ---
@@ -495,6 +536,8 @@ pub struct OllamaClient {
     pub config: OllamaConfig,
     #[allow(dead_code)] // Used in methods that may not be called directly
     client: reqwest::Client,
+    /// Filled by HTTP probe ([`Self::probe_and_set_backend`]) and/or chat response inference.
+    pub detected_backend: std::sync::Mutex<Option<llm_backend::LlmBackendKind>>,
 }
 
 impl OllamaClient {
@@ -511,7 +554,49 @@ impl OllamaClient {
             .timeout(std::time::Duration::from_secs(timeout_secs))
             .build()?;
 
-        Ok(Self { config, client })
+        Ok(Self {
+            config,
+            client,
+            detected_backend: std::sync::Mutex::new(None),
+        })
+    }
+
+    /// Store the result of [`llm_backend::probe_llm_backend_kind`] (or inference from chat).
+    pub fn set_detected_backend(&self, k: llm_backend::LlmBackendKind) {
+        if let Ok(mut g) = self.detected_backend.lock() {
+            *g = Some(k);
+        }
+    }
+
+    /// Probe `GET /v1/models` / `GET /api/version` and store [`llm_backend::LlmBackendKind`].
+    #[allow(dead_code)] // Public API; `check_ollama_connection` uses standalone probe + [`Self::set_detected_backend`].
+    pub async fn probe_and_set_backend(&self) -> llm_backend::LlmBackendKind {
+        let api_key = self
+            .config
+            .get_api_key()
+            .ok()
+            .flatten()
+            .and_then(|acc| crate::security::get_credential(&acc).ok().flatten());
+        let k = llm_backend::probe_llm_backend_kind(
+            &self.config.endpoint,
+            &self.client,
+            api_key.as_deref(),
+        )
+        .await;
+        self.set_detected_backend(k);
+        k
+    }
+
+    /// Refine detected backend from the raw chat response body when the probe was still [`llm_backend::LlmBackendKind::Unknown`].
+    pub fn merge_backend_kind_from_chat_body(&self, body: &str) {
+        if let Some(k) = llm_backend::infer_llm_kind_from_chat_response_body(body) {
+            if let Ok(mut slot) = self.detected_backend.lock() {
+                let replace = matches!(*slot, None | Some(llm_backend::LlmBackendKind::Unknown));
+                if replace {
+                    *slot = Some(k);
+                }
+            }
+        }
     }
 
     /// Returns a clone of the HTTP client for use after releasing the global lock (e.g. in async paths).
@@ -627,13 +712,15 @@ impl OllamaClient {
         }
 
         let start_time = std::time::Instant::now();
-        let response = http_request
+        let http = http_request
             .send()
             .await
-            .context("Failed to send chat request to Ollama")?
-            .json::<ChatResponse>()
+            .context("Failed to send chat request to Ollama")?;
+        let body = http
+            .text()
             .await
-            .context("Failed to parse Ollama response")?;
+            .context("Failed to read Ollama chat response body")?;
+        let response = chat_response_from_api_body(&body).map_err(|e| anyhow::anyhow!(e))?;
         let duration = start_time.elapsed();
 
         // Log raw response JSON
@@ -1030,5 +1117,14 @@ mod model_context_estimate_tests {
     #[test]
     fn default_model_info_is_8192() {
         assert_eq!(ModelInfo::default().context_size_tokens, 8192);
+    }
+
+    #[test]
+    fn chat_response_from_api_body_openai_llamacpp() {
+        let body = r#"{"choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"Hello"}}],"object":"chat.completion","model":"X"}"#;
+        let r = chat_response_from_api_body(body).expect("parse");
+        assert_eq!(r.message.role, "assistant");
+        assert_eq!(r.message.content, "Hello");
+        assert!(r.done);
     }
 }

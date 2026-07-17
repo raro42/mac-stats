@@ -1124,7 +1124,16 @@ function populateProcessDetailsBody(body, details, pid) {
       forceQuitBtn.parentNode.replaceChild(newBtn, forceQuitBtn);
       
       newBtn.addEventListener("click", async () => {
-        if (!confirm(`Are you sure you want to force quit "${details.name}" (PID: ${pid})? This action cannot be undone.`)) {
+        // WKWebView: window.confirm()/alert() are unreliable — two-click confirm instead.
+        if (newBtn.dataset.confirmArmed !== "1") {
+          newBtn.dataset.confirmArmed = "1";
+          newBtn.textContent = "Click again to confirm Force Quit";
+          setTimeout(() => {
+            if (newBtn.dataset.confirmArmed === "1") {
+              newBtn.dataset.confirmArmed = "0";
+              newBtn.textContent = "Force Quit Process";
+            }
+          }, 4000);
           return;
         }
         
@@ -1132,7 +1141,7 @@ function populateProcessDetailsBody(body, details, pid) {
           if (!invoke) {
             invoke = getInvoke();
             if (!invoke) {
-              alert("Cannot force quit: Tauri invoke not available");
+              console.error("Cannot force quit: Tauri invoke not available");
               return;
             }
           }
@@ -1150,14 +1159,12 @@ function populateProcessDetailsBody(body, details, pid) {
           // Force immediate refresh of process list (bypass 15-second throttle)
           window._forceProcessUpdate = true;
           if (window.refreshData) {
-            // Refresh immediately to show updated process list
             await window.refreshData();
           }
-          
-          alert(`Process "${details.name}" has been force quit.`);
         } catch (error) {
           console.error("Failed to force quit process:", error);
-          alert(`Failed to force quit process: ${error}`);
+          newBtn.dataset.confirmArmed = "0";
+          newBtn.textContent = "Force Quit Process";
         }
       });
     }
@@ -1489,6 +1496,7 @@ function initMonitorsSection() {
 
   // Initialize monitor history from localStorage
   initMonitorHistory();
+  wireMonitorRemoveDelegation();
 
   // Always load monitors to calculate height, even when collapsed
   loadMonitors().then(() => {
@@ -1718,8 +1726,51 @@ async function showMonitorsSettings() {
   const popover = document.getElementById('monitors-settings-popover');
   if (popover) {
     popover.style.display = 'flex';
+    wireMonitorRemoveDelegation();
     await refreshMonitorsSettingsList();
   }
+}
+
+
+async function removeMonitorById(monitorId) {
+  const invokeFn = getInvoke() || invoke;
+  if (!invokeFn) {
+    console.error('[Monitors] remove failed: Tauri invoke unavailable');
+    return;
+  }
+  console.log('[Monitors] remove_monitor invoke', monitorId);
+  try {
+    await invokeFn('remove_monitor', { monitorId });
+    monitorStatusCache.delete(monitorId);
+    await refreshMonitorsSettingsList();
+    await loadMonitors();
+    await updateMonitorsSummary();
+    console.log('[Monitors] removed', monitorId);
+  } catch (err) {
+    console.error('[Monitors] remove_monitor failed:', err);
+  }
+}
+
+function wireMonitorRemoveDelegation() {
+  const settingsList = document.getElementById('monitors-settings-list');
+  if (!settingsList || settingsList.dataset.removeDelegation === '1') return;
+  settingsList.dataset.removeDelegation = '1';
+  settingsList.addEventListener('click', (e) => {
+    const btn = e.target && e.target.closest && e.target.closest('.monitor-remove-btn');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const monitorId = btn.dataset.monitorId;
+    if (!monitorId) {
+      console.error('[Monitors] Remove clicked but data-monitor-id missing');
+      return;
+    }
+    btn.disabled = true;
+    removeMonitorById(monitorId).finally(() => {
+      // List may have been rebuilt; ignore if node detached
+      if (btn.isConnected) btn.disabled = false;
+    });
+  });
 }
 
 async function refreshMonitorsSettingsList() {
@@ -1772,24 +1823,11 @@ async function refreshMonitorsSettingsList() {
         actions.className = 'monitor-settings-item-actions';
         
         const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
         removeBtn.className = 'monitor-remove-btn';
         removeBtn.textContent = 'Remove';
-        removeBtn.addEventListener('click', async () => {
-          if (confirm(`Remove monitor "${monitorUrl}"?`)) {
-            try {
-              await invoke('remove_monitor', { monitorId });
-              // Remove from cache
-              monitorStatusCache.delete(monitorId);
-              await refreshMonitorsSettingsList();
-              await loadMonitors();
-              await updateMonitorsSummary();
-            } catch (err) {
-              console.error('Failed to remove monitor:', err);
-              alert(`Failed to remove monitor: ${err}`);
-            }
-          }
-        });
-        
+        removeBtn.dataset.monitorId = monitorId;
+        removeBtn.setAttribute('aria-label', `Remove ${monitorUrl}`);
         actions.appendChild(removeBtn);
         item.appendChild(info);
         item.appendChild(actions);
@@ -1821,10 +1859,12 @@ async function updateMonitorsSummary() {
     let totalResponseTime = 0;
     let responseTimeCount = 0;
 
+    // Use cached status from the background monitor thread — never live-probe here.
+    // Live check_monitor waits on HTTP (up to timeout_secs) and freezes window open.
     for (const monitorId of monitorIds) {
       try {
-        const status = await invoke('check_monitor', { monitorId });
-        // Cache the status for use in settings view
+        const status = await invoke('get_monitor_status', { monitorId });
+        if (!status) continue;
         monitorStatusCache.set(monitorId, status);
         if (status.is_up) upCount++;
         if (status.response_time_ms) {
@@ -1832,7 +1872,7 @@ async function updateMonitorsSummary() {
           responseTimeCount++;
         }
       } catch (err) {
-        console.error(`Failed to check monitor ${monitorId}:`, err);
+        console.error(`Failed to read monitor status ${monitorId}:`, err);
       }
     }
 
@@ -1886,8 +1926,19 @@ async function loadMonitors() {
           console.warn(`Failed to get details for monitor ${monitorId}:`, e);
         }
         
-        const status = await invoke('check_monitor', { monitorId });
-        // Cache the status for use in settings view
+        // Cached status only — background thread owns live HTTP checks
+        const status = await invoke('get_monitor_status', { monitorId });
+        if (!status) {
+          if (existingItems.has(monitorId)) {
+            // Keep existing row until first background check lands
+            continue;
+          }
+          const pending = { is_up: false, response_time_ms: null, error: 'Waiting for first check…' };
+          monitorStatusCache.set(monitorId, pending);
+          const monitorItem = createMonitorItem(monitorId, monitorUrl, pending);
+          monitorsList.appendChild(monitorItem);
+          continue;
+        }
         monitorStatusCache.set(monitorId, status);
         
         // Add to history
@@ -2151,6 +2202,34 @@ function updateOllamaIconStatus(status) {
     // Unknown/checking - keep default/grey color
     console.log('[CPU] Ollama icon set to default (unknown/checking)');
   }
+}
+
+function updateDiscordIconStatus(connected) {
+  const discordIcon = document.getElementById('icon-discord');
+  if (!discordIcon) return;
+  if (connected) {
+    discordIcon.classList.add('status-good');
+    discordIcon.title = 'Discord bot connected';
+  } else {
+    discordIcon.classList.remove('status-good');
+    discordIcon.title = 'Discord bot disconnected';
+  }
+}
+
+async function refreshDiscordIconStatus() {
+  const inv = getInvoke() || invoke;
+  if (!inv) return;
+  try {
+    const ready = await inv('is_discord_gateway_ready');
+    updateDiscordIconStatus(!!ready);
+  } catch (err) {
+    updateDiscordIconStatus(false);
+  }
+}
+
+function initDiscordIconStatus() {
+  refreshDiscordIconStatus();
+  setInterval(refreshDiscordIconStatus, 5000);
 }
 
 function showAddMonitorDialog() {
@@ -2573,13 +2652,8 @@ function showSystemPromptSettings() {
 }
 
 function getDefaultModel() {
-  // Get saved model from localStorage, or use default
-  const saved = localStorage.getItem('ollama_model');
-  if (saved) {
-    return saved;
-  }
-  // Default to qwen2.5-coder (or qwen2.5:7b-coder, depending on what's available)
-  return 'qwen2.5-coder';
+  // Prefer saved selection; validity against installed models is enforced in ollama.js.
+  return localStorage.getItem('ollama_model') || '';
 }
 
 function saveSelectedModel(model) {
@@ -2659,30 +2733,21 @@ async function loadAvailableModels() {
       return;
     }
 
-    const defaultModel = getDefaultModel();
-    let defaultFound = false;
-    let selectedModel = null;
+    const savedModel = localStorage.getItem('ollama_model');
+    let selectedModel =
+      savedModel && models.includes(savedModel) ? savedModel : models[0];
 
     models.forEach(model => {
       const option = document.createElement('option');
       option.value = model;
       option.textContent = model;
-      // Try to match default model (exact match or contains)
-      if (model === defaultModel || model.includes('qwen2.5') || (!defaultFound && model.includes('qwen'))) {
+      if (model === selectedModel) {
         option.selected = true;
-        defaultFound = true;
-        selectedModel = model;
-        saveSelectedModel(model);
       }
       modelSelect.appendChild(option);
     });
 
-    // If default not found, select first model
-    if (!defaultFound && models.length > 0) {
-      modelSelect.selectedIndex = 0;
-      selectedModel = models[0];
-      saveSelectedModel(models[0]);
-    }
+    saveSelectedModel(selectedModel);
 
     // Update model text display
     if (selectedModel && modelText) {
@@ -2721,31 +2786,26 @@ async function updateOllamaModel(model) {
 
 async function autoConfigureOllama() {
   if (window.Ollama) {
-    const endpoint = window.Ollama.getEndpoint();
-    const defaultModel = getDefaultModel();
     try {
-      await window.Ollama.configure(endpoint, defaultModel);
+      // Delegate entirely to ollama.js — it validates the model against /api/tags.
+      // Do not pass cpu.js's sync getDefaultModel() (stale localStorage like qwen2.5:1.5b).
+      await window.Ollama.autoConfigure();
       setTimeout(async () => {
-        // checkOllamaConnection will update the icon status
         try {
           const connected = await checkOllamaConnection();
           if (connected) {
             await loadAvailableModels();
             updateOllamaIconStatus('connected');
           } else {
-            // Connection check returned false - might be not configured or not running
-            // Try to determine which by checking if we got an error
             updateOllamaIconStatus('unknown');
           }
         } catch (checkErr) {
-          // Connection check threw an error - Ollama not available
           console.error('[Ollama] Connection check failed:', checkErr);
           updateOllamaIconStatus('error');
         }
       }, 500);
     } catch (err) {
       console.error('[Ollama] Failed to auto-configure:', err);
-      // Auto-configuration failed - likely Ollama not running/not installed
       updateOllamaIconStatus('error');
     }
   }
@@ -3225,7 +3285,107 @@ function initPerplexitySection() {
   window.Perplexity = { refreshStatus: refreshPerplexityStatus };
 }
 
-// Initialize icon line click handlers
+let logsAutoRefreshTimer = null;
+
+async function refreshLogsViewer(scrollToEnd = true) {
+  const viewer = document.getElementById('logs-viewer');
+  const pathHint = document.getElementById('logs-path-hint');
+  if (!viewer) return;
+  const inv = getInvoke() || invoke;
+  if (!inv) {
+    viewer.textContent = 'App not ready.';
+    return;
+  }
+  try {
+    const tail = await inv('read_debug_log', { maxBytes: 262144 });
+    if (pathHint && tail.path) {
+      pathHint.textContent = tail.path.replace(/^\/Users\/[^/]+/, '~');
+      pathHint.title = tail.path;
+    }
+    const prefix = tail.truncated
+      ? `… truncated (showing last ~${Math.round((tail.content || '').length / 1024)} KiB of ${Math.round((tail.total_bytes || 0) / 1024)} KiB)\n\n`
+      : '';
+    viewer.textContent = prefix + (tail.content || '(empty log)');
+    if (scrollToEnd) {
+      viewer.scrollTop = viewer.scrollHeight;
+    }
+  } catch (err) {
+    viewer.textContent = 'Failed to read log: ' + String(err);
+  }
+}
+
+function stopLogsAutoRefresh() {
+  if (logsAutoRefreshTimer) {
+    clearInterval(logsAutoRefreshTimer);
+    logsAutoRefreshTimer = null;
+  }
+}
+
+function startLogsAutoRefresh() {
+  stopLogsAutoRefresh();
+  logsAutoRefreshTimer = setInterval(() => refreshLogsViewer(true), 2000);
+}
+
+function initLogsSection() {
+  const header = document.getElementById('logs-header');
+  const content = document.getElementById('logs-content');
+  const section = document.querySelector('.logs-section');
+  const divider = document.getElementById('logs-details-divider');
+  const refreshBtn = document.getElementById('logs-refresh-btn');
+  const openBtn = document.getElementById('logs-open-btn');
+  const autoCb = document.getElementById('logs-autorefresh');
+  if (!header || !content) return;
+
+  let logsCollapsed = localStorage.getItem('logs_collapsed') !== 'false';
+  const applyCollapsed = () => {
+    if (logsCollapsed) {
+      content.classList.add('collapsed');
+      if (section) section.classList.add('collapsed');
+      if (divider) divider.style.display = 'none';
+      stopLogsAutoRefresh();
+    } else {
+      content.classList.remove('collapsed');
+      if (section) section.classList.remove('collapsed');
+      if (divider) divider.style.display = '';
+      refreshLogsViewer(true);
+      if (autoCb && autoCb.checked) startLogsAutoRefresh();
+    }
+  };
+  applyCollapsed();
+
+  header.addEventListener('click', (e) => {
+    e.stopPropagation();
+    logsCollapsed = !logsCollapsed;
+    localStorage.setItem('logs_collapsed', logsCollapsed.toString());
+    applyCollapsed();
+  });
+
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      refreshLogsViewer(true);
+    });
+  }
+  if (openBtn) {
+    openBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const inv = getInvoke() || invoke;
+      if (!inv) return;
+      try {
+        await inv('open_debug_log');
+      } catch (err) {
+        console.error('[Logs] open_debug_log failed:', err);
+      }
+    });
+  }
+  if (autoCb) {
+    autoCb.addEventListener('change', () => {
+      if (autoCb.checked && !logsCollapsed) startLogsAutoRefresh();
+      else stopLogsAutoRefresh();
+    });
+  }
+}
+
 function initIconLine() {
   const monitorsIcon = document.getElementById('icon-monitors');
   const ollamaIcon = document.getElementById('icon-ollama');
@@ -3263,6 +3423,19 @@ function initIconLine() {
       }
     });
   }
+
+  const logsIcon = document.getElementById('icon-logs');
+  if (logsIcon) {
+    logsIcon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const logsHeader = document.getElementById('logs-header');
+      if (logsHeader) {
+        logsHeader.click();
+      }
+    });
+  }
+
+  initDiscordIconStatus();
 }
 
 // Check if history data is available and show/hide dropdown accordingly
@@ -3315,6 +3488,7 @@ function initMonitoringFeatures() {
     initCollapsibleSections();
     initMonitorsSection();
     initPerplexitySection();
+    initLogsSection();
     initOllamaSection();
     initHistoryControls();
     // Auto-configure Ollama with default endpoint (if module is available)
