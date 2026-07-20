@@ -414,6 +414,7 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
             insights.mean_ms,
             insights.max_ms
         ),
+        crate::discord::format_discord_gateway_insights_line(),
     ];
     if !insights.by_lane.is_empty() {
         let lanes = insights

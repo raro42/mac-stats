@@ -142,12 +142,19 @@ fn try_pre_route_fetch_url(question: &str) -> Option<String> {
     None
 }
 
-/// Weather / "wether" questions → BRAVE_SEARCH (Open-Meteo grounding attaches in the tool handler).
+/// Weather / "wether" questions.
+/// Clear place names skip pre-route so the agent router uses Open-Meteo instant (0 LLM).
+/// Ambiguous weather asks still pre-route to Brave/Perplexity (with Open-Meteo grounding).
 fn try_pre_route_weather(question: &str) -> Option<String> {
     if !crate::commands::weather_grounding::looks_like_weather_query(question) {
         return None;
     }
-    // Need at least Brave or Perplexity, or Open-Meteo alone still helps via BRAVE path None branch.
+    if crate::commands::weather_grounding::can_instant_weather(question) {
+        info!(
+            "Agent router: weather has clear place — skip search pre-route (Open-Meteo instant)"
+        );
+        return None;
+    }
     let q = question.trim();
     let brave_ok = crate::commands::brave::get_brave_api_key().is_some();
     let perplexity_ok = crate::commands::perplexity::is_perplexity_configured().unwrap_or(false);
@@ -166,7 +173,6 @@ fn try_pre_route_weather(question: &str) -> Option<String> {
         );
         return Some(format!("PERPLEXITY_SEARCH: {query}"));
     }
-    // No search keys — still force a BRAVE_SEARCH line so the handler runs Open-Meteo-only path.
     Some(format!("BRAVE_SEARCH: {query}"))
 }
 

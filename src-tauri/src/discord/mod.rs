@@ -26,7 +26,7 @@ use serenity::model::gateway::GatewayIntents;
 use serenity::model::id::{MessageId, UserId};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::RwLock;
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Instant, UNIX_EPOCH};
@@ -1887,6 +1887,11 @@ static DISCORD_LAST_SHARD_STAGE: Mutex<Option<ConnectionStage>> = Mutex::new(Non
 /// When `run_discord_client` began (before `Ready` / shard events).
 static DISCORD_GATEWAY_CLIENT_STARTED_AT: Mutex<Option<Instant>> = Mutex::new(None);
 
+/// Gateway reconnect telemetry (process lifetime).
+static DISCORD_READY_COUNT: AtomicU64 = AtomicU64::new(0);
+static DISCORD_RESUME_COUNT: AtomicU64 = AtomicU64::new(0);
+static DISCORD_DISCONNECT_COUNT: AtomicU64 = AtomicU64::new(0);
+
 /// Cache of Discord user id -> display name for reuse in prompts. Updated on each message.
 static DISCORD_USER_NAMES: OnceLock<Mutex<HashMap<u64, String>>> = OnceLock::new();
 
@@ -2972,10 +2977,22 @@ impl EventHandler for Handler {
         if let Ok(mut g) = DISCORD_LAST_READY_AT.lock() {
             *g = Some(Instant::now());
         }
-        info!(
-            "Discord: Bot connected as {} (id: {})",
-            data_about_bot.user.name, id
-        );
+        let ready_n = DISCORD_READY_COUNT.fetch_add(1, Ordering::SeqCst) + 1;
+        if ready_n > 1 {
+            info!(
+                "Discord: Bot reconnected as {} (id: {}) — Ready #{} this process (resumes={}, disconnects={})",
+                data_about_bot.user.name,
+                id,
+                ready_n,
+                DISCORD_RESUME_COUNT.load(Ordering::SeqCst),
+                DISCORD_DISCONNECT_COUNT.load(Ordering::SeqCst)
+            );
+        } else {
+            info!(
+                "Discord: Bot connected as {} (id: {})",
+                data_about_bot.user.name, id
+            );
+        }
         tokio::spawn(having_fun_background_loop(ctx));
     }
 
@@ -2989,6 +3006,25 @@ impl EventHandler for Handler {
         );
         if let Ok(mut g) = DISCORD_LAST_SHARD_STAGE.lock() {
             *g = Some(event.new);
+        }
+        use serenity::gateway::ConnectionStage::*;
+        let was_up = matches!(event.old, Connected);
+        match event.new {
+            Disconnected if was_up => {
+                let n = DISCORD_DISCONNECT_COUNT.fetch_add(1, Ordering::SeqCst) + 1;
+                info!(
+                    "Discord: gateway disconnect #{} (shard {:?}: {:?} → {:?})",
+                    n, event.shard_id, event.old, event.new
+                );
+            }
+            Resuming => {
+                let n = DISCORD_RESUME_COUNT.fetch_add(1, Ordering::SeqCst) + 1;
+                info!(
+                    "Discord: gateway resume #{} (shard {:?})",
+                    n, event.shard_id
+                );
+            }
+            _ => {}
         }
     }
 
@@ -3225,6 +3261,29 @@ pub fn discord_bot_token_configured() -> bool {
 /// Gateway received Discord `Ready` (bot session active).
 pub fn discord_bot_gateway_ready() -> bool {
     bot_user_id().is_some()
+}
+
+/// Process-lifetime Discord gateway reconnect counters for insights / health.
+pub fn discord_gateway_reconnect_stats() -> (u64, u64, u64) {
+    (
+        DISCORD_READY_COUNT.load(Ordering::SeqCst),
+        DISCORD_RESUME_COUNT.load(Ordering::SeqCst),
+        DISCORD_DISCONNECT_COUNT.load(Ordering::SeqCst),
+    )
+}
+
+/// One-line gateway reconnect summary for Discord `/insights`.
+pub fn format_discord_gateway_insights_line() -> String {
+    let (ready, resume, disconnect) = discord_gateway_reconnect_stats();
+    let stage = discord_last_shard_stage()
+        .map(|s| format!("{:?}", s))
+        .unwrap_or_else(|| "unknown".into());
+    let ready_ago = discord_last_ready_at()
+        .map(|t| format!("{}s ago", t.elapsed().as_secs()))
+        .unwrap_or_else(|| "never".into());
+    format!(
+        "Discord gateway: ready×{ready} · resume×{resume} · disconnect×{disconnect} · stage={stage} · last Ready {ready_ago}"
+    )
 }
 
 /// Instant of the last `Ready` event, if the bot connected at least once this process.

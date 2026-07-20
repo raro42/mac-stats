@@ -5,7 +5,7 @@ use tracing::info;
 
 /// True when the search query / user question is about current weather / forecast.
 pub(crate) fn looks_like_weather_query(q: &str) -> bool {
-    let n = q.to_lowercase();
+    let n = normalize_weather_text(q).to_lowercase();
     // include common typo "wether"
     let has_weather = n.contains("weather")
         || n.contains("wether")
@@ -18,7 +18,8 @@ pub(crate) fn looks_like_weather_query(q: &str) -> bool {
 }
 
 /// Extract a place name from a weather question/query.
-fn extract_place(q: &str) -> Option<String> {
+pub(crate) fn extract_place(q: &str) -> Option<String> {
+    let q = normalize_weather_text(q);
     let lower = q.to_lowercase();
     for sep in [" in ", " for ", " at "] {
         if let Some(idx) = lower.find(sep) {
@@ -81,6 +82,21 @@ fn extract_place(q: &str) -> Option<String> {
         return Some(place);
     }
     None
+}
+
+/// True when Open-Meteo instant reply can answer without Brave/Perplexity.
+pub(crate) fn can_instant_weather(q: &str) -> bool {
+    looks_like_weather_query(q) && extract_place(q).is_some()
+}
+
+fn normalize_weather_text(q: &str) -> String {
+    q.chars()
+        .map(|c| match c {
+            '\u{2018}' | '\u{2019}' | '\u{00B4}' | '`' => '\'',
+            '\u{201C}' | '\u{201D}' => '"',
+            _ => c,
+        })
+        .collect()
 }
 
 /// Fetch current conditions from Open-Meteo for a weather query. Returns a grounded block
@@ -334,8 +350,11 @@ mod tests {
     }
 
     #[test]
-    fn extracts_place_from_search_query() {
-        let p = extract_place("weather El Masnou Spain current conditions").unwrap();
+    fn extracts_place_curly_apostrophe_typo() {
+        let p = extract_place("What´s the wether like in El Masnou right now?").unwrap();
         assert!(p.to_lowercase().contains("masnou"), "{p}");
+        assert!(can_instant_weather(
+            "What´s the wether like in El Masnou right now?"
+        ));
     }
 }
