@@ -84,19 +84,41 @@ pub(crate) fn deduplicate_consecutive_messages(
 /// Internal: send messages to Ollama and return the chat response.
 /// Used by the ollama_chat command and by answer_with_ollama_and_fetch (Discord / agent).
 /// When set, `model_override` and `options_override` apply only to this request.
+/// Passes `tools: []` so meta-calls (criteria/plan/verify) disable native tool parsing.
 pub async fn send_ollama_chat_messages(
     messages: Vec<crate::ollama::ChatMessage>,
     model_override: Option<String>,
     options_override: Option<crate::ollama::ChatOptions>,
     queue: OllamaHttpQueue,
 ) -> Result<crate::ollama::ChatResponse, String> {
+    send_ollama_chat_messages_with_tools(messages, model_override, options_override, queue, None)
+        .await
+}
+
+/// Like [`send_ollama_chat_messages`], but may attach OpenAI/Ollama `tools` schemas.
+///
+/// - `tools: None` → send empty `tools: []` (disable native tool parsing; text-line tools only).
+/// - `tools: Some(schemas)` → model may return `message.tool_calls`; we synthesize `TOOL: arg` lines.
+pub async fn send_ollama_chat_messages_with_tools(
+    messages: Vec<crate::ollama::ChatMessage>,
+    model_override: Option<String>,
+    options_override: Option<crate::ollama::ChatOptions>,
+    queue: OllamaHttpQueue,
+    tools: Option<Vec<serde_json::Value>>,
+) -> Result<crate::ollama::ChatResponse, String> {
     with_ollama_http_queue(queue, || async move {
         crate::ollama::ollama_http_circuit_allow()?;
         let messages_retry = messages.clone();
         let mo = model_override.clone();
         let oo = options_override.clone();
-        let mut out =
-            send_ollama_chat_messages_inner(messages, model_override, options_override).await;
+        let tools_retry = tools.clone();
+        let mut out = send_ollama_chat_messages_inner(
+            messages,
+            model_override,
+            options_override,
+            tools,
+        )
+        .await;
         if let Err(ref msg) = out {
             if crate::ollama::ollama_error_suggests_transient_cold_start(msg)
                 && OLLAMA_POST_START_COLD_CHAT_RETRY.swap(false, Ordering::SeqCst)
@@ -107,7 +129,7 @@ pub async fn send_ollama_chat_messages(
                     msg
                 );
                 tokio::time::sleep(std::time::Duration::from_millis(400)).await;
-                out = send_ollama_chat_messages_inner(messages_retry, mo, oo).await;
+                out = send_ollama_chat_messages_inner(messages_retry, mo, oo, tools_retry).await;
             }
         }
         match &out {
@@ -125,6 +147,7 @@ async fn send_ollama_chat_messages_inner(
     messages: Vec<crate::ollama::ChatMessage>,
     model_override: Option<String>,
     options_override: Option<crate::ollama::ChatOptions>,
+    tools: Option<Vec<serde_json::Value>>,
 ) -> Result<crate::ollama::ChatResponse, String> {
     use tracing::{debug, info};
 
@@ -150,12 +173,15 @@ async fn send_ollama_chat_messages_inner(
     let options = merge_chat_options(config_temp, config_num_ctx, options_override);
 
     let url = format!("{}/api/chat", endpoint.trim_end_matches('/'));
+    let use_native = tools.as_ref().map(|t| !t.is_empty()).unwrap_or(false);
     let chat_request = crate::ollama::ChatRequest {
         model: effective_model,
         messages,
         stream: false,
         options,
-        tools: Some(vec![]),
+        // Empty array disables Ollama's native tool-call parsing (meta-calls).
+        // Non-empty schemas enable Hermes/OpenClaw-style structured tool_calls.
+        tools: Some(tools.unwrap_or_default()),
     };
 
     // Log outgoing request (ping) so logs show full ping-pong with Ollama.
@@ -237,6 +263,10 @@ async fn send_ollama_chat_messages_inner(
                     if let Some(client) = guard.as_ref() {
                         client.merge_backend_kind_from_chat_body(&body);
                     }
+                }
+                let mut response = response;
+                if use_native {
+                    crate::commands::native_tools::synthesize_text_tools_from_native(&mut response);
                 }
                 // Success: log and return
                 let content = &response.message.content;
@@ -511,6 +541,7 @@ async fn send_ollama_chat_messages_streaming_inner(
                                 role: "assistant".to_string(),
                                 content: full_content.clone(),
                                 images: None,
+                                tool_calls: None
                             },
                             done: true,
                         };
@@ -569,6 +600,7 @@ async fn send_ollama_chat_messages_streaming_inner(
                                     role: "assistant".to_string(),
                                     content: full_content.clone(),
                                     images: None,
+                                    tool_calls: None
                                 },
                                 done: true,
                             };
@@ -609,6 +641,7 @@ async fn send_ollama_chat_messages_streaming_inner(
                                 role: "assistant".to_string(),
                                 content: full_content.clone(),
                                 images: None,
+                                tool_calls: None
                             },
                             done: true,
                         };
@@ -631,6 +664,7 @@ async fn send_ollama_chat_messages_streaming_inner(
             role: "assistant".to_string(),
             content: full_content,
             images: None,
+            tool_calls: None
         },
         done: true,
     };

@@ -168,6 +168,7 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
                     role: "user".to_string(),
                     content: SYNTHETIC_TOOL_RESULT.to_string(),
                     images: None,
+                    tool_calls: None
                 });
                 i += 1;
                 continue;
@@ -192,11 +193,13 @@ mod tests {
                 role: "assistant".into(),
                 content: "Fetching.\nFETCH_URL: https://example.com".into(),
                 images: None,
+                tool_calls: None
             },
             ChatMessage {
                 role: "user".into(),
                 content: "What is the capital of France?".into(),
                 images: None,
+                tool_calls: None
             },
         ];
         let out = sanitize_conversation_history(hist);
@@ -213,11 +216,13 @@ mod tests {
                 role: "assistant".into(),
                 content: "FETCH_URL: https://example.com".into(),
                 images: None,
+                tool_calls: None
             },
             ChatMessage {
                 role: "user".into(),
                 content: page,
                 images: None,
+                tool_calls: None
             },
         ];
         let out = sanitize_conversation_history(hist);
@@ -231,11 +236,13 @@ mod tests {
                 role: "assistant".into(),
                 content: "Hello, how can I help?".into(),
                 images: None,
+                tool_calls: None
             },
             ChatMessage {
                 role: "user".into(),
                 content: "Here is the page content:\n\ntest body".into(),
                 images: None,
+                tool_calls: None
             },
         ];
         let out = sanitize_conversation_history(hist);

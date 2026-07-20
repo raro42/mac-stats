@@ -81,14 +81,38 @@ impl OllamaConfig {
     }
 }
 
+/// One native tool call from Ollama / OpenAI-compat (`message.tool_calls`).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OllamaToolCall {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    pub function: OllamaFunctionCall,
+}
+
+/// Function name + JSON arguments (object or string, depending on provider).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OllamaFunctionCall {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// Some providers put a numeric index inside `function`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index: Option<u64>,
+    /// Ollama usually returns an object; some providers stringify JSON.
+    #[serde(default)]
+    pub arguments: serde_json::Value,
+}
+
 /// Chat message
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChatMessage {
-    pub role: String, // "user", "assistant", "system"
+    pub role: String, // "user", "assistant", "system", "tool"
     pub content: String,
     /// Optional base64-encoded images (for vision models). Ollama API: "images": ["<base64>"].
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub images: Option<Vec<String>>,
+    /// Native structured tool calls (when the model uses the tools API).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tool_calls: Option<Vec<OllamaToolCall>>,
 }
 
 /// Per-request chat options (temperature, num_ctx). Serializes to Ollama API `options` object.
@@ -138,30 +162,33 @@ pub fn chat_response_from_api_body(body: &str) -> Result<ChatResponse, String> {
     let v: serde_json::Value =
         serde_json::from_str(body).map_err(|e| format!("Chat response JSON: {}", e))?;
     if v.get("choices").is_some() {
-        let content = v
+        let message = v
             .get("choices")
             .and_then(|c| c.as_array())
             .and_then(|a| a.first())
-            .and_then(|ch| ch.get("message"))
+            .and_then(|ch| ch.get("message"));
+        let content = message
             .and_then(|m| m.get("content"))
             .and_then(|c| c.as_str())
             .unwrap_or("")
             .to_string();
-        let role = v
-            .get("choices")
-            .and_then(|c| c.as_array())
-            .and_then(|a| a.first())
-            .and_then(|ch| ch.get("message"))
+        let role = message
             .and_then(|m| m.get("role"))
             .and_then(|r| r.as_str())
             .filter(|s| !s.is_empty())
             .unwrap_or("assistant")
             .to_string();
+        let tool_calls = message
+            .and_then(|m| m.get("tool_calls"))
+            .cloned()
+            .and_then(|tc| serde_json::from_value::<Vec<OllamaToolCall>>(tc).ok())
+            .filter(|v| !v.is_empty());
         return Ok(ChatResponse {
             message: ChatMessage {
                 role,
                 content,
                 images: None,
+                tool_calls,
             },
             done: true,
         });

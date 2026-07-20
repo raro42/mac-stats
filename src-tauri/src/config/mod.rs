@@ -793,6 +793,65 @@ impl Config {
         true
     }
 
+    /// Agent harness mode (OpenClaw/Hermes-style vs classic multi-phase).
+    ///
+    /// - `"direct"` (default): skip criteria / new-topic / planning RECOMMEND / verify LLM calls;
+    ///   one execute tool-loop (model → tools → model). Matches OpenClaw/Hermes shape.
+    /// - `"classic"`: full pipeline (criteria → topic → plan → execute → verify).
+    ///
+    /// Config: `agentHarnessMode`; env `MAC_STATS_AGENT_HARNESS_MODE`.
+    pub fn agent_harness_mode() -> String {
+        if let Ok(s) = std::env::var("MAC_STATS_AGENT_HARNESS_MODE") {
+            let lower = s.trim().to_lowercase();
+            if lower == "classic" || lower == "full" || lower == "legacy" {
+                return "classic".to_string();
+            }
+            if lower == "direct" || lower == "hermes" || lower == "openclaw" {
+                return "direct".to_string();
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(s) = json.get("agentHarnessMode").and_then(|v| v.as_str()) {
+                    let lower = s.trim().to_lowercase();
+                    if lower == "classic" || lower == "full" || lower == "legacy" {
+                        return "classic".to_string();
+                    }
+                }
+            }
+        }
+        "direct".to_string()
+    }
+
+    pub fn agent_harness_is_direct() -> bool {
+        Self::agent_harness_mode() == "direct"
+    }
+
+    /// When true (default), Discord/agent execute + tool-loop chat requests send native Ollama
+    /// `tools` schemas (structured `tool_calls`). Text-line `TOOL: arg` remains a fallback.
+    /// Config: `agentNativeTools`; env `MAC_STATS_AGENT_NATIVE_TOOLS`.
+    pub fn agent_native_tools() -> bool {
+        if let Ok(s) = std::env::var("MAC_STATS_AGENT_NATIVE_TOOLS") {
+            let lower = s.to_lowercase();
+            if lower == "false" || lower == "0" || lower == "no" {
+                return false;
+            }
+            if lower == "true" || lower == "1" || lower == "yes" {
+                return true;
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(b) = json.get("agentNativeTools").and_then(|v| v.as_bool()) {
+                    return b;
+                }
+            }
+        }
+        true
+    }
+
     /// Ratio (0.0–1.0) at which a budget warning is injected into the agent tool loop.
     /// When (tool_count + 1) / max_tool_iterations >= this ratio, a warning is appended telling
     /// the model to consolidate results. Set to 0.0 or 1.0 to disable. Default 0.75.

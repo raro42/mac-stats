@@ -113,11 +113,13 @@ pub async fn run_judge(
             role: "system".to_string(),
             content: JUDGE_SYSTEM_PROMPT.to_string(),
             images: None,
+            tool_calls: None
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
             content: user_content,
             images: None,
+            tool_calls: None
         },
     ];
     let response = match crate::commands::ollama::send_ollama_chat_messages(

@@ -7,7 +7,9 @@ use std::sync::Arc;
 use std::time::Duration;
 
 pub(crate) use crate::commands::agent_session::run_agent_ollama_session;
-pub use crate::commands::ollama_chat::{send_ollama_chat_messages, OllamaHttpQueue};
+pub use crate::commands::ollama_chat::{
+    send_ollama_chat_messages, send_ollama_chat_messages_with_tools, OllamaHttpQueue,
+};
 pub use crate::commands::ollama_config::{
     ensure_ollama_agent_ready_at_startup, get_default_ollama_model_name,
 };
@@ -480,6 +482,16 @@ pub fn answer_with_ollama_and_fetch(
             &plain_for_lane,
             pre_routed_early.as_deref(),
         );
+        // Direct harness (default): OpenClaw/Hermes-style — skip criteria/topic/plan/verify meta-LLMs.
+        let harness_direct =
+            crate::config::Config::agent_harness_is_direct() && !is_verification_retry;
+        if harness_direct {
+            mac_stats_info!(
+                "ollama/chat",
+                "Agent router [{}]: DIRECT harness (skip criteria/topic/plan/verify meta-LLMs)",
+                request_id
+            );
+        }
         if let crate::commands::fast_lane::TurnLane::Instant { reply } = &turn_lane {
             if !is_verification_retry {
                 mac_stats_info!(
@@ -528,8 +540,13 @@ pub fn answer_with_ollama_and_fetch(
                 });
             }
         }
-        let skip_meta_llms = turn_lane.skips_meta_llms();
-        let lane_name = turn_lane.name().to_string();
+        let skip_meta_llms = turn_lane.skips_meta_llms() || harness_direct;
+        let lane_name = if harness_direct && matches!(turn_lane, crate::commands::fast_lane::TurnLane::Full)
+        {
+            "direct".to_string()
+        } else {
+            turn_lane.name().to_string()
+        };
         let pre_routed_for_turn = pre_routed_early.clone();
         if skip_meta_llms {
             mac_stats_info!(
@@ -547,6 +564,7 @@ pub fn answer_with_ollama_and_fetch(
             let qspec = ollama_http_q;
             let model_note_for_reply = model_not_in_catalog_note_for_turn.clone();
             let skip_meta_llms = skip_meta_llms;
+            let harness_direct = harness_direct;
             let lane_name = lane_name.clone();
             let pre_routed_for_turn = pre_routed_for_turn.clone();
             let turn_clock = turn_clock;
@@ -886,15 +904,22 @@ pub fn answer_with_ollama_and_fetch(
 
         // --- Pre-routing: already computed before the turn (reuse; skip RECOMMEND when set) ---
         let pre_routed_recommendation = pre_routed_for_turn.clone();
-        let skipped_plan_llm = pre_routed_recommendation.is_some();
+        let skipped_plan_llm = pre_routed_recommendation.is_some() || harness_direct;
 
-        // --- Planning step: ask Ollama how it would solve the question (skip if pre-routed) ---
+        // --- Planning step: ask Ollama how it would solve the question (skip if pre-routed or direct) ---
         let mut recommendation = if let Some(pre_routed) = pre_routed_recommendation {
             mac_stats_info!(
                 "ollama/chat",
                 "Agent router: skipping LLM planning (pre-routed)"
             );
             pre_routed
+        } else if harness_direct {
+            mac_stats_info!(
+                "ollama/chat",
+                "Agent router [{}]: DIRECT harness — skipping planning RECOMMEND (model chooses tools in execute loop)",
+                request_id
+            );
+            String::new()
         } else {
             mac_stats_info!(
                 "ollama/chat",
@@ -957,6 +982,7 @@ pub fn answer_with_ollama_and_fetch(
                     today_utc, question_for_plan_and_exec, model_hint
                 ),
                 images: attachment_images_base64.clone(),
+                tool_calls: None
             };
             let planning_messages = ContextAssembler::assemble(
                 &AgentContextAssembler,
@@ -1000,12 +1026,20 @@ pub fn answer_with_ollama_and_fetch(
             "ollama/chat",
             "Agent router [{}]: understood plan — {}",
             request_id,
-            recommendation.chars().take(200).collect::<String>()
+            if recommendation.is_empty() {
+                "(direct: model will choose tools)".to_string()
+            } else {
+                recommendation.chars().take(200).collect::<String>()
+            }
         );
-        send_status(&format!(
-            "⚙️ Executing: {}…",
-            truncate_status(&recommendation, 72)
-        ));
+        if recommendation.is_empty() {
+            send_status("⚙️ Executing…");
+        } else {
+            send_status(&format!(
+                "⚙️ Executing: {}…",
+                truncate_status(&recommendation, 72)
+            ));
+        }
 
         // Tools that benefit from a clean session (no stale conversation context).
         // Redmine reviews must not be polluted by prior turns — the model hallucinates.
@@ -1136,6 +1170,7 @@ pub fn answer_with_ollama_and_fetch(
                 role: "user".to_string(),
                 content: question_for_plan_and_exec.clone(),
                 images: attachment_images_base64.clone(),
+                tool_calls: None
             };
             let msgs = ContextAssembler::assemble(
                 &AgentContextAssembler,
@@ -1176,7 +1211,11 @@ pub fn answer_with_ollama_and_fetch(
                 news_format_reminder,
                 &discord_platform_formatting,
                 &model_identity,
-                Some(&recommendation),
+                if recommendation.is_empty() {
+                    None
+                } else {
+                    Some(&recommendation)
+                },
                 &ori_orient_section,
                 &ori_prefetch_section,
             );
@@ -1188,6 +1227,7 @@ pub fn answer_with_ollama_and_fetch(
                 role: "user".to_string(),
                 content: question_for_plan_and_exec.clone(),
                 images: attachment_images_base64.clone(),
+                tool_calls: None
             };
             let mut msgs = ContextAssembler::assemble(
                 &AgentContextAssembler,
@@ -1208,11 +1248,17 @@ pub fn answer_with_ollama_and_fetch(
                     n_proactive
                 );
             }
-            let response = match send_ollama_chat_messages(
+            let native_schemas = if crate::config::Config::agent_native_tools() {
+                Some(crate::commands::native_tools::ollama_tool_schemas())
+            } else {
+                None
+            };
+            let response = match send_ollama_chat_messages_with_tools(
                 msgs.clone(),
                 model_override.clone(),
                 options_override.clone(),
                 OllamaHttpQueue::Nested,
+                native_schemas.clone(),
             )
             .await
             {
@@ -1230,11 +1276,12 @@ pub fn answer_with_ollama_and_fetch(
                             "Agent router: context overflow on first execution call — truncated {} tool result(s) to {} chars, retrying",
                             n, max_chars
                         );
-                        send_ollama_chat_messages(
+                        send_ollama_chat_messages_with_tools(
                             msgs.clone(),
                             model_override.clone(),
                             options_override.clone(),
                             OllamaHttpQueue::Nested,
+                            native_schemas,
                         )
                         .await?
                     } else {
@@ -1313,6 +1360,11 @@ pub fn answer_with_ollama_and_fetch(
             partial_progress_capture: partial_progress_capture.clone(),
             output_gate: Some(og.clone()),
             forward_substantive_output: Some(forward_for_tool_loop),
+            native_tool_schemas: if crate::config::Config::agent_native_tools() {
+                Some(crate::commands::native_tools::ollama_tool_schemas())
+            } else {
+                None
+            },
         };
         let tool_loop_result = crate::commands::tool_loop::run_tool_loop(
             &tool_loop_params,
@@ -1522,11 +1574,13 @@ pub fn answer_with_ollama_and_fetch(
                         role: "user".to_string(),
                         content: question.to_string(),
                         images: None,
+                        tool_calls: None
                     });
                     updated_history.push(crate::ollama::ChatMessage {
                         role: "assistant".to_string(),
                         content: response_content.clone(),
                         images: None,
+                        tool_calls: None
                     });
                     let pass_intermediate =
                         discord_reply_channel_id.map(|_| response_content.clone());

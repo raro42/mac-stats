@@ -263,6 +263,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**: **Re-verify** (**2026-03-30**, Spanish, **`003-tester` / `TESTER.md`**, única tarea lógica **`UNTESTED-…`**): path absent; **`CLOSED-` → `TESTING-`**; **`cargo check`** / **`cargo test`** (**875** lib); turn-gate **`rg`** in **`src-tauri/src`** (`commands/ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`); top-level **`src/`** — no Rust matches — pass → **`CLOSED-…`**. **Plus** agent-run **Re-verify** subsection (same UTC date, acceptance 1–4, **`rg`** commands). **Plus** **Cursor** **Re-verify** block (solo **`UNTESTED-…`**, **`src-tauri/src`** vs root **`src/`** note, acceptance 1–4).
 - **Tasks** — **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**: triage (**TOP**) — English coder line with explicit on-disk **`FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md` → `WIP-…` → `UNTESTED-…`**; **Section 6** “canonical handoff” line **English** (source of truth after **`WIP → UNTESTED`**, do not strip on prefix renames); **Section 6** FEATURE-CODER wording uses literal **`FEAT-…` → `WIP-…` → `UNTESTED-…`**.
 
+## [0.1.88] - 2026-07-20
+
+### Added
+- **Native Ollama tools (default)** — execute + tool-loop send real `tools` schemas; `tool_calls` synthesized to `TOOL: arg` for existing dispatch. Config: `agentNativeTools`; env `MAC_STATS_AGENT_NATIVE_TOOLS`.
+- **Open-Meteo weather grounding** — weather / “wether” asks pre-route to search and prepend live Open-Meteo conditions so Brave snippets cannot invent temps.
+- **Harness parity doc** — `docs/039_werner_harness_parity.md`.
+
+### Changed
+- **Direct harness (default)** — Discord/agent turns skip criteria / new-topic / planning RECOMMEND / verify meta-LLMs (OpenClaw/Hermes-style single tool loop). Config: `agentHarnessMode` (`direct` | `classic`); env `MAC_STATS_AGENT_HARNESS_MODE`.
+- **Compact tool prompt** in direct+native mode.
+- **RUN_CMD allowlist** — permissive default (`curl`, `git`, `rg`, `jq`, `python3`, …); path sandbox is `$HOME` (still blocks shells / `sudo` / `rm` as first token).
+
 ## [0.1.87] - 2026-07-20
 
 ### Added

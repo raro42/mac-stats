@@ -13,7 +13,7 @@ use tracing::info;
 
 use crate::commands::discord_draft_stream::DiscordDraftHandle;
 use crate::commands::loop_guard::{ToolLoopAfterResult, ToolLoopGuard};
-use crate::commands::ollama_chat::{send_ollama_chat_messages, OllamaHttpQueue};
+use crate::commands::ollama_chat::{send_ollama_chat_messages_with_tools, OllamaHttpQueue};
 use crate::commands::redmine_helpers::{
     extract_redmine_time_entries_summary_for_reply, grounded_redmine_time_entries_failure_reply,
     question_explicitly_requests_json,
@@ -181,6 +181,8 @@ pub(crate) struct ToolLoopParams {
     pub output_gate: Option<TurnOutputGate>,
     /// Set to `true` after tool results are merged into the chat for the next model turn (user-visible pipeline).
     pub forward_substantive_output: Option<Arc<AtomicBool>>,
+    /// When set, follow-up `/api/chat` calls include these Ollama native tool schemas.
+    pub native_tool_schemas: Option<Vec<serde_json::Value>>,
 }
 
 /// Mutable state accumulated during the tool loop.
@@ -771,6 +773,7 @@ pub(crate) async fn run_tool_loop(
                 &response_content,
             ),
             images: None,
+            tool_calls: None
         });
         let tool_result_role = if user_message.starts_with("Here is the command output") {
             "system"
@@ -781,6 +784,7 @@ pub(crate) async fn run_tool_loop(
             role: tool_result_role.to_string(),
             content: user_message,
             images: None,
+            tool_calls: None
         });
 
         // Budget warning / last-iteration guidance.
@@ -803,11 +807,12 @@ pub(crate) async fn run_tool_loop(
             );
         }
 
-        let follow_up = match send_ollama_chat_messages(
+        let follow_up = match send_ollama_chat_messages_with_tools(
             messages.clone(),
             params.model_override.clone(),
             params.options_override.clone(),
             OllamaHttpQueue::Nested,
+            params.native_tool_schemas.clone(),
         )
         .await
         {
@@ -833,11 +838,12 @@ pub(crate) async fn run_tool_loop(
                     "Agent router: context overflow recovery — truncated {} tool result(s) to {} chars, retrying",
                     n, max_chars
                 );
-                match send_ollama_chat_messages(
+                match send_ollama_chat_messages_with_tools(
                     messages.clone(),
                     params.model_override.clone(),
                     params.options_override.clone(),
                     OllamaHttpQueue::Nested,
+                    params.native_tool_schemas.clone(),
                 )
                 .await
                 {
@@ -1019,6 +1025,7 @@ fn inject_budget_warnings(
             role: "system".to_string(),
             content: msg,
             images: None,
+            tool_calls: None
         });
     } else if ratio >= budget_warning_ratio {
         let remaining = max_tool_iterations - tool_count;
@@ -1038,6 +1045,7 @@ fn inject_budget_warnings(
             role: "system".to_string(),
             content: msg,
             images: None,
+            tool_calls: None
         });
     }
 }

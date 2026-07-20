@@ -123,38 +123,48 @@ pub(crate) async fn build_agent_descriptions(
 ) -> String {
     use tracing::info;
     let skills = crate::skills::load_skills();
-    let mut base = crate::commands::tool_registry::tool_descriptions_for_prompt();
-    base.push_str(AGENT_DESCRIPTIONS_BASE);
+    let compact_native = crate::config::Config::agent_harness_is_direct()
+        && crate::config::Config::agent_native_tools();
+    let mut base = if compact_native {
+        info!("Agent descriptions: compact native-tools prompt (direct harness)");
+        crate::commands::native_tools::compact_native_tools_prompt_section()
+    } else {
+        let mut b = crate::commands::tool_registry::tool_descriptions_for_prompt();
+        b.push_str(AGENT_DESCRIPTIONS_BASE);
+        b
+    };
 
-    if !crate::config::Config::browser_tools_enabled() {
-        // Omit the verbose BROWSER_* tool block from the system prompt when disabled so the model
-        // doesn't waste turns on tool calls that are guaranteed to be refused.
-        let start_marker = "3. **BROWSER_SCREENSHOT**";
-        let end_marker = "\n\n5. **BRAVE_SEARCH**";
-        if let (Some(start), Some(end)) = (base.find(start_marker), base.find(end_marker)) {
-            base.replace_range(
-                start..end,
-                "3. **BROWSER_*** (disabled): Browser automation tools are disabled in `~/.mac-stats/config.json` via `browserToolsEnabled=false`. Do not call any BROWSER_* tools. If called, the app will refuse them with: Browser tools disabled in config.\n",
-            );
-        } else {
-            base.push_str("\n\nNOTE: Browser automation tools (BROWSER_*) are disabled in `~/.mac-stats/config.json` via `browserToolsEnabled=false`. Do not call any BROWSER_* tools; the app will refuse them with: Browser tools disabled in config.");
+    if !compact_native {
+        if !crate::config::Config::browser_tools_enabled() {
+            // Omit the verbose BROWSER_* tool block from the system prompt when disabled so the model
+            // doesn't waste turns on tool calls that are guaranteed to be refused.
+            let start_marker = "3. **BROWSER_SCREENSHOT**";
+            let end_marker = "\n\n5. **BRAVE_SEARCH**";
+            if let (Some(start), Some(end)) = (base.find(start_marker), base.find(end_marker)) {
+                base.replace_range(
+                    start..end,
+                    "3. **BROWSER_*** (disabled): Browser automation tools are disabled in `~/.mac-stats/config.json` via `browserToolsEnabled=false`. Do not call any BROWSER_* tools. If called, the app will refuse them with: Browser tools disabled in config.\n",
+                );
+            } else {
+                base.push_str("\n\nNOTE: Browser automation tools (BROWSER_*) are disabled in `~/.mac-stats/config.json` via `browserToolsEnabled=false`. Do not call any BROWSER_* tools; the app will refuse them with: Browser tools disabled in config.");
+            }
         }
-    }
 
-    if !crate::config::Config::run_js_enabled() {
-        let start_marker = "1. **RUN_JS**";
-        let end_marker = "\n\n2. **FETCH_URL**";
-        if let (Some(start), Some(end)) = (base.find(start_marker), base.find(end_marker)) {
-            base.replace_range(
-                start..end,
-                "1. **RUN_JS** (disabled): Host JavaScript via Node is off in `~/.mac-stats/config.json` via `runJsEnabled=false`. Do not call RUN_JS. If called, the app refuses with: runJsEnabled=false: RUN_JS refused. (Orthogonal to BROWSER_* and FETCH_URL.)\n",
-            );
-        } else {
-            base.push_str("\n\nNOTE: RUN_JS is disabled via `runJsEnabled=false` in ~/.mac-stats/config.json.");
+        if !crate::config::Config::run_js_enabled() {
+            let start_marker = "1. **RUN_JS**";
+            let end_marker = "\n\n2. **FETCH_URL**";
+            if let (Some(start), Some(end)) = (base.find(start_marker), base.find(end_marker)) {
+                base.replace_range(
+                    start..end,
+                    "1. **RUN_JS** (disabled): Host JavaScript via Node is off in `~/.mac-stats/config.json` via `runJsEnabled=false`. Do not call RUN_JS. If called, the app refuses with: runJsEnabled=false: RUN_JS refused. (Orthogonal to BROWSER_* and FETCH_URL.)\n",
+                );
+            } else {
+                base.push_str("\n\nNOTE: RUN_JS is disabled via `runJsEnabled=false` in ~/.mac-stats/config.json.");
+            }
         }
-    }
 
-    base.push_str(SCHEDULE_CRON_EXAMPLES);
+        base.push_str(SCHEDULE_CRON_EXAMPLES);
+    }
     let mut num = 6u32;
     if !skills.is_empty() {
         base.push_str(&build_skill_agent_description(num, &skills));

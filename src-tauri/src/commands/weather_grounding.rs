@@ -1,0 +1,250 @@
+//! Ground weather answers with Open-Meteo so Brave snippets cannot invent temps.
+
+use serde_json::Value;
+use tracing::info;
+
+/// True when the search query / user question is about current weather / forecast.
+pub(crate) fn looks_like_weather_query(q: &str) -> bool {
+    let n = q.to_lowercase();
+    // include common typo "wether"
+    let has_weather = n.contains("weather")
+        || n.contains("wether")
+        || n.contains("forecast")
+        || n.contains("temperature")
+        || n.contains("humidit")
+        || ((n.contains("rain") || n.contains("wind") || n.contains("cloudy"))
+            && (n.contains("today") || n.contains("now") || n.contains("current")));
+    has_weather
+}
+
+/// Extract a place name from a weather question/query.
+fn extract_place(q: &str) -> Option<String> {
+    let lower = q.to_lowercase();
+    for sep in [" in ", " for ", " at "] {
+        if let Some(idx) = lower.find(sep) {
+            let rest = q[idx + sep.len()..].trim();
+            let end = rest
+                .find(|c: char| c == '?' || c == '!' || c == '.' || c == '\n')
+                .unwrap_or(rest.len());
+            let mut tokens: Vec<&str> = rest[..end].split_whitespace().collect();
+            while let Some(last) = tokens.last() {
+                let l = last.to_lowercase();
+                if matches!(
+                    l.as_str(),
+                    "right"
+                        | "now"
+                        | "today"
+                        | "tonight"
+                        | "currently"
+                        | "please"
+                        | "spain"
+                        | "current"
+                        | "conditions"
+                        | "like"
+                ) {
+                    tokens.pop();
+                } else {
+                    break;
+                }
+            }
+            while tokens.first().map(|t| t.eq_ignore_ascii_case("like")) == Some(true) {
+                tokens.remove(0);
+            }
+            let place = tokens.join(" ").trim().to_string();
+            if place.chars().count() >= 2 {
+                return Some(place);
+            }
+        }
+    }
+    let stripped = lower
+        .replace("current conditions", "")
+        .replace("weather forecast", "")
+        .replace("weather", "")
+        .replace("wether", "")
+        .replace("forecast", "")
+        .replace("temperature", "")
+        .replace("like", "")
+        .replace("what's the", "")
+        .replace("whats the", "")
+        .replace("what is the", "")
+        .replace("right now", "")
+        .replace("today", "");
+    let place = stripped
+        .split_whitespace()
+        .filter(|t| !matches!(*t, "the" | "a" | "an" | "in" | "for" | "at" | "spain"))
+        .collect::<Vec<_>>()
+        .join(" ");
+    if place.chars().count() >= 2 {
+        if let Some(pos) = lower.find(&place) {
+            return Some(q[pos..pos + place.len()].trim().to_string());
+        }
+        return Some(place);
+    }
+    None
+}
+
+/// Fetch current conditions from Open-Meteo for a weather query. Returns a grounded block
+/// the model must prefer over search snippets.
+pub(crate) async fn open_meteo_grounding_block(query: &str) -> Option<String> {
+    if !looks_like_weather_query(query) {
+        return None;
+    }
+    let place = extract_place(query)?;
+    info!(
+        "Weather grounding: geocoding place {:?}",
+        crate::logging::ellipse(&place, 60)
+    );
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(12))
+        .build()
+        .ok()?;
+    let geo_url = format!(
+        "https://geocoding-api.open-meteo.com/v1/search?name={}&count=1&language=en&format=json",
+        urlencoding_encode(&place)
+    );
+    let geo_text = client.get(&geo_url).send().await.ok()?.text().await.ok()?;
+    let geo: Value = serde_json::from_str(&geo_text).ok()?;
+    let results = geo.get("results")?.as_array()?;
+    let first = results.first()?;
+    let lat = first.get("latitude")?.as_f64()?;
+    let lon = first.get("longitude")?.as_f64()?;
+    let name = first
+        .get("name")
+        .and_then(|v| v.as_str())
+        .unwrap_or(place.as_str());
+    let admin = first
+        .get("admin1")
+        .and_then(|v| v.as_str())
+        .unwrap_or("");
+    let country = first
+        .get("country")
+        .and_then(|v| v.as_str())
+        .unwrap_or("");
+    let forecast_url = format!(
+        "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation&timezone=auto",
+        lat, lon
+    );
+    let fc_text = client
+        .get(&forecast_url)
+        .send()
+        .await
+        .ok()?
+        .text()
+        .await
+        .ok()?;
+    let fc: Value = serde_json::from_str(&fc_text).ok()?;
+    let current = fc.get("current")?;
+    let temp = current.get("temperature_2m")?.as_f64()?;
+    let feels = current
+        .get("apparent_temperature")
+        .and_then(|v| v.as_f64());
+    let humidity = current
+        .get("relative_humidity_2m")
+        .and_then(|v| v.as_f64());
+    let wind = current.get("wind_speed_10m").and_then(|v| v.as_f64());
+    let precip = current.get("precipitation").and_then(|v| v.as_f64());
+    let code = current.get("weather_code").and_then(|v| v.as_i64());
+    let when = current
+        .get("time")
+        .and_then(|v| v.as_str())
+        .unwrap_or("now");
+    let tz = fc
+        .get("timezone")
+        .and_then(|v| v.as_str())
+        .unwrap_or("local");
+    let desc = weather_code_label(code.unwrap_or(-1));
+    let mut lines = vec![
+        "**Grounded current conditions (Open-Meteo — prefer these numbers over search snippets):**"
+            .to_string(),
+        format!(
+            "- Place: {}{}{}",
+            name,
+            if admin.is_empty() {
+                String::new()
+            } else {
+                format!(", {}", admin)
+            },
+            if country.is_empty() {
+                String::new()
+            } else {
+                format!(", {}", country)
+            }
+        ),
+        format!("- Observed at: {} ({})", when, tz),
+        format!("- Temperature: {:.1} °C", temp),
+    ];
+    if let Some(f) = feels {
+        lines.push(format!("- Feels like: {:.1} °C", f));
+    }
+    if let Some(h) = humidity {
+        lines.push(format!("- Humidity: {:.0}%", h));
+    }
+    if let Some(w) = wind {
+        lines.push(format!("- Wind: {:.1} km/h", w));
+    }
+    if let Some(p) = precip {
+        lines.push(format!("- Precipitation: {:.1} mm", p));
+    }
+    lines.push(format!("- Conditions: {}", desc));
+    lines.push(
+        "Reply with these figures. Search snippets are links/context only — do not invent conflicting temps."
+            .to_string(),
+    );
+    Some(lines.join("\n"))
+}
+
+fn weather_code_label(code: i64) -> &'static str {
+    match code {
+        0 => "Clear",
+        1 | 2 => "Mainly clear / partly cloudy",
+        3 => "Overcast",
+        45 | 48 => "Fog",
+        51 | 53 | 55 => "Drizzle",
+        61 | 63 | 65 => "Rain",
+        66 | 67 => "Freezing rain",
+        71 | 73 | 75 | 77 => "Snow",
+        80 | 81 | 82 => "Rain showers",
+        85 | 86 => "Snow showers",
+        95 => "Thunderstorm",
+        96 | 99 => "Thunderstorm with hail",
+        _ => "Unknown",
+    }
+}
+
+fn urlencoding_encode(s: &str) -> String {
+    let mut out = String::with_capacity(s.len() * 3);
+    for b in s.bytes() {
+        match b {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                out.push(b as char)
+            }
+            b' ' => out.push_str("%20"),
+            _ => out.push_str(&format!("%{:02X}", b)),
+        }
+    }
+    out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn detects_weather_typo() {
+        assert!(looks_like_weather_query(
+            "What´s the wether like in El Masnou right now?"
+        ));
+    }
+
+    #[test]
+    fn extracts_place_in() {
+        let p = extract_place("What's the weather like in El Masnou right now?").unwrap();
+        assert!(p.to_lowercase().contains("masnou"), "{p}");
+    }
+
+    #[test]
+    fn extracts_place_from_search_query() {
+        let p = extract_place("weather El Masnou Spain current conditions").unwrap();
+        assert!(p.to_lowercase().contains("masnou"), "{p}");
+    }
+}

@@ -61,11 +61,13 @@ pub(crate) async fn run_agent_ollama_session(
             role: "system".to_string(),
             content: format!("{}\n\n{}", system_prompt, runtime_context),
             images: None,
+            tool_calls: None
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
             content: user_message.to_string(),
             images: None,
+            tool_calls: None
         },
     ];
     let max_iters = agent.max_tool_iterations;
@@ -110,11 +112,13 @@ pub(crate) async fn run_agent_ollama_session(
                 role: "assistant".to_string(),
                 content: out,
                 images: None,
+                tool_calls: None
             });
             messages.push(crate::ollama::ChatMessage {
                 role: "user".to_string(),
                 content: tool_result,
                 images: None,
+                tool_calls: None
             });
             continue;
         }

@@ -1,7 +1,7 @@
 //! RUN_CMD agent: restricted local command execution for Ollama.
 //!
 //! Allowlist is read from the first enabled orchestrator's skill.md (section "## RUN_CMD allowlist");
-//! if missing, the default list below is used. Paths under ~/.mac-stats where applicable.
+//! if missing, the default list below is used. Paths under `$HOME` (and thus `~/.mac-stats`) by default.
 //! Each pipeline stage is executed via `sh -c`; stages are split only at top-level `|`.
 //! Compound shell in one stage (`;`, `&&`, nested `|`, command substitution, etc.) is rejected
 //! fail-closed. See docs/011_local_cmd_agent.md.
@@ -11,26 +11,79 @@ use std::process::Command;
 use tracing::{info, warn};
 
 /// Default allowlist when orchestrator skill.md has no "## RUN_CMD allowlist" section.
+/// Permissive by default (common read / network / dev CLIs). Shells and destructive admin
+/// first-tokens stay blocked via [`BLOCKED_FIRST_COMMANDS`].
 /// Security: cursor-agent is an exception — it runs user/agent-controlled prompts in the user
 /// environment and receives args without path validation; treat it as a privileged capability.
 const DEFAULT_ALLOWED_COMMANDS: &[&str] = &[
+    // files / text
     "cat",
     "head",
     "tail",
     "ls",
     "grep",
-    "date",
-    "whoami",
-    "ps",
+    "egrep",
+    "fgrep",
+    "rg",
+    "find",
     "wc",
+    "sort",
+    "uniq",
+    "cut",
+    "tr",
+    "sed",
+    "awk",
+    "jq",
+    "file",
+    "stat",
+    "basename",
+    "dirname",
+    "realpath",
+    "pwd",
+    "echo",
+    "printf",
+    // system info
+    "date",
+    "cal",
+    "whoami",
+    "id",
+    "groups",
+    "ps",
     "uptime",
+    "uname",
+    "hostname",
+    "printenv",
+    "df",
+    "du",
+    "which",
+    "type",
+    "sw_vers",
+    "sysctl",
+    "vm_stat",
+    "md5",
+    "shasum",
+    "checksum",
+    // network (read-ish)
+    "curl",
+    "dig",
+    "ping",
+    "host",
+    "nslookup",
+    // dev
+    "git",
+    "python3",
+    "python",
+    "node",
+    "npm",
+    "npx",
+    "open",
     "cursor-agent",
 ];
 
-/// Commands that always require a path (under ~/.mac-stats). All others in the allowlist are treated as no-path.
-const PATH_REQUIRED_COMMANDS: &[&str] = &["cat", "head", "tail", "grep"];
+/// Commands that always require a path (under `$HOME`). Others may run with no path args.
+const PATH_REQUIRED_COMMANDS: &[&str] = &["cat", "head", "tail"];
 
-/// First token cannot be a nested shell / env wrapper even if mistakenly added to the skill allowlist.
+/// First token cannot be a nested shell / env wrapper / destructive admin even if listed in skill.md.
 const BLOCKED_FIRST_COMMANDS: &[&str] = &[
     "sh",
     "bash",
@@ -45,6 +98,22 @@ const BLOCKED_FIRST_COMMANDS: &[&str] = &[
     "env",
     "exec",
     "nix-shell",
+    "sudo",
+    "doas",
+    "su",
+    "rm",
+    "rmdir",
+    "chmod",
+    "chown",
+    "chgrp",
+    "mkfs",
+    "dd",
+    "launchctl",
+    "kill",
+    "killall",
+    "reboot",
+    "shutdown",
+    "passwd",
 ];
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -268,6 +337,20 @@ fn permitted_base_dir() -> Result<PathBuf, String> {
     }
 }
 
+/// `$HOME` as the default path sandbox (permissive). Falls back to ~/.mac-stats base.
+fn permitted_home_dir() -> Result<PathBuf, String> {
+    if let Ok(home) = std::env::var("HOME") {
+        let p = PathBuf::from(home);
+        if p.exists() {
+            return p
+                .canonicalize()
+                .map_err(|e| format!("Canonicalize home dir: {}", e));
+        }
+        return Ok(p);
+    }
+    permitted_base_dir()
+}
+
 /// Expand leading ~ in path using HOME.
 fn expand_tilde(path: &str) -> String {
     if path.starts_with("~/") {
@@ -377,7 +460,8 @@ fn run_single_command_shell(
         }
         return Ok(output.stdout);
     }
-    // Validate path-like tokens (contain / or start with ~) are under base.
+    // Validate path-like tokens (contain / or start with ~) are under $HOME (permissive default).
+    let home_base = permitted_home_dir()?;
     let tokens = parse_arg(stage);
     for t in &tokens {
         let looks_like_path = t.contains('/') || t.starts_with('~');
@@ -385,16 +469,17 @@ fn run_single_command_shell(
             let expanded = expand_tilde(t);
             let path = Path::new(&expanded);
             if path.exists() {
-                if !path_under_base(path, base)? {
-                    return Err("Path not allowed (must be under ~/.mac-stats).".to_string());
+                if !path_under_base(path, &home_base)? {
+                    return Err("Path not allowed (must be under your home directory).".to_string());
                 }
             } else if let Some(parent) = path.parent() {
-                if parent.exists() && !path_under_base(parent, base)? {
-                    return Err("Path not allowed (must be under ~/.mac-stats).".to_string());
+                if parent.exists() && !path_under_base(parent, &home_base)? {
+                    return Err("Path not allowed (must be under your home directory).".to_string());
                 }
             }
         }
     }
+    let _ = base; // retained for API compatibility / future mac-stats-only mode
     info!(
         "RUN_CMD: executing via shell: {}",
         crate::logging::ellipse(stage, 120)
@@ -432,10 +517,10 @@ fn run_single_command_shell(
 }
 
 /// Run a restricted local command. Stages are split at top-level `|` only; each stage runs via `sh -c`.
-/// Allowlist from orchestrator skill.md "## RUN_CMD allowlist" or default (cat, head, tail, ls, grep, date, whoami, ps, wc, uptime, cursor-agent).
+/// Allowlist from orchestrator skill.md "## RUN_CMD allowlist" or the permissive default (see DEFAULT_ALLOWED_COMMANDS).
 /// cursor-agent runs user/agent-controlled prompts and is not path-bound; document or restrict via skill.md if locking down.
 /// Compound shell inside a stage (`;`, `&&`, inner `|`, command substitution, …) is rejected.
-/// Path-like arguments must be under ~/.mac-stats where applicable.
+/// Path-like arguments must be under `$HOME` where applicable (includes ~/.mac-stats).
 pub fn run_local_command(arg: &str) -> Result<String, String> {
     info!("RUN_CMD: exact command: {}", arg);
     let stages: Vec<&str> = arg

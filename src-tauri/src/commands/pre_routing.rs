@@ -34,6 +34,10 @@ pub(crate) fn compute_pre_routed_recommendation(
         if fetch_rec.is_some() {
             return fetch_rec;
         }
+        let weather_rec = try_pre_route_weather(question);
+        if weather_rec.is_some() {
+            return weather_rec;
+        }
         let search_rec = try_pre_route_web_search(question);
         if search_rec.is_some() {
             return search_rec;
@@ -136,6 +140,34 @@ fn try_pre_route_fetch_url(question: &str) -> Option<String> {
     }
 
     None
+}
+
+/// Weather / "wether" questions → BRAVE_SEARCH (Open-Meteo grounding attaches in the tool handler).
+fn try_pre_route_weather(question: &str) -> Option<String> {
+    if !crate::commands::weather_grounding::looks_like_weather_query(question) {
+        return None;
+    }
+    // Need at least Brave or Perplexity, or Open-Meteo alone still helps via BRAVE path None branch.
+    let q = question.trim();
+    let brave_ok = crate::commands::brave::get_brave_api_key().is_some();
+    let perplexity_ok = crate::commands::perplexity::is_perplexity_configured().unwrap_or(false);
+    let query = format!("weather {}", q);
+    if brave_ok {
+        info!(
+            "Agent router: pre-routed weather → BRAVE_SEARCH: {}",
+            crate::logging::ellipse(&query, 80)
+        );
+        return Some(format!("BRAVE_SEARCH: {query}"));
+    }
+    if perplexity_ok {
+        info!(
+            "Agent router: pre-routed weather → PERPLEXITY_SEARCH: {}",
+            crate::logging::ellipse(&query, 80)
+        );
+        return Some(format!("PERPLEXITY_SEARCH: {query}"));
+    }
+    // No search keys — still force a BRAVE_SEARCH line so the handler runs Open-Meteo-only path.
+    Some(format!("BRAVE_SEARCH: {query}"))
 }
 
 /// "search for <query>" / "google <query>" / "BRAVE_SEARCH: <query>" → web search tool.

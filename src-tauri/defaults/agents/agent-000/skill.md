@@ -39,4 +39,4 @@ When the user **explicitly** asks to create a task that uses cursor-agent (e.g. 
 
 ## RUN_CMD allowlist
 
-cat, head, tail, ls, grep, date, whoami, ps, wc, uptime, cursor-agent
+cat, head, tail, ls, grep, egrep, fgrep, rg, find, wc, sort, uniq, cut, tr, sed, awk, jq, file, stat, basename, dirname, realpath, pwd, echo, printf, date, cal, whoami, id, groups, ps, uptime, uname, hostname, printenv, df, du, which, type, sw_vers, sysctl, vm_stat, md5, shasum, checksum, curl, dig, ping, host, nslookup, git, python3, python, node, npm, npx, open, cursor-agent

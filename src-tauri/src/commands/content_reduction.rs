@@ -89,11 +89,13 @@ pub(crate) async fn reduce_fetched_content_to_fit(
                 summary_tokens
             ),
             images: None,
+            tool_calls: None
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
             content: body_truncated_for_request,
             images: None,
+            tool_calls: None
         },
     ];
 
@@ -2926,11 +2928,13 @@ pub(crate) async fn run_skill_ollama_session(
             role: "system".to_string(),
             content: skill_content.to_string(),
             images: None,
+            tool_calls: None
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
             content: user_message.to_string(),
             images: None,
+            tool_calls: None
         },
     ];
     info!(
@@ -8749,6 +8753,7 @@ mod tests {
             role: role.to_string(),
             content: content.to_string(),
             images: None,
+            tool_calls: None
         }
     }
 

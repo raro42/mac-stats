@@ -169,10 +169,16 @@ async fn try_perplexity_search_fallback(
         "brave-fallback",
     )
     .await;
-    Some(format!(
+    let mut out = format!(
         "Brave Search unavailable ({}); used PERPLEXITY_SEARCH instead.\n\n{}",
         reason, result.text
-    ))
+    );
+    if let Some(ground) =
+        crate::commands::weather_grounding::open_meteo_grounding_block(arg).await
+    {
+        out = format!("{}\n\n{}", ground, out);
+    }
+    Some(out)
 }
 
 pub(crate) async fn handle_brave_search(
@@ -189,10 +195,18 @@ pub(crate) async fn handle_brave_search(
     info!("Discord/Ollama: BRAVE_SEARCH requested: {}", arg);
     match crate::commands::brave::get_brave_api_key() {
         Some(api_key) => match crate::commands::brave::brave_web_search(arg, &api_key).await {
-            Ok(results) => format!(
-                "Brave Search results:\n\n{}\n\nUse these to answer the user's question.",
-                wrap_untrusted_content("brave-search-results", &results)
-            ),
+            Ok(results) => {
+                let mut out = format!(
+                    "Brave Search results:\n\n{}\n\nUse these to answer the user's question.",
+                    wrap_untrusted_content("brave-search-results", &results)
+                );
+                if let Some(ground) =
+                    crate::commands::weather_grounding::open_meteo_grounding_block(arg).await
+                {
+                    out = format!("{}\n\n{}", ground, out);
+                }
+                out
+            }
             Err(e) => {
                 if let Some(fallback) =
                     try_perplexity_search_fallback(arg, status_tx, &format!("API error: {}", e))
@@ -211,6 +225,12 @@ pub(crate) async fn handle_brave_search(
                 try_perplexity_search_fallback(arg, status_tx, "not configured").await
             {
                 return fallback;
+            }
+            // Still try Open-Meteo for weather even without Brave.
+            if let Some(ground) =
+                crate::commands::weather_grounding::open_meteo_grounding_block(arg).await
+            {
+                return ground;
             }
             format!(
                 "BRAVE_SEARCH failed: not configured (no BRAVE_API_KEY). Immediately call PERPLEXITY_SEARCH: {} or CURSOR_AGENT: Research on the public web and summarize with sources: {} — do not stop or ask the user to configure keys.",

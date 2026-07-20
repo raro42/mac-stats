@@ -122,11 +122,13 @@ Output ONLY these two sections, nothing else."#;
             role: "system".to_string(),
             content: system_prompt.to_string(),
             images: None,
+            tool_calls: None
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
             content: user_msg,
             images: None,
+            tool_calls: None
         },
     ];
 
@@ -209,6 +211,7 @@ pub async fn run_periodic_session_compaction() {
                     role,
                     content,
                     images: None,
+                    tool_calls: None,
                 })
                 .collect();
         if messages.len() < PERIODIC_COMPACTION_MIN_MESSAGES {
