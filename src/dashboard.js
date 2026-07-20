@@ -1095,8 +1095,17 @@ function renderOpsRuns(insights) {
     const el = document.getElementById('ops-runs-list');
     el.innerHTML = '';
     if (card) card.innerHTML = '';
+    const gateway = insights?.discord_gateway || '';
     if (!insights || !insights.turns) {
-        el.innerHTML = '<div class="ops-empty">No runs in ~/.mac-stats/runs.jsonl yet</div>';
+        if (card && gateway) {
+            card.innerHTML = `
+                <div class="ops-insight-title">Insights</div>
+                <div class="ops-row-meta">${escapeHtml(gateway)}</div>
+                <div class="ops-empty" style="padding:8px 0 0">No runs in ~/.mac-stats/runs.jsonl yet</div>
+            `;
+        } else {
+            el.innerHTML = '<div class="ops-empty">No runs in ~/.mac-stats/runs.jsonl yet</div>';
+        }
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
@@ -1122,6 +1131,7 @@ function renderOpsRuns(insights) {
         card.innerHTML = `
             <div class="ops-insight-title">Insights</div>
             <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · fail ${insights.fail_count || 0} · mean ${insights.mean_ms} ms · max ${insights.max_ms} ms</div>
+            ${gateway ? `<div class="ops-row-meta">${escapeHtml(gateway)}</div>` : ''}
             <div class="ops-row-meta">Lanes: ${escapeHtml(lanes) || '—'}</div>
             <div class="ops-row-meta">Top tools: ${escapeHtml(tools) || '—'}</div>
             ${slow ? `<div class="ops-insight-sub">Slowest</div>${slow}` : ''}

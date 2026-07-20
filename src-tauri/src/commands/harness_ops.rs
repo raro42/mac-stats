@@ -69,6 +69,8 @@ pub struct RunsInsights {
     pub candidates: Vec<RunInsightCandidate>,
     pub slowest: Vec<RunTurnSummary>,
     pub recent: Vec<RunTurnSummary>,
+    /// Discord gateway reconnect line (process lifetime).
+    pub discord_gateway: String,
 }
 
 fn file_mtime_ms(meta: &fs::Metadata) -> u64 {
@@ -226,6 +228,7 @@ pub fn get_runs_insights(limit: Option<u32>) -> Result<RunsInsights, String> {
 pub fn compute_runs_insights(limit: u32) -> RunsInsights {
     let path = crate::commands::run_telemetry::runs_jsonl_path();
     let lim = limit.clamp(1, 200) as usize;
+    let gateway = crate::discord::format_discord_gateway_insights_line();
     let empty = RunsInsights {
         turns: 0,
         ok_count: 0,
@@ -238,6 +241,7 @@ pub fn compute_runs_insights(limit: u32) -> RunsInsights {
         candidates: vec![],
         slowest: vec![],
         recent: vec![],
+        discord_gateway: gateway.clone(),
     };
     if !path.is_file() {
         return empty;
@@ -362,6 +366,7 @@ pub fn compute_runs_insights(limit: u32) -> RunsInsights {
         candidates,
         slowest,
         recent,
+        discord_gateway: gateway,
     }
 }
 
