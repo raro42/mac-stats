@@ -47,13 +47,27 @@ pub struct RunTurnSummary {
 }
 
 #[derive(Debug, Clone, Serialize)]
+pub struct RunInsightCandidate {
+    pub kind: String,
+    pub reason: String,
+    pub wall_ms: u64,
+    pub lane: String,
+    pub question_preview: String,
+    pub request_id: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
 pub struct RunsInsights {
     pub turns: usize,
     pub ok_count: usize,
+    pub fail_count: usize,
     pub p50_ms: u64,
     pub mean_ms: u64,
     pub max_ms: u64,
     pub by_lane: Vec<(String, usize)>,
+    pub by_tool: Vec<(String, usize)>,
+    pub candidates: Vec<RunInsightCandidate>,
+    pub slowest: Vec<RunTurnSummary>,
     pub recent: Vec<RunTurnSummary>,
 }
 
@@ -202,27 +216,46 @@ pub fn read_memory_file(path: String) -> Result<String, String> {
     fs::read_to_string(&p).map_err(|e| e.to_string())
 }
 
-/// Tail + light insights over ~/.mac-stats/runs.jsonl (Hermes insights lite).
+/// Tail + Hermes-lite insights over ~/.mac-stats/runs.jsonl.
 #[tauri::command]
 pub fn get_runs_insights(limit: Option<u32>) -> Result<RunsInsights, String> {
+    Ok(compute_runs_insights(limit.unwrap_or(50)))
+}
+
+/// Shared analytics used by Agent Ops UI and Discord `/insights`.
+pub fn compute_runs_insights(limit: u32) -> RunsInsights {
     let path = crate::commands::run_telemetry::runs_jsonl_path();
-    let lim = limit.unwrap_or(50).clamp(1, 200) as usize;
+    let lim = limit.clamp(1, 200) as usize;
+    let empty = RunsInsights {
+        turns: 0,
+        ok_count: 0,
+        fail_count: 0,
+        p50_ms: 0,
+        mean_ms: 0,
+        max_ms: 0,
+        by_lane: vec![],
+        by_tool: vec![],
+        candidates: vec![],
+        slowest: vec![],
+        recent: vec![],
+    };
     if !path.is_file() {
-        return Ok(RunsInsights {
-            turns: 0,
-            ok_count: 0,
-            p50_ms: 0,
-            mean_ms: 0,
-            max_ms: 0,
-            by_lane: vec![],
-            recent: vec![],
-        });
+        return empty;
     }
-    let text = fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let text = match fs::read_to_string(&path) {
+        Ok(t) => t,
+        Err(_) => return empty,
+    };
     let mut recent = Vec::new();
     let mut walls: Vec<u64> = Vec::new();
     let mut ok_count = 0usize;
-    let mut lane_counts: std::collections::BTreeMap<String, usize> = std::collections::BTreeMap::new();
+    let mut fail_count = 0usize;
+    let mut lane_counts: std::collections::BTreeMap<String, usize> =
+        std::collections::BTreeMap::new();
+    let mut tool_counts: std::collections::BTreeMap<String, usize> =
+        std::collections::BTreeMap::new();
+    let mut candidates: Vec<RunInsightCandidate> = Vec::new();
+
     for line in text.lines() {
         let line = line.trim();
         if line.is_empty() {
@@ -237,6 +270,8 @@ pub fn get_runs_insights(limit: Option<u32>) -> Result<RunsInsights, String> {
         let ok = v.get("ok").and_then(|x| x.as_bool()).unwrap_or(true);
         if ok {
             ok_count += 1;
+        } else {
+            fail_count += 1;
         }
         let lane = v
             .get("lane")
@@ -250,9 +285,25 @@ pub fn get_runs_insights(limit: Option<u32>) -> Result<RunsInsights, String> {
             .map(|a| {
                 a.iter()
                     .filter_map(|x| x.as_str().map(|s| s.to_string()))
-                    .collect()
+                    .collect::<Vec<_>>()
             })
             .unwrap_or_default();
+        for t in &tools {
+            *tool_counts.entry(t.clone()).or_default() += 1;
+        }
+        let question_preview = v
+            .get("question_preview")
+            .and_then(|x| x.as_str())
+            .unwrap_or("")
+            .to_string();
+        let request_id = v
+            .get("request_id")
+            .and_then(|x| x.as_str())
+            .unwrap_or("")
+            .to_string();
+        if let Some(c) = classify_candidate(&lane, wall, &tools, &question_preview, &request_id) {
+            candidates.push(c);
+        }
         recent.push(RunTurnSummary {
             ts: v
                 .get("ts")
@@ -262,19 +313,12 @@ pub fn get_runs_insights(limit: Option<u32>) -> Result<RunsInsights, String> {
             lane,
             wall_ms: wall,
             tools,
-            question_preview: v
-                .get("question_preview")
-                .and_then(|x| x.as_str())
-                .unwrap_or("")
-                .to_string(),
+            question_preview,
             ok,
-            request_id: v
-                .get("request_id")
-                .and_then(|x| x.as_str())
-                .unwrap_or("")
-                .to_string(),
+            request_id,
         });
     }
+
     let turns = walls.len();
     let max_ms = walls.iter().copied().max().unwrap_or(0);
     let mean_ms = if turns == 0 {
@@ -289,21 +333,158 @@ pub fn get_runs_insights(limit: Option<u32>) -> Result<RunsInsights, String> {
     } else {
         sorted[sorted.len() / 2]
     };
-    // Keep only newest `lim` for the table (file is append-only chronological).
+
+    let mut slowest = recent.clone();
+    slowest.sort_by(|a, b| b.wall_ms.cmp(&a.wall_ms));
+    slowest.truncate(5);
+
+    candidates.sort_by(|a, b| b.wall_ms.cmp(&a.wall_ms));
+    candidates.truncate(8);
+
+    let mut by_tool: Vec<_> = tool_counts.into_iter().collect();
+    by_tool.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+    by_tool.truncate(12);
+
     if recent.len() > lim {
         recent = recent.split_off(recent.len() - lim);
     }
     recent.reverse();
     let by_lane: Vec<_> = lane_counts.into_iter().collect();
-    Ok(RunsInsights {
+    RunsInsights {
         turns,
         ok_count,
+        fail_count,
         p50_ms,
         mean_ms,
         max_ms,
         by_lane,
+        by_tool,
+        candidates,
+        slowest,
         recent,
-    })
+    }
+}
+
+fn classify_candidate(
+    lane: &str,
+    wall_ms: u64,
+    tools: &[String],
+    question: &str,
+    request_id: &str,
+) -> Option<RunInsightCandidate> {
+    let q = question.to_lowercase();
+    let looks_version = q.contains("version")
+        && (q.contains("you") || q.contains("app") || q.contains("mac-stats") || q.starts_with("what"));
+    if looks_version && lane != "instant" && wall_ms >= 500 {
+        return Some(RunInsightCandidate {
+            kind: "promote_instant".into(),
+            reason: "Version ask should stay on instant lane".into(),
+            wall_ms,
+            lane: lane.into(),
+            question_preview: question.chars().take(80).collect(),
+            request_id: request_id.into(),
+        });
+    }
+    if tools.is_empty() && wall_ms >= 8_000 && lane != "instant" {
+        return Some(RunInsightCandidate {
+            kind: "slow_zero_tool".into(),
+            reason: "Slow turn with no tools — candidate for lite/instant".into(),
+            wall_ms,
+            lane: lane.into(),
+            question_preview: question.chars().take(80).collect(),
+            request_id: request_id.into(),
+        });
+    }
+    None
+}
+
+/// Short Discord/gateway report (Hermes `/insights` lite).
+pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
+    if insights.turns == 0 {
+        return "No turns in `~/.mac-stats/runs.jsonl` yet.".into();
+    }
+    let mut lines = vec![
+        "**mac-stats insights** (runs.jsonl)".to_string(),
+        format!(
+            "Turns: **{}** · ok {} · fail {} · p50 **{}** ms · mean {} · max {}",
+            insights.turns,
+            insights.ok_count,
+            insights.fail_count,
+            insights.p50_ms,
+            insights.mean_ms,
+            insights.max_ms
+        ),
+    ];
+    if !insights.by_lane.is_empty() {
+        let lanes = insights
+            .by_lane
+            .iter()
+            .map(|(k, v)| format!("{k}:{v}"))
+            .collect::<Vec<_>>()
+            .join(" · ");
+        lines.push(format!("Lanes: {lanes}"));
+    }
+    if !insights.by_tool.is_empty() {
+        let tools = insights
+            .by_tool
+            .iter()
+            .take(8)
+            .map(|(k, v)| format!("{k}×{v}"))
+            .collect::<Vec<_>>()
+            .join(", ");
+        lines.push(format!("Top tools: {tools}"));
+    }
+    if !insights.slowest.is_empty() {
+        lines.push("**Slowest**".into());
+        for s in insights.slowest.iter().take(3) {
+            let q = if s.question_preview.is_empty() {
+                "(empty)"
+            } else {
+                &s.question_preview
+            };
+            lines.push(format!("• {} ms · {} · {}", s.wall_ms, s.lane, q));
+        }
+    }
+    if !insights.candidates.is_empty() {
+        lines.push("**Candidates**".into());
+        for c in insights.candidates.iter().take(4) {
+            lines.push(format!(
+                "• [{}] {} ms — {} ({})",
+                c.kind, c.wall_ms, c.reason, c.question_preview
+            ));
+        }
+    }
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
+/// True for `/insights` / `insights` (Hermes parity).
+pub fn looks_like_insights_request(content: &str) -> bool {
+    let n = content
+        .trim()
+        .trim_start_matches('@')
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_lowercase();
+    let n = n
+        .trim_start_matches("werner")
+        .trim_start_matches(',')
+        .trim()
+        .trim_start_matches("please")
+        .trim();
+    matches!(
+        n,
+        "insights"
+            | "/insights"
+            | "show insights"
+            | "usage insights"
+            | "run insights"
+            | "agent insights"
+    ) || n.starts_with("/insights ")
 }
 
 fn sanitize_under_dir(path: &str, root: &Path) -> Result<PathBuf, String> {
@@ -322,7 +503,7 @@ fn sanitize_under_dir(path: &str, root: &Path) -> Result<PathBuf, String> {
 
 #[cfg(test)]
 mod tests {
-    use super::parse_session_filename;
+    use super::*;
 
     #[test]
     fn parses_session_name() {
@@ -330,5 +511,26 @@ mod tests {
             parse_session_filename("session-memory-discord-20260720-181500-weather.md");
         assert_eq!(src, "discord");
         assert!(slug.contains("weather"));
+    }
+
+    #[test]
+    fn insights_request_detected() {
+        assert!(looks_like_insights_request("/insights"));
+        assert!(looks_like_insights_request("insights"));
+        assert!(looks_like_insights_request("@Werner insights"));
+        assert!(!looks_like_insights_request("any insights on weather?"));
+    }
+
+    #[test]
+    fn version_candidate_classified() {
+        let c = classify_candidate(
+            "lite",
+            26_000,
+            &[],
+            "What version are you?",
+            "abc",
+        );
+        assert!(c.is_some());
+        assert_eq!(c.unwrap().kind, "promote_instant");
     }
 }

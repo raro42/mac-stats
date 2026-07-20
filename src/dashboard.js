@@ -960,7 +960,7 @@ async function refreshAgentOps() {
             invoke('get_runs_insights', { limit: 40 }),
         ]);
         const enabled = (agents || []).filter((a) => a.enabled).length;
-        strip.textContent = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${(files || []).length} session files · p50 ${insights?.p50_ms ?? 0} ms · ${insights?.turns ?? 0} runs`;
+        strip.textContent = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${(files || []).length} session files · p50 ${insights?.p50_ms ?? 0} ms · ${insights?.turns ?? 0} runs${insights?.fail_count ? ` · ${insights.fail_count} fail` : ''}`;
         renderOpsAgents(agents || []);
         renderOpsLive(live || []);
         renderOpsSessionFiles(files || []);
@@ -1091,22 +1091,48 @@ function renderOpsMemory(files) {
 }
 
 function renderOpsRuns(insights) {
+    const card = document.getElementById('ops-runs-insights');
     const el = document.getElementById('ops-runs-list');
     el.innerHTML = '';
+    if (card) card.innerHTML = '';
     if (!insights || !insights.turns) {
         el.innerHTML = '<div class="ops-empty">No runs in ~/.mac-stats/runs.jsonl yet</div>';
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
-    const head = document.createElement('div');
-    head.className = 'ops-empty';
-    head.textContent = `${insights.ok_count}/${insights.turns} ok · mean ${insights.mean_ms} ms · max ${insights.max_ms} ms · ${lanes}`;
-    el.appendChild(head);
+    const tools = (insights.by_tool || [])
+        .slice(0, 6)
+        .map(([k, v]) => `${k}×${v}`)
+        .join(', ');
+    if (card) {
+        const cand = (insights.candidates || [])
+            .slice(0, 4)
+            .map(
+                (c) =>
+                    `<div class="ops-insight-line"><span class="ops-badge">${escapeHtml(c.kind)}</span> ${c.wall_ms} ms — ${escapeHtml(c.reason)} · <em>${escapeHtml(c.question_preview)}</em></div>`
+            )
+            .join('');
+        const slow = (insights.slowest || [])
+            .slice(0, 3)
+            .map(
+                (s) =>
+                    `<div class="ops-insight-line">${s.wall_ms} ms · ${escapeHtml(s.lane)} · ${escapeHtml(s.question_preview || '(empty)')}</div>`
+            )
+            .join('');
+        card.innerHTML = `
+            <div class="ops-insight-title">Insights</div>
+            <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · fail ${insights.fail_count || 0} · mean ${insights.mean_ms} ms · max ${insights.max_ms} ms</div>
+            <div class="ops-row-meta">Lanes: ${escapeHtml(lanes) || '—'}</div>
+            <div class="ops-row-meta">Top tools: ${escapeHtml(tools) || '—'}</div>
+            ${slow ? `<div class="ops-insight-sub">Slowest</div>${slow}` : ''}
+            ${cand ? `<div class="ops-insight-sub">Candidates</div>${cand}` : ''}
+        `;
+    }
     (insights.recent || []).forEach((r) => {
         const div = document.createElement('div');
         div.className = 'ops-row';
-        const tools = (r.tools || []).join(', ') || '—';
-        div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(tools)}${r.ok ? '' : ' · FAIL'}</div></div>`;
+        const t = (r.tools || []).join(', ') || '—';
+        div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(t)}${r.ok ? '' : ' · FAIL'}</div></div>`;
         el.appendChild(div);
     });
 }

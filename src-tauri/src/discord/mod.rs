@@ -2037,6 +2037,17 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // Hermes `/insights` — cheap runs.jsonl report, no Ollama.
+    if crate::commands::harness_ops::looks_like_insights_request(&content) {
+        let report = crate::commands::harness_ops::format_runs_insights_gateway(
+            &crate::commands::harness_ops::compute_runs_insights(80),
+        );
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send insights: {}", e);
+        }
+        return;
+    }
+
     let session_key = format!("discord:{}", channel_id_u64);
     crate::keyed_queue::run_serial(
         session_key,
