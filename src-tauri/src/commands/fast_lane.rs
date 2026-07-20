@@ -91,15 +91,39 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if matches!(n.as_str(), "thanks" | "thank you" | "thx" | "ty" | "danke") {
         return Some("You're welcome.".to_string());
     }
+    if is_version_question(&n) {
+        return Some(format!(
+            "I'm **mac-stats v{}**.",
+            crate::config::Config::version()
+        ));
+    }
     if is_git_commit_push_request(&n) {
         return Some(
-            "I can't run `git commit` / `git push` from Discord — `git` isn't on the RUN_CMD allowlist \
-(only things like `date`, `ls`, `cat`, …). Do the commit locally in the repo, or ask **Cursor Agent** \
-with an explicit path (e.g. `CURSOR_AGENT: in ~/projects/mac-stats commit and push`)."
+            "I won't `git commit` / `git push` from Discord by default (safety). \
+Do it in the repo, or ask **Cursor Agent** with an explicit path \
+(e.g. `CURSOR_AGENT: in ~/projects/mac-stats commit and push`)."
                 .to_string(),
         );
     }
     None
+}
+
+fn is_version_question(n: &str) -> bool {
+    let n = n.trim();
+    matches!(
+        n,
+        "what version"
+            | "what version are you"
+            | "what's your version"
+            | "whats your version"
+            | "which version"
+            | "version"
+            | "app version"
+            | "mac-stats version"
+            | "mac stats version"
+    ) || (n.contains("version")
+        && n.chars().count() < 48
+        && (n.contains("you") || n.contains("app") || n.contains("mac-stats") || n.starts_with("what")))
 }
 
 fn is_git_commit_push_request(n: &str) -> bool {
@@ -210,7 +234,21 @@ mod tests {
         match classify_turn_lane("We shall commit and push latest changes", None) {
             TurnLane::Instant { reply } => {
                 assert!(reply.to_lowercase().contains("git"));
-                assert!(reply.to_lowercase().contains("allowlist") || reply.contains("RUN_CMD"));
+                assert!(
+                    reply.to_lowercase().contains("cursor") || reply.contains("CURSOR_AGENT"),
+                    "expected safety/cursor guidance: {reply}"
+                );
+            }
+            other => panic!("expected Instant, got {:?}", other),
+        }
+    }
+
+    #[test]
+    fn version_ask_is_instant() {
+        match classify_turn_lane("What version are you?", None) {
+            TurnLane::Instant { reply } => {
+                assert!(reply.contains("mac-stats"));
+                assert!(reply.contains(&crate::config::Config::version()));
             }
             other => panic!("expected Instant, got {:?}", other),
         }

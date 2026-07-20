@@ -1,10 +1,12 @@
 # mac-stats
 
-**The AI agent that just gets it done. All local.**
+**Local agent harness. Same loop as OpenClaw / Hermes — on your Mac.**
 
 [![GitHub release](https://img.shields.io/github/v/release/raro42/mac-stats?include_prereleases&style=flat-square)](https://github.com/raro42/mac-stats/releases/latest)
 
-Rust + Tauri menu-bar app for **macOS** (Apple Silicon–first): **live system metrics** and a **serious local Ollama agent** in one place—tools, Discord, tasks, scheduler, and MCP—without shipping your data to a vendor backend.
+Rust + Tauri menu-bar app for **macOS** (Apple Silicon–first): **live system metrics** and a **local Ollama agent** that acts like a real harness—**native tool calling**, one **model → tools → model** loop, Discord, tasks, scheduler, and MCP—without shipping your data to a vendor backend.
+
+**The hook:** Werner (Discord / in-app chat) defaults to a **direct harness**—no criteria / plan / verify meta-LLM tax. Tools are sent as OpenAI/Ollama **`tools` schemas**; the model emits structured **`tool_calls`** (text `TOOL: arg` remains a fallback). Trivial asks (time, ping) answer in milliseconds with **zero** LLM calls. Details: [docs/039_werner_harness_parity.md](docs/039_werner_harness_parity.md).
 
 <img src="screens/data-poster.png" alt="mac-stats Data Poster theme" width="500">
 
@@ -20,15 +22,16 @@ Rust + Tauri menu-bar app for **macOS** (Apple Silicon–first): **live system m
 - **Nine themes**, collapsible sections, and a dashboard for **monitors**, **Ollama**, and more—designed to feel native on macOS.
 - **Low overhead** in normal use: on the order of **~0.5% CPU** with the window closed, **under ~1%** with the CPU window open.
 
-### Local AI agent (Ollama) with a deep toolbelt
+### Local AI agent (Ollama) — harness-first
 
-- **Chat in the app** or **via Discord** using the same engine: multi-step **tool loop**, sub-agents (**`AGENT:`**), **skills**, **memory** (`memory.md`, **MEMORY_APPEND**), and **session compaction** so long threads stay usable.
-- **Web & research:** **`FETCH_URL`** (server-side fetch, **SSRF-hardened**, HTML cleaned before the model sees it), **`BRAVE_SEARCH`**, **`PERPLEXITY_SEARCH`** (optional API keys).
-- **Browser automation (CDP):** navigate, click, scroll, extract, and **`BROWSER_SCREENSHOT`** → PNG under `~/.mac-stats/screenshots/` (handy for Discord attachments).
-- **Automation & coding helpers:** **`RUN_CMD`** (allowlisted), **`RUN_JS`**, **`PYTHON_SCRIPT`** under `~/.mac-stats/scripts/`, **`CURSOR_AGENT`** when the Cursor CLI is on `PATH`.
-- **Integrations:** **`DISCORD_API`**, **`MASTODON_POST`**, **Redmine** helpers, optional **plugins**—plus **any MCP server** (stdio or HTTP/SSE), e.g. [Ori Mnemos](docs/038_ori_mnemos_mcp.md).
-- **Smarter routing:** deterministic **pre-routing** for common intents (fetch URL, search, Discord API, schedules, tasks) so simple asks don’t pay an extra planning hop; **context-overflow auto-recovery** trims oversized tool results and retries instead of failing the whole run.
-- **Quality-of-life:** **completion verification** (did we meet the ask?), **escalation / “try harder”** phrases you can edit, **loop guards** against tool thrash, and user-facing **Ollama error sanitization**.
+- **Direct by default** (`agentHarnessMode: "direct"`) — one execute tool-loop, same shape as OpenClaw/Hermes. Set `"classic"` only if you want the old criteria → plan → verify pipeline.
+- **Native tools by default** (`agentNativeTools: true`) — schemas on `/api/chat`; compact tool catalog in the prompt; text-line tools still work as fallback.
+- **Chat in the app** or **via Discord (Werner)** with the same engine: multi-step tool loop, sub-agents (**`AGENT:`**), **skills**, **memory** (`memory.md`, **MEMORY_APPEND**), and **session compaction**.
+- **Web & research:** **`FETCH_URL`** (server-side, **SSRF-hardened**), **`BRAVE_SEARCH`**, **`PERPLEXITY_SEARCH`**. Weather asks get **Open-Meteo grounding** so search snippets cannot invent temperatures.
+- **Browser automation (CDP):** navigate, click, scroll, extract, and **`BROWSER_SCREENSHOT`** → PNG under `~/.mac-stats/screenshots/`.
+- **Automation & coding:** **`RUN_CMD`** (permissive allowlist under `$HOME`; shells / `sudo` / `rm` still blocked), **`RUN_JS`**, **`PYTHON_SCRIPT`**, **`CURSOR_AGENT`** when the Cursor CLI is on `PATH`.
+- **Integrations:** **`DISCORD_API`**, **`MASTODON_POST`**, **Redmine**, optional **plugins**, **any MCP server** (stdio or HTTP/SSE), e.g. [Ori Mnemos](docs/038_ori_mnemos_mcp.md).
+- **Fast paths:** instant lane (time / ping / thanks), deterministic **pre-routing** (fetch, search, weather, screenshot+URL, …), **context-overflow recovery**, loop guards.
 
 ### Discord, tasks, scheduler, monitoring
 
@@ -75,7 +78,7 @@ All settings live under `~/.mac-stats/`:
 
 ```
 ~/.mac-stats/
-├── config.json            # Window decorations, scheduler interval, ollamaChatTimeoutSecs, browserViewportWidth/Height
+├── config.json            # Window, timeouts, agentHarnessMode, agentNativeTools, browser*, …
 ├── .config.env            # Secrets (Discord, Mastodon, API keys, Perplexity) — never commit ;-)
 ├── discord_channels.json  # Per-channel modes (mention_only, all_messages, having_fun)
 ├── schedules.json         # Cron and one-shot tasks
@@ -111,11 +114,11 @@ Binary name `mac_stats`; app shows as **mac-stats**. From repo root unless noted
 ## Features
 
 ### AI & agents (Ollama, local)
-- **Chat** — In the app window or via Discord. Code execution (JS), **FETCH_URL**, **BRAVE_SEARCH**, **PERPLEXITY_SEARCH** (optional; API key in env, `.config.env`, or Keychain/Settings), **RUN_CMD** (allowlisted), **MASTODON_POST** (toot from the agent), retry and correction.
-- **Completion verification** — We extract 1–3 success criteria at the start and ask “Did we satisfy the request?” at the end; if not, we append a disclaimer. Heuristic: “screenshot requested but none attached” → note. See [docs/025_expectation_check_design_DONE.md](docs/025_expectation_check_design_DONE.md).
+- **Harness** — Default **direct** loop + **native tool schemas** ([parity notes](docs/039_werner_harness_parity.md)). Optional `agentHarnessMode: "classic"` restores criteria/plan/verify.
+- **Chat** — In the app window or via Discord (Werner). **FETCH_URL**, **BRAVE_SEARCH**, **PERPLEXITY_SEARCH**, **RUN_CMD** (permissive allowlist), **MASTODON_POST**, weather grounded via Open-Meteo.
 - **Escalation / “try harder”** — Edit `~/.mac-stats/agents/escalation_patterns.md`; one phrase per line. When your message matches one, we run a stronger pass (+10 tool steps). New phrases you use get auto-added.
 - **Memory** — Global and per-agent `memory.md`; **MEMORY_APPEND**; session compaction writes lessons to memory.
-- **Discord bot** — Optional. @mentions, DMs, or having_fun mode (your Mac chats with other bots when bored); per-channel model/agent. Full Ollama + tools.
+- **Discord bot** — Optional. @mentions, DMs, or having_fun mode; per-channel model/agent. Full Ollama + tools.
 - **Tasks** — `~/.mac-stats/task/` with **TASK_LIST**, **TASK_CREATE**, **TASK_STATUS**, assignees, scheduler loop.
 - **Scheduler** — Cron or one-shot (`~/.mac-stats/schedules.json`); tasks through Ollama; optional Discord reply channel.
 - **MCP** — Tools from any MCP server (HTTP/SSE or stdio). [Ori Mnemos](docs/038_ori_mnemos_mcp.md) vault via `MCP_SERVER_STDIO`.
@@ -149,7 +152,7 @@ Binary name `mac_stats`; app shows as **mac-stats**. From repo root unless noted
 
 ## Inspiration & notes
 
-Local AI agent stack first; system monitoring lives in the menu bar when you need it. Inspired by [Stats](https://github.com/exelban/stats) by exelban (low CPU, native metrics), [OpenClaw](https://github.com/openclaw/openclaw), [browser-use](https://github.com/browser-use/browser-use), and [Hermes](https://github.com/NousResearch/hermes-agent) by Nous Research. Built with Rust + Tauri; metrics use libproc, SMC, IOReport where appropriate.
+**Harness first, metrics always on.** The agent loop is deliberately aligned with [OpenClaw](https://github.com/openclaw/openclaw) and [Hermes](https://github.com/NousResearch/hermes-agent) (native tools, single act–observe loop)—running on **local Ollama**, with system monitoring in the menu bar when you need it. Also inspired by [Stats](https://github.com/exelban/stats) (low CPU, native metrics) and [browser-use](https://github.com/browser-use/browser-use). Built with Rust + Tauri; metrics use libproc, SMC, IOReport where appropriate.
 
 - Menu bar: refresh every 1–2s | Window: 1s | Process list: 15s
 

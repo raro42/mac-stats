@@ -165,6 +165,46 @@ pub(crate) async fn build_agent_descriptions(
 
         base.push_str(SCHEDULE_CRON_EXAMPLES);
     }
+
+    // Direct+native: schemas already carry tool detail. Do not append the classic numbered essays
+    // (they duplicated the compact catalog and burned context — see Discord weather turn logs).
+    if compact_native {
+        let agent_list = crate::agents::load_agents();
+        let cursor_agent_available = crate::commands::cursor_agent::is_cursor_agent_available();
+        if !agent_list.is_empty() || cursor_agent_available {
+            let mut names: Vec<String> = agent_list
+                .iter()
+                .map(|a| a.slug.as_deref().unwrap_or(a.name.as_str()).to_string())
+                .collect();
+            if cursor_agent_available {
+                names.push("cursor-agent".to_string());
+            }
+            base.push_str("\n\n**Agents** — `AGENT: <slug> [task]`. Available: ");
+            base.push_str(&names.join(", "));
+            base.push('.');
+        }
+        if skip_mcp_tool_list {
+            return base;
+        }
+        let Some(server_url) = crate::mcp::get_mcp_server_url() else {
+            return base;
+        };
+        match crate::mcp::list_tools(&server_url).await {
+            Ok(tools) if !tools.is_empty() => {
+                base.push_str(&format!(
+                    "\n\n**MCP** ({} tools) — `MCP: <tool_name> <args>`:\n",
+                    tools.len()
+                ));
+                for t in &tools {
+                    let desc = t.description.as_deref().unwrap_or("");
+                    base.push_str(&format!("- {}: {}\n", t.name, desc));
+                }
+                return base;
+            }
+            _ => return base,
+        }
+    }
+
     let mut num = 6u32;
     if !skills.is_empty() {
         base.push_str(&build_skill_agent_description(num, &skills));
