@@ -331,6 +331,8 @@ fn main() {
                                     &reply.text,
                                     &reply.attachment_paths,
                                     None,
+                                    Some(reply.turn_lane.as_str()),
+                                    reply.verify_passed,
                                 )
                                 .await;
                                 0

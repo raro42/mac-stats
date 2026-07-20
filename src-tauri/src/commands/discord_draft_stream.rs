@@ -18,7 +18,7 @@ enum Cmd {
     Update(String),
     Flush {
         text: String,
-        reply: oneshot::Sender<()>,
+        reply: oneshot::Sender<bool>,
     },
     /// Delete the placeholder message (silent-expected empty final; no `(No reply text.)`).
     AbandonSilent {
@@ -43,7 +43,8 @@ impl DiscordDraftHandle {
     }
 
     /// Replace the message with `text` immediately after any in-flight work, ignoring throttle.
-    pub async fn flush(&self, text: &str) {
+    /// Returns `true` when Discord accepted the edit (or text was empty); `false` on drop/API failure.
+    pub async fn flush(&self, text: &str) -> bool {
         let (reply_tx, reply_rx) = oneshot::channel();
         if self
             .tx
@@ -54,9 +55,9 @@ impl DiscordDraftHandle {
             .is_err()
         {
             debug!(target: "discord/draft", "draft flush dropped (editor stopped)");
-            return;
+            return false;
         }
-        let _ = reply_rx.await;
+        reply_rx.await.unwrap_or(false)
     }
 
     pub fn stop(&self) {
@@ -148,8 +149,8 @@ pub fn spawn_discord_draft_editor(
                     return;
                 }
                 Cmd::Flush { text, reply } => {
-                    let _ = apply_edit(&ctx, &mut message, &text, "draft flush").await;
-                    let _ = reply.send(());
+                    let ok = apply_edit(&ctx, &mut message, &text, "draft flush").await;
+                    let _ = reply.send(ok);
                     break;
                 }
                 Cmd::Update(mut latest) => {
@@ -182,17 +183,10 @@ pub fn spawn_discord_draft_editor(
                                 return;
                             }
                             Ok(Cmd::Flush { text, reply }) => {
-                                if clamp_discord_content(&latest) != last_sent {
-                                    let wait =
-                                        next_allowed.saturating_duration_since(Instant::now());
-                                    if !wait.is_zero() {
-                                        tokio::time::sleep(wait).await;
-                                    }
-                                    let _ = apply_edit(&ctx, &mut message, &latest, "draft update")
-                                        .await;
-                                }
-                                let _ = apply_edit(&ctx, &mut message, &text, "draft flush").await;
-                                let _ = reply.send(());
+                                // Skip intermediate update: flush is authoritative and must win.
+                                let ok =
+                                    apply_edit(&ctx, &mut message, &text, "draft flush").await;
+                                let _ = reply.send(ok);
                                 return;
                             }
                             Ok(Cmd::Stop) => return,

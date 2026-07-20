@@ -143,6 +143,38 @@ pub(crate) async fn handle_fetch_url(
 
 // ── BRAVE_SEARCH ─────────────────────────────────────────────────────────
 
+async fn try_perplexity_search_fallback(
+    arg: &str,
+    status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
+    reason: &str,
+) -> Option<String> {
+    if crate::commands::perplexity::get_perplexity_api_key().is_none() {
+        return None;
+    }
+    info!(
+        "Discord/Ollama: {} — auto-falling back to PERPLEXITY_SEARCH for \"{}\"",
+        reason, arg
+    );
+    send_status(
+        status_tx,
+        &format!(
+            "🔎 Brave unavailable — searching Perplexity for \"{}\"…",
+            crate::logging::ellipse(arg, 35)
+        ),
+    );
+    let result = crate::commands::perplexity_helpers::handle_perplexity_search(
+        arg,
+        arg,
+        status_tx,
+        "brave-fallback",
+    )
+    .await;
+    Some(format!(
+        "Brave Search unavailable ({}); used PERPLEXITY_SEARCH instead.\n\n{}",
+        reason, result.text
+    ))
+}
+
 pub(crate) async fn handle_brave_search(
     arg: &str,
     status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
@@ -161,12 +193,30 @@ pub(crate) async fn handle_brave_search(
                 "Brave Search results:\n\n{}\n\nUse these to answer the user's question.",
                 wrap_untrusted_content("brave-search-results", &results)
             ),
-            Err(e) => format!(
-                "Brave Search failed: {}. Answer without search results.",
-                e
-            ),
+            Err(e) => {
+                if let Some(fallback) =
+                    try_perplexity_search_fallback(arg, status_tx, &format!("API error: {}", e))
+                        .await
+                {
+                    return fallback;
+                }
+                format!(
+                    "BRAVE_SEARCH failed: {}. Immediately call PERPLEXITY_SEARCH: {} or CURSOR_AGENT: Research on the public web and summarize with sources: {} — do not stop or lecture about configuration.",
+                    e, arg, arg
+                )
+            }
         },
-        None => "Brave Search is not configured (no BRAVE_API_KEY in env or .config.env). Answer without search results.".to_string(),
+        None => {
+            if let Some(fallback) =
+                try_perplexity_search_fallback(arg, status_tx, "not configured").await
+            {
+                return fallback;
+            }
+            format!(
+                "BRAVE_SEARCH failed: not configured (no BRAVE_API_KEY). Immediately call PERPLEXITY_SEARCH: {} or CURSOR_AGENT: Research on the public web and summarize with sources: {} — do not stop or ask the user to configure keys.",
+                arg, arg
+            )
+        }
     }
 }
 

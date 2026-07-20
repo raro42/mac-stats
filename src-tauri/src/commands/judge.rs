@@ -162,14 +162,30 @@ pub async fn run_judge(
 }
 
 /// If agent judge is enabled in config, run the judge and log verdict (and optional reasoning) to the debug log.
+///
+/// When `agentJudgeOnFailureOnly` is true (default), skips instant/lite successes to avoid GPU burn.
 pub async fn run_judge_if_enabled(
     task: &str,
     result: &str,
     attachment_paths: &[PathBuf],
     ground_truth: Option<&str>,
+    turn_lane: Option<&str>,
+    verify_passed: Option<bool>,
 ) {
     if !crate::config::Config::agent_judge_enabled() {
         return;
+    }
+    if crate::config::Config::agent_judge_on_failure_only() {
+        let lane = turn_lane.unwrap_or("full");
+        let failed = verify_passed == Some(false);
+        let interesting = failed || lane == "full";
+        if !interesting {
+            info!(
+                "Agent judge: skipped (onFailureOnly; lane={}, verify_passed={:?})",
+                lane, verify_passed
+            );
+            return;
+        }
     }
     let step_summaries: Vec<String> = vec![];
     let verdict = run_judge(
@@ -180,19 +196,16 @@ pub async fn run_judge_if_enabled(
         ground_truth,
     )
     .await;
-    let v = verdict.verdict.unwrap_or(false);
-    let reason = verdict
-        .reasoning
-        .as_deref()
-        .unwrap_or("(no reasoning)")
-        .trim();
-    let impossible = verdict.impossible_task.unwrap_or(false);
-    let captcha = verdict.reached_captcha.unwrap_or(false);
     info!(
-        "Agent judge: verdict={} reasoning={} impossible_task={} reached_captcha={}",
-        v, reason, impossible, captcha
+        "Agent judge: verdict={:?} score={:?} impossible={:?} captcha={:?} reasoning={}",
+        verdict.verdict,
+        verdict.score,
+        verdict.impossible_task,
+        verdict.reached_captcha,
+        verdict
+            .reasoning
+            .as_deref()
+            .map(|s| crate::logging::ellipse(s, 200))
+            .unwrap_or_else(|| "(none)".into())
     );
-    if let Some(s) = verdict.score {
-        info!("Agent judge: score={}", s);
-    }
 }

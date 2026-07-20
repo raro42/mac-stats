@@ -335,6 +335,8 @@ fn run_internal(open_cpu_window: bool) {
             commands::discord::configure_discord,
             commands::discord::is_discord_configured,
             commands::discord::is_discord_gateway_ready,
+            commands::discord::set_discord_gateway_enabled,
+            commands::discord::is_discord_gateway_desired_online,
             // Logging commands
             commands::logging::log_from_js,
             commands::logging::set_chat_verbosity,

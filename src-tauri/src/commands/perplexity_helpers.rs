@@ -252,14 +252,54 @@ async fn auto_screenshot_urls(
 }
 
 pub(crate) fn is_news_query(question: &str) -> bool {
-    let q = question.to_lowercase();
-    q.contains("news")
-        || q.contains("latest")
-        || q.contains("recent")
+    let plain = crate::commands::untrusted_content::humanize_for_discord_status(question);
+    let q = plain.to_lowercase();
+
+    // Dev/git ops must never be treated as news (e.g. "commit and push latest changes").
+    if (q.contains("commit") || q.contains("git "))
+        && (q.contains("push")
+            || q.contains("pull")
+            || q.contains("branch")
+            || q.contains("repo")
+            || q.contains("changes")
+            || q.contains("stage"))
+    {
+        return false;
+    }
+    if q.contains("pull request")
+        || q.contains("merge request")
+        || (q.contains("mac-stats") && q.contains("version"))
+    {
+        return false;
+    }
+
+    // Strong news signals
+    if q.contains("news")
         || q.contains("headlines")
         || q.contains("current events")
-        || q.contains("today")
-        || q.contains("this week")
+        || q.contains("breaking news")
+    {
+        return true;
+    }
+
+    // Temporal words alone are too broad ("latest changes", "today we…"). Require framing.
+    let temporal =
+        q.contains("latest") || q.contains("recent") || q.contains("today") || q.contains("this week");
+    if !temporal {
+        return false;
+    }
+    q.contains("headline")
+        || q.contains("breaking")
+        || q.contains("happening")
+        || q.contains(" in the world")
+        || q.contains("politic")
+        || q.contains("sport")
+        || q.contains("economy")
+        || q.contains("article")
+        || q.contains("what's the latest")
+        || q.contains("whats the latest")
+        || q.contains("what is the latest")
+        || q.contains("top stories")
 }
 
 pub(crate) fn normalized_search_result_domain(url: &str) -> String {
@@ -549,6 +589,18 @@ pub(crate) fn build_perplexity_verbose_summary(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn is_news_query_rejects_commit_and_push_latest_changes() {
+        assert!(!is_news_query("We shall commit and push latest changes"));
+        assert!(!is_news_query("git commit and push"));
+    }
+
+    #[test]
+    fn is_news_query_accepts_real_news() {
+        assert!(is_news_query("What's the latest news about Barcelona?"));
+        assert!(is_news_query("Show me today's headlines"));
+    }
 
     #[test]
     fn perplexity_verbose_summary_zero_results() {

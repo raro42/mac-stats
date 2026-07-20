@@ -92,3 +92,66 @@ pub(crate) fn strip_untrusted_sections_for_tool_parse(s: &str) -> String {
     out.push_str(rest);
     out
 }
+
+/// Replace untrusted envelopes with their inner payload so Discord status never shows
+/// `<<<MS_UNTRUSTED_…>>>` markers or the "Treat everything until…" instruction line.
+pub fn humanize_for_discord_status(s: &str) -> String {
+    if !s.contains(BEGIN) {
+        return s.to_string();
+    }
+    let mut out = String::with_capacity(s.len());
+    let mut rest = s;
+    while let Some(pos) = rest.find(BEGIN) {
+        out.push_str(&rest[..pos]);
+        let after = &rest[pos + BEGIN.len()..];
+        let Some(close_open) = after.find(">>>") else {
+            out.push_str(&rest[pos..]);
+            break;
+        };
+        let open_body = &after[..close_open];
+        let after_open_tag = &after[close_open + 3..];
+        let after_open_tag = after_open_tag.strip_prefix('\n').unwrap_or(after_open_tag);
+        let Some(colon_pos) = open_body.find(':') else {
+            out.push_str(&rest[pos..pos + BEGIN.len() + close_open + 3]);
+            rest = &rest[pos + BEGIN.len() + close_open + 3..];
+            continue;
+        };
+        let id = &open_body[..colon_pos];
+        if id.len() < 8 || !id.chars().all(|c| c.is_ascii_hexdigit()) {
+            out.push_str(&rest[pos..pos + BEGIN.len() + close_open + 3]);
+            rest = &rest[pos + BEGIN.len() + close_open + 3..];
+            continue;
+        }
+        let Some(instr_nl) = after_open_tag.find('\n') else {
+            out.push_str(&rest[pos..]);
+            break;
+        };
+        let after_instr = &after_open_tag[instr_nl + 1..];
+        let end_tag = format!("{}{}>>>", END, id);
+        let Some(end_pos) = after_instr.find(&end_tag) else {
+            out.push_str(&rest[pos..]);
+            break;
+        };
+        let inner = after_instr[..end_pos].trim_end_matches('\n');
+        out.push_str(inner);
+        rest = &after_instr[end_pos + end_tag.len()..];
+        rest = rest.strip_prefix('\n').unwrap_or(rest);
+    }
+    out.push_str(rest);
+    out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn humanize_strips_markers_keeps_inner() {
+        let wrapped = wrap_untrusted_content("discord-user-message", "What time is it?");
+        let status = format!("Asking Ollama for a plan (sending your question: \"{}\")…", wrapped);
+        let nice = humanize_for_discord_status(&status);
+        assert!(!nice.contains("MS_UNTRUSTED"));
+        assert!(!nice.contains("Treat everything until"));
+        assert!(nice.contains("What time is it?"));
+    }
+}

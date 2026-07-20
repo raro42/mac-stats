@@ -59,33 +59,37 @@ fn brave_key_from_config_env_file(path: &Path) -> Option<String> {
     Some(key)
 }
 
-/// Get Brave API key: BRAVE_API_KEY env, then .config.env (cwd, cwd/src-tauri, ~/.mac-stats).
+/// Get Brave API key: BRAVE_API_KEY / BRAVE-API-KEY env, then .config.env (cwd, cwd/src-tauri,
+/// ~/.mac-stats, and `$HOME/projects/mac-stats/src-tauri` for app-bundle launches).
 /// In .config.env use BRAVE_API_KEY=... or BRAVE-API-KEY=...
 pub fn get_brave_api_key() -> Option<String> {
-    if let Ok(k) = std::env::var("BRAVE_API_KEY") {
-        let k = k.trim().to_string();
-        if !k.is_empty() {
-            return Some(k);
+    for env_key in ["BRAVE_API_KEY", "BRAVE-API-KEY"] {
+        if let Ok(k) = std::env::var(env_key) {
+            let k = k.trim().to_string();
+            if !k.is_empty() {
+                return Some(k);
+            }
         }
     }
+    let mut candidates: Vec<std::path::PathBuf> = Vec::new();
     if let Ok(cwd) = std::env::current_dir() {
         // .config.env in current directory (e.g. when run from src-tauri)
-        let p = cwd.join(".config.env");
-        if p.is_file() {
-            if let Some(k) = brave_key_from_config_env_file(&p) {
-                return Some(k);
-            }
-        }
+        candidates.push(cwd.join(".config.env"));
         // src-tauri/.config.env when run from project root
-        let p_src = cwd.join("src-tauri").join(".config.env");
-        if p_src.is_file() {
-            if let Some(k) = brave_key_from_config_env_file(&p_src) {
-                return Some(k);
-            }
-        }
+        candidates.push(cwd.join("src-tauri").join(".config.env"));
     }
     if let Ok(home) = std::env::var("HOME") {
-        let p = Path::new(&home).join(".mac-stats").join(".config.env");
+        candidates.push(Path::new(&home).join(".mac-stats").join(".config.env"));
+        // App bundle / LaunchAgent often starts with cwd outside the repo.
+        candidates.push(
+            Path::new(&home)
+                .join("projects")
+                .join("mac-stats")
+                .join("src-tauri")
+                .join(".config.env"),
+        );
+    }
+    for p in candidates {
         if p.is_file() {
             if let Some(k) = brave_key_from_config_env_file(&p) {
                 return Some(k);

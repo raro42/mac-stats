@@ -107,6 +107,9 @@ pub struct OllamaRequest {
     pub retry_count: u32,
     /// When set (Discord agent path), tool loop updates this message with throttled edits until flush.
     pub discord_draft: Option<crate::commands::discord_draft_stream::DiscordDraftHandle>,
+    /// When true (Discord verbose), show planning/tool progress in the draft message. When false, leave
+    /// the draft as Thinking… and rely on Discord typing indicators until the final flush.
+    pub discord_show_progress: bool,
     /// When set, appended under `## Heartbeat` in the execution system prompt (e.g. periodic heartbeat runs).
     pub heartbeat_system_append: Option<String>,
     /// Override compaction hook `source` label (default: `discord` when `discord_reply_channel_id` is set, else `agent_router`).
@@ -182,6 +185,7 @@ pub fn answer_with_ollama_and_fetch(
         request_id_override,
         retry_count,
         discord_draft,
+        discord_show_progress,
         heartbeat_system_append,
         compaction_hook_source,
         compaction_hook_session_id,
@@ -463,12 +467,89 @@ pub fn answer_with_ollama_and_fetch(
             }
         };
 
+        // --- Fast / lite lane: classify before burning GPU on meta-LLM calls ---
+        let turn_clock = crate::commands::run_telemetry::TurnClock::start();
+        let plain_for_lane =
+            crate::commands::untrusted_content::humanize_for_discord_status(&request_for_verification);
+        let pre_routed_early = compute_pre_routed_recommendation(
+            question,
+            &request_for_verification,
+            is_verification_retry,
+        );
+        let turn_lane = crate::commands::fast_lane::classify_turn_lane(
+            &plain_for_lane,
+            pre_routed_early.as_deref(),
+        );
+        if let crate::commands::fast_lane::TurnLane::Instant { reply } = &turn_lane {
+            if !is_verification_retry {
+                mac_stats_info!(
+                    "ollama/chat",
+                    "Agent router [{}]: INSTANT lane (0 LLM calls) — {}",
+                    request_id,
+                    crate::logging::ellipse(reply, 80)
+                );
+                crate::commands::turn_lifecycle::unregister_if_matches(coord_key, &request_id);
+                crate::commands::run_telemetry::record_turn(
+                    &crate::commands::run_telemetry::TurnRunRecord {
+                        ts: chrono::Utc::now().to_rfc3339(),
+                        request_id: request_id.clone(),
+                        channel_id: discord_reply_channel_id,
+                        entry: if discord_reply_channel_id.is_some() {
+                            "discord".into()
+                        } else {
+                            "agent_router".into()
+                        },
+                        lane: "instant".into(),
+                        question_preview:
+                            crate::commands::run_telemetry::TurnRunRecord::question_preview_from(
+                                &request_for_verification,
+                            ),
+                        wall_ms: turn_clock.wall_ms(),
+                        tools: vec![],
+                        tool_steps: 0,
+                        pre_routed: pre_routed_early.is_some(),
+                        verify_passed: None,
+                        reply_chars: reply.chars().count(),
+                        skipped_criteria_llm: true,
+                        skipped_topic_llm: true,
+                        skipped_verify_llm: true,
+                        skipped_plan_llm: true,
+                        ok: true,
+                        error: None,
+                    },
+                );
+                return Ok(OllamaReply {
+                    text: reply.clone(),
+                    attachment_paths: vec![],
+                    silent_user_output,
+                    turn_lane: "instant".into(),
+                    verify_passed: None,
+                    ..Default::default()
+                });
+            }
+        }
+        let skip_meta_llms = turn_lane.skips_meta_llms();
+        let lane_name = turn_lane.name().to_string();
+        let pre_routed_for_turn = pre_routed_early.clone();
+        if skip_meta_llms {
+            mac_stats_info!(
+                "ollama/chat",
+                "Agent router [{}]: LITE lane ({}) — skipping criteria/topic/verify meta-LLMs",
+                request_id,
+                lane_name
+            );
+        }
+
         let model_not_in_catalog_note_for_turn = model_not_in_catalog_note.clone();
         let turn_body = {
             let og = output_gate.clone();
             let forward_for_tool_loop = forward_for_tool_loop.clone();
             let qspec = ollama_http_q;
             let model_note_for_reply = model_not_in_catalog_note_for_turn.clone();
+            let skip_meta_llms = skip_meta_llms;
+            let lane_name = lane_name.clone();
+            let pre_routed_for_turn = pre_routed_for_turn.clone();
+            let turn_clock = turn_clock;
             async move {
                 crate::ollama_queue::with_ollama_http_queue(qspec, || async move {
         if silent_user_output {
@@ -521,20 +602,21 @@ pub fn answer_with_ollama_and_fetch(
                 q_preview
             );
         }
-        // Discord message limit 2000; wrapper ~50 chars → leave room for full question
-        const DISCORD_STATUS_QUESTION_MAX: usize = 1940;
+        // Discord status lines stay short; never dump MS_UNTRUSTED wrappers into the channel.
         let truncate_status = |s: &str, max: usize| {
-            let taken: String = s.chars().take(max).collect();
-            if s.chars().count() > max {
+            let human = crate::commands::untrusted_content::humanize_for_discord_status(s);
+            let taken: String = human.chars().take(max).collect();
+            if human.chars().count() > max {
                 format!("{}…", taken)
             } else {
                 taken
             }
         };
-        send_status(&format!(
-            "Asking Ollama for a plan (sending your question: \"{}\")…",
-            truncate_status(question, DISCORD_STATUS_QUESTION_MAX)
-        ));
+        send_status(if skip_meta_llms {
+            "⚡ Fast path…"
+        } else {
+            "🧭 Planning…"
+        });
 
         // Heartbeat turns: skip the extra /api/chat for success criteria and skip MCP tools/list so the
         // beat stays on one executor with fewer blocking edges (see openclaw heartbeat periodic check).
@@ -542,10 +624,13 @@ pub fn answer_with_ollama_and_fetch(
 
         // Criteria at start: extract 1–3 success criteria to feed into end verification
         if heartbeat_fast_preamble {
-            send_status("Heartbeat: skipping LLM success-criteria extraction…");
+            send_status("💓 Heartbeat — skipping success-criteria extraction…");
+        } else if skip_meta_llms {
+            send_status("⚡ Lite path — fixed success criteria…");
         } else {
-            send_status("Extracting success criteria…");
+            send_status("🎯 Extracting success criteria…");
         }
+        let skipped_criteria_llm = heartbeat_fast_preamble || skip_meta_llms;
         let success_criteria = if heartbeat_fast_preamble {
             mac_stats_info!(
                 "ollama/chat",
@@ -553,6 +638,15 @@ pub fn answer_with_ollama_and_fetch(
                 request_id
             );
             None
+        } else if skip_meta_llms {
+            mac_stats_info!(
+                "ollama/chat",
+                "Agent router [{}]: lite lane — using fixed success criteria (no LLM)",
+                request_id
+            );
+            Some(crate::commands::fast_lane::lite_success_criteria(
+                pre_routed_for_turn.as_deref(),
+            ))
         } else if let Some(criteria) = success_criteria_override.clone() {
             mac_stats_info!(
                 "ollama/chat",
@@ -617,24 +711,30 @@ pub fn answer_with_ollama_and_fetch(
             }
         };
         send_status(&format!(
-            "EDIT:Extracted success criteria: {}",
+            "EDIT:🎯 Success criteria: {}",
             criteria_status
         ));
-
         let mut is_new_topic = false;
+        let mut skipped_topic_llm = true;
         // 6.A New-topic check: one short LLM call when we have history and use a local model.
         // Skip when using a cloud model to minimize cost (only when cloud do we care about extra calls).
         // Skip on verification retry so the model keeps context (original request, cookie consent, etc.).
-        if is_verification_retry || crate::ollama::models::is_cloud_model(&effective_model) {
+        // Skip on lite/instant lanes — meta GPU burn is not worth it for pre-routed/trivial turns.
+        if is_verification_retry
+            || skip_meta_llms
+            || crate::ollama::models::is_cloud_model(&effective_model)
+        {
             mac_stats_debug!("ollama/chat",
                 request_id = %request_id,
                 verification_retry = is_verification_retry,
-                "skipping new-topic check (retry or cloud model)"
+                skip_meta_llms,
+                "skipping new-topic check (retry, lite lane, or cloud model)"
             );
         } else if let Some(ref hist) = conversation_history {
             const NEW_TOPIC_MIN_HISTORY: usize = 2;
             if hist.len() >= NEW_TOPIC_MIN_HISTORY {
-                send_status("Checking if new topic…");
+                skipped_topic_llm = false;
+                send_status("🧵 Checking if new topic…");
                 let summary = summarize_last_turns(hist, 3);
                 match detect_new_topic(question, &summary, &effective_model).await {
                     Ok(true) => {
@@ -682,7 +782,9 @@ pub fn answer_with_ollama_and_fetch(
             );
         }
 
-        send_status("Compacting session memory…");
+        if raw_history.len() >= crate::commands::compaction::COMPACTION_THRESHOLD {
+            send_status("🧠 Compacting session memory…");
+        }
         let hook_source_for_ori = compaction_lifecycle.hook_source.clone();
         let conversation_history = prepare_conversation_history(
             raw_history,
@@ -782,12 +884,9 @@ pub fn answer_with_ollama_and_fetch(
             _ => String::new(),
         };
 
-        // --- Pre-routing: deterministic tool dispatch for unambiguous patterns ---
-        let pre_routed_recommendation = compute_pre_routed_recommendation(
-            question,
-            &request_for_verification,
-            is_verification_retry,
-        );
+        // --- Pre-routing: already computed before the turn (reuse; skip RECOMMEND when set) ---
+        let pre_routed_recommendation = pre_routed_for_turn.clone();
+        let skipped_plan_llm = pre_routed_recommendation.is_some();
 
         // --- Planning step: ask Ollama how it would solve the question (skip if pre-routed) ---
         let mut recommendation = if let Some(pre_routed) = pre_routed_recommendation {
@@ -904,7 +1003,7 @@ pub fn answer_with_ollama_and_fetch(
             recommendation.chars().take(200).collect::<String>()
         );
         send_status(&format!(
-            "Executing plan: {}…",
+            "⚙️ Executing: {}…",
             truncate_status(&recommendation, 72)
         ));
 
@@ -1202,6 +1301,7 @@ pub fn answer_with_ollama_and_fetch(
             options_override: options_override.clone(),
             status_tx: status_for_tool_loop,
             discord_draft: discord_draft_for_tool_loop,
+            discord_show_progress: discord_show_progress && !silent_user_output,
             discord_reply_channel_id,
             allow_schedule,
             load_global_memory,
@@ -1338,10 +1438,18 @@ pub fn answer_with_ollama_and_fetch(
 
         // Completion verification: one short Ollama call; if not satisfied, retry once (A2) or append disclaimer
         let criteria_count = success_criteria.as_ref().map(|c| c.len()).unwrap_or(0);
+        let skipped_verify_llm = heartbeat_fast_preamble || skip_meta_llms;
         let verification_result = if heartbeat_fast_preamble {
             mac_stats_info!(
                 "ollama/chat",
                 "Agent router [{}]: heartbeat mode — skipping completion verification LLM call",
+                request_id
+            );
+            Ok((true, None))
+        } else if skip_meta_llms {
+            mac_stats_info!(
+                "ollama/chat",
+                "Agent router [{}]: lite lane — skipping completion verification LLM call",
                 request_id
             );
             Ok((true, None))
@@ -1365,6 +1473,11 @@ pub fn answer_with_ollama_and_fetch(
             )
             .await
         };
+        let verify_passed: Option<bool> = match &verification_result {
+            Ok((ok, _)) => Some(*ok),
+            Err(_) => None,
+        };
+        let mut cursor_handoff_replaced_reply = false;
         match verification_result {
             Ok((false, reason)) => {
                 // Use only the user's question for memory search — not the verification reason.
@@ -1441,6 +1554,7 @@ pub fn answer_with_ollama_and_fetch(
                         request_id_override: Some(request_id.clone()),
                         retry_count: 1,
                         discord_draft,
+                        discord_show_progress,
                         heartbeat_system_append: heartbeat_system_append.clone(),
                         compaction_hook_source,
                         compaction_hook_session_id,
@@ -1468,9 +1582,12 @@ pub fn answer_with_ollama_and_fetch(
                     mac_stats_info!("ollama/chat", 
                         "Agent router: verification not satisfied, handing off to Cursor Agent (general fallback)"
                     );
-                    let request_clone = request_for_verification.clone();
+                    let handoff_prompt = crate::commands::cursor_agent::build_cursor_handoff_prompt(
+                        &request_for_verification,
+                        reason.as_deref(),
+                    );
                     match tokio::task::spawn_blocking(move || {
-                        crate::commands::cursor_agent::run_cursor_agent(&request_clone)
+                        crate::commands::cursor_agent::run_cursor_agent(&handoff_prompt)
                     })
                     .await
                     .map_err(|e| format!("Cursor Agent handoff task: {}", e))
@@ -1487,6 +1604,7 @@ pub fn answer_with_ollama_and_fetch(
                                 "The local model couldn't fully complete this, so I handed it off to Cursor Agent. Here's what it did:\n\n",
                             );
                             response_content.push_str(cursor_result.trim());
+                            cursor_handoff_replaced_reply = true;
                         }
                         Err(e) => {
                             mac_stats_info!(
@@ -1548,7 +1666,10 @@ pub fn answer_with_ollama_and_fetch(
             }
         }
 
-        let final_text = if discord_reply_channel_id.is_some()
+        let final_text = if cursor_handoff_replaced_reply {
+            // Cursor handoff is the user-visible answer — do not prepend the failed intermediate.
+            response_content
+        } else if discord_reply_channel_id.is_some()
             && discord_intermediate.as_ref().is_some()
         {
             let inter = discord_intermediate.as_ref().unwrap();
@@ -1607,6 +1728,44 @@ pub fn answer_with_ollama_and_fetch(
             }
         }
 
+        let mut tools: Vec<String> = tool_loop_state
+            .tool_steps
+            .iter()
+            .map(|s| s.tool_name.clone())
+            .collect();
+        tools.sort();
+        tools.dedup();
+        let tool_steps = tool_loop_state.tool_steps.len() as u32;
+        crate::commands::run_telemetry::record_turn(
+            &crate::commands::run_telemetry::TurnRunRecord {
+                ts: chrono::Utc::now().to_rfc3339(),
+                request_id: request_id.clone(),
+                channel_id: discord_reply_channel_id,
+                entry: if discord_reply_channel_id.is_some() {
+                    "discord".into()
+                } else {
+                    "agent_router".into()
+                },
+                lane: lane_name.clone(),
+                question_preview:
+                    crate::commands::run_telemetry::TurnRunRecord::question_preview_from(
+                        &request_for_verification,
+                    ),
+                wall_ms: turn_clock.wall_ms(),
+                tools,
+                tool_steps,
+                pre_routed: skipped_plan_llm,
+                verify_passed,
+                reply_chars: final_text.chars().count(),
+                skipped_criteria_llm,
+                skipped_topic_llm,
+                skipped_verify_llm,
+                skipped_plan_llm,
+                ok: true,
+                error: None,
+            },
+        );
+
         Ok(OllamaReply {
             text: final_text,
             attachment_paths,
@@ -1614,6 +1773,8 @@ pub fn answer_with_ollama_and_fetch(
             directive_attach_screenshot: directive_flags.attach_screenshot,
             directive_split_long: directive_flags.split_long,
             silent_user_output,
+            turn_lane: lane_name,
+            verify_passed,
         })
         })
         .await

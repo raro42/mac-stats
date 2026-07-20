@@ -70,3 +70,16 @@ pub fn is_discord_configured() -> Result<bool, String> {
 pub fn is_discord_gateway_ready() -> Result<bool, String> {
     Ok(crate::discord::discord_bot_gateway_ready())
 }
+
+/// Enable or disable the Discord gateway (CPU icon toggle). Does not change the stored token.
+/// Returns the desired online state after the call.
+#[tauri::command]
+pub fn set_discord_gateway_enabled(enabled: bool) -> Result<bool, String> {
+    Ok(crate::discord::set_discord_gateway_enabled(enabled))
+}
+
+/// Whether the user wants Discord online (may still be connecting after enable).
+#[tauri::command]
+pub fn is_discord_gateway_desired_online() -> Result<bool, String> {
+    Ok(crate::discord::discord_gateway_desired_online())
+}

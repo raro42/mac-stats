@@ -90,6 +90,27 @@ fn read_config_env_key(path: &std::path::Path, key: &str) -> Option<String> {
     None
 }
 
+/// Build a handoff prompt for verification fallback (research / general tasks, not repo coding).
+pub fn build_cursor_handoff_prompt(user_request: &str, verification_reason: Option<&str>) -> String {
+    let mut prompt = String::from(
+        "Complete this Discord user request thoroughly. Use web search and any tools you have. \
+         Prefer factual answers with sources/links for people, companies, or current events. \
+         This is not a coding task in the mac-stats repository unless the user explicitly asked for code changes.\n\n",
+    );
+    prompt.push_str("User request:\n");
+    prompt.push_str(user_request.trim());
+    prompt.push('\n');
+    if let Some(reason) = verification_reason.map(str::trim).filter(|s| !s.is_empty()) {
+        prompt.push_str("\nPrior local attempt failed verification because:\n");
+        prompt.push_str(reason);
+        prompt.push('\n');
+    }
+    prompt.push_str(
+        "\nReturn a clear final answer the user can read in Discord. Do not say web tools are blocked if you can search.",
+    );
+    prompt
+}
+
 /// Run cursor-agent with a prompt in headless mode. Returns stdout or error.
 /// Timeout: 120 seconds (cursor-agent tasks can take a while).
 pub fn run_cursor_agent(prompt: &str) -> Result<String, String> {

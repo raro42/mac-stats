@@ -263,6 +263,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tasks** — **`tasks/CLOSED-20260321-2000-openclaw-hung-turn-timeout-event-gate.md`**: **Re-verify** (**2026-03-30**, Spanish, **`003-tester` / `TESTER.md`**, única tarea lógica **`UNTESTED-…`**): path absent; **`CLOSED-` → `TESTING-`**; **`cargo check`** / **`cargo test`** (**875** lib); turn-gate **`rg`** in **`src-tauri/src`** (`commands/ollama.rs`, `turn_lifecycle.rs`, `tool_loop.rs`); top-level **`src/`** — no Rust matches — pass → **`CLOSED-…`**. **Plus** agent-run **Re-verify** subsection (same UTC date, acceptance 1–4, **`rg`** commands). **Plus** **Cursor** **Re-verify** block (solo **`UNTESTED-…`**, **`src-tauri/src`** vs root **`src/`** note, acceptance 1–4).
 - **Tasks** — **`tasks/UNTESTED-20260330-2030-openclaw-operator-task-pressure-summary.md`**: triage (**TOP**) — English coder line with explicit on-disk **`FEAT-20260330-2030-openclaw-operator-task-pressure-summary.md` → `WIP-…` → `UNTESTED-…`**; **Section 6** “canonical handoff” line **English** (source of truth after **`WIP → UNTESTED`**, do not strip on prefix renames); **Section 6** FEATURE-CODER wording uses literal **`FEAT-…` → `WIP-…` → `UNTESTED-…`**.
 
+## [0.1.87] - 2026-07-20
+
+### Added
+- **Discord fast / lite lanes** — instant answers for time/ping (and clear git commit/push refusal); lite path skips criteria/topic/verify meta-LLMs for pre-routed tools.
+- **Turn telemetry** — `~/.mac-stats/runs.jsonl` plus `scripts/digest_agent_runs.py` for continuous improvement digests.
+- **Quiet Discord UX** — default verbose off for DMs; typing-only progress when quiet; sanitize `MS_UNTRUSTED` out of status text; emoji progress when verbose.
+
+### Fixed
+- **Draft delivery** — route verbose status into the draft message; flush failure falls back to a new message.
+- **Escalation false positive** — short patterns like `no` are whole-word only (so `now` no longer escalates time asks).
+- **News misclassify** — `latest changes` / commit+push no longer treated as news (avoids Perplexity retry timeouts).
+- **Search config** — Brave/Perplexity key path hardening and clearer tool failures when search is missing.
+
+### Changed
+- **Judge** — when enabled, defaults to failure/full-lane only (`agentJudgeOnFailureOnly`).
+- **Discord icon** — click toggles gateway connect/disconnect in the CPU window.
+
 ## [0.1.86] - 2026-07-17
 
 ### Added

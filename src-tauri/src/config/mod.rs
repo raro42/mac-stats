@@ -767,6 +767,32 @@ impl Config {
         false
     }
 
+    /// When true (default), the optional agent judge only runs if verification failed or the turn
+    /// lane is `full`. Set `agentJudgeOnFailureOnly: false` to judge every enabled run (costly).
+    pub fn agent_judge_on_failure_only() -> bool {
+        if let Ok(s) = std::env::var("MAC_STATS_AGENT_JUDGE_ON_FAILURE_ONLY") {
+            let lower = s.to_lowercase();
+            if lower == "false" || lower == "0" || lower == "no" {
+                return false;
+            }
+            if lower == "true" || lower == "1" || lower == "yes" {
+                return true;
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(b) = json
+                    .get("agentJudgeOnFailureOnly")
+                    .and_then(|v| v.as_bool())
+                {
+                    return b;
+                }
+            }
+        }
+        true
+    }
+
     /// Ratio (0.0–1.0) at which a budget warning is injected into the agent tool loop.
     /// When (tool_count + 1) / max_tool_iterations >= this ratio, a warning is appended telling
     /// the model to consolidate results. Set to 0.0 or 1.0 to disable. Default 0.75.

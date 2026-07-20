@@ -2209,10 +2209,10 @@ function updateDiscordIconStatus(connected) {
   if (!discordIcon) return;
   if (connected) {
     discordIcon.classList.add('status-good');
-    discordIcon.title = 'Discord bot connected';
+    discordIcon.title = 'Discord connected — click to disconnect';
   } else {
     discordIcon.classList.remove('status-good');
-    discordIcon.title = 'Discord bot disconnected';
+    discordIcon.title = 'Discord disconnected — click to connect';
   }
 }
 
@@ -2227,7 +2227,59 @@ async function refreshDiscordIconStatus() {
   }
 }
 
+let discordToggleInFlight = false;
+
+async function toggleDiscordGatewayFromIcon() {
+  if (discordToggleInFlight) return;
+  const inv = getInvoke() || invoke;
+  if (!inv) return;
+  discordToggleInFlight = true;
+  const discordIcon = document.getElementById('icon-discord');
+  try {
+    let ready = false;
+    try {
+      ready = !!(await inv('is_discord_gateway_ready'));
+    } catch (_) {
+      ready = false;
+    }
+    if (ready) {
+      updateDiscordIconStatus(false);
+      if (discordIcon) discordIcon.title = 'Discord disconnecting…';
+      await inv('set_discord_gateway_enabled', { enabled: false });
+      updateDiscordIconStatus(false);
+      console.log('[CPU] Discord gateway disabled via icon');
+    } else {
+      if (discordIcon) discordIcon.title = 'Discord connecting…';
+      await inv('set_discord_gateway_enabled', { enabled: true });
+      // Poll briefly until Ready (or timeout) so the icon turns green
+      for (let i = 0; i < 20; i++) {
+        await new Promise((r) => setTimeout(r, 500));
+        const nowReady = !!(await inv('is_discord_gateway_ready'));
+        if (nowReady) {
+          updateDiscordIconStatus(true);
+          console.log('[CPU] Discord gateway ready via icon');
+          return;
+        }
+      }
+      await refreshDiscordIconStatus();
+      console.log('[CPU] Discord gateway enable requested (still connecting or failed)');
+    }
+  } catch (err) {
+    console.error('[CPU] Discord toggle failed:', err);
+    await refreshDiscordIconStatus();
+  } finally {
+    discordToggleInFlight = false;
+  }
+}
+
 function initDiscordIconStatus() {
+  const discordIcon = document.getElementById('icon-discord');
+  if (discordIcon) {
+    discordIcon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleDiscordGatewayFromIcon();
+    });
+  }
   refreshDiscordIconStatus();
   setInterval(refreshDiscordIconStatus, 5000);
 }

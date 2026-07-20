@@ -599,14 +599,14 @@ fn channel_settings(channel_id: u64) -> ChannelSettings {
         .unwrap_or_else(|| default.clone())
 }
 
-/// Default verbose for DMs (when not set in message). From discord_channels.json "default_verbose_for_dm", default true.
+/// Default verbose for DMs (when not set in message). From discord_channels.json "default_verbose_for_dm", default false.
 fn default_verbose_for_dm() -> bool {
     ensure_channel_config_loaded();
     let guard = match CHANNEL_CONFIG.read() {
         Ok(g) => g,
-        Err(_) => return true,
+        Err(_) => return false,
     };
-    guard.as_ref().map(|(_, _, _, _, v, _)| *v).unwrap_or(true)
+    guard.as_ref().map(|(_, _, _, _, v, _)| *v).unwrap_or(false)
 }
 
 /// Default verbose for channel messages (when not set in message). From discord_channels.json "default_verbose_for_channel", default false.
@@ -906,6 +906,10 @@ async fn having_fun_background_loop(ctx: Context) {
     let mut tick_count: u64 = 0;
     loop {
         interval.tick().await;
+        if !DISCORD_DESIRED_ONLINE.load(Ordering::SeqCst) || bot_user_id().is_none() {
+            info!("Having fun: exiting background loop (Discord disconnected)");
+            break;
+        }
         tick_count = tick_count.wrapping_add(1);
 
         ensure_having_fun_state_for_configured_channels();
@@ -1636,10 +1640,19 @@ pub fn parse_discord_ollama_overrides(
             || lower == "verbose:"
             || lower == "verbose: true"
             || lower == "verbose=true"
+            || lower == "verbose on"
+            || lower == "verbose: on"
+            || lower == "/verbose"
+            || lower == "/verbose on"
         {
             verbose = Some(true);
             consumed += 1;
-        } else if lower == "verbose: false" || lower == "verbose=false" {
+        } else if lower == "verbose: false"
+            || lower == "verbose=false"
+            || lower == "verbose off"
+            || lower == "verbose: off"
+            || lower == "/verbose off"
+        {
             verbose = Some(false);
             consumed += 1;
         } else if lower.starts_with("model:") {
@@ -1781,26 +1794,83 @@ fn message_wants_agent_tools(content: &str) -> bool {
 
 /// True if the message indicates the user is not satisfied and wants the task actually completed.
 /// Patterns are loaded from ~/.mac-stats/agents/escalation_patterns.md (one phrase per line; user-editable).
+///
+/// Short patterns (≤3 chars, e.g. `no`) use whole-word matching so `now` / `note` do not false-trigger.
+/// Instant-lane questions (time/ping) never escalate.
 fn is_escalation_message(question: &str) -> bool {
-    let lower = question.trim().to_lowercase();
+    let plain = crate::commands::untrusted_content::humanize_for_discord_status(question);
+    let lower = plain.trim().to_lowercase();
     if lower.is_empty() {
         return false;
     }
+    // Never escalate clock/ping asks — they are Instant-lane and must stay cheap.
+    if matches!(
+        crate::commands::fast_lane::classify_turn_lane(&plain, None),
+        crate::commands::fast_lane::TurnLane::Instant { .. }
+    ) {
+        return false;
+    }
     let patterns = crate::config::Config::load_escalation_patterns();
-    patterns.iter().any(|p| lower.contains(&p.to_lowercase()))
+    patterns.iter().any(|p| escalation_pattern_matches(&lower, p))
 }
 
-/// True if we already spawned the gateway thread (only one gateway per process).
+fn escalation_pattern_matches(haystack_lower: &str, pattern: &str) -> bool {
+    let p = pattern.trim().to_lowercase();
+    if p.is_empty() {
+        return false;
+    }
+    // Short tokens: require a whole word so "no" does not match "now".
+    if p.chars().count() <= 3 {
+        return haystack_lower
+            .split(|c: char| !c.is_alphanumeric())
+            .any(|w| w == p);
+    }
+    haystack_lower.contains(&p)
+}
+
+#[cfg(test)]
+mod escalation_match_tests {
+    use super::escalation_pattern_matches;
+
+    #[test]
+    fn short_no_does_not_match_now() {
+        assert!(!escalation_pattern_matches("what time is it now?", "no"));
+        assert!(escalation_pattern_matches("no, try again", "no"));
+    }
+
+    #[test]
+    fn longer_phrase_still_substring() {
+        assert!(escalation_pattern_matches(
+            "please try again later",
+            "try again"
+        ));
+    }
+}
+
+/// True if a gateway thread is running (or starting). Cleared when the thread exits or on disconnect.
 static GATEWAY_STARTED: AtomicBool = AtomicBool::new(false);
 
-/// Shared shard manager for graceful disconnect on app exit (user appears offline).
-static DISCORD_SHARD_MANAGER: OnceLock<Arc<ShardManager>> = OnceLock::new();
+/// User preference: when false, gateway stays offline until re-enabled (icon toggle).
+static DISCORD_DESIRED_ONLINE: AtomicBool = AtomicBool::new(true);
+
+/// Shared shard manager for graceful disconnect (user appears offline).
+static DISCORD_SHARD_MANAGER: Mutex<Option<Arc<ShardManager>>> = Mutex::new(None);
 
 /// Keychain account name for the Discord bot token.
 pub const DISCORD_TOKEN_KEYCHAIN_ACCOUNT: &str = "discord_bot_token";
 
-/// Bot user id (set on Ready, used to filter self and mentions).
-static BOT_USER_ID: OnceLock<UserId> = OnceLock::new();
+/// Bot user id (set on Ready, cleared on disconnect; used to filter self and mentions).
+static BOT_USER_ID: Mutex<Option<UserId>> = Mutex::new(None);
+
+fn bot_user_id() -> Option<UserId> {
+    BOT_USER_ID.lock().ok().and_then(|g| *g)
+}
+
+fn set_bot_user_id(id: Option<UserId>) {
+    if let Ok(mut g) = BOT_USER_ID.lock() {
+        *g = id;
+    }
+}
 
 /// Last time the gateway fired `Ready` (used for health / reconnect messaging).
 static DISCORD_LAST_READY_AT: Mutex<Option<Instant>> = Mutex::new(None);
@@ -1945,8 +2015,8 @@ async fn run_discord_ollama_router_locked(
     attachment_images_base64: Vec<String>,
     mode: ChannelMode,
 ) {
-    let bot_id = match BOT_USER_ID.get() {
-        Some(id) => *id,
+    let bot_id = match bot_user_id() {
+        Some(id) => id,
         None => {
             debug!("Discord: Ignoring (bot id not set) in run_discord_ollama_router_locked");
             return;
@@ -1980,7 +2050,14 @@ async fn run_discord_ollama_router_locked(
     let escalation = is_escalation_message(&question);
     if escalation {
         info!("Discord: escalation detected (user wants task actually completed)");
-        crate::config::Config::append_escalation_pattern_if_new(&question);
+        // Do not learn Instant-lane phrases (e.g. time asks) into escalation_patterns.md.
+        let plain = crate::commands::untrusted_content::humanize_for_discord_status(&question);
+        if !matches!(
+            crate::commands::fast_lane::classify_turn_lane(&plain, None),
+            crate::commands::fast_lane::TurnLane::Instant { .. }
+        ) {
+            crate::config::Config::append_escalation_pattern_if_new(&question);
+        }
     }
     let verbose = match verbose_opt {
         Some(v) => v,
@@ -2164,8 +2241,8 @@ async fn run_discord_ollama_router_locked(
         );
     }
 
-    // Channel for status updates. Only posted to Discord when verbose mode is on;
-    // otherwise they are only logged internally to keep the channel clean for other bots.
+    // Channel for status updates. When verbose: edit the draft (or say) with progress.
+    // When quiet: only refresh Discord typing so "Werner is typing…" stays visible.
     let (status_tx, mut status_rx) = mpsc::unbounded_channel::<String>();
     let status_for_ollama = if dev_silent_discord {
         None
@@ -2176,9 +2253,14 @@ async fn run_discord_ollama_router_locked(
     let channel_id = new_message.channel_id;
     const EDIT_PREFIX: &str = "EDIT:";
     const ATTACH_PREFIX: &str = "ATTACH:";
-    const CRITERIA_PROGRESS: &str = "Extracting success criteria…";
+    const CRITERIA_PROGRESS: &str = "🎯 Extracting success criteria…";
     // Placeholder message edited in-place while tools run (throttled); flushed with the final reply.
     let throttle_ms = crate::config::Config::discord_draft_throttle_ms();
+    let placeholder_text = if verbose {
+        "Processing…"
+    } else {
+        "Thinking…"
+    };
     let discord_draft = if dev_silent_discord {
         info!(
             target: "discord/draft",
@@ -2186,12 +2268,13 @@ async fn run_discord_ollama_router_locked(
         );
         None
     } else {
-        match new_message.channel_id.say(&ctx, "Processing…").await {
+        match new_message.channel_id.say(&ctx, placeholder_text).await {
             Ok(placeholder) => {
                 info!(
                     target: "discord/draft",
-                    "placeholder sent, draft editor started (throttle_ms={})",
-                    throttle_ms
+                    "placeholder sent, draft editor started (throttle_ms={}, verbose={})",
+                    throttle_ms,
+                    verbose
                 );
                 Some(
                     crate::commands::discord_draft_stream::spawn_discord_draft_editor(
@@ -2212,11 +2295,17 @@ async fn run_discord_ollama_router_locked(
         }
     };
 
+    // When a draft placeholder exists, route verbose progress into that message (draft.update)
+    // instead of channel.say(). Quiet mode only refreshes typing — no intermediate text spam.
+    let status_draft = discord_draft.clone();
     let status_task = tokio::spawn(async move {
         let mut last_criteria_message: Option<Message> = None;
         while let Some(msg) = status_rx.recv().await {
+            let msg = crate::commands::untrusted_content::humanize_for_discord_status(&msg);
             debug!("Discord status (verbose={}): {}", verbose, msg);
             if !verbose {
+                // Keep the Discord "is typing…" indicator alive during long tool loops.
+                let _ = channel_id.broadcast_typing(&ctx_send).await;
                 continue;
             }
             if let Some(path_str) = msg.strip_prefix(ATTACH_PREFIX) {
@@ -2244,6 +2333,10 @@ async fn run_discord_ollama_router_locked(
                 continue;
             }
             if let Some(edit_content) = msg.strip_prefix(EDIT_PREFIX) {
+                if let Some(ref draft) = status_draft {
+                    draft.update(edit_content.to_string());
+                    continue;
+                }
                 if let Some(mut m) = last_criteria_message.take() {
                     if let Err(e) = m
                         .edit(&ctx_send, EditMessage::new().content(edit_content))
@@ -2252,6 +2345,8 @@ async fn run_discord_ollama_router_locked(
                         debug!("Discord: edit status message failed: {}", e);
                     }
                 }
+            } else if let Some(ref draft) = status_draft {
+                draft.update(msg);
             } else {
                 match channel_id.say(&ctx_send, &msg).await {
                     Ok(message) if msg == CRITERIA_PROGRESS => {
@@ -2341,6 +2436,7 @@ async fn run_discord_ollama_router_locked(
             attachment_images_base64: attachment_images_for_ollama,
             discord_is_dm: Some(is_dm),
             discord_draft: discord_draft.clone(),
+            discord_show_progress: verbose,
             partial_progress_capture: Some(partial_progress.clone()),
             ollama_queue_key: Some(format!("discord:{}", channel_id_u64)),
             ollama_queue_wait_hook,
@@ -2375,12 +2471,17 @@ async fn run_discord_ollama_router_locked(
             return;
         }
     }
-    let (reply_text, attachment_paths) = match ollama_router_result {
+    let (reply_text, attachment_paths, turn_lane, verify_passed) = match ollama_router_result {
         Ok(r) => {
             ollama_silent_user_output = r.silent_user_output;
             directive_thread_reply = r.directive_thread_reply;
             directive_split_long = r.directive_split_long;
-            (r.text, r.attachment_paths)
+            (
+                r.text,
+                r.attachment_paths,
+                r.turn_lane,
+                r.verify_passed,
+            )
         }
         Err(e) => {
             error!(
@@ -2425,7 +2526,7 @@ async fn run_discord_ollama_router_locked(
                 }
                 (friendly, Vec::new())
             };
-            (reply_text, attachments)
+            (reply_text, attachments, "error".to_string(), Some(false))
         }
     };
 
@@ -2439,11 +2540,14 @@ async fn run_discord_ollama_router_locked(
     let _ = status_task.await;
 
     // Optional agent judge: when enabled, evaluate run and log verdict to debug log (no user impact).
+    // Default: only on full-lane or verification failure (avoids GPU on instant/lite successes).
     crate::commands::judge::run_judge_if_enabled(
         &question_for_ollama,
         &reply_text,
         &attachment_paths,
         None,
+        Some(turn_lane.as_str()),
+        verify_passed,
     )
     .await;
 
@@ -2463,6 +2567,7 @@ async fn run_discord_ollama_router_locked(
     }
 
     let chunks = outbound_pipeline::split_discord_reply(&reply, directive_split_long);
+    let mut draft_flush_ok = false;
     if let Some(draft) = discord_draft.as_ref() {
         const EMPTY_REPLY_FALLBACK: &str = "(No reply text.)";
         let first_chunk = chunks.first().map(|s| s.as_str()).unwrap_or("");
@@ -2473,19 +2578,27 @@ async fn run_discord_ollama_router_locked(
                     "silent_user_output: empty final — deleting draft placeholder (no fallback text)"
                 );
                 draft.abandon_silent().await;
+                draft_flush_ok = true;
             } else {
                 info!(
                     target: "discord/draft",
                     "draft flush using empty-reply fallback (trimmed reply was empty)"
                 );
-                draft.flush(EMPTY_REPLY_FALLBACK).await;
+                draft_flush_ok = draft.flush(EMPTY_REPLY_FALLBACK).await;
             }
         } else {
-            draft.flush(first_chunk).await;
+            draft_flush_ok = draft.flush(first_chunk).await;
+            if !draft_flush_ok {
+                warn!(
+                    target: "discord/draft",
+                    "draft flush failed — will send first chunk as a new message"
+                );
+            }
         }
     }
 
-    let send_chunks: &[_] = if discord_draft.is_some() {
+    // If draft flush failed, include chunk 0 so the answer still appears at the bottom.
+    let send_chunks: &[_] = if discord_draft.is_some() && draft_flush_ok {
         &chunks[1..]
     } else {
         &chunks[..]
@@ -2503,7 +2616,7 @@ async fn run_discord_ollama_router_locked(
     let mut dedup = ReplyDedupState::new();
 
     for (si, chunk) in send_chunks.iter().enumerate() {
-        let part_no = if discord_draft.is_some() {
+        let part_no = if discord_draft.is_some() && draft_flush_ok {
             si + 2
         } else {
             si + 1
@@ -2801,8 +2914,12 @@ struct Handler;
 #[serenity::async_trait]
 impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, data_about_bot: serenity::model::gateway::Ready) {
+        if !DISCORD_DESIRED_ONLINE.load(Ordering::SeqCst) {
+            info!("Discord: Ready received but gateway disabled by user; ignoring");
+            return;
+        }
         let id = data_about_bot.user.id;
-        let _ = BOT_USER_ID.set(id);
+        set_bot_user_id(Some(id));
         if let Ok(mut g) = DISCORD_LAST_READY_AT.lock() {
             *g = Some(Instant::now());
         }
@@ -2827,8 +2944,8 @@ impl EventHandler for Handler {
     }
 
     async fn message(&self, ctx: Context, new_message: Message) {
-        let bot_id = match BOT_USER_ID.get() {
-            Some(id) => *id,
+        let bot_id = match bot_user_id() {
+            Some(id) => id,
             None => {
                 debug!("Discord: Ignoring message (bot id not set yet)");
                 return;
@@ -2958,8 +3075,10 @@ pub async fn run_discord_client(token: String) -> Result<(), String> {
         .await
         .map_err(|e| format!("Discord client build failed: {}", e))?;
 
-    // Store shard manager so we can call shutdown_all() on app exit (user appears offline).
-    let _ = DISCORD_SHARD_MANAGER.set(client.shard_manager.clone());
+    // Store shard manager so we can call shutdown_all() on disconnect / app exit.
+    if let Ok(mut g) = DISCORD_SHARD_MANAGER.lock() {
+        *g = Some(client.shard_manager.clone());
+    }
 
     if let Ok(mut g) = DISCORD_GATEWAY_CLIENT_STARTED_AT.lock() {
         *g = Some(Instant::now());
@@ -2973,11 +3092,25 @@ pub async fn run_discord_client(token: String) -> Result<(), String> {
     Ok(())
 }
 
-/// Disconnect from Discord on app shutdown so the user appears offline.
+/// Disconnect from Discord so the bot appears offline.
 /// Safe to call even if Discord was never started or already disconnected.
+/// Clears Ready state so UI/status immediately show disconnected.
 pub fn disconnect_discord() {
     message_debounce::discard_pending_batches_on_shutdown();
-    let Some(manager) = DISCORD_SHARD_MANAGER.get() else {
+    set_bot_user_id(None);
+    if let Ok(mut g) = DISCORD_LAST_READY_AT.lock() {
+        *g = None;
+    }
+    if let Ok(mut g) = DISCORD_GATEWAY_CLIENT_STARTED_AT.lock() {
+        *g = None;
+    }
+
+    let manager = DISCORD_SHARD_MANAGER
+        .lock()
+        .ok()
+        .and_then(|mut g| g.take());
+    let Some(manager) = manager else {
+        GATEWAY_STARTED.store(false, Ordering::SeqCst);
         debug!("Discord: No shard manager (gateway was not started), skipping disconnect");
         return;
     };
@@ -2986,11 +3119,33 @@ pub fn disconnect_discord() {
         Ok(r) => r,
         Err(e) => {
             error!("Discord: Failed to create runtime for shutdown: {}", e);
+            GATEWAY_STARTED.store(false, Ordering::SeqCst);
             return;
         }
     };
     rt.block_on(manager.shutdown_all());
+    // Allow reconnect once shards are shut down (gateway thread exits shortly after).
+    GATEWAY_STARTED.store(false, Ordering::SeqCst);
     info!("Discord: Gateway shut down (user offline)");
+}
+
+/// Enable or disable the Discord gateway (CPU-window icon toggle). Token is unchanged.
+/// Returns whether the gateway is desired online after the call.
+pub fn set_discord_gateway_enabled(enabled: bool) -> bool {
+    DISCORD_DESIRED_ONLINE.store(enabled, Ordering::SeqCst);
+    if enabled {
+        info!("Discord: enabling gateway (user toggle)");
+        spawn_discord_if_configured();
+    } else {
+        info!("Discord: disabling gateway (user toggle)");
+        disconnect_discord();
+    }
+    enabled
+}
+
+/// Whether the user wants the Discord gateway online (icon toggle preference).
+pub fn discord_gateway_desired_online() -> bool {
+    DISCORD_DESIRED_ONLINE.load(Ordering::SeqCst)
 }
 
 /// Bot token is configured (env, `.config.env`, or Keychain). Does not log which source (used for health probes).
@@ -3020,7 +3175,7 @@ pub fn discord_bot_token_configured() -> bool {
 
 /// Gateway received Discord `Ready` (bot session active).
 pub fn discord_bot_gateway_ready() -> bool {
-    BOT_USER_ID.get().is_some()
+    bot_user_id().is_some()
 }
 
 /// Instant of the last `Ready` event, if the bot connected at least once this process.
@@ -3324,10 +3479,14 @@ pub fn get_discord_token() -> Option<String> {
     }
 }
 
-/// Spawn the Discord gateway in a background thread if token is present.
+/// Spawn the Discord gateway in a background thread if token is present and desired online.
 /// Loads token via get_discord_token() (env, .config.env, then Keychain).
-/// Safe to call multiple times: only one gateway thread is started per process.
+/// Safe to call multiple times: only one gateway thread runs at a time; reconnect after disconnect.
 pub fn spawn_discord_if_configured() {
+    if !DISCORD_DESIRED_ONLINE.load(Ordering::SeqCst) {
+        debug!("Discord: Gateway disabled by user, skipping spawn");
+        return;
+    }
     if GATEWAY_STARTED.swap(true, Ordering::SeqCst) {
         debug!("Discord: Gateway already started, skipping");
         return;
@@ -3350,12 +3509,20 @@ pub fn spawn_discord_if_configured() {
             Ok(r) => r,
             Err(e) => {
                 error!("Discord: Failed to create tokio runtime: {}", e);
+                GATEWAY_STARTED.store(false, Ordering::SeqCst);
+                set_bot_user_id(None);
                 return;
             }
         };
         if let Err(e) = rt.block_on(run_discord_client(token)) {
             error!("Discord: Gateway stopped: {}", e);
         }
+        set_bot_user_id(None);
+        if let Ok(mut g) = DISCORD_SHARD_MANAGER.lock() {
+            *g = None;
+        }
+        GATEWAY_STARTED.store(false, Ordering::SeqCst);
+        info!("Discord: Gateway thread exited");
     });
     info!("Discord: Gateway thread spawned (connecting to Discord API)");
 }

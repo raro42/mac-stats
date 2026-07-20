@@ -16,7 +16,8 @@ fn perplexity_key_from_file(path: &Path) -> Option<String> {
     let content = std::fs::read_to_string(path).ok()?;
     let line = content.lines().find(|l| {
         let t = l.trim();
-        t.starts_with("PERPLEXITY_API_KEY=") && !t.starts_with("#")
+        (t.starts_with("PERPLEXITY_API_KEY=") || t.starts_with("PERPLEXITY-API-KEY="))
+            && !t.starts_with("#")
     })?;
     let (_, v) = line.split_once('=')?;
     let key = v.trim().to_string();
@@ -28,11 +29,13 @@ fn perplexity_key_from_file(path: &Path) -> Option<String> {
 
 /// Get Perplexity API key: PERPLEXITY_API_KEY env, then .config.env / .env.config, then Keychain.
 pub fn get_perplexity_api_key() -> Option<String> {
-    if let Ok(k) = std::env::var("PERPLEXITY_API_KEY") {
-        let k = k.trim().to_string();
-        if !k.is_empty() {
-            tracing::debug!("Perplexity: API key from PERPLEXITY_API_KEY env");
-            return Some(k);
+    for env_key in ["PERPLEXITY_API_KEY", "PERPLEXITY-API-KEY"] {
+        if let Ok(k) = std::env::var(env_key) {
+            let k = k.trim().to_string();
+            if !k.is_empty() {
+                tracing::debug!("Perplexity: API key from {}", env_key);
+                return Some(k);
+            }
         }
     }
     if let Ok(cwd) = std::env::current_dir() {
@@ -62,6 +65,17 @@ pub fn get_perplexity_api_key() -> Option<String> {
                     tracing::debug!("Perplexity: API key from ~/.mac-stats/{}", name);
                     return Some(k);
                 }
+            }
+        }
+        let project_cfg = Path::new(&home)
+            .join("projects")
+            .join("mac-stats")
+            .join("src-tauri")
+            .join(".config.env");
+        if project_cfg.is_file() {
+            if let Some(k) = perplexity_key_from_file(&project_cfg) {
+                tracing::debug!("Perplexity: API key from projects/mac-stats/src-tauri/.config.env");
+                return Some(k);
             }
         }
     }

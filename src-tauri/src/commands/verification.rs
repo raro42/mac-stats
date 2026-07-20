@@ -29,6 +29,10 @@ pub struct OllamaReply {
     pub directive_split_long: bool,
     /// When true, this invocation suppressed user-visible Discord hooks (status/draft/typing) and empty-reply placeholders.
     pub silent_user_output: bool,
+    /// Turn lane: `instant` | `lite` | `full` (for telemetry / judge gating).
+    pub turn_lane: String,
+    /// Completion verification outcome when it ran; `None` if skipped.
+    pub verify_passed: Option<bool>,
 }
 
 /// Request-local execution context for a single Discord/Ollama run (task-008 Phase 1).

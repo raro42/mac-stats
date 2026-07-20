@@ -428,7 +428,7 @@ pub(crate) async fn handle_run_cmd(
         send_status(
             status_tx,
             &format!(
-                "Running local command{}: {}",
+                "💻 Running local command{}: {}",
                 if attempt > 0 {
                     format!(" (retry {})", attempt)
                 } else {

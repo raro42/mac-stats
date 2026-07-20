@@ -1,7 +1,8 @@
 {
-  "_doc": "Discord channel listen modes for mac-stats. Modes: mention_only = respond only to @mentions and DMs (default), all_messages = respond to every human message (bots ignored), having_fun = respond to everyone including other bots (loop-protected). Channels support a simple string format or an object with 'mode' and optional 'prompt' to shape response style. Optional per-channel full-router debounce: 'debounce_ms' (0 = immediate Ollama, omit = use global discord_debounce_ms from config.json) or 'immediate_ollama': true. having_fun timeframes (response_delay_secs_min/max, idle_thought_secs_min/max) are in seconds; max_consecutive_bot_replies (default 0) caps bot-to-bot replies to avoid self-talk. Timeframe values each use picks a random value in that range (e.g. 300–3600 = 5–60 min).",
+  "_doc": "Discord channel listen modes for mac-stats. Modes: mention_only = respond only to @mentions and DMs (default), all_messages = respond to every human message (bots ignored), having_fun = respond to everyone including other bots (loop-protected). Channels support a simple string format or an object with 'mode' and optional 'prompt' to shape response style. Optional per-channel full-router debounce: 'debounce_ms' (0 = immediate Ollama, omit = use global discord_debounce_ms from config.json) or 'immediate_ollama': true. having_fun timeframes (response_delay_secs_min/max, idle_thought_secs_min/max) are in seconds; max_consecutive_bot_replies (default 0) caps bot-to-bot replies to avoid self-talk. Timeframe values each use picks a random value in that range (e.g. 300–3600 = 5–60 min). Optional default_verbose_for_dm / default_verbose_for_channel (bool): when true, show planning/tool progress in the draft message; when false (default), keep Thinking… + Discord typing until the final answer. Per-message override: put 'verbose' or '/verbose off' on its own first line.",
   "default": "mention_only",
-  "having_fun": {
+  "default_verbose_for_dm": false,
+  "default_verbose_for_channel": false,  "having_fun": {
     "response_delay_secs_min": 300,
     "response_delay_secs_max": 3600,
     "idle_thought_secs_min": 300,

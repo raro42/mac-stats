@@ -238,6 +238,8 @@ async fn run_one_beat(settings: &HeartbeatSettings) {
         &reply.text,
         &reply.attachment_paths,
         None,
+        Some(reply.turn_lane.as_str()),
+        reply.verify_passed,
     )
     .await;
     let Some(ref ch_str) = settings.reply_to_channel_id else {

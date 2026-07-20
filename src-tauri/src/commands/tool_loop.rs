@@ -81,6 +81,19 @@ pub(crate) fn tool_dispatch_message_is_error(tool: &str, message: &str) -> bool 
             || m.starts_with("Discord API failed")
             || m.starts_with("Cannot fetch discord.com pages directly");
     }
+    if tool == "BRAVE_SEARCH" {
+        let m = message.trim_start();
+        return m.starts_with("BRAVE_SEARCH failed")
+            || m.starts_with("Brave Search failed")
+            || m.starts_with("Brave Search is not configured")
+            || m.contains("no BRAVE_API_KEY");
+    }
+    if tool == "PERPLEXITY_SEARCH" {
+        let m = message.trim_start();
+        return m.contains("Perplexity API key not set")
+            || m.starts_with("Perplexity search failed")
+            || m.starts_with("PERPLEXITY_SEARCH failed");
+    }
     if tool == "RUN_CMD"
         && (message.starts_with("RUN_CMD failed")
             || message.starts_with("RUN_CMD failed in a multi-step plan"))
@@ -150,6 +163,8 @@ pub(crate) struct ToolLoopParams {
     pub options_override: Option<ChatOptions>,
     pub status_tx: Option<UnboundedSender<String>>,
     pub discord_draft: Option<DiscordDraftHandle>,
+    /// When false (Discord `/verbose off`), keep the draft as Thinking… and rely on typing indicators.
+    pub discord_show_progress: bool,
     pub discord_reply_channel_id: Option<u64>,
     pub allow_schedule: bool,
     pub load_global_memory: bool,
@@ -422,20 +437,22 @@ pub(crate) async fn run_tool_loop(
                 );
             }
 
-            if let Some(ref draft) = params.discord_draft {
-                if params
-                    .output_gate
-                    .as_ref()
-                    .is_none_or(crate::commands::turn_lifecycle::gate_allows_send)
-                {
-                    let progress = format!("Running {}…", tool);
-                    info!(
-                        target: "discord/draft",
-                        tool = %tool,
-                        chars = progress.chars().count(),
-                        "draft tool progress queued"
-                    );
-                    draft.update(progress);
+            if params.discord_show_progress {
+                if let Some(ref draft) = params.discord_draft {
+                    if params
+                        .output_gate
+                        .as_ref()
+                        .is_none_or(crate::commands::turn_lifecycle::gate_allows_send)
+                    {
+                        let progress = format!("⚙️ Running {}…", tool);
+                        info!(
+                            target: "discord/draft",
+                            tool = %tool,
+                            chars = progress.chars().count(),
+                            "draft tool progress queued"
+                        );
+                        draft.update(progress);
+                    }
                 }
             }
 
@@ -1509,6 +1526,30 @@ mod tool_step_tests {
         assert!(tool_dispatch_message_is_error(
             "BROWSER_NAVIGATE",
             "BROWSER_NAVIGATE failed: bad URL"
+        ));
+    }
+
+    #[test]
+    fn brave_search_not_configured_is_failure() {
+        assert!(tool_dispatch_message_is_error(
+            "BRAVE_SEARCH",
+            "BRAVE_SEARCH failed: not configured (no BRAVE_API_KEY). Immediately call PERPLEXITY_SEARCH: foo"
+        ));
+        assert!(tool_dispatch_message_is_error(
+            "BRAVE_SEARCH",
+            "Brave Search is not configured (no BRAVE_API_KEY in env or .config.env). Answer without search results."
+        ));
+    }
+
+    #[test]
+    fn brave_search_success_not_failure() {
+        assert!(!tool_dispatch_message_is_error(
+            "BRAVE_SEARCH",
+            "Brave Search results:\n\n1. Example"
+        ));
+        assert!(!tool_dispatch_message_is_error(
+            "BRAVE_SEARCH",
+            "Brave Search unavailable (not configured); used PERPLEXITY_SEARCH instead.\n\nok"
         ));
     }
 

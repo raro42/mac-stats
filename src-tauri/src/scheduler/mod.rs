@@ -587,6 +587,8 @@ async fn execute_task(
                     &reply.text,
                     &reply.attachment_paths,
                     None,
+                    Some(reply.turn_lane.as_str()),
+                    reply.verify_passed,
                 )
                 .await;
                 Ok(Some(ScheduleExecuteSuccess {
