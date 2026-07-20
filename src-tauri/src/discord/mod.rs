@@ -2002,9 +2002,31 @@ async fn discord_mentions_bot_effective(ctx: &Context, msg: &Message, bot_id: Us
 }
 
 /// Full agent-router path for a Discord message (possibly debounced merge in `content`).
-/// Per-channel serialization via [`crate::keyed_queue`] prevents concurrent router turns from
-/// corrupting shared session state.
-pub(super) async fn run_discord_ollama_router(
+/// True for short `scrub memory` / `/scrub-memory` operator asks.
+fn looks_like_memory_scrub_request(content: &str) -> bool {
+    let n = content
+        .trim()
+        .trim_start_matches('@')
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_lowercase();
+    let n = n
+        .trim_start_matches("werner")
+        .trim_start_matches(',')
+        .trim()
+        .trim_start_matches("please")
+        .trim();
+    matches!(
+        n,
+        "scrub memory"
+            | "scrub memories"
+            | "/scrub-memory"
+            | "memory scrub"
+            | "clean memory"
+            | "clean memories"
+    )
+}
     ctx: Context,
     new_message: Message,
     content: String,
@@ -2049,6 +2071,24 @@ pub(super) async fn run_discord_ollama_router(
         );
         if let Err(e) = new_message.channel_id.say(&ctx, report).await {
             error!("Discord: failed to send insights: {}", e);
+        }
+        return;
+    }
+
+    // Operator: scrub polluted memory lines (same as periodic compaction hygiene).
+    if looks_like_memory_scrub_request(&content) {
+        let (files, removed) =
+            crate::commands::session_search::scrub_polluted_memory_files();
+        let reply = if removed == 0 {
+            "Memory scrub: nothing polluted to remove.".to_string()
+        } else {
+            format!(
+                "Memory scrub: removed **{}** polluted line(s) from **{}** file(s).",
+                removed, files
+            )
+        };
+        if let Err(e) = new_message.channel_id.say(&ctx, reply).await {
+            error!("Discord: failed to send memory scrub ack: {}", e);
         }
         return;
     }

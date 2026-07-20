@@ -305,6 +305,11 @@ pub fn looks_like_memory_pollution(entry: &str) -> bool {
         || n.contains("output only these two sections")
         || n.contains("bullet points of important lessons")
         || (n.contains("tools that worked vs") && n.contains("mistakes to avoid"))
+        || n.contains("compact this conversation")
+        || n.contains("ms_untrusted_begin")
+        || n.contains("<<<ms_untrusted")
+        || n.contains("[partial progress:")
+        || n.contains("agent router turn timeout")
 }
 
 /// One-shot scrub of existing memory*.md files under agents/.
@@ -360,6 +365,9 @@ mod tests {
         ));
         assert!(!looks_like_memory_pollution(
             "Prefer Open-Meteo for El Masnou weather"
+        ));
+        assert!(looks_like_memory_pollution(
+            "Compact this conversation:\n[user]: hi"
         ));
     }
 

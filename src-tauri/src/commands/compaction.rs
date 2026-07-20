@@ -370,6 +370,21 @@ pub async fn run_periodic_session_compaction() {
             }
         }
     }
+
+    // Hermes-style memory hygiene: drop timeout/meta-lesson pollution from memory*.md
+    let (files, removed) =
+        crate::commands::session_search::scrub_polluted_memory_files();
+    if removed > 0 {
+        info!(
+            "Periodic memory scrub: removed {} polluted line(s) from {} file(s)",
+            removed, files
+        );
+    } else {
+        tracing::debug!(
+            target: "mac_stats::compaction",
+            "Periodic memory scrub: no polluted lines found"
+        );
+    }
 }
 
 #[cfg(test)]
