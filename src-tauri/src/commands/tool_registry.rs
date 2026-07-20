@@ -208,6 +208,13 @@ pub(crate) static TOOLS: &[ToolDef] = &[
         terminates_navigation: false,
     },
     ToolDef {
+        name: "SKILL_MANAGE",
+        description: "Create/edit/patch/delete skills under ~/.mac-stats/agents/skills/ (Hermes skill_manage).",
+        accepts_argument: true,
+        requires_browser: false,
+        terminates_navigation: false,
+    },
+    ToolDef {
         name: "TODO",
         description: "In-session checklist (Hermes todo). Survives compaction reinjection.",
         accepts_argument: true,
@@ -589,6 +596,7 @@ mod tests {
             "TODO",
             "SKILLS_LIST",
             "SKILL_VIEW",
+            "SKILL_MANAGE",
             "SESSION_SEARCH",
         ];
         for name in DISPATCH_TOOLS {

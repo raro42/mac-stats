@@ -62,6 +62,7 @@ pub mod security;
 pub mod session_history;
 pub mod session_search;
 pub mod session_todo;
+pub mod skill_manage;
 pub mod skills;
 pub mod suspicious_patterns;
 pub mod task_tool_handlers;

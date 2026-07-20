@@ -301,7 +301,7 @@ pub(crate) async fn build_agent_descriptions(
     ));
     num += 1;
     base.push_str(&format!(
-        "\n\n{}. **SKILLS_LIST** / **SKILL_VIEW**: Progressive skills — list catalog (SKILLS_LIST), load full body into this turn (SKILL_VIEW: <id>), or run side session (SKILL: <id> [task]).",
+        "\n\n{}. **SKILLS_LIST** / **SKILL_VIEW** / **SKILL_MANAGE**: Progressive skills — list (SKILLS_LIST), load (SKILL_VIEW), run (SKILL), or save a proven procedure (SKILL_MANAGE: create <topic> | <body>).",
         num
     ));
     num += 1;

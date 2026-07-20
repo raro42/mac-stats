@@ -1335,6 +1335,7 @@ async fn dispatch_tool(
         }
         "SKILLS_LIST" => crate::skills::skills_catalog_text(),
         "SKILL_VIEW" => crate::skills::skill_view_text(arg),
+        "SKILL_MANAGE" => crate::commands::skill_manage::handle_skill_manage(arg),
         "TODO" => crate::commands::session_todo::handle_todo(
             arg,
             params.discord_reply_channel_id,

@@ -76,6 +76,10 @@ fn primary_param(name: &str) -> (&'static str, &'static str) {
         "RUN_JS" => ("code", "JavaScript source to run"),
         "CURSOR_AGENT" => ("prompt", "Task prompt for Cursor Agent"),
         "AGENT" | "SKILL" | "SKILL_VIEW" => ("target", "Agent/skill id or slug, optional task after space"),
+        "SKILL_MANAGE" => (
+            "spec",
+            "create <topic> | <body> | edit <id> | <body> | patch <id> | <old> => <new> | delete <id>",
+        ),
         "TODO" => ("spec", "read | add <id> | <content> | done <id> | set <json> | clear"),
         "MEMORY" | "MEMORY_APPEND" => (
             "text",
