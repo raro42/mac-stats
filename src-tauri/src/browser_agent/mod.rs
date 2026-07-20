@@ -626,7 +626,7 @@ fn wait_for_cdp_http_after_visible_launch(port: u16) -> Result<(), String> {
                 port, max_wait, err_tail, port, port
             ));
         }
-        std::thread::sleep(sleep_for);
+        crate::commands::turn_interrupt::sleep_interruptible(sleep_for)?;
     }
 }
 
@@ -718,7 +718,7 @@ fn wait_for_cdp_targets_ready_after_attach(browser: &Browser) -> Result<(), Stri
                     .unwrap_or_default();
                 let sleep_for = CDP_ATTACH_READY_POLL.min(remaining);
                 if !sleep_for.is_zero() {
-                    std::thread::sleep(sleep_for);
+                    crate::commands::turn_interrupt::sleep_interruptible(sleep_for)?;
                 }
                 match browser.get_tabs().lock() {
                     Ok(tabs2) => {
@@ -779,7 +779,7 @@ fn wait_for_cdp_targets_ready_after_attach(browser: &Browser) -> Result<(), Stri
         if sleep_for.is_zero() {
             break;
         }
-        std::thread::sleep(sleep_for);
+        crate::commands::turn_interrupt::sleep_interruptible(sleep_for)?;
     }
     Err(
         "Chrome debugging port accepted a connection, but page targets were not ready in time. \
@@ -6232,7 +6232,7 @@ fn synchronize_tab_after_cdp_navigation(
                 );
                 break;
             }
-            std::thread::sleep(BROWSER_NAV_LIFECYCLE_POLL);
+            crate::commands::turn_interrupt::sleep_interruptible(BROWSER_NAV_LIFECYCLE_POLL)?;
         }
         if !saw_network_idle_class {
             let rs = tab
@@ -8042,7 +8042,7 @@ fn wait_for_browser_download_inner(timeout_secs: u64) -> Result<(String, Vec<Pat
     let cap = timeout_secs.clamp(1, 120);
     let deadline = Instant::now() + Duration::from_secs(cap);
     while Instant::now() < deadline {
-        std::thread::sleep(Duration::from_millis(200));
+        crate::commands::turn_interrupt::sleep_interruptible(Duration::from_millis(200))?;
         let cdp_paths = aux_out.lock().map(|g| g.clone()).unwrap_or_default();
         let got = cdp_downloads::merge_with_directory_diff(&download_dir, &pre_dl, &cdp_paths);
         if !got.is_empty() {

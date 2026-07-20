@@ -27,6 +27,23 @@ pub fn is_interrupted_for_poll() -> bool {
     is_interrupted(k)
 }
 
+/// Sleep in short slices, aborting if cooperative interrupt is set.
+pub fn sleep_interruptible(total: std::time::Duration) -> Result<(), String> {
+    let step = std::time::Duration::from_millis(100);
+    let mut left = total;
+    while !left.is_zero() {
+        if is_interrupted_for_poll() {
+            return Err(
+                "[interrupted] Browser/CDP wait cancelled after user stop/cancel.".to_string(),
+            );
+        }
+        let slice = left.min(step);
+        std::thread::sleep(slice);
+        left = left.saturating_sub(slice);
+    }
+    Ok(())
+}
+
 fn map() -> &'static Mutex<HashMap<u64, Arc<AtomicBool>>> {
     static M: OnceLock<Mutex<HashMap<u64, Arc<AtomicBool>>>> = OnceLock::new();
     M.get_or_init(|| Mutex::new(HashMap::new()))
@@ -116,5 +133,16 @@ mod tests {
         assert!(is_interrupted(999001));
         clear(999001);
         assert!(!is_interrupted(999001));
+    }
+
+    #[test]
+    fn sleep_interruptible_aborts() {
+        clear(999002);
+        set_poll_coord(Some(999002));
+        request(999002);
+        let err = sleep_interruptible(std::time::Duration::from_secs(5)).unwrap_err();
+        assert!(err.contains("interrupted"));
+        set_poll_coord(None);
+        clear(999002);
     }
 }

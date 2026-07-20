@@ -590,11 +590,27 @@ pub(crate) async fn run_tool_loop(
                         "Browser agent: waiting {:.3}s between actions (browserWaitBetweenActionsSecs)",
                         wait
                     );
-                    tokio::time::sleep(std::time::Duration::from_secs_f64(wait)).await;
+                    let mut left = wait;
+                    while left > 0.0 {
+                        if crate::commands::turn_interrupt::is_interrupted(coord_key) {
+                            critical_loop_abort =
+                                Some("User interrupted during browser inter-action wait.".into());
+                            break;
+                        }
+                        let slice = left.min(0.1);
+                        tokio::time::sleep(std::time::Duration::from_secs_f64(slice)).await;
+                        left -= slice;
+                    }
+                    if critical_loop_abort.is_some() {
+                        break;
+                    }
                 }
             }
 
             let started = Instant::now();
+            if is_browser_tool {
+                crate::commands::turn_interrupt::set_poll_coord(Some(coord_key));
+            }
             let mut user_message = dispatch_tool(
                 &tool,
                 &arg,
@@ -605,6 +621,9 @@ pub(crate) async fn run_tool_loop(
                 multi_tool_turn,
             )
             .await;
+            if is_browser_tool {
+                crate::commands::turn_interrupt::set_poll_coord(None);
+            }
             let duration_ms = started.elapsed().as_millis();
 
             if is_browser_tool {
