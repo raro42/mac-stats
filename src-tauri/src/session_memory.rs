@@ -633,7 +633,7 @@ fn flush_session_block(
 /// Parse persisted session markdown. Only lines that trim to exactly `## User` or `## Assistant`
 /// start a new block; lines like `## Notes` inside a message stay in the body (splitting on
 /// `\n## ` previously dropped those turns — see docs/022_feature_review_plan.md F1).
-fn parse_session_markdown(content: &str) -> Vec<(String, String)> {
+pub(crate) fn parse_session_markdown(content: &str) -> Vec<(String, String)> {
     let mut out = Vec::new();
     let mut current_role: Option<&'static str> = None;
     let mut body_lines: Vec<String> = Vec::new();

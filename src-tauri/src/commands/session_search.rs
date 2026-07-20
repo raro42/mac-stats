@@ -1,14 +1,17 @@
 //! Hermes-style cross-session recall over `~/.mac-stats/session/*.md`.
 //!
-//! Lean port: substring search + ranked snippets (no SQLite FTS / summarizer LLM yet).
+//! Substring search + extractive per-file summaries (no SQLite FTS / summarizer LLM).
 
 use crate::config::Config;
+use crate::session_memory::parse_session_markdown;
 use std::fs;
-use std::path::Path;
 
 const MAX_FILES: usize = 5;
-const MAX_SNIPPETS_PER_FILE: usize = 4;
-const SNIPPET_CHARS: usize = 180;
+const MAX_SNIPPETS_PER_FILE: usize = 2;
+const SNIPPET_CHARS: usize = 140;
+const MAX_SUMMARY_TURNS: usize = 3;
+const USER_SUMMARY_CHARS: usize = 140;
+const ASSISTANT_SUMMARY_CHARS: usize = 220;
 
 /// `SESSION_SEARCH: <query>` — search persisted session markdown.
 pub fn handle_session_search(arg: &str) -> String {
@@ -48,12 +51,14 @@ pub fn handle_session_search(arg: &str) -> String {
             continue;
         }
         let snippets = collect_snippets(&text, &q_lower);
+        let summary = extractive_summary(&text, &q_lower);
         let score = snippets.len()
             + text
                 .to_lowercase()
                 .matches(&q_lower)
                 .count()
-                .min(20);
+                .min(20)
+            + if summary.is_empty() { 0 } else { 2 };
         let mtime = ent
             .metadata()
             .ok()
@@ -63,9 +68,9 @@ pub fn handle_session_search(arg: &str) -> String {
             .unwrap_or(0);
         hits.push(FileHit {
             name,
-            path: path.display().to_string(),
             score,
             mtime,
+            summary,
             snippets,
         });
     }
@@ -77,27 +82,28 @@ pub fn handle_session_search(arg: &str) -> String {
     hits.truncate(MAX_FILES);
 
     let mut out = vec![format!(
-        "**Session search** for {:?} — {} file(s):",
+        "**Session search** for {:?} — {} file(s) (extractive summaries):",
         query,
         hits.len()
     )];
     for (i, h) in hits.iter().enumerate() {
+        let meta = file_meta_line(&h.name);
         out.push(format!(
-            "\n{}. `{}` (score {}, {})",
+            "\n{}. `{}`{} (score {})",
             i + 1,
             h.name,
-            h.score,
-            Path::new(&h.path)
-                .file_name()
-                .and_then(|n| n.to_str())
-                .unwrap_or("")
+            meta,
+            h.score
         ));
+        if !h.summary.is_empty() {
+            out.push(format!("   **Summary:** {}", h.summary));
+        }
         for s in &h.snippets {
-            out.push(format!("   - …{}…", s));
+            out.push(format!("   - evidence: …{}…", s));
         }
     }
     out.push(
-        "\nCite these if relevant; use READ of session files only via SESSION_SEARCH / Agent Ops — do not invent past decisions."
+        "\nCite these if relevant; do not invent past decisions. Prefer the summary over raw evidence."
             .into(),
     );
     out.join("\n")
@@ -105,10 +111,170 @@ pub fn handle_session_search(arg: &str) -> String {
 
 struct FileHit {
     name: String,
-    path: String,
     score: usize,
     mtime: u64,
+    summary: String,
     snippets: Vec<String>,
+}
+
+fn file_meta_line(name: &str) -> String {
+    // session-memory-{id}-{YYYYMMDD}-{HHMMSS}-{topic}.md
+    let stem = name.trim_end_matches(".md");
+    let rest = stem.strip_prefix("session-memory-").unwrap_or(stem);
+    let mut it = rest.splitn(3, '-');
+    let _id = it.next();
+    let date = it.next();
+    let rest2 = it.next().unwrap_or("");
+    let (time, topic) = match rest2.split_once('-') {
+        Some((t, topic)) if t.len() == 6 && t.chars().all(|c| c.is_ascii_digit()) => (t, topic),
+        _ => ("", rest2),
+    };
+    match date {
+        Some(d) if d.len() == 8 && d.chars().all(|c| c.is_ascii_digit()) => {
+            let pretty = format!("{}-{}-{}", &d[0..4], &d[4..6], &d[6..8]);
+            let topic = topic
+                .replace('_', " ")
+                .trim_matches(|c| c == '?' || c == '.')
+                .to_string();
+            if time.is_empty() {
+                format!(" — {pretty} · {topic}")
+            } else {
+                let clock = format!("{}:{}:{}", &time[0..2], &time[2..4], &time[4..6]);
+                format!(" — {pretty} {clock} · {topic}")
+            }
+        }
+        _ => String::new(),
+    }
+}
+
+/// Hermes-style focused recap without an extra LLM call.
+fn extractive_summary(text: &str, q_lower: &str) -> String {
+    let turns = parse_session_markdown(text);
+    if turns.is_empty() {
+        return String::new();
+    }
+
+    let mut match_idxs: Vec<usize> = turns
+        .iter()
+        .enumerate()
+        .filter(|(_, (_, c))| c.to_lowercase().contains(q_lower))
+        .map(|(i, _)| i)
+        .collect();
+    if match_idxs.is_empty() {
+        // File matched via non-turn text; summarize first exchange.
+        match_idxs.push(0);
+    }
+
+    let mut parts: Vec<String> = Vec::new();
+    let mut used_user: Vec<String> = Vec::new();
+    for &idx in match_idxs.iter().take(MAX_SUMMARY_TURNS * 2) {
+        let user_idx = nearest_user_before(&turns, idx);
+        let asst_idx = nearest_assistant_after(&turns, user_idx.unwrap_or(idx));
+        let Some(ui) = user_idx else {
+            continue;
+        };
+        let user = compress_line(&turns[ui].1, USER_SUMMARY_CHARS);
+        if user.is_empty() || used_user.iter().any(|u| u == &user) {
+            continue;
+        }
+        used_user.push(user.clone());
+        let outcome = asst_idx
+            .map(|ai| compress_assistant(&turns[ai].1, ASSISTANT_SUMMARY_CHARS))
+            .unwrap_or_else(|| "(no assistant reply)".into());
+        let tools = tools_mentioned(&turns[asst_idx.unwrap_or(ui)].1);
+        let mut bit = format!("Asked «{user}» → {outcome}");
+        if !tools.is_empty() {
+            bit.push_str(&format!(" [tools: {}]", tools.join(", ")));
+        }
+        parts.push(bit);
+        if parts.len() >= MAX_SUMMARY_TURNS {
+            break;
+        }
+    }
+    parts.join(" · ")
+}
+
+fn nearest_user_before(turns: &[(String, String)], idx: usize) -> Option<usize> {
+    (0..=idx).rev().find(|&i| turns[i].0 == "user")
+}
+
+fn nearest_assistant_after(turns: &[(String, String)], from: usize) -> Option<usize> {
+    (from..turns.len()).find(|&i| turns[i].0 == "assistant")
+}
+
+fn compress_line(s: &str, max: usize) -> String {
+    let one = s
+        .lines()
+        .map(str::trim)
+        .filter(|l| !l.is_empty())
+        .collect::<Vec<_>>()
+        .join(" ");
+    truncate_chars(&one, max)
+}
+
+fn compress_assistant(s: &str, max: usize) -> String {
+    // Prefer first non-tool-line prose; skip giant tool dumps.
+    let mut lines: Vec<&str> = Vec::new();
+    for line in s.lines() {
+        let t = line.trim();
+        if t.is_empty() {
+            continue;
+        }
+        if looks_like_tool_invocation(t) {
+            continue;
+        }
+        if t.starts_with("```") {
+            break;
+        }
+        lines.push(t);
+        if lines.join(" ").chars().count() >= max {
+            break;
+        }
+    }
+    if lines.is_empty() {
+        // Fall back to tool line names only.
+        let tools = tools_mentioned(s);
+        if !tools.is_empty() {
+            return format!("used {}", tools.join(", "));
+        }
+        return truncate_chars(&compress_line(s, max), max);
+    }
+    truncate_chars(&lines.join(" "), max)
+}
+
+fn looks_like_tool_invocation(line: &str) -> bool {
+    let upper = line.to_ascii_uppercase();
+    crate::commands::tool_registry::TOOLS
+        .iter()
+        .any(|t| {
+            upper.starts_with(&format!("{}:", t.name))
+                || upper.starts_with(&format!("{} ", t.name))
+        })
+}
+
+fn tools_mentioned(s: &str) -> Vec<String> {
+    let upper = s.to_ascii_uppercase();
+    let mut out = Vec::new();
+    for t in crate::commands::tool_registry::TOOLS {
+        let needle = format!("{}:", t.name);
+        if upper.contains(&needle) && !out.iter().any(|x| x == t.name) {
+            out.push(t.name.to_string());
+        }
+        if out.len() >= 6 {
+            break;
+        }
+    }
+    out
+}
+
+fn truncate_chars(s: &str, max: usize) -> String {
+    let n = s.chars().count();
+    if n <= max {
+        return s.to_string();
+    }
+    let mut t: String = s.chars().take(max.saturating_sub(1)).collect();
+    t.push('…');
+    t
 }
 
 fn collect_snippets(text: &str, q_lower: &str) -> Vec<String> {
@@ -195,5 +361,47 @@ mod tests {
         assert!(!looks_like_memory_pollution(
             "Prefer Open-Meteo for El Masnou weather"
         ));
+    }
+
+    #[test]
+    fn extractive_summary_focuses_on_query() {
+        let md = r#"## User
+
+What time is it?
+
+## Assistant
+
+It's Monday noon.
+
+## User
+
+What version are you?
+
+## Assistant
+
+I'm mac-stats v0.1.95.
+
+## User
+
+Weather in El Masnou
+
+## Assistant
+
+BRAVE_SEARCH: El Masnou weather
+Sunny, 24C.
+"#;
+        let s = extractive_summary(md, "version");
+        assert!(s.to_lowercase().contains("version"), "{s}");
+        assert!(s.contains("0.1.95") || s.contains("mac-stats"), "{s}");
+        assert!(!s.to_lowercase().contains("el masnou"), "{s}");
+    }
+
+    #[test]
+    fn file_meta_parses_timestamp() {
+        let m = file_meta_line(
+            "session-memory-1467450744864243725-20260720-173305-what-time-is-it_.md",
+        );
+        assert!(m.contains("2026-07-20"), "{m}");
+        assert!(m.contains("17:33:05"), "{m}");
     }
 }

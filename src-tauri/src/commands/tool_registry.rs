@@ -230,7 +230,7 @@ pub(crate) static TOOLS: &[ToolDef] = &[
     },
     ToolDef {
         name: "SESSION_SEARCH",
-        description: "Search past session transcripts under ~/.mac-stats/session/ (Hermes session_search).",
+        description: "Search past session transcripts under ~/.mac-stats/session/; returns extractive summaries (Hermes session_search).",
         accepts_argument: true,
         requires_browser: false,
         terminates_navigation: false,
