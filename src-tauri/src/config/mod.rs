@@ -828,6 +828,29 @@ impl Config {
         Self::agent_harness_mode() == "direct"
     }
 
+    /// Default place for weather asks with no explicit location (Open-Meteo instant).
+    /// Config: `weatherDefaultPlace`; env `MAC_STATS_WEATHER_DEFAULT_PLACE`. Default: `El Masnou`.
+    pub fn weather_default_place() -> String {
+        if let Ok(s) = std::env::var("MAC_STATS_WEATHER_DEFAULT_PLACE") {
+            let t = s.trim();
+            if !t.is_empty() {
+                return t.to_string();
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(s) = json.get("weatherDefaultPlace").and_then(|v| v.as_str()) {
+                    let t = s.trim();
+                    if !t.is_empty() {
+                        return t.to_string();
+                    }
+                }
+            }
+        }
+        "El Masnou".to_string()
+    }
+
     /// When true (default), Discord/agent execute + tool-loop chat requests send native Ollama
     /// `tools` schemas (structured `tool_calls`). Text-line `TOOL: arg` remains a fallback.
     /// Config: `agentNativeTools`; env `MAC_STATS_AGENT_NATIVE_TOOLS`.

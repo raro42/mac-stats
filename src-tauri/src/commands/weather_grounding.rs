@@ -52,7 +52,7 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
                 tokens.remove(0);
             }
             let place = tokens.join(" ").trim().to_string();
-            if place.chars().count() >= 2 {
+            if place.chars().count() >= 2 && !looks_like_place_garbage(&place) {
                 return Some(place);
             }
         }
@@ -68,14 +68,37 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
         .replace("what's the", "")
         .replace("whats the", "")
         .replace("what is the", "")
+        .replace("how's the", "")
+        .replace("hows the", "")
+        .replace("how is the", "")
         .replace("right now", "")
         .replace("today", "");
     let place = stripped
         .split_whitespace()
-        .filter(|t| !matches!(*t, "the" | "a" | "an" | "in" | "for" | "at" | "spain"))
+        .filter(|t| {
+            !matches!(
+                *t,
+                "the"
+                    | "a"
+                    | "an"
+                    | "in"
+                    | "for"
+                    | "at"
+                    | "spain"
+                    | "how"
+                    | "how's"
+                    | "hows"
+                    | "what"
+                    | "whats"
+                    | "what's"
+                    | "is"
+                    | "it"
+                    | "?"
+            )
+        })
         .collect::<Vec<_>>()
         .join(" ");
-    if place.chars().count() >= 2 {
+    if place.chars().count() >= 2 && !looks_like_place_garbage(&place) {
         if let Some(pos) = lower.find(&place) {
             return Some(q[pos..pos + place.len()].trim().to_string());
         }
@@ -84,9 +107,56 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
     None
 }
 
+fn looks_like_place_garbage(place: &str) -> bool {
+    let n = place.to_lowercase();
+    n.starts_with("how")
+        || n.starts_with("what")
+        || matches!(
+            n.as_str(),
+            "is" | "it" | "the" | "a" | "an" | "please" | "now" | "today" | "tonight"
+        )
+}
+
 /// True when Open-Meteo instant reply can answer without Brave/Perplexity.
 pub(crate) fn can_instant_weather(q: &str) -> bool {
-    looks_like_weather_query(q) && extract_place(q).is_some()
+    looks_like_weather_query(q) && resolve_weather_place(q).is_some()
+}
+
+/// Place for Open-Meteo: explicit "in X", or configured default for short local asks.
+pub(crate) fn resolve_weather_place(q: &str) -> Option<String> {
+    if let Some(p) = extract_place(q) {
+        return Some(p);
+    }
+    if should_use_default_weather_place(q) {
+        return Some(crate::config::Config::weather_default_place());
+    }
+    None
+}
+
+fn should_use_default_weather_place(q: &str) -> bool {
+    let n = normalize_weather_text(q).to_lowercase();
+    if n.contains(" in ") || n.contains(" for ") || n.contains(" at ") {
+        return false;
+    }
+    if n.contains("search") || n.contains("google") || n.contains("http") {
+        return false;
+    }
+    if n.chars().count() > 64 {
+        return false;
+    }
+    // "how's the weather", "weather today", "is it raining", etc.
+    let local = n.contains("today")
+        || n.contains("tonight")
+        || n.contains("right now")
+        || n.contains(" outside")
+        || n.contains(" here")
+        || n.contains("current")
+        || n.starts_with("how")
+        || n == "weather"
+        || n == "wether"
+        || n.starts_with("weather?")
+        || n.starts_with("wether?");
+    local && looks_like_weather_query(q)
 }
 
 fn normalize_weather_text(q: &str) -> String {
@@ -105,7 +175,7 @@ pub(crate) async fn open_meteo_grounding_block(query: &str) -> Option<String> {
     if !looks_like_weather_query(query) {
         return None;
     }
-    let place = extract_place(query)?;
+    let place = resolve_weather_place(query)?;
     info!(
         "Weather grounding: geocoding place {:?}",
         crate::logging::ellipse(&place, 60)
@@ -214,7 +284,7 @@ pub(crate) async fn format_instant_weather_reply(query: &str) -> Option<String> 
     if !looks_like_weather_query(query) {
         return None;
     }
-    let place = extract_place(query)?;
+    let place = resolve_weather_place(query)?;
     info!(
         "Weather instant: geocoding place {:?}",
         crate::logging::ellipse(&place, 60)
@@ -355,6 +425,15 @@ mod tests {
         assert!(p.to_lowercase().contains("masnou"), "{p}");
         assert!(can_instant_weather(
             "What´s the wether like in El Masnou right now?"
+        ));
+    }
+
+    #[test]
+    fn default_place_for_hows_the_weather() {
+        assert!(should_use_default_weather_place("How's the weather?"));
+        assert!(can_instant_weather("How's the weather today?"));
+        assert!(!should_use_default_weather_place(
+            "search the weather trends in Europe"
         ));
     }
 }
