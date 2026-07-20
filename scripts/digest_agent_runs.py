@@ -6,6 +6,10 @@ Usage:
   ./scripts/digest_agent_runs.py --days 7 --out ~/.mac-stats/improvements/latest.md
 
 No LLM required — heuristics only. Feed output into tasks / fast-lane rules.
+
+Suppresses candidates for patterns already shipped (instant version/time/weather)
+when the turn timestamp is older than the ship cutoff — those are stale telemetry,
+not open work.
 """
 
 from __future__ import annotations
@@ -13,9 +17,15 @@ from __future__ import annotations
 import argparse
 import json
 import statistics
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
+# Instant lanes / Open-Meteo weather landed ~2026-07-20 afternoon–evening UTC.
+SHIPPED_INSTANT_VERSION = datetime(2026, 7, 20, 15, 45, tzinfo=timezone.utc)
+SHIPPED_INSTANT_TIME = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
+SHIPPED_INSTANT_WEATHER = datetime(2026, 7, 20, 21, 0, tzinfo=timezone.utc)
+SHIPPED_GREETING = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
 
 
 def default_runs_path() -> Path:
@@ -49,6 +59,33 @@ def load_runs(path: Path, since: datetime) -> list[dict]:
                 continue
             out.append(rec)
     return out
+
+
+def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
+    """True when this candidate was already fixed after `ts` (stale digester noise)."""
+    if ts is None:
+        return False
+    hl = hint.lower()
+    ql = q.lower()
+    if "instant version" in hl and ts < SHIPPED_INSTANT_VERSION:
+        return True
+    if "instant time" in hl and ts < SHIPPED_INSTANT_TIME:
+        return True
+    if "greeting" in hl and ts < SHIPPED_GREETING:
+        return True
+    # Pre-Open-Meteo-instant weather that burned Brave (~28s).
+    if ts < SHIPPED_INSTANT_WEATHER and ("wether" in ql or "weather" in ql):
+        if (
+            "open-meteo" in hl
+            or "weather via search" in hl
+            or "brave" in hl
+            or "zero-tool" in hl
+            or "instant" in hl
+        ):
+            return True
+    if "version" in ql and "instant version" in hl and ts < SHIPPED_INSTANT_VERSION:
+        return True
+    return False
 
 
 def main() -> int:
@@ -103,14 +140,15 @@ def main() -> int:
         )
     lines.append("")
 
-    # Candidates: slow turns that should have been cheaper
-    candidates = []
+    candidates: list[tuple] = []
+    stale: list[tuple] = []
     for r in runs:
         q = (r.get("question_preview") or "").lower()
         wall = int(r.get("wall_ms") or 0)
         lane = r.get("lane") or "?"
         tools = r.get("tools") or []
         tool_steps = int(r.get("tool_steps") or 0)
+        ts = parse_ts(str(r.get("ts", "")))
         hint = None
         if wall >= 5_000 and lane in ("lite", "direct", "full") and (
             not tools and tool_steps == 0
@@ -132,15 +170,30 @@ def main() -> int:
                 hint = "Promote to INSTANT greeting lane"
             elif wall > 60_000 and not r.get("pre_routed"):
                 hint = "Investigate meta-LLM cost (criteria/topic/plan/verify); consider lite or smaller judge model"
-        if hint:
-            candidates.append((wall, hint, r.get("question_preview", ""), r.get("request_id")))
+        elif (
+            wall >= 15_000
+            and lane == "direct"
+            and tools
+            and ("weather" in q or "wether" in q)
+            and any("BRAVE" in str(t).upper() or "PERPLEXITY" in str(t).upper() for t in tools)
+        ):
+            hint = "Weather via search — prefer Open-Meteo INSTANT when place is clear"
+        if not hint:
+            continue
+        preview = r.get("question_preview", "")
+        rid = r.get("request_id")
+        row = (wall, hint, preview, rid, ts)
+        if is_stale_shipped_candidate(hint, preview, ts):
+            stale.append(row)
+        else:
+            candidates.append(row)
 
     lines.append("## Improvement candidates")
     if not candidates:
-        lines.append("_None this window._")
+        lines.append("_None this window (open)._")
     else:
         seen = set()
-        for wall, hint, q, rid in sorted(candidates, reverse=True)[:20]:
+        for wall, hint, q, rid, _ts in sorted(candidates, reverse=True)[:20]:
             key = (hint, q[:40])
             if key in seen:
                 continue
@@ -148,7 +201,23 @@ def main() -> int:
             lines.append(f"- **{hint}** — {wall} ms — `{q[:100]}` (`{rid}`)")
     lines.append("")
 
-    # Budget violations: full lane with many skipped=false and high wall
+    lines.append("## Stale / already shipped (ignored)")
+    if not stale:
+        lines.append("_None._")
+    else:
+        lines.append(
+            "_These matched heuristics but predate the instant-lane / Open-Meteo ship cutoff — not open work._"
+        )
+        seen = set()
+        for wall, hint, q, rid, ts in sorted(stale, reverse=True)[:15]:
+            key = (hint, q[:40])
+            if key in seen:
+                continue
+            seen.add(key)
+            ts_s = ts.isoformat() if ts else "?"
+            lines.append(f"- ~~{hint}~~ — {wall} ms — `{q[:80]}` (`{rid}`, {ts_s})")
+    lines.append("")
+
     waste = [
         r
         for r in runs
@@ -165,7 +234,10 @@ def main() -> int:
         )
     lines.append("")
     lines.append("## Next actions")
-    lines.append("1. Implement top candidates as code in `fast_lane.rs` / `pre_routing.rs`.")
+    if candidates:
+        lines.append("1. Implement open candidates in `fast_lane.rs` / `pre_routing.rs` / tools.")
+    else:
+        lines.append("1. No open digester candidates — prefer sibling-harness ports or fresh Discord traffic.")
     lines.append("2. Re-run digest after a day of Discord traffic.")
     lines.append("3. Keep judge on-failure-only (`agentJudgeOnFailureOnly: true`).")
     lines.append("")

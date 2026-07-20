@@ -413,6 +413,13 @@ fn resolve_hermes_tool_name(name: &str) -> Option<&'static str> {
 }
 
 fn hermes_args_to_arg_string(args: &serde_json::Value) -> String {
+    // Models sometimes nest arguments as a JSON string.
+    if let Some(s) = args.as_str() {
+        if let Ok(inner) = serde_json::from_str::<serde_json::Value>(s) {
+            return hermes_args_to_arg_string(&inner);
+        }
+        return s.to_string();
+    }
     match args {
         serde_json::Value::Null => String::new(),
         serde_json::Value::String(s) => s.clone(),
@@ -420,6 +427,17 @@ fn hermes_args_to_arg_string(args: &serde_json::Value) -> String {
         serde_json::Value::Bool(b) => b.to_string(),
         serde_json::Value::Array(a) => serde_json::to_string(a).unwrap_or_default(),
         serde_json::Value::Object(m) => {
+            // Nested {"arguments": {...}} or {"parameters": {...}}
+            for nest in ["arguments", "parameters", "args", "input"] {
+                if let Some(inner) = m.get(nest) {
+                    if inner.is_object() || inner.is_string() {
+                        let nested = hermes_args_to_arg_string(inner);
+                        if !nested.is_empty() && nested != "{}" {
+                            return nested;
+                        }
+                    }
+                }
+            }
             for key in [
                 "query",
                 "url",
@@ -431,6 +449,8 @@ fn hermes_args_to_arg_string(args: &serde_json::Value) -> String {
                 "text",
                 "message",
                 "code",
+                "location",
+                "place",
             ] {
                 if let Some(v) = m.get(key) {
                     if let Some(s) = v.as_str() {
@@ -839,6 +859,24 @@ mod tests {
         let t = parse_tool_from_response(content).unwrap();
         assert_eq!(t.0, "FETCH_URL");
         assert_eq!(t.1, "https://example.com");
+    }
+
+    #[test]
+    fn hermes_multi_tool_and_nested_args_string() {
+        let content = r#"
+<tool_call>
+{"name": "BRAVE_SEARCH", "arguments": "{\"query\": \"mac-stats\"}"}
+</tool_call>
+<tool_call>
+{"name": "FETCH_URL", "arguments": {"parameters": {"url": "https://example.com"}}}
+</tool_call>
+"#;
+        let tools = parse_all_tools_from_response(content);
+        assert!(tools.len() >= 2, "{tools:?}");
+        assert_eq!(tools[0].0, "BRAVE_SEARCH");
+        assert_eq!(tools[0].1, "mac-stats");
+        assert_eq!(tools[1].0, "FETCH_URL");
+        assert_eq!(tools[1].1, "https://example.com");
     }
 
     #[test]
