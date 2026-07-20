@@ -1308,6 +1308,16 @@ async fn dispatch_tool(
             )
             .await
         }
+        "SKILLS_LIST" => crate::skills::skills_catalog_text(),
+        "SKILL_VIEW" => crate::skills::skill_view_text(arg),
+        "TODO" => crate::commands::session_todo::handle_todo(
+            arg,
+            params.discord_reply_channel_id,
+        ),
+        "MEMORY" | "MEMORY_APPEND" => crate::commands::curated_memory::handle_memory(
+            arg,
+            params.discord_reply_channel_id,
+        ),
         "AGENT" => {
             let last_user_content = messages
                 .last()
@@ -1434,10 +1444,6 @@ async fn dispatch_tool(
             )
             .await
         }
-        "MEMORY_APPEND" => crate::commands::misc_tool_dispatch::handle_memory_append(
-            arg,
-            params.discord_reply_channel_id,
-        ),
         _ => {
             let msg = format!(
                 "Unknown tool \"{}\". Use one of the available tools from the agent list (e.g. FETCH_URL, BRAVE_SEARCH, BROWSER_NAVIGATE, DONE) or reply with your answer.",

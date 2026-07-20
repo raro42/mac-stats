@@ -291,7 +291,17 @@ pub(crate) async fn build_agent_descriptions(
         num += 1;
     }
     base.push_str(&format!(
-        "\n\n{}. **MEMORY_APPEND** (persistent memory): Save a lesson learned for future sessions. Use when something important was discovered (a mistake to avoid, a working approach, a user preference). To invoke: reply with exactly one line: MEMORY_APPEND: <lesson> (in Discord: saves to this channel's memory; otherwise global) or MEMORY_APPEND: agent:<slug-or-id> <lesson> (saves to that agent's memory only). Keep lessons concise and actionable.",
+        "\n\n{}. **MEMORY** (curated, Hermes-style): MEMORY: add <lesson> | replace <old> => <new> | remove <substr> | read. Optional agent:<slug> prefix. MEMORY_APPEND: <lesson> still works as add. Keep entries concise; char budget enforced.",
+        num
+    ));
+    num += 1;
+    base.push_str(&format!(
+        "\n\n{}. **TODO** (session checklist): TODO: add <id> | <content> | done <id> | start <id> | read | clear. Reinjected after compaction.",
+        num
+    ));
+    num += 1;
+    base.push_str(&format!(
+        "\n\n{}. **SKILLS_LIST** / **SKILL_VIEW**: Progressive skills — list catalog (SKILLS_LIST), load full body into this turn (SKILL_VIEW: <id>), or run side session (SKILL: <id> [task]).",
         num
     ));
     num += 1;

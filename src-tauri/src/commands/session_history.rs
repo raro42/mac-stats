@@ -101,12 +101,26 @@ pub(crate) async fn prepare_conversation_history(
 
         run_before_compaction_fire_and_forget(hook_src, hook_sid, &pairs, request_id);
 
+        // Hermes-style: let the model curate MEMORY before history is summarized away.
+        crate::commands::curated_memory::flush_memories_before_compaction(
+            &raw_history,
+            discord_reply_channel_id,
+            request_id,
+        )
+        .await;
+
         if lifecycle.emit_cpu_compaction_ui {
             emit_mac_stats_compaction_event("start", false, request_id, None);
         }
 
         match compact_conversation_history(&raw_history, question, discord_reply_channel_id).await {
-            Ok((context, lessons)) => {
+            Ok((mut context, lessons)) => {
+                // Reinject session TODO so long Discord plans survive compression.
+                let todos = crate::commands::session_todo::read(discord_reply_channel_id);
+                if !todos.is_empty() {
+                    context.push_str("\n\n");
+                    context.push_str(&crate::commands::session_todo::format_todos(&todos));
+                }
                 if lifecycle.emit_cpu_compaction_ui {
                     emit_mac_stats_compaction_event("end", false, request_id, Some(true));
                 }

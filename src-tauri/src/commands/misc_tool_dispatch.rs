@@ -1,6 +1,7 @@
 //! Miscellaneous tool dispatch handlers for the agent router tool loop.
 //!
-//! Contains: OLLAMA_API, MCP, CURSOR_AGENT, MASTODON_POST, MEMORY_APPEND.
+//! Contains: OLLAMA_API, MCP, CURSOR_AGENT, MASTODON_POST.
+//! MEMORY lives in `curated_memory` (Hermes-style add/replace/remove).
 //! Extracted from `commands/ollama.rs` to keep modules small and cohesive.
 
 use tracing::info;
@@ -9,7 +10,7 @@ use crate::commands::ollama_models::{
     delete_ollama_model, get_ollama_version, list_ollama_models_full, list_ollama_running_models,
     load_ollama_model, ollama_embeddings, pull_ollama_model, unload_ollama_model,
 };
-use crate::commands::reply_helpers::{append_to_file, mastodon_post};
+use crate::commands::reply_helpers::mastodon_post;
 
 fn send_status(tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>, msg: &str) {
     if let Some(tx) = tx {
@@ -301,55 +302,5 @@ pub(crate) async fn handle_mastodon_post(
     match mastodon_post(text, visibility).await {
         Ok(msg) => msg,
         Err(e) => format!("Mastodon post failed: {}", e),
-    }
-}
-
-pub(crate) fn handle_memory_append(arg: &str, discord_reply_channel_id: Option<u64>) -> String {
-    let arg = arg.trim();
-    if arg.is_empty() {
-        return "MEMORY_APPEND requires content. Usage: MEMORY_APPEND: <lesson> or MEMORY_APPEND: agent:<slug-or-id> <lesson>".to_string();
-    }
-    let (target, lesson) = if arg.to_lowercase().starts_with("agent:") {
-        let rest = arg["agent:".len()..].trim();
-        if let Some(space_idx) = rest.find(' ') {
-            let (sel, content) = rest.split_at(space_idx);
-            (Some(sel.trim().to_string()), content.trim().to_string())
-        } else {
-            (None, arg.to_string())
-        }
-    } else {
-        (None, arg.to_string())
-    };
-    let lesson_line = format!("- {}\n", lesson.trim_start_matches("- "));
-    let result = if let Some(selector) = target {
-        let agents = crate::agents::load_agents();
-        if let Some(agent) = crate::agents::find_agent_by_id_or_name(&agents, &selector) {
-            if let Some(dir) = crate::agents::get_agent_dir(&agent.id) {
-                let path = dir.join("memory.md");
-                append_to_file(&path, &lesson_line)
-            } else {
-                Err(format!("Agent directory not found for '{}'", selector))
-            }
-        } else {
-            Err(format!("Agent '{}' not found", selector))
-        }
-    } else {
-        let path = discord_reply_channel_id
-            .map(crate::config::Config::memory_file_path_for_discord_channel)
-            .unwrap_or_else(crate::config::Config::memory_file_path);
-        append_to_file(&path, &lesson_line)
-    };
-    match result {
-        Ok(path) => {
-            info!("Agent router: MEMORY_APPEND wrote to {:?}", path);
-            format!(
-                "Memory updated ({}). The lesson will be included in future prompts.",
-                path.display()
-            )
-        }
-        Err(e) => {
-            info!("Agent router: MEMORY_APPEND failed: {}", e);
-            format!("Failed to update memory: {}", e)
-        }
     }
 }

@@ -164,6 +164,54 @@ pub fn load_skills() -> Vec<Skill> {
     skills
 }
 
+/// Progressive disclosure catalog (Hermes skills_list): name + one-line description only.
+pub fn skills_catalog_text() -> String {
+    let skills = load_skills();
+    if skills.is_empty() {
+        return "No skills installed under ~/.mac-stats/agents/skills/.".to_string();
+    }
+    let mut lines = vec![format!("**Skills catalog** ({}):", skills.len())];
+    for s in &skills {
+        let desc = s
+            .content
+            .lines()
+            .map(|l| l.trim())
+            .find(|l| !l.is_empty())
+            .unwrap_or("(no description)")
+            .chars()
+            .take(120)
+            .collect::<String>();
+        lines.push(format!("- {}-{} — {}", s.number, s.topic, desc));
+    }
+    lines.push(
+        "Load full body with SKILL_VIEW: <number|topic>. Run as side session with SKILL: <number|topic> [task]."
+            .into(),
+    );
+    lines.join("\n")
+}
+
+/// Return full skill body for SKILL_VIEW (Hermes skill_view).
+pub fn skill_view_text(selector: &str) -> String {
+    let skills = load_skills();
+    match find_skill_by_number_or_topic(&skills, selector.trim()) {
+        Some(skill) => format!(
+            "Skill {}-{} (full body):\n\n{}",
+            skill.number, skill.topic, skill.content
+        ),
+        None => {
+            let avail: Vec<String> = skills
+                .iter()
+                .map(|s| format!("{}-{}", s.number, s.topic))
+                .collect();
+            format!(
+                "Unknown skill \"{}\". Available: {}",
+                selector.trim(),
+                avail.join(", ")
+            )
+        }
+    }
+}
+
 /// Return loaded skills for the Settings UI (number, topic, path). Path is full filesystem path.
 pub fn list_skills_for_ui() -> Vec<SkillForUi> {
     let skills = load_skills();

@@ -194,6 +194,34 @@ pub(crate) static TOOLS: &[ToolDef] = &[
         terminates_navigation: false,
     },
     ToolDef {
+        name: "SKILLS_LIST",
+        description: "List installed skills (name + short description only; Hermes progressive disclosure).",
+        accepts_argument: false,
+        requires_browser: false,
+        terminates_navigation: false,
+    },
+    ToolDef {
+        name: "SKILL_VIEW",
+        description: "Load the full body of one skill into this turn (without running a side session).",
+        accepts_argument: true,
+        requires_browser: false,
+        terminates_navigation: false,
+    },
+    ToolDef {
+        name: "TODO",
+        description: "In-session checklist (Hermes todo). Survives compaction reinjection.",
+        accepts_argument: true,
+        requires_browser: false,
+        terminates_navigation: false,
+    },
+    ToolDef {
+        name: "MEMORY",
+        description: "Curated memory add/replace/remove/read with char budget (Hermes memory). MEMORY_APPEND aliases add.",
+        accepts_argument: true,
+        requires_browser: false,
+        terminates_navigation: false,
+    },
+    ToolDef {
         name: "AGENT",
         description: "Delegate to another LLM agent by slug.",
         accepts_argument: true,
@@ -526,6 +554,10 @@ mod tests {
             "PERPLEXITY_SEARCH",
             "RUN_JS",
             "SKILL",
+            "SKILLS_LIST",
+            "SKILL_VIEW",
+            "TODO",
+            "MEMORY",
             "AGENT",
             "SCHEDULE",
             "REMOVE_SCHEDULE",
@@ -546,6 +578,10 @@ mod tests {
             "REDMINE_API",
             "MASTODON_POST",
             "MEMORY_APPEND",
+            "MEMORY",
+            "TODO",
+            "SKILLS_LIST",
+            "SKILL_VIEW",
         ];
         for name in DISPATCH_TOOLS {
             assert!(

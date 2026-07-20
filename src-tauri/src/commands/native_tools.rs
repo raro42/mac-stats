@@ -75,11 +75,15 @@ fn primary_param(name: &str) -> (&'static str, &'static str) {
         "RUN_CMD" => ("command", "Allowlisted shell command"),
         "RUN_JS" => ("code", "JavaScript source to run"),
         "CURSOR_AGENT" => ("prompt", "Task prompt for Cursor Agent"),
-        "AGENT" | "SKILL" => ("target", "Agent/skill id or slug, optional task after space"),
+        "AGENT" | "SKILL" | "SKILL_VIEW" => ("target", "Agent/skill id or slug, optional task after space"),
+        "TODO" => ("spec", "read | add <id> | <content> | done <id> | set <json> | clear"),
+        "MEMORY" | "MEMORY_APPEND" => (
+            "text",
+            "add <text> | replace <old> => <new> | remove <substr> | read (MEMORY_APPEND = add)",
+        ),
         "REDMINE_API" | "DISCORD_API" | "OLLAMA_API" | "MCP" => {
             ("request", "Method/path or tool invocation line")
         }
-        "MEMORY_APPEND" => ("text", "Text to append to memory"),
         "SCHEDULE" | "REMOVE_SCHEDULE" => ("spec", "Schedule specification or id"),
         _ => ("argument", "Tool argument string"),
     }
