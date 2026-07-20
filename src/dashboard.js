@@ -15,11 +15,15 @@ const UPDATE_INTERVAL = 2000; // 2 seconds
 let updateInterval = null;
 let monitorsCollapsed = false;
 let ollamaCollapsed = false;
+let agentOpsCollapsed = false;
+let opsAgentCache = null;
+let opsAgentFileTab = 'soul';
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     setupSettingsModalListeners();
+    setupAgentOps();
     startUpdates();
     // Initialize Ollama after a short delay to ensure ollama.js is loaded
     setTimeout(() => {
@@ -57,6 +61,16 @@ function setupEventListeners() {
     document.getElementById('ollama-collapse-btn').addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent header click from firing
         toggleSection('ollama');
+    });
+
+    document.getElementById('agent-ops-header').addEventListener('click', (e) => {
+        if (e.target.id !== 'agent-ops-collapse-btn' && !e.target.closest('.collapse-btn')) {
+            toggleSection('agent-ops');
+        }
+    });
+    document.getElementById('agent-ops-collapse-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSection('agent-ops');
     });
 
     // Add monitor button
@@ -104,6 +118,18 @@ function toggleSection(section) {
             content.classList.remove('collapsed');
             btn.textContent = '−';
             chat.style.display = 'block';
+        }
+    } else if (section === 'agent-ops') {
+        agentOpsCollapsed = !agentOpsCollapsed;
+        const content = document.getElementById('agent-ops-content');
+        const btn = document.getElementById('agent-ops-collapse-btn');
+        if (agentOpsCollapsed) {
+            content.classList.add('collapsed');
+            btn.textContent = '+';
+        } else {
+            content.classList.remove('collapsed');
+            btn.textContent = '−';
+            refreshAgentOps();
         }
     }
 }
@@ -879,6 +905,218 @@ async function addAlertChannelFromSettings() {
     } catch (err) {
         alert(`Failed to add channel: ${err}`);
     }
+}
+
+// --- Agent Ops (OpenClaw-shaped: agents / sessions / knowledge / runs) ---
+
+function setupAgentOps() {
+    document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const tab = btn.dataset.opsTab;
+            document.querySelectorAll('.agent-ops-tab').forEach((b) => b.classList.toggle('active', b === btn));
+            document.querySelectorAll('.agent-ops-panel').forEach((p) => {
+                p.classList.toggle('active', p.id === `ops-panel-${tab}`);
+            });
+        });
+    });
+    document.querySelectorAll('.ops-file-tab').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            opsAgentFileTab = btn.dataset.file;
+            document.querySelectorAll('.ops-file-tab').forEach((b) => b.classList.toggle('active', b === btn));
+            renderOpsAgentPreview();
+        });
+    });
+    document.getElementById('ops-agent-back')?.addEventListener('click', () => {
+        document.getElementById('ops-agent-detail').hidden = true;
+        document.getElementById('ops-agents-list').style.display = '';
+    });
+    document.getElementById('ops-refresh-btn')?.addEventListener('click', () => refreshAgentOps());
+    refreshAgentOps();
+}
+
+function fmtBytes(n) {
+    if (n < 1024) return `${n} B`;
+    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+    return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function fmtAge(ms) {
+    if (!ms) return '';
+    const age = Date.now() - ms;
+    if (age < 60_000) return 'just now';
+    if (age < 3600_000) return `${Math.floor(age / 60_000)}m ago`;
+    if (age < 86400_000) return `${Math.floor(age / 3600_000)}h ago`;
+    return `${Math.floor(age / 86400_000)}d ago`;
+}
+
+async function refreshAgentOps() {
+    const strip = document.getElementById('agent-ops-strip');
+    try {
+        const [agents, live, files, memory, insights] = await Promise.all([
+            invoke('list_agents'),
+            invoke('list_live_sessions'),
+            invoke('list_session_files', { limit: 40 }),
+            invoke('list_memory_files'),
+            invoke('get_runs_insights', { limit: 40 }),
+        ]);
+        const enabled = (agents || []).filter((a) => a.enabled).length;
+        strip.textContent = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${(files || []).length} session files · p50 ${insights?.p50_ms ?? 0} ms · ${insights?.turns ?? 0} runs`;
+        renderOpsAgents(agents || []);
+        renderOpsLive(live || []);
+        renderOpsSessionFiles(files || []);
+        renderOpsMemory(memory || []);
+        renderOpsRuns(insights);
+    } catch (err) {
+        strip.textContent = `Agent Ops unavailable: ${err}`;
+        console.warn('[Agent Ops]', err);
+    }
+}
+
+function renderOpsAgents(agents) {
+    const list = document.getElementById('ops-agents-list');
+    list.innerHTML = '';
+    if (!agents.length) {
+        list.innerHTML = '<div class="ops-empty">No agents under ~/.mac-stats/agents</div>';
+        return;
+    }
+    agents.forEach((a) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        const slug = a.slug || a.id;
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(a.name)} <span class="ops-row-meta">· ${escapeHtml(slug)}</span></div><div class="ops-row-meta">${escapeHtml(a.model || 'default model')}${a.orchestrator ? ' · orchestrator' : ''}</div></div><span class="ops-badge ${a.enabled ? '' : 'off'}">${a.enabled ? 'on' : 'off'}</span>`;
+        btn.addEventListener('click', () => openOpsAgent(a.id));
+        list.appendChild(btn);
+    });
+}
+
+async function openOpsAgent(id) {
+    try {
+        opsAgentCache = await invoke('get_agent_details', { selector: id });
+        document.getElementById('ops-agents-list').style.display = 'none';
+        const detail = document.getElementById('ops-agent-detail');
+        detail.hidden = false;
+        document.getElementById('ops-agent-meta').textContent =
+            `${opsAgentCache.name} · ${opsAgentCache.slug || opsAgentCache.id} · ${opsAgentCache.model || 'default'} · ${opsAgentCache.enabled ? 'enabled' : 'disabled'}`;
+        opsAgentFileTab = 'soul';
+        document.querySelectorAll('.ops-file-tab').forEach((b) => {
+            b.classList.toggle('active', b.dataset.file === 'soul');
+        });
+        renderOpsAgentPreview();
+    } catch (err) {
+        alert(`Failed to load agent: ${err}`);
+    }
+}
+
+function renderOpsAgentPreview() {
+    if (!opsAgentCache) return;
+    const pre = document.getElementById('ops-agent-preview');
+    const map = {
+        soul: opsAgentCache.soul || '(empty soul.md)',
+        skill: opsAgentCache.skill || '(empty skill.md)',
+        mood: opsAgentCache.mood || '(empty mood.md)',
+    };
+    pre.textContent = map[opsAgentFileTab] || '';
+}
+
+function renderOpsLive(rows) {
+    const el = document.getElementById('ops-live-sessions');
+    el.innerHTML = '';
+    if (!rows.length) {
+        el.innerHTML = '<div class="ops-empty">No live in-memory sessions</div>';
+        return;
+    }
+    rows.forEach((r) => {
+        const div = document.createElement('div');
+        div.className = 'ops-row';
+        div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs · ${escapeHtml(r.last_activity)}</div></div>`;
+        el.appendChild(div);
+    });
+}
+
+function renderOpsSessionFiles(files) {
+    const el = document.getElementById('ops-session-files');
+    const preview = document.getElementById('ops-session-preview');
+    el.innerHTML = '';
+    preview.hidden = true;
+    if (!files.length) {
+        el.innerHTML = '<div class="ops-empty">No session-memory-*.md files</div>';
+        return;
+    }
+    files.forEach((f) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(f.source_hint)} · ${fmtBytes(f.size_bytes)} · ${fmtAge(f.modified_ms)}</div></div>`;
+        btn.addEventListener('click', async () => {
+            try {
+                const text = await invoke('read_session_file', { path: f.path });
+                preview.hidden = false;
+                preview.textContent = text.slice(0, 12000);
+            } catch (err) {
+                preview.hidden = false;
+                preview.textContent = String(err);
+            }
+        });
+        el.appendChild(btn);
+    });
+}
+
+function renderOpsMemory(files) {
+    const el = document.getElementById('ops-memory-list');
+    const preview = document.getElementById('ops-memory-preview');
+    el.innerHTML = '';
+    preview.hidden = true;
+    if (!files.length) {
+        el.innerHTML = '<div class="ops-empty">No memory/soul files</div>';
+        return;
+    }
+    files.forEach((f) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(f.kind)} · ${f.line_count} lines · ${fmtBytes(f.size_bytes)}</div></div>`;
+        btn.addEventListener('click', async () => {
+            try {
+                const text = await invoke('read_memory_file', { path: f.path });
+                preview.hidden = false;
+                preview.textContent = text.slice(0, 12000);
+            } catch (err) {
+                preview.hidden = false;
+                preview.textContent = String(err);
+            }
+        });
+        el.appendChild(btn);
+    });
+}
+
+function renderOpsRuns(insights) {
+    const el = document.getElementById('ops-runs-list');
+    el.innerHTML = '';
+    if (!insights || !insights.turns) {
+        el.innerHTML = '<div class="ops-empty">No runs in ~/.mac-stats/runs.jsonl yet</div>';
+        return;
+    }
+    const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
+    const head = document.createElement('div');
+    head.className = 'ops-empty';
+    head.textContent = `${insights.ok_count}/${insights.turns} ok · mean ${insights.mean_ms} ms · max ${insights.max_ms} ms · ${lanes}`;
+    el.appendChild(head);
+    (insights.recent || []).forEach((r) => {
+        const div = document.createElement('div');
+        div.className = 'ops-row';
+        const tools = (r.tools || []).join(', ') || '—';
+        div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(tools)}${r.ok ? '' : ' · FAIL'}</div></div>`;
+        el.appendChild(div);
+    });
+}
+
+function escapeHtml(s) {
+    return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
 }
 
 // Cleanup on page unload

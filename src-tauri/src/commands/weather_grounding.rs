@@ -193,6 +193,97 @@ pub(crate) async fn open_meteo_grounding_block(query: &str) -> Option<String> {
     Some(lines.join("\n"))
 }
 
+/// User-facing weather reply (no LLM). Used for clear "weather in X" asks.
+pub(crate) async fn format_instant_weather_reply(query: &str) -> Option<String> {
+    if !looks_like_weather_query(query) {
+        return None;
+    }
+    let place = extract_place(query)?;
+    info!(
+        "Weather instant: geocoding place {:?}",
+        crate::logging::ellipse(&place, 60)
+    );
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(12))
+        .build()
+        .ok()?;
+    let geo_url = format!(
+        "https://geocoding-api.open-meteo.com/v1/search?name={}&count=1&language=en&format=json",
+        urlencoding_encode(&place)
+    );
+    let geo_text = client.get(&geo_url).send().await.ok()?.text().await.ok()?;
+    let geo: Value = serde_json::from_str(&geo_text).ok()?;
+    let first = geo.get("results")?.as_array()?.first()?;
+    let lat = first.get("latitude")?.as_f64()?;
+    let lon = first.get("longitude")?.as_f64()?;
+    let name = first
+        .get("name")
+        .and_then(|v| v.as_str())
+        .unwrap_or(&place);
+    let admin = first
+        .get("admin1")
+        .and_then(|v| v.as_str())
+        .unwrap_or("");
+    let country = first
+        .get("country")
+        .and_then(|v| v.as_str())
+        .unwrap_or("");
+    let fc_url = format!(
+        "https://api.open-meteo.com/v1/forecast?latitude={}&longitude={}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation&timezone=auto",
+        lat, lon
+    );
+    let fc_text = client.get(&fc_url).send().await.ok()?.text().await.ok()?;
+    let fc: Value = serde_json::from_str(&fc_text).ok()?;
+    let current = fc.get("current")?;
+    let temp = current.get("temperature_2m")?.as_f64()?;
+    let feels = current
+        .get("apparent_temperature")
+        .and_then(|v| v.as_f64());
+    let humidity = current
+        .get("relative_humidity_2m")
+        .and_then(|v| v.as_f64());
+    let wind = current.get("wind_speed_10m").and_then(|v| v.as_f64());
+    let code = current.get("weather_code").and_then(|v| v.as_i64());
+    let when = current
+        .get("time")
+        .and_then(|v| v.as_str())
+        .unwrap_or("now");
+    let tz = fc
+        .get("timezone")
+        .and_then(|v| v.as_str())
+        .unwrap_or("local");
+    let desc = weather_code_label(code.unwrap_or(-1));
+    let where_s = format!(
+        "{}{}{}",
+        name,
+        if admin.is_empty() {
+            String::new()
+        } else {
+            format!(", {}", admin)
+        },
+        if country.is_empty() {
+            String::new()
+        } else {
+            format!(", {}", country)
+        }
+    );
+    let mut out = format!(
+        "**{}** right now ({}, {}): **{:.1} °C**, {}.",
+        where_s, when, tz, temp, desc
+    );
+    if let Some(f) = feels {
+        out.push_str(&format!(" Feels like {:.1} °C.", f));
+    }
+    if let Some(h) = humidity {
+        out.push_str(&format!(" Humidity {:.0}%.", h));
+    }
+    if let Some(w) = wind {
+        out.push_str(&format!(" Wind {:.1} km/h.", w));
+    }
+    out.push_str("\n_Source: Open-Meteo_");
+    Some(out)
+}
+
 fn weather_code_label(code: i64) -> &'static str {
     match code {
         0 => "Clear",

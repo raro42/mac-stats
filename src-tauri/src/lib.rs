@@ -361,6 +361,12 @@ fn run_internal(open_cpu_window: bool) {
             // Agent commands
             commands::agents::list_agents,
             commands::agents::get_agent_details,
+            commands::harness_ops::list_live_sessions,
+            commands::harness_ops::list_session_files,
+            commands::harness_ops::read_session_file,
+            commands::harness_ops::list_memory_files,
+            commands::harness_ops::read_memory_file,
+            commands::harness_ops::get_runs_insights,
             commands::agents::update_agent_skill,
             commands::agents::update_agent_soul,
             commands::agents::update_agent_mood,

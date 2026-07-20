@@ -73,6 +73,51 @@
         </div>
       </section>
 
+      <!-- Agent Ops — OpenClaw-shaped: agents, sessions, memory, runs -->
+      <section class="agent-ops-section">
+        <div class="section-header" id="agent-ops-header">
+          <h2>Agent Ops</h2>
+          <button class="collapse-btn" id="agent-ops-collapse-btn">−</button>
+        </div>
+        <div class="section-content" id="agent-ops-content">
+          <div class="agent-ops-strip" id="agent-ops-strip">Loading…</div>
+          <div class="agent-ops-tabs">
+            <button type="button" class="agent-ops-tab active" data-ops-tab="agents">Agents</button>
+            <button type="button" class="agent-ops-tab" data-ops-tab="sessions">Sessions</button>
+            <button type="button" class="agent-ops-tab" data-ops-tab="memory">Knowledge</button>
+            <button type="button" class="agent-ops-tab" data-ops-tab="runs">Runs</button>
+          </div>
+          <div class="agent-ops-panel active" id="ops-panel-agents">
+            <div class="ops-list" id="ops-agents-list"></div>
+            <div class="ops-detail" id="ops-agent-detail" hidden>
+              <div class="ops-detail-meta" id="ops-agent-meta"></div>
+              <div class="ops-file-tabs">
+                <button type="button" class="ops-file-tab active" data-file="soul">Soul</button>
+                <button type="button" class="ops-file-tab" data-file="skill">Skill</button>
+                <button type="button" class="ops-file-tab" data-file="mood">Mood</button>
+              </div>
+              <pre class="ops-preview" id="ops-agent-preview"></pre>
+              <button type="button" class="btn-secondary" id="ops-agent-back">← Back</button>
+            </div>
+          </div>
+          <div class="agent-ops-panel" id="ops-panel-sessions">
+            <h4 class="ops-subhead">Live</h4>
+            <div class="ops-list" id="ops-live-sessions"></div>
+            <h4 class="ops-subhead">Recent files</h4>
+            <div class="ops-list" id="ops-session-files"></div>
+            <pre class="ops-preview" id="ops-session-preview" hidden></pre>
+          </div>
+          <div class="agent-ops-panel" id="ops-panel-memory">
+            <div class="ops-list" id="ops-memory-list"></div>
+            <pre class="ops-preview" id="ops-memory-preview" hidden></pre>
+          </div>
+          <div class="agent-ops-panel" id="ops-panel-runs">
+            <div class="ops-list" id="ops-runs-list"></div>
+          </div>
+          <button type="button" class="btn-secondary ops-refresh" id="ops-refresh-btn">Refresh</button>
+        </div>
+      </section>
+
       <!-- Ollama Chat Section (Collapsible) -->
       <section class="ollama-section">
         <div class="section-header" id="ollama-header">

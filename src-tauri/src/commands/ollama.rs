@@ -540,6 +540,59 @@ pub fn answer_with_ollama_and_fetch(
                 });
             }
         }
+        // Weather: Open-Meteo only (0 LLM) — avoid Brave snippet hallucination + 28s tool loops.
+        if !is_verification_retry
+            && crate::commands::weather_grounding::looks_like_weather_query(&plain_for_lane)
+        {
+            if let Some(wx) =
+                crate::commands::weather_grounding::format_instant_weather_reply(&plain_for_lane)
+                    .await
+            {
+                mac_stats_info!(
+                    "ollama/chat",
+                    "Agent router [{}]: INSTANT weather (Open-Meteo, 0 LLM)",
+                    request_id
+                );
+                crate::commands::turn_lifecycle::unregister_if_matches(coord_key, &request_id);
+                crate::commands::run_telemetry::record_turn(
+                    &crate::commands::run_telemetry::TurnRunRecord {
+                        ts: chrono::Utc::now().to_rfc3339(),
+                        request_id: request_id.clone(),
+                        channel_id: discord_reply_channel_id,
+                        entry: if discord_reply_channel_id.is_some() {
+                            "discord".into()
+                        } else {
+                            "agent_router".into()
+                        },
+                        lane: "instant".into(),
+                        question_preview:
+                            crate::commands::run_telemetry::TurnRunRecord::question_preview_from(
+                                &request_for_verification,
+                            ),
+                        wall_ms: turn_clock.wall_ms(),
+                        tools: vec!["OPEN_METEO".into()],
+                        tool_steps: 1,
+                        pre_routed: true,
+                        verify_passed: None,
+                        reply_chars: wx.chars().count(),
+                        skipped_criteria_llm: true,
+                        skipped_topic_llm: true,
+                        skipped_verify_llm: true,
+                        skipped_plan_llm: true,
+                        ok: true,
+                        error: None,
+                    },
+                );
+                return Ok(OllamaReply {
+                    text: wx,
+                    attachment_paths: vec![],
+                    silent_user_output,
+                    turn_lane: "instant".into(),
+                    verify_passed: None,
+                    ..Default::default()
+                });
+            }
+        }
         let skip_meta_llms = turn_lane.skips_meta_llms() || harness_direct;
         let lane_name = if harness_direct && matches!(turn_lane, crate::commands::fast_lane::TurnLane::Full)
         {

@@ -22,6 +22,7 @@ pub mod discord;
 pub mod discord_draft_stream;
 pub mod downloads_organizer;
 pub mod fast_lane;
+pub mod harness_ops;
 pub mod html_cleaning;
 pub mod judge;
 pub mod llm_screenshot;
