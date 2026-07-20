@@ -71,6 +71,22 @@ pub struct RunsInsights {
     pub recent: Vec<RunTurnSummary>,
     /// Discord gateway reconnect line (process lifetime).
     pub discord_gateway: String,
+    /// From `~/.mac-stats/improvements/latest.json` (digester).
+    pub digest_open_count: usize,
+    pub digest_stale_count: usize,
+    pub digest_generated_at: String,
+    pub digest_open_hints: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Default)]
+pub struct DigestSummary {
+    pub open_count: usize,
+    pub stale_count: usize,
+    pub turns: usize,
+    pub generated_at: String,
+    pub open_hints: Vec<String>,
+    pub stale_hints: Vec<String>,
+    pub path: String,
 }
 
 fn file_mtime_ms(meta: &fs::Metadata) -> u64 {
@@ -229,6 +245,7 @@ pub fn compute_runs_insights(limit: u32) -> RunsInsights {
     let path = crate::commands::run_telemetry::runs_jsonl_path();
     let lim = limit.clamp(1, 200) as usize;
     let gateway = crate::discord::format_discord_gateway_insights_line();
+    let digest = load_digest_summary();
     let empty = RunsInsights {
         turns: 0,
         ok_count: 0,
@@ -242,6 +259,10 @@ pub fn compute_runs_insights(limit: u32) -> RunsInsights {
         slowest: vec![],
         recent: vec![],
         discord_gateway: gateway.clone(),
+        digest_open_count: digest.open_count,
+        digest_stale_count: digest.stale_count,
+        digest_generated_at: digest.generated_at.clone(),
+        digest_open_hints: digest.open_hints.clone(),
     };
     if !path.is_file() {
         return empty;
@@ -367,7 +388,81 @@ pub fn compute_runs_insights(limit: u32) -> RunsInsights {
         slowest,
         recent,
         discord_gateway: gateway,
+        digest_open_count: digest.open_count,
+        digest_stale_count: digest.stale_count,
+        digest_generated_at: digest.generated_at,
+        digest_open_hints: digest.open_hints,
     }
+}
+
+fn digest_json_path() -> PathBuf {
+    if let Ok(home) = std::env::var("HOME") {
+        PathBuf::from(home)
+            .join(".mac-stats")
+            .join("improvements")
+            .join("latest.json")
+    } else {
+        std::env::temp_dir()
+            .join("mac-stats-improvements")
+            .join("latest.json")
+    }
+}
+
+/// Load digester summary written by `scripts/digest_agent_runs.py`.
+pub fn load_digest_summary() -> DigestSummary {
+    let path = digest_json_path();
+    let mut summary = DigestSummary {
+        path: path.display().to_string(),
+        ..Default::default()
+    };
+    let Ok(text) = fs::read_to_string(&path) else {
+        return summary;
+    };
+    let Ok(v) = serde_json::from_str::<serde_json::Value>(&text) else {
+        return summary;
+    };
+    summary.generated_at = v
+        .get("generated_at")
+        .and_then(|x| x.as_str())
+        .unwrap_or("")
+        .to_string();
+    summary.turns = v.get("turns").and_then(|x| x.as_u64()).unwrap_or(0) as usize;
+    summary.open_count = v.get("open_count").and_then(|x| x.as_u64()).unwrap_or(0) as usize;
+    summary.stale_count = v.get("stale_count").and_then(|x| x.as_u64()).unwrap_or(0) as usize;
+    summary.open_hints = v
+        .get("open")
+        .and_then(|x| x.as_array())
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|item| {
+                    item.get("hint")
+                        .and_then(|h| h.as_str())
+                        .map(|s| s.to_string())
+                })
+                .take(5)
+                .collect()
+        })
+        .unwrap_or_default();
+    summary.stale_hints = v
+        .get("stale")
+        .and_then(|x| x.as_array())
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|item| {
+                    item.get("hint")
+                        .and_then(|h| h.as_str())
+                        .map(|s| s.to_string())
+                })
+                .take(5)
+                .collect()
+        })
+        .unwrap_or_default();
+    summary
+}
+
+#[tauri::command]
+pub fn get_digest_summary() -> DigestSummary {
+    load_digest_summary()
 }
 
 fn classify_candidate(

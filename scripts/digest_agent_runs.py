@@ -244,8 +244,47 @@ def main() -> int:
 
     text = "\n".join(lines) + "\n"
     args.out.write_text(text)
+
+    # Machine-readable summary for Agent Ops.
+    json_out = args.out.with_suffix(".json")
+    open_items = [
+        {
+            "wall_ms": wall,
+            "hint": hint,
+            "question_preview": (q or "")[:120],
+            "request_id": rid,
+            "ts": ts.isoformat() if ts else None,
+        }
+        for wall, hint, q, rid, ts in sorted(candidates, reverse=True)[:20]
+    ]
+    stale_items = [
+        {
+            "wall_ms": wall,
+            "hint": hint,
+            "question_preview": (q or "")[:120],
+            "request_id": rid,
+            "ts": ts.isoformat() if ts else None,
+        }
+        for wall, hint, q, rid, ts in sorted(stale, reverse=True)[:20]
+    ]
+    payload = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "days": args.days,
+        "turns": len(runs),
+        "open_count": len(candidates),
+        "stale_count": len(stale),
+        "p50_ms": int(statistics.median(walls)) if walls else 0,
+        "max_ms": max(walls) if walls else 0,
+        "by_lane": dict(by_lane),
+        "open": open_items,
+        "stale": stale_items,
+        "markdown_path": str(args.out),
+    }
+    json_out.write_text(json.dumps(payload, indent=2) + "\n")
+
     print(text)
     print(f"Wrote {args.out}")
+    print(f"Wrote {json_out}")
     return 0
 
 
