@@ -60,6 +60,7 @@ pub mod scheduler;
 pub mod screenshot_lifecycle;
 pub mod security;
 pub mod session_history;
+pub mod session_search;
 pub mod session_todo;
 pub mod skills;
 pub mod suspicious_patterns;

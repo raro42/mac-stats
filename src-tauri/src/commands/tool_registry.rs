@@ -222,6 +222,13 @@ pub(crate) static TOOLS: &[ToolDef] = &[
         terminates_navigation: false,
     },
     ToolDef {
+        name: "SESSION_SEARCH",
+        description: "Search past session transcripts under ~/.mac-stats/session/ (Hermes session_search).",
+        accepts_argument: true,
+        requires_browser: false,
+        terminates_navigation: false,
+    },
+    ToolDef {
         name: "AGENT",
         description: "Delegate to another LLM agent by slug.",
         accepts_argument: true,
@@ -582,6 +589,7 @@ mod tests {
             "TODO",
             "SKILLS_LIST",
             "SKILL_VIEW",
+            "SESSION_SEARCH",
         ];
         for name in DISPATCH_TOOLS {
             assert!(

@@ -3,6 +3,7 @@
 //! `MEMORY_APPEND` remains an alias for `MEMORY: add …`.
 
 use std::path::PathBuf;
+use std::sync::OnceLock;
 
 use tracing::info;
 
@@ -18,6 +19,20 @@ const THREAT_PATTERNS: &[&str] = &[
     "disregard your instructions",
     "disregard all rules",
 ];
+
+fn scrub_memory_pollution_once() {
+    static ONCE: OnceLock<()> = OnceLock::new();
+    ONCE.get_or_init(|| {
+        let (files, removed) =
+            crate::commands::session_search::scrub_polluted_memory_files();
+        if removed > 0 {
+            info!(
+                "Memory hygiene: scrubbed {} polluted entr(y/ies) across {} file(s)",
+                removed, files
+            );
+        }
+    });
+}
 
 fn scan_threat(content: &str) -> Option<&'static str> {
     let lower = content.to_lowercase();
@@ -121,6 +136,7 @@ fn format_status(path: &PathBuf, entries: &[String], limit: usize) -> String {
 
 /// `MEMORY: add|replace|remove|read …` or bare text for add.
 pub fn handle_memory(arg: &str, discord_reply_channel_id: Option<u64>) -> String {
+    scrub_memory_pollution_once();
     let arg = arg.trim();
     if arg.is_empty() {
         return "Usage: MEMORY: add <text> | replace <old> => <new> | remove <substring> | read  (optional agent:<slug> prefix)".to_string();
@@ -179,6 +195,10 @@ pub fn handle_memory(arg: &str, discord_reply_channel_id: Option<u64>) -> String
             let lesson = body.trim_start_matches('-').trim();
             if lesson.len() < 3 {
                 return "MEMORY add: content too short.".to_string();
+            }
+            if crate::commands::session_search::looks_like_memory_pollution(lesson) {
+                return "Blocked: looks like compaction/timeout boilerplate — not written to memory."
+                    .to_string();
             }
             if entries.iter().any(|e| e.eq_ignore_ascii_case(lesson)) {
                 return format!(

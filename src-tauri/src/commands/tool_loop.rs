@@ -1318,6 +1318,7 @@ async fn dispatch_tool(
             arg,
             params.discord_reply_channel_id,
         ),
+        "SESSION_SEARCH" => crate::commands::session_search::handle_session_search(arg),
         "AGENT" => {
             let last_user_content = messages
                 .last()

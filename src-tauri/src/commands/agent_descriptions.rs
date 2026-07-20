@@ -305,6 +305,11 @@ pub(crate) async fn build_agent_descriptions(
         num
     ));
     num += 1;
+    base.push_str(&format!(
+        "\n\n{}. **SESSION_SEARCH**: Recall past chats under ~/.mac-stats/session/. Reply SESSION_SEARCH: <query> when the user asks what was decided earlier.",
+        num
+    ));
+    num += 1;
     let agent_list = crate::agents::load_agents();
     let cursor_agent_available = crate::commands::cursor_agent::is_cursor_agent_available();
     if !agent_list.is_empty() || cursor_agent_available {

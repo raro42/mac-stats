@@ -81,6 +81,7 @@ fn primary_param(name: &str) -> (&'static str, &'static str) {
             "text",
             "add <text> | replace <old> => <new> | remove <substr> | read (MEMORY_APPEND = add)",
         ),
+        "SESSION_SEARCH" => ("query", "Search past session transcripts"),
         "REDMINE_API" | "DISCORD_API" | "OLLAMA_API" | "MCP" => {
             ("request", "Method/path or tool invocation line")
         }
