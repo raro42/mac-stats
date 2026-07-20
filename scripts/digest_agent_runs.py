@@ -103,24 +103,35 @@ def main() -> int:
         )
     lines.append("")
 
-    # Candidates: full-lane turns that look pre-routable / trivial and were slow
+    # Candidates: slow turns that should have been cheaper
     candidates = []
     for r in runs:
-        if r.get("lane") != "full":
-            continue
         q = (r.get("question_preview") or "").lower()
         wall = int(r.get("wall_ms") or 0)
-        if wall < 15_000:
-            continue
+        lane = r.get("lane") or "?"
+        tools = r.get("tools") or []
+        tool_steps = int(r.get("tool_steps") or 0)
         hint = None
-        if "time" in q or "uhr" in q or "hora" in q:
-            hint = "Promote to INSTANT time/date lane"
-        elif q.startswith("search ") or "search for" in q or "look up" in q:
-            hint = "Ensure BRAVE/PERPLEXITY pre-route + LITE (skip criteria/verify)"
-        elif q.startswith("ping") or q in ("hi", "hello", "hey"):
-            hint = "Promote to INSTANT greeting lane"
-        elif wall > 60_000 and not r.get("pre_routed"):
-            hint = "Investigate meta-LLM cost (criteria/topic/plan/verify); consider lite or smaller judge model"
+        if wall >= 5_000 and lane in ("lite", "direct", "full") and (
+            not tools and tool_steps == 0
+        ):
+            if "version" in q:
+                hint = "Promote to INSTANT version lane"
+            elif "time" in q or "uhr" in q or "hora" in q or "date" in q:
+                hint = "Promote to INSTANT time/date lane"
+            elif q.strip() in ("ping", "hi", "hello", "hey", "thanks", "thank you"):
+                hint = "Promote to INSTANT greeting/thanks lane"
+            elif wall >= 15_000:
+                hint = "Zero-tool slow turn — consider instant/pre-route or smaller model"
+        elif lane == "full" and wall >= 15_000:
+            if "time" in q or "uhr" in q or "hora" in q:
+                hint = "Promote to INSTANT time/date lane"
+            elif q.startswith("search ") or "search for" in q or "look up" in q:
+                hint = "Ensure BRAVE/PERPLEXITY pre-route + LITE (skip criteria/verify)"
+            elif q.startswith("ping") or q in ("hi", "hello", "hey"):
+                hint = "Promote to INSTANT greeting lane"
+            elif wall > 60_000 and not r.get("pre_routed"):
+                hint = "Investigate meta-LLM cost (criteria/topic/plan/verify); consider lite or smaller judge model"
         if hint:
             candidates.append((wall, hint, r.get("question_preview", ""), r.get("request_id")))
 
