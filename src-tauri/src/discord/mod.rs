@@ -2006,7 +2006,38 @@ pub(super) async fn run_discord_ollama_router(
     attachment_images_base64: Vec<String>,
     mode: ChannelMode,
 ) {
-    let session_key = format!("discord:{}", new_message.channel_id.get());
+    let channel_id_u64 = new_message.channel_id.get();
+    let coord = crate::commands::turn_lifecycle::coordination_key(Some(channel_id_u64));
+    // Hermes-style cooperative cancel: set the flag *before* waiting on the serial queue
+    // so an in-flight tool loop can observe stop/cancel immediately.
+    if crate::commands::turn_interrupt::looks_like_stop_request(&content) {
+        if crate::commands::turn_lifecycle::has_active_turn(coord) {
+            crate::commands::turn_interrupt::request(coord);
+            info!(
+                "Discord: cooperative interrupt requested (channel={}, content={:?})",
+                channel_id_u64,
+                crate::logging::ellipse(&content, 40)
+            );
+            if let Err(e) = new_message
+                .channel_id
+                .say(&ctx, "Interrupted — stopping the current run.")
+                .await
+            {
+                error!("Discord: failed to send interrupt ack: {}", e);
+            }
+            return;
+        }
+        if let Err(e) = new_message
+            .channel_id
+            .say(&ctx, "Nothing in progress to stop.")
+            .await
+        {
+            error!("Discord: failed to send no-op interrupt ack: {}", e);
+        }
+        return;
+    }
+
+    let session_key = format!("discord:{}", channel_id_u64);
     crate::keyed_queue::run_serial(
         session_key,
         run_discord_ollama_router_locked(ctx, new_message, content, attachment_images_base64, mode),

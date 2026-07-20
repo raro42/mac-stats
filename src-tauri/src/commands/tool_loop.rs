@@ -291,6 +291,19 @@ pub(crate) async fn run_tool_loop(
     }
 
     'agent_tool_loop: while state.tool_count < params.max_tool_iterations {
+        let coord_key =
+            crate::commands::turn_lifecycle::coordination_key(params.discord_reply_channel_id);
+        if crate::commands::turn_interrupt::is_interrupted(coord_key) {
+            info!(
+                "Agent router: cooperative interrupt — stopping tool loop (coord_key={})",
+                coord_key
+            );
+            response_content = format!(
+                "{}\n\n[interrupted] User requested stop/cancel. Partial tool progress is above.",
+                response_content.trim_end()
+            );
+            break;
+        }
         let tools = parse_all_tools_from_response(&response_content);
         if tools.is_empty() {
             info!(
@@ -341,6 +354,18 @@ pub(crate) async fn run_tool_loop(
         };
 
         for (batch_idx, (tool, arg)) in tools.into_iter().enumerate() {
+            if crate::commands::turn_interrupt::is_interrupted(coord_key) {
+                info!(
+                    "Agent router: cooperative interrupt mid-batch after {} tool(s)",
+                    batch_idx
+                );
+                tool_results.push(
+                    "[interrupted] Stopped before remaining tools in this batch.".to_string(),
+                );
+                critical_loop_abort =
+                    Some("User interrupted (stop/cancel).".to_string());
+                break;
+            }
             if state.tool_count >= params.max_tool_iterations {
                 break;
             }

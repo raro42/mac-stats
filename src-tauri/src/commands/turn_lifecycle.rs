@@ -43,6 +43,7 @@ pub fn resolve_turn_budget_secs(
 }
 
 pub fn register(coord_key: u64, request_id: &str) {
+    crate::commands::turn_interrupt::clear(coord_key);
     let mut g = active_map().lock().unwrap_or_else(|e| e.into_inner());
     g.insert(coord_key, request_id.to_string());
     mac_stats_info!(
@@ -51,6 +52,12 @@ pub fn register(coord_key: u64, request_id: &str) {
         coord_key,
         request_id
     );
+}
+
+/// True if some request_id is currently registered for this coordination key.
+pub fn has_active_turn(coord_key: u64) -> bool {
+    let g = active_map().lock().unwrap_or_else(|e| e.into_inner());
+    g.contains_key(&coord_key)
 }
 
 pub fn unregister_if_matches(coord_key: u64, request_id: &str) {

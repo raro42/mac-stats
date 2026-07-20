@@ -69,6 +69,7 @@ pub mod text_normalize;
 pub mod tool_loop;
 pub mod tool_parsing;
 pub mod tool_registry;
+pub mod turn_interrupt;
 pub mod turn_lifecycle;
 pub mod untrusted_content;
 pub mod verification;
