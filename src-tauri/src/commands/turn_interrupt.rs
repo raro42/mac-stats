@@ -5,10 +5,27 @@
 //! stop/cancel **before** waiting on the per-channel serial queue.
 
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, OnceLock};
 
 use tracing::info;
+
+/// Coord key currently executing a tool that should poll interrupt (`u64::MAX` = none).
+static POLL_COORD: AtomicU64 = AtomicU64::new(u64::MAX);
+
+/// Set while a tool (e.g. RUN_CMD) may block; cleared when the tool returns.
+pub fn set_poll_coord(coord_key: Option<u64>) {
+    POLL_COORD.store(coord_key.unwrap_or(u64::MAX), Ordering::SeqCst);
+}
+
+/// True if the active polling coord has been interrupted.
+pub fn is_interrupted_for_poll() -> bool {
+    let k = POLL_COORD.load(Ordering::SeqCst);
+    if k == u64::MAX {
+        return false;
+    }
+    is_interrupted(k)
+}
 
 fn map() -> &'static Mutex<HashMap<u64, Arc<AtomicBool>>> {
     static M: OnceLock<Mutex<HashMap<u64, Arc<AtomicBool>>>> = OnceLock::new();

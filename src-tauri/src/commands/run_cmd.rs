@@ -7,7 +7,8 @@
 //! fail-closed. See docs/011_local_cmd_agent.md.
 
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Child, Command};
+use std::time::Duration;
 use tracing::{info, warn};
 
 /// Default allowlist when orchestrator skill.md has no "## RUN_CMD allowlist" section.
@@ -449,9 +450,7 @@ fn run_single_command_shell(
             }
             drop(child.stdin.take());
         }
-        let output = child
-            .wait_with_output()
-            .map_err(|e| format!("Command failed: {}", e))?;
+        let output = wait_child_interruptible(child)?;
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
             if !stderr.trim().is_empty() {
@@ -504,9 +503,7 @@ fn run_single_command_shell(
         }
         drop(child.stdin.take());
     }
-    let output = child
-        .wait_with_output()
-        .map_err(|e| format!("Command failed: {}", e))?;
+    let output = wait_child_interruptible(child)?;
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
         if !stderr.trim().is_empty() {
@@ -514,6 +511,41 @@ fn run_single_command_shell(
         }
     }
     Ok(output.stdout)
+}
+
+/// Poll `try_wait` so Discord `stop`/`cancel` can kill a stuck RUN_CMD (Hermes interrupt).
+fn wait_child_interruptible(mut child: Child) -> Result<std::process::Output, String> {
+    use std::io::Read;
+    let mut stdout_pipe = child.stdout.take();
+    let mut stderr_pipe = child.stderr.take();
+    loop {
+        if crate::commands::turn_interrupt::is_interrupted_for_poll() {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err("[interrupted] RUN_CMD killed after user stop/cancel.".to_string());
+        }
+        match child.try_wait() {
+            Ok(Some(status)) => {
+                let mut stdout = Vec::new();
+                let mut stderr = Vec::new();
+                if let Some(ref mut p) = stdout_pipe {
+                    let _ = p.read_to_end(&mut stdout);
+                }
+                if let Some(ref mut p) = stderr_pipe {
+                    let _ = p.read_to_end(&mut stderr);
+                }
+                return Ok(std::process::Output {
+                    status,
+                    stdout,
+                    stderr,
+                });
+            }
+            Ok(None) => {
+                std::thread::sleep(Duration::from_millis(100));
+            }
+            Err(e) => return Err(format!("Command failed: {}", e)),
+        }
+    }
 }
 
 /// Run a restricted local command. Stages are split at top-level `|` only; each stage runs via `sh -c`.

@@ -1377,6 +1377,9 @@ async fn dispatch_tool(
             crate::commands::task_tool_handlers::handle_list_schedules(&params.status_tx)
         }
         "RUN_CMD" => {
+            let coord =
+                crate::commands::turn_lifecycle::coordination_key(params.discord_reply_channel_id);
+            crate::commands::turn_interrupt::set_poll_coord(Some(coord));
             let result = crate::commands::delegation_tool_dispatch::handle_run_cmd(
                 arg,
                 state.last_run_cmd_arg.as_deref(),
@@ -1386,6 +1389,7 @@ async fn dispatch_tool(
                 params.status_tx.as_ref(),
             )
             .await;
+            crate::commands::turn_interrupt::set_poll_coord(None);
             if let Some(raw) = result.raw_output {
                 state.last_run_cmd_raw_output = Some(raw);
             }
