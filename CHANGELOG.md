@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.175] - 2026-07-21
+
+### Changed
+- **Agent Ops**: keyboard tip under tabs (`/` focuses filter · Esc clears).
+- **Ori Mnemos**: inbox captures use crash-safe `write_text_atomic`.
+
 ## [0.1.174] - 2026-07-21
 
 ### Changed

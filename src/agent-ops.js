@@ -94,9 +94,20 @@ function focusActiveOpsFilter() {
     return true;
 }
 
+function ensureOpsKeyboardHint() {
+    const tabs = document.querySelector('.agent-ops-tabs');
+    if (!tabs || document.getElementById('ops-keyboard-hint')) return;
+    const hint = document.createElement('div');
+    hint.id = 'ops-keyboard-hint';
+    hint.className = 'ops-row-meta ops-keyboard-hint';
+    hint.textContent = 'Tips: / focuses filter · Esc clears';
+    tabs.insertAdjacentElement('afterend', hint);
+}
+
 function setupAgentOps() {
     const activeBtn = document.querySelector('.agent-ops-tab.active');
     if (activeBtn?.dataset?.opsTab) opsActiveTab = activeBtn.dataset.opsTab;
+    ensureOpsKeyboardHint();
     document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
         btn.addEventListener('click', () => selectOpsTab(btn.dataset.opsTab));
     });

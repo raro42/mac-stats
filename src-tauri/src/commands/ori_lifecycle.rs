@@ -375,7 +375,7 @@ fn write_inbox_capture(vault: &Path, title: &str, body: &str) -> Result<PathBuf,
         path = inbox.join(format!("{}-{}.md", base, n));
         n += 1;
     }
-    std::fs::write(&path, yaml).map_err(|e| format!("write inbox: {}", e))?;
+    crate::config::write_text_atomic(&path, &yaml).map_err(|e| format!("write inbox: {}", e))?;
     Ok(path)
 }
 
