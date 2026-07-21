@@ -1054,7 +1054,7 @@ pub fn format_ops_help_gateway() -> String {
 • `stop` / `cancel` — interrupt an in-flight run\n\
 • `/ops` — this menu\n\
 \n\
-**Scheduled:** wake-up 06:00 · CHANGELOG hygiene Mondays 10:00 (`docs/040_changelog_hygiene.md`)"
+**Scheduled:** wake-up 06:00 · CHANGELOG hygiene Mondays 10:00 · UI review Wednesdays 11:00 (`docs/041_ui_command_center.md`)"
     )
 }
 

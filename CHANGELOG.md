@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.130] - 2026-07-21
+
+### Added
+- **Agent Ops Command Center** — health glass cards (version, Discord, next schedule, last delivery, digest) plus overview grid for **Schedules**, **Live** sessions, **Knowledge**, and **Recent chats** without opening tabs.
+- **Schedules tab** in Agent Ops (active jobs + recent deliveries; add/remove still in Settings).
+- **Weekly UI review** — Wednesday schedule + `ui-weekly-review` skill; see `docs/041_ui_command_center.md`.
+
+### Changed
+- Agent Ops panel max-height raised; overview deep-links into detail tabs and Load into AI Chat.
+
 ## [0.1.129] - 2026-07-21
 
 ### Added

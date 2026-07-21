@@ -907,16 +907,26 @@ async function addAlertChannelFromSettings() {
     }
 }
 
-// --- Agent Ops (OpenClaw-shaped: agents / sessions / knowledge / runs) ---
+// --- Agent Ops (Command Center: overview + detail tabs) ---
+
+function selectOpsTab(tab) {
+    document.querySelectorAll('.agent-ops-tab').forEach((b) => {
+        b.classList.toggle('active', b.dataset.opsTab === tab);
+    });
+    document.querySelectorAll('.agent-ops-panel').forEach((p) => {
+        p.classList.toggle('active', p.id === `ops-panel-${tab}`);
+    });
+}
 
 function setupAgentOps() {
     document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const tab = btn.dataset.opsTab;
-            document.querySelectorAll('.agent-ops-tab').forEach((b) => b.classList.toggle('active', b === btn));
-            document.querySelectorAll('.agent-ops-panel').forEach((p) => {
-                p.classList.toggle('active', p.id === `ops-panel-${tab}`);
-            });
+        btn.addEventListener('click', () => selectOpsTab(btn.dataset.opsTab));
+    });
+    document.querySelectorAll('.ops-overview-link').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const tab = btn.dataset.gotoTab;
+            if (tab) selectOpsTab(tab);
         });
     });
     document.querySelectorAll('.ops-file-tab').forEach((btn) => {
@@ -938,18 +948,18 @@ function setupAgentOps() {
 
 async function refreshOpsDigest() {
     const btn = document.getElementById('ops-digest-refresh-btn');
-    const strip = document.getElementById('agent-ops-strip');
+    const digestEl = document.getElementById('ops-health-digest');
     if (btn) {
         btn.disabled = true;
         btn.textContent = 'Refreshing…';
     }
     try {
         const msg = await invoke('refresh_agent_digest');
-        if (strip) strip.textContent = String(msg);
+        if (digestEl) digestEl.textContent = String(msg).slice(0, 80);
         await refreshAgentOps();
     } catch (err) {
         console.warn('[Agent Ops] digest refresh', err);
-        if (strip) strip.textContent = `Digest refresh failed: ${err}`;
+        if (digestEl) digestEl.textContent = `Refresh failed`;
     } finally {
         if (btn) {
             btn.disabled = false;
@@ -973,70 +983,289 @@ function fmtAge(ms) {
     return `${Math.floor(age / 86400_000)}d ago`;
 }
 
-async function refreshAgentOps() {
-    const strip = document.getElementById('agent-ops-strip');
-    try {
-        const [agents, live, files, memory, insights, version, sched, deliveries] = await Promise.all([
-            invoke('list_agents'),
-            invoke('list_live_sessions'),
-            invoke('list_session_files', { limit: 40 }),
-            invoke('list_memory_files'),
-            invoke('get_runs_insights', { limit: 40 }),
-            invoke('get_app_version').catch(() => null),
-            invoke('get_scheduler_snapshot').catch(() => null),
-            invoke('list_scheduler_delivery_awareness').catch(() => null),
-        ]);
-        const enabled = (agents || []).filter((a) => a.enabled).length;
-        const ver = version ? `v${version} · ` : '';
-        let schedBit = '';
-        if (sched && sched.totalEntries != null) {
-            const n = sched.totalEntries;
-            if (n === 0) {
-                schedBit = ' · schedules 0';
-            } else if (sched.secondsUntilNextFire != null) {
-                const secs = Number(sched.secondsUntilNextFire);
-                const when =
-                    secs < 3600
-                        ? `${Math.max(1, Math.round(secs / 60))}m`
-                        : `${Math.round(secs / 3600)}h`;
-                const preview = sched.nextTaskPreview
-                    ? ` (${String(sched.nextTaskPreview).slice(0, 28)})`
-                    : '';
-                schedBit = ` · next schedule ${when}${preview}`;
-            } else {
-                schedBit = ` · schedules ${n}`;
-            }
-        }
-        let deliveryBit = '';
-        if (Array.isArray(deliveries) && deliveries.length) {
-            const newest = deliveries[0];
-            const t = newest?.utc ? Date.parse(newest.utc) : NaN;
-            if (!Number.isNaN(t)) {
-                deliveryBit = ` · last delivery ${fmtAge(t)}`;
-            }
-        }
-        let digestAge = '';
-        if (insights?.digest_generated_at) {
+function fmtScheduleEta(sched) {
+    if (!sched || sched.totalEntries == null) return '—';
+    if (sched.totalEntries === 0) return 'None';
+    if (sched.secondsUntilNextFire == null) return `${sched.totalEntries} jobs`;
+    const secs = Number(sched.secondsUntilNextFire);
+    const when =
+        secs < 3600
+            ? `${Math.max(1, Math.round(secs / 60))}m`
+            : `${Math.round(secs / 3600)}h`;
+    const preview = sched.nextTaskPreview
+        ? String(sched.nextTaskPreview).slice(0, 32)
+        : '';
+    return preview ? `${when} · ${preview}` : when;
+}
+
+function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+}
+
+function renderOpsHealth({ version, insights, sched, deliveries, agents, live }) {
+    const enabled = (agents || []).filter((a) => a.enabled).length;
+    setText(
+        'ops-health-version',
+        version ? `v${version}` : '—'
+    );
+    const agentsHint = document.getElementById('ops-health-version');
+    if (agentsHint && version) {
+        agentsHint.title = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live`;
+    }
+
+    const dg = insights?.discord_gateway || '';
+    const readyMatch = dg.match(/last Ready\s+([^·]+)/i);
+    setText('ops-health-discord', readyMatch ? readyMatch[1].trim() : dg ? 'see Runs' : '—');
+
+    setText('ops-health-schedule', fmtScheduleEta(sched));
+
+    let deliveryText = '—';
+    if (Array.isArray(deliveries) && deliveries.length) {
+        const newest = deliveries[0];
+        const t = newest?.utc ? Date.parse(newest.utc) : NaN;
+        deliveryText = !Number.isNaN(t) ? fmtAge(t) : (newest.utc || '—');
+    }
+    setText('ops-health-delivery', deliveryText);
+
+    let digestText = '—';
+    if (insights) {
+        const open = insights.digest_open_count ?? 0;
+        const stale = insights.digest_stale_count ?? 0;
+        let age = '';
+        if (insights.digest_generated_at) {
             const t = Date.parse(insights.digest_generated_at);
-            if (!Number.isNaN(t)) {
-                digestAge = ` ${fmtAge(t)}`;
+            if (!Number.isNaN(t)) age = ` · ${fmtAge(t)}`;
+        }
+        digestText = `${open} open / ${stale} stale${age}`;
+    }
+    setText('ops-health-digest', digestText);
+}
+
+function renderOverviewSchedules(schedules, deliveries) {
+    const body = document.getElementById('ops-overview-schedules-body');
+    if (!body) return;
+    body.innerHTML = '';
+    if (!schedules || !schedules.length) {
+        body.innerHTML = '<div class="ops-empty">No schedules</div>';
+        return;
+    }
+    const count = document.createElement('div');
+    count.className = 'ops-overview-count';
+    count.textContent = `${schedules.length} active`;
+    body.appendChild(count);
+    schedules.slice(0, 3).forEach((s) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        const id = s.id || '(no id)';
+        const next = s.next_run || s.nextRun || '—';
+        const task = String(s.task || '').slice(0, 40);
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">next ${escapeHtml(next)} · ${escapeHtml(task)}</div></div>`;
+        btn.addEventListener('click', () => selectOpsTab('schedules'));
+        body.appendChild(btn);
+    });
+    if (Array.isArray(deliveries) && deliveries.length) {
+        const t = deliveries[0]?.utc ? Date.parse(deliveries[0].utc) : NaN;
+        const meta = document.createElement('div');
+        meta.className = 'ops-overview-count';
+        meta.textContent = !Number.isNaN(t)
+            ? `Last delivery ${fmtAge(t)}`
+            : 'Last delivery recorded';
+        body.appendChild(meta);
+    }
+}
+
+function renderOverviewLive(rows) {
+    const body = document.getElementById('ops-overview-live-body');
+    if (!body) return;
+    body.innerHTML = '';
+    if (!rows || !rows.length) {
+        body.innerHTML = '<div class="ops-empty">No live sessions</div>';
+        return;
+    }
+    const count = document.createElement('div');
+    count.className = 'ops-overview-count';
+    count.textContent = `${rows.length} live`;
+    body.appendChild(count);
+    rows.slice(0, 3).forEach((r) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs</div></div>`;
+        btn.addEventListener('click', async () => {
+            selectOpsTab('sessions');
+            try {
+                const msgs = await invoke('read_live_session_messages', {
+                    source: r.source,
+                    sessionId: r.session_id,
+                });
+                showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`);
+            } catch (err) {
+                showOpsSessionPreview([], String(err));
             }
+        });
+        body.appendChild(btn);
+    });
+}
+
+function renderOverviewKnowledge(files) {
+    const body = document.getElementById('ops-overview-knowledge-body');
+    if (!body) return;
+    body.innerHTML = '';
+    if (!files || !files.length) {
+        body.innerHTML = '<div class="ops-empty">No knowledge files</div>';
+        return;
+    }
+    const sorted = [...files].sort((a, b) => (b.modified_ms || 0) - (a.modified_ms || 0));
+    const count = document.createElement('div');
+    count.className = 'ops-overview-count';
+    count.textContent = `${files.length} files`;
+    body.appendChild(count);
+    sorted.slice(0, 4).forEach((f) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(f.kind)} · ${fmtAge(f.modified_ms)}</div></div>`;
+        btn.addEventListener('click', async () => {
+            selectOpsTab('memory');
+            const preview = document.getElementById('ops-memory-preview');
+            try {
+                const text = await invoke('read_memory_file', { path: f.path });
+                if (preview) {
+                    preview.hidden = false;
+                    preview.textContent = text.slice(0, 12000);
+                }
+            } catch (err) {
+                if (preview) {
+                    preview.hidden = false;
+                    preview.textContent = String(err);
+                }
+            }
+        });
+        body.appendChild(btn);
+    });
+}
+
+function renderOverviewRecent(files) {
+    const body = document.getElementById('ops-overview-recent-body');
+    if (!body) return;
+    body.innerHTML = '';
+    if (!files || !files.length) {
+        body.innerHTML = '<div class="ops-empty">No recent chats</div>';
+        return;
+    }
+    const count = document.createElement('div');
+    count.className = 'ops-overview-count';
+    count.textContent = `${Math.min(5, files.length)} of ${files.length}`;
+    body.appendChild(count);
+    files.slice(0, 5).forEach((f) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(f.source_hint)} · ${fmtAge(f.modified_ms)}</div></div>`;
+        btn.addEventListener('click', async () => {
+            selectOpsTab('sessions');
+            try {
+                const msgs = await invoke('read_session_file_messages', { path: f.path });
+                if (msgs && msgs.length) {
+                    showOpsSessionPreview(msgs, f.name);
+                } else {
+                    const text = await invoke('read_session_file', { path: f.path });
+                    const preview = document.getElementById('ops-session-preview');
+                    const loadBtn = document.getElementById('ops-session-load-chat');
+                    if (preview) {
+                        preview.hidden = false;
+                        preview.textContent = text.slice(0, 12000);
+                    }
+                    opsSessionLoadRows = null;
+                    if (loadBtn) loadBtn.hidden = true;
+                }
+            } catch (err) {
+                showOpsSessionPreview([], String(err));
+            }
+        });
+        body.appendChild(btn);
+    });
+}
+
+function renderOpsSchedulesTab(schedules, deliveries) {
+    const list = document.getElementById('ops-schedules-list');
+    const delList = document.getElementById('ops-deliveries-list');
+    if (list) {
+        list.innerHTML = '';
+        if (!schedules || !schedules.length) {
+            list.innerHTML = '<div class="ops-empty">No schedules</div>';
+        } else {
+            schedules.forEach((s) => {
+                const div = document.createElement('div');
+                div.className = 'ops-row';
+                const id = s.id || '(no id)';
+                const when = s.cron ? `cron ${s.cron}` : s.at ? `at ${s.at}` : '—';
+                const next = s.next_run || s.nextRun || '—';
+                const task = String(s.task || '');
+                div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">${escapeHtml(when)} · next ${escapeHtml(next)}</div><div class="ops-row-meta">${escapeHtml(task.slice(0, 80))}${task.length > 80 ? '…' : ''}</div></div>`;
+                list.appendChild(div);
+            });
         }
-        let discordBit = '';
-        const dg = insights?.discord_gateway || '';
-        const readyMatch = dg.match(/last Ready\s+([^·]+)/i);
-        if (readyMatch) {
-            discordBit = ` · Discord ${readyMatch[1].trim()}`;
+    }
+    if (delList) {
+        delList.innerHTML = '';
+        if (!deliveries || !deliveries.length) {
+            delList.innerHTML = '<div class="ops-empty">No deliveries yet</div>';
+        } else {
+            deliveries.slice(0, 8).forEach((d) => {
+                const div = document.createElement('div');
+                div.className = 'ops-row';
+                const t = d.utc ? Date.parse(d.utc) : NaN;
+                const age = !Number.isNaN(t) ? fmtAge(t) : d.utc || '';
+                const summary = String(d.summary || '').slice(0, 72);
+                div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(d.schedule_id || 'schedule')}</div><div class="ops-row-meta">${escapeHtml(age)} · ${escapeHtml(summary)}</div></div>`;
+                delList.appendChild(div);
+            });
         }
-        strip.textContent = `${ver}${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${(files || []).length} session files · p50 ${insights?.p50_ms ?? 0} ms · ${insights?.turns ?? 0} runs · digest ${insights?.digest_open_count ?? 0} open / ${insights?.digest_stale_count ?? 0} stale${digestAge}${insights?.digest_source ? ` · ${insights.digest_source}` : ''}${insights?.fail_count ? ` · ${insights.fail_count} fail` : ''}${discordBit}${schedBit}${deliveryBit}`;
+    }
+}
+
+async function refreshAgentOps() {
+    const healthRow = document.getElementById('ops-health-row');
+    try {
+        const [agents, live, files, memory, insights, version, sched, deliveries, schedules] =
+            await Promise.all([
+                invoke('list_agents'),
+                invoke('list_live_sessions'),
+                invoke('list_session_files', { limit: 40 }),
+                invoke('list_memory_files'),
+                invoke('get_runs_insights', { limit: 40 }),
+                invoke('get_app_version').catch(() => null),
+                invoke('get_scheduler_snapshot').catch(() => null),
+                invoke('list_scheduler_delivery_awareness').catch(() => null),
+                invoke('list_schedules').catch(() => []),
+            ]);
+        renderOpsHealth({
+            version,
+            insights,
+            sched,
+            deliveries,
+            agents,
+            live,
+        });
+        renderOverviewSchedules(schedules || [], deliveries || []);
+        renderOverviewLive(live || []);
+        renderOverviewKnowledge(memory || []);
+        renderOverviewRecent(files || []);
+        renderOpsSchedulesTab(schedules || [], deliveries || []);
         renderOpsAgents(agents || []);
         renderOpsLive(live || []);
         renderOpsSessionFiles(files || []);
         renderOpsMemory(memory || []);
         renderOpsRuns(insights);
     } catch (err) {
-        strip.textContent = `Agent Ops unavailable: ${err}`;
         console.warn('[Agent Ops]', err);
+        if (healthRow) {
+            setText('ops-health-version', 'Unavailable');
+            setText('ops-health-discord', String(err).slice(0, 40));
+        }
     }
 }
 

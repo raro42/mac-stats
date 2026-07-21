@@ -146,6 +146,117 @@ body {
   letter-spacing: 0.2px;
 }
 
+.ops-health-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0 12px 12px;
+}
+
+.ops-health-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-height: 58px;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.ops-health-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.55px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.ops-health-value {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.ops-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 12px 14px;
+}
+
+.ops-overview-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 12px 12px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ops-overview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ops-overview-head h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.ops-overview-link {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.ops-overview-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.ops-overview-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.ops-overview-body .ops-row {
+  padding: 6px 8px;
+}
+
+.ops-overview-count {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2px;
+}
+
+.ops-hint {
+  margin: 10px 4px 0;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 720px) {
+  .ops-health-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ops-overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .agent-ops-tabs {
   display: flex;
   gap: 6px;
@@ -171,7 +282,7 @@ body {
 .agent-ops-panel {
   display: none;
   padding: 0 12px 12px;
-  max-height: 320px;
+  max-height: 420px;
   overflow: auto;
 }
 
