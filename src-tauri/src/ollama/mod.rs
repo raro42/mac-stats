@@ -86,7 +86,14 @@ impl OllamaConfig {
 pub struct OllamaToolCall {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
+    /// OpenAI-compat requires `"type": "function"` on each tool call when echoing history.
+    #[serde(default = "default_tool_call_type", rename = "type")]
+    pub call_type: String,
     pub function: OllamaFunctionCall,
+}
+
+fn default_tool_call_type() -> String {
+    "function".to_string()
 }
 
 /// Mint a stable-looking `call_…` id when the provider omitted one (Hermes/OpenAI pairing).
@@ -105,7 +112,7 @@ pub fn mint_tool_call_id(index: usize) -> String {
     format!("call_{:012x}", mixed & 0xffff_ffff_ffff)
 }
 
-/// Fill empty/`None` tool call ids in place so role=`tool` results can set `tool_call_id`.
+/// Fill empty/`None` tool call ids and ensure `type` is `function` (OpenAI/Hermes).
 pub fn ensure_tool_call_ids(calls: &mut [OllamaToolCall]) {
     for (i, call) in calls.iter_mut().enumerate() {
         let missing = call
@@ -115,6 +122,9 @@ pub fn ensure_tool_call_ids(calls: &mut [OllamaToolCall]) {
             .unwrap_or(true);
         if missing {
             call.id = Some(mint_tool_call_id(i));
+        }
+        if call.call_type.trim().is_empty() {
+            call.call_type = default_tool_call_type();
         }
     }
 }
@@ -1208,6 +1218,7 @@ mod model_context_estimate_tests {
     fn ensure_tool_call_ids_mints_when_missing() {
         let mut calls = vec![
             OllamaToolCall {
+                call_type: "function".into(),
                 id: None,
                 function: OllamaFunctionCall {
                     name: Some("FETCH_URL".into()),
@@ -1216,6 +1227,7 @@ mod model_context_estimate_tests {
                 },
             },
             OllamaToolCall {
+                call_type: "function".into(),
                 id: Some("call_keep".into()),
                 function: OllamaFunctionCall {
                     name: Some("BRAVE_SEARCH".into()),
@@ -1224,6 +1236,7 @@ mod model_context_estimate_tests {
                 },
             },
             OllamaToolCall {
+                call_type: "function".into(),
                 id: Some("  ".into()),
                 function: OllamaFunctionCall {
                     name: Some("RUN_CMD".into()),
@@ -1254,5 +1267,27 @@ mod model_context_estimate_tests {
             .id
             .as_ref()
             .is_some_and(|s| s.starts_with("call_")));
+        assert_eq!(calls[0].call_type, "function");
+    }
+
+    #[test]
+    fn tool_call_serializes_openai_type_function() {
+        let call = OllamaToolCall {
+            call_type: "function".into(),
+            id: Some("call_abc".into()),
+            function: OllamaFunctionCall {
+                name: Some("FETCH_URL".into()),
+                index: None,
+                arguments: serde_json::json!({"url_or_arg": "https://example.com"}),
+            },
+        };
+        let v = serde_json::to_value(&call).expect("serialize");
+        assert_eq!(v["type"], "function");
+        assert_eq!(v["id"], "call_abc");
+        assert_eq!(v["function"]["name"], "FETCH_URL");
+        // Deserialize without type → default function
+        let raw = r#"{"id":"call_x","function":{"name":"BRAVE_SEARCH","arguments":{}}}"#;
+        let parsed: OllamaToolCall = serde_json::from_str(raw).expect("parse");
+        assert_eq!(parsed.call_type, "function");
     }
 }

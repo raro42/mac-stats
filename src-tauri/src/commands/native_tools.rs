@@ -261,6 +261,7 @@ mod tests {
                 content: String::new(),
                 images: None,
                 tool_calls: Some(vec![OllamaToolCall {
+                    call_type: "function".into(),
                     id: None,
                     function: OllamaFunctionCall {
                         name: Some("BRAVE_SEARCH".into()),
@@ -285,6 +286,7 @@ mod tests {
                 content: String::new(),
                 images: None,
                 tool_calls: Some(vec![OllamaToolCall {
+                    call_type: "function".into(),
                     id: None,
                     function: OllamaFunctionCall {
                         name: Some("DONE".into()),

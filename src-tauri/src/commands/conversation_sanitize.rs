@@ -227,6 +227,7 @@ mod tests {
             content: "FETCH_URL: https://example.com".into(),
             images: None,
             tool_calls: Some(vec![OllamaToolCall {
+                call_type: "function".into(),
                 id: Some("call_1".into()),
                 function: OllamaFunctionCall {
                     name: Some("FETCH_URL".into()),
@@ -253,6 +254,7 @@ mod tests {
             content: "FETCH_URL: https://example.com".into(),
             images: None,
             tool_calls: Some(vec![OllamaToolCall {
+                call_type: "function".into(),
                 id: None,
                 function: OllamaFunctionCall {
                     name: Some("FETCH_URL".into()),

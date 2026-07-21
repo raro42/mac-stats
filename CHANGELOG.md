@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.166] - 2026-07-21
+
+### Changed
+- **Native tool loop**: `OllamaToolCall` serializes OpenAI-compat `"type": "function"` (defaulted on parse) so echoed tool_calls match Hermes/OpenAI history shape.
+
 ## [0.1.165] - 2026-07-21
 
 ### Fixed
