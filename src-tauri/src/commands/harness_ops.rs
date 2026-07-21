@@ -485,47 +485,317 @@ fn digest_script_candidates() -> Vec<PathBuf> {
     out
 }
 
-/// Refresh `~/.mac-stats/improvements/latest.{md,json}` via the Python digester when available.
-/// Returns a short status line for logs / Discord.
+/// Refresh `~/.mac-stats/improvements/latest.{md,json}` via Python digester when available,
+/// otherwise a Rust-native fallback that writes `latest.json` (Agent Ops still works offline).
 pub fn refresh_agent_digest() -> String {
-    let script = digest_script_candidates().into_iter().find(|p| p.is_file());
-    let Some(script) = script else {
-        return "Digest refresh skipped — digest_agent_runs.py not found (set MAC_STATS_DIGEST_SCRIPT)."
-            .into();
-    };
     let out_dir = digest_json_path()
         .parent()
         .map(|p| p.to_path_buf())
         .unwrap_or_else(|| PathBuf::from("."));
     let _ = fs::create_dir_all(&out_dir);
-    match std::process::Command::new("python3")
-        .arg(&script)
-        .arg("--days")
-        .arg("7")
-        .arg("--out")
-        .arg(out_dir.join("latest.md"))
-        .output()
-    {
-        Ok(o) if o.status.success() => {
-            let summary = load_digest_summary();
-            format!(
-                "Digest refreshed ({}): {} open · {} stale · {} turns",
-                script.display(),
-                summary.open_count,
-                summary.stale_count,
-                summary.turns
-            )
+
+    if let Some(script) = digest_script_candidates().into_iter().find(|p| p.is_file()) {
+        match std::process::Command::new("python3")
+            .arg(&script)
+            .arg("--days")
+            .arg("7")
+            .arg("--out")
+            .arg(out_dir.join("latest.md"))
+            .output()
+        {
+            Ok(o) if o.status.success() => {
+                let summary = load_digest_summary();
+                return format!(
+                    "Digest refreshed (python {}): {} open · {} stale · {} turns",
+                    script.display(),
+                    summary.open_count,
+                    summary.stale_count,
+                    summary.turns
+                );
+            }
+            Ok(o) => {
+                let err = String::from_utf8_lossy(&o.stderr);
+                tracing::warn!(
+                    target: "mac_stats::digest",
+                    "python digester failed (exit {:?}): {} — using Rust fallback",
+                    o.status.code(),
+                    err.chars().take(160).collect::<String>()
+                );
+            }
+            Err(e) => {
+                tracing::warn!(
+                    target: "mac_stats::digest",
+                    "python digester spawn failed: {} — using Rust fallback",
+                    e
+                );
+            }
         }
-        Ok(o) => {
-            let err = String::from_utf8_lossy(&o.stderr);
-            format!(
-                "Digest refresh failed (exit {:?}): {}",
-                o.status.code(),
-                err.chars().take(200).collect::<String>()
-            )
-        }
-        Err(e) => format!("Digest refresh failed to spawn python3: {}", e),
     }
+
+    match write_digest_native(7) {
+        Ok(summary) => format!(
+            "Digest refreshed (rust-native): {} open · {} stale · {} turns",
+            summary.open_count, summary.stale_count, summary.turns
+        ),
+        Err(e) => format!("Digest refresh failed (rust-native): {}", e),
+    }
+}
+
+fn parse_run_ts(s: &str) -> Option<chrono::DateTime<chrono::Utc>> {
+    let s = if s.ends_with('Z') {
+        format!("{}+00:00", &s[..s.len().saturating_sub(1)])
+    } else {
+        s.to_string()
+    };
+    chrono::DateTime::parse_from_rfc3339(&s)
+        .ok()
+        .map(|dt| dt.with_timezone(&chrono::Utc))
+        .or_else(|| {
+            chrono::DateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M:%S%.f%z")
+                .ok()
+                .map(|dt| dt.with_timezone(&chrono::Utc))
+        })
+}
+
+fn shipped_cutoffs() -> (
+    chrono::DateTime<chrono::Utc>,
+    chrono::DateTime<chrono::Utc>,
+    chrono::DateTime<chrono::Utc>,
+    chrono::DateTime<chrono::Utc>,
+) {
+    use chrono::{TimeZone, Utc};
+    (
+        Utc.with_ymd_and_hms(2026, 7, 20, 15, 45, 0).unwrap(),
+        Utc.with_ymd_and_hms(2026, 7, 20, 14, 0, 0).unwrap(),
+        Utc.with_ymd_and_hms(2026, 7, 20, 21, 0, 0).unwrap(),
+        Utc.with_ymd_and_hms(2026, 7, 20, 14, 0, 0).unwrap(),
+    )
+}
+
+fn is_stale_shipped_candidate(
+    hint: &str,
+    q: &str,
+    ts: Option<chrono::DateTime<chrono::Utc>>,
+) -> bool {
+    let Some(ts) = ts else {
+        return false;
+    };
+    let (ver, time, weather, greet) = shipped_cutoffs();
+    let hl = hint.to_lowercase();
+    let ql = q.to_lowercase();
+    if hl.contains("instant version") && ts < ver {
+        return true;
+    }
+    if hl.contains("instant time") && ts < time {
+        return true;
+    }
+    if hl.contains("greeting") && ts < greet {
+        return true;
+    }
+    if ts < weather && (ql.contains("wether") || ql.contains("weather")) {
+        if hl.contains("open-meteo")
+            || hl.contains("weather via search")
+            || hl.contains("brave")
+            || hl.contains("zero-tool")
+            || hl.contains("instant")
+        {
+            return true;
+        }
+    }
+    false
+}
+
+fn hint_for_run(rec: &serde_json::Value) -> Option<String> {
+    let q = rec
+        .get("question_preview")
+        .and_then(|x| x.as_str())
+        .unwrap_or("")
+        .to_lowercase();
+    let wall = rec.get("wall_ms").and_then(|x| x.as_u64()).unwrap_or(0);
+    let lane = rec.get("lane").and_then(|x| x.as_str()).unwrap_or("?");
+    let tools = rec
+        .get("tools")
+        .and_then(|t| t.as_array())
+        .map(|a| a.len())
+        .unwrap_or(0);
+    let tool_steps = rec.get("tool_steps").and_then(|x| x.as_u64()).unwrap_or(0);
+    if wall >= 5_000 && matches!(lane, "lite" | "direct" | "full") && tools == 0 && tool_steps == 0
+    {
+        if q.contains("version") {
+            return Some("Promote to INSTANT version lane".into());
+        }
+        if q.contains("time") || q.contains("uhr") || q.contains("hora") || q.contains("date") {
+            return Some("Promote to INSTANT time/date lane".into());
+        }
+        if matches!(
+            q.trim(),
+            "ping" | "hi" | "hello" | "hey" | "thanks" | "thank you"
+        ) {
+            return Some("Promote to INSTANT greeting/thanks lane".into());
+        }
+        if wall >= 15_000 {
+            return Some(
+                "Zero-tool slow turn — consider instant/pre-route or smaller model".into(),
+            );
+        }
+    }
+    if wall >= 15_000
+        && lane == "direct"
+        && tools > 0
+        && (q.contains("weather") || q.contains("wether"))
+    {
+        let tool_names = rec
+            .get("tools")
+            .and_then(|t| t.as_array())
+            .map(|a| {
+                a.iter()
+                    .filter_map(|x| x.as_str())
+                    .collect::<Vec<_>>()
+                    .join(",")
+                    .to_uppercase()
+            })
+            .unwrap_or_default();
+        if tool_names.contains("BRAVE") || tool_names.contains("PERPLEXITY") {
+            return Some(
+                "Weather via search — prefer Open-Meteo INSTANT when place is clear".into(),
+            );
+        }
+    }
+    None
+}
+
+/// Write `latest.json` (+ short `latest.md`) without Python.
+fn write_digest_native(days: i64) -> Result<DigestSummary, String> {
+    let path = crate::commands::run_telemetry::runs_jsonl_path();
+    let since = chrono::Utc::now() - chrono::Duration::days(days);
+    let mut walls: Vec<u64> = Vec::new();
+    let mut by_lane: std::collections::BTreeMap<String, usize> =
+        std::collections::BTreeMap::new();
+    let mut open: Vec<serde_json::Value> = Vec::new();
+    let mut stale: Vec<serde_json::Value> = Vec::new();
+    let mut turns = 0usize;
+
+    if path.is_file() {
+        let text = fs::read_to_string(&path).map_err(|e| e.to_string())?;
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() {
+                continue;
+            }
+            let Ok(rec) = serde_json::from_str::<serde_json::Value>(line) else {
+                continue;
+            };
+            let ts = rec
+                .get("ts")
+                .and_then(|x| x.as_str())
+                .and_then(parse_run_ts);
+            if let Some(t) = ts {
+                if t < since {
+                    continue;
+                }
+            } else {
+                continue;
+            }
+            turns += 1;
+            let wall = rec.get("wall_ms").and_then(|x| x.as_u64()).unwrap_or(0);
+            walls.push(wall);
+            let lane = rec
+                .get("lane")
+                .and_then(|x| x.as_str())
+                .unwrap_or("?")
+                .to_string();
+            *by_lane.entry(lane).or_default() += 1;
+            let preview = rec
+                .get("question_preview")
+                .and_then(|x| x.as_str())
+                .unwrap_or("")
+                .to_string();
+            let rid = rec
+                .get("request_id")
+                .and_then(|x| x.as_str())
+                .unwrap_or("")
+                .to_string();
+            if let Some(hint) = hint_for_run(&rec) {
+                let item = serde_json::json!({
+                    "wall_ms": wall,
+                    "hint": hint,
+                    "question_preview": preview.chars().take(120).collect::<String>(),
+                    "request_id": rid,
+                    "ts": ts.map(|t| t.to_rfc3339()),
+                });
+                if is_stale_shipped_candidate(
+                    item.get("hint").and_then(|h| h.as_str()).unwrap_or(""),
+                    &preview,
+                    ts,
+                ) {
+                    stale.push(item);
+                } else {
+                    open.push(item);
+                }
+            }
+        }
+    }
+
+    walls.sort_unstable();
+    let p50 = if walls.is_empty() {
+        0
+    } else {
+        walls[walls.len() / 2]
+    };
+    let max_ms = walls.iter().copied().max().unwrap_or(0);
+    let generated = chrono::Utc::now().to_rfc3339();
+    let payload = serde_json::json!({
+        "generated_at": generated,
+        "days": days,
+        "turns": turns,
+        "open_count": open.len(),
+        "stale_count": stale.len(),
+        "p50_ms": p50,
+        "max_ms": max_ms,
+        "by_lane": by_lane,
+        "open": open,
+        "stale": stale,
+        "markdown_path": digest_json_path().with_extension("md").display().to_string(),
+        "source": "rust-native",
+    });
+
+    let json_path = digest_json_path();
+    if let Some(parent) = json_path.parent() {
+        let _ = fs::create_dir_all(parent);
+    }
+    fs::write(
+        &json_path,
+        serde_json::to_string_pretty(&payload).map_err(|e| e.to_string())? + "\n",
+    )
+    .map_err(|e| e.to_string())?;
+
+    let md_path = json_path.with_extension("md");
+    let md = format!(
+        "# Agent run digest ({days}d)\n\nGenerated: {generated} (rust-native)\nTurns: **{turns}**\n\n## Improvement candidates\n{}\n\n## Stale / already shipped\n{}\n",
+        if open.is_empty() {
+            "_None this window (open)._".to_string()
+        } else {
+            open.iter()
+                .take(10)
+                .filter_map(|i| {
+                    Some(format!(
+                        "- **{}** — {} ms",
+                        i.get("hint")?.as_str()?,
+                        i.get("wall_ms")?.as_u64()?
+                    ))
+                })
+                .collect::<Vec<_>>()
+                .join("\n")
+        },
+        if stale.is_empty() {
+            "_None._".to_string()
+        } else {
+            format!("_{} stale candidate(s) ignored._", stale.len())
+        }
+    );
+    let _ = fs::write(md_path, md);
+
+    Ok(load_digest_summary())
 }
 
 /// True for `/digest` / `run digest` operator asks.
@@ -716,6 +986,13 @@ mod tests {
         assert!(looks_like_digest_request("/digest"));
         assert!(looks_like_digest_request("refresh digest"));
         assert!(!looks_like_digest_request("digest this long research report please"));
+    }
+
+    #[test]
+    fn rust_native_digest_writes_json() {
+        let summary = write_digest_native(7).expect("native digest");
+        assert!(digest_json_path().is_file());
+        let _ = summary.open_count + summary.stale_count + summary.turns;
     }
 
     #[test]
