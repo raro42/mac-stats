@@ -142,6 +142,26 @@
   opacity: 0.95;
 }
 
+.ops-filter-row {
+  padding: 0 4px 10px;
+}
+
+.ops-filter-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 5%, transparent);
+  color: inherit;
+  font-size: 13px;
+}
+
+.ops-filter-input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, currentColor 40%, transparent);
+}
+
 .ops-overview-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

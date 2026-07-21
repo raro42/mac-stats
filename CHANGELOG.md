@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.152] - 2026-07-21
+
+### Added
+- **Agent Ops Sessions filter**: search live sessions and recent files by source/id/preview; Digest health card warns when open candidates exist and opens the Runs tab on click.
+
 ## [0.1.151] - 2026-07-21
 
 ### Added

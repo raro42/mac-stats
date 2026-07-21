@@ -21,6 +21,9 @@
   let opsAgentFileTab = 'soul';
   let opsRefreshInFlight = false;
   let opsSessionLoadRows = null;
+  let opsSessionFilterQ = '';
+  let opsLiveCache = [];
+  let opsSessionFilesCache = [];
 
 // --- Agent Ops (Command Center: overview + detail tabs) ---
 
@@ -65,10 +68,42 @@ function setupAgentOps() {
     document.getElementById('ops-refresh-btn')?.addEventListener('click', () => refreshAgentOps());
     document.getElementById('ops-digest-refresh-btn')?.addEventListener('click', () => refreshOpsDigest());
     document.getElementById('ops-session-load-chat')?.addEventListener('click', () => loadOpsSessionIntoChat());
+    ensureOpsSessionFilter();
     if (!agentOpsCollapsed) {
       refreshAgentOps();
       startAgentOpsAutoRefresh();
     }
+}
+
+function ensureOpsSessionFilter() {
+    const panel = document.getElementById('ops-panel-sessions');
+    if (!panel) return;
+    let input = document.getElementById('ops-session-filter');
+    if (!input) {
+        const row = document.createElement('div');
+        row.className = 'ops-filter-row';
+        input = document.createElement('input');
+        input.type = 'search';
+        input.id = 'ops-session-filter';
+        input.className = 'ops-filter-input';
+        input.placeholder = 'Filter live + files…';
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+        row.appendChild(input);
+        panel.insertBefore(row, panel.firstChild);
+    }
+    if (input.dataset.opsBound === '1') return;
+    input.dataset.opsBound = '1';
+    input.addEventListener('input', () => {
+        opsSessionFilterQ = (input.value || '').trim().toLowerCase();
+        renderOpsLive(opsLiveCache);
+        renderOpsSessionFiles(opsSessionFilesCache);
+    });
+}
+
+function sessionRowMatchesFilter(haystack) {
+    if (!opsSessionFilterQ) return true;
+    return String(haystack || '').toLowerCase().includes(opsSessionFilterQ);
 }
 
 function startAgentOpsAutoRefresh() {
@@ -230,6 +265,30 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         digestText = `${open} open / ${stale} stale${age}`;
     }
     setText('ops-health-digest', digestText);
+    const digestEl = document.getElementById('ops-health-digest');
+    if (digestEl) {
+        const openN = insights?.digest_open_count ?? 0;
+        const hints = insights?.digest_open_hints || [];
+        digestEl.title = hints.length
+            ? hints.slice(0, 5).join('\n')
+            : insights?.digest_generated_at
+              ? `Generated ${insights.digest_generated_at}`
+              : '';
+        const card = digestEl.closest('.ops-health-card');
+        if (card) {
+            card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+            if (openN > 0) card.classList.add('ops-health-warn');
+            else if (insights) card.classList.add('ops-health-ok');
+            card.style.cursor = 'pointer';
+            if (card.dataset.opsDigestClick !== '1') {
+                card.dataset.opsDigestClick = '1';
+                card.addEventListener('click', () => {
+                    if (agentOpsCollapsed) applyOpsCollapsed(false);
+                    selectOpsTab('runs');
+                });
+            }
+        }
+    }
 }
 
 function renderOverviewSchedules(schedules, deliveries) {
@@ -455,8 +514,10 @@ async function refreshAgentOps() {
         renderOverviewRecent(files || []);
         renderOpsSchedulesTab(schedules || [], deliveries || []);
         renderOpsAgents(agents || []);
-        renderOpsLive(live || []);
-        renderOpsSessionFiles(files || []);
+        opsLiveCache = live || [];
+        opsSessionFilesCache = files || [];
+        renderOpsLive(opsLiveCache);
+        renderOpsSessionFiles(opsSessionFilesCache);
         renderOpsMemory(memory || []);
         renderOpsRuns(insights);
     } catch (err) {
@@ -593,11 +654,21 @@ function loadOpsSessionIntoChat() {
 function renderOpsLive(rows) {
     const el = document.getElementById('ops-live-sessions');
     el.innerHTML = '';
-    if (!rows.length) {
+    const all = rows || [];
+    const filtered = all.filter((r) =>
+        sessionRowMatchesFilter(
+            `${r.source} ${r.session_id} ${r.preview || ''} ${r.last_activity || ''}`
+        )
+    );
+    if (!all.length) {
         el.innerHTML = '<div class="ops-empty">No live in-memory sessions</div>';
         return;
     }
-    rows.forEach((r) => {
+    if (!filtered.length) {
+        el.innerHTML = '<div class="ops-empty">No live sessions match filter</div>';
+        return;
+    }
+    filtered.forEach((r) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
@@ -633,11 +704,21 @@ function renderOpsSessionFiles(files) {
     preview.hidden = true;
     if (loadBtn) loadBtn.hidden = true;
     opsSessionLoadRows = null;
-    if (!files.length) {
+    const all = files || [];
+    const filtered = all.filter((f) =>
+        sessionRowMatchesFilter(
+            `${f.slug || ''} ${f.name || ''} ${f.source_hint || ''} ${f.preview || ''}`
+        )
+    );
+    if (!all.length) {
         el.innerHTML = '<div class="ops-empty">No session-memory-*.md files</div>';
         return;
     }
-    files.forEach((f) => {
+    if (!filtered.length) {
+        el.innerHTML = '<div class="ops-empty">No session files match filter</div>';
+        return;
+    }
+    filtered.forEach((f) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
