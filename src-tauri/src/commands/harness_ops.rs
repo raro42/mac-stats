@@ -939,12 +939,12 @@ fn classify_candidate(
 
 /// Short Discord/gateway report (Hermes `/insights` lite).
 pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
+    let mut lines = Vec::new();
     if insights.turns == 0 {
-        return "No turns in `~/.mac-stats/runs.jsonl` yet.".into();
-    }
-    let mut lines = vec![
-        "**mac-stats insights** (runs.jsonl)".to_string(),
-        format!(
+        lines.push("No turns in `~/.mac-stats/runs.jsonl` yet.".into());
+    } else {
+        lines.push("**mac-stats insights** (runs.jsonl)".to_string());
+        lines.push(format!(
             "Turns: **{}** · ok {} · fail {} · p50 **{}** ms · mean {} · max {}",
             insights.turns,
             insights.ok_count,
@@ -952,9 +952,56 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
             insights.p50_ms,
             insights.mean_ms,
             insights.max_ms
-        ),
-        crate::discord::format_discord_gateway_insights_line(),
-    ];
+        ));
+    }
+    lines.push(crate::discord::format_discord_gateway_insights_line());
+    {
+        let mut digest = format!(
+            "Digest: **{}** open · **{}** stale",
+            insights.digest_open_count, insights.digest_stale_count
+        );
+        if !insights.digest_source.is_empty() {
+            digest.push_str(&format!(" · {}", insights.digest_source));
+        }
+        if !insights.digest_generated_at.is_empty() {
+            digest.push_str(&format!(" · {}", insights.digest_generated_at));
+        }
+        lines.push(digest);
+        if !insights.digest_open_hints.is_empty() {
+            lines.push(format!(
+                "Open hints: {}",
+                insights.digest_open_hints.iter().take(3).cloned().collect::<Vec<_>>().join("; ")
+            ));
+        }
+    }
+    {
+        let snap = crate::scheduler::scheduler_operator_snapshot();
+        let mut sched = format!("Schedules: **{}**", snap.total_entries);
+        if let Some(secs) = snap.seconds_until_next_fire {
+            let when = if secs < 3600 {
+                format!("{}m", (secs / 60).max(1))
+            } else {
+                format!("{}h", (secs + 1800) / 3600)
+            };
+            let preview = snap
+                .next_task_preview
+                .as_deref()
+                .map(|p| {
+                    let t: String = p.chars().take(36).collect();
+                    format!(" ({t})")
+                })
+                .unwrap_or_default();
+            sched.push_str(&format!(" · next {when}{preview}"));
+        }
+        lines.push(sched);
+        if let Some(last) = crate::scheduler::list_scheduler_delivery_awareness()
+            .into_iter()
+            .next()
+        {
+            let preview: String = last.summary.chars().take(60).collect();
+            lines.push(format!("Last delivery: {} · {}", last.utc, preview));
+        }
+    }
     if !insights.by_lane.is_empty() {
         let lanes = insights
             .by_lane
@@ -1059,6 +1106,33 @@ mod tests {
         assert!(looks_like_insights_request("insights"));
         assert!(looks_like_insights_request("@Werner insights"));
         assert!(!looks_like_insights_request("any insights on weather?"));
+    }
+
+    #[test]
+    fn insights_gateway_includes_digest_and_schedules() {
+        let insights = RunsInsights {
+            turns: 0,
+            ok_count: 0,
+            fail_count: 0,
+            p50_ms: 0,
+            mean_ms: 0,
+            max_ms: 0,
+            by_lane: vec![],
+            by_tool: vec![],
+            candidates: vec![],
+            slowest: vec![],
+            recent: vec![],
+            discord_gateway: String::new(),
+            digest_open_count: 0,
+            digest_stale_count: 3,
+            digest_generated_at: "2026-07-21T05:00:00Z".into(),
+            digest_open_hints: vec![],
+            digest_source: "python".into(),
+        };
+        let report = format_runs_insights_gateway(&insights);
+        assert!(report.contains("Digest:"), "{report}");
+        assert!(report.contains("Schedules:"), "{report}");
+        assert!(report.contains("Discord gateway:"), "{report}");
     }
 
     #[test]
