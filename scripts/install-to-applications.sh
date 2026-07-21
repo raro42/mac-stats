@@ -36,6 +36,9 @@ if [[ -d "$DIST_SRC" && -d "$DIST_DST" ]]; then
   fi
 fi
 
+# LaunchAgent cwd is not src-tauri — merge REDMINE/Brave/Perplexity into ~/.mac-stats/.config.env
+bash "$ROOT/scripts/sync-home-config-env.sh" || true
+
 codesign -s - --force --deep "$APP"
 xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
 

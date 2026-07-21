@@ -31,6 +31,8 @@ SHIPPED_GREETING = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
 SHIPPED_INSTANT_WAKEUP = datetime(2026, 7, 21, 4, 30, tzinfo=timezone.utc)
 # v0.1.133 — scheduled SKILL tasks no longer instant-refused for commit/push.
 SHIPPED_SKILL_GIT_FASTLANE = datetime(2026, 7, 21, 9, 10, tzinfo=timezone.utc)
+# Redmine keys synced into ~/.mac-stats/.config.env for LaunchAgent installs.
+SHIPPED_REDMINE_HOME_CONFIG = datetime(2026, 7, 21, 10, 25, tzinfo=timezone.utc)
 
 
 def atomic_write_text(path: Path, text: str) -> None:
@@ -127,6 +129,8 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
             or "push" in ql
         ):
             return True
+    if ts < SHIPPED_REDMINE_HOME_CONFIG and "redmine" in ql and "home config" in hl:
+        return True
     return False
 
 
@@ -222,6 +226,15 @@ def main() -> int:
         hint = None
         if is_skill_git_fastlane_false_positive(r):
             hint = "Scheduled SKILL blocked by git fast-lane — exempt SKILL/CURSOR_AGENT"
+        elif (
+            wall >= 5_000
+            and "REDMINE_API" in [str(t) for t in tools]
+            and "redmine" in q
+            and ts is not None
+            and ts < SHIPPED_REDMINE_HOME_CONFIG
+        ):
+            # Pre-home-config sync: LaunchAgent could not see src-tauri/.config.env keys.
+            hint = "Sync REDMINE_* into ~/.mac-stats/.config.env (LaunchAgent home config)"
         elif wall >= 5_000 and lane in ("lite", "direct", "full") and (
             not tools and tool_steps == 0
         ):
