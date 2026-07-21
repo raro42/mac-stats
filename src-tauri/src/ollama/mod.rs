@@ -160,8 +160,13 @@ pub struct ChatMessage {
     /// Native structured tool calls (when the model uses the tools API).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tool_calls: Option<Vec<OllamaToolCall>>,
-    /// Ollama/OpenAI tool result name (role "tool"); skipped when None.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    /// Tool result name for role `tool` (OpenAI/Hermes wire field is `name`).
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        rename = "name",
+        alias = "tool_name"
+    )]
     pub tool_name: Option<String>,
     /// Matches assistant `tool_calls[].id` when the provider supplies one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -1289,5 +1294,28 @@ mod model_context_estimate_tests {
         let raw = r#"{"id":"call_x","function":{"name":"BRAVE_SEARCH","arguments":{}}}"#;
         let parsed: OllamaToolCall = serde_json::from_str(raw).expect("parse");
         assert_eq!(parsed.call_type, "function");
+    }
+
+    #[test]
+    fn tool_role_message_serializes_openai_name_field() {
+        let msg = ChatMessage {
+            role: "tool".into(),
+            content: "ok".into(),
+            images: None,
+            tool_calls: None,
+            tool_name: Some("BRAVE_SEARCH".into()),
+            tool_call_id: Some("call_1".into()),
+        };
+        let v = serde_json::to_value(&msg).expect("serialize");
+        assert_eq!(v["name"], "BRAVE_SEARCH");
+        assert!(v.get("tool_name").is_none());
+        assert_eq!(v["tool_call_id"], "call_1");
+        // Accept legacy `tool_name` when reading stored history.
+        let legacy = r#"{"role":"tool","content":"x","tool_name":"FETCH_URL","tool_call_id":"call_z"}"#;
+        let parsed: ChatMessage = serde_json::from_str(legacy).expect("parse legacy");
+        assert_eq!(parsed.tool_name.as_deref(), Some("FETCH_URL"));
+        let openai = r#"{"role":"tool","content":"y","name":"DONE","tool_call_id":"call_y"}"#;
+        let parsed2: ChatMessage = serde_json::from_str(openai).expect("parse openai");
+        assert_eq!(parsed2.tool_name.as_deref(), Some("DONE"));
     }
 }
