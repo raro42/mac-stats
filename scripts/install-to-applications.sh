@@ -7,6 +7,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP="/Applications/mac-stats.app"
 BIN_SRC="$ROOT/src-tauri/target/release/mac_stats"
 DIST_SRC="$ROOT/src-tauri/dist"
+DIST_DST="$APP/Contents/Resources/dist"
 LABEL="gui/$(id -u)/com.raro42.mac-stats"
 
 if [[ ! -x "$BIN_SRC" ]]; then
@@ -19,9 +20,20 @@ if [[ ! -d "$APP/Contents/MacOS" ]]; then
 fi
 
 cp -f "$BIN_SRC" "$APP/Contents/MacOS/mac-stats"
-if [[ -d "$DIST_SRC" && -d "$APP/Contents/Resources/dist" ]]; then
-  cp -f "$DIST_SRC"/dashboard.html "$DIST_SRC"/dashboard.js "$DIST_SRC"/dashboard.css \
-    "$DIST_SRC"/ollama.js "$APP/Contents/Resources/dist/" 2>/dev/null || true
+if [[ -d "$DIST_SRC" && -d "$DIST_DST" ]]; then
+  # Root UI assets (dashboard is unused by the menu-bar window but kept in sync)
+  for f in dashboard.html dashboard.js dashboard.css \
+           ollama.js cpu.js cpu.html cpu-ui.js discord.js \
+           tauri-logger.js agent-ops.js agent-ops.css; do
+    [[ -f "$DIST_SRC/$f" ]] && cp -f "$DIST_SRC/$f" "$DIST_DST/"
+  done
+  # Themes power the real CPU window (cpu.html → themes/<theme>/cpu.html)
+  if [[ -d "$DIST_SRC/themes" ]]; then
+    rsync -a --delete "$DIST_SRC/themes/" "$DIST_DST/themes/"
+  fi
+  if [[ -d "$DIST_SRC/assets" ]]; then
+    rsync -a "$DIST_SRC/assets/" "$DIST_DST/assets/"
+  fi
 fi
 
 codesign -s - --force --deep "$APP"

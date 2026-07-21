@@ -1,0 +1,727 @@
+/**
+ * Agent Ops Command Center — shared by dashboard.html and theme cpu.html.
+ */
+(function () {
+  'use strict';
+
+  function opsInvoke(cmd, args) {
+    const fn =
+      window.__TAURI__?.core?.invoke ??
+      window.__TAURI_INTERNALS__?.invoke ??
+      (typeof window.invoke === 'function' ? window.invoke.bind(window) : null);
+    if (!fn) throw new Error('Tauri invoke not available');
+    return fn(cmd, args);
+  }
+  const invoke = (...a) => opsInvoke(...a);
+
+  const OPS_REFRESH_INTERVAL = 30000;
+  let agentOpsInterval = null;
+  let agentOpsCollapsed = true;
+  let opsAgentCache = null;
+  let opsAgentFileTab = 'soul';
+  let opsRefreshInFlight = false;
+  let opsSessionLoadRows = null;
+
+// --- Agent Ops (Command Center: overview + detail tabs) ---
+
+function selectOpsTab(tab) {
+    document.querySelectorAll('.agent-ops-tab').forEach((b) => {
+        b.classList.toggle('active', b.dataset.opsTab === tab);
+    });
+    document.querySelectorAll('.agent-ops-panel').forEach((p) => {
+        p.classList.toggle('active', p.id === `ops-panel-${tab}`);
+    });
+}
+
+function setupAgentOps() {
+    document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
+        btn.addEventListener('click', () => selectOpsTab(btn.dataset.opsTab));
+    });
+    document.querySelectorAll('.ops-overview-link').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const tab = btn.dataset.gotoTab;
+            if (tab) selectOpsTab(tab);
+        });
+    });
+    document.querySelectorAll('.ops-file-tab').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            opsAgentFileTab = btn.dataset.file;
+            document.querySelectorAll('.ops-file-tab').forEach((b) => b.classList.toggle('active', b === btn));
+            renderOpsAgentPreview();
+        });
+    });
+    document.getElementById('ops-agent-back')?.addEventListener('click', () => {
+        document.getElementById('ops-agent-detail').hidden = true;
+        document.getElementById('ops-agents-list').style.display = '';
+    });
+    document.getElementById('ops-refresh-btn')?.addEventListener('click', () => refreshAgentOps());
+    document.getElementById('ops-digest-refresh-btn')?.addEventListener('click', () => refreshOpsDigest());
+    document.getElementById('ops-session-load-chat')?.addEventListener('click', () => loadOpsSessionIntoChat());
+    if (!agentOpsCollapsed) {
+      refreshAgentOps();
+      startAgentOpsAutoRefresh();
+    }
+}
+
+function startAgentOpsAutoRefresh() {
+    if (agentOpsInterval) return;
+    agentOpsInterval = setInterval(() => {
+        if (agentOpsCollapsed || opsRefreshInFlight) return;
+        refreshAgentOps();
+    }, OPS_REFRESH_INTERVAL);
+}
+
+function stopAgentOpsAutoRefresh() {
+    if (agentOpsInterval) {
+        clearInterval(agentOpsInterval);
+        agentOpsInterval = null;
+    }
+}
+
+async function refreshOpsDigest() {
+    const btn = document.getElementById('ops-digest-refresh-btn');
+    const digestEl = document.getElementById('ops-health-digest');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Refreshing…';
+    }
+    try {
+        const msg = await invoke('refresh_agent_digest');
+        if (digestEl) digestEl.textContent = String(msg).slice(0, 80);
+        await refreshAgentOps();
+    } catch (err) {
+        console.warn('[Agent Ops] digest refresh', err);
+        if (digestEl) digestEl.textContent = `Refresh failed`;
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Refresh digest';
+        }
+    }
+}
+
+function fmtBytes(n) {
+    if (n < 1024) return `${n} B`;
+    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+    return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function fmtAge(ms) {
+    if (!ms) return '';
+    const age = Date.now() - ms;
+    if (age < 60_000) return 'just now';
+    if (age < 3600_000) return `${Math.floor(age / 60_000)}m ago`;
+    if (age < 86400_000) return `${Math.floor(age / 3600_000)}h ago`;
+    return `${Math.floor(age / 86400_000)}d ago`;
+}
+
+function fmtScheduleEta(sched) {
+    if (!sched || sched.totalEntries == null) return '—';
+    if (sched.totalEntries === 0) return 'None';
+    if (sched.secondsUntilNextFire == null) return `${sched.totalEntries} jobs`;
+    const secs = Number(sched.secondsUntilNextFire);
+    const when =
+        secs < 3600
+            ? `${Math.max(1, Math.round(secs / 60))}m`
+            : `${Math.round(secs / 3600)}h`;
+    const preview = sched.nextTaskPreview
+        ? String(sched.nextTaskPreview).slice(0, 32)
+        : '';
+    return preview ? `${when} · ${preview}` : when;
+}
+
+function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+}
+
+function renderOpsHealth({ version, insights, sched, deliveries, agents, live }) {
+    const enabled = (agents || []).filter((a) => a.enabled).length;
+    setText(
+        'ops-health-version',
+        version ? `v${version}` : '—'
+    );
+    const agentsHint = document.getElementById('ops-health-version');
+    if (agentsHint && version) {
+        agentsHint.title = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live`;
+    }
+
+    const dg = insights?.discord_gateway || '';
+    const readyMatch = dg.match(/last Ready\s+([^·]+)/i);
+    setText('ops-health-discord', readyMatch ? readyMatch[1].trim() : dg ? 'see Runs' : '—');
+
+    setText('ops-health-schedule', fmtScheduleEta(sched));
+
+    let deliveryText = '—';
+    if (Array.isArray(deliveries) && deliveries.length) {
+        const newest = deliveries[0];
+        const t = newest?.utc ? Date.parse(newest.utc) : NaN;
+        deliveryText = !Number.isNaN(t) ? fmtAge(t) : (newest.utc || '—');
+    }
+    setText('ops-health-delivery', deliveryText);
+
+    let digestText = '—';
+    if (insights) {
+        const open = insights.digest_open_count ?? 0;
+        const stale = insights.digest_stale_count ?? 0;
+        let age = '';
+        if (insights.digest_generated_at) {
+            const t = Date.parse(insights.digest_generated_at);
+            if (!Number.isNaN(t)) age = ` · ${fmtAge(t)}`;
+        }
+        digestText = `${open} open / ${stale} stale${age}`;
+    }
+    setText('ops-health-digest', digestText);
+}
+
+function renderOverviewSchedules(schedules, deliveries) {
+    const body = document.getElementById('ops-overview-schedules-body');
+    if (!body) return;
+    body.innerHTML = '';
+    if (!schedules || !schedules.length) {
+        body.innerHTML = '<div class="ops-empty">No schedules</div>';
+        return;
+    }
+    const count = document.createElement('div');
+    count.className = 'ops-overview-count';
+    count.textContent = `${schedules.length} active`;
+    body.appendChild(count);
+    schedules.slice(0, 3).forEach((s) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        const id = s.id || '(no id)';
+        const next = s.next_run || s.nextRun || '—';
+        const task = String(s.task || '').slice(0, 40);
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">next ${escapeHtml(next)} · ${escapeHtml(task)}</div></div>`;
+        btn.addEventListener('click', () => selectOpsTab('schedules'));
+        body.appendChild(btn);
+    });
+    if (Array.isArray(deliveries) && deliveries.length) {
+        const t = deliveries[0]?.utc ? Date.parse(deliveries[0].utc) : NaN;
+        const meta = document.createElement('div');
+        meta.className = 'ops-overview-count';
+        meta.textContent = !Number.isNaN(t)
+            ? `Last delivery ${fmtAge(t)}`
+            : 'Last delivery recorded';
+        body.appendChild(meta);
+    }
+}
+
+function renderOverviewLive(rows) {
+    const body = document.getElementById('ops-overview-live-body');
+    if (!body) return;
+    body.innerHTML = '';
+    if (!rows || !rows.length) {
+        body.innerHTML = '<div class="ops-empty">No live sessions</div>';
+        return;
+    }
+    const count = document.createElement('div');
+    count.className = 'ops-overview-count';
+    count.textContent = `${rows.length} live`;
+    body.appendChild(count);
+    rows.slice(0, 3).forEach((r) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs</div></div>`;
+        btn.addEventListener('click', async () => {
+            selectOpsTab('sessions');
+            try {
+                const msgs = await invoke('read_live_session_messages', {
+                    source: r.source,
+                    sessionId: r.session_id,
+                });
+                showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`);
+            } catch (err) {
+                showOpsSessionPreview([], String(err));
+            }
+        });
+        body.appendChild(btn);
+    });
+}
+
+function renderOverviewKnowledge(files) {
+    const body = document.getElementById('ops-overview-knowledge-body');
+    if (!body) return;
+    body.innerHTML = '';
+    if (!files || !files.length) {
+        body.innerHTML = '<div class="ops-empty">No knowledge files</div>';
+        return;
+    }
+    const sorted = [...files].sort((a, b) => (b.modified_ms || 0) - (a.modified_ms || 0));
+    const count = document.createElement('div');
+    count.className = 'ops-overview-count';
+    count.textContent = `${files.length} files`;
+    body.appendChild(count);
+    sorted.slice(0, 4).forEach((f) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(f.kind)} · ${fmtAge(f.modified_ms)}</div></div>`;
+        btn.addEventListener('click', async () => {
+            selectOpsTab('memory');
+            const preview = document.getElementById('ops-memory-preview');
+            try {
+                const text = await invoke('read_memory_file', { path: f.path });
+                if (preview) {
+                    preview.hidden = false;
+                    preview.textContent = text.slice(0, 12000);
+                }
+            } catch (err) {
+                if (preview) {
+                    preview.hidden = false;
+                    preview.textContent = String(err);
+                }
+            }
+        });
+        body.appendChild(btn);
+    });
+}
+
+function renderOverviewRecent(files) {
+    const body = document.getElementById('ops-overview-recent-body');
+    if (!body) return;
+    body.innerHTML = '';
+    if (!files || !files.length) {
+        body.innerHTML = '<div class="ops-empty">No recent chats</div>';
+        return;
+    }
+    const count = document.createElement('div');
+    count.className = 'ops-overview-count';
+    count.textContent = `${Math.min(5, files.length)} of ${files.length}`;
+    body.appendChild(count);
+    files.slice(0, 5).forEach((f) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(f.source_hint)} · ${fmtAge(f.modified_ms)}</div></div>`;
+        btn.addEventListener('click', async () => {
+            selectOpsTab('sessions');
+            try {
+                const msgs = await invoke('read_session_file_messages', { path: f.path });
+                if (msgs && msgs.length) {
+                    showOpsSessionPreview(msgs, f.name);
+                } else {
+                    const text = await invoke('read_session_file', { path: f.path });
+                    const preview = document.getElementById('ops-session-preview');
+                    const loadBtn = document.getElementById('ops-session-load-chat');
+                    if (preview) {
+                        preview.hidden = false;
+                        preview.textContent = text.slice(0, 12000);
+                    }
+                    opsSessionLoadRows = null;
+                    if (loadBtn) loadBtn.hidden = true;
+                }
+            } catch (err) {
+                showOpsSessionPreview([], String(err));
+            }
+        });
+        body.appendChild(btn);
+    });
+}
+
+function renderOpsSchedulesTab(schedules, deliveries) {
+    const list = document.getElementById('ops-schedules-list');
+    const delList = document.getElementById('ops-deliveries-list');
+    if (list) {
+        list.innerHTML = '';
+        if (!schedules || !schedules.length) {
+            list.innerHTML = '<div class="ops-empty">No schedules</div>';
+        } else {
+            schedules.forEach((s) => {
+                const div = document.createElement('div');
+                div.className = 'ops-row';
+                const id = s.id || '(no id)';
+                const when = s.cron ? `cron ${s.cron}` : s.at ? `at ${s.at}` : '—';
+                const next = s.next_run || s.nextRun || '—';
+                const task = String(s.task || '');
+                div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">${escapeHtml(when)} · next ${escapeHtml(next)}</div><div class="ops-row-meta">${escapeHtml(task.slice(0, 80))}${task.length > 80 ? '…' : ''}</div></div>`;
+                list.appendChild(div);
+            });
+        }
+    }
+    if (delList) {
+        delList.innerHTML = '';
+        if (!deliveries || !deliveries.length) {
+            delList.innerHTML = '<div class="ops-empty">No deliveries yet</div>';
+        } else {
+            deliveries.slice(0, 8).forEach((d) => {
+                const div = document.createElement('div');
+                div.className = 'ops-row';
+                const t = d.utc ? Date.parse(d.utc) : NaN;
+                const age = !Number.isNaN(t) ? fmtAge(t) : d.utc || '';
+                const summary = String(d.summary || '').slice(0, 72);
+                div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(d.schedule_id || 'schedule')}</div><div class="ops-row-meta">${escapeHtml(age)} · ${escapeHtml(summary)}</div></div>`;
+                delList.appendChild(div);
+            });
+        }
+    }
+}
+
+async function refreshAgentOps() {
+    const healthRow = document.getElementById('ops-health-row');
+    if (opsRefreshInFlight) return;
+    opsRefreshInFlight = true;
+    try {
+        const [agents, live, files, memory, insights, version, sched, deliveries, schedules] =
+            await Promise.all([
+                invoke('list_agents'),
+                invoke('list_live_sessions'),
+                invoke('list_session_files', { limit: 40 }),
+                invoke('list_memory_files'),
+                invoke('get_runs_insights', { limit: 40 }),
+                invoke('get_app_version').catch(() => null),
+                invoke('get_scheduler_snapshot').catch(() => null),
+                invoke('list_scheduler_delivery_awareness').catch(() => null),
+                invoke('list_schedules').catch(() => []),
+            ]);
+        renderOpsHealth({
+            version,
+            insights,
+            sched,
+            deliveries,
+            agents,
+            live,
+        });
+        renderOverviewSchedules(schedules || [], deliveries || []);
+        renderOverviewLive(live || []);
+        renderOverviewKnowledge(memory || []);
+        renderOverviewRecent(files || []);
+        renderOpsSchedulesTab(schedules || [], deliveries || []);
+        renderOpsAgents(agents || []);
+        renderOpsLive(live || []);
+        renderOpsSessionFiles(files || []);
+        renderOpsMemory(memory || []);
+        renderOpsRuns(insights);
+    } catch (err) {
+        console.warn('[Agent Ops]', err);
+        if (healthRow) {
+            setText('ops-health-version', 'Unavailable');
+            setText('ops-health-discord', String(err).slice(0, 40));
+        }
+    } finally {
+        opsRefreshInFlight = false;
+    }
+}
+
+function renderOpsAgents(agents) {
+    const list = document.getElementById('ops-agents-list');
+    list.innerHTML = '';
+    if (!agents.length) {
+        list.innerHTML = '<div class="ops-empty">No agents under ~/.mac-stats/agents</div>';
+        return;
+    }
+    agents.forEach((a) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        const slug = a.slug || a.id;
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(a.name)} <span class="ops-row-meta">· ${escapeHtml(slug)}</span></div><div class="ops-row-meta">${escapeHtml(a.model || 'default model')}${a.orchestrator ? ' · orchestrator' : ''}</div></div><span class="ops-badge ${a.enabled ? '' : 'off'}">${a.enabled ? 'on' : 'off'}</span>`;
+        btn.addEventListener('click', () => openOpsAgent(a.id));
+        list.appendChild(btn);
+    });
+}
+
+async function openOpsAgent(id) {
+    try {
+        opsAgentCache = await invoke('get_agent_details', { selector: id });
+        document.getElementById('ops-agents-list').style.display = 'none';
+        const detail = document.getElementById('ops-agent-detail');
+        detail.hidden = false;
+        document.getElementById('ops-agent-meta').textContent =
+            `${opsAgentCache.name} · ${opsAgentCache.slug || opsAgentCache.id} · ${opsAgentCache.model || 'default'} · ${opsAgentCache.enabled ? 'enabled' : 'disabled'}`;
+        opsAgentFileTab = 'soul';
+        document.querySelectorAll('.ops-file-tab').forEach((b) => {
+            b.classList.toggle('active', b.dataset.file === 'soul');
+        });
+        renderOpsAgentPreview();
+    } catch (err) {
+        alert(`Failed to load agent: ${err}`);
+    }
+}
+
+function renderOpsAgentPreview() {
+    if (!opsAgentCache) return;
+    const pre = document.getElementById('ops-agent-preview');
+    const map = {
+        soul: opsAgentCache.soul || '(empty soul.md)',
+        skill: opsAgentCache.skill || '(empty skill.md)',
+        mood: opsAgentCache.mood || '(empty mood.md)',
+    };
+    pre.textContent = map[opsAgentFileTab] || '';
+}
+
+function formatSessionMessagesPreview(rows) {
+    if (!rows || !rows.length) return '(empty session)';
+    return rows
+        .map((m) => `## ${m.role === 'user' ? 'User' : 'Assistant'}\n\n${m.content}`)
+        .join('\n\n');
+}
+
+function showOpsSessionPreview(rows, label) {
+    const preview = document.getElementById('ops-session-preview');
+    const loadBtn = document.getElementById('ops-session-load-chat');
+    opsSessionLoadRows = rows && rows.length ? rows : null;
+    preview.hidden = false;
+    preview.textContent = (label ? `${label}\n\n` : '') + formatSessionMessagesPreview(rows || []);
+    if (loadBtn) loadBtn.hidden = !opsSessionLoadRows;
+}
+
+function loadOpsSessionIntoChat() {
+    if (!opsSessionLoadRows || !opsSessionLoadRows.length) return;
+    if (!window.Ollama?.replaceHistory) {
+        console.warn('[Agent Ops] Ollama.replaceHistory unavailable');
+        return;
+    }
+    window.Ollama.replaceHistory(opsSessionLoadRows);
+    const content = document.getElementById('ollama-content');
+    const btn = document.getElementById('ollama-collapse-btn');
+    const section = document.querySelector('.ollama-section');
+    if (content) {
+      content.classList.remove('collapsed');
+      content.style.display = '';
+    }
+    if (section) section.classList.remove('collapsed');
+    if (btn) btn.textContent = '−';
+    document.getElementById('chat-input')?.focus();
+}
+
+function renderOpsLive(rows) {
+    const el = document.getElementById('ops-live-sessions');
+    el.innerHTML = '';
+    if (!rows.length) {
+        el.innerHTML = '<div class="ops-empty">No live in-memory sessions</div>';
+        return;
+    }
+    rows.forEach((r) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs · ${escapeHtml(r.last_activity)}</div></div>`;
+        btn.addEventListener('click', async () => {
+            try {
+                const msgs = await invoke('read_live_session_messages', {
+                    source: r.source,
+                    sessionId: r.session_id,
+                });
+                showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`);
+            } catch (err) {
+                showOpsSessionPreview([], String(err));
+            }
+        });
+        el.appendChild(btn);
+    });
+}
+
+function renderOpsSessionFiles(files) {
+    const el = document.getElementById('ops-session-files');
+    const preview = document.getElementById('ops-session-preview');
+    const loadBtn = document.getElementById('ops-session-load-chat');
+    el.innerHTML = '';
+    preview.hidden = true;
+    if (loadBtn) loadBtn.hidden = true;
+    opsSessionLoadRows = null;
+    if (!files.length) {
+        el.innerHTML = '<div class="ops-empty">No session-memory-*.md files</div>';
+        return;
+    }
+    files.forEach((f) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(f.source_hint)} · ${fmtBytes(f.size_bytes)} · ${fmtAge(f.modified_ms)}</div></div>`;
+        btn.addEventListener('click', async () => {
+            try {
+                const msgs = await invoke('read_session_file_messages', { path: f.path });
+                if (msgs && msgs.length) {
+                    showOpsSessionPreview(msgs, f.name);
+                } else {
+                    const text = await invoke('read_session_file', { path: f.path });
+                    preview.hidden = false;
+                    preview.textContent = text.slice(0, 12000);
+                    opsSessionLoadRows = null;
+                    if (loadBtn) loadBtn.hidden = true;
+                }
+            } catch (err) {
+                preview.hidden = false;
+                preview.textContent = String(err);
+                opsSessionLoadRows = null;
+                if (loadBtn) loadBtn.hidden = true;
+            }
+        });
+        el.appendChild(btn);
+    });
+}
+
+function renderOpsMemory(files) {
+    const el = document.getElementById('ops-memory-list');
+    const preview = document.getElementById('ops-memory-preview');
+    el.innerHTML = '';
+    preview.hidden = true;
+    if (!files.length) {
+        el.innerHTML = '<div class="ops-empty">No memory/soul files</div>';
+        return;
+    }
+    files.forEach((f) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(f.kind)} · ${f.line_count} lines · ${fmtBytes(f.size_bytes)}</div></div>`;
+        btn.addEventListener('click', async () => {
+            try {
+                const text = await invoke('read_memory_file', { path: f.path });
+                preview.hidden = false;
+                preview.textContent = text.slice(0, 12000);
+            } catch (err) {
+                preview.hidden = false;
+                preview.textContent = String(err);
+            }
+        });
+        el.appendChild(btn);
+    });
+}
+
+function renderOpsRuns(insights) {
+    const card = document.getElementById('ops-runs-insights');
+    const el = document.getElementById('ops-runs-list');
+    el.innerHTML = '';
+    if (card) card.innerHTML = '';
+    const gateway = insights?.discord_gateway || '';
+    if (!insights || !insights.turns) {
+        if (card && gateway) {
+            card.innerHTML = `
+                <div class="ops-insight-title">Insights</div>
+                <div class="ops-row-meta">${escapeHtml(gateway)}</div>
+                <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}</div>
+                <div class="ops-empty" style="padding:8px 0 0">No runs in ~/.mac-stats/runs.jsonl yet</div>
+            `;
+        } else {
+            el.innerHTML = '<div class="ops-empty">No runs in ~/.mac-stats/runs.jsonl yet</div>';
+        }
+        return;
+    }
+    const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
+    const tools = (insights.by_tool || [])
+        .slice(0, 6)
+        .map(([k, v]) => `${k}×${v}`)
+        .join(', ');
+    if (card) {
+        const cand = (insights.candidates || [])
+            .slice(0, 4)
+            .map(
+                (c) =>
+                    `<div class="ops-insight-line"><span class="ops-badge">${escapeHtml(c.kind)}</span> ${c.wall_ms} ms — ${escapeHtml(c.reason)} · <em>${escapeHtml(c.question_preview)}</em></div>`
+            )
+            .join('');
+        const slow = (insights.slowest || [])
+            .slice(0, 3)
+            .map(
+                (s) =>
+                    `<div class="ops-insight-line">${s.wall_ms} ms · ${escapeHtml(s.lane)} · ${escapeHtml(s.question_preview || '(empty)')}</div>`
+            )
+            .join('');
+        card.innerHTML = `
+            <div class="ops-insight-title">Insights</div>
+            <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · fail ${insights.fail_count || 0} · mean ${insights.mean_ms} ms · max ${insights.max_ms} ms</div>
+            ${gateway ? `<div class="ops-row-meta">${escapeHtml(gateway)}</div>` : ''}
+            <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}${insights.digest_generated_at ? ` · ${escapeHtml(String(insights.digest_generated_at).slice(0, 19))}` : ''}</div>
+            ${(insights.digest_open_hints || []).length ? `<div class="ops-insight-sub">Digest open</div>${(insights.digest_open_hints || []).slice(0, 3).map((h) => `<div class="ops-insight-line">${escapeHtml(h)}</div>`).join('')}` : ''}
+            <div class="ops-row-meta">Lanes: ${escapeHtml(lanes) || '—'}</div>
+            <div class="ops-row-meta">Top tools: ${escapeHtml(tools) || '—'}</div>
+            ${slow ? `<div class="ops-insight-sub">Slowest</div>${slow}` : ''}
+            ${cand ? `<div class="ops-insight-sub">Candidates</div>${cand}` : ''}
+        `;
+    }
+    (insights.recent || []).forEach((r) => {
+        const div = document.createElement('div');
+        div.className = 'ops-row';
+        const t = (r.tools || []).join(', ') || '—';
+        div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(t)}${r.ok ? '' : ' · FAIL'}</div></div>`;
+        el.appendChild(div);
+    });
+}
+
+function escapeHtml(s) {
+    return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+
+
+  function applyOpsCollapsed(collapsed) {
+    agentOpsCollapsed = collapsed;
+    const section = document.getElementById('agent-ops-section') || document.querySelector('.agent-ops-section');
+    const content = document.getElementById('agent-ops-content');
+    const btn = document.getElementById('agent-ops-collapse-btn');
+    if (section) {
+      section.classList.toggle('collapsed', collapsed);
+    }
+    if (content) {
+      content.classList.toggle('collapsed', collapsed);
+      // dashboard uses display; themes use .collapsed class
+      if (!content.classList.contains('section-content-collapsible')) {
+        content.style.display = collapsed ? 'none' : '';
+      }
+    }
+    if (btn) btn.textContent = collapsed ? '+' : '−';
+    if (collapsed) {
+      stopAgentOpsAutoRefresh();
+    } else {
+      refreshAgentOps();
+      startAgentOpsAutoRefresh();
+    }
+  }
+
+  function toggleAgentOpsSection() {
+    applyOpsCollapsed(!agentOpsCollapsed);
+  }
+
+  function wireCollapse() {
+    const header = document.getElementById('agent-ops-header');
+    const btn = document.getElementById('agent-ops-collapse-btn');
+    if (!header) return;
+    header.addEventListener('click', (e) => {
+      if (e.target.id === 'agent-ops-collapse-btn' || e.target.closest('.collapse-btn')) return;
+      if (e.target.closest('.ops-overview-link') || e.target.closest('.agent-ops-tab')) return;
+      toggleAgentOpsSection();
+    });
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleAgentOpsSection();
+      });
+    }
+    // Themes start collapsed; dashboard starts expanded if collapse btn shows −
+    const content = document.getElementById('agent-ops-content');
+    const startsCollapsed =
+      content?.classList.contains('collapsed') ||
+      content?.style.display === 'none' ||
+      (document.querySelector('.agent-ops-section')?.classList.contains('collapsed') ?? true);
+    applyOpsCollapsed(!!startsCollapsed);
+  }
+
+  function initAgentOps() {
+    if (!document.getElementById('ops-health-row')) return;
+    wireCollapse();
+    setupAgentOps();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAgentOps);
+  } else {
+    initAgentOps();
+  }
+
+  window.addEventListener('beforeunload', () => stopAgentOpsAutoRefresh());
+
+  window.AgentOps = {
+    refresh: refreshAgentOps,
+    selectTab: selectOpsTab,
+    toggle: toggleAgentOpsSection,
+  };
+})();

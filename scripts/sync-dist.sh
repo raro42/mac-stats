@@ -11,7 +11,7 @@ echo "Syncing files from src/ to dist/..."
 # Create dist directory if it doesn't exist
 mkdir -p "$PROJECT_ROOT/dist"
 
-# Copy HTML, CSS, JS files
+# Copy HTML, CSS, JS files (includes agent-ops.js / agent-ops.css)
 cp "$PROJECT_ROOT/src"/*.html "$PROJECT_ROOT/dist/" 2>/dev/null || true
 cp "$PROJECT_ROOT/src"/*.css "$PROJECT_ROOT/dist/" 2>/dev/null || true
 cp "$PROJECT_ROOT/src"/*.js "$PROJECT_ROOT/dist/" 2>/dev/null || true
@@ -27,6 +27,7 @@ if [ -d "$PROJECT_ROOT/src-tauri" ]; then
     mkdir -p "$PROJECT_ROOT/src-tauri/dist"
     
     # Copy HTML, CSS, JS files to src-tauri/dist/
+    # Note: themes live only under src-tauri/dist/themes/ (not overwritten from src/)
     cp "$PROJECT_ROOT/src"/*.html "$PROJECT_ROOT/src-tauri/dist/" 2>/dev/null || true
     cp "$PROJECT_ROOT/src"/*.css "$PROJECT_ROOT/src-tauri/dist/" 2>/dev/null || true
     cp "$PROJECT_ROOT/src"/*.js "$PROJECT_ROOT/src-tauri/dist/" 2>/dev/null || true

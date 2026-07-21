@@ -1,0 +1,336 @@
+/* Agent Ops Command Center — shared across dashboard + theme CPU windows */
+.agent-ops-section {
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.agent-ops-section .section-header,
+.agent-ops-section .section-header-collapsible {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+
+.ops-health-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0 4px 12px;
+}
+
+.ops-health-card {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-height: 58px;
+}
+
+.ops-health-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.55px;
+  opacity: 0.5;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.ops-health-value {
+  font-size: 13px;
+  line-height: 1.35;
+  word-break: break-word;
+  opacity: 0.95;
+}
+
+.ops-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 4px 14px;
+}
+
+.ops-overview-card {
+  background: color-mix(in srgb, currentColor 5%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 12px;
+  padding: 10px 12px 12px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ops-overview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ops-overview-head h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ops-overview-link {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  color: inherit;
+  opacity: 0.75;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.ops-overview-link:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.ops-overview-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.ops-overview-body .ops-row {
+  padding: 6px 8px;
+}
+
+.ops-overview-count {
+  font-size: 11px;
+  opacity: 0.5;
+  margin-bottom: 2px;
+}
+
+.ops-hint {
+  margin: 10px 4px 0;
+  font-size: 11px;
+  opacity: 0.45;
+}
+
+@media (max-width: 720px) {
+  .ops-health-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ops-overview-grid { grid-template-columns: 1fr; }
+}
+
+.agent-ops-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 0 4px 10px;
+  flex-wrap: wrap;
+}
+
+.agent-ops-tab, .ops-file-tab {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  color: inherit;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.agent-ops-tab.active, .ops-file-tab.active {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  opacity: 1;
+}
+
+.agent-ops-panel {
+  display: none;
+  padding: 0 4px 12px;
+  max-height: 420px;
+  overflow: auto;
+}
+
+.agent-ops-panel.active { display: block; }
+
+.ops-subhead {
+  margin: 8px 4px 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  opacity: 0.5;
+  font-weight: 600;
+}
+
+.ops-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ops-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: baseline;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  width: 100%;
+}
+
+.ops-row:hover {
+  border-color: color-mix(in srgb, currentColor 15%, transparent);
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.ops-row-title { font-size: 13px; }
+.ops-row-meta { font-size: 11px; opacity: 0.5; }
+
+.ops-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(76, 175, 80, 0.25);
+  color: inherit;
+}
+
+.ops-badge.off {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  opacity: 0.6;
+}
+
+.ops-preview {
+  margin: 10px 0 0;
+  padding: 12px;
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 11px;
+  line-height: 1.45;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.ops-detail-meta {
+  font-size: 12px;
+  opacity: 0.75;
+  margin-bottom: 8px;
+}
+
+.ops-file-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.ops-refresh-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 4px 12px;
+}
+
+.ops-empty {
+  padding: 12px;
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+.ops-insights-card {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, currentColor 5%, transparent);
+}
+
+.ops-insight-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.ops-insight-sub {
+  margin-top: 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.5;
+}
+
+.ops-insight-line {
+  font-size: 12px;
+  margin-top: 4px;
+  opacity: 0.8;
+  line-height: 1.35;
+}
+
+.btn-secondary.ops-refresh,
+.agent-ops-section .btn-secondary {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  color: inherit;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* Perplexity Search — minimal shared styles for themes without local CSS */
+.perplexity-search-box {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0 10px;
+}
+.perplexity-search-box input {
+  flex: 1;
+  min-height: 28px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: inherit;
+  font: inherit;
+}
+.perplexity-search-box button,
+#perplexity-search-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+.perplexity-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 280px;
+  overflow: auto;
+}
+.perplexity-result-item {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+.perplexity-result-item a {
+  color: inherit;
+  font-weight: 600;
+}
+.perplexity-result-snippet {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+.perplexity-config-status {
+  font-size: 11px;
+  opacity: 0.55;
+}

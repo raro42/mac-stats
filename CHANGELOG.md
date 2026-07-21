@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.132] - 2026-07-21
+
+### Fixed
+- **Agent Ops Command Center now appears in the real CPU window** (theme `cpu.html`), not only unused `dashboard.html`.
+- Install script now syncs `themes/` + `agent-ops.*` into `/Applications/mac-stats.app` so UI changes are visible after install.
+- Perplexity **search icon** (and search section) added to all themes that were still showing placeholder slots.
+
+### Changed
+- Shared `agent-ops.js` / `agent-ops.css` for dashboard and themes.
+
 ## [0.1.131] - 2026-07-21
 
 ### Changed

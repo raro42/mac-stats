@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="./cpu.css" />
+    <link rel="stylesheet" href="../../agent-ops.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CPU</title>
   </head>
@@ -122,7 +123,16 @@
           <img src="/assets/ollama.svg" alt="Ollama" />
         </button>
         
-        <!-- Icon: Debug log -->
+        
+        <!-- Icon: Perplexity Search -->
+        <button class="icon-line-item" id="icon-perplexity" title="Perplexity Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+
+<!-- Icon: Debug log -->
         <button class="icon-line-item" id="icon-logs" title="Debug Log">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -209,6 +219,136 @@
       </div>
 
       <div class="mat-rule" id="monitors-ollama-divider" aria-hidden="true"></div>
+
+
+      <!-- Perplexity Search Section (Collapsible) -->
+      <section class="perplexity-section collapsed">
+        <div class="section-header-collapsible" id="perplexity-header">
+          <div class="section-title-with-status">
+            <h2 class="section-title">Perplexity Search</h2>
+            <span class="perplexity-config-status" id="perplexity-config-status" title="API key status">—</span>
+          </div>
+        </div>
+        <div class="section-content-collapsible collapsed" id="perplexity-content">
+          <div class="perplexity-search-box">
+            <input type="text" id="perplexity-query" placeholder="Search the web..." />
+            <button type="button" id="perplexity-search-btn">Search</button>
+          </div>
+          <div class="perplexity-results" id="perplexity-results"></div>
+        </div>
+      </section>
+
+      <!-- Agent Ops — Command Center -->
+      <section class="agent-ops-section collapsed" id="agent-ops-section">
+        <div class="section-header-collapsible" id="agent-ops-header">
+          <div class="section-title-with-status">
+            <h2 class="section-title">Agent Ops</h2>
+          </div>
+        </div>
+        <div class="section-content-collapsible collapsed" id="agent-ops-content">
+          <div class="ops-health-row" id="ops-health-row" aria-live="polite">
+            <div class="ops-health-card" data-health="version">
+              <div class="ops-health-label">Version</div>
+              <div class="ops-health-value" id="ops-health-version">—</div>
+            </div>
+            <div class="ops-health-card" data-health="discord">
+              <div class="ops-health-label">Discord</div>
+              <div class="ops-health-value" id="ops-health-discord">—</div>
+            </div>
+            <div class="ops-health-card" data-health="schedule">
+              <div class="ops-health-label">Next schedule</div>
+              <div class="ops-health-value" id="ops-health-schedule">—</div>
+            </div>
+            <div class="ops-health-card" data-health="delivery">
+              <div class="ops-health-label">Last delivery</div>
+              <div class="ops-health-value" id="ops-health-delivery">—</div>
+            </div>
+            <div class="ops-health-card" data-health="digest">
+              <div class="ops-health-label">Digest</div>
+              <div class="ops-health-value" id="ops-health-digest">—</div>
+            </div>
+          </div>
+
+          <div class="ops-overview-grid" id="ops-overview-grid">
+            <div class="ops-overview-card" id="ops-overview-schedules">
+              <div class="ops-overview-head">
+                <h3>Schedules</h3>
+                <button type="button" class="ops-overview-link" data-goto-tab="schedules">Open</button>
+              </div>
+              <div class="ops-overview-body" id="ops-overview-schedules-body">Loading…</div>
+            </div>
+            <div class="ops-overview-card" id="ops-overview-live">
+              <div class="ops-overview-head">
+                <h3>Live</h3>
+                <button type="button" class="ops-overview-link" data-goto-tab="sessions">Open</button>
+              </div>
+              <div class="ops-overview-body" id="ops-overview-live-body">Loading…</div>
+            </div>
+            <div class="ops-overview-card" id="ops-overview-knowledge">
+              <div class="ops-overview-head">
+                <h3>Knowledge</h3>
+                <button type="button" class="ops-overview-link" data-goto-tab="memory">Open</button>
+              </div>
+              <div class="ops-overview-body" id="ops-overview-knowledge-body">Loading…</div>
+            </div>
+            <div class="ops-overview-card" id="ops-overview-recent">
+              <div class="ops-overview-head">
+                <h3>Recent chats</h3>
+                <button type="button" class="ops-overview-link" data-goto-tab="sessions">Open</button>
+              </div>
+              <div class="ops-overview-body" id="ops-overview-recent-body">Loading…</div>
+            </div>
+          </div>
+
+          <div class="agent-ops-tabs">
+            <button type="button" class="agent-ops-tab active" data-ops-tab="agents">Agents</button>
+            <button type="button" class="agent-ops-tab" data-ops-tab="sessions">Sessions</button>
+            <button type="button" class="agent-ops-tab" data-ops-tab="schedules">Schedules</button>
+            <button type="button" class="agent-ops-tab" data-ops-tab="memory">Knowledge</button>
+            <button type="button" class="agent-ops-tab" data-ops-tab="runs">Runs</button>
+          </div>
+          <div class="agent-ops-panel active" id="ops-panel-agents">
+            <div class="ops-list" id="ops-agents-list"></div>
+            <div class="ops-detail" id="ops-agent-detail" hidden>
+              <div class="ops-detail-meta" id="ops-agent-meta"></div>
+              <div class="ops-file-tabs">
+                <button type="button" class="ops-file-tab active" data-file="soul">Soul</button>
+                <button type="button" class="ops-file-tab" data-file="skill">Skill</button>
+                <button type="button" class="ops-file-tab" data-file="mood">Mood</button>
+              </div>
+              <pre class="ops-preview" id="ops-agent-preview"></pre>
+              <button type="button" class="btn-secondary" id="ops-agent-back">← Back</button>
+            </div>
+          </div>
+          <div class="agent-ops-panel" id="ops-panel-sessions">
+            <h4 class="ops-subhead">Live</h4>
+            <div class="ops-list" id="ops-live-sessions"></div>
+            <h4 class="ops-subhead">Recent files</h4>
+            <div class="ops-list" id="ops-session-files"></div>
+            <pre class="ops-preview" id="ops-session-preview" hidden></pre>
+            <button type="button" class="btn-secondary" id="ops-session-load-chat" hidden>Load into AI Chat</button>
+          </div>
+          <div class="agent-ops-panel" id="ops-panel-schedules">
+            <h4 class="ops-subhead">Active schedules</h4>
+            <div class="ops-list" id="ops-schedules-list"></div>
+            <h4 class="ops-subhead">Recent deliveries</h4>
+            <div class="ops-list" id="ops-deliveries-list"></div>
+            <p class="ops-hint">Add or remove schedules in Settings → Schedules.</p>
+          </div>
+          <div class="agent-ops-panel" id="ops-panel-memory">
+            <div class="ops-list" id="ops-memory-list"></div>
+            <pre class="ops-preview" id="ops-memory-preview" hidden></pre>
+          </div>
+          <div class="agent-ops-panel" id="ops-panel-runs">
+            <div class="ops-insights-card" id="ops-runs-insights"></div>
+            <div class="ops-list" id="ops-runs-list"></div>
+          </div>
+          <div class="ops-refresh-row">
+            <button type="button" class="btn-secondary ops-refresh" id="ops-refresh-btn">Refresh</button>
+            <button type="button" class="btn-secondary ops-refresh" id="ops-digest-refresh-btn">Refresh digest</button>
+          </div>
+        </div>
+      </section>
 
       <!-- Ollama Chat Section (Collapsible) -->
       
@@ -397,6 +537,7 @@
 
     <script src="../../tauri-logger.js"></script>
     <script type="module" src="../../ollama.js?v=20260717-model"></script>
+    <script src="../../agent-ops.js"></script>
     <script src="../../cpu.js?v=20260717-logs"></script>
     <script src="../../discord.js"></script>
     <script src="../../cpu-ui.js"></script>
