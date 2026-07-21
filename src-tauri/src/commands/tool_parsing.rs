@@ -2,6 +2,7 @@
 //!
 //! All functions here are pure (no state, no I/O) and handle the various
 //! ways models format tool calls: `TOOL: arg`, `RECOMMEND: TOOL: arg`,
+//! Hermes/Qwen JSON `<tool_call>`, Qwen3-Coder `<function=` XML,
 //! numbered lists, inline chains with "then"/"and"/";", etc.
 
 use crate::commands::tool_registry::{
@@ -272,7 +273,7 @@ pub(crate) fn normalize_inline_tool_sequences(content: &str) -> String {
 
 /// Parse first tool from response (first match only).
 pub(crate) fn parse_tool_from_response(content: &str) -> Option<(String, String)> {
-    let expanded = expand_hermes_tool_call_xml(content);
+    let expanded = expand_model_tool_call_xml(content);
     let normalized = normalize_inline_tool_sequences(&expanded);
     let lines: Vec<&str> = normalized.lines().collect();
     parse_one_tool_at_line(&lines, 0).map(|(pair, _)| pair)
@@ -327,7 +328,7 @@ pub(crate) fn normalize_browser_tool_arg(tool: &str, arg: &str) -> String {
 
 /// Parse all tool invocations from a response (up to `MAX_TOOLS_PER_RESPONSE`).
 pub(crate) fn parse_all_tools_from_response(content: &str) -> Vec<(String, String)> {
-    let expanded = expand_hermes_tool_call_xml(content);
+    let expanded = expand_model_tool_call_xml(content);
     let normalized = normalize_inline_tool_sequences(&expanded);
     let lines: Vec<&str> = normalized.lines().collect();
     let mut out = Vec::with_capacity(MAX_TOOLS_PER_RESPONSE);
@@ -341,6 +342,130 @@ pub(crate) fn parse_all_tools_from_response(content: &str) -> Vec<(String, Strin
         }
     }
     out
+}
+
+/// Expand vendor tool-call XML (Qwen3-Coder first, then Hermes/Qwen JSON).
+fn expand_model_tool_call_xml(content: &str) -> String {
+    let qwen = expand_qwen3_coder_tool_call_xml(content);
+    expand_hermes_tool_call_xml(&qwen)
+}
+
+/// Qwen3-Coder / VLLM: `<tool_call><function=name><parameter=k>v</parameter></function></tool_call>`.
+fn expand_qwen3_coder_tool_call_xml(content: &str) -> String {
+    if !content.contains("<function=") {
+        return content.to_string();
+    }
+    let mut tool_lines: Vec<String> = Vec::new();
+    let mut search_from = 0usize;
+    let mut region_start: Option<usize> = None;
+    let mut last_end = 0usize;
+
+    while let Some(rel) = content[search_from..].find("<function=") {
+        let fn_start = search_from + rel;
+        if region_start.is_none() {
+            let before = &content[..fn_start];
+            region_start = Some(
+                before
+                    .rfind("<tool_call>")
+                    .unwrap_or(fn_start),
+            );
+        }
+        let after_eq = &content[fn_start + "<function=".len()..];
+        let Some(gt) = after_eq.find('>') else {
+            break;
+        };
+        let name = after_eq[..gt].trim();
+        let body_start = fn_start + "<function=".len() + gt + 1;
+        let (body, mut end) = if let Some(rel_end) = content[body_start..].find("</function>") {
+            (
+                &content[body_start..body_start + rel_end],
+                body_start + rel_end + "</function>".len(),
+            )
+        } else if let Some(rel_end) = content[body_start..].find("</tool_call>") {
+            (
+                &content[body_start..body_start + rel_end],
+                body_start + rel_end,
+            )
+        } else {
+            (&content[body_start..], content.len())
+        };
+        if let Some(p) = content[end..].find("</tool_call>") {
+            let between = content[end..end + p].trim();
+            if between.is_empty() {
+                end = end + p + "</tool_call>".len();
+            }
+        }
+        if let Some(line) = qwen3_function_to_tool_line(name, body) {
+            tool_lines.push(line);
+        }
+        last_end = end;
+        search_from = end;
+    }
+
+    if tool_lines.is_empty() {
+        return content.to_string();
+    }
+    let start = region_start.unwrap_or(0);
+    let mut out = String::new();
+    let preamble = content[..start].trim_end();
+    if !preamble.is_empty() {
+        out.push_str(preamble);
+        out.push('\n');
+    }
+    for line in &tool_lines {
+        out.push_str(line);
+        out.push('\n');
+    }
+    let after = content[last_end..].trim_start();
+    if !after.is_empty() {
+        out.push_str(after);
+    }
+    out
+}
+
+fn qwen3_function_to_tool_line(name: &str, body: &str) -> Option<String> {
+    let tool = resolve_hermes_tool_name(name)?;
+    let args = parse_qwen3_parameters(body);
+    let arg = hermes_args_to_arg_string(&args);
+    Some(format!("{tool}: {arg}"))
+}
+
+fn parse_qwen3_parameters(body: &str) -> serde_json::Value {
+    let mut map = serde_json::Map::new();
+    let mut rest = body;
+    while let Some(p) = rest.find("<parameter=") {
+        rest = &rest[p + "<parameter=".len()..];
+        let Some(gt) = rest.find('>') else {
+            break;
+        };
+        let key = rest[..gt].trim().to_string();
+        rest = &rest[gt + 1..];
+        let (raw_val, next) = if let Some(end) = rest.find("</parameter>") {
+            (rest[..end].to_string(), &rest[end + "</parameter>".len()..])
+        } else if let Some(next_p) = rest.find("<parameter=") {
+            (rest[..next_p].to_string(), &rest[next_p..])
+        } else {
+            (rest.to_string(), "")
+        };
+        let val = raw_val
+            .trim()
+            .trim_start_matches('\n')
+            .trim_end_matches('\n');
+        map.insert(key, qwen3_convert_param_value(val));
+        rest = next;
+    }
+    serde_json::Value::Object(map)
+}
+
+fn qwen3_convert_param_value(s: &str) -> serde_json::Value {
+    let t = s.trim();
+    if t.eq_ignore_ascii_case("null") {
+        return serde_json::Value::Null;
+    }
+    if let Ok(v) = serde_json::from_str::<serde_json::Value>(t) {
+        return v;
+    }
+    serde_json::Value::String(t.to_string())
 }
 
 /// Hermes / VLLM-style `<tool_call>{"name","arguments"}</tool_call>` → `TOOL: arg` lines.
@@ -877,6 +1002,34 @@ mod tests {
         assert_eq!(tools[0].1, "mac-stats");
         assert_eq!(tools[1].0, "FETCH_URL");
         assert_eq!(tools[1].1, "https://example.com");
+    }
+
+    #[test]
+    fn qwen3_coder_xml_tool_call_parses() {
+        let content = r#"Looking that up.
+<tool_call>
+<function=brave_search>
+<parameter=query>El Masnou weather</parameter>
+</function>
+</tool_call>
+"#;
+        let tools = parse_all_tools_from_response(content);
+        assert_eq!(tools.len(), 1, "{tools:?}");
+        assert_eq!(tools[0].0, "BRAVE_SEARCH");
+        assert_eq!(tools[0].1, "El Masnou weather");
+    }
+
+    #[test]
+    fn qwen3_coder_multi_param_and_unclosed() {
+        let content = r#"<tool_call>
+<function=FETCH_URL>
+<parameter=url>https://example.com</parameter>
+<parameter=timeout>30</parameter>
+</function>
+"#;
+        let t = parse_tool_from_response(content).unwrap();
+        assert_eq!(t.0, "FETCH_URL");
+        assert_eq!(t.1, "https://example.com");
     }
 
     #[test]
