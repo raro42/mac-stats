@@ -1024,6 +1024,38 @@ pub fn format_status_gateway() -> String {
     lines.join("\n")
 }
 
+/// True for `/ops` / operator command list — not free-form “help me with …”.
+pub fn looks_like_ops_help_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    matches!(
+        n.as_str(),
+        "/ops"
+            | "ops"
+            | "/ops help"
+            | "ops help"
+            | "operator help"
+            | "operator commands"
+            | "bot commands"
+            | "/commands"
+            | "commands"
+    )
+}
+
+/// Short Discord menu of cheap operator commands (no Ollama).
+pub fn format_ops_help_gateway() -> String {
+    let version = crate::config::Config::version();
+    format!(
+        "**mac-stats v{version} — operator commands** (instant, no Ollama)\n\
+• `/status` · `/health` · `/version` — one-screen health\n\
+• `/insights` — runs.jsonl report + digest/schedules\n\
+• `/schedules` · `/cron list` — active jobs + last delivery\n\
+• `/digest` — refresh digester (latest.md/json)\n\
+• `scrub memory` — remove polluted memory lines\n\
+• `stop` / `cancel` — interrupt an in-flight run\n\
+• `/ops` — this menu"
+    )
+}
+
 fn classify_candidate(
     lane: &str,
     wall_ms: u64,
@@ -1279,6 +1311,24 @@ mod tests {
         assert!(looks_like_status_request("bot status"));
         assert!(!looks_like_status_request("status of the redmine ticket"));
         assert!(!looks_like_status_request("status"));
+    }
+
+    #[test]
+    fn ops_help_request_detected() {
+        assert!(looks_like_ops_help_request("/ops"));
+        assert!(looks_like_ops_help_request("ops"));
+        assert!(looks_like_ops_help_request("operator commands"));
+        assert!(looks_like_ops_help_request("@Werner /ops"));
+        assert!(!looks_like_ops_help_request("help me write a cron"));
+        assert!(!looks_like_ops_help_request("help"));
+    }
+
+    #[test]
+    fn ops_help_lists_status() {
+        let report = format_ops_help_gateway();
+        assert!(report.contains("/status"), "{report}");
+        assert!(report.contains("/schedules"), "{report}");
+        assert!(report.contains("/digest"), "{report}");
     }
 
     #[test]
