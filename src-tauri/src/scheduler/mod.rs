@@ -80,7 +80,7 @@ fn load_schedules() -> Vec<ScheduleEntry> {
         }
     };
 
-    let file_data: SchedulesFile = match serde_json::from_str(&content) {
+    let mut file_data: SchedulesFile = match serde_json::from_str(&content) {
         Ok(d) => d,
         Err(e) => {
             warn!(
@@ -90,6 +90,26 @@ fn load_schedules() -> Vec<ScheduleEntry> {
             return Vec::new();
         }
     };
+
+    let pruned = prune_near_duplicate_schedules(&mut file_data.schedules);
+    if pruned > 0 {
+        match serde_json::to_string_pretty(&file_data) {
+            Ok(json) => {
+                if let Err(e) = std::fs::write(&path, json) {
+                    warn!(
+                        "Scheduler: failed to rewrite schedules after pruning {} near-duplicate(s): {}",
+                        pruned, e
+                    );
+                } else {
+                    info!(
+                        "Scheduler: pruned {} near-duplicate schedule(s) from {:?}",
+                        pruned, path
+                    );
+                }
+            }
+            Err(e) => warn!("Scheduler: serialize after prune failed: {}", e),
+        }
+    }
 
     let mut entries = Vec::new();
     for raw in file_data.schedules {
@@ -809,6 +829,82 @@ fn task_normalized_for_dedup(task: &str) -> String {
     task.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
+fn is_wakeup_schedule_task(task: &str) -> bool {
+    let n = task_normalized_for_dedup(task).to_lowercase();
+    n.contains("wake-up")
+        || n.contains("wakeup")
+        || n.contains("wake up message")
+        || (n.contains("wake up") && n.contains("message"))
+}
+
+/// Stem for wake-up variants: drop trailing "need anything else?" fluff.
+fn wakeup_task_stem(task: &str) -> String {
+    let mut s = task_normalized_for_dedup(task).to_lowercase();
+    for _ in 0..3 {
+        s = s
+            .trim_end_matches(['?', '!', '.', ','])
+            .trim()
+            .to_string();
+        if let Some(rest) = s.strip_suffix("need anything else") {
+            s = rest.trim_end_matches(['?', '!', '.', ',']).trim().to_string();
+            continue;
+        }
+        break;
+    }
+    s
+}
+
+/// True when two tasks should not both be scheduled (exact match, or wake-up near-duplicates).
+fn tasks_are_equivalent_for_dedup(a: &str, b: &str) -> bool {
+    let an = task_normalized_for_dedup(a);
+    let bn = task_normalized_for_dedup(b);
+    if an.eq_ignore_ascii_case(&bn) {
+        return true;
+    }
+    if is_wakeup_schedule_task(&an) && is_wakeup_schedule_task(&bn) {
+        let sa = wakeup_task_stem(&an);
+        let sb = wakeup_task_stem(&bn);
+        return sa == sb || sa.starts_with(&sb) || sb.starts_with(&sa);
+    }
+    false
+}
+
+/// Drop near-duplicates sharing cron (or at) + reply channel + equivalent task. Keeps longer task text.
+/// Returns number of entries removed.
+fn prune_near_duplicate_schedules(schedules: &mut Vec<ScheduleEntryRaw>) -> usize {
+    let mut removed = 0usize;
+    let mut i = 0usize;
+    while i < schedules.len() {
+        let mut j = i + 1;
+        while j < schedules.len() {
+            let same_when = schedules[i].cron == schedules[j].cron
+                && schedules[i].at == schedules[j].at
+                && (schedules[i].cron.is_some() || schedules[i].at.is_some());
+            let same_channel =
+                schedules[i].reply_to_channel_id == schedules[j].reply_to_channel_id;
+            if same_when
+                && same_channel
+                && tasks_are_equivalent_for_dedup(&schedules[i].task, &schedules[j].task)
+            {
+                if schedules[j].task.len() > schedules[i].task.len() {
+                    schedules.swap(i, j);
+                }
+                let dropped = schedules.remove(j);
+                info!(
+                    "Scheduler: pruning near-duplicate schedule id={:?} task={:?} (kept longer sibling)",
+                    dropped.id,
+                    dropped.task.chars().take(48).collect::<String>()
+                );
+                removed += 1;
+            } else {
+                j += 1;
+            }
+        }
+        i += 1;
+    }
+    removed
+}
+
 /// Add a schedule entry to the file (e.g. from Discord when Ollama invokes SCHEDULE).
 /// Uses cron only (no one-shot "at"). Id should be unique (e.g. "discord-<timestamp>").
 /// If an entry with the same cron and same task (normalized) already exists, returns AlreadyExists and does not add.
@@ -843,13 +939,13 @@ pub fn add_schedule(
         }
     }
 
-    let task_norm = task_normalized_for_dedup(&task);
     let is_duplicate = file_data.schedules.iter().any(|e| {
         e.cron.as_deref() == Some(cron_str.as_str())
-            && task_normalized_for_dedup(&e.task) == task_norm
+            && e.reply_to_channel_id == reply_to_channel_id
+            && tasks_are_equivalent_for_dedup(&e.task, &task)
     });
     if is_duplicate {
-        info!("Scheduler: skipping duplicate (same cron and task already scheduled)",);
+        info!("Scheduler: skipping duplicate (same cron/channel and equivalent task already scheduled)");
         return Ok(ScheduleAddOutcome::AlreadyExists);
     }
 
@@ -906,12 +1002,13 @@ pub fn add_schedule_at(
         }
     }
 
-    let task_norm = task_normalized_for_dedup(&task);
     let is_duplicate = file_data.schedules.iter().any(|e| {
-        e.at.as_deref() == Some(at_str.as_str()) && task_normalized_for_dedup(&e.task) == task_norm
+        e.at.as_deref() == Some(at_str.as_str())
+            && e.reply_to_channel_id == reply_to_channel_id
+            && tasks_are_equivalent_for_dedup(&e.task, &task)
     });
     if is_duplicate {
-        info!("Scheduler: skipping duplicate one-shot (same at and task already scheduled)");
+        info!("Scheduler: skipping duplicate one-shot (same at/channel and equivalent task already scheduled)");
         return Ok(ScheduleAddOutcome::AlreadyExists);
     }
 
@@ -985,4 +1082,57 @@ pub fn spawn_scheduler_thread() {
         info!("Scheduler: thread spawned");
         rt.block_on(scheduler_loop());
     });
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn wakeup_near_duplicates_are_equivalent() {
+        assert!(tasks_are_equivalent_for_dedup(
+            "Send wake-up message. Need anything else?",
+            "Send wake-up message."
+        ));
+        assert!(tasks_are_equivalent_for_dedup(
+            "Send wake-up message.",
+            "Send wake-up message. Need anything else?"
+        ));
+    }
+
+    #[test]
+    fn unrelated_tasks_not_equivalent() {
+        assert!(!tasks_are_equivalent_for_dedup(
+            "Send wake-up message.",
+            "Check Redmine tickets"
+        ));
+        assert!(!tasks_are_equivalent_for_dedup(
+            "Remind me to buy milk",
+            "Remind me to buy eggs"
+        ));
+    }
+
+    #[test]
+    fn prune_keeps_longer_wakeup_sibling() {
+        let mut schedules = vec![
+            ScheduleEntryRaw {
+                id: Some("a".into()),
+                cron: Some("0 0 6 * * *".into()),
+                at: None,
+                task: "Send wake-up message.".into(),
+                reply_to_channel_id: Some("1".into()),
+            },
+            ScheduleEntryRaw {
+                id: Some("b".into()),
+                cron: Some("0 0 6 * * *".into()),
+                at: None,
+                task: "Send wake-up message. Need anything else?".into(),
+                reply_to_channel_id: Some("1".into()),
+            },
+        ];
+        let removed = prune_near_duplicate_schedules(&mut schedules);
+        assert_eq!(removed, 1);
+        assert_eq!(schedules.len(), 1);
+        assert!(schedules[0].task.contains("Need anything else"));
+    }
 }
