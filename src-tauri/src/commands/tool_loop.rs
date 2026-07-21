@@ -825,8 +825,12 @@ pub(crate) async fn run_tool_loop(
             images: None,
             tool_calls: None
         });
+        // Native Ollama/OpenAI tools expect role "tool" for results (OpenClaw/Hermes fidelity).
+        // Text-line mode keeps role "user"; RUN_CMD raw dumps stay "system".
         let tool_result_role = if user_message.starts_with("Here is the command output") {
             "system"
+        } else if params.native_tool_schemas.is_some() {
+            "tool"
         } else {
             "user"
         };

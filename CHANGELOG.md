@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.153] - 2026-07-21
+
+### Changed
+- **Native tool loop fidelity**: when `agentNativeTools` schemas are active, tool results are sent with role `tool` (OpenClaw/Hermes-style) instead of `user`; conversation sanitize accepts `tool` as a valid follow-up.
+
 ## [0.1.152] - 2026-07-21
 
 ### Added

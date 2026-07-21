@@ -1,8 +1,9 @@
 //! Repair assistant / tool-result pairing in chat history before Ollama requests.
 //!
-//! mac-stats uses text-based tool lines in assistant messages and user/system messages
-//! for results. Interrupted tool loops or corrupted session state can leave unpaired
-//! tool calls or orphan result blobs; this module applies a lightweight linear pass.
+//! mac-stats uses text-based tool lines in assistant messages and user/system/`tool` messages
+//! for results (native schemas prefer role `tool`). Interrupted tool loops or corrupted session
+//! state can leave unpaired tool calls or orphan result blobs; this module applies a lightweight
+//! linear pass.
 
 use crate::commands::tool_parsing::parse_all_tools_from_response;
 use crate::debug2;
@@ -77,7 +78,7 @@ fn content_looks_like_tool_bundle(content: &str) -> bool {
     segment_looks_like_tool_result(t)
 }
 
-/// User/system message plausibly carries tool output for a preceding assistant tool turn.
+/// User/system/tool message plausibly carries tool output for a preceding assistant tool turn.
 fn next_message_is_tool_followup(next: &ChatMessage) -> bool {
     let t = next.content.trim();
     if t.is_empty() {
@@ -87,7 +88,7 @@ fn next_message_is_tool_followup(next: &ChatMessage) -> bool {
         return true;
     }
     match next.role.as_str() {
-        "system" => true,
+        "system" | "tool" => true,
         "user" => {
             content_looks_like_tool_bundle(&next.content)
                 || t.contains("\n\n---\n\n")
@@ -128,7 +129,7 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
         msg.content =
             crate::commands::directive_tags::strip_inline_directive_tags_for_display(&msg.content);
 
-        if matches!(msg.role.as_str(), "user" | "system") && i > 0 {
+        if matches!(msg.role.as_str(), "user" | "system" | "tool") && i > 0 {
             let prev = &messages[i - 1];
             let prev_had_tools =
                 prev.role == "assistant" && assistant_has_executable_tools(&prev.content);
@@ -136,7 +137,8 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
                 let stripped = strip_tool_like_segments(&msg.content);
                 if stripped.trim().is_empty() {
                     debug2!(
-                        "Sanitized history: dropped user/system message at index {} (orphan tool-like content, no prior assistant tool call)",
+                        "Sanitized history: dropped {} message at index {} (orphan tool-like content, no prior assistant tool call)",
+                        msg.role,
                         i
                     );
                     i += 1;
@@ -227,6 +229,28 @@ mod tests {
         ];
         let out = sanitize_conversation_history(hist);
         assert_eq!(out.len(), 2);
+    }
+
+    #[test]
+    fn keeps_paired_fetch_and_native_tool_role_result() {
+        let page = format!("Here is the page content:\n\n{}", "x".repeat(900));
+        let hist = vec![
+            ChatMessage {
+                role: "assistant".into(),
+                content: "FETCH_URL: https://example.com".into(),
+                images: None,
+                tool_calls: None,
+            },
+            ChatMessage {
+                role: "tool".into(),
+                content: page,
+                images: None,
+                tool_calls: None,
+            },
+        ];
+        let out = sanitize_conversation_history(hist);
+        assert_eq!(out.len(), 2);
+        assert_eq!(out[1].role, "tool");
     }
 
     #[test]
