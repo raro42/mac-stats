@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.137] - 2026-07-21
+
+### Changed
+- Digester: treat pre-v0.1.133 scheduled `SKILL`+commit Instant refusals as stale; drop sub-100ms Instant turns from Slowest noise.
+
 ## [0.1.136] - 2026-07-21
 
 ### Fixed

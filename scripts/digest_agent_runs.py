@@ -29,6 +29,8 @@ SHIPPED_INSTANT_TIME = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
 SHIPPED_INSTANT_WEATHER = datetime(2026, 7, 20, 21, 0, tzinfo=timezone.utc)
 SHIPPED_GREETING = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
 SHIPPED_INSTANT_WAKEUP = datetime(2026, 7, 21, 4, 30, tzinfo=timezone.utc)
+# v0.1.133 — scheduled SKILL tasks no longer instant-refused for commit/push.
+SHIPPED_SKILL_GIT_FASTLANE = datetime(2026, 7, 21, 9, 10, tzinfo=timezone.utc)
 
 
 def atomic_write_text(path: Path, text: str) -> None:
@@ -116,8 +118,44 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
     ):
         if "zero-tool" in hl or "instant" in hl or "wake" in hl:
             return True
+    if ts < SHIPPED_SKILL_GIT_FASTLANE and "skill:" in ql:
+        if (
+            "git fast-lane" in hl
+            or "ui-weekly" in ql
+            or "changelog-weekly" in ql
+            or "commit" in ql
+            or "push" in ql
+        ):
+            return True
     return False
 
+
+def is_trivial_instant_noise(r: dict) -> bool:
+    """Drop sub-100ms instant turns from Slowest (clock/ping/false-positive refuse)."""
+    if (r.get("lane") or "") != "instant":
+        return False
+    return int(r.get("wall_ms") or 0) < 100
+
+
+def is_skill_git_fastlane_false_positive(r: dict) -> bool:
+    """Pre-v0.1.133: SKILL weekly tasks hit Instant git refusal (0 LLM).
+
+    `question_preview` is often truncated before trailing `commit+push`, so also
+    match known weekly skill ids.
+    """
+    q = (r.get("question_preview") or "").lower()
+    if "skill:" not in q:
+        return False
+    skillish = (
+        "ui-weekly" in q
+        or "changelog-weekly" in q
+        or "commit" in q
+        or "push" in q
+        or "cursor_agent" in q
+    )
+    if not skillish:
+        return False
+    return (r.get("lane") or "") == "instant"
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
@@ -162,7 +200,8 @@ def main() -> int:
     lines.append(f"- max: **{max(walls)} ms**")
     lines.append("")
 
-    slow = sorted(runs, key=lambda r: int(r.get("wall_ms") or 0), reverse=True)[:15]
+    slow_pool = [r for r in runs if not is_trivial_instant_noise(r)]
+    slow = sorted(slow_pool, key=lambda r: int(r.get("wall_ms") or 0), reverse=True)[:15]
     lines.append("## Slowest 15")
     for r in slow:
         lines.append(
@@ -181,7 +220,9 @@ def main() -> int:
         tool_steps = int(r.get("tool_steps") or 0)
         ts = parse_ts(str(r.get("ts", "")))
         hint = None
-        if wall >= 5_000 and lane in ("lite", "direct", "full") and (
+        if is_skill_git_fastlane_false_positive(r):
+            hint = "Scheduled SKILL blocked by git fast-lane — exempt SKILL/CURSOR_AGENT"
+        elif wall >= 5_000 and lane in ("lite", "direct", "full") and (
             not tools and tool_steps == 0
         ):
             if "version" in q:
