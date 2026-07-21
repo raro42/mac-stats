@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.176] - 2026-07-22
+
+### Changed
+- **Instant lane**: short identity/role affirmations (`You are working for…`, online-on-channels) skip the LLM (digester zero-tool slow turns).
+
 ## [0.1.175] - 2026-07-21
 
 ### Changed

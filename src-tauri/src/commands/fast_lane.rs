@@ -102,6 +102,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_short_ack_or_signoff(&n) {
         return Some("👍 Got it — here if you need me.".to_string());
     }
+    if is_identity_affirmation(&n) {
+        return Some("Got it — noted. I'm here when you need me.".to_string());
+    }
     if is_wakeup_message_task(&n) {
         return Some(format_instant_wakeup_reply());
     }
@@ -218,6 +221,34 @@ fn is_short_ack_or_signoff(n: &str) -> bool {
         || n.contains("later")
         || n.contains("all good")
         || n.contains("find out")
+}
+
+/// Short role/identity statements without a question (digester: multi-second direct, zero tools).
+fn is_identity_affirmation(n: &str) -> bool {
+    if n.contains('?') || n.chars().count() > 180 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("search")
+        || n.contains("redmine")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("please")
+        || n.contains("can you")
+        || n.contains("could you")
+    {
+        return false;
+    }
+    let you_are = n.starts_with("you are ") || n.starts_with("you're ") || n.starts_with("youre ");
+    if !you_are {
+        return false;
+    }
+    n.contains("working for")
+        || n.contains("online")
+        || n.contains("assistant")
+        || n.contains(" agent")
+        || n.contains("bot")
+        || n.contains("on various channel")
 }
 
 fn format_instant_wakeup_reply() -> String {
@@ -454,6 +485,24 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "nice + real topic must not be instant"
+        );
+    }
+
+    #[test]
+    fn identity_affirmations_are_instant() {
+        assert!(matches!(
+            classify_turn_lane(
+                "You are working for Amvara. You are online in Amvara server on various channel.",
+                None
+            ),
+            TurnLane::Instant { .. }
+        ));
+        assert!(
+            !matches!(
+                classify_turn_lane("Can you talk to ultron user on Amvara redmine server?", None),
+                TurnLane::Instant { .. }
+            ),
+            "identity-adjacent asks must not be instant"
         );
     }
 
