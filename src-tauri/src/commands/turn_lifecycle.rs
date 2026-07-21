@@ -182,7 +182,18 @@ pub async fn finalize_turn_timeout(
     }
 
     if let Some(d) = discord_draft {
-        d.flush(&clamp_discord_content(&text)).await;
+        let ok = d.flush(&clamp_discord_content(&text)).await;
+        if ok {
+            mac_stats_info!(
+                "discord/draft",
+                "Agent router turn-timeout: draft flushed with timeout reply"
+            );
+        } else {
+            mac_stats_warn!(
+                "discord/draft",
+                "Agent router turn-timeout: draft flush failed (Discord reply path may re-send)"
+            );
+        }
     }
 
     Ok(OllamaReply {

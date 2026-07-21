@@ -3,6 +3,8 @@
 //! Discord path sends a placeholder message, then edits it periodically while tools run,
 //! then flushes the final reply into the same message (first chunk only; extra chunks use new messages).
 
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use serenity::builder::EditMessage;
@@ -31,6 +33,8 @@ enum Cmd {
 #[derive(Clone)]
 pub struct DiscordDraftHandle {
     tx: mpsc::UnboundedSender<Cmd>,
+    /// Set after a successful flush so wall-clock timeout + normal Discord send do not double-post.
+    flushed_ok: Arc<AtomicBool>,
 }
 
 impl DiscordDraftHandle {
@@ -44,7 +48,16 @@ impl DiscordDraftHandle {
 
     /// Replace the message with `text` immediately after any in-flight work, ignoring throttle.
     /// Returns `true` when Discord accepted the edit (or text was empty); `false` on drop/API failure.
+    /// Idempotent: after a successful flush, further calls return `true` without editing again
+    /// (timeout cleanup and the Discord reply path both flush the same draft).
     pub async fn flush(&self, text: &str) -> bool {
+        if self.flushed_ok.load(Ordering::Acquire) {
+            debug!(
+                target: "discord/draft",
+                "draft flush skipped (already flushed successfully)"
+            );
+            return true;
+        }
         let (reply_tx, reply_rx) = oneshot::channel();
         if self
             .tx
@@ -54,10 +67,34 @@ impl DiscordDraftHandle {
             })
             .is_err()
         {
-            debug!(target: "discord/draft", "draft flush dropped (editor stopped)");
-            return false;
+            // Editor already exited — honor a prior success (race with timeout flush).
+            let prior = self.flushed_ok.load(Ordering::Acquire);
+            if prior {
+                debug!(
+                    target: "discord/draft",
+                    "draft flush dropped after prior success (editor stopped)"
+                );
+            } else {
+                debug!(target: "discord/draft", "draft flush dropped (editor stopped)");
+            }
+            return prior;
         }
-        reply_rx.await.unwrap_or(false)
+        let ok = reply_rx.await.unwrap_or(false);
+        if ok {
+            self.flushed_ok.store(true, Ordering::Release);
+            return true;
+        }
+        // Sibling flush (e.g. wall-clock timeout) may have succeeded while our oneshot was dropped.
+        if self.flushed_ok.load(Ordering::Acquire) {
+            return true;
+        }
+        tokio::task::yield_now().await;
+        self.flushed_ok.load(Ordering::Acquire)
+    }
+
+    /// True after a successful [`Self::flush`] (shared across clones).
+    pub fn was_flushed_ok(&self) -> bool {
+        self.flushed_ok.load(Ordering::Acquire)
     }
 
     pub fn stop(&self) {
@@ -213,7 +250,10 @@ pub fn spawn_discord_draft_editor(
         }
     });
 
-    DiscordDraftHandle { tx }
+    DiscordDraftHandle {
+        tx,
+        flushed_ok: Arc::new(AtomicBool::new(false)),
+    }
 }
 
 #[cfg(test)]
@@ -232,5 +272,32 @@ mod tests {
         let out = clamp_discord_content(&s);
         assert_eq!(out.chars().count(), DISCORD_CONTENT_MAX_CHARS);
         assert!(out.ends_with('…'));
+    }
+
+    #[tokio::test]
+    async fn second_flush_is_idempotent_after_editor_exit() {
+        // Simulate: first flush succeeds via channel, editor exits; second flush must not look like failure.
+        let (tx, mut rx) = mpsc::unbounded_channel::<Cmd>();
+        let handle = DiscordDraftHandle {
+            tx: tx.clone(),
+            flushed_ok: Arc::new(AtomicBool::new(false)),
+        };
+        let worker = tokio::spawn(async move {
+            while let Some(cmd) = rx.recv().await {
+                match cmd {
+                    Cmd::Flush { reply, .. } => {
+                        let _ = reply.send(true);
+                        break;
+                    }
+                    Cmd::Stop => break,
+                    _ => {}
+                }
+            }
+        });
+        assert!(handle.flush("timeout text").await);
+        assert!(handle.was_flushed_ok());
+        // Editor gone — previously returned false and Discord re-sent chunk 0.
+        assert!(handle.flush("same text again").await);
+        let _ = worker.await;
     }
 }

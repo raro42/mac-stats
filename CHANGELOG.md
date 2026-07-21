@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.165] - 2026-07-21
+
+### Fixed
+- **Discord draft**: flush is idempotent after success so wall-clock timeout cleanup and the normal reply path no longer double-post the first chunk (`draft flush failed` after a successful timeout flush).
+
 ## [0.1.164] - 2026-07-21
 
 ### Changed
