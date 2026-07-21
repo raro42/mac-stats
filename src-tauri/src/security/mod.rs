@@ -172,7 +172,8 @@ fn write_credential_accounts_list(accounts: &[String]) -> Result<()> {
     }
     let content =
         serde_json::to_string_pretty(accounts).context("Failed to serialize accounts list")?;
-    fs::write(&path, content).context("Failed to write credential_accounts.json")?;
+    crate::config::write_text_atomic(&path, &content)
+        .map_err(|e| anyhow::anyhow!("Failed to write credential_accounts.json: {}", e))?;
     Ok(())
 }
 

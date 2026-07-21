@@ -81,7 +81,8 @@ pub fn get_agent_details(selector: String) -> Result<AgentDetails, String> {
 
 fn write_agent_file(dir: &Path, filename: &str, content: &str) -> Result<(), String> {
     let path = dir.join(filename);
-    std::fs::write(&path, content).map_err(|e| format!("Failed to write {}: {}", path.display(), e))
+    crate::config::write_text_atomic(&path, content)
+        .map_err(|e| format!("Failed to write {}: {}", path.display(), e))
 }
 
 #[tauri::command]
@@ -148,7 +149,8 @@ pub fn update_agent_config(
         max_tool_iterations,
     };
     let json = serde_json::to_string_pretty(&updated).map_err(|e| e.to_string())?;
-    std::fs::write(&path, json).map_err(|e| format!("Failed to write agent.json: {}", e))
+    crate::config::write_text_atomic(&path, &json)
+        .map_err(|e| format!("Failed to write agent.json: {}", e))
 }
 
 #[derive(Debug, Deserialize)]
@@ -191,13 +193,13 @@ pub fn create_agent(payload: CreateAgentPayload) -> Result<(), String> {
         max_tool_iterations: None, // default 15 when loaded
     };
     let config_json = serde_json::to_string_pretty(&config).map_err(|e| e.to_string())?;
-    std::fs::write(dir.join("agent.json"), config_json).map_err(|e| e.to_string())?;
+    crate::config::write_text_atomic(&dir.join("agent.json"), &config_json)?;
     let skill = payload
         .skill_initial
         .unwrap_or_else(|| "# Skill\n\nDescribe what this agent does.".to_string());
-    std::fs::write(dir.join("skill.md"), skill).map_err(|e| e.to_string())?;
+    crate::config::write_text_atomic(&dir.join("skill.md"), &skill)?;
     let testing = "# Testing\n\nOptional test cases (one per line):\n\n- Input: <user input> Expected: <expected>\n";
-    let _ = std::fs::write(dir.join("testing.md"), testing);
+    let _ = crate::config::write_text_atomic(&dir.join("testing.md"), testing);
     Ok(())
 }
 
@@ -216,7 +218,8 @@ fn set_agent_enabled(agent_id: &str, enabled: bool) -> Result<(), String> {
         serde_json::from_str(&s).map_err(|e| format!("Invalid agent.json: {}", e))?;
     config.enabled = Some(enabled);
     let json = serde_json::to_string_pretty(&config).map_err(|e| e.to_string())?;
-    std::fs::write(&path, json).map_err(|e| format!("Failed to write agent.json: {}", e))
+    crate::config::write_text_atomic(&path, &json)
+        .map_err(|e| format!("Failed to write agent.json: {}", e))
 }
 
 #[tauri::command]
@@ -280,6 +283,6 @@ pub fn save_prompt_file(name: String, content: String) -> Result<(), String> {
         std::fs::create_dir_all(parent)
             .map_err(|e| format!("Failed to create directory: {}", e))?;
     }
-    std::fs::write(&path, content.trim())
+    crate::config::write_text_atomic(&path, content.trim())
         .map_err(|e| format!("Failed to write {}: {}", path.display(), e))
 }

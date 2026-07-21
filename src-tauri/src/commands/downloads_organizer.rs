@@ -49,7 +49,7 @@ fn write_config_value(v: &Value) -> Result<(), String> {
         fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
     let pretty = serde_json::to_string_pretty(v).map_err(|e| e.to_string())?;
-    fs::write(&path, pretty).map_err(|e| e.to_string())
+    crate::config::write_text_atomic(&path, &pretty)
 }
 
 fn write_rules_default_if_missing(path: &std::path::Path) {

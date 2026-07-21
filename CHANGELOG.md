@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.170] - 2026-07-21
+
+### Changed
+- **Crash-safe writes**: agent files (`agent.json`, skill/soul/mood, prompts), downloads-organizer `config.json` updates, and `credential_accounts.json` use shared `write_text_atomic`.
+
 ## [0.1.169] - 2026-07-21
 
 ### Changed
