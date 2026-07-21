@@ -5,7 +5,7 @@
 //! Hermes/Qwen JSON `<tool_call>`, Qwen3-Coder `<function=`, GLM `<arg_key>`,
 //! Kimi K2 `<|tool_call_begin|>`, DeepSeek `tool▁call` unicode tokens,
 //! Llama `<|python_tag|>` / bare `{"name","arguments"}` JSON,
-//! numbered lists, inline chains with "then"/"and"/";", etc.
+//! Longcat `<longcat_tool_call>`, numbered lists, inline chains with "then"/"and"/";", etc.
 
 use crate::commands::tool_registry::{
     inline_tool_chain_regex, map_scheduler_alias, tool_line_prefixes,
@@ -346,14 +346,26 @@ pub(crate) fn parse_all_tools_from_response(content: &str) -> Vec<(String, Strin
     out
 }
 
-/// Expand vendor tool-call markup (DeepSeek → Kimi → Qwen3 → GLM → Hermes → Llama JSON).
+/// Expand vendor tool-call markup (DeepSeek → Kimi → Qwen3 → GLM → Longcat → Hermes → Llama JSON).
 fn expand_model_tool_call_xml(content: &str) -> String {
     let deepseek = expand_deepseek_tool_call_xml(content);
     let kimi = expand_kimi_k2_tool_call_xml(&deepseek);
     let qwen = expand_qwen3_coder_tool_call_xml(&kimi);
     let glm = expand_glm_arg_key_tool_call_xml(&qwen);
-    let hermes = expand_hermes_tool_call_xml(&glm);
+    let longcat = expand_longcat_tool_call_xml(&glm);
+    let hermes = expand_hermes_tool_call_xml(&longcat);
     expand_llama_json_tool_calls(&hermes)
+}
+
+/// Longcat Flash: same JSON body as Hermes, tags `<longcat_tool_call>` instead of `<tool_call>`.
+fn expand_longcat_tool_call_xml(content: &str) -> String {
+    if !content.contains("<longcat_tool_call>") {
+        return content.to_string();
+    }
+    let mapped = content
+        .replace("<longcat_tool_call>", "<tool_call>")
+        .replace("</longcat_tool_call>", "</tool_call>");
+    expand_hermes_tool_call_xml(&mapped)
 }
 
 /// Llama 3/4 JSON tool calls: optional `<|python_tag|>` then `{"name","arguments"|"parameters"}`.
@@ -1538,6 +1550,29 @@ mod tests {
     fn llama_json_ignores_non_tool_objects() {
         let content = r#"Here is data: {"name": "not_a_real_tool", "arguments": {"x": 1}} and done."#;
         assert!(parse_all_tools_from_response(content).is_empty());
+    }
+
+    #[test]
+    fn longcat_tool_call_xml_parses() {
+        let content = r#"Sure.
+<longcat_tool_call>
+{"name": "brave_search", "arguments": {"query": "El Masnou weather"}}
+</longcat_tool_call>
+"#;
+        let tools = parse_all_tools_from_response(content);
+        assert_eq!(tools.len(), 1, "{tools:?}");
+        assert_eq!(tools[0].0, "BRAVE_SEARCH");
+        assert_eq!(tools[0].1, "El Masnou weather");
+    }
+
+    #[test]
+    fn longcat_unclosed_tool_call_parses() {
+        let content = r#"<longcat_tool_call>
+{"name": "FETCH_URL", "arguments": {"url": "https://example.com"}}
+"#;
+        let t = parse_tool_from_response(content).unwrap();
+        assert_eq!(t.0, "FETCH_URL");
+        assert_eq!(t.1, "https://example.com");
     }
 
     #[test]
