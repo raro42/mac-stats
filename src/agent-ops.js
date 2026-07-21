@@ -476,16 +476,25 @@ function loadOpsSessionIntoChat() {
         return;
     }
     window.Ollama.replaceHistory(opsSessionLoadRows);
+    // Expand AI Chat via the same path as the Ollama icon (cpu.js owns
+    // ollamaCollapsed + localStorage — do not only poke CSS classes).
+    const section = document.querySelector('.ollama-section');
+    const themeCollapsed =
+      section?.classList.contains('collapsed') ||
+      localStorage.getItem('ollama_collapsed') === 'true';
+    if (themeCollapsed) {
+      document.getElementById('ollama-header')?.click();
+    }
     const content = document.getElementById('ollama-content');
     const btn = document.getElementById('ollama-collapse-btn');
-    const section = document.querySelector('.ollama-section');
     if (content) {
       content.classList.remove('collapsed');
-      content.style.display = '';
+      if (content.style.display === 'none') content.style.display = '';
     }
     if (section) section.classList.remove('collapsed');
     if (btn) btn.textContent = '−';
-    document.getElementById('chat-input')?.focus();
+    section?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => document.getElementById('chat-input')?.focus(), 80);
 }
 
 function renderOpsLive(rows) {

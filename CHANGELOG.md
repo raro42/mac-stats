@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.136] - 2026-07-21
+
+### Fixed
+- Agent Ops **Load into AI Chat** expands the Ollama section via the same toggle path as the icon (keeps `localStorage` / cpu.js state in sync).
+
 ## [0.1.135] - 2026-07-21
 
 ### Changed
