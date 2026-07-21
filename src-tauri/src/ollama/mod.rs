@@ -89,6 +89,43 @@ pub struct OllamaToolCall {
     pub function: OllamaFunctionCall,
 }
 
+/// Mint a stable-looking `call_…` id when the provider omitted one (Hermes/OpenAI pairing).
+pub fn mint_tool_call_id(index: usize) -> String {
+    use std::sync::atomic::{AtomicU64, Ordering};
+    static SEQ: AtomicU64 = AtomicU64::new(1);
+    let seq = SEQ.fetch_add(1, Ordering::Relaxed);
+    let t = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_nanos())
+        .unwrap_or(0);
+    let mixed = (t as u64)
+        .wrapping_mul(0x9E3779B97F4A7C15)
+        .wrapping_add(seq)
+        .wrapping_add(index as u64);
+    format!("call_{:012x}", mixed & 0xffff_ffff_ffff)
+}
+
+/// Fill empty/`None` tool call ids in place so role=`tool` results can set `tool_call_id`.
+pub fn ensure_tool_call_ids(calls: &mut [OllamaToolCall]) {
+    for (i, call) in calls.iter_mut().enumerate() {
+        let missing = call
+            .id
+            .as_ref()
+            .map(|s| s.trim().is_empty())
+            .unwrap_or(true);
+        if missing {
+            call.id = Some(mint_tool_call_id(i));
+        }
+    }
+}
+
+/// Ensure ids on an optional tool_calls list; returns the same option for chaining.
+pub fn ensure_tool_calls_option(calls: &mut Option<Vec<OllamaToolCall>>) {
+    if let Some(ref mut v) = calls {
+        ensure_tool_call_ids(v);
+    }
+}
+
 /// Function name + JSON arguments (object or string, depending on provider).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OllamaFunctionCall {
@@ -184,11 +221,12 @@ pub fn chat_response_from_api_body(body: &str) -> Result<ChatResponse, String> {
             .filter(|s| !s.is_empty())
             .unwrap_or("assistant")
             .to_string();
-        let tool_calls = message
+        let mut tool_calls = message
             .and_then(|m| m.get("tool_calls"))
             .cloned()
             .and_then(|tc| serde_json::from_value::<Vec<OllamaToolCall>>(tc).ok())
             .filter(|v| !v.is_empty());
+        ensure_tool_calls_option(&mut tool_calls);
         return Ok(ChatResponse {
             message: ChatMessage {
                 role,
@@ -201,7 +239,10 @@ pub fn chat_response_from_api_body(body: &str) -> Result<ChatResponse, String> {
             done: true,
         });
     }
-    serde_json::from_value(v).map_err(|e| format!("Ollama chat response: {}", e))
+    let mut parsed: ChatResponse =
+        serde_json::from_value(v).map_err(|e| format!("Ollama chat response: {}", e))?;
+    ensure_tool_calls_option(&mut parsed.message.tool_calls);
+    Ok(parsed)
 }
 
 // --- GET /api/tags (list models with details) ---
@@ -1161,5 +1202,57 @@ mod model_context_estimate_tests {
         assert_eq!(r.message.role, "assistant");
         assert_eq!(r.message.content, "Hello");
         assert!(r.done);
+    }
+
+    #[test]
+    fn ensure_tool_call_ids_mints_when_missing() {
+        let mut calls = vec![
+            OllamaToolCall {
+                id: None,
+                function: OllamaFunctionCall {
+                    name: Some("FETCH_URL".into()),
+                    index: None,
+                    arguments: serde_json::json!({}),
+                },
+            },
+            OllamaToolCall {
+                id: Some("call_keep".into()),
+                function: OllamaFunctionCall {
+                    name: Some("BRAVE_SEARCH".into()),
+                    index: None,
+                    arguments: serde_json::json!({}),
+                },
+            },
+            OllamaToolCall {
+                id: Some("  ".into()),
+                function: OllamaFunctionCall {
+                    name: Some("RUN_CMD".into()),
+                    index: None,
+                    arguments: serde_json::json!({}),
+                },
+            },
+        ];
+        ensure_tool_call_ids(&mut calls);
+        assert!(calls[0]
+            .id
+            .as_ref()
+            .is_some_and(|s| s.starts_with("call_")));
+        assert_eq!(calls[1].id.as_deref(), Some("call_keep"));
+        assert!(calls[2]
+            .id
+            .as_ref()
+            .is_some_and(|s| s.starts_with("call_")));
+    }
+
+    #[test]
+    fn chat_response_mints_ids_for_openai_tool_calls_without_id() {
+        let body = r#"{"choices":[{"message":{"role":"assistant","content":"","tool_calls":[{"function":{"name":"FETCH_URL","arguments":{"url_or_arg":"https://example.com"}}}]}}],"object":"chat.completion"}"#;
+        let r = chat_response_from_api_body(body).expect("parse");
+        let calls = r.message.tool_calls.expect("tool_calls");
+        assert_eq!(calls.len(), 1);
+        assert!(calls[0]
+            .id
+            .as_ref()
+            .is_some_and(|s| s.starts_with("call_")));
     }
 }

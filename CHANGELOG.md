@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.163] - 2026-07-21
+
+### Changed
+- **Native tool loop**: mint `call_…` ids when the provider omits `tool_calls[].id` (parse, tool loop, sanitize) so `tool_call_id` pairing still works with local Ollama.
+
 ## [0.1.162] - 2026-07-21
 
 ### Changed

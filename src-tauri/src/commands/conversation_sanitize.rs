@@ -175,6 +175,8 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
                 } else {
                     "user"
                 };
+                // Mint missing ids before reading so synthetic tool_call_id pairs with assistant.
+                crate::ollama::ensure_tool_calls_option(&mut msg.tool_calls);
                 let synthetic_name = msg.tool_calls.as_ref().and_then(|calls| {
                     calls.first().and_then(|c| c.function.name.clone())
                 });
@@ -241,6 +243,35 @@ mod tests {
         assert_eq!(out[1].content, SYNTHETIC_TOOL_RESULT);
         assert_eq!(out[1].tool_name.as_deref(), Some("FETCH_URL"));
         assert_eq!(out[1].tool_call_id.as_deref(), Some("call_1"));
+    }
+
+    #[test]
+    fn synthetic_tool_mints_call_id_when_assistant_omitted_id() {
+        use crate::ollama::{OllamaFunctionCall, OllamaToolCall};
+        let hist = vec![ChatMessage {
+            role: "assistant".into(),
+            content: "FETCH_URL: https://example.com".into(),
+            images: None,
+            tool_calls: Some(vec![OllamaToolCall {
+                id: None,
+                function: OllamaFunctionCall {
+                    name: Some("FETCH_URL".into()),
+                    index: None,
+                    arguments: serde_json::json!({"url_or_arg": "https://example.com"}),
+                },
+            }]),
+            tool_name: None,
+            tool_call_id: None,
+        }];
+        let out = sanitize_conversation_history(hist);
+        assert_eq!(out.len(), 2);
+        assert_eq!(out[1].role, "tool");
+        let aid = out[0].tool_calls.as_ref().unwrap()[0]
+            .id
+            .as_deref()
+            .expect("minted on assistant");
+        assert!(aid.starts_with("call_"));
+        assert_eq!(out[1].tool_call_id.as_deref(), Some(aid));
     }
 
     #[test]

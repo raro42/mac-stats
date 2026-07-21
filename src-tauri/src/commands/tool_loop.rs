@@ -292,6 +292,7 @@ pub(crate) async fn run_tool_loop(
     // Native tool_calls for the assistant turn that produced response_content (first push + follow-ups).
     let mut pending_assistant_tool_calls: Option<Vec<crate::ollama::OllamaToolCall>> =
         params.initial_assistant_tool_calls.clone();
+    crate::ollama::ensure_tool_calls_option(&mut pending_assistant_tool_calls);
     if let Some(ref cap) = params.partial_progress_capture {
         cap.set_last_assistant_text(&response_content);
     }
@@ -822,17 +823,19 @@ pub(crate) async fn run_tool_loop(
             f.store(true, Ordering::Release);
         }
 
+        let mut assistant_tool_calls = if params.native_tool_schemas.is_some() {
+            pending_assistant_tool_calls.take()
+        } else {
+            None
+        };
+        crate::ollama::ensure_tool_calls_option(&mut assistant_tool_calls);
         messages.push(ChatMessage {
             role: "assistant".to_string(),
             content: crate::commands::directive_tags::strip_inline_directive_tags_for_display(
                 &response_content,
             ),
             images: None,
-            tool_calls: if params.native_tool_schemas.is_some() {
-                pending_assistant_tool_calls.take()
-            } else {
-                None
-            },
+            tool_calls: assistant_tool_calls,
             tool_name: None,
             tool_call_id: None,
         });
@@ -866,7 +869,10 @@ pub(crate) async fn run_tool_loop(
                     "tool"
                 };
                 let tool_call_id = if role == "tool" {
-                    call_ids.get(i).and_then(|id| id.clone())
+                    call_ids
+                        .get(i)
+                        .and_then(|id| id.clone())
+                        .or_else(|| Some(crate::ollama::mint_tool_call_id(i)))
                 } else {
                     None
                 };
@@ -1016,6 +1022,7 @@ pub(crate) async fn run_tool_loop(
         response_content = follow_up.message.content.clone();
         if params.native_tool_schemas.is_some() {
             pending_assistant_tool_calls = follow_up.message.tool_calls.clone();
+            crate::ollama::ensure_tool_calls_option(&mut pending_assistant_tool_calls);
         } else {
             pending_assistant_tool_calls = None;
         }
