@@ -4,41 +4,12 @@
 use crate::config::Config;
 use serde::Serialize;
 use std::fs;
-use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
 /// Crash-safe text write (Hermes-style temp + fsync + rename).
 pub(crate) fn write_text_atomic(path: &Path, text: &str) -> Result<(), String> {
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent).map_err(|e| e.to_string())?;
-    }
-    let name = path
-        .file_name()
-        .and_then(|n| n.to_str())
-        .unwrap_or("out");
-    let tmp = path.with_file_name(format!(
-        ".{}.{}.{}.tmp",
-        name,
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .map(|d| d.as_nanos())
-            .unwrap_or(0)
-    ));
-    let write_result = (|| -> Result<(), String> {
-        let mut f = fs::File::create(&tmp).map_err(|e| e.to_string())?;
-        f.write_all(text.as_bytes())
-            .map_err(|e| e.to_string())?;
-        f.sync_all().map_err(|e| e.to_string())?;
-        drop(f);
-        fs::rename(&tmp, path).map_err(|e| e.to_string())?;
-        Ok(())
-    })();
-    if write_result.is_err() {
-        let _ = fs::remove_file(&tmp);
-    }
-    write_result
+    crate::config::write_text_atomic(path, text)
 }
 
 #[derive(Debug, Clone, Serialize)]

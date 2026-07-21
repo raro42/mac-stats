@@ -27,11 +27,45 @@
 //! - `schedules.json` — scheduler checks file mtime each loop and reloads when changed.
 //! - `discord_channels.json` — Discord loop checks mtime every tick and reloads when changed.
 
-use std::path::PathBuf;
+use std::io::Write;
+use std::path::{Path, PathBuf};
 
 mod protected_mutation;
 
 pub use protected_mutation::reject_if_protected_config_json_changed;
+
+/// Crash-safe text write (Hermes-style temp + fsync + rename). Shared by config, schedules, harness ops.
+pub(crate) fn write_text_atomic(path: &Path, text: &str) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    let name = path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("out");
+    let tmp = path.with_file_name(format!(
+        ".{}.{}.{}.tmp",
+        name,
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0)
+    ));
+    let write_result = (|| -> Result<(), String> {
+        let mut f = std::fs::File::create(&tmp).map_err(|e| e.to_string())?;
+        f.write_all(text.as_bytes())
+            .map_err(|e| e.to_string())?;
+        f.sync_all().map_err(|e| e.to_string())?;
+        drop(f);
+        std::fs::rename(&tmp, path).map_err(|e| e.to_string())?;
+        Ok(())
+    })();
+    if write_result.is_err() {
+        let _ = std::fs::remove_file(&tmp);
+    }
+    write_result
+}
 
 /// Build one default-agent entry from an id. Add new agents by creating defaults/agents/agent-<id>/ and adding default_agent_entry!("<id>") to DEFAULT_AGENT_IDS.
 macro_rules! default_agent_entry {
@@ -367,11 +401,10 @@ impl Config {
                 after = json!({ key: value });
             }
         }
-        std::fs::write(
+        crate::config::write_text_atomic(
             &config_path,
-            serde_json::to_string_pretty(&after).map_err(|e| e.to_string())?,
-        )
-        .map_err(|e| e.to_string())?;
+            &serde_json::to_string_pretty(&after).map_err(|e| e.to_string())?,
+        )?;
         Ok(())
     }
 
@@ -391,11 +424,10 @@ impl Config {
         obj.insert("menuBarCompact".into(), json!(true));
         obj.insert("windowDecorations".into(), json!(true));
         // Leave Discord tokens / .config.env alone — only config.json toggles.
-        std::fs::write(
+        crate::config::write_text_atomic(
             &config_path,
-            serde_json::to_string_pretty(&after).map_err(|e| e.to_string())?,
-        )
-        .map_err(|e| e.to_string())?;
+            &serde_json::to_string_pretty(&after).map_err(|e| e.to_string())?,
+        )?;
         Ok(())
     }
 

@@ -111,7 +111,7 @@ function ensureOpsSessionFilter() {
         input.type = 'search';
         input.id = 'ops-session-filter';
         input.className = 'ops-filter-input';
-        input.placeholder = 'Filter live + files…';
+        input.placeholder = 'Filter live + files… (Esc clears)';
         input.autocomplete = 'off';
         input.spellcheck = false;
         row.appendChild(input);
@@ -147,7 +147,7 @@ function ensureOpsMemoryFilter() {
         input.type = 'search';
         input.id = 'ops-memory-filter';
         input.className = 'ops-filter-input';
-        input.placeholder = 'Filter knowledge files…';
+        input.placeholder = 'Filter knowledge files… (Esc clears)';
         input.autocomplete = 'off';
         input.spellcheck = false;
         row.appendChild(input);
@@ -181,7 +181,7 @@ function ensureOpsRunsFilter() {
         input.type = 'search';
         input.id = 'ops-runs-filter';
         input.className = 'ops-filter-input';
-        input.placeholder = 'Filter runs by lane, tool, question…';
+        input.placeholder = 'Filter runs by lane, tool, question… (Esc clears)';
         input.autocomplete = 'off';
         input.spellcheck = false;
         row.appendChild(input);
@@ -217,7 +217,7 @@ function ensureOpsAgentsFilter() {
         input.type = 'search';
         input.id = 'ops-agents-filter';
         input.className = 'ops-filter-input';
-        input.placeholder = 'Filter agents by name, slug, model…';
+        input.placeholder = 'Filter agents by name, slug, model… (Esc clears)';
         input.autocomplete = 'off';
         input.spellcheck = false;
         row.appendChild(input);
@@ -253,7 +253,7 @@ function ensureOpsSchedulesFilter() {
         input.type = 'search';
         input.id = 'ops-schedules-filter';
         input.className = 'ops-filter-input';
-        input.placeholder = 'Filter schedules + deliveries…';
+        input.placeholder = 'Filter schedules + deliveries… (Esc clears)';
         input.autocomplete = 'off';
         input.spellcheck = false;
         row.appendChild(input);

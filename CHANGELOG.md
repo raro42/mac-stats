@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.168] - 2026-07-21
+
+### Changed
+- **Config**: `config.json` merges (`aiAgentEnabled`, monitor defaults, etc.) use crash-safe temp + fsync + rename; shared `write_text_atomic` lives in `config`.
+- **Agent Ops**: filter placeholders note that Esc clears.
+
 ## [0.1.167] - 2026-07-21
 
 ### Changed
