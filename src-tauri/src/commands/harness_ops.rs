@@ -465,6 +465,95 @@ pub fn get_digest_summary() -> DigestSummary {
     load_digest_summary()
 }
 
+/// Candidate digester script locations (dev tree + optional override).
+fn digest_script_candidates() -> Vec<PathBuf> {
+    let mut out = Vec::new();
+    if let Ok(p) = std::env::var("MAC_STATS_DIGEST_SCRIPT") {
+        let t = p.trim();
+        if !t.is_empty() {
+            out.push(PathBuf::from(t));
+        }
+    }
+    if let Ok(home) = std::env::var("HOME") {
+        let home = PathBuf::from(home);
+        out.push(home.join("projects/mac-stats/scripts/digest_agent_runs.py"));
+        out.push(home.join("src/mac-stats/scripts/digest_agent_runs.py"));
+    }
+    // Relative to cwd when running from repo
+    out.push(PathBuf::from("scripts/digest_agent_runs.py"));
+    out.push(PathBuf::from("../scripts/digest_agent_runs.py"));
+    out
+}
+
+/// Refresh `~/.mac-stats/improvements/latest.{md,json}` via the Python digester when available.
+/// Returns a short status line for logs / Discord.
+pub fn refresh_agent_digest() -> String {
+    let script = digest_script_candidates().into_iter().find(|p| p.is_file());
+    let Some(script) = script else {
+        return "Digest refresh skipped — digest_agent_runs.py not found (set MAC_STATS_DIGEST_SCRIPT)."
+            .into();
+    };
+    let out_dir = digest_json_path()
+        .parent()
+        .map(|p| p.to_path_buf())
+        .unwrap_or_else(|| PathBuf::from("."));
+    let _ = fs::create_dir_all(&out_dir);
+    match std::process::Command::new("python3")
+        .arg(&script)
+        .arg("--days")
+        .arg("7")
+        .arg("--out")
+        .arg(out_dir.join("latest.md"))
+        .output()
+    {
+        Ok(o) if o.status.success() => {
+            let summary = load_digest_summary();
+            format!(
+                "Digest refreshed ({}): {} open · {} stale · {} turns",
+                script.display(),
+                summary.open_count,
+                summary.stale_count,
+                summary.turns
+            )
+        }
+        Ok(o) => {
+            let err = String::from_utf8_lossy(&o.stderr);
+            format!(
+                "Digest refresh failed (exit {:?}): {}",
+                o.status.code(),
+                err.chars().take(200).collect::<String>()
+            )
+        }
+        Err(e) => format!("Digest refresh failed to spawn python3: {}", e),
+    }
+}
+
+/// True for `/digest` / `run digest` operator asks.
+pub fn looks_like_digest_request(content: &str) -> bool {
+    let n = content
+        .trim()
+        .trim_start_matches('@')
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_lowercase();
+    let n = n
+        .trim_start_matches("werner")
+        .trim_start_matches(',')
+        .trim()
+        .trim_start_matches("please")
+        .trim();
+    matches!(
+        n,
+        "digest"
+            | "/digest"
+            | "run digest"
+            | "refresh digest"
+            | "agent digest"
+            | "show digest"
+    )
+}
+
 fn classify_candidate(
     lane: &str,
     wall_ms: u64,
@@ -620,6 +709,13 @@ mod tests {
         assert!(looks_like_insights_request("insights"));
         assert!(looks_like_insights_request("@Werner insights"));
         assert!(!looks_like_insights_request("any insights on weather?"));
+    }
+
+    #[test]
+    fn digest_request_detected() {
+        assert!(looks_like_digest_request("/digest"));
+        assert!(looks_like_digest_request("refresh digest"));
+        assert!(!looks_like_digest_request("digest this long research report please"));
     }
 
     #[test]

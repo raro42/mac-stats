@@ -385,6 +385,10 @@ pub async fn run_periodic_session_compaction() {
             "Periodic memory scrub: no polluted lines found"
         );
     }
+
+    // Keep Agent Ops digester JSON fresh without waiting for Discord traffic.
+    let digest_line = crate::commands::harness_ops::refresh_agent_digest();
+    info!("Periodic digester: {}", digest_line);
 }
 
 #[cfg(test)]
