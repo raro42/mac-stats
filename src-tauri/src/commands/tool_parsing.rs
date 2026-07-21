@@ -3,7 +3,8 @@
 //! All functions here are pure (no state, no I/O) and handle the various
 //! ways models format tool calls: `TOOL: arg`, `RECOMMEND: TOOL: arg`,
 //! Hermes/Qwen JSON `<tool_call>`, Qwen3-Coder `<function=`, GLM `<arg_key>`,
-//! Kimi K2 `<|tool_call_begin|>`, numbered lists, inline chains with "then"/"and"/";", etc.
+//! Kimi K2 `<|tool_call_begin|>`, DeepSeek `tool▁call` unicode tokens,
+//! numbered lists, inline chains with "then"/"and"/";", etc.
 
 use crate::commands::tool_registry::{
     inline_tool_chain_regex, map_scheduler_alias, tool_line_prefixes,
@@ -344,12 +345,113 @@ pub(crate) fn parse_all_tools_from_response(content: &str) -> Vec<(String, Strin
     out
 }
 
-/// Expand vendor tool-call markup (Kimi → Qwen3-Coder → GLM → Hermes/Qwen JSON).
+/// Expand vendor tool-call markup (DeepSeek → Kimi → Qwen3-Coder → GLM → Hermes/Qwen JSON).
 fn expand_model_tool_call_xml(content: &str) -> String {
-    let kimi = expand_kimi_k2_tool_call_xml(content);
+    let deepseek = expand_deepseek_tool_call_xml(content);
+    let kimi = expand_kimi_k2_tool_call_xml(&deepseek);
     let qwen = expand_qwen3_coder_tool_call_xml(&kimi);
     let glm = expand_glm_arg_key_tool_call_xml(&qwen);
     expand_hermes_tool_call_xml(&glm)
+}
+
+// DeepSeek V3 / V3.1 special tokens (fullwidth ｜ U+FF5C, block ▁ U+2581).
+const DS_CALLS_BEGIN: &str = "<\u{ff5c}tool\u{2581}calls\u{2581}begin\u{ff5c}>";
+const DS_CALL_BEGIN: &str = "<\u{ff5c}tool\u{2581}call\u{2581}begin\u{ff5c}>";
+const DS_SEP: &str = "<\u{ff5c}tool\u{2581}sep\u{ff5c}>";
+const DS_CALL_END: &str = "<\u{ff5c}tool\u{2581}call\u{2581}end\u{ff5c}>";
+const DS_CALLS_END: &str = "<\u{ff5c}tool\u{2581}calls\u{2581}end\u{ff5c}>";
+
+/// DeepSeek V3 (`type<sep>name` + ```json) and V3.1 (`name<sep>args`) unicode tool tokens.
+fn expand_deepseek_tool_call_xml(content: &str) -> String {
+    if !content.contains(DS_CALL_BEGIN) {
+        return content.to_string();
+    }
+    let mut tool_lines: Vec<String> = Vec::new();
+    let mut search_from = 0usize;
+    let mut region_start: Option<usize> = None;
+    let mut last_end = 0usize;
+
+    while let Some(rel) = content[search_from..].find(DS_CALL_BEGIN) {
+        let start = search_from + rel;
+        if region_start.is_none() {
+            region_start = Some(
+                content[..start]
+                    .rfind(DS_CALLS_BEGIN)
+                    .unwrap_or(start),
+            );
+        }
+        let after = &content[start + DS_CALL_BEGIN.len()..];
+        let (inner, end) = if let Some(e) = after.find(DS_CALL_END) {
+            (
+                &after[..e],
+                start + DS_CALL_BEGIN.len() + e + DS_CALL_END.len(),
+            )
+        } else {
+            (after, content.len())
+        };
+        if let Some(line) = deepseek_inner_to_tool_line(inner) {
+            tool_lines.push(line);
+        }
+        last_end = end;
+        search_from = end;
+    }
+
+    if tool_lines.is_empty() {
+        return content.to_string();
+    }
+
+    let trail = &content[last_end..];
+    if let Some(i) = trail.find(DS_CALLS_END) {
+        if trail[..i].trim().is_empty() {
+            last_end += i + DS_CALLS_END.len();
+        }
+    }
+
+    let start = region_start.unwrap_or(0);
+    let mut out = String::new();
+    let preamble = content[..start].trim_end();
+    if !preamble.is_empty() {
+        out.push_str(preamble);
+        out.push('\n');
+    }
+    for line in &tool_lines {
+        out.push_str(line);
+        out.push('\n');
+    }
+    let after = content[last_end..].trim_start();
+    if !after.is_empty() {
+        out.push_str(after);
+    }
+    out
+}
+
+fn deepseek_inner_to_tool_line(inner: &str) -> Option<String> {
+    let sep_at = inner.find(DS_SEP)?;
+    let left = inner[..sep_at].trim();
+    let right = inner[sep_at + DS_SEP.len()..].trim();
+
+    // V3: type<sep>name\n```json\nargs\n```
+    if let Some(json_marker) = right.find("```json") {
+        let name = right[..json_marker].trim();
+        if name.is_empty() {
+            return None;
+        }
+        let after = right[json_marker + "```json".len()..].trim_start();
+        let after = after.strip_prefix('\n').unwrap_or(after);
+        let args = if let Some(end) = after.find("```") {
+            after[..end].trim()
+        } else {
+            after.trim()
+        };
+        return kimi_args_to_tool_line(name, args);
+    }
+
+    // V3.1: name<sep>arguments (JSON or raw)
+    if left.is_empty() {
+        return None;
+    }
+    // Ignore leftover "type" when mis-detected — V3.1 name is left.
+    kimi_args_to_tool_line(left, right)
 }
 
 /// Kimi K2 / VLLM: `<|tool_call_begin|>functions.name:0<|tool_call_argument_begin|>{...}<|tool_call_end|>`.
@@ -1295,6 +1397,35 @@ mod tests {
         assert_eq!(tools[0].1, "https://example.com");
         assert_eq!(tools[1].0, "BRAVE_SEARCH");
         assert_eq!(tools[1].1, "mac-stats");
+    }
+
+    #[test]
+    fn deepseek_v31_tool_call_parses() {
+        let content = format!(
+            "Sure.\n{calls_b}\n{call_b}brave_search{sep}{{\"query\": \"El Masnou weather\"}}{call_e}\n{calls_e}\n",
+            calls_b = DS_CALLS_BEGIN,
+            call_b = DS_CALL_BEGIN,
+            sep = DS_SEP,
+            call_e = DS_CALL_END,
+            calls_e = DS_CALLS_END,
+        );
+        let tools = parse_all_tools_from_response(&content);
+        assert_eq!(tools.len(), 1, "{tools:?}");
+        assert_eq!(tools[0].0, "BRAVE_SEARCH");
+        assert_eq!(tools[0].1, "El Masnou weather");
+    }
+
+    #[test]
+    fn deepseek_v3_json_fence_tool_call_parses() {
+        let content = format!(
+            "{call_b}function{sep}FETCH_URL\n```json\n{{\"url\": \"https://example.com\"}}\n```{call_e}",
+            call_b = DS_CALL_BEGIN,
+            sep = DS_SEP,
+            call_e = DS_CALL_END,
+        );
+        let t = parse_tool_from_response(&content).unwrap();
+        assert_eq!(t.0, "FETCH_URL");
+        assert_eq!(t.1, "https://example.com");
     }
 
     #[test]
