@@ -1088,11 +1088,25 @@ fn classify_candidate(
             || q.contains("no worries")
             || q.contains("myself")
             || q.contains("find out"));
-    if (looks_time || looks_greeting || looks_ack) && lane != "instant" && wall_ms >= 500 {
+    let looks_identity = !q.contains('?')
+        && q.chars().count() <= 180
+        && (q.starts_with("you are ") || q.starts_with("you're ") || q.starts_with("youre "))
+        && (q.contains("working for")
+            || q.contains("online")
+            || q.contains("assistant")
+            || q.contains(" agent")
+            || q.contains("bot")
+            || q.contains("on various channel"));
+    if (looks_time || looks_greeting || looks_ack || looks_identity)
+        && lane != "instant"
+        && wall_ms >= 500
+    {
         return Some(RunInsightCandidate {
             kind: "promote_instant".into(),
             reason: if looks_time {
                 "Time/date ask should stay on instant lane".into()
+            } else if looks_identity {
+                "Identity/role affirmation should stay on instant lane".into()
             } else if looks_ack {
                 "Short ack/sign-off should stay on instant lane".into()
             } else {
@@ -1402,5 +1416,20 @@ mod tests {
         );
         assert!(c.is_some());
         assert_eq!(c.unwrap().kind, "promote_instant");
+    }
+
+    #[test]
+    fn identity_affirmation_candidate_classified() {
+        let c = classify_candidate(
+            "direct",
+            4_200,
+            &[],
+            "You are working for Amvara. You are online in Amvara server on various channel.",
+            "id-aff",
+        );
+        assert!(c.is_some());
+        let c = c.unwrap();
+        assert_eq!(c.kind, "promote_instant");
+        assert!(c.reason.contains("Identity"));
     }
 }

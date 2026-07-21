@@ -431,12 +431,16 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
     const discMatch = dg.match(/disconnect×(\d+)/i);
     const resumeMatch = dg.match(/resume×(\d+)/i);
     const stageMatch = dg.match(/stage=([^\s·]+)/i);
+    const lastDiscMatch = dg.match(/last disc\s+([^·]+)/i);
     const discN = discMatch ? Number(discMatch[1]) : 0;
     const resumeN = resumeMatch ? Number(resumeMatch[1]) : 0;
     const stage = (stageMatch ? stageMatch[1] : '').trim();
+    const lastDisc = lastDiscMatch ? lastDiscMatch[1].trim() : '';
     let discordText = readyMatch ? readyMatch[1].trim() : dg ? 'see Runs' : '—';
     if (discN > 0) {
-        discordText = `${discordText} · disc×${discN}`;
+        discordText = lastDisc
+            ? `${discordText} · disc×${discN} (${lastDisc})`
+            : `${discordText} · disc×${discN}`;
     }
     setText('ops-health-discord', discordText);
     const discordEl = document.getElementById('ops-health-discord');
