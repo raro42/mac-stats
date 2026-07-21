@@ -1203,7 +1203,8 @@ async fn having_fun_respond_locked(
         role: "system".to_string(),
         content: system_content_with_model,
         images: None,
-        tool_calls: None
+        tool_calls: None,
+        tool_name: None,
     });
 
     for (role, content) in cap_tail_chronological(prior, CONVERSATION_HISTORY_CAP)
@@ -1215,6 +1216,7 @@ async fn having_fun_respond_locked(
             content,
             images: None,
             tool_calls: None,
+            tool_name: None,
         });
     }
 
@@ -1242,7 +1244,8 @@ async fn having_fun_respond_locked(
         role: "user".to_string(),
         content: new_context,
         images: None,
-        tool_calls: None
+        tool_calls: None,
+        tool_name: None,
     });
 
     let channel = serenity::model::id::ChannelId::new(channel_id);
@@ -1401,7 +1404,8 @@ async fn having_fun_idle_thought_locked(channel_id: u64, ctx: Context) {
         role: "system".to_string(),
         content: system_content_with_model,
         images: None,
-        tool_calls: None
+        tool_calls: None,
+        tool_name: None,
     });
 
     for (role, content) in cap_tail_chronological(prior, HAVING_FUN_IDLE_HISTORY_CAP)
@@ -1413,6 +1417,7 @@ async fn having_fun_idle_thought_locked(channel_id: u64, ctx: Context) {
             content,
             images: None,
             tool_calls: None,
+            tool_name: None,
         });
     }
 
@@ -1420,7 +1425,8 @@ async fn having_fun_idle_thought_locked(channel_id: u64, ctx: Context) {
         role: "user".to_string(),
         content: "The chat has been quiet for a while. Share a random thought, observation, or bring up something interesting. Be casual and brief — one or two sentences.".to_string(),
         images: None,
-        tool_calls: None
+        tool_calls: None,
+        tool_name: None,
     });
 
     let channel = serenity::model::id::ChannelId::new(channel_id);
@@ -2320,6 +2326,7 @@ async fn run_discord_ollama_router_locked(
                     content,
                     images: None,
                     tool_calls: None,
+                    tool_name: None,
                 })
                 .collect(),
         )

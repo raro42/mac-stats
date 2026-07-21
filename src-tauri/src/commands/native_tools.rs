@@ -225,6 +225,7 @@ pub(crate) fn msg(role: &str, content: impl Into<String>) -> ChatMessage {
         content: content.into(),
         images: None,
         tool_calls: None,
+        tool_name: None,
     }
 }
 
@@ -266,6 +267,7 @@ mod tests {
                         arguments: json!({"query": "Ralf Roeber"}),
                     },
                 }]),
+                tool_name: None,
             },
             done: true,
         };
@@ -288,6 +290,7 @@ mod tests {
                         arguments: json!({"status": "success"}),
                     },
                 }]),
+                tool_name: None,
             },
             done: true,
         };

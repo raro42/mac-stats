@@ -1035,7 +1035,8 @@ pub fn answer_with_ollama_and_fetch(
                     today_utc, question_for_plan_and_exec, model_hint
                 ),
                 images: attachment_images_base64.clone(),
-                tool_calls: None
+                tool_calls: None,
+                tool_name: None,
             };
             let planning_messages = ContextAssembler::assemble(
                 &AgentContextAssembler,
@@ -1223,7 +1224,8 @@ pub fn answer_with_ollama_and_fetch(
                 role: "user".to_string(),
                 content: question_for_plan_and_exec.clone(),
                 images: attachment_images_base64.clone(),
-                tool_calls: None
+                tool_calls: None,
+                tool_name: None,
             };
             let msgs = ContextAssembler::assemble(
                 &AgentContextAssembler,
@@ -1280,7 +1282,8 @@ pub fn answer_with_ollama_and_fetch(
                 role: "user".to_string(),
                 content: question_for_plan_and_exec.clone(),
                 images: attachment_images_base64.clone(),
-                tool_calls: None
+                tool_calls: None,
+                tool_name: None,
             };
             let mut msgs = ContextAssembler::assemble(
                 &AgentContextAssembler,
@@ -1633,13 +1636,15 @@ pub fn answer_with_ollama_and_fetch(
                         role: "user".to_string(),
                         content: question.to_string(),
                         images: None,
-                        tool_calls: None
+                        tool_calls: None,
+                        tool_name: None,
                     });
                     updated_history.push(crate::ollama::ChatMessage {
                         role: "assistant".to_string(),
                         content: response_content.clone(),
                         images: None,
-                        tool_calls: None
+                        tool_calls: None,
+                        tool_name: None,
                     });
                     let pass_intermediate =
                         discord_reply_channel_id.map(|_| response_content.clone());

@@ -489,7 +489,8 @@ pub(crate) async fn handle_run_cmd(
                         role: "user".to_string(),
                         content: fix_prompt.clone(),
                         images: None,
-                        tool_calls: None
+                        tool_calls: None,
+                        tool_name: None,
                     }];
                     match send_ollama_chat_messages(
                         fix_messages,

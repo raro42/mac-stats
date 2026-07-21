@@ -253,7 +253,8 @@ pub async fn ollama_chat_with_execution(
             role: "user".to_string(),
             content: context_message.clone(),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         },
         token_budget,
     );
@@ -319,7 +320,8 @@ pub async fn ollama_chat_with_execution(
                 &response_content,
             ),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         });
         follow_up_messages.push(crate::ollama::ChatMessage {
             role: "user".to_string(),
@@ -328,7 +330,8 @@ pub async fn ollama_chat_with_execution(
                 crate::commands::untrusted_content::wrap_untrusted_content("fetched-page", &page_content)
             ),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         });
 
         let follow_up_request = ChatRequest {
@@ -511,7 +514,8 @@ pub async fn ollama_chat_continue_with_result(
             role: "user".to_string(),
             content: context_message.clone(),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         },
         assemble_budget.max(512),
     );
@@ -519,13 +523,15 @@ pub async fn ollama_chat_continue_with_result(
         role: "assistant".to_string(),
         content: intermediate_response.clone(),
         images: None,
-        tool_calls: None
+        tool_calls: None,
+        tool_name: None,
     });
     messages.push(crate::ollama::ChatMessage {
         role: "user".to_string(),
         content: follow_up_message,
         images: None,
-        tool_calls: None
+        tool_calls: None,
+        tool_name: None,
     });
 
     let chat_request = ChatRequest { messages };

@@ -113,6 +113,9 @@ pub struct ChatMessage {
     /// Native structured tool calls (when the model uses the tools API).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tool_calls: Option<Vec<OllamaToolCall>>,
+    /// Ollama/OpenAI tool result name (role "tool"); skipped when None.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tool_name: Option<String>,
 }
 
 /// Per-request chat options (temperature, num_ctx). Serializes to Ollama API `options` object.
@@ -189,6 +192,7 @@ pub fn chat_response_from_api_body(body: &str) -> Result<ChatResponse, String> {
                 content,
                 images: None,
                 tool_calls,
+                tool_name: None,
             },
             done: true,
         });

@@ -175,12 +175,20 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
                 } else {
                     "user"
                 };
+                let synthetic_name = msg.tool_calls.as_ref().and_then(|calls| {
+                    calls.first().and_then(|c| c.function.name.clone())
+                });
                 out.push(msg);
                 out.push(ChatMessage {
                     role: synthetic_role.to_string(),
                     content: SYNTHETIC_TOOL_RESULT.to_string(),
                     images: None,
                     tool_calls: None,
+                    tool_name: if synthetic_role == "tool" {
+                        synthetic_name
+                    } else {
+                        None
+                    },
                 });
                 i += 1;
                 continue;
@@ -213,11 +221,13 @@ mod tests {
                     arguments: serde_json::json!({"url_or_arg": "https://example.com"}),
                 },
             }]),
+            tool_name: None,
         }];
         let out = sanitize_conversation_history(hist);
         assert_eq!(out.len(), 2);
         assert_eq!(out[1].role, "tool");
         assert_eq!(out[1].content, SYNTHETIC_TOOL_RESULT);
+        assert_eq!(out[1].tool_name.as_deref(), Some("FETCH_URL"));
     }
 
     #[test]
@@ -227,13 +237,15 @@ mod tests {
                 role: "assistant".into(),
                 content: "Fetching.\nFETCH_URL: https://example.com".into(),
                 images: None,
-                tool_calls: None
+                tool_calls: None,
+                tool_name: None,
             },
             ChatMessage {
                 role: "user".into(),
                 content: "What is the capital of France?".into(),
                 images: None,
-                tool_calls: None
+                tool_calls: None,
+                tool_name: None,
             },
         ];
         let out = sanitize_conversation_history(hist);
@@ -250,13 +262,15 @@ mod tests {
                 role: "assistant".into(),
                 content: "FETCH_URL: https://example.com".into(),
                 images: None,
-                tool_calls: None
+                tool_calls: None,
+                tool_name: None,
             },
             ChatMessage {
                 role: "user".into(),
                 content: page,
                 images: None,
-                tool_calls: None
+                tool_calls: None,
+                tool_name: None,
             },
         ];
         let out = sanitize_conversation_history(hist);
@@ -272,12 +286,14 @@ mod tests {
                 content: "FETCH_URL: https://example.com".into(),
                 images: None,
                 tool_calls: None,
+                tool_name: None,
             },
             ChatMessage {
                 role: "tool".into(),
                 content: page,
                 images: None,
                 tool_calls: None,
+                tool_name: None,
             },
         ];
         let out = sanitize_conversation_history(hist);
@@ -292,13 +308,15 @@ mod tests {
                 role: "assistant".into(),
                 content: "Hello, how can I help?".into(),
                 images: None,
-                tool_calls: None
+                tool_calls: None,
+                tool_name: None,
             },
             ChatMessage {
                 role: "user".into(),
                 content: "Here is the page content:\n\ntest body".into(),
                 images: None,
-                tool_calls: None
+                tool_calls: None,
+                tool_name: None,
             },
         ];
         let out = sanitize_conversation_history(hist);

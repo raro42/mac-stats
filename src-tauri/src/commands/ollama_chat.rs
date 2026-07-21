@@ -541,7 +541,8 @@ async fn send_ollama_chat_messages_streaming_inner(
                                 role: "assistant".to_string(),
                                 content: full_content.clone(),
                                 images: None,
-                                tool_calls: None
+                                tool_calls: None,
+                                tool_name: None,
                             },
                             done: true,
                         };
@@ -600,7 +601,8 @@ async fn send_ollama_chat_messages_streaming_inner(
                                     role: "assistant".to_string(),
                                     content: full_content.clone(),
                                     images: None,
-                                    tool_calls: None
+                                    tool_calls: None,
+                                    tool_name: None,
                                 },
                                 done: true,
                             };
@@ -641,7 +643,8 @@ async fn send_ollama_chat_messages_streaming_inner(
                                 role: "assistant".to_string(),
                                 content: full_content.clone(),
                                 images: None,
-                                tool_calls: None
+                                tool_calls: None,
+                                tool_name: None,
                             },
                             done: true,
                         };
@@ -664,7 +667,8 @@ async fn send_ollama_chat_messages_streaming_inner(
             role: "assistant".to_string(),
             content: full_content,
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         },
         done: true,
     };

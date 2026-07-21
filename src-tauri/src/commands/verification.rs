@@ -334,13 +334,15 @@ pub(crate) async fn extract_success_criteria(
             role: "system".to_string(),
             content: system.to_string(),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
             content: user,
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         },
     ];
     let response = match send_ollama_chat_messages(
@@ -393,13 +395,15 @@ pub(crate) async fn detect_new_topic(
             role: "system".to_string(),
             content: system.to_string(),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
             content: user,
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         },
     ];
     let response = send_ollama_chat_messages(
@@ -525,13 +529,15 @@ pub(crate) async fn verify_completion(
                     role: "system".to_string(),
                     content: system.to_string(),
                     images: None,
-                    tool_calls: None
+                    tool_calls: None,
+                    tool_name: None,
                 },
                 crate::ollama::ChatMessage {
                     role: "user".to_string(),
                     content: user_text.clone(),
                     images: Some(vec![b64]),
-                    tool_calls: None
+                    tool_calls: None,
+                    tool_name: None,
                 },
             ],
             Some(vm),
@@ -543,13 +549,15 @@ pub(crate) async fn verify_completion(
                     role: "system".to_string(),
                     content: system.to_string(),
                     images: None,
-                    tool_calls: None
+                    tool_calls: None,
+                    tool_name: None,
                 },
                 crate::ollama::ChatMessage {
                     role: "user".to_string(),
                     content: user_text,
                     images: None,
-                    tool_calls: None
+                    tool_calls: None,
+                    tool_name: None,
                 },
             ],
             model_override.clone(),
@@ -576,7 +584,8 @@ pub(crate) async fn verify_completion(
                         role: "system".to_string(),
                         content: system.to_string(),
                         images: None,
-                        tool_calls: None
+                        tool_calls: None,
+                        tool_name: None,
                     },
                     crate::ollama::ChatMessage {
                         role: "user".to_string(),
@@ -595,6 +604,7 @@ pub(crate) async fn verify_completion(
                         ),
                         images: None,
                         tool_calls: None,
+                        tool_name: None,
                     },
                 ];
                 match send_ollama_chat_messages(
@@ -792,13 +802,15 @@ mod tests {
                 role: "user".to_string(),
                 content: "Original request".to_string(),
                 images: None,
-                tool_calls: None
+                tool_calls: None,
+                tool_name: None,
             },
             crate::ollama::ChatMessage {
                 role: "assistant".to_string(),
                 content: "Intermediate reply".to_string(),
                 images: None,
-                tool_calls: None
+                tool_calls: None,
+                tool_name: None,
             },
         ];
         let retry_prompt = "Verification said we didn't fully complete the task.";
@@ -814,7 +826,8 @@ mod tests {
             role: "user".to_string(),
             content: "Older request".to_string(),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         }];
         assert_eq!(
             original_request_for_retry("Current request", Some(&history), false),

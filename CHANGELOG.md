@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.161] - 2026-07-21
+
+### Changed
+- **Native tool loop**: `ChatMessage` includes optional `tool_name` for role `tool` results (set from the tool step name); sanitize synthetic follow-ups carry the name when native `tool_calls` were present.
+
 ## [0.1.160] - 2026-07-21
 
 ### Added

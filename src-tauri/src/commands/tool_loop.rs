@@ -833,11 +833,21 @@ pub(crate) async fn run_tool_loop(
             } else {
                 None
             },
+            tool_name: None,
         });
         // Native Ollama/OpenAI tools expect one role "tool" message per call (OpenClaw/Hermes).
         // Text-line mode keeps a single role "user" blob; RUN_CMD raw dumps stay "system".
         if params.native_tool_schemas.is_some() && !tool_results.is_empty() {
-            for result in &tool_results {
+            let n = tool_results.len();
+            let step_names: Vec<String> = if state.tool_steps.len() >= n {
+                state.tool_steps[state.tool_steps.len() - n..]
+                    .iter()
+                    .map(|s| s.tool_name.clone())
+                    .collect()
+            } else {
+                vec![String::new(); n]
+            };
+            for (result, name) in tool_results.iter().zip(step_names) {
                 let role = if result.starts_with("Here is the command output") {
                     "system"
                 } else {
@@ -848,6 +858,11 @@ pub(crate) async fn run_tool_loop(
                     content: result.clone(),
                     images: None,
                     tool_calls: None,
+                    tool_name: if role == "tool" && !name.is_empty() {
+                        Some(name)
+                    } else {
+                        None
+                    },
                 });
             }
         } else {
@@ -861,6 +876,7 @@ pub(crate) async fn run_tool_loop(
                 content: user_message,
                 images: None,
                 tool_calls: None,
+                tool_name: None,
             });
         }
 
@@ -1107,7 +1123,8 @@ fn inject_budget_warnings(
             role: "system".to_string(),
             content: msg,
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         });
     } else if ratio >= budget_warning_ratio {
         let remaining = max_tool_iterations - tool_count;
@@ -1127,7 +1144,8 @@ fn inject_budget_warnings(
             role: "system".to_string(),
             content: msg,
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         });
     }
 }

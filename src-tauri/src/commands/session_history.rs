@@ -204,7 +204,8 @@ pub(crate) async fn prepare_conversation_history(
                             context
                         ),
                         images: None,
-                        tool_calls: None
+                        tool_calls: None,
+                        tool_name: None,
                     }]
                 }
             }
@@ -268,25 +269,29 @@ mod tests {
             role: "system".to_string(),
             content: "sys".to_string(),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         };
         let h1 = ChatMessage {
             role: "user".to_string(),
             content: "u1".to_string(),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         };
         let h2 = ChatMessage {
             role: "assistant".to_string(),
             content: "a1".to_string(),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         };
         let user = ChatMessage {
             role: "user".to_string(),
             content: "current".to_string(),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         };
         let out = build_execution_message_stack(system, &[h1.clone(), h2.clone()], user.clone());
         assert_eq!(out.len(), 4);
@@ -306,13 +311,15 @@ mod tests {
             role: "system".to_string(),
             content: "s".to_string(),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         };
         let user = ChatMessage {
             role: "user".to_string(),
             content: "q".to_string(),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         };
         let out = build_execution_message_stack(system, &[], user.clone());
         assert_eq!(out.len(), 2);
@@ -367,13 +374,15 @@ mod tests {
                 role: "user".to_string(),
                 content: "earlier".to_string(),
                 images: None,
-                tool_calls: None
+                tool_calls: None,
+                tool_name: None,
             },
             ChatMessage {
                 role: "assistant".to_string(),
                 content: "old reply".to_string(),
                 images: None,
-                tool_calls: None
+                tool_calls: None,
+                tool_name: None,
             },
         ];
         let out = prepare_conversation_history(
@@ -395,7 +404,8 @@ mod tests {
             role: "assistant".to_string(),
             content: confused.to_string(),
             images: None,
-            tool_calls: None
+            tool_calls: None,
+            tool_name: None,
         }];
         let out = prepare_conversation_history(
             raw,

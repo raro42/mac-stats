@@ -314,12 +314,14 @@ Skip timeout boilerplate, apologies, and one-off trivia. If nothing worth saving
             content: sys.into(),
             images: None,
             tool_calls: None,
+            tool_name: None,
         },
         crate::ollama::ChatMessage {
             role: "user".into(),
             content: format!("Conversation excerpt:\n{}", snippet),
             images: None,
             tool_calls: None,
+            tool_name: None,
         },
     ];
 
