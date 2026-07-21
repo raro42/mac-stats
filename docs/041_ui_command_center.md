@@ -24,7 +24,7 @@ Data comes from existing Tauri commands (`list_schedules`, `list_live_sessions`,
 2. Confirm overview shows schedules, live, knowledge, recent chats without opening tabs.
 3. Confirm **Perplexity** search icon appears in the icon row for the active theme.
 4. One visible polish (spacing, empty state, card copy, max-height)—not a tool-parser fix.
-5. Screenshot or note in Discord; commit + push when reasonable.
+5. Finish with `CURSOR_AGENT: in ~/projects/mac-stats … commit and push` (Discord alone will refuse bare git). Screenshot or note in Discord.
 
 ## Non-goals for the UI loop
 

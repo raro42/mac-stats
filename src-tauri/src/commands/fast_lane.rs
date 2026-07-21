@@ -158,9 +158,24 @@ fn is_version_question(n: &str) -> bool {
 }
 
 fn is_git_commit_push_request(n: &str) -> bool {
+    // Scheduled skills / Cursor Agent work must run — do not instant-refuse them.
+    // False positive example: "SKILL: ui-weekly-review … commit+push, reply briefly."
+    if n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("changelog-weekly")
+        || n.contains("ui-weekly")
+        || n.contains("docs/040_")
+        || n.contains("docs/041_")
+    {
+        return false;
+    }
     let has_commit = n.contains("commit");
     let has_push = n.contains("push");
     if !(has_commit || (has_push && n.contains("git"))) {
+        return false;
+    }
+    // Only refuse short, casual Discord asks — not multi-step operator tasks.
+    if n.chars().count() > 160 {
         return false;
     }
     has_push
@@ -272,6 +287,28 @@ mod tests {
             }
             other => panic!("expected Instant, got {:?}", other),
         }
+    }
+
+    #[test]
+    fn scheduled_skill_with_commit_push_is_not_instant_refusal() {
+        let task = "SKILL: ui-weekly-review — Weekly Agent Ops polish. One UI fix. \
+Sync dist, commit+push, reply briefly.";
+        assert!(
+            !matches!(
+                classify_turn_lane(task, None),
+                TurnLane::Instant { .. }
+            ),
+            "scheduled SKILL tasks that mention commit+push must run, not instant-refuse"
+        );
+        let changelog = "SKILL: changelog-weekly-review — hygiene per docs/040_changelog_hygiene.md, \
+commit+push, then reply briefly.";
+        assert!(
+            !matches!(
+                classify_turn_lane(changelog, None),
+                TurnLane::Instant { .. }
+            ),
+            "changelog weekly skill must not be instant-refused"
+        );
     }
 
     #[test]

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.133] - 2026-07-21
+
+### Fixed
+- Discord **fast lane** no longer instant-refuses scheduled `SKILL:` tasks that mention commit/push (was blocking Werner’s weekly changelog/UI schedules). Casual “commit and push” from chat still refused; skills finish via `CURSOR_AGENT`.
+
 ## [0.1.132] - 2026-07-21
 
 ### Fixed

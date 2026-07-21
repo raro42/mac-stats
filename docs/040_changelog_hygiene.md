@@ -28,6 +28,6 @@ Put that noise in `tasks/`, `005-openclaw-reviewer/`, or (if already dumped) `do
 3. Strip or relocate any reviewer/tester spam from Unreleased.
 4. Fold shipped-but-unversioned bullets into a new `## [0.1.x]` if a release shipped since last review (use `Cargo.toml` version + `git log`).
 5. Keep bullets scannable; archive bulk noise rather than deleting history without a trail.
-6. Commit + push when the file is cleaner; Discord a short “changelog review done” note (counts removed / versions folded).
+6. Commit + push via **`CURSOR_AGENT: in ~/projects/mac-stats …`** (not bare Discord chat — fast lane refuses casual git). Discord a short “changelog review done” note (counts removed / versions folded).
 
 **Skill:** `~/.mac-stats/agents/skills/changelog-weekly-review/SKILL.md` (also invoked via `SKILL: changelog-weekly-review`).
