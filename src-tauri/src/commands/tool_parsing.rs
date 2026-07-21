@@ -2,7 +2,7 @@
 //!
 //! All functions here are pure (no state, no I/O) and handle the various
 //! ways models format tool calls: `TOOL: arg`, `RECOMMEND: TOOL: arg`,
-//! Hermes/Qwen JSON `<tool_call>`, Qwen3-Coder `<function=` XML,
+//! Hermes/Qwen JSON `<tool_call>`, Qwen3-Coder `<function=`, GLM `<arg_key>` XML,
 //! numbered lists, inline chains with "then"/"and"/";", etc.
 
 use crate::commands::tool_registry::{
@@ -344,10 +344,106 @@ pub(crate) fn parse_all_tools_from_response(content: &str) -> Vec<(String, Strin
     out
 }
 
-/// Expand vendor tool-call XML (Qwen3-Coder first, then Hermes/Qwen JSON).
+/// Expand vendor tool-call XML (Qwen3-Coder → GLM → Hermes/Qwen JSON).
 fn expand_model_tool_call_xml(content: &str) -> String {
     let qwen = expand_qwen3_coder_tool_call_xml(content);
-    expand_hermes_tool_call_xml(&qwen)
+    let glm = expand_glm_arg_key_tool_call_xml(&qwen);
+    expand_hermes_tool_call_xml(&glm)
+}
+
+/// GLM 4.5/4.7 / VLLM: `<tool_call>name\n<arg_key>k</arg_key><arg_value>v</arg_value></tool_call>`.
+/// Non-GLM `<tool_call>` blocks are left unchanged for the Hermes JSON expander.
+fn expand_glm_arg_key_tool_call_xml(content: &str) -> String {
+    if !content.contains("<arg_key>") || !content.contains("<tool_call>") {
+        return content.to_string();
+    }
+    let mut out = String::new();
+    let mut rest = content;
+    let mut converted = false;
+
+    while let Some(start) = rest.find("<tool_call>") {
+        out.push_str(&rest[..start]);
+        let after_tag = &rest[start + "<tool_call>".len()..];
+        let (inner, next, closed) = if let Some(end) = after_tag.find("</tool_call>") {
+            (
+                &after_tag[..end],
+                &after_tag[end + "</tool_call>".len()..],
+                true,
+            )
+        } else {
+            (after_tag, "", false)
+        };
+        if let Some(line) = glm_inner_to_tool_line(inner) {
+            if !out.is_empty() && !out.ends_with('\n') {
+                out.push('\n');
+            }
+            out.push_str(&line);
+            out.push('\n');
+            converted = true;
+        } else {
+            out.push_str("<tool_call>");
+            out.push_str(inner);
+            if closed {
+                out.push_str("</tool_call>");
+            }
+        }
+        rest = next;
+    }
+
+    if !converted {
+        return content.to_string();
+    }
+    out.push_str(rest);
+    out
+}
+
+fn glm_inner_to_tool_line(inner: &str) -> Option<String> {
+    if !inner.contains("<arg_key>") {
+        return None;
+    }
+    let trimmed = inner.trim_start();
+    let (name_part, args_part) = if let Some(nl) = trimmed.find('\n') {
+        (trimmed[..nl].trim(), &trimmed[nl + 1..])
+    } else {
+        // Name then immediate <arg_key> on same "block".
+        if let Some(p) = trimmed.find("<arg_key>") {
+            (trimmed[..p].trim(), &trimmed[p..])
+        } else {
+            return None;
+        }
+    };
+    if name_part.is_empty() || name_part.starts_with('<') {
+        return None;
+    }
+    let tool = resolve_hermes_tool_name(name_part)?;
+    let args = parse_glm_arg_key_pairs(args_part);
+    let arg = hermes_args_to_arg_string(&args);
+    Some(format!("{tool}: {arg}"))
+}
+
+fn parse_glm_arg_key_pairs(body: &str) -> serde_json::Value {
+    let mut map = serde_json::Map::new();
+    let mut rest = body;
+    while let Some(k_start) = rest.find("<arg_key>") {
+        rest = &rest[k_start + "<arg_key>".len()..];
+        let Some(k_end) = rest.find("</arg_key>") else {
+            break;
+        };
+        let key = rest[..k_end].trim().to_string();
+        rest = &rest[k_end + "</arg_key>".len()..];
+        let Some(v_start) = rest.find("<arg_value>") else {
+            break;
+        };
+        rest = &rest[v_start + "<arg_value>".len()..];
+        let (raw_val, next) = if let Some(v_end) = rest.find("</arg_value>") {
+            (rest[..v_end].to_string(), &rest[v_end + "</arg_value>".len()..])
+        } else {
+            (rest.to_string(), "")
+        };
+        map.insert(key, qwen3_convert_param_value(raw_val.trim()));
+        rest = next;
+    }
+    serde_json::Value::Object(map)
 }
 
 /// Qwen3-Coder / VLLM: `<tool_call><function=name><parameter=k>v</parameter></function></tool_call>`.
@@ -1030,6 +1126,37 @@ mod tests {
         let t = parse_tool_from_response(content).unwrap();
         assert_eq!(t.0, "FETCH_URL");
         assert_eq!(t.1, "https://example.com");
+    }
+
+    #[test]
+    fn glm_arg_key_tool_call_parses() {
+        let content = r#"Sure.
+<tool_call>brave_search
+<arg_key>query</arg_key><arg_value>El Masnou weather</arg_value>
+</tool_call>
+"#;
+        let tools = parse_all_tools_from_response(content);
+        assert_eq!(tools.len(), 1, "{tools:?}");
+        assert_eq!(tools[0].0, "BRAVE_SEARCH");
+        assert_eq!(tools[0].1, "El Masnou weather");
+    }
+
+    #[test]
+    fn glm_and_hermes_json_coexist() {
+        let content = r#"
+<tool_call>FETCH_URL
+<arg_key>url</arg_key><arg_value>https://example.com</arg_value>
+</tool_call>
+<tool_call>
+{"name": "BRAVE_SEARCH", "arguments": {"query": "mac-stats"}}
+</tool_call>
+"#;
+        let tools = parse_all_tools_from_response(content);
+        assert!(tools.len() >= 2, "{tools:?}");
+        assert_eq!(tools[0].0, "FETCH_URL");
+        assert_eq!(tools[0].1, "https://example.com");
+        assert_eq!(tools[1].0, "BRAVE_SEARCH");
+        assert_eq!(tools[1].1, "mac-stats");
     }
 
     #[test]
