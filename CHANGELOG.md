@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.164] - 2026-07-21
+
+### Changed
+- **Instant lane**: short acknowledgments / sign-offs (`ok`, `nice`, `got it`, emoji, dismissals with “no worries”) skip the LLM; insights `promote_instant` covers the same patterns.
+
 ## [0.1.163] - 2026-07-21
 
 ### Changed

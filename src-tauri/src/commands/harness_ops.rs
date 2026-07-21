@@ -1103,12 +1103,27 @@ fn classify_candidate(
             | "thank you"
             | "thx"
             | "cheers"
+            | "ok"
+            | "okay"
+            | "cool"
+            | "nice"
+            | "got it"
+            | "no worries"
+            | "bye"
     );
-    if (looks_time || looks_greeting) && lane != "instant" && wall_ms >= 500 {
+    let looks_ack = !q.contains('?')
+        && (q.starts_with("ok") || q.starts_with("okay") || q.starts_with("nice") || q.starts_with("got it"))
+        && (q.chars().count() <= 48
+            || q.contains("no worries")
+            || q.contains("myself")
+            || q.contains("find out"));
+    if (looks_time || looks_greeting || looks_ack) && lane != "instant" && wall_ms >= 500 {
         return Some(RunInsightCandidate {
             kind: "promote_instant".into(),
             reason: if looks_time {
                 "Time/date ask should stay on instant lane".into()
+            } else if looks_ack {
+                "Short ack/sign-off should stay on instant lane".into()
             } else {
                 "Greeting/thanks should stay on instant lane".into()
             },

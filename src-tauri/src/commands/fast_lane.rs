@@ -99,6 +99,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     ) {
         return Some("You're welcome.".to_string());
     }
+    if is_short_ack_or_signoff(&n) {
+        return Some("👍 Got it — here if you need me.".to_string());
+    }
     if is_wakeup_message_task(&n) {
         return Some(format_instant_wakeup_reply());
     }
@@ -132,6 +135,89 @@ fn is_wakeup_message_task(n: &str) -> bool {
         || n.contains("message")
         || n.contains("need anything")
         || n.starts_with("wake")
+}
+
+/// Short acknowledgments / sign-offs (digester: multi-second direct lane, zero tools).
+fn is_short_ack_or_signoff(n: &str) -> bool {
+    if n.contains('?') {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("search")
+        || n.contains("redmine")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("screenshot")
+        || n.contains("commit")
+        || n.contains("push")
+        || n.contains("please")
+        || n.contains("can you")
+        || n.contains("could you")
+        || n.contains("would you")
+        || n.contains("weather")
+        || n.contains("ticket")
+        || n.contains("review")
+        || n.contains("tell me")
+        || n.contains(" what ")
+        || n.starts_with("what ")
+        || n.starts_with("how ")
+    {
+        return false;
+    }
+    if matches!(
+        n,
+        "ok" | "okay"
+            | "k"
+            | "kk"
+            | "cool"
+            | "nice"
+            | "nice one"
+            | "nice answer"
+            | "got it"
+            | "all good"
+            | "np"
+            | "no worries"
+            | "bye"
+            | "goodbye"
+            | "cya"
+            | "see you"
+            | "later"
+            | "perfect"
+            | "great"
+            | "awesome"
+            | "neat"
+            | "sweet"
+            | "alright"
+            | "sounds good"
+            | "fair enough"
+            | "👍"
+            | "👌"
+    ) {
+        return true;
+    }
+    let len = n.chars().count();
+    if len > 140 {
+        return false;
+    }
+    let starts_ack = n.starts_with("ok")
+        || n.starts_with("okay")
+        || n.starts_with("cool")
+        || n.starts_with("nice")
+        || n.starts_with("got it")
+        || n.starts_with("alright")
+        || n.starts_with("no worries")
+        || n.starts_with("sounds good");
+    if !starts_ack {
+        return false;
+    }
+    // Short follow-on, or clear sign-off / self-serve dismissal.
+    len <= 48
+        || n.contains("no worries")
+        || n.contains("bye")
+        || n.contains("myself")
+        || n.contains("later")
+        || n.contains("all good")
+        || n.contains("find out")
 }
 
 fn format_instant_wakeup_reply() -> String {
@@ -338,6 +424,37 @@ commit+push, then reply briefly.";
                 "expected Instant for {q}"
             );
         }
+    }
+
+    #[test]
+    fn short_acks_and_signoffs_are_instant() {
+        for q in [
+            "ok",
+            "Nice answer",
+            "Ok. 👌 I will switch you off and find out myself. No worries.",
+            "got it",
+            "no worries",
+            "👍",
+        ] {
+            assert!(
+                matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),
+                "expected Instant for {q}"
+            );
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane("Ok, can you search Redmine for ticket 12?", None),
+                TurnLane::Instant { .. }
+            ),
+            "acks with a real ask must not be instant"
+        );
+        assert!(
+            !matches!(
+                classify_turn_lane("Nice weather today in El Masnou", None),
+                TurnLane::Instant { .. }
+            ),
+            "nice + real topic must not be instant"
+        );
     }
 
     #[test]
