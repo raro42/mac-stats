@@ -170,6 +170,7 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
                 else if (st === 'unavailable') card.classList.add('ops-health-bad');
             }
         }
+        if (typeof syncOpsIconHealth === 'function') syncOpsIconHealth(redmine);
     }
 
     setText('ops-health-schedule', fmtScheduleEta(sched));
@@ -693,8 +694,20 @@ function escapeHtml(s) {
     if (!icon) return;
     const open = !agentOpsCollapsed;
     icon.classList.toggle('status-good', open);
+    if (open) icon.classList.remove('status-warning');
     icon.setAttribute('aria-pressed', open ? 'true' : 'false');
     icon.title = open ? 'Hide Agent Ops' : 'Agent Ops';
+  }
+
+  function syncOpsIconHealth(redmine) {
+    const icon = document.getElementById('icon-agent-ops');
+    if (!icon) return;
+    const st = String(redmine?.status || '').toLowerCase();
+    const warn = st === 'notconfigured' || st === 'unavailable' || st === 'degraded';
+    icon.classList.toggle('status-warning', warn && agentOpsCollapsed);
+    if (warn && agentOpsCollapsed) {
+      icon.title = `Agent Ops — Redmine ${st === 'notconfigured' ? 'not configured' : st}`;
+    }
   }
 
   function applyOpsCollapsed(collapsed) {
