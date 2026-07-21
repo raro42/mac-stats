@@ -116,6 +116,8 @@ pub struct RunsInsights {
     pub digest_stale_count: usize,
     pub digest_generated_at: String,
     pub digest_open_hints: Vec<String>,
+    /// Digester provenance: `python`, `rust-native`, or empty if missing.
+    pub digest_source: String,
 }
 
 #[derive(Debug, Clone, Serialize, Default)]
@@ -127,6 +129,7 @@ pub struct DigestSummary {
     pub open_hints: Vec<String>,
     pub stale_hints: Vec<String>,
     pub path: String,
+    pub source: String,
 }
 
 fn file_mtime_ms(meta: &fs::Metadata) -> u64 {
@@ -322,6 +325,7 @@ pub fn compute_runs_insights(limit: u32) -> RunsInsights {
         digest_stale_count: digest.stale_count,
         digest_generated_at: digest.generated_at.clone(),
         digest_open_hints: digest.open_hints.clone(),
+        digest_source: digest.source.clone(),
     };
     if !path.is_file() {
         return empty;
@@ -451,6 +455,7 @@ pub fn compute_runs_insights(limit: u32) -> RunsInsights {
         digest_stale_count: digest.stale_count,
         digest_generated_at: digest.generated_at,
         digest_open_hints: digest.open_hints,
+        digest_source: digest.source,
     }
 }
 
@@ -488,6 +493,11 @@ pub fn load_digest_summary() -> DigestSummary {
     summary.turns = v.get("turns").and_then(|x| x.as_u64()).unwrap_or(0) as usize;
     summary.open_count = v.get("open_count").and_then(|x| x.as_u64()).unwrap_or(0) as usize;
     summary.stale_count = v.get("stale_count").and_then(|x| x.as_u64()).unwrap_or(0) as usize;
+    summary.source = v
+        .get("source")
+        .and_then(|x| x.as_str())
+        .unwrap_or("")
+        .to_string();
     summary.open_hints = v
         .get("open")
         .and_then(|x| x.as_array())
@@ -546,6 +556,7 @@ fn digest_script_candidates() -> Vec<PathBuf> {
 
 /// Refresh `~/.mac-stats/improvements/latest.{md,json}` via Python digester when available,
 /// otherwise a Rust-native fallback that writes `latest.json` (Agent Ops still works offline).
+#[tauri::command]
 pub fn refresh_agent_digest() -> String {
     let out_dir = digest_json_path()
         .parent()
@@ -1050,6 +1061,8 @@ mod tests {
     fn rust_native_digest_writes_json() {
         let summary = write_digest_native(7).expect("native digest");
         assert!(digest_json_path().is_file());
+        let loaded = load_digest_summary();
+        assert_eq!(loaded.source, "rust-native");
         let _ = summary.open_count + summary.stale_count + summary.turns;
     }
 

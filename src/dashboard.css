@@ -265,6 +265,17 @@ body {
   margin-bottom: 8px;
 }
 
+.ops-refresh-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 12px 12px;
+}
+
+.ops-refresh-row .ops-refresh {
+  margin: 0;
+}
+
 .ops-refresh {
   margin: 0 12px 12px;
 }

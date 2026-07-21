@@ -370,6 +370,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::harness_ops::read_memory_file,
             commands::harness_ops::get_runs_insights,
             commands::harness_ops::get_digest_summary,
+            commands::harness_ops::refresh_agent_digest,
             commands::agents::update_agent_skill,
             commands::agents::update_agent_soul,
             commands::agents::update_agent_mood,

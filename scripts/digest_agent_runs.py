@@ -304,6 +304,7 @@ def main() -> int:
         "open": open_items,
         "stale": stale_items,
         "markdown_path": str(args.out),
+        "source": "python",
     }
     atomic_write_text(json_out, json.dumps(payload, indent=2) + "\n")
 

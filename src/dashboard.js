@@ -931,8 +931,31 @@ function setupAgentOps() {
         document.getElementById('ops-agents-list').style.display = '';
     });
     document.getElementById('ops-refresh-btn')?.addEventListener('click', () => refreshAgentOps());
+    document.getElementById('ops-digest-refresh-btn')?.addEventListener('click', () => refreshOpsDigest());
     document.getElementById('ops-session-load-chat')?.addEventListener('click', () => loadOpsSessionIntoChat());
     refreshAgentOps();
+}
+
+async function refreshOpsDigest() {
+    const btn = document.getElementById('ops-digest-refresh-btn');
+    const strip = document.getElementById('agent-ops-strip');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Refreshing…';
+    }
+    try {
+        const msg = await invoke('refresh_agent_digest');
+        if (strip) strip.textContent = String(msg);
+        await refreshAgentOps();
+    } catch (err) {
+        console.warn('[Agent Ops] digest refresh', err);
+        if (strip) strip.textContent = `Digest refresh failed: ${err}`;
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Refresh digest';
+        }
+    }
 }
 
 function fmtBytes(n) {
@@ -961,7 +984,7 @@ async function refreshAgentOps() {
             invoke('get_runs_insights', { limit: 40 }),
         ]);
         const enabled = (agents || []).filter((a) => a.enabled).length;
-        strip.textContent = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${(files || []).length} session files · p50 ${insights?.p50_ms ?? 0} ms · ${insights?.turns ?? 0} runs · digest ${insights?.digest_open_count ?? 0} open / ${insights?.digest_stale_count ?? 0} stale${insights?.fail_count ? ` · ${insights.fail_count} fail` : ''}`;
+        strip.textContent = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${(files || []).length} session files · p50 ${insights?.p50_ms ?? 0} ms · ${insights?.turns ?? 0} runs · digest ${insights?.digest_open_count ?? 0} open / ${insights?.digest_stale_count ?? 0} stale${insights?.digest_source ? ` · ${insights.digest_source}` : ''}${insights?.fail_count ? ` · ${insights.fail_count} fail` : ''}`;
         renderOpsAgents(agents || []);
         renderOpsLive(live || []);
         renderOpsSessionFiles(files || []);
@@ -1159,7 +1182,7 @@ function renderOpsRuns(insights) {
             card.innerHTML = `
                 <div class="ops-insight-title">Insights</div>
                 <div class="ops-row-meta">${escapeHtml(gateway)}</div>
-                <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale</div>
+                <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}</div>
                 <div class="ops-empty" style="padding:8px 0 0">No runs in ~/.mac-stats/runs.jsonl yet</div>
             `;
         } else {
@@ -1191,7 +1214,7 @@ function renderOpsRuns(insights) {
             <div class="ops-insight-title">Insights</div>
             <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · fail ${insights.fail_count || 0} · mean ${insights.mean_ms} ms · max ${insights.max_ms} ms</div>
             ${gateway ? `<div class="ops-row-meta">${escapeHtml(gateway)}</div>` : ''}
-            <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_generated_at ? ` · ${escapeHtml(String(insights.digest_generated_at).slice(0, 19))}` : ''}</div>
+            <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}${insights.digest_generated_at ? ` · ${escapeHtml(String(insights.digest_generated_at).slice(0, 19))}` : ''}</div>
             ${(insights.digest_open_hints || []).length ? `<div class="ops-insight-sub">Digest open</div>${(insights.digest_open_hints || []).slice(0, 3).map((h) => `<div class="ops-insight-line">${escapeHtml(h)}</div>`).join('')}` : ''}
             <div class="ops-row-meta">Lanes: ${escapeHtml(lanes) || '—'}</div>
             <div class="ops-row-meta">Top tools: ${escapeHtml(tools) || '—'}</div>
