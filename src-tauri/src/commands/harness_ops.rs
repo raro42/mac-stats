@@ -962,6 +962,68 @@ pub fn format_schedules_gateway() -> String {
     out
 }
 
+/// True for short `/status` / `/health` operator asks — not free-form “status of …”.
+pub fn looks_like_status_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    matches!(
+        n.as_str(),
+        "/status"
+            | "bot status"
+            | "app status"
+            | "mac-stats status"
+            | "/health"
+            | "health check"
+            | "bot health"
+            | "/version"
+            | "app version"
+            | "mac-stats version"
+    )
+}
+
+/// One-screen operator status: version, Discord gateway, digest, next schedule, last delivery.
+pub fn format_status_gateway() -> String {
+    let version = crate::config::Config::version();
+    let digest = load_digest_summary();
+    let snap = crate::scheduler::scheduler_operator_snapshot();
+    let mut lines = vec![
+        format!("**mac-stats v{version}**"),
+        crate::discord::format_discord_gateway_insights_line(),
+        format!(
+            "Digest: **{}** open · **{}** stale{}",
+            digest.open_count,
+            digest.stale_count,
+            if digest.source.is_empty() {
+                String::new()
+            } else {
+                format!(" · {}", digest.source)
+            }
+        ),
+    ];
+    let mut sched = format!("Schedules: **{}**", snap.total_entries);
+    if let Some(secs) = snap.seconds_until_next_fire {
+        let when = if secs < 3600 {
+            format!("{}m", (secs / 60).max(1))
+        } else {
+            format!("{}h", (secs + 1800) / 3600)
+        };
+        let preview = snap
+            .next_task_preview
+            .as_deref()
+            .map(|p| format!(" ({})", p.chars().take(36).collect::<String>()))
+            .unwrap_or_default();
+        sched.push_str(&format!(" · next {when}{preview}"));
+    }
+    lines.push(sched);
+    if let Some(last) = crate::scheduler::list_scheduler_delivery_awareness()
+        .into_iter()
+        .next()
+    {
+        let preview: String = last.summary.chars().take(72).collect();
+        lines.push(format!("Last delivery: {} · {}", last.utc, preview));
+    }
+    lines.join("\n")
+}
+
 fn classify_candidate(
     lane: &str,
     wall_ms: u64,
@@ -1207,6 +1269,24 @@ mod tests {
         assert!(looks_like_schedules_request("list schedules"));
         assert!(looks_like_schedules_request("@Werner schedules"));
         assert!(!looks_like_schedules_request("schedule a task for tomorrow"));
+    }
+
+    #[test]
+    fn status_request_detected() {
+        assert!(looks_like_status_request("/status"));
+        assert!(looks_like_status_request("/health"));
+        assert!(looks_like_status_request("/version"));
+        assert!(looks_like_status_request("bot status"));
+        assert!(!looks_like_status_request("status of the redmine ticket"));
+        assert!(!looks_like_status_request("status"));
+    }
+
+    #[test]
+    fn status_gateway_mentions_version() {
+        let report = format_status_gateway();
+        assert!(report.contains("mac-stats v"), "{report}");
+        assert!(report.contains("Digest:"), "{report}");
+        assert!(report.contains("Schedules:"), "{report}");
     }
 
     #[test]

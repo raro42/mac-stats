@@ -2079,6 +2079,15 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // Operator one-screen: version + gateway + digest + schedule (no Ollama).
+    if crate::commands::harness_ops::looks_like_status_request(&content) {
+        let report = crate::commands::harness_ops::format_status_gateway();
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send status: {}", e);
+        }
+        return;
+    }
+
     // Hermes `/cron list` parity — cheap schedules report, no Ollama.
     if crate::commands::harness_ops::looks_like_schedules_request(&content) {
         let report = crate::commands::harness_ops::format_schedules_gateway();
