@@ -345,6 +345,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::logging::open_debug_log,
             // Scheduler UI commands
             commands::scheduler::list_schedules,
+            commands::scheduler::get_scheduler_snapshot,
             commands::operator_task_pressure::get_operator_task_pressure_summary,
             commands::scheduler::list_scheduler_delivery_awareness,
             commands::scheduler::add_schedule,

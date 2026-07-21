@@ -218,6 +218,10 @@ pub struct SchedulerOperatorSnapshot {
     pub seconds_until_next_fire: Option<u64>,
     /// Entries whose computed next fire is within the next 120 seconds (local wall clock).
     pub imminent_fire_within_120s_count: u32,
+    /// Local datetime of the soonest next fire (`None` if none).
+    pub next_run_at: Option<String>,
+    /// Short preview of the soonest task text.
+    pub next_task_preview: Option<String>,
 }
 
 /// Snapshot of schedule pressure for operator dashboards. Cheap: re-reads and parses `schedules.json`.
@@ -229,14 +233,20 @@ pub fn scheduler_operator_snapshot() -> SchedulerOperatorSnapshot {
     let mut entries_without_next_run = 0u32;
     let mut seconds_until_next_fire: Option<u64> = None;
     let mut imminent_fire_within_120s_count = 0u32;
+    let mut next_run_at: Option<String> = None;
+    let mut next_task_preview: Option<String> = None;
     let horizon = now + chrono::Duration::seconds(120);
     for e in &entries {
         match next_run(e, now) {
             Some(nr) => {
                 entries_with_next_run += 1;
                 let secs_64 = (nr - now).num_seconds().max(0) as u64;
-                seconds_until_next_fire =
-                    Some(seconds_until_next_fire.map_or(secs_64, |m| m.min(secs_64)));
+                let is_sooner = seconds_until_next_fire.map_or(true, |m| secs_64 < m);
+                if is_sooner {
+                    seconds_until_next_fire = Some(secs_64);
+                    next_run_at = Some(nr.format("%Y-%m-%d %H:%M:%S").to_string());
+                    next_task_preview = Some(e.task.chars().take(48).collect());
+                }
                 if nr <= horizon {
                     imminent_fire_within_120s_count += 1;
                 }
@@ -250,6 +260,8 @@ pub fn scheduler_operator_snapshot() -> SchedulerOperatorSnapshot {
         entries_without_next_run,
         seconds_until_next_fire,
         imminent_fire_within_120s_count,
+        next_run_at,
+        next_task_preview,
     }
 }
 

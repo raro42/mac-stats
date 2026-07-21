@@ -9,6 +9,12 @@ pub fn list_schedules() -> Result<Vec<scheduler::ScheduleForUi>, String> {
     Ok(scheduler::list_schedules_for_ui())
 }
 
+/// Cheap scheduler pressure snapshot for Agent Ops / operator dashboards.
+#[tauri::command]
+pub fn get_scheduler_snapshot() -> scheduler::SchedulerOperatorSnapshot {
+    scheduler::scheduler_operator_snapshot()
+}
+
 /// Recent successful scheduler → Discord deliveries (newest first), for Settings / operator verification.
 #[tauri::command]
 pub fn list_scheduler_delivery_awareness() -> Result<Vec<scheduler::DeliveryAwarenessEntry>, String>
