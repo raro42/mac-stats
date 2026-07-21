@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.146] - 2026-07-21
+
+### Fixed
+- **Memory hygiene**: broader pollution filters (lesson-scaffold headers, agent-tool-run meta, timeout copy); filter+cap memory when building prompts; scrub at startup. Cuts system-prompt bloat from `memory-discord-*.md`.
+
 ## [0.1.145] - 2026-07-21
 
 ### Added

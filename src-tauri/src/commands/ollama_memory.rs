@@ -46,6 +46,8 @@ pub(crate) fn load_global_memory_block() -> String {
         Ok(s) => s.trim().to_string(),
         Err(_) => return String::new(),
     };
+    let content = crate::commands::session_search::filter_memory_markdown_for_prompt(&content);
+    let content = crate::commands::session_search::truncate_memory_for_prompt(&content);
     if content.is_empty() {
         return String::new();
     }
@@ -62,6 +64,8 @@ pub(crate) fn load_channel_memory_block(channel_id: u64) -> String {
         Ok(s) => s.trim().to_string(),
         Err(_) => return String::new(),
     };
+    let content = crate::commands::session_search::filter_memory_markdown_for_prompt(&content);
+    let content = crate::commands::session_search::truncate_memory_for_prompt(&content);
     if content.is_empty() {
         return String::new();
     }
@@ -79,6 +83,8 @@ pub(crate) fn load_main_session_memory_block() -> String {
         Ok(s) => s.trim().to_string(),
         Err(_) => return String::new(),
     };
+    let content = crate::commands::session_search::filter_memory_markdown_for_prompt(&content);
+    let content = crate::commands::session_search::truncate_memory_for_prompt(&content);
     if content.is_empty() {
         return String::new();
     }

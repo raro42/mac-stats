@@ -83,6 +83,7 @@ fn load_entries(path: &PathBuf) -> Vec<String> {
             t.to_string()
         })
         .filter(|l| !l.is_empty())
+        .filter(|l| !crate::commands::session_search::looks_like_memory_pollution(l))
         .collect()
 }
 

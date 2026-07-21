@@ -298,18 +298,60 @@ fn collect_snippets(text: &str, q_lower: &str) -> Vec<String> {
 /// Drop timeout / meta-lesson boilerplate from memory entries (Hermes hygiene).
 pub fn looks_like_memory_pollution(entry: &str) -> bool {
     let n = entry.to_lowercase();
+    let t = n.trim();
+    // Bare section headers / empty scaffolding from failed lesson extraction
+    if t == "learned"
+        || t == "- learned"
+        || t == "tools that worked vs. tools that failed"
+        || t == "correct ids or endpoints discovered"
+        || t == "user corrections about how things should work"
+        || t == "mistakes to avoid in future"
+        || t == "no lessons were found from this conversation."
+    {
+        return true;
+    }
     n.contains("turn timed out")
         || n.contains("wall-clock budget")
         || n.contains("agentroutertimeout")
         || n.contains("if no lessons, write")
         || n.contains("output only these two sections")
         || n.contains("bullet points of important lessons")
-        || (n.contains("tools that worked vs") && n.contains("mistakes to avoid"))
+        || n.contains("tools that worked vs")
+        || n.contains("mistakes to avoid")
+        || n.contains("correct ids or endpoints")
+        || n.contains("user corrections about how things should work")
         || n.contains("compact this conversation")
         || n.contains("ms_untrusted_begin")
         || n.contains("<<<ms_untrusted")
         || n.contains("[partial progress:")
         || n.contains("agent router turn timeout")
+        || n.contains("the run was stopped so the channel")
+        || n.contains("agent tool run:")
+        || n.contains("the user’s current question is")
+        || n.contains("the user's current question is")
+        || n.contains("[continue for next question]")
+        || n.contains("last assistant text:")
+        || (n.contains("*cursor agent") && n.len() < 80)
+        || (n.starts_with("*redmine") && n.len() < 120)
+}
+
+/// Filter memory markdown (bullet lines) for prompt injection — drop pollution in-memory.
+pub fn filter_memory_markdown_for_prompt(content: &str) -> String {
+    content
+        .lines()
+        .filter_map(|line| {
+            let raw = line.trim();
+            if raw.is_empty() {
+                return None;
+            }
+            let entry = raw.trim_start_matches('-').trim();
+            if entry.is_empty() || looks_like_memory_pollution(entry) {
+                return None;
+            }
+            Some(line.to_string())
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 /// One-shot scrub of existing memory*.md files under agents/.
@@ -354,6 +396,20 @@ pub fn scrub_polluted_memory_files() -> (usize, usize) {
     (files, removed)
 }
 
+/// Cap memory block size for the system prompt (bytes of markdown after filter).
+pub const MEMORY_PROMPT_MAX_CHARS: usize = 2_500;
+
+pub fn truncate_memory_for_prompt(filtered: &str) -> String {
+    if filtered.len() <= MEMORY_PROMPT_MAX_CHARS {
+        return filtered.to_string();
+    }
+    // Keep the tail (newest lessons usually appended).
+    let start = filtered.len().saturating_sub(MEMORY_PROMPT_MAX_CHARS);
+    let slice = &filtered[start..];
+    let cut = slice.find('\n').map(|i| i + 1).unwrap_or(0);
+    format!("…\n{}", &slice[cut..])
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -369,6 +425,17 @@ mod tests {
         assert!(looks_like_memory_pollution(
             "Compact this conversation:\n[user]: hi"
         ));
+        assert!(looks_like_memory_pollution(
+            "Tools that worked vs. tools that failed"
+        ));
+        assert!(looks_like_memory_pollution(
+            "*Agent tool run: 2 step(s), 0 with errors,  103354 ms total; tools: AGENT, DONE.*"
+        ));
+        let filtered = filter_memory_markdown_for_prompt(
+            "- Prefer Open-Meteo for El Masnou weather\n- Tools that worked vs. tools that failed\n- Learned\n",
+        );
+        assert!(filtered.to_lowercase().contains("open-meteo"), "{filtered}");
+        assert!(!filtered.to_lowercase().contains("tools that worked"), "{filtered}");
     }
 
     #[test]

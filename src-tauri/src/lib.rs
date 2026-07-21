@@ -514,6 +514,19 @@ fn run_internal(open_cpu_window: bool) {
                 );
             }
 
+            // Memory hygiene (cheap): drop timeout / lesson-scaffold pollution from memory*.md
+            {
+                let (files, removed) =
+                    commands::session_search::scrub_polluted_memory_files();
+                if removed > 0 {
+                    tracing::info!(
+                        "Memory hygiene at startup: scrubbed {} entr(y/ies) in {} file(s)",
+                        removed,
+                        files
+                    );
+                }
+            }
+
             // Watch agent and skills directories so file edits are picked up (emit events for frontend).
             agents::watch::spawn_agents_and_skills_watcher();
 
