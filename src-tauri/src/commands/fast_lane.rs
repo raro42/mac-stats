@@ -77,18 +77,26 @@ fn try_instant_reply(q: &str) -> Option<String> {
             | "hi"
             | "hello"
             | "hey"
+            | "hey there"
             | "yo"
             | "sup"
             | "hola"
             | "hallo"
             | "guten tag"
             | "good morning"
+            | "good afternoon"
             | "good evening"
             | "good night"
+            | "gm"
+            | "ga"
+            | "ge"
     ) {
         return Some("Hey — I'm here. What do you need?".to_string());
     }
-    if matches!(n.as_str(), "thanks" | "thank you" | "thx" | "ty" | "danke") {
+    if matches!(
+        n.as_str(),
+        "thanks" | "thank you" | "thx" | "ty" | "danke" | "cheers" | "appreciate it"
+    ) {
         return Some("You're welcome.".to_string());
     }
     if is_wakeup_message_task(&n) {
@@ -319,6 +327,16 @@ commit+push, then reply briefly.";
                 assert!(reply.contains(&crate::config::Config::version()));
             }
             other => panic!("expected Instant, got {:?}", other),
+        }
+    }
+
+    #[test]
+    fn extended_greeting_and_thanks_are_instant() {
+        for q in ["good afternoon", "hey there", "gm", "cheers", "appreciate it"] {
+            assert!(
+                matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),
+                "expected Instant for {q}"
+            );
         }
     }
 

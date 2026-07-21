@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.157] - 2026-07-21
+
+### Changed
+- **Instant lane**: more greetings/thanks (`good afternoon`, `hey there`, `gm`, `cheers`, …) skip the LLM.
+- **Runs insights**: promote-instant candidates also cover time/greeting/thanks turns that left the instant lane.
+- **Telemetry**: `runs.jsonl` appends flush + `sync_data` for crash-safer digester input.
+
 ## [0.1.156] - 2026-07-21
 
 ### Changed

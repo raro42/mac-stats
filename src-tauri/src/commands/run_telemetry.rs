@@ -70,6 +70,9 @@ pub fn record_turn(rec: &TurnRunRecord) {
             if let Err(e) = writeln!(f, "{}", line) {
                 warn!(target: "mac_stats::telemetry", "runs.jsonl write failed: {}", e);
             } else {
+                let _ = f.flush();
+                // Best-effort durability (Hermes-style crash resilience for append-only telemetry).
+                let _ = f.sync_data();
                 debug!(
                     target: "mac_stats::telemetry",
                     request_id = %rec.request_id,

@@ -1086,6 +1086,38 @@ fn classify_candidate(
             request_id: request_id.into(),
         });
     }
+    let looks_time = (q.contains("what time") || q.contains("what's the time") || q == "time")
+        && !q.contains("timezone");
+    let looks_greeting = matches!(
+        q.trim_end_matches(['?', '!', '.']).trim(),
+        "hi" | "hello" | "hey"
+            | "hey there"
+            | "yo"
+            | "sup"
+            | "hola"
+            | "good morning"
+            | "good afternoon"
+            | "good evening"
+            | "gm"
+            | "thanks"
+            | "thank you"
+            | "thx"
+            | "cheers"
+    );
+    if (looks_time || looks_greeting) && lane != "instant" && wall_ms >= 500 {
+        return Some(RunInsightCandidate {
+            kind: "promote_instant".into(),
+            reason: if looks_time {
+                "Time/date ask should stay on instant lane".into()
+            } else {
+                "Greeting/thanks should stay on instant lane".into()
+            },
+            wall_ms,
+            lane: lane.into(),
+            question_preview: question.chars().take(80).collect(),
+            request_id: request_id.into(),
+        });
+    }
     if tools.is_empty() && wall_ms >= 8_000 && lane != "instant" {
         return Some(RunInsightCandidate {
             kind: "slow_zero_tool".into(),
