@@ -28,6 +28,7 @@ SHIPPED_INSTANT_VERSION = datetime(2026, 7, 20, 15, 45, tzinfo=timezone.utc)
 SHIPPED_INSTANT_TIME = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
 SHIPPED_INSTANT_WEATHER = datetime(2026, 7, 20, 21, 0, tzinfo=timezone.utc)
 SHIPPED_GREETING = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
+SHIPPED_INSTANT_WAKEUP = datetime(2026, 7, 21, 4, 30, tzinfo=timezone.utc)
 
 
 def atomic_write_text(path: Path, text: str) -> None:
@@ -110,6 +111,11 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
             return True
     if "version" in ql and "instant version" in hl and ts < SHIPPED_INSTANT_VERSION:
         return True
+    if ts < SHIPPED_INSTANT_WAKEUP and (
+        "wake-up" in ql or "wakeup" in ql or "wake up" in ql
+    ):
+        if "zero-tool" in hl or "instant" in hl or "wake" in hl:
+            return True
     return False
 
 

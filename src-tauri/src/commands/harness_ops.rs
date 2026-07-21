@@ -632,6 +632,7 @@ fn shipped_cutoffs() -> (
     chrono::DateTime<chrono::Utc>,
     chrono::DateTime<chrono::Utc>,
     chrono::DateTime<chrono::Utc>,
+    chrono::DateTime<chrono::Utc>,
 ) {
     use chrono::{TimeZone, Utc};
     (
@@ -639,6 +640,7 @@ fn shipped_cutoffs() -> (
         Utc.with_ymd_and_hms(2026, 7, 20, 14, 0, 0).unwrap(),
         Utc.with_ymd_and_hms(2026, 7, 20, 21, 0, 0).unwrap(),
         Utc.with_ymd_and_hms(2026, 7, 20, 14, 0, 0).unwrap(),
+        Utc.with_ymd_and_hms(2026, 7, 21, 4, 30, 0).unwrap(),
     )
 }
 
@@ -650,7 +652,7 @@ fn is_stale_shipped_candidate(
     let Some(ts) = ts else {
         return false;
     };
-    let (ver, time, weather, greet) = shipped_cutoffs();
+    let (ver, time, weather, greet, wakeup) = shipped_cutoffs();
     let hl = hint.to_lowercase();
     let ql = q.to_lowercase();
     if hl.contains("instant version") && ts < ver {
@@ -671,6 +673,12 @@ fn is_stale_shipped_candidate(
         {
             return true;
         }
+    }
+    if ts < wakeup
+        && (ql.contains("wake-up") || ql.contains("wakeup") || ql.contains("wake up"))
+        && (hl.contains("zero-tool") || hl.contains("instant") || hl.contains("wake"))
+    {
+        return true;
     }
     false
 }
@@ -693,6 +701,9 @@ fn hint_for_run(rec: &serde_json::Value) -> Option<String> {
     {
         if q.contains("version") {
             return Some("Promote to INSTANT version lane".into());
+        }
+        if q.contains("wake-up") || q.contains("wakeup") || q.contains("wake up") {
+            return Some("Promote to INSTANT wake-up / morning greeting lane".into());
         }
         if q.contains("time") || q.contains("uhr") || q.contains("hora") || q.contains("date") {
             return Some("Promote to INSTANT time/date lane".into());

@@ -1,7 +1,7 @@
 //! Fast / lite lanes: cut GPU meta-calls (criteria, topic, plan, verify) for trivial
 //! and pre-routed Discord turns.
 
-use chrono::Local;
+use chrono::{Local, Timelike};
 
 /// How expensive this turn should be.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -91,6 +91,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if matches!(n.as_str(), "thanks" | "thank you" | "thx" | "ty" | "danke") {
         return Some("You're welcome.".to_string());
     }
+    if is_wakeup_message_task(&n) {
+        return Some(format_instant_wakeup_reply());
+    }
     if is_version_question(&n) {
         return Some(format!(
             "I'm **mac-stats v{}**.",
@@ -106,6 +109,34 @@ Do it in the repo, or ask **Cursor Agent** with an explicit path \
         );
     }
     None
+}
+
+fn is_wakeup_message_task(n: &str) -> bool {
+    let has_wakeup = n.contains("wake-up")
+        || n.contains("wakeup")
+        || n.contains("wake up message")
+        || (n.contains("wake up") && n.contains("message"));
+    if !has_wakeup {
+        return false;
+    }
+    // Scheduler-style: "Send wake-up message…" — not "did you wake up early?"
+    n.contains("send")
+        || n.contains("message")
+        || n.contains("need anything")
+        || n.starts_with("wake")
+}
+
+fn format_instant_wakeup_reply() -> String {
+    let now = Local::now();
+    let greeting = match now.hour() {
+        0..=11 => "Good morning",
+        12..=17 => "Good afternoon",
+        _ => "Good evening",
+    };
+    format!(
+        "{greeting}! Hope you're doing well — I'm here if you need anything. ({})",
+        now.format("%H:%M")
+    )
 }
 
 fn is_version_question(n: &str) -> bool {
@@ -252,6 +283,34 @@ mod tests {
             }
             other => panic!("expected Instant, got {:?}", other),
         }
+    }
+
+    #[test]
+    fn wakeup_schedule_task_is_instant() {
+        match classify_turn_lane("Send wake-up message. Need anything else?", None) {
+            TurnLane::Instant { reply } => {
+                let lower = reply.to_lowercase();
+                assert!(
+                    lower.contains("morning")
+                        || lower.contains("afternoon")
+                        || lower.contains("evening"),
+                    "expected daypart greeting: {reply}"
+                );
+                assert!(lower.contains("need") || lower.contains("here"));
+            }
+            other => panic!("expected Instant, got {:?}", other),
+        }
+    }
+
+    #[test]
+    fn casual_wake_up_question_not_instant() {
+        assert!(
+            !matches!(
+                classify_turn_lane("Did you wake up early today?", None),
+                TurnLane::Instant { .. }
+            ),
+            "casual wake-up chat should not be forced instant"
+        );
     }
 
     #[test]
