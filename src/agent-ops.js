@@ -28,6 +28,8 @@
   let opsMemoryCache = [];
   let opsRunsFilterQ = '';
   let opsRunsInsightsCache = null;
+  let opsAgentsFilterQ = '';
+  let opsAgentsCache = [];
 
 // --- Agent Ops (Command Center: overview + detail tabs) ---
 
@@ -75,6 +77,7 @@ function setupAgentOps() {
     ensureOpsSessionFilter();
     ensureOpsMemoryFilter();
     ensureOpsRunsFilter();
+    ensureOpsAgentsFilter();
     if (!agentOpsCollapsed) {
       refreshAgentOps();
       startAgentOpsAutoRefresh();
@@ -172,6 +175,38 @@ function ensureOpsRunsFilter() {
 function runsRowMatchesFilter(haystack) {
     if (!opsRunsFilterQ) return true;
     return String(haystack || '').toLowerCase().includes(opsRunsFilterQ);
+}
+
+function ensureOpsAgentsFilter() {
+    const panel = document.getElementById('ops-panel-agents');
+    if (!panel) return;
+    let input = document.getElementById('ops-agents-filter');
+    if (!input) {
+        const row = document.createElement('div');
+        row.className = 'ops-filter-row';
+        input = document.createElement('input');
+        input.type = 'search';
+        input.id = 'ops-agents-filter';
+        input.className = 'ops-filter-input';
+        input.placeholder = 'Filter agents by name, slug, model…';
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+        row.appendChild(input);
+        const list = document.getElementById('ops-agents-list');
+        if (list) panel.insertBefore(row, list);
+        else panel.insertBefore(row, panel.firstChild);
+    }
+    if (input.dataset.opsBound === '1') return;
+    input.dataset.opsBound = '1';
+    input.addEventListener('input', () => {
+        opsAgentsFilterQ = (input.value || '').trim().toLowerCase();
+        renderOpsAgents(opsAgentsCache);
+    });
+}
+
+function agentsRowMatchesFilter(haystack) {
+    if (!opsAgentsFilterQ) return true;
+    return String(haystack || '').toLowerCase().includes(opsAgentsFilterQ);
 }
 
 function startAgentOpsAutoRefresh() {
@@ -581,7 +616,8 @@ async function refreshAgentOps() {
         renderOverviewKnowledge(memory || []);
         renderOverviewRecent(files || []);
         renderOpsSchedulesTab(schedules || [], deliveries || []);
-        renderOpsAgents(agents || []);
+        opsAgentsCache = agents || [];
+        renderOpsAgents(opsAgentsCache);
         opsLiveCache = live || [];
         opsSessionFilesCache = files || [];
         renderOpsLive(opsLiveCache);
@@ -604,11 +640,21 @@ async function refreshAgentOps() {
 function renderOpsAgents(agents) {
     const list = document.getElementById('ops-agents-list');
     list.innerHTML = '';
-    if (!agents.length) {
+    const all = agents || [];
+    const filtered = all.filter((a) =>
+        agentsRowMatchesFilter(
+            `${a.name || ''} ${a.slug || ''} ${a.id || ''} ${a.model || ''} ${a.enabled ? 'on' : 'off'} ${a.orchestrator ? 'orchestrator' : ''}`
+        )
+    );
+    if (!all.length) {
         list.innerHTML = '<div class="ops-empty">No agents under ~/.mac-stats/agents</div>';
         return;
     }
-    agents.forEach((a) => {
+    if (!filtered.length) {
+        list.innerHTML = '<div class="ops-empty">No agents match filter</div>';
+        return;
+    }
+    filtered.forEach((a) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
