@@ -716,6 +716,8 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(d.schedule_id || 'schedule')}</div><div class="ops-row-meta">${escapeHtml(age)} · ${escapeHtml(summary)}</div></div>`;
                 delList.appendChild(div);
             });
+            const shown = Math.min(8, filtered.length);
+            prependOpsFilterCaption(delList, all.length, shown, opsSchedulesFilterQ);
         }
     }
 }

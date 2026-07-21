@@ -133,7 +133,7 @@ pub fn run_before_compaction_fire_and_forget(
         }
     }
 
-    match std::fs::write(&transcript_path, &body) {
+    match crate::config::write_text_atomic(&transcript_path, &body) {
         Ok(()) => info!(
             target: "mac_stats::compaction",
             "before_compaction wrote {} ({} messages, source={} session_id={} request_id={})",

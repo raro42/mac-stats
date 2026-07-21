@@ -162,6 +162,12 @@
   border-color: color-mix(in srgb, currentColor 40%, transparent);
 }
 
+.ops-filter-caption {
+  padding: 0 4px 8px;
+  opacity: 0.75;
+  font-size: 12px;
+}
+
 .ops-overview-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

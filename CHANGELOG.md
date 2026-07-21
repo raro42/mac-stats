@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.174] - 2026-07-21
+
+### Changed
+- **Agent Ops**: schedule deliveries show filter “N of M” captions; light styling for filter captions.
+- **Compaction**: before-compaction transcript export uses crash-safe `write_text_atomic`.
+
 ## [0.1.173] - 2026-07-21
 
 ### Changed
