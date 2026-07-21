@@ -904,6 +904,64 @@ pub fn looks_like_digest_request(content: &str) -> bool {
     )
 }
 
+/// Normalize operator command text (strip @mention / Werner / please).
+fn normalize_operator_command(content: &str) -> String {
+    let n = content
+        .trim()
+        .trim_start_matches('@')
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_lowercase();
+    n.trim_start_matches("werner")
+        .trim_start_matches(',')
+        .trim()
+        .trim_start_matches("please")
+        .trim()
+        .to_string()
+}
+
+/// True for Hermes-style `/schedules` / `/cron list` — cheap, no Ollama.
+pub fn looks_like_schedules_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    matches!(
+        n.as_str(),
+        "schedules"
+            | "/schedules"
+            | "list schedules"
+            | "show schedules"
+            | "my schedules"
+            | "what's scheduled"
+            | "whats scheduled"
+            | "what is scheduled"
+            | "/cron"
+            | "cron"
+            | "/cron list"
+            | "cron list"
+            | "list cron"
+            | "show cron"
+    )
+}
+
+/// Discord/gateway schedule report: active jobs + newest successful delivery.
+pub fn format_schedules_gateway() -> String {
+    let mut out = crate::scheduler::list_schedules_formatted();
+    if let Some(last) = crate::scheduler::list_scheduler_delivery_awareness()
+        .into_iter()
+        .next()
+    {
+        let preview: String = last.summary.chars().take(80).collect();
+        out.push_str(&format!(
+            "\n\n**Last delivery:** {}\n{}",
+            last.utc, preview
+        ));
+    }
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 fn classify_candidate(
     lane: &str,
     wall_ms: u64,
@@ -1140,6 +1198,15 @@ mod tests {
         assert!(looks_like_digest_request("/digest"));
         assert!(looks_like_digest_request("refresh digest"));
         assert!(!looks_like_digest_request("digest this long research report please"));
+    }
+
+    #[test]
+    fn schedules_request_detected() {
+        assert!(looks_like_schedules_request("/schedules"));
+        assert!(looks_like_schedules_request("/cron list"));
+        assert!(looks_like_schedules_request("list schedules"));
+        assert!(looks_like_schedules_request("@Werner schedules"));
+        assert!(!looks_like_schedules_request("schedule a task for tomorrow"));
     }
 
     #[test]

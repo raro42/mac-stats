@@ -2079,6 +2079,15 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // Hermes `/cron list` parity — cheap schedules report, no Ollama.
+    if crate::commands::harness_ops::looks_like_schedules_request(&content) {
+        let report = crate::commands::harness_ops::format_schedules_gateway();
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send schedules: {}", e);
+        }
+        return;
+    }
+
     // Operator: scrub polluted memory lines (same as periodic compaction hygiene).
     if looks_like_memory_scrub_request(&content) {
         let (files, removed) =
