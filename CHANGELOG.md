@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.140] - 2026-07-21
+
+### Fixed
+- Redmine **not configured** replies now point at `~/.mac-stats/.config.env` / `sync-home-config-env.sh` (ticket reviews short-circuit instead of LLM guessing).
+
 ## [0.1.139] - 2026-07-21
 
 ### Changed

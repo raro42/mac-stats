@@ -788,10 +788,14 @@ pub async fn redmine_api_request(
     body: Option<&str>,
 ) -> Result<String, String> {
     let base_url = get_redmine_url().ok_or_else(|| {
-        "Redmine not configured (REDMINE_URL missing from env or .config.env)".to_string()
+        "Redmine not configured (REDMINE_URL missing from ~/.mac-stats/.config.env or env; \
+run ./scripts/sync-home-config-env.sh then restart mac-stats)"
+            .to_string()
     })?;
     let api_key = get_redmine_api_key().ok_or_else(|| {
-        "Redmine not configured (REDMINE_API_KEY missing from env or .config.env)".to_string()
+        "Redmine not configured (REDMINE_API_KEY missing from ~/.mac-stats/.config.env or env; \
+run ./scripts/sync-home-config-env.sh then restart mac-stats)"
+            .to_string()
     })?;
 
     let path = path.trim();

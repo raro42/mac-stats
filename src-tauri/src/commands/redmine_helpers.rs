@@ -135,7 +135,8 @@ pub(crate) fn grounded_redmine_time_entries_failure_reply(
         || failure_lower.contains("redmine_url missing")
         || failure_lower.contains("redmine_api_key missing")
     {
-        "Redmine is not configured on this machine."
+        "Redmine is not configured (need REDMINE_URL + REDMINE_API_KEY in ~/.mac-stats/.config.env; \
+run ./scripts/sync-home-config-env.sh and restart)."
     } else if failure_lower.contains("invalid url") {
         "the configured Redmine URL is invalid."
     } else if failure_lower.contains("dns")
@@ -156,6 +157,24 @@ pub(crate) fn grounded_redmine_time_entries_failure_reply(
         format_redmine_time_entries_period(question),
         blocker
     ))
+}
+
+/// Short-circuit when REDMINE_API fails because keys are missing (any Redmine ask).
+pub(crate) fn grounded_redmine_config_failure_reply(text: &str) -> Option<String> {
+    let failure = extract_redmine_failure_message(text)?;
+    let fl = failure.to_lowercase();
+    if !(fl.contains("redmine not configured")
+        || fl.contains("redmine_url missing")
+        || fl.contains("redmine_api_key missing"))
+    {
+        return None;
+    }
+    Some(
+        "Redmine is not configured for this install. Add `REDMINE_URL` and `REDMINE_API_KEY` to \
+`~/.mac-stats/.config.env` (or run `./scripts/sync-home-config-env.sh` from the mac-stats repo), \
+then restart mac-stats. No Redmine data was fetched."
+            .to_string(),
+    )
 }
 
 pub(crate) fn is_grounded_redmine_time_entries_blocked_reply(
@@ -329,6 +348,15 @@ mod tests {
         assert!(reply.contains("configured Redmine host could not be resolved"));
         assert!(reply.contains("No Redmine data was fetched"));
         assert!(!reply.contains("no time entries were found"));
+    }
+
+    #[test]
+    fn grounded_redmine_config_failure_reply_points_at_home_config() {
+        let text = "Redmine API failed: Redmine not configured (REDMINE_URL missing from ~/.mac-stats/.config.env or env). Answer without this result.";
+        let reply = grounded_redmine_config_failure_reply(text).expect("expected config reply");
+        assert!(reply.contains("~/.mac-stats/.config.env"));
+        assert!(reply.contains("sync-home-config-env"));
+        assert!(reply.contains("No Redmine data was fetched"));
     }
 
     #[test]

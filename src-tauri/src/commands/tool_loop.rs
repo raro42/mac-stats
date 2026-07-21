@@ -16,6 +16,7 @@ use crate::commands::loop_guard::{ToolLoopAfterResult, ToolLoopGuard};
 use crate::commands::ollama_chat::{send_ollama_chat_messages_with_tools, OllamaHttpQueue};
 use crate::commands::redmine_helpers::{
     extract_redmine_time_entries_summary_for_reply, grounded_redmine_time_entries_failure_reply,
+    grounded_redmine_config_failure_reply,
     question_explicitly_requests_json,
 };
 use crate::commands::reply_helpers::final_reply_from_tool_results;
@@ -784,6 +785,11 @@ pub(crate) async fn run_tool_loop(
             grounded_redmine_time_entries_failure_reply(&params.question, &user_message)
         {
             info!("Agent router: returning grounded Redmine blocked-state reply");
+            response_content = blocked_reply;
+            break;
+        }
+        if let Some(blocked_reply) = grounded_redmine_config_failure_reply(&user_message) {
+            info!("Agent router: returning grounded Redmine not-configured reply");
             response_content = blocked_reply;
             break;
         }
