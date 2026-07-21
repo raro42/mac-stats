@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.141] - 2026-07-21
+
+### Changed
+- Redmine config read prefers `~/.mac-stats/.config.env` (LaunchAgent-safe) before cwd; Agent Ops Redmine card gets status border colors.
+
 ## [0.1.140] - 2026-07-21
 
 ### Fixed

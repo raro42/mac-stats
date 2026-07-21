@@ -101,7 +101,7 @@ fn read_key_from_file(path: &Path, key_names: &[&str]) -> Option<String> {
     None
 }
 
-/// Search env vars, then `.config.env` / `.env.config` in cwd, src-tauri, ~/.mac-stats.
+/// Search env vars, then `~/.mac-stats/.config.env` (LaunchAgent), then cwd / src-tauri.
 fn read_config(env_name: &str, file_keys: &[&str]) -> Option<String> {
     if let Ok(v) = std::env::var(env_name) {
         let v = v.trim().to_string();
@@ -109,15 +109,18 @@ fn read_config(env_name: &str, file_keys: &[&str]) -> Option<String> {
             return Some(v);
         }
     }
+    let home_cfg = std::env::var("HOME")
+        .ok()
+        .map(|h| Path::new(&h).join(".mac-stats").join(".config.env"));
+    let cwd = std::env::current_dir().ok();
     let candidates: Vec<std::path::PathBuf> = [
-        std::env::current_dir().ok().map(|d| d.join(".config.env")),
-        std::env::current_dir().ok().map(|d| d.join(".env.config")),
-        std::env::current_dir()
-            .ok()
-            .map(|d| d.join("..").join(".env.config")),
-        std::env::var("HOME")
-            .ok()
-            .map(|h| Path::new(&h).join(".mac-stats").join(".config.env")),
+        home_cfg,
+        cwd.as_ref().map(|d| d.join(".config.env")),
+        cwd.as_ref().map(|d| d.join(".env.config")),
+        cwd.as_ref().map(|d| d.join("src-tauri").join(".config.env")),
+        cwd.as_ref()
+            .map(|d| d.join("..").join("src-tauri").join(".config.env")),
+        cwd.as_ref().map(|d| d.join("..").join(".env.config")),
     ]
     .into_iter()
     .flatten()

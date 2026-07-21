@@ -52,6 +52,18 @@
   min-height: 58px;
 }
 
+.ops-health-card.ops-health-ok {
+  border-color: rgba(76, 175, 80, 0.45);
+}
+
+.ops-health-card.ops-health-warn {
+  border-color: rgba(255, 180, 0, 0.5);
+}
+
+.ops-health-card.ops-health-bad {
+  border-color: rgba(255, 80, 80, 0.5);
+}
+
 .ops-health-label {
   font-size: 10px;
   text-transform: uppercase;

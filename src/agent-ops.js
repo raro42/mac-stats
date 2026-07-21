@@ -151,7 +151,7 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
     const readyMatch = dg.match(/last Ready\s+([^·]+)/i);
     setText('ops-health-discord', readyMatch ? readyMatch[1].trim() : dg ? 'see Runs' : '—');
 
-    if (redmine) {
+        if (redmine) {
         const st = String(redmine.status || '').toLowerCase();
         const msg = String(redmine.message || '').trim();
         let text = '—';
@@ -160,7 +160,16 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         else if (st) text = msg ? `${st}: ${msg}`.slice(0, 36) : st;
         setText('ops-health-redmine', text);
         const el = document.getElementById('ops-health-redmine');
-        if (el) el.title = msg || st || '';
+        if (el) {
+            el.title = msg || st || '';
+            const card = el.closest('.ops-health-card');
+            if (card) {
+                card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+                if (st === 'ok') card.classList.add('ops-health-ok');
+                else if (st === 'notconfigured' || st === 'degraded') card.classList.add('ops-health-warn');
+                else if (st === 'unavailable') card.classList.add('ops-health-bad');
+            }
+        }
     }
 
     setText('ops-health-schedule', fmtScheduleEta(sched));
