@@ -287,6 +287,8 @@ pub(crate) async fn run_tool_loop(
     let verbosity = crate::logging::VERBOSITY.load(std::sync::atomic::Ordering::Relaxed);
     let mut state = ToolLoopState::new(params.loop_detection.clone());
     let mut response_content = initial_response;
+    // Native tool_calls from the assistant turn that produced response_content (for next push).
+    let mut pending_assistant_tool_calls: Option<Vec<crate::ollama::OllamaToolCall>> = None;
     if let Some(ref cap) = params.partial_progress_capture {
         cap.set_last_assistant_text(&response_content);
     }
@@ -823,7 +825,11 @@ pub(crate) async fn run_tool_loop(
                 &response_content,
             ),
             images: None,
-            tool_calls: None
+            tool_calls: if params.native_tool_schemas.is_some() {
+                pending_assistant_tool_calls.take()
+            } else {
+                None
+            },
         });
         // Native Ollama/OpenAI tools expect role "tool" for results (OpenClaw/Hermes fidelity).
         // Text-line mode keeps role "user"; RUN_CMD raw dumps stay "system".
@@ -956,6 +962,11 @@ pub(crate) async fn run_tool_loop(
             }
         };
         response_content = follow_up.message.content.clone();
+        if params.native_tool_schemas.is_some() {
+            pending_assistant_tool_calls = follow_up.message.tool_calls.clone();
+        } else {
+            pending_assistant_tool_calls = None;
+        }
         if let Some(ref cap) = params.partial_progress_capture {
             cap.set_last_assistant_text(&response_content);
         }

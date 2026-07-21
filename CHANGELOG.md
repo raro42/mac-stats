@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.154] - 2026-07-21
+
+### Changed
+- **Native tool loop**: keep structured `tool_calls` on follow-up assistant turns when native schemas are enabled (pairs with role `tool` results).
+
+### Added
+- **Agent Ops Knowledge filter**: search memory/soul files by name/kind.
+
 ## [0.1.153] - 2026-07-21
 
 ### Changed

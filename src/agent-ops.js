@@ -24,6 +24,8 @@
   let opsSessionFilterQ = '';
   let opsLiveCache = [];
   let opsSessionFilesCache = [];
+  let opsMemoryFilterQ = '';
+  let opsMemoryCache = [];
 
 // --- Agent Ops (Command Center: overview + detail tabs) ---
 
@@ -69,6 +71,7 @@ function setupAgentOps() {
     document.getElementById('ops-digest-refresh-btn')?.addEventListener('click', () => refreshOpsDigest());
     document.getElementById('ops-session-load-chat')?.addEventListener('click', () => loadOpsSessionIntoChat());
     ensureOpsSessionFilter();
+    ensureOpsMemoryFilter();
     if (!agentOpsCollapsed) {
       refreshAgentOps();
       startAgentOpsAutoRefresh();
@@ -104,6 +107,36 @@ function ensureOpsSessionFilter() {
 function sessionRowMatchesFilter(haystack) {
     if (!opsSessionFilterQ) return true;
     return String(haystack || '').toLowerCase().includes(opsSessionFilterQ);
+}
+
+function ensureOpsMemoryFilter() {
+    const panel = document.getElementById('ops-panel-memory');
+    if (!panel) return;
+    let input = document.getElementById('ops-memory-filter');
+    if (!input) {
+        const row = document.createElement('div');
+        row.className = 'ops-filter-row';
+        input = document.createElement('input');
+        input.type = 'search';
+        input.id = 'ops-memory-filter';
+        input.className = 'ops-filter-input';
+        input.placeholder = 'Filter knowledge files…';
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+        row.appendChild(input);
+        panel.insertBefore(row, panel.firstChild);
+    }
+    if (input.dataset.opsBound === '1') return;
+    input.dataset.opsBound = '1';
+    input.addEventListener('input', () => {
+        opsMemoryFilterQ = (input.value || '').trim().toLowerCase();
+        renderOpsMemory(opsMemoryCache);
+    });
+}
+
+function memoryRowMatchesFilter(haystack) {
+    if (!opsMemoryFilterQ) return true;
+    return String(haystack || '').toLowerCase().includes(opsMemoryFilterQ);
 }
 
 function startAgentOpsAutoRefresh() {
@@ -518,7 +551,8 @@ async function refreshAgentOps() {
         opsSessionFilesCache = files || [];
         renderOpsLive(opsLiveCache);
         renderOpsSessionFiles(opsSessionFilesCache);
-        renderOpsMemory(memory || []);
+        opsMemoryCache = memory || [];
+        renderOpsMemory(opsMemoryCache);
         renderOpsRuns(insights);
     } catch (err) {
         console.warn('[Agent Ops]', err);
@@ -760,11 +794,19 @@ function renderOpsMemory(files) {
     const preview = document.getElementById('ops-memory-preview');
     el.innerHTML = '';
     preview.hidden = true;
-    if (!files.length) {
+    const all = files || [];
+    const filtered = all.filter((f) =>
+        memoryRowMatchesFilter(`${f.name || ''} ${f.kind || ''} ${f.path || ''}`)
+    );
+    if (!all.length) {
         el.innerHTML = '<div class="ops-empty">No memory/soul files</div>';
         return;
     }
-    files.forEach((f) => {
+    if (!filtered.length) {
+        el.innerHTML = '<div class="ops-empty">No knowledge files match filter</div>';
+        return;
+    }
+    filtered.forEach((f) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
