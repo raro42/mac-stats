@@ -30,6 +30,9 @@
   let opsRunsInsightsCache = null;
   let opsAgentsFilterQ = '';
   let opsAgentsCache = [];
+  let opsSchedulesFilterQ = '';
+  let opsSchedulesCache = [];
+  let opsDeliveriesCache = [];
 
 // --- Agent Ops (Command Center: overview + detail tabs) ---
 
@@ -78,6 +81,7 @@ function setupAgentOps() {
     ensureOpsMemoryFilter();
     ensureOpsRunsFilter();
     ensureOpsAgentsFilter();
+    ensureOpsSchedulesFilter();
     if (!agentOpsCollapsed) {
       refreshAgentOps();
       startAgentOpsAutoRefresh();
@@ -207,6 +211,40 @@ function ensureOpsAgentsFilter() {
 function agentsRowMatchesFilter(haystack) {
     if (!opsAgentsFilterQ) return true;
     return String(haystack || '').toLowerCase().includes(opsAgentsFilterQ);
+}
+
+function ensureOpsSchedulesFilter() {
+    const panel = document.getElementById('ops-panel-schedules');
+    if (!panel) return;
+    let input = document.getElementById('ops-schedules-filter');
+    if (!input) {
+        const row = document.createElement('div');
+        row.className = 'ops-filter-row';
+        input = document.createElement('input');
+        input.type = 'search';
+        input.id = 'ops-schedules-filter';
+        input.className = 'ops-filter-input';
+        input.placeholder = 'Filter schedules + deliveries…';
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+        row.appendChild(input);
+        const list = document.getElementById('ops-schedules-list');
+        const sub = panel.querySelector('.ops-subhead');
+        if (sub) panel.insertBefore(row, sub);
+        else if (list) panel.insertBefore(row, list);
+        else panel.insertBefore(row, panel.firstChild);
+    }
+    if (input.dataset.opsBound === '1') return;
+    input.dataset.opsBound = '1';
+    input.addEventListener('input', () => {
+        opsSchedulesFilterQ = (input.value || '').trim().toLowerCase();
+        renderOpsSchedulesTab(opsSchedulesCache, opsDeliveriesCache);
+    });
+}
+
+function schedulesRowMatchesFilter(haystack) {
+    if (!opsSchedulesFilterQ) return true;
+    return String(haystack || '').toLowerCase().includes(opsSchedulesFilterQ);
 }
 
 function startAgentOpsAutoRefresh() {
@@ -548,10 +586,19 @@ function renderOpsSchedulesTab(schedules, deliveries) {
     const delList = document.getElementById('ops-deliveries-list');
     if (list) {
         list.innerHTML = '';
-        if (!schedules || !schedules.length) {
+        const all = schedules || [];
+        const filtered = all.filter((s) => {
+            const when = s.cron ? `cron ${s.cron}` : s.at ? `at ${s.at}` : '';
+            return schedulesRowMatchesFilter(
+                `${s.id || ''} ${when} ${s.next_run || s.nextRun || ''} ${s.task || ''}`
+            );
+        });
+        if (!all.length) {
             list.innerHTML = '<div class="ops-empty">No schedules</div>';
+        } else if (!filtered.length) {
+            list.innerHTML = '<div class="ops-empty">No schedules match filter</div>';
         } else {
-            schedules.forEach((s) => {
+            filtered.forEach((s) => {
                 const div = document.createElement('div');
                 div.className = 'ops-row';
                 const id = s.id || '(no id)';
@@ -565,10 +612,16 @@ function renderOpsSchedulesTab(schedules, deliveries) {
     }
     if (delList) {
         delList.innerHTML = '';
-        if (!deliveries || !deliveries.length) {
+        const all = deliveries || [];
+        const filtered = all.filter((d) =>
+            schedulesRowMatchesFilter(`${d.schedule_id || ''} ${d.summary || ''} ${d.utc || ''}`)
+        );
+        if (!all.length) {
             delList.innerHTML = '<div class="ops-empty">No deliveries yet</div>';
+        } else if (!filtered.length) {
+            delList.innerHTML = '<div class="ops-empty">No deliveries match filter</div>';
         } else {
-            deliveries.slice(0, 8).forEach((d) => {
+            filtered.slice(0, 8).forEach((d) => {
                 const div = document.createElement('div');
                 div.className = 'ops-row';
                 const t = d.utc ? Date.parse(d.utc) : NaN;
@@ -615,7 +668,9 @@ async function refreshAgentOps() {
         renderOverviewLive(live || []);
         renderOverviewKnowledge(memory || []);
         renderOverviewRecent(files || []);
-        renderOpsSchedulesTab(schedules || [], deliveries || []);
+        opsSchedulesCache = schedules || [];
+        opsDeliveriesCache = deliveries || [];
+        renderOpsSchedulesTab(opsSchedulesCache, opsDeliveriesCache);
         opsAgentsCache = agents || [];
         renderOpsAgents(opsAgentsCache);
         opsLiveCache = live || [];
