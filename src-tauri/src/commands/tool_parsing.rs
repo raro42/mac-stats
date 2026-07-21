@@ -5,7 +5,8 @@
 //! Hermes/Qwen JSON `<tool_call>`, Qwen3-Coder `<function=`, GLM `<arg_key>`,
 //! Kimi K2 `<|tool_call_begin|>`, DeepSeek `tool▁call` unicode tokens,
 //! Llama `<|python_tag|>` / bare `{"name","arguments"}` JSON,
-//! Longcat `<longcat_tool_call>`, numbered lists, inline chains with "then"/"and"/";", etc.
+//! Longcat `<longcat_tool_call>`, Mistral `[TOOL_CALLS]`,
+//! numbered lists, inline chains with "then"/"and"/";", etc.
 
 use crate::commands::tool_registry::{
     inline_tool_chain_regex, map_scheduler_alias, tool_line_prefixes,
@@ -346,7 +347,7 @@ pub(crate) fn parse_all_tools_from_response(content: &str) -> Vec<(String, Strin
     out
 }
 
-/// Expand vendor tool-call markup (DeepSeek → Kimi → Qwen3 → GLM → Longcat → Hermes → Llama JSON).
+/// Expand vendor tool-call markup (… → Longcat → Hermes → Mistral → Llama JSON).
 fn expand_model_tool_call_xml(content: &str) -> String {
     let deepseek = expand_deepseek_tool_call_xml(content);
     let kimi = expand_kimi_k2_tool_call_xml(&deepseek);
@@ -354,7 +355,106 @@ fn expand_model_tool_call_xml(content: &str) -> String {
     let glm = expand_glm_arg_key_tool_call_xml(&qwen);
     let longcat = expand_longcat_tool_call_xml(&glm);
     let hermes = expand_hermes_tool_call_xml(&longcat);
-    expand_llama_json_tool_calls(&hermes)
+    let mistral = expand_mistral_tool_calls(&hermes);
+    expand_llama_json_tool_calls(&mistral)
+}
+
+/// Mistral: `[TOOL_CALLS]` then either a JSON array/object (pre-v11) or `name{args}` (v11+).
+fn expand_mistral_tool_calls(content: &str) -> String {
+    const BOT: &str = "[TOOL_CALLS]";
+    if !content.contains(BOT) {
+        return content.to_string();
+    }
+    let mut parts = content.split(BOT);
+    let preamble = parts.next().unwrap_or("").trim_end();
+    let raw_parts: Vec<&str> = parts.collect();
+    if raw_parts.is_empty() {
+        return content.to_string();
+    }
+
+    let first_raw = raw_parts[0].trim();
+    let is_pre_v11 = first_raw.starts_with('[') || first_raw.starts_with('{');
+    let mut tool_lines: Vec<String> = Vec::new();
+
+    if is_pre_v11 {
+        if let Some(lines) = mistral_parse_pre_v11(first_raw) {
+            tool_lines.extend(lines);
+        }
+    } else {
+        for raw in &raw_parts {
+            let raw = raw.trim();
+            if raw.is_empty() || !raw.contains('{') {
+                continue;
+            }
+            if let Some(line) = mistral_parse_v11_segment(raw) {
+                tool_lines.push(line);
+            }
+        }
+    }
+
+    if tool_lines.is_empty() {
+        return content.to_string();
+    }
+
+    let mut out = String::new();
+    if !preamble.is_empty() {
+        out.push_str(preamble);
+        out.push('\n');
+    }
+    for line in &tool_lines {
+        out.push_str(line);
+        out.push('\n');
+    }
+    out
+}
+
+fn mistral_parse_v11_segment(raw: &str) -> Option<String> {
+    let brace = raw.find('{')?;
+    let name = raw[..brace].trim();
+    if name.is_empty() {
+        return None;
+    }
+    let args_raw = raw[brace..].trim();
+    let (args_val, _) = json_raw_decode(args_raw)?;
+    let tool = resolve_hermes_tool_name(name)?;
+    let arg = hermes_args_to_arg_string(&args_val);
+    Some(format!("{tool}: {arg}"))
+}
+
+fn mistral_parse_pre_v11(raw: &str) -> Option<Vec<String>> {
+    if let Ok(v) = serde_json::from_str::<serde_json::Value>(raw) {
+        let arr = match v {
+            serde_json::Value::Array(a) => a,
+            serde_json::Value::Object(_) => vec![v],
+            _ => return None,
+        };
+        let mut lines = Vec::new();
+        for item in arr {
+            if let Some(line) = llama_json_object_to_tool_line(&item) {
+                lines.push(line);
+            }
+        }
+        return if lines.is_empty() { None } else { Some(lines) };
+    }
+    // Fallback: decode successive JSON objects in the blob.
+    let mut lines = Vec::new();
+    let mut search = 0usize;
+    while let Some(rel) = raw[search..].find('{') {
+        let start = search + rel;
+        let Some((val, consumed)) = json_raw_decode(&raw[start..]) else {
+            search = start + 1;
+            continue;
+        };
+        if let Some(line) = llama_json_object_to_tool_line(&val) {
+            lines.push(line);
+        }
+        search = start + consumed;
+    }
+    if lines.is_empty() {
+        None
+    } else {
+        Some(lines)
+    }
 }
 
 /// Longcat Flash: same JSON body as Hermes, tags `<longcat_tool_call>` instead of `<tool_call>`.
@@ -1573,6 +1673,30 @@ mod tests {
         let t = parse_tool_from_response(content).unwrap();
         assert_eq!(t.0, "FETCH_URL");
         assert_eq!(t.1, "https://example.com");
+    }
+
+    #[test]
+    fn mistral_tool_calls_pre_v11_array() {
+        let content = r#"Looking up.
+[TOOL_CALLS][{"name": "brave_search", "arguments": {"query": "El Masnou weather"}}]
+"#;
+        let tools = parse_all_tools_from_response(content);
+        assert_eq!(tools.len(), 1, "{tools:?}");
+        assert_eq!(tools[0].0, "BRAVE_SEARCH");
+        assert_eq!(tools[0].1, "El Masnou weather");
+    }
+
+    #[test]
+    fn mistral_tool_calls_v11_name_json() {
+        let content = r#"Sure.
+[TOOL_CALLS]FETCH_URL{"url": "https://example.com"}[TOOL_CALLS]brave_search{"query": "mac-stats"}
+"#;
+        let tools = parse_all_tools_from_response(content);
+        assert!(tools.len() >= 2, "{tools:?}");
+        assert_eq!(tools[0].0, "FETCH_URL");
+        assert_eq!(tools[0].1, "https://example.com");
+        assert_eq!(tools[1].0, "BRAVE_SEARCH");
+        assert_eq!(tools[1].1, "mac-stats");
     }
 
     #[test]
