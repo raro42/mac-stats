@@ -204,7 +204,7 @@ pgrep -f mac_stats >/dev/null || open -a mac-stats
 
 ## Updating ~/.mac-stats from defaults
 - When asked to update MD files or agents inside `.mac-stats`, or to sync repo defaults into `~/.mac-stats`: **merge** default content into existing files; **do not overwrite**.
-- Add missing sections, new agents, or new bullets; preserve the user’s existing content. See `docs/024_mac_stats_merge_defaults.md`.
+- Add missing sections, new agents, or new bullets; preserve the user’s existing content. See `docs/design/024_mac_stats_merge_defaults.md`.
 
 ## When Uncertain
 - Ask for the exact macOS version and target (Dev vs notarized distribution).
@@ -249,9 +249,9 @@ Use the provided measurement script to track performance metrics:
    ```
 
 2. **Implement Optimizations**:
-   - See `docs/001_task_optimize_backend.md` (backend)
-   - See `docs/002_task_optimize_frontend.md` (frontend)
-   - See `docs/003_task_optimize_advanced_idle.md` (advanced)
+   - See `docs/design/001_task_optimize_backend.md` (backend)
+   - See `docs/design/002_task_optimize_frontend.md` (frontend)
+   - See `docs/design/003_task_optimize_advanced_idle.md` (advanced)
 
 3. **Measure After Each Phase**:
    ```bash

@@ -478,7 +478,7 @@ Agent-facing backlog for mac-stats. Pick an open row, implement, run `cargo chec
 
 ## Open / deferred (no owner)
 
-Large integrations and vague items stay in **docs/006_roadmap_ai_tasks.md** and per-doc “Future/backlog” sections (Mail, WhatsApp, Google Docs, parallel tool loop, etc.) until scoped.
+Large integrations and vague items stay in **docs/design/006_roadmap_ai_tasks.md** and per-doc “Future/backlog” sections (Mail, WhatsApp, Google Docs, parallel tool loop, etc.) until scoped.
 
 ## When empty
 

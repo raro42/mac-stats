@@ -74,15 +74,48 @@ jobs:
         working-directory: ./src-tauri
         run: cargo tauri build --bundles dmg
 
+      - name: Notarize DMG (optional)
+        id: notarize
+        if: steps.check-secrets.outputs.has_signing == 'true'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        run: |
+          chmod +x scripts/notarize-dmg.sh
+          DMG=$(ls -1 src-tauri/target/release/bundle/dmg/*.dmg | head -1)
+          if [ -z "$APPLE_ID" ] || [ -z "$APPLE_TEAM_ID" ] || [ -z "$APPLE_APP_SPECIFIC_PASSWORD" ]; then
+            echo "Signing cert present but notary credentials missing — skipping notarization"
+            echo "notarized=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          ./scripts/notarize-dmg.sh "$DMG"
+          echo "notarized=true" >> "$GITHUB_OUTPUT"
+
       - name: Upload DMG to release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: |
-            Release ${{ github.ref_name }}
-            
-            See [CHANGELOG.md](https://github.com/raro42/mac-stats/blob/main/CHANGELOG.md) for details.
+            ## mac-stats ${{ github.ref_name }}
+
+            **Apple Silicon (arm64) only.** See [CHANGELOG.md](https://github.com/raro42/mac-stats/blob/main/CHANGELOG.md).
+
+            ### Install
+            ```bash
+            brew tap raro42/mac-stats https://github.com/raro42/mac-stats
+            brew install --cask mac-stats
+            ```
+            Or open the DMG and drag **mac-stats** to Applications.
+
+            ### Gatekeeper / notarization
+            When CI has Apple notary credentials, this DMG is **signed and notarized for macOS Sequoia+**.
+            If Gatekeeper still blocks an older unsigned build: Right-click → **Open** (see [docs/NOTARIZATION.md](https://github.com/raro42/mac-stats/blob/main/docs/NOTARIZATION.md)).
+
+            ### Requirements
+            - [Ollama](https://ollama.com) + a pulled model (`ollama pull llama3.2`)
+            - Quick start: [docs/QUICKSTART.md](https://github.com/raro42/mac-stats/blob/main/docs/QUICKSTART.md)
           files: src-tauri/target/release/bundle/dmg/*.dmg
           overwrite_files: true
           fail_on_unmatched_files: false

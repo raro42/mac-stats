@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.143] - 2026-07-21
+
+### Added
+- **Adoption**: Homebrew cask (`Casks/mac-stats.rb`), README Requirements + Quick Start + screenshots, `docs/QUICKSTART.md` / `CONFIG.md`, design docs under `docs/design/`.
+- **CI** workflow badge target; release notes template covers Homebrew + Gatekeeper/notarization.
+- **First-launch tip** and **GitHub Releases update banner** in the CPU window.
+- Notarization script + docs (`scripts/notarize-dmg.sh`, `docs/NOTARIZATION.md`); optional CI notarize when Apple secrets exist.
+
 ## [0.1.142] - 2026-07-21
 
 ### Changed

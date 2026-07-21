@@ -264,9 +264,9 @@ Before implementing optimizations:
 ### 2. Implement Optimizations
 
 See optimization documentation:
-- `docs/001_task_optimize_backend.md`
-- `docs/002_task_optimize_frontend.md`
-- `docs/003_task_optimize_advanced_idle.md`
+- `docs/design/001_task_optimize_backend.md`
+- `docs/design/002_task_optimize_frontend.md`
+- `docs/design/003_task_optimize_advanced_idle.md`
 
 ```bash
 # After making changes:
@@ -410,7 +410,7 @@ Use these scripts alongside the optimization documentation:
 
 1. Read optimization summary: `docs/000_task_optimize_summary.md`
 2. Take baseline measurement: `./scripts/measure_performance.sh 30 1 window`
-3. Implement optimizations from `docs/001_task_optimize_backend.md`, etc.
+3. Implement optimizations from `docs/design/001_task_optimize_backend.md`, etc.
 4. Measure after each phase: `./scripts/measure_performance.sh 30 1 window`
 5. Track progress using the task docs in `docs/` (000, 001, 002)
 

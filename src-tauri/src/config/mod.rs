@@ -3235,7 +3235,7 @@ impl Config {
 
     /// Merge default content into existing: append any default paragraph whose first-line key
     /// is not present in existing. Preserves user content; adds new sections from defaults.
-    /// See docs/024_mac_stats_merge_defaults.md.
+    /// See docs/design/024_mac_stats_merge_defaults.md.
     fn merge_prompt_content(existing: &str, default: &str) -> String {
         let existing_trim = existing.trim();
         let default_trim = default.trim();

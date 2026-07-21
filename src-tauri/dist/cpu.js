@@ -907,13 +907,160 @@ if (document.readyState === "loading") {
 
   document.addEventListener("DOMContentLoaded", () => {
     // Fetch version once at startup (no polling)
-    fetchAppVersion();
+    fetchAppVersion().then((v) => {
+      showFirstLaunchTip();
+      checkForAppUpdate(v);
+    });
     initRingGauges();
     init();
   });
 } else {
+  showFirstLaunchTip();
+  (async () => {
+    try {
+      const inv = typeof getInvoke === "function" ? getInvoke() : null;
+      if (inv) {
+        const v = await inv("get_app_version");
+        checkForAppUpdate(v);
+      }
+    } catch (_) {}
+  })();
   initRingGauges();
   init();
+}
+
+/** Non-intrusive first-open tip: where config lives + Ollama requirement. */
+function showFirstLaunchTip() {
+  try {
+    if (localStorage.getItem("mac_stats_first_launch_tip_v1") === "1") return;
+  } catch (_) {
+    return;
+  }
+  if (document.getElementById("mac-stats-first-launch-tip")) return;
+
+  const style = document.createElement("style");
+  style.textContent = `
+    #mac-stats-first-launch-tip, #mac-stats-update-banner {
+      position: sticky; top: 0; z-index: 9999;
+      display: flex; align-items: flex-start; gap: 10px;
+      margin: 0; padding: 10px 12px;
+      font: 12px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      color: #1d1d1f; background: rgba(255,255,255,0.92);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    }
+    #mac-stats-update-banner { background: rgba(0,122,255,0.12); color: #003d99; }
+    #mac-stats-first-launch-tip code, #mac-stats-update-banner code {
+      font-size: 11px; padding: 1px 4px; border-radius: 3px;
+      background: rgba(0,0,0,0.06);
+    }
+    #mac-stats-first-launch-tip .tip-body, #mac-stats-update-banner .tip-body { flex: 1; }
+    #mac-stats-first-launch-tip button, #mac-stats-update-banner button {
+      flex-shrink: 0; border: none; background: transparent;
+      cursor: pointer; font-size: 16px; line-height: 1; opacity: 0.55; padding: 0 2px;
+    }
+    #mac-stats-first-launch-tip button:hover, #mac-stats-update-banner button:hover { opacity: 1; }
+    #mac-stats-update-banner a { color: inherit; font-weight: 600; }
+  `;
+  document.head.appendChild(style);
+
+  const tip = document.createElement("div");
+  tip.id = "mac-stats-first-launch-tip";
+  tip.setAttribute("role", "status");
+  tip.innerHTML = `
+    <div class="tip-body">
+      <strong>Welcome.</strong> Settings &amp; logs: <code>~/.mac-stats/</code>
+      · AI chat needs <strong>Ollama</strong> running locally with a model
+      (e.g. <code>ollama pull llama3.2</code>).
+    </div>
+    <button type="button" title="Dismiss" aria-label="Dismiss">×</button>
+  `;
+  tip.querySelector("button").addEventListener("click", () => {
+    try {
+      localStorage.setItem("mac_stats_first_launch_tip_v1", "1");
+    } catch (_) {}
+    tip.remove();
+  });
+  document.body.prepend(tip);
+}
+
+function parseSemverParts(v) {
+  const s = String(v || "").replace(/^v/i, "").split(/[+-]/)[0];
+  return s.split(".").map((n) => parseInt(n, 10) || 0);
+}
+
+function isNewerVersion(latest, current) {
+  const a = parseSemverParts(latest);
+  const b = parseSemverParts(current);
+  const len = Math.max(a.length, b.length);
+  for (let i = 0; i < len; i++) {
+    const x = a[i] || 0;
+    const y = b[i] || 0;
+    if (x > y) return true;
+    if (x < y) return false;
+  }
+  return false;
+}
+
+/** Lightweight GitHub Releases check (once per day). */
+async function checkForAppUpdate(currentVersion) {
+  if (!currentVersion || currentVersion === "unknown") return;
+  try {
+    const dayKey = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem("mac_stats_update_checked_day") === dayKey) return;
+    localStorage.setItem("mac_stats_update_checked_day", dayKey);
+  } catch (_) {
+    return;
+  }
+
+  let latestTag = null;
+  let htmlUrl = "https://github.com/raro42/mac-stats/releases/latest";
+  try {
+    const res = await fetch(
+      "https://api.github.com/repos/raro42/mac-stats/releases/latest",
+      { headers: { Accept: "application/vnd.github+json" } }
+    );
+    if (!res.ok) return;
+    const data = await res.json();
+    latestTag = data.tag_name || data.name;
+    if (data.html_url) htmlUrl = data.html_url;
+  } catch (err) {
+    console.debug("Update check skipped:", err);
+    return;
+  }
+  if (!latestTag || !isNewerVersion(latestTag, currentVersion)) return;
+
+  const dismissKey = `mac_stats_update_dismissed_${latestTag}`;
+  try {
+    if (localStorage.getItem(dismissKey) === "1") return;
+  } catch (_) {}
+
+  if (document.getElementById("mac-stats-update-banner")) return;
+  const banner = document.createElement("div");
+  banner.id = "mac-stats-update-banner";
+  banner.setAttribute("role", "status");
+  banner.innerHTML = `
+    <div class="tip-body">
+      Update available: <strong>${latestTag}</strong> (you have v${currentVersion}).
+      <a href="${htmlUrl}" target="_blank" rel="noopener">Release notes</a>
+      · <code>brew upgrade --cask mac-stats</code>
+    </div>
+    <button type="button" title="Dismiss" aria-label="Dismiss">×</button>
+  `;
+  banner.querySelector("button").addEventListener("click", () => {
+    try {
+      localStorage.setItem(dismissKey, "1");
+    } catch (_) {}
+    banner.remove();
+  });
+  const tip = document.getElementById("mac-stats-first-launch-tip");
+  if (tip && tip.nextSibling) {
+    tip.parentNode.insertBefore(banner, tip.nextSibling);
+  } else if (tip) {
+    tip.after(banner);
+  } else {
+    document.body.prepend(banner);
+  }
 }
 
 window.addEventListener("load", () => {
