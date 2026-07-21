@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.148] - 2026-07-21
+
+### Added
+- **Agent Ops session resume**: live sessions show last-user message preview; clearer Load into AI Chat status; double-click a live row to load.
+
 ## [0.1.147] - 2026-07-21
 
 ### Fixed

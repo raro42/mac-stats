@@ -47,6 +47,7 @@ pub struct LiveSessionSummary {
     pub session_id: u64,
     pub message_count: usize,
     pub last_activity: String,
+    pub preview: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -166,6 +167,7 @@ pub fn list_live_sessions() -> Vec<LiveSessionSummary> {
             session_id: e.session_id,
             message_count: e.message_count,
             last_activity: e.last_activity.to_rfc3339(),
+            preview: e.preview,
         })
         .collect();
     rows.sort_by(|a, b| b.last_activity.cmp(&a.last_activity));

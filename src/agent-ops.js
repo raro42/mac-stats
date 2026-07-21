@@ -254,7 +254,7 @@ function renderOverviewLive(rows) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs</div></div>`;
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
         btn.addEventListener('click', async () => {
             selectOpsTab('sessions');
             try {
@@ -263,8 +263,10 @@ function renderOverviewLive(rows) {
                     sessionId: r.session_id,
                 });
                 showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`);
+                showOpsSessionStatus('Preview ready — use “Load into AI Chat” on the Sessions tab.', true);
             } catch (err) {
                 showOpsSessionPreview([], String(err));
+                showOpsSessionStatus(String(err), false);
             }
         });
         body.appendChild(btn);
@@ -503,15 +505,40 @@ function showOpsSessionPreview(rows, label) {
     if (loadBtn) loadBtn.hidden = !opsSessionLoadRows;
 }
 
+function showOpsSessionStatus(msg, ok) {
+    let el = document.getElementById('ops-session-status');
+    if (!el) {
+        const loadBtn = document.getElementById('ops-session-load-chat');
+        el = document.createElement('div');
+        el.id = 'ops-session-status';
+        el.className = 'ops-row-meta';
+        el.style.margin = '6px 4px 0';
+        loadBtn?.parentNode?.insertBefore(el, loadBtn.nextSibling);
+    }
+    el.textContent = msg || '';
+    el.style.opacity = msg ? '0.9' : '0';
+    el.style.color = ok === false ? 'rgba(200,60,60,0.95)' : '';
+}
+
 function loadOpsSessionIntoChat() {
-    if (!opsSessionLoadRows || !opsSessionLoadRows.length) return;
+    if (!opsSessionLoadRows || !opsSessionLoadRows.length) {
+        showOpsSessionStatus('Select a session with messages first.', false);
+        return;
+    }
     if (!window.Ollama?.replaceHistory) {
+        showOpsSessionStatus('AI Chat module not ready — open AI Chat once, then retry.', false);
         console.warn('[Agent Ops] Ollama.replaceHistory unavailable');
         return;
     }
+    // Ensure AI agent UI is usable
+    const aiOff =
+      document.getElementById('icon-ollama')?.style.pointerEvents === 'none' ||
+      document.getElementById('ollama-section')?.style.display === 'none';
+    if (aiOff) {
+        showOpsSessionStatus('Enable local AI agent in Settings to load into chat.', false);
+        return;
+    }
     window.Ollama.replaceHistory(opsSessionLoadRows);
-    // Expand AI Chat via the same path as the Ollama icon (cpu.js owns
-    // ollamaCollapsed + localStorage — do not only poke CSS classes).
     const section = document.querySelector('.ollama-section');
     const themeCollapsed =
       section?.classList.contains('collapsed') ||
@@ -529,6 +556,10 @@ function loadOpsSessionIntoChat() {
     if (btn) btn.textContent = '−';
     section?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
     setTimeout(() => document.getElementById('chat-input')?.focus(), 80);
+    showOpsSessionStatus(
+      `Loaded ${opsSessionLoadRows.length} message(s) into AI Chat.`,
+      true
+    );
 }
 
 function renderOpsLive(rows) {
@@ -542,18 +573,26 @@ function renderOpsLive(rows) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs · ${escapeHtml(r.last_activity)}</div></div>`;
-        btn.addEventListener('click', async () => {
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs · ${escapeHtml(r.last_activity)}${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
+        const openLive = async () => {
             try {
                 const msgs = await invoke('read_live_session_messages', {
                     source: r.source,
                     sessionId: r.session_id,
                 });
                 showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`);
+                showOpsSessionStatus('Preview ready — click “Load into AI Chat” or double-click again to load.', true);
             } catch (err) {
                 showOpsSessionPreview([], String(err));
+                showOpsSessionStatus(String(err), false);
             }
+        };
+        btn.addEventListener('click', openLive);
+        btn.addEventListener('dblclick', async () => {
+            await openLive();
+            loadOpsSessionIntoChat();
         });
+        btn.title = 'Click to preview · double-click to load into AI Chat';
         el.appendChild(btn);
     });
 }

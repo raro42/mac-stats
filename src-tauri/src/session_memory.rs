@@ -517,6 +517,8 @@ pub struct SessionEntry {
     pub session_id: u64,
     pub message_count: usize,
     pub last_activity: chrono::DateTime<chrono::Local>,
+    /// Last user message preview (for Agent Ops resume UX).
+    pub preview: String,
 }
 
 /// List all in-memory sessions. Used by the 30-min compaction loop.
@@ -538,11 +540,26 @@ pub fn list_sessions() -> Vec<SessionEntry> {
             },
             None => continue,
         };
+        let preview = state
+            .messages
+            .iter()
+            .rev()
+            .find(|(role, _)| role == "user")
+            .map(|(_, c)| {
+                let t = c.trim().replace('\n', " ");
+                if t.chars().count() > 80 {
+                    format!("{}…", t.chars().take(80).collect::<String>())
+                } else {
+                    t
+                }
+            })
+            .unwrap_or_default();
         out.push(SessionEntry {
             source,
             session_id,
             message_count: state.messages.len(),
             last_activity,
+            preview,
         });
     }
     out
