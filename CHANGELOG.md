@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.167] - 2026-07-21
+
+### Changed
+- **Agent Ops**: Escape clears the focused list filter (Hermes-style skip/clear).
+- **Scheduler**: `schedules.json` writes use crash-safe temp + fsync + rename (`write_text_atomic`).
+
 ## [0.1.166] - 2026-07-21
 
 ### Changed

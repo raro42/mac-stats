@@ -9,7 +9,7 @@ use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
 /// Crash-safe text write (Hermes-style temp + fsync + rename).
-fn write_text_atomic(path: &Path, text: &str) -> Result<(), String> {
+pub(crate) fn write_text_atomic(path: &Path, text: &str) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }

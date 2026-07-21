@@ -131,7 +131,7 @@ fn load_schedules_from_disk() -> Vec<ScheduleEntry> {
     if pruned > 0 {
         match serde_json::to_string_pretty(&file_data) {
             Ok(json) => {
-                if let Err(e) = std::fs::write(&path, json) {
+                if let Err(e) = crate::commands::harness_ops::write_text_atomic(&path, &json) {
                     warn!(
                         "Scheduler: failed to rewrite schedules after pruning {} near-duplicate(s): {}",
                         pruned, e
@@ -1042,7 +1042,8 @@ pub fn add_schedule(
 
     let json = serde_json::to_string_pretty(&file_data)
         .map_err(|e| format!("Failed to serialize schedules: {}", e))?;
-    std::fs::write(&path, json).map_err(|e| format!("Failed to write schedules file: {}", e))?;
+    crate::commands::harness_ops::write_text_atomic(&path, &json)
+        .map_err(|e| format!("Failed to write schedules file: {}", e))?;
 
     info!(
         "Scheduler: schedule added from agent (id={}, cron={}, task_len={}, reply_channel={})",
@@ -1105,7 +1106,8 @@ pub fn add_schedule_at(
 
     let json = serde_json::to_string_pretty(&file_data)
         .map_err(|e| format!("Failed to serialize schedules: {}", e))?;
-    std::fs::write(&path, json).map_err(|e| format!("Failed to write schedules file: {}", e))?;
+    crate::commands::harness_ops::write_text_atomic(&path, &json)
+        .map_err(|e| format!("Failed to write schedules file: {}", e))?;
 
     info!(
         "Scheduler: one-shot schedule added (id={}, at={}, task_len={}, reply_channel={})",
@@ -1138,7 +1140,7 @@ pub fn remove_schedule_by_id(id: &str) -> Result<bool, String> {
     if removed {
         let json = serde_json::to_string_pretty(&file_data)
             .map_err(|e| format!("Failed to serialize schedules: {}", e))?;
-        std::fs::write(&path, json)
+        crate::commands::harness_ops::write_text_atomic(&path, &json)
             .map_err(|e| format!("Failed to write schedules file: {}", e))?;
         info!("Scheduler: schedule removed (id={})", id);
     }

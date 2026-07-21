@@ -14,6 +14,18 @@
   }
   const invoke = (...a) => opsInvoke(...a);
 
+  /** Escape clears the focused filter (Hermes-style: Escape skips / clears, does not leave the panel). */
+  function bindOpsFilterEscape(input, onClear) {
+    input.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (!(input.value || '').length) return;
+      e.preventDefault();
+      e.stopPropagation();
+      input.value = '';
+      onClear();
+    });
+  }
+
   const OPS_REFRESH_INTERVAL = 30000;
   let agentOpsInterval = null;
   let agentOpsCollapsed = true;
@@ -112,6 +124,11 @@ function ensureOpsSessionFilter() {
         renderOpsLive(opsLiveCache);
         renderOpsSessionFiles(opsSessionFilesCache);
     });
+    bindOpsFilterEscape(input, () => {
+        opsSessionFilterQ = '';
+        renderOpsLive(opsLiveCache);
+        renderOpsSessionFiles(opsSessionFilesCache);
+    });
 }
 
 function sessionRowMatchesFilter(haystack) {
@@ -140,6 +157,10 @@ function ensureOpsMemoryFilter() {
     input.dataset.opsBound = '1';
     input.addEventListener('input', () => {
         opsMemoryFilterQ = (input.value || '').trim().toLowerCase();
+        renderOpsMemory(opsMemoryCache);
+    });
+    bindOpsFilterEscape(input, () => {
+        opsMemoryFilterQ = '';
         renderOpsMemory(opsMemoryCache);
     });
 }
@@ -174,6 +195,10 @@ function ensureOpsRunsFilter() {
         opsRunsFilterQ = (input.value || '').trim().toLowerCase();
         renderOpsRuns(opsRunsInsightsCache);
     });
+    bindOpsFilterEscape(input, () => {
+        opsRunsFilterQ = '';
+        renderOpsRuns(opsRunsInsightsCache);
+    });
 }
 
 function runsRowMatchesFilter(haystack) {
@@ -204,6 +229,10 @@ function ensureOpsAgentsFilter() {
     input.dataset.opsBound = '1';
     input.addEventListener('input', () => {
         opsAgentsFilterQ = (input.value || '').trim().toLowerCase();
+        renderOpsAgents(opsAgentsCache);
+    });
+    bindOpsFilterEscape(input, () => {
+        opsAgentsFilterQ = '';
         renderOpsAgents(opsAgentsCache);
     });
 }
@@ -238,6 +267,10 @@ function ensureOpsSchedulesFilter() {
     input.dataset.opsBound = '1';
     input.addEventListener('input', () => {
         opsSchedulesFilterQ = (input.value || '').trim().toLowerCase();
+        renderOpsSchedulesTab(opsSchedulesCache, opsDeliveriesCache);
+    });
+    bindOpsFilterEscape(input, () => {
+        opsSchedulesFilterQ = '';
         renderOpsSchedulesTab(opsSchedulesCache, opsDeliveriesCache);
     });
 }
