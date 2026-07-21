@@ -976,15 +976,17 @@ function fmtAge(ms) {
 async function refreshAgentOps() {
     const strip = document.getElementById('agent-ops-strip');
     try {
-        const [agents, live, files, memory, insights] = await Promise.all([
+        const [agents, live, files, memory, insights, version] = await Promise.all([
             invoke('list_agents'),
             invoke('list_live_sessions'),
             invoke('list_session_files', { limit: 40 }),
             invoke('list_memory_files'),
             invoke('get_runs_insights', { limit: 40 }),
+            invoke('get_app_version').catch(() => null),
         ]);
         const enabled = (agents || []).filter((a) => a.enabled).length;
-        strip.textContent = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${(files || []).length} session files · p50 ${insights?.p50_ms ?? 0} ms · ${insights?.turns ?? 0} runs · digest ${insights?.digest_open_count ?? 0} open / ${insights?.digest_stale_count ?? 0} stale${insights?.digest_source ? ` · ${insights.digest_source}` : ''}${insights?.fail_count ? ` · ${insights.fail_count} fail` : ''}`;
+        const ver = version ? `v${version} · ` : '';
+        strip.textContent = `${ver}${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${(files || []).length} session files · p50 ${insights?.p50_ms ?? 0} ms · ${insights?.turns ?? 0} runs · digest ${insights?.digest_open_count ?? 0} open / ${insights?.digest_stale_count ?? 0} stale${insights?.digest_source ? ` · ${insights.digest_source}` : ''}${insights?.fail_count ? ` · ${insights.fail_count} fail` : ''}`;
         renderOpsAgents(agents || []);
         renderOpsLive(live || []);
         renderOpsSessionFiles(files || []);
