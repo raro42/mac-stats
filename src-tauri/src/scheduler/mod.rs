@@ -10,7 +10,8 @@ use chrono::{DateTime, Local, TimeZone, Utc};
 use cron::Schedule;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
-use std::time::Duration;
+use std::sync::Mutex;
+use std::time::{Duration, SystemTime};
 use tracing::{debug, error, info, warn};
 
 pub mod delivery_awareness;
@@ -57,14 +58,45 @@ struct SchedulesFile {
 }
 
 /// Returns the modification time of the schedules file, if it exists.
-fn schedules_file_mtime() -> Option<std::time::SystemTime> {
+fn schedules_file_mtime() -> Option<SystemTime> {
     let path = Config::schedules_file_path();
     std::fs::metadata(&path)
         .ok()
         .and_then(|m| m.modified().ok())
 }
 
+struct CachedSchedules {
+    mtime: Option<SystemTime>,
+    entries: Vec<ScheduleEntry>,
+}
+
+static SCHEDULES_CACHE: Mutex<Option<CachedSchedules>> = Mutex::new(None);
+
+/// Load schedules, reusing the in-memory parse when `schedules.json` mtime is unchanged.
+/// Avoids re-reading/parsing (and DEBUG spam) every scheduler tick / health probe.
 fn load_schedules() -> Vec<ScheduleEntry> {
+    let mtime = schedules_file_mtime();
+    if let Ok(guard) = SCHEDULES_CACHE.lock() {
+        if let Some(cached) = guard.as_ref() {
+            if cached.mtime == mtime {
+                return cached.entries.clone();
+            }
+        }
+    }
+
+    let entries = load_schedules_from_disk();
+    // Prune may rewrite the file — key the cache to post-load mtime.
+    let mtime_after = schedules_file_mtime();
+    if let Ok(mut guard) = SCHEDULES_CACHE.lock() {
+        *guard = Some(CachedSchedules {
+            mtime: mtime_after,
+            entries: entries.clone(),
+        });
+    }
+    entries
+}
+
+fn load_schedules_from_disk() -> Vec<ScheduleEntry> {
     let _ = Config::ensure_schedules_directory();
     let path = Config::schedules_file_path();
 
@@ -182,7 +214,7 @@ fn load_schedules() -> Vec<ScheduleEntry> {
     }
 
     debug!(
-        "Scheduler: loaded {} entries from {:?}",
+        "Scheduler: loaded {} entries from {:?} (disk)",
         entries.len(),
         path
     );
@@ -1146,5 +1178,16 @@ mod tests {
         assert_eq!(removed, 1);
         assert_eq!(schedules.len(), 1);
         assert!(schedules[0].task.contains("Need anything else"));
+    }
+
+    #[test]
+    fn schedules_mtime_cache_stable_across_loads() {
+        let first = load_schedules();
+        let second = load_schedules();
+        assert_eq!(first.len(), second.len());
+        assert_eq!(
+            first.iter().map(|e| e.id.clone()).collect::<Vec<_>>(),
+            second.iter().map(|e| e.id.clone()).collect::<Vec<_>>()
+        );
     }
 }
