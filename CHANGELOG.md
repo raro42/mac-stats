@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.158] - 2026-07-21
+
+### Changed
+- **Native tool loop**: multi-tool turns emit one `role: tool` message per result (OpenClaw/Hermes-style) instead of a single joined blob.
+
 ## [0.1.157] - 2026-07-21
 
 ### Changed

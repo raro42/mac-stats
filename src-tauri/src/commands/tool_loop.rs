@@ -834,21 +834,35 @@ pub(crate) async fn run_tool_loop(
                 None
             },
         });
-        // Native Ollama/OpenAI tools expect role "tool" for results (OpenClaw/Hermes fidelity).
-        // Text-line mode keeps role "user"; RUN_CMD raw dumps stay "system".
-        let tool_result_role = if user_message.starts_with("Here is the command output") {
-            "system"
-        } else if params.native_tool_schemas.is_some() {
-            "tool"
+        // Native Ollama/OpenAI tools expect one role "tool" message per call (OpenClaw/Hermes).
+        // Text-line mode keeps a single role "user" blob; RUN_CMD raw dumps stay "system".
+        if params.native_tool_schemas.is_some() && !tool_results.is_empty() {
+            for result in &tool_results {
+                let role = if result.starts_with("Here is the command output") {
+                    "system"
+                } else {
+                    "tool"
+                };
+                messages.push(ChatMessage {
+                    role: role.to_string(),
+                    content: result.clone(),
+                    images: None,
+                    tool_calls: None,
+                });
+            }
         } else {
-            "user"
-        };
-        messages.push(ChatMessage {
-            role: tool_result_role.to_string(),
-            content: user_message,
-            images: None,
-            tool_calls: None
-        });
+            let tool_result_role = if user_message.starts_with("Here is the command output") {
+                "system"
+            } else {
+                "user"
+            };
+            messages.push(ChatMessage {
+                role: tool_result_role.to_string(),
+                content: user_message,
+                images: None,
+                tool_calls: None,
+            });
+        }
 
         // Budget warning / last-iteration guidance.
         inject_budget_warnings(
