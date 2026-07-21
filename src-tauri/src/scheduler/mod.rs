@@ -72,6 +72,9 @@ struct CachedSchedules {
 
 static SCHEDULES_CACHE: Mutex<Option<CachedSchedules>> = Mutex::new(None);
 
+/// Last logged next-run plan fingerprint — avoid DEBUG spam every check interval.
+static LAST_NEXT_PLAN_LOG: Mutex<Option<String>> = Mutex::new(None);
+
 /// Load schedules, reusing the in-memory parse when `schedules.json` mtime is unchanged.
 /// Avoids re-reading/parsing (and DEBUG spam) every scheduler tick / health probe.
 fn load_schedules() -> Vec<ScheduleEntry> {
@@ -682,6 +685,66 @@ async fn execute_task(
     .await
 }
 
+/// Log the full next-run plan once when it changes (startup, file edit, or fire advances cron).
+fn log_next_plan_if_changed(
+    entries: &[ScheduleEntry],
+    next_runs: &[(DateTime<Local>, usize)],
+) {
+    let fingerprint = if next_runs.is_empty() {
+        format!("empty:{}", entries.len())
+    } else {
+        next_runs
+            .iter()
+            .map(|(t, idx)| {
+                let id = entries[*idx].id.as_deref().unwrap_or("(no id)");
+                format!("{}@{}", id, t.format("%Y-%m-%d %H:%M:%S"))
+            })
+            .collect::<Vec<_>>()
+            .join("|")
+    };
+    let mut guard = match LAST_NEXT_PLAN_LOG.lock() {
+        Ok(g) => g,
+        Err(_) => return,
+    };
+    if guard.as_ref() == Some(&fingerprint) {
+        return;
+    }
+    *guard = Some(fingerprint);
+
+    if next_runs.is_empty() {
+        debug!(
+            "Scheduler: {} entries loaded, none have a next run yet",
+            entries.len()
+        );
+        return;
+    }
+    for (t, idx) in next_runs {
+        let e = &entries[*idx];
+        let id_info = e.id.as_deref().unwrap_or("(no id)");
+        debug!(
+            "Scheduler: id={} next at {} (task: {}...)",
+            id_info,
+            t.format("%Y-%m-%d %H:%M:%S"),
+            e.task.chars().take(35).collect::<String>()
+        );
+    }
+    if next_runs.len() != entries.len() {
+        debug!(
+            "Scheduler: {} entries loaded, {} have a next run (others may be one-shot past)",
+            entries.len(),
+            next_runs.len()
+        );
+    }
+    let (next_time, idx) = next_runs[0];
+    let id_info = entries[idx].id.as_deref().unwrap_or("(no id)");
+    debug!(
+        "Scheduler: next run at {} for id={} (task: {}...)",
+        next_time.format("%Y-%m-%d %H:%M:%S"),
+        id_info,
+        entries[idx].task.chars().take(40).collect::<String>()
+    );
+}
+
 async fn scheduler_loop() {
     loop {
         let check_interval_secs = Config::scheduler_check_interval_secs().max(MIN_CHECK_SECS);
@@ -697,24 +760,7 @@ async fn scheduler_loop() {
 
         next_runs.sort_by_key(|(t, _)| *t);
 
-        // Log every schedule's next run so all are visible (not just the soonest).
-        for (t, idx) in &next_runs {
-            let e = &entries[*idx];
-            let id_info = e.id.as_deref().unwrap_or("(no id)");
-            debug!(
-                "Scheduler: id={} next at {} (task: {}...)",
-                id_info,
-                t.format("%Y-%m-%d %H:%M:%S"),
-                e.task.chars().take(35).collect::<String>()
-            );
-        }
-        if next_runs.len() != entries.len() {
-            debug!(
-                "Scheduler: {} entries loaded, {} have a next run (others may be one-shot past)",
-                entries.len(),
-                next_runs.len()
-            );
-        }
+        log_next_plan_if_changed(&entries, &next_runs);
 
         if next_runs.is_empty() {
             tokio::time::sleep(Duration::from_secs(check_interval_secs)).await;
@@ -725,14 +771,6 @@ async fn scheduler_loop() {
         }
 
         let (next_time, idx) = next_runs[0];
-        let entry = &entries[idx];
-        let id_info = entry.id.as_deref().unwrap_or("(no id)");
-        debug!(
-            "Scheduler: next run at {} for id={} (task: {}...)",
-            next_time.format("%Y-%m-%d %H:%M:%S"),
-            id_info,
-            entry.task.chars().take(40).collect::<String>()
-        );
         // Use millisecond precision so we don't spin when next run is < 1 second away (num_seconds() would truncate to 0).
         let wait_ms = (next_time - now).num_milliseconds().max(0) as u64;
         let sleep_millis = wait_ms.min(check_interval_secs * 1000);
@@ -1189,5 +1227,25 @@ mod tests {
             first.iter().map(|e| e.id.clone()).collect::<Vec<_>>(),
             second.iter().map(|e| e.id.clone()).collect::<Vec<_>>()
         );
+    }
+
+    #[test]
+    fn next_plan_log_dedupes_identical_fingerprint() {
+        let entries = load_schedules();
+        let now = Local::now();
+        let mut next_runs: Vec<(DateTime<Local>, usize)> = entries
+            .iter()
+            .enumerate()
+            .filter_map(|(i, e)| next_run(e, now).map(|t| (t, i)))
+            .collect();
+        next_runs.sort_by_key(|(t, _)| *t);
+        // Clear then log twice — second call must be a no-op (no panic / lock poison).
+        if let Ok(mut g) = LAST_NEXT_PLAN_LOG.lock() {
+            *g = None;
+        }
+        log_next_plan_if_changed(&entries, &next_runs);
+        log_next_plan_if_changed(&entries, &next_runs);
+        let fp = LAST_NEXT_PLAN_LOG.lock().ok().and_then(|g| g.clone());
+        assert!(fp.is_some());
     }
 }
