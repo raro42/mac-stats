@@ -100,7 +100,7 @@ function ensureOpsKeyboardHint() {
     const hint = document.createElement('div');
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
-    hint.textContent = 'Tips: / focuses filter · Esc clears';
+    hint.textContent = 'Tips: / focuses filter · Esc clears · Enter loads session';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -135,7 +135,15 @@ function setupAgentOps() {
     });
     document.getElementById('ops-refresh-btn')?.addEventListener('click', () => refreshAgentOps());
     document.getElementById('ops-digest-refresh-btn')?.addEventListener('click', () => refreshOpsDigest());
-    document.getElementById('ops-session-load-chat')?.addEventListener('click', () => loadOpsSessionIntoChat());
+    const loadChatBtn = document.getElementById('ops-session-load-chat');
+    loadChatBtn?.addEventListener('click', () => loadOpsSessionIntoChat());
+    if (loadChatBtn) {
+        loadChatBtn.title = 'Load preview into AI Chat (Enter)';
+        if (!loadChatBtn.dataset.opsEnterHint) {
+            loadChatBtn.dataset.opsEnterHint = '1';
+            loadChatBtn.textContent = 'Load into AI Chat ↵';
+        }
+    }
     ensureOpsSessionFilter();
     ensureOpsMemoryFilter();
     ensureOpsRunsFilter();
@@ -144,6 +152,9 @@ function setupAgentOps() {
     if (!window.__opsFilterSlashBound) {
         window.__opsFilterSlashBound = true;
         document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+                if (tryOpsSessionEnterLoad(e)) return;
+            }
             if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
             if (agentOpsCollapsed) return;
             const t = e.target;
@@ -860,6 +871,30 @@ function formatSessionMessagesPreview(rows) {
         .join('\n\n');
 }
 
+function markOpsSessionRowSelected(btn) {
+    document
+        .querySelectorAll('#ops-live-sessions .ops-row.is-selected, #ops-session-files .ops-row.is-selected')
+        .forEach((el) => el.classList.remove('is-selected'));
+    btn?.classList?.add('is-selected');
+}
+
+/** Enter loads the previewed session when Sessions tab is active and a load is ready. */
+function tryOpsSessionEnterLoad(e) {
+    if (agentOpsCollapsed) return false;
+    const panel = document.getElementById('ops-panel-sessions');
+    if (!panel || !panel.classList.contains('active')) return false;
+    const loadBtn = document.getElementById('ops-session-load-chat');
+    if (!loadBtn || loadBtn.hidden || !opsSessionLoadRows?.length) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    // Allow Enter from filter / list / body; skip unrelated text fields.
+    if (tag === 'TEXTAREA') return false;
+    if (tag === 'INPUT' && t.id && t.id !== 'ops-session-filter') return false;
+    e.preventDefault();
+    loadOpsSessionIntoChat();
+    return true;
+}
+
 function showOpsSessionPreview(rows, label) {
     const preview = document.getElementById('ops-session-preview');
     const loadBtn = document.getElementById('ops-session-load-chat');
@@ -954,8 +989,9 @@ function renderOpsLive(rows) {
                     source: r.source,
                     sessionId: r.session_id,
                 });
+                markOpsSessionRowSelected(btn);
                 showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`);
-                showOpsSessionStatus('Preview ready — click “Load into AI Chat” or double-click again to load.', true);
+                showOpsSessionStatus('Preview ready — Enter or “Load into AI Chat” · double-click also loads.', true);
             } catch (err) {
                 showOpsSessionPreview([], String(err));
                 showOpsSessionStatus(String(err), false);
@@ -966,7 +1002,7 @@ function renderOpsLive(rows) {
             await openLive();
             loadOpsSessionIntoChat();
         });
-        btn.title = 'Click to preview · double-click to load into AI Chat';
+        btn.title = 'Click to preview · Enter / double-click to load into AI Chat';
         el.appendChild(btn);
     });
     prependOpsFilterCaption(el, all.length, filtered.length, opsSessionFilterQ);
@@ -1003,9 +1039,11 @@ function renderOpsSessionFiles(files) {
             try {
                 const msgs = await invoke('read_session_file_messages', { path: f.path });
                 if (msgs && msgs.length) {
+                    markOpsSessionRowSelected(btn);
                     showOpsSessionPreview(msgs, f.name);
-                    showOpsSessionStatus('Preview ready — click “Load into AI Chat” or double-click to load.', true);
+                    showOpsSessionStatus('Preview ready — Enter or “Load into AI Chat” · double-click also loads.', true);
                 } else {
+                    markOpsSessionRowSelected(btn);
                     const text = await invoke('read_session_file', { path: f.path });
                     preview.hidden = false;
                     preview.textContent = text.slice(0, 12000);
@@ -1026,7 +1064,7 @@ function renderOpsSessionFiles(files) {
             await openFile();
             loadOpsSessionIntoChat();
         });
-        btn.title = 'Click to preview · double-click to load into AI Chat';
+        btn.title = 'Click to preview · Enter / double-click to load into AI Chat';
         el.appendChild(btn);
     });
     prependOpsFilterCaption(el, all.length, filtered.length, opsSessionFilterQ);

@@ -324,6 +324,11 @@
   background: color-mix(in srgb, currentColor 8%, transparent);
 }
 
+.ops-row.is-selected {
+  border-color: color-mix(in srgb, currentColor 28%, transparent);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
 .ops-row-title { font-size: 13px; }
 .ops-row-meta { font-size: 11px; opacity: 0.5; }
 
