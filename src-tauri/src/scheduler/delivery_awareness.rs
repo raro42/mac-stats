@@ -113,7 +113,7 @@ pub fn record_if_new(
 
     match serde_json::to_string_pretty(&file) {
         Ok(json) => {
-            if let Err(e) = std::fs::write(&path, json) {
+            if let Err(e) = crate::config::write_text_atomic(&path, &json) {
                 warn!(
                     "Scheduler delivery awareness: write {:?} failed: {}",
                     path, e

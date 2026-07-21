@@ -297,11 +297,12 @@ fn ensure_having_fun_in_config(path: &Path, parsed: &mut serde_json::Value) {
         }),
     );
     if let Ok(pretty) = serde_json::to_string_pretty(parsed) {
-        let _ = std::fs::write(path, pretty);
-        info!(
-            "Discord channels config: added default 'having_fun' block to {}",
-            path.display()
-        );
+        if crate::config::write_text_atomic(path, &pretty).is_ok() {
+            info!(
+                "Discord channels config: added default 'having_fun' block to {}",
+                path.display()
+            );
+        }
     }
 }
 

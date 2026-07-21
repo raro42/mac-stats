@@ -177,7 +177,8 @@ fn save_monitors() -> Result<(), String> {
     let json = serde_json::to_string_pretty(&file_data)
         .map_err(|e| format!("Failed to serialize monitors: {}", e))?;
 
-    fs::write(&monitors_path, json).map_err(|e| format!("Failed to write monitors file: {}", e))?;
+    crate::config::write_text_atomic(&monitors_path, &json)
+        .map_err(|e| format!("Failed to write monitors file: {}", e))?;
 
     info!(
         "Monitor: Saved {} monitors to disk - Path: {:?}",

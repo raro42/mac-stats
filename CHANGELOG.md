@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.169] - 2026-07-21
+
+### Changed
+- **Crash-safe JSON**: `monitors.json`, Discord `having_fun` channel-config updates, and scheduler delivery-awareness use shared `write_text_atomic`.
+
 ## [0.1.168] - 2026-07-21
 
 ### Changed
