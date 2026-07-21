@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.134] - 2026-07-21
+
+### Changed
+- **Agent Ops** opens from an icon in the CPU window icon row (dashboard-style tiles); icon toggles pane visibility. Section starts hidden until the icon is clicked.
+
 ## [0.1.133] - 2026-07-21
 
 ### Fixed

@@ -653,6 +653,15 @@ function escapeHtml(s) {
 
 
 
+  function syncOpsIcon() {
+    const icon = document.getElementById('icon-agent-ops');
+    if (!icon) return;
+    const open = !agentOpsCollapsed;
+    icon.classList.toggle('status-good', open);
+    icon.setAttribute('aria-pressed', open ? 'true' : 'false');
+    icon.title = open ? 'Hide Agent Ops' : 'Agent Ops';
+  }
+
   function applyOpsCollapsed(collapsed) {
     agentOpsCollapsed = collapsed;
     const section = document.getElementById('agent-ops-section') || document.querySelector('.agent-ops-section');
@@ -663,17 +672,19 @@ function escapeHtml(s) {
     }
     if (content) {
       content.classList.toggle('collapsed', collapsed);
-      // dashboard uses display; themes use .collapsed class
+      // dashboard uses display; themes use .collapsed class on the section
       if (!content.classList.contains('section-content-collapsible')) {
         content.style.display = collapsed ? 'none' : '';
       }
     }
     if (btn) btn.textContent = collapsed ? '+' : '−';
+    syncOpsIcon();
     if (collapsed) {
       stopAgentOpsAutoRefresh();
     } else {
       refreshAgentOps();
       startAgentOpsAutoRefresh();
+      section?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
     }
   }
 
@@ -684,24 +695,45 @@ function escapeHtml(s) {
   function wireCollapse() {
     const header = document.getElementById('agent-ops-header');
     const btn = document.getElementById('agent-ops-collapse-btn');
-    if (!header) return;
-    header.addEventListener('click', (e) => {
-      if (e.target.id === 'agent-ops-collapse-btn' || e.target.closest('.collapse-btn')) return;
-      if (e.target.closest('.ops-overview-link') || e.target.closest('.agent-ops-tab')) return;
-      toggleAgentOpsSection();
-    });
+    const icon = document.getElementById('icon-agent-ops');
+
+    if (icon) {
+      icon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleAgentOpsSection();
+      });
+    }
+
+    if (header) {
+      header.addEventListener('click', (e) => {
+        if (e.target.id === 'agent-ops-collapse-btn' || e.target.closest('.collapse-btn')) return;
+        if (e.target.closest('.ops-overview-link') || e.target.closest('.agent-ops-tab')) return;
+        // With an icon present, header click collapses (hide) only — open via icon
+        if (icon && !agentOpsCollapsed) {
+          applyOpsCollapsed(true);
+          return;
+        }
+        if (!icon) toggleAgentOpsSection();
+      });
+    }
     if (btn) {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleAgentOpsSection();
       });
     }
-    // Themes start collapsed; dashboard starts expanded if collapse btn shows −
+    // Themes: start hidden (icon opens). Dashboard without icon: start expanded if not collapsed.
     const content = document.getElementById('agent-ops-content');
-    const startsCollapsed =
-      content?.classList.contains('collapsed') ||
-      content?.style.display === 'none' ||
-      (document.querySelector('.agent-ops-section')?.classList.contains('collapsed') ?? true);
+    const section = document.querySelector('.agent-ops-section');
+    let startsCollapsed = true;
+    if (icon) {
+      startsCollapsed = true;
+    } else {
+      startsCollapsed =
+        content?.classList.contains('collapsed') ||
+        content?.style.display === 'none' ||
+        (section?.classList.contains('collapsed') ?? false);
+    }
     applyOpsCollapsed(!!startsCollapsed);
   }
 

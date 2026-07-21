@@ -1,4 +1,10 @@
 /* Agent Ops Command Center — shared across dashboard + theme CPU windows */
+
+/* Icon toggles whole pane (same as monitors/ollama sections) */
+.agent-ops-section.collapsed {
+  display: none;
+}
+
 .agent-ops-section {
   margin-bottom: 16px;
   overflow: hidden;
