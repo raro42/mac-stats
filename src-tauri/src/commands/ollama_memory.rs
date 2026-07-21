@@ -9,14 +9,33 @@ pub(crate) fn load_soul_content() -> String {
     Config::load_soul_content()
 }
 
+/// Drop baked-in identity lines so soul.md (or merges) cannot claim a stale app version.
+/// Canonical `You are mac-stats v…` is always appended by [`format_router_soul_block`].
+pub(crate) fn strip_stale_mac_stats_identity_lines(soul_md: &str) -> String {
+    soul_md
+        .lines()
+        .filter(|line| {
+            let t = line.trim().to_ascii_lowercase();
+            let t = t.replace('\u{2019}', "'"); // curly apostrophe → ASCII
+            !(t.starts_with("you are mac-stats v")
+                || t.starts_with("i'm mac-stats v")
+                || t.starts_with("i am mac-stats v"))
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+        .trim()
+        .to_string()
+}
+
 /// Planning-system prefix: shared `soul.md` plus the app identity line when no skill or agent
 /// `combined_prompt` is active. When `skill_content` is `Some`, callers use an empty string instead
 /// so the skill/agent block is the only extra voice (022 §F4).
 pub(crate) fn format_router_soul_block(soul_md: &str, app_version: &str) -> String {
-    if soul_md.is_empty() {
+    let cleaned = strip_stale_mac_stats_identity_lines(soul_md);
+    if cleaned.is_empty() {
         format!("You are mac-stats v{}.\n\n", app_version)
     } else {
-        format!("{}\n\nYou are mac-stats v{}.\n\n", soul_md, app_version)
+        format!("{}\n\nYou are mac-stats v{}.\n\n", cleaned, app_version)
     }
 }
 
@@ -185,6 +204,15 @@ mod tests {
         assert_eq!(
             format_router_soul_block("Be concise.", "1.0.0"),
             "Be concise.\n\nYou are mac-stats v1.0.0.\n\n"
+        );
+    }
+
+    #[test]
+    fn format_router_soul_block_strips_stale_identity() {
+        let soul = "Be concise.\nYou are mac-stats v0.1.115.\nOpinions welcome.";
+        assert_eq!(
+            format_router_soul_block(soul, "0.1.120"),
+            "Be concise.\nOpinions welcome.\n\nYou are mac-stats v0.1.120.\n\n"
         );
     }
 

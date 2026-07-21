@@ -1006,7 +1006,13 @@ async function refreshAgentOps() {
                 schedBit = ` · schedules ${n}`;
             }
         }
-        strip.textContent = `${ver}${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${(files || []).length} session files · p50 ${insights?.p50_ms ?? 0} ms · ${insights?.turns ?? 0} runs · digest ${insights?.digest_open_count ?? 0} open / ${insights?.digest_stale_count ?? 0} stale${insights?.digest_source ? ` · ${insights.digest_source}` : ''}${insights?.fail_count ? ` · ${insights.fail_count} fail` : ''}${schedBit}`;
+        let discordBit = '';
+        const dg = insights?.discord_gateway || '';
+        const readyMatch = dg.match(/last Ready\s+([^·]+)/i);
+        if (readyMatch) {
+            discordBit = ` · Discord ${readyMatch[1].trim()}`;
+        }
+        strip.textContent = `${ver}${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${(files || []).length} session files · p50 ${insights?.p50_ms ?? 0} ms · ${insights?.turns ?? 0} runs · digest ${insights?.digest_open_count ?? 0} open / ${insights?.digest_stale_count ?? 0} stale${insights?.digest_source ? ` · ${insights.digest_source}` : ''}${insights?.fail_count ? ` · ${insights.fail_count} fail` : ''}${discordBit}${schedBit}`;
         renderOpsAgents(agents || []);
         renderOpsLive(live || []);
         renderOpsSessionFiles(files || []);
