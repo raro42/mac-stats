@@ -165,44 +165,41 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
                     tool_names_for_log(&msg.content),
                     i
                 );
-                let synthetic_role = if msg
+                let has_native = msg
                     .tool_calls
                     .as_ref()
                     .map(|t| !t.is_empty())
-                    .unwrap_or(false)
-                {
-                    "tool"
-                } else {
-                    "user"
-                };
+                    .unwrap_or(false);
                 // Mint missing ids before reading so synthetic tool_call_id pairs with assistant.
                 crate::ollama::ensure_tool_calls_option(&mut msg.tool_calls);
-                let synthetic_name = msg.tool_calls.as_ref().and_then(|calls| {
-                    calls.first().and_then(|c| c.function.name.clone())
-                });
-                let synthetic_call_id = msg.tool_calls.as_ref().and_then(|calls| {
-                    calls
-                        .first()
-                        .and_then(|c| c.id.clone())
-                        .filter(|s| !s.is_empty())
-                });
                 out.push(msg);
-                out.push(ChatMessage {
-                    role: synthetic_role.to_string(),
-                    content: SYNTHETIC_TOOL_RESULT.to_string(),
-                    images: None,
-                    tool_calls: None,
-                    tool_name: if synthetic_role == "tool" {
-                        synthetic_name
-                    } else {
-                        None
-                    },
-                    tool_call_id: if synthetic_role == "tool" {
-                        synthetic_call_id
-                    } else {
-                        None
-                    },
-                });
+                if has_native {
+                    // OpenAI/Hermes: one role "tool" message per assistant tool_calls[] entry.
+                    let calls = out
+                        .last()
+                        .and_then(|m| m.tool_calls.clone())
+                        .unwrap_or_default();
+                    for call in calls {
+                        let call_id = call.id.clone().filter(|s| !s.is_empty());
+                        out.push(ChatMessage {
+                            role: "tool".to_string(),
+                            content: SYNTHETIC_TOOL_RESULT.to_string(),
+                            images: None,
+                            tool_calls: None,
+                            tool_name: call.function.name.clone(),
+                            tool_call_id: call_id,
+                        });
+                    }
+                } else {
+                    out.push(ChatMessage {
+                        role: "user".to_string(),
+                        content: SYNTHETIC_TOOL_RESULT.to_string(),
+                        images: None,
+                        tool_calls: None,
+                        tool_name: None,
+                        tool_call_id: None,
+                    });
+                }
                 i += 1;
                 continue;
             }
@@ -351,6 +348,46 @@ mod tests {
         let out = sanitize_conversation_history(hist);
         assert_eq!(out.len(), 2);
         assert_eq!(out[1].role, "tool");
+    }
+
+    #[test]
+    fn inserts_one_synthetic_tool_per_native_call() {
+        use crate::ollama::{OllamaFunctionCall, OllamaToolCall};
+        let hist = vec![ChatMessage {
+            role: "assistant".into(),
+            content: "FETCH_URL: https://a.example\nBRAVE_SEARCH: query".into(),
+            images: None,
+            tool_calls: Some(vec![
+                OllamaToolCall {
+                    call_type: "function".into(),
+                    id: Some("call_a".into()),
+                    function: OllamaFunctionCall {
+                        name: Some("FETCH_URL".into()),
+                        index: None,
+                        arguments: serde_json::json!({"url_or_arg": "https://a.example"}),
+                    },
+                },
+                OllamaToolCall {
+                    call_type: "function".into(),
+                    id: Some("call_b".into()),
+                    function: OllamaFunctionCall {
+                        name: Some("BRAVE_SEARCH".into()),
+                        index: None,
+                        arguments: serde_json::json!({"query": "query"}),
+                    },
+                },
+            ]),
+            tool_name: None,
+            tool_call_id: None,
+        }];
+        let out = sanitize_conversation_history(hist);
+        assert_eq!(out.len(), 3);
+        assert_eq!(out[1].role, "tool");
+        assert_eq!(out[1].tool_call_id.as_deref(), Some("call_a"));
+        assert_eq!(out[1].tool_name.as_deref(), Some("FETCH_URL"));
+        assert_eq!(out[2].role, "tool");
+        assert_eq!(out[2].tool_call_id.as_deref(), Some("call_b"));
+        assert_eq!(out[2].tool_name.as_deref(), Some("BRAVE_SEARCH"));
     }
 
     #[test]
