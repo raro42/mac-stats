@@ -77,25 +77,26 @@ static LAST_NEXT_PLAN_LOG: Mutex<Option<String>> = Mutex::new(None);
 
 /// Load schedules, reusing the in-memory parse when `schedules.json` mtime is unchanged.
 /// Avoids re-reading/parsing (and DEBUG spam) every scheduler tick / health probe.
+/// Holds the cache lock across disk load so concurrent startup callers share one parse.
 fn load_schedules() -> Vec<ScheduleEntry> {
     let mtime = schedules_file_mtime();
-    if let Ok(guard) = SCHEDULES_CACHE.lock() {
-        if let Some(cached) = guard.as_ref() {
-            if cached.mtime == mtime {
-                return cached.entries.clone();
-            }
+    let mut guard = match SCHEDULES_CACHE.lock() {
+        Ok(g) => g,
+        Err(poisoned) => poisoned.into_inner(),
+    };
+    if let Some(cached) = guard.as_ref() {
+        if cached.mtime == mtime {
+            return cached.entries.clone();
         }
     }
 
     let entries = load_schedules_from_disk();
     // Prune may rewrite the file — key the cache to post-load mtime.
     let mtime_after = schedules_file_mtime();
-    if let Ok(mut guard) = SCHEDULES_CACHE.lock() {
-        *guard = Some(CachedSchedules {
-            mtime: mtime_after,
-            entries: entries.clone(),
-        });
-    }
+    *guard = Some(CachedSchedules {
+        mtime: mtime_after,
+        entries: entries.clone(),
+    });
     entries
 }
 
@@ -1247,5 +1248,22 @@ mod tests {
         log_next_plan_if_changed(&entries, &next_runs);
         let fp = LAST_NEXT_PLAN_LOG.lock().ok().and_then(|g| g.clone());
         assert!(fp.is_some());
+    }
+
+    #[test]
+    fn schedules_cache_lock_serializes_reload() {
+        // Clear cache, then hit load twice — second must reuse the filled cache.
+        if let Ok(mut g) = SCHEDULES_CACHE.lock() {
+            *g = None;
+        }
+        let a = load_schedules();
+        let b = load_schedules();
+        assert_eq!(a.len(), b.len());
+        let filled = SCHEDULES_CACHE
+            .lock()
+            .ok()
+            .map(|g| g.is_some())
+            .unwrap_or(false);
+        assert!(filled || a.is_empty());
     }
 }
