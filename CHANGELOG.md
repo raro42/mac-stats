@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.171] - 2026-07-21
+
+### Changed
+- **Agent Ops**: `/` focuses the active tab’s list filter when not typing in an input (Esc still clears).
+- **Tasks**: task file creates/appends use crash-safe `write_text_atomic`.
+
 ## [0.1.170] - 2026-07-21
 
 ### Changed

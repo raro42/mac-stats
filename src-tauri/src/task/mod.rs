@@ -138,7 +138,7 @@ pub fn create_task(
         reply_to_line
     );
     let content = format!("{}{}", header, initial_content.trim());
-    fs::write(&path, content).map_err(|e| format!("Write task file: {}", e))?;
+    crate::config::write_text_atomic(&path, &content).map_err(|e| format!("Write task file: {}", e))?;
     info!("Task: created {:?} (topic={}, id={})", path, topic_slug, id);
     Ok(path)
 }
@@ -149,7 +149,7 @@ pub fn append_to_task(path: &Path, block: &str) -> Result<(), String> {
     let appendix = format!("\n\n## Feedback {}\n\n{}\n", ts, block.trim());
     let mut content = fs::read_to_string(path).map_err(|e| format!("Read task file: {}", e))?;
     content.push_str(&appendix);
-    fs::write(path, content).map_err(|e| format!("Write task file: {}", e))?;
+    crate::config::write_text_atomic(path, &content).map_err(|e| format!("Write task file: {}", e))?;
     info!("Task: appended {} chars to {:?}", block.trim().len(), path);
     Ok(())
 }
@@ -281,7 +281,7 @@ pub fn set_assignee(path: &Path, agent_id: &str) -> Result<(), String> {
             out
         );
     }
-    fs::write(path, out.trim_end()).map_err(|e| format!("Write task file: {}", e))?;
+    crate::config::write_text_atomic(path, out.trim_end()).map_err(|e| format!("Write task file: {}", e))?;
     info!("Task: assignee set to {} for {:?}", agent_id, path);
     Ok(())
 }
@@ -424,7 +424,7 @@ pub fn set_paused_until(path: &Path, until_iso: Option<&str>) -> Result<(), Stri
             out.trim_start()
         );
     }
-    fs::write(path, out.trim_end()).map_err(|e| format!("Write task file: {}", e))?;
+    crate::config::write_text_atomic(path, out.trim_end()).map_err(|e| format!("Write task file: {}", e))?;
     Ok(())
 }
 

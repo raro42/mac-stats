@@ -45,10 +45,12 @@
   let opsSchedulesFilterQ = '';
   let opsSchedulesCache = [];
   let opsDeliveriesCache = [];
+  let opsActiveTab = 'agents';
 
 // --- Agent Ops (Command Center: overview + detail tabs) ---
 
 function selectOpsTab(tab) {
+    opsActiveTab = tab || 'agents';
     document.querySelectorAll('.agent-ops-tab').forEach((b) => {
         b.classList.toggle('active', b.dataset.opsTab === tab);
     });
@@ -60,7 +62,31 @@ function selectOpsTab(tab) {
     (panel || tabs)?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
 }
 
+function focusActiveOpsFilter() {
+    const idByTab = {
+        sessions: 'ops-session-filter',
+        memory: 'ops-memory-filter',
+        runs: 'ops-runs-filter',
+        agents: 'ops-agents-filter',
+        schedules: 'ops-schedules-filter',
+    };
+    const id = idByTab[opsActiveTab];
+    if (!id) return false;
+    ensureOpsSessionFilter();
+    ensureOpsMemoryFilter();
+    ensureOpsRunsFilter();
+    ensureOpsAgentsFilter();
+    ensureOpsSchedulesFilter();
+    const input = document.getElementById(id);
+    if (!input) return false;
+    input.focus();
+    input.select?.();
+    return true;
+}
+
 function setupAgentOps() {
+    const activeBtn = document.querySelector('.agent-ops-tab.active');
+    if (activeBtn?.dataset?.opsTab) opsActiveTab = activeBtn.dataset.opsTab;
     document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
         btn.addEventListener('click', () => selectOpsTab(btn.dataset.opsTab));
     });
@@ -94,6 +120,22 @@ function setupAgentOps() {
     ensureOpsRunsFilter();
     ensureOpsAgentsFilter();
     ensureOpsSchedulesFilter();
+    if (!window.__opsFilterSlashBound) {
+        window.__opsFilterSlashBound = true;
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+            if (agentOpsCollapsed) return;
+            const t = e.target;
+            const tag = (t && t.tagName) || '';
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return;
+            if (!document.getElementById('agent-ops') && !document.querySelector('.agent-ops-tabs')) {
+                return;
+            }
+            if (focusActiveOpsFilter()) {
+                e.preventDefault();
+            }
+        });
+    }
     if (!agentOpsCollapsed) {
       refreshAgentOps();
       startAgentOpsAutoRefresh();
@@ -111,7 +153,7 @@ function ensureOpsSessionFilter() {
         input.type = 'search';
         input.id = 'ops-session-filter';
         input.className = 'ops-filter-input';
-        input.placeholder = 'Filter live + files… (Esc clears)';
+        input.placeholder = 'Filter live + files… (/ focus, Esc clears)';
         input.autocomplete = 'off';
         input.spellcheck = false;
         row.appendChild(input);
@@ -217,7 +259,7 @@ function ensureOpsAgentsFilter() {
         input.type = 'search';
         input.id = 'ops-agents-filter';
         input.className = 'ops-filter-input';
-        input.placeholder = 'Filter agents by name, slug, model… (Esc clears)';
+        input.placeholder = 'Filter agents by name, slug, model… (/ focus, Esc clears)';
         input.autocomplete = 'off';
         input.spellcheck = false;
         row.appendChild(input);
