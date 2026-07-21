@@ -4,6 +4,7 @@
 //! ways models format tool calls: `TOOL: arg`, `RECOMMEND: TOOL: arg`,
 //! Hermes/Qwen JSON `<tool_call>`, Qwen3-Coder `<function=`, GLM `<arg_key>`,
 //! Kimi K2 `<|tool_call_begin|>`, DeepSeek `tool▁call` unicode tokens,
+//! Llama `<|python_tag|>` / bare `{"name","arguments"}` JSON,
 //! numbered lists, inline chains with "then"/"and"/";", etc.
 
 use crate::commands::tool_registry::{
@@ -345,13 +346,92 @@ pub(crate) fn parse_all_tools_from_response(content: &str) -> Vec<(String, Strin
     out
 }
 
-/// Expand vendor tool-call markup (DeepSeek → Kimi → Qwen3-Coder → GLM → Hermes/Qwen JSON).
+/// Expand vendor tool-call markup (DeepSeek → Kimi → Qwen3 → GLM → Hermes → Llama JSON).
 fn expand_model_tool_call_xml(content: &str) -> String {
     let deepseek = expand_deepseek_tool_call_xml(content);
     let kimi = expand_kimi_k2_tool_call_xml(&deepseek);
     let qwen = expand_qwen3_coder_tool_call_xml(&kimi);
     let glm = expand_glm_arg_key_tool_call_xml(&qwen);
-    expand_hermes_tool_call_xml(&glm)
+    let hermes = expand_hermes_tool_call_xml(&glm);
+    expand_llama_json_tool_calls(&hermes)
+}
+
+/// Llama 3/4 JSON tool calls: optional `<|python_tag|>` then `{"name","arguments"|"parameters"}`.
+fn expand_llama_json_tool_calls(content: &str) -> String {
+    const BOT: &str = "<|python_tag|>";
+    if !content.contains('{') {
+        return content.to_string();
+    }
+
+    let mut tool_lines: Vec<String> = Vec::new();
+    let mut first_start: Option<usize> = None;
+    let mut last_end = 0usize;
+    let mut search_from = 0usize;
+
+    while let Some(rel) = content[search_from..].find('{') {
+        let start = search_from + rel;
+        let Some((val, consumed)) = json_raw_decode(&content[start..]) else {
+            search_from = start + 1;
+            continue;
+        };
+        let end = start + consumed;
+        if let Some(line) = llama_json_object_to_tool_line(&val) {
+            if first_start.is_none() {
+                let mut region = start;
+                if let Some(bot) = content[..start].rfind(BOT) {
+                    region = bot;
+                }
+                first_start = Some(region);
+            }
+            tool_lines.push(line);
+            last_end = end;
+            search_from = end;
+        } else {
+            // Skip the whole JSON value so we do not re-scan nested braces.
+            search_from = end.max(start + 1);
+        }
+    }
+
+    if tool_lines.is_empty() {
+        return content.to_string();
+    }
+
+    let start = first_start.unwrap_or(0);
+    let mut out = String::new();
+    let preamble = content[..start].trim_end();
+    if !preamble.is_empty() {
+        out.push_str(preamble);
+        out.push('\n');
+    }
+    for line in &tool_lines {
+        out.push_str(line);
+        out.push('\n');
+    }
+    let after = content[last_end..].trim_start();
+    // Drop leftover BOT token fragments if any remain at the front.
+    let after = after.strip_prefix(BOT).unwrap_or(after).trim_start();
+    if !after.is_empty() {
+        out.push_str(after);
+    }
+    out
+}
+
+fn json_raw_decode(s: &str) -> Option<(serde_json::Value, usize)> {
+    let mut stream = serde_json::Deserializer::from_str(s).into_iter::<serde_json::Value>();
+    let value = stream.next()?.ok()?;
+    Some((value, stream.byte_offset()))
+}
+
+fn llama_json_object_to_tool_line(val: &serde_json::Value) -> Option<String> {
+    let obj = val.as_object()?;
+    let name = obj.get("name")?.as_str()?;
+    let args = obj
+        .get("arguments")
+        .or_else(|| obj.get("parameters"))
+        .cloned()?;
+    let tool = resolve_hermes_tool_name(name)?;
+    let arg = hermes_args_to_arg_string(&args);
+    Some(format!("{tool}: {arg}"))
 }
 
 // DeepSeek V3 / V3.1 special tokens (fullwidth ｜ U+FF5C, block ▁ U+2581).
@@ -1426,6 +1506,38 @@ mod tests {
         let t = parse_tool_from_response(&content).unwrap();
         assert_eq!(t.0, "FETCH_URL");
         assert_eq!(t.1, "https://example.com");
+    }
+
+    #[test]
+    fn llama_json_tool_call_with_python_tag() {
+        let content = r#"Looking that up.
+<|python_tag|>
+{"name": "brave_search", "arguments": {"query": "El Masnou weather"}}
+"#;
+        let tools = parse_all_tools_from_response(content);
+        assert_eq!(tools.len(), 1, "{tools:?}");
+        assert_eq!(tools[0].0, "BRAVE_SEARCH");
+        assert_eq!(tools[0].1, "El Masnou weather");
+    }
+
+    #[test]
+    fn llama_json_parameters_key_and_multi() {
+        let content = r#"
+{"name": "FETCH_URL", "parameters": {"url": "https://example.com"}}
+{"name": "BRAVE_SEARCH", "arguments": {"query": "mac-stats"}}
+"#;
+        let tools = parse_all_tools_from_response(content);
+        assert!(tools.len() >= 2, "{tools:?}");
+        assert_eq!(tools[0].0, "FETCH_URL");
+        assert_eq!(tools[0].1, "https://example.com");
+        assert_eq!(tools[1].0, "BRAVE_SEARCH");
+        assert_eq!(tools[1].1, "mac-stats");
+    }
+
+    #[test]
+    fn llama_json_ignores_non_tool_objects() {
+        let content = r#"Here is data: {"name": "not_a_real_tool", "arguments": {"x": 1}} and done."#;
+        assert!(parse_all_tools_from_response(content).is_empty());
     }
 
     #[test]
