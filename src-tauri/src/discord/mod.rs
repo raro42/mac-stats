@@ -1881,6 +1881,9 @@ fn set_bot_user_id(id: Option<UserId>) {
 /// Last time the gateway fired `Ready` (used for health / reconnect messaging).
 static DISCORD_LAST_READY_AT: Mutex<Option<Instant>> = Mutex::new(None);
 
+/// Last time we observed a Connected→Disconnected transition (process lifetime).
+static DISCORD_LAST_DISCONNECT_AT: Mutex<Option<Instant>> = Mutex::new(None);
+
 /// Latest shard connection stage from Serenity (for feature health before/after Ready).
 static DISCORD_LAST_SHARD_STAGE: Mutex<Option<ConnectionStage>> = Mutex::new(None);
 
@@ -3100,6 +3103,9 @@ impl EventHandler for Handler {
         match event.new {
             Disconnected if was_up => {
                 let n = DISCORD_DISCONNECT_COUNT.fetch_add(1, Ordering::SeqCst) + 1;
+                if let Ok(mut g) = DISCORD_LAST_DISCONNECT_AT.lock() {
+                    *g = Some(Instant::now());
+                }
                 info!(
                     "Discord: gateway disconnect #{} (shard {:?}: {:?} → {:?})",
                     n, event.shard_id, event.old, event.new
@@ -3369,9 +3375,17 @@ pub fn format_discord_gateway_insights_line() -> String {
     let ready_ago = discord_last_ready_at()
         .map(|t| format!("{}s ago", t.elapsed().as_secs()))
         .unwrap_or_else(|| "never".into());
+    let disc_ago = discord_last_disconnect_at()
+        .map(|t| format!(" · last disc {}s ago", t.elapsed().as_secs()))
+        .unwrap_or_default();
     format!(
-        "Discord gateway: ready×{ready} · resume×{resume} · disconnect×{disconnect} · stage={stage} · last Ready {ready_ago}"
+        "Discord gateway: ready×{ready} · resume×{resume} · disconnect×{disconnect} · stage={stage} · last Ready {ready_ago}{disc_ago}"
     )
+}
+
+/// Instant of the last Connected→Disconnected transition this process, if any.
+pub fn discord_last_disconnect_at() -> Option<Instant> {
+    DISCORD_LAST_DISCONNECT_AT.lock().ok().and_then(|g| *g)
 }
 
 /// Instant of the last `Ready` event, if the bot connected at least once this process.

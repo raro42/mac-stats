@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.151] - 2026-07-21
+
+### Added
+- **Agent Ops Discord health**: show disconnect count on the Discord card; warn/bad styling from gateway stage + resume/disconnect counters; insights line includes last-disconnect age.
+
 ## [0.1.150] - 2026-07-21
 
 ### Fixed

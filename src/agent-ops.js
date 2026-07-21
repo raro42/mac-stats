@@ -156,7 +156,35 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
 
     const dg = insights?.discord_gateway || '';
     const readyMatch = dg.match(/last Ready\s+([^·]+)/i);
-    setText('ops-health-discord', readyMatch ? readyMatch[1].trim() : dg ? 'see Runs' : '—');
+    const discMatch = dg.match(/disconnect×(\d+)/i);
+    const resumeMatch = dg.match(/resume×(\d+)/i);
+    const stageMatch = dg.match(/stage=([^\s·]+)/i);
+    const discN = discMatch ? Number(discMatch[1]) : 0;
+    const resumeN = resumeMatch ? Number(resumeMatch[1]) : 0;
+    const stage = (stageMatch ? stageMatch[1] : '').trim();
+    let discordText = readyMatch ? readyMatch[1].trim() : dg ? 'see Runs' : '—';
+    if (discN > 0) {
+        discordText = `${discordText} · disc×${discN}`;
+    }
+    setText('ops-health-discord', discordText);
+    const discordEl = document.getElementById('ops-health-discord');
+    if (discordEl) {
+        discordEl.title = dg || '';
+        const card = discordEl.closest('.ops-health-card');
+        if (card) {
+            card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+            const stageLower = stage.toLowerCase();
+            if (!dg || discordText === '—') {
+                /* leave neutral */
+            } else if (stageLower === 'disconnected') {
+                card.classList.add('ops-health-bad');
+            } else if (discN > 0 || resumeN > 0 || stageLower === 'resuming') {
+                card.classList.add('ops-health-warn');
+            } else if (stageLower === 'connected' || readyMatch) {
+                card.classList.add('ops-health-ok');
+            }
+        }
+    }
 
         if (redmine) {
         const st = String(redmine.status || '').toLowerCase();
