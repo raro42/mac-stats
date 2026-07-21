@@ -931,6 +931,7 @@ function setupAgentOps() {
         document.getElementById('ops-agents-list').style.display = '';
     });
     document.getElementById('ops-refresh-btn')?.addEventListener('click', () => refreshAgentOps());
+    document.getElementById('ops-session-load-chat')?.addEventListener('click', () => loadOpsSessionIntoChat());
     refreshAgentOps();
 }
 
@@ -1019,6 +1020,39 @@ function renderOpsAgentPreview() {
     pre.textContent = map[opsAgentFileTab] || '';
 }
 
+function formatSessionMessagesPreview(rows) {
+    if (!rows || !rows.length) return '(empty session)';
+    return rows
+        .map((m) => `## ${m.role === 'user' ? 'User' : 'Assistant'}\n\n${m.content}`)
+        .join('\n\n');
+}
+
+let opsSessionLoadRows = null;
+
+function showOpsSessionPreview(rows, label) {
+    const preview = document.getElementById('ops-session-preview');
+    const loadBtn = document.getElementById('ops-session-load-chat');
+    opsSessionLoadRows = rows && rows.length ? rows : null;
+    preview.hidden = false;
+    preview.textContent = (label ? `${label}\n\n` : '') + formatSessionMessagesPreview(rows || []);
+    if (loadBtn) loadBtn.hidden = !opsSessionLoadRows;
+}
+
+function loadOpsSessionIntoChat() {
+    if (!opsSessionLoadRows || !opsSessionLoadRows.length) return;
+    if (!window.Ollama?.replaceHistory) {
+        console.warn('[Agent Ops] Ollama.replaceHistory unavailable');
+        return;
+    }
+    window.Ollama.replaceHistory(opsSessionLoadRows);
+    // Expand AI Chat section so the user sees the loaded turns.
+    const content = document.getElementById('ollama-content');
+    const btn = document.getElementById('ollama-collapse-btn');
+    if (content) content.style.display = '';
+    if (btn) btn.textContent = '−';
+    document.getElementById('chat-input')?.focus();
+}
+
 function renderOpsLive(rows) {
     const el = document.getElementById('ops-live-sessions');
     el.innerHTML = '';
@@ -1027,18 +1061,33 @@ function renderOpsLive(rows) {
         return;
     }
     rows.forEach((r) => {
-        const div = document.createElement('div');
-        div.className = 'ops-row';
-        div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs · ${escapeHtml(r.last_activity)}</div></div>`;
-        el.appendChild(div);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs · ${escapeHtml(r.last_activity)}</div></div>`;
+        btn.addEventListener('click', async () => {
+            try {
+                const msgs = await invoke('read_live_session_messages', {
+                    source: r.source,
+                    sessionId: r.session_id,
+                });
+                showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`);
+            } catch (err) {
+                showOpsSessionPreview([], String(err));
+            }
+        });
+        el.appendChild(btn);
     });
 }
 
 function renderOpsSessionFiles(files) {
     const el = document.getElementById('ops-session-files');
     const preview = document.getElementById('ops-session-preview');
+    const loadBtn = document.getElementById('ops-session-load-chat');
     el.innerHTML = '';
     preview.hidden = true;
+    if (loadBtn) loadBtn.hidden = true;
+    opsSessionLoadRows = null;
     if (!files.length) {
         el.innerHTML = '<div class="ops-empty">No session-memory-*.md files</div>';
         return;
@@ -1050,12 +1099,21 @@ function renderOpsSessionFiles(files) {
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(f.source_hint)} · ${fmtBytes(f.size_bytes)} · ${fmtAge(f.modified_ms)}</div></div>`;
         btn.addEventListener('click', async () => {
             try {
-                const text = await invoke('read_session_file', { path: f.path });
-                preview.hidden = false;
-                preview.textContent = text.slice(0, 12000);
+                const msgs = await invoke('read_session_file_messages', { path: f.path });
+                if (msgs && msgs.length) {
+                    showOpsSessionPreview(msgs, f.name);
+                } else {
+                    const text = await invoke('read_session_file', { path: f.path });
+                    preview.hidden = false;
+                    preview.textContent = text.slice(0, 12000);
+                    opsSessionLoadRows = null;
+                    if (loadBtn) loadBtn.hidden = true;
+                }
             } catch (err) {
                 preview.hidden = false;
                 preview.textContent = String(err);
+                opsSessionLoadRows = null;
+                if (loadBtn) loadBtn.hidden = true;
             }
         });
         el.appendChild(btn);

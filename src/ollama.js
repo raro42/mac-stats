@@ -438,6 +438,31 @@ function clearConversationHistory() {
 }
 
 /**
+ * Replace history (e.g. Agent Ops session resume). Caps at last 20 turns.
+ * Also rebuilds the chat message UI when present.
+ * @param {{role: string, content: string}[]} messages
+ */
+function replaceConversationHistory(messages) {
+  const list = Array.isArray(messages) ? messages : [];
+  conversationHistory = list
+    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+    .map((m) => ({ role: m.role, content: m.content }))
+    .slice(-20);
+  const container = document.getElementById('chat-messages');
+  if (container) {
+    container.innerHTML = '';
+    for (const m of conversationHistory) {
+      addChatMessage(m.role, m.content);
+    }
+  }
+  const chat = document.getElementById('ollama-chat');
+  if (chat && conversationHistory.length) {
+    chat.style.display = '';
+  }
+  console.log('[Ollama] Replaced conversation history:', conversationHistory.length, 'messages');
+}
+
+/**
  * Send chat message to Ollama using unified command
  */
 async function sendChatMessage() {
@@ -1144,6 +1169,7 @@ window.Ollama = {
   processResponse: processOllamaResponse,
   getHistory: getConversationHistory,
   clearHistory: clearConversationHistory,
+  replaceHistory: replaceConversationHistory,
   
   // Code execution
   executeCode: executeJavaScriptCode,

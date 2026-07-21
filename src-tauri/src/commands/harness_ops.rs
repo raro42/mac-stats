@@ -50,6 +50,12 @@ pub struct LiveSessionSummary {
 }
 
 #[derive(Debug, Clone, Serialize)]
+pub struct SessionMessageRow {
+    pub role: String,
+    pub content: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
 pub struct SessionFileSummary {
     pub name: String,
     pub path: String,
@@ -161,6 +167,25 @@ pub fn list_live_sessions() -> Vec<LiveSessionSummary> {
         .collect();
     rows.sort_by(|a, b| b.last_activity.cmp(&a.last_activity));
     rows
+}
+
+/// Messages for a live in-memory session (Agent Ops resume / preview).
+#[tauri::command]
+pub fn read_live_session_messages(source: String, session_id: u64) -> Vec<SessionMessageRow> {
+    crate::session_memory::get_messages(source.trim(), session_id)
+        .into_iter()
+        .map(|(role, content)| SessionMessageRow { role, content })
+        .collect()
+}
+
+/// Parsed user/assistant turns from a session markdown file under ~/.mac-stats/session/.
+#[tauri::command]
+pub fn read_session_file_messages(path: String) -> Result<Vec<SessionMessageRow>, String> {
+    let text = read_session_file(path)?;
+    Ok(crate::session_memory::parse_session_markdown(&text)
+        .into_iter()
+        .map(|(role, content)| SessionMessageRow { role, content })
+        .collect())
 }
 
 /// Recent persisted session markdown under ~/.mac-stats/session/.
