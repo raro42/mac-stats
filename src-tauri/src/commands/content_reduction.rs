@@ -91,6 +91,7 @@ pub(crate) async fn reduce_fetched_content_to_fit(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
@@ -98,6 +99,7 @@ pub(crate) async fn reduce_fetched_content_to_fit(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
     ];
 
@@ -2932,6 +2934,7 @@ pub(crate) async fn run_skill_ollama_session(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
@@ -2939,6 +2942,7 @@ pub(crate) async fn run_skill_ollama_session(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
     ];
     info!(
@@ -8759,6 +8763,7 @@ mod tests {
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         }
     }
 

@@ -124,6 +124,7 @@ Output ONLY these two sections, nothing else."#;
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
@@ -131,6 +132,7 @@ Output ONLY these two sections, nothing else."#;
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
     ];
 
@@ -215,6 +217,7 @@ pub async fn run_periodic_session_compaction() {
                     images: None,
                     tool_calls: None,
                     tool_name: None,
+                    tool_call_id: None,
                 })
                 .collect();
         if messages.len() < PERIODIC_COMPACTION_MIN_MESSAGES {

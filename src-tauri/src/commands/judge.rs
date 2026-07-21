@@ -115,6 +115,7 @@ pub async fn run_judge(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
@@ -122,6 +123,7 @@ pub async fn run_judge(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
     ];
     let response = match crate::commands::ollama::send_ollama_chat_messages(

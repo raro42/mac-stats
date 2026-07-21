@@ -226,6 +226,7 @@ pub(crate) fn msg(role: &str, content: impl Into<String>) -> ChatMessage {
         images: None,
         tool_calls: None,
         tool_name: None,
+        tool_call_id: None,
     }
 }
 
@@ -268,6 +269,7 @@ mod tests {
                     },
                 }]),
                 tool_name: None,
+                tool_call_id: None,
             },
             done: true,
         };
@@ -291,6 +293,7 @@ mod tests {
                     },
                 }]),
                 tool_name: None,
+                tool_call_id: None,
             },
             done: true,
         };

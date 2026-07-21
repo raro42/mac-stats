@@ -178,6 +178,12 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
                 let synthetic_name = msg.tool_calls.as_ref().and_then(|calls| {
                     calls.first().and_then(|c| c.function.name.clone())
                 });
+                let synthetic_call_id = msg.tool_calls.as_ref().and_then(|calls| {
+                    calls
+                        .first()
+                        .and_then(|c| c.id.clone())
+                        .filter(|s| !s.is_empty())
+                });
                 out.push(msg);
                 out.push(ChatMessage {
                     role: synthetic_role.to_string(),
@@ -186,6 +192,11 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
                     tool_calls: None,
                     tool_name: if synthetic_role == "tool" {
                         synthetic_name
+                    } else {
+                        None
+                    },
+                    tool_call_id: if synthetic_role == "tool" {
+                        synthetic_call_id
                     } else {
                         None
                     },
@@ -222,12 +233,14 @@ mod tests {
                 },
             }]),
             tool_name: None,
+            tool_call_id: None,
         }];
         let out = sanitize_conversation_history(hist);
         assert_eq!(out.len(), 2);
         assert_eq!(out[1].role, "tool");
         assert_eq!(out[1].content, SYNTHETIC_TOOL_RESULT);
         assert_eq!(out[1].tool_name.as_deref(), Some("FETCH_URL"));
+        assert_eq!(out[1].tool_call_id.as_deref(), Some("call_1"));
     }
 
     #[test]
@@ -239,6 +252,7 @@ mod tests {
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             },
             ChatMessage {
                 role: "user".into(),
@@ -246,6 +260,7 @@ mod tests {
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             },
         ];
         let out = sanitize_conversation_history(hist);
@@ -264,6 +279,7 @@ mod tests {
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             },
             ChatMessage {
                 role: "user".into(),
@@ -271,6 +287,7 @@ mod tests {
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             },
         ];
         let out = sanitize_conversation_history(hist);
@@ -287,6 +304,7 @@ mod tests {
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             },
             ChatMessage {
                 role: "tool".into(),
@@ -294,6 +312,7 @@ mod tests {
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             },
         ];
         let out = sanitize_conversation_history(hist);
@@ -310,6 +329,7 @@ mod tests {
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             },
             ChatMessage {
                 role: "user".into(),
@@ -317,6 +337,7 @@ mod tests {
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             },
         ];
         let out = sanitize_conversation_history(hist);

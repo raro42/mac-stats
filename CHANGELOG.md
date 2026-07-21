@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.162] - 2026-07-21
+
+### Changed
+- **Native tool loop**: `ChatMessage` includes optional `tool_call_id` on role `tool` results, paired from assistant `tool_calls[].id`; sanitize synthetic follow-ups copy the id when present.
+
 ## [0.1.161] - 2026-07-21
 
 ### Changed

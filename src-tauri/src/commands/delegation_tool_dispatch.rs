@@ -491,6 +491,7 @@ pub(crate) async fn handle_run_cmd(
                         images: None,
                         tool_calls: None,
                         tool_name: None,
+                        tool_call_id: None,
                     }];
                     match send_ollama_chat_messages(
                         fix_messages,

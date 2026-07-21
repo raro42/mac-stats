@@ -253,6 +253,7 @@ fn assemble_impl(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
         &trimmed,
         current_user,
@@ -279,6 +280,7 @@ mod tests {
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         };
         let h = vec![mk(1), mk(2), mk(3)];
         let max_tok = estimate_message_tokens(&h[1]) + estimate_message_tokens(&h[2]);
@@ -296,6 +298,7 @@ mod tests {
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             });
         }
         let out = ContextAssembler::compact(&FrontendContextAssembler, v);
@@ -310,6 +313,7 @@ mod tests {
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         }];
         let user = ChatMessage {
             role: "user".to_string(),
@@ -317,6 +321,7 @@ mod tests {
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         };
         let out =
             ContextAssembler::assemble(&AgentContextAssembler, &hist, "SYS", user.clone(), 100_000);

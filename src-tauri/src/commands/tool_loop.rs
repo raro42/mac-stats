@@ -834,6 +834,7 @@ pub(crate) async fn run_tool_loop(
                 None
             },
             tool_name: None,
+            tool_call_id: None,
         });
         // Native Ollama/OpenAI tools expect one role "tool" message per call (OpenClaw/Hermes).
         // Text-line mode keeps a single role "user" blob; RUN_CMD raw dumps stay "system".
@@ -847,11 +848,27 @@ pub(crate) async fn run_tool_loop(
             } else {
                 vec![String::new(); n]
             };
-            for (result, name) in tool_results.iter().zip(step_names) {
+            // Pair each tool result with the matching assistant tool_calls[].id (Hermes/OpenAI).
+            let call_ids: Vec<Option<String>> = messages
+                .last()
+                .and_then(|m| m.tool_calls.as_ref())
+                .map(|calls| {
+                    calls
+                        .iter()
+                        .map(|c| c.id.clone().filter(|s| !s.is_empty()))
+                        .collect()
+                })
+                .unwrap_or_default();
+            for (i, (result, name)) in tool_results.iter().zip(step_names).enumerate() {
                 let role = if result.starts_with("Here is the command output") {
                     "system"
                 } else {
                     "tool"
+                };
+                let tool_call_id = if role == "tool" {
+                    call_ids.get(i).and_then(|id| id.clone())
+                } else {
+                    None
                 };
                 messages.push(ChatMessage {
                     role: role.to_string(),
@@ -863,6 +880,7 @@ pub(crate) async fn run_tool_loop(
                     } else {
                         None
                     },
+                    tool_call_id,
                 });
             }
         } else {
@@ -877,6 +895,7 @@ pub(crate) async fn run_tool_loop(
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             });
         }
 
@@ -1125,6 +1144,7 @@ fn inject_budget_warnings(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         });
     } else if ratio >= budget_warning_ratio {
         let remaining = max_tool_iterations - tool_count;
@@ -1146,6 +1166,7 @@ fn inject_budget_warnings(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         });
     }
 }

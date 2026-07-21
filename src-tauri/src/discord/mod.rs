@@ -1205,6 +1205,7 @@ async fn having_fun_respond_locked(
         images: None,
         tool_calls: None,
         tool_name: None,
+        tool_call_id: None,
     });
 
     for (role, content) in cap_tail_chronological(prior, CONVERSATION_HISTORY_CAP)
@@ -1217,6 +1218,7 @@ async fn having_fun_respond_locked(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         });
     }
 
@@ -1246,6 +1248,7 @@ async fn having_fun_respond_locked(
         images: None,
         tool_calls: None,
         tool_name: None,
+        tool_call_id: None,
     });
 
     let channel = serenity::model::id::ChannelId::new(channel_id);
@@ -1406,6 +1409,7 @@ async fn having_fun_idle_thought_locked(channel_id: u64, ctx: Context) {
         images: None,
         tool_calls: None,
         tool_name: None,
+        tool_call_id: None,
     });
 
     for (role, content) in cap_tail_chronological(prior, HAVING_FUN_IDLE_HISTORY_CAP)
@@ -1418,6 +1422,7 @@ async fn having_fun_idle_thought_locked(channel_id: u64, ctx: Context) {
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         });
     }
 
@@ -1427,6 +1432,7 @@ async fn having_fun_idle_thought_locked(channel_id: u64, ctx: Context) {
         images: None,
         tool_calls: None,
         tool_name: None,
+        tool_call_id: None,
     });
 
     let channel = serenity::model::id::ChannelId::new(channel_id);
@@ -2327,6 +2333,7 @@ async fn run_discord_ollama_router_locked(
                     images: None,
                     tool_calls: None,
                     tool_name: None,
+                    tool_call_id: None,
                 })
                 .collect(),
         )

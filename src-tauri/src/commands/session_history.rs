@@ -206,6 +206,7 @@ pub(crate) async fn prepare_conversation_history(
                         images: None,
                         tool_calls: None,
                         tool_name: None,
+                        tool_call_id: None,
                     }]
                 }
             }
@@ -271,6 +272,7 @@ mod tests {
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         };
         let h1 = ChatMessage {
             role: "user".to_string(),
@@ -278,6 +280,7 @@ mod tests {
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         };
         let h2 = ChatMessage {
             role: "assistant".to_string(),
@@ -285,6 +288,7 @@ mod tests {
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         };
         let user = ChatMessage {
             role: "user".to_string(),
@@ -292,6 +296,7 @@ mod tests {
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         };
         let out = build_execution_message_stack(system, &[h1.clone(), h2.clone()], user.clone());
         assert_eq!(out.len(), 4);
@@ -313,6 +318,7 @@ mod tests {
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         };
         let user = ChatMessage {
             role: "user".to_string(),
@@ -320,6 +326,7 @@ mod tests {
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         };
         let out = build_execution_message_stack(system, &[], user.clone());
         assert_eq!(out.len(), 2);
@@ -376,6 +383,7 @@ mod tests {
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             },
             ChatMessage {
                 role: "assistant".to_string(),
@@ -383,6 +391,7 @@ mod tests {
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             },
         ];
         let out = prepare_conversation_history(
@@ -406,6 +415,7 @@ mod tests {
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         }];
         let out = prepare_conversation_history(
             raw,

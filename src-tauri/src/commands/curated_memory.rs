@@ -315,6 +315,7 @@ Skip timeout boilerplate, apologies, and one-off trivia. If nothing worth saving
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
         crate::ollama::ChatMessage {
             role: "user".into(),
@@ -322,6 +323,7 @@ Skip timeout boilerplate, apologies, and one-off trivia. If nothing worth saving
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
     ];
 

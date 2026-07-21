@@ -116,6 +116,9 @@ pub struct ChatMessage {
     /// Ollama/OpenAI tool result name (role "tool"); skipped when None.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tool_name: Option<String>,
+    /// Matches assistant `tool_calls[].id` when the provider supplies one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tool_call_id: Option<String>,
 }
 
 /// Per-request chat options (temperature, num_ctx). Serializes to Ollama API `options` object.
@@ -193,6 +196,7 @@ pub fn chat_response_from_api_body(body: &str) -> Result<ChatResponse, String> {
                 images: None,
                 tool_calls,
                 tool_name: None,
+                tool_call_id: None,
             },
             done: true,
         });

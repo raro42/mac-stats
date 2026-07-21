@@ -63,6 +63,7 @@ pub(crate) async fn run_agent_ollama_session(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
         crate::ollama::ChatMessage {
             role: "user".to_string(),
@@ -70,6 +71,7 @@ pub(crate) async fn run_agent_ollama_session(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
     ];
     let max_iters = agent.max_tool_iterations;
@@ -116,6 +118,7 @@ pub(crate) async fn run_agent_ollama_session(
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             });
             messages.push(crate::ollama::ChatMessage {
                 role: "user".to_string(),
@@ -123,6 +126,7 @@ pub(crate) async fn run_agent_ollama_session(
                 images: None,
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             });
             continue;
         }

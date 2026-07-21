@@ -255,6 +255,7 @@ pub async fn ollama_chat_with_execution(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
         token_budget,
     );
@@ -322,6 +323,7 @@ pub async fn ollama_chat_with_execution(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         });
         follow_up_messages.push(crate::ollama::ChatMessage {
             role: "user".to_string(),
@@ -332,6 +334,7 @@ pub async fn ollama_chat_with_execution(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         });
 
         let follow_up_request = ChatRequest {
@@ -516,6 +519,7 @@ pub async fn ollama_chat_continue_with_result(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
         assemble_budget.max(512),
     );
@@ -525,6 +529,7 @@ pub async fn ollama_chat_continue_with_result(
         images: None,
         tool_calls: None,
         tool_name: None,
+        tool_call_id: None,
     });
     messages.push(crate::ollama::ChatMessage {
         role: "user".to_string(),
@@ -532,6 +537,7 @@ pub async fn ollama_chat_continue_with_result(
         images: None,
         tool_calls: None,
         tool_name: None,
+        tool_call_id: None,
     });
 
     let chat_request = ChatRequest { messages };

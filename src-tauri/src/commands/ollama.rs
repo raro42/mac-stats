@@ -1037,6 +1037,7 @@ pub fn answer_with_ollama_and_fetch(
                 images: attachment_images_base64.clone(),
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             };
             let planning_messages = ContextAssembler::assemble(
                 &AgentContextAssembler,
@@ -1226,6 +1227,7 @@ pub fn answer_with_ollama_and_fetch(
                 images: attachment_images_base64.clone(),
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             };
             let msgs = ContextAssembler::assemble(
                 &AgentContextAssembler,
@@ -1284,6 +1286,7 @@ pub fn answer_with_ollama_and_fetch(
                 images: attachment_images_base64.clone(),
                 tool_calls: None,
                 tool_name: None,
+                tool_call_id: None,
             };
             let mut msgs = ContextAssembler::assemble(
                 &AgentContextAssembler,
@@ -1638,6 +1641,7 @@ pub fn answer_with_ollama_and_fetch(
                         images: None,
                         tool_calls: None,
                         tool_name: None,
+                        tool_call_id: None,
                     });
                     updated_history.push(crate::ollama::ChatMessage {
                         role: "assistant".to_string(),
@@ -1645,6 +1649,7 @@ pub fn answer_with_ollama_and_fetch(
                         images: None,
                         tool_calls: None,
                         tool_name: None,
+                        tool_call_id: None,
                     });
                     let pass_intermediate =
                         discord_reply_channel_id.map(|_| response_content.clone());

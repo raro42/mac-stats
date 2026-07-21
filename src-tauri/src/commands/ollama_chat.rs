@@ -543,6 +543,7 @@ async fn send_ollama_chat_messages_streaming_inner(
                                 images: None,
                                 tool_calls: None,
                                 tool_name: None,
+                                tool_call_id: None,
                             },
                             done: true,
                         };
@@ -603,6 +604,7 @@ async fn send_ollama_chat_messages_streaming_inner(
                                     images: None,
                                     tool_calls: None,
                                     tool_name: None,
+                                    tool_call_id: None,
                                 },
                                 done: true,
                             };
@@ -645,6 +647,7 @@ async fn send_ollama_chat_messages_streaming_inner(
                                 images: None,
                                 tool_calls: None,
                                 tool_name: None,
+                                tool_call_id: None,
                             },
                             done: true,
                         };
@@ -669,6 +672,7 @@ async fn send_ollama_chat_messages_streaming_inner(
             images: None,
             tool_calls: None,
             tool_name: None,
+            tool_call_id: None,
         },
         done: true,
     };
