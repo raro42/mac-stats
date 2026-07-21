@@ -130,7 +130,7 @@ fn create_skill(rest: &str) -> String {
     if path.exists() {
         return format!("Skill file already exists: {}", path.display());
     }
-    match std::fs::write(&path, content.trim()) {
+    match crate::config::write_text_atomic(&path, content.trim()) {
         Ok(()) => {
             info!("SKILL_MANAGE: created {}", path.display());
             format!(
@@ -160,7 +160,7 @@ fn edit_skill(rest: &str) -> String {
         Ok(v) => v,
         Err(e) => return e,
     };
-    match std::fs::write(&path, content.trim()) {
+    match crate::config::write_text_atomic(&path, content.trim()) {
         Ok(()) => {
             info!("SKILL_MANAGE: edited {}", path.display());
             format!("Updated skill {}-{}.", n, topic)
@@ -200,7 +200,7 @@ fn patch_skill(rest: &str) -> String {
     if updated.len() > MAX_CONTENT {
         return "Patch would exceed size limit.".to_string();
     }
-    match std::fs::write(&path, updated) {
+    match crate::config::write_text_atomic(&path, &updated) {
         Ok(()) => {
             info!("SKILL_MANAGE: patched {}", path.display());
             format!("Patched skill {}-{}.", n, topic)

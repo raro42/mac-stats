@@ -278,7 +278,7 @@ pub fn before_session_reset_export(source: &str, session_id: u64, reason: &str) 
         }
     }
 
-    match std::fs::write(&transcript_path, &body) {
+    match crate::config::write_text_atomic(&transcript_path, &body) {
         Ok(()) => info!(
             "Session memory: before_reset wrote {} ({} messages, reason={})",
             transcript_path.display(),
@@ -424,7 +424,7 @@ fn persist_session(source: &str, session_id: u64) -> std::io::Result<()> {
         body.push_str(&format!("## {}\n\n{}\n\n", heading, content));
     }
 
-    std::fs::write(&path, body)?;
+    crate::config::write_text_atomic(&path, &body).map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
     debug!(
         "Session memory: wrote {} ({} messages)",
         path.display(),

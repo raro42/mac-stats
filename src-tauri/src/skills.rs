@@ -60,7 +60,7 @@ fn ensure_default_skills() {
         if path.exists() {
             continue;
         }
-        if std::fs::write(&path, content.trim()).is_ok() {
+        if crate::config::write_text_atomic(&path, content.trim()).is_ok() {
             info!("Skills: created default {}", name);
         } else {
             warn!("Skills: failed to create {}", name);
