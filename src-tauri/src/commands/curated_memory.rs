@@ -104,7 +104,7 @@ fn write_entries(path: &PathBuf, entries: &[String], limit: usize) -> Result<usi
     }
     kept.reverse();
     let body: String = kept.iter().map(|e| format!("- {}\n", e)).collect();
-    std::fs::write(path, body).map_err(|e| e.to_string())?;
+    crate::config::write_text_atomic(path, &body).map_err(|e| e.to_string())?;
     Ok(kept.len())
 }
 

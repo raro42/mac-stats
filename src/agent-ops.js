@@ -26,6 +26,16 @@
     });
   }
 
+  function opsFilterCaptionHtml(total, shown, q) {
+    if (!q) return '';
+    return `<div class="ops-row-meta ops-filter-caption">${shown} of ${total} match</div>`;
+  }
+
+  function prependOpsFilterCaption(el, total, shown, q) {
+    if (!el || !q || !shown) return;
+    el.insertAdjacentHTML('afterbegin', opsFilterCaptionHtml(total, shown, q));
+  }
+
   const OPS_REFRESH_INTERVAL = 30000;
   let agentOpsInterval = null;
   let agentOpsCollapsed = true;
@@ -683,6 +693,7 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">${escapeHtml(when)} · next ${escapeHtml(next)}</div><div class="ops-row-meta">${escapeHtml(task.slice(0, 80))}${task.length > 80 ? '…' : ''}</div></div>`;
                 list.appendChild(div);
             });
+            prependOpsFilterCaption(list, all.length, filtered.length, opsSchedulesFilterQ);
         }
     }
     if (delList) {
@@ -793,6 +804,7 @@ function renderOpsAgents(agents) {
         btn.addEventListener('click', () => openOpsAgent(a.id));
         list.appendChild(btn);
     });
+    prependOpsFilterCaption(list, all.length, filtered.length, opsAgentsFilterQ);
 }
 
 async function openOpsAgent(id) {
@@ -940,6 +952,7 @@ function renderOpsLive(rows) {
         btn.title = 'Click to preview · double-click to load into AI Chat';
         el.appendChild(btn);
     });
+    prependOpsFilterCaption(el, all.length, filtered.length, opsSessionFilterQ);
 }
 
 function renderOpsSessionFiles(files) {
@@ -999,6 +1012,7 @@ function renderOpsSessionFiles(files) {
         btn.title = 'Click to preview · double-click to load into AI Chat';
         el.appendChild(btn);
     });
+    prependOpsFilterCaption(el, all.length, filtered.length, opsSessionFilterQ);
 }
 
 function renderOpsMemory(files) {
@@ -1035,6 +1049,7 @@ function renderOpsMemory(files) {
         });
         el.appendChild(btn);
     });
+    prependOpsFilterCaption(el, all.length, filtered.length, opsMemoryFilterQ);
 }
 
 function renderOpsRuns(insights) {
@@ -1088,6 +1103,7 @@ function renderOpsRuns(insights) {
             ${cand ? `<div class="ops-insight-sub">Candidates</div>${cand}` : ''}
         `;
     }
+    let shown = 0;
     (insights.recent || []).forEach((r) => {
         const toolsJoined = (r.tools || []).join(', ') || '—';
         if (
@@ -1097,12 +1113,17 @@ function renderOpsRuns(insights) {
         ) {
             return;
         }
+        shown += 1;
         const div = document.createElement('div');
         div.className = 'ops-row';
         div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(toolsJoined)}${r.ok ? '' : ' · FAIL'}</div></div>`;
         el.appendChild(div);
     });
-    if (opsRunsFilterQ && !el.children.length) {
+    const totalRecent = (insights.recent || []).length;
+    if (opsRunsFilterQ && shown) {
+        prependOpsFilterCaption(el, totalRecent, shown, opsRunsFilterQ);
+    }
+    if (opsRunsFilterQ && !el.querySelector('.ops-row')) {
         el.innerHTML = '<div class="ops-empty">No runs match filter</div>';
     }
 }

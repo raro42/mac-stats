@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.173] - 2026-07-21
+
+### Changed
+- **Agent Ops**: filtered lists show an “N of M match” caption when a filter is active.
+- **Memory**: curated memory file rewrites use crash-safe `write_text_atomic`.
+
 ## [0.1.172] - 2026-07-21
 
 ### Changed
