@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.149] - 2026-07-21
+
+### Added
+- **Agent Ops session files**: last-user message preview on persisted `session-memory-*.md` rows; double-click to load into AI Chat (parity with live sessions).
+
 ## [0.1.148] - 2026-07-21
 
 ### Added

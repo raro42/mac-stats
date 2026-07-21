@@ -64,6 +64,8 @@ pub struct SessionFileSummary {
     pub slug: String,
     pub modified_ms: u64,
     pub size_bytes: u64,
+    /// Last user message preview (Agent Ops resume UX).
+    pub preview: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -218,13 +220,17 @@ pub fn list_session_files(limit: Option<u32>) -> Result<Vec<SessionFileSummary>,
         }
         let meta = ent.metadata().map_err(|e| e.to_string())?;
         let (source_hint, slug) = parse_session_filename(&name);
+        let size_bytes = meta.len();
+        let preview =
+            crate::session_memory::last_user_preview_from_session_path(&path, size_bytes);
         rows.push(SessionFileSummary {
             name,
             path: path.display().to_string(),
             source_hint,
             slug,
             modified_ms: file_mtime_ms(&meta),
-            size_bytes: meta.len(),
+            size_bytes,
+            preview,
         });
     }
     rows.sort_by(|a, b| b.modified_ms.cmp(&a.modified_ms));

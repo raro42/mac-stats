@@ -613,26 +613,35 @@ function renderOpsSessionFiles(files) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(f.source_hint)} · ${fmtBytes(f.size_bytes)} · ${fmtAge(f.modified_ms)}</div></div>`;
-        btn.addEventListener('click', async () => {
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(f.source_hint)} · ${fmtBytes(f.size_bytes)} · ${fmtAge(f.modified_ms)}${f.preview ? ` · ${escapeHtml(f.preview)}` : ''}</div></div>`;
+        const openFile = async () => {
             try {
                 const msgs = await invoke('read_session_file_messages', { path: f.path });
                 if (msgs && msgs.length) {
                     showOpsSessionPreview(msgs, f.name);
+                    showOpsSessionStatus('Preview ready — click “Load into AI Chat” or double-click to load.', true);
                 } else {
                     const text = await invoke('read_session_file', { path: f.path });
                     preview.hidden = false;
                     preview.textContent = text.slice(0, 12000);
                     opsSessionLoadRows = null;
                     if (loadBtn) loadBtn.hidden = true;
+                    showOpsSessionStatus('No parseable turns — raw file shown.', false);
                 }
             } catch (err) {
                 preview.hidden = false;
                 preview.textContent = String(err);
                 opsSessionLoadRows = null;
                 if (loadBtn) loadBtn.hidden = true;
+                showOpsSessionStatus(String(err), false);
             }
+        };
+        btn.addEventListener('click', openFile);
+        btn.addEventListener('dblclick', async () => {
+            await openFile();
+            loadOpsSessionIntoChat();
         });
+        btn.title = 'Click to preview · double-click to load into AI Chat';
         el.appendChild(btn);
     });
 }

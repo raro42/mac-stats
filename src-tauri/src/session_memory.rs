@@ -511,6 +511,55 @@ pub fn replace_session(source: &str, session_id: u64, new_messages: Vec<(String,
     }
 }
 
+/// Truncate a user message for Agent Ops list rows (single line, ≤80 chars).
+pub fn truncate_session_preview(text: &str) -> String {
+    let t = text.trim().replace('\n', " ");
+    if t.chars().count() > 80 {
+        format!("{}…", t.chars().take(80).collect::<String>())
+    } else {
+        t
+    }
+}
+
+/// Last user-turn preview from session markdown (Agent Ops file list).
+pub fn last_user_preview_from_markdown(content: &str) -> String {
+    parse_session_markdown(content)
+        .into_iter()
+        .rev()
+        .find(|(role, _)| role == "user")
+        .map(|(_, c)| truncate_session_preview(&c))
+        .unwrap_or_default()
+}
+
+/// Read a session file and return a last-user preview without loading huge files fully.
+/// For large files, only the trailing bytes are scanned (may miss a turn that starts earlier).
+pub fn last_user_preview_from_session_path(path: &Path, size_bytes: u64) -> String {
+    const FULL_READ_MAX: u64 = 64_000;
+    const TAIL_READ: u64 = 32_000;
+    let content = if size_bytes <= FULL_READ_MAX {
+        match std::fs::read_to_string(path) {
+            Ok(c) => c,
+            Err(_) => return String::new(),
+        }
+    } else {
+        use std::io::{Read, Seek, SeekFrom};
+        let mut f = match std::fs::File::open(path) {
+            Ok(f) => f,
+            Err(_) => return String::new(),
+        };
+        let start = size_bytes.saturating_sub(TAIL_READ);
+        if f.seek(SeekFrom::Start(start)).is_err() {
+            return String::new();
+        }
+        let mut buf = Vec::with_capacity(TAIL_READ as usize);
+        if f.read_to_end(&mut buf).is_err() {
+            return String::new();
+        }
+        String::from_utf8_lossy(&buf).into_owned()
+    };
+    last_user_preview_from_markdown(&content)
+}
+
 /// One session entry for listing (source, session_id, message_count, last_activity).
 pub struct SessionEntry {
     pub source: String,
@@ -545,14 +594,7 @@ pub fn list_sessions() -> Vec<SessionEntry> {
             .iter()
             .rev()
             .find(|(role, _)| role == "user")
-            .map(|(_, c)| {
-                let t = c.trim().replace('\n', " ");
-                if t.chars().count() > 80 {
-                    format!("{}…", t.chars().take(80).collect::<String>())
-                } else {
-                    t
-                }
-            })
+            .map(|(_, c)| truncate_session_preview(c))
             .unwrap_or_default();
         out.push(SessionEntry {
             source,
@@ -683,8 +725,9 @@ fn parse_session_file(path: &Path) -> Vec<(String, String)> {
 mod tests {
     use super::{
         add_message, before_session_reset_export, clear_session, extract_assistant_final_answer,
-        get_messages, load_messages_from_latest_session_file, normalize_conversational_message,
-        parse_session_markdown, session_filename_matches_id,
+        get_messages, last_user_preview_from_markdown, load_messages_from_latest_session_file,
+        normalize_conversational_message, parse_session_markdown, session_filename_matches_id,
+        truncate_session_preview,
     };
     use std::sync::Mutex;
     use std::time::Duration;
@@ -856,6 +899,16 @@ mod tests {
         assert_eq!(v[0].1, "Hello");
         assert_eq!(v[1].0, "assistant");
         assert_eq!(v[1].1, "Hi there");
+    }
+
+    #[test]
+    fn last_user_preview_picks_latest_user_turn() {
+        let md = "## User\n\nFirst\n\n## Assistant\n\nOk\n\n## User\n\nSecond question here\n\n## Assistant\n\nDone\n";
+        assert_eq!(
+            last_user_preview_from_markdown(md),
+            "Second question here"
+        );
+        assert!(truncate_session_preview(&"x".repeat(100)).ends_with('…'));
     }
 
     /// Lines that look like markdown headings but are not exactly `## User` / `## Assistant` must
