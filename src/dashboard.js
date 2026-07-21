@@ -10,14 +10,17 @@ const invoke = (...a) => dashboardInvoke(...a);
 
 // Update interval (milliseconds)
 const UPDATE_INTERVAL = 2000; // 2 seconds
+const OPS_REFRESH_INTERVAL = 30000; // Command Center live data
 
 // State
 let updateInterval = null;
+let agentOpsInterval = null;
 let monitorsCollapsed = false;
 let ollamaCollapsed = false;
 let agentOpsCollapsed = false;
 let opsAgentCache = null;
 let opsAgentFileTab = 'soul';
+let opsRefreshInFlight = false;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -126,10 +129,12 @@ function toggleSection(section) {
         if (agentOpsCollapsed) {
             content.classList.add('collapsed');
             btn.textContent = '+';
+            stopAgentOpsAutoRefresh();
         } else {
             content.classList.remove('collapsed');
             btn.textContent = '−';
             refreshAgentOps();
+            startAgentOpsAutoRefresh();
         }
     }
 }
@@ -944,6 +949,22 @@ function setupAgentOps() {
     document.getElementById('ops-digest-refresh-btn')?.addEventListener('click', () => refreshOpsDigest());
     document.getElementById('ops-session-load-chat')?.addEventListener('click', () => loadOpsSessionIntoChat());
     refreshAgentOps();
+    startAgentOpsAutoRefresh();
+}
+
+function startAgentOpsAutoRefresh() {
+    if (agentOpsInterval) return;
+    agentOpsInterval = setInterval(() => {
+        if (agentOpsCollapsed || opsRefreshInFlight) return;
+        refreshAgentOps();
+    }, OPS_REFRESH_INTERVAL);
+}
+
+function stopAgentOpsAutoRefresh() {
+    if (agentOpsInterval) {
+        clearInterval(agentOpsInterval);
+        agentOpsInterval = null;
+    }
 }
 
 async function refreshOpsDigest() {
@@ -1229,6 +1250,8 @@ function renderOpsSchedulesTab(schedules, deliveries) {
 
 async function refreshAgentOps() {
     const healthRow = document.getElementById('ops-health-row');
+    if (opsRefreshInFlight) return;
+    opsRefreshInFlight = true;
     try {
         const [agents, live, files, memory, insights, version, sched, deliveries, schedules] =
             await Promise.all([
@@ -1266,6 +1289,8 @@ async function refreshAgentOps() {
             setText('ops-health-version', 'Unavailable');
             setText('ops-health-discord', String(err).slice(0, 40));
         }
+    } finally {
+        opsRefreshInFlight = false;
     }
 }
 
@@ -1517,4 +1542,5 @@ window.addEventListener('beforeunload', () => {
     if (updateInterval) {
         clearInterval(updateInterval);
     }
+    stopAgentOpsAutoRefresh();
 });

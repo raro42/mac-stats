@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.131] - 2026-07-21
+
+### Changed
+- **Agent Ops auto-refresh** — Command Center polls every 30s while expanded so live sessions, schedules, and health cards stay current without clicking Refresh.
+
 ## [0.1.130] - 2026-07-21
 
 ### Added
