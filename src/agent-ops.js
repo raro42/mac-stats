@@ -31,6 +31,9 @@ function selectOpsTab(tab) {
     document.querySelectorAll('.agent-ops-panel').forEach((p) => {
         p.classList.toggle('active', p.id === `ops-panel-${tab}`);
     });
+    const panel = document.getElementById(`ops-panel-${tab}`);
+    const tabs = document.querySelector('.agent-ops-tabs');
+    (panel || tabs)?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
 }
 
 function setupAgentOps() {
@@ -39,9 +42,13 @@ function setupAgentOps() {
     });
     document.querySelectorAll('.ops-overview-link').forEach((btn) => {
         btn.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             const tab = btn.dataset.gotoTab;
-            if (tab) selectOpsTab(tab);
+            if (!tab) return;
+            // Ensure pane is open (dashboard can leave it collapsed)
+            if (agentOpsCollapsed) applyOpsCollapsed(false);
+            selectOpsTab(tab);
         });
     });
     document.querySelectorAll('.ops-file-tab').forEach((btn) => {
@@ -720,8 +727,10 @@ function escapeHtml(s) {
     }
     if (content) {
       content.classList.toggle('collapsed', collapsed);
-      // dashboard uses display; themes use .collapsed class on the section
-      if (!content.classList.contains('section-content-collapsible')) {
+      // Themes use .section-content-collapsible.collapsed { display:none }; dashboard uses inline display.
+      if (content.classList.contains('section-content-collapsible')) {
+        content.style.display = collapsed ? 'none' : 'block';
+      } else {
         content.style.display = collapsed ? 'none' : '';
       }
     }
@@ -732,7 +741,10 @@ function escapeHtml(s) {
     } else {
       refreshAgentOps();
       startAgentOpsAutoRefresh();
-      section?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+      // Defer scroll until layout applies display:block
+      requestAnimationFrame(() => {
+        section?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+      });
     }
   }
 
@@ -745,11 +757,16 @@ function escapeHtml(s) {
     const btn = document.getElementById('agent-ops-collapse-btn');
     const icon = document.getElementById('icon-agent-ops');
 
-    if (icon) {
-      icon.addEventListener('click', (e) => {
+    if (icon && !icon.dataset.opsWired) {
+      icon.dataset.opsWired = '1';
+      const onIcon = (e) => {
+        e.preventDefault();
         e.stopPropagation();
         toggleAgentOpsSection();
-      });
+      };
+      icon.addEventListener('click', onIcon);
+      // SVG child clicks still hit the button; keep hit target large enough
+      icon.style.pointerEvents = 'auto';
     }
 
     const closeBtn = document.getElementById('agent-ops-close-btn');

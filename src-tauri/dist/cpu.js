@@ -3634,6 +3634,8 @@ function initIconLine() {
     });
   }
 
+  // Agent Ops icon is wired exclusively in agent-ops.js (avoid double-toggle).
+
   initDiscordIconStatus();
 }
 

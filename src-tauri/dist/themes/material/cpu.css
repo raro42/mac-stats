@@ -38,7 +38,10 @@ body {
 
 .mat-card {
   height: 100%;
-  max-width: 560px;
+  width: 100%;
+  max-width: none;
+  overflow-x: hidden;
+  overflow-y: auto;
   margin: 0 auto;
 
   border-radius: 34px;

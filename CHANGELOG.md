@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.145] - 2026-07-21
+
+### Added
+- Dual product positioning: monitor-first vs optional AI; `aiAgentEnabled` (default off for fresh installs; legacy Discord/schedules stay on).
+- Compact menu bar by default (`menuBarCompact`); Settings toggles, Help cheat sheet, Reset to monitor defaults.
+- `config.minimal.json` / `config.example.json`, `scripts/quickstart.sh`, Getting Started + Roadmap, issue templates, landing stub, outreach draft.
+- GitHub Discussions enabled.
+
+### Changed
+- README tagline and two Quick Start paths; comparison vs Stats / iStat Menus.
+
+## [0.1.144] - 2026-07-21
+
+### Fixed
+- **Agent Ops**: Open buttons scroll the detail tab into view; icon toggle is more reliable; theme shells fill resized window width and scroll vertically so Agent Ops is not clipped.
+
 ## [0.1.143] - 2026-07-21
 
 ### Added

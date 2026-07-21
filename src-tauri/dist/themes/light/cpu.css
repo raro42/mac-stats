@@ -45,6 +45,10 @@ body {
 .cpu-shell {
   height: 100%;
   width: 100%;
+  max-width: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 100%;
   max-width: 620px;
   margin: 0 auto;
 

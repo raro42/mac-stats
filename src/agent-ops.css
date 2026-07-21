@@ -1,13 +1,46 @@
 /* Agent Ops Command Center — shared across dashboard + theme CPU windows */
 
+/*
+ * Theme CPU windows pin body/shell to 100vh with overflow:hidden and often
+ * max-width:560px — so widening the OS window does nothing and Agent Ops
+ * gets clipped. These rules make the shell fill the window and scroll.
+ */
+.apple-shell,
+.arch-sheet,
+.mat-card,
+.swiss-shell,
+.glass-panel,
+.cpu-shell,
+.neon-frame,
+.poster-panel {
+  width: 100% !important;
+  max-width: none !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dashboard-container {
+  max-width: min(1100px, 100%);
+  width: 100%;
+}
+
 /* Icon toggles whole pane (same as monitors/ollama sections) */
 .agent-ops-section.collapsed {
-  display: none;
+  display: none !important;
 }
 
 .agent-ops-section {
   margin-bottom: 16px;
-  overflow: hidden;
+  overflow: visible;
+  flex: 0 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.agent-ops-section:not(.collapsed) {
+  display: flex;
+  flex-direction: column;
 }
 
 .ops-close-btn {
@@ -181,11 +214,18 @@
 .agent-ops-panel {
   display: none;
   padding: 0 4px 12px;
-  max-height: 420px;
+  max-height: min(70vh, 720px);
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .agent-ops-panel.active { display: block; }
+
+#agent-ops-content:not(.collapsed),
+.agent-ops-section:not(.collapsed) > #agent-ops-content {
+  display: block;
+  overflow: visible;
+}
 
 .ops-subhead {
   margin: 8px 4px 6px;

@@ -33,6 +33,10 @@ body {
 .swiss-shell {
   height: 100%;
   width: 100%;
+  max-width: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 100%;
   max-width: 100%;
   margin: 0;
 

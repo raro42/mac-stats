@@ -1,0 +1,6 @@
+{
+  "_doc": "Monitor-only defaults. Copy to ~/.mac-stats/config.json or merge keys. AI stays off.",
+  "aiAgentEnabled": false,
+  "menuBarCompact": true,
+  "windowDecorations": true
+}

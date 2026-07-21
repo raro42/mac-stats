@@ -45,9 +45,11 @@ body {
 
 .apple-shell {
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   height: 100%;
-  max-width: 560px;
+  width: 100%;
+  max-width: none;
   margin: 0 auto;
 
   background-color: rgba(255, 255, 255, 0.42);
@@ -1061,8 +1063,10 @@ body {
 }
 
 .icon-line-item {
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;

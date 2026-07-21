@@ -1,0 +1,14 @@
+{
+  "_doc": "Example operator config. Copy useful keys into ~/.mac-stats/config.json. Secrets stay in ~/.mac-stats/.config.env or Keychain — never commit tokens.",
+  "aiAgentEnabled": true,
+  "menuBarCompact": true,
+  "windowDecorations": true,
+  "schedulerCheckIntervalSecs": 120,
+  "ollamaChatTimeoutSecs": 300,
+  "agentHarnessMode": "direct",
+  "agentNativeTools": true,
+  "heartbeat": {
+    "enabled": false,
+    "interval_secs": 1800
+  }
+}

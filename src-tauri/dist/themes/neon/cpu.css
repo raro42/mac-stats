@@ -44,6 +44,10 @@ body::before {
 }
 
 .neon-frame {
+  width: auto;
+  max-width: none;
+  overflow-x: hidden;
+  overflow-y: auto;
   position: fixed;
   inset: 22px;
   border-radius: 42px;

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>mac-stats — Menu-bar monitor for Apple Silicon</title>
+  <style>
+    :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, sans-serif; }
+    body { max-width: 720px; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.5; }
+    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+    .tag { opacity: 0.75; margin-bottom: 1.5rem; }
+    .row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.25rem 0; }
+    a.btn { display: inline-block; padding: 0.6rem 1rem; border-radius: 8px; text-decoration: none;
+      background: #1d1d1f; color: #f5f5f7; }
+    @media (prefers-color-scheme: dark) {
+      a.btn { background: #f5f5f7; color: #1d1d1f; }
+    }
+    img { max-width: 100%; border-radius: 12px; margin: 0.5rem 0; }
+    .muted { opacity: 0.7; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+  <h1>mac-stats</h1>
+  <p class="tag">Menu-bar system monitor for Apple Silicon (optional local AI agent).</p>
+  <p>Lightweight stats in the menu bar. Local Ollama / Discord only if you turn them on.</p>
+  <div class="row">
+    <a class="btn" href="https://github.com/raro42/mac-stats/releases/latest">Download DMG</a>
+    <a class="btn" href="https://github.com/raro42/mac-stats#quick-start--just-the-monitor">Homebrew install</a>
+    <a class="btn" href="https://github.com/raro42/mac-stats/blob/main/docs/GETTING_STARTED.md">Getting Started</a>
+  </div>
+  <p class="muted">60s video walkthrough — coming soon (placeholder).</p>
+  <img src="../../screens/apple.png" alt="Apple theme window" />
+  <img src="../../screens/feature-ollama-integration.png" alt="Optional AI chat" />
+  <p class="muted"><a href="https://github.com/raro42/mac-stats">GitHub</a> · MIT · No cloud telemetry</p>
+</body>
+</html>

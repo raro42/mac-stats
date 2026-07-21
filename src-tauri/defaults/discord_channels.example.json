@@ -1,0 +1,19 @@
+{
+  "_doc": "Template for ~/.mac-stats/discord_channels.json. Replace channel snowflakes. Modes: mention_only | all_messages | having_fun. Discord gateway starts only when aiAgentEnabled is true and a token is configured.",
+  "default": "mention_only",
+  "default_verbose_for_dm": false,
+  "default_verbose_for_channel": false,
+  "having_fun": {
+    "response_delay_secs_min": 300,
+    "response_delay_secs_max": 3600,
+    "idle_thought_secs_min": 300,
+    "idle_thought_secs_max": 3600
+  },
+  "channels": {
+    "YOUR_CHANNEL_ID_MENTION_ONLY": "mention_only",
+    "YOUR_CHANNEL_ID_HAVING_FUN": {
+      "mode": "having_fun",
+      "prompt": "Casual group chat. Short human replies. Do not offer help unsolicited."
+    }
+  }
+}

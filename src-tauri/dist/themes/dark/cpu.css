@@ -28,6 +28,10 @@ body {
 }
 
 .glass-panel {
+  width: 100%;
+  max-width: none;
+  overflow-x: hidden;
+  overflow-y: auto;
   border-radius: 22px;
   background: var(--panel, var(--panel-bg, #0a0a0a));
   border: 1px solid var(--border);

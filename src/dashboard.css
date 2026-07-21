@@ -16,7 +16,8 @@ body {
 }
 
 .dashboard-container {
-  max-width: 800px;
+  max-width: min(1100px, 100%);
+  width: 100%;
   margin: 0 auto;
 }
 

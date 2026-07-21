@@ -270,6 +270,11 @@ fn run_internal(open_cpu_window: bool) {
             get_app_version,
             get_window_decorations,
             set_window_decorations,
+            metrics::get_ai_agent_enabled,
+            metrics::set_ai_agent_enabled,
+            metrics::get_menu_bar_compact,
+            metrics::set_menu_bar_compact,
+            metrics::reset_config_to_monitor_defaults,
             get_process_details,
             force_quit_process,
             get_changelog,
@@ -473,43 +478,41 @@ fn run_internal(open_cpu_window: bool) {
             println!("Happy monitoring! 🚀");
             println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
-            // Ollama warmup completes before Discord/scheduler/heartbeat so the first inbound message
-            // or due job does not race default config, /api/tags, or ModelCatalog (OpenClaw-style ordering).
-            tauri::async_runtime::block_on(async {
-                commands::ollama_config::ensure_ollama_agent_ready_at_startup().await;
-            });
-            tracing::debug!(
-                target: "mac_stats_startup",
-                "Ollama startup warmup finished (gate open); spawning Discord, scheduler, heartbeat, and task review"
-            );
+            // Ollama warmup / Discord / scheduler only when AI agent is enabled (opt-in).
+            if config::Config::ai_agent_enabled() {
+                tauri::async_runtime::block_on(async {
+                    commands::ollama_config::ensure_ollama_agent_ready_at_startup().await;
+                });
+                tracing::debug!(
+                    target: "mac_stats_startup",
+                    "Ollama startup warmup finished (gate open); spawning Discord, scheduler, heartbeat, and task review"
+                );
 
-            // Start Discord gateway in a background thread. Token is read from DISCORD_BOT_TOKEN
-            // env, .config.env, or Keychain (no Keychain write here, so no blocking).
-            std::thread::spawn(|| {
-                discord::spawn_discord_if_configured();
-            });
+                std::thread::spawn(|| {
+                    discord::spawn_discord_if_configured();
+                });
 
-            // Start scheduler agent: reads ~/.mac-stats/schedules.json and runs due tasks (Ollama + tools).
-            scheduler::spawn_scheduler_thread();
+                scheduler::spawn_scheduler_thread();
+                scheduler::heartbeat::spawn_heartbeat_thread();
+                task::review::spawn_review_thread();
 
-            // Optional heartbeat: periodic checklist turn + HEARTBEAT_OK ack (config.json `heartbeat`).
-            scheduler::heartbeat::spawn_heartbeat_thread();
-
-            // Start task review: every 10 min, close WIP tasks older than 30 min as unsuccessful, work on one open task.
-            task::review::spawn_review_thread();
-
-            // Session compaction: every 30 min, compact in-memory sessions into long-term memory; clear inactive sessions.
-            std::thread::spawn(|| {
-                let rt = match tokio::runtime::Runtime::new() {
-                    Ok(r) => r,
-                    Err(_) => return,
-                };
-                const INTERVAL_SECS: u64 = 30 * 60;
-                loop {
-                    std::thread::sleep(std::time::Duration::from_secs(INTERVAL_SECS));
-                    rt.block_on(commands::compaction::run_periodic_session_compaction());
-                }
-            });
+                std::thread::spawn(|| {
+                    let rt = match tokio::runtime::Runtime::new() {
+                        Ok(r) => r,
+                        Err(_) => return,
+                    };
+                    const INTERVAL_SECS: u64 = 30 * 60;
+                    loop {
+                        std::thread::sleep(std::time::Duration::from_secs(INTERVAL_SECS));
+                        rt.block_on(commands::compaction::run_periodic_session_compaction());
+                    }
+                });
+            } else {
+                tracing::info!(
+                    target: "mac_stats_startup",
+                    "AI agent disabled (aiAgentEnabled=false) — monitor-only mode; Discord/scheduler/Ollama warmup skipped"
+                );
+            }
 
             // Watch agent and skills directories so file edits are picked up (emit events for frontend).
             agents::watch::spawn_agents_and_skills_watcher();
@@ -645,7 +648,9 @@ fn run_internal(open_cpu_window: bool) {
                     }
 
                     let mut text = build_status_text(&metrics);
-                    if ollama::ollama_http_circuit_is_open_for_menu() {
+                    if config::Config::ai_agent_enabled()
+                        && ollama::ollama_http_circuit_is_open_for_menu()
+                    {
                         text.push_str("\nOllama ✕");
                     }
 

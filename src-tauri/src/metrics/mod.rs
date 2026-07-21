@@ -1237,6 +1237,38 @@ pub fn get_window_decorations() -> bool {
     crate::config::Config::get_window_decorations()
 }
 
+#[tauri::command]
+pub fn get_ai_agent_enabled() -> bool {
+    crate::config::Config::ai_agent_enabled()
+}
+
+#[tauri::command]
+pub fn set_ai_agent_enabled(enabled: bool) -> Result<bool, String> {
+    crate::config::Config::set_ai_agent_enabled(enabled)?;
+    if enabled {
+        // Best-effort: start Discord if a token exists (scheduler needs process restart for full stack).
+        crate::discord::spawn_discord_if_configured();
+    }
+    Ok(crate::config::Config::ai_agent_enabled())
+}
+
+#[tauri::command]
+pub fn get_menu_bar_compact() -> bool {
+    crate::config::Config::menu_bar_compact()
+}
+
+#[tauri::command]
+pub fn set_menu_bar_compact(compact: bool) -> Result<bool, String> {
+    crate::config::Config::set_menu_bar_compact(compact)?;
+    Ok(crate::config::Config::menu_bar_compact())
+}
+
+#[tauri::command]
+pub fn reset_config_to_monitor_defaults() -> Result<String, String> {
+    crate::config::Config::reset_config_to_monitor_defaults()?;
+    Ok("Monitor defaults applied (aiAgentEnabled=false, menuBarCompact=true). Restart recommended for Discord/scheduler.".into())
+}
+
 /// Set window decorations preference
 #[tauri::command]
 pub fn set_window_decorations(decorations: bool) -> Result<(), String> {

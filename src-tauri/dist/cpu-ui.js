@@ -174,6 +174,136 @@
     });
   }
 
+  function initProductToggles() {
+    const body = document.querySelector("#settings-modal .settings-body");
+    if (!body || document.getElementById("ai-agent-enabled-toggle")) return;
+
+    const block = document.createElement("div");
+    block.className = "setting-item";
+    block.innerHTML = `
+      <div class="setting-label">Product</div>
+      <label class="setting-toggle">
+        <input type="checkbox" id="ai-agent-enabled-toggle" />
+        <span class="toggle-label">Enable local AI agent</span>
+      </label>
+      <div class="setting-note" style="font-size:11px;opacity:0.75;margin-top:4px;">
+        Off = monitor only (no Discord/scheduler/Ollama startup). Restart after changing.
+      </div>
+      <label class="setting-toggle" style="margin-top:8px;display:flex;gap:8px;align-items:center;">
+        <input type="checkbox" id="menu-bar-compact-toggle" />
+        <span class="toggle-label">Compact menu bar (CPU / °C)</span>
+      </label>
+      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;">
+        <button type="button" class="theme-item" id="settings-help-btn">Help / cheat sheet</button>
+        <button type="button" class="theme-item" id="settings-reset-defaults-btn">Reset to monitor defaults</button>
+      </div>
+      <pre id="settings-help-sheet" style="display:none;margin-top:10px;font-size:11px;white-space:pre-wrap;opacity:0.85;max-height:180px;overflow:auto;"></pre>
+    `;
+    body.appendChild(block);
+
+    const aiToggle = document.getElementById("ai-agent-enabled-toggle");
+    const compactToggle = document.getElementById("menu-bar-compact-toggle");
+    const helpBtn = document.getElementById("settings-help-btn");
+    const resetBtn = document.getElementById("settings-reset-defaults-btn");
+    const helpSheet = document.getElementById("settings-help-sheet");
+
+    (async () => {
+      try {
+        const invoke = getInvoke();
+        if (!invoke) return;
+        if (aiToggle) aiToggle.checked = !!(await invoke("get_ai_agent_enabled"));
+        if (compactToggle) compactToggle.checked = !!(await invoke("get_menu_bar_compact"));
+        applyAiUiVisibility(aiToggle ? aiToggle.checked : true);
+      } catch (e) {
+        console.warn("product toggles load", e);
+      }
+    })();
+
+    if (aiToggle) {
+      aiToggle.addEventListener("change", async () => {
+        try {
+          const invoke = getInvoke();
+          if (!invoke) return;
+          const v = await invoke("set_ai_agent_enabled", { enabled: aiToggle.checked });
+          applyAiUiVisibility(!!v);
+        } catch (e) {
+          console.error(e);
+          alert("Could not save aiAgentEnabled: " + e);
+        }
+      });
+    }
+    if (compactToggle) {
+      compactToggle.addEventListener("change", async () => {
+        try {
+          const invoke = getInvoke();
+          if (!invoke) return;
+          await invoke("set_menu_bar_compact", { compact: compactToggle.checked });
+        } catch (e) {
+          console.error(e);
+        }
+      });
+    }
+    if (helpBtn && helpSheet) {
+      helpBtn.addEventListener("click", () => {
+        const show = helpSheet.style.display === "none";
+        helpSheet.style.display = show ? "block" : "none";
+        helpSheet.textContent = [
+          "Menu bar: click to open window.",
+          "CLI: mac_stats | mac_stats --cpu | mac_stats -vv  (logs: ~/.mac-stats/debug.log)",
+          "Config: ~/.mac-stats/config.json  (aiAgentEnabled, menuBarCompact)",
+          "Monitor-only: leave AI off. AI path: enable toggle + ollama pull llama3.2",
+          "First AI ask: “What's my CPU temp?”",
+          "Docs: docs/GETTING_STARTED.md",
+        ].join("\n");
+      });
+    }
+    if (resetBtn) {
+      resetBtn.addEventListener("click", async () => {
+        if (!confirm("Reset config toggles to monitor defaults? (Does not delete Keychain secrets.)")) return;
+        try {
+          const invoke = getInvoke();
+          if (!invoke) return;
+          const msg = await invoke("reset_config_to_monitor_defaults");
+          if (aiToggle) aiToggle.checked = false;
+          if (compactToggle) compactToggle.checked = true;
+          applyAiUiVisibility(false);
+          alert(msg || "Defaults applied. Restart recommended.");
+        } catch (e) {
+          alert(String(e));
+        }
+      });
+    }
+  }
+
+  function applyAiUiVisibility(enabled) {
+    const ids = [
+      "ollama-section",
+      "agent-ops-section",
+      "icon-ollama",
+      "icon-agent-ops",
+      "icon-discord",
+      "discord-setting",
+      "perplexity-setting",
+      "icon-perplexity",
+      "perplexity-section",
+    ];
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (id.endsWith("-section")) {
+        // sections also use .collapsed; keep icon row icons dimmed when off
+        el.style.display = enabled ? "" : "none";
+      } else if (el.classList.contains("icon-line-item")) {
+        el.style.opacity = enabled ? "" : "0.35";
+        el.style.pointerEvents = enabled ? "" : "none";
+        el.title = enabled ? el.title.replace(/ \(AI off\)$/, "") : (el.getAttribute("data-title-base") || el.title) + " (AI off)";
+        if (!el.getAttribute("data-title-base")) el.setAttribute("data-title-base", el.title.replace(/ \(AI off\)$/, ""));
+      } else {
+        el.style.display = enabled ? "" : "none";
+      }
+    });
+  }
+
   function initWindowDecorations() {
     const toggle = document.getElementById("window-decorations-toggle");
     if (!toggle) return;
@@ -652,6 +782,7 @@
     initRefresh();
     initExternalLinks();
     initWindowDecorations();
+    initProductToggles();
     // Initialize changelog modal first, then inject version (so version elements are ready)
     initChangelogModal();
     injectAppVersion();

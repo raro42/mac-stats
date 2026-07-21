@@ -1,0 +1,32 @@
+name: Bug report
+description: Something broken in the monitor or AI agent
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: product
+    attributes:
+      label: Which product path?
+      options:
+        - Just the monitor (menu bar / window)
+        - Monitor + AI agent (Ollama / Discord / Agent Ops)
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Steps, expected vs actual.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: mac-stats version
+      placeholder: "e.g. 0.1.144 (About / get_app_version)"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant ~/.mac-stats/debug.log lines
+      render: shell

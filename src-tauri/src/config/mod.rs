@@ -255,6 +255,150 @@ impl Config {
         true
     }
 
+    /// Whether the local AI agent stack is enabled (Ollama chat, Discord, scheduler, Agent Ops).
+    ///
+    /// Default **false** for a fresh install (monitor-only). If the key is missing but a Discord
+    /// token or non-empty `schedules.json` already exists, treat as **true** (legacy installs).
+    pub fn ai_agent_enabled() -> bool {
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(v) = json.get("aiAgentEnabled").and_then(|v| v.as_bool()) {
+                    return v;
+                }
+            }
+        }
+        // Legacy / existing operator setups without the key
+        if Self::legacy_discord_token_present() {
+            return true;
+        }
+        let schedules = Self::schedules_file_path();
+        if let Ok(content) = std::fs::read_to_string(schedules) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(arr) = json.as_array() {
+                    if !arr.is_empty() {
+                        return true;
+                    }
+                }
+                if let Some(arr) = json.get("schedules").and_then(|v| v.as_array()) {
+                    if !arr.is_empty() {
+                        return true;
+                    }
+                }
+            }
+        }
+        false
+    }
+
+    /// Cheap Discord-token probe for legacy `aiAgentEnabled` migration (no Keychain prompt).
+    fn legacy_discord_token_present() -> bool {
+        if std::env::var("DISCORD_BOT_TOKEN")
+            .ok()
+            .filter(|s| !s.trim().is_empty())
+            .is_some()
+        {
+            return true;
+        }
+        let candidates = [
+            Self::config_file_path()
+                .parent()
+                .map(|p| p.join(".config.env")),
+            Some(PathBuf::from("src-tauri/.config.env")),
+            Some(PathBuf::from(".config.env")),
+        ];
+        for path in candidates.into_iter().flatten() {
+            if let Ok(content) = std::fs::read_to_string(path) {
+                for line in content.lines() {
+                    let l = line.trim();
+                    if l.starts_with('#') || l.is_empty() {
+                        continue;
+                    }
+                    if (l.starts_with("DISCORD_BOT_TOKEN=")
+                        || l.starts_with("DISCORD-USER1-TOKEN=")
+                        || l.starts_with("DISCORD-USER2-TOKEN="))
+                        && l.split_once('=').is_some_and(|(_, v)| !v.trim().is_empty())
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        false
+    }
+
+    /// Persist `aiAgentEnabled` in `~/.mac-stats/config.json`.
+    pub fn set_ai_agent_enabled(enabled: bool) -> Result<(), String> {
+        Self::merge_config_bool("aiAgentEnabled", enabled)
+    }
+
+    /// Compact menu bar (CPU + cached temp when available). Default **true**.
+    /// Set `menuBarCompact: false` for the classic CPU/GPU/RAM/SSD grid.
+    pub fn menu_bar_compact() -> bool {
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(v) = json.get("menuBarCompact").and_then(|v| v.as_bool()) {
+                    return v;
+                }
+            }
+        }
+        true
+    }
+
+    pub fn set_menu_bar_compact(compact: bool) -> Result<(), String> {
+        Self::merge_config_bool("menuBarCompact", compact)
+    }
+
+    fn merge_config_bool(key: &str, value: bool) -> Result<(), String> {
+        use serde_json::{json, Value};
+        let config_path = Self::config_file_path();
+        if let Some(parent) = config_path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        }
+        let mut after: Value = std::fs::read_to_string(&config_path)
+            .ok()
+            .and_then(|s| serde_json::from_str(&s).ok())
+            .unwrap_or_else(|| json!({}));
+        match after.as_object_mut() {
+            Some(obj) => {
+                obj.insert(key.to_string(), json!(value));
+            }
+            None => {
+                after = json!({ key: value });
+            }
+        }
+        std::fs::write(
+            &config_path,
+            serde_json::to_string_pretty(&after).map_err(|e| e.to_string())?,
+        )
+        .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+
+    /// Write monitor-only safe defaults into `config.json` (preserves unrelated keys except known toggles).
+    pub fn reset_config_to_monitor_defaults() -> Result<(), String> {
+        use serde_json::{json, Value};
+        let config_path = Self::config_file_path();
+        if let Some(parent) = config_path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        }
+        let mut after: Value = std::fs::read_to_string(&config_path)
+            .ok()
+            .and_then(|s| serde_json::from_str(&s).ok())
+            .unwrap_or_else(|| json!({}));
+        let obj = after.as_object_mut().ok_or_else(|| "config.json is not an object".to_string())?;
+        obj.insert("aiAgentEnabled".into(), json!(false));
+        obj.insert("menuBarCompact".into(), json!(true));
+        obj.insert("windowDecorations".into(), json!(true));
+        // Leave Discord tokens / .config.env alone — only config.json toggles.
+        std::fs::write(
+            &config_path,
+            serde_json::to_string_pretty(&after).map_err(|e| e.to_string())?,
+        )
+        .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+
     /// Get the monitors file path
     ///
     /// Returns a path in the user's home directory: `$HOME/.mac-stats/monitors.json`

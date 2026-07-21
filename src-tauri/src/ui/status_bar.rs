@@ -37,6 +37,22 @@ fn as_any<T: objc2::Message>(obj: &T) -> &AnyObject {
 
 /// Build status text from metrics
 pub fn build_status_text(metrics: &SystemMetrics) -> String {
+    if Config::menu_bar_compact() {
+        // Default: CPU (+ cached °C when the window/SMC path has already filled TEMP_CACHE).
+        let temp = crate::state::TEMP_CACHE
+            .try_lock()
+            .ok()
+            .and_then(|g| g.as_ref().map(|(t, _)| *t))
+            .filter(|t| *t > 0.0);
+        return match temp {
+            Some(t) => format!(
+                "CPU  {:.0}%\n{:.0}°",
+                metrics.cpu.round() as i32,
+                t.round() as i32
+            ),
+            None => format!("CPU\n{:.0}%", metrics.cpu.round() as i32),
+        };
+    }
     let label_line = "CPU\tGPU\tRAM\tSSD".to_string();
     let value_line = format!(
         "{:.0}%\t{:.0}%\t{:.0}%\t{:.0}%",

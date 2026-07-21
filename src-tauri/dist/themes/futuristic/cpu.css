@@ -36,6 +36,10 @@ body {
 }
 
 .glass-panel {
+  width: 100%;
+  max-width: none;
+  overflow-x: hidden;
+  overflow-y: auto;
   border-radius: 26px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);

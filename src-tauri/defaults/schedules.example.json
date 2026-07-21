@@ -1,0 +1,12 @@
+{
+  "_doc": "Copy to ~/.mac-stats/schedules.json and edit. Set enabled entries carefully. Scheduler runs only when aiAgentEnabled is true.",
+  "schedules": [
+    {
+      "id": "example-weekday-brief",
+      "cron": "0 0 9 * * 1-5",
+      "at": null,
+      "task": "Summarize system health in one short paragraph.",
+      "reply_to_channel_id": "YOUR_DISCORD_CHANNEL_ID"
+    }
+  ]
+}
