@@ -136,7 +136,7 @@ function setText(id, text) {
     if (el) el.textContent = text;
 }
 
-function renderOpsHealth({ version, insights, sched, deliveries, agents, live }) {
+function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine }) {
     const enabled = (agents || []).filter((a) => a.enabled).length;
     setText(
         'ops-health-version',
@@ -150,6 +150,18 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live })
     const dg = insights?.discord_gateway || '';
     const readyMatch = dg.match(/last Ready\s+([^·]+)/i);
     setText('ops-health-discord', readyMatch ? readyMatch[1].trim() : dg ? 'see Runs' : '—');
+
+    if (redmine) {
+        const st = String(redmine.status || '').toLowerCase();
+        const msg = String(redmine.message || '').trim();
+        let text = '—';
+        if (st === 'ok') text = msg || 'Ok';
+        else if (st === 'notconfigured') text = 'Not configured';
+        else if (st) text = msg ? `${st}: ${msg}`.slice(0, 36) : st;
+        setText('ops-health-redmine', text);
+        const el = document.getElementById('ops-health-redmine');
+        if (el) el.title = msg || st || '';
+    }
 
     setText('ops-health-schedule', fmtScheduleEta(sched));
 
@@ -365,7 +377,7 @@ async function refreshAgentOps() {
     if (opsRefreshInFlight) return;
     opsRefreshInFlight = true;
     try {
-        const [agents, live, files, memory, insights, version, sched, deliveries, schedules] =
+        const [agents, live, files, memory, insights, version, sched, deliveries, schedules, features] =
             await Promise.all([
                 invoke('list_agents'),
                 invoke('list_live_sessions'),
@@ -376,7 +388,11 @@ async function refreshAgentOps() {
                 invoke('get_scheduler_snapshot').catch(() => null),
                 invoke('list_scheduler_delivery_awareness').catch(() => null),
                 invoke('list_schedules').catch(() => []),
+                invoke('get_feature_health', { refresh: false }).catch(() => []),
             ]);
+        const redmine = (features || []).find(
+            (h) => String(h.name || '').toLowerCase() === 'redmine'
+        );
         renderOpsHealth({
             version,
             insights,
@@ -384,6 +400,7 @@ async function refreshAgentOps() {
             deliveries,
             agents,
             live,
+            redmine,
         });
         renderOverviewSchedules(schedules || [], deliveries || []);
         renderOverviewLive(live || []);

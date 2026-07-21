@@ -148,7 +148,7 @@ body {
 
 .ops-health-row {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 8px;
   padding: 0 12px 12px;
 }
