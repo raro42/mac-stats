@@ -165,12 +165,22 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
                     tool_names_for_log(&msg.content),
                     i
                 );
+                let synthetic_role = if msg
+                    .tool_calls
+                    .as_ref()
+                    .map(|t| !t.is_empty())
+                    .unwrap_or(false)
+                {
+                    "tool"
+                } else {
+                    "user"
+                };
                 out.push(msg);
                 out.push(ChatMessage {
-                    role: "user".to_string(),
+                    role: synthetic_role.to_string(),
                     content: SYNTHETIC_TOOL_RESULT.to_string(),
                     images: None,
-                    tool_calls: None
+                    tool_calls: None,
                 });
                 i += 1;
                 continue;
@@ -187,6 +197,28 @@ pub(crate) fn sanitize_conversation_history(messages: Vec<ChatMessage>) -> Vec<C
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn inserts_synthetic_tool_role_when_assistant_has_native_calls() {
+        use crate::ollama::{OllamaFunctionCall, OllamaToolCall};
+        let hist = vec![ChatMessage {
+            role: "assistant".into(),
+            content: "FETCH_URL: https://example.com".into(),
+            images: None,
+            tool_calls: Some(vec![OllamaToolCall {
+                id: Some("call_1".into()),
+                function: OllamaFunctionCall {
+                    name: Some("FETCH_URL".into()),
+                    index: None,
+                    arguments: serde_json::json!({"url_or_arg": "https://example.com"}),
+                },
+            }]),
+        }];
+        let out = sanitize_conversation_history(hist);
+        assert_eq!(out.len(), 2);
+        assert_eq!(out[1].role, "tool");
+        assert_eq!(out[1].content, SYNTHETIC_TOOL_RESULT);
+    }
 
     #[test]
     fn inserts_synthetic_after_unpaired_fetch() {

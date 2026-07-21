@@ -26,6 +26,8 @@
   let opsSessionFilesCache = [];
   let opsMemoryFilterQ = '';
   let opsMemoryCache = [];
+  let opsRunsFilterQ = '';
+  let opsRunsInsightsCache = null;
 
 // --- Agent Ops (Command Center: overview + detail tabs) ---
 
@@ -72,6 +74,7 @@ function setupAgentOps() {
     document.getElementById('ops-session-load-chat')?.addEventListener('click', () => loadOpsSessionIntoChat());
     ensureOpsSessionFilter();
     ensureOpsMemoryFilter();
+    ensureOpsRunsFilter();
     if (!agentOpsCollapsed) {
       refreshAgentOps();
       startAgentOpsAutoRefresh();
@@ -137,6 +140,38 @@ function ensureOpsMemoryFilter() {
 function memoryRowMatchesFilter(haystack) {
     if (!opsMemoryFilterQ) return true;
     return String(haystack || '').toLowerCase().includes(opsMemoryFilterQ);
+}
+
+function ensureOpsRunsFilter() {
+    const panel = document.getElementById('ops-panel-runs');
+    if (!panel) return;
+    let input = document.getElementById('ops-runs-filter');
+    if (!input) {
+        const row = document.createElement('div');
+        row.className = 'ops-filter-row';
+        input = document.createElement('input');
+        input.type = 'search';
+        input.id = 'ops-runs-filter';
+        input.className = 'ops-filter-input';
+        input.placeholder = 'Filter runs by lane, tool, question…';
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+        row.appendChild(input);
+        const insights = document.getElementById('ops-runs-insights');
+        if (insights) panel.insertBefore(row, insights.nextSibling);
+        else panel.insertBefore(row, panel.firstChild);
+    }
+    if (input.dataset.opsBound === '1') return;
+    input.dataset.opsBound = '1';
+    input.addEventListener('input', () => {
+        opsRunsFilterQ = (input.value || '').trim().toLowerCase();
+        renderOpsRuns(opsRunsInsightsCache);
+    });
+}
+
+function runsRowMatchesFilter(haystack) {
+    if (!opsRunsFilterQ) return true;
+    return String(haystack || '').toLowerCase().includes(opsRunsFilterQ);
 }
 
 function startAgentOpsAutoRefresh() {
@@ -553,7 +588,8 @@ async function refreshAgentOps() {
         renderOpsSessionFiles(opsSessionFilesCache);
         opsMemoryCache = memory || [];
         renderOpsMemory(opsMemoryCache);
-        renderOpsRuns(insights);
+        opsRunsInsightsCache = insights;
+        renderOpsRuns(opsRunsInsightsCache);
     } catch (err) {
         console.warn('[Agent Ops]', err);
         if (healthRow) {
@@ -877,12 +913,22 @@ function renderOpsRuns(insights) {
         `;
     }
     (insights.recent || []).forEach((r) => {
+        const toolsJoined = (r.tools || []).join(', ') || '—';
+        if (
+            !runsRowMatchesFilter(
+                `${r.question_preview || ''} ${r.lane || ''} ${toolsJoined} ${r.ok ? 'ok' : 'fail'}`
+            )
+        ) {
+            return;
+        }
         const div = document.createElement('div');
         div.className = 'ops-row';
-        const t = (r.tools || []).join(', ') || '—';
-        div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(t)}${r.ok ? '' : ' · FAIL'}</div></div>`;
+        div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(toolsJoined)}${r.ok ? '' : ' · FAIL'}</div></div>`;
         el.appendChild(div);
     });
+    if (opsRunsFilterQ && !el.children.length) {
+        el.innerHTML = '<div class="ops-empty">No runs match filter</div>';
+    }
 }
 
 function escapeHtml(s) {

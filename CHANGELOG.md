@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.156] - 2026-07-21
+
+### Changed
+- **Conversation sanitize**: unpaired native `tool_calls` get a synthetic follow-up with role `tool` (not `user`).
+
+### Added
+- **Agent Ops Runs filter**: filter recent runs by lane, tool name, or question text.
+
 ## [0.1.155] - 2026-07-21
 
 ### Changed
