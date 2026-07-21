@@ -704,6 +704,14 @@ function escapeHtml(s) {
       });
     }
 
+    const closeBtn = document.getElementById('agent-ops-close-btn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        applyOpsCollapsed(true);
+      });
+    }
+
     if (header) {
       header.addEventListener('click', (e) => {
         if (e.target.id === 'agent-ops-collapse-btn' || e.target.closest('.collapse-btn')) return;

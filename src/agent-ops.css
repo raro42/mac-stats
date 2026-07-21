@@ -10,12 +10,30 @@
   overflow: hidden;
 }
 
-.agent-ops-section .section-header,
-.agent-ops-section .section-header-collapsible {
+.ops-close-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  color: inherit;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.ops-close-btn:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.agent-ops-section .section-header-collapsible,
+.agent-ops-section .section-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
+  gap: 8px;
   padding: 8px 4px;
 }
 

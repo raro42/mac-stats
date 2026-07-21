@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.135] - 2026-07-21
+
+### Changed
+- Agent Ops pane: **× close** in the section header (hides pane; reopen via icon).
+
 ## [0.1.134] - 2026-07-21
 
 ### Changed
