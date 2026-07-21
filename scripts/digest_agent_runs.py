@@ -16,7 +16,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import statistics
+import tempfile
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -26,6 +28,29 @@ SHIPPED_INSTANT_VERSION = datetime(2026, 7, 20, 15, 45, tzinfo=timezone.utc)
 SHIPPED_INSTANT_TIME = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
 SHIPPED_INSTANT_WEATHER = datetime(2026, 7, 20, 21, 0, tzinfo=timezone.utc)
 SHIPPED_GREETING = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
+
+
+def atomic_write_text(path: Path, text: str) -> None:
+    """Hermes-style crash-safe write: temp + fsync + os.replace."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_path = tempfile.mkstemp(
+        dir=str(path.parent),
+        prefix=f".{path.stem}_",
+        suffix=".tmp",
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_path, path)
+    except BaseException:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
 
 
 def default_runs_path() -> Path:
@@ -113,7 +138,7 @@ def main() -> int:
 
     if not runs:
         lines.append("_No runs in window. Ask Werner something, then re-run._")
-        args.out.write_text("\n".join(lines) + "\n")
+        atomic_write_text(args.out, "\n".join(lines) + "\n")
         print(args.out)
         return 0
 
@@ -243,7 +268,7 @@ def main() -> int:
     lines.append("")
 
     text = "\n".join(lines) + "\n"
-    args.out.write_text(text)
+    atomic_write_text(args.out, text)
 
     # Machine-readable summary for Agent Ops.
     json_out = args.out.with_suffix(".json")
@@ -280,7 +305,7 @@ def main() -> int:
         "stale": stale_items,
         "markdown_path": str(args.out),
     }
-    json_out.write_text(json.dumps(payload, indent=2) + "\n")
+    atomic_write_text(json_out, json.dumps(payload, indent=2) + "\n")
 
     print(text)
     print(f"Wrote {args.out}")

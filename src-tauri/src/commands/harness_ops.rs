@@ -4,8 +4,42 @@
 use crate::config::Config;
 use serde::Serialize;
 use std::fs;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
+
+/// Crash-safe text write (Hermes-style temp + fsync + rename).
+fn write_text_atomic(path: &Path, text: &str) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    let name = path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("out");
+    let tmp = path.with_file_name(format!(
+        ".{}.{}.{}.tmp",
+        name,
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0)
+    ));
+    let write_result = (|| -> Result<(), String> {
+        let mut f = fs::File::create(&tmp).map_err(|e| e.to_string())?;
+        f.write_all(text.as_bytes())
+            .map_err(|e| e.to_string())?;
+        f.sync_all().map_err(|e| e.to_string())?;
+        drop(f);
+        fs::rename(&tmp, path).map_err(|e| e.to_string())?;
+        Ok(())
+    })();
+    if write_result.is_err() {
+        let _ = fs::remove_file(&tmp);
+    }
+    write_result
+}
 
 #[derive(Debug, Clone, Serialize)]
 pub struct LiveSessionSummary {
@@ -763,11 +797,10 @@ fn write_digest_native(days: i64) -> Result<DigestSummary, String> {
     if let Some(parent) = json_path.parent() {
         let _ = fs::create_dir_all(parent);
     }
-    fs::write(
+    write_text_atomic(
         &json_path,
-        serde_json::to_string_pretty(&payload).map_err(|e| e.to_string())? + "\n",
-    )
-    .map_err(|e| e.to_string())?;
+        &(serde_json::to_string_pretty(&payload).map_err(|e| e.to_string())? + "\n"),
+    )?;
 
     let md_path = json_path.with_extension("md");
     let md = format!(
@@ -793,7 +826,7 @@ fn write_digest_native(days: i64) -> Result<DigestSummary, String> {
             format!("_{} stale candidate(s) ignored._", stale.len())
         }
     );
-    let _ = fs::write(md_path, md);
+    let _ = write_text_atomic(&md_path, &md);
 
     Ok(load_digest_summary())
 }
@@ -993,6 +1026,21 @@ mod tests {
         let summary = write_digest_native(7).expect("native digest");
         assert!(digest_json_path().is_file());
         let _ = summary.open_count + summary.stale_count + summary.turns;
+    }
+
+    #[test]
+    fn write_text_atomic_roundtrip() {
+        let dir = std::env::temp_dir().join(format!(
+            "mac-stats-atomic-digest-{}",
+            std::process::id()
+        ));
+        let _ = fs::create_dir_all(&dir);
+        let path = dir.join("latest.json");
+        write_text_atomic(&path, "{\"ok\":true}\n").expect("atomic write");
+        assert_eq!(fs::read_to_string(&path).unwrap(), "{\"ok\":true}\n");
+        write_text_atomic(&path, "{\"ok\":false}\n").expect("overwrite");
+        assert_eq!(fs::read_to_string(&path).unwrap(), "{\"ok\":false}\n");
+        let _ = fs::remove_dir_all(&dir);
     }
 
     #[test]
