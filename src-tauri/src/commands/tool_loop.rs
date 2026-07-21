@@ -184,6 +184,8 @@ pub(crate) struct ToolLoopParams {
     pub forward_substantive_output: Option<Arc<AtomicBool>>,
     /// When set, follow-up `/api/chat` calls include these Ollama native tool schemas.
     pub native_tool_schemas: Option<Vec<serde_json::Value>>,
+    /// Native `tool_calls` from the first execution response (paired with `initial_response`).
+    pub initial_assistant_tool_calls: Option<Vec<crate::ollama::OllamaToolCall>>,
 }
 
 /// Mutable state accumulated during the tool loop.
@@ -287,8 +289,9 @@ pub(crate) async fn run_tool_loop(
     let verbosity = crate::logging::VERBOSITY.load(std::sync::atomic::Ordering::Relaxed);
     let mut state = ToolLoopState::new(params.loop_detection.clone());
     let mut response_content = initial_response;
-    // Native tool_calls from the assistant turn that produced response_content (for next push).
-    let mut pending_assistant_tool_calls: Option<Vec<crate::ollama::OllamaToolCall>> = None;
+    // Native tool_calls for the assistant turn that produced response_content (first push + follow-ups).
+    let mut pending_assistant_tool_calls: Option<Vec<crate::ollama::OllamaToolCall>> =
+        params.initial_assistant_tool_calls.clone();
     if let Some(ref cap) = params.partial_progress_capture {
         cap.set_last_assistant_text(&response_content);
     }

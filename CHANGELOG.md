@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.155] - 2026-07-21
+
+### Changed
+- **Native tool loop**: pass first-turn structured `tool_calls` into the tool loop so the initial assistant message keeps them (completes role `tool` pairing for turn 1).
+
 ## [0.1.154] - 2026-07-21
 
 ### Changed

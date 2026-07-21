@@ -1182,7 +1182,7 @@ pub fn answer_with_ollama_and_fetch(
         // Fast path: if the recommendation already contains a parseable tool call, execute it
         // directly instead of asking Ollama a second time to regurgitate the same tool line.
         let direct_tool = parse_tool_from_response(&recommendation);
-        let (mut messages, response_content) = if let Some((ref tool, ref arg)) = direct_tool {
+        let (mut messages, response_content, initial_assistant_tool_calls) = if let Some((ref tool, ref arg)) = direct_tool {
             let all_tools = parse_all_tools_from_response(&normalized_recommendation);
             if all_tools.len() > 1 {
                 mac_stats_info!("ollama/chat", 
@@ -1244,7 +1244,7 @@ pub fn answer_with_ollama_and_fetch(
             } else {
                 format!("{}: {}", tool, arg)
             };
-            (msgs, synthetic)
+            (msgs, synthetic, None)
         } else {
             mac_stats_info!("ollama/chat", 
                 "Agent router: execution step — sending plan + question, starting tool loop (max {} tools)",
@@ -1352,6 +1352,11 @@ pub fn answer_with_ollama_and_fetch(
                 }
             };
             let content = response.message.content.clone();
+            let initial_calls = if crate::config::Config::agent_native_tools() {
+                response.message.tool_calls.clone()
+            } else {
+                None
+            };
             let n = content.chars().count();
             mac_stats_info!(
                 "ollama/chat",
@@ -1372,12 +1377,12 @@ pub fn answer_with_ollama_and_fetch(
                         "Agent router: empty response — falling back to tool from recommendation: {}",
                         crate::logging::ellipse(&synthetic, 80)
                     );
-                    (msgs, synthetic)
+                    (msgs, synthetic, None)
                 } else {
-                    (msgs, content)
+                    (msgs, content, initial_calls)
                 }
             } else {
-                (msgs, content)
+                (msgs, content, initial_calls)
             }
         };
 
@@ -1418,6 +1423,7 @@ pub fn answer_with_ollama_and_fetch(
             } else {
                 None
             },
+            initial_assistant_tool_calls,
         };
         let tool_loop_result = crate::commands::tool_loop::run_tool_loop(
             &tool_loop_params,
