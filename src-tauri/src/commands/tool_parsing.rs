@@ -2,8 +2,8 @@
 //!
 //! All functions here are pure (no state, no I/O) and handle the various
 //! ways models format tool calls: `TOOL: arg`, `RECOMMEND: TOOL: arg`,
-//! Hermes/Qwen JSON `<tool_call>`, Qwen3-Coder `<function=`, GLM `<arg_key>` XML,
-//! numbered lists, inline chains with "then"/"and"/";", etc.
+//! Hermes/Qwen JSON `<tool_call>`, Qwen3-Coder `<function=`, GLM `<arg_key>`,
+//! Kimi K2 `<|tool_call_begin|>`, numbered lists, inline chains with "then"/"and"/";", etc.
 
 use crate::commands::tool_registry::{
     inline_tool_chain_regex, map_scheduler_alias, tool_line_prefixes,
@@ -344,11 +344,122 @@ pub(crate) fn parse_all_tools_from_response(content: &str) -> Vec<(String, Strin
     out
 }
 
-/// Expand vendor tool-call XML (Qwen3-Coder → GLM → Hermes/Qwen JSON).
+/// Expand vendor tool-call markup (Kimi → Qwen3-Coder → GLM → Hermes/Qwen JSON).
 fn expand_model_tool_call_xml(content: &str) -> String {
-    let qwen = expand_qwen3_coder_tool_call_xml(content);
+    let kimi = expand_kimi_k2_tool_call_xml(content);
+    let qwen = expand_qwen3_coder_tool_call_xml(&kimi);
     let glm = expand_glm_arg_key_tool_call_xml(&qwen);
     expand_hermes_tool_call_xml(&glm)
+}
+
+/// Kimi K2 / VLLM: `<|tool_call_begin|>functions.name:0<|tool_call_argument_begin|>{...}<|tool_call_end|>`.
+fn expand_kimi_k2_tool_call_xml(content: &str) -> String {
+    const BEGIN: &str = "<|tool_call_begin|>";
+    const ARG_BEGIN: &str = "<|tool_call_argument_begin|>";
+    const END: &str = "<|tool_call_end|>";
+    const SECTION_BEGIN: &[&str] = &[
+        "<|tool_calls_section_begin|>",
+        "<|tool_call_section_begin|>",
+    ];
+    const SECTION_END: &[&str] = &[
+        "<|tool_calls_section_end|>",
+        "<|tool_call_section_end|>",
+    ];
+
+    if !content.contains(BEGIN) {
+        return content.to_string();
+    }
+
+    let mut tool_lines: Vec<String> = Vec::new();
+    let mut search_from = 0usize;
+    let mut region_start: Option<usize> = None;
+    let mut last_end = 0usize;
+
+    while let Some(rel) = content[search_from..].find(BEGIN) {
+        let start = search_from + rel;
+        if region_start.is_none() {
+            let before = &content[..start];
+            let mut best = start;
+            for tok in SECTION_BEGIN {
+                if let Some(i) = before.rfind(tok) {
+                    best = best.min(i);
+                }
+            }
+            region_start = Some(best);
+        }
+        let after_begin = &content[start + BEGIN.len()..];
+        let Some(arg_rel) = after_begin.find(ARG_BEGIN) else {
+            break;
+        };
+        let id_raw = after_begin[..arg_rel].trim();
+        let after_arg = &after_begin[arg_rel + ARG_BEGIN.len()..];
+        let (args_raw, end) = if let Some(e) = after_arg.find(END) {
+            (
+                after_arg[..e].trim(),
+                start + BEGIN.len() + arg_rel + ARG_BEGIN.len() + e + END.len(),
+            )
+        } else {
+            (after_arg.trim(), content.len())
+        };
+        let name = kimi_function_name_from_id(id_raw);
+        if let Some(line) = kimi_args_to_tool_line(name, args_raw) {
+            tool_lines.push(line);
+        }
+        last_end = end;
+        search_from = end;
+    }
+
+    if tool_lines.is_empty() {
+        return content.to_string();
+    }
+
+    // Consume trailing section-end token if present.
+    let trail = &content[last_end..];
+    for tok in SECTION_END {
+        if let Some(i) = trail.find(tok) {
+            if trail[..i].trim().is_empty() {
+                last_end += i + tok.len();
+                break;
+            }
+        }
+    }
+
+    let start = region_start.unwrap_or(0);
+    let mut out = String::new();
+    let preamble = content[..start].trim_end();
+    if !preamble.is_empty() {
+        out.push_str(preamble);
+        out.push('\n');
+    }
+    for line in &tool_lines {
+        out.push_str(line);
+        out.push('\n');
+    }
+    let after = content[last_end..].trim_start();
+    if !after.is_empty() {
+        out.push_str(after);
+    }
+    out
+}
+
+fn kimi_function_name_from_id(id: &str) -> &str {
+    let before_colon = id.split(':').next().unwrap_or(id).trim();
+    before_colon
+        .rsplit('.')
+        .next()
+        .unwrap_or(before_colon)
+        .trim()
+}
+
+fn kimi_args_to_tool_line(name: &str, args_raw: &str) -> Option<String> {
+    let tool = resolve_hermes_tool_name(name)?;
+    let args = if let Ok(v) = serde_json::from_str::<serde_json::Value>(args_raw) {
+        v
+    } else {
+        serde_json::Value::String(args_raw.to_string())
+    };
+    let arg = hermes_args_to_arg_string(&args);
+    Some(format!("{tool}: {arg}"))
 }
 
 /// GLM 4.5/4.7 / VLLM: `<tool_call>name\n<arg_key>k</arg_key><arg_value>v</arg_value></tool_call>`.
@@ -1151,6 +1262,33 @@ mod tests {
 {"name": "BRAVE_SEARCH", "arguments": {"query": "mac-stats"}}
 </tool_call>
 "#;
+        let tools = parse_all_tools_from_response(content);
+        assert!(tools.len() >= 2, "{tools:?}");
+        assert_eq!(tools[0].0, "FETCH_URL");
+        assert_eq!(tools[0].1, "https://example.com");
+        assert_eq!(tools[1].0, "BRAVE_SEARCH");
+        assert_eq!(tools[1].1, "mac-stats");
+    }
+
+    #[test]
+    fn kimi_k2_tool_call_parses() {
+        let content = r#"Looking up weather.
+<|tool_calls_section_begin|>
+<|tool_call_begin|>functions.brave_search:0<|tool_call_argument_begin|>{"query": "El Masnou weather"}<|tool_call_end|>
+<|tool_calls_section_end|>
+"#;
+        let tools = parse_all_tools_from_response(content);
+        assert_eq!(tools.len(), 1, "{tools:?}");
+        assert_eq!(tools[0].0, "BRAVE_SEARCH");
+        assert_eq!(tools[0].1, "El Masnou weather");
+    }
+
+    #[test]
+    fn kimi_k2_multi_and_bare_name() {
+        let content = r#"<|tool_call_section_begin|>
+<|tool_call_begin|>FETCH_URL:1<|tool_call_argument_begin|>{"url": "https://example.com"}<|tool_call_end|>
+<|tool_call_begin|>functions.brave_search:2<|tool_call_argument_begin|>{"query": "mac-stats"}<|tool_call_end|>
+<|tool_call_section_end|>"#;
         let tools = parse_all_tools_from_response(content);
         assert!(tools.len() >= 2, "{tools:?}");
         assert_eq!(tools[0].0, "FETCH_URL");
