@@ -310,9 +310,23 @@ pub fn looks_like_memory_pollution(entry: &str) -> bool {
     {
         return true;
     }
+    // Compacted / tool-loop transcript dumps that leaked into MEMORY_APPEND
+    if t.starts_with("[user]:")
+        || t.starts_with("[assistant]:")
+        || t.starts_with("run_cmd (")
+        || t.starts_with("perplexity_search:")
+        || t.starts_with("brave_search:")
+        || t.starts_with("fetch_url:")
+        || t.starts_with("redmine_api:")
+        || t.starts_with("**note:**")
+        || t.starts_with("note: in the last section")
+    {
+        return true;
+    }
     n.contains("turn timed out")
         || n.contains("wall-clock budget")
         || n.contains("agentroutertimeout")
+        || n.contains("if this keeps happening, try a narrower")
         || n.contains("if no lessons, write")
         || n.contains("output only these two sections")
         || n.contains("bullet points of important lessons")
@@ -331,6 +345,7 @@ pub fn looks_like_memory_pollution(entry: &str) -> bool {
         || n.contains("the user's current question is")
         || n.contains("[continue for next question]")
         || n.contains("last assistant text:")
+        || n.contains("rule applies to both previous")
         || (n.contains("*cursor agent") && n.len() < 80)
         || (n.starts_with("*redmine") && n.len() < 120)
 }
@@ -431,11 +446,22 @@ mod tests {
         assert!(looks_like_memory_pollution(
             "*Agent tool run: 2 step(s), 0 with errors,  103354 ms total; tools: AGENT, DONE.*"
         ));
+        assert!(looks_like_memory_pollution(
+            "If this keeps happening, try a narrower question, a faster model, or widen the matching `agentRouterTurnTimeoutSecs*` value."
+        ));
+        assert!(looks_like_memory_pollution("[user]: What time is it?"));
+        assert!(looks_like_memory_pollution(
+            "RUN_CMD (ok): cd ~/.mac-stats && git add -A && git status --short | head -50"
+        ));
+        assert!(looks_like_memory_pollution(
+            "**Note:** In the last section, the “DROP” rule applies to both previous and current questions."
+        ));
         let filtered = filter_memory_markdown_for_prompt(
-            "- Prefer Open-Meteo for El Masnou weather\n- Tools that worked vs. tools that failed\n- Learned\n",
+            "- Prefer Open-Meteo for El Masnou weather\n- Tools that worked vs. tools that failed\n- Learned\n- [user]: What version are you?\n",
         );
         assert!(filtered.to_lowercase().contains("open-meteo"), "{filtered}");
         assert!(!filtered.to_lowercase().contains("tools that worked"), "{filtered}");
+        assert!(!filtered.to_lowercase().contains("[user]"), "{filtered}");
     }
 
     #[test]

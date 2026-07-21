@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.150] - 2026-07-21
+
+### Fixed
+- **Memory hygiene**: drop transcript dumps (`[user]/`/`[assistant]:`), tool-result lines, and timeout tip copy that still leaked into `memory-discord-*.md` after compaction.
+
 ## [0.1.149] - 2026-07-21
 
 ### Added
