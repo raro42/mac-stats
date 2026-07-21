@@ -81,8 +81,10 @@ body {
 /* Scrollable container for details and processes sections */
 .apple-details,
 .apple-processes {
-  flex: 0 1 auto; /* Don't grow, but can shrink - use natural size */
-  overflow-y: auto;
+  flex: 0 0 auto; /* Natural height — do not shrink under Agent Ops */
+  overflow: visible;
+  position: relative;
+  z-index: 1;
 }
 
 /* Collapsible header styling */

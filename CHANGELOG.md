@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.147] - 2026-07-21
+
+### Fixed
+- **Agent Ops layout**: section no longer flex-shrinks with `overflow:visible`, which painted over Details / Processes when both were open.
+
 ## [0.1.146] - 2026-07-21
 
 ### Fixed

@@ -30,17 +30,46 @@
   display: none !important;
 }
 
+/*
+ * Do NOT flex-shrink Agent Ops inside the theme shell. With min-height:0 +
+ * overflow:visible, the pane collapses in the flex column and its content
+ * paints over Details / Processes below ("overlay" bug).
+ * Natural height + shell scroll keeps layout stacked.
+ */
 .agent-ops-section {
   margin-bottom: 16px;
   overflow: visible;
-  flex: 0 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  min-height: auto;
   width: 100%;
+  position: relative;
+  z-index: 0;
+  clear: both;
 }
 
 .agent-ops-section:not(.collapsed) {
-  display: flex;
-  flex-direction: column;
+  display: block;
+}
+
+/* Keep Details / Processes above any accidental sibling overflow */
+#details-section,
+#processes-section,
+.apple-details,
+.apple-processes,
+.arch-details,
+.arch-processes,
+.swiss-details,
+.swiss-processes,
+.mat-details,
+.mat-processes,
+.cpu-details,
+.cpu-processes,
+.details-section,
+.processes-section {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
 }
 
 .ops-close-btn {

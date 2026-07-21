@@ -54,8 +54,10 @@ body {
 /* Scrollable container for details and processes sections */
 .details-section,
 .processes-section {
-  flex: 0 1 auto; /* Don't grow, but can shrink - use natural size */
-  overflow-y: auto;
+  flex: 0 0 auto;
+  overflow: visible;
+  position: relative;
+  z-index: 1;
   overflow-x: hidden;
   min-height: 0; /* Critical: allows flex item to shrink below content size */
   max-height: 300px; /* Limit height to allow scrolling on small screens */
