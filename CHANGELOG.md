@@ -7,13 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.129] - 2026-07-21
+
 ### Added
-- **Weekly CHANGELOG review** — Monday schedule + skill/docs so Werner (or an agent) tidies Keep a Changelog instead of appending reviewer/tester spam. See `docs/040_changelog_hygiene.md`.
+- **Weekly CHANGELOG review** — Monday 10:00 schedule + `changelog-weekly-review` skill; policy in `docs/040_changelog_hygiene.md`. Keep a Changelog stays user-facing (no OpenClaw-reviewer / tester spam).
+- **Discord `/ops`** — instant menu of operator commands (`/status`, `/schedules`, `/insights`, `/digest`, scrub memory, stop).
 
 ### Changed
-- **Harness / Agent Ops (0.1.89–0.1.128, overnight 2026-07-20→21)** — Agent Ops dashboard; native tool markup parsers (Qwen3, GLM, Kimi, DeepSeek, Llama, Longcat, Mistral); digester + `/insights` / `/schedules` / `/status` / `/ops`; instant wake-up lane; schedules mtime cache + log dedupe. Detail lives in git history until the next weekly review folds bullets under version headings.
-
-> Prior `[Unreleased]` blocks full of OpenClaw-reviewer / `003-tester` paperwork were moved to [`docs/changelog-archive-agent-noise.md`](docs/changelog-archive-agent-noise.md).
+- **CHANGELOG triage** — removed three chaotic `[Unreleased]` dumps; noise archived in `docs/changelog-archive-agent-noise.md`.
+- **Harness / Agent Ops (0.1.89–0.1.128)** — Agent Ops dashboard; native tool markup parsers (Qwen3, GLM, Kimi, DeepSeek, Llama, Longcat, Mistral); digester + `/insights` / `/schedules` / `/status`; instant wake-up lane; schedules mtime cache, next-run log dedupe, serialized cache fill.
 
 ## [0.1.88] - 2026-07-20
 

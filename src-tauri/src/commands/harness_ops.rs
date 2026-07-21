@@ -1052,7 +1052,9 @@ pub fn format_ops_help_gateway() -> String {
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` — interrupt an in-flight run\n\
-• `/ops` — this menu"
+• `/ops` — this menu\n\
+\n\
+**Scheduled:** wake-up 06:00 · CHANGELOG hygiene Mondays 10:00 (`docs/040_changelog_hygiene.md`)"
     )
 }
 
