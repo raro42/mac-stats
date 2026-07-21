@@ -172,9 +172,9 @@ pub fn maybe_update_display_name_from_discord(user_id: u64, display_name: &str) 
     if let Some(parent) = path.parent() {
         let _ = std::fs::create_dir_all(parent);
     }
-    match std::fs::write(
+    match crate::config::write_text_atomic(
         &path,
-        serde_json::to_string_pretty(&file_data).unwrap_or_default(),
+        &serde_json::to_string_pretty(&file_data).unwrap_or_default(),
     ) {
         Ok(()) => {
             debug!(

@@ -59,7 +59,7 @@ fn write_rules_default_if_missing(path: &std::path::Path) {
     if let Some(parent) = path.parent() {
         let _ = fs::create_dir_all(parent);
     }
-    let _ = fs::write(path, Config::DEFAULT_DOWNLOADS_ORGANIZER_RULES);
+    let _ = crate::config::write_text_atomic(path, Config::DEFAULT_DOWNLOADS_ORGANIZER_RULES);
 }
 
 #[tauri::command]
@@ -80,7 +80,8 @@ pub fn save_downloads_organizer_rules(content: String) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
-    fs::write(&path, content).map_err(|e| e.to_string())
+    crate::config::write_text_atomic(&path, &content).map_err(|e| e.to_string())?;
+    Ok(())
 }
 
 fn parse_hhmm_settings(raw: &str) -> Option<()> {

@@ -397,7 +397,7 @@ impl HistoryBuffer {
         let json_str = serde_json::to_string_pretty(&all_points)
             .map_err(|e| format!("Serialization error: {}", e))?;
 
-        std::fs::write(history_file, json_str)
+        crate::config::write_text_atomic(&history_file, &json_str)
             .map_err(|e| format!("Failed to write history file: {}", e))?;
 
         Ok(())
