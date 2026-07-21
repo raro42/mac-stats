@@ -976,7 +976,7 @@ function fmtAge(ms) {
 async function refreshAgentOps() {
     const strip = document.getElementById('agent-ops-strip');
     try {
-        const [agents, live, files, memory, insights, version, sched] = await Promise.all([
+        const [agents, live, files, memory, insights, version, sched, deliveries] = await Promise.all([
             invoke('list_agents'),
             invoke('list_live_sessions'),
             invoke('list_session_files', { limit: 40 }),
@@ -984,6 +984,7 @@ async function refreshAgentOps() {
             invoke('get_runs_insights', { limit: 40 }),
             invoke('get_app_version').catch(() => null),
             invoke('get_scheduler_snapshot').catch(() => null),
+            invoke('list_scheduler_delivery_awareness').catch(() => null),
         ]);
         const enabled = (agents || []).filter((a) => a.enabled).length;
         const ver = version ? `v${version} · ` : '';
@@ -1006,13 +1007,28 @@ async function refreshAgentOps() {
                 schedBit = ` · schedules ${n}`;
             }
         }
+        let deliveryBit = '';
+        if (Array.isArray(deliveries) && deliveries.length) {
+            const newest = deliveries[0];
+            const t = newest?.utc ? Date.parse(newest.utc) : NaN;
+            if (!Number.isNaN(t)) {
+                deliveryBit = ` · last delivery ${fmtAge(t)}`;
+            }
+        }
+        let digestAge = '';
+        if (insights?.digest_generated_at) {
+            const t = Date.parse(insights.digest_generated_at);
+            if (!Number.isNaN(t)) {
+                digestAge = ` ${fmtAge(t)}`;
+            }
+        }
         let discordBit = '';
         const dg = insights?.discord_gateway || '';
         const readyMatch = dg.match(/last Ready\s+([^·]+)/i);
         if (readyMatch) {
             discordBit = ` · Discord ${readyMatch[1].trim()}`;
         }
-        strip.textContent = `${ver}${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${(files || []).length} session files · p50 ${insights?.p50_ms ?? 0} ms · ${insights?.turns ?? 0} runs · digest ${insights?.digest_open_count ?? 0} open / ${insights?.digest_stale_count ?? 0} stale${insights?.digest_source ? ` · ${insights.digest_source}` : ''}${insights?.fail_count ? ` · ${insights.fail_count} fail` : ''}${discordBit}${schedBit}`;
+        strip.textContent = `${ver}${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${(files || []).length} session files · p50 ${insights?.p50_ms ?? 0} ms · ${insights?.turns ?? 0} runs · digest ${insights?.digest_open_count ?? 0} open / ${insights?.digest_stale_count ?? 0} stale${digestAge}${insights?.digest_source ? ` · ${insights.digest_source}` : ''}${insights?.fail_count ? ` · ${insights.fail_count} fail` : ''}${discordBit}${schedBit}${deliveryBit}`;
         renderOpsAgents(agents || []);
         renderOpsLive(live || []);
         renderOpsSessionFiles(files || []);
