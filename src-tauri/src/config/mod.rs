@@ -1409,6 +1409,53 @@ impl Config {
         DEFAULT
     }
 
+    /// Keep at most this many `session-memory-*.md` files under `session_dir` (newest by mtime kept).
+    /// **`0` disables** count-based pruning. Default: **200**. Config: `sessionPruneMaxFiles`.
+    /// Env: `MAC_STATS_SESSION_PRUNE_MAX_FILES` (clamped to `0..=10000`).
+    pub fn session_prune_max_files() -> usize {
+        const DEFAULT: usize = 200;
+        const MAX: usize = 10_000;
+        if let Ok(s) = std::env::var("MAC_STATS_SESSION_PRUNE_MAX_FILES") {
+            if let Ok(n) = s.parse::<usize>() {
+                return n.min(MAX);
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(n) = json.get("sessionPruneMaxFiles").and_then(|v| v.as_u64()) {
+                    return (n as usize).min(MAX);
+                }
+            }
+        }
+        DEFAULT
+    }
+
+    /// Delete `session-memory-*.md` files older than this many days (by mtime).
+    /// **`0` disables** age-based pruning. Default: **30**. Config: `sessionPruneMaxAgeDays`.
+    /// Env: `MAC_STATS_SESSION_PRUNE_MAX_AGE_DAYS` (clamped to `0..=3650`).
+    pub fn session_prune_max_age_days() -> u32 {
+        const DEFAULT: u32 = 30;
+        const MAX_DAYS: u32 = 3650;
+        if let Ok(s) = std::env::var("MAC_STATS_SESSION_PRUNE_MAX_AGE_DAYS") {
+            if let Ok(n) = s.parse::<u32>() {
+                return n.min(MAX_DAYS);
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(n) = json
+                    .get("sessionPruneMaxAgeDays")
+                    .and_then(|v| v.as_u64())
+                {
+                    return (n as u32).min(MAX_DAYS);
+                }
+            }
+        }
+        DEFAULT
+    }
+
     /// When total size of `screenshots_dir` exceeds this many bytes, delete oldest files first (by filename timestamp, else mtime) until under the cap.
     /// **`0` disables** the size cap. Default: **524288000** (500 MiB). Config: `config.json` `screenshotPruneMaxTotalBytes`.
     /// Env: `MAC_STATS_SCREENSHOT_PRUNE_MAX_TOTAL_BYTES`.

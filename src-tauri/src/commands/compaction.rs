@@ -392,6 +392,11 @@ pub async fn run_periodic_session_compaction() {
         );
     }
 
+    let pruned = crate::session_memory::prune_old_session_files();
+    if pruned > 0 {
+        info!("Periodic session prune: removed {} transcript file(s)", pruned);
+    }
+
     // Keep Agent Ops digester JSON fresh without waiting for Discord traffic.
     let digest_line = crate::commands::harness_ops::refresh_agent_digest();
     info!("Periodic digester: {}", digest_line);

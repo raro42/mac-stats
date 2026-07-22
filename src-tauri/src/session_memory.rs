@@ -721,13 +721,98 @@ fn parse_session_file(path: &Path) -> Vec<(String, String)> {
     parse_session_markdown(&content)
 }
 
+/// Prune `session-memory-*.md` under [`Config::session_dir`]: drop by mtime age, then keep newest N.
+/// Safe defaults: 30 days / 200 files (`0` disables each axis). Logs when anything is removed.
+pub fn prune_old_session_files() -> u64 {
+    let dir = Config::session_dir();
+    if !dir.is_dir() {
+        return 0;
+    }
+    let max_age_days = Config::session_prune_max_age_days();
+    let max_files = Config::session_prune_max_files();
+    if max_age_days == 0 && max_files == 0 {
+        return 0;
+    }
+
+    let Ok(read_dir) = std::fs::read_dir(&dir) else {
+        return 0;
+    };
+    let mut entries: Vec<(PathBuf, std::time::SystemTime)> = Vec::new();
+    for ent in read_dir.flatten() {
+        let path = ent.path();
+        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+        if !name.starts_with("session-memory-") || !name.ends_with(".md") {
+            continue;
+        }
+        let Ok(meta) = std::fs::metadata(&path) else {
+            continue;
+        };
+        if !meta.is_file() {
+            continue;
+        }
+        let mtime = meta.modified().unwrap_or(std::time::SystemTime::UNIX_EPOCH);
+        entries.push((path, mtime));
+    }
+
+    let mut deleted = 0u64;
+    let now = std::time::SystemTime::now();
+
+    if max_age_days > 0 {
+        let max_age = std::time::Duration::from_secs(u64::from(max_age_days) * 24 * 3600);
+        entries.retain(|(path, mtime)| {
+            let too_old = now
+                .duration_since(*mtime)
+                .map(|d| d > max_age)
+                .unwrap_or(false);
+            if too_old {
+                match std::fs::remove_file(path) {
+                    Ok(()) => {
+                        deleted += 1;
+                        false
+                    }
+                    Err(e) => {
+                        debug!("session prune: failed to remove {:?}: {}", path, e);
+                        true
+                    }
+                }
+            } else {
+                true
+            }
+        });
+    }
+
+    if max_files > 0 && entries.len() > max_files {
+        // Newest first; delete the excess oldest.
+        entries.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+        for (path, _) in entries.into_iter().skip(max_files) {
+            match std::fs::remove_file(&path) {
+                Ok(()) => deleted += 1,
+                Err(e) => debug!("session prune: failed to remove {:?}: {}", path, e),
+            }
+        }
+    }
+
+    if deleted > 0 {
+        info!(
+            "Session prune: removed {} session-memory file(s) (max_age_days={}, max_files={})",
+            deleted, max_age_days, max_files
+        );
+    } else {
+        debug!(
+            "Session prune: nothing to remove (max_age_days={}, max_files={})",
+            max_age_days, max_files
+        );
+    }
+    deleted
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
         add_message, before_session_reset_export, clear_session, extract_assistant_final_answer,
         get_messages, last_user_preview_from_markdown, load_messages_from_latest_session_file,
-        normalize_conversational_message, parse_session_markdown, session_filename_matches_id,
-        truncate_session_preview,
+        normalize_conversational_message, parse_session_markdown, prune_old_session_files,
+        session_filename_matches_id, truncate_session_preview,
     };
     use std::sync::Mutex;
     use std::time::Duration;
@@ -1106,6 +1191,40 @@ mod tests {
         assert_eq!(u["content"], "from file");
 
         let _ = std::fs::remove_file(&out);
+        let _ = std::fs::remove_dir_all(&base);
+    }
+
+    #[test]
+    fn prune_old_session_files_keeps_newest() {
+        let _lock = SESSION_DIR_TEST_LOCK.lock().unwrap();
+        let base = std::env::temp_dir().join(format!(
+            "mac-stats-session-prune-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&base);
+        std::fs::create_dir_all(&base).unwrap();
+        let _dir = SessionDirOverride::set(&base);
+        let prev_max = std::env::var("MAC_STATS_SESSION_PRUNE_MAX_FILES").ok();
+        let prev_age = std::env::var("MAC_STATS_SESSION_PRUNE_MAX_AGE_DAYS").ok();
+        std::env::set_var("MAC_STATS_SESSION_PRUNE_MAX_FILES", "2");
+        std::env::set_var("MAC_STATS_SESSION_PRUNE_MAX_AGE_DAYS", "0");
+        for i in 0..5 {
+            let p = base.join(format!("session-memory-{i}-20260101-00000{i}-t.md"));
+            std::fs::write(&p, "## User\n\nx\n").unwrap();
+            std::thread::sleep(Duration::from_millis(8));
+        }
+        let deleted = prune_old_session_files();
+        assert!(deleted >= 3, "expected at least 3 deletions, got {deleted}");
+        let left = std::fs::read_dir(&base).unwrap().flatten().count();
+        assert_eq!(left, 2);
+        match prev_max {
+            Some(v) => std::env::set_var("MAC_STATS_SESSION_PRUNE_MAX_FILES", v),
+            None => std::env::remove_var("MAC_STATS_SESSION_PRUNE_MAX_FILES"),
+        }
+        match prev_age {
+            Some(v) => std::env::set_var("MAC_STATS_SESSION_PRUNE_MAX_AGE_DAYS", v),
+            None => std::env::remove_var("MAC_STATS_SESSION_PRUNE_MAX_AGE_DAYS"),
+        }
         let _ = std::fs::remove_dir_all(&base);
     }
 }
