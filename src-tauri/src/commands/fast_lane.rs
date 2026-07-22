@@ -102,6 +102,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_short_ack_or_signoff(&n) {
         return Some("👍 Got it — here if you need me.".to_string());
     }
+    if is_overnight_improvements_ask(&n) {
+        return Some(format_instant_overnight_improvements_reply());
+    }
     if is_presence_or_who_ask(&n) {
         return Some(format_instant_presence_reply());
     }
@@ -286,6 +289,42 @@ fn is_presence_or_who_ask(n: &str) -> bool {
 fn format_instant_presence_reply() -> String {
     format!(
         "I'm **Werner** on **mac-stats v{}** — online and ready. How can I help?",
+        crate::config::Config::version()
+    )
+}
+
+/// “Any improvements from last night / overnight coding?” — digester zero-tool slow turns.
+fn is_overnight_improvements_ask(n: &str) -> bool {
+    if n.chars().count() > 140 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("redmine")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("search")
+        || n.contains("weather")
+        || n.contains("ticket")
+    {
+        return false;
+    }
+    let asks_improvements = n.contains("improvement")
+        || n.contains("what shipped")
+        || n.contains("what changed")
+        || n.contains("what did you ship")
+        || n.contains("what did you change");
+    let overnight_context = n.contains("last night")
+        || n.contains("overnight")
+        || n.contains("coding session")
+        || n.contains("last night's");
+    asks_improvements && overnight_context
+}
+
+fn format_instant_overnight_improvements_reply() -> String {
+    format!(
+        "Overnight harness kept shipping — I'm on **mac-stats v{}**. Highlights: instant lane \
+(presence/uptime/capabilities), Agent Ops polish, native tool fidelity, bounded log growth. \
+Open **Agent Ops → Digest** or `~/.mac-stats/improvements/morning_surprise_*.md` for the run log.",
         crate::config::Config::version()
     )
 }
@@ -711,6 +750,34 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "need-anything with a real ask must not be instant"
+        );
+    }
+
+    #[test]
+    fn overnight_improvements_asks_are_instant() {
+        for q in [
+            "How are you today? Any improvements from last night coding session?",
+            "Any improvements from last night?",
+            "What shipped overnight?",
+            "What changed from last night's coding session?",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    let lower = reply.to_lowercase();
+                    assert!(
+                        lower.contains("mac-stats") || lower.contains("overnight"),
+                        "expected overnight blurb for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant for {q:?}, got {:?}", other),
+            }
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane("Any improvements to the Redmine ticket workflow?", None),
+                TurnLane::Instant { .. }
+            ),
+            "improvements without overnight context must not be instant"
         );
     }
 

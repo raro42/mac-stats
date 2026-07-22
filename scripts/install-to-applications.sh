@@ -19,7 +19,9 @@ if [[ ! -d "$APP/Contents/MacOS" ]]; then
   exit 1
 fi
 
-cp -f "$BIN_SRC" "$APP/Contents/MacOS/mac-stats"
+cp -f "$BIN_SRC" "$APP/Contents/MacOS/mac_stats"
+# LaunchAgent / older docs may refer to mac-stats; keep a symlink after DMG installs (CFBundleExecutable is mac_stats).
+ln -sfn mac_stats "$APP/Contents/MacOS/mac-stats"
 if [[ -d "$DIST_SRC" && -d "$DIST_DST" ]]; then
   # Root UI assets (dashboard is unused by the menu-bar window but kept in sync)
   for f in dashboard.html dashboard.js dashboard.css \
@@ -38,6 +40,12 @@ fi
 
 # LaunchAgent cwd is not src-tauri — merge REDMINE/Brave/Perplexity into ~/.mac-stats/.config.env
 bash "$ROOT/scripts/sync-home-config-env.sh" || true
+
+# Prefer CFBundleExecutable name; fall back to legacy mac-stats symlink.
+PLIST="$HOME/Library/LaunchAgents/com.raro42.mac-stats.plist"
+if [[ -f "$PLIST" ]]; then
+  /usr/libexec/PlistBuddy -c 'Set :ProgramArguments:0 /Applications/mac-stats.app/Contents/MacOS/mac_stats' "$PLIST" 2>/dev/null || true
+fi
 
 # codesign --deep can hang on some macOS builds (overnight harness saw multi-minute stalls).
 # Time out and continue — binary is already replaced; LaunchAgent restart still proceeds.
@@ -66,7 +74,7 @@ xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
 
 launchctl kickstart -k "$LABEL"
 sleep 3
-pgrep -fl 'Contents/MacOS/mac-stats' | head -1 || {
+pgrep -fl 'Contents/MacOS/mac_stats|Contents/MacOS/mac-stats' | head -1 || {
   echo "Process not running after kickstart" >&2
   exit 1
 }

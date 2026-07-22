@@ -1128,6 +1128,31 @@ fn classify_candidate(
             request_id: request_id.into(),
         });
     }
+    let asks_improvements = q.contains("improvement")
+        || q.contains("what shipped")
+        || q.contains("what changed")
+        || q.contains("what did you ship")
+        || q.contains("what did you change");
+    let overnight_context = q.contains("last night")
+        || q.contains("overnight")
+        || q.contains("coding session")
+        || q.contains("last night's");
+    if asks_improvements
+        && overnight_context
+        && !q.contains("redmine")
+        && !q.contains("ticket")
+        && lane != "instant"
+        && wall_ms >= 500
+    {
+        return Some(RunInsightCandidate {
+            kind: "promote_instant".into(),
+            reason: "Overnight improvements ask should stay on instant lane".into(),
+            wall_ms,
+            lane: lane.into(),
+            question_preview: question.chars().take(80).collect(),
+            request_id: request_id.into(),
+        });
+    }
     let n_cap = q.trim_end_matches(['?', '!', '.']).trim();
     let looks_capabilities = matches!(
         n_cap,
