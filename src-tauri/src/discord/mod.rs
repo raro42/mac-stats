@@ -12,6 +12,9 @@
 //! `config.json` `discord_debounce_ms` and `message_debounce`).
 
 pub mod api;
+mod token;
+pub use token::{get_discord_token, DISCORD_TOKEN_KEYCHAIN_ACCOUNT};
+use token::token_from_config_env_file;
 
 mod message_debounce;
 
@@ -1875,8 +1878,6 @@ static DISCORD_DESIRED_ONLINE: AtomicBool = AtomicBool::new(true);
 /// Shared shard manager for graceful disconnect (user appears offline).
 static DISCORD_SHARD_MANAGER: Mutex<Option<Arc<ShardManager>>> = Mutex::new(None);
 
-/// Keychain account name for the Discord bot token.
-pub const DISCORD_TOKEN_KEYCHAIN_ACCOUNT: &str = "discord_bot_token";
 
 /// Bot user id (set on Ready, cleared on disconnect; used to filter self and mentions).
 static BOT_USER_ID: Mutex<Option<UserId>> = Mutex::new(None);
@@ -3444,21 +3445,6 @@ pub fn discord_gateway_client_started_at() -> Option<Instant> {
         .and_then(|g| *g)
 }
 
-/// Read Discord token from a .config.env-style file (DISCORD_BOT_TOKEN= or DISCORD-USER1/2-TOKEN=).
-fn token_from_config_env_file(path: &Path) -> Option<String> {
-    // Do not log file content or path; file may contain secrets.
-    let content = std::fs::read_to_string(path).ok()?;
-    let token = content
-        .lines()
-        .find(|l| {
-            l.starts_with("DISCORD_BOT_TOKEN=")
-                || l.starts_with("DISCORD-USER1-TOKEN=")
-                || l.starts_with("DISCORD-USER2-TOKEN=")
-        })
-        .and_then(|l| l.split_once('='))
-        .map(|(_, v)| v.trim().to_string());
-    token.filter(|t| !t.is_empty())
-}
 
 /// Send a message to a Discord channel with optional file attachments (e.g. screenshots).
 /// Paths must be under configured outbound attachment roots (`security::attachment_roots`); others are skipped.
@@ -3682,50 +3668,6 @@ pub async fn send_message_to_channel(channel_id: u64, content: &str) -> Result<(
     }
 }
 
-/// Get Discord token: DISCORD_BOT_TOKEN env, then .config.env (cwd then ~/.mac-stats), then Keychain.
-/// Prefer env and file so the app works without Keychain access.
-pub fn get_discord_token() -> Option<String> {
-    if let Ok(t) = std::env::var("DISCORD_BOT_TOKEN") {
-        let t = t.trim().to_string();
-        if !t.is_empty() {
-            info!("Discord: Token from DISCORD_BOT_TOKEN env");
-            return Some(t);
-        }
-    }
-    if let Ok(cwd) = std::env::current_dir() {
-        let p = cwd.join(".config.env");
-        if p.is_file() {
-            if let Some(t) = token_from_config_env_file(&p) {
-                info!("Discord: Token from .config.env (current dir)");
-                return Some(t);
-            }
-        }
-    }
-    if let Ok(home) = std::env::var("HOME") {
-        let p = Path::new(&home).join(".mac-stats").join(".config.env");
-        if p.is_file() {
-            if let Some(t) = token_from_config_env_file(&p) {
-                info!("Discord: Token from ~/.mac-stats/.config.env");
-                return Some(t);
-            }
-        }
-    }
-    match crate::security::get_credential(DISCORD_TOKEN_KEYCHAIN_ACCOUNT) {
-        Ok(Some(t)) if !t.trim().is_empty() => {
-            info!("Discord: Token from Keychain");
-            Some(t)
-        }
-        Ok(Some(_)) => None,
-        Ok(None) => None,
-        Err(e) => {
-            debug!(
-                "Discord: Keychain read failed (using env/file instead): {}",
-                e
-            );
-            None
-        }
-    }
-}
 
 /// Spawn the Discord gateway in a background thread if token is present and desired online.
 /// Loads token via get_discord_token() (env, .config.env, then Keychain).

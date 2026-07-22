@@ -436,6 +436,32 @@ async fn build_and_cache_model_catalog(endpoint: &str, api_key: Option<&str>) {
 }
 
 /// Query GET /api/tags and return the first model name, or "llama3.2" as a fallback.
+/// Prefer gemma4 (etc.) over whatever `/api/tags` returns first (often an unrelated local model).
+fn pick_preferred_model_name(names: &[String]) -> Option<String> {
+    const PREFS: &[&str] = &[
+        "gemma4:latest",
+        "gemma4",
+        "qwen3:latest",
+        "qwen3",
+        "qwen2.5-coder:latest",
+    ];
+    for p in PREFS {
+        if names.iter().any(|n| n == p) {
+            return Some((*p).to_string());
+        }
+    }
+    for p in PREFS {
+        let base = p.split(':').next().unwrap_or(p);
+        if let Some(hit) = names
+            .iter()
+            .find(|n| n.as_str() == base || n.starts_with(&format!("{base}:")))
+        {
+            return Some(hit.clone());
+        }
+    }
+    None
+}
+
 async fn detect_first_model(endpoint: &str, api_key: Option<&str>) -> String {
     if let Some(override_model) = read_ollama_model_override() {
         tracing::info!("Ollama agent: using model override '{}'", override_model);
@@ -468,19 +494,31 @@ async fn detect_first_model(endpoint: &str, api_key: Option<&str>) -> String {
                     .collect::<Vec<_>>()
                     .join(", ")
             );
-            let local = list
+            let locals: Vec<String> = list
                 .models
                 .iter()
-                .find(|m| !crate::ollama::models::is_cloud_model(&m.name));
-            let chosen = local
+                .filter(|m| !crate::ollama::models::is_cloud_model(&m.name))
                 .map(|m| m.name.clone())
-                .unwrap_or_else(|| list.models[0].name.clone());
-            if local.is_none() && list.models.len() > 1 {
+                .collect();
+            let names: Vec<String> = if locals.is_empty() {
+                list.models.iter().map(|m| m.name.clone()).collect()
+            } else {
+                locals
+            };
+            let chosen = pick_preferred_model_name(&names)
+                .unwrap_or_else(|| names[0].clone());
+            if list
+                .models
+                .iter()
+                .all(|m| crate::ollama::models::is_cloud_model(&m.name))
+                && list.models.len() > 1
+            {
                 tracing::debug!(
                     "Ollama agent: no local model found, using cloud fallback '{}'",
                     chosen
                 );
             }
+            tracing::info!("Ollama agent: selected default model '{}'", chosen);
             chosen
         }
         _ => "llama3.2".to_string(),

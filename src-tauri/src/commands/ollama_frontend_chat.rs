@@ -150,6 +150,29 @@ pub async fn ollama_chat_with_execution(
         request.question
     );
 
+    // Instant weather (+ local time): same Open-Meteo path as Discord agent router.
+    // Avoids brittle FETCH_URL → Google/wttr loops in the CPU chat UI.
+    if crate::commands::weather_grounding::looks_like_weather_query(&request.question) {
+        if let Some(wx) =
+            crate::commands::weather_grounding::format_instant_weather_reply(&request.question)
+                .await
+        {
+            info!(
+                "Ollama Chat with Execution: INSTANT weather (Open-Meteo, 0 LLM) for {:?}",
+                crate::logging::ellipse(&request.question, 80)
+            );
+            return Ok(OllamaChatWithExecutionResponse {
+                needs_code_execution: false,
+                code: None,
+                intermediate_response: None,
+                final_answer: Some(wx),
+                error: None,
+                context_message: None,
+                attachment_paths: vec![],
+            });
+        }
+    }
+
     let token_budget =
         crate::commands::context_assembler::resolve_default_chat_context_token_budget().await;
 

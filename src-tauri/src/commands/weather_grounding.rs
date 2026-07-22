@@ -29,7 +29,9 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
                 .unwrap_or(rest.len());
             let mut tokens: Vec<&str> = rest[..end].split_whitespace().collect();
             while let Some(last) = tokens.last() {
-                let l = last.to_lowercase();
+                let l = last.to_lowercase().trim_matches(|c: char| {
+                    matches!(c, '?' | '!' | '.' | ',' | ';' | ':')
+                }).to_string();
                 if matches!(
                     l.as_str(),
                     "right"
@@ -42,6 +44,14 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
                         | "current"
                         | "conditions"
                         | "like"
+                        | "and"
+                        | "weather"
+                        | "wether"
+                        | "forecast"
+                        | "date"
+                        | "time"
+                        | "datetime"
+                        | "the"
                 ) {
                     tokens.pop();
                 } else {
@@ -366,6 +376,11 @@ pub(crate) async fn format_instant_weather_reply(query: &str) -> Option<String> 
     if let Some(w) = wind {
         out.push_str(&format!(" Wind {:.1} km/h.", w));
     }
+    // Local clock for the place (Open-Meteo `current.time` is already in `timezone`)
+    out.push_str(&format!(
+        "\nLocal date/time there: **{}** ({})",
+        when, tz
+    ));
     out.push_str("\n_Source: Open-Meteo_");
     Some(out)
 }
@@ -417,6 +432,15 @@ mod tests {
     fn extracts_place_in() {
         let p = extract_place("What's the weather like in El Masnou right now?").unwrap();
         assert!(p.to_lowercase().contains("masnou"), "{p}");
+    }
+
+    #[test]
+    fn extracts_place_date_time_and_weather() {
+        let q = "What's date and time in El Masnou and weather?";
+        assert!(looks_like_weather_query(q));
+        let p = extract_place(q).unwrap();
+        assert_eq!(p.to_lowercase(), "el masnou");
+        assert!(can_instant_weather(q));
     }
 
     #[test]

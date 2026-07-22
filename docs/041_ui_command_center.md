@@ -2,7 +2,7 @@
 
 Agent Ops is the **operator-facing control center** for mac-stats: schedules, live sessions, knowledge, recent chats, and run health—above AI Chat.
 
-**Important:** the menu-bar CPU window loads `themes/<theme>/cpu.html` (via `cpu.html`), **not** `dashboard.html`. Command Center UI must ship in theme files + shared `agent-ops.js` / `agent-ops.css`. Open it via the **Agent Ops icon** in the icon row (pane starts hidden). Install copies the full `themes/` tree via `scripts/install-to-applications.sh`.
+**Important:** the menu-bar CPU window loads `themes/<theme>/cpu.html` (via `cpu.html`), **not** `dashboard.html`. Command Center UI must ship in theme files + shared `agent-ops.js` / `agent-ops.css`. Open it via the **Agent Ops icon** in the icon row (pane starts hidden). Install copies the full `themes/` tree via `scripts/install-to-applications.sh`. See also [`042_dashboard_orphan.md`](042_dashboard_orphan.md) — dashboard Settings is quarantined and not shipped.
 
 ## Layout (v0.1.130+)
 

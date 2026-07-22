@@ -37,6 +37,18 @@ fn truncate_fetch_body_if_needed(body: String) -> String {
 
 /// Browser-like User-Agent so servers that block bots/scrapers allow the request (avoids 403).
 const USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+/// wttr.in returns HTML (or odd 500s) for browser UAs; curl-style UA gets plain `format=` text.
+const USER_AGENT_CURLISH: &str = "curl/8.4.0";
+
+fn user_agent_for_url(url: &str) -> &'static str {
+    let lower = url.to_ascii_lowercase();
+    if lower.contains("://wttr.in/") || lower.contains("://wttr.in?") || lower.ends_with("://wttr.in")
+    {
+        USER_AGENT_CURLISH
+    } else {
+        USER_AGENT
+    }
+}
 
 /// Extract the first URL-like token from text (e.g. FETCH_URL arg that may contain extra words).
 /// Takes the first substring that starts with http:// or https:// and runs until first whitespace or newline.
@@ -533,13 +545,16 @@ fn fetch_page_content_with_proxy_context(
         .build()
         .map_err(|e| format!("HTTP client: {}", e))?;
 
+    let ua = user_agent_for_url(url);
+    let accept = if ua == USER_AGENT_CURLISH {
+        "text/plain,*/*;q=0.8"
+    } else {
+        "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+    };
     let resp = client
         .get(url)
-        .header("User-Agent", USER_AGENT)
-        .header(
-            "Accept",
-            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        )
+        .header("User-Agent", ua)
+        .header("Accept", accept)
         .header("Accept-Language", "en-US,en;q=0.9")
         .send()
         .map_err(|e| format!("Request failed: {}", e))?;
@@ -548,8 +563,25 @@ fn fetch_page_content_with_proxy_context(
     if !status.is_success() {
         let code = status.as_u16();
         let reason = status.canonical_reason().unwrap_or("");
-        warn!("Fetch page failed: {} {} for URL {}", code, reason, url);
-        return Err(format!("HTTP {}: {}", code, reason));
+        let err_body = resp
+            .text()
+            .unwrap_or_default()
+            .chars()
+            .take(200)
+            .collect::<String>()
+            .replace('\n', " ");
+        warn!(
+            "Fetch page failed: {} {} for URL {} body={:?}",
+            code,
+            reason,
+            url,
+            crate::logging::ellipse(&err_body, 120)
+        );
+        return Err(if err_body.trim().is_empty() {
+            format!("HTTP {}: {}", code, reason)
+        } else {
+            format!("HTTP {}: {} — {}", code, reason, err_body.trim())
+        });
     }
 
     let body = resp.text().map_err(|e| format!("Read body: {}", e))?;

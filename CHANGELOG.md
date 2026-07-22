@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.217] - 2026-07-22
+
+### Fixed
+- CPU chat no longer stays blank on instant replies (e.g. weather/date) when streaming mode is on.
+- Default Ollama model prefers `gemma4` (and `OLLAMA_MODEL`) instead of the first `/api/tags` entry (often `ornith`).
+- CPU chat weather/date questions use Open-Meteo instantly (same idea as Discord), without a failed Google/wttr FETCH_URL loop.
+
+### Changed
+- Frontend SoT for CPU UI under `src/` (`cpu.js`, `cpu-ui.js`, …); shared `chart-line.js`; dashboard quarantined from install.
+- Theme settings chrome aligned; LaunchAgent bootstrap on install when missing.
+
 ## [0.1.216] - 2026-07-22
 
 ### Added

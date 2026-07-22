@@ -23,12 +23,13 @@ cp -f "$BIN_SRC" "$APP/Contents/MacOS/mac_stats"
 # LaunchAgent / older docs may refer to mac-stats; keep a symlink after DMG installs (CFBundleExecutable is mac_stats).
 ln -sfn mac_stats "$APP/Contents/MacOS/mac-stats"
 if [[ -d "$DIST_SRC" && -d "$DIST_DST" ]]; then
-  # Root UI assets (dashboard is unused by the menu-bar window but kept in sync)
-  for f in dashboard.html dashboard.js dashboard.css \
-           ollama.js cpu.js cpu.html cpu-ui.js discord.js \
+  # Live UI assets for the menu-bar CPU window (dashboard.* is orphaned — do not ship)
+  for f in ollama.js cpu.js cpu.html cpu-ui.js discord.js history.js chart-line.js \
            tauri-logger.js agent-ops.js agent-ops.css; do
     [[ -f "$DIST_SRC/$f" ]] && cp -f "$DIST_SRC/$f" "$DIST_DST/"
   done
+  # Remove previously installed orphaned dashboard copies if present
+  rm -f "$DIST_DST/dashboard.html" "$DIST_DST/dashboard.js" "$DIST_DST/dashboard.css"
   # Themes power the real CPU window (cpu.html → themes/<theme>/cpu.html)
   if [[ -d "$DIST_SRC/themes" ]]; then
     rsync -a --delete "$DIST_SRC/themes/" "$DIST_DST/themes/"
@@ -72,7 +73,28 @@ fi
 
 xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
 
-launchctl kickstart -k "$LABEL"
+PLIST_PATH="${HOME}/Library/LaunchAgents/com.raro42.mac-stats.plist"
+# kickstart only works if the agent is already bootstrapped in the GUI domain.
+# After reboot / bootout / fresh machine, bootstrap first (idempotent enough with bootout||true).
+if ! launchctl print "$LABEL" >/dev/null 2>&1; then
+  echo "LaunchAgent not loaded — bootstrapping $PLIST_PATH" >&2
+  if [[ -f "$PLIST_PATH" ]]; then
+    launchctl bootout "gui/$(id -u)" "$PLIST_PATH" 2>/dev/null || true
+    launchctl bootstrap "gui/$(id -u)" "$PLIST_PATH"
+    launchctl enable "$LABEL" 2>/dev/null || true
+  else
+    echo "Missing $PLIST_PATH — start mac-stats manually or recreate the LaunchAgent" >&2
+  fi
+fi
+
+launchctl kickstart -k "$LABEL" 2>/dev/null || {
+  echo "kickstart failed; trying bootstrap+kickstart" >&2
+  if [[ -f "$PLIST_PATH" ]]; then
+    launchctl bootout "gui/$(id -u)" "$PLIST_PATH" 2>/dev/null || true
+    launchctl bootstrap "gui/$(id -u)" "$PLIST_PATH"
+    launchctl kickstart -k "$LABEL"
+  fi
+}
 sleep 3
 pgrep -fl 'Contents/MacOS/mac_stats|Contents/MacOS/mac-stats' | head -1 || {
   echo "Process not running after kickstart" >&2

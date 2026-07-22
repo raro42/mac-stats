@@ -305,16 +305,20 @@ The codebase follows a clear separation between Rust backend (Tauri) and JavaScr
 
 ```
 mac-stats/
-├── src/                          ← Frontend source (JavaScript/HTML/CSS)
-│   ├── dashboard.html            ← Main dashboard UI
-│   ├── dashboard.js              ← Dashboard logic (delegates to modules)
-│   ├── dashboard.css             ← Dashboard styles
-│   ├── ollama.js                 ← Ollama AI chat integration (unified module)
+├── src/                          ← Frontend source of truth (synced → src-tauri/dist/)
+│   ├── cpu.js                    ← CPU window logic (metrics, tips, Perplexity, …)
+│   ├── cpu-ui.js                 ← Theme picker, Settings modal, product toggles
+│   ├── discord.js / history.js   ← Shared CPU helpers
+│   ├── chart-line.js             ← Shared history line charts (themes import this)
+│   ├── ollama.js                 ← Ollama AI chat integration
+│   ├── agent-ops.js / .css       ← Agent Ops / Command Center
 │   ├── tauri-logger.js           ← Console logging bridge to Rust
-│   ├── main.js                   ← Main entry point
-│   ├── index.html                ← App entry HTML
-│   └── assets/                   ← Icons and images
+│   ├── dashboard.*               ← ORPHANED (not loaded by menu-bar app; keep until ports done)
+│   ├── main.js / index.html      ← Legacy Tauri scaffold (unused by CPU window)
+│   └── assets/
 ├── src-tauri/                    ← Rust backend (Tauri application)
+│   ├── dist/                     ← Served frontend (sync from src/; themes/ is dist-only)
+│   │   └── themes/*/cpu.html     ← Per-theme shells (CSS + layout); shared chrome via scripts
 │   ├── src/
 │   │   ├── main.rs               ← Entry point, CLI argument parsing
 │   │   ├── lib.rs                ← Main app logic, Tauri setup, background threads
@@ -556,15 +560,16 @@ mac-stats/
 
 ### File Sync & Build Process
 
-- **Frontend files** in `src/` are synced to `src-tauri/dist/` via `scripts/sync-dist.sh`
-- **Single source of truth**: `src/ollama.js` is the primary file, synced to `dist/ollama.js`
-- **Always sync after changes**: Run sync script or manually copy when modifying frontend files
-- **Tauri serves from**: `src-tauri/dist/` directory
+- **Edit shared JS/CSS in `src/`**, then run `scripts/sync-dist.sh` → **`src-tauri/dist/` only** (Tauri `frontendDist`). Do **not** use a repo-root `dist/` mirror.
+- **CPU window SoT:** `src/cpu.js`, `src/cpu-ui.js`, `src/discord.js`, `src/history.js`, `src/ollama.js`, `src/agent-ops.js`
+- **Themes** (`src-tauri/dist/themes/*/`) are **dist-only** — CSS/layout per theme; keep `#settings-modal` in sync via `scripts/check-theme-settings-sync.sh` / `scripts/sync-theme-settings.sh`
+- **Orphaned:** `src/dashboard.*` is not loaded by the menu-bar app (see `docs/042_dashboard_orphan.md`); install no longer ships it
+- Always sync after changing `src/` frontend files before release/install
 
 ### Key Design Patterns
 
-1. **Module Delegation**: Frontend modules delegate to specialized modules (e.g., `dashboard.js` → `ollama.js`)
-2. **Single Source of Truth**: One primary file per feature, synced to distribution locations
+1. **Module Delegation**: Frontend modules delegate to specialized modules (e.g. CPU UI → `ollama.js`)
+2. **Single Source of Truth**: Shared JS lives in `src/`, synced to `src-tauri/dist/`
 3. **Conversation History**: Maintained in JavaScript, passed to Rust for API calls
 4. **Structured Responses**: Rust commands return structured data (needs_code_execution, final_answer, etc.)
 5. **Error Handling**: Comprehensive error handling with logging at each layer
@@ -573,9 +578,9 @@ mac-stats/
 ### Adding New Features
 
 **Frontend Feature**:
-1. Add to `src/` directory
-2. Update `scripts/sync-dist.sh` if needed
-3. Include in HTML templates (`dashboard.html`, `cpu.html`)
+1. Add to `src/` (shared JS) or `src-tauri/dist/themes/<theme>/` (theme shells)
+2. Run `scripts/sync-dist.sh` for shared files; for settings chrome run `scripts/sync-theme-settings.sh`
+3. Live templates are `themes/*/cpu.html` (not `dashboard.html`)
 
 **Backend Feature**:
 1. Create module in `src-tauri/src/`

@@ -80,18 +80,10 @@ pub(crate) fn format_process_uptime() -> String {
 // Caches
 pub(crate) static CHIP_INFO_CACHE: OnceLock<String> = OnceLock::new();
 
-// OPTIMIZATION Phase 3: Split ACCESS_CACHE into separate OnceLock fields
-// These capability flags are set once and never change, so OnceLock is more efficient
-// than Mutex<Option<_>> which requires locking on every access
 pub(crate) static CAN_READ_TEMPERATURE: OnceLock<bool> = OnceLock::new();
 pub(crate) static CAN_READ_FREQUENCY: OnceLock<bool> = OnceLock::new();
 pub(crate) static CAN_READ_CPU_POWER: OnceLock<bool> = OnceLock::new();
 pub(crate) static CAN_READ_GPU_POWER: OnceLock<bool> = OnceLock::new();
-
-// Legacy ACCESS_CACHE for backwards compatibility during transition
-// Will be removed after all references are migrated
-#[allow(dead_code)]
-pub(crate) static ACCESS_CACHE: Mutex<Option<(bool, bool, bool, bool)>> = Mutex::new(None); // temp, freq, cpu_power, gpu_power
 
 // Temperature cache: (temperature_value, last_update_timestamp)
 pub(crate) static TEMP_CACHE: Mutex<Option<(f32, Instant)>> = Mutex::new(None);

@@ -112,7 +112,7 @@
       <div class="icon-line" id="icon-line">
         <!-- Icon 1: Monitors -->
         <button class="icon-line-item" id="icon-monitors" title="Monitors">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
             <line x1="8" y1="21" x2="16" y2="21"></line>
             <line x1="12" y1="17" x2="12" y2="21"></line>
@@ -130,7 +130,7 @@
         
         <!-- Icon: Perplexity Search -->
         <button class="icon-line-item" id="icon-perplexity" title="Perplexity Search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
@@ -138,7 +138,7 @@
 
 <!-- Icon: Debug log -->
         <button class="icon-line-item" id="icon-logs" title="Debug Log">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
             <line x1="8" y1="13" x2="16" y2="13"></line>
@@ -158,7 +158,7 @@
         
         <!-- Icon: Agent Ops -->
         <button class="icon-line-item" id="icon-agent-ops" title="Agent Ops" aria-pressed="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="3" y="3" width="7" height="9" rx="1"></rect>
             <rect x="14" y="3" width="7" height="5" rx="1"></rect>
             <rect x="14" y="12" width="7" height="9" rx="1"></rect>
@@ -167,16 +167,6 @@
         </button>
 
 <!-- Icons 4-15: Placeholders -->
-        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
-        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
-        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
-        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
-        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
-        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
-        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
-        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
-        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
-        <div class="icon-line-item icon-placeholder" title="Coming soon"></div>
       </div>
 
       <div class="poster-rule" aria-hidden="true"></div>
@@ -491,46 +481,83 @@
       </footer>
     </main>
 
-    <div id="settings-modal" class="settings-modal" style="display: none;">
-      <div class="settings-card">
+    <div id="settings-modal" class="settings-modal" style="display: none;" aria-hidden="true">
+      <div class="settings-card" role="dialog" aria-labelledby="settings-title">
         <div class="settings-header">
-          <h2>Settings</h2>
+          <h2 id="settings-title">Settings</h2>
           <button id="close-settings" class="icon-btn" aria-label="Close">×</button>
         </div>
         <div class="settings-body">
-          <div class="setting-item">
-            <div class="setting-label">Theme</div>
-            <div id="theme-list" class="theme-list" role="list">
-              <button type="button" class="theme-item" data-theme="apple">Apple</button>
-              <button type="button" class="theme-item" data-theme="architect">Architect</button>
-              <button type="button" class="theme-item" data-theme="data-poster">Data Poster</button>
-              <button type="button" class="theme-item" data-theme="dark">Dark (TUI)</button>
-              <button type="button" class="theme-item" data-theme="futuristic">Futuristic</button>
-              <button type="button" class="theme-item" data-theme="light">Light</button>
-              <button type="button" class="theme-item" data-theme="material">Material</button>
-              <button type="button" class="theme-item" data-theme="neon">Neon</button>
-              <button type="button" class="theme-item" data-theme="swiss-minimalistic">Swiss Minimalistic</button>
+          <section class="settings-section" aria-labelledby="settings-appearance-heading">
+            <h3 class="settings-section-title" id="settings-appearance-heading">Appearance</h3>
+            <div class="setting-item">
+              <div class="setting-label">Theme</div>
+              <div id="theme-list" class="theme-list" role="list">
+                <button type="button" class="theme-item" data-theme="apple">Apple</button>
+                <button type="button" class="theme-item" data-theme="architect">Architect</button>
+                <button type="button" class="theme-item" data-theme="data-poster">Data Poster</button>
+                <button type="button" class="theme-item" data-theme="dark">Dark (TUI)</button>
+                <button type="button" class="theme-item" data-theme="futuristic">Futuristic</button>
+                <button type="button" class="theme-item" data-theme="light">Light</button>
+                <button type="button" class="theme-item" data-theme="material">Material</button>
+                <button type="button" class="theme-item" data-theme="neon">Neon</button>
+                <button type="button" class="theme-item" data-theme="swiss-minimalistic">Swiss Minimalistic</button>
+              </div>
             </div>
-          </div>
-          <div class="setting-item">
-            <div class="setting-label">Window Frame</div>
-            <label class="setting-toggle">
-              <input type="checkbox" id="window-decorations-toggle" />
-              <span class="toggle-label">Show window frame</span>
-            </label>
-            <div class="setting-note" style="font-size: 11px; color: rgba(255, 255, 255, 0.74); margin-top: 4px; font-style: italic;">Not yet functional</div>
-          </div>
-          <div class="setting-item" id="discord-setting">
-            <div class="setting-label">Discord bot</div>
-            <div class="discord-status" id="discord-status">—</div>
-            <input type="password" id="discord-token-input" class="discord-token-input" placeholder="Paste bot token here" autocomplete="off" style="width:100%; margin-top:4px; padding:6px 8px; box-sizing:border-box; min-height:28px;" />
-            <div class="discord-actions" style="margin-top: 6px;">
-              <button type="button" class="theme-item discord-btn" id="discord-save-token" style="margin-right: 8px; cursor: pointer;">Save token</button>
-              <button type="button" class="theme-item discord-btn" id="discord-clear-token" style="margin-right: 8px; cursor: pointer;">Clear token</button>
-              <button type="button" class="theme-item discord-btn" id="view-debug-log" style="cursor: pointer;">View logs</button>
+            <div class="setting-item">
+              <div class="setting-label">Window frame</div>
+              <label class="setting-toggle">
+                <input type="checkbox" id="window-decorations-toggle" />
+                <span class="toggle-label">Show window frame</span>
+              </label>
+              <div class="setting-note">Applies the next time the window is closed and reopened.</div>
             </div>
-            <div class="setting-note" style="font-size: 11px; color: rgba(255, 255, 255, 0.74); margin-top: 4px; font-style: italic;">Saving connects right away. Restart to disconnect after clearing.</div>
-          </div>
+          </section>
+
+          <section class="settings-section" aria-labelledby="settings-product-heading">
+            <h3 class="settings-section-title" id="settings-product-heading">Product</h3>
+            <div class="setting-item" id="product-setting">
+              <label class="setting-toggle">
+                <input type="checkbox" id="ai-agent-enabled-toggle" />
+                <span class="toggle-label">Enable local AI agent</span>
+              </label>
+              <div class="setting-note">Off = monitor only (no Discord / scheduler / Ollama startup). Restart after changing.</div>
+              <label class="setting-toggle">
+                <input type="checkbox" id="menu-bar-compact-toggle" />
+                <span class="toggle-label">Compact menu bar (CPU / °C)</span>
+              </label>
+              <div class="settings-actions">
+                <button type="button" class="settings-btn" id="settings-help-btn">Help / cheat sheet</button>
+                <button type="button" class="settings-btn" id="settings-reset-defaults-btn">Reset to monitor defaults</button>
+              </div>
+              <pre id="settings-help-sheet" class="settings-help-sheet" hidden></pre>
+            </div>
+          </section>
+
+          <section class="settings-section" aria-labelledby="settings-credentials-heading">
+            <h3 class="settings-section-title" id="settings-credentials-heading">Credentials</h3>
+            <div class="setting-item" id="discord-setting">
+              <div class="setting-label">Discord bot</div>
+              <div class="discord-status settings-status" id="discord-status">—</div>
+              <input type="password" id="discord-token-input" class="settings-input discord-token-input" placeholder="Paste bot token here" autocomplete="off" />
+              <div class="settings-actions discord-actions">
+                <button type="button" class="settings-btn settings-btn-primary discord-btn" id="discord-save-token">Save token</button>
+                <button type="button" class="settings-btn discord-btn" id="discord-clear-token">Clear token</button>
+                <button type="button" class="settings-btn discord-btn" id="view-debug-log">View logs</button>
+              </div>
+              <div class="setting-note">Saving connects right away. Restart to disconnect after clearing. Logs include Discord and app output.</div>
+            </div>
+            <div class="setting-item" id="perplexity-setting">
+              <div class="setting-label">Perplexity API key</div>
+              <div class="perplexity-status settings-status" id="perplexity-settings-status">—</div>
+              <input type="password" id="perplexity-api-key-input" class="settings-input discord-token-input" placeholder="Paste API key (pplx-...)" autocomplete="off" />
+              <div class="settings-actions perplexity-actions">
+                <button type="button" class="settings-btn settings-btn-primary discord-btn" id="perplexity-save-key">Save key</button>
+                <button type="button" class="settings-btn discord-btn" id="perplexity-clear-key">Clear key</button>
+              </div>
+              <div class="setting-note">Get a key at <a href="https://www.perplexity.ai/settings/api" target="_blank" rel="noopener noreferrer">perplexity.ai/settings/api</a>. Stored in Keychain.</div>
+            </div>
+          </section>
         </div>
       </div>
     </div>
@@ -560,9 +587,9 @@
     <script src="../../tauri-logger.js"></script>
     <script type="module" src="../../ollama.js?v=20260717-model"></script>
     <script src="../../agent-ops.js"></script>
-    <script src="../../cpu.js?v=20260717-logs"></script>
+    <script src="../../cpu.js?v=20260722-welcome"></script>
     <script src="../../discord.js"></script>
-    <script src="../../cpu-ui.js"></script>
+    <script src="../../cpu-ui.js?v=20260722-settings"></script>
     <script src="./poster-charts.js"></script>
     <script src="../../history.js"></script>
   </body>
