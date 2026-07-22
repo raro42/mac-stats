@@ -100,7 +100,7 @@ function ensureOpsKeyboardHint() {
     const hint = document.createElement('div');
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
-    hint.textContent = 'Tips: / focuses filter · Esc clears · Enter loads session';
+    hint.textContent = 'Tips: / focuses filter · Esc clears / closes agent · Enter loads session';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -129,10 +129,7 @@ function setupAgentOps() {
             renderOpsAgentPreview();
         });
     });
-    document.getElementById('ops-agent-back')?.addEventListener('click', () => {
-        document.getElementById('ops-agent-detail').hidden = true;
-        document.getElementById('ops-agents-list').style.display = '';
-    });
+    document.getElementById('ops-agent-back')?.addEventListener('click', () => closeOpsAgentDetail());
     document.getElementById('ops-refresh-btn')?.addEventListener('click', () => refreshAgentOps());
     document.getElementById('ops-digest-refresh-btn')?.addEventListener('click', () => refreshOpsDigest());
     const loadChatBtn = document.getElementById('ops-session-load-chat');
@@ -152,6 +149,9 @@ function setupAgentOps() {
     if (!window.__opsFilterSlashBound) {
         window.__opsFilterSlashBound = true;
         document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+                if (tryOpsAgentDetailEscape(e)) return;
+            }
             if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey && !e.altKey) {
                 if (tryOpsSessionEnterLoad(e)) return;
             }
@@ -863,6 +863,26 @@ async function openOpsAgent(id) {
     } catch (err) {
         alert(`Failed to load agent: ${err}`);
     }
+}
+
+function closeOpsAgentDetail() {
+    const detail = document.getElementById('ops-agent-detail');
+    if (detail) detail.hidden = true;
+    const list = document.getElementById('ops-agents-list');
+    if (list) list.style.display = '';
+}
+
+/** Esc closes agent detail when open (Agents tab). Filter Esc still clears first when focused. */
+function tryOpsAgentDetailEscape(e) {
+    if (agentOpsCollapsed) return false;
+    const detail = document.getElementById('ops-agent-detail');
+    if (!detail || detail.hidden) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return false;
+    e.preventDefault();
+    closeOpsAgentDetail();
+    return true;
 }
 
 function renderOpsAgentPreview() {
