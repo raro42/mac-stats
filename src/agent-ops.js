@@ -101,7 +101,7 @@ function ensureOpsKeyboardHint() {
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
         hint.textContent =
-        'Tips: 1–5 switch tabs · / focuses filter · Esc clears / closes preview · Enter opens row';
+        'Tips: 1–5 or ←/→ switch tabs · / focuses filter · Esc clears / closes preview · Enter opens row';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -183,6 +183,24 @@ function setupAgentOps() {
                     selectOpsTab(tab);
                     return;
                 }
+            }
+            if (!e.metaKey && !e.ctrlKey && !e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+                if (agentOpsCollapsed) return;
+                const t = e.target;
+                const tag = (t && t.tagName) || '';
+                if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return;
+                if (!document.getElementById('agent-ops') && !document.querySelector('.agent-ops-tabs')) {
+                    return;
+                }
+                const order = ['agents', 'sessions', 'schedules', 'memory', 'runs'];
+                let idx = order.indexOf(opsActiveTab);
+                if (idx < 0) idx = 0;
+                idx = e.key === 'ArrowRight'
+                    ? (idx + 1) % order.length
+                    : (idx - 1 + order.length) % order.length;
+                e.preventDefault();
+                selectOpsTab(order[idx]);
+                return;
             }
             if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
             if (agentOpsCollapsed) return;
