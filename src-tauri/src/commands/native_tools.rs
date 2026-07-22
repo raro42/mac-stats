@@ -130,8 +130,8 @@ fn tool_call_to_line(call: &OllamaToolCall) -> Option<String> {
         .as_deref()
         .map(str::trim)
         .filter(|s| !s.is_empty())?;
-    let name_upper = name.to_uppercase();
-    let arg = arguments_to_arg_string(name, &call.function.arguments);
+    let name_upper = normalize_native_tool_name(name);
+    let arg = arguments_to_arg_string(&name_upper, &call.function.arguments);
     if name_upper == "DONE" {
         let status = if arg.is_empty() { "success" } else { arg.as_str() };
         return Some(format!("DONE: {}", status));
@@ -141,6 +141,24 @@ fn tool_call_to_line(call: &OllamaToolCall) -> Option<String> {
     } else {
         Some(format!("{}: {}", name_upper, arg))
     }
+}
+
+/// Strip provider prefixes (OpenAI `functions.*`, tool namespaces) before matching tools.
+fn normalize_native_tool_name(name: &str) -> String {
+    let mut n = name.trim().to_ascii_lowercase();
+    // `functions.brave_search:0` → drop trailing call index
+    if let Some((head, tail)) = n.rsplit_once(':') {
+        if head.contains('.') && !tail.is_empty() && tail.chars().all(|c| c.is_ascii_digit()) {
+            n = head.to_string();
+        }
+    }
+    for prefix in ["functions.", "function.", "tools.", "tool."] {
+        if let Some(rest) = n.strip_prefix(prefix) {
+            n = rest.to_string();
+            break;
+        }
+    }
+    n.to_uppercase()
 }
 
 fn json_value_to_arg_fragment(v: &Value) -> Option<String> {
@@ -333,6 +351,31 @@ mod tests {
         };
         synthesize_text_tools_from_native(&mut resp);
         assert_eq!(resp.message.content.trim(), "BRAVE_SEARCH: Ralf Roeber");
+    }
+
+    #[test]
+    fn synthesize_functions_prefixed_tool_name() {
+        let mut resp = ChatResponse {
+            message: ChatMessage {
+                role: "assistant".into(),
+                content: String::new(),
+                images: None,
+                tool_calls: Some(vec![OllamaToolCall {
+                    call_type: "function".into(),
+                    id: None,
+                    function: OllamaFunctionCall {
+                        name: Some("functions.brave_search:0".into()),
+                        index: None,
+                        arguments: json!({"query": "El Masnou"}),
+                    },
+                }]),
+                tool_name: None,
+                tool_call_id: None,
+            },
+            done: true,
+        };
+        synthesize_text_tools_from_native(&mut resp);
+        assert_eq!(resp.message.content.trim(), "BRAVE_SEARCH: El Masnou");
     }
 
     #[test]
