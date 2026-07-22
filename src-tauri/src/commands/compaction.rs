@@ -404,6 +404,7 @@ pub async fn run_periodic_session_compaction() {
 
     crate::browser_agent::prune_cdp_traces_best_effort();
     crate::commands::screenshot_lifecycle::prune_old_pdfs();
+    crate::logging::prune_companion_logs_best_effort();
 
     // Keep Agent Ops digester JSON fresh without waiting for Discord traffic.
     let digest_line = crate::commands::harness_ops::refresh_agent_digest();

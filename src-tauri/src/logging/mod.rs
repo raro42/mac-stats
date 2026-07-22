@@ -47,7 +47,7 @@ fn rotate_debug_log_if_due(log_path: &std::path::Path) {
 }
 
 /// Truncate a log file when it exceeds `max_bytes` (unbounded growth guard).
-fn truncate_log_file_if_over(path: &std::path::Path, max_bytes: u64) {
+pub(crate) fn truncate_log_file_if_over(path: &std::path::Path, max_bytes: u64) {
     if !path.exists() {
         return;
     }
@@ -61,6 +61,30 @@ fn truncate_log_file_if_over(path: &std::path::Path, max_bytes: u64) {
         .write(true)
         .truncate(true)
         .open(path);
+}
+
+/// Cap LaunchAgent / redirect companions under `~/.mac-stats` (boot + periodic).
+/// LaunchAgent stderr grows while the process runs — re-check during compaction, not only at init.
+pub(crate) fn prune_companion_logs_best_effort() {
+    let Some(home) = std::env::var_os("HOME") else {
+        return;
+    };
+    let dir = std::path::PathBuf::from(home).join(".mac-stats");
+    if !dir.is_dir() {
+        return;
+    }
+    // debug.log* already capped at 10 MiB in init; companions use a tighter 5 MiB.
+    const MAX_COMPANION_BYTES: u64 = 5 * 1024 * 1024;
+    for name in [
+        "mac-stats-stdout.log",
+        "launchd.stderr.log",
+        "launchd.stdout.log",
+        "debug.log.bak.pre-test",
+        "debug.log-sic",
+    ] {
+        truncate_log_file_if_over(&dir.join(name), MAX_COMPANION_BYTES);
+    }
+    prune_old_sic_log_backups(&dir, MAX_COMPANION_BYTES);
 }
 
 /// Drop dated `~/.mac-stats/sic/debug.log.*` backups older than 14 days; also cap `debug.log-sic`.
@@ -218,20 +242,10 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
         const MAX_LOG_BYTES: u64 = 10 * 1024 * 1024;
         truncate_log_file_if_over(&log_path, MAX_LOG_BYTES);
         truncate_log_file_if_over(&crate::config::Config::debug_log_sic_path(), MAX_LOG_BYTES);
-        // LaunchAgent / redirect companions under ~/.mac-stats (unbounded growth guard).
-        if let Some(dir) = log_path.parent() {
-            for name in [
-                "mac-stats-stdout.log",
-                "launchd.stderr.log",
-                "launchd.stdout.log",
-                "debug.log.bak.pre-test",
-            ] {
-                truncate_log_file_if_over(&dir.join(name), MAX_LOG_BYTES);
-            }
-            // Best-effort: drop stale CDP traces (age + retention) at boot.
-            crate::browser_agent::prune_cdp_traces_best_effort();
-            prune_old_sic_log_backups(dir, MAX_LOG_BYTES);
-        }
+        // LaunchAgent / redirect companions (tighter cap; also re-run in periodic compaction).
+        prune_companion_logs_best_effort();
+        // Best-effort: drop stale CDP traces (age + retention) at boot.
+        crate::browser_agent::prune_cdp_traces_best_effort();
 
         // Create file layer
         let file = std::fs::OpenOptions::new()
