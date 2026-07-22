@@ -43,7 +43,7 @@ fn rotate_debug_log_if_due(log_path: &std::path::Path) {
     {
         let _ = f.sync_all();
     }
-    let _ = std::fs::write(&state_path, today);
+    let _ = crate::config::write_text_atomic(&state_path, &today);
 }
 
 mod legacy;

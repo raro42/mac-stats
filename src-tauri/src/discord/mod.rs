@@ -1897,6 +1897,9 @@ static DISCORD_LAST_READY_AT: Mutex<Option<Instant>> = Mutex::new(None);
 /// Last time we observed a Connected→Disconnected transition (process lifetime).
 static DISCORD_LAST_DISCONNECT_AT: Mutex<Option<Instant>> = Mutex::new(None);
 
+/// Last time we entered `Resuming` (process lifetime).
+static DISCORD_LAST_RESUME_AT: Mutex<Option<Instant>> = Mutex::new(None);
+
 /// Latest shard connection stage from Serenity (for feature health before/after Ready).
 static DISCORD_LAST_SHARD_STAGE: Mutex<Option<ConnectionStage>> = Mutex::new(None);
 
@@ -3128,6 +3131,9 @@ impl EventHandler for Handler {
             }
             Resuming => {
                 let n = DISCORD_RESUME_COUNT.fetch_add(1, Ordering::SeqCst) + 1;
+                if let Ok(mut g) = DISCORD_LAST_RESUME_AT.lock() {
+                    *g = Some(Instant::now());
+                }
                 info!(
                     "Discord: gateway resume #{} (shard {:?})",
                     n, event.shard_id
@@ -3393,14 +3399,22 @@ pub fn format_discord_gateway_insights_line() -> String {
     let disc_ago = discord_last_disconnect_at()
         .map(|t| format!(" · last disc {}s ago", t.elapsed().as_secs()))
         .unwrap_or_default();
+    let resume_ago = discord_last_resume_at()
+        .map(|t| format!(" · last resume {}s ago", t.elapsed().as_secs()))
+        .unwrap_or_default();
     format!(
-        "Discord gateway: ready×{ready} · resume×{resume} · disconnect×{disconnect} · stage={stage} · last Ready {ready_ago}{disc_ago}"
+        "Discord gateway: ready×{ready} · resume×{resume} · disconnect×{disconnect} · stage={stage} · last Ready {ready_ago}{disc_ago}{resume_ago}"
     )
 }
 
 /// Instant of the last Connected→Disconnected transition this process, if any.
 pub fn discord_last_disconnect_at() -> Option<Instant> {
     DISCORD_LAST_DISCONNECT_AT.lock().ok().and_then(|g| *g)
+}
+
+/// Instant of the last `Resuming` stage this process, if any.
+pub fn discord_last_resume_at() -> Option<Instant> {
+    DISCORD_LAST_RESUME_AT.lock().ok().and_then(|g| *g)
 }
 
 /// Instant of the last `Ready` event, if the bot connected at least once this process.
