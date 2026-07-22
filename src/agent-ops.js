@@ -101,7 +101,7 @@ function ensureOpsKeyboardHint() {
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
         hint.textContent =
-        'Tips: 1–5 or ←/→ tabs · ↑/↓ PgUp/PgDn Home/End · / filter · Esc · Enter';
+        'Tips: 1–5 ←/→ tabs · ↑/↓ j/k · PgUp/PgDn Home/End · / Esc Enter';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -209,6 +209,9 @@ function setupAgentOps() {
                 if (tryOpsArrowMoveSelection(e)) return;
             }
             if (!e.metaKey && !e.ctrlKey && !e.altKey && (e.key === 'PageUp' || e.key === 'PageDown')) {
+                if (tryOpsArrowMoveSelection(e)) return;
+            }
+            if (!e.metaKey && !e.ctrlKey && !e.altKey && (e.key === 'j' || e.key === 'k')) {
                 if (tryOpsArrowMoveSelection(e)) return;
             }
             if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -1175,7 +1178,7 @@ function tryOpsSchedulesEnter(e) {
     return true;
 }
 
-/** ↑/↓ move selection; PageUp/PageDown jump ~5 rows; Home/End first/last (Enter opens). */
+/** ↑/↓ or j/k move selection; PageUp/PageDown jump ~5; Home/End first/last (Enter opens). */
 function tryOpsArrowMoveSelection(e) {
     if (agentOpsCollapsed) return false;
     const t = e.target;
@@ -1214,9 +1217,10 @@ function tryOpsArrowMoveSelection(e) {
         idx = idx < 0 ? 0 : Math.min(idx + page, rows.length - 1);
     } else if (e.key === 'PageUp') {
         idx = idx < 0 ? 0 : Math.max(idx - page, 0);
-    } else if (e.key === 'ArrowDown') {
+    } else if (e.key === 'ArrowDown' || e.key === 'j') {
         idx = idx < 0 ? 0 : Math.min(idx + 1, rows.length - 1);
     } else {
+        // ArrowUp or k
         idx = idx < 0 ? 0 : Math.max(idx - 1, 0);
     }
     panel.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));

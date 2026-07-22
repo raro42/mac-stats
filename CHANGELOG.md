@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.221] - 2026-07-22
+
+### Changed
+- Agent Ops: `j`/`k` move list selection (same as ↑/↓ when not typing in a filter).
+
 ## [0.1.220] - 2026-07-22
 
 ### Changed
