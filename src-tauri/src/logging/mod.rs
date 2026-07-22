@@ -173,6 +173,16 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
         const MAX_LOG_BYTES: u64 = 10 * 1024 * 1024;
         truncate_log_file_if_over(&log_path, MAX_LOG_BYTES);
         truncate_log_file_if_over(&crate::config::Config::debug_log_sic_path(), MAX_LOG_BYTES);
+        // LaunchAgent / redirect companions under ~/.mac-stats (unbounded growth guard).
+        if let Some(dir) = log_path.parent() {
+            for name in [
+                "mac-stats-stdout.log",
+                "launchd.stderr.log",
+                "launchd.stdout.log",
+            ] {
+                truncate_log_file_if_over(&dir.join(name), MAX_LOG_BYTES);
+            }
+        }
 
         // Create file layer
         let file = std::fs::OpenOptions::new()

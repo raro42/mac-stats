@@ -100,7 +100,7 @@ function ensureOpsKeyboardHint() {
     const hint = document.createElement('div');
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
-    hint.textContent = 'Tips: / focuses filter · Esc clears / closes preview · Enter loads session';
+    hint.textContent = 'Tips: / focuses filter · Esc clears / closes preview · Enter loads session / opens knowledge';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -155,6 +155,7 @@ function setupAgentOps() {
             }
             if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey && !e.altKey) {
                 if (tryOpsSessionEnterLoad(e)) return;
+                if (tryOpsMemoryEnter(e)) return;
             }
             if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
             if (agentOpsCollapsed) return;
@@ -1023,6 +1024,25 @@ function tryOpsSessionEnterLoad(e) {
     if (tag === 'INPUT' && t.id && t.id !== 'ops-session-filter') return false;
     e.preventDefault();
     loadOpsSessionIntoChat();
+    return true;
+}
+
+/** Enter opens the selected Knowledge row (or first visible row) into the preview pane. */
+function tryOpsMemoryEnter(e) {
+    if (agentOpsCollapsed) return false;
+    const panel = document.getElementById('ops-panel-memory');
+    if (!panel || !panel.classList.contains('active')) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    if (tag === 'TEXTAREA') return false;
+    if (tag === 'INPUT' && t.id && t.id !== 'ops-memory-filter') return false;
+    const list = document.getElementById('ops-memory-list');
+    if (!list) return false;
+    const selected =
+        list.querySelector('.ops-row.is-selected') || list.querySelector('.ops-row');
+    if (!selected) return false;
+    e.preventDefault();
+    selected.click();
     return true;
 }
 
