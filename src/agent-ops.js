@@ -412,6 +412,23 @@ function fmtAge(ms) {
     return `${Math.floor(age / 86400_000)}d ago`;
 }
 
+function fmtUptimeSecs(secs) {
+    const s = Math.max(0, Math.floor(Number(secs) || 0));
+    if (s < 60) return `${s}s`;
+    const m = Math.floor(s / 60);
+    if (m < 60) return `${m}m`;
+    const h = Math.floor(m / 60);
+    const rm = m % 60;
+    if (h < 48) return rm ? `${h}h ${rm}m` : `${h}h`;
+    return `${Math.floor(h / 24)}d`;
+}
+
+function fmtProcessUptime(secs) {
+    const s = Number(secs) || 0;
+    if (s <= 0) return '';
+    return ` · ${fmtUptimeSecs(s)}`;
+}
+
 function fmtScheduleEta(sched) {
     if (!sched || sched.totalEntries == null) return '—';
     if (sched.totalEntries === 0) return 'None';
@@ -437,13 +454,15 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
     const sessionN = (sessionFiles || []).length;
     setText(
         'ops-health-version',
-        version ? `v${version}` : '—'
+        version ? `v${version}${fmtProcessUptime(insights?.process_uptime_secs)}` : '—'
     );
     const agentsHint = document.getElementById('ops-health-version');
     if (agentsHint && version) {
         const sessLabel =
             sessionN >= 40 ? `${sessionN}+ session files` : `${sessionN} session file${sessionN === 1 ? '' : 's'}`;
-        agentsHint.title = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${sessLabel}`;
+        const up = Number(insights?.process_uptime_secs) || 0;
+        const upBit = up > 0 ? ` · up ${fmtUptimeSecs(up)}` : '';
+        agentsHint.title = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${sessLabel}${upBit}`;
     }
     wireOpsHealthCardNavigation();
 

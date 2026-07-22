@@ -391,6 +391,7 @@ fn run_internal(open_cpu_window: bool) {
             feature_health::get_feature_health,
         ])
         .setup(move |app| {
+            crate::state::mark_process_start();
             // Write default prompt/agent files if missing (first launch or after update)
             crate::config::Config::ensure_defaults();
 

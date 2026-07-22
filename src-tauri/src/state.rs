@@ -38,6 +38,22 @@ thread_local! {
 pub(crate) static APP_HANDLE: OnceLock<AppHandle> = OnceLock::new();
 pub(crate) static MENU_BAR_TEXT: Mutex<Option<String>> = Mutex::new(None);
 
+/// Process start time (for Agent Ops uptime). Set once during Tauri setup.
+pub(crate) static PROCESS_START: OnceLock<Instant> = OnceLock::new();
+
+/// Record process start (best-effort; first call wins).
+pub(crate) fn mark_process_start() {
+    let _ = PROCESS_START.set(Instant::now());
+}
+
+/// Seconds since process start (0 if not marked yet).
+pub(crate) fn process_uptime_secs() -> u64 {
+    PROCESS_START
+        .get()
+        .map(|t| t.elapsed().as_secs())
+        .unwrap_or(0)
+}
+
 // Caches
 pub(crate) static CHIP_INFO_CACHE: OnceLock<String> = OnceLock::new();
 

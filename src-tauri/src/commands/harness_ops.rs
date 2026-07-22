@@ -92,6 +92,8 @@ pub struct RunsInsights {
     pub digest_open_hints: Vec<String>,
     /// Digester provenance: `python`, `rust-native`, or empty if missing.
     pub digest_source: String,
+    /// Seconds since this mac-stats process started (Agent Ops Version card).
+    pub process_uptime_secs: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Default)]
@@ -305,6 +307,7 @@ pub fn compute_runs_insights(limit: u32) -> RunsInsights {
         digest_generated_at: digest.generated_at.clone(),
         digest_open_hints: digest.open_hints.clone(),
         digest_source: digest.source.clone(),
+        process_uptime_secs: crate::state::process_uptime_secs(),
     };
     if !path.is_file() {
         return empty;
@@ -435,6 +438,7 @@ pub fn compute_runs_insights(limit: u32) -> RunsInsights {
         digest_generated_at: digest.generated_at,
         digest_open_hints: digest.open_hints,
         digest_source: digest.source,
+        process_uptime_secs: crate::state::process_uptime_secs(),
     }
 }
 
@@ -1391,6 +1395,7 @@ mod tests {
             digest_generated_at: "2026-07-21T05:00:00Z".into(),
             digest_open_hints: vec![],
             digest_source: "python".into(),
+            process_uptime_secs: 0,
         };
         let report = format_runs_insights_gateway(&insights);
         assert!(report.contains("Digest:"), "{report}");
