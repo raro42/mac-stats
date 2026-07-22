@@ -1218,10 +1218,16 @@ function renderOpsRuns(insights) {
             return;
         }
         shown += 1;
-        const div = document.createElement('div');
-        div.className = 'ops-row';
-        div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(toolsJoined)}${r.ok ? '' : ' · FAIL'}</div></div>`;
-        el.appendChild(div);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(toolsJoined)}${r.ok ? '' : ' · FAIL'}</div></div>`;
+        btn.title = r.request_id ? `request ${r.request_id}` : (r.question_preview || '');
+        btn.addEventListener('click', () => {
+            el.querySelectorAll('.ops-row.is-selected').forEach((node) => node.classList.remove('is-selected'));
+            btn.classList.add('is-selected');
+        });
+        el.appendChild(btn);
     });
     const totalRecent = (insights.recent || []).length;
     if (opsRunsFilterQ && shown) {

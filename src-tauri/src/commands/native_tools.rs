@@ -163,6 +163,13 @@ fn json_value_to_arg_fragment(v: &Value) -> Option<String> {
         }
         return Some(n.to_string());
     }
+    if let Some(arr) = v.as_array() {
+        let parts: Vec<String> = arr.iter().filter_map(json_value_to_arg_fragment).collect();
+        if parts.is_empty() {
+            return None;
+        }
+        return Some(parts.join(" "));
+    }
     if v.is_null() {
         return None;
     }
@@ -180,7 +187,19 @@ fn arguments_to_arg_string(tool_name: &str, args: &Value) -> String {
                 return arguments_to_arg_string(tool_name, &v);
             }
         }
+        if trimmed.starts_with('[') {
+            if let Ok(v) = serde_json::from_str::<Value>(trimmed) {
+                return arguments_to_arg_string(tool_name, &v);
+            }
+        }
         return trimmed.to_string();
+    }
+    if let Some(arr) = args.as_array() {
+        return arr
+            .iter()
+            .filter_map(json_value_to_arg_fragment)
+            .collect::<Vec<_>>()
+            .join(" ");
     }
     let obj = match args.as_object() {
         Some(o) => o,
@@ -366,6 +385,21 @@ mod tests {
         assert_eq!(
             arguments_to_arg_string("BROWSER_CLICK", &json!({"argument": 0.0})),
             "0"
+        );
+    }
+
+    #[test]
+    fn synthesize_array_argument() {
+        assert_eq!(
+            arguments_to_arg_string(
+                "BROWSER_UPLOAD",
+                &json!({"argument": ["/tmp/a.pdf", "/tmp/b.pdf"]})
+            ),
+            "/tmp/a.pdf /tmp/b.pdf"
+        );
+        assert_eq!(
+            arguments_to_arg_string("BROWSER_UPLOAD", &json!(["/tmp/a.pdf", "/tmp/b.pdf"])),
+            "/tmp/a.pdf /tmp/b.pdf"
         );
     }
 }
