@@ -39,7 +39,29 @@ fi
 # LaunchAgent cwd is not src-tauri — merge REDMINE/Brave/Perplexity into ~/.mac-stats/.config.env
 bash "$ROOT/scripts/sync-home-config-env.sh" || true
 
-codesign -s - --force --deep "$APP"
+# codesign --deep can hang on some macOS builds (overnight harness saw multi-minute stalls).
+# Time out and continue — binary is already replaced; LaunchAgent restart still proceeds.
+CODESIGN_TIMEOUT_SECS="${MAC_STATS_CODESIGN_TIMEOUT_SECS:-45}"
+codesign -s - --force --deep "$APP" &
+cs_pid=$!
+(
+  sleep "$CODESIGN_TIMEOUT_SECS"
+  if kill -0 "$cs_pid" 2>/dev/null; then
+    echo "codesign still running after ${CODESIGN_TIMEOUT_SECS}s — killing and continuing" >&2
+    kill "$cs_pid" 2>/dev/null || true
+  fi
+) &
+waiter_pid=$!
+set +e
+wait "$cs_pid"
+cs_status=$?
+set -e
+kill "$waiter_pid" 2>/dev/null || true
+wait "$waiter_pid" 2>/dev/null || true
+if [[ "$cs_status" -ne 0 ]]; then
+  echo "codesign did not complete cleanly (exit $cs_status) — app binary was still updated" >&2
+fi
+
 xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
 
 launchctl kickstart -k "$LABEL"

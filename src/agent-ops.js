@@ -747,13 +747,19 @@ function renderOpsSchedulesTab(schedules, deliveries) {
             delList.innerHTML = '<div class="ops-empty">No deliveries match filter</div>';
         } else {
             filtered.slice(0, 8).forEach((d) => {
-                const div = document.createElement('div');
-                div.className = 'ops-row';
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'ops-row';
                 const t = d.utc ? Date.parse(d.utc) : NaN;
                 const age = !Number.isNaN(t) ? fmtAge(t) : d.utc || '';
-                const summary = String(d.summary || '').slice(0, 72);
-                div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(d.schedule_id || 'schedule')}</div><div class="ops-row-meta">${escapeHtml(age)} · ${escapeHtml(summary)}</div></div>`;
-                delList.appendChild(div);
+                const summary = String(d.summary || '');
+                btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(d.schedule_id || 'schedule')}</div><div class="ops-row-meta">${escapeHtml(age)} · ${escapeHtml(summary.slice(0, 72))}${summary.length > 72 ? '…' : ''}</div></div>`;
+                btn.title = summary || d.schedule_id || '';
+                btn.addEventListener('click', () => {
+                    delList.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+                    btn.classList.add('is-selected');
+                });
+                delList.appendChild(btn);
             });
             const shown = Math.min(8, filtered.length);
             prependOpsFilterCaption(delList, all.length, shown, opsSchedulesFilterQ);
