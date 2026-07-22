@@ -100,7 +100,7 @@ function ensureOpsKeyboardHint() {
     const hint = document.createElement('div');
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
-    hint.textContent = 'Tips: / focuses filter · Esc clears / closes agent · Enter loads session';
+    hint.textContent = 'Tips: / focuses filter · Esc clears / closes preview · Enter loads session';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -151,6 +151,7 @@ function setupAgentOps() {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !e.metaKey && !e.ctrlKey && !e.altKey) {
                 if (tryOpsAgentDetailEscape(e)) return;
+                if (tryOpsPreviewEscape(e)) return;
             }
             if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey && !e.altKey) {
                 if (tryOpsSessionEnterLoad(e)) return;
@@ -532,7 +533,10 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
                     ? ` · p50 ${(p50Ms / 1000).toFixed(1)}s`
                     : ` · p50 ${Math.round(p50Ms)}ms`;
         }
-        digestText = `${open} open / ${stale} stale${p50}${age}`;
+        let fails = '';
+        const failN = Number(insights.fail_count) || 0;
+        if (failN > 0) fails = ` · ${failN} fail`;
+        digestText = `${open} open / ${stale} stale${p50}${fails}${age}`;
     }
     setText('ops-health-digest', digestText);
     const digestEl = document.getElementById('ops-health-digest');
@@ -926,6 +930,36 @@ function tryOpsAgentDetailEscape(e) {
     e.preventDefault();
     closeOpsAgentDetail();
     return true;
+}
+
+/** Esc hides session / knowledge preview panes (Hermes-style dismiss). */
+function tryOpsPreviewEscape(e) {
+    if (agentOpsCollapsed) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return false;
+    const sessionPreview = document.getElementById('ops-session-preview');
+    const memoryPreview = document.getElementById('ops-memory-preview');
+    const loadBtn = document.getElementById('ops-session-load-chat');
+    let closed = false;
+    if (sessionPreview && !sessionPreview.hidden) {
+        sessionPreview.hidden = true;
+        sessionPreview.textContent = '';
+        opsSessionLoadRows = null;
+        if (loadBtn) loadBtn.hidden = true;
+        showOpsSessionStatus('', true);
+        closed = true;
+    }
+    if (memoryPreview && !memoryPreview.hidden) {
+        memoryPreview.hidden = true;
+        memoryPreview.textContent = '';
+        closed = true;
+    }
+    if (closed) {
+        e.preventDefault();
+        return true;
+    }
+    return false;
 }
 
 function renderOpsAgentPreview() {

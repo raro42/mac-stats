@@ -201,6 +201,10 @@ fn arguments_to_arg_string(tool_name: &str, args: &Value) -> String {
             .collect::<Vec<_>>()
             .join(" ");
     }
+    // Bare primitive (some providers send the primary arg as the whole `arguments` value).
+    if !args.is_object() {
+        return json_value_to_arg_fragment(args).unwrap_or_else(|| args.to_string());
+    }
     let obj = match args.as_object() {
         Some(o) => o,
         None => return args.to_string(),
@@ -400,6 +404,16 @@ mod tests {
         assert_eq!(
             arguments_to_arg_string("BROWSER_UPLOAD", &json!(["/tmp/a.pdf", "/tmp/b.pdf"])),
             "/tmp/a.pdf /tmp/b.pdf"
+        );
+    }
+
+    #[test]
+    fn synthesize_bare_primitive_arguments() {
+        assert_eq!(arguments_to_arg_string("DONE", &json!(true)), "true");
+        assert_eq!(arguments_to_arg_string("DONE", &json!(1)), "1");
+        assert_eq!(
+            arguments_to_arg_string("BRAVE_SEARCH", &json!("Ralf Roeber")),
+            "Ralf Roeber"
         );
     }
 }
