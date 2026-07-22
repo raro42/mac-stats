@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.224] - 2026-07-23
+
+### Fixed
+- Instant lane clarifies “can you talk to &lt;user&gt; on Redmine?” (API tickets only — no Redmine DMs).
+
+### Changed
+- Digester Slowest drops pre-ship weather-via-search and Redmine home-config turns.
+
 ## [0.1.223] - 2026-07-23
 
 ### Changed

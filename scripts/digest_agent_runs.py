@@ -41,6 +41,8 @@ SHIPPED_INSTANT_DISCORD_REACH = datetime(2026, 7, 22, 20, 0, tzinfo=timezone.utc
 SHIPPED_INSTANT_SHORT_ACK = datetime(2026, 7, 21, 20, 10, tzinfo=timezone.utc)
 # v0.1.176 — short identity/role affirmations are instant.
 SHIPPED_INSTANT_IDENTITY = datetime(2026, 7, 22, 0, 15, tzinfo=timezone.utc)
+# v0.1.224 — Redmine user-chat capability asks are instant.
+SHIPPED_INSTANT_REDMINE_USER_CHAT = datetime(2026, 7, 22, 22, 50, tzinfo=timezone.utc)
 
 
 def looks_like_short_ack(q: str) -> bool:
@@ -187,18 +189,44 @@ def looks_like_discord_reach(q: str) -> bool:
 
 
 def is_now_instant_slowest_noise(r: dict) -> bool:
-    """Drop historical zero-tool turns from Slowest when they match shipped instant patterns."""
+    """Drop historical turns from Slowest when they match shipped instant patterns."""
     if (r.get("lane") or "") == "instant":
         return is_trivial_instant_noise(r)
-    tools = r.get("tools") or []
-    if tools or int(r.get("tool_steps") or 0) > 0:
-        return False
     q = (r.get("question_preview") or "").lower()
+    tools = r.get("tools") or []
+    tool_steps = int(r.get("tool_steps") or 0)
+    ts = parse_ts(str(r.get("ts", "")))
+    # Pre-Open-Meteo weather that burned Brave/Perplexity.
+    if ts is not None and ts < SHIPPED_INSTANT_WEATHER and (
+        "weather" in q or "wether" in q
+    ):
+        if any(
+            "BRAVE" in str(t).upper() or "PERPLEXITY" in str(t).upper() for t in tools
+        ):
+            return True
+    # Pre-home-config Redmine LaunchAgent misses.
+    if (
+        ts is not None
+        and ts < SHIPPED_REDMINE_HOME_CONFIG
+        and "REDMINE_API" in [str(t) for t in tools]
+        and "redmine" in q
+    ):
+        return True
+    if tools or tool_steps > 0:
+        return False
     if looks_like_short_ack(q) or looks_like_identity_affirmation(q):
         return True
     if looks_like_wakeup(q) or looks_like_overnight_improvements(q):
         return True
     if looks_like_version_ask(q) or looks_like_discord_reach(q):
+        return True
+    # Redmine user-chat capability (v0.1.224).
+    if (
+        "redmine" in q
+        and ("talk to" in q or "chat with" in q or "message " in q)
+        and "ticket" not in q
+        and "issue" not in q
+    ):
         return True
     return False
 
@@ -344,6 +372,11 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
         "zero-tool" in hl or "instant" in hl
     ):
         return True
+    if ts < SHIPPED_INSTANT_REDMINE_USER_CHAT and "redmine" in ql and (
+        "talk to" in ql or "chat with" in ql or "user chat" in hl or "redmine user" in hl
+    ):
+        if "ticket" not in ql and ("zero-tool" in hl or "instant" in hl or "capability" in hl):
+            return True
     return False
 
 
@@ -459,6 +492,13 @@ def main() -> int:
                 hint = "Promote to INSTANT short ack/sign-off lane"
             elif looks_like_identity_affirmation(q):
                 hint = "Promote to INSTANT identity affirmation lane"
+            elif (
+                "redmine" in q
+                and ("talk to" in q or "chat with" in q or "message " in q)
+                and "ticket" not in q
+                and "issue" not in q
+            ):
+                hint = "Promote to INSTANT Redmine user-chat capability lane"
             elif "version" in q:
                 hint = "Promote to INSTANT version lane"
             elif "time" in q or "uhr" in q or "hora" in q or "date" in q:

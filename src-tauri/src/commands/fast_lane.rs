@@ -111,6 +111,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_capabilities_ask(&n) {
         return Some(format_instant_capabilities_reply());
     }
+    if is_redmine_user_chat_capability_ask(&n) {
+        return Some(format_instant_redmine_user_chat_reply());
+    }
     if is_discord_reach_ask(&n) {
         return Some(format_instant_discord_reach_reply());
     }
@@ -368,6 +371,44 @@ fn format_instant_capabilities_reply() -> String {
         "I'm **Werner** (mac-stats v{}). I can check weather, search the web, work Redmine tickets, \
 browse/screenshots, run allowlisted commands/skills, search past sessions, and help from Discord or the dashboard. \
 Ask a concrete task — or open **Agent Ops** for schedules/runs.",
+        crate::config::Config::version()
+    )
+}
+
+/// “Can you talk to <user> on Redmine?” — capability clarify (not ticket work). Digester: ~5s zero-tool.
+fn is_redmine_user_chat_capability_ask(n: &str) -> bool {
+    if n.chars().count() > 160 {
+        return false;
+    }
+    if !n.contains("redmine") {
+        return false;
+    }
+    if n.contains("ticket")
+        || n.contains("issue")
+        || n.contains("#")
+        || n.contains("http")
+        || n.contains("time entr")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("review")
+        || n.contains("summar")
+    {
+        return false;
+    }
+    let talkish = n.contains("talk to")
+        || n.contains("message ")
+        || n.contains("dm ")
+        || n.contains("chat with")
+        || n.contains("speak to")
+        || n.contains("reach ");
+    let userish = n.contains("user") || n.contains("person") || n.contains("someone");
+    talkish && (userish || n.contains(" on ") || n.contains("ultron"))
+}
+
+fn format_instant_redmine_user_chat_reply() -> String {
+    format!(
+        "I can work **Redmine tickets** via API (status, comments, time entries) — mac-stats v{}. \
+I don't DM or chat with Redmine users as people. Give me a ticket id / URL, or ask in Discord if you meant a Discord user.",
         crate::config::Config::version()
     )
 }
@@ -778,10 +819,37 @@ commit+push, then reply briefly.";
         ));
         assert!(
             !matches!(
-                classify_turn_lane("Can you talk to ultron user on Amvara redmine server?", None),
+                classify_turn_lane(
+                    "You are working for Amvara. Please review Redmine ticket 12.",
+                    None
+                ),
                 TurnLane::Instant { .. }
             ),
-            "identity-adjacent asks must not be instant"
+            "identity + real redmine task must not be instant"
+        );
+    }
+
+    #[test]
+    fn redmine_user_chat_capability_asks_are_instant() {
+        match classify_turn_lane(
+            "Can you talk to ultron user on Amvara redmine server?",
+            None,
+        ) {
+            TurnLane::Instant { reply } => {
+                let lower = reply.to_lowercase();
+                assert!(
+                    lower.contains("ticket") || lower.contains("api") || lower.contains("dm"),
+                    "expected redmine-chat clarify: {reply}"
+                );
+            }
+            other => panic!("expected Instant, got {:?}", other),
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane("Review and summarize Redmine ticket: 7736", None),
+                TurnLane::Instant { .. }
+            ),
+            "real ticket work must not be instant"
         );
     }
 
