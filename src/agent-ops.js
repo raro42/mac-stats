@@ -101,7 +101,7 @@ function ensureOpsKeyboardHint() {
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
         hint.textContent =
-        'Tips: 1–5 or ←/→ switch tabs · / focuses filter · Esc clears / closes preview · Enter opens row';
+        'Tips: 1–5 or ←/→ tabs · ↑/↓ select row · / filter · Esc clears · Enter opens';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -201,6 +201,9 @@ function setupAgentOps() {
                 e.preventDefault();
                 selectOpsTab(order[idx]);
                 return;
+            }
+            if (!e.metaKey && !e.ctrlKey && !e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+                if (tryOpsArrowMoveSelection(e)) return;
             }
             if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
             if (agentOpsCollapsed) return;
@@ -1163,6 +1166,51 @@ function tryOpsSchedulesEnter(e) {
     if (!selected) return false;
     e.preventDefault();
     selected.click();
+    return true;
+}
+
+/** ↑/↓ move `.ops-row` selection in the active Agent Ops panel (Enter still opens). */
+function tryOpsArrowMoveSelection(e) {
+    if (agentOpsCollapsed) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    if (tag === 'TEXTAREA' || t?.isContentEditable) return false;
+    if (tag === 'INPUT') {
+        // Allow arrows in filters only when empty / not navigating text mid-word — keep simple: skip inputs.
+        return false;
+    }
+    if (!document.getElementById('agent-ops') && !document.querySelector('.agent-ops-tabs')) {
+        return false;
+    }
+    const panelIdByTab = {
+        agents: 'ops-panel-agents',
+        sessions: 'ops-panel-sessions',
+        schedules: 'ops-panel-schedules',
+        memory: 'ops-panel-memory',
+        runs: 'ops-panel-runs',
+    };
+    const panel = document.getElementById(panelIdByTab[opsActiveTab] || '');
+    if (!panel || !panel.classList.contains('active')) return false;
+    const rows = Array.from(panel.querySelectorAll('.ops-row')).filter((el) => {
+        if (el.offsetParent === null && el.style.display === 'none') return false;
+        const list = el.closest('.ops-list, .ops-detail');
+        if (list && list.style.display === 'none') return false;
+        return true;
+    });
+    if (!rows.length) return false;
+    let idx = rows.findIndex((r) => r.classList.contains('is-selected'));
+    if (e.key === 'ArrowDown') {
+        idx = idx < 0 ? 0 : Math.min(idx + 1, rows.length - 1);
+    } else {
+        idx = idx < 0 ? 0 : Math.max(idx - 1, 0);
+    }
+    panel.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+    const next = rows[idx];
+    next.classList.add('is-selected');
+    if (typeof next.scrollIntoView === 'function') {
+        next.scrollIntoView({ block: 'nearest' });
+    }
+    e.preventDefault();
     return true;
 }
 
