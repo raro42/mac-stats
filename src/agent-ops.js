@@ -524,18 +524,31 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
             const t = Date.parse(insights.digest_generated_at);
             if (!Number.isNaN(t)) age = ` · ${fmtAge(t)}`;
         }
-        digestText = `${open} open / ${stale} stale${age}`;
+        let p50 = '';
+        const p50Ms = Number(insights.p50_ms);
+        if (insights.turns > 0 && Number.isFinite(p50Ms) && p50Ms >= 0) {
+            p50 =
+                p50Ms >= 1000
+                    ? ` · p50 ${(p50Ms / 1000).toFixed(1)}s`
+                    : ` · p50 ${Math.round(p50Ms)}ms`;
+        }
+        digestText = `${open} open / ${stale} stale${p50}${age}`;
     }
     setText('ops-health-digest', digestText);
     const digestEl = document.getElementById('ops-health-digest');
     if (digestEl) {
         const openN = insights?.digest_open_count ?? 0;
         const hints = insights?.digest_open_hints || [];
-        digestEl.title = hints.length
-            ? hints.slice(0, 5).join('\n')
-            : insights?.digest_generated_at
-              ? `Generated ${insights.digest_generated_at}`
-              : '';
+        const latBits = [];
+        if (insights?.turns > 0) {
+            if (insights.p50_ms != null) latBits.push(`p50 ${insights.p50_ms} ms`);
+            if (insights.mean_ms != null) latBits.push(`mean ${insights.mean_ms} ms`);
+            if (insights.max_ms != null) latBits.push(`max ${insights.max_ms} ms`);
+            latBits.push(`${insights.turns} turns`);
+        }
+        const hintLines = hints.length ? hints.slice(0, 5) : [];
+        digestEl.title = [...latBits, ...hintLines].join('\n')
+            || (insights?.digest_generated_at ? `Generated ${insights.digest_generated_at}` : '');
         const card = digestEl.closest('.ops-health-card');
         if (card) {
             card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
@@ -573,7 +586,12 @@ function renderOverviewSchedules(schedules, deliveries) {
         const next = s.next_run || s.nextRun || '—';
         const task = String(s.task || '').slice(0, 40);
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">next ${escapeHtml(next)} · ${escapeHtml(task)}</div></div>`;
-        btn.addEventListener('click', () => selectOpsTab('schedules'));
+        btn.addEventListener('click', () => {
+            body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            btn.classList.add('is-selected');
+            selectOpsTab('schedules');
+        });
+        btn.title = 'Open in Schedules';
         body.appendChild(btn);
     });
     if (Array.isArray(deliveries) && deliveries.length) {
@@ -605,6 +623,8 @@ function renderOverviewLive(rows) {
         btn.className = 'ops-row';
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
         btn.addEventListener('click', async () => {
+            body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            btn.classList.add('is-selected');
             selectOpsTab('sessions');
             try {
                 const msgs = await invoke('read_live_session_messages', {
@@ -618,6 +638,7 @@ function renderOverviewLive(rows) {
                 showOpsSessionStatus(String(err), false);
             }
         });
+        btn.title = 'Open live session in Sessions';
         body.appendChild(btn);
     });
 }
