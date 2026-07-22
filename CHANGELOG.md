@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.220] - 2026-07-22
+
+### Changed
+- Agent Ops: PageUp/PageDown jumps list selection by ~5 rows (with ↑/↓ and Home/End).
+
 ## [0.1.219] - 2026-07-22
 
 ### Changed
