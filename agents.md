@@ -73,7 +73,7 @@ Create `~/Library/LaunchAgents/com.raro42.mac-stats.plist`:
   <string>com.raro42.mac-stats</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/Applications/mac-stats.app/Contents/MacOS/mac-stats</string>
+    <string>/Applications/mac-stats.app/Contents/MacOS/mac_stats</string>
     <string>-vv</string>
   </array>
   <key>RunAtLoad</key>
