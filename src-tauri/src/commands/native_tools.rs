@@ -143,6 +143,32 @@ fn tool_call_to_line(call: &OllamaToolCall) -> Option<String> {
     }
 }
 
+fn json_value_to_arg_fragment(v: &Value) -> Option<String> {
+    if let Some(s) = v.as_str() {
+        return Some(s.trim().to_string());
+    }
+    if let Some(n) = v.as_i64() {
+        return Some(n.to_string());
+    }
+    if let Some(n) = v.as_u64() {
+        return Some(n.to_string());
+    }
+    if let Some(b) = v.as_bool() {
+        return Some(b.to_string());
+    }
+    if let Some(n) = v.as_f64() {
+        // Prefer compact ints when the JSON number is whole (OpenAI often sends 0.0).
+        if n.fract() == 0.0 && n.abs() < (i64::MAX as f64) {
+            return Some((n as i64).to_string());
+        }
+        return Some(n.to_string());
+    }
+    if v.is_null() {
+        return None;
+    }
+    Some(v.to_string())
+}
+
 fn arguments_to_arg_string(tool_name: &str, args: &Value) -> String {
     if args.is_null() {
         return String::new();
@@ -164,8 +190,8 @@ fn arguments_to_arg_string(tool_name: &str, args: &Value) -> String {
         return String::new();
     }
     let (primary, _) = primary_param(&tool_name.to_uppercase());
-    if let Some(v) = obj.get(primary).and_then(|x| x.as_str()) {
-        return v.trim().to_string();
+    if let Some(v) = obj.get(primary).and_then(json_value_to_arg_fragment) {
+        return v;
     }
     // Common aliases
     for key in [
@@ -182,23 +208,26 @@ fn arguments_to_arg_string(tool_name: &str, args: &Value) -> String {
         "spec",
         "status",
         "input",
+        "index",
+        "element",
+        "x",
+        "y",
     ] {
-        if let Some(v) = obj.get(key).and_then(|x| x.as_str()) {
-            return v.trim().to_string();
+        if let Some(v) = obj.get(key).and_then(json_value_to_arg_fragment) {
+            return v;
         }
     }
     // Single-key object → that value
     if obj.len() == 1 {
         if let Some((_, v)) = obj.iter().next() {
-            if let Some(s) = v.as_str() {
-                return s.trim().to_string();
+            if let Some(s) = json_value_to_arg_fragment(v) {
+                return s;
             }
-            return v.to_string();
         }
     }
     // Multi-arg tools (e.g. BROWSER_INPUT): join values in a stable-ish order
     obj.values()
-        .filter_map(|v| v.as_str().map(|s| s.trim().to_string()))
+        .filter_map(json_value_to_arg_fragment)
         .collect::<Vec<_>>()
         .join(" ")
 }
@@ -301,5 +330,42 @@ mod tests {
         };
         synthesize_text_tools_from_native(&mut resp);
         assert_eq!(resp.message.content.trim(), "DONE: success");
+    }
+
+    #[test]
+    fn synthesize_numeric_primary_argument() {
+        let mut resp = ChatResponse {
+            message: ChatMessage {
+                role: "assistant".into(),
+                content: String::new(),
+                images: None,
+                tool_calls: Some(vec![OllamaToolCall {
+                    call_type: "function".into(),
+                    id: None,
+                    function: OllamaFunctionCall {
+                        name: Some("BROWSER_CLICK".into()),
+                        index: None,
+                        arguments: json!({"argument": 3}),
+                    },
+                }]),
+                tool_name: None,
+                tool_call_id: None,
+            },
+            done: true,
+        };
+        synthesize_text_tools_from_native(&mut resp);
+        assert_eq!(resp.message.content.trim(), "BROWSER_CLICK: 3");
+    }
+
+    #[test]
+    fn synthesize_numeric_index_alias() {
+        assert_eq!(
+            arguments_to_arg_string("BROWSER_SWITCH_TAB", &json!({"index": 1})),
+            "1"
+        );
+        assert_eq!(
+            arguments_to_arg_string("BROWSER_CLICK", &json!({"argument": 0.0})),
+            "0"
+        );
     }
 }

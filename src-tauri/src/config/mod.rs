@@ -3393,7 +3393,7 @@ impl Config {
         if let Some(parent) = path.parent() {
             let _ = std::fs::create_dir_all(parent);
         }
-        let _ = std::fs::write(path, content);
+        let _ = crate::config::write_text_atomic(path, content);
     }
 
     /// First-line key for a paragraph (trimmed, up to 80 chars). Used to detect same section.
