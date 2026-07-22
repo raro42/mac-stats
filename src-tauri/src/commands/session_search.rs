@@ -14,7 +14,14 @@ const USER_SUMMARY_CHARS: usize = 140;
 const ASSISTANT_SUMMARY_CHARS: usize = 220;
 
 /// `SESSION_SEARCH: <query>` — search persisted session markdown.
+///
+/// When `exclude_session_id` is set (Hermes parity), skip files for that session — the agent
+/// already has the current transcript in context.
 pub fn handle_session_search(arg: &str) -> String {
+    handle_session_search_excluding(arg, None)
+}
+
+pub fn handle_session_search_excluding(arg: &str, exclude_session_id: Option<u64>) -> String {
     let query = arg.trim();
     if query.chars().count() < 2 {
         return "SESSION_SEARCH requires a query (at least 2 characters).".to_string();
@@ -25,6 +32,7 @@ pub fn handle_session_search(arg: &str) -> String {
     }
     let q_lower = query.to_lowercase();
     let mut hits: Vec<FileHit> = Vec::new();
+    let mut skipped_current = 0usize;
 
     let rd = match fs::read_dir(&dir) {
         Ok(r) => r,
@@ -42,6 +50,12 @@ pub fn handle_session_search(arg: &str) -> String {
             .to_string();
         if !name.starts_with("session-memory-") {
             continue;
+        }
+        if let Some(sid) = exclude_session_id {
+            if crate::session_memory::session_filename_matches_id(&name, sid) {
+                skipped_current += 1;
+                continue;
+            }
         }
         let text = match fs::read_to_string(&path) {
             Ok(t) => t,
@@ -76,7 +90,14 @@ pub fn handle_session_search(arg: &str) -> String {
     }
 
     if hits.is_empty() {
-        return format!("No past sessions matched {:?}.", query);
+        let mut msg = format!("No past sessions matched {:?}.", query);
+        if skipped_current > 0 {
+            msg.push_str(&format!(
+                " (Skipped {} current-session file(s).)",
+                skipped_current
+            ));
+        }
+        return msg;
     }
     hits.sort_by(|a, b| b.score.cmp(&a.score).then(b.mtime.cmp(&a.mtime)));
     hits.truncate(MAX_FILES);
@@ -86,6 +107,12 @@ pub fn handle_session_search(arg: &str) -> String {
         query,
         hits.len()
     )];
+    if skipped_current > 0 {
+        out[0].push_str(&format!(
+            " · excluded {} current-session file(s)",
+            skipped_current
+        ));
+    }
     for (i, h) in hits.iter().enumerate() {
         let meta = file_meta_line(&h.name);
         out.push(format!(
@@ -504,5 +531,17 @@ Sunny, 24C.
         );
         assert!(m.contains("2026-07-20"), "{m}");
         assert!(m.contains("17:33:05"), "{m}");
+    }
+
+    #[test]
+    fn current_session_filename_matcher_hermes_exclude() {
+        let name = "session-memory-1467450744864243725-20260720-173305-what-time-is-it_.md";
+        assert!(crate::session_memory::session_filename_matches_id(
+            name,
+            1467450744864243725
+        ));
+        assert!(!crate::session_memory::session_filename_matches_id(name, 99));
+        let legacy = "session-memory-old-topic-88-20260321-090000.md";
+        assert!(crate::session_memory::session_filename_matches_id(legacy, 88));
     }
 }

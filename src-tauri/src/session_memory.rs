@@ -41,7 +41,7 @@ fn session_file_old_re() -> &'static Regex {
 }
 
 /// True if this session file name belongs to `session_id` (new or legacy filename pattern).
-fn session_filename_matches_id(name: &str, session_id: u64) -> bool {
+pub(crate) fn session_filename_matches_id(name: &str, session_id: u64) -> bool {
     if !name.starts_with("session-memory-") || !name.ends_with(".md") {
         return false;
     }
