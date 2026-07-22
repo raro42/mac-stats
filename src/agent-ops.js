@@ -426,15 +426,18 @@ function setText(id, text) {
     if (el) el.textContent = text;
 }
 
-function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine }) {
+function renderOpsHealth({ version, insights, sched, deliveries, agents, live, redmine, sessionFiles }) {
     const enabled = (agents || []).filter((a) => a.enabled).length;
+    const sessionN = (sessionFiles || []).length;
     setText(
         'ops-health-version',
         version ? `v${version}` : '—'
     );
     const agentsHint = document.getElementById('ops-health-version');
     if (agentsHint && version) {
-        agentsHint.title = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live`;
+        const sessLabel =
+            sessionN >= 40 ? `${sessionN}+ session files` : `${sessionN} session file${sessionN === 1 ? '' : 's'}`;
+        agentsHint.title = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${sessLabel}`;
     }
 
     const dg = insights?.discord_gateway || '';
@@ -796,6 +799,7 @@ async function refreshAgentOps() {
             agents,
             live,
             redmine,
+            sessionFiles: files || [],
         });
         renderOverviewSchedules(schedules || [], deliveries || []);
         renderOverviewLive(live || []);

@@ -46,6 +46,23 @@ fn rotate_debug_log_if_due(log_path: &std::path::Path) {
     let _ = crate::config::write_text_atomic(&state_path, &today);
 }
 
+/// Truncate a log file when it exceeds `max_bytes` (unbounded growth guard).
+fn truncate_log_file_if_over(path: &std::path::Path, max_bytes: u64) {
+    if !path.exists() {
+        return;
+    }
+    let Ok(meta) = std::fs::metadata(path) else {
+        return;
+    };
+    if meta.len() <= max_bytes {
+        return;
+    }
+    let _ = std::fs::OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .open(path);
+}
+
 mod legacy;
 
 /// Handle to `~/.mac-stats/debug.log` when file logging is enabled (for shutdown flush).
@@ -152,18 +169,10 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
         // Daily rotation: copy debug.log to debug.log_sic and truncate (once per calendar day, UTC)
         rotate_debug_log_if_due(&log_path);
 
-        // Rotate: if log file exceeds 10 MB, truncate to avoid unbounded growth
+        // Cap active log and yesterday's sic copy so neither grows without bound.
         const MAX_LOG_BYTES: u64 = 10 * 1024 * 1024;
-        if log_path.exists() {
-            if let Ok(meta) = std::fs::metadata(&log_path) {
-                if meta.len() > MAX_LOG_BYTES {
-                    let _ = std::fs::OpenOptions::new()
-                        .write(true)
-                        .truncate(true)
-                        .open(&log_path);
-                }
-            }
-        }
+        truncate_log_file_if_over(&log_path, MAX_LOG_BYTES);
+        truncate_log_file_if_over(&crate::config::Config::debug_log_sic_path(), MAX_LOG_BYTES);
 
         // Create file layer
         let file = std::fs::OpenOptions::new()
