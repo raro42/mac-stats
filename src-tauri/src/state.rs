@@ -54,6 +54,29 @@ pub(crate) fn process_uptime_secs() -> u64 {
         .unwrap_or(0)
 }
 
+/// Human-readable process uptime (e.g. `3m`, `2h 15m`).
+pub(crate) fn format_process_uptime() -> String {
+    let s = process_uptime_secs();
+    if s < 60 {
+        return format!("{s}s");
+    }
+    let m = s / 60;
+    if m < 60 {
+        return format!("{m}m");
+    }
+    let h = m / 60;
+    let rm = m % 60;
+    if h < 48 {
+        if rm == 0 {
+            format!("{h}h")
+        } else {
+            format!("{h}h {rm}m")
+        }
+    } else {
+        format!("{}d", h / 24)
+    }
+}
+
 // Caches
 pub(crate) static CHIP_INFO_CACHE: OnceLock<String> = OnceLock::new();
 

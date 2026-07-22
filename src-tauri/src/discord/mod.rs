@@ -3403,7 +3403,15 @@ pub fn format_discord_gateway_insights_line() -> String {
         .map(|t| format!(" · last resume {}s ago", t.elapsed().as_secs()))
         .unwrap_or_default();
     format!(
-        "Discord gateway: ready×{ready} · resume×{resume} · disconnect×{disconnect} · stage={stage} · last Ready {ready_ago}{disc_ago}{resume_ago}"
+        "Discord gateway: ready×{ready} · resume×{resume} · disconnect×{disconnect} · stage={stage} · last Ready {ready_ago}{disc_ago}{resume_ago} · process up {up}",
+        ready = ready,
+        resume = resume,
+        disconnect = disconnect,
+        stage = stage,
+        ready_ago = ready_ago,
+        disc_ago = disc_ago,
+        resume_ago = resume_ago,
+        up = crate::state::format_process_uptime(),
     )
 }
 

@@ -1061,6 +1061,34 @@ fn classify_candidate(
             request_id: request_id.into(),
         });
     }
+    let n_up = q.trim_end_matches(['?', '!', '.']).trim();
+    let looks_uptime = matches!(
+        n_up,
+        "uptime"
+            | "up time"
+            | "how long up"
+            | "how long have you been up"
+            | "how long are you up"
+            | "how long running"
+            | "how long have you been running"
+            | "process uptime"
+            | "app uptime"
+    ) || (n_up.contains("uptime") && n_up.chars().count() <= 32 && !n_up.contains("system") && !n_up.contains("machine"))
+        || (n_up.starts_with("how long")
+            && (n_up.contains("up") || n_up.contains("running"))
+            && n_up.chars().count() <= 48
+            && !n_up.contains("system")
+            && !n_up.contains("machine"));
+    if looks_uptime && lane != "instant" && wall_ms >= 500 {
+        return Some(RunInsightCandidate {
+            kind: "promote_instant".into(),
+            reason: "Uptime ask should stay on instant lane".into(),
+            wall_ms,
+            lane: lane.into(),
+            question_preview: question.chars().take(80).collect(),
+            request_id: request_id.into(),
+        });
+    }
     let looks_presence = matches!(
         q.trim_end_matches(['?', '!', '.']).trim(),
         "who are you"

@@ -120,6 +120,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
             crate::config::Config::version()
         ));
     }
+    if is_uptime_ask(&n) {
+        return Some(format_instant_uptime_reply());
+    }
     if is_git_commit_push_request(&n) {
         return Some(
             "I won't `git commit` / `git push` from Discord by default (safety). \
@@ -386,6 +389,46 @@ fn is_version_question(n: &str) -> bool {
         && (n.contains("you") || n.contains("app") || n.contains("mac-stats") || n.starts_with("what")))
 }
 
+/// Short process-uptime asks (pairs with Agent Ops Version card /insights).
+fn is_uptime_ask(n: &str) -> bool {
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("redmine")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("search")
+        || n.contains("weather")
+        || n.contains("ticket")
+        || n.contains("system uptime")
+        || n.contains("machine")
+    {
+        return false;
+    }
+    matches!(
+        n,
+        "uptime"
+            | "up time"
+            | "how long up"
+            | "how long have you been up"
+            | "how long are you up"
+            | "how long running"
+            | "how long have you been running"
+            | "process uptime"
+            | "app uptime"
+    ) || (n.contains("uptime") && n.chars().count() <= 32)
+        || (n.starts_with("how long") && (n.contains("up") || n.contains("running")) && n.chars().count() <= 48)
+}
+
+fn format_instant_uptime_reply() -> String {
+    format!(
+        "I've been up **{}** (mac-stats v{}).",
+        crate::state::format_process_uptime(),
+        crate::config::Config::version()
+    )
+}
+
 fn is_git_commit_push_request(n: &str) -> bool {
     // Scheduled skills / Cursor Agent work must run — do not instant-refuse them.
     // False positive example: "SKILL: ui-weekly-review … commit+push, reply briefly."
@@ -549,6 +592,29 @@ commit+push, then reply briefly.";
             }
             other => panic!("expected Instant, got {:?}", other),
         }
+    }
+
+    #[test]
+    fn uptime_ask_is_instant() {
+        crate::state::mark_process_start();
+        for q in ["uptime", "How long have you been up?", "process uptime"] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    assert!(
+                        reply.to_lowercase().contains("up"),
+                        "expected uptime reply for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant for {q:?}, got {:?}", other),
+            }
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane("What's the system uptime on this machine?", None),
+                TurnLane::Instant { .. }
+            ),
+            "host/system uptime asks must not be instant"
+        );
     }
 
     #[test]
