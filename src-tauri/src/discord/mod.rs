@@ -2089,8 +2089,9 @@ pub(super) async fn run_discord_ollama_router(
 
     // Hermes `/insights` — cheap runs.jsonl report, no Ollama.
     if crate::commands::harness_ops::looks_like_insights_request(&content) {
+        let days = crate::commands::harness_ops::parse_insights_days(&content);
         let report = crate::commands::harness_ops::format_runs_insights_gateway(
-            &crate::commands::harness_ops::compute_runs_insights(80),
+            &crate::commands::harness_ops::compute_runs_insights_for(80, days),
         );
         if let Err(e) = new_message.channel_id.say(&ctx, report).await {
             error!("Discord: failed to send insights: {}", e);

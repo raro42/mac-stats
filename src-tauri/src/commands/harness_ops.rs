@@ -94,6 +94,9 @@ pub struct RunsInsights {
     pub digest_source: String,
     /// Seconds since this mac-stats process started (Agent Ops Version card).
     pub process_uptime_secs: u64,
+    /// When set, stats cover only the last N days of runs.jsonl (Hermes `/insights [days]`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub window_days: Option<u32>,
 }
 
 #[derive(Debug, Clone, Serialize, Default)]
@@ -285,10 +288,59 @@ pub fn get_runs_insights(limit: Option<u32>) -> Result<RunsInsights, String> {
 
 /// Shared analytics used by Agent Ops UI and Discord `/insights`.
 pub fn compute_runs_insights(limit: u32) -> RunsInsights {
+    compute_runs_insights_for(limit, None)
+}
+
+/// Parse Hermes-style `/insights 7` or `/insights --days 7` (default: full file / recent limit).
+pub fn parse_insights_days(content: &str) -> Option<u32> {
+    let n = content
+        .trim()
+        .trim_start_matches('@')
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_lowercase();
+    let n = n
+        .trim_start_matches("werner")
+        .trim_start_matches(',')
+        .trim()
+        .trim_start_matches("please")
+        .trim();
+    let rest = if let Some(r) = n.strip_prefix("/insights") {
+        r.trim()
+    } else if let Some(r) = n.strip_prefix("insights") {
+        r.trim()
+    } else {
+        return None;
+    };
+    if rest.is_empty() {
+        return None;
+    }
+    let parts: Vec<&str> = rest.split_whitespace().collect();
+    let mut i = 0;
+    while i < parts.len() {
+        if parts[i] == "--days" && i + 1 < parts.len() {
+            if let Ok(d) = parts[i + 1].parse::<u32>() {
+                return Some(d.clamp(1, 90));
+            }
+            return None;
+        }
+        if let Ok(d) = parts[i].parse::<u32>() {
+            return Some(d.clamp(1, 90));
+        }
+        i += 1;
+    }
+    None
+}
+
+/// `days`: when set, only include turns with `ts` within the last N days (1–90).
+pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights {
     let path = crate::commands::run_telemetry::runs_jsonl_path();
     let lim = limit.clamp(1, 200) as usize;
     let gateway = crate::discord::format_discord_gateway_insights_line();
     let digest = load_digest_summary();
+    let window_days = days.map(|d| d.clamp(1, 90));
+    let since = window_days.map(|d| chrono::Utc::now() - chrono::Duration::days(d as i64));
     let empty = RunsInsights {
         turns: 0,
         ok_count: 0,
@@ -308,6 +360,7 @@ pub fn compute_runs_insights(limit: u32) -> RunsInsights {
         digest_open_hints: digest.open_hints.clone(),
         digest_source: digest.source.clone(),
         process_uptime_secs: crate::state::process_uptime_secs(),
+        window_days,
     };
     if !path.is_file() {
         return empty;
@@ -335,6 +388,17 @@ pub fn compute_runs_insights(limit: u32) -> RunsInsights {
             Ok(v) => v,
             Err(_) => continue,
         };
+        if let Some(since) = since {
+            let ts = v
+                .get("ts")
+                .and_then(|x| x.as_str())
+                .and_then(parse_run_ts);
+            match ts {
+                Some(t) if t >= since => {}
+                Some(_) => continue,
+                None => continue,
+            }
+        }
         let wall = v.get("wall_ms").and_then(|x| x.as_u64()).unwrap_or(0);
         walls.push(wall);
         let ok = v.get("ok").and_then(|x| x.as_bool()).unwrap_or(true);
@@ -439,6 +503,7 @@ pub fn compute_runs_insights(limit: u32) -> RunsInsights {
         digest_open_hints: digest.open_hints,
         digest_source: digest.source,
         process_uptime_secs: crate::state::process_uptime_secs(),
+        window_days,
     }
 }
 
@@ -1030,7 +1095,7 @@ pub fn format_ops_help_gateway() -> String {
     format!(
         "**mac-stats v{version} — operator commands** (instant, no Ollama)\n\
 • `/status` · `/health` · `/version` — one-screen health\n\
-• `/insights` — runs.jsonl report + digest/schedules\n\
+• `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/schedules` · `/cron list` — active jobs + last delivery\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
@@ -1261,9 +1326,17 @@ fn classify_candidate(
 pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     let mut lines = Vec::new();
     if insights.turns == 0 {
-        lines.push("No turns in `~/.mac-stats/runs.jsonl` yet.".into());
+        let empty_msg = match insights.window_days {
+            Some(d) => format!("No turns in `~/.mac-stats/runs.jsonl` for the last **{d}** days."),
+            None => "No turns in `~/.mac-stats/runs.jsonl` yet.".into(),
+        };
+        lines.push(empty_msg);
     } else {
-        lines.push("**mac-stats insights** (runs.jsonl)".to_string());
+        let title = match insights.window_days {
+            Some(d) => format!("**mac-stats insights** (last **{d}** days · runs.jsonl)"),
+            None => "**mac-stats insights** (runs.jsonl)".to_string(),
+        };
+        lines.push(title);
         lines.push(format!(
             "Turns: **{}** · ok {} · fail {} · p50 **{}** ms · mean {} · max {}",
             insights.turns,
@@ -1392,6 +1465,7 @@ pub fn looks_like_insights_request(content: &str) -> bool {
             | "run insights"
             | "agent insights"
     ) || n.starts_with("/insights ")
+        || (n.starts_with("insights ") && parse_insights_days(content).is_some())
 }
 
 fn sanitize_under_dir(path: &str, root: &Path) -> Result<PathBuf, String> {
@@ -1425,7 +1499,20 @@ mod tests {
         assert!(looks_like_insights_request("/insights"));
         assert!(looks_like_insights_request("insights"));
         assert!(looks_like_insights_request("@Werner insights"));
+        assert!(looks_like_insights_request("/insights 7"));
+        assert!(looks_like_insights_request("/insights --days 14"));
+        assert!(looks_like_insights_request("insights 3"));
         assert!(!looks_like_insights_request("any insights on weather?"));
+        assert!(!looks_like_insights_request("insights on weather"));
+    }
+
+    #[test]
+    fn parse_insights_days_hermes_args() {
+        assert_eq!(parse_insights_days("/insights"), None);
+        assert_eq!(parse_insights_days("/insights 7"), Some(7));
+        assert_eq!(parse_insights_days("/insights --days 14"), Some(14));
+        assert_eq!(parse_insights_days("@Werner insights 3"), Some(3));
+        assert_eq!(parse_insights_days("/insights 999"), Some(90)); // clamp
     }
 
     #[test]
@@ -1449,11 +1536,13 @@ mod tests {
             digest_open_hints: vec![],
             digest_source: "python".into(),
             process_uptime_secs: 0,
+            window_days: Some(7),
         };
         let report = format_runs_insights_gateway(&insights);
         assert!(report.contains("Digest:"), "{report}");
         assert!(report.contains("Schedules:"), "{report}");
         assert!(report.contains("Discord gateway:"), "{report}");
+        assert!(report.contains("last **7** days"), "{report}");
     }
 
     #[test]
