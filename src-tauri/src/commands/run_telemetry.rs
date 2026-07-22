@@ -88,6 +88,43 @@ pub fn record_turn(rec: &TurnRunRecord) {
     }
 }
 
+/// Keep at most `runs_prune_max_lines` lines in `runs.jsonl` (newest kept). `0` disables.
+pub fn prune_runs_jsonl_if_needed() -> u64 {
+    prune_runs_jsonl_at(&runs_jsonl_path(), crate::config::Config::runs_prune_max_lines())
+}
+
+/// Testable core: trim `path` to the last `max` non-empty lines.
+pub(crate) fn prune_runs_jsonl_at(path: &std::path::Path, max: usize) -> u64 {
+    if max == 0 {
+        return 0;
+    }
+    let Ok(text) = std::fs::read_to_string(path) else {
+        return 0;
+    };
+    let lines: Vec<&str> = text.lines().filter(|l| !l.trim().is_empty()).collect();
+    if lines.len() <= max {
+        return 0;
+    }
+    let keep = &lines[lines.len() - max..];
+    let body = keep.join("\n") + "\n";
+    match crate::config::write_text_atomic(path, &body) {
+        Ok(()) => {
+            let removed = (lines.len() - max) as u64;
+            tracing::info!(
+                target: "mac_stats::telemetry",
+                "runs.jsonl prune: removed {} old line(s); kept {}",
+                removed,
+                max
+            );
+            removed
+        }
+        Err(e) => {
+            warn!(target: "mac_stats::telemetry", "runs.jsonl prune failed: {}", e);
+            0
+        }
+    }
+}
+
 /// Wall-clock helper for a turn.
 pub struct TurnClock {
     start: Instant,
@@ -114,5 +151,26 @@ mod tests {
         let p = TurnRunRecord::question_preview_from("hello\nworld");
         assert!(!p.contains('\n'));
         assert!(p.contains("hello"));
+    }
+
+    #[test]
+    fn prune_runs_jsonl_keeps_tail() {
+        let dir = std::env::temp_dir().join(format!("mac-stats-runs-prune-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("runs.jsonl");
+        let mut body = String::new();
+        for i in 0..5 {
+            body.push_str(&format!("{{\"i\":{}}}\n", i));
+        }
+        std::fs::write(&path, &body).unwrap();
+        assert_eq!(prune_runs_jsonl_at(&path, 2), 3);
+        let kept = std::fs::read_to_string(&path).unwrap();
+        assert_eq!(kept.lines().filter(|l| !l.trim().is_empty()).count(), 2);
+        assert!(kept.contains("\"i\":3"));
+        assert!(kept.contains("\"i\":4"));
+        assert!(!kept.contains("\"i\":0"));
+        assert_eq!(prune_runs_jsonl_at(&path, 2), 0);
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

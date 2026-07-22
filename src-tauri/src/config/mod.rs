@@ -1431,6 +1431,28 @@ impl Config {
         DEFAULT
     }
 
+    /// Keep at most this many lines in `~/.mac-stats/runs.jsonl` (newest kept).
+    /// **`0` disables**. Default: **2000**. Config: `runsPruneMaxLines`.
+    /// Env: `MAC_STATS_RUNS_PRUNE_MAX_LINES` (clamped to `0..=100000`).
+    pub fn runs_prune_max_lines() -> usize {
+        const DEFAULT: usize = 2000;
+        const MAX: usize = 100_000;
+        if let Ok(s) = std::env::var("MAC_STATS_RUNS_PRUNE_MAX_LINES") {
+            if let Ok(n) = s.parse::<usize>() {
+                return n.min(MAX);
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(n) = json.get("runsPruneMaxLines").and_then(|v| v.as_u64()) {
+                    return (n as usize).min(MAX);
+                }
+            }
+        }
+        DEFAULT
+    }
+
     /// Delete `session-memory-*.md` files older than this many days (by mtime).
     /// **`0` disables** age-based pruning. Default: **30**. Config: `sessionPruneMaxAgeDays`.
     /// Env: `MAC_STATS_SESSION_PRUNE_MAX_AGE_DAYS` (clamped to `0..=3650`).

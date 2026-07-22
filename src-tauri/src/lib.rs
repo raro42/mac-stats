@@ -403,6 +403,8 @@ fn run_internal(open_cpu_window: bool) {
 
             crate::session_memory::prune_old_session_files();
 
+            crate::commands::run_telemetry::prune_runs_jsonl_if_needed();
+
             crate::browser_agent::cdp_downloads::prune_old_browser_downloads(
                 std::time::Duration::from_secs(24 * 3600),
             );

@@ -717,14 +717,20 @@ function renderOpsSchedulesTab(schedules, deliveries) {
             list.innerHTML = '<div class="ops-empty">No schedules match filter</div>';
         } else {
             filtered.forEach((s) => {
-                const div = document.createElement('div');
-                div.className = 'ops-row';
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'ops-row';
                 const id = s.id || '(no id)';
                 const when = s.cron ? `cron ${s.cron}` : s.at ? `at ${s.at}` : '—';
                 const next = s.next_run || s.nextRun || '—';
                 const task = String(s.task || '');
-                div.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">${escapeHtml(when)} · next ${escapeHtml(next)}</div><div class="ops-row-meta">${escapeHtml(task.slice(0, 80))}${task.length > 80 ? '…' : ''}</div></div>`;
-                list.appendChild(div);
+                btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">${escapeHtml(when)} · next ${escapeHtml(next)}</div><div class="ops-row-meta">${escapeHtml(task.slice(0, 80))}${task.length > 80 ? '…' : ''}</div></div>`;
+                btn.title = task || id;
+                btn.addEventListener('click', () => {
+                    list.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+                    btn.classList.add('is-selected');
+                });
+                list.appendChild(btn);
             });
             prependOpsFilterCaption(list, all.length, filtered.length, opsSchedulesFilterQ);
         }
