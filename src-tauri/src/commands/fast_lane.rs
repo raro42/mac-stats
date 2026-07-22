@@ -111,6 +111,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_capabilities_ask(&n) {
         return Some(format_instant_capabilities_reply());
     }
+    if is_discord_reach_ask(&n) {
+        return Some(format_instant_discord_reach_reply());
+    }
     if is_identity_affirmation(&n) {
         return Some("Got it — noted. I'm here when you need me.".to_string());
     }
@@ -365,6 +368,57 @@ fn format_instant_capabilities_reply() -> String {
         "I'm **Werner** (mac-stats v{}). I can check weather, search the web, work Redmine tickets, \
 browse/screenshots, run allowlisted commands/skills, search past sessions, and help from Discord or the dashboard. \
 Ask a concrete task — or open **Agent Ops** for schedules/runs.",
+        crate::config::Config::version()
+    )
+}
+
+/// Meta asks about Discord reach (other agents / seeing channels) — digester zero-tool slow turns.
+fn is_discord_reach_ask(n: &str) -> bool {
+    if n.chars().count() > 220 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("redmine")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("search")
+        || n.contains("weather")
+        || n.contains("ticket")
+        || n.contains("discord_api")
+        || n.contains("list all")
+        || n.contains("list the channel")
+        || n.contains("post to")
+        || n.contains("send to")
+        || n.contains("fetch")
+    {
+        return false;
+    }
+    let about_channels = n.contains("channel");
+    let about_other_agents = n.contains("another agent")
+        || n.contains("other agent")
+        || n.contains("other agents")
+        || n.contains("another bot")
+        || n.contains("other bot")
+        || n.contains("other bots");
+    if !about_channels && !about_other_agents {
+        return false;
+    }
+    n.contains("can you see")
+        || n.contains("do you see")
+        || n.contains("see channels")
+        || n.contains("talking to")
+        || n.contains("talk to another")
+        || n.contains("talk to other")
+        || n.contains("are you talking")
+        || n.contains("may you")
+        || n.contains("be talking")
+}
+
+fn format_instant_discord_reach_reply() -> String {
+    format!(
+        "I'm **Werner** (mac-stats v{}) on Discord. I see traffic in channels (and DMs) where the bot is present — \
+not the whole guild by default. I don't automatically chat with other bots/agents; ask me to do a concrete \
+thing (or use `/status` / Agent Ops for gateway health).",
         crate::config::Config::version()
     )
 }
@@ -807,6 +861,33 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "capabilities + real task must not be instant"
+        );
+    }
+
+    #[test]
+    fn discord_reach_asks_are_instant() {
+        for q in [
+            "So, may you be talking to another agent on the amvara server? Can you see channels of amvara server?",
+            "Can you see channels on the Amvara server?",
+            "Are you talking to other bots?",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    let lower = reply.to_lowercase();
+                    assert!(
+                        lower.contains("discord") || lower.contains("channel") || lower.contains("werner"),
+                        "expected discord-reach blurb for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant for {q:?}, got {:?}", other),
+            }
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane("List all channels and post to #general", None),
+                TurnLane::Instant { .. }
+            ),
+            "channel list/post tasks must not be instant"
         );
     }
 

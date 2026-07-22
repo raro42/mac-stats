@@ -1248,6 +1248,37 @@ fn classify_candidate(
             request_id: request_id.into(),
         });
     }
+    let about_channels = q.contains("channel");
+    let about_other_agents = q.contains("another agent")
+        || q.contains("other agent")
+        || q.contains("other agents")
+        || q.contains("another bot")
+        || q.contains("other bot")
+        || q.contains("other bots");
+    let looks_discord_reach = (about_channels || about_other_agents)
+        && (q.contains("can you see")
+            || q.contains("do you see")
+            || q.contains("see channels")
+            || q.contains("talking to")
+            || q.contains("talk to another")
+            || q.contains("talk to other")
+            || q.contains("are you talking")
+            || q.contains("may you")
+            || q.contains("be talking"))
+        && !q.contains("list all")
+        && !q.contains("discord_api")
+        && !q.contains("post to")
+        && !q.contains("send to");
+    if looks_discord_reach && lane != "instant" && wall_ms >= 500 {
+        return Some(RunInsightCandidate {
+            kind: "promote_instant".into(),
+            reason: "Discord reach/channels meta-ask should stay on instant lane".into(),
+            wall_ms,
+            lane: lane.into(),
+            question_preview: question.chars().take(80).collect(),
+            request_id: request_id.into(),
+        });
+    }
     let looks_time = (q.contains("what time") || q.contains("what's the time") || q == "time")
         && !q.contains("timezone");
     let looks_greeting = matches!(
