@@ -100,8 +100,8 @@ function ensureOpsKeyboardHint() {
     const hint = document.createElement('div');
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
-    hint.textContent =
-        'Tips: / focuses filter · Esc clears / closes preview · Enter opens row (session/knowledge/runs/agents/schedules)';
+        hint.textContent =
+        'Tips: 1–5 switch tabs · / focuses filter · Esc clears / closes preview · Enter opens row';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -160,6 +160,29 @@ function setupAgentOps() {
                 if (tryOpsRunsEnter(e)) return;
                 if (tryOpsAgentsEnter(e)) return;
                 if (tryOpsSchedulesEnter(e)) return;
+            }
+            // Hermes-style: digit keys jump tabs when not typing in an input.
+            if (!e.metaKey && !e.ctrlKey && !e.altKey && /^[1-5]$/.test(e.key)) {
+                if (agentOpsCollapsed) return;
+                const t = e.target;
+                const tag = (t && t.tagName) || '';
+                if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return;
+                if (!document.getElementById('agent-ops') && !document.querySelector('.agent-ops-tabs')) {
+                    return;
+                }
+                const byDigit = {
+                    1: 'agents',
+                    2: 'sessions',
+                    3: 'schedules',
+                    4: 'memory',
+                    5: 'runs',
+                };
+                const tab = byDigit[e.key];
+                if (tab) {
+                    e.preventDefault();
+                    selectOpsTab(tab);
+                    return;
+                }
             }
             if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
             if (agentOpsCollapsed) return;
