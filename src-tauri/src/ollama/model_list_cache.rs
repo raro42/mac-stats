@@ -12,6 +12,8 @@ use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
 
 const MODEL_LIST_TTL: Duration = Duration::from_secs(5 * 60);
+/// Avoid flooding debug.log when many callers hit a stale list during one bg refresh.
+const STALE_IN_PROGRESS_LOG_INTERVAL: Duration = Duration::from_secs(60);
 
 /// Visible in `~/.mac-stats/debug.log` message text: the file log layer omits tracing `target`, so
 /// operators should `rg '\[ollama/model_cache\]'` (or the human-readable phrases) to audit stale serves.
@@ -25,6 +27,8 @@ type SharedFetch = futures_util::future::Shared<BoxFetch>;
 struct EndpointEntry {
     last_success: Option<(Instant, ListResponse)>,
     bg_refreshing: bool,
+    /// Last time we logged "stale; refresh already in progress" for this endpoint.
+    last_stale_in_progress_log: Option<Instant>,
 }
 
 #[derive(Default)]
@@ -187,13 +191,20 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
                         );
                         return Ok(list);
                     }
-                    mac_stats_warn!(
-                        "ollama/model_cache",
-                        "{} Model list is stale ({}s since success); background refresh already in progress; serving cached result ({} models)",
-                        MCACHE_LOG_TAG,
-                        age.as_secs(),
-                        list.models.len()
-                    );
+                    let should_log = ent
+                        .last_stale_in_progress_log
+                        .map(|t| now.duration_since(t) >= STALE_IN_PROGRESS_LOG_INTERVAL)
+                        .unwrap_or(true);
+                    if should_log {
+                        ent.last_stale_in_progress_log = Some(now);
+                        mac_stats_warn!(
+                            "ollama/model_cache",
+                            "{} Model list is stale ({}s since success); background refresh already in progress; serving cached result ({} models)",
+                            MCACHE_LOG_TAG,
+                            age.as_secs(),
+                            list.models.len()
+                        );
+                    }
                     return Ok(list);
                 }
             }
