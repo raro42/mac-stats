@@ -13,10 +13,8 @@ const MAX_SUMMARY_TURNS: usize = 3;
 const USER_SUMMARY_CHARS: usize = 140;
 const ASSISTANT_SUMMARY_CHARS: usize = 220;
 
-/// `SESSION_SEARCH: <query>` — search persisted session markdown.
-///
-/// When `exclude_session_id` is set (Hermes parity), skip files for that session — the agent
-/// already has the current transcript in context.
+/// `SESSION_SEARCH: <query>` — search persisted session markdown (no current-session filter).
+#[allow(dead_code)] // thin wrapper for non-Discord / tests; Discord uses `_excluding`
 pub fn handle_session_search(arg: &str) -> String {
     handle_session_search_excluding(arg, None)
 }
