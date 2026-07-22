@@ -248,6 +248,11 @@ fn arguments_to_arg_string(tool_name: &str, args: &Value) -> String {
             }
         }
     }
+    // Structured multi-key payloads (nested object/array values): keep keys via compact JSON.
+    // Flat string/number multi-arg tools (e.g. BROWSER_INPUT) still space-join values.
+    if obj.values().any(|v| v.is_object() || v.is_array()) {
+        return Value::Object(obj.clone()).to_string();
+    }
     // Multi-arg tools (e.g. BROWSER_INPUT): join values in a stable-ish order
     obj.values()
         .filter_map(json_value_to_arg_fragment)
@@ -414,6 +419,27 @@ mod tests {
         assert_eq!(
             arguments_to_arg_string("BRAVE_SEARCH", &json!("Ralf Roeber")),
             "Ralf Roeber"
+        );
+    }
+
+    #[test]
+    fn synthesize_structured_multi_key_as_json() {
+        let args = json!({
+            "path": "/tmp/a",
+            "options": { "recursive": true }
+        });
+        let s = arguments_to_arg_string("RUN_CMD", &args);
+        assert!(s.contains("\"path\""), "expected JSON keys preserved: {s}");
+        assert!(s.contains("\"options\""), "expected nested object: {s}");
+        assert!(s.contains("recursive"), "expected nested field: {s}");
+    }
+
+    #[test]
+    fn synthesize_flat_multi_key_still_space_joins() {
+        let s = arguments_to_arg_string("BROWSER_CLICK", &json!({ "sel": "#q", "nth": "1" }));
+        assert!(
+            s.contains("#q") && s.contains("1") && !s.contains('{'),
+            "expected space-joined flat values, got {s}"
         );
     }
 }

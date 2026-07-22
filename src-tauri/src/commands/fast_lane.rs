@@ -105,6 +105,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_presence_or_who_ask(&n) {
         return Some(format_instant_presence_reply());
     }
+    if is_capabilities_ask(&n) {
+        return Some(format_instant_capabilities_reply());
+    }
     if is_identity_affirmation(&n) {
         return Some("Got it — noted. I'm here when you need me.".to_string());
     }
@@ -280,6 +283,46 @@ fn is_presence_or_who_ask(n: &str) -> bool {
 fn format_instant_presence_reply() -> String {
     format!(
         "I'm **Werner** on **mac-stats v{}** — online and ready. How can I help?",
+        crate::config::Config::version()
+    )
+}
+
+/// Short “what can you do?” asks (avoid a full meta+LLM turn for capability intros).
+fn is_capabilities_ask(n: &str) -> bool {
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("redmine")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("search")
+        || n.contains("weather")
+        || n.contains("ticket")
+    {
+        return false;
+    }
+    matches!(
+        n,
+        "what can you do"
+            | "what do you do"
+            | "what are you able to do"
+            | "what are your capabilities"
+            | "your capabilities"
+            | "capabilities"
+            | "help"
+            | "commands"
+            | "what can you help with"
+            | "how can you help"
+    ) || (n.starts_with("what can you") && n.chars().count() <= 40)
+        || (n.starts_with("how can you help") && n.chars().count() <= 40)
+}
+
+fn format_instant_capabilities_reply() -> String {
+    format!(
+        "I'm **Werner** (mac-stats v{}). I can check weather, search the web, work Redmine tickets, \
+browse/screenshots, run allowlisted commands/skills, search past sessions, and help from Discord or the dashboard. \
+Ask a concrete task — or open **Agent Ops** for schedules/runs.",
         crate::config::Config::version()
     )
 }
@@ -602,6 +645,35 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "need-anything with a real ask must not be instant"
+        );
+    }
+
+    #[test]
+    fn capabilities_asks_are_instant() {
+        for q in [
+            "What can you do?",
+            "what do you do?",
+            "help",
+            "capabilities",
+            "how can you help?",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    let lower = reply.to_lowercase();
+                    assert!(
+                        lower.contains("werner") || lower.contains("mac-stats"),
+                        "expected capabilities blurb for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant for {q:?}, got {:?}", other),
+            }
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane("What can you do with Redmine ticket 12?", None),
+                TurnLane::Instant { .. }
+            ),
+            "capabilities + real task must not be instant"
         );
     }
 
