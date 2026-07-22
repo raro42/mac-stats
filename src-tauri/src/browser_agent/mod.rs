@@ -30,6 +30,11 @@ pub mod url_filter;
 
 pub use http_fallback::{click_http, extract_http, input_http, navigate_http};
 
+/// Best-effort prune of `~/.mac-stats/traces/*_cdp_trace.json` (age + retention).
+pub(crate) fn prune_cdp_traces_best_effort() {
+    cdp_trace_archive::prune_cdp_traces_best_effort();
+}
+
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};

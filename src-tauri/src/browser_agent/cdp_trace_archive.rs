@@ -472,13 +472,10 @@ pub(crate) fn stop_and_persist_best_effort(ws_url_hint: Option<&str>, reason: &s
 
 fn prune_traces_dir_best_effort(dir: &Path) {
     let max_files = Config::browser_cdp_trace_max_retained_files();
-    if max_files == 0 {
-        return;
-    }
     let Ok(rd) = std::fs::read_dir(dir) else {
         return;
     };
-    let mut entries: Vec<std::path::PathBuf> = rd
+    let mut entries: Vec<(std::path::PathBuf, u64, u64)> = rd
         .filter_map(|e| e.ok())
         .map(|e| e.path())
         .filter(|p| {
@@ -486,38 +483,66 @@ fn prune_traces_dir_best_effort(dir: &Path) {
                 .and_then(|n| n.to_str())
                 .is_some_and(|s| s.ends_with("_cdp_trace.json"))
         })
+        .filter_map(|p| {
+            let meta = std::fs::metadata(&p).ok()?;
+            let mtime = meta
+                .modified()
+                .ok()
+                .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                .map(|d| d.as_secs())
+                .unwrap_or(0);
+            Some((p, mtime, meta.len()))
+        })
         .collect();
-    if entries.len() <= max_files {
-        return;
-    }
-    entries.sort_by_key(|p| {
-        std::fs::metadata(p)
-            .and_then(|m| m.modified())
-            .ok()
-            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
-            .map(|d| d.as_secs())
-            .unwrap_or(0)
-    });
-    let remove_n = entries.len().saturating_sub(max_files);
+
+    // Age prune: drop traces older than 14 days (operator diagnostics, not forever archives).
+    const MAX_AGE_SECS: u64 = 14 * 24 * 60 * 60;
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
     let mut freed: u64 = 0;
     let mut removed: usize = 0;
-    for p in entries.into_iter().take(remove_n) {
-        if let Ok(m) = std::fs::metadata(&p) {
-            freed = freed.saturating_add(m.len());
+    entries.retain(|(p, mtime, len)| {
+        if now.saturating_sub(*mtime) > MAX_AGE_SECS {
+            if std::fs::remove_file(p).is_ok() {
+                removed += 1;
+                freed = freed.saturating_add(*len);
+                return false;
+            }
         }
-        if std::fs::remove_file(&p).is_ok() {
-            removed += 1;
+        true
+    });
+
+    if max_files > 0 && entries.len() > max_files {
+        entries.sort_by_key(|(_, mtime, _)| *mtime);
+        let remove_n = entries.len().saturating_sub(max_files);
+        for (p, _, len) in entries.into_iter().take(remove_n) {
+            if std::fs::remove_file(&p).is_ok() {
+                removed += 1;
+                freed = freed.saturating_add(len);
+            }
         }
     }
+
     if removed > 0 {
         mac_stats_info!(
             "browser/cdp",
-            "CDP trace: pruned {} oldest file(s) (maxRetainedFiles={}), ~{} bytes freed",
+            "CDP trace: pruned {} file(s) (maxAge=14d, maxRetainedFiles={}), ~{} bytes freed",
             removed,
             max_files,
             freed
         );
     }
+}
+
+/// Best-effort startup / periodic prune of `~/.mac-stats/traces/*_cdp_trace.json`.
+pub(crate) fn prune_cdp_traces_best_effort() {
+    let dir = Config::browser_cdp_traces_dir();
+    if !dir.is_dir() {
+        return;
+    }
+    prune_traces_dir_best_effort(&dir);
 }
 
 /// Reset deadline tracking when a new process wants fresh timing (optional — currently unused).

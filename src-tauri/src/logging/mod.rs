@@ -179,9 +179,12 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
                 "mac-stats-stdout.log",
                 "launchd.stderr.log",
                 "launchd.stdout.log",
+                "debug.log.bak.pre-test",
             ] {
                 truncate_log_file_if_over(&dir.join(name), MAX_LOG_BYTES);
             }
+            // Best-effort: drop stale CDP traces (age + retention) at boot.
+            crate::browser_agent::prune_cdp_traces_best_effort();
         }
 
         // Create file layer
