@@ -252,9 +252,14 @@ fn is_presence_or_who_ask(n: &str) -> bool {
             | "you there"
             | "you online"
             | "still there"
+            | "still here"
             | "still online"
             | "are you up"
             | "you up"
+            | "you around"
+            | "you good"
+            | "you ok"
+            | "you okay"
             | "how are you"
             | "how're you"
             | "how r you"
@@ -263,6 +268,9 @@ fn is_presence_or_who_ask(n: &str) -> bool {
             | "how are things"
             | "whats up"
             | "what's up"
+            | "anything else"
+            | "need anything"
+            | "need anything else"
     ) || (n.starts_with("who are you") && n.chars().count() <= 40)
         || (n.starts_with("are you there") && n.chars().count() <= 40)
         || (n.starts_with("are you online") && n.chars().count() <= 40)
@@ -570,6 +578,11 @@ commit+push, then reply briefly.";
             "How are you?",
             "how's it going?",
             "what's up?",
+            "still here?",
+            "you around?",
+            "you good?",
+            "Need anything else?",
+            "anything else?",
         ] {
             assert!(
                 matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),
@@ -582,6 +595,13 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "substantive who-asks must not be instant"
+        );
+        assert!(
+            !matches!(
+                classify_turn_lane("Need anything else from the weather API?", None),
+                TurnLane::Instant { .. }
+            ),
+            "need-anything with a real ask must not be instant"
         );
     }
 

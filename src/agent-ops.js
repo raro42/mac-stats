@@ -641,6 +641,8 @@ function renderOverviewKnowledge(files) {
         btn.className = 'ops-row';
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(f.kind)} · ${fmtAge(f.modified_ms)}</div></div>`;
         btn.addEventListener('click', async () => {
+            body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            btn.classList.add('is-selected');
             selectOpsTab('memory');
             const preview = document.getElementById('ops-memory-preview');
             try {
@@ -656,6 +658,7 @@ function renderOverviewKnowledge(files) {
                 }
             }
         });
+        btn.title = 'Open in Knowledge';
         body.appendChild(btn);
     });
 }
@@ -678,6 +681,8 @@ function renderOverviewRecent(files) {
         btn.className = 'ops-row';
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(f.source_hint)} · ${fmtAge(f.modified_ms)}</div></div>`;
         btn.addEventListener('click', async () => {
+            body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            btn.classList.add('is-selected');
             selectOpsTab('sessions');
             try {
                 const msgs = await invoke('read_session_file_messages', { path: f.path });
@@ -698,6 +703,7 @@ function renderOverviewRecent(files) {
                 showOpsSessionPreview([], String(err));
             }
         });
+        btn.title = 'Open in Sessions';
         body.appendChild(btn);
     });
 }
