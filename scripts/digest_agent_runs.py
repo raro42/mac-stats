@@ -115,6 +115,77 @@ def looks_like_identity_affirmation(q: str) -> bool:
     )
 
 
+def looks_like_wakeup(q: str) -> bool:
+    return "wake-up" in q or "wakeup" in q or "wake up" in q
+
+
+def looks_like_overnight_improvements(q: str) -> bool:
+    if not (
+        "improvement" in q
+        or "what shipped" in q
+        or "what changed" in q
+        or "coding session" in q
+    ):
+        return False
+    return "last night" in q or "overnight" in q or "coding session" in q
+
+
+def looks_like_version_ask(q: str) -> bool:
+    n = q.strip()
+    if "version" not in n:
+        return False
+    # Avoid "version of the API" style task asks
+    return (
+        "what version" in n
+        or n.startswith("version")
+        or "your version" in n
+        or "which version" in n
+        or n in ("version?", "version")
+    )
+
+
+def looks_like_discord_reach(q: str) -> bool:
+    n = q.strip()
+    discordish = any(x in n for x in ("discord", "amvara", "server", "guild", "channel"))
+    if discordish and (
+        "talking on" in n
+        or "ok talking" in n
+        or "okay talking" in n
+        or "cross check" in n
+        or "are you online" in n
+        or "are you connected" in n
+    ):
+        return True
+    about_channels = "channel" in n
+    about_other = any(
+        x in n
+        for x in (
+            "another agent",
+            "other agent",
+            "other agents",
+            "another bot",
+            "other bot",
+            "other bots",
+        )
+    )
+    if not about_channels and not about_other:
+        return False
+    return any(
+        x in n
+        for x in (
+            "can you see",
+            "do you see",
+            "see channels",
+            "talking to",
+            "talk to another",
+            "talk to other",
+            "are you talking",
+            "may you",
+            "be talking",
+        )
+    )
+
+
 def is_now_instant_slowest_noise(r: dict) -> bool:
     """Drop historical zero-tool turns from Slowest when they match shipped instant patterns."""
     if (r.get("lane") or "") == "instant":
@@ -124,6 +195,10 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         return False
     q = (r.get("question_preview") or "").lower()
     if looks_like_short_ack(q) or looks_like_identity_affirmation(q):
+        return True
+    if looks_like_wakeup(q) or looks_like_overnight_improvements(q):
+        return True
+    if looks_like_version_ask(q) or looks_like_discord_reach(q):
         return True
     return False
 

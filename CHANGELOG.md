@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.223] - 2026-07-23
+
+### Changed
+- Agent-run digester: Slowest also drops wake-up / version / overnight / Discord-reach turns already on instant.
+
 ## [0.1.222] - 2026-07-22
 
 ### Changed
