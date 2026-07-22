@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.226] - 2026-07-23
+
+### Changed
+- Browser cookie jar save uses fsync + unique temp rename (Hermes-style atomic write).
+- Digester Slowest section notes when the window is clean.
+
 ## [0.1.225] - 2026-07-23
 
 ### Changed

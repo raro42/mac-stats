@@ -457,6 +457,8 @@ def main() -> int:
     ]
     slow = sorted(slow_pool, key=lambda r: int(r.get("wall_ms") or 0), reverse=True)[:15]
     lines.append("## Slowest 15")
+    if not slow:
+        lines.append("_None — remaining turns are fast instant or already filtered as shipped noise._")
     for r in slow:
         lines.append(
             f"- {int(r.get('wall_ms') or 0):>7} ms  lane=`{r.get('lane')}`  "
