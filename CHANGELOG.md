@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.225] - 2026-07-23
+
+### Changed
+- `PYTHON_SCRIPT` writes use atomic temp+rename (shared `write_text_atomic`).
+- Digester Slowest ignores sub-2s instant turns (Open-Meteo / ping noise).
+
 ## [0.1.224] - 2026-07-23
 
 ### Fixed

@@ -84,7 +84,8 @@ pub fn run_python_script(id: &str, topic: &str, script_body: &str) -> Result<Str
     let script_path =
         crate::config::Config::scripts_dir().join(format!("python-script-{}-{}.py", id, topic));
 
-    std::fs::write(&script_path, script_body).map_err(|e| format!("Write script failed: {}", e))?;
+    crate::config::write_text_atomic(&script_path, script_body)
+        .map_err(|e| format!("Write script failed: {}", e))?;
     info!(
         "PYTHON_SCRIPT: wrote {:?} ({} bytes), running with python3",
         script_path,

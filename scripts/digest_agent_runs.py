@@ -381,10 +381,10 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
 
 
 def is_trivial_instant_noise(r: dict) -> bool:
-    """Drop sub-100ms instant turns from Slowest (clock/ping/false-positive refuse)."""
+    """Drop fast instant turns from Slowest (acks, Open-Meteo, ping — not real slowness)."""
     if (r.get("lane") or "") != "instant":
         return False
-    return int(r.get("wall_ms") or 0) < 100
+    return int(r.get("wall_ms") or 0) < 2_000
 
 
 def is_skill_git_fastlane_false_positive(r: dict) -> bool:
