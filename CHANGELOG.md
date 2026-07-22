@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.222] - 2026-07-22
+
+### Changed
+- Agent-run digester: treat short acks / identity affirmations as shipped-instant (stale + drop from Slowest noise).
+
 ## [0.1.221] - 2026-07-22
 
 ### Changed

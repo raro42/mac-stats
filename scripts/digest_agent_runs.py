@@ -37,6 +37,95 @@ SHIPPED_REDMINE_HOME_CONFIG = datetime(2026, 7, 21, 10, 25, tzinfo=timezone.utc)
 SHIPPED_INSTANT_OVERNIGHT_IMPROVEMENTS = datetime(2026, 7, 22, 8, 40, tzinfo=timezone.utc)
 # v0.1.215 — Discord reach / see-channels / other-agent meta asks are instant.
 SHIPPED_INSTANT_DISCORD_REACH = datetime(2026, 7, 22, 20, 0, tzinfo=timezone.utc)
+# v0.1.164 — short acks / sign-offs are instant.
+SHIPPED_INSTANT_SHORT_ACK = datetime(2026, 7, 21, 20, 10, tzinfo=timezone.utc)
+# v0.1.176 — short identity/role affirmations are instant.
+SHIPPED_INSTANT_IDENTITY = datetime(2026, 7, 22, 0, 15, tzinfo=timezone.utc)
+
+
+def looks_like_short_ack(q: str) -> bool:
+    """Mirror fast_lane::is_short_ack_or_signoff (normalized lower text)."""
+    if "?" in q:
+        return False
+    n = q.strip()
+    if n in (
+        "ok",
+        "okay",
+        "k",
+        "kk",
+        "cool",
+        "nice",
+        "nice one",
+        "nice answer",
+        "got it",
+        "all good",
+        "np",
+        "no worries",
+        "bye",
+        "goodbye",
+        "cya",
+        "see you",
+        "later",
+        "perfect",
+        "great",
+        "awesome",
+        "neat",
+        "sweet",
+        "alright",
+        "sounds good",
+        "fair enough",
+        "👍",
+        "👌",
+    ):
+        return True
+    if len(n) > 140:
+        return False
+    starts = n.startswith(
+        ("ok", "okay", "cool", "nice", "got it", "alright", "no worries", "sounds good")
+    )
+    if not starts:
+        return False
+    return (
+        len(n) <= 48
+        or "no worries" in n
+        or "bye" in n
+        or "myself" in n
+        or "later" in n
+        or "all good" in n
+        or "find out" in n
+    )
+
+
+def looks_like_identity_affirmation(q: str) -> bool:
+    n = q.strip()
+    if "?" in n or len(n) > 180:
+        return False
+    if not (n.startswith("you are ") or n.startswith("you're ") or n.startswith("youre ")):
+        return False
+    return any(
+        x in n
+        for x in (
+            "working for",
+            "online",
+            "assistant",
+            " agent",
+            "bot",
+            "on various channel",
+        )
+    )
+
+
+def is_now_instant_slowest_noise(r: dict) -> bool:
+    """Drop historical zero-tool turns from Slowest when they match shipped instant patterns."""
+    if (r.get("lane") or "") == "instant":
+        return is_trivial_instant_noise(r)
+    tools = r.get("tools") or []
+    if tools or int(r.get("tool_steps") or 0) > 0:
+        return False
+    q = (r.get("question_preview") or "").lower()
+    if looks_like_short_ack(q) or looks_like_identity_affirmation(q):
+        return True
+    return False
 
 
 def atomic_write_text(path: Path, text: str) -> None:
@@ -166,6 +255,20 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
             or "be talking" in ql
         ) and ("zero-tool" in hl or "instant" in hl):
             return True
+    if ts < SHIPPED_INSTANT_SHORT_ACK and (
+        "short ack" in hl or "sign-off" in hl or "sign off" in hl
+    ):
+        return True
+    if ts < SHIPPED_INSTANT_IDENTITY and "identity" in hl:
+        return True
+    if ts < SHIPPED_INSTANT_SHORT_ACK and looks_like_short_ack(ql) and (
+        "zero-tool" in hl or "instant" in hl
+    ):
+        return True
+    if ts < SHIPPED_INSTANT_IDENTITY and looks_like_identity_affirmation(ql) and (
+        "zero-tool" in hl or "instant" in hl
+    ):
+        return True
     return False
 
 
@@ -239,7 +342,11 @@ def main() -> int:
     lines.append(f"- max: **{max(walls)} ms**")
     lines.append("")
 
-    slow_pool = [r for r in runs if not is_trivial_instant_noise(r)]
+    slow_pool = [
+        r
+        for r in runs
+        if not is_trivial_instant_noise(r) and not is_now_instant_slowest_noise(r)
+    ]
     slow = sorted(slow_pool, key=lambda r: int(r.get("wall_ms") or 0), reverse=True)[:15]
     lines.append("## Slowest 15")
     for r in slow:
@@ -273,7 +380,11 @@ def main() -> int:
         elif wall >= 5_000 and lane in ("lite", "direct", "full") and (
             not tools and tool_steps == 0
         ):
-            if "version" in q:
+            if looks_like_short_ack(q):
+                hint = "Promote to INSTANT short ack/sign-off lane"
+            elif looks_like_identity_affirmation(q):
+                hint = "Promote to INSTANT identity affirmation lane"
+            elif "version" in q:
                 hint = "Promote to INSTANT version lane"
             elif "time" in q or "uhr" in q or "hora" in q or "date" in q:
                 hint = "Promote to INSTANT time/date lane"
