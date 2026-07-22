@@ -100,7 +100,7 @@ function ensureOpsKeyboardHint() {
     const hint = document.createElement('div');
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
-    hint.textContent = 'Tips: / focuses filter · Esc clears / closes preview · Enter loads session / opens knowledge';
+    hint.textContent = 'Tips: / focuses filter · Esc clears / closes preview · Enter loads session / opens knowledge / selects run';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -156,6 +156,7 @@ function setupAgentOps() {
             if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey && !e.altKey) {
                 if (tryOpsSessionEnterLoad(e)) return;
                 if (tryOpsMemoryEnter(e)) return;
+                if (tryOpsRunsEnter(e)) return;
             }
             if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
             if (agentOpsCollapsed) return;
@@ -562,7 +563,8 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         const card = digestEl.closest('.ops-health-card');
         if (card) {
             card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
-            if (openN > 0) card.classList.add('ops-health-warn');
+            const failN = Number(insights?.fail_count) || 0;
+            if (openN > 0 || failN > 0) card.classList.add('ops-health-warn');
             else if (insights) card.classList.add('ops-health-ok');
         }
     }
@@ -1037,6 +1039,25 @@ function tryOpsMemoryEnter(e) {
     if (tag === 'TEXTAREA') return false;
     if (tag === 'INPUT' && t.id && t.id !== 'ops-memory-filter') return false;
     const list = document.getElementById('ops-memory-list');
+    if (!list) return false;
+    const selected =
+        list.querySelector('.ops-row.is-selected') || list.querySelector('.ops-row');
+    if (!selected) return false;
+    e.preventDefault();
+    selected.click();
+    return true;
+}
+
+/** Enter activates the selected (or first) Runs row. */
+function tryOpsRunsEnter(e) {
+    if (agentOpsCollapsed) return false;
+    const panel = document.getElementById('ops-panel-runs');
+    if (!panel || !panel.classList.contains('active')) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    if (tag === 'TEXTAREA') return false;
+    if (tag === 'INPUT' && t.id && t.id !== 'ops-runs-filter') return false;
+    const list = document.getElementById('ops-runs-list') || panel.querySelector('.ops-list');
     if (!list) return false;
     const selected =
         list.querySelector('.ops-row.is-selected') || list.querySelector('.ops-row');

@@ -400,6 +400,7 @@ fn run_internal(open_cpu_window: bool) {
             crate::browser_agent::kill_orphaned_browser_processes();
 
             crate::commands::screenshot_lifecycle::prune_old_screenshots();
+            crate::commands::screenshot_lifecycle::prune_old_pdfs();
 
             crate::session_memory::prune_old_session_files();
 

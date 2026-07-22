@@ -172,6 +172,63 @@ pub fn prune_old_screenshots() {
     }
 }
 
+/// Age-prune PDF exports under `~/.mac-stats/pdfs/` (same `YYYYMMDD_HHMMSS_*` naming as screenshots).
+/// Uses `screenshot_prune_max_age_days` (default 7); **0** disables.
+pub fn prune_old_pdfs() {
+    let dir = Config::pdfs_dir();
+    if !dir.is_dir() {
+        return;
+    }
+    let max_age_days = Config::screenshot_prune_max_age_days();
+    if max_age_days == 0 {
+        return;
+    }
+    let cutoff = Utc::now() - ChronoDuration::days(max_age_days as i64);
+    let Ok(rd) = fs::read_dir(&dir) else {
+        return;
+    };
+    let mut deleted = 0u64;
+    let mut freed: u64 = 0;
+    for entry in rd.filter_map(|e| e.ok()) {
+        let path = entry.path();
+        if path.extension().and_then(|e| e.to_str()).map(|e| e.eq_ignore_ascii_case("pdf")) != Some(true)
+        {
+            continue;
+        }
+        let stem = path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("");
+        let ts = parse_screenshot_filename_timestamp(stem).or_else(|| {
+            entry
+                .metadata()
+                .ok()
+                .and_then(|m| m.modified().ok())
+                .map(system_time_to_utc)
+        });
+        let Some(ts) = ts else {
+            continue;
+        };
+        if ts >= cutoff {
+            continue;
+        }
+        let size = entry.metadata().map(|m| m.len()).unwrap_or(0);
+        if fs::remove_file(&path).is_ok() {
+            deleted += 1;
+            freed = freed.saturating_add(size);
+        }
+    }
+    if deleted > 0 {
+        mac_stats_info!(
+            "pdfs/prune",
+            "PDF prune: removed {} file(s), freed {} byte(s) (age_days_cap={})",
+            deleted,
+            freed,
+            max_age_days
+        );
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
