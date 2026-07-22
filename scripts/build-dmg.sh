@@ -25,8 +25,21 @@ if [[ ! -d "dist" ]]; then
     exit 1
 fi
 
-# Build the DMG
-cargo tauri build --bundles dmg
+# Build the app bundle, then ensure legacy `mac-stats` → `mac_stats` symlink exists
+# (LaunchAgent / older docs). Without this, a fresh DMG install can leave launchd
+# with EX_CONFIG when ProgramArguments still points at mac-stats.
+cargo tauri build --bundles app
+APP_BUNDLE="target/release/bundle/macos/mac-stats.app"
+MACOS_DIR="$APP_BUNDLE/Contents/MacOS"
+if [[ -x "$MACOS_DIR/mac_stats" ]]; then
+    ln -sfn mac_stats "$MACOS_DIR/mac-stats"
+    echo "Linked $MACOS_DIR/mac-stats -> mac_stats"
+else
+    echo "Warning: $MACOS_DIR/mac_stats missing after app bundle" >&2
+fi
+
+# Package DMG from the prepared .app (reuses the release binary)
+cargo tauri bundle --bundles dmg
 
 # Show the result
 DMG_DIR="target/release/bundle/dmg"

@@ -33,6 +33,8 @@ SHIPPED_INSTANT_WAKEUP = datetime(2026, 7, 21, 4, 30, tzinfo=timezone.utc)
 SHIPPED_SKILL_GIT_FASTLANE = datetime(2026, 7, 21, 9, 10, tzinfo=timezone.utc)
 # Redmine keys synced into ~/.mac-stats/.config.env for LaunchAgent installs.
 SHIPPED_REDMINE_HOME_CONFIG = datetime(2026, 7, 21, 10, 25, tzinfo=timezone.utc)
+# v0.1.206 — overnight / last-night improvements asks are instant.
+SHIPPED_INSTANT_OVERNIGHT_IMPROVEMENTS = datetime(2026, 7, 22, 8, 40, tzinfo=timezone.utc)
 
 
 def atomic_write_text(path: Path, text: str) -> None:
@@ -131,6 +133,17 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
             return True
     if ts < SHIPPED_REDMINE_HOME_CONFIG and "redmine" in ql and "home config" in hl:
         return True
+    if ts < SHIPPED_INSTANT_OVERNIGHT_IMPROVEMENTS and (
+        "improvement" in ql
+        or "what shipped" in ql
+        or "what changed" in ql
+    ):
+        if (
+            "last night" in ql
+            or "overnight" in ql
+            or "coding session" in ql
+        ) and ("zero-tool" in hl or "instant" in hl):
+            return True
     return False
 
 
