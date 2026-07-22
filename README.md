@@ -153,11 +153,11 @@ In-app banner checks GitHub Releases. Or: `brew upgrade --cask mac-stats`.
 ```bash
 git clone https://github.com/raro42/mac-stats.git
 cd mac-stats
-git checkout v0.1.88   # pin when possible
+git checkout v0.1.205   # pin when possible
 ./run
 ```
 
-Requires Rust + Xcode CLT (macOS Tauri). Checksums: `./scripts/print-release-checksums.sh v0.1.88`.
+Requires Rust + Xcode CLT (macOS Tauri). Checksums: `./scripts/print-release-checksums.sh v0.1.205`.
 
 Contributor docs: [docs/design/](docs/design/). Workflow: [docs/agent_workflow.md](docs/agent_workflow.md).
 

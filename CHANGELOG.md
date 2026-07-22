@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.205] - 2026-07-22
+
+Overnight harness + Agent Ops / native-tool / hygiene push since **0.1.176** (versions **0.1.177–0.1.205**). GitHub binary release catches up from **v0.1.88**.
+
+### Added
+- **Instant lane**: presence / who-are-you, how-are-you / what’s-up, need-anything / still-here, capabilities / help, and **uptime** asks skip the LLM; digester `promote_instant` covers the same patterns.
+- **Agent Ops**: process **uptime** on the Version health card; Digest **p50** (+ fail warn); health cards **click-navigate** to related tabs; **Enter** opens Sessions / Knowledge / Runs / Agents / Schedules; Esc dismisses session/knowledge previews and closes agent detail; selectable rows across overview + list tabs; lane mix in Digest tooltip.
+- **Native tools**: bare primitive / numeric / array args; structured multi-key args keep JSON keys when nested; OpenAI `name` / `tool_call_id` fidelity and one synthetic `role=tool` per unpaired native call.
+
+### Changed
+- **Bounded growth**: session transcript prune (age/count); `runs.jsonl` line cap; `debug.log` / `debug.log_sic` 10 MiB; LaunchAgent companion logs 5 MiB (boot + periodic compaction); CDP traces older than 14d; PDF age prune (same policy as screenshots); stale `sic/debug.log.*` backups.
+- **Install**: codesign time-boxed (`MAC_STATS_CODESIGN_TIMEOUT_SECS`); atomic `windowDecorations` and more default/prompt writes.
+- **Discord `/insights`**: gateway line includes process uptime; last-disconnect / last-resume age in Agent Ops.
+
+### Fixed
+- Unpaired native `tool_calls` sanitized with one synthetic result each; draft flush idempotency and related harness fidelity from the 0.1.16x line remain in tree (see prior changelog entries through 0.1.176).
+
 ## [0.1.176] - 2026-07-22
 
 ### Changed
