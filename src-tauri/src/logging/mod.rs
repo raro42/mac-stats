@@ -63,6 +63,51 @@ fn truncate_log_file_if_over(path: &std::path::Path, max_bytes: u64) {
         .open(path);
 }
 
+/// Drop dated `~/.mac-stats/sic/debug.log.*` backups older than 14 days; also cap `debug.log-sic`.
+fn prune_old_sic_log_backups(mac_stats_dir: &std::path::Path, max_bytes: u64) {
+    truncate_log_file_if_over(&mac_stats_dir.join("debug.log-sic"), max_bytes);
+    let sic_dir = mac_stats_dir.join("sic");
+    if !sic_dir.is_dir() {
+        return;
+    }
+    const MAX_AGE_SECS: u64 = 14 * 24 * 60 * 60;
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    let Ok(rd) = std::fs::read_dir(&sic_dir) else {
+        return;
+    };
+    let mut removed = 0u32;
+    for entry in rd.filter_map(|e| e.ok()) {
+        let path = entry.path();
+        let name = path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("");
+        if !name.starts_with("debug.log.") {
+            continue;
+        }
+        let Ok(meta) = entry.metadata() else {
+            continue;
+        };
+        let mtime = meta
+            .modified()
+            .ok()
+            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        if now.saturating_sub(mtime) > MAX_AGE_SECS && std::fs::remove_file(&path).is_ok() {
+            removed += 1;
+        }
+    }
+    if removed > 0 {
+        eprintln!(
+            "mac-stats: pruned {removed} stale sic/debug.log.* backup(s) (maxAge=14d)"
+        );
+    }
+}
+
 mod legacy;
 
 /// Handle to `~/.mac-stats/debug.log` when file logging is enabled (for shutdown flush).
@@ -185,6 +230,7 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
             }
             // Best-effort: drop stale CDP traces (age + retention) at boot.
             crate::browser_agent::prune_cdp_traces_best_effort();
+            prune_old_sic_log_backups(dir, MAX_LOG_BYTES);
         }
 
         // Create file layer

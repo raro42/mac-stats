@@ -100,7 +100,8 @@ function ensureOpsKeyboardHint() {
     const hint = document.createElement('div');
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
-    hint.textContent = 'Tips: / focuses filter · Esc clears / closes preview · Enter loads session / opens knowledge / selects run';
+    hint.textContent =
+        'Tips: / focuses filter · Esc clears / closes preview · Enter opens row (session/knowledge/runs/agents/schedules)';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -157,6 +158,8 @@ function setupAgentOps() {
                 if (tryOpsSessionEnterLoad(e)) return;
                 if (tryOpsMemoryEnter(e)) return;
                 if (tryOpsRunsEnter(e)) return;
+                if (tryOpsAgentsEnter(e)) return;
+                if (tryOpsSchedulesEnter(e)) return;
             }
             if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
             if (agentOpsCollapsed) return;
@@ -1061,6 +1064,42 @@ function tryOpsRunsEnter(e) {
     if (!list) return false;
     const selected =
         list.querySelector('.ops-row.is-selected') || list.querySelector('.ops-row');
+    if (!selected) return false;
+    e.preventDefault();
+    selected.click();
+    return true;
+}
+
+/** Enter opens the selected (or first) Agents row detail. */
+function tryOpsAgentsEnter(e) {
+    if (agentOpsCollapsed) return false;
+    const panel = document.getElementById('ops-panel-agents');
+    if (!panel || !panel.classList.contains('active')) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    if (tag === 'TEXTAREA') return false;
+    if (tag === 'INPUT' && t.id && t.id !== 'ops-agents-filter') return false;
+    const list = document.getElementById('ops-agents-list');
+    if (!list || list.style.display === 'none') return false;
+    const selected =
+        list.querySelector('.ops-row.is-selected') || list.querySelector('.ops-row');
+    if (!selected) return false;
+    e.preventDefault();
+    selected.click();
+    return true;
+}
+
+/** Enter activates the selected (or first) Schedules/delivery row. */
+function tryOpsSchedulesEnter(e) {
+    if (agentOpsCollapsed) return false;
+    const panel = document.getElementById('ops-panel-schedules');
+    if (!panel || !panel.classList.contains('active')) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    if (tag === 'TEXTAREA') return false;
+    if (tag === 'INPUT' && t.id && t.id !== 'ops-schedules-filter') return false;
+    const selected =
+        panel.querySelector('.ops-row.is-selected') || panel.querySelector('.ops-row');
     if (!selected) return false;
     e.preventDefault();
     selected.click();
