@@ -1067,9 +1067,14 @@ fn classify_candidate(
             | "you there"
             | "you online"
             | "still there"
+            | "still here"
             | "still online"
             | "are you up"
             | "you up"
+            | "you around"
+            | "you good"
+            | "you ok"
+            | "you okay"
             | "how are you"
             | "how're you"
             | "how's it going"
@@ -1077,11 +1082,44 @@ fn classify_candidate(
             | "how are things"
             | "whats up"
             | "what's up"
+            | "anything else"
+            | "need anything"
+            | "need anything else"
     );
     if looks_presence && lane != "instant" && wall_ms >= 500 {
         return Some(RunInsightCandidate {
             kind: "promote_instant".into(),
             reason: "Presence/who-are-you ask should stay on instant lane".into(),
+            wall_ms,
+            lane: lane.into(),
+            question_preview: question.chars().take(80).collect(),
+            request_id: request_id.into(),
+        });
+    }
+    let n_cap = q.trim_end_matches(['?', '!', '.']).trim();
+    let looks_capabilities = matches!(
+        n_cap,
+        "what can you do"
+            | "what do you do"
+            | "what are you able to do"
+            | "what are your capabilities"
+            | "your capabilities"
+            | "capabilities"
+            | "help"
+            | "commands"
+            | "what can you help with"
+            | "how can you help"
+    ) || (n_cap.starts_with("what can you") && n_cap.chars().count() <= 40)
+        || (n_cap.starts_with("how can you help") && n_cap.chars().count() <= 40);
+    if looks_capabilities
+        && !q.contains("redmine")
+        && !q.contains("ticket")
+        && lane != "instant"
+        && wall_ms >= 500
+    {
+        return Some(RunInsightCandidate {
+            kind: "promote_instant".into(),
+            reason: "Capabilities/help ask should stay on instant lane".into(),
             wall_ms,
             lane: lane.into(),
             question_preview: question.chars().take(80).collect(),
@@ -1462,5 +1500,21 @@ mod tests {
         let c = c.unwrap();
         assert_eq!(c.kind, "promote_instant");
         assert!(c.reason.contains("Identity"));
+    }
+
+    #[test]
+    fn capabilities_candidate_classified() {
+        let c = classify_candidate("direct", 9_000, &[], "What can you do?", "cap-1");
+        assert!(c.is_some());
+        let c = c.unwrap();
+        assert_eq!(c.kind, "promote_instant");
+        assert!(c.reason.contains("Capabilities"));
+    }
+
+    #[test]
+    fn expanded_presence_candidate_classified() {
+        let c = classify_candidate("direct", 3_000, &[], "Need anything else?", "pres-1");
+        assert!(c.is_some());
+        assert_eq!(c.unwrap().kind, "promote_instant");
     }
 }

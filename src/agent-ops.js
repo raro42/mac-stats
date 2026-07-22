@@ -550,6 +550,10 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
             if (insights.mean_ms != null) latBits.push(`mean ${insights.mean_ms} ms`);
             if (insights.max_ms != null) latBits.push(`max ${insights.max_ms} ms`);
             latBits.push(`${insights.turns} turns`);
+            const lanes = (insights.by_lane || [])
+                .map((pair) => (Array.isArray(pair) ? `${pair[0]}:${pair[1]}` : String(pair)))
+                .join(' · ');
+            if (lanes) latBits.push(lanes);
         }
         const hintLines = hints.length ? hints.slice(0, 5) : [];
         digestEl.title = [...latBits, ...hintLines].join('\n')
