@@ -1255,20 +1255,32 @@ fn classify_candidate(
         || q.contains("another bot")
         || q.contains("other bot")
         || q.contains("other bots");
-    let looks_discord_reach = (about_channels || about_other_agents)
-        && (q.contains("can you see")
-            || q.contains("do you see")
-            || q.contains("see channels")
-            || q.contains("talking to")
-            || q.contains("talk to another")
-            || q.contains("talk to other")
-            || q.contains("are you talking")
-            || q.contains("may you")
-            || q.contains("be talking"))
-        && !q.contains("list all")
-        && !q.contains("discord_api")
-        && !q.contains("post to")
-        && !q.contains("send to");
+    let discordish = q.contains("discord")
+        || q.contains("amvara")
+        || q.contains("server")
+        || q.contains("guild");
+    let looks_discord_presence = discordish
+        && (q.contains("talking on")
+            || q.contains("ok talking")
+            || q.contains("okay talking")
+            || q.contains("are you online")
+            || q.contains("are you connected")
+            || (q.contains("cross check") && q.contains("talking")));
+    let looks_discord_reach = looks_discord_presence
+        || ((about_channels || about_other_agents)
+            && (q.contains("can you see")
+                || q.contains("do you see")
+                || q.contains("see channels")
+                || q.contains("talking to")
+                || q.contains("talk to another")
+                || q.contains("talk to other")
+                || q.contains("are you talking")
+                || q.contains("may you")
+                || q.contains("be talking"))
+            && !q.contains("list all")
+            && !q.contains("discord_api")
+            && !q.contains("post to")
+            && !q.contains("send to"));
     if looks_discord_reach && lane != "instant" && wall_ms >= 500 {
         return Some(RunInsightCandidate {
             kind: "promote_instant".into(),

@@ -36,7 +36,7 @@ SHIPPED_REDMINE_HOME_CONFIG = datetime(2026, 7, 21, 10, 25, tzinfo=timezone.utc)
 # v0.1.206 — overnight / last-night improvements asks are instant.
 SHIPPED_INSTANT_OVERNIGHT_IMPROVEMENTS = datetime(2026, 7, 22, 8, 40, tzinfo=timezone.utc)
 # v0.1.215 — Discord reach / see-channels / other-agent meta asks are instant.
-SHIPPED_INSTANT_DISCORD_REACH = datetime(2026, 7, 22, 11, 40, tzinfo=timezone.utc)
+SHIPPED_INSTANT_DISCORD_REACH = datetime(2026, 7, 22, 20, 0, tzinfo=timezone.utc)
 
 
 def atomic_write_text(path: Path, text: str) -> None:
@@ -151,11 +151,17 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
         or "another agent" in ql
         or "other agent" in ql
         or "other bot" in ql
+        or "discord" in ql
+        or "amvara" in ql
     ):
         if (
             "can you see" in ql
             or "see channels" in ql
             or "talking to" in ql
+            or "talking on" in ql
+            or "ok talking" in ql
+            or "okay talking" in ql
+            or "cross check" in ql
             or "may you" in ql
             or "be talking" in ql
         ) and ("zero-tool" in hl or "instant" in hl):

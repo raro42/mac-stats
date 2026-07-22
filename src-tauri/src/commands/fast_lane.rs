@@ -372,7 +372,8 @@ Ask a concrete task — or open **Agent Ops** for schedules/runs.",
     )
 }
 
-/// Meta asks about Discord reach (other agents / seeing channels) — digester zero-tool slow turns.
+/// Meta asks about Discord reach (other agents / seeing channels / “ok talking on …”) —
+/// digester zero-tool slow turns.
 fn is_discord_reach_ask(n: &str) -> bool {
     if n.chars().count() > 220 {
         return false;
@@ -392,6 +393,21 @@ fn is_discord_reach_ask(n: &str) -> bool {
         || n.contains("fetch")
     {
         return false;
+    }
+    let discordish = n.contains("discord")
+        || n.contains("amvara")
+        || n.contains("server")
+        || n.contains("guild");
+    // "Please cross check if you are ok talking on amvara discord server"
+    if discordish
+        && (n.contains("talking on")
+            || n.contains("ok talking")
+            || n.contains("okay talking")
+            || n.contains("are you online")
+            || n.contains("are you connected")
+            || (n.contains("cross check") && n.contains("talking")))
+    {
+        return true;
     }
     let about_channels = n.contains("channel");
     let about_other_agents = n.contains("another agent")
@@ -870,6 +886,7 @@ commit+push, then reply briefly.";
             "So, may you be talking to another agent on the amvara server? Can you see channels of amvara server?",
             "Can you see channels on the Amvara server?",
             "Are you talking to other bots?",
+            "Please cross check if you are ok talking on amvara discord server",
         ] {
             match classify_turn_lane(q, None) {
                 TurnLane::Instant { reply } => {
