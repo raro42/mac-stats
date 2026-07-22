@@ -1100,6 +1100,10 @@ function renderOpsMemory(files) {
         btn.className = 'ops-row';
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(f.kind)} · ${f.line_count} lines · ${fmtBytes(f.size_bytes)}</div></div>`;
         btn.addEventListener('click', async () => {
+            document
+                .querySelectorAll('#ops-memory-list .ops-row.is-selected')
+                .forEach((el) => el.classList.remove('is-selected'));
+            btn.classList.add('is-selected');
             try {
                 const text = await invoke('read_memory_file', { path: f.path });
                 preview.hidden = false;
@@ -1109,6 +1113,7 @@ function renderOpsMemory(files) {
                 preview.textContent = String(err);
             }
         });
+        btn.title = 'Click to preview knowledge file';
         el.appendChild(btn);
     });
     prependOpsFilterCaption(el, all.length, filtered.length, opsMemoryFilterQ);

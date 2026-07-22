@@ -102,6 +102,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_short_ack_or_signoff(&n) {
         return Some("👍 Got it — here if you need me.".to_string());
     }
+    if is_presence_or_who_ask(&n) {
+        return Some(format_instant_presence_reply());
+    }
     if is_identity_affirmation(&n) {
         return Some("Got it — noted. I'm here when you need me.".to_string());
     }
@@ -221,6 +224,47 @@ fn is_short_ack_or_signoff(n: &str) -> bool {
         || n.contains("later")
         || n.contains("all good")
         || n.contains("find out")
+}
+
+/// Short presence / “who are you” asks (digester: multi-second direct, zero tools).
+fn is_presence_or_who_ask(n: &str) -> bool {
+    if n.chars().count() > 64 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("redmine")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("search")
+        || n.contains("weather")
+        || n.contains("ticket")
+    {
+        return false;
+    }
+    matches!(
+        n,
+        "who are you"
+            | "who r you"
+            | "who're you"
+            | "what are you"
+            | "are you there"
+            | "are you online"
+            | "you there"
+            | "you online"
+            | "still there"
+            | "still online"
+            | "are you up"
+            | "you up"
+    ) || (n.starts_with("who are you") && n.chars().count() <= 40)
+        || (n.starts_with("are you there") && n.chars().count() <= 40)
+        || (n.starts_with("are you online") && n.chars().count() <= 40)
+}
+
+fn format_instant_presence_reply() -> String {
+    format!(
+        "I'm **Werner** on **mac-stats v{}** — online and ready.",
+        crate::config::Config::version()
+    )
 }
 
 /// Short role/identity statements without a question (digester: multi-second direct, zero tools).
@@ -503,6 +547,29 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "identity-adjacent asks must not be instant"
+        );
+    }
+
+    #[test]
+    fn presence_and_who_asks_are_instant() {
+        for q in [
+            "Who are you?",
+            "are you there?",
+            "Are you online?",
+            "still there",
+            "you up?",
+        ] {
+            assert!(
+                matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),
+                "expected Instant for {q:?}"
+            );
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane("Who are you working with on Redmine ticket 12?", None),
+                TurnLane::Instant { .. }
+            ),
+            "substantive who-asks must not be instant"
         );
     }
 

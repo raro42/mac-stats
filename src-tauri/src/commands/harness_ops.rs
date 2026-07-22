@@ -1057,6 +1057,30 @@ fn classify_candidate(
             request_id: request_id.into(),
         });
     }
+    let looks_presence = matches!(
+        q.trim_end_matches(['?', '!', '.']).trim(),
+        "who are you"
+            | "who r you"
+            | "what are you"
+            | "are you there"
+            | "are you online"
+            | "you there"
+            | "you online"
+            | "still there"
+            | "still online"
+            | "are you up"
+            | "you up"
+    );
+    if looks_presence && lane != "instant" && wall_ms >= 500 {
+        return Some(RunInsightCandidate {
+            kind: "promote_instant".into(),
+            reason: "Presence/who-are-you ask should stay on instant lane".into(),
+            wall_ms,
+            lane: lane.into(),
+            question_preview: question.chars().take(80).collect(),
+            request_id: request_id.into(),
+        });
+    }
     let looks_time = (q.contains("what time") || q.contains("what's the time") || q == "time")
         && !q.contains("timezone");
     let looks_greeting = matches!(
