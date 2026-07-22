@@ -950,6 +950,37 @@ body {
   opacity: 0.9 !important;
 }
 
+.icon-line-item.status-bad {
+  color: rgba(255, 59, 48, 0.9); /* Red when any monitor is down */
+}
+
+.icon-line-item.status-bad:hover {
+  color: rgba(255, 59, 48, 1);
+  background: rgba(255, 59, 48, 0.1);
+}
+
+.icon-line-item.status-bad img {
+  filter: brightness(0) saturate(100%) invert(32%) sepia(98%) saturate(2840%) hue-rotate(346deg) brightness(98%) contrast(105%);
+  opacity: 1;
+}
+
+.icon-line-item.status-bad:hover img {
+  filter: brightness(0) saturate(100%) invert(32%) sepia(98%) saturate(2840%) hue-rotate(346deg) brightness(105%) contrast(110%);
+  opacity: 1;
+}
+
+.icon-line-item.status-bad svg {
+  filter: brightness(0) saturate(100%) invert(32%) sepia(98%) saturate(2840%) hue-rotate(346deg) brightness(98%) contrast(105%);
+  opacity: 1;
+  color: rgba(255, 59, 48, 0.9);
+}
+
+.icon-line-item.status-bad:hover svg {
+  filter: brightness(0) saturate(100%) invert(32%) sepia(98%) saturate(2840%) hue-rotate(346deg) brightness(105%) contrast(110%);
+  opacity: 1;
+}
+
+
 .icon-placeholder {
   width: 20px;
   height: 20px;
@@ -1414,6 +1445,15 @@ body {
   transform: translateY(-50%);
   pointer-events: none;
 }
+
+.monitors-status-dot.down {
+  background: #ff3b30;
+}
+
+.monitors-status-dot.ok {
+  background: #34c759;
+}
+
 
 .monitors-header-actions {
   display: flex;

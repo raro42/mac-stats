@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.216] - 2026-07-22
+
+### Added
+- Feature screenshots (CPU metrics, Agent Ops, AI chat, processes) and a **~49s live window-only demo video** (`screens/mac-stats-features.mp4`) linked from the README and landing page.
+
+### Fixed
+- When any website monitor is down, the monitors icon turns **red** (`status-bad`) and the menu bar shows a red **Mon ✕** cue.
+
+### Changed
+- README / screens gallery refreshed; GitHub link uses `https://github.com/raro42/mac-stats/`.
+
 ## [0.1.205] - 2026-07-22
 
 Overnight harness + Agent Ops / native-tool / hygiene push since **0.1.176** (versions **0.1.177–0.1.205**). GitHub binary release catches up from **v0.1.88**.

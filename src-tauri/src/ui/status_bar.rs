@@ -121,14 +121,19 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
         length,
     };
 
-    let label_len = text.split('\n').next().unwrap_or("").encode_utf16().count();
-    let value_len = text.split('\n').nth(1).unwrap_or("").encode_utf16().count();
+    let lines: Vec<&str> = text.split('\n').collect();
+    let label_len = lines.first().map(|s| s.encode_utf16().count()).unwrap_or(0);
+    let value_len = lines.get(1).map(|s| s.encode_utf16().count()).unwrap_or(0);
     let label_range = NSRange {
         location: 0,
         length: label_len,
     };
     let value_range = NSRange {
-        location: label_len + 1,
+        location: if label_len > 0 && lines.len() > 1 {
+            label_len + 1
+        } else {
+            0
+        },
         length: value_len,
     };
 
@@ -138,6 +143,7 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
     // Use controlTextColor for menu bar - this works better than labelColor in status bar context
     // labelColor can sometimes turn black in menu bar, so use controlTextColor which adapts properly
     let color = NSColor::controlTextColor();
+    let alert_color = NSColor::systemRedColor();
     let paragraph = NSMutableParagraphStyle::new();
     paragraph.setLineSpacing(-2.0);
     paragraph.setLineHeightMultiple(0.75);
@@ -170,8 +176,12 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
     let baseline_offset = NSNumber::new_f64(-4.8);
 
     unsafe {
-        attributed.addAttribute_value_range(NSFontAttributeName, as_any(&*label_font), label_range);
-        attributed.addAttribute_value_range(NSFontAttributeName, as_any(&*value_font), value_range);
+        if label_len > 0 {
+            attributed.addAttribute_value_range(NSFontAttributeName, as_any(&*label_font), label_range);
+        }
+        if value_len > 0 {
+            attributed.addAttribute_value_range(NSFontAttributeName, as_any(&*value_font), value_range);
+        }
         attributed.addAttribute_value_range(
             NSForegroundColorAttributeName,
             as_any(&*color),
@@ -187,6 +197,35 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
             as_any(&*baseline_offset),
             full_range,
         );
+
+        // Color monitor-down alert line(s) red (e.g. "Mon ✕")
+        let mut utf16_pos: usize = 0;
+        for (i, line) in lines.iter().enumerate() {
+            let line_utf16 = line.encode_utf16().count();
+            let is_mon_alert = line.starts_with("Mon ") && line.contains('✕');
+            if is_mon_alert && line_utf16 > 0 {
+                let alert_font =
+                    NSFont::monospacedSystemFontOfSize_weight(10.0, NSFontWeightSemibold);
+                let range = NSRange {
+                    location: utf16_pos,
+                    length: line_utf16,
+                };
+                attributed.addAttribute_value_range(
+                    NSForegroundColorAttributeName,
+                    as_any(&*alert_color),
+                    range,
+                );
+                attributed.addAttribute_value_range(
+                    NSFontAttributeName,
+                    as_any(&*alert_font),
+                    range,
+                );
+            }
+            utf16_pos += line_utf16;
+            if i + 1 < lines.len() {
+                utf16_pos += 1; // newline
+            }
+        }
     }
 
     attributed

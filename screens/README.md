@@ -1,6 +1,8 @@
 # Screenshots & themes
 
-Screenshots for mac-stats: themes and feature highlights.
+Screenshots and a short demo reel for [mac-stats](https://github.com/raro42/mac-stats/).
+
+**Privacy:** Capture the **mac-stats window only** (or a dedicated feature page). Never full-desktop grabs — they can include other apps and sensitive content.
 
 ## Theme gallery
 
@@ -14,6 +16,28 @@ Screenshots for mac-stats: themes and feature highlights.
 
 ## Feature screenshots
 
-*(Add feature screens here when available, e.g. AI chat, Discord, process list.)*
+| CPU metrics | Agent Ops |
+|-------------|-----------|
+| <img src="feature-cpu-metrics.png" alt="CPU metrics" width="280"> | <img src="feature-agent-ops.png" alt="Agent Ops" width="280"> |
+| **AI chat (Ollama)** | **Top processes** |
+| <img src="feature-ai-chat.png" alt="AI chat" width="280"> | <img src="feature-processes.png" alt="Processes" width="280"> |
 
-To capture new screenshots: run the app, open the CPU window, then use `./scripts/take-screenshot.sh` from the repo root.
+### Short demo video
+
+[mac-stats-features.mp4](mac-stats-features.mp4) — ~49s **live** window-only capture of the running app:
+
+- ScreenCaptureKit recording of the CPU window (not a slideshow of stills)
+- Walkthrough: live metrics → website monitors → Agent Ops → Ollama chat → back to metrics
+- Letterboxed to 1920×1080; neural voiceover + ambient bed
+- Repo: [github.com/raro42/mac-stats](https://github.com/raro42/mac-stats/)
+
+Also linked from the [project README](../README.md#demo-video).
+
+## How to capture (window-only)
+
+1. Open the CPU window: `mac_stats --cpu` (or click the menu bar item).
+2. **Wait at least 30 seconds** with the window open before capturing so the history graphs (temperature / usage / frequency sparklines) have enough samples and look filled-in. Do not shoot on a cold open.
+3. Prefer **window capture**, not display capture:
+   - ScreenCaptureKit / `screencapture -l <windowid>` for the mac-stats window only
+   - Do **not** use `screencapture -D` (full display) for marketing assets
+4. Optional helper for ad-hoc local shots: `./scripts/take-screenshot.sh` (full screen — avoid for repo assets).

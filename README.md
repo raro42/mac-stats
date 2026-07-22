@@ -67,14 +67,29 @@ Details: [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
 ## Screenshots
 
+### Themes
+
 <p>
-  <img src="screens/apple.png" alt="Menu bar / Apple theme" width="280">
+  <img src="screens/apple.png" alt="Apple theme" width="280">
   <img src="screens/data-poster.png" alt="Data Poster theme" width="280">
-  <img src="screens/feature-ollama-integration.png" alt="AI chat (optional)" width="280">
+  <img src="screens/neon.png" alt="Neon theme" width="280">
 </p>
 
-More: [screens/README.md](screens/README.md).  
-**Video:** a 60s walkthrough will live on the [landing page](docs/site/index.html) / Releases when published (placeholder for now).
+### Features
+
+<p>
+  <img src="screens/feature-cpu-metrics.png" alt="CPU metrics" width="280">
+  <img src="screens/feature-agent-ops.png" alt="Agent Ops" width="280">
+  <img src="screens/feature-ai-chat.png" alt="AI chat (Ollama)" width="280">
+  <img src="screens/feature-processes.png" alt="Top processes" width="280">
+</p>
+
+### Demo video
+
+[~49s live window capture](screens/mac-stats-features.mp4) — real `mac_stats --cpu` session (ScreenCaptureKit, window-only): live gauges, monitors (including a red down site), Agent Ops, Ollama chat. Letterboxed to 1080p with light voiceover.
+
+Full theme gallery and capture notes: [screens/README.md](screens/README.md).  
+Repo: [github.com/raro42/mac-stats](https://github.com/raro42/mac-stats/)
 
 ---
 
@@ -126,7 +141,7 @@ In-app banner checks GitHub Releases. Or: `brew upgrade --cask mac-stats`.
 ### Menu bar & glass UI
 
 - Compact menu bar by default (**CPU** + °C when known); set `menuBarCompact: false` for CPU/GPU/RAM/SSD.
-- Nine themes, process list, website monitors.
+- Nine themes, process list, website monitors (menu bar shows a red **Mon ✕** cue when any site is down).
 - ~0.5% idle CPU (menu bar only).
 
 ### Local AI agent (opt-in)
@@ -153,11 +168,11 @@ In-app banner checks GitHub Releases. Or: `brew upgrade --cask mac-stats`.
 ```bash
 git clone https://github.com/raro42/mac-stats.git
 cd mac-stats
-git checkout v0.1.205   # pin when possible
+git checkout v0.1.216   # pin when possible
 ./run
 ```
 
-Requires Rust + Xcode CLT (macOS Tauri). Checksums: `./scripts/print-release-checksums.sh v0.1.205`.
+Requires Rust + Xcode CLT (macOS Tauri). Checksums: `./scripts/print-release-checksums.sh v0.1.216`.
 
 Contributor docs: [docs/design/](docs/design/). Workflow: [docs/agent_workflow.md](docs/agent_workflow.md).
 

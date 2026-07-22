@@ -672,6 +672,13 @@ fn run_internal(open_cpu_window: bool) {
                     {
                         text.push_str("\nOllama ✕");
                     }
+                    // Red monitor cue in the menu bar when any website/social check is down.
+                    let any_monitor_down = commands::monitors::get_monitor_statuses_snapshot()
+                        .iter()
+                        .any(|(_, st)| !st.is_up);
+                    if any_monitor_down {
+                        text.push_str("\nMon ✕");
+                    }
 
                     // Store update in static variable
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {

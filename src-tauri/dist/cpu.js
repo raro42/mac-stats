@@ -1998,11 +1998,13 @@ async function updateMonitorsSummary() {
     
     if (monitorIds.length === 0) {
       summaryText.textContent = 'No monitors configured';
-      updateMonitorsIconStatus(false, 0, 0); // No monitors = not all up
+      updateMonitorsIconStatus({ anyDown: false, allUp: false, upCount: 0, totalCount: 0 });
       return;
     }
 
     let upCount = 0;
+    let downCount = 0;
+    let checkedCount = 0;
     let totalResponseTime = 0;
     let responseTimeCount = 0;
 
@@ -2013,7 +2015,9 @@ async function updateMonitorsSummary() {
         const status = await invoke('get_monitor_status', { monitorId });
         if (!status) continue;
         monitorStatusCache.set(monitorId, status);
+        checkedCount++;
         if (status.is_up) upCount++;
+        else downCount++;
         if (status.response_time_ms) {
           totalResponseTime += status.response_time_ms;
           responseTimeCount++;
@@ -2030,12 +2034,14 @@ async function updateMonitorsSummary() {
     summaryText.textContent = 
       `${upCount} / ${monitorIds.length} sites up · Avg ${avgResponseTime} ms`;
     
-    // Update icon status: green if all monitors are up
-    const allUp = upCount === monitorIds.length && monitorIds.length > 0;
-    updateMonitorsIconStatus(allUp, upCount, monitorIds.length);
+    // Green only when every configured monitor has checked in and is up.
+    // Red as soon as any checked monitor is down (pending checks stay neutral).
+    const anyDown = downCount > 0;
+    const allUp = checkedCount > 0 && downCount === 0 && checkedCount === monitorIds.length;
+    updateMonitorsIconStatus({ anyDown, allUp, upCount, totalCount: monitorIds.length });
   } catch (err) {
     console.error('Failed to update monitors summary:', err);
-    updateMonitorsIconStatus(false, 0, 0);
+    updateMonitorsIconStatus({ anyDown: false, allUp: false, upCount: 0, totalCount: 0 });
   }
 }
 
@@ -2115,20 +2121,25 @@ async function loadMonitors() {
     });
     
     // Update icon status based on all monitors
-    // Count how many are up
     let upCount = 0;
+    let downCount = 0;
+    let checkedCount = 0;
     for (const monitorId of monitorIds) {
       const status = monitorStatusCache.get(monitorId);
-      if (status && status.is_up) upCount++;
+      if (!status) continue;
+      checkedCount++;
+      if (status.is_up) upCount++;
+      else downCount++;
     }
-    const allUp = upCount === monitorIds.length && monitorIds.length > 0;
-    updateMonitorsIconStatus(allUp, upCount, monitorIds.length);
+    const anyDown = downCount > 0;
+    const allUp = checkedCount > 0 && downCount === 0 && checkedCount === monitorIds.length;
+    updateMonitorsIconStatus({ anyDown, allUp, upCount, totalCount: monitorIds.length });
     
     // Update height after loading monitors
     updateMonitorsHeight();
   } catch (err) {
     console.error('Failed to load monitors:', err);
-    updateMonitorsIconStatus(false, 0, 0);
+    updateMonitorsIconStatus({ anyDown: false, allUp: false, upCount: 0, totalCount: 0 });
   }
 }
 
@@ -2308,22 +2319,29 @@ function updateMonitorsStatusDot() {
   }
 }
 
-function updateMonitorsIconStatus(allUp, upCount, totalCount) {
+function updateMonitorsIconStatus({ anyDown = false, allUp = false, upCount = 0, totalCount = 0 } = {}) {
   const monitorsIcon = document.getElementById('icon-monitors');
-  if (!monitorsIcon) return;
-  
-  if (allUp && totalCount > 0) {
-    // All monitors are up - make icon green
-    monitorsIcon.classList.add('status-good');
-    monitorsIcon.classList.remove('status-bad');
-  } else if (totalCount > 0) {
-    // Some monitors are down - keep default/grey color
-    monitorsIcon.classList.remove('status-good');
-    monitorsIcon.classList.remove('status-bad');
-  } else {
-    // No monitors configured - keep default/grey color
-    monitorsIcon.classList.remove('status-good');
-    monitorsIcon.classList.remove('status-bad');
+  if (monitorsIcon) {
+    monitorsIcon.classList.remove('status-good', 'status-bad');
+    if (anyDown) {
+      // At least one monitor is down — red icon
+      monitorsIcon.classList.add('status-bad');
+      monitorsIcon.title = `Monitors: ${upCount}/${totalCount} up — one or more down`;
+    } else if (allUp && totalCount > 0) {
+      monitorsIcon.classList.add('status-good');
+      monitorsIcon.title = `Monitors: all ${totalCount} up`;
+    } else if (totalCount > 0) {
+      monitorsIcon.title = `Monitors: ${upCount}/${totalCount} up (checking…)`;
+    } else {
+      monitorsIcon.title = 'Monitors';
+    }
+  }
+
+  // Collapsed-section status dot matches icon color
+  const statusDot = document.querySelector('.monitors-status-dot');
+  if (statusDot) {
+    statusDot.classList.toggle('down', !!anyDown);
+    statusDot.classList.toggle('ok', !!(allUp && totalCount > 0 && !anyDown));
   }
 }
 
@@ -3725,3 +3743,5 @@ window.addEventListener('beforeunload', () => {
   }
   console.log('Cleaned up animation state on window close');
 });
+
+
