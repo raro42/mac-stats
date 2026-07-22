@@ -1070,6 +1070,13 @@ fn classify_candidate(
             | "still online"
             | "are you up"
             | "you up"
+            | "how are you"
+            | "how're you"
+            | "how's it going"
+            | "hows it going"
+            | "how are things"
+            | "whats up"
+            | "what's up"
     );
     if looks_presence && lane != "instant" && wall_ms >= 500 {
         return Some(RunInsightCandidate {

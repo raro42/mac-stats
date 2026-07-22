@@ -255,14 +255,23 @@ fn is_presence_or_who_ask(n: &str) -> bool {
             | "still online"
             | "are you up"
             | "you up"
+            | "how are you"
+            | "how're you"
+            | "how r you"
+            | "how's it going"
+            | "hows it going"
+            | "how are things"
+            | "whats up"
+            | "what's up"
     ) || (n.starts_with("who are you") && n.chars().count() <= 40)
         || (n.starts_with("are you there") && n.chars().count() <= 40)
         || (n.starts_with("are you online") && n.chars().count() <= 40)
+        || (n.starts_with("how are you") && n.chars().count() <= 48)
 }
 
 fn format_instant_presence_reply() -> String {
     format!(
-        "I'm **Werner** on **mac-stats v{}** — online and ready.",
+        "I'm **Werner** on **mac-stats v{}** — online and ready. How can I help?",
         crate::config::Config::version()
     )
 }
@@ -558,6 +567,9 @@ commit+push, then reply briefly.";
             "Are you online?",
             "still there",
             "you up?",
+            "How are you?",
+            "how's it going?",
+            "what's up?",
         ] {
             assert!(
                 matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),
