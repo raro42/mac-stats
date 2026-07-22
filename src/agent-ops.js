@@ -836,7 +836,12 @@ function renderOpsAgents(agents) {
         btn.className = 'ops-row';
         const slug = a.slug || a.id;
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(a.name)} <span class="ops-row-meta">· ${escapeHtml(slug)}</span></div><div class="ops-row-meta">${escapeHtml(a.model || 'default model')}${a.orchestrator ? ' · orchestrator' : ''}</div></div><span class="ops-badge ${a.enabled ? '' : 'off'}">${a.enabled ? 'on' : 'off'}</span>`;
-        btn.addEventListener('click', () => openOpsAgent(a.id));
+        btn.addEventListener('click', () => {
+            list.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            btn.classList.add('is-selected');
+            openOpsAgent(a.id);
+        });
+        btn.title = 'Open agent soul / skill / mood';
         list.appendChild(btn);
     });
     prependOpsFilterCaption(list, all.length, filtered.length, opsAgentsFilterQ);

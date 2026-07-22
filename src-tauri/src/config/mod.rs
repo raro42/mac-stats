@@ -3449,7 +3449,7 @@ impl Config {
             let _ = std::fs::create_dir_all(parent);
         }
         if !path.exists() {
-            let _ = std::fs::write(path, default);
+            let _ = crate::config::write_text_atomic(path, default);
             return;
         }
         let existing = match std::fs::read_to_string(path) {
@@ -3458,16 +3458,13 @@ impl Config {
         };
         let merged = Self::merge_prompt_content(&existing, default);
         if merged != existing.trim() {
-            let _ = std::fs::write(path, merged);
+            let _ = crate::config::write_text_atomic(path, &merged);
         }
     }
 
     /// Write content to path (overwrite). Used to sync skill.md and testing.md from bundled defaults into ~/.mac-stats/agents/.
     fn write_agent_file(path: &std::path::Path, content: &str) {
-        if let Some(parent) = path.parent() {
-            let _ = std::fs::create_dir_all(parent);
-        }
-        let _ = std::fs::write(path, content);
+        let _ = crate::config::write_text_atomic(path, content);
     }
 
     /// Ensure all default files exist under ~/.mac-stats/. Shared soul.md is written if missing.
@@ -3618,7 +3615,10 @@ impl Config {
 
         // Also reset shared soul.md when resetting all agents
         if agent_id_filter.is_none() {
-            let _ = std::fs::write(agents_dir.join("soul.md"), Self::DEFAULT_SOUL);
+            let _ = crate::config::write_text_atomic(
+                &agents_dir.join("soul.md"),
+                Self::DEFAULT_SOUL,
+            );
         }
 
         reset
@@ -3741,7 +3741,7 @@ impl Config {
             Ok(s) => {
                 let trimmed = s.trim().to_string();
                 if trimmed.is_empty() {
-                    let _ = std::fs::write(path, default);
+                    let _ = crate::config::write_text_atomic(path, default);
                     default.trim().to_string()
                 } else {
                     trimmed
