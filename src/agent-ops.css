@@ -114,6 +114,16 @@
   min-height: 58px;
 }
 
+.ops-health-card.ops-health-clickable {
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.ops-health-card.ops-health-clickable:hover {
+  border-color: color-mix(in srgb, currentColor 28%, transparent);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
 .ops-health-card.ops-health-ok {
   border-color: rgba(76, 175, 80, 0.45);
 }

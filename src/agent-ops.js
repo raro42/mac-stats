@@ -440,6 +440,7 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
             sessionN >= 40 ? `${sessionN}+ session files` : `${sessionN} session file${sessionN === 1 ? '' : 's'}`;
         agentsHint.title = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${sessLabel}`;
     }
+    wireOpsHealthCardNavigation();
 
     const dg = insights?.discord_gateway || '';
     const readyMatch = dg.match(/last Ready\s+([^·]+)/i);
@@ -558,16 +559,33 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
             card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
             if (openN > 0) card.classList.add('ops-health-warn');
             else if (insights) card.classList.add('ops-health-ok');
-            card.style.cursor = 'pointer';
-            if (card.dataset.opsDigestClick !== '1') {
-                card.dataset.opsDigestClick = '1';
-                card.addEventListener('click', () => {
-                    if (agentOpsCollapsed) applyOpsCollapsed(false);
-                    selectOpsTab('runs');
-                });
-            }
         }
     }
+}
+
+/** Click health cards to jump to the related Agent Ops tab (once). */
+function wireOpsHealthCardNavigation() {
+    const row = document.getElementById('ops-health-row');
+    if (!row || row.dataset.opsHealthNav === '1') return;
+    row.dataset.opsHealthNav = '1';
+    const tabByHealth = {
+        version: 'agents',
+        discord: 'runs',
+        redmine: 'agents',
+        schedule: 'schedules',
+        delivery: 'schedules',
+        digest: 'runs',
+    };
+    row.querySelectorAll('.ops-health-card[data-health]').forEach((card) => {
+        const tab = tabByHealth[card.dataset.health];
+        if (!tab) return;
+        card.classList.add('ops-health-clickable');
+        card.title = card.title || `Open ${tab}`;
+        card.addEventListener('click', () => {
+            if (agentOpsCollapsed) applyOpsCollapsed(false);
+            selectOpsTab(tab);
+        });
+    });
 }
 
 function renderOverviewSchedules(schedules, deliveries) {

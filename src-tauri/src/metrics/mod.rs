@@ -1312,12 +1312,11 @@ pub fn set_window_decorations(decorations: bool) -> Result<(), String> {
         return Err(e);
     }
 
-    if let Err(e) = std::fs::write(
+    crate::config::write_text_atomic(
         &config_path,
-        serde_json::to_string_pretty(&after).unwrap_or_else(|_| after.to_string()),
-    ) {
-        return Err(format!("Failed to write config file: {}", e));
-    }
+        &serde_json::to_string_pretty(&after).unwrap_or_else(|_| after.to_string()),
+    )
+    .map_err(|e| format!("Failed to write config file: {}", e))?;
 
     crate::debug3!(
         "Window decorations preference set to: {} (saved to config file, merged with existing JSON)",
