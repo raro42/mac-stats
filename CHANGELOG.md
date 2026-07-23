@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.229] - 2026-07-23
+
+### Changed
+- Memory pollution scrub writes use atomic temp+fsync+rename (safer `memory.md` rewrites).
+
 ## [0.1.228] - 2026-07-23
 
 ### Changed

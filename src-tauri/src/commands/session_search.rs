@@ -431,7 +431,14 @@ pub fn scrub_polluted_memory_files() -> (usize, usize) {
         files += 1;
         removed += before.len() - after.len();
         let body: String = after.iter().map(|e| format!("- {}\n", e)).collect();
-        let _ = fs::write(&path, body);
+        if let Err(e) = crate::config::write_text_atomic(&path, &body) {
+            tracing::warn!(
+                target: "mac_stats::memory",
+                "memory scrub write failed for {}: {}",
+                path.display(),
+                e
+            );
+        }
     }
     (files, removed)
 }
