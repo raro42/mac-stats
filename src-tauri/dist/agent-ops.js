@@ -643,7 +643,13 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         }
         let p50 = '';
         const p50Ms = Number(insights.p50_ms);
-        if (insights.turns > 0 && Number.isFinite(p50Ms) && p50Ms >= 0) {
+        const latSample = Number(insights.latency_sample);
+        const hasLatency =
+            insights.turns > 0
+            && Number.isFinite(p50Ms)
+            && p50Ms > 0
+            && (Number.isNaN(latSample) || latSample > 0);
+        if (hasLatency) {
             p50 =
                 p50Ms >= 1000
                     ? ` · p50 ${(p50Ms / 1000).toFixed(1)}s`
@@ -661,10 +667,18 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         const hints = insights?.digest_open_hints || [];
         const latBits = [];
         if (insights?.turns > 0) {
-            if (insights.p50_ms != null) latBits.push(`p50 ${insights.p50_ms} ms`);
-            if (insights.mean_ms != null) latBits.push(`mean ${insights.mean_ms} ms`);
-            if (insights.max_ms != null) latBits.push(`max ${insights.max_ms} ms`);
-            latBits.push(`${insights.turns} turns`);
+            if (Number(insights.latency_sample) > 0 || (insights.p50_ms > 0 && insights.latency_sample == null)) {
+                if (insights.p50_ms != null) latBits.push(`p50 ${insights.p50_ms} ms`);
+                if (insights.mean_ms != null) latBits.push(`mean ${insights.mean_ms} ms`);
+                if (insights.max_ms != null) latBits.push(`max ${insights.max_ms} ms`);
+            } else {
+                latBits.push('p50 n/a (noise filtered)');
+            }
+            if (insights.latency_sample != null) {
+                latBits.push(`latency ${insights.latency_sample}/${insights.turns}`);
+            } else {
+                latBits.push(`${insights.turns} turns`);
+            }
             const lanes = (insights.by_lane || [])
                 .map((pair) => (Array.isArray(pair) ? `${pair[0]}:${pair[1]}` : String(pair)))
                 .join(' · ');

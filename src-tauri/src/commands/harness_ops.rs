@@ -78,6 +78,8 @@ pub struct RunsInsights {
     pub p50_ms: u64,
     pub mean_ms: u64,
     pub max_ms: u64,
+    /// Turns included in p50/mean/max/slowest after shipped-instant noise filters.
+    pub latency_sample: usize,
     pub by_lane: Vec<(String, usize)>,
     pub by_tool: Vec<(String, usize)>,
     pub candidates: Vec<RunInsightCandidate>,
@@ -348,6 +350,7 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         p50_ms: 0,
         mean_ms: 0,
         max_ms: 0,
+        latency_sample: 0,
         by_lane: vec![],
         by_tool: vec![],
         candidates: vec![],
@@ -371,6 +374,8 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
     };
     let mut recent = Vec::new();
     let mut walls: Vec<u64> = Vec::new();
+    let mut latency_walls: Vec<u64> = Vec::new();
+    let mut slowest_pool: Vec<RunTurnSummary> = Vec::new();
     let mut ok_count = 0usize;
     let mut fail_count = 0usize;
     let mut lane_counts: std::collections::BTreeMap<String, usize> =
@@ -438,29 +443,36 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         if let Some(c) = classify_candidate(&lane, wall, &tools, &question_preview, &request_id) {
             candidates.push(c);
         }
-        recent.push(RunTurnSummary {
+        let summary = RunTurnSummary {
             ts: v
                 .get("ts")
                 .and_then(|x| x.as_str())
                 .unwrap_or("")
                 .to_string(),
-            lane,
+            lane: lane.clone(),
             wall_ms: wall,
-            tools,
-            question_preview,
+            tools: tools.clone(),
+            question_preview: question_preview.clone(),
             ok,
             request_id,
-        });
+        };
+        // Digester Slowest parity: exclude shipped instant noise from latency + Slowest.
+        if !is_insights_slowest_noise(&lane, wall, &tools, &question_preview) {
+            latency_walls.push(wall);
+            slowest_pool.push(summary.clone());
+        }
+        recent.push(summary);
     }
 
     let turns = walls.len();
-    let max_ms = walls.iter().copied().max().unwrap_or(0);
-    let mean_ms = if turns == 0 {
+    let latency_sample = latency_walls.len();
+    let max_ms = latency_walls.iter().copied().max().unwrap_or(0);
+    let mean_ms = if latency_sample == 0 {
         0
     } else {
-        walls.iter().sum::<u64>() / turns as u64
+        latency_walls.iter().sum::<u64>() / latency_sample as u64
     };
-    let mut sorted = walls.clone();
+    let mut sorted = latency_walls;
     sorted.sort_unstable();
     let p50_ms = if sorted.is_empty() {
         0
@@ -468,7 +480,7 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         sorted[sorted.len() / 2]
     };
 
-    let mut slowest = recent.clone();
+    let mut slowest = slowest_pool;
     slowest.sort_by(|a, b| b.wall_ms.cmp(&a.wall_ms));
     slowest.truncate(5);
 
@@ -491,6 +503,7 @@ pub fn compute_runs_insights_for(limit: u32, days: Option<u32>) -> RunsInsights 
         p50_ms,
         mean_ms,
         max_ms,
+        latency_sample,
         by_lane,
         by_tool,
         candidates,
@@ -1106,6 +1119,115 @@ pub fn format_ops_help_gateway() -> String {
     )
 }
 
+/// Digester Slowest parity: exclude shipped instant noise from insights p50/slowest.
+fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], question: &str) -> bool {
+    if lane == "instant" && wall_ms < 2_000 {
+        return true;
+    }
+    let q = question.to_lowercase();
+    let has_search_tool = tools.iter().any(|t| {
+        let u = t.to_uppercase();
+        u.contains("BRAVE") || u.contains("PERPLEXITY")
+    });
+    // Pre-Open-Meteo weather that burned Brave/Perplexity.
+    if (q.contains("weather") || q.contains("wether")) && has_search_tool {
+        return true;
+    }
+    if !tools.is_empty() {
+        return false;
+    }
+    // Zero-tool patterns now covered by instant lanes.
+    if !q.contains('?')
+        && (matches!(
+            q.trim(),
+            "ok" | "okay"
+                | "k"
+                | "kk"
+                | "cool"
+                | "nice"
+                | "nice one"
+                | "nice answer"
+                | "got it"
+                | "all good"
+                | "np"
+                | "no worries"
+                | "bye"
+                | "goodbye"
+                | "cya"
+                | "see you"
+                | "later"
+                | "perfect"
+                | "great"
+                | "awesome"
+                | "neat"
+                | "sweet"
+                | "alright"
+                | "sounds good"
+                | "fair enough"
+                | "👍"
+                | "👌"
+        ) || ((q.starts_with("ok")
+            || q.starts_with("okay")
+            || q.starts_with("cool")
+            || q.starts_with("nice")
+            || q.starts_with("got it")
+            || q.starts_with("alright")
+            || q.starts_with("no worries")
+            || q.starts_with("sounds good"))
+            && (q.chars().count() <= 48
+                || q.contains("no worries")
+                || q.contains("bye")
+                || q.contains("myself")
+                || q.contains("later")
+                || q.contains("all good")
+                || q.contains("find out"))))
+    {
+        return true;
+    }
+    if (q.starts_with("you are ") || q.starts_with("you're ") || q.starts_with("youre "))
+        && !q.contains('?')
+        && q.chars().count() <= 180
+        && (q.contains("working for")
+            || q.contains("online")
+            || q.contains("assistant")
+            || q.contains(" agent")
+            || q.contains("bot")
+            || q.contains("on various channel"))
+    {
+        return true;
+    }
+    if q.contains("wake-up")
+        || q.contains("wakeup")
+        || q.contains("wake up")
+        || ((q.contains("improvement") || q.contains("what shipped") || q.contains("last night"))
+            && (q.contains("overnight") || q.contains("coding") || q.contains("session")))
+    {
+        return true;
+    }
+    if q.contains("version")
+        && (q.contains("you") || q.contains("app") || q.contains("mac-stats") || q.starts_with("what"))
+    {
+        return true;
+    }
+    if (q.contains("discord") || q.contains("amvara"))
+        && (q.contains("talking")
+            || q.contains("channel")
+            || q.contains("other agent")
+            || q.contains("ok talking")
+            || q.contains("cross check"))
+    {
+        return true;
+    }
+    if q.contains("redmine")
+        && (q.contains("talk to") || q.contains("chat with") || q.contains("message "))
+        && !q.contains("ticket")
+        && !q.contains("issue")
+    {
+        return true;
+    }
+    false
+}
+
 fn classify_candidate(
     lane: &str,
     wall_ms: u64,
@@ -1381,13 +1503,33 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
         };
         lines.push(title);
         lines.push(format!(
-            "Turns: **{}** · ok {} · fail {} · p50 **{}** ms · mean {} · max {}",
+            "Turns: **{}** · ok {} · fail {} · p50 **{}** · mean {} · max {}{}",
             insights.turns,
             insights.ok_count,
             insights.fail_count,
-            insights.p50_ms,
-            insights.mean_ms,
-            insights.max_ms
+            if insights.latency_sample == 0 {
+                "n/a".into()
+            } else {
+                format!("{} ms", insights.p50_ms)
+            },
+            if insights.latency_sample == 0 {
+                "n/a".into()
+            } else {
+                format!("{}", insights.mean_ms)
+            },
+            if insights.latency_sample == 0 {
+                "n/a".into()
+            } else {
+                format!("{}", insights.max_ms)
+            },
+            if insights.latency_sample > 0 && insights.latency_sample < insights.turns {
+                format!(
+                    " · latency sample {}/{}",
+                    insights.latency_sample, insights.turns
+                )
+            } else {
+                String::new()
+            }
         ));
     }
     lines.push(crate::discord::format_discord_gateway_insights_line());
@@ -1559,6 +1701,29 @@ mod tests {
     }
 
     #[test]
+    fn insights_slowest_noise_filters_shipped_patterns() {
+        assert!(is_insights_slowest_noise("instant", 400, &[], "ok"));
+        assert!(is_insights_slowest_noise(
+            "direct",
+            17_000,
+            &["BRAVE_SEARCH".into()],
+            "What´s the wether like in El Masnou right now?"
+        ));
+        assert!(is_insights_slowest_noise(
+            "direct",
+            16_000,
+            &[],
+            "Please cross check if you are ok talking on amvara discord server"
+        ));
+        assert!(!is_insights_slowest_noise(
+            "direct",
+            12_000,
+            &["REDMINE_API".into()],
+            "Review and summarize Redmine ticket: 7736"
+        ));
+    }
+
+    #[test]
     fn insights_gateway_includes_digest_and_schedules() {
         let insights = RunsInsights {
             turns: 0,
@@ -1567,6 +1732,7 @@ mod tests {
             p50_ms: 0,
             mean_ms: 0,
             max_ms: 0,
+            latency_sample: 0,
             by_lane: vec![],
             by_tool: vec![],
             candidates: vec![],

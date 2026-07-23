@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.233] - 2026-07-23
+
+### Changed
+- `/insights` and Agent Ops p50/Slowest exclude shipped instant noise (digester Slowest parity).
+- Agent Ops hides `p50 0ms` when the latency sample is empty after filters.
+
 ## [0.1.232] - 2026-07-23
 
 ### Changed
