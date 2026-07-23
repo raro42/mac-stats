@@ -35,8 +35,9 @@ mod browser;
 
 pub use protected_mutation::reject_if_protected_config_json_changed;
 
-/// Crash-safe text write (Hermes-style temp + fsync + rename). Shared by config, schedules, harness ops.
-pub(crate) fn write_text_atomic(path: &Path, text: &str) -> Result<(), String> {
+/// Crash-safe bytes write (Hermes-style unique temp + fsync + rename).
+/// Shared by text config, cookie jar, downloads-organizer state, and harness ops.
+pub(crate) fn write_bytes_atomic(path: &Path, data: &[u8]) -> Result<(), String> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
@@ -55,8 +56,7 @@ pub(crate) fn write_text_atomic(path: &Path, text: &str) -> Result<(), String> {
     ));
     let write_result = (|| -> Result<(), String> {
         let mut f = std::fs::File::create(&tmp).map_err(|e| e.to_string())?;
-        f.write_all(text.as_bytes())
-            .map_err(|e| e.to_string())?;
+        f.write_all(data).map_err(|e| e.to_string())?;
         f.sync_all().map_err(|e| e.to_string())?;
         drop(f);
         std::fs::rename(&tmp, path).map_err(|e| e.to_string())?;
@@ -66,6 +66,11 @@ pub(crate) fn write_text_atomic(path: &Path, text: &str) -> Result<(), String> {
         let _ = std::fs::remove_file(&tmp);
     }
     write_result
+}
+
+/// Crash-safe text write (Hermes-style temp + fsync + rename). Shared by config, schedules, harness ops.
+pub(crate) fn write_text_atomic(path: &Path, text: &str) -> Result<(), String> {
+    write_bytes_atomic(path, text.as_bytes())
 }
 
 /// Build one default-agent entry from an id. Add new agents by creating defaults/agents/agent-<id>/ and adding default_agent_entry!("<id>") to DEFAULT_AGENT_IDS.
@@ -2553,7 +2558,23 @@ fn parse_hhmm_local(raw: &str) -> Option<(u32, u32)> {
 
 #[cfg(test)]
 mod tests {
-    use super::{clamp_ollama_global_concurrency_n, Config};
+    use super::{clamp_ollama_global_concurrency_n, write_bytes_atomic, write_text_atomic, Config};
+
+    #[test]
+    fn write_bytes_atomic_roundtrip() {
+        let dir = std::env::temp_dir().join(format!(
+            "mac-stats-atomic-{}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("state.bin");
+        write_bytes_atomic(&path, b"alpha").expect("write");
+        assert_eq!(std::fs::read(&path).unwrap(), b"alpha");
+        write_text_atomic(&path, "beta").expect("overwrite");
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), "beta");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 
     #[test]
     fn paragraph_key_first_line() {

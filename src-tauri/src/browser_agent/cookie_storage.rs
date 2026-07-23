@@ -49,36 +49,8 @@ fn load_cookies_vec(path: &Path) -> Result<Vec<Cookie>, String> {
 }
 
 fn atomic_write(path: &Path, data: &[u8]) -> std::io::Result<()> {
-    if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
-    }
-    // Hermes-style: unique temp + fsync + rename (avoid torn browser_storage_state.json).
-    let name = path
-        .file_name()
-        .and_then(|n| n.to_str())
-        .unwrap_or("browser_storage_state.json");
-    let tmp = path.with_file_name(format!(
-        ".{}.{}.{}.tmp",
-        name,
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .map(|d| d.as_nanos())
-            .unwrap_or(0)
-    ));
-    let result = (|| -> std::io::Result<()> {
-        use std::io::Write;
-        let mut f = std::fs::File::create(&tmp)?;
-        f.write_all(data)?;
-        f.sync_all()?;
-        drop(f);
-        std::fs::rename(&tmp, path)?;
-        Ok(())
-    })();
-    if result.is_err() {
-        let _ = std::fs::remove_file(&tmp);
-    }
-    result
+    crate::config::write_bytes_atomic(path, data)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))
 }
 
 fn cookie_to_param(c: &Cookie) -> CookieParam {

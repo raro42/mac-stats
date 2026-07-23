@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.231] - 2026-07-23
+
+### Changed
+- Shared `write_bytes_atomic` for cookie jar and downloads-organizer saves (Hermes-style single helper).
+
 ## [0.1.230] - 2026-07-23
 
 ### Changed
