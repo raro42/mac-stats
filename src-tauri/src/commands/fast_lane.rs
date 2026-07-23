@@ -327,12 +327,67 @@ fn is_overnight_improvements_ask(n: &str) -> bool {
 }
 
 fn format_instant_overnight_improvements_reply() -> String {
-    format!(
-        "Overnight harness kept shipping — I'm on **mac-stats v{}**. Highlights: instant lane \
+    let version = crate::config::Config::version();
+    let bullets = load_morning_surprise_highlights(5);
+    if bullets.is_empty() {
+        return format!(
+            "Overnight harness kept shipping — I'm on **mac-stats v{}**. Highlights: instant lane \
 (presence/uptime/capabilities), Agent Ops polish, native tool fidelity, bounded log growth. \
 Open **Agent Ops → Digest** or `~/.mac-stats/improvements/morning_surprise_*.md` for the run log.",
-        crate::config::Config::version()
+            version
+        );
+    }
+    let list = bullets
+        .into_iter()
+        .map(|b| format!("• {b}"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    format!(
+        "Overnight harness kept shipping — I'm on **mac-stats v{version}**.\n{list}\n\n\
+Open **Agent Ops → Digest** or today's `morning_surprise_*.md` for the full run log."
     )
+}
+
+fn morning_surprise_path(day: chrono::NaiveDate) -> std::path::PathBuf {
+    let name = format!("morning_surprise_{}.md", day.format("%Y-%m-%d"));
+    std::env::var_os("HOME")
+        .map(|h| std::path::PathBuf::from(h).join(".mac-stats").join("improvements").join(&name))
+        .unwrap_or_else(|| std::env::temp_dir().join(&name))
+}
+
+/// Pull recent `- **v…**` bullets from today's (else yesterday's) morning surprise.
+fn load_morning_surprise_highlights(max: usize) -> Vec<String> {
+    let today = chrono::Local::now().date_naive();
+    for day in [today, today - chrono::Duration::days(1)] {
+        let path = morning_surprise_path(day);
+        let Ok(text) = std::fs::read_to_string(&path) else {
+            continue;
+        };
+        let bullets = parse_morning_surprise_bullets(&text, max);
+        if !bullets.is_empty() {
+            return bullets;
+        }
+    }
+    Vec::new()
+}
+
+fn parse_morning_surprise_bullets(text: &str, max: usize) -> Vec<String> {
+    let mut bullets: Vec<String> = text
+        .lines()
+        .filter_map(|line| {
+            let t = line.trim();
+            let rest = t.strip_prefix('-')?.trim_start();
+            if rest.starts_with("**v") || rest.starts_with("**V") {
+                Some(rest.trim().to_string())
+            } else {
+                None
+            }
+        })
+        .collect();
+    if bullets.len() > max {
+        bullets = bullets.split_off(bullets.len() - max);
+    }
+    bullets
 }
 
 /// Short “what can you do?” asks (avoid a full meta+LLM turn for capability intros).
@@ -917,6 +972,21 @@ commit+push, then reply briefly.";
             ),
             "improvements without overnight context must not be instant"
         );
+    }
+
+    #[test]
+    fn morning_surprise_bullets_take_last_n() {
+        let md = "\
+# Morning surprise\n\n\
+- **v0.1.230** — one\n\
+- not a version line\n\
+- **v0.1.231** — two\n\
+- **v0.1.232** — three\n\
+";
+        let got = parse_morning_surprise_bullets(md, 2);
+        assert_eq!(got.len(), 2);
+        assert!(got[0].contains("0.1.231"), "{got:?}");
+        assert!(got[1].contains("0.1.232"), "{got:?}");
     }
 
     #[test]
