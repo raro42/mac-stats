@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.248] - 2026-07-23
+
+### Fixed
+- Weather place parsing skips “at noon/3pm/…” time-of-day phrases (uses default place instead).
+
 ## [0.1.247] - 2026-07-23
 
 ### Added

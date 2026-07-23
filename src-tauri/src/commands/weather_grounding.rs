@@ -24,6 +24,10 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
     for sep in [" in ", " for ", " at "] {
         if let Some(idx) = lower.find(sep) {
             let rest = q[idx + sep.len()..].trim();
+            // "temperature at noon" / "rain at midnight" — not a place.
+            if sep == " at " && looks_like_time_of_day_rest(rest) {
+                continue;
+            }
             let end = rest
                 .find(|c: char| c == '?' || c == '!' || c == '.' || c == '\n')
                 .unwrap_or(rest.len());
@@ -127,8 +131,21 @@ fn looks_like_place_garbage(place: &str) -> bool {
     {
         return true;
     }
-    let tokens: Vec<&str> = n.split_whitespace().collect();
+    let tokens: Vec<String> = n
+        .split_whitespace()
+        .map(|t| {
+            t.trim_matches(|c: char| matches!(c, '?' | '!' | '.' | ',' | ';' | ':' | '"' | '\''))
+                .to_string()
+        })
+        .filter(|t| !t.is_empty())
+        .collect();
     if tokens.is_empty() || tokens.len() > 5 {
+        return true;
+    }
+    // Clock-ish tokens are not places ("3pm", "14:00").
+    if tokens.iter().any(|t| {
+        t.chars().any(|c| c.is_ascii_digit()) || t.ends_with("am") || t.ends_with("pm")
+    }) {
         return true;
     }
     // Phrase leftovers from "how's the weather going to be over time…" must not geocode.
@@ -170,6 +187,20 @@ fn looks_like_place_garbage(place: &str) -> bool {
         "or",
         "vs",
         "versus",
+        "noon",
+        "midnight",
+        "sunrise",
+        "sunset",
+        "dusk",
+        "dawn",
+        "midday",
+        "night",
+        "nighttime",
+        "nightfall",
+        "lunch",
+        "dinner",
+        "breakfast",
+        "brunch",
     ];
     if matches!(
         n.as_str(),
@@ -177,8 +208,45 @@ fn looks_like_place_garbage(place: &str) -> bool {
     ) {
         return true;
     }
-    let stop_count = tokens.iter().filter(|t| STOP.contains(t)).count();
+    let stop_count = tokens.iter().filter(|t| STOP.contains(&t.as_str())).count();
     stop_count * 2 >= tokens.len()
+}
+
+/// True when text after " at " is a time-of-day, not a place name.
+fn looks_like_time_of_day_rest(rest: &str) -> bool {
+    let first = rest
+        .split_whitespace()
+        .next()
+        .unwrap_or("")
+        .to_lowercase()
+        .trim_matches(|c: char| matches!(c, '?' | '!' | '.' | ',' | ';' | ':'))
+        .to_string();
+    if first.is_empty() {
+        return false;
+    }
+    if first.chars().any(|c| c.is_ascii_digit())
+        || first.ends_with("am")
+        || first.ends_with("pm")
+    {
+        return true;
+    }
+    matches!(
+        first.as_str(),
+        "noon"
+            | "night"
+            | "midnight"
+            | "sunrise"
+            | "sunset"
+            | "dusk"
+            | "dawn"
+            | "lunch"
+            | "dinner"
+            | "breakfast"
+            | "brunch"
+            | "midday"
+            | "nighttime"
+            | "nightfall"
+    )
 }
 
 /// True when Open-Meteo instant reply can answer without Brave/Perplexity.
@@ -199,8 +267,15 @@ pub(crate) fn resolve_weather_place(q: &str) -> Option<String> {
 
 fn should_use_default_weather_place(q: &str) -> bool {
     let n = normalize_weather_text(q).to_lowercase();
-    if n.contains(" in ") || n.contains(" for ") || n.contains(" at ") {
+    if n.contains(" in ") || n.contains(" for ") {
         return false;
+    }
+    // "at Barcelona" is an explicit place; "at noon" is still a local ask.
+    if let Some(idx) = n.find(" at ") {
+        let rest = n[idx + " at ".len()..].trim();
+        if !looks_like_time_of_day_rest(rest) {
+            return false;
+        }
     }
     if n.contains("search") || n.contains("google") || n.contains("http") {
         return false;
@@ -208,13 +283,17 @@ fn should_use_default_weather_place(q: &str) -> bool {
     if n.chars().count() > 64 {
         return false;
     }
-    // "how's the weather", "weather today", "is it raining", etc.
+    // "how's the weather", "weather today", "is it raining", "temperature at noon", etc.
     let local = n.contains("today")
         || n.contains("tonight")
         || n.contains("right now")
         || n.contains(" outside")
         || n.contains(" here")
         || n.contains("current")
+        || n.contains("temperature")
+        || n.contains("weather")
+        || n.contains("wether")
+        || n.contains("forecast")
         || n.starts_with("how")
         || n == "weather"
         || n == "wether"
@@ -525,5 +604,20 @@ mod tests {
             resolve_weather_place(q).unwrap().to_lowercase(),
             "going to be over time"
         );
+    }
+
+    #[test]
+    fn rejects_at_noon_as_place() {
+        let q = "What's the temperature at noon?";
+        assert!(looks_like_weather_query(q));
+        assert!(extract_place(q).is_none());
+        assert!(can_instant_weather(q)); // default place
+    }
+
+    #[test]
+    fn still_extracts_place_after_at_city() {
+        // Unusual phrasing but should still work when "at" introduces a place.
+        let p = extract_place("weather at Barcelona today").unwrap();
+        assert!(p.to_lowercase().contains("barcelona"), "{p}");
     }
 }
