@@ -1462,6 +1462,14 @@ body {
   color: var(--muted);
   font-size: 12px;
   margin-top: 4px;
+  white-space: pre-wrap;
+  line-height: 1.45;
+}
+.perplexity-result-meta {
+  color: var(--muted);
+  font-size: 11px;
+  opacity: 0.75;
+  margin-top: 2px;
 }
 
 .logs-path-hint {
@@ -2227,6 +2235,11 @@ body {
   border-radius: 8px;
   line-height: 1.6;
   word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.chat-message .markdown {
+  white-space: normal;
 }
 
 .chat-message.user {

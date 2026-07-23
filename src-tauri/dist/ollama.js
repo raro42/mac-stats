@@ -590,8 +590,9 @@ async function sendChatMessage() {
         const container = document.getElementById('chat-messages');
         const assistantMessages = container?.querySelectorAll('.chat-message.assistant');
         const last = assistantMessages?.[assistantMessages.length - 1];
-        if (last && !last.textContent.trim()) {
-          last.textContent = response.final_answer;
+        if (last) {
+          // Instant (empty bubble) or streamed text → render Markdown for readable layout.
+          setAssistantMessageContent(last, response.final_answer);
         } else {
           addChatMessage('assistant', response.final_answer);
         }
@@ -1025,7 +1026,8 @@ async function executeJavaScriptCode(code) {
 // ============================================================================
 
 /**
- * Add a chat message to the chat container
+ * Add a chat message to the chat container.
+ * Assistant replies use Markdown when `marked` is available (readable lists/paragraphs).
  */
 function addChatMessage(role, content, isHtml = false) {
   const messagesContainer = document.getElementById('chat-messages');
@@ -1039,12 +1041,44 @@ function addChatMessage(role, content, isHtml = false) {
 
   if (isHtml) {
     messageDiv.innerHTML = content;
+  } else if (role === 'assistant' && typeof marked !== 'undefined') {
+    try {
+      marked.setOptions({ breaks: true, gfm: true });
+      const markdownWrapper = document.createElement('div');
+      markdownWrapper.className = 'markdown';
+      markdownWrapper.innerHTML = marked.parse(String(content ?? ''));
+      messageDiv.appendChild(markdownWrapper);
+    } catch (err) {
+      console.warn('[Ollama] markdown render failed, falling back to text', err);
+      messageDiv.textContent = content;
+    }
   } else {
     messageDiv.textContent = content;
   }
 
   messagesContainer.appendChild(messageDiv);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+/**
+ * Replace an assistant bubble's content (used for instant replies into an empty stream bubble).
+ */
+function setAssistantMessageContent(el, content) {
+  if (!el) return;
+  el.replaceChildren();
+  if (typeof marked !== 'undefined') {
+    try {
+      marked.setOptions({ breaks: true, gfm: true });
+      const markdownWrapper = document.createElement('div');
+      markdownWrapper.className = 'markdown';
+      markdownWrapper.innerHTML = marked.parse(String(content ?? ''));
+      el.appendChild(markdownWrapper);
+      return;
+    } catch (_) {
+      /* fall through */
+    }
+  }
+  el.textContent = content;
 }
 
 /**
@@ -1213,6 +1247,7 @@ window.Ollama = {
   
   // UI
   addMessage: addChatMessage,
+  setAssistantMessageContent: setAssistantMessageContent,
   initListeners: initOllamaChatListeners,
   
   // Utils

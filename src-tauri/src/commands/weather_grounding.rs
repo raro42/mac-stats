@@ -364,24 +364,23 @@ pub(crate) async fn format_instant_weather_reply(query: &str) -> Option<String> 
         }
     );
     let mut out = format!(
-        "**{}** right now ({}, {}): **{:.1} °C**, {}.",
-        where_s, when, tz, temp, desc
+        "**{}**\n\n\
+• **{:.1} °C** — {}\n",
+        where_s, temp, desc
     );
     if let Some(f) = feels {
-        out.push_str(&format!(" Feels like {:.1} °C.", f));
+        out.push_str(&format!("• Feels like **{:.1} °C**\n", f));
     }
     if let Some(h) = humidity {
-        out.push_str(&format!(" Humidity {:.0}%.", h));
+        out.push_str(&format!("• Humidity **{:.0}%**\n", h));
     }
     if let Some(w) = wind {
-        out.push_str(&format!(" Wind {:.1} km/h.", w));
+        out.push_str(&format!("• Wind **{:.1} km/h**\n", w));
     }
-    // Local clock for the place (Open-Meteo `current.time` is already in `timezone`)
     out.push_str(&format!(
-        "\nLocal date/time there: **{}** ({})",
+        "\nLocal time: **{}** ({})\n_Source: Open-Meteo_",
         when, tz
     ));
-    out.push_str("\n_Source: Open-Meteo_");
     Some(out)
 }
 

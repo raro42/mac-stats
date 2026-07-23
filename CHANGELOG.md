@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.239] - 2026-07-23
+
+### Changed
+- Chat assistant replies render Markdown (lists/paragraphs) instead of one plain wall of text.
+- Perplexity tool results use clearer cards/snippets and tell the model to answer in short bullets.
+- Instant Open-Meteo weather reply uses a bullet layout.
+
 ## [0.1.238] - 2026-07-23
 
 ### Changed

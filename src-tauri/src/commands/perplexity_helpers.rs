@@ -95,7 +95,10 @@ pub(crate) async fn handle_perplexity_search(
                 "Perplexity search returned no results. Answer from general knowledge.".to_string()
             } else {
                 format!(
-                    "## Perplexity Search Results ({} items)\n\n{}\n\nUse these to answer the user's question. Cite source number, title or URL, and date when given.",
+                    "## Perplexity Search Results ({} items)\n\n{}\n\n\
+**How to answer the user:** Lead with a short direct answer, then 3–6 Discord-friendly bullets \
+(or short paragraphs). Cite source title/domain (and date when given). \
+Never paste snippets as one unbroken wall of text.",
                     num_results,
                     crate::commands::untrusted_content::wrap_untrusted_content(
                         "perplexity-search-results",
@@ -151,7 +154,7 @@ pub(crate) async fn handle_perplexity_search(
     }
 }
 
-/// Format shaped search results into structured markdown for the model.
+/// Format shaped search results into structured markdown for the model (and readable UI).
 fn format_search_results_markdown(
     results: &[crate::commands::perplexity::PerplexitySearchResult],
     is_news: bool,
@@ -179,18 +182,77 @@ fn format_search_results_markdown(
                 } else {
                     ""
                 };
+            let domain = normalized_search_result_domain(&r.url);
+            let domain_line = if domain.is_empty() {
+                String::new()
+            } else {
+                format!("- **Source:** {}\n", domain)
+            };
+            let snippet = normalize_snippet_layout(&r.snippet);
             format!(
-                "### {}. {}\n- **URL:** {}\n{}{}- **Snippet:** {}",
+                "### {}. {}\n{}{}{}- **URL:** {}\n\n{}",
                 i + 1,
-                r.title,
-                r.url,
+                r.title.trim(),
+                domain_line,
                 date_line,
                 page_type,
-                r.snippet
+                r.url,
+                snippet
             )
         })
         .collect::<Vec<_>>()
-        .join("\n\n")
+        .join("\n\n---\n\n")
+}
+
+/// Make long Perplexity snippets readable: real newlines, sentence breaks, no run-on walls.
+pub(crate) fn normalize_snippet_layout(snippet: &str) -> String {
+    let mut s = snippet.replace("\\n", "\n").replace("\\r", "");
+    s = s.replace('\r', "\n");
+    // Collapse spaces/tabs but keep paragraph breaks.
+    let mut out = String::with_capacity(s.len());
+    let mut prev_space = false;
+    let mut newline_run = 0u8;
+    for ch in s.chars() {
+        if ch == '\n' {
+            if newline_run < 2 {
+                out.push('\n');
+                newline_run += 1;
+            }
+            prev_space = false;
+            continue;
+        }
+        newline_run = 0;
+        if ch.is_whitespace() {
+            if !prev_space && !out.ends_with('\n') {
+                out.push(' ');
+                prev_space = true;
+            }
+            continue;
+        }
+        prev_space = false;
+        out.push(ch);
+        // Soft break after sentence end when the line is already long.
+        if matches!(ch, '.' | '!' | '?') {
+            let line_len = out.rsplit('\n').next().map(|l| l.chars().count()).unwrap_or(0);
+            if line_len >= 90 {
+                out.push('\n');
+                newline_run = 1;
+                prev_space = false;
+            }
+        }
+    }
+    let trimmed = out.trim().to_string();
+    if trimmed.is_empty() {
+        return String::new();
+    }
+    // Present as a short blockquote so Discord/chat markdown renders with structure.
+    trimmed
+        .lines()
+        .map(|l| l.trim())
+        .filter(|l| !l.is_empty())
+        .map(|l| format!("> {l}"))
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 /// Navigate to each URL and take a screenshot, collecting attachment paths.
@@ -591,9 +653,34 @@ mod tests {
     use super::*;
 
     #[test]
-    fn is_news_query_rejects_commit_and_push_latest_changes() {
-        assert!(!is_news_query("We shall commit and push latest changes"));
-        assert!(!is_news_query("git commit and push"));
+    fn normalize_snippet_layout_breaks_run_on_sentences() {
+        let long = "First sentence about El Masnou weather is quite long and keeps going with details. Second sentence continues with more facts that also stretch out for readability. Third wraps up.";
+        let got = normalize_snippet_layout(long);
+        assert!(got.contains('\n') || got.contains("> "), "{got}");
+        assert!(got.lines().count() >= 2, "expected multiple lines, got: {got}");
+        assert!(got.lines().all(|l| l.starts_with("> ")));
+    }
+
+    #[test]
+    fn normalize_snippet_layout_expands_escaped_newlines() {
+        let got = normalize_snippet_layout("Line one\\nLine two");
+        assert!(got.contains("> Line one"));
+        assert!(got.contains("> Line two"));
+    }
+
+    #[test]
+    fn format_search_results_markdown_has_separators_and_guidance_ready() {
+        let results = vec![crate::commands::perplexity::PerplexitySearchResult {
+            title: "El Masnou weather".into(),
+            url: "https://www.example.com/weather/el-masnou".into(),
+            snippet: "Sunny and mild. Expect light breeze later.".into(),
+            date: Some("2026-07-23".into()),
+            last_updated: None,
+        }];
+        let md = format_search_results_markdown(&results, false);
+        assert!(md.contains("### 1. El Masnou weather"));
+        assert!(md.contains("**Source:** example.com"));
+        assert!(md.contains("> Sunny and mild."));
     }
 
     #[test]

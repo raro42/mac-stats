@@ -3597,10 +3597,30 @@ function initPerplexitySection() {
           return;
         }
         resultsEl.innerHTML = resp.results.map(function (r) {
-          const snippet = (r.snippet || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          return '<div class="perplexity-result-item">' +
-            '<a href="' + (r.url || '#') + '" target="_blank" rel="noopener noreferrer">' + (r.title || 'Untitled') + '</a>' +
-            (snippet ? '<div class="perplexity-result-snippet">' + snippet + '</div>' : '') + '</div>';
+          const esc = (window.Ollama && window.Ollama.escapeHtml)
+            ? window.Ollama.escapeHtml
+            : function (t) {
+                const d = document.createElement('div');
+                d.textContent = t == null ? '' : String(t);
+                return d.innerHTML;
+              };
+          const title = esc(r.title || 'Untitled');
+          const url = esc(r.url || '#');
+          const snippetRaw = String(r.snippet || '')
+            .replace(/\\n/g, '\n')
+            .replace(/\r/g, '');
+          const snippet = esc(snippetRaw);
+          let domain = '';
+          try {
+            domain = r.url ? new URL(r.url).hostname.replace(/^www\./, '') : '';
+          } catch (_) {}
+          const date = r.date || r.last_updated || '';
+          const meta = [domain, date].filter(Boolean).join(' · ');
+          return '<article class="perplexity-result-item">' +
+            '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + title + '</a>' +
+            (meta ? '<div class="perplexity-result-meta">' + esc(meta) + '</div>' : '') +
+            (snippet ? '<div class="perplexity-result-snippet">' + snippet.replace(/\n/g, '<br>') + '</div>' : '') +
+            '</article>';
         }).join('');
       } catch (err) {
         resultsEl.innerHTML = '<p class="perplexity-result-snippet">Error: ' + String(err) + '</p>';
