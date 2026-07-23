@@ -12,7 +12,8 @@ use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
 
 const MODEL_LIST_TTL: Duration = Duration::from_secs(5 * 60);
-/// Avoid flooding debug.log when many callers hit a stale list during one bg refresh.
+/// Avoid flooding debug.log when many callers hit a stale list during one bg refresh
+/// (info-level SWR messages share this interval after the kickoff log).
 const STALE_IN_PROGRESS_LOG_INTERVAL: Duration = Duration::from_secs(60);
 
 /// Visible in `~/.mac-stats/debug.log` message text: the file log layer omits tracing `target`, so
@@ -178,11 +179,15 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
                     let age = now.duration_since(t);
                     if !ent.bg_refreshing {
                         ent.bg_refreshing = true;
+                        // Share the same rate-limit clock so a concurrent caller does not
+                        // immediately emit a second WARN for the same SWR cycle.
+                        ent.last_stale_in_progress_log = Some(now);
                         let ep_clone = ep.clone();
                         let ak = api_key_owned.clone();
                         drop(g);
                         tokio::spawn(run_bg_refresh(ep_clone, ak));
-                        mac_stats_warn!(
+                        // Expected stale-while-revalidate — info, not WARN spam.
+                        mac_stats_info!(
                             "ollama/model_cache",
                             "{} Model list is stale (last successful refresh {}s ago); serving cached result ({} models) while refreshing in background",
                             MCACHE_LOG_TAG,
@@ -197,7 +202,7 @@ pub async fn fetch_tags_cached(endpoint: &str, api_key: Option<&str>) -> FetchRe
                         .unwrap_or(true);
                     if should_log {
                         ent.last_stale_in_progress_log = Some(now);
-                        mac_stats_warn!(
+                        mac_stats_info!(
                             "ollama/model_cache",
                             "{} Model list is stale ({}s since success); background refresh already in progress; serving cached result ({} models)",
                             MCACHE_LOG_TAG,
