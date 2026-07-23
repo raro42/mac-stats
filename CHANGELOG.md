@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.240] - 2026-07-23
+
+### Changed
+- Brave search results use the same readable snippet layout and “short bullets” answer guidance as Perplexity.
+
 ## [0.1.239] - 2026-07-23
 
 ### Changed

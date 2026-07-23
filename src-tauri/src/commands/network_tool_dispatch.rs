@@ -197,7 +197,7 @@ pub(crate) async fn handle_brave_search(
         Some(api_key) => match crate::commands::brave::brave_web_search(arg, &api_key).await {
             Ok(results) => {
                 let mut out = format!(
-                    "Brave Search results:\n\n{}\n\nUse these to answer the user's question.",
+                    "{}\n\nUse these to answer the user's question with short bullets — not one wall of text.",
                     wrap_untrusted_content("brave-search-results", &results)
                 );
                 if let Some(ground) =

@@ -206,53 +206,7 @@ fn format_search_results_markdown(
 
 /// Make long Perplexity snippets readable: real newlines, sentence breaks, no run-on walls.
 pub(crate) fn normalize_snippet_layout(snippet: &str) -> String {
-    let mut s = snippet.replace("\\n", "\n").replace("\\r", "");
-    s = s.replace('\r', "\n");
-    // Collapse spaces/tabs but keep paragraph breaks.
-    let mut out = String::with_capacity(s.len());
-    let mut prev_space = false;
-    let mut newline_run = 0u8;
-    for ch in s.chars() {
-        if ch == '\n' {
-            if newline_run < 2 {
-                out.push('\n');
-                newline_run += 1;
-            }
-            prev_space = false;
-            continue;
-        }
-        newline_run = 0;
-        if ch.is_whitespace() {
-            if !prev_space && !out.ends_with('\n') {
-                out.push(' ');
-                prev_space = true;
-            }
-            continue;
-        }
-        prev_space = false;
-        out.push(ch);
-        // Soft break after sentence end when the line is already long.
-        if matches!(ch, '.' | '!' | '?') {
-            let line_len = out.rsplit('\n').next().map(|l| l.chars().count()).unwrap_or(0);
-            if line_len >= 90 {
-                out.push('\n');
-                newline_run = 1;
-                prev_space = false;
-            }
-        }
-    }
-    let trimmed = out.trim().to_string();
-    if trimmed.is_empty() {
-        return String::new();
-    }
-    // Present as a short blockquote so Discord/chat markdown renders with structure.
-    trimmed
-        .lines()
-        .map(|l| l.trim())
-        .filter(|l| !l.is_empty())
-        .map(|l| format!("> {l}"))
-        .collect::<Vec<_>>()
-        .join("\n")
+    crate::search_result_shaping::normalize_snippet_layout(snippet)
 }
 
 /// Navigate to each URL and take a screenshot, collecting attachment paths.

@@ -59,6 +59,54 @@ pub fn shape_search_results(
     out
 }
 
+/// Make long search snippets readable: real newlines, sentence breaks, no run-on walls.
+pub fn normalize_snippet_layout(snippet: &str) -> String {
+    let mut s = snippet.replace("\\n", "\n").replace("\\r", "");
+    s = s.replace('\r', "\n");
+    let mut out = String::with_capacity(s.len());
+    let mut prev_space = false;
+    let mut newline_run = 0u8;
+    for ch in s.chars() {
+        if ch == '\n' {
+            if newline_run < 2 {
+                out.push('\n');
+                newline_run += 1;
+            }
+            prev_space = false;
+            continue;
+        }
+        newline_run = 0;
+        if ch.is_whitespace() {
+            if !prev_space && !out.ends_with('\n') {
+                out.push(' ');
+                prev_space = true;
+            }
+            continue;
+        }
+        prev_space = false;
+        out.push(ch);
+        if matches!(ch, '.' | '!' | '?') {
+            let line_len = out.rsplit('\n').next().map(|l| l.chars().count()).unwrap_or(0);
+            if line_len >= 90 {
+                out.push('\n');
+                newline_run = 1;
+                prev_space = false;
+            }
+        }
+    }
+    let trimmed = out.trim().to_string();
+    if trimmed.is_empty() {
+        return String::new();
+    }
+    trimmed
+        .lines()
+        .map(|l| l.trim())
+        .filter(|l| !l.is_empty())
+        .map(|l| format!("> {l}"))
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
 /// Format shaped results as markdown. If the resulting string exceeds max_chars,
 /// apply head+tail truncation (keep start and end, insert "... [truncated] ..." in the middle).
 pub fn format_search_results_blob(
@@ -77,13 +125,24 @@ pub fn format_search_results_blob(
             .as_deref()
             .map(|d| format!("- **Date:** {}\n", d.trim()))
             .unwrap_or_default();
+        let domain = normalized_domain(&r.url);
+        let domain_line = if domain.is_empty() {
+            String::new()
+        } else {
+            format!("- **Source:** {}\n", domain)
+        };
+        let snippet = normalize_snippet_layout(&r.snippet);
+        if i > 0 {
+            blob.push_str("---\n\n");
+        }
         blob.push_str(&format!(
-            "### {}. {}\n- **URL:** {}\n{}- **Snippet:** {}\n\n",
+            "### {}. {}\n{}{}- **URL:** {}\n\n{}\n\n",
             i + 1,
-            r.title,
-            r.url,
+            r.title.trim(),
+            domain_line,
             date_line,
-            r.snippet
+            r.url,
+            snippet
         ));
     }
     if blob.chars().count() <= max_chars {
@@ -171,8 +230,9 @@ mod tests {
             "## Results",
             2000,
         );
-        assert!(out.contains("short"));
+        assert!(out.contains("> short") || out.contains("short"));
         assert!(!out.contains("[truncated]"));
+        assert!(out.contains("**Source:** x.com"));
     }
 
     #[test]

@@ -237,7 +237,10 @@ pub async fn brave_web_search(query: &str, api_key: &str) -> Result<String, Stri
     );
 
     let heading = format!(
-        "Brave Search results for \"{}\" ({} items). Use these to answer the user's question. Cite source number, title or URL, and date when given.",
+        "Brave Search results for \"{}\" ({} items).\n\n\
+**How to answer the user:** Lead with a short direct answer, then 3–6 Discord-friendly bullets \
+(or short paragraphs). Cite source title/domain (and date when given). \
+Never paste snippets as one unbroken wall of text.",
         query,
         shaped.len()
     );
