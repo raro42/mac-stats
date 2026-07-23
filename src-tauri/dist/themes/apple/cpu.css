@@ -1481,6 +1481,26 @@ body {
 .perplexity-result-list li {
   margin: 2px 0;
 }
+.perplexity-weather-card {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
+  background: var(--glass-fill, rgba(255, 255, 255, 0.04));
+}
+.perplexity-weather-body {
+  font-size: 13px;
+  line-height: 1.45;
+  margin-top: 4px;
+  color: var(--text, inherit);
+}
+.perplexity-weather-body p {
+  margin: 0.25em 0;
+}
+.perplexity-weather-body ul {
+  margin: 4px 0 0;
+  padding-left: 1.15em;
+}
 
 .logs-path-hint {
   font-size: 11px;

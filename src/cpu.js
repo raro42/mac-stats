@@ -3622,18 +3622,38 @@ function initPerplexitySection() {
       resultsEl.innerHTML = '<p class="perplexity-result-snippet">Searching…</p>';
       try {
         const resp = await invoke('perplexity_search', { request: { query: query, max_results: 10 } });
+        const esc = (window.Ollama && window.Ollama.escapeHtml)
+          ? window.Ollama.escapeHtml
+          : function (t) {
+              const d = document.createElement('div');
+              d.textContent = t == null ? '' : String(t);
+              return d.innerHTML;
+            };
+        let weatherHtml = '';
+        if (resp.weather_markdown) {
+          let body = '';
+          if (typeof marked !== 'undefined') {
+            try {
+              marked.setOptions({ breaks: true, gfm: true });
+              body = marked.parse(String(resp.weather_markdown));
+            } catch (_) {
+              body = '<pre>' + esc(resp.weather_markdown) + '</pre>';
+            }
+          } else {
+            body = esc(String(resp.weather_markdown)).replace(/\n/g, '<br>');
+          }
+          weatherHtml =
+            '<article class="perplexity-weather-card">' +
+            '<div class="perplexity-result-meta">Live conditions · Open-Meteo</div>' +
+            '<div class="perplexity-weather-body chat-message markdown-body">' + body + '</div>' +
+            '</article>';
+        }
         if (!resp.results || resp.results.length === 0) {
-          resultsEl.innerHTML = '<p class="perplexity-result-snippet">No results.</p>';
+          resultsEl.innerHTML = weatherHtml ||
+            '<p class="perplexity-result-snippet">No results.</p>';
           return;
         }
-        resultsEl.innerHTML = resp.results.map(function (r) {
-          const esc = (window.Ollama && window.Ollama.escapeHtml)
-            ? window.Ollama.escapeHtml
-            : function (t) {
-                const d = document.createElement('div');
-                d.textContent = t == null ? '' : String(t);
-                return d.innerHTML;
-              };
+        resultsEl.innerHTML = weatherHtml + resp.results.map(function (r) {
           const title = esc(r.title || 'Untitled');
           const url = esc(r.url || '#');
           const snippetRaw = formatPerplexitySnippet(

@@ -110,6 +110,9 @@ pub struct PerplexitySearchResult {
 pub struct PerplexitySearchResponse {
     pub results: Vec<PerplexitySearchResult>,
     pub id: String,
+    /// Open-Meteo instant conditions when the query looks like weather (prefer over AEMET tables).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub weather_markdown: Option<String>,
 }
 
 /// Run a Perplexity web search. API key from PERPLEXITY_API_KEY env, .config.env / .env.config, or Keychain.
@@ -129,16 +132,27 @@ pub async fn perplexity_search(
 
     debug!("Perplexity search: query len={}", query.len());
 
-    let response = perplexity::search(api_key.as_str(), query, request.max_results)
-        .await
-        .map_err(|e| {
-            let msg = e.to_string();
-            if msg.contains("401") || msg.contains("Unauthorized") {
-                "Invalid or expired API key. Update it in Settings.".to_string()
-            } else {
-                msg
-            }
-        })?;
+    let weather_query = query.to_string();
+    let weather_fut = async {
+        if crate::commands::weather_grounding::can_instant_weather(&weather_query) {
+            crate::commands::weather_grounding::format_instant_weather_reply(&weather_query).await
+        } else {
+            None
+        }
+    };
+
+    let search_fut = perplexity::search(api_key.as_str(), query, request.max_results);
+
+    let (search_result, weather_markdown) = tokio::join!(search_fut, weather_fut);
+
+    let response = search_result.map_err(|e| {
+        let msg = e.to_string();
+        if msg.contains("401") || msg.contains("Unauthorized") {
+            "Invalid or expired API key. Update it in Settings.".to_string()
+        } else {
+            msg
+        }
+    })?;
 
     let results = response
         .results
@@ -155,6 +169,7 @@ pub async fn perplexity_search(
     Ok(PerplexitySearchResponse {
         results,
         id: response.id,
+        weather_markdown,
     })
 }
 

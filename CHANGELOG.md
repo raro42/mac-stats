@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.245] - 2026-07-23
+
+### Added
+- Perplexity panel shows live Open-Meteo conditions above search results for weather queries.
+
 ## [0.1.244] - 2026-07-23
 
 ### Fixed
