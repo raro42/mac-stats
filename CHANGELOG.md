@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.228] - 2026-07-23
+
+### Changed
+- Agent Ops: Escape clears list row selection when preview/detail are already closed (Hermes Escape-skips).
+
 ## [0.1.227] - 2026-07-23
 
 ### Changed

@@ -100,7 +100,7 @@ function ensureOpsKeyboardHint() {
     const hint = document.createElement('div');
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
-        hint.textContent =
+    hint.textContent =
         'Tips: 1–5 ←/→ tabs · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc';
     tabs.insertAdjacentElement('afterend', hint);
 }
@@ -153,6 +153,7 @@ function setupAgentOps() {
             if (e.key === 'Escape' && !e.metaKey && !e.ctrlKey && !e.altKey) {
                 if (tryOpsAgentDetailEscape(e)) return;
                 if (tryOpsPreviewEscape(e)) return;
+                if (tryOpsClearSelectionEscape(e)) return;
             }
             if (
                 (e.key === 'Enter' || e.key === ' ')
@@ -1071,6 +1072,22 @@ function tryOpsPreviewEscape(e) {
         return true;
     }
     return false;
+}
+
+/** Esc clears list row selection when nothing else to dismiss (Hermes Escape-skips). */
+function tryOpsClearSelectionEscape(e) {
+    if (agentOpsCollapsed) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return false;
+    if (!document.getElementById('agent-ops') && !document.querySelector('.agent-ops-tabs')) {
+        return false;
+    }
+    const selected = document.querySelectorAll('.ops-row.is-selected');
+    if (!selected.length) return false;
+    selected.forEach((el) => el.classList.remove('is-selected'));
+    e.preventDefault();
+    return true;
 }
 
 function renderOpsAgentPreview() {
