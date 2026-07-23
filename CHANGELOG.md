@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.230] - 2026-07-23
+
+### Changed
+- Downloads-organizer state saves use unique-temp + fsync rename (safer concurrent writes).
+- Regression test: GLM 4.7-style newlines between `</arg_key>` and `<arg_value>` still parse.
+
 ## [0.1.229] - 2026-07-23
 
 ### Changed

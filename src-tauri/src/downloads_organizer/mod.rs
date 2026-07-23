@@ -411,12 +411,32 @@ fn save_state(state: &OrganizerState) {
 }
 
 fn atomic_write(path: &Path, data: &[u8]) -> std::io::Result<()> {
-    let tmp = path.with_extension("tmp");
-    let mut f = fs::File::create(&tmp)?;
-    f.write_all(data)?;
-    f.sync_all()?;
-    drop(f);
-    fs::rename(&tmp, path)
+    // Unique temp + fsync + rename (avoid torn state if two saves overlap).
+    let name = path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("downloads-organizer-state.json");
+    let tmp = path.with_file_name(format!(
+        ".{}.{}.{}.tmp",
+        name,
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0)
+    ));
+    let result = (|| -> std::io::Result<()> {
+        let mut f = fs::File::create(&tmp)?;
+        f.write_all(data)?;
+        f.sync_all()?;
+        drop(f);
+        fs::rename(&tmp, path)?;
+        Ok(())
+    })();
+    if result.is_err() {
+        let _ = fs::remove_file(&tmp);
+    }
+    result
 }
 
 /// Expand `~` and resolve default `~/Downloads`.

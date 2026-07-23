@@ -1547,6 +1547,22 @@ mod tests {
     }
 
     #[test]
+    fn glm47_arg_key_newlines_between_tags_parse() {
+        // Hermes/VLLM Glm47MoeModelToolParser: newlines between </arg_key> and <arg_value>.
+        let content = r#"
+<tool_call>brave_search
+<arg_key>query</arg_key>
+
+<arg_value>El Masnou weather</arg_value>
+</tool_call>
+"#;
+        let tools = parse_all_tools_from_response(content);
+        assert_eq!(tools.len(), 1, "{tools:?}");
+        assert_eq!(tools[0].0, "BRAVE_SEARCH");
+        assert_eq!(tools[0].1, "El Masnou weather");
+    }
+
+    #[test]
     fn glm_and_hermes_json_coexist() {
         let content = r#"
 <tool_call>FETCH_URL
