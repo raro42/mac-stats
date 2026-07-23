@@ -3641,7 +3641,20 @@ function initPerplexitySection() {
               .replace(/\\n/g, '\n')
               .replace(/\r/g, '')
           );
-          const snippet = esc(snippetRaw);
+          let snippetHtml = '';
+          if (snippetRaw) {
+            const lines = snippetRaw.split('\n').map((l) => l.trim()).filter(Boolean);
+            const allBullets = lines.length > 0 && lines.every((l) => l.startsWith('• '));
+            if (allBullets) {
+              snippetHtml = '<ul class="perplexity-result-list">' +
+                lines.map((l) => '<li>' + esc(l.replace(/^•\s*/, '')) + '</li>').join('') +
+                '</ul>';
+            } else {
+              snippetHtml = '<div class="perplexity-result-snippet">' +
+                esc(snippetRaw).replace(/\n/g, '<br>') +
+                '</div>';
+            }
+          }
           let domain = '';
           try {
             domain = r.url ? new URL(r.url).hostname.replace(/^www\./, '') : '';
@@ -3651,7 +3664,7 @@ function initPerplexitySection() {
           return '<article class="perplexity-result-item">' +
             '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + title + '</a>' +
             (meta ? '<div class="perplexity-result-meta">' + esc(meta) + '</div>' : '') +
-            (snippet ? '<div class="perplexity-result-snippet">' + snippet.replace(/\n/g, '<br>') + '</div>' : '') +
+            snippetHtml +
             '</article>';
         }).join('');
       } catch (err) {

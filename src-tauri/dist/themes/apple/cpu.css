@@ -1471,6 +1471,16 @@ body {
   opacity: 0.75;
   margin-top: 2px;
 }
+.perplexity-result-list {
+  margin: 6px 0 0;
+  padding-left: 1.15em;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.perplexity-result-list li {
+  margin: 2px 0;
+}
 
 .logs-path-hint {
   font-size: 11px;

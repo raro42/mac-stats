@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.242] - 2026-07-23
+
+### Changed
+- Perplexity result cards render humanized table snippets as a proper bullet list.
+
 ## [0.1.241] - 2026-07-23
 
 ### Fixed

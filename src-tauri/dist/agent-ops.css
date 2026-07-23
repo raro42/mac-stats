@@ -494,6 +494,16 @@
   white-space: pre-wrap;
   line-height: 1.45;
 }
+.perplexity-result-list {
+  margin: 6px 0 0;
+  padding-left: 1.15em;
+  font-size: 12px;
+  opacity: 0.78;
+  line-height: 1.45;
+}
+.perplexity-result-list li {
+  margin: 2px 0;
+}
 .perplexity-result-snippet ul {
   margin: 4px 0 0;
   padding-left: 1.1em;
