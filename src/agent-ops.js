@@ -101,7 +101,7 @@ function ensureOpsKeyboardHint() {
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
     hint.textContent =
-        'Tips: 1–5 ←/→ tabs · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · ?';
+        'Tips: 1–5 ←/→ tabs · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r · ?';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -250,6 +250,18 @@ function setupAgentOps() {
                 if (flashOpsKeyboardHint()) {
                     e.preventDefault();
                 }
+                return;
+            }
+            if ((e.key === 'r' || e.key === 'R') && !e.metaKey && !e.ctrlKey && !e.altKey) {
+                if (agentOpsCollapsed) return;
+                const t = e.target;
+                const tag = (t && t.tagName) || '';
+                if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return;
+                if (!document.getElementById('agent-ops') && !document.querySelector('.agent-ops-tabs')) {
+                    return;
+                }
+                e.preventDefault();
+                refreshAgentOps();
                 return;
             }
             if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;

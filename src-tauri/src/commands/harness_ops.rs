@@ -810,7 +810,7 @@ fn hint_for_run(rec: &serde_json::Value) -> Option<String> {
 fn write_digest_native(days: i64) -> Result<DigestSummary, String> {
     let path = crate::commands::run_telemetry::runs_jsonl_path();
     let since = chrono::Utc::now() - chrono::Duration::days(days);
-    let mut walls: Vec<u64> = Vec::new();
+    let mut latency_walls: Vec<u64> = Vec::new();
     let mut by_lane: std::collections::BTreeMap<String, usize> =
         std::collections::BTreeMap::new();
     let mut open: Vec<serde_json::Value> = Vec::new();
@@ -840,18 +840,29 @@ fn write_digest_native(days: i64) -> Result<DigestSummary, String> {
             }
             turns += 1;
             let wall = rec.get("wall_ms").and_then(|x| x.as_u64()).unwrap_or(0);
-            walls.push(wall);
             let lane = rec
                 .get("lane")
                 .and_then(|x| x.as_str())
                 .unwrap_or("?")
                 .to_string();
-            *by_lane.entry(lane).or_default() += 1;
+            *by_lane.entry(lane.clone()).or_default() += 1;
+            let tools = rec
+                .get("tools")
+                .and_then(|t| t.as_array())
+                .map(|a| {
+                    a.iter()
+                        .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                        .collect::<Vec<_>>()
+                })
+                .unwrap_or_default();
             let preview = rec
                 .get("question_preview")
                 .and_then(|x| x.as_str())
                 .unwrap_or("")
                 .to_string();
+            if !is_insights_slowest_noise(&lane, wall, &tools, &preview) {
+                latency_walls.push(wall);
+            }
             let rid = rec
                 .get("request_id")
                 .and_then(|x| x.as_str())
@@ -878,18 +889,19 @@ fn write_digest_native(days: i64) -> Result<DigestSummary, String> {
         }
     }
 
-    walls.sort_unstable();
-    let p50 = if walls.is_empty() {
+    latency_walls.sort_unstable();
+    let p50 = if latency_walls.is_empty() {
         0
     } else {
-        walls[walls.len() / 2]
+        latency_walls[latency_walls.len() / 2]
     };
-    let max_ms = walls.iter().copied().max().unwrap_or(0);
+    let max_ms = latency_walls.iter().copied().max().unwrap_or(0);
     let generated = chrono::Utc::now().to_rfc3339();
     let payload = serde_json::json!({
         "generated_at": generated,
         "days": days,
         "turns": turns,
+        "latency_sample": latency_walls.len(),
         "open_count": open.len(),
         "stale_count": stale.len(),
         "p50_ms": p50,

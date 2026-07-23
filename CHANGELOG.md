@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.234] - 2026-07-23
+
+### Changed
+- Rust-native digester p50 uses the same Slowest noise filters as Python/`/insights`.
+- Agent Ops: `r` refreshes the pane when not typing in a filter.
+
 ## [0.1.233] - 2026-07-23
 
 ### Changed
