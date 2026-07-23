@@ -3119,9 +3119,10 @@ impl EventHandler for Handler {
             *g = Some(event.new);
         }
         use serenity::gateway::ConnectionStage::*;
-        let was_up = matches!(event.old, Connected);
         match event.new {
-            Disconnected if was_up => {
+            // Any leave from Connected is a drop — heartbeat/request_restart often
+            // skips a clean Disconnected and goes Connected → Connecting/Handshake.
+            _ if gateway_stage_counts_as_disconnect(event.old, event.new) => {
                 let n = DISCORD_DISCONNECT_COUNT.fetch_add(1, Ordering::SeqCst) + 1;
                 if let Ok(mut g) = DISCORD_LAST_DISCONNECT_AT.lock() {
                     *g = Some(Instant::now());
@@ -3130,6 +3131,16 @@ impl EventHandler for Handler {
                     "Discord: gateway disconnect #{} (shard {:?}: {:?} → {:?})",
                     n, event.shard_id, event.old, event.new
                 );
+                if matches!(event.new, Resuming) {
+                    let n = DISCORD_RESUME_COUNT.fetch_add(1, Ordering::SeqCst) + 1;
+                    if let Ok(mut g) = DISCORD_LAST_RESUME_AT.lock() {
+                        *g = Some(Instant::now());
+                    }
+                    info!(
+                        "Discord: gateway resume #{} (shard {:?})",
+                        n, event.shard_id
+                    );
+                }
             }
             Resuming => {
                 let n = DISCORD_RESUME_COUNT.fetch_add(1, Ordering::SeqCst) + 1;
@@ -3378,6 +3389,15 @@ pub fn discord_bot_token_configured() -> bool {
 /// Gateway received Discord `Ready` (bot session active).
 pub fn discord_bot_gateway_ready() -> bool {
     bot_user_id().is_some()
+}
+
+/// True when leaving an established gateway session (including heartbeat restart
+/// paths that skip a clean `Disconnected` and go `Connected → Connecting/Handshake`).
+pub(crate) fn gateway_stage_counts_as_disconnect(
+    old: ConnectionStage,
+    new: ConnectionStage,
+) -> bool {
+    matches!(old, ConnectionStage::Connected) && !matches!(new, ConnectionStage::Connected)
 }
 
 /// Process-lifetime Discord gateway reconnect counters for insights / health.
@@ -3719,6 +3739,21 @@ pub fn spawn_discord_if_configured() {
 
 #[cfg(test)]
 mod tests {
+    use serenity::gateway::ConnectionStage;
+
+    #[test]
+    fn gateway_disconnect_counts_heartbeat_restart_paths() {
+        use ConnectionStage::*;
+        assert!(super::gateway_stage_counts_as_disconnect(Connected, Connecting));
+        assert!(super::gateway_stage_counts_as_disconnect(Connected, Handshake));
+        assert!(super::gateway_stage_counts_as_disconnect(Connected, Identifying));
+        assert!(super::gateway_stage_counts_as_disconnect(Connected, Disconnected));
+        assert!(super::gateway_stage_counts_as_disconnect(Connected, Resuming));
+        assert!(!super::gateway_stage_counts_as_disconnect(Connected, Connected));
+        assert!(!super::gateway_stage_counts_as_disconnect(Connecting, Identifying));
+        assert!(!super::gateway_stage_counts_as_disconnect(Disconnected, Connecting));
+    }
+
     #[test]
     fn outbound_attachment_path_allowlist() {
         let screenshots = crate::config::Config::screenshots_dir();

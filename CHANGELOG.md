@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.235] - 2026-07-23
+
+### Fixed
+- Discord gateway disconnect counter now includes heartbeat restart paths that skip a clean `Disconnected` stage (insights no longer show reconnect with disconnects=0).
+
 ## [0.1.234] - 2026-07-23
 
 ### Changed
