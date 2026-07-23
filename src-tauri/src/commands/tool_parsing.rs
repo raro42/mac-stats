@@ -1026,15 +1026,13 @@ fn resolve_hermes_tool_name(name: &str) -> Option<&'static str> {
         .iter()
         .find(|t| t.name == upper)
         .map(|t| t.name)
-        .or_else(|| {
+        .or(match upper.as_str() {
             // common aliases
-            match upper.as_str() {
-                "WEB_SEARCH" | "SEARCH" | "BRAVE" => Some("BRAVE_SEARCH"),
-                "FETCH" | "WEB_FETCH" => Some("FETCH_URL"),
-                "SHELL" | "BASH" | "TERMINAL" => Some("RUN_CMD"),
-                "SESSION_SEARCH_TOOL" => Some("SESSION_SEARCH"),
-                _ => None,
-            }
+            "WEB_SEARCH" | "SEARCH" | "BRAVE" => Some("BRAVE_SEARCH"),
+            "FETCH" | "WEB_FETCH" => Some("FETCH_URL"),
+            "SHELL" | "BASH" | "TERMINAL" => Some("RUN_CMD"),
+            "SESSION_SEARCH_TOOL" => Some("SESSION_SEARCH"),
+            _ => None,
         })
 }
 

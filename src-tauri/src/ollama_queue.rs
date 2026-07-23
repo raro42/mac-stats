@@ -163,7 +163,7 @@ pub struct OllamaHttpQueueSnapshot {
 pub async fn snapshot_http_queue() -> OllamaHttpQueueSnapshot {
     let state = queue_state();
     let available = state.global.available_permits() as u32;
-    let total = Config::ollama_global_concurrency().max(1) as u32;
+    let total = Config::ollama_global_concurrency().max(1);
     let map = state.keys.lock().await;
     let mut keys: Vec<OllamaHttpQueueKeySnapshot> = map
         .iter()

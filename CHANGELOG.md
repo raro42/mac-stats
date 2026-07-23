@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.250] - 2026-07-23
+
+### Fixed
+- Clippy hygiene: queue cast, host-env contains, scheduler `is_none_or`, tool-name `or`.
+
 ## [0.1.249] - 2026-07-23
 
 ### Fixed

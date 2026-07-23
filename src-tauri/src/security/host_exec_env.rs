@@ -53,10 +53,7 @@ const BLOCKED_ENV_KEYS: &[&str] = &[
 const BLOCKED_ENV_PREFIXES: &[&str] = &["BASH_FUNC_", "DYLD_", "LD_"];
 
 fn is_blocked_host_env_key(upper: &str) -> bool {
-    if BLOCKED_ENV_KEYS
-        .iter()
-        .any(|blocked| *blocked == upper)
-    {
+    if BLOCKED_ENV_KEYS.contains(&upper) {
         return true;
     }
     BLOCKED_ENV_PREFIXES

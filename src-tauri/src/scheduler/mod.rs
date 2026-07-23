@@ -277,7 +277,7 @@ pub fn scheduler_operator_snapshot() -> SchedulerOperatorSnapshot {
             Some(nr) => {
                 entries_with_next_run += 1;
                 let secs_64 = (nr - now).num_seconds().max(0) as u64;
-                let is_sooner = seconds_until_next_fire.map_or(true, |m| secs_64 < m);
+                let is_sooner = seconds_until_next_fire.is_none_or(|m| secs_64 < m);
                 if is_sooner {
                     seconds_until_next_fire = Some(secs_64);
                     next_run_at = Some(nr.format("%Y-%m-%d %H:%M:%S").to_string());
