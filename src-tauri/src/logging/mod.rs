@@ -184,13 +184,16 @@ pub fn init_tracing(verbosity: u8, log_file_path: Option<PathBuf>) {
     // Convert verbosity level (0-3) to tracing level.
     // -v (1): warn + discord/draft=info (draft placeholder/edits visible in debug.log for reviewers).
     // -vv (2): info + mac_stats=debug + ollama/untrusted=debug (untrusted wrap trace; no HTTP noise). -vvv (3): full trace.
+    // `serenity=error` at -v/-vv: library heartbeat / shard-shutdown WARNs are expected during Discord
+    // reconnects; our `Discord: gateway disconnect` / Ready lines already cover operator telemetry.
     let filter = match verbosity {
         0 => EnvFilter::new("error"),
-        1 => {
-            EnvFilter::try_new("warn,discord/draft=info").unwrap_or_else(|_| EnvFilter::new("warn"))
-        }
-        2 => EnvFilter::try_new("info,mac_stats=debug,ollama/untrusted=debug,discord/draft=info")
-            .unwrap_or_else(|_| EnvFilter::new("debug")),
+        1 => EnvFilter::try_new("warn,discord/draft=info,serenity=error")
+            .unwrap_or_else(|_| EnvFilter::new("warn")),
+        2 => EnvFilter::try_new(
+            "info,mac_stats=debug,ollama/untrusted=debug,discord/draft=info,serenity=error",
+        )
+        .unwrap_or_else(|_| EnvFilter::new("debug")),
         3 => EnvFilter::new("trace"),
         _ => EnvFilter::new("trace"),
     };
@@ -402,7 +405,7 @@ mod tests {
     /// Regression: `wrap_untrusted_content` uses target `ollama/untrusted`, which is not under `mac_stats::`.
     #[test]
     fn vv_env_filter_accepts_ollama_untrusted_directive() {
-        let s = "info,mac_stats=debug,ollama/untrusted=debug";
+        let s = "info,mac_stats=debug,ollama/untrusted=debug,discord/draft=info,serenity=error";
         let _ = EnvFilter::try_new(s)
             .expect("vv filter must include ollama/untrusted for untrusted wrap logs");
     }
