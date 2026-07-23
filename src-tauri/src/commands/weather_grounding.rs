@@ -7,14 +7,13 @@ use tracing::info;
 pub(crate) fn looks_like_weather_query(q: &str) -> bool {
     let n = normalize_weather_text(q).to_lowercase();
     // include common typo "wether"
-    let has_weather = n.contains("weather")
+    n.contains("weather")
         || n.contains("wether")
         || n.contains("forecast")
         || n.contains("temperature")
         || n.contains("humidit")
         || ((n.contains("rain") || n.contains("wind") || n.contains("cloudy"))
-            && (n.contains("today") || n.contains("now") || n.contains("current")));
-    has_weather
+            && (n.contains("today") || n.contains("now") || n.contains("current")))
 }
 
 /// Extract a place name from a weather question/query.
@@ -28,9 +27,7 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
             if sep == " at " && looks_like_time_of_day_rest(rest) {
                 continue;
             }
-            let end = rest
-                .find(|c: char| c == '?' || c == '!' || c == '.' || c == '\n')
-                .unwrap_or(rest.len());
+            let end = rest.find(['?', '!', '.', '\n']).unwrap_or(rest.len());
             let mut tokens: Vec<&str> = rest[..end].split_whitespace().collect();
             while let Some(last) = tokens.last() {
                 let l = last.to_lowercase().trim_matches(|c: char| {
@@ -527,7 +524,7 @@ fn weather_code_label(code: i64) -> &'static str {
         61 | 63 | 65 => "Rain",
         66 | 67 => "Freezing rain",
         71 | 73 | 75 | 77 => "Snow",
-        80 | 81 | 82 => "Rain showers",
+        80..=82 => "Rain showers",
         85 | 86 => "Snow showers",
         95 => "Thunderstorm",
         96 | 99 => "Thunderstorm with hail",
