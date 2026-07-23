@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.232] - 2026-07-23
+
+### Changed
+- Digester Latency uses the same noise filters as Slowest (honest p50 after shipped instant fixes).
+- Agent Ops: `?` flashes the keyboard tips row (Hermes-style control hints).
+
 ## [0.1.231] - 2026-07-23
 
 ### Changed

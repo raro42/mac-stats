@@ -442,19 +442,28 @@ def main() -> int:
         lines.append(f"- `{k}`: {v}")
     lines.append("")
 
-    walls = [int(r.get("wall_ms") or 0) for r in runs]
-    lines.append("## Latency")
-    lines.append(f"- p50: **{int(statistics.median(walls))} ms**")
-    if len(walls) >= 2:
-        lines.append(f"- mean: **{int(statistics.mean(walls))} ms**")
-    lines.append(f"- max: **{max(walls)} ms**")
-    lines.append("")
-
-    slow_pool = [
+    # Same filter as Slowest — don't let pre-shipped 20s+ instant misses inflate p50.
+    latency_pool = [
         r
         for r in runs
         if not is_trivial_instant_noise(r) and not is_now_instant_slowest_noise(r)
     ]
+    walls = [int(r.get("wall_ms") or 0) for r in latency_pool]
+    lines.append("## Latency")
+    lines.append(
+        f"_Sample: **{len(latency_pool)}** / {len(runs)} turns "
+        f"(excl. shipped instant noise + sub-2s instant)._"
+    )
+    if walls:
+        lines.append(f"- p50: **{int(statistics.median(walls))} ms**")
+        if len(walls) >= 2:
+            lines.append(f"- mean: **{int(statistics.mean(walls))} ms**")
+        lines.append(f"- max: **{max(walls)} ms**")
+    else:
+        lines.append("_No remaining turns after noise filters — Latency n/a._")
+    lines.append("")
+
+    slow_pool = latency_pool
     slow = sorted(slow_pool, key=lambda r: int(r.get("wall_ms") or 0), reverse=True)[:15]
     lines.append("## Slowest 15")
     if not slow:
@@ -619,6 +628,7 @@ def main() -> int:
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "days": args.days,
         "turns": len(runs),
+        "latency_sample": len(latency_pool),
         "open_count": len(candidates),
         "stale_count": len(stale),
         "p50_ms": int(statistics.median(walls)) if walls else 0,

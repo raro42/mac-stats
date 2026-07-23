@@ -101,8 +101,21 @@ function ensureOpsKeyboardHint() {
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
     hint.textContent =
-        'Tips: 1–5 ←/→ tabs · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc';
+        'Tips: 1–5 ←/→ tabs · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · ?';
     tabs.insertAdjacentElement('afterend', hint);
+}
+
+/** Hermes-style: ? flashes the keyboard tips row when not typing. */
+function flashOpsKeyboardHint() {
+    ensureOpsKeyboardHint();
+    const hint = document.getElementById('ops-keyboard-hint');
+    if (!hint) return false;
+    hint.classList.remove('ops-keyboard-hint-flash');
+    // Retrigger CSS animation.
+    void hint.offsetWidth;
+    hint.classList.add('ops-keyboard-hint-flash');
+    hint.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+    return true;
 }
 
 function setupAgentOps() {
@@ -225,6 +238,19 @@ function setupAgentOps() {
             }
             if (!e.metaKey && !e.ctrlKey && !e.altKey && (e.key === 'j' || e.key === 'k')) {
                 if (tryOpsArrowMoveSelection(e)) return;
+            }
+            if (e.key === '?' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+                if (agentOpsCollapsed) return;
+                const t = e.target;
+                const tag = (t && t.tagName) || '';
+                if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return;
+                if (!document.getElementById('agent-ops') && !document.querySelector('.agent-ops-tabs')) {
+                    return;
+                }
+                if (flashOpsKeyboardHint()) {
+                    e.preventDefault();
+                }
+                return;
             }
             if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
             if (agentOpsCollapsed) return;
