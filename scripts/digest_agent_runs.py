@@ -35,6 +35,10 @@ SHIPPED_SKILL_GIT_FASTLANE = datetime(2026, 7, 21, 9, 10, tzinfo=timezone.utc)
 SHIPPED_REDMINE_HOME_CONFIG = datetime(2026, 7, 21, 10, 25, tzinfo=timezone.utc)
 # v0.1.206 — overnight / last-night improvements asks are instant.
 SHIPPED_INSTANT_OVERNIGHT_IMPROVEMENTS = datetime(2026, 7, 22, 8, 40, tzinfo=timezone.utc)
+# v0.1.251 — “lately” / “improvement loop” phrasings are instant.
+SHIPPED_INSTANT_IMPROVEMENTS_LATELY = datetime(2026, 7, 23, 17, 40, tzinfo=timezone.utc)
+# v0.1.252 — tonight / this-night plan asks are instant from schedules.
+SHIPPED_INSTANT_TONIGHT_PLAN = datetime(2026, 7, 23, 17, 55, tzinfo=timezone.utc)
 # v0.1.215 — Discord reach / see-channels / other-agent meta asks are instant.
 SHIPPED_INSTANT_DISCORD_REACH = datetime(2026, 7, 22, 20, 0, tzinfo=timezone.utc)
 # v0.1.164 — short acks / sign-offs are instant.
@@ -129,7 +133,39 @@ def looks_like_overnight_improvements(q: str) -> bool:
         or "coding session" in q
     ):
         return False
-    return "last night" in q or "overnight" in q or "coding session" in q
+    if "workflow" in q or "ticket" in q or "redmine" in q:
+        return False
+    return (
+        "last night" in q
+        or "overnight" in q
+        or "coding session" in q
+        or "lately" in q
+        or "recently" in q
+        or "improvement loop" in q
+        or "harness loop" in q
+        or "overnight harness" in q
+    )
+
+
+def looks_like_tonight_plan(q: str) -> bool:
+    if "ticket" in q or "redmine" in q or "weather" in q:
+        return False
+    asks_plan = (
+        "planned" in q
+        or "what's the plan" in q
+        or "whats the plan" in q
+        or "what is the plan" in q
+        or "plan for" in q
+        or "agenda" in q
+    )
+    night_ctx = (
+        "tonight" in q
+        or "this night" in q
+        or "this evening" in q
+        or "for the night" in q
+        or "evening" in q
+    )
+    return asks_plan and night_ctx
 
 
 def looks_like_version_ask(q: str) -> bool:
@@ -211,6 +247,9 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         and "REDMINE_API" in [str(t) for t in tools]
         and "redmine" in q
     ):
+        return True
+    # Pre-ship over-tooled turns that are now instant (may still list tools).
+    if looks_like_overnight_improvements(q) or looks_like_tonight_plan(q):
         return True
     if tools or tool_steps > 0:
         return False
@@ -337,6 +376,12 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
             or "overnight" in ql
             or "coding session" in ql
         ) and ("zero-tool" in hl or "instant" in hl):
+            return True
+    if ts < SHIPPED_INSTANT_IMPROVEMENTS_LATELY and looks_like_overnight_improvements(ql):
+        if "zero-tool" in hl or "instant" in hl or "improvement" in hl:
+            return True
+    if ts < SHIPPED_INSTANT_TONIGHT_PLAN and looks_like_tonight_plan(ql):
+        if "zero-tool" in hl or "instant" in hl or "schedule" in hl or "tonight" in hl:
             return True
     if ts < SHIPPED_INSTANT_DISCORD_REACH and (
         "channel" in ql

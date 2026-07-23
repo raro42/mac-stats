@@ -1145,6 +1145,33 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     if (q.contains("weather") || q.contains("wether")) && has_search_tool {
         return true;
     }
+    // Pre-ship over-tooled turns that are now instant (may still list tools).
+    if ((q.contains("improvement") || q.contains("what shipped") || q.contains("last night"))
+        && (q.contains("overnight")
+            || q.contains("coding")
+            || q.contains("session")
+            || q.contains("lately")
+            || q.contains("recently")
+            || q.contains("improvement loop")
+            || q.contains("harness"))
+        && !q.contains("workflow")
+        && !q.contains("ticket")
+        && !q.contains("redmine"))
+        || ((q.contains("planned")
+            || q.contains("what's the plan")
+            || q.contains("whats the plan")
+            || q.contains("plan for")
+            || q.contains("agenda"))
+            && (q.contains("tonight")
+                || q.contains("this night")
+                || q.contains("this evening")
+                || q.contains("for the night")
+                || q.contains("evening"))
+            && !q.contains("ticket")
+            && !q.contains("redmine"))
+    {
+        return true;
+    }
     if !tools.is_empty() {
         return false;
     }
@@ -1763,6 +1790,18 @@ mod tests {
             16_000,
             &[],
             "Please cross check if you are ok talking on amvara discord server"
+        ));
+        assert!(is_insights_slowest_noise(
+            "lite",
+            44_000,
+            &["LIST_SCHEDULES".into(), "TASK_LIST".into()],
+            "No improvement loop?"
+        ));
+        assert!(is_insights_slowest_noise(
+            "direct",
+            10_000,
+            &["TASK_LIST".into()],
+            "What's planned for this night?"
         ));
         assert!(!is_insights_slowest_noise(
             "direct",

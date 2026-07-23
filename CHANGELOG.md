@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.253] - 2026-07-23
+
+### Fixed
+- Digester/insights Latency & Slowest ignore pre-ship “lately/improvement-loop” and tonight-plan turns (even with tools).
+
 ## [0.1.252] - 2026-07-23
 
 ### Fixed
