@@ -119,12 +119,66 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
 
 fn looks_like_place_garbage(place: &str) -> bool {
     let n = place.to_lowercase();
-    n.starts_with("how")
+    if n.starts_with("how")
         || n.starts_with("what")
-        || matches!(
-            n.as_str(),
-            "is" | "it" | "the" | "a" | "an" | "please" | "now" | "today" | "tonight"
-        )
+        || n.starts_with("going")
+        || n.starts_with("will ")
+        || n.starts_with("would ")
+    {
+        return true;
+    }
+    let tokens: Vec<&str> = n.split_whitespace().collect();
+    if tokens.is_empty() || tokens.len() > 5 {
+        return true;
+    }
+    // Phrase leftovers from "how's the weather going to be over time…" must not geocode.
+    const STOP: &[&str] = &[
+        "is",
+        "it",
+        "the",
+        "a",
+        "an",
+        "please",
+        "now",
+        "today",
+        "tonight",
+        "going",
+        "to",
+        "be",
+        "over",
+        "time",
+        "of",
+        "day",
+        "will",
+        "would",
+        "this",
+        "week",
+        "weekend",
+        "tomorrow",
+        "morning",
+        "afternoon",
+        "evening",
+        "next",
+        "few",
+        "days",
+        "hours",
+        "minutes",
+        "like",
+        "look",
+        "looking",
+        "and",
+        "or",
+        "vs",
+        "versus",
+    ];
+    if matches!(
+        n.as_str(),
+        "is" | "it" | "the" | "a" | "an" | "please" | "now" | "today" | "tonight"
+    ) {
+        return true;
+    }
+    let stop_count = tokens.iter().filter(|t| STOP.contains(t)).count();
+    stop_count * 2 >= tokens.len()
 }
 
 /// True when Open-Meteo instant reply can answer without Brave/Perplexity.
@@ -458,5 +512,18 @@ mod tests {
         assert!(!should_use_default_weather_place(
             "search the weather trends in Europe"
         ));
+    }
+
+    #[test]
+    fn rejects_forecast_phrase_as_place() {
+        let q = "How's the weather going to be over time?";
+        assert!(looks_like_weather_query(q));
+        assert!(extract_place(q).is_none());
+        // Falls back to configured default place for short local asks.
+        assert!(can_instant_weather(q));
+        assert_ne!(
+            resolve_weather_place(q).unwrap().to_lowercase(),
+            "going to be over time"
+        );
     }
 }

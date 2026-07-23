@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.246] - 2026-07-23
+
+### Fixed
+- Weather place parsing no longer geocodes phrase leftovers like “going to be over time”.
+
 ## [0.1.245] - 2026-07-23
 
 ### Added
