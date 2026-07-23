@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.252] - 2026-07-23
+
+### Fixed
+- Instant reply for “What’s planned for tonight/this night?” from live schedules (skips TASK_LIST loops).
+
 ## [0.1.251] - 2026-07-23
 
 ### Fixed

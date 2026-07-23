@@ -1364,6 +1364,31 @@ fn classify_candidate(
             request_id: request_id.into(),
         });
     }
+    let asks_plan = q.contains("planned")
+        || q.contains("what's the plan")
+        || q.contains("whats the plan")
+        || q.contains("plan for")
+        || q.contains("agenda");
+    let night_ctx = q.contains("tonight")
+        || q.contains("this night")
+        || q.contains("this evening")
+        || q.contains("for the night");
+    if asks_plan
+        && night_ctx
+        && !q.contains("redmine")
+        && !q.contains("ticket")
+        && lane != "instant"
+        && wall_ms >= 500
+    {
+        return Some(RunInsightCandidate {
+            kind: "promote_instant".into(),
+            reason: "Tonight/schedule plan ask should stay on instant lane".into(),
+            wall_ms,
+            lane: lane.into(),
+            question_preview: question.chars().take(80).collect(),
+            request_id: request_id.into(),
+        });
+    }
     let n_cap = q.trim_end_matches(['?', '!', '.']).trim();
     let looks_capabilities = matches!(
         n_cap,

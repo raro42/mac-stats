@@ -105,6 +105,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_overnight_improvements_ask(&n) {
         return Some(format_instant_overnight_improvements_reply());
     }
+    if is_tonight_plan_ask(&n) {
+        return Some(format_instant_tonight_plan_reply());
+    }
     if is_presence_or_who_ask(&n) {
         return Some(format_instant_presence_reply());
     }
@@ -330,6 +333,57 @@ fn is_overnight_improvements_ask(n: &str) -> bool {
         || n.contains("harness loop")
         || n.contains("overnight harness");
     asks_improvements && overnight_context
+}
+
+/// “What’s planned for this night / tonight?” — avoid TASK_LIST tool loops.
+fn is_tonight_plan_ask(n: &str) -> bool {
+    if n.chars().count() > 120 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("redmine")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("ticket")
+        || n.contains("weather")
+    {
+        return false;
+    }
+    let asks_plan = n.contains("planned")
+        || n.contains("what's the plan")
+        || n.contains("whats the plan")
+        || n.contains("what is the plan")
+        || n.contains("plan for")
+        || n.contains("agenda");
+    let night_ctx = n.contains("tonight")
+        || n.contains("this night")
+        || n.contains("this evening")
+        || n.contains("for the night")
+        || n.contains("evening");
+    asks_plan && night_ctx
+}
+
+fn format_instant_tonight_plan_reply() -> String {
+    let snap = crate::scheduler::scheduler_operator_snapshot();
+    let list = crate::scheduler::list_schedules_formatted();
+    let preview = list.lines().take(10).collect::<Vec<_>>().join("\n");
+    let next = match (
+        snap.next_run_at.as_deref(),
+        snap.next_task_preview.as_deref(),
+        snap.seconds_until_next_fire,
+    ) {
+        (Some(at), Some(task), Some(secs)) => {
+            let mins = secs / 60;
+            format!("Next up: **{at}** (~{mins} min) — {task}")
+        }
+        (Some(at), Some(task), None) => format!("Next up: **{at}** — {task}"),
+        _ => "No upcoming schedule fire computed.".to_string(),
+    };
+    format!(
+        "{next}\n\n**Schedules** ({} loaded):\n{preview}\n\n\
+Open **Agent Ops → Schedules** for the full list.",
+        snap.total_entries
+    )
 }
 
 fn format_instant_overnight_improvements_reply() -> String {
@@ -995,6 +1049,33 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "improvements without overnight context must not be instant"
+        );
+    }
+
+    #[test]
+    fn tonight_plan_asks_are_instant() {
+        for q in [
+            "What's planned for this night?",
+            "Whats planned for tonight?",
+            "What is the plan for this evening?",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    let lower = reply.to_lowercase();
+                    assert!(
+                        lower.contains("schedule") || lower.contains("next"),
+                        "expected schedule blurb for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant for {q:?}, got {:?}", other),
+            }
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane("What's the plan for the Redmine ticket?", None),
+                TurnLane::Instant { .. }
+            ),
+            "ticket planning must not be instant schedule dump"
         );
     }
 
