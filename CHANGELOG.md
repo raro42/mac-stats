@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.241] - 2026-07-23
+
+### Fixed
+- Perplexity/AEMET-style pipe-table snippets render as readable bullets instead of raw `|` walls.
+
 ## [0.1.240] - 2026-07-23
 
 ### Changed

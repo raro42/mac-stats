@@ -494,6 +494,10 @@
   white-space: pre-wrap;
   line-height: 1.45;
 }
+.perplexity-result-snippet ul {
+  margin: 4px 0 0;
+  padding-left: 1.1em;
+}
 .perplexity-result-meta {
   font-size: 11px;
   opacity: 0.55;

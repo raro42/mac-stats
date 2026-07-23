@@ -60,9 +60,25 @@ pub fn shape_search_results(
 }
 
 /// Make long search snippets readable: real newlines, sentence breaks, no run-on walls.
+/// Also turns raw Markdown pipe-tables (AEMET etc.) into bullet lists.
 pub fn normalize_snippet_layout(snippet: &str) -> String {
     let mut s = snippet.replace("\\n", "\n").replace("\\r", "");
     s = s.replace('\r', "\n");
+    if let Some(table) = humanize_pipe_table_snippet(&s) {
+        return table
+            .lines()
+            .map(|l| l.trim())
+            .filter(|l| !l.is_empty())
+            .map(|l| {
+                if l.starts_with('•') || l.starts_with('>') {
+                    l.to_string()
+                } else {
+                    format!("> {l}")
+                }
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+    }
     let mut out = String::with_capacity(s.len());
     let mut prev_space = false;
     let mut newline_run = 0u8;
@@ -105,6 +121,82 @@ pub fn normalize_snippet_layout(snippet: &str) -> String {
         .map(|l| format!("> {l}"))
         .collect::<Vec<_>>()
         .join("\n")
+}
+
+/// Detect Markdown/CSV-style `|cell|cell|` blobs and turn them into bullets.
+/// Returns `None` when the text does not look like a pipe table.
+pub fn humanize_pipe_table_snippet(snippet: &str) -> Option<String> {
+    let pipe_count = snippet.chars().filter(|c| *c == '|').count();
+    if pipe_count < 4 {
+        return None;
+    }
+    let raw_rows: Vec<&str> = if snippet.contains('\n') {
+        snippet.lines().collect()
+    } else {
+        vec![snippet]
+    };
+
+    let mut cells: Vec<String> = Vec::new();
+    for row in raw_rows {
+        let t = row.trim();
+        if t.is_empty() {
+            continue;
+        }
+        // Skip markdown separator rows: |---|:---|
+        let only_sep = t
+            .chars()
+            .all(|c| matches!(c, '|' | '-' | ':' | ' ' | '\t'));
+        if only_sep {
+            continue;
+        }
+        for cell in t.split('|') {
+            let c = cell.trim();
+            if c.is_empty() {
+                continue;
+            }
+            if c.chars().all(|ch| matches!(ch, '-' | ':')) {
+                continue;
+            }
+            cells.push(prettify_weather_table_cell(c));
+        }
+    }
+    if cells.len() < 2 {
+        return None;
+    }
+    // Cap so AEMET 7-day dumps don't flood the card.
+    const MAX_CELLS: usize = 12;
+    let shown = if cells.len() > MAX_CELLS {
+        let mut v = cells[..MAX_CELLS].to_vec();
+        v.push(format!("… +{} more", cells.len() - MAX_CELLS));
+        v
+    } else {
+        cells
+    };
+    Some(
+        shown
+            .into_iter()
+            .map(|c| format!("• {c}"))
+            .collect::<Vec<_>>()
+            .join("\n"),
+    )
+}
+
+fn prettify_weather_table_cell(cell: &str) -> String {
+    // "06–12 h 22°C" → "06–12 h · 22°C"
+    if let Some(idx) = cell.find('°') {
+        let before = &cell[..idx];
+        if let Some(sp) = before.rfind(|c: char| c.is_whitespace()) {
+            let left = before[..sp].trim();
+            let temp = cell[sp..].trim();
+            if !left.is_empty()
+                && temp.chars().any(|c| c.is_ascii_digit())
+                && (left.contains('h') || left.contains('–') || left.contains('-'))
+            {
+                return format!("{left} · {temp}");
+            }
+        }
+    }
+    cell.to_string()
 }
 
 /// Format shaped results as markdown. If the resulting string exceeds max_chars,
@@ -168,6 +260,17 @@ fn truncate_head_tail(text: &str, max_chars: usize) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn humanize_aemet_pipe_table_to_bullets() {
+        let raw = "|--|--|--|\n|06–12 h 22°C|12–18 h 20°C|18–24 h 18°C|\n|00–06 h 17°C|06–12 h 24°C|";
+        let got = humanize_pipe_table_snippet(raw).expect("table");
+        assert!(got.contains("• 06–12 h · 22°C"), "{got}");
+        assert!(got.contains("• 12–18 h · 20°C"), "{got}");
+        assert!(!got.contains("|--"), "{got}");
+        let normalized = normalize_snippet_layout(raw);
+        assert!(normalized.contains('•') || normalized.contains('>'), "{normalized}");
+    }
 
     #[test]
     fn shape_truncates_snippet_and_caps() {

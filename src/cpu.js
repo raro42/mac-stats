@@ -3524,6 +3524,36 @@ function initCollapsibleSections() {
 // ============================================================================
 const PERPLEXITY_KEYCHAIN_ACCOUNT = 'perplexity_api_key';
 
+/** Turn AEMET-style `|cell|cell|` Markdown tables into readable bullets for the results card. */
+function formatPerplexitySnippet(raw) {
+  const s = String(raw || '');
+  const pipeCount = (s.match(/\|/g) || []).length;
+  if (pipeCount < 4) return s;
+  const rows = s.includes('\n') ? s.split(/\n/) : [s];
+  const cells = [];
+  for (const row of rows) {
+    const t = row.trim();
+    if (!t) continue;
+    if (/^[\|\-\:\s]+$/.test(t)) continue;
+    for (const part of t.split('|')) {
+      let c = part.trim();
+      if (!c || /^[\-:]+$/.test(c)) continue;
+      // "06–12 h 22°C" → "06–12 h · 22°C"
+      const m = c.match(/^(.+?)\s+(\d+\s*°C)$/i);
+      if (m && (m[1].includes('h') || /[–-]/.test(m[1]))) {
+        c = `${m[1]} · ${m[2]}`;
+      }
+      cells.push(c);
+    }
+  }
+  if (cells.length < 2) return s;
+  const max = 12;
+  const shown = cells.length > max
+    ? cells.slice(0, max).concat([`… +${cells.length - max} more`])
+    : cells;
+  return shown.map((c) => `• ${c}`).join('\n');
+}
+
 function updatePerplexityConfigStatus(statusText, elId) {
   const el = document.getElementById(elId);
   if (el) el.textContent = statusText;
@@ -3606,9 +3636,11 @@ function initPerplexitySection() {
               };
           const title = esc(r.title || 'Untitled');
           const url = esc(r.url || '#');
-          const snippetRaw = String(r.snippet || '')
-            .replace(/\\n/g, '\n')
-            .replace(/\r/g, '');
+          const snippetRaw = formatPerplexitySnippet(
+            String(r.snippet || '')
+              .replace(/\\n/g, '\n')
+              .replace(/\r/g, '')
+          );
           const snippet = esc(snippetRaw);
           let domain = '';
           try {
