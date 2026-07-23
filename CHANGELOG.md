@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Documented Open-Meteo default place (`weatherDefaultPlace`) and feature-health probe.
+
 ## [0.1.248] - 2026-07-23
 
 ### Fixed

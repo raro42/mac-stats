@@ -46,6 +46,18 @@ In `config.json`:
 
 Details: [039_werner_harness_parity.md](039_werner_harness_parity.md).
 
+## Weather (Open-Meteo)
+
+Local weather asks (chat, Discord, Perplexity panel) use **Open-Meteo** when a place is clear or when the query is a short local ask.
+
+In `config.json`:
+
+- `weatherDefaultPlace` — place used when the user does not name one (default: `El Masnou`)
+
+Or env: `MAC_STATS_WEATHER_DEFAULT_PLACE`.
+
+Startup feature health geocodes this place (see [design/040_feature_health_dashboard.md](design/040_feature_health_dashboard.md)).
+
 ## Logs
 
 ```bash

@@ -9,7 +9,8 @@ mac-stats collects a **structured subsystem health report** after startup (about
 | Ollama | Client configured; `GET /api/tags` within timeout; configured model appears in the list |
 | Discord | Bot token present (env / `.config.env` / Keychain); gateway received `Ready`, or **Degraded** with stage-aware text (first connect vs reconnect via Serenity `ShardStageUpdate` + client start time) |
 | Browser (CDP) | Default Chrome path exists; `http://127.0.0.1:9222/json/version` responds |
-| Brave Search | `BRAVE_API_KEY` present (env or `.config.env`) |
+| Brave Search | `BRAVE_API_KEY` present (env or `.config.env`); API ping when configured |
+| Open-Meteo | Geocodes the configured default weather place (`weatherDefaultPlace` / `MAC_STATS_WEATHER_DEFAULT_PLACE`, default **El Masnou**) — no API key |
 | Redmine | `REDMINE_URL` + `REDMINE_API_KEY`; `GET .../users/current.json` |
 | SMC (temperature) | `Smc::connect()` within timeout |
 | IOReport (CPU frequency) | CPU performance-state channel group visible to IOReport |
