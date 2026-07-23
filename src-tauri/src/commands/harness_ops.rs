@@ -1212,7 +1212,13 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("wakeup")
         || q.contains("wake up")
         || ((q.contains("improvement") || q.contains("what shipped") || q.contains("last night"))
-            && (q.contains("overnight") || q.contains("coding") || q.contains("session")))
+            && (q.contains("overnight")
+                || q.contains("coding")
+                || q.contains("session")
+                || q.contains("lately")
+                || q.contains("recently")
+                || q.contains("improvement loop")
+                || q.contains("harness")))
     {
         return true;
     }
@@ -1335,11 +1341,17 @@ fn classify_candidate(
     let overnight_context = q.contains("last night")
         || q.contains("overnight")
         || q.contains("coding session")
-        || q.contains("last night's");
+        || q.contains("last night's")
+        || q.contains("lately")
+        || q.contains("recently")
+        || q.contains("improvement loop")
+        || q.contains("harness loop")
+        || q.contains("overnight harness");
     if asks_improvements
         && overnight_context
         && !q.contains("redmine")
         && !q.contains("ticket")
+        && !q.contains("workflow")
         && lane != "instant"
         && wall_ms >= 500
     {

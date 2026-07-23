@@ -299,7 +299,7 @@ fn format_instant_presence_reply() -> String {
     )
 }
 
-/// “Any improvements from last night / overnight coding?” — digester zero-tool slow turns.
+/// “Any improvements from last night / overnight / lately?” — digester zero-tool slow turns.
 fn is_overnight_improvements_ask(n: &str) -> bool {
     if n.chars().count() > 140 {
         return false;
@@ -311,6 +311,7 @@ fn is_overnight_improvements_ask(n: &str) -> bool {
         || n.contains("search")
         || n.contains("weather")
         || n.contains("ticket")
+        || n.contains("workflow")
     {
         return false;
     }
@@ -322,7 +323,12 @@ fn is_overnight_improvements_ask(n: &str) -> bool {
     let overnight_context = n.contains("last night")
         || n.contains("overnight")
         || n.contains("coding session")
-        || n.contains("last night's");
+        || n.contains("last night's")
+        || n.contains("lately")
+        || n.contains("recently")
+        || n.contains("improvement loop")
+        || n.contains("harness loop")
+        || n.contains("overnight harness");
     asks_improvements && overnight_context
 }
 
@@ -969,6 +975,8 @@ commit+push, then reply briefly.";
             "Any improvements from last night?",
             "What shipped overnight?",
             "What changed from last night's coding session?",
+            "Any improvement lately?",
+            "No improvement loop?",
         ] {
             match classify_turn_lane(q, None) {
                 TurnLane::Instant { reply } => {

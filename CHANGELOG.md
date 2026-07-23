@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.251] - 2026-07-23
+
+### Fixed
+- Instant overnight recap also covers “any improvement lately?” / “improvement loop?” (was ~10–44s lite).
+
 ## [0.1.250] - 2026-07-23
 
 ### Fixed
