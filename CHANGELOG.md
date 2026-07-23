@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.238] - 2026-07-23
+
+### Changed
+- Scheduled wake-up greeting includes overnight morning-surprise highlights when available.
+- Agent Ops: `R` refreshes digester; `r` refreshes the pane.
+
 ## [0.1.237] - 2026-07-23
 
 ### Fixed

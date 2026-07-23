@@ -570,8 +570,24 @@ fn format_instant_wakeup_reply() -> String {
         12..=17 => "Good afternoon",
         _ => "Good evening",
     };
+    let version = crate::config::Config::version();
+    let highlights = load_morning_surprise_highlights(3);
+    if highlights.is_empty() {
+        return format!(
+            "{greeting}! Hope you're doing well — I'm here if you need anything. \
+(mac-stats v{version}, {})",
+            now.format("%H:%M")
+        );
+    }
+    let list = highlights
+        .into_iter()
+        .map(|b| format!("• {b}"))
+        .collect::<Vec<_>>()
+        .join("\n");
     format!(
-        "{greeting}! Hope you're doing well — I'm here if you need anything. ({})",
+        "{greeting}! I'm here if you need anything (mac-stats v{version}, {}).\n\
+Overnight highlights:\n{list}\n\
+Ask *any improvements from last night?* for more.",
         now.format("%H:%M")
     )
 }
@@ -1057,7 +1073,10 @@ commit+push, then reply briefly.";
                         || lower.contains("evening"),
                     "expected daypart greeting: {reply}"
                 );
-                assert!(lower.contains("need") || lower.contains("here"));
+                assert!(
+                    lower.contains("need") || lower.contains("here") || lower.contains("mac-stats"),
+                    "expected presence/version cue: {reply}"
+                );
             }
             other => panic!("expected Instant, got {:?}", other),
         }
