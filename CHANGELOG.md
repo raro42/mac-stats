@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.237] - 2026-07-23
+
+### Fixed
+- Discord insights: infer disconnect count on Ready when heartbeat restarts skip stage updates (no more Ready #N with disconnects=0).
+
 ## [0.1.236] - 2026-07-23
 
 ### Changed

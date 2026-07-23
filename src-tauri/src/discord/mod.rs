@@ -3090,6 +3090,22 @@ impl EventHandler for Handler {
         }
         let ready_n = DISCORD_READY_COUNT.fetch_add(1, Ordering::SeqCst) + 1;
         if ready_n > 1 {
+            // Heartbeat/request_restart sometimes re-Ready without a Connected→* stage
+            // update we can count. Keep disconnect× ≥ Ready# − 1 for insights fidelity.
+            let disc = DISCORD_DISCONNECT_COUNT.load(Ordering::SeqCst);
+            let bump = inferred_disconnect_bump(ready_n, disc);
+            if bump > 0 {
+                DISCORD_DISCONNECT_COUNT.fetch_add(bump, Ordering::SeqCst);
+                if let Ok(mut g) = DISCORD_LAST_DISCONNECT_AT.lock() {
+                    *g = Some(Instant::now());
+                }
+                info!(
+                    "Discord: inferred disconnect ×{} before Ready #{} (stage updates missed drop; disconnects now {})",
+                    bump,
+                    ready_n,
+                    disc + bump
+                );
+            }
             info!(
                 "Discord: Bot reconnected as {} (id: {}) — Ready #{} this process (resumes={}, disconnects={})",
                 data_about_bot.user.name,
@@ -3389,6 +3405,15 @@ pub fn discord_bot_token_configured() -> bool {
 /// Gateway received Discord `Ready` (bot session active).
 pub fn discord_bot_gateway_ready() -> bool {
     bot_user_id().is_some()
+}
+
+/// Extra disconnects to attribute when Ready#N arrives without matching stage drops.
+/// Invariant: after Ready #N (N>1), disconnect× should be at least N−1.
+pub(crate) fn inferred_disconnect_bump(ready_n: u64, disconnect_count: u64) -> u64 {
+    if ready_n <= 1 {
+        return 0;
+    }
+    (ready_n - 1).saturating_sub(disconnect_count)
 }
 
 /// True when leaving an established gateway session (including heartbeat restart
@@ -3752,6 +3777,16 @@ mod tests {
         assert!(!super::gateway_stage_counts_as_disconnect(Connected, Connected));
         assert!(!super::gateway_stage_counts_as_disconnect(Connecting, Identifying));
         assert!(!super::gateway_stage_counts_as_disconnect(Disconnected, Connecting));
+    }
+
+    #[test]
+    fn inferred_disconnect_bump_covers_missed_stage_updates() {
+        assert_eq!(super::inferred_disconnect_bump(1, 0), 0);
+        assert_eq!(super::inferred_disconnect_bump(2, 0), 1);
+        assert_eq!(super::inferred_disconnect_bump(3, 0), 2);
+        assert_eq!(super::inferred_disconnect_bump(3, 1), 1);
+        assert_eq!(super::inferred_disconnect_bump(3, 2), 0);
+        assert_eq!(super::inferred_disconnect_bump(4, 1), 2);
     }
 
     #[test]
