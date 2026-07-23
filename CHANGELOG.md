@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.227] - 2026-07-23
+
+### Changed
+- Agent Ops: Space opens the selected row (same as Enter) when not typing in a filter.
+
 ## [0.1.226] - 2026-07-23
 
 ### Changed

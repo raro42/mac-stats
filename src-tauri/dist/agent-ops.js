@@ -101,7 +101,7 @@ function ensureOpsKeyboardHint() {
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
         hint.textContent =
-        'Tips: 1–5 ←/→ tabs · ↑/↓ j/k · PgUp/PgDn Home/End · / Esc Enter';
+        'Tips: 1–5 ←/→ tabs · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -154,7 +154,18 @@ function setupAgentOps() {
                 if (tryOpsAgentDetailEscape(e)) return;
                 if (tryOpsPreviewEscape(e)) return;
             }
-            if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+            if (
+                (e.key === 'Enter' || e.key === ' ')
+                && !e.metaKey
+                && !e.ctrlKey
+                && !e.altKey
+            ) {
+                const t = e.target;
+                const tag = (t && t.tagName) || '';
+                // Space in inputs must type a space; Enter in filters still opens rows.
+                if (e.key === ' ' && (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable)) {
+                    return;
+                }
                 if (tryOpsSessionEnterLoad(e)) return;
                 if (tryOpsMemoryEnter(e)) return;
                 if (tryOpsRunsEnter(e)) return;
