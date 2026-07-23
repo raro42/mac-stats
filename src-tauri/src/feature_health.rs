@@ -391,6 +391,84 @@ async fn probe_brave() -> FeatureHealth {
     }
 }
 
+/// Geocode the configured default weather place via Open-Meteo (no API key).
+async fn probe_open_meteo() -> FeatureHealth {
+    let place = crate::config::Config::weather_default_place();
+    let client = match reqwest::Client::builder()
+        .timeout(Duration::from_secs(2))
+        .build()
+    {
+        Ok(c) => c,
+        Err(e) => {
+            return entry(
+                "Open-Meteo",
+                HealthStatus::Unavailable,
+                Some(format!("HTTP client: {e}")),
+            );
+        }
+    };
+    let url = match reqwest::Url::parse_with_params(
+        "https://geocoding-api.open-meteo.com/v1/search",
+        &[
+            ("name", place.as_str()),
+            ("count", "1"),
+            ("language", "en"),
+            ("format", "json"),
+        ],
+    ) {
+        Ok(u) => u,
+        Err(e) => {
+            return entry(
+                "Open-Meteo",
+                HealthStatus::Unavailable,
+                Some(format!("bad URL: {e}")),
+            );
+        }
+    };
+    match tokio::time::timeout(PROBE_TIMEOUT, client.get(url).send()).await {
+        Ok(Ok(resp)) if resp.status().is_success() => {
+            let ok_body = resp
+                .json::<serde_json::Value>()
+                .await
+                .ok()
+                .and_then(|v| {
+                    v.get("results")
+                        .and_then(|r| r.as_array())
+                        .map(|a| !a.is_empty())
+                })
+                .unwrap_or(false);
+            if ok_body {
+                entry(
+                    "Open-Meteo",
+                    HealthStatus::Ok,
+                    Some(format!("geocode ok · default “{place}”")),
+                )
+            } else {
+                entry(
+                    "Open-Meteo",
+                    HealthStatus::Degraded,
+                    Some(format!("reachable but no geocode hit for “{place}”")),
+                )
+            }
+        }
+        Ok(Ok(resp)) => entry(
+            "Open-Meteo",
+            HealthStatus::Unavailable,
+            Some(format!("HTTP {}", resp.status())),
+        ),
+        Ok(Err(e)) => entry(
+            "Open-Meteo",
+            HealthStatus::Unavailable,
+            Some(format!("request failed: {e}")),
+        ),
+        Err(_) => entry(
+            "Open-Meteo",
+            HealthStatus::Unavailable,
+            Some("timeout".into()),
+        ),
+    }
+}
+
 async fn probe_redmine() -> FeatureHealth {
     if !crate::redmine::is_configured() {
         return entry("Redmine", HealthStatus::NotConfigured, None);
@@ -505,13 +583,24 @@ pub async fn collect_feature_health() -> Vec<FeatureHealth> {
     let redmine = probe_redmine();
     let browser = probe_browser();
     let brave = probe_brave();
-    let (o, r, b, br) = tokio::join!(ollama, redmine, browser, brave);
+    let open_meteo = probe_open_meteo();
+    let (o, r, b, br, om) = tokio::join!(ollama, redmine, browser, brave, open_meteo);
 
     let smc = probe_smc_blocking();
     let ioreport = probe_ioreport_blocking();
     let (s, i) = tokio::join!(smc, ioreport);
 
-    vec![o, probe_discord(), b, br, r, s, i, probe_scheduler()]
+    vec![
+        o,
+        probe_discord(),
+        b,
+        br,
+        om,
+        r,
+        s,
+        i,
+        probe_scheduler(),
+    ]
 }
 
 pub fn store_report(report: &[FeatureHealth]) {

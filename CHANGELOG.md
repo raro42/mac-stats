@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.247] - 2026-07-23
+
+### Added
+- Feature health probe for Open-Meteo (geocodes the default weather place at startup).
+
 ## [0.1.246] - 2026-07-23
 
 ### Fixed
