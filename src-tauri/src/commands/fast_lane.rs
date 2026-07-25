@@ -128,7 +128,7 @@ fn try_instant_reply(q: &str) -> Option<String> {
     }
     if is_version_question(&n) {
         return Some(format!(
-            "I'm **mac-stats v{}**.",
+            "I'm **mac-stats v{}** — current committed/shipped build.",
             crate::config::Config::version()
         ));
     }
@@ -667,7 +667,37 @@ fn is_version_question(n: &str) -> bool {
             | "mac stats version"
     ) || (n.contains("version")
         && n.chars().count() < 48
-        && (n.contains("you") || n.contains("app") || n.contains("mac-stats") || n.starts_with("what")))
+        && (n.contains("you")
+            || n.contains("app")
+            || n.contains("mac-stats")
+            || n.starts_with("what")))
+        || is_ship_version_status_ask(n)
+}
+
+/// Digester: "Improvement committed and version bumped?" (~12s direct, zero tools).
+fn is_ship_version_status_ask(n: &str) -> bool {
+    if n.chars().count() > 96 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("redmine")
+    {
+        return false;
+    }
+    let has_version = n.contains("version") || n.contains("bumped");
+    let has_ship = n.contains("commit")
+        || n.contains("ship")
+        || n.contains("release")
+        || n.contains("pushed");
+    has_version
+        && has_ship
+        && (n.contains('?')
+            || n.starts_with("did ")
+            || n.starts_with("is ")
+            || n.starts_with("was ")
+            || n.starts_with("has "))
 }
 
 /// Short process-uptime asks (pairs with Agent Ops Version card /insights).
@@ -872,6 +902,26 @@ commit+push, then reply briefly.";
                 assert!(reply.contains(&crate::config::Config::version()));
             }
             other => panic!("expected Instant, got {:?}", other),
+        }
+    }
+
+    #[test]
+    fn ship_version_status_ask_is_instant() {
+        for q in [
+            "Improvement committed and version bumped?",
+            "Improvement comitted and version bumped?",
+            "Was the version bumped?",
+            "Did you commit and bump the version?",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    assert!(
+                        reply.contains(&crate::config::Config::version()),
+                        "expected version in reply for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant for {q:?}, got {:?}", other),
+            }
         }
     }
 
