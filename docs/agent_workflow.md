@@ -65,7 +65,7 @@ Ollama invokes tools by replying with **exactly one line** in the form `TOOL_NAM
 | **SKILL** | `SKILL: <number or topic> [task]` | Run skill in separate Ollama session; result injected back. | `skills/`, `commands/ollama.rs`. When skills exist. |
 | **AGENT** | `AGENT: <slug or id> [task]` | Run specialized LLM agent. | `agents/`, `commands/ollama.rs`. When agents exist. |
 | **MCP** | `MCP: <tool_name> <args>` | Run tool from configured MCP server. | `mcp/`. When `MCP_SERVER_URL` or `MCP_SERVER_STDIO` set. |
-| **MEMORY_APPEND** | `MEMORY_APPEND: <lesson>` or `MEMORY_APPEND: agent:<id> <lesson>` | Save lesson for future sessions (channel or agent). | `commands/ollama.rs`. |
+| **MEMORY** / **MEMORY_APPEND** | `MEMORY: add <lesson>` · `MEMORY: save <slug>` + verbatim body · `MEMORY: read note:<slug>` · `MEMORY_APPEND: <lesson>` | Lessons (concise) or verbatim notes (plans/lists). Channel-scoped on Discord. | `commands/curated_memory.rs`. |
 | **MASTODON_POST** | `MASTODON_POST: [visibility:] <text>` | Post status to Mastodon. | When Mastodon configured. |
 | **DONE** | `DONE: success` or `DONE: no` | Signal task completed or could not complete; stops tool loop. | Parsed in tool loop. |
 

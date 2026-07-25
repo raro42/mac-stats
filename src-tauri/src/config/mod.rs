@@ -371,7 +371,7 @@ impl Config {
         Self::merge_config_bool("aiAgentEnabled", enabled)
     }
 
-    /// Compact menu bar (CPU + cached temp when available). Default **true**.
+    /// Compact menu bar (CPU + SSD + cached temp when available). Default **true**.
     /// Set `menuBarCompact: false` for the classic CPU/GPU/RAM/SSD grid.
     pub fn menu_bar_compact() -> bool {
         let config_path = Self::config_file_path();
@@ -1655,6 +1655,21 @@ impl Config {
     /// session has its own persistent memory like Discord channels have memory-discord-{id}.md.
     pub fn memory_file_path_for_main_session() -> PathBuf {
         Self::agents_dir().join("memory-main.md")
+    }
+
+    /// Directory for verbatim saved notes (plans, itineraries): `$HOME/.mac-stats/agents/notes/`
+    pub fn memory_notes_dir() -> PathBuf {
+        Self::agents_dir().join("notes")
+    }
+
+    /// Per-channel Discord notes: `$HOME/.mac-stats/agents/notes/discord-{channel_id}/`
+    pub fn memory_notes_dir_for_discord_channel(channel_id: u64) -> PathBuf {
+        Self::memory_notes_dir().join(format!("discord-{channel_id}"))
+    }
+
+    /// Main-session notes: `$HOME/.mac-stats/agents/notes/main/`
+    pub fn memory_notes_dir_for_main_session() -> PathBuf {
+        Self::memory_notes_dir().join("main")
     }
 
     /// Path to Discord channel config: `$HOME/.mac-stats/discord_channels.json`

@@ -291,7 +291,7 @@ pub(crate) async fn build_agent_descriptions(
         num += 1;
     }
     base.push_str(&format!(
-        "\n\n{}. **MEMORY** (curated, Hermes-style): MEMORY: add <lesson> | replace <old> => <new> | remove <substr> | read. Optional agent:<slug> prefix. MEMORY_APPEND: <lesson> still works as add. Keep entries concise; char budget enforced.",
+        "\n\n{}. **MEMORY** (curated + verbatim notes): Lessons: MEMORY: add <concise lesson> | replace <old> => <new> | remove <substr> | read. **When the user asks to save/remember a plan, itinerary, list, or exact details for later:** MEMORY: save <slug> then the **full verbatim** body on following lines (flights, dates, routes, names — never summarize). Read a note: MEMORY: read note:<slug>. Optional agent:<slug> prefix. MEMORY_APPEND: <lesson> still works as add.",
         num
     ));
     num += 1;

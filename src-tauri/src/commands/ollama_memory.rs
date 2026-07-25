@@ -98,6 +98,7 @@ pub(crate) fn load_main_session_memory_block() -> String {
 /// Global memory (personal/long-term) is only loaded in main session (in-app, or Discord DM).
 /// In Discord guild channels and having_fun, only per-channel memory is loaded to avoid leaking personal context.
 /// When there is no Discord channel (in-app), main-session memory (memory-main.md) is also loaded.
+/// Verbatim saved notes (`MEMORY: save`) are appended so plans/lists survive beyond one-line summaries.
 pub(crate) fn load_memory_block_for_request(
     discord_channel_id: Option<u64>,
     load_global_memory: bool,
@@ -116,11 +117,20 @@ pub(crate) fn load_memory_block_for_request(
                 String::new()
             }
         });
-    if channel.is_empty() {
+    let mut base = if channel.is_empty() {
         global
     } else {
         format!("{}{}", global, channel)
+    };
+    const NOTES_BUDGET: usize = 6_000;
+    let notes = crate::commands::curated_memory::load_notes_block_for_prompt(
+        discord_channel_id,
+        NOTES_BUDGET,
+    );
+    if !notes.is_empty() {
+        base.push_str(&notes);
     }
+    base
 }
 
 /// Extract words (alphanumeric, lowercase) for simple keyword matching.

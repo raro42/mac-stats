@@ -223,7 +223,7 @@ pub(crate) static TOOLS: &[ToolDef] = &[
     },
     ToolDef {
         name: "MEMORY",
-        description: "Curated memory add/replace/remove/read with char budget (Hermes memory). MEMORY_APPEND aliases add.",
+        description: "Curated memory + verbatim notes. add/replace/remove/read lessons; save <slug> + full body for plans/lists (never summarize). MEMORY_APPEND aliases add.",
         accepts_argument: true,
         requires_browser: false,
         terminates_navigation: false,

@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.255] - 2026-07-25
+
+### Added
+- Overnight **autoresearch ratchet** (Karpathy-style): `docs/autoresearch/program.md` strategy + `scripts/autoresearch_ratchet.py` verify/keep/discard with `~/.mac-stats/improvements/autoresearch/results.tsv`.
+
+## [0.1.254] - 2026-07-25
+
+### Added
+- Menu bar compact mode shows **SSD** usage alongside CPU (and temperature when available).
+- **MEMORY: save <slug>** stores verbatim multi-line notes (travel plans, lists) under `~/.mac-stats/agents/notes/`; thin one-line summaries are rejected.
+
+### Changed
+- MEMORY tool guidance: user-requested plans/itineraries must be saved verbatim, not summarized; notes load into prompts for exact recall.
+
 ## [0.1.253] - 2026-07-23
 
 ### Fixed

@@ -1,7 +1,7 @@
 //! Miscellaneous tool dispatch handlers for the agent router tool loop.
 //!
 //! Contains: OLLAMA_API, MCP, CURSOR_AGENT, MASTODON_POST.
-//! MEMORY lives in `curated_memory` (Hermes-style add/replace/remove).
+//! MEMORY lives in `curated_memory` (Hermes-style add/replace/remove + verbatim save notes).
 //! Extracted from `commands/ollama.rs` to keep modules small and cohesive.
 
 use tracing::info;

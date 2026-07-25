@@ -338,6 +338,8 @@ pub fn looks_like_memory_pollution(entry: &str) -> bool {
     // Compacted / tool-loop transcript dumps that leaked into MEMORY_APPEND
     if t.starts_with("[user]:")
         || t.starts_with("[assistant]:")
+        || t.starts_with("**[user]**")
+        || t.starts_with("**[assistant]**")
         || t.starts_with("run_cmd (")
         || t.starts_with("perplexity_search:")
         || t.starts_with("brave_search:")
@@ -345,6 +347,9 @@ pub fn looks_like_memory_pollution(entry: &str) -> bool {
         || t.starts_with("redmine_api:")
         || t.starts_with("**note:**")
         || t.starts_with("note: in the last section")
+        || t.starts_with("<td>")
+        || t.starts_with("<table>")
+        || t.starts_with("</table>")
     {
         return true;
     }
@@ -371,6 +376,10 @@ pub fn looks_like_memory_pollution(entry: &str) -> bool {
         || n.contains("[continue for next question]")
         || n.contains("last assistant text:")
         || n.contains("rule applies to both previous")
+        || n.contains("preserve in context")
+        || n.contains("purely social/casual")
+        || n.contains("### context")
+        || n.contains("### lessons")
         || (n.contains("*cursor agent") && n.len() < 80)
         || (n.starts_with("*redmine") && n.len() < 120)
 }
@@ -444,7 +453,7 @@ pub fn scrub_polluted_memory_files() -> (usize, usize) {
 }
 
 /// Cap memory block size for the system prompt (bytes of markdown after filter).
-pub const MEMORY_PROMPT_MAX_CHARS: usize = 2_500;
+pub const MEMORY_PROMPT_MAX_CHARS: usize = 4_000;
 
 pub fn truncate_memory_for_prompt(filtered: &str) -> String {
     if filtered.len() <= MEMORY_PROMPT_MAX_CHARS {

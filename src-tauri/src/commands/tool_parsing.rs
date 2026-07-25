@@ -164,16 +164,27 @@ pub(crate) fn parse_one_tool_at_line(
                 continue;
             }
             let tool_name = map_scheduler_alias(tool_name).to_string();
-            let next_line = if tool_name == "TASK_APPEND" || tool_name == "TASK_CREATE" {
-                line_index
-                    + 1
-                    + lines[line_index + 1..]
-                        .iter()
-                        .take_while(|l| !line_starts_with_tool_prefix(l))
-                        .count()
+            let multiline_body = matches!(
+                tool_name.as_str(),
+                "TASK_APPEND" | "TASK_CREATE" | "MEMORY" | "MEMORY_APPEND"
+            );
+            let cont_count = if multiline_body {
+                lines[line_index + 1..]
+                    .iter()
+                    .take_while(|l| !line_starts_with_tool_prefix(l))
+                    .count()
             } else {
-                line_index + 1
+                0
             };
+            let next_line = line_index + 1 + cont_count;
+            if cont_count > 0 {
+                let continuation = lines[line_index + 1..line_index + 1 + cont_count].join("\n");
+                if arg.is_empty() {
+                    arg = continuation;
+                } else {
+                    arg = format!("{arg}\n{continuation}");
+                }
+            }
             if tool_name == "FETCH_URL"
                 || tool_name == "BRAVE_SEARCH"
                 || tool_name == "BROWSER_SCREENSHOT"
@@ -198,7 +209,11 @@ pub(crate) fn parse_one_tool_at_line(
             if tool_name == "BROWSER_SEARCH_PAGE" || tool_name == "BROWSER_QUERY" {
                 arg = arg.trim_end_matches(['.', ',', ';', ':']).to_string();
             }
-            if tool_name != "TASK_APPEND" && tool_name != "TASK_CREATE" {
+            if tool_name != "TASK_APPEND"
+                && tool_name != "TASK_CREATE"
+                && tool_name != "MEMORY"
+                && tool_name != "MEMORY_APPEND"
+            {
                 if let Some(pos) = arg.find(|c: char| c.is_ascii_digit()).and_then(|_| {
                     let bytes = arg.as_bytes();
                     for i in 1..bytes.len().saturating_sub(2) {
@@ -1664,6 +1679,20 @@ mod tests {
     fn llama_json_ignores_non_tool_objects() {
         let content = r#"Here is data: {"name": "not_a_real_tool", "arguments": {"x": 1}} and done."#;
         assert!(parse_all_tools_from_response(content).is_empty());
+    }
+
+    #[test]
+    fn memory_save_multiline_body_joined() {
+        let content = r#"MEMORY: save txc26
+2026-10-31 ATL -> JFK DL123
+2026-11-01 JFK -> MAD IB6255
+DONE: saved
+"#;
+        let tools = parse_all_tools_from_response(content);
+        assert!(tools.iter().any(|(t, a)| {
+            t == "MEMORY" && a.contains("save txc26") && a.contains("DL123") && a.contains("IB6255")
+        }), "{tools:?}");
+        assert!(tools.iter().any(|(t, _)| t == "DONE"), "{tools:?}");
     }
 
     #[test]

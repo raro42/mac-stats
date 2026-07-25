@@ -83,7 +83,7 @@ fn primary_param(name: &str) -> (&'static str, &'static str) {
         "TODO" => ("spec", "read | add <id> | <content> | done <id> | set <json> | clear"),
         "MEMORY" | "MEMORY_APPEND" => (
             "text",
-            "add <text> | replace <old> => <new> | remove <substr> | read (MEMORY_APPEND = add)",
+            "add <lesson> | save <slug> + verbatim body | replace <old> => <new> | remove <substr> | read [note:<slug>] (MEMORY_APPEND = add)",
         ),
         "SESSION_SEARCH" => ("query", "Search past session transcripts"),
         "REDMINE_API" | "DISCORD_API" | "OLLAMA_API" | "MCP" => {
