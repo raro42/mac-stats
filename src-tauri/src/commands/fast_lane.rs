@@ -102,6 +102,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_short_ack_or_signoff(&n) {
         return Some("👍 Got it — here if you need me.".to_string());
     }
+    if is_thread_context_clarifier(&n) {
+        return Some("Got it — staying with this thread's context.".to_string());
+    }
     if is_overnight_improvements_ask(&n) {
         return Some(format_instant_overnight_improvements_reply());
     }
@@ -595,6 +598,37 @@ thing (or use `/status` / Agent Ops for gateway health).",
     )
 }
 
+/// Short “I mean this Discord thread” clarifiers (digester: ~16s direct, zero tools).
+fn is_thread_context_clarifier(n: &str) -> bool {
+    if n.chars().count() > 96 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("redmine")
+        || n.contains("search")
+        || n.contains("weather")
+    {
+        return false;
+    }
+    let referring = n.contains("referring to this conversation")
+        || n.contains("referring to this thread")
+        || n.contains("i mean this conversation")
+        || n.contains("i mean this thread")
+        || n.contains("in this conversation")
+        || n.contains("in this thread");
+    if !referring {
+        return false;
+    }
+    // Pure clarifier — not a new task ("in this conversation, book flights…").
+    !n.contains(" book ")
+        && !n.contains(" search ")
+        && !n.contains(" review ")
+        && !n.contains(" create ")
+        && !n.contains(" please ")
+}
+
 /// Short role/identity statements without a question (digester: multi-second direct, zero tools).
 fn is_identity_affirmation(n: &str) -> bool {
     if n.contains('?') || n.chars().count() > 180 {
@@ -923,6 +957,36 @@ commit+push, then reply briefly.";
                 other => panic!("expected Instant for {q:?}, got {:?}", other),
             }
         }
+    }
+
+    #[test]
+    fn thread_context_clarifier_is_instant() {
+        for q in [
+            "I am referring to this conversation!",
+            "I'm referring to this thread",
+            "I mean this conversation",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    assert!(
+                        reply.to_lowercase().contains("thread")
+                            || reply.to_lowercase().contains("context"),
+                        "expected thread/context ack for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant for {q:?}, got {:?}", other),
+            }
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane(
+                    "In this conversation please search for IBM TechXchange dates",
+                    None
+                ),
+                TurnLane::Instant { .. }
+            ),
+            "taskful 'in this conversation…' must not be instant"
+        );
     }
 
     #[test]

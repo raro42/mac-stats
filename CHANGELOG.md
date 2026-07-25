@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.257] - 2026-07-26
+
+### Fixed
+- Instant lane for “referring to this conversation/thread” clarifiers (was ~16s direct).
+
 ## [0.1.256] - 2026-07-25
 
 ### Fixed

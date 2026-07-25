@@ -37,6 +37,8 @@ SHIPPED_REDMINE_HOME_CONFIG = datetime(2026, 7, 21, 10, 25, tzinfo=timezone.utc)
 SHIPPED_INSTANT_OVERNIGHT_IMPROVEMENTS = datetime(2026, 7, 22, 8, 40, tzinfo=timezone.utc)
 # v0.1.251 — “lately” / “improvement loop” phrasings are instant.
 SHIPPED_INSTANT_IMPROVEMENTS_LATELY = datetime(2026, 7, 23, 17, 40, tzinfo=timezone.utc)
+# v0.1.257 — “referring to this conversation” clarifiers are instant.
+SHIPPED_INSTANT_THREAD_CLARIFIER = datetime(2026, 7, 25, 22, 15, tzinfo=timezone.utc)
 # v0.1.252 — tonight / this-night plan asks are instant from schedules.
 SHIPPED_INSTANT_TONIGHT_PLAN = datetime(2026, 7, 23, 17, 55, tzinfo=timezone.utc)
 # v0.1.215 — Discord reach / see-channels / other-agent meta asks are instant.
@@ -350,6 +352,14 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
             return True
     if "version" in ql and "instant version" in hl and ts < SHIPPED_INSTANT_VERSION:
         return True
+    if ts < SHIPPED_INSTANT_THREAD_CLARIFIER and (
+        "referring to this conversation" in ql
+        or "referring to this thread" in ql
+        or "i mean this conversation" in ql
+        or "i mean this thread" in ql
+    ):
+        if "zero-tool" in hl or "instant" in hl:
+            return True
     if ts < SHIPPED_INSTANT_WAKEUP and (
         "wake-up" in ql or "wakeup" in ql or "wake up" in ql
     ):
