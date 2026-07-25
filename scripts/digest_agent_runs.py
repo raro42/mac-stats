@@ -184,6 +184,29 @@ def looks_like_version_ask(q: str) -> bool:
     )
 
 
+def looks_like_tool_starved_task(q: str) -> bool:
+    """Needs browser/search/tools — do not suggest INSTANT for these zero-tool slows."""
+    n = q.strip().lower()
+    if "lighthouse" in n or " seo" in n or n.endswith(" seo") or "focus on seo" in n:
+        return True
+    if "review " in n and any(
+        t in n for t in (".de", ".com", ".org", ".net", "http://", "https://")
+    ):
+        return True
+    tokens = set(n.replace(",", " ").replace(".", " ").split())
+    airports = {"atl", "bcn", "mty", "lmm", "mex", "jfk", "mad", "lax", "ord"}
+    if len(tokens & airports) >= 2:
+        return True
+    if "monterrey" in n or "los mochis" in n or "techxchange" in n:
+        return True
+    # Mid-chat travel corrections (“I live in BCN… ATL MTY LMM”)
+    if ("i live in" in n or "messing things up" in n) and (tokens & airports):
+        return True
+    if "i would like" in n and (tokens & airports):
+        return True
+    return False
+
+
 def looks_like_discord_reach(q: str) -> bool:
     n = q.strip()
     discordish = any(x in n for x in ("discord", "amvara", "server", "guild", "channel"))
@@ -571,6 +594,9 @@ def main() -> int:
                 hint = "Promote to INSTANT time/date lane"
             elif q.strip() in ("ping", "hi", "hello", "hey", "thanks", "thank you"):
                 hint = "Promote to INSTANT greeting/thanks lane"
+            elif wall >= 15_000 and looks_like_tool_starved_task(q):
+                # Not an INSTANT candidate — model should have used tools; leave for Slowest only.
+                hint = None
             elif wall >= 15_000:
                 hint = "Zero-tool slow turn — consider instant/pre-route or smaller model"
         elif lane == "full" and wall >= 15_000:
