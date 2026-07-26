@@ -597,6 +597,14 @@ def main() -> int:
             elif wall >= 15_000 and looks_like_tool_starved_task(q):
                 # Not an INSTANT candidate — model should have used tools; leave for Slowest only.
                 hint = None
+            elif wall >= 15_000 and (
+                q.strip().startswith("skill:")
+                or q.strip().startswith("cursor_agent:")
+                or "skill: changelog-weekly" in q
+                or "skill: ui-weekly" in q
+            ):
+                # Scheduled skills must run work — not INSTANT noise.
+                hint = None
             elif wall >= 15_000:
                 hint = "Zero-tool slow turn — consider instant/pre-route or smaller model"
         elif lane == "full" and wall >= 15_000:
