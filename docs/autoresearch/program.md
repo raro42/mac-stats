@@ -10,6 +10,7 @@ Inspired by [karpathy/autoresearch](https://github.com/karpathy/autoresearch) an
 - **Active:** 20:00–06:00 local only.
 - **Quiet:** do not notify or ship during daytime focus hours unless the human explicitly restarts a day loop.
 - **NEVER STOP** inside the overnight window once a tick has started — finish the current experiment (keep or discard), then wait for the next harness tick.
+- **Morning surprise (mandatory):** Before the overnight window ends (by ~05:50), write or refresh `~/.mac-stats/improvements/morning_surprise_YYYY-MM-DD.md` with what shipped overnight. Do this even on quiet nights (say digester was empty). The human expects a surprise every morning.
 
 ## Immutable vs editable
 

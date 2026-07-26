@@ -9,22 +9,24 @@
 
 > **Apple Silicon only** (arm64). Intel Macs are not supported by the published DMG / Homebrew cask.
 
+**Free MIT · local-first · no cloud telemetry.** Core glanceable metrics in the menu bar; optional Ollama / Discord agent when you want it — off by default.
+
 Two products in one binary — pick your path:
 
 | | **Just the monitor** | **Monitor + AI agent** |
 |--|----------------------|-------------------------|
-| What you get | Menu-bar CPU (and °C when known), glass window, themes, process list | Everything left + local Ollama chat, Discord bot, schedules, Agent Ops |
+| What you get | Menu-bar **CPU + SSD** (and °C when known), glass window, themes, process list | Everything left + local Ollama chat, Discord bot, schedules, Agent Ops |
 | Needs | macOS on Apple Silicon | + [Ollama](https://ollama.com) + a model |
 | Config | Zero — AI is **off by default** | Set `aiAgentEnabled: true` or use Settings |
 
-📋 [Changelog](CHANGELOG.md) · 📘 [Getting Started](docs/GETTING_STARTED.md) · 🗺 [Roadmap](docs/ROADMAP.md) · 🍺 [Homebrew](docs/homebrew.md) · 🌐 [Landing](docs/site/index.html)
+📋 [Changelog](CHANGELOG.md) · 📘 [Getting Started](docs/GETTING_STARTED.md) · 🗺 [Roadmap](docs/ROADMAP.md) · 🍺 [Homebrew](docs/homebrew.md) · 🌐 [Landing](docs/site/index.html) · 🔬 [Competitor notes](docs/042_competitor_scan_perplexity.md)
 
 ## Table of contents
 
 - [Quick start — Just the monitor](#quick-start--just-the-monitor)
 - [Quick start — Monitor + AI agent](#quick-start--monitor--ai-agent)
 - [Screenshots](#screenshots)
-- [vs. Stats / iStat Menus](#vs-stats--istat-menus)
+- [vs. Stats / iStat Menus / MenuMeters](#vs-stats--istat-menus--menumeters)
 - [Install options](#install-options)
 - [Privacy](#privacy)
 - [Updates](#updates)
@@ -93,19 +95,22 @@ Repo: [github.com/raro42/mac-stats](https://github.com/raro42/mac-stats/)
 
 ---
 
-## vs. Stats / iStat Menus
+## vs. Stats / iStat Menus / MenuMeters
 
-| | **mac-stats** | **Stats** | **iStat Menus** |
-|--|---------------|-----------|-----------------|
-| Menu-bar CPU/RAM/disk | ✅ | ✅ | ✅ |
-| Apple Silicon focus | ✅ arm64 only | ✅ | ✅ |
-| Themes / glass UI | ✅ | ✅ | ✅ |
-| Local LLM agent (Ollama) | ✅ optional | — | — |
-| Discord bot / schedules | ✅ optional | — | — |
-| Price | Free (MIT) | Free / donate | Paid |
-| Cloud telemetry | ❌ none | — | — |
+Closest peers from a 2026 menu-bar monitor scan ([notes](docs/042_competitor_scan_perplexity.md)):
 
-If you only want a Stats-like monitor, stay on the **Just the monitor** path — leave AI disabled.
+| | **mac-stats** | **Stats** (exelban) | **iStat Menus** | **MenuMeters** |
+|--|---------------|---------------------|-----------------|----------------|
+| Menu-bar CPU / RAM / disk | ✅ | ✅ | ✅ | ✅ (basic) |
+| Apple Silicon focus | ✅ arm64 only | ✅ | ✅ | ✅ |
+| Themes / glass UI | ✅ | ✅ | ✅ | — |
+| Local LLM agent (Ollama) | ✅ **optional** | — | — | — |
+| Discord bot / schedules | ✅ **optional** | — | — | — |
+| Deep sensors / history / weather | lean essentials | strong | deepest | minimal |
+| Price | Free (**MIT**) | Free / donate | Paid | Free |
+| Cloud telemetry | ❌ none | — | — | — |
+
+**How to read this:** Stats is the classic free OSS monitor; iStat Menus is the paid depth benchmark; MenuMeters is the lightweight classic. mac-stats keeps the free/open-source spirit with a modern glass UI and an **optional local AI layer** — leave AI off for a Stats-like monitor only. We are **not** a full iStat Menus sensor replacement.
 
 ---
 
@@ -140,7 +145,7 @@ In-app banner checks GitHub Releases. Or: `brew upgrade --cask mac-stats`.
 
 ### Menu bar & glass UI
 
-- Compact menu bar by default (**CPU** + °C when known); set `menuBarCompact: false` for CPU/GPU/RAM/SSD.
+- Compact menu bar by default (**CPU + SSD**, plus °C when known); set `menuBarCompact: false` for CPU/GPU/RAM/SSD.
 - Nine themes, process list, website monitors (menu bar shows a red **Mon ✕** cue when any site is down).
 - ~0.5% idle CPU (menu bar only).
 
@@ -168,11 +173,11 @@ In-app banner checks GitHub Releases. Or: `brew upgrade --cask mac-stats`.
 ```bash
 git clone https://github.com/raro42/mac-stats.git
 cd mac-stats
-git checkout v0.1.216   # pin when possible
+git checkout v0.1.257   # pin when possible
 ./run
 ```
 
-Requires Rust + Xcode CLT (macOS Tauri). Checksums: `./scripts/print-release-checksums.sh v0.1.216`.
+Requires Rust + Xcode CLT (macOS Tauri). Checksums: `./scripts/print-release-checksums.sh v0.1.257`.
 
 Contributor docs: [docs/design/](docs/design/). Workflow: [docs/agent_workflow.md](docs/agent_workflow.md).
 

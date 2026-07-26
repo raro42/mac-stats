@@ -26,7 +26,7 @@ PROMPT = (
     "on fail: python3 scripts/autoresearch_ratchet.py discard --start-sha $START_SHA -d '…'; "
     "on pass: commit (no agent attribution), python3 scripts/autoresearch_ratchet.py keep -d '…', "
     "bump patch+CHANGELOG when shipping behavior, sync-dist/install/kickstart when runtime changes, push when reasonable "
-    "(7) update loop_backlog.md. Do not ask the user. Quiet outside 20:00–06:00."
+    "(7) update loop_backlog.md. Do not ask the user. Before ~05:50 write/refresh ~/.mac-stats/improvements/morning_surprise_YYYY-MM-DD.md (mandatory even on quiet nights). Quiet outside 20:00–06:00."
 )
 
 

@@ -41,3 +41,7 @@ Also linked from the [project README](../README.md#demo-video).
    - ScreenCaptureKit / `screencapture -l <windowid>` for the mac-stats window only
    - Do **not** use `screencapture -D` (full display) for marketing assets
 4. Optional helper for ad-hoc local shots: `./scripts/take-screenshot.sh` (full screen — avoid for repo assets).
+
+## Refresh log
+
+- **2026-07-26:** Recaptured `feature-cpu-metrics.png` (window-only, post SSD menu-bar / v0.1.257+).

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.258] - 2026-07-26
+
+### Changed
+- README positioning from Perplexity competitor scan (MenuMeters column, optional-AI framing, CPU+SSD menu bar copy).
+- Fresh `feature-cpu-metrics` screenshot; overnight `program.md` requires a morning surprise every night.
+
 ## [0.1.257] - 2026-07-26
 
 ### Fixed
