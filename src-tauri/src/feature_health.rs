@@ -589,23 +589,27 @@ async fn probe_redmine() -> FeatureHealth {
 }
 
 async fn probe_smc_blocking() -> FeatureHealth {
-    let (tx, rx) = oneshot::channel::<Result<(), String>>();
+    let (tx, rx) = oneshot::channel::<Result<String, String>>();
+    let chip_info = crate::metrics::get_chip_info();
     std::thread::spawn(move || {
-        let out = std::thread::spawn(|| {
-            macsmc::Smc::connect()
-                .map(|_| ())
-                .map_err(|e| format!("{e:?}"))
+        let out = std::thread::spawn(move || {
+            let mut smc = macsmc::Smc::connect().map_err(|e| format!("{e:?}"))?;
+            let mut reader = crate::metrics::smc_temperature::SmcTemperatureReader::default();
+            let reading = reader.read(&mut smc, &chip_info).ok_or_else(|| {
+                format!("SMC connected but no CPU temperature key matched {chip_info}")
+            })?;
+            Ok(format!(
+                "{:.1}°C via {}",
+                reading.value_celsius,
+                reading.keys.join(", ")
+            ))
         })
         .join()
         .unwrap_or_else(|_| Err("SMC thread panicked".into()));
         let _ = tx.send(out);
     });
     match tokio::time::timeout(PROBE_TIMEOUT, rx).await {
-        Ok(Ok(Ok(()))) => entry(
-            "SMC (temperature)",
-            HealthStatus::Ok,
-            Some("SMC driver reachable".into()),
-        ),
+        Ok(Ok(Ok(message))) => entry("SMC (temperature)", HealthStatus::Ok, Some(message)),
         Ok(Ok(Err(e))) => entry("SMC (temperature)", HealthStatus::Unavailable, Some(e)),
         Ok(Err(_)) => entry(
             "SMC (temperature)",
