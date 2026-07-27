@@ -648,6 +648,8 @@ fn run_internal(open_cpu_window: bool) {
                 // CRITICAL: Keep SMC connection alive in background thread (reuse for efficiency)
                 // SMC connection is not Sync, so we keep it thread-local
                 let mut smc_connection: Option<Smc> = None;
+                let mut smc_temperature_reader =
+                    metrics::smc_temperature::SmcTemperatureReader::default();
 
                 loop {
                     // Menu bar updates every 1-2 seconds (like Stats app) for responsive UI
@@ -724,11 +726,6 @@ fn run_internal(open_cpu_window: bool) {
                                 Ok(smc) => {
                                     smc_connection = Some(smc);
                                     debug3!("SMC connection established in background thread");
-                                    // OPTIMIZATION Phase 3: Update OnceLock to indicate SMC works
-                                    // This ensures can_read_temperature() returns true
-                                    if CAN_READ_TEMPERATURE.set(true).is_ok() {
-                                        debug3!("CAN_READ_TEMPERATURE set to true (SMC connection successful)");
-                                    }
                                 },
                                 Err(e) => {
                                     debug3!("Failed to connect to SMC: {:?}", e);
@@ -1154,13 +1151,13 @@ fn run_internal(open_cpu_window: bool) {
                             }
                         }
 
-                        // CRITICAL: Only read temperature every 20 seconds to reduce CPU usage
+                        // CRITICAL: Only read temperature periodically to reduce CPU usage
                         // all_data() iteration is VERY expensive - limit it as much as possible
                         // STEP 3: Temperature reading every 20s to save CPU
                         // Temperature doesn't change rapidly, so 20s is still responsive
                         let should_read_temp_now = if let Ok(mut last) = LAST_TEMP_UPDATE.lock() {
                             let should = last.as_ref()
-                                .map(|t| t.elapsed().as_secs() >= 20)
+                                .map(|t| t.elapsed() >= TEMP_READ_INTERVAL)
                                 .unwrap_or(true);
                             if should {
                                 *last = Some(std::time::Instant::now());
@@ -1174,86 +1171,29 @@ fn run_internal(open_cpu_window: bool) {
                         if should_read_temp_now {
                             // Read temperature using existing connection
                             if let Some(ref mut smc) = smc_connection {
-                                // First try standard cpu_temperature() method (works for M1/M2)
-                                let mut temp = 0.0;
-                                match smc.cpu_temperature() {
-                                    Ok(temps) => {
-                                        let die_temp: f64 = temps.die.into();
-                                        let prox_temp: f64 = temps.proximity.into();
-
-                                        // Priority: die > proximity
-                                        temp = if die_temp > 0.0 {
-                                            die_temp
-                                        } else if prox_temp > 0.0 {
-                                            prox_temp
-                                        } else {
-                                            0.0
-                                        };
-                                    },
-                                    Err(_) => {
-                                        // Standard method failed, continue to raw key reading
-                                    }
-                                }
-
-                                // If standard method returned 0.0, try reading M3 Max raw keys directly
-                                // These are the keys that exelban/stats uses for M3 Max
-                                if temp == 0.0 {
-                                    // Check if we've already discovered a working M3 key
-                                    let cached_key = M3_TEMP_KEY.lock().ok().and_then(|k| k.clone());
-
-                                    if let Some(key_name) = cached_key {
-                                        // CRITICAL: Use direct key reading instead of all_data() iteration
-                                        // This is MUCH more efficient - avoids iterating through all SMC keys
-                                        // Try to read the specific key directly
-                                        // Note: macsmc may not have direct key reading, so we'll limit all_data() usage
-                                        // Only call all_data() if we absolutely need to, and limit iteration
-                                        if let Ok(data_iter) = smc.all_data() {
-                                            for dbg in data_iter.flatten() {
-                                                if dbg.key == key_name {
-                                                    if let Ok(Some(macsmc::DataValue::Float(val))) = dbg.value {
-                                                        if val > 0.0 {
-                                                            temp = val as f64;
-                                                            debug3!("Temperature read from cached M3 key {}: {:.1}°C", key_name, temp);
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        // First time: discover which M3 key works
-                                        // CRITICAL: Only iterate through keys once, then cache the result
-                                        // Try known M3 Max temperature keys (same as exelban/stats uses)
-                                        let m3_keys = ["Tf04", "Tf09", "Tf0A", "Tf0B", "Tf0D", "Tf0E"];
-                                        if let Ok(data_iter) = smc.all_data() {
-                                            for dbg in data_iter.flatten() {
-                                                if m3_keys.contains(&dbg.key.as_str()) {
-                                                    if let Ok(Some(macsmc::DataValue::Float(val))) = dbg.value {
-                                                        if val > 0.0 {
-                                                            temp = val as f64;
-                                                            if let Ok(mut cached) = M3_TEMP_KEY.lock() {
-                                                                *cached = Some(dbg.key.clone());
-                                                                debug3!("Discovered working M3 temperature key: {} = {:.1}°C", dbg.key, temp);
-                                                            }
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if temp > 0.0 {
+                                let chip_info = metrics::get_chip_info();
+                                if let Some(reading) =
+                                    smc_temperature_reader.read(smc, &chip_info)
+                                {
                                     // Update cache with new temperature and timestamp
                                     if let Ok(mut cache) = TEMP_CACHE.try_lock() {
-                                        *cache = Some((temp as f32, std::time::Instant::now()));
-                                        debug3!("Temperature updated in cache: {:.1}°C", temp);
+                                        *cache = Some((
+                                            reading.value_celsius,
+                                            std::time::Instant::now(),
+                                        ));
+                                        debug3!(
+                                            "Temperature updated in cache: {:.1}°C via {:?}",
+                                            reading.value_celsius,
+                                            reading.keys
+                                        );
                                     } else {
                                         debug3!("Temperature cache lock failed, skipping update");
                                     }
                                 } else {
-                                    debug3!("Temperature read returned 0.0 - no valid temperature found");
+                                    debug3!(
+                                        "No valid CPU temperature found for chip '{}'",
+                                        chip_info
+                                    );
                                     // Don't update cache - keep previous value if available
                                 }
                             }

@@ -20,7 +20,7 @@ use objc2::runtime::AnyObject;
 use objc2_app_kit::NSStatusItem;
 use std::cell::RefCell;
 use std::sync::{Mutex, OnceLock};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use sysinfo::{Disks, System};
 use tauri::AppHandle;
 
@@ -80,14 +80,15 @@ pub(crate) fn format_process_uptime() -> String {
 // Caches
 pub(crate) static CHIP_INFO_CACHE: OnceLock<String> = OnceLock::new();
 
-pub(crate) static CAN_READ_TEMPERATURE: OnceLock<bool> = OnceLock::new();
 pub(crate) static CAN_READ_FREQUENCY: OnceLock<bool> = OnceLock::new();
 pub(crate) static CAN_READ_CPU_POWER: OnceLock<bool> = OnceLock::new();
 pub(crate) static CAN_READ_GPU_POWER: OnceLock<bool> = OnceLock::new();
 
+pub(crate) const TEMP_READ_INTERVAL: Duration = Duration::from_secs(20);
+pub(crate) const TEMP_CACHE_MAX_AGE: Duration = Duration::from_secs(30);
+
 // Temperature cache: (temperature_value, last_update_timestamp)
 pub(crate) static TEMP_CACHE: Mutex<Option<(f32, Instant)>> = Mutex::new(None);
-pub(crate) static M3_TEMP_KEY: Mutex<Option<String>> = Mutex::new(None);
 
 // Frequency cache: (frequency_value_ghz, last_update_timestamp)
 pub(crate) static FREQ_CACHE: Mutex<Option<(f32, Instant)>> = Mutex::new(None);

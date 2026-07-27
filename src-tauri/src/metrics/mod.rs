@@ -11,9 +11,9 @@
 //! All metrics are cached to reduce system load and improve performance.
 
 pub mod history;
+pub(crate) mod smc_temperature;
 
 use battery::{Manager as BatteryManager, State};
-use macsmc::Smc;
 use std::process::Command;
 use sysinfo::{Disks, System};
 use tauri::Manager;
@@ -468,48 +468,15 @@ fn extract_percentage_from_line(line: &str) -> Option<f32> {
 }
 
 pub fn can_read_temperature() -> bool {
-    // Check if we have a valid cached temperature (indicates SMC access works)
-    // This is more efficient than checking SMC directly
-    if let Ok(cache) = TEMP_CACHE.try_lock() {
-        if let Some((temp, timestamp)) = cache.as_ref() {
-            // If we have a recent temperature reading, SMC access works
-            // Increased from 10s to 20s to match the 15s reading frequency
-            if *temp > 0.0 && timestamp.elapsed().as_secs() < 20 {
-                debug3!(
-                    "can_read_temperature: true (from TEMP_CACHE with temp={:.1}°C)",
-                    *temp
-                );
-                return true;
-            }
-        }
-    }
-
-    // OPTIMIZATION Phase 3: Use OnceLock for faster access (no locking required)
-    *CAN_READ_TEMPERATURE.get_or_init(|| {
-        debug3!("can_read_temperature: First time check - trying SMC connection...");
-        let can_read = if let Ok(mut smc) = Smc::connect() {
-            // Connection succeeded - we can attempt to read (even if it returns 0.0)
-            match smc.cpu_temperature() {
-                Ok(_) => {
-                    // SMC read succeeded (even if temp is 0.0, the read worked)
-                    debug3!("SMC connection and read succeeded - can_read_temperature=true");
-                    true
-                }
-                Err(e) => {
-                    // SMC read failed
-                    debug3!("SMC read failed: {:?} - can_read_temperature=false", e);
-                    false
-                }
-            }
-        } else {
-            // SMC connection failed - can't read
-            debug3!("SMC connection failed - can_read_temperature=false");
-            false
-        };
-
-        debug3!("can_read_temperature: Cached result: {}", can_read);
-        can_read
-    })
+    TEMP_CACHE
+        .lock()
+        .ok()
+        .and_then(|cache| {
+            cache
+                .as_ref()
+                .map(|(temp, timestamp)| *temp > 0.0 && timestamp.elapsed() < TEMP_CACHE_MAX_AGE)
+        })
+        .unwrap_or(false)
 }
 
 // Get nominal CPU frequency using sysctl (cheap, no sudo required)
@@ -1755,20 +1722,17 @@ pub fn get_cpu_details() -> CpuDetails {
         has_battery,
     ) = {
         // Get cached access flags (fast OnceLock access, no blocking)
-        let _can_read_temp = CAN_READ_TEMPERATURE.get().copied().unwrap_or(false);
         let can_read_freq = CAN_READ_FREQUENCY.get().copied().unwrap_or(false);
         let can_read_cpu_p = CAN_READ_CPU_POWER.get().copied().unwrap_or(false);
         let can_read_gpu_p = CAN_READ_GPU_POWER.get().copied().unwrap_or(false);
 
         // CRITICAL: Read temperature from cache (updated by background thread)
         // Non-blocking read - returns 0.0 if cache is locked or stale
-        // Cache is valid for up to 20 seconds (background thread updates every 15 seconds)
+        // Keep a scheduling margin beyond the background sampling interval.
         let temperature = match TEMP_CACHE.try_lock() {
             Ok(cache) => {
                 if let Some((temp, timestamp)) = cache.as_ref() {
-                    // Only use cached value if it's fresh (less than 20 seconds old)
-                    // Increased from 10s to 20s to match the 15s reading frequency
-                    if timestamp.elapsed().as_secs() < 20 {
+                    if timestamp.elapsed() < TEMP_CACHE_MAX_AGE {
                         *temp
                     } else {
                         debug3!(
