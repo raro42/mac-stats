@@ -170,6 +170,16 @@ def looks_like_thread_clarifier(q: str) -> bool:
     )
 
 
+def looks_like_exact_saved_note_read(q: str) -> bool:
+    n = (q or "").lower()
+    if "http" in n or "redmine" in n or "skill:" in n:
+        return False
+    wants_read = "read" in n or "show" in n or "exact" in n or "verbatim" in n
+    return wants_read and ("saved" in n) and (
+        "file" in n or "note" in n or "do not summarize" in n or "don't summarize" in n
+    )
+
+
 def looks_like_how_solved_task(q: str) -> bool:
     if "ticket" in q or "redmine" in q or "http" in q:
         return False
@@ -326,6 +336,7 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         looks_like_overnight_improvements(q)
         or looks_like_tonight_plan(q)
         or looks_like_how_solved_task(q)
+        or looks_like_exact_saved_note_read(q)
     ):
         return True
     if tools or tool_steps > 0:

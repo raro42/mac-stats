@@ -235,6 +235,116 @@ fn list_note_slugs(notes_dir: &Path) -> Vec<String> {
     slugs
 }
 
+/// All note directories (main, global root, discord-* / other subdirs).
+fn all_notes_dirs() -> Vec<PathBuf> {
+    let mut dirs = Vec::new();
+    let main = crate::config::Config::memory_notes_dir_for_main_session();
+    let root = crate::config::Config::memory_notes_dir();
+    dirs.push(main.clone());
+    if root != main {
+        dirs.push(root.clone());
+    }
+    if let Ok(rd) = std::fs::read_dir(&root) {
+        for e in rd.flatten() {
+            let p = e.path();
+            if p.is_dir() && !dirs.iter().any(|d| d == &p) {
+                dirs.push(p);
+            }
+        }
+    }
+    dirs
+}
+
+fn collect_all_note_slugs() -> Vec<String> {
+    let mut set = std::collections::BTreeSet::new();
+    for dir in all_notes_dirs() {
+        for s in list_note_slugs(&dir) {
+            set.insert(s);
+        }
+    }
+    set.into_iter().collect()
+}
+
+fn hamming_or_near(a: &str, b: &str) -> bool {
+    if a == b {
+        return true;
+    }
+    let (shorter, longer) = if a.len() <= b.len() { (a, b) } else { (b, a) };
+    if shorter.len() + 1 < longer.len() {
+        return false;
+    }
+    // Adjacent transposition (tcx26 ↔ txc26).
+    if a.len() == b.len() && a.len() >= 2 {
+        let ac: Vec<char> = a.chars().collect();
+        let bc: Vec<char> = b.chars().collect();
+        for i in 0..ac.len() - 1 {
+            let mut swapped = ac.clone();
+            swapped.swap(i, i + 1);
+            if swapped == bc {
+                return true;
+            }
+        }
+    }
+    // Same length: allow ≤1 substitution.
+    if a.len() == b.len() {
+        let diff = a.chars().zip(b.chars()).filter(|(x, y)| x != y).count();
+        return diff <= 1;
+    }
+    // Length differs by 1: allow one insert (covers simple typos).
+    if longer.len() == shorter.len() + 1 {
+        let ac: Vec<char> = shorter.chars().collect();
+        let bc: Vec<char> = longer.chars().collect();
+        let mut i = 0;
+        let mut j = 0;
+        let mut skipped = false;
+        while i < ac.len() && j < bc.len() {
+            if ac[i] == bc[j] {
+                i += 1;
+                j += 1;
+            } else if !skipped {
+                skipped = true;
+                j += 1;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+    false
+}
+
+/// Instant / Discord-safe note read: search all note scopes; soft-match near typos (tcx26↔txc26).
+pub fn instant_read_saved_note(slug_raw: &str) -> String {
+    let slug = slugify_note_id(slug_raw);
+    for dir in all_notes_dirs() {
+        if let Some(body) = read_note_file(&dir, &slug) {
+            if !body.is_empty() {
+                return format!("note:{slug} (verbatim):\n\n{body}");
+            }
+        }
+    }
+    let available = collect_all_note_slugs();
+    if let Some(near) = available.iter().find(|s| hamming_or_near(s, &slug)) {
+        for dir in all_notes_dirs() {
+            if let Some(body) = read_note_file(&dir, near) {
+                if !body.is_empty() {
+                    return format!(
+                        "No exact note '{slug}' — showing near match **note:{near}** (verbatim):\n\n{body}"
+                    );
+                }
+            }
+        }
+    }
+    if available.is_empty() {
+        format!("No note named '{slug}' (and no saved notes on disk yet).")
+    } else {
+        format!(
+            "No note named '{slug}'. Saved notes: {}\n(Use MEMORY: read note:<slug> for a verbatim body.)",
+            available.join(", ")
+        )
+    }
+}
+
 /// Load full note bodies for prompt injection (newest files first, until budget).
 pub fn load_notes_block_for_prompt(
     discord_channel_id: Option<u64>,
@@ -765,6 +875,13 @@ Return open — confirm later";
         let index = std::fs::read_to_string(&mem).unwrap();
         assert!(index.contains("note:txc26"), "{index}");
         let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn near_typo_matches_transposition() {
+        assert!(hamming_or_near("tcx26", "txc26"));
+        assert!(hamming_or_near("txc26", "tcx26"));
+        assert!(!hamming_or_near("tcx26", "abc99"));
     }
 
     #[test]

@@ -121,6 +121,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_thread_context_clarifier(&n) {
         return Some("Got it — staying with this thread's context.".to_string());
     }
+    if let Some(slug) = extract_exact_saved_note_slug(&n) {
+        return Some(crate::commands::curated_memory::instant_read_saved_note(&slug));
+    }
     if is_overnight_improvements_ask(&n) {
         return Some(format_instant_overnight_improvements_reply());
     }
@@ -667,6 +670,83 @@ thing (or use `/status` / Agent Ops for gateway health).",
     )
 }
 
+/// “Read the exact saved tcx26 file” — verbatim notes live under MEMORY notes, not TASK_*.
+fn extract_exact_saved_note_slug(n: &str) -> Option<String> {
+    if n.chars().count() > 180 {
+        return None;
+    }
+    if n.contains("http")
+        || n.contains("redmine")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("task_list")
+        || n.contains("create a task")
+    {
+        return None;
+    }
+    // Explicit MEMORY / note forms.
+    for prefix in [
+        "memory: read note:",
+        "memory: read note ",
+        "read note:",
+        "read note ",
+        "show note:",
+        "show note ",
+    ] {
+        if let Some(rest) = n.strip_prefix(prefix) {
+            let token = rest
+                .split_whitespace()
+                .next()
+                .unwrap_or("")
+                .trim_matches(|c: char| !c.is_alphanumeric() && c != '-' && c != '_');
+            if token.len() >= 2 {
+                return Some(token.to_string());
+            }
+        }
+    }
+
+    let wants_verbatim = n.contains("exact")
+        || n.contains("verbatim")
+        || n.contains("do not summarize")
+        || n.contains("don't summarize")
+        || n.contains("dont summarize");
+    let wants_read = n.contains("read") || n.contains("show") || n.contains("open") || n.contains("dump");
+    let mentions_saved = n.contains("saved") || n.contains(" note");
+    if !(wants_read && mentions_saved) && !wants_verbatim {
+        return None;
+    }
+    if !mentions_saved && !n.contains("note") {
+        return None;
+    }
+
+    // Prefer token after "saved ".
+    if let Some(idx) = n.find("saved ") {
+        let after = &n[idx + "saved ".len()..];
+        for token in after.split_whitespace() {
+            let t = token.trim_matches(|c: char| !c.is_alphanumeric() && c != '-' && c != '_');
+            if t.is_empty() || matches!(t, "the" | "a" | "my" | "note" | "file" | "notes") {
+                continue;
+            }
+            if t.len() >= 2 {
+                return Some(t.to_string());
+            }
+        }
+    }
+    // "note:slug" / "note slug"
+    if let Some(idx) = n.find("note:") {
+        let after = &n[idx + "note:".len()..];
+        let t = after
+            .split_whitespace()
+            .next()
+            .unwrap_or("")
+            .trim_matches(|c: char| !c.is_alphanumeric() && c != '-' && c != '_');
+        if t.len() >= 2 {
+            return Some(t.to_string());
+        }
+    }
+    None
+}
+
 /// Short “I mean this Discord thread” clarifiers (digester: ~16s direct, zero tools).
 fn is_thread_context_clarifier(n: &str) -> bool {
     if n.chars().count() > 96 {
@@ -1105,6 +1185,36 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "taskful 'in this conversation…' must not be instant"
+        );
+    }
+
+    #[test]
+    fn exact_saved_note_read_is_instant() {
+        match classify_turn_lane(
+            "Do not summarize your answer. I want to read the exact saved tcx26 file",
+            None,
+        ) {
+            TurnLane::Instant { reply } => {
+                let lower = reply.to_lowercase();
+                assert!(
+                    lower.contains("note") || lower.contains("tcx26") || lower.contains("txc26"),
+                    "expected note read reply: {reply}"
+                );
+            }
+            other => panic!("expected Instant, got {:?}", other),
+        }
+        assert_eq!(
+            extract_exact_saved_note_slug(
+                &normalize_q("Do not summarize your answer. I want to read the exact saved tcx26 file")
+            ),
+            Some("tcx26".to_string())
+        );
+        assert!(
+            !matches!(
+                classify_turn_lane("Create a task for coder to improve knowledge saving", None),
+                TurnLane::Instant { .. }
+            ),
+            "task create must not be note-read instant"
         );
     }
 

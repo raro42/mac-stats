@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.274] - 2026-07-29
+
+### Changed
+- Instant lane: “read the exact saved \<slug\> file” returns the MEMORY note verbatim (searches all note scopes; soft-matches typos like tcx26↔txc26) instead of TASK_LIST thrash.
+
 ## [0.1.273] - 2026-07-29
 
 ### Changed
