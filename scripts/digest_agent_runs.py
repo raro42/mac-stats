@@ -22,6 +22,7 @@ import tempfile
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+import time
 
 # Instant lanes / Open-Meteo weather landed ~2026-07-20 afternoon–evening UTC.
 SHIPPED_INSTANT_VERSION = datetime(2026, 7, 25, 21, 15, tzinfo=timezone.utc)
@@ -351,6 +352,40 @@ def load_runs(path: Path, since: datetime) -> list[dict]:
     return out
 
 
+def design_review_candidate(repo_root: Path, max_age_days: float = 3.0) -> tuple | None:
+    """Synthetic open candidate when a feature screenshot is missing or stale."""
+    screens = repo_root / "screens"
+    surfaces = (
+        "feature-agent-ops.png",
+        "feature-ai-chat.png",
+        "feature-processes.png",
+        "feature-cpu-metrics.png",
+    )
+    now = time.time()
+    max_age = max_age_days * 86400
+    for name in surfaces:
+        path = screens / name
+        if not path.is_file():
+            return (
+                0,
+                "Overnight design review — capture + polish stale/missing feature screen",
+                f"missing screens/{name}",
+                "design-review",
+                None,
+            )
+        age = now - path.stat().st_mtime
+        if age >= max_age:
+            days = round(age / 86400, 1)
+            return (
+                0,
+                "Overnight design review — capture + polish stale/missing feature screen",
+                f"stale screens/{name} ({days}d)",
+                "design-review",
+                None,
+            )
+    return None
+
+
 def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
     """True when this candidate was already fixed after `ts` (stale digester noise)."""
     if ts is None:
@@ -624,6 +659,25 @@ def main() -> int:
             and any("BRAVE" in str(t).upper() or "PERPLEXITY" in str(t).upper() for t in tools)
         ):
             hint = "Weather via search — prefer Open-Meteo INSTANT when place is clear"
+        elif (
+            wall >= 60_000
+            and lane in ("direct", "full", "lite")
+            and tools
+            and (
+                "topic: improve" in q
+                or "## topic: improve" in q
+                or ("id: memory" in q and "improve" in q)
+            )
+            and any(
+                str(t).upper() in ("TASK_APPEND", "TASK_STATUS", "TASK_LIST", "CURSOR_AGENT")
+                for t in tools
+            )
+        ):
+            # Real overnight loss: Improve/memory schedule burns 40s–250s on TASK_* thrash.
+            hint = (
+                "Cap/compact Improve-task loop — stop TASK_* thrash "
+                "(scheduled Improve/memory, wall≥60s)"
+            )
         if not hint:
             continue
         preview = r.get("question_preview", "")
@@ -633,6 +687,12 @@ def main() -> int:
             stale.append(row)
         else:
             candidates.append(row)
+
+    # Standing visual fuel when feature screens are stale (not Discord-turn based).
+    repo_root = Path(__file__).resolve().parents[1]
+    design = design_review_candidate(repo_root)
+    if design is not None:
+        candidates.append(design)
 
     lines.append("## Improvement candidates")
     if not candidates:
@@ -681,10 +741,17 @@ def main() -> int:
     lines.append("")
     lines.append("## Next actions")
     if candidates:
-        lines.append("1. Implement open candidates in `fast_lane.rs` / `pre_routing.rs` / tools.")
+        lines.append("1. Implement open candidates (fast lane / pre-route / Improve-task cap / tools).")
     else:
-        lines.append("1. No open digester candidates — prefer sibling-harness ports or fresh Discord traffic.")
-    lines.append("2. Re-run digest after a day of Discord traffic.")
+        lines.append(
+            "1. Digester open empty — **do not quiet-default**: run "
+            "`python3 scripts/overnight_design_review.py`, then pull "
+            "`docs/autoresearch/standing_backlog.md` (nightly keep-or-discard required)."
+        )
+    lines.append(
+        "2. Design review track: `docs/043_overnight_design_review.md` "
+        "(screenshot + one visible polish when due)."
+    )
     lines.append("3. Keep judge on-failure-only (`agentJudgeOnFailureOnly: true`).")
     lines.append("")
 

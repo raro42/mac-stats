@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.259] - 2026-07-28
+
+### Changed
+- Overnight autoresearch: **nightly keep-or-discard required** (quiet is failure mode); standing backlog + **design-review** track (stale screenshots → polish → ship).
+- Digester now surfaces Improve/memory `TASK_*` thrash and overdue feature-screen design reviews as open candidates.
+
 ## [0.1.258] - 2026-07-26
 
 ### Changed

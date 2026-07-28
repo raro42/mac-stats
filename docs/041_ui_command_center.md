@@ -18,6 +18,8 @@ Data comes from existing Tauri commands (`list_schedules`, `list_live_sessions`,
 
 **Skill:** `~/.mac-stats/agents/skills/ui-weekly-review/SKILL.md`
 
+**Overnight complement:** Track B design review (`docs/043_overnight_design_review.md`) screenshots stale feature surfaces and ships one polish when digester would otherwise idle — does not replace Wednesday review.
+
 **Checklist:**
 
 1. Open the **CPU window** (menu bar) → expand **Agent Ops** (not only `dashboard.html`).
