@@ -10,7 +10,7 @@ use tracing::{error, info, warn};
 pub(crate) const TASK_REVIEW_INTERVAL_SECS: u64 = 60;
 /// WIP files with no writes for this long are closed as unsuccessful.
 pub(crate) const TASK_WIP_STALE_TIMEOUT_SECS: u64 = 30 * 60;
-const MAX_ITERATIONS_PER_TASK: u32 = 20;
+const MAX_ITERATIONS_PER_TASK: u32 = 8;
 /// Max open tasks started per review cycle (operator prompt text must stay in sync).
 pub(crate) const TASK_REVIEW_MAX_OPEN_PER_CYCLE: u32 = 3;
 

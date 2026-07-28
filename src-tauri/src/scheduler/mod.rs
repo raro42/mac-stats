@@ -565,7 +565,7 @@ async fn execute_task(
                     reply_to_channel.map(|_| (delivery_context_key.clone(), entry.id.clone()));
                 match crate::task::runner::run_task_until_finished(
                     path,
-                    10,
+                    6,
                     reply_to_channel,
                     prefix,
                     scheduler_awareness,

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.267] - 2026-07-28
+
+### Changed
+- Task runner iteration caps: scheduler 6 / review-loop 8 (was 10 / 20) to limit Improve/memory thrash wall time.
+
 ## [0.1.266] - 2026-07-28
 
 ### Fixed
