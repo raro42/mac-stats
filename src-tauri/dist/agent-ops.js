@@ -751,7 +751,7 @@ function renderOverviewSchedules(schedules, deliveries) {
     if (!body) return;
     body.innerHTML = '';
     if (!schedules || !schedules.length) {
-        body.innerHTML = '<div class="ops-empty">No schedules</div>';
+        body.innerHTML = '<div class="ops-empty">No schedules yet — open the Schedules tab to add one</div>';
         return;
     }
     const count = document.createElement('div');
@@ -790,7 +790,7 @@ function renderOverviewLive(rows) {
     if (!body) return;
     body.innerHTML = '';
     if (!rows || !rows.length) {
-        body.innerHTML = '<div class="ops-empty">No live sessions</div>';
+        body.innerHTML = '<div class="ops-empty">No live sessions — chats appear here while agents run</div>';
         return;
     }
     const count = document.createElement('div');
@@ -828,7 +828,7 @@ function renderOverviewKnowledge(files) {
     if (!body) return;
     body.innerHTML = '';
     if (!files || !files.length) {
-        body.innerHTML = '<div class="ops-empty">No knowledge files</div>';
+        body.innerHTML = '<div class="ops-empty">No knowledge files yet under ~/.mac-stats</div>';
         return;
     }
     const sorted = [...files].sort((a, b) => (b.modified_ms || 0) - (a.modified_ms || 0));
@@ -869,7 +869,7 @@ function renderOverviewRecent(files) {
     if (!body) return;
     body.innerHTML = '';
     if (!files || !files.length) {
-        body.innerHTML = '<div class="ops-empty">No recent chats</div>';
+        body.innerHTML = '<div class="ops-empty">No recent chats — session memory shows up here</div>';
         return;
     }
     const count = document.createElement('div');

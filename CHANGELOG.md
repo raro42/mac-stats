@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.261] - 2026-07-28
+
+### Changed
+- Agent Ops overview empty states: clearer dashed panels and actionable copy (schedules / live / knowledge / recent chats).
+
 ## [0.1.260] - 2026-07-28
 
 ### Fixed

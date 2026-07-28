@@ -223,6 +223,7 @@
   margin: 0;
   font-size: 13px;
   font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .ops-overview-link {
@@ -254,8 +255,9 @@
 
 .ops-overview-count {
   font-size: 11px;
-  opacity: 0.5;
+  opacity: 0.55;
   margin-bottom: 2px;
+  font-variant-numeric: tabular-nums;
 }
 
 .ops-hint {
@@ -399,9 +401,23 @@
 }
 
 .ops-empty {
-  padding: 12px;
+  margin: 2px 0;
+  padding: 14px 12px;
   font-size: 12px;
-  opacity: 0.5;
+  line-height: 1.4;
+  opacity: 0.72;
+  border-radius: 8px;
+  border: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 3%, transparent);
+  text-align: center;
+}
+
+.ops-overview-body > .ops-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
 }
 
 .ops-insights-card {
