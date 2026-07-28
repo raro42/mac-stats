@@ -762,10 +762,7 @@ async function refresh() {
       } else {
         const emptyMsg = document.createElement("div");
         emptyMsg.className = "process-empty";
-        emptyMsg.textContent = "No process data available";
-        emptyMsg.style.textAlign = "center";
-        emptyMsg.style.padding = "1rem";
-        emptyMsg.style.color = "var(--text-secondary, #666)";
+        emptyMsg.textContent = "Waiting for process samples — opens with the CPU window";
         fragment.appendChild(emptyMsg);
       }
       

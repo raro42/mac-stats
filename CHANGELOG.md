@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.263] - 2026-07-28
+
+### Changed
+- Process list: clearer empty state, row hover, and smoother CPU bar updates.
+
 ## [0.1.262] - 2026-07-28
 
 ### Changed

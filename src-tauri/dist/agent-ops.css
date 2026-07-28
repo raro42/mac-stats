@@ -443,6 +443,33 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
 }
 
+/* Shared process list polish (themes load agent-ops.css) */
+.process-empty {
+  margin: 4px 0;
+  padding: 16px 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  opacity: 0.72;
+  border-radius: 8px;
+  border: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 3%, transparent);
+  text-align: center;
+  color: inherit !important;
+}
+
+.process-row {
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.process-row:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+}
+
+.process-bar-fill {
+  transition: width 0.28s ease;
+}
+
 .ops-insights-card {
   margin: 0 0 10px;
   padding: 10px 12px;
