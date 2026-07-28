@@ -420,6 +420,29 @@
   min-height: 56px;
 }
 
+/* Shared AI chat empty state + taller transcript (all themes load agent-ops.css) */
+.chat-messages {
+  max-height: min(320px, 42vh) !important;
+}
+
+.chat-empty {
+  margin: 4px 0;
+  padding: 18px 14px;
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: 0.72;
+  border-radius: 8px;
+  border: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 3%, transparent);
+  text-align: center;
+}
+
+#chat-input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, #0a84ff 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
+}
+
 .ops-insights-card {
   margin: 0 0 10px;
   padding: 10px 12px;

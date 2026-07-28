@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.262] - 2026-07-28
+
+### Changed
+- AI chat empty state + taller transcript; clearer input placeholder across themes (“metrics, tasks, or the web”).
+
 ## [0.1.261] - 2026-07-28
 
 ### Changed

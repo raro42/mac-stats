@@ -4,7 +4,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## P0 — latency / thrash
 
-1. **Improve/memory scheduled task thrash** — Slowest turns are often `Topic: Improve ## Id: memory` with 40s–250s of `TASK_APPEND` / `TASK_STATUS` / `CURSOR_AGENT`. Cap tool loops, compact task context, or stop re-feeding the full task file every turn.
+1. ~~**Improve/memory scheduled task thrash**~~ — done in **v0.1.260** (runner prompt compaction).
 2. **p50 direct latency** — Digest often shows ~20s p50 after noise filters. Find one repeated pattern and instant/pre-route or shrink tools.
 
 ## P1 — design / marketing (rotate)

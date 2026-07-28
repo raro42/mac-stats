@@ -459,6 +459,34 @@ function addToHistory(role, content, attachmentPaths) {
  */
 function clearConversationHistory() {
   conversationHistory = [];
+  const container = document.getElementById('chat-messages');
+  if (container) {
+    container.innerHTML = '';
+    ensureChatEmptyHint();
+  }
+}
+
+/**
+ * Show a calm empty-state hint when the chat pane has no messages yet.
+ */
+function ensureChatEmptyHint() {
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
+  if (container.querySelector('.chat-message')) {
+    container.querySelector('.chat-empty')?.remove();
+    return;
+  }
+  if (container.querySelector('.chat-empty')) return;
+  const empty = document.createElement('div');
+  empty.className = 'chat-empty';
+  empty.setAttribute('role', 'status');
+  empty.textContent =
+    'Ask about CPU, RAM, schedules, or tasks — answers stay on this Mac.';
+  container.appendChild(empty);
+}
+
+function clearChatEmptyHint() {
+  document.getElementById('chat-messages')?.querySelector('.chat-empty')?.remove();
 }
 
 /**
@@ -478,6 +506,7 @@ function replaceConversationHistory(messages) {
     for (const m of conversationHistory) {
       addChatMessage(m.role, m.content);
     }
+    if (!conversationHistory.length) ensureChatEmptyHint();
   }
   const chat = document.getElementById('ollama-chat');
   if (chat && conversationHistory.length) {
@@ -1036,6 +1065,8 @@ function addChatMessage(role, content, isHtml = false) {
     return;
   }
 
+  clearChatEmptyHint();
+
   const messageDiv = document.createElement('div');
   messageDiv.className = `chat-message ${role}`;
 
@@ -1173,6 +1204,11 @@ function initOllamaChatListeners() {
   }
 
   void setupCompactionStatusListener();
+
+  if (!chatInput.placeholder || chatInput.placeholder.includes('system metrics')) {
+    chatInput.placeholder = 'Ask about metrics, tasks, or the web…';
+  }
+  ensureChatEmptyHint();
   
   // Send button click
   chatSendBtn.addEventListener('click', () => {
