@@ -133,8 +133,10 @@ def looks_like_wakeup(q: str) -> bool:
 def looks_like_overnight_improvements(q: str) -> bool:
     if not (
         "improvement" in q
+        or "improve" in q
         or "what shipped" in q
         or "what changed" in q
+        or "what was done" in q
         or "coding session" in q
     ):
         return False
@@ -149,7 +151,22 @@ def looks_like_overnight_improvements(q: str) -> bool:
         or "improvement loop" in q
         or "harness loop" in q
         or "overnight harness" in q
+        or "each night" in q
+        or "every night" in q
+        or "nightly" in q
     )
+
+
+def looks_like_how_solved_task(q: str) -> bool:
+    if "ticket" in q or "redmine" in q or "http" in q:
+        return False
+    asks = (
+        "how did you solve" in q
+        or "how did you fix" in q
+        or "how was this solved" in q
+        or "how was that solved" in q
+    )
+    return asks and "task" in q
 
 
 def looks_like_tonight_plan(q: str) -> bool:
@@ -292,7 +309,11 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
     ):
         return True
     # Pre-ship over-tooled turns that are now instant (may still list tools).
-    if looks_like_overnight_improvements(q) or looks_like_tonight_plan(q):
+    if (
+        looks_like_overnight_improvements(q)
+        or looks_like_tonight_plan(q)
+        or looks_like_how_solved_task(q)
+    ):
         return True
     if tools or tool_steps > 0:
         return False

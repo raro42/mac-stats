@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.271] - 2026-07-29
+
+### Changed
+- Instant lane: “improve each night / what was done” and “how did you solve this task?” skip the model loop and point at Digest / morning surprise.
+
 ## [0.1.270] - 2026-07-28
 
 ### Changed

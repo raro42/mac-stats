@@ -124,6 +124,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_overnight_improvements_ask(&n) {
         return Some(format_instant_overnight_improvements_reply());
     }
+    if is_how_solved_task_ask(&n) {
+        return Some(format_instant_how_solved_task_reply());
+    }
     if is_tonight_plan_ask(&n) {
         return Some(format_instant_tonight_plan_reply());
     }
@@ -341,10 +344,13 @@ fn is_overnight_improvements_ask(n: &str) -> bool {
         return false;
     }
     let asks_improvements = n.contains("improvement")
+        || n.contains("improve")
         || n.contains("what shipped")
         || n.contains("what changed")
         || n.contains("what did you ship")
-        || n.contains("what did you change");
+        || n.contains("what did you change")
+        || n.contains("what was done")
+        || n.contains("what did you do");
     let overnight_context = n.contains("last night")
         || n.contains("overnight")
         || n.contains("coding session")
@@ -353,8 +359,52 @@ fn is_overnight_improvements_ask(n: &str) -> bool {
         || n.contains("recently")
         || n.contains("improvement loop")
         || n.contains("harness loop")
-        || n.contains("overnight harness");
+        || n.contains("overnight harness")
+        || n.contains("each night")
+        || n.contains("every night")
+        || n.contains("nightly");
     asks_improvements && overnight_context
+}
+
+/// “How did you solve this task?” — point at morning surprise / Digest, not a model loop.
+fn is_how_solved_task_ask(n: &str) -> bool {
+    if n.chars().count() > 100 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("redmine")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("ticket")
+    {
+        return false;
+    }
+    let asks_how = n.contains("how did you solve")
+        || n.contains("how did you fix")
+        || n.contains("how was this solved")
+        || n.contains("how was that solved");
+    asks_how && n.contains("task")
+}
+
+fn format_instant_how_solved_task_reply() -> String {
+    let version = crate::config::Config::version();
+    let bullets = load_morning_surprise_highlights(3);
+    if bullets.is_empty() {
+        return format!(
+            "For overnight/harness work I ship concrete mac-stats changes (now **v{version}**). \
+Check **Agent Ops → Digest** or `~/.mac-stats/improvements/morning_surprise_*.md` for what landed — \
+not a chat-only summary."
+        );
+    }
+    let list = bullets
+        .into_iter()
+        .map(|b| format!("• {b}"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    format!(
+        "Recent harness keeps (I'm on **mac-stats v{version}**):\n{list}\n\n\
+Full trail: **Agent Ops → Digest** or today's `morning_surprise_*.md`."
+    )
 }
 
 /// “What’s planned for this night / tonight?” — avoid TASK_LIST tool loops.
@@ -1252,6 +1302,7 @@ commit+push, then reply briefly.";
             "What changed from last night's coding session?",
             "Any improvement lately?",
             "No improvement loop?",
+            "Don't you have a task to improve each night? I would like to know what was done.",
         ] {
             match classify_turn_lane(q, None) {
                 TurnLane::Instant { reply } => {
@@ -1270,6 +1321,27 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "improvements without overnight context must not be instant"
+        );
+    }
+
+    #[test]
+    fn how_solved_task_asks_are_instant() {
+        match classify_turn_lane("How did you solve this task?", None) {
+            TurnLane::Instant { reply } => {
+                let lower = reply.to_lowercase();
+                assert!(
+                    lower.contains("digest") || lower.contains("morning_surprise") || lower.contains("mac-stats"),
+                    "expected digest pointer: {reply}"
+                );
+            }
+            other => panic!("expected Instant, got {:?}", other),
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane("How did you solve the Redmine ticket?", None),
+                TurnLane::Instant { .. }
+            ),
+            "ticket solve asks must not be instant"
         );
     }
 
