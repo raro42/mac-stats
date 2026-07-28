@@ -422,6 +422,13 @@
   min-height: 56px;
 }
 
+.ops-empty-compact {
+  padding: 8px 10px;
+  margin: 4px 0 8px;
+  font-size: 11px;
+  text-align: left;
+}
+
 /* Shared AI chat empty state + taller transcript (all themes load agent-ops.css) */
 .chat-messages {
   max-height: min(320px, 42vh) !important;

@@ -1097,6 +1097,7 @@ fn lite_pre_route(rec: &str) -> bool {
         || u.starts_with("LIST_SCHEDULES")
         || u.starts_with("TASK_LIST")
         || u.starts_with("TASK_SHOW:")
+        || u.starts_with("TASK_CREATE:")
         || u.starts_with("OLLAMA_API:")
         || u.starts_with("BROWSER_SCREENSHOT:")
 }
@@ -1118,6 +1119,9 @@ pub fn lite_success_criteria(pre_routed: Option<&str>) -> Vec<String> {
     }
     if u.starts_with("BROWSER_SCREENSHOT:") {
         return vec!["Screenshot was taken and attached or path returned.".to_string()];
+    }
+    if u.starts_with("TASK_CREATE:") {
+        return vec!["A new task file was created and confirmed to the user.".to_string()];
     }
     vec!["User request answered clearly.".to_string()]
 }

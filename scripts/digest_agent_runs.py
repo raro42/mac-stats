@@ -201,6 +201,36 @@ def looks_like_scheduled_skill(q: str) -> bool:
     return n.startswith("skill:")
 
 
+def looks_like_greeting(q: str) -> bool:
+    n = (q or "").lower()
+    # Letters/spaces only — so "Hola 👋" still matches.
+    words = "".join(c if c.isalpha() or c.isspace() else " " for c in n)
+    compact = " ".join(words.split())
+    return compact in {
+        "hi",
+        "hello",
+        "hey",
+        "hey there",
+        "yo",
+        "sup",
+        "hola",
+        "hallo",
+        "guten tag",
+        "good morning",
+        "good afternoon",
+        "good evening",
+        "good night",
+        "gm",
+        "ga",
+        "ge",
+        "buenas",
+        "buenas tardes",
+        "buenas noches",
+        "ping",
+        "pong",
+    }
+
+
 def looks_like_how_solved_task(q: str) -> bool:
     if "ticket" in q or "redmine" in q or "http" in q:
         return False
@@ -363,6 +393,9 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         return True
     # Scheduled SKILL prompts are harness/scheduler work, not Discord UX latency.
     if looks_like_scheduled_skill(q) and not tools and tool_steps == 0:
+        return True
+    # Short greetings (incl. emoji) that are now Instant — historical lite noise.
+    if looks_like_greeting(q) and not tools and tool_steps == 0:
         return True
     if tools or tool_steps > 0:
         return False

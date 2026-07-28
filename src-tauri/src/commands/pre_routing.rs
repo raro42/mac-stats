@@ -526,7 +526,75 @@ fn try_pre_route_task_commands(q_lower: &str, q_original: &str) -> Option<String
         }
     }
 
-    None
+    try_pre_route_task_create(q_lower, q_original)
+}
+
+/// "create a task for coder to …" / "create a task about …" → TASK_CREATE.
+fn try_pre_route_task_create(q_lower: &str, q_original: &str) -> Option<String> {
+    if q_lower.len() > 600 {
+        return None;
+    }
+    if q_lower.contains("and then ")
+        || q_lower.contains("after that ")
+        || q_lower.contains("schedule ")
+        || q_lower.contains("http")
+        || q_lower.contains("skill:")
+        || q_lower.contains("cursor_agent:")
+    {
+        return None;
+    }
+
+    let (topic, content_from_lower_idx) = if let Some(rest) = q_lower.strip_prefix("create a task for ")
+    {
+        let rest = rest.trim();
+        if rest.is_empty() {
+            return None;
+        }
+        // "coder to improve …" → topic=coder, content=full original
+        let topic = rest
+            .split_whitespace()
+            .next()
+            .unwrap_or("task")
+            .trim_matches(|c: char| !c.is_alphanumeric() && c != '-' && c != '_')
+            .to_string();
+        if topic.is_empty() {
+            return None;
+        }
+        (topic, q_lower.find("create a task for ").unwrap_or(0))
+    } else if let Some(pos) = q_lower.find("create a task about ") {
+        let after = &q_lower[pos + "create a task about ".len()..];
+        if after.trim().is_empty() {
+            return None;
+        }
+        ("task".to_string(), pos)
+    } else if let Some(pos) = q_lower.find("create a task:") {
+        let after = &q_lower[pos + "create a task:".len()..];
+        if after.trim().is_empty() {
+            return None;
+        }
+        ("task".to_string(), pos)
+    } else if let Some(rest) = q_lower.strip_prefix("create a task ") {
+        let rest = rest.trim();
+        if rest.is_empty() || rest == "for" || rest == "about" {
+            return None;
+        }
+        ("task".to_string(), 0)
+    } else {
+        return None;
+    };
+
+    let content = q_original.trim();
+    if content.chars().count() < 12 {
+        return None;
+    }
+    let _ = content_from_lower_idx; // content is the full user ask (keeps context)
+    let topic = crate::commands::curated_memory::slugify_note_id(&topic);
+    info!(
+        "Agent router: pre-routed to TASK_CREATE (keyword): topic={} content={}",
+        topic,
+        crate::logging::ellipse(content, 80)
+    );
+    Some(format!("TASK_CREATE: {topic} 1 {content}"))
 }
 
 /// "list models", "what models", "ollama models" → OLLAMA_API: list_models.
@@ -1182,11 +1250,29 @@ mod tests {
     }
 
     #[test]
-    fn task_no_match() {
+    fn task_create_pre_route() {
+        let r = try_pre_route_task_commands(
+            "create a task for coder to improve your knowledge saving from this discussion.",
+            "Create a task for coder to improve your knowledge saving from this discussion.",
+        );
+        let rec = r.expect("expected TASK_CREATE");
+        assert!(rec.starts_with("TASK_CREATE: coder 1 "), "{rec}");
+        assert!(rec.contains("knowledge saving"), "{rec}");
+
+        let r2 = try_pre_route_task_commands(
+            "create a task about testing",
+            "create a task about testing",
+        );
+        let rec2 = r2.expect("expected TASK_CREATE about");
+        assert!(rec2.starts_with("TASK_CREATE: task 1 "), "{rec2}");
+    }
+
+    #[test]
+    fn task_create_skipped_for_compound() {
         assert_eq!(
             try_pre_route_task_commands(
-                "create a task about testing",
-                "create a task about testing"
+                "create a task about testing and then schedule it",
+                "create a task about testing and then schedule it"
             ),
             None
         );

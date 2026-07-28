@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.276] - 2026-07-29
+
+### Changed
+- Pre-route “create a task for/about …” to TASK_CREATE (lite lane) so Discord skips planning.
+- Agent Ops Insights: clearer empty state when digest open queue is clear.
+
 ## [0.1.275] - 2026-07-29
 
 ### Changed
