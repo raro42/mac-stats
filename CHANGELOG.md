@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.269] - 2026-07-28
+
+### Changed
+- AI chat Send button shared polish (hover lift / focus alignment) across themes.
+- Design-review helper: polish-without-capture grace marks so TCC-blocked screenshots do not starve the overnight queue.
+
 ## [0.1.268] - 2026-07-28
 
 ### Changed

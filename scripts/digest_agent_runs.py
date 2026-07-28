@@ -355,8 +355,13 @@ def load_runs(path: Path, since: datetime) -> list[dict]:
 
 
 def design_review_candidate(repo_root: Path, max_age_days: float = 3.0) -> tuple | None:
-    """Synthetic open candidate when a feature screenshot is missing or stale."""
+    """Synthetic open candidate when a feature screenshot is missing or stale.
+
+    A recent polish-without-capture mark under screens/.polish-grace/ suppresses
+    stale-screenshot nagging for that surface (TCC / Screen Recording gaps).
+    """
     screens = repo_root / "screens"
+    grace_dir = screens / ".polish-grace"
     surfaces = (
         "feature-agent-ops.png",
         "feature-ai-chat.png",
@@ -365,8 +370,12 @@ def design_review_candidate(repo_root: Path, max_age_days: float = 3.0) -> tuple
     )
     now = time.time()
     max_age = max_age_days * 86400
+    grace_max = 7.0 * 86400
     for name in surfaces:
         path = screens / name
+        grace = grace_dir / Path(name).stem
+        if grace.is_file() and (now - grace.stat().st_mtime) < grace_max:
+            continue
         if not path.is_file():
             return (
                 0,

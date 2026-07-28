@@ -40,3 +40,6 @@ performance_*.csv
 cpu-comparison-report-*.txt
 cpu-comparison-data-*.csv
 cpu-comparison-screenshots/
+
+# Overnight design-review: polish-without-capture grace markers (local)
+screens/.polish-grace/

@@ -17,6 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
+GRACE_DIR = SCREENS / ".polish-grace"
 
 # Rotate priority: Agent Ops / chat / processes often go stale first.
 SURFACES = (
@@ -31,13 +32,28 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--max-age-days", type=float, default=3.0)
     ap.add_argument("--json", action="store_true")
+    ap.add_argument(
+        "--mark-polished",
+        metavar="STEM",
+        help="Record polish-without-capture grace for a surface stem (e.g. feature-ai-chat)",
+    )
     args = ap.parse_args()
     now = time.time()
     max_age = args.max_age_days * 86400
+    grace_max = 7.0 * 86400
+
+    if args.mark_polished:
+        GRACE_DIR.mkdir(parents=True, exist_ok=True)
+        stem = args.mark_polished.removesuffix(".png")
+        (GRACE_DIR / stem).write_text(f"polished {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}\n")
+        print(f"marked polish grace: {stem}")
+        return
 
     rows = []
     for name, how in SURFACES:
         path = SCREENS / name
+        grace = GRACE_DIR / Path(name).stem
+        in_grace = grace.is_file() and (now - grace.stat().st_mtime) < grace_max
         if not path.is_file():
             rows.append(
                 {
@@ -45,7 +61,8 @@ def main() -> None:
                     "how": how,
                     "exists": False,
                     "age_days": None,
-                    "stale": True,
+                    "stale": not in_grace,
+                    "polish_grace": in_grace,
                 }
             )
             continue
@@ -56,7 +73,8 @@ def main() -> None:
                 "how": how,
                 "exists": True,
                 "age_days": round(age / 86400, 2),
-                "stale": age >= max_age,
+                "stale": (age >= max_age) and not in_grace,
+                "polish_grace": in_grace,
                 "path": str(path),
             }
         )
@@ -87,7 +105,7 @@ def main() -> None:
         print(f"recommended: {pick['file']} ({age_s}) — {pick['how']}")
     print("policy: docs/043_overnight_design_review.md")
     for r in rows:
-        mark = "STALE" if r["stale"] else "ok"
+        mark = "STALE" if r["stale"] else ("grace" if r.get("polish_grace") else "ok")
         age_s = "missing" if not r["exists"] else f"{r['age_days']}d"
         print(f"  [{mark}] {r['file']}  {age_s}")
 
