@@ -5,7 +5,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 ## P0 — latency / thrash
 
 1. ~~**Improve/memory scheduled task thrash**~~ — done in **v0.1.260** (runner prompt compaction).
-2. **p50 direct latency** — Digest often shows ~20s p50 after noise filters. Find one repeated pattern and instant/pre-route or shrink tools.
+2. **p50 direct latency** — partial: live metrics snapshot instant (**v0.1.264**); more patterns remain.
 
 ## P1 — design / marketing (rotate)
 

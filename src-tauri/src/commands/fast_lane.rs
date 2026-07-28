@@ -138,6 +138,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_uptime_ask(&n) {
         return Some(format_instant_uptime_reply());
     }
+    if is_live_metrics_snapshot_ask(&n) {
+        return Some(format_instant_live_metrics_reply());
+    }
     if is_git_commit_push_request(&n) {
         return Some(
             "I won't `git commit` / `git push` from Discord by default (safety). \
@@ -774,6 +777,56 @@ fn format_instant_uptime_reply() -> String {
     )
 }
 
+/// Live CPU/RAM/load snapshot from metrics cache (digester: ~14s direct for “system load”).
+fn is_live_metrics_snapshot_ask(n: &str) -> bool {
+    if n.chars().count() > 96 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("redmine")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("search")
+        || n.contains("weather")
+        || n.contains("ticket")
+        || n.contains("flight")
+        || n.contains("uptime")
+        || n.contains("fetch")
+        || n.contains("browser")
+    {
+        return false;
+    }
+    let load = n.contains("system load")
+        || n.contains("load look")
+        || n.contains("load average")
+        || (n.contains("how busy")
+            && (n.contains("system")
+                || n.contains("machine")
+                || n.contains("mac")
+                || n.contains("cpu")));
+    let cpu = n.contains("cpu usage")
+        || (n.contains("cpu") && (n.contains("how") || n.contains("look") || n.contains("doing")));
+    let ram = n.contains("ram usage")
+        || n.contains("memory usage")
+        || (n.contains("how much") && (n.contains("ram") || n.contains("memory")));
+    let metrics = n.contains("system metrics")
+        || n.contains("machine status")
+        || (n.contains("mac status") && !n.contains("discord"));
+    load || cpu || ram || metrics
+}
+
+fn format_instant_live_metrics_reply() -> String {
+    let raw = crate::metrics::format_metrics_for_ai_context();
+    let body = raw
+        .strip_prefix("Current system metrics:\n")
+        .unwrap_or(raw.as_str());
+    format!(
+        "Live snapshot (**mac-stats v{}**):\n{}",
+        crate::config::Config::version(),
+        body
+    )
+}
+
 fn is_git_commit_push_request(n: &str) -> bool {
     // Scheduled skills / Cursor Agent work must run — do not instant-refuse them.
     // False positive example: "SKILL: ui-weekly-review … commit+push, reply briefly."
@@ -1009,6 +1062,35 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "host/system uptime asks must not be instant"
+        );
+    }
+
+    #[test]
+    fn live_metrics_snapshot_ask_is_instant() {
+        for q in [
+            "What's the system load look like",
+            "system load",
+            "cpu usage?",
+            "How's the RAM usage?",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    assert!(
+                        reply.to_lowercase().contains("cpu")
+                            || reply.to_lowercase().contains("load")
+                            || reply.to_lowercase().contains("ram"),
+                        "expected metrics reply for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant for {q:?}, got {:?}", other),
+            }
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane("Search for system load monitoring tools", None),
+                TurnLane::Instant { .. }
+            ),
+            "search tasks must not be instant metrics"
         );
     }
 

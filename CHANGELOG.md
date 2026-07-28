@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.264] - 2026-07-28
+
+### Fixed
+- Instant lane for live system load / CPU / RAM snapshot asks (was ~14s direct).
+
 ## [0.1.263] - 2026-07-28
 
 ### Changed
