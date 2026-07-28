@@ -36,10 +36,26 @@ fn log_brave_rate_limit_headers(resp: &reqwest::Response) {
         .get(HDR_POLICY)
         .and_then(|v| v.to_str().ok())
         .unwrap_or("-");
-    info!(
-        "Brave agent: rate limit — limit={} remaining={} reset_sec={} policy={}",
-        limit, remaining, reset, policy
-    );
+    // Short-window remaining=0 is common after a health ping; keep that at debug.
+    let remaining_zero = remaining
+        .split(',')
+        .next()
+        .and_then(|s| s.trim().parse::<u64>().ok())
+        == Some(0);
+    if remaining_zero {
+        tracing::debug!(
+            "Brave agent: rate limit — limit={} remaining={} reset_sec={} policy={}",
+            limit,
+            remaining,
+            reset,
+            policy
+        );
+    } else {
+        info!(
+            "Brave agent: rate limit — limit={} remaining={} reset_sec={} policy={}",
+            limit, remaining, reset, policy
+        );
+    }
 }
 
 /// Read Brave API key from a .config.env-style file.

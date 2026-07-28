@@ -5,8 +5,9 @@
 use chrono::{SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
 use serenity::gateway::ConnectionStage;
+use std::path::PathBuf;
 use std::sync::Mutex;
-use std::time::{Duration, Instant};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use tokio::sync::oneshot;
 
 const PROBE_TIMEOUT: Duration = Duration::from_secs(3);
@@ -40,8 +41,47 @@ const HEALTH_REPORT_TTL: Duration = Duration::from_secs(5 * 60);
 /// Last known-good Brave Search probe (avoid flashing Unavailable on transient API errors).
 static BRAVE_LAST_OK: Mutex<Option<(Instant, FeatureHealth)>> = Mutex::new(None);
 
+/// Skip live Brave Search pings across restarts (install loop burns ~1 credit / start otherwise).
+const BRAVE_PROBE_DISK_CACHE_SECS: u64 = 6 * 60 * 60;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum BraveProbeMode {
+    /// Prefer disk/memory cache; only hit the API when stale.
+    Cached,
+    /// Always call the API (Agent Ops refresh).
+    ForceLive,
+}
+
 fn now_rfc3339_utc() -> String {
     Utc::now().to_rfc3339_opts(SecondsFormat::Secs, true)
+}
+
+fn brave_probe_stamp_path() -> PathBuf {
+    std::env::var_os("HOME")
+        .map(|h| PathBuf::from(h).join(".mac-stats").join("brave_probe_ok"))
+        .unwrap_or_else(|| std::env::temp_dir().join("mac-stats-brave_probe_ok"))
+}
+
+fn unix_now_secs() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0)
+}
+
+fn load_brave_probe_age_secs() -> Option<u64> {
+    let raw = std::fs::read_to_string(brave_probe_stamp_path()).ok()?;
+    let stamped: u64 = raw.trim().parse().ok()?;
+    let now = unix_now_secs();
+    now.checked_sub(stamped)
+}
+
+fn save_brave_probe_ok_stamp() {
+    let path = brave_probe_stamp_path();
+    if let Some(parent) = path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    let _ = std::fs::write(path, format!("{}\n", unix_now_secs()));
 }
 
 fn entry(name: &str, status: HealthStatus, message: Option<String>) -> FeatureHealth {
@@ -343,7 +383,7 @@ async fn probe_browser() -> FeatureHealth {
     }
 }
 
-async fn probe_brave() -> FeatureHealth {
+async fn probe_brave(mode: BraveProbeMode) -> FeatureHealth {
     let Some(api_key) = crate::commands::brave::get_brave_api_key() else {
         return entry(
             "Brave Search",
@@ -352,8 +392,33 @@ async fn probe_brave() -> FeatureHealth {
         );
     };
 
+    if mode == BraveProbeMode::Cached {
+        if let Some(age) = load_brave_probe_age_secs() {
+            if age < BRAVE_PROBE_DISK_CACHE_SECS {
+                tracing::info!(
+                    "feature_health: Brave Search skipped live ping (last ok {}m ago; cache {}h)",
+                    age / 60,
+                    BRAVE_PROBE_DISK_CACHE_SECS / 3600
+                );
+                let h = entry(
+                    "Brave Search",
+                    HealthStatus::Ok,
+                    Some(format!(
+                        "API reachable (cached; last live check {}m ago)",
+                        age / 60
+                    )),
+                );
+                if let Ok(mut g) = BRAVE_LAST_OK.lock() {
+                    *g = Some((Instant::now(), h.clone()));
+                }
+                return h;
+            }
+        }
+    }
+
     match crate::commands::brave::ping_brave_search_api(&api_key).await {
         Ok(()) => {
+            save_brave_probe_ok_stamp();
             let h = entry(
                 "Brave Search",
                 HealthStatus::Ok,
@@ -384,6 +449,25 @@ async fn probe_brave() -> FeatureHealth {
                             checked_at: now_rfc3339_utc(),
                         };
                     }
+                }
+            }
+            // Disk stamp still counts as soft OK across restarts (install thrash / transient 429).
+            if let Some(age) = load_brave_probe_age_secs() {
+                if age < BRAVE_PROBE_DISK_CACHE_SECS {
+                    tracing::warn!(
+                        "feature_health: Brave Search live ping failed; serving disk-cached OK from {}m ago: {}",
+                        age / 60,
+                        err
+                    );
+                    return entry(
+                        "Brave Search",
+                        HealthStatus::Ok,
+                        Some(format!(
+                            "API reachable (stale disk cache; last live check {}m ago; live error: {})",
+                            age / 60,
+                            err.chars().take(120).collect::<String>()
+                        )),
+                    );
                 }
             }
             entry("Brave Search", HealthStatus::Unavailable, Some(err))
@@ -579,10 +663,14 @@ fn probe_scheduler() -> FeatureHealth {
 
 /// Run all probes (parallel async where applicable).
 pub async fn collect_feature_health() -> Vec<FeatureHealth> {
+    collect_feature_health_with_brave(BraveProbeMode::Cached).await
+}
+
+async fn collect_feature_health_with_brave(brave_mode: BraveProbeMode) -> Vec<FeatureHealth> {
     let ollama = probe_ollama();
     let redmine = probe_redmine();
     let browser = probe_browser();
-    let brave = probe_brave();
+    let brave = probe_brave(brave_mode);
     let open_meteo = probe_open_meteo();
     let (o, r, b, br, om) = tokio::join!(ollama, redmine, browser, brave, open_meteo);
 
@@ -667,7 +755,12 @@ pub async fn get_feature_health(refresh: Option<bool>) -> Result<Vec<FeatureHeal
         .unwrap_or(true);
     if need_refresh || cached_empty {
         tracing::info!("feature_health: collecting probes (refresh={need_refresh}, cache_empty={cached_empty})");
-        let report = collect_feature_health().await;
+        let brave_mode = if need_refresh {
+            BraveProbeMode::ForceLive
+        } else {
+            BraveProbeMode::Cached
+        };
+        let report = collect_feature_health_with_brave(brave_mode).await;
         log_feature_health_summary(&report);
         store_report(&report);
         Ok(report)
@@ -693,5 +786,28 @@ pub async fn get_feature_health(refresh: Option<bool>) -> Result<Vec<FeatureHeal
             .lock()
             .map(|g| g.clone())
             .map_err(|_| "feature health lock poisoned".to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn brave_probe_stamp_roundtrip_age() {
+        let path = brave_probe_stamp_path();
+        if let Some(parent) = path.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        let before = unix_now_secs();
+        save_brave_probe_ok_stamp();
+        let age = load_brave_probe_age_secs().expect("stamp should load");
+        assert!(age <= 2, "age={age}");
+        let stamped: u64 = std::fs::read_to_string(&path)
+            .unwrap()
+            .trim()
+            .parse()
+            .unwrap();
+        assert!(stamped >= before);
     }
 }

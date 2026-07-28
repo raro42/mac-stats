@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.272] - 2026-07-29
+
+### Changed
+- Brave Search health probe: skip live API pings for 6h across restarts (overnight install loop was burning search quota); Agent Ops refresh still forces a live check.
+
 ## [0.1.271] - 2026-07-29
 
 ### Changed
