@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.268] - 2026-07-28
+
+### Changed
+- Landing page (`docs/site/index.html`): CPU+SSD / local-first framing aligned with the README vs-competitors pass.
+
 ## [0.1.267] - 2026-07-28
 
 ### Changed
