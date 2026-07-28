@@ -260,6 +260,21 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
     tools = r.get("tools") or []
     tool_steps = int(r.get("tool_steps") or 0)
     ts = parse_ts(str(r.get("ts", "")))
+    # Scheduled task-runner prompts (Improve/memory) dominate wall time — not Discord UX p50.
+    if q.strip().startswith("current task file content") or (
+        "topic: improve" in q and "id: memory" in q
+    ):
+        return True
+    # Live metrics snapshot now instant (v0.1.264).
+    if (
+        "system load" in q
+        or "load look" in q
+        or "cpu usage" in q
+        or "ram usage" in q
+        or "memory usage" in q
+        or "system metrics" in q
+    ) and not tools and tool_steps == 0:
+        return True
     # Pre-Open-Meteo weather that burned Brave/Perplexity.
     if ts is not None and ts < SHIPPED_INSTANT_WEATHER and (
         "weather" in q or "wether" in q

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.270] - 2026-07-28
+
+### Changed
+- Agent Ops health cards: clearer labels + subtle hover lift.
+- Digester latency: exclude scheduled Improve/memory task-runner turns (and live-metrics misses) so p50 reflects Discord UX.
+
 ## [0.1.269] - 2026-07-28
 
 ### Changed

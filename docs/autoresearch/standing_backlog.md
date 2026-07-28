@@ -5,7 +5,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 ## P0 — latency / thrash
 
 1. ~~**Improve/memory scheduled task thrash**~~ — done in **v0.1.260** (runner prompt compaction).
-2. **p50 direct latency** — partial: live metrics snapshot instant (**v0.1.264**); more patterns remain.
+2. **p50 direct latency** — digester now excludes Improve-task thrash from sample (**v0.1.270**); live-metrics instant already in; more patterns remain.
 
 ## P1 — design / marketing (rotate)
 

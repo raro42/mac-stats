@@ -112,16 +112,18 @@
   border-radius: 10px;
   padding: 10px 12px;
   min-height: 58px;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
 }
 
 .ops-health-card.ops-health-clickable {
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
 }
 
 .ops-health-card.ops-health-clickable:hover {
   border-color: color-mix(in srgb, currentColor 28%, transparent);
   background: color-mix(in srgb, currentColor 10%, transparent);
+  transform: translateY(-1px);
 }
 
 .ops-health-card.ops-health-ok {
@@ -139,8 +141,8 @@
 .ops-health-label {
   font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.55px;
-  opacity: 0.5;
+  letter-spacing: 0.06em;
+  opacity: 0.55;
   margin-bottom: 4px;
   font-weight: 600;
 }
