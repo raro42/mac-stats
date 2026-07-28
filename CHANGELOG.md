@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.273] - 2026-07-29
+
+### Changed
+- Pre-route bare “Any news?” / short headline asks (prefer Perplexity) and comma topic dumps (“IT, AI, Stocks…”) so Discord skips planning LLM.
+
 ## [0.1.272] - 2026-07-29
 
 ### Changed

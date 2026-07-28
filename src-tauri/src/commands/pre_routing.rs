@@ -235,6 +235,43 @@ fn try_pre_route_web_search(question: &str) -> Option<String> {
         }
     }
 
+    // Bare / short news asks ("Any news?", "today's headlines") — prefer Perplexity.
+    if crate::commands::perplexity_helpers::is_news_query(q) && q.chars().count() <= 96 {
+        let query = bare_news_search_query(&q_lower, q);
+        if !query.is_empty() {
+            let (tool, label) = if perplexity_ok {
+                ("PERPLEXITY_SEARCH", "news ask")
+            } else if brave_ok {
+                ("BRAVE_SEARCH", "news ask")
+            } else {
+                return None;
+            };
+            info!(
+                "Agent router: pre-routed to {} ({}): {}",
+                tool,
+                label,
+                crate::logging::ellipse(&query, 80)
+            );
+            return Some(format!("{tool}: {query}"));
+        }
+    }
+
+    // Short topic dumps ("IT, AI, Stocks, BTC, nerd stuff") — treat as web search.
+    if let Some(query) = topic_dump_search_query(q) {
+        let (tool, label) = if brave_ok {
+            ("BRAVE_SEARCH", "topic dump")
+        } else {
+            ("PERPLEXITY_SEARCH", "topic dump")
+        };
+        info!(
+            "Agent router: pre-routed to {} ({}): {}",
+            tool,
+            label,
+            crate::logging::ellipse(&query, 80)
+        );
+        return Some(format!("{tool}: {query}"));
+    }
+
     // Keyword-based search intent detection.
     // Extract the search query from the question after the keyword.
     let search_query = extract_search_query(&q_lower, q);
@@ -260,6 +297,71 @@ fn try_pre_route_web_search(question: &str) -> Option<String> {
     }
 
     None
+}
+
+/// Search string for short news asks. Bare "any news?" gets a default headline query.
+fn bare_news_search_query(q_lower: &str, q_original: &str) -> String {
+    let stripped = q_original.trim().trim_end_matches('?').trim();
+    let compact = q_lower
+        .trim()
+        .trim_end_matches('?')
+        .trim()
+        .replace(['!', '.'], "");
+    let bare = matches!(
+        compact.as_str(),
+        "any news"
+            | "news"
+            | "the news"
+            | "whats the news"
+            | "what's the news"
+            | "what is the news"
+            | "latest news"
+            | "todays headlines"
+            | "today's headlines"
+            | "headlines"
+            | "top stories"
+            | "breaking news"
+            | "current events"
+    ) || (compact.starts_with("any news") && compact.chars().count() <= 24);
+    if bare {
+        "top world and technology headlines today".to_string()
+    } else {
+        stripped.to_string()
+    }
+}
+
+/// Comma-heavy short topic lists without an explicit search verb.
+fn topic_dump_search_query(q: &str) -> Option<String> {
+    let trimmed = q.trim().trim_end_matches('?').trim();
+    let len = trimmed.chars().count();
+    if !(12..=96).contains(&len) {
+        return None;
+    }
+    let lower = trimmed.to_lowercase();
+    if lower.contains("http")
+        || lower.contains("redmine")
+        || lower.contains("skill:")
+        || lower.contains("cursor_agent:")
+        || lower.contains("search ")
+        || lower.contains("research ")
+        || lower.contains("look up")
+        || lower.contains(" and then ")
+    {
+        return None;
+    }
+    let commas = trimmed.matches(',').count();
+    if commas < 2 {
+        return None;
+    }
+    // Prefer lists of short tokens, not long prose clauses.
+    let parts: Vec<&str> = trimmed.split(',').map(str::trim).filter(|p| !p.is_empty()).collect();
+    if parts.len() < 3 {
+        return None;
+    }
+    if parts.iter().any(|p| p.split_whitespace().count() > 6) {
+        return None;
+    }
+    Some(trimmed.to_string())
 }
 
 /// Extract a search query from keyword patterns. Returns `(query, is_research)`.
@@ -847,6 +949,35 @@ mod tests {
             "please search for openai news",
         );
         assert_eq!(r, Some(("openai news".to_string(), false)));
+    }
+
+    #[test]
+    fn bare_news_query_defaults_headline_search() {
+        assert_eq!(
+            bare_news_search_query("any news?", "Any news?"),
+            "top world and technology headlines today"
+        );
+        assert_eq!(
+            bare_news_search_query("todays headlines", "todays headlines"),
+            "top world and technology headlines today"
+        );
+        assert_eq!(
+            bare_news_search_query(
+                "what's the latest news about barcelona?",
+                "What's the latest news about Barcelona?"
+            ),
+            "What's the latest news about Barcelona"
+        );
+    }
+
+    #[test]
+    fn topic_dump_search_query_accepts_short_lists() {
+        assert_eq!(
+            topic_dump_search_query("IT, AI, Stocks, BTC, nerd stuff"),
+            Some("IT, AI, Stocks, BTC, nerd stuff".to_string())
+        );
+        assert_eq!(topic_dump_search_query("just one topic"), None);
+        assert_eq!(topic_dump_search_query("search for IT, AI, Stocks"), None);
     }
 
     #[test]

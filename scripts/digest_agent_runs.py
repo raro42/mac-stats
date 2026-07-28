@@ -157,6 +157,19 @@ def looks_like_overnight_improvements(q: str) -> bool:
     )
 
 
+def looks_like_thread_clarifier(q: str) -> bool:
+    n = (q or "").lower().strip()
+    if len(n) > 80:
+        return False
+    return (
+        "referring to this conversation" in n
+        or "referring to this thread" in n
+        or "i mean this conversation" in n
+        or "i mean this thread" in n
+        or n in ("this conversation", "this thread", "here", "in this chat")
+    )
+
+
 def looks_like_how_solved_task(q: str) -> bool:
     if "ticket" in q or "redmine" in q or "http" in q:
         return False
@@ -322,6 +335,8 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
     if looks_like_wakeup(q) or looks_like_overnight_improvements(q):
         return True
     if looks_like_version_ask(q) or looks_like_discord_reach(q):
+        return True
+    if looks_like_thread_clarifier(q):
         return True
     # Redmine user-chat capability (v0.1.224).
     if (

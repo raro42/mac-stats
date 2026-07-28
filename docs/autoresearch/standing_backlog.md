@@ -5,7 +5,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 ## P0 — latency / thrash
 
 1. ~~**Improve/memory scheduled task thrash**~~ — done in **v0.1.260** (runner prompt compaction).
-2. **p50 direct latency** — digester excludes Improve-task thrash (**v0.1.270**); overnight / how-solved-task asks instant (**v0.1.271**); more tool-heavy patterns remain.
+2. **p50 direct latency** — digester excludes Improve-task thrash (**v0.1.270**); overnight / how-solved-task asks instant (**v0.1.271**); bare news + topic-dump pre-route (**v0.1.273**); more tool-heavy patterns remain.
 
 ## P1 — design / marketing (rotate)
 
