@@ -345,6 +345,49 @@ pub fn instant_read_saved_note(slug_raw: &str) -> String {
     }
 }
 
+/// Dump all saved note bodies (verbatim) for “extract what you saved” style asks.
+pub fn instant_dump_saved_notes(max_chars: usize) -> String {
+    let max_chars = max_chars.max(500);
+    let mut parts: Vec<String> = Vec::new();
+    let mut used = 0usize;
+    let mut seen = std::collections::BTreeSet::new();
+    for dir in all_notes_dirs() {
+        for slug in list_note_slugs(&dir) {
+            if !seen.insert(slug.clone()) {
+                continue;
+            }
+            let Some(body) = read_note_file(&dir, &slug) else {
+                continue;
+            };
+            if body.is_empty() {
+                continue;
+            }
+            let chunk = format!("### note:{slug}\n{body}\n\n");
+            if used + chunk.len() > max_chars && !parts.is_empty() {
+                parts.push("…(truncated; ask MEMORY: read note:<slug> for a specific note)\n".into());
+                break;
+            }
+            if chunk.len() > max_chars && parts.is_empty() {
+                let cut: String = body.chars().take(max_chars.saturating_sub(40)).collect();
+                parts.push(format!("### note:{slug}\n{cut}\n…(truncated)\n"));
+                break;
+            }
+            used += chunk.len();
+            parts.push(chunk);
+        }
+    }
+    if parts.is_empty() {
+        "No saved notes on disk yet. Use `MEMORY: save <slug>` with the full verbatim body when you want something kept exactly."
+            .to_string()
+    } else {
+        format!(
+            "Saved notes (verbatim — {}):\n\n{}",
+            seen.len(),
+            parts.concat()
+        )
+    }
+}
+
 /// Load full note bodies for prompt injection (newest files first, until budget).
 pub fn load_notes_block_for_prompt(
     discord_channel_id: Option<u64>,

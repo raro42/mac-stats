@@ -180,6 +180,27 @@ def looks_like_exact_saved_note_read(q: str) -> bool:
     )
 
 
+def looks_like_dump_saved_notes(q: str) -> bool:
+    n = (q or "").lower()
+    if "http" in n or "redmine" in n or "skill:" in n:
+        return False
+    asks = (
+        "what you saved" in n
+        or "what i saved" in n
+        or ("extract what" in n and "saved" in n)
+        or "show what you saved" in n
+        or "everything you saved" in n
+        or "what did you save" in n
+        or ("check if everything" in n and "saved" in n)
+    )
+    return bool(asks) and ("saved" in n or "memory" in n or "note" in n)
+
+
+def looks_like_scheduled_skill(q: str) -> bool:
+    n = (q or "").strip().lower()
+    return n.startswith("skill:")
+
+
 def looks_like_how_solved_task(q: str) -> bool:
     if "ticket" in q or "redmine" in q or "http" in q:
         return False
@@ -337,7 +358,11 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         or looks_like_tonight_plan(q)
         or looks_like_how_solved_task(q)
         or looks_like_exact_saved_note_read(q)
+        or looks_like_dump_saved_notes(q)
     ):
+        return True
+    # Scheduled SKILL prompts are harness/scheduler work, not Discord UX latency.
+    if looks_like_scheduled_skill(q) and not tools and tool_steps == 0:
         return True
     if tools or tool_steps > 0:
         return False

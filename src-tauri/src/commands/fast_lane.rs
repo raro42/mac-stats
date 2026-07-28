@@ -124,6 +124,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if let Some(slug) = extract_exact_saved_note_slug(&n) {
         return Some(crate::commands::curated_memory::instant_read_saved_note(&slug));
     }
+    if is_dump_saved_notes_ask(&n) {
+        return Some(crate::commands::curated_memory::instant_dump_saved_notes(12_000));
+    }
     if is_overnight_improvements_ask(&n) {
         return Some(format_instant_overnight_improvements_reply());
     }
@@ -747,6 +750,38 @@ fn extract_exact_saved_note_slug(n: &str) -> Option<String> {
     None
 }
 
+/// “Extract / show what you saved” — dump all MEMORY notes, not a model MEMORY tool loop.
+fn is_dump_saved_notes_ask(n: &str) -> bool {
+    if n.chars().count() > 180 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("redmine")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("create a task")
+        || n.contains("search ")
+    {
+        return false;
+    }
+    // Single-slug reads are handled by extract_exact_saved_note_slug.
+    if extract_exact_saved_note_slug(n).is_some() {
+        return false;
+    }
+    let asks = n.contains("what you saved")
+        || n.contains("what i saved")
+        || n.contains("extract what you saved")
+        || (n.contains("extract what") && n.contains("saved"))
+        || n.contains("show what you saved")
+        || n.contains("list what you saved")
+        || n.contains("everything you saved")
+        || n.contains("everything i saved")
+        || (n.contains("check if everything") && n.contains("saved"))
+        || n.contains("what did you save")
+        || n.contains("what have you saved");
+    asks && (n.contains("saved") || n.contains("memory") || n.contains("note"))
+}
+
 /// Short “I mean this Discord thread” clarifiers (digester: ~16s direct, zero tools).
 fn is_thread_context_clarifier(n: &str) -> bool {
     if n.chars().count() > 96 {
@@ -1216,6 +1251,23 @@ commit+push, then reply briefly.";
             ),
             "task create must not be note-read instant"
         );
+    }
+
+    #[test]
+    fn dump_saved_notes_ask_is_instant() {
+        match classify_turn_lane(
+            "Ok. We are good now. Extract what you saved for me to check if everything is ok",
+            None,
+        ) {
+            TurnLane::Instant { reply } => {
+                let lower = reply.to_lowercase();
+                assert!(
+                    lower.contains("saved note") || lower.contains("no saved notes"),
+                    "expected dump reply: {reply}"
+                );
+            }
+            other => panic!("expected Instant, got {:?}", other),
+        }
     }
 
     #[test]
