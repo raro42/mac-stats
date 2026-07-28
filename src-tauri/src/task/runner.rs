@@ -63,6 +63,15 @@ pub async fn run_task_until_finished(
         let mut last_reply = String::new();
         for iteration in 0..max_iterations {
             let content = crate::task::read_task(&current_path).map_err(|e| e.clone())?;
+            let content_for_prompt = crate::task::compact_task_content_for_runner(&content);
+            if content_for_prompt.len() < content.len() {
+                info!(
+                    "Task loop: compacted task '{}' for runner prompt ({} → {} chars)",
+                    task_name,
+                    content.len(),
+                    content_for_prompt.len()
+                );
+            }
             let assignee =
                 crate::task::get_assignee(&current_path).unwrap_or_else(|_| "default".to_string());
             let agents = crate::agents::load_agents();
@@ -70,14 +79,14 @@ pub async fn run_task_until_finished(
                 crate::agents::find_agent_by_id_or_name(&agents, &assignee).cloned();
             crate::commands::suspicious_patterns::log_untrusted_suspicious_scan(
                 "task-file-content",
-                &content,
+                &content_for_prompt,
             );
             let wrapped_content = crate::commands::untrusted_content::wrap_untrusted_content(
                 "task-file-content",
-                &content,
+                &content_for_prompt,
             );
             let question = format!(
-            "Current task file content:\n\n{}\n\nDecide the next step. For implement/refactor/add-feature/code tasks: use CURSOR_AGENT: <instruction> to have the editor apply changes, then TASK_APPEND with the result and TASK_STATUS when done. Otherwise use TASK_APPEND to add feedback and TASK_STATUS to set wip or finished. Reply with your action (CURSOR_AGENT, TASK_APPEND, TASK_STATUS, or a final summary).",
+            "Current task file content:\n\n{}\n\nDecide the next step. For implement/refactor/add-feature/code tasks: use CURSOR_AGENT: <instruction> to have the editor apply changes, then TASK_APPEND with the result and TASK_STATUS when done. Otherwise use TASK_APPEND to add feedback and TASK_STATUS to set wip or finished. Prefer finishing: if progress is done or blocked with a clear outcome, reply TASK_STATUS finished or unsuccessful — do not keep TASK_APPEND-only loops without new progress. Reply with your action (CURSOR_AGENT, TASK_APPEND, TASK_STATUS, or a final summary).",
             wrapped_content
         );
             info!(

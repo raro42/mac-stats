@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.260] - 2026-07-28
+
+### Fixed
+- Task runner no longer re-feeds the full growing task file every Ollama turn (caps body ~12k chars, keeps headers + latest notes) — cuts Improve/memory `TASK_*` thrash latency.
+
 ## [0.1.259] - 2026-07-28
 
 ### Changed

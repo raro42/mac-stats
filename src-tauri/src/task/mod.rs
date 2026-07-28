@@ -178,6 +178,64 @@ pub fn read_task(path: &Path) -> Result<String, String> {
     Ok(content)
 }
 
+/// Max chars of task text fed into each `run_task_until_finished` Ollama turn.
+/// Full files grow via TASK_APPEND; re-feeding everything is the Improve/memory thrash pattern.
+pub const RUNNER_TASK_CONTENT_MAX_CHARS: usize = 12_000;
+
+/// Compact task file text for the runner prompt: keep `##` headers, then the latest body.
+/// Returns the original string when already under the budget.
+pub fn compact_task_content_for_runner(content: &str) -> String {
+    let total_chars = content.chars().count();
+    if total_chars <= RUNNER_TASK_CONTENT_MAX_CHARS {
+        return content.to_string();
+    }
+
+    let mut header_lines: Vec<&str> = Vec::new();
+    let mut body_start = 0usize;
+    for (i, line) in content.lines().enumerate() {
+        let t = line.trim();
+        if t.starts_with("## ") || (t.is_empty() && header_lines.len() < 16) {
+            header_lines.push(line);
+            body_start = i + 1;
+            continue;
+        }
+        break;
+    }
+    let header = header_lines.join("\n");
+    let body = content.lines().skip(body_start).collect::<Vec<_>>().join("\n");
+    let header_chars = header.chars().count();
+    let marker_reserve = 120usize;
+    let budget = RUNNER_TASK_CONTENT_MAX_CHARS
+        .saturating_sub(header_chars)
+        .saturating_sub(marker_reserve)
+        .max(2_000);
+
+    let body_chars: Vec<char> = body.chars().collect();
+    if body_chars.len() <= budget {
+        if header.is_empty() {
+            return body;
+        }
+        return format!("{}\n\n{}", header, body);
+    }
+
+    let omitted = body_chars.len().saturating_sub(budget);
+    let mut tail: String = body_chars[body_chars.len() - budget..].iter().collect();
+    if let Some(i) = tail.find('\n') {
+        if i < 240 {
+            tail = tail[i + 1..].to_string();
+        }
+    }
+    let marker = format!(
+        "[… earlier task notes truncated for runner context ({} chars omitted) …]",
+        omitted
+    );
+    if header.is_empty() {
+        format!("{}\n\n{}", marker, tail)
+    } else {
+        format!("{}\n\n{}\n\n{}", header, marker, tail)
+    }
+}
+
 /// In-file header for assignee. Line format: "## Assigned: agent_id"
 const ASSIGNED_HEADER: &str = "## Assigned:";
 /// In-file header for topic (task-[date]-[status].md does not contain topic in filename).
@@ -917,6 +975,32 @@ mod tests {
         );
 
         let _ = fs::remove_dir_all(&base);
+    }
+
+    #[test]
+    fn compact_task_content_for_runner_keeps_short_files() {
+        let s = "## Topic: Improve\n## Id: memory\n\nshort body\n";
+        assert_eq!(compact_task_content_for_runner(s), s);
+    }
+
+    #[test]
+    fn compact_task_content_for_runner_keeps_headers_and_tail() {
+        let mut body = String::new();
+        for i in 0..800 {
+            body.push_str(&format!("note line {i} with some padding padding padding\n"));
+        }
+        let full = format!(
+            "## Assigned: default\n## Topic: Improve\n## Id: memory\n## Reply-to: discord 1\n\n{}",
+            body
+        );
+        assert!(full.chars().count() > RUNNER_TASK_CONTENT_MAX_CHARS);
+        let out = compact_task_content_for_runner(&full);
+        assert!(out.chars().count() <= RUNNER_TASK_CONTENT_MAX_CHARS + 50);
+        assert!(out.contains("## Topic: Improve"));
+        assert!(out.contains("## Id: memory"));
+        assert!(out.contains("truncated for runner context"));
+        assert!(out.contains("note line 799"));
+        assert!(!out.contains("note line 0 with"));
     }
 
     #[test]

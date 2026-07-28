@@ -50,6 +50,8 @@ SHIPPED_INSTANT_SHORT_ACK = datetime(2026, 7, 21, 20, 10, tzinfo=timezone.utc)
 SHIPPED_INSTANT_IDENTITY = datetime(2026, 7, 22, 0, 15, tzinfo=timezone.utc)
 # v0.1.224 — Redmine user-chat capability asks are instant.
 SHIPPED_INSTANT_REDMINE_USER_CHAT = datetime(2026, 7, 22, 22, 50, tzinfo=timezone.utc)
+# v0.1.260 — task runner compacts growing task body (Improve/memory thrash).
+SHIPPED_IMPROVE_TASK_COMPACT = datetime(2026, 7, 28, 18, 25, tzinfo=timezone.utc)
 
 
 def looks_like_short_ack(q: str) -> bool:
@@ -392,6 +394,13 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
         return False
     hl = hint.lower()
     ql = q.lower()
+    if ts < SHIPPED_IMPROVE_TASK_COMPACT and (
+        "improve-task" in hl
+        or "task_* thrash" in hl
+        or "compact improve-task" in hl
+        or "cap/compact improve-task" in hl
+    ):
+        return True
     if "instant version" in hl and ts < SHIPPED_INSTANT_VERSION:
         return True
     if "instant time" in hl and ts < SHIPPED_INSTANT_TIME:
