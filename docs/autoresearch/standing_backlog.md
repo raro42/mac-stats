@@ -10,7 +10,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 ## P1 — design / marketing (rotate)
 
 3. **Overnight design review** — Follow `docs/043_overnight_design_review.md`. Prefer stale feature screens (`feature-agent-ops`, `feature-ai-chat`, `feature-processes`) before re-shooting CPU.
-4. **README / landing** — One sharper vs-competitor or feature bullet when Perplexity/sibling notes exist.
+4. ~~**README / landing**~~ — sharper vs-competitor framing (**v0.1.265**).
 
 ## P2 — reliability
 

@@ -110,7 +110,12 @@ Closest peers from a 2026 menu-bar monitor scan ([notes](docs/042_competitor_sca
 | Price | Free (**MIT**) | Free / donate | Paid | Free |
 | Cloud telemetry | ❌ none | — | — | — |
 
-**How to read this:** Stats is the classic free OSS monitor; iStat Menus is the paid depth benchmark; MenuMeters is the lightweight classic. mac-stats keeps the free/open-source spirit with a modern glass UI and an **optional local AI layer** — leave AI off for a Stats-like monitor only. We are **not** a full iStat Menus sensor replacement.
+**How to pick:**
+- **vs Stats** — Stats is the classic free OSS monitor; mac-stats keeps that spirit with a more modern glass/theme system and **optional** local AI / Discord / schedules.
+- **vs iStat Menus** — iStat Menus is the paid deep-sensor benchmark; mac-stats stays on essentials + Apple Silicon glanceability (we are **not** a full iStat replacement).
+- **vs MenuMeters** — MenuMeters is minimal bars; mac-stats adds richer metrics, themes, and optional agent workflows without forcing AI on.
+
+Leave AI off for a Stats-like monitor only. Local-first: core metrics never need the cloud.
 
 ---
 

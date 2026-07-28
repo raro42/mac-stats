@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.265] - 2026-07-28
+
+### Changed
+- README vs Stats / iStat Menus / MenuMeters: sharper “how to pick” framing from the Perplexity competitor scan.
+
 ## [0.1.264] - 2026-07-28
 
 ### Fixed
