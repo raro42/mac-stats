@@ -59,6 +59,16 @@ fn normalize_q(q: &str) -> String {
         .to_lowercase()
 }
 
+/// Letters/spaces only — so `Hola 👋` / `hi!!!` still match greeting instant lanes.
+fn alpha_words(n: &str) -> String {
+    n.chars()
+        .map(|c| if c.is_alphabetic() || c.is_whitespace() { c } else { ' ' })
+        .collect::<String>()
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
 /// Zero-LLM answers for clock / ping style asks.
 fn try_instant_reply(q: &str) -> Option<String> {
     let n = normalize_q(q);
@@ -70,8 +80,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
             now.format("%z")
         ));
     }
+    let greet = alpha_words(&n);
     if matches!(
-        n.as_str(),
+        greet.as_str(),
         "ping"
             | "pong"
             | "hi"
@@ -90,12 +101,17 @@ fn try_instant_reply(q: &str) -> Option<String> {
             | "gm"
             | "ga"
             | "ge"
+            | "buenas"
+            | "buenas tardes"
+            | "buenas noches"
+            | "buen dia"
+            | "buen día"
     ) {
         return Some("Hey — I'm here. What do you need?".to_string());
     }
     if matches!(
-        n.as_str(),
-        "thanks" | "thank you" | "thx" | "ty" | "danke" | "cheers" | "appreciate it"
+        greet.as_str(),
+        "thanks" | "thank you" | "thx" | "ty" | "danke" | "cheers" | "appreciate it" | "gracias"
     ) {
         return Some("You're welcome.".to_string());
     }
@@ -1096,7 +1112,16 @@ commit+push, then reply briefly.";
 
     #[test]
     fn extended_greeting_and_thanks_are_instant() {
-        for q in ["good afternoon", "hey there", "gm", "cheers", "appreciate it"] {
+        for q in [
+            "good afternoon",
+            "hey there",
+            "gm",
+            "cheers",
+            "appreciate it",
+            "Hola 👋",
+            "hola!!!",
+            "gracias",
+        ] {
             assert!(
                 matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),
                 "expected Instant for {q}"

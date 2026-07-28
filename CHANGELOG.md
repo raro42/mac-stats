@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.266] - 2026-07-28
+
+### Fixed
+- Instant greetings tolerate emoji/punctuation (`Hola 👋`, `hola!!!`) and common Spanish thanks.
+
 ## [0.1.265] - 2026-07-28
 
 ### Changed
