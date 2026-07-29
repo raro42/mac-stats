@@ -167,11 +167,19 @@
   background: color-mix(in srgb, currentColor 5%, transparent);
   color: inherit;
   font-size: 13px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.ops-filter-input:hover {
+  background: color-mix(in srgb, currentColor 7%, transparent);
+  border-color: color-mix(in srgb, currentColor 24%, transparent);
 }
 
 .ops-filter-input:focus {
   outline: none;
-  border-color: color-mix(in srgb, currentColor 40%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
+  background: color-mix(in srgb, currentColor 6%, transparent);
 }
 
 .ops-filter-caption {

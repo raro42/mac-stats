@@ -363,6 +363,55 @@ def looks_like_itinerary_correction(q: str) -> bool:
     )
 
 
+def looks_like_bare_news_ask(q: str) -> bool:
+    n = (q or "").strip().lower().rstrip("?!.").strip()
+    if len(n) > 96:
+        return False
+    bare = n in (
+        "any news",
+        "news",
+        "the news",
+        "whats the news",
+        "what's the news",
+        "what is the news",
+        "latest news",
+        "todays headlines",
+        "today's headlines",
+        "headlines",
+        "top stories",
+        "breaking news",
+        "current events",
+    ) or (n.startswith("any news") and len(n) <= 24)
+    return bare or ("news" in n and len(n) <= 64 and "http" not in n)
+
+
+def looks_like_topic_dump(q: str) -> bool:
+    n = (q or "").strip().rstrip("?").strip()
+    if not (12 <= len(n) <= 96):
+        return False
+    lower = n.lower()
+    if any(
+        x in lower
+        for x in (
+            "http",
+            "redmine",
+            "skill:",
+            "cursor_agent:",
+            "search ",
+            "research ",
+            "look up",
+            " and then ",
+        )
+    ):
+        return False
+    if n.count(",") < 2:
+        return False
+    parts = [p.strip() for p in n.split(",") if p.strip()]
+    if len(parts) < 3:
+        return False
+    return not any(len(p.split()) > 6 for p in parts)
+
+
 def looks_like_research_using_perplexity(q: str) -> bool:
     n = (q or "").lower()
     return (
@@ -642,6 +691,8 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         or looks_like_airport_hop(q)
         or looks_like_bare_research_topic(q)
         or looks_like_itinerary_correction(q)
+        or looks_like_bare_news_ask(q)
+        or looks_like_topic_dump(q)
     ):
         return True
     # Scheduled SKILL prompts are harness/scheduler work, not Discord UX latency.

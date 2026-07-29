@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.287] - 2026-07-29
+
+### Changed
+- Agent Ops filter inputs: hover + blue focus ring (aligned with AI chat input).
+- Digester: bare news / topic-dump Brave walls no longer inflate Discord UX p50 after pre-route.
+
 ## [0.1.286] - 2026-07-29
 
 ### Changed
