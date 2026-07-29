@@ -1702,7 +1702,7 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     out
 }
 
-/// True for `/insights` / `insights` (Hermes parity).
+/// True for `/insights` / `insights` (Hermes parity) and short NL equivalents.
 pub fn looks_like_insights_request(content: &str) -> bool {
     let n = content
         .trim()
@@ -1716,17 +1716,40 @@ pub fn looks_like_insights_request(content: &str) -> bool {
         .trim_start_matches(',')
         .trim()
         .trim_start_matches("please")
+        .trim()
+        .trim_start_matches("can you")
+        .trim()
+        .trim_start_matches("could you")
+        .trim()
+        .trim_start_matches("show me")
+        .trim()
+        .trim_start_matches("show")
+        .trim()
+        .trim_end_matches('?')
         .trim();
+    // Topic research ("insights on weather") stays with the agent.
+    if n.contains(" on ") || n.contains(" about ") || n.contains("weather") || n.contains("http")
+    {
+        return false;
+    }
     matches!(
         n,
         "insights"
             | "/insights"
-            | "show insights"
             | "usage insights"
             | "run insights"
             | "agent insights"
+            | "usage analytics"
+            | "usage stats"
+            | "run stats"
+            | "runs report"
+            | "latency report"
+            | "p50"
+            | "p50 report"
     ) || n.starts_with("/insights ")
         || (n.starts_with("insights ") && parse_insights_days(content).is_some())
+        || (n.starts_with("usage insights ") && parse_insights_days(content).is_some())
+        || (n.starts_with("usage analytics ") && parse_insights_days(content).is_some())
 }
 
 fn sanitize_under_dir(path: &str, root: &Path) -> Result<PathBuf, String> {
@@ -1763,8 +1786,12 @@ mod tests {
         assert!(looks_like_insights_request("/insights 7"));
         assert!(looks_like_insights_request("/insights --days 14"));
         assert!(looks_like_insights_request("insights 3"));
+        assert!(looks_like_insights_request("show me usage analytics"));
+        assert!(looks_like_insights_request("usage stats"));
+        assert!(looks_like_insights_request("latency report"));
         assert!(!looks_like_insights_request("any insights on weather?"));
         assert!(!looks_like_insights_request("insights on weather"));
+        assert!(!looks_like_insights_request("show insights about Barcelona"));
     }
 
     #[test]

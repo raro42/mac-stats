@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.306] - 2026-07-30
+
+### Changed
+- Discord insights: recognize natural asks like “usage analytics”, “latency report”, “show me usage stats” (still Hermes `/insights [days]`).
+
 ## [0.1.305] - 2026-07-30
 
 ### Changed

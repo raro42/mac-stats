@@ -16,7 +16,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## P3 — sibling ports
 
-7. OpenClaw / Hermes ports that clearly map to mac-stats tools/sessions (not docs-only Related sections). Google SERP FETCH_URL→search rewrite shipped in **v0.1.281**.
+7. OpenClaw / Hermes ports that clearly map to mac-stats tools/sessions (not docs-only Related sections). Google SERP FETCH_URL→search rewrite shipped in **v0.1.281**. Insights NL aliases (`usage analytics` / `latency report`) in **v0.1.306**.
 
 ## Done recently (do not re-pick as filler)
 
