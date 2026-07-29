@@ -730,6 +730,8 @@ async function refresh() {
           const row = document.createElement("div");
           row.className = "process-row";
           row.setAttribute("data-pid", String(proc.pid));
+          row.setAttribute("role", "button");
+          row.setAttribute("tabindex", "0");
           row.style.cursor = "pointer";
           row.title = "Click for details";
           
@@ -776,6 +778,14 @@ async function refresh() {
               const pid = row.getAttribute("data-pid");
               if (pid) showProcessDetails(parseInt(pid, 10));
             }
+          });
+          list.addEventListener("keydown", (e) => {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            const row = e.target.closest(".process-row");
+            if (!row || !list.contains(row)) return;
+            e.preventDefault();
+            const pid = row.getAttribute("data-pid");
+            if (pid) showProcessDetails(parseInt(pid, 10));
           });
         }
         list.replaceChildren();

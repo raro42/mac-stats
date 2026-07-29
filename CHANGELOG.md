@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.298] - 2026-07-29
+
+### Changed
+- Process list rows: clearer hover lift, focus ring, keyboard Enter/Space to open details (aligned with Agent Ops lists).
+
 ## [0.1.297] - 2026-07-29
 
 ### Changed

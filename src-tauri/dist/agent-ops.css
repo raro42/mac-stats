@@ -604,12 +604,24 @@ textarea.ops-agent-editor.is-dirty {
 
 .process-row {
   border-radius: 8px;
-  transition: background 0.2s ease, transform 0.15s ease;
+  padding: 6px 8px;
+  margin: 0 -8px;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .process-row:hover {
-  background: color-mix(in srgb, currentColor 7%, transparent);
-  transform: translateY(-0.5px);
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px color-mix(in srgb, #000 7%, transparent);
+}
+
+.process-row:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  outline-offset: 2px;
+}
+
+.process-name {
+  font-weight: 500;
 }
 
 .process-bar-fill {
