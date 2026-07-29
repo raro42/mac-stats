@@ -441,6 +441,24 @@ fn try_pre_route_web_search(question: &str) -> Option<String> {
         return Some(format!("{tool}: {query}"));
     }
 
+    // Conference / event date reviews ("Review IBM techxchange dates in Atlanta…").
+    if let Some(query) = event_dates_search_query(q) {
+        let (tool, label) = if brave_ok {
+            ("BRAVE_SEARCH", "event dates")
+        } else if perplexity_ok {
+            ("PERPLEXITY_SEARCH", "event dates")
+        } else {
+            return None;
+        };
+        info!(
+            "Agent router: pre-routed to {} ({}): {}",
+            tool,
+            label,
+            crate::logging::ellipse(&query, 80)
+        );
+        return Some(format!("{tool}: {query}"));
+    }
+
     // Short airport hop chains without the word "flight" ("I would like ATL to Monterrey to LMM").
     if let Some(query) = airport_hop_search_query(q) {
         let (tool, label) = if brave_ok {
@@ -612,6 +630,59 @@ fn flight_search_query(q: &str) -> Option<String> {
         || lower.contains("around ")
         || lower.contains("itinerary")
     {
+        return None;
+    }
+    Some(trimmed.to_string())
+}
+
+/// Conference / summit / event date looks — skip planning when the ask is clearly web lookup.
+/// Travel constraints after the event name ("I want to be in Atlanta two days before") stay in the
+/// search query so the tool result can still ground the reply.
+fn event_dates_search_query(q: &str) -> Option<String> {
+    let trimmed = q.trim().trim_end_matches('?').trim();
+    let len = trimmed.chars().count();
+    if !(18..=240).contains(&len) {
+        return None;
+    }
+    let lower = trimmed.to_lowercase();
+    if lower.contains("http")
+        || lower.contains("skill:")
+        || lower.contains("cursor_agent:")
+        || lower.contains("redmine")
+        || lower.contains(" and then ")
+        || lower.contains("remember ")
+        || lower.contains("save ")
+        || lower.contains("schedule")
+        || lower.contains("memory")
+        || lower.contains("book ")
+    {
+        return None;
+    }
+    let eventish = lower.contains("techxchange")
+        || lower.contains("conference")
+        || lower.contains("summit")
+        || lower.contains("meetup")
+        || lower.contains("symposium")
+        || lower.contains("tradeshow")
+        || lower.contains("trade show")
+        || lower.contains(" expo")
+        || lower.starts_with("expo ")
+        || lower.contains("event dates")
+        || lower.contains("dates for ")
+        || (lower.contains(" dates") && (lower.contains(" in ") || lower.contains(" at ")));
+    if !eventish {
+        return None;
+    }
+    let reviewish = lower.starts_with("review ")
+        || lower.starts_with("check ")
+        || lower.starts_with("find ")
+        || lower.starts_with("look up ")
+        || lower.starts_with("lookup ")
+        || lower.contains("when is ")
+        || lower.contains("what are the dates")
+        || lower.contains("dates in ")
+        || lower.contains("dates for ");
+    if !reviewish {
         return None;
     }
     Some(trimmed.to_string())
@@ -1478,6 +1549,25 @@ mod tests {
             None
         );
         assert_eq!(flight_search_query("book flights to Atlanta tomorrow"), None);
+    }
+
+    #[test]
+    fn event_dates_search_query_accepts_conference_reviews() {
+        let q =
+            "Review IBM techxchange dates in Atlanta. I want to be in Atlanta two days before";
+        assert_eq!(event_dates_search_query(q), Some(q.to_string()));
+        assert_eq!(
+            event_dates_search_query("Check WWDC conference dates for 2026"),
+            Some("Check WWDC conference dates for 2026".to_string())
+        );
+        assert_eq!(
+            event_dates_search_query("Flights from Atlanta to Monterey to mochis"),
+            None
+        );
+        assert_eq!(
+            event_dates_search_query("save the techxchange dates in memory"),
+            None
+        );
     }
 
     #[test]

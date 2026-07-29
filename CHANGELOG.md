@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.292] - 2026-07-29
+
+### Changed
+- Pre-route conference/event date reviews (e.g. “Review IBM techxchange dates…”) straight to Brave/Perplexity — skips the planning LLM for that digester Slowest pattern.
+
 ## [0.1.291] - 2026-07-29
 
 ### Changed
