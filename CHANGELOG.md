@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.289] - 2026-07-29
+
+### Changed
+- Agent Ops: soul / skill / mood are editable in-app (Save or ⌘S); writes `~/.mac-stats/agents/agent-<id>/{soul,skill,mood}.md`.
+
 ## [0.1.288] - 2026-07-29
 
 ### Changed

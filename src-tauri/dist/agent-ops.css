@@ -431,6 +431,56 @@
   border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
 }
 
+textarea.ops-agent-editor {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 180px;
+  max-height: min(42vh, 360px);
+  resize: vertical;
+  color: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+textarea.ops-agent-editor:focus {
+  outline: none;
+  border-color: color-mix(in srgb, #0a84ff 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
+}
+
+textarea.ops-agent-editor.is-dirty {
+  border-color: color-mix(in srgb, #ff9f0a 50%, transparent);
+}
+
+.ops-agent-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ops-agent-edit-actions .btn-primary {
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ops-agent-edit-actions .btn-primary:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.ops-agent-save-status {
+  font-size: 11px;
+  opacity: 0.7;
+  flex: 1;
+  min-width: 80px;
+}
+
 .ops-detail-meta {
   font-size: 12px;
   opacity: 0.75;

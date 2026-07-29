@@ -325,8 +325,12 @@
                 <button type="button" class="ops-file-tab" data-file="skill">Skill</button>
                 <button type="button" class="ops-file-tab" data-file="mood">Mood</button>
               </div>
-              <pre class="ops-preview" id="ops-agent-preview"></pre>
-              <button type="button" class="btn-secondary" id="ops-agent-back">← Back</button>
+              <textarea class="ops-preview ops-agent-editor" id="ops-agent-preview" spellcheck="false" aria-label="Agent soul, skill, or mood"></textarea>
+              <div class="ops-agent-edit-actions">
+                <button type="button" class="btn-primary" id="ops-agent-save" disabled>Save</button>
+                <span class="ops-agent-save-status" id="ops-agent-save-status" aria-live="polite"></span>
+                <button type="button" class="btn-secondary" id="ops-agent-back">← Back</button>
+              </div>
             </div>
           </div>
           <div class="agent-ops-panel" id="ops-panel-sessions">

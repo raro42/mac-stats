@@ -41,6 +41,8 @@
   let agentOpsCollapsed = true;
   let opsAgentCache = null;
   let opsAgentFileTab = 'soul';
+  let opsAgentDirty = { soul: false, skill: false, mood: false };
+  let opsAgentSaveStatusTimer = null;
   let opsRefreshInFlight = false;
   let opsSessionLoadRows = null;
   let opsSessionFilterQ = '';
@@ -138,12 +140,23 @@ function setupAgentOps() {
     });
     document.querySelectorAll('.ops-file-tab').forEach((btn) => {
         btn.addEventListener('click', () => {
+            if (opsAgentDirty[opsAgentFileTab] && opsAgentCache) {
+                syncOpsAgentEditorToCache();
+            }
             opsAgentFileTab = btn.dataset.file;
             document.querySelectorAll('.ops-file-tab').forEach((b) => b.classList.toggle('active', b === btn));
             renderOpsAgentPreview();
         });
     });
-    document.getElementById('ops-agent-back')?.addEventListener('click', () => closeOpsAgentDetail());
+    document.getElementById('ops-agent-back')?.addEventListener('click', () => {
+        if (Object.values(opsAgentDirty).some(Boolean)) {
+            const ok = window.confirm('Discard unsaved soul/skill/mood changes?');
+            if (!ok) return;
+        }
+        closeOpsAgentDetail();
+    });
+    document.getElementById('ops-agent-save')?.addEventListener('click', () => saveOpsAgentFile());
+    ensureOpsAgentEditor();
     document.getElementById('ops-refresh-btn')?.addEventListener('click', () => refreshAgentOps());
     document.getElementById('ops-digest-refresh-btn')?.addEventListener('click', () => refreshOpsDigest());
     const loadChatBtn = document.getElementById('ops-session-load-chat');
@@ -1079,10 +1092,13 @@ async function openOpsAgent(id) {
         document.getElementById('ops-agent-meta').textContent =
             `${opsAgentCache.name} · ${opsAgentCache.slug || opsAgentCache.id} · ${opsAgentCache.model || 'default'} · ${opsAgentCache.enabled ? 'enabled' : 'disabled'}`;
         opsAgentFileTab = 'soul';
+        opsAgentDirty = { soul: false, skill: false, mood: false };
         document.querySelectorAll('.ops-file-tab').forEach((b) => {
             b.classList.toggle('active', b.dataset.file === 'soul');
         });
+        ensureOpsAgentEditor();
         renderOpsAgentPreview();
+        setOpsAgentSaveStatus('');
     } catch (err) {
         alert(`Failed to load agent: ${err}`);
     }
@@ -1093,6 +1109,176 @@ function closeOpsAgentDetail() {
     if (detail) detail.hidden = true;
     const list = document.getElementById('ops-agents-list');
     if (list) list.style.display = '';
+    opsAgentDirty = { soul: false, skill: false, mood: false };
+    setOpsAgentSaveStatus('');
+    const editor = document.getElementById('ops-agent-preview');
+    if (editor) editor.classList.remove('is-dirty');
+    const saveBtn = document.getElementById('ops-agent-save');
+    if (saveBtn) saveBtn.disabled = true;
+}
+
+/** Ensure agent detail uses an editable textarea + Save (themes may still ship a read-only <pre>). */
+function ensureOpsAgentEditor() {
+    const detail = document.getElementById('ops-agent-detail');
+    if (!detail) return;
+    let editor = document.getElementById('ops-agent-preview');
+    if (editor && editor.tagName === 'PRE') {
+        const ta = document.createElement('textarea');
+        ta.className = 'ops-preview ops-agent-editor';
+        ta.id = 'ops-agent-preview';
+        ta.spellcheck = false;
+        ta.setAttribute('aria-label', 'Agent soul, skill, or mood');
+        editor.replaceWith(ta);
+        editor = ta;
+    } else if (!editor) {
+        editor = document.createElement('textarea');
+        editor.className = 'ops-preview ops-agent-editor';
+        editor.id = 'ops-agent-preview';
+        editor.spellcheck = false;
+        editor.setAttribute('aria-label', 'Agent soul, skill, or mood');
+        const tabs = detail.querySelector('.ops-file-tabs');
+        if (tabs) tabs.after(editor);
+        else detail.prepend(editor);
+    }
+    if (!document.getElementById('ops-agent-edit-actions') && !document.querySelector('.ops-agent-edit-actions')) {
+        const row = document.createElement('div');
+        row.className = 'ops-agent-edit-actions';
+        row.id = 'ops-agent-edit-actions';
+        const save = document.createElement('button');
+        save.type = 'button';
+        save.className = 'btn-primary';
+        save.id = 'ops-agent-save';
+        save.textContent = 'Save';
+        save.disabled = true;
+        const status = document.createElement('span');
+        status.className = 'ops-agent-save-status';
+        status.id = 'ops-agent-save-status';
+        status.setAttribute('aria-live', 'polite');
+        let back = document.getElementById('ops-agent-back');
+        if (!back) {
+            back = document.createElement('button');
+            back.type = 'button';
+            back.className = 'btn-secondary';
+            back.id = 'ops-agent-back';
+            back.textContent = '← Back';
+            back.addEventListener('click', () => {
+                if (Object.values(opsAgentDirty).some(Boolean)) {
+                    const ok = window.confirm('Discard unsaved soul/skill/mood changes?');
+                    if (!ok) return;
+                }
+                closeOpsAgentDetail();
+            });
+        } else {
+            back.remove();
+        }
+        row.appendChild(save);
+        row.appendChild(status);
+        row.appendChild(back);
+        editor.after(row);
+        save.addEventListener('click', () => saveOpsAgentFile());
+    }
+    if (editor && editor.dataset.opsEditBound !== '1') {
+        editor.dataset.opsEditBound = '1';
+        editor.addEventListener('input', () => {
+            if (!opsAgentCache) return;
+            syncOpsAgentEditorToCache();
+            opsAgentDirty[opsAgentFileTab] = true;
+            editor.classList.add('is-dirty');
+            const saveBtn = document.getElementById('ops-agent-save');
+            if (saveBtn) saveBtn.disabled = false;
+            setOpsAgentSaveStatus('Unsaved changes');
+        });
+        editor.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                saveOpsAgentFile();
+            }
+        });
+    }
+}
+
+function opsAgentFileContent(kind) {
+    if (!opsAgentCache) return '';
+    if (kind === 'skill') return opsAgentCache.skill || '';
+    if (kind === 'soul') return opsAgentCache.soul || '';
+    if (kind === 'mood') return opsAgentCache.mood || '';
+    return '';
+}
+
+function syncOpsAgentEditorToCache() {
+    const editor = document.getElementById('ops-agent-preview');
+    if (!editor || !opsAgentCache || editor.tagName === 'PRE') return;
+    const text = editor.value;
+    if (opsAgentFileTab === 'skill') opsAgentCache.skill = text;
+    else if (opsAgentFileTab === 'soul') opsAgentCache.soul = text;
+    else if (opsAgentFileTab === 'mood') opsAgentCache.mood = text;
+}
+
+function setOpsAgentSaveStatus(msg) {
+    const el = document.getElementById('ops-agent-save-status');
+    if (el) el.textContent = msg || '';
+    if (opsAgentSaveStatusTimer) {
+        clearTimeout(opsAgentSaveStatusTimer);
+        opsAgentSaveStatusTimer = null;
+    }
+    if (msg && msg.startsWith('Saved')) {
+        opsAgentSaveStatusTimer = setTimeout(() => {
+            const cur = document.getElementById('ops-agent-save-status');
+            if (cur && cur.textContent === msg) cur.textContent = '';
+        }, 2500);
+    }
+}
+
+async function saveOpsAgentFile() {
+    if (!opsAgentCache?.id) return;
+    ensureOpsAgentEditor();
+    syncOpsAgentEditorToCache();
+    const kind = opsAgentFileTab;
+    const content = opsAgentFileContent(kind);
+    const cmd =
+        kind === 'soul'
+            ? 'update_agent_soul'
+            : kind === 'mood'
+              ? 'update_agent_mood'
+              : 'update_agent_skill';
+    const saveBtn = document.getElementById('ops-agent-save');
+    if (saveBtn) saveBtn.disabled = true;
+    setOpsAgentSaveStatus('Saving…');
+    try {
+        await invoke(cmd, { agentId: opsAgentCache.id, content });
+        opsAgentDirty[kind] = false;
+        const editor = document.getElementById('ops-agent-preview');
+        if (editor) editor.classList.remove('is-dirty');
+        const stillDirty = Object.values(opsAgentDirty).some(Boolean);
+        if (saveBtn) saveBtn.disabled = !stillDirty;
+        setOpsAgentSaveStatus(`Saved ${kind}.md`);
+    } catch (err) {
+        if (saveBtn) saveBtn.disabled = false;
+        setOpsAgentSaveStatus(`Save failed: ${err}`);
+        alert(`Failed to save ${kind}.md: ${err}`);
+    }
+}
+
+function renderOpsAgentPreview() {
+    if (!opsAgentCache) return;
+    ensureOpsAgentEditor();
+    const editor = document.getElementById('ops-agent-preview');
+    if (!editor) return;
+    const text = opsAgentFileContent(opsAgentFileTab);
+    if (editor.tagName === 'TEXTAREA') {
+        editor.value = text;
+        editor.placeholder = `Edit ${opsAgentFileTab}.md for this agent…`;
+        editor.classList.toggle('is-dirty', !!opsAgentDirty[opsAgentFileTab]);
+    } else {
+        editor.textContent = text || `(empty ${opsAgentFileTab}.md)`;
+    }
+    const saveBtn = document.getElementById('ops-agent-save');
+    if (saveBtn) saveBtn.disabled = !Object.values(opsAgentDirty).some(Boolean);
+    if (!opsAgentDirty[opsAgentFileTab]) {
+        setOpsAgentSaveStatus('');
+    } else {
+        setOpsAgentSaveStatus('Unsaved changes');
+    }
 }
 
 /** Esc closes agent detail when open (Agents tab). Filter Esc still clears first when focused. */
@@ -1103,6 +1289,10 @@ function tryOpsAgentDetailEscape(e) {
     const t = e.target;
     const tag = (t && t.tagName) || '';
     if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return false;
+    if (Object.values(opsAgentDirty).some(Boolean)) {
+        const ok = window.confirm('Discard unsaved soul/skill/mood changes?');
+        if (!ok) return true;
+    }
     e.preventDefault();
     closeOpsAgentDetail();
     return true;
@@ -1152,17 +1342,6 @@ function tryOpsClearSelectionEscape(e) {
     selected.forEach((el) => el.classList.remove('is-selected'));
     e.preventDefault();
     return true;
-}
-
-function renderOpsAgentPreview() {
-    if (!opsAgentCache) return;
-    const pre = document.getElementById('ops-agent-preview');
-    const map = {
-        soul: opsAgentCache.soul || '(empty soul.md)',
-        skill: opsAgentCache.skill || '(empty skill.md)',
-        mood: opsAgentCache.mood || '(empty mood.md)',
-    };
-    pre.textContent = map[opsAgentFileTab] || '';
 }
 
 function formatSessionMessagesPreview(rows) {
