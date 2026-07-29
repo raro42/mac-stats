@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.299] - 2026-07-29
+
+### Changed
+- Battery/power strip: subtle glass hover lift and clearer battery/power value weight on the CPU window.
+
 ## [0.1.298] - 2026-07-29
 
 ### Changed
