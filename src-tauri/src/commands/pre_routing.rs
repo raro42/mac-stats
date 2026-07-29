@@ -425,6 +425,22 @@ fn try_pre_route_web_search(question: &str) -> Option<String> {
         return Some(format!("{tool}: {query}"));
     }
 
+    // Clear flight / airline route asks ("Flights from Atlanta to MTY", "Viva Aerobus flights…").
+    if let Some(query) = flight_search_query(q) {
+        let (tool, label) = if brave_ok {
+            ("BRAVE_SEARCH", "flight ask")
+        } else {
+            ("PERPLEXITY_SEARCH", "flight ask")
+        };
+        info!(
+            "Agent router: pre-routed to {} ({}): {}",
+            tool,
+            label,
+            crate::logging::ellipse(&query, 80)
+        );
+        return Some(format!("{tool}: {query}"));
+    }
+
     // Keyword-based search intent detection.
     // Extract the search query from the question after the keyword.
     let search_query = extract_search_query(&q_lower, q);
@@ -512,6 +528,56 @@ fn topic_dump_search_query(q: &str) -> Option<String> {
         return None;
     }
     if parts.iter().any(|p| p.split_whitespace().count() > 6) {
+        return None;
+    }
+    Some(trimmed.to_string())
+}
+
+/// Clear flight / airline route asks — skip planning LLM and search immediately.
+/// Complex multi-leg planning ("I want to be in Atlanta two days before…") stays with the agent.
+fn flight_search_query(q: &str) -> Option<String> {
+    let trimmed = q.trim().trim_end_matches('?').trim();
+    let len = trimmed.chars().count();
+    if !(12..=140).contains(&len) {
+        return None;
+    }
+    let lower = trimmed.to_lowercase();
+    if lower.contains("http")
+        || lower.contains("skill:")
+        || lower.contains("cursor_agent:")
+        || lower.contains("redmine")
+        || lower.contains(" and then ")
+        || lower.contains("book ")
+        || lower.contains("remember ")
+        || lower.contains("save ")
+        || lower.contains("schedule")
+        || lower.contains("memory")
+    {
+        return None;
+    }
+    let has_flight = lower.contains("flight")
+        || lower.contains("flights")
+        || lower.contains("aerobus")
+        || lower.contains("airline")
+        || lower.contains("airlines");
+    if !has_flight {
+        return None;
+    }
+    let has_route = lower.contains(" from ")
+        || lower.contains(" to ")
+        || lower.contains("→")
+        || lower.contains("->")
+        || lower.contains(" → ");
+    let what_about_airline = lower.starts_with("what about ") && has_flight;
+    if !has_route && !what_about_airline {
+        return None;
+    }
+    // Long itinerary prose with dates / "I want" stays with the planner.
+    if lower.contains("i want")
+        || lower.contains("two days before")
+        || lower.contains("around ")
+        || lower.contains("itinerary")
+    {
         return None;
     }
     Some(trimmed.to_string())
@@ -1252,6 +1318,25 @@ mod tests {
         );
         assert_eq!(topic_dump_search_query("just one topic"), None);
         assert_eq!(topic_dump_search_query("search for IT, AI, Stocks"), None);
+    }
+
+    #[test]
+    fn flight_search_query_accepts_clear_routes() {
+        assert_eq!(
+            flight_search_query("Flights from Atlanta to Monterey to mochis"),
+            Some("Flights from Atlanta to Monterey to mochis".to_string())
+        );
+        assert_eq!(
+            flight_search_query("What about Viva Aerobus flights from MTY to LMM?"),
+            Some("What about Viva Aerobus flights from MTY to LMM".to_string())
+        );
+        assert_eq!(
+            flight_search_query(
+                "Review IBM techxchange dates in Atlanta. I want to be in Atlanta two days before"
+            ),
+            None
+        );
+        assert_eq!(flight_search_query("book flights to Atlanta tomorrow"), None);
     }
 
     #[test]

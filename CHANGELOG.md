@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.282] - 2026-07-29
+
+### Changed
+- Clear flight/airline route asks (“Flights from … to …”) pre-route to Brave/Perplexity (skip planning LLM).
+
 ## [0.1.281] - 2026-07-29
 
 ### Changed
