@@ -389,20 +389,31 @@
   color: inherit;
   font: inherit;
   width: 100%;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 
 .ops-row:hover {
-  border-color: color-mix(in srgb, currentColor 15%, transparent);
-  background: color-mix(in srgb, currentColor 8%, transparent);
+  border-color: color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 9%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, #000 8%, transparent);
+  transform: translateY(-1px);
+}
+
+.ops-row:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  outline-offset: 2px;
 }
 
 .ops-row.is-selected {
   border-color: color-mix(in srgb, currentColor 28%, transparent);
   background: color-mix(in srgb, currentColor 12%, transparent);
+  box-shadow: none;
+  transform: none;
 }
 
-.ops-row-title { font-size: 13px; }
-.ops-row-meta { font-size: 11px; opacity: 0.5; }
+.ops-row-title { font-size: 13px; font-weight: 600; }
+.ops-row-meta { font-size: 11px; opacity: 0.58; }
 
 .ops-badge {
   font-size: 10px;
@@ -502,13 +513,13 @@ textarea.ops-agent-editor.is-dirty {
 
 .ops-empty {
   margin: 2px 0;
-  padding: 14px 12px;
+  padding: 16px 14px;
   font-size: 12px;
-  line-height: 1.4;
-  opacity: 0.72;
-  border-radius: 8px;
-  border: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
-  background: color-mix(in srgb, currentColor 3%, transparent);
+  line-height: 1.45;
+  opacity: 0.78;
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, currentColor 22%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
   text-align: center;
 }
 

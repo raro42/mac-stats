@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.296] - 2026-07-29
+
+### Changed
+- Agent Ops list rows: hover lift + focus ring, clearer title/meta weight; empty states slightly more readable (sessions / schedules / memory lists).
+
 ## [0.1.295] - 2026-07-29
 
 ### Changed
