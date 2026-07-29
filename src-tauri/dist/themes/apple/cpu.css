@@ -202,8 +202,10 @@ body {
 .apple-subtitle {
   margin-top: 12px;
   font-size: 12px;
-  font-weight: 300;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   color: var(--muted);
+  opacity: 0.92;
 }
 
 /* Add Apple glyph, like the mock */
@@ -225,6 +227,15 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.75),
     inset 0 -1px 0 rgba(0, 0, 0, 0.04),
     0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.apple-actions:hover {
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+    0 3px 10px rgba(0, 0, 0, 0.07);
 }
 
 .icon-btn {
@@ -237,7 +248,7 @@ body {
   font-size: 18px;
   cursor: pointer;
   position: relative;
-  transition: background 0.12s ease;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
 
   display: inline-flex;
   align-items: center;
@@ -256,11 +267,19 @@ body {
 }
 
 .icon-btn:hover {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.65);
+  color: rgba(30, 30, 34, 0.82);
+}
+
+.icon-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 1px;
+  z-index: 1;
 }
 
 .icon-btn:active {
   background: rgba(255, 255, 255, 0.5);
+  transform: scale(0.96);
 }
 
 .icon-btn svg {
