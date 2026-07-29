@@ -246,6 +246,80 @@ def looks_like_vague_followup(q: str) -> bool:
     return investigate or tailor
 
 
+def looks_like_airport_hop(q: str) -> bool:
+    n = (q or "").strip().lower().rstrip("?").strip()
+    if not (10 <= len(n) <= 120):
+        return False
+    if any(
+        x in n
+        for x in (
+            "http",
+            "skill:",
+            "cursor_agent:",
+            "redmine",
+            " and then ",
+            "book ",
+            "remember ",
+            "save ",
+            "schedule",
+            "memory",
+            "messing",
+            "i live",
+            "you missed",
+            "still have to",
+            "two days before",
+            "itinerary",
+            "flight",
+            "airline",
+            "aerobus",
+        )
+    ):
+        return False
+    if not any(x in n for x in (" to ", " - ", "→", "->")):
+        return False
+    airports = {"atl", "bcn", "mty", "lmm", "mex", "jfk", "mad", "lax", "ord", "sfo", "mia", "ewr"}
+    tokens = set(
+        t for t in "".join(c if c.isalnum() else " " for c in n).split() if t
+    )
+    code_hits = len(tokens & airports)
+    place_hits = sum(
+        1
+        for p in ("monterrey", "barcelona", "atlanta", "mochis", "los mochis")
+        if p in n
+    )
+    return code_hits + place_hits >= 2
+
+
+def looks_like_bare_research_topic(q: str) -> bool:
+    n = (q or "").strip().lower().rstrip("?").strip()
+    words = n.split()
+    if not (16 <= len(n) <= 100) or not (3 <= len(words) <= 10):
+        return False
+    if any(
+        x in n
+        for x in (
+            "http",
+            "skill:",
+            "cursor_agent:",
+            "redmine",
+            "search ",
+            "research ",
+            "look up",
+            "google ",
+            "please ",
+            "can you",
+            "could you",
+            " and then ",
+            "flight",
+            "weather",
+        )
+    ):
+        return False
+    return any(
+        x in n for x in (" problem", "scandal", "controversy", "lawsuit", " ceo")
+    ) or n.endswith("problem")
+
+
 def looks_like_research_using_perplexity(q: str) -> bool:
     n = (q or "").lower()
     return (
@@ -522,6 +596,8 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         or looks_like_google_serp_fetch(q)
         or looks_like_flight_search(q)
         or looks_like_vague_followup(q)
+        or looks_like_airport_hop(q)
+        or looks_like_bare_research_topic(q)
     ):
         return True
     # Scheduled SKILL prompts are harness/scheduler work, not Discord UX latency.

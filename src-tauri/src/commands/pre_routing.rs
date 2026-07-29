@@ -441,6 +441,40 @@ fn try_pre_route_web_search(question: &str) -> Option<String> {
         return Some(format!("{tool}: {query}"));
     }
 
+    // Short airport hop chains without the word "flight" ("I would like ATL to Monterrey to LMM").
+    if let Some(query) = airport_hop_search_query(q) {
+        let (tool, label) = if brave_ok {
+            ("BRAVE_SEARCH", "airport hop")
+        } else {
+            ("PERPLEXITY_SEARCH", "airport hop")
+        };
+        info!(
+            "Agent router: pre-routed to {} ({}): {}",
+            tool,
+            label,
+            crate::logging::ellipse(&query, 80)
+        );
+        return Some(format!("{tool}: {query}"));
+    }
+
+    // Bare person/company research topics ("Florian Fischer delivery hero problem").
+    if let Some(query) = bare_research_topic_query(q) {
+        let (tool, label) = if perplexity_ok {
+            ("PERPLEXITY_SEARCH", "bare research topic")
+        } else if brave_ok {
+            ("BRAVE_SEARCH", "bare research topic")
+        } else {
+            return None;
+        };
+        info!(
+            "Agent router: pre-routed to {} ({}): {}",
+            tool,
+            label,
+            crate::logging::ellipse(&query, 80)
+        );
+        return Some(format!("{tool}: {query}"));
+    }
+
     // Keyword-based search intent detection.
     // Extract the search query from the question after the keyword.
     let search_query = extract_search_query(&q_lower, q);
@@ -578,6 +612,113 @@ fn flight_search_query(q: &str) -> Option<String> {
         || lower.contains("around ")
         || lower.contains("itinerary")
     {
+        return None;
+    }
+    Some(trimmed.to_string())
+}
+
+/// Short airport-code hop chains without an explicit "flight" word.
+/// Conversational corrections ("you missed that leg", "I live in BCN…") stay with the agent.
+fn airport_hop_search_query(q: &str) -> Option<String> {
+    let trimmed = q.trim().trim_end_matches('?').trim();
+    let len = trimmed.chars().count();
+    if !(10..=120).contains(&len) {
+        return None;
+    }
+    let lower = trimmed.to_lowercase();
+    if lower.contains("http")
+        || lower.contains("skill:")
+        || lower.contains("cursor_agent:")
+        || lower.contains("redmine")
+        || lower.contains(" and then ")
+        || lower.contains("book ")
+        || lower.contains("remember ")
+        || lower.contains("save ")
+        || lower.contains("schedule")
+        || lower.contains("memory")
+        || lower.contains("messing")
+        || lower.contains("i live")
+        || lower.contains("you missed")
+        || lower.contains("still have to")
+        || lower.contains("two days before")
+        || lower.contains("around ")
+        || lower.contains("itinerary")
+        || lower.contains("october")
+        || lower.contains("november")
+    {
+        return None;
+    }
+    // Already handled by flight_search_query.
+    if lower.contains("flight") || lower.contains("airline") || lower.contains("aerobus") {
+        return None;
+    }
+    let has_hop = lower.contains(" to ")
+        || lower.contains(" - ")
+        || lower.contains("→")
+        || lower.contains("->");
+    if !has_hop {
+        return None;
+    }
+    const AIRPORTS: &[&str] = &[
+        "atl", "bcn", "mty", "lmm", "mex", "jfk", "mad", "lax", "ord", "sfo", "mia", "ewr",
+    ];
+    let tokens: Vec<&str> = lower
+        .split(|c: char| !c.is_ascii_alphanumeric())
+        .filter(|t| !t.is_empty())
+        .collect();
+    let code_hits = AIRPORTS
+        .iter()
+        .filter(|code| tokens.iter().any(|t| t == *code))
+        .count();
+    let place_hits = [
+        "monterrey",
+        "barcelona",
+        "atlanta",
+        "mochis",
+        "los mochis",
+    ]
+    .iter()
+    .filter(|p| lower.contains(*p))
+    .count();
+    if code_hits + place_hits < 2 {
+        return None;
+    }
+    Some(format!("flights {trimmed}"))
+}
+
+/// Short bare research topics without an explicit search verb (person + company + "problem").
+fn bare_research_topic_query(q: &str) -> Option<String> {
+    let trimmed = q.trim().trim_end_matches('?').trim();
+    let len = trimmed.chars().count();
+    let words = trimmed.split_whitespace().count();
+    if !(16..=100).contains(&len) || !(3..=10).contains(&words) {
+        return None;
+    }
+    let lower = trimmed.to_lowercase();
+    if lower.contains("http")
+        || lower.contains("skill:")
+        || lower.contains("cursor_agent:")
+        || lower.contains("redmine")
+        || lower.contains("search ")
+        || lower.contains("research ")
+        || lower.contains("look up")
+        || lower.contains("google ")
+        || lower.contains("please ")
+        || lower.contains("can you")
+        || lower.contains("could you")
+        || lower.contains(" and then ")
+        || lower.contains("flight")
+        || lower.contains("weather")
+    {
+        return None;
+    }
+    let researchy = lower.contains(" problem")
+        || lower.ends_with("problem")
+        || lower.contains(" scandal")
+        || lower.contains(" controversy")
+        || lower.contains(" lawsuit")
+        || lower.contains(" ceo");
+    if !researchy {
         return None;
     }
     Some(trimmed.to_string())
@@ -1337,6 +1478,26 @@ mod tests {
             None
         );
         assert_eq!(flight_search_query("book flights to Atlanta tomorrow"), None);
+    }
+
+    #[test]
+    fn airport_hop_and_bare_research_pre_route() {
+        assert_eq!(
+            airport_hop_search_query("I would like ATL to Monterrey to LMM"),
+            Some("flights I would like ATL to Monterrey to LMM".to_string())
+        );
+        assert_eq!(
+            airport_hop_search_query("We still have to go BCN - ATL. You missed that leg"),
+            None
+        );
+        assert_eq!(
+            bare_research_topic_query("Florian Fischer delivery hero problem"),
+            Some("Florian Fischer delivery hero problem".to_string())
+        );
+        assert_eq!(
+            bare_research_topic_query("please search for Florian Fischer"),
+            None
+        );
     }
 
     #[test]

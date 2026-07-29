@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.284] - 2026-07-29
+
+### Changed
+- Pre-route short airport hop chains (“ATL to Monterrey to LMM”) and bare research topics (“… problem”) to Brave/Perplexity.
+
 ## [0.1.283] - 2026-07-29
 
 ### Changed
