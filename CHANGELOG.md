@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.277] - 2026-07-29
+
+### Fixed
+- Instant ship/version-bump asks work again after `normalize_q` strips `?` (and tolerate “comitted”).
+
+### Changed
+- Pre-route lighthouse/pagespeed site reviews to a PageSpeed Insights `BROWSER_SCREENSHOT`.
+
 ## [0.1.276] - 2026-07-29
 
 ### Changed

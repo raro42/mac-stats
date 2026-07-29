@@ -265,16 +265,49 @@ def looks_like_tonight_plan(q: str) -> bool:
 
 
 def looks_like_version_ask(q: str) -> bool:
-    n = q.strip()
-    if "version" not in n:
+    n = (q or "").strip().lower().rstrip("?!.")
+    if "version" not in n and "bump" not in n:
         return False
     # Avoid "version of the API" style task asks
-    return (
+    if "http" in n or "redmine" in n or "skill:" in n:
+        return False
+    if (
         "what version" in n
         or n.startswith("version")
         or "your version" in n
         or "which version" in n
         or n in ("version?", "version")
+    ):
+        return True
+    # Ship / bump status (normalize strips ? in Rust)
+    about_bump = "bump" in n
+    about_ship = (
+        "commit" in n
+        or "comit" in n
+        or "ship" in n
+        or "release" in n
+        or "pushed" in n
+        or "improvement" in n
+    )
+    status_frame = (
+        n.startswith("did ")
+        or n.startswith("is ")
+        or n.startswith("was ")
+        or n.startswith("has ")
+        or about_ship
+    )
+    return about_bump and status_frame and ("version" in n or about_ship)
+
+
+def looks_like_task_create_ask(q: str) -> bool:
+    n = (q or "").lower()
+    return "create a task" in n and "http" not in n and "skill:" not in n
+
+
+def looks_like_lighthouse_pagespeed(q: str) -> bool:
+    n = (q or "").lower()
+    return ("lighthouse" in n or "pagespeed" in n) and (
+        ".de" in n or ".com" in n or ".org" in n or ".net" in n or "http" in n
     )
 
 
@@ -389,6 +422,8 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         or looks_like_how_solved_task(q)
         or looks_like_exact_saved_note_read(q)
         or looks_like_dump_saved_notes(q)
+        or looks_like_task_create_ask(q)
+        or looks_like_lighthouse_pagespeed(q)
     ):
         return True
     # Scheduled SKILL prompts are harness/scheduler work, not Discord UX latency.

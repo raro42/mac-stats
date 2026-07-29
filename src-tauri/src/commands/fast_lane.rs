@@ -901,21 +901,30 @@ fn is_ship_version_status_ask(n: &str) -> bool {
         || n.contains("skill:")
         || n.contains("cursor_agent:")
         || n.contains("redmine")
+        || n.contains("please bump")
+        || n.contains("bump the version in")
     {
         return false;
     }
-    let has_version = n.contains("version") || n.contains("bumped");
-    let has_ship = n.contains("commit")
+    let about_bump = n.contains("bump");
+    let about_version = n.contains("version");
+    if !about_bump && !about_version {
+        return false;
+    }
+    // "comitted" (one m) is a common typo of "committed".
+    let about_ship = n.contains("commit")
+        || n.contains("comit")
         || n.contains("ship")
         || n.contains("release")
-        || n.contains("pushed");
-    has_version
-        && has_ship
-        && (n.contains('?')
-            || n.starts_with("did ")
-            || n.starts_with("is ")
-            || n.starts_with("was ")
-            || n.starts_with("has "))
+        || n.contains("pushed")
+        || n.contains("improvement");
+    // `normalize_q` strips trailing `?`, so do not require a question mark.
+    let status_frame = n.starts_with("did ")
+        || n.starts_with("is ")
+        || n.starts_with("was ")
+        || n.starts_with("has ")
+        || about_ship;
+    about_bump && status_frame && (about_version || about_ship)
 }
 
 /// Short process-uptime asks (pairs with Agent Ops Version card /insights).

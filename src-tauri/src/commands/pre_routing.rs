@@ -34,6 +34,10 @@ pub(crate) fn compute_pre_routed_recommendation(
         if fetch_rec.is_some() {
             return fetch_rec;
         }
+        let lighthouse_rec = try_pre_route_lighthouse_pagespeed(question);
+        if lighthouse_rec.is_some() {
+            return lighthouse_rec;
+        }
         let weather_rec = try_pre_route_weather(question);
         if weather_rec.is_some() {
             return weather_rec;
@@ -139,6 +143,74 @@ fn try_pre_route_fetch_url(question: &str) -> Option<String> {
         return Some(format!("FETCH_URL: {url}"));
     }
 
+    None
+}
+
+/// "Review example.com using lighthouse / pagespeed" → open PageSpeed Insight URL in browser.
+fn try_pre_route_lighthouse_pagespeed(question: &str) -> Option<String> {
+    let q = question.trim();
+    let q_lower = q.to_lowercase();
+    if !(q_lower.contains("lighthouse") || q_lower.contains("pagespeed")) {
+        return None;
+    }
+    if q_lower.contains("and then ")
+        || q_lower.contains("skill:")
+        || q_lower.contains("cursor_agent:")
+        || q_lower.contains("redmine")
+    {
+        return None;
+    }
+
+    // Prefer an explicit http(s) URL when present.
+    let site = if let Some(url) = extract_url_from_question(q) {
+        url
+    } else {
+        extract_bare_hostname(&q_lower)?
+    };
+    let site = site.trim_end_matches('/').to_string();
+    let encoded = site
+        .chars()
+        .map(|c| match c {
+            'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' | '.' | '~' | ':' | '/' => c.to_string(),
+            _ => format!("%{:02X}", c as u8),
+        })
+        .collect::<String>();
+    let analysis = format!("https://pagespeed.web.dev/analysis?url={encoded}");
+    info!(
+        "Agent router: pre-routed to BROWSER_SCREENSHOT (lighthouse/pagespeed): {}",
+        crate::logging::ellipse(&analysis, 100)
+    );
+    Some(format!("BROWSER_SCREENSHOT: {analysis}"))
+}
+
+/// First bare hostname like `satisfecho.de` / `www.example.com` in the question.
+fn extract_bare_hostname(q_lower: &str) -> Option<String> {
+    for token in q_lower
+        .split(|c: char| c.is_whitespace() || matches!(c, ',' | ';' | '"' | '\'' | ')' | '('))
+    {
+        let t = token.trim_matches(|c: char| !c.is_alphanumeric() && c != '.' && c != '-');
+        if t.len() < 4 || !t.contains('.') {
+            continue;
+        }
+        if t.starts_with("http") {
+            continue;
+        }
+        let parts: Vec<&str> = t.split('.').collect();
+        if parts.len() < 2 {
+            continue;
+        }
+        let tld = parts.last().copied().unwrap_or("");
+        if tld.len() < 2 || tld.len() > 24 || !tld.chars().all(|c| c.is_ascii_alphabetic()) {
+            continue;
+        }
+        if parts
+            .iter()
+            .any(|p| p.is_empty() || !p.chars().all(|c| c.is_ascii_alphanumeric() || c == '-'))
+        {
+            continue;
+        }
+        return Some(format!("https://{t}"));
+    }
     None
 }
 
@@ -916,6 +988,24 @@ mod tests {
     fn fetch_url_http_scheme() {
         let r = try_pre_route_fetch_url("fetch http://localhost:8080/api");
         assert_eq!(r, Some("FETCH_URL: http://localhost:8080/api".to_string()));
+    }
+
+    #[test]
+    fn lighthouse_pagespeed_pre_route_bare_domain() {
+        let r = try_pre_route_lighthouse_pagespeed(
+            "Review satisfecho.de using lighthouse from chrome especially and only focus on SEO",
+        );
+        let rec = r.expect("expected BROWSER_SCREENSHOT");
+        assert!(rec.starts_with("BROWSER_SCREENSHOT: https://pagespeed.web.dev/analysis?url="), "{rec}");
+        assert!(rec.contains("satisfecho.de"), "{rec}");
+    }
+
+    #[test]
+    fn lighthouse_pagespeed_requires_signal() {
+        assert_eq!(
+            try_pre_route_lighthouse_pagespeed("Review satisfecho.de homepage copy"),
+            None
+        );
     }
 
     // --- extract_search_query tests ---
