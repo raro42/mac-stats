@@ -1,10 +1,10 @@
-# Competitor scan — macOS menu-bar monitors (Perplexity)
+# How we compare — macOS menu-bar monitors
 
-Generated via Perplexity API for README / marketing refresh. Not a commitment to clone features.
+Research notes for how **mac-stats** sits among common menu-bar system monitors. Not a commitment to clone features.
 
-## Synthesized brief (sonar)
+## Short take
 
-For **mac-stats**, the strongest README position is: **free MIT, Apple Silicon-native, covers the core metrics most people actually want, and adds optional local AI/agent workflows**. That is the clearest contrast against **iStat Menus**’ paid, deep-sensor, premium-polish positioning and **MenuMeters**’ lightweight-but-basic niche, while keeping **Stats** as the closest “free open-source” comparator.[1][4][5][10]
+For **mac-stats**, the clearest position is: **free MIT, Apple Silicon-native, covers the core metrics most people actually want, and adds optional local AI/agent workflows**. That contrasts with **iStat Menus**’ paid, deep-sensor positioning and **MenuMeters**’ lightweight-but-basic niche, while keeping **Stats** as the closest free/open-source peer.[1][4][5][10]
 
 ## Competitors to mention
 
@@ -18,67 +18,16 @@ For **mac-stats**, the strongest README position is: **free MIT, Apple Silicon-n
 | **FavTray** | **Free core / Pro** | Dev-tool bundle with basic monitoring | Basic system info plus broader developer tooling[6] | Not a pure system-monitor competitor; only mention if you want “adjacent tools”[6] |
 | **Pulse** | **Paid**; about **$5.99** in one comparison[4] | Mac App Store system monitor | General monitoring with app-store distribution[4] | Different channel; not open-source/MIT[4] |
 
-## Feature-comparison angles that matter most
-
-Use comparison angles that map directly to purchase decisions:
+## Comparison angles that matter most
 
 - **Price / license**: mac-stats is **free MIT**; iStat Menus is paid; Stats is free/open-source; MenuMeters is free.[1][4][5][6]
-- **Apple Silicon readiness**: explicitly say mac-stats is **Apple Silicon-first/native** and compare it to “modern macOS support” expectations.[5][6]
-- **Core coverage vs depth**: mac-stats should show it covers **CPU/GPU/RAM/disk** cleanly, while iStat Menus wins on deep sensor breadth, historical graphs, weather, and notifications.[1][4][5][6][10]
-- **Simplicity**: contrast mac-stats with iStat Menus’ config depth; say mac-stats is for people who want useful data *without* a settings maze.[5]
-- **Open-source trust**: mention MIT licensing, local transparency, and no cloud dependency for the core monitor.[1][4][6]
-- **Optional local AI / agents**: this is your differentiator. Position it as “monitoring plus actions/insights,” not just another meter app.
-- **Performance/lightweight feel**: if true, highlight low overhead and fast glanceability versus more feature-heavy tools.[5]
-- **Visual design/themes**: make themes a first-class differentiator because menu-bar apps are bought by appearance as much as by function.
-
-## What the README “vs competitors” section should emphasize
-
-- **“Core monitoring for free”**: mac-stats should be framed as the best fit for users who want the essentials without paying for iStat Menus.[1][4][6]
-- **“Apple Silicon-native and modern”**: put this near the top because many comparison readers are scanning for compatibility first.[5]
-- **“Close to Stats, but more opinionated”**: if mac-stats is similar in base metrics, your differentiator is the **polish + themes + optional local AI/Discord/Ollama workflows**.[1][2][4]
-- **“Not a full iStat Menus replacement”**: being explicit increases credibility. Say iStat Menus still leads in deep sensors, weather, and historical detail.[4][5][10]
-- **“Optional AI, never required”**: this matters a lot. Users of menu-bar monitors usually want predictability; local AI should be presented as an *optional enhancement* rather than the core product.
-- **“Local-first”**: if the app can operate without cloud services, stress that privacy angle clearly.
-- **“For people who want at-a-glance answers”**: phrase the product around decisions and workflow, not raw telemetry.
-
-## README comparison wording that usually converts well
-
-A strong framing is:
-
-- **mac-stats vs Stats**: “Stats is the classic free system monitor; mac-stats keeps the free/open-source spirit but adds a more modern visual system and optional local AI workflows.”[1][4]
-- **mac-stats vs iStat Menus**: “iStat Menus is the premium deep-monitoring benchmark; mac-stats focuses on the essentials, Apple Silicon performance, and optional AI automation.”[4][5][10]
-- **mac-stats vs MenuMeters**: “MenuMeters is minimal and lightweight; mac-stats gives you modern theming, richer metrics, and AI-driven extras.”[4][5][7]
-
-## Screenshots and videos that help conversion
-
-### Screenshots that matter most
-- **Menu bar in context**: show the app inside a real macOS menu bar with several metrics visible at once.
-- **Dark mode and light mode**: menu-bar apps are aesthetic purchases; show both.
-- **Theme gallery**: one image with several theme variants side by side.
-- **Metric detail popovers**: CPU, GPU, RAM, disk, and network popovers with readable charts.
-- **Apple Silicon-specific proof**: a screenshot or badge showing Apple Silicon support, if you can truthfully state it.
-- **AI feature screenshot**: show the optional local Ollama/Discord agent prompt/result flow, but keep it separate from the core monitor so it does not distract.
-- **Before/after density**: a clean “simple mode” versus a richer “detailed mode” screenshot.
-
-### Video/gif content that converts best
-- **10–20 second menu-bar demo**: open the app, hover/click metrics, show instant readability.
-- **Theme switching**: fast visual transformation is highly persuasive for menu-bar utilities.
-- **Local AI action demo**: one short clip showing a metric alert or query turning into an action or summary.
-- **Comparison clip**: side-by-side with a dense competitor view versus mac-stats’ cleaner glanceable layout.
-- **Startup/install flow**: if the app is easy to install, show it; “quick to try” matters.
-
-## Practical README structure
-
-- **One-line value prop**
-- **Feature bullets**
-- **Screenshots**
-- **Competitor comparison table**
-- **Why mac-stats exists**
-- **Optional local AI / Discord / Ollama section**
-- **Privacy / local-first note**
-- **Compatibility note for Apple Silicon**
-
-If you want, I can turn this into a **ready-to-paste README “Compared to Stats / iStat Menus / MenuMeters” section** with concise marketing-safe wording.
+- **Apple Silicon readiness**: mac-stats is **Apple Silicon-first**; compare against “modern macOS support” expectations.[5][6]
+- **Core coverage vs depth**: mac-stats covers **CPU/GPU/RAM/disk** cleanly; iStat Menus wins on deep sensors, historical graphs, weather, and notifications.[1][4][5][6][10]
+- **Simplicity**: useful data without a settings maze, versus iStat Menus’ config depth.[5]
+- **Open-source trust**: MIT, local transparency, no cloud dependency for the core monitor.[1][4][6]
+- **Optional local AI / agents**: monitoring plus actions/insights — not just another meter app.
+- **Performance / glanceability**: low overhead versus more feature-heavy tools (when true).[5]
+- **Visual design / themes**: a first-class differentiator for menu-bar apps.
 
 ### Citations
 1. <https://www.reddit.com/r/macapps/comments/1du9ufy/stats_is_a_free_alternative_to_istat_menus/>
@@ -92,7 +41,7 @@ If you want, I can turn this into a **ready-to-paste README “Compared to Stats
 9. <https://www.macworld.com/article/205630/istatmenus3.html>
 10. <https://www.forbes.com/sites/barrycollins/2024/09/07/istat-menus-7-review-this-great-mac-app-has-just-got-better/>
 
-## Raw search hits
+## Source snippets
 
 ### Query: best macOS menu bar system monitors 2025 2026 Apple Silicon Stats iStat Menus MenuMeters alternatives comparison features pricing
 
@@ -100,7 +49,7 @@ If you want, I can turn this into a **ready-to-paste README “Compared to Stats
   - In this comprehensive comparison, we evaluate the five most popular Mac system monitors in 2026: iStat Menus, Stats, MenuMeters, TG Pro, and Pulse. ... Before diving into individual apps, here are the criteria we used for evaluation: - **Apple Silicon support:** Does it fully sup
 - **Menu bar system monitors on Mac: what to look for in 2026** — <https://lucidbit.app/Blog/mac-menu-bar-system-monitor-guide.html>
   - The incumbent. Still the most feature-complete monitor on the platform — every sensor macOS exposes, plus weather and time zone readouts as bonus modules. If you want maximum information density and you're happy tuning the display to hide what you don't need, iStat Menus remains 
-- **Comparing Mac system monitors (iStat, MenuMeters, Beacon ...** — <https://general.software/guides/beacon/tips/compare-mac-system-monitors/>
+- **Comparing Mac system monitors (iStat, MenuMeters, Beacon ...)** — <https://general.software/guides/beacon/tips/compare-mac-system-monitors/>
   - The grandparent of the category. Bjango has been shipping it since 2008. Strengths: the most sensor coverage of any tool here (every temperature probe macOS exposes, every fan, every battery internal), deep customisation, mature. Weaknesses: now subscription-only (annual or one-t
 - **Top 8 Best Mac System Monitor Apps in 2026** — <https://www.tenorshare.com/mac-optimization/best-mac-system-monitor-app.html>
   - Menu Bar ... Best For iStat Menus Yes $14.15 one time or $9.99/mo. Yes ... Stats Yes Free ... Free performance monitoring Sensei No $29.00/yr. ... No $10.00 ... **Quick Picks** - **Best Value:** Tenorshare Cleamio (Apple-Notorized + Only tool with cleanup + monitoring) - **Best F
@@ -127,7 +76,7 @@ If you want, I can turn this into a **ready-to-paste README “Compared to Stats
   - iStat Menus has the functionality you are asking for. It is available starting at USD$14.39 for a single license or $17.99 for a family pack (up to five different Macs). It's also included with a membership to SetApp. ... For free options, a combination of github.com/iglance/iGla
 - **iStat Menus 6 from App store vs directly from Devs.** — <https://forums.macrumors.com/threads/istat-menus-6-from-app-store-vs-directly-from-devs.2345825/>
   - Been reading that the AS variant is slightly crippled, fan control and CPU clock speed only on the developers purchased option. There is a vague indication from the AS description that fan control at least, can be added after the fact. ... From the iStat Menus web site, the diffe
-- **Comparing Mac system monitors (iStat, MenuMeters, Beacon ...** — <https://general.software/guides/beacon/tips/compare-mac-system-monitors/>
+- **Comparing Mac system monitors (iStat, MenuMeters, Beacon ...)** — <https://general.software/guides/beacon/tips/compare-mac-system-monitors/>
   - ### iStat Menus The grandparent of the category. Bjango has been shipping it since 2008. Strengths: the most sensor coverage of any tool here (every temperature probe macOS exposes, every fan, every battery internal), deep customisation, mature. Weaknesses: now subscription-only 
 - **Best menu bar app for showing memory usage at a glance? - Software** — <https://talk.macpowerusers.com/t/best-menu-bar-app-for-showing-memory-usage-at-a-glance/28385>
   - CPU temp, CPU load, Active memory, SSD activity, network throughput.
@@ -150,4 +99,3 @@ If you want, I can turn this into a **ready-to-paste README “Compared to Stats
   - **Not a Mac citizen.** No Spotlight indexing of conversations. ... No native notifications. ... ## Native alternatives Three options connect to Ollama without containers: ### Ollama's own app Shipped in early 2026. Minimal: single conversation view, model selector, text input. No
 - **Best Mac for AI in 2026: Run Local LLMs on a Budget** — <https://www.refurb.me/blog/best-mac-for-ai>
   - Any Apple Silicon Mac with 16 GB of RAM or more can run a local AI model today, no cloud subscription required. ... It is a personal AI agent that connects to LLMs (cloud or local via Ollama) and uses messaging platforms like WhatsApp, Slack, Discord, and iMessage as its interfac
-

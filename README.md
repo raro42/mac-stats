@@ -25,7 +25,7 @@ Two products in one binary — pick your path:
 | Needs | macOS on Apple Silicon | + [Ollama](https://ollama.com) + a model |
 | Config | Zero — AI is **off by default** | Set `aiAgentEnabled: true` or use Settings |
 
-📋 [Changelog](CHANGELOG.md) · 📘 [Getting Started](docs/GETTING_STARTED.md) · 🗺 [Roadmap](docs/ROADMAP.md) · 🍺 [Homebrew](docs/homebrew.md) · 🌐 [Landing](docs/site/index.html) · 🔬 [Competitor notes](docs/042_competitor_scan_perplexity.md)
+📋 [Changelog](CHANGELOG.md) · 📘 [Getting Started](docs/GETTING_STARTED.md) · 🗺 [Roadmap](docs/ROADMAP.md) · 🍺 [Homebrew](docs/homebrew.md) · 🌐 [Landing](docs/site/index.html) · 🔬 [How we compare](docs/042_how_we_compare.md)
 
 ## Table of contents
 
@@ -103,7 +103,7 @@ Repo: [github.com/raro42/mac-stats](https://github.com/raro42/mac-stats/)
 
 ## vs. Stats / iStat Menus / MenuMeters
 
-Closest peers from a 2026 menu-bar monitor scan ([notes](docs/042_competitor_scan_perplexity.md)):
+Closest peers from a 2026 menu-bar monitor scan ([how we compare](docs/042_how_we_compare.md)):
 
 | | **mac-stats** | **Stats** (exelban) | **iStat Menus** | **MenuMeters** |
 |--|---------------|---------------------|-----------------|----------------|
