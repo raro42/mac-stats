@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.288] - 2026-07-29
+
+### Changed
+- Agent Ops overview cards: subtle hover lift; “Open” links get a focus ring.
+
 ## [0.1.287] - 2026-07-29
 
 ### Changed
