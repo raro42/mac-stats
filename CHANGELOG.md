@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.291] - 2026-07-29
+
+### Changed
+- CPU metrics cards: clearer labels, hover lift, focus ring; history sparklines slightly taller and more readable.
+
 ## [0.1.290] - 2026-07-29
 
 ### Added
