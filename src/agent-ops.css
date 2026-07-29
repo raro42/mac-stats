@@ -481,24 +481,26 @@
 /* Shared process list polish (themes load agent-ops.css) */
 .process-empty {
   margin: 4px 0;
-  padding: 16px 12px;
+  padding: 18px 14px;
   font-size: 12px;
-  line-height: 1.4;
-  opacity: 0.72;
-  border-radius: 8px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  opacity: 0.78;
+  border-radius: 10px;
   border: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
-  background: color-mix(in srgb, currentColor 3%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
   text-align: center;
   color: inherit !important;
 }
 
 .process-row {
   border-radius: 8px;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 
 .process-row:hover {
-  background: color-mix(in srgb, currentColor 6%, transparent);
+  background: color-mix(in srgb, currentColor 7%, transparent);
+  transform: translateY(-0.5px);
 }
 
 .process-bar-fill {

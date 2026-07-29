@@ -692,7 +692,7 @@ thing (or use `/status` / Agent Ops for gateway health).",
     )
 }
 
-/// “Read the exact saved tcx26 file” — verbatim notes live under MEMORY notes, not TASK_*.
+/// “Read the exact saved tcx26 file” / “Extract exact txc26 plan” — MEMORY notes, not TASK_*.
 fn extract_exact_saved_note_slug(n: &str) -> Option<String> {
     if n.chars().count() > 180 {
         return None;
@@ -732,13 +732,46 @@ fn extract_exact_saved_note_slug(n: &str) -> Option<String> {
         || n.contains("do not summarize")
         || n.contains("don't summarize")
         || n.contains("dont summarize");
-    let wants_read = n.contains("read") || n.contains("show") || n.contains("open") || n.contains("dump");
-    let mentions_saved = n.contains("saved") || n.contains(" note");
+    let wants_read = n.contains("read")
+        || n.contains("show")
+        || n.contains("open")
+        || n.contains("dump")
+        || n.contains("extract");
+    let mentions_saved = n.contains("saved") || n.contains(" note") || n.contains("plan");
     if !(wants_read && mentions_saved) && !wants_verbatim {
         return None;
     }
-    if !mentions_saved && !n.contains("note") {
-        return None;
+
+    // "exact txc26 plan" / "exact tcx26 file" (slug right after exact).
+    if let Some(idx) = n.find("exact ") {
+        let after = &n[idx + "exact ".len()..];
+        for token in after.split_whitespace() {
+            let t = token.trim_matches(|c: char| !c.is_alphanumeric() && c != '-' && c != '_');
+            if t.is_empty()
+                || matches!(
+                    t,
+                    "the"
+                        | "a"
+                        | "my"
+                        | "note"
+                        | "file"
+                        | "notes"
+                        | "saved"
+                        | "plan"
+                        | "detail"
+                        | "details"
+                        | "in"
+                        | "only"
+                        | "this"
+                        | "full"
+                )
+            {
+                continue;
+            }
+            if t.len() >= 2 {
+                return Some(t.to_string());
+            }
+        }
     }
 
     // Prefer token after "saved ".
@@ -746,7 +779,9 @@ fn extract_exact_saved_note_slug(n: &str) -> Option<String> {
         let after = &n[idx + "saved ".len()..];
         for token in after.split_whitespace() {
             let t = token.trim_matches(|c: char| !c.is_alphanumeric() && c != '-' && c != '_');
-            if t.is_empty() || matches!(t, "the" | "a" | "my" | "note" | "file" | "notes") {
+            if t.is_empty()
+                || matches!(t, "the" | "a" | "my" | "note" | "file" | "notes" | "plan")
+            {
                 continue;
             }
             if t.len() >= 2 {
@@ -1281,6 +1316,16 @@ commit+push, then reply briefly.";
             ),
             Some("tcx26".to_string())
         );
+        assert_eq!(
+            extract_exact_saved_note_slug(&normalize_q(
+                "Extract exact txc26 plan in detail! Only this"
+            )),
+            Some("txc26".to_string())
+        );
+        match classify_turn_lane("Extract exact txc26 plan in detail! Only this", None) {
+            TurnLane::Instant { .. } => {}
+            other => panic!("expected Instant for exact plan extract, got {:?}", other),
+        }
         assert!(
             !matches!(
                 classify_turn_lane("Create a task for coder to improve knowledge saving", None),

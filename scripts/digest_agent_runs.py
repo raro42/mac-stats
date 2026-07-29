@@ -206,9 +206,13 @@ def looks_like_exact_saved_note_read(q: str) -> bool:
     n = (q or "").lower()
     if "http" in n or "redmine" in n or "skill:" in n:
         return False
-    wants_read = "read" in n or "show" in n or "exact" in n or "verbatim" in n
-    return wants_read and ("saved" in n) and (
-        "file" in n or "note" in n or "do not summarize" in n or "don't summarize" in n
+    wants_read = (
+        "read" in n or "show" in n or "exact" in n or "verbatim" in n or "extract" in n
+    )
+    return wants_read and (
+        "saved" in n
+        or ("exact" in n and ("plan" in n or "file" in n or "note" in n))
+        or ("do not summarize" in n or "don't summarize" in n)
     )
 
 

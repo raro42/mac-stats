@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.280] - 2026-07-29
+
+### Changed
+- Instant lane: “Extract exact \<slug\> plan” returns the MEMORY note (same path as exact saved file).
+- Process list empty state + row hover polish (aligned with AI chat empty).
+
 ## [0.1.279] - 2026-07-29
 
 ### Changed
