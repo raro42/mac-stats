@@ -128,6 +128,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_vague_followup_clarifier(&n) {
         return Some(format_vague_followup_clarifier_reply(&n));
     }
+    if is_itinerary_correction(&n) {
+        return Some(format_itinerary_correction_reply(&n));
+    }
     if let Some(slug) = extract_exact_saved_note_slug(&n) {
         return Some(crate::commands::curated_memory::instant_read_saved_note(&slug));
     }
@@ -917,6 +920,74 @@ fn format_vague_followup_clarifier_reply(n: &str) -> String {
     }
 }
 
+/// Mid-chat travel corrections that burned empty direct turns (“you missed that leg”).
+fn is_itinerary_correction(n: &str) -> bool {
+    if n.chars().count() > 220 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("redmine")
+        || n.contains("search ")
+        || n.contains("brave_search")
+        || n.contains("perplexity")
+        || n.contains("book ")
+        || n.contains("schedule")
+    {
+        return false;
+    }
+    const AIRPORTS: &[&str] = &[
+        "atl", "bcn", "mty", "lmm", "mex", "jfk", "mad", "lax", "ord", "sfo", "mia", "ewr",
+    ];
+    let tokens: Vec<&str> = n
+        .split(|c: char| !c.is_ascii_alphanumeric())
+        .filter(|t| !t.is_empty())
+        .collect();
+    let code_hits = AIRPORTS
+        .iter()
+        .filter(|code| tokens.iter().any(|t| t == *code))
+        .count();
+    let place_hits = ["monterrey", "barcelona", "atlanta", "mochis", "techxchange", "txc"]
+        .iter()
+        .filter(|p| n.contains(*p))
+        .count();
+    if code_hits + place_hits < 2 {
+        return false;
+    }
+    n.contains("you missed")
+        || n.contains("missed that leg")
+        || n.contains("messing things up")
+        || n.contains("i live in")
+        || (n.contains("still have to go") && (n.contains(" to ") || n.contains(" - ")))
+}
+
+fn format_itinerary_correction_reply(n: &str) -> String {
+    const AIRPORTS: &[&str] = &[
+        "atl", "bcn", "mty", "lmm", "mex", "jfk", "mad", "lax", "ord", "sfo", "mia", "ewr",
+    ];
+    let tokens: Vec<&str> = n
+        .split(|c: char| !c.is_ascii_alphanumeric())
+        .filter(|t| !t.is_empty())
+        .collect();
+    let mut codes: Vec<String> = Vec::new();
+    for t in &tokens {
+        if AIRPORTS.contains(t) && !codes.iter().any(|c| c == *t) {
+            codes.push(t.to_uppercase());
+        }
+    }
+    let route = if codes.len() >= 2 {
+        codes.join(" → ")
+    } else {
+        "that route".to_string()
+    };
+    format!(
+        "Got it — treating **{route}** as part of the itinerary. \
+Say `MEMORY: save <slug>` with the full legs if you want it persisted, \
+or name the next flight/date to look up."
+    )
+}
+
 /// Short role/identity statements without a question (digester: multi-second direct, zero tools).
 fn is_identity_affirmation(n: &str) -> bool {
     if n.contains('?') || n.chars().count() > 180 {
@@ -1371,6 +1442,36 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "investigate-about-<topic> must not be instant clarifier"
+        );
+    }
+
+    #[test]
+    fn itinerary_correction_is_instant() {
+        for q in [
+            "We still have to go BCN - ATL. You missed that leg",
+            "You're messing things up. I live in BCN. So, BCN ATL to get to txc Then ATL MTY",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    assert!(
+                        reply.to_lowercase().contains("itinerary")
+                            || reply.contains("→")
+                            || reply.to_lowercase().contains("memory"),
+                        "expected itinerary ack for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant for {q:?}, got {:?}", other),
+            }
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane(
+                    "Search flights from BCN to ATL next October",
+                    None
+                ),
+                TurnLane::Instant { .. }
+            ),
+            "flight search must not be itinerary-correction instant"
         );
     }
 

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.286] - 2026-07-29
+
+### Changed
+- Instant lane: mid-chat itinerary corrections (“you missed that leg”, “I live in BCN…”) ack the route and point at MEMORY save.
+
 ## [0.1.285] - 2026-07-29
 
 ### Changed

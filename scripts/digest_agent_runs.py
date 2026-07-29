@@ -320,6 +320,49 @@ def looks_like_bare_research_topic(q: str) -> bool:
     ) or n.endswith("problem")
 
 
+def looks_like_itinerary_correction(q: str) -> bool:
+    n = (q or "").strip().lower().rstrip("?!.").strip()
+    if len(n) > 220:
+        return False
+    if any(
+        x in n
+        for x in (
+            "http",
+            "skill:",
+            "cursor_agent:",
+            "redmine",
+            "search ",
+            "brave_search",
+            "perplexity",
+            "book ",
+            "schedule",
+        )
+    ):
+        return False
+    airports = {"atl", "bcn", "mty", "lmm", "mex", "jfk", "mad", "lax", "ord", "sfo", "mia", "ewr"}
+    tokens = set(
+        t for t in "".join(c if c.isalnum() else " " for c in n).split() if t
+    )
+    code_hits = len(tokens & airports)
+    place_hits = sum(
+        1
+        for p in ("monterrey", "barcelona", "atlanta", "mochis", "techxchange", "txc")
+        if p in n
+    )
+    if code_hits + place_hits < 2:
+        return False
+    return (
+        "you missed" in n
+        or "missed that leg" in n
+        or "messing things up" in n
+        or "i live in" in n
+        or (
+            "still have to go" in n
+            and (" to " in n or " - " in n)
+        )
+    )
+
+
 def looks_like_research_using_perplexity(q: str) -> bool:
     n = (q or "").lower()
     return (
@@ -598,6 +641,7 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         or looks_like_vague_followup(q)
         or looks_like_airport_hop(q)
         or looks_like_bare_research_topic(q)
+        or looks_like_itinerary_correction(q)
     ):
         return True
     # Scheduled SKILL prompts are harness/scheduler work, not Discord UX latency.
