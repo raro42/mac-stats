@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.305] - 2026-07-30
+
+### Changed
+- Settings modal: theme chips hover/focus lift; inputs use the same blue focus ring as Agent Ops filters.
+
 ## [0.1.304] - 2026-07-30
 
 ### Changed

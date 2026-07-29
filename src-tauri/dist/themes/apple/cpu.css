@@ -657,20 +657,27 @@ body {
   text-align: left;
   padding: 0 10px;
   box-shadow: none;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 
 .theme-item:hover {
-  transform: none;
   background: color-mix(in srgb, var(--text, #0c0c10) 10%, transparent);
-  border-color: color-mix(in srgb, var(--text, #0c0c10) 16%, transparent);
-  box-shadow: none;
+  border-color: color-mix(in srgb, var(--text, #0c0c10) 18%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, #000 8%, transparent);
+  transform: translateY(-1px);
+}
+
+.theme-item:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+  outline-offset: 2px;
 }
 
 .theme-item[aria-current="true"] {
-  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 55%, transparent);
-  background: color-mix(in srgb, var(--accent, #8bb4e8) 18%, transparent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #8bb4e8) 22%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 14%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 18%, transparent);
+  transform: none;
 }
 
 .settings-input,
@@ -686,12 +693,20 @@ body {
   color: var(--text);
   font-size: 13px;
   outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.settings-input:hover,
+.discord-token-input:hover {
+  background: color-mix(in srgb, var(--text, #0c0c10) 7%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 22%, var(--hairline, rgba(0, 0, 0, 0.10)));
 }
 
 .settings-input:focus,
 .discord-token-input:focus {
-  border-color: color-mix(in srgb, var(--accent, #8bb4e8) 50%, transparent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #8bb4e8) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 18%, transparent);
+  background: color-mix(in srgb, var(--text, #0c0c10) 6%, transparent);
 }
 
 .settings-actions {
