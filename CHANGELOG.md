@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.285] - 2026-07-29
+
+### Changed
+- Agent Ops tab buttons: hover lift, focus ring, stronger active weight (aligned with refresh polish).
+
 ## [0.1.284] - 2026-07-29
 
 ### Changed

@@ -289,11 +289,33 @@
   font-size: 12px;
   cursor: pointer;
   opacity: 0.8;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease,
+    opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+.agent-ops-tab:hover, .ops-file-tab:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  border-color: color-mix(in srgb, currentColor 20%, transparent);
+}
+
+.agent-ops-tab:focus-visible, .ops-file-tab:focus-visible {
+  outline: none;
+  opacity: 1;
+  border-color: color-mix(in srgb, #0a84ff 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
 }
 
 .agent-ops-tab.active, .ops-file-tab.active {
   background: color-mix(in srgb, currentColor 14%, transparent);
+  border-color: color-mix(in srgb, currentColor 22%, transparent);
   opacity: 1;
+  font-weight: 600;
+}
+
+.agent-ops-tab.active:hover, .ops-file-tab.active:hover {
+  background: color-mix(in srgb, currentColor 16%, transparent);
 }
 
 .agent-ops-panel {
