@@ -436,13 +436,14 @@
 
 .chat-empty {
   margin: 4px 0;
-  padding: 18px 14px;
+  padding: 20px 16px;
   font-size: 12px;
-  line-height: 1.45;
-  opacity: 0.72;
-  border-radius: 8px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  opacity: 0.78;
+  border-radius: 10px;
   border: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
-  background: color-mix(in srgb, currentColor 3%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
   text-align: center;
 }
 

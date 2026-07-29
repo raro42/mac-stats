@@ -177,15 +177,27 @@ def looks_like_how_solved_task(q: str) -> bool:
     return asks and ("task" in q)
 
 
+def looks_like_research_using_perplexity(q: str) -> bool:
+    n = (q or "").lower()
+    return (
+        "research using perplexity" in n
+        or "using perplexity:" in n
+        or n.strip().startswith("perplexity:")
+    )
+
+
 def looks_like_thread_clarifier(q: str) -> bool:
     n = (q or "").lower().strip()
-    if len(n) > 80:
+    if len(n) > 140:
         return False
     return (
         "referring to this conversation" in n
         or "referring to this thread" in n
+        or "referring to the last task" in n
+        or "referring to that task" in n
         or "i mean this conversation" in n
         or "i mean this thread" in n
+        or "i mean the last task" in n
         or n in ("this conversation", "this thread", "here", "in this chat")
     )
 
@@ -432,6 +444,8 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         or looks_like_dump_saved_notes(q)
         or looks_like_task_create_ask(q)
         or looks_like_lighthouse_pagespeed(q)
+        or looks_like_research_using_perplexity(q)
+        or looks_like_thread_clarifier(q)
     ):
         return True
     # Scheduled SKILL prompts are harness/scheduler work, not Discord UX latency.

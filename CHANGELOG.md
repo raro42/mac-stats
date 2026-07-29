@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.279] - 2026-07-29
+
+### Changed
+- Pre-route “Research using perplexity: …” natural language to PERPLEXITY_SEARCH.
+- Instant clarifier: “referring to the last task …” stays on that task’s context.
+- AI chat empty-state spacing/opacity polish.
+
 ## [0.1.278] - 2026-07-29
 
 ### Changed

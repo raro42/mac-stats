@@ -291,6 +291,33 @@ fn try_pre_route_web_search(question: &str) -> Option<String> {
                 return Some(format!("PERPLEXITY_SEARCH: {query}"));
             }
         }
+        // Natural language: "Research using perplexity: …" / "using perplexity: …"
+        for marker in [
+            "research using perplexity:",
+            "using perplexity:",
+            "perplexity search:",
+            "perplexity:",
+        ] {
+            if let Some(pos) = q_lower.find(marker) {
+                let before = q_lower[..pos].trim();
+                if !before.is_empty()
+                    && !before.ends_with("please")
+                    && !before.ends_with("can you")
+                    && !before.ends_with("could you")
+                    && !before.ends_with("pls")
+                {
+                    continue;
+                }
+                let query = q[pos + marker.len()..].trim().trim_end_matches('?').trim();
+                if !query.is_empty() {
+                    info!(
+                        "Agent router: pre-routed to PERPLEXITY_SEARCH (natural language): {}",
+                        crate::logging::ellipse(query, 80)
+                    );
+                    return Some(format!("PERPLEXITY_SEARCH: {query}"));
+                }
+            }
+        }
     }
 
     // Explicit "BRAVE_SEARCH: <query>"
@@ -1098,6 +1125,17 @@ mod tests {
             "research quantum computing advances",
         );
         assert_eq!(r, Some(("quantum computing advances".to_string(), true)));
+    }
+
+    #[test]
+    fn research_using_perplexity_pre_route() {
+        let q = "Research using perplexity: Florian Fischer delivery hero problem";
+        let r = try_pre_route_web_search(q);
+        if crate::commands::perplexity::is_perplexity_configured().unwrap_or(false) {
+            let rec = r.expect("expected PERPLEXITY_SEARCH when configured");
+            assert!(rec.starts_with("PERPLEXITY_SEARCH: "), "{rec}");
+            assert!(rec.contains("Florian Fischer"), "{rec}");
+        }
     }
 
     #[test]

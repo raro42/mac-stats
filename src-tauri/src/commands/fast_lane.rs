@@ -119,7 +119,11 @@ fn try_instant_reply(q: &str) -> Option<String> {
         return Some("👍 Got it — here if you need me.".to_string());
     }
     if is_thread_context_clarifier(&n) {
-        return Some("Got it — staying with this thread's context.".to_string());
+        return Some(if n.contains("last task") || n.contains("that task") {
+            "Got it — staying with that task's context.".to_string()
+        } else {
+            "Got it — staying with this thread's context.".to_string()
+        });
     }
     if let Some(slug) = extract_exact_saved_note_slug(&n) {
         return Some(crate::commands::curated_memory::instant_read_saved_note(&slug));
@@ -797,9 +801,9 @@ fn is_dump_saved_notes_ask(n: &str) -> bool {
     asks && (n.contains("saved") || n.contains("memory") || n.contains("note"))
 }
 
-/// Short “I mean this Discord thread” clarifiers (digester: ~16s direct, zero tools).
+/// Short “I mean this Discord thread / last task” clarifiers.
 fn is_thread_context_clarifier(n: &str) -> bool {
-    if n.chars().count() > 96 {
+    if n.chars().count() > 140 {
         return false;
     }
     if n.contains("http")
@@ -813,8 +817,11 @@ fn is_thread_context_clarifier(n: &str) -> bool {
     }
     let referring = n.contains("referring to this conversation")
         || n.contains("referring to this thread")
+        || n.contains("referring to the last task")
+        || n.contains("referring to that task")
         || n.contains("i mean this conversation")
         || n.contains("i mean this thread")
+        || n.contains("i mean the last task")
         || n.contains("in this conversation")
         || n.contains("in this thread");
     if !referring {
@@ -1227,12 +1234,14 @@ commit+push, then reply briefly.";
             "I am referring to this conversation!",
             "I'm referring to this thread",
             "I mean this conversation",
+            "I am referring to the last task I had given you to improve and saving information",
         ] {
             match classify_turn_lane(q, None) {
                 TurnLane::Instant { reply } => {
                     assert!(
                         reply.to_lowercase().contains("thread")
-                            || reply.to_lowercase().contains("context"),
+                            || reply.to_lowercase().contains("context")
+                            || reply.to_lowercase().contains("task"),
                         "expected thread/context ack for {q:?}: {reply}"
                     );
                 }
