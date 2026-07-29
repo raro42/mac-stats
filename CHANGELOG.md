@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.293] - 2026-07-29
+
+### Changed
+- Instant lane: itinerary preference dumps (“I want to be back in Barcelona around … LMM - MEX - BCN”) ack the route and point at `MEMORY: save` instead of a slow MEMORY_APPEND direct turn.
+
 ## [0.1.292] - 2026-07-29
 
 ### Changed

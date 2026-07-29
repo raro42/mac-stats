@@ -131,6 +131,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_itinerary_correction(&n) {
         return Some(format_itinerary_correction_reply(&n));
     }
+    if is_itinerary_preference_statement(&n) {
+        return Some(format_itinerary_preference_reply(&n));
+    }
     if let Some(slug) = extract_exact_saved_note_slug(&n) {
         return Some(crate::commands::curated_memory::instant_read_saved_note(&slug));
     }
@@ -988,6 +991,91 @@ or name the next flight/date to look up."
     )
 }
 
+/// Preference dumps like “I want to be back in Barcelona around 14 Nov. LMM - MEX - BCN”
+/// that previously burned a full MEMORY_APPEND direct turn.
+fn is_itinerary_preference_statement(n: &str) -> bool {
+    let len = n.chars().count();
+    if !(24..=280).contains(&len) {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("redmine")
+        || n.contains("search ")
+        || n.contains("brave_search")
+        || n.contains("perplexity")
+        || n.contains("book ")
+        || n.contains("schedule")
+        || n.contains("review ")
+        || n.contains("techxchange")
+        || n.contains("conference")
+        || n.contains("memory:")
+        || n.contains("memory_append")
+    {
+        return false;
+    }
+    let wants = n.contains("i want to be")
+        || n.contains("i want to be back")
+        || n.contains("i'd like to be")
+        || n.contains("i would like to be")
+        || (n.contains("i want ") && (n.contains(" around ") || n.contains(" in november") || n.contains(" in october")));
+    if !wants {
+        return false;
+    }
+    const AIRPORTS: &[&str] = &[
+        "atl", "bcn", "mty", "lmm", "mex", "jfk", "mad", "lax", "ord", "sfo", "mia", "ewr",
+    ];
+    let tokens: Vec<&str> = n
+        .split(|c: char| !c.is_ascii_alphanumeric())
+        .filter(|t| !t.is_empty())
+        .collect();
+    let code_hits = AIRPORTS
+        .iter()
+        .filter(|code| tokens.iter().any(|t| t == *code))
+        .count();
+    let place_hits = ["barcelona", "atlanta", "monterrey", "mochis", "mexico"]
+        .iter()
+        .filter(|p| n.contains(*p))
+        .count();
+    if code_hits < 2 && !(code_hits >= 1 && place_hits >= 1) {
+        return false;
+    }
+    // Prefer preference prose, not pure questions.
+    if n.contains('?') && !n.contains("around ") {
+        return false;
+    }
+    true
+}
+
+fn format_itinerary_preference_reply(n: &str) -> String {
+    const AIRPORTS: &[&str] = &[
+        "atl", "bcn", "mty", "lmm", "mex", "jfk", "mad", "lax", "ord", "sfo", "mia", "ewr",
+    ];
+    let tokens: Vec<&str> = n
+        .split(|c: char| !c.is_ascii_alphanumeric())
+        .filter(|t| !t.is_empty())
+        .collect();
+    let mut codes: Vec<String> = Vec::new();
+    for t in &tokens {
+        if AIRPORTS.contains(t) && !codes.iter().any(|c| c == *t) {
+            codes.push(t.to_uppercase());
+        }
+    }
+    let route = if codes.len() >= 2 {
+        codes.join(" → ")
+    } else if !codes.is_empty() {
+        codes[0].clone()
+    } else {
+        "that return".to_string()
+    };
+    format!(
+        "Got it — **{route}** noted as the preference. \
+To lock it in, say `MEMORY: save itinerary` and paste the full dates/legs on the following lines \
+(verbatim — don’t summarize). Or tell me the next city/date to research."
+    )
+}
+
 /// Short role/identity statements without a question (digester: multi-second direct, zero tools).
 fn is_identity_affirmation(n: &str) -> bool {
     if n.contains('?') || n.chars().count() > 180 {
@@ -1472,6 +1560,32 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "flight search must not be itinerary-correction instant"
+        );
+    }
+
+    #[test]
+    fn itinerary_preference_statement_is_instant() {
+        let q =
+            "I want to be back in Barcelona around 14 of November. LMM - MEX - BCN. I want the return legs";
+        match classify_turn_lane(q, None) {
+            TurnLane::Instant { reply } => {
+                assert!(
+                    reply.to_lowercase().contains("memory")
+                        && (reply.contains("→") || reply.to_lowercase().contains("lmm")),
+                    "expected preference ack for {q:?}: {reply}"
+                );
+            }
+            other => panic!("expected Instant for preference statement, got {:?}", other),
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane(
+                    "Review IBM techxchange dates in Atlanta. I want to be in Atlanta two days before",
+                    None
+                ),
+                TurnLane::Instant { .. }
+            ),
+            "event-date review must not be itinerary-preference instant"
         );
     }
 
