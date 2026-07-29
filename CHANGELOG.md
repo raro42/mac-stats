@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.300] - 2026-07-29
+
+### Changed
+- CPU Details section: glass card hover, clearer value weight, focusable collapsible header.
+
 ## [0.1.299] - 2026-07-29
 
 ### Changed
