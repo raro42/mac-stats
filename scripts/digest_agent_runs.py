@@ -363,6 +363,176 @@ def looks_like_itinerary_correction(q: str) -> bool:
     )
 
 
+def looks_like_event_dates_review(q: str) -> bool:
+    """Conference/event date reviews now pre-routed (v0.1.292)."""
+    n = (q or "").strip().lower().rstrip("?!.").strip()
+    if not (18 <= len(n) <= 240):
+        return False
+    if any(
+        x in n
+        for x in (
+            "http",
+            "skill:",
+            "cursor_agent:",
+            "redmine",
+            "remember ",
+            "save ",
+            "schedule",
+            "memory",
+            "book ",
+        )
+    ):
+        return False
+    eventish = any(
+        x in n
+        for x in (
+            "techxchange",
+            "conference",
+            "summit",
+            "meetup",
+            "symposium",
+            "tradeshow",
+            "trade show",
+            "event dates",
+            "dates for ",
+        )
+    ) or (" dates" in n and (" in " in n or " at " in n))
+    if not eventish:
+        return False
+    return (
+        n.startswith("review ")
+        or n.startswith("check ")
+        or n.startswith("find ")
+        or n.startswith("look up ")
+        or "when is " in n
+        or "what are the dates" in n
+        or "dates in " in n
+        or "dates for " in n
+    )
+
+
+def looks_like_itinerary_preference(q: str) -> bool:
+    """Itinerary preference dumps now instant (v0.1.293)."""
+    n = (q or "").strip().lower().rstrip("?!.").strip()
+    if not (24 <= len(n) <= 280):
+        return False
+    if any(
+        x in n
+        for x in (
+            "http",
+            "skill:",
+            "cursor_agent:",
+            "redmine",
+            "search ",
+            "brave_search",
+            "perplexity",
+            "book ",
+            "schedule",
+            "review ",
+            "techxchange",
+            "conference",
+            "memory:",
+            "memory_append",
+        )
+    ):
+        return False
+    wants = (
+        "i want to be" in n
+        or "i want to be back" in n
+        or "i'd like to be" in n
+        or "i would like to be" in n
+        or (
+            "i want " in n
+            and (" around " in n or " in november" in n or " in october" in n)
+        )
+    )
+    if not wants:
+        return False
+    airports = {"atl", "bcn", "mty", "lmm", "mex", "jfk", "mad", "lax", "ord", "sfo", "mia", "ewr"}
+    tokens = set(t for t in "".join(c if c.isalnum() else " " for c in n).split() if t)
+    code_hits = len(tokens & airports)
+    place_hits = sum(
+        1 for p in ("barcelona", "atlanta", "monterrey", "mochis", "mexico") if p in n
+    )
+    return code_hits >= 2 or (code_hits >= 1 and place_hits >= 1)
+
+
+def looks_like_travel_plan(q: str) -> bool:
+    """Multi-city travel plans now pre-routed (v0.1.294)."""
+    n = (q or "").strip().lower().rstrip("?!.").strip()
+    if not (28 <= len(n) <= 240):
+        return False
+    if any(
+        x in n
+        for x in (
+            "http",
+            "skill:",
+            "cursor_agent:",
+            "redmine",
+            "remember ",
+            "save ",
+            "schedule",
+            "memory",
+            "book ",
+            "techxchange",
+            "conference",
+            "review ",
+        )
+    ):
+        return False
+    if "i want to be back" in n or "i want to be in" in n:
+        return False
+    if "lmm" in n and "mex" in n and "bcn" in n:
+        return False
+    travelish = any(
+        x in n
+        for x in (
+            "travel",
+            "travelling",
+            "traveling",
+            "trip to",
+            "going to travel",
+            "we are going to",
+        )
+    )
+    if not travelish:
+        return False
+    multi = any(
+        x in n
+        for x in (
+            " and want to go to ",
+            " and then go to ",
+            " afterward",
+            " afterwards",
+            " after that",
+            " then to ",
+            " and then to ",
+        )
+    )
+    if not multi:
+        return False
+    places = ("atlanta", "mochis", "monterrey", "barcelona", "mexico", "madrid", "miami")
+    place_hits = sum(1 for p in places if p in n)
+    month = any(
+        m in n
+        for m in (
+            "january",
+            "february",
+            "march",
+            "april",
+            "may",
+            "june",
+            "july",
+            "august",
+            "september",
+            "october",
+            "november",
+            "december",
+        )
+    )
+    return place_hits >= 2 or (place_hits >= 1 and month)
+
+
 def looks_like_bare_news_ask(q: str) -> bool:
     n = (q or "").strip().lower().rstrip("?!.").strip()
     if len(n) > 96:
@@ -691,6 +861,9 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         or looks_like_airport_hop(q)
         or looks_like_bare_research_topic(q)
         or looks_like_itinerary_correction(q)
+        or looks_like_event_dates_review(q)
+        or looks_like_itinerary_preference(q)
+        or looks_like_travel_plan(q)
         or looks_like_bare_news_ask(q)
         or looks_like_topic_dump(q)
     ):

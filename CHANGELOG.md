@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.295] - 2026-07-29
+
+### Changed
+- AI chat input: hover + blue focus ring; Send button hover lift (aligned with Agent Ops filters).
+- Digester: drop historical Slowest rows for event-date / itinerary-preference / multi-city travel patterns already shipped in v0.1.292–294.
+
 ## [0.1.294] - 2026-07-29
 
 ### Changed
