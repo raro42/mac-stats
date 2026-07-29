@@ -459,6 +459,24 @@ fn try_pre_route_web_search(question: &str) -> Option<String> {
         return Some(format!("{tool}: {query}"));
     }
 
+    // Multi-leg travel plans ("travel to Atlanta in October and … Los mochis afterward").
+    if let Some(query) = travel_plan_search_query(q) {
+        let (tool, label) = if perplexity_ok {
+            ("PERPLEXITY_SEARCH", "travel plan")
+        } else if brave_ok {
+            ("BRAVE_SEARCH", "travel plan")
+        } else {
+            return None;
+        };
+        info!(
+            "Agent router: pre-routed to {} ({}): {}",
+            tool,
+            label,
+            crate::logging::ellipse(&query, 80)
+        );
+        return Some(format!("{tool}: {query}"));
+    }
+
     // Short airport hop chains without the word "flight" ("I would like ATL to Monterrey to LMM").
     if let Some(query) = airport_hop_search_query(q) {
         let (tool, label) = if brave_ok {
@@ -683,6 +701,80 @@ fn event_dates_search_query(q: &str) -> Option<String> {
         || lower.contains("dates in ")
         || lower.contains("dates for ");
     if !reviewish {
+        return None;
+    }
+    Some(trimmed.to_string())
+}
+
+/// Multi-city travel plans without an explicit "flight" word — prefer Perplexity research.
+/// Preference dumps ("I want to be back in Barcelona… LMM-MEX-BCN") stay with the instant lane.
+fn travel_plan_search_query(q: &str) -> Option<String> {
+    let trimmed = q.trim().trim_end_matches('?').trim();
+    let len = trimmed.chars().count();
+    if !(28..=240).contains(&len) {
+        return None;
+    }
+    let lower = trimmed.to_lowercase();
+    if lower.contains("http")
+        || lower.contains("skill:")
+        || lower.contains("cursor_agent:")
+        || lower.contains("redmine")
+        || lower.contains(" and then ")
+        || lower.contains("remember ")
+        || lower.contains("save ")
+        || lower.contains("schedule")
+        || lower.contains("memory")
+        || lower.contains("book ")
+        || lower.contains("techxchange")
+        || lower.contains("conference")
+        || lower.contains("review ")
+    {
+        return None;
+    }
+    // Preference / return-home dumps are handled by the instant lane.
+    if lower.contains("i want to be back")
+        || lower.contains("i want to be in")
+        || (lower.contains("lmm") && lower.contains("mex") && lower.contains("bcn"))
+    {
+        return None;
+    }
+    let travelish = lower.contains("travel")
+        || lower.contains("travelling")
+        || lower.contains("traveling")
+        || lower.contains("trip to")
+        || lower.contains("going to travel")
+        || lower.contains("we are going to");
+    if !travelish {
+        return None;
+    }
+    let multi = lower.contains(" and want to go to ")
+        || lower.contains(" and then go to ")
+        || lower.contains(" afterward")
+        || lower.contains(" afterwards")
+        || lower.contains(" after that")
+        || lower.contains(" then to ")
+        || lower.contains(" and then to ");
+    if !multi {
+        return None;
+    }
+    let places = [
+        "atlanta",
+        "mochis",
+        "monterrey",
+        "barcelona",
+        "mexico",
+        "madrid",
+        "miami",
+    ];
+    let place_hits = places.iter().filter(|p| lower.contains(*p)).count();
+    let month = [
+        "january", "february", "march", "april", "may", "june", "july", "august", "september",
+        "october", "november", "december",
+    ]
+    .iter()
+    .any(|m| lower.contains(m));
+    // Need two named places, or one place + month when a second-leg cue is present.
+    if place_hits < 2 && !(place_hits >= 1 && month) {
         return None;
     }
     Some(trimmed.to_string())
@@ -1566,6 +1658,23 @@ mod tests {
         );
         assert_eq!(
             event_dates_search_query("save the techxchange dates in memory"),
+            None
+        );
+    }
+
+    #[test]
+    fn travel_plan_search_query_accepts_multi_city() {
+        let q =
+            "We are going to travel to Atlanta in October and want to go to Los mochis afterward";
+        assert_eq!(travel_plan_search_query(q), Some(q.to_string()));
+        assert_eq!(
+            travel_plan_search_query(
+                "I want to be back in Barcelona around 14 of November. LMM - MEX - BCN"
+            ),
+            None
+        );
+        assert_eq!(
+            travel_plan_search_query("We are going to travel to Atlanta in October"),
             None
         );
     }

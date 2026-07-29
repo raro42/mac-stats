@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.294] - 2026-07-29
+
+### Changed
+- Pre-route multi-city travel plans (“travel to Atlanta in October and … Los Mochis afterward”) to Perplexity/Brave — skips the planning LLM for that digester Slowest pattern.
+
 ## [0.1.293] - 2026-07-29
 
 ### Changed
