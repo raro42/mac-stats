@@ -30,6 +30,11 @@ pub(crate) fn compute_pre_routed_recommendation(
         if run_cmd_rec.is_some() {
             return run_cmd_rec;
         }
+        // Google SERP HTML via FETCH_URL is huge and low-signal — rewrite to web search.
+        let google_rec = try_pre_route_google_serp_as_search(question);
+        if google_rec.is_some() {
+            return google_rec;
+        }
         let fetch_rec = try_pre_route_fetch_url(question);
         if fetch_rec.is_some() {
             return fetch_rec;
@@ -56,6 +61,55 @@ pub(crate) fn compute_pre_routed_recommendation(
         }
         try_pre_route_redmine(question, request_for_verification, is_verification_retry)
     })
+}
+
+/// Google `/search?q=…` SERPs are a bad FETCH_URL target — rewrite to Brave/Perplexity.
+fn try_pre_route_google_serp_as_search(question: &str) -> Option<String> {
+    let url = extract_url_from_question(question)?;
+    let query = google_serp_search_query(&url)?;
+    let brave_ok = crate::commands::brave::get_brave_api_key().is_some();
+    let perplexity_ok = crate::commands::perplexity::is_perplexity_configured().unwrap_or(false);
+    if !brave_ok && !perplexity_ok {
+        return None;
+    }
+    let (tool, label) = if brave_ok {
+        ("BRAVE_SEARCH", "google SERP rewrite")
+    } else {
+        ("PERPLEXITY_SEARCH", "google SERP rewrite")
+    };
+    info!(
+        "Agent router: pre-routed to {} ({}): {}",
+        tool,
+        label,
+        crate::logging::ellipse(&query, 80)
+    );
+    Some(format!("{tool}: {query}"))
+}
+
+/// Extract `q=` from a Google `/search` URL (also used when FETCH_URL still hits a SERP).
+pub(crate) fn google_serp_search_query(url_or_arg: &str) -> Option<String> {
+    let url = extract_url_from_question(url_or_arg).unwrap_or_else(|| url_or_arg.trim().to_string());
+    let parsed = url::Url::parse(&url).ok()?;
+    let host = parsed.host_str()?.to_lowercase();
+    let is_google = host == "google.com"
+        || host == "www.google.com"
+        || host.ends_with(".google.com");
+    if !is_google {
+        return None;
+    }
+    if !parsed.path().starts_with("/search") {
+        return None;
+    }
+    let q_param = parsed
+        .query_pairs()
+        .find(|(k, _)| k == "q")
+        .map(|(_, v)| v.into_owned())?;
+    let query = q_param.trim();
+    if query.is_empty() {
+        None
+    } else {
+        Some(query.to_string())
+    }
 }
 
 /// "run <command>" / "RUN_CMD: <command>" → `RUN_CMD: <arg>`.
@@ -1015,6 +1069,30 @@ mod tests {
     fn fetch_url_http_scheme() {
         let r = try_pre_route_fetch_url("fetch http://localhost:8080/api");
         assert_eq!(r, Some("FETCH_URL: http://localhost:8080/api".to_string()));
+    }
+
+    #[test]
+    fn google_serp_rewrites_to_search() {
+        let q = "Extract interesting people from https://www.google.com/search?q=site%3Afacebook.com+ceo";
+        assert_eq!(
+            google_serp_search_query(
+                "https://www.google.com/search?q=site%3Afacebook.com+ceo"
+            )
+            .as_deref(),
+            Some("site:facebook.com ceo")
+        );
+        let r = try_pre_route_google_serp_as_search(q);
+        // When neither Brave nor Perplexity is configured in the test env, rewrite is skipped.
+        if crate::commands::brave::get_brave_api_key().is_some()
+            || crate::commands::perplexity::is_perplexity_configured().unwrap_or(false)
+        {
+            let rec = r.expect("expected search rewrite");
+            assert!(
+                rec.starts_with("BRAVE_SEARCH: ") || rec.starts_with("PERPLEXITY_SEARCH: "),
+                "{rec}"
+            );
+            assert!(rec.contains("facebook"), "{rec}");
+        }
     }
 
     #[test]

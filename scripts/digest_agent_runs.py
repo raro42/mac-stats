@@ -177,6 +177,11 @@ def looks_like_how_solved_task(q: str) -> bool:
     return asks and ("task" in q)
 
 
+def looks_like_google_serp_fetch(q: str) -> bool:
+    n = (q or "").lower()
+    return "google.com/search" in n or "google.com/search?" in n
+
+
 def looks_like_research_using_perplexity(q: str) -> bool:
     n = (q or "").lower()
     return (
@@ -450,6 +455,7 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         or looks_like_lighthouse_pagespeed(q)
         or looks_like_research_using_perplexity(q)
         or looks_like_thread_clarifier(q)
+        or looks_like_google_serp_fetch(q)
     ):
         return True
     # Scheduled SKILL prompts are harness/scheduler work, not Discord UX latency.

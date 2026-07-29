@@ -1196,6 +1196,27 @@ async fn dispatch_tool(
             )
             .await
         }
+        "FETCH_URL"
+            if crate::commands::pre_routing::google_serp_search_query(arg).is_some() =>
+        {
+            let query = crate::commands::pre_routing::google_serp_search_query(arg)
+                .expect("checked above");
+            info!(
+                "Agent router: FETCH_URL Google SERP → BRAVE_SEARCH: {}",
+                crate::logging::ellipse(&query, 80)
+            );
+            if crate::commands::brave::get_brave_api_key().is_some() {
+                crate::commands::network_tool_dispatch::handle_brave_search(
+                    &query,
+                    params.status_tx.as_ref(),
+                )
+                .await
+            } else {
+                format!(
+                    "Google search pages are not fetched as HTML. Use BRAVE_SEARCH: {query} (or configure BRAVE_API_KEY)."
+                )
+            }
+        }
         "FETCH_URL" => {
             let estimated_used = messages.iter().map(|m| m.content.len()).sum::<usize>()
                 + params.agent_descriptions_len;
