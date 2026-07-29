@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.278] - 2026-07-29
+
+### Changed
+- Instant lane: “how was the last task done?” and “what needs to be done” (mac-stats) point at Digest / morning surprise.
+- Agent Ops Refresh digest / secondary buttons: hover lift + focus ring.
+
 ## [0.1.277] - 2026-07-29
 
 ### Fixed

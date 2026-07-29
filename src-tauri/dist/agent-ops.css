@@ -542,6 +542,20 @@
   padding: 6px 12px;
   font-size: 12px;
   cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-secondary.ops-refresh:hover,
+.agent-ops-section .btn-secondary:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  border-color: color-mix(in srgb, currentColor 22%, transparent);
+}
+
+.btn-secondary.ops-refresh:focus-visible,
+.agent-ops-section .btn-secondary:focus-visible {
+  outline: 2px solid color-mix(in srgb, currentColor 35%, transparent);
+  outline-offset: 2px;
 }
 
 /* Perplexity Search — minimal shared styles for themes without local CSS */

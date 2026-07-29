@@ -335,7 +335,7 @@ fn format_instant_presence_reply() -> String {
 
 /// “Any improvements from last night / overnight / lately?” — digester zero-tool slow turns.
 fn is_overnight_improvements_ask(n: &str) -> bool {
-    if n.chars().count() > 140 {
+    if n.chars().count() > 200 {
         return false;
     }
     if n.contains("http")
@@ -348,6 +348,15 @@ fn is_overnight_improvements_ask(n: &str) -> bool {
         || n.contains("workflow")
     {
         return false;
+    }
+    // “you didn’t improve Mac-stats… what needs to be done?”
+    if (n.contains("mac-stats") || n.contains("mac stats"))
+        && (n.contains("what needs")
+            || n.contains("what should we")
+            || n.contains("what to improve")
+            || n.contains("what needs to be done"))
+    {
+        return true;
     }
     let asks_improvements = n.contains("improvement")
         || n.contains("improve")
@@ -372,9 +381,9 @@ fn is_overnight_improvements_ask(n: &str) -> bool {
     asks_improvements && overnight_context
 }
 
-/// “How did you solve this task?” — point at morning surprise / Digest, not a model loop.
+/// “How did you solve this task?” / “how exactly was the last task done?”
 fn is_how_solved_task_ask(n: &str) -> bool {
-    if n.chars().count() > 100 {
+    if n.chars().count() > 120 {
         return false;
     }
     if n.contains("http")
@@ -388,8 +397,14 @@ fn is_how_solved_task_ask(n: &str) -> bool {
     let asks_how = n.contains("how did you solve")
         || n.contains("how did you fix")
         || n.contains("how was this solved")
-        || n.contains("how was that solved");
-    asks_how && n.contains("task")
+        || n.contains("how was that solved")
+        || n.contains("how exactly was the last task")
+        || n.contains("how was the last task")
+        || n.contains("how was that task")
+        || (n.contains("last task")
+            && n.contains("how")
+            && (n.contains("done") || n.contains("solved") || n.contains("finished")));
+    asks_how && (n.contains("task") || n.contains("last task"))
 }
 
 fn format_instant_how_solved_task_reply() -> String {
@@ -1501,15 +1516,22 @@ commit+push, then reply briefly.";
 
     #[test]
     fn how_solved_task_asks_are_instant() {
-        match classify_turn_lane("How did you solve this task?", None) {
-            TurnLane::Instant { reply } => {
-                let lower = reply.to_lowercase();
-                assert!(
-                    lower.contains("digest") || lower.contains("morning_surprise") || lower.contains("mac-stats"),
-                    "expected digest pointer: {reply}"
-                );
+        for q in [
+            "How did you solve this task?",
+            "Then how exactly was the last task done?",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    let lower = reply.to_lowercase();
+                    assert!(
+                        lower.contains("digest")
+                            || lower.contains("morning_surprise")
+                            || lower.contains("mac-stats"),
+                        "expected digest pointer for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant for {q:?}, got {:?}", other),
             }
-            other => panic!("expected Instant, got {:?}", other),
         }
         assert!(
             !matches!(
@@ -1518,6 +1540,23 @@ commit+push, then reply briefly.";
             ),
             "ticket solve asks must not be instant"
         );
+    }
+
+    #[test]
+    fn mac_stats_what_needs_ask_is_instant() {
+        match classify_turn_lane(
+            "so you didn't improve Mac-stats itself. Just your md files. What needs to be done?",
+            None,
+        ) {
+            TurnLane::Instant { reply } => {
+                let lower = reply.to_lowercase();
+                assert!(
+                    lower.contains("mac-stats") || lower.contains("overnight") || lower.contains("digest"),
+                    "expected overnight blurb: {reply}"
+                );
+            }
+            other => panic!("expected Instant, got {:?}", other),
+        }
     }
 
     #[test]

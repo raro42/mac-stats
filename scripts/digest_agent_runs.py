@@ -131,30 +131,50 @@ def looks_like_wakeup(q: str) -> bool:
 
 
 def looks_like_overnight_improvements(q: str) -> bool:
+    ql = (q or "").lower()
+    if ("mac-stats" in ql or "mac stats" in ql) and (
+        "what needs" in ql or "what should we" in ql or "what to improve" in ql
+    ):
+        return True
     if not (
-        "improvement" in q
-        or "improve" in q
-        or "what shipped" in q
-        or "what changed" in q
-        or "what was done" in q
-        or "coding session" in q
+        "improvement" in ql
+        or "improve" in ql
+        or "what shipped" in ql
+        or "what changed" in ql
+        or "what was done" in ql
+        or "coding session" in ql
     ):
         return False
-    if "workflow" in q or "ticket" in q or "redmine" in q:
+    if "workflow" in ql or "ticket" in ql or "redmine" in ql:
         return False
     return (
-        "last night" in q
-        or "overnight" in q
-        or "coding session" in q
-        or "lately" in q
-        or "recently" in q
-        or "improvement loop" in q
-        or "harness loop" in q
-        or "overnight harness" in q
-        or "each night" in q
-        or "every night" in q
-        or "nightly" in q
+        "last night" in ql
+        or "overnight" in ql
+        or "coding session" in ql
+        or "lately" in ql
+        or "recently" in ql
+        or "improvement loop" in ql
+        or "harness loop" in ql
+        or "overnight harness" in ql
+        or "each night" in ql
+        or "every night" in ql
+        or "nightly" in ql
     )
+
+
+def looks_like_how_solved_task(q: str) -> bool:
+    if "ticket" in q or "redmine" in q or "http" in q:
+        return False
+    asks = (
+        "how did you solve" in q
+        or "how did you fix" in q
+        or "how was this solved" in q
+        or "how was that solved" in q
+        or "how exactly was the last task" in q
+        or "how was the last task" in q
+        or ("last task" in q and "how" in q and ("done" in q or "solved" in q))
+    )
+    return asks and ("task" in q)
 
 
 def looks_like_thread_clarifier(q: str) -> bool:
@@ -229,18 +249,6 @@ def looks_like_greeting(q: str) -> bool:
         "ping",
         "pong",
     }
-
-
-def looks_like_how_solved_task(q: str) -> bool:
-    if "ticket" in q or "redmine" in q or "http" in q:
-        return False
-    asks = (
-        "how did you solve" in q
-        or "how did you fix" in q
-        or "how was this solved" in q
-        or "how was that solved" in q
-    )
-    return asks and "task" in q
 
 
 def looks_like_tonight_plan(q: str) -> bool:
