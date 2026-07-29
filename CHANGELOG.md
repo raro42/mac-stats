@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.297] - 2026-07-29
+
+### Changed
+- Discord voice notes: show typing while ffmpeg/Ollama transcription runs so the channel isn’t silent during the wait.
+
 ## [0.1.296] - 2026-07-29
 
 ### Changed

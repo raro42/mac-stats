@@ -3208,6 +3208,10 @@ impl EventHandler for Handler {
             content = DISCORD_IMAGE_ONLY_PROMPT.to_string();
         }
         // Discord voice notes: empty text + audio attachment — transcribe via local Ollama (gemma4).
+        if voice::message_has_voice_or_audio(&new_message) {
+            // Transcription can take several seconds; show typing so the channel isn't silent.
+            let _ = new_message.channel_id.broadcast_typing(&ctx).await;
+        }
         if let Some(augmented) =
             voice::maybe_augment_content_with_voice_transcript(&new_message, &content).await
         {
