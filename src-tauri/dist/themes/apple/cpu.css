@@ -888,61 +888,67 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 0;
+  padding: 8px 10px;
   margin-bottom: 8px;
   font-size: 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid var(--hairline);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .history-controls label {
-  color: var(--text-muted, rgba(128, 128, 128, 0.8));
-  font-weight: 500;
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0.9;
 }
 
 .time-range-dropdown {
-  background: rgba(139, 180, 232, 0.05);
-  border: 1px solid rgba(139, 180, 232, 0.3);
-  border-radius: 4px;
-  color: #8bb4e8;
-  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 5px 10px;
   font-size: 12px;
-  font-family: monospace;
+  font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .time-range-dropdown:hover {
-  background: rgba(139, 180, 232, 0.1);
-  border-color: rgba(139, 180, 232, 0.5);
+  background: rgba(255, 255, 255, 0.58);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, var(--hairline));
 }
 
 .time-range-dropdown:focus {
   outline: none;
-  background: rgba(139, 180, 232, 0.15);
-  border-color: rgba(139, 180, 232, 0.7);
-  box-shadow: 0 0 0 2px rgba(139, 180, 232, 0.1);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .time-range-dropdown option {
-  background: #1a1a1a;
-  color: #8bb4e8;
+  background: #fff;
+  color: var(--text);
 }
 
 /* History tooltip */
 .history-tooltip {
   position: fixed;
-  background: rgba(0, 0, 0, 0.95);
-  color: #8bb4e8;
+  background: rgba(28, 28, 30, 0.92);
+  color: rgba(255, 255, 255, 0.92);
   padding: 8px 12px;
-  border: 1px solid rgba(139, 180, 232, 0.5);
-  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
   font-size: 11px;
-  font-family: monospace;
+  font-family: inherit;
   pointer-events: none;
   z-index: 10000;
   display: none;
   white-space: pre;
   line-height: 1.4;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
 
 @media (max-width: 560px) {

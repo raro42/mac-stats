@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.303] - 2026-07-30
+
+### Changed
+- History controls: glass-styled time-range dropdown and tooltip (drops the old blue monospace look).
+
 ## [0.1.302] - 2026-07-30
 
 ### Changed
