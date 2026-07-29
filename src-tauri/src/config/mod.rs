@@ -639,6 +639,33 @@ impl Config {
         DEFAULT_MS
     }
 
+    /// Ollama model for Discord voice-message transcription (default `gemma4:latest`).
+    /// Config: `discordVoiceModel` / `discord_voice_model`; env `MAC_STATS_DISCORD_VOICE_MODEL`.
+    pub fn discord_voice_model() -> String {
+        const DEFAULT: &str = "gemma4:latest";
+        if let Ok(s) = std::env::var("MAC_STATS_DISCORD_VOICE_MODEL") {
+            let t = s.trim();
+            if !t.is_empty() {
+                return t.to_string();
+            }
+        }
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(m) = json
+                    .get("discordVoiceModel")
+                    .or_else(|| json.get("discord_voice_model"))
+                    .and_then(|v| v.as_str())
+                    .map(str::trim)
+                    .filter(|s| !s.is_empty())
+                {
+                    return m.to_string();
+                }
+            }
+        }
+        DEFAULT.to_string()
+    }
+
     /// Minimum milliseconds between Discord **draft** message edits while the agent router runs tools.
     /// Default 1500. Config: `discord_draft_throttle_ms`; override: env `MAC_STATS_DISCORD_DRAFT_THROTTLE_MS`.
     /// Clamped to 200..=60_000.

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.290] - 2026-07-29
+
+### Added
+- Discord voice notes: download Opus/OGG, convert with ffmpeg to 16 kHz WAV, transcribe via Ollama `/v1/audio/transcriptions` (default model `gemma4:latest`), then run the normal agent path. Override model with `discordVoiceModel` in `config.json` or env `MAC_STATS_DISCORD_VOICE_MODEL` (ffmpeg via `MAC_STATS_FFMPEG` if not on PATH).
+
 ## [0.1.289] - 2026-07-29
 
 ### Changed

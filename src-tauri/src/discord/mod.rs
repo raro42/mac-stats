@@ -17,6 +17,7 @@ pub use token::{get_discord_token, DISCORD_TOKEN_KEYCHAIN_ACCOUNT};
 use token::token_from_config_env_file;
 
 mod message_debounce;
+mod voice;
 
 use crate::circuit_breaker::CircuitBreaker;
 use base64::Engine;
@@ -3206,6 +3207,12 @@ impl EventHandler for Handler {
         if content.is_empty() && !attachment_images_base64.is_empty() {
             content = DISCORD_IMAGE_ONLY_PROMPT.to_string();
         }
+        // Discord voice notes: empty text + audio attachment — transcribe via local Ollama (gemma4).
+        if let Some(augmented) =
+            voice::maybe_augment_content_with_voice_transcript(&new_message, &content).await
+        {
+            content = augmented;
+        }
         if content.is_empty() {
             debug!("Discord: Ignoring empty message");
             return;
@@ -3216,7 +3223,10 @@ impl EventHandler for Handler {
                 return;
             }
         } else if !is_dm && !mentions_bot_effective && mode == ChannelMode::MentionOnly {
-            return;
+            // Native Discord voice notes usually have no @mention text; treat audio as addressing the bot.
+            if !voice::message_has_voice_or_audio(&new_message) {
+                return;
+            }
         }
 
         // having_fun channels: buffer the message and let the background loop respond — unless the user clearly wants tools (search, browser, screenshot, send here), then use full agent router.
