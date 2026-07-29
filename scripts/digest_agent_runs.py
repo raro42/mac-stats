@@ -215,6 +215,37 @@ def looks_like_flight_search(q: str) -> bool:
     return has_route or what_about
 
 
+def looks_like_vague_followup(q: str) -> bool:
+    n = (q or "").strip().lower().rstrip("?!.").strip()
+    if len(n) > 96:
+        return False
+    if any(x in n for x in ("http", "skill:", "cursor_agent:", "redmine", "brave_search", "perplexity")):
+        return False
+    if " about " in n:
+        return False
+    investigate = any(
+        x in n
+        for x in (
+            "investigate further",
+            "dig deeper",
+            "dig further",
+            "look further",
+            "look into it further",
+            "research further",
+        )
+    ) or n in ("further", "go further", "go deeper")
+    tailor = any(
+        x in n
+        for x in (
+            "tailor it to my interest",
+            "tailor it to my interests",
+            "tailor to my interest",
+            "make it more relevant to me",
+        )
+    ) or n in ("tailor it", "make it relevant")
+    return investigate or tailor
+
+
 def looks_like_research_using_perplexity(q: str) -> bool:
     n = (q or "").lower()
     return (
@@ -490,6 +521,7 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         or looks_like_thread_clarifier(q)
         or looks_like_google_serp_fetch(q)
         or looks_like_flight_search(q)
+        or looks_like_vague_followup(q)
     ):
         return True
     # Scheduled SKILL prompts are harness/scheduler work, not Discord UX latency.

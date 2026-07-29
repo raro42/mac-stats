@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.283] - 2026-07-29
+
+### Changed
+- Instant lane: vague follow-ups (“investigate further”, “tailor it to my interest”) ask for a target instead of a slow empty Ollama pass.
+
 ## [0.1.282] - 2026-07-29
 
 ### Changed

@@ -125,6 +125,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
             "Got it — staying with this thread's context.".to_string()
         });
     }
+    if is_vague_followup_clarifier(&n) {
+        return Some(format_vague_followup_clarifier_reply(&n));
+    }
     if let Some(slug) = extract_exact_saved_note_slug(&n) {
         return Some(crate::commands::curated_memory::instant_read_saved_note(&slug));
     }
@@ -870,6 +873,50 @@ fn is_thread_context_clarifier(n: &str) -> bool {
         && !n.contains(" please ")
 }
 
+/// Short vague follow-ups that need a target, not a 10s empty Ollama pass.
+fn is_vague_followup_clarifier(n: &str) -> bool {
+    if n.chars().count() > 96 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("redmine")
+        || n.contains("brave_search")
+        || n.contains("perplexity")
+    {
+        return false;
+    }
+    let investigate = n.contains("investigate further")
+        || n.contains("dig deeper")
+        || n.contains("dig further")
+        || n.contains("look further")
+        || n.contains("look into it further")
+        || n.contains("research further")
+        || n == "further"
+        || n == "go further"
+        || n == "go deeper";
+    let tailor = n.contains("tailor it to my interest")
+        || n.contains("tailor it to my interests")
+        || n.contains("tailor to my interest")
+        || n.contains("make it more relevant to me")
+        || n == "tailor it"
+        || n == "make it relevant";
+    (investigate || tailor)
+        && !n.contains(" about ")
+        && !n.contains("http")
+}
+
+fn format_vague_followup_clarifier_reply(n: &str) -> String {
+    if n.contains("tailor") || n.contains("relevant") {
+        "Sure — what should I tailor to? (e.g. AI/tech, markets/BTC, travel, or a specific topic.)"
+            .to_string()
+    } else {
+        "Happy to dig further — what should I investigate? (name, URL, or a short topic.)"
+            .to_string()
+    }
+}
+
 /// Short role/identity statements without a question (digester: multi-second direct, zero tools).
 fn is_identity_affirmation(n: &str) -> bool {
     if n.contains('?') || n.chars().count() > 180 {
@@ -1292,6 +1339,38 @@ commit+push, then reply briefly.";
                 TurnLane::Instant { .. }
             ),
             "taskful 'in this conversation…' must not be instant"
+        );
+    }
+
+    #[test]
+    fn vague_followup_clarifier_is_instant() {
+        for q in [
+            "Can't you investigate further?",
+            "Can you dig deeper?",
+            "Tailor it to my interest",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    let lower = reply.to_lowercase();
+                    assert!(
+                        lower.contains("investigate")
+                            || lower.contains("tailor")
+                            || lower.contains("dig"),
+                        "expected clarifier reply for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant for {q:?}, got {:?}", other),
+            }
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane(
+                    "Investigate further about Florian Fischer delivery hero problem",
+                    None
+                ),
+                TurnLane::Instant { .. }
+            ),
+            "investigate-about-<topic> must not be instant clarifier"
         );
     }
 
