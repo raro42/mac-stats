@@ -1354,60 +1354,62 @@ function populateProcessDetailsBody(body, details, pid) {
     const diskWrittenFormatted = formatBytes(details.disk_written);
     
     body.innerHTML = `
-      <div class="process-detail-row">
-        <span class="process-detail-label">Name</span>
-        <span class="process-detail-value">${details.name}</span>
+      <div class="process-detail-hero">
+        <div class="process-detail-name">${details.name}</div>
+        <div class="process-detail-pid">PID ${details.pid}</div>
       </div>
-      <div class="process-detail-row">
-        <span class="process-detail-label">PID</span>
-        <span class="process-detail-value">${details.pid}</span>
-      </div>
-      <div class="process-detail-row">
-        <span class="process-detail-label">Current CPU</span>
-        <span class="process-detail-value">${details.cpu.toFixed(1)}%</span>
-      </div>
-      <div class="process-detail-row">
-        <span class="process-detail-label">Total CPU Time</span>
-        <span class="process-detail-value">${cpuTimeFormatted}</span>
-      </div>
-      <div class="process-detail-row">
-        <span class="process-detail-label">Parent Process</span>
-        <span class="process-detail-value">${details.parent_name ? `${details.parent_name} (PID: ${details.parent_pid})` : "—"}</span>
-      </div>
-      <div class="process-detail-row">
-        <span class="process-detail-label">Started</span>
-        <span class="process-detail-value">${startDate}</span>
-      </div>
-      <div class="process-detail-row">
-        <span class="process-detail-label">User</span>
-        <span class="process-detail-value">${details.user_name ? `${details.user_name} (${details.user_id})` : (details.user_id || "—")}</span>
-      </div>
-      <div class="process-detail-row">
-        <span class="process-detail-label">Effective User</span>
-        <span class="process-detail-value">${details.effective_user_name ? `${details.effective_user_name} (${details.effective_user_id})` : (details.effective_user_id || "—")}</span>
-      </div>
-      <div class="process-detail-row-group">
+      <div class="process-detail-section">
         <div class="process-detail-row">
-          <span class="process-detail-label">Memory</span>
-          <span class="process-detail-value">${memoryFormatted}</span>
+          <span class="process-detail-label">Current CPU</span>
+          <span class="process-detail-value">${details.cpu.toFixed(1)}%</span>
         </div>
         <div class="process-detail-row">
-          <span class="process-detail-label">Virtual Memory</span>
-          <span class="process-detail-value">${virtualMemoryFormatted}</span>
+          <span class="process-detail-label">Total CPU Time</span>
+          <span class="process-detail-value">${cpuTimeFormatted}</span>
+        </div>
+        <div class="process-detail-row">
+          <span class="process-detail-label">Started</span>
+          <span class="process-detail-value">${startDate}</span>
         </div>
       </div>
-      <div class="process-detail-row-group">
+      <div class="process-detail-section">
         <div class="process-detail-row">
-          <span class="process-detail-label">Disk Read</span>
-          <span class="process-detail-value">${diskReadFormatted}</span>
+          <span class="process-detail-label">Parent Process</span>
+          <span class="process-detail-value">${details.parent_name ? `${details.parent_name} (PID: ${details.parent_pid})` : "—"}</span>
         </div>
         <div class="process-detail-row">
-          <span class="process-detail-label">Disk Written</span>
-          <span class="process-detail-value">${diskWrittenFormatted}</span>
+          <span class="process-detail-label">User</span>
+          <span class="process-detail-value">${details.user_name ? `${details.user_name} (${details.user_id})` : (details.user_id || "—")}</span>
+        </div>
+        <div class="process-detail-row">
+          <span class="process-detail-label">Effective User</span>
+          <span class="process-detail-value">${details.effective_user_name ? `${details.effective_user_name} (${details.effective_user_id})` : (details.effective_user_id || "—")}</span>
+        </div>
+      </div>
+      <div class="process-detail-section">
+        <div class="process-detail-row-group">
+          <div class="process-detail-row">
+            <span class="process-detail-label">Memory</span>
+            <span class="process-detail-value">${memoryFormatted}</span>
+          </div>
+          <div class="process-detail-row">
+            <span class="process-detail-label">Virtual Memory</span>
+            <span class="process-detail-value">${virtualMemoryFormatted}</span>
+          </div>
+        </div>
+        <div class="process-detail-row-group">
+          <div class="process-detail-row">
+            <span class="process-detail-label">Disk Read</span>
+            <span class="process-detail-value">${diskReadFormatted}</span>
+          </div>
+          <div class="process-detail-row">
+            <span class="process-detail-label">Disk Written</span>
+            <span class="process-detail-value">${diskWrittenFormatted}</span>
+          </div>
         </div>
       </div>
       <div class="force-quit-section">
-        <button id="force-quit-process-btn" class="force-quit-btn">Force Quit Process</button>
+        <button id="force-quit-process-btn" class="force-quit-btn" type="button">Force Quit Process</button>
       </div>
     `;
     
@@ -1485,10 +1487,13 @@ async function showProcessDetails(pid) {
       processDetailsModal.id = "process-details-modal";
       processDetailsModal.className = "settings-modal";
       processDetailsModal.style.display = "none";
+      processDetailsModal.setAttribute("role", "dialog");
+      processDetailsModal.setAttribute("aria-modal", "true");
+      processDetailsModal.setAttribute("aria-labelledby", "process-details-title");
       processDetailsModal.innerHTML = `
         <div class="settings-card">
           <div class="settings-header">
-            <h2>Process Details</h2>
+            <h2 id="process-details-title">Process Details</h2>
             <button id="close-process-details" class="icon-btn" aria-label="Close">×</button>
           </div>
           <div class="settings-body" id="process-details-body"></div>

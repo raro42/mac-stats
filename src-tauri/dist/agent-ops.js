@@ -1742,7 +1742,7 @@ function renderOpsRuns(insights) {
                 <div class="ops-insight-title">Insights</div>
                 <div class="ops-row-meta">${escapeHtml(gateway)}</div>
                 <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}</div>
-                <div class="ops-empty" style="padding:8px 0 0">No runs in ~/.mac-stats/runs.jsonl yet</div>
+                <div class="ops-empty ops-empty-compact">No runs in ~/.mac-stats/runs.jsonl yet</div>
             `;
         } else {
             el.innerHTML = '<div class="ops-empty">No runs in ~/.mac-stats/runs.jsonl yet</div>';

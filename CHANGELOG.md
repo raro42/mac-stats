@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.330] - 2026-07-30
+
+### Changed
+- Process details modal: hero name/PID plus glass sections for CPU, identity, and resources.
+
 ## [0.1.329] - 2026-07-30
 
 ### Changed
