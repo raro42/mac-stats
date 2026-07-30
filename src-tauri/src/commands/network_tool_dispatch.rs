@@ -185,6 +185,55 @@ pub(crate) async fn handle_brave_search(
     arg: &str,
     status_tx: Option<&tokio::sync::mpsc::UnboundedSender<String>>,
 ) -> String {
+    // Weather asks: never return Brave link-farm alone. Prefer Open-Meteo instant,
+    // else Perplexity (conditions prose) + Open-Meteo grounding.
+    if crate::commands::weather_grounding::looks_like_weather_query(arg) {
+        if crate::commands::weather_grounding::can_instant_weather(arg) {
+            if let Some(reply) =
+                crate::commands::weather_grounding::format_instant_weather_reply(arg).await
+            {
+                info!(
+                    "Discord/Ollama: BRAVE_SEARCH weather → Open-Meteo instant for \"{}\"",
+                    crate::logging::ellipse(arg, 60)
+                );
+                send_status(status_tx, "🌤 Checking live weather (Open-Meteo)…");
+                return format!(
+                    "BRAVE_SEARCH was requested for a weather query; answered with live Open-Meteo conditions instead (prefer these over web links).\n\n{reply}"
+                );
+            }
+        }
+        if crate::commands::perplexity::get_perplexity_api_key().is_some() {
+            info!(
+                "Discord/Ollama: BRAVE_SEARCH weather → PERPLEXITY_SEARCH for \"{}\"",
+                crate::logging::ellipse(arg, 60)
+            );
+            send_status(
+                status_tx,
+                &format!(
+                    "🔎 Weather search via Perplexity for \"{}\"…",
+                    crate::logging::ellipse(arg, 35)
+                ),
+            );
+            let result = crate::commands::perplexity_helpers::handle_perplexity_search(
+                arg,
+                arg,
+                status_tx,
+                "brave-weather-redirect",
+            )
+            .await;
+            let mut out = format!(
+                "BRAVE_SEARCH was requested for weather; used PERPLEXITY_SEARCH instead (better conditions prose than portal links).\n\n{}",
+                result.text
+            );
+            if let Some(ground) =
+                crate::commands::weather_grounding::open_meteo_grounding_block(arg).await
+            {
+                out = format!("{}\n\n{}", ground, out);
+            }
+            return out;
+        }
+    }
+
     send_status(
         status_tx,
         &format!(

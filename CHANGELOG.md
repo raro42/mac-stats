@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.321] - 2026-07-30
+
+### Fixed
+- When the model calls `BRAVE_SEARCH` for weather/climate, redirect to Open-Meteo (clear place) or Perplexity instead of portal link snippets.
+
 ## [0.1.320] - 2026-07-30
 
 ### Fixed
