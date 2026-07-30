@@ -624,6 +624,7 @@ textarea.ops-agent-editor.is-dirty {
   border-radius: 8px;
   padding: 6px 8px;
   margin: 0 -8px;
+  cursor: pointer;
   transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -636,6 +637,12 @@ textarea.ops-agent-editor.is-dirty {
 .process-row:focus-visible {
   outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
   outline-offset: 2px;
+}
+
+.process-row:active {
+  transform: translateY(0);
+  box-shadow: none;
+  background: color-mix(in srgb, currentColor 12%, transparent);
 }
 
 .process-name {

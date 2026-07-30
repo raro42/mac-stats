@@ -498,7 +498,13 @@ body {
   gap: 18px;
   align-items: center;
   padding: 4px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  border-bottom: none;
+}
+
+.process-row:active {
+  transform: translateY(0);
+  opacity: 0.92;
 }
 
 .process-name {
@@ -2069,6 +2075,18 @@ body {
   color: var(--text);
   border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
   background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
+}
+
+.monitors-empty.monitors-error {
+  color: #ff3b30;
+  border-color: color-mix(in srgb, #ff3b30 35%, transparent);
+  background: color-mix(in srgb, #ff3b30 8%, transparent);
+}
+
+.monitors-empty.monitors-error:hover {
+  color: #ff3b30;
+  border-color: color-mix(in srgb, #ff3b30 45%, transparent);
+  background: color-mix(in srgb, #ff3b30 12%, transparent);
 }
 
 .monitor-item {

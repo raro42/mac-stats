@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.326] - 2026-07-30
+
+### Changed
+- Process list rows drop hairline separators for glass hover/press; monitors load errors use a dashed error empty state.
+
 ## [0.1.325] - 2026-07-30
 
 ### Changed

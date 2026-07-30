@@ -732,7 +732,6 @@ async function refresh() {
           row.setAttribute("data-pid", String(proc.pid));
           row.setAttribute("role", "button");
           row.setAttribute("tabindex", "0");
-          row.style.cursor = "pointer";
           row.title = "Click for details";
           
           const name = document.createElement("div");
@@ -2134,7 +2133,7 @@ async function refreshMonitorsSettingsList() {
     }
   } catch (err) {
     console.error('Failed to refresh monitors list:', err);
-    settingsList.innerHTML = '<div style="padding: 20px; text-align: center; color: #ff3b30;">Error loading monitors</div>';
+    settingsList.innerHTML = '<div class="monitors-empty monitors-error" role="alert">Error loading monitors</div>';
   }
 }
 
