@@ -1153,13 +1153,20 @@ body {
 .changelog-loading,
 .changelog-error {
   text-align: center;
-  padding: 40px 20px;
+  padding: 28px 18px;
   color: var(--muted);
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.45;
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, currentColor 20%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  margin: 8px 0;
 }
 
 .changelog-error {
-  color: rgba(255, 59, 48, 0.8);
+  color: rgba(255, 59, 48, 0.85);
+  border-color: color-mix(in srgb, #ff3b30 35%, transparent);
+  background: color-mix(in srgb, #ff3b30 8%, transparent);
 }
 
 .changelog-h2 {

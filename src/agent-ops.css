@@ -288,6 +288,26 @@
   flex: 1;
 }
 
+.ops-loading {
+  margin: 2px 0;
+  padding: 12px 10px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: inherit;
+  opacity: 0.62;
+  border-radius: 8px;
+  border: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  animation: ops-loading-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes ops-loading-pulse {
+  0%, 100% { opacity: 0.48; }
+  50% { opacity: 0.78; }
+}
+
 .ops-overview-body .ops-row {
   padding: 6px 8px;
 }

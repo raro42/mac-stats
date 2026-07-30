@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.328] - 2026-07-30
+
+### Changed
+- Agent Ops overview loading placeholders use pulsing dashed glass; changelog loading/error match the same empty-state language.
+
 ## [0.1.327] - 2026-07-30
 
 ### Changed
