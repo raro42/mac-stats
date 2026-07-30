@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.333] - 2026-07-31
+
+### Changed
+- History charts labeled Temp/CPU/Freq; Force Quit confirm step pulses red for clearer two-click arming.
+
 ## [0.1.332] - 2026-07-31
 
 ### Changed

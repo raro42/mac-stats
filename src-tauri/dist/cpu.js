@@ -1456,10 +1456,12 @@ function populateProcessDetailsBody(body, details, pid) {
         // WKWebView: window.confirm()/alert() are unreliable — two-click confirm instead.
         if (newBtn.dataset.confirmArmed !== "1") {
           newBtn.dataset.confirmArmed = "1";
+          newBtn.classList.add("is-confirming");
           newBtn.textContent = "Click again to confirm Force Quit";
           setTimeout(() => {
             if (newBtn.dataset.confirmArmed === "1") {
               newBtn.dataset.confirmArmed = "0";
+              newBtn.classList.remove("is-confirming");
               newBtn.textContent = "Force Quit Process";
             }
           }, 4000);
@@ -1494,6 +1496,7 @@ function populateProcessDetailsBody(body, details, pid) {
         } catch (error) {
           console.error("Failed to force quit process:", error);
           newBtn.dataset.confirmArmed = "0";
+          newBtn.classList.remove("is-confirming");
           newBtn.textContent = "Force Quit Process";
         }
       });

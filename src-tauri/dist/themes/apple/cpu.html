@@ -83,13 +83,16 @@
             <option value="7d">Last 7 days</option>
           </select>
         </div>
-        <div class="history-chart-container">
+        <div class="history-chart-container" aria-label="Temperature history">
+          <span class="history-chart-caption">Temp</span>
           <canvas class="history-chart" id="temperature-history-chart" width="200" height="40"></canvas>
         </div>
-        <div class="history-chart-container">
+        <div class="history-chart-container" aria-label="CPU usage history">
+          <span class="history-chart-caption">CPU</span>
           <canvas class="history-chart" id="usage-history-chart" width="200" height="40"></canvas>
         </div>
-        <div class="history-chart-container">
+        <div class="history-chart-container" aria-label="Frequency history">
+          <span class="history-chart-caption">Freq</span>
           <canvas class="history-chart" id="frequency-history-chart" width="200" height="40"></canvas>
         </div>
       </section>
