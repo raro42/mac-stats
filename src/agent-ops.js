@@ -751,10 +751,19 @@ function wireOpsHealthCardNavigation() {
         const tab = tabByHealth[card.dataset.health];
         if (!tab) return;
         card.classList.add('ops-health-clickable');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button');
         card.title = card.title || `Open ${tab}`;
-        card.addEventListener('click', () => {
+        const openTab = () => {
             if (agentOpsCollapsed) applyOpsCollapsed(false);
             selectOpsTab(tab);
+        };
+        card.addEventListener('click', openTab);
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                openTab();
+            }
         });
     });
 }

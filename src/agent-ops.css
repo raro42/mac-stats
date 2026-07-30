@@ -126,6 +126,12 @@
   transform: translateY(-1px);
 }
 
+.ops-health-card.ops-health-clickable:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
+}
+
 .ops-health-card.ops-health-ok {
   border-color: rgba(76, 175, 80, 0.45);
 }
