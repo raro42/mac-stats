@@ -521,6 +521,13 @@ textarea.ops-agent-editor.is-dirty {
   border: 1px dashed color-mix(in srgb, currentColor 22%, transparent);
   background: color-mix(in srgb, currentColor 4%, transparent);
   text-align: center;
+  transition: opacity 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.ops-empty:hover {
+  opacity: 0.92;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
 }
 
 .ops-overview-body > .ops-empty {

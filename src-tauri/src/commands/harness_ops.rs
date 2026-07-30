@@ -1163,6 +1163,7 @@ pub fn looks_like_ops_help_request(content: &str) -> bool {
             | "/ops help"
             | "ops help"
             | "/help"
+            | "help"
             | "operator help"
             | "operator commands"
             | "bot commands"
@@ -1982,10 +1983,11 @@ mod tests {
         assert!(looks_like_ops_help_request("operator commands"));
         assert!(looks_like_ops_help_request("@Werner /ops"));
         assert!(looks_like_ops_help_request("/help"));
+        assert!(looks_like_ops_help_request("help"));
         assert!(looks_like_ops_help_request("what can you do"));
         assert!(looks_like_ops_help_request("command list"));
         assert!(!looks_like_ops_help_request("help me write a cron"));
-        assert!(!looks_like_ops_help_request("help"));
+        assert!(!looks_like_ops_help_request("help with weather"));
     }
 
     #[test]

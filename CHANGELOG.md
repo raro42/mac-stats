@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.315] - 2026-07-30
+
+### Changed
+- Discord: bare `help` opens the operator command menu (same as `/help`); Agent Ops empty states get a subtle accent hover.
+
 ## [0.1.314] - 2026-07-30
 
 ### Changed
