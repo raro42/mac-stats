@@ -268,9 +268,9 @@ fn extract_bare_hostname(q_lower: &str) -> Option<String> {
     None
 }
 
-/// Weather / "wether" questions.
+/// Weather / "wether" / climate questions.
 /// Clear place names skip pre-route so the agent router uses Open-Meteo instant (0 LLM).
-/// Ambiguous weather asks still pre-route to Brave/Perplexity (with Open-Meteo grounding).
+/// Ambiguous weather asks still pre-route to Perplexity (preferred) or Brave, with Open-Meteo grounding.
 fn try_pre_route_weather(question: &str) -> Option<String> {
     if !crate::commands::weather_grounding::looks_like_weather_query(question) {
         return None;
@@ -285,13 +285,7 @@ fn try_pre_route_weather(question: &str) -> Option<String> {
     let brave_ok = crate::commands::brave::get_brave_api_key().is_some();
     let perplexity_ok = crate::commands::perplexity::is_perplexity_configured().unwrap_or(false);
     let query = format!("weather {}", q);
-    if brave_ok {
-        info!(
-            "Agent router: pre-routed weather → BRAVE_SEARCH: {}",
-            crate::logging::ellipse(&query, 80)
-        );
-        return Some(format!("BRAVE_SEARCH: {query}"));
-    }
+    // Prefer Perplexity for weather: answers with conditions, not bare forecast-portal links.
     if perplexity_ok {
         info!(
             "Agent router: pre-routed weather → PERPLEXITY_SEARCH: {}",
@@ -299,7 +293,14 @@ fn try_pre_route_weather(question: &str) -> Option<String> {
         );
         return Some(format!("PERPLEXITY_SEARCH: {query}"));
     }
-    Some(format!("BRAVE_SEARCH: {query}"))
+    if brave_ok {
+        info!(
+            "Agent router: pre-routed weather → BRAVE_SEARCH: {}",
+            crate::logging::ellipse(&query, 80)
+        );
+        return Some(format!("BRAVE_SEARCH: {query}"));
+    }
+    Some(format!("PERPLEXITY_SEARCH: {query}"))
 }
 
 /// "search for <query>" / "google <query>" / "BRAVE_SEARCH: <query>" → web search tool.

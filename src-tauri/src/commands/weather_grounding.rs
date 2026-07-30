@@ -6,21 +6,24 @@ use tracing::info;
 /// True when the search query / user question is about current weather / forecast.
 pub(crate) fn looks_like_weather_query(q: &str) -> bool {
     let n = normalize_weather_text(q).to_lowercase();
-    // include common typo "wether"
+    // include common typo "wether"; "climate"/"clima" often mean today's conditions (voice STT).
     n.contains("weather")
         || n.contains("wether")
+        || n.contains("climate")
+        || n.contains("clima")
         || n.contains("forecast")
         || n.contains("temperature")
+        || n.contains("temperatura")
         || n.contains("humidit")
-        || ((n.contains("rain") || n.contains("wind") || n.contains("cloudy"))
-            && (n.contains("today") || n.contains("now") || n.contains("current")))
+        || ((n.contains("rain") || n.contains("wind") || n.contains("cloudy") || n.contains("lluvia"))
+            && (n.contains("today") || n.contains("now") || n.contains("current") || n.contains("hoy")))
 }
 
 /// Extract a place name from a weather question/query.
 pub(crate) fn extract_place(q: &str) -> Option<String> {
     let q = normalize_weather_text(q);
     let lower = q.to_lowercase();
-    for sep in [" in ", " for ", " at "] {
+    for sep in [" in ", " for ", " at ", " en "] {
         if let Some(idx) = lower.find(sep) {
             let rest = q[idx + sep.len()..].trim();
             // "temperature at noon" / "rain at midnight" — not a place.
@@ -48,6 +51,8 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
                         | "and"
                         | "weather"
                         | "wether"
+                        | "climate"
+                        | "clima"
                         | "forecast"
                         | "date"
                         | "time"
@@ -64,7 +69,7 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
             }
             let place = tokens.join(" ").trim().to_string();
             if place.chars().count() >= 2 && !looks_like_place_garbage(&place) {
-                return Some(place);
+                return Some(canonicalize_known_place(&place));
             }
         }
     }
@@ -73,8 +78,11 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
         .replace("weather forecast", "")
         .replace("weather", "")
         .replace("wether", "")
+        .replace("climate", "")
+        .replace("clima", "")
         .replace("forecast", "")
         .replace("temperature", "")
+        .replace("temperatura", "")
         .replace("like", "")
         .replace("what's the", "")
         .replace("whats the", "")
@@ -83,7 +91,8 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
         .replace("hows the", "")
         .replace("how is the", "")
         .replace("right now", "")
-        .replace("today", "");
+        .replace("today", "")
+        .replace("hoy", "");
     let place = stripped
         .split_whitespace()
         .filter(|t| {
@@ -95,6 +104,7 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
                     | "in"
                     | "for"
                     | "at"
+                    | "en"
                     | "spain"
                     | "how"
                     | "how's"
@@ -111,11 +121,29 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
         .join(" ");
     if place.chars().count() >= 2 && !looks_like_place_garbage(&place) {
         if let Some(pos) = lower.find(&place) {
-            return Some(q[pos..pos + place.len()].trim().to_string());
+            return Some(canonicalize_known_place(q[pos..pos + place.len()].trim()));
         }
-        return Some(place);
+        return Some(canonicalize_known_place(&place));
     }
     None
+}
+
+/// Fix common voice-STT / typo place names so Open-Meteo geocoding succeeds.
+fn canonicalize_known_place(place: &str) -> String {
+    let n = place
+        .to_lowercase()
+        .replace(['\'', '`', '\u{2018}', '\u{2019}'], "");
+    let compact: String = n.chars().filter(|c| !c.is_whitespace()).collect();
+    if compact == "lmasnou"
+        || compact == "elmasnou"
+        || compact == "elmasnau"
+        || compact == "masnou"
+        || n == "l masnou"
+        || n == "el masnau"
+    {
+        return "El Masnou".to_string();
+    }
+    place.trim().to_string()
 }
 
 fn looks_like_place_garbage(place: &str) -> bool {
@@ -283,19 +311,26 @@ fn should_use_default_weather_place(q: &str) -> bool {
     // "how's the weather", "weather today", "is it raining", "temperature at noon", etc.
     let local = n.contains("today")
         || n.contains("tonight")
+        || n.contains("hoy")
         || n.contains("right now")
         || n.contains(" outside")
         || n.contains(" here")
         || n.contains("current")
         || n.contains("temperature")
+        || n.contains("temperatura")
         || n.contains("weather")
         || n.contains("wether")
+        || n.contains("climate")
+        || n.contains("clima")
         || n.contains("forecast")
         || n.starts_with("how")
         || n == "weather"
         || n == "wether"
+        || n == "climate"
+        || n == "clima"
         || n.starts_with("weather?")
-        || n.starts_with("wether?");
+        || n.starts_with("wether?")
+        || n.starts_with("climate?");
     local && looks_like_weather_query(q)
 }
 
@@ -555,6 +590,20 @@ mod tests {
         assert!(looks_like_weather_query(
             "What´s the wether like in El Masnou right now?"
         ));
+    }
+
+    #[test]
+    fn detects_climate_and_stt_place() {
+        let q = "What is the climate today in L Masnou?";
+        assert!(looks_like_weather_query(q));
+        let p = extract_place(q).unwrap();
+        assert_eq!(p, "El Masnou");
+        assert!(can_instant_weather(q));
+        assert!(looks_like_weather_query("clima hoy en L'Masnou"));
+        assert_eq!(
+            extract_place("clima hoy en L'Masnou").unwrap(),
+            "El Masnou"
+        );
     }
 
     #[test]
