@@ -2079,7 +2079,7 @@ async function refreshMonitorsSettingsList() {
     const monitorIds = await invoke('list_monitors');
     
     if (monitorIds.length === 0) {
-      settingsList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--muted);">No monitors configured</div>';
+      settingsList.innerHTML = '<div class="monitors-empty">No monitors configured</div>';
       return;
     }
     

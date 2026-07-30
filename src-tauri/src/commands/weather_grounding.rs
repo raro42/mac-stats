@@ -480,9 +480,12 @@ pub(crate) async fn format_instant_weather_reply(query: &str) -> Option<String> 
         .timeout(std::time::Duration::from_secs(12))
         .build()
         .ok()?;
+    let es = looks_like_spanish_or_catalan_weather(query);
+    let geo_lang = if es { "es" } else { "en" };
     let geo_url = format!(
-        "https://geocoding-api.open-meteo.com/v1/search?name={}&count=1&language=en&format=json",
-        urlencoding_encode(&place)
+        "https://geocoding-api.open-meteo.com/v1/search?name={}&count=1&language={}&format=json",
+        urlencoding_encode(&place),
+        geo_lang
     );
     let geo_text = client.get(&geo_url).send().await.ok()?.text().await.ok()?;
     let geo: Value = serde_json::from_str(&geo_text).ok()?;
@@ -540,7 +543,6 @@ pub(crate) async fn format_instant_weather_reply(query: &str) -> Option<String> 
             format!(", {}", country)
         }
     );
-    let es = looks_like_spanish_or_catalan_weather(query);
     let desc_s = if es {
         weather_code_label_es(code.unwrap_or(-1))
     } else {

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.325] - 2026-07-30
+
+### Changed
+- Open-Meteo geocoding uses Spanish locale for clima/klima asks; monitors settings empty state uses dashed glass placeholder.
+
 ## [0.1.324] - 2026-07-30
 
 ### Changed
