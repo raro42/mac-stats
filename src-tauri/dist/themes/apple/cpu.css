@@ -871,6 +871,11 @@ body {
   border-color: rgba(255, 59, 48, 0.4);
 }
 
+.force-quit-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, rgba(255, 59, 48, 0.9) 70%, transparent);
+  outline-offset: 2px;
+}
+
 .force-quit-btn:active {
   background: rgba(255, 59, 48, 0.2);
 }

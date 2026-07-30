@@ -90,6 +90,8 @@ pub fn looks_like_stop_request(content: &str) -> bool {
         .trim_start_matches(',')
         .trim()
         .trim_start_matches("please")
+        .trim()
+        .trim_end_matches('?')
         .trim();
     matches!(
         n,
@@ -106,10 +108,22 @@ pub fn looks_like_stop_request(content: &str) -> bool {
             | "abort that"
             | "stop please"
             | "cancel please"
+            | "interrupt"
+            | "interrupt that"
+            | "interrupt it"
+            | "stop the run"
+            | "cancel the run"
+            | "abort the run"
+            | "stop running"
+            | "kill the run"
+            | "cut it out"
+            | "that's enough"
+            | "thats enough"
     ) || (n.chars().count() <= 24
         && (n.starts_with("stop ")
             || n.starts_with("cancel ")
             || n.starts_with("abort ")
+            || n.starts_with("interrupt ")
             || n == "s top"))
 }
 
@@ -122,6 +136,9 @@ mod tests {
         assert!(looks_like_stop_request("stop"));
         assert!(looks_like_stop_request("Cancel that"));
         assert!(looks_like_stop_request("@Werner stop"));
+        assert!(looks_like_stop_request("interrupt"));
+        assert!(looks_like_stop_request("stop the run"));
+        assert!(looks_like_stop_request("that's enough"));
         assert!(!looks_like_stop_request("stop the redmine ticket and summarize"));
     }
 

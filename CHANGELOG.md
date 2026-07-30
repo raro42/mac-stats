@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.312] - 2026-07-30
+
+### Changed
+- Discord interrupt: recognize `interrupt`, `stop the run`, `that's enough` (and similar) without an Ollama round-trip; Force Quit button focus ring.
+
 ## [0.1.311] - 2026-07-30
 
 ### Changed
