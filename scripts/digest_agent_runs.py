@@ -28,6 +28,8 @@ import time
 SHIPPED_INSTANT_VERSION = datetime(2026, 7, 25, 21, 15, tzinfo=timezone.utc)
 SHIPPED_INSTANT_TIME = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
 SHIPPED_INSTANT_WEATHER = datetime(2026, 7, 20, 21, 0, tzinfo=timezone.utc)
+# v0.1.319–320 — climate/clima/klima voice asks → Open-Meteo (was Brave link-farm).
+SHIPPED_CLIMATE_WEATHER = datetime(2026, 7, 30, 8, 0, tzinfo=timezone.utc)
 SHIPPED_GREETING = datetime(2026, 7, 20, 14, 0, tzinfo=timezone.utc)
 SHIPPED_INSTANT_WAKEUP = datetime(2026, 7, 21, 4, 30, tzinfo=timezone.utc)
 # v0.1.133 — scheduled SKILL tasks no longer instant-refused for commit/push.
@@ -836,6 +838,14 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
             "BRAVE" in str(t).upper() or "PERPLEXITY" in str(t).upper() for t in tools
         ):
             return True
+    # Pre-climate/clima Open-Meteo (v0.1.319+) — Brave link-farm turns.
+    if ts is not None and ts < SHIPPED_CLIMATE_WEATHER and (
+        "climate" in q or "clima" in q or "klima" in q or "masnou" in q
+    ):
+        if any(
+            "BRAVE" in str(t).upper() or "PERPLEXITY" in str(t).upper() for t in tools
+        ) or (not tools and tool_steps == 0):
+            return True
     # Pre-home-config Redmine LaunchAgent misses.
     if (
         ts is not None
@@ -1270,7 +1280,13 @@ def main() -> int:
             wall >= 15_000
             and lane == "direct"
             and tools
-            and ("weather" in q or "wether" in q)
+            and (
+                "weather" in q
+                or "wether" in q
+                or "climate" in q
+                or "clima" in q
+                or "klima" in q
+            )
             and any("BRAVE" in str(t).upper() or "PERPLEXITY" in str(t).upper() for t in tools)
         ):
             hint = "Weather via search — prefer Open-Meteo INSTANT when place is clear"

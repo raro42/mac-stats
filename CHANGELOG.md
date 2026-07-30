@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.320] - 2026-07-30
+
+### Fixed
+- Weather: Catalan `klima` and garbled STT like “ke klima en elmasnau eu” → Open-Meteo for El Masnou; digester/insights ignore pre-fix climate Brave noise.
+
 ## [0.1.319] - 2026-07-30
 
 ### Fixed

@@ -6,11 +6,12 @@ use tracing::info;
 /// True when the search query / user question is about current weather / forecast.
 pub(crate) fn looks_like_weather_query(q: &str) -> bool {
     let n = normalize_weather_text(q).to_lowercase();
-    // include common typo "wether"; "climate"/"clima" often mean today's conditions (voice STT).
+    // include common typo "wether"; "climate"/"clima"/"klima" often mean today's conditions (voice STT).
     n.contains("weather")
         || n.contains("wether")
         || n.contains("climate")
         || n.contains("clima")
+        || n.contains("klima")
         || n.contains("forecast")
         || n.contains("temperature")
         || n.contains("temperatura")
@@ -53,6 +54,7 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
                         | "wether"
                         | "climate"
                         | "clima"
+                        | "klima"
                         | "forecast"
                         | "date"
                         | "time"
@@ -80,6 +82,7 @@ pub(crate) fn extract_place(q: &str) -> Option<String> {
         .replace("wether", "")
         .replace("climate", "")
         .replace("clima", "")
+        .replace("klima", "")
         .replace("forecast", "")
         .replace("temperature", "")
         .replace("temperatura", "")
@@ -142,6 +145,13 @@ fn canonicalize_known_place(place: &str) -> String {
         || n == "el masnau"
     {
         return "El Masnou".to_string();
+    }
+    // STT often appends junk after the place ("elmasnau eu", "l masnou please").
+    for tok in n.split_whitespace() {
+        let c: String = tok.chars().filter(|ch| ch.is_alphanumeric()).collect();
+        if c == "lmasnou" || c == "elmasnou" || c == "elmasnau" || c == "masnou" {
+            return "El Masnou".to_string();
+        }
     }
     place.trim().to_string()
 }
@@ -322,12 +332,14 @@ fn should_use_default_weather_place(q: &str) -> bool {
         || n.contains("wether")
         || n.contains("climate")
         || n.contains("clima")
+        || n.contains("klima")
         || n.contains("forecast")
         || n.starts_with("how")
         || n == "weather"
         || n == "wether"
         || n == "climate"
         || n == "clima"
+        || n == "klima"
         || n.starts_with("weather?")
         || n.starts_with("wether?")
         || n.starts_with("climate?");
@@ -604,6 +616,10 @@ mod tests {
             extract_place("clima hoy en L'Masnou").unwrap(),
             "El Masnou"
         );
+        let garb = "ke klima en elmasnau eu";
+        assert!(looks_like_weather_query(garb));
+        assert_eq!(extract_place(garb).unwrap(), "El Masnou");
+        assert!(can_instant_weather(garb));
     }
 
     #[test]

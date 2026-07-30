@@ -1206,8 +1206,12 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         let u = t.to_uppercase();
         u.contains("BRAVE") || u.contains("PERPLEXITY")
     });
-    // Pre-Open-Meteo weather that burned Brave/Perplexity.
-    if (q.contains("weather") || q.contains("wether")) && has_search_tool {
+    // Pre-Open-Meteo weather that burned Brave/Perplexity (incl. climate/clima/klima voice STT).
+    if q.contains("climate") || q.contains("clima") || q.contains("klima") {
+        return true;
+    }
+    if (q.contains("weather") || q.contains("wether") || q.contains("masnou")) && has_search_tool
+    {
         return true;
     }
     // Pre-ship over-tooled turns that are now instant (may still list tools).
@@ -1894,6 +1898,18 @@ mod tests {
             10_000,
             &["TASK_LIST".into()],
             "What's planned for this night?"
+        ));
+        assert!(is_insights_slowest_noise(
+            "direct",
+            21_000,
+            &["BRAVE_SEARCH".into()],
+            "What is the climate today in L Masnou?"
+        ));
+        assert!(is_insights_slowest_noise(
+            "lite",
+            8_000,
+            &[],
+            "ke klima en elmasnau eu"
         ));
         assert!(!is_insights_slowest_noise(
             "direct",
