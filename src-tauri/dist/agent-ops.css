@@ -237,6 +237,11 @@
   transform: translateY(-1px);
 }
 
+.ops-overview-card:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+}
+
 .ops-overview-head {
   display: flex;
   align-items: center;

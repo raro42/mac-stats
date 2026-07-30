@@ -2065,6 +2065,7 @@ pub(super) async fn run_discord_ollama_router(
 
     // Hermes `/insights` — cheap runs.jsonl report, no Ollama.
     if crate::commands::harness_ops::looks_like_insights_request(&content) {
+        let _ = new_message.channel_id.broadcast_typing(&ctx).await;
         let days = crate::commands::harness_ops::parse_insights_days(&content);
         let report = crate::commands::harness_ops::format_runs_insights_gateway(
             &crate::commands::harness_ops::compute_runs_insights_for(80, days),
@@ -2104,6 +2105,7 @@ pub(super) async fn run_discord_ollama_router(
 
     // Operator: scrub polluted memory lines (same as periodic compaction hygiene).
     if crate::commands::harness_ops::looks_like_memory_scrub_request(&content) {
+        let _ = new_message.channel_id.broadcast_typing(&ctx).await;
         let (files, removed) =
             crate::commands::session_search::scrub_polluted_memory_files();
         let reply = if removed == 0 {
@@ -2122,6 +2124,7 @@ pub(super) async fn run_discord_ollama_router(
 
     // Operator: refresh digester (latest.md / latest.json) without Ollama.
     if crate::commands::harness_ops::looks_like_digest_request(&content) {
+        let _ = new_message.channel_id.broadcast_typing(&ctx).await;
         let line = tokio::task::spawn_blocking(crate::commands::harness_ops::refresh_agent_digest)
             .await
             .unwrap_or_else(|e| format!("Digest refresh join error: {}", e));
