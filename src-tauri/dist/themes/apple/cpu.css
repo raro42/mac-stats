@@ -2522,6 +2522,33 @@ body {
   border: 1px solid var(--hairline);
   border-radius: 8px;
   font-size: 13px;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chat-messages:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, var(--hairline));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+}
+
+.chat-empty {
+  margin: 2px 0;
+  padding: 16px 14px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+  opacity: 0.9;
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, currentColor 22%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  text-align: center;
+  transition: opacity 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.chat-empty:hover {
+  opacity: 1;
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
 }
 
 .chat-message {
