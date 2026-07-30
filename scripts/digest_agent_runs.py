@@ -1033,6 +1033,12 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
             or "instant" in hl
         ):
             return True
+    # Pre-climate/clima Open-Meteo (v0.1.319+).
+    if ts < SHIPPED_CLIMATE_WEATHER and (
+        "climate" in ql or "clima" in ql or "klima" in ql or "masnou" in ql
+    ):
+        if "open-meteo" in hl or "weather via search" in hl or "brave" in hl or "instant" in hl:
+            return True
     if "version" in ql and "instant version" in hl and ts < SHIPPED_INSTANT_VERSION:
         return True
     if ts < SHIPPED_INSTANT_THREAD_CLARIFIER and (
