@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.309] - 2026-07-30
+
+### Changed
+- Discord: Hermes-style `/help` and “what can you do” / “command list” open the operator menu.
+- Monitors list: glass hover on rows; collapse button keyboard focus ring.
+
 ## [0.1.308] - 2026-07-30
 
 ### Changed

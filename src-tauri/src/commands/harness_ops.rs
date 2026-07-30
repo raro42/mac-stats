@@ -1149,20 +1149,31 @@ pub fn format_status_gateway() -> String {
     lines.join("\n")
 }
 
-/// True for `/ops` / operator command list — not free-form “help me with …”.
+/// True for `/ops` / `/help` operator command list — not free-form “help me with …”.
 pub fn looks_like_ops_help_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
+    // Free-form help (“help me write…”) stays with the agent.
+    if n.starts_with("help me") || n.starts_with("help with") || n.contains(" write ") {
+        return false;
+    }
     matches!(
         n.as_str(),
         "/ops"
             | "ops"
             | "/ops help"
             | "ops help"
+            | "/help"
             | "operator help"
             | "operator commands"
             | "bot commands"
             | "/commands"
             | "commands"
+            | "command list"
+            | "list commands"
+            | "command menu"
+            | "what commands"
+            | "what can you do"
+            | "available commands"
     )
 }
 
@@ -1177,7 +1188,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` — interrupt an in-flight run\n\
-• `/ops` — this menu\n\
+• `/ops` · `/help` — this menu\n\
 \n\
 **Scheduled:** wake-up 06:00 · CHANGELOG hygiene Mondays 10:00 · UI review Wednesdays 11:00 (`docs/041_ui_command_center.md`)"
     )
@@ -1970,6 +1981,9 @@ mod tests {
         assert!(looks_like_ops_help_request("ops"));
         assert!(looks_like_ops_help_request("operator commands"));
         assert!(looks_like_ops_help_request("@Werner /ops"));
+        assert!(looks_like_ops_help_request("/help"));
+        assert!(looks_like_ops_help_request("what can you do"));
+        assert!(looks_like_ops_help_request("command list"));
         assert!(!looks_like_ops_help_request("help me write a cron"));
         assert!(!looks_like_ops_help_request("help"));
     }
@@ -1980,6 +1994,7 @@ mod tests {
         assert!(report.contains("/status"), "{report}");
         assert!(report.contains("/schedules"), "{report}");
         assert!(report.contains("/digest"), "{report}");
+        assert!(report.contains("/help"), "{report}");
     }
 
     #[test]

@@ -1515,6 +1515,12 @@ body {
   color: var(--text);
 }
 
+.collapse-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
+  color: var(--text);
+}
+
 .section-content-collapsible {
   margin-top: 12px;
   /* Reserve space to prevent layout shifts - will be set dynamically based on monitor count */
@@ -1998,6 +2004,15 @@ body {
   padding: 10px 12px;
   margin-bottom: 8px;
   font-size: 13px;
+  transition: background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.monitor-item:hover {
+  background: rgba(255, 255, 255, 0.42);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 14%, var(--hairline));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .monitor-item-header {
