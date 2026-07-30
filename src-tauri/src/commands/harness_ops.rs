@@ -1004,6 +1004,11 @@ fn normalize_operator_command(content: &str) -> String {
 /// True for Hermes-style `/schedules` / `/cron list` — cheap, no Ollama.
 pub fn looks_like_schedules_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
+    // Free-form “schedule a task…” stays with the agent.
+    if n.starts_with("schedule a") || n.starts_with("schedule me") || n.contains(" for tomorrow")
+    {
+        return false;
+    }
     matches!(
         n.as_str(),
         "schedules"
@@ -1014,12 +1019,42 @@ pub fn looks_like_schedules_request(content: &str) -> bool {
             | "what's scheduled"
             | "whats scheduled"
             | "what is scheduled"
+            | "upcoming schedules"
+            | "upcoming jobs"
+            | "scheduled jobs"
+            | "list scheduled"
+            | "list scheduled jobs"
+            | "my cron"
+            | "my cron jobs"
+            | "cron jobs"
             | "/cron"
             | "cron"
             | "/cron list"
             | "cron list"
             | "list cron"
             | "show cron"
+    )
+}
+
+/// True for short `scrub memory` / `/scrub-memory` operator asks.
+pub fn looks_like_memory_scrub_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 40 {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "scrub memory"
+            | "scrub memories"
+            | "/scrub-memory"
+            | "memory scrub"
+            | "clean memory"
+            | "clean memories"
+            | "clean up memory"
+            | "purge memory"
+            | "purge memories"
+            | "remove polluted memory"
+            | "scrub polluted memory"
     )
 }
 
@@ -1901,7 +1936,20 @@ mod tests {
         assert!(looks_like_schedules_request("/cron list"));
         assert!(looks_like_schedules_request("list schedules"));
         assert!(looks_like_schedules_request("@Werner schedules"));
+        assert!(looks_like_schedules_request("upcoming jobs"));
+        assert!(looks_like_schedules_request("my cron jobs"));
         assert!(!looks_like_schedules_request("schedule a task for tomorrow"));
+    }
+
+    #[test]
+    fn memory_scrub_request_detected() {
+        assert!(looks_like_memory_scrub_request("scrub memory"));
+        assert!(looks_like_memory_scrub_request("clean up memory"));
+        assert!(looks_like_memory_scrub_request("purge memory"));
+        assert!(looks_like_memory_scrub_request("@Werner please scrub memory"));
+        assert!(!looks_like_memory_scrub_request(
+            "scrub memory and then rewrite my soul.md with a full biography"
+        ));
     }
 
     #[test]
