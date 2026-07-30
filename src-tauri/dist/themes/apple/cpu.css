@@ -1744,6 +1744,12 @@ body {
   color: var(--text);
 }
 
+.monitors-menu-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
+  color: var(--text);
+}
+
 .monitors-menu {
   position: fixed;
   background: var(--panel);
@@ -1771,6 +1777,12 @@ body {
 }
 
 .monitors-menu-item:hover {
+  background: var(--hairline);
+}
+
+.monitors-menu-item:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: -2px;
   background: var(--hairline);
 }
 
@@ -1835,6 +1847,12 @@ body {
 
 .monitors-settings-popover .popover-close:hover {
   background: var(--hairline);
+  color: var(--text);
+}
+
+.monitors-settings-popover .popover-close:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
   color: var(--text);
 }
 
@@ -1985,6 +2003,12 @@ body {
 .add-btn-small:hover {
   background: rgba(255, 255, 255, 0.4);
   border-color: rgba(12, 12, 16, 0.1);
+  color: var(--text);
+}
+
+.add-btn-small:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
   color: var(--text);
 }
 

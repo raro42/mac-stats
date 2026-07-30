@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.310] - 2026-07-30
+
+### Changed
+- Monitors chrome: focus rings on ⋯ menu, menu items, add button, and settings close.
+
 ## [0.1.309] - 2026-07-30
 
 ### Changed
