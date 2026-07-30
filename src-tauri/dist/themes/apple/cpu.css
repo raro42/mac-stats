@@ -2855,12 +2855,13 @@ body {
 
 /* Response time label */
 .response-time {
-  font-size: 7px;
+  font-size: 10px;
   color: var(--muted);
-  margin-bottom: 4px;
-  font-weight: 400;
-  letter-spacing: 0.3px;
-  opacity: 0.6;
+  margin-bottom: 5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.72;
+  font-variant-numeric: tabular-nums;
 }
 
 .chat-input-container {

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.332] - 2026-07-31
+
+### Changed
+- Process details dialog semantics on all themes; AI chat response-time label more readable.
+
 ## [0.1.331] - 2026-07-31
 
 ### Changed
