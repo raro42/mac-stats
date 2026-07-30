@@ -2726,14 +2726,24 @@ function initOllamaSection() {
 
   // Connection indicator click handler (only when not connected)
   if (connectionIndicator) {
-    connectionIndicator.addEventListener('click', (e) => {
-      e.stopPropagation();
+    const openUrlDialog = () => {
       if (!connectionIndicator.classList.contains('connected')) {
         if (window.Ollama) {
           window.Ollama.showUrlDialog();
         } else {
           showOllamaUrlDialog(); // Fallback
         }
+      }
+    };
+    connectionIndicator.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openUrlDialog();
+    });
+    connectionIndicator.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        e.stopPropagation();
+        openUrlDialog();
       }
     });
   }
@@ -2743,6 +2753,13 @@ function initOllamaSection() {
     modelText.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleModelDropdown();
+    });
+    modelText.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleModelDropdown();
+      }
     });
   }
 

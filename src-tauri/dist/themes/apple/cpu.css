@@ -2399,6 +2399,11 @@ body {
   transform: scale(1.1);
 }
 
+.connection-indicator:focus-visible:not(.connected) {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 3px;
+}
+
 .model-text {
   font-size: 12px;
   color: var(--muted);
@@ -2416,6 +2421,12 @@ body {
 .model-text:hover {
   color: var(--text);
   background: var(--hairline);
+}
+
+.model-text:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
+  color: var(--text);
 }
 
 .model-select-dropdown {

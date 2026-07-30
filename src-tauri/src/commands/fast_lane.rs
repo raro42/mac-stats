@@ -590,8 +590,9 @@ fn is_capabilities_ask(n: &str) -> bool {
 fn format_instant_capabilities_reply() -> String {
     format!(
         "I'm **Werner** (mac-stats v{}). I can check weather, search the web, work Redmine tickets, \
-browse/screenshots, run allowlisted commands/skills, search past sessions, and help from Discord or the dashboard. \
-Ask a concrete task — or open **Agent Ops** for schedules/runs.",
+browse/screenshots, run allowlisted commands/skills, search past sessions, and transcribe Discord voice notes. \
+Ask a concrete task — or open **Agent Ops** for schedules/runs. On Discord, `/help` lists instant operator commands \
+(status, insights, schedules, digest, scrub, interrupt).",
         crate::config::Config::version()
     )
 }
@@ -1964,6 +1965,10 @@ commit+push, then reply briefly.";
                     assert!(
                         lower.contains("werner") || lower.contains("mac-stats"),
                         "expected capabilities blurb for {q:?}: {reply}"
+                    );
+                    assert!(
+                        lower.contains("/help") || lower.contains("voice"),
+                        "expected /help or voice mention for {q:?}: {reply}"
                     );
                 }
                 other => panic!("expected Instant for {q:?}, got {:?}", other),
