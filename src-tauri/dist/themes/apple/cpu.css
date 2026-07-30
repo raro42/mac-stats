@@ -536,9 +536,22 @@ body {
 }
 
 .process-empty {
-  padding: 1rem;
+  margin: 4px 0 2px;
+  padding: 14px 12px;
   text-align: center;
   color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, currentColor 22%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  transition: opacity 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.process-empty:hover {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
+  color: var(--text);
 }
 
 .settings-modal {
@@ -2484,6 +2497,12 @@ body {
   outline: none;
   border-color: rgba(0, 122, 255, 0.3);
   background: rgba(255, 255, 255, 0.7);
+}
+
+.model-select:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, var(--hairline));
 }
 
 .model-select:hover {

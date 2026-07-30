@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.322] - 2026-07-30
+
+### Changed
+- Process list empty state uses the same dashed glass placeholder as Agent Ops; Ollama model `<select>` gets a keyboard focus ring.
+
 ## [0.1.321] - 2026-07-30
 
 ### Fixed
