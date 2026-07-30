@@ -758,10 +758,7 @@ async function executeCodeAndContinue(response, originalQuestion, systemPrompt, 
         // Show both intermediate and final when we have both (so user can see if intermediate was correct)
         const intermediate = (response.intermediate_response || '').trim();
         const finalText = (continueResponse.final_answer || '').trim();
-        const displayText = intermediate
-          ? `--- Intermediate answer ---\n\n${intermediate}\n\n--- Final answer ---\n\n${finalText}`
-          : finalText;
-        addChatMessage('assistant', displayText);
+        const displayText = addIntermediateFinalAnswers(intermediate, finalText);
         addToHistory('assistant', displayText, continueResponse.attachment_paths);
       } else {
         // Unexpected response format
@@ -942,16 +939,13 @@ Can you now answer the original question: ${originalMessage}?`;
       // Display both intermediate and final so user can see if intermediate was correct
       const finalAnswer = (followUpResponse.message.content || '').trim();
       const intermediateContent = (responseContent || '').trim();
-      const displayText = intermediateContent
-        ? `--- Intermediate answer ---\n\n${intermediateContent}\n\n--- Final answer ---\n\n${finalAnswer}`
-        : finalAnswer;
       
       // Remove the intermediate message and add the combined answer(s)
       if (lastMessage && lastMessage.textContent.includes('Getting final answer')) {
         messagesContainer.removeChild(lastMessage);
       }
       
-      addChatMessage('assistant', displayText);
+      addIntermediateFinalAnswers(intermediateContent, finalAnswer);
       
     } catch (error) {
       console.error('[Ollama JS Execution] ERROR executing code:', error);
@@ -1053,6 +1047,46 @@ async function executeJavaScriptCode(code) {
 // ============================================================================
 // UI Helpers
 // ============================================================================
+
+/**
+ * Render assistant markdown to HTML (escaped fallback).
+ */
+function renderMarkdownHtml(text) {
+  if (typeof marked !== 'undefined') {
+    try {
+      marked.setOptions({ breaks: true, gfm: true });
+      return marked.parse(String(text ?? ''));
+    } catch (_) {
+      /* fall through */
+    }
+  }
+  return escapeHtml(text);
+}
+
+/**
+ * Show intermediate + final code-exec answers as glass-labeled parts.
+ * Returns plain text for conversation history.
+ */
+function addIntermediateFinalAnswers(intermediate, finalText) {
+  const inter = String(intermediate || '').trim();
+  const fin = String(finalText || '').trim();
+  if (!inter) {
+    addChatMessage('assistant', fin);
+    return fin;
+  }
+  const html = `<div class="chat-answer-stack">
+      <div class="chat-answer-part">
+        <div class="chat-exec-label">Intermediate</div>
+        <div class="markdown">${renderMarkdownHtml(inter)}</div>
+      </div>
+      <div class="chat-answer-part chat-answer-final">
+        <div class="chat-exec-label">Final</div>
+        <div class="markdown">${renderMarkdownHtml(fin)}</div>
+      </div>
+    </div>`;
+  addChatMessage('assistant', html, true);
+  return `--- Intermediate answer ---\n\n${inter}\n\n--- Final answer ---\n\n${fin}`;
+}
 
 /**
  * Add a chat message to the chat container.

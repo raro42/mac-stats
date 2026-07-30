@@ -831,6 +831,24 @@ textarea.ops-agent-editor.is-dirty {
   margin-top: 8px;
 }
 
+.chat-answer-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-answer-part {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+}
+
+.chat-answer-part.chat-answer-final {
+  border-color: color-mix(in srgb, #0a84ff 28%, transparent);
+  background: color-mix(in srgb, #0a84ff 6%, transparent);
+}
+
 .ops-insights-card {
   margin: 0 0 10px;
   padding: 10px 12px;

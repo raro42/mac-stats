@@ -2889,6 +2889,24 @@ body {
   margin-top: 8px;
 }
 
+.chat-answer-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-answer-part {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+}
+
+.chat-answer-part.chat-answer-final {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
+}
+
 .thinking-animation {
   display: flex;
   align-items: center;
