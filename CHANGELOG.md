@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.331] - 2026-07-31
+
+### Changed
+- Process details glass layout shared across themes; selected process row highlights while the modal is open; process name fields HTML-escaped.
+
 ## [0.1.330] - 2026-07-30
 
 ### Changed

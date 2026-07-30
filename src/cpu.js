@@ -733,6 +733,10 @@ async function refresh() {
           row.setAttribute("role", "button");
           row.setAttribute("tabindex", "0");
           row.title = "Click for details";
+          if (currentProcessPid !== null && Number(proc.pid) === Number(currentProcessPid)) {
+            row.classList.add("is-selected");
+            row.setAttribute("aria-current", "true");
+          }
           
           const name = document.createElement("div");
           name.className = "process-name";
@@ -1237,6 +1241,19 @@ document.addEventListener("visibilitychange", () => {
 // Process details popover
 let processDetailsModal = null;
 let currentProcessPid = null;
+
+function syncProcessRowSelection() {
+  const list = document.getElementById("process-list");
+  if (!list) return;
+  list.querySelectorAll(".process-row").forEach((row) => {
+    const selected =
+      currentProcessPid !== null &&
+      row.getAttribute("data-pid") === String(currentProcessPid);
+    row.classList.toggle("is-selected", selected);
+    if (selected) row.setAttribute("aria-current", "true");
+    else row.removeAttribute("aria-current");
+  });
+}
 let processDetailsRefreshInterval = null;
 
 function formatBytes(bytes) {
@@ -1345,6 +1362,15 @@ async function updateProcessDetailsContent(pid) {
   }
 }
 
+function escapeProcessHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function populateProcessDetailsBody(body, details, pid) {
     const startDate = formatDate(details.start_time);
     const cpuTimeFormatted = formatTime(Math.floor(details.total_cpu_time / 1000));
@@ -1352,10 +1378,16 @@ function populateProcessDetailsBody(body, details, pid) {
     const virtualMemoryFormatted = formatBytes(details.virtual_memory);
     const diskReadFormatted = formatBytes(details.disk_read);
     const diskWrittenFormatted = formatBytes(details.disk_written);
+    const name = escapeProcessHtml(details.name);
+    const parentName = details.parent_name ? escapeProcessHtml(details.parent_name) : "";
+    const userName = details.user_name ? escapeProcessHtml(details.user_name) : "";
+    const effectiveUserName = details.effective_user_name
+      ? escapeProcessHtml(details.effective_user_name)
+      : "";
     
     body.innerHTML = `
       <div class="process-detail-hero">
-        <div class="process-detail-name">${details.name}</div>
+        <div class="process-detail-name">${name}</div>
         <div class="process-detail-pid">PID ${details.pid}</div>
       </div>
       <div class="process-detail-section">
@@ -1375,15 +1407,15 @@ function populateProcessDetailsBody(body, details, pid) {
       <div class="process-detail-section">
         <div class="process-detail-row">
           <span class="process-detail-label">Parent Process</span>
-          <span class="process-detail-value">${details.parent_name ? `${details.parent_name} (PID: ${details.parent_pid})` : "—"}</span>
+          <span class="process-detail-value">${parentName ? `${parentName} (PID: ${details.parent_pid})` : "—"}</span>
         </div>
         <div class="process-detail-row">
           <span class="process-detail-label">User</span>
-          <span class="process-detail-value">${details.user_name ? `${details.user_name} (${details.user_id})` : (details.user_id || "—")}</span>
+          <span class="process-detail-value">${userName ? `${userName} (${details.user_id})` : (details.user_id || "—")}</span>
         </div>
         <div class="process-detail-row">
           <span class="process-detail-label">Effective User</span>
-          <span class="process-detail-value">${details.effective_user_name ? `${details.effective_user_name} (${details.effective_user_id})` : (details.effective_user_id || "—")}</span>
+          <span class="process-detail-value">${effectiveUserName ? `${effectiveUserName} (${details.effective_user_id})` : (details.effective_user_id || "—")}</span>
         </div>
       </div>
       <div class="process-detail-section">
@@ -1451,6 +1483,7 @@ function populateProcessDetailsBody(body, details, pid) {
             processDetailsRefreshInterval = null;
           }
           currentProcessPid = null;
+          syncProcessRowSelection();
           processDetailsModal.style.display = "none";
           
           // Force immediate refresh of process list (bypass 15-second throttle)
@@ -1513,6 +1546,7 @@ async function showProcessDetails(pid) {
             processDetailsRefreshInterval = null;
           }
           currentProcessPid = null;
+          syncProcessRowSelection();
           processDetailsModal.style.display = "none";
         });
       }
@@ -1526,6 +1560,7 @@ async function showProcessDetails(pid) {
             processDetailsRefreshInterval = null;
           }
           currentProcessPid = null;
+          syncProcessRowSelection();
           processDetailsModal.style.display = "none";
         }
       });
@@ -1539,6 +1574,7 @@ async function showProcessDetails(pid) {
             processDetailsRefreshInterval = null;
           }
           currentProcessPid = null;
+          syncProcessRowSelection();
           processDetailsModal.style.display = "none";
         }
       };
@@ -1548,6 +1584,7 @@ async function showProcessDetails(pid) {
     
     // Store current PID for refresh functionality
     currentProcessPid = pid;
+    syncProcessRowSelection();
     
     // Clear any existing refresh interval
     if (processDetailsRefreshInterval) {
@@ -1577,6 +1614,7 @@ async function showProcessDetails(pid) {
           processDetailsRefreshInterval = null;
         }
         currentProcessPid = null;
+        syncProcessRowSelection();
       }
     }, 2000);
   } catch (error) {
