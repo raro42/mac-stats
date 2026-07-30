@@ -708,12 +708,12 @@ async function executeCodeAndContinue(response, originalQuestion, systemPrompt, 
     const lastMessage = messagesContainer?.lastElementChild;
     if (lastMessage && lastMessage.textContent.includes('Executing code')) {
       const stepText = iteration > 0 ? ` (step ${iteration + 1})` : '';
-      lastMessage.innerHTML = `<div style="margin: 8px 0; padding: 8px; background: #f9f9f9; border-left: 3px solid #4CAF50; border-radius: 4px;">
-        <div style="font-size: 0.9em; color: #666; margin-bottom: 4px;">📝 Code executed${stepText}:</div>
-        <pre style="background: #fff; padding: 6px; border-radius: 3px; margin: 4px 0; overflow-x: auto; font-size: 0.85em;"><code>${escapeHtml(response.code)}</code></pre>
-        <div style="font-size: 0.9em; color: #666; margin-top: 8px; margin-bottom: 4px;">✅ Result:</div>
-        <div><strong style="color: #4CAF50;">${escapeHtml(resultString)}</strong></div>
-        <div style="font-size: 0.9em; color: #666; margin-top: 8px;">⏳ Getting response from AI...</div>
+      lastMessage.innerHTML = `<div class="chat-exec-card">
+        <div class="chat-exec-label">Code executed${stepText}</div>
+        <pre class="chat-exec-code"><code>${escapeHtml(response.code)}</code></pre>
+        <div class="chat-exec-label">Result</div>
+        <div class="chat-exec-result">${escapeHtml(resultString)}</div>
+        <div class="chat-status">Getting response from AI…</div>
       </div>`;
     }
     
@@ -917,12 +917,12 @@ Can you now answer the original question: ${originalMessage}?`;
       const messagesContainer = document.getElementById('chat-messages');
       const lastMessage = messagesContainer?.lastElementChild;
       if (lastMessage && lastMessage.textContent.includes('Executing code')) {
-        lastMessage.innerHTML = `<div style="margin: 8px 0; padding: 8px; background: #f9f9f9; border-left: 3px solid #4CAF50; border-radius: 4px;">
-          <div style="font-size: 0.9em; color: #666; margin-bottom: 4px;">📝 Code executed:</div>
-          <pre style="background: #fff; padding: 6px; border-radius: 3px; margin: 4px 0; overflow-x: auto; font-size: 0.85em;"><code>${escapeHtml(code)}</code></pre>
-          <div style="font-size: 0.9em; color: #666; margin-top: 8px; margin-bottom: 4px;">✅ Result:</div>
-          <div><strong style="color: #4CAF50;">${escapeHtml(resultString)}</strong></div>
-          <div style="font-size: 0.9em; color: #666; margin-top: 8px;">⏳ Getting final answer from AI...</div>
+        lastMessage.innerHTML = `<div class="chat-exec-card">
+          <div class="chat-exec-label">Code executed</div>
+          <pre class="chat-exec-code"><code>${escapeHtml(code)}</code></pre>
+          <div class="chat-exec-label">Result</div>
+          <div class="chat-exec-result">${escapeHtml(resultString)}</div>
+          <div class="chat-status">Getting final answer from AI…</div>
         </div>`;
       }
       

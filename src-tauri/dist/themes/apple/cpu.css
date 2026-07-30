@@ -2837,6 +2837,58 @@ body {
   opacity: 0.9;
 }
 
+.chat-exec-card {
+  margin: 2px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, #34c759 28%, transparent);
+  border-left: 3px solid color-mix(in srgb, #34c759 75%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+}
+
+.chat-exec-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 4px;
+}
+
+.chat-exec-label + .chat-exec-label,
+.chat-exec-result + .chat-exec-label,
+.chat-exec-code + .chat-exec-label {
+  margin-top: 8px;
+}
+
+.chat-exec-code {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 12px;
+  line-height: 1.4;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.chat-exec-code code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: var(--text);
+}
+
+.chat-exec-result {
+  font-size: 13px;
+  font-weight: 600;
+  color: color-mix(in srgb, #34c759 85%, var(--text));
+  word-break: break-word;
+}
+
+.chat-exec-card .chat-status {
+  display: block;
+  margin-top: 8px;
+}
+
 .thinking-animation {
   display: flex;
   align-items: center;

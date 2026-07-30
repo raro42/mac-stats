@@ -790,6 +790,47 @@ textarea.ops-agent-editor.is-dirty {
   font-variant-numeric: tabular-nums;
 }
 
+.chat-exec-card {
+  margin: 2px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, #34c759 28%, transparent);
+  border-left: 3px solid color-mix(in srgb, #34c759 75%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+}
+
+.chat-exec-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin: 0 0 4px;
+}
+
+.chat-exec-code {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 12px;
+  line-height: 1.4;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.chat-exec-result {
+  font-size: 13px;
+  font-weight: 600;
+  color: color-mix(in srgb, #34c759 80%, currentColor);
+  word-break: break-word;
+}
+
+.chat-exec-card .chat-status {
+  display: block;
+  margin-top: 8px;
+}
+
 .ops-insights-card {
   margin: 0 0 10px;
   padding: 10px 12px;
