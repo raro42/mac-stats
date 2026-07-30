@@ -1585,6 +1585,11 @@ body {
   font-size: 13px;
   font-family: inherit;
 }
+.perplexity-search-box input:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 1px;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, var(--hairline));
+}
 .perplexity-search-box button {
   padding: 8px 14px;
   border-radius: 8px;
@@ -1596,6 +1601,10 @@ body {
 }
 .perplexity-search-box button:hover {
   background: rgba(255, 255, 255, 0.7);
+}
+.perplexity-search-box button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
 }
 .perplexity-results {
   max-height: 240px;
@@ -1691,6 +1700,10 @@ body {
 }
 .logs-toolbar button:hover {
   background: rgba(255, 255, 255, 0.8);
+}
+.logs-toolbar button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
 }
 .logs-autorefresh {
   font-size: 12px;
@@ -2177,6 +2190,12 @@ body {
   color: var(--text);
 }
 
+.ollama-menu-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
+  color: var(--text);
+}
+
 .ollama-menu {
   position: fixed;
   background: var(--panel);
@@ -2204,6 +2223,12 @@ body {
 }
 
 .ollama-menu-item:hover {
+  background: var(--hairline);
+}
+
+.ollama-menu-item:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: -2px;
   background: var(--hairline);
 }
 
@@ -2267,6 +2292,12 @@ body {
   color: var(--text);
 }
 
+.ollama-settings-popover .popover-close:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
+  color: var(--text);
+}
+
 .ollama-settings-popover .popover-body {
   padding: 20px;
 }
@@ -2325,6 +2356,12 @@ body {
 
 .ollama-settings-popover .popover-btn-primary:hover {
   background: rgba(0, 122, 255, 1);
+}
+
+.ollama-settings-popover .popover-btn-primary:focus-visible,
+.ollama-settings-popover .popover-btn-secondary:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
 }
 
 .ollama-settings-popover .popover-btn-secondary {
