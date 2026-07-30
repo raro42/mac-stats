@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.318] - 2026-07-30
+
+### Changed
+- Discord `/help` menu lists voice-note transcription as a first-class input path.
+
 ## [0.1.317] - 2026-07-30
 
 ### Changed

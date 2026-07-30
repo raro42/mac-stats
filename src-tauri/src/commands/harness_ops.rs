@@ -1190,6 +1190,7 @@ pub fn format_ops_help_gateway() -> String {
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` / `interrupt` — interrupt an in-flight run\n\
 • `/ops` · `/help` — this menu\n\
+• Voice notes — transcribed locally (Ollama audio) then answered like text\n\
 \n\
 **Scheduled:** wake-up 06:00 · CHANGELOG hygiene Mondays 10:00 · UI review Wednesdays 11:00 (`docs/041_ui_command_center.md`)"
     )
@@ -1997,6 +1998,7 @@ mod tests {
         assert!(report.contains("/schedules"), "{report}");
         assert!(report.contains("/digest"), "{report}");
         assert!(report.contains("/help"), "{report}");
+        assert!(report.contains("Voice"), "{report}");
     }
 
     #[test]
