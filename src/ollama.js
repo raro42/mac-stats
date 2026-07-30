@@ -666,7 +666,7 @@ async function executeCodeAndContinue(response, originalQuestion, systemPrompt, 
   console.log(`[Ollama] Code execution iteration ${iteration + 1}/${MAX_ITERATIONS}`);
   console.log('[Ollama] Code to execute:', response.code);
   
-  addChatMessage('assistant', `<em style="color: #666;">Executing code (step ${iteration + 1})...</em>`, true);
+  addChatMessage('assistant', `<span class="chat-status">Executing code (step ${iteration + 1})…</span>`, true);
   
   try {
     // Execute the code
@@ -831,7 +831,7 @@ async function processOllamaResponse(response, originalMessage, contextMessage) 
     console.log('[Ollama JS Execution] ✅✅✅ DETECTED ROLE=code-assistant response ✅✅✅');
     
     // Show intermediate message
-    addChatMessage('assistant', '<em style="color: #666;">Executing code to gather information...</em>', true);
+    addChatMessage('assistant', '<span class="chat-status">Executing code to gather information…</span>', true);
     
     // Extract code (everything after the first line)
     const lines = responseContent.split(/\r?\n/);

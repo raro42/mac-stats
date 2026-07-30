@@ -2595,6 +2595,18 @@ body {
   line-height: 1.6;
   word-wrap: break-word;
   white-space: pre-wrap;
+  animation: chat-message-in 0.22s ease-out;
+}
+
+@keyframes chat-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .chat-message .markdown {
@@ -2738,7 +2750,18 @@ body {
 
 /* Thinking animation */
 .chat-message.thinking {
-  opacity: 0.7;
+  opacity: 0.85;
+  border: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+}
+
+.chat-status {
+  display: inline-block;
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+  opacity: 0.9;
 }
 
 .thinking-animation {
@@ -2849,4 +2872,17 @@ body {
 #chat-send-btn:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
   outline-offset: 2px;
+}
+
+#chat-send-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+  background: rgba(0, 100, 220, 0.95);
+}
+
+#chat-send-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
