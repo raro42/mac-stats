@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.313] - 2026-07-30
+
+### Fixed
+- Discord voice: always resample via ffmpeg to 16 kHz mono WAV (no raw-WAV skip); mention-only captions treated as empty so the transcript becomes the message.
+
 ## [0.1.312] - 2026-07-30
 
 ### Changed

@@ -212,11 +212,14 @@ pub(super) async fn transcribe_discord_voice_message(msg: &Message) -> Result<St
     let wav_path = dir.join(format!("{stem}.wav"));
     std::fs::write(&raw_path, &bytes).map_err(|e| format!("write temp audio: {e}"))?;
 
-    let wav_bytes = if looks_like_wav(&bytes) {
-        bytes
-    } else {
-        convert_to_wav16k(&raw_path, &wav_path)?;
-        std::fs::read(&wav_path).map_err(|e| format!("read wav: {e}"))?
+    let wav_bytes = match convert_to_wav16k(&raw_path, &wav_path) {
+        Ok(()) => std::fs::read(&wav_path).map_err(|e| format!("read wav: {e}"))?,
+        Err(e) if looks_like_wav(&bytes) => {
+            // Last resort: some WAVs already work without resampling; prefer convert when possible.
+            warn!("Discord: ffmpeg convert failed ({e}); falling back to raw WAV bytes");
+            bytes
+        }
+        Err(e) => return Err(e),
     };
 
     let text = transcribe_wav_bytes(
@@ -264,6 +267,37 @@ fn sanitize_filename(name: &str) -> String {
         .collect()
 }
 
+/// Strip Discord `<@…>` / `<#…>` / `<:emoji:…>` tokens so mention-only content counts as empty for voice.
+fn strip_discord_markup(content: &str) -> String {
+    let mut out = String::with_capacity(content.len());
+    let chars: Vec<char> = content.chars().collect();
+    let mut i = 0;
+    while i < chars.len() {
+        if chars[i] == '<' {
+            let mut j = i + 1;
+            let mut closed = false;
+            while j < chars.len() {
+                if chars[j] == '>' {
+                    closed = true;
+                    break;
+                }
+                // Avoid swallowing free-form "< not a mention"
+                if chars[j].is_whitespace() {
+                    break;
+                }
+                j += 1;
+            }
+            if closed {
+                i = j + 1;
+                continue;
+            }
+        }
+        out.push(chars[i]);
+        i += 1;
+    }
+    out.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
 /// Prefer voice transcript when text is empty (or prepend when both present).
 pub(super) async fn maybe_augment_content_with_voice_transcript(
     msg: &Message,
@@ -276,7 +310,7 @@ pub(super) async fn maybe_augment_content_with_voice_transcript(
     // and append — but for empty/mention-only content, replace.
     match transcribe_discord_voice_message(msg).await {
         Ok(transcript) => {
-            let trimmed = content.trim();
+            let trimmed = strip_discord_markup(content);
             if trimmed.is_empty() {
                 Some(transcript)
             } else {
@@ -286,7 +320,7 @@ pub(super) async fn maybe_augment_content_with_voice_transcript(
         Err(e) => {
             warn!("Discord: voice transcription failed: {e}");
             // Surface a short user-visible hint only when there was no text at all.
-            if content.trim().is_empty() {
+            if strip_discord_markup(content).is_empty() {
                 Some(format!(
                     "(I received a voice message but could not transcribe it: {e}. Please retry as text, or ensure Ollama model `{}` and ffmpeg are available.)",
                     voice_model_name()
@@ -315,5 +349,16 @@ mod tests {
         b[8..12].copy_from_slice(b"WAVE");
         assert!(looks_like_wav(&b));
         assert!(!looks_like_wav(b"OggS........"));
+    }
+
+    #[test]
+    fn strip_discord_markup_treats_mention_as_empty() {
+        assert!(strip_discord_markup("<@1467208052443975763>").is_empty());
+        assert!(strip_discord_markup("  <@!123>  ").is_empty());
+        assert_eq!(
+            strip_discord_markup("<@123> what's the weather"),
+            "what's the weather"
+        );
+        assert_eq!(strip_discord_markup("plain text"), "plain text");
     }
 }
