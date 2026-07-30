@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.324] - 2026-07-30
+
+### Changed
+- Open-Meteo instant weather replies in Spanish when the ask uses clima/klima/tiempo/hoy (voice or typed).
+
 ## [0.1.323] - 2026-07-30
 
 ### Changed

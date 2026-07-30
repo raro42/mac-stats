@@ -540,25 +540,75 @@ pub(crate) async fn format_instant_weather_reply(query: &str) -> Option<String> 
             format!(", {}", country)
         }
     );
-    let mut out = format!(
-        "**{}**\n\n\
+    let es = looks_like_spanish_or_catalan_weather(query);
+    let desc_s = if es {
+        weather_code_label_es(code.unwrap_or(-1))
+    } else {
+        desc
+    };
+    let mut out = if es {
+        format!(
+            "**{}**\n\n\
 • **{:.1} °C** — {}\n",
-        where_s, temp, desc
-    );
+            where_s, temp, desc_s
+        )
+    } else {
+        format!(
+            "**{}**\n\n\
+• **{:.1} °C** — {}\n",
+            where_s, temp, desc
+        )
+    };
     if let Some(f) = feels {
-        out.push_str(&format!("• Feels like **{:.1} °C**\n", f));
+        if es {
+            out.push_str(&format!("• Sensación térmica **{:.1} °C**\n", f));
+        } else {
+            out.push_str(&format!("• Feels like **{:.1} °C**\n", f));
+        }
     }
     if let Some(h) = humidity {
-        out.push_str(&format!("• Humidity **{:.0}%**\n", h));
+        if es {
+            out.push_str(&format!("• Humedad **{:.0}%**\n", h));
+        } else {
+            out.push_str(&format!("• Humidity **{:.0}%**\n", h));
+        }
     }
     if let Some(w) = wind {
-        out.push_str(&format!("• Wind **{:.1} km/h**\n", w));
+        if es {
+            out.push_str(&format!("• Viento **{:.1} km/h**\n", w));
+        } else {
+            out.push_str(&format!("• Wind **{:.1} km/h**\n", w));
+        }
     }
-    out.push_str(&format!(
-        "\nLocal time: **{}** ({})\n_Source: Open-Meteo_",
-        when, tz
-    ));
+    if es {
+        out.push_str(&format!(
+            "\nHora local: **{}** ({})\n_Fuente: Open-Meteo_",
+            when, tz
+        ));
+    } else {
+        out.push_str(&format!(
+            "\nLocal time: **{}** ({})\n_Source: Open-Meteo_",
+            when, tz
+        ));
+    }
     Some(out)
+}
+
+fn looks_like_spanish_or_catalan_weather(q: &str) -> bool {
+    let n = normalize_weather_text(q).to_lowercase();
+    // Word-aware: do not match English "climate" via substring "clima".
+    let has_word = |w: &str| {
+        n.split(|c: char| !c.is_alphanumeric())
+            .any(|t| t == w)
+    };
+    has_word("clima")
+        || has_word("klima")
+        || has_word("tiempo")
+        || has_word("temperatura")
+        || has_word("hoy")
+        || has_word("lluvia")
+        || has_word("en")
+        || n.starts_with("ke ")
 }
 
 fn weather_code_label(code: i64) -> &'static str {
@@ -576,6 +626,24 @@ fn weather_code_label(code: i64) -> &'static str {
         95 => "Thunderstorm",
         96 | 99 => "Thunderstorm with hail",
         _ => "Unknown",
+    }
+}
+
+fn weather_code_label_es(code: i64) -> &'static str {
+    match code {
+        0 => "Despejado",
+        1 | 2 => "Mayormente despejado / parcialmente nublado",
+        3 => "Cubierto",
+        45 | 48 => "Niebla",
+        51 | 53 | 55 => "Llovizna",
+        61 | 63 | 65 => "Lluvia",
+        66 | 67 => "Lluvia helada",
+        71 | 73 | 75 | 77 => "Nieve",
+        80..=82 => "Chubascos",
+        85 | 86 => "Chubascos de nieve",
+        95 => "Tormenta",
+        96 | 99 => "Tormenta con granizo",
+        _ => "Desconocido",
     }
 }
 
@@ -620,6 +688,11 @@ mod tests {
         assert!(looks_like_weather_query(garb));
         assert_eq!(extract_place(garb).unwrap(), "El Masnou");
         assert!(can_instant_weather(garb));
+        assert!(looks_like_spanish_or_catalan_weather("clima hoy en El Masnou"));
+        assert!(looks_like_spanish_or_catalan_weather(garb));
+        assert!(!looks_like_spanish_or_catalan_weather(
+            "What is the climate today in El Masnou?"
+        ));
     }
 
     #[test]
