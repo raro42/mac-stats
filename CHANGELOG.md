@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.307] - 2026-07-30
+
+### Changed
+- Discord operator commands: wider NL for `/status` / `/health` / `/digest` (e.g. “system health”, “run digester”, “what version”).
+
 ## [0.1.306] - 2026-07-30
 
 ### Changed

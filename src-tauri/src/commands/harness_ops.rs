@@ -953,6 +953,27 @@ fn write_digest_native(days: i64) -> Result<DigestSummary, String> {
 
 /// True for `/digest` / `run digest` operator asks.
 pub fn looks_like_digest_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    // Long “digest this report…” stays with the agent.
+    if n.chars().count() > 48 || n.contains(" this ") || n.contains("research") {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "digest"
+            | "/digest"
+            | "run digest"
+            | "refresh digest"
+            | "agent digest"
+            | "run digester"
+            | "refresh digester"
+            | "update digest"
+            | "rerun digest"
+    )
+}
+
+/// Normalize operator command text (strip @mention / Werner / please / show me).
+fn normalize_operator_command(content: &str) -> String {
     let n = content
         .trim()
         .trim_start_matches('@')
@@ -965,33 +986,19 @@ pub fn looks_like_digest_request(content: &str) -> bool {
         .trim_start_matches(',')
         .trim()
         .trim_start_matches("please")
-        .trim();
-    matches!(
-        n,
-        "digest"
-            | "/digest"
-            | "run digest"
-            | "refresh digest"
-            | "agent digest"
-            | "show digest"
-    )
-}
-
-/// Normalize operator command text (strip @mention / Werner / please).
-fn normalize_operator_command(content: &str) -> String {
-    let n = content
         .trim()
-        .trim_start_matches('@')
-        .split_whitespace()
-        .collect::<Vec<_>>()
-        .join(" ")
-        .to_lowercase();
-    n.trim_start_matches("werner")
-        .trim_start_matches(',')
+        .trim_start_matches("can you")
         .trim()
-        .trim_start_matches("please")
+        .trim_start_matches("could you")
         .trim()
-        .to_string()
+        .trim_start_matches("show me")
+        .trim()
+        .trim_start_matches("show")
+        .trim()
+        .trim_end_matches('?')
+        .trim()
+        .to_string();
+    n
 }
 
 /// True for Hermes-style `/schedules` / `/cron list` — cheap, no Ollama.
@@ -1038,18 +1045,28 @@ pub fn format_schedules_gateway() -> String {
 /// True for short `/status` / `/health` operator asks — not free-form “status of …”.
 pub fn looks_like_status_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
+    if n.contains(" of ") || n.contains(" for ") || n.contains("ticket") || n.contains("redmine")
+    {
+        return false;
+    }
     matches!(
         n.as_str(),
         "/status"
             | "bot status"
             | "app status"
             | "mac-stats status"
+            | "system status"
             | "/health"
             | "health check"
             | "bot health"
+            | "system health"
+            | "how healthy"
+            | "are you healthy"
             | "/version"
             | "app version"
             | "mac-stats version"
+            | "what version"
+            | "which version"
     )
 }
 
@@ -1873,6 +1890,8 @@ mod tests {
     fn digest_request_detected() {
         assert!(looks_like_digest_request("/digest"));
         assert!(looks_like_digest_request("refresh digest"));
+        assert!(looks_like_digest_request("run digester"));
+        assert!(looks_like_digest_request("show me digest"));
         assert!(!looks_like_digest_request("digest this long research report please"));
     }
 
@@ -1891,6 +1910,8 @@ mod tests {
         assert!(looks_like_status_request("/health"));
         assert!(looks_like_status_request("/version"));
         assert!(looks_like_status_request("bot status"));
+        assert!(looks_like_status_request("system health"));
+        assert!(looks_like_status_request("what version"));
         assert!(!looks_like_status_request("status of the redmine ticket"));
         assert!(!looks_like_status_request("status"));
     }
