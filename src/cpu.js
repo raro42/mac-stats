@@ -1876,25 +1876,11 @@ function initMonitorsSection() {
     }
   }
 
-  // Make header clickable to toggle collapse/expand
-  header.addEventListener('click', (e) => {
-    // Don't toggle if clicking on menu button (it opens settings)
-    const menuBtn = document.getElementById('monitors-menu-btn');
-    
-    // Check if click originated from within the menu button
-    const clickedElement = e.target;
-    if (menuBtn && (clickedElement === menuBtn || clickedElement.closest && clickedElement.closest('#monitors-menu-btn'))) {
-      return; // Let menu button handle its own click (opens settings)
-    }
-    
-    // Toggle collapse state when clicking anywhere else on the header (including title text)
-    e.stopPropagation(); // Prevent any parent handlers
-    monitorsCollapsed = !monitorsCollapsed;
-    saveMonitorsCollapsedState(monitorsCollapsed);
-    
+  // Make header clickable/keyboardable to toggle collapse/expand
+  const applyMonitorsCollapsed = () => {
     const section = document.querySelector('.monitors-section');
     const divider = document.getElementById('monitors-ollama-divider');
-    
+
     if (monitorsCollapsed) {
       content.classList.add('collapsed');
       if (section) {
@@ -1918,7 +1904,7 @@ function initMonitorsSection() {
       // Just update height based on existing content - don't trigger backend calls
       // The interval will handle data updates
       updateMonitorsHeight();
-      
+
       // Start interval if not already running (but don't call immediately)
       if (!monitorsUpdateInterval) {
         monitorsUpdateInterval = setInterval(() => {
@@ -1930,7 +1916,37 @@ function initMonitorsSection() {
       }
     }
     updateMonitorsStatusDot();
-    
+    header.setAttribute('aria-expanded', String(!monitorsCollapsed));
+  };
+
+  header.setAttribute('role', 'button');
+  header.setAttribute('tabindex', '0');
+  header.setAttribute('aria-controls', 'monitors-content');
+  header.setAttribute('aria-expanded', String(!monitorsCollapsed));
+
+  header.addEventListener('click', (e) => {
+    // Don't toggle if clicking on menu button (it opens settings)
+    const menuBtn = document.getElementById('monitors-menu-btn');
+
+    // Check if click originated from within the menu button
+    const clickedElement = e.target;
+    if (menuBtn && (clickedElement === menuBtn || clickedElement.closest && clickedElement.closest('#monitors-menu-btn'))) {
+      return; // Let menu button handle its own click (opens settings)
+    }
+
+    // Toggle collapse state when clicking anywhere else on the header (including title text)
+    e.stopPropagation(); // Prevent any parent handlers
+    monitorsCollapsed = !monitorsCollapsed;
+    saveMonitorsCollapsedState(monitorsCollapsed);
+    applyMonitorsCollapsed();
+  });
+
+  header.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    monitorsCollapsed = !monitorsCollapsed;
+    saveMonitorsCollapsedState(monitorsCollapsed);
+    applyMonitorsCollapsed();
   });
 
   // Initialize menu button - directly opens settings
