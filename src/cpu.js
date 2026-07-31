@@ -721,19 +721,32 @@ async function refresh() {
         return;
       }
       lastProcessListKey = processKey;
+
+      const activeRow = document.activeElement?.closest?.(".process-row");
+      const listHadFocus = !!(activeRow && list.contains(activeRow));
+      const focusPid =
+        (activeRow && list.contains(activeRow) && activeRow.getAttribute("data-pid")) ||
+        (currentProcessPid !== null ? String(currentProcessPid) : null);
       
       // Use document fragment to batch all DOM updates and reduce reflows
       const fragment = document.createDocumentFragment();
       
       if (processes.length > 0) {
-        processes.forEach((proc) => {
+        let tabIdx = processes.findIndex(
+          (p) => focusPid !== null && String(p.pid) === String(focusPid)
+        );
+        if (tabIdx < 0) tabIdx = 0;
+        processes.forEach((proc, i) => {
           const row = document.createElement("div");
           row.className = "process-row";
           row.setAttribute("data-pid", String(proc.pid));
-          row.setAttribute("role", "button");
-          row.setAttribute("tabindex", "0");
+          row.setAttribute("role", "option");
+          row.setAttribute("tabindex", i === tabIdx ? "0" : "-1");
           row.title = "Click for details";
-          if (currentProcessPid !== null && Number(proc.pid) === Number(currentProcessPid)) {
+          const selected =
+            currentProcessPid !== null && Number(proc.pid) === Number(currentProcessPid);
+          row.setAttribute("aria-selected", selected ? "true" : "false");
+          if (selected) {
             row.classList.add("is-selected");
             row.setAttribute("aria-current", "true");
           }
@@ -775,6 +788,8 @@ async function refresh() {
       scheduleDOMUpdate(() => {
         if (!list.dataset.processClickDelegation) {
           list.dataset.processClickDelegation = "true";
+          list.setAttribute("role", "listbox");
+          list.setAttribute("aria-label", "Top processes");
           list.addEventListener("click", (e) => {
             const row = e.target.closest(".process-row");
             if (row) {
@@ -783,16 +798,37 @@ async function refresh() {
             }
           });
           list.addEventListener("keydown", (e) => {
-            if (e.key !== "Enter" && e.key !== " ") return;
             const row = e.target.closest(".process-row");
             if (!row || !list.contains(row)) return;
+            const rows = Array.from(list.querySelectorAll(".process-row"));
+            const idx = rows.indexOf(row);
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              const pid = row.getAttribute("data-pid");
+              if (pid) showProcessDetails(parseInt(pid, 10));
+              return;
+            }
+            let next = -1;
+            if (e.key === "ArrowDown") next = Math.min(idx + 1, rows.length - 1);
+            else if (e.key === "ArrowUp") next = Math.max(idx - 1, 0);
+            else if (e.key === "Home") next = 0;
+            else if (e.key === "End") next = rows.length - 1;
+            else return;
             e.preventDefault();
-            const pid = row.getAttribute("data-pid");
-            if (pid) showProcessDetails(parseInt(pid, 10));
+            if (next < 0 || next === idx) return;
+            rows.forEach((r, i) => r.setAttribute("tabindex", i === next ? "0" : "-1"));
+            rows[next].focus();
           });
         }
         list.replaceChildren();
         list.appendChild(fragment);
+        if (listHadFocus) {
+          const target =
+            (focusPid && list.querySelector(`.process-row[data-pid="${focusPid}"]`)) ||
+            list.querySelector('.process-row[tabindex="0"]') ||
+            list.querySelector(".process-row");
+          target?.focus();
+        }
       });
     }
   } catch (error) {
@@ -1288,6 +1324,7 @@ function syncProcessRowSelection() {
       currentProcessPid !== null &&
       row.getAttribute("data-pid") === String(currentProcessPid);
     row.classList.toggle("is-selected", selected);
+    row.setAttribute("aria-selected", selected ? "true" : "false");
     if (selected) row.setAttribute("aria-current", "true");
     else row.removeAttribute("aria-current");
   });
