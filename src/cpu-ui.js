@@ -695,12 +695,7 @@
               e.preventDefault();
               e.stopPropagation();
               console.log("Version clicked (from injectAppVersion), opening changelog modal");
-              
-              // Trigger changelog modal opening
-              changelogModal.style.display = "flex";
-              
-              // Load changelog
-              loadChangelogForModal(changelogBody, changelogModal);
+              openChangelogModal(changelogModal, changelogBody);
             });
           }
         }
@@ -712,6 +707,43 @@
     }
   }
 
+
+  let changelogFocusReturn = null;
+
+  function openChangelogModal(changelogModal, changelogBody) {
+    if (!changelogModal || !changelogBody) return;
+    changelogFocusReturn = document.activeElement;
+    changelogModal.style.display = "flex";
+    changelogModal.setAttribute("aria-hidden", "false");
+    changelogModal.setAttribute("role", "dialog");
+    changelogModal.setAttribute("aria-modal", "true");
+    const title =
+      changelogModal.querySelector("#changelog-modal-title") ||
+      changelogModal.querySelector(".settings-header h2");
+    if (title) {
+      if (!title.id) title.id = "changelog-modal-title";
+      changelogModal.setAttribute("aria-labelledby", title.id);
+    }
+    loadChangelogForModal(changelogBody, changelogModal);
+    requestAnimationFrame(() => {
+      document.getElementById("close-changelog")?.focus();
+    });
+  }
+
+  function closeChangelogModal(changelogModal) {
+    if (!changelogModal) return;
+    changelogModal.style.display = "none";
+    changelogModal.setAttribute("aria-hidden", "true");
+    const returnEl = changelogFocusReturn;
+    changelogFocusReturn = null;
+    if (returnEl && typeof returnEl.focus === "function") {
+      try {
+        returnEl.focus();
+      } catch (_) {
+        /* ignore */
+      }
+    }
+  }
 
   function initChangelogModal() {
     const changelogModal = document.getElementById("changelog-modal");
@@ -730,11 +762,6 @@
     
     console.log(`Found ${versionElements.length} version elements for changelog`);
 
-    // Function to load and display changelog (uses the global function)
-    function loadChangelog() {
-      loadChangelogForModal(changelogBody, changelogModal);
-    }
-
     // Open modal when version is clicked
     versionElements.forEach((el) => {
       console.log("Adding click handler to version element:", el.className, el.textContent);
@@ -742,8 +769,7 @@
         e.preventDefault();
         e.stopPropagation();
         console.log("Version clicked, opening changelog modal");
-        changelogModal.style.display = "flex";
-        loadChangelogForModal(changelogBody, changelogModal);
+        openChangelogModal(changelogModal, changelogBody);
       });
     });
     
@@ -762,8 +788,7 @@
             e.preventDefault();
             e.stopPropagation();
             console.log("Version clicked (from observer), opening changelog modal");
-            changelogModal.style.display = "flex";
-            loadChangelogForModal(changelogBody, changelogModal);
+            openChangelogModal(changelogModal, changelogBody);
           });
         }
       });
@@ -778,20 +803,20 @@
     // Close modal handlers
     if (closeChangelog) {
       closeChangelog.addEventListener("click", () => {
-        changelogModal.style.display = "none";
+        closeChangelogModal(changelogModal);
       });
     }
 
     changelogModal.addEventListener("click", (e) => {
       if (e.target === changelogModal) {
-        changelogModal.style.display = "none";
+        closeChangelogModal(changelogModal);
       }
     });
 
     // ESC key to close
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && changelogModal.style.display !== "none") {
-        changelogModal.style.display = "none";
+        closeChangelogModal(changelogModal);
       }
     });
   }
