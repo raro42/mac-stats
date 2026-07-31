@@ -1731,13 +1731,40 @@ body {
   overflow-y: auto;
   font-size: 13px;
 }
+.perplexity-empty {
+  margin: 4px 0;
+  padding: 14px 12px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, currentColor 22%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+}
+.perplexity-empty-error {
+  color: #ff3b30;
+  border-color: color-mix(in srgb, #ff3b30 35%, transparent);
+  background: color-mix(in srgb, #ff3b30 8%, transparent);
+}
 .perplexity-result-item {
   padding: 10px 12px;
   margin-bottom: 8px;
-  background: rgba(255, 255, 255, 0.3);
-  border: 1px solid var(--hairline);
-  border-radius: 8px;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 10px;
   line-height: 1.5;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+.perplexity-result-item:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, #000 6%, transparent);
+  transform: translateY(-1px);
+}
+.perplexity-result-item:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
 }
 .perplexity-result-item a {
   color: var(--accent);
@@ -1772,10 +1799,11 @@ body {
 }
 .perplexity-weather-card {
   margin: 0 0 10px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
-  background: var(--glass-fill, rgba(255, 255, 255, 0.04));
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, #0a84ff 22%, transparent);
+  border-left: 3px solid color-mix(in srgb, #0a84ff 70%, transparent);
+  background: color-mix(in srgb, #0a84ff 6%, transparent);
 }
 .perplexity-weather-body {
   font-size: 13px;

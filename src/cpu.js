@@ -3720,10 +3720,10 @@ function initPerplexitySection() {
       if (!query) return;
       const invoke = getInvoke();
       if (!invoke) {
-        resultsEl.innerHTML = '<p class="perplexity-result-snippet">App not ready.</p>';
+        resultsEl.innerHTML = '<div class="perplexity-empty" role="status">App not ready.</div>';
         return;
       }
-      resultsEl.innerHTML = '<p class="perplexity-result-snippet">Searching…</p>';
+      resultsEl.innerHTML = '<div class="perplexity-empty" role="status">Searching…</div>';
       try {
         const resp = await invoke('perplexity_search', { request: { query: query, max_results: 10 } });
         const esc = (window.Ollama && window.Ollama.escapeHtml)
@@ -3754,7 +3754,7 @@ function initPerplexitySection() {
         }
         if (!resp.results || resp.results.length === 0) {
           resultsEl.innerHTML = weatherHtml ||
-            '<p class="perplexity-result-snippet">No results.</p>';
+            '<div class="perplexity-empty" role="status">No results.</div>';
           return;
         }
         resultsEl.innerHTML = weatherHtml + resp.results.map(function (r) {
@@ -3792,7 +3792,7 @@ function initPerplexitySection() {
             '</article>';
         }).join('');
       } catch (err) {
-        resultsEl.innerHTML = '<p class="perplexity-result-snippet">Error: ' + String(err) + '</p>';
+        resultsEl.innerHTML = '<div class="perplexity-empty perplexity-empty-error" role="alert">Error: ' + String(err) + '</div>';
       }
     });
   }
