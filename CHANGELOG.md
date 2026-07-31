@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.346] - 2026-07-31
+
+### Changed
+- AI Chat options menu is a proper menu (aria-haspopup/menuitem) with Escape close and focus return.
+
 ## [0.1.345] - 2026-07-31
 
 ### Changed

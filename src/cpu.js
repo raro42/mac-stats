@@ -2099,6 +2099,14 @@ document.addEventListener('keydown', (e) => {
     const processModal = document.getElementById('process-details-modal');
     if (processModal && processModal.style.display !== 'none') return;
 
+    const ollamaMenu = document.getElementById('ollama-menu');
+    if (ollamaMenu && ollamaMenu.style.display !== 'none') {
+      if (window.closeOllamaOptionsMenu) window.closeOllamaOptionsMenu();
+      else ollamaMenu.style.display = 'none';
+      e.preventDefault();
+      return;
+    }
+
     // Close monitors settings popover if visible
     const monitorsPopover = document.getElementById('monitors-settings-popover');
     if (monitorsPopover && monitorsPopover.style.display !== 'none') {
@@ -3031,43 +3039,66 @@ function initOllamaSection() {
   const menuSettings = document.getElementById('ollama-menu-settings');
   
   if (menuBtn && menu) {
+    menuBtn.setAttribute('aria-haspopup', 'menu');
+    menuBtn.setAttribute('aria-expanded', 'false');
+    menuBtn.setAttribute('aria-controls', 'ollama-menu');
+    menu.setAttribute('role', 'menu');
+    menu.setAttribute('aria-hidden', 'true');
+    menu.querySelectorAll('.ollama-menu-item').forEach((item) => {
+      item.setAttribute('role', 'menuitem');
+    });
+
     // Update menu text based on current state
     const updateOllamaMenuText = () => {
-      const menuCollapse = document.getElementById('ollama-menu-collapse');
-      if (menuCollapse) {
-        menuCollapse.textContent = ollamaCollapsed ? 'Expand' : 'Collapse';
+      const menuCollapseEl = document.getElementById('ollama-menu-collapse');
+      if (menuCollapseEl) {
+        menuCollapseEl.textContent = ollamaCollapsed ? 'Expand' : 'Collapse';
       }
     };
     updateOllamaMenuText();
+
+    const setOllamaMenuOpen = (open) => {
+      menu.style.display = open ? 'block' : 'none';
+      menu.setAttribute('aria-hidden', String(!open));
+      menuBtn.setAttribute('aria-expanded', String(open));
+      if (open) {
+        requestAnimationFrame(() => {
+          const rect = menuBtn.getBoundingClientRect();
+          menu.style.position = 'fixed';
+          menu.style.top = `${rect.top}px`;
+          menu.style.left = `${rect.right + 2}px`;
+          menu.style.transform = 'none';
+          updateOllamaMenuText();
+          menu.querySelector('.ollama-menu-item')?.focus();
+        });
+      } else if (document.activeElement && menu.contains(document.activeElement)) {
+        menuBtn.focus();
+      }
+    };
     
     // Toggle menu on button click
     menuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
       const isVisible = menu.style.display !== 'none';
-      menu.style.display = isVisible ? 'none' : 'block';
-      
-      // Position menu right next to button
-      if (!isVisible) {
-        // Use requestAnimationFrame to ensure layout is stable before positioning
-        requestAnimationFrame(() => {
-          const rect = menuBtn.getBoundingClientRect();
-          menu.style.position = 'fixed';
-          // Align menu top with button top, position immediately adjacent to button
-          menu.style.top = `${rect.top}px`;
-          menu.style.left = `${rect.right + 2}px`;
-          menu.style.transform = 'none'; // Ensure no transforms interfere
-          updateOllamaMenuText(); // Update text when opening menu
-        });
-      }
+      setOllamaMenuOpen(!isVisible);
     });
     
     // Close menu when clicking outside
     document.addEventListener('click', (e) => {
       if (menu && !menu.contains(e.target) && !menuBtn.contains(e.target)) {
-        menu.style.display = 'none';
+        setOllamaMenuOpen(false);
       }
     });
+
+    menu.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      e.preventDefault();
+      e.stopPropagation();
+      setOllamaMenuOpen(false);
+    });
+
+    window.closeOllamaOptionsMenu = () => setOllamaMenuOpen(false);
   }
   
   if (menuCollapse) {
@@ -3080,7 +3111,8 @@ function initOllamaSection() {
       menuCollapse.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      menu.style.display = 'none';
+      if (window.closeOllamaOptionsMenu) window.closeOllamaOptionsMenu();
+      else menu.style.display = 'none';
       // Toggle collapse
       ollamaCollapsed = !ollamaCollapsed;
       applyOllamaCollapsed();
@@ -3092,7 +3124,8 @@ function initOllamaSection() {
     menuSettings.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      menu.style.display = 'none';
+      if (window.closeOllamaOptionsMenu) window.closeOllamaOptionsMenu();
+      else menu.style.display = 'none';
       showSystemPromptSettings();
     });
   }
