@@ -2089,40 +2089,75 @@ function initMonitorsSection() {
   }
   
   // Close monitors settings function
-  window.closeMonitorsSettings = function() {
-    const popover = document.getElementById('monitors-settings-popover');
-    const addForm = document.getElementById('add-monitor-form');
-    if (popover) popover.style.display = 'none';
-    if (addForm) addForm.style.display = 'none';
-  };
+  window.closeMonitorsSettings = closeMonitorsSettingsPopover;
 }
 
 // Global ESC key handler for all popovers
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' || e.key === 'Esc') {
+    // Prefer top-level modals already handled elsewhere; skip if process details open
+    const processModal = document.getElementById('process-details-modal');
+    if (processModal && processModal.style.display !== 'none') return;
+
     // Close monitors settings popover if visible
     const monitorsPopover = document.getElementById('monitors-settings-popover');
     if (monitorsPopover && monitorsPopover.style.display !== 'none') {
       if (window.closeMonitorsSettings) {
         window.closeMonitorsSettings();
       }
+      e.preventDefault();
       return;
     }
     
     // Close Ollama settings popover if visible
     const ollamaPopover = document.getElementById('ollama-settings-popover');
     if (ollamaPopover && ollamaPopover.style.display !== 'none') {
-      ollamaPopover.style.display = 'none';
+      closeOllamaSettingsPopover();
+      e.preventDefault();
     }
   }
 });
 
+let monitorsSettingsFocusReturn = null;
+let ollamaSettingsFocusReturn = null;
+
 async function showMonitorsSettings() {
   const popover = document.getElementById('monitors-settings-popover');
   if (popover) {
+    monitorsSettingsFocusReturn = document.activeElement;
     popover.style.display = 'flex';
+    popover.setAttribute('role', 'dialog');
+    popover.setAttribute('aria-modal', 'true');
+    popover.setAttribute('aria-hidden', 'false');
+    const title = popover.querySelector('.popover-header h3');
+    if (title) {
+      if (!title.id) title.id = 'monitors-settings-title';
+      popover.setAttribute('aria-labelledby', title.id);
+    }
     wireMonitorRemoveDelegation();
     await refreshMonitorsSettingsList();
+    requestAnimationFrame(() => {
+      document.getElementById('monitors-settings-close')?.focus();
+    });
+  }
+}
+
+function closeMonitorsSettingsPopover() {
+  const popover = document.getElementById('monitors-settings-popover');
+  const addForm = document.getElementById('add-monitor-form');
+  if (popover) {
+    popover.style.display = 'none';
+    popover.setAttribute('aria-hidden', 'true');
+  }
+  if (addForm) addForm.style.display = 'none';
+  const returnEl = monitorsSettingsFocusReturn;
+  monitorsSettingsFocusReturn = null;
+  if (returnEl && typeof returnEl.focus === 'function') {
+    try {
+      returnEl.focus();
+    } catch (_) {
+      /* ignore */
+    }
   }
 }
 
@@ -3071,7 +3106,7 @@ function initOllamaSection() {
   
   if (settingsClose) {
     settingsClose.addEventListener('click', () => {
-      if (settingsPopover) settingsPopover.style.display = 'none';
+      closeOllamaSettingsPopover();
     });
   }
   
@@ -3080,7 +3115,7 @@ function initOllamaSection() {
       if (systemPromptTextarea) {
         const prompt = systemPromptTextarea.value.trim();
         saveSystemPrompt(prompt || DEFAULT_SYSTEM_PROMPT);
-        if (settingsPopover) settingsPopover.style.display = 'none';
+        closeOllamaSettingsPopover();
         console.log('[Ollama] System prompt saved');
       }
     });
@@ -3098,7 +3133,7 @@ function initOllamaSection() {
   if (settingsPopover) {
     settingsPopover.addEventListener('click', (e) => {
       if (e.target === settingsPopover) {
-        settingsPopover.style.display = 'none';
+        closeOllamaSettingsPopover();
       }
     });
   }
@@ -3109,14 +3144,42 @@ function initOllamaSection() {
   }
 }
 
+function closeOllamaSettingsPopover() {
+  const popover = document.getElementById('ollama-settings-popover');
+  if (popover) {
+    popover.style.display = 'none';
+    popover.setAttribute('aria-hidden', 'true');
+  }
+  const returnEl = ollamaSettingsFocusReturn;
+  ollamaSettingsFocusReturn = null;
+  if (returnEl && typeof returnEl.focus === 'function') {
+    try {
+      returnEl.focus();
+    } catch (_) {
+      /* ignore */
+    }
+  }
+}
+
 function showSystemPromptSettings() {
   const popover = document.getElementById('ollama-settings-popover');
   const textarea = document.getElementById('ollama-system-prompt');
   if (popover && textarea) {
+    ollamaSettingsFocusReturn = document.activeElement;
     textarea.value = getSystemPrompt();
     popover.style.display = 'flex';
-    // Focus textarea after a short delay
-    setTimeout(() => textarea.focus(), 100);
+    popover.setAttribute('role', 'dialog');
+    popover.setAttribute('aria-modal', 'true');
+    popover.setAttribute('aria-hidden', 'false');
+    const title = popover.querySelector('.popover-header h3');
+    if (title) {
+      if (!title.id) title.id = 'ollama-settings-title';
+      popover.setAttribute('aria-labelledby', title.id);
+    }
+    // Focus close for consistent dialog pattern; textarea remains one Tab away
+    requestAnimationFrame(() => {
+      document.getElementById('ollama-settings-close')?.focus();
+    });
   }
 }
 

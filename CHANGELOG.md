@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.345] - 2026-07-31
+
+### Changed
+- Monitors and Ollama settings popovers get dialog focus management; Escape skips popovers while Process details is open.
+
 ## [0.1.344] - 2026-07-31
 
 ### Changed
