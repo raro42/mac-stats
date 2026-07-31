@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.337] - 2026-07-31
+
+### Changed
+- Perplexity, Logs, and Agent Ops collapsible headers support keyboard toggle with aria-expanded.
+
 ## [0.1.336] - 2026-07-31
 
 ### Changed

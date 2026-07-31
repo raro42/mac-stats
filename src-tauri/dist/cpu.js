@@ -1813,6 +1813,34 @@ function getMonitorHistory(monitorId) {
   return history.filter(entry => entry.timestamp >= twentyFourHoursAgo);
 }
 
+function wireCollapsibleHeaderA11y(header, options = {}) {
+  if (!header || header.dataset.collapseA11y === '1') return;
+  const {
+    contentId = null,
+    getExpanded = () => true,
+    onToggle = null,
+    ignoreSelector = null,
+  } = options;
+  header.dataset.collapseA11y = '1';
+  header.setAttribute('role', 'button');
+  header.setAttribute('tabindex', '0');
+  if (contentId) header.setAttribute('aria-controls', contentId);
+  const syncExpanded = () => {
+    header.setAttribute('aria-expanded', String(!!getExpanded()));
+  };
+  syncExpanded();
+  header._syncCollapseA11y = syncExpanded;
+  if (typeof onToggle === 'function') {
+    header.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      if (ignoreSelector && e.target.closest && e.target.closest(ignoreSelector)) return;
+      e.preventDefault();
+      onToggle();
+      syncExpanded();
+    });
+  }
+}
+
 function getMonitorsCollapsedState() {
   // Get saved state from localStorage, default to true (collapsed)
   const saved = localStorage.getItem('monitors_collapsed');
@@ -1919,10 +1947,16 @@ function initMonitorsSection() {
     header.setAttribute('aria-expanded', String(!monitorsCollapsed));
   };
 
-  header.setAttribute('role', 'button');
-  header.setAttribute('tabindex', '0');
-  header.setAttribute('aria-controls', 'monitors-content');
-  header.setAttribute('aria-expanded', String(!monitorsCollapsed));
+  wireCollapsibleHeaderA11y(header, {
+    contentId: 'monitors-content',
+    getExpanded: () => !monitorsCollapsed,
+    ignoreSelector: '#monitors-menu-btn',
+    onToggle: () => {
+      monitorsCollapsed = !monitorsCollapsed;
+      saveMonitorsCollapsedState(monitorsCollapsed);
+      applyMonitorsCollapsed();
+    },
+  });
 
   header.addEventListener('click', (e) => {
     // Don't toggle if clicking on menu button (it opens settings)
@@ -1936,14 +1970,6 @@ function initMonitorsSection() {
 
     // Toggle collapse state when clicking anywhere else on the header (including title text)
     e.stopPropagation(); // Prevent any parent handlers
-    monitorsCollapsed = !monitorsCollapsed;
-    saveMonitorsCollapsedState(monitorsCollapsed);
-    applyMonitorsCollapsed();
-  });
-
-  header.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault();
     monitorsCollapsed = !monitorsCollapsed;
     saveMonitorsCollapsedState(monitorsCollapsed);
     applyMonitorsCollapsed();
@@ -3670,19 +3696,7 @@ function initPerplexitySection() {
   if (!header || !content) return;
 
   let perplexityCollapsed = localStorage.getItem('perplexity_collapsed') !== 'false';
-  if (perplexityCollapsed) {
-    content.classList.add('collapsed');
-    if (section) section.classList.add('collapsed');
-    if (divider) divider.style.display = 'none';
-  } else {
-    content.classList.remove('collapsed');
-    if (section) section.classList.remove('collapsed');
-    if (divider) divider.style.display = '';
-  }
-
-  header.addEventListener('click', () => {
-    perplexityCollapsed = !perplexityCollapsed;
-    localStorage.setItem('perplexity_collapsed', perplexityCollapsed.toString());
+  const applyPerplexityCollapsed = () => {
     if (perplexityCollapsed) {
       content.classList.add('collapsed');
       if (section) section.classList.add('collapsed');
@@ -3693,6 +3707,24 @@ function initPerplexitySection() {
       if (divider) divider.style.display = '';
       refreshPerplexityStatus();
     }
+    if (header._syncCollapseA11y) header._syncCollapseA11y();
+  };
+  applyPerplexityCollapsed();
+
+  wireCollapsibleHeaderA11y(header, {
+    contentId: 'perplexity-content',
+    getExpanded: () => !perplexityCollapsed,
+    onToggle: () => {
+      perplexityCollapsed = !perplexityCollapsed;
+      localStorage.setItem('perplexity_collapsed', perplexityCollapsed.toString());
+      applyPerplexityCollapsed();
+    },
+  });
+
+  header.addEventListener('click', () => {
+    perplexityCollapsed = !perplexityCollapsed;
+    localStorage.setItem('perplexity_collapsed', perplexityCollapsed.toString());
+    applyPerplexityCollapsed();
   });
 
   if (searchBtn && queryInput && resultsEl) {
@@ -3879,8 +3911,20 @@ function initLogsSection() {
       refreshLogsViewer(true);
       if (autoCb && autoCb.checked) startLogsAutoRefresh();
     }
+    if (header._syncCollapseA11y) header._syncCollapseA11y();
   };
   applyCollapsed();
+
+  wireCollapsibleHeaderA11y(header, {
+    contentId: 'logs-content',
+    getExpanded: () => !logsCollapsed,
+    ignoreSelector: '#logs-refresh-btn, #logs-open-btn, #logs-autorefresh, label',
+    onToggle: () => {
+      logsCollapsed = !logsCollapsed;
+      localStorage.setItem('logs_collapsed', logsCollapsed.toString());
+      applyCollapsed();
+    },
+  });
 
   header.addEventListener('click', (e) => {
     e.stopPropagation();

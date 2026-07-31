@@ -1865,6 +1865,8 @@ function escapeHtml(s) {
       }
     }
     if (btn) btn.textContent = collapsed ? '+' : '−';
+    const header = document.getElementById('agent-ops-header');
+    if (header) header.setAttribute('aria-expanded', String(!collapsed));
     syncOpsIcon();
     if (collapsed) {
       stopAgentOpsAutoRefresh();
@@ -1904,6 +1906,29 @@ function escapeHtml(s) {
       closeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         applyOpsCollapsed(true);
+      });
+    }
+
+    if (header && !header.dataset.collapseA11y) {
+      header.dataset.collapseA11y = '1';
+      header.setAttribute('role', 'button');
+      header.setAttribute('tabindex', '0');
+      header.setAttribute('aria-controls', 'agent-ops-content');
+      header.setAttribute('aria-expanded', String(!agentOpsCollapsed));
+      header.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if (e.target.closest?.('.collapse-btn, .ops-overview-link, .agent-ops-tab')) return;
+        e.preventDefault();
+        // Match click behavior: with icon present, keyboard collapses when open; toggles when closed/no icon
+        if (icon && !agentOpsCollapsed) {
+          applyOpsCollapsed(true);
+          return;
+        }
+        if (icon && agentOpsCollapsed) {
+          applyOpsCollapsed(false);
+          return;
+        }
+        toggleAgentOpsSection();
       });
     }
 
