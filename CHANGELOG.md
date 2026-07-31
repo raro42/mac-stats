@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.349] - 2026-07-31
+
 ### Fixed
-- CPU temperature readings on M4-family Macs now use the generation-specific SMC sensor keys.
+- CPU temperature on M4-family Macs uses generation-specific SMC keys (with standard die/proximity tried first).
+- SMC health probe requires a real temperature sample (15s budget; prefers fresh cache).
 
 ## [0.1.348] - 2026-07-31
 

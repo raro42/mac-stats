@@ -19,6 +19,7 @@ use objc2::rc::Retained;
 use objc2::runtime::AnyObject;
 use objc2_app_kit::NSStatusItem;
 use std::cell::RefCell;
+use std::sync::atomic::AtomicBool;
 use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, Instant};
 use sysinfo::{Disks, System};
@@ -86,6 +87,9 @@ pub(crate) static CAN_READ_GPU_POWER: OnceLock<bool> = OnceLock::new();
 
 pub(crate) const TEMP_READ_INTERVAL: Duration = Duration::from_secs(20);
 pub(crate) const TEMP_CACHE_MAX_AGE: Duration = Duration::from_secs(30);
+
+/// Sticky: set true after any successful CPU temperature sample (survives cache age gaps).
+pub(crate) static TEMPERATURE_READ_OK: AtomicBool = AtomicBool::new(false);
 
 // Temperature cache: (temperature_value, last_update_timestamp)
 pub(crate) static TEMP_CACHE: Mutex<Option<(f32, Instant)>> = Mutex::new(None);

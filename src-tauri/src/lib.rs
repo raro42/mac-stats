@@ -1181,6 +1181,10 @@ fn run_internal(open_cpu_window: bool) {
                                             reading.value_celsius,
                                             std::time::Instant::now(),
                                         ));
+                                        crate::state::TEMPERATURE_READ_OK.store(
+                                            true,
+                                            std::sync::atomic::Ordering::Relaxed,
+                                        );
                                         debug3!(
                                             "Temperature updated in cache: {:.1}°C via {:?}",
                                             reading.value_celsius,

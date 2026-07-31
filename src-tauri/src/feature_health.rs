@@ -11,6 +11,8 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use tokio::sync::oneshot;
 
 const PROBE_TIMEOUT: Duration = Duration::from_secs(3);
+/// SMC `all_data()` scans are expensive; give health probes more headroom than HTTP checks.
+const SMC_PROBE_TIMEOUT: Duration = Duration::from_secs(15);
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -589,6 +591,19 @@ async fn probe_redmine() -> FeatureHealth {
 }
 
 async fn probe_smc_blocking() -> FeatureHealth {
+    // Prefer a fresh background sample so Agent Ops health does not force another all_data().
+    if let Ok(cache) = crate::state::TEMP_CACHE.lock() {
+        if let Some((temp, timestamp)) = cache.as_ref() {
+            if *temp > 0.0 && timestamp.elapsed() < crate::state::TEMP_CACHE_MAX_AGE {
+                return entry(
+                    "SMC (temperature)",
+                    HealthStatus::Ok,
+                    Some(format!("{temp:.1}°C (cached)")),
+                );
+            }
+        }
+    }
+
     let (tx, rx) = oneshot::channel::<Result<String, String>>();
     let chip_info = crate::metrics::get_chip_info();
     std::thread::spawn(move || {
@@ -598,6 +613,8 @@ async fn probe_smc_blocking() -> FeatureHealth {
             let reading = reader.read(&mut smc, &chip_info).ok_or_else(|| {
                 format!("SMC connected but no CPU temperature key matched {chip_info}")
             })?;
+            crate::state::TEMPERATURE_READ_OK
+                .store(true, std::sync::atomic::Ordering::Relaxed);
             Ok(format!(
                 "{:.1}°C via {}",
                 reading.value_celsius,
@@ -608,7 +625,7 @@ async fn probe_smc_blocking() -> FeatureHealth {
         .unwrap_or_else(|_| Err("SMC thread panicked".into()));
         let _ = tx.send(out);
     });
-    match tokio::time::timeout(PROBE_TIMEOUT, rx).await {
+    match tokio::time::timeout(SMC_PROBE_TIMEOUT, rx).await {
         Ok(Ok(Ok(message))) => entry("SMC (temperature)", HealthStatus::Ok, Some(message)),
         Ok(Ok(Err(e))) => entry("SMC (temperature)", HealthStatus::Unavailable, Some(e)),
         Ok(Err(_)) => entry(

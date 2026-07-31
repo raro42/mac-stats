@@ -468,6 +468,10 @@ fn extract_percentage_from_line(line: &str) -> Option<f32> {
 }
 
 pub fn can_read_temperature() -> bool {
+    use std::sync::atomic::Ordering;
+    if crate::state::TEMPERATURE_READ_OK.load(Ordering::Relaxed) {
+        return true;
+    }
     TEMP_CACHE
         .lock()
         .ok()

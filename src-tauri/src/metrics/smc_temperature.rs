@@ -31,9 +31,14 @@ pub(crate) struct SmcTemperatureReader {
 
 impl SmcTemperatureReader {
     pub(crate) fn read(&mut self, smc: &mut Smc, chip_info: &str) -> Option<CpuTemperatureReading> {
+        // Prefer macsmc's standard die/proximity path first (works on many M1–M3 machines).
+        // Fall back to generation-scoped raw keys when the standard API returns nothing useful
+        // (typical on M4; also covers M3 variants whose Tf* sensors still work).
         match apple_silicon_generation(chip_info) {
-            AppleSiliconGeneration::M3 => self.read_raw_keys(smc, M3_CPU_TEMPERATURE_KEYS),
-            AppleSiliconGeneration::M4 => self.read_raw_keys(smc, M4_CPU_TEMPERATURE_KEYS),
+            AppleSiliconGeneration::M3 => read_standard_temperature(smc)
+                .or_else(|| self.read_raw_keys(smc, M3_CPU_TEMPERATURE_KEYS)),
+            AppleSiliconGeneration::M4 => read_standard_temperature(smc)
+                .or_else(|| self.read_raw_keys(smc, M4_CPU_TEMPERATURE_KEYS)),
             AppleSiliconGeneration::Other => read_standard_temperature(smc),
         }
     }
