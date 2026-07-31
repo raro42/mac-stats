@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.344] - 2026-07-31
+
+### Changed
+- Process details modal focus management: Close on open, restore focus to the process row on dismiss.
+
 ## [0.1.343] - 2026-07-31
 
 ### Changed

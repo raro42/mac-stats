@@ -1241,6 +1241,44 @@ document.addEventListener("visibilitychange", () => {
 // Process details popover
 let processDetailsModal = null;
 let currentProcessPid = null;
+let processDetailsFocusReturn = null;
+
+function closeProcessDetailsModal() {
+  if (processDetailsRefreshInterval) {
+    clearInterval(processDetailsRefreshInterval);
+    processDetailsRefreshInterval = null;
+  }
+  currentProcessPid = null;
+  syncProcessRowSelection();
+  if (processDetailsModal) {
+    processDetailsModal.style.display = "none";
+    processDetailsModal.setAttribute("aria-hidden", "true");
+  }
+  const returnEl = processDetailsFocusReturn;
+  processDetailsFocusReturn = null;
+  if (returnEl && typeof returnEl.focus === "function") {
+    try {
+      returnEl.focus();
+    } catch (_) {
+      /* ignore */
+    }
+  }
+}
+
+function openProcessDetailsModal() {
+  if (!processDetailsModal) return;
+  processDetailsFocusReturn = document.activeElement;
+  processDetailsModal.style.display = "flex";
+  processDetailsModal.setAttribute("aria-hidden", "false");
+  processDetailsModal.setAttribute("role", "dialog");
+  processDetailsModal.setAttribute("aria-modal", "true");
+  if (!processDetailsModal.getAttribute("aria-labelledby")) {
+    processDetailsModal.setAttribute("aria-labelledby", "process-details-title");
+  }
+  requestAnimationFrame(() => {
+    processDetailsModal.querySelector("#close-process-details")?.focus();
+  });
+}
 
 function syncProcessRowSelection() {
   const list = document.getElementById("process-list");
@@ -1480,13 +1518,7 @@ function populateProcessDetailsBody(body, details, pid) {
           await invoke("force_quit_process", { pid });
           
           // Clear refresh interval and close modal
-          if (processDetailsRefreshInterval) {
-            clearInterval(processDetailsRefreshInterval);
-            processDetailsRefreshInterval = null;
-          }
-          currentProcessPid = null;
-          syncProcessRowSelection();
-          processDetailsModal.style.display = "none";
+          closeProcessDetailsModal();
           
           // Force immediate refresh of process list (bypass 15-second throttle)
           window._forceProcessUpdate = true;
@@ -1522,7 +1554,7 @@ async function showProcessDetails(pid) {
       processDetailsModal = document.createElement("div");
       processDetailsModal.id = "process-details-modal";
       processDetailsModal.className = "settings-modal";
-      processDetailsModal.style.display = "none";
+      processDetailsModal.setAttribute("aria-hidden", "true");
       processDetailsModal.setAttribute("role", "dialog");
       processDetailsModal.setAttribute("aria-modal", "true");
       processDetailsModal.setAttribute("aria-labelledby", "process-details-title");
@@ -1544,13 +1576,7 @@ async function showProcessDetails(pid) {
       if (closeBtn) {
         closeBtn.addEventListener("click", () => {
           // Clear refresh interval when closing
-          if (processDetailsRefreshInterval) {
-            clearInterval(processDetailsRefreshInterval);
-            processDetailsRefreshInterval = null;
-          }
-          currentProcessPid = null;
-          syncProcessRowSelection();
-          processDetailsModal.style.display = "none";
+          closeProcessDetailsModal();
         });
       }
       
@@ -1558,13 +1584,7 @@ async function showProcessDetails(pid) {
       processDetailsModal.addEventListener("click", (e) => {
         if (e.target === processDetailsModal) {
           // Clear refresh interval when closing
-          if (processDetailsRefreshInterval) {
-            clearInterval(processDetailsRefreshInterval);
-            processDetailsRefreshInterval = null;
-          }
-          currentProcessPid = null;
-          syncProcessRowSelection();
-          processDetailsModal.style.display = "none";
+          closeProcessDetailsModal();
         }
       });
       
@@ -1572,13 +1592,7 @@ async function showProcessDetails(pid) {
       const escHandler = (e) => {
         if (e.key === "Escape" && processDetailsModal.style.display !== "none") {
           // Clear refresh interval when closing
-          if (processDetailsRefreshInterval) {
-            clearInterval(processDetailsRefreshInterval);
-            processDetailsRefreshInterval = null;
-          }
-          currentProcessPid = null;
-          syncProcessRowSelection();
-          processDetailsModal.style.display = "none";
+          closeProcessDetailsModal();
         }
       };
       document.addEventListener("keydown", escHandler);
@@ -1600,7 +1614,7 @@ async function showProcessDetails(pid) {
     populateProcessDetailsBody(body, details, pid);
     
     // Show modal (using same display style as settings modal)
-    processDetailsModal.style.display = "flex";
+    openProcessDetailsModal();
     
     // Start auto-refresh every 2 seconds while modal is open
     // CRITICAL: Only refresh if modal is actually visible (checked in updateProcessDetailsContent too)
@@ -1616,8 +1630,6 @@ async function showProcessDetails(pid) {
           clearInterval(processDetailsRefreshInterval);
           processDetailsRefreshInterval = null;
         }
-        currentProcessPid = null;
-        syncProcessRowSelection();
       }
     }, 2000);
   } catch (error) {
