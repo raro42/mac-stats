@@ -2871,25 +2871,11 @@ function initOllamaSection() {
     });
   }
 
-  header.addEventListener('click', (e) => {
-    // Don't toggle if clicking on controls
-    const menuBtn = document.getElementById('ollama-menu-btn');
-    const menu = document.getElementById('ollama-menu');
-    if (e.target === connectionIndicator || 
-        e.target === modelText || 
-        e.target === menuBtn ||
-        connectionIndicator?.contains(e.target) ||
-        modelText?.contains(e.target) ||
-        modelSelect?.contains(e.target) ||
-        menuBtn?.contains(e.target) ||
-        menu?.contains(e.target)) {
-      return;
-    }
-    
-    ollamaCollapsed = !ollamaCollapsed;
+  const applyOllamaCollapsed = () => {
     const section = document.querySelector('.ollama-section');
     const divider = document.getElementById('monitors-ollama-divider');
-    
+    const chat = document.getElementById('ollama-chat');
+
     if (ollamaCollapsed) {
       content.classList.add('collapsed');
       if (section) {
@@ -2898,7 +2884,6 @@ function initOllamaSection() {
       if (divider) {
         divider.style.display = 'none';
       }
-      const chat = document.getElementById('ollama-chat');
       if (chat) chat.style.display = 'none';
       hideModelDropdown();
     } else {
@@ -2909,7 +2894,6 @@ function initOllamaSection() {
       if (divider) {
         divider.style.display = '';
       }
-      const chat = document.getElementById('ollama-chat');
       if (chat) chat.style.display = 'block';
       checkOllamaConnection().then((connected) => {
         // Update icon based on connection result
@@ -2939,6 +2923,36 @@ function initOllamaSection() {
       menuCollapse.textContent = ollamaCollapsed ? 'Expand' : 'Collapse';
     }
     localStorage.setItem('ollama_collapsed', ollamaCollapsed.toString());
+    if (header._syncCollapseA11y) header._syncCollapseA11y();
+  };
+
+  wireCollapsibleHeaderA11y(header, {
+    contentId: 'ollama-content',
+    getExpanded: () => !ollamaCollapsed,
+    ignoreSelector: '#ollama-menu-btn, #ollama-menu, #ollama-connection-indicator, #ollama-model-text, #ollama-model-select',
+    onToggle: () => {
+      ollamaCollapsed = !ollamaCollapsed;
+      applyOllamaCollapsed();
+    },
+  });
+
+  header.addEventListener('click', (e) => {
+    // Don't toggle if clicking on controls
+    const menuBtn = document.getElementById('ollama-menu-btn');
+    const menu = document.getElementById('ollama-menu');
+    if (e.target === connectionIndicator || 
+        e.target === modelText || 
+        e.target === menuBtn ||
+        connectionIndicator?.contains(e.target) ||
+        modelText?.contains(e.target) ||
+        modelSelect?.contains(e.target) ||
+        menuBtn?.contains(e.target) ||
+        menu?.contains(e.target)) {
+      return;
+    }
+    
+    ollamaCollapsed = !ollamaCollapsed;
+    applyOllamaCollapsed();
   });
 
   // Chat event listeners - handled by Ollama module
@@ -3022,35 +3036,8 @@ function initOllamaSection() {
       menu.style.display = 'none';
       // Toggle collapse
       ollamaCollapsed = !ollamaCollapsed;
-      const content = document.getElementById('ollama-content');
-      const chat = document.getElementById('ollama-chat');
-      const section = document.querySelector('.ollama-section');
-      const divider = document.getElementById('monitors-ollama-divider');
-      
-      if (content) {
-        if (ollamaCollapsed) {
-          content.classList.add('collapsed');
-          if (section) {
-            section.classList.add('collapsed');
-          }
-          if (divider) {
-            divider.style.display = 'none';
-          }
-          if (chat) chat.style.display = 'none';
-        } else {
-          content.classList.remove('collapsed');
-          if (section) {
-            section.classList.remove('collapsed');
-          }
-          if (divider) {
-            divider.style.display = '';
-          }
-          if (chat) chat.style.display = 'block';
-          checkOllamaConnection();
-        }
-        localStorage.setItem('ollama_collapsed', ollamaCollapsed.toString());
-        updateMenuText();
-      }
+      applyOllamaCollapsed();
+      updateMenuText();
     });
   }
   
