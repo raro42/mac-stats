@@ -645,7 +645,42 @@ textarea.ops-agent-editor.is-dirty {
   padding: 6px 8px;
   margin: 0 -8px;
   cursor: pointer;
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: 10px;
+  align-items: center;
   transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.process-pin {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: inherit;
+  opacity: 0.45;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px;
+  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+}
+
+.process-pin:hover,
+.process-pin:focus-visible {
+  opacity: 0.95;
+  outline: none;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.process-pin.is-pinned {
+  opacity: 1;
+  color: color-mix(in srgb, #0a84ff 85%, currentColor);
+}
+
+.process-row.is-pinned {
+  background: color-mix(in srgb, #0a84ff 6%, transparent);
 }
 
 .process-row:hover {
@@ -749,15 +784,44 @@ textarea.ops-agent-editor.is-dirty {
   border-top: 1px dashed color-mix(in srgb, #ff3b30 28%, transparent);
 }
 
-.process-row.is-selected {
-  background: color-mix(in srgb, #0a84ff 12%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, transparent);
+.force-quit-advanced {
+  border: none;
+}
+
+.force-quit-advanced > summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0.72;
+  list-style: none;
+  user-select: none;
+}
+
+.force-quit-advanced > summary::-webkit-details-marker {
+  display: none;
+}
+
+.force-quit-advanced > summary::before {
+  content: "▸ ";
+  opacity: 0.7;
+}
+
+.force-quit-advanced[open] > summary::before {
+  content: "▾ ";
+}
+
+.force-quit-hint {
+  margin: 8px 0 10px;
+  font-size: 11px;
+  line-height: 1.4;
+  opacity: 0.7;
 }
 
 .process-list-header {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 18px;
+  grid-template-columns: 22px 1fr auto;
+  gap: 10px;
   align-items: center;
   padding: 2px 8px 6px;
   margin: 0 -8px 2px;
@@ -775,6 +839,11 @@ textarea.ops-agent-editor.is-dirty {
 .process-list-header span:last-child {
   min-width: calc(120px + 14px + 62px);
   text-align: right;
+}
+
+.process-row.is-selected {
+  background: color-mix(in srgb, #0a84ff 12%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, transparent);
 }
 
 .history-chart-caption {

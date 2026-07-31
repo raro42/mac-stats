@@ -389,6 +389,23 @@ impl Config {
         Self::merge_config_bool("menuBarCompact", compact)
     }
 
+    /// Compact CPU window (smaller size + collapsed heavy sections). Default **false**.
+    pub fn cpu_window_compact() -> bool {
+        let config_path = Self::config_file_path();
+        if let Ok(content) = std::fs::read_to_string(&config_path) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(v) = json.get("cpuWindowCompact").and_then(|v| v.as_bool()) {
+                    return v;
+                }
+            }
+        }
+        false
+    }
+
+    pub fn set_cpu_window_compact(compact: bool) -> Result<(), String> {
+        Self::merge_config_bool("cpuWindowCompact", compact)
+    }
+
     fn merge_config_bool(key: &str, value: bool) -> Result<(), String> {
         use serde_json::{json, Value};
         let config_path = Self::config_file_path();

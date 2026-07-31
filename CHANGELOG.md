@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.350] - 2026-07-31
+
+### Added
+- Pin favorite processes (★ by name; stays visible when not in top CPU)
+- Compact CPU window setting (`cpuWindowCompact`) — smaller size + collapsed heavy sections
+
+### Changed
+- Force Quit lives under an Advanced disclosure in Process details (two-click confirm kept)
+
 ## [0.1.349] - 2026-07-31
 
 ### Fixed

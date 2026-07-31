@@ -1235,6 +1235,78 @@ pub fn set_menu_bar_compact(compact: bool) -> Result<bool, String> {
 }
 
 #[tauri::command]
+pub fn get_cpu_window_compact() -> bool {
+    crate::config::Config::cpu_window_compact()
+}
+
+#[tauri::command]
+pub fn set_cpu_window_compact(compact: bool) -> Result<bool, String> {
+    crate::config::Config::set_cpu_window_compact(compact)?;
+    resize_cpu_window_for_compact(compact);
+    Ok(crate::config::Config::cpu_window_compact())
+}
+
+fn resize_cpu_window_for_compact(compact: bool) {
+    use crate::state::APP_HANDLE;
+    use tauri::Manager;
+    let Some(app) = APP_HANDLE.get() else {
+        return;
+    };
+    let Some(win) = app.get_webview_window("cpu") else {
+        return;
+    };
+    let (w, h) = if compact {
+        (440.0_f64, 560.0_f64)
+    } else {
+        (644.0_f64, 995.0_f64)
+    };
+    let _ = win.set_size(tauri::Size::Logical(tauri::LogicalSize::new(w, h)));
+}
+
+/// Look up current CPU/pid for pinned process names (highest-CPU match per name).
+#[tauri::command]
+pub fn get_processes_by_names(names: Vec<String>) -> Vec<ProcessUsage> {
+    if names.is_empty() {
+        return Vec::new();
+    }
+    let Ok(mut guard) = SYSTEM.try_lock() else {
+        return Vec::new();
+    };
+    let Some(sys) = guard.as_mut() else {
+        return Vec::new();
+    };
+    use sysinfo::ProcessesToUpdate;
+    sys.refresh_processes(ProcessesToUpdate::All, true);
+
+    let mut out = Vec::with_capacity(names.len());
+    for name in names {
+        let mut best: Option<ProcessUsage> = None;
+        for (pid, proc) in sys.processes() {
+            let n = proc.name().to_string_lossy().to_string();
+            if n != name {
+                continue;
+            }
+            let cand = ProcessUsage {
+                name: n,
+                cpu: proc.cpu_usage(),
+                pid: pid.as_u32(),
+            };
+            if best
+                .as_ref()
+                .map(|b| cand.cpu > b.cpu)
+                .unwrap_or(true)
+            {
+                best = Some(cand);
+            }
+        }
+        if let Some(p) = best {
+            out.push(p);
+        }
+    }
+    out
+}
+
+#[tauri::command]
 pub fn reset_config_to_monitor_defaults() -> Result<String, String> {
     crate::config::Config::reset_config_to_monitor_defaults()?;
     Ok("Monitor defaults applied (aiAgentEnabled=false, menuBarCompact=true). Restart recommended for Discord/scheduler.".into())

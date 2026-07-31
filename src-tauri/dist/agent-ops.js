@@ -1879,6 +1879,7 @@ function escapeHtml(s) {
       });
     }
   }
+  window.applyOpsCollapsed = applyOpsCollapsed;
 
   function toggleAgentOpsSection() {
     applyOpsCollapsed(!agentOpsCollapsed);

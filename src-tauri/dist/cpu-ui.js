@@ -220,10 +220,11 @@
   function initProductToggles() {
     const aiToggle = document.getElementById("ai-agent-enabled-toggle");
     const compactToggle = document.getElementById("menu-bar-compact-toggle");
+    const cpuWindowCompactToggle = document.getElementById("cpu-window-compact-toggle");
     const helpBtn = document.getElementById("settings-help-btn");
     const resetBtn = document.getElementById("settings-reset-defaults-btn");
     const helpSheet = document.getElementById("settings-help-sheet");
-    if (!aiToggle && !compactToggle && !helpBtn && !resetBtn) return;
+    if (!aiToggle && !compactToggle && !cpuWindowCompactToggle && !helpBtn && !resetBtn) return;
 
     (async () => {
       try {
@@ -231,6 +232,9 @@
         if (!invoke) return;
         if (aiToggle) aiToggle.checked = !!(await invoke("get_ai_agent_enabled"));
         if (compactToggle) compactToggle.checked = !!(await invoke("get_menu_bar_compact"));
+        if (cpuWindowCompactToggle) {
+          cpuWindowCompactToggle.checked = !!(await invoke("get_cpu_window_compact"));
+        }
         applyAiUiVisibility(aiToggle ? aiToggle.checked : true);
       } catch (e) {
         console.warn("product toggles load", e);
@@ -261,6 +265,22 @@
         }
       });
     }
+    if (cpuWindowCompactToggle) {
+      cpuWindowCompactToggle.addEventListener("change", async () => {
+        try {
+          const invoke = getInvoke();
+          if (!invoke) return;
+          const on = !!cpuWindowCompactToggle.checked;
+          await invoke("set_cpu_window_compact", { compact: on });
+          document.body.classList.toggle("cpu-window-compact", on);
+          if (on && typeof window.applyCpuWindowCompactLayout === "function") {
+            window.applyCpuWindowCompactLayout(true);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      });
+    }
     if (helpBtn && helpSheet) {
       helpBtn.addEventListener("click", () => {
         const show = helpSheet.hasAttribute("hidden");
@@ -268,7 +288,7 @@
           helpSheet.textContent = [
             "Menu bar: click to open window.",
             "CLI: mac_stats | mac_stats --cpu | mac_stats -vv  (logs: ~/.mac-stats/debug.log)",
-            "Config: ~/.mac-stats/config.json  (aiAgentEnabled, menuBarCompact)",
+            "Config: ~/.mac-stats/config.json  (aiAgentEnabled, menuBarCompact, cpuWindowCompact)",
             "Monitor-only: leave AI off. AI path: enable toggle + ollama pull llama3.2",
             "First AI ask: “What's my CPU temp?”",
             "Docs: docs/GETTING_STARTED.md",
@@ -288,6 +308,7 @@
           const msg = await invoke("reset_config_to_monitor_defaults");
           if (aiToggle) aiToggle.checked = false;
           if (compactToggle) compactToggle.checked = true;
+          if (cpuWindowCompactToggle) cpuWindowCompactToggle.checked = false;
           applyAiUiVisibility(false);
           alert(msg || "Defaults applied. Restart recommended.");
         } catch (e) {

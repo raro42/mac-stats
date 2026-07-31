@@ -202,6 +202,61 @@ let lastProcessUpdate = 0;
 let lastProcessListKey = "";
 let isWaitingForData = false; // Track if we're waiting for real data (non-zero usage)
 
+const PINNED_PROCESS_NAMES_KEY = "pinned_process_names";
+const MAX_PINNED_PROCESSES = 6;
+const PROCESS_LIST_DISPLAY_CAP = 10;
+
+function getPinnedProcessNames() {
+  try {
+    const raw = localStorage.getItem(PINNED_PROCESS_NAMES_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((n) => typeof n === "string" && n.trim())
+      .map((n) => n.trim())
+      .slice(0, MAX_PINNED_PROCESSES);
+  } catch {
+    return [];
+  }
+}
+
+function setPinnedProcessNames(names) {
+  const cleaned = (names || [])
+    .filter((n) => typeof n === "string" && n.trim())
+    .map((n) => n.trim())
+    .slice(0, MAX_PINNED_PROCESSES);
+  localStorage.setItem(PINNED_PROCESS_NAMES_KEY, JSON.stringify(cleaned));
+  return cleaned;
+}
+
+function togglePinnedProcessName(name) {
+  if (!name) return getPinnedProcessNames();
+  const pins = getPinnedProcessNames();
+  const idx = pins.indexOf(name);
+  if (idx >= 0) {
+    pins.splice(idx, 1);
+  } else if (pins.length < MAX_PINNED_PROCESSES) {
+    pins.push(name);
+  }
+  return setPinnedProcessNames(pins);
+}
+
+function mergePinnedProcesses(pinOrder, pinnedLookup, top) {
+  const pinned = [];
+  const usedNames = new Set();
+  for (const name of pinOrder) {
+    const fromLookup = (pinnedLookup || []).find((p) => p.name === name);
+    const fromTop = (top || []).find((p) => p.name === name);
+    const proc = fromLookup || fromTop;
+    if (proc) {
+      pinned.push(proc);
+      usedNames.add(name);
+    }
+  }
+  const rest = (top || []).filter((p) => !usedNames.has(p.name));
+  return [...pinned, ...rest].slice(0, PROCESS_LIST_DISPLAY_CAP);
+}
+
 // Make refresh available globally for refresh button
 window.refreshData = refresh;
 
@@ -711,12 +766,24 @@ async function refresh() {
       if (!list) return;
       
       // Skip DOM update when process list unchanged (avoids reflows and listener churn)
-      const processes = data.top_processes && data.top_processes.length > 0
-        ? data.top_processes.slice(0, 8)
-        : [];
+      const pinnedNames = getPinnedProcessNames();
+      let processes =
+        data.top_processes && data.top_processes.length > 0
+          ? data.top_processes.slice(0, 8)
+          : [];
+      if (pinnedNames.length > 0) {
+        let pinnedLookup = [];
+        try {
+          pinnedLookup = await invoke("get_processes_by_names", { names: pinnedNames });
+        } catch (e) {
+          console.warn("get_processes_by_names failed", e);
+        }
+        processes = mergePinnedProcesses(pinnedNames, pinnedLookup, processes);
+      }
       const processKey = processes.length > 0
-        ? processes.map((p) => `${p.pid}:${p.cpu.toFixed(1)}:${p.name}`).join("|")
-        : "empty";
+        ? `${pinnedNames.join(",")}|` +
+          processes.map((p) => `${p.pid}:${p.cpu.toFixed(1)}:${p.name}`).join("|")
+        : `empty|${pinnedNames.join(",")}`;
       if (!forceUpdate && !isInitialLoad && processKey === lastProcessListKey) {
         return;
       }
@@ -734,10 +801,14 @@ async function refresh() {
       const colHeader = document.createElement("div");
       colHeader.className = "process-list-header";
       colHeader.setAttribute("aria-hidden", "true");
+      const colPin = document.createElement("span");
+      colPin.className = "process-list-header-pin";
+      colPin.textContent = "";
       const colName = document.createElement("span");
       colName.textContent = "Process";
       const colCpu = document.createElement("span");
       colCpu.textContent = "CPU";
+      colHeader.appendChild(colPin);
       colHeader.appendChild(colName);
       colHeader.appendChild(colCpu);
       fragment.appendChild(colHeader);
@@ -748,9 +819,11 @@ async function refresh() {
         );
         if (tabIdx < 0) tabIdx = 0;
         processes.forEach((proc, i) => {
+          const isPinned = pinnedNames.includes(proc.name);
           const row = document.createElement("div");
-          row.className = "process-row";
+          row.className = "process-row" + (isPinned ? " is-pinned" : "");
           row.setAttribute("data-pid", String(proc.pid));
+          row.setAttribute("data-name", proc.name);
           row.setAttribute("role", "option");
           row.setAttribute("tabindex", i === tabIdx ? "0" : "-1");
           row.title = "Click for details";
@@ -761,6 +834,15 @@ async function refresh() {
             row.classList.add("is-selected");
             row.setAttribute("aria-current", "true");
           }
+
+          const pinBtn = document.createElement("button");
+          pinBtn.type = "button";
+          pinBtn.className = "process-pin" + (isPinned ? " is-pinned" : "");
+          pinBtn.setAttribute("aria-label", isPinned ? `Unpin ${proc.name}` : `Pin ${proc.name}`);
+          pinBtn.setAttribute("aria-pressed", isPinned ? "true" : "false");
+          pinBtn.setAttribute("data-name", proc.name);
+          pinBtn.title = isPinned ? "Unpin" : "Pin favorite";
+          pinBtn.textContent = isPinned ? "★" : "☆";
           
           const name = document.createElement("div");
           name.className = "process-name";
@@ -784,6 +866,7 @@ async function refresh() {
           usage.appendChild(bar);
           usage.appendChild(percent);
           
+          row.appendChild(pinBtn);
           row.appendChild(name);
           row.appendChild(usage);
           fragment.appendChild(row);
@@ -802,6 +885,15 @@ async function refresh() {
           list.setAttribute("role", "listbox");
           list.setAttribute("aria-label", "Top processes");
           list.addEventListener("click", (e) => {
+            const pinBtn = e.target.closest(".process-pin");
+            if (pinBtn && list.contains(pinBtn)) {
+              e.preventDefault();
+              e.stopPropagation();
+              togglePinnedProcessName(pinBtn.getAttribute("data-name"));
+              window._forceProcessUpdate = true;
+              if (window.refreshData) window.refreshData();
+              return;
+            }
             const row = e.target.closest(".process-row");
             if (row) {
               const pid = row.getAttribute("data-pid");
@@ -1527,7 +1619,11 @@ function populateProcessDetailsBody(body, details, pid) {
         </div>
       </div>
       <div class="force-quit-section">
-        <button id="force-quit-process-btn" class="force-quit-btn" type="button">Force Quit Process</button>
+        <details class="force-quit-advanced">
+          <summary>Advanced</summary>
+          <p class="force-quit-hint">Force Quit ends the process immediately.</p>
+          <button id="force-quit-process-btn" class="force-quit-btn" type="button">Force Quit Process</button>
+        </details>
       </div>
     `;
     
@@ -3735,6 +3831,9 @@ function initCollapsibleSections() {
     showProcesses();
     localStorage.setItem('details_processes_collapsed', 'false');
   }
+
+  window.hideDetailsProcessesSections = hideSections;
+  window.showDetailsProcessesSections = showSections;
   
   // Apply initial state (hidden by default)
   if (sectionsCollapsed) {
@@ -4147,6 +4246,48 @@ function initLogsSection() {
   }
 }
 
+function collapseSectionByIds(sectionSel, contentId, collapsedKey) {
+  const content = contentId ? document.getElementById(contentId) : null;
+  const section = sectionSel ? document.querySelector(sectionSel) : null;
+  if (content) {
+    content.classList.add('collapsed');
+    if (content.classList.contains('section-content-collapsible')) {
+      content.style.display = 'none';
+    }
+  }
+  if (section) section.classList.add('collapsed');
+  if (collapsedKey) localStorage.setItem(collapsedKey, 'true');
+}
+
+/** Force-collapse heavy sections when Compact CPU window is enabled (does not run on disable). */
+window.applyCpuWindowCompactLayout = function applyCpuWindowCompactLayout(compact) {
+  if (!compact) return;
+  collapseSectionByIds('.monitors-section', 'monitors-content', 'monitors_collapsed');
+  collapseSectionByIds('.ollama-section', 'ollama-content', 'ollama_collapsed');
+  collapseSectionByIds('.perplexity-section', 'perplexity-content', 'perplexity_collapsed');
+  collapseSectionByIds('.logs-section', 'logs-content', 'logs_collapsed');
+  if (typeof window.applyOpsCollapsed === 'function') {
+    window.applyOpsCollapsed(true);
+  } else {
+    collapseSectionByIds('.agent-ops-section', 'agent-ops-content', null);
+  }
+  if (typeof window.hideDetailsProcessesSections === 'function') {
+    window.hideDetailsProcessesSections();
+  }
+};
+
+async function initCpuWindowCompactPreference() {
+  try {
+    const inv = getInvoke();
+    if (!inv) return;
+    const compact = !!(await inv('get_cpu_window_compact'));
+    document.body.classList.toggle('cpu-window-compact', compact);
+    if (compact) window.applyCpuWindowCompactLayout(true);
+  } catch (e) {
+    console.warn('cpu window compact pref', e);
+  }
+}
+
 function initIconLine() {
   const monitorsIcon = document.getElementById('icon-monitors');
   const ollamaIcon = document.getElementById('icon-ollama');
@@ -4258,6 +4399,7 @@ function initMonitoringFeatures() {
     if (window.Ollama) {
       autoConfigureOllama();
     }
+    initCpuWindowCompactPreference();
   }, 100);
 }
 

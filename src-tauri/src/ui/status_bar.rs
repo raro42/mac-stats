@@ -689,7 +689,18 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
         WebviewWindowBuilder::new(app_handle, "cpu", WebviewUrl::App("cpu.html".into()))
             .title("CPU")
             .visible(true) // Show immediately when created
-            .inner_size(644.0, 995.0)
+            .inner_size(
+                if Config::cpu_window_compact() {
+                    440.0
+                } else {
+                    644.0
+                },
+                if Config::cpu_window_compact() {
+                    560.0
+                } else {
+                    995.0
+                },
+            )
             .resizable(true)
             .always_on_top(false)
             .decorations(decorations)
