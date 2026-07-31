@@ -59,13 +59,31 @@
     document.body.className = `theme-${theme}`;
   }
 
+  let settingsFocusReturn = null;
+
   function openSettingsModal() {
     const settingsModal = document.getElementById("settings-modal");
     if (!settingsModal) return;
+    settingsFocusReturn = document.activeElement;
     settingsModal.style.display = "flex";
     settingsModal.setAttribute("aria-hidden", "false");
+    settingsModal.setAttribute("role", "dialog");
+    settingsModal.setAttribute("aria-modal", "true");
+    if (!settingsModal.getAttribute("aria-labelledby")) {
+      const title =
+        settingsModal.querySelector("#settings-modal-title") ||
+        settingsModal.querySelector("#settings-title") ||
+        settingsModal.querySelector(".settings-header h2");
+      if (title) {
+        if (!title.id) title.id = "settings-modal-title";
+        settingsModal.setAttribute("aria-labelledby", title.id);
+      }
+    }
     if (window.Discord?.refreshStatus) window.Discord.refreshStatus();
     if (window.Perplexity?.refreshStatus) window.Perplexity.refreshStatus();
+    requestAnimationFrame(() => {
+      document.getElementById("close-settings")?.focus();
+    });
   }
 
   function closeSettingsModal() {
@@ -73,6 +91,15 @@
     if (!settingsModal) return;
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
+    const returnEl = settingsFocusReturn;
+    settingsFocusReturn = null;
+    if (returnEl && typeof returnEl.focus === "function") {
+      try {
+        returnEl.focus();
+      } catch (_) {
+        /* ignore */
+      }
+    }
   }
 
   function initSettingsModal() {

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.342] - 2026-07-31
+
+### Changed
+- Settings modal is a proper dialog with focus move to Close on open and restore on dismiss; soft card entrance animation.
+
 ## [0.1.341] - 2026-07-31
 
 ### Changed

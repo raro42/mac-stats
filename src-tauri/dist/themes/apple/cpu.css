@@ -602,6 +602,18 @@ body {
   -webkit-backdrop-filter: blur(36px) saturate(160%);
   padding: 18px 18px 16px;
   overflow: hidden;
+  animation: settings-card-in 0.22s ease-out;
+}
+
+@keyframes settings-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .settings-header {
