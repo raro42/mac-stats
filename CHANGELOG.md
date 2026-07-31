@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.340] - 2026-07-31
+
+### Changed
+- Logs toolbar/viewer glass polish with empty state; Usage card and Details/Processes headers are keyboard-toggleable.
+
 ## [0.1.339] - 2026-07-31
 
 ### Changed

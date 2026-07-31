@@ -1836,22 +1836,32 @@ body {
   gap: 8px;
   align-items: center;
   margin-bottom: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
 }
 .logs-toolbar button {
   font-size: 12px;
   padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--hairline);
-  background: rgba(255, 255, 255, 0.55);
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, currentColor 5%, transparent);
   color: var(--text);
   cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 .logs-toolbar button:hover {
-  background: rgba(255, 255, 255, 0.8);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 24%, transparent);
+  transform: translateY(-1px);
 }
 .logs-toolbar button:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
   outline-offset: 2px;
+}
+.logs-toolbar button:active {
+  transform: translateY(0);
 }
 .logs-autorefresh {
   font-size: 12px;
@@ -1870,11 +1880,22 @@ body {
   line-height: 1.45;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   color: var(--text);
-  background: rgba(0, 0, 0, 0.06);
-  border: 1px solid var(--hairline);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
   border-radius: 10px;
   white-space: pre-wrap;
   word-break: break-word;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.logs-viewer:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+}
+.logs-viewer.is-empty {
+  color: var(--muted);
+  font-style: italic;
+  border-style: dashed;
 }
 
 .monitors-summary {

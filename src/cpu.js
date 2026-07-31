@@ -3589,30 +3589,70 @@ function initCollapsibleSections() {
   
   // Details header click - hide Details section
   if (detailsHeader) {
-    detailsHeader.addEventListener('click', (e) => {
+    detailsHeader.setAttribute('role', 'button');
+    detailsHeader.setAttribute('aria-label', 'Hide Details section');
+    if (!detailsHeader.hasAttribute('tabindex')) detailsHeader.setAttribute('tabindex', '0');
+    const hideDetailsAction = (e) => {
       e.stopPropagation();
       hideDetails();
+    };
+    detailsHeader.addEventListener('click', hideDetailsAction);
+    detailsHeader.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      hideDetailsAction(e);
     });
   }
   
   // Processes header click - hide Processes section
   if (processesHeader) {
-    processesHeader.addEventListener('click', (e) => {
+    processesHeader.setAttribute('role', 'button');
+    processesHeader.setAttribute('aria-label', 'Hide Processes section');
+    if (!processesHeader.hasAttribute('tabindex')) processesHeader.setAttribute('tabindex', '0');
+    const hideProcessesAction = (e) => {
       e.stopPropagation();
       hideProcesses();
+    };
+    processesHeader.addEventListener('click', hideProcessesAction);
+    processesHeader.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      hideProcessesAction(e);
     });
   }
   
   // Usage card click - toggle both sections (open/close)
   if (usageCard) {
-    usageCard.addEventListener('click', (e) => {
+    usageCard.setAttribute('role', 'button');
+    usageCard.setAttribute('tabindex', '0');
+    const syncUsageExpanded = () => {
+      const hidden =
+        detailsSection?.style.display === 'none' ||
+        processesSection?.style.display === 'none';
+      usageCard.setAttribute('aria-expanded', String(!hidden));
+      usageCard.setAttribute(
+        'aria-label',
+        hidden ? 'Show Details and Processes' : 'Hide Details and Processes'
+      );
+    };
+    syncUsageExpanded();
+    const toggleSections = (e) => {
       e.stopPropagation();
-      const currentlyHidden = detailsSection?.style.display === 'none' || processesSection?.style.display === 'none';
+      const currentlyHidden =
+        detailsSection?.style.display === 'none' ||
+        processesSection?.style.display === 'none';
       if (currentlyHidden) {
         showSections();
       } else {
         hideSections();
       }
+      syncUsageExpanded();
+    };
+    usageCard.addEventListener('click', toggleSections);
+    usageCard.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      toggleSections(e);
     });
   }
 }
@@ -3839,9 +3879,11 @@ async function refreshLogsViewer(scrollToEnd = true) {
   const viewer = document.getElementById('logs-viewer');
   const pathHint = document.getElementById('logs-path-hint');
   if (!viewer) return;
+  if (!viewer.hasAttribute('tabindex')) viewer.setAttribute('tabindex', '0');
   const inv = getInvoke() || invoke;
   if (!inv) {
     viewer.textContent = 'App not ready.';
+    viewer.classList.add('is-empty');
     return;
   }
   try {
@@ -3853,12 +3895,15 @@ async function refreshLogsViewer(scrollToEnd = true) {
     const prefix = tail.truncated
       ? `… truncated (showing last ~${Math.round((tail.content || '').length / 1024)} KiB of ${Math.round((tail.total_bytes || 0) / 1024)} KiB)\n\n`
       : '';
-    viewer.textContent = prefix + (tail.content || '(empty log)');
+    const body = tail.content || '(empty log)';
+    viewer.textContent = prefix + body;
+    viewer.classList.toggle('is-empty', !tail.content);
     if (scrollToEnd) {
       viewer.scrollTop = viewer.scrollHeight;
     }
   } catch (err) {
     viewer.textContent = 'Failed to read log: ' + String(err);
+    viewer.classList.add('is-empty');
   }
 }
 
