@@ -730,6 +730,17 @@ async function refresh() {
       
       // Use document fragment to batch all DOM updates and reduce reflows
       const fragment = document.createDocumentFragment();
+
+      const colHeader = document.createElement("div");
+      colHeader.className = "process-list-header";
+      colHeader.setAttribute("aria-hidden", "true");
+      const colName = document.createElement("span");
+      colName.textContent = "Process";
+      const colCpu = document.createElement("span");
+      colCpu.textContent = "CPU";
+      colHeader.appendChild(colName);
+      colHeader.appendChild(colCpu);
+      fragment.appendChild(colHeader);
       
       if (processes.length > 0) {
         let tabIdx = processes.findIndex(

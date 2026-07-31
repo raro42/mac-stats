@@ -754,6 +754,29 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: inset 0 0 0 1px color-mix(in srgb, #0a84ff 28%, transparent);
 }
 
+.process-list-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+  padding: 2px 8px 6px;
+  margin: 0 -8px 2px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: inherit;
+  opacity: 0.55;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  pointer-events: none;
+  user-select: none;
+}
+
+.process-list-header span:last-child {
+  min-width: calc(120px + 14px + 62px);
+  text-align: right;
+}
+
 .history-chart-caption {
   position: absolute;
   top: 5px;
