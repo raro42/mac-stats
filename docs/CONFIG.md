@@ -6,8 +6,9 @@ All runtime data stays on your Mac under **`~/.mac-stats/`**. There is **no clou
 
 ```
 ~/.mac-stats/
-├── config.json            # Window, timeouts, harness mode, browser, …
+├── config.json            # Window, timeouts, harness mode, browser, diskCleanupScopes, …
 ├── .config.env            # Secrets — never commit
+├── disk_cleanup.json      # Last / next Disk Cleanup run state
 ├── discord_channels.json
 ├── schedules.json
 ├── agents/                # soul.md, memory.md, skills, prompts
@@ -24,6 +25,15 @@ After editing secrets for LaunchAgent / `/Applications` installs, run:
 ```
 
 (from a clone) so keys from `src-tauri/.config.env` merge into `~/.mac-stats/.config.env`.
+
+## Disk Cleanup
+
+In `config.json`:
+
+- `diskCleanupScopes` — array of scopes (`mac-stats`, `trash`, `downloads`, `temp`, or `path` with custom `path` / `maxAgeDays` / `recursive`)
+- `diskCleanupIntervalHours` — periodic run interval while the app is running (default `24`)
+
+See [FEATURES.md](../FEATURES.md#disk-cleanup).
 
 ## Secrets
 

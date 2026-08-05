@@ -25,7 +25,7 @@ Two products in one binary — pick your path:
 | Needs | macOS on Apple Silicon | + [Ollama](https://ollama.com) + a model |
 | Config | Zero — AI is **off by default** | Set `aiAgentEnabled: true` or use Settings |
 
-📋 [Changelog](CHANGELOG.md) · 📘 [Getting Started](docs/GETTING_STARTED.md) · 🗺 [Roadmap](docs/ROADMAP.md) · 🍺 [Homebrew](docs/homebrew.md) · 🌐 [Landing](docs/site/index.html) · 🔬 [How we compare](docs/042_how_we_compare.md)
+📋 [Changelog](CHANGELOG.md) · ✨ [Features](FEATURES.md) · 📘 [Getting Started](docs/GETTING_STARTED.md) · 🗺 [Roadmap](docs/ROADMAP.md) · 🍺 [Homebrew](docs/homebrew.md) · 🌐 [Landing](docs/site/index.html) · 🔬 [How we compare](docs/042_how_we_compare.md)
 
 ## Table of contents
 
@@ -87,6 +87,7 @@ Details: [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
 <p>
   <img src="screens/feature-cpu-metrics.png" alt="CPU metrics" width="280">
+  <img src="screens/feature-disk-cleanup.png" alt="Disk Cleanup" width="280">
   <img src="screens/feature-agent-ops.png" alt="Agent Ops" width="280">
   <img src="screens/feature-ai-chat.png" alt="AI chat (Ollama)" width="280">
   <img src="screens/feature-processes.png" alt="Top processes" width="280">
@@ -158,7 +159,14 @@ In-app banner checks GitHub Releases. Or: `brew upgrade --cask mac-stats`.
 
 - Compact menu bar by default (**CPU + SSD**, plus °C when known); set `menuBarCompact: false` for CPU/GPU/RAM/SSD.
 - Nine themes, process list, website monitors (menu bar shows a red **Mon ✕** cue when any site is down).
+- GPU usage ring gauge alongside CPU / frequency / temperature.
 - ~0.5% idle CPU (menu bar only).
+
+### Disk Cleanup
+
+- Preview reclaimable files; **Clean now** or automatic runs (app launch + every 24h while running).
+- Configurable scopes: mac-stats data, Trash, Downloads, Temp, plus custom paths (age days + recurse) in `diskCleanupScopes`.
+- Details: [FEATURES.md](FEATURES.md#disk-cleanup).
 
 ### Local AI agent (opt-in)
 

@@ -16,11 +16,13 @@ Screenshots and a short demo reel for [mac-stats](https://github.com/raro42/mac-
 
 ## Feature screenshots
 
-| CPU metrics | Agent Ops |
-|-------------|-----------|
-| <img src="feature-cpu-metrics.png" alt="CPU metrics" width="280"> | <img src="feature-agent-ops.png" alt="Agent Ops" width="280"> |
-| **AI chat (Ollama)** | **Top processes** |
-| <img src="feature-ai-chat.png" alt="AI chat" width="280"> | <img src="feature-processes.png" alt="Processes" width="280"> |
+| CPU metrics | Disk Cleanup |
+|-------------|--------------|
+| <img src="feature-cpu-metrics.png" alt="CPU metrics" width="280"> | <img src="feature-disk-cleanup.png" alt="Disk Cleanup" width="280"> |
+| **Agent Ops** | **AI chat (Ollama)** |
+| <img src="feature-agent-ops.png" alt="Agent Ops" width="280"> | <img src="feature-ai-chat.png" alt="AI chat" width="280"> |
+| **Top processes** | |
+| <img src="feature-processes.png" alt="Processes" width="280"> | |
 
 ### Short demo video
 
@@ -44,5 +46,6 @@ Also linked from the [project README](../README.md#demo-video).
 
 ## Refresh log
 
+- **2026-08-05:** Added `feature-disk-cleanup.png` (window-only) for configurable cleanup scopes (Trash / Downloads / Temp / custom paths) — v0.1.355+.
 - **2026-07-28:** Agent Ops empty-state polish shipped (v0.1.261). Window-only recapture of `feature-agent-ops.png` deferred — agent-session `screencapture` returned black frames (Screen Recording / TCC); keep prior asset until a permitted capture.
 - **2026-07-26:** Recaptured `feature-cpu-metrics.png` (window-only, post SSD menu-bar / v0.1.257+).

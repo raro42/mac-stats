@@ -21,6 +21,7 @@ pub mod delegation_tool_dispatch;
 pub mod directive_tags;
 pub mod discord;
 pub mod discord_draft_stream;
+pub mod disk_cleanup;
 pub mod downloads_organizer;
 pub mod fast_lane;
 pub mod harness_ops;

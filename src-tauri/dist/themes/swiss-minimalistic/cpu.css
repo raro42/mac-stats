@@ -149,7 +149,7 @@ body {
 
 .swiss-metrics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 22px;
   margin-bottom: 0;
 }
@@ -2371,4 +2371,8 @@ body {
 /* Logs section */
 .logs-section.collapsed {
   display: none;
+}
+
+#gpu-usage-ring-progress {
+  stroke: #c4a8d8;
 }

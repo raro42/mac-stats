@@ -1036,6 +1036,249 @@ textarea.ops-agent-editor.is-dirty {
   border-style: dashed;
 }
 
+/* Disk Cleanup panel */
+.disk-cleanup-section .disk-cleanup-summary {
+  font-size: 12px;
+  opacity: 0.72;
+  margin-left: 8px;
+}
+
+.disk-cleanup-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.disk-cleanup-meta-card {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+}
+
+.disk-cleanup-meta-label {
+  font-size: 11px;
+  opacity: 0.65;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.disk-cleanup-meta-value {
+  font-size: 13px;
+  font-weight: 560;
+  line-height: 1.35;
+}
+
+.disk-cleanup-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.disk-cleanup-toolbar .disk-cleanup-primary {
+  background: color-mix(in srgb, #0a84ff 14%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 30%, transparent);
+}
+
+.disk-cleanup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.disk-cleanup-item {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3%, transparent);
+}
+
+.disk-cleanup-item.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 28%, transparent);
+  background: color-mix(in srgb, #ff9f0a 6%, transparent);
+}
+
+.disk-cleanup-item-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.disk-cleanup-item-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.disk-cleanup-item-stat {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+.disk-cleanup-item-policy,
+.disk-cleanup-item-path,
+.disk-cleanup-item-samples {
+  font-size: 11px;
+  opacity: 0.62;
+  margin-top: 4px;
+}
+
+.disk-cleanup-item-samples {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  word-break: break-all;
+}
+
+.disk-cleanup-last {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, currentColor 14%, transparent);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.disk-cleanup-last strong {
+  font-weight: 600;
+}
+
+.disk-cleanup-empty {
+  font-size: 13px;
+  opacity: 0.7;
+  font-style: italic;
+  padding: 8px 2px;
+}
+
+.disk-cleanup-scopes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.disk-cleanup-scope-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  gap: 8px 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3%, transparent);
+}
+
+.disk-cleanup-scope-row.is-disabled {
+  opacity: 0.55;
+}
+
+.disk-cleanup-scope-main {
+  min-width: 0;
+}
+
+.disk-cleanup-scope-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.disk-cleanup-scope-path {
+  font-size: 11px;
+  opacity: 0.62;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.disk-cleanup-scope-row input[type="number"] {
+  width: 4.5rem;
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: inherit;
+}
+
+.disk-cleanup-scope-row label.disk-cleanup-scope-rec {
+  font-size: 11px;
+  opacity: 0.8;
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.disk-cleanup-scope-remove {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.disk-cleanup-add-scope {
+  display: grid;
+  grid-template-columns: 1.1fr 1.4fr 4.5rem auto auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.disk-cleanup-add-scope input[type="text"],
+.disk-cleanup-add-scope input[type="number"] {
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: inherit;
+  min-width: 0;
+}
+
+.disk-cleanup-add-rec {
+  font-size: 11px;
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .disk-cleanup-add-scope {
+    grid-template-columns: 1fr;
+  }
+  .disk-cleanup-scope-row {
+    grid-template-columns: auto 1fr;
+  }
+}
+
+#icon-disk-cleanup {
+  position: relative;
+}
+
+#icon-disk-cleanup .disk-cleanup-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #ff9f0a;
+  box-shadow: 0 0 0 2px color-mix(in srgb, #000 12%, transparent);
+  display: none;
+}
+
+#icon-disk-cleanup.has-reclaim .disk-cleanup-badge {
+  display: block;
+}
+
 #cpu-usage-card:focus-visible {
   outline: none;
   box-shadow:

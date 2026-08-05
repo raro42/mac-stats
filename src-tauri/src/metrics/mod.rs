@@ -77,6 +77,7 @@ pub struct ProcessDetails {
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct CpuDetails {
     pub usage: f32,
+    pub gpu_usage: f32,
     pub temperature: f32,
     pub frequency: f32,
     pub p_core_frequency: f32,
@@ -1256,9 +1257,9 @@ fn resize_cpu_window_for_compact(compact: bool) {
         return;
     };
     let (w, h) = if compact {
-        (440.0_f64, 560.0_f64)
+        (520.0_f64, 560.0_f64)
     } else {
-        (644.0_f64, 995.0_f64)
+        (720.0_f64, 995.0_f64)
     };
     let _ = win.set_size(tauri::Size::Logical(tauri::LogicalSize::new(w, h)));
 }
@@ -1554,6 +1555,7 @@ pub fn get_cpu_details() -> CpuDetails {
         // Use get_power_consumption() for consistent cache handling
         // This ensures we always return cached values (even if stale) instead of 0.0
         let (cpu_power, gpu_power) = get_power_consumption();
+        let gpu_usage = get_gpu_usage();
 
         // Check if we actually have power values (even if 0, if we have a cache entry, we can read power)
         // This is more reliable than checking the flags, which might not be set yet
@@ -1573,6 +1575,7 @@ pub fn get_cpu_details() -> CpuDetails {
 
         return CpuDetails {
             usage,
+            gpu_usage,
             temperature,
             frequency,
             p_core_frequency,
@@ -1973,8 +1976,11 @@ pub fn get_cpu_details() -> CpuDetails {
         debug3!("get_cpu_details returning: temperature={:.1}°C, frequency={:.2} GHz, can_read_temperature={}, can_read_frequency={}", temperature, frequency, can_read_temperature, can_read_frequency);
     }
 
+    let gpu_usage = get_gpu_usage();
+
     CpuDetails {
         usage,
+        gpu_usage,
         temperature,
         frequency,
         p_core_frequency,

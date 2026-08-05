@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.356] - 2026-08-05
+
+### Added
+- FEATURES.md product feature list; Disk Cleanup screenshot and README / screens gallery updates.
+
+## [0.1.355] - 2026-08-05
+
+### Added
+- Disk Cleanup scopes are configurable: enable Trash / Downloads / Temp, set age days, and add custom paths (saved in `config.json`).
+
+## [0.1.354] - 2026-08-05
+
+### Added
+- Disk Cleanup icon and panel: preview reclaimable `~/.mac-stats` files, last/next run, Clean now (startup + daily while running).
+
+## [0.1.353] - 2026-08-05
+
+### Changed
+- History sparklines under the gauges are ordered CPU → Frequency → Temperature.
+
+## [0.1.352] - 2026-08-05
+
+### Fixed
+- CPU window reloads theme HTML when the app version changes (WKWebView was keeping a warm/stale gauge layout after installs).
+
+## [0.1.351] - 2026-08-05
+
+### Added
+- GPU usage ring gauge at the top of every theme’s metrics row (with CPU/Temperature/Frequency).
+
+### Changed
+- CPU window default width widened slightly so four top gauges fit comfortably.
+
 ## [0.1.350] - 2026-07-31
 
 ### Added

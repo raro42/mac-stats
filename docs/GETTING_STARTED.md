@@ -13,9 +13,9 @@
    ```
    Or from a clone: `./scripts/quickstart.sh`
 2. Open **mac-stats** — menu bar shows **CPU** (and °C when available).
-3. Click the menu bar for the glass window (themes, processes, monitors).
+3. Click the menu bar for the glass window (themes, processes, monitors, Disk Cleanup).
 
-AI features stay **off** until you enable them (`aiAgentEnabled`).
+AI features stay **off** until you enable them (`aiAgentEnabled`). Full feature list: [FEATURES.md](../FEATURES.md).
 
 ### B) Monitor + AI agent
 

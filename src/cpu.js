@@ -32,6 +32,7 @@ function formatUptime(seconds) {
 let previousValues = {
   temperature: 0,
   usage: 0,
+  gpuUsage: 0,
   frequency: 0,
   cpuPower: 0,
   gpuPower: 0,
@@ -420,6 +421,39 @@ async function refresh() {
       }
       if (window.appleHistory && data.can_read_temperature && data.temperature > 0) {
         window.appleHistory.updateTemperature(data.temperature);
+      }
+    }
+
+    // Update GPU usage (top gauge)
+    const gpuUsageEl = document.getElementById("gpu-usage-value");
+    const gpuUsageSubtext = document.getElementById("gpu-usage-subtext");
+    if (gpuUsageEl) {
+      const newGpuUsage = Math.max(0, Math.round(data.gpu_usage || 0));
+      const gpuNumberText = `${newGpuUsage}`;
+      const gpuCurrentText = gpuUsageEl.textContent.match(/^\d+/)
+        ? gpuUsageEl.textContent.match(/^\d+/)[0]
+        : "";
+      if (gpuCurrentText !== gpuNumberText) {
+        scheduleDOMUpdate(() => {
+          if (gpuUsageEl.firstChild && gpuUsageEl.firstChild.nodeType === 3) {
+            gpuUsageEl.firstChild.textContent = gpuNumberText;
+          } else {
+            gpuUsageEl.innerHTML = `${gpuNumberText}<span class="metric-unit">%</span>`;
+          }
+        });
+        previousValues.gpuUsage = newGpuUsage;
+      }
+      if (gpuUsageSubtext) {
+        const gpuSubtext = "Live";
+        if (gpuUsageSubtext.textContent !== gpuSubtext) {
+          scheduleDOMUpdate(() => {
+            gpuUsageSubtext.textContent = gpuSubtext;
+          });
+        }
+      }
+      updateRingGauge("gpu-usage-ring-progress", data.gpu_usage || 0, "gpu");
+      if (window.posterCharts && typeof window.posterCharts.updateGpuUsage === "function") {
+        window.posterCharts.updateGpuUsage(data.gpu_usage || 0);
       }
     }
 
@@ -1001,7 +1035,7 @@ function init() {
 
 // Initialize ring gauges
 function initRingGauges() {
-  const rings = ['temperature-ring-progress', 'cpu-usage-ring-progress', 'frequency-ring-progress'];
+  const rings = ['gpu-usage-ring-progress', 'temperature-ring-progress', 'cpu-usage-ring-progress', 'frequency-ring-progress'];
   rings.forEach(ringId => {
     const el = document.getElementById(ringId);
     if (el) {
@@ -1029,6 +1063,17 @@ if (document.readyState === "loading") {
     
     try {
       appVersion = await invoke("get_app_version");
+      try {
+        const prev = localStorage.getItem("macStatsAssetVersion");
+        if (prev !== appVersion) {
+          localStorage.setItem("macStatsAssetVersion", appVersion);
+          // Hard reload theme shell once per version so gauge/layout HTML updates stick.
+          if (prev) {
+            window.location.replace(`../../cpu.html?v=${encodeURIComponent(appVersion)}`);
+            return appVersion;
+          }
+        }
+      } catch (_) {}
       // Set version in all footer elements
       const versionElements = document.querySelectorAll('.app-version, .theme-version, .arch-version');
       versionElements.forEach(el => {
@@ -4174,6 +4219,350 @@ function startLogsAutoRefresh() {
   logsAutoRefreshTimer = setInterval(() => refreshLogsViewer(true), 2000);
 }
 
+function formatDiskBytes(n) {
+  const x = Number(n) || 0;
+  if (x >= 1024 * 1024 * 1024) return `${(x / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+  if (x >= 1024 * 1024) return `${(x / (1024 * 1024)).toFixed(1)} MB`;
+  if (x >= 1024) return `${Math.round(x / 1024)} KB`;
+  return `${x} B`;
+}
+
+function formatDiskWhen(iso) {
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch (_) {
+    return iso;
+  }
+}
+
+async function refreshDiskCleanupPanel() {
+  const list = document.getElementById('disk-cleanup-list');
+  const summary = document.getElementById('disk-cleanup-summary');
+  const lastEl = document.getElementById('disk-cleanup-last');
+  const nextEl = document.getElementById('disk-cleanup-next');
+  const triggersEl = document.getElementById('disk-cleanup-triggers');
+  const reclaimEl = document.getElementById('disk-cleanup-reclaim');
+  const scopeSummaryEl = document.getElementById('disk-cleanup-scope-summary');
+  const scopesEl = document.getElementById('disk-cleanup-scopes');
+  const icon = document.getElementById('icon-disk-cleanup');
+  const runBtn = document.getElementById('disk-cleanup-run-btn');
+  const inv = getInvoke();
+  if (!inv || !list) return null;
+
+  try {
+    const status = await inv('get_disk_cleanup_status');
+    window.__diskCleanupScopes = Array.isArray(status.scopes)
+      ? status.scopes.map((s) => ({ ...s }))
+      : [];
+    const reclaimBytes = status.reclaimableBytes || 0;
+    const reclaimFiles = status.reclaimableFiles || 0;
+
+    if (summary) {
+      summary.textContent =
+        reclaimBytes > 0
+          ? `${formatDiskBytes(reclaimBytes)} reclaimable`
+          : 'Clean';
+    }
+    if (reclaimEl) {
+      reclaimEl.textContent =
+        reclaimBytes > 0
+          ? `${formatDiskBytes(reclaimBytes)} · ${reclaimFiles} item(s)`
+          : 'Nothing pending';
+    }
+    if (nextEl) {
+      nextEl.textContent = status.nextRunLabel || '—';
+      nextEl.title = status.nextRunUtc || '';
+    }
+    if (triggersEl) {
+      triggersEl.textContent = (status.triggers || []).join(' · ') || '—';
+    }
+    if (scopeSummaryEl) {
+      scopeSummaryEl.textContent = status.enabledScopeSummary || status.rootHint || '—';
+    }
+    if (icon) {
+      icon.classList.toggle('has-reclaim', reclaimBytes >= 1024 * 1024);
+      const base = icon.getAttribute('data-title-base') || 'Disk cleanup';
+      icon.title =
+        reclaimBytes > 0
+          ? `${base} — ${formatDiskBytes(reclaimBytes)} reclaimable`
+          : base;
+    }
+
+    if (scopesEl) {
+      const scopes = window.__diskCleanupScopes || [];
+      scopesEl.innerHTML = scopes
+        .map((s, idx) => {
+          const pathHint = s.path || (s.kind === 'temp' ? 'system temp + /tmp' : s.kind);
+          const ageDisabled = s.kind === 'mac-stats' ? 'disabled' : '';
+          const ageVal = s.maxAgeDays != null ? s.maxAgeDays : '';
+          const removeBtn = s.builtin
+            ? ''
+            : `<button type="button" class="disk-cleanup-scope-remove" data-scope-remove="${idx}">Remove</button>`;
+          return `<div class="disk-cleanup-scope-row${s.enabled ? '' : ' is-disabled'}" data-scope-idx="${idx}">
+            <input type="checkbox" data-scope-enabled="${idx}" ${s.enabled ? 'checked' : ''} aria-label="Enable ${s.label}" />
+            <div class="disk-cleanup-scope-main">
+              <div class="disk-cleanup-scope-title">${s.label} <span style="opacity:.55;font-weight:400">(${s.kind})</span></div>
+              <div class="disk-cleanup-scope-path" title="${pathHint}">${pathHint}</div>
+            </div>
+            <input type="number" min="1" max="3650" data-scope-days="${idx}" value="${ageVal}" ${ageDisabled} title="Max age (days)" placeholder="days" />
+            <label class="disk-cleanup-scope-rec"><input type="checkbox" data-scope-rec="${idx}" ${s.recursive ? 'checked' : ''} ${s.kind === 'mac-stats' ? 'disabled' : ''} /> Recurse</label>
+            ${removeBtn}
+          </div>`;
+        })
+        .join('');
+    }
+
+    const cats = (status.categories || []).filter((c) => c.enabled !== false);
+    if (!cats.length) {
+      list.innerHTML =
+        '<li class="disk-cleanup-empty">No enabled scopes — turn some on and Save scopes.</li>';
+    } else {
+      list.innerHTML = cats
+        .map((c) => {
+          const has = (c.bytes || 0) > 0 || (c.fileCount || 0) > 0;
+          const samples = (c.sampleNames || []).slice(0, 3).join(', ');
+          return `<li class="disk-cleanup-item${has ? ' has-reclaim' : ''}">
+            <div class="disk-cleanup-item-head">
+              <span class="disk-cleanup-item-title">${c.label || c.id}</span>
+              <span class="disk-cleanup-item-stat">${
+                has
+                  ? `${formatDiskBytes(c.bytes || 0)} · ${c.fileCount || 0}`
+                  : 'OK'
+              }</span>
+            </div>
+            <div class="disk-cleanup-item-policy">${c.policy || ''}</div>
+            <div class="disk-cleanup-item-path">${c.pathHint || ''}</div>
+            ${
+              samples
+                ? `<div class="disk-cleanup-item-samples">${samples}</div>`
+                : ''
+            }
+          </li>`;
+        })
+        .join('');
+    }
+
+    if (lastEl) {
+      const last = status.lastRun;
+      if (!last) {
+        lastEl.innerHTML =
+          '<strong>Last run</strong><br>Not yet this install — will run on launch.';
+      } else {
+        const catBits = (last.categories || [])
+          .filter((c) => (c.filesRemoved || 0) > 0 || (c.bytesFreed || 0) > 0)
+          .map(
+            (c) =>
+              `${c.label}: ${c.filesRemoved || 0} / ${formatDiskBytes(c.bytesFreed || 0)}`
+          )
+          .join(' · ');
+        lastEl.innerHTML = `<strong>Last run</strong> · ${formatDiskWhen(last.atUtc)} · ${
+          last.trigger || '?'
+        }<br>${
+          last.note ||
+          (last.filesRemoved
+            ? `Removed ${last.filesRemoved} · freed ${formatDiskBytes(last.bytesFreed || 0)}`
+            : 'Nothing removed')
+        }${catBits ? `<br>${catBits}` : ''}`;
+      }
+    }
+
+    if (runBtn) {
+      runBtn.disabled = false;
+      runBtn.textContent = reclaimBytes > 0 ? 'Clean now' : 'Run cleanup';
+    }
+    return status;
+  } catch (e) {
+    console.warn('disk cleanup status', e);
+    if (list) {
+      list.innerHTML = `<li class="disk-cleanup-empty">Could not load status: ${String(
+        e?.message || e
+      )}</li>`;
+    }
+    return null;
+  }
+}
+
+function readDiskCleanupScopesFromDom() {
+  const scopes = (window.__diskCleanupScopes || []).map((s) => ({ ...s }));
+  scopes.forEach((s, idx) => {
+    const en = document.querySelector(`[data-scope-enabled="${idx}"]`);
+    const days = document.querySelector(`[data-scope-days="${idx}"]`);
+    const rec = document.querySelector(`[data-scope-rec="${idx}"]`);
+    if (en) s.enabled = !!en.checked;
+    if (days && !days.disabled && days.value !== '') {
+      const n = parseInt(days.value, 10);
+      if (!Number.isNaN(n) && n > 0) s.maxAgeDays = n;
+    }
+    if (rec && !rec.disabled) s.recursive = !!rec.checked;
+  });
+  return scopes;
+}
+
+async function saveDiskCleanupScopes(scopes) {
+  const inv = getInvoke();
+  if (!inv) return;
+  await inv('set_disk_cleanup_scopes', { scopes });
+  await refreshDiskCleanupPanel();
+}
+
+function initDiskCleanupSection() {
+  const header = document.getElementById('disk-cleanup-header');
+  const content = document.getElementById('disk-cleanup-content');
+  const section = document.querySelector('.disk-cleanup-section');
+  const refreshBtn = document.getElementById('disk-cleanup-refresh-btn');
+  const runBtn = document.getElementById('disk-cleanup-run-btn');
+  const saveBtn = document.getElementById('disk-cleanup-save-scopes-btn');
+  const addBtn = document.getElementById('disk-cleanup-add-btn');
+  const scopesEl = document.getElementById('disk-cleanup-scopes');
+  const icon = document.getElementById('icon-disk-cleanup');
+  if (!header || !content) return;
+
+  if (icon && !icon.getAttribute('data-title-base')) {
+    icon.setAttribute('data-title-base', icon.title || 'Disk cleanup');
+  }
+
+  let collapsed = localStorage.getItem('disk_cleanup_collapsed') !== 'false';
+  const applyCollapsed = () => {
+    if (collapsed) {
+      content.classList.add('collapsed');
+      if (section) section.classList.add('collapsed');
+    } else {
+      content.classList.remove('collapsed');
+      if (section) section.classList.remove('collapsed');
+      refreshDiskCleanupPanel();
+    }
+    if (header._syncCollapseA11y) header._syncCollapseA11y();
+  };
+  applyCollapsed();
+  refreshDiskCleanupPanel();
+
+  if (typeof wireCollapsibleHeaderA11y === 'function') {
+    wireCollapsibleHeaderA11y(header, {
+      contentId: 'disk-cleanup-content',
+      getExpanded: () => !collapsed,
+      ignoreSelector:
+        '#disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, #disk-cleanup-scopes, #disk-cleanup-add-label, #disk-cleanup-add-path, #disk-cleanup-add-days, #disk-cleanup-add-recursive, .disk-cleanup-add-scope, .disk-cleanup-scopes, input, button, label',
+      onToggle: () => {
+        collapsed = !collapsed;
+        localStorage.setItem('disk_cleanup_collapsed', collapsed.toString());
+        applyCollapsed();
+      },
+    });
+  }
+
+  header.addEventListener('click', (e) => {
+    if (
+      e.target.closest(
+        '#disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, .disk-cleanup-scopes, .disk-cleanup-add-scope, input, button, label'
+      )
+    ) {
+      return;
+    }
+    e.stopPropagation();
+    collapsed = !collapsed;
+    localStorage.setItem('disk_cleanup_collapsed', collapsed.toString());
+    applyCollapsed();
+  });
+
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      refreshDiskCleanupPanel();
+    });
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      try {
+        await saveDiskCleanupScopes(readDiskCleanupScopesFromDom());
+      } catch (err) {
+        alert(`Save scopes failed: ${err?.message || err}`);
+      }
+    });
+  }
+
+  if (addBtn) {
+    addBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const label = (document.getElementById('disk-cleanup-add-label')?.value || '').trim();
+      const path = (document.getElementById('disk-cleanup-add-path')?.value || '').trim();
+      const days = parseInt(document.getElementById('disk-cleanup-add-days')?.value || '30', 10);
+      const recursive = !!document.getElementById('disk-cleanup-add-recursive')?.checked;
+      if (!label || !path) {
+        alert('Label and path are required for a custom scope.');
+        return;
+      }
+      const scopes = readDiskCleanupScopesFromDom();
+      const id = `custom-${Date.now().toString(36)}`;
+      scopes.push({
+        id,
+        kind: 'path',
+        label,
+        enabled: true,
+        path,
+        maxAgeDays: Number.isNaN(days) || days < 1 ? 30 : days,
+        recursive,
+        builtin: false,
+      });
+      try {
+        await saveDiskCleanupScopes(scopes);
+        const labelEl = document.getElementById('disk-cleanup-add-label');
+        const pathEl = document.getElementById('disk-cleanup-add-path');
+        if (labelEl) labelEl.value = '';
+        if (pathEl) pathEl.value = '';
+      } catch (err) {
+        alert(`Add scope failed: ${err?.message || err}`);
+      }
+    });
+  }
+
+  if (scopesEl) {
+    scopesEl.addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-scope-remove]');
+      if (!btn) return;
+      e.stopPropagation();
+      const idx = parseInt(btn.getAttribute('data-scope-remove'), 10);
+      const scopes = readDiskCleanupScopesFromDom().filter((_, i) => i !== idx);
+      try {
+        await saveDiskCleanupScopes(scopes);
+      } catch (err) {
+        alert(`Remove failed: ${err?.message || err}`);
+      }
+    });
+  }
+
+  if (runBtn) {
+    runBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const inv = getInvoke();
+      if (!inv) return;
+      try {
+        await saveDiskCleanupScopes(readDiskCleanupScopesFromDom());
+      } catch (_) {}
+      runBtn.disabled = true;
+      runBtn.textContent = 'Cleaning…';
+      try {
+        await inv('run_disk_cleanup_now');
+        await refreshDiskCleanupPanel();
+      } catch (err) {
+        console.warn('disk cleanup run', err);
+        runBtn.disabled = false;
+        runBtn.textContent = 'Clean now';
+        alert(`Cleanup failed: ${err?.message || err}`);
+      }
+    });
+  }
+}
+
 function initLogsSection() {
   const header = document.getElementById('logs-header');
   const content = document.getElementById('logs-content');
@@ -4266,6 +4655,7 @@ window.applyCpuWindowCompactLayout = function applyCpuWindowCompactLayout(compac
   collapseSectionByIds('.ollama-section', 'ollama-content', 'ollama_collapsed');
   collapseSectionByIds('.perplexity-section', 'perplexity-content', 'perplexity_collapsed');
   collapseSectionByIds('.logs-section', 'logs-content', 'logs_collapsed');
+  collapseSectionByIds('.disk-cleanup-section', 'disk-cleanup-content', 'disk_cleanup_collapsed');
   if (typeof window.applyOpsCollapsed === 'function') {
     window.applyOpsCollapsed(true);
   } else {
@@ -4337,6 +4727,17 @@ function initIconLine() {
     });
   }
 
+  const diskIcon = document.getElementById('icon-disk-cleanup');
+  if (diskIcon) {
+    diskIcon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const diskHeader = document.getElementById('disk-cleanup-header');
+      if (diskHeader) {
+        diskHeader.click();
+      }
+    });
+  }
+
   // Agent Ops icon is wired exclusively in agent-ops.js (avoid double-toggle).
 
   initDiscordIconStatus();
@@ -4393,6 +4794,7 @@ function initMonitoringFeatures() {
     initMonitorsSection();
     initPerplexitySection();
     initLogsSection();
+    initDiskCleanupSection();
     initOllamaSection();
     initHistoryControls();
     // Auto-configure Ollama with default endpoint (if module is available)

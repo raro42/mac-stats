@@ -20,6 +20,7 @@ Overnight digester often goes empty after instant-lane wins. Design review is **
 | 2 | `screens/feature-ai-chat.png` | CPU window → AI / Ollama chat |
 | 3 | `screens/feature-processes.png` | CPU window → process list |
 | 4 | `screens/feature-cpu-metrics.png` | CPU window → metrics rings |
+| 5 | `screens/feature-disk-cleanup.png` | CPU window → Disk Cleanup (scopes expanded) |
 
 Real UI ships from `src-tauri/dist/themes/<theme>/cpu.html` + `src/agent-ops.{js,css}` / theme CSS — not `dashboard.html` alone. See `docs/041_ui_command_center.md` and `docs/042_dashboard_orphan.md`.
 

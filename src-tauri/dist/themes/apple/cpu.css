@@ -24,6 +24,7 @@
   --accent: #8bb4e8; /* Pastel blue for temperature */
   --accent-usage: #9db5c4; /* Pastel blue-grey for usage */
   --accent-freq: #a8c5e8; /* Pastel blue for frequency */
+  --accent-gpu: #c4a8d8; /* Pastel purple for GPU */
   --ring-track: rgba(0, 0, 0, 0.06);
 
   --modal-backdrop: rgba(0, 0, 0, 0.30);
@@ -332,7 +333,7 @@ body {
 
 .apple-metrics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 20px;
   flex-shrink: 0; /* Don't shrink metrics section */
 }
@@ -447,6 +448,10 @@ body {
   stroke-dasharray: 264;
   stroke-dashoffset: 264;
   transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#gpu-usage-ring-progress {
+  stroke: var(--accent-gpu);
 }
 
 #cpu-usage-ring-progress {

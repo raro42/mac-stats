@@ -474,6 +474,14 @@ pub fn toggle_cpu_window(app_handle: &AppHandle) {
         } else {
             // Reuse the existing WebView — recreating it caused multi-second hourglass
             // (WKWebView init + full JS boot + monitor probes).
+            // If the installed asset version changed, force a navigation so theme HTML
+            // (gauge order, etc.) is not stuck in WKWebView's warm/document cache.
+            let asset_v = env!("CARGO_PKG_VERSION");
+            let reload_js = format!(
+                r#"(function(){{try{{var k='macStatsAssetVersion';var cur=localStorage.getItem(k);if(cur!=='{v}'){{localStorage.setItem(k,'{v}');location.replace('cpu.html?v={v}');}}}}catch(e){{location.replace('cpu.html?v={v}');}}}})()"#,
+                v = asset_v
+            );
+            let _ = window.eval(&reload_js);
             debug1!("CPU window exists but is hidden, showing it");
             let _ = window.show();
             let _ = window.set_focus();
@@ -685,15 +693,16 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
         decorations
     );
 
+    let cpu_url = format!("cpu.html?v={}", env!("CARGO_PKG_VERSION"));
     let cpu_window =
-        WebviewWindowBuilder::new(app_handle, "cpu", WebviewUrl::App("cpu.html".into()))
+        WebviewWindowBuilder::new(app_handle, "cpu", WebviewUrl::App(cpu_url.into()))
             .title("CPU")
             .visible(true) // Show immediately when created
             .inner_size(
                 if Config::cpu_window_compact() {
-                    440.0
+                    520.0
                 } else {
-                    644.0
+                    720.0
                 },
                 if Config::cpu_window_compact() {
                     560.0

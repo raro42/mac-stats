@@ -392,6 +392,10 @@ fn run_internal(open_cpu_window: bool) {
             commands::agents::list_prompt_files,
             commands::agents::save_prompt_file,
             feature_health::get_feature_health,
+            commands::disk_cleanup::get_disk_cleanup_status,
+            commands::disk_cleanup::run_disk_cleanup_now,
+            commands::disk_cleanup::get_disk_cleanup_scopes,
+            commands::disk_cleanup::set_disk_cleanup_scopes,
         ])
         .setup(move |app| {
             crate::state::mark_process_start();
@@ -403,16 +407,8 @@ fn run_internal(open_cpu_window: bool) {
             // Kill orphaned headless Chrome processes from previous runs or races (keeps browser usage lean)
             crate::browser_agent::kill_orphaned_browser_processes();
 
-            crate::commands::screenshot_lifecycle::prune_old_screenshots();
-            crate::commands::screenshot_lifecycle::prune_old_pdfs();
-
-            crate::session_memory::prune_old_session_files();
-
-            crate::commands::run_telemetry::prune_runs_jsonl_if_needed();
-
-            crate::browser_agent::cdp_downloads::prune_old_browser_downloads(
-                std::time::Duration::from_secs(24 * 3600),
-            );
+            // Disk cleanup (screenshots/PDFs/sessions/runs/browser downloads/logs) — record last/next run.
+            let _ = crate::commands::disk_cleanup::run_now("startup");
 
             // Load persistent monitors on startup
             use crate::commands::monitors;
@@ -586,6 +582,14 @@ fn run_internal(open_cpu_window: bool) {
                 loop {
                     std::thread::sleep(std::time::Duration::from_secs(60));
                     downloads_organizer::run_if_due();
+                }
+            });
+
+            // Disk cleanup: every 60s, run if the periodic interval (default 24h) is due.
+            std::thread::spawn(|| {
+                loop {
+                    std::thread::sleep(std::time::Duration::from_secs(60));
+                    commands::disk_cleanup::run_if_due();
                 }
             });
 

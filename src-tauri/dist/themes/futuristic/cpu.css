@@ -154,7 +154,7 @@ body {
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-bottom: 22px;
   flex-shrink: 0; /* Don't shrink metrics section */
@@ -2323,4 +2323,8 @@ body {
 /* Logs section */
 .logs-section.collapsed {
   display: none;
+}
+
+#gpu-usage-ring-progress {
+  stroke: #c4a8d8;
 }

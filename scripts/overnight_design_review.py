@@ -25,6 +25,7 @@ SURFACES = (
     ("feature-ai-chat.png", "CPU window → AI / Ollama chat"),
     ("feature-processes.png", "CPU window → process list"),
     ("feature-cpu-metrics.png", "CPU window → metrics rings"),
+    ("feature-disk-cleanup.png", "CPU window → Disk Cleanup (scopes expanded)"),
 )
 
 
