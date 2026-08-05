@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.357] - 2026-08-05
+
+### Changed
+- Release packaging for Disk Cleanup scopes, GPU gauge, and FEATURES.md / screens (same feature set as 0.1.356, with a proper release write-up).
+
 ## [0.1.356] - 2026-08-05
 
 ### Added
