@@ -87,6 +87,7 @@ Details: [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
 <p>
   <img src="screens/feature-cpu-metrics.png" alt="CPU metrics" width="280">
+  <img src="screens/feature-monitors.png" alt="Website monitors" width="280">
   <img src="screens/feature-disk-cleanup.png" alt="Disk Cleanup" width="280">
   <img src="screens/feature-agent-ops.png" alt="Agent Ops" width="280">
   <img src="screens/feature-ai-chat.png" alt="AI chat (Ollama)" width="280">

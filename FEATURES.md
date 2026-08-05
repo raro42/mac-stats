@@ -14,8 +14,22 @@ Screenshots: [screens/](screens/) · [screens/README.md](screens/README.md)
 | Glass CPU window | Nine themes; ring gauges for CPU, GPU, frequency, temperature |
 | History sparklines | CPU → Frequency → Temperature under the gauges |
 | Top processes | Sortable list, pin favorites, process details, Advanced Force Quit |
-| Website monitors | HTTP checks; menu bar **Mon ✕** when a site is down |
+| Website monitors | See below |
 | Low overhead | On the order of ~0.5% idle (menu bar only) |
+
+## Website monitors (External / Monitors)
+
+HTTP(S) uptime checks in the CPU window — part of the core monitor (no AI required).
+
+| Detail | Notes |
+|--------|--------|
+| Summary | *N / M sites up · Avg … ms* |
+| Per site | Status dot, URL, latency, error text when down |
+| History bars | Recent check history (green up / red down) |
+| Menu bar | Red **Mon ✕** cue when any site is down |
+| Manage | `…` menu on the section — add / remove / check |
+
+<img src="screens/feature-monitors.png" alt="External / Monitors" width="360">
 
 ## Disk Cleanup
 
