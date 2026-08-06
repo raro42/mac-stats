@@ -15,6 +15,7 @@ A night that only appends “Quiet tick” to the backlog is a **loss** — same
 - **Active:** 20:00–06:00 local only.
 - **Quiet daytime:** do not notify or ship during focus hours unless the human explicitly asks.
 - **NEVER STOP** inside the overnight window once a tick has started — finish the current experiment (keep or discard), then wait for the next harness tick.
+- **No dirty leftovers:** when an experiment finishes, **commit + push** immediately. Around **23:00** local the harness loop runs `scripts/overnight_git_flush.py` once as a backstop (see `.cursor/rules/no-uncommitted-leftovers.mdc`).
 - **Morning surprise (mandatory):** Before ~05:50 write/refresh `~/.mac-stats/improvements/morning_surprise_YYYY-MM-DD.md` with what **shipped** (or what was tried + discarded). “Digester empty / stayed on version X” alone is **not** a surprise — if that would be the whole note, you failed the night and must still have attempted a standing-backlog experiment.
 
 ## Nightly minimum (keep or discard)
@@ -73,7 +74,7 @@ Log path (untracked): `~/.mac-stats/improvements/autoresearch/results.tsv`
 5. Record `START_SHA=$(git rev-parse HEAD)`. Implement the smallest change that could fix it. Sync frontend with `./scripts/sync-dist.sh` when UI changes.
 6. `python3 scripts/autoresearch_ratchet.py verify` (add `--test-filter <name>` when you know the module).
 7. **Fail →** `discard --start-sha …`. Log and stop for this tick.
-8. **Pass →** commit (no agent attribution), `keep --description …`, bump patch in `src-tauri/Cargo.toml` + user-facing `CHANGELOG.md` when behavior ships, install/restart when runtime changes, push when reasonable.
+8. **Pass →** commit (no agent attribution), `keep --description …`, bump patch in `src-tauri/Cargo.toml` + user-facing `CHANGELOG.md` when behavior ships, install/restart when runtime changes, **`git push origin HEAD`** (do not leave the tree dirty).
 9. Update `loop_backlog.md` with keep/discard outcome. Refresh morning surprise when something meaningful kept (and always before ~05:50).
 
 ## Idea priority

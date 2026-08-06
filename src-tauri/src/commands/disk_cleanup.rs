@@ -86,6 +86,9 @@ pub struct DiskCleanupStatus {
     pub interval_hours: u64,
     pub triggers: Vec<String>,
     pub enabled_scope_summary: String,
+    /// When true (default), cleaned files are moved to `~/.Trash` instead of unlinked.
+    /// The Trash scope itself is always permanently deleted.
+    pub soft_delete: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -150,6 +153,124 @@ fn interval_hours() -> u64 {
         return n.min(24 * 30);
     }
     DEFAULT_INTERVAL_HOURS
+}
+
+/// Soft-delete (move to Trash) is the default. Set `diskCleanupSoftDelete: false` for permanent delete.
+fn soft_delete_enabled() -> bool {
+    if let Ok(s) = std::env::var("MAC_STATS_DISK_CLEANUP_SOFT_DELETE") {
+        let t = s.trim().to_ascii_lowercase();
+        return !(t == "0" || t == "false" || t == "no" || t == "off");
+    }
+    read_config_value()
+        .get("diskCleanupSoftDelete")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(true)
+}
+
+fn save_soft_delete(enabled: bool) -> Result<(), String> {
+    let mut cfg = read_config_value();
+    cfg["diskCleanupSoftDelete"] = json!(enabled);
+    write_config_value(&cfg)
+}
+
+fn trash_dir() -> PathBuf {
+    home_dir().join(".Trash")
+}
+
+fn path_is_under_trash(path: &Path) -> bool {
+    let trash = trash_dir();
+    let Ok(canon) = path.canonicalize() else {
+        return path.starts_with(&trash);
+    };
+    let Ok(trash_canon) = trash.canonicalize() else {
+        return canon.starts_with(&trash);
+    };
+    canon.starts_with(&trash_canon)
+}
+
+/// Move `path` into `~/.Trash` with a collision-safe name. Falls back to copy+remove across volumes.
+fn move_to_trash(path: &Path) -> Result<(), String> {
+    if !path.is_file() {
+        return Err("not a file".into());
+    }
+    if path_is_under_trash(path) {
+        return fs::remove_file(path).map_err(|e| e.to_string());
+    }
+    let trash = trash_dir();
+    fs::create_dir_all(&trash).map_err(|e| e.to_string())?;
+    let base = path
+        .file_name()
+        .map(|n| n.to_string_lossy().into_owned())
+        .ok_or_else(|| "missing file name".to_string())?;
+    let mut dest = trash.join(&base);
+    if dest.exists() {
+        let stem = path
+            .file_stem()
+            .map(|s| s.to_string_lossy().into_owned())
+            .unwrap_or_else(|| base.clone());
+        let ext = path
+            .extension()
+            .map(|e| format!(".{}", e.to_string_lossy()))
+            .unwrap_or_default();
+        dest = trash.join(format!(
+            "{} {}{}",
+            stem,
+            Utc::now().format("%Y-%m-%d %H.%M.%S"),
+            ext
+        ));
+        let mut n = 2u32;
+        while dest.exists() {
+            dest = trash.join(format!(
+                "{} {} ({}){}",
+                stem,
+                Utc::now().format("%Y-%m-%d %H.%M.%S"),
+                n,
+                ext
+            ));
+            n += 1;
+            if n > 50 {
+                break;
+            }
+        }
+    }
+    match fs::rename(path, &dest) {
+        Ok(()) => Ok(()),
+        Err(e) => {
+            // Cross-volume rename fails (e.g. /tmp → ~/.Trash): copy then remove.
+            match fs::copy(path, &dest).and_then(|_| fs::remove_file(path)) {
+                Ok(()) => Ok(()),
+                Err(_) => Err(e.to_string()),
+            }
+        }
+    }
+}
+
+/// Soft-delete moves to Trash; permanent unlinks. Paths already in Trash are always unlinked.
+fn remove_cleaned_file(path: &Path, soft: bool) -> bool {
+    if soft && !path_is_under_trash(path) {
+        match move_to_trash(path) {
+            Ok(()) => true,
+            Err(err) => {
+                crate::mac_stats_debug!(
+                    "disk_cleanup",
+                    "Soft-delete failed for {:?}: {}; falling back to permanent delete",
+                    path,
+                    err
+                );
+                fs::remove_file(path).is_ok()
+            }
+        }
+    } else {
+        fs::remove_file(path).is_ok()
+    }
+}
+
+fn disposal_policy_suffix(soft: bool, force_permanent: bool) -> &'static str {
+    if force_permanent || !soft {
+        " · permanent delete"
+    } else {
+        " · move to Trash"
+    }
 }
 
 fn default_scopes() -> Vec<DiskCleanupScope> {
@@ -471,6 +592,8 @@ fn collect_aged_files(root: &Path, max_age_days: u32, recursive: bool) -> Vec<(P
 }
 
 fn preview_aged_scope(scope: &DiskCleanupScope) -> CleanupCategory {
+    let soft = soft_delete_enabled();
+    let force_permanent = scope.kind == "trash";
     let days = scope.max_age_days.unwrap_or(0);
     let policy = if !scope.enabled {
         "disabled".into()
@@ -478,9 +601,14 @@ fn preview_aged_scope(scope: &DiskCleanupScope) -> CleanupCategory {
         "no age policy".into()
     } else {
         format!(
-            "age > {}d{}",
+            "age > {}d{}{}",
             days,
-            if scope.recursive { " · recursive" } else { " · top-level" }
+            if scope.recursive {
+                " · recursive"
+            } else {
+                " · top-level"
+            },
+            disposal_policy_suffix(soft, force_permanent)
         )
     };
     let roots = resolve_scope_roots(scope);
@@ -541,6 +669,8 @@ fn apply_aged_scope(scope: &DiskCleanupScope) -> (u64, u64) {
         return (0, 0);
     }
     let days = scope.max_age_days.unwrap_or(0);
+    // Trash scope empties old Trash entries — always permanent.
+    let soft = soft_delete_enabled() && scope.kind != "trash";
     let mut deleted = 0u64;
     let mut freed = 0u64;
     for (root, _) in resolve_scope_roots(scope) {
@@ -548,7 +678,7 @@ fn apply_aged_scope(scope: &DiskCleanupScope) -> (u64, u64) {
             continue;
         }
         for (path, sz) in collect_aged_files(&root, days, scope.recursive) {
-            if fs::remove_file(&path).is_ok() {
+            if remove_cleaned_file(&path, soft) {
                 deleted += 1;
                 freed = freed.saturating_add(sz);
             }
@@ -557,8 +687,230 @@ fn apply_aged_scope(scope: &DiskCleanupScope) -> (u64, u64) {
     (deleted, freed)
 }
 
-fn preview_screenshots(scope_id: &str, enabled: bool) -> CleanupCategory {
+fn collect_screenshot_reclaim() -> Vec<(PathBuf, u64)> {
     let dir = Config::screenshots_dir();
+    let max_age_days = Config::screenshot_prune_max_age_days();
+    let max_total = Config::screenshot_prune_max_total_bytes();
+    let mut would: Vec<(PathBuf, u64, DateTime<Utc>)> = Vec::new();
+    if !dir.is_dir() || (max_age_days == 0 && max_total == 0) {
+        return Vec::new();
+    }
+    let Ok(rd) = fs::read_dir(&dir) else {
+        return Vec::new();
+    };
+    let now = Utc::now();
+    let cutoff = now - ChronoDuration::days(max_age_days as i64);
+    let mut all: Vec<(PathBuf, u64, DateTime<Utc>)> = Vec::new();
+    for ent in rd.flatten() {
+        let path = ent.path();
+        let Ok(meta) = fs::metadata(&path) else {
+            continue;
+        };
+        if !meta.is_file() {
+            continue;
+        }
+        let stem = path
+            .file_stem()
+            .map(|s| s.to_string_lossy().into_owned())
+            .unwrap_or_default();
+        let ts = parse_screenshot_filename_timestamp(&stem).unwrap_or_else(|| {
+            system_time_to_utc(meta.modified().unwrap_or(SystemTime::UNIX_EPOCH))
+        });
+        all.push((path, meta.len(), ts));
+    }
+    if max_age_days > 0 {
+        for (p, sz, ts) in &all {
+            if *ts < cutoff {
+                would.push((p.clone(), *sz, *ts));
+            }
+        }
+    }
+    if max_total > 0 {
+        let mut rest: Vec<_> = all
+            .into_iter()
+            .filter(|(p, _, _)| !would.iter().any(|(w, _, _)| w == p))
+            .collect();
+        rest.sort_by(|a, b| a.2.cmp(&b.2).then_with(|| a.0.cmp(&b.0)));
+        let mut total: u64 = rest.iter().map(|e| e.1).sum();
+        total = total.saturating_add(would.iter().map(|e| e.1).sum());
+        for (p, sz, ts) in rest {
+            if total <= max_total {
+                break;
+            }
+            would.push((p, sz, ts));
+            total = total.saturating_sub(sz);
+        }
+    }
+    would.into_iter().map(|(p, sz, _)| (p, sz)).collect()
+}
+
+fn collect_pdf_reclaim() -> Vec<(PathBuf, u64)> {
+    let dir = Config::pdfs_dir();
+    let max_age_days = Config::screenshot_prune_max_age_days();
+    let mut out = Vec::new();
+    if !dir.is_dir() || max_age_days == 0 {
+        return out;
+    }
+    let cutoff = Utc::now() - ChronoDuration::days(max_age_days as i64);
+    let Ok(rd) = fs::read_dir(&dir) else {
+        return out;
+    };
+    for ent in rd.flatten() {
+        let path = ent.path();
+        if path
+            .extension()
+            .and_then(|e| e.to_str())
+            .map(|e| e.eq_ignore_ascii_case("pdf"))
+            != Some(true)
+        {
+            continue;
+        }
+        let stem = path.file_stem().and_then(|s| s.to_str()).unwrap_or("");
+        let ts = parse_screenshot_filename_timestamp(stem).or_else(|| {
+            ent.metadata()
+                .ok()
+                .and_then(|m| m.modified().ok())
+                .map(system_time_to_utc)
+        });
+        let Some(ts) = ts else {
+            continue;
+        };
+        if ts >= cutoff {
+            continue;
+        }
+        let sz = ent.metadata().map(|m| m.len()).unwrap_or(0);
+        out.push((path, sz));
+    }
+    out
+}
+
+fn collect_session_reclaim() -> Vec<(PathBuf, u64)> {
+    let dir = Config::session_dir();
+    let max_age_days = Config::session_prune_max_age_days();
+    let max_files = Config::session_prune_max_files();
+    let mut entries: Vec<(PathBuf, SystemTime, u64)> = Vec::new();
+    if dir.is_dir() {
+        if let Ok(rd) = fs::read_dir(&dir) {
+            for ent in rd.flatten() {
+                let path = ent.path();
+                let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+                if !name.starts_with("session-memory-") || !name.ends_with(".md") {
+                    continue;
+                }
+                let Ok(meta) = fs::metadata(&path) else {
+                    continue;
+                };
+                if !meta.is_file() {
+                    continue;
+                }
+                entries.push((
+                    path,
+                    meta.modified().unwrap_or(SystemTime::UNIX_EPOCH),
+                    meta.len(),
+                ));
+            }
+        }
+    }
+    let mut marked: Vec<(PathBuf, u64)> = Vec::new();
+    let now = SystemTime::now();
+    if max_age_days > 0 {
+        let max_age = Duration::from_secs(u64::from(max_age_days) * 24 * 3600);
+        entries.retain(|(path, mtime, size)| {
+            let too_old = now
+                .duration_since(*mtime)
+                .map(|d| d > max_age)
+                .unwrap_or(false);
+            if too_old {
+                marked.push((path.clone(), *size));
+                false
+            } else {
+                true
+            }
+        });
+    }
+    if max_files > 0 && entries.len() > max_files {
+        entries.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+        for (path, _, size) in entries.into_iter().skip(max_files) {
+            marked.push((path, size));
+        }
+    }
+    marked
+}
+
+fn collect_browser_download_reclaim() -> Vec<(PathBuf, u64)> {
+    let dir = Config::browser_downloads_dir();
+    let max_age = Duration::from_secs(24 * 3600);
+    let mut out = Vec::new();
+    if !dir.is_dir() {
+        return out;
+    }
+    let now = SystemTime::now();
+    let Ok(rd) = fs::read_dir(&dir) else {
+        return out;
+    };
+    for ent in rd.flatten() {
+        let path = ent.path();
+        let Ok(meta) = fs::metadata(&path) else {
+            continue;
+        };
+        if !meta.is_file() {
+            continue;
+        }
+        let Ok(mt) = meta.modified() else {
+            continue;
+        };
+        let age = now.duration_since(mt).unwrap_or(Duration::ZERO);
+        if age > max_age {
+            out.push((path, meta.len()));
+        }
+    }
+    out
+}
+
+fn collect_sic_backup_reclaim() -> Vec<(PathBuf, u64)> {
+    let dir = Config::config_file_path()
+        .parent()
+        .map(|p| p.join("sic"))
+        .unwrap_or_else(|| PathBuf::from("sic"));
+    let mut out = Vec::new();
+    if !dir.is_dir() {
+        return out;
+    }
+    let now = SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    const MAX_AGE_SECS: u64 = 14 * 24 * 60 * 60;
+    let Ok(rd) = fs::read_dir(&dir) else {
+        return out;
+    };
+    for ent in rd.flatten() {
+        let path = ent.path();
+        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+        if !name.starts_with("debug.log.") {
+            continue;
+        }
+        let Ok(meta) = fs::metadata(&path) else {
+            continue;
+        };
+        if !meta.is_file() {
+            continue;
+        }
+        let mtime = meta
+            .modified()
+            .ok()
+            .and_then(|t| t.duration_since(SystemTime::UNIX_EPOCH).ok())
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        if now.saturating_sub(mtime) > MAX_AGE_SECS {
+            out.push((path, meta.len()));
+        }
+    }
+    out
+}
+
+fn preview_screenshots(scope_id: &str, enabled: bool) -> CleanupCategory {
+    let soft = soft_delete_enabled();
     let max_age_days = Config::screenshot_prune_max_age_days();
     let max_total = Config::screenshot_prune_max_total_bytes();
     let policy = if !enabled {
@@ -573,7 +925,7 @@ fn preview_screenshots(scope_id: &str, enabled: bool) -> CleanupCategory {
         if max_total > 0 {
             parts.push(format!("cap {}", format_bytes(max_total)));
         }
-        parts.join(" · ")
+        parts.join(" · ") + disposal_policy_suffix(soft, false)
     };
 
     if !enabled {
@@ -587,66 +939,10 @@ fn preview_screenshots(scope_id: &str, enabled: bool) -> CleanupCategory {
         );
     }
 
-    let mut would: Vec<(PathBuf, u64, DateTime<Utc>)> = Vec::new();
-    if dir.is_dir() && (max_age_days > 0 || max_total > 0) {
-        let Ok(rd) = fs::read_dir(&dir) else {
-            return empty_cat(
-                "screenshots",
-                "Screenshots",
-                "~/.mac-stats/screenshots",
-                &policy,
-                scope_id,
-                true,
-            );
-        };
-        let now = Utc::now();
-        let cutoff = now - ChronoDuration::days(max_age_days as i64);
-        let mut all: Vec<(PathBuf, u64, DateTime<Utc>)> = Vec::new();
-        for ent in rd.flatten() {
-            let path = ent.path();
-            let Ok(meta) = fs::metadata(&path) else {
-                continue;
-            };
-            if !meta.is_file() {
-                continue;
-            }
-            let stem = path
-                .file_stem()
-                .map(|s| s.to_string_lossy().into_owned())
-                .unwrap_or_default();
-            let ts = parse_screenshot_filename_timestamp(&stem).unwrap_or_else(|| {
-                system_time_to_utc(meta.modified().unwrap_or(SystemTime::UNIX_EPOCH))
-            });
-            all.push((path, meta.len(), ts));
-        }
-        if max_age_days > 0 {
-            for (p, sz, ts) in &all {
-                if *ts < cutoff {
-                    would.push((p.clone(), *sz, *ts));
-                }
-            }
-        }
-        if max_total > 0 {
-            let mut rest: Vec<_> = all
-                .into_iter()
-                .filter(|(p, _, _)| !would.iter().any(|(w, _, _)| w == p))
-                .collect();
-            rest.sort_by(|a, b| a.2.cmp(&b.2).then_with(|| a.0.cmp(&b.0)));
-            let mut total: u64 = rest.iter().map(|e| e.1).sum();
-            total = total.saturating_add(would.iter().map(|e| e.1).sum());
-            for (p, sz, ts) in rest {
-                if total <= max_total {
-                    break;
-                }
-                would.push((p, sz, ts));
-                total = total.saturating_sub(sz);
-            }
-        }
-    }
-
+    let would = collect_screenshot_reclaim();
     let mut samples = Vec::new();
     let mut bytes = 0u64;
-    for (p, sz, _) in &would {
+    for (p, sz) in &would {
         bytes = bytes.saturating_add(*sz);
         if let Some(n) = p.file_name() {
             push_sample(&mut samples, n.to_string_lossy().into_owned());
@@ -666,54 +962,25 @@ fn preview_screenshots(scope_id: &str, enabled: bool) -> CleanupCategory {
 }
 
 fn preview_pdfs(scope_id: &str, enabled: bool) -> CleanupCategory {
-    let dir = Config::pdfs_dir();
+    let soft = soft_delete_enabled();
     let max_age_days = Config::screenshot_prune_max_age_days();
     let policy = if !enabled {
         "disabled (scope off)".into()
     } else if max_age_days == 0 {
         "disabled".into()
     } else {
-        format!("age > {}d", max_age_days)
+        format!("age > {}d{}", max_age_days, disposal_policy_suffix(soft, false))
     };
     if !enabled {
         return empty_cat("pdfs", "PDFs", "~/.mac-stats/pdfs", &policy, scope_id, false);
     }
-    let mut count = 0u64;
-    let mut bytes = 0u64;
+    let marked = collect_pdf_reclaim();
     let mut samples = Vec::new();
-    if dir.is_dir() && max_age_days > 0 {
-        let cutoff = Utc::now() - ChronoDuration::days(max_age_days as i64);
-        if let Ok(rd) = fs::read_dir(&dir) {
-            for ent in rd.flatten() {
-                let path = ent.path();
-                if path
-                    .extension()
-                    .and_then(|e| e.to_str())
-                    .map(|e| e.eq_ignore_ascii_case("pdf"))
-                    != Some(true)
-                {
-                    continue;
-                }
-                let stem = path.file_stem().and_then(|s| s.to_str()).unwrap_or("");
-                let ts = parse_screenshot_filename_timestamp(stem).or_else(|| {
-                    ent.metadata()
-                        .ok()
-                        .and_then(|m| m.modified().ok())
-                        .map(system_time_to_utc)
-                });
-                let Some(ts) = ts else {
-                    continue;
-                };
-                if ts >= cutoff {
-                    continue;
-                }
-                let sz = ent.metadata().map(|m| m.len()).unwrap_or(0);
-                count += 1;
-                bytes = bytes.saturating_add(sz);
-                if let Some(n) = path.file_name() {
-                    push_sample(&mut samples, n.to_string_lossy().into_owned());
-                }
-            }
+    let mut bytes = 0u64;
+    for (p, sz) in &marked {
+        bytes = bytes.saturating_add(*sz);
+        if let Some(n) = p.file_name() {
+            push_sample(&mut samples, n.to_string_lossy().into_owned());
         }
     }
     CleanupCategory {
@@ -721,7 +988,7 @@ fn preview_pdfs(scope_id: &str, enabled: bool) -> CleanupCategory {
         label: "PDFs".into(),
         path_hint: "~/.mac-stats/pdfs".into(),
         policy,
-        file_count: count,
+        file_count: marked.len() as u64,
         bytes,
         sample_names: samples,
         scope_id: Some(scope_id.into()),
@@ -1030,7 +1297,29 @@ fn build_preview_categories(scopes: &[DiskCleanupScope]) -> Vec<CleanupCategory>
     out
 }
 
-fn apply_mac_stats_scope() {
+fn apply_mac_stats_scope(soft: bool) {
+    if soft {
+        // Move reclaimable app data to Trash (recoverable). Line-based / log prune stays permanent.
+        for (path, _) in collect_screenshot_reclaim() {
+            let _ = remove_cleaned_file(&path, true);
+        }
+        for (path, _) in collect_pdf_reclaim() {
+            let _ = remove_cleaned_file(&path, true);
+        }
+        for (path, _) in collect_session_reclaim() {
+            let _ = remove_cleaned_file(&path, true);
+        }
+        for (path, _) in collect_browser_download_reclaim() {
+            let _ = remove_cleaned_file(&path, true);
+        }
+        for (path, _) in collect_sic_backup_reclaim() {
+            let _ = remove_cleaned_file(&path, true);
+        }
+        let _ = crate::commands::run_telemetry::prune_runs_jsonl_if_needed();
+        crate::browser_agent::prune_cdp_traces_best_effort();
+        crate::logging::prune_companion_logs_best_effort();
+        return;
+    }
     crate::commands::screenshot_lifecycle::prune_old_screenshots();
     crate::commands::screenshot_lifecycle::prune_old_pdfs();
     let _ = crate::session_memory::prune_old_session_files();
@@ -1132,6 +1421,7 @@ fn build_status_from(
     let next_run_utc = next_dt.map(|d| d.to_rfc3339());
     let next_run_label = next_run_label(next_dt, hours);
     let summary = enabled_scope_summary(&scopes);
+    let soft = soft_delete_enabled();
     DiskCleanupStatus {
         root_hint: summary.clone(),
         reclaimable_bytes,
@@ -1152,6 +1442,7 @@ fn build_status_from(
             "Manual (Clean now)".into(),
         ],
         enabled_scope_summary: summary,
+        soft_delete: soft,
     }
 }
 
@@ -1171,7 +1462,7 @@ pub fn run_now(trigger: &str) -> DiskCleanupStatus {
             continue;
         }
         match scope.kind.as_str() {
-            "mac-stats" => apply_mac_stats_scope(),
+            "mac-stats" => apply_mac_stats_scope(soft_delete_enabled()),
             "trash" | "downloads" | "temp" | "path" => {
                 let (d, f) = apply_aged_scope(scope);
                 if d > 0 {
@@ -1204,8 +1495,14 @@ pub fn run_now(trigger: &str) -> DiskCleanupStatus {
         note: if files_removed == 0 && bytes_freed == 0 {
             Some("Nothing to clean under enabled scopes.".into())
         } else {
+            let how = if soft_delete_enabled() {
+                "Moved to Trash"
+            } else {
+                "Permanently deleted"
+            };
             Some(format!(
-                "Freed {} across {} item(s).",
+                "{} {} across {} item(s) (Trash scope always permanent).",
+                how,
                 format_bytes(bytes_freed),
                 files_removed
             ))
@@ -1268,6 +1565,12 @@ pub fn get_disk_cleanup_scopes() -> Vec<DiskCleanupScope> {
 #[tauri::command]
 pub fn set_disk_cleanup_scopes(scopes: Vec<DiskCleanupScope>) -> Result<DiskCleanupStatus, String> {
     save_scopes(&scopes)?;
+    Ok(get_status())
+}
+
+#[tauri::command]
+pub fn set_disk_cleanup_soft_delete(soft_delete: bool) -> Result<DiskCleanupStatus, String> {
+    save_soft_delete(soft_delete)?;
     Ok(get_status())
 }
 

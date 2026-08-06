@@ -396,6 +396,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::disk_cleanup::run_disk_cleanup_now,
             commands::disk_cleanup::get_disk_cleanup_scopes,
             commands::disk_cleanup::set_disk_cleanup_scopes,
+            commands::disk_cleanup::set_disk_cleanup_soft_delete,
         ])
         .setup(move |app| {
             crate::state::mark_process_start();

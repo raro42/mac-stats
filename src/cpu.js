@@ -4287,6 +4287,10 @@ async function refreshDiskCleanupPanel() {
     if (scopeSummaryEl) {
       scopeSummaryEl.textContent = status.enabledScopeSummary || status.rootHint || '—';
     }
+    const softEl = document.getElementById('disk-cleanup-soft-delete');
+    if (softEl) {
+      softEl.checked = status.softDelete !== false;
+    }
     if (icon) {
       icon.classList.toggle('has-reclaim', reclaimBytes >= 1024 * 1024);
       const base = icon.getAttribute('data-title-base') || 'Disk cleanup';
@@ -4376,7 +4380,15 @@ async function refreshDiskCleanupPanel() {
 
     if (runBtn) {
       runBtn.disabled = false;
-      runBtn.textContent = reclaimBytes > 0 ? 'Clean now' : 'Run cleanup';
+      const soft = status.softDelete !== false;
+      runBtn.textContent =
+        reclaimBytes > 0
+          ? soft
+            ? 'Clean now (→ Trash)'
+            : 'Clean now (permanent)'
+          : soft
+            ? 'Run cleanup (→ Trash)'
+            : 'Run cleanup (permanent)';
     }
     return status;
   } catch (e) {
@@ -4411,6 +4423,28 @@ async function saveDiskCleanupScopes(scopes) {
   if (!inv) return;
   await inv('set_disk_cleanup_scopes', { scopes });
   await refreshDiskCleanupPanel();
+}
+
+/** Brief success flash on a Save control; restores label after ~1.8s. */
+function flashSaveButton(btn, opts = {}) {
+  if (!btn) return;
+  const savedLabel = opts.savedLabel || 'Saved';
+  const durationMs = opts.durationMs || 1800;
+  if (btn._saveFlashTimer) {
+    clearTimeout(btn._saveFlashTimer);
+    btn._saveFlashTimer = null;
+  }
+  if (btn._saveFlashOriginalLabel == null) {
+    btn._saveFlashOriginalLabel = btn.textContent;
+  }
+  btn.classList.add('is-just-saved');
+  btn.textContent = savedLabel;
+  btn._saveFlashTimer = setTimeout(() => {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = btn._saveFlashOriginalLabel || 'Save';
+    btn._saveFlashOriginalLabel = null;
+    btn._saveFlashTimer = null;
+  }, durationMs);
 }
 
 function initDiskCleanupSection() {
@@ -4449,7 +4483,7 @@ function initDiskCleanupSection() {
       contentId: 'disk-cleanup-content',
       getExpanded: () => !collapsed,
       ignoreSelector:
-        '#disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, #disk-cleanup-scopes, #disk-cleanup-add-label, #disk-cleanup-add-path, #disk-cleanup-add-days, #disk-cleanup-add-recursive, .disk-cleanup-add-scope, .disk-cleanup-scopes, input, button, label',
+        '#disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, #disk-cleanup-soft-delete, #disk-cleanup-scopes, #disk-cleanup-add-label, #disk-cleanup-add-path, #disk-cleanup-add-days, #disk-cleanup-add-recursive, .disk-cleanup-add-scope, .disk-cleanup-scopes, .disk-cleanup-soft-delete, input, button, label',
       onToggle: () => {
         collapsed = !collapsed;
         localStorage.setItem('disk_cleanup_collapsed', collapsed.toString());
@@ -4461,7 +4495,7 @@ function initDiskCleanupSection() {
   header.addEventListener('click', (e) => {
     if (
       e.target.closest(
-        '#disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, .disk-cleanup-scopes, .disk-cleanup-add-scope, input, button, label'
+        '#disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, .disk-cleanup-scopes, .disk-cleanup-add-scope, .disk-cleanup-soft-delete, input, button, label'
       )
     ) {
       return;
@@ -4484,8 +4518,31 @@ function initDiskCleanupSection() {
       e.stopPropagation();
       try {
         await saveDiskCleanupScopes(readDiskCleanupScopesFromDom());
+        const softEl = document.getElementById('disk-cleanup-soft-delete');
+        const invoke = getInvoke();
+        if (softEl && invoke) {
+          await invoke('set_disk_cleanup_soft_delete', { softDelete: !!softEl.checked });
+          await refreshDiskCleanupPanel();
+        }
+        flashSaveButton(saveBtn);
       } catch (err) {
         alert(`Save scopes failed: ${err?.message || err}`);
+      }
+    });
+  }
+
+  const softToggle = document.getElementById('disk-cleanup-soft-delete');
+  if (softToggle) {
+    softToggle.addEventListener('change', async (e) => {
+      e.stopPropagation();
+      const inv = getInvoke();
+      if (!inv) return;
+      try {
+        await inv('set_disk_cleanup_soft_delete', { softDelete: !!softToggle.checked });
+        await refreshDiskCleanupPanel();
+      } catch (err) {
+        alert(`Could not save delete mode: ${err?.message || err}`);
+        softToggle.checked = !softToggle.checked;
       }
     });
   }
@@ -4547,6 +4604,10 @@ function initDiskCleanupSection() {
       if (!inv) return;
       try {
         await saveDiskCleanupScopes(readDiskCleanupScopesFromDom());
+        const softEl = document.getElementById('disk-cleanup-soft-delete');
+        if (softEl) {
+          await inv('set_disk_cleanup_soft_delete', { softDelete: !!softEl.checked });
+        }
       } catch (_) {}
       runBtn.disabled = true;
       runBtn.textContent = 'Cleaning…';

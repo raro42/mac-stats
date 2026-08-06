@@ -45,6 +45,8 @@ Preview and reclaim reclaimable files with **configurable scopes**:
 
 Runs on **app launch**, every **24h while running** (configurable), and **Clean now**. State in `~/.mac-stats/disk_cleanup.json`; scopes in `config.json` → `diskCleanupScopes`.
 
+**Soft-delete (default):** cleaned files are **moved to Trash** so you can recover them. Uncheck *Move cleaned items to Trash* (or set `diskCleanupSoftDelete: false`) for permanent delete. Emptying the **Trash** scope is always permanent.
+
 <img src="screens/feature-disk-cleanup.png" alt="Disk Cleanup scopes" width="360">
 
 ## Local AI agent (opt-in)

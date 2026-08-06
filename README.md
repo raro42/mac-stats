@@ -21,7 +21,7 @@ Two products in one binary — pick your path:
 
 | | **Just the monitor** | **Monitor + AI agent** |
 |--|----------------------|-------------------------|
-| What you get | Menu-bar **CPU + SSD** (and °C when known), glass window, themes, process list | Everything left + local Ollama chat, Discord bot, schedules, Agent Ops |
+| What you get | Menu-bar **CPU + SSD** (and °C when known), glass window, themes, process list, website monitors, **Disk Cleanup** | Everything left + local Ollama chat, Discord bot, schedules, Agent Ops |
 | Needs | macOS on Apple Silicon | + [Ollama](https://ollama.com) + a model |
 | Config | Zero — AI is **off by default** | Set `aiAgentEnabled: true` or use Settings |
 
@@ -50,7 +50,7 @@ brew install --cask mac-stats
 open -a mac-stats
 ```
 
-Look at the menu bar → click for the window. **No Ollama required.**
+Look at the menu bar → click for the window. **No Ollama required.** Disk Cleanup, monitors, and themes are all in the glass window.
 
 ---
 
@@ -112,6 +112,7 @@ Closest peers from a 2026 menu-bar monitor scan ([how we compare](docs/042_how_w
 | Menu-bar CPU / RAM / disk | ✅ | ✅ | ✅ | ✅ (basic) |
 | Apple Silicon focus | ✅ arm64 only | ✅ | ✅ | ✅ |
 | Themes / glass UI | ✅ | ✅ | ✅ | — |
+| Disk Cleanup (scopes · soft-delete → Trash) | ✅ | — | — | — |
 | Local LLM agent (Ollama) | ✅ **optional** | — | — | — |
 | Discord bot / schedules | ✅ **optional** | — | — | — |
 | Deep sensors / history / weather | lean essentials | strong | deepest | minimal |
@@ -119,9 +120,9 @@ Closest peers from a 2026 menu-bar monitor scan ([how we compare](docs/042_how_w
 | Cloud telemetry | ❌ none | — | — | — |
 
 **How to pick:**
-- **vs Stats** — Stats is the classic free OSS monitor; mac-stats keeps that spirit with a more modern glass/theme system and **optional** local AI / Discord / schedules.
-- **vs iStat Menus** — iStat Menus is the paid deep-sensor benchmark; mac-stats stays on essentials + Apple Silicon glanceability (we are **not** a full iStat replacement).
-- **vs MenuMeters** — MenuMeters is minimal bars; mac-stats adds richer metrics, themes, and optional agent workflows without forcing AI on.
+- **vs Stats** — Stats is the classic free OSS monitor; mac-stats keeps that spirit with glass/themes, **Disk Cleanup** (scoped reclaim with soft-delete to Trash by default), and **optional** local AI / Discord / schedules.
+- **vs iStat Menus** — iStat Menus is the paid deep-sensor benchmark; mac-stats stays on essentials + Apple Silicon glanceability + lightweight cleanup (we are **not** a full iStat replacement).
+- **vs MenuMeters** — MenuMeters is minimal bars; mac-stats adds richer metrics, themes, Disk Cleanup, and optional agent workflows without forcing AI on.
 
 Leave AI off for a Stats-like monitor only. Local-first: core metrics never need the cloud.
 
@@ -165,9 +166,12 @@ In-app banner checks GitHub Releases. Or: `brew upgrade --cask mac-stats`.
 
 ### Disk Cleanup
 
-- Preview reclaimable files; **Clean now** or automatic runs (app launch + every 24h while running).
-- Configurable scopes: mac-stats data, Trash, Downloads, Temp, plus custom paths (age days + recurse) in `diskCleanupScopes`.
-- Details: [FEATURES.md](FEATURES.md#disk-cleanup).
+Built-in reclaim panel (no AI required):
+
+- Preview reclaimable size; **Clean now**, or automatic runs on **app launch** and every **24h** while running.
+- **Scopes** you can turn on/off: mac-stats data, Trash, Downloads, Temp, plus custom paths (age in days + recurse). Saved in `diskCleanupScopes`.
+- **Soft-delete by default** — cleaned files go to **Trash** so you can recover them. Uncheck *Move cleaned items to Trash* (or set `diskCleanupSoftDelete: false`) for permanent delete. Emptying the Trash scope is always permanent.
+- Details: [FEATURES.md](FEATURES.md#disk-cleanup) · screenshot above.
 
 ### Local AI agent (opt-in)
 

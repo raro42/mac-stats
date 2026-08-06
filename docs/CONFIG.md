@@ -32,6 +32,7 @@ In `config.json`:
 
 - `diskCleanupScopes` — array of scopes (`mac-stats`, `trash`, `downloads`, `temp`, or `path` with custom `path` / `maxAgeDays` / `recursive`)
 - `diskCleanupIntervalHours` — periodic run interval while the app is running (default `24`)
+- `diskCleanupSoftDelete` — `true` (default) moves cleaned files to `~/.Trash`; `false` permanently deletes. Trash-scope cleanup is always permanent.
 
 See [FEATURES.md](../FEATURES.md#disk-cleanup).
 

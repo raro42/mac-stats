@@ -438,6 +438,11 @@
             <button type="button" id="disk-cleanup-refresh-btn" class="popover-btn-secondary">Refresh</button>
             <button type="button" id="disk-cleanup-save-scopes-btn" class="popover-btn-secondary">Save scopes</button>
           </div>
+          <label class="disk-cleanup-soft-delete">
+            <input type="checkbox" id="disk-cleanup-soft-delete" checked />
+            Move cleaned items to Trash (recoverable)
+          </label>
+          <p class="disk-cleanup-soft-hint">Uncheck for permanent delete. Emptying the Trash scope is always permanent.</p>
           <div class="disk-cleanup-scopes" id="disk-cleanup-scopes" aria-label="Cleanup scopes"></div>
           <div class="disk-cleanup-add-scope">
             <input type="text" id="disk-cleanup-add-label" placeholder="Label (e.g. Project cache)" />

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.359] - 2026-08-06
+
+### Added
+- Disk Cleanup soft-delete by default (move to Trash); optional permanent delete via UI / `diskCleanupSoftDelete`.
+- Overnight ~23:00 git flush backstop (`scripts/overnight_git_flush.py`) so finished work is not left uncommitted.
+
+### Changed
+- Disk Cleanup **Save scopes** shows a brief Saved confirmation.
+- README: Disk Cleanup in feature list, comparison table, and soft-delete docs.
+
 ## [0.1.357] - 2026-08-05
 
 ### Changed
