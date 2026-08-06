@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Disk Cleanup **Save scopes** shows a brief Saved confirmation.
 - README: Disk Cleanup in feature list, comparison table, and soft-delete docs.
 
+## [0.1.358] - 2026-08-05
+
+### Added
+- Disk Cleanup soft-delete landing (pre-docs); see 0.1.359 for full ship notes.
+
 ## [0.1.357] - 2026-08-05
 
 ### Changed
