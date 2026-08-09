@@ -12,6 +12,15 @@
   --line: rgba(35, 45, 65, 0.20);
   --line-strong: rgba(35, 45, 65, 0.35);
 
+  /* Settings chrome aliases (shared modal CSS uses --text/--panel). */
+  --text: var(--ink);
+  --muted: var(--ink-muted);
+  --hairline: var(--line);
+  --panel: rgba(250, 250, 248, 0.94);
+  --panel-border: rgba(35, 45, 65, 0.18);
+  --panel-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
+  --modal-backdrop: rgba(20, 28, 40, 0.45);
+
   --accent: rgba(35, 45, 65, 0.70);
   --ring-track: rgba(35, 45, 65, 0.20);
 

@@ -18,10 +18,12 @@
   --accent: #00cc66;
   --hairline: #004400;
   --panel-border: #004400;
+  --panel-shadow: 0 24px 80px rgba(0, 0, 0, 0.85);
   --border: #004400;
   --ring-active: #00ff00;
   --ring-inactive: #003300;
   --hint: #006600;
+  --modal-backdrop: rgba(0, 0, 0, 0.80);
 }
 
 body {

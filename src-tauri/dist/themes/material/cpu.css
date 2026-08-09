@@ -12,6 +12,7 @@
   --text: rgba(24, 24, 26, 0.85);
   --muted: rgba(24, 24, 26, 0.55);
   --rule: rgba(24, 24, 26, 0.14);
+  --hairline: rgba(24, 24, 26, 0.14);
 
   --dial-face: rgba(245, 241, 234, 0.80);
   --dial-border: rgba(0, 0, 0, 0.10);
@@ -20,7 +21,11 @@
   --warn: #e2b14a;
   --ring-track: rgba(0, 0, 0, 0.12);
 
+  --panel: rgba(245, 241, 234, 0.96);
+  --panel-border: rgba(24, 24, 26, 0.14);
+  --panel-shadow: 0 28px 90px rgba(0, 0, 0, 0.22);
   --modal: rgba(0, 0, 0, 0.32);
+  --modal-backdrop: rgba(0, 0, 0, 0.32);
 }
 
 body {

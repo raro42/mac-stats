@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.360] - 2026-08-09
+
+### Fixed
+- Data Poster (and other dark themes) Settings modal: dark panel tokens so text is readable (was light-glass fallback).
+
 ## [0.1.359] - 2026-08-06
 
 ### Added

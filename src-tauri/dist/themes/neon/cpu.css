@@ -14,7 +14,11 @@
   --green: #6dff7b;
   --green2: #2bff9f;
   --panel-bg: rgba(8, 18, 12, 0.72);
+  --panel: rgba(8, 18, 12, 0.92);
   --panel-border: rgba(120, 255, 160, 0.22);
+  --panel-shadow: 0 32px 100px rgba(0, 0, 0, 0.70);
+  --modal-backdrop: rgba(0, 0, 0, 0.70);
+  --accent: #6dff7b;
 
   --shadow: 0 24px 90px rgba(0, 0, 0, 0.70);
   --glow: 0 0 22px rgba(90, 255, 140, 0.35), 0 0 60px rgba(90, 255, 140, 0.22);
