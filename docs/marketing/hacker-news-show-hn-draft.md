@@ -1,5 +1,7 @@
 # Show HN — preferred draft (2026-08-10)
 
+**Posted:** 2026-08-10 · https://news.ycombinator.com/item?id=49248085
+
 Tone: dry, sarcastic, nerdy. Short. Honest about early stage.
 Real motivation: iStat Menus eating 6–15% CPU constantly.
 
