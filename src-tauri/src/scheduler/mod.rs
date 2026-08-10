@@ -1,7 +1,8 @@
 //! Scheduler agent: runs tasks at scheduled times from ~/.mac-stats/schedules.json.
 //!
-//! Loads the file at startup and in a loop: sleeps until the next due time (or a short interval
-//! to check for file changes), executes the task (via Ollama + agents or direct FETCH_URL/BRAVE_SEARCH),
+//! Loads the file at startup and in a loop: sleeps until the next due time (capped by
+//! `schedulerCheckIntervalSecs`, default 5 minutes, so `schedules.json` edits are noticed),
+//! executes the task (via Ollama + agents or direct FETCH_URL/BRAVE_SEARCH),
 //! and re-reads the file whenever it changes (mtime poll) or after each run.
 
 use crate::config::Config;
@@ -774,7 +775,8 @@ async fn scheduler_loop() {
         let (next_time, idx) = next_runs[0];
         // Use millisecond precision so we don't spin when next run is < 1 second away (num_seconds() would truncate to 0).
         let wait_ms = (next_time - now).num_milliseconds().max(0) as u64;
-        let sleep_millis = wait_ms.min(check_interval_secs * 1000);
+        // Sleep until the next due time; only wake early to reload schedules.json (default every 5m).
+        let sleep_millis = wait_ms.min(check_interval_secs.saturating_mul(1000));
         let sleep_duration = Duration::from_millis(sleep_millis);
 
         tokio::time::sleep(sleep_duration).await;

@@ -750,6 +750,46 @@ fn random_secs_in_range(min_secs: u64, max_secs: u64) -> u64 {
 // ---------------------------------------------------------------------------
 
 const HAVING_FUN_TICK_SECS: u64 = 10;
+/// After 5 minutes with no inbound Discord messages, having_fun ticks once a minute.
+const DISCORD_QUIET_SOFT_SECS: u64 = 5 * 60;
+const HAVING_FUN_TICK_QUIET_SOFT_SECS: u64 = 60;
+/// After 30 minutes quiet, having_fun ticks every 5 minutes.
+const DISCORD_QUIET_HARD_SECS: u64 = 30 * 60;
+const HAVING_FUN_TICK_QUIET_HARD_SECS: u64 = 300;
+
+/// Monotonic millis of last inbound Discord message (non-bot). 0 = never (treat as quiet).
+static LAST_DISCORD_INBOUND_MS: AtomicU64 = AtomicU64::new(0);
+
+fn note_discord_inbound_activity() {
+    let ms = std::time::SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0);
+    LAST_DISCORD_INBOUND_MS.store(ms, Ordering::Relaxed);
+}
+
+/// Adaptive having_fun poll interval: 10s when active, 60s after 5m quiet, 5m after 30m quiet.
+pub(crate) fn having_fun_tick_secs_for_quiet(quiet_secs: u64) -> u64 {
+    if quiet_secs >= DISCORD_QUIET_HARD_SECS {
+        HAVING_FUN_TICK_QUIET_HARD_SECS
+    } else if quiet_secs >= DISCORD_QUIET_SOFT_SECS {
+        HAVING_FUN_TICK_QUIET_SOFT_SECS
+    } else {
+        HAVING_FUN_TICK_SECS
+    }
+}
+
+fn discord_inbound_quiet_secs() -> u64 {
+    let last = LAST_DISCORD_INBOUND_MS.load(Ordering::Relaxed);
+    if last == 0 {
+        return DISCORD_QUIET_HARD_SECS; // no traffic yet this process → calm tick
+    }
+    let now = std::time::SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(last);
+    now.saturating_sub(last) / 1000
+}
 
 struct BufferedMessage {
     author_name: String,
@@ -903,14 +943,16 @@ fn buffer_having_fun_message(
 
 /// Background loop for having_fun channels: flushes buffered messages after configurable random delay,
 /// posts random thoughts after configurable random idle time. Reloads discord_channels.json when file changes.
-/// Log idle timer heartbeat every this many ticks (tick = 10s → 6 ticks = 1 min).
+/// Log idle timer heartbeat every this many *active* ticks (10s → 6 ticks = 1 min).
+/// When quiet-backed off, heartbeat still lands about once per soft/hard period.
 const HAVING_FUN_LOG_TICKS: u64 = 6;
 
 async fn having_fun_background_loop(ctx: Context) {
-    let mut interval = tokio::time::interval(std::time::Duration::from_secs(HAVING_FUN_TICK_SECS));
     let mut tick_count: u64 = 0;
     loop {
-        interval.tick().await;
+        let quiet = discord_inbound_quiet_secs();
+        let tick_secs = having_fun_tick_secs_for_quiet(quiet);
+        tokio::time::sleep(std::time::Duration::from_secs(tick_secs)).await;
         if !DISCORD_DESIRED_ONLINE.load(Ordering::SeqCst) || bot_user_id().is_none() {
             info!("Having fun: exiting background loop (Discord disconnected)");
             break;
@@ -3164,6 +3206,8 @@ impl EventHandler for Handler {
             return;
         }
 
+        note_discord_inbound_activity();
+
         let is_dm = new_message.guild_id.is_none();
         let mentions_bot = new_message.mentions.iter().any(|u| u.id == bot_id);
         let mentions_bot_effective =
@@ -3756,6 +3800,16 @@ pub fn spawn_discord_if_configured() {
 #[cfg(test)]
 mod tests {
     use serenity::gateway::ConnectionStage;
+
+    #[test]
+    fn having_fun_tick_backs_off_when_discord_quiet() {
+        assert_eq!(super::having_fun_tick_secs_for_quiet(0), 10);
+        assert_eq!(super::having_fun_tick_secs_for_quiet(60), 10);
+        assert_eq!(super::having_fun_tick_secs_for_quiet(5 * 60), 60);
+        assert_eq!(super::having_fun_tick_secs_for_quiet(29 * 60), 60);
+        assert_eq!(super::having_fun_tick_secs_for_quiet(30 * 60), 300);
+        assert_eq!(super::having_fun_tick_secs_for_quiet(2 * 60 * 60), 300);
+    }
 
     #[test]
     fn gateway_disconnect_counts_heartbeat_restart_paths() {

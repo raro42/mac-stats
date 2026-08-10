@@ -520,11 +520,12 @@ impl Config {
         None
     }
 
-    /// Scheduler check interval in seconds: how often to reload schedules from disk.
-    /// Default 60 (every minute). Config: config.json `schedulerCheckIntervalSecs`;
+    /// Scheduler file-reload poll while waiting for the next due job.
+    /// Default **300** (5 minutes). The loop still wakes exactly when the next schedule is due
+    /// (sleep is `min(time_until_due, this)`). Config: `schedulerCheckIntervalSecs`;
     /// override: env `MAC_STATS_SCHEDULER_CHECK_SECS`. Clamped to 1..=86400.
     pub fn scheduler_check_interval_secs() -> u64 {
-        let default_secs = 60u64;
+        let default_secs = 300u64;
         let from_env = std::env::var("MAC_STATS_SCHEDULER_CHECK_SECS")
             .ok()
             .and_then(|s| s.parse::<u64>().ok());

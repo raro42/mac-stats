@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.366] - 2026-08-10
+
+### Changed
+- Idle calm-down toward ~0.1% CPU with the window closed: menu-bar metrics every 5s (1s when open); scheduler sleeps until the next due job (5m file-reload default); Discord having_fun ticks back off to 1m / 5m after 5m / 30m of quiet; slower monitor/alert/hygiene wakeups.
+
 ## [0.1.365] - 2026-08-10
 
 ### Changed

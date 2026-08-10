@@ -541,7 +541,7 @@ fn run_internal(open_cpu_window: bool) {
 
             // Periodic operator pressure line when automation is non-trivial (queues, WIP tasks, imminent schedules).
             tauri::async_runtime::spawn(async move {
-                let mut tick = tokio::time::interval(std::time::Duration::from_secs(90));
+                let mut tick = tokio::time::interval(std::time::Duration::from_secs(180));
                 tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
                 loop {
                     tick.tick().await;
@@ -560,36 +560,36 @@ fn run_internal(open_cpu_window: bool) {
             });
 
             // Run website monitor checks in the background so monitors are checked even when the CPU window
-            // is not open. Wakes every 30s and runs checks for any monitor that is due (by its interval).
+            // is not open. Wakes every 60s and runs checks for any monitor that is due (by its interval).
             std::thread::spawn(|| {
                 loop {
-                    std::thread::sleep(std::time::Duration::from_secs(30));
+                    std::thread::sleep(std::time::Duration::from_secs(60));
                     commands::monitors::run_due_monitor_checks();
                 }
             });
 
             // Run alert evaluation periodically so SiteDown, BatteryLow, TemperatureHigh, CpuHigh
-            // etc. can fire without user action. Wakes every 60s and evaluates all alerts against
+            // etc. can fire without user action. Wakes every 120s and evaluates all alerts against
             // current metrics and monitor statuses.
             std::thread::spawn(|| {
                 loop {
-                    std::thread::sleep(std::time::Duration::from_secs(60));
+                    std::thread::sleep(std::time::Duration::from_secs(120));
                     commands::alerts::run_periodic_alert_evaluation();
                 }
             });
 
-            // Downloads organizer: every 60s, run if enabled and hourly/daily schedule is due.
+            // Downloads organizer: every 120s, run if enabled and hourly/daily schedule is due.
             std::thread::spawn(|| {
                 loop {
-                    std::thread::sleep(std::time::Duration::from_secs(60));
+                    std::thread::sleep(std::time::Duration::from_secs(120));
                     downloads_organizer::run_if_due();
                 }
             });
 
-            // Disk cleanup: every 60s, run if the periodic interval (default 24h) is due.
+            // Disk cleanup: every 120s, run if the periodic interval (default 24h) is due.
             std::thread::spawn(|| {
                 loop {
-                    std::thread::sleep(std::time::Duration::from_secs(60));
+                    std::thread::sleep(std::time::Duration::from_secs(120));
                     commands::disk_cleanup::run_if_due();
                 }
             });
@@ -660,9 +660,18 @@ fn run_internal(open_cpu_window: bool) {
                     metrics::smc_temperature::SmcTemperatureReader::default();
 
                 loop {
-                    // Menu bar updates every 1-2 seconds (like Stats app) for responsive UI
-                    // Fast metrics (CPU, RAM) are cached, so this is cheap
-                    std::thread::sleep(std::time::Duration::from_secs(1));
+                    // Idle (no CPU window): 5s between menu-bar metric samples.
+                    // Window open: 1s for responsive gauges.
+                    let cpu_window_visible = APP_HANDLE
+                        .get()
+                        .and_then(|app_handle| {
+                            app_handle.get_webview_window("cpu").and_then(|window| {
+                                window.is_visible().ok().filter(|&visible| visible)
+                            })
+                        })
+                        .is_some();
+                    let sleep_secs = if cpu_window_visible { 1 } else { 5 };
+                    std::thread::sleep(std::time::Duration::from_secs(sleep_secs));
 
                     debug3!("Update loop: getting metrics...");
                     let metrics = get_metrics();
@@ -717,14 +726,7 @@ fn run_internal(open_cpu_window: bool) {
                     let mut final_history_point = history_point;
 
                     // CRITICAL: Only read temperature when CPU window is visible (saves CPU)
-                    // Check window visibility before expensive SMC operations
-                    let should_read_temp = APP_HANDLE.get()
-                        .and_then(|app_handle| {
-                            app_handle.get_webview_window("cpu").and_then(|window| {
-                                window.is_visible().ok().filter(|&visible| visible)
-                            })
-                        })
-                        .is_some();
+                    let should_read_temp = cpu_window_visible;
 
                     if should_read_temp {
                         // CPU window is visible - read temperature and frequency
