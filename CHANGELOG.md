@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.362] - 2026-08-10
+
+### Fixed
+- Light theme: smaller gauge value/unit text so numbers fit inside the rings.
+
 ## [0.1.361] - 2026-08-10
 
 ### Fixed
