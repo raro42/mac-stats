@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.361] - 2026-08-10
+
+### Fixed
+- Data Poster footer: poster-styled credit strip (accent GitHub link); panel scrolls so the footer stays reachable.
+
 ## [0.1.360] - 2026-08-09
 
 ### Fixed

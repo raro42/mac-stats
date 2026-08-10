@@ -63,7 +63,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  overflow: hidden;
   min-height: 0; /* Allow flex children to shrink below content size */
 }
 
@@ -394,6 +393,78 @@ body {
   padding: 1rem;
   text-align: center;
   color: rgba(255, 255, 255, 0.55);
+}
+
+/* Poster credit strip — was unstyled (browser-blue GitHub, left-jammed). */
+.theme-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-top: auto;
+  padding: 14px 4px 2px;
+  border-top: 1px solid var(--hairline);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.theme-footer-sep {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 70%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 45%, transparent);
+  flex-shrink: 0;
+}
+
+.theme-version {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.theme-version:hover {
+  color: var(--text);
+}
+
+.theme-version:active {
+  color: color-mix(in srgb, var(--text) 80%, transparent);
+}
+
+.theme-github-link {
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  position: relative;
+  transition: color 0.15s ease, text-shadow 0.15s ease;
+}
+
+.theme-github-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.35;
+  transition: opacity 0.15s ease;
+}
+
+.theme-github-link:hover {
+  color: color-mix(in srgb, var(--accent) 85%, #fff);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.theme-github-link:hover::after {
+  opacity: 0.7;
 }
 
 .settings-modal {
