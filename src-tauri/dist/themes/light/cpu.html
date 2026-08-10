@@ -5,10 +5,36 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="stylesheet" href="./cpu.css?v=0.1.363-gauges2" />
-    <link rel="stylesheet" href="../../agent-ops.css?v=0.1.363" />
+    <link rel="stylesheet" href="./cpu.css?v=0.1.364" />
+    <link rel="stylesheet" href="../../agent-ops.css?v=0.1.364" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CPU</title>
+    <style id="gauge-type-fix">
+      .metric-label {
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.02em !important;
+        text-transform: none !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        white-space: nowrap !important;
+        max-width: none !important;
+      }
+      .metric-value {
+        font-size: 17px !important;
+        font-weight: 560 !important;
+        max-width: 90% !important;
+        line-height: 1 !important;
+      }
+      .metric-unit {
+        font-size: 10px !important;
+        opacity: 0.7 !important;
+      }
+      .metric-card {
+        overflow: visible !important;
+      }
+    </style>
+
   </head>
   <body>
     <main class="cpu-shell">

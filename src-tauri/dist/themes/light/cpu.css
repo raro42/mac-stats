@@ -205,10 +205,11 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: 0 26px 70px rgba(0, 0, 0, 0.12);
 
-  padding: 16px 8px 14px;
+  padding: 14px 6px 12px;
   min-height: 200px;
 
-  overflow: hidden;
+  /* visible so long gauge titles are not clipped */
+  overflow: visible;
 }
 
 .metric-card::after {
@@ -245,16 +246,18 @@ body {
   position: relative;
   z-index: 2;
 
-  font-size: 12px;
-  font-weight: 650;
-  letter-spacing: -0.01em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   text-transform: none;
   text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: rgba(12, 12, 16, 0.62);
   overflow: visible;
+  text-overflow: clip;
   white-space: nowrap;
-  padding: 0 2px;
+  max-width: none;
+  padding: 0 4px;
 }
 
 .metric-value {
@@ -269,12 +272,12 @@ body {
     "SF Pro Display",
     "SF Pro Text",
     sans-serif;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 560;
   letter-spacing: -0.02em;
   line-height: 1;
   white-space: nowrap;
-  max-width: 86%;
+  max-width: 90%;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;

@@ -45,11 +45,28 @@
     return "./themes/";
   }
 
+  function themeAssetVersion() {
+    try {
+      return (
+        localStorage.getItem("macStatsAssetVersion") ||
+        new URLSearchParams(window.location.search).get("v") ||
+        String(Date.now())
+      );
+    } catch (_) {
+      return String(Date.now());
+    }
+  }
+
   function navigateToTheme(theme) {
     const base = getThemeBasePath();
     // base ends with / for root page; for themes page it's "../"
-    const url = `${base}${theme}/cpu.html`;
-    if (window.location.pathname.endsWith(url)) return;
+    const v = encodeURIComponent(themeAssetVersion());
+    const url = `${base}${theme}/cpu.html?v=${v}`;
+    const path = window.location.pathname;
+    if (path.endsWith(`${theme}/cpu.html`) || path.endsWith(`${theme}/cpu.html/`)) {
+      const cur = new URLSearchParams(window.location.search).get("v");
+      if (cur === themeAssetVersion()) return;
+    }
     window.location.href = url;
   }
 
@@ -143,11 +160,12 @@
   function applyTheme(theme) {
     localStorage.setItem("theme", theme);
     syncThemeClass(theme);
-    const url = (function () {
-      const base = getThemeBasePath();
-      return base + theme + "/cpu.html";
-    })();
-    if (window.location.pathname.endsWith(theme + "/cpu.html")) return;
+    const v = encodeURIComponent(themeAssetVersion());
+    const url = `${getThemeBasePath()}${theme}/cpu.html?v=${v}`;
+    if (window.location.pathname.endsWith(theme + "/cpu.html")) {
+      const cur = new URLSearchParams(window.location.search).get("v");
+      if (cur === themeAssetVersion()) return;
+    }
 
     ensureThemeSwitchStyle();
     document.body.classList.add("theme-switch-fade-out");

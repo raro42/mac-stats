@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.364] - 2026-08-10
+
+### Fixed
+- Light theme gauges: Frequency/Temperature titles no longer truncate (assets are embedded at build time — rebuild required for theme HTML/CSS).
+
 ## [0.1.363] - 2026-08-10
 
 ### Fixed

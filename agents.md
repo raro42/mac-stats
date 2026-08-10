@@ -561,6 +561,7 @@ mac-stats/
 
 ### File Sync & Build Process
 
+- **Theme/HTML/CSS are embedded into the binary at `cargo build` time** (`frontendDist`). Copying into `/Applications/.../Resources/dist` alone does **not** change what the WebView serves — rebuild + reinstall (or `cargo run`) after theme edits.
 - **Edit shared JS/CSS in `src/`**, then run `scripts/sync-dist.sh` → **`src-tauri/dist/` only** (Tauri `frontendDist`). Do **not** use a repo-root `dist/` mirror.
 - **CPU window SoT:** `src/cpu.js`, `src/cpu-ui.js`, `src/discord.js`, `src/history.js`, `src/ollama.js`, `src/agent-ops.js`
 - **Themes** (`src-tauri/dist/themes/*/`) are **dist-only** — CSS/layout per theme; keep `#settings-modal` in sync via `scripts/check-theme-settings-sync.sh` / `scripts/sync-theme-settings.sh`
