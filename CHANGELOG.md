@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Drop unused root `package.json` / `package-lock.json` (build is Cargo / `cargo tauri` only).
 - Marketing screenshots and demo video live under `docs/screens/` (was repo-root `screens/`).
 - README demo video link uses a `video/mp4` CDN URL (GitHub blob preview rejects this file size; raw is `octet-stream`).
 - Agent ops folders live under `agents/` (testing queue, log-monitor, task archives). Root `agents.md` stays the project instructions file.
