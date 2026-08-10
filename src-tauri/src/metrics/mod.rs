@@ -1259,7 +1259,7 @@ fn resize_cpu_window_for_compact(compact: bool) {
     let (w, h) = if compact {
         (520.0_f64, 560.0_f64)
     } else {
-        (720.0_f64, 995.0_f64)
+        (820.0_f64, 995.0_f64)
     };
     let _ = win.set_size(tauri::Size::Logical(tauri::LogicalSize::new(w, h)));
 }

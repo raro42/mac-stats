@@ -702,7 +702,8 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
                 if Config::cpu_window_compact() {
                     520.0
                 } else {
-                    720.0
+                    // Room for four gauge titles (Frequency / Temperature) without clipping.
+                    820.0
                 },
                 if Config::cpu_window_compact() {
                     560.0

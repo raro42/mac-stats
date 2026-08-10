@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.365] - 2026-08-10
+
+### Changed
+- CPU window default width 720→820; Light theme shell no longer capped at 620px so Frequency/Temperature titles breathe.
+
 ## [0.1.364] - 2026-08-10
 
 ### Fixed
