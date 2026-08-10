@@ -15,6 +15,7 @@ Agent-ops homes for this **repo**. Not the live app agent files.
 | [log-monitor/](log-monitor/) | Scan `~/.mac-stats/debug.log` for errors (read-only) |
 | [tasks/](tasks/) | Queue/archive: `UNTESTED-*`, `CLOSED-*`, `WIP-*`, `FEAT-*` |
 | [agents-tasks/](agents-tasks/) | Log findings (`log-NNN`) + legacy scanner tasks |
+| [007-quality-monitor/](007-quality-monitor/) | Weekly repo quality (root clutter, dead scaffolding) |
 | [006-feature-coder/](006-feature-coder/) | FEAT backlog |
 | [005-openclaw-reviewer/](005-openclaw-reviewer/) | OpenClaw port review notes |
 | [004-closing-reviewer/](004-closing-reviewer/) | Closing-reviewer prompt |

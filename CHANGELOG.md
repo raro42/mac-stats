@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Weekly **repo quality** monitor: Friday ~10:00 (`quality-weekly-review` skill + `scripts/scan_repo_quality.py`); see `docs/044_repo_quality_hygiene.md`.
 - Drop unused root `package.json` / `package-lock.json` (build is Cargo / `cargo tauri` only).
 - Marketing screenshots and demo video live under `docs/screens/` (was repo-root `screens/`).
 - README demo video link uses a `video/mp4` CDN URL (GitHub blob preview rejects this file size; raw is `octet-stream`).

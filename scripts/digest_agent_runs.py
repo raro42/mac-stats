@@ -1059,6 +1059,7 @@ def is_stale_shipped_candidate(hint: str, q: str, ts: datetime | None) -> bool:
             "git fast-lane" in hl
             or "ui-weekly" in ql
             or "changelog-weekly" in ql
+            or "quality-weekly" in ql
             or "commit" in ql
             or "push" in ql
         ):
@@ -1143,6 +1144,7 @@ def is_skill_git_fastlane_false_positive(r: dict) -> bool:
     skillish = (
         "ui-weekly" in q
         or "changelog-weekly" in q
+        or "quality-weekly" in q
         or "commit" in q
         or "push" in q
         or "cursor_agent" in q
