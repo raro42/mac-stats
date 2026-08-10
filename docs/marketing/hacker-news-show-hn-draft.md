@@ -48,10 +48,24 @@ https://github.com/raro42/mac-stats
 
 ---
 
-## Optional first comment
+## First comment — paste this (2026-08-10)
+
+Post as **raro43** on https://news.ycombinator.com/item?id=49248085  
+(Comment box at the bottom → **add comment**.)
 
 ```text
-Screens: https://github.com/raro42/mac-stats/tree/main/docs/screens
-Measure script: scripts/measure_performance.sh — happy to post before/after if useful.
-AI stays off until Settings / aiAgentEnabled.
+A few pointers if you try it:
+
+- Screens + short demo: https://github.com/raro42/mac-stats/tree/main/docs/screens
+- Idle CPU numbers (mac-stats vs Stats, same host/sampler): https://github.com/raro42/mac-stats/blob/main/docs/ops/2026-08-10-performance-baseline.md
+- Measure yourself: ./scripts/measure_performance.sh 60 1 idle
+
+Install (Apple Silicon):
+
+  brew tap raro42/mac-stats https://github.com/raro42/mac-stats
+  brew install --cask mac-stats
+
+The local LLM / Discord / scheduler stuff stays off until you turn on Settings → AI agent. Menu-bar monitor alone is the default path.
+
+Happy to dig into methodology or weird SMC/freq edge cases if useful.
 ```
