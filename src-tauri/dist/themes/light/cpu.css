@@ -194,7 +194,7 @@ body {
 .cpu-metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
+  gap: 12px;
   flex-shrink: 0; /* Don't shrink metrics section */
 }
 
@@ -205,8 +205,8 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: 0 26px 70px rgba(0, 0, 0, 0.12);
 
-  padding: 24px 18px 18px;
-  min-height: 228px;
+  padding: 16px 8px 14px;
+  min-height: 200px;
 
   overflow: hidden;
 }
@@ -245,23 +245,22 @@ body {
   position: relative;
   z-index: 2;
 
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  text-transform: none;
   text-align: center;
-  margin-bottom: 10px;
-  color: rgba(12, 12, 16, 0.55);
-  overflow: hidden;
-  text-overflow: ellipsis;
+  margin-bottom: 8px;
+  color: rgba(12, 12, 16, 0.62);
+  overflow: visible;
   white-space: nowrap;
-  padding: 0 6px;
+  padding: 0 2px;
 }
 
 .metric-value {
   position: absolute;
   z-index: 2;
-  top: calc(50% + 16px);
+  top: calc(50% + 14px);
   left: 50%;
   transform: translate(-50%, -50%);
   font-family:
@@ -270,12 +269,12 @@ body {
     "SF Pro Display",
     "SF Pro Text",
     sans-serif;
-  font-size: 22px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-size: 18px;
+  font-weight: 560;
+  letter-spacing: -0.02em;
   line-height: 1;
   white-space: nowrap;
-  max-width: 78%;
+  max-width: 86%;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
@@ -286,23 +285,23 @@ body {
   font-weight: 500;
   vertical-align: baseline;
   position: relative;
-  top: -1px;
+  top: 0;
   margin-left: 1px;
-  opacity: 0.7;
+  opacity: 0.68;
 }
 
 .metric-subtext {
   position: absolute;
   z-index: 2;
-  top: 74%;
+  top: 76%;
   left: 50%;
   transform: translate(-50%, 0);
 
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   color: rgba(12, 12, 16, 0.48);
   white-space: nowrap;
-  max-width: 90%;
+  max-width: 94%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -319,8 +318,8 @@ body {
   top: 58%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 128px;
-  height: 128px;
+  width: 112px;
+  height: 112px;
   pointer-events: none;
 }
 
@@ -953,16 +952,16 @@ body {
   }
 
   .metric-label {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .metric-value {
-    font-size: 20px;
+    font-size: 16px;
   }
 
   .ring {
-    width: 120px;
-    height: 120px;
+    width: 104px;
+    height: 104px;
   }
 
   .details-grid {

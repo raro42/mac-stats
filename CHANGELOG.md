@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.363] - 2026-08-10
 
 ### Fixed
-- Light theme gauges: shrink oversized card titles (was clipping “Temperature”) and fit value text inside the rings.
+- Light theme gauges: fix clipped Frequency/Temperature titles and oversized dial numbers (titles + values scaled to the cards).
 
 ## [0.1.362] - 2026-08-10
 
