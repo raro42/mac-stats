@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Marketing screenshots and demo video live under `docs/screens/` (was repo-root `screens/`).
 - Agent ops folders live under `agents/` (testing queue, log-monitor, task archives). Root `agents.md` stays the project instructions file.
 
 ## [0.1.367] - 2026-08-10

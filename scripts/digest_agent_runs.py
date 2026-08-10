@@ -964,10 +964,10 @@ def load_runs(path: Path, since: datetime) -> list[dict]:
 def design_review_candidate(repo_root: Path, max_age_days: float = 3.0) -> tuple | None:
     """Synthetic open candidate when a feature screenshot is missing or stale.
 
-    A recent polish-without-capture mark under screens/.polish-grace/ suppresses
+    A recent polish-without-capture mark under docs/screens/.polish-grace/ suppresses
     stale-screenshot nagging for that surface (TCC / Screen Recording gaps).
     """
-    screens = repo_root / "screens"
+    screens = repo_root / "docs" / "screens"
     grace_dir = screens / ".polish-grace"
     surfaces = (
         "feature-agent-ops.png",
@@ -987,7 +987,7 @@ def design_review_candidate(repo_root: Path, max_age_days: float = 3.0) -> tuple
             return (
                 0,
                 "Overnight design review — capture + polish stale/missing feature screen",
-                f"missing screens/{name}",
+                f"missing docs/screens/{name}",
                 "design-review",
                 None,
             )
@@ -997,7 +997,7 @@ def design_review_candidate(repo_root: Path, max_age_days: float = 3.0) -> tuple
             return (
                 0,
                 "Overnight design review — capture + polish stale/missing feature screen",
-                f"stale screens/{name} ({days}d)",
+                f"stale docs/screens/{name} ({days}d)",
                 "design-review",
                 None,
             )

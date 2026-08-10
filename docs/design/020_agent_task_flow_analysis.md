@@ -6,9 +6,9 @@
 
 A local AI agent for macOS: Ollama chat, Discord bot, task runner, scheduler, and MCP—all on your Mac. No cloud, no telemetry. Lives in your menu bar—CPU, GPU, RAM, disk at a glance. Real-time, minimal, there when you look. Built with Rust and Tauri.
 
-<img src="screens/data-poster.png" alt="mac-stats Data Poster theme" width="500">
+<img src="../screens/data-poster.png" alt="mac-stats Data Poster theme" width="500">
 
-📋 [Changelog](CHANGELOG.md) · 📸 [Screenshots & themes](screens/README.md)
+📋 [Changelog](CHANGELOG.md) · 📸 [Screenshots & themes](../screens/README.md)
 
 ---
 

@@ -16,7 +16,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SCREENS = ROOT / "screens"
+SCREENS = ROOT / "docs" / "screens"
 GRACE_DIR = SCREENS / ".polish-grace"
 
 # Rotate priority: Agent Ops / chat / processes often go stale first.

@@ -49,7 +49,7 @@ https://github.com/raro42/mac-stats
 ## Optional first comment
 
 ```text
-Screens: https://github.com/raro42/mac-stats/tree/main/screens
+Screens: https://github.com/raro42/mac-stats/tree/main/docs/screens
 Measure script: scripts/measure_performance.sh — happy to post before/after if useful.
 AI stays off until Settings / aiAgentEnabled.
 ```

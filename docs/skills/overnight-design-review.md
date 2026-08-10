@@ -11,7 +11,7 @@ Policy: `docs/043_overnight_design_review.md`. Helper: `python3 scripts/overnigh
 
 1. Run the helper; if `due=false` and digester has open work, prefer digester. If digester empty and standing backlog points here, proceed even when not “due” if screens are the best fuel.
 2. Open the recommended surface in the **menu-bar CPU window** (not orphan dashboard).
-3. Recapture `screens/feature-*.png` window-only.
+3. Recapture `docs/screens/feature-*.png` window-only.
 4. One CSS/layout/copy polish in the correct source files; `./scripts/sync-dist.sh`.
 5. Ratchet verify → commit → keep → version + CHANGELOG → push when reasonable.
 6. Morning surprise: name the surface + what got nicer.

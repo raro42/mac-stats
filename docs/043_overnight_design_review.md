@@ -16,12 +16,12 @@ Overnight digester often goes empty after instant-lane wins. Design review is **
 
 | Priority | Screen file | What to open |
 |----------|-------------|--------------|
-| 1 | `screens/feature-agent-ops.png` | CPU window → Agent Ops expanded |
-| 2 | `screens/feature-ai-chat.png` | CPU window → AI / Ollama chat |
-| 3 | `screens/feature-processes.png` | CPU window → process list |
-| 4 | `screens/feature-cpu-metrics.png` | CPU window → metrics rings |
-| 5 | `screens/feature-disk-cleanup.png` | CPU window → Disk Cleanup (scopes expanded) |
-| 6 | `screens/feature-monitors.png` | CPU window → External / Monitors |
+| 1 | `docs/screens/feature-agent-ops.png` | CPU window → Agent Ops expanded |
+| 2 | `docs/screens/feature-ai-chat.png` | CPU window → AI / Ollama chat |
+| 3 | `docs/screens/feature-processes.png` | CPU window → process list |
+| 4 | `docs/screens/feature-cpu-metrics.png` | CPU window → metrics rings |
+| 5 | `docs/screens/feature-disk-cleanup.png` | CPU window → Disk Cleanup (scopes expanded) |
+| 6 | `docs/screens/feature-monitors.png` | CPU window → External / Monitors |
 
 Real UI ships from `src-tauri/dist/themes/<theme>/cpu.html` + `src/agent-ops.{js,css}` / theme CSS — not `dashboard.html` alone. See `docs/041_ui_command_center.md` and `docs/042_dashboard_orphan.md`.
 
@@ -29,7 +29,7 @@ Real UI ships from `src-tauri/dist/themes/<theme>/cpu.html` + `src/agent-ops.{js
 
 1. `python3 scripts/overnight_design_review.py` → pick the recommended surface.
 2. Ensure mac-stats is running; open the CPU window to that view.
-3. Capture **window-only** PNG into `screens/<feature-….png>` (Swift CGWindowList / `screencapture -l`, not full desktop).
+3. Capture **window-only** PNG into `docs/screens/<feature-….png>` (Swift CGWindowList / `screencapture -l`, not full desktop).
 4. Pick **one** visible improvement: spacing, empty state, hierarchy, contrast, copy, affordance — make the view nicer or clearer.
 5. Edit source under `src/` (and theme files as needed), `./scripts/sync-dist.sh`.
 6. `python3 scripts/autoresearch_ratchet.py verify` → commit → keep → bump patch + CHANGELOG → install if runtime UI.

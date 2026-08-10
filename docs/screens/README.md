@@ -33,7 +33,7 @@ Screenshots and a short demo reel for [mac-stats](https://github.com/raro42/mac-
 - Letterboxed to 1920×1080; neural voiceover + ambient bed
 - Repo: [github.com/raro42/mac-stats](https://github.com/raro42/mac-stats/)
 
-Also linked from the [project README](../README.md#demo-video).
+Also linked from the [project README](../../README.md#demo-video).
 
 ## How to capture (window-only)
 

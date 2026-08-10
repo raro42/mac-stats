@@ -78,27 +78,27 @@ Details: [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 ### Themes
 
 <p>
-  <img src="screens/apple.png" alt="Apple theme" width="280">
-  <img src="screens/data-poster.png" alt="Data Poster theme" width="280">
-  <img src="screens/neon.png" alt="Neon theme" width="280">
+  <img src="docs/screens/apple.png" alt="Apple theme" width="280">
+  <img src="docs/screens/data-poster.png" alt="Data Poster theme" width="280">
+  <img src="docs/screens/neon.png" alt="Neon theme" width="280">
 </p>
 
 ### Features
 
 <p>
-  <img src="screens/feature-cpu-metrics.png" alt="CPU metrics" width="280">
-  <img src="screens/feature-monitors.png" alt="Website monitors" width="280">
-  <img src="screens/feature-disk-cleanup.png" alt="Disk Cleanup" width="280">
-  <img src="screens/feature-agent-ops.png" alt="Agent Ops" width="280">
-  <img src="screens/feature-ai-chat.png" alt="AI chat (Ollama)" width="280">
-  <img src="screens/feature-processes.png" alt="Top processes" width="280">
+  <img src="docs/screens/feature-cpu-metrics.png" alt="CPU metrics" width="280">
+  <img src="docs/screens/feature-monitors.png" alt="Website monitors" width="280">
+  <img src="docs/screens/feature-disk-cleanup.png" alt="Disk Cleanup" width="280">
+  <img src="docs/screens/feature-agent-ops.png" alt="Agent Ops" width="280">
+  <img src="docs/screens/feature-ai-chat.png" alt="AI chat (Ollama)" width="280">
+  <img src="docs/screens/feature-processes.png" alt="Top processes" width="280">
 </p>
 
 ### Demo video
 
-[~49s live window capture](screens/mac-stats-features.mp4) — real `mac_stats --cpu` session (ScreenCaptureKit, window-only): live gauges, monitors (including a red down site), Agent Ops, Ollama chat. Letterboxed to 1080p with light voiceover.
+[~49s live window capture](docs/screens/mac-stats-features.mp4) — real `mac_stats --cpu` session (ScreenCaptureKit, window-only): live gauges, monitors (including a red down site), Agent Ops, Ollama chat. Letterboxed to 1080p with light voiceover.
 
-Full theme gallery and capture notes: [screens/README.md](screens/README.md).  
+Full theme gallery and capture notes: [docs/screens/README.md](docs/screens/README.md).  
 Repo: [github.com/raro42/mac-stats](https://github.com/raro42/mac-stats/)
 
 ---

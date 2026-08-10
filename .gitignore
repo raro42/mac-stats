@@ -41,7 +41,7 @@ cpu-comparison-data-*.csv
 cpu-comparison-screenshots/
 
 # Overnight design-review: polish-without-capture grace markers (local)
-screens/.polish-grace/
+docs/screens/.polish-grace/
 
-# Local ad-hoc UI captures (not marketing screens/)
+# Local ad-hoc UI captures (not marketing docs/screens/)
 screen-what-i-see/

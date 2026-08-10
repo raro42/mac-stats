@@ -2,7 +2,7 @@
 
 Product feature list for [mac-stats](https://github.com/raro42/mac-stats/) — menu-bar system monitor for Apple Silicon (optional local AI agent).
 
-Screenshots: [screens/](screens/) · [screens/README.md](screens/README.md)
+Screenshots: [docs/screens/](docs/screens/) · [docs/screens/README.md](docs/screens/README.md)
 
 ---
 
@@ -29,7 +29,7 @@ HTTP(S) uptime checks in the CPU window — part of the core monitor (no AI requ
 | Menu bar | Red **Mon ✕** cue when any site is down |
 | Manage | `…` menu on the section — add / remove / check |
 
-<img src="screens/feature-monitors.png" alt="External / Monitors" width="360">
+<img src="docs/screens/feature-monitors.png" alt="External / Monitors" width="360">
 
 ## Disk Cleanup
 
@@ -47,7 +47,7 @@ Runs on **app launch**, every **24h while running** (configurable), and **Clean 
 
 **Soft-delete (default):** cleaned files are **moved to Trash** so you can recover them. Uncheck *Move cleaned items to Trash* (or set `diskCleanupSoftDelete: false`) for permanent delete. Emptying the **Trash** scope is always permanent.
 
-<img src="screens/feature-disk-cleanup.png" alt="Disk Cleanup scopes" width="360">
+<img src="docs/screens/feature-disk-cleanup.png" alt="Disk Cleanup scopes" width="360">
 
 ## Local AI agent (opt-in)
 
@@ -63,7 +63,7 @@ Off until `aiAgentEnabled: true` (Settings or config).
 
 ## Themes
 
-Apple · Architect · Dark (TUI) · Data Poster · Futuristic · Light · Material · Neon · Swiss Minimalistic — gallery in [screens/README.md](screens/README.md).
+Apple · Architect · Dark (TUI) · Data Poster · Futuristic · Light · Material · Neon · Swiss Minimalistic — gallery in [docs/screens/README.md](docs/screens/README.md).
 
 ## Privacy
 
