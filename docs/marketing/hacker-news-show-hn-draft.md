@@ -26,9 +26,9 @@ So I built mac-stats: an MIT menu-bar monitor for Apple Silicon that tries not t
 
 Menu bar: CPU / SSD / °C. Window: themes, processes, site monitors, Disk Cleanup. Agent (opt-in): local chat, schedules, Discord. Rust + Tauri. No cloud telemetry. Arm64 only.
 
-Fresh measure tonight (v0.1.367, top interval samples): idle menu-bar ~0.17% CPU avg; with the CPU window open ~0.20% avg. Built because my old monitor cost more CPU than half my actual work.
+Fresh measure tonight (v0.1.367, same top interval sampler): mac-stats idle ~0.17% CPU avg (window open ~0.20%). Same machine, exelban Stats menu-bar idle ~3.4% avg (2.4–6.9%). Built because my old monitor cost more CPU than half my actual work.
 
-Not a full iStat/Stats replacement if you want every sensor and graph. Early (~6 GitHub stars).
+Not a full iStat/Stats replacement if you want every sensor and graph. Early (~6 GitHub stars). Numbers: https://github.com/raro42/mac-stats/blob/main/docs/ops/2026-08-10-performance-baseline.md
 
   brew tap raro42/mac-stats https://github.com/raro42/mac-stats
   brew install --cask mac-stats

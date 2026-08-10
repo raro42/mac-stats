@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# mac-stats Performance Measurement Script
-# Measures CPU, GPU, RAM, and other metrics for mac-stats process
-# Usage: ./measure_performance.sh [duration_seconds] [interval_seconds] [mode]
+# Performance Measurement Script
+# Measures CPU/RAM for mac-stats or exelban Stats (same sampling method).
+# Usage: ./measure_performance.sh [duration_seconds] [interval_seconds] [mode] [target]
+#   target: mac-stats (default) | stats
 
 set -euo pipefail
 
@@ -17,19 +18,10 @@ NC='\033[0m' # No Color
 DURATION=${1:-30}  # Default: 30 seconds
 INTERVAL=${2:-1}   # Default: 1 second between measurements
 MODE=${3:-"window"}  # "idle" or "window" (window = CPU window open)
+# Target: mac-stats (default) | stats (exelban Stats.app)
+TARGET=${4:-${MEASURE_TARGET:-mac-stats}}
 
-# Ensure app is running
-if ! pgrep -f "mac_stats" > /dev/null; then
-    echo -e "${RED}Error: mac_stats is not running${NC}"
-    echo "Start the app first:"
-    echo "  ./target/release/mac_stats --cpu  # With window open"
-    echo "  ./target/release/mac_stats        # Idle (menu bar only)"
-    exit 1
-fi
-
-# Prefer the real app binary (avoid matching shells that mention mac_stats).
-# If several instances exist, prefer --cpu when MODE=window, else prefer no --cpu.
-resolve_pid() {
+resolve_pid_mac_stats() {
     local prefer_cpu=0
     [[ "$MODE" == "window" ]] && prefer_cpu=1
     local pids
@@ -59,9 +51,43 @@ resolve_pid() {
     done
     echo "${fallback:-$best}"
 }
-PID=$(resolve_pid)
+
+resolve_pid_stats() {
+    # exelban Stats — main binary only (not widget extensions / MonitorStats)
+    pgrep -f '/Applications/Stats\.app/Contents/MacOS/Stats$' \
+        || pgrep -x Stats \
+        || true
+}
+
+case "$TARGET" in
+    mac-stats|mac_stats)
+        TARGET_LABEL="mac-stats"
+        if ! pgrep -f '/Contents/MacOS/mac_stats|/target/release/mac_stats' >/dev/null \
+            && ! pgrep -x mac_stats >/dev/null; then
+            echo -e "${RED}Error: mac_stats is not running${NC}"
+            echo "Start the app first (menu bar or --cpu)."
+            exit 1
+        fi
+        PID=$(resolve_pid_mac_stats)
+        ;;
+    stats|Stats|exelban-stats)
+        TARGET_LABEL="stats"
+        if ! pgrep -f '/Applications/Stats\.app/Contents/MacOS/Stats' >/dev/null \
+            && ! pgrep -x Stats >/dev/null; then
+            echo -e "${RED}Error: Stats.app is not running${NC}"
+            echo "Start it: open -a Stats"
+            exit 1
+        fi
+        PID=$(resolve_pid_stats | head -1)
+        ;;
+    *)
+        echo -e "${RED}Unknown target: $TARGET (use mac-stats or stats)${NC}"
+        exit 1
+        ;;
+esac
+
 if [ -z "${PID}" ]; then
-    echo -e "${RED}Error: could not resolve mac_stats PID${NC}"
+    echo -e "${RED}Error: could not resolve PID for $TARGET_LABEL${NC}"
     exit 1
 fi
 echo "Resolved PID: $PID  ($(ps -p "$PID" -o args= 2>/dev/null | tr -s ' '))"
@@ -74,15 +100,15 @@ IS_DARWIN=0
 
 # Output file (repo root; gitignored)
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-OUTPUT_FILE="performance_${MODE}_${TIMESTAMP}.txt"
-CSV_FILE="performance_${MODE}_${TIMESTAMP}.csv"
+OUTPUT_FILE="performance_${TARGET_LABEL}_${MODE}_${TIMESTAMP}.txt"
+CSV_FILE="performance_${TARGET_LABEL}_${MODE}_${TIMESTAMP}.csv"
 
 echo -e "${BLUE}════════════════════════════════════════════════════${NC}"
-echo -e "${BLUE}  mac-stats Performance Measurement${NC}"
+echo -e "${BLUE}  Performance Measurement ($TARGET_LABEL)${NC}"
 echo -e "${BLUE}════════════════════════════════════════════════════${NC}"
 echo ""
 echo "Configuration:"
-echo "  Process: mac_stats (PID: $PID)"
+echo "  Process: $TARGET_LABEL (PID: $PID)"
 echo "  Mode: $MODE"
 echo "  Duration: ${DURATION}s"
 echo "  Interval: ${INTERVAL}s"
@@ -92,8 +118,9 @@ echo ""
 
 # Create headers
 {
-    echo "=== mac-stats Performance Measurement ==="
+    echo "=== Performance Measurement ($TARGET_LABEL) ==="
     echo "Date: $(date)"
+    echo "Target: $TARGET_LABEL"
     echo "Mode: $MODE"
     echo "Duration: ${DURATION}s"
     echo "Interval: ${INTERVAL}s"
