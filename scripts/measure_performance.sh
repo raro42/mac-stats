@@ -27,10 +27,52 @@ if ! pgrep -f "mac_stats" > /dev/null; then
     exit 1
 fi
 
-# Get PID
-PID=$(pgrep -f "mac_stats" | head -1)
+# Prefer the real app binary (avoid matching shells that mention mac_stats).
+# If several instances exist, prefer --cpu when MODE=window, else prefer no --cpu.
+resolve_pid() {
+    local prefer_cpu=0
+    [[ "$MODE" == "window" ]] && prefer_cpu=1
+    local pids
+    pids=$(pgrep -f '/Contents/MacOS/mac_stats|/target/release/mac_stats' || true)
+    if [[ -z "$pids" ]]; then
+        pgrep -x mac_stats || true
+        return
+    fi
+    local best="" fallback=""
+    local p args
+    for p in $pids; do
+        args=$(ps -p "$p" -o args= 2>/dev/null || true)
+        if [[ "$args" == *"--cpu"* ]]; then
+            if [[ "$prefer_cpu" -eq 1 ]]; then
+                echo "$p"
+                return
+            fi
+            fallback=${fallback:-$p}
+        else
+            if [[ "$prefer_cpu" -eq 0 ]]; then
+                echo "$p"
+                return
+            fi
+            fallback=${fallback:-$p}
+        fi
+        best=${best:-$p}
+    done
+    echo "${fallback:-$best}"
+}
+PID=$(resolve_pid)
+if [ -z "${PID}" ]; then
+    echo -e "${RED}Error: could not resolve mac_stats PID${NC}"
+    exit 1
+fi
+echo "Resolved PID: $PID  ($(ps -p "$PID" -o args= 2>/dev/null | tr -s ' '))"
 
-# Output file
+# Darwin vs Linux sampling:
+# - macOS `ps %cpu` is lifetime average (useless for a long-lived menu-bar app).
+# - Prefer `top -l 2 -s 1` for an interval sample on Darwin.
+IS_DARWIN=0
+[[ "$(uname -s)" == "Darwin" ]] && IS_DARWIN=1
+
+# Output file (repo root; gitignored)
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 OUTPUT_FILE="performance_${MODE}_${TIMESTAMP}.txt"
 CSV_FILE="performance_${MODE}_${TIMESTAMP}.csv"
@@ -87,14 +129,32 @@ while true; do
         break
     fi
 
-    # Get metrics using ps
-    metrics=$(ps -p $PID -o %cpu=,%mem=,rss=,vsz=,nlwp= 2>/dev/null || echo "0 0 0 0 0")
+    # Memory / VSZ from ps (KB)
+    mem_metrics=$(ps -p "$PID" -o %mem=,rss=,vsz= 2>/dev/null || echo "0 0 0")
+    mem=$(echo "$mem_metrics" | awk '{print $1}')
+    rss=$(echo "$mem_metrics" | awk '{print $2}')
+    vsz=$(echo "$mem_metrics" | awk '{print $3}')
 
-    cpu=$(echo $metrics | awk '{print $1}')
-    mem=$(echo $metrics | awk '{print $2}')
-    rss=$(echo $metrics | awk '{print $3}')
-    vsz=$(echo $metrics | awk '{print $4}')
-    threads=$(echo $metrics | awk '{print $5}')
+    # Threads
+    if [[ "$IS_DARWIN" -eq 1 ]]; then
+        threads=$(ps -M -p "$PID" 2>/dev/null | tail -n +2 | wc -l | tr -d ' ')
+    else
+        threads=$(ps -p "$PID" -o nlwp= 2>/dev/null | tr -d ' ')
+        threads=${threads:-0}
+    fi
+
+    # CPU: interval sample on Darwin; ps %cpu elsewhere
+    if [[ "$IS_DARWIN" -eq 1 ]]; then
+        # Second sample of top is the interval measurement (-s uses INTERVAL when >=1)
+        top_s="$INTERVAL"
+        [[ "$top_s" -lt 1 ]] && top_s=1
+        cpu=$(top -l 2 -s "$top_s" -pid "$PID" -stats pid,cpu 2>/dev/null \
+            | awk -v pid="$PID" '$1 == pid { cpu=$2 } END { if (cpu == "") print 0; else print cpu }')
+    else
+        cpu=$(ps -p "$PID" -o %cpu= 2>/dev/null | tr -d ' ')
+        cpu=${cpu:-0}
+        sleep "$INTERVAL"
+    fi
 
     # Convert KB to MB
     rss_mb=$(echo "scale=1; $rss / 1024" | bc)
@@ -116,9 +176,7 @@ while true; do
     echo "$timestamp,$cpu,$threads,$rss_mb,$vsz_mb,$mem" >> "$CSV_FILE"
 
     measurement_count=$((measurement_count + 1))
-
-    # Sleep between measurements
-    sleep "$INTERVAL"
+    # Darwin path already waited via top -s; Linux slept above
 done
 
 echo ""

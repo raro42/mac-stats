@@ -1,72 +1,55 @@
-# Show HN draft — mac-stats (2026-08-10)
+# Show HN — preferred draft (2026-08-10)
 
-HN does not want “another Stats clone.” Stats already owns that story.
-Lead with a clear difference: Apple Silicon menu-bar monitor + **optional** local agent, AI off by default.
+Tone: dry, sarcastic, nerdy. Short. Honest about early stage.
+Real motivation: iStat Menus eating 6–15% CPU constantly.
 
-## Best angle (recommended)
+---
 
-**Monitor first. Agent optional.** Technical readers install for CPU/SSD glance + low idle cost. They stay for Disk Cleanup, themes, and opt-in Ollama/Discord.
+## Title
 
-## Title options (pick one)
+```text
+Show HN: I put a local LLM agent inside a menu-bar Mac monitor (and you can leave it off)
+```
 
-1. **Show HN: mac-stats – Apple Silicon menu-bar monitor with optional local AI (MIT)**
-2. **Show HN: mac-stats – Rust/Tauri system monitor; Ollama agent is opt-in, off by default**
-3. **Show HN: I put a local LLM agent inside a menu-bar Mac monitor (and you can leave it off)**
+**URL:** `https://github.com/raro42/mac-stats`
 
-Prefer **1** for breadth. Prefer **3** if you want debate / curiosity.
+---
 
-## Body (copy-ready)
+## Body (short — use this)
 
+```text
 Hi HN —
 
-I built **mac-stats**, a free MIT menu-bar system monitor for **Apple Silicon**.
+iStat Menus was sitting at 6–15% CPU all day for the privilege of showing me… CPU. That felt rude.
 
-Core idea: glanceable CPU / SSD / temp in the menu bar, a glass window with themes and process list, plus Disk Cleanup and website monitors — without cloud telemetry.
+So I built mac-stats: an MIT menu-bar monitor for Apple Silicon that tries not to be the workload. Optional local Ollama agent in the same binary — off by default. Never enable it and it’s just a monitor.
 
-What makes it different from Stats / iStat Menus / MenuMeters:
+Menu bar: CPU / SSD / °C. Window: themes, processes, site monitors, Disk Cleanup. Agent (opt-in): local chat, schedules, Discord. Rust + Tauri. No cloud telemetry. Arm64 only.
 
-- **Optional local AI agent** (Ollama) — chat about machine state, schedules, Discord bot. **Off by default.** Most people can use it as a plain monitor.
-- **Apple Silicon only** (arm64). Frequency via IOReport; temp via SMC where available. No fake `hw.cpufrequency` claims.
-- **Rust + Tauri.** Idle target around **~0.5% CPU** with the menu bar only (window closed).
-- **Disk Cleanup** with scoped reclaim and soft-delete to Trash by default.
-- Install: Homebrew cask or DMG. Config lives under `~/.mac-stats/`.
+Fresh measure tonight (v0.1.367, top interval samples): idle menu-bar ~0.17% CPU avg; with the CPU window open ~0.20% avg. Built because my old monitor cost more CPU than half my actual work.
 
-Repo: https://github.com/raro42/mac-stats  
-Install: `brew tap raro42/mac-stats https://github.com/raro42/mac-stats && brew install --cask mac-stats`
+Not a full iStat/Stats replacement if you want every sensor and graph. Early (~6 GitHub stars).
 
-Honest gaps vs Stats / iStat: we are leaner on deep sensors, history graphs, network widgets, and weather. If you need every probe, keep those tools. If you want essentials + local agent workflows in one binary, this may fit.
-
-Happy to answer questions about idle CPU tricks (lazy CPU window, selective SMC/IOReport), the agent tool loop, or notarization / Homebrew packaging.
-
-## Alternate body — “engineering story” (if title 3)
-
-I run a Mac that does Discord, schedules, website checks, and local Ollama tools. Those only work while a process is alive — so I put the agent **inside** the system monitor I already want in the menu bar.
-
-mac-stats is that binary:
-
-1. Menu-bar metrics (always).
-2. Optional agent (Ollama / Discord / scheduler) when `aiAgentEnabled: true`.
-
-Same process, MIT, no cloud for core metrics. Design constraint: the monitor must stay cheap when the agent is off and the CPU window is closed (~0.5% idle target).
+  brew tap raro42/mac-stats https://github.com/raro42/mac-stats
+  brew install --cask mac-stats
 
 https://github.com/raro42/mac-stats
+```
 
-## What to avoid on HN
+---
 
-- “Best Stats alternative” as the headline (invites pile-on).
-- Leading with Discord / Redmine / agent ops (too niche; bury as “also”).
-- AI hype without “off by default.”
-- Fake benchmarks. Quote measured idle only if you can defend the script (`scripts/measure_performance.sh`).
-- Walls of feature lists. Three bullets + honest gaps beat ten checkmarks.
+## Why this angle works
 
-## Timing / posting tips
+- Specific numbers (6–15%) beat vague “I wanted something better.”
+- HN loves “the tool measuring X was the hot path.”
+- Still fair to iStat: deep sensors cost something; you chose lean.
 
-- Use **Show HN** prefix.
-- Submit **GitHub repo** (or landing `docs/site/index.html` if polished); put brew one-liner in the text.
-- Post when you can reply for a few hours (US morning often works).
-- First comment can add a screenshot album + short demo video link (`screens/mac-stats-features.mp4`).
-- Expect “why not Stats?” — answer with Disk Cleanup + optional local agent + Apple Silicon focus + MIT, and concede sensor depth.
+---
 
-## One-line pitch (tweet / About)
+## Optional first comment
 
-Apple Silicon menu-bar monitor (MIT) with an optional local Ollama agent — AI off by default.
+```text
+Screens: https://github.com/raro42/mac-stats/tree/main/screens
+Measure script: scripts/measure_performance.sh — happy to post before/after if useful.
+AI stays off until Settings / aiAgentEnabled.
+```
