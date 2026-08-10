@@ -1270,6 +1270,7 @@ def main() -> int:
                 or q.strip().startswith("cursor_agent:")
                 or "skill: changelog-weekly" in q
                 or "skill: ui-weekly" in q
+                or "skill: quality-weekly" in q
             ):
                 # Scheduled skills must run work — not INSTANT noise.
                 hint = None
