@@ -395,16 +395,26 @@ body {
   color: rgba(255, 255, 255, 0.55);
 }
 
-/* Poster credit strip — was unstyled (browser-blue GitHub, left-jammed). */
+/* Poster credit strip — sticky so it stays visible; was unstyled (browser-blue GitHub). */
 .theme-footer {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 8;
   margin-top: auto;
-  padding: 14px 4px 2px;
+  margin-left: -20px;
+  margin-right: -20px;
+  margin-bottom: -8px;
+  padding: 12px 24px 14px;
   border-top: 1px solid var(--hairline);
+  background:
+    linear-gradient(180deg, rgba(8, 8, 12, 0.55), rgba(8, 8, 12, 0.92) 35%, rgba(8, 8, 12, 0.96));
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
   font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.08em;
