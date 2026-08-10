@@ -459,38 +459,24 @@ pub fn setup_status_item() {
     }
 }
 
-/// CPU window control for menu bar / chat: closes any existing `cpu` window, then creates one if none remains.
+/// CPU window control for menu bar / chat: closes (destroys) any visible `cpu` window, or creates one.
 ///
-/// Effect is always a visible CPU window after return (not a strict “close and stay closed” toggle).
-/// When the user triggers this from chat inside the CPU window (`--cpu`), the WebView is destroyed and
-/// recreated like a menu-bar click—not a soft dismiss of the same surface.
+/// Closing **destroys** the WebView so WebKit’s GPU helper (“Graphics and Media”) does not
+/// keep burning CPU while only the menu bar is running. Re-open pays a cold WKWebView boot.
 /// Must be called on the main thread (e.g. menu bar click or `AppHandle::run_on_main_thread`).
 pub fn toggle_cpu_window(app_handle: &AppHandle) {
     if let Some(window) = app_handle.get_webview_window("cpu") {
         let is_visible = window.is_visible().unwrap_or(false);
         if is_visible {
-            debug1!("CPU window is visible, hiding it");
-            let _ = window.hide();
+            // Destroy (don't hide): a hidden WKWebView keeps WebKit GPU/"Graphics and Media"
+            // at ~0.5–1% forever. Menu-bar idle target needs the WebView gone.
+            debug1!("CPU window is visible, destroying it (idle CPU)");
+            let _ = window.destroy();
         } else {
-            // Reuse the existing WebView — recreating it caused multi-second hourglass
-            // (WKWebView init + full JS boot + monitor probes).
-            // If the installed asset version changed, force a navigation so theme HTML
-            // (gauge order, etc.) is not stuck in WKWebView's warm/document cache.
-            let asset_v = env!("CARGO_PKG_VERSION");
-            let reload_js = format!(
-                r#"(function(){{try{{var k='macStatsAssetVersion';var cur=localStorage.getItem(k);if(cur!=='{v}'){{localStorage.setItem(k,'{v}');location.replace('cpu.html?v={v}');}}}}catch(e){{location.replace('cpu.html?v={v}');}}}})()"#,
-                v = asset_v
-            );
-            let _ = window.eval(&reload_js);
-            debug1!("CPU window exists but is hidden, showing it");
-            let _ = window.show();
-            let _ = window.set_focus();
-            let _ = window.unminimize();
-            // Allow an immediate metrics refresh without forcing a full process rescan
-            // every open; cache age logic in get_cpu_details still refreshes when stale.
-            if let Ok(mut last_call) = crate::state::LAST_CPU_DETAILS_CALL.try_lock() {
-                *last_call = None;
-            }
+            // Hidden leftover from older builds — destroy and recreate cleanly.
+            debug1!("CPU window exists but is hidden, destroying then recreating");
+            let _ = window.destroy();
+            create_cpu_window(app_handle);
         }
     } else {
         debug1!("CPU window doesn't exist, creating it");
@@ -757,14 +743,14 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             let _ = window.set_focus();
             let _ = window.unminimize();
 
-            // Title-bar close should hide (keep WebView warm) instead of destroying —
-            // destroying forced a full recreate + JS boot on every menu-bar click.
+            // Title-bar close destroys the WebView so WebKit GPU ("Graphics and Media")
+            // does not keep burning CPU while the menu bar is idle.
             let window_for_close = window.clone();
             window.on_window_event(move |event| {
                 if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                     api.prevent_close();
-                    let _ = window_for_close.hide();
-                    debug1!("CPU window close requested — hidden instead of destroyed");
+                    let _ = window_for_close.destroy();
+                    debug1!("CPU window close requested — destroyed for idle CPU");
                 }
             });
 

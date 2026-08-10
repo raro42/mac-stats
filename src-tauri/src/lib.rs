@@ -417,14 +417,10 @@ fn run_internal(open_cpu_window: bool) {
                 tracing::warn!("Failed to load monitors: {}", e);
             }
 
-            // Hide ALL webview windows immediately (menu bar app - no windows visible at startup)
-            for window in app.webview_windows().values() {
-                let _ = window.hide();
-            }
-
-            // Also hide the main window specifically if it exists
-            if let Some(main_window) = app.get_webview_window("main") {
-                let _ = main_window.hide();
+            // No default WebView in tauri.conf (windows: []). Destroy any stray ones so
+            // WebKit GPU ("Graphics and Media") is not kept warm while menu-bar-only.
+            for (_label, window) in app.webview_windows() {
+                let _ = window.destroy();
             }
 
             let _ = APP_HANDLE.set(app.handle().clone());
@@ -432,7 +428,7 @@ fn run_internal(open_cpu_window: bool) {
             // Don't create CPU window at startup - create it on demand when clicked
             // This saves CPU by not having the window exist until needed
             debug3!("CPU window will be created on demand when menu bar is clicked");
-            debug3!("All windows hidden at startup - app running in menu bar only");
+            debug3!("No WebView at startup - app running in menu bar only");
 
             // If -cpu flag is set, create the window after a short delay (for testing only)
             if open_cpu_window {
@@ -1693,9 +1689,7 @@ fn run_internal(open_cpu_window: bool) {
                     // - performSelector doesn't fire reliably
                     // Menu bar will update when user clicks on it (click handler works)
                     // Updates are stored in MENU_BAR_TEXT and processed on click
-
-                    // Update menu bar every 2 seconds to reduce CPU usage
-                    std::thread::sleep(std::time::Duration::from_secs(2));
+                    // Sleep is at the top of this loop (1s with window open, 5s idle).
                 }
             });
             Ok(())
@@ -1703,6 +1697,10 @@ fn run_internal(open_cpu_window: bool) {
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|_app_handle, event| {
+            // Menu-bar-only: destroying the CPU WebView must not quit the process.
+            if let tauri::RunEvent::ExitRequested { api, .. } = &event {
+                api.prevent_exit();
+            }
             if matches!(event, tauri::RunEvent::Exit) {
                 tracing::info!(
                     target: "mac_stats::browser_shutdown",

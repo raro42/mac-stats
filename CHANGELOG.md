@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.367] - 2026-08-10
+
+### Fixed
+- Idle CPU: no default Tauri WebView at startup; closing the CPU window **destroys** it so WebKit “Graphics and Media” is gone. LaunchAgent must not use `--cpu`; install script strips it.
+
 ## [0.1.366] - 2026-08-10
 
 ### Changed

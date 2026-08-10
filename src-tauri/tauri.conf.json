@@ -24,14 +24,6 @@
   "plugins": {},
   "app": {
     "withGlobalTauri": true,
-    "windows": [
-      {
-        "title": "mac-stats",
-        "width": 300,
-        "height": 100,
-        "visible": false,
-        "useHttpsScheme": true
-      }
-    ]
+    "windows": []
   }
 }

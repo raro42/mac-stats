@@ -43,9 +43,19 @@ fi
 bash "$ROOT/scripts/sync-home-config-env.sh" || true
 
 # Prefer CFBundleExecutable name; fall back to legacy mac-stats symlink.
+# Never keep `--cpu` in the LaunchAgent — that leaves WKWebView (Graphics and Media) hot 24/7.
 PLIST="$HOME/Library/LaunchAgents/com.raro42.mac-stats.plist"
 if [[ -f "$PLIST" ]]; then
   /usr/libexec/PlistBuddy -c 'Set :ProgramArguments:0 /Applications/mac-stats.app/Contents/MacOS/mac_stats' "$PLIST" 2>/dev/null || true
+  # Drop any --cpu args (indices may shift as we delete).
+  while /usr/libexec/PlistBuddy -c 'Print :ProgramArguments' "$PLIST" 2>/dev/null | grep -q -- '--cpu'; do
+    idx=$(/usr/libexec/PlistBuddy -c 'Print :ProgramArguments' "$PLIST" 2>/dev/null | awk '/--cpu/{print NR-2; exit}')
+    if [[ -n "$idx" && "$idx" =~ ^[0-9]+$ ]]; then
+      /usr/libexec/PlistBuddy -c "Delete :ProgramArguments:$idx" "$PLIST" 2>/dev/null || break
+    else
+      break
+    fi
+  done
 fi
 
 # codesign --deep can hang on some macOS builds (overnight harness saw multi-minute stalls).
