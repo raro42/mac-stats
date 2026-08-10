@@ -134,4 +134,4 @@ The Brave Search API uses a 1-second sliding window and returns rate limit info 
 
 ## Open tasks
 
-Brave Search open tasks are tracked in **006-feature-coder/FEATURE-CODER.md**.
+Brave Search open tasks are tracked in **agents/006-feature-coder/FEATURE-CODER.md**.

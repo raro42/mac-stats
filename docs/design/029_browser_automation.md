@@ -392,4 +392,4 @@ Rust code that **writes** `config.json` via merge (e.g. Tauri settings) must not
 
 ## Open tasks
 
-Browser-automation open tasks are tracked in **006-feature-coder/FEATURE-CODER.md**.
+Browser-automation open tasks are tracked in **agents/006-feature-coder/FEATURE-CODER.md**.

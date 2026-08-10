@@ -103,7 +103,7 @@ Whenever Ollama is asked to decide which agent to use, the app sends the complet
 
 ## Open tasks
 
-Open tasks for plugins, alerts, Ollama, and UI are tracked in **006-feature-coder/FEATURE-CODER.md** (table “Remaining open”). Completed items:
+Open tasks for plugins, alerts, Ollama, and UI are tracked in **agents/006-feature-coder/FEATURE-CODER.md** (table “Remaining open”). Completed items:
 
 - **Plugin system:** timeout handling (std thread + `mpsc::recv_timeout` + kill on timeout in `plugins/mod.rs`); improved plugin script error messages (plugin_id, script path, stdout snippet, exit code, stderr).
 - **Alert system:** Tauri commands for registering Telegram/Slack/Mastodon channels and removing alert channels (`commands/alerts.rs`); periodic alert evaluation in background thread every 60s (`run_periodic_alert_evaluation`, `get_monitor_statuses_snapshot`).

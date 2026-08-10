@@ -96,7 +96,7 @@ All errors are returned as the tool result so the LLM (and user) can see why the
 
 ## Open tasks
 
-Redmine open tasks and completed items are tracked in **006-feature-coder/FEATURE-CODER.md**. Completed:
+Redmine open tasks and completed items are tracked in **agents/006-feature-coder/FEATURE-CODER.md**. Completed:
 
 - ~~Implement a more robust way to handle Redmine API errors.~~ **Done:** 401/404/422 and generic status get clear messages (401: check API key; 404: check ID/path; 422: date format hint); see `redmine_api_request` in `redmine/mod.rs`.
 - ~~Improve the documentation for the `REDMINE_API` command.~~ **Done:** Configuration, Error handling (table), and Implementation sections added above.

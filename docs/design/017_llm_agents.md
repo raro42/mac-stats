@@ -286,9 +286,9 @@ If no specialist matches, the orchestrator answers directly using its own model.
 ---
 
 ## Open tasks
-- ~~Clarify `model_role` resolution logic~~ **Done:** § "model_role resolution logic" above (when it runs, per-agent order, catalog-not-ready, role→pick rules, cloud models). Tracked in 006-feature-coder/FEATURE-CODER.md.
-- ~~Add documentation for `AGENT: <selector> [task]` syntax~~ **Done:** § "AGENT: \<selector\> [task] syntax" above (invocation, selector resolution order, optional task, cursor-agent proxy, behaviour). Tracked in 006-feature-coder/FEATURE-CODER.md.
-- ~~Implement missing orchestrator routing examples~~ **Done:** § "Orchestrator routing examples" above (routing table, multi-step, fallback). Tracked in 006-feature-coder/FEATURE-CODER.md.
-- ~~Document `testing.md` format requirements~~ **Done:** § "testing.md format" above (file structure, parsing rules, conventions, timeout, examples). Tracked in 006-feature-coder/FEATURE-CODER.md.
-- ~~Define fallback behavior for cloud model roles~~ **Done:** § "Cloud model as default — fallback behavior" above (scenario table, entry-point vs sub-agent, local-preference, warning log). Tracked in 006-feature-coder/FEATURE-CODER.md.
-- ~~Add CLI command for agent reset/defaults~~ **Done:** § "Agent Reset" above; `mac_stats agent reset-defaults [id]` CLI subcommand; `Config::reset_agent_defaults()` force-overwrites bundled default files. Tracked in 006-feature-coder/FEATURE-CODER.md.
+- ~~Clarify `model_role` resolution logic~~ **Done:** § "model_role resolution logic" above (when it runs, per-agent order, catalog-not-ready, role→pick rules, cloud models). Tracked in agents/006-feature-coder/FEATURE-CODER.md.
+- ~~Add documentation for `AGENT: <selector> [task]` syntax~~ **Done:** § "AGENT: \<selector\> [task] syntax" above (invocation, selector resolution order, optional task, cursor-agent proxy, behaviour). Tracked in agents/006-feature-coder/FEATURE-CODER.md.
+- ~~Implement missing orchestrator routing examples~~ **Done:** § "Orchestrator routing examples" above (routing table, multi-step, fallback). Tracked in agents/006-feature-coder/FEATURE-CODER.md.
+- ~~Document `testing.md` format requirements~~ **Done:** § "testing.md format" above (file structure, parsing rules, conventions, timeout, examples). Tracked in agents/006-feature-coder/FEATURE-CODER.md.
+- ~~Define fallback behavior for cloud model roles~~ **Done:** § "Cloud model as default — fallback behavior" above (scenario table, entry-point vs sub-agent, local-preference, warning log). Tracked in agents/006-feature-coder/FEATURE-CODER.md.
+- ~~Add CLI command for agent reset/defaults~~ **Done:** § "Agent Reset" above; `mac_stats agent reset-defaults [id]` CLI subcommand; `Config::reset_agent_defaults()` force-overwrites bundled default files. Tracked in agents/006-feature-coder/FEATURE-CODER.md.

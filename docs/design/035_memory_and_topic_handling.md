@@ -130,6 +130,6 @@ Context is kept under control by **caps** and **compaction** (summarize-then-rep
 
 ## Open tasks
 
-Memory/topic open tasks (per-channel memory, new-topic detection, pruning docs, multi-language reset, compaction) are tracked in **006-feature-coder/FEATURE-CODER.md**.
+Memory/topic open tasks (per-channel memory, new-topic detection, pruning docs, multi-language reset, compaction) are tracked in **agents/006-feature-coder/FEATURE-CODER.md**.
 
 *Sibling repos: OpenClaw = `../openclaw`, Hermes = `../hermes-agent`*

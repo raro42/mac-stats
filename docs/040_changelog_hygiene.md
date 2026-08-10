@@ -15,7 +15,7 @@
 - Full `cargo test` pass counts every hour
 - Duplicate `[Unreleased]` sections
 
-Put that noise in `tasks/`, `005-openclaw-reviewer/`, or (if already dumped) `docs/changelog-archive-agent-noise.md`.
+Put that noise in `agents/tasks/`, `agents/005-openclaw-reviewer/`, or (if already dumped) `docs/changelog-archive-agent-noise.md`.
 
 ## Weekly review (owner: Werner + agent)
 

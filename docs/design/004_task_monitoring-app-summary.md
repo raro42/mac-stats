@@ -239,7 +239,7 @@ If a feature is:
 
 ## Open tasks:
 
-See **006-feature-coder/FEATURE-CODER.md** for the current FEAT backlog.
+See **agents/006-feature-coder/FEATURE-CODER.md** for the current FEAT backlog.
 
 - ~~Re-evaluate plugin system for better performance and security~~ Deferred: future/backlog (plugin timeout and error messages already improved; further work tracked in FEATURE-CODER backlog when scoped).
 - ~~Implement a more robust and user-friendly settings interface~~ **Done:** Settings modal with Monitors, Alert Channels, Schedules, Skills, and Ollama tabs.

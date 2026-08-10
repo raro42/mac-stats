@@ -159,7 +159,7 @@ No code changes are implied; the above is for documentation and future considera
 
 ## Open tasks
 
-RUN_CMD open tasks are tracked in **006-feature-coder/FEATURE-CODER.md**. Completed:
+RUN_CMD open tasks are tracked in **agents/006-feature-coder/FEATURE-CODER.md**. Completed:
 
 *   ~~Update the documentation to better reflect the current implementation and usage of the RUN_CMD agent.~~ **Done:** doc updated to match code (shell execution, allowlist section case-insensitive, pipelines, duplicate detection, TASK_APPEND full output, RUN_CMD naming, retry count, tool iterations).
 *   ~~Review the security measures in place to prevent unauthorized access to the app's data and functionality.~~ **Done:** § "Security review (measures in place)" above (allowlist, path validation, shell scope, cursor-agent caveat, ALLOW_LOCAL_CMD).

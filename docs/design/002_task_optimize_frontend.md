@@ -103,4 +103,4 @@ This achieves the goal of "minimizing CPU usage to the absolute max" while maint
 
 ### Open tasks
 
-Frontend-optimization open tasks are tracked in **006-feature-coder/FEATURE-CODER.md**.
+Frontend-optimization open tasks are tracked in **agents/006-feature-coder/FEATURE-CODER.md**.

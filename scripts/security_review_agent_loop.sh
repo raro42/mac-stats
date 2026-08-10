@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 # Security review loop: run cursor-agent to review the project (security in mind),
-# create tasks in the agents-tasks/task directory, and mark as done tasks that
-# no longer need work.
+# create tasks under ~/.mac-stats/task/ (or TASK_DIR), and mark as done tasks that
+# no longer need work. (Repo log findings live under agents/agents-tasks/.)
 #
 # Usage:
 #   ./scripts/security_review_agent_loop.sh          # run once

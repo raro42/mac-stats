@@ -335,4 +335,4 @@ When **enabled**, the legacy same-call limit is **replaced** by hash-based track
 
 ## Open tasks
 
-Discord-related open tasks and completed items are tracked in **006-feature-coder/FEATURE-CODER.md** (table “Remaining open” and “Current FEAT backlog”).
+Discord-related open tasks and completed items are tracked in **agents/006-feature-coder/FEATURE-CODER.md** (table “Remaining open” and “Current FEAT backlog”).

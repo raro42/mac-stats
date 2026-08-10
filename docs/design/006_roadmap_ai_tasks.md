@@ -70,6 +70,6 @@ For the full table and invocation details, see **docs/README.md** (Tool Agents) 
 
 ## Open tasks
 
-See **006-feature-coder/FEATURE-CODER.md** for the current FEAT backlog. Remaining items:
+See **agents/006-feature-coder/FEATURE-CODER.md** for the current FEAT backlog. Remaining items:
 
 * Implement Mail, WhatsApp, and Google Docs integrations.

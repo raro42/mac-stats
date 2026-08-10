@@ -117,6 +117,6 @@ No code change in this FEAT; this section records the investigation and design o
 
 ## 🛠️ Open tasks
 
-Scheduler open tasks (scheduler UI, multiple API keys) are tracked in **006-feature-coder/FEATURE-CODER.md**. Completed: error handling for scheduler tool invocations (failure message to Discord when `reply_to_channel_id` set); cron/`at` = local time (data_files_reference.md); deduplication for identical cron+task pairs (add_schedule / add_schedule_at).
+Scheduler open tasks (scheduler UI, multiple API keys) are tracked in **agents/006-feature-coder/FEATURE-CODER.md**. Completed: error handling for scheduler tool invocations (failure message to Discord when `reply_to_channel_id` set); cron/`at` = local time (data_files_reference.md); deduplication for identical cron+task pairs (add_schedule / add_schedule_at).
 
 ---

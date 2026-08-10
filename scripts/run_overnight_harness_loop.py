@@ -35,6 +35,7 @@ PROMPT = (
     "(4) read docs/autoresearch/{program,standing_backlog}.md and "
     "~/.mac-stats/improvements/{latest,sibling_harness,loop_backlog,standing_backlog}.md "
     "(5) skim ~/.mac-stats/debug.log for errors "
+    "(run python3 scripts/scan_debug_log_errors.py; see agents/log-monitor/) "
     "(6) pick fuel: open digester → design review if due → standing backlog → sibling/debug; "
     "do NOT quiet-default when backlog/design-review has work "
     "(7) ONE experiment: START_SHA=$(git rev-parse HEAD); implement; "

@@ -54,7 +54,7 @@ So Discord users see both. The in-app Ollama chat did not.
 - **History**  
   The combined text (intermediate + final) is what we add to conversation history and display, so the behaviour is consistent.
 
-No change was made (in this fix) to the backend code-detection logic. ~~Tightening that (e.g. require explicit code blocks or `ROLE=code-assistant` only) could be a follow-up to reduce spurious code-execution rounds.~~ **Done:** Fallback now requires a fenced markdown code block (` ```javascript ` / ` ```js ` / ` ``` ` with executable JS patterns) instead of keyword substring checks. Shared helper `detect_and_extract_js_code()` in `tool_parsing.rs`; duplicated logic in `ollama_chat_with_execution` and `ollama_chat_continue_with_result` replaced. See `006-feature-coder/FEATURE-CODER.md`.
+No change was made (in this fix) to the backend code-detection logic. ~~Tightening that (e.g. require explicit code blocks or `ROLE=code-assistant` only) could be a follow-up to reduce spurious code-execution rounds.~~ **Done:** Fallback now requires a fenced markdown code block (` ```javascript ` / ` ```js ` / ` ``` ` with executable JS patterns) instead of keyword substring checks. Shared helper `detect_and_extract_js_code()` in `tool_parsing.rs`; duplicated logic in `ollama_chat_with_execution` and `ollama_chat_continue_with_result` replaced. See `agents/006-feature-coder/FEATURE-CODER.md`.
 
 ## How to verify
 

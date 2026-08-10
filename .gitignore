@@ -1,5 +1,4 @@
 # Logs
-agents-tasks
 logs
 *.log
 npm-debug.log*

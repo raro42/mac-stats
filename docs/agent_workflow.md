@@ -86,4 +86,4 @@ For the Coder to edit files in this repo directly:
 
 ## Open tasks
 
-Tool-agent and Coder open tasks (e.g. more robust patching system) are tracked in **006-feature-coder/FEATURE-CODER.md**.
+Tool-agent and Coder open tasks (e.g. more robust patching system) are tracked in **agents/006-feature-coder/FEATURE-CODER.md**.

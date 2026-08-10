@@ -128,6 +128,8 @@ pgrep -f mac_stats >/dev/null || open -a mac-stats
 - Keep modules small and cohesive.
 - When coding, create logs and read them afterwards.
 - Execute the app yourself, read the logs, understand if changes are working from the logs - iterate until you are confident the change is good to be test by a human.
+- **Always test** after a runtime change (`cargo check` / relevant tests / task verification). Queue work lives under [`agents/`](agents/) (see `agents/testing/`).
+- **Always read logs** after start/restart or failed behaviour. Skim `~/.mac-stats/debug.log` for related ERROR / WARN / panic. Structured scan: `python3 scripts/scan_debug_log_errors.py` (`agents/log-monitor/`).
 - **ALWAYS check for build errors before starting the app**: Run `cargo check` in `src-tauri/` directory and fix any compilation errors before attempting to start the app.
 - **Commits**: Do **not** add `Co-authored-by:`, `Signed-off-by:`, or any Cursor/agent/IDE attribution to commit messages. Do not advertise the agent or tool in commits or in the repo. To enforce this locally, run `./scripts/install-git-hooks.sh` once (installs a prepare-commit-msg hook that strips such lines).
 - **Push when reasonable**: Do **not** wait for an explicit “please push.” After local commits that are ready to share (especially overnight/harness version ships), push to `origin` (`git push origin HEAD` / current branch). Skip push only when the build is known-broken, secrets are involved, the user said local-only, or a force-push to `main`/`master` would be required. Cutting a GitHub **Release**/tag is separate — do that when asked or when repo practice clearly warrants a tagged ship.
