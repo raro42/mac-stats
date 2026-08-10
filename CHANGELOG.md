@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.363] - 2026-08-10
+
+### Fixed
+- Light theme gauges: shrink oversized card titles (was clipping “Temperature”) and fit value text inside the rings.
+
 ## [0.1.362] - 2026-08-10
 
 ### Fixed
