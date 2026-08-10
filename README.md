@@ -96,7 +96,7 @@ Details: [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 
 ### Demo video
 
-[~49s live window capture](docs/screens/mac-stats-features.mp4) — real `mac_stats --cpu` session (ScreenCaptureKit, window-only): live gauges, monitors (including a red down site), Agent Ops, Ollama chat. Letterboxed to 1080p with light voiceover.
+[~49s live window capture](https://cdn.jsdelivr.net/gh/raro42/mac-stats@main/docs/screens/mac-stats-features.mp4) — real `mac_stats --cpu` session (ScreenCaptureKit, window-only): live gauges, monitors (including a red down site), Agent Ops, Ollama chat. Letterboxed to 1080p with light voiceover. ([repo file](docs/screens/mac-stats-features.mp4))
 
 Full theme gallery and capture notes: [docs/screens/README.md](docs/screens/README.md).  
 Repo: [github.com/raro42/mac-stats](https://github.com/raro42/mac-stats/)

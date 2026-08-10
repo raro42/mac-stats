@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Marketing screenshots and demo video live under `docs/screens/` (was repo-root `screens/`).
+- README demo video link uses a `video/mp4` CDN URL (GitHub blob preview rejects this file size; raw is `octet-stream`).
 - Agent ops folders live under `agents/` (testing queue, log-monitor, task archives). Root `agents.md` stays the project instructions file.
 
 ## [0.1.367] - 2026-08-10

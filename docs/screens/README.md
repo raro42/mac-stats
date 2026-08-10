@@ -26,7 +26,7 @@ Screenshots and a short demo reel for [mac-stats](https://github.com/raro42/mac-
 
 ### Short demo video
 
-[mac-stats-features.mp4](mac-stats-features.mp4) — ~49s **live** window-only capture of the running app:
+[Play demo (~49s)](https://cdn.jsdelivr.net/gh/raro42/mac-stats@main/docs/screens/mac-stats-features.mp4) · [mac-stats-features.mp4](mac-stats-features.mp4) — **live** window-only capture of the running app:
 
 - ScreenCaptureKit recording of the CPU window (not a slideshow of stills)
 - Walkthrough: live metrics → website monitors → Agent Ops → Ollama chat → back to metrics
