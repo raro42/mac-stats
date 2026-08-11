@@ -3997,18 +3997,124 @@ function updatePerplexityConfigStatus(statusText, elId) {
   if (el) el.textContent = statusText;
 }
 
+/** @type {boolean} */
+let perplexityConfigured = false;
+/** @type {boolean} */
+let perplexityCollapsed = true;
+
+const PERPLEXITY_API_KEY_HELP_URL = 'https://www.perplexity.ai/settings/api';
+
+function ensurePerplexitySetupPanel() {
+  const content = document.getElementById('perplexity-content');
+  if (!content || document.getElementById('perplexity-setup')) return;
+
+  const setup = document.createElement('div');
+  setup.id = 'perplexity-setup';
+  setup.className = 'perplexity-setup';
+  setup.hidden = true;
+  setup.innerHTML =
+    '<p class="perplexity-setup-lead">Web search needs a Perplexity API key. Create a free key on their site, then paste it here. It is stored in the macOS Keychain.</p>' +
+    '<p class="perplexity-setup-link"><a href="' + PERPLEXITY_API_KEY_HELP_URL + '" target="_blank" rel="noopener noreferrer">Get an API key at perplexity.ai/settings/api</a></p>' +
+    '<div class="perplexity-setup-row">' +
+    '<input type="password" id="perplexity-inline-key" class="perplexity-inline-key" placeholder="Paste API key (pplx-…)" autocomplete="off" />' +
+    '<button type="button" id="perplexity-inline-save" class="perplexity-inline-save">Save key</button>' +
+    '</div>' +
+    '<p class="perplexity-setup-note" id="perplexity-setup-note" hidden></p>';
+  content.insertBefore(setup, content.firstChild);
+
+  const inlineSave = document.getElementById('perplexity-inline-save');
+  const inlineKey = document.getElementById('perplexity-inline-key');
+  if (inlineSave && inlineKey) {
+    const saveInline = async () => {
+      const invoke = getInvoke();
+      if (!invoke) return;
+      const key = inlineKey.value.trim();
+      const note = document.getElementById('perplexity-setup-note');
+      if (!key) {
+        if (note) {
+          note.hidden = false;
+          note.textContent = 'Paste a key first (it usually starts with pplx-).';
+        }
+        return;
+      }
+      try {
+        await invoke('store_credential', {
+          request: { account: PERPLEXITY_KEYCHAIN_ACCOUNT, password: key },
+        });
+        inlineKey.value = '';
+        if (note) note.hidden = true;
+        if (typeof flashSaveButton === 'function') flashSaveButton(inlineSave);
+        await refreshPerplexityStatus();
+        if (document.getElementById('perplexity-query')) {
+          document.getElementById('perplexity-query').focus();
+        }
+      } catch (e) {
+        console.error('Perplexity save key:', e);
+        if (note) {
+          note.hidden = false;
+          note.textContent = 'Could not save key: ' + String(e);
+        }
+      }
+    };
+    inlineSave.addEventListener('click', saveInline);
+    inlineKey.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') {
+        ev.preventDefault();
+        saveInline();
+      }
+    });
+  }
+}
+
+function updatePerplexitySetupVisibility() {
+  ensurePerplexitySetupPanel();
+  const setup = document.getElementById('perplexity-setup');
+  const content = document.getElementById('perplexity-content');
+  const searchBox = content ? content.querySelector('.perplexity-search-box') : null;
+  const resultsEl = document.getElementById('perplexity-results');
+  const showSetup = !perplexityCollapsed && !perplexityConfigured;
+  if (setup) setup.hidden = !showSetup;
+  if (searchBox) searchBox.hidden = showSetup;
+  if (resultsEl) resultsEl.hidden = showSetup;
+  if (showSetup) {
+    const inlineKey = document.getElementById('perplexity-inline-key');
+    if (inlineKey) {
+      setTimeout(() => inlineKey.focus(), 50);
+    }
+  }
+}
+
 async function refreshPerplexityStatus() {
   const invoke = getInvoke();
   if (!invoke) return;
   try {
     const configured = await invoke('is_perplexity_configured');
-    const text = configured ? 'API key set' : 'No API key';
-    updatePerplexityConfigStatus(text, 'perplexity-config-status');
-    updatePerplexityConfigStatus(configured ? 'Key set' : 'No key', 'perplexity-settings-status');
+    perplexityConfigured = !!configured;
+    // Header: never shout "No API key" on a fresh install — hide until section is open + key exists.
+    const headerStatus = document.getElementById('perplexity-config-status');
+    if (headerStatus) {
+      if (perplexityCollapsed || !perplexityConfigured) {
+        headerStatus.textContent = '';
+        headerStatus.hidden = true;
+      } else {
+        headerStatus.hidden = false;
+        headerStatus.textContent = 'API key set';
+      }
+    }
+    updatePerplexityConfigStatus(
+      perplexityConfigured ? 'Key set' : 'No key',
+      'perplexity-settings-status'
+    );
   } catch (_) {
-    updatePerplexityConfigStatus('—', 'perplexity-config-status');
+    perplexityConfigured = false;
+    const headerStatus = document.getElementById('perplexity-config-status');
+    if (headerStatus) {
+      headerStatus.textContent = '';
+      headerStatus.hidden = true;
+    }
     updatePerplexityConfigStatus('—', 'perplexity-settings-status');
   }
+  updatePerplexitySetupVisibility();
 }
 
 function initPerplexitySection() {
@@ -4022,7 +4128,7 @@ function initPerplexitySection() {
 
   if (!header || !content) return;
 
-  let perplexityCollapsed = localStorage.getItem('perplexity_collapsed') !== 'false';
+  perplexityCollapsed = localStorage.getItem('perplexity_collapsed') !== 'false';
   const applyPerplexityCollapsed = () => {
     if (perplexityCollapsed) {
       content.classList.add('collapsed');
@@ -4032,9 +4138,9 @@ function initPerplexitySection() {
       content.classList.remove('collapsed');
       if (section) section.classList.remove('collapsed');
       if (divider) divider.style.display = '';
-      refreshPerplexityStatus();
     }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
+    refreshPerplexityStatus();
   };
   applyPerplexityCollapsed();
 
@@ -4061,6 +4167,11 @@ function initPerplexitySection() {
       const invoke = getInvoke();
       if (!invoke) {
         resultsEl.innerHTML = '<div class="perplexity-empty" role="status">App not ready.</div>';
+        return;
+      }
+      if (!perplexityConfigured) {
+        await refreshPerplexityStatus();
+        updatePerplexitySetupVisibility();
         return;
       }
       resultsEl.innerHTML = '<div class="perplexity-empty" role="status">Searching…</div>';
@@ -4149,6 +4260,7 @@ function initPerplexitySection() {
       try {
         await invoke('store_credential', { request: { account: PERPLEXITY_KEYCHAIN_ACCOUNT, password: key } });
         keyInput.value = '';
+        if (typeof flashSaveButton === 'function') flashSaveButton(saveBtn);
         await refreshPerplexityStatus();
       } catch (e) {
         console.error('Perplexity save key:', e);
