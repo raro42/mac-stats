@@ -6,7 +6,7 @@
 curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/install.sh | bash
 ```
 
-[`install.sh`](../install.sh) runs tap + Homebrew 6 trust + cask install (or DMG fallback), clears Gatekeeper quarantine, and opens the app.
+[`install.sh`](../install.sh) runs tap + Homebrew 6 trust + cask install (or DMG fallback), clears Gatekeeper quarantine, and opens the app. If Ollama is already serving locally, it turns on `aiAgentEnabled`.
 
 ## Manual Homebrew
 

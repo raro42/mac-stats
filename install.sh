@@ -10,7 +10,9 @@
 # Env:
 #   MAC_STATS_NO_OPEN=1       skip `open -a mac-stats`
 #   MAC_STATS_NO_BREW=1       force DMG path even if brew exists
+#   MAC_STATS_NO_AI=1         do not auto-enable AI even if Ollama is running
 #   MAC_STATS_REPO=owner/repo default raro42/mac-stats
+#   OLLAMA_HOST               Ollama base URL (default http://127.0.0.1:11434)
 set -euo pipefail
 
 REPO="${MAC_STATS_REPO:-raro42/mac-stats}"
@@ -35,18 +37,90 @@ clear_quarantine() {
   fi
 }
 
+# True when the local Ollama HTTP API answers (default 127.0.0.1:11434).
+ollama_is_running() {
+  local host="${OLLAMA_HOST:-http://127.0.0.1:11434}"
+  # OLLAMA_HOST may be host:port without scheme.
+  case "$host" in
+    http://*|https://*) ;;
+    *) host="http://${host}" ;;
+  esac
+  host="${host%/}"
+  curl -fsS --connect-timeout 1 --max-time 2 "${host}/api/tags" >/dev/null 2>&1
+}
+
+# Merge aiAgentEnabled into ~/.mac-stats/config.json (create from minimal if missing).
+set_ai_agent_enabled() {
+  local enabled="$1" # true|false
+  local cfg_dir="${HOME}/.mac-stats"
+  local cfg="${cfg_dir}/config.json"
+  mkdir -p "$cfg_dir"
+
+  if [[ ! -f "$cfg" ]]; then
+    if ! curl -fsSL "${RAW}/config.minimal.json" -o "$cfg"; then
+      warn "Could not download config.minimal.json — writing minimal stub"
+      printf '%s\n' '{"aiAgentEnabled":false,"menuBarCompact":true,"windowDecorations":true}' >"$cfg"
+    fi
+  fi
+
+  ENABLED="$enabled" CFG="$cfg" python3 - <<'PY'
+import json, os, pathlib, sys
+path = pathlib.Path(os.environ["CFG"])
+enabled = os.environ["ENABLED"].lower() == "true"
+try:
+    data = json.loads(path.read_text(encoding="utf-8"))
+except Exception as e:
+    sys.stderr.write(f"config parse failed: {e}\n")
+    sys.exit(1)
+if not isinstance(data, dict):
+    sys.stderr.write("config.json is not an object\n")
+    sys.exit(1)
+prev = data.get("aiAgentEnabled")
+data["aiAgentEnabled"] = enabled
+tmp = path.with_suffix(".json.tmp")
+tmp.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+tmp.replace(path)
+print(f"prev={prev!r}")
+print(f"now={enabled}")
+PY
+}
+
 seed_home_config() {
   local cfg="${HOME}/.mac-stats"
+  local cfg_json="${cfg}/config.json"
   mkdir -p "$cfg"
-  if [[ ! -f "$cfg/config.json" ]]; then
-    if curl -fsSL "${RAW}/config.minimal.json" -o "$cfg/config.json"; then
-      log "Wrote $cfg/config.json (monitor-only defaults; AI off)"
+
+  local enable_ai=false
+  if [[ "${MAC_STATS_NO_AI:-}" == "1" ]]; then
+    log "MAC_STATS_NO_AI=1 — leaving AI disabled"
+  elif ollama_is_running; then
+    log "Ollama API is reachable — enabling local AI agent (aiAgentEnabled=true)"
+    enable_ai=true
+  else
+    log "Ollama not running — AI stays off (start Ollama later, then enable in Settings)"
+  fi
+
+  if [[ ! -f "$cfg_json" ]]; then
+    if [[ "$enable_ai" == "true" ]]; then
+      set_ai_agent_enabled true >/dev/null
+      log "Wrote $cfg_json with aiAgentEnabled=true"
     else
-      warn "Could not download config.minimal.json — app still runs with built-in defaults"
-      rm -f "$cfg/config.json"
+      if curl -fsSL "${RAW}/config.minimal.json" -o "$cfg_json"; then
+        log "Wrote $cfg_json (monitor-only defaults; AI off)"
+      else
+        warn "Could not download config.minimal.json — app still runs with built-in defaults"
+        rm -f "$cfg_json"
+      fi
     fi
   else
-    log "Keeping existing $cfg/config.json"
+    if [[ "$enable_ai" == "true" ]]; then
+      local out
+      out="$(set_ai_agent_enabled true | tr '\n' ' ')"
+      log "Updated $cfg_json ($out)"
+      log "If mac-stats was already running, quit and reopen so AI starts"
+    else
+      log "Keeping existing $cfg_json"
+    fi
   fi
 }
 
@@ -138,34 +212,44 @@ install_via_dmg() {
 
 # --- main ---
 
-[[ "$(uname -s)" == "Darwin" ]] || die "mac-stats requires macOS"
-[[ "$(uname -m)" == "arm64" ]] || die "mac-stats requires Apple Silicon (arm64); Intel is not supported"
+main() {
+  [[ "$(uname -s)" == "Darwin" ]] || die "mac-stats requires macOS"
+  [[ "$(uname -m)" == "arm64" ]] || die "mac-stats requires Apple Silicon (arm64); Intel is not supported"
 
-log "mac-stats installer (repo ${REPO})"
+  log "mac-stats installer (repo ${REPO})"
 
-if [[ "${MAC_STATS_NO_BREW:-}" != "1" ]] && command -v brew >/dev/null 2>&1; then
-  install_via_brew
-else
-  if [[ "${MAC_STATS_NO_BREW:-}" == "1" ]]; then
-    log "MAC_STATS_NO_BREW=1 — skipping Homebrew"
+  if [[ "${MAC_STATS_NO_BREW:-}" != "1" ]] && command -v brew >/dev/null 2>&1; then
+    install_via_brew
   else
-    warn "brew not found — falling back to DMG install"
-    warn "Install Homebrew from https://brew.sh for easier upgrades"
+    if [[ "${MAC_STATS_NO_BREW:-}" == "1" ]]; then
+      log "MAC_STATS_NO_BREW=1 — skipping Homebrew"
+    else
+      warn "brew not found — falling back to DMG install"
+      warn "Install Homebrew from https://brew.sh for easier upgrades"
+    fi
+    install_via_dmg
   fi
-  install_via_dmg
+
+  [[ -d "$APP" ]] || die "Install finished but $APP is missing"
+  clear_quarantine
+  seed_home_config
+
+  if [[ "${MAC_STATS_NO_OPEN:-}" == "1" ]]; then
+    log "Skipping open (MAC_STATS_NO_OPEN=1)"
+  else
+    log "Launching mac-stats"
+    open -a mac-stats || warn "open -a mac-stats failed — launch from Applications"
+  fi
+
+  log "Done. Menu bar should show CPU (and °C when known)."
+  if [[ -f "${HOME}/.mac-stats/config.json" ]] && grep -q '"aiAgentEnabled"[[:space:]]*:[[:space:]]*true' "${HOME}/.mac-stats/config.json"; then
+    log "AI agent enabled (Ollama was running at install time)."
+  else
+    log "AI stays off until Settings → Enable local AI agent (or re-run install with Ollama up)."
+  fi
+  log "If Finder still says “damaged”: xattr -rd com.apple.quarantine ${APP}"
+}
+
+if [[ "${BASH_SOURCE[0]-}" == "$0" ]]; then
+  main "$@"
 fi
-
-[[ -d "$APP" ]] || die "Install finished but $APP is missing"
-clear_quarantine
-seed_home_config
-
-if [[ "${MAC_STATS_NO_OPEN:-}" == "1" ]]; then
-  log "Skipping open (MAC_STATS_NO_OPEN=1)"
-else
-  log "Launching mac-stats"
-  open -a mac-stats || warn "open -a mac-stats failed — launch from Applications"
-fi
-
-log "Done. Menu bar should show CPU (and °C when known)."
-log "AI stays off until Settings → Enable local AI agent."
-log "If Finder still says “damaged”: xattr -rd com.apple.quarantine ${APP}"

@@ -48,7 +48,7 @@ Two products in one binary — pick your path:
 curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/install.sh | bash
 ```
 
-That script taps Homebrew (with Homebrew 6 `brew trust`), installs the cask, or falls back to the latest GitHub DMG. It clears Gatekeeper quarantine and opens the app. **No Ollama required.**
+That script taps Homebrew (with Homebrew 6 `brew trust`), installs the cask, or falls back to the latest GitHub DMG. It clears Gatekeeper quarantine and opens the app. If a local **Ollama** API is already running (`http://127.0.0.1:11434`), it sets `aiAgentEnabled: true`; otherwise AI stays off. **No Ollama required** for the monitor.
 
 Manual Homebrew steps (same outcome): see [docs/homebrew.md](docs/homebrew.md).
 
