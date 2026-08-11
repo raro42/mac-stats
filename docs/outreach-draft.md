@@ -9,10 +9,7 @@ mac-stats is a free MIT menu-bar system monitor for Apple Silicon — think Stat
 AI is **opt-in**: leave it off for a zero-config monitor. Turn on local Ollama (and optionally Discord) when you want an on-device agent.
 
 ```bash
-brew tap raro42/mac-stats https://github.com/raro42/mac-stats
-brew trust --cask raro42/mac-stats/mac-stats
-brew install --cask mac-stats
-xattr -rd com.apple.quarantine /Applications/mac-stats.app
+curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/install.sh | bash
 ```
 
 Apple Silicon only. No cloud telemetry — data stays in `~/.mac-stats/`.
