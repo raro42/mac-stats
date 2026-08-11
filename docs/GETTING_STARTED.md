@@ -6,14 +6,11 @@
 
 ### A) Just the monitor (recommended first)
 
-1. Install:
+1. Install (pick one):
    ```bash
-   brew tap raro42/mac-stats https://github.com/raro42/mac-stats
-   brew trust --cask raro42/mac-stats/mac-stats   # Homebrew 6+
-   brew install --cask mac-stats
-   xattr -rd com.apple.quarantine /Applications/mac-stats.app
+   curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/install.sh | bash
    ```
-   Or from a clone: `./scripts/quickstart.sh`
+   Or Homebrew by hand ([homebrew.md](homebrew.md)), or from a clone: `./scripts/quickstart.sh`
 2. Open **mac-stats** — menu bar shows **CPU** (and °C when available).
 3. Click the menu bar for the glass window (themes, processes, monitors, Disk Cleanup).
 

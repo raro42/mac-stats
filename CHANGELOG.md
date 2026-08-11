@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README Quick start: explain Gatekeeper “DMG is damaged” (unsigned/not notarized) and Right-click → Open / `xattr` fallback.
 - Document that **Homebrew still hits Gatekeeper** until notarized; Quick start runs `xattr -rd com.apple.quarantine`; cask `postflight` clears quarantine too.
 - Homebrew 6+: document `brew trust --cask raro42/mac-stats/mac-stats` (fixes “Refusing to start from untrusted tap”).
+- Add curlable [`install.sh`](install.sh) one-liner (brew trust + cask, or DMG fallback, plus quarantine clear).
 
 ## [0.1.368] - 2026-08-10
 

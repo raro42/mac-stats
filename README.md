@@ -45,24 +45,20 @@ Two products in one binary — pick your path:
 ## Quick start — Just the monitor
 
 ```bash
-brew tap raro42/mac-stats https://github.com/raro42/mac-stats
-brew trust --cask raro42/mac-stats/mac-stats   # Homebrew 6+: allow this third-party cask
-brew install --cask mac-stats
-# Required until notarized: Gatekeeper still blocks the brew-installed .app
-xattr -rd com.apple.quarantine /Applications/mac-stats.app
-# or: ./scripts/quickstart.sh   # from a clone; installs + seeds ~/.mac-stats
-open -a mac-stats
+curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/install.sh | bash
 ```
 
-Look at the menu bar → click for the window. **No Ollama required.** Disk Cleanup, monitors, and themes are all in the glass window.
+That script taps Homebrew (with Homebrew 6 `brew trust`), installs the cask, or falls back to the latest GitHub DMG. It clears Gatekeeper quarantine and opens the app. **No Ollama required.**
+
+Manual Homebrew steps (same outcome): see [docs/homebrew.md](docs/homebrew.md).
+
+Look at the menu bar → click for the window. Disk Cleanup, monitors, and themes are all in the glass window.
 
 ### If macOS says the DMG / app is “damaged”
 
 That message is **Gatekeeper**, not a corrupt download. The release app is **ad-hoc signed and not notarized** until Apple Developer credentials are in CI ([docs/NOTARIZATION.md](docs/NOTARIZATION.md)). On recent macOS, that often shows as “**… is damaged and can’t be opened**.”
 
-**Homebrew does not skip this.** `brew install --cask` still installs the same unsigned `.app`, so Finder / Launchpad can still refuse it after a successful brew install.
-
-**Fix (run this after brew or DMG install):**
+**Homebrew does not skip this by itself.** `brew install --cask` still installs the same unsigned `.app`. The [`install.sh`](install.sh) one-liner clears quarantine for you. If you installed by hand:
 
 ```bash
 xattr -rd com.apple.quarantine /Applications/mac-stats.app
@@ -73,7 +69,7 @@ Or: **Right-click** `mac-stats.app` in Applications → **Open** → confirm **O
 
 Do **not** use random “disable Gatekeeper” tips from the web. Verify downloads from [GitHub Releases](https://github.com/raro42/mac-stats/releases/latest) or this Homebrew tap.
 
-**Homebrew 6+ “Refusing to start from untrusted tap”:** third-party taps need an explicit trust step. Run `brew trust --cask raro42/mac-stats/mac-stats` after `brew tap` (already in the Quick start block). See [docs/homebrew.md](docs/homebrew.md).
+**Homebrew 6+ “Refusing to start from untrusted tap”:** use the [`install.sh`](install.sh) one-liner, or run `brew trust --cask raro42/mac-stats/mac-stats` after `brew tap`. See [docs/homebrew.md](docs/homebrew.md).
 
 ---
 
@@ -155,7 +151,8 @@ Leave AI off for a Stats-like monitor only. Local-first: core metrics never need
 
 | Method | Command / link |
 |--------|----------------|
-| **Homebrew cask** | `brew tap …` then `brew trust --cask raro42/mac-stats/mac-stats` then `brew install --cask mac-stats` ([details](docs/homebrew.md)) |
+| **One-liner** | `curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/install.sh \| bash` |
+| **Homebrew cask** | Manual tap + trust + install ([docs/homebrew.md](docs/homebrew.md)) |
 | **Quick Start script** | `./scripts/quickstart.sh` (clone) — app + `~/.mac-stats` defaults + Ollama check |
 | **DMG** | [Releases](https://github.com/raro42/mac-stats/releases/latest) |
 | **Source** | Pin a release tag; see [Build from source](#build-from-source) |

@@ -72,10 +72,7 @@ A few pointers if you try it:
 
 Install (Apple Silicon):
 
-  brew tap raro42/mac-stats https://github.com/raro42/mac-stats
-  brew trust --cask raro42/mac-stats/mac-stats
-  brew install --cask mac-stats
-  xattr -rd com.apple.quarantine /Applications/mac-stats.app
+  curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/install.sh | bash
 
 The local LLM / Discord / scheduler stuff stays off until you turn on Settings → AI agent. Menu-bar monitor alone is the default path.
 

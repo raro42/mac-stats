@@ -1,6 +1,14 @@
 # Homebrew / Cask
 
-Install mac-stats like other Mac apps:
+## Recommended: one-liner
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/install.sh | bash
+```
+
+[`install.sh`](../install.sh) runs tap + Homebrew 6 trust + cask install (or DMG fallback), clears Gatekeeper quarantine, and opens the app.
+
+## Manual Homebrew
 
 ```bash
 brew tap raro42/mac-stats https://github.com/raro42/mac-stats
