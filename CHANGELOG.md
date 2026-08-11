@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Watch `~/.mac-stats/config.json` and start the AI stack when `aiAgentEnabled` flips on (no process restart).
 - Homebrew cask: `depends_on macos: :sonoma` (fixes Homebrew 6 deprecation warning for `">= :sonoma"`).
 - Perplexity: hide “No API key” until the section is opened; then show inline key setup with link to get a key.
+- Disk Cleanup: hide the whole section when collapsed (same as monitors/Perplexity); open via the icon.
 
 ## [0.1.368] - 2026-08-10
 

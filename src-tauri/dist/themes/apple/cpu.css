@@ -1720,6 +1720,10 @@ body {
 .logs-section.collapsed {
   display: none;
 }
+
+.disk-cleanup-section.collapsed {
+  display: none;
+}
 .perplexity-config-status {
   font-size: 12px;
   color: var(--muted);

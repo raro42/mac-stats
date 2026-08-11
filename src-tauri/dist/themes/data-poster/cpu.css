@@ -2325,6 +2325,10 @@ body {
   display: none;
 }
 
+.disk-cleanup-section.collapsed {
+  display: none;
+}
+
 #gpu-usage-ring-progress {
   stroke: #c4a8d8;
 }

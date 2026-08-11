@@ -1263,6 +1263,10 @@ textarea.ops-agent-editor.is-dirty {
   position: relative;
 }
 
+.disk-cleanup-section.collapsed {
+  display: none;
+}
+
 #icon-disk-cleanup .disk-cleanup-badge {
   position: absolute;
   top: 2px;
