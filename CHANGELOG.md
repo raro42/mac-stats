@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add curlable [`install.sh`](install.sh) one-liner (brew trust + cask, or DMG fallback, plus quarantine clear).
 - `install.sh` enables `aiAgentEnabled` when a local Ollama API is reachable (opt out: `MAC_STATS_NO_AI=1`).
 - Watch `~/.mac-stats/config.json` and start the AI stack when `aiAgentEnabled` flips on (no process restart).
+- Homebrew cask: `depends_on macos: :sonoma` (fixes Homebrew 6 deprecation warning for `">= :sonoma"`).
 
 ## [0.1.368] - 2026-08-10
 
