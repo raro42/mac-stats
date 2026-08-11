@@ -38,11 +38,19 @@ if [[ -x "$ROOT/scripts/install-to-applications.sh" ]]; then
   if [[ "${ans:-}" =~ ^[Yy]$ ]]; then
     "$ROOT/scripts/install-to-applications.sh"
   else
-    echo "    Skip install. Use: brew install --cask mac-stats   or ./scripts/install-to-applications.sh"
-    echo "    If macOS says the app is “damaged” after brew: xattr -rd com.apple.quarantine /Applications/mac-stats.app"
+    echo "    Skip install. Use:"
+    echo "      brew tap raro42/mac-stats https://github.com/raro42/mac-stats"
+    echo "      brew trust --cask raro42/mac-stats/mac-stats   # Homebrew 6+"
+    echo "      brew install --cask mac-stats"
+    echo "      xattr -rd com.apple.quarantine /Applications/mac-stats.app"
+    echo "    Or: ./scripts/install-to-applications.sh"
   fi
 else
-  echo "    Install: brew install --cask mac-stats"
+  echo "    Install:"
+  echo "      brew tap raro42/mac-stats https://github.com/raro42/mac-stats"
+  echo "      brew trust --cask raro42/mac-stats/mac-stats"
+  echo "      brew install --cask mac-stats"
+  echo "      xattr -rd com.apple.quarantine /Applications/mac-stats.app"
 fi
 
 echo "Done. Open the app → menu bar. Enable AI later in Settings if you want Ollama/Discord."

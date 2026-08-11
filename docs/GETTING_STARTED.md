@@ -9,7 +9,9 @@
 1. Install:
    ```bash
    brew tap raro42/mac-stats https://github.com/raro42/mac-stats
+   brew trust --cask raro42/mac-stats/mac-stats   # Homebrew 6+
    brew install --cask mac-stats
+   xattr -rd com.apple.quarantine /Applications/mac-stats.app
    ```
    Or from a clone: `./scripts/quickstart.sh`
 2. Open **mac-stats** — menu bar shows **CPU** (and °C when available).

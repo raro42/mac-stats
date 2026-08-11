@@ -8,7 +8,7 @@
 | [QUICKSTART.md](QUICKSTART.md) | Short install |
 | [CONFIG.md](CONFIG.md) | `~/.mac-stats/`, secrets, privacy |
 | [ROADMAP.md](ROADMAP.md) | Near-term product roadmap |
-| [homebrew.md](homebrew.md) | `brew install --cask mac-stats` |
+| [homebrew.md](homebrew.md) | Tap trust (Homebrew 6+) + `brew install --cask mac-stats` |
 | [NOTARIZATION.md](NOTARIZATION.md) | Signing / Gatekeeper |
 | [site/index.html](site/index.html) | Landing page (GitHub Pages candidate) |
 | [outreach-draft.md](outreach-draft.md) | Community post draft |

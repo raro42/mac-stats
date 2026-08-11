@@ -41,7 +41,9 @@ Fresh measure (v0.1.368, same top interval sampler): mac-stats idle ~0.17% CPU a
 Not a full iStat/Stats replacement if you want every sensor and graph. Early (~6 GitHub stars). Numbers: https://github.com/raro42/mac-stats/blob/main/docs/ops/2026-08-10-performance-baseline.md
 
   brew tap raro42/mac-stats https://github.com/raro42/mac-stats
+  brew trust --cask raro42/mac-stats/mac-stats
   brew install --cask mac-stats
+  xattr -rd com.apple.quarantine /Applications/mac-stats.app
 
 https://github.com/raro42/mac-stats
 ```
@@ -71,7 +73,9 @@ A few pointers if you try it:
 Install (Apple Silicon):
 
   brew tap raro42/mac-stats https://github.com/raro42/mac-stats
+  brew trust --cask raro42/mac-stats/mac-stats
   brew install --cask mac-stats
+  xattr -rd com.apple.quarantine /Applications/mac-stats.app
 
 The local LLM / Discord / scheduler stuff stays off until you turn on Settings → AI agent. Menu-bar monitor alone is the default path.
 

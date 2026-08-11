@@ -46,6 +46,7 @@ Two products in one binary — pick your path:
 
 ```bash
 brew tap raro42/mac-stats https://github.com/raro42/mac-stats
+brew trust --cask raro42/mac-stats/mac-stats   # Homebrew 6+: allow this third-party cask
 brew install --cask mac-stats
 # Required until notarized: Gatekeeper still blocks the brew-installed .app
 xattr -rd com.apple.quarantine /Applications/mac-stats.app
@@ -71,6 +72,8 @@ open -a mac-stats
 Or: **Right-click** `mac-stats.app` in Applications → **Open** → confirm **Open** (once). Later launches then work normally.
 
 Do **not** use random “disable Gatekeeper” tips from the web. Verify downloads from [GitHub Releases](https://github.com/raro42/mac-stats/releases/latest) or this Homebrew tap.
+
+**Homebrew 6+ “Refusing to start from untrusted tap”:** third-party taps need an explicit trust step. Run `brew trust --cask raro42/mac-stats/mac-stats` after `brew tap` (already in the Quick start block). See [docs/homebrew.md](docs/homebrew.md).
 
 ---
 
@@ -152,7 +155,7 @@ Leave AI off for a Stats-like monitor only. Local-first: core metrics never need
 
 | Method | Command / link |
 |--------|----------------|
-| **Homebrew cask** | `brew tap raro42/mac-stats https://github.com/raro42/mac-stats && brew install --cask mac-stats` |
+| **Homebrew cask** | `brew tap …` then `brew trust --cask raro42/mac-stats/mac-stats` then `brew install --cask mac-stats` ([details](docs/homebrew.md)) |
 | **Quick Start script** | `./scripts/quickstart.sh` (clone) — app + `~/.mac-stats` defaults + Ollama check |
 | **DMG** | [Releases](https://github.com/raro42/mac-stats/releases/latest) |
 | **Source** | Pin a release tag; see [Build from source](#build-from-source) |
