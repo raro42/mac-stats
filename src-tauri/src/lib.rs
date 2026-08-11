@@ -18,6 +18,7 @@
 //! - `run_with_cpu_window()`: Start the application with CPU window open
 
 pub mod agents;
+mod ai_agent_stack;
 mod alerts;
 pub mod browser_agent;
 pub mod browser_doctor;
@@ -481,40 +482,15 @@ fn run_internal(open_cpu_window: bool) {
             println!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
             // Ollama warmup / Discord / scheduler only when AI agent is enabled (opt-in).
-            if config::Config::ai_agent_enabled() {
-                tauri::async_runtime::block_on(async {
-                    commands::ollama_config::ensure_ollama_agent_ready_at_startup().await;
-                });
-                tracing::debug!(
-                    target: "mac_stats_startup",
-                    "Ollama startup warmup finished (gate open); spawning Discord, scheduler, heartbeat, and task review"
-                );
-
-                std::thread::spawn(|| {
-                    discord::spawn_discord_if_configured();
-                });
-
-                scheduler::spawn_scheduler_thread();
-                scheduler::heartbeat::spawn_heartbeat_thread();
-                task::review::spawn_review_thread();
-
-                std::thread::spawn(|| {
-                    let rt = match tokio::runtime::Runtime::new() {
-                        Ok(r) => r,
-                        Err(_) => return,
-                    };
-                    const INTERVAL_SECS: u64 = 30 * 60;
-                    loop {
-                        std::thread::sleep(std::time::Duration::from_secs(INTERVAL_SECS));
-                        rt.block_on(commands::compaction::run_periodic_session_compaction());
-                    }
-                });
-            } else {
+            // Also watch config.json so install.sh / hand-edits can enable AI without restart.
+            ai_agent_stack::ensure_ai_agent_stack_started();
+            if !config::Config::ai_agent_enabled() {
                 tracing::info!(
                     target: "mac_stats_startup",
-                    "AI agent disabled (aiAgentEnabled=false) — monitor-only mode; Discord/scheduler/Ollama warmup skipped"
+                    "AI agent disabled (aiAgentEnabled=false) — monitor-only mode; Discord/scheduler/Ollama warmup skipped until enabled"
                 );
             }
+            ai_agent_stack::spawn_config_ai_watcher();
 
             // Memory hygiene (cheap): drop timeout / lesson-scaffold pollution from memory*.md
             {

@@ -1156,8 +1156,13 @@ pub fn list_scheduler_delivery_awareness() -> Vec<DeliveryAwarenessEntry> {
 }
 
 /// Spawn the scheduler in a background thread. Reads ~/.mac-stats/schedules.json and runs due tasks.
-/// Safe to call once at startup.
+/// Safe to call multiple times (starts at most one loop).
 pub fn spawn_scheduler_thread() {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    static STARTED: AtomicBool = AtomicBool::new(false);
+    if STARTED.swap(true, Ordering::SeqCst) {
+        return;
+    }
     std::thread::spawn(|| {
         let rt = match tokio::runtime::Runtime::new() {
             Ok(r) => r,

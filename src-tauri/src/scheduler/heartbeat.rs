@@ -314,6 +314,11 @@ pub(crate) async fn heartbeat_loop() {
 /// `Handle::block_on` on the app runtime (current-thread Tauri would wedge all timers; see task
 /// CLOSED-20260308-1640-openclaw-heartbeat-periodic-check).
 pub fn spawn_heartbeat_thread() {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    static STARTED: AtomicBool = AtomicBool::new(false);
+    if STARTED.swap(true, Ordering::SeqCst) {
+        return;
+    }
     tauri::async_runtime::spawn(async {
         mac_stats_info!(
             "scheduler/heartbeat",

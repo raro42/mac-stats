@@ -209,6 +209,11 @@ async fn review_loop() {
 
 /// Spawn the task review thread. Runs every TASK_REVIEW_INTERVAL_SECS (e.g. 1 min): close WIP > 30 min as unsuccessful, work on open tasks.
 pub fn spawn_review_thread() {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    static STARTED: AtomicBool = AtomicBool::new(false);
+    if STARTED.swap(true, Ordering::SeqCst) {
+        return;
+    }
     std::thread::spawn(|| {
         let rt = match tokio::runtime::Runtime::new() {
             Ok(r) => r,

@@ -271,6 +271,17 @@
           alert("Could not save aiAgentEnabled: " + e);
         }
       });
+      // install.sh / hand-edit of config.json can flip AI without restart
+      try {
+        const { listen } = window.__TAURI__.event;
+        listen("ai-agent-enabled-changed", (ev) => {
+          const on = !!ev.payload;
+          aiToggle.checked = on;
+          applyAiUiVisibility(on);
+        });
+      } catch (_) {
+        /* event bridge optional when not in Tauri */
+      }
     }
     if (compactToggle) {
       compactToggle.addEventListener("change", async () => {

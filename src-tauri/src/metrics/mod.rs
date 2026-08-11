@@ -1218,8 +1218,7 @@ pub fn get_ai_agent_enabled() -> bool {
 pub fn set_ai_agent_enabled(enabled: bool) -> Result<bool, String> {
     crate::config::Config::set_ai_agent_enabled(enabled)?;
     if enabled {
-        // Best-effort: start Discord if a token exists (scheduler needs process restart for full stack).
-        crate::discord::spawn_discord_if_configured();
+        crate::ai_agent_stack::ensure_ai_agent_stack_started();
     }
     Ok(crate::config::Config::ai_agent_enabled())
 }

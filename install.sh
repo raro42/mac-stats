@@ -117,7 +117,7 @@ seed_home_config() {
       local out
       out="$(set_ai_agent_enabled true | tr '\n' ' ')"
       log "Updated $cfg_json ($out)"
-      log "If mac-stats was already running, quit and reopen so AI starts"
+      log "AI stack starts automatically (config watcher) — no restart needed"
     else
       log "Keeping existing $cfg_json"
     fi
