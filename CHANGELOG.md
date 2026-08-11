@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Homebrew cask: `depends_on macos: :sonoma` (fixes Homebrew 6 deprecation warning for `">= :sonoma"`).
 - Perplexity: hide “No API key” until the section is opened; then show inline key setup with link to get a key.
 - Disk Cleanup: hide the whole section when collapsed (same as monitors/Perplexity); open via the icon.
+- Dedicated Homebrew tap [raro42/homebrew-mac-stats](https://github.com/raro42/homebrew-mac-stats) so `brew tap raro42/mac-stats` works; document that bare `brew install --cask mac-stats` fails (not an official cask).
 
 ## [0.1.368] - 2026-08-10
 

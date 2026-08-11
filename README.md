@@ -50,7 +50,15 @@ curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/install.sh | 
 
 That script taps Homebrew (with Homebrew 6 `brew trust`), installs the cask, or falls back to the latest GitHub DMG. It clears Gatekeeper quarantine and opens the app. If a local **Ollama** API is already running (`http://127.0.0.1:11434`), it sets `aiAgentEnabled: true`; otherwise AI stays off. **No Ollama required** for the monitor.
 
-Manual Homebrew steps (same outcome): see [docs/homebrew.md](docs/homebrew.md).
+> **Do not** run only `brew install --cask mac-stats`. mac-stats is **not** in Homebrew’s official casks, so that command fails with “No Cask with this name exists” (and may suggest unrelated `mac-sai`). Use the one-liner above, or see [docs/homebrew.md](docs/homebrew.md).
+
+Manual Homebrew (tap first):
+
+```bash
+brew tap raro42/mac-stats
+brew trust --cask raro42/mac-stats/mac-stats
+brew install --cask mac-stats
+```
 
 Look at the menu bar → click for the window. Disk Cleanup, monitors, and themes are all in the glass window.
 
@@ -69,7 +77,9 @@ Or: **Right-click** `mac-stats.app` in Applications → **Open** → confirm **O
 
 Do **not** use random “disable Gatekeeper” tips from the web. Verify downloads from [GitHub Releases](https://github.com/raro42/mac-stats/releases/latest) or this Homebrew tap.
 
-**Homebrew 6+ “Refusing to start from untrusted tap”:** use the [`install.sh`](install.sh) one-liner, or run `brew trust --cask raro42/mac-stats/mac-stats` after `brew tap`. See [docs/homebrew.md](docs/homebrew.md).
+**Homebrew 6+ “Refusing … untrusted tap”:** use the [`install.sh`](install.sh) one-liner, or run `brew trust --cask raro42/mac-stats/mac-stats` after `brew tap raro42/mac-stats`. See [docs/homebrew.md](docs/homebrew.md).
+
+**“No Cask with this name exists”:** you skipped the tap — use the one-liner, not bare `brew install --cask mac-stats`. Do not install `mac-sai`.
 
 ---
 

@@ -10,7 +10,7 @@
    ```bash
    curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/install.sh | bash
    ```
-   Or Homebrew by hand ([homebrew.md](homebrew.md)), or from a clone: `./scripts/quickstart.sh`
+   Or Homebrew by hand ([homebrew.md](homebrew.md): tap first — bare `brew install --cask mac-stats` fails), or from a clone: `./scripts/quickstart.sh`
 2. Open **mac-stats** — menu bar shows **CPU** (and °C when available).
 3. Click the menu bar for the glass window (themes, processes, monitors, Disk Cleanup).
 

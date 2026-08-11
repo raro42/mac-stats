@@ -1,4 +1,4 @@
-This folder is the in-repo Homebrew tap layout.
+# Homebrew tap stub (mirrored to https://github.com/raro42/homebrew-mac-stats)
 
 Preferred install:
 
@@ -6,8 +6,20 @@ Preferred install:
 curl -fsSL https://raw.githubusercontent.com/raro42/mac-stats/main/install.sh | bash
 ```
 
-Manual tap install: see [docs/homebrew.md](../docs/homebrew.md).
+Manual:
 
-Or copy `Casks/mac-stats.rb` into a dedicated `homebrew-mac-stats` repository (standard tap name: `raro42/homebrew-mac-stats`).
+```bash
+brew tap raro42/mac-stats
+brew trust --cask raro42/mac-stats/mac-stats
+brew install --cask mac-stats
+```
 
-Update `version` and `sha256` whenever you publish a new DMG release (`scripts/print-release-checksums.sh`).
+Do **not** run only `brew install --cask mac-stats` (not in official Homebrew casks).
+
+After a release, update `Casks/mac-stats.rb` here and in `../Casks/mac-stats.rb`, then:
+
+```bash
+./scripts/sync-homebrew-tap.sh
+```
+
+See [docs/homebrew.md](../docs/homebrew.md).

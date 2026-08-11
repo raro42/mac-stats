@@ -128,11 +128,17 @@ install_via_brew() {
   need_cmd brew
   log "Using Homebrew"
 
+  # Standard tap name → github.com/raro42/homebrew-mac-stats (dedicated cask tap).
+  # Fall back to the monorepo URL if the dedicated tap is unreachable.
   if ! brew tap | grep -qx "$TAP"; then
-    log "Tapping $TAP ($TAP_URL)"
-    brew tap "$TAP" "$TAP_URL"
+    log "Tapping $TAP (standard homebrew-mac-stats tap)"
+    if ! brew tap "$TAP"; then
+      warn "Standard tap failed — trying monorepo URL $TAP_URL"
+      brew tap "$TAP" "$TAP_URL"
+    fi
   else
     log "Tap $TAP already present"
+    brew update --force --quiet 2>/dev/null || true
   fi
 
   # Homebrew 6+: third-party taps refuse to load until trusted.
