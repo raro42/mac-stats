@@ -30,6 +30,7 @@ Two products in one binary — pick your path:
 ## Table of contents
 
 - [Quick start — Just the monitor](#quick-start--just-the-monitor)
+- [If macOS says the DMG / app is “damaged”](#if-macos-says-the-dmg--app-is-damaged)
 - [Quick start — Monitor + AI agent](#quick-start--monitor--ai-agent)
 - [Screenshots](#screenshots)
 - [vs. Stats / iStat Menus / MenuMeters](#vs-stats--istat-menus--menumeters)
@@ -52,11 +53,27 @@ open -a mac-stats
 
 Look at the menu bar → click for the window. **No Ollama required.** Disk Cleanup, monitors, and themes are all in the glass window.
 
+### If macOS says the DMG / app is “damaged”
+
+That message is **Gatekeeper**, not a corrupt download. The GitHub DMG may ship **unsigned / not notarized** until Apple Developer credentials are wired in CI ([docs/NOTARIZATION.md](docs/NOTARIZATION.md)). macOS often labels that as “damaged” and refuses a normal double-click.
+
+**Fix (prefer this order):**
+
+1. Prefer **Homebrew** (`brew install --cask mac-stats` above) when you can.
+2. Or: **Right-click** the DMG (or `mac-stats.app`) → **Open** → confirm **Open**. Do this once; later launches work normally.
+3. Last resort, after you confirm the file came from [GitHub Releases](https://github.com/raro42/mac-stats/releases/latest):
+
+```bash
+xattr -rd com.apple.quarantine /Applications/mac-stats.app
+```
+
+Do **not** use random “disable Gatekeeper” tips from the web.
+
 ---
 
 ## Quick start — Monitor + AI agent
 
-1. Install the app (above).
+1. Install the app (above). If Gatekeeper blocks the DMG, use the steps in [If macOS says the DMG / app is “damaged”](#if-macos-says-the-dmg--app-is-damaged).
 2. Install Ollama and pull a model:
    ```bash
    curl -fsSL https://ollama.com/install.sh | sh
@@ -137,7 +154,7 @@ Leave AI off for a Stats-like monitor only. Local-first: core metrics never need
 | **DMG** | [Releases](https://github.com/raro42/mac-stats/releases/latest) |
 | **Source** | Pin a release tag; see [Build from source](#build-from-source) |
 
-**Gatekeeper / notarization:** Prefer signed+notarized builds ([docs/NOTARIZATION.md](docs/NOTARIZATION.md)). Until CI secrets are set, use Right-click → **Open**.
+**Gatekeeper / notarization:** If macOS says the DMG is “damaged,” that is usually quarantine on an unsigned build — see [If macOS says the DMG / app is “damaged”](#if-macos-says-the-dmg--app-is-damaged) and [docs/NOTARIZATION.md](docs/NOTARIZATION.md).
 
 Config templates in repo root: [`config.minimal.json`](config.minimal.json) (monitor-only), [`config.example.json`](config.example.json) (AI enabled).
 

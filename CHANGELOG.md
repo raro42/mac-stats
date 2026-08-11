@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- README Quick start: explain Gatekeeper “DMG is damaged” (unsigned/not notarized) and Right-click → Open / `xattr` fallback.
+
 ## [0.1.368] - 2026-08-10
 
 ### Changed
