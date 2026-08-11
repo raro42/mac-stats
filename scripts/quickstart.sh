@@ -39,6 +39,7 @@ if [[ -x "$ROOT/scripts/install-to-applications.sh" ]]; then
     "$ROOT/scripts/install-to-applications.sh"
   else
     echo "    Skip install. Use: brew install --cask mac-stats   or ./scripts/install-to-applications.sh"
+    echo "    If macOS says the app is “damaged” after brew: xattr -rd com.apple.quarantine /Applications/mac-stats.app"
   fi
 else
   echo "    Install: brew install --cask mac-stats"

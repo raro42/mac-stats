@@ -20,6 +20,26 @@ cask "mac-stats" do
 
   app "mac-stats.app"
 
+  # Release DMG is ad-hoc signed until Developer ID + notarization secrets are
+  # in CI. Sequoia+ then reports “mac-stats is damaged” even after brew install.
+  # Clearing quarantine after install is the supported workaround (same as
+  # scripts/install-to-applications.sh).
+  postflight do
+    system_command "/usr/bin/xattr",
+                   args: ["-dr", "com.apple.quarantine", "#{appdir}/mac-stats.app"]
+  end
+
+  caveats <<~EOS
+    Until the GitHub release DMG is Developer ID–signed and notarized, macOS
+    Gatekeeper may say the app is “damaged”. That is not a corrupt download.
+
+    brew install runs xattr to clear quarantine. If open still fails:
+
+      xattr -rd com.apple.quarantine #{appdir}/mac-stats.app
+
+    Or Right-click mac-stats.app → Open → confirm Open (once).
+  EOS
+
   zap trash: [
     "~/.mac-stats",
   ]

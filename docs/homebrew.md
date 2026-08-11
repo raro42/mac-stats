@@ -18,4 +18,12 @@ Requires **Apple Silicon** (the published DMG is `aarch64` only).
 
 ## Gatekeeper
 
-Prefer a **notarized** DMG (see [NOTARIZATION.md](NOTARIZATION.md)). Until notarization secrets are configured in CI, first launch may still need Right-click → Open once.
+`brew install` installs the same **ad-hoc / not-notarized** `.app` as the GitHub DMG. Recent macOS may still say the app is **“damaged”** after a successful brew install.
+
+```bash
+xattr -rd com.apple.quarantine /Applications/mac-stats.app
+open -a mac-stats
+```
+
+Or Right-click → **Open** once. The cask `postflight` clears quarantine on install; run `xattr` by hand if an older cask was used. Full notes: [NOTARIZATION.md](NOTARIZATION.md).
+

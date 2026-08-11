@@ -15,7 +15,14 @@
 2. Open **mac-stats** — menu bar shows **CPU** (and °C when available).
 3. Click the menu bar for the glass window (themes, processes, monitors, Disk Cleanup).
 
-If macOS says the DMG or app is **“damaged”**, that is Gatekeeper on an unsigned build — not a bad file. Prefer Homebrew, or **Right-click → Open**. Details: [README Quick start](../README.md#if-macos-says-the-dmg--app-is-damaged) and [NOTARIZATION.md](NOTARIZATION.md).
+If macOS says the DMG or app is **“damaged”** (also after Homebrew), that is Gatekeeper on an unsigned build — not a bad file. Run:
+
+```bash
+xattr -rd com.apple.quarantine /Applications/mac-stats.app
+open -a mac-stats
+```
+
+Details: [README Quick start](../README.md#if-macos-says-the-dmg--app-is-damaged) and [NOTARIZATION.md](NOTARIZATION.md).
 
 AI features stay **off** until you enable them (`aiAgentEnabled`). Full feature list: [FEATURES.md](../FEATURES.md).
 

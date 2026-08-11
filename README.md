@@ -47,6 +47,8 @@ Two products in one binary — pick your path:
 ```bash
 brew tap raro42/mac-stats https://github.com/raro42/mac-stats
 brew install --cask mac-stats
+# Required until notarized: Gatekeeper still blocks the brew-installed .app
+xattr -rd com.apple.quarantine /Applications/mac-stats.app
 # or: ./scripts/quickstart.sh   # from a clone; installs + seeds ~/.mac-stats
 open -a mac-stats
 ```
@@ -55,25 +57,26 @@ Look at the menu bar → click for the window. **No Ollama required.** Disk Clea
 
 ### If macOS says the DMG / app is “damaged”
 
-That message is **Gatekeeper**, not a corrupt download. The GitHub DMG may ship **unsigned / not notarized** until Apple Developer credentials are wired in CI ([docs/NOTARIZATION.md](docs/NOTARIZATION.md)). macOS often labels that as “damaged” and refuses a normal double-click.
+That message is **Gatekeeper**, not a corrupt download. The release app is **ad-hoc signed and not notarized** until Apple Developer credentials are in CI ([docs/NOTARIZATION.md](docs/NOTARIZATION.md)). On recent macOS, that often shows as “**… is damaged and can’t be opened**.”
 
-**Fix (prefer this order):**
+**Homebrew does not skip this.** `brew install --cask` still installs the same unsigned `.app`, so Finder / Launchpad can still refuse it after a successful brew install.
 
-1. Prefer **Homebrew** (`brew install --cask mac-stats` above) when you can.
-2. Or: **Right-click** the DMG (or `mac-stats.app`) → **Open** → confirm **Open**. Do this once; later launches work normally.
-3. Last resort, after you confirm the file came from [GitHub Releases](https://github.com/raro42/mac-stats/releases/latest):
+**Fix (run this after brew or DMG install):**
 
 ```bash
 xattr -rd com.apple.quarantine /Applications/mac-stats.app
+open -a mac-stats
 ```
 
-Do **not** use random “disable Gatekeeper” tips from the web.
+Or: **Right-click** `mac-stats.app` in Applications → **Open** → confirm **Open** (once). Later launches then work normally.
+
+Do **not** use random “disable Gatekeeper” tips from the web. Verify downloads from [GitHub Releases](https://github.com/raro42/mac-stats/releases/latest) or this Homebrew tap.
 
 ---
 
 ## Quick start — Monitor + AI agent
 
-1. Install the app (above). If Gatekeeper blocks the DMG, use the steps in [If macOS says the DMG / app is “damaged”](#if-macos-says-the-dmg--app-is-damaged).
+1. Install the app (above). If macOS says it is “damaged” after brew or DMG, run `xattr -rd com.apple.quarantine /Applications/mac-stats.app` — see [If macOS says the DMG / app is “damaged”](#if-macos-says-the-dmg--app-is-damaged).
 2. Install Ollama and pull a model:
    ```bash
    curl -fsSL https://ollama.com/install.sh | sh
@@ -154,7 +157,7 @@ Leave AI off for a Stats-like monitor only. Local-first: core metrics never need
 | **DMG** | [Releases](https://github.com/raro42/mac-stats/releases/latest) |
 | **Source** | Pin a release tag; see [Build from source](#build-from-source) |
 
-**Gatekeeper / notarization:** If macOS says the DMG is “damaged,” that is usually quarantine on an unsigned build — see [If macOS says the DMG / app is “damaged”](#if-macos-says-the-dmg--app-is-damaged) and [docs/NOTARIZATION.md](docs/NOTARIZATION.md).
+**Gatekeeper / notarization:** Brew install still hits Gatekeeper until notarized — run `xattr -rd com.apple.quarantine /Applications/mac-stats.app`. See [If macOS says the DMG / app is “damaged”](#if-macos-says-the-dmg--app-is-damaged) and [docs/NOTARIZATION.md](docs/NOTARIZATION.md).
 
 Config templates in repo root: [`config.minimal.json`](config.minimal.json) (monitor-only), [`config.example.json`](config.example.json) (AI enabled).
 

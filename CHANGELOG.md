@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - README Quick start: explain Gatekeeper “DMG is damaged” (unsigned/not notarized) and Right-click → Open / `xattr` fallback.
+- Document that **Homebrew still hits Gatekeeper** until notarized; Quick start runs `xattr -rd com.apple.quarantine`; cask `postflight` clears quarantine too.
 
 ## [0.1.368] - 2026-08-10
 
