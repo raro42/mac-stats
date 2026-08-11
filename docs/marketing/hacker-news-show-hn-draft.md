@@ -5,6 +5,14 @@
 Tone: dry, sarcastic, nerdy. Short. Honest about early stage.
 Real motivation: iStat Menus eating 6–15% CPU constantly.
 
+## Postmortem (2026-08-11 morning)
+
+- Story still **1 point** after ~11h. Not killed/flagged on the page — it simply never left `/newest`.
+- Live title is **missing** the `Show HN:` prefix (API title starts with “I put a local…”). That hurt `/show` discovery.
+- Both OP comments (`49248086`, `49248176`) are **dead/flagged**. Account `raro43` has **karma 1** (only this story). Link-heavy first comments from low-karma accounts often get auto-killed.
+- Do **not** treat this as “product has no audience.” Treat it as “did not get first-upvote velocity + soft account + title prefix miss.”
+- Do **not** repost this week. Wait **≥2–4 weeks**, then one clean retry with `Show HN:` in the title, US weekday morning, leaner first comment (few links), maybe lead with idle-CPU angle not LLM.
+
 ---
 
 ## Title
