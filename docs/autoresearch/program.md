@@ -13,6 +13,7 @@ A night that only appends “Quiet tick” to the backlog is a **loss** — same
 ## Window
 
 - **Active:** 20:00–06:00 local only.
+- **Harness spawn:** `scripts/run_overnight_harness_loop.py` must **run** the Cursor `agent` CLI each tick (not only print `AGENT_LOOP_TICK_harness`). Print-only ticks are a quiet failure mode.
 - **Quiet daytime:** do not notify or ship during focus hours unless the human explicitly asks.
 - **NEVER STOP** inside the overnight window once a tick has started — finish the current experiment (keep or discard), then wait for the next harness tick.
 - **No dirty leftovers:** when an experiment finishes, **commit + push** immediately. Around **23:00** local the harness loop runs `scripts/overnight_git_flush.py` once as a backstop (see `.cursor/rules/no-uncommitted-leftovers.mdc`).

@@ -1246,6 +1246,12 @@ pub fn set_cpu_window_compact(compact: bool) -> Result<bool, String> {
     Ok(crate::config::Config::cpu_window_compact())
 }
 
+/// One-shot: which CPU-window section to open (`agent-ops`, …). See `Config::take_open_ui_section`.
+#[tauri::command]
+pub fn take_open_ui_section() -> Option<String> {
+    crate::config::Config::take_open_ui_section()
+}
+
 fn resize_cpu_window_for_compact(compact: bool) {
     use crate::state::APP_HANDLE;
     use tauri::Manager;

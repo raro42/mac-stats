@@ -406,6 +406,40 @@ impl Config {
         Self::merge_config_bool("cpuWindowCompact", compact)
     }
 
+    /// One-shot UI section to open on CPU window load (`agent-ops`, `monitors`, …).
+    /// Prefers `MAC_STATS_OPEN_SECTION` env; else reads and clears `openUiSection` in config.json.
+    pub fn take_open_ui_section() -> Option<String> {
+        if let Ok(v) = std::env::var("MAC_STATS_OPEN_SECTION") {
+            let t = v.trim().to_string();
+            if !t.is_empty() {
+                return Some(t);
+            }
+        }
+        let config_path = Self::config_file_path();
+        let Ok(content) = std::fs::read_to_string(&config_path) else {
+            return None;
+        };
+        let Ok(mut json) = serde_json::from_str::<serde_json::Value>(&content) else {
+            return None;
+        };
+        let section = json
+            .get("openUiSection")
+            .and_then(|v| v.as_str())
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty());
+        let Some(section) = section else {
+            return None;
+        };
+        if let Some(obj) = json.as_object_mut() {
+            obj.remove("openUiSection");
+            let _ = crate::config::write_text_atomic(
+                &config_path,
+                &serde_json::to_string_pretty(&json).unwrap_or_default(),
+            );
+        }
+        Some(section)
+    }
+
     fn merge_config_bool(key: &str, value: bool) -> Result<(), String> {
         use serde_json::{json, Value};
         let config_path = Self::config_file_path();

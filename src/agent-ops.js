@@ -1777,7 +1777,7 @@ function renderOpsRuns(insights) {
             ${(insights.digest_open_hints || []).length
                 ? `<div class="ops-insight-sub">Digest open</div>${(insights.digest_open_hints || []).slice(0, 3).map((h) => `<div class="ops-insight-line">${escapeHtml(h)}</div>`).join('')}`
                 : (Number(insights.digest_open_count) === 0
-                    ? `<div class="ops-insight-sub">Digest open</div><div class="ops-empty ops-empty-compact">Queue clear — overnight pulls standing backlog / design review</div>`
+                    ? `<div class="ops-insight-sub">Digest open</div><div class="ops-empty ops-empty-compact">Queue clear — overnight must still ship design review / standing backlog (quiet is a fail)</div>`
                     : '')}
             <div class="ops-row-meta">Lanes: ${escapeHtml(lanes) || '—'}</div>
             <div class="ops-row-meta">Top tools: ${escapeHtml(tools) || '—'}</div>
@@ -1964,6 +1964,20 @@ function escapeHtml(s) {
         (section?.classList.contains('collapsed') ?? false);
     }
     applyOpsCollapsed(!!startsCollapsed);
+    // Design-review / capture: MAC_STATS_OPEN_SECTION or one-shot config openUiSection.
+    void (async () => {
+      try {
+        const section = await invoke('take_open_ui_section');
+        if (!section) return;
+        const key = String(section).trim().toLowerCase();
+        if (key === 'agent-ops' || key === 'agent_ops' || key === 'ops') {
+          applyOpsCollapsed(false);
+          selectOpsTab('runs');
+        }
+      } catch (_) {
+        /* ignore — normal launches omit the flag */
+      }
+    })();
   }
 
   function initAgentOps() {

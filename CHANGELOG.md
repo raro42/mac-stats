@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.369] - 2026-08-12
+
+### Fixed
+- Overnight harness now **spawns** the Cursor `agent` CLI each tick (print-only `AGENT_LOOP_TICK_harness` lines no longer count as work).
+
 ### Changed
+- Design review: refreshed `feature-agent-ops.png` and `feature-cpu-metrics.png`; open Agent Ops for capture via `MAC_STATS_OPEN_SECTION=agent-ops` (or one-shot `openUiSection` in config).
+- Agent Ops digest empty copy: overnight must still ship design review / standing backlog (quiet is a fail).
 - README Quick start: explain Gatekeeper “DMG is damaged” (unsigned/not notarized) and Right-click → Open / `xattr` fallback.
 - Document that **Homebrew still hits Gatekeeper** until notarized; Quick start runs `xattr -rd com.apple.quarantine`; cask `postflight` clears quarantine too.
 - Homebrew 6+: document `brew trust --cask raro42/mac-stats/mac-stats` (fixes “Refusing to start from untrusted tap”).

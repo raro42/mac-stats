@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
-"""Overnight-only harness loop (20:00–06:00 local). Emits AGENT_LOOP_TICK_harness.
+"""Overnight-only harness loop (20:00–06:00 local).
+
+Prints AGENT_LOOP_TICK_harness for observability, then **spawns** the Cursor
+`agent` CLI so work actually runs (print-only ticks were a quiet failure mode).
 
 Also runs a **~23:00 pending git flush** (commit+push dirty safe files) once per night
 so finished work never sits uncommitted. See scripts/overnight_git_flush.py and
 .cursor/rules/no-uncommitted-leftovers.mdc.
 
-Does not notify during daytime — only prints AGENT_LOOP_SLEEP_harness then.
+Does not spawn agents during daytime — only prints AGENT_LOOP_SLEEP_harness then.
 """
 
 from __future__ import annotations
 
+import os
+import shutil
 import subprocess
 import time
 from datetime import datetime, timedelta
@@ -18,11 +23,17 @@ from pathlib import Path
 SENTINEL = "AGENT_LOOP_TICK_harness"
 SLEEP_NOTE = "AGENT_LOOP_SLEEP_harness"
 FLUSH_NOTE = "AGENT_LOOP_FLUSH_git"
+AGENT_NOTE = "AGENT_LOOP_AGENT"
 START_H, END_H = 20, 6
 FLUSH_H = 23
 INTERVAL = 1200
+# Leave a little headroom inside the 20m cadence.
+AGENT_TIMEOUT_S = 1100
 ROOT = Path(__file__).resolve().parents[1]
-FLUSH_STAMP = Path.home() / ".mac-stats" / "improvements" / "overnight_git_flush_date.txt"
+IMPROVEMENTS = Path.home() / ".mac-stats" / "improvements"
+FLUSH_STAMP = IMPROVEMENTS / "overnight_git_flush_date.txt"
+AGENT_LOCK = IMPROVEMENTS / "overnight_agent.pid"
+AGENT_LOG = IMPROVEMENTS / "overnight_agent.log"
 
 PROMPT = (
     "Overnight mac-stats autoresearch tick (surprise Ralf). Follow docs/autoresearch/program.md. "
@@ -102,16 +113,121 @@ def run_git_flush(now: datetime) -> None:
         FLUSH_STAMP.write_text(now.date().isoformat() + "\n")
 
 
+def agent_still_running() -> bool:
+    if not AGENT_LOCK.exists():
+        return False
+    try:
+        pid = int(AGENT_LOCK.read_text().strip())
+    except ValueError:
+        AGENT_LOCK.unlink(missing_ok=True)
+        return False
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        AGENT_LOCK.unlink(missing_ok=True)
+        return False
+    return True
+
+
+def resolve_agent_bin() -> str | None:
+    for name in ("agent", "cursor-agent"):
+        path = shutil.which(name)
+        if path:
+            return path
+    # Common install location when PATH is thin (launchd / limited shells).
+    home_local = Path.home() / ".local" / "bin"
+    for name in ("agent", "cursor-agent"):
+        cand = home_local / name
+        if cand.is_file() and os.access(cand, os.X_OK):
+            return str(cand)
+    return None
+
+
+def run_agent_tick(now: datetime) -> None:
+    """Spawn Cursor agent CLI for one overnight experiment."""
+    IMPROVEMENTS.mkdir(parents=True, exist_ok=True)
+    payload = PROMPT.replace("\\", "\\\\").replace('"', '\\"')
+    print(f'{SENTINEL} {{"prompt":"{payload}"}}', flush=True)
+
+    if agent_still_running():
+        print(
+            f'{AGENT_NOTE} {{"skip":"busy","pid_file":"{AGENT_LOCK}"}}',
+            flush=True,
+        )
+        return
+
+    agent_bin = resolve_agent_bin()
+    if not agent_bin:
+        print(
+            f'{AGENT_NOTE} {{"error":"agent CLI not on PATH","hint":"install cursor agent CLI"}}',
+            flush=True,
+        )
+        return
+
+    env = os.environ.copy()
+    # Ensure ~/.local/bin stays available inside the child.
+    local_bin = str(Path.home() / ".local" / "bin")
+    env["PATH"] = local_bin + os.pathsep + env.get("PATH", "")
+
+    cmd = [
+        agent_bin,
+        "-p",
+        "--force",
+        "--trust",
+        "--workspace",
+        str(ROOT),
+        "--output-format",
+        "text",
+        PROMPT,
+    ]
+    print(
+        f'{AGENT_NOTE} {{"start":"{now.isoformat(timespec="seconds")}","bin":"{agent_bin}"}}',
+        flush=True,
+    )
+    with AGENT_LOG.open("a", encoding="utf-8") as log:
+        log.write(f"\n--- {now.isoformat(timespec='seconds')} ---\n")
+        log.flush()
+        try:
+            proc = subprocess.Popen(
+                cmd,
+                cwd=str(ROOT),
+                env=env,
+                stdout=log,
+                stderr=subprocess.STDOUT,
+                start_new_session=True,
+            )
+        except OSError as exc:
+            print(f'{AGENT_NOTE} {{"error":"spawn failed","detail":"{exc}"}}', flush=True)
+            return
+        AGENT_LOCK.write_text(str(proc.pid) + "\n")
+        try:
+            code = proc.wait(timeout=AGENT_TIMEOUT_S)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            try:
+                proc.wait(timeout=30)
+            except subprocess.TimeoutExpired:
+                pass
+            print(
+                f'{AGENT_NOTE} {{"exit":"timeout","seconds":{AGENT_TIMEOUT_S}}}',
+                flush=True,
+            )
+            AGENT_LOCK.unlink(missing_ok=True)
+            return
+        AGENT_LOCK.unlink(missing_ok=True)
+        print(f'{AGENT_NOTE} {{"exit":{code}}}', flush=True)
+
+
 def main() -> None:
     now = datetime.now().astimezone()
     if in_window(now):
         print(
-            f'{SLEEP_NOTE} {{"until":"next-tick","seconds":{INTERVAL},"policy":"overnight-only-autoresearch"}}',
+            f'{SLEEP_NOTE} {{"until":"next-tick","seconds":{INTERVAL},"policy":"overnight-only-autoresearch","spawn":"agent-cli"}}',
             flush=True,
         )
     else:
         print(
-            f'{SLEEP_NOTE} {{"until":"20:00","policy":"overnight-only-autoresearch"}}',
+            f'{SLEEP_NOTE} {{"until":"20:00","policy":"overnight-only-autoresearch","spawn":"agent-cli"}}',
             flush=True,
         )
     while True:
@@ -124,16 +240,10 @@ def main() -> None:
         if flush_due(now):
             run_git_flush(now)
 
+        # Tick first (do not burn the first 20 minutes of the night on sleep-only).
+        run_agent_tick(now)
+
         time.sleep(INTERVAL)
-        now = datetime.now().astimezone()
-        if not in_window(now):
-            continue
-
-        if flush_due(now):
-            run_git_flush(now)
-
-        payload = PROMPT.replace("\\", "\\\\").replace('"', '\\"')
-        print(f'{SENTINEL} {{"prompt":"{payload}"}}', flush=True)
 
 
 if __name__ == "__main__":
