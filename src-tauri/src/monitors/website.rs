@@ -101,17 +101,109 @@ impl MonitorCheck for WebsiteMonitor {
                 })
             }
             Err(e) => {
-                trace!("Monitor: Website check error - ID: {}, URL: {}, Error: {}, Response time: {}ms", 
-                      self.id, self.url, e, elapsed_ms);
+                let short = classify_website_request_error(&e);
+                trace!(
+                    "Monitor: Website check error - ID: {}, URL: {}, Error: {} (raw: {}), Response time: {}ms",
+                    self.id,
+                    self.url,
+                    short,
+                    e,
+                    elapsed_ms
+                );
                 Ok(MonitorStatus {
                     is_up: false,
                     response_time_ms: Some(elapsed_ms),
-                    error: Some(format!("Request failed: {}", e)),
+                    error: Some(short),
                     checked_at,
                     extra: Default::default(),
                 })
             }
         }
+    }
+}
+
+/// Short operator-facing reason for a failed website probe (UI + debug.log).
+pub(crate) fn classify_website_request_error(err: &reqwest::Error) -> String {
+    classify_website_error_text(&err.to_string(), err.is_timeout(), err.is_connect())
+}
+
+fn classify_website_error_text(raw: &str, is_timeout: bool, is_connect: bool) -> String {
+    let lower = raw.to_lowercase();
+    if lower.contains("dns error")
+        || lower.contains("failed to lookup")
+        || lower.contains("nodename nor servname")
+        || lower.contains("name or service not known")
+        || lower.contains("no such host")
+    {
+        return "DNS lookup failed".to_string();
+    }
+    if is_timeout || lower.contains("timed out") || lower.contains("timeout") {
+        return "Connection timed out".to_string();
+    }
+    if lower.contains("certificate")
+        || lower.contains("tls")
+        || lower.contains("ssl")
+        || lower.contains("handshake")
+    {
+        return "TLS/SSL error".to_string();
+    }
+    if lower.contains("connection refused") || lower.contains("actively refused") {
+        return "Connection refused".to_string();
+    }
+    if lower.contains("network is unreachable") || lower.contains("no route to host") {
+        return "Network unreachable".to_string();
+    }
+    if is_connect || lower.contains("error trying to connect") || lower.contains("connect error") {
+        return "Connection failed".to_string();
+    }
+    "Request failed".to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::classify_website_error_text;
+
+    #[test]
+    fn classifies_dns_lookup_failure() {
+        let raw = "error sending request for url (https://www.econsultants.es/): \
+                   error trying to connect: dns error: failed to lookup address information: \
+                   nodename nor servname provided, or not known";
+        assert_eq!(
+            classify_website_error_text(raw, false, true),
+            "DNS lookup failed"
+        );
+    }
+
+    #[test]
+    fn classifies_timeout() {
+        assert_eq!(
+            classify_website_error_text("operation timed out", true, false),
+            "Connection timed out"
+        );
+    }
+
+    #[test]
+    fn classifies_tls_and_refused() {
+        assert_eq!(
+            classify_website_error_text("invalid certificate: UnknownIssuer", false, false),
+            "TLS/SSL error"
+        );
+        assert_eq!(
+            classify_website_error_text("tcp connect error: Connection refused", false, true),
+            "Connection refused"
+        );
+    }
+
+    #[test]
+    fn classifies_generic_connect() {
+        assert_eq!(
+            classify_website_error_text("error trying to connect: …", false, true),
+            "Connection failed"
+        );
+        assert_eq!(
+            classify_website_error_text("something odd happened", false, false),
+            "Request failed"
+        );
     }
 }
 

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.375] - 2026-08-13
+
+### Changed
+- Website monitors show short failure reasons (DNS lookup failed, timeout, TLS, refused) instead of raw reqwest strings — clearer External / Monitors rows and shorter `debug.log` DOWN lines.
+
 ## [0.1.374] - 2026-08-13
 
 ### Fixed
