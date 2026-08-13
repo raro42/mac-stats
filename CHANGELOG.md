@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.378] - 2026-08-13
+
+### Changed
+- Website monitors rewrite `monitors.json` only on up/down or error change, else about every 5 minutes for last_check — fewer SSD writes and quieter `debug.log` on steady UP hosts.
+
 ## [0.1.377] - 2026-08-13
 
 ### Changed

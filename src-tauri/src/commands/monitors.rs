@@ -23,6 +23,51 @@ fn clamp_monitor_check_interval_secs(stored: u64) -> u64 {
 const DOWN_BACKOFF_SECS: u64 = 180;
 /// Longer gap when the last failure was DNS (hostname usually stays broken for minutes).
 const DNS_DOWN_BACKOFF_SECS: u64 = 300;
+/// While outcome is unchanged, rewrite `monitors.json` at most this often (last_check checkpoint).
+const STATS_DISK_CHECKPOINT_SECS: i64 = 300;
+
+/// True when up/down or error text changed (ignore response-time jitter).
+fn monitor_outcome_changed(
+    prev: Option<&crate::monitors::MonitorStatus>,
+    next: &crate::monitors::MonitorStatus,
+) -> bool {
+    match prev {
+        None => true,
+        Some(p) => {
+            p.is_up != next.is_up || p.error.as_deref() != next.error.as_deref()
+        }
+    }
+}
+
+/// Persist after every outcome flip; otherwise checkpoint last_check about every 5 minutes.
+fn should_persist_monitor_stats(
+    prev: Option<&crate::monitors::MonitorStatus>,
+    next: &crate::monitors::MonitorStatus,
+    last_disk_persist: Option<chrono::DateTime<chrono::Utc>>,
+    now: chrono::DateTime<chrono::Utc>,
+) -> bool {
+    if monitor_outcome_changed(prev, next) {
+        return true;
+    }
+    match last_disk_persist {
+        None => true,
+        Some(t) => (now - t).num_seconds() >= STATS_DISK_CHECKPOINT_SECS,
+    }
+}
+
+fn get_last_disk_persist() -> &'static Mutex<HashMap<String, chrono::DateTime<chrono::Utc>>> {
+    static LAST_DISK: OnceLock<Mutex<HashMap<String, chrono::DateTime<chrono::Utc>>>> =
+        OnceLock::new();
+    LAST_DISK.get_or_init(|| Mutex::new(HashMap::new()))
+}
+
+fn mark_monitors_disk_persisted(ids: impl IntoIterator<Item = String>, at: chrono::DateTime<chrono::Utc>) {
+    if let Ok(mut map) = get_last_disk_persist().lock() {
+        for id in ids {
+            map.insert(id, at);
+        }
+    }
+}
 
 /// Effective background interval: honor stored cadence when UP; stretch while DOWN.
 fn background_interval_secs(
@@ -139,7 +184,7 @@ struct MonitorsFile {
 /// Save monitors to disk
 /// Uses try_lock to avoid blocking if locks are busy (non-blocking)
 fn save_monitors() -> Result<(), String> {
-    use tracing::{debug, info};
+    use tracing::debug;
 
     Config::ensure_monitors_directory()
         .map_err(|e| format!("Failed to create monitors directory: {}", e))?;
@@ -206,7 +251,14 @@ fn save_monitors() -> Result<(), String> {
     crate::config::write_text_atomic(&monitors_path, &json)
         .map_err(|e| format!("Failed to write monitors file: {}", e))?;
 
-    info!(
+    let persisted_at = chrono::Utc::now();
+    mark_monitors_disk_persisted(
+        persistent_monitors.iter().map(|pm| pm.id.clone()),
+        persisted_at,
+    );
+
+    // Routine checkpoints are common; keep INFO for structural add/remove paths only.
+    debug!(
         "Monitor: Saved {} monitors to disk - Path: {:?}",
         persistent_monitors.len(),
         monitors_path
@@ -541,6 +593,17 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
     }
 
     let now = Utc::now();
+    let (prev_status, last_disk) = {
+        let prev_status = get_monitor_stats()
+            .lock()
+            .ok()
+            .and_then(|stats| stats.get(&monitor_id).and_then(|s| s.last_status.clone()));
+        let last_disk = get_last_disk_persist()
+            .lock()
+            .ok()
+            .and_then(|m| m.get(&monitor_id).copied());
+        (prev_status, last_disk)
+    };
     {
         if let Ok(mut stats) = get_monitor_stats().lock() {
             stats.insert(
@@ -558,9 +621,16 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
         }
     }
 
-    // Persist last_check / last_status so restarts and `run_due_monitor_checks` intervals stay
-    // correct after reboot. `save_monitors` uses try_lock on each map — skip quietly if busy.
-    let _ = save_monitors();
+    // Persist on outcome change, else ~5 min last_check checkpoint (cuts SSD + log thrash).
+    // `save_monitors` uses try_lock on each map — skip quietly if busy.
+    if should_persist_monitor_stats(prev_status.as_ref(), &result, last_disk, now) {
+        let _ = save_monitors();
+    } else {
+        trace!(
+            "Monitor: Skip disk persist (unchanged outcome) - ID: {}",
+            monitor_id
+        );
+    }
 
     Ok(result)
 }
@@ -749,7 +819,8 @@ pub fn get_monitor_status(
 mod monitor_interval_tests {
     use super::{
         background_interval_secs, clamp_monitor_check_interval_secs, enrich_status_with_backoff,
-        is_monitor_due_for_background, DNS_DOWN_BACKOFF_SECS, DOWN_BACKOFF_SECS,
+        is_monitor_due_for_background, monitor_outcome_changed, should_persist_monitor_stats,
+        DNS_DOWN_BACKOFF_SECS, DOWN_BACKOFF_SECS, STATS_DISK_CHECKPOINT_SECS,
     };
     use chrono::{TimeZone, Utc};
     use crate::monitors::MonitorStatus;
@@ -913,5 +984,57 @@ mod monitor_interval_tests {
             lib_rs.contains("run_due_monitor_checks()"),
             "lib.rs should call run_due_monitor_checks from the 30s monitor thread"
         );
+    }
+
+    #[test]
+    fn outcome_ignores_response_time_jitter() {
+        let mut a = up_status();
+        let mut b = up_status();
+        a.response_time_ms = Some(10);
+        b.response_time_ms = Some(99);
+        assert!(!monitor_outcome_changed(Some(&a), &b));
+    }
+
+    #[test]
+    fn outcome_detects_up_to_down() {
+        assert!(monitor_outcome_changed(Some(&up_status()), &down_status("DNS lookup failed")));
+    }
+
+    #[test]
+    fn persist_on_first_check_and_outcome_change() {
+        let now = Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap();
+        assert!(should_persist_monitor_stats(None, &up_status(), None, now));
+        let recent = Utc.with_ymd_and_hms(2026, 3, 22, 11, 59, 0).unwrap();
+        assert!(should_persist_monitor_stats(
+            Some(&up_status()),
+            &down_status("DNS lookup failed"),
+            Some(recent),
+            now
+        ));
+    }
+
+    #[test]
+    fn skip_persist_when_unchanged_and_checkpoint_fresh() {
+        let now = Utc.with_ymd_and_hms(2026, 3, 22, 12, 1, 0).unwrap();
+        let recent = Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap();
+        assert!(!should_persist_monitor_stats(
+            Some(&up_status()),
+            &up_status(),
+            Some(recent),
+            now
+        ));
+    }
+
+    #[test]
+    fn persist_checkpoint_after_five_minutes() {
+        let now = Utc.with_ymd_and_hms(2026, 3, 22, 12, 5, 0).unwrap();
+        let older = Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap();
+        assert_eq!(STATS_DISK_CHECKPOINT_SECS, 300);
+        assert!(should_persist_monitor_stats(
+            Some(&up_status()),
+            &up_status(),
+            Some(older),
+            now
+        ));
     }
 }
