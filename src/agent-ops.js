@@ -1989,6 +1989,31 @@ function escapeHtml(s) {
           }
           ollamaSection?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
           setTimeout(() => document.getElementById('chat-input')?.focus(), 120);
+        } else if (
+          key === 'processes' ||
+          key === 'process' ||
+          key === 'process-list' ||
+          key === 'process_list' ||
+          key === 'top-processes'
+        ) {
+          applyOpsCollapsed(true);
+          if (typeof window.showDetailsProcessesSections === 'function') {
+            window.showDetailsProcessesSections();
+          } else {
+            localStorage.setItem('details_processes_collapsed', 'false');
+          }
+          const processesSection =
+            document.getElementById('processes-section') ||
+            document.querySelector(
+              '.apple-processes, .arch-processes, .swiss-processes, .mat-processes, .cpu-processes, .processes-section'
+            );
+          setTimeout(() => {
+            processesSection?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+            const row =
+              document.querySelector('#process-list .process-row[tabindex="0"]') ||
+              document.querySelector('#process-list .process-row');
+            row?.focus?.();
+          }, 160);
         }
       } catch (_) {
         /* ignore — normal launches omit the flag */

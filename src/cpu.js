@@ -837,7 +837,8 @@ async function refresh() {
       colHeader.setAttribute("aria-hidden", "true");
       const colPin = document.createElement("span");
       colPin.className = "process-list-header-pin";
-      colPin.textContent = "";
+      colPin.textContent = "★";
+      colPin.title = "Pin favorites";
       const colName = document.createElement("span");
       colName.textContent = "Process";
       const colCpu = document.createElement("span");

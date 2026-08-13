@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.371] - 2026-08-13
+
+### Changed
+- Design review: Top Processes — accent CPU bars, pin-column ★ header, clearer pin focus rings (`feature-processes`).
+- Open Top Processes for capture via `MAC_STATS_OPEN_SECTION=processes` (aliases: `process`, `process-list`, `top-processes`).
+
 ## [0.1.370] - 2026-08-13
 
 ### Fixed

@@ -665,13 +665,19 @@ textarea.ops-agent-editor.is-dirty {
   border-radius: 4px;
   width: 22px;
   height: 22px;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.process-pin:hover,
+.process-pin:hover {
+  opacity: 0.95;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
 .process-pin:focus-visible {
   opacity: 0.95;
   outline: none;
-  background: color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, #0a84ff 12%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 40%, transparent);
 }
 
 .process-pin.is-pinned {
@@ -704,8 +710,30 @@ textarea.ops-agent-editor.is-dirty {
   font-weight: 500;
 }
 
-.process-bar-fill {
+#process-list .process-bar {
+  height: 6px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+#process-list .process-bar-fill {
   transition: width 0.28s ease;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent, #0a84ff) 78%, #6eaadf),
+    color-mix(in srgb, var(--accent, #0a84ff) 92%, #8cbef0)
+  );
+}
+
+.process-list-header-pin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  font-size: 11px;
+  opacity: 0.55;
+  letter-spacing: 0;
 }
 
 /* Shared process details modal (all themes) */
