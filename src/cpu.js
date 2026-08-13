@@ -2673,6 +2673,25 @@ function updateMonitorsHeight() {
   monitorsList.style.padding = '';
 }
 
+function formatMonitorBackoffHint(status) {
+  if (!status || status.is_up) return null;
+  const extra = status.extra || {};
+  const nextRaw = extra.next_background_check_secs;
+  const intervalRaw = extra.background_interval_secs;
+  const next = typeof nextRaw === 'number' ? nextRaw : Number(nextRaw);
+  const interval = typeof intervalRaw === 'number' ? intervalRaw : Number(intervalRaw);
+  if (Number.isFinite(next) && next > 0) {
+    const mins = Math.max(1, Math.ceil(next / 60));
+    return mins === 1
+      ? 'Next auto-check in <1 min'
+      : `Next auto-check in ~${mins} min`;
+  }
+  if (Number.isFinite(interval) && interval >= 180) {
+    return `Auto-checks every ${Math.round(interval / 60)}+ min while down`;
+  }
+  return null;
+}
+
 function fillMonitorInfo(info, monitorUrl, status) {
   const responseTimeText = status.response_time_ms ? `${status.response_time_ms}ms` : '--';
   const pending =
@@ -2705,6 +2724,14 @@ function fillMonitorInfo(info, monitorUrl, status) {
     errEl.className = 'monitor-error';
     errEl.textContent = status.error;
     info.appendChild(errEl);
+  }
+
+  const backoffHint = !pending ? formatMonitorBackoffHint(status) : null;
+  if (backoffHint) {
+    const hintEl = document.createElement('div');
+    hintEl.className = 'monitor-backoff-hint';
+    hintEl.textContent = backoffHint;
+    info.appendChild(hintEl);
   }
 }
 

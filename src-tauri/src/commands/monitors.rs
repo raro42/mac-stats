@@ -700,21 +700,56 @@ pub fn get_monitor_details(monitor_id: String) -> Result<MonitorDetails, String>
     })
 }
 
+/// Attach DOWN backoff timing so the UI can show “next auto-check”.
+fn enrich_status_with_backoff(
+    mut status: crate::monitors::MonitorStatus,
+    last_check: Option<chrono::DateTime<chrono::Utc>>,
+    stored_interval_secs: Option<u64>,
+) -> crate::monitors::MonitorStatus {
+    if status.is_up {
+        return status;
+    }
+    let interval = background_interval_secs(stored_interval_secs, Some(&status));
+    let anchor = last_check.unwrap_or(status.checked_at);
+    let elapsed = (chrono::Utc::now() - anchor).num_seconds().max(0) as u64;
+    let next = interval.saturating_sub(elapsed);
+    status.extra.insert(
+        "background_interval_secs".into(),
+        serde_json::json!(interval),
+    );
+    status.extra.insert(
+        "next_background_check_secs".into(),
+        serde_json::json!(next),
+    );
+    status
+}
+
 /// Get cached monitor status without performing a check
 #[tauri::command]
 pub fn get_monitor_status(
     monitor_id: String,
 ) -> Result<Option<crate::monitors::MonitorStatus>, String> {
     let stats = get_monitor_stats().lock().map_err(|e| e.to_string())?;
-
-    Ok(stats.get(&monitor_id).and_then(|s| s.last_status.clone()))
+    let configs = get_monitor_configs().lock().map_err(|e| e.to_string())?;
+    let Some(st) = stats.get(&monitor_id) else {
+        return Ok(None);
+    };
+    let Some(status) = st.last_status.clone() else {
+        return Ok(None);
+    };
+    let stored = configs.get(&monitor_id).map(|c| c.check_interval_secs);
+    Ok(Some(enrich_status_with_backoff(
+        status,
+        st.last_check,
+        stored,
+    )))
 }
 
 #[cfg(test)]
 mod monitor_interval_tests {
     use super::{
-        background_interval_secs, clamp_monitor_check_interval_secs, is_monitor_due_for_background,
-        DNS_DOWN_BACKOFF_SECS, DOWN_BACKOFF_SECS,
+        background_interval_secs, clamp_monitor_check_interval_secs, enrich_status_with_backoff,
+        is_monitor_due_for_background, DNS_DOWN_BACKOFF_SECS, DOWN_BACKOFF_SECS,
     };
     use chrono::{TimeZone, Utc};
     use crate::monitors::MonitorStatus;
@@ -838,6 +873,24 @@ mod monitor_interval_tests {
         assert!(!is_monitor_due_for_background(now, Some(last), None, None));
         let now2 = Utc.with_ymd_and_hms(2026, 3, 22, 12, 1, 0).unwrap();
         assert!(is_monitor_due_for_background(now2, Some(last), None, None));
+    }
+
+    #[test]
+    fn enrich_down_status_sets_next_check_extra() {
+        let st = down_status("DNS lookup failed");
+        let last = Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap();
+        // Freeze-ish: enrich uses Utc::now(); just assert keys + interval value.
+        let enriched = enrich_status_with_backoff(st, Some(last), Some(60));
+        assert_eq!(
+            enriched
+                .extra
+                .get("background_interval_secs")
+                .and_then(|v| v.as_u64()),
+            Some(DNS_DOWN_BACKOFF_SECS)
+        );
+        assert!(enriched.extra.contains_key("next_background_check_secs"));
+        let up = enrich_status_with_backoff(up_status(), Some(last), Some(60));
+        assert!(!up.extra.contains_key("background_interval_secs"));
     }
 
     #[test]

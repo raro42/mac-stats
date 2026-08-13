@@ -878,8 +878,9 @@ def is_now_instant_slowest_noise(r: dict) -> bool:
         or looks_like_topic_dump(q)
     ):
         return True
-    # Scheduled SKILL prompts are harness/scheduler work, not Discord UX latency.
-    if looks_like_scheduled_skill(q) and not tools and tool_steps == 0:
+    # Scheduled SKILL prompts are harness/scheduler work, not Discord UX latency
+    # (include tool-using weekly reviews — they inflate p50 without being product debt).
+    if looks_like_scheduled_skill(q):
         return True
     # Short greetings (incl. emoji) that are now Instant — historical lite noise.
     if looks_like_greeting(q) and not tools and tool_steps == 0:

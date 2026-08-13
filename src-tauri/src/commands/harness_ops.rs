@@ -1202,6 +1202,10 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         return true;
     }
     let q = question.to_lowercase();
+    // Scheduled SKILL weekly reviews — harness work, not Discord UX latency (v0.1.377).
+    if q.trim_start().starts_with("skill:") {
+        return true;
+    }
     let has_search_tool = tools.iter().any(|t| {
         let u = t.to_uppercase();
         u.contains("BRAVE") || u.contains("PERPLEXITY")
@@ -1921,6 +1925,12 @@ mod tests {
             8_000,
             &[],
             "ke klima en elmasnau eu"
+        ));
+        assert!(is_insights_slowest_noise(
+            "direct",
+            28_000,
+            &["SKILL".into()],
+            "SKILL: ui-weekly-review — Weekly Agent Ops polish per docs/041_ui_command_center"
         ));
         assert!(!is_insights_slowest_noise(
             "direct",

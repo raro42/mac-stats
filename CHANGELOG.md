@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.377] - 2026-08-13
+
+### Changed
+- External / Monitors DOWN rows show next auto-check countdown (uses stretched DNS ≥5 min / other ≥3 min backoff from v0.1.376) so slow rechecks are visible, not silent.
+- Digester Slowest / p50 ignore scheduled `SKILL:` weekly reviews (tool-using too) — harness work, not Discord UX latency.
+
 ## [0.1.376] - 2026-08-13
 
 ### Changed
