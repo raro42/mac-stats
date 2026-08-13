@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.381] - 2026-08-14
+
+### Changed
+- Second-launch single-instance busy exits: WARN at most once per 5 minutes (stamp beside the lock file); LaunchAgent `KeepAlive` retries stay DEBUG — quieter `debug.log` during install/kickstart races.
+
 ## [0.1.380] - 2026-08-14
 
 ### Fixed

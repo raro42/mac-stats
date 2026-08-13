@@ -176,6 +176,61 @@ pub fn run() {
 #[cfg(unix)]
 static SINGLE_INSTANCE_LOCK_FILE: std::sync::OnceLock<std::fs::File> = std::sync::OnceLock::new();
 
+/// LaunchAgent `KeepAlive` retries about every 10s while another instance holds the lock.
+/// Emit at most one WARN per interval (stamp file); further collisions stay DEBUG.
+#[cfg(unix)]
+const SINGLE_INSTANCE_BUSY_WARN_INTERVAL: std::time::Duration =
+    std::time::Duration::from_secs(5 * 60);
+
+#[cfg(unix)]
+fn should_warn_single_instance_busy(
+    stamp_mtime: Option<std::time::SystemTime>,
+    now: std::time::SystemTime,
+    interval: std::time::Duration,
+) -> bool {
+    match stamp_mtime {
+        None => true,
+        Some(mtime) => now
+            .duration_since(mtime)
+            .map(|age| age >= interval)
+            .unwrap_or(true),
+    }
+}
+
+/// Rate-limit busy-lock WARN across short-lived second launches (stamp beside the flock file).
+#[cfg(unix)]
+fn log_single_instance_busy(lock_path: &std::path::Path) {
+    let stamp_path = lock_path
+        .parent()
+        .map(|p| p.join("single-instance-busy.stamp"))
+        .unwrap_or_else(|| std::path::PathBuf::from("single-instance-busy.stamp"));
+    let now = std::time::SystemTime::now();
+    let stamp_mtime = std::fs::metadata(&stamp_path)
+        .and_then(|m| m.modified())
+        .ok();
+    let warn = should_warn_single_instance_busy(
+        stamp_mtime,
+        now,
+        SINGLE_INSTANCE_BUSY_WARN_INTERVAL,
+    );
+    if warn {
+        tracing::warn!(
+            "mac-stats: another instance is already running (single-instance lock); exiting this launch"
+        );
+        let epoch = now
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        let _ = std::fs::write(&stamp_path, format!("{epoch}\n"));
+        eprintln!("mac-stats: already running; exiting this launch.");
+    } else {
+        tracing::debug!(
+            target: "mac_stats::single_instance",
+            "another instance is already running (single-instance lock); exiting this launch"
+        );
+    }
+}
+
 fn run_internal(open_cpu_window: bool) {
     // Single-instance guard (fail-fast): prevents concurrent Discord/scheduler/CDP startup that
     // would otherwise cause duplicated local I/O and confusing logs.
@@ -199,10 +254,7 @@ fn run_internal(open_cpu_window: bool) {
                 let fd = lock_file.as_raw_fd();
                 let res = unsafe { libc::flock(fd, libc::LOCK_EX | libc::LOCK_NB) };
                 if res != 0 {
-                    tracing::warn!(
-                        "mac-stats: another instance is already running (single-instance lock); exiting this launch"
-                    );
-                    eprintln!("mac-stats: already running; exiting this launch.");
+                    log_single_instance_busy(&lock_path);
                     std::process::exit(0);
                 }
                 match SINGLE_INSTANCE_LOCK_FILE.set(lock_file) {
@@ -1694,4 +1746,42 @@ fn run_internal(open_cpu_window: bool) {
 
     // Log off from Discord on app shutdown so the user appears offline.
     discord::disconnect_discord();
+}
+
+#[cfg(all(test, unix))]
+mod single_instance_busy_tests {
+    use super::should_warn_single_instance_busy;
+    use std::time::{Duration, SystemTime};
+
+    #[test]
+    fn warn_when_no_stamp() {
+        let now = SystemTime::UNIX_EPOCH + Duration::from_secs(1_000);
+        assert!(should_warn_single_instance_busy(
+            None,
+            now,
+            Duration::from_secs(300)
+        ));
+    }
+
+    #[test]
+    fn debug_when_stamp_fresh() {
+        let now = SystemTime::UNIX_EPOCH + Duration::from_secs(1_000);
+        let mtime = now - Duration::from_secs(60);
+        assert!(!should_warn_single_instance_busy(
+            Some(mtime),
+            now,
+            Duration::from_secs(300)
+        ));
+    }
+
+    #[test]
+    fn warn_when_stamp_stale() {
+        let now = SystemTime::UNIX_EPOCH + Duration::from_secs(1_000);
+        let mtime = now - Duration::from_secs(301);
+        assert!(should_warn_single_instance_busy(
+            Some(mtime),
+            now,
+            Duration::from_secs(300)
+        ));
+    }
 }
