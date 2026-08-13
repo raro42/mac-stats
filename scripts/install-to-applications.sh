@@ -19,6 +19,20 @@ if [[ ! -d "$APP/Contents/MacOS" ]]; then
   exit 1
 fi
 
+# Refuse a stale target/release binary (cargo check alone does not refresh it).
+# Overnight ticks hit this when source bumped to 0.1.377+ but Applications stayed on 0.1.376.
+EXPECTED_VER="$(grep -E '^version[[:space:]]*=' "$ROOT/src-tauri/Cargo.toml" | head -1 | sed -E 's/.*"([^"]+)".*/\1/')"
+if [[ -z "$EXPECTED_VER" ]]; then
+  echo "Could not read version from src-tauri/Cargo.toml" >&2
+  exit 1
+fi
+if ! grep -a -F -q "$EXPECTED_VER" "$BIN_SRC"; then
+  echo "Stale release binary: expected embedded version $EXPECTED_VER in $BIN_SRC" >&2
+  echo "Run: cd src-tauri && cargo build --release" >&2
+  exit 1
+fi
+echo "Release binary version check OK ($EXPECTED_VER)"
+
 cp -f "$BIN_SRC" "$APP/Contents/MacOS/mac_stats"
 # LaunchAgent / older docs may refer to mac-stats; keep a symlink after DMG installs (CFBundleExecutable is mac_stats).
 ln -sfn mac_stats "$APP/Contents/MacOS/mac-stats"

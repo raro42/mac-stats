@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.380] - 2026-08-14
+
+### Fixed
+- `install-to-applications.sh` refuses to copy a stale `target/release/mac_stats` when its embedded version does not match `Cargo.toml` — overnight ticks no longer leave `/Applications` on an older binary after source-only bumps.
+
+### Changed
+- Routine `monitors.json` save logs: one DEBUG summary line; per-monitor detail at TRACE (`-vvv`).
+
 ## [0.1.379] - 2026-08-13
 
 ### Changed

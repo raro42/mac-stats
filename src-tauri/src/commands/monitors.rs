@@ -184,7 +184,7 @@ struct MonitorsFile {
 /// Save monitors to disk
 /// Uses try_lock to avoid blocking if locks are busy (non-blocking)
 fn save_monitors() -> Result<(), String> {
-    use tracing::debug;
+    use tracing::{debug, trace};
 
     Config::ensure_monitors_directory()
         .map_err(|e| format!("Failed to create monitors directory: {}", e))?;
@@ -257,16 +257,18 @@ fn save_monitors() -> Result<(), String> {
         persisted_at,
     );
 
-    // Routine checkpoints are common; keep INFO for structural add/remove paths only.
+    // Routine checkpoints are common; summary at DEBUG, per-id detail at TRACE (-vvv).
     debug!(
         "Monitor: Saved {} monitors to disk - Path: {:?}",
         persistent_monitors.len(),
         monitors_path
     );
-    for pm in persistent_monitors {
-        debug!(
+    for pm in &persistent_monitors {
+        trace!(
             "Monitor: Saved monitor - ID: {}, URL: {}, Last check: {:?}",
-            pm.id, pm.url, pm.last_check
+            pm.id,
+            pm.url,
+            pm.last_check
         );
     }
 
