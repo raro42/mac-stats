@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.374] - 2026-08-13
+
+### Fixed
+- Instant overnight / wake-up highlights read morning-surprise **table** rows (`| **v…** | … |`), not only `- **v…**` list bullets — Discord no longer falls back to a generic blurb when tonight’s surprise uses the table format.
+
+### Changed
+- Instant lane for product self-changelog asks (“Your changelog?”, “Latest enhancements of Mac-stats?”, “Your latest changes?”) so they skip Brave/LLM.
+
 ## [0.1.373] - 2026-08-13
 
 ### Changed

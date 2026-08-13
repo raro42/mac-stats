@@ -371,6 +371,10 @@ fn is_overnight_improvements_ask(n: &str) -> bool {
     {
         return true;
     }
+    // Product self-changelog (digester: Brave/LLM for “Your changelog?” / “Latest enhancements”).
+    if is_product_changelog_ask(n) {
+        return true;
+    }
     let asks_improvements = n.contains("improvement")
         || n.contains("improve")
         || n.contains("what shipped")
@@ -392,6 +396,32 @@ fn is_overnight_improvements_ask(n: &str) -> bool {
         || n.contains("every night")
         || n.contains("nightly");
     asks_improvements && overnight_context
+}
+
+/// “Your changelog?” / “Latest enhancements of Mac-stats?” / “Your latest changes?”
+fn is_product_changelog_ask(n: &str) -> bool {
+    if n.chars().count() > 140 {
+        return false;
+    }
+    let about_changes = n.contains("changelog")
+        || n.contains("enhancement")
+        || n.contains("latest change")
+        || n.contains("latests change")
+        || n.contains("recent change")
+        || n.contains("latest version")
+        || ((n.contains("what was changed") || n.contains("what changed"))
+            && (n.contains("version") || n.contains("latest")));
+    if !about_changes {
+        return false;
+    }
+    n.contains("mac-stats")
+        || n.contains("mac stats")
+        || n.contains("your changelog")
+        || n.contains("your latest")
+        || n.contains("your latests")
+        || n.contains("your recent")
+        || (n.contains("your") && n.contains("version"))
+        || (n.contains("enhancement") && (n.contains("mac-stats") || n.contains("mac stats")))
 }
 
 /// “How did you solve this task?” / “how exactly was the last task done?”
@@ -538,22 +568,62 @@ fn load_morning_surprise_highlights(max: usize) -> Vec<String> {
 }
 
 fn parse_morning_surprise_bullets(text: &str, max: usize) -> Vec<String> {
-    let mut bullets: Vec<String> = text
-        .lines()
-        .filter_map(|line| {
-            let t = line.trim();
-            let rest = t.strip_prefix('-')?.trim_start();
+    let mut bullets: Vec<String> = Vec::new();
+    for line in text.lines() {
+        let t = line.trim();
+        // List form: `- **v0.1.370** — …`
+        if let Some(rest) = t.strip_prefix('-').map(str::trim_start) {
             if rest.starts_with("**v") || rest.starts_with("**V") {
-                Some(rest.trim().to_string())
-            } else {
-                None
+                bullets.push(rest.trim().to_string());
+                continue;
             }
-        })
-        .collect();
+        }
+        // Table form (2026-08-14+): `| **v0.1.370** | Startup Disk Cleanup… |`
+        if let Some(row) = parse_morning_surprise_table_row(t) {
+            bullets.push(row);
+        }
+    }
     if bullets.len() > max {
         bullets = bullets.split_off(bullets.len() - max);
     }
     bullets
+}
+
+/// Parse `| **vX.Y.Z** | what shipped |` into `**vX.Y.Z** — what shipped`.
+fn parse_morning_surprise_table_row(line: &str) -> Option<String> {
+    let t = line.trim();
+    if !t.starts_with('|') {
+        return None;
+    }
+    // Skip header / separator rows.
+    let lower = t.to_lowercase();
+    if lower.contains("| version |") || lower.contains("|---") || lower.contains("| ---") {
+        return None;
+    }
+    let cells: Vec<&str> = t
+        .trim_matches('|')
+        .split('|')
+        .map(str::trim)
+        .filter(|c| !c.is_empty())
+        .collect();
+    if cells.len() < 2 {
+        return None;
+    }
+    let ver = cells[0];
+    if !(ver.starts_with("**v") || ver.starts_with("**V") || ver.starts_with('v') || ver.starts_with('V'))
+    {
+        return None;
+    }
+    let what = cells[1].trim();
+    if what.is_empty() {
+        return None;
+    }
+    let ver_fmt = if ver.starts_with("**") {
+        ver.to_string()
+    } else {
+        format!("**{ver}**")
+    };
+    Some(format!("{ver_fmt} — {what}"))
 }
 
 /// Short “what can you do?” asks (avoid a full meta+LLM turn for capability intros).
@@ -1948,6 +2018,51 @@ commit+push, then reply briefly.";
         assert_eq!(got.len(), 2);
         assert!(got[0].contains("0.1.231"), "{got:?}");
         assert!(got[1].contains("0.1.232"), "{got:?}");
+    }
+
+    #[test]
+    fn morning_surprise_table_rows_parse() {
+        let md = "\
+# Morning surprise — 2026-08-14\n\n\
+## Shipped\n\n\
+| Version | What |\n\
+|---------|------|\n\
+| **v0.1.370** | Startup Disk Cleanup off main thread |\n\
+| **v0.1.371** | Top Processes accent CPU bars |\n\
+| **v0.1.372** | Disk Cleanup reclaim accent |\n\
+";
+        let got = parse_morning_surprise_bullets(md, 2);
+        assert_eq!(got.len(), 2, "{got:?}");
+        assert!(got[0].contains("0.1.371") && got[0].contains("Processes"), "{got:?}");
+        assert!(got[1].contains("0.1.372") && got[1].contains("Disk Cleanup"), "{got:?}");
+    }
+
+    #[test]
+    fn product_changelog_asks_are_instant() {
+        for q in [
+            "Latest enhancements of Mac-stats?",
+            "Your latests changes?",
+            "Your changelog? What was changed in your latest version",
+            "Your latest changes?",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    let lower = reply.to_lowercase();
+                    assert!(
+                        lower.contains("mac-stats") || lower.contains("overnight"),
+                        "expected changelog/overnight blurb for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant for {q:?}, got {:?}", other),
+            }
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane("Latest enhancements of React Native?", None),
+                TurnLane::Instant { .. }
+            ),
+            "third-party enhancements must not be instant"
+        );
     }
 
     #[test]

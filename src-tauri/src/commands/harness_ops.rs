@@ -1443,8 +1443,19 @@ fn classify_candidate(
         || q.contains("improvement loop")
         || q.contains("harness loop")
         || q.contains("overnight harness");
-    if asks_improvements
-        && overnight_context
+    let product_changelog = (q.contains("changelog")
+        || q.contains("enhancement")
+        || q.contains("latest change")
+        || q.contains("latests change")
+        || q.contains("recent change")
+        || q.contains("latest version"))
+        && (q.contains("mac-stats")
+            || q.contains("mac stats")
+            || q.contains("your changelog")
+            || q.contains("your latest")
+            || q.contains("your latests")
+            || (q.contains("your") && q.contains("version")));
+    if ((asks_improvements && overnight_context) || product_changelog)
         && !q.contains("redmine")
         && !q.contains("ticket")
         && !q.contains("workflow")
