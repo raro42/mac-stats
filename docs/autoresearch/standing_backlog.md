@@ -11,7 +11,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## P2 — reliability
 
-5. **`debug.log` errors** — First recurring error/panic in the last 24h that is product-owned. Brave health-ping quota burn mitigated in **v0.1.272**. Website monitor DNS/connect failures classify to short reasons in **v0.1.375** (UI + log).
+5. **`debug.log` errors** — First recurring error/panic in the last 24h that is product-owned. Brave health-ping quota burn mitigated in **v0.1.272**. Website monitor DNS/connect failures classify to short reasons in **v0.1.375** (UI + log). DOWN recheck backoff (DNS ≥5 min) in **v0.1.376**.
 6. **Discord / LaunchAgent uptime** — Confirm process + Discord Ready after any install; fix silent downtime causes.
 
 ## P3 — sibling ports

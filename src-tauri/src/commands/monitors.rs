@@ -19,16 +19,42 @@ fn clamp_monitor_check_interval_secs(stored: u64) -> u64 {
     stored.max(MIN_MONITOR_CHECK_INTERVAL_SECS)
 }
 
+/// Minimum background gap while a monitor is already DOWN (reduces DNS thrash + log spam).
+const DOWN_BACKOFF_SECS: u64 = 180;
+/// Longer gap when the last failure was DNS (hostname usually stays broken for minutes).
+const DNS_DOWN_BACKOFF_SECS: u64 = 300;
+
+/// Effective background interval: honor stored cadence when UP; stretch while DOWN.
+fn background_interval_secs(
+    stored_interval_secs: Option<u64>,
+    last_status: Option<&crate::monitors::MonitorStatus>,
+) -> u64 {
+    let base = stored_interval_secs
+        .map(clamp_monitor_check_interval_secs)
+        .unwrap_or(60);
+    match last_status {
+        Some(s) if !s.is_up => {
+            let err = s.error.as_deref().unwrap_or("");
+            if err == "DNS lookup failed" {
+                base.max(DNS_DOWN_BACKOFF_SECS)
+            } else {
+                base.max(DOWN_BACKOFF_SECS)
+            }
+        }
+        _ => base,
+    }
+}
+
 /// Whether `run_due_monitor_checks` should invoke `check_monitor` for this monitor.
 /// `stored_interval_secs` is `None` when the monitor id has no config row (treat as 60s).
+/// Manual `check_monitor` from the UI is unchanged (always runs when requested).
 fn is_monitor_due_for_background(
     now: chrono::DateTime<chrono::Utc>,
     last_check: Option<chrono::DateTime<chrono::Utc>>,
     stored_interval_secs: Option<u64>,
+    last_status: Option<&crate::monitors::MonitorStatus>,
 ) -> bool {
-    let interval_secs = stored_interval_secs
-        .map(clamp_monitor_check_interval_secs)
-        .unwrap_or(60) as i64;
+    let interval_secs = background_interval_secs(stored_interval_secs, last_status) as i64;
     match last_check {
         None => true,
         Some(t) => (now - t).num_seconds() >= interval_secs,
@@ -315,8 +341,10 @@ pub fn run_due_monitor_checks() {
         .keys()
         .filter(|id| {
             let stored = configs.get(*id).map(|c| c.check_interval_secs);
-            let last = stats.get(*id).and_then(|s| s.last_check);
-            is_monitor_due_for_background(now, last, stored)
+            let st = stats.get(*id);
+            let last = st.and_then(|s| s.last_check);
+            let last_status = st.and_then(|s| s.last_status.as_ref());
+            is_monitor_due_for_background(now, last, stored, last_status)
         })
         .cloned()
         .collect();
@@ -684,8 +712,32 @@ pub fn get_monitor_status(
 
 #[cfg(test)]
 mod monitor_interval_tests {
-    use super::{clamp_monitor_check_interval_secs, is_monitor_due_for_background};
+    use super::{
+        background_interval_secs, clamp_monitor_check_interval_secs, is_monitor_due_for_background,
+        DNS_DOWN_BACKOFF_SECS, DOWN_BACKOFF_SECS,
+    };
     use chrono::{TimeZone, Utc};
+    use crate::monitors::MonitorStatus;
+
+    fn down_status(error: &str) -> MonitorStatus {
+        MonitorStatus {
+            is_up: false,
+            response_time_ms: Some(5),
+            error: Some(error.to_string()),
+            checked_at: Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap(),
+            extra: Default::default(),
+        }
+    }
+
+    fn up_status() -> MonitorStatus {
+        MonitorStatus {
+            is_up: true,
+            response_time_ms: Some(40),
+            error: None,
+            checked_at: Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap(),
+            extra: Default::default(),
+        }
+    }
 
     #[test]
     fn clamp_zero_becomes_one() {
@@ -703,39 +755,101 @@ mod monitor_interval_tests {
     }
 
     #[test]
+    fn background_interval_up_uses_stored() {
+        assert_eq!(
+            background_interval_secs(Some(60), Some(&up_status())),
+            60
+        );
+        assert_eq!(background_interval_secs(Some(60), None), 60);
+    }
+
+    #[test]
+    fn background_interval_dns_down_stretches() {
+        let st = down_status("DNS lookup failed");
+        assert_eq!(
+            background_interval_secs(Some(60), Some(&st)),
+            DNS_DOWN_BACKOFF_SECS
+        );
+    }
+
+    #[test]
+    fn background_interval_other_down_stretches() {
+        let st = down_status("Connection timed out");
+        assert_eq!(
+            background_interval_secs(Some(60), Some(&st)),
+            DOWN_BACKOFF_SECS
+        );
+    }
+
+    #[test]
     fn due_never_checked() {
         let now = Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap();
-        assert!(is_monitor_due_for_background(now, None, Some(60)));
+        assert!(is_monitor_due_for_background(now, None, Some(60), None));
     }
 
     #[test]
     fn due_elapsed_equals_interval() {
         let now = Utc.with_ymd_and_hms(2026, 3, 22, 12, 1, 0).unwrap();
         let last = Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap();
-        assert!(is_monitor_due_for_background(now, Some(last), Some(60)));
+        assert!(is_monitor_due_for_background(
+            now,
+            Some(last),
+            Some(60),
+            Some(&up_status())
+        ));
     }
 
     #[test]
     fn not_due_elapsed_below_interval() {
         let now = Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 30).unwrap();
         let last = Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap();
-        assert!(!is_monitor_due_for_background(now, Some(last), Some(60)));
+        assert!(!is_monitor_due_for_background(
+            now,
+            Some(last),
+            Some(60),
+            Some(&up_status())
+        ));
+    }
+
+    #[test]
+    fn dns_down_not_due_at_sixty_seconds() {
+        let now = Utc.with_ymd_and_hms(2026, 3, 22, 12, 1, 0).unwrap();
+        let last = Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap();
+        let st = down_status("DNS lookup failed");
+        assert!(!is_monitor_due_for_background(
+            now,
+            Some(last),
+            Some(60),
+            Some(&st)
+        ));
+        let later = Utc.with_ymd_and_hms(2026, 3, 22, 12, 5, 0).unwrap();
+        assert!(is_monitor_due_for_background(
+            later,
+            Some(last),
+            Some(60),
+            Some(&st)
+        ));
     }
 
     #[test]
     fn missing_config_interval_defaults_sixty() {
         let now = Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 30).unwrap();
         let last = Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap();
-        assert!(!is_monitor_due_for_background(now, Some(last), None));
+        assert!(!is_monitor_due_for_background(now, Some(last), None, None));
         let now2 = Utc.with_ymd_and_hms(2026, 3, 22, 12, 1, 0).unwrap();
-        assert!(is_monitor_due_for_background(now2, Some(last), None));
+        assert!(is_monitor_due_for_background(now2, Some(last), None, None));
     }
 
     #[test]
     fn stored_interval_zero_clamps_so_not_due_same_second() {
         let now = Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap();
         let last = Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap();
-        assert!(!is_monitor_due_for_background(now, Some(last), Some(0)));
+        assert!(!is_monitor_due_for_background(
+            now,
+            Some(last),
+            Some(0),
+            None
+        ));
     }
 
     /// docs/022_feature_review_plan.md §F10: guard against removing the background wake loop.

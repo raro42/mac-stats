@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.376] - 2026-08-13
+
+### Changed
+- Background website monitors stretch recheck interval while DOWN (DNS ≥5 min, other failures ≥3 min) so dead hostnames do not thrash DNS every minute. Manual Refresh in External / Monitors still checks immediately.
+
 ## [0.1.375] - 2026-08-13
 
 ### Changed
