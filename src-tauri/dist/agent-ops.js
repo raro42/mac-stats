@@ -2014,6 +2014,30 @@ function escapeHtml(s) {
               document.querySelector('#process-list .process-row');
             row?.focus?.();
           }, 160);
+        } else if (
+          key === 'disk-cleanup' ||
+          key === 'disk_cleanup' ||
+          key === 'cleanup' ||
+          key === 'disk'
+        ) {
+          applyOpsCollapsed(true);
+          localStorage.setItem('disk_cleanup_collapsed', 'false');
+          const diskSection = document.querySelector('.disk-cleanup-section');
+          const diskContent = document.getElementById('disk-cleanup-content');
+          const isCollapsed =
+            diskSection?.classList.contains('collapsed') ||
+            diskContent?.classList.contains('collapsed');
+          if (isCollapsed) {
+            document.getElementById('icon-disk-cleanup')?.click();
+          } else if (typeof window.refreshDiskCleanupPanel === 'function') {
+            void window.refreshDiskCleanupPanel();
+          }
+          setTimeout(() => {
+            document
+              .querySelector('.disk-cleanup-section')
+              ?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+            document.getElementById('disk-cleanup-run-btn')?.focus?.();
+          }, 160);
         }
       } catch (_) {
         /* ignore — normal launches omit the flag */

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.372] - 2026-08-13
+
+### Changed
+- Design review: Disk Cleanup — reclaim meta accent, scope/item hover + focus rings, soft-delete glass row, dashed empty state, Clean now press feedback (`feature-disk-cleanup`).
+- Open Disk Cleanup for capture via `MAC_STATS_OPEN_SECTION=disk-cleanup` (aliases: `disk`, `cleanup`, `disk_cleanup`).
+
 ## [0.1.371] - 2026-08-13
 
 ### Changed

@@ -1083,6 +1083,34 @@ textarea.ops-agent-editor.is-dirty {
   border-radius: 10px;
   border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
   background: color-mix(in srgb, currentColor 3.5%, transparent);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.disk-cleanup-meta-card:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+  transform: translateY(-1px);
+}
+
+.disk-cleanup-meta-card:focus-within {
+  outline: none;
+  border-color: color-mix(in srgb, #0a84ff 36%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
+}
+
+.disk-cleanup-meta-card.has-reclaim {
+  border-color: color-mix(in srgb, #ff9f0a 34%, transparent);
+  background: color-mix(in srgb, #ff9f0a 8%, transparent);
+}
+
+.disk-cleanup-meta-card.has-reclaim .disk-cleanup-meta-value {
+  color: color-mix(in srgb, #ff9f0a 55%, currentColor);
+  font-variant-numeric: tabular-nums;
 }
 
 .disk-cleanup-meta-label {
@@ -1107,9 +1135,30 @@ textarea.ops-agent-editor.is-dirty {
   margin-bottom: 10px;
 }
 
+.disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, transparent);
+}
+
 .disk-cleanup-toolbar .disk-cleanup-primary {
   background: color-mix(in srgb, #0a84ff 14%, transparent);
   border-color: color-mix(in srgb, #0a84ff 30%, transparent);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+
+.disk-cleanup-toolbar .disk-cleanup-primary:hover {
+  background: color-mix(in srgb, #0a84ff 22%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 42%, transparent);
+}
+
+.disk-cleanup-toolbar .disk-cleanup-primary:active {
+  transform: scale(0.98);
+}
+
+.disk-cleanup-toolbar .disk-cleanup-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .disk-cleanup-list {
@@ -1126,11 +1175,24 @@ textarea.ops-agent-editor.is-dirty {
   border-radius: 10px;
   border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
   background: color-mix(in srgb, currentColor 3%, transparent);
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.disk-cleanup-item:hover {
+  background: color-mix(in srgb, currentColor 5.5%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  box-shadow: 0 4px 14px color-mix(in srgb, #000 7%, transparent);
 }
 
 .disk-cleanup-item.has-reclaim {
   border-color: color-mix(in srgb, #ff9f0a 28%, transparent);
   background: color-mix(in srgb, #ff9f0a 6%, transparent);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff9f0a 70%, transparent);
+}
+
+.disk-cleanup-item.has-reclaim:hover {
+  background: color-mix(in srgb, #ff9f0a 10%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 38%, transparent);
 }
 
 .disk-cleanup-item-head {
@@ -1179,9 +1241,13 @@ textarea.ops-agent-editor.is-dirty {
 
 .disk-cleanup-empty {
   font-size: 13px;
-  opacity: 0.7;
+  opacity: 0.75;
   font-style: italic;
-  padding: 8px 2px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 3%, transparent);
+  list-style: none;
 }
 
 .disk-cleanup-scopes {
@@ -1200,6 +1266,17 @@ textarea.ops-agent-editor.is-dirty {
   border-radius: 10px;
   border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
   background: color-mix(in srgb, currentColor 3%, transparent);
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.disk-cleanup-scope-row:hover {
+  background: color-mix(in srgb, currentColor 5.5%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.disk-cleanup-scope-row:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 34%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, transparent);
 }
 
 .disk-cleanup-scope-row.is-disabled {
@@ -1213,6 +1290,13 @@ textarea.ops-agent-editor.is-dirty {
 .disk-cleanup-scope-title {
   font-size: 13px;
   font-weight: 600;
+}
+
+.disk-cleanup-scope-kind {
+  opacity: 0.55;
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 0.02em;
 }
 
 .disk-cleanup-scope-path {
@@ -1233,6 +1317,13 @@ textarea.ops-agent-editor.is-dirty {
   color: inherit;
 }
 
+.disk-cleanup-scope-row input[type="number"]:focus-visible,
+.disk-cleanup-add-scope input:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, #0a84ff 40%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #0a84ff 18%, transparent);
+}
+
 .disk-cleanup-scope-row label.disk-cleanup-scope-rec {
   font-size: 11px;
   opacity: 0.8;
@@ -1249,6 +1340,17 @@ textarea.ops-agent-editor.is-dirty {
   background: transparent;
   color: inherit;
   cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.disk-cleanup-scope-remove:hover {
+  background: color-mix(in srgb, #ff453a 12%, transparent);
+  border-color: color-mix(in srgb, #ff453a 32%, transparent);
+}
+
+.disk-cleanup-scope-remove:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, transparent);
 }
 
 .disk-cleanup-add-scope {
@@ -1526,7 +1628,6 @@ textarea.ops-agent-editor.is-dirty {
 
 .perplexity-setup-note:not([hidden]) {
   color: color-mix(in srgb, #c44 70%, currentColor);
-}
   font-size: 11px;
   opacity: 0.55;
 }
@@ -1536,9 +1637,24 @@ textarea.ops-agent-editor.is-dirty {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  margin: 4px 0 2px;
+  margin: 4px 0 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3%, transparent);
   cursor: pointer;
   user-select: none;
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.disk-cleanup-soft-delete:hover {
+  background: color-mix(in srgb, currentColor 5.5%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.disk-cleanup-soft-delete:focus-within {
+  border-color: color-mix(in srgb, #0a84ff 34%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, transparent);
 }
 
 .disk-cleanup-soft-delete input {

@@ -4389,6 +4389,10 @@ async function refreshDiskCleanupPanel() {
         reclaimBytes > 0
           ? `${formatDiskBytes(reclaimBytes)} · ${reclaimFiles} item(s)`
           : 'Nothing pending';
+      reclaimEl.closest('.disk-cleanup-meta-card')?.classList.toggle(
+        'has-reclaim',
+        reclaimBytes > 0
+      );
     }
     if (nextEl) {
       nextEl.textContent = status.nextRunLabel || '—';
@@ -4426,7 +4430,7 @@ async function refreshDiskCleanupPanel() {
           return `<div class="disk-cleanup-scope-row${s.enabled ? '' : ' is-disabled'}" data-scope-idx="${idx}">
             <input type="checkbox" data-scope-enabled="${idx}" ${s.enabled ? 'checked' : ''} aria-label="Enable ${s.label}" />
             <div class="disk-cleanup-scope-main">
-              <div class="disk-cleanup-scope-title">${s.label} <span style="opacity:.55;font-weight:400">(${s.kind})</span></div>
+              <div class="disk-cleanup-scope-title">${s.label} <span class="disk-cleanup-scope-kind">(${s.kind})</span></div>
               <div class="disk-cleanup-scope-path" title="${pathHint}">${pathHint}</div>
             </div>
             <input type="number" min="1" max="3650" data-scope-days="${idx}" value="${ageVal}" ${ageDisabled} title="Max age (days)" placeholder="days" />
@@ -4514,6 +4518,8 @@ async function refreshDiskCleanupPanel() {
     return null;
   }
 }
+
+window.refreshDiskCleanupPanel = refreshDiskCleanupPanel;
 
 function readDiskCleanupScopesFromDom() {
   const scopes = (window.__diskCleanupScopes || []).map((s) => ({ ...s }));
