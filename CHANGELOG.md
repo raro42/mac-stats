@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.383] - 2026-08-14
+
+### Changed
+- External / Monitors summary names DOWN hosts with short failure reasons (e.g. `1 / 2 up · DOWN: econsultants.es (DNS)`) — tooltip lists all; all-up still shows average latency.
+
 ## [0.1.382] - 2026-08-14
 
 ### Changed

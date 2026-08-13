@@ -2478,6 +2478,40 @@ function applyMonitorsSummaryState({ anyDown, allUp, empty }) {
   summary.classList.toggle('is-empty', !!empty);
 }
 
+/** Short host label for Monitors summary (name preferred, else hostname). */
+function shortMonitorHostLabel(name, url) {
+  const raw = (name && String(name).trim()) || '';
+  if (raw && !raw.startsWith('monitor_')) {
+    return raw.replace(/^www\./i, '');
+  }
+  try {
+    const host = new URL(url || '').hostname;
+    if (host) return host.replace(/^www\./i, '');
+  } catch (_) {
+    /* ignore */
+  }
+  const fallback = (url || name || 'site').replace(/^https?:\/\//i, '');
+  return fallback.slice(0, 40);
+}
+
+/** Prefer classified short reasons (DNS / timeout / TLS / …) for summary chips. */
+function shortMonitorFailReason(error) {
+  if (!error) return null;
+  const e = String(error).trim();
+  if (!e) return null;
+  const head = e.match(
+    /^(DNS|Timeout|TLS|Refused|Unreachable|Connect)(\s+[^\n|;,]{0,36})?/i
+  );
+  if (head) return head[0].replace(/\s+/g, ' ').trim();
+  const lower = e.toLowerCase();
+  for (const k of ['dns', 'timeout', 'tls', 'refused', 'unreachable', 'connect']) {
+    if (lower.includes(k)) {
+      return k === 'dns' ? 'DNS' : k.charAt(0).toUpperCase() + k.slice(1);
+    }
+  }
+  return e.length > 32 ? `${e.slice(0, 29)}…` : e;
+}
+
 async function updateMonitorsSummary() {
   const summaryText = document.getElementById('monitors-summary-text');
   if (!summaryText) return;
@@ -2487,6 +2521,7 @@ async function updateMonitorsSummary() {
     
     if (monitorIds.length === 0) {
       summaryText.textContent = 'No monitors configured';
+      summaryText.removeAttribute('title');
       applyMonitorsSummaryState({ anyDown: false, allUp: false, empty: true });
       updateMonitorsIconStatus({ anyDown: false, allUp: false, upCount: 0, totalCount: 0 });
       return;
@@ -2497,6 +2532,7 @@ async function updateMonitorsSummary() {
     let checkedCount = 0;
     let totalResponseTime = 0;
     let responseTimeCount = 0;
+    const downHints = [];
 
     // Use cached status from the background monitor thread — never live-probe here.
     // Live check_monitor waits on HTTP (up to timeout_secs) and freezes window open.
@@ -2506,8 +2542,27 @@ async function updateMonitorsSummary() {
         if (!status) continue;
         monitorStatusCache.set(monitorId, status);
         checkedCount++;
-        if (status.is_up) upCount++;
-        else downCount++;
+        if (status.is_up) {
+          upCount++;
+        } else {
+          downCount++;
+          const pending =
+            !status.response_time_ms || String(status.error || '').includes('Waiting');
+          if (!pending) {
+            let name = monitorId;
+            let url = '';
+            try {
+              const details = await invoke('get_monitor_details', { monitorId });
+              if (details?.name) name = details.name;
+              if (details?.url) url = details.url;
+            } catch (_) {
+              /* keep id */
+            }
+            const host = shortMonitorHostLabel(name, url);
+            const reason = shortMonitorFailReason(status.error);
+            downHints.push(reason ? `${host} (${reason})` : host);
+          }
+        }
         if (status.response_time_ms) {
           totalResponseTime += status.response_time_ms;
           responseTimeCount++;
@@ -2521,8 +2576,17 @@ async function updateMonitorsSummary() {
       ? Math.round(totalResponseTime / responseTimeCount)
       : 0;
 
-    summaryText.textContent = 
-      `${upCount} / ${monitorIds.length} sites up · Avg ${avgResponseTime} ms`;
+    if (downHints.length > 0) {
+      const shown = downHints.slice(0, 2);
+      const more = downHints.length > 2 ? ` +${downHints.length - 2}` : '';
+      summaryText.textContent =
+        `${upCount} / ${monitorIds.length} up · DOWN: ${shown.join(', ')}${more}`;
+      summaryText.title = downHints.join('; ');
+    } else {
+      summaryText.textContent =
+        `${upCount} / ${monitorIds.length} sites up · Avg ${avgResponseTime} ms`;
+      summaryText.removeAttribute('title');
+    }
     
     // Green only when every configured monitor has checked in and is up.
     // Red as soon as any checked monitor is down (pending checks stay neutral).
