@@ -579,19 +579,6 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
         e.to_string()
     })?;
 
-    if result.is_up {
-        let ms = result.response_time_ms.unwrap_or(0);
-        debug!("Monitor: {} UP {}ms", monitor_url, ms);
-    } else {
-        let err = result.error.as_deref().unwrap_or("error");
-        debug!(
-            "Monitor: {} DOWN {}ms {}",
-            monitor_url,
-            result.response_time_ms.unwrap_or(0),
-            err
-        );
-    }
-
     let now = Utc::now();
     let (prev_status, last_disk) = {
         let prev_status = get_monitor_stats()
@@ -604,6 +591,31 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
             .and_then(|m| m.get(&monitor_id).copied());
         (prev_status, last_disk)
     };
+
+    // DEBUG on first check or up/down/error flip; unchanged rechecks stay at TRACE
+    // (pairs with disk persist throttle — chronic DNS hosts no longer flood debug.log).
+    let outcome_changed = monitor_outcome_changed(prev_status.as_ref(), &result);
+    if result.is_up {
+        let ms = result.response_time_ms.unwrap_or(0);
+        if outcome_changed {
+            debug!("Monitor: {} UP {}ms", monitor_url, ms);
+        } else {
+            trace!("Monitor: {} UP {}ms (unchanged)", monitor_url, ms);
+        }
+    } else {
+        let err = result.error.as_deref().unwrap_or("error");
+        let ms = result.response_time_ms.unwrap_or(0);
+        if outcome_changed {
+            debug!("Monitor: {} DOWN {}ms {}", monitor_url, ms, err);
+        } else {
+            trace!(
+                "Monitor: {} DOWN {}ms {} (unchanged)",
+                monitor_url,
+                ms,
+                err
+            );
+        }
+    }
     {
         if let Ok(mut stats) = get_monitor_stats().lock() {
             stats.insert(
@@ -998,6 +1010,16 @@ mod monitor_interval_tests {
     #[test]
     fn outcome_detects_up_to_down() {
         assert!(monitor_outcome_changed(Some(&up_status()), &down_status("DNS lookup failed")));
+    }
+
+    #[test]
+    fn outcome_same_down_reason_unchanged() {
+        // Unchanged DOWN rechecks must not DEBUG (check_monitor uses this gate).
+        let a = down_status("DNS lookup failed");
+        let mut b = down_status("DNS lookup failed");
+        b.response_time_ms = Some(50);
+        assert!(!monitor_outcome_changed(Some(&a), &b));
+        assert!(monitor_outcome_changed(None, &a));
     }
 
     #[test]

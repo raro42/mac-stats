@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.379] - 2026-08-13
+
+### Changed
+- Website monitor UP/DOWN `debug.log` lines emit only on first check or up/down/error change; unchanged rechecks stay at TRACE — less noise for chronic DNS hosts after backoff.
+
 ## [0.1.378] - 2026-08-13
 
 ### Changed
