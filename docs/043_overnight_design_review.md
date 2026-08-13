@@ -30,6 +30,7 @@ Real UI ships from `src-tauri/dist/themes/<theme>/cpu.html` + `src/agent-ops.{js
 1. `python3 scripts/overnight_design_review.py` → pick the recommended surface.
 2. Ensure mac-stats is running; open the CPU window to that view.
    - Agent Ops: `MAC_STATS_OPEN_SECTION=agent-ops` with `--cpu` (or one-shot `openUiSection` in `~/.mac-stats/config.json`).
+   - AI Chat: `MAC_STATS_OPEN_SECTION=ai-chat` (aliases: `ollama`, `chat`).
 3. Capture **window-only** PNG into `docs/screens/<feature-….png>` (`screencapture -l`, not full desktop).
 4. Pick **one** visible improvement: spacing, empty state, hierarchy, contrast, copy, affordance — make the view nicer or clearer.
 5. Edit source under `src/` (and theme files as needed), `./scripts/sync-dist.sh`.

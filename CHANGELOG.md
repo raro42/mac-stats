@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.370] - 2026-08-13
+
+### Fixed
+- Startup no longer blocks the main thread on Disk Cleanup scans (Downloads/Trash/Temp). Menu bar and CPU window appear while cleanup runs in the background.
+
+### Changed
+- Design review: AI Chat composer glass bar (focus-within) + clearer user/assistant message accents (`feature-ai-chat` polish grace; window capture still needs Screen Recording TCC).
+- Open AI Chat for capture via `MAC_STATS_OPEN_SECTION=ai-chat` (or `ollama` / `chat`; one-shot `openUiSection` in config).
+
 ## [0.1.369] - 2026-08-12
 
 ### Fixed

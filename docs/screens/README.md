@@ -46,6 +46,7 @@ Also linked from the [project README](../../README.md#demo-video).
 
 ## Refresh log
 
+- **2026-08-13:** AI Chat composer polish (v0.1.370); `feature-ai-chat.png` recapture deferred (Screen Recording TCC). Open AI Chat with `MAC_STATS_OPEN_SECTION=ai-chat`.
 - **2026-08-12:** Recaptured `feature-agent-ops.png` and `feature-cpu-metrics.png` (window-only, ≥30s warm-up). Overnight harness now spawns the Cursor `agent` CLI (print-only ticks were a quiet failure). Open Agent Ops for capture with `MAC_STATS_OPEN_SECTION=agent-ops`.
 - **2026-08-05:** Added `feature-monitors.png` (window-only) for External / Monitors (up/down, latency, history bars).
 - **2026-08-05:** Added `feature-disk-cleanup.png` (window-only) for configurable cleanup scopes (Trash / Downloads / Temp / custom paths) — v0.1.355+.

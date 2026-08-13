@@ -2372,6 +2372,18 @@ body {
 .chat-input-container {
   display: flex;
   gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.chat-input-container:focus-within {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, var(--hairline));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, transparent);
 }
 
 #chat-input {

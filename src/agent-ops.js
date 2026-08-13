@@ -1973,6 +1973,22 @@ function escapeHtml(s) {
         if (key === 'agent-ops' || key === 'agent_ops' || key === 'ops') {
           applyOpsCollapsed(false);
           selectOpsTab('runs');
+        } else if (
+          key === 'ai-chat' ||
+          key === 'ai_chat' ||
+          key === 'ollama' ||
+          key === 'chat'
+        ) {
+          applyOpsCollapsed(true);
+          const ollamaSection = document.querySelector('.ollama-section');
+          const themeCollapsed =
+            ollamaSection?.classList.contains('collapsed') ||
+            localStorage.getItem('ollama_collapsed') === 'true';
+          if (themeCollapsed) {
+            document.getElementById('ollama-header')?.click();
+          }
+          ollamaSection?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+          setTimeout(() => document.getElementById('chat-input')?.focus(), 120);
         }
       } catch (_) {
         /* ignore — normal launches omit the flag */

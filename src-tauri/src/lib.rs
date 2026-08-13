@@ -410,8 +410,11 @@ fn run_internal(open_cpu_window: bool) {
             // Kill orphaned headless Chrome processes from previous runs or races (keeps browser usage lean)
             crate::browser_agent::kill_orphaned_browser_processes();
 
-            // Disk cleanup (screenshots/PDFs/sessions/runs/browser downloads/logs) — record last/next run.
-            let _ = crate::commands::disk_cleanup::run_now("startup");
+            // Disk cleanup off the main thread — Trash/Downloads/Temp scans can take minutes and
+            // previously blocked menu bar + CPU window creation (Tauri setup hangs in collect_aged_files).
+            std::thread::spawn(|| {
+                let _ = crate::commands::disk_cleanup::run_now("startup");
+            });
 
             // Load persistent monitors on startup
             use crate::commands::monitors;
