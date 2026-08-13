@@ -46,6 +46,7 @@ Also linked from the [project README](../../README.md#demo-video).
 
 ## Refresh log
 
+- **2026-08-13:** Monitors summary up/down accents + row latency polish (v0.1.373); open with `MAC_STATS_OPEN_SECTION=monitors`. Recapture of `feature-monitors.png` deferred if Screen Recording TCC blocks.
 - **2026-08-13:** Disk Cleanup reclaim accent + scope/item hover (v0.1.372); open with `MAC_STATS_OPEN_SECTION=disk-cleanup`. Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC blocks.
 - **2026-08-13:** Top Processes accent bars + pin header (v0.1.371); open with `MAC_STATS_OPEN_SECTION=processes`. Recapture of `feature-processes.png` deferred if Screen Recording TCC blocks.
 - **2026-08-13:** AI Chat composer polish (v0.1.370); `feature-ai-chat.png` recapture deferred (Screen Recording TCC). Open AI Chat with `MAC_STATS_OPEN_SECTION=ai-chat`.

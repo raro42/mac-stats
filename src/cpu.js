@@ -2470,6 +2470,14 @@ async function refreshMonitorsSettingsList() {
   }
 }
 
+function applyMonitorsSummaryState({ anyDown, allUp, empty }) {
+  const summary = document.getElementById('monitors-summary');
+  if (!summary) return;
+  summary.classList.toggle('has-down', !!anyDown);
+  summary.classList.toggle('is-all-up', !!allUp && !empty);
+  summary.classList.toggle('is-empty', !!empty);
+}
+
 async function updateMonitorsSummary() {
   const summaryText = document.getElementById('monitors-summary-text');
   if (!summaryText) return;
@@ -2479,6 +2487,7 @@ async function updateMonitorsSummary() {
     
     if (monitorIds.length === 0) {
       summaryText.textContent = 'No monitors configured';
+      applyMonitorsSummaryState({ anyDown: false, allUp: false, empty: true });
       updateMonitorsIconStatus({ anyDown: false, allUp: false, upCount: 0, totalCount: 0 });
       return;
     }
@@ -2519,9 +2528,11 @@ async function updateMonitorsSummary() {
     // Red as soon as any checked monitor is down (pending checks stay neutral).
     const anyDown = downCount > 0;
     const allUp = checkedCount > 0 && downCount === 0 && checkedCount === monitorIds.length;
+    applyMonitorsSummaryState({ anyDown, allUp, empty: false });
     updateMonitorsIconStatus({ anyDown, allUp, upCount, totalCount: monitorIds.length });
   } catch (err) {
     console.error('Failed to update monitors summary:', err);
+    applyMonitorsSummaryState({ anyDown: false, allUp: false, empty: false });
     updateMonitorsIconStatus({ anyDown: false, allUp: false, upCount: 0, totalCount: 0 });
   }
 }
@@ -2662,10 +2673,56 @@ function updateMonitorsHeight() {
   monitorsList.style.padding = '';
 }
 
+function fillMonitorInfo(info, monitorUrl, status) {
+  const responseTimeText = status.response_time_ms ? `${status.response_time_ms}ms` : '--';
+  const pending =
+    !status.is_up &&
+    (!status.response_time_ms || String(status.error || '').includes('Waiting'));
+  info.replaceChildren();
+
+  const primary = document.createElement('div');
+  primary.className = 'monitor-info-primary';
+
+  const urlEl = document.createElement('span');
+  urlEl.className = 'monitor-url';
+  urlEl.textContent = monitorUrl;
+
+  const latencyEl = document.createElement('span');
+  latencyEl.className = 'monitor-latency';
+  latencyEl.textContent = responseTimeText;
+
+  primary.appendChild(urlEl);
+  primary.appendChild(latencyEl);
+  info.appendChild(primary);
+
+  if (status.error && !pending) {
+    const errEl = document.createElement('div');
+    errEl.className = 'monitor-error';
+    errEl.textContent = status.error;
+    info.appendChild(errEl);
+  } else if (pending && status.error) {
+    const errEl = document.createElement('div');
+    errEl.className = 'monitor-error';
+    errEl.textContent = status.error;
+    info.appendChild(errEl);
+  }
+}
+
+function applyMonitorItemState(item, status) {
+  const pending =
+    !status.is_up &&
+    (!status.response_time_ms || String(status.error || '').includes('Waiting'));
+  item.classList.toggle('is-down', !status.is_up && !pending);
+  item.classList.toggle('is-pending', pending);
+}
+
 function createMonitorItem(monitorId, monitorUrl, status) {
   const item = document.createElement('div');
   item.className = 'monitor-item';
   item.setAttribute('data-monitor-id', monitorId);
+  item.tabIndex = 0;
+  item.setAttribute('role', 'listitem');
+  applyMonitorItemState(item, status);
   
   // Create header container for status indicator and info
   const header = document.createElement('div');
@@ -2679,13 +2736,7 @@ function createMonitorItem(monitorId, monitorUrl, status) {
 
   const info = document.createElement('div');
   info.className = 'monitor-info';
-  
-  // Format: "URL · 240ms" (matching summary format)
-  const responseTimeText = status.response_time_ms ? `${status.response_time_ms}ms` : '--';
-  const errorText = status.error ? ` · ${status.error}` : '';
-  info.innerHTML = `
-    <div>${monitorUrl} · ${responseTimeText}${errorText}</div>
-  `;
+  fillMonitorInfo(info, monitorUrl, status);
 
   header.appendChild(statusIndicator);
   header.appendChild(info);
@@ -2703,6 +2754,10 @@ function createMonitorItem(monitorId, monitorUrl, status) {
 }
 
 function updateMonitorItem(item, monitorId, monitorUrl, status) {
+  applyMonitorItemState(item, status);
+  if (!item.hasAttribute('tabindex')) item.tabIndex = 0;
+  if (!item.getAttribute('role')) item.setAttribute('role', 'listitem');
+
   // Update status indicator
   const statusIndicator = item.querySelector('.status-indicator');
   if (statusIndicator) {
@@ -2716,14 +2771,7 @@ function updateMonitorItem(item, monitorId, monitorUrl, status) {
   // Update info text
   const info = item.querySelector('.monitor-info');
   if (info) {
-    const responseTimeText = status.response_time_ms ? `${status.response_time_ms}ms` : '--';
-    const errorText = status.error ? ` · ${status.error}` : '';
-    const infoDiv = info.querySelector('div');
-    if (infoDiv) {
-      infoDiv.textContent = `${monitorUrl} · ${responseTimeText}${errorText}`;
-    } else {
-      info.innerHTML = `<div>${monitorUrl} · ${responseTimeText}${errorText}</div>`;
-    }
+    fillMonitorInfo(info, monitorUrl, status);
   }
   
   // Update history visualization

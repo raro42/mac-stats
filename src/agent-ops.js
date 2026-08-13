@@ -2038,6 +2038,32 @@ function escapeHtml(s) {
               ?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
             document.getElementById('disk-cleanup-run-btn')?.focus?.();
           }, 160);
+        } else if (
+          key === 'monitors' ||
+          key === 'monitor' ||
+          key === 'external' ||
+          key === 'external-monitors' ||
+          key === 'external_monitors'
+        ) {
+          applyOpsCollapsed(true);
+          localStorage.setItem('monitors_collapsed', 'false');
+          const monitorsSection = document.querySelector('.monitors-section');
+          const monitorsContent = document.getElementById('monitors-content');
+          const isCollapsed =
+            monitorsSection?.classList.contains('collapsed') ||
+            monitorsContent?.classList.contains('collapsed');
+          if (isCollapsed) {
+            document.getElementById('icon-monitors')?.click();
+          }
+          setTimeout(() => {
+            document
+              .querySelector('.monitors-section')
+              ?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+            const row =
+              document.querySelector('#monitors-list .monitor-item[tabindex="0"]') ||
+              document.querySelector('#monitors-list .monitor-item');
+            (row || document.getElementById('monitors-menu-btn'))?.focus?.();
+          }, 160);
         }
       } catch (_) {
         /* ignore — normal launches omit the flag */

@@ -1064,6 +1064,146 @@ textarea.ops-agent-editor.is-dirty {
   border-style: dashed;
 }
 
+/* External / Monitors — design-review polish (overlays theme cpu.css) */
+.monitors-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 4px 0 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  font-size: 13px;
+  font-weight: 520;
+  line-height: 1.35;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.monitors-summary:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+}
+
+.monitors-summary.has-down {
+  border-color: color-mix(in srgb, #ff3b30 34%, transparent);
+  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  color: color-mix(in srgb, #ff3b30 45%, currentColor);
+}
+
+.monitors-summary.is-all-up {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+}
+
+.monitors-summary.is-empty {
+  font-weight: 450;
+  opacity: 0.85;
+}
+
+.monitor-item {
+  cursor: default;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.monitor-item:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.monitor-item.is-down {
+  border-color: color-mix(in srgb, #ff3b30 28%, var(--hairline, currentColor));
+  background: color-mix(in srgb, #ff3b30 6%, transparent);
+}
+
+.monitor-item.is-down:hover {
+  border-color: color-mix(in srgb, #ff3b30 40%, transparent);
+  background: color-mix(in srgb, #ff3b30 10%, transparent);
+}
+
+.monitor-item.is-pending {
+  opacity: 0.78;
+  border-style: dashed;
+}
+
+.monitor-info-primary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+}
+
+.monitor-url {
+  font-weight: 600;
+  color: var(--text, currentColor);
+  word-break: break-all;
+}
+
+.monitor-latency {
+  font-size: 11px;
+  font-weight: 560;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--muted, currentColor);
+  opacity: 0.9;
+}
+
+.monitor-item.is-down .monitor-latency {
+  color: color-mix(in srgb, #ff3b30 55%, currentColor);
+}
+
+.monitor-error {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: color-mix(in srgb, #ff3b30 70%, currentColor);
+}
+
+.monitor-history {
+  gap: 1.5px;
+  margin-top: 8px;
+  padding-top: 8px;
+  min-height: 14px;
+}
+
+.monitor-history-line {
+  width: 2.5px;
+  height: 12px;
+  border-radius: 1.5px;
+}
+
+.monitor-settings-item:focus-within {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 16%, transparent);
+}
+
+.monitor-remove-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, #ff3b30 55%, transparent);
+  outline-offset: 2px;
+}
+
+.monitors-settings-popover .popover-btn-primary:active {
+  transform: scale(0.98);
+  filter: brightness(0.96);
+}
+
+.monitors-settings-popover .popover-btn-primary:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
+}
+
 /* Disk Cleanup panel */
 .disk-cleanup-section .disk-cleanup-summary {
   font-size: 12px;
