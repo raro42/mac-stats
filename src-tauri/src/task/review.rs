@@ -4,7 +4,7 @@
 use std::time::{Duration, SystemTime};
 
 use chrono::TimeZone;
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 
 /// Review loop sleep between cycles (operator prompt text must stay in sync).
 pub(crate) const TASK_REVIEW_INTERVAL_SECS: u64 = 60;
@@ -146,10 +146,18 @@ fn resume_paused_tasks() {
 /// Run one review cycle: close stale WIPs, resume due paused tasks, then work on up to TASK_REVIEW_MAX_OPEN_PER_CYCLE open tasks.
 async fn run_review_once() {
     if let Ok((open, wip, paused, finished, unsuccessful)) = crate::task::count_tasks_by_status() {
-        info!(
-            "Task scan: open={}, wip={}, paused={}, finished={}, unsuccessful={}",
-            open, wip, paused, finished, unsuccessful
-        );
+        // Idle cycles fire every minute; keep INFO for real queue pressure only.
+        if open > 0 || wip > 0 {
+            info!(
+                "Task scan: open={}, wip={}, paused={}, finished={}, unsuccessful={}",
+                open, wip, paused, finished, unsuccessful
+            );
+        } else {
+            debug!(
+                "Task scan: open={}, wip={}, paused={}, finished={}, unsuccessful={}",
+                open, wip, paused, finished, unsuccessful
+            );
+        }
     }
     close_stale_wips();
     resume_paused_tasks();
@@ -159,7 +167,7 @@ async fn run_review_once() {
             Some(p) => p,
             None => {
                 if count == 0 {
-                    info!("Task review: no open task to work on this cycle (see above if open tasks exist: assignee or dependencies)");
+                    debug!("Task review: no open task to work on this cycle (see above if open tasks exist: assignee or dependencies)");
                 }
                 break;
             }

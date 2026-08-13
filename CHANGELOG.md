@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.382] - 2026-08-14
+
+### Changed
+- Task review idle cycles: `Task scan` and “no open task” lines stay DEBUG when open=0 and wip=0 — less per-minute INFO noise in `debug.log` (queue pressure still INFO).
+
 ## [0.1.381] - 2026-08-14
 
 ### Changed
