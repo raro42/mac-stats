@@ -5926,9 +5926,31 @@ function initDiskCleanupSection() {
   });
 
   if (refreshBtn) {
-    refreshBtn.addEventListener('click', (e) => {
+    if (!refreshBtn.dataset.idleLabel) {
+      refreshBtn.dataset.idleLabel = refreshBtn.textContent || 'Refresh';
+    }
+    refreshBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
-      refreshDiskCleanupPanel();
+      if (refreshBtn.disabled) return;
+      const runBusy = runBtn && runBtn.disabled && /Cleaning/i.test(runBtn.textContent || '');
+      if (runBusy) return;
+      refreshBtn.classList.remove('is-just-saved');
+      if (refreshBtn._saveFlashTimer) {
+        clearTimeout(refreshBtn._saveFlashTimer);
+        refreshBtn._saveFlashTimer = null;
+        refreshBtn._saveFlashOriginalLabel = null;
+      }
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = 'Refreshing…';
+      try {
+        await refreshDiskCleanupPanel();
+        refreshBtn.disabled = false;
+        flashSaveButton(refreshBtn, { savedLabel: 'Refreshed', durationMs: 1600 });
+      } catch (err) {
+        console.warn('disk cleanup refresh', err);
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = refreshBtn.dataset.idleLabel || 'Refresh';
+      }
     });
   }
 
@@ -6047,6 +6069,7 @@ function initDiskCleanupSection() {
   if (runBtn) {
     runBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
+      if (runBtn.disabled) return;
       const inv = getInvoke();
       if (!inv) return;
       try {
@@ -6056,15 +6079,32 @@ function initDiskCleanupSection() {
           await inv('set_disk_cleanup_soft_delete', { softDelete: !!softEl.checked });
         }
       } catch (_) {}
+      runBtn.classList.remove('is-just-saved');
+      if (runBtn._saveFlashTimer) {
+        clearTimeout(runBtn._saveFlashTimer);
+        runBtn._saveFlashTimer = null;
+        runBtn._saveFlashOriginalLabel = null;
+      }
       runBtn.disabled = true;
       runBtn.textContent = 'Cleaning…';
+      if (refreshBtn) refreshBtn.disabled = true;
       try {
         await inv('run_disk_cleanup_now');
         await refreshDiskCleanupPanel();
+        if (refreshBtn) {
+          refreshBtn.disabled = false;
+          refreshBtn.textContent = refreshBtn.dataset.idleLabel || 'Refresh';
+        }
+        // refreshDiskCleanupPanel restores idle Clean-now label; flash confirms success.
+        flashSaveButton(runBtn, { savedLabel: 'Cleaned', durationMs: 1600 });
       } catch (err) {
         console.warn('disk cleanup run', err);
         runBtn.disabled = false;
         runBtn.textContent = 'Clean now';
+        if (refreshBtn) {
+          refreshBtn.disabled = false;
+          refreshBtn.textContent = refreshBtn.dataset.idleLabel || 'Refresh';
+        }
         alert(`Cleanup failed: ${err?.message || err}`);
       }
     });
