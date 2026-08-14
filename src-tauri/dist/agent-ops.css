@@ -513,7 +513,7 @@ textarea.ops-agent-editor.is-dirty {
 
 .ops-agent-edit-actions .btn-primary:disabled {
   opacity: 0.45;
-  cursor: default;
+  cursor: pointer;
 }
 
 .ops-agent-save-status {
@@ -1108,7 +1108,7 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .monitor-item {
-  cursor: default;
+  cursor: pointer;
   transition:
     background 0.15s ease,
     box-shadow 0.15s ease,
@@ -1191,11 +1191,83 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.85;
 }
 
+.monitor-down-meta {
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 520;
+  line-height: 1.35;
+  color: color-mix(in srgb, #ff3b30 62%, currentColor);
+}
+
 .monitor-error {
   margin-top: 3px;
   font-size: 11px;
   line-height: 1.35;
   color: color-mix(in srgb, #ff3b30 70%, currentColor);
+}
+
+.monitor-detail {
+  margin: 8px 0 2px 22px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--hairline, currentColor) 55%, transparent);
+  background: color-mix(in srgb, var(--glass-fill, #fff) 55%, transparent);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.monitor-detail-row {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 6px 10px;
+  margin-bottom: 4px;
+}
+
+.monitor-detail-k {
+  color: var(--muted, currentColor);
+  opacity: 0.78;
+  font-weight: 500;
+}
+
+.monitor-detail-v {
+  word-break: break-word;
+  font-variant-numeric: tabular-nums;
+}
+
+.monitor-detail-log-title {
+  margin: 8px 0 4px;
+  font-weight: 560;
+  color: var(--muted, currentColor);
+}
+
+.monitor-detail-log {
+  margin: 0;
+  padding: 6px 8px;
+  max-height: 9.5rem;
+  overflow: auto;
+  border-radius: 6px;
+  background: color-mix(in srgb, #000 6%, transparent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  line-height: 1.45;
+  white-space: pre;
+}
+
+.monitor-detail-note {
+  margin-top: 6px;
+  opacity: 0.72;
+  font-size: 10px;
+}
+
+.monitor-detail-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.monitor-detail-check {
+  font-size: 11px;
+  padding: 4px 10px;
 }
 
 .monitor-backoff-hint {

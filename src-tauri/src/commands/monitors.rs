@@ -39,6 +39,60 @@ fn monitor_outcome_changed(
     }
 }
 
+/// Keep `extra.down_since` (RFC3339) across DOWN checks so the UI can show when
+/// the outage started. Cleared when the monitor is UP again.
+fn attach_down_since(
+    prev: Option<&crate::monitors::MonitorStatus>,
+    mut next: crate::monitors::MonitorStatus,
+) -> crate::monitors::MonitorStatus {
+    if next.is_up {
+        next.extra.remove("down_since");
+        next.extra.remove("down_since_approx");
+        return next;
+    }
+    let inherited = prev
+        .filter(|p| !p.is_up)
+        .and_then(|p| {
+            p.extra
+                .get("down_since")
+                .and_then(|v| v.as_str())
+                .map(|s| s.to_string())
+                .or_else(|| Some(p.checked_at.to_rfc3339()))
+        });
+    match inherited {
+        Some(since) => {
+            next.extra
+                .insert("down_since".into(), serde_json::json!(since));
+            // Preserve approx flag only when we invented a start from an older check.
+            if prev
+                .and_then(|p| p.extra.get("down_since"))
+                .and_then(|v| v.as_str())
+                .is_none()
+            {
+                next.extra
+                    .insert("down_since_approx".into(), serde_json::json!(true));
+            } else if prev
+                .and_then(|p| p.extra.get("down_since_approx"))
+                .and_then(|v| v.as_bool())
+                == Some(true)
+            {
+                next.extra
+                    .insert("down_since_approx".into(), serde_json::json!(true));
+            } else {
+                next.extra.remove("down_since_approx");
+            }
+        }
+        None => {
+            next.extra.insert(
+                "down_since".into(),
+                serde_json::json!(next.checked_at.to_rfc3339()),
+            );
+            next.extra.remove("down_since_approx");
+        }
+    }
+    next
+}
+
 /// Persist after every outcome flip; otherwise checkpoint last_check about every 5 minutes.
 fn should_persist_monitor_stats(
     prev: Option<&crate::monitors::MonitorStatus>,
@@ -573,7 +627,7 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
         monitor_url
     );
 
-    let result = website.check().map_err(|e| {
+    let checked = website.check().map_err(|e| {
         debug!(
             "Monitor: Check failed - ID: {}, URL: {}, Error: {}",
             monitor_id, monitor_url, e
@@ -593,6 +647,8 @@ pub fn check_monitor(monitor_id: String) -> Result<crate::monitors::MonitorStatu
             .and_then(|m| m.get(&monitor_id).copied());
         (prev_status, last_disk)
     };
+
+    let result = attach_down_since(prev_status.as_ref(), checked);
 
     // DEBUG on first check or up/down/error flip; unchanged rechecks stay at TRACE
     // (pairs with disk persist throttle — chronic DNS hosts no longer flood debug.log).
@@ -832,9 +888,10 @@ pub fn get_monitor_status(
 #[cfg(test)]
 mod monitor_interval_tests {
     use super::{
-        background_interval_secs, clamp_monitor_check_interval_secs, enrich_status_with_backoff,
-        is_monitor_due_for_background, monitor_outcome_changed, should_persist_monitor_stats,
-        DNS_DOWN_BACKOFF_SECS, DOWN_BACKOFF_SECS, STATS_DISK_CHECKPOINT_SECS,
+        attach_down_since, background_interval_secs, clamp_monitor_check_interval_secs,
+        enrich_status_with_backoff, is_monitor_due_for_background, monitor_outcome_changed,
+        should_persist_monitor_stats, DNS_DOWN_BACKOFF_SECS, DOWN_BACKOFF_SECS,
+        STATS_DISK_CHECKPOINT_SECS,
     };
     use chrono::{TimeZone, Utc};
     use crate::monitors::MonitorStatus;
@@ -857,6 +914,46 @@ mod monitor_interval_tests {
             checked_at: Utc.with_ymd_and_hms(2026, 3, 22, 12, 0, 0).unwrap(),
             extra: Default::default(),
         }
+    }
+
+    #[test]
+    fn down_since_set_on_first_down() {
+        let next = down_status("DNS");
+        let out = attach_down_since(None, next.clone());
+        assert_eq!(
+            out.extra
+                .get("down_since")
+                .and_then(|v| v.as_str())
+                .map(|s| s.to_string()),
+            Some(next.checked_at.to_rfc3339())
+        );
+        assert!(out.extra.get("down_since_approx").is_none());
+    }
+
+    #[test]
+    fn down_since_preserved_across_down_checks() {
+        let mut prev = down_status("DNS");
+        prev.extra.insert(
+            "down_since".into(),
+            serde_json::json!("2026-03-22T10:00:00+00:00"),
+        );
+        let next = down_status("DNS");
+        let out = attach_down_since(Some(&prev), next);
+        assert_eq!(
+            out.extra.get("down_since").and_then(|v| v.as_str()),
+            Some("2026-03-22T10:00:00+00:00")
+        );
+    }
+
+    #[test]
+    fn down_since_cleared_on_up() {
+        let mut prev = down_status("DNS");
+        prev.extra.insert(
+            "down_since".into(),
+            serde_json::json!("2026-03-22T10:00:00+00:00"),
+        );
+        let out = attach_down_since(Some(&prev), up_status());
+        assert!(out.extra.get("down_since").is_none());
     }
 
     #[test]

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.394] - 2026-08-14
+
+### Changed
+- Monitors: show failure type + downtime start on the row and hover tooltip; click opens a detail panel with recent local checks and Check now (persists `down_since` across DOWN checks).
+
 ## [0.1.393] - 2026-08-14
 
 ### Added

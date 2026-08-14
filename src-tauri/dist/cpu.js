@@ -2513,6 +2513,252 @@ function shortMonitorFailReason(error) {
   return e.length > 32 ? `${e.slice(0, 29)}…` : e;
 }
 
+/** Parse checked_at / down_since into epoch ms. */
+function parseMonitorTimeMs(raw) {
+  if (raw == null) return null;
+  if (typeof raw === 'number' && Number.isFinite(raw)) {
+    return raw < 1e12 ? raw * 1000 : raw;
+  }
+  const parsed = Date.parse(String(raw));
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+/** Format a duration like 2h 15m for downtime. */
+function formatMonitorDuration(msAgo) {
+  if (msAgo == null || !Number.isFinite(msAgo) || msAgo < 0) return null;
+  const sec = Math.floor(msAgo / 1000);
+  if (sec < 60) return `${sec}s`;
+  const mins = Math.floor(sec / 60);
+  if (mins < 60) return `${mins}m`;
+  const hours = Math.floor(mins / 60);
+  const remM = mins % 60;
+  if (hours < 48) return remM ? `${hours}h ${remM}m` : `${hours}h`;
+  const days = Math.floor(hours / 24);
+  const remH = hours % 24;
+  return remH ? `${days}d ${remH}h` : `${days}d`;
+}
+
+/**
+ * Best-effort downtime start: status.extra.down_since, else contiguous DOWN streak
+ * in local history, else last check (approx).
+ */
+function resolveMonitorDownSince(monitorId, status) {
+  if (!status || status.is_up) return null;
+  const pending =
+    !status.response_time_ms || String(status.error || '').includes('Waiting');
+  if (pending) return null;
+
+  const extra = status.extra || {};
+  const fromExtra = parseMonitorTimeMs(extra.down_since);
+  if (fromExtra != null) {
+    return {
+      ms: fromExtra,
+      approx: extra.down_since_approx === true,
+      source: 'status',
+    };
+  }
+
+  const hist = getMonitorHistory(monitorId);
+  if (hist.length) {
+    const sorted = [...hist].sort((a, b) => a.timestamp - b.timestamp);
+    let start = null;
+    for (let i = sorted.length - 1; i >= 0; i--) {
+      if (sorted[i].is_up) break;
+      start = sorted[i].timestamp;
+    }
+    if (start != null) {
+      return { ms: start, approx: true, source: 'history' };
+    }
+  }
+
+  const checked = parseMonitorTimeMs(status.checked_at);
+  if (checked != null) {
+    return { ms: checked, approx: true, source: 'checked_at' };
+  }
+  return null;
+}
+
+function formatMonitorDownSinceLabel(downInfo) {
+  if (!downInfo) return null;
+  const when = new Date(downInfo.ms);
+  const dur = formatMonitorDuration(Date.now() - downInfo.ms);
+  const clock = when.toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  const prefix = downInfo.approx ? 'Down at least since' : 'Down since';
+  return dur ? `${prefix} ${clock} (${dur})` : `${prefix} ${clock}`;
+}
+
+/** Hover title: failure + downtime + last check (keyboard stays in kb hint). */
+function buildMonitorRowTooltip(monitorUrl, status, monitorId) {
+  const lines = [monitorUrl || 'Monitor'];
+  const pending =
+    !status.is_up &&
+    (!status.response_time_ms || String(status.error || '').includes('Waiting'));
+  if (pending) {
+    lines.push('Waiting for first check…');
+    lines.push('Click for details · Enter checks now');
+    return lines.join('\n');
+  }
+  if (status.is_up) {
+    const ago = formatMonitorCheckedAgo(status);
+    const ms = status.response_time_ms != null ? `${status.response_time_ms} ms` : null;
+    lines.push(['UP', ms, ago].filter(Boolean).join(' · '));
+    if (status.checked_at) {
+      lines.push(`Last check: ${new Date(status.checked_at).toLocaleString()}`);
+    }
+  } else {
+    const reason = shortMonitorFailReason(status.error) || 'error';
+    lines.push(`DOWN · ${reason}`);
+    const downInfo = resolveMonitorDownSince(monitorId, status);
+    const downLabel = formatMonitorDownSinceLabel(downInfo);
+    if (downLabel) lines.push(downLabel);
+    if (status.error) lines.push(String(status.error));
+    if (status.checked_at) {
+      lines.push(`Last check: ${new Date(status.checked_at).toLocaleString()}`);
+    }
+    const backoff = formatMonitorBackoffHint(status);
+    if (backoff) lines.push(backoff);
+  }
+  lines.push('Click for details · Enter / Space checks now');
+  return lines.join('\n');
+}
+
+function applyMonitorRowTooltip(item, monitorUrl, status) {
+  if (!item) return;
+  const id = item.getAttribute('data-monitor-id') || '';
+  item.title = buildMonitorRowTooltip(monitorUrl, status, id);
+  item.dataset.monitorUrl = monitorUrl || '';
+}
+
+function recentMonitorLogLines(monitorId, limit = 12) {
+  const hist = getMonitorHistory(monitorId);
+  if (!hist.length) return [];
+  return [...hist]
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, limit)
+    .map((e) => {
+      const t = new Date(e.timestamp).toLocaleString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
+      return `${t}  ${e.is_up ? 'UP' : 'DOWN'}`;
+    });
+}
+
+function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
+  detail.replaceChildren();
+  const pending =
+    !status.is_up &&
+    (!status.response_time_ms || String(status.error || '').includes('Waiting'));
+
+  const addRow = (label, value) => {
+    if (!value) return;
+    const row = document.createElement('div');
+    row.className = 'monitor-detail-row';
+    const k = document.createElement('span');
+    k.className = 'monitor-detail-k';
+    k.textContent = label;
+    const v = document.createElement('span');
+    v.className = 'monitor-detail-v';
+    v.textContent = value;
+    row.appendChild(k);
+    row.appendChild(v);
+    detail.appendChild(row);
+  };
+
+  addRow('URL', monitorUrl);
+  if (pending) {
+    addRow('Status', 'Pending first check');
+  } else if (status.is_up) {
+    addRow('Status', 'UP');
+    if (status.response_time_ms != null) addRow('Latency', `${status.response_time_ms} ms`);
+  } else {
+    addRow('Status', 'DOWN');
+    addRow('Failure', shortMonitorFailReason(status.error) || status.error || 'error');
+    const downInfo = resolveMonitorDownSince(monitorId, status);
+    if (downInfo) {
+      addRow(
+        downInfo.approx ? 'Down at least since' : 'Down since',
+        `${new Date(downInfo.ms).toLocaleString()}${
+          formatMonitorDuration(Date.now() - downInfo.ms)
+            ? ` (${formatMonitorDuration(Date.now() - downInfo.ms)})`
+            : ''
+        }`
+      );
+    }
+    if (status.error) addRow('Detail', String(status.error));
+  }
+  if (status.checked_at && !pending) {
+    addRow('Last check', new Date(status.checked_at).toLocaleString());
+  }
+  const backoff = formatMonitorBackoffHint(status);
+  if (backoff) addRow('Auto-check', backoff);
+
+  const log = recentMonitorLogLines(monitorId, 14);
+  if (log.length) {
+    const logTitle = document.createElement('div');
+    logTitle.className = 'monitor-detail-log-title';
+    logTitle.textContent = 'Recent checks (this Mac)';
+    detail.appendChild(logTitle);
+    const pre = document.createElement('pre');
+    pre.className = 'monitor-detail-log';
+    pre.textContent = log.join('\n');
+    detail.appendChild(pre);
+  } else {
+    const note = document.createElement('div');
+    note.className = 'monitor-detail-note';
+    note.textContent = 'No local check history yet for this monitor.';
+    detail.appendChild(note);
+  }
+
+  const actions = document.createElement('div');
+  actions.className = 'monitor-detail-actions';
+  const checkBtn = document.createElement('button');
+  checkBtn.type = 'button';
+  checkBtn.className = 'btn-secondary monitor-detail-check';
+  checkBtn.textContent = 'Check now';
+  checkBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    void forceCheckMonitorNow(monitorId, detail.closest('.monitor-item'));
+  });
+  actions.appendChild(checkBtn);
+  detail.appendChild(actions);
+}
+
+function setMonitorDetailOpen(item, open) {
+  if (!item) return;
+  const detail = item.querySelector('.monitor-detail');
+  if (!detail) return;
+  item.classList.toggle('is-detail-open', !!open);
+  detail.hidden = !open;
+  if (open) {
+    const id = item.getAttribute('data-monitor-id');
+    const url = item.dataset.monitorUrl || id;
+    const status = monitorStatusCache.get(id) || {
+      is_up: !item.classList.contains('is-down'),
+      error: null,
+      checked_at: null,
+      response_time_ms: null,
+      extra: {},
+    };
+    fillMonitorDetail(detail, id, url, status);
+  }
+  updateMonitorsHeight();
+}
+
+function toggleMonitorDetail(item) {
+  if (!item) return;
+  setMonitorDetailOpen(item, !item.classList.contains('is-detail-open'));
+}
+
 async function updateMonitorsSummary() {
   const summaryText = document.getElementById('monitors-summary-text');
   if (!summaryText) return;
@@ -2583,8 +2829,13 @@ async function updateMonitorsSummary() {
             const host = shortMonitorHostLabel(name, url);
             const reason = shortMonitorFailReason(status.error);
             const ago = formatMonitorCheckedAgo(status);
+            const downInfo = resolveMonitorDownSince(monitorId, status);
+            const downLabel = formatMonitorDownSinceLabel(downInfo);
             const base = reason ? `${host} (${reason})` : host;
-            downHints.push(ago ? `${base} · ${ago}` : base);
+            const parts = [base];
+            if (downLabel) parts.push(downLabel);
+            else if (ago) parts.push(ago);
+            downHints.push(parts.join(' · '));
           }
         }
         if (status.response_time_ms) {
@@ -2742,11 +2993,15 @@ function updateMonitorsHeight() {
   const monitorsContent = document.getElementById('monitors-content');
   if (!monitorsList || !monitorsContent) return;
   
-  // Calculate height needed: summary (~40px) + each monitor item (~40px including margin)
+  // Calculate height needed: summary + each monitor item (+ open detail panels)
   const monitorItems = monitorsList.querySelectorAll('.monitor-item');
-  const itemHeight = 40; // Approximate height per monitor item (padding + margin + content)
-  const summaryHeight = 40; // Approximate height of summary
-  const listMargin = 12; // margin-top of monitors-list
+  const itemHeight = 52; // row + down-meta / error lines
+  const summaryHeight = 40;
+  const listMargin = 12;
+  let openDetailExtra = 0;
+  monitorItems.forEach((el) => {
+    if (el.classList.contains('is-detail-open')) openDetailExtra += 200;
+  });
   
   // When collapsed, hide everything - don't set any heights
   if (monitorsCollapsed) {
@@ -2760,7 +3015,11 @@ function updateMonitorsHeight() {
     return;
   }
   
-  const totalHeight = summaryHeight + (monitorItems.length > 0 ? listMargin + (monitorItems.length * itemHeight) : 0);
+  const totalHeight =
+    summaryHeight +
+    (monitorItems.length > 0
+      ? listMargin + monitorItems.length * itemHeight + openDetailExtra
+      : 0);
   
   // Set min-height to reserve space and prevent layout shifts
   // This ensures the section always takes up the same space regardless of collapse state
@@ -2857,8 +3116,16 @@ function syncMonitorsListTabOrder(monitorsList, preferId) {
   items.forEach((el, i) => {
     el.setAttribute('tabindex', i === activeIdx ? '0' : '-1');
     el.classList.toggle('is-selected', i === activeIdx);
-    el.title =
-      '↑↓ / j k select · Enter or Space: check now (bypasses DOWN backoff) · Esc clears selection';
+    const url = el.dataset.monitorUrl || el.getAttribute('data-monitor-id') || '';
+    const id = el.getAttribute('data-monitor-id');
+    const status = (id && monitorStatusCache.get(id)) || {
+      is_up: !el.classList.contains('is-down'),
+      error: null,
+      checked_at: null,
+      response_time_ms: el.classList.contains('is-pending') ? null : 1,
+      extra: {},
+    };
+    applyMonitorRowTooltip(el, url, status);
   });
   ensureMonitorsListKbHint(monitorsList, items.length > 0);
 }
@@ -2878,7 +3145,7 @@ function ensureMonitorsListKbHint(monitorsList, show) {
     monitorsList.parentNode?.insertBefore(hint, monitorsList);
   }
   hint.textContent =
-    '↑↓ / j k select · Enter check now · Esc clears selection';
+    'Click row for details · ↑↓ / j k select · Enter check now · Esc clears';
 }
 
 function wireMonitorsListKeyboard() {
@@ -2891,9 +3158,11 @@ function wireMonitorsListKeyboard() {
   monitorsList.addEventListener('click', (e) => {
     const item = e.target && e.target.closest && e.target.closest('.monitor-item');
     if (!item || !monitorsList.contains(item)) return;
+    if (e.target.closest && e.target.closest('.monitor-detail-check')) return;
     const id = item.getAttribute('data-monitor-id');
     syncMonitorsListTabOrder(monitorsList, id);
     item.focus();
+    toggleMonitorDetail(item);
   });
 
   monitorsList.addEventListener('keydown', (e) => {
@@ -2986,7 +3255,7 @@ async function forceCheckMonitorNow(monitorId, itemEl) {
   }
 }
 
-function fillMonitorInfo(info, monitorUrl, status) {
+function fillMonitorInfo(info, monitorUrl, status, monitorId) {
   const responseTimeText = status.response_time_ms ? `${status.response_time_ms}ms` : '--';
   const pending =
     !status.is_up &&
@@ -3019,6 +3288,18 @@ function fillMonitorInfo(info, monitorUrl, status) {
   }
 
   info.appendChild(primary);
+
+  if (!status.is_up && !pending) {
+    const reason = shortMonitorFailReason(status.error);
+    const downInfo = resolveMonitorDownSince(monitorId, status);
+    const downLabel = formatMonitorDownSinceLabel(downInfo);
+    if (reason || downLabel) {
+      const meta = document.createElement('div');
+      meta.className = 'monitor-down-meta';
+      meta.textContent = [reason, downLabel].filter(Boolean).join(' · ');
+      info.appendChild(meta);
+    }
+  }
 
   if (status.error && !pending) {
     const errEl = document.createElement('div');
@@ -3057,6 +3338,7 @@ function createMonitorItem(monitorId, monitorUrl, status) {
   item.setAttribute('role', 'option');
   item.setAttribute('aria-label', `Monitor ${monitorUrl}`);
   applyMonitorItemState(item, status);
+  applyMonitorRowTooltip(item, monitorUrl, status);
   
   // Create header container for status indicator and info
   const header = document.createElement('div');
@@ -3070,7 +3352,7 @@ function createMonitorItem(monitorId, monitorUrl, status) {
 
   const info = document.createElement('div');
   info.className = 'monitor-info';
-  fillMonitorInfo(info, monitorUrl, status);
+  fillMonitorInfo(info, monitorUrl, status, monitorId);
 
   header.appendChild(statusIndicator);
   header.appendChild(info);
@@ -3081,8 +3363,13 @@ function createMonitorItem(monitorId, monitorUrl, status) {
   historyContainer.setAttribute('data-monitor-id', monitorId);
   updateMonitorHistory(historyContainer, monitorId);
 
+  const detail = document.createElement('div');
+  detail.className = 'monitor-detail';
+  detail.hidden = true;
+
   item.appendChild(header);
   item.appendChild(historyContainer);
+  item.appendChild(detail);
   
   return item;
 }
@@ -3092,6 +3379,7 @@ function updateMonitorItem(item, monitorId, monitorUrl, status) {
   if (!item.hasAttribute('tabindex')) item.tabIndex = -1;
   if (!item.getAttribute('role')) item.setAttribute('role', 'option');
   item.setAttribute('aria-label', `Monitor ${monitorUrl}`);
+  applyMonitorRowTooltip(item, monitorUrl, status);
 
   // Update status indicator
   const statusIndicator = item.querySelector('.status-indicator');
@@ -3106,7 +3394,7 @@ function updateMonitorItem(item, monitorId, monitorUrl, status) {
   // Update info text
   const info = item.querySelector('.monitor-info');
   if (info) {
-    fillMonitorInfo(info, monitorUrl, status);
+    fillMonitorInfo(info, monitorUrl, status, monitorId);
   }
   
   // Update history visualization
@@ -3124,6 +3412,18 @@ function updateMonitorItem(item, monitorId, monitorUrl, status) {
     }
   }
   updateMonitorHistory(historyContainer, monitorId);
+
+  let detail = item.querySelector('.monitor-detail');
+  if (!detail) {
+    detail = document.createElement('div');
+    detail.className = 'monitor-detail';
+    detail.hidden = true;
+    item.appendChild(detail);
+  }
+  if (item.classList.contains('is-detail-open')) {
+    fillMonitorDetail(detail, monitorId, monitorUrl, status);
+    detail.hidden = false;
+  }
 }
 
 // Update the history visualization for a monitor
