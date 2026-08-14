@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.392] - 2026-08-14
+
+### Added
+- External / Monitors: `j` / `k` move selection (Agent Ops parity); Escape clears selection; keyboard hint above the list.
+
 ## [0.1.391] - 2026-08-14
 
 ### Added

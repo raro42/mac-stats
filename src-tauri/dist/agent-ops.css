@@ -1501,6 +1501,12 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.72;
 }
 
+.monitors-kb-hint {
+  margin: 8px 0 6px;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
 .disk-cleanup-scope-main {
   min-width: 0;
 }

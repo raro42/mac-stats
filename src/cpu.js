@@ -2857,8 +2857,28 @@ function syncMonitorsListTabOrder(monitorsList, preferId) {
   items.forEach((el, i) => {
     el.setAttribute('tabindex', i === activeIdx ? '0' : '-1');
     el.classList.toggle('is-selected', i === activeIdx);
-    el.title = 'Enter or Space: check now (bypasses DOWN backoff)';
+    el.title =
+      '↑↓ / j k select · Enter or Space: check now (bypasses DOWN backoff) · Esc clears selection';
   });
+  ensureMonitorsListKbHint(monitorsList, items.length > 0);
+}
+
+/** Hint above External / Monitors list (Disk Cleanup kb-hint parity). */
+function ensureMonitorsListKbHint(monitorsList, show) {
+  if (!monitorsList) return;
+  let hint = document.getElementById('monitors-kb-hint');
+  if (!show) {
+    hint?.remove();
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'monitors-kb-hint';
+    hint.id = 'monitors-kb-hint';
+    monitorsList.parentNode?.insertBefore(hint, monitorsList);
+  }
+  hint.textContent =
+    '↑↓ / j k select · Enter check now · Esc clears selection';
 }
 
 function wireMonitorsListKeyboard() {
@@ -2890,9 +2910,25 @@ function wireMonitorsListKeyboard() {
       return;
     }
 
+    // Esc clears row selection (Agent Ops / Hermes Escape-skips parity).
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      if (!item.classList.contains('is-selected') && document.activeElement !== item) {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      items.forEach((el) => {
+        el.classList.remove('is-selected');
+        el.setAttribute('tabindex', '-1');
+      });
+      if (items[0]) items[0].setAttribute('tabindex', '0');
+      item.blur();
+      return;
+    }
+
     let next = -1;
-    if (e.key === 'ArrowDown') next = Math.min(idx + 1, items.length - 1);
-    else if (e.key === 'ArrowUp') next = Math.max(idx - 1, 0);
+    if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, items.length - 1);
+    else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
     else if (e.key === 'Home') next = 0;
     else if (e.key === 'End') next = items.length - 1;
     else return;
