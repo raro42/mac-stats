@@ -6,15 +6,37 @@
     <title>CPU</title>
     <script>
       (function () {
-        const theme = localStorage.getItem("theme") || "apple";
-        // Propagate ?v= so WKWebView does not keep a stale theme document after installs.
-        const params = new URLSearchParams(window.location.search);
-        const v = params.get("v") || String(Date.now());
-        try {
-          localStorage.setItem("macStatsAssetVersion", v);
-        } catch (_) {}
+        var theme = localStorage.getItem("theme") || "apple";
+        var boot = {
+          dark: ["#000000", "dark"],
+          "data-poster": ["#0b0b10", "dark"],
+          neon: ["#020302", "dark"],
+          futuristic: ["#07070c", "dark"],
+          apple: ["#e8e8ed", "light"],
+          architect: ["#dfe6f0", "light"],
+          light: ["#f2f2f7", "light"],
+          material: ["#ebe4d9", "light"],
+          "swiss-minimalistic": ["#ffffff", "light"]
+        };
+        var pair = boot[theme] || ["#e8e8ed", "light"];
+        var bg = pair[0];
+        var scheme = pair[1];
+        var s = document.createElement("style");
+        s.id = "theme-boot-paint";
+        s.textContent = "html,body{background:" + bg + ";color-scheme:" + scheme + ";margin:0;min-height:100%}";
+        document.documentElement.style.background = bg;
+        document.documentElement.style.colorScheme = scheme;
+        document.head.appendChild(s);
+        var meta = document.createElement("meta");
+        meta.name = "color-scheme";
+        meta.content = scheme;
+        document.head.appendChild(meta);
+
+        var params = new URLSearchParams(window.location.search);
+        var v = params.get("v") || String(Date.now());
+        try { localStorage.setItem("macStatsAssetVersion", v); } catch (_) {}
         window.location.replace(
-          `./themes/${theme}/cpu.html?v=${encodeURIComponent(v)}`
+          "./themes/" + theme + "/cpu.html?v=" + encodeURIComponent(v)
         );
       })();
     </script>

@@ -30,6 +30,34 @@
     return localStorage.getItem("theme") || "apple";
   }
 
+  /** First-paint colors so theme navigation does not flash the WKWebView default white. */
+  const THEME_BOOT_PAINT = {
+    dark: ["#000000", "dark"],
+    "data-poster": ["#0b0b10", "dark"],
+    neon: ["#020302", "dark"],
+    futuristic: ["#07070c", "dark"],
+    apple: ["#e8e8ed", "light"],
+    architect: ["#dfe6f0", "light"],
+    light: ["#f2f2f7", "light"],
+    material: ["#ebe4d9", "light"],
+    "swiss-minimalistic": ["#ffffff", "light"],
+  };
+
+  function paintThemeBoot(theme) {
+    const pair = THEME_BOOT_PAINT[theme] || THEME_BOOT_PAINT.apple;
+    const bg = pair[0];
+    const scheme = pair[1];
+    try {
+      document.documentElement.style.background = bg;
+      document.documentElement.style.colorScheme = scheme;
+      if (document.body) {
+        document.body.style.background = bg;
+      }
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
   function getThemeBasePath() {
     // When opened via src-tauri/dist/cpu.html => base is "./themes"
     // When opened via src-tauri/dist/themes/<theme>/cpu.html => base is "../"
@@ -160,6 +188,8 @@
   function applyTheme(theme) {
     localStorage.setItem("theme", theme);
     syncThemeClass(theme);
+    // Paint destination color under the fade so opacity:0 does not show white WKWebView chrome.
+    paintThemeBoot(theme);
     const v = encodeURIComponent(themeAssetVersion());
     const url = `${getThemeBasePath()}${theme}/cpu.html?v=${v}`;
     if (window.location.pathname.endsWith(theme + "/cpu.html")) {
@@ -873,6 +903,7 @@
 
   function bootstrap() {
     const savedTheme = getSavedTheme();
+    paintThemeBoot(savedTheme);
     syncThemeClass(savedTheme);
     initSettingsModal();
     initThemePicker();

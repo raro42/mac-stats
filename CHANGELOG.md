@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.398] - 2026-08-14
+
+### Fixed
+- Dark themes: no white flash on open/switch — inline first-paint background + `color-scheme` before CSS; theme fade paints the destination color under opacity.
+
 ## [0.1.397] - 2026-08-14
 
 ### Fixed
