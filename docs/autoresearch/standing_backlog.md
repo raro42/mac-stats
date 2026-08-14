@@ -20,8 +20,9 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Disk Cleanup j/k + Esc clear selection + hints (**v0.1.393**)
 - Monitors j/k + Esc clear selection + kb hint (**v0.1.392**)
-- Disk Cleanup keyboard: scopes / categories / Delete custom / Enter-to-add + ⌘S / R recurse / T soft-delete (**v0.1.386–391**)
+- Disk Cleanup keyboard: scopes / categories / Delete custom / Enter-to-add + ⌘S / R recurse / T soft-delete / j/k + Esc (**v0.1.386–391, 393**)
 - Instant lanes: version, thread clarifier, weather Open-Meteo, short ack, …
 - Menu bar SSD + `MEMORY: save` verbatim notes
 - Digester filters for travel/SEO and scheduled SKILL (meta — not a night’s sole win)
