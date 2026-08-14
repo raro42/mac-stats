@@ -5026,9 +5026,6 @@ function wireDiskCleanupScopesKeyboard() {
     else if (e.key === 'End') next = rows.length - 1;
     else return;
 
-    // From nested fields, only navigate with Home/End or when not editing a number.
-    if (onNumber && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) return;
-
     e.preventDefault();
     if (next < 0 || next === idx) return;
     syncDiskCleanupScopeTabOrder(scopesEl, next);
