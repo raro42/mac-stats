@@ -4779,8 +4779,8 @@ async function refreshDiskCleanupPanel() {
             ? ''
             : `<button type="button" class="disk-cleanup-scope-remove" data-scope-remove="${idx}">Remove</button>`;
           const rowTitle = s.builtin
-            ? '↑↓ select · Space toggle enable'
-            : '↑↓ select · Space toggle enable · Delete removes custom scope';
+            ? '↑↓ select · Space toggle enable · R toggle recurse'
+            : '↑↓ select · Space toggle enable · R toggle recurse · Delete removes custom scope';
           return `<div class="disk-cleanup-scope-row${s.enabled ? '' : ' is-disabled'}" data-scope-idx="${idx}" role="option" title="${rowTitle}">
             <input type="checkbox" data-scope-enabled="${idx}" ${s.enabled ? 'checked' : ''} aria-label="Enable ${s.label}" />
             <div class="disk-cleanup-scope-main">
@@ -4802,7 +4802,7 @@ async function refreshDiskCleanupPanel() {
           scopesEl.parentNode?.insertBefore(hint, scopesEl);
         }
         hint.textContent =
-          '↑↓ select scope · Space toggle enable · Delete removes custom · Enter in Add form adds · Save scopes when done';
+          '↑↓ select scope · Space toggle enable · R toggle recurse · Delete removes custom · Enter in Add form adds · ⌘S saves';
       } else {
         document.getElementById('disk-cleanup-kb-hint')?.remove();
       }
@@ -5127,6 +5127,26 @@ function wireDiskCleanupScopesKeyboard() {
       void removeDiskCleanupScopeAt(scopeIdx).catch((err) => {
         alert(`Remove failed: ${err?.message || err}`);
       });
+      return;
+    }
+
+    // R toggles Recurse on the selected row (mouse still uses the checkbox).
+    if (
+      (e.key === 'r' || e.key === 'R') &&
+      !onNumber &&
+      !onTextLike &&
+      !onButton &&
+      !e.metaKey &&
+      !e.ctrlKey &&
+      !e.altKey
+    ) {
+      if (onRecurse) return; // native checkbox already handles Space/click
+      const rec = row.querySelector('input[data-scope-rec]');
+      if (rec && !rec.disabled) {
+        e.preventDefault();
+        rec.checked = !rec.checked;
+        rec.dispatchEvent(new Event('change', { bubbles: true }));
+      }
       return;
     }
 

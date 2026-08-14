@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.390] - 2026-08-14
+
+### Added
+- Disk Cleanup scopes: `R` toggles Recurse on the selected row (when not on nested inputs); hint and row tooltips updated.
+
 ## [0.1.389] - 2026-08-14
 
 ### Added
