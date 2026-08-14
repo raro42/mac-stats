@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Monitors Check now busy-guard (Checking…) + Checked flash — **v0.1.413**
 - Disk Cleanup Refresh busy-guard (Refreshing…) + Refreshed flash; Clean now Cleaned flash — **v0.1.412**
 - Agent Ops Refresh / Refresh digest busy-guard (Refreshing…) + Refreshed flash — **v0.1.411**
 - Perplexity Search busy-guard (Searching…) + Searched flash + Enter-to-search — **v0.1.410**
