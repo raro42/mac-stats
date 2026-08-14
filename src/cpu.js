@@ -2818,7 +2818,15 @@ function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
   const checkBtn = document.createElement('button');
   checkBtn.type = 'button';
   checkBtn.className = 'btn-secondary monitor-detail-check';
-  checkBtn.textContent = 'Check now';
+  checkBtn.dataset.idleLabel = 'Check now';
+  const row = detail.closest('.monitor-item');
+  const checking = row?.dataset?.checking === '1';
+  if (checking) {
+    checkBtn.disabled = true;
+    checkBtn.textContent = 'Checking…';
+  } else {
+    checkBtn.textContent = 'Check now';
+  }
   checkBtn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -3346,6 +3354,18 @@ async function forceCheckMonitorNow(monitorId, itemEl) {
     Array.from(document.querySelectorAll('.monitor-item')).find(
       (el) => el.getAttribute('data-monitor-id') === monitorId
     );
+  const setCheckBtnBusy = (row) => {
+    const btn = row?.querySelector?.('.monitor-detail-check');
+    if (!btn) return;
+    if (btn._saveFlashTimer) {
+      clearTimeout(btn._saveFlashTimer);
+      btn._saveFlashTimer = null;
+    }
+    btn.classList.remove('is-just-saved');
+    btn.dataset.idleLabel = btn.dataset.idleLabel || 'Check now';
+    btn.disabled = true;
+    btn.textContent = 'Checking…';
+  };
   const item = itemEl || findRow();
   if (item?.dataset.checking === '1') return;
   if (item) {
@@ -3353,7 +3373,9 @@ async function forceCheckMonitorNow(monitorId, itemEl) {
     item.classList.add('is-checking');
     const latencyEl = item.querySelector('.monitor-latency');
     if (latencyEl) latencyEl.textContent = '…';
+    setCheckBtnBusy(item);
   }
+  let checkOk = false;
   try {
     const status = await invoke('check_monitor', { monitorId });
     if (status) {
@@ -3368,6 +3390,7 @@ async function forceCheckMonitorNow(monitorId, itemEl) {
       }
       const row = item || findRow();
       if (row) updateMonitorItem(row, monitorId, monitorUrl, status);
+      checkOk = true;
     }
     await updateMonitorsSummary();
     const list = document.getElementById('monitors-list');
@@ -3381,6 +3404,18 @@ async function forceCheckMonitorNow(monitorId, itemEl) {
     if (row) {
       row.dataset.checking = '0';
       row.classList.remove('is-checking');
+      const btn = row.querySelector('.monitor-detail-check');
+      if (btn) {
+        btn.disabled = false;
+        const idle = btn.dataset.idleLabel || 'Check now';
+        if (checkOk && typeof flashSaveButton === 'function') {
+          btn.textContent = idle;
+          flashSaveButton(btn, { savedLabel: 'Checked', durationMs: 1600 });
+        } else {
+          btn.classList.remove('is-just-saved');
+          btn.textContent = idle;
+        }
+      }
     }
   }
 }
