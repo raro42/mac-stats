@@ -5024,9 +5024,55 @@ function initPerplexitySection() {
   });
 
   if (searchBtn && queryInput && resultsEl) {
-    searchBtn.addEventListener('click', async () => {
+    let perplexitySearchInFlight = false;
+    let perplexitySearchFlashTimer = null;
+    if (searchBtn.dataset.idleLabel == null) {
+      searchBtn.dataset.idleLabel = searchBtn.textContent || 'Search';
+    }
+
+    const setPerplexitySearchBusy = (busy) => {
+      perplexitySearchInFlight = !!busy;
+      if (perplexitySearchFlashTimer) {
+        clearTimeout(perplexitySearchFlashTimer);
+        perplexitySearchFlashTimer = null;
+      }
+      searchBtn.classList.remove('is-just-saved');
+      if (busy) {
+        searchBtn.disabled = true;
+        searchBtn.textContent = 'Searching…';
+        searchBtn.title = 'Search in progress';
+      } else {
+        searchBtn.disabled = false;
+        searchBtn.textContent = searchBtn.dataset.idleLabel || 'Search';
+        searchBtn.title = 'Search the web with Perplexity';
+      }
+    };
+
+    const flashPerplexitySearched = () => {
+      if (perplexitySearchFlashTimer) {
+        clearTimeout(perplexitySearchFlashTimer);
+        perplexitySearchFlashTimer = null;
+      }
+      const idle = searchBtn.dataset.idleLabel || 'Search';
+      searchBtn.disabled = false;
+      searchBtn.classList.add('is-just-saved');
+      searchBtn.textContent = 'Searched';
+      searchBtn.title = 'Search complete';
+      perplexitySearchFlashTimer = setTimeout(() => {
+        searchBtn.classList.remove('is-just-saved');
+        searchBtn.textContent = idle;
+        searchBtn.title = 'Search the web with Perplexity';
+        perplexitySearchFlashTimer = null;
+      }, 1600);
+    };
+
+    const runPerplexitySearch = async () => {
       const query = queryInput.value.trim();
       if (!query) return;
+      if (perplexitySearchInFlight) {
+        console.log('[Perplexity] Search ignored — already in flight');
+        return;
+      }
       const invoke = getInvoke();
       if (!invoke) {
         resultsEl.innerHTML = '<div class="perplexity-empty" role="status">App not ready.</div>';
@@ -5037,7 +5083,9 @@ function initPerplexitySection() {
         updatePerplexitySetupVisibility();
         return;
       }
+      setPerplexitySearchBusy(true);
       resultsEl.innerHTML = '<div class="perplexity-empty" role="status">Searching…</div>';
+      let searchOk = false;
       try {
         const resp = await invoke('perplexity_search', { request: { query: query, max_results: 10 } });
         const esc = (window.Ollama && window.Ollama.escapeHtml)
@@ -5069,6 +5117,7 @@ function initPerplexitySection() {
         if (!resp.results || resp.results.length === 0) {
           resultsEl.innerHTML = weatherHtml ||
             '<div class="perplexity-empty" role="status">No results.</div>';
+          searchOk = true;
           return;
         }
         resultsEl.innerHTML = weatherHtml + resp.results.map(function (r) {
@@ -5105,9 +5154,23 @@ function initPerplexitySection() {
             snippetHtml +
             '</article>';
         }).join('');
+        searchOk = true;
       } catch (err) {
         resultsEl.innerHTML = '<div class="perplexity-empty perplexity-empty-error" role="alert">Error: ' + String(err) + '</div>';
+      } finally {
+        setPerplexitySearchBusy(false);
+        if (searchOk) flashPerplexitySearched();
       }
+    };
+
+    searchBtn.addEventListener('click', () => {
+      void runPerplexitySearch();
+    });
+    queryInput.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' || e.shiftKey) return;
+      e.preventDefault();
+      if (perplexitySearchInFlight) return;
+      void runPerplexitySearch();
     });
   }
 

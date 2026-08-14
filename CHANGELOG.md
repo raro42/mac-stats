@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.410] - 2026-08-14
+
+### Changed
+- Perplexity Search: disable while a search is in flight (blocks double click/Enter); shows Searching… then a brief Searched flash on success. Enter in the query field runs search.
+
 ## [0.1.409] - 2026-08-14
 
 ### Added

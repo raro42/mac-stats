@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Perplexity Search busy-guard (Searching…) + Searched flash + Enter-to-search — **v0.1.410**
 - AI Chat Clear button + Cleared flash (disabled while empty / Sending…) — **v0.1.409**
 - AI Chat Send busy-guard (Sending…) + Sent flash — **v0.1.408**
 - Disk Cleanup last-run soft-delete skip counts — **v0.1.407**
