@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.406] - 2026-08-14
+
+### Fixed
+- Disk Cleanup soft-delete: if move to Trash fails (e.g. EPERM on protected cache files), skip the file instead of permanently deleting it. Soft-delete means recoverable; permanent delete stays an explicit opt-out.
+
 ## [0.1.405] - 2026-08-14
 
 ### Changed

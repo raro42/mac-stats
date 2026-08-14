@@ -237,8 +237,17 @@ fn move_to_trash(path: &Path) -> Result<(), String> {
         Ok(()) => Ok(()),
         Err(e) => {
             // Cross-volume rename fails (e.g. /tmp → ~/.Trash): copy then remove.
-            match fs::copy(path, &dest).and_then(|_| fs::remove_file(path)) {
-                Ok(()) => Ok(()),
+            match fs::copy(path, &dest) {
+                Ok(_) => match fs::remove_file(path) {
+                    Ok(()) => Ok(()),
+                    Err(rm_err) => {
+                        // Do not leave an orphan Trash copy while the source stays.
+                        let _ = fs::remove_file(&dest);
+                        Err(format!(
+                            "copy-to-trash ok but remove source failed: {rm_err}; rename was: {e}"
+                        ))
+                    }
+                },
                 Err(_) => Err(e.to_string()),
             }
         }
@@ -246,6 +255,9 @@ fn move_to_trash(path: &Path) -> Result<(), String> {
 }
 
 /// Soft-delete moves to Trash; permanent unlinks. Paths already in Trash are always unlinked.
+///
+/// When soft-delete is on and Trash move fails (EPERM, cross-volume, etc.), **skip** the file.
+/// Never fall back to permanent delete — that would violate the user's recoverability choice.
 fn remove_cleaned_file(path: &Path, soft: bool) -> bool {
     if soft && !path_is_under_trash(path) {
         match move_to_trash(path) {
@@ -253,11 +265,11 @@ fn remove_cleaned_file(path: &Path, soft: bool) -> bool {
             Err(err) => {
                 crate::mac_stats_debug!(
                     "disk_cleanup",
-                    "Soft-delete failed for {:?}: {}; falling back to permanent delete",
+                    "Soft-delete failed for {:?}: {}; skipping (no permanent fallback)",
                     path,
                     err
                 );
-                fs::remove_file(path).is_ok()
+                false
             }
         }
     } else {
@@ -1612,5 +1624,45 @@ mod tests {
     fn forbid_home_and_root() {
         assert!(path_is_forbidden(Path::new("/")));
         assert!(path_is_forbidden(&home_dir()));
+    }
+
+    #[test]
+    fn soft_delete_skips_when_trash_move_fails() {
+        // Soft path must not unlink when Trash is unreachable (recoverability).
+        let dir = std::env::temp_dir().join(format!(
+            "mac-stats-soft-skip-{}",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).expect("temp dir");
+        let file = dir.join("kept.txt");
+        fs::write(&file, b"keep-me").expect("write");
+        // Point trash at a non-writable path by using a file-as-dir via move_to_trash failure:
+        // Call remove_cleaned_file with soft=true against a path that cannot be renamed into Trash.
+        // Use a directory (move_to_trash rejects non-files) to force Err → skip.
+        let not_a_file = dir.join("subdir");
+        fs::create_dir_all(&not_a_file).expect("subdir");
+        assert!(
+            !remove_cleaned_file(&not_a_file, true),
+            "soft-delete must skip when trash move fails"
+        );
+        assert!(file.exists(), "unrelated file must remain");
+        assert!(not_a_file.exists(), "failed soft target must remain (no permanent fallback)");
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn permanent_delete_unlinks_file() {
+        let dir = std::env::temp_dir().join(format!(
+            "mac-stats-perm-del-{}",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).expect("temp dir");
+        let file = dir.join("gone.txt");
+        fs::write(&file, b"bye").expect("write");
+        assert!(remove_cleaned_file(&file, false));
+        assert!(!file.exists());
+        let _ = fs::remove_dir_all(&dir);
     }
 }
