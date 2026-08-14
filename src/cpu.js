@@ -861,7 +861,8 @@ async function refresh() {
           row.setAttribute("data-name", proc.name);
           row.setAttribute("role", "option");
           row.setAttribute("tabindex", i === tabIdx ? "0" : "-1");
-          row.title = "Click for details";
+          row.title =
+            "Click or Enter for details · ↑↓ / j k · P pin · Esc clears";
           const selected =
             currentProcessPid !== null && Number(proc.pid) === Number(currentProcessPid);
           row.setAttribute("aria-selected", selected ? "true" : "false");
@@ -938,17 +939,51 @@ async function refresh() {
           list.addEventListener("keydown", (e) => {
             const row = e.target.closest(".process-row");
             if (!row || !list.contains(row)) return;
+            // Pin button handles its own keys; do not steal from text fields.
+            if (e.target.closest && e.target.closest(".process-pin")) return;
             const rows = Array.from(list.querySelectorAll(".process-row"));
             const idx = rows.indexOf(row);
+            if (idx < 0) return;
+
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
               const pid = row.getAttribute("data-pid");
               if (pid) showProcessDetails(parseInt(pid, 10));
               return;
             }
+
+            // P toggles pin on the focused row (mouse still uses ★).
+            if (e.key === "p" || e.key === "P") {
+              e.preventDefault();
+              const name = row.getAttribute("data-name");
+              if (name) {
+                togglePinnedProcessName(name);
+                window._forceProcessUpdate = true;
+                if (window.refreshData) window.refreshData();
+              }
+              return;
+            }
+
+            // Esc clears row selection / focus (Monitors / Disk Cleanup / Hermes parity).
+            if (e.key === "Escape" || e.key === "Esc") {
+              if (!row.classList.contains("is-selected") && document.activeElement !== row) {
+                return;
+              }
+              e.preventDefault();
+              e.stopPropagation();
+              if (currentProcessPid !== null) {
+                currentProcessPid = null;
+                syncProcessRowSelection();
+              }
+              rows.forEach((r) => r.setAttribute("tabindex", "-1"));
+              if (rows[0]) rows[0].setAttribute("tabindex", "0");
+              row.blur();
+              return;
+            }
+
             let next = -1;
-            if (e.key === "ArrowDown") next = Math.min(idx + 1, rows.length - 1);
-            else if (e.key === "ArrowUp") next = Math.max(idx - 1, 0);
+            if (e.key === "ArrowDown" || e.key === "j") next = Math.min(idx + 1, rows.length - 1);
+            else if (e.key === "ArrowUp" || e.key === "k") next = Math.max(idx - 1, 0);
             else if (e.key === "Home") next = 0;
             else if (e.key === "End") next = rows.length - 1;
             else return;
@@ -958,6 +993,7 @@ async function refresh() {
             rows[next].focus();
           });
         }
+        ensureProcessesListKbHint(list, processes.length > 0);
         list.replaceChildren();
         list.appendChild(fragment);
         if (listHadFocus) {
@@ -3168,6 +3204,24 @@ function syncMonitorsListTabOrder(monitorsList, preferId) {
     applyMonitorRowTooltip(el, url, status);
   });
   ensureMonitorsListKbHint(monitorsList, items.length > 0);
+}
+
+/** Hint above Top Processes list (Monitors / Disk Cleanup kb-hint parity). */
+function ensureProcessesListKbHint(processList, show) {
+  if (!processList) return;
+  let hint = document.getElementById('processes-kb-hint');
+  if (!show) {
+    hint?.remove();
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'processes-kb-hint';
+    hint.id = 'processes-kb-hint';
+    processList.parentNode?.insertBefore(hint, processList);
+  }
+  hint.textContent =
+    'Click row for details · ↑↓ / j k select · Enter opens · P pin/unpin · Esc clears';
 }
 
 /** Hint above External / Monitors list (Disk Cleanup kb-hint parity). */

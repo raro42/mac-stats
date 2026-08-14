@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.401] - 2026-08-14
+
+### Changed
+- Top Processes: j/k selection + Esc clears focus/selection; `P` pins/unpins; keyboard hint (Monitors / Disk Cleanup parity).
+
 ## [0.1.400] - 2026-08-14
 
 ### Fixed
