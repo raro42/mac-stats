@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.411] - 2026-08-15
+
+### Changed
+- Agent Ops Refresh and Refresh digest: disable while in flight (blocks double click / `r` / `R`); show Refreshing… then a brief Refreshed flash on success. Auto-refresh stays silent (no flash).
+
 ## [0.1.410] - 2026-08-14
 
 ### Changed

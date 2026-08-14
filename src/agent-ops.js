@@ -44,6 +44,9 @@
   let opsAgentDirty = { soul: false, skill: false, mood: false };
   let opsAgentSaveStatusTimer = null;
   let opsRefreshInFlight = false;
+  let opsRefreshFlashTimer = null;
+  let opsDigestRefreshInFlight = false;
+  let opsDigestRefreshFlashTimer = null;
   let opsSessionLoadRows = null;
   let opsSessionFilterQ = '';
   let opsLiveCache = [];
@@ -157,7 +160,9 @@ function setupAgentOps() {
     });
     document.getElementById('ops-agent-save')?.addEventListener('click', () => saveOpsAgentFile());
     ensureOpsAgentEditor();
-    document.getElementById('ops-refresh-btn')?.addEventListener('click', () => refreshAgentOps());
+    document.getElementById('ops-refresh-btn')?.addEventListener('click', () =>
+        refreshAgentOps({ userTriggered: true })
+    );
     document.getElementById('ops-digest-refresh-btn')?.addEventListener('click', () => refreshOpsDigest());
     const loadChatBtn = document.getElementById('ops-session-load-chat');
     loadChatBtn?.addEventListener('click', () => loadOpsSessionIntoChat());
@@ -286,7 +291,7 @@ function setupAgentOps() {
                     return;
                 }
                 e.preventDefault();
-                refreshAgentOps();
+                refreshAgentOps({ userTriggered: true });
                 return;
             }
             if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -503,25 +508,66 @@ function stopAgentOpsAutoRefresh() {
     }
 }
 
-async function refreshOpsDigest() {
+function setOpsDigestRefreshBusy(busy) {
     const btn = document.getElementById('ops-digest-refresh-btn');
-    const digestEl = document.getElementById('ops-health-digest');
-    if (btn) {
+    if (!btn) return;
+    if (opsDigestRefreshFlashTimer) {
+        clearTimeout(opsDigestRefreshFlashTimer);
+        opsDigestRefreshFlashTimer = null;
+    }
+    btn.classList.remove('is-just-saved');
+    if (!btn.dataset.idleLabel) {
+        btn.dataset.idleLabel = btn.textContent || 'Refresh digest';
+    }
+    if (busy) {
         btn.disabled = true;
         btn.textContent = 'Refreshing…';
+        btn.title = 'Digest refresh in progress';
+    } else {
+        btn.disabled = false;
+        btn.textContent = btn.dataset.idleLabel || 'Refresh digest';
+        btn.title = 'Refresh agent digest';
     }
+}
+
+function flashOpsDigestRefreshed() {
+    const btn = document.getElementById('ops-digest-refresh-btn');
+    if (!btn) return;
+    if (opsDigestRefreshFlashTimer) {
+        clearTimeout(opsDigestRefreshFlashTimer);
+        opsDigestRefreshFlashTimer = null;
+    }
+    const idle = btn.dataset.idleLabel || 'Refresh digest';
+    btn.disabled = false;
+    btn.classList.add('is-just-saved');
+    btn.textContent = 'Refreshed';
+    btn.title = 'Digest refresh complete';
+    opsDigestRefreshFlashTimer = setTimeout(() => {
+        btn.classList.remove('is-just-saved');
+        btn.textContent = idle;
+        btn.title = 'Refresh agent digest';
+        opsDigestRefreshFlashTimer = null;
+    }, 1600);
+}
+
+async function refreshOpsDigest() {
+    if (opsDigestRefreshInFlight) return;
+    opsDigestRefreshInFlight = true;
+    const digestEl = document.getElementById('ops-health-digest');
+    setOpsDigestRefreshBusy(true);
+    let ok = false;
     try {
         const msg = await invoke('refresh_agent_digest');
         if (digestEl) digestEl.textContent = String(msg).slice(0, 80);
         await refreshAgentOps();
+        ok = true;
     } catch (err) {
         console.warn('[Agent Ops] digest refresh', err);
         if (digestEl) digestEl.textContent = `Refresh failed`;
     } finally {
-        if (btn) {
-            btn.disabled = false;
-            btn.textContent = 'Refresh digest';
-        }
+        opsDigestRefreshInFlight = false;
+        setOpsDigestRefreshBusy(false);
+        if (ok) flashOpsDigestRefreshed();
     }
 }
 
@@ -999,10 +1045,55 @@ function renderOpsSchedulesTab(schedules, deliveries) {
     }
 }
 
-async function refreshAgentOps() {
+function setOpsRefreshBusy(busy) {
+    const btn = document.getElementById('ops-refresh-btn');
+    if (!btn) return;
+    if (opsRefreshFlashTimer) {
+        clearTimeout(opsRefreshFlashTimer);
+        opsRefreshFlashTimer = null;
+    }
+    btn.classList.remove('is-just-saved');
+    if (!btn.dataset.idleLabel) {
+        btn.dataset.idleLabel = btn.textContent || 'Refresh';
+    }
+    if (busy) {
+        btn.disabled = true;
+        btn.textContent = 'Refreshing…';
+        btn.title = 'Refresh in progress';
+    } else {
+        btn.disabled = false;
+        btn.textContent = btn.dataset.idleLabel || 'Refresh';
+        btn.title = 'Refresh Agent Ops';
+    }
+}
+
+function flashOpsRefreshed() {
+    const btn = document.getElementById('ops-refresh-btn');
+    if (!btn) return;
+    if (opsRefreshFlashTimer) {
+        clearTimeout(opsRefreshFlashTimer);
+        opsRefreshFlashTimer = null;
+    }
+    const idle = btn.dataset.idleLabel || 'Refresh';
+    btn.disabled = false;
+    btn.classList.add('is-just-saved');
+    btn.textContent = 'Refreshed';
+    btn.title = 'Refresh complete';
+    opsRefreshFlashTimer = setTimeout(() => {
+        btn.classList.remove('is-just-saved');
+        btn.textContent = idle;
+        btn.title = 'Refresh Agent Ops';
+        opsRefreshFlashTimer = null;
+    }, 1600);
+}
+
+async function refreshAgentOps(opts = {}) {
+    const userTriggered = !!opts.userTriggered;
     const healthRow = document.getElementById('ops-health-row');
     if (opsRefreshInFlight) return;
     opsRefreshInFlight = true;
+    if (userTriggered) setOpsRefreshBusy(true);
+    let ok = false;
     try {
         const [agents, live, files, memory, insights, version, sched, deliveries, schedules, features] =
             await Promise.all([
@@ -1047,6 +1138,7 @@ async function refreshAgentOps() {
         renderOpsMemory(opsMemoryCache);
         opsRunsInsightsCache = insights;
         renderOpsRuns(opsRunsInsightsCache);
+        ok = true;
     } catch (err) {
         console.warn('[Agent Ops]', err);
         if (healthRow) {
@@ -1055,6 +1147,10 @@ async function refreshAgentOps() {
         }
     } finally {
         opsRefreshInFlight = false;
+        if (userTriggered) {
+            setOpsRefreshBusy(false);
+            if (ok) flashOpsRefreshed();
+        }
     }
 }
 
