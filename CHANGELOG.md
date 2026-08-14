@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.388] - 2026-08-14
+
+### Added
+- Disk Cleanup scopes: Delete or Backspace removes a custom (non-builtin) scope — same as the Remove button; builtins stay; focus moves to a neighbor row; hint updated.
+
 ## [0.1.387] - 2026-08-14
 
 ### Added

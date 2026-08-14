@@ -4778,7 +4778,10 @@ async function refreshDiskCleanupPanel() {
           const removeBtn = s.builtin
             ? ''
             : `<button type="button" class="disk-cleanup-scope-remove" data-scope-remove="${idx}">Remove</button>`;
-          return `<div class="disk-cleanup-scope-row${s.enabled ? '' : ' is-disabled'}" data-scope-idx="${idx}" role="option" title="↑↓ select · Space toggle enable">
+          const rowTitle = s.builtin
+            ? '↑↓ select · Space toggle enable'
+            : '↑↓ select · Space toggle enable · Delete removes custom scope';
+          return `<div class="disk-cleanup-scope-row${s.enabled ? '' : ' is-disabled'}" data-scope-idx="${idx}" role="option" title="${rowTitle}">
             <input type="checkbox" data-scope-enabled="${idx}" ${s.enabled ? 'checked' : ''} aria-label="Enable ${s.label}" />
             <div class="disk-cleanup-scope-main">
               <div class="disk-cleanup-scope-title">${s.label} <span class="disk-cleanup-scope-kind">(${s.kind})</span></div>
@@ -4796,9 +4799,10 @@ async function refreshDiskCleanupPanel() {
           hint = document.createElement('div');
           hint.className = 'disk-cleanup-kb-hint';
           hint.id = 'disk-cleanup-kb-hint';
-          hint.textContent = '↑↓ select scope · Space toggle enable · Save scopes when done';
           scopesEl.parentNode?.insertBefore(hint, scopesEl);
         }
+        hint.textContent =
+          '↑↓ select scope · Space toggle enable · Delete removes custom · Save scopes when done';
       } else {
         document.getElementById('disk-cleanup-kb-hint')?.remove();
       }
@@ -4924,6 +4928,18 @@ async function saveDiskCleanupScopes(scopes) {
   if (!inv) return;
   await inv('set_disk_cleanup_scopes', { scopes });
   await refreshDiskCleanupPanel();
+}
+
+/** Remove a custom (non-builtin) scope by index; no-op for builtins. */
+async function removeDiskCleanupScopeAt(idx) {
+  const scopes = readDiskCleanupScopesFromDom();
+  if (idx < 0 || idx >= scopes.length) return false;
+  if (scopes[idx]?.builtin) return false;
+  const next = scopes.filter((_, i) => i !== idx);
+  const focusAfter = Math.min(idx, Math.max(0, next.length - 1));
+  window.__diskCleanupScopeFocusIdx = next.length ? focusAfter : 0;
+  await saveDiskCleanupScopes(next);
+  return true;
 }
 
 /** Brief success flash on a Save control; restores label after ~1.8s. */
@@ -5054,6 +5070,23 @@ function wireDiskCleanupScopesKeyboard() {
         cb.dispatchEvent(new Event('change', { bubbles: true }));
         row.classList.toggle('is-disabled', !cb.checked);
       }
+      return;
+    }
+
+    // Delete / Backspace removes custom scopes (same as Remove button); builtins stay.
+    if (
+      (e.key === 'Delete' || e.key === 'Backspace') &&
+      !onNumber &&
+      !onTextLike &&
+      !onButton
+    ) {
+      const scopeIdx = parseInt(row.getAttribute('data-scope-idx') || `${idx}`, 10);
+      const scopes = window.__diskCleanupScopes || [];
+      if (scopes[scopeIdx]?.builtin) return;
+      e.preventDefault();
+      void removeDiskCleanupScopeAt(scopeIdx).catch((err) => {
+        alert(`Remove failed: ${err?.message || err}`);
+      });
       return;
     }
 
@@ -5268,9 +5301,8 @@ function initDiskCleanupSection() {
       if (!btn) return;
       e.stopPropagation();
       const idx = parseInt(btn.getAttribute('data-scope-remove'), 10);
-      const scopes = readDiskCleanupScopesFromDom().filter((_, i) => i !== idx);
       try {
-        await saveDiskCleanupScopes(scopes);
+        await removeDiskCleanupScopeAt(idx);
       } catch (err) {
         alert(`Remove failed: ${err?.message || err}`);
       }
