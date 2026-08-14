@@ -1281,16 +1281,29 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .monitor-history {
-  gap: 1.5px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: 1px;
   margin-top: 8px;
   padding-top: 8px;
-  min-height: 14px;
+  min-height: 18px;
+  /* Clear of the row summary tooltip — ticks own hover here */
+  pointer-events: auto;
 }
 
 .monitor-history-line {
-  width: 2.5px;
-  height: 12px;
+  display: inline-block;
+  width: 4px;
+  height: 14px;
   border-radius: 1.5px;
+  flex-shrink: 0;
+  /* Larger hit target than the visible bar */
+  padding: 2px 1px;
+  margin: -2px 0;
+  box-sizing: content-box;
+  background-clip: content-box;
+  cursor: help;
 }
 
 .monitor-settings-item:focus-within {

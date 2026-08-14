@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.395] - 2026-08-14
+
+### Changed
+- Monitors history ticks: each bar has its own hover (UP/DOWN + time; red ticks show when the outage started). Row summary tooltip stays on the header so the two hovers no longer fight.
+
 ## [0.1.394] - 2026-08-14
 
 ### Changed

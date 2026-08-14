@@ -2630,8 +2630,48 @@ function buildMonitorRowTooltip(monitorUrl, status, monitorId) {
 function applyMonitorRowTooltip(item, monitorUrl, status) {
   if (!item) return;
   const id = item.getAttribute('data-monitor-id') || '';
-  item.title = buildMonitorRowTooltip(monitorUrl, status, id);
   item.dataset.monitorUrl = monitorUrl || '';
+  // Put the summary tooltip on the header/info only — history ticks own their hover.
+  item.removeAttribute('title');
+  const tip = buildMonitorRowTooltip(monitorUrl, status, id);
+  const header = item.querySelector('.monitor-item-header');
+  const info = item.querySelector('.monitor-info');
+  if (info) info.title = tip;
+  if (header) header.title = tip;
+}
+
+/** Contiguous DOWN streak start at or before this history entry (epoch ms). */
+function downStreakStartMs(sortedAsc, index) {
+  if (!sortedAsc[index] || sortedAsc[index].is_up) return null;
+  let start = sortedAsc[index].timestamp;
+  for (let i = index - 1; i >= 0; i--) {
+    if (sortedAsc[i].is_up) break;
+    start = sortedAsc[i].timestamp;
+  }
+  return start;
+}
+
+function buildMonitorHistoryTickTitle(entry, sortedAsc, index) {
+  const when = new Date(entry.timestamp).toLocaleString();
+  if (entry.is_up) {
+    return `UP · ${when}`;
+  }
+  const streakStart = downStreakStartMs(sortedAsc, index);
+  const lines = [`DOWN · ${when}`];
+  if (streakStart != null) {
+    const startLabel = new Date(streakStart).toLocaleString();
+    const dur = formatMonitorDuration(entry.timestamp - streakStart);
+    if (streakStart === entry.timestamp) {
+      lines.push(`Outage started here`);
+    } else {
+      lines.push(
+        dur
+          ? `Outage started ${startLabel} (${dur} by this check)`
+          : `Outage started ${startLabel}`
+      );
+    }
+  }
+  return lines.join('\n');
 }
 
 function recentMonitorLogLines(monitorId, limit = 12) {
@@ -3446,29 +3486,40 @@ function updateMonitorHistory(container, monitorId) {
   
   // If we have more data points than maxLines, sample them
   let dataPoints = sortedHistory;
+  let indexMap = null; // sampled index → original index in sortedHistory
   if (sortedHistory.length > maxLines) {
     // Sample evenly
     const step = Math.floor(sortedHistory.length / maxLines);
     dataPoints = [];
+    indexMap = [];
     for (let i = 0; i < sortedHistory.length; i += step) {
       dataPoints.push(sortedHistory[i]);
+      indexMap.push(i);
     }
     // Always include the last point
     if (dataPoints[dataPoints.length - 1] !== sortedHistory[sortedHistory.length - 1]) {
       dataPoints.push(sortedHistory[sortedHistory.length - 1]);
+      indexMap.push(sortedHistory.length - 1);
     }
   }
   
-  // Create lines for each data point
-  dataPoints.forEach(entry => {
+  // Create lines for each data point — each tick has its own hover (not the row title).
+  dataPoints.forEach((entry, i) => {
     const line = document.createElement('span');
     line.className = 'monitor-history-line';
     line.classList.add(entry.is_up ? 'up' : 'down');
-    line.title = new Date(entry.timestamp).toLocaleString();
+    const histIdx = indexMap ? indexMap[i] : i;
+    line.title = buildMonitorHistoryTickTitle(entry, sortedHistory, histIdx);
+    line.setAttribute(
+      'aria-label',
+      entry.is_up ? `Up at ${new Date(entry.timestamp).toLocaleString()}` : `Down at ${new Date(entry.timestamp).toLocaleString()}`
+    );
     lines.push(line);
   });
   
   container.innerHTML = '';
+  container.removeAttribute('title');
+  container.title = 'Hover a tick for check time · red ticks show when the outage started';
   lines.forEach(line => container.appendChild(line));
 }
 
