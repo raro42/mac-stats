@@ -46,6 +46,7 @@ Also linked from the [project README](../../README.md#demo-video).
 
 ## Refresh log
 
+- **2026-08-14:** Recaptured `feature-monitors.png`, `feature-ai-chat.png`, and `dark-tui.png` (window-only, ≥30s warm-up) after Monitors downtime tips (v0.1.394–397) and dark first-paint (v0.1.398). Open section uses `MAC_STATS_OPEN_SECTION`; installed-app theme lives in WebKit `com.raro42.mac-stats` localStorage (not the legacy `mac_stats` folder). Window owner name for `screencapture -l` is **`mac-stats`**.
 - **2026-08-13:** Monitors summary up/down accents + row latency polish (v0.1.373); open with `MAC_STATS_OPEN_SECTION=monitors`. Recapture of `feature-monitors.png` deferred if Screen Recording TCC blocks.
 - **2026-08-13:** Disk Cleanup reclaim accent + scope/item hover (v0.1.372); open with `MAC_STATS_OPEN_SECTION=disk-cleanup`. Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC blocks.
 - **2026-08-13:** Top Processes accent bars + pin header (v0.1.371); open with `MAC_STATS_OPEN_SECTION=processes`. Recapture of `feature-processes.png` deferred if Screen Recording TCC blocks.

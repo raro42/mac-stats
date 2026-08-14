@@ -1966,107 +1966,127 @@ function escapeHtml(s) {
     applyOpsCollapsed(!!startsCollapsed);
     // Design-review / capture: MAC_STATS_OPEN_SECTION or one-shot config openUiSection.
     void (async () => {
-      try {
-        const section = await invoke('take_open_ui_section');
-        if (!section) return;
-        const key = String(section).trim().toLowerCase();
-        if (key === 'agent-ops' || key === 'agent_ops' || key === 'ops') {
-          applyOpsCollapsed(false);
-          selectOpsTab('runs');
-        } else if (
-          key === 'ai-chat' ||
-          key === 'ai_chat' ||
-          key === 'ollama' ||
-          key === 'chat'
-        ) {
-          applyOpsCollapsed(true);
+      const scrollStart = (el) => {
+        try {
+          el?.scrollIntoView?.({ behavior: 'auto', block: 'start' });
+        } catch (_) {
+          el?.scrollIntoView?.(true);
+        }
+      };
+      let section = null;
+      for (let i = 0; i < 25; i++) {
+        try {
+          section = await invoke('take_open_ui_section');
+          break;
+        } catch (_) {
+          await new Promise((r) => setTimeout(r, 100));
+        }
+      }
+      if (!section) return;
+      const key = String(section).trim().toLowerCase();
+      if (key === 'agent-ops' || key === 'agent_ops' || key === 'ops') {
+        applyOpsCollapsed(false);
+        selectOpsTab('runs');
+      } else if (
+        key === 'ai-chat' ||
+        key === 'ai_chat' ||
+        key === 'ollama' ||
+        key === 'chat'
+      ) {
+        applyOpsCollapsed(true);
+        localStorage.setItem('ollama_collapsed', 'false');
+        const openOllama = () => {
           const ollamaSection = document.querySelector('.ollama-section');
-          const themeCollapsed =
+          const ollamaContent = document.getElementById('ollama-content');
+          const collapsed =
             ollamaSection?.classList.contains('collapsed') ||
-            localStorage.getItem('ollama_collapsed') === 'true';
-          if (themeCollapsed) {
+            ollamaContent?.classList.contains('collapsed') ||
+            ollamaContent?.style.display === 'none';
+          // Expand only — icon-ollama toggles and would collapse an open section.
+          if (collapsed) {
             document.getElementById('ollama-header')?.click();
           }
-          ollamaSection?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
-          setTimeout(() => document.getElementById('chat-input')?.focus(), 120);
-        } else if (
-          key === 'processes' ||
-          key === 'process' ||
-          key === 'process-list' ||
-          key === 'process_list' ||
-          key === 'top-processes'
-        ) {
-          applyOpsCollapsed(true);
-          if (typeof window.showDetailsProcessesSections === 'function') {
-            window.showDetailsProcessesSections();
-          } else {
-            localStorage.setItem('details_processes_collapsed', 'false');
+          try {
+            ollamaSection?.scrollIntoView?.({ behavior: 'auto', block: 'start' });
+          } catch (_) {
+            ollamaSection?.scrollIntoView?.(true);
           }
-          const processesSection =
-            document.getElementById('processes-section') ||
-            document.querySelector(
-              '.apple-processes, .arch-processes, .swiss-processes, .mat-processes, .cpu-processes, .processes-section'
-            );
-          setTimeout(() => {
-            processesSection?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
-            const row =
-              document.querySelector('#process-list .process-row[tabindex="0"]') ||
-              document.querySelector('#process-list .process-row');
-            row?.focus?.();
-          }, 160);
-        } else if (
-          key === 'disk-cleanup' ||
-          key === 'disk_cleanup' ||
-          key === 'cleanup' ||
-          key === 'disk'
-        ) {
-          applyOpsCollapsed(true);
-          localStorage.setItem('disk_cleanup_collapsed', 'false');
-          const diskSection = document.querySelector('.disk-cleanup-section');
-          const diskContent = document.getElementById('disk-cleanup-content');
-          const isCollapsed =
-            diskSection?.classList.contains('collapsed') ||
-            diskContent?.classList.contains('collapsed');
-          if (isCollapsed) {
-            document.getElementById('icon-disk-cleanup')?.click();
-          } else if (typeof window.refreshDiskCleanupPanel === 'function') {
-            void window.refreshDiskCleanupPanel();
-          }
-          setTimeout(() => {
-            document
-              .querySelector('.disk-cleanup-section')
-              ?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
-            document.getElementById('disk-cleanup-run-btn')?.focus?.();
-          }, 160);
-        } else if (
-          key === 'monitors' ||
-          key === 'monitor' ||
-          key === 'external' ||
-          key === 'external-monitors' ||
-          key === 'external_monitors'
-        ) {
-          applyOpsCollapsed(true);
-          localStorage.setItem('monitors_collapsed', 'false');
-          const monitorsSection = document.querySelector('.monitors-section');
-          const monitorsContent = document.getElementById('monitors-content');
-          const isCollapsed =
-            monitorsSection?.classList.contains('collapsed') ||
-            monitorsContent?.classList.contains('collapsed');
-          if (isCollapsed) {
-            document.getElementById('icon-monitors')?.click();
-          }
-          setTimeout(() => {
-            document
-              .querySelector('.monitors-section')
-              ?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
-            const row =
-              document.querySelector('#monitors-list .monitor-item[tabindex="0"]') ||
-              document.querySelector('#monitors-list .monitor-item');
-            (row || document.getElementById('monitors-menu-btn'))?.focus?.();
-          }, 160);
+          document.getElementById('chat-input')?.focus();
+        };
+        openOllama();
+        setTimeout(openOllama, 400);
+        setTimeout(openOllama, 1200);
+      } else if (
+        key === 'processes' ||
+        key === 'process' ||
+        key === 'process-list' ||
+        key === 'process_list' ||
+        key === 'top-processes'
+      ) {
+        applyOpsCollapsed(true);
+        if (typeof window.showDetailsProcessesSections === 'function') {
+          window.showDetailsProcessesSections();
+        } else {
+          localStorage.setItem('details_processes_collapsed', 'false');
         }
-      } catch (_) {
-        /* ignore — normal launches omit the flag */
+        const processesSection =
+          document.getElementById('processes-section') ||
+          document.querySelector(
+            '.apple-processes, .arch-processes, .swiss-processes, .mat-processes, .cpu-processes, .processes-section'
+          );
+        setTimeout(() => {
+          scrollStart(processesSection);
+          const row =
+            document.querySelector('#process-list .process-row[tabindex="0"]') ||
+            document.querySelector('#process-list .process-row');
+          row?.focus?.();
+        }, 160);
+      } else if (
+        key === 'disk-cleanup' ||
+        key === 'disk_cleanup' ||
+        key === 'cleanup' ||
+        key === 'disk'
+      ) {
+        applyOpsCollapsed(true);
+        localStorage.setItem('disk_cleanup_collapsed', 'false');
+        const diskSection = document.querySelector('.disk-cleanup-section');
+        const diskContent = document.getElementById('disk-cleanup-content');
+        const isCollapsed =
+          diskSection?.classList.contains('collapsed') ||
+          diskContent?.classList.contains('collapsed');
+        if (isCollapsed) {
+          document.getElementById('icon-disk-cleanup')?.click();
+        } else if (typeof window.refreshDiskCleanupPanel === 'function') {
+          void window.refreshDiskCleanupPanel();
+        }
+        setTimeout(() => {
+          scrollStart(document.querySelector('.disk-cleanup-section'));
+          document.getElementById('disk-cleanup-run-btn')?.focus?.();
+        }, 160);
+      } else if (
+        key === 'monitors' ||
+        key === 'monitor' ||
+        key === 'external' ||
+        key === 'external-monitors' ||
+        key === 'external_monitors'
+      ) {
+        applyOpsCollapsed(true);
+        localStorage.setItem('monitors_collapsed', 'false');
+        const monitorsSection = document.querySelector('.monitors-section');
+        const monitorsContent = document.getElementById('monitors-content');
+        const isCollapsed =
+          monitorsSection?.classList.contains('collapsed') ||
+          monitorsContent?.classList.contains('collapsed');
+        if (isCollapsed) {
+          document.getElementById('icon-monitors')?.click();
+        }
+        setTimeout(() => {
+          scrollStart(document.querySelector('.monitors-section'));
+          const row =
+            document.querySelector('#monitors-list .monitor-item[tabindex="0"]') ||
+            document.querySelector('#monitors-list .monitor-item');
+          (row || document.getElementById('monitors-menu-btn'))?.focus?.();
+        }, 160);
       }
     })();
   }

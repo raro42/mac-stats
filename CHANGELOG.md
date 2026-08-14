@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.399] - 2026-08-14
+
+### Changed
+- Design-review open section (`MAC_STATS_OPEN_SECTION` / `openUiSection`): retry until Tauri invoke is ready; scroll with `block: start`; AI Chat expands without toggling closed; theme script cache-bust for `agent-ops.js`.
+
+### Fixed
+- Screenshots / docs: refreshed `feature-monitors.png`, `feature-ai-chat.png`, and `dark-tui.png` (window-only, ≥30s warm-up).
+
 ## [0.1.398] - 2026-08-14
 
 ### Fixed

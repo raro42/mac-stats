@@ -31,6 +31,8 @@ Real UI ships from `src-tauri/dist/themes/<theme>/cpu.html` + `src/agent-ops.{js
 2. Ensure mac-stats is running; open the CPU window to that view.
    - Agent Ops: `MAC_STATS_OPEN_SECTION=agent-ops` with `--cpu` (or one-shot `openUiSection` in `~/.mac-stats/config.json`).
    - AI Chat: `MAC_STATS_OPEN_SECTION=ai-chat` (aliases: `ollama`, `chat`).
+   - Monitors: `MAC_STATS_OPEN_SECTION=monitors`.
+   - Installed-app theme: WebKit store `com.raro42.mac-stats` (not legacy `mac_stats`). Window owner for capture: `mac-stats`. Rebuild+install after frontend edits (embedded `frontendDist`).
 3. Capture **window-only** PNG into `docs/screens/<feature-….png>` (`screencapture -l`, not full desktop).
 4. Pick **one** visible improvement: spacing, empty state, hierarchy, contrast, copy, affordance — make the view nicer or clearer.
 5. Edit source under `src/` (and theme files as needed), `./scripts/sync-dist.sh`.
