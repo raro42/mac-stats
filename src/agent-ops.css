@@ -1452,13 +1452,26 @@ textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, currentColor 16%, transparent);
 }
 
+.disk-cleanup-scope-row:focus-visible,
 .disk-cleanup-scope-row:focus-within {
+  outline: none;
   border-color: color-mix(in srgb, #0a84ff 34%, transparent);
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 16%, transparent);
 }
 
+.disk-cleanup-scope-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, transparent);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 6%, transparent);
+}
+
 .disk-cleanup-scope-row.is-disabled {
   opacity: 0.55;
+}
+
+.disk-cleanup-kb-hint {
+  margin: -4px 0 10px;
+  font-size: 11px;
+  opacity: 0.72;
 }
 
 .disk-cleanup-scope-main {

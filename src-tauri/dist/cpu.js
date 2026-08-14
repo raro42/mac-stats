@@ -4766,6 +4766,10 @@ async function refreshDiskCleanupPanel() {
 
     if (scopesEl) {
       const scopes = window.__diskCleanupScopes || [];
+      const preferIdx =
+        typeof window.__diskCleanupScopeFocusIdx === 'number'
+          ? window.__diskCleanupScopeFocusIdx
+          : null;
       scopesEl.innerHTML = scopes
         .map((s, idx) => {
           const pathHint = s.path || (s.kind === 'temp' ? 'system temp + /tmp' : s.kind);
@@ -4774,7 +4778,7 @@ async function refreshDiskCleanupPanel() {
           const removeBtn = s.builtin
             ? ''
             : `<button type="button" class="disk-cleanup-scope-remove" data-scope-remove="${idx}">Remove</button>`;
-          return `<div class="disk-cleanup-scope-row${s.enabled ? '' : ' is-disabled'}" data-scope-idx="${idx}">
+          return `<div class="disk-cleanup-scope-row${s.enabled ? '' : ' is-disabled'}" data-scope-idx="${idx}" role="option" title="↑↓ select · Space toggle enable">
             <input type="checkbox" data-scope-enabled="${idx}" ${s.enabled ? 'checked' : ''} aria-label="Enable ${s.label}" />
             <div class="disk-cleanup-scope-main">
               <div class="disk-cleanup-scope-title">${s.label} <span class="disk-cleanup-scope-kind">(${s.kind})</span></div>
@@ -4786,6 +4790,19 @@ async function refreshDiskCleanupPanel() {
           </div>`;
         })
         .join('');
+      if (scopes.length > 0) {
+        let hint = document.getElementById('disk-cleanup-kb-hint');
+        if (!hint) {
+          hint = document.createElement('div');
+          hint.className = 'disk-cleanup-kb-hint';
+          hint.id = 'disk-cleanup-kb-hint';
+          hint.textContent = '↑↓ select scope · Space toggle enable · Save scopes when done';
+          scopesEl.parentNode?.insertBefore(hint, scopesEl);
+        }
+      } else {
+        document.getElementById('disk-cleanup-kb-hint')?.remove();
+      }
+      syncDiskCleanupScopeTabOrder(scopesEl, preferIdx);
     }
 
     const cats = (status.categories || []).filter((c) => c.enabled !== false);
@@ -4913,6 +4930,112 @@ function flashSaveButton(btn, opts = {}) {
   }, durationMs);
 }
 
+/** Roving tabindex for Disk Cleanup scope rows (Monitors / process-list parity). */
+function syncDiskCleanupScopeTabOrder(scopesEl, preferIdx) {
+  if (!scopesEl) return;
+  const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
+  if (rows.length === 0) return;
+  let activeIdx = 0;
+  if (typeof preferIdx === 'number' && preferIdx >= 0 && preferIdx < rows.length) {
+    activeIdx = preferIdx;
+  } else {
+    const focused = rows.findIndex(
+      (el) => el === document.activeElement || el.contains(document.activeElement)
+    );
+    if (focused >= 0) activeIdx = focused;
+    else {
+      const selected = rows.findIndex((el) => el.classList.contains('is-selected'));
+      if (selected >= 0) activeIdx = selected;
+    }
+  }
+  window.__diskCleanupScopeFocusIdx = activeIdx;
+  rows.forEach((el, i) => {
+    el.setAttribute('tabindex', i === activeIdx ? '0' : '-1');
+    el.classList.toggle('is-selected', i === activeIdx);
+    el.setAttribute('aria-selected', i === activeIdx ? 'true' : 'false');
+  });
+}
+
+function wireDiskCleanupScopesKeyboard() {
+  const scopesEl = document.getElementById('disk-cleanup-scopes');
+  if (!scopesEl || scopesEl.dataset.keyboardNav === '1') return;
+  scopesEl.dataset.keyboardNav = '1';
+  scopesEl.setAttribute('role', 'listbox');
+  scopesEl.setAttribute('aria-label', 'Cleanup scopes');
+
+  scopesEl.addEventListener('click', (e) => {
+    const row = e.target && e.target.closest && e.target.closest('.disk-cleanup-scope-row');
+    if (!row || !scopesEl.contains(row)) return;
+    const idx = parseInt(row.getAttribute('data-scope-idx') || '0', 10);
+    syncDiskCleanupScopeTabOrder(scopesEl, idx);
+    if (e.target === row) row.focus();
+  });
+
+  scopesEl.addEventListener('change', (e) => {
+    const row = e.target && e.target.closest && e.target.closest('.disk-cleanup-scope-row');
+    if (!row || !scopesEl.contains(row)) return;
+    if (e.target.matches && e.target.matches('input[data-scope-enabled]')) {
+      row.classList.toggle('is-disabled', !e.target.checked);
+    }
+  });
+
+  scopesEl.addEventListener('keydown', (e) => {
+    const row = e.target && e.target.closest && e.target.closest('.disk-cleanup-scope-row');
+    if (!row || !scopesEl.contains(row)) return;
+    const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
+    const idx = rows.indexOf(row);
+    if (idx < 0) return;
+
+    const onNumber = e.target.matches && e.target.matches('input[type="number"]');
+    const onTextLike =
+      e.target.matches &&
+      (e.target.matches('input[type="text"]') || e.target.matches('textarea'));
+    const onEnable =
+      e.target.matches && e.target.matches('input[data-scope-enabled]');
+    const onRecurse =
+      e.target.matches && e.target.matches('input[data-scope-rec]');
+    const onButton = e.target.closest && e.target.closest('button');
+
+    // Space / Enter on the row (not nested controls): toggle enable.
+    if (
+      (e.key === 'Enter' || e.key === ' ') &&
+      !onNumber &&
+      !onTextLike &&
+      !onEnable &&
+      !onRecurse &&
+      !onButton
+    ) {
+      e.preventDefault();
+      const cb = row.querySelector('input[data-scope-enabled]');
+      if (cb && !cb.disabled) {
+        cb.checked = !cb.checked;
+        cb.dispatchEvent(new Event('change', { bubbles: true }));
+        row.classList.toggle('is-disabled', !cb.checked);
+      }
+      return;
+    }
+
+    // Leave ArrowUp/Down to number steppers; leave Space to native checkboxes.
+    if (onNumber && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) return;
+    if ((onEnable || onRecurse) && (e.key === ' ' || e.key === 'Spacebar')) return;
+
+    let next = -1;
+    if (e.key === 'ArrowDown') next = Math.min(idx + 1, rows.length - 1);
+    else if (e.key === 'ArrowUp') next = Math.max(idx - 1, 0);
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = rows.length - 1;
+    else return;
+
+    // From nested fields, only navigate with Home/End or when not editing a number.
+    if (onNumber && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) return;
+
+    e.preventDefault();
+    if (next < 0 || next === idx) return;
+    syncDiskCleanupScopeTabOrder(scopesEl, next);
+    rows[next].focus();
+  });
+}
+
 function initDiskCleanupSection() {
   const header = document.getElementById('disk-cleanup-header');
   const content = document.getElementById('disk-cleanup-content');
@@ -4924,6 +5047,8 @@ function initDiskCleanupSection() {
   const scopesEl = document.getElementById('disk-cleanup-scopes');
   const icon = document.getElementById('icon-disk-cleanup');
   if (!header || !content) return;
+
+  wireDiskCleanupScopesKeyboard();
 
   if (icon && !icon.getAttribute('data-title-base')) {
     icon.setAttribute('data-title-base', icon.title || 'Disk cleanup');

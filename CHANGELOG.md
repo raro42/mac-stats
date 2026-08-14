@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.386] - 2026-08-14
+
+### Added
+- Disk Cleanup scope rows: Arrow / Home / End keyboard nav with selected-row highlight; Space or Enter toggles enable (nested age/recurse controls keep native keys); hint under the scope list.
+
 ## [0.1.385] - 2026-08-14
 
 ### Added
