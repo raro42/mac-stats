@@ -4802,7 +4802,7 @@ async function refreshDiskCleanupPanel() {
           scopesEl.parentNode?.insertBefore(hint, scopesEl);
         }
         hint.textContent =
-          '↑↓ select scope · Space toggle enable · Delete removes custom · Save scopes when done';
+          '↑↓ select scope · Space toggle enable · Delete removes custom · Enter in Add form adds · Save scopes when done';
       } else {
         document.getElementById('disk-cleanup-kb-hint')?.remove();
       }
@@ -4928,6 +4928,46 @@ async function saveDiskCleanupScopes(scopes) {
   if (!inv) return;
   await inv('set_disk_cleanup_scopes', { scopes });
   await refreshDiskCleanupPanel();
+}
+
+/** Add a custom scope from the add-scope form fields; focuses the new row. */
+async function addDiskCleanupScopeFromForm() {
+  const label = (document.getElementById('disk-cleanup-add-label')?.value || '').trim();
+  const path = (document.getElementById('disk-cleanup-add-path')?.value || '').trim();
+  const days = parseInt(document.getElementById('disk-cleanup-add-days')?.value || '30', 10);
+  const recursive = !!document.getElementById('disk-cleanup-add-recursive')?.checked;
+  if (!label || !path) {
+    alert('Label and path are required for a custom scope.');
+    return false;
+  }
+  const scopes = readDiskCleanupScopesFromDom();
+  const id = `custom-${Date.now().toString(36)}`;
+  scopes.push({
+    id,
+    kind: 'path',
+    label,
+    enabled: true,
+    path,
+    maxAgeDays: Number.isNaN(days) || days < 1 ? 30 : days,
+    recursive,
+    builtin: false,
+  });
+  window.__diskCleanupScopeFocusIdx = scopes.length - 1;
+  await saveDiskCleanupScopes(scopes);
+  const labelEl = document.getElementById('disk-cleanup-add-label');
+  const pathEl = document.getElementById('disk-cleanup-add-path');
+  if (labelEl) labelEl.value = '';
+  if (pathEl) pathEl.value = '';
+  // Focus the new scope row after DOM refresh.
+  requestAnimationFrame(() => {
+    const scopesEl = document.getElementById('disk-cleanup-scopes');
+    if (!scopesEl) return;
+    const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
+    const idx = Math.min(window.__diskCleanupScopeFocusIdx || 0, Math.max(0, rows.length - 1));
+    syncDiskCleanupScopeTabOrder(scopesEl, idx);
+    rows[idx]?.focus();
+  });
+  return true;
 }
 
 /** Remove a custom (non-builtin) scope by index; no-op for builtins. */
@@ -5263,35 +5303,39 @@ function initDiskCleanupSection() {
   if (addBtn) {
     addBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
-      const label = (document.getElementById('disk-cleanup-add-label')?.value || '').trim();
-      const path = (document.getElementById('disk-cleanup-add-path')?.value || '').trim();
-      const days = parseInt(document.getElementById('disk-cleanup-add-days')?.value || '30', 10);
-      const recursive = !!document.getElementById('disk-cleanup-add-recursive')?.checked;
-      if (!label || !path) {
-        alert('Label and path are required for a custom scope.');
-        return;
-      }
-      const scopes = readDiskCleanupScopesFromDom();
-      const id = `custom-${Date.now().toString(36)}`;
-      scopes.push({
-        id,
-        kind: 'path',
-        label,
-        enabled: true,
-        path,
-        maxAgeDays: Number.isNaN(days) || days < 1 ? 30 : days,
-        recursive,
-        builtin: false,
-      });
       try {
-        await saveDiskCleanupScopes(scopes);
-        const labelEl = document.getElementById('disk-cleanup-add-label');
-        const pathEl = document.getElementById('disk-cleanup-add-path');
-        if (labelEl) labelEl.value = '';
-        if (pathEl) pathEl.value = '';
+        await addDiskCleanupScopeFromForm();
       } catch (err) {
         alert(`Add scope failed: ${err?.message || err}`);
       }
+    });
+  }
+
+  // Enter in Add form fields submits (same as Add scope button).
+  const addForm = document.querySelector('.disk-cleanup-add-scope');
+  if (addForm && addForm.dataset.enterAdd !== '1') {
+    addForm.dataset.enterAdd = '1';
+    addForm.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      if (e.target && e.target.matches && e.target.matches('textarea')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      void addDiskCleanupScopeFromForm().catch((err) => {
+        alert(`Add scope failed: ${err?.message || err}`);
+      });
+    });
+  }
+
+  // ⌘/Ctrl+S in Disk Cleanup saves scopes (incl. soft-delete) with Save flash.
+  const diskSection = document.querySelector('.disk-cleanup-section');
+  if (diskSection && diskSection.dataset.saveShortcut !== '1') {
+    diskSection.dataset.saveShortcut = '1';
+    diskSection.addEventListener('keydown', (e) => {
+      if (!(e.metaKey || e.ctrlKey) || (e.key !== 's' && e.key !== 'S')) return;
+      if (!saveBtn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      saveBtn.click();
     });
   }
 

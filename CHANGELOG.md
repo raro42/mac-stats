@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.389] - 2026-08-14
+
+### Added
+- Disk Cleanup add-scope form: Enter submits Add (same as the button); focus moves to the new scope row; ⌘/Ctrl+S saves scopes with the Saved flash; hint updated.
+
 ## [0.1.388] - 2026-08-14
 
 ### Added
