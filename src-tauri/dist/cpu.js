@@ -3467,28 +3467,52 @@ function updateMonitorItem(item, monitorId, monitorUrl, status) {
 }
 
 // Update the history visualization for a monitor
+function hideMonitorTickTip() {
+  const tip = document.getElementById('monitor-tick-tip');
+  if (tip) tip.hidden = true;
+}
+
+function showMonitorTickTip(anchor, text) {
+  let tip = document.getElementById('monitor-tick-tip');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 'monitor-tick-tip';
+    tip.className = 'monitor-tick-tip';
+    tip.setAttribute('role', 'tooltip');
+    document.body.appendChild(tip);
+  }
+  tip.textContent = text;
+  tip.hidden = false;
+  const r = anchor.getBoundingClientRect();
+  const x = r.left + r.width / 2;
+  const y = r.top;
+  tip.style.left = `${Math.round(x)}px`;
+  tip.style.top = `${Math.round(y)}px`;
+  // Keep on screen horizontally
+  const tw = tip.offsetWidth || 160;
+  const minX = tw / 2 + 8;
+  const maxX = window.innerWidth - tw / 2 - 8;
+  tip.style.left = `${Math.round(Math.min(maxX, Math.max(minX, x)))}px`;
+}
+
 function updateMonitorHistory(container, monitorId) {
+  hideMonitorTickTip();
   const history = getMonitorHistory(monitorId);
-  
+
   if (history.length === 0) {
     container.innerHTML = '';
     return;
   }
-  
-  // Create a visualization with colored lines
-  // We'll show up to 288 lines (24 hours * 60 minutes / 5 minutes per check)
-  // But we'll scale based on actual data points
-  const maxLines = 288; // 24 hours * 12 checks per hour (5 min intervals)
-  const lines = [];
-  
-  // Sort history by timestamp (oldest first)
+
+  // Fit ticks inside the card width (3px bar + 1px gap).
+  const widthPx = container.clientWidth || container.parentElement?.clientWidth || 320;
+  const maxByWidth = Math.max(48, Math.floor(widthPx / 4));
+  const maxLines = Math.min(160, maxByWidth);
+
   const sortedHistory = [...history].sort((a, b) => a.timestamp - b.timestamp);
-  
-  // If we have more data points than maxLines, sample them
   let dataPoints = sortedHistory;
-  let indexMap = null; // sampled index → original index in sortedHistory
+  let indexMap = null;
   if (sortedHistory.length > maxLines) {
-    // Sample evenly
     const step = Math.floor(sortedHistory.length / maxLines);
     dataPoints = [];
     indexMap = [];
@@ -3496,30 +3520,45 @@ function updateMonitorHistory(container, monitorId) {
       dataPoints.push(sortedHistory[i]);
       indexMap.push(i);
     }
-    // Always include the last point
     if (dataPoints[dataPoints.length - 1] !== sortedHistory[sortedHistory.length - 1]) {
       dataPoints.push(sortedHistory[sortedHistory.length - 1]);
       indexMap.push(sortedHistory.length - 1);
     }
   }
-  
-  // Create lines for each data point — each tick has its own hover (not the row title).
+
+  container.replaceChildren();
   dataPoints.forEach((entry, i) => {
     const line = document.createElement('span');
     line.className = 'monitor-history-line';
     line.classList.add(entry.is_up ? 'up' : 'down');
     const histIdx = indexMap ? indexMap[i] : i;
-    line.title = buildMonitorHistoryTickTitle(entry, sortedHistory, histIdx);
+    const tipText = buildMonitorHistoryTickTitle(entry, sortedHistory, histIdx);
     line.setAttribute(
       'aria-label',
-      entry.is_up ? `Up at ${new Date(entry.timestamp).toLocaleString()}` : `Down at ${new Date(entry.timestamp).toLocaleString()}`
+      entry.is_up
+        ? `Up at ${new Date(entry.timestamp).toLocaleString()}`
+        : `Down at ${new Date(entry.timestamp).toLocaleString()}`
     );
-    lines.push(line);
+    // No native title — OS balloons sit below the cursor and feel “off” the tick.
+    line.addEventListener('mouseenter', () => showMonitorTickTip(line, tipText));
+    line.addEventListener('mouseleave', hideMonitorTickTip);
+    container.appendChild(line);
   });
-  
-  container.innerHTML = '';
-  container.removeAttribute('title');
-  lines.forEach(line => container.appendChild(line));
+
+  // First paint may have width 0; relayout once so we don't overflow the card.
+  if (!(container.clientWidth > 40) && container.dataset.histRelayout !== '1') {
+    container.dataset.histRelayout = '1';
+    requestAnimationFrame(() => {
+      container.dataset.histRelayout = '0';
+      updateMonitorHistory(container, monitorId);
+    });
+  }
+}
+
+if (!window.__monitorTickTipScrollBound) {
+  window.__monitorTickTipScrollBound = true;
+  window.addEventListener('scroll', hideMonitorTickTip, true);
+  window.addEventListener('blur', hideMonitorTickTip);
 }
 
 function updateMonitorsStatusDot() {

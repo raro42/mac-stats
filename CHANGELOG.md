@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.397] - 2026-08-14
+
+### Fixed
+- Monitors history: ticks stay inside the card (width-capped + wrap); per-tick tip is a custom overlay on the bar (no native `title`, which sat below the tick on macOS).
+
 ## [0.1.396] - 2026-08-14
 
 ### Fixed

@@ -1109,6 +1109,7 @@ textarea.ops-agent-editor.is-dirty {
 
 .monitor-item {
   cursor: pointer;
+  overflow: hidden;
   transition:
     background 0.15s ease,
     box-shadow 0.15s ease,
@@ -1282,49 +1283,61 @@ textarea.ops-agent-editor.is-dirty {
 
 .monitor-history {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: 1px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   margin-top: 8px;
   padding-top: 8px;
-  min-height: 18px;
-  pointer-events: auto;
+  min-height: 12px;
+  overflow: hidden;
 }
 
-/* Hit target is the full box; colored bar is ::after (avoids padding/clip hover bugs). */
+/* Hit box === painted bar. No padding, no ::after, no native title (macOS draws those below). */
 .monitor-history-line {
-  position: relative;
-  display: inline-block;
-  width: 8px;
-  height: 16px;
-  border-radius: 0;
-  flex-shrink: 0;
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-  cursor: default;
-  background: transparent !important;
-  background-clip: border-box;
-}
-
-.monitor-history-line::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  display: block;
+  flex: 0 0 3px;
   width: 3px;
   height: 12px;
-  border-radius: 1.5px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 1px;
+  box-sizing: border-box;
+  cursor: default;
+  background: #8e8e93;
+}
+
+.monitor-history-line.up {
+  background: #34c759 !important;
+}
+
+.monitor-history-line.down {
+  background: #ff3b30 !important;
+}
+
+/* Custom tick tip — anchored to the bar, not the OS title balloon */
+.monitor-tick-tip {
+  position: fixed;
+  z-index: 100000;
+  max-width: min(280px, calc(100vw - 24px));
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(28, 28, 30, 0.92);
+  color: #f5f5f7;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: pre-line;
   pointer-events: none;
+  transform: translate(-50%, calc(-100% - 6px));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
 }
 
-.monitor-history-line.up::after {
-  background: #34c759;
-}
-
-.monitor-history-line.down::after {
-  background: #ff3b30;
+.monitor-tick-tip[hidden] {
+  display: none !important;
 }
 
 .monitor-settings-item:focus-within {
