@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.396] - 2026-08-14
+
+### Fixed
+- Monitors history ticks: normal cursor (no help/?); full-tick hover hit target (bar via ::after so the active region is not only the bottom edge).
+
 ## [0.1.395] - 2026-08-14
 
 ### Changed

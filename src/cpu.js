@@ -3519,7 +3519,6 @@ function updateMonitorHistory(container, monitorId) {
   
   container.innerHTML = '';
   container.removeAttribute('title');
-  container.title = 'Hover a tick for check time · red ticks show when the outage started';
   lines.forEach(line => container.appendChild(line));
 }
 
