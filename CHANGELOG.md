@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.384] - 2026-08-14
+
+### Changed
+- External / Monitors rows show relative last-check age (`12s ago` / `5m ago`); list sorts DOWN then pending above UP; all-up summary names the slowest host and tooltips list per-site latency + age.
+
 ## [0.1.383] - 2026-08-14
 
 ### Changed

@@ -1159,8 +1159,21 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.9;
 }
 
+.monitor-checked-ago {
+  font-size: 10px;
+  font-weight: 450;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: var(--muted, currentColor);
+  opacity: 0.72;
+}
+
 .monitor-item.is-down .monitor-latency {
   color: color-mix(in srgb, #ff3b30 55%, currentColor);
+}
+
+.monitor-item.is-down .monitor-checked-ago {
+  opacity: 0.85;
 }
 
 .monitor-error {

@@ -2533,6 +2533,7 @@ async function updateMonitorsSummary() {
     let totalResponseTime = 0;
     let responseTimeCount = 0;
     const downHints = [];
+    const upLatencyHints = [];
 
     // Use cached status from the background monitor thread — never live-probe here.
     // Live check_monitor waits on HTTP (up to timeout_secs) and freezes window open.
@@ -2544,6 +2545,26 @@ async function updateMonitorsSummary() {
         checkedCount++;
         if (status.is_up) {
           upCount++;
+          if (status.response_time_ms) {
+            let name = monitorId;
+            let url = '';
+            try {
+              const details = await invoke('get_monitor_details', { monitorId });
+              if (details?.name) name = details.name;
+              if (details?.url) url = details.url;
+            } catch (_) {
+              /* keep id */
+            }
+            const host = shortMonitorHostLabel(name, url);
+            const ago = formatMonitorCheckedAgo(status);
+            upLatencyHints.push({
+              host,
+              ms: status.response_time_ms,
+              label: ago
+                ? `${host} ${status.response_time_ms}ms (${ago})`
+                : `${host} ${status.response_time_ms}ms`,
+            });
+          }
         } else {
           downCount++;
           const pending =
@@ -2560,7 +2581,9 @@ async function updateMonitorsSummary() {
             }
             const host = shortMonitorHostLabel(name, url);
             const reason = shortMonitorFailReason(status.error);
-            downHints.push(reason ? `${host} (${reason})` : host);
+            const ago = formatMonitorCheckedAgo(status);
+            const base = reason ? `${host} (${reason})` : host;
+            downHints.push(ago ? `${base} · ${ago}` : base);
           }
         }
         if (status.response_time_ms) {
@@ -2583,9 +2606,20 @@ async function updateMonitorsSummary() {
         `${upCount} / ${monitorIds.length} up · DOWN: ${shown.join(', ')}${more}`;
       summaryText.title = downHints.join('; ');
     } else {
-      summaryText.textContent =
-        `${upCount} / ${monitorIds.length} sites up · Avg ${avgResponseTime} ms`;
-      summaryText.removeAttribute('title');
+      upLatencyHints.sort((a, b) => b.ms - a.ms);
+      const slowest = upLatencyHints[0];
+      if (slowest && upLatencyHints.length >= 2) {
+        summaryText.textContent =
+          `${upCount} / ${monitorIds.length} sites up · Avg ${avgResponseTime} ms · slowest ${slowest.host} ${slowest.ms}ms`;
+      } else {
+        summaryText.textContent =
+          `${upCount} / ${monitorIds.length} sites up · Avg ${avgResponseTime} ms`;
+      }
+      if (upLatencyHints.length > 0) {
+        summaryText.title = upLatencyHints.map((h) => h.label).join('; ');
+      } else {
+        summaryText.removeAttribute('title');
+      }
     }
     
     // Green only when every configured monitor has checked in and is up.
@@ -2690,7 +2724,9 @@ async function loadMonitors() {
     const anyDown = downCount > 0;
     const allUp = checkedCount > 0 && downCount === 0 && checkedCount === monitorIds.length;
     updateMonitorsIconStatus({ anyDown, allUp, upCount, totalCount: monitorIds.length });
-    
+
+    sortMonitorsListByHealth(monitorsList);
+
     // Update height after loading monitors
     updateMonitorsHeight();
   } catch (err) {
@@ -2756,6 +2792,49 @@ function formatMonitorBackoffHint(status) {
   return null;
 }
 
+/** Relative age from checked_at (ISO / epoch ms) for Monitors rows + tooltips. */
+function formatMonitorCheckedAgo(status) {
+  if (!status || status.checked_at == null) return null;
+  const raw = status.checked_at;
+  let ms = null;
+  if (typeof raw === 'number' && Number.isFinite(raw)) {
+    ms = raw < 1e12 ? raw * 1000 : raw;
+  } else {
+    const parsed = Date.parse(String(raw));
+    if (Number.isFinite(parsed)) ms = parsed;
+  }
+  if (ms == null) return null;
+  const sec = Math.max(0, Math.floor((Date.now() - ms) / 1000));
+  if (sec < 5) return 'just now';
+  if (sec < 60) return `${sec}s ago`;
+  const mins = Math.floor(sec / 60);
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 48) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
+
+/** Keep DOWN (then pending) above UP so failures stay visible. */
+function sortMonitorsListByHealth(monitorsList) {
+  if (!monitorsList) return;
+  const items = Array.from(monitorsList.querySelectorAll('.monitor-item'));
+  if (items.length < 2) return;
+  const rank = (el) => {
+    if (el.classList.contains('is-down')) return 0;
+    if (el.classList.contains('is-pending')) return 1;
+    return 2;
+  };
+  items
+    .sort((a, b) => {
+      const d = rank(a) - rank(b);
+      if (d !== 0) return d;
+      return (a.getAttribute('data-monitor-id') || '').localeCompare(
+        b.getAttribute('data-monitor-id') || ''
+      );
+    })
+    .forEach((el) => monitorsList.appendChild(el));
+}
+
 function fillMonitorInfo(info, monitorUrl, status) {
   const responseTimeText = status.response_time_ms ? `${status.response_time_ms}ms` : '--';
   const pending =
@@ -2776,6 +2855,18 @@ function fillMonitorInfo(info, monitorUrl, status) {
 
   primary.appendChild(urlEl);
   primary.appendChild(latencyEl);
+
+  const ago = formatMonitorCheckedAgo(status);
+  if (ago && !pending) {
+    const agoEl = document.createElement('span');
+    agoEl.className = 'monitor-checked-ago';
+    agoEl.textContent = ago;
+    agoEl.title = status.checked_at
+      ? `Last check: ${new Date(status.checked_at).toLocaleString()}`
+      : 'Last check';
+    primary.appendChild(agoEl);
+  }
+
   info.appendChild(primary);
 
   if (status.error && !pending) {
