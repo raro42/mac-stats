@@ -2655,7 +2655,7 @@ function buildMonitorRowTooltip(monitorUrl, status, monitorId) {
     (!status.response_time_ms || String(status.error || '').includes('Waiting'));
   if (pending) {
     lines.push('Waiting for first check…');
-    lines.push('Click or d for details · Enter checks now');
+    lines.push('Click or d for details · Enter checks now · PgUp/PgDn');
     return lines.join('\n');
   }
   if (status.is_up) {
@@ -2678,7 +2678,7 @@ function buildMonitorRowTooltip(monitorUrl, status, monitorId) {
     const backoff = formatMonitorBackoffHint(status);
     if (backoff) lines.push(backoff);
   }
-  lines.push('Click or d for details · Enter / Space checks now');
+  lines.push('Click or d for details · Enter / Space checks now · PgUp/PgDn');
   return lines.join('\n');
 }
 
@@ -3258,7 +3258,7 @@ function ensureMonitorsListKbHint(monitorsList, show) {
     monitorsList.parentNode?.insertBefore(hint, monitorsList);
   }
   hint.textContent =
-    'Click row for details · ↑↓ / j k select · Enter check now · d details · Esc closes/clears';
+    'Click row for details · ↑↓ / j k · PgUp/PgDn · Enter check now · d details · Esc closes/clears';
 }
 
 function wireMonitorsListKeyboard() {
@@ -3320,8 +3320,11 @@ function wireMonitorsListKeyboard() {
     }
 
     let next = -1;
+    const page = 5;
     if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, items.length - 1);
     else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
+    else if (e.key === 'PageDown') next = Math.min(idx + page, items.length - 1);
+    else if (e.key === 'PageUp') next = Math.max(idx - page, 0);
     else if (e.key === 'Home') next = 0;
     else if (e.key === 'End') next = items.length - 1;
     else return;
@@ -3330,6 +3333,9 @@ function wireMonitorsListKeyboard() {
     const preferId = items[next].getAttribute('data-monitor-id');
     syncMonitorsListTabOrder(monitorsList, preferId);
     items[next].focus();
+    if (typeof items[next].scrollIntoView === 'function') {
+      items[next].scrollIntoView({ block: 'nearest' });
+    }
   });
 }
 
