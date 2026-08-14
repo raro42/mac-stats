@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.409] - 2026-08-14
+
+### Added
+- AI Chat Clear button next to Send: clears the thread and shows a brief Cleared flash; disabled while empty or while a reply is in flight.
+
 ## [0.1.408] - 2026-08-14
 
 ### Changed

@@ -464,6 +464,57 @@ function clearConversationHistory() {
     container.innerHTML = '';
     ensureChatEmptyHint();
   }
+  updateChatClearButton();
+}
+
+function getChatClearButton() {
+  return document.getElementById('chat-clear-btn');
+}
+
+/** Enable Clear only when history exists and Send is not in flight. */
+function updateChatClearButton() {
+  const btn = getChatClearButton();
+  if (!btn) return;
+  const hasUi = !!document.querySelector('#chat-messages .chat-message');
+  const hasSomething = conversationHistory.length > 0 || hasUi;
+  btn.disabled = !hasSomething || chatSendInFlight;
+  btn.title = chatSendInFlight
+    ? 'Wait for the reply to finish'
+    : hasSomething
+      ? 'Clear this chat'
+      : 'No messages to clear';
+}
+
+/**
+ * Clear chat with visible confirmation on the Clear control (save-button feedback).
+ */
+function clearChatWithFeedback() {
+  if (chatSendInFlight) return;
+  const hasUi = !!document.querySelector('#chat-messages .chat-message');
+  if (!conversationHistory.length && !hasUi) return;
+  const btn = getChatClearButton();
+  clearConversationHistory();
+  const input = document.getElementById('chat-input');
+  if (input) {
+    input.value = '';
+    input.focus();
+  }
+  if (!btn) return;
+  if (btn._clearFlashTimer) {
+    clearTimeout(btn._clearFlashTimer);
+    btn._clearFlashTimer = null;
+  }
+  const idle = btn.dataset.idleLabel || 'Clear';
+  btn.dataset.idleLabel = idle;
+  btn.classList.add('is-just-saved');
+  btn.textContent = 'Cleared';
+  btn.disabled = true;
+  btn._clearFlashTimer = setTimeout(() => {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = idle;
+    btn._clearFlashTimer = null;
+    updateChatClearButton();
+  }, 1600);
 }
 
 /**
@@ -513,6 +564,7 @@ function replaceConversationHistory(messages) {
     chat.style.display = '';
   }
   console.log('[Ollama] Replaced conversation history:', conversationHistory.length, 'messages');
+  updateChatClearButton();
 }
 
 /**
@@ -529,20 +581,22 @@ function getChatSendButton() {
 function setChatSendBusy(busy) {
   const btn = getChatSendButton();
   chatSendInFlight = !!busy;
-  if (!btn) return;
-  if (chatSendFlashTimer) {
-    clearTimeout(chatSendFlashTimer);
-    chatSendFlashTimer = null;
+  if (btn) {
+    if (chatSendFlashTimer) {
+      clearTimeout(chatSendFlashTimer);
+      chatSendFlashTimer = null;
+    }
+    btn.classList.remove('is-just-saved');
+    if (busy) {
+      if (btn.dataset.idleLabel == null) btn.dataset.idleLabel = btn.textContent || 'Send';
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+    } else {
+      btn.disabled = false;
+      btn.textContent = btn.dataset.idleLabel || 'Send';
+    }
   }
-  btn.classList.remove('is-just-saved');
-  if (busy) {
-    if (btn.dataset.idleLabel == null) btn.dataset.idleLabel = btn.textContent || 'Send';
-    btn.disabled = true;
-    btn.textContent = 'Sending…';
-  } else {
-    btn.disabled = false;
-    btn.textContent = btn.dataset.idleLabel || 'Send';
-  }
+  updateChatClearButton();
 }
 
 /** Brief success flash on Send (save-button-feedback parity). */
@@ -1184,6 +1238,7 @@ function addChatMessage(role, content, isHtml = false) {
 
   messagesContainer.appendChild(messageDiv);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  updateChatClearButton();
 }
 
 /**
@@ -1292,6 +1347,7 @@ async function setupCompactionStatusListener() {
 function initOllamaChatListeners() {
   const chatInput = document.getElementById('chat-input');
   const chatSendBtn = document.getElementById('chat-send-btn');
+  const chatClearBtn = document.getElementById('chat-clear-btn');
   
   if (!chatInput || !chatSendBtn) {
     console.warn('[Ollama] Chat input or send button not found');
@@ -1304,12 +1360,23 @@ function initOllamaChatListeners() {
     chatInput.placeholder = 'Ask about metrics, tasks, or the web…';
   }
   ensureChatEmptyHint();
+  updateChatClearButton();
   
   // Send button click
   chatSendBtn.addEventListener('click', () => {
     console.log('[Ollama] Send button clicked');
     sendChatMessage();
   });
+
+  if (chatClearBtn) {
+    if (chatClearBtn.dataset.idleLabel == null) {
+      chatClearBtn.dataset.idleLabel = chatClearBtn.textContent || 'Clear';
+    }
+    chatClearBtn.addEventListener('click', () => {
+      console.log('[Ollama] Clear button clicked');
+      clearChatWithFeedback();
+    });
+  }
   
   // Enter sends (ignore while in flight; Shift+Enter left for future multiline)
   chatInput.addEventListener('keydown', (e) => {
@@ -1372,6 +1439,7 @@ window.Ollama = {
   processResponse: processOllamaResponse,
   getHistory: getConversationHistory,
   clearHistory: clearConversationHistory,
+  clearChat: clearChatWithFeedback,
   replaceHistory: replaceConversationHistory,
   
   // Code execution
