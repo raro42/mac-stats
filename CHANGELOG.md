@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.393] - 2026-08-14
+
+### Added
+- Disk Cleanup scopes and categories: `j` / `k` move selection (Monitors / Agent Ops parity); Escape clears selection; hints and row tooltips updated.
+
 ## [0.1.392] - 2026-08-14
 
 ### Added

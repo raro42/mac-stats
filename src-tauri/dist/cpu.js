@@ -4820,8 +4820,8 @@ async function refreshDiskCleanupPanel() {
             ? ''
             : `<button type="button" class="disk-cleanup-scope-remove" data-scope-remove="${idx}">Remove</button>`;
           const rowTitle = s.builtin
-            ? '↑↓ select · Space toggle enable · R toggle recurse'
-            : '↑↓ select · Space toggle enable · R toggle recurse · Delete removes custom scope';
+            ? '↑↓ / j k select · Space toggle enable · R toggle recurse · Esc clears'
+            : '↑↓ / j k select · Space toggle enable · R toggle recurse · Delete removes custom · Esc clears';
           return `<div class="disk-cleanup-scope-row${s.enabled ? '' : ' is-disabled'}" data-scope-idx="${idx}" role="option" title="${rowTitle}">
             <input type="checkbox" data-scope-enabled="${idx}" ${s.enabled ? 'checked' : ''} aria-label="Enable ${s.label}" />
             <div class="disk-cleanup-scope-main">
@@ -4843,7 +4843,7 @@ async function refreshDiskCleanupPanel() {
           scopesEl.parentNode?.insertBefore(hint, scopesEl);
         }
         hint.textContent =
-          '↑↓ select scope · Space toggle enable · R toggle recurse · T toggle Trash soft-delete · Delete removes custom · Enter in Add form adds · ⌘S saves';
+          '↑↓ / j k select scope · Esc clears · Space toggle enable · R toggle recurse · T toggle Trash soft-delete · Delete removes custom · Enter in Add form adds · ⌘S saves';
       } else {
         document.getElementById('disk-cleanup-kb-hint')?.remove();
       }
@@ -4865,8 +4865,8 @@ async function refreshDiskCleanupPanel() {
           const has = (c.bytes || 0) > 0 || (c.fileCount || 0) > 0;
           const samples = (c.sampleNames || []).slice(0, 3).join(', ');
           const title = has
-            ? '↑↓ select · Enter Clean now'
-            : '↑↓ select · Enter focuses Clean now';
+            ? '↑↓ / j k select · Enter Clean now · Esc clears'
+            : '↑↓ / j k select · Enter focuses Clean now · Esc clears';
           return `<li class="disk-cleanup-item${has ? ' has-reclaim' : ''}" role="option" data-item-idx="${idx}" title="${title}">
             <div class="disk-cleanup-item-head">
               <span class="disk-cleanup-item-title">${c.label || c.id}</span>
@@ -4892,7 +4892,7 @@ async function refreshDiskCleanupPanel() {
         listHint.className = 'disk-cleanup-list-kb-hint';
         listHint.id = 'disk-cleanup-list-kb-hint';
         listHint.textContent =
-          'Categories: ↑↓ / Home / End select · Enter runs Clean now when reclaimable';
+          'Categories: ↑↓ / j k / Home / End select · Esc clears · Enter runs Clean now when reclaimable';
         list.parentNode.insertBefore(listHint, list);
       }
       syncDiskCleanupItemTabOrder(list, preferItemIdx);
@@ -5191,13 +5191,41 @@ function wireDiskCleanupScopesKeyboard() {
       return;
     }
 
+    // Esc clears row selection (Monitors / Agent Ops parity).
+    if (
+      (e.key === 'Escape' || e.key === 'Esc') &&
+      !onNumber &&
+      !onTextLike
+    ) {
+      if (!row.classList.contains('is-selected') && document.activeElement !== row) {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      rows.forEach((el) => {
+        el.classList.remove('is-selected');
+        el.setAttribute('tabindex', '-1');
+      });
+      if (rows[0]) rows[0].setAttribute('tabindex', '0');
+      window.__diskCleanupScopeFocusIdx = null;
+      if (document.activeElement === row || row.contains(document.activeElement)) {
+        row.blur();
+        if (document.activeElement && row.contains(document.activeElement)) {
+          document.activeElement.blur();
+        }
+      }
+      return;
+    }
+
     // Leave ArrowUp/Down to number steppers; leave Space to native checkboxes.
+    // Skip j/k while typing in age/path fields.
     if (onNumber && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) return;
     if ((onEnable || onRecurse) && (e.key === ' ' || e.key === 'Spacebar')) return;
+    if (onNumber || onTextLike) return;
 
     let next = -1;
-    if (e.key === 'ArrowDown') next = Math.min(idx + 1, rows.length - 1);
-    else if (e.key === 'ArrowUp') next = Math.max(idx - 1, 0);
+    if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, rows.length - 1);
+    else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
     else if (e.key === 'Home') next = 0;
     else if (e.key === 'End') next = rows.length - 1;
     else return;
@@ -5244,9 +5272,26 @@ function wireDiskCleanupListKeyboard() {
       return;
     }
 
+    // Esc clears category selection (Monitors / Agent Ops parity).
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      if (!row.classList.contains('is-selected') && document.activeElement !== row) {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      rows.forEach((el) => {
+        el.classList.remove('is-selected');
+        el.setAttribute('tabindex', '-1');
+      });
+      if (rows[0]) rows[0].setAttribute('tabindex', '0');
+      window.__diskCleanupItemFocusIdx = null;
+      row.blur();
+      return;
+    }
+
     let next = -1;
-    if (e.key === 'ArrowDown') next = Math.min(idx + 1, rows.length - 1);
-    else if (e.key === 'ArrowUp') next = Math.max(idx - 1, 0);
+    if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, rows.length - 1);
+    else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
     else if (e.key === 'Home') next = 0;
     else if (e.key === 'End') next = rows.length - 1;
     else return;
