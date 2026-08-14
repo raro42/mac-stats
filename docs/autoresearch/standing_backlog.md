@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Top Processes PageUp/PageDown (~5) + `d` details + Esc closes modal first (**v0.1.403**)
 - Monitors `d` detail toggle + Esc closes detail before clear (**v0.1.402**)
 - Top Processes j/k + Esc clear + P pin/unpin + kb hint (**v0.1.401**)
 - Disk Cleanup j/k + Esc clear selection + hints (**v0.1.393**)

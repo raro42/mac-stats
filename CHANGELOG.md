@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.403] - 2026-08-14
+
+### Changed
+- Top Processes: PageUp/PageDown jump ~5 rows; `d` opens details (Monitors muscle memory); Esc closes the details modal before clearing selection; hint and row tooltips updated.
+
 ## [0.1.402] - 2026-08-14
 
 ### Changed

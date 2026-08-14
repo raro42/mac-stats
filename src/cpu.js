@@ -862,7 +862,7 @@ async function refresh() {
           row.setAttribute("role", "option");
           row.setAttribute("tabindex", i === tabIdx ? "0" : "-1");
           row.title =
-            "Click or Enter for details · ↑↓ / j k · P pin · Esc clears";
+            "Click / Enter / d for details · ↑↓ / j k · PgUp/PgDn · P pin · Esc clears";
           const selected =
             currentProcessPid !== null && Number(proc.pid) === Number(currentProcessPid);
           row.setAttribute("aria-selected", selected ? "true" : "false");
@@ -952,6 +952,14 @@ async function refresh() {
               return;
             }
 
+            // d opens details (Monitors muscle memory; Enter/Space still work).
+            if (e.key === "d" || e.key === "D") {
+              e.preventDefault();
+              const pid = row.getAttribute("data-pid");
+              if (pid) showProcessDetails(parseInt(pid, 10));
+              return;
+            }
+
             // P toggles pin on the focused row (mouse still uses ★).
             if (e.key === "p" || e.key === "P") {
               e.preventDefault();
@@ -964,13 +972,18 @@ async function refresh() {
               return;
             }
 
-            // Esc clears row selection / focus (Monitors / Disk Cleanup / Hermes parity).
+            // Esc: close process details first, then clear selection (Monitors parity).
             if (e.key === "Escape" || e.key === "Esc") {
               if (!row.classList.contains("is-selected") && document.activeElement !== row) {
                 return;
               }
               e.preventDefault();
               e.stopPropagation();
+              const modal = document.getElementById("process-details-modal");
+              if (modal && modal.style.display !== "none") {
+                closeProcessDetailsModal();
+                return;
+              }
               if (currentProcessPid !== null) {
                 currentProcessPid = null;
                 syncProcessRowSelection();
@@ -982,8 +995,11 @@ async function refresh() {
             }
 
             let next = -1;
+            const page = 5;
             if (e.key === "ArrowDown" || e.key === "j") next = Math.min(idx + 1, rows.length - 1);
             else if (e.key === "ArrowUp" || e.key === "k") next = Math.max(idx - 1, 0);
+            else if (e.key === "PageDown") next = Math.min(idx + page, rows.length - 1);
+            else if (e.key === "PageUp") next = Math.max(idx - page, 0);
             else if (e.key === "Home") next = 0;
             else if (e.key === "End") next = rows.length - 1;
             else return;
@@ -991,6 +1007,9 @@ async function refresh() {
             if (next < 0 || next === idx) return;
             rows.forEach((r, i) => r.setAttribute("tabindex", i === next ? "0" : "-1"));
             rows[next].focus();
+            if (typeof rows[next].scrollIntoView === "function") {
+              rows[next].scrollIntoView({ block: "nearest" });
+            }
           });
         }
         ensureProcessesListKbHint(list, processes.length > 0);
@@ -3221,7 +3240,7 @@ function ensureProcessesListKbHint(processList, show) {
     processList.parentNode?.insertBefore(hint, processList);
   }
   hint.textContent =
-    'Click row for details · ↑↓ / j k select · Enter opens · P pin/unpin · Esc clears';
+    'Click row for details · ↑↓ / j k · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
 }
 
 /** Hint above External / Monitors list (Disk Cleanup kb-hint parity). */
