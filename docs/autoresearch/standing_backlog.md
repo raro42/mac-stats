@@ -20,7 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
-- Disk Cleanup PageUp/PageDown (~5) on scopes + categories (**v0.1.405**)
+- Disk Cleanup soft-delete: skip when Trash move fails — no permanent fallback (**v0.1.406**)
+- Disk Cleanup PageUp/PageDown (~5) on scopes + categories (**v0.1.405**). Soft-delete EPERM → skip (no permanent fallback) in **v0.1.406**
 - Monitors PageUp/PageDown (~5) + hint/tooltips (**v0.1.404**)
 - Top Processes PageUp/PageDown (~5) + `d` details + Esc closes modal first (**v0.1.403**)
 - Monitors `d` detail toggle + Esc closes detail before clear (**v0.1.402**)
