@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.385] - 2026-08-14
+
+### Added
+- External / Monitors list keyboard nav (Arrow / Home / End) with selected-row highlight; Enter or Space runs a manual check now (bypasses DOWN backoff — `check_monitor` was unused in the UI).
+
 ## [0.1.384] - 2026-08-14
 
 ### Changed

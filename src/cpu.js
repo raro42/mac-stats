@@ -2068,6 +2068,7 @@ function initMonitorsSection() {
   // Initialize monitor history from localStorage
   initMonitorHistory();
   wireMonitorRemoveDelegation();
+  wireMonitorsListKeyboard();
 
   // Always load monitors to calculate height, even when collapsed
   loadMonitors().then(() => {
@@ -2726,6 +2727,7 @@ async function loadMonitors() {
     updateMonitorsIconStatus({ anyDown, allUp, upCount, totalCount: monitorIds.length });
 
     sortMonitorsListByHealth(monitorsList);
+    syncMonitorsListTabOrder(monitorsList);
 
     // Update height after loading monitors
     updateMonitorsHeight();
@@ -2835,6 +2837,119 @@ function sortMonitorsListByHealth(monitorsList) {
     .forEach((el) => monitorsList.appendChild(el));
 }
 
+/** Roving tabindex for External / Monitors rows (process-list parity). */
+function syncMonitorsListTabOrder(monitorsList, preferId) {
+  if (!monitorsList) return;
+  const items = Array.from(monitorsList.querySelectorAll('.monitor-item'));
+  if (items.length === 0) return;
+  let activeIdx = 0;
+  if (preferId) {
+    const hit = items.findIndex((el) => el.getAttribute('data-monitor-id') === preferId);
+    if (hit >= 0) activeIdx = hit;
+  } else {
+    const focused = items.findIndex((el) => el === document.activeElement);
+    if (focused >= 0) activeIdx = focused;
+    else {
+      const selected = items.findIndex((el) => el.classList.contains('is-selected'));
+      if (selected >= 0) activeIdx = selected;
+    }
+  }
+  items.forEach((el, i) => {
+    el.setAttribute('tabindex', i === activeIdx ? '0' : '-1');
+    el.classList.toggle('is-selected', i === activeIdx);
+    el.title = 'Enter or Space: check now (bypasses DOWN backoff)';
+  });
+}
+
+function wireMonitorsListKeyboard() {
+  const monitorsList = document.getElementById('monitors-list');
+  if (!monitorsList || monitorsList.dataset.keyboardNav === '1') return;
+  monitorsList.dataset.keyboardNav = '1';
+  monitorsList.setAttribute('role', 'listbox');
+  monitorsList.setAttribute('aria-label', 'External monitors');
+
+  monitorsList.addEventListener('click', (e) => {
+    const item = e.target && e.target.closest && e.target.closest('.monitor-item');
+    if (!item || !monitorsList.contains(item)) return;
+    const id = item.getAttribute('data-monitor-id');
+    syncMonitorsListTabOrder(monitorsList, id);
+    item.focus();
+  });
+
+  monitorsList.addEventListener('keydown', (e) => {
+    const item = e.target && e.target.closest && e.target.closest('.monitor-item');
+    if (!item || !monitorsList.contains(item)) return;
+    const items = Array.from(monitorsList.querySelectorAll('.monitor-item'));
+    const idx = items.indexOf(item);
+    if (idx < 0) return;
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const monitorId = item.getAttribute('data-monitor-id');
+      if (monitorId) void forceCheckMonitorNow(monitorId, item);
+      return;
+    }
+
+    let next = -1;
+    if (e.key === 'ArrowDown') next = Math.min(idx + 1, items.length - 1);
+    else if (e.key === 'ArrowUp') next = Math.max(idx - 1, 0);
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = items.length - 1;
+    else return;
+    e.preventDefault();
+    if (next < 0 || next === idx) return;
+    const preferId = items[next].getAttribute('data-monitor-id');
+    syncMonitorsListTabOrder(monitorsList, preferId);
+    items[next].focus();
+  });
+}
+
+/** Manual check: bypasses background DOWN backoff (UI was never wired to check_monitor). */
+async function forceCheckMonitorNow(monitorId, itemEl) {
+  if (!monitorId) return;
+  const findRow = () =>
+    Array.from(document.querySelectorAll('.monitor-item')).find(
+      (el) => el.getAttribute('data-monitor-id') === monitorId
+    );
+  const item = itemEl || findRow();
+  if (item?.dataset.checking === '1') return;
+  if (item) {
+    item.dataset.checking = '1';
+    item.classList.add('is-checking');
+    const latencyEl = item.querySelector('.monitor-latency');
+    if (latencyEl) latencyEl.textContent = '…';
+  }
+  try {
+    const status = await invoke('check_monitor', { monitorId });
+    if (status) {
+      monitorStatusCache.set(monitorId, status);
+      addMonitorHistoryEntry(monitorId, status.is_up);
+      let monitorUrl = monitorId;
+      try {
+        const details = await invoke('get_monitor_details', { monitorId });
+        if (details?.url) monitorUrl = details.url;
+      } catch (_) {
+        /* keep id */
+      }
+      const row = item || findRow();
+      if (row) updateMonitorItem(row, monitorId, monitorUrl, status);
+    }
+    await updateMonitorsSummary();
+    const list = document.getElementById('monitors-list');
+    sortMonitorsListByHealth(list);
+    syncMonitorsListTabOrder(list, monitorId);
+    updateMonitorsHeight();
+  } catch (err) {
+    console.error(`[Monitors] check_monitor failed for ${monitorId}:`, err);
+  } finally {
+    const row = item || findRow();
+    if (row) {
+      row.dataset.checking = '0';
+      row.classList.remove('is-checking');
+    }
+  }
+}
+
 function fillMonitorInfo(info, monitorUrl, status) {
   const responseTimeText = status.response_time_ms ? `${status.response_time_ms}ms` : '--';
   const pending =
@@ -2902,8 +3017,9 @@ function createMonitorItem(monitorId, monitorUrl, status) {
   const item = document.createElement('div');
   item.className = 'monitor-item';
   item.setAttribute('data-monitor-id', monitorId);
-  item.tabIndex = 0;
-  item.setAttribute('role', 'listitem');
+  item.tabIndex = -1;
+  item.setAttribute('role', 'option');
+  item.setAttribute('aria-label', `Monitor ${monitorUrl}`);
   applyMonitorItemState(item, status);
   
   // Create header container for status indicator and info
@@ -2937,8 +3053,9 @@ function createMonitorItem(monitorId, monitorUrl, status) {
 
 function updateMonitorItem(item, monitorId, monitorUrl, status) {
   applyMonitorItemState(item, status);
-  if (!item.hasAttribute('tabindex')) item.tabIndex = 0;
-  if (!item.getAttribute('role')) item.setAttribute('role', 'listitem');
+  if (!item.hasAttribute('tabindex')) item.tabIndex = -1;
+  if (!item.getAttribute('role')) item.setAttribute('role', 'option');
+  item.setAttribute('aria-label', `Monitor ${monitorUrl}`);
 
   // Update status indicator
   const statusIndicator = item.querySelector('.status-indicator');

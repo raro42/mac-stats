@@ -1122,6 +1122,21 @@ textarea.ops-agent-editor.is-dirty {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
 }
 
+.monitor-item.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, var(--hairline, currentColor));
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, transparent);
+}
+
+.monitor-item.is-checking {
+  opacity: 0.72;
+  cursor: progress;
+}
+
+.monitor-item.is-checking .monitor-latency {
+  font-weight: 600;
+  color: var(--accent, #007aff);
+}
+
 .monitor-item.is-down {
   border-color: color-mix(in srgb, #ff3b30 28%, var(--hairline, currentColor));
   background: color-mix(in srgb, #ff3b30 6%, transparent);
