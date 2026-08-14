@@ -4754,6 +4754,11 @@ async function refreshDiskCleanupPanel() {
     const softEl = document.getElementById('disk-cleanup-soft-delete');
     if (softEl) {
       softEl.checked = status.softDelete !== false;
+      const softLabel = softEl.closest?.('label.disk-cleanup-soft-delete');
+      if (softLabel) {
+        softLabel.title =
+          'T toggles Trash soft-delete (unchecked = permanent delete)';
+      }
     }
     if (icon) {
       icon.classList.toggle('has-reclaim', reclaimBytes >= 1024 * 1024);
@@ -4802,7 +4807,7 @@ async function refreshDiskCleanupPanel() {
           scopesEl.parentNode?.insertBefore(hint, scopesEl);
         }
         hint.textContent =
-          '↑↓ select scope · Space toggle enable · R toggle recurse · Delete removes custom · Enter in Add form adds · ⌘S saves';
+          '↑↓ select scope · Space toggle enable · R toggle recurse · T toggle Trash soft-delete · Delete removes custom · Enter in Add form adds · ⌘S saves';
       } else {
         document.getElementById('disk-cleanup-kb-hint')?.remove();
       }
@@ -5346,16 +5351,41 @@ function initDiskCleanupSection() {
     });
   }
 
-  // ⌘/Ctrl+S in Disk Cleanup saves scopes (incl. soft-delete) with Save flash.
+  // Disk Cleanup section shortcuts: ⌘/Ctrl+S save; T toggles Trash soft-delete.
   const diskSection = document.querySelector('.disk-cleanup-section');
   if (diskSection && diskSection.dataset.saveShortcut !== '1') {
     diskSection.dataset.saveShortcut = '1';
     diskSection.addEventListener('keydown', (e) => {
-      if (!(e.metaKey || e.ctrlKey) || (e.key !== 's' && e.key !== 'S')) return;
-      if (!saveBtn) return;
-      e.preventDefault();
-      e.stopPropagation();
-      saveBtn.click();
+      if ((e.metaKey || e.ctrlKey) && (e.key === 's' || e.key === 'S')) {
+        if (!saveBtn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        saveBtn.click();
+        return;
+      }
+
+      // T toggles "Move cleaned items to Trash" (same as the soft-delete checkbox).
+      if (
+        (e.key === 't' || e.key === 'T') &&
+        !e.metaKey &&
+        !e.ctrlKey &&
+        !e.altKey
+      ) {
+        const t = e.target;
+        const typing =
+          t &&
+          t.matches &&
+          (t.matches('input[type="text"]') ||
+            t.matches('textarea') ||
+            t.matches('input[type="number"]'));
+        if (typing) return;
+        const softEl = document.getElementById('disk-cleanup-soft-delete');
+        if (!softEl) return;
+        e.preventDefault();
+        e.stopPropagation();
+        softEl.checked = !softEl.checked;
+        softEl.dispatchEvent(new Event('change', { bubbles: true }));
+      }
     });
   }
 

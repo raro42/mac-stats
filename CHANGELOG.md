@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.391] - 2026-08-14
+
+### Added
+- Disk Cleanup: `T` toggles Trash soft-delete (Move cleaned items to Trash) when focus is in the section; hint and soft-delete label tooltip updated.
+
 ## [0.1.390] - 2026-08-14
 
 ### Added
