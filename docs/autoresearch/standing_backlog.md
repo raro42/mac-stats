@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Disk Cleanup PageUp/PageDown (~5) on scopes + categories (**v0.1.405**)
 - Monitors PageUp/PageDown (~5) + hint/tooltips (**v0.1.404**)
 - Top Processes PageUp/PageDown (~5) + `d` details + Esc closes modal first (**v0.1.403**)
 - Monitors `d` detail toggle + Esc closes detail before clear (**v0.1.402**)

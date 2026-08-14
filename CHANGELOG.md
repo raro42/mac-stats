@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.405] - 2026-08-14
+
+### Changed
+- Disk Cleanup: PageUp/PageDown jump ~5 rows on scopes and categories (Monitors / Top Processes parity); hints and row tooltips updated.
+
 ## [0.1.404] - 2026-08-14
 
 ### Changed
