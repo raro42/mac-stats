@@ -2636,7 +2636,7 @@ function buildMonitorRowTooltip(monitorUrl, status, monitorId) {
     (!status.response_time_ms || String(status.error || '').includes('Waiting'));
   if (pending) {
     lines.push('Waiting for first check…');
-    lines.push('Click for details · Enter checks now');
+    lines.push('Click or d for details · Enter checks now');
     return lines.join('\n');
   }
   if (status.is_up) {
@@ -2659,7 +2659,7 @@ function buildMonitorRowTooltip(monitorUrl, status, monitorId) {
     const backoff = formatMonitorBackoffHint(status);
     if (backoff) lines.push(backoff);
   }
-  lines.push('Click for details · Enter / Space checks now');
+  lines.push('Click or d for details · Enter / Space checks now');
   return lines.join('\n');
 }
 
@@ -3239,7 +3239,7 @@ function ensureMonitorsListKbHint(monitorsList, show) {
     monitorsList.parentNode?.insertBefore(hint, monitorsList);
   }
   hint.textContent =
-    'Click row for details · ↑↓ / j k select · Enter check now · Esc clears';
+    'Click row for details · ↑↓ / j k select · Enter check now · d details · Esc closes/clears';
 }
 
 function wireMonitorsListKeyboard() {
@@ -3273,13 +3273,24 @@ function wireMonitorsListKeyboard() {
       return;
     }
 
-    // Esc clears row selection (Agent Ops / Hermes Escape-skips parity).
+    // d toggles the detail panel (mouse still uses click).
+    if (e.key === 'd' || e.key === 'D') {
+      e.preventDefault();
+      toggleMonitorDetail(item);
+      return;
+    }
+
+    // Esc: close open detail first, then clear selection (Hermes escape-skips parity).
     if (e.key === 'Escape' || e.key === 'Esc') {
       if (!item.classList.contains('is-selected') && document.activeElement !== item) {
         return;
       }
       e.preventDefault();
       e.stopPropagation();
+      if (item.classList.contains('is-detail-open')) {
+        setMonitorDetailOpen(item, false);
+        return;
+      }
       items.forEach((el) => {
         el.classList.remove('is-selected');
         el.setAttribute('tabindex', '-1');

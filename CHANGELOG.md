@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.402] - 2026-08-14
+
+### Changed
+- Monitors: `d` toggles the detail panel from the keyboard; Esc closes an open detail before clearing selection; hint and row tooltips updated.
+
 ## [0.1.401] - 2026-08-14
 
 ### Changed
