@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.387] - 2026-08-14
+
+### Added
+- Disk Cleanup category rows: Arrow / Home / End keyboard nav with selected-row highlight; Enter or Space runs Clean now when the row is reclaimable (otherwise focuses the Clean now button); hint above the category list.
+
 ## [0.1.386] - 2026-08-14
 
 ### Added

@@ -4809,12 +4809,20 @@ async function refreshDiskCleanupPanel() {
     if (!cats.length) {
       list.innerHTML =
         '<li class="disk-cleanup-empty">No enabled scopes — turn some on and Save scopes.</li>';
+      document.getElementById('disk-cleanup-list-kb-hint')?.remove();
     } else {
+      const preferItemIdx =
+        typeof window.__diskCleanupItemFocusIdx === 'number'
+          ? window.__diskCleanupItemFocusIdx
+          : 0;
       list.innerHTML = cats
-        .map((c) => {
+        .map((c, idx) => {
           const has = (c.bytes || 0) > 0 || (c.fileCount || 0) > 0;
           const samples = (c.sampleNames || []).slice(0, 3).join(', ');
-          return `<li class="disk-cleanup-item${has ? ' has-reclaim' : ''}">
+          const title = has
+            ? '↑↓ select · Enter Clean now'
+            : '↑↓ select · Enter focuses Clean now';
+          return `<li class="disk-cleanup-item${has ? ' has-reclaim' : ''}" role="option" data-item-idx="${idx}" title="${title}">
             <div class="disk-cleanup-item-head">
               <span class="disk-cleanup-item-title">${c.label || c.id}</span>
               <span class="disk-cleanup-item-stat">${
@@ -4833,6 +4841,16 @@ async function refreshDiskCleanupPanel() {
           </li>`;
         })
         .join('');
+      let listHint = document.getElementById('disk-cleanup-list-kb-hint');
+      if (!listHint && list.parentNode) {
+        listHint = document.createElement('div');
+        listHint.className = 'disk-cleanup-list-kb-hint';
+        listHint.id = 'disk-cleanup-list-kb-hint';
+        listHint.textContent =
+          'Categories: ↑↓ / Home / End select · Enter runs Clean now when reclaimable';
+        list.parentNode.insertBefore(listHint, list);
+      }
+      syncDiskCleanupItemTabOrder(list, preferItemIdx);
     }
 
     if (lastEl) {
@@ -4956,6 +4974,30 @@ function syncDiskCleanupScopeTabOrder(scopesEl, preferIdx) {
   });
 }
 
+/** Roving tabindex for Disk Cleanup category / reclaim rows. */
+function syncDiskCleanupItemTabOrder(listEl, preferIdx) {
+  if (!listEl) return;
+  const rows = Array.from(listEl.querySelectorAll('.disk-cleanup-item'));
+  if (rows.length === 0) return;
+  let activeIdx = 0;
+  if (typeof preferIdx === 'number' && preferIdx >= 0 && preferIdx < rows.length) {
+    activeIdx = preferIdx;
+  } else {
+    const focused = rows.findIndex((el) => el === document.activeElement);
+    if (focused >= 0) activeIdx = focused;
+    else {
+      const selected = rows.findIndex((el) => el.classList.contains('is-selected'));
+      if (selected >= 0) activeIdx = selected;
+    }
+  }
+  window.__diskCleanupItemFocusIdx = activeIdx;
+  rows.forEach((el, i) => {
+    el.setAttribute('tabindex', i === activeIdx ? '0' : '-1');
+    el.classList.toggle('is-selected', i === activeIdx);
+    el.setAttribute('aria-selected', i === activeIdx ? 'true' : 'false');
+  });
+}
+
 function wireDiskCleanupScopesKeyboard() {
   const scopesEl = document.getElementById('disk-cleanup-scopes');
   if (!scopesEl || scopesEl.dataset.keyboardNav === '1') return;
@@ -5033,6 +5075,55 @@ function wireDiskCleanupScopesKeyboard() {
   });
 }
 
+function wireDiskCleanupListKeyboard() {
+  const listEl = document.getElementById('disk-cleanup-list');
+  if (!listEl || listEl.dataset.keyboardNav === '1') return;
+  listEl.dataset.keyboardNav = '1';
+  listEl.setAttribute('role', 'listbox');
+  listEl.setAttribute('aria-label', 'Cleanup categories');
+
+  listEl.addEventListener('click', (e) => {
+    const row = e.target && e.target.closest && e.target.closest('.disk-cleanup-item');
+    if (!row || !listEl.contains(row)) return;
+    const idx = parseInt(row.getAttribute('data-item-idx') || '0', 10);
+    syncDiskCleanupItemTabOrder(listEl, idx);
+    row.focus();
+  });
+
+  listEl.addEventListener('keydown', (e) => {
+    const row = e.target && e.target.closest && e.target.closest('.disk-cleanup-item');
+    if (!row || !listEl.contains(row)) return;
+    const rows = Array.from(listEl.querySelectorAll('.disk-cleanup-item'));
+    const idx = rows.indexOf(row);
+    if (idx < 0) return;
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const runBtn = document.getElementById('disk-cleanup-run-btn');
+      if (runBtn && !runBtn.disabled) {
+        if (row.classList.contains('has-reclaim')) {
+          runBtn.click();
+        } else {
+          runBtn.focus();
+        }
+      }
+      return;
+    }
+
+    let next = -1;
+    if (e.key === 'ArrowDown') next = Math.min(idx + 1, rows.length - 1);
+    else if (e.key === 'ArrowUp') next = Math.max(idx - 1, 0);
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = rows.length - 1;
+    else return;
+
+    e.preventDefault();
+    if (next < 0 || next === idx) return;
+    syncDiskCleanupItemTabOrder(listEl, next);
+    rows[next].focus();
+  });
+}
+
 function initDiskCleanupSection() {
   const header = document.getElementById('disk-cleanup-header');
   const content = document.getElementById('disk-cleanup-content');
@@ -5046,6 +5137,7 @@ function initDiskCleanupSection() {
   if (!header || !content) return;
 
   wireDiskCleanupScopesKeyboard();
+  wireDiskCleanupListKeyboard();
 
   if (icon && !icon.getAttribute('data-title-base')) {
     icon.setAttribute('data-title-base', icon.title || 'Disk cleanup');
