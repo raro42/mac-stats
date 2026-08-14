@@ -19,19 +19,20 @@ Overnight Track B (20:00–06:00 local, window opened 2026-08-14).
 | **v0.1.411** | Agent Ops Refresh / Refresh digest: busy-guard (Refreshing…) + Refreshed flash; auto-refresh silent |
 | **v0.1.412** | Disk Cleanup Refresh: busy-guard (Refreshing…) + Refreshed flash; Clean now flashes Cleaned after success; Refresh disabled during cleanup |
 | **v0.1.413** | Monitors Check now: busy-guard (Checking…) + Checked flash; blocks double Enter/click while in flight |
+| **v0.1.414** | Logs Refresh: busy-guard (Refreshing…) + Refreshed flash; auto-refresh stays silent |
 
 ## Design review
 
-- Not due at 20:00–01:17 ticks (feature screens ok/grace; ai-chat ~0.52d).
+- Not due at 20:00–01:42 ticks (feature screens ok/grace; ai-chat ~0.54d).
 - Next due surface: wait for age >3d or re-shoot when TCC allows.
 
 ## Digester
 
 - Open candidates: none (latency n/a after noise filters).
-- Fuel used: standing backlog keyboard UX (v0.1.401–405), soft-delete safety (v0.1.406), skip visibility (v0.1.407), AI Chat Send/Clear (v0.1.408–409), Perplexity Search feedback (v0.1.410), Agent Ops Refresh feedback (v0.1.411), Disk Cleanup Refresh/Clean now feedback (v0.1.412), Monitors Check now feedback (v0.1.413).
+- Fuel used: standing backlog keyboard UX (v0.1.401–405), soft-delete safety (v0.1.406), skip visibility (v0.1.407), AI Chat Send/Clear (v0.1.408–409), Perplexity Search feedback (v0.1.410), Agent Ops Refresh feedback (v0.1.411), Disk Cleanup Refresh/Clean now feedback (v0.1.412), Monitors Check now feedback (v0.1.413), Logs Refresh feedback (v0.1.414).
 
 ## Notes
 
-- Nightly minimum satisfied: keep rows in `autoresearch/results.tsv` for v0.1.401–413.
+- Nightly minimum satisfied: keep rows in `autoresearch/results.tsv` for v0.1.401–414.
 - Quiet ticks: 0 so far this window.
-- Installed `/Applications/mac-stats.app` at 0.1.413 after release rebuild + kickstart.
+- Installed `/Applications/mac-stats.app` at 0.1.414 after release rebuild + kickstart.
