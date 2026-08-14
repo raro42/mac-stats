@@ -17,7 +17,7 @@ A night that only appends “Quiet tick” to the backlog is a **loss** — same
 - **Quiet daytime:** do not notify or ship during focus hours unless the human explicitly asks.
 - **NEVER STOP** inside the overnight window once a tick has started — finish the current experiment (keep or discard), then wait for the next harness tick.
 - **No dirty leftovers:** when an experiment finishes, **commit + push** immediately. Around **23:00** local the harness loop runs `scripts/overnight_git_flush.py` once as a backstop (see `.cursor/rules/no-uncommitted-leftovers.mdc`).
-- **Morning surprise (mandatory):** Before ~05:50 write/refresh `~/.mac-stats/improvements/morning_surprise_YYYY-MM-DD.md` with what **shipped** (or what was tried + discarded). “Digester empty / stayed on version X” alone is **not** a surprise — if that would be the whole note, you failed the night and must still have attempted a standing-backlog experiment.
+- **Morning surprise (mandatory):** Before ~05:50 write/refresh `~/.mac-stats/improvements/morning_surprise_YYYY-MM-DD.md` with what **shipped** (or what was tried + discarded). **Also archive** a copy into `docs/ops/morning-surprises/` (`python3 scripts/archive_morning_surprise.py`) and commit it — the home path is runtime SoT for digester/instant; the repo copy is durable history. “Digester empty / stayed on version X” alone is **not** a surprise — if that would be the whole note, you failed the night and must still have attempted a standing-backlog experiment.
 
 ## Nightly minimum (keep or discard)
 

@@ -57,6 +57,7 @@ PROMPT = (
     "git push origin HEAD "
     "(8) update loop_backlog.md. Do not ask the user. Before ~05:50 write/refresh "
     "~/.mac-stats/improvements/morning_surprise_YYYY-MM-DD.md with what shipped/tried "
+    "then python3 scripts/archive_morning_surprise.py and commit the docs/ops/morning-surprises/ copy "
     "(empty digester alone is not a surprise). Quiet outside 20:00–06:00."
 )
 
