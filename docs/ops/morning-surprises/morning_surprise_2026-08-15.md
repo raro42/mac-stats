@@ -17,19 +17,20 @@ Overnight Track B (20:00–06:00 local, window opened 2026-08-14).
 | **v0.1.409** | AI Chat Clear button next to Send + Cleared flash; disabled while empty or Sending… |
 | **v0.1.410** | Perplexity Search: busy-guard (Searching…) blocks double click/Enter; Searched flash; Enter runs search |
 | **v0.1.411** | Agent Ops Refresh / Refresh digest: busy-guard (Refreshing…) + Refreshed flash; auto-refresh silent |
+| **v0.1.412** | Disk Cleanup Refresh: busy-guard (Refreshing…) + Refreshed flash; Clean now flashes Cleaned after success; Refresh disabled during cleanup |
 
 ## Design review
 
-- Not due at 20:00–00:25 ticks (feature screens ok/grace; ai-chat ~0.49d).
+- Not due at 20:00–00:51 ticks (feature screens ok/grace; ai-chat ~0.51d).
 - Next due surface: wait for age >3d or re-shoot when TCC allows.
 
 ## Digester
 
 - Open candidates: none (latency n/a after noise filters).
-- Fuel used: standing backlog keyboard UX (v0.1.401–405), soft-delete safety (v0.1.406), skip visibility (v0.1.407), AI Chat Send/Clear (v0.1.408–409), Perplexity Search feedback (v0.1.410), Agent Ops Refresh feedback (v0.1.411).
+- Fuel used: standing backlog keyboard UX (v0.1.401–405), soft-delete safety (v0.1.406), skip visibility (v0.1.407), AI Chat Send/Clear (v0.1.408–409), Perplexity Search feedback (v0.1.410), Agent Ops Refresh feedback (v0.1.411), Disk Cleanup Refresh/Clean now feedback (v0.1.412).
 
 ## Notes
 
-- Nightly minimum satisfied: keep rows in `autoresearch/results.tsv` for v0.1.401–411.
+- Nightly minimum satisfied: keep rows in `autoresearch/results.tsv` for v0.1.401–412.
 - Quiet ticks: 0 so far this window.
-- Installed `/Applications/mac-stats.app` at 0.1.411 after release rebuild + kickstart.
+- Installed `/Applications/mac-stats.app` at 0.1.412 after release rebuild + kickstart.
