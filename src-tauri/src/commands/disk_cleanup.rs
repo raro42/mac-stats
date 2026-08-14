@@ -47,6 +47,9 @@ pub struct DiskCleanupLastRun {
     pub trigger: String,
     pub files_removed: u64,
     pub bytes_freed: u64,
+    /// Soft-delete only: files left in place because Trash move failed (no permanent fallback).
+    #[serde(default)]
+    pub files_skipped: u64,
     pub categories: Vec<CleanupCategoryDelta>,
     pub note: Option<String>,
 }
@@ -676,15 +679,17 @@ fn preview_aged_scope(scope: &DiskCleanupScope) -> CleanupCategory {
     }
 }
 
-fn apply_aged_scope(scope: &DiskCleanupScope) -> (u64, u64) {
+/// Returns `(deleted, freed_bytes, soft_skips)`. Soft skips are Trash-move failures only.
+fn apply_aged_scope(scope: &DiskCleanupScope) -> (u64, u64, u64) {
     if !scope.enabled {
-        return (0, 0);
+        return (0, 0, 0);
     }
     let days = scope.max_age_days.unwrap_or(0);
     // Trash scope empties old Trash entries — always permanent.
     let soft = soft_delete_enabled() && scope.kind != "trash";
     let mut deleted = 0u64;
     let mut freed = 0u64;
+    let mut skipped = 0u64;
     for (root, _) in resolve_scope_roots(scope) {
         if path_is_forbidden(&root) {
             continue;
@@ -693,10 +698,12 @@ fn apply_aged_scope(scope: &DiskCleanupScope) -> (u64, u64) {
             if remove_cleaned_file(&path, soft) {
                 deleted += 1;
                 freed = freed.saturating_add(sz);
+            } else if soft {
+                skipped += 1;
             }
         }
     }
-    (deleted, freed)
+    (deleted, freed, skipped)
 }
 
 fn collect_screenshot_reclaim() -> Vec<(PathBuf, u64)> {
@@ -1309,28 +1316,40 @@ fn build_preview_categories(scopes: &[DiskCleanupScope]) -> Vec<CleanupCategory>
     out
 }
 
-fn apply_mac_stats_scope(soft: bool) {
+/// Soft path returns count of files left in place when Trash move failed.
+fn apply_mac_stats_scope(soft: bool) -> u64 {
     if soft {
         // Move reclaimable app data to Trash (recoverable). Line-based / log prune stays permanent.
+        let mut skipped = 0u64;
         for (path, _) in collect_screenshot_reclaim() {
-            let _ = remove_cleaned_file(&path, true);
+            if !remove_cleaned_file(&path, true) {
+                skipped += 1;
+            }
         }
         for (path, _) in collect_pdf_reclaim() {
-            let _ = remove_cleaned_file(&path, true);
+            if !remove_cleaned_file(&path, true) {
+                skipped += 1;
+            }
         }
         for (path, _) in collect_session_reclaim() {
-            let _ = remove_cleaned_file(&path, true);
+            if !remove_cleaned_file(&path, true) {
+                skipped += 1;
+            }
         }
         for (path, _) in collect_browser_download_reclaim() {
-            let _ = remove_cleaned_file(&path, true);
+            if !remove_cleaned_file(&path, true) {
+                skipped += 1;
+            }
         }
         for (path, _) in collect_sic_backup_reclaim() {
-            let _ = remove_cleaned_file(&path, true);
+            if !remove_cleaned_file(&path, true) {
+                skipped += 1;
+            }
         }
         let _ = crate::commands::run_telemetry::prune_runs_jsonl_if_needed();
         crate::browser_agent::prune_cdp_traces_best_effort();
         crate::logging::prune_companion_logs_best_effort();
-        return;
+        return skipped;
     }
     crate::commands::screenshot_lifecycle::prune_old_screenshots();
     crate::commands::screenshot_lifecycle::prune_old_pdfs();
@@ -1341,6 +1360,7 @@ fn apply_mac_stats_scope(soft: bool) {
     ));
     crate::browser_agent::prune_cdp_traces_best_effort();
     crate::logging::prune_companion_logs_best_effort();
+    0
 }
 
 fn compute_next_run_utc(last: Option<&DiskCleanupLastRun>, hours: u64) -> Option<DateTime<Utc>> {
@@ -1465,25 +1485,42 @@ pub fn get_status() -> DiskCleanupStatus {
     build_status_from(state, scopes, categories)
 }
 
+fn soft_skip_note_suffix(skipped: u64) -> String {
+    if skipped == 0 {
+        String::new()
+    } else {
+        format!(
+            "; skipped {} (could not move to Trash — left in place)",
+            skipped
+        )
+    }
+}
+
 pub fn run_now(trigger: &str) -> DiskCleanupStatus {
     let scopes = load_scopes();
     let before = build_preview_categories(&scopes);
+    let mut files_skipped = 0u64;
 
     for scope in &scopes {
         if !scope.enabled {
             continue;
         }
         match scope.kind.as_str() {
-            "mac-stats" => apply_mac_stats_scope(soft_delete_enabled()),
+            "mac-stats" => {
+                files_skipped =
+                    files_skipped.saturating_add(apply_mac_stats_scope(soft_delete_enabled()));
+            }
             "trash" | "downloads" | "temp" | "path" => {
-                let (d, f) = apply_aged_scope(scope);
-                if d > 0 {
+                let (d, f, sk) = apply_aged_scope(scope);
+                files_skipped = files_skipped.saturating_add(sk);
+                if d > 0 || sk > 0 {
                     mac_stats_info!(
                         "disk_cleanup",
-                        "Scope {}: removed {} file(s), freed {} byte(s)",
+                        "Scope {}: removed {} file(s), freed {} byte(s), soft-skipped {}",
                         scope.id,
                         d,
-                        f
+                        f,
+                        sk
                     );
                 }
             }
@@ -1503,9 +1540,15 @@ pub fn run_now(trigger: &str) -> DiskCleanupStatus {
         trigger: trigger.to_string(),
         files_removed,
         bytes_freed,
+        files_skipped,
         categories,
-        note: if files_removed == 0 && bytes_freed == 0 {
+        note: if files_removed == 0 && bytes_freed == 0 && files_skipped == 0 {
             Some("Nothing to clean under enabled scopes.".into())
+        } else if files_removed == 0 && bytes_freed == 0 {
+            Some(format!(
+                "Nothing moved; skipped {} (could not move to Trash — left in place).",
+                files_skipped
+            ))
         } else {
             let how = if soft_delete_enabled() {
                 "Moved to Trash"
@@ -1513,10 +1556,11 @@ pub fn run_now(trigger: &str) -> DiskCleanupStatus {
                 "Permanently deleted"
             };
             Some(format!(
-                "{} {} across {} item(s) (Trash scope always permanent).",
+                "{} {} across {} item(s) (Trash scope always permanent){}.",
                 how,
                 format_bytes(bytes_freed),
-                files_removed
+                files_removed,
+                soft_skip_note_suffix(files_skipped)
             ))
         },
     };
@@ -1533,10 +1577,11 @@ pub fn run_now(trigger: &str) -> DiskCleanupStatus {
 
     mac_stats_info!(
         "disk_cleanup",
-        "Disk cleanup ({}): removed {} item(s), freed {} byte(s)",
+        "Disk cleanup ({}): removed {} item(s), freed {} byte(s), soft-skipped {}",
         trigger,
         files_removed,
-        bytes_freed
+        bytes_freed,
+        files_skipped
     );
 
     build_status_from(state, scopes, after)
@@ -1664,5 +1709,27 @@ mod tests {
         assert!(remove_cleaned_file(&file, false));
         assert!(!file.exists());
         let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn soft_skip_note_suffix_formats() {
+        assert_eq!(soft_skip_note_suffix(0), "");
+        assert!(soft_skip_note_suffix(2).contains("skipped 2"));
+        assert!(soft_skip_note_suffix(1).contains("left in place"));
+    }
+
+    #[test]
+    fn last_run_deserializes_without_files_skipped() {
+        let v = serde_json::json!({
+            "atUtc": "2026-08-14T00:00:00Z",
+            "trigger": "manual",
+            "filesRemoved": 1,
+            "bytesFreed": 10,
+            "categories": [],
+            "note": "ok"
+        });
+        let last: DiskCleanupLastRun = serde_json::from_value(v).expect("parse");
+        assert_eq!(last.files_skipped, 0);
+        assert_eq!(last.files_removed, 1);
     }
 }

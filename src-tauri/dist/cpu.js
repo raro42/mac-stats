@@ -5395,8 +5395,14 @@ async function refreshDiskCleanupPanel() {
         }<br>${
           last.note ||
           (last.filesRemoved
-            ? `Removed ${last.filesRemoved} · freed ${formatDiskBytes(last.bytesFreed || 0)}`
-            : 'Nothing removed')
+            ? `Removed ${last.filesRemoved} · freed ${formatDiskBytes(last.bytesFreed || 0)}${
+                last.filesSkipped
+                  ? ` · skipped ${last.filesSkipped} (Trash move failed)`
+                  : ''
+              }`
+            : last.filesSkipped
+              ? `Nothing moved; skipped ${last.filesSkipped} (Trash move failed)`
+              : 'Nothing removed')
         }${catBits ? `<br>${catBits}` : ''}`;
       }
     }

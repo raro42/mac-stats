@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.407] - 2026-08-14
+
+### Changed
+- Disk Cleanup last-run note counts soft-delete skips when Trash move fails (files left in place; no silent under-count after Clean now).
+
 ## [0.1.406] - 2026-08-14
 
 ### Fixed
