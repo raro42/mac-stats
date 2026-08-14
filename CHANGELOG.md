@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.400] - 2026-08-14
+
+### Fixed
+- CPU window scrollbars: thin, transparent track, thumb only on hover — no thick grey WKWebView bar on Dark (TUI) and other themes.
+
 ## [0.1.399] - 2026-08-14
 
 ### Changed

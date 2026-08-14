@@ -69,10 +69,10 @@ body {
   max-height: 300px; /* Limit height to allow scrolling on small screens */
 }
 
-/* Smooth scrolling */
+/* Smooth scrolling — keep Details/Processes thumbs quiet */
 .details-section::-webkit-scrollbar,
 .processes-section::-webkit-scrollbar {
-  width: 1px;
+  width: 5px;
 }
 
 .details-section::-webkit-scrollbar-track,
@@ -82,13 +82,49 @@ body {
 
 .details-section::-webkit-scrollbar-thumb,
 .processes-section::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 0, 0.15);
-  border-radius: 3px;
+  background: transparent;
+  border-radius: 8px;
 }
 
-.details-section::-webkit-scrollbar-thumb:hover,
-.processes-section::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 255, 0, 0.25);
+.details-section:hover::-webkit-scrollbar-thumb,
+.processes-section:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 0, 0.22);
+}
+
+.details-section:hover::-webkit-scrollbar-thumb:hover,
+.processes-section:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 0, 0.4);
+}
+
+/* Main shell scroll (also covered by agent-ops.css; keep dark-local fallback) */
+.glass-panel {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 0, 0.28) transparent;
+}
+
+.glass-panel::-webkit-scrollbar {
+  width: 5px;
+}
+
+.glass-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.glass-panel::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 8px;
+}
+
+.glass-panel:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 0, 0.28);
+}
+
+.glass-panel:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 0, 0.45);
+}
+
+.glass-panel::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .glass-panel::before {
