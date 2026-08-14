@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Top Processes j/k + Esc clear + P pin/unpin + kb hint (**v0.1.401**)
 - Disk Cleanup j/k + Esc clear selection + hints (**v0.1.393**)
 - Monitors j/k + Esc clear selection + kb hint (**v0.1.392**)
 - Disk Cleanup keyboard: scopes / categories / Delete custom / Enter-to-add + ⌘S / R recurse / T soft-delete / j/k + Esc (**v0.1.386–391, 393**)
