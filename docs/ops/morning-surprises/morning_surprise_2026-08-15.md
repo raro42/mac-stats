@@ -12,19 +12,20 @@ Overnight Track B (20:00–06:00 local, window opened 2026-08-14).
 | **v0.1.404** | Monitors: PageUp/PageDown jump ~5 rows (Top Processes / Agent Ops parity); hint + tooltips |
 | **v0.1.405** | Disk Cleanup: PageUp/PageDown jump ~5 rows on scopes and categories; hints + tooltips |
 | **v0.1.406** | Disk Cleanup soft-delete: skip file when Trash move fails (no permanent-delete fallback on EPERM) |
+| **v0.1.407** | Disk Cleanup last-run note counts soft-delete skips when Trash move fails (files left in place) |
 
 ## Design review
 
-- Not due at 20:00–22:11 ticks (feature screens ok/grace; ai-chat ~0.39d).
+- Not due at 20:00–22:37 ticks (feature screens ok/grace; ai-chat ~0.41d).
 - Next due surface: wait for age >3d or re-shoot when TCC allows.
 
 ## Digester
 
 - Open candidates: none (latency n/a after noise filters).
-- Fuel used: standing backlog keyboard UX (v0.1.401–405), then P2 soft-delete safety (v0.1.406).
+- Fuel used: standing backlog keyboard UX (v0.1.401–405), soft-delete safety (v0.1.406), skip visibility (v0.1.407).
 
 ## Notes
 
-- Nightly minimum satisfied: keep rows in `autoresearch/results.tsv` for v0.1.401–406.
+- Nightly minimum satisfied: keep rows in `autoresearch/results.tsv` for v0.1.401–407.
 - Quiet ticks: 0 so far this window.
-- Installed `/Applications/mac-stats.app` at 0.1.406; Discord Ready after kickstart.
+- Installed `/Applications/mac-stats.app` at 0.1.407; Discord Ready after kickstart.
