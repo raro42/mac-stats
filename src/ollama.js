@@ -518,6 +518,52 @@ function replaceConversationHistory(messages) {
 /**
  * Send chat message to Ollama using unified command
  */
+/** In-flight chat send: blocks double Enter/click and labels the Send button. */
+let chatSendInFlight = false;
+let chatSendFlashTimer = null;
+
+function getChatSendButton() {
+  return document.getElementById('chat-send-btn');
+}
+
+function setChatSendBusy(busy) {
+  const btn = getChatSendButton();
+  chatSendInFlight = !!busy;
+  if (!btn) return;
+  if (chatSendFlashTimer) {
+    clearTimeout(chatSendFlashTimer);
+    chatSendFlashTimer = null;
+  }
+  btn.classList.remove('is-just-saved');
+  if (busy) {
+    if (btn.dataset.idleLabel == null) btn.dataset.idleLabel = btn.textContent || 'Send';
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+  } else {
+    btn.disabled = false;
+    btn.textContent = btn.dataset.idleLabel || 'Send';
+  }
+}
+
+/** Brief success flash on Send (save-button-feedback parity). */
+function flashChatSendSent() {
+  const btn = getChatSendButton();
+  if (!btn) return;
+  if (chatSendFlashTimer) {
+    clearTimeout(chatSendFlashTimer);
+    chatSendFlashTimer = null;
+  }
+  const idle = btn.dataset.idleLabel || 'Send';
+  btn.disabled = false;
+  btn.classList.add('is-just-saved');
+  btn.textContent = 'Sent';
+  chatSendFlashTimer = setTimeout(() => {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = idle;
+    chatSendFlashTimer = null;
+  }, 1600);
+}
+
 async function sendChatMessage() {
   const input = document.getElementById('chat-input');
   const message = input?.value.trim();
@@ -526,125 +572,140 @@ async function sendChatMessage() {
     console.log('[Ollama] Empty message or input not found');
     return;
   }
+  if (chatSendInFlight) {
+    console.log('[Ollama] Send ignored — already in flight');
+    return;
+  }
 
   console.log('[Ollama] ========== sendChatMessage() CALLED ==========');
   console.log('[Ollama] Message:', message);
   console.log('[Ollama] Conversation history length:', conversationHistory.length);
 
   input.value = '';
-
-  // Reserved words: meta-commands only — no user bubble, no history, no Ollama (022 §F8).
-  if (message === '--cpu') {
-    try {
-      await invoke('toggle_cpu_window');
-      addChatMessage('assistant', 'CPU window toggled.');
-    } catch (err) {
-      addChatMessage('assistant', `Error: ${err}`);
-    }
-    return;
-  }
-  if (message === '-v' || message === '-vv' || message === '-vvv') {
-    const level = message.length - 1; // -v=1, -vv=2, -vvv=3
-    try {
-      await invoke('set_chat_verbosity', { level });
-      const labels = { 1: 'warn (-v)', 2: 'debug (-vv)', 3: 'trace (-vvv)' };
-      addChatMessage('assistant', `Verbosity set to ${labels[level]}.`);
-    } catch (err) {
-      addChatMessage('assistant', `Error: ${err}`);
-    }
-    return;
-  }
-
-  addChatMessage('user', message);
-  addToHistory('user', message);
-
-  const systemPrompt = getSystemPrompt();
-  const history = getConversationHistory().slice(0, -1);
-
-  let useStreaming = false;
-  let unlistenChunk = null;
-  const listenFn = getListen();
-  if (listenFn) {
-    try {
-      addChatMessage('assistant', '');
-      unlistenChunk = await listenFn('ollama-chat-chunk', (event) => {
-        const content = event?.payload?.content;
-        if (typeof content === 'string') appendToLastAssistantMessage(content);
-      });
-      useStreaming = true;
-    } catch (_) {
-      const container = document.getElementById('chat-messages');
-      const assistantMessages = container?.querySelectorAll('.chat-message.assistant');
-      if (assistantMessages?.length) assistantMessages[assistantMessages.length - 1].remove();
-    }
-  }
+  setChatSendBusy(true);
+  let sendOk = false;
 
   try {
-    console.log('[Ollama] Sending request via unified command (stream=', useStreaming, ')...');
-    const response = await invoke('ollama_chat_with_execution', {
-      request: {
-        question: message,
-        ...(systemPrompt ? { system_prompt: systemPrompt } : {}),
-        conversation_history: history.length > 0 ? history : null,
-        stream: useStreaming
+    // Reserved words: meta-commands only — no user bubble, no history, no Ollama (022 §F8).
+    if (message === '--cpu') {
+      try {
+        await invoke('toggle_cpu_window');
+        addChatMessage('assistant', 'CPU window toggled.');
+        sendOk = true;
+      } catch (err) {
+        addChatMessage('assistant', `Error: ${err}`);
       }
-    });
-
-    if (unlistenChunk && typeof unlistenChunk === 'function') {
-      unlistenChunk();
-      unlistenChunk = null;
+      return;
     }
-
-    console.log('[Ollama] ✅ Response received:', response);
-
-    if (response.error) {
-      if (useStreaming) {
-        const container = document.getElementById('chat-messages');
-        const assistantMessages = container?.querySelectorAll('.chat-message.assistant');
-        const last = assistantMessages?.[assistantMessages.length - 1];
-        if (last && !last.textContent.trim()) last.textContent = `Error: ${response.error}`;
-        else addChatMessage('assistant', `Error: ${response.error}`);
-      } else {
-        addChatMessage('assistant', `Error: ${response.error}`);
+    if (message === '-v' || message === '-vv' || message === '-vvv') {
+      const level = message.length - 1; // -v=1, -vv=2, -vvv=3
+      try {
+        await invoke('set_chat_verbosity', { level });
+        const labels = { 1: 'warn (-v)', 2: 'debug (-vv)', 3: 'trace (-vvv)' };
+        addChatMessage('assistant', `Verbosity set to ${labels[level]}.`);
+        sendOk = true;
+      } catch (err) {
+        addChatMessage('assistant', `Error: ${err}`);
       }
       return;
     }
 
-    if (response.needs_code_execution && response.code) {
-      await executeCodeAndContinue(response, message, systemPrompt, 0);
-    } else if (response.final_answer) {
-      // Instant / non-stream replies still set stream=true in the UI, which creates an
-      // empty assistant bubble and never emits chunks — fill that bubble instead of skipping.
+    addChatMessage('user', message);
+    addToHistory('user', message);
+
+    const systemPrompt = getSystemPrompt();
+    const history = getConversationHistory().slice(0, -1);
+
+    let useStreaming = false;
+    let unlistenChunk = null;
+    const listenFn = getListen();
+    if (listenFn) {
+      try {
+        addChatMessage('assistant', '');
+        unlistenChunk = await listenFn('ollama-chat-chunk', (event) => {
+          const content = event?.payload?.content;
+          if (typeof content === 'string') appendToLastAssistantMessage(content);
+        });
+        useStreaming = true;
+      } catch (_) {
+        const container = document.getElementById('chat-messages');
+        const assistantMessages = container?.querySelectorAll('.chat-message.assistant');
+        if (assistantMessages?.length) assistantMessages[assistantMessages.length - 1].remove();
+      }
+    }
+
+    try {
+      console.log('[Ollama] Sending request via unified command (stream=', useStreaming, ')...');
+      const response = await invoke('ollama_chat_with_execution', {
+        request: {
+          question: message,
+          ...(systemPrompt ? { system_prompt: systemPrompt } : {}),
+          conversation_history: history.length > 0 ? history : null,
+          stream: useStreaming
+        }
+      });
+
+      if (unlistenChunk && typeof unlistenChunk === 'function') {
+        unlistenChunk();
+        unlistenChunk = null;
+      }
+
+      console.log('[Ollama] ✅ Response received:', response);
+
+      if (response.error) {
+        if (useStreaming) {
+          const container = document.getElementById('chat-messages');
+          const assistantMessages = container?.querySelectorAll('.chat-message.assistant');
+          const last = assistantMessages?.[assistantMessages.length - 1];
+          if (last && !last.textContent.trim()) last.textContent = `Error: ${response.error}`;
+          else addChatMessage('assistant', `Error: ${response.error}`);
+        } else {
+          addChatMessage('assistant', `Error: ${response.error}`);
+        }
+        return;
+      }
+
+      if (response.needs_code_execution && response.code) {
+        await executeCodeAndContinue(response, message, systemPrompt, 0);
+        sendOk = true;
+      } else if (response.final_answer) {
+        // Instant / non-stream replies still set stream=true in the UI, which creates an
+        // empty assistant bubble and never emits chunks — fill that bubble instead of skipping.
+        if (useStreaming) {
+          const container = document.getElementById('chat-messages');
+          const assistantMessages = container?.querySelectorAll('.chat-message.assistant');
+          const last = assistantMessages?.[assistantMessages.length - 1];
+          if (last) {
+            // Instant (empty bubble) or streamed text → render Markdown for readable layout.
+            setAssistantMessageContent(last, response.final_answer);
+          } else {
+            addChatMessage('assistant', response.final_answer);
+          }
+        } else {
+          addChatMessage('assistant', response.final_answer);
+        }
+        addToHistory('assistant', response.final_answer, response.attachment_paths);
+        sendOk = true;
+      } else {
+        if (!useStreaming) addChatMessage('assistant', 'Received unexpected response format');
+        else addChatMessage('assistant', 'Received unexpected response format');
+      }
+    } catch (err) {
+      if (unlistenChunk && typeof unlistenChunk === 'function') unlistenChunk();
+      console.error('[Ollama] Failed to send chat message:', err);
       if (useStreaming) {
         const container = document.getElementById('chat-messages');
         const assistantMessages = container?.querySelectorAll('.chat-message.assistant');
         const last = assistantMessages?.[assistantMessages.length - 1];
-        if (last) {
-          // Instant (empty bubble) or streamed text → render Markdown for readable layout.
-          setAssistantMessageContent(last, response.final_answer);
-        } else {
-          addChatMessage('assistant', response.final_answer);
-        }
+        if (last && !last.textContent.trim()) last.textContent = `Error: ${err}`;
+        else addChatMessage('assistant', `Error: ${err}`);
       } else {
-        addChatMessage('assistant', response.final_answer);
+        addChatMessage('assistant', `Error: ${err}`);
       }
-      addToHistory('assistant', response.final_answer, response.attachment_paths);
-    } else {
-      if (!useStreaming) addChatMessage('assistant', 'Received unexpected response format');
-      else addChatMessage('assistant', 'Received unexpected response format');
     }
-  } catch (err) {
-    if (unlistenChunk && typeof unlistenChunk === 'function') unlistenChunk();
-    console.error('[Ollama] Failed to send chat message:', err);
-    if (useStreaming) {
-      const container = document.getElementById('chat-messages');
-      const assistantMessages = container?.querySelectorAll('.chat-message.assistant');
-      const last = assistantMessages?.[assistantMessages.length - 1];
-      if (last && !last.textContent.trim()) last.textContent = `Error: ${err}`;
-      else addChatMessage('assistant', `Error: ${err}`);
-    } else {
-      addChatMessage('assistant', `Error: ${err}`);
-    }
+  } finally {
+    setChatSendBusy(false);
+    if (sendOk) flashChatSendSent();
   }
 }
 
@@ -1250,12 +1311,13 @@ function initOllamaChatListeners() {
     sendChatMessage();
   });
   
-  // Enter key in input
-  chatInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      console.log('[Ollama] Enter key pressed');
-      sendChatMessage();
-    }
+  // Enter sends (ignore while in flight; Shift+Enter left for future multiline)
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || e.shiftKey) return;
+    e.preventDefault();
+    if (chatSendInFlight) return;
+    console.log('[Ollama] Enter key pressed');
+    sendChatMessage();
   });
   
   console.log('[Ollama] Chat event listeners initialized');

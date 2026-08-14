@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.408] - 2026-08-14
+
+### Changed
+- AI Chat Send: disable while a reply is in flight (blocks double Enter/click); shows Sending… then a brief Sent flash on success.
+
 ## [0.1.407] - 2026-08-14
 
 ### Changed
