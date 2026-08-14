@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.414] - 2026-08-15
+### Changed
+- **Logs Refresh** — busy-guard (`Refreshing…`) + `Refreshed` flash after a manual refresh; blocks double click while in flight. Auto-refresh stays silent.
+
 ## [0.1.413] - 2026-08-15
 ### Changed
 - **Monitors Check now** — busy-guard (`Checking…`) + `Checked` flash after a successful manual check; blocks double Enter/click while in flight.

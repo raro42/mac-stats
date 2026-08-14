@@ -6194,9 +6194,32 @@ function initLogsSection() {
   });
 
   if (refreshBtn) {
-    refreshBtn.addEventListener('click', (e) => {
+    if (!refreshBtn.dataset.idleLabel) {
+      refreshBtn.dataset.idleLabel = refreshBtn.textContent || 'Refresh';
+    }
+    refreshBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
-      refreshLogsViewer(true);
+      if (refreshBtn.disabled) return;
+      refreshBtn.classList.remove('is-just-saved');
+      if (refreshBtn._saveFlashTimer) {
+        clearTimeout(refreshBtn._saveFlashTimer);
+        refreshBtn._saveFlashTimer = null;
+        refreshBtn._saveFlashOriginalLabel = null;
+      }
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = 'Refreshing…';
+      try {
+        await refreshLogsViewer(true);
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = refreshBtn.dataset.idleLabel || 'Refresh';
+        if (typeof flashSaveButton === 'function') {
+          flashSaveButton(refreshBtn, { savedLabel: 'Refreshed', durationMs: 1600 });
+        }
+      } catch (err) {
+        console.warn('[Logs] refresh failed', err);
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = refreshBtn.dataset.idleLabel || 'Refresh';
+      }
     });
   }
   if (openBtn) {
