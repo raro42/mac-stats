@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Perplexity Save key / Clear key busy-guard (Saving…/Clearing…) + Saved/Cleared flash (Settings + inline) — **v0.1.419**
 - Monitors Add Monitor busy-guard (Adding…) + Added flash; form stays open for confirmation — **v0.1.418**
 - AI Chat system-prompt Save busy-guard + Saved flash — **v0.1.417**
 - Agent Ops Save (soul/skill/mood) busy-guard + Saved flash — **v0.1.416**
