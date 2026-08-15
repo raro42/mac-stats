@@ -20,8 +20,8 @@ Overnight Track B (20:00–06:00 local, window opened 2026-08-14).
 | **v0.1.412** | Disk Cleanup Refresh: busy-guard (Refreshing…) + Refreshed flash; Clean now flashes Cleaned after success; Refresh disabled during cleanup |
 | **v0.1.413** | Monitors Check now: busy-guard (Checking…) + Checked flash; blocks double Enter/click while in flight |
 | **v0.1.414** | Logs Refresh: busy-guard (Refreshing…) + Refreshed flash; auto-refresh stays silent |
-| **v0.1.416** | Agent Ops Save (soul/skill/mood): busy-guard (Saving…) + Saved flash; blocks double click |
 | **v0.1.415** | Discord Save/Clear token: busy-guard (Saving…/Clearing…) + Saved/Cleared flash; blocks double click |
+| **v0.1.416** | Agent Ops Save (soul/skill/mood): busy-guard (Saving…) + Saved flash; blocks double click |
 
 ## Design review
 
