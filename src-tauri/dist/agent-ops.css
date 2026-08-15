@@ -2129,6 +2129,15 @@ button.is-just-saved,
   box-shadow: none;
 }
 
+/* Force Quit — green success flash on destructive control */
+#force-quit-process-btn.is-just-saved {
+  background: rgba(52, 199, 89, 0.95) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  animation: none;
+  box-shadow: none;
+}
+
 /* Agent Ops agent Save (btn-primary) — same solid green flash */
 #ops-agent-save.is-just-saved {
   background: rgba(52, 199, 89, 0.95) !important;

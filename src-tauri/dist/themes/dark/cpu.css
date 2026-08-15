@@ -767,6 +767,13 @@ body {
   background: rgba(255, 0, 0, 0.2);
 }
 
+.force-quit-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+  animation: none;
+}
+
+
 .setting-toggle {
   display: flex;
   align-items: center;

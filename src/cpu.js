@@ -1736,13 +1736,16 @@ function populateProcessDetailsBody(body, details, pid) {
       forceQuitBtn.parentNode.replaceChild(newBtn, forceQuitBtn);
       
       newBtn.addEventListener("click", async () => {
+        // Ignore while quit is in flight (blocks double confirm / double invoke).
+        if (newBtn.dataset.quitting === "1" || newBtn.disabled) return;
+
         // WKWebView: window.confirm()/alert() are unreliable — two-click confirm instead.
         if (newBtn.dataset.confirmArmed !== "1") {
           newBtn.dataset.confirmArmed = "1";
           newBtn.classList.add("is-confirming");
           newBtn.textContent = "Click again to confirm Force Quit";
           setTimeout(() => {
-            if (newBtn.dataset.confirmArmed === "1") {
+            if (newBtn.dataset.confirmArmed === "1" && newBtn.dataset.quitting !== "1") {
               newBtn.dataset.confirmArmed = "0";
               newBtn.classList.remove("is-confirming");
               newBtn.textContent = "Force Quit Process";
@@ -1750,21 +1753,38 @@ function populateProcessDetailsBody(body, details, pid) {
           }, 4000);
           return;
         }
-        
+
+        newBtn.dataset.quitting = "1";
+        newBtn.dataset.confirmArmed = "0";
+        newBtn.disabled = true;
+        newBtn.classList.remove("is-confirming");
+        if (newBtn._saveFlashOriginalLabel == null) {
+          newBtn._saveFlashOriginalLabel = "Force Quit Process";
+        }
+        newBtn.textContent = "Quitting…";
+
         try {
           if (!invoke) {
             invoke = getInvoke();
             if (!invoke) {
               console.error("Cannot force quit: Tauri invoke not available");
+              newBtn.dataset.quitting = "0";
+              newBtn.disabled = false;
+              newBtn.textContent = newBtn._saveFlashOriginalLabel || "Force Quit Process";
               return;
             }
           }
-          
+
           await invoke("force_quit_process", { pid });
-          
+
+          if (typeof flashSaveButton === "function") {
+            flashSaveButton(newBtn, { savedLabel: "Quit", durationMs: 900 });
+            await new Promise((r) => setTimeout(r, 450));
+          }
+
           // Clear refresh interval and close modal
           closeProcessDetailsModal();
-          
+
           // Force immediate refresh of process list (bypass 15-second throttle)
           window._forceProcessUpdate = true;
           if (window.refreshData) {
@@ -1772,9 +1792,11 @@ function populateProcessDetailsBody(body, details, pid) {
           }
         } catch (error) {
           console.error("Failed to force quit process:", error);
-          newBtn.dataset.confirmArmed = "0";
-          newBtn.classList.remove("is-confirming");
-          newBtn.textContent = "Force Quit Process";
+          newBtn.dataset.quitting = "0";
+          newBtn.disabled = false;
+          newBtn.classList.remove("is-just-saved");
+          newBtn.textContent = newBtn._saveFlashOriginalLabel || "Force Quit Process";
+          newBtn._saveFlashOriginalLabel = null;
         }
       });
     }
