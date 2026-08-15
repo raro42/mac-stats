@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.431] - 2026-08-15
+
+### Changed
+- Agent Ops design review: active tabs (and agent file tabs) use the accent wash so the selected tab matches overview cards; on/off badges use clearer green glass.
+
 ## [0.1.430] - 2026-08-15
 
 ### Changed
