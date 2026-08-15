@@ -781,6 +781,14 @@ textarea.ops-agent-editor.is-dirty {
   color: color-mix(in srgb, #0a84ff 85%, currentColor);
 }
 
+/* Pin/unpin confirmation flash (see save-button-feedback) */
+.process-pin.is-just-saved {
+  opacity: 1 !important;
+  background: color-mix(in srgb, #34c759 22%, transparent) !important;
+  color: color-mix(in srgb, #34c759 90%, currentColor) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, #34c759 40%, transparent);
+}
+
 .process-row.is-pinned {
   background: color-mix(in srgb, #0a84ff 6%, transparent);
 }

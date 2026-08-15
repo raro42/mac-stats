@@ -242,6 +242,55 @@ function togglePinnedProcessName(name) {
   return setPinnedProcessNames(pins);
 }
 
+/** Brief ★ flash after pin/unpin (survives list rebuild). */
+let processPinFlash = null; // { name, pinned }
+let processPinFlashTimer = null;
+
+function clearProcessPinFlashTimers() {
+  if (processPinFlashTimer) {
+    clearTimeout(processPinFlashTimer);
+    processPinFlashTimer = null;
+  }
+}
+
+function requestProcessPinFlash(name, pinned) {
+  if (!name) return;
+  processPinFlash = { name, pinned: !!pinned };
+  clearProcessPinFlashTimers();
+  processPinFlashTimer = setTimeout(() => {
+    processPinFlash = null;
+    processPinFlashTimer = null;
+    document.querySelectorAll(".process-pin.is-just-saved").forEach((el) => {
+      el.classList.remove("is-just-saved");
+      const isPinned = el.classList.contains("is-pinned");
+      el.title = isPinned ? "Unpin" : "Pin favorite";
+    });
+  }, 1200);
+}
+
+function applyProcessPinFlash(list) {
+  if (!processPinFlash || !list) return;
+  const want = processPinFlash.name;
+  const btn = Array.from(list.querySelectorAll(".process-pin")).find(
+    (el) => el.getAttribute("data-name") === want
+  );
+  if (!btn) return;
+  btn.classList.add("is-just-saved");
+  btn.title = processPinFlash.pinned ? "Pinned" : "Unpinned";
+}
+
+function toggleProcessPinFromUi(name) {
+  if (!name) return;
+  if (processPinFlash && processPinFlash.name === name) return;
+  const before = getPinnedProcessNames().includes(name);
+  togglePinnedProcessName(name);
+  const after = getPinnedProcessNames().includes(name);
+  if (before === after) return;
+  requestProcessPinFlash(name, after);
+  window._forceProcessUpdate = true;
+  if (window.refreshData) window.refreshData();
+}
+
 function mergePinnedProcesses(pinOrder, pinnedLookup, top) {
   const pinned = [];
   const usedNames = new Set();
@@ -947,9 +996,7 @@ async function refresh() {
             if (pinBtn && list.contains(pinBtn)) {
               e.preventDefault();
               e.stopPropagation();
-              togglePinnedProcessName(pinBtn.getAttribute("data-name"));
-              window._forceProcessUpdate = true;
-              if (window.refreshData) window.refreshData();
+              toggleProcessPinFromUi(pinBtn.getAttribute("data-name"));
               return;
             }
             const row = e.target.closest(".process-row");
@@ -985,12 +1032,7 @@ async function refresh() {
             // P toggles pin on the focused row (mouse still uses ★).
             if (e.key === "p" || e.key === "P") {
               e.preventDefault();
-              const name = row.getAttribute("data-name");
-              if (name) {
-                togglePinnedProcessName(name);
-                window._forceProcessUpdate = true;
-                if (window.refreshData) window.refreshData();
-              }
+              toggleProcessPinFromUi(row.getAttribute("data-name"));
               return;
             }
 
@@ -1037,6 +1079,7 @@ async function refresh() {
         ensureProcessesListKbHint(list, processes.length > 0);
         list.replaceChildren();
         list.appendChild(fragment);
+        applyProcessPinFlash(list);
         if (listHadFocus) {
           const target =
             (focusPid && list.querySelector(`.process-row[data-pid="${focusPid}"]`)) ||

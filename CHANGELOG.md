@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.437] - 2026-08-15
+
+### Changed
+- Top Processes: pin/unpin (★ or P) shows a brief Pinned/Unpinned flash on the star and blocks double toggle while flashing.
+
 ## [0.1.436] - 2026-08-15
 
 ### Changed
