@@ -567,33 +567,83 @@
     const githubLink = document.getElementById("github-link");
     if (!githubLink) return;
 
+    let githubOpenBusy = false;
+
     githubLink.addEventListener("click", async (e) => {
       e.preventDefault();
-      const url = githubLink.href;
-      const invoke = window.__TAURI__?.core?.invoke;
-
-      // Tauri 2: shell plugin IPC
-      if (invoke) {
-        try {
-          await invoke("plugin:shell|open", { path: url });
-          return;
-        } catch (err) {
-          console.warn("plugin:shell|open failed, trying legacy/fallback", err);
-        }
+      if (
+        githubOpenBusy ||
+        githubLink.getAttribute("aria-disabled") === "true" ||
+        githubLink.classList.contains("is-just-saved")
+      ) {
+        return;
       }
 
-      if (window.__TAURI__?.shell?.open) {
-        window.__TAURI__.shell.open(url).catch((err) => {
-          console.error("Failed to open URL with Tauri shell:", err);
+      const url = githubLink.href;
+      const idleLabel =
+        githubLink._saveFlashOriginalLabel || githubLink.textContent || "GitHub";
+      githubLink._saveFlashOriginalLabel = idleLabel;
+      githubOpenBusy = true;
+      githubLink.setAttribute("aria-disabled", "true");
+      githubLink.setAttribute("aria-busy", "true");
+      githubLink.classList.remove("is-just-saved");
+      githubLink.textContent = "Opening…";
+
+      let ok = false;
+      const invoke = window.__TAURI__?.core?.invoke;
+
+      try {
+        // Tauri 2: shell plugin IPC
+        if (invoke) {
+          try {
+            await invoke("plugin:shell|open", { path: url });
+            ok = true;
+          } catch (err) {
+            console.warn("plugin:shell|open failed, trying legacy/fallback", err);
+          }
+        }
+
+        if (!ok && window.__TAURI__?.shell?.open) {
+          await window.__TAURI__.shell.open(url);
+          ok = true;
+        } else if (!ok && window.__TAURI__?.tauri?.shell?.open) {
+          await window.__TAURI__.tauri.shell.open(url);
+          ok = true;
+        } else if (!ok) {
           window.open(url, "_blank", "noopener,noreferrer");
-        });
-      } else if (window.__TAURI__?.tauri?.shell?.open) {
-        window.__TAURI__.tauri.shell.open(url).catch((err) => {
-          console.error("Failed to open URL with Tauri shell:", err);
+          ok = true;
+        }
+      } catch (err) {
+        console.error("Failed to open GitHub URL:", err);
+        try {
           window.open(url, "_blank", "noopener,noreferrer");
-        });
-      } else {
-        window.open(url, "_blank", "noopener,noreferrer");
+          ok = true;
+        } catch (_) {
+          ok = false;
+        }
+      } finally {
+        githubOpenBusy = false;
+        githubLink.removeAttribute("aria-busy");
+        githubLink.removeAttribute("aria-disabled");
+        if (ok) {
+          if (typeof window.flashSaveButton === "function") {
+            window.flashSaveButton(githubLink, {
+              savedLabel: "Opened",
+              durationMs: 1600,
+            });
+          } else {
+            githubLink.classList.add("is-just-saved");
+            githubLink.textContent = "Opened";
+            setTimeout(() => {
+              githubLink.classList.remove("is-just-saved");
+              githubLink.textContent = idleLabel;
+              githubLink._saveFlashOriginalLabel = null;
+            }, 1600);
+          }
+        } else {
+          githubLink.textContent = idleLabel;
+          githubLink._saveFlashOriginalLabel = null;
+        }
       }
     });
   }

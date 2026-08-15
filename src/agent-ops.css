@@ -2242,6 +2242,20 @@ button.is-just-saved,
   color: inherit;
 }
 
+/* Footer GitHub — soft green flash after open */
+#github-link.is-just-saved {
+  color: color-mix(in srgb, #34c759 75%, currentColor) !important;
+  text-decoration: none;
+  pointer-events: none;
+}
+
+#github-link[aria-busy="true"],
+#github-link[aria-disabled="true"] {
+  opacity: 0.7;
+  pointer-events: none;
+  cursor: wait;
+}
+
 /* AI Chat system-prompt Reset to Default — soft green flash */
 #ollama-settings-reset.is-just-saved {
   background: color-mix(in srgb, #34c759 22%, transparent) !important;

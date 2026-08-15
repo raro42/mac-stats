@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.439] - 2026-08-15
+
+### Changed
+- Footer: GitHub link shows Opening… then an Opened flash and blocks double click while in flight or flashing.
+
 ## [0.1.438] - 2026-08-15
 
 ### Changed

@@ -1224,6 +1224,19 @@ body {
   outline-offset: 2px;
 }
 
+.apple-github-link.is-just-saved {
+  color: color-mix(in srgb, #34c759 75%, var(--text, currentColor));
+  text-decoration: none;
+  pointer-events: none;
+}
+
+.apple-github-link[aria-busy="true"],
+.apple-github-link[aria-disabled="true"] {
+  opacity: 0.7;
+  pointer-events: none;
+  cursor: wait;
+}
+
 /* Changelog Modal Styling */
 .changelog-card {
   width: min(600px, 90vw);
