@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops overview active-tab highlight + health ok/warn/bad wash — **v0.1.430** (screenshot recapture deferred TCC)
 - Force Quit Quitting… busy-guard + Quit flash — **v0.1.424**
 - Logs Open in editor busy-guard (Opening…) + Opened flash — **v0.1.423**
 - Disk Cleanup Add scope busy-guard (Adding…) + Added flash — **v0.1.422**
