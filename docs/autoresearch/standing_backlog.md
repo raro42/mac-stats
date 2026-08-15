@@ -22,6 +22,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 - Agent Ops active-tab accent wash + on/off badge glass — **v0.1.431** (screenshot recapture deferred TCC)
 - Agent Ops overview active-tab highlight + health ok/warn/bad wash — **v0.1.430** (screenshot recapture deferred TCC)
+- Agent Ops Load into AI Chat Loaded flash — **v0.1.432**
 - Force Quit Quitting… busy-guard + Quit flash — **v0.1.424**
 - Logs Open in editor busy-guard (Opening…) + Opened flash — **v0.1.423**
 - Disk Cleanup Add scope busy-guard (Adding…) + Added flash — **v0.1.422**
