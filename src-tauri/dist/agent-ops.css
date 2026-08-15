@@ -2220,6 +2220,13 @@ button.is-just-saved,
   color: inherit;
 }
 
+/* Settings View logs — soft green flash after open */
+#view-debug-log.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, transparent) !important;
+  border-color: color-mix(in srgb, #34c759 45%, transparent) !important;
+  color: inherit;
+}
+
 /* AI Chat system-prompt Reset to Default — soft green flash */
 #ollama-settings-reset.is-just-saved {
   background: color-mix(in srgb, #34c759 22%, transparent) !important;

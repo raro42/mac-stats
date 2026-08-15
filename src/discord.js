@@ -166,14 +166,45 @@
   }
 
   async function doViewLogs() {
+    const viewLogsBtn = document.getElementById("view-debug-log");
+    if (viewLogsBtn && (viewLogsBtn.disabled || viewLogsBtn.classList.contains("is-just-saved"))) {
+      return;
+    }
     const invoke = getInvoke();
     if (!invoke) {
       window.alert("App not ready. Try again in a moment.");
       return;
     }
+    const originalLabel =
+      (viewLogsBtn &&
+        (viewLogsBtn._saveFlashOriginalLabel || viewLogsBtn.textContent)) ||
+      "View logs";
+    if (viewLogsBtn) {
+      viewLogsBtn._saveFlashOriginalLabel = originalLabel;
+      viewLogsBtn.disabled = true;
+      viewLogsBtn.classList.remove("is-just-saved");
+      viewLogsBtn.textContent = "Opening…";
+    }
     try {
       await invoke("open_debug_log");
+      if (viewLogsBtn) {
+        viewLogsBtn.disabled = false;
+        if (typeof window.flashSaveButton === "function") {
+          window.flashSaveButton(viewLogsBtn, {
+            savedLabel: "Opened",
+            durationMs: 1600,
+          });
+        } else {
+          flashDiscordBtn(viewLogsBtn, "Opened");
+        }
+      }
     } catch (err) {
+      if (viewLogsBtn) {
+        viewLogsBtn.disabled = false;
+        viewLogsBtn.classList.remove("is-just-saved");
+        viewLogsBtn.textContent = originalLabel;
+        viewLogsBtn._saveFlashOriginalLabel = null;
+      }
       const path = await invoke("get_debug_log_path").catch(() => null);
       const msg = path
         ? "Could not open log file. Path: " + path
