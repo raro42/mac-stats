@@ -1129,6 +1129,30 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #0a84ff 6%, transparent);
 }
 
+/* Debug Log path — click to copy (shared; themes keep base mono/ellipsis) */
+.logs-path-hint {
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+}
+.logs-path-hint:hover {
+  opacity: 1;
+  color: var(--text, inherit);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.logs-path-hint:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  outline-offset: 2px;
+}
+.logs-path-hint.is-just-saved {
+  color: #34c759;
+  opacity: 1;
+  text-decoration: none;
+  background: color-mix(in srgb, #34c759 12%, transparent);
+  padding: 0 4px;
+}
+
 .logs-toolbar {
   display: flex;
   flex-wrap: wrap;

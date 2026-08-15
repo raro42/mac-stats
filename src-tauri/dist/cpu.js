@@ -5678,8 +5678,13 @@ async function refreshLogsViewer(scrollToEnd = true) {
   try {
     const tail = await inv('read_debug_log', { maxBytes: 262144 });
     if (pathHint && tail.path) {
-      pathHint.textContent = tail.path.replace(/^\/Users\/[^/]+/, '~');
-      pathHint.title = tail.path;
+      pathHint.dataset.fullPath = tail.path;
+      const display = tail.path.replace(/^\/Users\/[^/]+/, '~');
+      pathHint.dataset.pathDisplay = display;
+      if (!pathHint.classList.contains('is-just-saved')) {
+        pathHint.textContent = display;
+      }
+      pathHint.title = `${tail.path} — click to copy`;
     }
     const prefix = tail.truncated
       ? `… truncated (showing last ~${Math.round((tail.content || '').length / 1024)} KiB of ${Math.round((tail.total_bytes || 0) / 1024)} KiB)\n\n`
@@ -6634,6 +6639,33 @@ function initDiskCleanupSection() {
   }
 }
 
+async function copyTextToClipboard(text) {
+  const value = String(text || '').trim();
+  if (!value) return false;
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch (_) {
+    /* fall through */
+  }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = value;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return !!ok;
+  } catch (_) {
+    return false;
+  }
+}
+
 function initLogsSection() {
   const header = document.getElementById('logs-header');
   const content = document.getElementById('logs-content');
@@ -6642,6 +6674,7 @@ function initLogsSection() {
   const refreshBtn = document.getElementById('logs-refresh-btn');
   const openBtn = document.getElementById('logs-open-btn');
   const autoCb = document.getElementById('logs-autorefresh');
+  const pathHint = document.getElementById('logs-path-hint');
   if (!header || !content) return;
 
   let logsCollapsed = localStorage.getItem('logs_collapsed') !== 'false';
@@ -6665,7 +6698,7 @@ function initLogsSection() {
   wireCollapsibleHeaderA11y(header, {
     contentId: 'logs-content',
     getExpanded: () => !logsCollapsed,
-    ignoreSelector: '#logs-refresh-btn, #logs-open-btn, #logs-autorefresh, label',
+    ignoreSelector: '#logs-refresh-btn, #logs-open-btn, #logs-autorefresh, #logs-path-hint, label',
     onToggle: () => {
       logsCollapsed = !logsCollapsed;
       localStorage.setItem('logs_collapsed', logsCollapsed.toString());
@@ -6674,11 +6707,55 @@ function initLogsSection() {
   });
 
   header.addEventListener('click', (e) => {
+    if (e.target && e.target.closest && e.target.closest('#logs-path-hint')) return;
     e.stopPropagation();
     logsCollapsed = !logsCollapsed;
     localStorage.setItem('logs_collapsed', logsCollapsed.toString());
     applyCollapsed();
   });
+
+  if (pathHint) {
+    pathHint.setAttribute('role', 'button');
+    pathHint.tabIndex = 0;
+    if (!pathHint.title || pathHint.title === 'Log file path') {
+      pathHint.title = 'Click to copy log path';
+    }
+    const copyLogsPath = async (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (pathHint.classList.contains('is-just-saved')) return;
+      const full =
+        pathHint.dataset.fullPath ||
+        (pathHint.title && !/click to copy/i.test(pathHint.title)
+          ? pathHint.title.replace(/\s*—\s*click to copy.*/i, '').trim()
+          : '') ||
+        (pathHint.textContent || '').trim() ||
+        '~/.mac-stats/debug.log';
+      const displayPath = pathHint.dataset.pathDisplay || pathHint.textContent || full;
+      pathHint.dataset.pathDisplay = displayPath;
+      const ok = await copyTextToClipboard(full);
+      if (!ok) {
+        alert('Could not copy log path.');
+        return;
+      }
+      if (typeof flashSaveButton === 'function') {
+        flashSaveButton(pathHint, { savedLabel: 'Copied', durationMs: 1600 });
+      } else {
+        pathHint.classList.add('is-just-saved');
+        pathHint.textContent = 'Copied';
+        setTimeout(() => {
+          pathHint.classList.remove('is-just-saved');
+          pathHint.textContent = pathHint.dataset.pathDisplay || displayPath;
+        }, 1600);
+      }
+    };
+    pathHint.addEventListener('click', copyLogsPath);
+    pathHint.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        copyLogsPath(e);
+      }
+    });
+  }
 
   if (refreshBtn) {
     if (!refreshBtn.dataset.idleLabel) {

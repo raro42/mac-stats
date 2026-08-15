@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.441] - 2026-08-16
+
+### Changed
+- Debug Log path hint: click (or Enter/Space) copies the log path and shows a Copied flash; does not toggle the section.
+
 ## [0.1.440] - 2026-08-16
 
 ### Changed
