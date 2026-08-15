@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Logs Open in editor busy-guard (Opening…) + Opened flash — **v0.1.423**
 - Disk Cleanup Add scope busy-guard (Adding…) + Added flash — **v0.1.422**
 - Monitors Delete/Backspace removes selected + detail Remove busy-guard — **v0.1.421**
 - Disk Cleanup Save scopes busy-guard (Saving…) + Saved flash — **v0.1.420**
