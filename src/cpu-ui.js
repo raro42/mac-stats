@@ -394,6 +394,7 @@
     }
     if (helpBtn && helpSheet) {
       helpBtn.addEventListener("click", () => {
+        if (helpBtn.disabled || helpBtn.classList.contains("is-just-saved")) return;
         const show = helpSheet.hasAttribute("hidden");
         if (show) {
           helpSheet.textContent = [
@@ -405,6 +406,20 @@
             "Docs: docs/GETTING_STARTED.md",
           ].join("\n");
           helpSheet.removeAttribute("hidden");
+          const originalLabel =
+            helpBtn._saveFlashOriginalLabel || helpBtn.textContent || "Help / cheat sheet";
+          helpBtn._saveFlashOriginalLabel = originalLabel;
+          if (typeof window.flashSaveButton === "function") {
+            window.flashSaveButton(helpBtn, { savedLabel: "Opened", durationMs: 1600 });
+          } else {
+            helpBtn.classList.add("is-just-saved");
+            helpBtn.textContent = "Opened";
+            setTimeout(() => {
+              helpBtn.classList.remove("is-just-saved");
+              helpBtn.textContent = originalLabel;
+              helpBtn._saveFlashOriginalLabel = null;
+            }, 1600);
+          }
         } else {
           helpSheet.setAttribute("hidden", "");
         }

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.438] - 2026-08-15
+
+### Changed
+- Settings: Help / cheat sheet shows an Opened flash on the control when the sheet opens and blocks double click while flashing.
+
 ## [0.1.437] - 2026-08-15
 
 ### Changed
