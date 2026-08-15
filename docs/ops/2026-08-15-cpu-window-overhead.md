@@ -4,17 +4,16 @@
 
 Why does mac-stats sometimes show **>5% CPU** with the window open, while the target is **<2%** (ideally **<1%**)?
 
-## Measurement (this machine, v0.1.428 tree before 0.1.429)
+## Measurement (this machine)
 
-`./scripts/measure_performance.sh 20 1 window` with `--cpu`:
+`./scripts/measure_performance.sh` with `--cpu`:
 
-| Metric | Value |
-|--------|-------|
-| CPU avg | **0.21%** |
-| CPU max | 0.60% |
-| RSS | ~97 MB |
+| Build | Duration | CPU avg | CPU max |
+|-------|----------|---------|---------|
+| Before 0.1.429 (window open, idle UI) | 20s | **0.21%** | 0.60% |
+| After 0.1.429 | 25s | **0.23%** | 0.70% |
 
-So steady-state window open is already under 1% when idle of agent work. Spikes come from stacked work, not a constant 5% floor.
+Steady-state window open is already under 1% when idle of agent work. Spikes (>5%) come from stacked work (details modal + double ioreg + 1s polls), not a constant 5% floor.
 
 ## Hot paths found
 
