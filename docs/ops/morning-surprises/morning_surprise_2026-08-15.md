@@ -23,19 +23,20 @@ Overnight Track B (20:00–06:00 local, window opened 2026-08-14).
 | **v0.1.415** | Discord Save/Clear token: busy-guard (Saving…/Clearing…) + Saved/Cleared flash; blocks double click |
 | **v0.1.416** | Agent Ops Save (soul/skill/mood): busy-guard (Saving…) + Saved flash; blocks double click |
 | **v0.1.417** | AI Chat system-prompt Save: busy-guard (Saving…) + Saved flash; popover stays open so confirmation is visible |
+| **v0.1.418** | Monitors Add Monitor: busy-guard (Adding…) + Added flash; form stays open for confirmation, then closes |
 
 ## Design review
 
-- Not due at 20:00–02:57 ticks (feature screens ok/grace; ai-chat ~0.59d).
+- Not due at 20:00–03:22 ticks (feature screens ok/grace; ai-chat ~0.61d).
 - Next due surface: wait for age >3d or re-shoot when TCC allows.
 
 ## Digester
 
 - Open candidates: none (latency n/a after noise filters).
-- Fuel used: standing backlog keyboard UX (v0.1.401–405), soft-delete safety (v0.1.406), skip visibility (v0.1.407), AI Chat Send/Clear (v0.1.408–409), Perplexity Search feedback (v0.1.410), Agent Ops Refresh feedback (v0.1.411), Disk Cleanup Refresh/Clean now feedback (v0.1.412), Monitors Check now feedback (v0.1.413), Logs Refresh feedback (v0.1.414), Discord Save/Clear token feedback (v0.1.415), Agent Ops Save feedback (v0.1.416), AI Chat system-prompt Save feedback (v0.1.417).
+- Fuel used: standing backlog keyboard UX (v0.1.401–405), soft-delete safety (v0.1.406), skip visibility (v0.1.407), AI Chat Send/Clear (v0.1.408–409), Perplexity Search feedback (v0.1.410), Agent Ops Refresh feedback (v0.1.411), Disk Cleanup Refresh/Clean now feedback (v0.1.412), Monitors Check now feedback (v0.1.413), Logs Refresh feedback (v0.1.414), Discord Save/Clear token feedback (v0.1.415), Agent Ops Save feedback (v0.1.416), AI Chat system-prompt Save feedback (v0.1.417), Monitors Add Monitor feedback (v0.1.418).
 
 ## Notes
 
-- Nightly minimum satisfied: keep rows in `autoresearch/results.tsv` for v0.1.401–417.
+- Nightly minimum satisfied: keep rows in `autoresearch/results.tsv` for v0.1.401–418.
 - Quiet ticks: 0 so far this window.
-- Installed `/Applications/mac-stats.app` at 0.1.417 after release rebuild + kickstart.
+- Installed `/Applications/mac-stats.app` at 0.1.418 after release rebuild + kickstart.
