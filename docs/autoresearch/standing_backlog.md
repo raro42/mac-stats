@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops filter-miss Clear filter — **v0.1.443**
 - Settings product toggles Saved flash (AI / compact menu bar / compact CPU window) — **v0.1.442**
 - Debug Log path hint click-to-copy + Copied flash — **v0.1.441**
 - Theme / app version → changelog Opened flash — **v0.1.440**

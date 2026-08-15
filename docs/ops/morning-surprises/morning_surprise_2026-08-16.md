@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-16
 
-Overnight Track B (20:00–06:00 local) strengthened the product with keep rows through **v0.1.442**.
+Overnight Track B (20:00–06:00 local) strengthened the product with keep rows through **v0.1.443**.
 
 ## Shipped (selected)
 
@@ -18,14 +18,16 @@ Overnight Track B (20:00–06:00 local) strengthened the product with keep rows 
 | v0.1.439 | Footer GitHub Opening…/Opened flash |
 | v0.1.440 | Theme / app version → changelog Opened flash |
 | v0.1.441 | Debug Log path hint click-to-copy + Copied flash |
-| **v0.1.442** | **Settings product toggles Saved flash after persist** |
+| v0.1.442 | Settings product toggles Saved flash after persist |
+| **v0.1.443** | **Agent Ops filter-miss empty states: Clear filter + filter-field highlight** |
 
-## Latest tick (~01:06)
+## Latest tick (~01:31)
 
-- Digester open pointed at stale `feature-agent-ops.png`; design-review polish already used earlier tonight (v0.1.430–431).
-- Screen Recording TCC still blocks `screencapture -l` (probe hung).
-- Picked standing UX: product toggles (AI agent, compact menu bar, compact CPU window) saved silently after path-hint flash in v0.1.441.
-- Verify green → keep → install → Discord Bot connected.
+- Digester open = overnight design review (`feature-agent-ops.png` stale 3.7d); debug.log quiet.
+- Fuel: design review — Agent Ops filter miss empty states had no recovery affordance (Esc-only).
+- **Keep v0.1.443** — Clear filter button on no-match empties; filter input pulses after clear.
+- Recapture of `docs/screens/feature-agent-ops.png` still deferred if Screen Recording TCC blocks.
+- Verify green → keep → install → Discord Ready after kickstart.
 
 ## Deferred
 
@@ -33,4 +35,4 @@ Overnight Track B (20:00–06:00 local) strengthened the product with keep rows 
 
 ## Not a quiet night
 
-Empty digester Slowest alone was not the win — control feedback and Agent Ops hierarchy shipped.
+Empty digester Slowest alone was not the win — Agent Ops filter recovery and control feedback shipped.
