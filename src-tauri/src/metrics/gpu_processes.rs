@@ -30,11 +30,11 @@ pub fn gpu_usage_by_pid() -> HashMap<u32, f32> {
         .and_then(|g| g.as_ref().map(|(_, at)| at.elapsed().as_millis()))
         .unwrap_or(u128::MAX);
 
-    // Rate-limit ioreg, but never skip the second sample needed for deltas.
-    // Bug fixed: caching an *empty* first result for 1.5s blocked warm-up.
+    // Rate-limit ioreg (~20ms each). Allow a quick second sample for deltas,
+    // then hold ~3s so process-list + details refresh do not stack dumps.
     let have_prev = prev_age_ms != u128::MAX;
     let need_second = have_prev && prev_age_ms >= 50 && prev_age_ms < 2000;
-    let ioreg_fresh_enough = prev_age_ms < 800 && !need_second;
+    let ioreg_fresh_enough = (prev_age_ms < 3000 && !need_second) || prev_age_ms < 50;
 
     if ioreg_fresh_enough {
         if let Ok(cache) = CACHED_PCT.lock() {

@@ -220,9 +220,9 @@ pub fn get_gpu_usage() -> f32 {
     // Try reading from IOGPUWrangler or AGXAccelerator
     let gpu_usage = read_gpu_usage_from_system();
 
-    // Advance per-process GPU sampler on the same cadence as the device % gauge
-    // (needs two samples; empty first results must not block the second).
-    let _ = gpu_processes::gpu_usage_by_pid();
+    // Do NOT tick per-process GPU here: that runs a second `ioreg -l` (~20ms) and
+    // stacked with the device-utilization dump when the window is open. Process
+    // list / details advance the sampler on their own cadence.
 
     // Update cache
     if let Ok(mut cache) = GPU_USAGE_CACHE.try_lock() {
@@ -2106,10 +2106,12 @@ pub fn get_process_details(pid: u32) -> Result<ProcessDetails, String> {
             }
             let sys = sys.as_mut().unwrap();
 
-            // Only refresh all processes if CPU window is visible (saves CPU)
+            // Details modal refreshes every few seconds — never refresh *all*
+            // processes here (~8ms+ each). Touch only this PID (~0.02ms).
             if should_refresh_processes {
                 use sysinfo::ProcessesToUpdate;
-                sys.refresh_processes(ProcessesToUpdate::All, true);
+                let target = Pid::from_u32(pid);
+                sys.refresh_processes(ProcessesToUpdate::Some(&[target]), true);
             }
 
             // Get the process while lock is held

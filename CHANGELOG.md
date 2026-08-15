@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.429] - 2026-08-15
+
+### Changed
+- CPU window open: lower polling (UI 2s, process details 5s, background loop 2s); stop stacking per-process `ioreg` on every GPU gauge tick; process details refreshes only the selected PID (not all processes).
+
 ## [0.1.428] - 2026-08-15
 
 ### Fixed

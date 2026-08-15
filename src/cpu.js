@@ -290,9 +290,10 @@ async function refresh() {
       if (refreshInterval) {
         clearInterval(refreshInterval);
       }
-      // Start 1-second interval to match menu bar update frequency
-      refreshInterval = setInterval(refresh, 1000);
-      console.log("Got real data, switched to 1-second interval (matching menu bar)");
+      // 2s matches backend get_cpu_details rate limit (1s polls were mostly cache hits
+      // but still woke WebKit + IPC every second while the window was open).
+      refreshInterval = setInterval(refresh, 2000);
+      console.log("Got real data, switched to 2-second interval");
     }
     
     // STEP 7: Batch all DOM updates to reduce WebKit rendering
@@ -1084,7 +1085,7 @@ function startRefresh() {
   // If not, poll every 1 second until we do (SYSTEM might not be initialized yet)
   // Once we get real data (usage > 0), continue with 1-second interval (matches menu bar)
   isWaitingForData = true;
-  refreshInterval = setInterval(refresh, 1000); // 1-second polling (matches menu bar frequency)
+  refreshInterval = setInterval(refresh, 2000); // 2s: matches backend rate limit / lower WebKit wakeups
 }
 
 // Initialize when DOM and Tauri are ready
@@ -1937,8 +1938,7 @@ async function showProcessDetails(pid) {
     // Show modal (using same display style as settings modal)
     openProcessDetailsModal();
     
-    // Start auto-refresh every 2 seconds while modal is open
-    // CRITICAL: Only refresh if modal is actually visible (checked in updateProcessDetailsContent too)
+    // Live metrics every 5s (was 2s). Faster polls forced full work + DOM rebuild.
     processDetailsRefreshInterval = setInterval(() => {
       // Check if modal is visible before refreshing
       if (currentProcessPid !== null && 
@@ -1952,7 +1952,7 @@ async function showProcessDetails(pid) {
           processDetailsRefreshInterval = null;
         }
       }
-    }, 2000);
+    }, 5000);
   } catch (error) {
     console.error("Failed to fetch process details:", error);
     alert(`Failed to fetch process details: ${error}`);

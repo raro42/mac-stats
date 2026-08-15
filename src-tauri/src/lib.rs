@@ -698,7 +698,8 @@ fn run_internal(open_cpu_window: bool) {
                             })
                         })
                         .is_some();
-                    let sleep_secs = if cpu_window_visible { 1 } else { 5 };
+                    // Window open: 2s (was 1s). Frontend also polls; 1s doubled work.
+                    let sleep_secs = if cpu_window_visible { 2 } else { 5 };
                     std::thread::sleep(std::time::Duration::from_secs(sleep_secs));
 
                     debug3!("Update loop: getting metrics...");
