@@ -180,6 +180,48 @@ fn trash_dir() -> PathBuf {
     home_dir().join(".Trash")
 }
 
+/// Soft-delete target that stays inside `~/.mac-stats` (no macOS Downloads/Trash TCC prompts).
+fn quarantine_dir() -> PathBuf {
+    home_dir().join(".mac-stats").join("cleanup-quarantine")
+}
+
+/// Folders that trigger macOS “access files in …” prompts when scanned or written.
+fn path_is_tcc_sensitive(path: &Path) -> bool {
+    let home = home_dir();
+    let sensitive = [
+        home.join("Downloads"),
+        home.join("Desktop"),
+        home.join("Documents"),
+        home.join(".Trash"),
+    ];
+    let Ok(canon) = path.canonicalize() else {
+        let s = path.to_string_lossy();
+        return sensitive.iter().any(|p| {
+            s == p.to_string_lossy() || path.starts_with(p) || s.starts_with(&*p.to_string_lossy())
+        });
+    };
+    sensitive.iter().any(|p| {
+        let Ok(pc) = p.canonicalize() else {
+            return canon.starts_with(p);
+        };
+        canon == pc || canon.starts_with(&pc)
+    })
+}
+
+fn scope_is_tcc_sensitive(scope: &DiskCleanupScope) -> bool {
+    match scope.kind.as_str() {
+        "downloads" | "trash" => true,
+        "path" => resolve_scope_roots(scope)
+            .iter()
+            .any(|(root, _)| path_is_tcc_sensitive(root)),
+        _ => false,
+    }
+}
+
+fn auto_trigger(trigger: &str) -> bool {
+    matches!(trigger, "startup" | "periodic")
+}
+
 fn path_is_under_trash(path: &Path) -> bool {
     let trash = trash_dir();
     let Ok(canon) = path.canonicalize() else {
@@ -191,21 +233,20 @@ fn path_is_under_trash(path: &Path) -> bool {
     canon.starts_with(&trash_canon)
 }
 
-/// Move `path` into `~/.Trash` with a collision-safe name. Falls back to copy+remove across volumes.
-fn move_to_trash(path: &Path) -> Result<(), String> {
+/// Move `path` into `soft_root` (system Trash or app quarantine) with a collision-safe name.
+fn move_to_soft_root(path: &Path, soft_root: &Path) -> Result<(), String> {
     if !path.is_file() {
         return Err("not a file".into());
     }
-    if path_is_under_trash(path) {
+    if path_is_under_trash(path) || path.starts_with(soft_root) {
         return fs::remove_file(path).map_err(|e| e.to_string());
     }
-    let trash = trash_dir();
-    fs::create_dir_all(&trash).map_err(|e| e.to_string())?;
+    fs::create_dir_all(soft_root).map_err(|e| e.to_string())?;
     let base = path
         .file_name()
         .map(|n| n.to_string_lossy().into_owned())
         .ok_or_else(|| "missing file name".to_string())?;
-    let mut dest = trash.join(&base);
+    let mut dest = soft_root.join(&base);
     if dest.exists() {
         let stem = path
             .file_stem()
@@ -215,7 +256,7 @@ fn move_to_trash(path: &Path) -> Result<(), String> {
             .extension()
             .map(|e| format!(".{}", e.to_string_lossy()))
             .unwrap_or_default();
-        dest = trash.join(format!(
+        dest = soft_root.join(format!(
             "{} {}{}",
             stem,
             Utc::now().format("%Y-%m-%d %H.%M.%S"),
@@ -223,7 +264,7 @@ fn move_to_trash(path: &Path) -> Result<(), String> {
         ));
         let mut n = 2u32;
         while dest.exists() {
-            dest = trash.join(format!(
+            dest = soft_root.join(format!(
                 "{} {} ({}){}",
                 stem,
                 Utc::now().format("%Y-%m-%d %H.%M.%S"),
@@ -239,15 +280,13 @@ fn move_to_trash(path: &Path) -> Result<(), String> {
     match fs::rename(path, &dest) {
         Ok(()) => Ok(()),
         Err(e) => {
-            // Cross-volume rename fails (e.g. /tmp → ~/.Trash): copy then remove.
             match fs::copy(path, &dest) {
                 Ok(_) => match fs::remove_file(path) {
                     Ok(()) => Ok(()),
                     Err(rm_err) => {
-                        // Do not leave an orphan Trash copy while the source stays.
                         let _ = fs::remove_file(&dest);
                         Err(format!(
-                            "copy-to-trash ok but remove source failed: {rm_err}; rename was: {e}"
+                            "copy-to-soft-root ok but remove source failed: {rm_err}; rename was: {e}"
                         ))
                     }
                 },
@@ -257,13 +296,18 @@ fn move_to_trash(path: &Path) -> Result<(), String> {
     }
 }
 
-/// Soft-delete moves to Trash; permanent unlinks. Paths already in Trash are always unlinked.
+#[allow(dead_code)]
+fn move_to_trash(path: &Path) -> Result<(), String> {
+    move_to_soft_root(path, &trash_dir())
+}
+
+/// Soft-delete moves to `soft_root`; permanent unlinks. Paths already in Trash are always unlinked.
 ///
-/// When soft-delete is on and Trash move fails (EPERM, cross-volume, etc.), **skip** the file.
+/// When soft-delete is on and the move fails (EPERM, cross-volume, etc.), **skip** the file.
 /// Never fall back to permanent delete — that would violate the user's recoverability choice.
-fn remove_cleaned_file(path: &Path, soft: bool) -> bool {
+fn remove_cleaned_file(path: &Path, soft: bool, soft_root: &Path) -> bool {
     if soft && !path_is_under_trash(path) {
-        match move_to_trash(path) {
+        match move_to_soft_root(path, soft_root) {
             Ok(()) => true,
             Err(err) => {
                 crate::mac_stats_debug!(
@@ -606,7 +650,7 @@ fn collect_aged_files(root: &Path, max_age_days: u32, recursive: bool) -> Vec<(P
     out
 }
 
-fn preview_aged_scope(scope: &DiskCleanupScope) -> CleanupCategory {
+fn preview_aged_scope(scope: &DiskCleanupScope, touch_user_folders: bool) -> CleanupCategory {
     let soft = soft_delete_enabled();
     let force_permanent = scope.kind == "trash";
     let days = scope.max_age_days.unwrap_or(0);
@@ -640,6 +684,18 @@ fn preview_aged_scope(scope: &DiskCleanupScope) -> CleanupCategory {
             &policy,
             &scope.id,
             false,
+        );
+    }
+
+    // Avoid macOS TCC prompts on routine status polls (Downloads / Trash / Desktop / Documents).
+    if !touch_user_folders && scope_is_tcc_sensitive(scope) {
+        return empty_cat(
+            &scope.id,
+            &scope.label,
+            &path_hint,
+            &format!("{policy} · not scanned (Refresh or Clean now)"),
+            &scope.id,
+            true,
         );
     }
 
@@ -679,8 +735,8 @@ fn preview_aged_scope(scope: &DiskCleanupScope) -> CleanupCategory {
     }
 }
 
-/// Returns `(deleted, freed_bytes, soft_skips)`. Soft skips are Trash-move failures only.
-fn apply_aged_scope(scope: &DiskCleanupScope) -> (u64, u64, u64) {
+/// Returns `(deleted, freed_bytes, soft_skips)`. Soft skips are soft-root move failures only.
+fn apply_aged_scope(scope: &DiskCleanupScope, soft_root: &Path) -> (u64, u64, u64) {
     if !scope.enabled {
         return (0, 0, 0);
     }
@@ -695,7 +751,7 @@ fn apply_aged_scope(scope: &DiskCleanupScope) -> (u64, u64, u64) {
             continue;
         }
         for (path, sz) in collect_aged_files(&root, days, scope.recursive) {
-            if remove_cleaned_file(&path, soft) {
+            if remove_cleaned_file(&path, soft, soft_root) {
                 deleted += 1;
                 freed = freed.saturating_add(sz);
             } else if soft {
@@ -1304,45 +1360,50 @@ fn preview_mac_stats_scope(scope: &DiskCleanupScope) -> Vec<CleanupCategory> {
     ]
 }
 
-fn build_preview_categories(scopes: &[DiskCleanupScope]) -> Vec<CleanupCategory> {
+fn build_preview_categories(
+    scopes: &[DiskCleanupScope],
+    touch_user_folders: bool,
+) -> Vec<CleanupCategory> {
     let mut out = Vec::new();
     for scope in scopes {
         match scope.kind.as_str() {
             "mac-stats" => out.extend(preview_mac_stats_scope(scope)),
-            "trash" | "downloads" | "temp" | "path" => out.push(preview_aged_scope(scope)),
+            "trash" | "downloads" | "temp" | "path" => {
+                out.push(preview_aged_scope(scope, touch_user_folders))
+            }
             _ => {}
         }
     }
     out
 }
 
-/// Soft path returns count of files left in place when Trash move failed.
-fn apply_mac_stats_scope(soft: bool) -> u64 {
+/// Soft path returns count of files left in place when soft-root move failed.
+fn apply_mac_stats_scope(soft: bool, soft_root: &Path) -> u64 {
     if soft {
-        // Move reclaimable app data to Trash (recoverable). Line-based / log prune stays permanent.
+        // Move reclaimable app data to soft_root (Trash or in-app quarantine).
         let mut skipped = 0u64;
         for (path, _) in collect_screenshot_reclaim() {
-            if !remove_cleaned_file(&path, true) {
+            if !remove_cleaned_file(&path, true, soft_root) {
                 skipped += 1;
             }
         }
         for (path, _) in collect_pdf_reclaim() {
-            if !remove_cleaned_file(&path, true) {
+            if !remove_cleaned_file(&path, true, soft_root) {
                 skipped += 1;
             }
         }
         for (path, _) in collect_session_reclaim() {
-            if !remove_cleaned_file(&path, true) {
+            if !remove_cleaned_file(&path, true, soft_root) {
                 skipped += 1;
             }
         }
         for (path, _) in collect_browser_download_reclaim() {
-            if !remove_cleaned_file(&path, true) {
+            if !remove_cleaned_file(&path, true, soft_root) {
                 skipped += 1;
             }
         }
         for (path, _) in collect_sic_backup_reclaim() {
-            if !remove_cleaned_file(&path, true) {
+            if !remove_cleaned_file(&path, true, soft_root) {
                 skipped += 1;
             }
         }
@@ -1465,23 +1526,23 @@ fn build_status_from(
         next_run_label,
         interval_hours: hours,
         triggers: vec![
-            "App launch".into(),
+            "App launch (mac-stats data only; no Downloads/Trash scan)".into(),
             if hours > 0 {
-                format!("Every {}h while running", hours)
+                format!("Every {}h while running (mac-stats data only)", hours)
             } else {
                 "Periodic: off".into()
             },
-            "Manual (Clean now)".into(),
+            "Manual Clean now (all enabled scopes)".into(),
         ],
         enabled_scope_summary: summary,
         soft_delete: soft,
     }
 }
 
-pub fn get_status() -> DiskCleanupStatus {
+pub fn get_status(touch_user_folders: bool) -> DiskCleanupStatus {
     let state = load_state();
     let scopes = load_scopes();
-    let categories = build_preview_categories(&scopes);
+    let categories = build_preview_categories(&scopes, touch_user_folders);
     build_status_from(state, scopes, categories)
 }
 
@@ -1490,7 +1551,7 @@ fn soft_skip_note_suffix(skipped: u64) -> String {
         String::new()
     } else {
         format!(
-            "; skipped {} (could not move to Trash — left in place)",
+            "; skipped {} (could not soft-delete — left in place)",
             skipped
         )
     }
@@ -1498,20 +1559,34 @@ fn soft_skip_note_suffix(skipped: u64) -> String {
 
 pub fn run_now(trigger: &str) -> DiskCleanupStatus {
     let scopes = load_scopes();
-    let before = build_preview_categories(&scopes);
+    let is_auto = auto_trigger(trigger);
+    // Auto runs must not touch Downloads/Trash (macOS TCC). Soft-delete goes to
+    // ~/.mac-stats/cleanup-quarantine instead of ~/.Trash.
+    let soft_root = if is_auto {
+        quarantine_dir()
+    } else {
+        trash_dir()
+    };
+    let touch_preview = !is_auto;
+    let before = build_preview_categories(&scopes, touch_preview);
     let mut files_skipped = 0u64;
+    let mut skipped_tcc_scopes = 0u32;
 
     for scope in &scopes {
         if !scope.enabled {
             continue;
         }
+        if is_auto && scope_is_tcc_sensitive(scope) {
+            skipped_tcc_scopes += 1;
+            continue;
+        }
         match scope.kind.as_str() {
             "mac-stats" => {
-                files_skipped =
-                    files_skipped.saturating_add(apply_mac_stats_scope(soft_delete_enabled()));
+                files_skipped = files_skipped
+                    .saturating_add(apply_mac_stats_scope(soft_delete_enabled(), &soft_root));
             }
             "trash" | "downloads" | "temp" | "path" => {
-                let (d, f, sk) = apply_aged_scope(scope);
+                let (d, f, sk) = apply_aged_scope(scope, &soft_root);
                 files_skipped = files_skipped.saturating_add(sk);
                 if d > 0 || sk > 0 {
                     mac_stats_info!(
@@ -1528,13 +1603,26 @@ pub fn run_now(trigger: &str) -> DiskCleanupStatus {
         }
     }
 
-    let after = build_preview_categories(&scopes);
+    let after = build_preview_categories(&scopes, touch_preview);
     let categories = deltas_from_preview(&before, &after);
     let files_removed: u64 = categories.iter().map(|c| c.files_removed).sum();
     let bytes_freed: u64 = categories.iter().map(|c| c.bytes_freed).sum();
 
     let hours = interval_hours();
     let at = Utc::now();
+    let soft_dest_note = if is_auto && soft_delete_enabled() {
+        " · auto soft-delete → ~/.mac-stats/cleanup-quarantine"
+    } else {
+        ""
+    };
+    let tcc_skip_note = if skipped_tcc_scopes > 0 {
+        format!(
+            " Skipped {} Downloads/Trash/path scope(s) on auto run (use Clean now).",
+            skipped_tcc_scopes
+        )
+    } else {
+        String::new()
+    };
     let last = DiskCleanupLastRun {
         at_utc: at.to_rfc3339(),
         trigger: trigger.to_string(),
@@ -1543,24 +1631,33 @@ pub fn run_now(trigger: &str) -> DiskCleanupStatus {
         files_skipped,
         categories,
         note: if files_removed == 0 && bytes_freed == 0 && files_skipped == 0 {
-            Some("Nothing to clean under enabled scopes.".into())
+            Some(format!(
+                "Nothing to clean under enabled scopes.{}{}",
+                soft_dest_note, tcc_skip_note
+            ))
         } else if files_removed == 0 && bytes_freed == 0 {
             Some(format!(
-                "Nothing moved; skipped {} (could not move to Trash — left in place).",
-                files_skipped
+                "Nothing moved; skipped {} (could not soft-delete — left in place).{}{}",
+                files_skipped, soft_dest_note, tcc_skip_note
             ))
         } else {
             let how = if soft_delete_enabled() {
-                "Moved to Trash"
+                if is_auto {
+                    "Moved to cleanup-quarantine"
+                } else {
+                    "Moved to Trash"
+                }
             } else {
                 "Permanently deleted"
             };
             Some(format!(
-                "{} {} across {} item(s) (Trash scope always permanent){}.",
+                "{} {} across {} item(s) (Trash scope always permanent){}.{}{}",
                 how,
                 format_bytes(bytes_freed),
                 files_removed,
-                soft_skip_note_suffix(files_skipped)
+                soft_skip_note_suffix(files_skipped),
+                soft_dest_note,
+                tcc_skip_note
             ))
         },
     };
@@ -1577,11 +1674,12 @@ pub fn run_now(trigger: &str) -> DiskCleanupStatus {
 
     mac_stats_info!(
         "disk_cleanup",
-        "Disk cleanup ({}): removed {} item(s), freed {} byte(s), soft-skipped {}",
+        "Disk cleanup ({}): removed {} item(s), freed {} byte(s), soft-skipped {}, tcc-scopes-skipped {}",
         trigger,
         files_removed,
         bytes_freed,
-        files_skipped
+        files_skipped,
+        skipped_tcc_scopes
     );
 
     build_status_from(state, scopes, after)
@@ -1605,8 +1703,8 @@ pub fn run_if_due() {
 }
 
 #[tauri::command]
-pub fn get_disk_cleanup_status() -> DiskCleanupStatus {
-    get_status()
+pub fn get_disk_cleanup_status(deep: Option<bool>) -> DiskCleanupStatus {
+    get_status(deep.unwrap_or(false))
 }
 
 #[tauri::command]
@@ -1622,13 +1720,13 @@ pub fn get_disk_cleanup_scopes() -> Vec<DiskCleanupScope> {
 #[tauri::command]
 pub fn set_disk_cleanup_scopes(scopes: Vec<DiskCleanupScope>) -> Result<DiskCleanupStatus, String> {
     save_scopes(&scopes)?;
-    Ok(get_status())
+    Ok(get_status(false))
 }
 
 #[tauri::command]
 pub fn set_disk_cleanup_soft_delete(soft_delete: bool) -> Result<DiskCleanupStatus, String> {
     save_soft_delete(soft_delete)?;
-    Ok(get_status())
+    Ok(get_status(false))
 }
 
 #[cfg(test)]
@@ -1673,7 +1771,7 @@ mod tests {
 
     #[test]
     fn soft_delete_skips_when_trash_move_fails() {
-        // Soft path must not unlink when Trash is unreachable (recoverability).
+        // Soft path must not unlink when soft-root move fails (recoverability).
         let dir = std::env::temp_dir().join(format!(
             "mac-stats-soft-skip-{}",
             std::process::id()
@@ -1682,17 +1780,19 @@ mod tests {
         fs::create_dir_all(&dir).expect("temp dir");
         let file = dir.join("kept.txt");
         fs::write(&file, b"keep-me").expect("write");
-        // Point trash at a non-writable path by using a file-as-dir via move_to_trash failure:
-        // Call remove_cleaned_file with soft=true against a path that cannot be renamed into Trash.
-        // Use a directory (move_to_trash rejects non-files) to force Err → skip.
         let not_a_file = dir.join("subdir");
         fs::create_dir_all(&not_a_file).expect("subdir");
+        let soft_root = dir.join("soft-root");
+        fs::create_dir_all(&soft_root).expect("soft root");
         assert!(
-            !remove_cleaned_file(&not_a_file, true),
-            "soft-delete must skip when trash move fails"
+            !remove_cleaned_file(&not_a_file, true, &soft_root),
+            "soft-delete must skip when move fails"
         );
         assert!(file.exists(), "unrelated file must remain");
-        assert!(not_a_file.exists(), "failed soft target must remain (no permanent fallback)");
+        assert!(
+            not_a_file.exists(),
+            "failed soft target must remain (no permanent fallback)"
+        );
         let _ = fs::remove_dir_all(&dir);
     }
 
@@ -1706,7 +1806,8 @@ mod tests {
         fs::create_dir_all(&dir).expect("temp dir");
         let file = dir.join("gone.txt");
         fs::write(&file, b"bye").expect("write");
-        assert!(remove_cleaned_file(&file, false));
+        let soft_root = dir.join("soft-root");
+        assert!(remove_cleaned_file(&file, false, &soft_root));
         assert!(!file.exists());
         let _ = fs::remove_dir_all(&dir);
     }

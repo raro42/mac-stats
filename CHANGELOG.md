@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.425] - 2026-08-15
+
+### Fixed
+- Disk Cleanup no longer triggers macOS Downloads/Trash access prompts on every launch: auto runs only clean `~/.mac-stats` data; soft-delete on auto goes to `~/.mac-stats/cleanup-quarantine` (not `~/.Trash`). Status preview skips Downloads/Trash until Refresh or Clean now.
+
 ## [0.1.424] - 2026-08-15
 ### Changed
 - **Force Quit Process** — busy-guard (`Quitting…`) while the quit runs; brief `Quit` flash on success; blocks double confirm/click in flight.

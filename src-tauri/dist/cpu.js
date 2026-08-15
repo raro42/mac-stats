@@ -5616,7 +5616,8 @@ function formatDiskWhen(iso) {
   }
 }
 
-async function refreshDiskCleanupPanel() {
+async function refreshDiskCleanupPanel(opts) {
+  const deep = !!(opts && opts.deep);
   const list = document.getElementById('disk-cleanup-list');
   const summary = document.getElementById('disk-cleanup-summary');
   const lastEl = document.getElementById('disk-cleanup-last');
@@ -5631,7 +5632,7 @@ async function refreshDiskCleanupPanel() {
   if (!inv || !list) return null;
 
   try {
-    const status = await inv('get_disk_cleanup_status');
+    const status = await inv('get_disk_cleanup_status', { deep });
     window.__diskCleanupScopes = Array.isArray(status.scopes)
       ? status.scopes.map((s) => ({ ...s }))
       : [];
@@ -6280,7 +6281,8 @@ function initDiskCleanupSection() {
     if (header._syncCollapseA11y) header._syncCollapseA11y();
   };
   applyCollapsed();
-  refreshDiskCleanupPanel();
+  // Do not scan Downloads/Trash on every CPU-window open — only when the section is expanded
+  // (applyCollapsed) or the user clicks Refresh / Clean now.
 
   if (typeof wireCollapsibleHeaderA11y === 'function') {
     wireCollapsibleHeaderA11y(header, {
@@ -6328,7 +6330,7 @@ function initDiskCleanupSection() {
       refreshBtn.disabled = true;
       refreshBtn.textContent = 'Refreshing…';
       try {
-        await refreshDiskCleanupPanel();
+        await refreshDiskCleanupPanel({ deep: true });
         refreshBtn.disabled = false;
         refreshBtn.textContent = refreshBtn.dataset.idleLabel || 'Refresh';
         flashSaveButton(refreshBtn, { savedLabel: 'Refreshed', durationMs: 1600 });
