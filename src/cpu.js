@@ -5627,6 +5627,8 @@ function flashSaveButton(btn, opts = {}) {
     btn._saveFlashTimer = null;
   }, durationMs);
 }
+// Shared with discord.js / other script tags (save-button-feedback rule).
+window.flashSaveButton = flashSaveButton;
 
 /** Roving tabindex for Disk Cleanup scope rows (Monitors / process-list parity). */
 function syncDiskCleanupScopeTabOrder(scopesEl, preferIdx) {

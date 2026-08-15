@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Discord Save token / Clear token busy-guard + Saved/Cleared flash — **v0.1.415**
 - Logs Refresh busy-guard (Refreshing…) + Refreshed flash; auto-refresh silent — **v0.1.414**
 - Monitors Check now busy-guard (Checking…) + Checked flash — **v0.1.413**
 - Disk Cleanup Refresh busy-guard (Refreshing…) + Refreshed flash; Clean now Cleaned flash — **v0.1.412**
