@@ -43,6 +43,7 @@
   let opsAgentFileTab = 'soul';
   let opsAgentDirty = { soul: false, skill: false, mood: false };
   let opsAgentSaveStatusTimer = null;
+  let opsAgentSaveBusy = false;
   let opsRefreshInFlight = false;
   let opsRefreshFlashTimer = null;
   let opsDigestRefreshInFlight = false;
@@ -1334,7 +1335,43 @@ function setOpsAgentSaveStatus(msg) {
     }
 }
 
+function setOpsAgentSaveBusy(busy) {
+    opsAgentSaveBusy = !!busy;
+    const saveBtn = document.getElementById('ops-agent-save');
+    if (!saveBtn) return;
+    if (busy) {
+        saveBtn.disabled = true;
+        saveBtn.classList.remove('is-just-saved');
+        if (saveBtn._saveFlashOriginalLabel == null) {
+            saveBtn._saveFlashOriginalLabel = saveBtn.textContent || 'Save';
+        }
+        saveBtn.textContent = 'Saving…';
+        return;
+    }
+    if (!saveBtn.classList.contains('is-just-saved')) {
+        saveBtn.textContent = saveBtn._saveFlashOriginalLabel || 'Save';
+        saveBtn._saveFlashOriginalLabel = null;
+    }
+}
+
+function flashOpsAgentSaveBtn(saveBtn) {
+    if (!saveBtn) return;
+    if (typeof window.flashSaveButton === 'function') {
+        window.flashSaveButton(saveBtn, { savedLabel: 'Saved', durationMs: 1600 });
+        return;
+    }
+    const prev = saveBtn._saveFlashOriginalLabel || saveBtn.textContent || 'Save';
+    saveBtn.classList.add('is-just-saved');
+    saveBtn.textContent = 'Saved';
+    setTimeout(() => {
+        saveBtn.classList.remove('is-just-saved');
+        saveBtn.textContent = prev;
+        saveBtn._saveFlashOriginalLabel = null;
+    }, 1600);
+}
+
 async function saveOpsAgentFile() {
+    if (opsAgentSaveBusy) return;
     if (!opsAgentCache?.id) return;
     ensureOpsAgentEditor();
     syncOpsAgentEditorToCache();
@@ -1347,7 +1384,7 @@ async function saveOpsAgentFile() {
               ? 'update_agent_mood'
               : 'update_agent_skill';
     const saveBtn = document.getElementById('ops-agent-save');
-    if (saveBtn) saveBtn.disabled = true;
+    setOpsAgentSaveBusy(true);
     setOpsAgentSaveStatus('Saving…');
     try {
         await invoke(cmd, { agentId: opsAgentCache.id, content });
@@ -1355,9 +1392,12 @@ async function saveOpsAgentFile() {
         const editor = document.getElementById('ops-agent-preview');
         if (editor) editor.classList.remove('is-dirty');
         const stillDirty = Object.values(opsAgentDirty).some(Boolean);
+        setOpsAgentSaveBusy(false);
         if (saveBtn) saveBtn.disabled = !stillDirty;
+        flashOpsAgentSaveBtn(saveBtn);
         setOpsAgentSaveStatus(`Saved ${kind}.md`);
     } catch (err) {
+        setOpsAgentSaveBusy(false);
         if (saveBtn) saveBtn.disabled = false;
         setOpsAgentSaveStatus(`Save failed: ${err}`);
         alert(`Failed to save ${kind}.md: ${err}`);
@@ -1378,8 +1418,13 @@ function renderOpsAgentPreview() {
         editor.textContent = text || `(empty ${opsAgentFileTab}.md)`;
     }
     const saveBtn = document.getElementById('ops-agent-save');
-    if (saveBtn) saveBtn.disabled = !Object.values(opsAgentDirty).some(Boolean);
-    if (!opsAgentDirty[opsAgentFileTab]) {
+    if (saveBtn && !opsAgentSaveBusy && !saveBtn.classList.contains('is-just-saved')) {
+        saveBtn.disabled = !Object.values(opsAgentDirty).some(Boolean);
+        saveBtn.textContent = 'Save';
+    }
+    if (opsAgentSaveBusy) {
+        setOpsAgentSaveStatus('Saving…');
+    } else if (!opsAgentDirty[opsAgentFileTab]) {
         setOpsAgentSaveStatus('');
     } else {
         setOpsAgentSaveStatus('Unsaved changes');

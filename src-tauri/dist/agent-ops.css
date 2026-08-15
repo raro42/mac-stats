@@ -2118,6 +2118,14 @@ button.is-just-saved,
   box-shadow: none;
 }
 
+/* Agent Ops agent Save (btn-primary) — same solid green flash */
+#ops-agent-save.is-just-saved {
+  background: rgba(52, 199, 89, 0.95) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  opacity: 1;
+}
+
 /* AI Chat Clear — secondary control next to Send */
 #chat-clear-btn {
   background: color-mix(in srgb, currentColor 8%, transparent);

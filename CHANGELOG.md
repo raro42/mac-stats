@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.416] - 2026-08-15
+### Changed
+- **Agent Ops Save** (soul/skill/mood) — busy-guard (`Saving…`) + `Saved` flash on the control; blocks double click while in flight (status line still updates).
+
 ## [0.1.415] - 2026-08-15
 ### Changed
 - **Discord Save token / Clear token** — busy-guard (`Saving…` / `Clearing…`) + `Saved` / `Cleared` flash on the control; blocks double click while in flight (status line still updates).
