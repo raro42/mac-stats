@@ -258,9 +258,61 @@
     const refreshBtn = document.getElementById("refresh-btn");
     if (!refreshBtn) return;
 
-    refreshBtn.addEventListener("click", () => {
-      if (window.refreshData) {
-        window.refreshData();
+    let metricsRefreshBusy = false;
+
+    refreshBtn.addEventListener("click", async () => {
+      if (
+        metricsRefreshBusy ||
+        refreshBtn.disabled ||
+        refreshBtn.classList.contains("is-just-saved")
+      ) {
+        return;
+      }
+      if (typeof window.refreshData !== "function") return;
+
+      metricsRefreshBusy = true;
+      const idleLabel = refreshBtn._saveFlashOriginalLabel || refreshBtn.textContent || "↻";
+      refreshBtn._saveFlashOriginalLabel = idleLabel;
+      refreshBtn.disabled = true;
+      refreshBtn.classList.remove("is-just-saved");
+      refreshBtn.classList.add("is-refreshing");
+      refreshBtn.title = "Refreshing…";
+      refreshBtn.setAttribute("aria-busy", "true");
+
+      let ok = false;
+      try {
+        await window.refreshData();
+        ok = true;
+      } catch (e) {
+        console.error("metrics refresh failed", e);
+      } finally {
+        metricsRefreshBusy = false;
+        refreshBtn.classList.remove("is-refreshing");
+        refreshBtn.removeAttribute("aria-busy");
+        refreshBtn.disabled = false;
+        if (ok) {
+          if (typeof window.flashSaveButton === "function") {
+            window.flashSaveButton(refreshBtn, { savedLabel: "✓", durationMs: 1200 });
+          } else {
+            refreshBtn.classList.add("is-just-saved");
+            refreshBtn.textContent = "✓";
+            setTimeout(() => {
+              refreshBtn.classList.remove("is-just-saved");
+              refreshBtn.textContent = idleLabel;
+              refreshBtn._saveFlashOriginalLabel = null;
+            }, 1200);
+          }
+          refreshBtn.title = "Refreshed";
+          setTimeout(() => {
+            if (!refreshBtn.classList.contains("is-just-saved")) {
+              refreshBtn.title = "Refresh";
+            }
+          }, 1300);
+        } else {
+          refreshBtn.textContent = idleLabel;
+          refreshBtn._saveFlashOriginalLabel = null;
+          refreshBtn.title = "Refresh";
+        }
       }
     });
   }

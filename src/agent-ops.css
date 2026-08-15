@@ -2234,6 +2234,24 @@ button.is-just-saved,
   color: inherit;
 }
 
+/* Header metrics Refresh (↻) — spin while fetching; soft green on ✓ flash */
+#refresh-btn.is-refreshing {
+  opacity: 0.7;
+  cursor: wait;
+  animation: refresh-btn-spin 0.7s linear infinite;
+}
+
+#refresh-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, transparent) !important;
+  color: color-mix(in srgb, #34c759 85%, currentColor) !important;
+  animation: none;
+}
+
+@keyframes refresh-btn-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* AI Chat Clear — secondary control next to Send */
 #chat-clear-btn {
   background: color-mix(in srgb, currentColor 8%, transparent);

@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- CPU window header Refresh spinning + ✓ flash — **v0.1.436**
 - Settings View logs Opening…/Opened flash — **v0.1.435**
 - Settings Reset to monitor defaults Resetting…/Reset flash — **v0.1.433**
 - AI Chat system-prompt Reset to Default Resetting…/Reset flash — **v0.1.434**
