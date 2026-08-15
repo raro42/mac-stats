@@ -1684,6 +1684,22 @@ function populateProcessDetailsBody(body, details, pid) {
     const effectiveUserName = details.effective_user_name
       ? escapeProcessHtml(details.effective_user_name)
       : "";
+
+    // Live refresh replaces innerHTML — keep Advanced open + Force Quit confirm UI.
+    const prevAdvanced = body.querySelector(".force-quit-advanced");
+    const advancedWasOpen = !!(prevAdvanced && prevAdvanced.open);
+    const prevQuitBtn = body.querySelector("#force-quit-process-btn");
+    const quitUi = prevQuitBtn
+      ? {
+          confirming: prevQuitBtn.dataset.confirmArmed === "1",
+          quitting: prevQuitBtn.dataset.quitting === "1",
+          disabled: !!prevQuitBtn.disabled,
+          text: prevQuitBtn.textContent || "Force Quit Process",
+          classConfirming: prevQuitBtn.classList.contains("is-confirming"),
+          classJustSaved: prevQuitBtn.classList.contains("is-just-saved"),
+          saveFlashOriginal: prevQuitBtn._saveFlashOriginalLabel ?? null,
+        }
+      : null;
     
     body.innerHTML = `
       <div class="process-detail-hero">
@@ -1743,7 +1759,7 @@ function populateProcessDetailsBody(body, details, pid) {
         </div>
       </div>
       <div class="force-quit-section">
-        <details class="force-quit-advanced">
+        <details class="force-quit-advanced"${advancedWasOpen ? " open" : ""}>
           <summary>Advanced</summary>
           <p class="force-quit-hint">Force Quit ends the process immediately.</p>
           <button id="force-quit-process-btn" class="force-quit-btn" type="button">Force Quit Process</button>
@@ -1754,8 +1770,23 @@ function populateProcessDetailsBody(body, details, pid) {
     // Set up force quit button handler (remove old listeners first by cloning)
     const forceQuitBtn = document.getElementById("force-quit-process-btn");
     if (forceQuitBtn) {
+      if (quitUi) {
+        forceQuitBtn.dataset.confirmArmed = quitUi.confirming ? "1" : "0";
+        forceQuitBtn.dataset.quitting = quitUi.quitting ? "1" : "0";
+        forceQuitBtn.disabled = quitUi.disabled || quitUi.quitting;
+        forceQuitBtn.textContent = quitUi.text;
+        forceQuitBtn.classList.toggle("is-confirming", quitUi.classConfirming);
+        forceQuitBtn.classList.toggle("is-just-saved", quitUi.classJustSaved);
+        if (quitUi.saveFlashOriginal != null) {
+          forceQuitBtn._saveFlashOriginalLabel = quitUi.saveFlashOriginal;
+        }
+      }
+
       // Clone and replace to remove old event listeners when refreshing
       const newBtn = forceQuitBtn.cloneNode(true);
+      if (forceQuitBtn._saveFlashOriginalLabel != null) {
+        newBtn._saveFlashOriginalLabel = forceQuitBtn._saveFlashOriginalLabel;
+      }
       forceQuitBtn.parentNode.replaceChild(newBtn, forceQuitBtn);
       
       newBtn.addEventListener("click", async () => {

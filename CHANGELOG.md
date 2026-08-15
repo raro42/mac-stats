@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.428] - 2026-08-15
+
+### Fixed
+- Process Details: keep the Advanced section open (and Force Quit confirm state) across the 2s live refresh.
+
 ## [0.1.427] - 2026-08-15
 
 ### Fixed
