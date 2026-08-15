@@ -803,7 +803,7 @@ async function refresh() {
       const pinnedNames = getPinnedProcessNames();
       let processes =
         data.top_processes && data.top_processes.length > 0
-          ? data.top_processes.slice(0, 8)
+          ? data.top_processes.slice(0, 10)
           : [];
       if (pinnedNames.length > 0) {
         let pinnedLookup = [];
@@ -816,7 +816,7 @@ async function refresh() {
       }
       const processKey = processes.length > 0
         ? `${pinnedNames.join(",")}|` +
-          processes.map((p) => `${p.pid}:${p.cpu.toFixed(1)}:${p.name}`).join("|")
+          processes.map((p) => `${p.pid}:${p.cpu.toFixed(1)}:${(p.gpu || 0).toFixed(1)}:${p.name}`).join("|")
         : `empty|${pinnedNames.join(",")}`;
       if (!forceUpdate && !isInitialLoad && processKey === lastProcessListKey) {
         return;
@@ -842,10 +842,15 @@ async function refresh() {
       const colName = document.createElement("span");
       colName.textContent = "Process";
       const colCpu = document.createElement("span");
+      colCpu.className = "process-list-header-cpu";
       colCpu.textContent = "CPU";
+      const colGpu = document.createElement("span");
+      colGpu.className = "process-list-header-gpu";
+      colGpu.textContent = "GPU";
       colHeader.appendChild(colPin);
       colHeader.appendChild(colName);
       colHeader.appendChild(colCpu);
+      colHeader.appendChild(colGpu);
       fragment.appendChild(colHeader);
       
       if (processes.length > 0) {
@@ -901,10 +906,26 @@ async function refresh() {
           bar.appendChild(barFill);
           usage.appendChild(bar);
           usage.appendChild(percent);
+
+          const gpuUsage = document.createElement("div");
+          gpuUsage.className = "process-usage process-usage-gpu";
+          const gpuPct = Number(proc.gpu) || 0;
+          const gpuBar = document.createElement("div");
+          gpuBar.className = "process-bar process-bar-gpu";
+          const gpuFill = document.createElement("div");
+          gpuFill.className = "process-bar-fill process-bar-fill-gpu";
+          gpuFill.style.width = `${Math.min(100, gpuPct)}%`;
+          const gpuPercent = document.createElement("div");
+          gpuPercent.className = "process-percent";
+          gpuPercent.textContent = gpuPct >= 0.1 ? `${gpuPct.toFixed(1)}%` : "—";
+          gpuBar.appendChild(gpuFill);
+          gpuUsage.appendChild(gpuBar);
+          gpuUsage.appendChild(gpuPercent);
           
           row.appendChild(pinBtn);
           row.appendChild(name);
           row.appendChild(usage);
+          row.appendChild(gpuUsage);
           fragment.appendChild(row);
         });
       } else {
@@ -1673,6 +1694,8 @@ function populateProcessDetailsBody(body, details, pid) {
         <div class="process-detail-row">
           <span class="process-detail-label">Current CPU</span>
           <span class="process-detail-value">${details.cpu.toFixed(1)}%</span>
+          <span class="process-detail-label">Current GPU</span>
+          <span class="process-detail-value">${(Number(details.gpu) || 0) >= 0.1 ? `${Number(details.gpu).toFixed(1)}%` : "—"}</span>
         </div>
         <div class="process-detail-row">
           <span class="process-detail-label">Total CPU Time</span>

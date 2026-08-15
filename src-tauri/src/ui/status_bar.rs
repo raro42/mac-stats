@@ -720,6 +720,13 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
                 debug2!("Process cache cleared - will refresh immediately on first get_cpu_details() call");
             }
 
+            // Warm AGX GPU-time sampler (needs two samples ~400ms apart for %).
+            std::thread::spawn(|| {
+                let _ = crate::metrics::gpu_processes::gpu_usage_by_pid();
+                std::thread::sleep(std::time::Duration::from_millis(450));
+                let _ = crate::metrics::gpu_processes::gpu_usage_by_pid();
+            });
+
             // Clear rate limiter so first call always goes through (instant data on window open)
             use crate::state::LAST_CPU_DETAILS_CALL;
             if let Ok(mut last_call) = LAST_CPU_DETAILS_CALL.try_lock() {

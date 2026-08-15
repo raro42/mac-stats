@@ -716,7 +716,7 @@ textarea.ops-agent-editor.is-dirty {
   margin: 0 -8px;
   cursor: pointer;
   display: grid;
-  grid-template-columns: 22px 1fr auto;
+  grid-template-columns: 22px 1fr auto auto;
   gap: 10px;
   align-items: center;
   transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
@@ -918,7 +918,7 @@ textarea.ops-agent-editor.is-dirty {
 
 .process-list-header {
   display: grid;
-  grid-template-columns: 22px 1fr auto;
+  grid-template-columns: 22px 1fr auto auto;
   gap: 10px;
   align-items: center;
   padding: 2px 8px 6px;
@@ -934,8 +934,21 @@ textarea.ops-agent-editor.is-dirty {
   user-select: none;
 }
 
+.process-list-header-cpu,
+.process-list-header-gpu {
+  min-width: calc(72px + 10px + 48px);
+  text-align: right;
+}
+
+.process-usage-gpu .process-bar {
+  width: 72px;
+}
+
+.process-bar-fill-gpu {
+  background: color-mix(in srgb, #bf5af2 85%, currentColor);
+}
+
 .process-list-header span:last-child {
-  min-width: calc(120px + 14px + 62px);
   text-align: right;
 }
 

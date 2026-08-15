@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.426] - 2026-08-15
+
+### Added
+- Top Processes: GPU% column (Apple Silicon AGX client time). High-GPU processes join the list even when CPU is low — so 100% GPU is attributable.
+
 ## [0.1.425] - 2026-08-15
 
 ### Fixed

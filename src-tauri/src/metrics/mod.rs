@@ -11,6 +11,7 @@
 //! All metrics are cached to reduce system load and improve performance.
 
 pub mod history;
+pub(crate) mod gpu_processes;
 pub(crate) mod smc_temperature;
 
 use battery::{Manager as BatteryManager, State};
@@ -50,6 +51,9 @@ impl SystemMetrics {
 pub struct ProcessUsage {
     pub name: String,
     pub cpu: f32,
+    /// Estimated GPU utilization % from AGX client time deltas (Apple Silicon). 0 if unknown.
+    #[serde(default)]
+    pub gpu: f32,
     pub pid: u32,
 }
 
@@ -58,6 +62,8 @@ pub struct ProcessDetails {
     pub pid: u32,
     pub name: String,
     pub cpu: f32,
+    #[serde(default)]
+    pub gpu: f32,
     pub parent_pid: Option<u32>,
     pub parent_name: Option<String>,
     pub start_time: u64,
@@ -1284,6 +1290,7 @@ pub fn get_processes_by_names(names: Vec<String>) -> Vec<ProcessUsage> {
     use sysinfo::ProcessesToUpdate;
     sys.refresh_processes(ProcessesToUpdate::All, true);
 
+    let gpu_map = gpu_processes::gpu_usage_by_pid();
     let mut out = Vec::with_capacity(names.len());
     for name in names {
         let mut best: Option<ProcessUsage> = None;
@@ -1292,10 +1299,12 @@ pub fn get_processes_by_names(names: Vec<String>) -> Vec<ProcessUsage> {
             if n != name {
                 continue;
             }
+            let pid_u = pid.as_u32();
             let cand = ProcessUsage {
                 name: n,
                 cpu: proc.cpu_usage(),
-                pid: pid.as_u32(),
+                gpu: gpu_map.get(&pid_u).copied().unwrap_or(0.0),
+                pid: pid_u,
             };
             if best
                 .as_ref()
@@ -1310,6 +1319,53 @@ pub fn get_processes_by_names(names: Vec<String>) -> Vec<ProcessUsage> {
         }
     }
     out
+}
+
+/// Attach AGX GPU % and ensure high-GPU processes appear in the top list.
+fn enrich_processes_with_gpu(mut processes: Vec<ProcessUsage>, sys: &System) -> Vec<ProcessUsage> {
+    let gpu_map = gpu_processes::gpu_usage_by_pid();
+    for p in &mut processes {
+        if let Some(g) = gpu_map.get(&p.pid) {
+            p.gpu = *g;
+        }
+    }
+    let mut have: std::collections::HashSet<u32> = processes.iter().map(|p| p.pid).collect();
+    let mut gpu_ranked: Vec<(u32, f32)> = gpu_map.into_iter().collect();
+    gpu_ranked.sort_by(|a, b| {
+        b.1.partial_cmp(&a.1)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+    for (pid, gpu) in gpu_ranked.into_iter().take(8) {
+        if gpu < 1.0 {
+            break;
+        }
+        if have.contains(&pid) {
+            continue;
+        }
+        let sys_pid = sysinfo::Pid::from_u32(pid);
+        if let Some(proc) = sys.process(sys_pid) {
+            processes.push(ProcessUsage {
+                name: proc.name().to_string_lossy().to_string(),
+                cpu: proc.cpu_usage(),
+                gpu,
+                pid,
+            });
+            have.insert(pid);
+        }
+    }
+    processes.sort_by(|a, b| {
+        let sa = a.gpu.max(a.cpu);
+        let sb = b.gpu.max(b.cpu);
+        sb.partial_cmp(&sa)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| {
+                b.cpu
+                    .partial_cmp(&a.cpu)
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
+    });
+    processes.truncate(10);
+    processes
 }
 
 #[tauri::command]
@@ -1499,6 +1555,7 @@ pub fn get_cpu_details() -> CpuDetails {
                                                                 .to_string_lossy()
                                                                 .to_string(),
                                                             cpu: proc.cpu_usage(),
+                                                            gpu: 0.0,
                                                             pid: pid.as_u32(),
                                                         }
                                                     })
@@ -1509,7 +1566,9 @@ pub fn get_cpu_details() -> CpuDetails {
                                                     .partial_cmp(&a.cpu)
                                                     .unwrap_or(std::cmp::Ordering::Equal)
                                             });
-                                            processes.truncate(8);
+                                            processes.truncate(12);
+                                            let processes =
+                                                enrich_processes_with_gpu(processes, sys);
 
                                             // Update cache
                                             if let Ok(mut process_cache) =
@@ -1693,6 +1752,7 @@ pub fn get_cpu_details() -> CpuDetails {
                                 .map(|(pid, proc)| ProcessUsage {
                                     name: proc.name().to_string_lossy().to_string(),
                                     cpu: proc.cpu_usage(),
+                                    gpu: 0.0,
                                     pid: pid.as_u32(),
                                 })
                                 .collect();
@@ -1704,8 +1764,9 @@ pub fn get_cpu_details() -> CpuDetails {
                                     .unwrap_or(std::cmp::Ordering::Equal)
                             });
 
-                            // Take top 8 after sorting
-                            processes.truncate(8);
+                            // Take top candidates then merge high-GPU users
+                            processes.truncate(12);
+                            let processes = enrich_processes_with_gpu(processes, sys);
 
                             // Update cache
                             if let Ok(mut cache) = PROCESS_CACHE.try_lock() {
@@ -1731,6 +1792,7 @@ pub fn get_cpu_details() -> CpuDetails {
                             .map(|(pid, proc)| ProcessUsage {
                                 name: proc.name().to_string_lossy().to_string(),
                                 cpu: proc.cpu_usage(),
+                                gpu: 0.0,
                                 pid: pid.as_u32(),
                             })
                             .collect();
@@ -1742,8 +1804,9 @@ pub fn get_cpu_details() -> CpuDetails {
                                 .unwrap_or(std::cmp::Ordering::Equal)
                         });
 
-                        // Take top 8 after sorting
-                        processes.truncate(8);
+                        // Take top candidates then merge high-GPU users
+                        processes.truncate(12);
+                        let processes = enrich_processes_with_gpu(processes, sys);
 
                         // Update cache
                         if let Ok(mut cache) = PROCESS_CACHE.try_lock() {
@@ -1754,7 +1817,7 @@ pub fn get_cpu_details() -> CpuDetails {
                         processes
                     }
                 } else {
-                    // Window is not visible - return empty process list to save CPU
+                    // Window not visible - return empty process list to save CPU
                     debug3!("Window not visible, skipping process collection");
                     Vec::new()
                 };
@@ -2084,6 +2147,10 @@ pub fn get_process_details(pid: u32) -> Result<ProcessDetails, String> {
                     pid,
                     name: proc.name().to_string_lossy().to_string(),
                     cpu: proc.cpu_usage(),
+                    gpu: gpu_processes::gpu_usage_by_pid()
+                        .get(&pid)
+                        .copied()
+                        .unwrap_or(0.0),
                     parent_pid,
                     parent_name,
                     start_time: proc.start_time(),
