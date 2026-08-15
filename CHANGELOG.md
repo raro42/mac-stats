@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.419] - 2026-08-15
+### Changed
+- **Perplexity Save key / Clear key** — busy-guard (`Saving…` / `Clearing…`) + `Saved` / `Cleared` flash on the control (Settings and inline setup); blocks double click while in flight.
+
 ## [0.1.418] - 2026-08-15
 ### Changed
 - **Monitors Add Monitor** — busy-guard (`Adding…`) + `Added` flash on the control; blocks double click; keeps the add form open so the confirmation is visible, then closes.

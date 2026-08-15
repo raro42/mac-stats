@@ -4998,7 +4998,10 @@ function ensurePerplexitySetupPanel() {
   const inlineSave = document.getElementById('perplexity-inline-save');
   const inlineKey = document.getElementById('perplexity-inline-key');
   if (inlineSave && inlineKey) {
+    let inlineSaveBusy = false;
     const saveInline = async () => {
+      if (inlineSaveBusy) return;
+      if (inlineSave.classList.contains('is-just-saved')) return;
       const invoke = getInvoke();
       if (!invoke) return;
       const key = inlineKey.value.trim();
@@ -5010,19 +5013,35 @@ function ensurePerplexitySetupPanel() {
         }
         return;
       }
+      inlineSaveBusy = true;
+      inlineSave.disabled = true;
+      inlineSave.classList.remove('is-just-saved');
+      if (inlineSave._saveFlashOriginalLabel == null) {
+        inlineSave._saveFlashOriginalLabel = inlineSave.textContent || 'Save key';
+      }
+      inlineSave.textContent = 'Saving…';
       try {
         await invoke('store_credential', {
           request: { account: PERPLEXITY_KEYCHAIN_ACCOUNT, password: key },
         });
         inlineKey.value = '';
         if (note) note.hidden = true;
-        if (typeof flashSaveButton === 'function') flashSaveButton(inlineSave);
+        inlineSaveBusy = false;
+        inlineSave.disabled = false;
+        if (typeof flashSaveButton === 'function') {
+          flashSaveButton(inlineSave, { savedLabel: 'Saved', durationMs: 1600 });
+        }
         await refreshPerplexityStatus();
         if (document.getElementById('perplexity-query')) {
           document.getElementById('perplexity-query').focus();
         }
       } catch (e) {
         console.error('Perplexity save key:', e);
+        inlineSaveBusy = false;
+        inlineSave.disabled = false;
+        inlineSave.textContent =
+          inlineSave._saveFlashOriginalLabel || 'Save key';
+        inlineSave._saveFlashOriginalLabel = null;
         if (note) {
           note.hidden = false;
           note.textContent = 'Could not save key: ' + String(e);
@@ -5284,35 +5303,98 @@ function initPerplexitySection() {
     });
   }
 
-  // Settings: Save / Clear API key (only if elements exist, e.g. Apple theme)
+  // Settings: Save / Clear API key (busy-guard + flash; Discord token parity)
   const saveBtn = document.getElementById('perplexity-save-key');
   const clearBtn = document.getElementById('perplexity-clear-key');
   const keyInput = document.getElementById('perplexity-api-key-input');
+  let perplexityKeyBusy = false;
+
+  function setPerplexityKeyBusy(busy, which) {
+    perplexityKeyBusy = !!busy;
+    if (saveBtn) {
+      saveBtn.disabled = !!busy;
+      if (busy && which === 'save') {
+        saveBtn.classList.remove('is-just-saved');
+        if (saveBtn._saveFlashOriginalLabel == null) {
+          saveBtn._saveFlashOriginalLabel = saveBtn.textContent || 'Save key';
+        }
+        saveBtn.textContent = 'Saving…';
+      } else if (!busy && !saveBtn.classList.contains('is-just-saved')) {
+        saveBtn.textContent = saveBtn._saveFlashOriginalLabel || 'Save key';
+        saveBtn._saveFlashOriginalLabel = null;
+      }
+    }
+    if (clearBtn) {
+      clearBtn.disabled = !!busy;
+      if (busy && which === 'clear') {
+        clearBtn.classList.remove('is-just-saved');
+        if (clearBtn._saveFlashOriginalLabel == null) {
+          clearBtn._saveFlashOriginalLabel = clearBtn.textContent || 'Clear key';
+        }
+        clearBtn.textContent = 'Clearing…';
+      } else if (!busy && !clearBtn.classList.contains('is-just-saved')) {
+        clearBtn.textContent = clearBtn._saveFlashOriginalLabel || 'Clear key';
+        clearBtn._saveFlashOriginalLabel = null;
+      }
+    }
+  }
+
+  function flashPerplexityKeyBtn(btn, savedLabel) {
+    if (!btn) return;
+    if (typeof flashSaveButton === 'function') {
+      flashSaveButton(btn, { savedLabel, durationMs: 1600 });
+      return;
+    }
+    const prev = btn._saveFlashOriginalLabel || btn.textContent;
+    btn.classList.add('is-just-saved');
+    btn.textContent = savedLabel;
+    setTimeout(() => {
+      btn.classList.remove('is-just-saved');
+      btn.textContent = prev;
+      btn._saveFlashOriginalLabel = null;
+    }, 1600);
+  }
+
   if (saveBtn && keyInput) {
     saveBtn.addEventListener('click', async () => {
+      if (perplexityKeyBusy) return;
+      if (saveBtn.classList.contains('is-just-saved')) return;
       const invoke = getInvoke();
       if (!invoke) return;
       const key = keyInput.value.trim();
+      setPerplexityKeyBusy(true, 'save');
       try {
-        await invoke('store_credential', { request: { account: PERPLEXITY_KEYCHAIN_ACCOUNT, password: key } });
+        await invoke('store_credential', {
+          request: { account: PERPLEXITY_KEYCHAIN_ACCOUNT, password: key },
+        });
         keyInput.value = '';
-        if (typeof flashSaveButton === 'function') flashSaveButton(saveBtn);
+        setPerplexityKeyBusy(false);
+        flashPerplexityKeyBtn(saveBtn, 'Saved');
         await refreshPerplexityStatus();
       } catch (e) {
         console.error('Perplexity save key:', e);
+        setPerplexityKeyBusy(false);
+        alert('Could not save Perplexity key: ' + String(e));
       }
     });
   }
   if (clearBtn) {
     clearBtn.addEventListener('click', async () => {
+      if (perplexityKeyBusy) return;
+      if (clearBtn.classList.contains('is-just-saved')) return;
       const invoke = getInvoke();
       if (!invoke) return;
+      setPerplexityKeyBusy(true, 'clear');
       try {
         await invoke('delete_credential', { account: PERPLEXITY_KEYCHAIN_ACCOUNT });
         if (keyInput) keyInput.value = '';
+        setPerplexityKeyBusy(false);
+        flashPerplexityKeyBtn(clearBtn, 'Cleared');
         await refreshPerplexityStatus();
       } catch (e) {
         console.error('Perplexity clear key:', e);
+        setPerplexityKeyBusy(false);
+        alert('Could not clear Perplexity key: ' + String(e));
       }
     });
   }
