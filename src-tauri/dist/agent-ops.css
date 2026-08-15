@@ -2213,6 +2213,13 @@ button.is-just-saved,
   color: #fff !important;
 }
 
+/* Settings Reset to monitor defaults — soft green flash */
+#settings-reset-defaults-btn.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, transparent) !important;
+  border-color: color-mix(in srgb, #34c759 45%, transparent) !important;
+  color: inherit;
+}
+
 /* AI Chat Clear — secondary control next to Send */
 #chat-clear-btn {
   background: color-mix(in srgb, currentColor 8%, transparent);

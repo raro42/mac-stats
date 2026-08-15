@@ -360,17 +360,45 @@
     }
     if (resetBtn) {
       resetBtn.addEventListener("click", async () => {
+        if (resetBtn.disabled || resetBtn.classList.contains("is-just-saved")) return;
         if (!confirm("Reset config toggles to monitor defaults? (Does not delete Keychain secrets.)")) return;
+        const originalLabel =
+          resetBtn._saveFlashOriginalLabel || resetBtn.textContent || "Reset to monitor defaults";
+        resetBtn._saveFlashOriginalLabel = originalLabel;
+        resetBtn.disabled = true;
+        resetBtn.classList.remove("is-just-saved");
+        resetBtn.textContent = "Resetting…";
         try {
           const invoke = getInvoke();
-          if (!invoke) return;
+          if (!invoke) {
+            resetBtn.disabled = false;
+            resetBtn.textContent = originalLabel;
+            resetBtn._saveFlashOriginalLabel = null;
+            return;
+          }
           const msg = await invoke("reset_config_to_monitor_defaults");
           if (aiToggle) aiToggle.checked = false;
           if (compactToggle) compactToggle.checked = true;
           if (cpuWindowCompactToggle) cpuWindowCompactToggle.checked = false;
           applyAiUiVisibility(false);
+          resetBtn.disabled = false;
+          if (typeof window.flashSaveButton === "function") {
+            window.flashSaveButton(resetBtn, { savedLabel: "Reset", durationMs: 1600 });
+          } else {
+            resetBtn.classList.add("is-just-saved");
+            resetBtn.textContent = "Reset";
+            setTimeout(() => {
+              resetBtn.classList.remove("is-just-saved");
+              resetBtn.textContent = originalLabel;
+              resetBtn._saveFlashOriginalLabel = null;
+            }, 1600);
+          }
           alert(msg || "Defaults applied. Restart recommended.");
         } catch (e) {
+          resetBtn.disabled = false;
+          resetBtn.classList.remove("is-just-saved");
+          resetBtn.textContent = originalLabel;
+          resetBtn._saveFlashOriginalLabel = null;
           alert(String(e));
         }
       });

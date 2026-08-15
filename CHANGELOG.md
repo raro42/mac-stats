@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.433] - 2026-08-15
+
+### Changed
+- Settings: Reset to monitor defaults shows Resetting… then a Reset flash on the control and blocks double click while in flight or flashing.
+
 ## [0.1.432] - 2026-08-15
 
 ### Changed
