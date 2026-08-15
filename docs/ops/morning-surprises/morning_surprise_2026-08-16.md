@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-16
 
-Overnight Track B (20:00–06:00 local) strengthened the product with keep rows through **v0.1.441**.
+Overnight Track B (20:00–06:00 local) strengthened the product with keep rows through **v0.1.442**.
 
 ## Shipped (selected)
 
@@ -17,12 +17,14 @@ Overnight Track B (20:00–06:00 local) strengthened the product with keep rows 
 | v0.1.438 | Settings Help / cheat sheet Opened flash |
 | v0.1.439 | Footer GitHub Opening…/Opened flash |
 | v0.1.440 | Theme / app version → changelog Opened flash |
-| **v0.1.441** | **Debug Log path hint click-to-copy + Copied flash** |
+| v0.1.441 | Debug Log path hint click-to-copy + Copied flash |
+| **v0.1.442** | **Settings product toggles Saved flash after persist** |
 
-## Latest tick (~00:41)
+## Latest tick (~01:06)
 
-- Digester open pointed at stale `feature-agent-ops.png`; design-review already used earlier tonight.
-- Picked standing UX: log path was display-only (no copy / flash) after version flash in v0.1.440.
+- Digester open pointed at stale `feature-agent-ops.png`; design-review polish already used earlier tonight (v0.1.430–431).
+- Screen Recording TCC still blocks `screencapture -l` (probe hung).
+- Picked standing UX: product toggles (AI agent, compact menu bar, compact CPU window) saved silently after path-hint flash in v0.1.441.
 - Verify green → keep → install → Discord Bot connected.
 
 ## Deferred
