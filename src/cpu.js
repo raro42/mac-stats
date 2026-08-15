@@ -4515,8 +4515,27 @@ function initOllamaSection() {
   
   if (settingsReset) {
     settingsReset.addEventListener('click', () => {
-      if (systemPromptTextarea) {
-        systemPromptTextarea.value = DEFAULT_SYSTEM_PROMPT;
+      if (settingsReset.disabled || settingsReset.classList.contains('is-just-saved')) return;
+      if (!systemPromptTextarea) return;
+      const originalLabel =
+        settingsReset._saveFlashOriginalLabel || settingsReset.textContent || 'Reset to Default';
+      settingsReset._saveFlashOriginalLabel = originalLabel;
+      settingsReset.disabled = true;
+      settingsReset.classList.remove('is-just-saved');
+      settingsReset.textContent = 'Resetting…';
+      systemPromptTextarea.value = DEFAULT_SYSTEM_PROMPT;
+      // Keep popover open so the Reset flash is visible (Save still required to persist).
+      settingsReset.disabled = false;
+      if (typeof flashSaveButton === 'function') {
+        flashSaveButton(settingsReset, { savedLabel: 'Reset', durationMs: 1600 });
+      } else {
+        settingsReset.classList.add('is-just-saved');
+        settingsReset.textContent = 'Reset';
+        setTimeout(() => {
+          settingsReset.classList.remove('is-just-saved');
+          settingsReset.textContent = originalLabel;
+          settingsReset._saveFlashOriginalLabel = null;
+        }, 1600);
       }
     });
   }

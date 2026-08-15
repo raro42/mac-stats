@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.434] - 2026-08-15
+
+### Changed
+- AI Chat system-prompt: Reset to Default shows Resetting… then a Reset flash on the control and blocks double click while flashing (popover stays open; Save still persists).
+
 ## [0.1.433] - 2026-08-15
 
 ### Changed
