@@ -29,19 +29,13 @@ Overnight Track B (20:00–06:00 local, window opened 2026-08-14).
 | **v0.1.421** | Monitors: Delete/Backspace removes selected; detail Remove with Removing… busy-guard (Settings Remove shared) |
 | **v0.1.422** | Disk Cleanup Add scope: busy-guard (Adding…) + Added flash; blocks double click and Enter while in flight |
 | **v0.1.423** | Logs Open in editor: busy-guard (Opening…) + Opened flash; blocks double click while in flight |
+| **v0.1.424** | Force Quit Process: busy-guard (Quitting…) while quit runs; brief Quit flash; blocks double confirm/click |
 
 ## Design review
 
-- Not due at 20:00–05:30 ticks (feature screens ok/grace; ai-chat ~0.7d).
+- Not due at 20:00–05:55 ticks (feature screens ok/grace; ai-chat ~0.72d).
 - Next due surface: wait for age >3d or re-shoot when TCC allows.
 
 ## Digester
 
 - Open candidates: none (latency n/a after noise filters).
-- Fuel used: standing backlog keyboard UX (v0.1.401–405), soft-delete safety (v0.1.406), skip visibility (v0.1.407), AI Chat Send/Clear (v0.1.408–409), Perplexity Search feedback (v0.1.410), Agent Ops Refresh feedback (v0.1.411), Disk Cleanup Refresh/Clean now feedback (v0.1.412), Monitors Check now feedback (v0.1.413), Logs Refresh feedback (v0.1.414), Discord Save/Clear token feedback (v0.1.415), Agent Ops Save feedback (v0.1.416), AI Chat system-prompt Save feedback (v0.1.417), Monitors Add Monitor feedback (v0.1.418), Perplexity Save/Clear key feedback (v0.1.419), Disk Cleanup Save scopes feedback (v0.1.420), Monitors Delete/Remove (v0.1.421), Disk Cleanup Add scope feedback (v0.1.422), Logs Open in editor feedback (v0.1.423).
-
-## Notes
-
-- Nightly minimum satisfied: keep rows in `autoresearch/results.tsv` for v0.1.401–423.
-- Quiet ticks: 0 so far this window.
-- Installed `/Applications/mac-stats.app` at 0.1.423 after release rebuild + kickstart; Discord Ready when verified.
