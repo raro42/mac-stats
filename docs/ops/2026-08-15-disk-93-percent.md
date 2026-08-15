@@ -14,7 +14,13 @@
 
 `df` on `/System/Volumes/Data` shows **~94%** / **~57–61 GiB free**. That matches the menu-bar Disk gauge.
 
-## Where home space goes (~667 GB under `/Users/raro42`)
+## Cleanup log
+
+| Date | Action | Result |
+|------|--------|--------|
+| 2026-08-15 | `cargo clean` in `mac-stats/src-tauri` | Removed **~198 GiB** (145578 files). Operator-only review note: `~/.mac-stats/improvements/operator_disk_review.md` + standing backlog P2. Free space may lag until local TM snapshots thin. |
+
+## Where home space goes (~667 GB under `/Users/raro42`, before cargo clean)
 
 | Path | ~Size | Notes |
 |------|-------|--------|
