@@ -6149,9 +6149,21 @@ function initDiskCleanupSection() {
     });
   }
 
+  let diskCleanupSaveBusy = false;
   if (saveBtn) {
     saveBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
+      if (diskCleanupSaveBusy) return;
+      if (saveBtn.classList.contains('is-just-saved')) return;
+
+      diskCleanupSaveBusy = true;
+      saveBtn.disabled = true;
+      saveBtn.classList.remove('is-just-saved');
+      if (saveBtn._saveFlashOriginalLabel == null) {
+        saveBtn._saveFlashOriginalLabel = saveBtn.textContent || 'Save scopes';
+      }
+      saveBtn.textContent = 'Saving…';
+
       try {
         await saveDiskCleanupScopes(readDiskCleanupScopesFromDom());
         const softEl = document.getElementById('disk-cleanup-soft-delete');
@@ -6160,8 +6172,15 @@ function initDiskCleanupSection() {
           await invoke('set_disk_cleanup_soft_delete', { softDelete: !!softEl.checked });
           await refreshDiskCleanupPanel();
         }
-        flashSaveButton(saveBtn);
+        diskCleanupSaveBusy = false;
+        saveBtn.disabled = false;
+        flashSaveButton(saveBtn, { savedLabel: 'Saved', durationMs: 1600 });
       } catch (err) {
+        diskCleanupSaveBusy = false;
+        saveBtn.disabled = false;
+        saveBtn.textContent =
+          saveBtn._saveFlashOriginalLabel || 'Save scopes';
+        saveBtn._saveFlashOriginalLabel = null;
         alert(`Save scopes failed: ${err?.message || err}`);
       }
     });
