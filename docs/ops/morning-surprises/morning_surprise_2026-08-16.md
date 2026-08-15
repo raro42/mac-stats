@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-16
 
-Overnight Track B (20:00–06:00 local) strengthened the product with keep rows through **v0.1.440**.
+Overnight Track B (20:00–06:00 local) strengthened the product with keep rows through **v0.1.441**.
 
 ## Shipped (selected)
 
@@ -16,12 +16,13 @@ Overnight Track B (20:00–06:00 local) strengthened the product with keep rows 
 | v0.1.437 | Top Processes pin/unpin Pinned/Unpinned flash |
 | v0.1.438 | Settings Help / cheat sheet Opened flash |
 | v0.1.439 | Footer GitHub Opening…/Opened flash |
-| **v0.1.440** | **Theme / app version → changelog Opened flash** |
+| v0.1.440 | Theme / app version → changelog Opened flash |
+| **v0.1.441** | **Debug Log path hint click-to-copy + Copied flash** |
 
-## Latest tick (~00:16)
+## Latest tick (~00:41)
 
 - Digester open pointed at stale `feature-agent-ops.png`; design-review already used earlier tonight.
-- Picked standing UX: version label opened changelog with no control flash (after GitHub flash in v0.1.439).
+- Picked standing UX: log path was display-only (no copy / flash) after version flash in v0.1.440.
 - Verify green → keep → install → Discord Bot connected.
 
 ## Deferred

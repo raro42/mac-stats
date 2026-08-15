@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Debug Log path hint click-to-copy + Copied flash — **v0.1.441**
 - Theme / app version → changelog Opened flash — **v0.1.440**
 - Footer GitHub Opening…/Opened flash — **v0.1.439**
 - Settings Help / cheat sheet Opened flash — **v0.1.438**
