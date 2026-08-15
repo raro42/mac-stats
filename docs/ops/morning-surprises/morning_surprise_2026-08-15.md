@@ -26,6 +26,7 @@ Overnight Track B (20:00–06:00 local, window opened 2026-08-14).
 | **v0.1.418** | Monitors Add Monitor: busy-guard (Adding…) + Added flash; form stays open for confirmation, then closes |
 | **v0.1.419** | Perplexity Save/Clear key: busy-guard (Saving…/Clearing…) + Saved/Cleared flash (Settings + inline setup); blocks double click |
 | **v0.1.420** | Disk Cleanup Save scopes: busy-guard (Saving…) + Saved flash; blocks double click and ⌘/Ctrl+S while in flight |
+| **v0.1.421** | Monitors: Delete/Backspace removes selected; detail Remove with Removing… busy-guard (Settings Remove shared) |
 
 ## Design review
 
@@ -35,10 +36,10 @@ Overnight Track B (20:00–06:00 local, window opened 2026-08-14).
 ## Digester
 
 - Open candidates: none (latency n/a after noise filters).
-- Fuel used: standing backlog keyboard UX (v0.1.401–405), soft-delete safety (v0.1.406), skip visibility (v0.1.407), AI Chat Send/Clear (v0.1.408–409), Perplexity Search feedback (v0.1.410), Agent Ops Refresh feedback (v0.1.411), Disk Cleanup Refresh/Clean now feedback (v0.1.412), Monitors Check now feedback (v0.1.413), Logs Refresh feedback (v0.1.414), Discord Save/Clear token feedback (v0.1.415), Agent Ops Save feedback (v0.1.416), AI Chat system-prompt Save feedback (v0.1.417), Monitors Add Monitor feedback (v0.1.418), Perplexity Save/Clear key feedback (v0.1.419), Disk Cleanup Save scopes feedback (v0.1.420).
+- Fuel used: standing backlog keyboard UX (v0.1.401–405), soft-delete safety (v0.1.406), skip visibility (v0.1.407), AI Chat Send/Clear (v0.1.408–409), Perplexity Search feedback (v0.1.410), Agent Ops Refresh feedback (v0.1.411), Disk Cleanup Refresh/Clean now feedback (v0.1.412), Monitors Check now feedback (v0.1.413), Logs Refresh feedback (v0.1.414), Discord Save/Clear token feedback (v0.1.415), Agent Ops Save feedback (v0.1.416), AI Chat system-prompt Save feedback (v0.1.417), Monitors Add Monitor feedback (v0.1.418), Perplexity Save/Clear key feedback (v0.1.419), Disk Cleanup Save scopes feedback (v0.1.420), Monitors Delete/Remove (v0.1.421).
 
 ## Notes
 
-- Nightly minimum satisfied: keep rows in `autoresearch/results.tsv` for v0.1.401–420.
+- Nightly minimum satisfied: keep rows in `autoresearch/results.tsv` for v0.1.401–421.
 - Quiet ticks: 0 so far this window.
-- Installed `/Applications/mac-stats.app` at 0.1.420 after release rebuild + kickstart; Discord Ready (`Werner_Amvara`).
+- Installed `/Applications/mac-stats.app` at 0.1.421 after release rebuild + kickstart; Discord Ready (`Werner_Amvara`).
