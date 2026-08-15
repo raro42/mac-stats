@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.423] - 2026-08-15
+### Changed
+- **Logs Open in editor** — busy-guard (`Opening…`) + `Opened` flash on the control; blocks double click while in flight (Refresh parity).
+
 ## [0.1.422] - 2026-08-15
 ### Changed
 - **Disk Cleanup Add scope** — busy-guard (`Adding…`) + `Added` flash on the control; blocks double click and Enter while in flight.

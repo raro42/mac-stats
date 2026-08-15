@@ -6570,14 +6570,33 @@ function initLogsSection() {
     });
   }
   if (openBtn) {
+    if (!openBtn.dataset.idleLabel) {
+      openBtn.dataset.idleLabel = openBtn.textContent || 'Open in editor';
+    }
     openBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
+      if (openBtn.disabled || openBtn.classList.contains('is-just-saved')) return;
       const inv = getInvoke() || invoke;
       if (!inv) return;
+      openBtn.classList.remove('is-just-saved');
+      if (openBtn._saveFlashTimer) {
+        clearTimeout(openBtn._saveFlashTimer);
+        openBtn._saveFlashTimer = null;
+        openBtn._saveFlashOriginalLabel = null;
+      }
+      openBtn.disabled = true;
+      openBtn.textContent = 'Opening…';
       try {
         await inv('open_debug_log');
+        openBtn.disabled = false;
+        openBtn.textContent = openBtn.dataset.idleLabel || 'Open in editor';
+        if (typeof flashSaveButton === 'function') {
+          flashSaveButton(openBtn, { savedLabel: 'Opened', durationMs: 1600 });
+        }
       } catch (err) {
         console.error('[Logs] open_debug_log failed:', err);
+        openBtn.disabled = false;
+        openBtn.textContent = openBtn.dataset.idleLabel || 'Open in editor';
       }
     });
   }
