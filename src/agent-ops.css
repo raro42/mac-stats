@@ -2249,6 +2249,15 @@ button.is-just-saved,
   pointer-events: none;
 }
 
+/* Theme / app version → changelog — soft green Opened flash */
+.version-clickable.is-just-saved,
+.app-version.is-just-saved,
+.theme-version.is-just-saved,
+.arch-version.is-just-saved {
+  color: color-mix(in srgb, #34c759 75%, currentColor) !important;
+  pointer-events: none;
+}
+
 #github-link[aria-busy="true"],
 #github-link[aria-disabled="true"] {
   opacity: 0.7;

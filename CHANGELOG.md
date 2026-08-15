@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.440] - 2026-08-16
+
+### Changed
+- Theme / app version label: opening the changelog shows an Opened flash and blocks double click while flashing.
+
 ## [0.1.439] - 2026-08-15
 
 ### Changed

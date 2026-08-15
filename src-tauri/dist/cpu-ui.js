@@ -914,13 +914,12 @@
           const changelogBody = document.getElementById("changelog-body");
           
           if (changelogModal && changelogBody) {
-            // Get the loadChangelog function from the closure
-            // We'll need to access it via a global or re-implement the click handler
             el.addEventListener("click", (e) => {
               e.preventDefault();
               e.stopPropagation();
+              if (el.classList.contains("is-just-saved")) return;
               console.log("Version clicked (from injectAppVersion), opening changelog modal");
-              openChangelogModal(changelogModal, changelogBody);
+              openChangelogModal(changelogModal, changelogBody, el);
             });
           }
         }
@@ -935,8 +934,28 @@
 
   let changelogFocusReturn = null;
 
-  function openChangelogModal(changelogModal, changelogBody) {
+  /** Version label → changelog: Opened flash + block double open while flashing. */
+  function flashChangelogOpened(triggerEl) {
+    if (!triggerEl) return;
+    const idleLabel =
+      triggerEl._saveFlashOriginalLabel || triggerEl.textContent || "v?";
+    triggerEl._saveFlashOriginalLabel = idleLabel;
+    if (typeof window.flashSaveButton === "function") {
+      window.flashSaveButton(triggerEl, { savedLabel: "Opened", durationMs: 1600 });
+    } else {
+      triggerEl.classList.add("is-just-saved");
+      triggerEl.textContent = "Opened";
+      setTimeout(() => {
+        triggerEl.classList.remove("is-just-saved");
+        triggerEl.textContent = idleLabel;
+        triggerEl._saveFlashOriginalLabel = null;
+      }, 1600);
+    }
+  }
+
+  function openChangelogModal(changelogModal, changelogBody, triggerEl) {
     if (!changelogModal || !changelogBody) return;
+    if (triggerEl && triggerEl.classList.contains("is-just-saved")) return;
     changelogFocusReturn = document.activeElement;
     changelogModal.style.display = "flex";
     changelogModal.setAttribute("aria-hidden", "false");
@@ -950,6 +969,7 @@
       changelogModal.setAttribute("aria-labelledby", title.id);
     }
     loadChangelogForModal(changelogBody, changelogModal);
+    if (triggerEl) flashChangelogOpened(triggerEl);
     requestAnimationFrame(() => {
       document.getElementById("close-changelog")?.focus();
     });
@@ -989,12 +1009,18 @@
 
     // Open modal when version is clicked
     versionElements.forEach((el) => {
+      if (el.dataset.changelogHandler) return;
+      el.dataset.changelogHandler = "true";
+      el.style.cursor = "pointer";
+      el.setAttribute("title", "Click to view changelog");
+      el.classList.add("version-clickable");
       console.log("Adding click handler to version element:", el.className, el.textContent);
       el.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
+        if (el.classList.contains("is-just-saved")) return;
         console.log("Version clicked, opening changelog modal");
-        openChangelogModal(changelogModal, changelogBody);
+        openChangelogModal(changelogModal, changelogBody, el);
       });
     });
     
@@ -1012,8 +1038,9 @@
           el.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
+            if (el.classList.contains("is-just-saved")) return;
             console.log("Version clicked (from observer), opening changelog modal");
-            openChangelogModal(changelogModal, changelogBody);
+            openChangelogModal(changelogModal, changelogBody, el);
           });
         }
       });
