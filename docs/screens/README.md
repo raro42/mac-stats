@@ -46,6 +46,7 @@ Also linked from the [project README](../../README.md#demo-video).
 
 ## Refresh log
 
+- **2026-08-15:** Agent Ops overview active-tab highlight + health status wash (v0.1.430). Recapture of `feature-agent-ops.png` deferred — agent-session `screencapture -l/-R` hit TCC (`could not create image`); keep prior asset until a permitted capture.
 - **2026-08-14:** Recaptured `feature-monitors.png`, `feature-ai-chat.png`, and `dark-tui.png` (window-only, ≥30s warm-up) after Monitors downtime tips (v0.1.394–397) and dark first-paint (v0.1.398). Open section uses `MAC_STATS_OPEN_SECTION`; installed-app theme lives in WebKit `com.raro42.mac-stats` localStorage (not the legacy `mac_stats` folder). Window owner name for `screencapture -l` is **`mac-stats`**.
 - **2026-08-13:** Monitors summary up/down accents + row latency polish (v0.1.373); open with `MAC_STATS_OPEN_SECTION=monitors`. Recapture of `feature-monitors.png` deferred if Screen Recording TCC blocks.
 - **2026-08-13:** Disk Cleanup reclaim accent + scope/item hover (v0.1.372); open with `MAC_STATS_OPEN_SECTION=disk-cleanup`. Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC blocks.
