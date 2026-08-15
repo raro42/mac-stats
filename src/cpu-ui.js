@@ -317,6 +317,21 @@
     });
   }
 
+  /** Brief Saved flash on a Settings toggle label (save-button feedback). */
+  function flashToggleLabelSaved(toggle) {
+    const label = toggle?.closest?.(".setting-toggle")?.querySelector(".toggle-label");
+    if (!label || label.classList.contains("is-just-saved")) return;
+    const original = label._saveFlashOriginalLabel || label.textContent || "";
+    label._saveFlashOriginalLabel = original;
+    label.classList.add("is-just-saved");
+    label.textContent = "Saved";
+    clearTimeout(label._saveFlashTimer);
+    label._saveFlashTimer = setTimeout(() => {
+      label.classList.remove("is-just-saved");
+      label.textContent = original;
+    }, 1600);
+  }
+
   function initProductToggles() {
     const aiToggle = document.getElementById("ai-agent-enabled-toggle");
     const compactToggle = document.getElementById("menu-bar-compact-toggle");
@@ -348,6 +363,7 @@
           if (!invoke) return;
           const v = await invoke("set_ai_agent_enabled", { enabled: aiToggle.checked });
           applyAiUiVisibility(!!v);
+          flashToggleLabelSaved(aiToggle);
         } catch (e) {
           console.error(e);
           alert("Could not save aiAgentEnabled: " + e);
@@ -371,6 +387,7 @@
           const invoke = getInvoke();
           if (!invoke) return;
           await invoke("set_menu_bar_compact", { compact: compactToggle.checked });
+          flashToggleLabelSaved(compactToggle);
         } catch (e) {
           console.error(e);
         }
@@ -387,6 +404,7 @@
           if (on && typeof window.applyCpuWindowCompactLayout === "function") {
             window.applyCpuWindowCompactLayout(true);
           }
+          flashToggleLabelSaved(cpuWindowCompactToggle);
         } catch (e) {
           console.error(e);
         }

@@ -2343,3 +2343,9 @@ button.is-just-saved,
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+/* Settings product toggles — Saved flash on the label after persist */
+.setting-toggle .toggle-label.is-just-saved {
+  color: #1a7f37;
+  font-weight: 600;
+}

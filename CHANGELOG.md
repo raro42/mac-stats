@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.442] - 2026-08-16
+
+### Changed
+- Settings product toggles (AI agent, compact menu bar, compact CPU window): after a successful save the label shows a brief Saved flash.
+
 ## [0.1.441] - 2026-08-16
 
 ### Changed
