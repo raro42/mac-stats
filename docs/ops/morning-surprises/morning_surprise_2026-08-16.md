@@ -11,11 +11,12 @@ Overnight Track B (20:00–06:00 starting 2026-08-15).
 - **v0.1.435** — Settings: View logs shows Opening… then an Opened flash on the control and blocks double click while in flight or flashing.
 - **v0.1.436** — CPU window: header Refresh (↻) spins while fetching, shows a brief ✓ flash, and blocks double click while in flight or flashing.
 - **v0.1.437** — Top Processes: pin/unpin (★ or P) shows a brief Pinned/Unpinned flash on the star and blocks double toggle while flashing.
+- **v0.1.438** — Settings: Help / cheat sheet shows an Opened flash when the sheet opens and blocks double click while flashing.
 
 ## Tried / notes
 - Digester Slowest empty; design-review still due on `feature-agent-ops.png` / `feature-cpu-metrics.png` (~3.6d) because window-only recapture remains TCC-blocked.
-- After header Refresh (v0.1.436), tick picked Top Processes pin flash (non-header-Refresh-adjacent; pin had silent feedback).
-- Install/kickstart: Discord Ready expected on 0.1.437 after release install.
+- After pin flash (v0.1.437), tick picked Settings Help Opened flash (non-process-pin-adjacent; Help had silent open).
+- Install/kickstart: Discord Ready expected on 0.1.438 after release install.
 
 ## Ratchet
 - keep @ e4bc3a8 — v0.1.430 Agent Ops overview active + health wash
@@ -26,3 +27,4 @@ Overnight Track B (20:00–06:00 starting 2026-08-15).
 - keep @ c65e96f — v0.1.435 Settings View logs Opening…/Opened flash
 - keep @ 1a70e33 — v0.1.436 CPU header Refresh spin + ✓ flash
 - keep @ a5284f1 — v0.1.437 Top Processes pin/unpin Pinned flash
+- keep @ b256708 — v0.1.438 Settings Help / cheat sheet Opened flash
