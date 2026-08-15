@@ -5872,6 +5872,54 @@ async function addDiskCleanupScopeFromForm() {
   return true;
 }
 
+/** Busy-guard + Added flash for Add scope (click and Enter). */
+let diskCleanupAddBusy = false;
+async function submitDiskCleanupAddScope() {
+  const addBtn = document.getElementById('disk-cleanup-add-btn');
+  if (diskCleanupAddBusy) return false;
+  if (addBtn && addBtn.classList.contains('is-just-saved')) return false;
+
+  const label = (document.getElementById('disk-cleanup-add-label')?.value || '').trim();
+  const path = (document.getElementById('disk-cleanup-add-path')?.value || '').trim();
+  if (!label || !path) {
+    alert('Label and path are required for a custom scope.');
+    return false;
+  }
+
+  diskCleanupAddBusy = true;
+  if (addBtn) {
+    addBtn.disabled = true;
+    addBtn.classList.remove('is-just-saved');
+    if (addBtn._saveFlashOriginalLabel == null) {
+      addBtn._saveFlashOriginalLabel = addBtn.textContent || 'Add scope';
+    }
+    addBtn.textContent = 'Adding…';
+  }
+
+  try {
+    const ok = await addDiskCleanupScopeFromForm();
+    diskCleanupAddBusy = false;
+    if (addBtn) {
+      addBtn.disabled = false;
+      if (ok) {
+        flashSaveButton(addBtn, { savedLabel: 'Added', durationMs: 1600 });
+      } else {
+        addBtn.textContent = addBtn._saveFlashOriginalLabel || 'Add scope';
+        addBtn._saveFlashOriginalLabel = null;
+      }
+    }
+    return !!ok;
+  } catch (err) {
+    diskCleanupAddBusy = false;
+    if (addBtn) {
+      addBtn.disabled = false;
+      addBtn.textContent = addBtn._saveFlashOriginalLabel || 'Add scope';
+      addBtn._saveFlashOriginalLabel = null;
+    }
+    throw err;
+  }
+}
+
 /** Remove a custom (non-builtin) scope by index; no-op for builtins. */
 async function removeDiskCleanupScopeAt(idx) {
   const scopes = readDiskCleanupScopesFromDom();
@@ -6327,7 +6375,7 @@ function initDiskCleanupSection() {
     addBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
       try {
-        await addDiskCleanupScopeFromForm();
+        await submitDiskCleanupAddScope();
       } catch (err) {
         alert(`Add scope failed: ${err?.message || err}`);
       }
@@ -6343,7 +6391,7 @@ function initDiskCleanupSection() {
       if (e.target && e.target.matches && e.target.matches('textarea')) return;
       e.preventDefault();
       e.stopPropagation();
-      void addDiskCleanupScopeFromForm().catch((err) => {
+      void submitDiskCleanupAddScope().catch((err) => {
         alert(`Add scope failed: ${err?.message || err}`);
       });
     });

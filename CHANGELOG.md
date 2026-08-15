@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.422] - 2026-08-15
+### Changed
+- **Disk Cleanup Add scope** — busy-guard (`Adding…`) + `Added` flash on the control; blocks double click and Enter while in flight.
+
 ## [0.1.421] - 2026-08-15
 ### Added
 - **Monitors** — `Delete` / `Backspace` removes the selected monitor (Disk Cleanup parity); detail panel **Remove** with `Removing…` busy-guard; Settings Remove shares the same path.
