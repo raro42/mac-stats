@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.443] - 2026-08-16
+
+### Changed
+- Agent Ops: when a list filter has no matches, the empty state shows a Clear filter action and briefly highlights the filter field after clear.
+
 ## [0.1.442] - 2026-08-16
 
 ### Changed

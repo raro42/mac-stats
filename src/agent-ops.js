@@ -36,6 +36,76 @@
     el.insertAdjacentHTML('afterbegin', opsFilterCaptionHtml(total, shown, q));
   }
 
+  /** Empty state when a filter is active but no rows match — includes Clear filter action. */
+  function opsFilterMissHtml(message, filterKind) {
+    const kind = String(filterKind || '').replace(/[^a-z]/gi, '');
+    return (
+      `<div class="ops-empty ops-empty-filter-miss">` +
+      `<div class="ops-empty-filter-msg">${escapeHtml(message)}</div>` +
+      `<button type="button" class="ops-clear-filter" data-ops-clear-filter="${kind}">Clear filter</button>` +
+      `</div>`
+    );
+  }
+
+  function clearOpsFilter(kind) {
+    const map = {
+      sessions: {
+        id: 'ops-session-filter',
+        clear() {
+          opsSessionFilterQ = '';
+          renderOpsLive(opsLiveCache);
+          renderOpsSessionFiles(opsSessionFilesCache);
+        },
+      },
+      memory: {
+        id: 'ops-memory-filter',
+        clear() {
+          opsMemoryFilterQ = '';
+          renderOpsMemory(opsMemoryCache);
+        },
+      },
+      runs: {
+        id: 'ops-runs-filter',
+        clear() {
+          opsRunsFilterQ = '';
+          renderOpsRuns(opsRunsInsightsCache);
+        },
+      },
+      agents: {
+        id: 'ops-agents-filter',
+        clear() {
+          opsAgentsFilterQ = '';
+          renderOpsAgents(opsAgentsCache);
+        },
+      },
+      schedules: {
+        id: 'ops-schedules-filter',
+        clear() {
+          opsSchedulesFilterQ = '';
+          renderOpsSchedulesTab(opsSchedulesCache, opsDeliveriesCache);
+        },
+      },
+    };
+    const entry = map[kind];
+    if (!entry) return false;
+    ensureOpsSessionFilter();
+    ensureOpsMemoryFilter();
+    ensureOpsRunsFilter();
+    ensureOpsAgentsFilter();
+    ensureOpsSchedulesFilter();
+    const input = document.getElementById(entry.id);
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
+    entry.clear();
+    if (input) {
+      input.classList.add('ops-filter-just-cleared');
+      setTimeout(() => input.classList.remove('ops-filter-just-cleared'), 900);
+    }
+    return true;
+  }
+
   const OPS_REFRESH_INTERVAL = 30000;
   let agentOpsInterval = null;
   let agentOpsCollapsed = true;
@@ -154,6 +224,19 @@ function setupAgentOps() {
             selectOpsTab(tab);
         });
     });
+    const opsRoot =
+      document.getElementById('agent-ops-section') ||
+      document.querySelector('.agent-ops-section');
+    if (opsRoot && opsRoot.dataset.opsClearFilterBound !== '1') {
+      opsRoot.dataset.opsClearFilterBound = '1';
+      opsRoot.addEventListener('click', (e) => {
+        const btn = e.target?.closest?.('.ops-clear-filter');
+        if (!btn || !opsRoot.contains(btn)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        clearOpsFilter(btn.dataset.opsClearFilter || '');
+      });
+    }
     document.querySelectorAll('.ops-file-tab').forEach((btn) => {
         btn.addEventListener('click', () => {
             if (opsAgentDirty[opsAgentFileTab] && opsAgentCache) {
@@ -1005,7 +1088,7 @@ function renderOpsSchedulesTab(schedules, deliveries) {
         if (!all.length) {
             list.innerHTML = '<div class="ops-empty">No schedules</div>';
         } else if (!filtered.length) {
-            list.innerHTML = '<div class="ops-empty">No schedules match filter</div>';
+            list.innerHTML = opsFilterMissHtml('No schedules match filter', 'schedules');
         } else {
             filtered.forEach((s) => {
                 const btn = document.createElement('button');
@@ -1035,7 +1118,7 @@ function renderOpsSchedulesTab(schedules, deliveries) {
         if (!all.length) {
             delList.innerHTML = '<div class="ops-empty">No deliveries yet</div>';
         } else if (!filtered.length) {
-            delList.innerHTML = '<div class="ops-empty">No deliveries match filter</div>';
+            delList.innerHTML = opsFilterMissHtml('No deliveries match filter', 'schedules');
         } else {
             filtered.slice(0, 8).forEach((d) => {
                 const btn = document.createElement('button');
@@ -1181,7 +1264,7 @@ function renderOpsAgents(agents) {
         return;
     }
     if (!filtered.length) {
-        list.innerHTML = '<div class="ops-empty">No agents match filter</div>';
+        list.innerHTML = opsFilterMissHtml('No agents match filter', 'agents');
         return;
     }
     filtered.forEach((a) => {
@@ -1761,7 +1844,7 @@ function renderOpsLive(rows) {
         return;
     }
     if (!filtered.length) {
-        el.innerHTML = '<div class="ops-empty">No live sessions match filter</div>';
+        el.innerHTML = opsFilterMissHtml('No live sessions match filter', 'sessions');
         return;
     }
     filtered.forEach((r) => {
@@ -1813,7 +1896,7 @@ function renderOpsSessionFiles(files) {
         return;
     }
     if (!filtered.length) {
-        el.innerHTML = '<div class="ops-empty">No session files match filter</div>';
+        el.innerHTML = opsFilterMissHtml('No session files match filter', 'sessions');
         return;
     }
     filtered.forEach((f) => {
@@ -1870,7 +1953,7 @@ function renderOpsMemory(files) {
         return;
     }
     if (!filtered.length) {
-        el.innerHTML = '<div class="ops-empty">No knowledge files match filter</div>';
+        el.innerHTML = opsFilterMissHtml('No knowledge files match filter', 'memory');
         return;
     }
     filtered.forEach((f) => {
@@ -1980,7 +2063,7 @@ function renderOpsRuns(insights) {
         prependOpsFilterCaption(el, totalRecent, shown, opsRunsFilterQ);
     }
     if (opsRunsFilterQ && !el.querySelector('.ops-row')) {
-        el.innerHTML = '<div class="ops-empty">No runs match filter</div>';
+        el.innerHTML = opsFilterMissHtml('No runs match filter', 'runs');
     }
 }
 

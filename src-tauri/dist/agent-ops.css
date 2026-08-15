@@ -657,6 +657,50 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
 }
 
+.ops-empty-filter-miss {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.ops-empty-filter-msg {
+  max-width: 28em;
+}
+
+.ops-clear-filter {
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 36%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.ops-clear-filter:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 48%, transparent);
+  transform: translateY(-1px);
+}
+
+.ops-clear-filter:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+}
+
+.ops-filter-input.ops-filter-just-cleared {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 8%, transparent);
+}
+
 .ops-overview-body > .ops-empty {
   flex: 1;
   display: flex;
