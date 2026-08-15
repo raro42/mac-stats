@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.418] - 2026-08-15
+### Changed
+- **Monitors Add Monitor** — busy-guard (`Adding…`) + `Added` flash on the control; blocks double click; keeps the add form open so the confirmation is visible, then closes.
+
 ## [0.1.417] - 2026-08-15
 ### Changed
 - **AI Chat system-prompt Save** — busy-guard (`Saving…`) + `Saved` flash on the control; blocks double click; keeps the settings popover open so the confirmation is visible (no silent close).

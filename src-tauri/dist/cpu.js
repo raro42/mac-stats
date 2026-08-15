@@ -2282,24 +2282,36 @@ function initMonitorsSection() {
     });
   }
   
+  let monitorsAddBusy = false;
   if (addSave && urlInput) {
     addSave.addEventListener('click', async () => {
+      if (monitorsAddBusy) return;
+      if (addSave.classList.contains('is-just-saved')) return;
+
       let url = urlInput.value.trim();
       if (!url) {
         alert('Please enter a URL');
         return;
       }
-      
+
       // Add https:// if no protocol specified
       if (!url.match(/^https?:\/\//i)) {
         url = 'https://' + url;
       }
-      
+
+      monitorsAddBusy = true;
+      addSave.disabled = true;
+      addSave.classList.remove('is-just-saved');
+      if (addSave._saveFlashOriginalLabel == null) {
+        addSave._saveFlashOriginalLabel = addSave.textContent || 'Add Monitor';
+      }
+      addSave.textContent = 'Adding…';
+
       try {
         const urlObj = new URL(url);
         const id = `monitor_${Date.now()}`;
         const name = urlObj.hostname;
-        
+
         await invoke('add_website_monitor', {
           request: {
             id,
@@ -2310,16 +2322,44 @@ function initMonitorsSection() {
             verify_ssl: true
           }
         });
-        
+
         console.log('Monitor added successfully');
-        if (addForm) addForm.style.display = 'none';
-        if (urlInput) urlInput.value = 'https://www.amvara.de/';
         // After adding, load monitors will update the cache
         await loadMonitors();
         await updateMonitorsSummary();
         await refreshMonitorsSettingsList();
+
+        monitorsAddBusy = false;
+        addSave.disabled = false;
+        if (typeof flashSaveButton === 'function') {
+          flashSaveButton(addSave, { savedLabel: 'Added', durationMs: 1600 });
+        } else {
+          addSave.classList.add('is-just-saved');
+          addSave.textContent = 'Added';
+          setTimeout(() => {
+            addSave.classList.remove('is-just-saved');
+            addSave.textContent =
+              addSave._saveFlashOriginalLabel || 'Add Monitor';
+            addSave._saveFlashOriginalLabel = null;
+          }, 1600);
+        }
+        // Keep form open so the Added flash is visible, then reset.
+        setTimeout(() => {
+          if (addForm) addForm.style.display = 'none';
+          if (urlInput) urlInput.value = 'https://www.amvara.de/';
+          if (!addSave.classList.contains('is-just-saved')) {
+            addSave.textContent =
+              addSave._saveFlashOriginalLabel || 'Add Monitor';
+            addSave._saveFlashOriginalLabel = null;
+          }
+        }, 1600);
       } catch (err) {
         console.error('Failed to add monitor:', err);
+        monitorsAddBusy = false;
+        addSave.disabled = false;
+        addSave.textContent =
+          addSave._saveFlashOriginalLabel || 'Add Monitor';
+        addSave._saveFlashOriginalLabel = null;
         alert(`Failed to add monitor: ${err}`);
       }
     });
