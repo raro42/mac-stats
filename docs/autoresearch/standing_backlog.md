@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- AI Chat system-prompt Save busy-guard + Saved flash — **v0.1.417**
 - Agent Ops Save (soul/skill/mood) busy-guard + Saved flash — **v0.1.416**
 - Discord Save token / Clear token busy-guard + Saved/Cleared flash — **v0.1.415**
 - Logs Refresh busy-guard (Refreshing…) + Refreshed flash; auto-refresh silent — **v0.1.414**
