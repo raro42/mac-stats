@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Settings Help / cheat sheet Opened flash — **v0.1.438**
 - Top Processes pin/unpin ★ flash (Pinned/Unpinned) — **v0.1.437**
 - CPU window header Refresh spinning + ✓ flash — **v0.1.436**
 - Settings View logs Opening…/Opened flash — **v0.1.435**
