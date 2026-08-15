@@ -2126,6 +2126,13 @@ button.is-just-saved,
   opacity: 1;
 }
 
+/* AI Chat system-prompt Save (popover-btn-primary) — solid green flash */
+#ollama-settings-save.is-just-saved {
+  background: rgba(52, 199, 89, 0.95) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+}
+
 /* AI Chat Clear — secondary control next to Send */
 #chat-clear-btn {
   background: color-mix(in srgb, currentColor 8%, transparent);

@@ -4230,13 +4230,48 @@ function initOllamaSection() {
     });
   }
   
+  let ollamaSettingsSaveBusy = false;
   if (settingsSave) {
     settingsSave.addEventListener('click', () => {
-      if (systemPromptTextarea) {
+      if (ollamaSettingsSaveBusy) return;
+      if (settingsSave.classList.contains('is-just-saved')) return;
+      if (!systemPromptTextarea) return;
+
+      ollamaSettingsSaveBusy = true;
+      settingsSave.disabled = true;
+      settingsSave.classList.remove('is-just-saved');
+      if (settingsSave._saveFlashOriginalLabel == null) {
+        settingsSave._saveFlashOriginalLabel = settingsSave.textContent || 'Save';
+      }
+      settingsSave.textContent = 'Saving…';
+
+      try {
         const prompt = systemPromptTextarea.value.trim();
         saveSystemPrompt(prompt || DEFAULT_SYSTEM_PROMPT);
-        closeOllamaSettingsPopover();
+        ollamaSettingsSaveBusy = false;
+        settingsSave.disabled = false;
+        if (typeof flashSaveButton === 'function') {
+          flashSaveButton(settingsSave, { savedLabel: 'Saved', durationMs: 1600 });
+        } else {
+          settingsSave.classList.add('is-just-saved');
+          settingsSave.textContent = 'Saved';
+          setTimeout(() => {
+            settingsSave.classList.remove('is-just-saved');
+            settingsSave.textContent =
+              settingsSave._saveFlashOriginalLabel || 'Save';
+            settingsSave._saveFlashOriginalLabel = null;
+          }, 1600);
+        }
         console.log('[Ollama] System prompt saved');
+        // Keep popover open so the Saved flash is visible (was silent close).
+      } catch (err) {
+        ollamaSettingsSaveBusy = false;
+        settingsSave.disabled = false;
+        settingsSave.textContent =
+          settingsSave._saveFlashOriginalLabel || 'Save';
+        settingsSave._saveFlashOriginalLabel = null;
+        console.error('[Ollama] System prompt save failed:', err);
+        alert(`Save failed: ${err?.message || err}`);
       }
     });
   }
