@@ -204,14 +204,17 @@
 
 .ops-health-card.ops-health-ok {
   border-color: rgba(76, 175, 80, 0.45);
+  background: color-mix(in srgb, rgba(76, 175, 80, 0.14) 70%, transparent);
 }
 
 .ops-health-card.ops-health-warn {
-  border-color: rgba(255, 180, 0, 0.5);
+  border-color: rgba(255, 180, 0, 0.55);
+  background: color-mix(in srgb, rgba(255, 180, 0, 0.16) 75%, transparent);
 }
 
 .ops-health-card.ops-health-bad {
-  border-color: rgba(255, 80, 80, 0.5);
+  border-color: rgba(255, 80, 80, 0.55);
+  background: color-mix(in srgb, rgba(255, 80, 80, 0.16) 75%, transparent);
 }
 
 .ops-health-label {
@@ -310,6 +313,25 @@
 .ops-overview-card:focus-within {
   border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+}
+
+/* Linked detail tab is active (Schedules / Sessions / Memory). */
+.ops-overview-card.is-active {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.ops-overview-card.is-active:hover {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 52%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 13%, transparent);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+}
+
+.ops-overview-card.is-active .ops-overview-link {
+  opacity: 1;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 40%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
 }
 
 .ops-overview-head {

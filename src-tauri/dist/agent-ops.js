@@ -65,6 +65,16 @@
 
 // --- Agent Ops (Command Center: overview + detail tabs) ---
 
+/** Overview cards light up when their linked detail tab is active. */
+function syncOpsOverviewCardActive(tab) {
+    const active = tab || opsActiveTab || 'agents';
+    document.querySelectorAll('.ops-overview-card').forEach((card) => {
+        const link = card.querySelector('.ops-overview-link[data-goto-tab]');
+        const goto = link?.dataset?.gotoTab || '';
+        card.classList.toggle('is-active', !!goto && goto === active);
+    });
+}
+
 function selectOpsTab(tab) {
     opsActiveTab = tab || 'agents';
     document.querySelectorAll('.agent-ops-tab').forEach((b) => {
@@ -73,6 +83,7 @@ function selectOpsTab(tab) {
     document.querySelectorAll('.agent-ops-panel').forEach((p) => {
         p.classList.toggle('active', p.id === `ops-panel-${tab}`);
     });
+    syncOpsOverviewCardActive(opsActiveTab);
     const panel = document.getElementById(`ops-panel-${tab}`);
     const tabs = document.querySelector('.agent-ops-tabs');
     (panel || tabs)?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
@@ -128,6 +139,7 @@ function setupAgentOps() {
     const activeBtn = document.querySelector('.agent-ops-tab.active');
     if (activeBtn?.dataset?.opsTab) opsActiveTab = activeBtn.dataset.opsTab;
     ensureOpsKeyboardHint();
+    syncOpsOverviewCardActive(opsActiveTab);
     document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
         btn.addEventListener('click', () => selectOpsTab(btn.dataset.opsTab));
     });
