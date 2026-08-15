@@ -2185,6 +2185,13 @@ button.is-just-saved,
   opacity: 1;
 }
 
+/* Agent Ops Load into AI Chat (btn-secondary) — Loaded flash */
+#ops-session-load-chat.is-just-saved {
+  background: color-mix(in srgb, #34c759 22%, transparent) !important;
+  border-color: color-mix(in srgb, #34c759 45%, transparent) !important;
+  color: inherit;
+}
+
 /* AI Chat system-prompt Save (popover-btn-primary) — solid green flash */
 #ollama-settings-save.is-just-saved {
   background: rgba(52, 199, 89, 0.95) !important;

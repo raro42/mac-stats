@@ -1527,6 +1527,7 @@ function tryOpsSessionEnterLoad(e) {
     if (!panel || !panel.classList.contains('active')) return false;
     const loadBtn = document.getElementById('ops-session-load-chat');
     if (!loadBtn || loadBtn.hidden || !opsSessionLoadRows?.length) return false;
+    if (loadBtn.classList.contains('is-just-saved')) return false;
     const t = e.target;
     const tag = (t && t.tagName) || '';
     // Allow Enter from filter / list / body; skip unrelated text fields.
@@ -1691,6 +1692,8 @@ function showOpsSessionStatus(msg, ok) {
 }
 
 function loadOpsSessionIntoChat() {
+    const loadBtn = document.getElementById('ops-session-load-chat');
+    if (loadBtn?.classList.contains('is-just-saved')) return;
     if (!opsSessionLoadRows || !opsSessionLoadRows.length) {
         showOpsSessionStatus('Select a session with messages first.', false);
         return;
@@ -1708,6 +1711,7 @@ function loadOpsSessionIntoChat() {
         showOpsSessionStatus('Enable local AI agent in Settings to load into chat.', false);
         return;
     }
+    const msgCount = opsSessionLoadRows.length;
     window.Ollama.replaceHistory(opsSessionLoadRows);
     const section = document.querySelector('.ollama-section');
     const themeCollapsed =
@@ -1726,10 +1730,21 @@ function loadOpsSessionIntoChat() {
     if (btn) btn.textContent = '−';
     section?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
     setTimeout(() => document.getElementById('chat-input')?.focus(), 80);
-    showOpsSessionStatus(
-      `Loaded ${opsSessionLoadRows.length} message(s) into AI Chat.`,
-      true
-    );
+    showOpsSessionStatus(`Loaded ${msgCount} message(s) into AI Chat.`, true);
+    // Control feedback (status line alone is easy to miss) — block double Enter/click/dblclick.
+    if (loadBtn && !loadBtn.hidden) {
+        if (typeof window.flashSaveButton === 'function') {
+            window.flashSaveButton(loadBtn, { savedLabel: 'Loaded', durationMs: 1600 });
+        } else {
+            const idle = loadBtn.textContent || 'Load into AI Chat ↵';
+            loadBtn.classList.add('is-just-saved');
+            loadBtn.textContent = 'Loaded';
+            setTimeout(() => {
+                loadBtn.classList.remove('is-just-saved');
+                loadBtn.textContent = idle;
+            }, 1600);
+        }
+    }
 }
 
 function renderOpsLive(rows) {

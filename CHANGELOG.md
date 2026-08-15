@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.432] - 2026-08-15
+
+### Changed
+- Agent Ops Sessions: Load into AI Chat shows a Loaded flash on the control and blocks double Enter/click/dblclick while flashing.
+
 ## [0.1.431] - 2026-08-15
 
 ### Changed
