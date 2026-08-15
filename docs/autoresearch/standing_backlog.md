@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Monitors Delete/Backspace removes selected + detail Remove busy-guard — **v0.1.421**
 - Disk Cleanup Save scopes busy-guard (Saving…) + Saved flash — **v0.1.420**
 - Perplexity Save key / Clear key busy-guard (Saving…/Clearing…) + Saved/Cleared flash (Settings + inline) — **v0.1.419**
 - Monitors Add Monitor busy-guard (Adding…) + Added flash; form stays open for confirmation — **v0.1.418**

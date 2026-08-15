@@ -1336,9 +1336,20 @@ textarea.ops-agent-editor.is-dirty {
   gap: 8px;
 }
 
-.monitor-detail-check {
+.monitor-detail-check,
+.monitor-detail-remove {
   font-size: 11px;
   padding: 4px 10px;
+}
+
+.monitor-detail-remove:focus-visible {
+  outline: 2px solid color-mix(in srgb, #ff3b30 55%, transparent);
+  outline-offset: 2px;
+}
+
+.monitor-item.is-removing {
+  opacity: 0.55;
+  pointer-events: none;
 }
 
 .monitor-backoff-hint {

@@ -2460,7 +2460,7 @@ async function removeMonitorById(monitorId) {
   const invokeFn = getInvoke() || invoke;
   if (!invokeFn) {
     console.error('[Monitors] remove failed: Tauri invoke unavailable');
-    return;
+    return false;
   }
   console.log('[Monitors] remove_monitor invoke', monitorId);
   try {
@@ -2470,9 +2470,74 @@ async function removeMonitorById(monitorId) {
     await loadMonitors();
     await updateMonitorsSummary();
     console.log('[Monitors] removed', monitorId);
+    return true;
   } catch (err) {
     console.error('[Monitors] remove_monitor failed:', err);
+    return false;
   }
+}
+
+/** Remove selected monitor; focus a neighbor after the list rebuilds. */
+async function removeMonitorFromListRow(item) {
+  if (!item || item.dataset.removing === '1') return false;
+  const monitorId = item.getAttribute('data-monitor-id');
+  if (!monitorId) return false;
+  const list = document.getElementById('monitors-list');
+  const items = list
+    ? Array.from(list.querySelectorAll('.monitor-item'))
+    : [];
+  const idx = items.indexOf(item);
+  const preferId =
+    (idx >= 0 && items[idx + 1]?.getAttribute('data-monitor-id')) ||
+    (idx > 0 && items[idx - 1]?.getAttribute('data-monitor-id')) ||
+    null;
+  item.dataset.removing = '1';
+  item.classList.add('is-removing');
+  const removeBtn = item.querySelector('.monitor-detail-remove');
+  if (removeBtn) {
+    removeBtn.disabled = true;
+    removeBtn.dataset.idleLabel = removeBtn.dataset.idleLabel || 'Remove';
+    removeBtn.textContent = 'Removing…';
+  }
+  const settingsBtn = document.querySelector(
+    `.monitor-remove-btn[data-monitor-id="${CSS.escape(monitorId)}"]`
+  );
+  if (settingsBtn) {
+    settingsBtn.disabled = true;
+    settingsBtn.dataset.idleLabel = settingsBtn.dataset.idleLabel || 'Remove';
+    settingsBtn.textContent = 'Removing…';
+  }
+  let ok = false;
+  try {
+    ok = await removeMonitorById(monitorId);
+  } finally {
+    if (item.isConnected) {
+      item.dataset.removing = '0';
+      item.classList.remove('is-removing');
+      if (removeBtn?.isConnected) {
+        removeBtn.disabled = false;
+        removeBtn.textContent = removeBtn.dataset.idleLabel || 'Remove';
+      }
+    }
+    if (settingsBtn?.isConnected) {
+      settingsBtn.disabled = false;
+      settingsBtn.textContent = settingsBtn.dataset.idleLabel || 'Remove';
+    }
+  }
+  if (ok && preferId) {
+    const listAfter = document.getElementById('monitors-list');
+    syncMonitorsListTabOrder(listAfter, preferId);
+    const next = listAfter?.querySelector?.(
+      `.monitor-item[data-monitor-id="${CSS.escape(preferId)}"]`
+    );
+    if (next && typeof next.focus === 'function') {
+      next.focus();
+      if (typeof next.scrollIntoView === 'function') {
+        next.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  }
+  return ok;
 }
 
 function wireMonitorRemoveDelegation() {
@@ -2484,15 +2549,29 @@ function wireMonitorRemoveDelegation() {
     if (!btn) return;
     e.preventDefault();
     e.stopPropagation();
+    if (btn.disabled || btn.classList.contains('is-just-saved')) return;
     const monitorId = btn.dataset.monitorId;
     if (!monitorId) {
       console.error('[Monitors] Remove clicked but data-monitor-id missing');
       return;
     }
+    const row = document.querySelector(
+      `.monitor-item[data-monitor-id="${CSS.escape(monitorId)}"]`
+    );
+    if (row) {
+      void removeMonitorFromListRow(row);
+      return;
+    }
     btn.disabled = true;
-    removeMonitorById(monitorId).finally(() => {
-      // List may have been rebuilt; ignore if node detached
-      if (btn.isConnected) btn.disabled = false;
+    btn.dataset.idleLabel = btn.dataset.idleLabel || 'Remove';
+    btn.textContent = 'Removing…';
+    removeMonitorById(monitorId).then((ok) => {
+      if (!btn.isConnected) return;
+      btn.disabled = false;
+      btn.textContent = btn.dataset.idleLabel || 'Remove';
+      if (ok && typeof flashSaveButton === 'function') {
+        flashSaveButton(btn, { savedLabel: 'Removed', durationMs: 1200 });
+      }
     });
   });
 }
@@ -2718,7 +2797,9 @@ function buildMonitorRowTooltip(monitorUrl, status, monitorId) {
     const backoff = formatMonitorBackoffHint(status);
     if (backoff) lines.push(backoff);
   }
-  lines.push('Click or d for details · Enter / Space checks now · PgUp/PgDn');
+  lines.push(
+    'Click or d for details · Enter / Space checks now · Delete removes · PgUp/PgDn'
+  );
   return lines.join('\n');
 }
 
@@ -2861,11 +2942,13 @@ function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
   checkBtn.dataset.idleLabel = 'Check now';
   const row = detail.closest('.monitor-item');
   const checking = row?.dataset?.checking === '1';
+  const removing = row?.dataset?.removing === '1';
   if (checking) {
     checkBtn.disabled = true;
     checkBtn.textContent = 'Checking…';
   } else {
     checkBtn.textContent = 'Check now';
+    checkBtn.disabled = !!removing;
   }
   checkBtn.addEventListener('click', (e) => {
     e.preventDefault();
@@ -2873,6 +2956,26 @@ function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
     void forceCheckMonitorNow(monitorId, detail.closest('.monitor-item'));
   });
   actions.appendChild(checkBtn);
+
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'btn-secondary monitor-detail-remove';
+  removeBtn.dataset.idleLabel = 'Remove';
+  removeBtn.setAttribute('aria-label', `Remove monitor ${monitorUrl || monitorId}`);
+  removeBtn.title = 'Remove this monitor (Delete)';
+  if (removing) {
+    removeBtn.disabled = true;
+    removeBtn.textContent = 'Removing…';
+  } else {
+    removeBtn.textContent = 'Remove';
+    removeBtn.disabled = !!checking;
+  }
+  removeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    void removeMonitorFromListRow(detail.closest('.monitor-item'));
+  });
+  actions.appendChild(removeBtn);
   detail.appendChild(actions);
 }
 
@@ -3306,7 +3409,7 @@ function ensureMonitorsListKbHint(monitorsList, show) {
     monitorsList.parentNode?.insertBefore(hint, monitorsList);
   }
   hint.textContent =
-    'Click row for details · ↑↓ / j k · PgUp/PgDn · Enter check now · d details · Esc closes/clears';
+    'Click row for details · ↑↓ / j k · PgUp/PgDn · Enter check now · d details · Delete removes · Esc closes/clears';
 }
 
 function wireMonitorsListKeyboard() {
@@ -3319,7 +3422,13 @@ function wireMonitorsListKeyboard() {
   monitorsList.addEventListener('click', (e) => {
     const item = e.target && e.target.closest && e.target.closest('.monitor-item');
     if (!item || !monitorsList.contains(item)) return;
-    if (e.target.closest && e.target.closest('.monitor-detail-check')) return;
+    if (
+      e.target.closest &&
+      (e.target.closest('.monitor-detail-check') ||
+        e.target.closest('.monitor-detail-remove'))
+    ) {
+      return;
+    }
     const id = item.getAttribute('data-monitor-id');
     syncMonitorsListTabOrder(monitorsList, id);
     item.focus();
@@ -3344,6 +3453,18 @@ function wireMonitorsListKeyboard() {
     if (e.key === 'd' || e.key === 'D') {
       e.preventDefault();
       toggleMonitorDetail(item);
+      return;
+    }
+
+    // Delete / Backspace removes the selected monitor (Settings Remove parity).
+    if (
+      (e.key === 'Delete' || e.key === 'Backspace') &&
+      !e.metaKey &&
+      !e.ctrlKey &&
+      !e.altKey
+    ) {
+      e.preventDefault();
+      void removeMonitorFromListRow(item);
       return;
     }
 
