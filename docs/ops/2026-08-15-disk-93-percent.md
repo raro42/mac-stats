@@ -18,7 +18,7 @@
 
 | Date | Action | Result |
 |------|--------|--------|
-| 2026-08-15 | `cargo clean` in `mac-stats/src-tauri` | Removed **~198 GiB** (145578 files). Operator-only review note: `~/.mac-stats/improvements/operator_disk_review.md` + standing backlog P2. Free space may lag until local TM snapshots thin. |
+| 2026-08-15 | `cargo clean` in `mac-stats/src-tauri` + thin local TM snapshots | Removed **~198 GiB** from `target/`; Data free **~54 GiB → ~213 GiB** (**94% → 76%**). Operator-only review: `~/.mac-stats/improvements/operator_disk_review.md` + standing backlog P2. |
 
 ## Where home space goes (~667 GB under `/Users/raro42`, before cargo clean)
 
