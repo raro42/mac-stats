@@ -22,3 +22,7 @@ Top Processes: **GPU** column (purple bar). List merges high-GPU PIDs and sorts 
 - `src-tauri/src/metrics/gpu_processes.rs`
 - `ProcessUsage.gpu` / enrich in `metrics/mod.rs`
 - `src/cpu.js`, `src/agent-ops.css`
+
+## Fix (v0.1.427)
+
+Empty first-sample cache blocked warm-up; `ioreg` now uses `-l`. Gauge refresh also ticks the process sampler.

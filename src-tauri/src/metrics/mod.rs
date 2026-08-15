@@ -220,6 +220,10 @@ pub fn get_gpu_usage() -> f32 {
     // Try reading from IOGPUWrangler or AGXAccelerator
     let gpu_usage = read_gpu_usage_from_system();
 
+    // Advance per-process GPU sampler on the same cadence as the device % gauge
+    // (needs two samples; empty first results must not block the second).
+    let _ = gpu_processes::gpu_usage_by_pid();
+
     // Update cache
     if let Ok(mut cache) = GPU_USAGE_CACHE.try_lock() {
         *cache = Some((gpu_usage, std::time::Instant::now()));

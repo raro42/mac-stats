@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.427] - 2026-08-15
+
+### Fixed
+- Top Processes GPU%: use `ioreg -l` for AGX client properties; do not cache an empty first sample (warm-up can complete). Sampler also advances when the GPU gauge refreshes.
+
 ## [0.1.426] - 2026-08-15
 
 ### Added

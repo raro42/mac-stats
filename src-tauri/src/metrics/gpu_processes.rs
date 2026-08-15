@@ -22,12 +22,26 @@ static PREV_SAMPLES: Mutex<Option<(HashMap<u32, GpuSample>, Instant)>> = Mutex::
 static CACHED_PCT: Mutex<Option<(HashMap<u32, f32>, Instant)>> = Mutex::new(None);
 
 /// Latest per-PID estimated GPU utilization % (0–100+; may exceed 100 if multi-queue).
-/// Cached ~1.5s so process-list polls do not spawn ioreg every tick.
 pub fn gpu_usage_by_pid() -> HashMap<u32, f32> {
-    if let Ok(cache) = CACHED_PCT.lock() {
-        if let Some((map, at)) = cache.as_ref() {
-            if at.elapsed().as_millis() < 1500 {
-                return map.clone();
+    // How old is the previous raw sample?
+    let prev_age_ms = PREV_SAMPLES
+        .lock()
+        .ok()
+        .and_then(|g| g.as_ref().map(|(_, at)| at.elapsed().as_millis()))
+        .unwrap_or(u128::MAX);
+
+    // Rate-limit ioreg, but never skip the second sample needed for deltas.
+    // Bug fixed: caching an *empty* first result for 1.5s blocked warm-up.
+    let have_prev = prev_age_ms != u128::MAX;
+    let need_second = have_prev && prev_age_ms >= 50 && prev_age_ms < 2000;
+    let ioreg_fresh_enough = prev_age_ms < 800 && !need_second;
+
+    if ioreg_fresh_enough {
+        if let Ok(cache) = CACHED_PCT.lock() {
+            if let Some((map, _)) = cache.as_ref() {
+                if !map.is_empty() || prev_age_ms < 50 {
+                    return map.clone();
+                }
             }
         }
     }
@@ -40,7 +54,6 @@ pub fn gpu_usage_by_pid() -> HashMap<u32, f32> {
         if let Some((prev_map, prev_at)) = prev_guard.as_ref() {
             let elapsed_ns = prev_at.elapsed().as_nanos() as f64;
             if elapsed_ns > 50_000_000.0 {
-                // Need ≥50ms between samples for a stable ratio.
                 for (pid, cur_ns) in &raw {
                     if let Some(prev) = prev_map.get(pid) {
                         if *cur_ns >= prev.accumulated_ns {
@@ -50,7 +63,6 @@ pub fn gpu_usage_by_pid() -> HashMap<u32, f32> {
                                 if p < 0.0 {
                                     p = 0.0;
                                 }
-                                // Cap display absurdities from clock skew / multi-engine sum.
                                 if p > 999.0 {
                                     p = 999.0;
                                 }
@@ -71,17 +83,40 @@ pub fn gpu_usage_by_pid() -> HashMap<u32, f32> {
         *prev_guard = Some((stamped, now));
     }
 
-    if let Ok(mut cache) = CACHED_PCT.lock() {
-        *cache = Some((pct.clone(), now));
+    // Keep last non-empty % if this pass is still warming (first sample → empty pct).
+    if pct.is_empty() {
+        if let Ok(cache) = CACHED_PCT.lock() {
+            if let Some((map, at)) = cache.as_ref() {
+                if !map.is_empty() && at.elapsed().as_secs() < 5 {
+                    return map.clone();
+                }
+            }
+        }
     }
-    debug3!("GPU processes: {} PIDs with measurable use", pct.len());
+
+    if let Ok(mut cache) = CACHED_PCT.lock() {
+        // Do not overwrite a good cache with empty first-sample noise.
+        let overwrite = !pct.is_empty()
+            || cache
+                .as_ref()
+                .map(|(m, _)| m.is_empty())
+                .unwrap_or(true);
+        if overwrite {
+            *cache = Some((pct.clone(), now));
+        }
+    }
+    debug3!(
+        "GPU processes: {} PIDs with measurable use (raw clients sampled)",
+        pct.len()
+    );
     pct
 }
 
 fn sample_accumulated_ns_by_pid() -> HashMap<u32, u64> {
-    // Depth must include AGXDeviceUserClient children (not `-d 1`).
+    // `-l` lists properties on children (AGXDeviceUserClient). Without it, some
+    // macOS builds omit AppUsage / IOUserClientCreator on the text dump.
     let output = Command::new("/usr/sbin/ioreg")
-        .args(["-r", "-w", "0", "-c", "AGXAccelerator"])
+        .args(["-r", "-l", "-w", "0", "-c", "AGXAccelerator"])
         .stderr(std::process::Stdio::null())
         .output();
 
@@ -94,25 +129,21 @@ fn sample_accumulated_ns_by_pid() -> HashMap<u32, u64> {
     parse_ioreg_agx_clients(&String::from_utf8_lossy(&output.stdout))
 }
 
-/// Parse `ioreg -r -c AGXAccelerator` text for creator PID + AppUsage GPU times.
+/// Parse `ioreg -rl -c AGXAccelerator` text for creator PID + AppUsage GPU times.
 pub(crate) fn parse_ioreg_agx_clients(stdout: &str) -> HashMap<u32, u64> {
     let mut by_pid: HashMap<u32, u64> = HashMap::new();
     let mut pending_usage: Option<u64> = None;
 
     for line in stdout.lines() {
         let t = line.trim();
-        if t.contains("\"AppUsage\"") {
+        if t.contains("AppUsage") {
             pending_usage = Some(sum_accumulated_gpu_time(t));
             continue;
         }
         if let Some(pid) = parse_creator_pid(t) {
             let add = pending_usage.take().unwrap_or(0);
-            if add > 0 || by_pid.contains_key(&pid) {
-                *by_pid.entry(pid).or_insert(0) = by_pid.get(&pid).copied().unwrap_or(0) + add;
-            } else if t.contains("IOUserClientCreator") {
-                // Client with empty AppUsage — still track as 0 so we can see attachers.
-                by_pid.entry(pid).or_insert(0);
-            }
+            let entry = by_pid.entry(pid).or_insert(0);
+            *entry = entry.saturating_add(add);
         }
     }
     by_pid
@@ -173,5 +204,19 @@ mod tests {
             ),
             30
         );
+    }
+
+    #[test]
+    fn parses_live_shaped_multiline_block() {
+        // Creator after AppUsage (real ioreg order).
+        let sample = r#"
+  +-o AGXDeviceUserClient  <class AGXDeviceUserClient>
+  |   {
+  |     "AppUsage" = ({"API"="Metal","lastSubmittedTime"=1,"accumulatedGPUTime"=5000000000})
+  |     "IOUserClientCreator" = "pid 4242, Chrome Helper"
+  |   }
+"#;
+        let m = parse_ioreg_agx_clients(sample);
+        assert_eq!(m.get(&4242), Some(&5_000_000_000));
     }
 }
