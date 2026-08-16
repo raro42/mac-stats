@@ -30,11 +30,14 @@ body {
   background: var(--bg);
   color: var(--text);
   height: 100vh;
+  width: 100vw;
+  overflow: hidden;
   padding: 18px;
 }
 
 .glass-panel {
   width: 100%;
+  height: 100%;
   max-width: none;
   overflow-x: hidden;
   overflow-y: auto;
@@ -49,22 +52,26 @@ body {
 
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   transition: box-shadow 0.3s ease;
   min-height: 0; /* Allow flex children to shrink below content size */
-  /* No height:100% — it stretched the green border mid-window when content was shorter. */
 }
 
-/* Scrollable container for details and processes sections */
-.details-section,
-.processes-section {
+/* Details: natural height. Processes: flex:1 below grows with the window. */
+.details-section {
   flex: 0 0 auto;
   overflow: visible;
   position: relative;
   z-index: 1;
   overflow-x: hidden;
-  min-height: 0; /* Critical: allows flex item to shrink below content size */
-  max-height: 300px; /* Limit height to allow scrolling on small screens */
+  min-height: 0;
+}
+
+.processes-section {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 /* Smooth scrolling — keep Details/Processes thumbs quiet */
@@ -382,13 +389,13 @@ body {
 }
 
 .processes-section {
-  flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
 }
 
 .process-table {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;

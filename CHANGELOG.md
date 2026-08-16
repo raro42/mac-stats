@@ -7,13 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Root [LICENSE](LICENSE) (MIT) and [CONTRIBUTING.md](CONTRIBUTING.md); README and Cargo.toml point at them.
+## [0.1.460] - 2026-08-16
+
+### Fixed
+- Dark (TUI): CPU window panel fills the window again on resize (restore `height: 100%`; drop the `300px` cap on Details/Processes so Top Processes can grow).
 
 ## [0.1.459] - 2026-08-16
 
 ### Added
 - CPU window remembers outer position and inner size on close (menu bar toggle or title-bar close) and restores them on the next open (`cpuWindowGeometry` in `~/.mac-stats/config.json`).
+- Root [LICENSE](LICENSE) (MIT) and [CONTRIBUTING.md](CONTRIBUTING.md); README and Cargo.toml point at them.
 
 ## [0.1.458] - 2026-08-16
 
