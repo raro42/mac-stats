@@ -1,6 +1,8 @@
 # Getting Started
 
-**Menu-bar system monitor for Apple Silicon (optional local AI agent).**
+**Your Mac already knows how busy it is. Now you can too — from the menu bar.**
+
+Apple Silicon only. Optional local AI agent when you want company (off by default, stays on your machine).
 
 ## Choose a path
 

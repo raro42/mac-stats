@@ -1,6 +1,8 @@
 # mac-stats
 
-**Menu-bar system monitor for Apple Silicon (optional local AI agent).**
+**Your Mac already knows how busy it is. Now you can too — from the menu bar.**
+
+Apple Silicon only. Optional local AI agent when you want company (off by default, stays on your machine).
 
 [![GitHub release](https://img.shields.io/github/v/release/raro42/mac-stats?include_prereleases&style=flat-square)](https://github.com/raro42/mac-stats/releases/latest)
 [![CI](https://img.shields.io/github/actions/workflow/status/raro42/mac-stats/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/raro42/mac-stats/actions/workflows/ci.yml)

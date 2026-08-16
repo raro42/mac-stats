@@ -1,6 +1,6 @@
 # mac-stats features
 
-Product feature list for [mac-stats](https://github.com/raro42/mac-stats/) — menu-bar system monitor for Apple Silicon (optional local AI agent).
+Product feature list for [mac-stats](https://github.com/raro42/mac-stats/) — your Mac already knows how busy it is; now you can too, from the menu bar (optional local AI agent).
 
 Screenshots: [docs/screens/](docs/screens/) · [docs/screens/README.md](docs/screens/README.md)
 
