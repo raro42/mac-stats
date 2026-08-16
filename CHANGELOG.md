@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.465] - 2026-08-16
+
+### Fixed
+- CPU window JS parse error (broken `initLogsSection`) that stopped all metric updates.
+
 ## [0.1.464] - 2026-08-16
 
 ### Added

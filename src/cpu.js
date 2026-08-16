@@ -7087,6 +7087,9 @@ function initLogsSection() {
     syncSectionIcon('icon-logs', !logsCollapsed);
   };
   applyCollapsed();
+
+  wireCollapsibleHeaderA11y(header, {
+    contentId: 'logs-content',
     getExpanded: () => !logsCollapsed,
     ignoreSelector: '#logs-refresh-btn, #logs-open-btn, #logs-autorefresh, #logs-path-hint, label',
     onToggle: () => {
