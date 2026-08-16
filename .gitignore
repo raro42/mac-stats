@@ -16,7 +16,9 @@ dist-ssr
 .vscode/*
 !.vscode/extensions.json
 .idea
+# Keep agent chat/state private; share project rules.
 .cursor/*
+!.cursor/
 !.cursor/rules/
 !.cursor/rules/**
 .cursorrules
