@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.457] - 2026-08-16
+
+### Fixed
+- Dark (TUI): drop `height: 100%` on `.glass-panel` so the green panel border follows content height instead of cutting mid-window.
+
 ## [0.1.456] - 2026-08-16
 
 ### Fixed
