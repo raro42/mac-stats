@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - README / landing **Star growth** banner with a local cumulative-star chart (`docs/screens/star-history.svg`; regenerate via `scripts/generate_star_history_svg.py`).
 - Nightly star-chart refresh from `overnight_git_flush.py` (updates SVG only when stars change).
+- Session handoff note: [docs/045_session_handoff_2026-08-16.md](docs/045_session_handoff_2026-08-16.md).
 
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
