@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.459] - 2026-08-16
+
+### Added
+- CPU window remembers outer position and inner size on close (menu bar toggle or title-bar close) and restores them on the next open (`cpuWindowGeometry` in `~/.mac-stats/config.json`).
+
 ## [0.1.458] - 2026-08-16
 
 **GitHub Release** (first since **v0.1.399**). Ship tag **v0.1.458** includes all product work from **0.1.400–0.1.457**.

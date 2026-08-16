@@ -471,16 +471,43 @@ pub fn toggle_cpu_window(app_handle: &AppHandle) {
             // Destroy (don't hide): a hidden WKWebView keeps WebKit GPU/"Graphics and Media"
             // at ~0.5–1% forever. Menu-bar idle target needs the WebView gone.
             debug1!("CPU window is visible, destroying it (idle CPU)");
+            save_cpu_window_geometry(&window);
             let _ = window.destroy();
         } else {
             // Hidden leftover from older builds — destroy and recreate cleanly.
             debug1!("CPU window exists but is hidden, destroying then recreating");
+            save_cpu_window_geometry(&window);
             let _ = window.destroy();
             create_cpu_window(app_handle);
         }
     } else {
         debug1!("CPU window doesn't exist, creating it");
         create_cpu_window(app_handle);
+    }
+}
+
+fn save_cpu_window_geometry(window: &tauri::WebviewWindow) {
+    use crate::config::{Config, CpuWindowGeometry};
+    let Ok(pos) = window.outer_position() else {
+        return;
+    };
+    let Ok(size) = window.inner_size() else {
+        return;
+    };
+    let scale = window.scale_factor().unwrap_or(1.0).max(0.5);
+    let geo = CpuWindowGeometry {
+        x: (pos.x as f64) / scale,
+        y: (pos.y as f64) / scale,
+        width: (size.width as f64) / scale,
+        height: (size.height as f64) / scale,
+    };
+    if let Err(e) = Config::set_cpu_window_geometry(&geo) {
+        debug2!("Failed to save CPU window geometry: {}", e);
+    } else {
+        debug2!(
+            "Saved CPU window geometry: {:.0}x{:.0} @ ({:.0},{:.0})",
+            geo.width, geo.height, geo.x, geo.y
+        );
     }
 }
 
@@ -680,23 +707,22 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
     );
 
     let cpu_url = format!("cpu.html?v={}", env!("CARGO_PKG_VERSION"));
+    let saved = Config::cpu_window_geometry();
+    let (default_w, default_h) = if Config::cpu_window_compact() {
+        (520.0, 560.0)
+    } else {
+        // Room for four gauge titles (Frequency / Temperature) without clipping.
+        (820.0, 995.0)
+    };
+    let (w, h) = saved
+        .map(|g| (g.width, g.height))
+        .unwrap_or((default_w, default_h));
+
     let cpu_window =
         WebviewWindowBuilder::new(app_handle, "cpu", WebviewUrl::App(cpu_url.into()))
             .title("CPU")
             .visible(true) // Show immediately when created
-            .inner_size(
-                if Config::cpu_window_compact() {
-                    520.0
-                } else {
-                    // Room for four gauge titles (Frequency / Temperature) without clipping.
-                    820.0
-                },
-                if Config::cpu_window_compact() {
-                    560.0
-                } else {
-                    995.0
-                },
-            )
+            .inner_size(w, h)
             .resizable(true)
             .always_on_top(false)
             .decorations(decorations)
@@ -711,6 +737,15 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
                 &serde_json::json!({}),
                 "I",
             );
+
+            if let Some(g) = saved {
+                use tauri::{LogicalPosition, Position};
+                let _ = window.set_position(Position::Logical(LogicalPosition::new(g.x, g.y)));
+                debug2!(
+                    "Restored CPU window position ({:.0},{:.0}) size {:.0}x{:.0}",
+                    g.x, g.y, g.width, g.height
+                );
+            }
 
             // Clear process cache to force fresh collection on first call
             // This ensures we get up-to-date process list immediately when window opens
@@ -756,6 +791,7 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
             window.on_window_event(move |event| {
                 if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                     api.prevent_close();
+                    save_cpu_window_geometry(&window_for_close);
                     let _ = window_for_close.destroy();
                     debug1!("CPU window close requested — destroyed for idle CPU");
                 }

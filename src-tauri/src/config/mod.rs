@@ -124,6 +124,37 @@ macro_rules! default_agent_entry_with_soul {
 }
 
 /// Configuration manager
+/// Saved CPU window outer position + inner size (logical pixels).
+#[derive(Debug, Clone, Copy)]
+pub struct CpuWindowGeometry {
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
+}
+
+impl CpuWindowGeometry {
+    /// Reject NaN/inf and absurd sizes; keep multi-monitor negative origins.
+    pub fn sanitized(self) -> Option<Self> {
+        let vals = [self.x, self.y, self.width, self.height];
+        if vals.iter().any(|v| !v.is_finite()) {
+            return None;
+        }
+        if self.width < 320.0 || self.height < 360.0 {
+            return None;
+        }
+        if self.width > 4000.0 || self.height > 3000.0 {
+            return None;
+        }
+        Some(Self {
+            x: self.x,
+            y: self.y,
+            width: self.width.round(),
+            height: self.height.round(),
+        })
+    }
+}
+
 pub struct Config;
 
 /// Optional hash-based tool-loop repeat detection (agent router / Discord path).
@@ -404,6 +435,64 @@ impl Config {
 
     pub fn set_cpu_window_compact(compact: bool) -> Result<(), String> {
         Self::merge_config_bool("cpuWindowCompact", compact)
+    }
+
+    /// Last CPU window outer position + inner size (logical pixels). Used to restore on reopen.
+    pub fn cpu_window_geometry() -> Option<CpuWindowGeometry> {
+        let config_path = Self::config_file_path();
+        let content = std::fs::read_to_string(&config_path).ok()?;
+        let json: serde_json::Value = serde_json::from_str(&content).ok()?;
+        let g = json.get("cpuWindowGeometry")?;
+        let geo = CpuWindowGeometry {
+            x: g.get("x")?.as_f64()?,
+            y: g.get("y")?.as_f64()?,
+            width: g.get("width")?.as_f64()?,
+            height: g.get("height")?.as_f64()?,
+        };
+        geo.sanitized()
+    }
+
+    pub fn set_cpu_window_geometry(geo: &CpuWindowGeometry) -> Result<(), String> {
+        let Some(geo) = geo.sanitized() else {
+            return Err("invalid cpu window geometry".into());
+        };
+        use serde_json::{json, Value};
+        let config_path = Self::config_file_path();
+        if let Some(parent) = config_path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        }
+        let mut after: Value = std::fs::read_to_string(&config_path)
+            .ok()
+            .and_then(|s| serde_json::from_str(&s).ok())
+            .unwrap_or_else(|| json!({}));
+        match after.as_object_mut() {
+            Some(obj) => {
+                obj.insert(
+                    "cpuWindowGeometry".into(),
+                    json!({
+                        "x": geo.x,
+                        "y": geo.y,
+                        "width": geo.width,
+                        "height": geo.height,
+                    }),
+                );
+            }
+            None => {
+                after = json!({
+                    "cpuWindowGeometry": {
+                        "x": geo.x,
+                        "y": geo.y,
+                        "width": geo.width,
+                        "height": geo.height,
+                    }
+                });
+            }
+        }
+        crate::config::write_text_atomic(
+            &config_path,
+            &serde_json::to_string_pretty(&after).map_err(|e| e.to_string())?,
+        )?;
+        Ok(())
     }
 
     /// One-shot UI section to open on CPU window load (`agent-ops`, `monitors`, …).
@@ -2652,7 +2741,46 @@ fn parse_hhmm_local(raw: &str) -> Option<(u32, u32)> {
 
 #[cfg(test)]
 mod tests {
-    use super::{clamp_ollama_global_concurrency_n, write_bytes_atomic, write_text_atomic, Config};
+    use super::{
+        clamp_ollama_global_concurrency_n, write_bytes_atomic, write_text_atomic, Config,
+        CpuWindowGeometry,
+    };
+
+    #[test]
+    fn cpu_window_geometry_sanitized() {
+        assert!(CpuWindowGeometry {
+            x: 100.0,
+            y: 80.0,
+            width: 820.0,
+            height: 995.0,
+        }
+        .sanitized()
+        .is_some());
+        assert!(CpuWindowGeometry {
+            x: -200.0,
+            y: 10.0,
+            width: 500.0,
+            height: 600.0,
+        }
+        .sanitized()
+        .is_some());
+        assert!(CpuWindowGeometry {
+            x: 0.0,
+            y: 0.0,
+            width: 100.0,
+            height: 100.0,
+        }
+        .sanitized()
+        .is_none());
+        assert!(CpuWindowGeometry {
+            x: f64::NAN,
+            y: 0.0,
+            width: 800.0,
+            height: 600.0,
+        }
+        .sanitized()
+        .is_none());
+    }
 
     #[test]
     fn write_bytes_atomic_roundtrip() {
