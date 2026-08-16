@@ -748,6 +748,11 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   margin: 8px 4px 0;
 }
 
+.ops-panel-agents .ops-agent-edit-actions .ops-agent-load-chat {
+  display: inline-flex;
+  margin: 0;
+}
+
 textarea.ops-agent-editor {
   display: block;
   width: 100%;
@@ -2560,7 +2565,8 @@ button.is-just-saved,
 #ops-session-load-chat.is-just-saved,
 #ops-runs-load-chat.is-just-saved,
 #ops-schedules-load-chat.is-just-saved,
-#ops-memory-load-chat.is-just-saved {
+#ops-memory-load-chat.is-just-saved,
+#ops-agent-load-chat.is-just-saved {
   background: color-mix(in srgb, #34c759 22%, transparent) !important;
   border-color: color-mix(in srgb, #34c759 45%, transparent) !important;
   color: inherit;

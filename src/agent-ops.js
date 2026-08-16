@@ -137,6 +137,7 @@
   let opsAgentCache = null;
   let opsAgentFileTab = 'soul';
   let opsAgentDirty = { soul: false, skill: false, mood: false };
+  let opsAgentLoadText = null;
   let opsAgentSaveStatusTimer = null;
   let opsAgentSaveBusy = false;
   let opsRefreshInFlight = false;
@@ -300,6 +301,7 @@ function setupAgentOps() {
             opsAgentFileTab = btn.dataset.file;
             document.querySelectorAll('.ops-file-tab').forEach((b) => b.classList.toggle('active', b === btn));
             renderOpsAgentPreview();
+            refreshOpsAgentLoadText();
         });
     });
     document.getElementById('ops-agent-back')?.addEventListener('click', () => {
@@ -353,6 +355,7 @@ function setupAgentOps() {
                 if (tryOpsRunsEnterLoad(e)) return;
                 if (tryOpsSchedulesEnterLoad(e)) return;
                 if (tryOpsMemoryEnterLoad(e)) return;
+                if (tryOpsAgentsEnterLoad(e)) return;
                 if (tryOpsMemoryEnter(e)) return;
                 if (tryOpsRunsEnter(e)) return;
                 if (tryOpsAgentsEnter(e)) return;
@@ -1625,7 +1628,15 @@ function renderOpsAgents(agents) {
             btn.classList.add('is-selected');
             openOpsAgent(a.id);
         });
-        btn.title = 'Open agent soul / skill / mood';
+        btn.addEventListener('dblclick', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            list.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            btn.classList.add('is-selected');
+            await openOpsAgent(a.id);
+            loadOpsAgentIntoChat();
+        });
+        btn.title = 'Open agent · Enter / double-click to load soul/skill/mood into AI Chat';
         list.appendChild(btn);
     });
     prependOpsFilterCaption(list, all.length, filtered.length, opsAgentsFilterQ);
@@ -1648,7 +1659,11 @@ async function openOpsAgent(id) {
         ensureOpsAgentEditor();
         renderOpsAgentPreview();
         setOpsAgentSaveStatus('');
+        refreshOpsAgentLoadText();
     } catch (err) {
+        opsAgentLoadText = null;
+        setOpsAgentLoadChatVisible(false);
+        showOpsAgentLoadStatus(String(err), false);
         alert(`Failed to load agent: ${err}`);
     }
 }
@@ -1659,8 +1674,11 @@ function closeOpsAgentDetail() {
     const list = document.getElementById('ops-agents-list');
     if (list) list.style.display = '';
     opsAgentDirty = { soul: false, skill: false, mood: false };
+    opsAgentLoadText = null;
     setOpsAgentSaveStatus('');
     setOpsAgentCopyChip(null);
+    setOpsAgentLoadChatVisible(false);
+    showOpsAgentLoadStatus('', true);
     const editor = document.getElementById('ops-agent-preview');
     if (editor) editor.classList.remove('is-dirty');
     const saveBtn = document.getElementById('ops-agent-save');
@@ -1727,6 +1745,7 @@ function ensureOpsAgentEditor() {
         editor.after(row);
         save.addEventListener('click', () => saveOpsAgentFile());
     }
+    ensureOpsAgentLoadChatBtn();
     if (editor && editor.dataset.opsEditBound !== '1') {
         editor.dataset.opsEditBound = '1';
         editor.addEventListener('input', () => {
@@ -1737,6 +1756,7 @@ function ensureOpsAgentEditor() {
             const saveBtn = document.getElementById('ops-agent-save');
             if (saveBtn) saveBtn.disabled = false;
             setOpsAgentSaveStatus('Unsaved changes');
+            refreshOpsAgentLoadText({ quiet: true });
         });
         editor.addEventListener('keydown', (e) => {
             if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
@@ -2076,6 +2096,25 @@ function tryOpsAgentsEnter(e) {
     return true;
 }
 
+/** Enter loads the open agent soul/skill/mood into AI Chat when ready (Sessions/Knowledge parity). */
+function tryOpsAgentsEnterLoad(e) {
+    if (agentOpsCollapsed) return false;
+    const panel = document.getElementById('ops-panel-agents');
+    if (!panel || !panel.classList.contains('active')) return false;
+    const detail = document.getElementById('ops-agent-detail');
+    if (!detail || detail.hidden) return false;
+    const loadBtn = document.getElementById('ops-agent-load-chat');
+    if (!loadBtn || loadBtn.hidden || !opsAgentLoadText) return false;
+    if (loadBtn.classList.contains('is-just-saved')) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    if (tag === 'TEXTAREA') return false;
+    if (tag === 'INPUT' && t.id && t.id !== 'ops-agents-filter') return false;
+    e.preventDefault();
+    loadOpsAgentIntoChat();
+    return true;
+}
+
 /** Enter loads the previewed schedule task / delivery summary when ready (Sessions/Runs parity). */
 function tryOpsSchedulesEnterLoad(e) {
     if (agentOpsCollapsed) return false;
@@ -2259,6 +2298,165 @@ function setOpsAgentCopyChip(copyValue) {
     if (!el.classList.contains('is-just-saved')) {
         el.textContent = value;
         el._saveFlashOriginalLabel = value;
+    }
+}
+
+/** Refresh Load-into-chat payload from the open agent file (current tab). */
+function refreshOpsAgentLoadText(opts) {
+    const quiet = !!(opts && opts.quiet);
+    if (!opsAgentCache) {
+        opsAgentLoadText = null;
+        setOpsAgentLoadChatVisible(false);
+        if (!quiet) showOpsAgentLoadStatus('', true);
+        return;
+    }
+    syncOpsAgentEditorToCache();
+    const kind = opsAgentFileTab || 'soul';
+    const body = String(opsAgentFileContent(kind) || '')
+        .trim()
+        .slice(0, 12000);
+    const label = opsAgentCache.name || opsAgentCache.slug || opsAgentCache.id || 'agent';
+    if (body) {
+        opsAgentLoadText = `Agent ${label} (${kind}.md)\n\n${body}`;
+        setOpsAgentLoadChatVisible(true);
+        if (!quiet) {
+            showOpsAgentLoadStatus(
+                'Detail ready — Enter or “Load into AI Chat” · double-click a row also loads.',
+                true
+            );
+        }
+    } else {
+        opsAgentLoadText = null;
+        setOpsAgentLoadChatVisible(false);
+        if (!quiet) showOpsAgentLoadStatus(`${kind}.md is empty.`, false);
+    }
+}
+
+/** Load-into-chat control on Agents detail (Sessions/Knowledge parity). */
+function ensureOpsAgentLoadChatBtn() {
+    let el = document.getElementById('ops-agent-load-chat');
+    if (el) return el;
+    const actions = document.getElementById('ops-agent-edit-actions');
+    const editor = document.getElementById('ops-agent-preview');
+    const parent = actions || editor?.parentNode;
+    if (!parent) return null;
+    el = document.createElement('button');
+    el.type = 'button';
+    el.id = 'ops-agent-load-chat';
+    el.className = 'btn-secondary ops-agent-load-chat';
+    el.hidden = true;
+    el.textContent = 'Load into AI Chat ↵';
+    el.title = 'Put this agent file into AI Chat (Enter)';
+    el.setAttribute('aria-label', 'Load agent file into AI Chat');
+    if (actions) {
+        const back = document.getElementById('ops-agent-back');
+        if (back) actions.insertBefore(el, back);
+        else actions.appendChild(el);
+    } else {
+        parent.insertBefore(el, editor?.nextSibling || null);
+    }
+    el.addEventListener('click', () => loadOpsAgentIntoChat());
+    return el;
+}
+
+function setOpsAgentLoadChatVisible(visible) {
+    const el = ensureOpsAgentLoadChatBtn();
+    if (!el) return;
+    el.hidden = !visible;
+    if (!visible) {
+        el.classList.remove('is-just-saved');
+        if (!el._saveFlashOriginalLabel) {
+            el.textContent = 'Load into AI Chat ↵';
+        }
+    }
+}
+
+function showOpsAgentLoadStatus(msg, ok) {
+    let el = document.getElementById('ops-agent-load-status');
+    const loadBtn = ensureOpsAgentLoadChatBtn();
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'ops-agent-load-status';
+        el.className = 'ops-row-meta';
+        el.style.margin = '6px 4px 0';
+        const actions = document.getElementById('ops-agent-edit-actions');
+        if (actions?.parentNode) {
+            actions.parentNode.insertBefore(el, actions.nextSibling);
+        } else if (loadBtn?.parentNode) {
+            loadBtn.parentNode.insertBefore(el, loadBtn.nextSibling);
+        }
+    }
+    el.textContent = msg || '';
+    el.style.opacity = msg ? '0.9' : '0';
+    el.style.color = ok === false ? 'rgba(200,60,60,0.95)' : '';
+}
+
+/** Put the open agent soul/skill/mood into AI Chat for a quick follow-up. */
+function loadOpsAgentIntoChat() {
+    const loadBtn = ensureOpsAgentLoadChatBtn();
+    if (loadBtn?.classList.contains('is-just-saved')) return;
+    refreshOpsAgentLoadText({ quiet: true });
+    const q = String(opsAgentLoadText || '').trim();
+    if (!q) {
+        showOpsAgentLoadStatus('Open an agent file first.', false);
+        return;
+    }
+    const aiOff =
+        document.getElementById('icon-ollama')?.style.pointerEvents === 'none' ||
+        document.getElementById('ollama-section')?.style.display === 'none';
+    if (aiOff) {
+        showOpsAgentLoadStatus('Enable local AI agent in Settings to load into chat.', false);
+        return;
+    }
+    const input = document.getElementById('chat-input');
+    if (!input) {
+        showOpsAgentLoadStatus('AI Chat input not ready — open AI Chat once, then retry.', false);
+        return;
+    }
+    input.value = q;
+    try {
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+    } catch (_) {
+        /* ignore */
+    }
+    const section = document.querySelector('.ollama-section');
+    const themeCollapsed =
+        section?.classList.contains('collapsed') ||
+        localStorage.getItem('ollama_collapsed') === 'true';
+    if (themeCollapsed) {
+        document.getElementById('ollama-header')?.click();
+    }
+    const content = document.getElementById('ollama-content');
+    const btn = document.getElementById('ollama-collapse-btn');
+    if (content) {
+        content.classList.remove('collapsed');
+        if (content.style.display === 'none') content.style.display = '';
+    }
+    if (section) section.classList.remove('collapsed');
+    if (btn) btn.textContent = '−';
+    section?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => {
+        input.focus();
+        try {
+            const len = input.value.length;
+            input.setSelectionRange(len, len);
+        } catch (_) {
+            /* ignore */
+        }
+    }, 80);
+    showOpsAgentLoadStatus('Agent file loaded into AI Chat.', true);
+    if (loadBtn && !loadBtn.hidden) {
+        if (typeof window.flashSaveButton === 'function') {
+            window.flashSaveButton(loadBtn, { savedLabel: 'Loaded', durationMs: 1600 });
+        } else {
+            const idle = loadBtn.textContent || 'Load into AI Chat ↵';
+            loadBtn.classList.add('is-just-saved');
+            loadBtn.textContent = 'Loaded';
+            setTimeout(() => {
+                loadBtn.classList.remove('is-just-saved');
+                loadBtn.textContent = idle;
+            }, 1600);
+        }
     }
 }
 
