@@ -1029,10 +1029,10 @@ function renderOverviewLive(rows) {
                     source: r.source,
                     sessionId: r.session_id,
                 });
-                showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`);
+                showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`, r.session_id);
                 showOpsSessionStatus('Preview ready — use “Load into AI Chat” on the Sessions tab.', true);
             } catch (err) {
-                showOpsSessionPreview([], String(err));
+                showOpsSessionPreview([], String(err), null);
                 showOpsSessionStatus(String(err), false);
             }
         });
@@ -1113,8 +1113,9 @@ function renderOverviewRecent(files) {
             selectOpsTab('sessions');
             try {
                 const msgs = await invoke('read_session_file_messages', { path: f.path });
+                const copyId = f.slug || f.name || '';
                 if (msgs && msgs.length) {
-                    showOpsSessionPreview(msgs, f.name);
+                    showOpsSessionPreview(msgs, f.name, copyId);
                 } else {
                     const text = await invoke('read_session_file', { path: f.path });
                     const preview = document.getElementById('ops-session-preview');
@@ -1125,9 +1126,10 @@ function renderOverviewRecent(files) {
                     }
                     opsSessionLoadRows = null;
                     if (loadBtn) loadBtn.hidden = true;
+                    setOpsSessionCopyChip(copyId);
                 }
             } catch (err) {
-                showOpsSessionPreview([], String(err));
+                showOpsSessionPreview([], String(err), null);
             }
         });
         btn.title = 'Open in Sessions';
@@ -1821,13 +1823,114 @@ function tryOpsArrowMoveSelection(e) {
     return true;
 }
 
-function showOpsSessionPreview(rows, label) {
+async function copyOpsTextToClipboard(text) {
+    if (typeof copyTextToClipboard === 'function') {
+        return copyTextToClipboard(text);
+    }
+    const value = String(text || '').trim();
+    if (!value) return false;
+    try {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            await navigator.clipboard.writeText(value);
+            return true;
+        }
+    } catch (_) {
+        /* fall through */
+    }
+    try {
+        const ta = document.createElement('textarea');
+        ta.value = value;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return !!ok;
+    } catch (_) {
+        return false;
+    }
+}
+
+/** Click-to-copy session id / file slug above the Sessions preview (Copied flash). */
+function ensureOpsSessionCopyChip() {
+    let el = document.getElementById('ops-session-copy-chip');
+    if (el) return el;
+    const preview = document.getElementById('ops-session-preview');
+    if (!preview || !preview.parentNode) return null;
+    el = document.createElement('button');
+    el.type = 'button';
+    el.id = 'ops-session-copy-chip';
+    el.className = 'ops-session-copy-chip';
+    el.hidden = true;
+    el.setAttribute('aria-label', 'Copy session id');
+    preview.parentNode.insertBefore(el, preview);
+    el.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (el.classList.contains('is-just-saved')) return;
+        const value = el.dataset.copyValue || '';
+        if (!value) return;
+        const ok = await copyOpsTextToClipboard(value);
+        if (!ok) {
+            showOpsSessionStatus('Could not copy.', false);
+            return;
+        }
+        if (typeof window.flashSaveButton === 'function') {
+            window.flashSaveButton(el, { savedLabel: 'Copied', durationMs: 1600 });
+        } else {
+            const idle = el._saveFlashOriginalLabel || value;
+            el._saveFlashOriginalLabel = idle;
+            el.classList.add('is-just-saved');
+            el.textContent = 'Copied';
+            clearTimeout(el._saveFlashTimer);
+            el._saveFlashTimer = setTimeout(() => {
+                el.classList.remove('is-just-saved');
+                el.textContent = idle;
+                el._saveFlashOriginalLabel = null;
+                el._saveFlashTimer = null;
+            }, 1600);
+        }
+    });
+    el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            el.click();
+        }
+    });
+    return el;
+}
+
+function setOpsSessionCopyChip(copyValue) {
+    const el = ensureOpsSessionCopyChip();
+    if (!el) return;
+    const value = String(copyValue || '').trim();
+    if (!value) {
+        el.hidden = true;
+        el.dataset.copyValue = '';
+        el.classList.remove('is-just-saved');
+        el.textContent = '';
+        return;
+    }
+    el.hidden = false;
+    el.dataset.copyValue = value;
+    el.title = 'Click to copy';
+    el.setAttribute('aria-label', `Copy ${value}`);
+    if (!el.classList.contains('is-just-saved')) {
+        el.textContent = value;
+        el._saveFlashOriginalLabel = value;
+    }
+}
+
+function showOpsSessionPreview(rows, label, copyValue) {
     const preview = document.getElementById('ops-session-preview');
     const loadBtn = document.getElementById('ops-session-load-chat');
     opsSessionLoadRows = rows && rows.length ? rows : null;
     preview.hidden = false;
     preview.textContent = (label ? `${label}\n\n` : '') + formatSessionMessagesPreview(rows || []);
     if (loadBtn) loadBtn.hidden = !opsSessionLoadRows;
+    setOpsSessionCopyChip(copyValue);
 }
 
 function showOpsSessionStatus(msg, ok) {
@@ -1933,10 +2036,10 @@ function renderOpsLive(rows) {
                     sessionId: r.session_id,
                 });
                 markOpsSessionRowSelected(btn);
-                showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`);
+                showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`, r.session_id);
                 showOpsSessionStatus('Preview ready — Enter or “Load into AI Chat” · double-click also loads.', true);
             } catch (err) {
-                showOpsSessionPreview([], String(err));
+                showOpsSessionPreview([], String(err), null);
                 showOpsSessionStatus(String(err), false);
             }
         };
@@ -1959,6 +2062,7 @@ function renderOpsSessionFiles(files) {
     preview.hidden = true;
     if (loadBtn) loadBtn.hidden = true;
     opsSessionLoadRows = null;
+    setOpsSessionCopyChip(null);
     const all = files || [];
     const filtered = all.filter((f) =>
         sessionRowMatchesFilter(
@@ -1983,10 +2087,11 @@ function renderOpsSessionFiles(files) {
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(f.source_hint)} · ${fmtBytes(f.size_bytes)} · ${fmtAge(f.modified_ms)}${f.preview ? ` · ${escapeHtml(f.preview)}` : ''}</div></div>`;
         const openFile = async () => {
             try {
+                const copyId = f.slug || f.name || '';
                 const msgs = await invoke('read_session_file_messages', { path: f.path });
                 if (msgs && msgs.length) {
                     markOpsSessionRowSelected(btn);
-                    showOpsSessionPreview(msgs, f.name);
+                    showOpsSessionPreview(msgs, f.name, copyId);
                     showOpsSessionStatus('Preview ready — Enter or “Load into AI Chat” · double-click also loads.', true);
                 } else {
                     markOpsSessionRowSelected(btn);
@@ -1995,6 +2100,7 @@ function renderOpsSessionFiles(files) {
                     preview.textContent = text.slice(0, 12000);
                     opsSessionLoadRows = null;
                     if (loadBtn) loadBtn.hidden = true;
+                    setOpsSessionCopyChip(copyId);
                     showOpsSessionStatus('No parseable turns — raw file shown.', false);
                 }
             } catch (err) {
@@ -2002,6 +2108,7 @@ function renderOpsSessionFiles(files) {
                 preview.textContent = String(err);
                 opsSessionLoadRows = null;
                 if (loadBtn) loadBtn.hidden = true;
+                setOpsSessionCopyChip(null);
                 showOpsSessionStatus(String(err), false);
             }
         };
