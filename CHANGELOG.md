@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.462] - 2026-08-16
+
+### Fixed
+- Dark (TUI): match other themes’ near-invisible scrollbars (drop loud green 5–6px thumbs).
+
 ## [0.1.461] - 2026-08-16
 
 ### Fixed

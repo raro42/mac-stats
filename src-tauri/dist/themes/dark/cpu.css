@@ -74,62 +74,13 @@ body {
   z-index: 1;
 }
 
-/* Smooth scrolling — keep Details/Processes thumbs quiet */
-.details-section::-webkit-scrollbar,
-.processes-section::-webkit-scrollbar {
-  width: 5px;
-}
-
-.details-section::-webkit-scrollbar-track,
-.processes-section::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.details-section::-webkit-scrollbar-thumb,
-.processes-section::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 8px;
-}
-
-.details-section:hover::-webkit-scrollbar-thumb,
-.processes-section:hover::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 0, 0.22);
-}
-
-.details-section:hover::-webkit-scrollbar-thumb:hover,
-.processes-section:hover::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 255, 0, 0.4);
-}
-
-/* Main shell scroll (also covered by agent-ops.css; keep dark-local fallback) */
-.glass-panel {
+/* Scrollbars: use shared near-invisible rules from agent-ops.css (2px, thumb on hover). */
+.details-section,
+.processes-section,
+.glass-panel,
+.changelog-body {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 255, 0, 0.28) transparent;
-}
-
-.glass-panel::-webkit-scrollbar {
-  width: 5px;
-}
-
-.glass-panel::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.glass-panel::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 8px;
-}
-
-.glass-panel:hover::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 0, 0.28);
-}
-
-.glass-panel:hover::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 255, 0, 0.45);
-}
-
-.glass-panel::-webkit-scrollbar-corner {
-  background: transparent;
+  scrollbar-color: transparent transparent;
 }
 
 .glass-panel::before {
@@ -903,24 +854,6 @@ body {
   max-height: calc(80vh - 100px);
   padding: 8px 4px;
   line-height: 1.6;
-}
-
-.changelog-body::-webkit-scrollbar {
-  width: 6px;
-}
-
-.changelog-body::-webkit-scrollbar-track {
-  background: rgba(0, 255, 0, 0.05);
-  border-radius: 3px;
-}
-
-.changelog-body::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 0, 0.3);
-  border-radius: 3px;
-}
-
-.changelog-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 255, 0, 0.5);
 }
 
 .changelog-loading,
