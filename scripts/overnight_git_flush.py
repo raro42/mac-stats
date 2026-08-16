@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Commit + push any pending safe work (nightly ~23:00 backstop).
 
+Also regenerates docs/screens/star-history.svg when GitHub stars changed.
+
 Usage:
   python3 scripts/overnight_git_flush.py
   python3 scripts/overnight_git_flush.py --dry-run
