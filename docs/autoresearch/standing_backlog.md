@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops overview Schedules click-to-preview — **v0.1.477**
 - Agent Ops Agents Load into AI Chat (soul/skill/mood → composer) — **v0.1.476**
 - Agent Ops Knowledge Load into AI Chat (file → composer) — **v0.1.475**
 - Agent Ops Schedules Load into AI Chat (task/summary → composer) — **v0.1.474**
