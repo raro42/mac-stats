@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops overview empty Open-tab CTAs — **v0.1.446**
 - Top Processes detail PID click-to-copy Copied flash — **v0.1.445**
 - Disk Cleanup soft-delete (Move to Trash) Saved flash — **v0.1.444**
 - Agent Ops filter-miss Clear filter — **v0.1.443**
