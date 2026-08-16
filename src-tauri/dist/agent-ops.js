@@ -1692,6 +1692,7 @@ function tryOpsPreviewEscape(e) {
     }
     if (runsPreview && !runsPreview.hidden) {
         showOpsRunPreview('');
+        setOpsRunsCopyChip(null);
         closed = true;
     }
     if (closed) {
@@ -2380,18 +2381,87 @@ function ensureOpsRunsPreview() {
     return preview;
 }
 
+/** Click-to-copy run request id above the Runs preview (Copied flash). */
+function ensureOpsRunsCopyChip() {
+    let el = document.getElementById('ops-runs-copy-chip');
+    if (el) return el;
+    const preview = ensureOpsRunsPreview();
+    if (!preview || !preview.parentNode) return null;
+    el = document.createElement('button');
+    el.type = 'button';
+    el.id = 'ops-runs-copy-chip';
+    el.className = 'ops-session-copy-chip ops-runs-copy-chip';
+    el.hidden = true;
+    el.setAttribute('aria-label', 'Copy run request id');
+    preview.parentNode.insertBefore(el, preview);
+    el.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (el.classList.contains('is-just-saved')) return;
+        const value = el.dataset.copyValue || '';
+        if (!value) return;
+        const ok = await copyOpsTextToClipboard(value);
+        if (!ok) return;
+        if (typeof window.flashSaveButton === 'function') {
+            window.flashSaveButton(el, { savedLabel: 'Copied', durationMs: 1600 });
+        } else {
+            const idle = el._saveFlashOriginalLabel || value;
+            el._saveFlashOriginalLabel = idle;
+            el.classList.add('is-just-saved');
+            el.textContent = 'Copied';
+            clearTimeout(el._saveFlashTimer);
+            el._saveFlashTimer = setTimeout(() => {
+                el.classList.remove('is-just-saved');
+                el.textContent = idle;
+                el._saveFlashOriginalLabel = null;
+                el._saveFlashTimer = null;
+            }, 1600);
+        }
+    });
+    el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            el.click();
+        }
+    });
+    return el;
+}
+
+function setOpsRunsCopyChip(copyValue) {
+    const el = ensureOpsRunsCopyChip();
+    if (!el) return;
+    const value = String(copyValue || '').trim();
+    if (!value || value === '—') {
+        el.hidden = true;
+        el.dataset.copyValue = '';
+        el.classList.remove('is-just-saved');
+        el.textContent = '';
+        return;
+    }
+    el.hidden = false;
+    el.dataset.copyValue = value;
+    el.title = 'Click to copy request id';
+    el.setAttribute('aria-label', `Copy ${value}`);
+    if (!el.classList.contains('is-just-saved')) {
+        el.textContent = value;
+        el._saveFlashOriginalLabel = value;
+    }
+}
+
 /** Show full run turn details (list rows truncate question / tools). */
-function showOpsRunPreview(text) {
+function showOpsRunPreview(text, requestId) {
     const preview = ensureOpsRunsPreview();
     if (!preview) return;
     const body = String(text || '').trim();
     if (!body) {
         preview.hidden = true;
         preview.textContent = '';
+        setOpsRunsCopyChip(null);
         return;
     }
     preview.hidden = false;
     preview.textContent = body.slice(0, 12000);
+    setOpsRunsCopyChip(requestId);
 }
 
 function formatOpsRunPreview(r) {
@@ -2483,7 +2553,7 @@ function renderOpsRuns(insights) {
         btn.addEventListener('click', () => {
             el.querySelectorAll('.ops-row.is-selected').forEach((node) => node.classList.remove('is-selected'));
             btn.classList.add('is-selected');
-            showOpsRunPreview(formatOpsRunPreview(r));
+            showOpsRunPreview(formatOpsRunPreview(r), r?.request_id);
         });
         el.appendChild(btn);
     });

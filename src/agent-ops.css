@@ -734,6 +734,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   background: color-mix(in srgb, #34c759 14%, transparent);
 }
 
+.ops-panel-runs .ops-runs-copy-chip,
 .ops-detail .ops-agent-copy-chip {
   display: block;
   margin: 0 0 10px;

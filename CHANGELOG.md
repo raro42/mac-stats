@@ -7,10 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- Data Poster: inactive section icons are near-white (were nearly invisible on dark UI).
-
-
 ### Added
 - README / landing **Star growth** banner with a local cumulative-star chart (`docs/screens/star-history.svg`; regenerate via `scripts/generate_star_history_svg.py`).
 - Nightly star-chart refresh from `overnight_git_flush.py` (updates SVG only when stars change).
@@ -18,6 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
+
+## [0.1.471] - 2026-08-16
+
+### Added
+- Agent Ops **Runs**: click-to-copy request id chip under run preview (Copied flash; Sessions/Knowledge parity).
+
+## [0.1.470] - 2026-08-16
+
+### Fixed
+- Data Poster: inactive section icons are near-white (were nearly invisible on dark UI).
 
 ## [0.1.469] - 2026-08-16
 
