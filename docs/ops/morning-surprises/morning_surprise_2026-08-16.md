@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-16
 
-Overnight Track B (20:00–06:00 local) strengthened the product with keep rows through **v0.1.443**.
+Overnight Track B (20:00–06:00 local) strengthened the product with keep rows through **v0.1.444**.
 
 ## Shipped (selected)
 
@@ -19,13 +19,14 @@ Overnight Track B (20:00–06:00 local) strengthened the product with keep rows 
 | v0.1.440 | Theme / app version → changelog Opened flash |
 | v0.1.441 | Debug Log path hint click-to-copy + Copied flash |
 | v0.1.442 | Settings product toggles Saved flash after persist |
-| **v0.1.443** | **Agent Ops filter-miss empty states: Clear filter + filter-field highlight** |
+| v0.1.443 | Agent Ops filter-miss empty states: Clear filter + filter-field highlight |
+| **v0.1.444** | **Disk Cleanup soft-delete (Move to Trash): Saved flash after persist** |
 
-## Latest tick (~01:31)
+## Latest tick (~01:58)
 
-- Digester open = overnight design review (`feature-agent-ops.png` stale 3.7d); debug.log quiet.
-- Fuel: design review — Agent Ops filter miss empty states had no recovery affordance (Esc-only).
-- **Keep v0.1.443** — Clear filter button on no-match empties; filter input pulses after clear.
+- Digester open = overnight design review (`feature-agent-ops.png` stale 3.7d); design-review already used tonight; debug.log quiet.
+- Fuel: standing backlog P1 UX — soft-delete toggle had silent save after Clear filter (v0.1.443).
+- **Keep v0.1.444** — Saved flash + busy-guard on Move cleaned items to Trash.
 - Recapture of `docs/screens/feature-agent-ops.png` still deferred if Screen Recording TCC blocks.
 - Verify green → keep → install → Discord Ready after kickstart.
 
@@ -35,4 +36,4 @@ Overnight Track B (20:00–06:00 local) strengthened the product with keep rows 
 
 ## Not a quiet night
 
-Empty digester Slowest alone was not the win — Agent Ops filter recovery and control feedback shipped.
+Empty digester Slowest alone was not the win — control feedback and Agent Ops filter recovery shipped.
