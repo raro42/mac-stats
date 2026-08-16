@@ -1011,14 +1011,47 @@ function renderOverviewSchedules(schedules, deliveries) {
         body.appendChild(btn);
     });
     if (Array.isArray(deliveries) && deliveries.length) {
-        const t = deliveries[0]?.utc ? Date.parse(deliveries[0].utc) : NaN;
-        const meta = document.createElement('div');
-        meta.className = 'ops-overview-count';
-        meta.textContent = !Number.isNaN(t)
-            ? `Last delivery ${fmtAge(t)}`
-            : 'Last delivery recorded';
-        body.appendChild(meta);
+        appendOverviewLastDeliveryRow(body, deliveries[0]);
     }
+}
+
+/** Overview Schedules: last delivery as a clickable row (schedule-row preview parity). */
+function appendOverviewLastDeliveryRow(body, d) {
+    if (!body || !d) return;
+    const t = d.utc ? Date.parse(d.utc) : NaN;
+    const id = d.schedule_id || 'schedule';
+    const ageLabel = !Number.isNaN(t) ? fmtAge(t) : '';
+    const summary = String(d.summary || '').trim();
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ops-row';
+    const metaBits = [id, ageLabel, summary.slice(0, 40)].filter(Boolean);
+    btn.innerHTML =
+        `<div><div class="ops-row-title">Last delivery</div>` +
+        `<div class="ops-row-meta">${escapeHtml(metaBits.join(' · '))}${summary.length > 40 ? '…' : ''}</div></div>`;
+    btn.addEventListener('click', () => {
+        body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+        btn.classList.add('is-selected');
+        selectOpsTab('schedules');
+        const loadSummary = summary;
+        showOpsSchedulePreview(formatOpsDeliveryPreview(d), d.schedule_id || '', loadSummary);
+        const list = document.getElementById('ops-schedules-list');
+        const delList = document.getElementById('ops-deliveries-list');
+        list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+        delList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+        let matched = false;
+        delList?.querySelectorAll('.ops-row').forEach((row) => {
+            if (matched) return;
+            const title = row.querySelector('.ops-row-title');
+            if (title && title.textContent === id) {
+                matched = true;
+                row.classList.add('is-selected');
+                row.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+            }
+        });
+    });
+    btn.title = 'Open in Schedules · preview last delivery · load into AI Chat from that tab';
+    body.appendChild(btn);
 }
 
 function renderOverviewLive(rows) {

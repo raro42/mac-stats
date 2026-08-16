@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.481] - 2026-08-17
+
+### Changed
+- Agent Ops **overview Schedules**: Last delivery is a clickable row — opens Schedules, selects the matching delivery, and shows preview + Load into AI Chat status (schedule-row overview parity).
+
 ## [0.1.480] - 2026-08-17
 
 ### Changed
