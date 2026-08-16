@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00) shipped product UI polish. Digester open staye
 
 | Version | What |
 |---------|------|
+| **v0.1.449** | Agent Ops list tabs: true-empty title + short hint (schedules / deliveries / agents / sessions / knowledge / runs) |
 | **v0.1.448** | Monitors URL click-to-copy + Copied flash (list + detail) |
 | **v0.1.447** | Agent Ops list selection: accent wash for ↑/↓ · j/k · click focus |
 | **v0.1.446** | Agent Ops overview empty cards: Open Schedules / Sessions / Knowledge CTAs |
@@ -27,4 +28,4 @@ Overnight Track B (20:00–06:00) shipped product UI polish. Digester open staye
 
 ## Ratchet
 
-Keeps landed in `~/.mac-stats/improvements/autoresearch/results.tsv` (nightly minimum met).
+Keeps landed in `~/.mac-stats/improvements/autoresearch/results.tsv` (nightly minimum met). Latest: **v0.1.449** Agent Ops tab true-empty title+hint.
