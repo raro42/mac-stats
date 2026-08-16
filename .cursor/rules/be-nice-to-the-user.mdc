@@ -10,8 +10,9 @@ User-facing words should feel warm, clear, and human. Do not sound like a build 
 ## Do
 
 - Prefer short, friendly phrases people can remember.
+- Prefer welcome tone over status tone for titles, taglines, and empty states.
+- A little warmth or light sarcasm is fine if it still feels kind (see README tagline).
 - Put the **version in the footer / About**, not in the window title chrome.
-- Prefer welcome tone over status tone for titles and empty states.
 - Keep ASD-STE100: short sentences, active voice, simple words.
 
 ## Do not
