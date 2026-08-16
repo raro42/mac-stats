@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-16
 
-Overnight Track B (20:00–06:00 local) strengthened the product with keep rows through **v0.1.444**.
+Overnight Track B (20:00–06:00 local) strengthened the product with keep rows through **v0.1.445**.
 
 ## Shipped (selected)
 
@@ -20,13 +20,14 @@ Overnight Track B (20:00–06:00 local) strengthened the product with keep rows 
 | v0.1.441 | Debug Log path hint click-to-copy + Copied flash |
 | v0.1.442 | Settings product toggles Saved flash after persist |
 | v0.1.443 | Agent Ops filter-miss empty states: Clear filter + filter-field highlight |
-| **v0.1.444** | **Disk Cleanup soft-delete (Move to Trash): Saved flash after persist** |
+| v0.1.444 | Disk Cleanup soft-delete (Move to Trash): Saved flash after persist |
+| **v0.1.445** | **Top Processes detail: PID click-to-copy + Copied flash** |
 
-## Latest tick (~01:58)
+## Latest tick (~02:23)
 
-- Digester open = overnight design review (`feature-agent-ops.png` stale 3.7d); design-review already used tonight; debug.log quiet.
-- Fuel: standing backlog P1 UX — soft-delete toggle had silent save after Clear filter (v0.1.443).
-- **Keep v0.1.444** — Saved flash + busy-guard on Move cleaned items to Trash.
+- Digester open = overnight design review (`feature-agent-ops.png` stale 3.7d); design-review already used tonight (v0.1.443); debug.log quiet.
+- Fuel: standing backlog P1 UX — process detail PID was display-only after soft-delete Saved flash (v0.1.444); non-Disk-Cleanup-adjacent.
+- **Keep v0.1.445** — click/Enter/Space copies PID + Copied flash; busy-guard while flashing; survives live detail refresh.
 - Recapture of `docs/screens/feature-agent-ops.png` still deferred if Screen Recording TCC blocks.
 - Verify green → keep → install → Discord Ready after kickstart.
 
