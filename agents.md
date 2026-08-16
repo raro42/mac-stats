@@ -185,6 +185,7 @@ pgrep -f mac_stats >/dev/null || open -a mac-stats
   - document how to breakpoint `objc_exception_throw`, `__cxa_throw`, `abort`
 
 ## UI Guidelines
+- **Be nice to the user**: warm, memorable copy; see `.cursor/rules/be-nice-to-the-user.mdc`. Window title: `mac-stats · glad you're here` (version lives in the footer, not the title bar).
 - Use macOS-like glass design:
   - backdrop blur + subtle borders + soft shadows
   - consistent spacing, typography, and units

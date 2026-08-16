@@ -2603,6 +2603,20 @@ button.is-just-saved,
   cursor: wait;
 }
 
+/* Icon link: hide text-underline deco from theme CSS */
+#github-link::after {
+  display: none !important;
+}
+
+/* Theme / app version → changelog — soft green Opened flash */
+.version-clickable.is-just-saved,
+.app-version.is-just-saved,
+.theme-version.is-just-saved,
+.arch-version.is-just-saved {
+  color: color-mix(in srgb, #34c759 75%, currentColor) !important;
+  pointer-events: none;
+}
+
 /* AI Chat system-prompt Reset to Default — soft green flash */
 #ollama-settings-reset.is-just-saved {
   background: color-mix(in srgb, #34c759 22%, transparent) !important;
