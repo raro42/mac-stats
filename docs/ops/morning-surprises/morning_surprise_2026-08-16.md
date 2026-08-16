@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00) shipped product UI polish. Digester open staye
 
 | Version | What |
 |---------|------|
+| **v0.1.447** | Agent Ops list selection: accent wash for ↑/↓ · j/k · click focus |
 | **v0.1.446** | Agent Ops overview empty cards: Open Schedules / Sessions / Knowledge CTAs |
 | **v0.1.445** | Top Processes detail PID click-to-copy + Copied flash |
 | **v0.1.444** | Disk Cleanup soft-delete (Move to Trash) Saved flash |
@@ -21,7 +22,7 @@ Overnight Track B (20:00–06:00) shipped product UI polish. Digester open staye
 
 ## Tried / deferred
 
-- `docs/screens/feature-agent-ops.png` and `feature-cpu-metrics.png` still stale (~3.7d) when Screen Recording TCC blocks `screencapture -l`.
+- `docs/screens/feature-agent-ops.png` and `feature-cpu-metrics.png` still stale (~3.8d) when Screen Recording / Accessibility TCC blocks `screencapture -l` / System Events probes.
 
 ## Ratchet
 
