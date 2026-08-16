@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Root [LICENSE](LICENSE) (MIT) and [CONTRIBUTING.md](CONTRIBUTING.md); README and Cargo.toml point at them.
+
 ## [0.1.459] - 2026-08-16
 
 ### Added

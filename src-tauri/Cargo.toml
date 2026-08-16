@@ -4,6 +4,7 @@ version = "0.1.459"
 description = "Local AI agent for macOS (Rust + Tauri): Ollama chat, Discord bot, task runner, scheduler, MCP—all on your Mac. No cloud, no telemetry. Menu bar shows CPU/GPU/RAM/disk when you need it; website monitoring and alerts. Built for minimal CPU overhead."
 authors = ["raro42"]
 edition = "2021"
+license = "MIT"
 default-run = "mac_stats"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

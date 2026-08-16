@@ -5,7 +5,7 @@
 [![GitHub release](https://img.shields.io/github/v/release/raro42/mac-stats?include_prereleases&style=flat-square)](https://github.com/raro42/mac-stats/releases/latest)
 [![CI](https://img.shields.io/github/actions/workflow/status/raro42/mac-stats/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/raro42/mac-stats/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/actions/workflow/status/raro42/mac-stats/release.yml?event=release&label=release&style=flat-square)](https://github.com/raro42/mac-stats/actions/workflows/release.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
 [![Rust](https://img.shields.io/badge/Rust-000000?style=flat-square&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![Tauri](https://img.shields.io/badge/Tauri-24C8DB?style=flat-square&logo=tauri&logoColor=white)](https://tauri.app/)
@@ -25,7 +25,7 @@ Two products in one binary — pick your path:
 | Needs | macOS on Apple Silicon | + [Ollama](https://ollama.com) + a model |
 | Config | Zero — AI is **off by default** | Set `aiAgentEnabled: true` or use Settings |
 
-📋 [Changelog](CHANGELOG.md) · ✨ [Features](FEATURES.md) · 📘 [Getting Started](docs/GETTING_STARTED.md) · 🗺 [Roadmap](docs/ROADMAP.md) · 🍺 [Homebrew](docs/homebrew.md) · 🌐 [Landing](docs/site/index.html) · 🔬 [How we compare](docs/042_how_we_compare.md)
+📋 [Changelog](CHANGELOG.md) · ✨ [Features](FEATURES.md) · 📘 [Getting Started](docs/GETTING_STARTED.md) · 🗺 [Roadmap](docs/ROADMAP.md) · 🍺 [Homebrew](docs/homebrew.md) · 🌐 [Landing](docs/site/index.html) · 🔬 [How we compare](docs/042_how_we_compare.md) · 🤝 [Contributing](CONTRIBUTING.md)
 
 ## Table of contents
 
@@ -233,7 +233,7 @@ git checkout v0.1.257   # pin when possible
 
 Requires Rust + Xcode CLT (macOS Tauri). Checksums: `./scripts/print-release-checksums.sh v0.1.257`.
 
-Contributor docs: [docs/design/](docs/design/). Workflow: [docs/agent_workflow.md](docs/agent_workflow.md).
+Contributor docs: [docs/design/](docs/design/). Workflow: [docs/agent_workflow.md](docs/agent_workflow.md). How to contribute: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
@@ -241,4 +241,6 @@ Contributor docs: [docs/design/](docs/design/). Workflow: [docs/agent_workflow.m
 
 [Discord](https://discord.com/users/687953899566530588) · [Discussions](https://github.com/raro42/mac-stats/discussions) · [Issues](https://github.com/raro42/mac-stats/issues) · [Feedback](https://github.com/raro42/mac-stats/issues/3)
 
-[MIT License](https://opensource.org/licenses/MIT)
+## License
+
+[MIT](LICENSE)
