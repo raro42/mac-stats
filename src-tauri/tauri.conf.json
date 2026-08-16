@@ -8,7 +8,8 @@
     "resources": [
       "dist/assets/ollama.svg",
       "dist/assets/javascript.svg",
-      "dist/assets/tauri.svg"
+      "dist/assets/tauri.svg",
+      "dist/assets/github.svg"
     ],
     "icon": [
       "icons/32x32.png",

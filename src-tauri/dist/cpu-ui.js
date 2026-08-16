@@ -586,6 +586,12 @@
     if (!githubLink) return;
 
     let githubOpenBusy = false;
+    if (!githubLink.getAttribute("title")) {
+      githubLink.setAttribute("title", "GitHub");
+    }
+    if (!githubLink.getAttribute("aria-label")) {
+      githubLink.setAttribute("aria-label", "Open mac-stats on GitHub");
+    }
 
     githubLink.addEventListener("click", async (e) => {
       e.preventDefault();
@@ -598,14 +604,12 @@
       }
 
       const url = githubLink.href;
-      const idleLabel =
-        githubLink._saveFlashOriginalLabel || githubLink.textContent || "GitHub";
-      githubLink._saveFlashOriginalLabel = idleLabel;
+      const idleTitle = githubLink.getAttribute("title") || "GitHub";
       githubOpenBusy = true;
       githubLink.setAttribute("aria-disabled", "true");
       githubLink.setAttribute("aria-busy", "true");
       githubLink.classList.remove("is-just-saved");
-      githubLink.textContent = "Opening…";
+      githubLink.setAttribute("title", "Opening…");
 
       let ok = false;
       const invoke = window.__TAURI__?.core?.invoke;
@@ -643,24 +647,16 @@
         githubOpenBusy = false;
         githubLink.removeAttribute("aria-busy");
         githubLink.removeAttribute("aria-disabled");
+        // Keep the local SVG icon — do not replace link contents with text.
         if (ok) {
-          if (typeof window.flashSaveButton === "function") {
-            window.flashSaveButton(githubLink, {
-              savedLabel: "Opened",
-              durationMs: 1600,
-            });
-          } else {
-            githubLink.classList.add("is-just-saved");
-            githubLink.textContent = "Opened";
-            setTimeout(() => {
-              githubLink.classList.remove("is-just-saved");
-              githubLink.textContent = idleLabel;
-              githubLink._saveFlashOriginalLabel = null;
-            }, 1600);
-          }
+          githubLink.classList.add("is-just-saved");
+          githubLink.setAttribute("title", "Opened");
+          setTimeout(() => {
+            githubLink.classList.remove("is-just-saved");
+            githubLink.setAttribute("title", idleTitle);
+          }, 1600);
         } else {
-          githubLink.textContent = idleLabel;
-          githubLink._saveFlashOriginalLabel = null;
+          githubLink.setAttribute("title", idleTitle);
         }
       }
     });

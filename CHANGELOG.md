@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.466] - 2026-08-16
+
+### Changed
+- Footer: replace “GitHub” text with a local SVG mark (no network fetch).
+
 ## [0.1.465] - 2026-08-16
 
 ### Fixed
