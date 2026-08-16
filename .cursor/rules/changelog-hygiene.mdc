@@ -1,0 +1,11 @@
+---
+description: Keep CHANGELOG.md user-facing; weekly hygiene, no agent spam
+alwaysApply: true
+---
+
+# CHANGELOG hygiene
+
+- `CHANGELOG.md` = Keep a Changelog for **users**, not agent run logs.
+- Never append OpenClaw-reviewer ticks, `DIGEST_SHA256`, or repeated tester CLOSED↔TESTING paperwork.
+- Exactly one `## [Unreleased]`. Archive noise to `docs/changelog-archive-agent-noise.md` if needed.
+- Weekly owner: Monday ~10:00 schedule + skill `changelog-weekly-review` (`docs/040_changelog_hygiene.md`).

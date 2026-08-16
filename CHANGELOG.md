@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.467] - 2026-08-16
+
+### Changed
+- Window title is now **mac-stats · glad you're here** (version stays in the footer). Rule: `.cursor/rules/be-nice-to-the-user.mdc`.
+
 ## [0.1.466] - 2026-08-16
 
 ### Changed

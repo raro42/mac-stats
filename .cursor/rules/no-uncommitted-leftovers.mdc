@@ -1,0 +1,33 @@
+---
+description: Never leave finished work uncommitted; nightly 23:00 flush
+alwaysApply: true
+---
+
+# No uncommitted leftovers
+
+Do **not** leave finished work sitting dirty in the tree.
+
+## When work is finished
+
+As soon as a coherent task is done (feature, fix, docs, rule):
+
+1. **Commit** (no agent attribution / `Co-authored-by`)
+2. **Push** to `origin` (`git push origin HEAD`) unless secrets, red build, or explicit “local only”
+
+Do not wait for the user to say “commit” or “push” when the task itself is complete and project rules already require unattended ship discipline (overnight harness, this rule).
+
+## Nightly safety net (~23:00 local)
+
+The overnight harness loop runs a **pending git flush** around **23:00**:
+
+- If the working tree is dirty → stage safe files, commit, push
+- Skip secrets (`.env`, `.config.env`, credentials, private keys)
+- Skip if `cargo check` is known-broken for the pending Rust changes (fix first when practical)
+
+Agents must still commit when finishing work; 23:00 is a backstop, not the primary path.
+
+## Related
+
+- `.cursor/rules/push-when-reasonable.mdc`
+- `scripts/run_overnight_harness_loop.py` (23:00 flush)
+- `scripts/overnight_git_flush.py`

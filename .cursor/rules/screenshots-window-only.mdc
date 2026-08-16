@@ -1,0 +1,12 @@
+---
+description: Window-only screenshots; wait 30s for graphs before capturing mac-stats UI
+alwaysApply: true
+---
+
+# mac-stats screenshots & demo video
+
+When capturing marketing / `docs/screens/` assets for the CPU window or feature UI:
+
+- **Window only** — capture the mac-stats window (or an isolated feature page). Never full-display grabs (`screencapture -D`, whole-desktop ffmpeg). Delete any accidental desktop probes immediately.
+- **Warm-up ≥ 30 seconds** — after opening the CPU window (`--cpu` or menu bar), wait **at least 30 seconds** before shooting so temperature/usage/frequency sparklines and gauges have real history and look filled-in. Do not capture on a cold open (empty/flat graphs).
+- Prefer ScreenCaptureKit / `screencapture -l <windowid>` for the mac-stats window. See `docs/screens/README.md`.

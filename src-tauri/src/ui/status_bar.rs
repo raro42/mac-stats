@@ -720,7 +720,7 @@ pub fn create_cpu_window(app_handle: &tauri::AppHandle) {
 
     let cpu_window =
         WebviewWindowBuilder::new(app_handle, "cpu", WebviewUrl::App(cpu_url.into()))
-            .title(format!("mac-stats {}", env!("CARGO_PKG_VERSION")))
+            .title("mac-stats · glad you're here")
             .visible(true) // Show immediately when created
             .inner_size(w, h)
             .resizable(true)

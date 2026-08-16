@@ -1,0 +1,46 @@
+---
+description: Be nice to the user in product copy, titles, and UI wording
+alwaysApply: true
+---
+
+# Be nice to the user
+
+User-facing words should feel warm, clear, and human. Do not sound like a build log or a corporate brochure.
+
+## Do
+
+- Prefer short, friendly phrases people can remember.
+- Put the **version in the footer / About**, not in the window title chrome.
+- Prefer welcome tone over status tone for titles and empty states.
+- Keep ASD-STE100: short sentences, active voice, simple words.
+
+## Do not
+
+- Put raw version strings in the main window title (e.g. `mac-stats 0.1.465`).
+- Use cold engineering labels when a kinder phrase works (`CPU` alone as the whole product name in the title bar).
+- Write filler praise ("Great question!") or stiff handbook prose.
+
+## Window title
+
+Default CPU window title:
+
+```text
+mac-stats · glad you're here
+```
+
+Keep that string (or an equally warm successor) in sync in:
+
+- `src-tauri/src/ui/status_bar.rs` (Tauri `.title(...)`)
+- `src/cpu.js` (`document.title`)
+- theme `<title>` tags when you touch them
+
+## Examples
+
+```text
+❌ mac-stats 0.1.465
+❌ CPU
+✅ mac-stats · glad you're here
+
+❌ No data available at this time
+✅ Nothing here yet — check back after a moment
+```

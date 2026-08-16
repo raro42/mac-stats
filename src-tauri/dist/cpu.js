@@ -1363,7 +1363,7 @@ if (document.readyState === "loading") {
     try {
       appVersion = await invoke("get_app_version");
       try {
-        document.title = `mac-stats ${appVersion}`;
+        document.title = "mac-stats · glad you're here";
       } catch (_) {}
       try {
         const prev = localStorage.getItem("macStatsAssetVersion");

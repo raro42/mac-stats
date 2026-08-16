@@ -1,0 +1,32 @@
+---
+description: Push local commits to origin when reasonable (no need to ask)
+alwaysApply: true
+---
+
+# Push when reasonable
+
+Do **not** wait for the user to ask before pushing. After local commits that are ready to share, push to `origin` when it is reasonable.
+
+## When to push (do it)
+
+- Overnight / harness ticks after a versioned ship commit (`v0.1.x`)
+- A coherent feature, fix, or refactor set is committed and builds
+- User said to push, or previously asked for unattended push discipline
+- Branch is ahead of `origin` and the work is not an unfinished experiment
+
+Prefer: commit → (install/verify if runtime) → **`git push -u origin HEAD`** (or `git push origin <branch>`).
+
+## When not to push
+
+- Secrets, credentials, or `.env` in the commit
+- Broken `cargo check` / known red build
+- Explicit user “local only” / “don’t push yet”
+- Rewriting history that would need force-push to `main`/`master` (never force-push those unless the user explicitly demands it)
+
+## Releases
+
+Pushing commits ≠ cutting a GitHub Release. Create a release only when the user asks, or when a ship clearly warrants a tagged release and prior practice on the repo matches that.
+
+## Commits
+
+Still follow normal commit hygiene (no `Co-authored-by` / agent attribution). When a task is **finished**, commit and push without waiting to be asked — see `.cursor/rules/no-uncommitted-leftovers.mdc`. Nightly ~23:00 harness flush is a backstop only.

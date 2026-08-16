@@ -1,0 +1,17 @@
+---
+description: When a clear bug or performance problem is found, fix it — do not ask for permission
+alwaysApply: true
+---
+
+# Fix, don't ask
+
+When you discover a clear bug, performance problem, or broken behavior while investigating:
+
+- **Fix it immediately.** Do not ask "want me to fix this?" or wait for confirmation.
+- Report what you found and what you changed.
+- Only ask when the fix is ambiguous (multiple valid approaches with real trade-offs), destructive, or outside the current task scope in a way that would surprise the user.
+
+```text
+❌ BAD: "The stall is from check_monitor on open. Want me to fix it?"
+✅ GOOD: Fix it, then briefly explain cause + change.
+```

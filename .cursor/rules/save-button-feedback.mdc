@@ -1,0 +1,20 @@
+---
+description: Save buttons must show brief visual confirmation
+alwaysApply: true
+---
+
+# Save button feedback
+
+When the user presses a **Save** (or equivalent persist) control in the UI:
+
+1. On success, give **visible confirmation** on the control itself (label and/or style change).
+2. Revert to the normal label/style after a **short delay** (~1.5–2s).
+3. Prefer a shared helper (e.g. `flashSaveButton(btn)`) over one-off copy.
+4. Do not rely on silent success — no “did it save?” ambiguity.
+5. On failure, keep the error path (alert / inline error); do not show the saved flash.
+
+Example pattern:
+
+```js
+flashSaveButton(saveBtn); // → "Saved" + .is-just-saved, then restore
+```
