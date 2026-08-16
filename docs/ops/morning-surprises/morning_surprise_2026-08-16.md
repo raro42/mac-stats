@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00) shipped product UI polish. Digester open staye
 
 | Version | What |
 |---------|------|
+| **v0.1.448** | Monitors URL click-to-copy + Copied flash (list + detail) |
 | **v0.1.447** | Agent Ops list selection: accent wash for ↑/↓ · j/k · click focus |
 | **v0.1.446** | Agent Ops overview empty cards: Open Schedules / Sessions / Knowledge CTAs |
 | **v0.1.445** | Top Processes detail PID click-to-copy + Copied flash |
