@@ -152,6 +152,7 @@
   let opsRunsFilterQ = '';
   let opsRunsInsightsCache = null;
   let opsRunLoadQuestion = null;
+  let opsScheduleLoadText = null;
   let opsAgentsFilterQ = '';
   let opsAgentsCache = [];
   let opsSchedulesFilterQ = '';
@@ -349,6 +350,7 @@ function setupAgentOps() {
                 }
                 if (tryOpsSessionEnterLoad(e)) return;
                 if (tryOpsRunsEnterLoad(e)) return;
+                if (tryOpsSchedulesEnterLoad(e)) return;
                 if (tryOpsMemoryEnter(e)) return;
                 if (tryOpsRunsEnter(e)) return;
                 if (tryOpsAgentsEnter(e)) return;
@@ -1143,19 +1145,146 @@ function renderOverviewRecent(files) {
 }
 
 /** Show full schedule or delivery text (rows truncate task/summary). */
-function showOpsSchedulePreview(text, copyValue) {
+function showOpsSchedulePreview(text, copyValue, loadText) {
     const preview = document.getElementById('ops-schedule-preview');
     if (!preview) return;
     const body = String(text || '').trim();
     if (!body) {
         preview.hidden = true;
         preview.textContent = '';
+        opsScheduleLoadText = null;
         setOpsScheduleCopyChip(null);
+        setOpsScheduleLoadChatVisible(false);
+        showOpsScheduleLoadStatus('', true);
         return;
     }
     preview.hidden = false;
     preview.textContent = body.slice(0, 12000);
     setOpsScheduleCopyChip(copyValue);
+    const q = String(loadText || '').trim();
+    opsScheduleLoadText = q && q !== '(empty task)' && q !== '(empty summary)' ? q : null;
+    setOpsScheduleLoadChatVisible(!!opsScheduleLoadText);
+    if (opsScheduleLoadText) {
+        showOpsScheduleLoadStatus('Preview ready — Enter or “Load into AI Chat” · double-click also loads.', true);
+    } else {
+        showOpsScheduleLoadStatus('', true);
+    }
+}
+
+/** Load-into-chat control under the Schedules preview (Sessions/Runs parity). */
+function ensureOpsScheduleLoadChatBtn() {
+    let el = document.getElementById('ops-schedules-load-chat');
+    if (el) return el;
+    const preview = document.getElementById('ops-schedule-preview');
+    if (!preview || !preview.parentNode) return null;
+    el = document.createElement('button');
+    el.type = 'button';
+    el.id = 'ops-schedules-load-chat';
+    el.className = 'btn-secondary ops-schedules-load-chat';
+    el.hidden = true;
+    el.textContent = 'Load into AI Chat ↵';
+    el.title = 'Put this schedule task or delivery summary into AI Chat (Enter)';
+    el.setAttribute('aria-label', 'Load schedule task into AI Chat');
+    preview.parentNode.insertBefore(el, preview.nextSibling);
+    el.addEventListener('click', () => loadOpsScheduleIntoChat());
+    return el;
+}
+
+function setOpsScheduleLoadChatVisible(visible) {
+    const el = ensureOpsScheduleLoadChatBtn();
+    if (!el) return;
+    el.hidden = !visible;
+    if (!visible) {
+        el.classList.remove('is-just-saved');
+        if (!el._saveFlashOriginalLabel) {
+            el.textContent = 'Load into AI Chat ↵';
+        }
+    }
+}
+
+function showOpsScheduleLoadStatus(msg, ok) {
+    let el = document.getElementById('ops-schedules-load-status');
+    const loadBtn = ensureOpsScheduleLoadChatBtn();
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'ops-schedules-load-status';
+        el.className = 'ops-row-meta';
+        el.style.margin = '6px 4px 0';
+        if (loadBtn?.parentNode) {
+            loadBtn.parentNode.insertBefore(el, loadBtn.nextSibling);
+        }
+    }
+    el.textContent = msg || '';
+    el.style.opacity = msg ? '0.9' : '0';
+    el.style.color = ok === false ? 'rgba(200,60,60,0.95)' : '';
+}
+
+/** Put the previewed schedule task or delivery summary into AI Chat. */
+function loadOpsScheduleIntoChat() {
+    const loadBtn = ensureOpsScheduleLoadChatBtn();
+    if (loadBtn?.classList.contains('is-just-saved')) return;
+    const q = String(opsScheduleLoadText || '').trim();
+    if (!q) {
+        showOpsScheduleLoadStatus('Select a schedule or delivery with text first.', false);
+        return;
+    }
+    const aiOff =
+        document.getElementById('icon-ollama')?.style.pointerEvents === 'none' ||
+        document.getElementById('ollama-section')?.style.display === 'none';
+    if (aiOff) {
+        showOpsScheduleLoadStatus('Enable local AI agent in Settings to load into chat.', false);
+        return;
+    }
+    const input = document.getElementById('chat-input');
+    if (!input) {
+        showOpsScheduleLoadStatus('AI Chat input not ready — open AI Chat once, then retry.', false);
+        return;
+    }
+    input.value = q;
+    try {
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+    } catch (_) {
+        /* ignore */
+    }
+    const section = document.querySelector('.ollama-section');
+    const themeCollapsed =
+        section?.classList.contains('collapsed') ||
+        localStorage.getItem('ollama_collapsed') === 'true';
+    if (themeCollapsed) {
+        document.getElementById('ollama-header')?.click();
+    }
+    const content = document.getElementById('ollama-content');
+    const btn = document.getElementById('ollama-collapse-btn');
+    if (content) {
+        content.classList.remove('collapsed');
+        if (content.style.display === 'none') content.style.display = '';
+    }
+    if (section) section.classList.remove('collapsed');
+    if (btn) btn.textContent = '−';
+    section?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => {
+        input.focus();
+        try {
+            const len = input.value.length;
+            input.setSelectionRange(len, len);
+        } catch (_) {
+            /* ignore */
+        }
+    }, 80);
+    showOpsScheduleLoadStatus('Loaded into AI Chat.', true);
+    if (loadBtn && !loadBtn.hidden) {
+        if (typeof window.flashSaveButton === 'function') {
+            window.flashSaveButton(loadBtn, { savedLabel: 'Loaded', durationMs: 1600 });
+        } else {
+            const idle = loadBtn.textContent || 'Load into AI Chat ↵';
+            loadBtn.classList.add('is-just-saved');
+            loadBtn.textContent = 'Loaded';
+            setTimeout(() => {
+                loadBtn.classList.remove('is-just-saved');
+                loadBtn.textContent = idle;
+            }, 1600);
+        }
+    }
 }
 
 /** Click-to-copy schedule id above the Schedules preview (Copied flash). */
@@ -1273,12 +1402,19 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 const next = s.next_run || s.nextRun || '—';
                 const task = String(s.task || '');
                 btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">${escapeHtml(when)} · next ${escapeHtml(next)}</div><div class="ops-row-meta">${escapeHtml(task.slice(0, 80))}${task.length > 80 ? '…' : ''}</div></div>`;
-                btn.title = 'Click to preview full schedule task';
-                btn.addEventListener('click', () => {
+                btn.title = 'Click to preview · Enter / double-click to load task into AI Chat';
+                const openPreview = () => {
                     list.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
                     delList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
                     btn.classList.add('is-selected');
-                    showOpsSchedulePreview(formatOpsSchedulePreview(s), s.id || '');
+                    const task = String(s?.task || '').trim();
+                    showOpsSchedulePreview(formatOpsSchedulePreview(s), s.id || '', task);
+                };
+                btn.addEventListener('click', openPreview);
+                btn.addEventListener('dblclick', (e) => {
+                    e.preventDefault();
+                    openPreview();
+                    loadOpsScheduleIntoChat();
                 });
                 list.appendChild(btn);
             });
@@ -1307,12 +1443,19 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 const age = !Number.isNaN(t) ? fmtAge(t) : d.utc || '';
                 const summary = String(d.summary || '');
                 btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(d.schedule_id || 'schedule')}</div><div class="ops-row-meta">${escapeHtml(age)} · ${escapeHtml(summary.slice(0, 72))}${summary.length > 72 ? '…' : ''}</div></div>`;
-                btn.title = 'Click to preview full delivery summary';
-                btn.addEventListener('click', () => {
+                btn.title = 'Click to preview · Enter / double-click to load summary into AI Chat';
+                const openPreview = () => {
                     delList.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
                     list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
                     btn.classList.add('is-selected');
-                    showOpsSchedulePreview(formatOpsDeliveryPreview(d), d.schedule_id || '');
+                    const summary = String(d?.summary || '').trim();
+                    showOpsSchedulePreview(formatOpsDeliveryPreview(d), d.schedule_id || '', summary);
+                };
+                btn.addEventListener('click', openPreview);
+                btn.addEventListener('dblclick', (e) => {
+                    e.preventDefault();
+                    openPreview();
+                    loadOpsScheduleIntoChat();
                 });
                 delList.appendChild(btn);
             });
@@ -1757,9 +1900,7 @@ function tryOpsPreviewEscape(e) {
         closed = true;
     }
     if (schedulePreview && !schedulePreview.hidden) {
-        schedulePreview.hidden = true;
-        schedulePreview.textContent = '';
-        setOpsScheduleCopyChip(null);
+        showOpsSchedulePreview('');
         closed = true;
     }
     if (runsPreview && !runsPreview.hidden) {
@@ -1892,6 +2033,23 @@ function tryOpsAgentsEnter(e) {
     if (!selected) return false;
     e.preventDefault();
     selected.click();
+    return true;
+}
+
+/** Enter loads the previewed schedule task / delivery summary when ready (Sessions/Runs parity). */
+function tryOpsSchedulesEnterLoad(e) {
+    if (agentOpsCollapsed) return false;
+    const panel = document.getElementById('ops-panel-schedules');
+    if (!panel || !panel.classList.contains('active')) return false;
+    const loadBtn = document.getElementById('ops-schedules-load-chat');
+    if (!loadBtn || loadBtn.hidden || !opsScheduleLoadText) return false;
+    if (loadBtn.classList.contains('is-just-saved')) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    if (tag === 'TEXTAREA') return false;
+    if (tag === 'INPUT' && t.id && t.id !== 'ops-schedules-filter') return false;
+    e.preventDefault();
+    loadOpsScheduleIntoChat();
     return true;
 }
 
