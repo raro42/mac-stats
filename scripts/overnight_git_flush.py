@@ -64,10 +64,35 @@ def paths_from_porcelain(lines: list[str]) -> list[str]:
     return paths
 
 
+def refresh_star_history() -> None:
+    """Regenerate star-history.svg when GitHub stars changed (no empty rewrites)."""
+    script = ROOT / "scripts" / "generate_star_history_svg.py"
+    if not script.is_file():
+        return
+    proc = run(["python3", str(script)], check=False)
+    out = (proc.stdout or "").strip()
+    err = (proc.stderr or "").strip()
+    if out:
+        print(f"overnight_git_flush: star-history {out}")
+    if proc.returncode != 0:
+        print(
+            f"overnight_git_flush: star-history refresh failed (exit {proc.returncode})",
+            file=sys.stderr,
+        )
+        if err:
+            print(err, file=sys.stderr)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
+
+    # Nightly: refresh the README star chart before the flush decision.
+    if not args.dry_run:
+        refresh_star_history()
+    else:
+        print("overnight_git_flush: dry-run — skip star-history refresh")
 
     lines = porcelain()
     if not lines:

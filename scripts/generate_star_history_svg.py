@@ -2,19 +2,29 @@
 """Build docs/screens/star-history.svg from GitHub stargazer timestamps.
 
 Requires `gh` authenticated for this repo (owner/collaborator).
-Usage: python3 scripts/generate_star_history_svg.py
+
+Usage:
+  python3 scripts/generate_star_history_svg.py
+  python3 scripts/generate_star_history_svg.py --force
+
+Rewrites the SVG only when the star list changes (fingerprint), so nightly
+runs do not create empty commits.
 """
 
 from __future__ import annotations
 
+import argparse
+import hashlib
 import json
+import re
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 REPO = "raro42/mac-stats"
 OUT = Path(__file__).resolve().parents[1] / "docs" / "screens" / "star-history.svg"
+FINGERPRINT_RE = re.compile(r"<!-- star-fingerprint:([0-9a-f]+) -->")
 
 
 def fetch_starred_at() -> list[datetime]:
@@ -39,6 +49,18 @@ def fetch_starred_at() -> list[datetime]:
     return times
 
 
+def fingerprint(times: list[datetime]) -> str:
+    payload = "\n".join(t.isoformat() for t in times)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+
+
+def read_existing_fingerprint() -> str | None:
+    if not OUT.exists():
+        return None
+    m = FINGERPRINT_RE.search(OUT.read_text(encoding="utf-8"))
+    return m.group(1) if m else None
+
+
 def cumulative(times: list[datetime]) -> list[tuple[datetime, int]]:
     return [(t, i + 1) for i, t in enumerate(times)]
 
@@ -52,7 +74,7 @@ def svg_path(points: list[tuple[float, float]]) -> str:
     return " ".join(parts)
 
 
-def render(points: list[tuple[datetime, int]]) -> str:
+def render(points: list[tuple[datetime, int]], fp: str) -> str:
     width, height = 720, 220
     pad_l, pad_r, pad_t, pad_b = 48, 24, 36, 40
     plot_w = width - pad_l - pad_r
@@ -60,6 +82,7 @@ def render(points: list[tuple[datetime, int]]) -> str:
 
     if not points:
         return (
+            f"<!-- star-fingerprint:{fp} -->\n"
             f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
             f'role="img" aria-label="Star growth chart (no stars yet)">'
             f'<rect width="100%" height="100%" fill="#fafafa" rx="12"/>'
@@ -80,20 +103,15 @@ def render(points: list[tuple[datetime, int]]) -> str:
         y = pad_t + plot_h - (count / ymax) * plot_h
         xy.append((x, y))
 
-    # Extend flat to "now" so the line doesn't stop mid-plot.
-    now = datetime.now(timezone.utc)
-    if now > t1:
-        x_now = pad_l + min(1.0, (now - t0).total_seconds() / span) * plot_w
-        xy.append((x_now, xy[-1][1]))
-
     line = svg_path(xy)
     area = line + f" L {xy[-1][0]:.1f} {pad_t + plot_h:.1f} L {xy[0][0]:.1f} {pad_t + plot_h:.1f} Z"
     last = points[-1]
     title = f"Star growth — {n} ★"
     subtitle = f"Since {t0.date().isoformat()} · last star {last[0].date().isoformat()}"
+    end_label = t1.date().isoformat()
 
-    # Light-friendly chart (GitHub README default). Soft teal line.
     return f"""\
+<!-- star-fingerprint:{fp} -->
 <svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}"
   role="img" aria-label="{title}">
   <title>{title}</title>
@@ -125,22 +143,46 @@ def render(points: list[tuple[datetime, int]]) -> str:
   <text x="{pad_l}" y="{height - 12}" fill="#6e6e73"
     font-family="ui-sans-serif, system-ui, sans-serif" font-size="10">{t0.date().isoformat()}</text>
   <text x="{pad_l + plot_w}" y="{height - 12}" text-anchor="end" fill="#6e6e73"
-    font-family="ui-sans-serif, system-ui, sans-serif" font-size="10">now</text>
+    font-family="ui-sans-serif, system-ui, sans-serif" font-size="10">{end_label}</text>
 </svg>
 """
 
 
 def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--force",
+        action="store_true",
+        help="Rewrite SVG even when the star fingerprint is unchanged",
+    )
+    args = ap.parse_args()
+
     try:
         times = fetch_starred_at()
     except subprocess.CalledProcessError as exc:
         print(f"gh api failed: {exc}", file=sys.stderr)
         return 1
-    chart = render(cumulative(times))
+
+    fp = fingerprint(times)
+    existing = read_existing_fingerprint()
+    if not args.force and existing == fp:
+        print(json.dumps({"repo": REPO, "stars": len(times), "changed": False, "fingerprint": fp}))
+        return 0
+
+    chart = render(cumulative(times), fp)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(chart, encoding="utf-8")
-    meta = {"repo": REPO, "stars": len(times), "out": str(OUT)}
-    print(json.dumps(meta))
+    print(
+        json.dumps(
+            {
+                "repo": REPO,
+                "stars": len(times),
+                "changed": True,
+                "fingerprint": fp,
+                "out": str(OUT),
+            }
+        )
+    )
     return 0
 
 

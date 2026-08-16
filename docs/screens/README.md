@@ -39,7 +39,9 @@ Also linked from the [project README](../../README.md#demo-video).
 
 [`star-history.svg`](star-history.svg) — cumulative GitHub stars for the README / landing banner.
 
-Regenerate (needs `gh` auth as owner/collaborator):
+**Daily refresh:** the overnight harness (~23:00) runs `scripts/overnight_git_flush.py`, which calls `scripts/generate_star_history_svg.py`. The SVG updates only when the star list changes, then the flush commits and pushes if the tree is dirty.
+
+Manual:
 
 ```bash
 python3 scripts/generate_star_history_svg.py
