@@ -902,10 +902,37 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .process-detail-pid {
+  display: inline-block;
   margin-top: 4px;
+  padding: 0 4px;
+  margin-left: -4px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
   opacity: 0.62;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+}
+.process-detail-pid:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.process-detail-pid:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  outline-offset: 2px;
+  opacity: 1;
+}
+.process-detail-pid.is-just-saved {
+  color: #34c759;
+  opacity: 1;
+  text-decoration: none;
+  background: color-mix(in srgb, #34c759 12%, transparent);
 }
 
 .process-detail-section {

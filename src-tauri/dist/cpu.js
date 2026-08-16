@@ -1744,11 +1744,20 @@ function populateProcessDetailsBody(body, details, pid) {
           saveFlashOriginal: prevQuitBtn._saveFlashOriginalLabel ?? null,
         }
       : null;
+    const prevPidEl = body.querySelector(".process-detail-pid");
+    const pidUi = prevPidEl
+      ? {
+          classJustSaved: prevPidEl.classList.contains("is-just-saved"),
+          text: prevPidEl.textContent || `PID ${details.pid}`,
+          saveFlashOriginal: prevPidEl._saveFlashOriginalLabel ?? null,
+          saveFlashTimer: prevPidEl._saveFlashTimer ?? null,
+        }
+      : null;
     
     body.innerHTML = `
       <div class="process-detail-hero">
         <div class="process-detail-name">${name}</div>
-        <div class="process-detail-pid">PID ${details.pid}</div>
+        <button type="button" class="process-detail-pid" title="Click to copy PID" aria-label="Copy PID ${details.pid}">PID ${details.pid}</button>
       </div>
       <div class="process-detail-section">
         <div class="process-detail-row">
@@ -1810,6 +1819,58 @@ function populateProcessDetailsBody(body, details, pid) {
         </details>
       </div>
     `;
+
+    const pidEl = body.querySelector(".process-detail-pid");
+    if (pidEl) {
+      const idlePidLabel = `PID ${details.pid}`;
+      pidEl._saveFlashOriginalLabel =
+        (pidUi && pidUi.saveFlashOriginal) || idlePidLabel;
+      if (pidUi && pidUi.classJustSaved) {
+        pidEl.classList.add("is-just-saved");
+        pidEl.textContent = pidUi.text || "Copied";
+        if (pidUi.saveFlashTimer) {
+          clearTimeout(pidUi.saveFlashTimer);
+        }
+        pidEl._saveFlashTimer = setTimeout(() => {
+          pidEl.classList.remove("is-just-saved");
+          pidEl.textContent = idlePidLabel;
+          pidEl._saveFlashOriginalLabel = idlePidLabel;
+          pidEl._saveFlashTimer = null;
+        }, 1600);
+      }
+      const copyPid = async (e) => {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        if (pidEl.classList.contains("is-just-saved")) return;
+        const ok = await copyTextToClipboard(String(details.pid));
+        if (!ok) {
+          alert("Could not copy PID.");
+          return;
+        }
+        if (typeof flashSaveButton === "function") {
+          flashSaveButton(pidEl, { savedLabel: "Copied", durationMs: 1600 });
+        } else {
+          pidEl._saveFlashOriginalLabel = idlePidLabel;
+          pidEl.classList.add("is-just-saved");
+          pidEl.textContent = "Copied";
+          clearTimeout(pidEl._saveFlashTimer);
+          pidEl._saveFlashTimer = setTimeout(() => {
+            pidEl.classList.remove("is-just-saved");
+            pidEl.textContent = idlePidLabel;
+            pidEl._saveFlashOriginalLabel = null;
+            pidEl._saveFlashTimer = null;
+          }, 1600);
+        }
+      };
+      pidEl.addEventListener("click", copyPid);
+      pidEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          void copyPid(e);
+        }
+      });
+    }
     
     // Set up force quit button handler (remove old listeners first by cloning)
     const forceQuitBtn = document.getElementById("force-quit-process-btn");

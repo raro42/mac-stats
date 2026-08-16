@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.445] - 2026-08-16
+
+### Changed
+- Top Processes detail: click (or Enter/Space) the PID to copy it; shows a Copied flash and blocks double copy while flashing (survives live refresh).
+
 ## [0.1.444] - 2026-08-16
 
 ### Changed
