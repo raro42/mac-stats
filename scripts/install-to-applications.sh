@@ -10,6 +10,23 @@ DIST_SRC="$ROOT/src-tauri/dist"
 DIST_DST="$APP/Contents/Resources/dist"
 LABEL="gui/$(id -u)/com.raro42.mac-stats"
 
+# Tauri embeds frontendDist into the Mach-O at `cargo build` time. Copying
+# Resources/dist alone does NOT update what the WebView serves. Rebuild when
+# dist (or Cargo.toml) is newer than the release binary.
+need_rebuild=0
+if [[ ! -x "$BIN_SRC" ]]; then
+  need_rebuild=1
+elif [[ -d "$DIST_SRC" ]]; then
+  newer="$(find "$DIST_SRC" "$ROOT/src-tauri/Cargo.toml" -type f -newer "$BIN_SRC" 2>/dev/null | head -1 || true)"
+  if [[ -n "$newer" ]]; then
+    echo "frontendDist newer than release binary ($newer) — rebuilding so embed matches disk"
+    need_rebuild=1
+  fi
+fi
+if [[ "$need_rebuild" -eq 1 ]]; then
+  (cd "$ROOT/src-tauri" && cargo build --release)
+fi
+
 if [[ ! -x "$BIN_SRC" ]]; then
   echo "Missing $BIN_SRC — run: cd src-tauri && cargo build --release" >&2
   exit 1
@@ -34,6 +51,11 @@ fi
 echo "Release binary version check OK ($EXPECTED_VER)"
 
 cp -f "$BIN_SRC" "$APP/Contents/MacOS/mac_stats"
+if ! cmp -s "$BIN_SRC" "$APP/Contents/MacOS/mac_stats"; then
+  echo "ERROR: $APP/Contents/MacOS/mac_stats does not match $BIN_SRC after cp" >&2
+  ls -la "$BIN_SRC" "$APP/Contents/MacOS/mac_stats" >&2
+  exit 1
+fi
 # LaunchAgent / older docs may refer to mac-stats; keep a symlink after DMG installs (CFBundleExecutable is mac_stats).
 ln -sfn mac_stats "$APP/Contents/MacOS/mac-stats"
 if [[ -d "$DIST_SRC" && -d "$DIST_DST" ]]; then

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Data Poster: inactive section icons are near-white (were nearly invisible on dark UI).
+
+
 ### Added
 - README / landing **Star growth** banner with a local cumulative-star chart (`docs/screens/star-history.svg`; regenerate via `scripts/generate_star_history_svg.py`).
 - Nightly star-chart refresh from `overnight_git_flush.py` (updates SVG only when stars change).

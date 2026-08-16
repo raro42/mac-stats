@@ -111,7 +111,7 @@ body:hover {
     background-color 0.2s ease,
     border-color 0.2s ease,
     filter 0.2s ease;
-  opacity: 0.4;
+  opacity: 1;
 }
 
 #icon-monitors.section-open,
@@ -169,6 +169,40 @@ body:hover {
 #icon-agent-ops.status-warning {
   opacity: 1;
 }
+
+
+/* Data Poster: keep closed icons near-white (dark UI; no grey wash) */
+body.theme-data-poster #icon-monitors,
+body.theme-data-poster #icon-ollama,
+body.theme-data-poster #icon-perplexity,
+body.theme-data-poster #icon-logs,
+body.theme-data-poster #icon-disk-cleanup,
+body.theme-data-poster #icon-agent-ops {
+  opacity: 1;
+  color: rgba(255, 255, 255, 0.95);
+}
+body.theme-data-poster #icon-monitors.section-open,
+body.theme-data-poster #icon-ollama.section-open,
+body.theme-data-poster #icon-perplexity.section-open,
+body.theme-data-poster #icon-logs.section-open,
+body.theme-data-poster #icon-disk-cleanup.section-open,
+body.theme-data-poster #icon-agent-ops.section-open {
+  opacity: 1;
+  color: var(--accent, #55c7ff);
+}
+body.theme-data-poster #icon-discord.status-good,
+body.theme-data-poster #icon-monitors.status-good,
+body.theme-data-poster #icon-ollama.status-good,
+body.theme-data-poster #icon-perplexity.status-good,
+body.theme-data-poster #icon-logs.status-good,
+body.theme-data-poster #icon-agent-ops.status-good {
+  color: rgba(52, 199, 89, 0.95);
+}
+body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.status-warning) img {
+  filter: brightness(0) saturate(100%) invert(1);
+  opacity: 1;
+}
+
 
 /*
  * Do NOT flex-shrink Agent Ops inside the theme shell. With min-height:0 +

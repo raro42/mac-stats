@@ -509,7 +509,7 @@
         // sections also use .collapsed; keep icon row icons dimmed when off
         el.style.display = enabled ? "" : "none";
       } else if (el.classList.contains("icon-line-item")) {
-        el.style.opacity = enabled ? "" : "0.35";
+        el.style.opacity = enabled ? "" : "0.55";
         el.style.pointerEvents = enabled ? "" : "none";
         el.title = enabled ? el.title.replace(/ \(AI off\)$/, "") : (el.getAttribute("data-title-base") || el.title) + " (AI off)";
         if (!el.getAttribute("data-title-base")) el.setAttribute("data-title-base", el.title.replace(/ \(AI off\)$/, ""));
