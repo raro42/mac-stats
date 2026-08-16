@@ -1154,11 +1154,30 @@ function renderOverviewRecent(files) {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
             selectOpsTab('sessions');
+            const matchTitle = f.slug || f.name || '';
+            const list = document.getElementById('ops-session-files');
+            const liveList = document.getElementById('ops-live-sessions');
+            liveList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            let matchedRow = null;
+            list?.querySelectorAll('.ops-row').forEach((row) => {
+                const title = row.querySelector('.ops-row-title');
+                if (title && title.textContent === matchTitle) {
+                    matchedRow = row;
+                    row.classList.add('is-selected');
+                    row.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
             try {
                 const msgs = await invoke('read_session_file_messages', { path: f.path });
                 const copyId = f.slug || f.name || '';
                 if (msgs && msgs.length) {
+                    if (matchedRow) markOpsSessionRowSelected(matchedRow);
                     showOpsSessionPreview(msgs, f.name, copyId);
+                    showOpsSessionStatus(
+                        'Preview ready — Enter or “Load into AI Chat” · double-click also loads.',
+                        true
+                    );
                 } else {
                     const text = await invoke('read_session_file', { path: f.path });
                     const preview = document.getElementById('ops-session-preview');
@@ -1170,12 +1189,14 @@ function renderOverviewRecent(files) {
                     opsSessionLoadRows = null;
                     if (loadBtn) loadBtn.hidden = true;
                     setOpsSessionCopyChip(copyId);
+                    showOpsSessionStatus('No messages to load — raw file preview only.', false);
                 }
             } catch (err) {
                 showOpsSessionPreview([], String(err), null);
+                showOpsSessionStatus(String(err), false);
             }
         });
-        btn.title = 'Open in Sessions';
+        btn.title = 'Open in Sessions · preview chat · load into AI Chat from that tab';
         body.appendChild(btn);
     });
 }
