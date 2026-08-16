@@ -1068,17 +1068,20 @@ function renderOverviewKnowledge(files) {
             btn.classList.add('is-selected');
             selectOpsTab('memory');
             const preview = document.getElementById('ops-memory-preview');
+            const copyPath = f.path || f.name || '';
             try {
                 const text = await invoke('read_memory_file', { path: f.path });
                 if (preview) {
                     preview.hidden = false;
                     preview.textContent = text.slice(0, 12000);
                 }
+                setOpsMemoryCopyChip(copyPath);
             } catch (err) {
                 if (preview) {
                     preview.hidden = false;
                     preview.textContent = String(err);
                 }
+                setOpsMemoryCopyChip(null);
             }
         });
         btn.title = 'Open in Knowledge';
@@ -1670,11 +1673,13 @@ function tryOpsPreviewEscape(e) {
         opsSessionLoadRows = null;
         if (loadBtn) loadBtn.hidden = true;
         showOpsSessionStatus('', true);
+        setOpsSessionCopyChip(null);
         closed = true;
     }
     if (memoryPreview && !memoryPreview.hidden) {
         memoryPreview.hidden = true;
         memoryPreview.textContent = '';
+        setOpsMemoryCopyChip(null);
         closed = true;
     }
     if (schedulePreview && !schedulePreview.hidden) {
@@ -1893,6 +1898,73 @@ async function copyOpsTextToClipboard(text) {
         return !!ok;
     } catch (_) {
         return false;
+    }
+}
+
+/** Click-to-copy knowledge file path above the Knowledge preview (Copied flash). */
+function ensureOpsMemoryCopyChip() {
+    let el = document.getElementById('ops-memory-copy-chip');
+    if (el) return el;
+    const preview = document.getElementById('ops-memory-preview');
+    if (!preview || !preview.parentNode) return null;
+    el = document.createElement('button');
+    el.type = 'button';
+    el.id = 'ops-memory-copy-chip';
+    el.className = 'ops-session-copy-chip';
+    el.hidden = true;
+    el.setAttribute('aria-label', 'Copy knowledge file path');
+    preview.parentNode.insertBefore(el, preview);
+    el.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (el.classList.contains('is-just-saved')) return;
+        const value = el.dataset.copyValue || '';
+        if (!value) return;
+        const ok = await copyOpsTextToClipboard(value);
+        if (!ok) return;
+        if (typeof window.flashSaveButton === 'function') {
+            window.flashSaveButton(el, { savedLabel: 'Copied', durationMs: 1600 });
+        } else {
+            const idle = el._saveFlashOriginalLabel || value;
+            el._saveFlashOriginalLabel = idle;
+            el.classList.add('is-just-saved');
+            el.textContent = 'Copied';
+            clearTimeout(el._saveFlashTimer);
+            el._saveFlashTimer = setTimeout(() => {
+                el.classList.remove('is-just-saved');
+                el.textContent = idle;
+                el._saveFlashOriginalLabel = null;
+                el._saveFlashTimer = null;
+            }, 1600);
+        }
+    });
+    el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            el.click();
+        }
+    });
+    return el;
+}
+
+function setOpsMemoryCopyChip(copyValue) {
+    const el = ensureOpsMemoryCopyChip();
+    if (!el) return;
+    const value = String(copyValue || '').trim();
+    if (!value) {
+        el.hidden = true;
+        el.dataset.copyValue = '';
+        el.classList.remove('is-just-saved');
+        el.textContent = '';
+        return;
+    }
+    el.hidden = false;
+    el.dataset.copyValue = value;
+    el.title = 'Click to copy path';
+    el.setAttribute('aria-label', `Copy ${value}`);
+    if (!el.classList.contains('is-just-saved')) {
+        el.textContent = value;
+        el._saveFlashOriginalLabel = value;
     }
 }
 
@@ -2171,6 +2243,7 @@ function renderOpsMemory(files) {
     const preview = document.getElementById('ops-memory-preview');
     el.innerHTML = '';
     preview.hidden = true;
+    setOpsMemoryCopyChip(null);
     const all = files || [];
     const filtered = all.filter((f) =>
         memoryRowMatchesFilter(`${f.name || ''} ${f.kind || ''} ${f.path || ''}`)
@@ -2196,13 +2269,16 @@ function renderOpsMemory(files) {
                 .querySelectorAll('#ops-memory-list .ops-row.is-selected')
                 .forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
+            const copyPath = f.path || f.name || '';
             try {
                 const text = await invoke('read_memory_file', { path: f.path });
                 preview.hidden = false;
                 preview.textContent = text.slice(0, 12000);
+                setOpsMemoryCopyChip(copyPath);
             } catch (err) {
                 preview.hidden = false;
                 preview.textContent = String(err);
+                setOpsMemoryCopyChip(null);
             }
         });
         btn.title = 'Click to preview knowledge file';

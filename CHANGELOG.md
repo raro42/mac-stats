@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.453] - 2026-08-16
+
+### Changed
+- Agent Ops Knowledge: preview shows a click-to-copy file path chip with a Copied flash (list + overview; Esc clears).
+
 ## [0.1.452] - 2026-08-16
 
 ### Changed

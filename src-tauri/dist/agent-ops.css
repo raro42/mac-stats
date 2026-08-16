@@ -591,7 +591,7 @@
   border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
 }
 
-/* Sessions: click-to-copy session id / file slug above preview */
+/* Sessions / Knowledge: click-to-copy id, slug, or file path above preview */
 .ops-session-copy-chip {
   display: inline-flex;
   align-items: center;
