@@ -11,5 +11,5 @@ Inactive section icons on Data Poster were nearly invisible (dark ink on dark UI
 - `install-to-applications.sh` rebuilds when `dist/` is newer than the release binary (UI is embedded at `cargo build` time)
 
 ## Verify
-- Screenshots: `docs/screens/data-poster-icon-row-v0.1.469.png` (preflight), re-check after install
+- Screenshots: `docs/screens/data-poster-icon-row-v0.1.470.png` (preflight), re-check after install
 - Embedded brotli asset contains `data-poster-icon-contrast`
