@@ -6,10 +6,11 @@ Overnight Track B (20:00–06:00) shipped product UI polish. Digester open staye
 
 | Version | What |
 |---------|------|
+| **v0.1.450** | Agent Ops health cards: accent ring when linked tab is active (status wash stays) |
 | **v0.1.449** | Agent Ops list tabs: true-empty title + short hint (schedules / deliveries / agents / sessions / knowledge / runs) |
 | **v0.1.448** | Monitors URL click-to-copy + Copied flash (list + detail) |
 | **v0.1.447** | Agent Ops list selection: accent wash for ↑/↓ · j/k · click focus |
-| **v0.1.446** | Agent Ops overview empty cards: Open Schedules / Sessions / Knowledge CTAs |
+| **v0.1.446** | Agent Ops overview empty cards: Open-tab CTAs |
 | **v0.1.445** | Top Processes detail PID click-to-copy + Copied flash |
 | **v0.1.444** | Disk Cleanup soft-delete (Move to Trash) Saved flash |
 | **v0.1.443** | Agent Ops filter-miss Clear filter + input highlight |
@@ -28,4 +29,4 @@ Overnight Track B (20:00–06:00) shipped product UI polish. Digester open staye
 
 ## Ratchet
 
-Keeps landed in `~/.mac-stats/improvements/autoresearch/results.tsv` (nightly minimum met). Latest: **v0.1.449** Agent Ops tab true-empty title+hint.
+Keeps landed in `~/.mac-stats/improvements/autoresearch/results.tsv` (nightly minimum met). Latest: **v0.1.450** Agent Ops health-card active-tab accent ring.
