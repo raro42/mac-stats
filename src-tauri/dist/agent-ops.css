@@ -32,6 +32,19 @@ body,
   scrollbar-color: transparent transparent;
 }
 
+/* Beat theme shells that set a louder scrollbar-color (e.g. Dark TUI green). */
+.apple-shell,
+.arch-sheet,
+.mat-card,
+.swiss-shell,
+.glass-panel,
+.cpu-shell,
+.neon-frame,
+.poster-panel {
+  scrollbar-width: thin !important;
+  scrollbar-color: transparent transparent !important;
+}
+
 *::-webkit-scrollbar {
   width: 2px !important;
   height: 2px !important;

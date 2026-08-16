@@ -2521,6 +2521,10 @@ function escapeHtml(s) {
     // Restore last open/closed state after config.json load (WebView is destroyed on close).
     void (async () => {
       try {
+        for (let i = 0; i < 40; i++) {
+          if (typeof window.loadCpuUiSections === 'function') break;
+          await new Promise((r) => setTimeout(r, 25));
+        }
         if (typeof window.loadCpuUiSections === 'function') {
           await window.loadCpuUiSections();
         } else if (window.cpuUiSectionsReady) {
