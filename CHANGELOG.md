@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.456] - 2026-08-16
+
+### Fixed
+- Disk Cleanup Temp preview no longer lists root-owned / immutable files (e.g. stuck Microsoft AutoUpdate `.pkg` in `/var/folders/…/T`) that Clean now cannot remove.
+
 ## [0.1.455] - 2026-08-16
 
 ### Fixed

@@ -603,6 +603,7 @@ fn empty_cat(id: &str, label: &str, path: &str, policy: &str, scope_id: &str, en
 }
 
 /// Collect files older than `max_age_days` under `root` (files only; never deletes directories).
+/// Skips root-owned / immutable / unlink-blocked files so preview matches what Clean now can remove.
 fn collect_aged_files(root: &Path, max_age_days: u32, recursive: bool) -> Vec<(PathBuf, u64)> {
     if max_age_days == 0 || !root.is_dir() || path_is_forbidden(root) {
         return Vec::new();
@@ -639,6 +640,9 @@ fn collect_aged_files(root: &Path, max_age_days: u32, recursive: bool) -> Vec<(P
             if !meta.is_file() {
                 continue;
             }
+            if !file_is_user_reclaimable(&path, &meta) {
+                continue;
+            }
             let Ok(mtime) = meta.modified() else {
                 continue;
             };
@@ -648,6 +652,50 @@ fn collect_aged_files(root: &Path, max_age_days: u32, recursive: bool) -> Vec<(P
         }
     }
     out
+}
+
+/// True when this process can likely unlink `path` (preview + Clean now).
+/// Drops root-owned Microsoft AutoUpdate leftovers in `/var/folders/…/T` that
+/// carry `uchg` and only produce soft-delete EPERM spam.
+#[cfg(unix)]
+fn file_is_user_reclaimable(path: &Path, meta: &fs::Metadata) -> bool {
+    use std::os::unix::fs::MetadataExt;
+    let uid = unsafe { libc::getuid() };
+    if meta.uid() != uid {
+        return false;
+    }
+    #[cfg(target_os = "macos")]
+    {
+        // UF_IMMUTABLE (uchg) / SF_IMMUTABLE — cannot unlink without clearing flags as root.
+        use std::os::unix::ffi::OsStrExt;
+        const UF_IMMUTABLE: u32 = 0x0000_0002;
+        const SF_IMMUTABLE: u32 = 0x0002_0000;
+        let mut st: libc::stat = unsafe { std::mem::zeroed() };
+        if let Ok(c) = std::ffi::CString::new(path.as_os_str().as_bytes()) {
+            if unsafe { libc::stat(c.as_ptr(), &mut st) } == 0
+                && (st.st_flags & (UF_IMMUTABLE | SF_IMMUTABLE)) != 0
+            {
+                return false;
+            }
+        }
+    }
+    // Unlink needs write on the parent directory.
+    if let Some(parent) = path.parent() {
+        use std::os::unix::ffi::OsStrExt;
+        if let Ok(c) = std::ffi::CString::new(parent.as_os_str().as_bytes()) {
+            if unsafe { libc::access(c.as_ptr(), libc::W_OK) } != 0 {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    true
+}
+
+#[cfg(not(unix))]
+fn file_is_user_reclaimable(_path: &Path, _meta: &fs::Metadata) -> bool {
+    true
 }
 
 fn preview_aged_scope(scope: &DiskCleanupScope, touch_user_folders: bool) -> CleanupCategory {
@@ -1793,6 +1841,21 @@ mod tests {
             not_a_file.exists(),
             "failed soft target must remain (no permanent fallback)"
         );
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn user_owned_temp_file_is_reclaimable() {
+        let dir = std::env::temp_dir().join(format!(
+            "mac-stats-reclaim-ok-{}",
+            std::process::id()
+        ));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).expect("temp dir");
+        let file = dir.join("ok.txt");
+        fs::write(&file, b"x").expect("write");
+        let meta = fs::symlink_metadata(&file).expect("meta");
+        assert!(file_is_user_reclaimable(&file, &meta));
         let _ = fs::remove_dir_all(&dir);
     }
 
