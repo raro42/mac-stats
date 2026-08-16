@@ -35,6 +35,18 @@ Screenshots and a short demo reel for [mac-stats](https://github.com/raro42/mac-
 
 Also linked from the [project README](../../README.md#demo-video).
 
+## Star growth chart
+
+[`star-history.svg`](star-history.svg) — cumulative GitHub stars for the README / landing banner.
+
+Regenerate (needs `gh` auth as owner/collaborator):
+
+```bash
+python3 scripts/generate_star_history_svg.py
+```
+
+We keep a local SVG because the public Star History embed needs a sealed token after GitHub restricted stargazer API access (2026).
+
 ## How to capture (window-only)
 
 1. Open the CPU window: `mac_stats --cpu` (or click the menu bar item).

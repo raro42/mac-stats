@@ -29,8 +29,17 @@ Two products in one binary — pick your path:
 
 📋 [Changelog](CHANGELOG.md) · ✨ [Features](FEATURES.md) · 📘 [Getting Started](docs/GETTING_STARTED.md) · 🗺 [Roadmap](docs/ROADMAP.md) · 🍺 [Homebrew](docs/homebrew.md) · 🌐 [Landing](docs/site/index.html) · 🔬 [How we compare](docs/042_how_we_compare.md) · 🤝 [Contributing](CONTRIBUTING.md)
 
+## Star growth
+
+Stars are how quiet tools get found. If mac-stats earns a click, [★ star the repo](https://github.com/raro42/mac-stats) — it helps more than you think.
+
+[![GitHub stars](https://img.shields.io/github/stars/raro42/mac-stats?style=social)](https://github.com/raro42/mac-stats/stargazers)
+
+[![Star growth chart](docs/screens/star-history.svg)](https://github.com/raro42/mac-stats/stargazers)
+
 ## Table of contents
 
+- [Star growth](#star-growth)
 - [Quick start — Just the monitor](#quick-start--just-the-monitor)
 - [If macOS says the DMG / app is “damaged”](#if-macos-says-the-dmg--app-is-damaged)
 - [Quick start — Monitor + AI agent](#quick-start--monitor--ai-agent)
