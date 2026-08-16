@@ -993,8 +993,21 @@ function renderOverviewSchedules(schedules, deliveries) {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
             selectOpsTab('schedules');
+            const fullTask = String(s?.task || '').trim();
+            showOpsSchedulePreview(formatOpsSchedulePreview(s), s.id || '', fullTask);
+            const list = document.getElementById('ops-schedules-list');
+            const delList = document.getElementById('ops-deliveries-list');
+            list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            delList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            list?.querySelectorAll('.ops-row').forEach((row) => {
+                const title = row.querySelector('.ops-row-title');
+                if (title && title.textContent === id) {
+                    row.classList.add('is-selected');
+                    row.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
         });
-        btn.title = 'Open in Schedules';
+        btn.title = 'Open in Schedules · preview task · load into AI Chat from that tab';
         body.appendChild(btn);
     });
     if (Array.isArray(deliveries) && deliveries.length) {

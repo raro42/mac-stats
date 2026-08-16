@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.477] - 2026-08-16
+
+### Changed
+- Agent Ops **overview Schedules**: click a schedule opens the Schedules tab and shows the full task preview (Live/Knowledge/Recent parity; Load into AI Chat stays on that tab).
+
 ## [0.1.476] - 2026-08-16
 
 ### Added
