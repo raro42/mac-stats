@@ -2219,6 +2219,16 @@ textarea.ops-agent-editor.is-dirty {
   margin: 0;
 }
 
+.disk-cleanup-soft-delete-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.disk-cleanup-soft-delete-label.is-just-saved {
+  color: #1a7f37;
+  font-weight: 600;
+}
+
 .disk-cleanup-soft-hint {
   margin: 0 0 10px;
   font-size: 11px;

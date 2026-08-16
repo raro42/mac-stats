@@ -6500,18 +6500,73 @@ function initDiskCleanupSection() {
     });
   }
 
+  /** Wrap soft-delete label text so we can flash Saved without wiping the checkbox. */
+  function ensureDiskCleanupSoftDeleteLabel(softToggle) {
+    const label = softToggle?.closest?.('label.disk-cleanup-soft-delete');
+    if (!label) return null;
+    let span = label.querySelector('.disk-cleanup-soft-delete-label');
+    if (span) return span;
+    const texts = [];
+    for (const node of [...label.childNodes]) {
+      if (node.nodeType !== Node.TEXT_NODE) continue;
+      const t = node.textContent.replace(/\s+/g, ' ').trim();
+      if (t) texts.push(t);
+      node.remove();
+    }
+    span = document.createElement('span');
+    span.className = 'disk-cleanup-soft-delete-label';
+    span.textContent =
+      texts.join(' ') || 'Move cleaned items to Trash (recoverable)';
+    label.appendChild(span);
+    return span;
+  }
+
+  function flashDiskCleanupSoftDeleteSaved(softToggle) {
+    const span = ensureDiskCleanupSoftDeleteLabel(softToggle);
+    if (!span || span.classList.contains('is-just-saved')) return;
+    const original = span._saveFlashOriginalLabel || span.textContent || '';
+    span._saveFlashOriginalLabel = original;
+    span.classList.add('is-just-saved');
+    span.textContent = 'Saved';
+    clearTimeout(span._saveFlashTimer);
+    span._saveFlashTimer = setTimeout(() => {
+      span.classList.remove('is-just-saved');
+      span.textContent = original;
+      span._saveFlashOriginalLabel = null;
+    }, 1600);
+  }
+
+  let diskCleanupSoftDeleteBusy = false;
   const softToggle = document.getElementById('disk-cleanup-soft-delete');
   if (softToggle) {
+    ensureDiskCleanupSoftDeleteLabel(softToggle);
     softToggle.addEventListener('change', async (e) => {
       e.stopPropagation();
+      const span = ensureDiskCleanupSoftDeleteLabel(softToggle);
+      if (
+        diskCleanupSoftDeleteBusy ||
+        softToggle.disabled ||
+        (span && span.classList.contains('is-just-saved'))
+      ) {
+        softToggle.checked = !softToggle.checked;
+        return;
+      }
       const inv = getInvoke();
       if (!inv) return;
+      diskCleanupSoftDeleteBusy = true;
+      softToggle.disabled = true;
       try {
-        await inv('set_disk_cleanup_soft_delete', { softDelete: !!softToggle.checked });
+        await inv('set_disk_cleanup_soft_delete', {
+          softDelete: !!softToggle.checked,
+        });
         await refreshDiskCleanupPanel();
+        flashDiskCleanupSoftDeleteSaved(softToggle);
       } catch (err) {
-        alert(`Could not save delete mode: ${err?.message || err}`);
         softToggle.checked = !softToggle.checked;
+        alert(`Could not save delete mode: ${err?.message || err}`);
+      } finally {
+        diskCleanupSoftDeleteBusy = false;
+        softToggle.disabled = false;
       }
     });
   }

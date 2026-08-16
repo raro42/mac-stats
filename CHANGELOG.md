@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.444] - 2026-08-16
+
+### Changed
+- Disk Cleanup: toggling Move cleaned items to Trash shows a brief Saved flash after a successful save (and blocks double toggle while flashing).
+
 ## [0.1.443] - 2026-08-16
 
 ### Changed
