@@ -709,6 +709,13 @@ textarea.ops-agent-editor.is-dirty {
   min-height: 56px;
 }
 
+.ops-overview-body > .ops-empty-overview-cta {
+  flex-direction: column;
+  gap: 10px;
+  min-height: 72px;
+  padding: 14px 12px;
+}
+
 .ops-empty-compact {
   padding: 8px 10px;
   margin: 4px 0 8px;

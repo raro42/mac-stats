@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.446] - 2026-08-16
+
+### Changed
+- Agent Ops overview: empty cards (schedules / live / knowledge / recent) show an Open-tab action so you can jump straight to the right detail tab.
+
 ## [0.1.445] - 2026-08-16
 
 ### Changed

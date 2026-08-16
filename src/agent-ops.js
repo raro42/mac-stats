@@ -47,6 +47,18 @@
     );
   }
 
+  /** Overview card empty state with an Open-tab CTA (same affordance as Clear filter). */
+  function opsOverviewEmptyHtml(message, tab, ctaLabel) {
+    const safeTab = String(tab || '').replace(/[^a-z]/gi, '');
+    const label = ctaLabel || (safeTab ? `Open ${safeTab}` : 'Open tab');
+    return (
+      `<div class="ops-empty ops-empty-filter-miss ops-empty-overview-cta">` +
+      `<div class="ops-empty-filter-msg">${escapeHtml(message)}</div>` +
+      `<button type="button" class="ops-clear-filter" data-ops-goto-tab="${safeTab}">${escapeHtml(label)}</button>` +
+      `</div>`
+    );
+  }
+
   function clearOpsFilter(kind) {
     const map = {
       sessions: {
@@ -234,6 +246,12 @@ function setupAgentOps() {
         if (!btn || !opsRoot.contains(btn)) return;
         e.preventDefault();
         e.stopPropagation();
+        const gotoTab = btn.dataset.opsGotoTab || '';
+        if (gotoTab) {
+          if (agentOpsCollapsed) applyOpsCollapsed(false);
+          selectOpsTab(gotoTab);
+          return;
+        }
         clearOpsFilter(btn.dataset.opsClearFilter || '');
       });
     }
@@ -915,7 +933,11 @@ function renderOverviewSchedules(schedules, deliveries) {
     if (!body) return;
     body.innerHTML = '';
     if (!schedules || !schedules.length) {
-        body.innerHTML = '<div class="ops-empty">No schedules yet — open the Schedules tab to add one</div>';
+        body.innerHTML = opsOverviewEmptyHtml(
+          'No schedules yet — add one on the Schedules tab',
+          'schedules',
+          'Open Schedules'
+        );
         return;
     }
     const count = document.createElement('div');
@@ -954,7 +976,11 @@ function renderOverviewLive(rows) {
     if (!body) return;
     body.innerHTML = '';
     if (!rows || !rows.length) {
-        body.innerHTML = '<div class="ops-empty">No live sessions — chats appear here while agents run</div>';
+        body.innerHTML = opsOverviewEmptyHtml(
+          'No live sessions — chats appear here while agents run',
+          'sessions',
+          'Open Sessions'
+        );
         return;
     }
     const count = document.createElement('div');
@@ -992,7 +1018,11 @@ function renderOverviewKnowledge(files) {
     if (!body) return;
     body.innerHTML = '';
     if (!files || !files.length) {
-        body.innerHTML = '<div class="ops-empty">No knowledge files yet under ~/.mac-stats</div>';
+        body.innerHTML = opsOverviewEmptyHtml(
+          'No knowledge files yet under ~/.mac-stats',
+          'memory',
+          'Open Knowledge'
+        );
         return;
     }
     const sorted = [...files].sort((a, b) => (b.modified_ms || 0) - (a.modified_ms || 0));
@@ -1033,7 +1063,11 @@ function renderOverviewRecent(files) {
     if (!body) return;
     body.innerHTML = '';
     if (!files || !files.length) {
-        body.innerHTML = '<div class="ops-empty">No recent chats — session memory shows up here</div>';
+        body.innerHTML = opsOverviewEmptyHtml(
+          'No recent chats — session memory shows up here',
+          'sessions',
+          'Open Sessions'
+        );
         return;
     }
     const count = document.createElement('div');
