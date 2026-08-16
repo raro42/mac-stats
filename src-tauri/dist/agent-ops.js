@@ -2428,6 +2428,13 @@ function escapeHtml(s) {
     const header = document.getElementById('agent-ops-header');
     if (header) header.setAttribute('aria-expanded', String(!collapsed));
     syncOpsIcon();
+    if (typeof window.setSectionCollapsed === 'function') {
+      window.setSectionCollapsed('agent_ops_collapsed', collapsed);
+    } else {
+      try {
+        localStorage.setItem('agent_ops_collapsed', collapsed ? 'true' : 'false');
+      } catch (_) {}
+    }
     if (collapsed) {
       stopAgentOpsAutoRefresh();
     } else {
@@ -2511,21 +2518,28 @@ function escapeHtml(s) {
         toggleAgentOpsSection();
       });
     }
-    // Themes: start hidden (icon opens). Dashboard without icon: start expanded if not collapsed.
-    const content = document.getElementById('agent-ops-content');
-    const section = document.querySelector('.agent-ops-section');
-    let startsCollapsed = true;
-    if (icon) {
-      startsCollapsed = true;
-    } else {
-      startsCollapsed =
-        content?.classList.contains('collapsed') ||
-        content?.style.display === 'none' ||
-        (section?.classList.contains('collapsed') ?? false);
-    }
-    applyOpsCollapsed(!!startsCollapsed);
-    // Design-review / capture: MAC_STATS_OPEN_SECTION or one-shot config openUiSection.
+    // Restore last open/closed state after config.json load (WebView is destroyed on close).
     void (async () => {
+      try {
+        if (typeof window.loadCpuUiSections === 'function') {
+          await window.loadCpuUiSections();
+        } else if (window.cpuUiSectionsReady) {
+          await window.cpuUiSectionsReady;
+        }
+      } catch (_) {}
+      let startsCollapsed = true;
+      if (typeof window.getSectionCollapsed === 'function') {
+        startsCollapsed = window.getSectionCollapsed('agent_ops_collapsed');
+      } else {
+        try {
+          const saved = localStorage.getItem('agent_ops_collapsed');
+          if (saved !== null) startsCollapsed = saved === 'true';
+        } catch (_) {
+          startsCollapsed = true;
+        }
+      }
+      applyOpsCollapsed(!!startsCollapsed);
+      // Design-review / capture: MAC_STATS_OPEN_SECTION or one-shot config openUiSection.
       const scrollStart = (el) => {
         try {
           el?.scrollIntoView?.({ behavior: 'auto', block: 'start' });
@@ -2554,7 +2568,11 @@ function escapeHtml(s) {
         key === 'chat'
       ) {
         applyOpsCollapsed(true);
-        localStorage.setItem('ollama_collapsed', 'false');
+        if (typeof window.setSectionCollapsed === 'function') {
+          window.setSectionCollapsed('ollama_collapsed', false);
+        } else {
+          localStorage.setItem('ollama_collapsed', 'false');
+        }
         const openOllama = () => {
           const ollamaSection = document.querySelector('.ollama-section');
           const ollamaContent = document.getElementById('ollama-content');
@@ -2586,6 +2604,8 @@ function escapeHtml(s) {
         applyOpsCollapsed(true);
         if (typeof window.showDetailsProcessesSections === 'function') {
           window.showDetailsProcessesSections();
+        } else if (typeof window.setSectionCollapsed === 'function') {
+          window.setSectionCollapsed('details_processes_collapsed', false);
         } else {
           localStorage.setItem('details_processes_collapsed', 'false');
         }
@@ -2608,7 +2628,11 @@ function escapeHtml(s) {
         key === 'disk'
       ) {
         applyOpsCollapsed(true);
-        localStorage.setItem('disk_cleanup_collapsed', 'false');
+        if (typeof window.setSectionCollapsed === 'function') {
+          window.setSectionCollapsed('disk_cleanup_collapsed', false);
+        } else {
+          localStorage.setItem('disk_cleanup_collapsed', 'false');
+        }
         const diskSection = document.querySelector('.disk-cleanup-section');
         const diskContent = document.getElementById('disk-cleanup-content');
         const isCollapsed =
@@ -2631,7 +2655,11 @@ function escapeHtml(s) {
         key === 'external_monitors'
       ) {
         applyOpsCollapsed(true);
-        localStorage.setItem('monitors_collapsed', 'false');
+        if (typeof window.setSectionCollapsed === 'function') {
+          window.setSectionCollapsed('monitors_collapsed', false);
+        } else {
+          localStorage.setItem('monitors_collapsed', 'false');
+        }
         const monitorsSection = document.querySelector('.monitors-section');
         const monitorsContent = document.getElementById('monitors-content');
         const isCollapsed =

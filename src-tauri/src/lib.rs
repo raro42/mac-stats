@@ -329,6 +329,8 @@ fn run_internal(open_cpu_window: bool) {
             metrics::set_menu_bar_compact,
             metrics::get_cpu_window_compact,
             metrics::set_cpu_window_compact,
+            metrics::get_cpu_window_ui_state,
+            metrics::set_cpu_window_ui_state,
             metrics::take_open_ui_section,
             metrics::get_processes_by_names,
             metrics::reset_config_to_monitor_defaults,

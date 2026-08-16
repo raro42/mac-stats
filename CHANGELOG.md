@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.461] - 2026-08-16
+
+### Fixed
+- Remember which CPU window sections were open/closed across menu-bar toggles (persist `cpuWindowUi` in `~/.mac-stats/config.json`; Agent Ops included).
+
 ## [0.1.460] - 2026-08-16
 
 ### Fixed

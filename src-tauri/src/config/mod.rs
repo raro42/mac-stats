@@ -495,6 +495,60 @@ impl Config {
         Ok(())
     }
 
+    /// CPU window section open/closed flags (`cpuWindowUi` in config.json).
+    /// Survives WebView destroy (menu-bar toggle closes by destroying the window).
+    pub fn cpu_window_ui_state() -> serde_json::Value {
+        use serde_json::{json, Value};
+        let config_path = Self::config_file_path();
+        let Ok(content) = std::fs::read_to_string(&config_path) else {
+            return json!({});
+        };
+        let Ok(json) = serde_json::from_str::<Value>(&content) else {
+            return json!({});
+        };
+        json.get("cpuWindowUi")
+            .cloned()
+            .filter(|v| v.is_object())
+            .unwrap_or_else(|| json!({}))
+    }
+
+    /// Replace/merge `cpuWindowUi` object in config.json (shallow merge of object keys).
+    pub fn set_cpu_window_ui_state(patch: serde_json::Value) -> Result<serde_json::Value, String> {
+        use serde_json::{json, Map, Value};
+        let config_path = Self::config_file_path();
+        if let Some(parent) = config_path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        }
+        let mut after: Value = std::fs::read_to_string(&config_path)
+            .ok()
+            .and_then(|s| serde_json::from_str(&s).ok())
+            .unwrap_or_else(|| json!({}));
+        let mut ui: Map<String, Value> = after
+            .get("cpuWindowUi")
+            .and_then(|v| v.as_object())
+            .cloned()
+            .unwrap_or_default();
+        if let Some(patch_obj) = patch.as_object() {
+            for (k, v) in patch_obj {
+                ui.insert(k.clone(), v.clone());
+            }
+        }
+        let ui_val = Value::Object(ui);
+        match after.as_object_mut() {
+            Some(obj) => {
+                obj.insert("cpuWindowUi".into(), ui_val.clone());
+            }
+            None => {
+                after = json!({ "cpuWindowUi": ui_val.clone() });
+            }
+        }
+        crate::config::write_text_atomic(
+            &config_path,
+            &serde_json::to_string_pretty(&after).map_err(|e| e.to_string())?,
+        )?;
+        Ok(ui_val)
+    }
+
     /// One-shot UI section to open on CPU window load (`agent-ops`, `monitors`, …).
     /// Prefers `MAC_STATS_OPEN_SECTION` env; else reads and clears `openUiSection` in config.json.
     pub fn take_open_ui_section() -> Option<String> {

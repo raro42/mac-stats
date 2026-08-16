@@ -1256,6 +1256,16 @@ pub fn set_cpu_window_compact(compact: bool) -> Result<bool, String> {
     Ok(crate::config::Config::cpu_window_compact())
 }
 
+#[tauri::command]
+pub fn get_cpu_window_ui_state() -> serde_json::Value {
+    crate::config::Config::cpu_window_ui_state()
+}
+
+#[tauri::command]
+pub fn set_cpu_window_ui_state(state: serde_json::Value) -> Result<serde_json::Value, String> {
+    crate::config::Config::set_cpu_window_ui_state(state)
+}
+
 /// One-shot: which CPU-window section to open (`agent-ops`, …). See `Config::take_open_ui_section`.
 #[tauri::command]
 pub fn take_open_ui_section() -> Option<String> {

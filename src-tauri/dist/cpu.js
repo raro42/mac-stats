@@ -19,6 +19,146 @@ function getInvoke() {
   return null;
 }
 
+/** Section open/closed state — config.json (survives WebView destroy) + localStorage mirror. */
+const CPU_UI_SECTION_DEFAULTS = {
+  monitors_collapsed: true,
+  ollama_collapsed: true,
+  perplexity_collapsed: true,
+  agent_ops_collapsed: true,
+  logs_collapsed: true,
+  disk_cleanup_collapsed: true,
+  details_processes_collapsed: true,
+};
+
+let cpuUiSectionsCache = null;
+let cpuUiSectionsPersistTimer = null;
+let cpuUiSectionsLoadPromise = null;
+
+function readCpuUiSectionFromLocalStorage(key, defaultCollapsed) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return defaultCollapsed;
+    return raw === 'true';
+  } catch (_) {
+    return defaultCollapsed;
+  }
+}
+
+function seedCpuUiSectionsFromLocalStorage() {
+  const seeded = { ...CPU_UI_SECTION_DEFAULTS };
+  for (const key of Object.keys(CPU_UI_SECTION_DEFAULTS)) {
+    seeded[key] = readCpuUiSectionFromLocalStorage(key, CPU_UI_SECTION_DEFAULTS[key]);
+  }
+  try {
+    const tab = localStorage.getItem('agent_ops_tab');
+    if (tab) seeded.agent_ops_tab = tab;
+  } catch (_) {}
+  return seeded;
+}
+
+async function loadCpuUiSections() {
+  if (cpuUiSectionsLoadPromise) return cpuUiSectionsLoadPromise;
+  cpuUiSectionsLoadPromise = (async () => {
+    const seeded = seedCpuUiSectionsFromLocalStorage();
+    cpuUiSectionsCache = { ...seeded };
+    const inv = getInvoke();
+    if (!inv) return cpuUiSectionsCache;
+    // Tauri invoke may not be ready on first tick.
+    for (let i = 0; i < 30; i++) {
+      try {
+        const remote = await inv('get_cpu_window_ui_state');
+        if (remote && typeof remote === 'object' && !Array.isArray(remote)) {
+          cpuUiSectionsCache = { ...seeded, ...remote };
+          for (const [k, v] of Object.entries(cpuUiSectionsCache)) {
+            if (typeof v === 'boolean') {
+              try {
+                localStorage.setItem(k, v ? 'true' : 'false');
+              } catch (_) {}
+            } else if (k === 'agent_ops_tab' && typeof v === 'string') {
+              try {
+                localStorage.setItem(k, v);
+              } catch (_) {}
+            }
+          }
+        }
+        return cpuUiSectionsCache;
+      } catch (_) {
+        await new Promise((r) => setTimeout(r, 50));
+      }
+    }
+    console.warn('cpuWindowUi load failed; using localStorage defaults');
+    return cpuUiSectionsCache;
+  })();
+  return cpuUiSectionsLoadPromise;
+}
+
+function getSectionCollapsed(key) {
+  const def = Object.prototype.hasOwnProperty.call(CPU_UI_SECTION_DEFAULTS, key)
+    ? CPU_UI_SECTION_DEFAULTS[key]
+    : true;
+  if (cpuUiSectionsCache && Object.prototype.hasOwnProperty.call(cpuUiSectionsCache, key)) {
+    return !!cpuUiSectionsCache[key];
+  }
+  return readCpuUiSectionFromLocalStorage(key, def);
+}
+
+function setSectionCollapsed(key, collapsed) {
+  const value = !!collapsed;
+  if (!cpuUiSectionsCache) cpuUiSectionsCache = seedCpuUiSectionsFromLocalStorage();
+  cpuUiSectionsCache[key] = value;
+  try {
+    localStorage.setItem(key, value ? 'true' : 'false');
+  } catch (_) {}
+  schedulePersistCpuUiSections();
+}
+
+function setCpuUiSectionValue(key, value) {
+  if (!cpuUiSectionsCache) cpuUiSectionsCache = seedCpuUiSectionsFromLocalStorage();
+  cpuUiSectionsCache[key] = value;
+  try {
+    if (typeof value === 'boolean') {
+      localStorage.setItem(key, value ? 'true' : 'false');
+    } else if (typeof value === 'string') {
+      localStorage.setItem(key, value);
+    }
+  } catch (_) {}
+  schedulePersistCpuUiSections();
+}
+
+function schedulePersistCpuUiSections() {
+  if (cpuUiSectionsPersistTimer) clearTimeout(cpuUiSectionsPersistTimer);
+  cpuUiSectionsPersistTimer = setTimeout(() => {
+    cpuUiSectionsPersistTimer = null;
+    void persistCpuUiSectionsNow();
+  }, 120);
+}
+
+async function persistCpuUiSectionsNow() {
+  const inv = getInvoke();
+  if (!inv || !cpuUiSectionsCache) return;
+  try {
+    await inv('set_cpu_window_ui_state', { state: cpuUiSectionsCache });
+  } catch (e) {
+    console.warn('cpuWindowUi save failed', e);
+  }
+}
+
+window.getSectionCollapsed = getSectionCollapsed;
+window.setSectionCollapsed = setSectionCollapsed;
+window.setCpuUiSectionValue = setCpuUiSectionValue;
+window.loadCpuUiSections = loadCpuUiSections;
+// Kick off early so Agent Ops can await the same promise.
+window.cpuUiSectionsReady = loadCpuUiSections();
+
+// Flush section state before WebView destroy (menu-bar toggle / title-bar close).
+window.addEventListener('pagehide', () => {
+  if (cpuUiSectionsPersistTimer) {
+    clearTimeout(cpuUiSectionsPersistTimer);
+    cpuUiSectionsPersistTimer = null;
+  }
+  void persistCpuUiSectionsNow();
+});
+
 function formatUptime(seconds) {
   const hours = Math.floor(seconds / 3600);
   const days = Math.floor(hours / 24);
@@ -2279,13 +2419,11 @@ function wireCollapsibleHeaderA11y(header, options = {}) {
 }
 
 function getMonitorsCollapsedState() {
-  // Get saved state from localStorage, default to true (collapsed)
-  const saved = localStorage.getItem('monitors_collapsed');
-  return saved !== null ? saved === 'true' : true;
+  return getSectionCollapsed('monitors_collapsed');
 }
 
 function saveMonitorsCollapsedState(collapsed) {
-  localStorage.setItem('monitors_collapsed', collapsed.toString());
+  setSectionCollapsed('monitors_collapsed', collapsed);
 }
 
 function initMonitorsSection() {
@@ -4363,8 +4501,7 @@ function initOllamaSection() {
   if (!header || !content) return;
 
   // Restore saved state
-  const savedState = localStorage.getItem('ollama_collapsed');
-  ollamaCollapsed = savedState !== null ? savedState === 'true' : true;
+  ollamaCollapsed = getSectionCollapsed('ollama_collapsed');
   const section = document.querySelector('.ollama-section');
   const divider = document.getElementById('monitors-ollama-divider');
   
@@ -4497,7 +4634,7 @@ function initOllamaSection() {
     if (menuCollapse) {
       menuCollapse.textContent = ollamaCollapsed ? 'Expand' : 'Collapse';
     }
-    localStorage.setItem('ollama_collapsed', ollamaCollapsed.toString());
+    setSectionCollapsed('ollama_collapsed', ollamaCollapsed);
     if (header._syncCollapseA11y) header._syncCollapseA11y();
   };
 
@@ -5191,7 +5328,7 @@ function replaceThinkingWithResponse(thinkingId, content, durationMs) {
 // Universal implementation that works across all themes using IDs
 function initCollapsibleSections() {
   // Get collapsed state from localStorage (default to true - hidden)
-  const sectionsCollapsed = localStorage.getItem('details_processes_collapsed') !== 'false';
+  const sectionsCollapsed = getSectionCollapsed('details_processes_collapsed');
   
   // Use IDs for universal theme support (fallback to class selectors for backward compatibility)
   const detailsSection = document.getElementById('details-section') || 
@@ -5252,14 +5389,14 @@ function initCollapsibleSections() {
   function hideSections() {
     hideDetails();
     hideProcesses();
-    localStorage.setItem('details_processes_collapsed', 'true');
+    setSectionCollapsed('details_processes_collapsed', true);
   }
   
   // Show both sections
   function showSections() {
     showDetails();
     showProcesses();
-    localStorage.setItem('details_processes_collapsed', 'false');
+    setSectionCollapsed('details_processes_collapsed', false);
   }
 
   window.hideDetailsProcessesSections = hideSections;
@@ -5532,7 +5669,7 @@ function initPerplexitySection() {
 
   if (!header || !content) return;
 
-  perplexityCollapsed = localStorage.getItem('perplexity_collapsed') !== 'false';
+  perplexityCollapsed = getSectionCollapsed('perplexity_collapsed');
   const applyPerplexityCollapsed = () => {
     if (perplexityCollapsed) {
       content.classList.add('collapsed');
@@ -5553,14 +5690,14 @@ function initPerplexitySection() {
     getExpanded: () => !perplexityCollapsed,
     onToggle: () => {
       perplexityCollapsed = !perplexityCollapsed;
-      localStorage.setItem('perplexity_collapsed', perplexityCollapsed.toString());
+      setSectionCollapsed('perplexity_collapsed', perplexityCollapsed);
       applyPerplexityCollapsed();
     },
   });
 
   header.addEventListener('click', () => {
     perplexityCollapsed = !perplexityCollapsed;
-    localStorage.setItem('perplexity_collapsed', perplexityCollapsed.toString());
+    setSectionCollapsed('perplexity_collapsed', perplexityCollapsed);
     applyPerplexityCollapsed();
   });
 
@@ -6542,7 +6679,7 @@ function initDiskCleanupSection() {
     icon.setAttribute('data-title-base', icon.title || 'Disk cleanup');
   }
 
-  let collapsed = localStorage.getItem('disk_cleanup_collapsed') !== 'false';
+  let collapsed = getSectionCollapsed('disk_cleanup_collapsed');
   const applyCollapsed = () => {
     if (collapsed) {
       content.classList.add('collapsed');
@@ -6566,7 +6703,7 @@ function initDiskCleanupSection() {
         '#disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, #disk-cleanup-soft-delete, #disk-cleanup-scopes, #disk-cleanup-add-label, #disk-cleanup-add-path, #disk-cleanup-add-days, #disk-cleanup-add-recursive, .disk-cleanup-add-scope, .disk-cleanup-scopes, .disk-cleanup-soft-delete, input, button, label',
       onToggle: () => {
         collapsed = !collapsed;
-        localStorage.setItem('disk_cleanup_collapsed', collapsed.toString());
+        setSectionCollapsed('disk_cleanup_collapsed', collapsed);
         applyCollapsed();
       },
     });
@@ -6582,7 +6719,7 @@ function initDiskCleanupSection() {
     }
     e.stopPropagation();
     collapsed = !collapsed;
-    localStorage.setItem('disk_cleanup_collapsed', collapsed.toString());
+    setSectionCollapsed('disk_cleanup_collapsed', collapsed);
     applyCollapsed();
   });
 
@@ -6885,7 +7022,7 @@ function initLogsSection() {
   const pathHint = document.getElementById('logs-path-hint');
   if (!header || !content) return;
 
-  let logsCollapsed = localStorage.getItem('logs_collapsed') !== 'false';
+  let logsCollapsed = getSectionCollapsed('logs_collapsed');
   const applyCollapsed = () => {
     if (logsCollapsed) {
       content.classList.add('collapsed');
@@ -6909,7 +7046,7 @@ function initLogsSection() {
     ignoreSelector: '#logs-refresh-btn, #logs-open-btn, #logs-autorefresh, #logs-path-hint, label',
     onToggle: () => {
       logsCollapsed = !logsCollapsed;
-      localStorage.setItem('logs_collapsed', logsCollapsed.toString());
+      setSectionCollapsed('logs_collapsed', logsCollapsed);
       applyCollapsed();
     },
   });
@@ -6918,7 +7055,7 @@ function initLogsSection() {
     if (e.target && e.target.closest && e.target.closest('#logs-path-hint')) return;
     e.stopPropagation();
     logsCollapsed = !logsCollapsed;
-    localStorage.setItem('logs_collapsed', logsCollapsed.toString());
+    setSectionCollapsed('logs_collapsed', logsCollapsed);
     applyCollapsed();
   });
 
@@ -7043,7 +7180,7 @@ function collapseSectionByIds(sectionSel, contentId, collapsedKey) {
     }
   }
   if (section) section.classList.add('collapsed');
-  if (collapsedKey) localStorage.setItem(collapsedKey, 'true');
+  if (collapsedKey) setSectionCollapsed(collapsedKey, true);
 }
 
 /** Force-collapse heavy sections when Compact CPU window is enabled (does not run on disable). */
@@ -7185,21 +7322,25 @@ function initHistoryControls() {
 
 // Initialize monitoring features when DOM is ready
 function initMonitoringFeatures() {
-  // Use setTimeout to ensure DOM is fully ready
+  // Use setTimeout to ensure DOM is fully ready; load persisted section state first
+  // (config.json) because the CPU WebView is destroyed on close.
   setTimeout(() => {
-    initIconLine();
-    initCollapsibleSections();
-    initMonitorsSection();
-    initPerplexitySection();
-    initLogsSection();
-    initDiskCleanupSection();
-    initOllamaSection();
-    initHistoryControls();
-    // Auto-configure Ollama with default endpoint (if module is available)
-    if (window.Ollama) {
-      autoConfigureOllama();
-    }
-    initCpuWindowCompactPreference();
+    void (async () => {
+      await loadCpuUiSections();
+      initIconLine();
+      initCollapsibleSections();
+      initMonitorsSection();
+      initPerplexitySection();
+      initLogsSection();
+      initDiskCleanupSection();
+      initOllamaSection();
+      initHistoryControls();
+      // Auto-configure Ollama with default endpoint (if module is available)
+      if (window.Ollama) {
+        autoConfigureOllama();
+      }
+      await initCpuWindowCompactPreference();
+    })();
   }, 100);
 }
 
