@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops health-card active-tab accent ring — **v0.1.450**
 - Agent Ops tab true-empty title+hint — **v0.1.449**
 - Monitors URL click-to-copy Copied flash — **v0.1.448**
 - Agent Ops selected-row accent wash (↑/↓ · j/k · click) — **v0.1.447**

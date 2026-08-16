@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.450] - 2026-08-16
+
+### Changed
+- Agent Ops design review: health cards highlight with an accent ring when their linked tab is active (parity with overview cards; status wash stays visible).
+
 ## [0.1.449] - 2026-08-16
 
 ### Changed

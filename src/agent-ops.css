@@ -217,6 +217,21 @@
   background: color-mix(in srgb, rgba(255, 80, 80, 0.16) 75%, transparent);
 }
 
+/* Linked detail tab is active — accent ring keeps ok/warn/bad wash visible. */
+.ops-health-card.is-active {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
+}
+
+.ops-health-card.is-active:not(.ops-health-ok):not(.ops-health-warn):not(.ops-health-bad) {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+}
+
+.ops-health-card.is-active.ops-health-clickable:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 52%, transparent),
+    0 2px 8px color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+}
+
 .ops-health-label {
   font-size: 10px;
   text-transform: uppercase;

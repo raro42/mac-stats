@@ -160,12 +160,31 @@
 
 // --- Agent Ops (Command Center: overview + detail tabs) ---
 
+/** Health card → detail tab (same map as click navigation). */
+const OPS_HEALTH_TAB_BY_KEY = {
+    version: 'agents',
+    discord: 'runs',
+    redmine: 'agents',
+    schedule: 'schedules',
+    delivery: 'schedules',
+    digest: 'runs',
+};
+
 /** Overview cards light up when their linked detail tab is active. */
 function syncOpsOverviewCardActive(tab) {
     const active = tab || opsActiveTab || 'agents';
     document.querySelectorAll('.ops-overview-card').forEach((card) => {
         const link = card.querySelector('.ops-overview-link[data-goto-tab]');
         const goto = link?.dataset?.gotoTab || '';
+        card.classList.toggle('is-active', !!goto && goto === active);
+    });
+}
+
+/** Health cards light up when their linked detail tab is active (parity with overview). */
+function syncOpsHealthCardActive(tab) {
+    const active = tab || opsActiveTab || 'agents';
+    document.querySelectorAll('.ops-health-card[data-health]').forEach((card) => {
+        const goto = card.dataset.gotoTab || OPS_HEALTH_TAB_BY_KEY[card.dataset.health] || '';
         card.classList.toggle('is-active', !!goto && goto === active);
     });
 }
@@ -179,6 +198,7 @@ function selectOpsTab(tab) {
         p.classList.toggle('active', p.id === `ops-panel-${tab}`);
     });
     syncOpsOverviewCardActive(opsActiveTab);
+    syncOpsHealthCardActive(opsActiveTab);
     const panel = document.getElementById(`ops-panel-${tab}`);
     const tabs = document.querySelector('.agent-ops-tabs');
     (panel || tabs)?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
@@ -235,6 +255,7 @@ function setupAgentOps() {
     if (activeBtn?.dataset?.opsTab) opsActiveTab = activeBtn.dataset.opsTab;
     ensureOpsKeyboardHint();
     syncOpsOverviewCardActive(opsActiveTab);
+    syncOpsHealthCardActive(opsActiveTab);
     document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
         btn.addEventListener('click', () => selectOpsTab(btn.dataset.opsTab));
     });
@@ -912,17 +933,10 @@ function wireOpsHealthCardNavigation() {
     const row = document.getElementById('ops-health-row');
     if (!row || row.dataset.opsHealthNav === '1') return;
     row.dataset.opsHealthNav = '1';
-    const tabByHealth = {
-        version: 'agents',
-        discord: 'runs',
-        redmine: 'agents',
-        schedule: 'schedules',
-        delivery: 'schedules',
-        digest: 'runs',
-    };
     row.querySelectorAll('.ops-health-card[data-health]').forEach((card) => {
-        const tab = tabByHealth[card.dataset.health];
+        const tab = OPS_HEALTH_TAB_BY_KEY[card.dataset.health];
         if (!tab) return;
+        card.dataset.gotoTab = tab;
         card.classList.add('ops-health-clickable');
         card.setAttribute('tabindex', '0');
         card.setAttribute('role', 'button');
@@ -939,6 +953,7 @@ function wireOpsHealthCardNavigation() {
             }
         });
     });
+    syncOpsHealthCardActive(opsActiveTab);
 }
 
 function renderOverviewSchedules(schedules, deliveries) {
