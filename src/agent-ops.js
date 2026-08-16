@@ -151,6 +151,7 @@
   let opsMemoryCache = [];
   let opsRunsFilterQ = '';
   let opsRunsInsightsCache = null;
+  let opsRunLoadQuestion = null;
   let opsAgentsFilterQ = '';
   let opsAgentsCache = [];
   let opsSchedulesFilterQ = '';
@@ -347,6 +348,7 @@ function setupAgentOps() {
                     return;
                 }
                 if (tryOpsSessionEnterLoad(e)) return;
+                if (tryOpsRunsEnterLoad(e)) return;
                 if (tryOpsMemoryEnter(e)) return;
                 if (tryOpsRunsEnter(e)) return;
                 if (tryOpsAgentsEnter(e)) return;
@@ -1762,7 +1764,6 @@ function tryOpsPreviewEscape(e) {
     }
     if (runsPreview && !runsPreview.hidden) {
         showOpsRunPreview('');
-        setOpsRunsCopyChip(null);
         closed = true;
     }
     if (closed) {
@@ -1836,6 +1837,23 @@ function tryOpsMemoryEnter(e) {
     if (!selected) return false;
     e.preventDefault();
     selected.click();
+    return true;
+}
+
+/** Enter loads the previewed run question into AI Chat when ready (Sessions parity). */
+function tryOpsRunsEnterLoad(e) {
+    if (agentOpsCollapsed) return false;
+    const panel = document.getElementById('ops-panel-runs');
+    if (!panel || !panel.classList.contains('active')) return false;
+    const loadBtn = document.getElementById('ops-runs-load-chat');
+    if (!loadBtn || loadBtn.hidden || !opsRunLoadQuestion) return false;
+    if (loadBtn.classList.contains('is-just-saved')) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    if (tag === 'TEXTAREA') return false;
+    if (tag === 'INPUT' && t.id && t.id !== 'ops-runs-filter') return false;
+    e.preventDefault();
+    loadOpsRunIntoChat();
     return true;
 }
 
@@ -2518,20 +2536,147 @@ function setOpsRunsCopyChip(copyValue) {
     }
 }
 
+/** Load-into-chat control under the Runs preview (Sessions parity). */
+function ensureOpsRunsLoadChatBtn() {
+    let el = document.getElementById('ops-runs-load-chat');
+    if (el) return el;
+    const preview = ensureOpsRunsPreview();
+    if (!preview || !preview.parentNode) return null;
+    el = document.createElement('button');
+    el.type = 'button';
+    el.id = 'ops-runs-load-chat';
+    el.className = 'btn-secondary ops-runs-load-chat';
+    el.hidden = true;
+    el.textContent = 'Load into AI Chat ↵';
+    el.title = 'Put this run’s question into AI Chat (Enter)';
+    el.setAttribute('aria-label', 'Load run question into AI Chat');
+    preview.parentNode.insertBefore(el, preview.nextSibling);
+    el.addEventListener('click', () => loadOpsRunIntoChat());
+    return el;
+}
+
+function setOpsRunsLoadChatVisible(visible) {
+    const el = ensureOpsRunsLoadChatBtn();
+    if (!el) return;
+    el.hidden = !visible;
+    if (!visible) {
+        el.classList.remove('is-just-saved');
+        if (!el._saveFlashOriginalLabel) {
+            el.textContent = 'Load into AI Chat ↵';
+        }
+    }
+}
+
+function showOpsRunLoadStatus(msg, ok) {
+    let el = document.getElementById('ops-runs-load-status');
+    const loadBtn = ensureOpsRunsLoadChatBtn();
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'ops-runs-load-status';
+        el.className = 'ops-row-meta';
+        el.style.margin = '6px 4px 0';
+        if (loadBtn?.parentNode) {
+            loadBtn.parentNode.insertBefore(el, loadBtn.nextSibling);
+        }
+    }
+    el.textContent = msg || '';
+    el.style.opacity = msg ? '0.9' : '0';
+    el.style.color = ok === false ? 'rgba(200,60,60,0.95)' : '';
+}
+
+/** Put the previewed run question into AI Chat for a quick retry. */
+function loadOpsRunIntoChat() {
+    const loadBtn = ensureOpsRunsLoadChatBtn();
+    if (loadBtn?.classList.contains('is-just-saved')) return;
+    const q = String(opsRunLoadQuestion || '').trim();
+    if (!q) {
+        showOpsRunLoadStatus('Select a run with a question first.', false);
+        return;
+    }
+    const aiOff =
+        document.getElementById('icon-ollama')?.style.pointerEvents === 'none' ||
+        document.getElementById('ollama-section')?.style.display === 'none';
+    if (aiOff) {
+        showOpsRunLoadStatus('Enable local AI agent in Settings to load into chat.', false);
+        return;
+    }
+    const input = document.getElementById('chat-input');
+    if (!input) {
+        showOpsRunLoadStatus('AI Chat input not ready — open AI Chat once, then retry.', false);
+        return;
+    }
+    input.value = q;
+    try {
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+    } catch (_) {
+        /* ignore */
+    }
+    const section = document.querySelector('.ollama-section');
+    const themeCollapsed =
+        section?.classList.contains('collapsed') ||
+        localStorage.getItem('ollama_collapsed') === 'true';
+    if (themeCollapsed) {
+        document.getElementById('ollama-header')?.click();
+    }
+    const content = document.getElementById('ollama-content');
+    const btn = document.getElementById('ollama-collapse-btn');
+    if (content) {
+        content.classList.remove('collapsed');
+        if (content.style.display === 'none') content.style.display = '';
+    }
+    if (section) section.classList.remove('collapsed');
+    if (btn) btn.textContent = '−';
+    section?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => {
+        input.focus();
+        try {
+            const len = input.value.length;
+            input.setSelectionRange(len, len);
+        } catch (_) {
+            /* ignore */
+        }
+    }, 80);
+    showOpsRunLoadStatus('Question loaded into AI Chat.', true);
+    if (loadBtn && !loadBtn.hidden) {
+        if (typeof window.flashSaveButton === 'function') {
+            window.flashSaveButton(loadBtn, { savedLabel: 'Loaded', durationMs: 1600 });
+        } else {
+            const idle = loadBtn.textContent || 'Load into AI Chat ↵';
+            loadBtn.classList.add('is-just-saved');
+            loadBtn.textContent = 'Loaded';
+            setTimeout(() => {
+                loadBtn.classList.remove('is-just-saved');
+                loadBtn.textContent = idle;
+            }, 1600);
+        }
+    }
+}
+
 /** Show full run turn details (list rows truncate question / tools). */
-function showOpsRunPreview(text, requestId) {
+function showOpsRunPreview(text, requestId, question) {
     const preview = ensureOpsRunsPreview();
     if (!preview) return;
     const body = String(text || '').trim();
     if (!body) {
         preview.hidden = true;
         preview.textContent = '';
+        opsRunLoadQuestion = null;
         setOpsRunsCopyChip(null);
+        setOpsRunsLoadChatVisible(false);
+        showOpsRunLoadStatus('', true);
         return;
     }
     preview.hidden = false;
     preview.textContent = body.slice(0, 12000);
     setOpsRunsCopyChip(requestId);
+    const q = String(question || '').trim();
+    opsRunLoadQuestion = q && q !== '(empty)' ? q : null;
+    setOpsRunsLoadChatVisible(!!opsRunLoadQuestion);
+    if (opsRunLoadQuestion) {
+        showOpsRunLoadStatus('Preview ready — Enter or “Load into AI Chat” · double-click also loads.', true);
+    } else {
+        showOpsRunLoadStatus('', true);
+    }
 }
 
 function formatOpsRunPreview(r) {
@@ -2619,11 +2764,18 @@ function renderOpsRuns(insights) {
         btn.type = 'button';
         btn.className = 'ops-row';
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(toolsJoined)}${r.ok ? '' : ' · FAIL'}</div></div>`;
-        btn.title = 'Click to preview full run (question, tools, request id)';
-        btn.addEventListener('click', () => {
+        btn.title = 'Click to preview · Enter / double-click to load question into AI Chat';
+        const openPreview = () => {
             el.querySelectorAll('.ops-row.is-selected').forEach((node) => node.classList.remove('is-selected'));
             btn.classList.add('is-selected');
-            showOpsRunPreview(formatOpsRunPreview(r), r?.request_id);
+            const q = String(r?.question_preview || '').trim();
+            showOpsRunPreview(formatOpsRunPreview(r), r?.request_id, q);
+        };
+        btn.addEventListener('click', openPreview);
+        btn.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            openPreview();
+            loadOpsRunIntoChat();
         });
         el.appendChild(btn);
     });
