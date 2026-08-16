@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.449] - 2026-08-16
+
+### Changed
+- Agent Ops list tabs: true-empty states (schedules, deliveries, agents, sessions, knowledge, runs) use a clear title plus a short hint instead of a one-line stub.
+
 ## [0.1.448] - 2026-08-16
 
 ### Changed

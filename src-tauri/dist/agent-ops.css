@@ -671,6 +671,20 @@ textarea.ops-agent-editor.is-dirty {
   gap: 10px;
 }
 
+.ops-empty-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.ops-empty-tab-hint {
+  max-width: 28em;
+  font-size: 11px;
+  line-height: 1.4;
+  opacity: 0.72;
+}
+
 .ops-empty-filter-msg {
   max-width: 28em;
 }

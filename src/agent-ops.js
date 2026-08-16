@@ -59,6 +59,19 @@
     );
   }
 
+  /** True-empty state on a list tab (already on the surface — title + short hint). */
+  function opsTabEmptyHtml(title, hint) {
+    const hintHtml = hint
+      ? `<div class="ops-empty-tab-hint">${escapeHtml(hint)}</div>`
+      : '';
+    return (
+      `<div class="ops-empty ops-empty-tab">` +
+      `<div class="ops-empty-filter-msg">${escapeHtml(title)}</div>` +
+      hintHtml +
+      `</div>`
+    );
+  }
+
   function clearOpsFilter(kind) {
     const map = {
       sessions: {
@@ -1120,7 +1133,10 @@ function renderOpsSchedulesTab(schedules, deliveries) {
             );
         });
         if (!all.length) {
-            list.innerHTML = '<div class="ops-empty">No schedules</div>';
+            list.innerHTML = opsTabEmptyHtml(
+              'No schedules yet',
+              'Create one via Discord SCHEDULE tools or the scheduler API'
+            );
         } else if (!filtered.length) {
             list.innerHTML = opsFilterMissHtml('No schedules match filter', 'schedules');
         } else {
@@ -1150,7 +1166,10 @@ function renderOpsSchedulesTab(schedules, deliveries) {
             schedulesRowMatchesFilter(`${d.schedule_id || ''} ${d.summary || ''} ${d.utc || ''}`)
         );
         if (!all.length) {
-            delList.innerHTML = '<div class="ops-empty">No deliveries yet</div>';
+            delList.innerHTML = opsTabEmptyHtml(
+              'No deliveries yet',
+              'Results appear here after a schedule runs'
+            );
         } else if (!filtered.length) {
             delList.innerHTML = opsFilterMissHtml('No deliveries match filter', 'schedules');
         } else {
@@ -1294,7 +1313,10 @@ function renderOpsAgents(agents) {
         )
     );
     if (!all.length) {
-        list.innerHTML = '<div class="ops-empty">No agents under ~/.mac-stats/agents</div>';
+        list.innerHTML = opsTabEmptyHtml(
+          'No agents yet',
+          'Add agent folders under ~/.mac-stats/agents'
+        );
         return;
     }
     if (!filtered.length) {
@@ -1874,7 +1896,10 @@ function renderOpsLive(rows) {
         )
     );
     if (!all.length) {
-        el.innerHTML = '<div class="ops-empty">No live in-memory sessions</div>';
+        el.innerHTML = opsTabEmptyHtml(
+          'No live sessions',
+          'In-memory chats appear here while agents run'
+        );
         return;
     }
     if (!filtered.length) {
@@ -1926,7 +1951,10 @@ function renderOpsSessionFiles(files) {
         )
     );
     if (!all.length) {
-        el.innerHTML = '<div class="ops-empty">No session-memory-*.md files</div>';
+        el.innerHTML = opsTabEmptyHtml(
+          'No saved session files',
+          'session-memory-*.md appears after Discord chats land on disk'
+        );
         return;
     }
     if (!filtered.length) {
@@ -1983,7 +2011,10 @@ function renderOpsMemory(files) {
         memoryRowMatchesFilter(`${f.name || ''} ${f.kind || ''} ${f.path || ''}`)
     );
     if (!all.length) {
-        el.innerHTML = '<div class="ops-empty">No memory/soul files</div>';
+        el.innerHTML = opsTabEmptyHtml(
+          'No knowledge files yet',
+          'soul.md and memory/*.md live under ~/.mac-stats'
+        );
         return;
     }
     if (!filtered.length) {
@@ -2027,10 +2058,13 @@ function renderOpsRuns(insights) {
                 <div class="ops-insight-title">Insights</div>
                 <div class="ops-row-meta">${escapeHtml(gateway)}</div>
                 <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}</div>
-                <div class="ops-empty ops-empty-compact">No runs in ~/.mac-stats/runs.jsonl yet</div>
+                <div class="ops-empty ops-empty-compact ops-empty-tab">No runs yet — turns land in ~/.mac-stats/runs.jsonl after Discord or chat</div>
             `;
         } else {
-            el.innerHTML = '<div class="ops-empty">No runs in ~/.mac-stats/runs.jsonl yet</div>';
+            el.innerHTML = opsTabEmptyHtml(
+              'No runs yet',
+              'Turns land in ~/.mac-stats/runs.jsonl after Discord or chat'
+            );
         }
         return;
     }
