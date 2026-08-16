@@ -1137,9 +1137,42 @@ function renderOverviewRecent(files) {
     });
 }
 
+/** Show full schedule or delivery text (rows truncate task/summary). */
+function showOpsSchedulePreview(text) {
+    const preview = document.getElementById('ops-schedule-preview');
+    if (!preview) return;
+    const body = String(text || '').trim();
+    if (!body) {
+        preview.hidden = true;
+        preview.textContent = '';
+        return;
+    }
+    preview.hidden = false;
+    preview.textContent = body.slice(0, 12000);
+}
+
+function formatOpsSchedulePreview(s) {
+    const id = s?.id || '(no id)';
+    const when = s?.cron ? `cron ${s.cron}` : s?.at ? `at ${s.at}` : '—';
+    const next = s?.next_run || s?.nextRun || '—';
+    const task = String(s?.task || '').trim() || '(empty task)';
+    return `Schedule: ${id}\nWhen: ${when}\nNext: ${next}\n\nTask:\n${task}`;
+}
+
+function formatOpsDeliveryPreview(d) {
+    const id = d?.schedule_id || 'schedule';
+    const utc = d?.utc || '—';
+    const t = d?.utc ? Date.parse(d.utc) : NaN;
+    const age = !Number.isNaN(t) ? fmtAge(t) : '';
+    const whenLine = age ? `${utc} (${age})` : utc;
+    const summary = String(d?.summary || '').trim() || '(empty summary)';
+    return `Delivery: ${id}\nWhen: ${whenLine}\n\nSummary:\n${summary}`;
+}
+
 function renderOpsSchedulesTab(schedules, deliveries) {
     const list = document.getElementById('ops-schedules-list');
     const delList = document.getElementById('ops-deliveries-list');
+    showOpsSchedulePreview('');
     if (list) {
         list.innerHTML = '';
         const all = schedules || [];
@@ -1166,10 +1199,12 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 const next = s.next_run || s.nextRun || '—';
                 const task = String(s.task || '');
                 btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">${escapeHtml(when)} · next ${escapeHtml(next)}</div><div class="ops-row-meta">${escapeHtml(task.slice(0, 80))}${task.length > 80 ? '…' : ''}</div></div>`;
-                btn.title = task || id;
+                btn.title = 'Click to preview full schedule task';
                 btn.addEventListener('click', () => {
                     list.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+                    delList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
                     btn.classList.add('is-selected');
+                    showOpsSchedulePreview(formatOpsSchedulePreview(s));
                 });
                 list.appendChild(btn);
             });
@@ -1198,10 +1233,12 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 const age = !Number.isNaN(t) ? fmtAge(t) : d.utc || '';
                 const summary = String(d.summary || '');
                 btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(d.schedule_id || 'schedule')}</div><div class="ops-row-meta">${escapeHtml(age)} · ${escapeHtml(summary.slice(0, 72))}${summary.length > 72 ? '…' : ''}</div></div>`;
-                btn.title = summary || d.schedule_id || '';
+                btn.title = 'Click to preview full delivery summary';
                 btn.addEventListener('click', () => {
                     delList.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+                    list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
                     btn.classList.add('is-selected');
+                    showOpsSchedulePreview(formatOpsDeliveryPreview(d));
                 });
                 delList.appendChild(btn);
             });
@@ -1616,7 +1653,7 @@ function tryOpsAgentDetailEscape(e) {
     return true;
 }
 
-/** Esc hides session / knowledge preview panes (Hermes-style dismiss). */
+/** Esc hides session / knowledge / schedule preview panes (Hermes-style dismiss). */
 function tryOpsPreviewEscape(e) {
     if (agentOpsCollapsed) return false;
     const t = e.target;
@@ -1624,6 +1661,7 @@ function tryOpsPreviewEscape(e) {
     if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return false;
     const sessionPreview = document.getElementById('ops-session-preview');
     const memoryPreview = document.getElementById('ops-memory-preview');
+    const schedulePreview = document.getElementById('ops-schedule-preview');
     const loadBtn = document.getElementById('ops-session-load-chat');
     let closed = false;
     if (sessionPreview && !sessionPreview.hidden) {
@@ -1637,6 +1675,11 @@ function tryOpsPreviewEscape(e) {
     if (memoryPreview && !memoryPreview.hidden) {
         memoryPreview.hidden = true;
         memoryPreview.textContent = '';
+        closed = true;
+    }
+    if (schedulePreview && !schedulePreview.hidden) {
+        schedulePreview.hidden = true;
+        schedulePreview.textContent = '';
         closed = true;
     }
     if (closed) {

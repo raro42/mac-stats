@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.452] - 2026-08-16
+
+### Changed
+- Agent Ops Schedules: click a schedule or delivery row to preview the full task or summary (Esc dismisses; rows still truncate in the list).
+
 ## [0.1.451] - 2026-08-16
 
 ### Changed

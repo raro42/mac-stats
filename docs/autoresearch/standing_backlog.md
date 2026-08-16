@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops Schedules/deliveries click-to-preview full task/summary — **v0.1.452**
 - Agent Ops Sessions click-to-copy id/slug chip — **v0.1.451**
 - Agent Ops health-card active-tab accent ring — **v0.1.450**
 - Agent Ops tab true-empty title+hint — **v0.1.449**
