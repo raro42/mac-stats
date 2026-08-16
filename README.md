@@ -175,7 +175,7 @@ Config templates in repo root: [`config.minimal.json`](config.minimal.json) (mon
 
 ## Privacy
 
-**No cloud telemetry** — everything stays in **`~/.mac-stats/`**. Secrets: Keychain and/or `.config.env` (never commit). See [docs/CONFIG.md](docs/CONFIG.md).
+**No cloud telemetry** — everything stays in **`~/.mac-stats/`**. Secrets: Keychain and/or `.config.env`. See [docs/CONFIG.md](docs/CONFIG.md).
 
 ---
 
