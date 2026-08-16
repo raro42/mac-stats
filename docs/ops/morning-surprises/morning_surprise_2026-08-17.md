@@ -13,6 +13,7 @@ Overnight Track B (from 2026-08-16 20:00). Digester open = design-review (stale 
 | **v0.1.472** | Agent Ops **Schedules**: click-to-copy schedule id chip under schedule/delivery preview (Copied flash; Sessions/Knowledge parity) |
 | **v0.1.473** | Agent Ops **Runs**: Load into AI Chat puts the run question into the composer (Enter / double-click; Loaded flash; Sessions parity) |
 | **v0.1.474** | Agent Ops **Schedules**: Load into AI Chat puts the schedule task or delivery summary into the composer (Enter / double-click; Loaded flash; Sessions/Runs parity) |
+| **v0.1.475** | Agent Ops **Knowledge**: Load into AI Chat puts the previewed knowledge file into the composer (Enter / double-click; Loaded flash; Sessions/Runs/Schedules parity) |
 
 ## Tried / deferred
 
@@ -22,4 +23,4 @@ Overnight Track B (from 2026-08-16 20:00). Digester open = design-review (stale 
 ## Notes
 
 - Digester Slowest empty after filters; open candidate remains design-review.
-- Keep logged @ `ca69124` (v0.1.474). Discord Ready after install/kickstart.
+- Keep logged @ `00d40b2` (v0.1.475). Discord Ready after install/kickstart (~22:44).
