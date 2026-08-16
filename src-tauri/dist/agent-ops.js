@@ -1107,6 +1107,16 @@ function renderOverviewKnowledge(files) {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
             selectOpsTab('memory');
+            const matchTitle = f.name || '';
+            const list = document.getElementById('ops-memory-list');
+            list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            list?.querySelectorAll('.ops-row').forEach((row) => {
+                const title = row.querySelector('.ops-row-title');
+                if (title && title.textContent === matchTitle) {
+                    row.classList.add('is-selected');
+                    row.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
             const preview = document.getElementById('ops-memory-preview');
             const copyPath = f.path || f.name || '';
             const label = f.name || f.path || 'knowledge';
@@ -1142,7 +1152,7 @@ function renderOverviewKnowledge(files) {
                 showOpsMemoryLoadStatus(String(err), false);
             }
         });
-        btn.title = 'Open in Knowledge · load into AI Chat from that tab';
+        btn.title = 'Open in Knowledge · preview file · load into AI Chat from that tab';
         body.appendChild(btn);
     });
 }

@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.480] - 2026-08-17
+
+### Changed
+- Agent Ops **overview Knowledge**: click a knowledge file opens Knowledge, selects the matching list row, and shows preview + Load into AI Chat status (Live/Recent/Schedules overview parity).
+
 ## [0.1.479] - 2026-08-17
 
 ### Changed
