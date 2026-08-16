@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00) shipped product UI polish. Digester open staye
 
 | Version | What |
 |---------|------|
+| **v0.1.453** | Agent Ops Knowledge: click-to-copy file path chip + Copied flash (list + overview; Esc clears) |
 | **v0.1.452** | Agent Ops Schedules: click schedule/delivery → full task or summary preview (Esc dismisses) |
 | **v0.1.451** | Agent Ops Sessions: click-to-copy session id / file slug chip + Copied flash |
 | **v0.1.450** | Agent Ops health cards: accent ring when linked tab is active (status wash stays) |
@@ -31,4 +32,4 @@ Overnight Track B (20:00–06:00) shipped product UI polish. Digester open staye
 
 ## Ratchet
 
-Keeps landed in `~/.mac-stats/improvements/autoresearch/results.tsv` (nightly minimum met). Latest: **v0.1.452** Agent Ops Schedules/deliveries click-to-preview.
+Keeps landed in `~/.mac-stats/improvements/autoresearch/results.tsv` (nightly minimum met). Latest: **v0.1.453** Agent Ops Knowledge path click-to-copy.
