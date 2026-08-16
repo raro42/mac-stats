@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.469] - 2026-08-16
+
+### Added
+- Agent Ops **Agents**: click-to-copy slug/id chip under agent detail meta (Copied flash; Sessions/Knowledge parity).
+
 ## [0.1.468] - 2026-08-16
 
 ### Added

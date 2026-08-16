@@ -661,7 +661,7 @@ body:hover {
   border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
 }
 
-/* Sessions / Knowledge: click-to-copy id, slug, or file path above preview */
+/* Sessions / Knowledge / Agents: click-to-copy id, slug, or file path */
 .ops-session-copy-chip {
   display: inline-flex;
   align-items: center;
@@ -698,6 +698,11 @@ body:hover {
   color: #34c759;
   border-color: color-mix(in srgb, #34c759 45%, transparent);
   background: color-mix(in srgb, #34c759 14%, transparent);
+}
+
+.ops-detail .ops-agent-copy-chip {
+  display: block;
+  margin: 0 0 10px;
 }
 
 textarea.ops-agent-editor {

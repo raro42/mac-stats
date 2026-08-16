@@ -1405,6 +1405,7 @@ async function openOpsAgent(id) {
         detail.hidden = false;
         document.getElementById('ops-agent-meta').textContent =
             `${opsAgentCache.name} · ${opsAgentCache.slug || opsAgentCache.id} · ${opsAgentCache.model || 'default'} · ${opsAgentCache.enabled ? 'enabled' : 'disabled'}`;
+        setOpsAgentCopyChip(opsAgentCache.slug || opsAgentCache.id || '');
         opsAgentFileTab = 'soul';
         opsAgentDirty = { soul: false, skill: false, mood: false };
         document.querySelectorAll('.ops-file-tab').forEach((b) => {
@@ -1425,6 +1426,7 @@ function closeOpsAgentDetail() {
     if (list) list.style.display = '';
     opsAgentDirty = { soul: false, skill: false, mood: false };
     setOpsAgentSaveStatus('');
+    setOpsAgentCopyChip(null);
     const editor = document.getElementById('ops-agent-preview');
     if (editor) editor.classList.remove('is-dirty');
     const saveBtn = document.getElementById('ops-agent-save');
@@ -1903,6 +1905,73 @@ async function copyOpsTextToClipboard(text) {
         return !!ok;
     } catch (_) {
         return false;
+    }
+}
+
+/** Click-to-copy agent slug/id under Agents detail meta (Copied flash). */
+function ensureOpsAgentCopyChip() {
+    let el = document.getElementById('ops-agent-copy-chip');
+    if (el) return el;
+    const meta = document.getElementById('ops-agent-meta');
+    if (!meta || !meta.parentNode) return null;
+    el = document.createElement('button');
+    el.type = 'button';
+    el.id = 'ops-agent-copy-chip';
+    el.className = 'ops-session-copy-chip ops-agent-copy-chip';
+    el.hidden = true;
+    el.setAttribute('aria-label', 'Copy agent id');
+    meta.parentNode.insertBefore(el, meta.nextSibling);
+    el.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (el.classList.contains('is-just-saved')) return;
+        const value = el.dataset.copyValue || '';
+        if (!value) return;
+        const ok = await copyOpsTextToClipboard(value);
+        if (!ok) return;
+        if (typeof window.flashSaveButton === 'function') {
+            window.flashSaveButton(el, { savedLabel: 'Copied', durationMs: 1600 });
+        } else {
+            const idle = el._saveFlashOriginalLabel || value;
+            el._saveFlashOriginalLabel = idle;
+            el.classList.add('is-just-saved');
+            el.textContent = 'Copied';
+            clearTimeout(el._saveFlashTimer);
+            el._saveFlashTimer = setTimeout(() => {
+                el.classList.remove('is-just-saved');
+                el.textContent = idle;
+                el._saveFlashOriginalLabel = null;
+                el._saveFlashTimer = null;
+            }, 1600);
+        }
+    });
+    el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            el.click();
+        }
+    });
+    return el;
+}
+
+function setOpsAgentCopyChip(copyValue) {
+    const el = ensureOpsAgentCopyChip();
+    if (!el) return;
+    const value = String(copyValue || '').trim();
+    if (!value) {
+        el.hidden = true;
+        el.dataset.copyValue = '';
+        el.classList.remove('is-just-saved');
+        el.textContent = '';
+        return;
+    }
+    el.hidden = false;
+    el.dataset.copyValue = value;
+    el.title = 'Click to copy agent id';
+    el.setAttribute('aria-label', `Copy ${value}`);
+    if (!el.classList.contains('is-just-saved')) {
+        el.textContent = value;
+        el._saveFlashOriginalLabel = value;
     }
 }
 
