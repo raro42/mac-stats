@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.464] - 2026-08-16
+
+### Added
+- Details section: system **RAM** % / used / total (menu-bar parity). Placement note: [docs/design/046_ram_details_placement.md](docs/design/046_ram_details_placement.md).
+
+### Changed
+- CPU window title bar is now `mac-stats <version>` (was `CPU`).
+
 ## [0.1.463] - 2026-08-16
 
 ### Fixed

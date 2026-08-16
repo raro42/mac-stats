@@ -851,6 +851,37 @@ async function refresh() {
       });
     }
 
+    // System RAM (menu-bar parity) — Details section
+    const ramPctEl = document.getElementById("ram-percent-value");
+    const ramUsedEl = document.getElementById("ram-used-value");
+    const ramTotalEl = document.getElementById("ram-total-value");
+    if (ramPctEl || ramUsedEl || ramTotalEl) {
+      const pct =
+        typeof data.ram_percent === "number" && Number.isFinite(data.ram_percent)
+          ? data.ram_percent
+          : null;
+      const used = Number(data.ram_used_bytes) || 0;
+      const total = Number(data.ram_total_bytes) || 0;
+      const pctText = pct != null ? `${pct.toFixed(0)}%` : "—";
+      const usedText = used > 0 ? formatBytes(used) : "—";
+      const totalText = total > 0 ? formatBytes(total) : "—";
+      if (ramPctEl && ramPctEl.textContent !== pctText) {
+        scheduleDOMUpdate(() => {
+          ramPctEl.textContent = pctText;
+        });
+      }
+      if (ramUsedEl && ramUsedEl.textContent !== usedText) {
+        scheduleDOMUpdate(() => {
+          ramUsedEl.textContent = usedText;
+        });
+      }
+      if (ramTotalEl && ramTotalEl.textContent !== totalText) {
+        scheduleDOMUpdate(() => {
+          ramTotalEl.textContent = totalText;
+        });
+      }
+    }
+
     // Update load averages (simple updates, no tweening)
     const load1El = document.getElementById("load-1");
     const newLoad1 = data.load_1.toFixed(2);
@@ -1331,6 +1362,9 @@ if (document.readyState === "loading") {
     
     try {
       appVersion = await invoke("get_app_version");
+      try {
+        document.title = `mac-stats ${appVersion}`;
+      } catch (_) {}
       try {
         const prev = localStorage.getItem("macStatsAssetVersion");
         if (prev !== appVersion) {

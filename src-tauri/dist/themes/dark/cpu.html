@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="./cpu.css" />
     <link rel="stylesheet" href="../../agent-ops.css?v=0.1.463" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CPU</title>
+    <title>mac-stats</title>
   </head>
   <body>
     <main class="glass-panel">
@@ -533,6 +533,13 @@
             <div class="metric-hint" id="gpu-power-hint" style="display: none;">--</div>
           </div>
 
+
+          <div class="detail-label">RAM</div>
+          <div class="detail-value" id="ram-percent-value">—</div>
+          <div class="detail-label">RAM used</div>
+          <div class="detail-value" id="ram-used-value">—</div>
+          <div class="detail-label">RAM total</div>
+          <div class="detail-value" id="ram-total-value">—</div>
           <div class="detail-label">Uptime</div>
           <div class="detail-value" id="uptime-value">0h</div>
         </div>
@@ -660,7 +667,7 @@
     <script src="../../tauri-logger.js"></script>
     <script type="module" src="../../ollama.js?v=20260717-model"></script>
     <script src="../../agent-ops.js?v=0.1.463"></script>
-    <script src="../../cpu.js?v=0.1.463"></script>
+    <script src="../../cpu.js?v=0.1.464"></script>
     <script src="../../discord.js"></script>
     <script src="../../cpu-ui.js?v=20260722-settings"></script>
     <script src="../../chart-line.js"></script>

@@ -94,6 +94,15 @@ pub struct CpuDetails {
     pub load_5: f64,
     pub load_15: f64,
     pub uptime_secs: u64,
+    /// System RAM used / total as percent (0–100). Same basis as menu-bar RAM.
+    #[serde(default)]
+    pub ram_percent: f32,
+    /// Bytes of used system memory (sysinfo).
+    #[serde(default)]
+    pub ram_used_bytes: u64,
+    /// Bytes of total system memory (sysinfo).
+    #[serde(default)]
+    pub ram_total_bytes: u64,
     pub top_processes: Vec<ProcessUsage>,
     pub chip_info: String,
     // Access flags - true if we can read the value, false if access is denied
@@ -1477,13 +1486,24 @@ pub fn get_cpu_details() -> CpuDetails {
         debug3!("get_cpu_details() rate limited - returning cached values for most metrics");
         // Return cached values immediately without doing expensive work
         // BUT: Still check and refresh process cache if stale (>5s)
-        let (usage, load, uptime_secs) = match crate::state::SYSTEM.try_lock() {
+        let (usage, load, uptime_secs, ram_percent, ram_used_bytes, ram_total_bytes) =
+            match crate::state::SYSTEM.try_lock() {
             Ok(sys) => {
                 if let Some(sys) = sys.as_ref() {
+                    let total = sys.total_memory();
+                    let used = sys.used_memory();
+                    let pct = if total > 0 {
+                        (used as f32 / total as f32) * 100.0
+                    } else {
+                        0.0
+                    };
                     (
                         sys.global_cpu_usage(),
                         sysinfo::System::load_average(),
                         sysinfo::System::uptime(),
+                        pct,
+                        used,
+                        total,
                     )
                 } else {
                     (
@@ -1493,6 +1513,9 @@ pub fn get_cpu_details() -> CpuDetails {
                             five: 0.0,
                             fifteen: 0.0,
                         },
+                        0,
+                        0.0,
+                        0,
                         0,
                     )
                 }
@@ -1504,6 +1527,9 @@ pub fn get_cpu_details() -> CpuDetails {
                     five: 0.0,
                     fifteen: 0.0,
                 },
+                0,
+                0.0,
+                0,
                 0,
             ),
         };
@@ -1664,6 +1690,9 @@ pub fn get_cpu_details() -> CpuDetails {
             load_5: load.five,
             load_15: load.fifteen,
             uptime_secs,
+            ram_percent,
+            ram_used_bytes,
+            ram_total_bytes,
             top_processes: processes,
             chip_info: crate::metrics::get_chip_info(),
             can_read_temperature: crate::metrics::can_read_temperature(),
@@ -2060,6 +2089,24 @@ pub fn get_cpu_details() -> CpuDetails {
 
     let gpu_usage = get_gpu_usage();
 
+    let (ram_percent, ram_used_bytes, ram_total_bytes) = match SYSTEM.try_lock() {
+        Ok(sys) => {
+            if let Some(sys) = sys.as_ref() {
+                let total = sys.total_memory();
+                let used = sys.used_memory();
+                let pct = if total > 0 {
+                    (used as f32 / total as f32) * 100.0
+                } else {
+                    0.0
+                };
+                (pct, used, total)
+            } else {
+                (0.0, 0, 0)
+            }
+        }
+        Err(_) => (0.0, 0, 0),
+    };
+
     CpuDetails {
         usage,
         gpu_usage,
@@ -2073,6 +2120,9 @@ pub fn get_cpu_details() -> CpuDetails {
         load_5: load.five,
         load_15: load.fifteen,
         uptime_secs,
+        ram_percent,
+        ram_used_bytes,
+        ram_total_bytes,
         top_processes,
         chip_info,
         can_read_temperature,
