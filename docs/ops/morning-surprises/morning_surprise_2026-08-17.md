@@ -1,26 +1,30 @@
 # Morning surprise — 2026-08-17
 
-Overnight Track B (from 2026-08-16 20:00). Digester open = design-review (stale `feature-agent-ops.png`); design-review due. Product UI shipped — not quiet.
+Updated: 2026-08-16 23:09 (overnight harness)
 
-## Shipped
+## Shipped tonight (Track B)
 
 | Version | What |
 |---------|------|
-| **v0.1.468** | Agent Ops **Runs**: click a run → preview question, tools, lane, wall time, request id (Esc dismisses) |
-| **v0.1.469** | Agent Ops **Agents**: click-to-copy slug/id chip under detail meta (Copied flash; Sessions/Knowledge parity) |
-| **v0.1.470** | Data Poster: inactive section icons near-white (were nearly invisible on dark UI) + install rebuild-when-dist-newer gate |
-| **v0.1.471** | Agent Ops **Runs**: click-to-copy request id chip under run preview (Copied flash; Sessions/Knowledge parity) |
-| **v0.1.472** | Agent Ops **Schedules**: click-to-copy schedule id chip under schedule/delivery preview (Copied flash; Sessions/Knowledge parity) |
-| **v0.1.473** | Agent Ops **Runs**: Load into AI Chat puts the run question into the composer (Enter / double-click; Loaded flash; Sessions parity) |
-| **v0.1.474** | Agent Ops **Schedules**: Load into AI Chat puts the schedule task or delivery summary into the composer (Enter / double-click; Loaded flash; Sessions/Runs parity) |
-| **v0.1.475** | Agent Ops **Knowledge**: Load into AI Chat puts the previewed knowledge file into the composer (Enter / double-click; Loaded flash; Sessions/Runs/Schedules parity) |
+| **v0.1.476** | Agent Ops **Agents** Load into AI Chat — open soul/skill/mood → composer (Enter / double-click; Loaded flash) |
+| v0.1.475 | Agent Ops Knowledge Load into AI Chat |
+| v0.1.474 | Agent Ops Schedules Load into AI Chat |
+| v0.1.473 | Agent Ops Runs Load into AI Chat |
+| v0.1.472 | Agent Ops Schedules/deliveries id copy chip |
+| v0.1.471 | Agent Ops Runs request-id copy chip |
 
-## Tried / deferred
+## Design review
 
-- Recapture of `docs/screens/feature-agent-ops.png` still deferred — Screen Recording TCC / no on-screen CPU window for capture.
-- Install `cmp -s` on ~50MB Mach-O sometimes gets SIGKILL overnight; install script now checks size after `cp` instead.
+- Digester open = stale `feature-agent-ops.png` (~4.6d); `overnight_design_review.py` due=true.
+- Recapture still deferred when Screen Recording TCC blocks Quartz window list.
+- Polish continued on Agent Ops Agents tab (parity with Sessions/Knowledge load).
 
-## Notes
+## Digester / debug
 
-- Digester Slowest empty after filters; open candidate remains design-review.
-- Keep logged @ `00d40b2` (v0.1.475). Discord Ready after install/kickstart (~22:44).
+- Latency n/a (instant noise filtered); no Slowest open product candidates beyond design-review.
+- `debug.log`: single-instance WARN only (expected KeepAlive / launch race).
+
+## Next
+
+- Prefer non-agents-load-adjacent fuel when digester empty (e.g. processes keyboard polish, screenshot when TCC allows, or Discord traffic).
+- Finish deferred `docs/screens/feature-agent-ops.png` / `feature-cpu-metrics.png` when a CPU window is capturable.
