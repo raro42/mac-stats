@@ -1141,17 +1141,86 @@ function renderOverviewRecent(files) {
 }
 
 /** Show full schedule or delivery text (rows truncate task/summary). */
-function showOpsSchedulePreview(text) {
+function showOpsSchedulePreview(text, copyValue) {
     const preview = document.getElementById('ops-schedule-preview');
     if (!preview) return;
     const body = String(text || '').trim();
     if (!body) {
         preview.hidden = true;
         preview.textContent = '';
+        setOpsScheduleCopyChip(null);
         return;
     }
     preview.hidden = false;
     preview.textContent = body.slice(0, 12000);
+    setOpsScheduleCopyChip(copyValue);
+}
+
+/** Click-to-copy schedule id above the Schedules preview (Copied flash). */
+function ensureOpsScheduleCopyChip() {
+    let el = document.getElementById('ops-schedule-copy-chip');
+    if (el) return el;
+    const preview = document.getElementById('ops-schedule-preview');
+    if (!preview || !preview.parentNode) return null;
+    el = document.createElement('button');
+    el.type = 'button';
+    el.id = 'ops-schedule-copy-chip';
+    el.className = 'ops-session-copy-chip ops-schedule-copy-chip';
+    el.hidden = true;
+    el.setAttribute('aria-label', 'Copy schedule id');
+    preview.parentNode.insertBefore(el, preview);
+    el.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (el.classList.contains('is-just-saved')) return;
+        const value = el.dataset.copyValue || '';
+        if (!value) return;
+        const ok = await copyOpsTextToClipboard(value);
+        if (!ok) return;
+        if (typeof window.flashSaveButton === 'function') {
+            window.flashSaveButton(el, { savedLabel: 'Copied', durationMs: 1600 });
+        } else {
+            const idle = el._saveFlashOriginalLabel || value;
+            el._saveFlashOriginalLabel = idle;
+            el.classList.add('is-just-saved');
+            el.textContent = 'Copied';
+            clearTimeout(el._saveFlashTimer);
+            el._saveFlashTimer = setTimeout(() => {
+                el.classList.remove('is-just-saved');
+                el.textContent = idle;
+                el._saveFlashOriginalLabel = null;
+                el._saveFlashTimer = null;
+            }, 1600);
+        }
+    });
+    el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            el.click();
+        }
+    });
+    return el;
+}
+
+function setOpsScheduleCopyChip(copyValue) {
+    const el = ensureOpsScheduleCopyChip();
+    if (!el) return;
+    const value = String(copyValue || '').trim();
+    if (!value || value === '—') {
+        el.hidden = true;
+        el.dataset.copyValue = '';
+        el.classList.remove('is-just-saved');
+        el.textContent = '';
+        return;
+    }
+    el.hidden = false;
+    el.dataset.copyValue = value;
+    el.title = 'Click to copy schedule id';
+    el.setAttribute('aria-label', `Copy ${value}`);
+    if (!el.classList.contains('is-just-saved')) {
+        el.textContent = value;
+        el._saveFlashOriginalLabel = value;
+    }
 }
 
 function formatOpsSchedulePreview(s) {
@@ -1207,7 +1276,7 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                     list.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
                     delList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
                     btn.classList.add('is-selected');
-                    showOpsSchedulePreview(formatOpsSchedulePreview(s));
+                    showOpsSchedulePreview(formatOpsSchedulePreview(s), s.id || '');
                 });
                 list.appendChild(btn);
             });
@@ -1241,7 +1310,7 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                     delList.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
                     list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
                     btn.classList.add('is-selected');
-                    showOpsSchedulePreview(formatOpsDeliveryPreview(d));
+                    showOpsSchedulePreview(formatOpsDeliveryPreview(d), d.schedule_id || '');
                 });
                 delList.appendChild(btn);
             });
@@ -1688,6 +1757,7 @@ function tryOpsPreviewEscape(e) {
     if (schedulePreview && !schedulePreview.hidden) {
         schedulePreview.hidden = true;
         schedulePreview.textContent = '';
+        setOpsScheduleCopyChip(null);
         closed = true;
     }
     if (runsPreview && !runsPreview.hidden) {

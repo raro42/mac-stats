@@ -695,7 +695,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
 }
 
-/* Sessions / Knowledge / Agents: click-to-copy id, slug, or file path */
+/* Sessions / Knowledge / Agents / Schedules / Runs: click-to-copy id, slug, path, or request id */
 .ops-session-copy-chip {
   display: inline-flex;
   align-items: center;
@@ -735,6 +735,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 .ops-panel-runs .ops-runs-copy-chip,
+.ops-panel-schedules .ops-schedule-copy-chip,
 .ops-detail .ops-agent-copy-chip {
   display: block;
   margin: 0 0 10px;
