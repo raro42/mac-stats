@@ -26,7 +26,7 @@ open -a mac-stats
 
 The Homebrew cask `postflight` also clears quarantine; if an older cask is cached, run the `xattr` line by hand. Do not disable Gatekeeper system-wide.
 
-Unsigned ≠ malicious; it means Apple Developer credentials are not in CI yet.
+Unsigned ≠ malicious. The maintainer does not have an Apple Developer account to sign and notarize builds yet — help is welcome (see secrets table above).
 
 ## Goal
 

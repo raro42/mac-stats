@@ -20,8 +20,8 @@ cask "mac-stats" do
 
   app "mac-stats.app"
 
-  # Release DMG is ad-hoc signed until Developer ID + notarization secrets are
-  # in CI. Sequoia+ then reports “mac-stats is damaged” even after brew install.
+  # Maintainer has no Apple Developer account to sign/notarize yet — help welcome.
+  # Sequoia+ then reports “mac-stats is damaged” even after brew install.
   # Clearing quarantine after install is the supported workaround (same as
   # scripts/install-to-applications.sh).
   postflight do
@@ -30,8 +30,9 @@ cask "mac-stats" do
   end
 
   caveats <<~EOS
-    Until the GitHub release DMG is Developer ID–signed and notarized, macOS
-    Gatekeeper may say the app is “damaged”. That is not a corrupt download.
+    The maintainer does not have an Apple Developer account to sign mac-stats
+    yet — help is welcome. Gatekeeper may say the app is “damaged”; that is
+    not a corrupt download.
 
     brew install runs xattr to clear quarantine. If open still fails:
 

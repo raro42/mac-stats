@@ -64,7 +64,7 @@ Look at the menu bar → click for the window. Disk Cleanup, monitors, and theme
 
 ### If macOS says the DMG / app is “damaged”
 
-That message is **Gatekeeper**, not a corrupt download. The release app is **ad-hoc signed and not notarized** until Apple Developer credentials are in CI ([docs/NOTARIZATION.md](docs/NOTARIZATION.md)). On recent macOS, that often shows as “**… is damaged and can’t be opened**.”
+That message is **Gatekeeper**, not a corrupt download. I don’t have an Apple Developer account to sign mac-stats — help is welcome ([docs/NOTARIZATION.md](docs/NOTARIZATION.md)). On recent macOS, that often shows as “**… is damaged and can’t be opened**.”
 
 **Homebrew does not skip this by itself.** `brew install --cask` still installs the same unsigned `.app`. The [`install.sh`](install.sh) one-liner clears quarantine for you. If you installed by hand:
 
