@@ -1046,19 +1046,37 @@ function renderOverviewLive(rows) {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
             selectOpsTab('sessions');
+            const matchTitle = `${r.source} · ${r.session_id}`;
+            const liveList = document.getElementById('ops-live-sessions');
+            const fileList = document.getElementById('ops-session-files');
+            fileList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            liveList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            let matchedRow = null;
+            liveList?.querySelectorAll('.ops-row').forEach((row) => {
+                const title = row.querySelector('.ops-row-title');
+                if (title && title.textContent === matchTitle) {
+                    matchedRow = row;
+                    row.classList.add('is-selected');
+                    row.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
             try {
                 const msgs = await invoke('read_live_session_messages', {
                     source: r.source,
                     sessionId: r.session_id,
                 });
+                if (matchedRow) markOpsSessionRowSelected(matchedRow);
                 showOpsSessionPreview(msgs, `Live ${r.source} · ${r.session_id}`, r.session_id);
-                showOpsSessionStatus('Preview ready — use “Load into AI Chat” on the Sessions tab.', true);
+                showOpsSessionStatus(
+                    'Preview ready — Enter or “Load into AI Chat” · double-click also loads.',
+                    true
+                );
             } catch (err) {
                 showOpsSessionPreview([], String(err), null);
                 showOpsSessionStatus(String(err), false);
             }
         });
-        btn.title = 'Open live session in Sessions';
+        btn.title = 'Open in Sessions · preview live chat · load into AI Chat from that tab';
         body.appendChild(btn);
     });
 }
