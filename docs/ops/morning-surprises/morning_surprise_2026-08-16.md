@@ -6,6 +6,7 @@ Overnight Track B (20:00–06:00) shipped product UI polish. Digester open staye
 
 | Version | What |
 |---------|------|
+| **v0.1.451** | Agent Ops Sessions: click-to-copy session id / file slug chip + Copied flash |
 | **v0.1.450** | Agent Ops health cards: accent ring when linked tab is active (status wash stays) |
 | **v0.1.449** | Agent Ops list tabs: true-empty title + short hint (schedules / deliveries / agents / sessions / knowledge / runs) |
 | **v0.1.448** | Monitors URL click-to-copy + Copied flash (list + detail) |
@@ -29,4 +30,4 @@ Overnight Track B (20:00–06:00) shipped product UI polish. Digester open staye
 
 ## Ratchet
 
-Keeps landed in `~/.mac-stats/improvements/autoresearch/results.tsv` (nightly minimum met). Latest: **v0.1.450** Agent Ops health-card active-tab accent ring.
+Keeps landed in `~/.mac-stats/improvements/autoresearch/results.tsv` (nightly minimum met). Latest: **v0.1.451** Agent Ops Sessions click-to-copy id/slug chip.
