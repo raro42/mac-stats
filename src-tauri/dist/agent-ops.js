@@ -149,6 +149,7 @@
   let opsSessionFilesCache = [];
   let opsMemoryFilterQ = '';
   let opsMemoryCache = [];
+  let opsMemoryLoadText = null;
   let opsRunsFilterQ = '';
   let opsRunsInsightsCache = null;
   let opsRunLoadQuestion = null;
@@ -351,6 +352,7 @@ function setupAgentOps() {
                 if (tryOpsSessionEnterLoad(e)) return;
                 if (tryOpsRunsEnterLoad(e)) return;
                 if (tryOpsSchedulesEnterLoad(e)) return;
+                if (tryOpsMemoryEnterLoad(e)) return;
                 if (tryOpsMemoryEnter(e)) return;
                 if (tryOpsRunsEnter(e)) return;
                 if (tryOpsAgentsEnter(e)) return;
@@ -1073,22 +1075,40 @@ function renderOverviewKnowledge(files) {
             selectOpsTab('memory');
             const preview = document.getElementById('ops-memory-preview');
             const copyPath = f.path || f.name || '';
+            const label = f.name || f.path || 'knowledge';
             try {
                 const text = await invoke('read_memory_file', { path: f.path });
+                const bodyText = String(text || '').slice(0, 12000);
                 if (preview) {
                     preview.hidden = false;
-                    preview.textContent = text.slice(0, 12000);
+                    preview.textContent = bodyText;
                 }
                 setOpsMemoryCopyChip(copyPath);
+                const loadBody = bodyText.trim();
+                if (loadBody) {
+                    opsMemoryLoadText = `Knowledge: ${label}\n\n${loadBody}`;
+                    setOpsMemoryLoadChatVisible(true);
+                    showOpsMemoryLoadStatus(
+                        'Preview ready — Enter or “Load into AI Chat” · double-click also loads.',
+                        true
+                    );
+                } else {
+                    opsMemoryLoadText = null;
+                    setOpsMemoryLoadChatVisible(false);
+                    showOpsMemoryLoadStatus('File is empty.', false);
+                }
             } catch (err) {
                 if (preview) {
                     preview.hidden = false;
                     preview.textContent = String(err);
                 }
+                opsMemoryLoadText = null;
                 setOpsMemoryCopyChip(null);
+                setOpsMemoryLoadChatVisible(false);
+                showOpsMemoryLoadStatus(String(err), false);
             }
         });
-        btn.title = 'Open in Knowledge';
+        btn.title = 'Open in Knowledge · load into AI Chat from that tab';
         body.appendChild(btn);
     });
 }
@@ -1896,7 +1916,10 @@ function tryOpsPreviewEscape(e) {
     if (memoryPreview && !memoryPreview.hidden) {
         memoryPreview.hidden = true;
         memoryPreview.textContent = '';
+        opsMemoryLoadText = null;
         setOpsMemoryCopyChip(null);
+        setOpsMemoryLoadChatVisible(false);
+        showOpsMemoryLoadStatus('', true);
         closed = true;
     }
     if (schedulePreview && !schedulePreview.hidden) {
@@ -1959,6 +1982,23 @@ function tryOpsSessionEnterLoad(e) {
     if (tag === 'INPUT' && t.id && t.id !== 'ops-session-filter') return false;
     e.preventDefault();
     loadOpsSessionIntoChat();
+    return true;
+}
+
+/** Enter loads the previewed knowledge file into AI Chat when ready (Sessions/Runs parity). */
+function tryOpsMemoryEnterLoad(e) {
+    if (agentOpsCollapsed) return false;
+    const panel = document.getElementById('ops-panel-memory');
+    if (!panel || !panel.classList.contains('active')) return false;
+    const loadBtn = document.getElementById('ops-memory-load-chat');
+    if (!loadBtn || loadBtn.hidden || !opsMemoryLoadText) return false;
+    if (loadBtn.classList.contains('is-just-saved')) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    if (tag === 'TEXTAREA') return false;
+    if (tag === 'INPUT' && t.id && t.id !== 'ops-memory-filter') return false;
+    e.preventDefault();
+    loadOpsMemoryIntoChat();
     return true;
 }
 
@@ -2289,6 +2329,122 @@ function setOpsMemoryCopyChip(copyValue) {
     }
 }
 
+/** Load-into-chat control under the Knowledge preview (Sessions/Runs/Schedules parity). */
+function ensureOpsMemoryLoadChatBtn() {
+    let el = document.getElementById('ops-memory-load-chat');
+    if (el) return el;
+    const preview = document.getElementById('ops-memory-preview');
+    if (!preview || !preview.parentNode) return null;
+    el = document.createElement('button');
+    el.type = 'button';
+    el.id = 'ops-memory-load-chat';
+    el.className = 'btn-secondary ops-memory-load-chat';
+    el.hidden = true;
+    el.textContent = 'Load into AI Chat ↵';
+    el.title = 'Put this knowledge file into AI Chat (Enter)';
+    el.setAttribute('aria-label', 'Load knowledge file into AI Chat');
+    preview.parentNode.insertBefore(el, preview.nextSibling);
+    el.addEventListener('click', () => loadOpsMemoryIntoChat());
+    return el;
+}
+
+function setOpsMemoryLoadChatVisible(visible) {
+    const el = ensureOpsMemoryLoadChatBtn();
+    if (!el) return;
+    el.hidden = !visible;
+    if (!visible) {
+        el.classList.remove('is-just-saved');
+        if (!el._saveFlashOriginalLabel) {
+            el.textContent = 'Load into AI Chat ↵';
+        }
+    }
+}
+
+function showOpsMemoryLoadStatus(msg, ok) {
+    let el = document.getElementById('ops-memory-load-status');
+    const loadBtn = ensureOpsMemoryLoadChatBtn();
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'ops-memory-load-status';
+        el.className = 'ops-row-meta';
+        el.style.margin = '6px 4px 0';
+        if (loadBtn?.parentNode) {
+            loadBtn.parentNode.insertBefore(el, loadBtn.nextSibling);
+        }
+    }
+    el.textContent = msg || '';
+    el.style.opacity = msg ? '0.9' : '0';
+    el.style.color = ok === false ? 'rgba(200,60,60,0.95)' : '';
+}
+
+/** Put the previewed knowledge file into AI Chat for a quick follow-up. */
+function loadOpsMemoryIntoChat() {
+    const loadBtn = ensureOpsMemoryLoadChatBtn();
+    if (loadBtn?.classList.contains('is-just-saved')) return;
+    const q = String(opsMemoryLoadText || '').trim();
+    if (!q) {
+        showOpsMemoryLoadStatus('Select a knowledge file first.', false);
+        return;
+    }
+    const aiOff =
+        document.getElementById('icon-ollama')?.style.pointerEvents === 'none' ||
+        document.getElementById('ollama-section')?.style.display === 'none';
+    if (aiOff) {
+        showOpsMemoryLoadStatus('Enable local AI agent in Settings to load into chat.', false);
+        return;
+    }
+    const input = document.getElementById('chat-input');
+    if (!input) {
+        showOpsMemoryLoadStatus('AI Chat input not ready — open AI Chat once, then retry.', false);
+        return;
+    }
+    input.value = q;
+    try {
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+    } catch (_) {
+        /* ignore */
+    }
+    const section = document.querySelector('.ollama-section');
+    const themeCollapsed =
+        section?.classList.contains('collapsed') ||
+        localStorage.getItem('ollama_collapsed') === 'true';
+    if (themeCollapsed) {
+        document.getElementById('ollama-header')?.click();
+    }
+    const content = document.getElementById('ollama-content');
+    const btn = document.getElementById('ollama-collapse-btn');
+    if (content) {
+        content.classList.remove('collapsed');
+        if (content.style.display === 'none') content.style.display = '';
+    }
+    if (section) section.classList.remove('collapsed');
+    if (btn) btn.textContent = '−';
+    section?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => {
+        input.focus();
+        try {
+            const len = input.value.length;
+            input.setSelectionRange(len, len);
+        } catch (_) {
+            /* ignore */
+        }
+    }, 80);
+    showOpsMemoryLoadStatus('Knowledge loaded into AI Chat.', true);
+    if (loadBtn && !loadBtn.hidden) {
+        if (typeof window.flashSaveButton === 'function') {
+            window.flashSaveButton(loadBtn, { savedLabel: 'Loaded', durationMs: 1600 });
+        } else {
+            const idle = loadBtn.textContent || 'Load into AI Chat ↵';
+            loadBtn.classList.add('is-just-saved');
+            loadBtn.textContent = 'Loaded';
+            setTimeout(() => {
+                loadBtn.classList.remove('is-just-saved');
+                loadBtn.textContent = idle;
+            }, 1600);
+        }
+    }
+}
+
 /** Click-to-copy session id / file slug above the Sessions preview (Copied flash). */
 function ensureOpsSessionCopyChip() {
     let el = document.getElementById('ops-session-copy-chip');
@@ -2564,7 +2720,10 @@ function renderOpsMemory(files) {
     const preview = document.getElementById('ops-memory-preview');
     el.innerHTML = '';
     preview.hidden = true;
+    opsMemoryLoadText = null;
     setOpsMemoryCopyChip(null);
+    setOpsMemoryLoadChatVisible(false);
+    showOpsMemoryLoadStatus('', true);
     const all = files || [];
     const filtered = all.filter((f) =>
         memoryRowMatchesFilter(`${f.name || ''} ${f.kind || ''} ${f.path || ''}`)
@@ -2585,24 +2744,47 @@ function renderOpsMemory(files) {
         btn.type = 'button';
         btn.className = 'ops-row';
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(f.kind)} · ${f.line_count} lines · ${fmtBytes(f.size_bytes)}</div></div>`;
-        btn.addEventListener('click', async () => {
+        const openFile = async () => {
             document
                 .querySelectorAll('#ops-memory-list .ops-row.is-selected')
-                .forEach((el) => el.classList.remove('is-selected'));
+                .forEach((row) => row.classList.remove('is-selected'));
             btn.classList.add('is-selected');
             const copyPath = f.path || f.name || '';
+            const label = f.name || f.path || 'knowledge';
             try {
                 const text = await invoke('read_memory_file', { path: f.path });
+                const body = String(text || '').slice(0, 12000);
                 preview.hidden = false;
-                preview.textContent = text.slice(0, 12000);
+                preview.textContent = body;
                 setOpsMemoryCopyChip(copyPath);
+                const loadBody = body.trim();
+                if (loadBody) {
+                    opsMemoryLoadText = `Knowledge: ${label}\n\n${loadBody}`;
+                    setOpsMemoryLoadChatVisible(true);
+                    showOpsMemoryLoadStatus(
+                        'Preview ready — Enter or “Load into AI Chat” · double-click also loads.',
+                        true
+                    );
+                } else {
+                    opsMemoryLoadText = null;
+                    setOpsMemoryLoadChatVisible(false);
+                    showOpsMemoryLoadStatus('File is empty.', false);
+                }
             } catch (err) {
                 preview.hidden = false;
                 preview.textContent = String(err);
+                opsMemoryLoadText = null;
                 setOpsMemoryCopyChip(null);
+                setOpsMemoryLoadChatVisible(false);
+                showOpsMemoryLoadStatus(String(err), false);
             }
+        };
+        btn.addEventListener('click', openFile);
+        btn.addEventListener('dblclick', async () => {
+            await openFile();
+            loadOpsMemoryIntoChat();
         });
-        btn.title = 'Click to preview knowledge file';
+        btn.title = 'Click to preview · Enter / double-click to load into AI Chat';
         el.appendChild(btn);
     });
     prependOpsFilterCaption(el, all.length, filtered.length, opsMemoryFilterQ);

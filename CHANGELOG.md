@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.475] - 2026-08-16
+
+### Added
+- Agent Ops **Knowledge**: Load into AI Chat puts the previewed knowledge file into the composer (Enter / double-click; Loaded flash; Sessions/Runs/Schedules parity).
+
 ## [0.1.474] - 2026-08-16
 
 ### Added
