@@ -2285,6 +2285,35 @@ button.monitor-detail-url.is-just-saved {
   line-height: 1.35;
 }
 
+/* Runs Insights Slowest / Candidates — click-to-preview (list-row parity). */
+.ops-insight-line.is-clickable {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 4px 6px;
+  margin-left: -6px;
+  margin-right: -6px;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  opacity: 0.9;
+}
+
+.ops-insight-line.is-clickable:hover {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  border-color: color-mix(in srgb, currentColor 14%, transparent);
+  opacity: 1;
+}
+
+.ops-insight-line.is-clickable:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  outline-offset: 1px;
+}
+
+.ops-insight-line.is-clickable.is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  opacity: 1;
+}
+
 .btn-secondary.ops-refresh,
 .agent-ops-section .btn-secondary {
   background: color-mix(in srgb, currentColor 8%, transparent);

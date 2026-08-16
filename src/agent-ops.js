@@ -2062,8 +2062,10 @@ function tryOpsClearSelectionEscape(e) {
         return false;
     }
     const selected = document.querySelectorAll('.ops-row.is-selected');
-    if (!selected.length) return false;
+    const insightSel = document.querySelectorAll('.ops-insight-line.is-selected');
+    if (!selected.length && !insightSel.length) return false;
     selected.forEach((el) => el.classList.remove('is-selected'));
+    insightSel.forEach((el) => el.classList.remove('is-selected'));
     e.preventDefault();
     return true;
 }
@@ -3285,6 +3287,86 @@ function loadOpsRunIntoChat() {
     }
 }
 
+/** Preview a Slowest / Candidate insight line (select matching Runs row when present). */
+function previewOpsRunFromInsight(summary, insightLine) {
+    const card = document.getElementById('ops-runs-insights');
+    card?.querySelectorAll('.ops-insight-line.is-selected').forEach((node) => {
+        node.classList.remove('is-selected');
+    });
+    if (insightLine) insightLine.classList.add('is-selected');
+
+    const el = document.getElementById('ops-runs-list');
+    const rid = String(summary?.request_id || '').trim();
+    const qPreview = String(summary?.question_preview || '').trim();
+    let matched = null;
+    if (el) {
+        el.querySelectorAll('.ops-row.is-selected').forEach((node) => node.classList.remove('is-selected'));
+        if (rid) {
+            matched =
+                Array.from(el.querySelectorAll('.ops-row')).find((btn) => btn.dataset.requestId === rid) ||
+                null;
+        }
+        if (!matched && qPreview) {
+            const needle = qPreview.slice(0, 48);
+            el.querySelectorAll('.ops-row[data-question-preview]').forEach((btn) => {
+                if (matched) return;
+                const hay = String(btn.dataset.questionPreview || '');
+                if (hay.startsWith(needle) || needle.startsWith(hay.slice(0, 48))) {
+                    matched = btn;
+                }
+            });
+        }
+        if (matched) {
+            matched.classList.add('is-selected');
+            try {
+                matched.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            } catch (_) {
+                /* ignore */
+            }
+        }
+    }
+
+    const q = qPreview && qPreview !== '(empty)' ? qPreview : '';
+    showOpsRunPreview(formatOpsRunPreview(summary), summary?.request_id, q);
+}
+
+/** Wire Slowest / Candidate lines: click preview, Enter/dblclick load (list-row parity). */
+function wireOpsInsightRunLine(lineEl, summary) {
+    if (!lineEl || !summary) return;
+    lineEl.classList.add('is-clickable');
+    lineEl.setAttribute('role', 'button');
+    lineEl.setAttribute('tabindex', '0');
+    lineEl.title = 'Click to preview · Enter / double-click to load question into AI Chat';
+    const open = () => previewOpsRunFromInsight(summary, lineEl);
+    lineEl.addEventListener('click', open);
+    lineEl.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        open();
+        loadOpsRunIntoChat();
+    });
+    lineEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            open();
+            if (e.key === 'Enter') loadOpsRunIntoChat();
+        }
+    });
+}
+
+function formatOpsCandidateAsSummary(c) {
+    return {
+        ts: '',
+        lane: c?.lane || '—',
+        wall_ms: typeof c?.wall_ms === 'number' ? c.wall_ms : 0,
+        tools: [],
+        question_preview: c?.question_preview || '',
+        ok: true,
+        request_id: c?.request_id || '',
+        _candidateKind: c?.kind || '',
+        _candidateReason: c?.reason || '',
+    };
+}
+
 /** Show full run turn details (list rows truncate question / tools). */
 function showOpsRunPreview(text, requestId, question) {
     const preview = ensureOpsRunsPreview();
@@ -3320,7 +3402,12 @@ function formatOpsRunPreview(r) {
     const ok = r?.ok ? 'ok' : 'FAIL';
     const ts = r?.ts || '—';
     const rid = String(r?.request_id || '').trim() || '—';
-    return `Run (${ok})\nLane: ${lane}\nWall: ${wall}\nWhen: ${ts}\nRequest: ${rid}\nTools: ${tools}\n\nQuestion:\n${q}`;
+    const kind = String(r?._candidateKind || '').trim();
+    const reason = String(r?._candidateReason || '').trim();
+    const head = kind
+        ? `Candidate (${kind})${reason ? `\nWhy: ${reason}` : ''}\n`
+        : `Run (${ok})\n`;
+    return `${head}Lane: ${lane}\nWall: ${wall}\nWhen: ${ts}\nRequest: ${rid}\nTools: ${tools}\n\nQuestion:\n${q}`;
 }
 
 function renderOpsRuns(insights) {
@@ -3352,20 +3439,6 @@ function renderOpsRuns(insights) {
         .map(([k, v]) => `${k}×${v}`)
         .join(', ');
     if (card) {
-        const cand = (insights.candidates || [])
-            .slice(0, 4)
-            .map(
-                (c) =>
-                    `<div class="ops-insight-line"><span class="ops-badge">${escapeHtml(c.kind)}</span> ${c.wall_ms} ms — ${escapeHtml(c.reason)} · <em>${escapeHtml(c.question_preview)}</em></div>`
-            )
-            .join('');
-        const slow = (insights.slowest || [])
-            .slice(0, 3)
-            .map(
-                (s) =>
-                    `<div class="ops-insight-line">${s.wall_ms} ms · ${escapeHtml(s.lane)} · ${escapeHtml(s.question_preview || '(empty)')}</div>`
-            )
-            .join('');
         card.innerHTML = `
             <div class="ops-insight-title">Insights</div>
             <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · fail ${insights.fail_count || 0} · mean ${insights.mean_ms} ms · max ${insights.max_ms} ms</div>
@@ -3378,9 +3451,35 @@ function renderOpsRuns(insights) {
                     : '')}
             <div class="ops-row-meta">Lanes: ${escapeHtml(lanes) || '—'}</div>
             <div class="ops-row-meta">Top tools: ${escapeHtml(tools) || '—'}</div>
-            ${slow ? `<div class="ops-insight-sub">Slowest</div>${slow}` : ''}
-            ${cand ? `<div class="ops-insight-sub">Candidates</div>${cand}` : ''}
         `;
+        const slowRows = insights.slowest || [];
+        if (slowRows.length) {
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Slowest';
+            card.appendChild(sub);
+            slowRows.slice(0, 3).forEach((s) => {
+                const line = document.createElement('div');
+                line.className = 'ops-insight-line';
+                line.textContent = `${s.wall_ms} ms · ${s.lane || '—'} · ${s.question_preview || '(empty)'}`;
+                wireOpsInsightRunLine(line, s);
+                card.appendChild(line);
+            });
+        }
+        const candRows = insights.candidates || [];
+        if (candRows.length) {
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Candidates';
+            card.appendChild(sub);
+            candRows.slice(0, 4).forEach((c) => {
+                const line = document.createElement('div');
+                line.className = 'ops-insight-line';
+                line.innerHTML = `<span class="ops-badge">${escapeHtml(c.kind)}</span> ${c.wall_ms} ms — ${escapeHtml(c.reason)} · <em>${escapeHtml(c.question_preview)}</em>`;
+                wireOpsInsightRunLine(line, formatOpsCandidateAsSummary(c));
+                card.appendChild(line);
+            });
+        }
     }
     let shown = 0;
     (insights.recent || []).forEach((r) => {
@@ -3396,9 +3495,16 @@ function renderOpsRuns(insights) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
+        const rid = String(r?.request_id || '').trim();
+        if (rid) btn.dataset.requestId = rid;
+        btn.dataset.questionPreview = String(r?.question_preview || '');
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(toolsJoined)}${r.ok ? '' : ' · FAIL'}</div></div>`;
         btn.title = 'Click to preview · Enter / double-click to load question into AI Chat';
         const openPreview = () => {
+            document
+                .getElementById('ops-runs-insights')
+                ?.querySelectorAll('.ops-insight-line.is-selected')
+                .forEach((node) => node.classList.remove('is-selected'));
             el.querySelectorAll('.ops-row.is-selected').forEach((node) => node.classList.remove('is-selected'));
             btn.classList.add('is-selected');
             const q = String(r?.question_preview || '').trim();
