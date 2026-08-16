@@ -147,6 +147,13 @@ window.getSectionCollapsed = getSectionCollapsed;
 window.setSectionCollapsed = setSectionCollapsed;
 window.setCpuUiSectionValue = setCpuUiSectionValue;
 window.loadCpuUiSections = loadCpuUiSections;
+/** Highlight icon when its section is open; fade when closed. */
+window.syncSectionIcon = function syncSectionIcon(iconId, isOpen) {
+  const icon = document.getElementById(iconId);
+  if (!icon) return;
+  icon.classList.toggle('section-open', !!isOpen);
+  icon.setAttribute('aria-pressed', isOpen ? 'true' : 'false');
+};
 // Kick off early so Agent Ops can await the same promise.
 window.cpuUiSectionsReady = loadCpuUiSections();
 
@@ -2479,6 +2486,7 @@ function initMonitorsSection() {
       }, 30000);
     }
   }
+  syncSectionIcon('icon-monitors', !monitorsCollapsed);
 
   // Make header clickable/keyboardable to toggle collapse/expand
   const applyMonitorsCollapsed = () => {
@@ -2521,6 +2529,7 @@ function initMonitorsSection() {
     }
     updateMonitorsStatusDot();
     header.setAttribute('aria-expanded', String(!monitorsCollapsed));
+    syncSectionIcon('icon-monitors', !monitorsCollapsed);
   };
 
   wireCollapsibleHeaderA11y(header, {
@@ -4272,17 +4281,18 @@ function updateMonitorsIconStatus({ anyDown = false, allUp = false, upCount = 0,
   const monitorsIcon = document.getElementById('icon-monitors');
   if (monitorsIcon) {
     monitorsIcon.classList.remove('status-good', 'status-bad');
+    // Open pane → section-open highlight; closed → fade (unless alert).
+    syncSectionIcon('icon-monitors', !monitorsCollapsed);
     if (anyDown) {
-      // At least one monitor is down — red icon
+      // At least one monitor is down — red icon (visible even when section closed)
       monitorsIcon.classList.add('status-bad');
       monitorsIcon.title = `Monitors: ${upCount}/${totalCount} up — one or more down`;
-    } else if (allUp && totalCount > 0) {
-      monitorsIcon.classList.add('status-good');
-      monitorsIcon.title = `Monitors: all ${totalCount} up`;
     } else if (totalCount > 0) {
-      monitorsIcon.title = `Monitors: ${upCount}/${totalCount} up (checking…)`;
+      monitorsIcon.title = monitorsCollapsed
+        ? `Monitors: ${upCount}/${totalCount} up`
+        : `Monitors: ${upCount}/${totalCount} up`;
     } else {
-      monitorsIcon.title = 'Monitors';
+      monitorsIcon.title = monitorsCollapsed ? 'Monitors' : 'Hide Monitors';
     }
   }
 
@@ -4301,21 +4311,20 @@ function updateOllamaIconStatus(status) {
     return;
   }
   
-  // Remove all status classes first
+  // Remove health classes; open/closed uses section-open (fade vs highlight).
   ollamaIcon.classList.remove('status-good', 'status-warning');
+  syncSectionIcon('icon-ollama', !ollamaCollapsed);
   
-  if (status === true || status === 'connected') {
-    // Connection is good - make icon green
-    ollamaIcon.classList.add('status-good');
-    console.log('[CPU] Ollama icon set to green (connected)');
-  } else if (status === 'error' || status === 'unavailable') {
-    // Ollama not installed/not running - make icon yellow
+  if (status === 'error' || status === 'unavailable') {
+    // Ollama not installed/not running — warn even when section is closed
     ollamaIcon.classList.add('status-warning');
     console.log('[CPU] Ollama icon set to yellow (not available/not running)');
+  } else if (status === true || status === 'connected') {
+    console.log('[CPU] Ollama connected; section-open=', !ollamaCollapsed);
   } else {
-    // Unknown/checking - keep default/grey color
-    console.log('[CPU] Ollama icon set to default (unknown/checking)');
+    console.log('[CPU] Ollama icon default (unknown/checking)');
   }
+  ollamaIcon.title = ollamaCollapsed ? 'AI Chat (Ollama)' : 'Hide AI Chat';
 }
 
 function updateDiscordIconStatus(connected) {
@@ -4522,6 +4531,7 @@ function initOllamaSection() {
       divider.style.display = '';
     }
   }
+  syncSectionIcon('icon-ollama', !ollamaCollapsed);
 
   // Connection indicator click handler (only when not connected)
   if (connectionIndicator) {
@@ -4636,6 +4646,7 @@ function initOllamaSection() {
     }
     setSectionCollapsed('ollama_collapsed', ollamaCollapsed);
     if (header._syncCollapseA11y) header._syncCollapseA11y();
+    syncSectionIcon('icon-ollama', !ollamaCollapsed);
   };
 
   wireCollapsibleHeaderA11y(header, {
@@ -5682,6 +5693,7 @@ function initPerplexitySection() {
     }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
     refreshPerplexityStatus();
+    syncSectionIcon('icon-perplexity', !perplexityCollapsed);
   };
   applyPerplexityCollapsed();
 
@@ -6690,6 +6702,7 @@ function initDiskCleanupSection() {
       refreshDiskCleanupPanel();
     }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
+    syncSectionIcon('icon-disk-cleanup', !collapsed);
   };
   applyCollapsed();
   // Do not scan Downloads/Trash on every CPU-window open — only when the section is expanded
@@ -7037,11 +7050,9 @@ function initLogsSection() {
       if (autoCb && autoCb.checked) startLogsAutoRefresh();
     }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
+    syncSectionIcon('icon-logs', !logsCollapsed);
   };
   applyCollapsed();
-
-  wireCollapsibleHeaderA11y(header, {
-    contentId: 'logs-content',
     getExpanded: () => !logsCollapsed,
     ignoreSelector: '#logs-refresh-btn, #logs-open-btn, #logs-autorefresh, #logs-path-hint, label',
     onToggle: () => {

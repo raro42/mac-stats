@@ -2390,9 +2390,14 @@ function escapeHtml(s) {
     const icon = document.getElementById('icon-agent-ops');
     if (!icon) return;
     const open = !agentOpsCollapsed;
-    icon.classList.toggle('status-good', open);
+    if (typeof window.syncSectionIcon === 'function') {
+      window.syncSectionIcon('icon-agent-ops', open);
+    } else {
+      icon.classList.toggle('section-open', open);
+      icon.classList.toggle('status-good', open);
+      icon.setAttribute('aria-pressed', open ? 'true' : 'false');
+    }
     if (open) icon.classList.remove('status-warning');
-    icon.setAttribute('aria-pressed', open ? 'true' : 'false');
     icon.title = open ? 'Hide Agent Ops' : 'Agent Ops';
   }
 

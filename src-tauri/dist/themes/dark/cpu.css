@@ -1239,6 +1239,10 @@ body {
   display: none;
 }
 
+.perplexity-section.collapsed {
+  display: none;
+}
+
 .monitors-summary {
   display: flex;
   justify-content: space-between;
@@ -2274,6 +2278,8 @@ body {
 .disk-cleanup-section.collapsed {
   display: none;
 }
+
+/* Shared agent-ops.css also hides collapsed sections; keep theme-local fallback. */
 
 /* Disk Cleanup meta cards: stretch equal height (TUI green borders make
  * short neighbors look like a broken mid-panel line). Soft borders use

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.463] - 2026-08-16
+
+### Fixed
+- Perplexity (and other icon sections): fully hide the section header when collapsed.
+- Section icons fade when closed and highlight with the theme accent when open.
+
 ## [0.1.462] - 2026-08-16
 
 ### Fixed

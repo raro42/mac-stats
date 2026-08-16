@@ -85,6 +85,91 @@ body:hover {
   display: none !important;
 }
 
+/* Icon toggles: whole section hides when collapsed (header included). */
+.monitors-section.collapsed,
+.ollama-section.collapsed,
+.perplexity-section.collapsed,
+.logs-section.collapsed,
+.disk-cleanup-section.collapsed,
+.agent-ops-section.collapsed {
+  display: none !important;
+}
+
+/*
+ * Section icons: faded when the pane is closed, highlighted when open.
+ * Alerts (bad/warning) stay full opacity so problems remain visible.
+ */
+#icon-monitors,
+#icon-ollama,
+#icon-perplexity,
+#icon-logs,
+#icon-disk-cleanup,
+#icon-agent-ops {
+  transition:
+    opacity 0.2s ease,
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    filter 0.2s ease;
+  opacity: 0.4;
+}
+
+#icon-monitors.section-open,
+#icon-ollama.section-open,
+#icon-perplexity.section-open,
+#icon-logs.section-open,
+#icon-disk-cleanup.section-open,
+#icon-agent-ops.section-open {
+  opacity: 1;
+  color: var(--accent, var(--ring-active, rgba(72, 210, 120, 0.9)));
+  background: color-mix(
+    in srgb,
+    var(--accent, var(--ring-active, #34c759)) 14%,
+    transparent
+  );
+  border-color: color-mix(
+    in srgb,
+    var(--accent, var(--ring-active, #34c759)) 32%,
+    transparent
+  );
+}
+
+#icon-monitors.section-open svg,
+#icon-ollama.section-open svg,
+#icon-perplexity.section-open svg,
+#icon-logs.section-open svg,
+#icon-disk-cleanup.section-open svg,
+#icon-agent-ops.section-open svg {
+  opacity: 1;
+  color: inherit;
+  filter: none;
+}
+
+#icon-monitors.section-open img,
+#icon-ollama.section-open img,
+#icon-perplexity.section-open img,
+#icon-logs.section-open img,
+#icon-disk-cleanup.section-open img,
+#icon-agent-ops.section-open img {
+  opacity: 0.95;
+}
+
+#icon-monitors.status-bad,
+#icon-monitors.status-warning,
+#icon-ollama.status-bad,
+#icon-ollama.status-warning,
+#icon-perplexity.status-bad,
+#icon-perplexity.status-warning,
+#icon-logs.status-bad,
+#icon-logs.status-warning,
+#icon-disk-cleanup.status-bad,
+#icon-disk-cleanup.status-warning,
+#icon-disk-cleanup.has-reclaim,
+#icon-agent-ops.status-bad,
+#icon-agent-ops.status-warning {
+  opacity: 1;
+}
+
 /*
  * Do NOT flex-shrink Agent Ops inside the theme shell. With min-height:0 +
  * overflow:visible, the pane collapses in the flex column and its content
