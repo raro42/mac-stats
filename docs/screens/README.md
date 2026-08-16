@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-08-17 (~00:01):** Agent Ops overview Recent click-to-preview (v0.1.478). Recapture of `feature-agent-ops.png` still deferred (no on-screen CPU window for Quartz/`screencapture -l`).
 - **2026-08-16 (~23:38):** Agent Ops overview Schedules click-to-preview (v0.1.477). Recapture of `feature-agent-ops.png` still deferred (`screencapture -l` → could not create image).
 - **2026-08-16 (evening):** Agent Ops Schedules Load into AI Chat (v0.1.474). Runs Load into AI Chat (v0.1.473). Schedules/deliveries id click-to-copy chip (v0.1.472). Runs request-id chip (v0.1.471). Agents slug/id chip (v0.1.469). Runs click-to-preview (v0.1.468). Data Poster inactive icons (v0.1.470). Recapture of `feature-agent-ops.png` still deferred (`screencapture -l` → could not create image).
 - **2026-08-16:** Agent Ops Knowledge path click-to-copy (v0.1.453). Agent Ops Schedules/deliveries click-to-preview full task/summary (v0.1.452). Agent Ops Sessions click-to-copy id/slug chip (v0.1.451). Agent Ops health-card active-tab accent ring (v0.1.450). Agent Ops tab true-empty title+hint (v0.1.449). Agent Ops selected-row accent wash (v0.1.447). Agent Ops overview empty Open-tab CTAs (v0.1.446). Top Processes detail PID Copied flash (v0.1.445). Disk Cleanup soft-delete Saved flash (v0.1.444). Agent Ops filter-miss Clear filter (v0.1.443). Recapture of `feature-agent-ops.png` still deferred if Screen Recording TCC blocks `screencapture -l`.
