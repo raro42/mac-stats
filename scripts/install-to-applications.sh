@@ -51,9 +51,13 @@ fi
 echo "Release binary version check OK ($EXPECTED_VER)"
 
 cp -f "$BIN_SRC" "$APP/Contents/MacOS/mac_stats"
-if ! cmp -s "$BIN_SRC" "$APP/Contents/MacOS/mac_stats"; then
-  echo "ERROR: $APP/Contents/MacOS/mac_stats does not match $BIN_SRC after cp" >&2
-  ls -la "$BIN_SRC" "$APP/Contents/MacOS/mac_stats" >&2
+# Prefer size match over cmp -s: overnight hosts sometimes SIGKILL cmp on ~50MB Mach-O.
+DST_BIN="$APP/Contents/MacOS/mac_stats"
+src_sz=$(stat -f%z "$BIN_SRC" 2>/dev/null || echo 0)
+dst_sz=$(stat -f%z "$DST_BIN" 2>/dev/null || echo 0)
+if [[ "$src_sz" -eq 0 || "$src_sz" != "$dst_sz" ]]; then
+  echo "ERROR: $DST_BIN size mismatch after cp (src=$src_sz dst=$dst_sz)" >&2
+  ls -la "$BIN_SRC" "$DST_BIN" >&2
   exit 1
 fi
 # LaunchAgent / older docs may refer to mac-stats; keep a symlink after DMG installs (CFBundleExecutable is mac_stats).

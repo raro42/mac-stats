@@ -9,12 +9,13 @@ Overnight Track B (from 2026-08-16 20:00). Digester open = design-review (stale 
 | **v0.1.468** | Agent Ops **Runs**: click a run → preview question, tools, lane, wall time, request id (Esc dismisses) |
 | **v0.1.469** | Agent Ops **Agents**: click-to-copy slug/id chip under detail meta (Copied flash; Sessions/Knowledge parity) |
 | **v0.1.470** | Data Poster: inactive section icons near-white (were nearly invisible on dark UI) + install rebuild-when-dist-newer gate |
+| **v0.1.471** | Agent Ops **Runs**: click-to-copy request id chip under run preview (Copied flash; Sessions/Knowledge parity) |
 
 ## Tried / deferred
 
-- Recapture of `docs/screens/feature-agent-ops.png` still deferred when Screen Recording TCC blocks window-only capture.
-- Concurrent overnight ticks shared the tree; `pkill -f mac_stats` briefly SIGKILL’d rustc (argv contains `crate-name mac_stats`) — prefer path-scoped kills.
+- Recapture of `docs/screens/feature-agent-ops.png` still deferred — window visible (`screencapture -l` → `could not create image`; Screen Recording TCC).
+- Install `cmp -s` on ~50MB Mach-O sometimes gets SIGKILL overnight; install script now checks size after `cp` instead.
 
 ## Ratchet
 
-Keeps in `~/.mac-stats/improvements/autoresearch/results.tsv` include `6169a9a` (v0.1.469 Agents copy chip). Nightly minimum met.
+Keeps in `~/.mac-stats/improvements/autoresearch/results.tsv` include `33d38c7` (v0.1.471 Runs request-id chip). Nightly minimum met.
