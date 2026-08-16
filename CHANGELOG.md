@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.454] - 2026-08-16
+
+### Changed
+- CPU window scrollbars: nearly invisible (2px, transparent thumb until hover) across themes and nested panes.
+
 ## [0.1.453] - 2026-08-16
 
 ### Changed

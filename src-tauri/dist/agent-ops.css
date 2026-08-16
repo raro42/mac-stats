@@ -18,76 +18,48 @@
   overflow-x: hidden !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
-  /* Quiet scrollbars — default WKWebView bar is loud on dark themes */
+}
+
+/*
+ * Practically invisible scrollbars (all themes / nested panes).
+ * Loads after theme cpu.css — overrides loud WKWebView / theme thumbs.
+ * Thumb appears faintly only while the scrolling element is hovered.
+ */
+html,
+body,
+* {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, currentColor 28%, transparent) transparent;
+  scrollbar-color: transparent transparent;
 }
 
-.apple-shell::-webkit-scrollbar,
-.arch-sheet::-webkit-scrollbar,
-.mat-card::-webkit-scrollbar,
-.swiss-shell::-webkit-scrollbar,
-.glass-panel::-webkit-scrollbar,
-.cpu-shell::-webkit-scrollbar,
-.neon-frame::-webkit-scrollbar,
-.poster-panel::-webkit-scrollbar {
-  width: 5px;
+*::-webkit-scrollbar {
+  width: 2px !important;
+  height: 2px !important;
 }
 
-.apple-shell::-webkit-scrollbar-track,
-.arch-sheet::-webkit-scrollbar-track,
-.mat-card::-webkit-scrollbar-track,
-.swiss-shell::-webkit-scrollbar-track,
-.glass-panel::-webkit-scrollbar-track,
-.cpu-shell::-webkit-scrollbar-track,
-.neon-frame::-webkit-scrollbar-track,
-.poster-panel::-webkit-scrollbar-track {
-  background: transparent;
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+  background: transparent !important;
 }
 
-.apple-shell::-webkit-scrollbar-thumb,
-.arch-sheet::-webkit-scrollbar-thumb,
-.mat-card::-webkit-scrollbar-thumb,
-.swiss-shell::-webkit-scrollbar-thumb,
-.glass-panel::-webkit-scrollbar-thumb,
-.cpu-shell::-webkit-scrollbar-thumb,
-.neon-frame::-webkit-scrollbar-thumb,
-.poster-panel::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 8px;
+*::-webkit-scrollbar-thumb {
+  background: transparent !important;
+  border-radius: 999px;
+  border: none !important;
+  box-shadow: none !important;
 }
 
-.apple-shell:hover::-webkit-scrollbar-thumb,
-.arch-sheet:hover::-webkit-scrollbar-thumb,
-.mat-card:hover::-webkit-scrollbar-thumb,
-.swiss-shell:hover::-webkit-scrollbar-thumb,
-.glass-panel:hover::-webkit-scrollbar-thumb,
-.cpu-shell:hover::-webkit-scrollbar-thumb,
-.neon-frame:hover::-webkit-scrollbar-thumb,
-.poster-panel:hover::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, currentColor 28%, transparent);
+*:hover::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, currentColor 16%, transparent) !important;
 }
 
-.apple-shell:hover::-webkit-scrollbar-thumb:hover,
-.arch-sheet:hover::-webkit-scrollbar-thumb:hover,
-.mat-card:hover::-webkit-scrollbar-thumb:hover,
-.swiss-shell:hover::-webkit-scrollbar-thumb:hover,
-.glass-panel:hover::-webkit-scrollbar-thumb:hover,
-.cpu-shell:hover::-webkit-scrollbar-thumb:hover,
-.neon-frame:hover::-webkit-scrollbar-thumb:hover,
-.poster-panel:hover::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, currentColor 45%, transparent);
+*:hover::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, currentColor 28%, transparent) !important;
 }
 
-.apple-shell::-webkit-scrollbar-corner,
-.arch-sheet::-webkit-scrollbar-corner,
-.mat-card::-webkit-scrollbar-corner,
-.swiss-shell::-webkit-scrollbar-corner,
-.glass-panel::-webkit-scrollbar-corner,
-.cpu-shell::-webkit-scrollbar-corner,
-.neon-frame::-webkit-scrollbar-corner,
-.poster-panel::-webkit-scrollbar-corner {
-  background: transparent;
+html:hover,
+body:hover {
+  scrollbar-color: color-mix(in srgb, currentColor 16%, transparent) transparent;
 }
 
 .dashboard-container {
