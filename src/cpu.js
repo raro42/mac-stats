@@ -3048,7 +3048,76 @@ function recentMonitorLogLines(monitorId, limit = 12) {
     });
 }
 
+/**
+ * Wire a monitor URL control for click/Enter/Space copy + Copied flash.
+ * Survives live refresh when prevFlash is passed from the previous element.
+ */
+function wireMonitorUrlCopy(el, url, prevFlash) {
+  if (!el || !url) return;
+  const idleLabel = String(url);
+  el._saveFlashOriginalLabel =
+    (prevFlash && prevFlash.saveFlashOriginal) || idleLabel;
+  if (prevFlash && prevFlash.classJustSaved) {
+    el.classList.add('is-just-saved');
+    el.textContent = prevFlash.text || 'Copied';
+    if (prevFlash.saveFlashTimer) {
+      clearTimeout(prevFlash.saveFlashTimer);
+    }
+    el._saveFlashTimer = setTimeout(() => {
+      el.classList.remove('is-just-saved');
+      el.textContent = idleLabel;
+      el._saveFlashOriginalLabel = idleLabel;
+      el._saveFlashTimer = null;
+    }, 1600);
+  }
+  const copyUrl = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (el.classList.contains('is-just-saved')) return;
+    const ok = await copyTextToClipboard(idleLabel);
+    if (!ok) {
+      alert('Could not copy URL.');
+      return;
+    }
+    if (typeof flashSaveButton === 'function') {
+      flashSaveButton(el, { savedLabel: 'Copied', durationMs: 1600 });
+    } else {
+      el._saveFlashOriginalLabel = idleLabel;
+      el.classList.add('is-just-saved');
+      el.textContent = 'Copied';
+      clearTimeout(el._saveFlashTimer);
+      el._saveFlashTimer = setTimeout(() => {
+        el.classList.remove('is-just-saved');
+        el.textContent = idleLabel;
+        el._saveFlashOriginalLabel = null;
+        el._saveFlashTimer = null;
+      }, 1600);
+    }
+  };
+  el.addEventListener('click', copyUrl);
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      void copyUrl(e);
+    }
+  });
+}
+
+function captureMonitorUrlFlash(el) {
+  if (!el) return null;
+  return {
+    classJustSaved: el.classList.contains('is-just-saved'),
+    text: el.textContent,
+    saveFlashOriginal: el._saveFlashOriginalLabel,
+    saveFlashTimer: el._saveFlashTimer,
+  };
+}
+
 function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
+  const prevUrlFlash = captureMonitorUrlFlash(
+    detail.querySelector('.monitor-detail-url')
+  );
   detail.replaceChildren();
   const pending =
     !status.is_up &&
@@ -3069,7 +3138,23 @@ function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
     detail.appendChild(row);
   };
 
-  addRow('URL', monitorUrl);
+  {
+    const row = document.createElement('div');
+    row.className = 'monitor-detail-row';
+    const k = document.createElement('span');
+    k.className = 'monitor-detail-k';
+    k.textContent = 'URL';
+    const v = document.createElement('button');
+    v.type = 'button';
+    v.className = 'monitor-detail-v monitor-detail-url';
+    v.textContent = monitorUrl;
+    v.title = 'Click to copy URL';
+    v.setAttribute('aria-label', `Copy URL ${monitorUrl}`);
+    wireMonitorUrlCopy(v, monitorUrl, prevUrlFlash);
+    row.appendChild(k);
+    row.appendChild(v);
+    detail.appendChild(row);
+  }
   if (pending) {
     addRow('Status', 'Pending first check');
   } else if (status.is_up) {
@@ -3605,7 +3690,9 @@ function wireMonitorsListKeyboard() {
     if (
       e.target.closest &&
       (e.target.closest('.monitor-detail-check') ||
-        e.target.closest('.monitor-detail-remove'))
+        e.target.closest('.monitor-detail-remove') ||
+        e.target.closest('.monitor-url') ||
+        e.target.closest('.monitor-detail-url'))
     ) {
       return;
     }
@@ -3766,14 +3853,19 @@ function fillMonitorInfo(info, monitorUrl, status, monitorId) {
   const pending =
     !status.is_up &&
     (!status.response_time_ms || String(status.error || '').includes('Waiting'));
+  const prevUrlFlash = captureMonitorUrlFlash(info.querySelector('.monitor-url'));
   info.replaceChildren();
 
   const primary = document.createElement('div');
   primary.className = 'monitor-info-primary';
 
-  const urlEl = document.createElement('span');
+  const urlEl = document.createElement('button');
+  urlEl.type = 'button';
   urlEl.className = 'monitor-url';
   urlEl.textContent = monitorUrl;
+  urlEl.title = 'Click to copy URL';
+  urlEl.setAttribute('aria-label', `Copy URL ${monitorUrl}`);
+  wireMonitorUrlCopy(urlEl, monitorUrl, prevUrlFlash);
 
   const latencyEl = document.createElement('span');
   latencyEl.className = 'monitor-latency';

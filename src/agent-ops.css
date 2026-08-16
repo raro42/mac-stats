@@ -1387,9 +1387,33 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 .monitor-url {
+  display: inline;
+  margin: 0;
+  padding: 0 2px;
+  margin-left: -2px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  font: inherit;
   font-weight: 600;
   color: var(--text, currentColor);
   word-break: break-all;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.monitor-url:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.monitor-url:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  outline-offset: 2px;
+}
+.monitor-url.is-just-saved {
+  color: #34c759;
+  text-decoration: none;
+  background: color-mix(in srgb, #34c759 12%, transparent);
 }
 
 .monitor-latency {
@@ -1459,6 +1483,34 @@ textarea.ops-agent-editor.is-dirty {
 .monitor-detail-v {
   word-break: break-word;
   font-variant-numeric: tabular-nums;
+}
+
+button.monitor-detail-url {
+  display: inline;
+  margin: 0;
+  padding: 0 2px;
+  margin-left: -2px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+button.monitor-detail-url:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+button.monitor-detail-url:focus-visible {
+  outline: 2px solid color-mix(in srgb, #0a84ff 55%, transparent);
+  outline-offset: 2px;
+}
+button.monitor-detail-url.is-just-saved {
+  color: #34c759;
+  text-decoration: none;
+  background: color-mix(in srgb, #34c759 12%, transparent);
 }
 
 .monitor-detail-log-title {
