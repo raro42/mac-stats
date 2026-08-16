@@ -1656,7 +1656,7 @@ function tryOpsAgentDetailEscape(e) {
     return true;
 }
 
-/** Esc hides session / knowledge / schedule preview panes (Hermes-style dismiss). */
+/** Esc hides session / knowledge / schedule / runs preview panes (Hermes-style dismiss). */
 function tryOpsPreviewEscape(e) {
     if (agentOpsCollapsed) return false;
     const t = e.target;
@@ -1665,6 +1665,7 @@ function tryOpsPreviewEscape(e) {
     const sessionPreview = document.getElementById('ops-session-preview');
     const memoryPreview = document.getElementById('ops-memory-preview');
     const schedulePreview = document.getElementById('ops-schedule-preview');
+    const runsPreview = document.getElementById('ops-runs-preview');
     const loadBtn = document.getElementById('ops-session-load-chat');
     let closed = false;
     if (sessionPreview && !sessionPreview.hidden) {
@@ -1685,6 +1686,10 @@ function tryOpsPreviewEscape(e) {
     if (schedulePreview && !schedulePreview.hidden) {
         schedulePreview.hidden = true;
         schedulePreview.textContent = '';
+        closed = true;
+    }
+    if (runsPreview && !runsPreview.hidden) {
+        showOpsRunPreview('');
         closed = true;
     }
     if (closed) {
@@ -2287,11 +2292,56 @@ function renderOpsMemory(files) {
     prependOpsFilterCaption(el, all.length, filtered.length, opsMemoryFilterQ);
 }
 
+/** Ensure Runs preview pane exists (themes + dashboard; create if HTML is stale). */
+function ensureOpsRunsPreview() {
+    let preview = document.getElementById('ops-runs-preview');
+    if (preview) return preview;
+    const panel = document.getElementById('ops-panel-runs');
+    const list = document.getElementById('ops-runs-list');
+    if (!panel && !list) return null;
+    preview = document.createElement('pre');
+    preview.id = 'ops-runs-preview';
+    preview.className = 'ops-preview';
+    preview.hidden = true;
+    if (list && list.parentNode) {
+        list.parentNode.insertBefore(preview, list.nextSibling);
+    } else if (panel) {
+        panel.appendChild(preview);
+    }
+    return preview;
+}
+
+/** Show full run turn details (list rows truncate question / tools). */
+function showOpsRunPreview(text) {
+    const preview = ensureOpsRunsPreview();
+    if (!preview) return;
+    const body = String(text || '').trim();
+    if (!body) {
+        preview.hidden = true;
+        preview.textContent = '';
+        return;
+    }
+    preview.hidden = false;
+    preview.textContent = body.slice(0, 12000);
+}
+
+function formatOpsRunPreview(r) {
+    const q = String(r?.question_preview || '').trim() || '(empty)';
+    const lane = r?.lane || '—';
+    const wall = typeof r?.wall_ms === 'number' ? `${r.wall_ms} ms` : '—';
+    const tools = (r?.tools || []).length ? (r.tools || []).join(', ') : '—';
+    const ok = r?.ok ? 'ok' : 'FAIL';
+    const ts = r?.ts || '—';
+    const rid = String(r?.request_id || '').trim() || '—';
+    return `Run (${ok})\nLane: ${lane}\nWall: ${wall}\nWhen: ${ts}\nRequest: ${rid}\nTools: ${tools}\n\nQuestion:\n${q}`;
+}
+
 function renderOpsRuns(insights) {
     const card = document.getElementById('ops-runs-insights');
     const el = document.getElementById('ops-runs-list');
     el.innerHTML = '';
     if (card) card.innerHTML = '';
+    showOpsRunPreview('');
     const gateway = insights?.discord_gateway || '';
     if (!insights || !insights.turns) {
         if (card && gateway) {
@@ -2360,10 +2410,11 @@ function renderOpsRuns(insights) {
         btn.type = 'button';
         btn.className = 'ops-row';
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(toolsJoined)}${r.ok ? '' : ' · FAIL'}</div></div>`;
-        btn.title = r.request_id ? `request ${r.request_id}` : (r.question_preview || '');
+        btn.title = 'Click to preview full run (question, tools, request id)';
         btn.addEventListener('click', () => {
             el.querySelectorAll('.ops-row.is-selected').forEach((node) => node.classList.remove('is-selected'));
             btn.classList.add('is-selected');
+            showOpsRunPreview(formatOpsRunPreview(r));
         });
         el.appendChild(btn);
     });
@@ -2373,6 +2424,7 @@ function renderOpsRuns(insights) {
     }
     if (opsRunsFilterQ && !el.querySelector('.ops-row')) {
         el.innerHTML = opsFilterMissHtml('No runs match filter', 'runs');
+        showOpsRunPreview('');
     }
 }
 

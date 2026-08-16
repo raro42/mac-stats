@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.468] - 2026-08-16
+
+### Added
+- Agent Ops **Runs**: click a run row to preview full question, tools, lane, wall time, and request id (Esc dismisses).
+
 ## [0.1.467] - 2026-08-16
 
 ### Changed
