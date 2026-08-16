@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.447] - 2026-08-16
+
+### Changed
+- Agent Ops lists: selected rows (↑/↓ · j/k · click) use an accent wash so the keyboard focus is easier to see.
+
 ## [0.1.446] - 2026-08-16
 
 ### Changed

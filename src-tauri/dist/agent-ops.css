@@ -530,11 +530,18 @@
   outline-offset: 2px;
 }
 
+/* Keyboard/click selection — accent wash (parity with overview .is-active). */
 .ops-row.is-selected {
-  border-color: color-mix(in srgb, currentColor 28%, transparent);
-  background: color-mix(in srgb, currentColor 12%, transparent);
-  box-shadow: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 16%, transparent);
   transform: none;
+}
+
+.ops-row.is-selected:hover {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 52%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 15%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
 }
 
 .ops-row-title { font-size: 13px; font-weight: 600; }
