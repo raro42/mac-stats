@@ -2337,6 +2337,30 @@ body {
   display: none;
 }
 
+/* Disk Cleanup meta cards: stretch equal height (TUI green borders make
+ * short neighbors look like a broken mid-panel line). Soft borders use
+ * hairline, not neon currentColor. */
+.disk-cleanup-meta {
+  align-items: stretch;
+}
+
+.disk-cleanup-meta-card {
+  height: 100%;
+  border-color: var(--hairline, #004400);
+  background: color-mix(in srgb, var(--accent, #00cc66) 6%, transparent);
+}
+
+.disk-cleanup-meta-card:hover {
+  border-color: color-mix(in srgb, var(--accent, #00cc66) 45%, var(--hairline, #004400));
+  background: color-mix(in srgb, var(--accent, #00cc66) 10%, transparent);
+  box-shadow: none;
+  transform: none;
+}
+
+.disk-cleanup-soft-delete {
+  border-color: var(--hairline, #004400);
+}
+
 #gpu-usage-ring-progress {
   stroke: #c4a8d8;
 }

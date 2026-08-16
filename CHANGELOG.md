@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.455] - 2026-08-16
+
+### Fixed
+- Dark (TUI) Disk Cleanup: meta cards stretch to equal height so short “Enabled scopes” no longer leaves a broken green border line; softer hairline borders on those cards.
+
 ## [0.1.454] - 2026-08-16
 
 ### Changed
