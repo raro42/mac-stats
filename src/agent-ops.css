@@ -434,7 +434,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
 }
 
-/* Linked detail tab is active (Schedules / Sessions / Memory). */
+/* Linked detail tab is active (Agents / Schedules / Sessions / Memory). */
 .ops-overview-card.is-active {
   border-color: color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
   background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);

@@ -7,7 +7,7 @@ Agent Ops is the **operator-facing control center** for mac-stats: schedules, li
 ## Layout (v0.1.130+)
 
 1. **Health cards** — version, Discord Ready, next schedule, last delivery, digest open/stale
-2. **Overview grid** — Schedules / Live / Knowledge / Recent chats (always visible when expanded)
+2. **Overview grid** — Agents / Schedules / Live / Knowledge / Recent chats (always visible when expanded)
 3. **Detail tabs** — Agents, Sessions, Schedules, Knowledge, Runs
 
 Data comes from existing Tauri commands (`list_schedules`, `list_live_sessions`, `list_memory_files`, `list_session_files`, `get_runs_insights`, …). Prefer presentation changes over new backends.

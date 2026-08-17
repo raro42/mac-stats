@@ -254,10 +254,29 @@ function flashOpsKeyboardHint() {
     return true;
 }
 
+/** Inject Agents overview card (first) so Agents tab gets active-card parity. */
+function ensureOpsOverviewAgentsCard() {
+    const grid = document.getElementById('ops-overview-grid');
+    if (!grid || document.getElementById('ops-overview-agents')) return;
+    const card = document.createElement('div');
+    card.className = 'ops-overview-card';
+    card.id = 'ops-overview-agents';
+    card.innerHTML =
+        `<div class="ops-overview-head">` +
+        `<h3>Agents</h3>` +
+        `<button type="button" class="ops-overview-link" data-goto-tab="agents">Open</button>` +
+        `</div>` +
+        `<div class="ops-overview-body" id="ops-overview-agents-body">` +
+        `<div class="ops-loading" role="status">Loading…</div>` +
+        `</div>`;
+    grid.insertBefore(card, grid.firstChild);
+}
+
 function setupAgentOps() {
     const activeBtn = document.querySelector('.agent-ops-tab.active');
     if (activeBtn?.dataset?.opsTab) opsActiveTab = activeBtn.dataset.opsTab;
     ensureOpsKeyboardHint();
+    ensureOpsOverviewAgentsCard();
     syncOpsOverviewCardActive(opsActiveTab);
     syncOpsHealthCardActive(opsActiveTab);
     document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
@@ -1166,6 +1185,60 @@ function wireOpsHealthCardNavigation() {
     syncOpsHealthCardActive(opsActiveTab);
 }
 
+/** Overview Agents card: enabled/orchestrator first; click → Agents + Load into AI Chat. */
+function renderOverviewAgents(agents) {
+    ensureOpsOverviewAgentsCard();
+    const body = document.getElementById('ops-overview-agents-body');
+    if (!body) return;
+    body.innerHTML = '';
+    const rows = Array.isArray(agents) ? agents.slice() : [];
+    if (!rows.length) {
+        body.innerHTML = opsOverviewEmptyHtml(
+            'No agents yet — add folders under ~/.mac-stats/agents',
+            'agents',
+            'Open Agents'
+        );
+        return;
+    }
+    rows.sort((a, b) => {
+        const ae = a.enabled ? 1 : 0;
+        const be = b.enabled ? 1 : 0;
+        if (be !== ae) return be - ae;
+        const ao = a.orchestrator ? 1 : 0;
+        const bo = b.orchestrator ? 1 : 0;
+        if (bo !== ao) return bo - ao;
+        return String(a.name || '').localeCompare(String(b.name || ''));
+    });
+    const enabledN = rows.filter((a) => a.enabled).length;
+    const count = document.createElement('div');
+    count.className = 'ops-overview-count';
+    count.textContent = `${enabledN}/${rows.length} on`;
+    body.appendChild(count);
+    rows.slice(0, 4).forEach((a) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        const slug = a.slug || a.id || '';
+        const metaBits = [
+            a.model || 'default model',
+            a.orchestrator ? 'orchestrator' : '',
+            a.enabled ? 'on' : 'off',
+        ].filter(Boolean);
+        btn.innerHTML =
+            `<div><div class="ops-row-title">${escapeHtml(a.name || slug)}` +
+            (slug ? ` <span class="ops-row-meta">· ${escapeHtml(slug)}</span>` : '') +
+            `</div><div class="ops-row-meta">${escapeHtml(metaBits.join(' · '))}</div></div>` +
+            `<span class="ops-badge ${a.enabled ? '' : 'off'}">${a.enabled ? 'on' : 'off'}</span>`;
+        btn.addEventListener('click', () => {
+            body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            btn.classList.add('is-selected');
+            openOpsAgentPreviewNavigate(a);
+        });
+        btn.title = 'Open in Agents · load soul/skill/mood into AI Chat from that tab';
+        body.appendChild(btn);
+    });
+}
+
 function renderOverviewSchedules(schedules, deliveries) {
     const body = document.getElementById('ops-overview-schedules-body');
     if (!body) return;
@@ -1831,6 +1904,8 @@ async function refreshAgentOps(opts = {}) {
             redmine,
             sessionFiles: files || [],
         });
+        opsAgentsCache = agents || [];
+        renderOverviewAgents(opsAgentsCache);
         renderOverviewSchedules(schedules || [], deliveries || []);
         renderOverviewLive(live || []);
         renderOverviewKnowledge(memory || []);
@@ -1838,7 +1913,6 @@ async function refreshAgentOps(opts = {}) {
         opsSchedulesCache = schedules || [];
         opsDeliveriesCache = deliveries || [];
         renderOpsSchedulesTab(opsSchedulesCache, opsDeliveriesCache);
-        opsAgentsCache = agents || [];
         renderOpsAgents(opsAgentsCache);
         opsLiveCache = live || [];
         opsSessionFilesCache = files || [];
