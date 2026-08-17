@@ -142,6 +142,8 @@
   let opsAgentSaveBusy = false;
   let opsRefreshInFlight = false;
   let opsRefreshFlashTimer = null;
+  let opsLastRefreshMs = 0;
+  let opsUpdatedAgoTimer = null;
   let opsDigestRefreshInFlight = false;
   let opsDigestRefreshFlashTimer = null;
   let opsSessionLoadRows = null;
@@ -347,6 +349,7 @@ function setupAgentOps() {
     if (activeBtn?.dataset?.opsTab) opsActiveTab = activeBtn.dataset.opsTab;
     ensureOpsTabDigits();
     ensureOpsKeyboardHint();
+    ensureOpsUpdatedAgo();
     ensureOpsOverviewAgentsCard();
     ensureOpsOverviewRunsCard();
     ensureOpsOverviewDigestCard();
@@ -2332,6 +2335,46 @@ function renderOpsSchedulesTab(schedules, deliveries) {
     }
 }
 
+/** Relative age stamp beside Refresh so operators see Command Center freshness. */
+function ensureOpsUpdatedAgo() {
+    const row = document.querySelector('.ops-refresh-row');
+    if (!row) return null;
+    let el = document.getElementById('ops-updated-ago');
+    if (el) return el;
+    el = document.createElement('span');
+    el.id = 'ops-updated-ago';
+    el.className = 'ops-row-meta ops-updated-ago';
+    el.setAttribute('aria-live', 'polite');
+    el.hidden = true;
+    row.appendChild(el);
+    return el;
+}
+
+function paintOpsUpdatedAgo() {
+    const el = ensureOpsUpdatedAgo();
+    if (!el) return;
+    if (!opsLastRefreshMs) {
+        el.hidden = true;
+        el.textContent = '';
+        el.removeAttribute('title');
+        return;
+    }
+    const age = fmtAge(opsLastRefreshMs) || 'just now';
+    el.hidden = false;
+    el.textContent = `Updated ${age}`;
+    el.title = `Last refresh ${new Date(opsLastRefreshMs).toLocaleTimeString()}`;
+}
+
+function markOpsRefreshedAt(ms) {
+    opsLastRefreshMs = ms || Date.now();
+    paintOpsUpdatedAgo();
+    if (opsUpdatedAgoTimer) return;
+    opsUpdatedAgoTimer = setInterval(() => {
+        if (!opsLastRefreshMs) return;
+        paintOpsUpdatedAgo();
+    }, 15_000);
+}
+
 function setOpsRefreshBusy(busy) {
     const btn = document.getElementById('ops-refresh-btn');
     if (!btn) return;
@@ -2437,6 +2480,7 @@ async function refreshAgentOps(opts = {}) {
         }
     } finally {
         opsRefreshInFlight = false;
+        if (ok) markOpsRefreshedAt(Date.now());
         if (userTriggered) {
             setOpsRefreshBusy(false);
             if (ok) flashOpsRefreshed();

@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.502] - 2026-08-17
+
+### Added
+- Agent Ops **Updated … ago** stamp beside Refresh — shows Command Center freshness after auto and manual refresh (hover for clock time).
+
 ## [0.1.501] - 2026-08-17
 
 ### Changed

@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops Updated … ago stamp beside Refresh — **v0.1.502**
 - Agent Ops tab digit badges (1–5) — **v0.1.501**
 - Agent Ops overview cards click/keyboard open linked tab — **v0.1.500**
 - Agent Ops overview Recent ok/warn/bad wash — **v0.1.499**

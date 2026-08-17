@@ -883,8 +883,22 @@ textarea.ops-agent-editor.is-dirty {
 .ops-refresh-row {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
   margin: 0 4px 12px;
+}
+
+.ops-updated-ago {
+  margin: 0 2px;
+  padding: 2px 0;
+  font-size: 11px;
+  opacity: 0.72;
+  font-variant-numeric: tabular-nums;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.ops-updated-ago:not([hidden]) {
+  opacity: 0.78;
 }
 
 .ops-empty {
