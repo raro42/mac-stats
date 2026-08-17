@@ -6,7 +6,8 @@ Overnight Track B kept shipping Agent Ops Command Center polish (design-review d
 
 | Version | What |
 |---------|------|
-| **v0.1.496** | Overview **Digest** ok/warn/bad wash (health Digest fail/open parity) |
+| **v0.1.497** | Overview **Live** ok/warn/bad wash (health Discord gateway parity) |
+| v0.1.496 | Overview **Digest** ok/warn/bad wash (health Digest fail/open parity) |
 | v0.1.495 | Overview **Runs** ok/warn/bad wash (health Digest fail/open parity) |
 | v0.1.494 | Overview **Agents** ok/warn/bad wash (health Version agent-count parity) |
 | v0.1.493 | Overview **Schedules** ok/warn/bad wash (health schedule/delivery parity) |
@@ -22,7 +23,7 @@ Overnight Track B kept shipping Agent Ops Command Center polish (design-review d
 | v0.1.483 | Health Next schedule / Last delivery click-to-preview |
 | v0.1.482 | Runs Insights Slowest/Candidates click-to-preview |
 
-Latest keep: `737b480` on `main` (pushed; install/kickstart to **v0.1.496**).
+Latest keep: `445a895` on `main` (pushed; install/kickstart to **v0.1.497**).
 
 ## Tried / deferred
 
@@ -31,4 +32,4 @@ Latest keep: `737b480` on `main` (pushed; install/kickstart to **v0.1.496**).
 
 ## For Ralf
 
-Open CPU → Agent Ops overview **Digest** card: green when digester is clear; amber when digest is missing, open candidates remain, or fails show in the window. Matches the health Digest wash.
+Open CPU → Agent Ops overview **Live** card: red when Discord is disconnected; amber on reconnect noise or when nothing is live; green when live sessions show and the gateway is ready. Matches the Discord health wash.
