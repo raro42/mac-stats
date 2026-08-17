@@ -853,12 +853,25 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
         version ? `v${version}${fmtProcessUptime(insights?.process_uptime_secs)}` : '—'
     );
     const agentsHint = document.getElementById('ops-health-version');
-    if (agentsHint && version) {
-        const sessLabel =
-            sessionN >= 40 ? `${sessionN}+ session files` : `${sessionN} session file${sessionN === 1 ? '' : 's'}`;
-        const up = Number(insights?.process_uptime_secs) || 0;
-        const upBit = up > 0 ? ` · up ${fmtUptimeSecs(up)}` : '';
-        agentsHint.title = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${sessLabel}${upBit}`;
+    if (agentsHint) {
+        if (version) {
+            const sessLabel =
+                sessionN >= 40 ? `${sessionN}+ session files` : `${sessionN} session file${sessionN === 1 ? '' : 's'}`;
+            const up = Number(insights?.process_uptime_secs) || 0;
+            const upBit = up > 0 ? ` · up ${fmtUptimeSecs(up)}` : '';
+            agentsHint.title = `${enabled}/${(agents || []).length} agents · ${(live || []).length} live · ${sessLabel}${upBit}`;
+        }
+        const card = agentsHint.closest('.ops-health-card');
+        if (card) {
+            card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+            if (!version) {
+                card.classList.add('ops-health-bad');
+            } else if (enabled === 0 || sessionN >= 40) {
+                card.classList.add('ops-health-warn');
+            } else {
+                card.classList.add('ops-health-ok');
+            }
+        }
     }
     wireOpsHealthCardNavigation();
 
