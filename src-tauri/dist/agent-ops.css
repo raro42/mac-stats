@@ -409,6 +409,40 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   opacity: 0.95;
 }
 
+.ops-filter-clear {
+  flex: 0 0 auto;
+  appearance: none;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 7%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0.88;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ops-filter-clear[hidden] {
+  display: none !important;
+}
+
+.ops-filter-clear:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 36%, transparent);
+  opacity: 1;
+}
+
+.ops-filter-clear:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, transparent);
+}
+
 .ops-filter-input:hover {
   background: color-mix(in srgb, currentColor 7%, transparent);
   border-color: color-mix(in srgb, currentColor 24%, transparent);

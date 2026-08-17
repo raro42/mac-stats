@@ -26,6 +26,15 @@
     });
   }
 
+  /** Filter input id → clearOpsFilter kind (row Clear beside N/M chip). */
+  const OPS_FILTER_KIND_BY_INPUT = {
+    'ops-session-filter': 'sessions',
+    'ops-memory-filter': 'memory',
+    'ops-runs-filter': 'runs',
+    'ops-agents-filter': 'agents',
+    'ops-schedules-filter': 'schedules',
+  };
+
   /** Live match chip beside the filter input (stays visible while scrolling the list). */
   function ensureOpsFilterMatchChip(input) {
     if (!input || !input.parentElement) return null;
@@ -39,10 +48,30 @@
     return chip;
   }
 
+  /** Compact Clear control when a filter query is active (Esc parity; works with matches too). */
+  function ensureOpsFilterClearBtn(input) {
+    if (!input || !input.parentElement) return null;
+    let btn = input.parentElement.querySelector('.ops-filter-clear');
+    if (btn) return btn;
+    const kind = OPS_FILTER_KIND_BY_INPUT[input.id];
+    if (!kind) return null;
+    btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ops-filter-clear';
+    btn.hidden = true;
+    btn.setAttribute('aria-label', 'Clear filter');
+    btn.title = 'Clear filter (Esc)';
+    btn.textContent = 'Clear';
+    btn.dataset.opsClearFilter = kind;
+    input.parentElement.appendChild(btn);
+    return btn;
+  }
+
   function paintOpsFilterMatch(filterInputId, total, shown, q) {
     const input = document.getElementById(filterInputId);
     if (!input) return;
     const chip = ensureOpsFilterMatchChip(input);
+    const clearBtn = ensureOpsFilterClearBtn(input);
     if (!chip) return;
     const query = String(q || '').trim();
     if (!query) {
@@ -50,6 +79,7 @@
       chip.textContent = '';
       chip.removeAttribute('title');
       chip.classList.remove('is-zero', 'is-partial', 'is-all');
+      if (clearBtn) clearBtn.hidden = true;
       return;
     }
     const t = Math.max(0, Number(total) || 0);
@@ -60,6 +90,7 @@
     chip.classList.toggle('is-zero', s === 0);
     chip.classList.toggle('is-partial', s > 0 && s < t);
     chip.classList.toggle('is-all', s > 0 && s === t);
+    if (clearBtn) clearBtn.hidden = false;
   }
 
   /** @deprecated list captions replaced by filter-row chips — keep name for call-site clarity */
@@ -338,7 +369,7 @@ function ensureOpsKeyboardHint() {
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
     hint.textContent =
-        'Tips: digits + counts on tabs · filter N/M chip · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r refresh · R digest · ?';
+        'Tips: digits + counts on tabs · filter N/M + Clear · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r refresh · R digest · ?';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -450,7 +481,7 @@ function setupAgentOps() {
     if (opsRoot && opsRoot.dataset.opsClearFilterBound !== '1') {
       opsRoot.dataset.opsClearFilterBound = '1';
       opsRoot.addEventListener('click', (e) => {
-        const btn = e.target?.closest?.('.ops-clear-filter');
+        const btn = e.target?.closest?.('.ops-clear-filter, .ops-filter-clear');
         if (!btn || !opsRoot.contains(btn)) return;
         e.preventDefault();
         e.stopPropagation();
@@ -656,11 +687,13 @@ function ensureOpsSessionFilter() {
         input.spellcheck = false;
         row.appendChild(input);
         ensureOpsFilterMatchChip(input);
+        ensureOpsFilterClearBtn(input);
         panel.insertBefore(row, panel.firstChild);
     }
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
     ensureOpsFilterMatchChip(input);
+    ensureOpsFilterClearBtn(input);
     input.addEventListener('input', () => {
         opsSessionFilterQ = (input.value || '').trim().toLowerCase();
         renderOpsLive(opsLiveCache);
@@ -694,11 +727,13 @@ function ensureOpsMemoryFilter() {
         input.spellcheck = false;
         row.appendChild(input);
         ensureOpsFilterMatchChip(input);
+        ensureOpsFilterClearBtn(input);
         panel.insertBefore(row, panel.firstChild);
     }
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
     ensureOpsFilterMatchChip(input);
+    ensureOpsFilterClearBtn(input);
     input.addEventListener('input', () => {
         opsMemoryFilterQ = (input.value || '').trim().toLowerCase();
         renderOpsMemory(opsMemoryCache);
@@ -730,6 +765,7 @@ function ensureOpsRunsFilter() {
         input.spellcheck = false;
         row.appendChild(input);
         ensureOpsFilterMatchChip(input);
+        ensureOpsFilterClearBtn(input);
         const insights = document.getElementById('ops-runs-insights');
         if (insights) panel.insertBefore(row, insights.nextSibling);
         else panel.insertBefore(row, panel.firstChild);
@@ -737,6 +773,7 @@ function ensureOpsRunsFilter() {
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
     ensureOpsFilterMatchChip(input);
+    ensureOpsFilterClearBtn(input);
     input.addEventListener('input', () => {
         opsRunsFilterQ = (input.value || '').trim().toLowerCase();
         renderOpsRuns(opsRunsInsightsCache);
@@ -768,6 +805,7 @@ function ensureOpsAgentsFilter() {
         input.spellcheck = false;
         row.appendChild(input);
         ensureOpsFilterMatchChip(input);
+        ensureOpsFilterClearBtn(input);
         const list = document.getElementById('ops-agents-list');
         if (list) panel.insertBefore(row, list);
         else panel.insertBefore(row, panel.firstChild);
@@ -775,6 +813,7 @@ function ensureOpsAgentsFilter() {
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
     ensureOpsFilterMatchChip(input);
+    ensureOpsFilterClearBtn(input);
     input.addEventListener('input', () => {
         opsAgentsFilterQ = (input.value || '').trim().toLowerCase();
         renderOpsAgents(opsAgentsCache);
@@ -806,6 +845,7 @@ function ensureOpsSchedulesFilter() {
         input.spellcheck = false;
         row.appendChild(input);
         ensureOpsFilterMatchChip(input);
+        ensureOpsFilterClearBtn(input);
         const list = document.getElementById('ops-schedules-list');
         const sub = panel.querySelector('.ops-subhead');
         if (sub) panel.insertBefore(row, sub);
@@ -815,6 +855,7 @@ function ensureOpsSchedulesFilter() {
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
     ensureOpsFilterMatchChip(input);
+    ensureOpsFilterClearBtn(input);
     input.addEventListener('input', () => {
         opsSchedulesFilterQ = (input.value || '').trim().toLowerCase();
         renderOpsSchedulesTab(opsSchedulesCache, opsDeliveriesCache);

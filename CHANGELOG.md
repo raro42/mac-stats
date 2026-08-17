@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.506] - 2026-08-18
+
+### Added
+- Agent Ops list filters show a glass **Clear** control beside the N/M match chip whenever a query is active (Esc parity; works when matches still show).
+
 ## [0.1.505] - 2026-08-18
 
 ### Added

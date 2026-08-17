@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-08-18 (~01:50):** Agent Ops filter-row Clear beside N/M chip (v0.1.506). Recapture of `feature-agent-ops.png` still deferred if Screen Recording TCC blocks; prior Aug 12 asset kept.
 - **2026-08-18 (~00:30):** Agent Ops tab inventory count pills (v0.1.503). Recapture of `feature-agent-ops.png` still deferred if Screen Recording TCC blocks; prior Aug 12 asset kept.
 - **2026-08-17 (~00:05):** Agent Ops Updated … ago stamp beside Refresh (v0.1.502). Recapture of `feature-agent-ops.png` still deferred if Screen Recording TCC blocks; prior Aug 12 asset kept.
 - **2026-08-17 (~23:35):** Agent Ops tab digit badges 1–5 (v0.1.501). Recapture of `feature-agent-ops.png` still deferred (`screencapture -l` → could not create image / Screen Recording TCC); prior Aug 12 asset kept.
