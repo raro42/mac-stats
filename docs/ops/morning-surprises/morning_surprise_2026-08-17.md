@@ -6,7 +6,8 @@ Overnight Track B kept shipping Agent Ops Command Center polish (design-review d
 
 | Version | What |
 |---------|------|
-| **v0.1.490** | Overview **Digest** card — digester open hints with click-to-preview + Load into AI Chat (health Digest / Runs Insights parity) |
+| **v0.1.491** | Health **Next schedule / Last delivery** ok/warn/bad wash (Discord/Digest parity) |
+| v0.1.490 | Overview **Digest** card — digester open hints with click-to-preview + Load into AI Chat |
 | v0.1.489 | Overview **Runs** card — recent-turn snapshot + click-to-preview |
 | v0.1.488 | Overview **Agents** card — enabled/orchestrator snapshot + click-to-open |
 | v0.1.487 | Health **Redmine** → Redmine agent open + Load into AI Chat |
@@ -16,7 +17,7 @@ Overnight Track B kept shipping Agent Ops Command Center polish (design-review d
 | v0.1.483 | Health Next schedule / Last delivery click-to-preview |
 | v0.1.482 | Runs Insights Slowest/Candidates click-to-preview |
 
-Latest keep: `bde0e3c` on `main` (pushed). Discord Ready after install/kickstart.
+Latest keep: `07a5c4a` on `main` (push after install). Discord Ready after install/kickstart.
 
 ## Tried / deferred
 
@@ -25,4 +26,4 @@ Latest keep: `bde0e3c` on `main` (pushed). Discord Ready after install/kickstart
 
 ## For Ralf
 
-Open CPU → Agent Ops overview: new **Digest** card after Runs. Click an open hint → Runs preview → Load into AI Chat.
+Open CPU → Agent Ops health row: **Next schedule** and **Last delivery** now show green/amber/red wash (no jobs, fresh delivery &lt;24h, stale ≥7d). Click still opens Schedules with preview.
