@@ -1281,6 +1281,30 @@ function wireOpsHealthCardNavigation() {
     syncOpsHealthCardActive(opsActiveTab);
 }
 
+/** Overview Agents card: ok/warn/bad wash (health Version agent-count parity). */
+function setOverviewAgentsStatus(agents) {
+    const card = document.getElementById('ops-overview-agents');
+    if (!card) return;
+    card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+    const rows = Array.isArray(agents) ? agents : [];
+    if (!rows.length) {
+        card.classList.add('ops-health-warn');
+        card.title = 'No agents yet';
+        return;
+    }
+    const enabledN = rows.filter((a) => a.enabled).length;
+    if (enabledN === 0) {
+        card.classList.add('ops-health-warn');
+        card.title = 'Agents present but none enabled';
+        return;
+    }
+    const hasOrch = rows.some((a) => a.enabled && a.orchestrator);
+    card.classList.add('ops-health-ok');
+    card.title = hasOrch
+        ? `${enabledN}/${rows.length} agents on · orchestrator ready`
+        : `${enabledN}/${rows.length} agents on`;
+}
+
 /** Overview Agents card: enabled/orchestrator first; click → Agents + Load into AI Chat. */
 function renderOverviewAgents(agents) {
     ensureOpsOverviewAgentsCard();
@@ -1288,6 +1312,7 @@ function renderOverviewAgents(agents) {
     if (!body) return;
     body.innerHTML = '';
     const rows = Array.isArray(agents) ? agents.slice() : [];
+    setOverviewAgentsStatus(rows);
     if (!rows.length) {
         body.innerHTML = opsOverviewEmptyHtml(
             'No agents yet — add folders under ~/.mac-stats/agents',

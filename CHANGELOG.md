@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.494] - 2026-08-17
+
+### Changed
+- Agent Ops **overview Agents** card: ok/warn/bad status wash (health Version agent-count parity) — empty or zero enabled warn; at least one enabled ok.
+
 ## [0.1.493] - 2026-08-17
 
 ### Changed
