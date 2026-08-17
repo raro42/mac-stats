@@ -928,14 +928,51 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
     }
 
     setText('ops-health-schedule', fmtScheduleEta(sched));
+    const scheduleEl = document.getElementById('ops-health-schedule');
+    if (scheduleEl) {
+        const card = scheduleEl.closest('.ops-health-card');
+        if (card) {
+            card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+            if (sched && sched.totalEntries != null) {
+                if (Number(sched.totalEntries) === 0) {
+                    card.classList.add('ops-health-warn');
+                } else if (sched.secondsUntilNextFire != null) {
+                    card.classList.add('ops-health-ok');
+                } else {
+                    card.classList.add('ops-health-warn');
+                }
+            }
+        }
+    }
 
     let deliveryText = '—';
+    let deliveryAgeMs = NaN;
     if (Array.isArray(deliveries) && deliveries.length) {
         const newest = deliveries[0];
         const t = newest?.utc ? Date.parse(newest.utc) : NaN;
+        deliveryAgeMs = !Number.isNaN(t) ? Date.now() - t : NaN;
         deliveryText = !Number.isNaN(t) ? fmtAge(t) : (newest.utc || '—');
     }
     setText('ops-health-delivery', deliveryText);
+    const deliveryEl = document.getElementById('ops-health-delivery');
+    if (deliveryEl) {
+        const card = deliveryEl.closest('.ops-health-card');
+        if (card) {
+            card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+            if (Array.isArray(deliveries) && deliveries.length) {
+                const dayMs = 24 * 60 * 60 * 1000;
+                if (!Number.isNaN(deliveryAgeMs) && deliveryAgeMs >= 0 && deliveryAgeMs < dayMs) {
+                    card.classList.add('ops-health-ok');
+                } else if (!Number.isNaN(deliveryAgeMs) && deliveryAgeMs >= 7 * dayMs) {
+                    card.classList.add('ops-health-bad');
+                } else {
+                    card.classList.add('ops-health-warn');
+                }
+            } else if (Array.isArray(deliveries)) {
+                card.classList.add('ops-health-warn');
+            }
+        }
+    }
 
     let digestText = '—';
     if (insights) {
