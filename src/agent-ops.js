@@ -937,6 +937,29 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
     }
 }
 
+/** Open Runs + preview a digest-open hint (Slowest/Candidates parity). */
+function openOpsDigestHintPreviewNavigate(hint) {
+    const text = String(hint || '').trim();
+    if (!text) return false;
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    selectOpsTab('runs');
+    const card = document.getElementById('ops-runs-insights');
+    let line = null;
+    card?.querySelectorAll('.ops-insight-line[data-digest-hint]').forEach((el) => {
+        if (line) return;
+        if (String(el.dataset.digestHint || '') === text) line = el;
+    });
+    previewOpsRunFromInsight(formatOpsDigestHintAsSummary(text), line);
+    if (line) {
+        try {
+            line.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } catch (_) {
+            /* ignore */
+        }
+    }
+    return true;
+}
+
 /** Open Schedules + select/preview a schedule (overview / health parity). */
 function openOpsSchedulePreviewNavigate(s) {
     if (!s) return false;
@@ -1019,6 +1042,9 @@ function wireOpsHealthCardNavigation() {
         } else if (key === 'delivery') {
             card.title =
                 'Open Schedules · preview last delivery · load into AI Chat from that tab';
+        } else if (key === 'digest') {
+            card.title =
+                'Open Runs · preview first digest-open hint · load into AI Chat from that tab';
         } else {
             card.title = card.title || `Open ${tab}`;
         }
@@ -1034,6 +1060,11 @@ function wireOpsHealthCardNavigation() {
                         ? opsDeliveriesCache[0]
                         : null;
                 if (newest && openOpsDeliveryPreviewNavigate(newest)) return;
+            }
+            if (key === 'digest') {
+                const hints = opsRunsInsightsCache?.digest_open_hints || [];
+                const first = hints.length ? String(hints[0] || '').trim() : '';
+                if (first && openOpsDigestHintPreviewNavigate(first)) return;
             }
             selectOpsTab(tab);
         };
@@ -3421,6 +3452,22 @@ function formatOpsCandidateAsSummary(c) {
     };
 }
 
+/** Digest-open hint → run preview shape (Load into AI Chat). */
+function formatOpsDigestHintAsSummary(hint) {
+    const text = String(hint || '').trim();
+    return {
+        ts: '',
+        lane: 'digest',
+        wall_ms: 0,
+        tools: [],
+        question_preview: text,
+        ok: true,
+        request_id: '',
+        _candidateKind: 'digest-open',
+        _candidateReason: 'Digester open candidate',
+    };
+}
+
 /** Show full run turn details (list rows truncate question / tools). */
 function showOpsRunPreview(text, requestId, question) {
     const preview = ensureOpsRunsPreview();
@@ -3498,14 +3545,42 @@ function renderOpsRuns(insights) {
             <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · fail ${insights.fail_count || 0} · mean ${insights.mean_ms} ms · max ${insights.max_ms} ms</div>
             ${gateway ? `<div class="ops-row-meta">${escapeHtml(gateway)}</div>` : ''}
             <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}${insights.digest_generated_at ? ` · ${escapeHtml(String(insights.digest_generated_at).slice(0, 19))}` : ''}</div>
-            ${(insights.digest_open_hints || []).length
-                ? `<div class="ops-insight-sub">Digest open</div>${(insights.digest_open_hints || []).slice(0, 3).map((h) => `<div class="ops-insight-line">${escapeHtml(h)}</div>`).join('')}`
-                : (Number(insights.digest_open_count) === 0
-                    ? `<div class="ops-insight-sub">Digest open</div><div class="ops-empty ops-empty-compact">Queue clear — overnight must still ship design review / standing backlog (quiet is a fail)</div>`
-                    : '')}
-            <div class="ops-row-meta">Lanes: ${escapeHtml(lanes) || '—'}</div>
-            <div class="ops-row-meta">Top tools: ${escapeHtml(tools) || '—'}</div>
         `;
+        const digestHints = insights.digest_open_hints || [];
+        if (digestHints.length) {
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Digest open';
+            card.appendChild(sub);
+            digestHints.slice(0, 3).forEach((h) => {
+                const text = String(h || '').trim();
+                if (!text) return;
+                const line = document.createElement('div');
+                line.className = 'ops-insight-line';
+                line.textContent = text;
+                line.dataset.digestHint = text;
+                wireOpsInsightRunLine(line, formatOpsDigestHintAsSummary(text));
+                card.appendChild(line);
+            });
+        } else if (Number(insights.digest_open_count) === 0) {
+            const sub = document.createElement('div');
+            sub.className = 'ops-insight-sub';
+            sub.textContent = 'Digest open';
+            card.appendChild(sub);
+            const empty = document.createElement('div');
+            empty.className = 'ops-empty ops-empty-compact';
+            empty.textContent =
+                'Queue clear — overnight must still ship design review / standing backlog (quiet is a fail)';
+            card.appendChild(empty);
+        }
+        const lanesEl = document.createElement('div');
+        lanesEl.className = 'ops-row-meta';
+        lanesEl.textContent = `Lanes: ${lanes || '—'}`;
+        card.appendChild(lanesEl);
+        const toolsEl = document.createElement('div');
+        toolsEl.className = 'ops-row-meta';
+        toolsEl.textContent = `Top tools: ${tools || '—'}`;
+        card.appendChild(toolsEl);
         const slowRows = insights.slowest || [];
         if (slowRows.length) {
             const sub = document.createElement('div');

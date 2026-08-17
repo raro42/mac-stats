@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.484] - 2026-08-17
+
+### Changed
+- Agent Ops **Runs Insights** Digest open hints are clickable — preview + Load into AI Chat; health Digest card opens the first hint (Slowest/Candidates parity).
+
 ## [0.1.483] - 2026-08-17
 
 ### Changed
