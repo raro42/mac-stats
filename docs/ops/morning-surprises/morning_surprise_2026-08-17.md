@@ -1,38 +1,22 @@
 # Morning surprise — 2026-08-17
 
-Overnight Track B kept shipping Agent Ops Command Center polish (design-review due: stale `feature-agent-ops`).
+Overnight Track B kept shipping Agent Ops Command Center polish.
 
-## Shipped tonight (keeps)
+## Shipped tonight (highlights)
 
-| Version | What |
-|---------|------|
-| **v0.1.500** | Overview cards: click chrome / empty body (or Enter/Space when focused) opens the linked tab — health-card parity |
-| v0.1.499 | Overview **Recent** ok/warn/bad wash (health Last delivery age parity) |
-| v0.1.498 | Overview **Knowledge** ok/warn/bad wash (health Version session-file count parity) |
-| v0.1.497 | Overview **Live** ok/warn/bad wash (health Discord gateway parity) |
-| v0.1.496 | Overview **Digest** ok/warn/bad wash (health Digest fail/open parity) |
-| v0.1.495 | Overview **Runs** ok/warn/bad wash (health Digest fail/open parity) |
-| v0.1.494 | Overview **Agents** ok/warn/bad wash (health Version agent-count parity) |
-| v0.1.493 | Overview **Schedules** ok/warn/bad wash (health schedule/delivery parity) |
-| v0.1.492 | Health **Version** ok/warn/bad wash (Discord/Redmine/Digest parity) |
-| v0.1.491 | Health **Next schedule / Last delivery** ok/warn/bad wash |
-| v0.1.490 | Overview **Digest** card — digester open hints with click-to-preview + Load into AI Chat |
-| v0.1.489 | Overview **Runs** card — recent-turn snapshot + click-to-preview |
-| v0.1.488 | Overview **Agents** card — enabled/orchestrator snapshot + click-to-open |
-| v0.1.487 | Health **Redmine** → Redmine agent open + Load into AI Chat |
-| v0.1.486 | Health **Discord** → Runs gateway preview + Load into AI Chat |
-| v0.1.485 | Health **Version** → primary agent open |
-| v0.1.484 | Digest open hints click-to-preview + health Digest card |
-| v0.1.483 | Health Next schedule / Last delivery click-to-preview |
-| v0.1.482 | Runs Insights Slowest/Candidates click-to-preview |
-
-Latest keep: `4095851` on `main` (pushed; install/kickstart to **v0.1.500**).
+| Version | What got better |
+|---------|-----------------|
+| **v0.1.501** | Agent Ops **tabs**: visible digit badges (1–5) so Hermes-style shortcuts are obvious |
+| **v0.1.500** | Overview cards click/keyboard open linked tab |
+| **v0.1.493–499** | Overview cards ok/warn/bad wash (Schedules → Recent) |
+| **v0.1.491–492** | Health schedule/delivery + Version washes |
 
 ## Tried / deferred
 
-- Recapture `docs/screens/feature-agent-ops.png` — still deferred (no on-screen CPU window for `screencapture -l`).
-- Digester Slowest empty (instant noise filtered); night fuel = design review, not quiet.
+- Recapture `docs/screens/feature-agent-ops.png` — Screen Recording TCC (`screencapture -l` → could not create image). Aug 12 asset kept.
 
-## For Ralf
+## Digester
 
-Open CPU → Agent Ops overview: click empty space on a card (or focus the card and press Enter/Space) to open that tab. Rows and the Open button still do their own jobs. Matches how health cards already work.
+- Open candidates were design-review (stale feature-agent-ops). Latency sample empty after noise filters.
+
+Updated: 2026-08-17 ~23:36
