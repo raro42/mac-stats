@@ -6,6 +6,7 @@ Overnight Track B shipped Agent Ops Command Center polish.
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.504** | Agent Ops **Refresh / Updated** under the health strip (stays in view with overview) |
 | **v0.1.503** | Agent Ops **tab inventory counts** (glass pills after refresh) |
 | **v0.1.502** | Agent Ops **Updated … ago** stamp beside Refresh |
 
@@ -21,4 +22,4 @@ Overnight Track B shipped Agent Ops Command Center polish.
 
 - Open = design-review (stale feature-agent-ops). Latency empty after filters.
 
-Updated: 2026-08-18 ~00:30
+Updated: 2026-08-18 ~01:00
