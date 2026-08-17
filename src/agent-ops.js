@@ -323,6 +323,7 @@ function setupAgentOps() {
     ensureOpsOverviewAgentsCard();
     ensureOpsOverviewRunsCard();
     ensureOpsOverviewDigestCard();
+    wireOpsOverviewCardNavigation();
     syncOpsOverviewCardActive(opsActiveTab);
     syncOpsHealthCardActive(opsActiveTab);
     document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
@@ -1203,6 +1204,44 @@ function openOpsAgentPreviewNavigate(a) {
     const selector = id || slug;
     if (selector) void openOpsAgent(selector);
     return true;
+}
+
+/** Click overview cards (chrome / empty body) to open the linked tab — health-card parity. */
+function wireOpsOverviewCardNavigation() {
+    const grid = document.getElementById('ops-overview-grid');
+    if (!grid || grid.dataset.opsOverviewNav === '1') return;
+    grid.dataset.opsOverviewNav = '1';
+    grid.querySelectorAll('.ops-overview-card').forEach((card) => {
+        const link = card.querySelector('.ops-overview-link[data-goto-tab]');
+        const tab = link?.dataset?.gotoTab || '';
+        if (!tab) return;
+        card.classList.add('ops-overview-clickable');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button');
+        if (!card.getAttribute('aria-label')) {
+            card.setAttribute('aria-label', `Open ${tab} tab`);
+        }
+        const openTab = () => {
+            if (agentOpsCollapsed) applyOpsCollapsed(false);
+            selectOpsTab(tab);
+        };
+        card.addEventListener('click', (e) => {
+            if (
+                e.target.closest(
+                    '.ops-row, .ops-overview-link, .ops-clear-filter, button, a, input, textarea, select'
+                )
+            ) {
+                return;
+            }
+            openTab();
+        });
+        card.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            if (e.target !== card) return;
+            e.preventDefault();
+            openTab();
+        });
+    });
 }
 
 /** Click health cards to jump to the related Agent Ops tab (once). */

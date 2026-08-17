@@ -422,6 +422,10 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
     transform 0.15s ease;
 }
 
+.ops-overview-card.ops-overview-clickable {
+  cursor: pointer;
+}
+
 .ops-overview-card:hover {
   background: color-mix(in srgb, currentColor 7%, transparent);
   border-color: color-mix(in srgb, currentColor 18%, transparent);
@@ -432,6 +436,12 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 .ops-overview-card:focus-within {
   border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+}
+
+.ops-overview-card.ops-overview-clickable:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
 }
 
 /* Linked detail tab is active (Agents / Schedules / Sessions / Memory). */
