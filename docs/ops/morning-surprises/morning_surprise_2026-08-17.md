@@ -6,7 +6,8 @@ Overnight Track B kept shipping Agent Ops Command Center polish (design-review d
 
 | Version | What |
 |---------|------|
-| **v0.1.498** | Overview **Knowledge** ok/warn/bad wash (health Version session-file count parity) |
+| **v0.1.499** | Overview **Recent** ok/warn/bad wash (health Last delivery age parity) |
+| v0.1.498 | Overview **Knowledge** ok/warn/bad wash (health Version session-file count parity) |
 | v0.1.497 | Overview **Live** ok/warn/bad wash (health Discord gateway parity) |
 | v0.1.496 | Overview **Digest** ok/warn/bad wash (health Digest fail/open parity) |
 | v0.1.495 | Overview **Runs** ok/warn/bad wash (health Digest fail/open parity) |
@@ -24,7 +25,7 @@ Overnight Track B kept shipping Agent Ops Command Center polish (design-review d
 | v0.1.483 | Health Next schedule / Last delivery click-to-preview |
 | v0.1.482 | Runs Insights Slowest/Candidates click-to-preview |
 
-Latest keep: `8c82bd5` on `main` (pushed; install/kickstart to **v0.1.498**).
+Latest keep: `4ef3149` on `main` (pushed; install/kickstart to **v0.1.499**).
 
 ## Tried / deferred
 
@@ -33,4 +34,4 @@ Latest keep: `8c82bd5` on `main` (pushed; install/kickstart to **v0.1.498**).
 
 ## For Ralf
 
-Open CPU → Agent Ops overview **Knowledge** card: amber when the vault is empty or has ≥40 files; green when knowledge files are present and the vault is not crowded. Matches the Version health session-file count wash.
+Open CPU → Agent Ops overview **Recent** card: green when the newest session is under 24h old; amber when empty or 1–7 days; red when the newest chat is ≥7 days old. Matches the Last delivery health age wash.
