@@ -1369,6 +1369,34 @@ function openOpsRunPreviewNavigate(summary) {
     return true;
 }
 
+/** Overview Runs card: ok/warn/bad wash (health Digest fail/open parity). */
+function setOverviewRunsStatus(insights) {
+    const card = document.getElementById('ops-overview-runs');
+    if (!card) return;
+    card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+    const recent = Array.isArray(insights?.recent) ? insights.recent : [];
+    const failN = Number(insights?.fail_count) || 0;
+    const openN = Number(insights?.digest_open_count) || 0;
+    if (!insights || (!recent.length && !(Number(insights?.turns) > 0))) {
+        card.classList.add('ops-health-warn');
+        card.title = 'No runs yet';
+        return;
+    }
+    if (failN > 0) {
+        card.classList.add('ops-health-warn');
+        card.title = `${failN} failed turn${failN === 1 ? '' : 's'} in the window`;
+        return;
+    }
+    if (openN > 0) {
+        card.classList.add('ops-health-warn');
+        card.title = `${openN} digester open candidate${openN === 1 ? '' : 's'}`;
+        return;
+    }
+    card.classList.add('ops-health-ok');
+    const turns = Number(insights?.turns) || recent.length;
+    card.title = turns > 0 ? `${turns} turn${turns === 1 ? '' : 's'} · no fails` : 'Runs healthy';
+}
+
 /** Overview Runs card: recent turns snapshot; click → Runs + Load into AI Chat. */
 function renderOverviewRuns(insights) {
     ensureOpsOverviewRunsCard();
@@ -1376,6 +1404,7 @@ function renderOverviewRuns(insights) {
     if (!body) return;
     body.innerHTML = '';
     const recent = Array.isArray(insights?.recent) ? insights.recent : [];
+    setOverviewRunsStatus(insights);
     if (!recent.length) {
         body.innerHTML = opsOverviewEmptyHtml(
             'No runs yet — turns land after Discord or chat',
