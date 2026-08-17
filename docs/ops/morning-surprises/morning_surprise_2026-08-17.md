@@ -6,7 +6,8 @@ Overnight Track B kept shipping Agent Ops Command Center polish (design-review d
 
 | Version | What |
 |---------|------|
-| **v0.1.494** | Overview **Agents** ok/warn/bad wash (health Version agent-count parity) |
+| **v0.1.495** | Overview **Runs** ok/warn/bad wash (health Digest fail/open parity) |
+| v0.1.494 | Overview **Agents** ok/warn/bad wash (health Version agent-count parity) |
 | v0.1.493 | Overview **Schedules** ok/warn/bad wash (health schedule/delivery parity) |
 | v0.1.492 | Health **Version** ok/warn/bad wash (Discord/Redmine/Digest parity) |
 | v0.1.491 | Health **Next schedule / Last delivery** ok/warn/bad wash |
@@ -20,7 +21,7 @@ Overnight Track B kept shipping Agent Ops Command Center polish (design-review d
 | v0.1.483 | Health Next schedule / Last delivery click-to-preview |
 | v0.1.482 | Runs Insights Slowest/Candidates click-to-preview |
 
-Latest keep: `6dc275c` on `main` (push after install). Discord Ready after install/kickstart.
+Latest keep: `e619315` on `main` (pushed; install/kickstart to **v0.1.495**).
 
 ## Tried / deferred
 
@@ -29,4 +30,4 @@ Latest keep: `6dc275c` on `main` (push after install). Discord Ready after insta
 
 ## For Ralf
 
-Open CPU → Agent Ops overview **Agents** card: green when at least one agent is enabled; amber when the list is empty or every agent is off. Matches the health Version agent-count wash.
+Open CPU → Agent Ops overview **Runs** card: green when turns look healthy; amber when the list is empty, a turn failed, or digester still has open candidates. Matches the health Digest wash.
