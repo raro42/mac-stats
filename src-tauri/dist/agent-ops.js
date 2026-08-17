@@ -1734,10 +1734,33 @@ function renderOverviewLive(rows, insights) {
     });
 }
 
+/** Overview Knowledge card: ok/warn/bad wash (health Version session-file count parity). */
+function setOverviewKnowledgeStatus(files) {
+    const card = document.getElementById('ops-overview-knowledge');
+    if (!card) return;
+    card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+    const rows = Array.isArray(files) ? files : [];
+    if (!rows.length) {
+        card.classList.add('ops-health-warn');
+        card.title = 'No knowledge files yet under ~/.mac-stats';
+        return;
+    }
+    const n = rows.length;
+    const fileLabel = n === 1 ? '1 knowledge file' : `${n} knowledge files`;
+    if (n >= 40) {
+        card.classList.add('ops-health-warn');
+        card.title = `${fileLabel} — vault is getting crowded`;
+        return;
+    }
+    card.classList.add('ops-health-ok');
+    card.title = fileLabel;
+}
+
 function renderOverviewKnowledge(files) {
     const body = document.getElementById('ops-overview-knowledge-body');
     if (!body) return;
     body.innerHTML = '';
+    setOverviewKnowledgeStatus(files);
     if (!files || !files.length) {
         body.innerHTML = opsOverviewEmptyHtml(
           'No knowledge files yet under ~/.mac-stats',
