@@ -1627,10 +1627,57 @@ function appendOverviewLastDeliveryRow(body, d) {
     body.appendChild(btn);
 }
 
-function renderOverviewLive(rows) {
+/** Overview Live card: ok/warn/bad wash (health Discord gateway parity). */
+function setOverviewLiveStatus(rows, insights) {
+    const card = document.getElementById('ops-overview-live');
+    if (!card) return;
+    card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+    const live = Array.isArray(rows) ? rows : [];
+    const dg = insights?.discord_gateway || '';
+    const stageMatch = dg.match(/stage=([^\s·]+)/i);
+    const stage = (stageMatch ? stageMatch[1] : '').trim().toLowerCase();
+    const discMatch = dg.match(/disconnect×(\d+)/i);
+    const discN = discMatch ? Number(discMatch[1]) : 0;
+    const resumeMatch = dg.match(/resume×(\d+)/i);
+    const resumeN = resumeMatch ? Number(resumeMatch[1]) : 0;
+    const readyMatch = /last Ready/i.test(dg);
+    const liveLabel =
+        live.length === 1 ? '1 live session' : `${live.length} live sessions`;
+
+    if (stage === 'disconnected') {
+        card.classList.add('ops-health-bad');
+        card.title = live.length
+            ? `Discord disconnected · ${liveLabel} still listed`
+            : 'Discord disconnected · no live sessions';
+        return;
+    }
+    if (discN > 0 || resumeN > 0 || stage === 'resuming') {
+        card.classList.add('ops-health-warn');
+        card.title = live.length
+            ? `Gateway reconnect noise · ${liveLabel}`
+            : 'Gateway reconnect noise · no live sessions';
+        return;
+    }
+    if (!live.length) {
+        card.classList.add('ops-health-warn');
+        card.title =
+            stage === 'connected' || readyMatch
+                ? 'No live sessions — gateway ready'
+                : 'No live sessions';
+        return;
+    }
+    card.classList.add('ops-health-ok');
+    card.title =
+        stage === 'connected' || readyMatch
+            ? `${liveLabel} · gateway ready`
+            : liveLabel;
+}
+
+function renderOverviewLive(rows, insights) {
     const body = document.getElementById('ops-overview-live-body');
     if (!body) return;
     body.innerHTML = '';
+    setOverviewLiveStatus(rows, insights);
     if (!rows || !rows.length) {
         body.innerHTML = opsOverviewEmptyHtml(
           'No live sessions — chats appear here while agents run',
@@ -2235,7 +2282,7 @@ async function refreshAgentOps(opts = {}) {
         opsAgentsCache = agents || [];
         renderOverviewAgents(opsAgentsCache);
         renderOverviewSchedules(schedules || [], deliveries || []);
-        renderOverviewLive(live || []);
+        renderOverviewLive(live || [], insights);
         renderOverviewKnowledge(memory || []);
         renderOverviewRecent(files || []);
         renderOverviewRuns(insights);
