@@ -6,7 +6,8 @@ Overnight Track B (design review due: stale `feature-agent-ops.png`).
 
 | Version | What |
 |---------|------|
-| **v0.1.488** | Agent Ops **overview Agents** card: enabled/orchestrator snapshot on the Command Center grid; click opens Agents + Load into AI Chat; Agents tab gets overview active wash (Schedules/Live/Knowledge/Recent parity). |
+| **v0.1.489** | Agent Ops **overview Runs** card: recent-turn snapshot on the Command Center grid; click opens Runs + preview/Load into AI Chat; Runs tab gets overview active wash (Agents/Schedules/Live/Knowledge/Recent parity). |
+| v0.1.488 | Agent Ops overview Agents card (enabled snapshot + click-to-open) |
 | v0.1.487 | Agent Ops health Redmine → Redmine agent open |
 | v0.1.486 | Agent Ops health Discord → Runs gateway preview + Load into AI Chat |
 | v0.1.485 | Agent Ops health Version → primary agent open |
@@ -29,4 +30,4 @@ Open fuel was design-review only (latency sample empty after noise filters). Deb
 
 ## Next fuel
 
-Prefer non-overview-agents-adjacent: Digester Discord traffic, rotate to stale `feature-processes` / `feature-cpu-metrics` when TCC allows a capture, or a sibling/OpenClaw port that maps to sessions/tools.
+Prefer non-overview-runs-adjacent: Digester Discord traffic, rotate to stale `feature-processes` / `feature-cpu-metrics` when TCC allows a capture, or a sibling/OpenClaw port that maps to sessions/tools.
