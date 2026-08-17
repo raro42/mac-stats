@@ -613,6 +613,45 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   color: var(--accent, #007aff);
 }
 
+.ops-tab-count {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+  vertical-align: 0.05em;
+  color: inherit;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  opacity: 0.78;
+  transition: opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.ops-tab-count[hidden] {
+  display: none;
+}
+
+.ops-tab-count.is-zero {
+  opacity: 0.42;
+}
+
+.agent-ops-tab:hover .ops-tab-count,
+.ops-file-tab:hover .ops-tab-count {
+  opacity: 0.92;
+}
+
+.agent-ops-tab.active .ops-tab-count,
+.ops-file-tab.active .ops-tab-count {
+  opacity: 1;
+  color: var(--accent, #007aff);
+  background: color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+}
+
 .agent-ops-tab, .ops-file-tab {
   background: color-mix(in srgb, currentColor 6%, transparent);
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);

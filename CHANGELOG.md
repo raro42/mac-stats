@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.503] - 2026-08-18
+
+### Added
+- Agent Ops **tab inventory counts** — glass count pills on Agents / Sessions / Schedules / Knowledge / Runs after refresh (hover shows count + digit shortcut).
+
 ## [0.1.502] - 2026-08-17
 
 ### Added

@@ -251,10 +251,52 @@ function ensureOpsTabDigits() {
         span.setAttribute('aria-hidden', 'true');
         span.textContent = d;
         btn.insertBefore(span, btn.firstChild);
+        btn.dataset.opsTabLabel = label;
         btn.setAttribute('title', `${label} · press ${d}`);
         if (!btn.getAttribute('aria-keyshortcuts')) {
             btn.setAttribute('aria-keyshortcuts', d);
         }
+    });
+}
+
+/** Inventory counts on tabs (agents / sessions / schedules / knowledge / runs). */
+function ensureOpsTabCountEl(btn) {
+    let el = btn.querySelector('.ops-tab-count');
+    if (el) return el;
+    el = document.createElement('span');
+    el.className = 'ops-tab-count';
+    el.setAttribute('aria-hidden', 'true');
+    el.hidden = true;
+    btn.appendChild(el);
+    return el;
+}
+
+function paintOpsTabCounts(counts) {
+    ensureOpsTabDigits();
+    const digits = {
+        agents: '1',
+        sessions: '2',
+        schedules: '3',
+        memory: '4',
+        runs: '5',
+    };
+    const c = counts || {};
+    document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
+        const tab = btn.dataset.opsTab || '';
+        if (!(tab in c)) return;
+        const n = Math.max(0, Number(c[tab]) || 0);
+        const el = ensureOpsTabCountEl(btn);
+        el.textContent = String(n);
+        el.hidden = false;
+        el.classList.toggle('is-zero', n === 0);
+        const label =
+            btn.dataset.opsTabLabel ||
+            tab;
+        const d = digits[tab] || '';
+        btn.setAttribute(
+            'title',
+            d ? `${label} · ${n} · press ${d}` : `${label} · ${n}`
+        );
     });
 }
 
@@ -265,7 +307,7 @@ function ensureOpsKeyboardHint() {
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
     hint.textContent =
-        'Tips: digits on tabs · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r refresh · R digest · ?';
+        'Tips: digits + counts on tabs · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r refresh · R digest · ?';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -2471,6 +2513,15 @@ async function refreshAgentOps(opts = {}) {
         renderOpsMemory(opsMemoryCache);
         opsRunsInsightsCache = insights;
         renderOpsRuns(opsRunsInsightsCache);
+        paintOpsTabCounts({
+            agents: (opsAgentsCache || []).length,
+            sessions: (opsLiveCache || []).length + (opsSessionFilesCache || []).length,
+            schedules: (opsSchedulesCache || []).length,
+            memory: (opsMemoryCache || []).length,
+            runs: Array.isArray(insights?.recent)
+                ? insights.recent.length
+                : Number(insights?.turns) || 0,
+        });
         ok = true;
     } catch (err) {
         console.warn('[Agent Ops]', err);
