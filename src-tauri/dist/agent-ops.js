@@ -1035,6 +1035,21 @@ function findOpsPrimaryAgent() {
     return rows[0];
 }
 
+/** Prefer slug/name/id “redmine” for health Redmine (Version uses primary). */
+function findOpsRedmineAgent() {
+    const rows = opsAgentsCache || [];
+    if (!rows.length) return null;
+    const match = (a) => {
+        const slug = String(a?.slug || '').toLowerCase();
+        const id = String(a?.id || '').toLowerCase();
+        const name = String(a?.name || '').toLowerCase();
+        return slug === 'redmine' || name === 'redmine' || id.includes('redmine');
+    };
+    const on = rows.find((a) => a.enabled && match(a));
+    if (on) return on;
+    return rows.find(match) || null;
+}
+
 /** Open Agents + select/open a row (health Version parity with schedule/delivery). */
 function openOpsAgentPreviewNavigate(a) {
     if (!a || !(a.id || a.slug)) return false;
@@ -1102,6 +1117,9 @@ function wireOpsHealthCardNavigation() {
         } else if (key === 'discord') {
             card.title =
                 'Open Runs · preview Discord gateway status · load into AI Chat from that tab';
+        } else if (key === 'redmine') {
+            card.title =
+                'Open Agents · open Redmine agent · load soul/skill/mood into AI Chat from that tab';
         } else {
             card.title = card.title || `Open ${tab}`;
         }
@@ -1130,6 +1148,10 @@ function wireOpsHealthCardNavigation() {
             if (key === 'discord') {
                 const gw = String(opsRunsInsightsCache?.discord_gateway || '').trim();
                 if (gw && openOpsDiscordGatewayPreviewNavigate(gw)) return;
+            }
+            if (key === 'redmine') {
+                const redmineAgent = findOpsRedmineAgent();
+                if (redmineAgent && openOpsAgentPreviewNavigate(redmineAgent)) return;
             }
             selectOpsTab(tab);
         };
@@ -3636,12 +3658,17 @@ function renderOpsRuns(insights) {
     }
     if (!insights || !insights.turns) {
         if (card && gateway) {
-            card.innerHTML = `
-                <div class="ops-insight-title">Insights</div>
-                <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}</div>
-                <div class="ops-empty ops-empty-compact ops-empty-tab">No runs yet — turns land in ~/.mac-stats/runs.jsonl after Discord or chat</div>
-            `;
+            card.innerHTML = `<div class="ops-insight-title">Insights</div>`;
             appendOpsDiscordGatewayLine(card, gateway);
+            const digestMeta = document.createElement('div');
+            digestMeta.className = 'ops-row-meta';
+            digestMeta.textContent = `Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${insights.digest_source}` : ''}`;
+            card.appendChild(digestMeta);
+            const empty = document.createElement('div');
+            empty.className = 'ops-empty ops-empty-compact ops-empty-tab';
+            empty.textContent =
+                'No runs yet — turns land in ~/.mac-stats/runs.jsonl after Discord or chat';
+            card.appendChild(empty);
         } else {
             el.innerHTML = opsTabEmptyHtml(
               'No runs yet',
