@@ -272,11 +272,30 @@ function ensureOpsOverviewAgentsCard() {
     grid.insertBefore(card, grid.firstChild);
 }
 
+/** Inject Runs overview card (end) so Runs tab gets active-card parity. */
+function ensureOpsOverviewRunsCard() {
+    const grid = document.getElementById('ops-overview-grid');
+    if (!grid || document.getElementById('ops-overview-runs')) return;
+    const card = document.createElement('div');
+    card.className = 'ops-overview-card';
+    card.id = 'ops-overview-runs';
+    card.innerHTML =
+        `<div class="ops-overview-head">` +
+        `<h3>Runs</h3>` +
+        `<button type="button" class="ops-overview-link" data-goto-tab="runs">Open</button>` +
+        `</div>` +
+        `<div class="ops-overview-body" id="ops-overview-runs-body">` +
+        `<div class="ops-loading" role="status">Loading…</div>` +
+        `</div>`;
+    grid.appendChild(card);
+}
+
 function setupAgentOps() {
     const activeBtn = document.querySelector('.agent-ops-tab.active');
     if (activeBtn?.dataset?.opsTab) opsActiveTab = activeBtn.dataset.opsTab;
     ensureOpsKeyboardHint();
     ensureOpsOverviewAgentsCard();
+    ensureOpsOverviewRunsCard();
     syncOpsOverviewCardActive(opsActiveTab);
     syncOpsHealthCardActive(opsActiveTab);
     document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
@@ -1239,6 +1258,61 @@ function renderOverviewAgents(agents) {
     });
 }
 
+/** Open Runs + preview a turn (overview / Insights Slowest parity). */
+function openOpsRunPreviewNavigate(summary) {
+    if (!summary) return false;
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    selectOpsTab('runs');
+    previewOpsRunFromInsight(summary, null);
+    return true;
+}
+
+/** Overview Runs card: recent turns snapshot; click → Runs + Load into AI Chat. */
+function renderOverviewRuns(insights) {
+    ensureOpsOverviewRunsCard();
+    const body = document.getElementById('ops-overview-runs-body');
+    if (!body) return;
+    body.innerHTML = '';
+    const recent = Array.isArray(insights?.recent) ? insights.recent : [];
+    if (!recent.length) {
+        body.innerHTML = opsOverviewEmptyHtml(
+            'No runs yet — turns land after Discord or chat',
+            'runs',
+            'Open Runs'
+        );
+        return;
+    }
+    const turns = Number(insights?.turns) || recent.length;
+    const okN = Number(insights?.ok_count);
+    const failN = Number(insights?.fail_count) || 0;
+    const okLabel = Number.isFinite(okN) ? okN : recent.filter((r) => r.ok).length;
+    const count = document.createElement('div');
+    count.className = 'ops-overview-count';
+    count.textContent =
+        failN > 0 ? `${okLabel}/${turns} ok · ${failN} fail` : `${okLabel}/${turns} ok`;
+    body.appendChild(count);
+    recent.slice(0, 3).forEach((r) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        const q = String(r?.question_preview || '').trim() || '(empty)';
+        const toolsJoined = (r?.tools || []).slice(0, 3).join(', ') || '—';
+        const wall = typeof r?.wall_ms === 'number' ? `${r.wall_ms} ms` : '—';
+        btn.innerHTML =
+            `<div><div class="ops-row-title">${escapeHtml(q.slice(0, 72))}</div>` +
+            `<div class="ops-row-meta">${escapeHtml(r?.lane || '—')} · ${escapeHtml(wall)} · ${escapeHtml(toolsJoined)}` +
+            `${r?.ok === false ? ' · FAIL' : ''}</div></div>`;
+        btn.addEventListener('click', () => {
+            body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            btn.classList.add('is-selected');
+            openOpsRunPreviewNavigate(r);
+        });
+        btn.title =
+            'Open in Runs · preview question/tools · load into AI Chat from that tab';
+        body.appendChild(btn);
+    });
+}
+
 function renderOverviewSchedules(schedules, deliveries) {
     const body = document.getElementById('ops-overview-schedules-body');
     if (!body) return;
@@ -1910,6 +1984,7 @@ async function refreshAgentOps(opts = {}) {
         renderOverviewLive(live || []);
         renderOverviewKnowledge(memory || []);
         renderOverviewRecent(files || []);
+        renderOverviewRuns(insights);
         opsSchedulesCache = schedules || [];
         opsDeliveriesCache = deliveries || [];
         renderOpsSchedulesTab(opsSchedulesCache, opsDeliveriesCache);
