@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-08-17 (~04:06):** Agent Ops overview Agents card (v0.1.488). Recapture of `feature-agent-ops.png` still deferred if Screen Recording TCC blocks.
 - **2026-08-17 (~03:42):** Agent Ops health Redmine → Redmine agent open (v0.1.487). Recapture of `feature-agent-ops.png` still deferred if Screen Recording TCC blocks.
 - **2026-08-17 (~02:55):** Agent Ops health Version → primary agent open (v0.1.485). Recapture of `feature-agent-ops.png` still deferred if Screen Recording TCC blocks.
 - **2026-08-17 (~02:00):** Agent Ops health Next schedule / Last delivery click-to-preview (v0.1.483). Recapture of `feature-agent-ops.png` still deferred if Screen Recording TCC blocks.
