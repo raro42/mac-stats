@@ -353,11 +353,16 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 .ops-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 0 4px 10px;
 }
 
 .ops-filter-input {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
+  width: auto;
   box-sizing: border-box;
   padding: 8px 10px;
   border-radius: 8px;
@@ -366,6 +371,42 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   color: inherit;
   font-size: 13px;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.ops-filter-match {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  padding: 5px 8px;
+  border-radius: 6px;
+  opacity: 0.85;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.ops-filter-match[hidden] {
+  display: none !important;
+}
+
+.ops-filter-match.is-all {
+  background: color-mix(in srgb, #30d158 18%, transparent);
+  border-color: color-mix(in srgb, #30d158 32%, transparent);
+  opacity: 0.95;
+}
+
+.ops-filter-match.is-partial {
+  background: color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  opacity: 0.95;
+}
+
+.ops-filter-match.is-zero {
+  background: color-mix(in srgb, #ff9f0a 16%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+  opacity: 0.95;
 }
 
 .ops-filter-input:hover {

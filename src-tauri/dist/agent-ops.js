@@ -26,14 +26,45 @@
     });
   }
 
-  function opsFilterCaptionHtml(total, shown, q) {
-    if (!q) return '';
-    return `<div class="ops-row-meta ops-filter-caption">${shown} of ${total} match</div>`;
+  /** Live match chip beside the filter input (stays visible while scrolling the list). */
+  function ensureOpsFilterMatchChip(input) {
+    if (!input || !input.parentElement) return null;
+    let chip = input.parentElement.querySelector('.ops-filter-match');
+    if (chip) return chip;
+    chip = document.createElement('span');
+    chip.className = 'ops-filter-match';
+    chip.hidden = true;
+    chip.setAttribute('aria-live', 'polite');
+    input.parentElement.appendChild(chip);
+    return chip;
   }
 
-  function prependOpsFilterCaption(el, total, shown, q) {
-    if (!el || !q || !shown) return;
-    el.insertAdjacentHTML('afterbegin', opsFilterCaptionHtml(total, shown, q));
+  function paintOpsFilterMatch(filterInputId, total, shown, q) {
+    const input = document.getElementById(filterInputId);
+    if (!input) return;
+    const chip = ensureOpsFilterMatchChip(input);
+    if (!chip) return;
+    const query = String(q || '').trim();
+    if (!query) {
+      chip.hidden = true;
+      chip.textContent = '';
+      chip.removeAttribute('title');
+      chip.classList.remove('is-zero', 'is-partial', 'is-all');
+      return;
+    }
+    const t = Math.max(0, Number(total) || 0);
+    const s = Math.max(0, Math.min(t, Number(shown) || 0));
+    chip.hidden = false;
+    chip.textContent = `${s}/${t}`;
+    chip.title = s === 1 ? `1 of ${t} match` : `${s} of ${t} match`;
+    chip.classList.toggle('is-zero', s === 0);
+    chip.classList.toggle('is-partial', s > 0 && s < t);
+    chip.classList.toggle('is-all', s > 0 && s === t);
+  }
+
+  /** @deprecated list captions replaced by filter-row chips — keep name for call-site clarity */
+  function prependOpsFilterCaption(_el, total, shown, q, filterInputId) {
+    if (filterInputId) paintOpsFilterMatch(filterInputId, total, shown, q);
   }
 
   /** Empty state when a filter is active but no rows match — includes Clear filter action. */
@@ -307,7 +338,7 @@ function ensureOpsKeyboardHint() {
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
     hint.textContent =
-        'Tips: digits + counts on tabs · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r refresh · R digest · ?';
+        'Tips: digits + counts on tabs · filter N/M chip · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r refresh · R digest · ?';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -624,10 +655,12 @@ function ensureOpsSessionFilter() {
         input.autocomplete = 'off';
         input.spellcheck = false;
         row.appendChild(input);
+        ensureOpsFilterMatchChip(input);
         panel.insertBefore(row, panel.firstChild);
     }
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
+    ensureOpsFilterMatchChip(input);
     input.addEventListener('input', () => {
         opsSessionFilterQ = (input.value || '').trim().toLowerCase();
         renderOpsLive(opsLiveCache);
@@ -656,14 +689,16 @@ function ensureOpsMemoryFilter() {
         input.type = 'search';
         input.id = 'ops-memory-filter';
         input.className = 'ops-filter-input';
-        input.placeholder = 'Filter knowledge files… (Esc clears)';
+        input.placeholder = 'Filter knowledge files… (/ focus, Esc clears)';
         input.autocomplete = 'off';
         input.spellcheck = false;
         row.appendChild(input);
+        ensureOpsFilterMatchChip(input);
         panel.insertBefore(row, panel.firstChild);
     }
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
+    ensureOpsFilterMatchChip(input);
     input.addEventListener('input', () => {
         opsMemoryFilterQ = (input.value || '').trim().toLowerCase();
         renderOpsMemory(opsMemoryCache);
@@ -690,16 +725,18 @@ function ensureOpsRunsFilter() {
         input.type = 'search';
         input.id = 'ops-runs-filter';
         input.className = 'ops-filter-input';
-        input.placeholder = 'Filter runs by lane, tool, question… (Esc clears)';
+        input.placeholder = 'Filter runs by lane, tool, question… (/ focus, Esc clears)';
         input.autocomplete = 'off';
         input.spellcheck = false;
         row.appendChild(input);
+        ensureOpsFilterMatchChip(input);
         const insights = document.getElementById('ops-runs-insights');
         if (insights) panel.insertBefore(row, insights.nextSibling);
         else panel.insertBefore(row, panel.firstChild);
     }
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
+    ensureOpsFilterMatchChip(input);
     input.addEventListener('input', () => {
         opsRunsFilterQ = (input.value || '').trim().toLowerCase();
         renderOpsRuns(opsRunsInsightsCache);
@@ -730,12 +767,14 @@ function ensureOpsAgentsFilter() {
         input.autocomplete = 'off';
         input.spellcheck = false;
         row.appendChild(input);
+        ensureOpsFilterMatchChip(input);
         const list = document.getElementById('ops-agents-list');
         if (list) panel.insertBefore(row, list);
         else panel.insertBefore(row, panel.firstChild);
     }
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
+    ensureOpsFilterMatchChip(input);
     input.addEventListener('input', () => {
         opsAgentsFilterQ = (input.value || '').trim().toLowerCase();
         renderOpsAgents(opsAgentsCache);
@@ -762,10 +801,11 @@ function ensureOpsSchedulesFilter() {
         input.type = 'search';
         input.id = 'ops-schedules-filter';
         input.className = 'ops-filter-input';
-        input.placeholder = 'Filter schedules + deliveries… (Esc clears)';
+        input.placeholder = 'Filter schedules + deliveries… (/ focus, Esc clears)';
         input.autocomplete = 'off';
         input.spellcheck = false;
         row.appendChild(input);
+        ensureOpsFilterMatchChip(input);
         const list = document.getElementById('ops-schedules-list');
         const sub = panel.querySelector('.ops-subhead');
         if (sub) panel.insertBefore(row, sub);
@@ -774,6 +814,7 @@ function ensureOpsSchedulesFilter() {
     }
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
+    ensureOpsFilterMatchChip(input);
     input.addEventListener('input', () => {
         opsSchedulesFilterQ = (input.value || '').trim().toLowerCase();
         renderOpsSchedulesTab(opsSchedulesCache, opsDeliveriesCache);
@@ -787,6 +828,28 @@ function ensureOpsSchedulesFilter() {
 function schedulesRowMatchesFilter(haystack) {
     if (!opsSchedulesFilterQ) return true;
     return String(haystack || '').toLowerCase().includes(opsSchedulesFilterQ);
+}
+
+/** Combined live + files match count for the shared Sessions filter chip. */
+function paintOpsSessionFilterFromCaches() {
+    const liveAll = opsLiveCache || [];
+    const liveShown = liveAll.filter((r) =>
+        sessionRowMatchesFilter(
+            `${r.source} ${r.session_id} ${r.preview || ''} ${r.last_activity || ''}`
+        )
+    ).length;
+    const filesAll = opsSessionFilesCache || [];
+    const filesShown = filesAll.filter((f) =>
+        sessionRowMatchesFilter(
+            `${f.slug || ''} ${f.name || ''} ${f.source_hint || ''} ${f.preview || ''}`
+        )
+    ).length;
+    paintOpsFilterMatch(
+        'ops-session-filter',
+        liveAll.length + filesAll.length,
+        liveShown + filesShown,
+        opsSessionFilterQ
+    );
 }
 
 function startAgentOpsAutoRefresh() {
@@ -2289,24 +2352,28 @@ function renderOpsSchedulesTab(schedules, deliveries) {
     const list = document.getElementById('ops-schedules-list');
     const delList = document.getElementById('ops-deliveries-list');
     showOpsSchedulePreview('');
+    const schedAll = schedules || [];
+    const schedFiltered = schedAll.filter((s) => {
+        const when = s.cron ? `cron ${s.cron}` : s.at ? `at ${s.at}` : '';
+        return schedulesRowMatchesFilter(
+            `${s.id || ''} ${when} ${s.next_run || s.nextRun || ''} ${s.task || ''}`
+        );
+    });
+    const delAll = deliveries || [];
+    const delFiltered = delAll.filter((d) =>
+        schedulesRowMatchesFilter(`${d.schedule_id || ''} ${d.summary || ''} ${d.utc || ''}`)
+    );
     if (list) {
         list.innerHTML = '';
-        const all = schedules || [];
-        const filtered = all.filter((s) => {
-            const when = s.cron ? `cron ${s.cron}` : s.at ? `at ${s.at}` : '';
-            return schedulesRowMatchesFilter(
-                `${s.id || ''} ${when} ${s.next_run || s.nextRun || ''} ${s.task || ''}`
-            );
-        });
-        if (!all.length) {
+        if (!schedAll.length) {
             list.innerHTML = opsTabEmptyHtml(
               'No schedules yet',
               'Create one via Discord SCHEDULE tools or the scheduler API'
             );
-        } else if (!filtered.length) {
+        } else if (!schedFiltered.length) {
             list.innerHTML = opsFilterMissHtml('No schedules match filter', 'schedules');
         } else {
-            filtered.forEach((s) => {
+            schedFiltered.forEach((s) => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'ops-row';
@@ -2331,24 +2398,19 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 });
                 list.appendChild(btn);
             });
-            prependOpsFilterCaption(list, all.length, filtered.length, opsSchedulesFilterQ);
         }
     }
     if (delList) {
         delList.innerHTML = '';
-        const all = deliveries || [];
-        const filtered = all.filter((d) =>
-            schedulesRowMatchesFilter(`${d.schedule_id || ''} ${d.summary || ''} ${d.utc || ''}`)
-        );
-        if (!all.length) {
+        if (!delAll.length) {
             delList.innerHTML = opsTabEmptyHtml(
               'No deliveries yet',
               'Results appear here after a schedule runs'
             );
-        } else if (!filtered.length) {
+        } else if (!delFiltered.length) {
             delList.innerHTML = opsFilterMissHtml('No deliveries match filter', 'schedules');
         } else {
-            filtered.slice(0, 8).forEach((d) => {
+            delFiltered.slice(0, 8).forEach((d) => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'ops-row';
@@ -2372,10 +2434,14 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 });
                 delList.appendChild(btn);
             });
-            const shown = Math.min(8, filtered.length);
-            prependOpsFilterCaption(delList, all.length, shown, opsSchedulesFilterQ);
         }
     }
+    paintOpsFilterMatch(
+        'ops-schedules-filter',
+        schedAll.length + delAll.length,
+        schedFiltered.length + delFiltered.length,
+        opsSchedulesFilterQ
+    );
 }
 
 /**
@@ -2569,10 +2635,12 @@ function renderOpsAgents(agents) {
           'No agents yet',
           'Add agent folders under ~/.mac-stats/agents'
         );
+        paintOpsFilterMatch('ops-agents-filter', 0, 0, opsAgentsFilterQ);
         return;
     }
     if (!filtered.length) {
         list.innerHTML = opsFilterMissHtml('No agents match filter', 'agents');
+        paintOpsFilterMatch('ops-agents-filter', all.length, 0, opsAgentsFilterQ);
         return;
     }
     filtered.forEach((a) => {
@@ -2597,7 +2665,7 @@ function renderOpsAgents(agents) {
         btn.title = 'Open agent · Enter / double-click to load soul/skill/mood into AI Chat';
         list.appendChild(btn);
     });
-    prependOpsFilterCaption(list, all.length, filtered.length, opsAgentsFilterQ);
+    paintOpsFilterMatch('ops-agents-filter', all.length, filtered.length, opsAgentsFilterQ);
 }
 
 async function openOpsAgent(id) {
@@ -3758,6 +3826,7 @@ function renderOpsLive(rows) {
     const el = document.getElementById('ops-live-sessions');
     el.innerHTML = '';
     const all = rows || [];
+    opsLiveCache = all;
     const filtered = all.filter((r) =>
         sessionRowMatchesFilter(
             `${r.source} ${r.session_id} ${r.preview || ''} ${r.last_activity || ''}`
@@ -3768,10 +3837,12 @@ function renderOpsLive(rows) {
           'No live sessions',
           'In-memory chats appear here while agents run'
         );
+        paintOpsSessionFilterFromCaches();
         return;
     }
     if (!filtered.length) {
         el.innerHTML = opsFilterMissHtml('No live sessions match filter', 'sessions');
+        paintOpsSessionFilterFromCaches();
         return;
     }
     filtered.forEach((r) => {
@@ -3801,7 +3872,7 @@ function renderOpsLive(rows) {
         btn.title = 'Click to preview · Enter / double-click to load into AI Chat';
         el.appendChild(btn);
     });
-    prependOpsFilterCaption(el, all.length, filtered.length, opsSessionFilterQ);
+    paintOpsSessionFilterFromCaches();
 }
 
 function renderOpsSessionFiles(files) {
@@ -3814,6 +3885,7 @@ function renderOpsSessionFiles(files) {
     opsSessionLoadRows = null;
     setOpsSessionCopyChip(null);
     const all = files || [];
+    opsSessionFilesCache = all;
     const filtered = all.filter((f) =>
         sessionRowMatchesFilter(
             `${f.slug || ''} ${f.name || ''} ${f.source_hint || ''} ${f.preview || ''}`
@@ -3824,10 +3896,12 @@ function renderOpsSessionFiles(files) {
           'No saved session files',
           'session-memory-*.md appears after Discord chats land on disk'
         );
+        paintOpsSessionFilterFromCaches();
         return;
     }
     if (!filtered.length) {
         el.innerHTML = opsFilterMissHtml('No session files match filter', 'sessions');
+        paintOpsSessionFilterFromCaches();
         return;
     }
     filtered.forEach((f) => {
@@ -3870,7 +3944,7 @@ function renderOpsSessionFiles(files) {
         btn.title = 'Click to preview · Enter / double-click to load into AI Chat';
         el.appendChild(btn);
     });
-    prependOpsFilterCaption(el, all.length, filtered.length, opsSessionFilterQ);
+    paintOpsSessionFilterFromCaches();
 }
 
 function renderOpsMemory(files) {
@@ -3891,10 +3965,12 @@ function renderOpsMemory(files) {
           'No knowledge files yet',
           'soul.md and memory/*.md live under ~/.mac-stats'
         );
+        paintOpsFilterMatch('ops-memory-filter', 0, 0, opsMemoryFilterQ);
         return;
     }
     if (!filtered.length) {
         el.innerHTML = opsFilterMissHtml('No knowledge files match filter', 'memory');
+        paintOpsFilterMatch('ops-memory-filter', all.length, 0, opsMemoryFilterQ);
         return;
     }
     filtered.forEach((f) => {
@@ -3945,7 +4021,7 @@ function renderOpsMemory(files) {
         btn.title = 'Click to preview · Enter / double-click to load into AI Chat';
         el.appendChild(btn);
     });
-    prependOpsFilterCaption(el, all.length, filtered.length, opsMemoryFilterQ);
+    paintOpsFilterMatch('ops-memory-filter', all.length, filtered.length, opsMemoryFilterQ);
 }
 
 /** Ensure Runs preview pane exists (themes + dashboard; create if HTML is stale). */
@@ -4366,6 +4442,7 @@ function renderOpsRuns(insights) {
               'Turns land in ~/.mac-stats/runs.jsonl after Discord or chat'
             );
         }
+        paintOpsFilterMatch('ops-runs-filter', 0, 0, opsRunsFilterQ);
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
@@ -4482,9 +4559,7 @@ function renderOpsRuns(insights) {
         el.appendChild(btn);
     });
     const totalRecent = (insights.recent || []).length;
-    if (opsRunsFilterQ && shown) {
-        prependOpsFilterCaption(el, totalRecent, shown, opsRunsFilterQ);
-    }
+    paintOpsFilterMatch('ops-runs-filter', totalRecent, shown, opsRunsFilterQ);
     if (opsRunsFilterQ && !el.querySelector('.ops-row')) {
         el.innerHTML = opsFilterMissHtml('No runs match filter', 'runs');
         showOpsRunPreview('');

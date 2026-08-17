@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.505] - 2026-08-18
+
+### Added
+- Agent Ops list filters show a live **N/M** match chip beside the search field (combined live+files / schedules+deliveries; ok / partial / zero wash).
+
 ## [0.1.504] - 2026-08-18
 
 ### Changed

@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops filter live N/M match chips — **v0.1.505**
 - Agent Ops Refresh/Updated under health strip — **v0.1.504**
 - Agent Ops tab inventory count pills — **v0.1.503**
 - Agent Ops Updated … ago stamp beside Refresh — **v0.1.502**
