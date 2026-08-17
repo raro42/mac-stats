@@ -290,12 +290,39 @@ function ensureOpsOverviewRunsCard() {
     grid.appendChild(card);
 }
 
+/** Inject Digest overview card (after Runs) — digester open hints on the command center. */
+function ensureOpsOverviewDigestCard() {
+    const grid = document.getElementById('ops-overview-grid');
+    if (!grid || document.getElementById('ops-overview-digest')) return;
+    ensureOpsOverviewRunsCard();
+    const card = document.createElement('div');
+    card.className = 'ops-overview-card';
+    card.id = 'ops-overview-digest';
+    card.innerHTML =
+        `<div class="ops-overview-head">` +
+        `<h3>Digest</h3>` +
+        `<button type="button" class="ops-overview-link" data-goto-tab="runs">Open</button>` +
+        `</div>` +
+        `<div class="ops-overview-body" id="ops-overview-digest-body">` +
+        `<div class="ops-loading" role="status">Loading…</div>` +
+        `</div>`;
+    const runs = document.getElementById('ops-overview-runs');
+    if (runs && runs.nextSibling) {
+        grid.insertBefore(card, runs.nextSibling);
+    } else if (runs) {
+        grid.appendChild(card);
+    } else {
+        grid.appendChild(card);
+    }
+}
+
 function setupAgentOps() {
     const activeBtn = document.querySelector('.agent-ops-tab.active');
     if (activeBtn?.dataset?.opsTab) opsActiveTab = activeBtn.dataset.opsTab;
     ensureOpsKeyboardHint();
     ensureOpsOverviewAgentsCard();
     ensureOpsOverviewRunsCard();
+    ensureOpsOverviewDigestCard();
     syncOpsOverviewCardActive(opsActiveTab);
     syncOpsHealthCardActive(opsActiveTab);
     document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
@@ -1313,6 +1340,60 @@ function renderOverviewRuns(insights) {
     });
 }
 
+/** Overview Digest card: digester open hints; click → Runs + Load into AI Chat. */
+function renderOverviewDigest(insights) {
+    ensureOpsOverviewDigestCard();
+    const body = document.getElementById('ops-overview-digest-body');
+    if (!body) return;
+    body.innerHTML = '';
+    const hints = (insights?.digest_open_hints || [])
+        .map((h) => String(h || '').trim())
+        .filter(Boolean);
+    const openN = Number(insights?.digest_open_count);
+    const staleN = Number(insights?.digest_stale_count) || 0;
+    const openLabel = Number.isFinite(openN) ? openN : hints.length;
+    if (!hints.length && openLabel === 0) {
+        body.innerHTML = opsOverviewEmptyHtml(
+            'No open digester candidates — overnight is quiet for now',
+            'runs',
+            'Open Runs'
+        );
+        return;
+    }
+    if (!hints.length && openLabel > 0) {
+        body.innerHTML = opsOverviewEmptyHtml(
+            `${openLabel} open in digest — open Runs Insights for the list`,
+            'runs',
+            'Open Runs'
+        );
+        return;
+    }
+    const count = document.createElement('div');
+    count.className = 'ops-overview-count';
+    count.textContent =
+        staleN > 0
+            ? `${openLabel} open · ${staleN} stale`
+            : `${openLabel} open`;
+    body.appendChild(count);
+    hints.slice(0, 4).forEach((text) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ops-row';
+        const title = text.length > 72 ? `${text.slice(0, 72)}…` : text;
+        btn.innerHTML =
+            `<div><div class="ops-row-title">${escapeHtml(title)}</div>` +
+            `<div class="ops-row-meta">Digester open candidate</div></div>`;
+        btn.addEventListener('click', () => {
+            body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+            btn.classList.add('is-selected');
+            openOpsDigestHintPreviewNavigate(text);
+        });
+        btn.title =
+            'Open in Runs · preview digester hint · load into AI Chat from that tab';
+        body.appendChild(btn);
+    });
+}
+
 function renderOverviewSchedules(schedules, deliveries) {
     const body = document.getElementById('ops-overview-schedules-body');
     if (!body) return;
@@ -1985,6 +2066,7 @@ async function refreshAgentOps(opts = {}) {
         renderOverviewKnowledge(memory || []);
         renderOverviewRecent(files || []);
         renderOverviewRuns(insights);
+        renderOverviewDigest(insights);
         opsSchedulesCache = schedules || [];
         opsDeliveriesCache = deliveries || [];
         renderOpsSchedulesTab(opsSchedulesCache, opsDeliveriesCache);
