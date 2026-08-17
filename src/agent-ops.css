@@ -588,6 +588,31 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   flex-wrap: wrap;
 }
 
+.ops-tab-digit {
+  display: inline-block;
+  min-width: 0.9em;
+  margin-right: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  opacity: 0.42;
+  color: inherit;
+  vertical-align: 0.05em;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.agent-ops-tab:hover .ops-tab-digit,
+.ops-file-tab:hover .ops-tab-digit {
+  opacity: 0.72;
+}
+
+.agent-ops-tab.active .ops-tab-digit,
+.ops-file-tab.active .ops-tab-digit {
+  opacity: 0.95;
+  color: var(--accent, #007aff);
+}
+
 .agent-ops-tab, .ops-file-tab {
   background: color-mix(in srgb, currentColor 6%, transparent);
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);

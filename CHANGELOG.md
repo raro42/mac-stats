@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.501] - 2026-08-17
+
+### Changed
+- Agent Ops **tabs**: visible digit badges (1–5) on Agents / Sessions / Schedules / Knowledge / Runs so the existing keyboard shortcuts are obvious; tip line updated.
+
 ## [0.1.500] - 2026-08-17
 
 ### Changed

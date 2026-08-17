@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-08-17 (~23:35):** Agent Ops tab digit badges 1–5 (v0.1.501). Recapture of `feature-agent-ops.png` still deferred (`screencapture -l` → could not create image / Screen Recording TCC); prior Aug 12 asset kept.
 - **2026-08-17 (~23:00):** Agent Ops overview cards click/keyboard open linked tab (v0.1.500). Recapture of `feature-agent-ops.png` still deferred (no on-screen CPU window for Quartz/`screencapture -l`).
 - **2026-08-17 (~22:35):** Agent Ops overview Recent ok/warn/bad wash (v0.1.499). Recapture of `feature-agent-ops.png` still deferred (no on-screen CPU window for Quartz/`screencapture -l`).
 - **2026-08-17 (~05:25):** Agent Ops health Next schedule / Last delivery ok/warn/bad wash (v0.1.491). Recapture of `feature-agent-ops.png` still deferred if Screen Recording TCC blocks.

@@ -230,6 +230,32 @@ function focusActiveOpsFilter() {
     return true;
 }
 
+/** Show digit keys on tab buttons (Hermes-style 1–5 already bound). */
+function ensureOpsTabDigits() {
+    const digits = {
+        agents: '1',
+        sessions: '2',
+        schedules: '3',
+        memory: '4',
+        runs: '5',
+    };
+    document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
+        const tab = btn.dataset.opsTab || '';
+        const d = digits[tab];
+        if (!d || btn.querySelector('.ops-tab-digit')) return;
+        const label = (btn.textContent || tab || '').trim() || tab;
+        const span = document.createElement('span');
+        span.className = 'ops-tab-digit';
+        span.setAttribute('aria-hidden', 'true');
+        span.textContent = d;
+        btn.insertBefore(span, btn.firstChild);
+        btn.setAttribute('title', `${label} · press ${d}`);
+        if (!btn.getAttribute('aria-keyshortcuts')) {
+            btn.setAttribute('aria-keyshortcuts', d);
+        }
+    });
+}
+
 function ensureOpsKeyboardHint() {
     const tabs = document.querySelector('.agent-ops-tabs');
     if (!tabs || document.getElementById('ops-keyboard-hint')) return;
@@ -237,7 +263,7 @@ function ensureOpsKeyboardHint() {
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
     hint.textContent =
-        'Tips: 1–5 ←/→ tabs · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r refresh · R digest · ?';
+        'Tips: digits on tabs · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r refresh · R digest · ?';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -319,6 +345,7 @@ function ensureOpsOverviewDigestCard() {
 function setupAgentOps() {
     const activeBtn = document.querySelector('.agent-ops-tab.active');
     if (activeBtn?.dataset?.opsTab) opsActiveTab = activeBtn.dataset.opsTab;
+    ensureOpsTabDigits();
     ensureOpsKeyboardHint();
     ensureOpsOverviewAgentsCard();
     ensureOpsOverviewRunsCard();
