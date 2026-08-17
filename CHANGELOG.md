@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.485] - 2026-08-17
+
+### Changed
+- Agent Ops **health Version**: click opens Agents with the primary agent selected and soul/skill/mood ready for Load into AI Chat (schedule/delivery health parity).
+
 ## [0.1.484] - 2026-08-17
 
 ### Changed

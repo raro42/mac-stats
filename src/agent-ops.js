@@ -1024,6 +1024,57 @@ function findOpsNextSchedule() {
     return best || rows[0];
 }
 
+/** Prefer enabled orchestrator, else first enabled, else first agent (health Version). */
+function findOpsPrimaryAgent() {
+    const rows = opsAgentsCache || [];
+    if (!rows.length) return null;
+    const orch = rows.find((a) => a.enabled && a.orchestrator);
+    if (orch) return orch;
+    const on = rows.find((a) => a.enabled);
+    if (on) return on;
+    return rows[0];
+}
+
+/** Open Agents + select/open a row (health Version parity with schedule/delivery). */
+function openOpsAgentPreviewNavigate(a) {
+    if (!a || !(a.id || a.slug)) return false;
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    selectOpsTab('agents');
+    const list = document.getElementById('ops-agents-list');
+    const detail = document.getElementById('ops-agent-detail');
+    if (detail && !detail.hidden && list?.style.display === 'none') {
+        /* keep detail open; openOpsAgent replaces contents */
+    } else if (list) {
+        list.style.display = '';
+    }
+    const id = String(a.id || '');
+    const slug = String(a.slug || a.id || '');
+    const name = String(a.name || '');
+    list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+    let matched = null;
+    list?.querySelectorAll('.ops-row').forEach((row) => {
+        if (matched) return;
+        const title = row.querySelector('.ops-row-title');
+        const text = title ? title.textContent || '' : '';
+        if (
+            (slug && text.includes(slug)) ||
+            (name && text.includes(name)) ||
+            (id && text.includes(id))
+        ) {
+            matched = row;
+            row.classList.add('is-selected');
+            try {
+                row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } catch (_) {
+                /* ignore */
+            }
+        }
+    });
+    const selector = id || slug;
+    if (selector) void openOpsAgent(selector);
+    return true;
+}
+
 /** Click health cards to jump to the related Agent Ops tab (once). */
 function wireOpsHealthCardNavigation() {
     const row = document.getElementById('ops-health-row');
@@ -1045,6 +1096,9 @@ function wireOpsHealthCardNavigation() {
         } else if (key === 'digest') {
             card.title =
                 'Open Runs · preview first digest-open hint · load into AI Chat from that tab';
+        } else if (key === 'version') {
+            card.title =
+                'Open Agents · open primary agent · load soul/skill/mood into AI Chat from that tab';
         } else {
             card.title = card.title || `Open ${tab}`;
         }
@@ -1065,6 +1119,10 @@ function wireOpsHealthCardNavigation() {
                 const hints = opsRunsInsightsCache?.digest_open_hints || [];
                 const first = hints.length ? String(hints[0] || '').trim() : '';
                 if (first && openOpsDigestHintPreviewNavigate(first)) return;
+            }
+            if (key === 'version') {
+                const primary = findOpsPrimaryAgent();
+                if (primary && openOpsAgentPreviewNavigate(primary)) return;
             }
             selectOpsTab(tab);
         };
