@@ -1444,12 +1444,41 @@ function renderOverviewRuns(insights) {
     });
 }
 
+/** Overview Digest card: ok/warn/bad wash (health Digest fail/open parity). */
+function setOverviewDigestStatus(insights) {
+    const card = document.getElementById('ops-overview-digest');
+    if (!card) return;
+    card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+    if (!insights) {
+        card.classList.add('ops-health-warn');
+        card.title = 'Digest not loaded yet';
+        return;
+    }
+    const openN = Number(insights.digest_open_count) || 0;
+    const failN = Number(insights.fail_count) || 0;
+    const staleN = Number(insights.digest_stale_count) || 0;
+    if (openN > 0 || failN > 0) {
+        card.classList.add('ops-health-warn');
+        const bits = [];
+        if (openN > 0) bits.push(`${openN} open candidate${openN === 1 ? '' : 's'}`);
+        if (failN > 0) bits.push(`${failN} fail${failN === 1 ? '' : 's'}`);
+        card.title = bits.join(' · ');
+        return;
+    }
+    card.classList.add('ops-health-ok');
+    card.title =
+        staleN > 0
+            ? `Digest clear · ${staleN} stale ignored`
+            : 'Digest clear — no open candidates';
+}
+
 /** Overview Digest card: digester open hints; click → Runs + Load into AI Chat. */
 function renderOverviewDigest(insights) {
     ensureOpsOverviewDigestCard();
     const body = document.getElementById('ops-overview-digest-body');
     if (!body) return;
     body.innerHTML = '';
+    setOverviewDigestStatus(insights);
     const hints = (insights?.digest_open_hints || [])
         .map((h) => String(h || '').trim())
         .filter(Boolean);

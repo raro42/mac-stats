@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.496] - 2026-08-17
+
+### Changed
+- Agent Ops **overview Digest** card: ok/warn/bad status wash (health Digest fail/open parity) — missing digest warn; open candidates or fails warn; clear digest ok.
+
 ## [0.1.495] - 2026-08-17
 
 ### Changed
