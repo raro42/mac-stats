@@ -6,7 +6,8 @@ Overnight Track B (design review due: stale `feature-agent-ops.png`).
 
 | Version | What |
 |---------|------|
-| **v0.1.484** | Agent Ops **Runs Insights** Digest open hints are clickable — preview + Load into AI Chat; health Digest card opens the first hint (Slowest/Candidates parity). |
+| **v0.1.485** | Agent Ops **health Version**: click opens Agents with the primary agent (orchestrator → enabled → first) selected and soul ready for Load into AI Chat (schedule/delivery health parity). |
+| v0.1.484 | Runs Insights Digest open hints click-to-preview + health Digest card |
 | v0.1.483 | Health Next schedule / Last delivery click-to-preview |
 | v0.1.482 | Runs Insights Slowest/Candidates click-to-preview |
 | v0.1.481 | Overview Last delivery click-to-preview |
@@ -26,4 +27,4 @@ Open fuel was design-review only (latency sample empty after noise filters). Deb
 
 ## Next fuel
 
-Prefer non-digest-hint-adjacent: Digester Discord traffic, rotate to stale `feature-processes` / `feature-cpu-metrics` when TCC allows a capture, or a sibling/OpenClaw port that maps to sessions/tools.
+Prefer non-version-health-adjacent: Digester Discord traffic, rotate to stale `feature-processes` / `feature-cpu-metrics` when TCC allows a capture, health Discord/Redmine deeper preview, or a sibling/OpenClaw port that maps to sessions/tools.
