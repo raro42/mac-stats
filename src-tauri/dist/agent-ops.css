@@ -927,6 +927,13 @@ textarea.ops-agent-editor.is-dirty {
   margin: 0 4px 12px;
 }
 
+/* Re-homed under health (see ensureOpsRefreshRowPlacement) — stays in view with overview. */
+.ops-refresh-row.ops-refresh-row-top {
+  margin: 0 4px 14px;
+  padding: 0 0 10px;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+
 .ops-updated-ago {
   margin: 0 2px;
   padding: 2px 0;

@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.504] - 2026-08-18
+
+### Changed
+- Agent Ops **Refresh / Updated** row sits under the health strip (not under tab panels) so freshness stays in view with overview.
+
 ## [0.1.503] - 2026-08-18
 
 ### Added

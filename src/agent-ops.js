@@ -389,6 +389,7 @@ function ensureOpsOverviewDigestCard() {
 function setupAgentOps() {
     const activeBtn = document.querySelector('.agent-ops-tab.active');
     if (activeBtn?.dataset?.opsTab) opsActiveTab = activeBtn.dataset.opsTab;
+    ensureOpsRefreshRowPlacement();
     ensureOpsTabDigits();
     ensureOpsKeyboardHint();
     ensureOpsUpdatedAgo();
@@ -2377,8 +2378,23 @@ function renderOpsSchedulesTab(schedules, deliveries) {
     }
 }
 
+/**
+ * Keep Refresh / Updated under the health strip (not buried under tab panels).
+ * Themes still ship the row at the bottom of agent-ops-content; we re-home it once.
+ */
+function ensureOpsRefreshRowPlacement() {
+    const row = document.querySelector('.ops-refresh-row');
+    const health = document.getElementById('ops-health-row');
+    if (!row || !health) return null;
+    if (health.nextElementSibling === row) return row;
+    health.insertAdjacentElement('afterend', row);
+    row.classList.add('ops-refresh-row-top');
+    return row;
+}
+
 /** Relative age stamp beside Refresh so operators see Command Center freshness. */
 function ensureOpsUpdatedAgo() {
+    ensureOpsRefreshRowPlacement();
     const row = document.querySelector('.ops-refresh-row');
     if (!row) return null;
     let el = document.getElementById('ops-updated-ago');
