@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.499] - 2026-08-17
+
+### Changed
+- Agent Ops **overview Recent** card: ok/warn/bad status wash (health Last delivery age parity) — empty warn; newest <24h ok; newest ≥7d bad; otherwise warn.
+
 ## [0.1.498] - 2026-08-17
 
 ### Changed

@@ -1833,10 +1833,50 @@ function renderOverviewKnowledge(files) {
     });
 }
 
+/** Overview Recent card: ok/warn/bad wash (health Last delivery age parity). */
+function setOverviewRecentStatus(files) {
+    const card = document.getElementById('ops-overview-recent');
+    if (!card) return;
+    card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+    const rows = Array.isArray(files) ? files : [];
+    if (!rows.length) {
+        card.classList.add('ops-health-warn');
+        card.title = 'No recent chats — session memory shows up here';
+        return;
+    }
+    const newestMs = rows.reduce((max, f) => {
+        const m = Number(f?.modified_ms) || 0;
+        return m > max ? m : max;
+    }, 0);
+    const n = rows.length;
+    const chatLabel = n === 1 ? '1 recent chat' : `${n} recent chats`;
+    if (!newestMs) {
+        card.classList.add('ops-health-warn');
+        card.title = `${chatLabel} — age unknown`;
+        return;
+    }
+    const ageMs = Date.now() - newestMs;
+    const dayMs = 24 * 60 * 60 * 1000;
+    const ageLabel = fmtAge(newestMs);
+    if (ageMs >= 0 && ageMs < dayMs) {
+        card.classList.add('ops-health-ok');
+        card.title = `${chatLabel} · newest ${ageLabel}`;
+        return;
+    }
+    if (ageMs >= 7 * dayMs) {
+        card.classList.add('ops-health-bad');
+        card.title = `${chatLabel} — newest is ${ageLabel} (stale)`;
+        return;
+    }
+    card.classList.add('ops-health-warn');
+    card.title = `${chatLabel} · newest ${ageLabel}`;
+}
+
 function renderOverviewRecent(files) {
     const body = document.getElementById('ops-overview-recent-body');
     if (!body) return;
     body.innerHTML = '';
+    setOverviewRecentStatus(files);
     if (!files || !files.length) {
         body.innerHTML = opsOverviewEmptyHtml(
           'No recent chats — session memory shows up here',
