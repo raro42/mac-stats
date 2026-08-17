@@ -1444,10 +1444,50 @@ function renderOverviewDigest(insights) {
     });
 }
 
+/** Overview Schedules card: ok/warn/bad wash (health schedule + delivery parity). */
+function setOverviewSchedulesStatus(schedules, deliveries) {
+    const card = document.getElementById('ops-overview-schedules');
+    if (!card) return;
+    card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
+    if (!schedules || !schedules.length) {
+        card.classList.add('ops-health-warn');
+        card.title = 'No schedules yet';
+        return;
+    }
+    let deliveryAgeMs = NaN;
+    if (Array.isArray(deliveries) && deliveries.length) {
+        const t = deliveries[0]?.utc ? Date.parse(deliveries[0].utc) : NaN;
+        deliveryAgeMs = !Number.isNaN(t) ? Date.now() - t : NaN;
+    }
+    const dayMs = 24 * 60 * 60 * 1000;
+    const hasNext = schedules.some(
+        (s) => s.next_run || s.nextRun || s.secondsUntilNextFire != null
+    );
+    if (!Number.isNaN(deliveryAgeMs) && deliveryAgeMs >= 7 * dayMs) {
+        card.classList.add('ops-health-bad');
+        card.title = 'Last delivery is a week or older';
+        return;
+    }
+    if (hasNext && !Number.isNaN(deliveryAgeMs) && deliveryAgeMs >= 0 && deliveryAgeMs < dayMs) {
+        card.classList.add('ops-health-ok');
+        card.title = 'Schedules armed · last delivery under 24h';
+        return;
+    }
+    card.classList.add('ops-health-warn');
+    if (!hasNext) {
+        card.title = 'Schedules present but no next fire time';
+    } else if (!Array.isArray(deliveries) || !deliveries.length) {
+        card.title = 'Schedules armed · no deliveries yet';
+    } else {
+        card.title = 'Schedules armed · last delivery older than 24h';
+    }
+}
+
 function renderOverviewSchedules(schedules, deliveries) {
     const body = document.getElementById('ops-overview-schedules-body');
     if (!body) return;
     body.innerHTML = '';
+    setOverviewSchedulesStatus(schedules, deliveries);
     if (!schedules || !schedules.length) {
         body.innerHTML = opsOverviewEmptyHtml(
           'No schedules yet — add one on the Schedules tab',

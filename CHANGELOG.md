@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.493] - 2026-08-17
+
+### Changed
+- Agent Ops **overview Schedules** card: ok/warn/bad status wash (health Next schedule / Last delivery parity) — empty jobs warn; next fire + delivery under 24h ok; delivery a week or older bad.
+
 ## [0.1.492] - 2026-08-17
 
 ### Changed
