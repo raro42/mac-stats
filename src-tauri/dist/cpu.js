@@ -1094,8 +1094,7 @@ async function refresh() {
           row.setAttribute("data-name", proc.name);
           row.setAttribute("role", "option");
           row.setAttribute("tabindex", i === tabIdx ? "0" : "-1");
-          row.title =
-            "Click / Enter / d for details · ↑↓ / j k · PgUp/PgDn · P pin · Esc clears";
+          // No row.title: keyboard tips live in #processes-kb-hint under the section title.
           const selected =
             currentProcessPid !== null && Number(proc.pid) === Number(currentProcessPid);
           row.setAttribute("aria-selected", selected ? "true" : "false");
