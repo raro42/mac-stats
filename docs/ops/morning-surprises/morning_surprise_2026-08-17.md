@@ -6,7 +6,8 @@ Overnight Track B (design review due: stale `feature-agent-ops.png`).
 
 | Version | What |
 |---------|------|
-| **v0.1.486** | Agent Ops **health Discord**: click opens Runs with gateway status preview + Load into AI Chat; Runs Insights Discord line is clickable (Digest/Version health parity). |
+| **v0.1.487** | Agent Ops **health Redmine**: click opens Agents with the Redmine agent selected and soul/skill/mood ready for Load into AI Chat (Version health parity). |
+| v0.1.486 | Agent Ops health Discord → Runs gateway preview + Load into AI Chat |
 | v0.1.485 | Agent Ops health Version → primary agent open |
 | v0.1.484 | Runs Insights Digest open hints click-to-preview + health Digest card |
 | v0.1.483 | Health Next schedule / Last delivery click-to-preview |
@@ -28,4 +29,4 @@ Open fuel was design-review only (latency sample empty after noise filters). Deb
 
 ## Next fuel
 
-Prefer non-discord-health-adjacent: Digester Discord traffic, rotate to stale `feature-processes` / `feature-cpu-metrics` when TCC allows a capture, health Redmine deeper preview, or a sibling/OpenClaw port that maps to sessions/tools.
+Prefer non-redmine-health-adjacent: Digester Discord traffic, rotate to stale `feature-processes` / `feature-cpu-metrics` when TCC allows a capture, or a sibling/OpenClaw port that maps to sessions/tools.
