@@ -1099,6 +1099,9 @@ function wireOpsHealthCardNavigation() {
         } else if (key === 'version') {
             card.title =
                 'Open Agents · open primary agent · load soul/skill/mood into AI Chat from that tab';
+        } else if (key === 'discord') {
+            card.title =
+                'Open Runs · preview Discord gateway status · load into AI Chat from that tab';
         } else {
             card.title = card.title || `Open ${tab}`;
         }
@@ -1123,6 +1126,10 @@ function wireOpsHealthCardNavigation() {
             if (key === 'version') {
                 const primary = findOpsPrimaryAgent();
                 if (primary && openOpsAgentPreviewNavigate(primary)) return;
+            }
+            if (key === 'discord') {
+                const gw = String(opsRunsInsightsCache?.discord_gateway || '').trim();
+                if (gw && openOpsDiscordGatewayPreviewNavigate(gw)) return;
             }
             selectOpsTab(tab);
         };
@@ -3526,6 +3533,43 @@ function formatOpsDigestHintAsSummary(hint) {
     };
 }
 
+/** Discord gateway status → run preview shape (Load into AI Chat). */
+function formatOpsDiscordGatewayAsSummary(gateway) {
+    const text = String(gateway || '').trim();
+    return {
+        ts: '',
+        lane: 'discord',
+        wall_ms: 0,
+        tools: [],
+        question_preview: text
+            ? `Discord gateway status:\n${text}`
+            : 'Discord gateway status unknown',
+        ok: true,
+        request_id: '',
+        _candidateKind: 'discord-gateway',
+        _candidateReason: 'Agent Ops Discord health',
+    };
+}
+
+/** Open Runs + preview Discord gateway insight (health Discord parity with Digest). */
+function openOpsDiscordGatewayPreviewNavigate(gateway) {
+    const text = String(gateway || '').trim();
+    if (!text) return false;
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    selectOpsTab('runs');
+    const card = document.getElementById('ops-runs-insights');
+    let line = card?.querySelector('.ops-insight-line[data-discord-gateway="1"]') || null;
+    previewOpsRunFromInsight(formatOpsDiscordGatewayAsSummary(text), line);
+    if (line) {
+        try {
+            line.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } catch (_) {
+            /* ignore */
+        }
+    }
+    return true;
+}
+
 /** Show full run turn details (list rows truncate question / tools). */
 function showOpsRunPreview(text, requestId, question) {
     const preview = ensureOpsRunsPreview();
@@ -3576,14 +3620,33 @@ function renderOpsRuns(insights) {
     if (card) card.innerHTML = '';
     showOpsRunPreview('');
     const gateway = insights?.discord_gateway || '';
+    function appendOpsDiscordGatewayLine(parent, gwText) {
+        const text = String(gwText || '').trim();
+        if (!parent || !text) return;
+        const sub = document.createElement('div');
+        sub.className = 'ops-insight-sub';
+        sub.textContent = 'Discord';
+        parent.appendChild(sub);
+        const line = document.createElement('div');
+        line.className = 'ops-insight-line';
+        line.textContent = text;
+        line.dataset.discordGateway = '1';
+        wireOpsInsightRunLine(line, formatOpsDiscordGatewayAsSummary(text));
+        parent.appendChild(line);
+    }
     if (!insights || !insights.turns) {
         if (card && gateway) {
-            card.innerHTML = `
-                <div class="ops-insight-title">Insights</div>
-                <div class="ops-row-meta">${escapeHtml(gateway)}</div>
-                <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}</div>
-                <div class="ops-empty ops-empty-compact ops-empty-tab">No runs yet — turns land in ~/.mac-stats/runs.jsonl after Discord or chat</div>
-            `;
+            card.innerHTML = `<div class="ops-insight-title">Insights</div>`;
+            appendOpsDiscordGatewayLine(card, gateway);
+            const digestMeta = document.createElement('div');
+            digestMeta.className = 'ops-row-meta';
+            digestMeta.textContent = `Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${insights.digest_source}` : ''}`;
+            card.appendChild(digestMeta);
+            const empty = document.createElement('div');
+            empty.className = 'ops-empty ops-empty-compact ops-empty-tab';
+            empty.textContent =
+                'No runs yet — turns land in ~/.mac-stats/runs.jsonl after Discord or chat';
+            card.appendChild(empty);
         } else {
             el.innerHTML = opsTabEmptyHtml(
               'No runs yet',
@@ -3601,9 +3664,9 @@ function renderOpsRuns(insights) {
         card.innerHTML = `
             <div class="ops-insight-title">Insights</div>
             <div class="ops-row-meta">${insights.ok_count}/${insights.turns} ok · fail ${insights.fail_count || 0} · mean ${insights.mean_ms} ms · max ${insights.max_ms} ms</div>
-            ${gateway ? `<div class="ops-row-meta">${escapeHtml(gateway)}</div>` : ''}
             <div class="ops-row-meta">Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${escapeHtml(insights.digest_source)}` : ''}${insights.digest_generated_at ? ` · ${escapeHtml(String(insights.digest_generated_at).slice(0, 19))}` : ''}</div>
         `;
+        appendOpsDiscordGatewayLine(card, gateway);
         const digestHints = insights.digest_open_hints || [];
         if (digestHints.length) {
             const sub = document.createElement('div');

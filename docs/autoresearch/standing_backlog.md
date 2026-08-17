@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops health Discord → Runs gateway preview — **v0.1.486**
 - Agent Ops health Version → primary agent open — **v0.1.485**
 - Agent Ops Runs Insights Digest open hints + health Digest click-to-preview — **v0.1.484**
 - Agent Ops health Next schedule / Last delivery click-to-preview — **v0.1.483**
