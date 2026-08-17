@@ -6,7 +6,8 @@ Overnight Track B (design review due: stale `feature-agent-ops.png`).
 
 | Version | What |
 |---------|------|
-| **v0.1.485** | Agent Ops **health Version**: click opens Agents with the primary agent (orchestrator → enabled → first) selected and soul ready for Load into AI Chat (schedule/delivery health parity). |
+| **v0.1.486** | Agent Ops **health Discord**: click opens Runs with gateway status preview + Load into AI Chat; Runs Insights Discord line is clickable (Digest/Version health parity). |
+| v0.1.485 | Agent Ops health Version → primary agent open |
 | v0.1.484 | Runs Insights Digest open hints click-to-preview + health Digest card |
 | v0.1.483 | Health Next schedule / Last delivery click-to-preview |
 | v0.1.482 | Runs Insights Slowest/Candidates click-to-preview |
@@ -19,7 +20,7 @@ Overnight Track B (design review due: stale `feature-agent-ops.png`).
 
 ## Screenshot
 
-`docs/screens/feature-agent-ops.png` recapture still deferred when Screen Recording TCC / no listable CPU window blocks `screencapture -l`.
+`docs/screens/feature-agent-ops.png` recapture still deferred: `screencapture -l` returns “could not create image from window” (Screen Recording TCC). Window was open and listable via Quartz.
 
 ## Digester
 
@@ -27,4 +28,4 @@ Open fuel was design-review only (latency sample empty after noise filters). Deb
 
 ## Next fuel
 
-Prefer non-version-health-adjacent: Digester Discord traffic, rotate to stale `feature-processes` / `feature-cpu-metrics` when TCC allows a capture, health Discord/Redmine deeper preview, or a sibling/OpenClaw port that maps to sessions/tools.
+Prefer non-discord-health-adjacent: Digester Discord traffic, rotate to stale `feature-processes` / `feature-cpu-metrics` when TCC allows a capture, health Redmine deeper preview, or a sibling/OpenClaw port that maps to sessions/tools.
