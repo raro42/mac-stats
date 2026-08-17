@@ -6,7 +6,8 @@ Overnight Track B kept shipping Agent Ops Command Center polish (design-review d
 
 | Version | What |
 |---------|------|
-| **v0.1.499** | Overview **Recent** ok/warn/bad wash (health Last delivery age parity) |
+| **v0.1.500** | Overview cards: click chrome / empty body (or Enter/Space when focused) opens the linked tab — health-card parity |
+| v0.1.499 | Overview **Recent** ok/warn/bad wash (health Last delivery age parity) |
 | v0.1.498 | Overview **Knowledge** ok/warn/bad wash (health Version session-file count parity) |
 | v0.1.497 | Overview **Live** ok/warn/bad wash (health Discord gateway parity) |
 | v0.1.496 | Overview **Digest** ok/warn/bad wash (health Digest fail/open parity) |
@@ -25,7 +26,7 @@ Overnight Track B kept shipping Agent Ops Command Center polish (design-review d
 | v0.1.483 | Health Next schedule / Last delivery click-to-preview |
 | v0.1.482 | Runs Insights Slowest/Candidates click-to-preview |
 
-Latest keep: `4ef3149` on `main` (pushed; install/kickstart to **v0.1.499**).
+Latest keep: `4095851` on `main` (pushed; install/kickstart to **v0.1.500**).
 
 ## Tried / deferred
 
@@ -34,4 +35,4 @@ Latest keep: `4ef3149` on `main` (pushed; install/kickstart to **v0.1.499**).
 
 ## For Ralf
 
-Open CPU → Agent Ops overview **Recent** card: green when the newest session is under 24h old; amber when empty or 1–7 days; red when the newest chat is ≥7 days old. Matches the Last delivery health age wash.
+Open CPU → Agent Ops overview: click empty space on a card (or focus the card and press Enter/Space) to open that tab. Rows and the Open button still do their own jobs. Matches how health cards already work.
