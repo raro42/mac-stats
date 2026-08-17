@@ -937,21 +937,104 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
     }
 }
 
+/** Open Schedules + select/preview a schedule (overview / health parity). */
+function openOpsSchedulePreviewNavigate(s) {
+    if (!s) return false;
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    selectOpsTab('schedules');
+    const id = s.id || '(no id)';
+    const fullTask = String(s?.task || '').trim();
+    showOpsSchedulePreview(formatOpsSchedulePreview(s), s.id || '', fullTask);
+    const list = document.getElementById('ops-schedules-list');
+    const delList = document.getElementById('ops-deliveries-list');
+    list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+    delList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+    list?.querySelectorAll('.ops-row').forEach((row) => {
+        const title = row.querySelector('.ops-row-title');
+        if (title && title.textContent === id) {
+            row.classList.add('is-selected');
+            row.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+        }
+    });
+    return true;
+}
+
+/** Open Schedules + select/preview a delivery (overview / health parity). */
+function openOpsDeliveryPreviewNavigate(d) {
+    if (!d) return false;
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    selectOpsTab('schedules');
+    const id = d.schedule_id || 'schedule';
+    const summary = String(d.summary || '').trim();
+    showOpsSchedulePreview(formatOpsDeliveryPreview(d), d.schedule_id || '', summary);
+    const list = document.getElementById('ops-schedules-list');
+    const delList = document.getElementById('ops-deliveries-list');
+    list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+    delList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
+    let matched = false;
+    delList?.querySelectorAll('.ops-row').forEach((row) => {
+        if (matched) return;
+        const title = row.querySelector('.ops-row-title');
+        if (title && title.textContent === id) {
+            matched = true;
+            row.classList.add('is-selected');
+            row.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+        }
+    });
+    return true;
+}
+
+/** Soonest schedule from cache (for health Next schedule preview). */
+function findOpsNextSchedule() {
+    const rows = opsSchedulesCache || [];
+    if (!rows.length) return null;
+    let best = null;
+    let bestTs = Infinity;
+    rows.forEach((s) => {
+        const raw = s?.next_run || s?.nextRun || '';
+        const t = raw ? Date.parse(raw) : NaN;
+        if (!Number.isNaN(t) && t < bestTs) {
+            bestTs = t;
+            best = s;
+        }
+    });
+    return best || rows[0];
+}
+
 /** Click health cards to jump to the related Agent Ops tab (once). */
 function wireOpsHealthCardNavigation() {
     const row = document.getElementById('ops-health-row');
     if (!row || row.dataset.opsHealthNav === '1') return;
     row.dataset.opsHealthNav = '1';
     row.querySelectorAll('.ops-health-card[data-health]').forEach((card) => {
-        const tab = OPS_HEALTH_TAB_BY_KEY[card.dataset.health];
+        const key = card.dataset.health;
+        const tab = OPS_HEALTH_TAB_BY_KEY[key];
         if (!tab) return;
         card.dataset.gotoTab = tab;
         card.classList.add('ops-health-clickable');
         card.setAttribute('tabindex', '0');
         card.setAttribute('role', 'button');
-        card.title = card.title || `Open ${tab}`;
+        if (key === 'schedule') {
+            card.title = 'Open Schedules · preview next job · load into AI Chat from that tab';
+        } else if (key === 'delivery') {
+            card.title =
+                'Open Schedules · preview last delivery · load into AI Chat from that tab';
+        } else {
+            card.title = card.title || `Open ${tab}`;
+        }
         const openTab = () => {
             if (agentOpsCollapsed) applyOpsCollapsed(false);
+            if (key === 'schedule') {
+                const next = findOpsNextSchedule();
+                if (next && openOpsSchedulePreviewNavigate(next)) return;
+            }
+            if (key === 'delivery') {
+                const newest =
+                    Array.isArray(opsDeliveriesCache) && opsDeliveriesCache.length
+                        ? opsDeliveriesCache[0]
+                        : null;
+                if (newest && openOpsDeliveryPreviewNavigate(newest)) return;
+            }
             selectOpsTab(tab);
         };
         card.addEventListener('click', openTab);
@@ -992,20 +1075,7 @@ function renderOverviewSchedules(schedules, deliveries) {
         btn.addEventListener('click', () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
-            selectOpsTab('schedules');
-            const fullTask = String(s?.task || '').trim();
-            showOpsSchedulePreview(formatOpsSchedulePreview(s), s.id || '', fullTask);
-            const list = document.getElementById('ops-schedules-list');
-            const delList = document.getElementById('ops-deliveries-list');
-            list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
-            delList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
-            list?.querySelectorAll('.ops-row').forEach((row) => {
-                const title = row.querySelector('.ops-row-title');
-                if (title && title.textContent === id) {
-                    row.classList.add('is-selected');
-                    row.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
-                }
-            });
+            openOpsSchedulePreviewNavigate(s);
         });
         btn.title = 'Open in Schedules · preview task · load into AI Chat from that tab';
         body.appendChild(btn);
@@ -1032,23 +1102,7 @@ function appendOverviewLastDeliveryRow(body, d) {
     btn.addEventListener('click', () => {
         body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
         btn.classList.add('is-selected');
-        selectOpsTab('schedules');
-        const loadSummary = summary;
-        showOpsSchedulePreview(formatOpsDeliveryPreview(d), d.schedule_id || '', loadSummary);
-        const list = document.getElementById('ops-schedules-list');
-        const delList = document.getElementById('ops-deliveries-list');
-        list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
-        delList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
-        let matched = false;
-        delList?.querySelectorAll('.ops-row').forEach((row) => {
-            if (matched) return;
-            const title = row.querySelector('.ops-row-title');
-            if (title && title.textContent === id) {
-                matched = true;
-                row.classList.add('is-selected');
-                row.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
-            }
-        });
+        openOpsDeliveryPreviewNavigate(d);
     });
     btn.title = 'Open in Schedules · preview last delivery · load into AI Chat from that tab';
     body.appendChild(btn);

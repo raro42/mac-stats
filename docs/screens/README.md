@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-08-17 (~02:00):** Agent Ops health Next schedule / Last delivery click-to-preview (v0.1.483). Recapture of `feature-agent-ops.png` still deferred if Screen Recording TCC blocks.
 - **2026-08-17 (~01:35):** Agent Ops Runs Insights Slowest/Candidates click-to-preview (v0.1.482). Recapture of `feature-agent-ops.png` still deferred (no on-screen CPU window / Screen Recording TCC).
 - **2026-08-17 (~00:25):** Agent Ops overview Live click-to-preview (v0.1.479). Recapture of `feature-agent-ops.png` still deferred if Screen Recording TCC blocks.
 - **2026-08-17 (~00:01):** Agent Ops overview Recent click-to-preview (v0.1.478). Recapture of `feature-agent-ops.png` still deferred (no on-screen CPU window for Quartz/`screencapture -l`).
