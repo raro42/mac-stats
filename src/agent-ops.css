@@ -2805,6 +2805,59 @@ button.monitor-detail-url.is-just-saved {
   list-style: none;
 }
 
+.disk-cleanup-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  opacity: 1;
+  font-style: normal;
+  padding: 18px 14px 16px;
+}
+
+.disk-cleanup-empty-msg {
+  font-size: 13px;
+  font-weight: 560;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.disk-cleanup-empty-hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 10px;
+  line-height: 1.4;
+  max-width: 28em;
+}
+
+.disk-cleanup-empty-cta {
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 560;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.disk-cleanup-empty-cta:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 20%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 50%, transparent);
+}
+
+.disk-cleanup-empty-cta:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+}
+
 .disk-cleanup-scopes {
   display: flex;
   flex-direction: column;

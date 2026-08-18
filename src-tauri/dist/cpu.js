@@ -2848,6 +2848,9 @@ let monitorsUpdateInterval = null;
 /** List filter: all | up | down (Debug Log chip parity). */
 let monitorsFilterMode = 'all';
 
+/** Disk Cleanup section collapsed (module-level for empty-CTA expand). */
+let diskCleanupCollapsed = true;
+
 // Cache for monitor status data (to avoid polling backend when opening settings)
 const monitorStatusCache = new Map(); // Map<monitorId, {is_up, response_time_ms, error, checked_at}>
 
@@ -7036,6 +7039,69 @@ function formatDiskWhen(iso) {
   }
 }
 
+/** Expand Disk Cleanup if collapsed (empty CTA / Review scopes). */
+function ensureDiskCleanupSectionExpanded() {
+  const content = document.getElementById('disk-cleanup-content');
+  const section = document.querySelector('.disk-cleanup-section');
+  const header = document.getElementById('disk-cleanup-header');
+  if (!content) return;
+  if (!diskCleanupCollapsed && !content.classList.contains('collapsed')) {
+    return;
+  }
+  diskCleanupCollapsed = false;
+  setSectionCollapsed('disk_cleanup_collapsed', false);
+  content.classList.remove('collapsed');
+  section?.classList.remove('collapsed');
+  header?.setAttribute('aria-expanded', 'true');
+  if (typeof header?._syncCollapseA11y === 'function') header._syncCollapseA11y();
+  syncSectionIcon('icon-disk-cleanup', true);
+}
+
+/** Focus first disabled scope (or Add form) after empty-list CTA. */
+function focusDiskCleanupScopesReview() {
+  ensureDiskCleanupSectionExpanded();
+  const scopesEl = document.getElementById('disk-cleanup-scopes');
+  const addLabel = document.getElementById('disk-cleanup-add-label');
+  requestAnimationFrame(() => {
+    const disabledRow = scopesEl?.querySelector('.disk-cleanup-scope-row.is-disabled');
+    const anyRow = scopesEl?.querySelector('.disk-cleanup-scope-row');
+    const row = disabledRow || anyRow;
+    if (row) {
+      const idx = parseInt(row.getAttribute('data-scope-idx') || '0', 10);
+      syncDiskCleanupScopeTabOrder(scopesEl, Number.isFinite(idx) ? idx : 0);
+      const enable = row.querySelector('input[data-scope-enabled]');
+      const focusEl = enable || row;
+      if (typeof focusEl.focus === 'function') focusEl.focus();
+      if (typeof row.scrollIntoView === 'function') {
+        row.scrollIntoView({ block: 'nearest' });
+      }
+      return;
+    }
+    if (addLabel && typeof addLabel.focus === 'function') {
+      addLabel.focus();
+      if (typeof addLabel.scrollIntoView === 'function') {
+        addLabel.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  });
+}
+
+/** Category list empty: warm title + Review scopes CTA (Monitors empty Add parity). */
+function renderDiskCleanupListEmpty(list) {
+  if (!list) return;
+  list.innerHTML =
+    `<li class="disk-cleanup-empty disk-cleanup-list-empty" role="status">` +
+    `<div class="disk-cleanup-empty-msg">Nothing to reclaim yet</div>` +
+    `<div class="disk-cleanup-empty-hint">Turn a scope on and Save, or add a custom path.</div>` +
+    `<button type="button" class="disk-cleanup-empty-cta">Review scopes</button>` +
+    `</li>`;
+  list.querySelector('.disk-cleanup-empty-cta')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    focusDiskCleanupScopesReview();
+  });
+}
+
 async function refreshDiskCleanupPanel(opts) {
   const deep = !!(opts && opts.deep);
   const list = document.getElementById('disk-cleanup-list');
@@ -7152,8 +7218,7 @@ async function refreshDiskCleanupPanel(opts) {
 
     const cats = (status.categories || []).filter((c) => c.enabled !== false);
     if (!cats.length) {
-      list.innerHTML =
-        '<li class="disk-cleanup-empty">No enabled scopes — turn some on and Save scopes.</li>';
+      renderDiskCleanupListEmpty(list);
       document.getElementById('disk-cleanup-list-kb-hint')?.remove();
     } else {
       const preferItemIdx =
@@ -7816,9 +7881,9 @@ function initDiskCleanupSection() {
     icon.setAttribute('data-title-base', icon.title || 'Disk cleanup');
   }
 
-  let collapsed = getSectionCollapsed('disk_cleanup_collapsed');
+  diskCleanupCollapsed = getSectionCollapsed('disk_cleanup_collapsed');
   const applyCollapsed = () => {
-    if (collapsed) {
+    if (diskCleanupCollapsed) {
       content.classList.add('collapsed');
       if (section) section.classList.add('collapsed');
     } else {
@@ -7827,7 +7892,7 @@ function initDiskCleanupSection() {
       refreshDiskCleanupPanel();
     }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
-    syncSectionIcon('icon-disk-cleanup', !collapsed);
+    syncSectionIcon('icon-disk-cleanup', !diskCleanupCollapsed);
   };
   applyCollapsed();
   // Do not scan Downloads/Trash on every CPU-window open — only when the section is expanded
@@ -7836,12 +7901,12 @@ function initDiskCleanupSection() {
   if (typeof wireCollapsibleHeaderA11y === 'function') {
     wireCollapsibleHeaderA11y(header, {
       contentId: 'disk-cleanup-content',
-      getExpanded: () => !collapsed,
+      getExpanded: () => !diskCleanupCollapsed,
       ignoreSelector:
         '#disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, #disk-cleanup-soft-delete, #disk-cleanup-scopes, #disk-cleanup-add-label, #disk-cleanup-add-path, #disk-cleanup-add-days, #disk-cleanup-add-recursive, .disk-cleanup-add-scope, .disk-cleanup-scopes, .disk-cleanup-soft-delete, input, button, label',
       onToggle: () => {
-        collapsed = !collapsed;
-        setSectionCollapsed('disk_cleanup_collapsed', collapsed);
+        diskCleanupCollapsed = !diskCleanupCollapsed;
+        setSectionCollapsed('disk_cleanup_collapsed', diskCleanupCollapsed);
         applyCollapsed();
       },
     });
@@ -7856,8 +7921,8 @@ function initDiskCleanupSection() {
       return;
     }
     e.stopPropagation();
-    collapsed = !collapsed;
-    setSectionCollapsed('disk_cleanup_collapsed', collapsed);
+    diskCleanupCollapsed = !diskCleanupCollapsed;
+    setSectionCollapsed('disk_cleanup_collapsed', diskCleanupCollapsed);
     applyCollapsed();
   });
 
@@ -8332,6 +8397,7 @@ window.applyCpuWindowCompactLayout = function applyCpuWindowCompactLayout(compac
   collapseSectionByIds('.perplexity-section', 'perplexity-content', 'perplexity_collapsed');
   collapseSectionByIds('.logs-section', 'logs-content', 'logs_collapsed');
   collapseSectionByIds('.disk-cleanup-section', 'disk-cleanup-content', 'disk_cleanup_collapsed');
+  diskCleanupCollapsed = true;
   if (typeof window.applyOpsCollapsed === 'function') {
     window.applyOpsCollapsed(true);
   } else {
