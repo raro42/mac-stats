@@ -6,6 +6,7 @@ Overnight Track B (design review). Digester open stayed empty; design-review / s
 
 | Version | What got nicer |
 |---------|----------------|
+| **v0.1.524** | Disk Cleanup Reclaimable now meta-card click |
 | **v0.1.523** | Disk Cleanup empty Review scopes CTA (warm empty + focus scopes) |
 | **v0.1.522** | Top Processes All · Pinned filter chips (count + Clear on miss) |
 | **v0.1.521** | Monitors All · Up · Down filter chips (counts + Clear on miss) |
@@ -17,8 +18,8 @@ Overnight Track B (design review). Digester open stayed empty; design-review / s
 ## Tried / notes
 
 - Screenshot recapture for feature screens still deferred (no on-screen CPU window / TCC); polish grace marked for disk-cleanup when due.
-- Latest keep: Disk Cleanup empty Review scopes (Monitors empty Add parity) — `acb1406`.
+- Latest keep: Disk Cleanup Reclaimable now meta-card click — `63128ef`.
 
 ## Not a quiet night
 
-Empty digester alone would have been a loss; standing design-review backlog drove keeps through **v0.1.523**.
+Empty digester alone would have been a loss; standing design-review backlog drove keeps through **v0.1.524**.
