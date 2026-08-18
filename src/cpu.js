@@ -2724,6 +2724,7 @@ function initMonitorsSection() {
   initMonitorHistory();
   wireMonitorRemoveDelegation();
   wireMonitorsListKeyboard();
+  wireMonitorsSummaryClick();
 
   // Always load monitors to calculate height, even when collapsed
   loadMonitors().then(() => {
@@ -3188,7 +3189,25 @@ async function refreshMonitorsSettingsList() {
     const monitorIds = await invoke('list_monitors');
     
     if (monitorIds.length === 0) {
-      settingsList.innerHTML = '<div class="monitors-empty">No monitors configured</div>';
+      settingsList.innerHTML =
+        `<div class="monitors-empty monitors-settings-empty" role="status">` +
+        `<div class="monitors-empty-msg">No monitors configured</div>` +
+        `<div class="monitors-empty-hint">Add a site to start uptime checks.</div>` +
+        `<button type="button" class="monitors-empty-cta">Add a monitor</button>` +
+        `</div>`;
+      settingsList.querySelector('.monitors-empty-cta')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        const addForm = document.getElementById('add-monitor-form');
+        const urlInput = document.getElementById('monitor-url-input');
+        if (addForm) addForm.style.display = 'block';
+        requestAnimationFrame(() => {
+          if (urlInput) {
+            if (!urlInput.value.trim()) urlInput.value = 'https://www.amvara.de/';
+            urlInput.focus();
+            urlInput.select?.();
+          }
+        });
+      });
       return;
     }
     
@@ -3253,6 +3272,133 @@ function applyMonitorsSummaryState({ anyDown, allUp, empty }) {
   summary.classList.toggle('has-down', !!anyDown);
   summary.classList.toggle('is-all-up', !!allUp && !empty);
   summary.classList.toggle('is-empty', !!empty);
+  // Clickable glance (Agent Ops health/overview parity): empty → Add, DOWN → first down row.
+  summary.setAttribute('role', 'button');
+  summary.setAttribute('tabindex', '0');
+  if (empty) {
+    summary.title = 'Click to add a monitor';
+    summary.setAttribute('aria-label', 'No monitors configured — click to add');
+  } else if (anyDown) {
+    summary.title = 'Click to open the first DOWN monitor';
+    summary.setAttribute('aria-label', 'Monitors summary — click to open first DOWN site');
+  } else {
+    summary.title = 'Click to open the first monitor';
+    summary.setAttribute('aria-label', 'Monitors summary — click to open first site');
+  }
+}
+
+/** Expand External / Monitors if collapsed (summary click / empty CTA). */
+function ensureMonitorsSectionExpanded() {
+  if (!monitorsCollapsed) {
+    updateMonitorsHeight();
+    return;
+  }
+  monitorsCollapsed = false;
+  saveMonitorsCollapsedState(false);
+  const content = document.getElementById('monitors-content');
+  const section = document.querySelector('.monitors-section');
+  const header = document.getElementById('monitors-header');
+  const divider = document.getElementById('monitors-ollama-divider');
+  content?.classList.remove('collapsed');
+  section?.classList.remove('collapsed');
+  if (divider) divider.style.display = '';
+  header?.setAttribute('aria-expanded', 'true');
+  syncSectionIcon('icon-monitors', true);
+  updateMonitorsHeight();
+  if (!monitorsUpdateInterval) {
+    monitorsUpdateInterval = setInterval(() => {
+      updateMonitorsSummary();
+      loadMonitors().then(() => {
+        updateMonitorsHeight();
+      });
+    }, 30000);
+  }
+}
+
+/** Open Monitor Settings with the Add form focused (empty-state CTA). */
+async function openMonitorsAddFlow() {
+  ensureMonitorsSectionExpanded();
+  await showMonitorsSettings();
+  const addForm = document.getElementById('add-monitor-form');
+  const urlInput = document.getElementById('monitor-url-input');
+  if (addForm) addForm.style.display = 'block';
+  requestAnimationFrame(() => {
+    if (urlInput) {
+      if (!urlInput.value.trim()) urlInput.value = 'https://www.amvara.de/';
+      urlInput.focus();
+      urlInput.select?.();
+    }
+  });
+}
+
+/** Empty list: title + Add a monitor CTA (Agent Ops overview empty parity). */
+function ensureMonitorsListEmptyState(monitorsList, empty) {
+  if (!monitorsList) return;
+  const existing = monitorsList.querySelector('.monitors-list-empty');
+  if (!empty) {
+    existing?.remove();
+    return;
+  }
+  monitorsList.querySelectorAll('.monitor-item').forEach((el) => el.remove());
+  ensureMonitorsListKbHint(monitorsList, false);
+  let wrap = existing;
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.className = 'monitors-empty monitors-list-empty';
+    wrap.setAttribute('role', 'status');
+    wrap.innerHTML =
+      `<div class="monitors-empty-msg">Nothing watching yet</div>` +
+      `<div class="monitors-empty-hint">Add a site to see uptime here.</div>` +
+      `<button type="button" class="monitors-empty-cta">Add a monitor</button>`;
+    monitorsList.appendChild(wrap);
+    wrap.querySelector('.monitors-empty-cta')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      void openMonitorsAddFlow();
+    });
+  }
+}
+
+/** Summary click / Enter / Space → Add (empty) or first DOWN / first row. */
+function wireMonitorsSummaryClick() {
+  const summary = document.getElementById('monitors-summary');
+  if (!summary || summary.dataset.summaryClick === '1') return;
+  summary.dataset.summaryClick = '1';
+
+  const activate = () => {
+    ensureMonitorsSectionExpanded();
+    if (summary.classList.contains('is-empty')) {
+      void openMonitorsAddFlow();
+      return;
+    }
+    const list = document.getElementById('monitors-list');
+    if (!list) return;
+    const down = list.querySelector('.monitor-item.is-down');
+    const first = down || list.querySelector('.monitor-item');
+    if (!first) {
+      void openMonitorsAddFlow();
+      return;
+    }
+    const id = first.getAttribute('data-monitor-id');
+    syncMonitorsListTabOrder(list, id);
+    first.focus();
+    if (typeof first.scrollIntoView === 'function') {
+      first.scrollIntoView({ block: 'nearest' });
+    }
+    setMonitorDetailOpen(first, true);
+  };
+
+  summary.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  summary.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
 }
 
 /** Short host label for Monitors summary (name preferred, else hostname). */
@@ -3930,6 +4076,14 @@ async function loadMonitors() {
         monitorStatusCache.delete(monitorId);
       }
     });
+
+    if (monitorIds.length === 0) {
+      ensureMonitorsListEmptyState(monitorsList, true);
+      updateMonitorsIconStatus({ anyDown: false, allUp: false, upCount: 0, totalCount: 0 });
+      updateMonitorsHeight();
+      return;
+    }
+    ensureMonitorsListEmptyState(monitorsList, false);
     
     // Update icon status based on all monitors
     let upCount = 0;
@@ -3964,6 +4118,7 @@ function updateMonitorsHeight() {
   
   // Calculate height needed: summary + each monitor item (+ open detail panels)
   const monitorItems = monitorsList.querySelectorAll('.monitor-item');
+  const emptyEl = monitorsList.querySelector('.monitors-list-empty');
   const itemHeight = 52; // row + down-meta / error lines
   const summaryHeight = 40;
   const listMargin = 12;
@@ -3984,11 +4139,14 @@ function updateMonitorsHeight() {
     return;
   }
   
+  const emptyHeight = emptyEl ? 110 : 0;
   const totalHeight =
     summaryHeight +
     (monitorItems.length > 0
       ? listMargin + monitorItems.length * itemHeight + openDetailExtra
-      : 0);
+      : emptyHeight
+        ? listMargin + emptyHeight
+        : 0);
   
   // Set min-height to reserve space and prevent layout shifts
   // This ensures the section always takes up the same space regardless of collapse state

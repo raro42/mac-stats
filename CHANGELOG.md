@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 - Comparison vs Stats / iStat Menus / MenuMeters: **Disk Cleanup** is in the how-we-compare notes and landing compare blurb (README table already had the row).
 
+## [0.1.518] - 2026-08-18
+
+### Added
+- External / Monitors **summary click + empty Add CTA** — click (or Enter/Space) the summary to open the first DOWN site (or first row); empty list shows “Nothing watching yet” with **Add a monitor** (settings Add form; Agent Ops empty-CTA parity).
+
 ## [0.1.517] - 2026-08-18
 
 ### Added
