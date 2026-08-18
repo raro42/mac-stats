@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.513] - 2026-08-18
+
+### Added
+- CPU metrics **click-to-copy value** — click (or Enter/Space) a ring value (CPU %, GPU %, frequency, temperature) to copy; Copied flash stays on the card so live refresh can keep updating the number (Top Processes / Monitors parity on the metrics surface).
+
 ## [0.1.512] - 2026-08-18
 
 ### Added

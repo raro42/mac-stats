@@ -1389,6 +1389,7 @@ function startRefresh() {
 function init() {
   // Force immediate process update on initial load
   window._forceProcessUpdate = true;
+  wireMetricValueCopy();
   
   // Try to get Tauri immediately - don't wait if it's already available
   const immediateInvoke = getInvoke();
@@ -1418,6 +1419,122 @@ function initRingGauges() {
       el.style.strokeDashoffset = CIRCUMFERENCE;
     }
   });
+}
+
+/** Inject click-to-copy styles for ring metric values (all themes; flash via ::after so refresh can keep updating the number). */
+function ensureMetricValueCopyStyles() {
+  if (document.getElementById('mac-stats-metric-copy-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'mac-stats-metric-copy-styles';
+  style.textContent = `
+    .metric-value[data-metric-copy="1"] {
+      cursor: pointer;
+      position: relative;
+      border-radius: 8px;
+      outline: none;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .metric-value[data-metric-copy="1"]:hover {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
+    }
+    .metric-value[data-metric-copy="1"]:focus-visible {
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+    }
+    .metric-value[data-metric-copy="1"].is-just-copied {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 18%, transparent);
+    }
+    .metric-value[data-metric-copy="1"].is-just-copied::after {
+      content: "Copied";
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 4px);
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      padding: 3px 7px;
+      border-radius: 999px;
+      white-space: nowrap;
+      color: var(--text, #fff);
+      background: color-mix(in srgb, var(--accent, #0a84ff) 55%, rgba(0, 0, 0, 0.45));
+      pointer-events: none;
+      z-index: 4;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+/**
+ * Normalize ring metric text for clipboard (e.g. "42%", "3.2 GHz", "58°C").
+ * Skips empty / em-dash placeholders.
+ */
+function metricValueCopyText(el) {
+  if (!el) return '';
+  let raw = (el.textContent || '').replace(/\s+/g, ' ').trim();
+  if (!raw || raw === '—' || raw.startsWith('—')) return '';
+  // Prefer a space before unit when the unit is a sibling span (GHz / % / °C).
+  const unit = el.querySelector?.('.metric-unit');
+  if (unit) {
+    const unitText = (unit.textContent || '').trim();
+    const num = raw.replace(unitText, '').trim();
+    if (num && unitText) return `${num} ${unitText}`.replace(/\s+/g, ' ').trim();
+  }
+  return raw;
+}
+
+async function copyMetricValueFromUi(el) {
+  if (!el || el.classList.contains('is-just-copied')) return false;
+  const value = metricValueCopyText(el);
+  if (!value) return false;
+  const ok = await copyTextToClipboard(value);
+  if (!ok) {
+    alert('Could not copy metric value.');
+    return false;
+  }
+  el.classList.add('is-just-copied');
+  el.setAttribute('aria-label', 'Copied');
+  const prevTitle = el.getAttribute('data-copy-title') || el.title || 'Click to copy';
+  el.title = 'Copied';
+  window.setTimeout(() => {
+    el.classList.remove('is-just-copied');
+    el.title = prevTitle;
+    el.removeAttribute('aria-label');
+  }, 1600);
+  return true;
+}
+
+/** Wire the four ring metric values for click / Enter / Space copy (Top Processes name parity). */
+function wireMetricValueCopy() {
+  ensureMetricValueCopyStyles();
+  const ids = [
+    'cpu-usage-value',
+    'gpu-usage-value',
+    'frequency-value',
+    'temperature-value',
+  ];
+  for (const id of ids) {
+    const el = document.getElementById(id);
+    if (!el || el.dataset.metricCopyWired === '1') continue;
+    el.dataset.metricCopyWired = '1';
+    el.dataset.metricCopy = '1';
+    el.setAttribute('role', 'button');
+    el.tabIndex = 0;
+    const title = 'Click to copy';
+    el.title = title;
+    el.setAttribute('data-copy-title', title);
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      copyMetricValueFromUi(el);
+    });
+    el.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      e.stopPropagation();
+      copyMetricValueFromUi(el);
+    });
+  }
 }
 
 // Try multiple initialization strategies
