@@ -1,14 +1,16 @@
 # Morning surprise — 2026-08-18
 
-Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL, Disk Cleanup path copy, CPU metrics ring-value copy, AI Chat starter chips, then Debug Log Error/Warn filter chips so operators can find issues without hunting a wall of DEBUG.
+Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL, Disk Cleanup path copy, CPU metrics ring-value copy (then restored CPU % Details toggle), AI Chat starter chips, Debug Log Error/Warn filters, and battery/power strip click-to-copy on the metrics surface.
 
 ## Shipped (so far)
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.517** | Battery / power strip **click-to-copy** — click (or Enter/Space) battery % or power watts; Copied overlay so live refresh keeps updating the number (GPU/GHz/°C parity) |
+| **v0.1.516** | CPU gauge click again **toggles Details / Top Processes** — overnight ring copy on CPU % had stolen that control; copy stays on GPU, frequency, temperature, battery, and power |
 | **v0.1.515** | Debug Log **Error / Warn filter chips** — All, Error, and Warn in the toolbar (live counts; indented follow-up lines stay with the match); empty filter says nothing is there yet |
 | **v0.1.514** | AI Chat empty-state **starter chips** — click a prompt to fill the composer, then Send or Enter (Load into AI Chat parity; no auto-send) |
-| **v0.1.513** | CPU metrics **click-to-copy value** — click (or Enter/Space) a ring value (CPU %, GPU %, frequency, temperature) to copy; Copied overlay so live refresh keeps updating the number |
+| **v0.1.513** | CPU metrics **click-to-copy value** — click (or Enter/Space) a ring value (GPU %, frequency, temperature) to copy; Copied overlay so live refresh keeps updating the number |
 | **v0.1.512** | Disk Cleanup **click-to-copy path** — scope or category path copies on click or `c` (Top Processes / Monitors / Agent Ops parity); Copied flash |
 | **v0.1.511** | Monitors **c copies URL** — selected row copies monitor URL (click-to-copy parity; Top Processes / Agent Ops); Copied flash |
 | **v0.1.510** | Agent Ops **c copies id** — selected row or preview chip copies agent slug / session id / schedule id / knowledge path / run request id; Copied flash (Top Processes name-copy parity) |
@@ -31,6 +33,6 @@ Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL
 
 ## Digester
 
-- Open = design-review (stale feature-agent-ops ~5.9d). Latency empty after filters. This tick: Debug Log Error/Warn chips (P2 `debug.log` + design-review rotation off saturated Agent Ops / copy / starter-chip surfaces).
+- Open = design-review (stale feature-agent-ops ~6.5d; cpu-metrics stale ~6.5d). Latency empty after filters. This tick: battery/power strip click-to-copy (rotate off saturated Agent Ops chrome onto stale CPU metrics strip).
 
-Updated: 2026-08-18 ~05:55
+Updated: 2026-08-18 ~20:05
