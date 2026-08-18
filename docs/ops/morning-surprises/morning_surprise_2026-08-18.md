@@ -1,11 +1,12 @@
 # Morning surprise — 2026-08-18
 
-Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL, Disk Cleanup path copy, CPU metrics ring-value copy (then restored CPU % Details toggle), AI Chat starter chips, Debug Log Error/Warn filters, battery/power strip click-to-copy, Monitors summary click + empty Add CTA, and Agent Ops empty Open AI Chat.
+Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL, Disk Cleanup path copy, CPU metrics ring-value copy (then restored CPU % Details toggle), AI Chat starter chips, Debug Log Error/Warn filters, battery/power strip click-to-copy, Monitors summary click + empty Add CTA, Agent Ops empty Open AI Chat, and RAM % on the metrics strip.
 
 ## Shipped (so far)
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.520** | CPU metrics **RAM on the battery/power strip** — RAM % next to battery and power (menu-bar parity). Click (or Enter/Space) opens Details and highlights used / total |
 | **v0.1.519** | Agent Ops **empty Open AI Chat** — Live, saved sessions, and Runs true-empty lists show **Open AI Chat** (expands the composer; Monitors empty Add CTA parity) |
 | **v0.1.518** | External / Monitors **summary click + empty Add CTA** — click (or Enter/Space) the summary to open the first DOWN site (or first row); empty list shows “Nothing watching yet” with **Add a monitor** |
 | **v0.1.517** | Battery / power strip **click-to-copy** — click (or Enter/Space) battery % or power watts; Copied overlay so live refresh keeps updating the number (GPU/GHz/°C parity) |
@@ -35,6 +36,6 @@ Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL
 
 ## Digester
 
-- Open = design-review (stale feature-agent-ops ~6.5d). Latency empty after filters. This tick: Agent Ops empty Open AI Chat CTA (rotate off Monitors summary onto recommended Agent Ops surface).
+- Open = design-review (stale feature-cpu-metrics ~6.5d; monitors also stale). Latency empty after filters. This tick: RAM % on the battery/power strip (click opens Details).
 
-Updated: 2026-08-18 ~21:00
+Updated: 2026-08-18 ~21:25
