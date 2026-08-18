@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Disk Cleanup click-to-copy path (scopes + categories; click / `c`; Copied flash) — **v0.1.512**
 - Monitors `c` copies URL (click-to-copy parity; Top Processes / Agent Ops) — **v0.1.511**
 - Agent Ops `c` copies selected id (list + preview chip; Copied flash) — **v0.1.510**
 - Top Processes click-to-copy name (list + `c` + details hero) — **v0.1.509**

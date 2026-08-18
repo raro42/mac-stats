@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.512] - 2026-08-18
+
+### Added
+- Disk Cleanup **click-to-copy path** — click the scope or category path, or press `c` on a selected row, to copy (Top Processes / Monitors / Agent Ops parity); Copied flash.
+
 ## [0.1.511] - 2026-08-18
 
 ### Added

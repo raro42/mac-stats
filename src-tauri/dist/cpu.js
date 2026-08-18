@@ -6304,19 +6304,20 @@ async function refreshDiskCleanupPanel(opts) {
       scopesEl.innerHTML = scopes
         .map((s, idx) => {
           const pathHint = s.path || (s.kind === 'temp' ? 'system temp + /tmp' : s.kind);
+          const pathEsc = escapeDiskHtml(pathHint);
           const ageDisabled = s.kind === 'mac-stats' ? 'disabled' : '';
           const ageVal = s.maxAgeDays != null ? s.maxAgeDays : '';
           const removeBtn = s.builtin
             ? ''
             : `<button type="button" class="disk-cleanup-scope-remove" data-scope-remove="${idx}">Remove</button>`;
           const rowTitle = s.builtin
-            ? '↑↓ / j k · PgUp/PgDn select · Space toggle enable · R toggle recurse · Esc clears'
-            : '↑↓ / j k · PgUp/PgDn select · Space toggle enable · R toggle recurse · Delete removes custom · Esc clears';
-          return `<div class="disk-cleanup-scope-row${s.enabled ? '' : ' is-disabled'}" data-scope-idx="${idx}" role="option" title="${rowTitle}">
+            ? '↑↓ / j k · PgUp/PgDn select · click path / c copies · Space toggle enable · R toggle recurse · Esc clears'
+            : '↑↓ / j k · PgUp/PgDn select · click path / c copies · Space toggle enable · R toggle recurse · Delete removes custom · Esc clears';
+          return `<div class="disk-cleanup-scope-row${s.enabled ? '' : ' is-disabled'}" data-scope-idx="${idx}" data-copy-path="${pathEsc}" role="option" title="${rowTitle}">
             <input type="checkbox" data-scope-enabled="${idx}" ${s.enabled ? 'checked' : ''} aria-label="Enable ${s.label}" />
             <div class="disk-cleanup-scope-main">
               <div class="disk-cleanup-scope-title">${s.label} <span class="disk-cleanup-scope-kind">(${s.kind})</span></div>
-              <div class="disk-cleanup-scope-path" title="${pathHint}">${pathHint}</div>
+              <button type="button" class="disk-cleanup-scope-path" data-copy-path="${pathEsc}" title="Click to copy path">${pathEsc}</button>
             </div>
             <input type="number" min="1" max="3650" data-scope-days="${idx}" value="${ageVal}" ${ageDisabled} title="Max age (days)" placeholder="days" />
             <label class="disk-cleanup-scope-rec"><input type="checkbox" data-scope-rec="${idx}" ${s.recursive ? 'checked' : ''} ${s.kind === 'mac-stats' ? 'disabled' : ''} /> Recurse</label>
@@ -6333,11 +6334,12 @@ async function refreshDiskCleanupPanel(opts) {
           scopesEl.parentNode?.insertBefore(hint, scopesEl);
         }
         hint.textContent =
-          '↑↓ / j k · PgUp/PgDn select scope · Esc clears · Space toggle enable · R toggle recurse · T toggle Trash soft-delete · Delete removes custom · Enter in Add form adds · ⌘S saves';
+          '↑↓ / j k · PgUp/PgDn select scope · click path / c copies · Esc clears · Space toggle enable · R toggle recurse · T toggle Trash soft-delete · Delete removes custom · Enter in Add form adds · ⌘S saves';
       } else {
         document.getElementById('disk-cleanup-kb-hint')?.remove();
       }
       syncDiskCleanupScopeTabOrder(scopesEl, preferIdx);
+      applyDiskCleanupPathCopyFlash(scopesEl);
     }
 
     const cats = (status.categories || []).filter((c) => c.enabled !== false);
@@ -6354,10 +6356,15 @@ async function refreshDiskCleanupPanel(opts) {
         .map((c, idx) => {
           const has = (c.bytes || 0) > 0 || (c.fileCount || 0) > 0;
           const samples = (c.sampleNames || []).slice(0, 3).join(', ');
+          const pathHint = String(c.pathHint || '').trim();
+          const pathEsc = escapeDiskHtml(pathHint);
           const title = has
-            ? '↑↓ / j k · PgUp/PgDn select · Enter Clean now · Esc clears'
-            : '↑↓ / j k · PgUp/PgDn select · Enter focuses Clean now · Esc clears';
-          return `<li class="disk-cleanup-item${has ? ' has-reclaim' : ''}" role="option" data-item-idx="${idx}" title="${title}">
+            ? '↑↓ / j k · PgUp/PgDn select · click path / c copies · Enter Clean now · Esc clears'
+            : '↑↓ / j k · PgUp/PgDn select · click path / c copies · Enter focuses Clean now · Esc clears';
+          const pathBtn = pathEsc
+            ? `<button type="button" class="disk-cleanup-item-path" data-copy-path="${pathEsc}" title="Click to copy path">${pathEsc}</button>`
+            : '';
+          return `<li class="disk-cleanup-item${has ? ' has-reclaim' : ''}" role="option" data-item-idx="${idx}" data-copy-path="${pathEsc}" title="${title}">
             <div class="disk-cleanup-item-head">
               <span class="disk-cleanup-item-title">${c.label || c.id}</span>
               <span class="disk-cleanup-item-stat">${
@@ -6367,7 +6374,7 @@ async function refreshDiskCleanupPanel(opts) {
               }</span>
             </div>
             <div class="disk-cleanup-item-policy">${c.policy || ''}</div>
-            <div class="disk-cleanup-item-path">${c.pathHint || ''}</div>
+            ${pathBtn}
             ${
               samples
                 ? `<div class="disk-cleanup-item-samples">${samples}</div>`
@@ -6381,11 +6388,14 @@ async function refreshDiskCleanupPanel(opts) {
         listHint = document.createElement('div');
         listHint.className = 'disk-cleanup-list-kb-hint';
         listHint.id = 'disk-cleanup-list-kb-hint';
-        listHint.textContent =
-          'Categories: ↑↓ / j k · PgUp/PgDn · Home / End select · Esc clears · Enter runs Clean now when reclaimable';
         list.parentNode.insertBefore(listHint, list);
       }
+      if (listHint) {
+        listHint.textContent =
+          'Categories: ↑↓ / j k · PgUp/PgDn · Home / End select · click path / c copies · Esc clears · Enter runs Clean now when reclaimable';
+      }
       syncDiskCleanupItemTabOrder(list, preferItemIdx);
+      applyDiskCleanupPathCopyFlash(list);
     }
 
     if (lastEl) {
@@ -6591,6 +6601,81 @@ function flashSaveButton(btn, opts = {}) {
 // Shared with discord.js / other script tags (save-button-feedback rule).
 window.flashSaveButton = flashSaveButton;
 
+function escapeDiskHtml(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+/** Brief Copied flash on Disk Cleanup path (survives panel refresh). */
+let diskCleanupPathCopyFlash = null; // { path }
+let diskCleanupPathCopyFlashTimer = null;
+
+function clearDiskCleanupPathCopyFlashTimers() {
+  if (diskCleanupPathCopyFlashTimer) {
+    clearTimeout(diskCleanupPathCopyFlashTimer);
+    diskCleanupPathCopyFlashTimer = null;
+  }
+}
+
+function requestDiskCleanupPathCopyFlash(path) {
+  if (!path) return;
+  diskCleanupPathCopyFlash = { path };
+  clearDiskCleanupPathCopyFlashTimers();
+  diskCleanupPathCopyFlashTimer = setTimeout(() => {
+    diskCleanupPathCopyFlash = null;
+    diskCleanupPathCopyFlashTimer = null;
+    document
+      .querySelectorAll(
+        '.disk-cleanup-scope-path.is-just-saved, .disk-cleanup-item-path.is-just-saved'
+      )
+      .forEach((el) => {
+        el.classList.remove('is-just-saved');
+        const idle = el.getAttribute('data-copy-path') || '';
+        el.textContent = idle;
+        el.title = 'Click to copy path';
+        el._saveFlashOriginalLabel = null;
+      });
+  }, 1600);
+}
+
+function applyDiskCleanupPathCopyFlash(root) {
+  if (!diskCleanupPathCopyFlash || !root) return;
+  const want = diskCleanupPathCopyFlash.path;
+  const btn = Array.from(
+    root.querySelectorAll('.disk-cleanup-scope-path, .disk-cleanup-item-path')
+  ).find((el) => (el.getAttribute('data-copy-path') || '') === want);
+  if (!btn) return;
+  btn._saveFlashOriginalLabel = want;
+  btn.classList.add('is-just-saved');
+  btn.textContent = 'Copied';
+  btn.title = 'Copied';
+}
+
+/** Keyboard `c` / click-to-copy path (Top Processes name + Monitors URL parity). */
+async function copyDiskCleanupPathFromRow(row) {
+  if (!row) return false;
+  const btn = row.querySelector('.disk-cleanup-scope-path, .disk-cleanup-item-path');
+  const value = String(
+    row.getAttribute('data-copy-path') ||
+      btn?.getAttribute('data-copy-path') ||
+      btn?._saveFlashOriginalLabel ||
+      ''
+  ).trim();
+  if (!value) return false;
+  if (btn && btn.classList.contains('is-just-saved')) return true;
+  const ok = await copyTextToClipboard(value);
+  if (!ok) {
+    alert('Could not copy path.');
+    return false;
+  }
+  requestDiskCleanupPathCopyFlash(value);
+  applyDiskCleanupPathCopyFlash(row);
+  return true;
+}
+
 /** Roving tabindex for Disk Cleanup scope rows (Monitors / process-list parity). */
 function syncDiskCleanupScopeTabOrder(scopesEl, preferIdx) {
   if (!scopesEl) return;
@@ -6653,6 +6738,13 @@ function wireDiskCleanupScopesKeyboard() {
     if (!row || !scopesEl.contains(row)) return;
     const idx = parseInt(row.getAttribute('data-scope-idx') || '0', 10);
     syncDiskCleanupScopeTabOrder(scopesEl, idx);
+    const pathBtn = e.target.closest && e.target.closest('.disk-cleanup-scope-path');
+    if (pathBtn && scopesEl.contains(pathBtn)) {
+      e.preventDefault();
+      e.stopPropagation();
+      void copyDiskCleanupPathFromRow(row);
+      return;
+    }
     if (e.target === row) row.focus();
   });
 
@@ -6714,6 +6806,20 @@ function wireDiskCleanupScopesKeyboard() {
       void removeDiskCleanupScopeAt(scopeIdx).catch((err) => {
         alert(`Remove failed: ${err?.message || err}`);
       });
+      return;
+    }
+
+    // c copies the scope path (click-to-copy parity; Top Processes / Monitors).
+    if (
+      (e.key === 'c' || e.key === 'C') &&
+      !onNumber &&
+      !onTextLike &&
+      !e.metaKey &&
+      !e.ctrlKey &&
+      !e.altKey
+    ) {
+      e.preventDefault();
+      void copyDiskCleanupPathFromRow(row);
       return;
     }
 
@@ -6801,6 +6907,13 @@ function wireDiskCleanupListKeyboard() {
     if (!row || !listEl.contains(row)) return;
     const idx = parseInt(row.getAttribute('data-item-idx') || '0', 10);
     syncDiskCleanupItemTabOrder(listEl, idx);
+    const pathBtn = e.target.closest && e.target.closest('.disk-cleanup-item-path');
+    if (pathBtn && listEl.contains(pathBtn)) {
+      e.preventDefault();
+      e.stopPropagation();
+      void copyDiskCleanupPathFromRow(row);
+      return;
+    }
     row.focus();
   });
 
@@ -6812,6 +6925,9 @@ function wireDiskCleanupListKeyboard() {
     if (idx < 0) return;
 
     if (e.key === 'Enter' || e.key === ' ') {
+      if (e.target.closest && e.target.closest('.disk-cleanup-item-path')) {
+        return;
+      }
       e.preventDefault();
       const runBtn = document.getElementById('disk-cleanup-run-btn');
       if (runBtn && !runBtn.disabled) {
@@ -6821,6 +6937,18 @@ function wireDiskCleanupListKeyboard() {
           runBtn.focus();
         }
       }
+      return;
+    }
+
+    // c copies the category path (click-to-copy parity; scopes / Monitors).
+    if (
+      (e.key === 'c' || e.key === 'C') &&
+      !e.metaKey &&
+      !e.ctrlKey &&
+      !e.altKey
+    ) {
+      e.preventDefault();
+      void copyDiskCleanupPathFromRow(row);
       return;
     }
 
