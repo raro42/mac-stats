@@ -7161,6 +7161,61 @@ function wireDiskCleanupReclaimCard() {
   });
 }
 
+/** Clickable Enabled scopes card (Reclaimable now / Monitors summary parity). */
+function applyDiskCleanupEnabledScopesCardState(enabledCount, totalCount) {
+  const summaryEl = document.getElementById('disk-cleanup-scope-summary');
+  const card = summaryEl?.closest('.disk-cleanup-meta-card');
+  if (!card) return;
+  const en = Number.isFinite(enabledCount) ? enabledCount : 0;
+  const tot = Number.isFinite(totalCount) ? totalCount : 0;
+  const off = Math.max(0, tot - en);
+  card.classList.add('is-action');
+  card.classList.toggle('has-scopes-off', off > 0);
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  if (off > 0) {
+    card.title = 'Click to review scopes — some are off';
+    card.setAttribute(
+      'aria-label',
+      `Enabled scopes ${en} of ${tot} — click to turn more on`
+    );
+  } else if (tot > 0) {
+    card.title = 'Click to review cleanup scopes';
+    card.setAttribute(
+      'aria-label',
+      `Enabled scopes ${en} of ${tot} — click to review`
+    );
+  } else {
+    card.title = 'Click to add a cleanup scope';
+    card.setAttribute(
+      'aria-label',
+      'No scopes yet — click to add a cleanup path'
+    );
+  }
+}
+
+function wireDiskCleanupEnabledScopesCard() {
+  const summaryEl = document.getElementById('disk-cleanup-scope-summary');
+  const card = summaryEl?.closest('.disk-cleanup-meta-card');
+  if (!card || card.dataset.scopesNav === '1') return;
+  card.dataset.scopesNav = '1';
+  applyDiskCleanupEnabledScopesCardState(0, 0);
+  const activate = () => {
+    focusDiskCleanupScopesReview();
+  };
+  card.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  card.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /** Category list empty: warm title + Review scopes CTA (Monitors empty Add parity). */
 function renderDiskCleanupListEmpty(list) {
   if (!list) return;
@@ -7226,6 +7281,9 @@ async function refreshDiskCleanupPanel(opts) {
     }
     if (scopeSummaryEl) {
       scopeSummaryEl.textContent = status.enabledScopeSummary || status.rootHint || '—';
+      const scopesForCard = window.__diskCleanupScopes || [];
+      const enabledN = scopesForCard.filter((s) => s && s.enabled).length;
+      applyDiskCleanupEnabledScopesCardState(enabledN, scopesForCard.length);
     }
     const softEl = document.getElementById('disk-cleanup-soft-delete');
     if (softEl) {
@@ -7953,6 +8011,7 @@ function initDiskCleanupSection() {
   wireDiskCleanupScopesKeyboard();
   wireDiskCleanupListKeyboard();
   wireDiskCleanupReclaimCard();
+  wireDiskCleanupEnabledScopesCard();
 
   if (icon && !icon.getAttribute('data-title-base')) {
     icon.setAttribute('data-title-base', icon.title || 'Disk cleanup');
