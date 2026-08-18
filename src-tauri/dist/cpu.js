@@ -903,11 +903,14 @@ async function refresh() {
       });
     }
 
-    // System RAM (menu-bar parity) — Details section
+    // System RAM (menu-bar parity) — Details section + battery/power strip
+    ensureRamStrip();
     const ramPctEl = document.getElementById("ram-percent-value");
     const ramUsedEl = document.getElementById("ram-used-value");
     const ramTotalEl = document.getElementById("ram-total-value");
-    if (ramPctEl || ramUsedEl || ramTotalEl) {
+    const ramStripEl = document.getElementById("ram-strip-value");
+    const ramStripCell = document.getElementById("ram-strip");
+    if (ramPctEl || ramUsedEl || ramTotalEl || ramStripEl) {
       const pct =
         typeof data.ram_percent === "number" && Number.isFinite(data.ram_percent)
           ? data.ram_percent
@@ -931,6 +934,20 @@ async function refresh() {
         scheduleDOMUpdate(() => {
           ramTotalEl.textContent = totalText;
         });
+      }
+      if (ramStripEl && ramStripEl.textContent !== pctText) {
+        scheduleDOMUpdate(() => {
+          ramStripEl.textContent = pctText;
+        });
+      }
+      if (ramStripCell) {
+        const extra =
+          usedText !== "—" && totalText !== "—"
+            ? ` (${usedText} of ${totalText})`
+            : "";
+        const title = `Show RAM in Details${extra}`;
+        ramStripCell.title = title;
+        ramStripCell.setAttribute("aria-label", `RAM ${pctText}. ${title}`);
       }
     }
 
@@ -1390,6 +1407,7 @@ function init() {
   // Force immediate process update on initial load
   window._forceProcessUpdate = true;
   wireMetricValueCopy();
+  ensureRamStrip();
   
   // Try to get Tauri immediately - don't wait if it's already available
   const immediateInvoke = getInvoke();
@@ -1552,6 +1570,122 @@ function wireMetricValueCopy() {
       copyMetricValueFromUi(el);
     });
   }
+}
+
+/** Inject RAM cell on the battery/power strip (all themes). */
+function ensureRamStripStyles() {
+  if (document.getElementById('mac-stats-ram-strip-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'mac-stats-ram-strip-styles';
+  style.textContent = `
+    #battery-power-strip {
+      flex-wrap: wrap;
+      gap: 8px 12px;
+    }
+    .ram-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      outline: none;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .ram-info:hover {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
+    }
+    .ram-info:focus-visible {
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+    }
+    .ram-label {
+      color: var(--muted);
+    }
+    .ram-value {
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .detail-label.is-ram-highlight,
+    .detail-value.is-ram-highlight {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      border-radius: 6px;
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function flashRamDetails() {
+  const ids = ['ram-percent-value', 'ram-used-value', 'ram-total-value'];
+  for (const id of ids) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    el.classList.add('is-ram-highlight');
+    const label = el.previousElementSibling;
+    if (label && label.classList.contains('detail-label')) {
+      label.classList.add('is-ram-highlight');
+    }
+    window.setTimeout(() => {
+      el.classList.remove('is-ram-highlight');
+      if (label && label.classList.contains('detail-label')) {
+        label.classList.remove('is-ram-highlight');
+      }
+    }, 1600);
+  }
+}
+
+function openRamDetailsFromStrip() {
+  if (typeof window.showCpuDetailsSection === 'function') {
+    window.showCpuDetailsSection();
+  } else if (typeof window.showDetailsProcessesSections === 'function') {
+    window.showDetailsProcessesSections();
+  }
+  const ramEl = document.getElementById('ram-percent-value');
+  if (ramEl && typeof ramEl.scrollIntoView === 'function') {
+    ramEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  flashRamDetails();
+}
+
+/**
+ * RAM % on the battery/power strip (menu-bar parity). Click / Enter / Space
+ * opens Details and flashes the RAM rows — not copy (battery/power already copy).
+ */
+function ensureRamStrip() {
+  ensureRamStripStyles();
+  const strip = document.getElementById('battery-power-strip');
+  if (!strip) return null;
+  let cell = document.getElementById('ram-strip');
+  if (!cell) {
+    cell = document.createElement('div');
+    cell.id = 'ram-strip';
+    cell.className = 'ram-info';
+    cell.setAttribute('role', 'button');
+    cell.tabIndex = 0;
+    cell.title = 'Show RAM in Details';
+    cell.setAttribute('aria-label', 'Show RAM in Details');
+    cell.innerHTML =
+      '<span class="ram-label">RAM</span>' +
+      '<span class="ram-value" id="ram-strip-value">—</span>';
+    const timeEl = document.getElementById('time-remaining');
+    if (timeEl) strip.insertBefore(cell, timeEl);
+    else strip.appendChild(cell);
+  }
+  if (cell.dataset.ramStripWired === '1') return cell;
+  cell.dataset.ramStripWired = '1';
+  const openRam = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openRamDetailsFromStrip();
+  };
+  cell.addEventListener('click', openRam);
+  cell.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    openRam(e);
+  });
+  return cell;
 }
 
 // Try multiple initialization strategies
@@ -5891,8 +6025,24 @@ function initCollapsibleSections() {
     setSectionCollapsed('details_processes_collapsed', false);
   }
 
+  function syncUsageExpanded() {
+    if (!usageCard) return;
+    const hidden =
+      detailsSection?.style.display === 'none' ||
+      processesSection?.style.display === 'none';
+    usageCard.setAttribute('aria-expanded', String(!hidden));
+    usageCard.setAttribute(
+      'aria-label',
+      hidden ? 'Show Details and Processes' : 'Hide Details and Processes'
+    );
+  }
+
   window.hideDetailsProcessesSections = hideSections;
   window.showDetailsProcessesSections = showSections;
+  window.showCpuDetailsSection = () => {
+    showDetails();
+    syncUsageExpanded();
+  };
   
   // Apply initial state (hidden by default)
   if (sectionsCollapsed) {
@@ -5939,16 +6089,6 @@ function initCollapsibleSections() {
   if (usageCard) {
     usageCard.setAttribute('role', 'button');
     usageCard.setAttribute('tabindex', '0');
-    const syncUsageExpanded = () => {
-      const hidden =
-        detailsSection?.style.display === 'none' ||
-        processesSection?.style.display === 'none';
-      usageCard.setAttribute('aria-expanded', String(!hidden));
-      usageCard.setAttribute(
-        'aria-label',
-        hidden ? 'Show Details and Processes' : 'Hide Details and Processes'
-      );
-    };
     syncUsageExpanded();
     const toggleSections = (e) => {
       e.stopPropagation();
@@ -5969,6 +6109,8 @@ function initCollapsibleSections() {
       toggleSections(e);
     });
   }
+
+  ensureRamStrip();
 }
 
 // ============================================================================
