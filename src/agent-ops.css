@@ -2605,6 +2605,22 @@ button.monitor-detail-url.is-just-saved {
   font-variant-numeric: tabular-nums;
 }
 
+/* Reclaimable now — click/keyboard glance (Monitors summary parity) */
+.disk-cleanup-meta-card.is-action {
+  cursor: pointer;
+}
+
+.disk-cleanup-meta-card.is-action:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, #0a84ff 36%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 18%, transparent);
+}
+
+.disk-cleanup-meta-card.is-action.has-reclaim:focus-visible {
+  border-color: color-mix(in srgb, #ff9f0a 48%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ff9f0a 22%, transparent);
+}
+
 .disk-cleanup-meta-label {
   font-size: 11px;
   opacity: 0.65;

@@ -7086,6 +7086,81 @@ function focusDiskCleanupScopesReview() {
   });
 }
 
+/** Reclaimable-now card: jump to first reclaim row, or scopes when nothing pending. */
+function focusDiskCleanupReclaimGlance() {
+  ensureDiskCleanupSectionExpanded();
+  requestAnimationFrame(() => {
+    const list = document.getElementById('disk-cleanup-list');
+    const reclaimRow = list?.querySelector('.disk-cleanup-item.has-reclaim');
+    if (reclaimRow) {
+      const idx = parseInt(reclaimRow.getAttribute('data-item-idx') || '0', 10);
+      syncDiskCleanupItemTabOrder(list, Number.isFinite(idx) ? idx : 0);
+      if (typeof reclaimRow.focus === 'function') reclaimRow.focus();
+      if (typeof reclaimRow.scrollIntoView === 'function') {
+        reclaimRow.scrollIntoView({ block: 'nearest' });
+      }
+      return;
+    }
+    const emptyCta = list?.querySelector('.disk-cleanup-empty-cta');
+    if (emptyCta || !list?.querySelector('.disk-cleanup-item')) {
+      focusDiskCleanupScopesReview();
+      return;
+    }
+    const runBtn = document.getElementById('disk-cleanup-run-btn');
+    if (runBtn && typeof runBtn.focus === 'function') {
+      runBtn.focus();
+      if (typeof runBtn.scrollIntoView === 'function') {
+        runBtn.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  });
+}
+
+/** Clickable Reclaimable now card (Monitors summary parity). */
+function applyDiskCleanupReclaimCardState(hasReclaim) {
+  const reclaimEl = document.getElementById('disk-cleanup-reclaim');
+  const card = reclaimEl?.closest('.disk-cleanup-meta-card');
+  if (!card) return;
+  card.classList.add('is-action');
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  if (hasReclaim) {
+    card.title = 'Click to open the first reclaimable category';
+    card.setAttribute(
+      'aria-label',
+      'Reclaimable now — click to open the first reclaimable category'
+    );
+  } else {
+    card.title = 'Click to review cleanup scopes';
+    card.setAttribute(
+      'aria-label',
+      'Nothing reclaimable — click to review cleanup scopes'
+    );
+  }
+}
+
+function wireDiskCleanupReclaimCard() {
+  const reclaimEl = document.getElementById('disk-cleanup-reclaim');
+  const card = reclaimEl?.closest('.disk-cleanup-meta-card');
+  if (!card || card.dataset.reclaimNav === '1') return;
+  card.dataset.reclaimNav = '1';
+  applyDiskCleanupReclaimCardState(false);
+  const activate = () => {
+    focusDiskCleanupReclaimGlance();
+  };
+  card.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  card.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /** Category list empty: warm title + Review scopes CTA (Monitors empty Add parity). */
 function renderDiskCleanupListEmpty(list) {
   if (!list) return;
@@ -7140,6 +7215,7 @@ async function refreshDiskCleanupPanel(opts) {
         'has-reclaim',
         reclaimBytes > 0
       );
+      applyDiskCleanupReclaimCardState(reclaimBytes > 0);
     }
     if (nextEl) {
       nextEl.textContent = status.nextRunLabel || '—';
@@ -7876,6 +7952,7 @@ function initDiskCleanupSection() {
 
   wireDiskCleanupScopesKeyboard();
   wireDiskCleanupListKeyboard();
+  wireDiskCleanupReclaimCard();
 
   if (icon && !icon.getAttribute('data-title-base')) {
     icon.setAttribute('data-title-base', icon.title || 'Disk cleanup');
