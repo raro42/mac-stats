@@ -1,11 +1,12 @@
 # Morning surprise — 2026-08-18
 
-Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL, then Disk Cleanup path copy so Finder and RUN_CMD do not need retyping.
+Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL, Disk Cleanup path copy, then CPU metrics ring-value copy so live numbers paste into Discord / notes without retyping.
 
 ## Shipped (so far)
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.513** | CPU metrics **click-to-copy value** — click (or Enter/Space) a ring value (CPU %, GPU %, frequency, temperature) to copy; Copied overlay so live refresh keeps updating the number |
 | **v0.1.512** | Disk Cleanup **click-to-copy path** — scope or category path copies on click or `c` (Top Processes / Monitors / Agent Ops parity); Copied flash |
 | **v0.1.511** | Monitors **c copies URL** — selected row copies monitor URL (click-to-copy parity; Top Processes / Agent Ops); Copied flash |
 | **v0.1.510** | Agent Ops **c copies id** — selected row or preview chip copies agent slug / session id / schedule id / knowledge path / run request id; Copied flash (Top Processes name-copy parity) |
@@ -24,10 +25,10 @@ Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL
 
 ## Tried / deferred
 
-- Recapture `docs/screens/feature-disk-cleanup.png` / `feature-agent-ops.png` / `feature-monitors.png` — no on-screen CPU window for Quartz/`screencapture -l`. Prior assets kept until a permitted shot. Disk Cleanup polish grace marked.
+- Recapture `docs/screens/feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` / `feature-monitors.png` — no on-screen CPU window for Quartz/`screencapture -l` (or Screen Recording TCC). Prior assets kept until a permitted shot. CPU-metrics polish grace marked.
 
 ## Digester
 
-- Open = design-review (stale feature-agent-ops ~5.8d). Latency empty after filters. This tick: rotated off saturated Agent Ops / Monitors copy chrome → Disk Cleanup path copy.
+- Open = design-review (stale feature-agent-ops ~5.8d; cpu-metrics also stale). Latency empty after filters. This tick: rotated to stale CPU metrics surface — click-to-copy ring values.
 
-Updated: 2026-08-18 ~04:35
+Updated: 2026-08-18 ~05:00

@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- CPU metrics click-to-copy ring values (CPU/GPU % · GHz · °C; Copied overlay) — **v0.1.513**
 - Disk Cleanup click-to-copy path (scopes + categories; click / `c`; Copied flash) — **v0.1.512**
 - Monitors `c` copies URL (click-to-copy parity; Top Processes / Agent Ops) — **v0.1.511**
 - Agent Ops `c` copies selected id (list + preview chip; Copied flash) — **v0.1.510**
