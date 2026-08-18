@@ -708,6 +708,27 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   flex-wrap: wrap;
 }
 
+.ops-overview-jump {
+  margin-right: 4px;
+}
+
+.ops-overview-jump.ops-overview-jump-flash,
+.ops-overview-grid.ops-overview-jump-flash {
+  animation: ops-overview-jump-flash 0.85s ease;
+}
+
+@keyframes ops-overview-jump-flash {
+  0% {
+    box-shadow: none;
+  }
+  30% {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 32%, transparent);
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
 .ops-tab-digit {
   display: inline-block;
   min-width: 0.9em;

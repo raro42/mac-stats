@@ -260,6 +260,7 @@ function syncOpsHealthCardActive(tab) {
 function selectOpsTab(tab) {
     opsActiveTab = tab || 'agents';
     document.querySelectorAll('.agent-ops-tab').forEach((b) => {
+        if (!b.dataset.opsTab) return;
         b.classList.toggle('active', b.dataset.opsTab === tab);
     });
     document.querySelectorAll('.agent-ops-panel').forEach((p) => {
@@ -292,6 +293,57 @@ function focusActiveOpsFilter() {
     input.focus();
     input.select?.();
     return true;
+}
+
+/** Scroll health + overview into view (1–5 jump into detail panels). */
+function showOpsOverview() {
+    const health = document.getElementById('ops-health-row');
+    const grid = document.getElementById('ops-overview-grid');
+    const target = health || grid;
+    try {
+        target?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+    } catch (_) {
+        target?.scrollIntoView?.(true);
+    }
+    const flash = (el) => {
+        if (!el) return;
+        el.classList.remove('ops-overview-jump-flash');
+        void el.offsetWidth;
+        el.classList.add('ops-overview-jump-flash');
+    };
+    flash(document.getElementById('ops-overview-jump'));
+    flash(grid);
+    return !!target;
+}
+
+/** Visible 0 Overview control at the start of the tab strip. */
+function ensureOpsOverviewJump() {
+    const tabs = document.querySelector('.agent-ops-tabs');
+    if (!tabs) return null;
+    let btn = document.getElementById('ops-overview-jump');
+    if (!btn) {
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = 'ops-overview-jump';
+        btn.className = 'agent-ops-tab ops-overview-jump';
+        btn.title = 'Overview · press 0';
+        btn.setAttribute('aria-keyshortcuts', '0');
+        btn.setAttribute('aria-label', 'Jump to overview');
+        const digit = document.createElement('span');
+        digit.className = 'ops-tab-digit';
+        digit.setAttribute('aria-hidden', 'true');
+        digit.textContent = '0';
+        btn.appendChild(digit);
+        btn.appendChild(document.createTextNode('Overview'));
+        tabs.insertBefore(btn, tabs.firstChild);
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (agentOpsCollapsed) applyOpsCollapsed(false);
+            showOpsOverview();
+        });
+    }
+    return btn;
 }
 
 /** Show digit keys on tab buttons (Hermes-style 1–5 already bound). */
@@ -407,7 +459,7 @@ function ensureOpsKeyboardHint() {
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
     hint.textContent =
-        'Tips: digits + counts on tabs · overview head counts · filter N/M + Clear · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r refresh · R digest · ?';
+        'Tips: 0 overview · digits + counts on tabs · overview head counts · filter N/M + Clear · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r refresh · R digest · ?';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -490,6 +542,7 @@ function setupAgentOps() {
     const activeBtn = document.querySelector('.agent-ops-tab.active');
     if (activeBtn?.dataset?.opsTab) opsActiveTab = activeBtn.dataset.opsTab;
     ensureOpsRefreshRowPlacement();
+    ensureOpsOverviewJump();
     ensureOpsTabDigits();
     ensureOpsKeyboardHint();
     ensureOpsUpdatedAgo();
@@ -500,7 +553,11 @@ function setupAgentOps() {
     syncOpsOverviewCardActive(opsActiveTab);
     syncOpsHealthCardActive(opsActiveTab);
     document.querySelectorAll('.agent-ops-tab').forEach((btn) => {
-        btn.addEventListener('click', () => selectOpsTab(btn.dataset.opsTab));
+        btn.addEventListener('click', () => {
+            const tab = btn.dataset.opsTab;
+            if (!tab) return;
+            selectOpsTab(tab);
+        });
     });
     document.querySelectorAll('.ops-overview-link').forEach((btn) => {
         btn.addEventListener('click', (e) => {
@@ -600,13 +657,18 @@ function setupAgentOps() {
                 if (tryOpsAgentsEnter(e)) return;
                 if (tryOpsSchedulesEnter(e)) return;
             }
-            // Hermes-style: digit keys jump tabs when not typing in an input.
-            if (!e.metaKey && !e.ctrlKey && !e.altKey && /^[1-5]$/.test(e.key)) {
+            // Hermes-style: 0 jumps to overview; 1–5 jump detail tabs (when not typing).
+            if (!e.metaKey && !e.ctrlKey && !e.altKey && /^[0-5]$/.test(e.key)) {
                 if (agentOpsCollapsed) return;
                 const t = e.target;
                 const tag = (t && t.tagName) || '';
                 if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return;
                 if (!document.getElementById('agent-ops') && !document.querySelector('.agent-ops-tabs')) {
+                    return;
+                }
+                if (e.key === '0') {
+                    e.preventDefault();
+                    showOpsOverview();
                     return;
                 }
                 const byDigit = {
