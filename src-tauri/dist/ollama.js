@@ -517,6 +517,30 @@ function clearChatWithFeedback() {
   }, 1600);
 }
 
+/** Starter prompts for an empty chat (fill composer; do not auto-send). */
+const CHAT_EMPTY_SUGGESTIONS = [
+  { label: "What's using CPU?", prompt: "What's using CPU?" },
+  { label: "What's scheduled?", prompt: "What's scheduled next?" },
+  { label: 'Any sites down?', prompt: 'Are any website monitors down?' },
+];
+
+/**
+ * Put a starter prompt in the composer (Load into AI Chat parity — user hits Enter).
+ */
+function applyChatEmptySuggestion(prompt) {
+  const input = document.getElementById('chat-input');
+  const text = String(prompt || '').trim();
+  if (!input || !text || chatSendInFlight) return;
+  input.value = text;
+  input.focus();
+  try {
+    const len = input.value.length;
+    input.setSelectionRange(len, len);
+  } catch (_) {
+    /* ignore */
+  }
+}
+
 /**
  * Show a calm empty-state hint when the chat pane has no messages yet.
  */
@@ -531,8 +555,35 @@ function ensureChatEmptyHint() {
   const empty = document.createElement('div');
   empty.className = 'chat-empty';
   empty.setAttribute('role', 'status');
-  empty.textContent =
+
+  const copy = document.createElement('p');
+  copy.className = 'chat-empty-copy';
+  copy.textContent =
     'Ask about CPU, RAM, schedules, or tasks — answers stay on this Mac.';
+  empty.appendChild(copy);
+
+  const row = document.createElement('div');
+  row.className = 'chat-empty-suggestions';
+  CHAT_EMPTY_SUGGESTIONS.forEach((item) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chat-empty-chip';
+    btn.textContent = item.label;
+    btn.title = 'Put this in the composer — then Send or Enter';
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      applyChatEmptySuggestion(item.prompt);
+    });
+    row.appendChild(btn);
+  });
+  empty.appendChild(row);
+
+  empty.addEventListener('click', (e) => {
+    if (e.target.closest('.chat-empty-chip')) return;
+    document.getElementById('chat-input')?.focus();
+  });
+
   container.appendChild(empty);
 }
 

@@ -1207,11 +1207,54 @@ textarea.ops-agent-editor.is-dirty {
   font-size: 12px;
   line-height: 1.5;
   letter-spacing: 0.01em;
-  opacity: 0.78;
+  opacity: 1;
   border-radius: 10px;
   border: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
   background: color-mix(in srgb, currentColor 3.5%, transparent);
   text-align: center;
+  cursor: text;
+}
+
+.chat-empty-copy {
+  margin: 0;
+  opacity: 0.78;
+}
+
+.chat-empty-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.chat-empty-chip {
+  appearance: none;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 10%, transparent);
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.95;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.chat-empty-chip:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 42%, transparent);
+  opacity: 1;
+}
+
+.chat-empty-chip:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
 }
 
 #chat-input:focus {
