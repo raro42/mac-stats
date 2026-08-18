@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.511] - 2026-08-18
+
+### Added
+- Monitors **c copies URL** — press `c` on a selected row to copy the monitor URL (click-to-copy parity; Top Processes / Agent Ops); Copied flash on the URL control.
+
 ## [0.1.510] - 2026-08-18
 
 ### Added

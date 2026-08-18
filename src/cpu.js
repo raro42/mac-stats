@@ -3402,6 +3402,42 @@ function captureMonitorUrlFlash(el) {
   };
 }
 
+/** Keyboard `c` / list parity with Top Processes name + Agent Ops id copy. */
+async function copyMonitorUrlFromRow(item) {
+  if (!item) return false;
+  const urlEl =
+    item.querySelector('.monitor-detail-url') || item.querySelector('.monitor-url');
+  const value = String(
+    item.dataset.monitorUrl ||
+      urlEl?._saveFlashOriginalLabel ||
+      item.getAttribute('data-monitor-id') ||
+      ''
+  ).trim();
+  if (!value) return false;
+  if (urlEl && urlEl.classList.contains('is-just-saved')) return true;
+  const ok = await copyTextToClipboard(value);
+  if (!ok) {
+    alert('Could not copy URL.');
+    return false;
+  }
+  if (urlEl && typeof flashSaveButton === 'function') {
+    flashSaveButton(urlEl, { savedLabel: 'Copied', durationMs: 1600 });
+  } else if (urlEl) {
+    const idle = urlEl._saveFlashOriginalLabel || value;
+    urlEl._saveFlashOriginalLabel = idle;
+    urlEl.classList.add('is-just-saved');
+    urlEl.textContent = 'Copied';
+    clearTimeout(urlEl._saveFlashTimer);
+    urlEl._saveFlashTimer = setTimeout(() => {
+      urlEl.classList.remove('is-just-saved');
+      urlEl.textContent = idle;
+      urlEl._saveFlashOriginalLabel = null;
+      urlEl._saveFlashTimer = null;
+    }, 1600);
+  }
+  return true;
+}
+
 function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
   const prevUrlFlash = captureMonitorUrlFlash(
     detail.querySelector('.monitor-detail-url')
@@ -3962,7 +3998,7 @@ function ensureMonitorsListKbHint(monitorsList, show) {
     monitorsList.parentNode?.insertBefore(hint, monitorsList);
   }
   hint.textContent =
-    'Click row for details · ↑↓ / j k · PgUp/PgDn · Enter check now · d details · Delete removes · Esc closes/clears';
+    'Click row for details · ↑↓ / j k · PgUp/PgDn · Enter check now · c copy URL · d details · Delete removes · Esc closes/clears';
 }
 
 function wireMonitorsListKeyboard() {
@@ -4008,6 +4044,18 @@ function wireMonitorsListKeyboard() {
     if (e.key === 'd' || e.key === 'D') {
       e.preventDefault();
       toggleMonitorDetail(item);
+      return;
+    }
+
+    // c copies the monitor URL (click-to-copy parity; Top Processes / Agent Ops).
+    if (
+      (e.key === 'c' || e.key === 'C') &&
+      !e.metaKey &&
+      !e.ctrlKey &&
+      !e.altKey
+    ) {
+      e.preventDefault();
+      void copyMonitorUrlFromRow(item);
       return;
     }
 
