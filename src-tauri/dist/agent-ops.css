@@ -1852,6 +1852,71 @@ textarea.ops-agent-editor.is-dirty {
   border-style: dashed;
 }
 
+.logs-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.logs-toolbar .logs-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+  transform: none;
+  opacity: 0.88;
+}
+
+.logs-toolbar .logs-filter-chip:hover {
+  transform: none;
+  opacity: 1;
+}
+
+.logs-toolbar .logs-filter-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 20%, transparent);
+}
+
+.logs-toolbar .logs-filter-chip.is-active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, transparent);
+}
+
+.logs-toolbar .logs-filter-chip[data-logs-filter='error'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 28%, transparent);
+}
+
+.logs-toolbar .logs-filter-chip[data-logs-filter='error'].is-active {
+  background: color-mix(in srgb, #ff3b30 18%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 38%, transparent);
+}
+
+.logs-toolbar .logs-filter-chip[data-logs-filter='warn'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 14%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 30%, transparent);
+}
+
+.logs-toolbar .logs-filter-chip[data-logs-filter='warn'].is-active {
+  background: color-mix(in srgb, #ff9f0a 20%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 40%, transparent);
+}
+
+.logs-filter-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  min-width: 1.1em;
+  text-align: center;
+  opacity: 0.9;
+}
+
 /* External / Monitors — design-review polish (overlays theme cpu.css) */
 .monitors-summary {
   display: flex;

@@ -6271,16 +6271,123 @@ function initPerplexitySection() {
 }
 
 let logsAutoRefreshTimer = null;
+let logsViewerRaw = { prefix: '', body: '', hasContent: false };
+let logsFilterMode = 'all'; // all | error | warn
+
+function logsLineKind(line) {
+  if (/\sERROR\s|\bERROR:|\bpanic\b/i.test(line)) return 'error';
+  if (/\sWARN\s|\bWARN:/i.test(line)) return 'warn';
+  return 'other';
+}
+
+function countLogsByKind(body) {
+  let error = 0;
+  let warn = 0;
+  if (!body) return { error, warn };
+  for (const line of body.split('\n')) {
+    const kind = logsLineKind(line);
+    if (kind === 'error') error += 1;
+    else if (kind === 'warn') warn += 1;
+  }
+  return { error, warn };
+}
+
+function filterLogsBody(body, mode) {
+  if (!body || mode === 'all') return body;
+  const out = [];
+  let keepCont = false;
+  for (const line of body.split('\n')) {
+    const isCont = /^\s/.test(line) && line.trim() !== '';
+    const kind = logsLineKind(line);
+    if (kind === mode) {
+      out.push(line);
+      keepCont = true;
+    } else if (keepCont && isCont) {
+      out.push(line);
+    } else {
+      keepCont = false;
+    }
+  }
+  return out.join('\n');
+}
+
+function ensureLogsFilterChips() {
+  const toolbar = document.querySelector('#logs-content .logs-toolbar') || document.querySelector('.logs-toolbar');
+  if (!toolbar || document.getElementById('logs-filter-chips')) return;
+  const wrap = document.createElement('div');
+  wrap.id = 'logs-filter-chips';
+  wrap.className = 'logs-filter-chips';
+  wrap.setAttribute('role', 'group');
+  wrap.setAttribute('aria-label', 'Log level filter');
+  wrap.innerHTML =
+    '<button type="button" class="logs-filter-chip is-active" data-logs-filter="all" aria-pressed="true" title="Show the full log tail">All</button>' +
+    '<button type="button" class="logs-filter-chip" data-logs-filter="error" aria-pressed="false" title="Show ERROR and panic lines">Error <span class="logs-filter-count" data-logs-filter-count="error">0</span></button>' +
+    '<button type="button" class="logs-filter-chip" data-logs-filter="warn" aria-pressed="false" title="Show WARN lines">Warn <span class="logs-filter-count" data-logs-filter-count="warn">0</span></button>';
+  toolbar.appendChild(wrap);
+  wrap.addEventListener('click', (e) => {
+    const btn = e.target && e.target.closest && e.target.closest('[data-logs-filter]');
+    if (!btn || !wrap.contains(btn)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setLogsFilterMode(btn.getAttribute('data-logs-filter') || 'all');
+  });
+}
+
+function setLogsFilterMode(mode) {
+  const next = mode === 'error' || mode === 'warn' ? mode : 'all';
+  logsFilterMode = next;
+  document.querySelectorAll('#logs-filter-chips [data-logs-filter]').forEach((btn) => {
+    const on = btn.getAttribute('data-logs-filter') === next;
+    btn.classList.toggle('is-active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  applyLogsFilter(true);
+}
+
+function applyLogsFilter(scrollToEnd) {
+  const viewer = document.getElementById('logs-viewer');
+  if (!viewer) return;
+  ensureLogsFilterChips();
+  const { prefix, body, hasContent } = logsViewerRaw;
+  const counts = countLogsByKind(hasContent ? body : '');
+  const errEl = document.querySelector('[data-logs-filter-count="error"]');
+  const warnEl = document.querySelector('[data-logs-filter-count="warn"]');
+  if (errEl) errEl.textContent = String(counts.error);
+  if (warnEl) warnEl.textContent = String(counts.warn);
+  document.querySelectorAll('#logs-filter-chips [data-logs-filter]').forEach((btn) => {
+    const key = btn.getAttribute('data-logs-filter');
+    btn.classList.toggle('has-hits', key === 'error' ? counts.error > 0 : key === 'warn' ? counts.warn > 0 : false);
+  });
+  if (!hasContent) {
+    viewer.textContent = prefix + (body || '(empty log)');
+    viewer.classList.add('is-empty');
+    return;
+  }
+  const filtered = filterLogsBody(body, logsFilterMode);
+  if (logsFilterMode !== 'all' && !filtered.trim()) {
+    const empty =
+      logsFilterMode === 'error'
+        ? 'Nothing here yet — no ERROR lines in this tail'
+        : 'Nothing here yet — no WARN lines in this tail';
+    viewer.textContent = prefix + empty;
+    viewer.classList.add('is-empty');
+  } else {
+    viewer.textContent = prefix + filtered;
+    viewer.classList.remove('is-empty');
+  }
+  if (scrollToEnd) viewer.scrollTop = viewer.scrollHeight;
+}
 
 async function refreshLogsViewer(scrollToEnd = true) {
   const viewer = document.getElementById('logs-viewer');
   const pathHint = document.getElementById('logs-path-hint');
   if (!viewer) return;
   if (!viewer.hasAttribute('tabindex')) viewer.setAttribute('tabindex', '0');
+  ensureLogsFilterChips();
   const inv = getInvoke() || invoke;
   if (!inv) {
-    viewer.textContent = 'App not ready.';
-    viewer.classList.add('is-empty');
+    logsViewerRaw = { prefix: '', body: 'App not ready.', hasContent: false };
+    applyLogsFilter(false);
     return;
   }
   try {
@@ -6297,15 +6404,15 @@ async function refreshLogsViewer(scrollToEnd = true) {
     const prefix = tail.truncated
       ? `… truncated (showing last ~${Math.round((tail.content || '').length / 1024)} KiB of ${Math.round((tail.total_bytes || 0) / 1024)} KiB)\n\n`
       : '';
-    const body = tail.content || '(empty log)';
-    viewer.textContent = prefix + body;
-    viewer.classList.toggle('is-empty', !tail.content);
-    if (scrollToEnd) {
-      viewer.scrollTop = viewer.scrollHeight;
-    }
+    logsViewerRaw = {
+      prefix,
+      body: tail.content || '(empty log)',
+      hasContent: !!tail.content,
+    };
+    applyLogsFilter(scrollToEnd);
   } catch (err) {
-    viewer.textContent = 'Failed to read log: ' + String(err);
-    viewer.classList.add('is-empty');
+    logsViewerRaw = { prefix: '', body: 'Failed to read log: ' + String(err), hasContent: false };
+    applyLogsFilter(false);
   }
 }
 
@@ -7468,6 +7575,8 @@ function initLogsSection() {
   const autoCb = document.getElementById('logs-autorefresh');
   const pathHint = document.getElementById('logs-path-hint');
   if (!header || !content) return;
+
+  ensureLogsFilterChips();
 
   let logsCollapsed = getSectionCollapsed('logs_collapsed');
   const applyCollapsed = () => {

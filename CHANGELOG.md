@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.515] - 2026-08-18
+
+### Added
+- Debug Log **Error / Warn filter chips** — All, Error, and Warn in the toolbar (counts + continuation lines); empty filter says nothing is there yet.
+
 ## [0.1.514] - 2026-08-18
 
 ### Added
