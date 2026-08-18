@@ -571,18 +571,63 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 .ops-overview-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
 }
 
 .ops-overview-head h3 {
   margin: 0;
+  flex: 1;
+  min-width: 0;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.01em;
 }
 
+.ops-overview-head-count {
+  flex-shrink: 0;
+  max-width: 52%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+  color: inherit;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  opacity: 0.78;
+  transition: opacity 0.15s ease, background 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.ops-overview-head-count[hidden] {
+  display: none;
+}
+
+.ops-overview-head-count.is-zero {
+  opacity: 0.42;
+}
+
+.ops-overview-card:hover .ops-overview-head-count {
+  opacity: 0.92;
+}
+
+.ops-overview-card.is-active .ops-overview-head-count {
+  opacity: 1;
+  color: var(--accent, #007aff);
+  background: color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #007aff) 28%, transparent);
+}
+
+.ops-overview-card.is-active .ops-overview-head-count.is-zero {
+  opacity: 0.55;
+}
+
 .ops-overview-link {
+  flex-shrink: 0;
   background: transparent;
   border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
   color: inherit;

@@ -362,6 +362,44 @@ function paintOpsTabCounts(counts) {
     });
 }
 
+/**
+ * Inventory/status pill in an overview card head (tab-count parity).
+ * Keeps the glance number next to the title while rows scroll in the body.
+ * @param {string} cardId
+ * @param {string|null|undefined} text — empty/null hides the pill
+ * @param {{ zero?: boolean }} [opts]
+ */
+function paintOpsOverviewHeadCount(cardId, text, opts) {
+    const card = document.getElementById(cardId);
+    if (!card) return;
+    const head = card.querySelector('.ops-overview-head');
+    if (!head) return;
+    let el = head.querySelector('.ops-overview-head-count');
+    const label = String(text || '').trim();
+    if (!label) {
+        if (el) {
+            el.hidden = true;
+            el.textContent = '';
+            el.removeAttribute('title');
+            el.classList.remove('is-zero');
+        }
+        return;
+    }
+    if (!el) {
+        el = document.createElement('span');
+        el.className = 'ops-overview-head-count';
+        el.setAttribute('aria-hidden', 'true');
+        const link = head.querySelector('.ops-overview-link');
+        if (link) head.insertBefore(el, link);
+        else head.appendChild(el);
+    }
+    el.hidden = false;
+    el.textContent = label;
+    el.title = label;
+    const zero = !!(opts && opts.zero);
+    el.classList.toggle('is-zero', zero);
+}
+
 function ensureOpsKeyboardHint() {
     const tabs = document.querySelector('.agent-ops-tabs');
     if (!tabs || document.getElementById('ops-keyboard-hint')) return;
@@ -369,7 +407,7 @@ function ensureOpsKeyboardHint() {
     hint.id = 'ops-keyboard-hint';
     hint.className = 'ops-row-meta ops-keyboard-hint';
     hint.textContent =
-        'Tips: digits + counts on tabs · filter N/M + Clear · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r refresh · R digest · ?';
+        'Tips: digits + counts on tabs · overview head counts · filter N/M + Clear · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r refresh · R digest · ?';
     tabs.insertAdjacentElement('afterend', hint);
 }
 
@@ -1530,6 +1568,7 @@ function renderOverviewAgents(agents) {
     const rows = Array.isArray(agents) ? agents.slice() : [];
     setOverviewAgentsStatus(rows);
     if (!rows.length) {
+        paintOpsOverviewHeadCount('ops-overview-agents', '0', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
             'No agents yet — add folders under ~/.mac-stats/agents',
             'agents',
@@ -1547,10 +1586,11 @@ function renderOverviewAgents(agents) {
         return String(a.name || '').localeCompare(String(b.name || ''));
     });
     const enabledN = rows.filter((a) => a.enabled).length;
-    const count = document.createElement('div');
-    count.className = 'ops-overview-count';
-    count.textContent = `${enabledN}/${rows.length} on`;
-    body.appendChild(count);
+    paintOpsOverviewHeadCount(
+        'ops-overview-agents',
+        `${enabledN}/${rows.length} on`,
+        { zero: enabledN === 0 }
+    );
     rows.slice(0, 4).forEach((a) => {
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -1622,6 +1662,7 @@ function renderOverviewRuns(insights) {
     const recent = Array.isArray(insights?.recent) ? insights.recent : [];
     setOverviewRunsStatus(insights);
     if (!recent.length) {
+        paintOpsOverviewHeadCount('ops-overview-runs', '0', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
             'No runs yet — turns land after Discord or chat',
             'runs',
@@ -1633,11 +1674,11 @@ function renderOverviewRuns(insights) {
     const okN = Number(insights?.ok_count);
     const failN = Number(insights?.fail_count) || 0;
     const okLabel = Number.isFinite(okN) ? okN : recent.filter((r) => r.ok).length;
-    const count = document.createElement('div');
-    count.className = 'ops-overview-count';
-    count.textContent =
-        failN > 0 ? `${okLabel}/${turns} ok · ${failN} fail` : `${okLabel}/${turns} ok`;
-    body.appendChild(count);
+    paintOpsOverviewHeadCount(
+        'ops-overview-runs',
+        failN > 0 ? `${okLabel}/${turns} ok · ${failN} fail` : `${okLabel}/${turns} ok`,
+        { zero: turns === 0 }
+    );
     recent.slice(0, 3).forEach((r) => {
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -1702,6 +1743,7 @@ function renderOverviewDigest(insights) {
     const staleN = Number(insights?.digest_stale_count) || 0;
     const openLabel = Number.isFinite(openN) ? openN : hints.length;
     if (!hints.length && openLabel === 0) {
+        paintOpsOverviewHeadCount('ops-overview-digest', '0 open', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
             'No open digester candidates — overnight is quiet for now',
             'runs',
@@ -1710,6 +1752,10 @@ function renderOverviewDigest(insights) {
         return;
     }
     if (!hints.length && openLabel > 0) {
+        paintOpsOverviewHeadCount(
+            'ops-overview-digest',
+            staleN > 0 ? `${openLabel} open · ${staleN} stale` : `${openLabel} open`
+        );
         body.innerHTML = opsOverviewEmptyHtml(
             `${openLabel} open in digest — open Runs Insights for the list`,
             'runs',
@@ -1717,13 +1763,11 @@ function renderOverviewDigest(insights) {
         );
         return;
     }
-    const count = document.createElement('div');
-    count.className = 'ops-overview-count';
-    count.textContent =
-        staleN > 0
-            ? `${openLabel} open · ${staleN} stale`
-            : `${openLabel} open`;
-    body.appendChild(count);
+    paintOpsOverviewHeadCount(
+        'ops-overview-digest',
+        staleN > 0 ? `${openLabel} open · ${staleN} stale` : `${openLabel} open`,
+        { zero: openLabel === 0 }
+    );
     hints.slice(0, 4).forEach((text) => {
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -1788,6 +1832,7 @@ function renderOverviewSchedules(schedules, deliveries) {
     body.innerHTML = '';
     setOverviewSchedulesStatus(schedules, deliveries);
     if (!schedules || !schedules.length) {
+        paintOpsOverviewHeadCount('ops-overview-schedules', '0', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
           'No schedules yet — add one on the Schedules tab',
           'schedules',
@@ -1795,10 +1840,11 @@ function renderOverviewSchedules(schedules, deliveries) {
         );
         return;
     }
-    const count = document.createElement('div');
-    count.className = 'ops-overview-count';
-    count.textContent = `${schedules.length} active`;
-    body.appendChild(count);
+    paintOpsOverviewHeadCount(
+        'ops-overview-schedules',
+        `${schedules.length} active`,
+        { zero: false }
+    );
     schedules.slice(0, 3).forEach((s) => {
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -1895,6 +1941,7 @@ function renderOverviewLive(rows, insights) {
     body.innerHTML = '';
     setOverviewLiveStatus(rows, insights);
     if (!rows || !rows.length) {
+        paintOpsOverviewHeadCount('ops-overview-live', '0', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
           'No live sessions — chats appear here while agents run',
           'sessions',
@@ -1902,10 +1949,7 @@ function renderOverviewLive(rows, insights) {
         );
         return;
     }
-    const count = document.createElement('div');
-    count.className = 'ops-overview-count';
-    count.textContent = `${rows.length} live`;
-    body.appendChild(count);
+    paintOpsOverviewHeadCount('ops-overview-live', `${rows.length} live`);
     rows.slice(0, 3).forEach((r) => {
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -1978,6 +2022,7 @@ function renderOverviewKnowledge(files) {
     body.innerHTML = '';
     setOverviewKnowledgeStatus(files);
     if (!files || !files.length) {
+        paintOpsOverviewHeadCount('ops-overview-knowledge', '0', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
           'No knowledge files yet under ~/.mac-stats',
           'memory',
@@ -1986,10 +2031,7 @@ function renderOverviewKnowledge(files) {
         return;
     }
     const sorted = [...files].sort((a, b) => (b.modified_ms || 0) - (a.modified_ms || 0));
-    const count = document.createElement('div');
-    count.className = 'ops-overview-count';
-    count.textContent = `${files.length} files`;
-    body.appendChild(count);
+    paintOpsOverviewHeadCount('ops-overview-knowledge', `${files.length} files`);
     sorted.slice(0, 4).forEach((f) => {
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -2094,6 +2136,7 @@ function renderOverviewRecent(files) {
     body.innerHTML = '';
     setOverviewRecentStatus(files);
     if (!files || !files.length) {
+        paintOpsOverviewHeadCount('ops-overview-recent', '0', { zero: true });
         body.innerHTML = opsOverviewEmptyHtml(
           'No recent chats — session memory shows up here',
           'sessions',
@@ -2101,10 +2144,10 @@ function renderOverviewRecent(files) {
         );
         return;
     }
-    const count = document.createElement('div');
-    count.className = 'ops-overview-count';
-    count.textContent = `${Math.min(5, files.length)} of ${files.length}`;
-    body.appendChild(count);
+    paintOpsOverviewHeadCount(
+        'ops-overview-recent',
+        `${Math.min(5, files.length)} of ${files.length}`
+    );
     files.slice(0, 5).forEach((f) => {
         const btn = document.createElement('button');
         btn.type = 'button';
