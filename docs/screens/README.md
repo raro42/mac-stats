@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-08-18 (~20:00):** Battery / power strip click-to-copy (v0.1.517). Recapture of `feature-cpu-metrics.png` still deferred if Screen Recording TCC / no on-screen CPU window blocks Quartz/`screencapture -l`; prior asset kept; polish grace marked.
 - **2026-08-18 (~05:30):** AI Chat empty-state starter chips (v0.1.514). Recapture of `feature-ai-chat.png` still deferred if Screen Recording TCC / no on-screen CPU window blocks Quartz/`screencapture -l`; prior asset kept; polish grace marked.
 - **2026-08-18 (~05:00):** CPU metrics click-to-copy ring values (v0.1.513). Recapture of `feature-cpu-metrics.png` still deferred if Screen Recording TCC / no on-screen CPU window blocks Quartz/`screencapture -l`; prior asset kept; polish grace marked.
 - **2026-08-18 (~04:30):** Disk Cleanup click-to-copy path (v0.1.512). Recapture of `feature-disk-cleanup.png` still deferred if Screen Recording TCC / no on-screen CPU window blocks Quartz/`screencapture -l`; prior asset kept.

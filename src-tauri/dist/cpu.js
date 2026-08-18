@@ -1421,29 +1421,39 @@ function initRingGauges() {
   });
 }
 
-/** Inject click-to-copy styles for ring metric values (all themes; flash via ::after so refresh can keep updating the number). */
+/** Inject click-to-copy styles for ring metric values + battery/power strip (all themes; flash via ::after so refresh can keep updating the number). */
 function ensureMetricValueCopyStyles() {
   if (document.getElementById('mac-stats-metric-copy-styles')) return;
   const style = document.createElement('style');
   style.id = 'mac-stats-metric-copy-styles';
   style.textContent = `
-    .metric-value[data-metric-copy="1"] {
+    .metric-value[data-metric-copy="1"],
+    .battery-level[data-metric-copy="1"],
+    .power-value[data-metric-copy="1"] {
       cursor: pointer;
       position: relative;
       border-radius: 8px;
       outline: none;
       transition: background-color 0.2s ease, box-shadow 0.2s ease;
     }
-    .metric-value[data-metric-copy="1"]:hover {
+    .metric-value[data-metric-copy="1"]:hover,
+    .battery-level[data-metric-copy="1"]:hover,
+    .power-value[data-metric-copy="1"]:hover {
       background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
     }
-    .metric-value[data-metric-copy="1"]:focus-visible {
+    .metric-value[data-metric-copy="1"]:focus-visible,
+    .battery-level[data-metric-copy="1"]:focus-visible,
+    .power-value[data-metric-copy="1"]:focus-visible {
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
     }
-    .metric-value[data-metric-copy="1"].is-just-copied {
+    .metric-value[data-metric-copy="1"].is-just-copied,
+    .battery-level[data-metric-copy="1"].is-just-copied,
+    .power-value[data-metric-copy="1"].is-just-copied {
       background-color: color-mix(in srgb, var(--accent, #0a84ff) 18%, transparent);
     }
-    .metric-value[data-metric-copy="1"].is-just-copied::after {
+    .metric-value[data-metric-copy="1"].is-just-copied::after,
+    .battery-level[data-metric-copy="1"].is-just-copied::after,
+    .power-value[data-metric-copy="1"].is-just-copied::after {
       content: "Copied";
       position: absolute;
       left: 50%;
@@ -1466,13 +1476,15 @@ function ensureMetricValueCopyStyles() {
 }
 
 /**
- * Normalize ring metric text for clipboard (e.g. "42%", "3.2 GHz", "58°C").
- * Skips empty / em-dash placeholders.
+ * Normalize metric / battery / power text for clipboard (e.g. "42%", "3.2 GHz", "58°C", "12.3 W").
+ * Skips empty / em-dash / N/A / -- placeholders.
  */
 function metricValueCopyText(el) {
   if (!el) return '';
   let raw = (el.textContent || '').replace(/\s+/g, ' ').trim();
   if (!raw || raw === '—' || raw.startsWith('—')) return '';
+  if (/^(N\/A|--|–)$/i.test(raw)) return '';
+  if (/^--\s*W$/i.test(raw) || /^–\s*W$/i.test(raw)) return '';
   // Prefer a space before unit when the unit is a sibling span (GHz / % / °C).
   const unit = el.querySelector?.('.metric-unit');
   if (unit) {
@@ -1505,7 +1517,7 @@ async function copyMetricValueFromUi(el) {
 }
 
 /**
- * Wire ring metric values for click / Enter / Space copy.
+ * Wire ring metric values + battery/power strip for click / Enter / Space copy.
  * Skip CPU % — `#cpu-usage-card` already toggles Details / Top Processes on click;
  * copy+stopPropagation there stole that behavior (v0.1.513).
  */
@@ -1515,6 +1527,8 @@ function wireMetricValueCopy() {
     'gpu-usage-value',
     'frequency-value',
     'temperature-value',
+    'battery-level',
+    'power-value',
   ];
   for (const id of ids) {
     const el = document.getElementById(id);
