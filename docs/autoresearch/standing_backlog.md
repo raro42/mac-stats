@@ -22,7 +22,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 - Debug Log Error / Warn filter chips (All · Error · Warn counts; continuation lines) — **v0.1.515**
 - AI Chat empty-state starter chips (fill composer; Send/Enter; no auto-send) — **v0.1.514**
-- CPU metrics click-to-copy ring values (CPU/GPU % · GHz · °C; Copied overlay) — **v0.1.513**
+- CPU metrics click-to-copy ring values (GPU % · GHz · °C; Copied overlay) — **v0.1.513** (CPU % click restored to Details/Processes toggle in **v0.1.516**)
+
 - Disk Cleanup click-to-copy path (scopes + categories; click / `c`; Copied flash) — **v0.1.512**
 - Monitors `c` copies URL (click-to-copy parity; Top Processes / Agent Ops) — **v0.1.511**
 - Agent Ops `c` copies selected id (list + preview chip; Copied flash) — **v0.1.510**

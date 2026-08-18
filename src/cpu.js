@@ -1504,11 +1504,14 @@ async function copyMetricValueFromUi(el) {
   return true;
 }
 
-/** Wire the four ring metric values for click / Enter / Space copy (Top Processes name parity). */
+/**
+ * Wire ring metric values for click / Enter / Space copy.
+ * Skip CPU % — `#cpu-usage-card` already toggles Details / Top Processes on click;
+ * copy+stopPropagation there stole that behavior (v0.1.513).
+ */
 function wireMetricValueCopy() {
   ensureMetricValueCopyStyles();
   const ids = [
-    'cpu-usage-value',
     'gpu-usage-value',
     'frequency-value',
     'temperature-value',
