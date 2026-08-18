@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Monitors `c` copies URL (click-to-copy parity; Top Processes / Agent Ops) — **v0.1.511**
 - Agent Ops `c` copies selected id (list + preview chip; Copied flash) — **v0.1.510**
 - Top Processes click-to-copy name (list + `c` + details hero) — **v0.1.509**
 - Agent Ops 0 Overview jump — **v0.1.508**
@@ -28,6 +29,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 - Agent Ops filter live N/M match chips — **v0.1.505**
 - Agent Ops Refresh/Updated under health strip — **v0.1.504**
 - Agent Ops tab inventory count pills — **v0.1.503**
+
 - Agent Ops Updated … ago stamp beside Refresh — **v0.1.502**
 - Agent Ops tab digit badges (1–5) — **v0.1.501**
 - Agent Ops overview cards click/keyboard open linked tab — **v0.1.500**

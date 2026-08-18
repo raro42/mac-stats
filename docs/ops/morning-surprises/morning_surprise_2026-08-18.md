@@ -1,11 +1,12 @@
 # Morning surprise — 2026-08-18
 
-Overnight Track B shipped Agent Ops Command Center polish, a Top Processes copy affordance, then Agent Ops keyboard copy-id.
+Overnight Track B shipped Agent Ops Command Center polish, Top Processes name copy, Agent Ops keyboard copy-id, then Monitors keyboard URL copy.
 
 ## Shipped (so far)
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.511** | Monitors **c copies URL** — selected row copies monitor URL (click-to-copy parity; Top Processes / Agent Ops); Copied flash |
 | **v0.1.510** | Agent Ops **c copies id** — selected row or preview chip copies agent slug / session id / schedule id / knowledge path / run request id; Copied flash (Top Processes name-copy parity) |
 | **v0.1.509** | Top Processes **click-to-copy name** — list name or `c` copies the process name (PID / monitor-URL parity); details hero name copies too; Copied flash |
 | **v0.1.508** | Agent Ops **0 Overview** jump: tab-strip control + digit 0 scrolls health/overview into view after 1–5 detail tabs (accent flash) |
@@ -22,10 +23,10 @@ Overnight Track B shipped Agent Ops Command Center polish, a Top Processes copy 
 
 ## Tried / deferred
 
-- Recapture `docs/screens/feature-processes.png` and `feature-agent-ops.png` — no on-screen CPU window for Quartz/`screencapture -l`. Prior assets kept until a permitted shot.
+- Recapture `docs/screens/feature-monitors.png` / `feature-agent-ops.png` / `feature-processes.png` — no on-screen CPU window for Quartz/`screencapture -l`. Prior assets kept until a permitted shot.
 
 ## Digester
 
-- Open = design-review (stale feature-agent-ops ~5.8d). Latency empty after filters. This tick: Agent Ops `c` copy id (chip existed; keyboard users had no `c`).
+- Open = design-review (stale feature-agent-ops ~5.8d; monitors also stale). Latency empty after filters. This tick: rotated off saturated Agent Ops chrome → Monitors `c` copy URL.
 
-Updated: 2026-08-18 ~03:40
+Updated: 2026-08-18 ~04:05
