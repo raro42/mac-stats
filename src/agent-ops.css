@@ -1976,6 +1976,94 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.85;
 }
 
+.monitors-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 4px;
+  padding: 0 2px;
+}
+
+.monitors-filter-chips[hidden] {
+  display: none !important;
+}
+
+.monitors-filter-chip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  opacity: 0.88;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.monitors-filter-chip:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 7%, transparent);
+}
+
+.monitors-filter-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, transparent);
+}
+
+.monitors-filter-chip.is-active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, transparent);
+}
+
+.monitors-filter-chip[data-monitors-filter='down'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 28%, transparent);
+}
+
+.monitors-filter-chip[data-monitors-filter='down'].is-active {
+  background: color-mix(in srgb, #ff3b30 18%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 38%, transparent);
+}
+
+.monitors-filter-chip[data-monitors-filter='up'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+}
+
+.monitors-filter-chip[data-monitors-filter='up'].is-active {
+  background: color-mix(in srgb, #34c759 18%, transparent);
+  border-color: color-mix(in srgb, #34c759 38%, transparent);
+}
+
+.monitors-filter-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  min-width: 1.1em;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.monitors-filter-miss {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 14px 16px;
+}
+
 .monitors-empty-msg {
   font-size: 13px;
   font-weight: 560;

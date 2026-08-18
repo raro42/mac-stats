@@ -2721,6 +2721,8 @@ function updateBatteryPower(cpuDetails) {
 // Monitors Section
 let monitorsCollapsed = true;
 let monitorsUpdateInterval = null;
+/** List filter: all | up | down (Debug Log chip parity). */
+let monitorsFilterMode = 'all';
 
 // Cache for monitor status data (to avoid polling backend when opening settings)
 const monitorStatusCache = new Map(); // Map<monitorId, {is_up, response_time_ms, error, checked_at}>
@@ -2859,6 +2861,7 @@ function initMonitorsSection() {
   wireMonitorRemoveDelegation();
   wireMonitorsListKeyboard();
   wireMonitorsSummaryClick();
+  ensureMonitorsFilterChips();
 
   // Always load monitors to calculate height, even when collapsed
   loadMonitors().then(() => {
@@ -3465,6 +3468,128 @@ async function openMonitorsAddFlow() {
   });
 }
 
+/** Visible monitor rows after All / Up / Down filter. */
+function visibleMonitorItems(monitorsList) {
+  if (!monitorsList) return [];
+  return Array.from(monitorsList.querySelectorAll('.monitor-item')).filter(
+    (el) => el.style.display !== 'none'
+  );
+}
+
+/** All / Up / Down chips (Debug Log filter parity). */
+function ensureMonitorsFilterChips() {
+  const content = document.getElementById('monitors-content');
+  const summary = document.getElementById('monitors-summary');
+  if (!content || !summary) return;
+  if (document.getElementById('monitors-filter-chips')) return;
+  const wrap = document.createElement('div');
+  wrap.id = 'monitors-filter-chips';
+  wrap.className = 'monitors-filter-chips';
+  wrap.setAttribute('role', 'group');
+  wrap.setAttribute('aria-label', 'Monitor status filter');
+  wrap.hidden = true;
+  wrap.innerHTML =
+    '<button type="button" class="monitors-filter-chip is-active" data-monitors-filter="all" aria-pressed="true" title="Show every monitor">All</button>' +
+    '<button type="button" class="monitors-filter-chip" data-monitors-filter="up" aria-pressed="false" title="Show UP sites only">Up <span class="monitors-filter-count" data-monitors-filter-count="up">0</span></button>' +
+    '<button type="button" class="monitors-filter-chip" data-monitors-filter="down" aria-pressed="false" title="Show DOWN sites only">Down <span class="monitors-filter-count" data-monitors-filter-count="down">0</span></button>';
+  summary.insertAdjacentElement('afterend', wrap);
+  wrap.addEventListener('click', (e) => {
+    const btn = e.target && e.target.closest && e.target.closest('[data-monitors-filter]');
+    if (!btn || !wrap.contains(btn)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setMonitorsFilterMode(btn.getAttribute('data-monitors-filter') || 'all');
+  });
+}
+
+function setMonitorsFilterMode(mode) {
+  const next = mode === 'up' || mode === 'down' ? mode : 'all';
+  monitorsFilterMode = next;
+  document.querySelectorAll('#monitors-filter-chips [data-monitors-filter]').forEach((btn) => {
+    const on = btn.getAttribute('data-monitors-filter') === next;
+    btn.classList.toggle('is-active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  applyMonitorsListFilter();
+}
+
+function ensureMonitorsFilterMissState(monitorsList, show) {
+  if (!monitorsList) return;
+  const existing = monitorsList.querySelector('.monitors-filter-miss');
+  if (!show) {
+    existing?.remove();
+    return;
+  }
+  let wrap = existing;
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.className = 'monitors-empty monitors-filter-miss';
+    wrap.setAttribute('role', 'status');
+    wrap.innerHTML =
+      `<div class="monitors-empty-msg">Nothing matches this filter</div>` +
+      `<div class="monitors-empty-hint">Try All, or clear the status filter.</div>` +
+      `<button type="button" class="monitors-empty-cta monitors-clear-filter">Clear filter</button>`;
+    monitorsList.appendChild(wrap);
+    wrap.querySelector('.monitors-clear-filter')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setMonitorsFilterMode('all');
+    });
+  }
+}
+
+function applyMonitorsListFilter() {
+  ensureMonitorsFilterChips();
+  const chips = document.getElementById('monitors-filter-chips');
+  const monitorsList = document.getElementById('monitors-list');
+  if (!monitorsList) return;
+
+  const items = Array.from(monitorsList.querySelectorAll('.monitor-item'));
+  const trueEmpty = !!monitorsList.querySelector('.monitors-list-empty');
+  if (chips) chips.hidden = trueEmpty || items.length === 0;
+
+  let upCount = 0;
+  let downCount = 0;
+  items.forEach((el) => {
+    if (el.classList.contains('is-down')) downCount++;
+    else if (!el.classList.contains('is-pending')) upCount++;
+  });
+
+  const upEl = document.querySelector('[data-monitors-filter-count="up"]');
+  const downEl = document.querySelector('[data-monitors-filter-count="down"]');
+  if (upEl) upEl.textContent = String(upCount);
+  if (downEl) downEl.textContent = String(downCount);
+  document.querySelectorAll('#monitors-filter-chips [data-monitors-filter]').forEach((btn) => {
+    const key = btn.getAttribute('data-monitors-filter');
+    btn.classList.toggle(
+      'has-hits',
+      key === 'up' ? upCount > 0 : key === 'down' ? downCount > 0 : false
+    );
+  });
+
+  if (trueEmpty || items.length === 0) {
+    ensureMonitorsFilterMissState(monitorsList, false);
+    updateMonitorsHeight();
+    return;
+  }
+
+  let visible = 0;
+  items.forEach((el) => {
+    const isDown = el.classList.contains('is-down');
+    const isPending = el.classList.contains('is-pending');
+    let show = true;
+    if (monitorsFilterMode === 'down') show = isDown;
+    else if (monitorsFilterMode === 'up') show = !isDown && !isPending;
+    el.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  ensureMonitorsFilterMissState(monitorsList, visible === 0);
+  ensureMonitorsListKbHint(monitorsList, visible > 0);
+  syncMonitorsListTabOrder(monitorsList);
+  updateMonitorsHeight();
+}
+
 /** Empty list: title + Add a monitor CTA (Agent Ops overview empty parity). */
 function ensureMonitorsListEmptyState(monitorsList, empty) {
   if (!monitorsList) return;
@@ -3474,6 +3599,7 @@ function ensureMonitorsListEmptyState(monitorsList, empty) {
     return;
   }
   monitorsList.querySelectorAll('.monitor-item').forEach((el) => el.remove());
+  ensureMonitorsFilterMissState(monitorsList, false);
   ensureMonitorsListKbHint(monitorsList, false);
   let wrap = existing;
   if (!wrap) {
@@ -3491,6 +3617,7 @@ function ensureMonitorsListEmptyState(monitorsList, empty) {
       void openMonitorsAddFlow();
     });
   }
+  applyMonitorsListFilter();
 }
 
 /** Summary click / Enter / Space → Add (empty) or first DOWN / first row. */
@@ -3507,8 +3634,9 @@ function wireMonitorsSummaryClick() {
     }
     const list = document.getElementById('monitors-list');
     if (!list) return;
-    const down = list.querySelector('.monitor-item.is-down');
-    const first = down || list.querySelector('.monitor-item');
+    const visible = visibleMonitorItems(list);
+    const down = visible.find((el) => el.classList.contains('is-down'));
+    const first = down || visible[0];
     if (!first) {
       void openMonitorsAddFlow();
       return;
@@ -4235,6 +4363,7 @@ async function loadMonitors() {
     updateMonitorsIconStatus({ anyDown, allUp, upCount, totalCount: monitorIds.length });
 
     sortMonitorsListByHealth(monitorsList);
+    applyMonitorsListFilter();
     syncMonitorsListTabOrder(monitorsList);
 
     // Update height after loading monitors
@@ -4250,11 +4379,15 @@ function updateMonitorsHeight() {
   const monitorsContent = document.getElementById('monitors-content');
   if (!monitorsList || !monitorsContent) return;
   
-  // Calculate height needed: summary + each monitor item (+ open detail panels)
-  const monitorItems = monitorsList.querySelectorAll('.monitor-item');
-  const emptyEl = monitorsList.querySelector('.monitors-list-empty');
+  // Calculate height needed: summary + filter chips + each visible monitor item
+  const monitorItems = visibleMonitorItems(monitorsList);
+  const emptyEl =
+    monitorsList.querySelector('.monitors-list-empty') ||
+    monitorsList.querySelector('.monitors-filter-miss');
+  const chips = document.getElementById('monitors-filter-chips');
   const itemHeight = 52; // row + down-meta / error lines
   const summaryHeight = 40;
+  const chipsHeight = chips && !chips.hidden ? 36 : 0;
   const listMargin = 12;
   let openDetailExtra = 0;
   monitorItems.forEach((el) => {
@@ -4276,6 +4409,7 @@ function updateMonitorsHeight() {
   const emptyHeight = emptyEl ? 110 : 0;
   const totalHeight =
     summaryHeight +
+    chipsHeight +
     (monitorItems.length > 0
       ? listMargin + monitorItems.length * itemHeight + openDetailExtra
       : emptyHeight
@@ -4360,7 +4494,7 @@ function sortMonitorsListByHealth(monitorsList) {
 /** Roving tabindex for External / Monitors rows (process-list parity). */
 function syncMonitorsListTabOrder(monitorsList, preferId) {
   if (!monitorsList) return;
-  const items = Array.from(monitorsList.querySelectorAll('.monitor-item'));
+  const items = visibleMonitorItems(monitorsList);
   if (items.length === 0) return;
   let activeIdx = 0;
   if (preferId) {
@@ -4374,6 +4508,13 @@ function syncMonitorsListTabOrder(monitorsList, preferId) {
       if (selected >= 0) activeIdx = selected;
     }
   }
+  // Clear selection on hidden rows so filter does not leave a ghost highlight.
+  monitorsList.querySelectorAll('.monitor-item').forEach((el) => {
+    if (el.style.display === 'none') {
+      el.classList.remove('is-selected');
+      el.setAttribute('tabindex', '-1');
+    }
+  });
   items.forEach((el, i) => {
     el.setAttribute('tabindex', i === activeIdx ? '0' : '-1');
     el.classList.toggle('is-selected', i === activeIdx);
@@ -4424,7 +4565,7 @@ function ensureMonitorsListKbHint(monitorsList, show) {
     monitorsList.parentNode?.insertBefore(hint, monitorsList);
   }
   hint.textContent =
-    'Click row for details · ↑↓ / j k · PgUp/PgDn · Enter check now · c copy URL · d details · Delete removes · Esc closes/clears';
+    'All · Up · Down filters · click row for details · ↑↓ / j k · PgUp/PgDn · Enter check now · c copy URL · d details · Delete removes · Esc closes/clears';
 }
 
 function wireMonitorsListKeyboard() {
@@ -4455,7 +4596,8 @@ function wireMonitorsListKeyboard() {
   monitorsList.addEventListener('keydown', (e) => {
     const item = e.target && e.target.closest && e.target.closest('.monitor-item');
     if (!item || !monitorsList.contains(item)) return;
-    const items = Array.from(monitorsList.querySelectorAll('.monitor-item'));
+    if (item.style.display === 'none') return;
+    const items = visibleMonitorItems(monitorsList);
     const idx = items.indexOf(item);
     if (idx < 0) return;
 
@@ -4585,6 +4727,7 @@ async function forceCheckMonitorNow(monitorId, itemEl) {
     await updateMonitorsSummary();
     const list = document.getElementById('monitors-list');
     sortMonitorsListByHealth(list);
+    applyMonitorsListFilter();
     syncMonitorsListTabOrder(list, monitorId);
     updateMonitorsHeight();
   } catch (err) {
