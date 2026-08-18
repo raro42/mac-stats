@@ -1,11 +1,12 @@
 # Morning surprise — 2026-08-18
 
-Overnight Track B shipped Agent Ops Command Center polish, then a Top Processes copy affordance.
+Overnight Track B shipped Agent Ops Command Center polish, a Top Processes copy affordance, then Agent Ops keyboard copy-id.
 
 ## Shipped (so far)
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.510** | Agent Ops **c copies id** — selected row or preview chip copies agent slug / session id / schedule id / knowledge path / run request id; Copied flash (Top Processes name-copy parity) |
 | **v0.1.509** | Top Processes **click-to-copy name** — list name or `c` copies the process name (PID / monitor-URL parity); details hero name copies too; Copied flash |
 | **v0.1.508** | Agent Ops **0 Overview** jump: tab-strip control + digit 0 scrolls health/overview into view after 1–5 detail tabs (accent flash) |
 | **v0.1.507** | Agent Ops overview cards: glass **head count pills** (tab-count parity; inventory stays next to the title) |
@@ -25,6 +26,6 @@ Overnight Track B shipped Agent Ops Command Center polish, then a Top Processes 
 
 ## Digester
 
-- Open = design-review (stale feature-agent-ops ~5.8d). Latency empty after filters. This tick rotated to Top Processes (Agent Ops chrome saturating).
+- Open = design-review (stale feature-agent-ops ~5.8d). Latency empty after filters. This tick: Agent Ops `c` copy id (chip existed; keyboard users had no `c`).
 
-Updated: 2026-08-18 ~03:15
+Updated: 2026-08-18 ~03:40
