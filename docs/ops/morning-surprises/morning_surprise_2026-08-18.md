@@ -6,6 +6,7 @@ Overnight Track B shipped Agent Ops Command Center polish.
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.507** | Agent Ops overview cards: glass **head count pills** (tab-count parity; inventory stays next to the title) |
 | **v0.1.506** | Agent Ops list filters: glass **Clear** beside the N/M chip when a query is active (Esc parity; works when matches still show) |
 | **v0.1.505** | Agent Ops list filters: live **N/M** match chip beside search (Sessions + Schedules combined; ok / partial / zero wash) |
 | **v0.1.504** | Agent Ops **Refresh / Updated** under the health strip (stays in view with overview) |
@@ -24,4 +25,4 @@ Overnight Track B shipped Agent Ops Command Center polish.
 
 - Open = design-review (stale feature-agent-ops ~5.7d). Latency empty after filters.
 
-Updated: 2026-08-18 ~01:52
+Updated: 2026-08-18 ~02:15
