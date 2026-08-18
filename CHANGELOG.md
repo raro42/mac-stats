@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.510] - 2026-08-18
+
+### Added
+- Agent Ops **c copies id** — press `c` on a selected list row (or when the preview copy chip is showing) to copy agent slug, session id, schedule id, knowledge path, or run request id; the row flashes Copied (the chip still flashes when a preview is open). Top Processes name-copy parity.
+
 ## [0.1.509] - 2026-08-18
 
 ### Added

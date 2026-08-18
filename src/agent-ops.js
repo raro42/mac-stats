@@ -454,13 +454,16 @@ function paintOpsOverviewHeadCount(cardId, text, opts) {
 
 function ensureOpsKeyboardHint() {
     const tabs = document.querySelector('.agent-ops-tabs');
-    if (!tabs || document.getElementById('ops-keyboard-hint')) return;
-    const hint = document.createElement('div');
-    hint.id = 'ops-keyboard-hint';
-    hint.className = 'ops-row-meta ops-keyboard-hint';
+    if (!tabs) return;
+    let hint = document.getElementById('ops-keyboard-hint');
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'ops-keyboard-hint';
+        hint.className = 'ops-row-meta ops-keyboard-hint';
+        tabs.insertAdjacentElement('afterend', hint);
+    }
     hint.textContent =
-        'Tips: 0 overview · digits + counts on tabs · overview head counts · filter N/M + Clear · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · / Esc · r refresh · R digest · ?';
-    tabs.insertAdjacentElement('afterend', hint);
+        'Tips: 0 overview · digits + counts on tabs · overview head counts · filter N/M + Clear · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · c copy id · / Esc · r refresh · R digest · ?';
 }
 
 /** Hermes-style: ? flashes the keyboard tips row when not typing. */
@@ -714,6 +717,9 @@ function setupAgentOps() {
             }
             if (!e.metaKey && !e.ctrlKey && !e.altKey && (e.key === 'j' || e.key === 'k')) {
                 if (tryOpsArrowMoveSelection(e)) return;
+            }
+            if (!e.metaKey && !e.ctrlKey && !e.altKey && (e.key === 'c' || e.key === 'C')) {
+                if (tryOpsCopySelected(e)) return;
             }
             if (e.key === '?' && !e.metaKey && !e.ctrlKey && !e.altKey) {
                 if (agentOpsCollapsed) return;
@@ -2468,7 +2474,7 @@ function setOpsScheduleCopyChip(copyValue) {
     }
     el.hidden = false;
     el.dataset.copyValue = value;
-    el.title = 'Click to copy schedule id';
+    el.title = 'Click to copy schedule id (c)';
     el.setAttribute('aria-label', `Copy ${value}`);
     if (!el.classList.contains('is-just-saved')) {
         el.textContent = value;
@@ -2528,7 +2534,8 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 const next = s.next_run || s.nextRun || '—';
                 const task = String(s.task || '');
                 btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(id)}</div><div class="ops-row-meta">${escapeHtml(when)} · next ${escapeHtml(next)}</div><div class="ops-row-meta">${escapeHtml(task.slice(0, 80))}${task.length > 80 ? '…' : ''}</div></div>`;
-                btn.title = 'Click to preview · Enter / double-click to load task into AI Chat';
+                setOpsRowCopyValue(btn, s.id);
+                btn.title = 'Click to preview · c copies id · Enter / double-click to load task into AI Chat';
                 const openPreview = () => {
                     list.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
                     delList?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
@@ -2564,7 +2571,8 @@ function renderOpsSchedulesTab(schedules, deliveries) {
                 const age = !Number.isNaN(t) ? fmtAge(t) : d.utc || '';
                 const summary = String(d.summary || '');
                 btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(d.schedule_id || 'schedule')}</div><div class="ops-row-meta">${escapeHtml(age)} · ${escapeHtml(summary.slice(0, 72))}${summary.length > 72 ? '…' : ''}</div></div>`;
-                btn.title = 'Click to preview · Enter / double-click to load summary into AI Chat';
+                setOpsRowCopyValue(btn, d.schedule_id);
+                btn.title = 'Click to preview · c copies id · Enter / double-click to load summary into AI Chat';
                 const openPreview = () => {
                     delList.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
                     list?.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
@@ -2795,6 +2803,7 @@ function renderOpsAgents(agents) {
         btn.className = 'ops-row';
         const slug = a.slug || a.id;
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(a.name)} <span class="ops-row-meta">· ${escapeHtml(slug)}</span></div><div class="ops-row-meta">${escapeHtml(a.model || 'default model')}${a.orchestrator ? ' · orchestrator' : ''}</div></div><span class="ops-badge ${a.enabled ? '' : 'off'}">${a.enabled ? 'on' : 'off'}</span>`;
+        setOpsRowCopyValue(btn, slug);
         btn.addEventListener('click', () => {
             list.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
@@ -2808,7 +2817,7 @@ function renderOpsAgents(agents) {
             await openOpsAgent(a.id);
             loadOpsAgentIntoChat();
         });
-        btn.title = 'Open agent · Enter / double-click to load soul/skill/mood into AI Chat';
+        btn.title = 'Open agent · c copies id · Enter / double-click to load soul/skill/mood into AI Chat';
         list.appendChild(btn);
     });
     paintOpsFilterMatch('ops-agents-filter', all.length, filtered.length, opsAgentsFilterQ);
@@ -3378,6 +3387,89 @@ function tryOpsArrowMoveSelection(e) {
     return true;
 }
 
+const OPS_COPY_CHIP_BY_TAB = {
+    agents: 'ops-agent-copy-chip',
+    sessions: 'ops-session-copy-chip',
+    schedules: 'ops-schedule-copy-chip',
+    memory: 'ops-memory-copy-chip',
+    runs: 'ops-runs-copy-chip',
+};
+
+function setOpsRowCopyValue(btn, value) {
+    if (!btn) return;
+    const v = String(value || '').trim();
+    if (!v || v === '—' || v === '(no id)') {
+        delete btn.dataset.copyValue;
+        return;
+    }
+    btn.dataset.copyValue = v;
+}
+
+function flashOpsRowCopied(row) {
+    if (!row) return;
+    document.querySelectorAll('.ops-row.is-copied').forEach((el) => {
+        if (el === row) return;
+        el.classList.remove('is-copied');
+        if (el._opsCopiedTimer) {
+            clearTimeout(el._opsCopiedTimer);
+            el._opsCopiedTimer = null;
+        }
+    });
+    row.classList.add('is-copied');
+    if (row._opsCopiedTimer) clearTimeout(row._opsCopiedTimer);
+    row._opsCopiedTimer = setTimeout(() => {
+        row.classList.remove('is-copied');
+        row._opsCopiedTimer = null;
+    }, 1600);
+}
+
+function activeOpsPanelEl() {
+    const panelIdByTab = {
+        agents: 'ops-panel-agents',
+        sessions: 'ops-panel-sessions',
+        schedules: 'ops-panel-schedules',
+        memory: 'ops-panel-memory',
+        runs: 'ops-panel-runs',
+    };
+    return document.getElementById(panelIdByTab[opsActiveTab] || '');
+}
+
+/** c copies selected/previewed id (Top Processes name-copy parity). */
+function tryOpsCopySelected(e) {
+    if (agentOpsCollapsed) return false;
+    if (e.metaKey || e.ctrlKey || e.altKey) return false;
+    const t = e.target;
+    const tag = (t && t.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return false;
+    if (!document.getElementById('agent-ops') && !document.querySelector('.agent-ops-tabs')) {
+        return false;
+    }
+    const chip = document.getElementById(OPS_COPY_CHIP_BY_TAB[opsActiveTab] || '');
+    const chipValue = String(chip?.dataset?.copyValue || '').trim();
+    if (chip && !chip.hidden && chipValue) {
+        e.preventDefault();
+        chip.click();
+        flashOpsRowCopied(activeOpsPanelEl()?.querySelector('.ops-row.is-selected'));
+        return true;
+    }
+    const panel = activeOpsPanelEl();
+    if (!panel || !panel.classList.contains('active')) return false;
+    let row = panel.querySelector('.ops-row.is-selected');
+    if (!row && t?.closest) {
+        const maybe = t.closest('.ops-row');
+        if (maybe && panel.contains(maybe)) row = maybe;
+    }
+    const value = String(row?.dataset?.copyValue || '').trim();
+    if (!value) return false;
+    e.preventDefault();
+    void (async () => {
+        const ok = await copyOpsTextToClipboard(value);
+        if (!ok) return;
+        flashOpsRowCopied(row);
+    })();
+    return true;
+}
+
 async function copyOpsTextToClipboard(text) {
     if (typeof copyTextToClipboard === 'function') {
         return copyTextToClipboard(text);
@@ -3467,7 +3559,7 @@ function setOpsAgentCopyChip(copyValue) {
     }
     el.hidden = false;
     el.dataset.copyValue = value;
-    el.title = 'Click to copy agent id';
+    el.title = 'Click to copy agent id (c)';
     el.setAttribute('aria-label', `Copy ${value}`);
     if (!el.classList.contains('is-just-saved')) {
         el.textContent = value;
@@ -3693,7 +3785,7 @@ function setOpsMemoryCopyChip(copyValue) {
     }
     el.hidden = false;
     el.dataset.copyValue = value;
-    el.title = 'Click to copy path';
+    el.title = 'Click to copy path (c)';
     el.setAttribute('aria-label', `Copy ${value}`);
     if (!el.classList.contains('is-just-saved')) {
         el.textContent = value;
@@ -3879,7 +3971,7 @@ function setOpsSessionCopyChip(copyValue) {
     }
     el.hidden = false;
     el.dataset.copyValue = value;
-    el.title = 'Click to copy';
+    el.title = 'Click to copy (c)';
     el.setAttribute('aria-label', `Copy ${value}`);
     if (!el.classList.contains('is-just-saved')) {
         el.textContent = value;
@@ -3996,6 +4088,7 @@ function renderOpsLive(rows) {
         btn.type = 'button';
         btn.className = 'ops-row';
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.source)} · ${r.session_id}</div><div class="ops-row-meta">${r.message_count} msgs · ${escapeHtml(r.last_activity)}${r.preview ? ` · ${escapeHtml(r.preview)}` : ''}</div></div>`;
+        setOpsRowCopyValue(btn, r.session_id);
         const openLive = async () => {
             try {
                 const msgs = await invoke('read_live_session_messages', {
@@ -4015,7 +4108,7 @@ function renderOpsLive(rows) {
             await openLive();
             loadOpsSessionIntoChat();
         });
-        btn.title = 'Click to preview · Enter / double-click to load into AI Chat';
+        btn.title = 'Click to preview · c copies id · Enter / double-click to load into AI Chat';
         el.appendChild(btn);
     });
     paintOpsSessionFilterFromCaches();
@@ -4055,6 +4148,7 @@ function renderOpsSessionFiles(files) {
         btn.type = 'button';
         btn.className = 'ops-row';
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.slug || f.name)}</div><div class="ops-row-meta">${escapeHtml(f.source_hint)} · ${fmtBytes(f.size_bytes)} · ${fmtAge(f.modified_ms)}${f.preview ? ` · ${escapeHtml(f.preview)}` : ''}</div></div>`;
+        setOpsRowCopyValue(btn, f.slug || f.name);
         const openFile = async () => {
             try {
                 const copyId = f.slug || f.name || '';
@@ -4087,7 +4181,7 @@ function renderOpsSessionFiles(files) {
             await openFile();
             loadOpsSessionIntoChat();
         });
-        btn.title = 'Click to preview · Enter / double-click to load into AI Chat';
+        btn.title = 'Click to preview · c copies id · Enter / double-click to load into AI Chat';
         el.appendChild(btn);
     });
     paintOpsSessionFilterFromCaches();
@@ -4124,6 +4218,7 @@ function renderOpsMemory(files) {
         btn.type = 'button';
         btn.className = 'ops-row';
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(f.name)}</div><div class="ops-row-meta">${escapeHtml(f.kind)} · ${f.line_count} lines · ${fmtBytes(f.size_bytes)}</div></div>`;
+        setOpsRowCopyValue(btn, f.path || f.name);
         const openFile = async () => {
             document
                 .querySelectorAll('#ops-memory-list .ops-row.is-selected')
@@ -4164,7 +4259,7 @@ function renderOpsMemory(files) {
             await openFile();
             loadOpsMemoryIntoChat();
         });
-        btn.title = 'Click to preview · Enter / double-click to load into AI Chat';
+        btn.title = 'Click to preview · c copies path · Enter / double-click to load into AI Chat';
         el.appendChild(btn);
     });
     paintOpsFilterMatch('ops-memory-filter', all.length, filtered.length, opsMemoryFilterQ);
@@ -4248,7 +4343,7 @@ function setOpsRunsCopyChip(copyValue) {
     }
     el.hidden = false;
     el.dataset.copyValue = value;
-    el.title = 'Click to copy request id';
+    el.title = 'Click to copy request id (c)';
     el.setAttribute('aria-label', `Copy ${value}`);
     if (!el.classList.contains('is-just-saved')) {
         el.textContent = value;
@@ -4684,8 +4779,9 @@ function renderOpsRuns(insights) {
         const rid = String(r?.request_id || '').trim();
         if (rid) btn.dataset.requestId = rid;
         btn.dataset.questionPreview = String(r?.question_preview || '');
+        setOpsRowCopyValue(btn, rid);
         btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(r.question_preview || '(empty)')}</div><div class="ops-row-meta">${escapeHtml(r.lane)} · ${r.wall_ms} ms · ${escapeHtml(toolsJoined)}${r.ok ? '' : ' · FAIL'}</div></div>`;
-        btn.title = 'Click to preview · Enter / double-click to load question into AI Chat';
+        btn.title = 'Click to preview · c copies id · Enter / double-click to load question into AI Chat';
         const openPreview = () => {
             document
                 .getElementById('ops-runs-insights')
