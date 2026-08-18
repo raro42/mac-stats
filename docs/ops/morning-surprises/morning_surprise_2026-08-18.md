@@ -1,11 +1,12 @@
 # Morning surprise — 2026-08-18
 
-Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL, Disk Cleanup path copy, then CPU metrics ring-value copy so live numbers paste into Discord / notes without retyping.
+Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL, Disk Cleanup path copy, CPU metrics ring-value copy, then AI Chat empty-state starter chips so a blank chat has a visible first step.
 
 ## Shipped (so far)
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.514** | AI Chat empty-state **starter chips** — click a prompt to fill the composer, then Send or Enter (Load into AI Chat parity; no auto-send) |
 | **v0.1.513** | CPU metrics **click-to-copy value** — click (or Enter/Space) a ring value (CPU %, GPU %, frequency, temperature) to copy; Copied overlay so live refresh keeps updating the number |
 | **v0.1.512** | Disk Cleanup **click-to-copy path** — scope or category path copies on click or `c` (Top Processes / Monitors / Agent Ops parity); Copied flash |
 | **v0.1.511** | Monitors **c copies URL** — selected row copies monitor URL (click-to-copy parity; Top Processes / Agent Ops); Copied flash |
@@ -25,10 +26,10 @@ Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL
 
 ## Tried / deferred
 
-- Recapture `docs/screens/feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` / `feature-monitors.png` — no on-screen CPU window for Quartz/`screencapture -l` (or Screen Recording TCC). Prior assets kept until a permitted shot. CPU-metrics polish grace marked.
+- Recapture `docs/screens/feature-ai-chat.png` / `feature-cpu-metrics.png` / `feature-agent-ops.png` / `feature-disk-cleanup.png` / `feature-monitors.png` — no on-screen CPU window for Quartz/`screencapture -l` (or Screen Recording TCC). Prior assets kept until a permitted shot. AI-chat polish grace marked.
 
 ## Digester
 
-- Open = design-review (stale feature-agent-ops ~5.8d; cpu-metrics also stale). Latency empty after filters. This tick: rotated to stale CPU metrics surface — click-to-copy ring values.
+- Open = design-review (stale feature-agent-ops ~5.9d). Latency empty after filters. This tick: rotated to AI Chat empty state — starter chips fill the composer.
 
-Updated: 2026-08-18 ~05:00
+Updated: 2026-08-18 ~05:30
