@@ -122,16 +122,67 @@
   }
 
   /** True-empty state on a list tab (already on the surface — title + short hint). */
-  function opsTabEmptyHtml(title, hint) {
+  function opsTabEmptyHtml(title, hint, cta) {
     const hintHtml = hint
       ? `<div class="ops-empty-tab-hint">${escapeHtml(hint)}</div>`
       : '';
+    let ctaHtml = '';
+    if (cta && cta.action === 'ai-chat') {
+      const label = cta.label || 'Open AI Chat';
+      ctaHtml =
+        `<button type="button" class="ops-clear-filter" data-ops-open-ai-chat="1">${escapeHtml(label)}</button>`;
+    }
+    const extra = ctaHtml ? ' ops-empty-filter-miss' : '';
     return (
-      `<div class="ops-empty ops-empty-tab">` +
+      `<div class="ops-empty ops-empty-tab${extra}">` +
       `<div class="ops-empty-filter-msg">${escapeHtml(title)}</div>` +
       hintHtml +
+      ctaHtml +
       `</div>`
     );
+  }
+
+  /** Empty Live / session / Runs CTA — expand AI Chat (Monitors empty Add parity). */
+  function openOpsAiChat() {
+    const input = document.getElementById('chat-input');
+    const section = document.querySelector('.ollama-section');
+    if (!input || !section || section.style.display === 'none') {
+      return false;
+    }
+    applyOpsCollapsed(true);
+    if (typeof window.setSectionCollapsed === 'function') {
+      window.setSectionCollapsed('ollama_collapsed', false);
+    } else {
+      try {
+        localStorage.setItem('ollama_collapsed', 'false');
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    const content = document.getElementById('ollama-content');
+    const collapsed =
+      section.classList.contains('collapsed') ||
+      content?.classList.contains('collapsed') ||
+      content?.style.display === 'none';
+    if (collapsed) {
+      document.getElementById('ollama-header')?.click();
+    }
+    if (content) {
+      content.classList.remove('collapsed');
+      if (content.style.display === 'none') content.style.display = '';
+    }
+    section.classList.remove('collapsed');
+    const collapseBtn = document.getElementById('ollama-collapse-btn');
+    if (collapseBtn) collapseBtn.textContent = '−';
+    try {
+      section.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+    } catch (_) {
+      section.scrollIntoView?.(true);
+    }
+    setTimeout(() => {
+      input.focus();
+    }, 80);
+    return true;
   }
 
   function clearOpsFilter(kind) {
@@ -583,6 +634,10 @@ function setupAgentOps() {
         if (!btn || !opsRoot.contains(btn)) return;
         e.preventDefault();
         e.stopPropagation();
+        if (btn.dataset.opsOpenAiChat) {
+          openOpsAiChat();
+          return;
+        }
         const gotoTab = btn.dataset.opsGotoTab || '';
         if (gotoTab) {
           if (agentOpsCollapsed) applyOpsCollapsed(false);
@@ -4073,7 +4128,8 @@ function renderOpsLive(rows) {
     if (!all.length) {
         el.innerHTML = opsTabEmptyHtml(
           'No live sessions',
-          'In-memory chats appear here while agents run'
+          'A chat appears here while an agent runs',
+          { action: 'ai-chat', label: 'Open AI Chat' }
         );
         paintOpsSessionFilterFromCaches();
         return;
@@ -4133,7 +4189,8 @@ function renderOpsSessionFiles(files) {
     if (!all.length) {
         el.innerHTML = opsTabEmptyHtml(
           'No saved session files',
-          'session-memory-*.md appears after Discord chats land on disk'
+          'session-memory-*.md appears after Discord chats land on disk',
+          { action: 'ai-chat', label: 'Open AI Chat' }
         );
         paintOpsSessionFilterFromCaches();
         return;
@@ -4673,14 +4730,17 @@ function renderOpsRuns(insights) {
             digestMeta.textContent = `Digest: ${insights.digest_open_count ?? 0} open · ${insights.digest_stale_count ?? 0} stale${insights.digest_source ? ` · ${insights.digest_source}` : ''}`;
             card.appendChild(digestMeta);
             const empty = document.createElement('div');
-            empty.className = 'ops-empty ops-empty-compact ops-empty-tab';
-            empty.textContent =
-                'No runs yet — turns land in ~/.mac-stats/runs.jsonl after Discord or chat';
+            empty.className = 'ops-empty ops-empty-compact ops-empty-tab ops-empty-filter-miss';
+            empty.innerHTML =
+                `<div class="ops-empty-filter-msg">No runs yet</div>` +
+                `<div class="ops-empty-tab-hint">Turns land after Discord or chat</div>` +
+                `<button type="button" class="ops-clear-filter" data-ops-open-ai-chat="1">Open AI Chat</button>`;
             card.appendChild(empty);
         } else {
             el.innerHTML = opsTabEmptyHtml(
               'No runs yet',
-              'Turns land in ~/.mac-stats/runs.jsonl after Discord or chat'
+              'Turns land in ~/.mac-stats/runs.jsonl after Discord or chat',
+              { action: 'ai-chat', label: 'Open AI Chat' }
             );
         }
         paintOpsFilterMatch('ops-runs-filter', 0, 0, opsRunsFilterQ);
