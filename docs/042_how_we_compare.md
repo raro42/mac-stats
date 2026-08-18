@@ -4,25 +4,42 @@ Research notes for how **mac-stats** sits among common menu-bar system monitors.
 
 ## Short take
 
-For **mac-stats**, the clearest position is: **free MIT, Apple Silicon-native, covers the core metrics most people actually want, and adds optional local AI/agent workflows**. That contrasts with **iStat Menus**’ paid, deep-sensor positioning and **MenuMeters**’ lightweight-but-basic niche, while keeping **Stats** as the closest free/open-source peer.[1][4][5][10]
+For **mac-stats**, the clearest position is: **free MIT, Apple Silicon-native, covers the core metrics most people actually want, includes scoped Disk Cleanup (soft-delete to Trash), and adds optional local AI/agent workflows**. That contrasts with **iStat Menus**’ paid, deep-sensor positioning and **MenuMeters**’ lightweight-but-basic niche, while keeping **Stats** as the closest free/open-source peer.[1][4][5][10]
 
 ## Competitors to mention
 
 | App | Pricing band | Positioning | Best-known strengths | Likely gap vs mac-stats |
 |---|---:|---|---|---|
-| **Stats** (exelban) | **Free** | Free/open-source menu bar monitor | CPU, GPU, RAM, disk, network, battery, fan control, sensors, Bluetooth, multi-time-zone clock[1][2][4][6] | No local AI/agent layer; community readers may already know it as the main free alternative[2][4][6] |
-| **iStat Menus** (Bjango) | **Paid**; review sources mention about **$11.99–$14.99** depending on the article/date[4][6] | Premium, deepest monitoring and customisation | Broad sensor coverage, charts/graphs, weather, historical data, notifications, custom widgets[2][4][5][6][10] | Not free; more complex/heavier; mac-stats should stress simplicity and AI add-ons[5][6] |
-| **MenuMeters** | **Free** | Lightweight classic | Simple CPU/memory/disk/network bars, minimal footprint[4][5][7] | Much narrower feature set; no modern AI or richer dashboards[4][5] |
+| **Stats** (exelban) | **Free** | Free/open-source menu bar monitor | CPU, GPU, RAM, disk, network, battery, fan control, sensors, Bluetooth, multi-time-zone clock[1][2][4][6] | No scoped Disk Cleanup; no local AI/agent layer; community readers may already know it as the main free alternative[2][4][6] |
+| **iStat Menus** (Bjango) | **Paid**; review sources mention about **$11.99–$14.99** depending on the article/date[4][6] | Premium, deepest monitoring and customisation | Broad sensor coverage, charts/graphs, weather, historical data, notifications, custom widgets[2][4][5][6][10] | Not free; more complex/heavier; no lightweight scoped Disk Cleanup; mac-stats should stress simplicity, cleanup, and optional AI[5][6] |
+| **MenuMeters** | **Free** | Lightweight classic | Simple CPU/memory/disk/network bars, minimal footprint[4][5][7] | Much narrower feature set; no Disk Cleanup, no modern AI or richer dashboards[4][5] |
 | **Beacon** | **Paid once**; described as roughly **$5.99** in one 2026 comparison[4] | Quick setup, modern-native feel | Fast “install and go” menu bar monitoring[5] | Different buying model; mention only if you want a “modern paid alternative” bucket[4][5] |
 | **TG Pro** | **Paid**; about **$20** in one comparison[4] | Thermal specialist | Temperature/fan focus[4][5] | Not a general system monitor[4][5] |
 | **FavTray** | **Free core / Pro** | Dev-tool bundle with basic monitoring | Basic system info plus broader developer tooling[6] | Not a pure system-monitor competitor; only mention if you want “adjacent tools”[6] |
 | **Pulse** | **Paid**; about **$5.99** in one comparison[4] | Mac App Store system monitor | General monitoring with app-store distribution[4] | Different channel; not open-source/MIT[4] |
+
+## Feature snapshot (vs Stats / iStat Menus / MenuMeters)
+
+Same rows as the README compare table:
+
+| | **mac-stats** | **Stats** (exelban) | **iStat Menus** | **MenuMeters** |
+|--|---------------|---------------------|-----------------|----------------|
+| Menu-bar CPU / RAM / disk | ✅ | ✅ | ✅ | ✅ (basic) |
+| Apple Silicon focus | ✅ arm64 only | ✅ | ✅ | ✅ |
+| Themes / glass UI | ✅ | ✅ | ✅ | — |
+| Disk Cleanup (scopes · soft-delete → Trash) | ✅ | — | — | — |
+| Local LLM agent (Ollama) | ✅ **optional** | — | — | — |
+| Discord bot / schedules | ✅ **optional** | — | — | — |
+| Deep sensors / history / weather | lean essentials | strong | deepest | minimal |
+| Price | Free (**MIT**) | Free / donate | Paid | Free |
+| Cloud telemetry | ❌ none | — | — | — |
 
 ## Comparison angles that matter most
 
 - **Price / license**: mac-stats is **free MIT**; iStat Menus is paid; Stats is free/open-source; MenuMeters is free.[1][4][5][6]
 - **Apple Silicon readiness**: mac-stats is **Apple Silicon-first**; compare against “modern macOS support” expectations.[5][6]
 - **Core coverage vs depth**: mac-stats covers **CPU/GPU/RAM/disk** cleanly; iStat Menus wins on deep sensors, historical graphs, weather, and notifications.[1][4][5][6][10]
+- **Disk Cleanup**: mac-stats can reclaim files with **scopes** (mac-stats data, Trash, Downloads, Temp, custom paths) and **soft-delete to Trash** by default. Stats, iStat Menus, and MenuMeters stay on monitoring; they are not a scoped cleaner.
 - **Simplicity**: useful data without a settings maze, versus iStat Menus’ config depth.[5]
 - **Open-source trust**: MIT, local transparency, no cloud dependency for the core monitor.[1][4][6]
 - **Optional local AI / agents**: monitoring plus actions/insights — not just another meter app.

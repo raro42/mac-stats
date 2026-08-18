@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
+- Comparison vs Stats / iStat Menus / MenuMeters: **Disk Cleanup** is in the how-we-compare notes and landing compare blurb (README table already had the row).
 
 ## [0.1.516] - 2026-08-18
 

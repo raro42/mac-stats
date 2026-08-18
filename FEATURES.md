@@ -15,6 +15,7 @@ Screenshots: [docs/screens/](docs/screens/) · [docs/screens/README.md](docs/scr
 | History sparklines | CPU → Frequency → Temperature under the gauges |
 | Top processes | Sortable list, pin favorites, process details, Advanced Force Quit |
 | Website monitors | See below |
+| Disk Cleanup | Scoped reclaim (Trash / Downloads / Temp / custom); soft-delete to Trash by default |
 | Low overhead | On the order of ~0.5% idle (menu bar only) |
 
 ## Website monitors (External / Monitors)
