@@ -349,6 +349,8 @@ let invoke = null;
 let lastProcessUpdate = 0;
 let lastProcessListKey = "";
 let isWaitingForData = false; // Track if we're waiting for real data (non-zero usage)
+/** Top Processes list filter: all | pinned (Monitors All/Up/Down parity). */
+let processesFilterMode = "all";
 
 const PINNED_PROCESS_NAMES_KEY = "pinned_process_names";
 const MAX_PINNED_PROCESSES = 6;
@@ -488,6 +490,122 @@ function toggleProcessPinFromUi(name) {
   requestProcessPinFlash(name, after);
   window._forceProcessUpdate = true;
   if (window.refreshData) window.refreshData();
+}
+
+/** Visible process rows after All / Pinned filter. */
+function visibleProcessRows(processList) {
+  if (!processList) return [];
+  return Array.from(processList.querySelectorAll(".process-row")).filter(
+    (el) => el.style.display !== "none"
+  );
+}
+
+/** All / Pinned chips (Monitors / Debug Log filter parity). */
+function ensureProcessesFilterChips() {
+  const list = document.getElementById("process-list");
+  if (!list || !list.parentNode) return;
+  if (document.getElementById("processes-filter-chips")) return;
+  const wrap = document.createElement("div");
+  wrap.id = "processes-filter-chips";
+  wrap.className = "processes-filter-chips";
+  wrap.setAttribute("role", "group");
+  wrap.setAttribute("aria-label", "Process list filter");
+  wrap.hidden = true;
+  wrap.innerHTML =
+    '<button type="button" class="processes-filter-chip is-active" data-processes-filter="all" aria-pressed="true" title="Show every process in the list">All</button>' +
+    '<button type="button" class="processes-filter-chip" data-processes-filter="pinned" aria-pressed="false" title="Show pinned favorites only">Pinned <span class="processes-filter-count" data-processes-filter-count="pinned">0</span></button>';
+  list.parentNode.insertBefore(wrap, list);
+  wrap.addEventListener("click", (e) => {
+    const btn = e.target && e.target.closest && e.target.closest("[data-processes-filter]");
+    if (!btn || !wrap.contains(btn)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setProcessesFilterMode(btn.getAttribute("data-processes-filter") || "all");
+  });
+}
+
+function setProcessesFilterMode(mode) {
+  const next = mode === "pinned" ? "pinned" : "all";
+  processesFilterMode = next;
+  document.querySelectorAll("#processes-filter-chips [data-processes-filter]").forEach((btn) => {
+    const on = btn.getAttribute("data-processes-filter") === next;
+    btn.classList.toggle("is-active", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  applyProcessesListFilter();
+}
+
+function ensureProcessesFilterMissState(processList, show) {
+  if (!processList) return;
+  const existing = processList.querySelector(".processes-filter-miss");
+  if (!show) {
+    existing?.remove();
+    return;
+  }
+  let wrap = existing;
+  if (!wrap) {
+    wrap = document.createElement("div");
+    wrap.className = "process-empty processes-filter-miss";
+    wrap.setAttribute("role", "status");
+    wrap.innerHTML =
+      `<div class="processes-filter-miss-msg">Nothing matches this filter</div>` +
+      `<div class="processes-filter-miss-hint">Pin a favorite with ★ or P, or clear the filter.</div>` +
+      `<button type="button" class="processes-filter-miss-cta processes-clear-filter">Clear filter</button>`;
+    processList.appendChild(wrap);
+    wrap.querySelector(".processes-clear-filter")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setProcessesFilterMode("all");
+    });
+  }
+}
+
+function applyProcessesListFilter() {
+  ensureProcessesFilterChips();
+  const chips = document.getElementById("processes-filter-chips");
+  const processList = document.getElementById("process-list");
+  if (!processList) return;
+
+  const rows = Array.from(processList.querySelectorAll(".process-row"));
+  const waiting = !!processList.querySelector(".process-empty:not(.processes-filter-miss)");
+  if (chips) chips.hidden = waiting || rows.length === 0;
+
+  let pinnedCount = 0;
+  rows.forEach((el) => {
+    if (el.classList.contains("is-pinned")) pinnedCount++;
+  });
+
+  const pinnedEl = document.querySelector('[data-processes-filter-count="pinned"]');
+  if (pinnedEl) pinnedEl.textContent = String(pinnedCount);
+  document.querySelectorAll("#processes-filter-chips [data-processes-filter]").forEach((btn) => {
+    const key = btn.getAttribute("data-processes-filter");
+    btn.classList.toggle("has-hits", key === "pinned" ? pinnedCount > 0 : false);
+  });
+
+  if (waiting || rows.length === 0) {
+    ensureProcessesFilterMissState(processList, false);
+    return;
+  }
+
+  let visible = 0;
+  rows.forEach((el) => {
+    const isPinned = el.classList.contains("is-pinned");
+    const show = processesFilterMode !== "pinned" || isPinned;
+    el.style.display = show ? "" : "none";
+    if (show) visible++;
+  });
+
+  const header = processList.querySelector(".process-list-header");
+  if (header) header.style.display = visible === 0 ? "none" : "";
+
+  ensureProcessesFilterMissState(processList, visible === 0);
+  ensureProcessesListKbHint(processList, visible > 0);
+
+  const visibleRows = visibleProcessRows(processList);
+  visibleRows.forEach((r, i) => r.setAttribute("tabindex", i === 0 ? "0" : "-1"));
+  rows
+    .filter((r) => r.style.display === "none")
+    .forEach((r) => r.setAttribute("tabindex", "-1"));
 }
 
 function mergePinnedProcesses(pinOrder, pinnedLookup, top) {
@@ -1266,9 +1384,10 @@ async function refresh() {
           list.addEventListener("keydown", (e) => {
             const row = e.target.closest(".process-row");
             if (!row || !list.contains(row)) return;
+            if (row.style.display === "none") return;
             // Pin button handles its own keys; do not steal from text fields.
             if (e.target.closest && e.target.closest(".process-pin")) return;
-            const rows = Array.from(list.querySelectorAll(".process-row"));
+            const rows = visibleProcessRows(list);
             const idx = rows.indexOf(row);
             if (idx < 0) return;
 
@@ -1346,16 +1465,21 @@ async function refresh() {
             }
           });
         }
-        ensureProcessesListKbHint(list, processes.length > 0);
         list.replaceChildren();
         list.appendChild(fragment);
         applyProcessPinFlash(list);
         applyProcessNameCopyFlash(list);
+        applyProcessesListFilter();
         if (listHadFocus) {
+          const visible = visibleProcessRows(list);
+          const byPid =
+            focusPid &&
+            visible.find((r) => r.getAttribute("data-pid") === String(focusPid));
           const target =
-            (focusPid && list.querySelector(`.process-row[data-pid="${focusPid}"]`)) ||
+            byPid ||
             list.querySelector('.process-row[tabindex="0"]') ||
-            list.querySelector(".process-row");
+            visible[0] ||
+            null;
           target?.focus();
         }
       });
@@ -4547,7 +4671,7 @@ function ensureProcessesListKbHint(processList, show) {
     processList.parentNode?.insertBefore(hint, processList);
   }
   hint.textContent =
-    'Click row for details · click name / c copies · ↑↓ / j k · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
+    'All · Pinned filters · click row for details · click name / c copies · ↑↓ / j k · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
 }
 
 /** Hint above External / Monitors list (Disk Cleanup kb-hint parity). */
