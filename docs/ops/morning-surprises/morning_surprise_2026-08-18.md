@@ -1,11 +1,12 @@
 # Morning surprise — 2026-08-18
 
-Overnight Track B shipped Agent Ops Command Center polish.
+Overnight Track B shipped Agent Ops Command Center polish, then a Top Processes copy affordance.
 
 ## Shipped (so far)
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.509** | Top Processes **click-to-copy name** — list name or `c` copies the process name (PID / monitor-URL parity); details hero name copies too; Copied flash |
 | **v0.1.508** | Agent Ops **0 Overview** jump: tab-strip control + digit 0 scrolls health/overview into view after 1–5 detail tabs (accent flash) |
 | **v0.1.507** | Agent Ops overview cards: glass **head count pills** (tab-count parity; inventory stays next to the title) |
 | **v0.1.506** | Agent Ops list filters: glass **Clear** beside the N/M chip when a query is active (Esc parity; works when matches still show) |
@@ -20,10 +21,10 @@ Overnight Track B shipped Agent Ops Command Center polish.
 
 ## Tried / deferred
 
-- Recapture `docs/screens/feature-agent-ops.png` — no on-screen CPU window for Quartz/`screencapture -l`. Aug 12 asset kept until a permitted shot.
+- Recapture `docs/screens/feature-processes.png` and `feature-agent-ops.png` — no on-screen CPU window for Quartz/`screencapture -l`. Prior assets kept until a permitted shot.
 
 ## Digester
 
-- Open = design-review (stale feature-agent-ops ~5.7d). Latency empty after filters.
+- Open = design-review (stale feature-agent-ops ~5.8d). Latency empty after filters. This tick rotated to Top Processes (Agent Ops chrome saturating).
 
-Updated: 2026-08-18 ~02:45
+Updated: 2026-08-18 ~03:15
