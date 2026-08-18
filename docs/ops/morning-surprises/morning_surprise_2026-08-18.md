@@ -1,11 +1,12 @@
 # Morning surprise — 2026-08-18
 
-Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL, Disk Cleanup path copy, CPU metrics ring-value copy (then restored CPU % Details toggle), AI Chat starter chips, Debug Log Error/Warn filters, and battery/power strip click-to-copy on the metrics surface.
+Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL, Disk Cleanup path copy, CPU metrics ring-value copy (then restored CPU % Details toggle), AI Chat starter chips, Debug Log Error/Warn filters, battery/power strip click-to-copy, and Monitors summary click + empty Add CTA.
 
 ## Shipped (so far)
 
 | Version | What got better |
 |---------|-----------------|
+| **v0.1.518** | External / Monitors **summary click + empty Add CTA** — click (or Enter/Space) the summary to open the first DOWN site (or first row); empty list shows “Nothing watching yet” with **Add a monitor** |
 | **v0.1.517** | Battery / power strip **click-to-copy** — click (or Enter/Space) battery % or power watts; Copied overlay so live refresh keeps updating the number (GPU/GHz/°C parity) |
 | **v0.1.516** | CPU gauge click again **toggles Details / Top Processes** — overnight ring copy on CPU % had stolen that control; copy stays on GPU, frequency, temperature, battery, and power |
 | **v0.1.515** | Debug Log **Error / Warn filter chips** — All, Error, and Warn in the toolbar (live counts; indented follow-up lines stay with the match); empty filter says nothing is there yet |
@@ -33,6 +34,6 @@ Overnight Track B shipped Agent Ops Command Center polish, list copy-id/name/URL
 
 ## Digester
 
-- Open = design-review (stale feature-agent-ops ~6.5d; cpu-metrics stale ~6.5d). Latency empty after filters. This tick: battery/power strip click-to-copy (rotate off saturated Agent Ops chrome onto stale CPU metrics strip).
+- Open = design-review (stale feature-agent-ops ~6.5d; monitors stale ~4.3d). Latency empty after filters. This tick: Monitors summary click + empty Add CTA (rotate off battery-copy onto stale monitors surface).
 
-Updated: 2026-08-18 ~20:05
+Updated: 2026-08-18 ~20:35
