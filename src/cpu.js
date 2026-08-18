@@ -426,6 +426,58 @@ function applyProcessPinFlash(list) {
   btn.title = processPinFlash.pinned ? "Pinned" : "Unpinned";
 }
 
+/** Brief Copied flash on process name (survives list rebuild). */
+let processNameCopyFlash = null; // { name }
+let processNameCopyFlashTimer = null;
+
+function clearProcessNameCopyFlashTimers() {
+  if (processNameCopyFlashTimer) {
+    clearTimeout(processNameCopyFlashTimer);
+    processNameCopyFlashTimer = null;
+  }
+}
+
+function requestProcessNameCopyFlash(name) {
+  if (!name) return;
+  processNameCopyFlash = { name };
+  clearProcessNameCopyFlashTimers();
+  processNameCopyFlashTimer = setTimeout(() => {
+    processNameCopyFlash = null;
+    processNameCopyFlashTimer = null;
+    document.querySelectorAll("button.process-name.is-just-saved").forEach((el) => {
+      el.classList.remove("is-just-saved");
+      const n = el.getAttribute("data-name") || "";
+      el.textContent = n;
+      el.title = "Click to copy name";
+    });
+  }, 1600);
+}
+
+function applyProcessNameCopyFlash(list) {
+  if (!processNameCopyFlash || !list) return;
+  const want = processNameCopyFlash.name;
+  const btn = Array.from(list.querySelectorAll("button.process-name")).find(
+    (el) => el.getAttribute("data-name") === want
+  );
+  if (!btn) return;
+  btn.classList.add("is-just-saved");
+  btn.textContent = "Copied";
+  btn.title = "Copied";
+}
+
+async function copyProcessNameFromUi(name) {
+  const value = String(name || "").trim();
+  if (!value) return false;
+  const ok = await copyTextToClipboard(value);
+  if (!ok) {
+    alert("Could not copy process name.");
+    return false;
+  }
+  requestProcessNameCopyFlash(value);
+  applyProcessNameCopyFlash(document.getElementById("process-list"));
+  return true;
+}
+
 function toggleProcessPinFromUi(name) {
   if (!name) return;
   if (processPinFlash && processPinFlash.name === name) return;
@@ -1112,8 +1164,13 @@ async function refresh() {
           pinBtn.title = isPinned ? "Unpin" : "Pin favorite";
           pinBtn.textContent = isPinned ? "★" : "☆";
           
-          const name = document.createElement("div");
+          const name = document.createElement("button");
+          name.type = "button";
           name.className = "process-name";
+          name.setAttribute("data-name", proc.name);
+          name.setAttribute("tabindex", "-1");
+          name.title = "Click to copy name";
+          name.setAttribute("aria-label", `Copy name ${proc.name}`);
           name.textContent = proc.name;
           
           const usage = document.createElement("div");
@@ -1176,6 +1233,13 @@ async function refresh() {
               toggleProcessPinFromUi(pinBtn.getAttribute("data-name"));
               return;
             }
+            const nameBtn = e.target.closest("button.process-name");
+            if (nameBtn && list.contains(nameBtn)) {
+              e.preventDefault();
+              e.stopPropagation();
+              void copyProcessNameFromUi(nameBtn.getAttribute("data-name"));
+              return;
+            }
             const row = e.target.closest(".process-row");
             if (row) {
               const pid = row.getAttribute("data-pid");
@@ -1210,6 +1274,18 @@ async function refresh() {
             if (e.key === "p" || e.key === "P") {
               e.preventDefault();
               toggleProcessPinFromUi(row.getAttribute("data-name"));
+              return;
+            }
+
+            // c copies the process name (PID copy lives in the details hero).
+            if (
+              (e.key === "c" || e.key === "C") &&
+              !e.metaKey &&
+              !e.ctrlKey &&
+              !e.altKey
+            ) {
+              e.preventDefault();
+              void copyProcessNameFromUi(row.getAttribute("data-name"));
               return;
             }
 
@@ -1257,6 +1333,7 @@ async function refresh() {
         list.replaceChildren();
         list.appendChild(fragment);
         applyProcessPinFlash(list);
+        applyProcessNameCopyFlash(list);
         if (listHadFocus) {
           const target =
             (focusPid && list.querySelector(`.process-row[data-pid="${focusPid}"]`)) ||
@@ -1895,6 +1972,69 @@ function escapeProcessHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+function snapshotCopyFlash(el) {
+  if (!el) return null;
+  return {
+    classJustSaved: el.classList.contains("is-just-saved"),
+    text: el.textContent || "",
+    saveFlashOriginal: el._saveFlashOriginalLabel ?? null,
+    saveFlashTimer: el._saveFlashTimer ?? null,
+  };
+}
+
+function wireProcessDetailCopyButton(el, copyValue, idleLabel, prevFlash, failMsg, onOk) {
+  if (!el) return;
+  const idle = String(idleLabel || "");
+  el._saveFlashOriginalLabel =
+    (prevFlash && prevFlash.saveFlashOriginal) || idle;
+  if (prevFlash && prevFlash.classJustSaved) {
+    el.classList.add("is-just-saved");
+    el.textContent = prevFlash.text || "Copied";
+    if (prevFlash.saveFlashTimer) {
+      clearTimeout(prevFlash.saveFlashTimer);
+    }
+    el._saveFlashTimer = setTimeout(() => {
+      el.classList.remove("is-just-saved");
+      el.textContent = idle;
+      el._saveFlashOriginalLabel = idle;
+      el._saveFlashTimer = null;
+    }, 1600);
+  }
+  const copy = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (el.classList.contains("is-just-saved")) return;
+    const ok = await copyTextToClipboard(String(copyValue));
+    if (!ok) {
+      alert(failMsg || "Could not copy.");
+      return;
+    }
+    if (typeof onOk === "function") onOk();
+    if (typeof flashSaveButton === "function") {
+      flashSaveButton(el, { savedLabel: "Copied", durationMs: 1600 });
+    } else {
+      el._saveFlashOriginalLabel = idle;
+      el.classList.add("is-just-saved");
+      el.textContent = "Copied";
+      clearTimeout(el._saveFlashTimer);
+      el._saveFlashTimer = setTimeout(() => {
+        el.classList.remove("is-just-saved");
+        el.textContent = idle;
+        el._saveFlashOriginalLabel = null;
+        el._saveFlashTimer = null;
+      }, 1600);
+    }
+  };
+  el.addEventListener("click", copy);
+  el.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      void copy(e);
+    }
+  });
+}
+
 function populateProcessDetailsBody(body, details, pid) {
     const startDate = formatDate(details.start_time);
     const cpuTimeFormatted = formatTime(Math.floor(details.total_cpu_time / 1000));
@@ -1925,18 +2065,13 @@ function populateProcessDetailsBody(body, details, pid) {
         }
       : null;
     const prevPidEl = body.querySelector(".process-detail-pid");
-    const pidUi = prevPidEl
-      ? {
-          classJustSaved: prevPidEl.classList.contains("is-just-saved"),
-          text: prevPidEl.textContent || `PID ${details.pid}`,
-          saveFlashOriginal: prevPidEl._saveFlashOriginalLabel ?? null,
-          saveFlashTimer: prevPidEl._saveFlashTimer ?? null,
-        }
-      : null;
+    const pidUi = snapshotCopyFlash(prevPidEl);
+    const prevNameEl = body.querySelector(".process-detail-name");
+    const nameUi = snapshotCopyFlash(prevNameEl);
     
     body.innerHTML = `
       <div class="process-detail-hero">
-        <div class="process-detail-name">${name}</div>
+        <button type="button" class="process-detail-name" title="Click to copy name" aria-label="Copy name ${name}">${name}</button>
         <button type="button" class="process-detail-pid" title="Click to copy PID" aria-label="Copy PID ${details.pid}">PID ${details.pid}</button>
       </div>
       <div class="process-detail-section">
@@ -2000,56 +2135,29 @@ function populateProcessDetailsBody(body, details, pid) {
       </div>
     `;
 
+    const nameEl = body.querySelector(".process-detail-name");
+    if (nameEl) {
+      wireProcessDetailCopyButton(
+        nameEl,
+        details.name,
+        details.name,
+        nameUi,
+        "Could not copy process name.",
+        () => {
+          requestProcessNameCopyFlash(details.name);
+          applyProcessNameCopyFlash(document.getElementById("process-list"));
+        }
+      );
+    }
     const pidEl = body.querySelector(".process-detail-pid");
     if (pidEl) {
-      const idlePidLabel = `PID ${details.pid}`;
-      pidEl._saveFlashOriginalLabel =
-        (pidUi && pidUi.saveFlashOriginal) || idlePidLabel;
-      if (pidUi && pidUi.classJustSaved) {
-        pidEl.classList.add("is-just-saved");
-        pidEl.textContent = pidUi.text || "Copied";
-        if (pidUi.saveFlashTimer) {
-          clearTimeout(pidUi.saveFlashTimer);
-        }
-        pidEl._saveFlashTimer = setTimeout(() => {
-          pidEl.classList.remove("is-just-saved");
-          pidEl.textContent = idlePidLabel;
-          pidEl._saveFlashOriginalLabel = idlePidLabel;
-          pidEl._saveFlashTimer = null;
-        }, 1600);
-      }
-      const copyPid = async (e) => {
-        if (e) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        if (pidEl.classList.contains("is-just-saved")) return;
-        const ok = await copyTextToClipboard(String(details.pid));
-        if (!ok) {
-          alert("Could not copy PID.");
-          return;
-        }
-        if (typeof flashSaveButton === "function") {
-          flashSaveButton(pidEl, { savedLabel: "Copied", durationMs: 1600 });
-        } else {
-          pidEl._saveFlashOriginalLabel = idlePidLabel;
-          pidEl.classList.add("is-just-saved");
-          pidEl.textContent = "Copied";
-          clearTimeout(pidEl._saveFlashTimer);
-          pidEl._saveFlashTimer = setTimeout(() => {
-            pidEl.classList.remove("is-just-saved");
-            pidEl.textContent = idlePidLabel;
-            pidEl._saveFlashOriginalLabel = null;
-            pidEl._saveFlashTimer = null;
-          }, 1600);
-        }
-      };
-      pidEl.addEventListener("click", copyPid);
-      pidEl.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          void copyPid(e);
-        }
-      });
+      wireProcessDetailCopyButton(
+        pidEl,
+        String(details.pid),
+        `PID ${details.pid}`,
+        pidUi,
+        "Could not copy PID."
+      );
     }
     
     // Set up force quit button handler (remove old listeners first by cloning)
@@ -3836,7 +3944,7 @@ function ensureProcessesListKbHint(processList, show) {
     processList.parentNode?.insertBefore(hint, processList);
   }
   hint.textContent =
-    'Click row for details · ↑↓ / j k · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
+    'Click row for details · click name / c copies · ↑↓ / j k · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
 }
 
 /** Hint above External / Monitors list (Disk Cleanup kb-hint parity). */

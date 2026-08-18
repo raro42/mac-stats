@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 
+## [0.1.509] - 2026-08-18
+
+### Added
+- Top Processes **click-to-copy name** — click the list name or press `c` to copy (PID / monitor-URL parity); details hero name is the same control; Copied flash.
+
 ## [0.1.508] - 2026-08-18
 
 ### Added
