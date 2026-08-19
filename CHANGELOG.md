@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.535] - 2026-08-19
+
+### Added
+- CPU metrics **temperature °C on the battery/power strip** (GPU/RAM parity). Click or Enter/Space scrolls to the temperature ring and flashes it. Soft amber wash when ≥ 70°C (Serious).
+
 ## [0.1.534] - 2026-08-19
 
 ### Added

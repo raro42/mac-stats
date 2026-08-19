@@ -869,6 +869,31 @@ async function refresh() {
       if (window.appleHistory && data.can_read_temperature && data.temperature > 0) {
         window.appleHistory.updateTemperature(data.temperature);
       }
+      ensureTempStrip();
+      const tempStripEl = document.getElementById("temp-strip-value");
+      const tempStripCell = document.getElementById("temp-strip");
+      let tempStripText = "—";
+      if (data.can_read_temperature) {
+        tempStripText = `${newTemp}°C`;
+      }
+      if (tempStripEl && tempStripEl.textContent !== tempStripText) {
+        scheduleDOMUpdate(() => {
+          tempStripEl.textContent = tempStripText;
+        });
+      }
+      if (tempStripCell) {
+        const hot =
+          data.can_read_temperature &&
+          typeof data.temperature === "number" &&
+          data.temperature >= 70;
+        tempStripCell.classList.toggle("is-hot", hot);
+        const title = "Show temperature ring";
+        tempStripCell.title = title;
+        tempStripCell.setAttribute(
+          "aria-label",
+          `Temperature ${tempStripText}. ${title}`
+        );
+      }
     }
 
     // Update GPU usage (top gauge)
@@ -1636,6 +1661,7 @@ function init() {
   wireMetricValueCopy();
   ensureRamStrip();
   ensureGpuStrip();
+  ensureTempStrip();
   
   // Try to get Tauri immediately - don't wait if it's already available
   const immediateInvoke = getInvoke();
@@ -1876,6 +1902,40 @@ function ensureRamStripStyles() {
       border-radius: 10px;
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
     }
+    .temp-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      outline: none;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .temp-info:hover {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
+    }
+    .temp-info:focus-visible {
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+    }
+    .temp-info.is-hot {
+      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
+    }
+    .temp-label {
+      color: var(--muted);
+    }
+    .temp-value {
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .metric-card.is-temp-highlight {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      border-radius: 10px;
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+    }
   `;
   document.head.appendChild(style);
 }
@@ -2010,6 +2070,66 @@ function ensureGpuStrip() {
   cell.addEventListener("keydown", (e) => {
     if (e.key !== "Enter" && e.key !== " ") return;
     openGpu(e);
+  });
+  return cell;
+}
+
+function flashTempRing() {
+  const tempVal = document.getElementById("temperature-value");
+  const card = tempVal && tempVal.closest ? tempVal.closest(".metric-card") : null;
+  if (!card) return;
+  card.classList.add("is-temp-highlight");
+  window.setTimeout(() => {
+    card.classList.remove("is-temp-highlight");
+  }, 1600);
+}
+
+function openTempRingFromStrip() {
+  const tempVal = document.getElementById("temperature-value");
+  if (tempVal && typeof tempVal.scrollIntoView === "function") {
+    tempVal.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+  flashTempRing();
+}
+
+/**
+ * Temperature °C on the battery/power strip (GPU/RAM strip parity). Click /
+ * Enter / Space scrolls to the temperature ring and flashes it — not copy
+ * (the ring value already copies). Soft amber wash when ≥ 70°C (Serious).
+ */
+function ensureTempStrip() {
+  ensureRamStripStyles();
+  const strip = document.getElementById("battery-power-strip");
+  if (!strip) return null;
+  let cell = document.getElementById("temp-strip");
+  if (!cell) {
+    cell = document.createElement("div");
+    cell.id = "temp-strip";
+    cell.className = "temp-info";
+    cell.setAttribute("role", "button");
+    cell.tabIndex = 0;
+    cell.title = "Show temperature ring";
+    cell.setAttribute("aria-label", "Show temperature ring");
+    cell.innerHTML =
+      '<span class="temp-label">Temp</span>' +
+      '<span class="temp-value" id="temp-strip-value">—</span>';
+    const gpuEl = document.getElementById("gpu-strip");
+    const timeEl = document.getElementById("time-remaining");
+    if (gpuEl && gpuEl.nextSibling) strip.insertBefore(cell, gpuEl.nextSibling);
+    else if (timeEl) strip.insertBefore(cell, timeEl);
+    else strip.appendChild(cell);
+  }
+  if (cell.dataset.tempStripWired === "1") return cell;
+  cell.dataset.tempStripWired = "1";
+  const openTemp = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openTempRingFromStrip();
+  };
+  cell.addEventListener("click", openTemp);
+  cell.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    openTemp(e);
   });
   return cell;
 }
@@ -6604,6 +6724,7 @@ function initCollapsibleSections() {
 
   ensureRamStrip();
   ensureGpuStrip();
+  ensureTempStrip();
   ensureProcessesTopGlance();
 }
 
