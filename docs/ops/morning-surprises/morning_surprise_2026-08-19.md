@@ -12,13 +12,14 @@ Overnight Track B (design review / standing backlog). Digester open empty; desig
 | **v0.1.529** | Disk Cleanup **Last run** panel click (opens first category cleaned last run; reclaim/scopes fallback; amber wash when Trash skips) |
 | **v0.1.530** | Monitors summary click opens the **slowest** site when all monitors are up (DOWN still opens first DOWN row; soft amber wash on summary) |
 | **v0.1.531** | Top Processes **Top CPU** glance strip under the header — shows hottest process; click opens details (Monitors slowest-summary parity; amber wash when CPU ≥ 15%) |
+| **v0.1.532** | AI Chat **turn glance** strip — turn count + last question preview; click scrolls to latest message and focuses composer (accent wash while Sending…) |
 
 ## Tried / notes
 
 - Prep: digester empty (10 turns, 7 instant); design-review due=false; debug.log quiet in 180m scan (single-instance busy WARN only).
-- Screenshot recapture still deferred (no on-screen CPU window / TCC); prior feature-processes.png kept in grace.
-- Latest keep: `42172c3` — v0.1.531 installed; Discord Ready.
+- Screenshot recapture still deferred (no on-screen CPU window / TCC); prior feature-ai-chat.png kept in grace.
+- Latest keep: `8ce1086` — v0.1.532 installed; Discord Ready.
 
 ## Not a quiet night
 
-Sixth keep of the 2026-08-19 window — Top Processes top-CPU navigation after Monitors slowest-host series.
+Seventh keep of the 2026-08-19 window — AI Chat turn navigation after Top Processes top-CPU glance series.
