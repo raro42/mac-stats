@@ -1132,6 +1132,32 @@ async function refresh() {
         window.appleHistory.updateFrequency(data.frequency);
       }
 
+      ensureFreqStrip();
+      const freqStripEl = document.getElementById("freq-strip-value");
+      const freqStripCell = document.getElementById("freq-strip");
+      let freqStripText = "—";
+      if (data.can_read_frequency && typeof data.frequency === "number" && data.frequency > 0) {
+        freqStripText = data.frequency.toFixed(1);
+      }
+      if (freqStripEl && freqStripEl.textContent !== freqStripText) {
+        scheduleDOMUpdate(() => {
+          freqStripEl.textContent = freqStripText;
+        });
+      }
+      if (freqStripCell) {
+        const hot =
+          data.can_read_frequency &&
+          typeof data.frequency === "number" &&
+          data.frequency >= 3.5;
+        freqStripCell.classList.toggle("is-hot", hot);
+        const title = "Show frequency ring";
+        freqStripCell.title = title;
+        freqStripCell.setAttribute(
+          "aria-label",
+          `CPU frequency ${freqStripText === "—" ? "unavailable" : freqStripText + " GHz"}. ${title}`
+        );
+      }
+
     // Update uptime
     const uptimeEl = document.getElementById("uptime-value");
     const uptimeFormatted = formatUptime(data.uptime_secs);
@@ -1662,6 +1688,7 @@ function init() {
   ensureRamStrip();
   ensureGpuStrip();
   ensureTempStrip();
+  ensureFreqStrip();
   
   // Try to get Tauri immediately - don't wait if it's already available
   const immediateInvoke = getInvoke();
@@ -1936,6 +1963,40 @@ function ensureRamStripStyles() {
       border-radius: 10px;
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
     }
+    .freq-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      outline: none;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .freq-info:hover {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
+    }
+    .freq-info:focus-visible {
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+    }
+    .freq-info.is-hot {
+      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
+    }
+    .freq-label {
+      color: var(--muted);
+    }
+    .freq-value {
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .metric-card.is-freq-highlight {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      border-radius: 10px;
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+    }
   `;
   document.head.appendChild(style);
 }
@@ -2130,6 +2191,66 @@ function ensureTempStrip() {
   cell.addEventListener("keydown", (e) => {
     if (e.key !== "Enter" && e.key !== " ") return;
     openTemp(e);
+  });
+  return cell;
+}
+
+function flashFreqRing() {
+  const freqVal = document.getElementById("frequency-value");
+  const card = freqVal && freqVal.closest ? freqVal.closest(".metric-card") : null;
+  if (!card) return;
+  card.classList.add("is-freq-highlight");
+  window.setTimeout(() => {
+    card.classList.remove("is-freq-highlight");
+  }, 1600);
+}
+
+function openFreqRingFromStrip() {
+  const freqVal = document.getElementById("frequency-value");
+  if (freqVal && typeof freqVal.scrollIntoView === "function") {
+    freqVal.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+  flashFreqRing();
+}
+
+/**
+ * CPU frequency GHz on the battery/power strip (GPU/Temp strip parity). Click /
+ * Enter / Space scrolls to the frequency ring and flashes it — not copy (the
+ * ring value already copies). Soft amber wash when ≥ 3.5 GHz (active boost).
+ */
+function ensureFreqStrip() {
+  ensureRamStripStyles();
+  const strip = document.getElementById("battery-power-strip");
+  if (!strip) return null;
+  let cell = document.getElementById("freq-strip");
+  if (!cell) {
+    cell = document.createElement("div");
+    cell.id = "freq-strip";
+    cell.className = "freq-info";
+    cell.setAttribute("role", "button");
+    cell.tabIndex = 0;
+    cell.title = "Show frequency ring";
+    cell.setAttribute("aria-label", "Show frequency ring");
+    cell.innerHTML =
+      '<span class="freq-label">GHz</span>' +
+      '<span class="freq-value" id="freq-strip-value">—</span>';
+    const tempEl = document.getElementById("temp-strip");
+    const timeEl = document.getElementById("time-remaining");
+    if (tempEl && tempEl.nextSibling) strip.insertBefore(cell, tempEl.nextSibling);
+    else if (timeEl) strip.insertBefore(cell, timeEl);
+    else strip.appendChild(cell);
+  }
+  if (cell.dataset.freqStripWired === "1") return cell;
+  cell.dataset.freqStripWired = "1";
+  const openFreq = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openFreqRingFromStrip();
+  };
+  cell.addEventListener("click", openFreq);
+  cell.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    openFreq(e);
   });
   return cell;
 }
@@ -6725,6 +6846,7 @@ function initCollapsibleSections() {
   ensureRamStrip();
   ensureGpuStrip();
   ensureTempStrip();
+  ensureFreqStrip();
   ensureProcessesTopGlance();
 }
 

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.536] - 2026-08-20
+
+### Added
+- CPU metrics **frequency GHz on the battery/power strip** (GPU/Temp parity). Click or Enter/Space scrolls to the frequency ring and flashes it. Soft amber wash when ≥ 3.5 GHz (active boost).
+
 ## [0.1.535] - 2026-08-19
 
 ### Added
