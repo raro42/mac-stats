@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 - Comparison vs Stats / iStat Menus / MenuMeters: **Disk Cleanup** is in the how-we-compare notes and landing compare blurb (README table already had the row).
 
+## [0.1.530] - 2026-08-19
+
+### Added
+- External / Monitors summary click opens the **slowest** site when all monitors are up and latency hints are shown (DOWN still opens first DOWN row). Soft amber wash on the summary strip when the slowest hint is active.
+
 ## [0.1.529] - 2026-08-19
 
 ### Added

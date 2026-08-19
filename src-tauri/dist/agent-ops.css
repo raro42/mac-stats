@@ -2097,6 +2097,11 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #34c759 7%, transparent);
 }
 
+.monitors-summary.has-slowest-hint {
+  border-color: color-mix(in srgb, #ff9500 26%, transparent);
+  background: color-mix(in srgb, #ff9500 6%, transparent);
+}
+
 .monitors-summary.is-empty {
   font-weight: 450;
   opacity: 0.85;

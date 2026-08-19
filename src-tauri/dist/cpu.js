@@ -3530,12 +3530,16 @@ async function refreshMonitorsSettingsList() {
   }
 }
 
-function applyMonitorsSummaryState({ anyDown, allUp, empty }) {
+function applyMonitorsSummaryState({ anyDown, allUp, empty, slowestId }) {
   const summary = document.getElementById('monitors-summary');
   if (!summary) return;
   summary.classList.toggle('has-down', !!anyDown);
   summary.classList.toggle('is-all-up', !!allUp && !empty);
   summary.classList.toggle('is-empty', !!empty);
+  summary.classList.toggle(
+    'has-slowest-hint',
+    !!slowestId && !!allUp && !anyDown && !empty
+  );
   // Clickable glance (Agent Ops health/overview parity): empty → Add, DOWN → first down row.
   summary.setAttribute('role', 'button');
   summary.setAttribute('tabindex', '0');
@@ -3545,6 +3549,9 @@ function applyMonitorsSummaryState({ anyDown, allUp, empty }) {
   } else if (anyDown) {
     summary.title = 'Click to open the first DOWN monitor';
     summary.setAttribute('aria-label', 'Monitors summary — click to open first DOWN site');
+  } else if (slowestId) {
+    summary.title = 'Click to open the slowest monitor';
+    summary.setAttribute('aria-label', 'Monitors summary — click to open slowest site');
   } else {
     summary.title = 'Click to open the first monitor';
     summary.setAttribute('aria-label', 'Monitors summary — click to open first site');
@@ -3763,7 +3770,15 @@ function wireMonitorsSummaryClick() {
     if (!list) return;
     const visible = visibleMonitorItems(list);
     const down = visible.find((el) => el.classList.contains('is-down'));
-    const first = down || visible[0];
+    let first = down || visible[0];
+    if (!down && window.__monitorsSlowestId) {
+      const slowRow = list.querySelector(
+        `.monitor-item[data-monitor-id="${CSS.escape(window.__monitorsSlowestId)}"]`
+      );
+      if (slowRow && slowRow.style.display !== 'none') {
+        first = slowRow;
+      }
+    }
     if (!first) {
       void openMonitorsAddFlow();
       return;
@@ -4309,6 +4324,7 @@ async function updateMonitorsSummary() {
             const host = shortMonitorHostLabel(name, url);
             const ago = formatMonitorCheckedAgo(status);
             upLatencyHints.push({
+              id: monitorId,
               host,
               ms: status.response_time_ms,
               label: ago
@@ -4355,6 +4371,14 @@ async function updateMonitorsSummary() {
       ? Math.round(totalResponseTime / responseTimeCount)
       : 0;
 
+    upLatencyHints.sort((a, b) => b.ms - a.ms);
+    const anyDown = downCount > 0;
+    const allUp = checkedCount > 0 && downCount === 0 && checkedCount === monitorIds.length;
+    const slowest = upLatencyHints[0];
+    const slowestHint =
+      !anyDown && upLatencyHints.length >= 2 ? slowest?.id || null : null;
+    window.__monitorsSlowestId = slowestHint;
+
     if (downHints.length > 0) {
       const shown = downHints.slice(0, 2);
       const more = downHints.length > 2 ? ` +${downHints.length - 2}` : '';
@@ -4362,8 +4386,6 @@ async function updateMonitorsSummary() {
         `${upCount} / ${monitorIds.length} up · DOWN: ${shown.join(', ')}${more}`;
       summaryText.title = downHints.join('; ');
     } else {
-      upLatencyHints.sort((a, b) => b.ms - a.ms);
-      const slowest = upLatencyHints[0];
       if (slowest && upLatencyHints.length >= 2) {
         summaryText.textContent =
           `${upCount} / ${monitorIds.length} sites up · Avg ${avgResponseTime} ms · slowest ${slowest.host} ${slowest.ms}ms`;
@@ -4380,9 +4402,7 @@ async function updateMonitorsSummary() {
     
     // Green only when every configured monitor has checked in and is up.
     // Red as soon as any checked monitor is down (pending checks stay neutral).
-    const anyDown = downCount > 0;
-    const allUp = checkedCount > 0 && downCount === 0 && checkedCount === monitorIds.length;
-    applyMonitorsSummaryState({ anyDown, allUp, empty: false });
+    applyMonitorsSummaryState({ anyDown, allUp, empty: false, slowestId: slowestHint });
     updateMonitorsIconStatus({ anyDown, allUp, upCount, totalCount: monitorIds.length });
   } catch (err) {
     console.error('Failed to update monitors summary:', err);
