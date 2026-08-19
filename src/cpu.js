@@ -7371,6 +7371,114 @@ function wireDiskCleanupRunsWhenCard() {
   });
 }
 
+/** Last run panel: jump to first category cleaned last run (meta-card parity). */
+function focusDiskCleanupLastRunGlance() {
+  ensureDiskCleanupSectionExpanded();
+  const last = window.__diskCleanupLastRun;
+  const list = document.getElementById('disk-cleanup-list');
+  const catIds = (last?.categories || [])
+    .filter((c) => (c.filesRemoved || 0) > 0 || (c.bytesFreed || 0) > 0)
+    .map((c) => c.id)
+    .filter(Boolean);
+  requestAnimationFrame(() => {
+    if (catIds.length && list) {
+      for (const id of catIds) {
+        const row = list.querySelector(`.disk-cleanup-item[data-cat-id="${CSS.escape(id)}"]`);
+        if (row) {
+          const idx = parseInt(row.getAttribute('data-item-idx') || '0', 10);
+          syncDiskCleanupItemTabOrder(list, Number.isFinite(idx) ? idx : 0);
+          if (typeof row.focus === 'function') row.focus();
+          if (typeof row.scrollIntoView === 'function') {
+            row.scrollIntoView({ block: 'nearest' });
+          }
+          return;
+        }
+      }
+    }
+    const reclaimRow = list?.querySelector('.disk-cleanup-item.has-reclaim');
+    if (reclaimRow) {
+      focusDiskCleanupReclaimGlance();
+      return;
+    }
+    if (!last) {
+      focusDiskCleanupScopesReview();
+      return;
+    }
+    const runBtn = document.getElementById('disk-cleanup-run-btn');
+    if (runBtn && typeof runBtn.focus === 'function') {
+      runBtn.focus();
+      if (typeof runBtn.scrollIntoView === 'function') {
+        runBtn.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  });
+}
+
+function applyDiskCleanupLastRunState(last) {
+  const lastEl = document.getElementById('disk-cleanup-last');
+  if (!lastEl) return;
+  window.__diskCleanupLastRun = last || null;
+  const hadRemoval =
+    !!last &&
+    ((last.filesRemoved || 0) > 0 ||
+      (last.bytesFreed || 0) > 0 ||
+      (last.categories || []).some(
+        (c) => (c.filesRemoved || 0) > 0 || (c.bytesFreed || 0) > 0
+      ));
+  const hadSkip = !!last && (last.filesSkipped || 0) > 0;
+  lastEl.classList.add('is-action');
+  lastEl.classList.toggle('has-last-run', !!last);
+  lastEl.classList.toggle('has-skip', hadSkip);
+  lastEl.setAttribute('role', 'button');
+  lastEl.setAttribute('tabindex', '0');
+  if (!last) {
+    lastEl.title = 'Click to review cleanup scopes';
+    lastEl.setAttribute(
+      'aria-label',
+      'Last run — not yet this install; click to review cleanup scopes'
+    );
+  } else if (hadRemoval) {
+    lastEl.title = 'Click to open categories cleaned in the last run';
+    lastEl.setAttribute(
+      'aria-label',
+      'Last run — click to open categories cleaned in the last run'
+    );
+  } else if (hadSkip) {
+    lastEl.title = 'Click to review categories — some files were skipped last run';
+    lastEl.setAttribute(
+      'aria-label',
+      'Last run had skipped files — click to review categories'
+    );
+  } else {
+    lastEl.title = 'Click to review cleanup categories';
+    lastEl.setAttribute(
+      'aria-label',
+      'Last run — click to review cleanup categories'
+    );
+  }
+}
+
+function wireDiskCleanupLastRunPanel() {
+  const lastEl = document.getElementById('disk-cleanup-last');
+  if (!lastEl || lastEl.dataset.lastRunNav === '1') return;
+  lastEl.dataset.lastRunNav = '1';
+  applyDiskCleanupLastRunState(null);
+  const activate = () => {
+    focusDiskCleanupLastRunGlance();
+  };
+  lastEl.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  lastEl.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /** Category list empty: warm title + Review scopes CTA (Monitors empty Add parity). */
 function renderDiskCleanupListEmpty(list) {
   if (!list) return;
@@ -7538,7 +7646,8 @@ async function refreshDiskCleanupPanel(opts) {
           const pathBtn = pathEsc
             ? `<button type="button" class="disk-cleanup-item-path" data-copy-path="${pathEsc}" title="Click to copy path">${pathEsc}</button>`
             : '';
-          return `<li class="disk-cleanup-item${has ? ' has-reclaim' : ''}" role="option" data-item-idx="${idx}" data-copy-path="${pathEsc}" title="${title}">
+          const catIdEsc = escapeDiskHtml(String(c.id || ''));
+          return `<li class="disk-cleanup-item${has ? ' has-reclaim' : ''}" role="option" data-item-idx="${idx}" data-cat-id="${catIdEsc}" data-copy-path="${pathEsc}" title="${title}">
             <div class="disk-cleanup-item-head">
               <span class="disk-cleanup-item-title">${c.label || c.id}</span>
               <span class="disk-cleanup-item-stat">${
@@ -7600,6 +7709,7 @@ async function refreshDiskCleanupPanel(opts) {
               : 'Nothing removed')
         }${catBits ? `<br>${catBits}` : ''}`;
       }
+      applyDiskCleanupLastRunState(last || null);
     }
 
     if (runBtn) {
@@ -8181,6 +8291,7 @@ function initDiskCleanupSection() {
   wireDiskCleanupEnabledScopesCard();
   wireDiskCleanupNextRunCard();
   wireDiskCleanupRunsWhenCard();
+  wireDiskCleanupLastRunPanel();
 
   if (icon && !icon.getAttribute('data-title-base')) {
     icon.setAttribute('data-title-base', icon.title || 'Disk cleanup');

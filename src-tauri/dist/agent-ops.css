@@ -2844,6 +2844,38 @@ button.monitor-detail-url.is-just-saved {
   line-height: 1.45;
 }
 
+.disk-cleanup-last.is-action {
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.disk-cleanup-last.is-action:hover {
+  background: color-mix(in srgb, currentColor 5%, transparent);
+  border-color: color-mix(in srgb, currentColor 22%, transparent);
+}
+
+.disk-cleanup-last.is-action:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.disk-cleanup-last.is-action.has-last-run {
+  border-style: solid;
+  border-color: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.disk-cleanup-last.is-action.has-skip {
+  background: color-mix(in srgb, #ff9f0a 10%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 28%, transparent);
+}
+
+.disk-cleanup-last.is-action.has-skip:focus-visible {
+  outline-color: color-mix(in srgb, #ff9f0a 55%, transparent);
+}
+
 .disk-cleanup-last strong {
   font-weight: 600;
 }
