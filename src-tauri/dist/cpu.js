@@ -6967,8 +6967,11 @@ function initPerplexitySection() {
 }
 
 let logsAutoRefreshTimer = null;
+let logsGlancePollTimer = null;
+let logsSectionCollapsed = true;
 let logsViewerRaw = { prefix: '', body: '', hasContent: false };
 let logsFilterMode = 'all'; // all | error | warn
+let logsGlanceCounts = { error: 0, warn: 0 };
 
 function logsLineKind(line) {
   if (/\sERROR\s|\bERROR:|\bpanic\b/i.test(line)) return 'error';
@@ -7005,6 +7008,123 @@ function filterLogsBody(body, mode) {
     }
   }
   return out.join('\n');
+}
+
+/** Error/warn glance under Debug Log header (filter-chip parity; polls when collapsed). */
+function ensureLogsErrorGlance() {
+  const header = document.getElementById('logs-header');
+  if (!header) return null;
+  let glance = document.getElementById('logs-error-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'logs-error-glance';
+    glance.className = 'logs-error-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="logs-error-glance-text"></span>';
+    header.insertAdjacentElement('afterend', glance);
+    wireLogsErrorGlanceClick(glance);
+  }
+  return glance;
+}
+
+function applyLogsGlanceState({ error, warn }) {
+  const glance = ensureLogsErrorGlance();
+  if (!glance) return;
+  const text = document.getElementById('logs-error-glance-text');
+  const err = Number(error) || 0;
+  const wrn = Number(warn) || 0;
+  logsGlanceCounts = { error: err, warn: wrn };
+  if (err <= 0 && wrn <= 0) {
+    glance.hidden = true;
+    glance.classList.remove('has-errors', 'has-warns-only');
+    return;
+  }
+  glance.hidden = false;
+  const parts = [];
+  if (err > 0) parts.push(`${err} error${err === 1 ? '' : 's'}`);
+  if (wrn > 0) parts.push(`${wrn} warn${wrn === 1 ? '' : 's'}`);
+  if (text) text.textContent = parts.join(' · ');
+  glance.classList.toggle('has-errors', err > 0);
+  glance.classList.toggle('has-warns-only', err <= 0 && wrn > 0);
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  const filterHint = err > 0 ? 'errors' : 'warnings';
+  glance.title = `Click to show ${filterHint} in Debug Log`;
+  glance.setAttribute(
+    'aria-label',
+    `Debug Log tail has ${parts.join(' and ')} — click to filter`
+  );
+}
+
+function wireLogsErrorGlanceClick(glance) {
+  if (!glance || glance.dataset.logsGlanceWired === '1') return;
+  glance.dataset.logsGlanceWired = '1';
+  const activate = () => {
+    ensureLogsSectionExpanded();
+    const mode = logsGlanceCounts.error > 0 ? 'error' : 'warn';
+    setLogsFilterMode(mode);
+  };
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
+/** Expand Debug Log if collapsed (glance click / error CTA). */
+function ensureLogsSectionExpanded() {
+  const content = document.getElementById('logs-content');
+  const section = document.querySelector('.logs-section');
+  const header = document.getElementById('logs-header');
+  if (!content) return;
+  if (!logsSectionCollapsed && !content.classList.contains('collapsed')) {
+    return;
+  }
+  logsSectionCollapsed = false;
+  setSectionCollapsed('logs_collapsed', false);
+  content.classList.remove('collapsed');
+  if (section) section.classList.remove('collapsed');
+  const divider = document.getElementById('logs-details-divider');
+  if (divider) divider.style.display = '';
+  header?.setAttribute('aria-expanded', 'true');
+  if (typeof header?._syncCollapseA11y === 'function') header._syncCollapseA11y();
+  syncSectionIcon('icon-logs', true);
+  refreshLogsViewer(true);
+  const autoCb = document.getElementById('logs-autorefresh');
+  if (autoCb && autoCb.checked) startLogsAutoRefresh();
+}
+
+async function pollLogsGlanceCounts() {
+  const inv = getInvoke() || invoke;
+  if (!inv || !document.getElementById('logs-header')) return;
+  try {
+    const tail = await inv('read_debug_log', { maxBytes: 65536 });
+    const body = tail.content || '';
+    const counts = countLogsByKind(body);
+    applyLogsGlanceState(counts);
+  } catch (_) {
+    /* glance poll is best-effort */
+  }
+}
+
+function startLogsGlancePoll() {
+  stopLogsGlancePoll();
+  ensureLogsErrorGlance();
+  pollLogsGlanceCounts();
+  logsGlancePollTimer = setInterval(pollLogsGlanceCounts, 60000);
+}
+
+function stopLogsGlancePoll() {
+  if (logsGlancePollTimer) {
+    clearInterval(logsGlancePollTimer);
+    logsGlancePollTimer = null;
+  }
 }
 
 function ensureLogsFilterChips() {
@@ -7050,6 +7170,7 @@ function applyLogsFilter(scrollToEnd) {
   const warnEl = document.querySelector('[data-logs-filter-count="warn"]');
   if (errEl) errEl.textContent = String(counts.error);
   if (warnEl) warnEl.textContent = String(counts.warn);
+  applyLogsGlanceState(counts);
   document.querySelectorAll('#logs-filter-chips [data-logs-filter]').forEach((btn) => {
     const key = btn.getAttribute('data-logs-filter');
     btn.classList.toggle('has-hits', key === 'error' ? counts.error > 0 : key === 'warn' ? counts.warn > 0 : false);
@@ -8751,10 +8872,12 @@ function initLogsSection() {
   if (!header || !content) return;
 
   ensureLogsFilterChips();
+  ensureLogsErrorGlance();
+  startLogsGlancePoll();
 
-  let logsCollapsed = getSectionCollapsed('logs_collapsed');
+  logsSectionCollapsed = getSectionCollapsed('logs_collapsed');
   const applyCollapsed = () => {
-    if (logsCollapsed) {
+    if (logsSectionCollapsed) {
       content.classList.add('collapsed');
       if (section) section.classList.add('collapsed');
       if (divider) divider.style.display = 'none';
@@ -8767,26 +8890,28 @@ function initLogsSection() {
       if (autoCb && autoCb.checked) startLogsAutoRefresh();
     }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
-    syncSectionIcon('icon-logs', !logsCollapsed);
+    syncSectionIcon('icon-logs', !logsSectionCollapsed);
   };
   applyCollapsed();
 
   wireCollapsibleHeaderA11y(header, {
     contentId: 'logs-content',
-    getExpanded: () => !logsCollapsed,
-    ignoreSelector: '#logs-refresh-btn, #logs-open-btn, #logs-autorefresh, #logs-path-hint, label',
+    getExpanded: () => !logsSectionCollapsed,
+    ignoreSelector:
+      '#logs-refresh-btn, #logs-open-btn, #logs-autorefresh, #logs-path-hint, #logs-error-glance, label',
     onToggle: () => {
-      logsCollapsed = !logsCollapsed;
-      setSectionCollapsed('logs_collapsed', logsCollapsed);
+      logsSectionCollapsed = !logsSectionCollapsed;
+      setSectionCollapsed('logs_collapsed', logsSectionCollapsed);
       applyCollapsed();
     },
   });
 
   header.addEventListener('click', (e) => {
     if (e.target && e.target.closest && e.target.closest('#logs-path-hint')) return;
+    if (e.target && e.target.closest && e.target.closest('#logs-error-glance')) return;
     e.stopPropagation();
-    logsCollapsed = !logsCollapsed;
-    setSectionCollapsed('logs_collapsed', logsCollapsed);
+    logsSectionCollapsed = !logsSectionCollapsed;
+    setSectionCollapsed('logs_collapsed', logsSectionCollapsed);
     applyCollapsed();
   });
 
@@ -8895,7 +9020,7 @@ function initLogsSection() {
   }
   if (autoCb) {
     autoCb.addEventListener('change', () => {
-      if (autoCb.checked && !logsCollapsed) startLogsAutoRefresh();
+      if (autoCb.checked && !logsSectionCollapsed) startLogsAutoRefresh();
       else stopLogsAutoRefresh();
     });
   }

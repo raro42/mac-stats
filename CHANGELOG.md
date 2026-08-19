@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 - Comparison vs Stats / iStat Menus / MenuMeters: **Disk Cleanup** is in the how-we-compare notes and landing compare blurb (README table already had the row).
 
+## [0.1.533] - 2026-08-19
+
+### Added
+- Debug Log **error/warn glance** strip under the section header — shows ERROR/WARN counts from the log tail (polls every 60s even when collapsed). Click expands Debug Log and filters to errors (or warnings when no errors). Red wash when errors exist; amber when warnings only.
+
 ## [0.1.532] - 2026-08-19
 
 ### Added
