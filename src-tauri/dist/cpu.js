@@ -7216,6 +7216,82 @@ function wireDiskCleanupEnabledScopesCard() {
   });
 }
 
+/** Scroll/focus Clean now when due, else last-run summary (Reclaimable / Enabled scopes parity). */
+function focusDiskCleanupNextRunGlance() {
+  const nextEl = document.getElementById('disk-cleanup-next');
+  const label = (nextEl?.textContent || '').trim();
+  const due =
+    label.includes('Due now') ||
+    (() => {
+      const utc = nextEl?.title || '';
+      if (!utc) return false;
+      const t = Date.parse(utc);
+      return Number.isFinite(t) && t <= Date.now();
+    })();
+  if (due) {
+    const runBtn = document.getElementById('disk-cleanup-run-btn');
+    if (runBtn && typeof runBtn.focus === 'function') {
+      runBtn.focus();
+      if (typeof runBtn.scrollIntoView === 'function') {
+        runBtn.scrollIntoView({ block: 'nearest' });
+      }
+      return;
+    }
+  }
+  const lastEl = document.getElementById('disk-cleanup-last');
+  if (lastEl && typeof lastEl.scrollIntoView === 'function') {
+    lastEl.scrollIntoView({ block: 'nearest' });
+    lastEl.setAttribute('tabindex', '-1');
+    lastEl.focus({ preventScroll: true });
+  }
+}
+
+/** Clickable Next automatic run card (Reclaimable / Enabled scopes parity). */
+function applyDiskCleanupNextRunCardState(isDue) {
+  const nextEl = document.getElementById('disk-cleanup-next');
+  const card = nextEl?.closest('.disk-cleanup-meta-card');
+  if (!card) return;
+  card.classList.add('is-action');
+  card.classList.toggle('has-due', !!isDue);
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  if (isDue) {
+    card.title = 'Cleanup is due — click to focus Clean now';
+    card.setAttribute(
+      'aria-label',
+      'Next automatic run due — click to focus Clean now'
+    );
+  } else {
+    card.title = 'Click to scroll to last run summary';
+    card.setAttribute(
+      'aria-label',
+      'Next automatic run — click to scroll to last run summary'
+    );
+  }
+}
+
+function wireDiskCleanupNextRunCard() {
+  const nextEl = document.getElementById('disk-cleanup-next');
+  const card = nextEl?.closest('.disk-cleanup-meta-card');
+  if (!card || card.dataset.nextRunNav === '1') return;
+  card.dataset.nextRunNav = '1';
+  applyDiskCleanupNextRunCardState(false);
+  const activate = () => {
+    focusDiskCleanupNextRunGlance();
+  };
+  card.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  card.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /** Category list empty: warm title + Review scopes CTA (Monitors empty Add parity). */
 function renderDiskCleanupListEmpty(list) {
   if (!list) return;
@@ -7275,6 +7351,16 @@ async function refreshDiskCleanupPanel(opts) {
     if (nextEl) {
       nextEl.textContent = status.nextRunLabel || '—';
       nextEl.title = status.nextRunUtc || '';
+      const label = (status.nextRunLabel || '').trim();
+      const due =
+        label.includes('Due now') ||
+        (() => {
+          const utc = status.nextRunUtc || '';
+          if (!utc) return false;
+          const t = Date.parse(utc);
+          return Number.isFinite(t) && t <= Date.now();
+        })();
+      applyDiskCleanupNextRunCardState(due);
     }
     if (triggersEl) {
       triggersEl.textContent = (status.triggers || []).join(' · ') || '—';
@@ -8012,6 +8098,7 @@ function initDiskCleanupSection() {
   wireDiskCleanupListKeyboard();
   wireDiskCleanupReclaimCard();
   wireDiskCleanupEnabledScopesCard();
+  wireDiskCleanupNextRunCard();
 
   if (icon && !icon.getAttribute('data-title-base')) {
     icon.setAttribute('data-title-base', icon.title || 'Disk cleanup');
