@@ -500,6 +500,86 @@ function visibleProcessRows(processList) {
   );
 }
 
+/** Top CPU glance under Top Processes header (Monitors slowest-summary parity). */
+function ensureProcessesTopGlance() {
+  const header = document.getElementById("processes-header");
+  if (!header) return null;
+  let glance = document.getElementById("processes-top-glance");
+  if (!glance) {
+    glance = document.createElement("div");
+    glance.id = "processes-top-glance";
+    glance.className = "processes-top-glance";
+    glance.hidden = true;
+    glance.innerHTML = '<span id="processes-top-glance-text"></span>';
+    header.insertAdjacentElement("afterend", glance);
+    wireProcessesTopGlanceClick(glance);
+  }
+  return glance;
+}
+
+function applyProcessesTopGlanceState({ topPid, topName, topCpu, waiting }) {
+  const glance = ensureProcessesTopGlance();
+  if (!glance) return;
+  const text = document.getElementById("processes-top-glance-text");
+  if (waiting || topPid == null || !topName) {
+    glance.hidden = true;
+    window.__processesTopPid = null;
+    glance.classList.remove("is-hot");
+    return;
+  }
+  window.__processesTopPid = String(topPid);
+  glance.hidden = false;
+  const cpuStr = typeof topCpu === "number" ? `${topCpu.toFixed(1)}%` : "—";
+  if (text) text.textContent = `Top CPU · ${topName} ${cpuStr}`;
+  glance.classList.toggle("is-hot", typeof topCpu === "number" && topCpu >= 15);
+  glance.setAttribute("role", "button");
+  glance.tabIndex = 0;
+  glance.title = `Click to open ${topName} details`;
+  glance.setAttribute(
+    "aria-label",
+    `Top CPU process ${topName} at ${cpuStr} — click to open details`
+  );
+}
+
+function wireProcessesTopGlanceClick(glance) {
+  if (!glance || glance.dataset.topGlanceWired === "1") return;
+  glance.dataset.topGlanceWired = "1";
+  const activate = () => {
+    if (typeof window.showDetailsProcessesSections === "function") {
+      window.showDetailsProcessesSections();
+    }
+    const pid = window.__processesTopPid;
+    if (!pid) return;
+    if (processesFilterMode !== "all") setProcessesFilterMode("all");
+    const list = document.getElementById("process-list");
+    if (!list) return;
+    const row = list.querySelector(
+      `.process-row[data-pid="${CSS.escape(pid)}"]`
+    );
+    if (!row) return;
+    const visible = visibleProcessRows(list);
+    visible.forEach((r, i) =>
+      r.setAttribute("tabindex", r === row ? "0" : "-1")
+    );
+    row.focus();
+    if (typeof row.scrollIntoView === "function") {
+      row.scrollIntoView({ block: "nearest" });
+    }
+    showProcessDetails(parseInt(pid, 10));
+  };
+  glance.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /** All / Pinned chips (Monitors / Debug Log filter parity). */
 function ensureProcessesFilterChips() {
   const list = document.getElementById("process-list");
@@ -1268,6 +1348,14 @@ async function refresh() {
       colHeader.appendChild(colGpu);
       fragment.appendChild(colHeader);
       
+      const topProc = processes.length > 0 ? processes[0] : null;
+      applyProcessesTopGlanceState({
+        topPid: topProc?.pid ?? null,
+        topName: topProc?.name ?? null,
+        topCpu: topProc?.cpu ?? null,
+        waiting: processes.length === 0,
+      });
+
       if (processes.length > 0) {
         let tabIdx = processes.findIndex(
           (p) => focusPid !== null && String(p.pid) === String(focusPid)
@@ -6401,6 +6489,7 @@ function initCollapsibleSections() {
   }
 
   ensureRamStrip();
+  ensureProcessesTopGlance();
 }
 
 // ============================================================================
