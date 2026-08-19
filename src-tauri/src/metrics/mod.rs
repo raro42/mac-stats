@@ -103,6 +103,9 @@ pub struct CpuDetails {
     /// Bytes of total system memory (sysinfo).
     #[serde(default)]
     pub ram_total_bytes: u64,
+    /// System disk used / total as percent (0–100). Same basis as menu-bar SSD.
+    #[serde(default)]
+    pub disk_percent: f32,
     pub top_processes: Vec<ProcessUsage>,
     pub chip_info: String,
     // Access flags - true if we can read the value, false if access is denied
@@ -935,6 +938,47 @@ pub fn get_power_consumption() -> (f32, f32) {
     (0.0, 0.0)
 }
 
+/// System disk used / total as percent (0–100). Same basis as menu-bar SSD.
+fn get_disk_usage_percent(refresh_if_new: bool) -> f32 {
+    match DISKS.try_lock() {
+        Ok(mut disks) => {
+            if disks.is_none() {
+                debug3!("Creating new Disks instance (will refresh once)");
+                let mut new_disks = Disks::new();
+                if refresh_if_new {
+                    debug3!("Initial disk refresh (one time only)");
+                    new_disks.refresh(false);
+                }
+                *disks = Some(new_disks);
+            }
+            debug3!("Reading disk info (no refresh)");
+            let disks = disks.as_ref().unwrap();
+            if let Some(disk) = disks.list().first() {
+                let total = disk.total_space();
+                let available = disk.available_space();
+                if total > 0 {
+                    let disk_usage = ((total - available) as f32 / total as f32) * 100.0;
+                    debug3!(
+                        "Disk usage: {}% (total: {}, available: {})",
+                        disk_usage,
+                        total,
+                        available
+                    );
+                    disk_usage
+                } else {
+                    0.0
+                }
+            } else {
+                0.0
+            }
+        }
+        Err(_) => {
+            debug3!("WARNING: DISKS mutex is locked, using 0% for disk");
+            0.0
+        }
+    }
+}
+
 #[tauri::command]
 pub fn get_metrics() -> SystemMetrics {
     debug3!("get_metrics() called");
@@ -1000,46 +1044,7 @@ pub fn get_metrics() -> SystemMetrics {
         }
     };
 
-    // Use try_lock ONCE for disk - if locked, return cached value immediately
-    let disk_usage = match DISKS.try_lock() {
-        Ok(mut disks) => {
-            if disks.is_none() {
-                debug3!("Creating new Disks instance (will refresh once)");
-                let mut new_disks = Disks::new();
-                // Only refresh once on creation (expensive operation)
-                if should_refresh {
-                    debug3!("Initial disk refresh (one time only)");
-                    new_disks.refresh(false);
-                }
-                *disks = Some(new_disks);
-            }
-            debug3!("Reading disk info (no refresh)");
-            let disks = disks.as_ref().unwrap();
-            if let Some(disk) = disks.list().first() {
-                let total = disk.total_space();
-                let available = disk.available_space();
-                if total > 0 {
-                    let disk_usage = ((total - available) as f32 / total as f32) * 100.0;
-                    debug3!(
-                        "Disk usage: {}% (total: {}, available: {})",
-                        disk_usage,
-                        total,
-                        available
-                    );
-                    disk_usage
-                } else {
-                    0.0
-                }
-            } else {
-                0.0
-            }
-        }
-        Err(_) => {
-            // Lock held - return zero immediately, no retry
-            debug3!("WARNING: DISKS mutex is locked, using 0% for disk");
-            0.0
-        }
-    };
+    let disk_usage = get_disk_usage_percent(should_refresh);
 
     let gpu_usage = get_gpu_usage();
     debug3!("GPU usage: {}%", gpu_usage);
@@ -1677,6 +1682,8 @@ pub fn get_cpu_details() -> CpuDetails {
         let can_read_gpu_power =
             has_power_cache || gpu_power > 0.0 || crate::metrics::can_read_gpu_power();
 
+        let disk_percent = get_disk_usage_percent(false);
+
         return CpuDetails {
             usage,
             gpu_usage,
@@ -1693,6 +1700,7 @@ pub fn get_cpu_details() -> CpuDetails {
             ram_percent,
             ram_used_bytes,
             ram_total_bytes,
+            disk_percent,
             top_processes: processes,
             chip_info: crate::metrics::get_chip_info(),
             can_read_temperature: crate::metrics::can_read_temperature(),
@@ -2107,6 +2115,8 @@ pub fn get_cpu_details() -> CpuDetails {
         Err(_) => (0.0, 0, 0),
     };
 
+    let disk_percent = get_disk_usage_percent(false);
+
     CpuDetails {
         usage,
         gpu_usage,
@@ -2123,6 +2133,7 @@ pub fn get_cpu_details() -> CpuDetails {
         ram_percent,
         ram_used_bytes,
         ram_total_bytes,
+        disk_percent,
         top_processes,
         chip_info,
         can_read_temperature,

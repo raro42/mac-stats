@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.537] - 2026-08-20
+
+### Added
+- CPU metrics **SSD % on the battery/power strip** (menu-bar parity). Click or Enter/Space opens Disk Cleanup and flashes the section. Soft amber wash when ≥ 85% full.
+
 ## [0.1.536] - 2026-08-20
 
 ### Added

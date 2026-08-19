@@ -1215,6 +1215,33 @@ async function refresh() {
       }
     }
 
+    // System SSD (menu-bar parity) — Disk Cleanup section + battery/power strip
+    ensureDiskStrip();
+    const diskStripEl = document.getElementById("disk-strip-value");
+    const diskStripCell = document.getElementById("disk-strip");
+    if (diskStripEl || diskStripCell) {
+      const diskPct =
+        typeof data.disk_percent === "number" && Number.isFinite(data.disk_percent)
+          ? data.disk_percent
+          : null;
+      const diskPctText = diskPct != null ? `${diskPct.toFixed(0)}%` : "—";
+      if (diskStripEl && diskStripEl.textContent !== diskPctText) {
+        scheduleDOMUpdate(() => {
+          diskStripEl.textContent = diskPctText;
+        });
+      }
+      if (diskStripCell) {
+        const hot = diskPct != null && diskPct >= 85;
+        diskStripCell.classList.toggle("is-hot", hot);
+        const title = "Show Disk Cleanup";
+        diskStripCell.title = title;
+        diskStripCell.setAttribute(
+          "aria-label",
+          `SSD ${diskPctText}. ${title}`
+        );
+      }
+    }
+
     // Update load averages (simple updates, no tweening)
     const load1El = document.getElementById("load-1");
     const newLoad1 = data.load_1.toFixed(2);
@@ -1689,6 +1716,7 @@ function init() {
   ensureGpuStrip();
   ensureTempStrip();
   ensureFreqStrip();
+  ensureDiskStrip();
   
   // Try to get Tauri immediately - don't wait if it's already available
   const immediateInvoke = getInvoke();
@@ -1997,6 +2025,40 @@ function ensureRamStripStyles() {
       border-radius: 10px;
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
     }
+    .disk-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      outline: none;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .disk-info:hover {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
+    }
+    .disk-info:focus-visible {
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+    }
+    .disk-info.is-hot {
+      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
+    }
+    .disk-label {
+      color: var(--muted);
+    }
+    .disk-value {
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .disk-cleanup-section.is-disk-highlight {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, transparent);
+      border-radius: 12px;
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, transparent);
+    }
   `;
   document.head.appendChild(style);
 }
@@ -2251,6 +2313,67 @@ function ensureFreqStrip() {
   cell.addEventListener("keydown", (e) => {
     if (e.key !== "Enter" && e.key !== " ") return;
     openFreq(e);
+  });
+  return cell;
+}
+
+function flashDiskCleanupSection() {
+  const section = document.querySelector('.disk-cleanup-section');
+  if (!section) return;
+  section.classList.add('is-disk-highlight');
+  window.setTimeout(() => {
+    section.classList.remove('is-disk-highlight');
+  }, 1600);
+}
+
+function openDiskCleanupFromStrip() {
+  if (typeof ensureDiskCleanupSectionExpanded === 'function') {
+    ensureDiskCleanupSectionExpanded();
+  }
+  const header = document.getElementById('disk-cleanup-header');
+  if (header && typeof header.scrollIntoView === 'function') {
+    header.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  flashDiskCleanupSection();
+}
+
+/**
+ * SSD % on the battery/power strip (menu-bar parity). Click / Enter / Space
+ * opens Disk Cleanup and flashes the section — not copy.
+ */
+function ensureDiskStrip() {
+  ensureRamStripStyles();
+  const strip = document.getElementById('battery-power-strip');
+  if (!strip) return null;
+  let cell = document.getElementById('disk-strip');
+  if (!cell) {
+    cell = document.createElement('div');
+    cell.id = 'disk-strip';
+    cell.className = 'disk-info';
+    cell.setAttribute('role', 'button');
+    cell.tabIndex = 0;
+    cell.title = 'Show Disk Cleanup';
+    cell.setAttribute('aria-label', 'Show Disk Cleanup');
+    cell.innerHTML =
+      '<span class="disk-label">SSD</span>' +
+      '<span class="disk-value" id="disk-strip-value">—</span>';
+    const freqEl = document.getElementById('freq-strip');
+    const timeEl = document.getElementById('time-remaining');
+    if (freqEl && freqEl.nextSibling) strip.insertBefore(cell, freqEl.nextSibling);
+    else if (timeEl) strip.insertBefore(cell, timeEl);
+    else strip.appendChild(cell);
+  }
+  if (cell.dataset.diskStripWired === '1') return cell;
+  cell.dataset.diskStripWired = '1';
+  const openDisk = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openDiskCleanupFromStrip();
+  };
+  cell.addEventListener('click', openDisk);
+  cell.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    openDisk(e);
   });
   return cell;
 }
@@ -6847,6 +6970,7 @@ function initCollapsibleSections() {
   ensureGpuStrip();
   ensureTempStrip();
   ensureFreqStrip();
+  ensureDiskStrip();
   ensureProcessesTopGlance();
 }
 
