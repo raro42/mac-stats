@@ -524,10 +524,30 @@ const CHAT_EMPTY_SUGGESTIONS = [
   { label: 'Any sites down?', prompt: 'Are any website monitors down?' },
 ];
 
+/** Brief flash on a starter chip (Load into AI Chat / save-button-feedback parity). */
+function flashChatEmptyChip(btn) {
+  if (!btn) return;
+  if (btn._chipFlashTimer) {
+    clearTimeout(btn._chipFlashTimer);
+    btn._chipFlashTimer = null;
+  }
+  const idle = btn.dataset.idleLabel || btn.textContent || '';
+  btn.dataset.idleLabel = idle;
+  btn.classList.add('is-just-saved');
+  btn.textContent = 'In composer';
+  btn._chipFlashTimer = setTimeout(() => {
+    btn.classList.remove('is-just-saved');
+    btn.textContent = idle;
+    btn._chipFlashTimer = null;
+  }, 1600);
+}
+
 /**
  * Put a starter prompt in the composer (Load into AI Chat parity — user hits Enter).
+ * @param {string} prompt
+ * @param {HTMLButtonElement | null | undefined} chipBtn
  */
-function applyChatEmptySuggestion(prompt) {
+function applyChatEmptySuggestion(prompt, chipBtn) {
   const input = document.getElementById('chat-input');
   const text = String(prompt || '').trim();
   if (!input || !text || chatSendInFlight) return;
@@ -539,6 +559,7 @@ function applyChatEmptySuggestion(prompt) {
   } catch (_) {
     /* ignore */
   }
+  flashChatEmptyChip(chipBtn);
 }
 
 /**
@@ -573,7 +594,7 @@ function ensureChatEmptyHint() {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      applyChatEmptySuggestion(item.prompt);
+      applyChatEmptySuggestion(item.prompt, btn);
     });
     row.appendChild(btn);
   });

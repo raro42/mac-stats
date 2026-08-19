@@ -1266,6 +1266,11 @@ textarea.ops-agent-editor.is-dirty {
   outline-offset: 2px;
 }
 
+.chat-empty-chip.is-just-saved {
+  cursor: default;
+  pointer-events: none;
+}
+
 #chat-input:focus {
   outline: none;
   border-color: color-mix(in srgb, #0a84ff 55%, transparent);
