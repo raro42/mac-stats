@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.534] - 2026-08-19
+
+### Added
+- CPU metrics **GPU % on the battery/power strip** (RAM / menu-bar parity). Click or Enter/Space scrolls to the GPU ring and flashes it. Soft amber wash when GPU ≥ 15%.
+
 ### Added
 - README / landing **Star growth** banner with a local cumulative-star chart (`docs/screens/star-history.svg`; regenerate via `scripts/generate_star_history_svg.py`).
 - Nightly star-chart refresh from `overnight_git_flush.py` (updates SVG only when stars change).

@@ -902,6 +902,21 @@ async function refresh() {
       if (window.posterCharts && typeof window.posterCharts.updateGpuUsage === "function") {
         window.posterCharts.updateGpuUsage(data.gpu_usage || 0);
       }
+      ensureGpuStrip();
+      const gpuStripEl = document.getElementById("gpu-strip-value");
+      const gpuStripCell = document.getElementById("gpu-strip");
+      const gpuPctText = `${newGpuUsage}%`;
+      if (gpuStripEl && gpuStripEl.textContent !== gpuPctText) {
+        scheduleDOMUpdate(() => {
+          gpuStripEl.textContent = gpuPctText;
+        });
+      }
+      if (gpuStripCell) {
+        gpuStripCell.classList.toggle("is-hot", newGpuUsage >= 15);
+        const title = "Show GPU ring";
+        gpuStripCell.title = title;
+        gpuStripCell.setAttribute("aria-label", `GPU ${gpuPctText}. ${title}`);
+      }
     }
 
     // Update CPU usage
@@ -1620,6 +1635,7 @@ function init() {
   window._forceProcessUpdate = true;
   wireMetricValueCopy();
   ensureRamStrip();
+  ensureGpuStrip();
   
   // Try to get Tauri immediately - don't wait if it's already available
   const immediateInvoke = getInvoke();
@@ -1825,6 +1841,41 @@ function ensureRamStripStyles() {
       border-radius: 6px;
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
     }
+    .gpu-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      outline: none;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .gpu-info:hover {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
+    }
+    .gpu-info:focus-visible {
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+    }
+    .gpu-info.is-hot {
+      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
+    }
+    .gpu-label {
+      color: var(--muted);
+    }
+    .gpu-value {
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .metric-card.is-gpu-highlight,
+    #gpu-power.is-gpu-highlight {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      border-radius: 10px;
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+    }
   `;
   document.head.appendChild(style);
 }
@@ -1896,6 +1947,69 @@ function ensureRamStrip() {
   cell.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     openRam(e);
+  });
+  return cell;
+}
+
+function flashGpuRing() {
+  const gpuVal = document.getElementById("gpu-usage-value");
+  const card = gpuVal && gpuVal.closest ? gpuVal.closest(".metric-card") : null;
+  const powerEl = document.getElementById("gpu-power");
+  const targets = [card, powerEl].filter(Boolean);
+  for (const el of targets) {
+    el.classList.add("is-gpu-highlight");
+    window.setTimeout(() => {
+      el.classList.remove("is-gpu-highlight");
+    }, 1600);
+  }
+}
+
+function openGpuRingFromStrip() {
+  const gpuVal = document.getElementById("gpu-usage-value");
+  if (gpuVal && typeof gpuVal.scrollIntoView === "function") {
+    gpuVal.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+  flashGpuRing();
+}
+
+/**
+ * GPU % on the battery/power strip (RAM strip / menu-bar parity). Click /
+ * Enter / Space scrolls to the GPU ring and flashes it — not copy (the ring
+ * value already copies).
+ */
+function ensureGpuStrip() {
+  ensureRamStripStyles();
+  const strip = document.getElementById("battery-power-strip");
+  if (!strip) return null;
+  let cell = document.getElementById("gpu-strip");
+  if (!cell) {
+    cell = document.createElement("div");
+    cell.id = "gpu-strip";
+    cell.className = "gpu-info";
+    cell.setAttribute("role", "button");
+    cell.tabIndex = 0;
+    cell.title = "Show GPU ring";
+    cell.setAttribute("aria-label", "Show GPU ring");
+    cell.innerHTML =
+      '<span class="gpu-label">GPU</span>' +
+      '<span class="gpu-value" id="gpu-strip-value">—</span>';
+    const ramEl = document.getElementById("ram-strip");
+    const timeEl = document.getElementById("time-remaining");
+    if (ramEl && ramEl.nextSibling) strip.insertBefore(cell, ramEl.nextSibling);
+    else if (timeEl) strip.insertBefore(cell, timeEl);
+    else strip.appendChild(cell);
+  }
+  if (cell.dataset.gpuStripWired === "1") return cell;
+  cell.dataset.gpuStripWired = "1";
+  const openGpu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openGpuRingFromStrip();
+  };
+  cell.addEventListener("click", openGpu);
+  cell.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    openGpu(e);
   });
   return cell;
 }
@@ -6489,6 +6603,7 @@ function initCollapsibleSections() {
   }
 
   ensureRamStrip();
+  ensureGpuStrip();
   ensureProcessesTopGlance();
 }
 
