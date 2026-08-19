@@ -2648,6 +2648,17 @@ button.monitor-detail-url.is-just-saved {
   box-shadow: 0 0 0 3px color-mix(in srgb, #30d158 22%, transparent);
 }
 
+/* Runs when — soft wash when periodic cleanup is off */
+.disk-cleanup-meta-card.has-periodic-off {
+  border-color: color-mix(in srgb, #64d2ff 34%, transparent);
+  background: color-mix(in srgb, #64d2ff 8%, transparent);
+}
+
+.disk-cleanup-meta-card.is-action.has-periodic-off:focus-visible {
+  border-color: color-mix(in srgb, #64d2ff 48%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #64d2ff 22%, transparent);
+}
+
 .disk-cleanup-meta-label {
   font-size: 11px;
   opacity: 0.65;

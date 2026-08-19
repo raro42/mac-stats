@@ -7292,6 +7292,85 @@ function wireDiskCleanupNextRunCard() {
   });
 }
 
+/** Launch/periodic runs use enabled scopes — focus first on scope (not disabled-first). */
+function focusDiskCleanupRunsWhenGlance() {
+  ensureDiskCleanupSectionExpanded();
+  const scopesEl = document.getElementById('disk-cleanup-scopes');
+  const addLabel = document.getElementById('disk-cleanup-add-label');
+  requestAnimationFrame(() => {
+    const enabledRow = scopesEl?.querySelector(
+      '.disk-cleanup-scope-row:not(.is-disabled)'
+    );
+    const anyRow = scopesEl?.querySelector('.disk-cleanup-scope-row');
+    const row = enabledRow || anyRow;
+    if (row) {
+      const idx = parseInt(row.getAttribute('data-scope-idx') || '0', 10);
+      syncDiskCleanupScopeTabOrder(scopesEl, Number.isFinite(idx) ? idx : 0);
+      const enable = row.querySelector('input[data-scope-enabled]');
+      const focusEl = enable || row;
+      if (typeof focusEl.focus === 'function') focusEl.focus();
+      if (typeof row.scrollIntoView === 'function') {
+        row.scrollIntoView({ block: 'nearest' });
+      }
+      return;
+    }
+    if (addLabel && typeof addLabel.focus === 'function') {
+      addLabel.focus();
+      if (typeof addLabel.scrollIntoView === 'function') {
+        addLabel.scrollIntoView({ block: 'nearest' });
+      }
+    }
+  });
+}
+
+/** Clickable Runs when card (Next automatic run / Enabled scopes parity). */
+function applyDiskCleanupRunsWhenCardState(triggersText) {
+  const triggersEl = document.getElementById('disk-cleanup-triggers');
+  const card = triggersEl?.closest('.disk-cleanup-meta-card');
+  if (!card) return;
+  card.classList.add('is-action');
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  const periodicOff = (triggersText || '').includes('Periodic: off');
+  card.classList.toggle('has-periodic-off', periodicOff);
+  if (periodicOff) {
+    card.title =
+      'Periodic cleanup is off — click to review scopes that run on launch';
+    card.setAttribute(
+      'aria-label',
+      'Runs when — periodic off; click to review launch scopes'
+    );
+  } else {
+    card.title = 'Click to review scopes that run on launch and on schedule';
+    card.setAttribute(
+      'aria-label',
+      'Runs when — click to review launch and scheduled scopes'
+    );
+  }
+}
+
+function wireDiskCleanupRunsWhenCard() {
+  const triggersEl = document.getElementById('disk-cleanup-triggers');
+  const card = triggersEl?.closest('.disk-cleanup-meta-card');
+  if (!card || card.dataset.runsWhenNav === '1') return;
+  card.dataset.runsWhenNav = '1';
+  applyDiskCleanupRunsWhenCardState('');
+  const activate = () => {
+    focusDiskCleanupRunsWhenGlance();
+  };
+  card.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  card.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /** Category list empty: warm title + Review scopes CTA (Monitors empty Add parity). */
 function renderDiskCleanupListEmpty(list) {
   if (!list) return;
@@ -7363,7 +7442,9 @@ async function refreshDiskCleanupPanel(opts) {
       applyDiskCleanupNextRunCardState(due);
     }
     if (triggersEl) {
-      triggersEl.textContent = (status.triggers || []).join(' · ') || '—';
+      const triggersJoined = (status.triggers || []).join(' · ') || '—';
+      triggersEl.textContent = triggersJoined;
+      applyDiskCleanupRunsWhenCardState(triggersJoined);
     }
     if (scopeSummaryEl) {
       scopeSummaryEl.textContent = status.enabledScopeSummary || status.rootHint || '—';
@@ -8099,6 +8180,7 @@ function initDiskCleanupSection() {
   wireDiskCleanupReclaimCard();
   wireDiskCleanupEnabledScopesCard();
   wireDiskCleanupNextRunCard();
+  wireDiskCleanupRunsWhenCard();
 
   if (icon && !icon.getAttribute('data-title-base')) {
     icon.setAttribute('data-title-base', icon.title || 'Disk cleanup');

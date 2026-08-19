@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 - Comparison vs Stats / iStat Menus / MenuMeters: **Disk Cleanup** is in the how-we-compare notes and landing compare blurb (README table already had the row).
 
+## [0.1.528] - 2026-08-19
+
+### Added
+- Disk Cleanup **Runs when** meta-card click — scrolls to enabled scopes (launch/schedule parity; Enabled scopes prefers off scopes first). Soft blue wash when periodic cleanup is off.
+
 ## [0.1.527] - 2026-08-19
 
 ### Added
