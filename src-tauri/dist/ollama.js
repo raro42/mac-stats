@@ -571,6 +571,141 @@ function wireChatTurnGlanceClick(glance) {
   });
 }
 
+/** Last assistant reply text for the answer glance (history first, then DOM). */
+function getLastAssistantAnswerText() {
+  for (let i = conversationHistory.length - 1; i >= 0; i--) {
+    const m = conversationHistory[i];
+    if (m?.role === 'assistant' && typeof m.content === 'string') {
+      const t = m.content.trim();
+      if (t) return t;
+    }
+  }
+  const nodes = document.querySelectorAll(
+    '#chat-messages .chat-message.assistant:not(.thinking)'
+  );
+  const last = nodes.length ? nodes[nodes.length - 1] : null;
+  if (!last) return '';
+  return String(last.innerText || last.textContent || '').trim();
+}
+
+/** Truncate last-answer glance preview. */
+function getChatAnswerGlancePreview() {
+  return truncateChatGlancePreview(getLastAssistantAnswerText(), 52);
+}
+
+async function copyChatTextToClipboard(text) {
+  const value = String(text || '').trim();
+  if (!value) return false;
+  if (typeof window.copyTextToClipboard === 'function') {
+    return window.copyTextToClipboard(value);
+  }
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch (_) {
+    /* fall through */
+  }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = value;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return !!ok;
+  } catch (_) {
+    return false;
+  }
+}
+
+function flashChatAnswerGlanceCopied(glance) {
+  if (!glance) return;
+  const text = document.getElementById('chat-answer-glance-text');
+  if (glance._answerCopiedTimer) {
+    clearTimeout(glance._answerCopiedTimer);
+    glance._answerCopiedTimer = null;
+  }
+  const prev = text ? text.textContent : '';
+  glance.classList.add('is-just-copied');
+  if (text) text.textContent = 'Copied';
+  glance.title = 'Copied';
+  glance.setAttribute('aria-label', 'Copied last answer');
+  glance._answerCopiedTimer = setTimeout(() => {
+    glance.classList.remove('is-just-copied');
+    glance._answerCopiedTimer = null;
+    applyChatAnswerGlanceState();
+    if (text && !text.textContent) text.textContent = prev;
+  }, 1600);
+}
+
+/** Last-answer glance under AI Chat — click copies reply (Top Processes / Monitors parity). */
+function ensureChatAnswerGlance() {
+  const turn = ensureChatTurnGlance();
+  const header = document.getElementById('ollama-header');
+  const anchor = turn || header;
+  if (!anchor) return null;
+  let glance = document.getElementById('chat-answer-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'chat-answer-glance';
+    glance.className = 'chat-answer-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="chat-answer-glance-text"></span>';
+    anchor.insertAdjacentElement('afterend', glance);
+    wireChatAnswerGlanceClick(glance);
+  }
+  return glance;
+}
+
+function applyChatAnswerGlanceState() {
+  const glance = ensureChatAnswerGlance();
+  if (!glance) return;
+  if (glance.classList.contains('is-just-copied') && glance._answerCopiedTimer) return;
+  const text = document.getElementById('chat-answer-glance-text');
+  const answer = getLastAssistantAnswerText();
+  const preview = getChatAnswerGlancePreview();
+  if (!answer || !preview || chatSendInFlight) {
+    glance.hidden = true;
+    glance.classList.remove('has-answer');
+    return;
+  }
+  glance.hidden = false;
+  glance.classList.add('has-answer');
+  if (text) text.textContent = `Last answer · ${preview}`;
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  glance.title = 'Copy last answer';
+  glance.setAttribute('aria-label', `Copy last answer: ${preview}`);
+}
+
+function wireChatAnswerGlanceClick(glance) {
+  if (!glance || glance.dataset.answerGlanceWired === '1') return;
+  glance.dataset.answerGlanceWired = '1';
+  const activate = async () => {
+    if (chatSendInFlight) return;
+    const answer = getLastAssistantAnswerText();
+    if (!answer) return;
+    const ok = await copyChatTextToClipboard(answer);
+    if (ok) flashChatAnswerGlanceCopied(glance);
+  };
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /** Enable Clear only when history exists and Send is not in flight. */
 function updateChatClearButton() {
   const btn = getChatClearButton();
@@ -584,6 +719,7 @@ function updateChatClearButton() {
       ? 'Clear this chat'
       : 'No messages to clear';
   applyChatTurnGlanceState();
+  applyChatAnswerGlanceState();
 }
 
 /**

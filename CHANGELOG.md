@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.539] - 2026-08-20
+
+### Added
+- AI Chat **last-answer glance** — preview of the latest reply; click or Enter/Space copies it (Copied flash). Soft accent wash when an answer is ready. Hidden while Sending….
+
 ## [0.1.538] - 2026-08-20
 
 ### Added
