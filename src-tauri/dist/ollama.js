@@ -471,6 +471,106 @@ function getChatClearButton() {
   return document.getElementById('chat-clear-btn');
 }
 
+/** Truncate glance preview (strip markdown noise, cap length). */
+function truncateChatGlancePreview(text, maxLen = 48) {
+  const raw = String(text || '')
+    .replace(/\[screenshot:[^\]]+\]/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!raw) return '';
+  if (raw.length <= maxLen) return raw;
+  return `${raw.slice(0, maxLen - 1).trim()}…`;
+}
+
+/** Last user turn preview for the turn glance strip (Top CPU / Monitors parity). */
+function getChatTurnGlancePreview() {
+  for (let i = conversationHistory.length - 1; i >= 0; i--) {
+    if (conversationHistory[i]?.role === 'user') {
+      return truncateChatGlancePreview(conversationHistory[i].content);
+    }
+  }
+  const nodes = document.querySelectorAll('#chat-messages .chat-message.user');
+  const last = nodes.length ? nodes[nodes.length - 1] : null;
+  if (last) return truncateChatGlancePreview(last.textContent || '');
+  return '';
+}
+
+function countChatTurns() {
+  let turns = conversationHistory.filter((m) => m.role === 'user').length;
+  if (!turns) {
+    turns = document.querySelectorAll('#chat-messages .chat-message.user').length;
+  }
+  return turns;
+}
+
+/** Turn glance under AI Chat header — scroll to latest + focus composer. */
+function ensureChatTurnGlance() {
+  const header = document.getElementById('ollama-header');
+  if (!header) return null;
+  let glance = document.getElementById('chat-turn-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'chat-turn-glance';
+    glance.className = 'chat-turn-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="chat-turn-glance-text"></span>';
+    header.insertAdjacentElement('afterend', glance);
+    wireChatTurnGlanceClick(glance);
+  }
+  return glance;
+}
+
+function applyChatTurnGlanceState() {
+  const glance = ensureChatTurnGlance();
+  if (!glance) return;
+  const text = document.getElementById('chat-turn-glance-text');
+  const turns = countChatTurns();
+  const preview = getChatTurnGlancePreview();
+  if (!turns || !preview) {
+    glance.hidden = true;
+    glance.classList.remove('is-active');
+    return;
+  }
+  glance.hidden = false;
+  const turnLabel = turns === 1 ? '1 turn' : `${turns} turns`;
+  if (text) text.textContent = `${turnLabel} · ${preview}`;
+  glance.classList.toggle('is-active', chatSendInFlight);
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  glance.title = 'Scroll to latest message and focus composer';
+  glance.setAttribute(
+    'aria-label',
+    `${turnLabel} — last question "${preview}" — scroll to latest`
+  );
+}
+
+function wireChatTurnGlanceClick(glance) {
+  if (!glance || glance.dataset.turnGlanceWired === '1') return;
+  glance.dataset.turnGlanceWired = '1';
+  const activate = () => {
+    const container = document.getElementById('chat-messages');
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+      const last = container.querySelector('.chat-message:last-child');
+      if (last && typeof last.scrollIntoView === 'function') {
+        last.scrollIntoView({ block: 'nearest' });
+      }
+    }
+    document.getElementById('chat-input')?.focus();
+  };
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /** Enable Clear only when history exists and Send is not in flight. */
 function updateChatClearButton() {
   const btn = getChatClearButton();
@@ -483,6 +583,7 @@ function updateChatClearButton() {
     : hasSomething
       ? 'Clear this chat'
       : 'No messages to clear';
+  applyChatTurnGlanceState();
 }
 
 /**
@@ -1469,6 +1570,7 @@ function initOllamaChatListeners() {
 async function initializeOllama() {
   // Auto-configure after a short delay to ensure everything is ready
   console.log('[Ollama] Module loaded, auto-configuring...');
+  ensureChatTurnGlance();
   try {
     // Always auto-configure the backend, regardless of DOM elements
     await autoConfigureOllama();

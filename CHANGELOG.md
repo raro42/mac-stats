@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README / landing tagline: warmer, slightly sarcastic (“Your Mac already knows how busy it is…”).
 - Comparison vs Stats / iStat Menus / MenuMeters: **Disk Cleanup** is in the how-we-compare notes and landing compare blurb (README table already had the row).
 
+## [0.1.532] - 2026-08-19
+
+### Added
+- AI Chat **turn glance** strip under the section header — shows turn count and last question preview; click scrolls to the latest message and focuses the composer (Top Processes / Monitors summary parity). Soft accent wash while a reply is sending.
+
 ## [0.1.531] - 2026-08-19
 
 ### Added
