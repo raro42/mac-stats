@@ -21,6 +21,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 ## Done recently (do not re-pick as filler)
 
 - CPU metrics **Temp °C on the battery/power strip** (click scrolls to temp ring; amber wash ≥ 70°C) — **v0.1.535**
+- CPU metrics **frequency GHz on the battery/power strip** (click scrolls to freq ring; amber wash ≥ 3.5 GHz) — **v0.1.536**
 - CPU metrics **GPU % on the battery/power strip** (click scrolls to GPU ring; amber wash ≥ 15%) — **v0.1.534**
 - Debug Log **error/warn glance** strip (ERROR/WARN counts from tail; 60s poll when collapsed; click expands + filters; red/amber wash) — **v0.1.533**
 - AI Chat **turn glance** strip (turn count + last question; scroll to latest + focus composer; accent wash while sending) — **v0.1.532**
