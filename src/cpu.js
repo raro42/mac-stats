@@ -974,6 +974,22 @@ async function refresh() {
     
     // Always update ring gauge (it handles first paint and change detection internally)
     updateRingGauge("cpu-usage-ring-progress", data.usage, 'usage');
+
+    ensureCpuStrip();
+    const cpuStripEl = document.getElementById("cpu-strip-value");
+    const cpuStripCell = document.getElementById("cpu-strip");
+    const cpuPctText = `${newUsage}%`;
+    if (cpuStripEl && cpuStripEl.textContent !== cpuPctText) {
+      scheduleDOMUpdate(() => {
+        cpuStripEl.textContent = cpuPctText;
+      });
+    }
+    if (cpuStripCell) {
+      cpuStripCell.classList.toggle("is-hot", newUsage >= 50);
+      const title = "Show CPU ring";
+      cpuStripCell.title = title;
+      cpuStripCell.setAttribute("aria-label", `CPU ${cpuPctText}. ${title}`);
+    }
     
     // Update data-poster charts if available
     if (window.posterCharts) {
@@ -1712,6 +1728,7 @@ function init() {
   // Force immediate process update on initial load
   window._forceProcessUpdate = true;
   wireMetricValueCopy();
+  ensureCpuStrip();
   ensureRamStrip();
   ensureGpuStrip();
   ensureTempStrip();
@@ -1890,6 +1907,40 @@ function ensureRamStripStyles() {
     #battery-power-strip {
       flex-wrap: wrap;
       gap: 8px 12px;
+    }
+    .cpu-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      outline: none;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .cpu-info:hover {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
+    }
+    .cpu-info:focus-visible {
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+    }
+    .cpu-info.is-hot {
+      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
+    }
+    .cpu-label {
+      color: var(--muted);
+    }
+    .cpu-value {
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    #cpu-usage-card.is-cpu-highlight {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      border-radius: 10px;
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
     }
     .ram-info {
       display: flex;
@@ -2093,6 +2144,64 @@ function openRamDetailsFromStrip() {
     ramEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
   flashRamDetails();
+}
+
+function flashCpuRing() {
+  const card = document.getElementById("cpu-usage-card");
+  if (!card) return;
+  card.classList.add("is-cpu-highlight");
+  window.setTimeout(() => {
+    card.classList.remove("is-cpu-highlight");
+  }, 1600);
+}
+
+function openCpuRingFromStrip() {
+  const cpuVal = document.getElementById("cpu-usage-value");
+  if (cpuVal && typeof cpuVal.scrollIntoView === "function") {
+    cpuVal.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+  flashCpuRing();
+}
+
+/**
+ * CPU % on the battery/power strip (menu-bar parity). Click / Enter / Space
+ * scrolls to the CPU ring and flashes it — not copy (`#cpu-usage-card` toggles
+ * Details / Top Processes; copy on the ring value stole that in v0.1.513).
+ * Soft amber wash when ≥ 50%.
+ */
+function ensureCpuStrip() {
+  ensureRamStripStyles();
+  const strip = document.getElementById("battery-power-strip");
+  if (!strip) return null;
+  let cell = document.getElementById("cpu-strip");
+  if (!cell) {
+    cell = document.createElement("div");
+    cell.id = "cpu-strip";
+    cell.className = "cpu-info";
+    cell.setAttribute("role", "button");
+    cell.tabIndex = 0;
+    cell.title = "Show CPU ring";
+    cell.setAttribute("aria-label", "Show CPU ring");
+    cell.innerHTML =
+      '<span class="cpu-label">CPU</span>' +
+      '<span class="cpu-value" id="cpu-strip-value">—</span>';
+    const timeEl = document.getElementById("time-remaining");
+    if (timeEl) strip.insertBefore(cell, timeEl);
+    else strip.insertBefore(cell, strip.firstChild);
+  }
+  if (cell.dataset.cpuStripWired === "1") return cell;
+  cell.dataset.cpuStripWired = "1";
+  const openCpu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openCpuRingFromStrip();
+  };
+  cell.addEventListener("click", openCpu);
+  cell.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    openCpu(e);
+  });
+  return cell;
 }
 
 /**
@@ -6966,6 +7075,7 @@ function initCollapsibleSections() {
     });
   }
 
+  ensureCpuStrip();
   ensureRamStrip();
   ensureGpuStrip();
   ensureTempStrip();

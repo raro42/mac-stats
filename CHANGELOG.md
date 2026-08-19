@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.538] - 2026-08-20
+
+### Added
+- CPU metrics **CPU % on the battery/power strip** (menu-bar parity). Click or Enter/Space scrolls to the CPU ring and flashes it. Soft amber wash when ≥ 50%.
+
 ## [0.1.537] - 2026-08-20
 
 ### Added
