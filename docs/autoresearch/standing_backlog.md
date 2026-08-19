@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Monitors summary click opens **slowest** site when all UP (latency hint; amber wash; DOWN still first DOWN) — **v0.1.530**
 - Disk Cleanup **Last run panel click** (first cleaned category / reclaim / scopes; amber wash on Trash skips) — **v0.1.529**
 - Disk Cleanup **Runs when meta-card click** (enabled scopes focus; periodic-off blue wash) — **v0.1.528**
 - AI Chat empty-state starter chip **In composer** flash (Load into AI Chat parity; no auto-send) — **v0.1.527**
