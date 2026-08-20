@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.546] - 2026-08-20
+
+### Added
+- Agent Ops Knowledge **All · Discord · Core** filter chips (Sessions Live/Files parity). Counts on Discord/Core; overview Knowledge opens Discord when any (else Core); overview file preview sets the matching kind; Clear resets to All; N/M chip respects kind.
+
 ## [0.1.545] - 2026-08-20
 
 ### Added

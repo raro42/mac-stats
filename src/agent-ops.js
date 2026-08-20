@@ -198,7 +198,7 @@
         id: 'ops-memory-filter',
         clear() {
           opsMemoryFilterQ = '';
-          renderOpsMemory(opsMemoryCache);
+          setOpsMemoryKindFilter('all');
         },
       },
       runs: {
@@ -265,6 +265,8 @@
   let opsLiveCache = [];
   let opsSessionFilesCache = [];
   let opsMemoryFilterQ = '';
+  /** Knowledge panel kind chip: `all` | `discord` | `core` (Sessions All/Live/Files parity). */
+  let opsMemoryKindFilter = 'all';
   let opsMemoryCache = [];
   let opsMemoryLoadText = null;
   let opsRunsFilterQ = '';
@@ -631,6 +633,7 @@ function setupAgentOps() {
             if (tab === 'agents') preferOpsAgentsEnabledFromOverview();
             if (tab === 'runs') preferOpsRunsLaneFromOverview();
             if (tab === 'schedules') preferOpsSchedulesKindFromOverview();
+            if (tab === 'memory') preferOpsMemoryKindFromOverview();
             selectOpsTab(tab);
         });
     });
@@ -981,6 +984,7 @@ function ensureOpsMemoryFilter() {
         ensureOpsFilterClearBtn(input);
         panel.insertBefore(row, panel.firstChild);
     }
+    ensureOpsMemoryKindChips();
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
     ensureOpsFilterMatchChip(input);
@@ -993,6 +997,88 @@ function ensureOpsMemoryFilter() {
         opsMemoryFilterQ = '';
         renderOpsMemory(opsMemoryCache);
     });
+}
+
+/** All · Discord · Core chips (Sessions Live/Files parity). */
+function ensureOpsMemoryKindChips() {
+    const panel = document.getElementById('ops-panel-memory');
+    const filterRow = panel && panel.querySelector('.ops-filter-row');
+    if (!panel || !filterRow) return;
+    let wrap = document.getElementById('ops-memory-kind-chips');
+    if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.id = 'ops-memory-kind-chips';
+        wrap.className = 'ops-memory-kind-chips';
+        wrap.setAttribute('role', 'group');
+        wrap.setAttribute('aria-label', 'Knowledge kind filter');
+        wrap.innerHTML =
+            '<button type="button" class="ops-memory-kind-chip is-active" data-ops-memory-kind="all" aria-pressed="true" title="Show every knowledge file">All</button>' +
+            '<button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="discord" aria-pressed="false" title="Show Discord channel memory files only">Discord <span class="ops-memory-kind-count" data-ops-memory-kind-count="discord">0</span></button>' +
+            '<button type="button" class="ops-memory-kind-chip" data-ops-memory-kind="core" aria-pressed="false" title="Show soul / global / main files only">Core <span class="ops-memory-kind-count" data-ops-memory-kind-count="core">0</span></button>';
+        filterRow.insertAdjacentElement('afterend', wrap);
+        wrap.addEventListener('click', (e) => {
+            const btn =
+                e.target && e.target.closest && e.target.closest('[data-ops-memory-kind]');
+            if (!btn || !wrap.contains(btn)) return;
+            setOpsMemoryKindFilter(btn.getAttribute('data-ops-memory-kind') || 'all');
+        });
+    }
+    paintOpsMemoryKindChips();
+}
+
+function setOpsMemoryKindFilter(mode) {
+    const next =
+        mode === 'discord' || mode === 'core' || mode === 'all' ? mode : 'all';
+    opsMemoryKindFilter = next;
+    paintOpsMemoryKindChips();
+    renderOpsMemory(opsMemoryCache);
+}
+
+function paintOpsMemoryKindChips() {
+    const wrap = document.getElementById('ops-memory-kind-chips');
+    if (!wrap) return;
+    const all = opsMemoryCache || [];
+    const discordN = all.filter((f) => memoryRowMatchesKind(f, 'discord')).length;
+    const coreN = all.filter((f) => memoryRowMatchesKind(f, 'core')).length;
+    const discordEl = wrap.querySelector('[data-ops-memory-kind-count="discord"]');
+    const coreEl = wrap.querySelector('[data-ops-memory-kind-count="core"]');
+    if (discordEl) discordEl.textContent = String(discordN);
+    if (coreEl) coreEl.textContent = String(coreN);
+    wrap.querySelectorAll('[data-ops-memory-kind]').forEach((btn) => {
+        const key = btn.getAttribute('data-ops-memory-kind');
+        const on = key === opsMemoryKindFilter;
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (key === 'discord') {
+            btn.classList.toggle('has-hits', discordN > 0);
+        } else if (key === 'core') {
+            btn.classList.toggle('has-hits', coreN > 0);
+        }
+    });
+}
+
+/** Overview Knowledge open → Discord when any else Core (Sessions Live/Files parity). */
+function preferOpsMemoryKindFromOverview() {
+    const rows = opsMemoryCache || [];
+    if (!rows.length) {
+        setOpsMemoryKindFilter('all');
+        return;
+    }
+    const discordN = rows.filter((f) => memoryRowMatchesKind(f, 'discord')).length;
+    if (discordN > 0) {
+        setOpsMemoryKindFilter('discord');
+        return;
+    }
+    const coreN = rows.filter((f) => memoryRowMatchesKind(f, 'core')).length;
+    setOpsMemoryKindFilter(coreN > 0 ? 'core' : 'all');
+}
+
+function memoryRowMatchesKind(f, mode) {
+    const kind = String(f?.kind || '').toLowerCase();
+    const want = mode || opsMemoryKindFilter;
+    if (want === 'discord') return kind === 'discord';
+    if (want === 'core') return kind === 'soul' || kind === 'global' || kind === 'main';
+    return true;
 }
 
 function memoryRowMatchesFilter(haystack) {
@@ -1924,6 +2010,7 @@ function wireOpsOverviewCardNavigation() {
             if (tab === 'agents') preferOpsAgentsEnabledFromOverview();
             if (tab === 'runs') preferOpsRunsLaneFromOverview();
             if (tab === 'schedules') preferOpsSchedulesKindFromOverview();
+            if (tab === 'memory') preferOpsMemoryKindFromOverview();
             selectOpsTab(tab);
         };
         card.addEventListener('click', (e) => {
@@ -2531,6 +2618,8 @@ function renderOverviewKnowledge(files) {
         btn.addEventListener('click', async () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
+            const kind = String(f.kind || '').toLowerCase();
+            setOpsMemoryKindFilter(kind === 'discord' ? 'discord' : 'core');
             selectOpsTab('memory');
             const matchTitle = f.name || '';
             const list = document.getElementById('ops-memory-list');
@@ -4647,8 +4736,10 @@ function renderOpsMemory(files) {
     setOpsMemoryCopyChip(null);
     setOpsMemoryLoadChatVisible(false);
     showOpsMemoryLoadStatus('', true);
+    ensureOpsMemoryKindChips();
     const all = files || [];
-    const filtered = all.filter((f) =>
+    const kindPool = all.filter((f) => memoryRowMatchesKind(f));
+    const filtered = kindPool.filter((f) =>
         memoryRowMatchesFilter(`${f.name || ''} ${f.kind || ''} ${f.path || ''}`)
     );
     if (!all.length) {
@@ -4661,7 +4752,7 @@ function renderOpsMemory(files) {
     }
     if (!filtered.length) {
         el.innerHTML = opsFilterMissHtml('No knowledge files match filter', 'memory');
-        paintOpsFilterMatch('ops-memory-filter', all.length, 0, opsMemoryFilterQ);
+        paintOpsFilterMatch('ops-memory-filter', kindPool.length, 0, opsMemoryFilterQ);
         return;
     }
     filtered.forEach((f) => {
@@ -4713,7 +4804,10 @@ function renderOpsMemory(files) {
         btn.title = 'Click to preview · c copies path · Enter / double-click to load into AI Chat';
         el.appendChild(btn);
     });
-    paintOpsFilterMatch('ops-memory-filter', all.length, filtered.length, opsMemoryFilterQ);
+    paintOpsFilterMatch('ops-memory-filter', kindPool.length, filtered.length, opsMemoryFilterQ);
+    if ((opsMemoryFilterQ || opsMemoryKindFilter !== 'all') && !el.querySelector('.ops-row')) {
+        el.innerHTML = opsFilterMissHtml('No knowledge files match filter', 'memory');
+    }
 }
 
 /** Ensure Runs preview pane exists (themes + dashboard; create if HTML is stale). */
