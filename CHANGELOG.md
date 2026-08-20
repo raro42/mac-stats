@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.543] - 2026-08-20
+
+### Added
+- Agent Ops Agents **All · On · Off** filter chips (Sessions / Monitors parity). Counts on On/Off; overview Agents opens On when any enabled (else Off); Clear resets to All.
+
 ## [0.1.542] - 2026-08-20
 
 ### Added

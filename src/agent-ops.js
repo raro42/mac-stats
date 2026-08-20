@@ -212,7 +212,7 @@
         id: 'ops-agents-filter',
         clear() {
           opsAgentsFilterQ = '';
-          renderOpsAgents(opsAgentsCache);
+          setOpsAgentsEnabledFilter('all');
         },
       },
       schedules: {
@@ -272,6 +272,8 @@
   let opsRunLoadQuestion = null;
   let opsScheduleLoadText = null;
   let opsAgentsFilterQ = '';
+  /** Agents panel enabled chip: `all` | `on` | `off` (Sessions All/Live/Files parity). */
+  let opsAgentsEnabledFilter = 'all';
   let opsAgentsCache = [];
   let opsSchedulesFilterQ = '';
   let opsSchedulesCache = [];
@@ -622,6 +624,7 @@ function setupAgentOps() {
             if (!tab) return;
             // Ensure pane is open (dashboard can leave it collapsed)
             if (agentOpsCollapsed) applyOpsCollapsed(false);
+            if (tab === 'agents') preferOpsAgentsEnabledFromOverview();
             selectOpsTab(tab);
         });
     });
@@ -1052,6 +1055,7 @@ function ensureOpsAgentsFilter() {
         if (list) panel.insertBefore(row, list);
         else panel.insertBefore(row, panel.firstChild);
     }
+    ensureOpsAgentsEnabledChips();
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
     ensureOpsFilterMatchChip(input);
@@ -1064,6 +1068,80 @@ function ensureOpsAgentsFilter() {
         opsAgentsFilterQ = '';
         renderOpsAgents(opsAgentsCache);
     });
+}
+
+/** All · On · Off chips (Sessions / Monitors filter parity). */
+function ensureOpsAgentsEnabledChips() {
+    const panel = document.getElementById('ops-panel-agents');
+    const filterRow = panel && panel.querySelector('.ops-filter-row');
+    if (!panel || !filterRow) return;
+    let wrap = document.getElementById('ops-agents-enabled-chips');
+    if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.id = 'ops-agents-enabled-chips';
+        wrap.className = 'ops-agents-enabled-chips';
+        wrap.setAttribute('role', 'group');
+        wrap.setAttribute('aria-label', 'Agent enabled filter');
+        wrap.innerHTML =
+            '<button type="button" class="ops-agents-enabled-chip is-active" data-ops-agents-enabled="all" aria-pressed="true" title="Show every agent">All</button>' +
+            '<button type="button" class="ops-agents-enabled-chip" data-ops-agents-enabled="on" aria-pressed="false" title="Show enabled agents only">On <span class="ops-agents-enabled-count" data-ops-agents-enabled-count="on">0</span></button>' +
+            '<button type="button" class="ops-agents-enabled-chip" data-ops-agents-enabled="off" aria-pressed="false" title="Show disabled agents only">Off <span class="ops-agents-enabled-count" data-ops-agents-enabled-count="off">0</span></button>';
+        filterRow.insertAdjacentElement('afterend', wrap);
+        wrap.addEventListener('click', (e) => {
+            const btn =
+                e.target && e.target.closest && e.target.closest('[data-ops-agents-enabled]');
+            if (!btn || !wrap.contains(btn)) return;
+            setOpsAgentsEnabledFilter(btn.getAttribute('data-ops-agents-enabled') || 'all');
+        });
+    }
+    paintOpsAgentsEnabledChips();
+}
+
+function setOpsAgentsEnabledFilter(mode) {
+    const next = mode === 'on' || mode === 'off' || mode === 'all' ? mode : 'all';
+    opsAgentsEnabledFilter = next;
+    paintOpsAgentsEnabledChips();
+    renderOpsAgents(opsAgentsCache);
+}
+
+function paintOpsAgentsEnabledChips() {
+    const wrap = document.getElementById('ops-agents-enabled-chips');
+    if (!wrap) return;
+    const all = opsAgentsCache || [];
+    const onN = all.filter((a) => a.enabled).length;
+    const offN = all.length - onN;
+    const onEl = wrap.querySelector('[data-ops-agents-enabled-count="on"]');
+    const offEl = wrap.querySelector('[data-ops-agents-enabled-count="off"]');
+    if (onEl) onEl.textContent = String(onN);
+    if (offEl) offEl.textContent = String(offN);
+    wrap.querySelectorAll('[data-ops-agents-enabled]').forEach((btn) => {
+        const key = btn.getAttribute('data-ops-agents-enabled');
+        const active = key === opsAgentsEnabledFilter;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        if (key === 'on') {
+            btn.classList.toggle('has-hits', onN > 0);
+        } else if (key === 'off') {
+            btn.classList.toggle('has-hits', offN > 0);
+        }
+    });
+}
+
+/** Overview Agents open → On when any enabled, else Off when agents exist (Sessions Live/Files parity). */
+function preferOpsAgentsEnabledFromOverview() {
+    const rows = opsAgentsCache || [];
+    if (!rows.length) {
+        setOpsAgentsEnabledFilter('all');
+        return;
+    }
+    const onN = rows.filter((a) => a.enabled).length;
+    setOpsAgentsEnabledFilter(onN === 0 ? 'off' : 'on');
+}
+
+function agentsRowMatchesEnabled(a) {
+    if (opsAgentsEnabledFilter === 'on') return !!a.enabled;
+    if (opsAgentsEnabledFilter === 'off') return !a.enabled;
+    return true;
 }
 
 function agentsRowMatchesFilter(haystack) {
@@ -1654,6 +1732,7 @@ function wireOpsOverviewCardNavigation() {
         }
         const openTab = () => {
             if (agentOpsCollapsed) applyOpsCollapsed(false);
+            if (tab === 'agents') preferOpsAgentsEnabledFromOverview();
             selectOpsTab(tab);
         };
         card.addEventListener('click', (e) => {
@@ -2929,7 +3008,9 @@ function renderOpsAgents(agents) {
     const list = document.getElementById('ops-agents-list');
     list.innerHTML = '';
     const all = agents || [];
-    const filtered = all.filter((a) =>
+    ensureOpsAgentsEnabledChips();
+    const kindPool = all.filter(agentsRowMatchesEnabled);
+    const filtered = kindPool.filter((a) =>
         agentsRowMatchesFilter(
             `${a.name || ''} ${a.slug || ''} ${a.id || ''} ${a.model || ''} ${a.enabled ? 'on' : 'off'} ${a.orchestrator ? 'orchestrator' : ''}`
         )
@@ -2940,11 +3021,13 @@ function renderOpsAgents(agents) {
           'Add agent folders under ~/.mac-stats/agents'
         );
         paintOpsFilterMatch('ops-agents-filter', 0, 0, opsAgentsFilterQ);
+        paintOpsAgentsEnabledChips();
         return;
     }
     if (!filtered.length) {
         list.innerHTML = opsFilterMissHtml('No agents match filter', 'agents');
-        paintOpsFilterMatch('ops-agents-filter', all.length, 0, opsAgentsFilterQ);
+        paintOpsFilterMatch('ops-agents-filter', kindPool.length, 0, opsAgentsFilterQ);
+        paintOpsAgentsEnabledChips();
         return;
     }
     filtered.forEach((a) => {
@@ -2970,7 +3053,8 @@ function renderOpsAgents(agents) {
         btn.title = 'Open agent · c copies id · Enter / double-click to load soul/skill/mood into AI Chat';
         list.appendChild(btn);
     });
-    paintOpsFilterMatch('ops-agents-filter', all.length, filtered.length, opsAgentsFilterQ);
+    paintOpsFilterMatch('ops-agents-filter', kindPool.length, filtered.length, opsAgentsFilterQ);
+    paintOpsAgentsEnabledChips();
 }
 
 async function openOpsAgent(id) {

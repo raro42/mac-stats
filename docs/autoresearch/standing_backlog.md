@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops Agents **All · On · Off** filter chips (counts; overview Agents opens On/Off; Clear → All) — **v0.1.543**
 - Agent Ops Sessions **All · Live · Files** filter chips (counts; overview Live/Recent set kind; Clear → All) — **v0.1.542**
 - Top Processes **Top GPU glance** (highest GPU in list; click opens details; amber wash ≥ 15%) — **v0.1.541**
 - AI Chat **model / connection glance** (Model · name / Offline; click picker or URL; green/amber wash) — **v0.1.540**
