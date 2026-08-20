@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.545] - 2026-08-20
+
+### Added
+- Agent Ops Schedules **All · Jobs · Deliveries** filter chips (Sessions Live/Files parity). Counts on Jobs/Deliveries; overview Schedules opens Jobs when any (else Deliveries); schedule/delivery preview sets the matching kind; Clear resets to All; N/M chip respects kind.
+
 ## [0.1.544] - 2026-08-20
 
 ### Added

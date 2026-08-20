@@ -219,7 +219,7 @@
         id: 'ops-schedules-filter',
         clear() {
           opsSchedulesFilterQ = '';
-          renderOpsSchedulesTab(opsSchedulesCache, opsDeliveriesCache);
+          setOpsSchedulesKindFilter('all');
         },
       },
     };
@@ -278,6 +278,8 @@
   let opsAgentsEnabledFilter = 'all';
   let opsAgentsCache = [];
   let opsSchedulesFilterQ = '';
+  /** Schedules panel kind chip: `all` | `jobs` | `deliveries` (Sessions All/Live/Files parity). */
+  let opsSchedulesKindFilter = 'all';
   let opsSchedulesCache = [];
   let opsDeliveriesCache = [];
   let opsActiveTab = 'agents';
@@ -628,6 +630,7 @@ function setupAgentOps() {
             if (agentOpsCollapsed) applyOpsCollapsed(false);
             if (tab === 'agents') preferOpsAgentsEnabledFromOverview();
             if (tab === 'runs') preferOpsRunsLaneFromOverview();
+            if (tab === 'schedules') preferOpsSchedulesKindFromOverview();
             selectOpsTab(tab);
         });
     });
@@ -1262,6 +1265,7 @@ function ensureOpsSchedulesFilter() {
         else if (list) panel.insertBefore(row, list);
         else panel.insertBefore(row, panel.firstChild);
     }
+    ensureOpsSchedulesKindChips();
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
     ensureOpsFilterMatchChip(input);
@@ -1274,6 +1278,99 @@ function ensureOpsSchedulesFilter() {
         opsSchedulesFilterQ = '';
         renderOpsSchedulesTab(opsSchedulesCache, opsDeliveriesCache);
     });
+}
+
+/** All · Jobs · Deliveries chips (Sessions Live/Files parity). */
+function ensureOpsSchedulesKindChips() {
+    const panel = document.getElementById('ops-panel-schedules');
+    const filterRow = panel && panel.querySelector('.ops-filter-row');
+    if (!panel || !filterRow) return;
+    let wrap = document.getElementById('ops-schedules-kind-chips');
+    if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.id = 'ops-schedules-kind-chips';
+        wrap.className = 'ops-schedules-kind-chips';
+        wrap.setAttribute('role', 'group');
+        wrap.setAttribute('aria-label', 'Schedule kind filter');
+        wrap.innerHTML =
+            '<button type="button" class="ops-schedules-kind-chip is-active" data-ops-schedules-kind="all" aria-pressed="true" title="Show active schedules and recent deliveries">All</button>' +
+            '<button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="jobs" aria-pressed="false" title="Show active schedules only">Jobs <span class="ops-schedules-kind-count" data-ops-schedules-kind-count="jobs">0</span></button>' +
+            '<button type="button" class="ops-schedules-kind-chip" data-ops-schedules-kind="deliveries" aria-pressed="false" title="Show recent deliveries only">Deliveries <span class="ops-schedules-kind-count" data-ops-schedules-kind-count="deliveries">0</span></button>';
+        filterRow.insertAdjacentElement('afterend', wrap);
+        wrap.addEventListener('click', (e) => {
+            const btn =
+                e.target && e.target.closest && e.target.closest('[data-ops-schedules-kind]');
+            if (!btn || !wrap.contains(btn)) return;
+            setOpsSchedulesKindFilter(btn.getAttribute('data-ops-schedules-kind') || 'all');
+        });
+    }
+    paintOpsSchedulesKindChips();
+    applyOpsSchedulesKindVisibility();
+}
+
+function setOpsSchedulesKindFilter(mode) {
+    const next =
+        mode === 'jobs' || mode === 'deliveries' || mode === 'all' ? mode : 'all';
+    opsSchedulesKindFilter = next;
+    paintOpsSchedulesKindChips();
+    applyOpsSchedulesKindVisibility();
+    renderOpsSchedulesTab(opsSchedulesCache, opsDeliveriesCache);
+}
+
+function paintOpsSchedulesKindChips() {
+    const wrap = document.getElementById('ops-schedules-kind-chips');
+    if (!wrap) return;
+    const jobsAll = opsSchedulesCache || [];
+    const delAll = opsDeliveriesCache || [];
+    const jobsEl = wrap.querySelector('[data-ops-schedules-kind-count="jobs"]');
+    const delEl = wrap.querySelector('[data-ops-schedules-kind-count="deliveries"]');
+    if (jobsEl) jobsEl.textContent = String(jobsAll.length);
+    if (delEl) delEl.textContent = String(delAll.length);
+    wrap.querySelectorAll('[data-ops-schedules-kind]').forEach((btn) => {
+        const key = btn.getAttribute('data-ops-schedules-kind');
+        const on = key === opsSchedulesKindFilter;
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (key === 'jobs') {
+            btn.classList.toggle('has-hits', jobsAll.length > 0);
+        } else if (key === 'deliveries') {
+            btn.classList.toggle('has-hits', delAll.length > 0);
+        }
+    });
+}
+
+/** Hide Jobs or Deliveries blocks when a kind chip narrows the Schedules tab. */
+function applyOpsSchedulesKindVisibility() {
+    const jobList = document.getElementById('ops-schedules-list');
+    const delList = document.getElementById('ops-deliveries-list');
+    if (!jobList || !delList) return;
+    const jobHead = jobList.previousElementSibling;
+    const delHead = delList.previousElementSibling;
+    const showJobs = opsSchedulesKindFilter === 'all' || opsSchedulesKindFilter === 'jobs';
+    const showDel = opsSchedulesKindFilter === 'all' || opsSchedulesKindFilter === 'deliveries';
+    if (jobHead && jobHead.classList && jobHead.classList.contains('ops-subhead')) {
+        jobHead.hidden = !showJobs;
+    }
+    jobList.hidden = !showJobs;
+    if (delHead && delHead.classList && delHead.classList.contains('ops-subhead')) {
+        delHead.hidden = !showDel;
+    }
+    delList.hidden = !showDel;
+}
+
+/** Overview Schedules open → Jobs when any else Deliveries (Sessions Live/Files parity). */
+function preferOpsSchedulesKindFromOverview() {
+    const jobs = opsSchedulesCache || [];
+    const dels = opsDeliveriesCache || [];
+    if (jobs.length) {
+        setOpsSchedulesKindFilter('jobs');
+        return;
+    }
+    if (dels.length) {
+        setOpsSchedulesKindFilter('deliveries');
+        return;
+    }
+    setOpsSchedulesKindFilter('all');
 }
 
 function schedulesRowMatchesFilter(haystack) {
@@ -1680,6 +1777,7 @@ function openOpsSchedulePreviewNavigate(s) {
     if (!s) return false;
     if (agentOpsCollapsed) applyOpsCollapsed(false);
     selectOpsTab('schedules');
+    setOpsSchedulesKindFilter('jobs');
     const id = s.id || '(no id)';
     const fullTask = String(s?.task || '').trim();
     showOpsSchedulePreview(formatOpsSchedulePreview(s), s.id || '', fullTask);
@@ -1702,6 +1800,7 @@ function openOpsDeliveryPreviewNavigate(d) {
     if (!d) return false;
     if (agentOpsCollapsed) applyOpsCollapsed(false);
     selectOpsTab('schedules');
+    setOpsSchedulesKindFilter('deliveries');
     const id = d.schedule_id || 'schedule';
     const summary = String(d.summary || '').trim();
     showOpsSchedulePreview(formatOpsDeliveryPreview(d), d.schedule_id || '', summary);
@@ -1824,6 +1923,7 @@ function wireOpsOverviewCardNavigation() {
             if (agentOpsCollapsed) applyOpsCollapsed(false);
             if (tab === 'agents') preferOpsAgentsEnabledFromOverview();
             if (tab === 'runs') preferOpsRunsLaneFromOverview();
+            if (tab === 'schedules') preferOpsSchedulesKindFromOverview();
             selectOpsTab(tab);
         };
         card.addEventListener('click', (e) => {
@@ -2916,10 +3016,20 @@ function renderOpsSchedulesTab(schedules, deliveries) {
     }
     paintOpsFilterMatch(
         'ops-schedules-filter',
-        schedAll.length + delAll.length,
-        schedFiltered.length + delFiltered.length,
+        (() => {
+            if (opsSchedulesKindFilter === 'jobs') return schedAll.length;
+            if (opsSchedulesKindFilter === 'deliveries') return delAll.length;
+            return schedAll.length + delAll.length;
+        })(),
+        (() => {
+            if (opsSchedulesKindFilter === 'jobs') return schedFiltered.length;
+            if (opsSchedulesKindFilter === 'deliveries') return delFiltered.length;
+            return schedFiltered.length + delFiltered.length;
+        })(),
         opsSchedulesFilterQ
     );
+    paintOpsSchedulesKindChips();
+    applyOpsSchedulesKindVisibility();
 }
 
 /**

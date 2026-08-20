@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops Schedules **All · Jobs · Deliveries** filter chips (counts; overview → Jobs when any; Clear → All) — **v0.1.545**
 - Agent Ops Runs **All · Instant · Direct** filter chips (counts; overview → Direct when any; Clear → All) — **v0.1.544**
 - Agent Ops Agents **All · On · Off** filter chips (counts; overview Agents opens On/Off; Clear → All) — **v0.1.543**
 - Agent Ops Sessions **All · Live · Files** filter chips (counts; overview Live/Recent set kind; Clear → All) — **v0.1.542**

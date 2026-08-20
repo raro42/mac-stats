@@ -2538,6 +2538,81 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.85;
 }
 
+/* Agent Ops Schedules — All · Jobs · Deliveries (Sessions Live/Files parity) */
+.ops-schedules-kind-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 8px;
+  padding: 0 2px;
+}
+
+.ops-schedules-kind-chip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  opacity: 0.88;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ops-schedules-kind-chip:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 7%, transparent);
+}
+
+.ops-schedules-kind-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, transparent);
+}
+
+.ops-schedules-kind-chip.is-active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, transparent);
+}
+
+.ops-schedules-kind-chip[data-ops-schedules-kind='jobs'].has-hits {
+  background: color-mix(in srgb, #30d158 12%, transparent);
+  border-color: color-mix(in srgb, #30d158 28%, transparent);
+}
+
+.ops-schedules-kind-chip[data-ops-schedules-kind='jobs'].is-active {
+  background: color-mix(in srgb, #30d158 18%, transparent);
+  border-color: color-mix(in srgb, #30d158 36%, transparent);
+}
+
+.ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].has-hits {
+  background: color-mix(in srgb, #0a84ff 12%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 28%, transparent);
+}
+
+.ops-schedules-kind-chip[data-ops-schedules-kind='deliveries'].is-active {
+  background: color-mix(in srgb, #0a84ff 18%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 36%, transparent);
+}
+
+.ops-schedules-kind-count {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
 /* Agent Ops Runs — All · Instant · Direct (Agents / Sessions parity) */
 .ops-runs-lane-chips {
   display: flex;
