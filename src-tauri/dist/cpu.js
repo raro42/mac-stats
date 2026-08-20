@@ -1015,14 +1015,10 @@ async function refresh() {
             previousValues.temperature = newTemp;
           }
           // Thermal state subtext (only update if changed)
-          let thermalText = "Thermal: Nominal";
-          if (data.temperature >= 85) {
-            thermalText = "Thermal: Critical";
-          } else if (data.temperature >= 70) {
-            thermalText = "Thermal: Serious";
-          } else if (data.temperature >= 50) {
-            thermalText = "Thermal: Fair";
-          }
+          const thermalLevel = thermalLevelFromTemp(data.temperature, true);
+          const thermalText = thermalLevel
+            ? `Thermal: ${thermalLevel}`
+            : "Thermal: Nominal";
           if (tempSubtext.textContent !== thermalText) {
             scheduleDOMUpdate(() => {
               tempSubtext.textContent = thermalText;
@@ -1083,6 +1079,36 @@ async function refresh() {
         tempStripCell.setAttribute(
           "aria-label",
           `Temperature ${tempStripText}. ${title}`
+        );
+      }
+      // Thermal / heat band on the power strip (Temp ring parity)
+      ensureThermalStrip();
+      const thermalStripEl = document.getElementById("thermal-strip-value");
+      const thermalStripCell = document.getElementById("thermal-strip");
+      const thermalLevel = thermalLevelFromTemp(
+        data.temperature,
+        !!data.can_read_temperature
+      );
+      const thermalStripText = thermalLevel || "—";
+      if (thermalStripEl && thermalStripEl.textContent !== thermalStripText) {
+        scheduleDOMUpdate(() => {
+          thermalStripEl.textContent = thermalStripText;
+        });
+      }
+      if (thermalStripCell) {
+        thermalStripCell.classList.toggle(
+          "is-hot",
+          thermalLevel === "Serious" || thermalLevel === "Critical"
+        );
+        thermalStripCell.classList.toggle(
+          "is-critical",
+          thermalLevel === "Critical"
+        );
+        const title = "Show temperature ring";
+        thermalStripCell.title = title;
+        thermalStripCell.setAttribute(
+          "aria-label",
+          `Thermal ${thermalStripText === "—" ? "unavailable" : thermalStripText}. ${title}`
         );
       }
     }
@@ -1986,6 +2012,7 @@ function init() {
   ensureRamStrip();
   ensureGpuStrip();
   ensureTempStrip();
+  ensureThermalStrip();
   ensureFreqStrip();
   ensureDiskStrip();
   ensureUptimeStrip();
@@ -2400,6 +2427,39 @@ function ensureRamStripStyles() {
       border-radius: 6px;
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
     }
+    .thermal-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      outline: none;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .thermal-info:hover {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
+    }
+    .thermal-info:focus-visible {
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+    }
+    .thermal-info.is-hot {
+      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
+    }
+    .thermal-info.is-critical {
+      background-color: color-mix(in srgb, #ff453a 18%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ff453a 40%, transparent);
+    }
+    .thermal-label {
+      color: var(--muted);
+    }
+    .thermal-value {
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
   `;
   document.head.appendChild(style);
 }
@@ -2656,6 +2716,59 @@ function ensureTempStrip() {
   return cell;
 }
 
+/** Map die temp °C → thermal band (same thresholds as the temp ring subtext). */
+function thermalLevelFromTemp(temp, canRead) {
+  if (!canRead || typeof temp !== "number" || !Number.isFinite(temp)) {
+    return null;
+  }
+  if (temp >= 85) return "Critical";
+  if (temp >= 70) return "Serious";
+  if (temp >= 50) return "Fair";
+  return "Nominal";
+}
+
+/**
+ * Thermal band on the battery/power strip (Temp strip / ring subtext parity).
+ * Click / Enter / Space scrolls to the temperature ring. Amber wash Serious;
+ * red wash Critical.
+ */
+function ensureThermalStrip() {
+  ensureRamStripStyles();
+  const strip = document.getElementById("battery-power-strip");
+  if (!strip) return null;
+  let cell = document.getElementById("thermal-strip");
+  if (!cell) {
+    cell = document.createElement("div");
+    cell.id = "thermal-strip";
+    cell.className = "thermal-info";
+    cell.setAttribute("role", "button");
+    cell.tabIndex = 0;
+    cell.title = "Show temperature ring";
+    cell.setAttribute("aria-label", "Show temperature ring");
+    cell.innerHTML =
+      '<span class="thermal-label">Heat</span>' +
+      '<span class="thermal-value" id="thermal-strip-value">—</span>';
+    const tempEl = document.getElementById("temp-strip");
+    const timeEl = document.getElementById("time-remaining");
+    if (tempEl && tempEl.nextSibling) strip.insertBefore(cell, tempEl.nextSibling);
+    else if (timeEl) strip.insertBefore(cell, timeEl);
+    else strip.appendChild(cell);
+  }
+  if (cell.dataset.thermalStripWired === "1") return cell;
+  cell.dataset.thermalStripWired = "1";
+  const openThermal = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openTempRingFromStrip();
+  };
+  cell.addEventListener("click", openThermal);
+  cell.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    openThermal(e);
+  });
+  return cell;
+}
+
 function flashFreqRing() {
   const freqVal = document.getElementById("frequency-value");
   const card = freqVal && freqVal.closest ? freqVal.closest(".metric-card") : null;
@@ -2695,9 +2808,11 @@ function ensureFreqStrip() {
     cell.innerHTML =
       '<span class="freq-label">GHz</span>' +
       '<span class="freq-value" id="freq-strip-value">—</span>';
+    const thermalEl = document.getElementById("thermal-strip");
     const tempEl = document.getElementById("temp-strip");
+    const anchor = thermalEl || tempEl;
     const timeEl = document.getElementById("time-remaining");
-    if (tempEl && tempEl.nextSibling) strip.insertBefore(cell, tempEl.nextSibling);
+    if (anchor && anchor.nextSibling) strip.insertBefore(cell, anchor.nextSibling);
     else if (timeEl) strip.insertBefore(cell, timeEl);
     else strip.appendChild(cell);
   }
@@ -7773,6 +7888,7 @@ function initCollapsibleSections() {
   ensureRamStrip();
   ensureGpuStrip();
   ensureTempStrip();
+  ensureThermalStrip();
   ensureFreqStrip();
   ensureDiskStrip();
   ensureUptimeStrip();

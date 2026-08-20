@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.560] - 2026-08-21
+
+### Added
+- CPU metrics **thermal / Heat on the battery/power strip** (Temp strip / ring subtext parity). Label **Heat** + Nominal / Fair / Serious / Critical (same °C bands as the temperature ring); click opens the temp ring. Soft amber wash when Serious; red wash when Critical.
+
 ## [0.1.559] - 2026-08-21
 
 ### Added
