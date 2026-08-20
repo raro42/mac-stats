@@ -1,11 +1,12 @@
 # Morning surprise — 2026-08-20
 
-Overnight Track B kept shipping design-review polish (digester open empty). Night window continues with **v0.1.550**.
+Overnight Track B kept shipping design-review polish (digester open empty). Night window continues with **v0.1.551**.
 
 ## Shipped tonight (highlights)
 
 | Version | What |
 |---------|------|
+| **v0.1.551** | Perplexity **last-search glance** (Last · query · N results / Key · add API key; click expands) |
 | **v0.1.550** | CPU metrics **uptime on battery/power strip** (Up · formatted; click → Details; amber ≥ 7d) |
 | **v0.1.549** | AI Chat **All · You · Assistant** filter chips (Monitors parity; Clear → All) |
 | **v0.1.548** | Disk Cleanup **All · Reclaim · Clean** filter chips (Monitors parity; Reclaimable-now → Reclaim) |
@@ -23,6 +24,6 @@ Overnight Track B kept shipping design-review polish (digester open empty). Nigh
 ## Notes
 
 - Digester: no open candidates (instant-heavy window).
-- Design review: due=false (grace); CPU metrics marked polished after uptime strip.
+- Design review: due=false (grace); Perplexity glance shipped; monitors grace refreshed (nearest surface).
 - Screenshots: deferred (TCC / no on-screen CPU window).
-- Next fuel: digester Discord traffic, or Perplexity polish / p50 latency / non-uptime-strip fuel.
+- Next fuel: digester Discord traffic, or p50 latency / thermal strip / non-perplexity-glance fuel.
