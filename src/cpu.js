@@ -659,6 +659,85 @@ function wireProcessesTopGpuGlanceClick(glance) {
   });
 }
 
+/** Highest-RAM process in the current list (Top CPU / GPU may differ). */
+function pickTopRamProcess(processes) {
+  if (!processes || processes.length === 0) return null;
+  let best = null;
+  let bestMem = -1;
+  for (const p of processes) {
+    const m = Number(p.memory) || 0;
+    if (m > bestMem) {
+      best = p;
+      bestMem = m;
+    }
+  }
+  return best;
+}
+
+/** Top RAM glance under Top Processes (Top CPU / Top GPU parity). */
+function ensureProcessesTopRamGlance() {
+  ensureProcessesTopGpuGlance();
+  const anchor =
+    document.getElementById("processes-top-gpu-glance") ||
+    document.getElementById("processes-top-glance") ||
+    document.getElementById("processes-header");
+  if (!anchor) return null;
+  let glance = document.getElementById("processes-top-ram-glance");
+  if (!glance) {
+    glance = document.createElement("div");
+    glance.id = "processes-top-ram-glance";
+    glance.className = "processes-top-ram-glance";
+    glance.hidden = true;
+    glance.innerHTML = '<span id="processes-top-ram-glance-text"></span>';
+    anchor.insertAdjacentElement("afterend", glance);
+    wireProcessesTopRamGlanceClick(glance);
+  }
+  return glance;
+}
+
+function applyProcessesTopRamGlanceState({ topPid, topName, topMem, waiting }) {
+  const glance = ensureProcessesTopRamGlance();
+  if (!glance) return;
+  const text = document.getElementById("processes-top-ram-glance-text");
+  if (waiting || topPid == null || !topName) {
+    glance.hidden = true;
+    window.__processesTopRamPid = null;
+    glance.classList.remove("is-hot");
+    return;
+  }
+  window.__processesTopRamPid = String(topPid);
+  glance.hidden = false;
+  const memNum = Number(topMem) || 0;
+  const memStr = memNum > 0 ? formatBytes(memNum) : "—";
+  if (text) text.textContent = `Top RAM · ${topName} ${memStr}`;
+  // Amber wash when resident ≥ 1 GiB (heavy process).
+  glance.classList.toggle("is-hot", memNum >= 1024 * 1024 * 1024);
+  glance.setAttribute("role", "button");
+  glance.tabIndex = 0;
+  glance.title = `Click to open ${topName} details`;
+  glance.setAttribute(
+    "aria-label",
+    `Top RAM process ${topName} at ${memStr} — click to open details`
+  );
+}
+
+function wireProcessesTopRamGlanceClick(glance) {
+  if (!glance || glance.dataset.topRamGlanceWired === "1") return;
+  glance.dataset.topRamGlanceWired = "1";
+  const activate = () => openProcessFromGlance(window.__processesTopRamPid);
+  glance.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /** All / Pinned chips (Monitors / Debug Log filter parity). */
 function ensureProcessesFilterChips() {
   const list = document.getElementById("process-list");
@@ -1499,7 +1578,12 @@ async function refresh() {
       }
       const processKey = processes.length > 0
         ? `${pinnedNames.join(",")}|` +
-          processes.map((p) => `${p.pid}:${p.cpu.toFixed(1)}:${(p.gpu || 0).toFixed(1)}:${p.name}`).join("|")
+          processes
+            .map(
+              (p) =>
+                `${p.pid}:${p.cpu.toFixed(1)}:${(p.gpu || 0).toFixed(1)}:${p.memory || 0}:${p.name}`
+            )
+            .join("|")
         : `empty|${pinnedNames.join(",")}`;
       if (!forceUpdate && !isInitialLoad && processKey === lastProcessListKey) {
         return;
@@ -1548,6 +1632,13 @@ async function refresh() {
         topPid: topGpuProc?.pid ?? null,
         topName: topGpuProc?.name ?? null,
         topGpu: topGpuProc?.gpu ?? null,
+        waiting: processes.length === 0,
+      });
+      const topRamProc = pickTopRamProcess(processes);
+      applyProcessesTopRamGlanceState({
+        topPid: topRamProc?.pid ?? null,
+        topName: topRamProc?.name ?? null,
+        topMem: topRamProc?.memory ?? null,
         waiting: processes.length === 0,
       });
 

@@ -55,6 +55,9 @@ pub struct ProcessUsage {
     #[serde(default)]
     pub gpu: f32,
     pub pid: u32,
+    /// Resident memory bytes (sysinfo). 0 if unknown / older payload.
+    #[serde(default)]
+    pub memory: u64,
 }
 
 #[derive(serde::Serialize)]
@@ -1333,6 +1336,7 @@ pub fn get_processes_by_names(names: Vec<String>) -> Vec<ProcessUsage> {
                 cpu: proc.cpu_usage(),
                 gpu: gpu_map.get(&pid_u).copied().unwrap_or(0.0),
                 pid: pid_u,
+                memory: proc.memory(),
             };
             if best
                 .as_ref()
@@ -1377,6 +1381,7 @@ fn enrich_processes_with_gpu(mut processes: Vec<ProcessUsage>, sys: &System) -> 
                 cpu: proc.cpu_usage(),
                 gpu,
                 pid,
+                memory: proc.memory(),
             });
             have.insert(pid);
         }
@@ -1602,6 +1607,7 @@ pub fn get_cpu_details() -> CpuDetails {
                                                             cpu: proc.cpu_usage(),
                                                             gpu: 0.0,
                                                             pid: pid.as_u32(),
+                                                            memory: proc.memory(),
                                                         }
                                                     })
                                                     .collect();
@@ -1805,6 +1811,7 @@ pub fn get_cpu_details() -> CpuDetails {
                                     cpu: proc.cpu_usage(),
                                     gpu: 0.0,
                                     pid: pid.as_u32(),
+                                    memory: proc.memory(),
                                 })
                                 .collect();
 
@@ -1845,6 +1852,7 @@ pub fn get_cpu_details() -> CpuDetails {
                                 cpu: proc.cpu_usage(),
                                 gpu: 0.0,
                                 pid: pid.as_u32(),
+                                memory: proc.memory(),
                             })
                             .collect();
 

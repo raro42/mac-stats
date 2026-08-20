@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.547] - 2026-08-20
+
+### Added
+- Top Processes **Top RAM glance** — shows the highest-resident-memory process in the list (may differ from Top CPU / Top GPU). Click or Enter/Space opens details. Soft amber wash when RAM ≥ 1 GiB. `ProcessUsage` now includes resident `memory` bytes.
+
 ## [0.1.546] - 2026-08-20
 
 ### Added
