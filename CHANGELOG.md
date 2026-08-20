@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.544] - 2026-08-20
+
+### Added
+- Agent Ops Runs **All · Instant · Direct** filter chips (Agents / Sessions parity). Counts on Instant/Direct; overview Runs opens Direct when any direct (else Instant); Clear resets to All; overview/Insight row preview sets the matching lane.
+
 ## [0.1.543] - 2026-08-20
 
 ### Added

@@ -205,7 +205,7 @@
         id: 'ops-runs-filter',
         clear() {
           opsRunsFilterQ = '';
-          renderOpsRuns(opsRunsInsightsCache);
+          setOpsRunsLaneFilter('all');
         },
       },
       agents: {
@@ -268,6 +268,8 @@
   let opsMemoryCache = [];
   let opsMemoryLoadText = null;
   let opsRunsFilterQ = '';
+  /** Runs panel lane chip: `all` | `instant` | `direct` (Agents All/On/Off parity). */
+  let opsRunsLaneFilter = 'all';
   let opsRunsInsightsCache = null;
   let opsRunLoadQuestion = null;
   let opsScheduleLoadText = null;
@@ -625,6 +627,7 @@ function setupAgentOps() {
             // Ensure pane is open (dashboard can leave it collapsed)
             if (agentOpsCollapsed) applyOpsCollapsed(false);
             if (tab === 'agents') preferOpsAgentsEnabledFromOverview();
+            if (tab === 'runs') preferOpsRunsLaneFromOverview();
             selectOpsTab(tab);
         });
     });
@@ -1015,6 +1018,7 @@ function ensureOpsRunsFilter() {
         if (insights) panel.insertBefore(row, insights.nextSibling);
         else panel.insertBefore(row, panel.firstChild);
     }
+    ensureOpsRunsLaneChips();
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
     ensureOpsFilterMatchChip(input);
@@ -1027,6 +1031,92 @@ function ensureOpsRunsFilter() {
         opsRunsFilterQ = '';
         renderOpsRuns(opsRunsInsightsCache);
     });
+}
+
+/** All · Instant · Direct chips (Agents / Sessions filter parity). */
+function ensureOpsRunsLaneChips() {
+    const panel = document.getElementById('ops-panel-runs');
+    const filterRow = panel && panel.querySelector('.ops-filter-row');
+    if (!panel || !filterRow) return;
+    let wrap = document.getElementById('ops-runs-lane-chips');
+    if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.id = 'ops-runs-lane-chips';
+        wrap.className = 'ops-runs-lane-chips';
+        wrap.setAttribute('role', 'group');
+        wrap.setAttribute('aria-label', 'Run lane filter');
+        wrap.innerHTML =
+            '<button type="button" class="ops-runs-lane-chip is-active" data-ops-runs-lane="all" aria-pressed="true" title="Show every run lane">All</button>' +
+            '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="instant" aria-pressed="false" title="Show instant-lane runs only">Instant <span class="ops-runs-lane-count" data-ops-runs-lane-count="instant">0</span></button>' +
+            '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="direct" aria-pressed="false" title="Show direct-lane runs only">Direct <span class="ops-runs-lane-count" data-ops-runs-lane-count="direct">0</span></button>';
+        filterRow.insertAdjacentElement('afterend', wrap);
+        wrap.addEventListener('click', (e) => {
+            const btn =
+                e.target && e.target.closest && e.target.closest('[data-ops-runs-lane]');
+            if (!btn || !wrap.contains(btn)) return;
+            setOpsRunsLaneFilter(btn.getAttribute('data-ops-runs-lane') || 'all');
+        });
+    }
+    paintOpsRunsLaneChips();
+}
+
+function setOpsRunsLaneFilter(mode) {
+    const next =
+        mode === 'instant' || mode === 'direct' || mode === 'all' ? mode : 'all';
+    opsRunsLaneFilter = next;
+    paintOpsRunsLaneChips();
+    renderOpsRuns(opsRunsInsightsCache);
+}
+
+function paintOpsRunsLaneChips() {
+    const wrap = document.getElementById('ops-runs-lane-chips');
+    if (!wrap) return;
+    const recent = Array.isArray(opsRunsInsightsCache?.recent)
+        ? opsRunsInsightsCache.recent
+        : [];
+    const instantN = recent.filter((r) => runsRowMatchesLane(r, 'instant')).length;
+    const directN = recent.filter((r) => runsRowMatchesLane(r, 'direct')).length;
+    const instantEl = wrap.querySelector('[data-ops-runs-lane-count="instant"]');
+    const directEl = wrap.querySelector('[data-ops-runs-lane-count="direct"]');
+    if (instantEl) instantEl.textContent = String(instantN);
+    if (directEl) directEl.textContent = String(directN);
+    wrap.querySelectorAll('[data-ops-runs-lane]').forEach((btn) => {
+        const key = btn.getAttribute('data-ops-runs-lane');
+        const active = key === opsRunsLaneFilter;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        if (key === 'instant') {
+            btn.classList.toggle('has-hits', instantN > 0);
+        } else if (key === 'direct') {
+            btn.classList.toggle('has-hits', directN > 0);
+        }
+    });
+}
+
+/** Overview Runs open → Direct when any direct else Instant when any instant (Agents On/Off parity). */
+function preferOpsRunsLaneFromOverview() {
+    const recent = Array.isArray(opsRunsInsightsCache?.recent)
+        ? opsRunsInsightsCache.recent
+        : [];
+    if (!recent.length) {
+        setOpsRunsLaneFilter('all');
+        return;
+    }
+    const directN = recent.filter((r) => runsRowMatchesLane(r, 'direct')).length;
+    if (directN > 0) {
+        setOpsRunsLaneFilter('direct');
+        return;
+    }
+    const instantN = recent.filter((r) => runsRowMatchesLane(r, 'instant')).length;
+    setOpsRunsLaneFilter(instantN > 0 ? 'instant' : 'all');
+}
+
+function runsRowMatchesLane(r, mode) {
+    const lane = String(r?.lane || '').toLowerCase();
+    const want = mode || opsRunsLaneFilter;
+    if (want === 'instant') return lane === 'instant';
+    if (want === 'direct') return lane === 'direct';
+    return true;
 }
 
 function runsRowMatchesFilter(haystack) {
@@ -1733,6 +1823,7 @@ function wireOpsOverviewCardNavigation() {
         const openTab = () => {
             if (agentOpsCollapsed) applyOpsCollapsed(false);
             if (tab === 'agents') preferOpsAgentsEnabledFromOverview();
+            if (tab === 'runs') preferOpsRunsLaneFromOverview();
             selectOpsTab(tab);
         };
         card.addEventListener('click', (e) => {
@@ -1915,6 +2006,10 @@ function renderOverviewAgents(agents) {
 function openOpsRunPreviewNavigate(summary) {
     if (!summary) return false;
     if (agentOpsCollapsed) applyOpsCollapsed(false);
+    const lane = String(summary?.lane || '').toLowerCase();
+    if (lane === 'instant' || lane === 'direct') {
+        setOpsRunsLaneFilter(lane);
+    }
     selectOpsTab('runs');
     previewOpsRunFromInsight(summary, null);
     return true;
@@ -4933,6 +5028,7 @@ function renderOpsRuns(insights) {
             );
         }
         paintOpsFilterMatch('ops-runs-filter', 0, 0, opsRunsFilterQ);
+        ensureOpsRunsLaneChips();
         return;
     }
     const lanes = (insights.by_lane || []).map(([k, v]) => `${k}:${v}`).join(' · ');
@@ -5011,8 +5107,11 @@ function renderOpsRuns(insights) {
             });
         }
     }
+    ensureOpsRunsLaneChips();
+    const recentAll = insights.recent || [];
+    const kindPool = recentAll.filter((r) => runsRowMatchesLane(r));
     let shown = 0;
-    (insights.recent || []).forEach((r) => {
+    kindPool.forEach((r) => {
         const toolsJoined = (r.tools || []).join(', ') || '—';
         if (
             !runsRowMatchesFilter(
@@ -5049,9 +5148,9 @@ function renderOpsRuns(insights) {
         });
         el.appendChild(btn);
     });
-    const totalRecent = (insights.recent || []).length;
-    paintOpsFilterMatch('ops-runs-filter', totalRecent, shown, opsRunsFilterQ);
-    if (opsRunsFilterQ && !el.querySelector('.ops-row')) {
+    paintOpsFilterMatch('ops-runs-filter', kindPool.length, shown, opsRunsFilterQ);
+    paintOpsRunsLaneChips();
+    if ((opsRunsFilterQ || opsRunsLaneFilter !== 'all') && !el.querySelector('.ops-row')) {
         el.innerHTML = opsFilterMissHtml('No runs match filter', 'runs');
         showOpsRunPreview('');
     }
