@@ -1014,8 +1014,8 @@ async function refresh() {
             });
             previousValues.temperature = newTemp;
           }
-          // Thermal state subtext (only update if changed)
-          const thermalLevel = thermalLevelFromTemp(data.temperature, true);
+          // Thermal state subtext — prefer OS thermalState; else °C bands
+          const thermalLevel = thermalLevelFromCpuDetails(data);
           const thermalText = thermalLevel
             ? `Thermal: ${thermalLevel}`
             : "Thermal: Nominal";
@@ -1081,14 +1081,11 @@ async function refresh() {
           `Temperature ${tempStripText}. ${title}`
         );
       }
-      // Thermal / heat band on the power strip (Temp ring parity)
+      // Thermal / heat band on the power strip (OS thermalState, else °C bands)
       ensureThermalStrip();
       const thermalStripEl = document.getElementById("thermal-strip-value");
       const thermalStripCell = document.getElementById("thermal-strip");
-      const thermalLevel = thermalLevelFromTemp(
-        data.temperature,
-        !!data.can_read_temperature && data.temperature > 0
-      );
+      const thermalLevel = thermalLevelFromCpuDetails(data);
       const thermalStripText = thermalLevel || "—";
       if (thermalStripEl && thermalStripEl.textContent !== thermalStripText) {
         scheduleDOMUpdate(() => {
@@ -1104,7 +1101,14 @@ async function refresh() {
           "is-critical",
           thermalLevel === "Critical"
         );
-        const title = "Show temperature ring";
+        const fromOs =
+          typeof data.thermal_state === "string" &&
+          ["Nominal", "Fair", "Serious", "Critical"].includes(
+            data.thermal_state.trim()
+          );
+        const title = fromOs
+          ? "Apple thermal pressure — show temperature ring"
+          : "Show temperature ring";
         thermalStripCell.title = title;
         thermalStripCell.setAttribute(
           "aria-label",
@@ -2716,7 +2720,7 @@ function ensureTempStrip() {
   return cell;
 }
 
-/** Map die temp °C → thermal band (same thresholds as the temp ring subtext). */
+/** Map die temp °C → thermal band (fallback when OS thermalState is unavailable). */
 function thermalLevelFromTemp(temp, canRead) {
   if (!canRead || typeof temp !== "number" || !Number.isFinite(temp)) {
     return null;
@@ -2727,8 +2731,29 @@ function thermalLevelFromTemp(temp, canRead) {
   return "Nominal";
 }
 
+/** Prefer Apple NSProcessInfo.thermalState; else °C bands (Heat strip / temp subtext). */
+function thermalLevelFromCpuDetails(data) {
+  const os =
+    data && typeof data.thermal_state === "string"
+      ? data.thermal_state.trim()
+      : "";
+  if (
+    os === "Nominal" ||
+    os === "Fair" ||
+    os === "Serious" ||
+    os === "Critical"
+  ) {
+    return os;
+  }
+  return thermalLevelFromTemp(
+    data && data.temperature,
+    !!(data && data.can_read_temperature && data.temperature > 0)
+  );
+}
+
 /**
- * Thermal band on the battery/power strip (Temp strip / ring subtext parity).
+ * Thermal band on the battery/power strip. Prefers Apple NSProcessInfo
+ * thermalState (Nominal/Fair/Serious/Critical); falls back to °C bands.
  * Click / Enter / Space scrolls to the temperature ring. Amber wash Serious;
  * red wash Critical.
  */

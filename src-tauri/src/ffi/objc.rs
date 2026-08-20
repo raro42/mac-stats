@@ -5,7 +5,28 @@
 
 use objc2::msg_send;
 use objc2::runtime::{AnyClass, AnyObject, Sel};
+use objc2_foundation::NSProcessInfo;
 use thiserror::Error;
+
+/// Apple thermal pressure from `NSProcessInfo.thermalState` (user-mode; no root).
+///
+/// Returns `Nominal` / `Fair` / `Serious` / `Critical`, or `None` for an unknown
+/// future enum value. Safe: `processInfo` is always available on macOS; `thermalState`
+/// is a plain getter with no CF ownership transfer.
+pub fn read_process_thermal_state() -> Option<&'static str> {
+    let info = NSProcessInfo::processInfo();
+    // Match raw NSInteger — NSProcessInfoThermalState is a transparent newtype, not an enum.
+    match info.thermalState().0 {
+        0 => Some("Nominal"),
+        1 => Some("Fair"),
+        2 => Some("Serious"),
+        3 => Some("Critical"),
+        other => {
+            tracing::debug!("Unknown NSProcessInfoThermalState raw={other}");
+            None
+        }
+    }
+}
 
 /// Objective-C FFI error types
 /// Currently unused as direct FFI calls are used in ui module.

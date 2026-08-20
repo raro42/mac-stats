@@ -119,6 +119,9 @@ pub struct CpuDetails {
     pub battery_level: f32, // Battery level as percentage (0-100), or -1.0 if not available
     pub is_charging: bool,  // True if battery is charging, false if discharging or no battery
     pub has_battery: bool,  // True if device has a battery
+    /// Apple `NSProcessInfo.thermalState` as Nominal/Fair/Serious/Critical (empty if unknown).
+    #[serde(default)]
+    pub thermal_state: String,
 }
 
 /// Get chip information (cached)
@@ -1085,6 +1088,9 @@ pub fn format_metrics_for_ai_context() -> String {
     } else if c.can_read_temperature {
         lines.push("Temperature: N/A".to_string());
     }
+    if !c.thermal_state.is_empty() {
+        lines.push(format!("Thermal pressure: {}", c.thermal_state));
+    }
     if c.can_read_frequency {
         lines.push(format!(
             "Frequency: {:.2} GHz (P-core: {:.2}, E-core: {:.2})",
@@ -1689,6 +1695,9 @@ pub fn get_cpu_details() -> CpuDetails {
             has_power_cache || gpu_power > 0.0 || crate::metrics::can_read_gpu_power();
 
         let disk_percent = get_disk_usage_percent(false);
+        let thermal_state = crate::ffi::objc::read_process_thermal_state()
+            .unwrap_or("")
+            .to_string();
 
         return CpuDetails {
             usage,
@@ -1716,6 +1725,7 @@ pub fn get_cpu_details() -> CpuDetails {
             battery_level,
             is_charging,
             has_battery,
+            thermal_state,
         };
     }
 
@@ -2124,6 +2134,9 @@ pub fn get_cpu_details() -> CpuDetails {
     };
 
     let disk_percent = get_disk_usage_percent(false);
+    let thermal_state = crate::ffi::objc::read_process_thermal_state()
+        .unwrap_or("")
+        .to_string();
 
     CpuDetails {
         usage,
@@ -2151,6 +2164,7 @@ pub fn get_cpu_details() -> CpuDetails {
         battery_level,
         is_charging,
         has_battery,
+        thermal_state,
     }
 }
 

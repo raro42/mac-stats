@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.561] - 2026-08-21
+
+### Changed
+- CPU metrics **Heat / thermal** now prefers Apple **`NSProcessInfo.thermalState`** (Nominal / Fair / Serious / Critical) for the power-strip Heat cell and temperature ring subtext. Falls back to die-temp °C bands when the OS value is unavailable. AI metrics context includes **Thermal pressure**.
+
 ## [0.1.560] - 2026-08-21
 
 ### Added
