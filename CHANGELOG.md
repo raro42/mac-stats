@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.551] - 2026-08-20
+
+### Added
+- Perplexity Search **last-search glance** (AI Chat last-answer / Debug Log parity). Shows last query + result count (or Key · add API key when unset); click expands the section and focuses setup or results. Soft accent wash on results; amber when a key is needed; red on error.
+
 ## [0.1.550] - 2026-08-20
 
 ### Added

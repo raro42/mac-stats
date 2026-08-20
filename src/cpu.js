@@ -7436,6 +7436,10 @@ function updatePerplexityConfigStatus(statusText, elId) {
 let perplexityConfigured = false;
 /** @type {boolean} */
 let perplexityCollapsed = true;
+/** @type {{ query: string, count: number, weather?: boolean, error?: boolean } | null} */
+let perplexityLastSearch = null;
+/** @type {boolean} */
+let perplexitySearchBusyForGlance = false;
 
 const PERPLEXITY_API_KEY_HELP_URL = 'https://www.perplexity.ai/settings/api';
 
@@ -7540,7 +7544,10 @@ function updatePerplexitySetupVisibility() {
 
 async function refreshPerplexityStatus() {
   const invoke = getInvoke();
-  if (!invoke) return;
+  if (!invoke) {
+    applyPerplexityLastGlanceState();
+    return;
+  }
   try {
     const configured = await invoke('is_perplexity_configured');
     perplexityConfigured = !!configured;
@@ -7569,6 +7576,156 @@ async function refreshPerplexityStatus() {
     updatePerplexityConfigStatus('—', 'perplexity-settings-status');
   }
   updatePerplexitySetupVisibility();
+  applyPerplexityLastGlanceState();
+}
+
+function truncatePerplexityGlancePreview(raw, maxLen) {
+  const s = String(raw || '').replace(/\s+/g, ' ').trim();
+  if (!s) return '';
+  const n = typeof maxLen === 'number' && maxLen > 8 ? maxLen : 48;
+  if (s.length <= n) return s;
+  return s.slice(0, Math.max(1, n - 1)).trimEnd() + '…';
+}
+
+/** Expand Perplexity if collapsed (glance click). */
+function ensurePerplexitySectionExpanded() {
+  const content = document.getElementById('perplexity-content');
+  const section = document.querySelector('.perplexity-section');
+  const header = document.getElementById('perplexity-header');
+  const divider = document.getElementById('perplexity-details-divider');
+  if (!content) return;
+  if (!perplexityCollapsed && !content.classList.contains('collapsed')) {
+    return;
+  }
+  perplexityCollapsed = false;
+  setSectionCollapsed('perplexity_collapsed', false);
+  content.classList.remove('collapsed');
+  if (section) section.classList.remove('collapsed');
+  if (divider) divider.style.display = '';
+  if (header && header._syncCollapseA11y) header._syncCollapseA11y();
+  syncSectionIcon('icon-perplexity', true);
+  updatePerplexitySetupVisibility();
+  void refreshPerplexityStatus();
+}
+
+/** Last-search / key glance under Perplexity header (AI Chat / Debug Log parity). */
+function ensurePerplexityLastGlance() {
+  const header = document.getElementById('perplexity-header');
+  if (!header) return null;
+  let glance = document.getElementById('perplexity-last-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'perplexity-last-glance';
+    glance.className = 'perplexity-last-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="perplexity-last-glance-text"></span>';
+    header.insertAdjacentElement('afterend', glance);
+    wirePerplexityLastGlanceClick(glance);
+  }
+  return glance;
+}
+
+function applyPerplexityLastGlanceState() {
+  const glance = ensurePerplexityLastGlance();
+  if (!glance) return;
+  const text = document.getElementById('perplexity-last-glance-text');
+  glance.classList.remove('has-results', 'has-error', 'needs-key', 'is-searching');
+
+  if (perplexitySearchBusyForGlance && perplexityLastSearch && perplexityLastSearch.query) {
+    const preview = truncatePerplexityGlancePreview(perplexityLastSearch.query, 44);
+    glance.hidden = false;
+    glance.classList.add('is-searching');
+    if (text) text.textContent = `Searching · ${preview}`;
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = 'Show Perplexity Search';
+    glance.setAttribute('aria-label', `Searching for ${preview}`);
+    return;
+  }
+
+  if (perplexityLastSearch && perplexityLastSearch.query) {
+    const preview = truncatePerplexityGlancePreview(perplexityLastSearch.query, 40);
+    const last = perplexityLastSearch;
+    glance.hidden = false;
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    if (last.error) {
+      glance.classList.add('has-error');
+      if (text) text.textContent = `Last · ${preview} · error`;
+      glance.title = 'Show last search error';
+      glance.setAttribute('aria-label', `Last Perplexity search failed: ${preview}`);
+      return;
+    }
+    glance.classList.add('has-results');
+    let outcome = 'no results';
+    const n = Number(last.count) || 0;
+    if (n > 0) outcome = `${n} result${n === 1 ? '' : 's'}`;
+    else if (last.weather) outcome = 'weather';
+    if (text) text.textContent = `Last · ${preview} · ${outcome}`;
+    glance.title = 'Show last Perplexity results';
+    glance.setAttribute(
+      'aria-label',
+      `Last Perplexity search: ${preview}, ${outcome}. Click to open`
+    );
+    return;
+  }
+
+  if (!perplexityConfigured) {
+    glance.hidden = false;
+    glance.classList.add('needs-key');
+    if (text) text.textContent = 'Key · add API key';
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = 'Add a Perplexity API key';
+    glance.setAttribute('aria-label', 'Perplexity needs an API key — click to set up');
+    return;
+  }
+
+  glance.hidden = true;
+}
+
+function wirePerplexityLastGlanceClick(glance) {
+  if (!glance || glance.dataset.perplexityGlanceWired === '1') return;
+  glance.dataset.perplexityGlanceWired = '1';
+  const activate = () => {
+    ensurePerplexitySectionExpanded();
+    if (!perplexityConfigured) {
+      const inlineKey = document.getElementById('perplexity-inline-key');
+      if (inlineKey && typeof inlineKey.focus === 'function') {
+        try {
+          inlineKey.focus();
+        } catch (_) {
+          /* ignore */
+        }
+      }
+      return;
+    }
+    const resultsEl = document.getElementById('perplexity-results');
+    const queryInput = document.getElementById('perplexity-query');
+    if (resultsEl && perplexityLastSearch && !perplexityLastSearch.error) {
+      if (typeof resultsEl.scrollIntoView === 'function') {
+        resultsEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }
+    if (queryInput && typeof queryInput.focus === 'function') {
+      try {
+        queryInput.focus();
+      } catch (_) {
+        /* ignore */
+      }
+    }
+  };
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
 }
 
 function initPerplexitySection() {
@@ -7624,6 +7781,7 @@ function initPerplexitySection() {
 
     const setPerplexitySearchBusy = (busy) => {
       perplexitySearchInFlight = !!busy;
+      perplexitySearchBusyForGlance = !!busy;
       if (perplexitySearchFlashTimer) {
         clearTimeout(perplexitySearchFlashTimer);
         perplexitySearchFlashTimer = null;
@@ -7638,6 +7796,7 @@ function initPerplexitySection() {
         searchBtn.textContent = searchBtn.dataset.idleLabel || 'Search';
         searchBtn.title = 'Search the web with Perplexity';
       }
+      applyPerplexityLastGlanceState();
     };
 
     const flashPerplexitySearched = () => {
@@ -7673,8 +7832,10 @@ function initPerplexitySection() {
       if (!perplexityConfigured) {
         await refreshPerplexityStatus();
         updatePerplexitySetupVisibility();
+        applyPerplexityLastGlanceState();
         return;
       }
+      perplexityLastSearch = { query: query, count: 0 };
       setPerplexitySearchBusy(true);
       resultsEl.innerHTML = '<div class="perplexity-empty" role="status">Searching…</div>';
       let searchOk = false;
@@ -7709,6 +7870,11 @@ function initPerplexitySection() {
         if (!resp.results || resp.results.length === 0) {
           resultsEl.innerHTML = weatherHtml ||
             '<div class="perplexity-empty" role="status">No results.</div>';
+          perplexityLastSearch = {
+            query: query,
+            count: 0,
+            weather: !!weatherHtml,
+          };
           searchOk = true;
           return;
         }
@@ -7746,9 +7912,15 @@ function initPerplexitySection() {
             snippetHtml +
             '</article>';
         }).join('');
+        perplexityLastSearch = {
+          query: query,
+          count: resp.results.length,
+          weather: !!weatherHtml,
+        };
         searchOk = true;
       } catch (err) {
         resultsEl.innerHTML = '<div class="perplexity-empty perplexity-empty-error" role="alert">Error: ' + String(err) + '</div>';
+        perplexityLastSearch = { query: query, count: 0, error: true };
       } finally {
         setPerplexitySearchBusy(false);
         if (searchOk) flashPerplexitySearched();
