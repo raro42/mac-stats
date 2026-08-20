@@ -2393,6 +2393,76 @@ textarea.ops-agent-editor.is-dirty {
   display: none !important;
 }
 
+/* Agent Ops Sessions — All · Live · Files (Monitors / Processes parity) */
+.ops-session-kind-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 8px;
+  padding: 0 2px;
+}
+
+.ops-session-kind-chip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  opacity: 0.88;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ops-session-kind-chip:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 7%, transparent);
+}
+
+.ops-session-kind-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, transparent);
+}
+
+.ops-session-kind-chip.is-active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, transparent);
+}
+
+.ops-session-kind-chip[data-ops-session-kind='live'].has-hits {
+  background: color-mix(in srgb, #30d158 12%, transparent);
+  border-color: color-mix(in srgb, #30d158 28%, transparent);
+}
+
+.ops-session-kind-chip[data-ops-session-kind='live'].is-active {
+  background: color-mix(in srgb, #30d158 18%, transparent);
+  border-color: color-mix(in srgb, #30d158 36%, transparent);
+}
+
+.ops-session-kind-chip[data-ops-session-kind='files'].has-hits {
+  background: color-mix(in srgb, #0a84ff 12%, transparent);
+  border-color: color-mix(in srgb, #0a84ff 28%, transparent);
+}
+
+.ops-session-kind-count {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
 .monitors-filter-chip {
   appearance: none;
   display: inline-flex;

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.542] - 2026-08-20
+
+### Added
+- Agent Ops Sessions **All · Live · Files** filter chips (Monitors / Top Processes parity). Counts on Live/Files; overview Live/Recent open the matching kind; Clear resets kind to All.
+
 ## [0.1.541] - 2026-08-20
 
 ### Added

@@ -191,8 +191,7 @@
         id: 'ops-session-filter',
         clear() {
           opsSessionFilterQ = '';
-          renderOpsLive(opsLiveCache);
-          renderOpsSessionFiles(opsSessionFilesCache);
+          setOpsSessionKindFilter('all');
         },
       },
       memory: {
@@ -261,6 +260,8 @@
   let opsDigestRefreshFlashTimer = null;
   let opsSessionLoadRows = null;
   let opsSessionFilterQ = '';
+  /** Sessions panel kind chip: `all` | `live` | `files` (Monitors All/Up/Down parity). */
+  let opsSessionKindFilter = 'all';
   let opsLiveCache = [];
   let opsSessionFilesCache = [];
   let opsMemoryFilterQ = '';
@@ -514,7 +515,7 @@ function ensureOpsKeyboardHint() {
         tabs.insertAdjacentElement('afterend', hint);
     }
     hint.textContent =
-        'Tips: 0 overview · digits + counts on tabs · overview head counts · filter N/M + Clear · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · c copy id · / Esc · r refresh · R digest · ?';
+        'Tips: 0 overview · digits + counts on tabs · overview head counts · Sessions All/Live/Files · filter N/M + Clear · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · c copy id · / Esc · r refresh · R digest · ?';
 }
 
 /** Hermes-style: ? flashes the keyboard tips row when not typing. */
@@ -851,6 +852,7 @@ function ensureOpsSessionFilter() {
         ensureOpsFilterClearBtn(input);
         panel.insertBefore(row, panel.firstChild);
     }
+    ensureOpsSessionKindChips();
     if (input.dataset.opsBound === '1') return;
     input.dataset.opsBound = '1';
     ensureOpsFilterMatchChip(input);
@@ -865,6 +867,85 @@ function ensureOpsSessionFilter() {
         renderOpsLive(opsLiveCache);
         renderOpsSessionFiles(opsSessionFilesCache);
     });
+}
+
+/** All · Live · Files chips (Monitors / Top Processes filter parity). */
+function ensureOpsSessionKindChips() {
+    const panel = document.getElementById('ops-panel-sessions');
+    const filterRow = panel && panel.querySelector('.ops-filter-row');
+    if (!panel || !filterRow) return;
+    let wrap = document.getElementById('ops-session-kind-chips');
+    if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.id = 'ops-session-kind-chips';
+        wrap.className = 'ops-session-kind-chips';
+        wrap.setAttribute('role', 'group');
+        wrap.setAttribute('aria-label', 'Session kind filter');
+        wrap.innerHTML =
+            '<button type="button" class="ops-session-kind-chip is-active" data-ops-session-kind="all" aria-pressed="true" title="Show live sessions and saved files">All</button>' +
+            '<button type="button" class="ops-session-kind-chip" data-ops-session-kind="live" aria-pressed="false" title="Show live sessions only">Live <span class="ops-session-kind-count" data-ops-session-kind-count="live">0</span></button>' +
+            '<button type="button" class="ops-session-kind-chip" data-ops-session-kind="files" aria-pressed="false" title="Show saved session files only">Files <span class="ops-session-kind-count" data-ops-session-kind-count="files">0</span></button>';
+        filterRow.insertAdjacentElement('afterend', wrap);
+        wrap.addEventListener('click', (e) => {
+            const btn =
+                e.target && e.target.closest && e.target.closest('[data-ops-session-kind]');
+            if (!btn || !wrap.contains(btn)) return;
+            setOpsSessionKindFilter(btn.getAttribute('data-ops-session-kind') || 'all');
+        });
+    }
+    paintOpsSessionKindChips();
+    applyOpsSessionKindVisibility();
+}
+
+function setOpsSessionKindFilter(mode) {
+    const next =
+        mode === 'live' || mode === 'files' || mode === 'all' ? mode : 'all';
+    opsSessionKindFilter = next;
+    paintOpsSessionKindChips();
+    applyOpsSessionKindVisibility();
+    renderOpsLive(opsLiveCache);
+    renderOpsSessionFiles(opsSessionFilesCache);
+}
+
+function paintOpsSessionKindChips() {
+    const wrap = document.getElementById('ops-session-kind-chips');
+    if (!wrap) return;
+    const liveAll = opsLiveCache || [];
+    const filesAll = opsSessionFilesCache || [];
+    const liveEl = wrap.querySelector('[data-ops-session-kind-count="live"]');
+    const filesEl = wrap.querySelector('[data-ops-session-kind-count="files"]');
+    if (liveEl) liveEl.textContent = String(liveAll.length);
+    if (filesEl) filesEl.textContent = String(filesAll.length);
+    wrap.querySelectorAll('[data-ops-session-kind]').forEach((btn) => {
+        const key = btn.getAttribute('data-ops-session-kind');
+        const on = key === opsSessionKindFilter;
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (key === 'live') {
+            btn.classList.toggle('has-hits', liveAll.length > 0);
+        } else if (key === 'files') {
+            btn.classList.toggle('has-hits', filesAll.length > 0);
+        }
+    });
+}
+
+/** Hide Live or Files blocks when a kind chip narrows the Sessions tab. */
+function applyOpsSessionKindVisibility() {
+    const liveList = document.getElementById('ops-live-sessions');
+    const fileList = document.getElementById('ops-session-files');
+    if (!liveList || !fileList) return;
+    const liveHead = liveList.previousElementSibling;
+    const fileHead = fileList.previousElementSibling;
+    const showLive = opsSessionKindFilter === 'all' || opsSessionKindFilter === 'live';
+    const showFiles = opsSessionKindFilter === 'all' || opsSessionKindFilter === 'files';
+    if (liveHead && liveHead.classList && liveHead.classList.contains('ops-subhead')) {
+        liveHead.hidden = !showLive;
+    }
+    liveList.hidden = !showLive;
+    if (fileHead && fileHead.classList && fileHead.classList.contains('ops-subhead')) {
+        fileHead.hidden = !showFiles;
+    }
+    fileList.hidden = !showFiles;
 }
 
 function sessionRowMatchesFilter(haystack) {
@@ -1034,6 +1115,7 @@ function schedulesRowMatchesFilter(haystack) {
 
 /** Combined live + files match count for the shared Sessions filter chip. */
 function paintOpsSessionFilterFromCaches() {
+    ensureOpsSessionKindChips();
     const liveAll = opsLiveCache || [];
     const liveShown = liveAll.filter((r) =>
         sessionRowMatchesFilter(
@@ -1046,12 +1128,23 @@ function paintOpsSessionFilterFromCaches() {
             `${f.slug || ''} ${f.name || ''} ${f.source_hint || ''} ${f.preview || ''}`
         )
     ).length;
+    let total = liveAll.length + filesAll.length;
+    let shown = liveShown + filesShown;
+    if (opsSessionKindFilter === 'live') {
+        total = liveAll.length;
+        shown = liveShown;
+    } else if (opsSessionKindFilter === 'files') {
+        total = filesAll.length;
+        shown = filesShown;
+    }
     paintOpsFilterMatch(
         'ops-session-filter',
-        liveAll.length + filesAll.length,
-        liveShown + filesShown,
+        total,
+        shown,
         opsSessionFilterQ
     );
+    paintOpsSessionKindChips();
+    applyOpsSessionKindVisibility();
 }
 
 function startAgentOpsAutoRefresh() {
@@ -2082,6 +2175,7 @@ function renderOverviewLive(rows, insights) {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
             selectOpsTab('sessions');
+            setOpsSessionKindFilter('live');
             const matchTitle = `${r.source} · ${r.session_id}`;
             const liveList = document.getElementById('ops-live-sessions');
             const fileList = document.getElementById('ops-session-files');
@@ -2280,6 +2374,7 @@ function renderOverviewRecent(files) {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
             btn.classList.add('is-selected');
             selectOpsTab('sessions');
+            setOpsSessionKindFilter('files');
             const matchTitle = f.slug || f.name || '';
             const list = document.getElementById('ops-session-files');
             const liveList = document.getElementById('ops-live-sessions');
@@ -4117,9 +4212,14 @@ function loadOpsSessionIntoChat() {
 
 function renderOpsLive(rows) {
     const el = document.getElementById('ops-live-sessions');
+    if (!el) return;
     el.innerHTML = '';
     const all = rows || [];
     opsLiveCache = all;
+    if (opsSessionKindFilter === 'files') {
+        paintOpsSessionFilterFromCaches();
+        return;
+    }
     const filtered = all.filter((r) =>
         sessionRowMatchesFilter(
             `${r.source} ${r.session_id} ${r.preview || ''} ${r.last_activity || ''}`
@@ -4174,6 +4274,7 @@ function renderOpsSessionFiles(files) {
     const el = document.getElementById('ops-session-files');
     const preview = document.getElementById('ops-session-preview');
     const loadBtn = document.getElementById('ops-session-load-chat');
+    if (!el) return;
     el.innerHTML = '';
     preview.hidden = true;
     if (loadBtn) loadBtn.hidden = true;
@@ -4181,6 +4282,10 @@ function renderOpsSessionFiles(files) {
     setOpsSessionCopyChip(null);
     const all = files || [];
     opsSessionFilesCache = all;
+    if (opsSessionKindFilter === 'live') {
+        paintOpsSessionFilterFromCaches();
+        return;
+    }
     const filtered = all.filter((f) =>
         sessionRowMatchesFilter(
             `${f.slug || ''} ${f.name || ''} ${f.source_hint || ''} ${f.preview || ''}`
