@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- AI Chat **model / connection glance** (Model · name / Offline; click picker or URL; green/amber wash) — **v0.1.540**
 - AI Chat **last-answer glance** (preview + click copies reply; Copied flash; accent wash) — **v0.1.539**
 - CPU metrics **CPU % on the battery/power strip** (click scrolls to CPU ring; amber wash ≥ 50%) — **v0.1.538**
 - CPU metrics **SSD % on the battery/power strip** (click opens Disk Cleanup; amber wash ≥ 85%) — **v0.1.537**

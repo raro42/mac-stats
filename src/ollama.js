@@ -286,6 +286,12 @@ async function checkOllamaConnection() {
         window.updateOllamaIconStatus('unknown');
       }
     }
+
+    chatModelGlanceState = {
+      status: connected ? 'connected' : connectionFailed ? 'error' : 'unknown',
+      model: String(localStorage.getItem('ollama_model') || '').trim(),
+    };
+    applyChatModelGlanceState();
     
     return connected;
   } catch (err) {
@@ -304,6 +310,8 @@ async function checkOllamaConnection() {
       connectionIndicator.classList.remove('connected');
       connectionIndicator.title = 'Error: Ollama not available - Check if Ollama is running';
     }
+    chatModelGlanceState = { status: 'error', model: '' };
+    applyChatModelGlanceState();
     return false;
   }
 }
@@ -399,6 +407,10 @@ async function updateOllamaModel(model) {
   try {
     await configureOllama(endpoint, model);
     console.log('[Ollama] Model updated successfully');
+    if (chatModelGlanceState.status === 'connected') {
+      chatModelGlanceState.model = String(model || '').trim();
+    }
+    applyChatModelGlanceState();
     return true;
   } catch (err) {
     console.error('[Ollama] Failed to update model:', err);
@@ -482,6 +494,129 @@ function truncateChatGlancePreview(text, maxLen = 48) {
   return `${raw.slice(0, maxLen - 1).trim()}…`;
 }
 
+/** Connection snapshot for the model glance (updated by checkOllamaConnection). */
+let chatModelGlanceState = { status: 'unknown', model: '' };
+
+function shortChatModelName(modelName, maxLen = 28) {
+  const name = String(modelName || '').trim();
+  if (!name) return '';
+  if (name.length <= maxLen) return name;
+  return `${name.slice(0, maxLen - 1).trim()}…`;
+}
+
+function getChatModelGlanceLabel() {
+  const modelText = document.getElementById('ollama-model-text');
+  const fromUi = modelText && modelText.style.display !== 'none'
+    ? String(modelText.textContent || '').trim()
+    : '';
+  const fromStore = String(localStorage.getItem('ollama_model') || '').trim();
+  return shortChatModelName(fromUi || fromStore || chatModelGlanceState.model || '');
+}
+
+/** Expand AI Chat if collapsed (model glance / Offline CTA). */
+function ensureOllamaSectionExpanded() {
+  const content = document.getElementById('ollama-content');
+  const section = document.querySelector('.ollama-section');
+  const header = document.getElementById('ollama-header');
+  if (!content) return;
+  if (!content.classList.contains('collapsed')) return;
+  content.classList.remove('collapsed');
+  section?.classList.remove('collapsed');
+  const divider = document.getElementById('monitors-ollama-divider');
+  if (divider) divider.style.display = '';
+  if (typeof window.setSectionCollapsed === 'function') {
+    window.setSectionCollapsed('ollama_collapsed', false);
+  }
+  header?.setAttribute('aria-expanded', 'true');
+  if (typeof header?._syncCollapseA11y === 'function') header._syncCollapseA11y();
+  if (typeof window.syncSectionIcon === 'function') {
+    window.syncSectionIcon('icon-ollama', true);
+  }
+  const chat = document.getElementById('ollama-chat');
+  if (chat) chat.style.display = 'block';
+}
+
+/** Model / connection glance under AI Chat header (Debug Log / turn-glance parity). */
+function ensureChatModelGlance() {
+  const header = document.getElementById('ollama-header');
+  if (!header) return null;
+  let glance = document.getElementById('chat-model-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'chat-model-glance';
+    glance.className = 'chat-model-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="chat-model-glance-text"></span>';
+    header.insertAdjacentElement('afterend', glance);
+    wireChatModelGlanceClick(glance);
+  }
+  return glance;
+}
+
+function applyChatModelGlanceState() {
+  const glance = ensureChatModelGlance();
+  if (!glance) return;
+  const text = document.getElementById('chat-model-glance-text');
+  const status = chatModelGlanceState.status || 'unknown';
+  const model = getChatModelGlanceLabel();
+  glance.hidden = false;
+  glance.classList.toggle('is-online', status === 'connected');
+  glance.classList.toggle('is-offline', status === 'error' || status === 'unknown');
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  if (status === 'connected') {
+    const label = model ? `Model · ${model}` : 'Model · pick one';
+    if (text) text.textContent = label;
+    glance.title = model
+      ? `Change model (${model})`
+      : 'Choose an Ollama model';
+    glance.setAttribute(
+      'aria-label',
+      model ? `Connected — model ${model}. Click to change.` : 'Connected — choose a model'
+    );
+    return;
+  }
+  if (status === 'error') {
+    if (text) text.textContent = 'Offline · check Ollama';
+    glance.title = 'Ollama is not available — click to set the URL';
+    glance.setAttribute('aria-label', 'Ollama offline — click to configure URL');
+    return;
+  }
+  if (text) text.textContent = 'Not set · configure URL';
+  glance.title = 'Click to configure the Ollama URL';
+  glance.setAttribute('aria-label', 'Ollama not configured — click to set URL');
+}
+
+function wireChatModelGlanceClick(glance) {
+  if (!glance || glance.dataset.modelGlanceWired === '1') return;
+  glance.dataset.modelGlanceWired = '1';
+  const activate = () => {
+    ensureOllamaSectionExpanded();
+    const status = chatModelGlanceState.status || 'unknown';
+    if (status === 'connected') {
+      const modelText = document.getElementById('ollama-model-text');
+      if (modelText && typeof modelText.click === 'function') {
+        modelText.click();
+        return;
+      }
+      document.getElementById('chat-input')?.focus();
+      return;
+    }
+    showOllamaUrlDialog();
+  };
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 /** Last user turn preview for the turn glance strip (Top CPU / Monitors parity). */
 function getChatTurnGlancePreview() {
   for (let i = conversationHistory.length - 1; i >= 0; i--) {
@@ -514,7 +649,9 @@ function ensureChatTurnGlance() {
     glance.className = 'chat-turn-glance';
     glance.hidden = true;
     glance.innerHTML = '<span id="chat-turn-glance-text"></span>';
-    header.insertAdjacentElement('afterend', glance);
+    const model = ensureChatModelGlance();
+    const anchor = model || header;
+    anchor.insertAdjacentElement('afterend', glance);
     wireChatTurnGlanceClick(glance);
   }
   return glance;
@@ -646,8 +783,9 @@ function flashChatAnswerGlanceCopied(glance) {
 /** Last-answer glance under AI Chat — click copies reply (Top Processes / Monitors parity). */
 function ensureChatAnswerGlance() {
   const turn = ensureChatTurnGlance();
+  const model = ensureChatModelGlance();
   const header = document.getElementById('ollama-header');
-  const anchor = turn || header;
+  const anchor = turn || model || header;
   if (!anchor) return null;
   let glance = document.getElementById('chat-answer-glance');
   if (!glance) {
@@ -718,6 +856,7 @@ function updateChatClearButton() {
     : hasSomething
       ? 'Clear this chat'
       : 'No messages to clear';
+  applyChatModelGlanceState();
   applyChatTurnGlanceState();
   applyChatAnswerGlanceState();
 }
@@ -1706,7 +1845,9 @@ function initOllamaChatListeners() {
 async function initializeOllama() {
   // Auto-configure after a short delay to ensure everything is ready
   console.log('[Ollama] Module loaded, auto-configuring...');
+  ensureChatModelGlance();
   ensureChatTurnGlance();
+  applyChatModelGlanceState();
   try {
     // Always auto-configure the backend, regardless of DOM elements
     await autoConfigureOllama();

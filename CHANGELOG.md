@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.540] - 2026-08-20
+
+### Added
+- AI Chat **model / connection glance** — shows Model · name when online (click opens the model picker) or Offline / Not set (click configures the URL). Soft green wash online; amber when offline. Expands the section if collapsed.
+
 ## [0.1.539] - 2026-08-20
 
 ### Added

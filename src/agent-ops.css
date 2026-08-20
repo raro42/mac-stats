@@ -2150,6 +2150,54 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #ff9500 6%, transparent);
 }
 
+/* AI Chat — model / connection glance (Debug Log / turn-glance parity) */
+.chat-model-glance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 4px 0 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  font-size: 13px;
+  font-weight: 520;
+  line-height: 1.35;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.chat-model-glance[hidden] {
+  display: none !important;
+}
+
+.chat-model-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+}
+
+.chat-model-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.chat-model-glance.is-online {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 6%, transparent);
+}
+
+.chat-model-glance.is-offline {
+  border-color: color-mix(in srgb, #ff9500 32%, transparent);
+  background: color-mix(in srgb, #ff9500 7%, transparent);
+}
+
 /* AI Chat — turn glance (Top CPU / Monitors summary parity) */
 .chat-turn-glance {
   display: flex;
