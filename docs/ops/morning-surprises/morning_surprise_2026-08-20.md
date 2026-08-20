@@ -6,6 +6,7 @@ Overnight Track B kept shipping design-review polish (digester open empty all ni
 
 | Version | What |
 |---------|------|
+| **v0.1.547** | Top Processes **Top RAM glance** (highest resident memory in list; click opens details; amber wash ≥ 1 GiB; `ProcessUsage.memory`) |
 | **v0.1.546** | Agent Ops Knowledge **All · Discord · Core** filter chips (Sessions Live/Files parity; overview → Discord when any; Clear → All) |
 | v0.1.545 | Agent Ops Schedules **All · Jobs · Deliveries** filter chips |
 | v0.1.544 | Agent Ops Runs **All · Instant · Direct** filter chips |
@@ -22,6 +23,6 @@ Overnight Track B kept shipping design-review polish (digester open empty all ni
 ## Notes
 
 - Digester: no open candidates (instant-heavy window).
-- Design review: due=false (grace); Agent Ops marked polished again after Knowledge kind chips.
+- Design review: due=false (grace); Processes marked polished again after Top RAM glance.
 - Screenshots: mostly deferred (TCC / no on-screen CPU window).
-- Next fuel: digester Discord traffic, or uptime strip / Top RAM (needs ProcessUsage.memory) / p50 latency / non-Knowledge kind polish.
+- Next fuel: digester Discord traffic, or uptime strip / p50 latency / Disk Cleanup kind chips / non-process-glance polish.
