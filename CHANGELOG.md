@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.548] - 2026-08-20
+
+### Added
+- Disk Cleanup **All · Reclaim · Clean** filter chips (Monitors All/Up/Down parity). Counts on Reclaim/Clean; Reclaimable-now glance sets Reclaim; Clear resets to All; keyboard nav skips hidden rows.
+
 ## [0.1.547] - 2026-08-20
 
 ### Added
