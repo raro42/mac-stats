@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.550] - 2026-08-20
+
+### Added
+- CPU metrics **uptime on the battery/power strip** (RAM/SSD strip parity). Label **Up** + formatted uptime; click opens Details and flashes the Uptime row. Soft amber wash when uptime ≥ 7 days.
+
 ## [0.1.549] - 2026-08-20
 
 ### Added

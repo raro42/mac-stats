@@ -1332,13 +1332,35 @@ async function refresh() {
         );
       }
 
-    // Update uptime
+    // Update uptime — Details row + battery/power strip
+    ensureUptimeStrip();
     const uptimeEl = document.getElementById("uptime-value");
-    const uptimeFormatted = formatUptime(data.uptime_secs);
-    if (uptimeEl.textContent !== uptimeFormatted) {
+    const uptimeStripEl = document.getElementById("uptime-strip-value");
+    const uptimeStripCell = document.getElementById("uptime-strip");
+    const uptimeSecs =
+      typeof data.uptime_secs === "number" && Number.isFinite(data.uptime_secs)
+        ? data.uptime_secs
+        : 0;
+    const uptimeFormatted = uptimeSecs > 0 ? formatUptime(uptimeSecs) : "—";
+    if (uptimeEl && uptimeEl.textContent !== uptimeFormatted) {
       scheduleDOMUpdate(() => {
         uptimeEl.textContent = uptimeFormatted;
       });
+    }
+    if (uptimeStripEl && uptimeStripEl.textContent !== uptimeFormatted) {
+      scheduleDOMUpdate(() => {
+        uptimeStripEl.textContent = uptimeFormatted;
+      });
+    }
+    if (uptimeStripCell) {
+      // Soft wash when up ≥ 7 days (long-run awareness; SSD/CPU hot-threshold parity).
+      uptimeStripCell.classList.toggle("is-long", uptimeSecs >= 7 * 24 * 3600);
+      const title = "Show uptime in Details";
+      uptimeStripCell.title = title;
+      uptimeStripCell.setAttribute(
+        "aria-label",
+        `Uptime ${uptimeFormatted === "—" ? "unavailable" : uptimeFormatted}. ${title}`
+      );
     }
 
     // System RAM (menu-bar parity) — Details section + battery/power strip
@@ -1911,6 +1933,7 @@ function init() {
   ensureTempStrip();
   ensureFreqStrip();
   ensureDiskStrip();
+  ensureUptimeStrip();
   
   // Try to get Tauri immediately - don't wait if it's already available
   const immediateInvoke = getInvoke();
@@ -2287,6 +2310,41 @@ function ensureRamStripStyles() {
       border-radius: 12px;
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, transparent);
     }
+    .uptime-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      outline: none;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .uptime-info:hover {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
+    }
+    .uptime-info:focus-visible {
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+    }
+    .uptime-info.is-long {
+      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
+    }
+    .uptime-label {
+      color: var(--muted);
+    }
+    .uptime-value {
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    .detail-label.is-uptime-highlight,
+    .detail-value.is-uptime-highlight {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      border-radius: 6px;
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+    }
   `;
   document.head.appendChild(style);
 }
@@ -2660,6 +2718,76 @@ function ensureDiskStrip() {
   cell.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     openDisk(e);
+  });
+  return cell;
+}
+
+function flashUptimeDetails() {
+  const el = document.getElementById('uptime-value');
+  if (!el) return;
+  el.classList.add('is-uptime-highlight');
+  const label = el.previousElementSibling;
+  if (label && label.classList.contains('detail-label')) {
+    label.classList.add('is-uptime-highlight');
+  }
+  window.setTimeout(() => {
+    el.classList.remove('is-uptime-highlight');
+    if (label && label.classList.contains('detail-label')) {
+      label.classList.remove('is-uptime-highlight');
+    }
+  }, 1600);
+}
+
+function openUptimeFromStrip() {
+  if (typeof window.showCpuDetailsSection === 'function') {
+    window.showCpuDetailsSection();
+  } else if (typeof window.showDetailsProcessesSections === 'function') {
+    window.showDetailsProcessesSections();
+  }
+  const uptimeEl = document.getElementById('uptime-value');
+  if (uptimeEl && typeof uptimeEl.scrollIntoView === 'function') {
+    uptimeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  flashUptimeDetails();
+}
+
+/**
+ * Uptime on the battery/power strip (RAM / SSD strip parity). Click / Enter /
+ * Space opens Details and flashes the Uptime row. Soft amber wash when ≥ 7d.
+ */
+function ensureUptimeStrip() {
+  ensureRamStripStyles();
+  const strip = document.getElementById('battery-power-strip');
+  if (!strip) return null;
+  let cell = document.getElementById('uptime-strip');
+  if (!cell) {
+    cell = document.createElement('div');
+    cell.id = 'uptime-strip';
+    cell.className = 'uptime-info';
+    cell.setAttribute('role', 'button');
+    cell.tabIndex = 0;
+    cell.title = 'Show uptime in Details';
+    cell.setAttribute('aria-label', 'Show uptime in Details');
+    cell.innerHTML =
+      '<span class="uptime-label">Up</span>' +
+      '<span class="uptime-value" id="uptime-strip-value">—</span>';
+    const diskEl = document.getElementById('disk-strip');
+    const timeEl = document.getElementById('time-remaining');
+    if (diskEl && diskEl.nextSibling) strip.insertBefore(cell, diskEl.nextSibling);
+    else if (timeEl) strip.insertBefore(cell, timeEl);
+    else strip.appendChild(cell);
+  }
+  if (cell.dataset.uptimeStripWired === '1') return cell;
+  cell.dataset.uptimeStripWired = '1';
+  const openUptime = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openUptimeFromStrip();
+  };
+  cell.addEventListener('click', openUptime);
+  cell.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    openUptime(e);
   });
   return cell;
 }
@@ -7260,6 +7388,7 @@ function initCollapsibleSections() {
   ensureTempStrip();
   ensureFreqStrip();
   ensureDiskStrip();
+  ensureUptimeStrip();
   ensureProcessesTopGlance();
 }
 
