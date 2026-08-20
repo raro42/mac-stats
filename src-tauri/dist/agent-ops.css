@@ -2375,6 +2375,133 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #34c759 10%, transparent);
 }
 
+/* AI Chat — All · You · Assistant (Monitors All/Up/Down parity) */
+.chat-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 6px;
+  padding: 0 2px;
+}
+
+.chat-filter-chips[hidden] {
+  display: none !important;
+}
+
+.chat-filter-chip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  opacity: 0.88;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.chat-filter-chip:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 7%, transparent);
+}
+
+.chat-filter-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, transparent);
+}
+
+.chat-filter-chip.is-active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, transparent);
+}
+
+.chat-filter-chip[data-chat-filter='you'].has-hits {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 10%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 24%, transparent);
+}
+
+.chat-filter-chip[data-chat-filter='you'].is-active {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 38%, transparent);
+}
+
+.chat-filter-chip[data-chat-filter='assistant'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+}
+
+.chat-filter-chip[data-chat-filter='assistant'].is-active {
+  background: color-mix(in srgb, #34c759 18%, transparent);
+  border-color: color-mix(in srgb, #34c759 38%, transparent);
+}
+
+.chat-filter-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  min-width: 1.1em;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.chat-filter-miss {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 14px 16px;
+}
+
+.chat-filter-miss-msg {
+  margin-bottom: 4px;
+}
+
+.chat-filter-miss-hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 10px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.chat-filter-miss-cta {
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 560;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.chat-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.chat-filter-miss-cta:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 20%, transparent);
+}
+
 /* Debug Log — error/warn glance (filter-chip parity; visible when section collapsed) */
 .logs-error-glance {
   display: flex;

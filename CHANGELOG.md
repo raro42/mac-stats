@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.549] - 2026-08-20
+
+### Added
+- AI Chat **All · You · Assistant** filter chips (Monitors All/Up/Down parity). Counts on You/Assistant; Clear resets to All; empty transcript hides chips.
+
 ## [0.1.548] - 2026-08-20
 
 ### Added

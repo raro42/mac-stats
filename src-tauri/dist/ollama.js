@@ -471,12 +471,127 @@ function addToHistory(role, content, attachmentPaths) {
  */
 function clearConversationHistory() {
   conversationHistory = [];
+  chatFilterMode = 'all';
   const container = document.getElementById('chat-messages');
   if (container) {
     container.innerHTML = '';
     ensureChatEmptyHint();
   }
+  applyChatListFilter();
   updateChatClearButton();
+}
+
+/** Transcript role filter (Monitors All/Up/Down parity). */
+let chatFilterMode = 'all';
+
+/** All · You · Assistant chips above the message list. */
+function ensureChatFilterChips() {
+  const chat = document.getElementById('ollama-chat');
+  const messages = document.getElementById('chat-messages');
+  if (!chat || !messages || !messages.parentNode) return;
+  if (document.getElementById('chat-filter-chips')) return;
+  const wrap = document.createElement('div');
+  wrap.id = 'chat-filter-chips';
+  wrap.className = 'chat-filter-chips';
+  wrap.setAttribute('role', 'group');
+  wrap.setAttribute('aria-label', 'Chat message filter');
+  wrap.hidden = true;
+  wrap.innerHTML =
+    '<button type="button" class="chat-filter-chip is-active" data-chat-filter="all" aria-pressed="true" title="Show every message">All</button>' +
+    '<button type="button" class="chat-filter-chip" data-chat-filter="you" aria-pressed="false" title="Show your messages only">You <span class="chat-filter-count" data-chat-filter-count="you">0</span></button>' +
+    '<button type="button" class="chat-filter-chip" data-chat-filter="assistant" aria-pressed="false" title="Show assistant replies only">Assistant <span class="chat-filter-count" data-chat-filter-count="assistant">0</span></button>';
+  messages.parentNode.insertBefore(wrap, messages);
+  wrap.addEventListener('click', (e) => {
+    const btn = e.target && e.target.closest && e.target.closest('[data-chat-filter]');
+    if (!btn || !wrap.contains(btn)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setChatFilterMode(btn.getAttribute('data-chat-filter') || 'all');
+  });
+}
+
+function setChatFilterMode(mode) {
+  const next = mode === 'you' || mode === 'assistant' ? mode : 'all';
+  chatFilterMode = next;
+  document.querySelectorAll('#chat-filter-chips [data-chat-filter]').forEach((btn) => {
+    const on = btn.getAttribute('data-chat-filter') === next;
+    btn.classList.toggle('is-active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  applyChatListFilter();
+}
+
+function ensureChatFilterMissState(container, show) {
+  if (!container) return;
+  const existing = container.querySelector('.chat-filter-miss');
+  if (!show) {
+    existing?.remove();
+    return;
+  }
+  let wrap = existing;
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.className = 'chat-empty chat-filter-miss';
+    wrap.setAttribute('role', 'status');
+    wrap.innerHTML =
+      `<div class="chat-empty-copy chat-filter-miss-msg">Nothing matches this filter</div>` +
+      `<div class="chat-filter-miss-hint">Try All, or clear the role filter.</div>` +
+      `<button type="button" class="chat-filter-miss-cta chat-clear-filter">Clear filter</button>`;
+    container.appendChild(wrap);
+    wrap.querySelector('.chat-clear-filter')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setChatFilterMode('all');
+    });
+  }
+}
+
+function applyChatListFilter() {
+  ensureChatFilterChips();
+  const chips = document.getElementById('chat-filter-chips');
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
+
+  const items = Array.from(container.querySelectorAll('.chat-message'));
+  const trueEmpty = !!container.querySelector('.chat-empty:not(.chat-filter-miss)');
+  if (chips) chips.hidden = trueEmpty || items.length === 0;
+
+  let youCount = 0;
+  let assistantCount = 0;
+  items.forEach((el) => {
+    if (el.classList.contains('user')) youCount++;
+    else if (el.classList.contains('assistant')) assistantCount++;
+  });
+
+  const youEl = document.querySelector('[data-chat-filter-count="you"]');
+  const asstEl = document.querySelector('[data-chat-filter-count="assistant"]');
+  if (youEl) youEl.textContent = String(youCount);
+  if (asstEl) asstEl.textContent = String(assistantCount);
+  document.querySelectorAll('#chat-filter-chips [data-chat-filter]').forEach((btn) => {
+    const key = btn.getAttribute('data-chat-filter');
+    btn.classList.toggle(
+      'has-hits',
+      key === 'you' ? youCount > 0 : key === 'assistant' ? assistantCount > 0 : false
+    );
+  });
+
+  if (trueEmpty || items.length === 0) {
+    ensureChatFilterMissState(container, false);
+    return;
+  }
+
+  let visible = 0;
+  items.forEach((el) => {
+    const isYou = el.classList.contains('user');
+    const isAsst = el.classList.contains('assistant');
+    let show = true;
+    if (chatFilterMode === 'you') show = isYou;
+    else if (chatFilterMode === 'assistant') show = isAsst;
+    el.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  ensureChatFilterMissState(container, visible === 0);
 }
 
 function getChatClearButton() {
@@ -859,6 +974,7 @@ function updateChatClearButton() {
   applyChatModelGlanceState();
   applyChatTurnGlanceState();
   applyChatAnswerGlanceState();
+  applyChatListFilter();
 }
 
 /**
@@ -945,10 +1061,15 @@ function ensureChatEmptyHint() {
   const container = document.getElementById('chat-messages');
   if (!container) return;
   if (container.querySelector('.chat-message')) {
-    container.querySelector('.chat-empty')?.remove();
+    container.querySelector('.chat-empty:not(.chat-filter-miss)')?.remove();
+    applyChatListFilter();
     return;
   }
-  if (container.querySelector('.chat-empty')) return;
+  ensureChatFilterMissState(container, false);
+  if (container.querySelector('.chat-empty:not(.chat-filter-miss)')) {
+    applyChatListFilter();
+    return;
+  }
   const empty = document.createElement('div');
   empty.className = 'chat-empty';
   empty.setAttribute('role', 'status');
@@ -982,10 +1103,14 @@ function ensureChatEmptyHint() {
   });
 
   container.appendChild(empty);
+  applyChatListFilter();
 }
 
 function clearChatEmptyHint() {
-  document.getElementById('chat-messages')?.querySelector('.chat-empty')?.remove();
+  document
+    .getElementById('chat-messages')
+    ?.querySelector('.chat-empty:not(.chat-filter-miss)')
+    ?.remove();
 }
 
 /**
@@ -1012,6 +1137,7 @@ function replaceConversationHistory(messages) {
     chat.style.display = '';
   }
   console.log('[Ollama] Replaced conversation history:', conversationHistory.length, 'messages');
+  applyChatListFilter();
   updateChatClearButton();
 }
 
@@ -1685,7 +1811,10 @@ function addChatMessage(role, content, isHtml = false) {
   }
 
   messagesContainer.appendChild(messageDiv);
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  applyChatListFilter();
+  if (messageDiv.style.display !== 'none') {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
   updateChatClearButton();
 }
 

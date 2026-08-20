@@ -8809,9 +8809,8 @@ async function refreshDiskCleanupPanel(opts) {
         listHint.textContent =
           'Categories: All · Reclaim · Clean filters · ↑↓ / j k · PgUp/PgDn · Home / End select · click path / c copies · Esc clears · Enter runs Clean now when reclaimable';
       }
-      applyDiskCleanupListFilter();
       window.__diskCleanupItemFocusIdx = preferItemIdx;
-      syncDiskCleanupItemTabOrder(list, preferItemIdx);
+      applyDiskCleanupListFilter();
       applyDiskCleanupPathCopyFlash(list);
     }
 
