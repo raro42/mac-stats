@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.553] - 2026-08-20
+
+### Added
+- Disk Cleanup **collapsed glance** (Monitors parity). When the section is collapsed, a summary strip under the header shows reclaim / due / scopes-off status; click or Enter/Space expands to reclaimable categories, Clean now, or scope review. Light 60s shallow status poll while collapsed. Collapsed Monitors/Disk Cleanup keep header + glance visible (content stays hidden).
+
 ## [0.1.552] - 2026-08-20
 
 ### Added

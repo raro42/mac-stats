@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Disk Cleanup **collapsed glance** (summary under header when collapsed; click → reclaim / due / scopes; 60s shallow poll; collapsed section keeps header + glance) — **v0.1.553**
 - External / Monitors **collapsed glance** (summary under header when collapsed; click → expand + DOWN/slowest/Add; 30s summary poll) — **v0.1.552**
 - Perplexity Search **last-search glance** (Last · query · N results / Key · add API key; click expands + focuses) — **v0.1.551**
 - CPU metrics **uptime on the battery/power strip** (Up · formatted; click → Details Uptime flash; amber wash ≥ 7d) — **v0.1.550**

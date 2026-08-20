@@ -3832,6 +3832,8 @@ let monitorsFilterMode = 'all';
 let diskCleanupCollapsed = true;
 /** Category list filter: all | reclaim | clean (Monitors All/Up/Down parity). */
 let diskCleanupFilterMode = 'all';
+/** Shallow status poll while Disk Cleanup is collapsed (collapsed glance). */
+let diskCleanupGlanceInterval = null;
 
 // Cache for monitor status data (to avoid polling backend when opening settings)
 const monitorStatusCache = new Map(); // Map<monitorId, {is_up, response_time_ms, error, checked_at}>
@@ -8434,6 +8436,7 @@ function ensureDiskCleanupSectionExpanded() {
   const header = document.getElementById('disk-cleanup-header');
   if (!content) return;
   if (!diskCleanupCollapsed && !content.classList.contains('collapsed')) {
+    syncDiskCleanupCollapsedGlance();
     return;
   }
   diskCleanupCollapsed = false;
@@ -8443,6 +8446,143 @@ function ensureDiskCleanupSectionExpanded() {
   header?.setAttribute('aria-expanded', 'true');
   if (typeof header?._syncCollapseA11y === 'function') header._syncCollapseA11y();
   syncSectionIcon('icon-disk-cleanup', true);
+  stopDiskCleanupGlancePoll();
+  syncDiskCleanupCollapsedGlance();
+}
+
+/** Collapsed-section glance under Disk Cleanup header (Monitors parity). */
+function ensureDiskCleanupCollapsedGlance() {
+  const header = document.getElementById('disk-cleanup-header');
+  if (!header) return null;
+  let glance = document.getElementById('disk-cleanup-collapsed-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'disk-cleanup-collapsed-glance';
+    glance.className = 'disk-cleanup-collapsed-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="disk-cleanup-collapsed-glance-text"></span>';
+    header.insertAdjacentElement('afterend', glance);
+    wireDiskCleanupCollapsedGlanceClick(glance);
+  }
+  return glance;
+}
+
+function syncDiskCleanupCollapsedGlance() {
+  const glance = ensureDiskCleanupCollapsedGlance();
+  if (!glance) return;
+  const glanceText = document.getElementById('disk-cleanup-collapsed-glance-text');
+  const summary = document.getElementById('disk-cleanup-summary');
+  if (!diskCleanupCollapsed) {
+    glance.hidden = true;
+    return;
+  }
+  glance.hidden = false;
+  const st = window.__diskCleanupGlanceState || {};
+  const reclaimBytes = Number(st.reclaimBytes) || 0;
+  const due = !!st.due;
+  const enabledN = Number(st.enabledCount) || 0;
+  const totalN = Number(st.totalCount) || 0;
+  const scopesOff = totalN > 0 && enabledN < totalN;
+  let line =
+    (summary && summary.textContent && summary.textContent.trim()) ||
+    st.summaryText ||
+    'Disk Cleanup';
+  if (due && reclaimBytes > 0) {
+    line = `${line} · Due now`;
+  } else if (due && reclaimBytes <= 0) {
+    line = `Due now · ${st.nextLabel || 'run cleanup'}`;
+  } else if (scopesOff && reclaimBytes <= 0) {
+    line = `${enabledN}/${totalN} scopes on · Review`;
+  } else if (st.nextLabel && reclaimBytes <= 0 && line === 'Clean') {
+    line = `Clean · ${st.nextLabel}`;
+  }
+  if (glanceText) glanceText.textContent = line;
+  glance.classList.toggle('has-reclaim', reclaimBytes > 0);
+  glance.classList.toggle('is-due', due && reclaimBytes <= 0);
+  glance.classList.toggle('has-scopes-off', scopesOff && reclaimBytes <= 0 && !due);
+  glance.classList.toggle('is-clean', reclaimBytes <= 0 && !due && !scopesOff);
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  if (reclaimBytes > 0) {
+    glance.title = 'Show reclaimable categories';
+    glance.setAttribute(
+      'aria-label',
+      `Disk Cleanup: ${line} — click to open reclaimable`
+    );
+  } else if (due) {
+    glance.title = 'Open Disk Cleanup — due now';
+    glance.setAttribute('aria-label', 'Disk Cleanup is due — click to open Clean now');
+  } else if (scopesOff) {
+    glance.title = 'Review Disk Cleanup scopes';
+    glance.setAttribute('aria-label', 'Some scopes are off — click to review');
+  } else {
+    glance.title = 'Show Disk Cleanup';
+    glance.setAttribute('aria-label', `Disk Cleanup: ${line} — click to expand`);
+  }
+}
+
+function activateDiskCleanupCollapsedGlance() {
+  const st = window.__diskCleanupGlanceState || {};
+  const reclaimBytes = Number(st.reclaimBytes) || 0;
+  const due = !!st.due;
+  const enabledN = Number(st.enabledCount) || 0;
+  const totalN = Number(st.totalCount) || 0;
+  if (reclaimBytes > 0) {
+    focusDiskCleanupReclaimGlance();
+    return;
+  }
+  if (due) {
+    focusDiskCleanupNextRunGlance();
+    return;
+  }
+  if (totalN > 0 && enabledN < totalN) {
+    focusDiskCleanupScopesReview();
+    return;
+  }
+  ensureDiskCleanupSectionExpanded();
+  const runBtn = document.getElementById('disk-cleanup-run-btn');
+  if (runBtn && typeof runBtn.focus === 'function') {
+    runBtn.focus();
+  }
+}
+
+function wireDiskCleanupCollapsedGlanceClick(glance) {
+  if (!glance || glance.dataset.diskCleanupCollapsedGlanceWired === '1') return;
+  glance.dataset.diskCleanupCollapsedGlanceWired = '1';
+  const activate = () => {
+    activateDiskCleanupCollapsedGlance();
+  };
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
+function stopDiskCleanupGlancePoll() {
+  if (diskCleanupGlanceInterval) {
+    clearInterval(diskCleanupGlanceInterval);
+    diskCleanupGlanceInterval = null;
+  }
+}
+
+function startDiskCleanupGlancePoll() {
+  stopDiskCleanupGlancePoll();
+  diskCleanupGlanceInterval = setInterval(() => {
+    if (!diskCleanupCollapsed) {
+      stopDiskCleanupGlancePoll();
+      return;
+    }
+    void refreshDiskCleanupPanel({ deep: false }).then(() => {
+      syncDiskCleanupCollapsedGlance();
+    });
+  }, 60000);
 }
 
 /** Focus first disabled scope (or Add form) after empty-list CTA. */
@@ -9043,6 +9183,30 @@ async function refreshDiskCleanupPanel(opts) {
           ? `${formatDiskBytes(reclaimBytes)} reclaimable`
           : 'Clean';
     }
+    const scopesForGlance = Array.isArray(status.scopes) ? status.scopes : [];
+    const enabledGlanceN = scopesForGlance.filter((s) => s && s.enabled).length;
+    const nextLabelGlance = (status.nextRunLabel || '').trim();
+    const dueGlance =
+      nextLabelGlance.includes('Due now') ||
+      (() => {
+        const utc = status.nextRunUtc || '';
+        if (!utc) return false;
+        const t = Date.parse(utc);
+        return Number.isFinite(t) && t <= Date.now();
+      })();
+    window.__diskCleanupGlanceState = {
+      reclaimBytes,
+      reclaimFiles,
+      due: dueGlance,
+      nextLabel: nextLabelGlance || '',
+      enabledCount: enabledGlanceN,
+      totalCount: scopesForGlance.length,
+      summaryText:
+        reclaimBytes > 0
+          ? `${formatDiskBytes(reclaimBytes)} reclaimable`
+          : 'Clean',
+    };
+    syncDiskCleanupCollapsedGlance();
     if (reclaimEl) {
       reclaimEl.textContent =
         reclaimBytes > 0
@@ -9837,6 +10001,7 @@ function initDiskCleanupSection() {
   wireDiskCleanupNextRunCard();
   wireDiskCleanupRunsWhenCard();
   wireDiskCleanupLastRunPanel();
+  ensureDiskCleanupCollapsedGlance();
 
   if (icon && !icon.getAttribute('data-title-base')) {
     icon.setAttribute('data-title-base', icon.title || 'Disk cleanup');
@@ -9847,13 +10012,18 @@ function initDiskCleanupSection() {
     if (diskCleanupCollapsed) {
       content.classList.add('collapsed');
       if (section) section.classList.add('collapsed');
+      // Shallow status poll so the collapsed glance stays fresh (no deep Downloads scan).
+      void refreshDiskCleanupPanel({ deep: false });
+      startDiskCleanupGlancePoll();
     } else {
       content.classList.remove('collapsed');
       if (section) section.classList.remove('collapsed');
+      stopDiskCleanupGlancePoll();
       refreshDiskCleanupPanel();
     }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
     syncSectionIcon('icon-disk-cleanup', !diskCleanupCollapsed);
+    syncDiskCleanupCollapsedGlance();
   };
   applyCollapsed();
   // Do not scan Downloads/Trash on every CPU-window open — only when the section is expanded
@@ -9864,7 +10034,7 @@ function initDiskCleanupSection() {
       contentId: 'disk-cleanup-content',
       getExpanded: () => !diskCleanupCollapsed,
       ignoreSelector:
-        '#disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, #disk-cleanup-soft-delete, #disk-cleanup-scopes, #disk-cleanup-add-label, #disk-cleanup-add-path, #disk-cleanup-add-days, #disk-cleanup-add-recursive, .disk-cleanup-add-scope, .disk-cleanup-scopes, .disk-cleanup-soft-delete, input, button, label',
+        '#disk-cleanup-collapsed-glance, #disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, #disk-cleanup-soft-delete, #disk-cleanup-scopes, #disk-cleanup-add-label, #disk-cleanup-add-path, #disk-cleanup-add-days, #disk-cleanup-add-recursive, .disk-cleanup-add-scope, .disk-cleanup-scopes, .disk-cleanup-soft-delete, input, button, label',
       onToggle: () => {
         diskCleanupCollapsed = !diskCleanupCollapsed;
         setSectionCollapsed('disk_cleanup_collapsed', diskCleanupCollapsed);
@@ -9876,7 +10046,7 @@ function initDiskCleanupSection() {
   header.addEventListener('click', (e) => {
     if (
       e.target.closest(
-        '#disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, .disk-cleanup-scopes, .disk-cleanup-add-scope, .disk-cleanup-soft-delete, input, button, label'
+        '#disk-cleanup-collapsed-glance, #disk-cleanup-refresh-btn, #disk-cleanup-run-btn, #disk-cleanup-save-scopes-btn, #disk-cleanup-add-btn, .disk-cleanup-scopes, .disk-cleanup-add-scope, .disk-cleanup-soft-delete, input, button, label'
       )
     ) {
       return;

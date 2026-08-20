@@ -85,14 +85,18 @@ body:hover {
   display: none !important;
 }
 
-/* Icon toggles: whole section hides when collapsed (header included). */
-.monitors-section.collapsed,
+/* Icon toggles: whole section hides when collapsed (header included).
+ * Monitors + Disk Cleanup keep header + collapsed glance (content still collapses). */
 .ollama-section.collapsed,
 .perplexity-section.collapsed,
 .logs-section.collapsed,
-.disk-cleanup-section.collapsed,
 .agent-ops-section.collapsed {
   display: none !important;
+}
+
+.monitors-section.collapsed,
+.disk-cleanup-section.collapsed {
+  display: block !important;
 }
 
 /*
@@ -2166,6 +2170,69 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.85;
 }
 
+/* Disk Cleanup — collapsed glance under header (Monitors parity) */
+.disk-cleanup-collapsed-glance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 2px 0 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  font-size: 13px;
+  font-weight: 520;
+  line-height: 1.35;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.disk-cleanup-collapsed-glance[hidden] {
+  display: none !important;
+}
+
+.disk-cleanup-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+}
+
+.disk-cleanup-collapsed-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.disk-cleanup-collapsed-glance.has-reclaim {
+  border-color: color-mix(in srgb, #ff9500 28%, transparent);
+  background: color-mix(in srgb, #ff9500 7%, transparent);
+}
+
+.disk-cleanup-collapsed-glance.is-due {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+}
+
+.disk-cleanup-collapsed-glance.has-scopes-off {
+  border-color: color-mix(in srgb, #0a84ff 26%, transparent);
+  background: color-mix(in srgb, #0a84ff 6%, transparent);
+}
+
+.disk-cleanup-collapsed-glance.is-clean {
+  font-weight: 450;
+  opacity: 0.9;
+}
+
+.disk-cleanup-section.collapsed .disk-cleanup-summary {
+  /* Glance under header carries the status when collapsed. */
+  display: none;
+}
+
 /* Top Processes — top CPU glance (Monitors slowest-summary parity) */
 .processes-top-glance {
   display: flex;
@@ -4099,10 +4166,6 @@ button.monitor-detail-url.is-just-saved {
 
 #icon-disk-cleanup {
   position: relative;
-}
-
-.disk-cleanup-section.collapsed {
-  display: none;
 }
 
 #icon-disk-cleanup .disk-cleanup-badge {
