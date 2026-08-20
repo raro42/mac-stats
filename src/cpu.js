@@ -556,14 +556,39 @@ function ensureProcessesTopGlance() {
   return glance;
 }
 
+function isProcessesSectionCollapsed() {
+  const section =
+    document.getElementById("processes-section") ||
+    document.querySelector(
+      ".apple-processes, .arch-processes, .swiss-processes, .mat-processes, .cpu-processes, .processes-section"
+    );
+  return !!(
+    section &&
+    (section.classList.contains("collapsed") || section.style.display === "none")
+  );
+}
+
 function applyProcessesTopGlanceState({ topPid, topName, topCpu, waiting }) {
   const glance = ensureProcessesTopGlance();
   if (!glance) return;
   const text = document.getElementById("processes-top-glance-text");
   if (waiting || topPid == null || !topName) {
-    glance.hidden = true;
     window.__processesTopPid = null;
     glance.classList.remove("is-hot");
+    // Collapsed: always show a glance so keep-header is useful (Debug Log / Perplexity parity).
+    if (isProcessesSectionCollapsed()) {
+      glance.hidden = false;
+      if (text) text.textContent = "Waiting · processes";
+      glance.setAttribute("role", "button");
+      glance.tabIndex = 0;
+      glance.title = "Show Top Processes";
+      glance.setAttribute(
+        "aria-label",
+        "Top Processes waiting — click to expand"
+      );
+      return;
+    }
+    glance.hidden = true;
     return;
   }
   window.__processesTopPid = String(topPid);
@@ -583,7 +608,15 @@ function applyProcessesTopGlanceState({ topPid, topName, topCpu, waiting }) {
 function wireProcessesTopGlanceClick(glance) {
   if (!glance || glance.dataset.topGlanceWired === "1") return;
   glance.dataset.topGlanceWired = "1";
-  const activate = () => openProcessFromGlance(window.__processesTopPid);
+  const activate = () => {
+    if (window.__processesTopPid) {
+      openProcessFromGlance(window.__processesTopPid);
+      return;
+    }
+    if (typeof window.showDetailsProcessesSections === "function") {
+      window.showDetailsProcessesSections();
+    }
+  };
   glance.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -7375,23 +7408,61 @@ function initCollapsibleSections() {
     }
   }
   
-  // Hide Processes section
+  function syncProcessesCollapseA11y() {
+    if (!processesHeader) return;
+    const collapsed = isProcessesSectionCollapsed();
+    processesHeader.setAttribute('aria-expanded', String(!collapsed));
+    processesHeader.setAttribute(
+      'aria-label',
+      collapsed ? 'Show Top Processes' : 'Hide Top Processes list'
+    );
+  }
+
+  // Collapse Processes: keep header + Top CPU/GPU/RAM glances (Debug Log / Perplexity parity).
   function hideProcesses() {
-    if (processesSection) processesSection.style.display = 'none';
-    if (processesDivider && isDivider(processesDivider)) {
+    if (processesSection) {
+      processesSection.classList.add('collapsed');
+      processesSection.style.display = '';
+    }
+    const detailsHidden = detailsSection?.style.display === 'none';
+    if (processesDivider && isDivider(processesDivider) && detailsHidden) {
       processesDivider.style.display = 'none';
+    }
+    syncProcessesCollapseA11y();
+    // Refresh quiet Waiting glance when list is empty while collapsed.
+    const topGlance = document.getElementById('processes-top-glance');
+    if (topGlance && !window.__processesTopPid) {
+      applyProcessesTopGlanceState({
+        topPid: null,
+        topName: null,
+        topCpu: null,
+        waiting: true,
+      });
     }
   }
   
-  // Show Processes section
+  // Show Processes section (full list)
   function showProcesses() {
-    if (processesSection) processesSection.style.display = '';
+    if (processesSection) {
+      processesSection.classList.remove('collapsed');
+      processesSection.style.display = '';
+    }
     if (processesDivider && isDivider(processesDivider)) {
       processesDivider.style.display = '';
     }
+    syncProcessesCollapseA11y();
+    const topGlance = document.getElementById('processes-top-glance');
+    if (topGlance && !window.__processesTopPid) {
+      applyProcessesTopGlanceState({
+        topPid: null,
+        topName: null,
+        topCpu: null,
+        waiting: true,
+      });
+    }
   }
   
-  // Hide both sections
+  // Hide both sections (Details fully; Processes keep-header)
   function hideSections() {
     hideDetails();
     hideProcesses();
@@ -7409,7 +7480,7 @@ function initCollapsibleSections() {
     if (!usageCard) return;
     const hidden =
       detailsSection?.style.display === 'none' ||
-      processesSection?.style.display === 'none';
+      isProcessesSectionCollapsed();
     usageCard.setAttribute('aria-expanded', String(!hidden));
     usageCard.setAttribute(
       'aria-label',
@@ -7439,6 +7510,11 @@ function initCollapsibleSections() {
     const hideDetailsAction = (e) => {
       e.stopPropagation();
       hideDetails();
+      // Details gone: hide divider above Processes keep-header when collapsed.
+      if (isProcessesSectionCollapsed() && processesDivider && isDivider(processesDivider)) {
+        processesDivider.style.display = 'none';
+      }
+      syncUsageExpanded();
     };
     detailsHeader.addEventListener('click', hideDetailsAction);
     detailsHeader.addEventListener('keydown', (e) => {
@@ -7448,20 +7524,34 @@ function initCollapsibleSections() {
     });
   }
   
-  // Processes header click - hide Processes section
+  // Processes header click - toggle keep-header collapse (list hides; glances stay)
   if (processesHeader) {
     processesHeader.setAttribute('role', 'button');
-    processesHeader.setAttribute('aria-label', 'Hide Processes section');
     if (!processesHeader.hasAttribute('tabindex')) processesHeader.setAttribute('tabindex', '0');
-    const hideProcessesAction = (e) => {
+    syncProcessesCollapseA11y();
+    const toggleProcessesAction = (e) => {
+      if (
+        e.target &&
+        e.target.closest &&
+        e.target.closest(
+          '#processes-top-glance, #processes-top-gpu-glance, #processes-top-ram-glance'
+        )
+      ) {
+        return;
+      }
       e.stopPropagation();
-      hideProcesses();
+      if (isProcessesSectionCollapsed()) {
+        showProcesses();
+      } else {
+        hideProcesses();
+      }
+      syncUsageExpanded();
     };
-    processesHeader.addEventListener('click', hideProcessesAction);
+    processesHeader.addEventListener('click', toggleProcessesAction);
     processesHeader.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
       e.preventDefault();
-      hideProcessesAction(e);
+      toggleProcessesAction(e);
     });
   }
   
@@ -7474,7 +7564,7 @@ function initCollapsibleSections() {
       e.stopPropagation();
       const currentlyHidden =
         detailsSection?.style.display === 'none' ||
-        processesSection?.style.display === 'none';
+        isProcessesSectionCollapsed();
       if (currentlyHidden) {
         showSections();
       } else {

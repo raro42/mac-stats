@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.558] - 2026-08-21
+
+### Added
+- Top Processes **collapsed keep-header** (Debug Log / Perplexity parity). When the section is collapsed, the header stays visible with Top CPU / GPU / RAM glances (or Waiting · processes); click the header or a glance expands the list. Process table, filter chips, and keyboard hint stay hidden.
+
 ## [0.1.557] - 2026-08-20
 
 ### Added

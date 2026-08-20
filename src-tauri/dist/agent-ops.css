@@ -86,8 +86,47 @@ body:hover {
 .ollama-section.collapsed,
 .agent-ops-section.collapsed,
 .perplexity-section.collapsed,
-.logs-section.collapsed {
+.logs-section.collapsed,
+#processes-section.collapsed,
+.apple-processes.collapsed,
+.arch-processes.collapsed,
+.swiss-processes.collapsed,
+.mat-processes.collapsed,
+.cpu-processes.collapsed,
+.processes-section.collapsed {
   display: block !important;
+}
+
+/* Top Processes keep-header: hide list/filters/hints; keep Top CPU/GPU/RAM glances. */
+#processes-section.collapsed #process-list,
+#processes-section.collapsed .process-table,
+#processes-section.collapsed .processes-filter-chips,
+#processes-section.collapsed .processes-kb-hint,
+.apple-processes.collapsed #process-list,
+.apple-processes.collapsed .process-table,
+.apple-processes.collapsed .processes-filter-chips,
+.apple-processes.collapsed .processes-kb-hint,
+.arch-processes.collapsed #process-list,
+.arch-processes.collapsed .process-table,
+.arch-processes.collapsed .processes-filter-chips,
+.arch-processes.collapsed .processes-kb-hint,
+.swiss-processes.collapsed #process-list,
+.swiss-processes.collapsed .process-table,
+.swiss-processes.collapsed .processes-filter-chips,
+.swiss-processes.collapsed .processes-kb-hint,
+.mat-processes.collapsed #process-list,
+.mat-processes.collapsed .process-table,
+.mat-processes.collapsed .processes-filter-chips,
+.mat-processes.collapsed .processes-kb-hint,
+.cpu-processes.collapsed #process-list,
+.cpu-processes.collapsed .process-table,
+.cpu-processes.collapsed .processes-filter-chips,
+.cpu-processes.collapsed .processes-kb-hint,
+.processes-section.collapsed #process-list,
+.processes-section.collapsed .process-table,
+.processes-section.collapsed .processes-filter-chips,
+.processes-section.collapsed .processes-kb-hint {
+  display: none !important;
 }
 
 .agent-ops-section.collapsed .ops-close-btn {
