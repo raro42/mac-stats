@@ -13,16 +13,17 @@ Continues from late 2026-08-20 window (local night).
 | **v0.1.559** | Details **collapsed keep-header** (Load · RAM · Up glance; Waiting · details; amber wash Load≥4 / RAM≥85%) |
 | **v0.1.560** | CPU metrics **Heat / thermal on the battery/power strip** (°C-band bands; click → temp ring) |
 | **v0.1.561** | Heat prefers Apple **`NSProcessInfo.thermalState`** (OS Nominal/Fair/Serious/Critical; °C-band fallback; AI Thermal pressure) |
+| **v0.1.562** | CPU metrics **Low Power Mode (LPM)** on the power strip (On/Off; click → Battery settings; green wash when On) |
 
-## Latest tick (~01:28)
+## Latest tick (~01:54)
 
-- Digester open empty; design-review grace (feature-ai-chat ~6.5d); debug.log quiet (soul dump only).
-- Fuel: standing backlog next after thermal strip — **NSProcessInfo.thermalState** wire-up.
-- **Keep** `CpuDetails.thermal_state` via `ffi::objc::read_process_thermal_state`; Heat strip + temp ring subtext prefer OS pressure.
+- Digester open empty; design-review grace (feature-ai-chat ~6.55d); debug.log quiet (soul dump only).
+- Fuel: standing backlog next after thermalState — **Low Power Mode** glance.
+- **Keep** `CpuDetails.low_power_mode` via `ffi::objc::read_process_low_power_mode` (`isLowPowerModeEnabled`); LPM strip + AI context when on.
 - Discord Ready after install/kickstart.
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-thermalState fuel: p50 latency / Low Power Mode glance / sibling ports
+- Prefer non-LPM fuel: p50 latency / sibling ports / menu-bar LPM
