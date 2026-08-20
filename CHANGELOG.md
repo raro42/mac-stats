@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.556] - 2026-08-20
+
+### Added
+- Perplexity Search **collapsed keep-header** (Monitors / AI Chat parity). When the section is collapsed, the header stays visible with the last-search glance (Last · query · N / Key · add API key / Ready · search); click expands and focuses setup or the query field. Content stays hidden.
+
 ## [0.1.555] - 2026-08-20
 
 ### Added

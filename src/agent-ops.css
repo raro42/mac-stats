@@ -81,9 +81,8 @@ body:hover {
 }
 
 /* Icon toggles: whole section hides when collapsed (header included).
- * Monitors + Disk Cleanup + AI Chat + Agent Ops keep header + collapsed glance
- * (content still collapses). */
-.perplexity-section.collapsed,
+ * Monitors + Disk Cleanup + AI Chat + Agent Ops + Perplexity keep header + glance
+ * (content still collapses). Debug Log still hides entirely when collapsed. */
 .logs-section.collapsed {
   display: none !important;
 }
@@ -91,7 +90,8 @@ body:hover {
 .monitors-section.collapsed,
 .disk-cleanup-section.collapsed,
 .ollama-section.collapsed,
-.agent-ops-section.collapsed {
+.agent-ops-section.collapsed,
+.perplexity-section.collapsed {
   display: block !important;
 }
 
@@ -4553,6 +4553,11 @@ button.monitor-detail-url.is-just-saved {
 .perplexity-last-glance.needs-key {
   border-color: color-mix(in srgb, #ff9f0a 32%, transparent);
   background: color-mix(in srgb, #ff9f0a 7%, transparent);
+}
+
+.perplexity-last-glance.is-ready {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 3.5%, transparent);
 }
 
 .perplexity-setup {

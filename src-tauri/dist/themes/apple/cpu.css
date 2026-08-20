@@ -1731,9 +1731,9 @@ body {
   display: none;
 }
 
-/* Perplexity Search section */
+/* Perplexity Search section — keep header + last-search glance (agent-ops.css) */
 .perplexity-section.collapsed {
-  display: none;
+  display: block;
 }
 
 /* Logs section */

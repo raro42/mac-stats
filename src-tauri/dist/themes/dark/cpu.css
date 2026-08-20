@@ -1240,7 +1240,7 @@ body {
 }
 
 .perplexity-section.collapsed {
-  display: none;
+  display: block;
 }
 
 .monitors-summary {

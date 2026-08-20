@@ -7737,7 +7737,13 @@ function applyPerplexityLastGlanceState() {
   const glance = ensurePerplexityLastGlance();
   if (!glance) return;
   const text = document.getElementById('perplexity-last-glance-text');
-  glance.classList.remove('has-results', 'has-error', 'needs-key', 'is-searching');
+  glance.classList.remove(
+    'has-results',
+    'has-error',
+    'needs-key',
+    'is-searching',
+    'is-ready'
+  );
 
   if (perplexitySearchBusyForGlance && perplexityLastSearch && perplexityLastSearch.query) {
     const preview = truncatePerplexityGlancePreview(perplexityLastSearch.query, 44);
@@ -7786,6 +7792,18 @@ function applyPerplexityLastGlanceState() {
     glance.tabIndex = 0;
     glance.title = 'Add a Perplexity API key';
     glance.setAttribute('aria-label', 'Perplexity needs an API key — click to set up');
+    return;
+  }
+
+  // Collapsed: always show a glance so keep-header is useful (Monitors parity).
+  if (perplexityCollapsed) {
+    glance.hidden = false;
+    glance.classList.add('is-ready');
+    if (text) text.textContent = 'Ready · search';
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    glance.title = 'Show Perplexity Search';
+    glance.setAttribute('aria-label', 'Perplexity ready — click to expand and search');
     return;
   }
 
@@ -7859,6 +7877,7 @@ function initPerplexitySection() {
       if (divider) divider.style.display = '';
     }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
+    applyPerplexityLastGlanceState();
     refreshPerplexityStatus();
     syncSectionIcon('icon-perplexity', !perplexityCollapsed);
   };
@@ -7867,6 +7886,7 @@ function initPerplexitySection() {
   wireCollapsibleHeaderA11y(header, {
     contentId: 'perplexity-content',
     getExpanded: () => !perplexityCollapsed,
+    ignoreSelector: '#perplexity-last-glance',
     onToggle: () => {
       perplexityCollapsed = !perplexityCollapsed;
       setSectionCollapsed('perplexity_collapsed', perplexityCollapsed);
@@ -7874,7 +7894,8 @@ function initPerplexitySection() {
     },
   });
 
-  header.addEventListener('click', () => {
+  header.addEventListener('click', (e) => {
+    if (e.target.closest && e.target.closest('#perplexity-last-glance')) return;
     perplexityCollapsed = !perplexityCollapsed;
     setSectionCollapsed('perplexity_collapsed', perplexityCollapsed);
     applyPerplexityCollapsed();
