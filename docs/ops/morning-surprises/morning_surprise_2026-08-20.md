@@ -6,8 +6,9 @@ Overnight Track B kept shipping design-review polish (digester open empty all ni
 
 | Version | What |
 |---------|------|
-| **v0.1.543** | Agent Ops Agents **All · On · Off** filter chips (Sessions/Monitors parity; overview opens On/Off; Clear → All) |
-| v0.1.542 | Agent Ops Sessions **All · Live · Files** filter chips (Monitors/Processes parity; overview Live/Recent set kind) |
+| **v0.1.544** | Agent Ops Runs **All · Instant · Direct** filter chips (Agents/Sessions parity; overview → Direct when any; Clear → All) |
+| v0.1.543 | Agent Ops Agents **All · On · Off** filter chips |
+| v0.1.542 | Agent Ops Sessions **All · Live · Files** filter chips |
 | v0.1.541 | Top Processes **Top GPU** glance |
 | v0.1.540 | AI Chat **model / connection** glance |
 | v0.1.539 | AI Chat **last-answer** glance (copy) |
@@ -20,6 +21,6 @@ Overnight Track B kept shipping design-review polish (digester open empty all ni
 ## Notes
 
 - Digester: no open candidates (instant-heavy window).
-- Design review: due=false (grace); Agent Ops marked polished again after Agents chips.
+- Design review: due=false (grace); Agent Ops marked polished again after Runs lane chips.
 - Screenshots: mostly deferred (TCC / no on-screen CPU window).
-- Next fuel: digester Discord traffic, or uptime strip / Runs Instant·Direct chips / Top RAM (needs ProcessUsage.memory) / p50 latency.
+- Next fuel: digester Discord traffic, or uptime strip / Schedules Enabled·Disabled chips / Top RAM (needs ProcessUsage.memory) / p50 latency.
