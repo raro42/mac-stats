@@ -12,15 +12,16 @@ Overnight Track B (autoresearch) for Ralf.
 | **v0.1.552** | Monitors **collapsed glance** |
 | **v0.1.553** | Disk Cleanup **collapsed glance** (+ keep header when collapsed) |
 | **v0.1.554** | AI Chat **collapsed glance** (Offline / Ready · model / turns · last question; click expands) |
+| **v0.1.555** | Agent Ops **Discord Ready collapsed glance** (Ready · age / Offline / warn; click → gateway preview) |
 
-## Latest tick (~22:15)
+## Latest tick (~22:45)
 
 - Digester open empty; design-review grace (feature-ai-chat recommended).
-- **Keep** AI Chat collapsed glance — Monitors / Disk Cleanup parity when the pane is closed.
-- Discord Ready after install/kickstart (`37a6b02`).
+- **Keep** Agent Ops Discord Ready collapsed glance — uptime status stays visible when the pane is closed.
+- Discord Ready after install/kickstart.
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-collapsed-glance fuel: p50 latency / Discord Ready glance / Top Processes collapsed glance
+- Prefer non-ops-collapsed-glance fuel: p50 latency / Perplexity keep-header / Top Processes collapsed glance
