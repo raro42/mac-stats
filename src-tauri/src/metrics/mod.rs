@@ -122,6 +122,9 @@ pub struct CpuDetails {
     /// Apple `NSProcessInfo.thermalState` as Nominal/Fair/Serious/Critical (empty if unknown).
     #[serde(default)]
     pub thermal_state: String,
+    /// Apple `NSProcessInfo.isLowPowerModeEnabled` (Low Power Mode).
+    #[serde(default)]
+    pub low_power_mode: bool,
 }
 
 /// Get chip information (cached)
@@ -1091,6 +1094,9 @@ pub fn format_metrics_for_ai_context() -> String {
     if !c.thermal_state.is_empty() {
         lines.push(format!("Thermal pressure: {}", c.thermal_state));
     }
+    if c.low_power_mode {
+        lines.push("Low Power Mode: on".to_string());
+    }
     if c.can_read_frequency {
         lines.push(format!(
             "Frequency: {:.2} GHz (P-core: {:.2}, E-core: {:.2})",
@@ -1698,6 +1704,7 @@ pub fn get_cpu_details() -> CpuDetails {
         let thermal_state = crate::ffi::objc::read_process_thermal_state()
             .unwrap_or("")
             .to_string();
+        let low_power_mode = crate::ffi::objc::read_process_low_power_mode();
 
         return CpuDetails {
             usage,
@@ -1726,6 +1733,7 @@ pub fn get_cpu_details() -> CpuDetails {
             is_charging,
             has_battery,
             thermal_state,
+            low_power_mode,
         };
     }
 
@@ -2137,6 +2145,7 @@ pub fn get_cpu_details() -> CpuDetails {
     let thermal_state = crate::ffi::objc::read_process_thermal_state()
         .unwrap_or("")
         .to_string();
+    let low_power_mode = crate::ffi::objc::read_process_low_power_mode();
 
     CpuDetails {
         usage,
@@ -2165,6 +2174,7 @@ pub fn get_cpu_details() -> CpuDetails {
         is_charging,
         has_battery,
         thermal_state,
+        low_power_mode,
     }
 }
 

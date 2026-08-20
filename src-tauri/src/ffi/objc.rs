@@ -28,6 +28,14 @@ pub fn read_process_thermal_state() -> Option<&'static str> {
     }
 }
 
+/// Apple Low Power Mode from `NSProcessInfo.isLowPowerModeEnabled` (user-mode; no root).
+///
+/// Safe: `processInfo` is always available; the getter is a plain BOOL with no
+/// CF ownership transfer.
+pub fn read_process_low_power_mode() -> bool {
+    NSProcessInfo::processInfo().isLowPowerModeEnabled()
+}
+
 /// Objective-C FFI error types
 /// Currently unused as direct FFI calls are used in ui module.
 /// Kept for future migration to safer FFI patterns.

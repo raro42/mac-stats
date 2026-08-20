@@ -1115,6 +1115,26 @@ async function refresh() {
           `Thermal ${thermalStripText === "—" ? "unavailable" : thermalStripText}. ${title}`
         );
       }
+      // Low Power Mode on the power strip (NSProcessInfo.isLowPowerModeEnabled)
+      ensureLowPowerStrip();
+      const lpmStripEl = document.getElementById("lpm-strip-value");
+      const lpmStripCell = document.getElementById("lpm-strip");
+      const lpmOn = !!(data && data.low_power_mode);
+      const lpmStripText = lpmOn ? "On" : "Off";
+      if (lpmStripEl && lpmStripEl.textContent !== lpmStripText) {
+        scheduleDOMUpdate(() => {
+          lpmStripEl.textContent = lpmStripText;
+        });
+      }
+      if (lpmStripCell) {
+        lpmStripCell.classList.toggle("is-on", lpmOn);
+        const title = "Open Battery settings (Low Power Mode)";
+        lpmStripCell.title = title;
+        lpmStripCell.setAttribute(
+          "aria-label",
+          `Low Power Mode ${lpmStripText}. ${title}`
+        );
+      }
     }
 
     // Update GPU usage (top gauge)
@@ -2017,6 +2037,7 @@ function init() {
   ensureGpuStrip();
   ensureTempStrip();
   ensureThermalStrip();
+  ensureLowPowerStrip();
   ensureFreqStrip();
   ensureDiskStrip();
   ensureUptimeStrip();
@@ -2464,6 +2485,40 @@ function ensureRamStripStyles() {
       letter-spacing: -0.01em;
       color: var(--text);
     }
+    .lpm-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      outline: none;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .lpm-info:hover {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
+    }
+    .lpm-info:focus-visible {
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+    }
+    .lpm-info.is-on {
+      background-color: color-mix(in srgb, #30d158 16%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #30d158 35%, transparent);
+    }
+    .lpm-label {
+      color: var(--muted);
+    }
+    .lpm-value {
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+    #battery-power-strip.is-lpm-highlight {
+      background-color: color-mix(in srgb, #30d158 16%, transparent);
+      border-radius: 10px;
+      box-shadow: 0 0 0 4px color-mix(in srgb, #30d158 16%, transparent);
+    }
   `;
   document.head.appendChild(style);
 }
@@ -2794,6 +2849,82 @@ function ensureThermalStrip() {
   return cell;
 }
 
+async function openBatterySettingsFromStrip() {
+  const urls = [
+    "x-apple.systempreferences:com.apple.Battery-Settings.extension",
+    "x-apple.systempreferences:com.apple.preference.battery",
+  ];
+  const invokeFn =
+    typeof getInvoke === "function" ? getInvoke() : null;
+  for (const url of urls) {
+    try {
+      if (invokeFn) {
+        await invokeFn("plugin:shell|open", { path: url });
+        return;
+      }
+    } catch (_) {
+      /* try next */
+    }
+    try {
+      if (window.__TAURI__?.shell?.open) {
+        await window.__TAURI__.shell.open(url);
+        return;
+      }
+    } catch (_) {
+      /* try next */
+    }
+  }
+  const strip = document.getElementById("battery-power-strip");
+  if (strip) {
+    strip.classList.add("is-lpm-highlight");
+    window.setTimeout(() => strip.classList.remove("is-lpm-highlight"), 1600);
+  }
+}
+
+/**
+ * Low Power Mode on the battery/power strip (Heat / NSProcessInfo parity).
+ * Label LPM + On/Off from `isLowPowerModeEnabled`. Click / Enter / Space opens
+ * Battery settings. Soft green wash when On.
+ */
+function ensureLowPowerStrip() {
+  ensureRamStripStyles();
+  const strip = document.getElementById("battery-power-strip");
+  if (!strip) return null;
+  let cell = document.getElementById("lpm-strip");
+  if (!cell) {
+    cell = document.createElement("div");
+    cell.id = "lpm-strip";
+    cell.className = "lpm-info";
+    cell.setAttribute("role", "button");
+    cell.tabIndex = 0;
+    cell.title = "Open Battery settings (Low Power Mode)";
+    cell.setAttribute("aria-label", "Open Battery settings (Low Power Mode)");
+    cell.innerHTML =
+      '<span class="lpm-label">LPM</span>' +
+      '<span class="lpm-value" id="lpm-strip-value">—</span>';
+    const thermalEl = document.getElementById("thermal-strip");
+    const tempEl = document.getElementById("temp-strip");
+    const anchor = thermalEl || tempEl;
+    const timeEl = document.getElementById("time-remaining");
+    if (anchor && anchor.nextSibling) strip.insertBefore(cell, anchor.nextSibling);
+    else if (timeEl) strip.insertBefore(cell, timeEl);
+    else strip.appendChild(cell);
+  }
+  if (cell.dataset.lpmStripWired === "1") return cell;
+  cell.dataset.lpmStripWired = "1";
+  const openLpm = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openBatterySettingsFromStrip();
+  };
+  cell.addEventListener("click", openLpm);
+  cell.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    openLpm(e);
+  });
+  return cell;
+}
+
 function flashFreqRing() {
   const freqVal = document.getElementById("frequency-value");
   const card = freqVal && freqVal.closest ? freqVal.closest(".metric-card") : null;
@@ -2833,9 +2964,10 @@ function ensureFreqStrip() {
     cell.innerHTML =
       '<span class="freq-label">GHz</span>' +
       '<span class="freq-value" id="freq-strip-value">—</span>';
+    const lpmEl = document.getElementById("lpm-strip");
     const thermalEl = document.getElementById("thermal-strip");
     const tempEl = document.getElementById("temp-strip");
-    const anchor = thermalEl || tempEl;
+    const anchor = lpmEl || thermalEl || tempEl;
     const timeEl = document.getElementById("time-remaining");
     if (anchor && anchor.nextSibling) strip.insertBefore(cell, anchor.nextSibling);
     else if (timeEl) strip.insertBefore(cell, timeEl);
@@ -7914,6 +8046,7 @@ function initCollapsibleSections() {
   ensureGpuStrip();
   ensureTempStrip();
   ensureThermalStrip();
+  ensureLowPowerStrip();
   ensureFreqStrip();
   ensureDiskStrip();
   ensureUptimeStrip();

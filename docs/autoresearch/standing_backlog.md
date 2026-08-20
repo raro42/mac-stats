@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- CPU metrics **Low Power Mode (LPM) on the battery/power strip** (On/Off from `isLowPowerModeEnabled`; click → Battery settings; green wash when On) — **v0.1.562**
 - CPU metrics **Heat prefers NSProcessInfo.thermalState** (OS Nominal/Fair/Serious/Critical; °C-band fallback; AI Thermal pressure) — **v0.1.561**
 - CPU metrics **Heat / thermal on the battery/power strip** (Nominal / Fair / Serious / Critical; click → temp ring; amber Serious / red Critical) — **v0.1.560**
 - Details **collapsed keep-header** (header + Load · RAM · Up glance stay when collapsed; Waiting · details; amber wash Load≥4 / RAM≥85%) — **v0.1.559**

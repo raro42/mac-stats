@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.562] - 2026-08-21
+
+### Added
+- CPU metrics **Low Power Mode (LPM) on the battery/power strip** (Heat / NSProcessInfo parity). Label **LPM** + On / Off from `isLowPowerModeEnabled`; click opens Battery settings. Soft green wash when On. AI metrics context includes **Low Power Mode: on** when active.
+
 ## [0.1.561] - 2026-08-21
 
 ### Changed
