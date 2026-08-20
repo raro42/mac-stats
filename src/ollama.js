@@ -628,7 +628,13 @@ function getChatModelGlanceLabel() {
   return shortChatModelName(fromUi || fromStore || chatModelGlanceState.model || '');
 }
 
-/** Expand AI Chat if collapsed (model glance / Offline CTA). */
+/** True when AI Chat content is collapsed (header may still show). */
+function isOllamaSectionCollapsed() {
+  const content = document.getElementById('ollama-content');
+  return !!(content && content.classList.contains('collapsed'));
+}
+
+/** Expand AI Chat if collapsed (model glance / Offline CTA / collapsed glance). */
 function ensureOllamaSectionExpanded() {
   const content = document.getElementById('ollama-content');
   const section = document.querySelector('.ollama-section');
@@ -642,6 +648,9 @@ function ensureOllamaSectionExpanded() {
   if (typeof window.setSectionCollapsed === 'function') {
     window.setSectionCollapsed('ollama_collapsed', false);
   }
+  if (typeof window.__setOllamaCollapsed === 'function') {
+    window.__setOllamaCollapsed(false);
+  }
   header?.setAttribute('aria-expanded', 'true');
   if (typeof header?._syncCollapseA11y === 'function') header._syncCollapseA11y();
   if (typeof window.syncSectionIcon === 'function') {
@@ -649,6 +658,132 @@ function ensureOllamaSectionExpanded() {
   }
   const chat = document.getElementById('ollama-chat');
   if (chat) chat.style.display = 'block';
+  const menuCollapse = document.getElementById('ollama-menu-collapse');
+  if (menuCollapse) menuCollapse.textContent = 'Collapse';
+}
+
+/** Collapsed-section glance under AI Chat header (Monitors / Disk Cleanup parity). */
+function ensureOllamaCollapsedGlance() {
+  const header = document.getElementById('ollama-header');
+  if (!header) return null;
+  let glance = document.getElementById('ollama-collapsed-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'ollama-collapsed-glance';
+    glance.className = 'ollama-collapsed-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="ollama-collapsed-glance-text"></span>';
+    header.insertAdjacentElement('afterend', glance);
+    wireOllamaCollapsedGlanceClick(glance);
+  }
+  return glance;
+}
+
+function syncOllamaCollapsedGlance() {
+  const glance = ensureOllamaCollapsedGlance();
+  if (!glance) return;
+  const glanceText = document.getElementById('ollama-collapsed-glance-text');
+  if (!isOllamaSectionCollapsed()) {
+    glance.hidden = true;
+    // Re-apply expanded glances (header toggle / icon open).
+    applyChatModelGlanceState();
+    applyChatTurnGlanceState();
+    applyChatAnswerGlanceState();
+    return;
+  }
+  // One strip while collapsed — hide the expanded model/turn/answer glances.
+  const model = document.getElementById('chat-model-glance');
+  const turn = document.getElementById('chat-turn-glance');
+  const answer = document.getElementById('chat-answer-glance');
+  if (model) model.hidden = true;
+  if (turn) turn.hidden = true;
+  if (answer) answer.hidden = true;
+
+  glance.hidden = false;
+  const status = chatModelGlanceState.status || 'unknown';
+  const modelName = getChatModelGlanceLabel();
+  const turns = countChatTurns();
+  const preview = getChatTurnGlancePreview();
+  let line = 'AI Chat';
+  let wash = 'is-empty';
+  if (status === 'error') {
+    line = 'Offline · check Ollama';
+    wash = 'is-offline';
+  } else if (status === 'unknown') {
+    line = 'Not set · configure URL';
+    wash = 'is-offline';
+  } else if (turns && preview) {
+    const turnLabel = turns === 1 ? '1 turn' : `${turns} turns`;
+    line = `${turnLabel} · ${preview}`;
+    wash = chatSendInFlight ? 'is-active' : 'is-online';
+  } else if (modelName) {
+    line = `Ready · ${modelName}`;
+    wash = 'is-online';
+  } else {
+    line = 'Ready · pick a model';
+    wash = 'is-online';
+  }
+  if (glanceText) glanceText.textContent = line;
+  glance.classList.toggle('is-online', wash === 'is-online');
+  glance.classList.toggle('is-offline', wash === 'is-offline');
+  glance.classList.toggle('is-active', wash === 'is-active');
+  glance.classList.toggle('is-empty', wash === 'is-empty');
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  if (wash === 'is-offline') {
+    glance.title = 'Open AI Chat — configure Ollama';
+    glance.setAttribute('aria-label', `${line} — click to configure`);
+  } else if (turns && preview) {
+    glance.title = 'Show AI Chat and focus composer';
+    glance.setAttribute(
+      'aria-label',
+      `${line} — click to expand and focus composer`
+    );
+  } else {
+    glance.title = 'Show AI Chat';
+    glance.setAttribute('aria-label', `${line} — click to expand`);
+  }
+}
+
+function activateOllamaCollapsedGlance() {
+  const status = chatModelGlanceState.status || 'unknown';
+  ensureOllamaSectionExpanded();
+  syncOllamaCollapsedGlance();
+  applyChatModelGlanceState();
+  applyChatTurnGlanceState();
+  applyChatAnswerGlanceState();
+  if (status !== 'connected') {
+    showOllamaUrlDialog();
+    return;
+  }
+  const container = document.getElementById('chat-messages');
+  if (container) {
+    container.scrollTop = container.scrollHeight;
+    const last = container.querySelector('.chat-message:last-child');
+    if (last && typeof last.scrollIntoView === 'function') {
+      last.scrollIntoView({ block: 'nearest' });
+    }
+  }
+  document.getElementById('chat-input')?.focus();
+}
+
+function wireOllamaCollapsedGlanceClick(glance) {
+  if (!glance || glance.dataset.ollamaCollapsedGlanceWired === '1') return;
+  glance.dataset.ollamaCollapsedGlanceWired = '1';
+  const activate = () => {
+    activateOllamaCollapsedGlance();
+  };
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
 }
 
 /** Model / connection glance under AI Chat header (Debug Log / turn-glance parity). */
@@ -662,13 +797,21 @@ function ensureChatModelGlance() {
     glance.className = 'chat-model-glance';
     glance.hidden = true;
     glance.innerHTML = '<span id="chat-model-glance-text"></span>';
-    header.insertAdjacentElement('afterend', glance);
+    const collapsed = ensureOllamaCollapsedGlance();
+    const anchor = collapsed || header;
+    anchor.insertAdjacentElement('afterend', glance);
     wireChatModelGlanceClick(glance);
   }
   return glance;
 }
 
 function applyChatModelGlanceState() {
+  if (isOllamaSectionCollapsed()) {
+    syncOllamaCollapsedGlance();
+    return;
+  }
+  const collapsedGlance = document.getElementById('ollama-collapsed-glance');
+  if (collapsedGlance) collapsedGlance.hidden = true;
   const glance = ensureChatModelGlance();
   if (!glance) return;
   const text = document.getElementById('chat-model-glance-text');
@@ -773,6 +916,10 @@ function ensureChatTurnGlance() {
 }
 
 function applyChatTurnGlanceState() {
+  if (isOllamaSectionCollapsed()) {
+    syncOllamaCollapsedGlance();
+    return;
+  }
   const glance = ensureChatTurnGlance();
   if (!glance) return;
   const text = document.getElementById('chat-turn-glance-text');
@@ -916,6 +1063,10 @@ function ensureChatAnswerGlance() {
 }
 
 function applyChatAnswerGlanceState() {
+  if (isOllamaSectionCollapsed()) {
+    syncOllamaCollapsedGlance();
+    return;
+  }
   const glance = ensureChatAnswerGlance();
   if (!glance) return;
   if (glance.classList.contains('is-just-copied') && glance._answerCopiedTimer) return;
@@ -1974,9 +2125,11 @@ function initOllamaChatListeners() {
 async function initializeOllama() {
   // Auto-configure after a short delay to ensure everything is ready
   console.log('[Ollama] Module loaded, auto-configuring...');
+  ensureOllamaCollapsedGlance();
   ensureChatModelGlance();
   ensureChatTurnGlance();
   applyChatModelGlanceState();
+  syncOllamaCollapsedGlance();
   try {
     // Always auto-configure the backend, regardless of DOM elements
     await autoConfigureOllama();
@@ -2029,6 +2182,7 @@ window.Ollama = {
   addMessage: addChatMessage,
   setAssistantMessageContent: setAssistantMessageContent,
   initListeners: initOllamaChatListeners,
+  syncCollapsedGlance: syncOllamaCollapsedGlance,
   
   // Utils
   getEndpoint: getOllamaEndpoint,

@@ -6436,6 +6436,9 @@ function showAddMonitorDialog() {
 // ============================================================================
 
 let ollamaCollapsed = true;
+window.__setOllamaCollapsed = (v) => {
+  ollamaCollapsed = !!v;
+};
 
 // ============================================================================
 // System Prompt Management (UI-specific, stays in cpu.js)
@@ -6507,6 +6510,16 @@ function initOllamaSection() {
     }
   }
   syncSectionIcon('icon-ollama', !ollamaCollapsed);
+  if (window.Ollama && typeof window.Ollama.syncCollapsedGlance === 'function') {
+    window.Ollama.syncCollapsedGlance();
+  } else {
+    // Ollama module may load after this init — retry once for collapsed glance.
+    setTimeout(() => {
+      if (window.Ollama && typeof window.Ollama.syncCollapsedGlance === 'function') {
+        window.Ollama.syncCollapsedGlance();
+      }
+    }, 250);
+  }
 
   // Connection indicator click handler (only when not connected)
   if (connectionIndicator) {
@@ -6622,12 +6635,15 @@ function initOllamaSection() {
     setSectionCollapsed('ollama_collapsed', ollamaCollapsed);
     if (header._syncCollapseA11y) header._syncCollapseA11y();
     syncSectionIcon('icon-ollama', !ollamaCollapsed);
+    if (window.Ollama && typeof window.Ollama.syncCollapsedGlance === 'function') {
+      window.Ollama.syncCollapsedGlance();
+    }
   };
 
   wireCollapsibleHeaderA11y(header, {
     contentId: 'ollama-content',
     getExpanded: () => !ollamaCollapsed,
-    ignoreSelector: '#ollama-menu-btn, #ollama-menu, #ollama-connection-indicator, #ollama-model-text, #ollama-model-select',
+    ignoreSelector: '#ollama-menu-btn, #ollama-menu, #ollama-connection-indicator, #ollama-model-text, #ollama-model-select, #ollama-collapsed-glance, #chat-model-glance, #chat-turn-glance, #chat-answer-glance',
     onToggle: () => {
       ollamaCollapsed = !ollamaCollapsed;
       applyOllamaCollapsed();
@@ -6638,14 +6654,18 @@ function initOllamaSection() {
     // Don't toggle if clicking on controls
     const menuBtn = document.getElementById('ollama-menu-btn');
     const menu = document.getElementById('ollama-menu');
+    const collapsedGlance = document.getElementById('ollama-collapsed-glance');
     if (e.target === connectionIndicator || 
         e.target === modelText || 
         e.target === menuBtn ||
+        e.target === collapsedGlance ||
         connectionIndicator?.contains(e.target) ||
         modelText?.contains(e.target) ||
         modelSelect?.contains(e.target) ||
         menuBtn?.contains(e.target) ||
-        menu?.contains(e.target)) {
+        menu?.contains(e.target) ||
+        collapsedGlance?.contains(e.target) ||
+        e.target?.closest?.('#chat-model-glance, #chat-turn-glance, #chat-answer-glance')) {
       return;
     }
     

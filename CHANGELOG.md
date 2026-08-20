@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.554] - 2026-08-20
+
+### Added
+- AI Chat **collapsed glance** (Monitors / Disk Cleanup parity). When the section is collapsed, a summary strip under the header shows Offline / Ready · model / N turns · last question; click or Enter/Space expands and focuses the composer (or opens the URL dialog when offline). Collapsed AI Chat keeps header + glance visible (content stays hidden).
+
 ## [0.1.553] - 2026-08-20
 
 ### Added
