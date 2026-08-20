@@ -6,6 +6,7 @@ Overnight Track B (design review / standing backlog). Digester open empty; desig
 
 | Version | What got nicer |
 |---------|----------------|
+| **v0.1.540** | AI Chat **model / connection glance** — Model · name when online (click opens picker); Offline / Not set opens URL config. Green wash online; amber offline. Expands section if collapsed. |
 | **v0.1.539** | AI Chat **last-answer glance** — preview of the latest reply; click or Enter/Space copies it (Copied flash). Soft accent wash when ready. Hidden while Sending…. |
 | **v0.1.538** | CPU metrics **CPU % on the battery/power strip** (menu-bar parity). Click scrolls to the CPU ring and flashes it. Soft amber wash when ≥ 50%. |
 | **v0.1.537** | CPU metrics **SSD % on the battery/power strip** (menu-bar parity). Click opens Disk Cleanup and flashes the section. Soft amber wash when ≥ 85% full. |
@@ -14,10 +15,10 @@ Overnight Track B (design review / standing backlog). Digester open empty; desig
 ## Tried / notes
 
 - Prep: digester empty (10 turns, 7 instant); design-review due=false; debug.log quiet in 180m scan (single-instance busy WARN only).
-- Left the saturated power-strip lane; polished AI Chat (design-review recommended surface) with copy-last-answer glance (Top Processes / Monitors parity).
+- Left answer-glance lane; polished AI Chat (design-review recommended surface) with model/connection glance (loop_backlog next item).
 - Screenshot recapture still deferred (no on-screen CPU window / TCC); feature-ai-chat.png stays in grace (~5.5d).
-- Latest keep: v0.1.539 installed; Discord gateway ready.
+- Latest keep: v0.1.540 installed; Discord gateway ready.
 
 ## Not a quiet night
 
-Four keeps in the 2026-08-20 window — frequency strip, SSD strip, CPU % strip, then AI Chat last-answer copy glance.
+Five keeps in the 2026-08-20 window — frequency strip, SSD strip, CPU % strip, AI Chat last-answer copy glance, then model/connection glance.
