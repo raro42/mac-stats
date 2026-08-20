@@ -1499,6 +1499,28 @@ async function refresh() {
       previousValues.load15 = data.load_15;
     }
 
+    // Details collapsed keep-header glance (Load · RAM · Up)
+    {
+      const glanceLoad1 =
+        typeof data.load_1 === "number" && Number.isFinite(data.load_1)
+          ? data.load_1
+          : null;
+      const glanceRam =
+        typeof data.ram_percent === "number" && Number.isFinite(data.ram_percent)
+          ? data.ram_percent
+          : null;
+      const glanceUpSecs =
+        typeof data.uptime_secs === "number" && Number.isFinite(data.uptime_secs)
+          ? data.uptime_secs
+          : 0;
+      applyDetailsCollapsedGlanceState({
+        load1: glanceLoad1,
+        ramPct: glanceRam,
+        uptime: glanceUpSecs > 0 ? formatUptime(glanceUpSecs) : "—",
+        waiting: glanceLoad1 == null && glanceRam == null && glanceUpSecs <= 0,
+      });
+    }
+
     // Update power consumption (with caching to prevent flickering)
     const cpuPowerEl = document.getElementById("cpu-power");
     if (!data.can_read_cpu_power) {
@@ -7365,6 +7387,147 @@ function replaceThinkingWithResponse(thinkingId, content, durationMs) {
 
 // Initialize collapsible sections (Details and Top Processes)
 // Universal implementation that works across all themes using IDs
+
+/** Details section collapsed (keep-header + glance; Top Processes / Debug Log parity). */
+function isDetailsSectionCollapsed() {
+  const section =
+    document.getElementById("details-section") ||
+    document.querySelector(
+      ".apple-details, .arch-details, .swiss-details, .mat-details, .cpu-details, .details-section"
+    );
+  return !!(
+    section &&
+    (section.classList.contains("collapsed") || section.style.display === "none")
+  );
+}
+
+function ensureDetailsCollapsedGlance() {
+  const header = document.getElementById("details-header");
+  if (!header) return null;
+  let glance = document.getElementById("details-collapsed-glance");
+  if (!glance) {
+    glance = document.createElement("div");
+    glance.id = "details-collapsed-glance";
+    glance.className = "details-collapsed-glance";
+    glance.hidden = true;
+    glance.innerHTML = '<span id="details-collapsed-glance-text"></span>';
+    header.insertAdjacentElement("afterend", glance);
+    wireDetailsCollapsedGlanceClick(glance);
+  }
+  return glance;
+}
+
+function applyDetailsCollapsedGlanceState({ load1, ramPct, uptime, waiting }) {
+  const glance = ensureDetailsCollapsedGlance();
+  if (!glance) return;
+  const text = document.getElementById("details-collapsed-glance-text");
+  const collapsed = isDetailsSectionCollapsed();
+  if (waiting) {
+    glance.classList.remove("is-hot");
+    if (collapsed) {
+      glance.hidden = false;
+      if (text) text.textContent = "Waiting · details";
+      glance.setAttribute("role", "button");
+      glance.tabIndex = 0;
+      glance.title = "Show Details";
+      glance.setAttribute("aria-label", "Details waiting — click to expand");
+      return;
+    }
+    glance.hidden = true;
+    return;
+  }
+  if (!collapsed) {
+    glance.hidden = true;
+    return;
+  }
+  glance.hidden = false;
+  const loadStr =
+    typeof load1 === "number" && Number.isFinite(load1) ? load1.toFixed(2) : "—";
+  const ramStr =
+    typeof ramPct === "number" && Number.isFinite(ramPct)
+      ? `${Math.round(ramPct)}%`
+      : "—";
+  const upStr = uptime && String(uptime).trim() ? String(uptime).trim() : "—";
+  if (text) text.textContent = `Load · ${loadStr} · RAM · ${ramStr} · Up · ${upStr}`;
+  const hot =
+    (typeof load1 === "number" && load1 >= 4) ||
+    (typeof ramPct === "number" && ramPct >= 85);
+  glance.classList.toggle("is-hot", hot);
+  glance.setAttribute("role", "button");
+  glance.tabIndex = 0;
+  glance.title = "Show Details";
+  glance.setAttribute(
+    "aria-label",
+    `Details Load ${loadStr}, RAM ${ramStr}, uptime ${upStr} — click to expand`
+  );
+}
+
+function refreshDetailsCollapsedGlanceFromDom() {
+  if (!isDetailsSectionCollapsed()) {
+    const glance = document.getElementById("details-collapsed-glance");
+    if (glance) glance.hidden = true;
+    return;
+  }
+  const loadEl = document.getElementById("load-1");
+  const ramEl = document.getElementById("ram-percent-value");
+  const upEl = document.getElementById("uptime-value");
+  const loadRaw = loadEl?.textContent?.trim();
+  const ramRaw = ramEl?.textContent?.trim();
+  const upRaw = upEl?.textContent?.trim();
+  const load1 = loadRaw != null && loadRaw !== "" ? Number(loadRaw) : NaN;
+  const ramPct =
+    ramRaw != null && ramRaw.endsWith("%")
+      ? Number(ramRaw.replace("%", ""))
+      : NaN;
+  const waiting =
+    (!Number.isFinite(load1) && (!upRaw || upRaw === "—" || upRaw === "0h")) ||
+    (loadRaw === "0.0" && (!ramRaw || ramRaw === "—") && (!upRaw || upRaw === "0h"));
+  // Prefer live metrics when any row has real data.
+  if (
+    waiting &&
+    !Number.isFinite(load1) &&
+    !Number.isFinite(ramPct) &&
+    (!upRaw || upRaw === "—" || upRaw === "0h")
+  ) {
+    applyDetailsCollapsedGlanceState({
+      load1: null,
+      ramPct: null,
+      uptime: null,
+      waiting: true,
+    });
+    return;
+  }
+  applyDetailsCollapsedGlanceState({
+    load1: Number.isFinite(load1) ? load1 : null,
+    ramPct: Number.isFinite(ramPct) ? ramPct : null,
+    uptime: upRaw && upRaw !== "—" ? upRaw : null,
+    waiting: false,
+  });
+}
+
+function wireDetailsCollapsedGlanceClick(glance) {
+  if (!glance || glance.dataset.detailsGlanceWired === "1") return;
+  glance.dataset.detailsGlanceWired = "1";
+  const activate = () => {
+    if (typeof window.showCpuDetailsSection === "function") {
+      window.showCpuDetailsSection();
+    } else if (typeof window.showDetailsProcessesSections === "function") {
+      window.showDetailsProcessesSections();
+    }
+  };
+  glance.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
 function initCollapsibleSections() {
   // Get collapsed state from localStorage (default to true - hidden)
   const sectionsCollapsed = getSectionCollapsed('details_processes_collapsed');
@@ -7392,20 +7555,41 @@ function initCollapsibleSections() {
            el.getAttribute('aria-hidden') === 'true';
   }
   
-  // Hide Details section
+  function syncDetailsCollapseA11y() {
+    if (!detailsHeader) return;
+    const collapsed = isDetailsSectionCollapsed();
+    detailsHeader.setAttribute("aria-expanded", String(!collapsed));
+    detailsHeader.setAttribute(
+      "aria-label",
+      collapsed ? "Show Details" : "Hide Details"
+    );
+  }
+
+  // Collapse Details: keep header + Load/RAM/Up glance (Top Processes / Debug Log parity).
   function hideDetails() {
-    if (detailsSection) detailsSection.style.display = 'none';
-    if (detailsDivider && isDivider(detailsDivider)) {
-      detailsDivider.style.display = 'none';
+    if (detailsSection) {
+      detailsSection.classList.add("collapsed");
+      detailsSection.style.display = "";
     }
+    if (detailsDivider && isDivider(detailsDivider)) {
+      detailsDivider.style.display = "";
+    }
+    syncDetailsCollapseA11y();
+    refreshDetailsCollapsedGlanceFromDom();
   }
   
-  // Show Details section
+  // Show Details section (full grid)
   function showDetails() {
-    if (detailsSection) detailsSection.style.display = '';
-    if (detailsDivider && isDivider(detailsDivider)) {
-      detailsDivider.style.display = '';
+    if (detailsSection) {
+      detailsSection.classList.remove("collapsed");
+      detailsSection.style.display = "";
     }
+    if (detailsDivider && isDivider(detailsDivider)) {
+      detailsDivider.style.display = "";
+    }
+    syncDetailsCollapseA11y();
+    const glance = document.getElementById("details-collapsed-glance");
+    if (glance) glance.hidden = true;
   }
   
   function syncProcessesCollapseA11y() {
@@ -7424,9 +7608,9 @@ function initCollapsibleSections() {
       processesSection.classList.add('collapsed');
       processesSection.style.display = '';
     }
-    const detailsHidden = detailsSection?.style.display === 'none';
-    if (processesDivider && isDivider(processesDivider) && detailsHidden) {
-      processesDivider.style.display = 'none';
+    // Details keep-header stays visible when collapsed — keep divider between sections.
+    if (processesDivider && isDivider(processesDivider)) {
+      processesDivider.style.display = '';
     }
     syncProcessesCollapseA11y();
     // Refresh quiet Waiting glance when list is empty while collapsed.
@@ -7479,8 +7663,7 @@ function initCollapsibleSections() {
   function syncUsageExpanded() {
     if (!usageCard) return;
     const hidden =
-      detailsSection?.style.display === 'none' ||
-      isProcessesSectionCollapsed();
+      isDetailsSectionCollapsed() || isProcessesSectionCollapsed();
     usageCard.setAttribute('aria-expanded', String(!hidden));
     usageCard.setAttribute(
       'aria-label',
@@ -7502,25 +7685,32 @@ function initCollapsibleSections() {
     showSections();
   }
   
-  // Details header click - hide Details section
+  // Details header click - toggle keep-header collapse (grid hides; glance stays)
   if (detailsHeader) {
     detailsHeader.setAttribute('role', 'button');
-    detailsHeader.setAttribute('aria-label', 'Hide Details section');
     if (!detailsHeader.hasAttribute('tabindex')) detailsHeader.setAttribute('tabindex', '0');
-    const hideDetailsAction = (e) => {
+    syncDetailsCollapseA11y();
+    const toggleDetailsAction = (e) => {
+      if (
+        e.target &&
+        e.target.closest &&
+        e.target.closest('#details-collapsed-glance')
+      ) {
+        return;
+      }
       e.stopPropagation();
-      hideDetails();
-      // Details gone: hide divider above Processes keep-header when collapsed.
-      if (isProcessesSectionCollapsed() && processesDivider && isDivider(processesDivider)) {
-        processesDivider.style.display = 'none';
+      if (isDetailsSectionCollapsed()) {
+        showDetails();
+      } else {
+        hideDetails();
       }
       syncUsageExpanded();
     };
-    detailsHeader.addEventListener('click', hideDetailsAction);
+    detailsHeader.addEventListener('click', toggleDetailsAction);
     detailsHeader.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
       e.preventDefault();
-      hideDetailsAction(e);
+      toggleDetailsAction(e);
     });
   }
   
@@ -7563,8 +7753,7 @@ function initCollapsibleSections() {
     const toggleSections = (e) => {
       e.stopPropagation();
       const currentlyHidden =
-        detailsSection?.style.display === 'none' ||
-        isProcessesSectionCollapsed();
+        isDetailsSectionCollapsed() || isProcessesSectionCollapsed();
       if (currentlyHidden) {
         showSections();
       } else {
@@ -7588,6 +7777,10 @@ function initCollapsibleSections() {
   ensureDiskStrip();
   ensureUptimeStrip();
   ensureProcessesTopGlance();
+  ensureDetailsCollapsedGlance();
+  if (isDetailsSectionCollapsed()) {
+    refreshDetailsCollapsedGlanceFromDom();
+  }
 }
 
 // ============================================================================

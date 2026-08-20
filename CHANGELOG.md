@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.559] - 2026-08-21
+
+### Added
+- Details **collapsed keep-header** (Top Processes / Debug Log parity). When the section is collapsed, the header stays visible with a Load · RAM · Up glance (or Waiting · details); click the header or glance expands the grid. Soft amber wash when Load 1m ≥ 4 or RAM ≥ 85%.
+
 ## [0.1.558] - 2026-08-21
 
 ### Added
