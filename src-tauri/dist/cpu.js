@@ -7877,6 +7877,7 @@ function initPerplexitySection() {
       if (divider) divider.style.display = '';
     }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
+    applyPerplexityLastGlanceState();
     refreshPerplexityStatus();
     syncSectionIcon('icon-perplexity', !perplexityCollapsed);
   };
@@ -8234,9 +8235,20 @@ function applyLogsGlanceState({ error, warn }) {
   const err = Number(error) || 0;
   const wrn = Number(warn) || 0;
   logsGlanceCounts = { error: err, warn: wrn };
+  glance.classList.remove('has-errors', 'has-warns-only', 'is-quiet');
   if (err <= 0 && wrn <= 0) {
+    // Collapsed: always show a glance so keep-header is useful (Perplexity parity).
+    if (logsSectionCollapsed) {
+      glance.hidden = false;
+      glance.classList.add('is-quiet');
+      if (text) text.textContent = 'Quiet · clean';
+      glance.setAttribute('role', 'button');
+      glance.tabIndex = 0;
+      glance.title = 'Show Debug Log';
+      glance.setAttribute('aria-label', 'Debug Log quiet — click to expand');
+      return;
+    }
     glance.hidden = true;
-    glance.classList.remove('has-errors', 'has-warns-only');
     return;
   }
   glance.hidden = false;
@@ -8261,7 +8273,12 @@ function wireLogsErrorGlanceClick(glance) {
   glance.dataset.logsGlanceWired = '1';
   const activate = () => {
     ensureLogsSectionExpanded();
-    const mode = logsGlanceCounts.error > 0 ? 'error' : 'warn';
+    const mode =
+      logsGlanceCounts.error > 0
+        ? 'error'
+        : logsGlanceCounts.warn > 0
+          ? 'warn'
+          : 'all';
     setLogsFilterMode(mode);
   };
   glance.addEventListener('click', (e) => {
@@ -10407,6 +10424,7 @@ function initLogsSection() {
       if (section) section.classList.add('collapsed');
       if (divider) divider.style.display = 'none';
       stopLogsAutoRefresh();
+      applyLogsGlanceState(logsGlanceCounts);
     } else {
       content.classList.remove('collapsed');
       if (section) section.classList.remove('collapsed');

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.557] - 2026-08-20
+
+### Added
+- Debug Log **collapsed keep-header** (Perplexity / Monitors parity). When the section is collapsed, the header stays visible with the error/warn glance (N errors · N warns / Quiet · clean); click expands and filters Error/Warn when needed. Content stays hidden.
+
 ## [0.1.556] - 2026-08-20
 
 ### Added

@@ -2271,8 +2271,9 @@ body {
 
 
 /* Logs section */
+/* Logs — keep header + glance when collapsed (agent-ops.css) */
 .logs-section.collapsed {
-  display: none;
+  display: block;
 }
 
 .disk-cleanup-section.collapsed {

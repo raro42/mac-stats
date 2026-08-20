@@ -80,18 +80,13 @@ body:hover {
   width: 100%;
 }
 
-/* Icon toggles: whole section hides when collapsed (header included).
- * Monitors + Disk Cleanup + AI Chat + Agent Ops + Perplexity keep header + glance
- * (content still collapses). Debug Log still hides entirely when collapsed. */
-.logs-section.collapsed {
-  display: none !important;
-}
-
+/* Icon toggles: keep header + glance when collapsed (content still collapses). */
 .monitors-section.collapsed,
 .disk-cleanup-section.collapsed,
 .ollama-section.collapsed,
 .agent-ops-section.collapsed,
-.perplexity-section.collapsed {
+.perplexity-section.collapsed,
+.logs-section.collapsed {
   display: block !important;
 }
 
@@ -2791,6 +2786,11 @@ textarea.ops-agent-editor.is-dirty {
 .logs-error-glance.has-warns-only {
   border-color: color-mix(in srgb, #ff9500 26%, transparent);
   background: color-mix(in srgb, #ff9500 6%, transparent);
+}
+
+.logs-error-glance.is-quiet {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 3.5%, transparent);
 }
 
 .monitors-filter-chips {
