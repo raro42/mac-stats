@@ -6,7 +6,8 @@ Overnight Track B kept shipping design-review polish (digester open empty all ni
 
 | Version | What |
 |---------|------|
-| **v0.1.545** | Agent Ops Schedules **All · Jobs · Deliveries** filter chips (Sessions Live/Files parity; overview → Jobs when any; Clear → All) |
+| **v0.1.546** | Agent Ops Knowledge **All · Discord · Core** filter chips (Sessions Live/Files parity; overview → Discord when any; Clear → All) |
+| v0.1.545 | Agent Ops Schedules **All · Jobs · Deliveries** filter chips |
 | v0.1.544 | Agent Ops Runs **All · Instant · Direct** filter chips |
 | v0.1.543 | Agent Ops Agents **All · On · Off** filter chips |
 | v0.1.542 | Agent Ops Sessions **All · Live · Files** filter chips |
@@ -16,12 +17,11 @@ Overnight Track B kept shipping design-review polish (digester open empty all ni
 | v0.1.538 | CPU % on battery/power strip |
 | v0.1.537 | SSD % on battery/power strip |
 | v0.1.536 | Frequency GHz on battery/power strip |
-| v0.1.535 | Temp °C on battery/power strip (late 19th) |
-| v0.1.534–531 | GPU strip, Debug Log glance, AI turn glance, Top CPU glance |
+| v0.1.535–531 | Temp/GPU strips, Debug Log glance, AI turn glance, Top CPU glance |
 
 ## Notes
 
 - Digester: no open candidates (instant-heavy window).
-- Design review: due=false (grace); Agent Ops marked polished again after Schedules kind chips.
+- Design review: due=false (grace); Agent Ops marked polished again after Knowledge kind chips.
 - Screenshots: mostly deferred (TCC / no on-screen CPU window).
-- Next fuel: digester Discord traffic, or Knowledge kind chips / uptime strip / Top RAM (needs ProcessUsage.memory) / p50 latency.
+- Next fuel: digester Discord traffic, or uptime strip / Top RAM (needs ProcessUsage.memory) / p50 latency / non-Knowledge kind polish.
