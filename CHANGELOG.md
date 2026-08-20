@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.555] - 2026-08-20
+
+### Added
+- Agent Ops **Discord Ready collapsed glance** (AI Chat / Monitors parity). When Agent Ops is collapsed, a summary strip under the header shows Discord · Ready · age (or Offline / reconnect warn); click or Enter/Space expands and opens the Discord gateway preview on Runs. Light 60s insights poll while collapsed. Collapsed Agent Ops keeps header + glance visible (content stays hidden).
+
 ## [0.1.554] - 2026-08-20
 
 ### Added

@@ -80,23 +80,23 @@ body:hover {
   width: 100%;
 }
 
-/* Icon toggles whole pane (same as monitors/ollama sections) */
-.agent-ops-section.collapsed {
-  display: none !important;
-}
-
 /* Icon toggles: whole section hides when collapsed (header included).
- * Monitors + Disk Cleanup + AI Chat keep header + collapsed glance (content still collapses). */
+ * Monitors + Disk Cleanup + AI Chat + Agent Ops keep header + collapsed glance
+ * (content still collapses). */
 .perplexity-section.collapsed,
-.logs-section.collapsed,
-.agent-ops-section.collapsed {
+.logs-section.collapsed {
   display: none !important;
 }
 
 .monitors-section.collapsed,
 .disk-cleanup-section.collapsed,
-.ollama-section.collapsed {
+.ollama-section.collapsed,
+.agent-ops-section.collapsed {
   display: block !important;
+}
+
+.agent-ops-section.collapsed .ops-close-btn {
+  display: none;
 }
 
 /*
@@ -2360,6 +2360,64 @@ textarea.ops-agent-editor.is-dirty {
 .processes-top-ram-glance.is-hot {
   border-color: color-mix(in srgb, #ff9500 26%, transparent);
   background: color-mix(in srgb, #ff9500 6%, transparent);
+}
+
+/* Agent Ops — Discord Ready collapsed glance under header (AI Chat / Monitors parity) */
+.agent-ops-collapsed-glance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 2px 0 2px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  font-size: 13px;
+  font-weight: 520;
+  line-height: 1.35;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.agent-ops-collapsed-glance[hidden] {
+  display: none !important;
+}
+
+.agent-ops-collapsed-glance:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+}
+
+.agent-ops-collapsed-glance:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.agent-ops-collapsed-glance.is-ready {
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+  background: color-mix(in srgb, #34c759 7%, transparent);
+}
+
+.agent-ops-collapsed-glance.is-warn {
+  border-color: color-mix(in srgb, #ff9500 28%, transparent);
+  background: color-mix(in srgb, #ff9500 7%, transparent);
+}
+
+.agent-ops-collapsed-glance.is-offline {
+  border-color: color-mix(in srgb, #ff3b30 28%, transparent);
+  background: color-mix(in srgb, #ff3b30 7%, transparent);
+}
+
+.agent-ops-collapsed-glance.is-empty {
+  font-weight: 450;
+  opacity: 0.85;
 }
 
 /* AI Chat — collapsed glance under header (Monitors / Disk Cleanup parity) */

@@ -244,7 +244,9 @@
   }
 
   const OPS_REFRESH_INTERVAL = 30000;
+  const OPS_GLANCE_POLL_INTERVAL = 60000;
   let agentOpsInterval = null;
+  let agentOpsGlanceInterval = null;
   let agentOpsCollapsed = true;
   let opsAgentCache = null;
   let opsAgentFileTab = 'soul';
@@ -1513,6 +1515,185 @@ function stopAgentOpsAutoRefresh() {
     }
 }
 
+/** Parse Discord gateway insight string (health card + collapsed glance). */
+function parseOpsDiscordGateway(dgRaw) {
+    const dg = String(dgRaw || '').trim();
+    const readyMatch = dg.match(/last Ready\s+([^·]+)/i);
+    const discMatch = dg.match(/disconnect×(\d+)/i);
+    const resumeMatch = dg.match(/resume×(\d+)/i);
+    const stageMatch = dg.match(/stage=([^\s·]+)/i);
+    const lastDiscMatch = dg.match(/last disc\s+([^·]+)/i);
+    const lastResumeMatch = dg.match(/last resume\s+([^·]+)/i);
+    const discN = discMatch ? Number(discMatch[1]) : 0;
+    const resumeN = resumeMatch ? Number(resumeMatch[1]) : 0;
+    const stage = (stageMatch ? stageMatch[1] : '').trim();
+    const lastDisc = lastDiscMatch ? lastDiscMatch[1].trim() : '';
+    const lastResume = lastResumeMatch ? lastResumeMatch[1].trim() : '';
+    let healthText = readyMatch ? readyMatch[1].trim() : dg ? 'see Runs' : '—';
+    if (discN > 0) {
+        healthText = lastDisc
+            ? `${healthText} · disc×${discN} (${lastDisc})`
+            : `${healthText} · disc×${discN}`;
+    }
+    if (resumeN > 0) {
+        healthText = lastResume
+            ? `${healthText} · res×${resumeN} (${lastResume})`
+            : `${healthText} · res×${resumeN}`;
+    }
+    const stageLower = stage.toLowerCase();
+    let wash = 'empty';
+    if (!dg || healthText === '—') {
+        wash = 'empty';
+    } else if (stageLower === 'disconnected') {
+        wash = 'offline';
+    } else if (discN > 0 || resumeN > 0 || stageLower === 'resuming') {
+        wash = 'warn';
+    } else if (stageLower === 'connected' || readyMatch) {
+        wash = 'ready';
+    }
+    let glanceLine = 'Discord · —';
+    if (wash === 'offline') {
+        glanceLine = 'Discord · Offline';
+    } else if (readyMatch) {
+        const age = readyMatch[1].trim();
+        glanceLine =
+            discN > 0
+                ? `Discord · Ready · ${age} · disc×${discN}`
+                : `Discord · Ready · ${age}`;
+        if (wash === 'warn' && discN <= 0 && resumeN > 0) {
+            glanceLine = `Discord · Resuming · ${age}`;
+        }
+    } else if (dg) {
+        glanceLine = `Discord · ${healthText}`;
+    }
+    return { dg, healthText, wash, glanceLine, stage, discN, resumeN, readyMatch };
+}
+
+/** Collapsed-section glance under Agent Ops header (Discord Ready / Monitors parity). */
+function ensureOpsCollapsedGlance() {
+    const header = document.getElementById('agent-ops-header');
+    if (!header) return null;
+    let glance = document.getElementById('agent-ops-collapsed-glance');
+    if (!glance) {
+        glance = document.createElement('div');
+        glance.id = 'agent-ops-collapsed-glance';
+        glance.className = 'agent-ops-collapsed-glance';
+        glance.hidden = true;
+        glance.innerHTML = '<span id="agent-ops-collapsed-glance-text"></span>';
+        header.insertAdjacentElement('afterend', glance);
+        wireOpsCollapsedGlanceClick(glance);
+    }
+    return glance;
+}
+
+function syncOpsCollapsedGlance() {
+    const glance = ensureOpsCollapsedGlance();
+    if (!glance) return;
+    const glanceText = document.getElementById('agent-ops-collapsed-glance-text');
+    if (!agentOpsCollapsed) {
+        glance.hidden = true;
+        return;
+    }
+    const parsed = parseOpsDiscordGateway(opsRunsInsightsCache?.discord_gateway);
+    glance.hidden = false;
+    if (glanceText) glanceText.textContent = parsed.glanceLine;
+    glance.classList.toggle('is-ready', parsed.wash === 'ready');
+    glance.classList.toggle('is-warn', parsed.wash === 'warn');
+    glance.classList.toggle('is-offline', parsed.wash === 'offline');
+    glance.classList.toggle('is-empty', parsed.wash === 'empty');
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    if (parsed.wash === 'offline') {
+        glance.title = 'Open Agent Ops — Discord is offline';
+        glance.setAttribute(
+            'aria-label',
+            'Discord offline — click to expand Agent Ops and preview gateway'
+        );
+    } else if (parsed.wash === 'warn') {
+        glance.title = 'Open Agent Ops — Discord reconnect noise';
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to expand and preview gateway`
+        );
+    } else if (parsed.wash === 'ready') {
+        glance.title = 'Show Agent Ops Discord gateway';
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to expand and preview`
+        );
+    } else {
+        glance.title = 'Show Agent Ops';
+        glance.setAttribute('aria-label', 'Discord status unknown — click to expand Agent Ops');
+    }
+}
+
+function activateOpsCollapsedGlance() {
+    const gw = String(opsRunsInsightsCache?.discord_gateway || '').trim();
+    if (gw && openOpsDiscordGatewayPreviewNavigate(gw)) {
+        syncOpsCollapsedGlance();
+        return;
+    }
+    if (agentOpsCollapsed) applyOpsCollapsed(false);
+    selectOpsTab('runs');
+    syncOpsCollapsedGlance();
+}
+
+function wireOpsCollapsedGlanceClick(glance) {
+    if (!glance || glance.dataset.opsCollapsedGlanceWired === '1') return;
+    glance.dataset.opsCollapsedGlanceWired = '1';
+    const activate = () => {
+        activateOpsCollapsedGlance();
+    };
+    glance.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+    glance.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        activate();
+    });
+}
+
+function stopOpsGlancePoll() {
+    if (agentOpsGlanceInterval) {
+        clearInterval(agentOpsGlanceInterval);
+        agentOpsGlanceInterval = null;
+    }
+}
+
+async function pollOpsCollapsedGlance() {
+    if (!agentOpsCollapsed) return;
+    try {
+        const insights = await invoke('get_runs_insights', { limit: 8 });
+        if (insights && typeof insights === 'object') {
+            opsRunsInsightsCache = {
+                ...(opsRunsInsightsCache || {}),
+                ...insights,
+            };
+        }
+        syncOpsCollapsedGlance();
+    } catch (_) {
+        /* glance poll is best-effort */
+        syncOpsCollapsedGlance();
+    }
+}
+
+function startOpsGlancePoll() {
+    stopOpsGlancePoll();
+    ensureOpsCollapsedGlance();
+    void pollOpsCollapsedGlance();
+    agentOpsGlanceInterval = setInterval(() => {
+        if (!agentOpsCollapsed) {
+            stopOpsGlancePoll();
+            return;
+        }
+        void pollOpsCollapsedGlance();
+    }, OPS_GLANCE_POLL_INTERVAL);
+}
+
 function setOpsDigestRefreshBusy(busy) {
     const btn = document.getElementById('ops-digest-refresh-btn');
     if (!btn) return;
@@ -1658,48 +1839,30 @@ function renderOpsHealth({ version, insights, sched, deliveries, agents, live, r
     }
     wireOpsHealthCardNavigation();
 
-    const dg = insights?.discord_gateway || '';
-    const readyMatch = dg.match(/last Ready\s+([^·]+)/i);
-    const discMatch = dg.match(/disconnect×(\d+)/i);
-    const resumeMatch = dg.match(/resume×(\d+)/i);
-    const stageMatch = dg.match(/stage=([^\s·]+)/i);
-    const lastDiscMatch = dg.match(/last disc\s+([^·]+)/i);
-    const lastResumeMatch = dg.match(/last resume\s+([^·]+)/i);
-    const discN = discMatch ? Number(discMatch[1]) : 0;
-    const resumeN = resumeMatch ? Number(resumeMatch[1]) : 0;
-    const stage = (stageMatch ? stageMatch[1] : '').trim();
-    const lastDisc = lastDiscMatch ? lastDiscMatch[1].trim() : '';
-    const lastResume = lastResumeMatch ? lastResumeMatch[1].trim() : '';
-    let discordText = readyMatch ? readyMatch[1].trim() : dg ? 'see Runs' : '—';
-    if (discN > 0) {
-        discordText = lastDisc
-            ? `${discordText} · disc×${discN} (${lastDisc})`
-            : `${discordText} · disc×${discN}`;
-    }
-    if (resumeN > 0) {
-        discordText = lastResume
-            ? `${discordText} · res×${resumeN} (${lastResume})`
-            : `${discordText} · res×${resumeN}`;
-    }
-    setText('ops-health-discord', discordText);
+    const parsedDiscord = parseOpsDiscordGateway(insights?.discord_gateway);
+    setText('ops-health-discord', parsedDiscord.healthText);
     const discordEl = document.getElementById('ops-health-discord');
     if (discordEl) {
-        discordEl.title = dg || '';
+        discordEl.title = parsedDiscord.dg || '';
         const card = discordEl.closest('.ops-health-card');
         if (card) {
             card.classList.remove('ops-health-ok', 'ops-health-warn', 'ops-health-bad');
-            const stageLower = stage.toLowerCase();
-            if (!dg || discordText === '—') {
-                /* leave neutral */
-            } else if (stageLower === 'disconnected') {
+            if (parsedDiscord.wash === 'offline') {
                 card.classList.add('ops-health-bad');
-            } else if (discN > 0 || resumeN > 0 || stageLower === 'resuming') {
+            } else if (parsedDiscord.wash === 'warn') {
                 card.classList.add('ops-health-warn');
-            } else if (stageLower === 'connected' || readyMatch) {
+            } else if (parsedDiscord.wash === 'ready') {
                 card.classList.add('ops-health-ok');
             }
         }
     }
+    if (insights?.discord_gateway != null) {
+        opsRunsInsightsCache = {
+            ...(opsRunsInsightsCache || {}),
+            discord_gateway: insights.discord_gateway,
+        };
+    }
+    syncOpsCollapsedGlance();
 
         if (redmine) {
         const st = String(redmine.status || '').toLowerCase();
@@ -5426,7 +5589,11 @@ function escapeHtml(s) {
     }
     if (collapsed) {
       stopAgentOpsAutoRefresh();
+      syncOpsCollapsedGlance();
+      startOpsGlancePoll();
     } else {
+      stopOpsGlancePoll();
+      syncOpsCollapsedGlance();
       refreshAgentOps();
       startAgentOpsAutoRefresh();
       // Defer scroll until layout applies display:block
@@ -5674,6 +5841,7 @@ function escapeHtml(s) {
 
   function initAgentOps() {
     if (!document.getElementById('ops-health-row')) return;
+    ensureOpsCollapsedGlance();
     wireCollapse();
     setupAgentOps();
   }

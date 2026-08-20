@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops **Discord Ready collapsed glance** (Discord · Ready · age / Offline / reconnect warn under header when collapsed; click → expand + gateway preview; 60s insights poll) — **v0.1.555**
 - AI Chat **collapsed glance** (summary under header when collapsed; Offline / Ready · model / turns · last question; click → expand + composer or URL dialog) — **v0.1.554**
 - Disk Cleanup **collapsed glance** (summary under header when collapsed; click → reclaim / due / scopes; 60s shallow poll; collapsed section keeps header + glance) — **v0.1.553**
 - External / Monitors **collapsed glance** (summary under header when collapsed; click → expand + DOWN/slowest/Add; 30s summary poll) — **v0.1.552**
