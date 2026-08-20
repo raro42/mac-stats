@@ -3971,6 +3971,7 @@ function initMonitorsSection() {
   wireMonitorsListKeyboard();
   wireMonitorsSummaryClick();
   ensureMonitorsFilterChips();
+  ensureMonitorsCollapsedGlance();
 
   // Always load monitors to calculate height, even when collapsed
   loadMonitors().then(() => {
@@ -3989,6 +3990,12 @@ function initMonitorsSection() {
     }
     if (divider) {
       divider.style.display = 'none';
+    }
+    // Summary-only poll while collapsed (collapsed glance).
+    if (!monitorsUpdateInterval) {
+      monitorsUpdateInterval = setInterval(() => {
+        updateMonitorsSummary();
+      }, 30000);
     }
   } else {
     content.classList.remove('collapsed');
@@ -4009,6 +4016,7 @@ function initMonitorsSection() {
     }
   }
   syncSectionIcon('icon-monitors', !monitorsCollapsed);
+  syncMonitorsCollapsedGlance();
 
   // Make header clickable/keyboardable to toggle collapse/expand
   const applyMonitorsCollapsed = () => {
@@ -4023,10 +4031,14 @@ function initMonitorsSection() {
       if (divider) {
         divider.style.display = 'none';
       }
+      // Keep a light summary poll so the collapsed glance stays fresh (no list rebuild).
       if (monitorsUpdateInterval) {
         clearInterval(monitorsUpdateInterval);
         monitorsUpdateInterval = null;
       }
+      monitorsUpdateInterval = setInterval(() => {
+        updateMonitorsSummary();
+      }, 30000);
     } else {
       content.classList.remove('collapsed');
       if (section) {
@@ -4039,19 +4051,22 @@ function initMonitorsSection() {
       // The interval will handle data updates
       updateMonitorsHeight();
 
-      // Start interval if not already running (but don't call immediately)
-      if (!monitorsUpdateInterval) {
-        monitorsUpdateInterval = setInterval(() => {
-          updateMonitorsSummary();
-          loadMonitors().then(() => {
-            updateMonitorsHeight();
-          });
-        }, 30000);
+      if (monitorsUpdateInterval) {
+        clearInterval(monitorsUpdateInterval);
+        monitorsUpdateInterval = null;
       }
+      // Start interval if not already running (but don't call immediately)
+      monitorsUpdateInterval = setInterval(() => {
+        updateMonitorsSummary();
+        loadMonitors().then(() => {
+          updateMonitorsHeight();
+        });
+      }, 30000);
     }
     updateMonitorsStatusDot();
     header.setAttribute('aria-expanded', String(!monitorsCollapsed));
     syncSectionIcon('icon-monitors', !monitorsCollapsed);
+    syncMonitorsCollapsedGlance();
   };
 
   wireCollapsibleHeaderA11y(header, {
@@ -4538,6 +4553,108 @@ function applyMonitorsSummaryState({ anyDown, allUp, empty, slowestId }) {
     summary.title = 'Click to open the first monitor';
     summary.setAttribute('aria-label', 'Monitors summary — click to open first site');
   }
+  syncMonitorsCollapsedGlance();
+}
+
+/** Summary / collapsed-glance activate (empty → Add; DOWN → first down; else slowest / first). */
+function activateMonitorsSummaryGlance() {
+  const summary = document.getElementById('monitors-summary');
+  ensureMonitorsSectionExpanded();
+  if (summary?.classList.contains('is-empty')) {
+    void openMonitorsAddFlow();
+    return;
+  }
+  const list = document.getElementById('monitors-list');
+  if (!list) return;
+  const visible = visibleMonitorItems(list);
+  const down = visible.find((el) => el.classList.contains('is-down'));
+  let first = down || visible[0];
+  if (!down && window.__monitorsSlowestId) {
+    const slowRow = list.querySelector(
+      `.monitor-item[data-monitor-id="${CSS.escape(window.__monitorsSlowestId)}"]`
+    );
+    if (slowRow && slowRow.style.display !== 'none') {
+      first = slowRow;
+    }
+  }
+  if (!first) {
+    void openMonitorsAddFlow();
+    return;
+  }
+  const id = first.getAttribute('data-monitor-id');
+  syncMonitorsListTabOrder(list, id);
+  first.focus();
+  if (typeof first.scrollIntoView === 'function') {
+    first.scrollIntoView({ block: 'nearest' });
+  }
+  setMonitorDetailOpen(first, true);
+}
+
+/** Collapsed-section glance under Monitors header (Debug Log / Perplexity parity). */
+function ensureMonitorsCollapsedGlance() {
+  const header = document.getElementById('monitors-header');
+  if (!header) return null;
+  let glance = document.getElementById('monitors-collapsed-glance');
+  if (!glance) {
+    glance = document.createElement('div');
+    glance.id = 'monitors-collapsed-glance';
+    glance.className = 'monitors-collapsed-glance';
+    glance.hidden = true;
+    glance.innerHTML = '<span id="monitors-collapsed-glance-text"></span>';
+    header.insertAdjacentElement('afterend', glance);
+    wireMonitorsCollapsedGlanceClick(glance);
+  }
+  return glance;
+}
+
+function syncMonitorsCollapsedGlance() {
+  const glance = ensureMonitorsCollapsedGlance();
+  if (!glance) return;
+  const summary = document.getElementById('monitors-summary');
+  const summaryText = document.getElementById('monitors-summary-text');
+  const glanceText = document.getElementById('monitors-collapsed-glance-text');
+  if (!monitorsCollapsed) {
+    glance.hidden = true;
+    return;
+  }
+  glance.hidden = false;
+  if (glanceText && summaryText) {
+    glanceText.textContent = summaryText.textContent || 'Monitors';
+  }
+  glance.classList.toggle('has-down', !!summary?.classList.contains('has-down'));
+  glance.classList.toggle('is-all-up', !!summary?.classList.contains('is-all-up'));
+  glance.classList.toggle('is-empty', !!summary?.classList.contains('is-empty'));
+  glance.classList.toggle(
+    'has-slowest-hint',
+    !!summary?.classList.contains('has-slowest-hint')
+  );
+  glance.setAttribute('role', 'button');
+  glance.tabIndex = 0;
+  glance.title = summary?.title || 'Show External / Monitors';
+  const aria = summary?.getAttribute('aria-label');
+  glance.setAttribute(
+    'aria-label',
+    aria || 'Monitors summary — click to expand'
+  );
+}
+
+function wireMonitorsCollapsedGlanceClick(glance) {
+  if (!glance || glance.dataset.monitorsCollapsedGlanceWired === '1') return;
+  glance.dataset.monitorsCollapsedGlanceWired = '1';
+  const activate = () => {
+    activateMonitorsSummaryGlance();
+  };
+  glance.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
 }
 
 /** Expand External / Monitors if collapsed (summary click / empty CTA). */
@@ -4558,6 +4675,7 @@ function ensureMonitorsSectionExpanded() {
   header?.setAttribute('aria-expanded', 'true');
   syncSectionIcon('icon-monitors', true);
   updateMonitorsHeight();
+  syncMonitorsCollapsedGlance();
   if (!monitorsUpdateInterval) {
     monitorsUpdateInterval = setInterval(() => {
       updateMonitorsSummary();
@@ -4742,48 +4860,16 @@ function wireMonitorsSummaryClick() {
   if (!summary || summary.dataset.summaryClick === '1') return;
   summary.dataset.summaryClick = '1';
 
-  const activate = () => {
-    ensureMonitorsSectionExpanded();
-    if (summary.classList.contains('is-empty')) {
-      void openMonitorsAddFlow();
-      return;
-    }
-    const list = document.getElementById('monitors-list');
-    if (!list) return;
-    const visible = visibleMonitorItems(list);
-    const down = visible.find((el) => el.classList.contains('is-down'));
-    let first = down || visible[0];
-    if (!down && window.__monitorsSlowestId) {
-      const slowRow = list.querySelector(
-        `.monitor-item[data-monitor-id="${CSS.escape(window.__monitorsSlowestId)}"]`
-      );
-      if (slowRow && slowRow.style.display !== 'none') {
-        first = slowRow;
-      }
-    }
-    if (!first) {
-      void openMonitorsAddFlow();
-      return;
-    }
-    const id = first.getAttribute('data-monitor-id');
-    syncMonitorsListTabOrder(list, id);
-    first.focus();
-    if (typeof first.scrollIntoView === 'function') {
-      first.scrollIntoView({ block: 'nearest' });
-    }
-    setMonitorDetailOpen(first, true);
-  };
-
   summary.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    activate();
+    activateMonitorsSummaryGlance();
   });
   summary.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     e.preventDefault();
     e.stopPropagation();
-    activate();
+    activateMonitorsSummaryGlance();
   });
 }
 

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.552] - 2026-08-20
+
+### Added
+- External / Monitors **collapsed glance** (Debug Log / Perplexity parity). When the section is collapsed, a summary strip under the header shows up/down (or empty) status with the same wash colors; click or Enter/Space expands and opens first DOWN / slowest / Add. Light 30s summary poll while collapsed.
+
 ## [0.1.551] - 2026-08-20
 
 ### Added
