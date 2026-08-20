@@ -500,6 +500,45 @@ function visibleProcessRows(processList) {
   );
 }
 
+/** Open a process row + details from a Top Processes glance strip. */
+function openProcessFromGlance(pid) {
+  if (!pid) return;
+  if (typeof window.showDetailsProcessesSections === "function") {
+    window.showDetailsProcessesSections();
+  }
+  if (processesFilterMode !== "all") setProcessesFilterMode("all");
+  const list = document.getElementById("process-list");
+  if (!list) return;
+  const row = list.querySelector(
+    `.process-row[data-pid="${CSS.escape(String(pid))}"]`
+  );
+  if (!row) return;
+  const visible = visibleProcessRows(list);
+  visible.forEach((r) =>
+    r.setAttribute("tabindex", r === row ? "0" : "-1")
+  );
+  row.focus();
+  if (typeof row.scrollIntoView === "function") {
+    row.scrollIntoView({ block: "nearest" });
+  }
+  showProcessDetails(parseInt(pid, 10));
+}
+
+/** Highest-GPU process in the current list (Top CPU may differ). */
+function pickTopGpuProcess(processes) {
+  if (!processes || processes.length === 0) return null;
+  let best = null;
+  let bestGpu = -1;
+  for (const p of processes) {
+    const g = Number(p.gpu) || 0;
+    if (g > bestGpu) {
+      best = p;
+      bestGpu = g;
+    }
+  }
+  return best;
+}
+
 /** Top CPU glance under Top Processes header (Monitors slowest-summary parity). */
 function ensureProcessesTopGlance() {
   const header = document.getElementById("processes-header");
@@ -544,29 +583,69 @@ function applyProcessesTopGlanceState({ topPid, topName, topCpu, waiting }) {
 function wireProcessesTopGlanceClick(glance) {
   if (!glance || glance.dataset.topGlanceWired === "1") return;
   glance.dataset.topGlanceWired = "1";
-  const activate = () => {
-    if (typeof window.showDetailsProcessesSections === "function") {
-      window.showDetailsProcessesSections();
-    }
-    const pid = window.__processesTopPid;
-    if (!pid) return;
-    if (processesFilterMode !== "all") setProcessesFilterMode("all");
-    const list = document.getElementById("process-list");
-    if (!list) return;
-    const row = list.querySelector(
-      `.process-row[data-pid="${CSS.escape(pid)}"]`
-    );
-    if (!row) return;
-    const visible = visibleProcessRows(list);
-    visible.forEach((r, i) =>
-      r.setAttribute("tabindex", r === row ? "0" : "-1")
-    );
-    row.focus();
-    if (typeof row.scrollIntoView === "function") {
-      row.scrollIntoView({ block: "nearest" });
-    }
-    showProcessDetails(parseInt(pid, 10));
-  };
+  const activate = () => openProcessFromGlance(window.__processesTopPid);
+  glance.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+  glance.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    e.stopPropagation();
+    activate();
+  });
+}
+
+/** Top GPU glance under Top Processes (Top CPU / GPU-strip parity). */
+function ensureProcessesTopGpuGlance() {
+  ensureProcessesTopGlance();
+  const anchor =
+    document.getElementById("processes-top-glance") ||
+    document.getElementById("processes-header");
+  if (!anchor) return null;
+  let glance = document.getElementById("processes-top-gpu-glance");
+  if (!glance) {
+    glance = document.createElement("div");
+    glance.id = "processes-top-gpu-glance";
+    glance.className = "processes-top-gpu-glance";
+    glance.hidden = true;
+    glance.innerHTML = '<span id="processes-top-gpu-glance-text"></span>';
+    anchor.insertAdjacentElement("afterend", glance);
+    wireProcessesTopGpuGlanceClick(glance);
+  }
+  return glance;
+}
+
+function applyProcessesTopGpuGlanceState({ topPid, topName, topGpu, waiting }) {
+  const glance = ensureProcessesTopGpuGlance();
+  if (!glance) return;
+  const text = document.getElementById("processes-top-gpu-glance-text");
+  if (waiting || topPid == null || !topName) {
+    glance.hidden = true;
+    window.__processesTopGpuPid = null;
+    glance.classList.remove("is-hot");
+    return;
+  }
+  window.__processesTopGpuPid = String(topPid);
+  glance.hidden = false;
+  const gpuNum = Number(topGpu) || 0;
+  const gpuStr = gpuNum >= 0.1 ? `${gpuNum.toFixed(1)}%` : "—";
+  if (text) text.textContent = `Top GPU · ${topName} ${gpuStr}`;
+  glance.classList.toggle("is-hot", gpuNum >= 15);
+  glance.setAttribute("role", "button");
+  glance.tabIndex = 0;
+  glance.title = `Click to open ${topName} details`;
+  glance.setAttribute(
+    "aria-label",
+    `Top GPU process ${topName} at ${gpuStr} — click to open details`
+  );
+}
+
+function wireProcessesTopGpuGlanceClick(glance) {
+  if (!glance || glance.dataset.topGpuGlanceWired === "1") return;
+  glance.dataset.topGpuGlanceWired = "1";
+  const activate = () => openProcessFromGlance(window.__processesTopGpuPid);
   glance.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -1462,6 +1541,13 @@ async function refresh() {
         topPid: topProc?.pid ?? null,
         topName: topProc?.name ?? null,
         topCpu: topProc?.cpu ?? null,
+        waiting: processes.length === 0,
+      });
+      const topGpuProc = pickTopGpuProcess(processes);
+      applyProcessesTopGpuGlanceState({
+        topPid: topGpuProc?.pid ?? null,
+        topName: topGpuProc?.name ?? null,
+        topGpu: topGpuProc?.gpu ?? null,
         waiting: processes.length === 0,
       });
 

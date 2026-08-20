@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.541] - 2026-08-20
+
+### Added
+- Top Processes **Top GPU glance** — shows the highest-GPU process in the list (may differ from Top CPU). Click or Enter/Space opens details. Soft amber wash when GPU ≥ 15%.
+
 ## [0.1.540] - 2026-08-20
 
 ### Added
