@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Menu bar **GHz** amber cue when cached frequency ≥ 3.5 GHz (power-strip freq is-hot parity) — **v0.1.572**
 - Menu bar **Temp** amber cue when cached CPU ≥ 70°C (power-strip Temp is-hot parity) — **v0.1.571**
 - Menu bar **GPU** amber cue when usage ≥ 15% (power-strip GPU is-hot parity) — **v0.1.570**
 - Menu bar **CPU** amber cue when usage ≥ 50% (power-strip CPU is-hot parity) — **v0.1.569**
