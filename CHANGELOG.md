@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.584] - 2026-08-22
+
+### Added
+- Agent Ops **row Copied badge + first/last chrome** — `c` / copy-id chip shows a green **Copied** badge on the selected row (Top Processes / Monitors parity; wash was already there). With no selection, ↑ / k / PgUp jumps to the last row and ↓ / j / PgDn to the first (Monitors listbox chrome parity). Soft kb hint updated.
+
 ## [0.1.583] - 2026-08-22
 
 ### Added

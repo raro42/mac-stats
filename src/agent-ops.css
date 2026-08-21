@@ -928,6 +928,7 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 }
 
 .ops-row {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px;
@@ -971,13 +972,32 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   box-shadow: 0 2px 8px color-mix(in srgb, var(--accent, #007aff) 12%, transparent);
 }
 
-/* c copy-id flash (Top Processes Copied parity). */
+/* c / chip copy — green Copied wash + badge (Top Processes / Monitors parity). */
 .ops-row.is-copied,
 .ops-row.is-selected.is-copied,
 .ops-row.is-selected.is-copied:hover {
   border-color: color-mix(in srgb, #34c759 48%, transparent);
   background: color-mix(in srgb, #34c759 14%, transparent);
   box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 18%, transparent);
+}
+
+.ops-row.is-copied::after {
+  content: 'Copied';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+  color: var(--text, #fff);
+  background: color-mix(in srgb, #34c759 55%, rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+  z-index: 4;
 }
 
 .ops-row-title { font-size: 13px; font-weight: 600; }

@@ -525,7 +525,7 @@ function ensureOpsKeyboardHint() {
         tabs.insertAdjacentElement('afterend', hint);
     }
     hint.textContent =
-        'Tips: 0 overview · digits + counts on tabs · overview head counts · Sessions All/Live/Files · filter N/M + Clear · ←/→ · ↑/↓ j/k · PgUp/PgDn Home/End · Space/Enter · c copy id · / Esc · r refresh · R digest · ?';
+        'Tips: 0 overview · digits + counts on tabs · overview head counts · Sessions All/Live/Files · filter N/M + Clear · ←/→ · ↑/↓ j/k (no selection → first/last) · PgUp/PgDn Home/End · Space/Enter · c copy id (Copied) · / Esc · r refresh · R digest · ?';
 }
 
 /** Hermes-style: ? flashes the keyboard tips row when not typing. */
@@ -4054,6 +4054,7 @@ function tryOpsArrowMoveSelection(e) {
     if (!rows.length) return false;
     let idx = rows.findIndex((r) => r.classList.contains('is-selected'));
     const page = 5;
+    // No selection: ↓/j/Home/PgDn → first; ↑/k/End/PgUp → last (Monitors listbox chrome).
     if (e.key === 'Home') {
         idx = 0;
     } else if (e.key === 'End') {
@@ -4061,12 +4062,12 @@ function tryOpsArrowMoveSelection(e) {
     } else if (e.key === 'PageDown') {
         idx = idx < 0 ? 0 : Math.min(idx + page, rows.length - 1);
     } else if (e.key === 'PageUp') {
-        idx = idx < 0 ? 0 : Math.max(idx - page, 0);
+        idx = idx < 0 ? rows.length - 1 : Math.max(idx - page, 0);
     } else if (e.key === 'ArrowDown' || e.key === 'j') {
         idx = idx < 0 ? 0 : Math.min(idx + 1, rows.length - 1);
     } else {
         // ArrowUp or k
-        idx = idx < 0 ? 0 : Math.max(idx - 1, 0);
+        idx = idx < 0 ? rows.length - 1 : Math.max(idx - 1, 0);
     }
     panel.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
     const next = rows[idx];
