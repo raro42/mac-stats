@@ -10757,6 +10757,26 @@ function applyDiskCleanupPathCopyFlash(root) {
   btn.title = 'Copied';
 }
 
+/** Brief Copied wash on scope/category row (Debug Log / Perplexity / AI Chat parity). */
+function flashDiskCleanupRowCopied(row) {
+  if (!row) return;
+  if (row._diskCleanupCopiedTimer) {
+    clearTimeout(row._diskCleanupCopiedTimer);
+    row._diskCleanupCopiedTimer = null;
+  }
+  row.classList.add('is-just-copied');
+  const prevTitle = row.getAttribute('title') || '';
+  row.title = 'Copied';
+  row.setAttribute('aria-label', 'Copied');
+  row._diskCleanupCopiedTimer = setTimeout(() => {
+    row.classList.remove('is-just-copied');
+    row._diskCleanupCopiedTimer = null;
+    if (prevTitle) row.title = prevTitle;
+    else row.removeAttribute('title');
+    row.removeAttribute('aria-label');
+  }, 1600);
+}
+
 /** Keyboard `c` / click-to-copy path (Top Processes name + Monitors URL parity). */
 async function copyDiskCleanupPathFromRow(row) {
   if (!row) return false;
@@ -10768,7 +10788,12 @@ async function copyDiskCleanupPathFromRow(row) {
       ''
   ).trim();
   if (!value) return false;
-  if (btn && btn.classList.contains('is-just-saved')) return true;
+  if (
+    row.classList.contains('is-just-copied') ||
+    (btn && btn.classList.contains('is-just-saved'))
+  ) {
+    return true;
+  }
   const ok = await copyTextToClipboard(value);
   if (!ok) {
     alert('Could not copy path.');
@@ -10776,6 +10801,7 @@ async function copyDiskCleanupPathFromRow(row) {
   }
   requestDiskCleanupPathCopyFlash(value);
   applyDiskCleanupPathCopyFlash(row);
+  flashDiskCleanupRowCopied(row);
   return true;
 }
 
@@ -10856,6 +10882,7 @@ function wireDiskCleanupScopesKeyboard() {
   scopesEl.dataset.keyboardNav = '1';
   scopesEl.setAttribute('role', 'listbox');
   scopesEl.setAttribute('aria-label', 'Cleanup scopes');
+  if (!scopesEl.hasAttribute('tabindex')) scopesEl.setAttribute('tabindex', '0');
 
   scopesEl.addEventListener('click', (e) => {
     const row = e.target && e.target.closest && e.target.closest('.disk-cleanup-scope-row');
@@ -10882,7 +10909,23 @@ function wireDiskCleanupScopesKeyboard() {
 
   scopesEl.addEventListener('keydown', (e) => {
     const row = e.target && e.target.closest && e.target.closest('.disk-cleanup-scope-row');
-    if (!row || !scopesEl.contains(row)) return;
+    if (!row || !scopesEl.contains(row)) {
+      // First arrow/j from listbox chrome focuses first/last scope (Debug Log parity).
+      if (e.target !== scopesEl) return;
+      const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
+      if (!rows.length) return;
+      let next = -1;
+      if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'Home') next = 0;
+      else if (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'End') next = rows.length - 1;
+      else return;
+      e.preventDefault();
+      syncDiskCleanupScopeTabOrder(scopesEl, next);
+      rows[next].focus();
+      if (typeof rows[next].scrollIntoView === 'function') {
+        rows[next].scrollIntoView({ block: 'nearest' });
+      }
+      return;
+    }
     const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
     const idx = rows.indexOf(row);
     if (idx < 0) return;
@@ -11025,6 +11068,7 @@ function wireDiskCleanupListKeyboard() {
   listEl.dataset.keyboardNav = '1';
   listEl.setAttribute('role', 'listbox');
   listEl.setAttribute('aria-label', 'Cleanup categories');
+  if (!listEl.hasAttribute('tabindex')) listEl.setAttribute('tabindex', '0');
 
   listEl.addEventListener('click', (e) => {
     const row = e.target && e.target.closest && e.target.closest('.disk-cleanup-item');
@@ -11043,7 +11087,24 @@ function wireDiskCleanupListKeyboard() {
 
   listEl.addEventListener('keydown', (e) => {
     const row = e.target && e.target.closest && e.target.closest('.disk-cleanup-item');
-    if (!row || !listEl.contains(row)) return;
+    if (!row || !listEl.contains(row)) {
+      // First arrow/j from listbox chrome focuses first/last category (Debug Log parity).
+      if (e.target !== listEl) return;
+      const rows = visibleDiskCleanupItems(listEl);
+      if (!rows.length) return;
+      let next = -1;
+      if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'Home') next = 0;
+      else if (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'End') next = rows.length - 1;
+      else return;
+      e.preventDefault();
+      const prefer = parseInt(rows[next].getAttribute('data-item-idx') || '0', 10);
+      syncDiskCleanupItemTabOrder(listEl, prefer);
+      rows[next].focus();
+      if (typeof rows[next].scrollIntoView === 'function') {
+        rows[next].scrollIntoView({ block: 'nearest' });
+      }
+      return;
+    }
     if (row.style.display === 'none') return;
     const rows = visibleDiskCleanupItems(listEl);
     const idx = rows.indexOf(row);

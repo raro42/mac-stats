@@ -4161,6 +4161,7 @@ button.monitor-detail-url.is-just-saved {
 }
 
 .disk-cleanup-item {
+  position: relative;
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
@@ -4184,6 +4185,38 @@ button.monitor-detail-url.is-just-saved {
 .disk-cleanup-item.is-selected {
   border-color: color-mix(in srgb, var(--accent, #0a84ff) 28%, transparent);
   background: color-mix(in srgb, var(--accent, #0a84ff) 6%, transparent);
+}
+
+.disk-cleanup-item.is-just-copied,
+.disk-cleanup-scope-row.is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, transparent);
+  border-color: color-mix(in srgb, #34c759 32%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 28%, transparent);
+}
+
+.disk-cleanup-item.is-just-copied::after,
+.disk-cleanup-scope-row.is-just-copied::after {
+  content: 'Copied';
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+  color: var(--text, #fff);
+  background: color-mix(in srgb, #34c759 55%, rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+  z-index: 4;
+}
+
+.disk-cleanup-item.has-reclaim.is-just-copied {
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #34c759 70%, transparent),
+    0 0 0 1px color-mix(in srgb, #34c759 28%, transparent);
 }
 
 .disk-cleanup-item.has-reclaim {
@@ -4395,6 +4428,7 @@ button.monitor-detail-url.is-just-saved {
 }
 
 .disk-cleanup-scope-row {
+  position: relative;
   display: grid;
   grid-template-columns: auto 1fr auto auto auto;
   gap: 8px 10px;

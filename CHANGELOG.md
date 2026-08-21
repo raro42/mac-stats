@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.580] - 2026-08-21
+
+### Added
+- Disk Cleanup **row Copied flash + listbox chrome keyboard** — click path / `c` shows a green **Copied** wash on the scope or category row (Debug Log / Perplexity / AI Chat parity; path button still flashes). Focus the scopes or categories listbox, then ↑↓ / j k / Home / End to jump to the first or last row (Debug Log chrome parity).
+
 ## [0.1.579] - 2026-08-21
 
 ### Added
