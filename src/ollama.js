@@ -1042,6 +1042,88 @@ function flashChatAnswerGlanceCopied(glance) {
   }, 1600);
 }
 
+/** Plain text for a chat bubble (stored at create time; falls back to visible text). */
+function getChatMessageCopyText(el) {
+  if (!el) return '';
+  const stored = (el.dataset && el.dataset.copyText) || '';
+  if (stored.trim()) return stored.trim();
+  return String(el.innerText || el.textContent || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function flashChatMessageCopied(el) {
+  if (!el) return;
+  if (el._msgCopiedTimer) {
+    clearTimeout(el._msgCopiedTimer);
+    el._msgCopiedTimer = null;
+  }
+  el.classList.add('is-just-copied');
+  const prevTitle = el.title || '';
+  el.title = 'Copied';
+  el.setAttribute('aria-label', 'Copied');
+  el._msgCopiedTimer = setTimeout(() => {
+    el.classList.remove('is-just-copied');
+    el._msgCopiedTimer = null;
+    el.title = prevTitle || 'Click to copy message';
+    const role = el.classList.contains('user') ? 'your' : 'assistant';
+    el.setAttribute('aria-label', `Copy ${role} message`);
+  }, 1600);
+}
+
+async function copyChatMessageFromUi(el) {
+  if (!el || el.classList.contains('is-just-copied') || chatSendInFlight) return false;
+  // Let the user finish a drag-select without stealing the clipboard.
+  try {
+    const sel = window.getSelection && window.getSelection();
+    if (sel && sel.rangeCount > 0 && String(sel.toString() || '').trim()) {
+      const anchor = sel.anchorNode;
+      if (anchor && el.contains(anchor)) return false;
+    }
+  } catch (_) {
+    /* ignore */
+  }
+  const value = getChatMessageCopyText(el);
+  if (!value) return false;
+  const ok = await copyChatTextToClipboard(value);
+  if (ok) flashChatMessageCopied(el);
+  return ok;
+}
+
+/** Wire click / Enter / Space copy on chat bubbles (last-answer glance parity). */
+function wireChatMessagesCopy(container) {
+  if (!container || container.dataset.copyWired === '1') return;
+  container.dataset.copyWired = '1';
+  const activate = (msg) => {
+    if (!msg || msg.classList.contains('thinking')) return;
+    void copyChatMessageFromUi(msg);
+  };
+  container.addEventListener('click', (e) => {
+    const msg = e.target && e.target.closest && e.target.closest('.chat-message');
+    if (!msg || !container.contains(msg)) return;
+    if (e.target.closest('a, button, input, textarea, select')) return;
+    activate(msg);
+  });
+  container.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const msg = e.target && e.target.closest && e.target.closest('.chat-message');
+    if (!msg || !container.contains(msg)) return;
+    e.preventDefault();
+    activate(msg);
+  });
+}
+
+function decorateChatMessageForCopy(messageDiv, role, plainText) {
+  if (!messageDiv) return;
+  const text = String(plainText ?? '').trim();
+  if (text) messageDiv.dataset.copyText = text;
+  messageDiv.setAttribute('role', 'button');
+  messageDiv.tabIndex = 0;
+  messageDiv.title = 'Click to copy message';
+  const who = role === 'user' ? 'your' : 'assistant';
+  messageDiv.setAttribute('aria-label', `Copy ${who} message`);
+}
+
 /** Last-answer glance under AI Chat — click copies reply (Top Processes / Monitors parity). */
 function ensureChatAnswerGlance() {
   const turn = ensureChatTurnGlance();
@@ -1946,6 +2028,11 @@ function addChatMessage(role, content, isHtml = false) {
 
   if (isHtml) {
     messageDiv.innerHTML = content;
+    decorateChatMessageForCopy(
+      messageDiv,
+      role,
+      String(messageDiv.innerText || messageDiv.textContent || '').trim()
+    );
   } else if (role === 'assistant' && typeof marked !== 'undefined') {
     try {
       marked.setOptions({ breaks: true, gfm: true });
@@ -1953,14 +2040,18 @@ function addChatMessage(role, content, isHtml = false) {
       markdownWrapper.className = 'markdown';
       markdownWrapper.innerHTML = marked.parse(String(content ?? ''));
       messageDiv.appendChild(markdownWrapper);
+      decorateChatMessageForCopy(messageDiv, role, content);
     } catch (err) {
       console.warn('[Ollama] markdown render failed, falling back to text', err);
       messageDiv.textContent = content;
+      decorateChatMessageForCopy(messageDiv, role, content);
     }
   } else {
     messageDiv.textContent = content;
+    decorateChatMessageForCopy(messageDiv, role, content);
   }
 
+  wireChatMessagesCopy(messagesContainer);
   messagesContainer.appendChild(messageDiv);
   applyChatListFilter();
   if (messageDiv.style.display !== 'none') {
@@ -1982,12 +2073,14 @@ function setAssistantMessageContent(el, content) {
       markdownWrapper.className = 'markdown';
       markdownWrapper.innerHTML = marked.parse(String(content ?? ''));
       el.appendChild(markdownWrapper);
+      decorateChatMessageForCopy(el, 'assistant', content);
       return;
     } catch (_) {
       /* fall through */
     }
   }
   el.textContent = content;
+  decorateChatMessageForCopy(el, 'assistant', content);
 }
 
 /**
@@ -2000,6 +2093,8 @@ function appendToLastAssistantMessage(text) {
   const last = assistantMessages[assistantMessages.length - 1];
   if (!last) return;
   last.appendChild(document.createTextNode(text));
+  const prev = (last.dataset && last.dataset.copyText) || '';
+  last.dataset.copyText = `${prev}${text}`;
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
@@ -2087,6 +2182,7 @@ function initOllamaChatListeners() {
   if (!chatInput.placeholder || chatInput.placeholder.includes('system metrics')) {
     chatInput.placeholder = 'Ask about metrics, tasks, or the web…';
   }
+  wireChatMessagesCopy(document.getElementById('chat-messages'));
   ensureChatEmptyHint();
   updateChatClearButton();
   

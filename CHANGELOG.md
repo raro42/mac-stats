@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.576] - 2026-08-21
+
+### Added
+- AI Chat **click-to-copy on messages** — click (or Enter / Space when focused) copies that bubble; brief **Copied** flash. Drag-select still works without stealing the clipboard. Matches last-answer glance / Top Processes / Monitors copy parity.
+
 ## [0.1.575] - 2026-08-21
 
 ### Added

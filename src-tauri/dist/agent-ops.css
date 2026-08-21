@@ -2671,6 +2671,48 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
 }
 
+/* AI Chat — message click-to-copy (last-answer glance / Top Processes parity) */
+.chat-message[role='button'] {
+  cursor: pointer;
+  position: relative;
+  outline: none;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.chat-message[role='button']:hover {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+}
+
+.chat-message[role='button']:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
+}
+
+.chat-message[role='button'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 35%, transparent);
+}
+
+.chat-message[role='button'].is-just-copied::after {
+  content: 'Copied';
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+  color: var(--text, #fff);
+  background: color-mix(in srgb, #34c759 55%, rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+  z-index: 4;
+}
+
 /* AI Chat — last-answer glance (click copies; Top Processes / Monitors parity) */
 .chat-answer-glance {
   display: flex;
