@@ -1821,9 +1821,13 @@ body {
   box-shadow: 0 2px 8px color-mix(in srgb, #000 6%, transparent);
   transform: translateY(-1px);
 }
-.perplexity-result-item:focus-within {
+.perplexity-result-item:focus-within,
+.perplexity-result-item.is-selected {
   border-color: color-mix(in srgb, var(--accent, #007aff) 35%, transparent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #007aff) 14%, transparent);
+}
+.perplexity-result-item.is-selected {
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, transparent);
 }
 .perplexity-result-item a {
   color: var(--accent);

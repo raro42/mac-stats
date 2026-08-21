@@ -8131,6 +8131,203 @@ function updatePerplexityConfigStatus(statusText, elId) {
   if (el) el.textContent = statusText;
 }
 
+/** Visible Perplexity result cards for keyboard nav (weather card skipped). */
+function visiblePerplexityResultItems(resultsEl) {
+  if (!resultsEl) return [];
+  return Array.from(resultsEl.querySelectorAll('.perplexity-result-item')).filter((el) => {
+    if (el.style.display === 'none') return false;
+    return true;
+  });
+}
+
+/** Soft tip above results (Monitors / AI Chat kb-hint parity). */
+function ensurePerplexityResultsKbHint(resultsEl, show) {
+  if (!resultsEl || !resultsEl.parentNode) return;
+  let hint = document.getElementById('perplexity-kb-hint');
+  if (!show) {
+    hint?.remove();
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'perplexity-kb-hint';
+    hint.id = 'perplexity-kb-hint';
+    resultsEl.parentNode.insertBefore(hint, resultsEl);
+  }
+  hint.textContent =
+    '↑↓ / j k · PgUp/PgDn · Home/End select · Enter opens · c copies URL · Esc clears';
+}
+
+function syncPerplexityResultsTabOrder(resultsEl, preferEl) {
+  const items = visiblePerplexityResultItems(resultsEl);
+  ensurePerplexityResultsKbHint(resultsEl, items.length > 0);
+  if (!items.length) {
+    resultsEl?.querySelectorAll('.perplexity-result-item.is-selected').forEach((el) => {
+      el.classList.remove('is-selected');
+      el.setAttribute('aria-selected', 'false');
+    });
+    return;
+  }
+  let activeIdx = preferEl ? items.indexOf(preferEl) : -1;
+  if (activeIdx < 0) {
+    activeIdx = items.findIndex((el) => el.classList.contains('is-selected'));
+  }
+  if (activeIdx < 0) {
+    const focused = document.activeElement;
+    activeIdx = focused && items.includes(focused) ? items.indexOf(focused) : 0;
+  }
+  items.forEach((el, i) => {
+    const on = i === activeIdx;
+    el.classList.toggle('is-selected', on);
+    el.setAttribute('aria-selected', on ? 'true' : 'false');
+    el.tabIndex = on ? 0 : -1;
+  });
+}
+
+function clearPerplexityResultSelection(resultsEl) {
+  if (!resultsEl) return;
+  resultsEl.querySelectorAll('.perplexity-result-item.is-selected').forEach((el) => {
+    el.classList.remove('is-selected');
+    el.setAttribute('aria-selected', 'false');
+  });
+  const items = visiblePerplexityResultItems(resultsEl);
+  items.forEach((el, i) => {
+    el.tabIndex = i === 0 ? 0 : -1;
+  });
+  if (document.activeElement && resultsEl.contains(document.activeElement)) {
+    document.activeElement.blur();
+  }
+}
+
+function flashPerplexityResultCopied(el) {
+  if (!el) return;
+  if (el._perpCopiedTimer) {
+    clearTimeout(el._perpCopiedTimer);
+    el._perpCopiedTimer = null;
+  }
+  el.classList.add('is-just-copied');
+  const prevTitle = el.getAttribute('title') || '';
+  el.title = 'Copied';
+  el.setAttribute('aria-label', 'Copied');
+  el._perpCopiedTimer = setTimeout(() => {
+    el.classList.remove('is-just-copied');
+    el._perpCopiedTimer = null;
+    if (prevTitle) el.title = prevTitle;
+    else el.removeAttribute('title');
+    const url = el.dataset.url || '';
+    el.setAttribute(
+      'aria-label',
+      url ? `Search result — Enter opens · c copies URL` : 'Search result'
+    );
+  }, 1600);
+}
+
+async function copyPerplexityResultUrl(item) {
+  if (!item) return false;
+  const url = String(item.dataset.url || item.querySelector?.('a')?.href || '').trim();
+  if (!url || url === '#') return false;
+  const ok = await copyTextToClipboard(url);
+  if (ok) flashPerplexityResultCopied(item);
+  return ok;
+}
+
+function openPerplexityResultUrl(item) {
+  if (!item) return;
+  const url = String(item.dataset.url || item.querySelector?.('a')?.href || '').trim();
+  if (!url || url === '#') return;
+  try {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  } catch (_) {
+    const a = item.querySelector('a[href]');
+    if (a) a.click();
+  }
+}
+
+function decoratePerplexityResultItems(resultsEl) {
+  if (!resultsEl) return;
+  visiblePerplexityResultItems(resultsEl).forEach((el) => {
+    el.setAttribute('role', 'option');
+    if (!el.hasAttribute('tabindex')) el.tabIndex = -1;
+    el.setAttribute('aria-selected', 'false');
+    el.title = 'Enter opens · c copies URL · ↑↓ / j k to move · Esc clears';
+    const url = el.dataset.url || el.querySelector?.('a')?.href || '';
+    if (url && !el.dataset.url) el.dataset.url = url;
+    el.setAttribute('aria-label', 'Search result — Enter opens · c copies URL');
+  });
+  syncPerplexityResultsTabOrder(resultsEl);
+}
+
+/** Wire j/k list nav + Enter open + c copy on Perplexity results (Monitors parity). */
+function wirePerplexityResultsKeyboard(resultsEl) {
+  if (!resultsEl || resultsEl.dataset.keyboardNav === '1') return;
+  resultsEl.dataset.keyboardNav = '1';
+  resultsEl.setAttribute('role', 'listbox');
+  resultsEl.setAttribute('aria-label', 'Perplexity search results');
+
+  resultsEl.addEventListener('click', (e) => {
+    const item = e.target && e.target.closest && e.target.closest('.perplexity-result-item');
+    if (!item || !resultsEl.contains(item)) return;
+    syncPerplexityResultsTabOrder(resultsEl, item);
+    // Keep native <a> navigation; still focus the card for keyboard follow-up.
+    if (!e.target.closest || !e.target.closest('a')) {
+      item.focus();
+    }
+  });
+
+  resultsEl.addEventListener('keydown', (e) => {
+    const item = e.target && e.target.closest && e.target.closest('.perplexity-result-item');
+    if (!item || !resultsEl.contains(item)) return;
+    if (item.style.display === 'none') return;
+    const items = visiblePerplexityResultItems(resultsEl);
+    const idx = items.indexOf(item);
+    if (idx < 0) return;
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openPerplexityResultUrl(item);
+      return;
+    }
+
+    if (
+      (e.key === 'c' || e.key === 'C') &&
+      !e.metaKey &&
+      !e.ctrlKey &&
+      !e.altKey
+    ) {
+      e.preventDefault();
+      void copyPerplexityResultUrl(item);
+      return;
+    }
+
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      if (!item.classList.contains('is-selected') && document.activeElement !== item) {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      clearPerplexityResultSelection(resultsEl);
+      return;
+    }
+
+    let next = -1;
+    const page = 5;
+    if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, items.length - 1);
+    else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
+    else if (e.key === 'PageDown') next = Math.min(idx + page, items.length - 1);
+    else if (e.key === 'PageUp') next = Math.max(idx - page, 0);
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = items.length - 1;
+    else return;
+    e.preventDefault();
+    if (next < 0 || next === idx) return;
+    syncPerplexityResultsTabOrder(resultsEl, items[next]);
+    items[next].focus();
+    if (typeof items[next].scrollIntoView === 'function') {
+      items[next].scrollIntoView({ block: 'nearest' });
+    }
+  });
+}
+
 /** @type {boolean} */
 let perplexityConfigured = false;
 /** @type {boolean} */
@@ -8547,6 +8744,7 @@ function initPerplexitySection() {
       const invoke = getInvoke();
       if (!invoke) {
         resultsEl.innerHTML = '<div class="perplexity-empty" role="status">App not ready.</div>';
+        ensurePerplexityResultsKbHint(resultsEl, false);
         return;
       }
       if (!perplexityConfigured) {
@@ -8558,6 +8756,7 @@ function initPerplexitySection() {
       perplexityLastSearch = { query: query, count: 0 };
       setPerplexitySearchBusy(true);
       resultsEl.innerHTML = '<div class="perplexity-empty" role="status">Searching…</div>';
+      ensurePerplexityResultsKbHint(resultsEl, false);
       let searchOk = false;
       try {
         const resp = await invoke('perplexity_search', { request: { query: query, max_results: 10 } });
@@ -8590,6 +8789,7 @@ function initPerplexitySection() {
         if (!resp.results || resp.results.length === 0) {
           resultsEl.innerHTML = weatherHtml ||
             '<div class="perplexity-empty" role="status">No results.</div>';
+          ensurePerplexityResultsKbHint(resultsEl, false);
           perplexityLastSearch = {
             query: query,
             count: 0,
@@ -8626,12 +8826,13 @@ function initPerplexitySection() {
           } catch (_) {}
           const date = r.date || r.last_updated || '';
           const meta = [domain, date].filter(Boolean).join(' · ');
-          return '<article class="perplexity-result-item">' +
+          return '<article class="perplexity-result-item" role="option" tabindex="-1" aria-selected="false" data-url="' + url + '" title="Enter opens · c copies URL · ↑↓ / j k to move · Esc clears" aria-label="Search result — Enter opens · c copies URL">' +
             '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + title + '</a>' +
             (meta ? '<div class="perplexity-result-meta">' + esc(meta) + '</div>' : '') +
             snippetHtml +
             '</article>';
         }).join('');
+        decoratePerplexityResultItems(resultsEl);
         perplexityLastSearch = {
           query: query,
           count: resp.results.length,
@@ -8640,12 +8841,15 @@ function initPerplexitySection() {
         searchOk = true;
       } catch (err) {
         resultsEl.innerHTML = '<div class="perplexity-empty perplexity-empty-error" role="alert">Error: ' + String(err) + '</div>';
+        ensurePerplexityResultsKbHint(resultsEl, false);
         perplexityLastSearch = { query: query, count: 0, error: true };
       } finally {
         setPerplexitySearchBusy(false);
         if (searchOk) flashPerplexitySearched();
       }
     };
+
+    wirePerplexityResultsKeyboard(resultsEl);
 
     searchBtn.addEventListener('click', () => {
       void runPerplexitySearch();

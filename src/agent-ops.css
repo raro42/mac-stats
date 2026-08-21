@@ -1964,6 +1964,61 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, #ff3b30 8%, transparent);
 }
 
+/* Perplexity results — keyboard hint + selected wash (Monitors / AI Chat parity) */
+.perplexity-kb-hint {
+  margin: 6px 0 8px;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.perplexity-section.collapsed .perplexity-kb-hint,
+#perplexity-content.collapsed .perplexity-kb-hint {
+  display: none;
+}
+
+.perplexity-result-item[role='option'] {
+  cursor: pointer;
+  position: relative;
+  outline: none;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.perplexity-result-item[role='option']:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
+}
+
+.perplexity-result-item[role='option'].is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.perplexity-result-item[role='option'].is-just-copied {
+  background: color-mix(in srgb, #34c759 12%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 35%, transparent);
+}
+
+.perplexity-result-item[role='option'].is-just-copied::after {
+  content: 'Copied';
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+  color: var(--text, #fff);
+  background: color-mix(in srgb, #34c759 55%, rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+  z-index: 4;
+}
+
 .perplexity-result-item:hover {
   background: color-mix(in srgb, #0a84ff 6%, transparent);
   border-color: color-mix(in srgb, #0a84ff 22%, transparent);

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.578] - 2026-08-21
+
+### Added
+- Perplexity Search **result keyboard nav** — ↑↓ / j k, PgUp/PgDn, Home/End move between result cards; selected accent wash; Enter / Space opens the URL; `c` copies with a brief **Copied** flash; Esc clears. Soft kb hint above the list. Matches Monitors / AI Chat / Top Processes listbox parity.
+
 ## [0.1.577] - 2026-08-21
 
 ### Added
