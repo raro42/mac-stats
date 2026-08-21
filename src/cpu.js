@@ -1485,6 +1485,8 @@ async function refresh() {
         });
       }
       if (ramStripCell) {
+        const hot = pct != null && pct >= 85;
+        ramStripCell.classList.toggle("is-hot", hot);
         const extra =
           usedText !== "—" && totalText !== "—"
             ? ` (${usedText} of ${totalText})`
@@ -2266,6 +2268,10 @@ function ensureRamStripStyles() {
     }
     .ram-info:focus-visible {
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+    }
+    .ram-info.is-hot {
+      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
     }
     .ram-label {
       color: var(--muted);

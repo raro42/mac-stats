@@ -745,6 +745,10 @@ fn run_internal(open_cpu_window: bool) {
                     if metrics.disk >= 85.0 {
                         text.push_str("\nSSD");
                     }
+                    // Amber RAM cue when memory used ≥ 85% (Details / power-strip is-hot parity).
+                    if metrics.ram >= 85.0 {
+                        text.push_str("\nRAM");
+                    }
 
                     // Store update in static variable
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {

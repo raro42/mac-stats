@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.568] - 2026-08-21
+
+### Added
+- Menu bar **RAM** cue (amber) when memory used is **≥ 85%** — same threshold as the Details collapsed glance and the power-strip RAM hot wash. Hidden when below 85%.
+- CPU metrics power-strip **RAM** cell gets a soft amber wash when RAM ≥ 85% (SSD hot-wash parity).
+
 ## [0.1.567] - 2026-08-21
 
 ### Added
