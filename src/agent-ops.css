@@ -2671,7 +2671,20 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, var(--accent, #007aff) 6%, transparent);
 }
 
-/* AI Chat — message click-to-copy (last-answer glance / Top Processes parity) */
+/* AI Chat — message list keyboard hint (Monitors / Top Processes parity) */
+.chat-kb-hint {
+  margin: 6px 0 8px;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.ollama-section.collapsed .chat-kb-hint,
+#ollama-content.collapsed .chat-kb-hint {
+  display: none;
+}
+
+/* AI Chat — message click-to-copy + j/k selection (Monitors / Top Processes parity) */
+.chat-message[role='option'],
 .chat-message[role='button'] {
   cursor: pointer;
   position: relative;
@@ -2682,19 +2695,30 @@ textarea.ops-agent-editor.is-dirty {
     border-color 0.2s ease;
 }
 
+.chat-message[role='option']:hover,
 .chat-message[role='button']:hover {
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
 }
 
+.chat-message[role='option']:focus-visible,
 .chat-message[role='button']:focus-visible {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #007aff) 45%, transparent);
 }
 
+.chat-message[role='option'].is-selected,
+.chat-message[role='button'].is-selected {
+  border-color: color-mix(in srgb, var(--accent, #007aff) 22%, transparent);
+  background: color-mix(in srgb, var(--accent, #007aff) 5%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #007aff) 18%, transparent);
+}
+
+.chat-message[role='option'].is-just-copied,
 .chat-message[role='button'].is-just-copied {
   background: color-mix(in srgb, #34c759 12%, transparent);
   box-shadow: 0 0 0 1px color-mix(in srgb, #34c759 35%, transparent);
 }
 
+.chat-message[role='option'].is-just-copied::after,
 .chat-message[role='button'].is-just-copied::after {
   content: 'Copied';
   position: absolute;

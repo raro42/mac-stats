@@ -476,6 +476,7 @@ function clearConversationHistory() {
   if (container) {
     container.innerHTML = '';
     ensureChatEmptyHint();
+    ensureChatMessagesKbHint(container, false);
   }
   applyChatListFilter();
   updateChatClearButton();
@@ -592,6 +593,18 @@ function applyChatListFilter() {
   });
 
   ensureChatFilterMissState(container, visible === 0);
+  // Drop selection if the active bubble was filtered out.
+  const selected = container.querySelector('.chat-message.is-selected');
+  if (selected && selected.style.display === 'none') {
+    clearChatMessageSelection(container);
+  } else if (visible > 0) {
+    syncChatMessagesTabOrder(
+      container,
+      selected && selected.style.display !== 'none' ? selected : null
+    );
+  } else {
+    ensureChatMessagesKbHint(container, false);
+  }
 }
 
 function getChatClearButton() {
@@ -1065,9 +1078,9 @@ function flashChatMessageCopied(el) {
   el._msgCopiedTimer = setTimeout(() => {
     el.classList.remove('is-just-copied');
     el._msgCopiedTimer = null;
-    el.title = prevTitle || 'Click to copy message';
+    el.title = prevTitle || 'Click to copy · ↑↓ / j k to move · Esc clears';
     const role = el.classList.contains('user') ? 'your' : 'assistant';
-    el.setAttribute('aria-label', `Copy ${role} message`);
+    el.setAttribute('aria-label', `${role} message — copy with Enter or c`);
   }, 1600);
 }
 
@@ -1090,10 +1103,82 @@ async function copyChatMessageFromUi(el) {
   return ok;
 }
 
-/** Wire click / Enter / Space copy on chat bubbles (last-answer glance parity). */
+/** Visible (non-thinking) chat bubbles for keyboard nav. */
+function visibleChatMessages(container) {
+  if (!container) return [];
+  return Array.from(container.querySelectorAll('.chat-message')).filter((el) => {
+    if (el.classList.contains('thinking')) return false;
+    if (el.style.display === 'none') return false;
+    return true;
+  });
+}
+
+/** Hint above the message list (Monitors / Top Processes kb-hint parity). */
+function ensureChatMessagesKbHint(container, show) {
+  if (!container || !container.parentNode) return;
+  let hint = document.getElementById('chat-kb-hint');
+  if (!show) {
+    hint?.remove();
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'chat-kb-hint';
+    hint.id = 'chat-kb-hint';
+    container.parentNode.insertBefore(hint, container);
+  }
+  hint.textContent =
+    'All · You · Assistant filters · click / Enter / Space / c copies · ↑↓ / j k · PgUp/PgDn · Esc clears';
+}
+
+/** Keep one selected + tabbable bubble (Monitors listbox parity). */
+function syncChatMessagesTabOrder(container, preferEl) {
+  const items = visibleChatMessages(container);
+  ensureChatMessagesKbHint(container, items.length > 0);
+  if (!items.length) {
+    container?.querySelectorAll('.chat-message.is-selected').forEach((el) => {
+      el.classList.remove('is-selected');
+      el.setAttribute('aria-selected', 'false');
+    });
+    return;
+  }
+  let activeIdx = preferEl ? items.indexOf(preferEl) : -1;
+  if (activeIdx < 0) {
+    activeIdx = items.findIndex((el) => el.classList.contains('is-selected'));
+  }
+  if (activeIdx < 0) {
+    const focused = document.activeElement;
+    activeIdx = focused && items.includes(focused) ? items.indexOf(focused) : 0;
+  }
+  items.forEach((el, i) => {
+    const on = i === activeIdx;
+    el.classList.toggle('is-selected', on);
+    el.setAttribute('aria-selected', on ? 'true' : 'false');
+    el.tabIndex = on ? 0 : -1;
+  });
+}
+
+function clearChatMessageSelection(container) {
+  if (!container) return;
+  container.querySelectorAll('.chat-message.is-selected').forEach((el) => {
+    el.classList.remove('is-selected');
+    el.setAttribute('aria-selected', 'false');
+  });
+  const items = visibleChatMessages(container);
+  items.forEach((el, i) => {
+    el.tabIndex = i === 0 ? 0 : -1;
+  });
+  if (document.activeElement && container.contains(document.activeElement)) {
+    document.activeElement.blur();
+  }
+}
+
+/** Wire click / Enter / Space / c copy + j/k list nav on chat bubbles. */
 function wireChatMessagesCopy(container) {
   if (!container || container.dataset.copyWired === '1') return;
   container.dataset.copyWired = '1';
+  container.setAttribute('role', 'listbox');
+  container.setAttribute('aria-label', 'Chat messages');
   const activate = (msg) => {
     if (!msg || msg.classList.contains('thinking')) return;
     void copyChatMessageFromUi(msg);
@@ -1102,14 +1187,77 @@ function wireChatMessagesCopy(container) {
     const msg = e.target && e.target.closest && e.target.closest('.chat-message');
     if (!msg || !container.contains(msg)) return;
     if (e.target.closest('a, button, input, textarea, select')) return;
+    syncChatMessagesTabOrder(container, msg);
+    msg.focus();
     activate(msg);
   });
   container.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
     const msg = e.target && e.target.closest && e.target.closest('.chat-message');
     if (!msg || !container.contains(msg)) return;
-    e.preventDefault();
-    activate(msg);
+    if (msg.style.display === 'none' || msg.classList.contains('thinking')) return;
+    const items = visibleChatMessages(container);
+    const idx = items.indexOf(msg);
+    if (idx < 0) return;
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      activate(msg);
+      return;
+    }
+
+    if (
+      (e.key === 'c' || e.key === 'C') &&
+      !e.metaKey &&
+      !e.ctrlKey &&
+      !e.altKey
+    ) {
+      e.preventDefault();
+      activate(msg);
+      return;
+    }
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      clearChatMessageSelection(container);
+      return;
+    }
+
+    const move = (nextIdx) => {
+      if (nextIdx < 0 || nextIdx >= items.length) return;
+      e.preventDefault();
+      const next = items[nextIdx];
+      syncChatMessagesTabOrder(container, next);
+      next.focus();
+      try {
+        next.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      } catch (_) {
+        /* ignore */
+      }
+    };
+
+    if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'J') {
+      move(idx + 1);
+      return;
+    }
+    if (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'K') {
+      move(idx - 1);
+      return;
+    }
+    if (e.key === 'PageDown') {
+      move(Math.min(items.length - 1, idx + 5));
+      return;
+    }
+    if (e.key === 'PageUp') {
+      move(Math.max(0, idx - 5));
+      return;
+    }
+    if (e.key === 'Home') {
+      move(0);
+      return;
+    }
+    if (e.key === 'End') {
+      move(items.length - 1);
+    }
   });
 }
 
@@ -1117,11 +1265,12 @@ function decorateChatMessageForCopy(messageDiv, role, plainText) {
   if (!messageDiv) return;
   const text = String(plainText ?? '').trim();
   if (text) messageDiv.dataset.copyText = text;
-  messageDiv.setAttribute('role', 'button');
-  messageDiv.tabIndex = 0;
-  messageDiv.title = 'Click to copy message';
+  messageDiv.setAttribute('role', 'option');
+  if (!messageDiv.hasAttribute('tabindex')) messageDiv.tabIndex = -1;
+  messageDiv.setAttribute('aria-selected', 'false');
+  messageDiv.title = 'Click to copy · ↑↓ / j k to move · Esc clears';
   const who = role === 'user' ? 'your' : 'assistant';
-  messageDiv.setAttribute('aria-label', `Copy ${who} message`);
+  messageDiv.setAttribute('aria-label', `${who} message — copy with Enter or c`);
 }
 
 /** Last-answer glance under AI Chat — click copies reply (Top Processes / Monitors parity). */

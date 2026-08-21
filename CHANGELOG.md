@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.577] - 2026-08-21
+
+### Added
+- AI Chat **message keyboard nav** — ↑↓ / j k, PgUp/PgDn, Home/End move between bubbles; selected accent wash; Esc clears; `c` copies (Enter / Space / click unchanged). Soft kb hint above the list. Matches Monitors / Top Processes listbox parity.
+
 ## [0.1.576] - 2026-08-21
 
 ### Added
