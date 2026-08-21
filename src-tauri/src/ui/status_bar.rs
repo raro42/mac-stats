@@ -200,8 +200,8 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
 
         // Color cue lines: Mon ✕ / Ollama ✕ red; Heat yellow/amber/red
         // (Fair/Serious/Critical); LPM green; CPU amber (≥50%); GPU amber (≥15%);
-        // SSD/RAM amber (≥85%). Heat from NSProcessInfo. Cue lines are exact
-        // "CPU"/"GPU"/"SSD"/"RAM" (not tabbed labels).
+        // SSD/RAM amber (≥85%); Temp amber (≥70°C). Heat from NSProcessInfo.
+        // Cue lines are exact "CPU"/"GPU"/"SSD"/"RAM"/"Temp" (not tabbed labels).
         let heat_state = crate::ffi::objc::read_process_thermal_state();
         let heat_fair_color = NSColor::systemYellowColor();
         let mut utf16_pos: usize = 0;
@@ -216,6 +216,7 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
             let is_gpu_warn = *line == "GPU";
             let is_ssd_warn = *line == "SSD";
             let is_ram_warn = *line == "RAM";
+            let is_temp_warn = *line == "Temp";
             if (is_mon_alert
                 || is_ollama_alert
                 || is_heat_cue
@@ -223,15 +224,21 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
                 || is_cpu_warn
                 || is_gpu_warn
                 || is_ssd_warn
-                || is_ram_warn)
+                || is_ram_warn
+                || is_temp_warn)
                 && line_utf16 > 0
             {
                 let cue_font =
                     NSFont::monospacedSystemFontOfSize_weight(10.0, NSFontWeightSemibold);
                 let cue_color = if is_lpm_cue {
                     &*lpm_color
-                } else if is_cpu_warn || is_gpu_warn || is_ssd_warn || is_ram_warn {
-                    // amber — power-strip CPU≥50% / GPU≥15% / SSD·RAM≥85%
+                } else if is_cpu_warn
+                    || is_gpu_warn
+                    || is_ssd_warn
+                    || is_ram_warn
+                    || is_temp_warn
+                {
+                    // amber — power-strip CPU≥50% / GPU≥15% / SSD·RAM≥85% / Temp≥70°C
                     &*heat_serious_color
                 } else if is_heat_cue {
                     match heat_state {

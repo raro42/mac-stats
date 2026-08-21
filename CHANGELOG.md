@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.571] - 2026-08-21
+
+### Added
+- Menu bar **Temp** cue (amber) when cached CPU temperature is **≥ 70°C** — same threshold as the power-strip Temp hot wash. Hidden when cooler or when the temp cache is stale/missing.
+
 ## [0.1.570] - 2026-08-21
 
 ### Added

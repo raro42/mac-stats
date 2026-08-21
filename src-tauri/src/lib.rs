@@ -757,6 +757,24 @@ fn run_internal(open_cpu_window: bool) {
                     if metrics.ram >= 85.0 {
                         text.push_str("\nRAM");
                     }
+                    // Amber Temp cue when cached CPU °C ≥ 70 (power-strip Temp is-hot parity).
+                    // Uses TEMP_CACHE (same source as compact menu-bar T°); skipped when stale/missing.
+                    let temp_hot = TEMP_CACHE
+                        .try_lock()
+                        .ok()
+                        .and_then(|g| {
+                            g.as_ref().and_then(|(t, ts)| {
+                                if *t >= 70.0 && ts.elapsed() < TEMP_CACHE_MAX_AGE {
+                                    Some(())
+                                } else {
+                                    None
+                                }
+                            })
+                        })
+                        .is_some();
+                    if temp_hot {
+                        text.push_str("\nTemp");
+                    }
 
                     // Store update in static variable
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {
