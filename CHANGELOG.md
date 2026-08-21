@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.573] - 2026-08-21
+
+### Added
+- Menu bar **Up** cue (amber) when system uptime is **≥ 7 days** — same threshold as the power-strip Up `is-long` wash. Hidden below 7 days. Cheap `sysinfo` uptime (no SMC/IOReport).
+
 ## [0.1.572] - 2026-08-21
 
 ### Added

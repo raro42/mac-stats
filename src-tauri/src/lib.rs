@@ -793,6 +793,11 @@ fn run_internal(open_cpu_window: bool) {
                     if freq_hot {
                         text.push_str("\nGHz");
                     }
+                    // Amber Up cue when system uptime ≥ 7 days (power-strip Up is-long parity).
+                    // Cheap: sysinfo::System::uptime() — no SMC/IOReport.
+                    if sysinfo::System::uptime() >= 7 * 24 * 3600 {
+                        text.push_str("\nUp");
+                    }
 
                     // Store update in static variable
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {
