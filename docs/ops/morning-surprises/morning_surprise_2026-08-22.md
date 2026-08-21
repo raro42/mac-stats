@@ -1,33 +1,28 @@
 # Morning surprise — 2026-08-22
 
-Overnight Track B (autoresearch) for Ralf.
+Overnight Track B (20:00–06:00) shipped user-facing listbox / copy polish. Digester open stayed empty; design-review screens are in grace (recommended: feature-ai-chat).
 
-## Shipped tonight (2026-08-21 20:00–…)
+## Shipped tonight
 
 | Version | What |
-|--------|------|
-| **v0.1.572** | Menu bar **GHz** amber cue when cached CPU frequency **≥ 3.5 GHz** (power-strip freq is-hot parity; fresh `FREQ_CACHE` only) |
-| **v0.1.573** | Menu bar **Up** amber cue when system uptime **≥ 7 days** (power-strip Up `is-long` parity; cheap `sysinfo` uptime) |
-| **v0.1.574** | Menu bar **Bat** amber cue when cached battery **≤ 20%** and not charging (power-strip battery `is-low` wash parity) |
-| **v0.1.575** | Menu bar **Mon** amber cue when any UP monitor responds **≥ 2000 ms** (Monitors summary slowest / latency parity; red **Mon ✕** still wins on DOWN) |
-| **v0.1.576** | AI Chat **click-to-copy on messages** (Copied flash; drag-select safe; last-answer / processes / monitors parity) |
-| **v0.1.577** | AI Chat **message keyboard nav** (↑↓ / j k · selected wash · Esc · c copy; Monitors / Top Processes listbox parity) |
-| **v0.1.578** | Perplexity Search **result keyboard nav** (↑↓ / j k · Enter opens · c copies URL · Esc; Monitors / AI Chat listbox parity) |
-| **v0.1.579** | Debug Log **line keyboard nav** (↑↓ / j k · selected wash · Enter/c copy · Esc; ERROR/WARN tint; auto-refresh skip) |
-| **v0.1.580** | Disk Cleanup **row Copied flash + listbox chrome keyboard** (green Copied wash on scope/category; ↑↓ / j k from listbox → first/last) |
-| **v0.1.581** | Top Processes **row Copied wash** (click name / `c` → green Copied badge on row; name button still flashes; Disk Cleanup / Debug Log parity) |
-| **v0.1.582** | External / Monitors **row Copied wash + listbox chrome keyboard** (click URL / `c` → green Copied badge; ↑↓ / j k from listbox → first/last; Top Processes / Disk Cleanup parity) |
-| **v0.1.583** | Top Processes **listbox chrome keyboard** (focus list → ↑↓ / j k / Home / End first/last; Monitors / Disk Cleanup / Debug Log chrome parity) |
+|---------|------|
+| **v0.1.576** | AI Chat click-to-copy on messages |
+| **v0.1.577** | AI Chat message keyboard nav |
+| **v0.1.578** | Perplexity result keyboard nav |
+| **v0.1.579** | Debug Log line keyboard nav |
+| **v0.1.580** | Disk Cleanup row Copied flash + listbox chrome |
+| **v0.1.581** | Top Processes row Copied wash |
+| **v0.1.582** | Monitors row Copied wash + listbox chrome |
+| **v0.1.583** | Top Processes listbox chrome keyboard |
+| **v0.1.584** | Agent Ops row Copied badge + ↑/k no-selection → last |
 
-## Latest tick (~00:41)
+## Latest keep (this tick)
 
-- Digester open empty; design-review grace (feature-ai-chat ~7.5d recommended); debug.log quiet (no ERROR/WARN clusters).
-- Fuel: process-list listbox chrome first/last (after Monitors chrome; standing design-review listbox parity).
-- **Keep** listbox chrome on Top Processes; Discord Ready after install (0.1.583).
-- Screenshot recapture deferred (TCC / warm window).
+**v0.1.584** — Agent Ops selected row shows a green **Copied** badge after `c` / copy-id chip (Top Processes / Monitors parity). With no row selected, ↑ / k / PgUp select the last row; ↓ / j / PgDn select the first.
 
-## Next fuel
+## Notes
 
-- Digester Discord traffic if any
-- Deferred screenshots when TCC allows
-- Prefer non-process-listbox fuel: p50 latency / sibling ports / design-review when due / Agent Ops Copied badge (::after) if still a gap / Details keyboard
+- Digester: no open candidates (instant-heavy sample).
+- Design review: `due=false` (grace); screenshots deferred (TCC).
+- `debug.log`: quiet in 180m scan.
+- Git: keep @ `25bef55`; install + LaunchAgent kickstart after ship.
