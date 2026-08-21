@@ -15,14 +15,15 @@ Overnight Track B (20:00–06:00) shipped user-facing listbox / copy polish. Dig
 | **v0.1.582** | Monitors row Copied wash + listbox chrome |
 | **v0.1.583** | Top Processes listbox chrome keyboard |
 | **v0.1.584** | Agent Ops row Copied badge + ↑/k no-selection → last |
+| **v0.1.585** | Perplexity listbox chrome keyboard |
 
 ## Latest keep (this tick)
 
-**v0.1.584** — Agent Ops selected row shows a green **Copied** badge after `c` / copy-id chip (Top Processes / Monitors parity). With no row selected, ↑ / k / PgUp select the last row; ↓ / j / PgDn select the first.
+**v0.1.585** — Focus the Perplexity results list, then ↑↓ / j k / Home / End jump to the first or last result (Monitors / Debug Log / Top Processes chrome parity). Soft kb hint mentions list focus.
 
 ## Notes
 
 - Digester: no open candidates (instant-heavy sample).
 - Design review: `due=false` (grace); screenshots deferred (TCC).
 - `debug.log`: quiet in 180m scan.
-- Git: keep @ `25bef55`; install + LaunchAgent kickstart after ship.
+- Git: keep @ `b387e89`; install + LaunchAgent kickstart after ship.
