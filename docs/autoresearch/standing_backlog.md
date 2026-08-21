@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Menu bar **Ollama ✕** red semibold when circuit open (Mon ✕ color parity) — **v0.1.565**
+
 - Menu bar **Heat** cue when thermal Serious (amber) or Critical (red); hidden on Nominal/Fair — **v0.1.564**
 - Menu bar **green LPM** cue when Low Power Mode is on (Mon ✕ cue style; hidden when off) — **v0.1.563**
 - CPU metrics **Low Power Mode (LPM) on the battery/power strip** (On/Off from `isLowPowerModeEnabled`; click → Battery settings; green wash when On) — **v0.1.562**

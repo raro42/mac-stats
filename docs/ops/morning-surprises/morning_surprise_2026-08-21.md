@@ -16,16 +16,17 @@ Continues from late 2026-08-20 window (local night).
 | **v0.1.562** | CPU metrics **Low Power Mode (LPM)** on the power strip (On/Off; click → Battery settings; green wash when On) |
 | **v0.1.563** | Menu bar **green LPM** cue when Low Power Mode is on (Mon ✕ cue style; hidden when off) |
 | **v0.1.564** | Menu bar **Heat** cue when thermal is **Serious** (amber) or **Critical** (red); hidden on Nominal/Fair |
+| **v0.1.565** | Menu bar **Ollama ✕** cue **red semibold** when the Ollama HTTP circuit is open (Mon ✕ color parity) |
 
-## Latest tick (~02:42)
+## Latest tick (~03:08)
 
-- Digester open empty; design-review grace (feature-ai-chat ~6.58d); debug.log quiet (no ERROR/WARN clusters).
-- Fuel: standing backlog next after menu-bar LPM — **Serious·Critical thermal menu cue**.
-- **Keep** append `\nHeat` when `thermalState` is Serious or Critical; amber/red semibold in `make_attributed_title` (Mon ✕ / LPM parity).
-- Discord Ready after install/kickstart (0.1.564).
+- Digester open empty; design-review grace (feature-ai-chat ~6.6d); debug.log quiet (no ERROR/WARN clusters).
+- Fuel: standing backlog next after Heat menu — **Ollama ✕ color parity**.
+- **Keep** paint `Ollama ✕` red semibold in `make_attributed_title` (Mon ✕ / Heat / LPM cue family).
+- Discord Ready after install/kickstart (0.1.565).
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-Heat-menu fuel: p50 latency / sibling ports / Fair thermal soft cue / Ollama ✕ color parity
+- Prefer non-Ollama-✕-color fuel: p50 latency / sibling ports / Fair thermal soft cue
