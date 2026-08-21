@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Menu bar **SSD** amber cue when disk ≥ 85% (power-strip hot parity) — **v0.1.567**
 - Menu bar **Heat** Fair soft yellow + power-strip Fair soft wash — **v0.1.566**
 - Menu bar **Ollama ✕** red semibold when circuit open (Mon ✕ color parity) — **v0.1.565**
 

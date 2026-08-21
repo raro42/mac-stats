@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.567] - 2026-08-21
+
+### Added
+- Menu bar **SSD** cue (amber) when disk used is **≥ 85%** — same threshold as the power-strip SSD hot wash. Hidden when below 85%.
+
 ## [0.1.566] - 2026-08-21
 
 ### Changed

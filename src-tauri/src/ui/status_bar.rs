@@ -199,7 +199,7 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
         );
 
         // Color cue lines: Mon ✕ / Ollama ✕ red; Heat yellow/amber/red
-        // (Fair/Serious/Critical); LPM green. Heat severity from NSProcessInfo.
+        // (Fair/Serious/Critical); LPM green; SSD amber (≥85%). Heat from NSProcessInfo.
         let heat_state = crate::ffi::objc::read_process_thermal_state();
         let heat_fair_color = NSColor::systemYellowColor();
         let mut utf16_pos: usize = 0;
@@ -209,11 +209,17 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
             let is_ollama_alert = line.starts_with("Ollama ") && line.contains('✕');
             let is_heat_cue = *line == "Heat";
             let is_lpm_cue = *line == "LPM";
-            if (is_mon_alert || is_ollama_alert || is_heat_cue || is_lpm_cue) && line_utf16 > 0 {
+            // Cue-only line (not the "CPU\tSSD" / "CPU\tGPU\tRAM\tSSD" label row).
+            let is_ssd_warn = *line == "SSD";
+            if (is_mon_alert || is_ollama_alert || is_heat_cue || is_lpm_cue || is_ssd_warn)
+                && line_utf16 > 0
+            {
                 let cue_font =
                     NSFont::monospacedSystemFontOfSize_weight(10.0, NSFontWeightSemibold);
                 let cue_color = if is_lpm_cue {
                     &*lpm_color
+                } else if is_ssd_warn {
+                    &*heat_serious_color // amber — power-strip SSD ≥85%
                 } else if is_heat_cue {
                     match heat_state {
                         Some("Fair") => &*heat_fair_color,

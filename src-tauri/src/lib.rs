@@ -741,6 +741,10 @@ fn run_internal(open_cpu_window: bool) {
                     if crate::ffi::objc::read_process_low_power_mode() {
                         text.push_str("\nLPM");
                     }
+                    // Amber SSD cue when disk used ≥ 85% (power-strip SSD is-hot parity).
+                    if metrics.disk >= 85.0 {
+                        text.push_str("\nSSD");
+                    }
 
                     // Store update in static variable
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {
