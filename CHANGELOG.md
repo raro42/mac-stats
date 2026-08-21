@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.574] - 2026-08-21
+
+### Added
+- Menu bar **Bat** cue (amber) when cached battery is **≤ 20%** and not charging — same threshold as the power-strip battery `is-low` wash. Hidden when charging, above 20%, or when the battery cache is missing. Power-strip battery cell gets a soft amber wash when low.
+
 ## [0.1.573] - 2026-08-21
 
 ### Added

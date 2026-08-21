@@ -2239,6 +2239,14 @@ function ensureRamStripStyles() {
       background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
       box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
     }
+    .battery-info.is-low {
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
     .cpu-label {
       color: var(--muted);
     }
@@ -4083,7 +4091,14 @@ function updateBatteryPower(cpuDetails) {
   if (cpuDetails.has_battery) {
     const level = cpuDetails.battery_level || 0;
     const isCharging = cpuDetails.is_charging || false;
-    
+    const batteryInfo = batteryLevel && batteryLevel.closest
+      ? batteryLevel.closest('.battery-info')
+      : document.querySelector('#battery-power-strip .battery-info');
+    if (batteryInfo) {
+      // Soft amber wash when ≤20% and not charging (menu-bar Bat cue parity).
+      batteryInfo.classList.toggle('is-low', level <= 20 && !isCharging);
+    }
+
     if (batteryLevel) batteryLevel.textContent = `${level.toFixed(0)}%`;
     if (batteryStatus) batteryStatus.textContent = isCharging ? 'Charging' : 'Discharging';
     
@@ -4133,6 +4148,10 @@ function updateBatteryPower(cpuDetails) {
     }
   } else {
     // No battery (desktop Mac)
+    const batteryInfo = batteryLevel && batteryLevel.closest
+      ? batteryLevel.closest('.battery-info')
+      : document.querySelector('#battery-power-strip .battery-info');
+    if (batteryInfo) batteryInfo.classList.remove('is-low');
     if (batteryLevel) batteryLevel.textContent = 'N/A';
     if (batteryStatus) batteryStatus.textContent = 'No battery';
     if (batteryIcon && batteryIcon.tagName === 'svg') {

@@ -798,6 +798,25 @@ fn run_internal(open_cpu_window: bool) {
                     if sysinfo::System::uptime() >= 7 * 24 * 3600 {
                         text.push_str("\nUp");
                     }
+                    // Amber Bat cue when cached battery ≤ 20% and not charging
+                    // (power-strip battery is-low parity). Uses BATTERY_CACHE (filled when
+                    // CPU window reads battery); skipped when missing / no battery / charging.
+                    let bat_low = BATTERY_CACHE
+                        .try_lock()
+                        .ok()
+                        .and_then(|g| {
+                            g.as_ref().and_then(|(level, charging, _ts)| {
+                                if *level >= 0.0 && *level <= 20.0 && !*charging {
+                                    Some(())
+                                } else {
+                                    None
+                                }
+                            })
+                        })
+                        .is_some();
+                    if bat_low {
+                        text.push_str("\nBat");
+                    }
 
                     // Store update in static variable
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {
