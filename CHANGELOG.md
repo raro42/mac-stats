@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.572] - 2026-08-21
+
+### Added
+- Menu bar **GHz** cue (amber) when cached CPU frequency is **≥ 3.5 GHz** — same threshold as the power-strip frequency hot wash. Hidden when lower or when the frequency cache is stale/missing.
+
 ## [0.1.571] - 2026-08-21
 
 ### Added

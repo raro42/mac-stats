@@ -775,6 +775,24 @@ fn run_internal(open_cpu_window: bool) {
                     if temp_hot {
                         text.push_str("\nTemp");
                     }
+                    // Amber GHz cue when cached frequency ≥ 3.5 (power-strip freq is-hot parity).
+                    // Uses FREQ_CACHE (IOReport); 35s freshness matches get_cpu_details(); skipped when stale/missing.
+                    let freq_hot = FREQ_CACHE
+                        .try_lock()
+                        .ok()
+                        .and_then(|g| {
+                            g.as_ref().and_then(|(f, ts)| {
+                                if *f >= 3.5 && ts.elapsed().as_secs() < 35 {
+                                    Some(())
+                                } else {
+                                    None
+                                }
+                            })
+                        })
+                        .is_some();
+                    if freq_hot {
+                        text.push_str("\nGHz");
+                    }
 
                     // Store update in static variable
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {
