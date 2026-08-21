@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.569] - 2026-08-21
+
+### Added
+- Menu bar **CPU** cue (amber) when CPU usage is **≥ 50%** — same threshold as the power-strip CPU hot wash. Hidden when below 50%.
+
 ## [0.1.568] - 2026-08-21
 
 ### Added
