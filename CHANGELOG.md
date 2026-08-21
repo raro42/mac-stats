@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.566] - 2026-08-21
+
+### Changed
+- Menu bar **Heat** cue now also shows for Apple thermal **Fair** (soft yellow). Serious stays amber; Critical stays red. Hidden only when Nominal.
+- CPU metrics power-strip **Heat** cell gets a soft yellow wash when Fair (amber Serious / red Critical unchanged).
+
 ## [0.1.565] - 2026-08-21
 
 ### Changed

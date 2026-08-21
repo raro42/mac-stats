@@ -1093,6 +1093,7 @@ async function refresh() {
         });
       }
       if (thermalStripCell) {
+        thermalStripCell.classList.toggle("is-fair", thermalLevel === "Fair");
         thermalStripCell.classList.toggle(
           "is-hot",
           thermalLevel === "Serious" || thermalLevel === "Critical"
@@ -2469,6 +2470,10 @@ function ensureRamStripStyles() {
     .thermal-info:focus-visible {
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
     }
+    .thermal-info.is-fair {
+      background-color: color-mix(in srgb, #ffd60a 12%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ffd60a 28%, transparent);
+    }
     .thermal-info.is-hot {
       background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
       box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
@@ -2809,8 +2814,8 @@ function thermalLevelFromCpuDetails(data) {
 /**
  * Thermal band on the battery/power strip. Prefers Apple NSProcessInfo
  * thermalState (Nominal/Fair/Serious/Critical); falls back to °C bands.
- * Click / Enter / Space scrolls to the temperature ring. Amber wash Serious;
- * red wash Critical.
+ * Click / Enter / Space scrolls to the temperature ring. Soft yellow wash Fair;
+ * amber wash Serious; red wash Critical.
  */
 function ensureThermalStrip() {
   ensureRamStripStyles();

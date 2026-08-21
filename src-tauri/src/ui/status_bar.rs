@@ -198,10 +198,10 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
             full_range,
         );
 
-        // Color cue lines: Mon ✕ / Ollama ✕ red; Heat amber/red (Serious/Critical); LPM green.
-        // Heat severity comes from NSProcessInfo (same source as the cue append).
-        let heat_is_critical = crate::ffi::objc::read_process_thermal_state()
-            == Some("Critical");
+        // Color cue lines: Mon ✕ / Ollama ✕ red; Heat yellow/amber/red
+        // (Fair/Serious/Critical); LPM green. Heat severity from NSProcessInfo.
+        let heat_state = crate::ffi::objc::read_process_thermal_state();
+        let heat_fair_color = NSColor::systemYellowColor();
         let mut utf16_pos: usize = 0;
         for (i, line) in lines.iter().enumerate() {
             let line_utf16 = line.encode_utf16().count();
@@ -214,8 +214,12 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
                     NSFont::monospacedSystemFontOfSize_weight(10.0, NSFontWeightSemibold);
                 let cue_color = if is_lpm_cue {
                     &*lpm_color
-                } else if is_heat_cue && !heat_is_critical {
-                    &*heat_serious_color
+                } else if is_heat_cue {
+                    match heat_state {
+                        Some("Fair") => &*heat_fair_color,
+                        Some("Critical") => &*alert_color,
+                        _ => &*heat_serious_color, // Serious (and unknown)
+                    }
                 } else {
                     &*alert_color
                 };
