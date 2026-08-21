@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Menu bar **green LPM** cue when Low Power Mode is on (Mon ✕ cue style; hidden when off) — **v0.1.563**
 - CPU metrics **Low Power Mode (LPM) on the battery/power strip** (On/Off from `isLowPowerModeEnabled`; click → Battery settings; green wash when On) — **v0.1.562**
 - CPU metrics **Heat prefers NSProcessInfo.thermalState** (OS Nominal/Fair/Serious/Critical; °C-band fallback; AI Thermal pressure) — **v0.1.561**
 - CPU metrics **Heat / thermal on the battery/power strip** (Nominal / Fair / Serious / Critical; click → temp ring; amber Serious / red Critical) — **v0.1.560**
