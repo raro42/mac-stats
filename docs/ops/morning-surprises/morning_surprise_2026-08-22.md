@@ -13,16 +13,17 @@ Overnight Track B (autoresearch) for Ralf.
 | **v0.1.576** | AI Chat **click-to-copy on messages** (Copied flash; drag-select safe; last-answer / processes / monitors parity) |
 | **v0.1.577** | AI Chat **message keyboard nav** (↑↓ / j k · selected wash · Esc · c copy; Monitors / Top Processes listbox parity) |
 | **v0.1.578** | Perplexity Search **result keyboard nav** (↑↓ / j k · Enter opens · c copies URL · Esc; Monitors / AI Chat listbox parity) |
+| **v0.1.579** | Debug Log **line keyboard nav** (↑↓ / j k · selected wash · Enter/c copy · Esc; ERROR/WARN tint; auto-refresh skip) |
 
-## Latest tick (~22:33)
+## Latest tick (~22:58)
 
-- Digester open empty; design-review grace (feature-ai-chat ~7.41d recommended); debug.log quiet (no ERROR/WARN clusters).
-- Fuel: Perplexity results keyboard (after AI Chat kb-nav).
-- **Keep** result j/k nav + Enter open + c copy; Discord Ready after install (0.1.578).
+- Digester open empty; design-review grace (feature-ai-chat ~7.43d recommended); debug.log quiet (no ERROR/WARN clusters).
+- Fuel: Debug Log keyboard (after Perplexity kb-nav; standing design-review listbox parity).
+- **Keep** log-line j/k nav + Enter/c copy + Copied flash; Discord Ready after install (0.1.579).
 - Screenshot recapture deferred (TCC / warm window).
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-Perplexity-kb fuel: p50 latency / sibling ports / design-review when due / Debug Log keyboard
+- Prefer non-Debug-Log-kb fuel: p50 latency / sibling ports / design-review when due / Disk Cleanup keyboard polish
