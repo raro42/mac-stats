@@ -729,6 +729,12 @@ fn run_internal(open_cpu_window: bool) {
                     if any_monitor_down {
                         text.push_str("\nMon ✕");
                     }
+                    // Amber/red Heat cue when thermal pressure is Serious or Critical
+                    // (power-strip Heat / NSProcessInfo.thermalState parity).
+                    match crate::ffi::objc::read_process_thermal_state() {
+                        Some("Serious") | Some("Critical") => text.push_str("\nHeat"),
+                        _ => {}
+                    }
                     // Green LPM cue when Apple Low Power Mode is on (power-strip parity).
                     if crate::ffi::objc::read_process_low_power_mode() {
                         text.push_str("\nLPM");

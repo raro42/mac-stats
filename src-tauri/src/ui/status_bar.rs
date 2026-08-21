@@ -142,6 +142,7 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
     // labelColor can sometimes turn black in menu bar, so use controlTextColor which adapts properly
     let color = NSColor::controlTextColor();
     let alert_color = NSColor::systemRedColor();
+    let heat_serious_color = NSColor::systemOrangeColor();
     let lpm_color = NSColor::systemGreenColor();
     let paragraph = NSMutableParagraphStyle::new();
     paragraph.setLineSpacing(-2.0);
@@ -197,17 +198,23 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
             full_range,
         );
 
-        // Color cue lines: Mon ✕ red; LPM green (Low Power Mode on).
+        // Color cue lines: Mon ✕ red; Heat amber/red (Serious/Critical); LPM green.
+        // Heat severity comes from NSProcessInfo (same source as the cue append).
+        let heat_is_critical = crate::ffi::objc::read_process_thermal_state()
+            == Some("Critical");
         let mut utf16_pos: usize = 0;
         for (i, line) in lines.iter().enumerate() {
             let line_utf16 = line.encode_utf16().count();
             let is_mon_alert = line.starts_with("Mon ") && line.contains('✕');
+            let is_heat_cue = *line == "Heat";
             let is_lpm_cue = *line == "LPM";
-            if (is_mon_alert || is_lpm_cue) && line_utf16 > 0 {
+            if (is_mon_alert || is_heat_cue || is_lpm_cue) && line_utf16 > 0 {
                 let cue_font =
                     NSFont::monospacedSystemFontOfSize_weight(10.0, NSFontWeightSemibold);
                 let cue_color = if is_lpm_cue {
                     &*lpm_color
+                } else if is_heat_cue && !heat_is_critical {
+                    &*heat_serious_color
                 } else {
                     &*alert_color
                 };

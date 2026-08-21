@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.564] - 2026-08-21
+
+### Added
+- Menu bar **Heat** cue when Apple thermal pressure is **Serious** (amber) or **Critical** (red). Uses `NSProcessInfo.thermalState` (power-strip Heat parity). Hidden when Nominal or Fair.
+
 ## [0.1.563] - 2026-08-21
 
 ### Added
