@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.582] - 2026-08-22
+
+### Added
+- External / Monitors **row Copied wash + listbox chrome keyboard** — click URL / `c` shows a green **Copied** badge wash on the monitor row (Top Processes / Disk Cleanup / Debug Log parity; URL control still flashes). Focus the monitors listbox, then ↑↓ / j k / Home / End to jump to the first or last row (Disk Cleanup chrome parity).
+
 ## [0.1.581] - 2026-08-21
 
 ### Added

@@ -5504,6 +5504,36 @@ function recentMonitorLogLines(monitorId, limit = 12) {
     });
 }
 
+/** Brief green Copied wash on monitor row (Top Processes / Disk Cleanup parity). */
+function flashMonitorRowCopied(row) {
+  if (!row) return;
+  if (row._monitorCopiedTimer) {
+    clearTimeout(row._monitorCopiedTimer);
+    row._monitorCopiedTimer = null;
+  }
+  row.classList.add('is-just-copied');
+  row.title = 'Copied';
+  row.setAttribute('aria-label', 'Copied');
+  row._monitorCopiedTimer = setTimeout(() => {
+    row.classList.remove('is-just-copied');
+    row._monitorCopiedTimer = null;
+    row.removeAttribute('title');
+    row.removeAttribute('aria-label');
+    const id = row.getAttribute('data-monitor-id') || '';
+    const url = row.dataset.monitorUrl || '';
+    // Restore hover tip on header/info (row title stays empty).
+    if (id || url) {
+      const status = monitorStatusCache.get(id) || {
+        is_up: !row.classList.contains('is-down'),
+        response_time_ms: null,
+        error: '',
+        checked_at: null,
+      };
+      applyMonitorRowTooltip(row, url || id, status);
+    }
+  }, 1600);
+}
+
 /**
  * Wire a monitor URL control for click/Enter/Space copy + Copied flash.
  * Survives live refresh when prevFlash is passed from the previous element.
@@ -5551,6 +5581,8 @@ function wireMonitorUrlCopy(el, url, prevFlash) {
         el._saveFlashTimer = null;
       }, 1600);
     }
+    const row = el.closest && el.closest('.monitor-item');
+    if (row) flashMonitorRowCopied(row);
   };
   el.addEventListener('click', copyUrl);
   el.addEventListener('keydown', (e) => {
@@ -5582,7 +5614,12 @@ async function copyMonitorUrlFromRow(item) {
       ''
   ).trim();
   if (!value) return false;
-  if (urlEl && urlEl.classList.contains('is-just-saved')) return true;
+  if (
+    item.classList.contains('is-just-copied') ||
+    (urlEl && urlEl.classList.contains('is-just-saved'))
+  ) {
+    return true;
+  }
   const ok = await copyTextToClipboard(value);
   if (!ok) {
     alert('Could not copy URL.');
@@ -5603,6 +5640,7 @@ async function copyMonitorUrlFromRow(item) {
       urlEl._saveFlashTimer = null;
     }, 1600);
   }
+  flashMonitorRowCopied(item);
   return true;
 }
 
@@ -6209,6 +6247,9 @@ function wireMonitorsListKeyboard() {
   monitorsList.dataset.keyboardNav = '1';
   monitorsList.setAttribute('role', 'listbox');
   monitorsList.setAttribute('aria-label', 'External monitors');
+  if (!monitorsList.hasAttribute('tabindex')) {
+    monitorsList.setAttribute('tabindex', '0');
+  }
 
   monitorsList.addEventListener('click', (e) => {
     const item = e.target && e.target.closest && e.target.closest('.monitor-item');
@@ -6230,7 +6271,24 @@ function wireMonitorsListKeyboard() {
 
   monitorsList.addEventListener('keydown', (e) => {
     const item = e.target && e.target.closest && e.target.closest('.monitor-item');
-    if (!item || !monitorsList.contains(item)) return;
+    if (!item || !monitorsList.contains(item)) {
+      // First arrow/j from listbox chrome focuses first/last row (Disk Cleanup parity).
+      if (e.target !== monitorsList) return;
+      const items = visibleMonitorItems(monitorsList);
+      if (!items.length) return;
+      let next = -1;
+      if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'Home') next = 0;
+      else if (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'End') next = items.length - 1;
+      else return;
+      e.preventDefault();
+      const preferId = items[next].getAttribute('data-monitor-id');
+      syncMonitorsListTabOrder(monitorsList, preferId);
+      items[next].focus();
+      if (typeof items[next].scrollIntoView === 'function') {
+        items[next].scrollIntoView({ block: 'nearest' });
+      }
+      return;
+    }
     if (item.style.display === 'none') return;
     const items = visibleMonitorItems(monitorsList);
     const idx = items.indexOf(item);
