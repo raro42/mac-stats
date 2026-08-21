@@ -10,15 +10,17 @@ Overnight Track B (autoresearch) for Ralf.
 | **v0.1.573** | Menu bar **Up** amber cue when system uptime **≥ 7 days** (power-strip Up `is-long` parity; cheap `sysinfo` uptime) |
 | **v0.1.574** | Menu bar **Bat** amber cue when cached battery **≤ 20%** and not charging (power-strip battery `is-low` wash parity) |
 | **v0.1.575** | Menu bar **Mon** amber cue when any UP monitor responds **≥ 2000 ms** (Monitors summary slowest / latency parity; red **Mon ✕** still wins on DOWN) |
+| **v0.1.576** | AI Chat **click-to-copy on messages** (Copied flash; drag-select safe; last-answer / processes / monitors parity) |
 
-## Latest tick (~21:16)
+## Latest tick (~21:40)
 
-- Digester open empty; design-review grace (feature-ai-chat ~7.36d); debug.log quiet (no ERROR/WARN clusters).
-- Fuel: standing backlog next after Bat warn — **Monitors latency cue**.
-- **Keep** amber **Mon** when all checks are up but any site is ≥ 2 s; summary amber wash also for a single slow UP site; Discord Ready after install/kickstart (0.1.575).
+- Digester open empty; design-review grace (feature-ai-chat ~7.37d); debug.log quiet (no ERROR/WARN clusters).
+- Fuel: design-review AI Chat — left Mon-latency menu-bar lane.
+- **Keep** click-to-copy on chat bubbles; Discord Ready after install/kickstart (0.1.576).
+- Screenshot recapture deferred (TCC / warm window).
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-Mon-latency fuel: p50 latency / sibling ports / design-review when due
+- Prefer non-copy-polish fuel: p50 latency / sibling ports / design-review when due
