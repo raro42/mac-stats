@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.575] - 2026-08-21
+
+### Added
+- Menu bar **Mon** cue (amber) when all monitors are up but any site responds in **≥ 2000 ms** — Monitors summary slowest / latency parity. Red **Mon ✕** still wins when any check is down. Summary amber wash also applies for a single slow UP site (≥ 2000 ms), not only when comparing two or more.
+
 ## [0.1.574] - 2026-08-21
 
 ### Added

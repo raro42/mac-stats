@@ -5802,8 +5802,12 @@ async function updateMonitorsSummary() {
     const anyDown = downCount > 0;
     const allUp = checkedCount > 0 && downCount === 0 && checkedCount === monitorIds.length;
     const slowest = upLatencyHints[0];
+    // Amber slowest hint: relative (≥2 UP) or absolute (any UP ≥ 2000 ms — menu-bar Mon parity).
+    const anySlowAbs = upLatencyHints.some((h) => h.ms >= 2000);
     const slowestHint =
-      !anyDown && upLatencyHints.length >= 2 ? slowest?.id || null : null;
+      !anyDown && slowest && (upLatencyHints.length >= 2 || anySlowAbs)
+        ? slowest.id || null
+        : null;
     window.__monitorsSlowestId = slowestHint;
 
     if (downHints.length > 0) {

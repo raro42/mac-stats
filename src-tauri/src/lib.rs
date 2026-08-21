@@ -722,12 +722,25 @@ fn run_internal(open_cpu_window: bool) {
                     {
                         text.push_str("\nOllama ✕");
                     }
-                    // Red monitor cue in the menu bar when any website/social check is down.
-                    let any_monitor_down = commands::monitors::get_monitor_statuses_snapshot()
-                        .iter()
-                        .any(|(_, st)| !st.is_up);
-                    if any_monitor_down {
-                        text.push_str("\nMon ✕");
+                    // Monitor cues: red Mon ✕ when any check is down; else amber Mon when
+                    // any UP site responds ≥ 2000 ms (Monitors summary slowest / latency parity).
+                    {
+                        let statuses = commands::monitors::get_monitor_statuses_snapshot();
+                        let any_monitor_down = statuses.iter().any(|(_, st)| !st.is_up);
+                        if any_monitor_down {
+                            text.push_str("\nMon ✕");
+                        } else {
+                            let any_slow = statuses.iter().any(|(_, st)| {
+                                st.is_up
+                                    && st
+                                        .response_time_ms
+                                        .map(|ms| ms >= 2000)
+                                        .unwrap_or(false)
+                            });
+                            if any_slow {
+                                text.push_str("\nMon");
+                            }
+                        }
                     }
                     // Soft yellow / amber / red Heat cue when thermal pressure is
                     // Fair, Serious, or Critical (power-strip Heat parity).

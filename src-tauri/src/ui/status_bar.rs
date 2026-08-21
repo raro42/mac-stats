@@ -198,18 +198,19 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
             full_range,
         );
 
-        // Color cue lines: Mon ✕ / Ollama ✕ red; Heat yellow/amber/red
-        // (Fair/Serious/Critical); LPM green; CPU amber (≥50%); GPU amber (≥15%);
-        // SSD/RAM amber (≥85%); Temp amber (≥70°C); GHz amber (≥3.5); Up amber (≥7d);
-        // Bat amber (≤20% not charging).
-        // Heat from NSProcessInfo. Cue lines are exact "CPU"/"GPU"/"SSD"/"RAM"/"Temp"/
-        // "GHz"/"Up"/"Bat" (not tabbed labels).
+        // Color cue lines: Mon ✕ / Ollama ✕ red; Mon amber (≥2000 ms UP latency);
+        // Heat yellow/amber/red (Fair/Serious/Critical); LPM green; CPU amber (≥50%);
+        // GPU amber (≥15%); SSD/RAM amber (≥85%); Temp amber (≥70°C); GHz amber (≥3.5);
+        // Up amber (≥7d); Bat amber (≤20% not charging).
+        // Heat from NSProcessInfo. Cue lines are exact "Mon"/"CPU"/"GPU"/"SSD"/"RAM"/
+        // "Temp"/"GHz"/"Up"/"Bat" (not tabbed labels).
         let heat_state = crate::ffi::objc::read_process_thermal_state();
         let heat_fair_color = NSColor::systemYellowColor();
         let mut utf16_pos: usize = 0;
         for (i, line) in lines.iter().enumerate() {
             let line_utf16 = line.encode_utf16().count();
             let is_mon_alert = line.starts_with("Mon ") && line.contains('✕');
+            let is_mon_slow = *line == "Mon";
             let is_ollama_alert = line.starts_with("Ollama ") && line.contains('✕');
             let is_heat_cue = *line == "Heat";
             let is_lpm_cue = *line == "LPM";
@@ -223,6 +224,7 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
             let is_up_warn = *line == "Up";
             let is_bat_warn = *line == "Bat";
             if (is_mon_alert
+                || is_mon_slow
                 || is_ollama_alert
                 || is_heat_cue
                 || is_lpm_cue
@@ -240,7 +242,8 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
                     NSFont::monospacedSystemFontOfSize_weight(10.0, NSFontWeightSemibold);
                 let cue_color = if is_lpm_cue {
                     &*lpm_color
-                } else if is_cpu_warn
+                } else if is_mon_slow
+                    || is_cpu_warn
                     || is_gpu_warn
                     || is_ssd_warn
                     || is_ram_warn
@@ -249,8 +252,8 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
                     || is_up_warn
                     || is_bat_warn
                 {
-                    // amber — power-strip CPU≥50% / GPU≥15% / SSD·RAM≥85% / Temp≥70°C /
-                    // GHz≥3.5 / Up≥7d / Bat≤20% not charging
+                    // amber — Mon ≥2000 ms UP / power-strip CPU≥50% / GPU≥15% /
+                    // SSD·RAM≥85% / Temp≥70°C / GHz≥3.5 / Up≥7d / Bat≤20% not charging
                     &*heat_serious_color
                 } else if is_heat_cue {
                     match heat_state {
