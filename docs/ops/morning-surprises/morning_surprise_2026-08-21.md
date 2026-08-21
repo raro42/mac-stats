@@ -22,16 +22,17 @@ Continues from late 2026-08-20 window (local night).
 | **v0.1.568** | Menu bar **RAM** amber cue when memory used **≥ 85%** + power-strip RAM hot wash (Details glance parity) |
 | **v0.1.569** | Menu bar **CPU** amber cue when usage **≥ 50%** (power-strip CPU is-hot parity) |
 | **v0.1.570** | Menu bar **GPU** amber cue when usage **≥ 15%** (power-strip GPU is-hot parity) |
+| **v0.1.571** | Menu bar **Temp** amber cue when cached CPU **≥ 70°C** (power-strip Temp is-hot parity) |
 
-## Latest tick (~05:19)
+## Latest tick (~05:45)
 
-- Digester open empty; design-review grace (feature-ai-chat ~6.69d); debug.log quiet (no ERROR/WARN clusters).
-- Fuel: standing backlog next after CPU warn — **menu-bar GPU≥15% amber**.
-- **Keep** amber **GPU** cue under metrics when usage ≥ 15%; hidden below that threshold (exact cue line `GPU`, not the tabbed label row).
-- Discord Ready after install/kickstart (0.1.570).
+- Digester open empty; design-review grace (feature-ai-chat ~6.71d); debug.log quiet (no ERROR/WARN clusters).
+- Fuel: standing backlog next after GPU warn — **menu-bar Temp≥70°C amber**.
+- **Keep** amber **Temp** cue when fresh `TEMP_CACHE` is ≥ 70°C; hidden when cooler or cache stale/missing (exact cue line `Temp`).
+- Discord Ready after install/kickstart (0.1.571).
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-GPU-warn fuel: p50 latency / sibling ports / menu-bar Temp≥70°C amber / Monitors latency cue
+- Prefer non-Temp-warn fuel: p50 latency / sibling ports / Monitors latency cue / frequency ≥3.5 GHz menu cue
