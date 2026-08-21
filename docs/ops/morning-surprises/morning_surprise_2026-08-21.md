@@ -15,16 +15,17 @@ Continues from late 2026-08-20 window (local night).
 | **v0.1.561** | Heat prefers Apple **`NSProcessInfo.thermalState`** (OS Nominal/Fair/Serious/Critical; °C-band fallback; AI Thermal pressure) |
 | **v0.1.562** | CPU metrics **Low Power Mode (LPM)** on the power strip (On/Off; click → Battery settings; green wash when On) |
 | **v0.1.563** | Menu bar **green LPM** cue when Low Power Mode is on (Mon ✕ cue style; hidden when off) |
+| **v0.1.564** | Menu bar **Heat** cue when thermal is **Serious** (amber) or **Critical** (red); hidden on Nominal/Fair |
 
-## Latest tick (~02:18)
+## Latest tick (~02:42)
 
-- Digester open empty; design-review grace (feature-ai-chat ~6.57d); debug.log quiet (soul dump only).
-- Fuel: standing backlog next after power-strip LPM — **menu-bar LPM**.
-- **Keep** append `\nLPM` when `isLowPowerModeEnabled`; green semibold in `make_attributed_title` (Mon ✕ red parity).
-- Discord Ready after install/kickstart.
+- Digester open empty; design-review grace (feature-ai-chat ~6.58d); debug.log quiet (no ERROR/WARN clusters).
+- Fuel: standing backlog next after menu-bar LPM — **Serious·Critical thermal menu cue**.
+- **Keep** append `\nHeat` when `thermalState` is Serious or Critical; amber/red semibold in `make_attributed_title` (Mon ✕ / LPM parity).
+- Discord Ready after install/kickstart (0.1.564).
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-menu-bar-LPM fuel: p50 latency / sibling ports / Serious·Critical thermal menu cue
+- Prefer non-Heat-menu fuel: p50 latency / sibling ports / Fair thermal soft cue / Ollama ✕ color parity
