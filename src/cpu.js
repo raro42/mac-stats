@@ -8968,6 +8968,10 @@ let logsSectionCollapsed = true;
 let logsViewerRaw = { prefix: '', body: '', hasContent: false };
 let logsFilterMode = 'all'; // all | error | warn
 let logsGlanceCounts = { error: 0, warn: 0 };
+/** Fingerprint of last rendered viewer body (skip rebuild on unchanged auto-refresh). */
+let logsViewerRenderKey = '';
+/** Last selected log line text (restore across refresh when possible). */
+let logsSelectedLineText = '';
 
 function logsLineKind(line) {
   if (/\sERROR\s|\bERROR:|\bpanic\b/i.test(line)) return 'error';
@@ -9164,6 +9168,8 @@ function ensureLogsFilterChips() {
 function setLogsFilterMode(mode) {
   const next = mode === 'error' || mode === 'warn' ? mode : 'all';
   logsFilterMode = next;
+  logsViewerRenderKey = '';
+  logsSelectedLineText = '';
   document.querySelectorAll('#logs-filter-chips [data-logs-filter]').forEach((btn) => {
     const on = btn.getAttribute('data-logs-filter') === next;
     btn.classList.toggle('is-active', on);
@@ -9172,10 +9178,253 @@ function setLogsFilterMode(mode) {
   applyLogsFilter(true);
 }
 
+/** Soft tip above Debug Log viewer (Monitors / Perplexity kb-hint parity). */
+function ensureLogsKbHint(viewer, show) {
+  if (!viewer || !viewer.parentNode) return;
+  let hint = document.getElementById('logs-kb-hint');
+  if (!show) {
+    hint?.remove();
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'logs-kb-hint';
+    hint.id = 'logs-kb-hint';
+    viewer.parentNode.insertBefore(hint, viewer);
+  }
+  hint.textContent =
+    '↑↓ / j k · PgUp/PgDn · Home/End select · Enter / c copies line · Esc clears';
+}
+
+function visibleLogsLines(viewer) {
+  if (!viewer) return [];
+  return Array.from(viewer.querySelectorAll('.logs-line'));
+}
+
+function syncLogsLinesTabOrder(viewer, preferEl) {
+  const items = visibleLogsLines(viewer);
+  ensureLogsKbHint(viewer, items.length > 0);
+  if (!items.length) {
+    logsSelectedLineText = '';
+    viewer?.querySelectorAll('.logs-line.is-selected').forEach((el) => {
+      el.classList.remove('is-selected');
+      el.setAttribute('aria-selected', 'false');
+    });
+    return;
+  }
+  let activeIdx = preferEl ? items.indexOf(preferEl) : -1;
+  if (activeIdx < 0 && logsSelectedLineText) {
+    activeIdx = items.findIndex((el) => el.dataset.lineText === logsSelectedLineText);
+  }
+  if (activeIdx < 0) {
+    activeIdx = items.findIndex((el) => el.classList.contains('is-selected'));
+  }
+  if (activeIdx < 0) {
+    const focused = document.activeElement;
+    activeIdx = focused && items.includes(focused) ? items.indexOf(focused) : -1;
+  }
+  if (activeIdx < 0) {
+    items.forEach((el, i) => {
+      el.classList.remove('is-selected');
+      el.setAttribute('aria-selected', 'false');
+      el.tabIndex = i === 0 ? 0 : -1;
+    });
+    return;
+  }
+  items.forEach((el, i) => {
+    const on = i === activeIdx;
+    el.classList.toggle('is-selected', on);
+    el.setAttribute('aria-selected', on ? 'true' : 'false');
+    el.tabIndex = on ? 0 : -1;
+    if (on) logsSelectedLineText = el.dataset.lineText || el.textContent || '';
+  });
+}
+
+function clearLogsLineSelection(viewer) {
+  if (!viewer) return;
+  logsSelectedLineText = '';
+  viewer.querySelectorAll('.logs-line.is-selected').forEach((el) => {
+    el.classList.remove('is-selected');
+    el.setAttribute('aria-selected', 'false');
+  });
+  const items = visibleLogsLines(viewer);
+  items.forEach((el, i) => {
+    el.tabIndex = i === 0 ? 0 : -1;
+  });
+  if (document.activeElement && viewer.contains(document.activeElement)) {
+    document.activeElement.blur();
+  }
+}
+
+function flashLogsLineCopied(el) {
+  if (!el) return;
+  if (el._logsCopiedTimer) {
+    clearTimeout(el._logsCopiedTimer);
+    el._logsCopiedTimer = null;
+  }
+  el.classList.add('is-just-copied');
+  const prevTitle = el.getAttribute('title') || '';
+  el.title = 'Copied';
+  el.setAttribute('aria-label', 'Copied');
+  el._logsCopiedTimer = setTimeout(() => {
+    el.classList.remove('is-just-copied');
+    el._logsCopiedTimer = null;
+    if (prevTitle) el.title = prevTitle;
+    else el.removeAttribute('title');
+    el.setAttribute('aria-label', 'Log line — Enter or c copies');
+  }, 1600);
+}
+
+async function copyLogsLine(el) {
+  if (!el) return false;
+  const value = String(el.dataset.lineText || el.textContent || '').trim();
+  if (!value) return false;
+  const ok = await copyTextToClipboard(value);
+  if (ok) flashLogsLineCopied(el);
+  return ok;
+}
+
+/** Wire j/k list nav + Enter/c copy on Debug Log lines (Perplexity / AI Chat parity). */
+function wireLogsViewerKeyboard(viewer) {
+  if (!viewer || viewer.dataset.keyboardNav === '1') return;
+  viewer.dataset.keyboardNav = '1';
+  viewer.setAttribute('role', 'listbox');
+  viewer.setAttribute('aria-label', 'Debug log lines');
+
+  viewer.addEventListener('click', (e) => {
+    const line = e.target && e.target.closest && e.target.closest('.logs-line');
+    if (!line || !viewer.contains(line)) return;
+    syncLogsLinesTabOrder(viewer, line);
+    line.focus();
+  });
+
+  viewer.addEventListener('keydown', (e) => {
+    const line = e.target && e.target.closest && e.target.closest('.logs-line');
+    if (!line || !viewer.contains(line)) {
+      // First arrow/j from viewer chrome focuses first/last line.
+      if (e.target !== viewer) return;
+      const items = visibleLogsLines(viewer);
+      if (!items.length) return;
+      let next = -1;
+      if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'Home') next = 0;
+      else if (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'End') next = items.length - 1;
+      else return;
+      e.preventDefault();
+      syncLogsLinesTabOrder(viewer, items[next]);
+      items[next].focus();
+      items[next].scrollIntoView({ block: 'nearest' });
+      return;
+    }
+    const items = visibleLogsLines(viewer);
+    const idx = items.indexOf(line);
+    if (idx < 0) return;
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      void copyLogsLine(line);
+      return;
+    }
+
+    if (
+      (e.key === 'c' || e.key === 'C') &&
+      !e.metaKey &&
+      !e.ctrlKey &&
+      !e.altKey
+    ) {
+      e.preventDefault();
+      void copyLogsLine(line);
+      return;
+    }
+
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      if (!line.classList.contains('is-selected') && document.activeElement !== line) {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      clearLogsLineSelection(viewer);
+      return;
+    }
+
+    let next = -1;
+    const page = 5;
+    if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, items.length - 1);
+    else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
+    else if (e.key === 'PageDown') next = Math.min(idx + page, items.length - 1);
+    else if (e.key === 'PageUp') next = Math.max(idx - page, 0);
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = items.length - 1;
+    else return;
+    e.preventDefault();
+    if (next < 0 || next === idx) return;
+    syncLogsLinesTabOrder(viewer, items[next]);
+    items[next].focus();
+    if (typeof items[next].scrollIntoView === 'function') {
+      items[next].scrollIntoView({ block: 'nearest' });
+    }
+  });
+}
+
+function renderLogsViewerLines(viewer, prefix, text, preferScrollEnd) {
+  const wasAtEnd =
+    preferScrollEnd ||
+    viewer.scrollHeight - viewer.scrollTop - viewer.clientHeight < 48;
+  const keepFocus =
+    document.activeElement &&
+    viewer.contains(document.activeElement) &&
+    document.activeElement.classList.contains('logs-line');
+  const prevSelected = logsSelectedLineText;
+
+  viewer.replaceChildren();
+  if (prefix) {
+    const pre = document.createElement('div');
+    pre.className = 'logs-viewer-prefix';
+    pre.textContent = prefix.replace(/\n+$/, '');
+    viewer.appendChild(pre);
+  }
+
+  const lines = String(text || '').split('\n');
+  // Drop a single trailing empty split from a final newline.
+  if (lines.length && lines[lines.length - 1] === '') lines.pop();
+  const frag = document.createDocumentFragment();
+  for (const raw of lines) {
+    const el = document.createElement('div');
+    el.className = 'logs-line';
+    const kind = logsLineKind(raw);
+    if (kind === 'error') el.classList.add('is-error');
+    else if (kind === 'warn') el.classList.add('is-warn');
+    el.setAttribute('role', 'option');
+    el.tabIndex = -1;
+    el.setAttribute('aria-selected', 'false');
+    el.dataset.lineText = raw;
+    el.textContent = raw || ' ';
+    el.title = 'Enter / c copies · ↑↓ / j k to move · Esc clears';
+    el.setAttribute('aria-label', 'Log line — Enter or c copies');
+    frag.appendChild(el);
+  }
+  viewer.appendChild(frag);
+  wireLogsViewerKeyboard(viewer);
+
+  let preferEl = null;
+  if (prevSelected) {
+    preferEl =
+      visibleLogsLines(viewer).find((el) => el.dataset.lineText === prevSelected) || null;
+  }
+  syncLogsLinesTabOrder(viewer, preferEl);
+  if (keepFocus && preferEl) {
+    preferEl.focus();
+    preferEl.scrollIntoView({ block: 'nearest' });
+  } else if (wasAtEnd) {
+    viewer.scrollTop = viewer.scrollHeight;
+  }
+}
+
 function applyLogsFilter(scrollToEnd) {
   const viewer = document.getElementById('logs-viewer');
   if (!viewer) return;
   ensureLogsFilterChips();
+  wireLogsViewerKeyboard(viewer);
+  if (!viewer.hasAttribute('tabindex')) viewer.setAttribute('tabindex', '0');
   const { prefix, body, hasContent } = logsViewerRaw;
   const counts = countLogsByKind(hasContent ? body : '');
   const errEl = document.querySelector('[data-logs-filter-count="error"]');
@@ -9187,24 +9436,58 @@ function applyLogsFilter(scrollToEnd) {
     const key = btn.getAttribute('data-logs-filter');
     btn.classList.toggle('has-hits', key === 'error' ? counts.error > 0 : key === 'warn' ? counts.warn > 0 : false);
   });
+
   if (!hasContent) {
-    viewer.textContent = prefix + (body || '(empty log)');
+    const emptyBody = body || '(empty log)';
+    const key = `empty|${logsFilterMode}|${prefix}|${emptyBody}`;
+    if (key === logsViewerRenderKey && viewer.querySelector('.logs-line, .logs-viewer-empty')) {
+      ensureLogsKbHint(viewer, false);
+      return;
+    }
+    logsViewerRenderKey = key;
+    logsSelectedLineText = '';
+    viewer.replaceChildren();
+    const empty = document.createElement('div');
+    empty.className = 'logs-viewer-empty';
+    empty.textContent = prefix + emptyBody;
+    viewer.appendChild(empty);
     viewer.classList.add('is-empty');
+    ensureLogsKbHint(viewer, false);
     return;
   }
+
   const filtered = filterLogsBody(body, logsFilterMode);
   if (logsFilterMode !== 'all' && !filtered.trim()) {
     const empty =
       logsFilterMode === 'error'
         ? 'Nothing here yet — no ERROR lines in this tail'
         : 'Nothing here yet — no WARN lines in this tail';
-    viewer.textContent = prefix + empty;
+    const key = `miss|${logsFilterMode}|${prefix}|${empty}`;
+    if (key === logsViewerRenderKey && viewer.querySelector('.logs-viewer-empty')) {
+      ensureLogsKbHint(viewer, false);
+      return;
+    }
+    logsViewerRenderKey = key;
+    logsSelectedLineText = '';
+    viewer.replaceChildren();
+    const emptyEl = document.createElement('div');
+    emptyEl.className = 'logs-viewer-empty';
+    emptyEl.textContent = prefix + empty;
+    viewer.appendChild(emptyEl);
     viewer.classList.add('is-empty');
-  } else {
-    viewer.textContent = prefix + filtered;
-    viewer.classList.remove('is-empty');
+    ensureLogsKbHint(viewer, false);
+    return;
   }
-  if (scrollToEnd) viewer.scrollTop = viewer.scrollHeight;
+
+  const key = `lines|${logsFilterMode}|${prefix}|${filtered}`;
+  if (key === logsViewerRenderKey && viewer.querySelector('.logs-line')) {
+    if (scrollToEnd) viewer.scrollTop = viewer.scrollHeight;
+    ensureLogsKbHint(viewer, visibleLogsLines(viewer).length > 0);
+    return;
+  }
+  logsViewerRenderKey = key;
+  viewer.classList.remove('is-empty');
+  renderLogsViewerLines(viewer, prefix, filtered, scrollToEnd);
 }
 
 async function refreshLogsViewer(scrollToEnd = true) {

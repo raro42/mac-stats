@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.579] - 2026-08-21
+
+### Added
+- Debug Log **line keyboard nav** — ↑↓ / j k, PgUp/PgDn, Home/End move between log lines; selected accent wash; Enter / Space / `c` copies the line with a brief **Copied** flash; Esc clears. Soft kb hint above the viewer. ERROR/WARN tint on matching lines. Unchanged auto-refresh skips rebuild. Matches Perplexity / AI Chat / Monitors listbox parity.
+
 ## [0.1.578] - 2026-08-21
 
 ### Added
