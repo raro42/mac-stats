@@ -1128,7 +1128,7 @@ function ensureChatMessagesKbHint(container, show) {
     container.parentNode.insertBefore(hint, container);
   }
   hint.textContent =
-    'All · You · Assistant filters · click / Enter / Space / c copies · ↑↓ / j k · PgUp/PgDn · Esc clears';
+    'All · You · Assistant filters · focus list then ↑↓ / j k / Home / End · click / Enter / Space / c copies · PgUp/PgDn · Esc clears';
 }
 
 /** Keep one selected + tabbable bubble (Monitors listbox parity). */
@@ -1179,9 +1179,22 @@ function wireChatMessagesCopy(container) {
   container.dataset.copyWired = '1';
   container.setAttribute('role', 'listbox');
   container.setAttribute('aria-label', 'Chat messages');
+  if (!container.hasAttribute('tabindex')) {
+    container.setAttribute('tabindex', '0');
+  }
   const activate = (msg) => {
     if (!msg || msg.classList.contains('thinking')) return;
     void copyChatMessageFromUi(msg);
+  };
+  const focusMessage = (next) => {
+    if (!next) return;
+    syncChatMessagesTabOrder(container, next);
+    next.focus();
+    try {
+      next.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    } catch (_) {
+      /* ignore */
+    }
   };
   container.addEventListener('click', (e) => {
     const msg = e.target && e.target.closest && e.target.closest('.chat-message');
@@ -1193,7 +1206,19 @@ function wireChatMessagesCopy(container) {
   });
   container.addEventListener('keydown', (e) => {
     const msg = e.target && e.target.closest && e.target.closest('.chat-message');
-    if (!msg || !container.contains(msg)) return;
+    if (!msg || !container.contains(msg)) {
+      // First arrow/j from listbox chrome focuses first/last message (Perplexity / Monitors parity).
+      if (e.target !== container) return;
+      const items = visibleChatMessages(container);
+      if (!items.length) return;
+      let next = -1;
+      if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'Home') next = 0;
+      else if (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'End') next = items.length - 1;
+      else return;
+      e.preventDefault();
+      focusMessage(items[next]);
+      return;
+    }
     if (msg.style.display === 'none' || msg.classList.contains('thinking')) return;
     const items = visibleChatMessages(container);
     const idx = items.indexOf(msg);
@@ -1225,14 +1250,7 @@ function wireChatMessagesCopy(container) {
     const move = (nextIdx) => {
       if (nextIdx < 0 || nextIdx >= items.length) return;
       e.preventDefault();
-      const next = items[nextIdx];
-      syncChatMessagesTabOrder(container, next);
-      next.focus();
-      try {
-        next.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      } catch (_) {
-        /* ignore */
-      }
+      focusMessage(items[nextIdx]);
     };
 
     if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'J') {
@@ -1268,7 +1286,8 @@ function decorateChatMessageForCopy(messageDiv, role, plainText) {
   messageDiv.setAttribute('role', 'option');
   if (!messageDiv.hasAttribute('tabindex')) messageDiv.tabIndex = -1;
   messageDiv.setAttribute('aria-selected', 'false');
-  messageDiv.title = 'Click to copy · ↑↓ / j k to move · Esc clears';
+  messageDiv.title =
+    'Click to copy · focus list then ↑↓ / j k / Home / End · Esc clears';
   const who = role === 'user' ? 'your' : 'assistant';
   messageDiv.setAttribute('aria-label', `${who} message — copy with Enter or c`);
 }
