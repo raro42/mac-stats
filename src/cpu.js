@@ -428,7 +428,7 @@ function applyProcessPinFlash(list) {
   btn.title = processPinFlash.pinned ? "Pinned" : "Unpinned";
 }
 
-/** Brief Copied flash on process name (survives list rebuild). */
+/** Brief Copied flash on process name + row wash (survives list rebuild). */
 let processNameCopyFlash = null; // { name }
 let processNameCopyFlashTimer = null;
 
@@ -437,6 +437,47 @@ function clearProcessNameCopyFlashTimers() {
     clearTimeout(processNameCopyFlashTimer);
     processNameCopyFlashTimer = null;
   }
+}
+
+function clearProcessRowCopiedWash(list) {
+  const root = list || document.getElementById("process-list");
+  if (!root) return;
+  root.querySelectorAll(".process-row.is-just-copied").forEach((row) => {
+    if (row._processCopiedTimer) {
+      clearTimeout(row._processCopiedTimer);
+      row._processCopiedTimer = null;
+    }
+    row.classList.remove("is-just-copied");
+    row.removeAttribute("aria-label");
+    const prev = row._processCopiedPrevTitle;
+    if (prev) row.title = prev;
+    else row.removeAttribute("title");
+    row._processCopiedPrevTitle = undefined;
+  });
+}
+
+/** Brief green Copied wash on process row (Disk Cleanup / Debug Log parity). */
+function flashProcessRowCopied(row) {
+  if (!row) return;
+  if (row._processCopiedTimer) {
+    clearTimeout(row._processCopiedTimer);
+    row._processCopiedTimer = null;
+  }
+  if (!row._processCopiedPrevTitle && row.hasAttribute("title")) {
+    row._processCopiedPrevTitle = row.getAttribute("title") || "";
+  }
+  row.classList.add("is-just-copied");
+  row.title = "Copied";
+  row.setAttribute("aria-label", "Copied");
+  row._processCopiedTimer = setTimeout(() => {
+    row.classList.remove("is-just-copied");
+    row._processCopiedTimer = null;
+    row.removeAttribute("aria-label");
+    const prev = row._processCopiedPrevTitle;
+    if (prev) row.title = prev;
+    else row.removeAttribute("title");
+    row._processCopiedPrevTitle = undefined;
+  }, 1600);
 }
 
 function requestProcessNameCopyFlash(name) {
@@ -452,6 +493,7 @@ function requestProcessNameCopyFlash(name) {
       el.textContent = n;
       el.title = "Click to copy name";
     });
+    clearProcessRowCopiedWash();
   }, 1600);
 }
 
@@ -465,18 +507,33 @@ function applyProcessNameCopyFlash(list) {
   btn.classList.add("is-just-saved");
   btn.textContent = "Copied";
   btn.title = "Copied";
+  const row = btn.closest(".process-row");
+  if (row) flashProcessRowCopied(row);
 }
 
 async function copyProcessNameFromUi(name) {
   const value = String(name || "").trim();
   if (!value) return false;
+  const list = document.getElementById("process-list");
+  const existingRow = list
+    ? Array.from(list.querySelectorAll(".process-row")).find(
+        (el) => el.getAttribute("data-name") === value
+      )
+    : null;
+  if (
+    existingRow &&
+    (existingRow.classList.contains("is-just-copied") ||
+      existingRow.querySelector("button.process-name.is-just-saved"))
+  ) {
+    return true;
+  }
   const ok = await copyTextToClipboard(value);
   if (!ok) {
     alert("Could not copy process name.");
     return false;
   }
   requestProcessNameCopyFlash(value);
-  applyProcessNameCopyFlash(document.getElementById("process-list"));
+  applyProcessNameCopyFlash(list);
   return true;
 }
 

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.581] - 2026-08-21
+
+### Added
+- Top Processes **row Copied wash** — click name / `c` shows a green **Copied** badge wash on the process row (Disk Cleanup / Debug Log / Perplexity / AI Chat parity; name button still flashes Copied).
+
 ## [0.1.580] - 2026-08-21
 
 ### Added
