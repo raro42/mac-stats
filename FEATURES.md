@@ -10,7 +10,7 @@ Screenshots: [docs/screens/](docs/screens/) · [docs/screens/README.md](docs/scr
 
 | Feature | Notes |
 |---------|--------|
-| Menu-bar glance | Compact **CPU + SSD** (and °C when known); expand with `menuBarCompact: false` for CPU/GPU/RAM/SSD; green **LPM** when Low Power Mode is on |
+| Menu-bar glance | Compact **CPU + SSD** (and °C when known); expand with `menuBarCompact: false` for CPU/GPU/RAM/SSD; green **LPM** when Low Power Mode is on; amber/red **Heat** when thermal Serious/Critical; red **Ollama ✕** when the Ollama circuit is open |
 | Glass CPU window | Nine themes; ring gauges for CPU, GPU, frequency, temperature |
 | History sparklines | CPU → Frequency → Temperature under the gauges |
 | Top processes | Sortable list, pin favorites, process details, Advanced Force Quit |

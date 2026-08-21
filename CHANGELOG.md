@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.565] - 2026-08-21
+
+### Changed
+- Menu bar **Ollama ✕** cue (circuit open) is now **red semibold**, same style as **Mon ✕** (was default menu-bar text color).
+
 ## [0.1.564] - 2026-08-21
 
 ### Added
