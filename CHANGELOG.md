@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.583] - 2026-08-22
+
+### Added
+- Top Processes **listbox chrome keyboard** — focus the process list, then ↑↓ / j k / Home / End jumps to the first or last visible row (Monitors / Disk Cleanup / Debug Log chrome parity). Soft kb hint mentions list focus.
+
 ## [0.1.582] - 2026-08-22
 
 ### Added

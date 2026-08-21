@@ -1921,6 +1921,9 @@ async function refresh() {
           list.dataset.processClickDelegation = "true";
           list.setAttribute("role", "listbox");
           list.setAttribute("aria-label", "Top processes");
+          if (!list.hasAttribute("tabindex")) {
+            list.setAttribute("tabindex", "0");
+          }
           list.addEventListener("click", (e) => {
             const pinBtn = e.target.closest(".process-pin");
             if (pinBtn && list.contains(pinBtn)) {
@@ -1944,7 +1947,26 @@ async function refresh() {
           });
           list.addEventListener("keydown", (e) => {
             const row = e.target.closest(".process-row");
-            if (!row || !list.contains(row)) return;
+            if (!row || !list.contains(row)) {
+              // First arrow/j from listbox chrome focuses first/last row (Monitors parity).
+              if (e.target !== list) return;
+              const rows = visibleProcessRows(list);
+              if (!rows.length) return;
+              let next = -1;
+              if (e.key === "ArrowDown" || e.key === "j" || e.key === "Home") next = 0;
+              else if (e.key === "ArrowUp" || e.key === "k" || e.key === "End")
+                next = rows.length - 1;
+              else return;
+              e.preventDefault();
+              rows.forEach((r, i) =>
+                r.setAttribute("tabindex", i === next ? "0" : "-1")
+              );
+              rows[next].focus();
+              if (typeof rows[next].scrollIntoView === "function") {
+                rows[next].scrollIntoView({ block: "nearest" });
+              }
+              return;
+            }
             if (row.style.display === "none") return;
             // Pin button handles its own keys; do not steal from text fields.
             if (e.target.closest && e.target.closest(".process-pin")) return;
@@ -6220,7 +6242,7 @@ function ensureProcessesListKbHint(processList, show) {
     processList.parentNode?.insertBefore(hint, processList);
   }
   hint.textContent =
-    'All · Pinned filters · click row for details · click name / c copies · ↑↓ / j k · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
+    'All · Pinned filters · click row for details · click name / c copies · focus list then ↑↓ / j k / Home / End · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
 }
 
 /** Hint above External / Monitors list (Disk Cleanup kb-hint parity). */
