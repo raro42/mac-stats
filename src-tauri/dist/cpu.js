@@ -8292,7 +8292,7 @@ function ensurePerplexityResultsKbHint(resultsEl, show) {
     resultsEl.parentNode.insertBefore(hint, resultsEl);
   }
   hint.textContent =
-    '↑↓ / j k · PgUp/PgDn · Home/End select · Enter opens · c copies URL · Esc clears';
+    'Focus results then ↑↓ / j k / Home / End · PgUp/PgDn · Enter opens · c copies URL · Esc clears';
 }
 
 function syncPerplexityResultsTabOrder(resultsEl, preferEl) {
@@ -8400,6 +8400,9 @@ function wirePerplexityResultsKeyboard(resultsEl) {
   resultsEl.dataset.keyboardNav = '1';
   resultsEl.setAttribute('role', 'listbox');
   resultsEl.setAttribute('aria-label', 'Perplexity search results');
+  if (!resultsEl.hasAttribute('tabindex')) {
+    resultsEl.setAttribute('tabindex', '0');
+  }
 
   resultsEl.addEventListener('click', (e) => {
     const item = e.target && e.target.closest && e.target.closest('.perplexity-result-item');
@@ -8413,7 +8416,23 @@ function wirePerplexityResultsKeyboard(resultsEl) {
 
   resultsEl.addEventListener('keydown', (e) => {
     const item = e.target && e.target.closest && e.target.closest('.perplexity-result-item');
-    if (!item || !resultsEl.contains(item)) return;
+    if (!item || !resultsEl.contains(item)) {
+      // First arrow/j from listbox chrome focuses first/last result (Monitors / Debug Log parity).
+      if (e.target !== resultsEl) return;
+      const items = visiblePerplexityResultItems(resultsEl);
+      if (!items.length) return;
+      let next = -1;
+      if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'Home') next = 0;
+      else if (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'End') next = items.length - 1;
+      else return;
+      e.preventDefault();
+      syncPerplexityResultsTabOrder(resultsEl, items[next]);
+      items[next].focus();
+      if (typeof items[next].scrollIntoView === 'function') {
+        items[next].scrollIntoView({ block: 'nearest' });
+      }
+      return;
+    }
     if (item.style.display === 'none') return;
     const items = visiblePerplexityResultItems(resultsEl);
     const idx = items.indexOf(item);

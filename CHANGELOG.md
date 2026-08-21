@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.585] - 2026-08-22
+
+### Added
+- Perplexity Search **listbox chrome keyboard** — focus the results list, then ↑↓ / j k / Home / End jumps to the first or last result (Monitors / Debug Log / Top Processes chrome parity). Soft kb hint mentions list focus.
+
 ## [0.1.584] - 2026-08-22
 
 ### Added
