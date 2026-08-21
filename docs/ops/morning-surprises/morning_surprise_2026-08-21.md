@@ -19,16 +19,17 @@ Continues from late 2026-08-20 window (local night).
 | **v0.1.565** | Menu bar **Ollama ✕** cue **red semibold** when the Ollama HTTP circuit is open |
 | **v0.1.566** | Menu bar **Heat** also for **Fair** (soft yellow); power-strip Heat soft yellow wash when Fair |
 | **v0.1.567** | Menu bar **SSD** amber cue when disk used **≥ 85%** (power-strip SSD hot wash parity) |
+| **v0.1.568** | Menu bar **RAM** amber cue when memory used **≥ 85%** + power-strip RAM hot wash (Details glance parity) |
 
-## Latest tick (~03:57)
+## Latest tick (~04:28)
 
-- Digester open empty; design-review grace (feature-ai-chat ~6.63d); debug.log quiet (no ERROR/WARN clusters).
-- Fuel: standing backlog next after Fair Heat — **menu-bar SSD warn**.
-- **Keep** amber **SSD** cue under CPU/SSD when disk ≥ 85%; hidden below that threshold.
-- Discord Ready after install/kickstart (0.1.567).
+- Digester open empty; design-review grace (feature-ai-chat ~6.65d); debug.log quiet (no ERROR/WARN clusters).
+- Fuel: standing backlog next after SSD warn — **menu-bar RAM warn**.
+- **Keep** amber **RAM** cue under CPU metrics when memory ≥ 85%; power-strip RAM cell soft amber wash; hidden below that threshold.
+- Discord Ready after install/kickstart (0.1.568).
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-SSD-warn fuel: p50 latency / sibling ports / Monitors latency cue / menu-bar RAM warn
+- Prefer non-RAM-warn fuel: p50 latency / sibling ports / Monitors latency cue / menu-bar CPU≥50% amber
