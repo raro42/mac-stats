@@ -142,6 +142,7 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
     // labelColor can sometimes turn black in menu bar, so use controlTextColor which adapts properly
     let color = NSColor::controlTextColor();
     let alert_color = NSColor::systemRedColor();
+    let lpm_color = NSColor::systemGreenColor();
     let paragraph = NSMutableParagraphStyle::new();
     paragraph.setLineSpacing(-2.0);
     paragraph.setLineHeightMultiple(0.75);
@@ -196,26 +197,32 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
             full_range,
         );
 
-        // Color monitor-down alert line(s) red (e.g. "Mon ✕")
+        // Color cue lines: Mon ✕ red; LPM green (Low Power Mode on).
         let mut utf16_pos: usize = 0;
         for (i, line) in lines.iter().enumerate() {
             let line_utf16 = line.encode_utf16().count();
             let is_mon_alert = line.starts_with("Mon ") && line.contains('✕');
-            if is_mon_alert && line_utf16 > 0 {
-                let alert_font =
+            let is_lpm_cue = *line == "LPM";
+            if (is_mon_alert || is_lpm_cue) && line_utf16 > 0 {
+                let cue_font =
                     NSFont::monospacedSystemFontOfSize_weight(10.0, NSFontWeightSemibold);
+                let cue_color = if is_lpm_cue {
+                    &*lpm_color
+                } else {
+                    &*alert_color
+                };
                 let range = NSRange {
                     location: utf16_pos,
                     length: line_utf16,
                 };
                 attributed.addAttribute_value_range(
                     NSForegroundColorAttributeName,
-                    as_any(&*alert_color),
+                    as_any(cue_color),
                     range,
                 );
                 attributed.addAttribute_value_range(
                     NSFontAttributeName,
-                    as_any(&*alert_font),
+                    as_any(&*cue_font),
                     range,
                 );
             }

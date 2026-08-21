@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.563] - 2026-08-21
+
+### Added
+- Menu bar **LPM** cue when Apple Low Power Mode is on (power-strip / `isLowPowerModeEnabled` parity). Green semibold line under CPU/SSD (same cue style as red **Mon ✕**). Hidden when LPM is off.
+
 ## [0.1.562] - 2026-08-21
 
 ### Added

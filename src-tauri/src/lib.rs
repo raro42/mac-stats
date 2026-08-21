@@ -729,6 +729,10 @@ fn run_internal(open_cpu_window: bool) {
                     if any_monitor_down {
                         text.push_str("\nMon ✕");
                     }
+                    // Green LPM cue when Apple Low Power Mode is on (power-strip parity).
+                    if crate::ffi::objc::read_process_low_power_mode() {
+                        text.push_str("\nLPM");
+                    }
 
                     // Store update in static variable
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {
