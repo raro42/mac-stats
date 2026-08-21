@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.570] - 2026-08-21
+
+### Added
+- Menu bar **GPU** cue (amber) when GPU usage is **≥ 15%** — same threshold as the power-strip GPU hot wash. Hidden when below 15%.
+
 ## [0.1.569] - 2026-08-21
 
 ### Added

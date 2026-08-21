@@ -745,6 +745,10 @@ fn run_internal(open_cpu_window: bool) {
                     if metrics.cpu >= 50.0 {
                         text.push_str("\nCPU");
                     }
+                    // Amber GPU cue when usage ≥ 15% (power-strip GPU is-hot parity).
+                    if metrics.gpu >= 15.0 {
+                        text.push_str("\nGPU");
+                    }
                     // Amber SSD cue when disk used ≥ 85% (power-strip SSD is-hot parity).
                     if metrics.disk >= 85.0 {
                         text.push_str("\nSSD");
