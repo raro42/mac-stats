@@ -19,6 +19,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 7. OpenClaw / Hermes ports that clearly map to mac-stats tools/sessions (not docs-only Related sections). Google SERP FETCH_URL→search rewrite shipped in **v0.1.281**. Insights/status/digest/schedules/scrub/`/help`/interrupt NL in **v0.1.306–315**. Discord voice STT harden in **v0.1.313**. Climate/clima/klima → Open-Meteo + Brave-weather→Perplexity redirect in **v0.1.319–321**.
 
 ## Done recently (do not re-pick as filler)
+- Perplexity Search **result keyboard nav** (↑↓ / j k · Enter opens · c copies URL · Esc; Monitors / AI Chat / Top Processes listbox parity) — **v0.1.578**
+
 
 - AI Chat **message keyboard nav** (↑↓ / j k · selected wash · Esc · c copy; Monitors / Top Processes listbox parity) — **v0.1.577**
 - AI Chat **click-to-copy on messages** (Copied flash; drag-select safe; last-answer / processes / monitors parity) — **v0.1.576**

@@ -12,16 +12,17 @@ Overnight Track B (autoresearch) for Ralf.
 | **v0.1.575** | Menu bar **Mon** amber cue when any UP monitor responds **≥ 2000 ms** (Monitors summary slowest / latency parity; red **Mon ✕** still wins on DOWN) |
 | **v0.1.576** | AI Chat **click-to-copy on messages** (Copied flash; drag-select safe; last-answer / processes / monitors parity) |
 | **v0.1.577** | AI Chat **message keyboard nav** (↑↓ / j k · selected wash · Esc · c copy; Monitors / Top Processes listbox parity) |
+| **v0.1.578** | Perplexity Search **result keyboard nav** (↑↓ / j k · Enter opens · c copies URL · Esc; Monitors / AI Chat listbox parity) |
 
-## Latest tick (~22:07)
+## Latest tick (~22:33)
 
-- Digester open empty; design-review grace (feature-ai-chat ~7.39d recommended); debug.log quiet (no ERROR/WARN clusters).
-- Fuel: design-review AI Chat — left copy-only polish; keyboard listbox after click-to-copy.
-- **Keep** message j/k nav + selected wash; Discord Ready after install (0.1.577).
+- Digester open empty; design-review grace (feature-ai-chat ~7.41d recommended); debug.log quiet (no ERROR/WARN clusters).
+- Fuel: Perplexity results keyboard (after AI Chat kb-nav).
+- **Keep** result j/k nav + Enter open + c copy; Discord Ready after install (0.1.578).
 - Screenshot recapture deferred (TCC / warm window).
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-kb-nav fuel: p50 latency / sibling ports / design-review when due / Perplexity result keyboard
+- Prefer non-Perplexity-kb fuel: p50 latency / sibling ports / design-review when due / Debug Log keyboard
