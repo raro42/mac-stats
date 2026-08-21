@@ -14,16 +14,17 @@ Overnight Track B (autoresearch) for Ralf.
 | **v0.1.577** | AI Chat **message keyboard nav** (↑↓ / j k · selected wash · Esc · c copy; Monitors / Top Processes listbox parity) |
 | **v0.1.578** | Perplexity Search **result keyboard nav** (↑↓ / j k · Enter opens · c copies URL · Esc; Monitors / AI Chat listbox parity) |
 | **v0.1.579** | Debug Log **line keyboard nav** (↑↓ / j k · selected wash · Enter/c copy · Esc; ERROR/WARN tint; auto-refresh skip) |
+| **v0.1.580** | Disk Cleanup **row Copied flash + listbox chrome keyboard** (green Copied wash on scope/category; ↑↓ / j k from listbox → first/last) |
 
-## Latest tick (~22:58)
+## Latest tick (~23:23)
 
-- Digester open empty; design-review grace (feature-ai-chat ~7.43d recommended); debug.log quiet (no ERROR/WARN clusters).
-- Fuel: Debug Log keyboard (after Perplexity kb-nav; standing design-review listbox parity).
-- **Keep** log-line j/k nav + Enter/c copy + Copied flash; Discord Ready after install (0.1.579).
+- Digester open empty; design-review grace (feature-ai-chat ~7.44d recommended); debug.log quiet (no ERROR/WARN clusters).
+- Fuel: Disk Cleanup keyboard polish (after Debug Log kb-nav; standing design-review listbox parity).
+- **Keep** row Copied wash + listbox chrome first/last focus; Discord Ready after install (0.1.580).
 - Screenshot recapture deferred (TCC / warm window).
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-Debug-Log-kb fuel: p50 latency / sibling ports / design-review when due / Disk Cleanup keyboard polish
+- Prefer non-Disk-Cleanup-copy fuel: p50 latency / sibling ports / design-review when due / Top Processes row Copied overlay if still a gap
