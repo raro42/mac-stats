@@ -15,18 +15,19 @@ Continues from late 2026-08-20 window (local night).
 | **v0.1.561** | Heat prefers Apple **`NSProcessInfo.thermalState`** (OS Nominal/Fair/Serious/Critical; °C-band fallback; AI Thermal pressure) |
 | **v0.1.562** | CPU metrics **Low Power Mode (LPM)** on the power strip (On/Off; click → Battery settings; green wash when On) |
 | **v0.1.563** | Menu bar **green LPM** cue when Low Power Mode is on (Mon ✕ cue style; hidden when off) |
-| **v0.1.564** | Menu bar **Heat** cue when thermal is **Serious** (amber) or **Critical** (red); hidden on Nominal/Fair |
-| **v0.1.565** | Menu bar **Ollama ✕** cue **red semibold** when the Ollama HTTP circuit is open (Mon ✕ color parity) |
+| **v0.1.564** | Menu bar **Heat** cue when thermal is **Serious** (amber) or **Critical** (red) |
+| **v0.1.565** | Menu bar **Ollama ✕** cue **red semibold** when the Ollama HTTP circuit is open |
+| **v0.1.566** | Menu bar **Heat** also for **Fair** (soft yellow); power-strip Heat soft yellow wash when Fair |
 
-## Latest tick (~03:08)
+## Latest tick (~03:33)
 
-- Digester open empty; design-review grace (feature-ai-chat ~6.6d); debug.log quiet (no ERROR/WARN clusters).
-- Fuel: standing backlog next after Heat menu — **Ollama ✕ color parity**.
-- **Keep** paint `Ollama ✕` red semibold in `make_attributed_title` (Mon ✕ / Heat / LPM cue family).
-- Discord Ready after install/kickstart (0.1.565).
+- Digester open empty; design-review grace (feature-ai-chat ~6.62d); debug.log quiet (no ERROR/WARN clusters).
+- Fuel: standing backlog next after Ollama ✕ — **Fair thermal soft cue**.
+- **Keep** Heat ladder: Fair → yellow, Serious → amber, Critical → red (menu bar + power-strip wash).
+- Discord Ready after install/kickstart (0.1.566).
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-Ollama-✕-color fuel: p50 latency / sibling ports / Fair thermal soft cue
+- Prefer non-Fair-Heat fuel: p50 latency / sibling ports / menu-bar SSD warn / Monitors latency cue
