@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- AI Chat **message keyboard nav** (↑↓ / j k · selected wash · Esc · c copy; Monitors / Top Processes listbox parity) — **v0.1.577**
 - AI Chat **click-to-copy on messages** (Copied flash; drag-select safe; last-answer / processes / monitors parity) — **v0.1.576**
 - Menu bar **Mon** amber cue when any UP monitor responds ≥ 2000 ms (Monitors summary slowest / latency parity; Mon ✕ still wins on DOWN) — **v0.1.575**
 - Menu bar **Bat** amber cue when cached battery ≤ 20% and not charging (power-strip battery is-low parity) — **v0.1.574**

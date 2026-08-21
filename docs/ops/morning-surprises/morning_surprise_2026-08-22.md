@@ -11,16 +11,17 @@ Overnight Track B (autoresearch) for Ralf.
 | **v0.1.574** | Menu bar **Bat** amber cue when cached battery **≤ 20%** and not charging (power-strip battery `is-low` wash parity) |
 | **v0.1.575** | Menu bar **Mon** amber cue when any UP monitor responds **≥ 2000 ms** (Monitors summary slowest / latency parity; red **Mon ✕** still wins on DOWN) |
 | **v0.1.576** | AI Chat **click-to-copy on messages** (Copied flash; drag-select safe; last-answer / processes / monitors parity) |
+| **v0.1.577** | AI Chat **message keyboard nav** (↑↓ / j k · selected wash · Esc · c copy; Monitors / Top Processes listbox parity) |
 
-## Latest tick (~21:40)
+## Latest tick (~22:07)
 
-- Digester open empty; design-review grace (feature-ai-chat ~7.37d); debug.log quiet (no ERROR/WARN clusters).
-- Fuel: design-review AI Chat — left Mon-latency menu-bar lane.
-- **Keep** click-to-copy on chat bubbles; Discord Ready after install/kickstart (0.1.576).
+- Digester open empty; design-review grace (feature-ai-chat ~7.39d recommended); debug.log quiet (no ERROR/WARN clusters).
+- Fuel: design-review AI Chat — left copy-only polish; keyboard listbox after click-to-copy.
+- **Keep** message j/k nav + selected wash; Discord Ready after install (0.1.577).
 - Screenshot recapture deferred (TCC / warm window).
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-copy-polish fuel: p50 latency / sibling ports / design-review when due
+- Prefer non-kb-nav fuel: p50 latency / sibling ports / design-review when due / Perplexity result keyboard
