@@ -17,16 +17,17 @@ Overnight Track B (autoresearch) for Ralf.
 | **v0.1.580** | Disk Cleanup **row Copied flash + listbox chrome keyboard** (green Copied wash on scope/category; ↑↓ / j k from listbox → first/last) |
 | **v0.1.581** | Top Processes **row Copied wash** (click name / `c` → green Copied badge on row; name button still flashes; Disk Cleanup / Debug Log parity) |
 | **v0.1.582** | External / Monitors **row Copied wash + listbox chrome keyboard** (click URL / `c` → green Copied badge; ↑↓ / j k from listbox → first/last; Top Processes / Disk Cleanup parity) |
+| **v0.1.583** | Top Processes **listbox chrome keyboard** (focus list → ↑↓ / j k / Home / End first/last; Monitors / Disk Cleanup / Debug Log chrome parity) |
 
-## Latest tick (~00:17)
+## Latest tick (~00:41)
 
-- Digester open empty; design-review grace (feature-ai-chat ~7.48d recommended); debug.log quiet (no ERROR/WARN clusters).
-- Fuel: Monitors row Copied overlay + listbox chrome (after Top Processes copy wash; standing design-review listbox parity).
-- **Keep** green Copied badge wash on monitor row + listbox first/last; Discord Ready after install (0.1.582).
+- Digester open empty; design-review grace (feature-ai-chat ~7.5d recommended); debug.log quiet (no ERROR/WARN clusters).
+- Fuel: process-list listbox chrome first/last (after Monitors chrome; standing design-review listbox parity).
+- **Keep** listbox chrome on Top Processes; Discord Ready after install (0.1.583).
 - Screenshot recapture deferred (TCC / warm window).
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-Monitors-copy fuel: p50 latency / sibling ports / design-review when due / process-list listbox chrome first/last / Agent Ops row Copied if still a gap
+- Prefer non-process-listbox fuel: p50 latency / sibling ports / design-review when due / Agent Ops Copied badge (::after) if still a gap / Details keyboard
