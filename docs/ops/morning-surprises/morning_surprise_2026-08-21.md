@@ -20,16 +20,17 @@ Continues from late 2026-08-20 window (local night).
 | **v0.1.566** | Menu bar **Heat** also for **Fair** (soft yellow); power-strip Heat soft yellow wash when Fair |
 | **v0.1.567** | Menu bar **SSD** amber cue when disk used **≥ 85%** (power-strip SSD hot wash parity) |
 | **v0.1.568** | Menu bar **RAM** amber cue when memory used **≥ 85%** + power-strip RAM hot wash (Details glance parity) |
+| **v0.1.569** | Menu bar **CPU** amber cue when usage **≥ 50%** (power-strip CPU is-hot parity) |
 
-## Latest tick (~04:28)
+## Latest tick (~04:52)
 
-- Digester open empty; design-review grace (feature-ai-chat ~6.65d); debug.log quiet (no ERROR/WARN clusters).
-- Fuel: standing backlog next after SSD warn — **menu-bar RAM warn**.
-- **Keep** amber **RAM** cue under CPU metrics when memory ≥ 85%; power-strip RAM cell soft amber wash; hidden below that threshold.
-- Discord Ready after install/kickstart (0.1.568).
+- Digester open empty; design-review grace (feature-ai-chat ~6.67d); debug.log quiet (no ERROR/WARN clusters).
+- Fuel: standing backlog next after RAM warn — **menu-bar CPU≥50% amber**.
+- **Keep** amber **CPU** cue under metrics when usage ≥ 50%; hidden below that threshold (exact cue line `CPU`, not the tabbed label row).
+- Discord Ready after install/kickstart (0.1.569).
 
 ## Next fuel
 
 - Digester Discord traffic if any
 - Deferred screenshots when TCC allows
-- Prefer non-RAM-warn fuel: p50 latency / sibling ports / Monitors latency cue / menu-bar CPU≥50% amber
+- Prefer non-CPU-warn fuel: p50 latency / sibling ports / menu-bar GPU≥15% amber / Monitors latency cue
