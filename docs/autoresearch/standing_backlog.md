@@ -21,6 +21,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 ## Done recently (do not re-pick as filler)
 
 
+- Agent Ops **refresh-row toolbar keyboard** (← → / h l · Home/End across Refresh · Refresh digest · Updated; Enter/Space activates; Updated Enter triggers full refresh; tab-bar / health-strip parity) — **v0.1.599**
+
 - Agent Ops **tab-bar toolbar keyboard** (← → / h l · Home/End across 0 Overview · Agents · Sessions · Schedules · Knowledge · Runs; Enter/Space opens tab; overview-card / health-strip parity) — **v0.1.598**
 
 - Agent Ops **overview-card toolbar keyboard** (← → / h l · Home/End across Agents · Schedules · Live · Knowledge · Recent · Runs · Digest; Enter/Space opens linked tab; health-strip / power-strip parity) — **v0.1.597**

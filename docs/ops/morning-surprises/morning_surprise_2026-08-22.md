@@ -4,7 +4,7 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 
 ## Latest keep (this tick)
 
-**v0.1.598** — Agent Ops tab-bar toolbar keyboard: focus 0 Overview · Agents · Sessions · Schedules · Knowledge · Runs, then ← → / h l / Home / End moves across tabs (overview-card / health-strip parity). Enter / Space opens tab or overview. Soft kb hint; one Tab stop via roving tabindex.
+**v0.1.599** — Agent Ops refresh-row toolbar keyboard: focus Refresh · Refresh digest · Updated, then ← → / h l / Home / End moves across controls (tab-bar / health-strip parity). Enter / Space activates buttons; Updated stamp triggers full refresh. Soft kb hint; one Tab stop via roving tabindex.
 
 ## Tonight's keeps (selected)
 
@@ -26,6 +26,7 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 | **v0.1.596** | Agent Ops health-strip toolbar keyboard |
 | **v0.1.597** | Agent Ops overview-card toolbar keyboard |
 | **v0.1.598** | Agent Ops tab-bar toolbar keyboard |
+| **v0.1.599** | Agent Ops refresh-row toolbar keyboard |
 
 ## Notes
 
