@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.588] - 2026-08-22
+
+### Added
+- Battery / power strip **toolbar keyboard** — focus a chip, then ← → / h l / Home / End moves across CPU · RAM · GPU · Temp · Heat · LPM · GHz · SSD · Up · Bat · Power (Details / Monitors listbox chrome parity). Enter / Space keeps activate or copy. Soft kb hint under the strip; one Tab stop via roving tabindex.
+
 ## [0.1.587] - 2026-08-22
 
 ### Added

@@ -2123,6 +2123,7 @@ function init() {
   ensureFreqStrip();
   ensureDiskStrip();
   ensureUptimeStrip();
+  ensurePowerStripKeyboard();
   
   // Try to get Tauri immediately - don't wait if it's already available
   const immediateInvoke = getInvoke();
@@ -2616,6 +2617,13 @@ function ensureRamStripStyles() {
       background-color: color-mix(in srgb, #30d158 16%, transparent);
       border-radius: 10px;
       box-shadow: 0 0 0 4px color-mix(in srgb, #30d158 16%, transparent);
+    }
+    .power-strip-kb-hint {
+      margin: 4px 0 0;
+      font-size: 11px;
+      opacity: 0.72;
+      width: 100%;
+      flex-basis: 100%;
     }
   `;
   document.head.appendChild(style);
@@ -3215,6 +3223,121 @@ function ensureUptimeStrip() {
     openUptime(e);
   });
   return cell;
+}
+
+/** Focusable chips on #battery-power-strip (DOM order). */
+function getPowerStripChips() {
+  const strip = document.getElementById('battery-power-strip');
+  if (!strip) return [];
+  const sel = [
+    '#cpu-strip',
+    '#ram-strip',
+    '#gpu-strip',
+    '#temp-strip',
+    '#thermal-strip',
+    '#lpm-strip',
+    '#freq-strip',
+    '#disk-strip',
+    '#uptime-strip',
+    '#battery-level',
+    '#power-value',
+  ].join(',');
+  return Array.from(strip.querySelectorAll(sel)).filter((el) => {
+    if (!el || el.hidden) return false;
+    // Prefer laid-out chips; keep just-created nodes before first paint.
+    return el.getClientRects().length > 0 || el.offsetParent !== null || strip.contains(el);
+  });
+}
+
+/** One Tab stop on the strip; arrows move focus (Details / listbox chrome parity). */
+function refreshPowerStripRovingTabindex(preferred) {
+  const chips = getPowerStripChips();
+  if (!chips.length) return;
+  const focused = chips.find((el) => el === document.activeElement);
+  const current =
+    (preferred && chips.includes(preferred) && preferred) ||
+    focused ||
+    chips.find((el) => el.tabIndex === 0) ||
+    chips[0];
+  for (const el of chips) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+/** Soft tip under the battery/power strip (Details kb-hint parity). */
+function ensurePowerStripKbHint() {
+  ensureRamStripStyles();
+  const strip = document.getElementById('battery-power-strip');
+  if (!strip) return;
+  let hint = document.getElementById('power-strip-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.id = 'power-strip-kb-hint';
+    hint.className = 'power-strip-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    strip.appendChild(hint);
+  }
+  hint.textContent =
+    '← → / h l · Home/End move · Enter / Space activates (or copies Bat / Power)';
+}
+
+/**
+ * Power strip toolbar keyboard — focus a chip, then ←→ / h l / Home/End
+ * moves across CPU·RAM·GPU·Temp·Heat·LPM·GHz·SSD·Up·Bat·Power (Details /
+ * Monitors listbox chrome parity). Enter/Space keep existing activate/copy.
+ */
+function ensurePowerStripKeyboard() {
+  ensureRamStripStyles();
+  const strip = document.getElementById('battery-power-strip');
+  if (!strip) return;
+  ensurePowerStripKbHint();
+  refreshPowerStripRovingTabindex();
+  if (strip.dataset.powerStripKbWired === '1') return;
+  strip.dataset.powerStripKbWired = '1';
+  if (!strip.getAttribute('role')) {
+    strip.setAttribute('role', 'toolbar');
+  }
+  if (!strip.getAttribute('aria-label')) {
+    strip.setAttribute('aria-label', 'Battery and power metrics');
+  }
+  strip.addEventListener('focusin', (e) => {
+    const chips = getPowerStripChips();
+    if (chips.includes(e.target)) refreshPowerStripRovingTabindex(e.target);
+  });
+  strip.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const chips = getPowerStripChips();
+    if (!chips.length) return;
+    const idx = chips.indexOf(document.activeElement);
+    if (idx < 0) return;
+    let next = -1;
+    if (
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j'
+    ) {
+      next = Math.min(idx + 1, chips.length - 1);
+    } else if (
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k'
+    ) {
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = chips.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshPowerStripRovingTabindex(chips[next]);
+    chips[next].focus();
+  });
 }
 
 // Try multiple initialization strategies
@@ -8446,6 +8569,7 @@ function initCollapsibleSections() {
   ensureFreqStrip();
   ensureDiskStrip();
   ensureUptimeStrip();
+  ensurePowerStripKeyboard();
   ensureProcessesTopGlance();
   ensureDetailsCollapsedGlance();
   initDetailsGridKeyboard();
