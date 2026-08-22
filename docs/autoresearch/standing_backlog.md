@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Perplexity Search **toolbar keyboard** (← → / h l · Home/End across query · Search; setup key · Save key; composer parity) — **v0.1.606**
+
 - AI Chat **composer toolbar keyboard** (← → / h l · Home/End across input · Clear · Send; arrows at text boundaries; filter-row parity) — **v0.1.605**
 
 - Agent Ops **Runs Insights toolbar keyboard** (← → / h l · Home/End across Discord · Digest open · Slowest · Candidates; arrow previews run; Enter loads chat; filter-row / preview-row parity) — **v0.1.604**

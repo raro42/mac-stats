@@ -4954,8 +4954,20 @@ button.monitor-detail-url.is-just-saved {
 /* Perplexity Search — minimal shared styles for themes without local CSS */
 .perplexity-search-box {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 4px 0 10px;
+}
+
+.perplexity-search-kb-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.perplexity-search-kb-hint[hidden] {
+  display: none !important;
 }
 .perplexity-search-box input {
   flex: 1;
@@ -5152,8 +5164,20 @@ button.monitor-detail-url.is-just-saved {
 
 .perplexity-setup-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: center;
+}
+
+.perplexity-setup-kb-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.perplexity-setup-kb-hint[hidden] {
+  display: none !important;
 }
 
 .perplexity-inline-key {

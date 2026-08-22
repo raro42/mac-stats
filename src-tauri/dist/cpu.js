@@ -9301,6 +9301,262 @@ function wirePerplexityResultsKeyboard(resultsEl) {
   });
 }
 
+/** Focusable Perplexity search toolbar items (query input · Search). */
+function getPerplexitySearchToolbarItems(container) {
+  const row = container || document.querySelector('.perplexity-search-box');
+  if (!row || row.hidden) return [];
+  const items = [];
+  const query = document.getElementById('perplexity-query');
+  const searchBtn = document.getElementById('perplexity-search-btn');
+  if (query && row.contains(query) && !query.hidden) items.push(query);
+  if (searchBtn && row.contains(searchBtn) && !searchBtn.hidden) items.push(searchBtn);
+  return items.filter((el) => {
+    if (!el || el.hidden) return false;
+    return el.getClientRects().length > 0 || row.contains(el);
+  });
+}
+
+function perplexitySearchInputAtMoveBoundary(input, direction) {
+  if (!input || input.tagName !== 'INPUT') return true;
+  if (direction > 0) {
+    const len = (input.value || '').length;
+    return input.selectionStart === len && input.selectionEnd === len;
+  }
+  return input.selectionStart === 0 && input.selectionEnd === 0;
+}
+
+function refreshPerplexitySearchRovingTabindex(container, preferred) {
+  const row = container || document.querySelector('.perplexity-search-box');
+  const items = getPerplexitySearchToolbarItems(row);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensurePerplexitySearchKbHint(container) {
+  const row = container || document.querySelector('.perplexity-search-box');
+  if (!row) return;
+  let hint = row.querySelector('.perplexity-search-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'perplexity-search-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    row.appendChild(hint);
+  }
+  const items = getPerplexitySearchToolbarItems(row);
+  hint.hidden = items.length < 2;
+  hint.textContent =
+    '← → / h l · Home/End move · Enter searches from input · Search on button';
+}
+
+/**
+ * Perplexity search toolbar keyboard — focus query · Search, then ←→ / h l /
+ * Home/End (composer parity). Input keeps normal typing; arrows move only at
+ * text start/end. One Tab stop via roving tabindex.
+ */
+function wirePerplexitySearchToolbarKeyboard(row) {
+  if (!row) return;
+  ensurePerplexitySearchKbHint(row);
+  refreshPerplexitySearchRovingTabindex(row);
+  if (row.dataset.perplexitySearchKbWired === '1') return;
+  row.dataset.perplexitySearchKbWired = '1';
+  if (!row.getAttribute('role')) row.setAttribute('role', 'toolbar');
+  if (!row.getAttribute('aria-label')) row.setAttribute('aria-label', 'Perplexity search');
+  row.addEventListener('focusin', (e) => {
+    const items = getPerplexitySearchToolbarItems(row);
+    if (items.includes(e.target)) {
+      refreshPerplexitySearchRovingTabindex(row, e.target);
+      ensurePerplexitySearchKbHint(row);
+    }
+  });
+  row.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getPerplexitySearchToolbarItems(row);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (active?.id === 'perplexity-query' || active?.id === 'perplexity-search-btn') return;
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward) {
+      if (active?.id === 'perplexity-query' && !perplexitySearchInputAtMoveBoundary(active, 1)) {
+        return;
+      }
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (back) {
+      if (active?.id === 'perplexity-query' && !perplexitySearchInputAtMoveBoundary(active, -1)) {
+        return;
+      }
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshPerplexitySearchRovingTabindex(row, items[next]);
+    items[next].focus();
+    if (items[next]?.id === 'perplexity-query' && typeof items[next].select === 'function') {
+      const len = (items[next].value || '').length;
+      items[next].setSelectionRange(len, len);
+    }
+  });
+}
+
+/** Focusable Perplexity setup toolbar items (inline key · Save key). */
+function getPerplexitySetupToolbarItems(container) {
+  const row = container || document.querySelector('.perplexity-setup-row');
+  if (!row) return [];
+  const setup = document.getElementById('perplexity-setup');
+  if (setup?.hidden) return [];
+  const items = [];
+  const keyInput = document.getElementById('perplexity-inline-key');
+  const saveBtn = document.getElementById('perplexity-inline-save');
+  if (keyInput && row.contains(keyInput) && !keyInput.hidden) items.push(keyInput);
+  if (saveBtn && row.contains(saveBtn) && !saveBtn.hidden) items.push(saveBtn);
+  return items.filter((el) => {
+    if (!el || el.hidden) return false;
+    return el.getClientRects().length > 0 || row.contains(el);
+  });
+}
+
+function refreshPerplexitySetupRovingTabindex(container, preferred) {
+  const row = container || document.querySelector('.perplexity-setup-row');
+  const items = getPerplexitySetupToolbarItems(row);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensurePerplexitySetupKbHint(container) {
+  const row = container || document.querySelector('.perplexity-setup-row');
+  if (!row) return;
+  let hint = row.querySelector('.perplexity-setup-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'perplexity-setup-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    row.appendChild(hint);
+  }
+  const items = getPerplexitySetupToolbarItems(row);
+  hint.hidden = items.length < 2;
+  hint.textContent =
+    '← → / h l · Home/End move · Enter saves from key field · Save key on button';
+}
+
+function wirePerplexitySetupToolbarKeyboard(row) {
+  if (!row) return;
+  ensurePerplexitySetupKbHint(row);
+  refreshPerplexitySetupRovingTabindex(row);
+  if (row.dataset.perplexitySetupKbWired === '1') return;
+  row.dataset.perplexitySetupKbWired = '1';
+  if (!row.getAttribute('role')) row.setAttribute('role', 'toolbar');
+  if (!row.getAttribute('aria-label')) row.setAttribute('aria-label', 'Perplexity API key');
+  row.addEventListener('focusin', (e) => {
+    const items = getPerplexitySetupToolbarItems(row);
+    if (items.includes(e.target)) {
+      refreshPerplexitySetupRovingTabindex(row, e.target);
+      ensurePerplexitySetupKbHint(row);
+    }
+  });
+  row.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getPerplexitySetupToolbarItems(row);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (active?.id === 'perplexity-inline-key' || active?.id === 'perplexity-inline-save') {
+        return;
+      }
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward) {
+      if (
+        active?.id === 'perplexity-inline-key' &&
+        !perplexitySearchInputAtMoveBoundary(active, 1)
+      ) {
+        return;
+      }
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (back) {
+      if (
+        active?.id === 'perplexity-inline-key' &&
+        !perplexitySearchInputAtMoveBoundary(active, -1)
+      ) {
+        return;
+      }
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshPerplexitySetupRovingTabindex(row, items[next]);
+    items[next].focus();
+    if (
+      items[next]?.id === 'perplexity-inline-key' &&
+      typeof items[next].setSelectionRange === 'function'
+    ) {
+      const len = (items[next].value || '').length;
+      items[next].setSelectionRange(len, len);
+    }
+  });
+}
+
+function ensurePerplexitySearchToolbarKeyboard() {
+  const searchBox = document.querySelector('.perplexity-search-box');
+  if (searchBox) wirePerplexitySearchToolbarKeyboard(searchBox);
+  const setupRow = document.querySelector('.perplexity-setup-row');
+  if (setupRow) wirePerplexitySetupToolbarKeyboard(setupRow);
+}
+
 /** @type {boolean} */
 let perplexityConfigured = false;
 /** @type {boolean} */
@@ -9391,6 +9647,7 @@ function ensurePerplexitySetupPanel() {
       }
     });
   }
+  ensurePerplexitySearchToolbarKeyboard();
 }
 
 function updatePerplexitySetupVisibility() {
@@ -9409,6 +9666,7 @@ function updatePerplexitySetupVisibility() {
       setTimeout(() => inlineKey.focus(), 50);
     }
   }
+  ensurePerplexitySearchToolbarKeyboard();
 }
 
 async function refreshPerplexityStatus() {
@@ -9834,6 +10092,8 @@ function initPerplexitySection() {
       void runPerplexitySearch();
     });
   }
+
+  ensurePerplexitySearchToolbarKeyboard();
 
   // Settings: Save / Clear API key (busy-guard + flash; Discord token parity)
   const saveBtn = document.getElementById('perplexity-save-key');

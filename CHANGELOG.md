@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.606] - 2026-08-23
+
+### Added
+- Perplexity Search **toolbar keyboard** — focus query · Search (or inline key · Save key when setup is shown), then ← → / h l / Home / End moves across controls (composer parity). Arrows leave text fields only at start/end. Enter still searches or saves from inputs; buttons keep native activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+
 ## [0.1.605] - 2026-08-22
 
 ### Added
