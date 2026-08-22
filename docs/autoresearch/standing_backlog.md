@@ -21,6 +21,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 ## Done recently (do not re-pick as filler)
 
 
+- Agent Ops **agent edit-actions toolbar keyboard** (← → / h l · Home/End across Save · Load into AI Chat · Back; Enter/Space activates; file-tab / refresh-row parity) — **v0.1.601**
+
 - Agent Ops **file-tab toolbar keyboard** (← → / h l · Home/End across Soul · Skill · Mood; Enter/Space activates; tab-bar / refresh-row parity) — **v0.1.600**
 
 - Agent Ops **refresh-row toolbar keyboard** (← → / h l · Home/End across Refresh · Refresh digest · Updated; Enter/Space activates; Updated Enter triggers full refresh; tab-bar / health-strip parity) — **v0.1.599**

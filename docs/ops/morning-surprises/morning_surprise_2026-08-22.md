@@ -4,7 +4,7 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 
 ## Latest keep (this tick)
 
-**v0.1.600** — Agent Ops file-tab toolbar keyboard: focus Soul · Skill · Mood, then ← → / h l / Home / End moves across tabs (tab-bar / refresh-row parity). Enter / Space keeps existing tab activate. Soft kb hint; one Tab stop via roving tabindex.
+**v0.1.601** — Agent Ops agent edit-actions toolbar keyboard: focus Save · Load into AI Chat · Back, then ← → / h l / Home / End moves across controls (file-tab / refresh-row parity). Enter / Space keeps button activate. Soft kb hint; one Tab stop via roving tabindex.
 
 ## Tonight's keeps (selected)
 
@@ -28,6 +28,7 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 | **v0.1.598** | Agent Ops tab-bar toolbar keyboard |
 | **v0.1.599** | Agent Ops refresh-row toolbar keyboard |
 | **v0.1.600** | Agent Ops file-tab toolbar keyboard |
+| **v0.1.601** | Agent Ops agent edit-actions toolbar keyboard |
 
 ## Notes
 
