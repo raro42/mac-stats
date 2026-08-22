@@ -17,14 +17,15 @@ Overnight Track B (20:00–06:00) shipped user-facing listbox / copy polish. Dig
 | **v0.1.584** | Agent Ops row Copied badge + ↑/k no-selection → last |
 | **v0.1.585** | Perplexity listbox chrome keyboard |
 | **v0.1.586** | AI Chat listbox chrome keyboard |
+| **v0.1.587** | Details click-to-copy + keyboard nav |
 
 ## Latest keep (this tick)
 
-**v0.1.586** — Focus the AI Chat messages list, then ↑↓ / j k / Home / End jump to the first or last message (Perplexity / Monitors / Debug Log chrome parity). Soft kb hint mentions list focus.
+**v0.1.587** — Details values: click or ↑↓ / j k / Home / End · Enter / c copies with a green Copied badge (Debug Log / Monitors / Top Processes parity). Soft kb hint under the section title; focus the grid for first/last.
 
 ## Notes
 
 - Digester: no open candidates (instant-heavy sample).
 - Design review: `due=false` (grace); screenshots deferred (TCC).
 - `debug.log`: quiet in 180m scan.
-- Git: keep @ `73f013e`; install + LaunchAgent kickstart after ship.
+- Git: keep @ `847281f`; install + LaunchAgent kickstart after ship.
