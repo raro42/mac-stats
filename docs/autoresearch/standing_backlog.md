@@ -21,6 +21,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 ## Done recently (do not re-pick as filler)
 
 
+- Disk Cleanup **meta-card toolbar keyboard** (← → / h l · Home/End across Reclaim · Next · Runs when · Scopes; Enter/Space activate; power-strip / filter-chip parity) — **v0.1.595**
+
 - CPU metrics **history sparkline toolbar keyboard** (← → / h l · Home/End across CPU · Freq · Temp; Enter/Space/click → matching ring; ring-gauge / power-strip parity) — **v0.1.594**
 
 - CPU metrics **ring-gauge toolbar keyboard** (← → / h l · Home/End across CPU · GPU · Frequency · Temperature; Enter/Space activates/copies; power-strip / filter-chip parity) — **v0.1.593**

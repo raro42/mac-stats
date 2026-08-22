@@ -4,7 +4,7 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 
 ## Latest keep (this tick)
 
-**v0.1.594** — CPU metrics history sparkline toolbar keyboard: focus CPU · Freq · Temp charts, then ← → / h l / Home / End moves across sparklines (ring-gauge / power-strip parity). Enter / Space / click jumps to the matching ring (scroll + flash). Soft kb hint; one Tab stop via roving tabindex.
+**v0.1.595** — Disk Cleanup meta-card toolbar keyboard: focus Reclaimable · Next run · Runs when · Enabled scopes, then ← → / h l / Home / End moves across cards (power-strip / filter-chip parity). Enter / Space keeps existing card activate. Soft kb hint; one Tab stop via roving tabindex.
 
 ## Tonight’s keeps (selected)
 
@@ -22,6 +22,7 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 | **v0.1.592** | Settings Product toolbar keyboard |
 | **v0.1.593** | CPU ring-gauge toolbar keyboard |
 | **v0.1.594** | History sparkline toolbar keyboard |
+| **v0.1.595** | Disk Cleanup meta-card toolbar keyboard |
 
 ## Notes
 
