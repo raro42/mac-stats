@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.596] - 2026-08-22
+
+### Added
+- Agent Ops **health-strip toolbar keyboard** — focus Version · Discord · Redmine · Schedule · Delivery · Digest, then ← → / h l / Home / End moves across health cards (Disk Cleanup meta-card / power-strip parity). Enter / Space keeps existing tab open or preview. Soft kb hint; one Tab stop via roving tabindex.
+
 ## [0.1.595] - 2026-08-22
 
 ### Added

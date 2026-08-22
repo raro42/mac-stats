@@ -2210,6 +2210,105 @@ function wireOpsOverviewCardNavigation() {
     });
 }
 
+/** Focusable health cards in DOM order (Version · Discord · Redmine · Schedule · Delivery · Digest). */
+function getOpsHealthCards() {
+    const row = document.getElementById('ops-health-row');
+    if (!row) return [];
+    return Array.from(row.querySelectorAll(':scope > .ops-health-card[data-health]')).filter(
+        (el) => {
+            if (!el || el.hidden) return false;
+            return el.getClientRects().length > 0 || el.offsetParent !== null || row.contains(el);
+        }
+    );
+}
+
+function refreshOpsHealthRovingTabindex(preferred) {
+    const cards = getOpsHealthCards();
+    if (!cards.length) return;
+    const focused = cards.find((el) => el === document.activeElement);
+    const current =
+        (preferred && cards.includes(preferred) && preferred) ||
+        focused ||
+        cards.find((el) => el.tabIndex === 0) ||
+        cards[0];
+    for (const el of cards) {
+        el.tabIndex = el === current ? 0 : -1;
+    }
+}
+
+function ensureOpsHealthKbHint() {
+    const row = document.getElementById('ops-health-row');
+    if (!row) return;
+    let hint = document.getElementById('ops-health-kb-hint');
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'ops-health-kb-hint';
+        hint.className = 'ops-health-kb-hint';
+        hint.setAttribute('aria-hidden', 'true');
+        row.appendChild(hint);
+    }
+    hint.textContent =
+        '← → / h l · Home/End move · Enter / Space opens linked tab or preview';
+}
+
+/**
+ * Health-strip toolbar keyboard — focus Version · Discord · Redmine · Schedule ·
+ * Delivery · Digest, then ←→ / h l / Home/End (Disk Cleanup meta-card / power-strip parity).
+ * Enter/Space keep existing card activate.
+ */
+function ensureOpsHealthToolbarKeyboard() {
+    const row = document.getElementById('ops-health-row');
+    if (!row) return;
+    ensureOpsHealthKbHint();
+    refreshOpsHealthRovingTabindex();
+    if (row.dataset.opsHealthKbWired === '1') return;
+    row.dataset.opsHealthKbWired = '1';
+    if (!row.getAttribute('role')) {
+        row.setAttribute('role', 'toolbar');
+    }
+    if (!row.getAttribute('aria-label')) {
+        row.setAttribute('aria-label', 'Agent Ops health summary');
+    }
+    row.addEventListener('focusin', (e) => {
+        const cards = getOpsHealthCards();
+        if (cards.includes(e.target)) refreshOpsHealthRovingTabindex(e.target);
+    });
+    row.addEventListener('keydown', (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const cards = getOpsHealthCards();
+        if (!cards.length) return;
+        const idx = cards.indexOf(document.activeElement);
+        if (idx < 0) return;
+        let next = -1;
+        if (
+            e.key === 'ArrowRight' ||
+            e.key === 'l' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'j'
+        ) {
+            next = Math.min(idx + 1, cards.length - 1);
+        } else if (
+            e.key === 'ArrowLeft' ||
+            e.key === 'h' ||
+            e.key === 'ArrowUp' ||
+            e.key === 'k'
+        ) {
+            next = Math.max(idx - 1, 0);
+        } else if (e.key === 'Home') {
+            next = 0;
+        } else if (e.key === 'End') {
+            next = cards.length - 1;
+        } else {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        if (next === idx) return;
+        refreshOpsHealthRovingTabindex(cards[next]);
+        cards[next].focus();
+    });
+}
+
 /** Click health cards to jump to the related Agent Ops tab (once). */
 function wireOpsHealthCardNavigation() {
     const row = document.getElementById('ops-health-row');
@@ -2221,7 +2320,6 @@ function wireOpsHealthCardNavigation() {
         if (!tab) return;
         card.dataset.gotoTab = tab;
         card.classList.add('ops-health-clickable');
-        card.setAttribute('tabindex', '0');
         card.setAttribute('role', 'button');
         if (key === 'schedule') {
             card.title = 'Open Schedules · preview next job · load into AI Chat from that tab';
@@ -2284,6 +2382,7 @@ function wireOpsHealthCardNavigation() {
         });
     });
     syncOpsHealthCardActive(opsActiveTab);
+    ensureOpsHealthToolbarKeyboard();
 }
 
 /** Overview Agents card: ok/warn/bad wash (health Version agent-count parity). */

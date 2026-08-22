@@ -406,6 +406,13 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   padding: 0 4px 12px;
 }
 
+.ops-health-kb-hint {
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
+  grid-column: 1 / -1;
+}
+
 .ops-health-card {
   background: color-mix(in srgb, currentColor 6%, transparent);
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
