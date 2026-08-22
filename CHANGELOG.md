@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.600] - 2026-08-22
+
+### Added
+- Agent Ops **file-tab toolbar keyboard** — focus Soul · Skill · Mood, then ← → / h l / Home / End moves across tabs (tab-bar / refresh-row parity). Enter / Space keeps existing tab activate. Soft kb hint; one Tab stop via roving tabindex.
+
 ## [0.1.599] - 2026-08-22
 
 ### Added

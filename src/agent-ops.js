@@ -478,6 +478,105 @@ function ensureOpsTabBarKbHint() {
         '← → / h l · Home/End move · Enter / Space opens tab or overview';
 }
 
+function getOpsFileTabButtons() {
+    const tabs = document.querySelector('.ops-file-tabs');
+    if (!tabs) return [];
+    return Array.from(tabs.querySelectorAll(':scope > .ops-file-tab')).filter((el) => {
+        if (!el || el.hidden) return false;
+        const detail = document.getElementById('ops-agent-detail');
+        if (detail?.hidden) return false;
+        return el.getClientRects().length > 0 || el.offsetParent !== null || tabs.contains(el);
+    });
+}
+
+function refreshOpsFileTabRovingTabindex(preferred) {
+    const buttons = getOpsFileTabButtons();
+    if (!buttons.length) return;
+    const activeBtn = buttons.find((el) => el.classList.contains('active'));
+    const focused = buttons.find((el) => el === document.activeElement);
+    const current =
+        (preferred && buttons.includes(preferred) && preferred) ||
+        focused ||
+        buttons.find((el) => el.tabIndex === 0) ||
+        activeBtn ||
+        buttons[0];
+    for (const el of buttons) {
+        el.tabIndex = el === current ? 0 : -1;
+    }
+}
+
+function ensureOpsFileTabKbHint() {
+    const tabs = document.querySelector('.ops-file-tabs');
+    if (!tabs) return;
+    let hint = document.getElementById('ops-file-tab-kb-hint');
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'ops-file-tab-kb-hint';
+        hint.className = 'ops-file-tab-kb-hint';
+        hint.setAttribute('aria-hidden', 'true');
+        tabs.insertAdjacentElement('afterend', hint);
+    }
+    hint.textContent =
+        '← → / h l · Home/End move · Enter / Space switches soul / skill / mood';
+}
+
+/**
+ * File-tab toolbar keyboard — focus Soul · Skill · Mood, then ←→ / h l / Home/End
+ * (tab-bar / refresh-row parity). Enter/Space keeps existing tab activate.
+ */
+function ensureOpsFileTabToolbarKeyboard() {
+    const tabs = document.querySelector('.ops-file-tabs');
+    if (!tabs) return;
+    ensureOpsFileTabKbHint();
+    refreshOpsFileTabRovingTabindex();
+    if (tabs.dataset.opsFileTabKbWired === '1') return;
+    tabs.dataset.opsFileTabKbWired = '1';
+    if (!tabs.getAttribute('role')) {
+        tabs.setAttribute('role', 'toolbar');
+    }
+    if (!tabs.getAttribute('aria-label')) {
+        tabs.setAttribute('aria-label', 'Agent soul, skill, and mood');
+    }
+    tabs.addEventListener('focusin', (e) => {
+        const buttons = getOpsFileTabButtons();
+        if (buttons.includes(e.target)) refreshOpsFileTabRovingTabindex(e.target);
+    });
+    tabs.addEventListener('keydown', (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const buttons = getOpsFileTabButtons();
+        if (!buttons.length) return;
+        const idx = buttons.indexOf(document.activeElement);
+        if (idx < 0) return;
+        let next = -1;
+        if (
+            e.key === 'ArrowRight' ||
+            e.key === 'l' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'j'
+        ) {
+            next = Math.min(idx + 1, buttons.length - 1);
+        } else if (
+            e.key === 'ArrowLeft' ||
+            e.key === 'h' ||
+            e.key === 'ArrowUp' ||
+            e.key === 'k'
+        ) {
+            next = Math.max(idx - 1, 0);
+        } else if (e.key === 'Home') {
+            next = 0;
+        } else if (e.key === 'End') {
+            next = buttons.length - 1;
+        } else {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        if (next === idx) return;
+        refreshOpsFileTabRovingTabindex(buttons[next]);
+        buttons[next].focus();
+    });
+}
+
 /**
  * Tab-bar toolbar keyboard — focus 0 Overview · Agents · Sessions · Schedules ·
  * Knowledge · Runs, then ←→ / h l / Home/End (overview-card / health-strip parity).
@@ -711,6 +810,7 @@ function setupAgentOps() {
     ensureOpsOverviewJump();
     ensureOpsTabDigits();
     ensureOpsTabBarToolbarKeyboard();
+    ensureOpsFileTabToolbarKeyboard();
     ensureOpsRefreshRowToolbarKeyboard();
     ensureOpsKeyboardHint();
     ensureOpsUpdatedAgo();
@@ -3970,6 +4070,8 @@ async function openOpsAgent(id) {
             b.classList.toggle('active', b.dataset.file === 'soul');
         });
         ensureOpsAgentEditor();
+        ensureOpsFileTabToolbarKeyboard();
+        refreshOpsFileTabRovingTabindex();
         renderOpsAgentPreview();
         setOpsAgentSaveStatus('');
         refreshOpsAgentLoadText();
