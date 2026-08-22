@@ -4,9 +4,9 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 
 ## Latest keep (this tick)
 
-**v0.1.595** — Disk Cleanup meta-card toolbar keyboard: focus Reclaimable · Next run · Runs when · Enabled scopes, then ← → / h l / Home / End moves across cards (power-strip / filter-chip parity). Enter / Space keeps existing card activate. Soft kb hint; one Tab stop via roving tabindex.
+**v0.1.596** — Agent Ops health-strip toolbar keyboard: focus Version · Discord · Redmine · Schedule · Delivery · Digest, then ← → / h l / Home / End moves across health cards (Disk Cleanup meta-card / power-strip parity). Enter / Space keeps existing tab open or preview. Soft kb hint; one Tab stop via roving tabindex.
 
-## Tonight’s keeps (selected)
+## Tonight's keeps (selected)
 
 | Version | What |
 |---------|------|
@@ -23,6 +23,7 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 | **v0.1.593** | CPU ring-gauge toolbar keyboard |
 | **v0.1.594** | History sparkline toolbar keyboard |
 | **v0.1.595** | Disk Cleanup meta-card toolbar keyboard |
+| **v0.1.596** | Agent Ops health-strip toolbar keyboard |
 
 ## Notes
 
