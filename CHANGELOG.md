@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.598] - 2026-08-22
+
+### Added
+- Agent Ops **tab-bar toolbar keyboard** — focus 0 Overview · Agents · Sessions · Schedules · Knowledge · Runs, then ← → / h l / Home / End moves across tabs (overview-card / health-strip parity). Enter / Space keeps existing tab activate. Soft kb hint; one Tab stop via roving tabindex.
+
 ## [0.1.597] - 2026-08-22
 
 ### Added

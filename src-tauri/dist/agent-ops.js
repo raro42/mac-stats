@@ -325,6 +325,7 @@ function selectOpsTab(tab) {
         if (!b.dataset.opsTab) return;
         b.classList.toggle('active', b.dataset.opsTab === tab);
     });
+    refreshOpsTabBarRovingTabindex();
     document.querySelectorAll('.agent-ops-panel').forEach((p) => {
         p.classList.toggle('active', p.id === `ops-panel-${tab}`);
     });
@@ -432,6 +433,106 @@ function ensureOpsTabDigits() {
         if (!btn.getAttribute('aria-keyshortcuts')) {
             btn.setAttribute('aria-keyshortcuts', d);
         }
+    });
+}
+
+/** Focusable tab-bar buttons in DOM order (0 Overview · Agents · Sessions · …). */
+function getOpsTabBarButtons() {
+    const tabs = document.querySelector('.agent-ops-tabs');
+    if (!tabs) return [];
+    return Array.from(tabs.querySelectorAll(':scope > .agent-ops-tab')).filter((el) => {
+        if (!el || el.hidden) return false;
+        return el.getClientRects().length > 0 || el.offsetParent !== null || tabs.contains(el);
+    });
+}
+
+function refreshOpsTabBarRovingTabindex(preferred) {
+    const buttons = getOpsTabBarButtons();
+    if (!buttons.length) return;
+    const activeTab = opsActiveTab || 'agents';
+    const activeBtn = buttons.find((el) => el.dataset.opsTab === activeTab);
+    const focused = buttons.find((el) => el === document.activeElement);
+    const current =
+        (preferred && buttons.includes(preferred) && preferred) ||
+        focused ||
+        buttons.find((el) => el.tabIndex === 0) ||
+        activeBtn ||
+        buttons[0];
+    for (const el of buttons) {
+        el.tabIndex = el === current ? 0 : -1;
+    }
+}
+
+function ensureOpsTabBarKbHint() {
+    const tabs = document.querySelector('.agent-ops-tabs');
+    if (!tabs) return;
+    let hint = document.getElementById('ops-tab-bar-kb-hint');
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'ops-tab-bar-kb-hint';
+        hint.className = 'ops-tab-bar-kb-hint';
+        hint.setAttribute('aria-hidden', 'true');
+        tabs.insertAdjacentElement('afterend', hint);
+    }
+    hint.textContent =
+        '← → / h l · Home/End move · Enter / Space opens tab or overview';
+}
+
+/**
+ * Tab-bar toolbar keyboard — focus 0 Overview · Agents · Sessions · Schedules ·
+ * Knowledge · Runs, then ←→ / h l / Home/End (overview-card / health-strip parity).
+ * Enter/Space keep existing tab activate.
+ */
+function ensureOpsTabBarToolbarKeyboard() {
+    const tabs = document.querySelector('.agent-ops-tabs');
+    if (!tabs) return;
+    ensureOpsTabBarKbHint();
+    refreshOpsTabBarRovingTabindex();
+    if (tabs.dataset.opsTabBarKbWired === '1') return;
+    tabs.dataset.opsTabBarKbWired = '1';
+    if (!tabs.getAttribute('role')) {
+        tabs.setAttribute('role', 'toolbar');
+    }
+    if (!tabs.getAttribute('aria-label')) {
+        tabs.setAttribute('aria-label', 'Agent Ops tabs');
+    }
+    tabs.addEventListener('focusin', (e) => {
+        const buttons = getOpsTabBarButtons();
+        if (buttons.includes(e.target)) refreshOpsTabBarRovingTabindex(e.target);
+    });
+    tabs.addEventListener('keydown', (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const buttons = getOpsTabBarButtons();
+        if (!buttons.length) return;
+        const idx = buttons.indexOf(document.activeElement);
+        if (idx < 0) return;
+        let next = -1;
+        if (
+            e.key === 'ArrowRight' ||
+            e.key === 'l' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'j'
+        ) {
+            next = Math.min(idx + 1, buttons.length - 1);
+        } else if (
+            e.key === 'ArrowLeft' ||
+            e.key === 'h' ||
+            e.key === 'ArrowUp' ||
+            e.key === 'k'
+        ) {
+            next = Math.max(idx - 1, 0);
+        } else if (e.key === 'Home') {
+            next = 0;
+        } else if (e.key === 'End') {
+            next = buttons.length - 1;
+        } else {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        if (next === idx) return;
+        refreshOpsTabBarRovingTabindex(buttons[next]);
+        buttons[next].focus();
     });
 }
 
@@ -609,6 +710,7 @@ function setupAgentOps() {
     ensureOpsRefreshRowPlacement();
     ensureOpsOverviewJump();
     ensureOpsTabDigits();
+    ensureOpsTabBarToolbarKeyboard();
     ensureOpsKeyboardHint();
     ensureOpsUpdatedAgo();
     ensureOpsOverviewAgentsCard();

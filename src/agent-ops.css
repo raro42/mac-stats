@@ -848,6 +848,12 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   flex-wrap: wrap;
 }
 
+.ops-tab-bar-kb-hint {
+  margin: -4px 4px 10px;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
 .ops-overview-jump {
   margin-right: 4px;
 }
