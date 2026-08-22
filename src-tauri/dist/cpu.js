@@ -3244,8 +3244,8 @@ function getPowerStripChips() {
   ].join(',');
   return Array.from(strip.querySelectorAll(sel)).filter((el) => {
     if (!el || el.hidden) return false;
-    // Keep chips that are laid out (or just created before paint).
-    return el.getClientRects().length > 0 || el.offsetParent !== null || el.tabIndex >= -1;
+    // Prefer laid-out chips; keep just-created nodes before first paint.
+    return el.getClientRects().length > 0 || el.offsetParent !== null || strip.contains(el);
   });
 }
 
@@ -12258,6 +12258,142 @@ async function initCpuWindowCompactPreference() {
   }
 }
 
+/** Visible, interactive icon-line buttons (skips AI-off / hidden). */
+function getIconLineItems() {
+  const line = document.getElementById('icon-line');
+  if (!line) return [];
+  return Array.from(line.querySelectorAll('button.icon-line-item')).filter((el) => {
+    if (!el || el.hidden || el.disabled) return false;
+    if (el.style.display === 'none') return false;
+    if ((el.style.pointerEvents || '').toLowerCase() === 'none') return false;
+    try {
+      if (window.getComputedStyle(el).pointerEvents === 'none') return false;
+    } catch (_) {
+      /* ignore */
+    }
+    return el.getClientRects().length > 0 || el.offsetParent !== null;
+  });
+}
+
+/** One Tab stop on the icon line; arrows move focus (power-strip parity). */
+function refreshIconLineRovingTabindex(preferred) {
+  const items = getIconLineItems();
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  let current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  if (focused && !items.includes(focused)) {
+    current = items[0];
+  }
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+  // Demote any leftover buttons that are currently non-interactive.
+  const line = document.getElementById('icon-line');
+  if (line) {
+    line.querySelectorAll('button.icon-line-item').forEach((el) => {
+      if (!items.includes(el)) el.tabIndex = -1;
+    });
+  }
+}
+window.refreshIconLineRovingTabindex = refreshIconLineRovingTabindex;
+
+function ensureIconLineKbStyles() {
+  if (document.getElementById('mac-stats-icon-line-kb-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'mac-stats-icon-line-kb-styles';
+  style.textContent = `
+    .icon-line-kb-hint {
+      margin: 2px 0 0;
+      font-size: 11px;
+      opacity: 0.72;
+      width: 100%;
+      flex-basis: 100%;
+      text-align: center;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+/** Soft tip under the section icon line (power-strip kb-hint parity). */
+function ensureIconLineKbHint() {
+  ensureIconLineKbStyles();
+  const line = document.getElementById('icon-line');
+  if (!line) return;
+  let hint = document.getElementById('icon-line-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.id = 'icon-line-kb-hint';
+    hint.className = 'icon-line-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    line.appendChild(hint);
+  }
+  hint.textContent =
+    '← → / h l · Home/End move · Enter / Space opens section';
+}
+
+/**
+ * Icon-line toolbar keyboard — focus an icon, then ←→ / h l / Home/End
+ * moves across Monitors · AI Chat · Perplexity · Debug Log · Discord ·
+ * Disk Cleanup · Agent Ops (power-strip / Details listbox chrome parity).
+ * Enter/Space keep native button activate (section toggle).
+ */
+function ensureIconLineKeyboard() {
+  const line = document.getElementById('icon-line');
+  if (!line) return;
+  ensureIconLineKbHint();
+  refreshIconLineRovingTabindex();
+  if (line.dataset.iconLineKbWired === '1') return;
+  line.dataset.iconLineKbWired = '1';
+  if (!line.getAttribute('role')) {
+    line.setAttribute('role', 'toolbar');
+  }
+  if (!line.getAttribute('aria-label')) {
+    line.setAttribute('aria-label', 'Section shortcuts');
+  }
+  line.addEventListener('focusin', (e) => {
+    const items = getIconLineItems();
+    if (items.includes(e.target)) refreshIconLineRovingTabindex(e.target);
+  });
+  line.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getIconLineItems();
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    let next = -1;
+    if (
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j'
+    ) {
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k'
+    ) {
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshIconLineRovingTabindex(items[next]);
+    items[next].focus();
+  });
+}
+
 function initIconLine() {
   const monitorsIcon = document.getElementById('icon-monitors');
   const ollamaIcon = document.getElementById('icon-ollama');
@@ -12321,6 +12457,7 @@ function initIconLine() {
   // Agent Ops icon is wired exclusively in agent-ops.js (avoid double-toggle).
 
   initDiscordIconStatus();
+  ensureIconLineKeyboard();
 }
 
 // Check if history data is available and show/hide dropdown accordingly

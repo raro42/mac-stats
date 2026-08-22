@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.589] - 2026-08-22
+
+### Added
+- Section **icon-line toolbar keyboard** — focus an icon, then ← → / h l / Home / End moves across Monitors · AI Chat · Perplexity · Debug Log · Discord · Disk Cleanup · Agent Ops (power-strip / Details listbox chrome parity). Enter / Space opens the section. Soft kb hint; one Tab stop via roving tabindex; AI-off icons skipped.
+
 ## [0.1.588] - 2026-08-22
 
 ### Added

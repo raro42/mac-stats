@@ -517,6 +517,9 @@
         el.style.display = enabled ? "" : "none";
       }
     });
+    if (typeof window.refreshIconLineRovingTabindex === "function") {
+      window.refreshIconLineRovingTabindex();
+    }
   }
 
   function initWindowDecorations() {
