@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.593] - 2026-08-22
+
+### Added
+- CPU metrics **ring-gauge toolbar keyboard** — focus CPU · GPU · Frequency · Temperature, then ← → / h l / Home / End moves across the rings (power-strip / filter-chip parity). Enter / Space keeps CPU Details/Processes toggle and GPU / Freq / Temp click-to-copy. Soft kb hint; one Tab stop via roving tabindex.
+
 ## [0.1.592] - 2026-08-22
 
 ### Added

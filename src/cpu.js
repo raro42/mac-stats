@@ -2117,6 +2117,7 @@ function init() {
   // Force immediate process update on initial load
   window._forceProcessUpdate = true;
   wireMetricValueCopy();
+  ensureRingGaugeKeyboard();
   ensureCpuStrip();
   ensureRamStrip();
   ensureGpuStrip();
@@ -3339,6 +3340,149 @@ function ensurePowerStripKeyboard() {
     e.stopPropagation();
     if (next === idx) return;
     refreshPowerStripRovingTabindex(chips[next]);
+    chips[next].focus();
+  });
+}
+
+/** Metrics section that holds the four ring cards (theme class varies). */
+function getRingGaugeSection() {
+  const cpuCard = document.getElementById('cpu-usage-card');
+  if (!cpuCard) return null;
+  return (
+    cpuCard.closest(
+      '.apple-metrics, .cpu-metrics, .metrics-grid, .arch-metrics, .swiss-metrics, .mat-metrics, .poster-metrics, section'
+    ) || cpuCard.parentElement
+  );
+}
+
+/**
+ * Focusable ring-gauge targets in DOM order: CPU card (toggles Details /
+ * Processes) then GPU · Frequency · Temperature values (click-to-copy).
+ */
+function getRingGaugeChips() {
+  const section = getRingGaugeSection();
+  if (!section) return [];
+  const ids = [
+    'cpu-usage-card',
+    'gpu-usage-value',
+    'frequency-value',
+    'temperature-value',
+  ];
+  return ids
+    .map((id) => document.getElementById(id))
+    .filter((el) => {
+      if (!el || !section.contains(el)) return false;
+      if (el.hidden) return false;
+      return (
+        el.getClientRects().length > 0 ||
+        el.offsetParent !== null ||
+        section.contains(el)
+      );
+    });
+}
+
+function refreshRingGaugeRovingTabindex(preferred) {
+  const chips = getRingGaugeChips();
+  if (!chips.length) return;
+  const focused = chips.find((el) => el === document.activeElement);
+  const current =
+    (preferred && chips.includes(preferred) && preferred) ||
+    focused ||
+    chips.find((el) => el.tabIndex === 0) ||
+    chips[0];
+  for (const el of chips) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureRingGaugeKbStyles() {
+  if (document.getElementById('mac-stats-ring-gauge-kb-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'mac-stats-ring-gauge-kb-styles';
+  style.textContent = `
+    .ring-gauge-kb-hint {
+      margin: 6px 0 0;
+      font-size: 11px;
+      opacity: 0.72;
+      width: 100%;
+      flex-basis: 100%;
+      grid-column: 1 / -1;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+/** Soft tip under the ring gauges (power-strip kb-hint parity). */
+function ensureRingGaugeKbHint() {
+  ensureRingGaugeKbStyles();
+  const section = getRingGaugeSection();
+  if (!section) return;
+  let hint = document.getElementById('ring-gauge-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.id = 'ring-gauge-kb-hint';
+    hint.className = 'ring-gauge-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    section.appendChild(hint);
+  }
+  hint.textContent =
+    '← → / h l · Home/End move · Enter / Space activates CPU or copies GPU / Freq / Temp';
+}
+
+/**
+ * Ring-gauge toolbar keyboard — focus CPU · GPU · Frequency · Temperature,
+ * then ←→ / h l / Home/End (power-strip / filter-chip parity). Enter/Space
+ * keep CPU toggle and metric copy.
+ */
+function ensureRingGaugeKeyboard() {
+  const section = getRingGaugeSection();
+  if (!section) return;
+  ensureRingGaugeKbHint();
+  refreshRingGaugeRovingTabindex();
+  if (section.dataset.ringGaugeKbWired === '1') return;
+  section.dataset.ringGaugeKbWired = '1';
+  if (!section.getAttribute('role')) {
+    section.setAttribute('role', 'toolbar');
+  }
+  if (!section.getAttribute('aria-label')) {
+    section.setAttribute('aria-label', 'CPU metric rings');
+  }
+  section.addEventListener('focusin', (e) => {
+    const chips = getRingGaugeChips();
+    if (chips.includes(e.target)) refreshRingGaugeRovingTabindex(e.target);
+  });
+  section.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const chips = getRingGaugeChips();
+    if (!chips.length) return;
+    const idx = chips.indexOf(document.activeElement);
+    if (idx < 0) return;
+    let next = -1;
+    if (
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j'
+    ) {
+      next = Math.min(idx + 1, chips.length - 1);
+    } else if (
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k'
+    ) {
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = chips.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshRingGaugeRovingTabindex(chips[next]);
     chips[next].focus();
   });
 }
@@ -8689,6 +8833,7 @@ function initCollapsibleSections() {
   ensureDiskStrip();
   ensureUptimeStrip();
   ensurePowerStripKeyboard();
+  ensureRingGaugeKeyboard();
   ensureProcessesTopGlance();
   ensureDetailsCollapsedGlance();
   initDetailsGridKeyboard();
