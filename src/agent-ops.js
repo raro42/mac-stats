@@ -907,6 +907,9 @@ function ensureOpsSessionKindChips() {
             setOpsSessionKindFilter(btn.getAttribute('data-ops-session-kind') || 'all');
         });
     }
+    if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
+        window.wireFilterChipToolbarKeyboard(wrap);
+    }
     paintOpsSessionKindChips();
     applyOpsSessionKindVisibility();
 }
@@ -1024,6 +1027,9 @@ function ensureOpsMemoryKindChips() {
             if (!btn || !wrap.contains(btn)) return;
             setOpsMemoryKindFilter(btn.getAttribute('data-ops-memory-kind') || 'all');
         });
+    }
+    if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
+        window.wireFilterChipToolbarKeyboard(wrap);
     }
     paintOpsMemoryKindChips();
 }
@@ -1147,6 +1153,9 @@ function ensureOpsRunsLaneChips() {
             if (!btn || !wrap.contains(btn)) return;
             setOpsRunsLaneFilter(btn.getAttribute('data-ops-runs-lane') || 'all');
         });
+    }
+    if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
+        window.wireFilterChipToolbarKeyboard(wrap);
     }
     paintOpsRunsLaneChips();
 }
@@ -1275,6 +1284,9 @@ function ensureOpsAgentsEnabledChips() {
             setOpsAgentsEnabledFilter(btn.getAttribute('data-ops-agents-enabled') || 'all');
         });
     }
+    if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
+        window.wireFilterChipToolbarKeyboard(wrap);
+    }
     paintOpsAgentsEnabledChips();
 }
 
@@ -1391,6 +1403,9 @@ function ensureOpsSchedulesKindChips() {
             if (!btn || !wrap.contains(btn)) return;
             setOpsSchedulesKindFilter(btn.getAttribute('data-ops-schedules-kind') || 'all');
         });
+    }
+    if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
+        window.wireFilterChipToolbarKeyboard(wrap);
     }
     paintOpsSchedulesKindChips();
     applyOpsSchedulesKindVisibility();

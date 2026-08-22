@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.590] - 2026-08-22
+
+### Added
+- Filter-chip **toolbar keyboard** — focus a filter / kind chip, then ← → / h l / Home / End moves across All · … chips (Monitors · Processes · Debug Log · Disk Cleanup · AI Chat · Agent Ops Sessions/Knowledge/Runs/Agents/Schedules; power-strip / icon-line parity). Enter / Space selects the filter. Soft kb hint; one Tab stop via roving tabindex.
+
 ## [0.1.589] - 2026-08-22
 
 ### Added

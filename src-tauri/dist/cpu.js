@@ -832,24 +832,27 @@ function wireProcessesTopRamGlanceClick(glance) {
 function ensureProcessesFilterChips() {
   const list = document.getElementById("process-list");
   if (!list || !list.parentNode) return;
-  if (document.getElementById("processes-filter-chips")) return;
-  const wrap = document.createElement("div");
-  wrap.id = "processes-filter-chips";
-  wrap.className = "processes-filter-chips";
-  wrap.setAttribute("role", "group");
-  wrap.setAttribute("aria-label", "Process list filter");
-  wrap.hidden = true;
-  wrap.innerHTML =
-    '<button type="button" class="processes-filter-chip is-active" data-processes-filter="all" aria-pressed="true" title="Show every process in the list">All</button>' +
-    '<button type="button" class="processes-filter-chip" data-processes-filter="pinned" aria-pressed="false" title="Show pinned favorites only">Pinned <span class="processes-filter-count" data-processes-filter-count="pinned">0</span></button>';
-  list.parentNode.insertBefore(wrap, list);
-  wrap.addEventListener("click", (e) => {
-    const btn = e.target && e.target.closest && e.target.closest("[data-processes-filter]");
-    if (!btn || !wrap.contains(btn)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    setProcessesFilterMode(btn.getAttribute("data-processes-filter") || "all");
-  });
+  let wrap = document.getElementById("processes-filter-chips");
+  if (!wrap) {
+    wrap = document.createElement("div");
+    wrap.id = "processes-filter-chips";
+    wrap.className = "processes-filter-chips";
+    wrap.setAttribute("role", "group");
+    wrap.setAttribute("aria-label", "Process list filter");
+    wrap.hidden = true;
+    wrap.innerHTML =
+      '<button type="button" class="processes-filter-chip is-active" data-processes-filter="all" aria-pressed="true" title="Show every process in the list">All</button>' +
+      '<button type="button" class="processes-filter-chip" data-processes-filter="pinned" aria-pressed="false" title="Show pinned favorites only">Pinned <span class="processes-filter-count" data-processes-filter-count="pinned">0</span></button>';
+    list.parentNode.insertBefore(wrap, list);
+    wrap.addEventListener("click", (e) => {
+      const btn = e.target && e.target.closest && e.target.closest("[data-processes-filter]");
+      if (!btn || !wrap.contains(btn)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setProcessesFilterMode(btn.getAttribute("data-processes-filter") || "all");
+    });
+  }
+  wireFilterChipToolbarKeyboard(wrap);
 }
 
 function setProcessesFilterMode(mode) {
@@ -3340,6 +3343,119 @@ function ensurePowerStripKeyboard() {
   });
 }
 
+/** Visible filter / kind chip buttons inside a chip row. */
+function getFilterChipButtons(wrap) {
+  if (!wrap) return [];
+  return Array.from(wrap.querySelectorAll(':scope > button')).filter((el) => {
+    if (!el || el.hidden || el.disabled) return false;
+    return el.getClientRects().length > 0 || el.offsetParent !== null || wrap.contains(el);
+  });
+}
+
+function refreshFilterChipRovingTabindex(wrap, preferred) {
+  const chips = getFilterChipButtons(wrap);
+  if (!chips.length) return;
+  const focused = chips.find((el) => el === document.activeElement);
+  const current =
+    (preferred && chips.includes(preferred) && preferred) ||
+    focused ||
+    chips.find((el) => el.tabIndex === 0) ||
+    chips[0];
+  for (const el of chips) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureFilterChipKbStyles() {
+  if (document.getElementById('mac-stats-filter-chip-kb-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'mac-stats-filter-chip-kb-styles';
+  style.textContent = `
+    .filter-chip-kb-hint {
+      margin: 2px 0 0;
+      font-size: 11px;
+      opacity: 0.72;
+      width: 100%;
+      flex-basis: 100%;
+    }
+    .processes-filter-chips,
+    .monitors-filter-chips,
+    .logs-filter-chips,
+    .disk-cleanup-filter-chips,
+    .chat-filter-chips,
+    .ops-session-kind-chips,
+    .ops-memory-kind-chips,
+    .ops-runs-lane-chips,
+    .ops-agents-enabled-chips,
+    .ops-schedules-kind-chips {
+      flex-wrap: wrap;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+/**
+ * Filter-chip toolbar keyboard — focus a chip, then ←→ / h l / Home/End
+ * (power-strip / icon-line parity). Enter/Space keep native filter activate.
+ * Exposed on window for ollama.js / agent-ops.js.
+ */
+function wireFilterChipToolbarKeyboard(wrap) {
+  if (!wrap) return;
+  ensureFilterChipKbStyles();
+  let hint = wrap.querySelector(':scope > .filter-chip-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'filter-chip-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    wrap.appendChild(hint);
+  }
+  hint.textContent =
+    '← → / h l · Home/End move · Enter / Space selects filter';
+  refreshFilterChipRovingTabindex(wrap);
+  if (wrap.dataset.filterChipKbWired === '1') return;
+  wrap.dataset.filterChipKbWired = '1';
+  wrap.setAttribute('role', 'toolbar');
+  wrap.addEventListener('focusin', (e) => {
+    const chips = getFilterChipButtons(wrap);
+    if (chips.includes(e.target)) refreshFilterChipRovingTabindex(wrap, e.target);
+  });
+  wrap.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const chips = getFilterChipButtons(wrap);
+    if (!chips.length) return;
+    const idx = chips.indexOf(document.activeElement);
+    if (idx < 0) return;
+    let next = -1;
+    if (
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j'
+    ) {
+      next = Math.min(idx + 1, chips.length - 1);
+    } else if (
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k'
+    ) {
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = chips.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshFilterChipRovingTabindex(wrap, chips[next]);
+    chips[next].focus();
+  });
+}
+window.wireFilterChipToolbarKeyboard = wireFilterChipToolbarKeyboard;
+
 // Try multiple initialization strategies
 if (document.readyState === "loading") {
   // Fetch app version once at startup (no polling for CPU efficiency)
@@ -5276,25 +5392,28 @@ function ensureMonitorsFilterChips() {
   const content = document.getElementById('monitors-content');
   const summary = document.getElementById('monitors-summary');
   if (!content || !summary) return;
-  if (document.getElementById('monitors-filter-chips')) return;
-  const wrap = document.createElement('div');
-  wrap.id = 'monitors-filter-chips';
-  wrap.className = 'monitors-filter-chips';
-  wrap.setAttribute('role', 'group');
-  wrap.setAttribute('aria-label', 'Monitor status filter');
-  wrap.hidden = true;
-  wrap.innerHTML =
-    '<button type="button" class="monitors-filter-chip is-active" data-monitors-filter="all" aria-pressed="true" title="Show every monitor">All</button>' +
-    '<button type="button" class="monitors-filter-chip" data-monitors-filter="up" aria-pressed="false" title="Show UP sites only">Up <span class="monitors-filter-count" data-monitors-filter-count="up">0</span></button>' +
-    '<button type="button" class="monitors-filter-chip" data-monitors-filter="down" aria-pressed="false" title="Show DOWN sites only">Down <span class="monitors-filter-count" data-monitors-filter-count="down">0</span></button>';
-  summary.insertAdjacentElement('afterend', wrap);
-  wrap.addEventListener('click', (e) => {
-    const btn = e.target && e.target.closest && e.target.closest('[data-monitors-filter]');
-    if (!btn || !wrap.contains(btn)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    setMonitorsFilterMode(btn.getAttribute('data-monitors-filter') || 'all');
-  });
+  let wrap = document.getElementById('monitors-filter-chips');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'monitors-filter-chips';
+    wrap.className = 'monitors-filter-chips';
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-label', 'Monitor status filter');
+    wrap.hidden = true;
+    wrap.innerHTML =
+      '<button type="button" class="monitors-filter-chip is-active" data-monitors-filter="all" aria-pressed="true" title="Show every monitor">All</button>' +
+      '<button type="button" class="monitors-filter-chip" data-monitors-filter="up" aria-pressed="false" title="Show UP sites only">Up <span class="monitors-filter-count" data-monitors-filter-count="up">0</span></button>' +
+      '<button type="button" class="monitors-filter-chip" data-monitors-filter="down" aria-pressed="false" title="Show DOWN sites only">Down <span class="monitors-filter-count" data-monitors-filter-count="down">0</span></button>';
+    summary.insertAdjacentElement('afterend', wrap);
+    wrap.addEventListener('click', (e) => {
+      const btn = e.target && e.target.closest && e.target.closest('[data-monitors-filter]');
+      if (!btn || !wrap.contains(btn)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setMonitorsFilterMode(btn.getAttribute('data-monitors-filter') || 'all');
+    });
+  }
+  wireFilterChipToolbarKeyboard(wrap);
 }
 
 function setMonitorsFilterMode(mode) {
@@ -9651,24 +9770,28 @@ function stopLogsGlancePoll() {
 
 function ensureLogsFilterChips() {
   const toolbar = document.querySelector('#logs-content .logs-toolbar') || document.querySelector('.logs-toolbar');
-  if (!toolbar || document.getElementById('logs-filter-chips')) return;
-  const wrap = document.createElement('div');
-  wrap.id = 'logs-filter-chips';
-  wrap.className = 'logs-filter-chips';
-  wrap.setAttribute('role', 'group');
-  wrap.setAttribute('aria-label', 'Log level filter');
-  wrap.innerHTML =
-    '<button type="button" class="logs-filter-chip is-active" data-logs-filter="all" aria-pressed="true" title="Show the full log tail">All</button>' +
-    '<button type="button" class="logs-filter-chip" data-logs-filter="error" aria-pressed="false" title="Show ERROR and panic lines">Error <span class="logs-filter-count" data-logs-filter-count="error">0</span></button>' +
-    '<button type="button" class="logs-filter-chip" data-logs-filter="warn" aria-pressed="false" title="Show WARN lines">Warn <span class="logs-filter-count" data-logs-filter-count="warn">0</span></button>';
-  toolbar.appendChild(wrap);
-  wrap.addEventListener('click', (e) => {
-    const btn = e.target && e.target.closest && e.target.closest('[data-logs-filter]');
-    if (!btn || !wrap.contains(btn)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    setLogsFilterMode(btn.getAttribute('data-logs-filter') || 'all');
-  });
+  if (!toolbar) return;
+  let wrap = document.getElementById('logs-filter-chips');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'logs-filter-chips';
+    wrap.className = 'logs-filter-chips';
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-label', 'Log level filter');
+    wrap.innerHTML =
+      '<button type="button" class="logs-filter-chip is-active" data-logs-filter="all" aria-pressed="true" title="Show the full log tail">All</button>' +
+      '<button type="button" class="logs-filter-chip" data-logs-filter="error" aria-pressed="false" title="Show ERROR and panic lines">Error <span class="logs-filter-count" data-logs-filter-count="error">0</span></button>' +
+      '<button type="button" class="logs-filter-chip" data-logs-filter="warn" aria-pressed="false" title="Show WARN lines">Warn <span class="logs-filter-count" data-logs-filter-count="warn">0</span></button>';
+    toolbar.appendChild(wrap);
+    wrap.addEventListener('click', (e) => {
+      const btn = e.target && e.target.closest && e.target.closest('[data-logs-filter]');
+      if (!btn || !wrap.contains(btn)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setLogsFilterMode(btn.getAttribute('data-logs-filter') || 'all');
+    });
+  }
+  wireFilterChipToolbarKeyboard(wrap);
 }
 
 function setLogsFilterMode(mode) {
@@ -10679,26 +10802,29 @@ function visibleDiskCleanupItems(listEl) {
 function ensureDiskCleanupFilterChips() {
   const list = document.getElementById('disk-cleanup-list');
   if (!list || !list.parentNode) return;
-  if (document.getElementById('disk-cleanup-filter-chips')) return;
-  const wrap = document.createElement('div');
-  wrap.id = 'disk-cleanup-filter-chips';
-  wrap.className = 'disk-cleanup-filter-chips';
-  wrap.setAttribute('role', 'group');
-  wrap.setAttribute('aria-label', 'Cleanup category filter');
-  wrap.hidden = true;
-  wrap.innerHTML =
-    '<button type="button" class="disk-cleanup-filter-chip is-active" data-disk-cleanup-filter="all" aria-pressed="true" title="Show every category">All</button>' +
-    '<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="reclaim" aria-pressed="false" title="Show categories with reclaimable space">Reclaim <span class="disk-cleanup-filter-count" data-disk-cleanup-filter-count="reclaim">0</span></button>' +
-    '<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="clean" aria-pressed="false" title="Show categories that are already clean">Clean <span class="disk-cleanup-filter-count" data-disk-cleanup-filter-count="clean">0</span></button>';
-  list.parentNode.insertBefore(wrap, list);
-  wrap.addEventListener('click', (e) => {
-    const btn =
-      e.target && e.target.closest && e.target.closest('[data-disk-cleanup-filter]');
-    if (!btn || !wrap.contains(btn)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    setDiskCleanupFilterMode(btn.getAttribute('data-disk-cleanup-filter') || 'all');
-  });
+  let wrap = document.getElementById('disk-cleanup-filter-chips');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'disk-cleanup-filter-chips';
+    wrap.className = 'disk-cleanup-filter-chips';
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-label', 'Cleanup category filter');
+    wrap.hidden = true;
+    wrap.innerHTML =
+      '<button type="button" class="disk-cleanup-filter-chip is-active" data-disk-cleanup-filter="all" aria-pressed="true" title="Show every category">All</button>' +
+      '<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="reclaim" aria-pressed="false" title="Show categories with reclaimable space">Reclaim <span class="disk-cleanup-filter-count" data-disk-cleanup-filter-count="reclaim">0</span></button>' +
+      '<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="clean" aria-pressed="false" title="Show categories that are already clean">Clean <span class="disk-cleanup-filter-count" data-disk-cleanup-filter-count="clean">0</span></button>';
+    list.parentNode.insertBefore(wrap, list);
+    wrap.addEventListener('click', (e) => {
+      const btn =
+        e.target && e.target.closest && e.target.closest('[data-disk-cleanup-filter]');
+      if (!btn || !wrap.contains(btn)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setDiskCleanupFilterMode(btn.getAttribute('data-disk-cleanup-filter') || 'all');
+    });
+  }
+  wireFilterChipToolbarKeyboard(wrap);
 }
 
 function setDiskCleanupFilterMode(mode) {

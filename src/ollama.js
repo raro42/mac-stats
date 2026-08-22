@@ -490,25 +490,30 @@ function ensureChatFilterChips() {
   const chat = document.getElementById('ollama-chat');
   const messages = document.getElementById('chat-messages');
   if (!chat || !messages || !messages.parentNode) return;
-  if (document.getElementById('chat-filter-chips')) return;
-  const wrap = document.createElement('div');
-  wrap.id = 'chat-filter-chips';
-  wrap.className = 'chat-filter-chips';
-  wrap.setAttribute('role', 'group');
-  wrap.setAttribute('aria-label', 'Chat message filter');
-  wrap.hidden = true;
-  wrap.innerHTML =
-    '<button type="button" class="chat-filter-chip is-active" data-chat-filter="all" aria-pressed="true" title="Show every message">All</button>' +
-    '<button type="button" class="chat-filter-chip" data-chat-filter="you" aria-pressed="false" title="Show your messages only">You <span class="chat-filter-count" data-chat-filter-count="you">0</span></button>' +
-    '<button type="button" class="chat-filter-chip" data-chat-filter="assistant" aria-pressed="false" title="Show assistant replies only">Assistant <span class="chat-filter-count" data-chat-filter-count="assistant">0</span></button>';
-  messages.parentNode.insertBefore(wrap, messages);
-  wrap.addEventListener('click', (e) => {
-    const btn = e.target && e.target.closest && e.target.closest('[data-chat-filter]');
-    if (!btn || !wrap.contains(btn)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    setChatFilterMode(btn.getAttribute('data-chat-filter') || 'all');
-  });
+  let wrap = document.getElementById('chat-filter-chips');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'chat-filter-chips';
+    wrap.className = 'chat-filter-chips';
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-label', 'Chat message filter');
+    wrap.hidden = true;
+    wrap.innerHTML =
+      '<button type="button" class="chat-filter-chip is-active" data-chat-filter="all" aria-pressed="true" title="Show every message">All</button>' +
+      '<button type="button" class="chat-filter-chip" data-chat-filter="you" aria-pressed="false" title="Show your messages only">You <span class="chat-filter-count" data-chat-filter-count="you">0</span></button>' +
+      '<button type="button" class="chat-filter-chip" data-chat-filter="assistant" aria-pressed="false" title="Show assistant replies only">Assistant <span class="chat-filter-count" data-chat-filter-count="assistant">0</span></button>';
+    messages.parentNode.insertBefore(wrap, messages);
+    wrap.addEventListener('click', (e) => {
+      const btn = e.target && e.target.closest && e.target.closest('[data-chat-filter]');
+      if (!btn || !wrap.contains(btn)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setChatFilterMode(btn.getAttribute('data-chat-filter') || 'all');
+    });
+  }
+  if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
+    window.wireFilterChipToolbarKeyboard(wrap);
+  }
 }
 
 function setChatFilterMode(mode) {
