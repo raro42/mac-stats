@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops **Runs Insights toolbar keyboard** (← → / h l · Home/End across Discord · Digest open · Slowest · Candidates; arrow previews run; Enter loads chat; filter-row / preview-row parity) — **v0.1.604**
+
 - Agent Ops **filter-row toolbar keyboard** (← → / h l · Home/End across search input · N/M chip · Clear; arrows at text boundaries; preview-row / refresh-row parity) — **v0.1.603**
 
 - Agent Ops **preview-row toolbar keyboard** (← → / h l · Home/End across copy chip · Load into AI Chat on Sessions / Runs / Schedules / Knowledge previews; edit-actions parity) — **v0.1.602**
