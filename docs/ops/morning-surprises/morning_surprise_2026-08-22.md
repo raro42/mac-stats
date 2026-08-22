@@ -4,7 +4,7 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 
 ## Latest keep (this tick)
 
-**v0.1.592** — Settings Product: focus AI · compact menu bar · compact CPU window · Help · Reset, then ← → / h l / Home / End moves across them (theme-list / filter-chip parity). Space toggles checkboxes; Enter / Space keep Help / Reset. Soft kb hint; one Tab stop via roving tabindex.
+**v0.1.593** — CPU metrics ring-gauge toolbar keyboard: focus CPU · GPU · Frequency · Temperature, then ← → / h l / Home / End moves across the rings (power-strip / filter-chip parity). Enter / Space keeps CPU Details/Processes toggle and GPU / Freq / Temp click-to-copy. Soft kb hint; one Tab stop via roving tabindex.
 
 ## Tonight’s keeps (selected)
 
@@ -20,6 +20,7 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 | **v0.1.590** | Filter-chip toolbar keyboard |
 | **v0.1.591** | Settings theme-list toolbar keyboard |
 | **v0.1.592** | Settings Product toolbar keyboard |
+| **v0.1.593** | CPU ring-gauge toolbar keyboard |
 
 ## Notes
 
