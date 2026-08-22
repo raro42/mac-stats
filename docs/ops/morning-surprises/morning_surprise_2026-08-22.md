@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-22
 
-Overnight Track B (20:00–06:00) shipped user-facing listbox / copy polish. Digester open stayed empty; design-review screens are in grace (recommended: feature-ai-chat).
+Overnight Track B (20:00–06:00) shipped user-facing listbox / copy / power-strip polish. Digester open stayed empty; design-review screens are in grace (recommended: feature-ai-chat).
 
 ## Shipped tonight
 
@@ -18,14 +18,15 @@ Overnight Track B (20:00–06:00) shipped user-facing listbox / copy polish. Dig
 | **v0.1.585** | Perplexity listbox chrome keyboard |
 | **v0.1.586** | AI Chat listbox chrome keyboard |
 | **v0.1.587** | Details click-to-copy + keyboard nav |
+| **v0.1.588** | Battery / power strip toolbar keyboard |
 
 ## Latest keep (this tick)
 
-**v0.1.587** — Details values: click or ↑↓ / j k / Home / End · Enter / c copies with a green Copied badge (Debug Log / Monitors / Top Processes parity). Soft kb hint under the section title; focus the grid for first/last.
+**v0.1.588** — Power strip: focus a chip, then ← → / h l / Home / End moves across CPU · RAM · GPU · Temp · Heat · LPM · GHz · SSD · Up · Bat · Power (Details / Monitors listbox chrome parity). Enter / Space still activates or copies. Soft kb hint; one Tab stop via roving tabindex.
 
 ## Notes
 
 - Digester: no open candidates (instant-heavy sample).
 - Design review: `due=false` (grace); screenshots deferred (TCC).
 - `debug.log`: quiet in 180m scan.
-- Git: keep @ `847281f`; install + LaunchAgent kickstart after ship.
+- Git: keep @ `166eb36`; install + LaunchAgent kickstart after ship.
