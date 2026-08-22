@@ -10376,6 +10376,156 @@ function stopLogsGlancePoll() {
   }
 }
 
+/** Group Debug Log action controls for toolbar keyboard (filter chips stay separate). */
+function ensureLogsToolbarActionsWrap(toolbar) {
+  if (!toolbar) return null;
+  let wrap = toolbar.querySelector('.logs-toolbar-actions');
+  if (wrap) return wrap;
+  wrap = document.createElement('div');
+  wrap.className = 'logs-toolbar-actions';
+  const refresh = document.getElementById('logs-refresh-btn');
+  const open = document.getElementById('logs-open-btn');
+  const autoLabel = toolbar.querySelector('label.logs-autorefresh');
+  if (refresh && toolbar.contains(refresh)) wrap.appendChild(refresh);
+  if (open && toolbar.contains(open)) wrap.appendChild(open);
+  if (autoLabel && toolbar.contains(autoLabel)) wrap.appendChild(autoLabel);
+  if (!wrap.childElementCount) return null;
+  toolbar.insertBefore(wrap, toolbar.firstChild);
+  return wrap;
+}
+
+/** Focusable Debug Log toolbar items (Refresh · Open · Auto-refresh). */
+function getLogsToolbarActionItems(row) {
+  const wrap =
+    row ||
+    document.querySelector('.logs-toolbar-actions') ||
+    ensureLogsToolbarActionsWrap(
+      document.querySelector('#logs-content .logs-toolbar') ||
+        document.querySelector('.logs-toolbar')
+    );
+  if (!wrap) return [];
+  const items = [];
+  const refresh = document.getElementById('logs-refresh-btn');
+  const open = document.getElementById('logs-open-btn');
+  const auto = document.getElementById('logs-autorefresh');
+  if (refresh && wrap.contains(refresh) && !refresh.hidden) items.push(refresh);
+  if (open && wrap.contains(open) && !open.hidden) items.push(open);
+  if (auto && wrap.contains(auto) && !auto.hidden) items.push(auto);
+  return items.filter((el) => {
+    if (!el || el.hidden) return false;
+    return el.getClientRects().length > 0 || wrap.contains(el);
+  });
+}
+
+function refreshLogsToolbarRovingTabindex(row, preferred) {
+  const items = getLogsToolbarActionItems(row);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureLogsToolbarKbHint(row) {
+  const wrap =
+    row ||
+    document.querySelector('.logs-toolbar-actions') ||
+    ensureLogsToolbarActionsWrap(
+      document.querySelector('#logs-content .logs-toolbar') ||
+        document.querySelector('.logs-toolbar')
+    );
+  if (!wrap) return;
+  let hint = wrap.querySelector('.logs-toolbar-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'logs-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    wrap.appendChild(hint);
+  }
+  const items = getLogsToolbarActionItems(wrap);
+  hint.hidden = items.length < 2;
+  hint.textContent =
+    '← → / h l · Home/End move · Space toggles auto-refresh · Enter / Space on buttons';
+}
+
+/**
+ * Debug Log toolbar keyboard — focus Refresh · Open in editor · Auto-refresh,
+ * then ←→ / h l / Home/End (refresh-row / filter-chip parity). Enter/Space keeps
+ * native button activate; Space toggles the checkbox.
+ */
+function ensureLogsToolbarKeyboard() {
+  const toolbar =
+    document.querySelector('#logs-content .logs-toolbar') ||
+    document.querySelector('.logs-toolbar');
+  if (!toolbar) return;
+  const wrap = ensureLogsToolbarActionsWrap(toolbar);
+  if (!wrap) return;
+  ensureLogsToolbarKbHint(wrap);
+  refreshLogsToolbarRovingTabindex(wrap);
+  if (wrap.dataset.logsToolbarKbWired === '1') return;
+  wrap.dataset.logsToolbarKbWired = '1';
+  if (!wrap.getAttribute('role')) wrap.setAttribute('role', 'toolbar');
+  if (!wrap.getAttribute('aria-label')) {
+    wrap.setAttribute('aria-label', 'Debug log controls');
+  }
+  wrap.addEventListener('focusin', (e) => {
+    const items = getLogsToolbarActionItems(wrap);
+    if (items.includes(e.target)) {
+      refreshLogsToolbarRovingTabindex(wrap, e.target);
+      ensureLogsToolbarKbHint(wrap);
+    }
+  });
+  wrap.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getLogsToolbarActionItems(wrap);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (
+        active?.id === 'logs-refresh-btn' ||
+        active?.id === 'logs-open-btn' ||
+        active?.id === 'logs-autorefresh'
+      ) {
+        return;
+      }
+    }
+    let next = -1;
+    if (
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j'
+    ) {
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k'
+    ) {
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshLogsToolbarRovingTabindex(wrap, items[next]);
+    items[next].focus();
+  });
+}
+
 function ensureLogsFilterChips() {
   const toolbar = document.querySelector('#logs-content .logs-toolbar') || document.querySelector('.logs-toolbar');
   if (!toolbar) return;
@@ -12915,6 +13065,7 @@ function initLogsSection() {
   if (!header || !content) return;
 
   ensureLogsFilterChips();
+  ensureLogsToolbarKeyboard();
   ensureLogsErrorGlance();
   startLogsGlancePoll();
 

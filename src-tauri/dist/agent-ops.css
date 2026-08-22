@@ -2264,6 +2264,20 @@ textarea.ops-agent-editor.is-dirty {
   background: color-mix(in srgb, currentColor 3.5%, transparent);
 }
 
+.logs-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.logs-toolbar-kb-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
 .logs-toolbar button {
   font-size: 12px;
   padding: 6px 10px;

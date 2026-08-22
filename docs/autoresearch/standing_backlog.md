@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Debug Log **toolbar keyboard** (← → / h l · Home/End across Refresh · Open in editor · Auto-refresh; Space toggles; refresh-row parity) — **v0.1.607**
+
 - Perplexity Search **toolbar keyboard** (← → / h l · Home/End across query · Search; setup key · Save key; composer parity) — **v0.1.606**
 
 - AI Chat **composer toolbar keyboard** (← → / h l · Home/End across input · Clear · Send; arrows at text boundaries; filter-row parity) — **v0.1.605**

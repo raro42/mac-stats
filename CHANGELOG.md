@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.607] - 2026-08-23
+
+### Added
+- Debug Log **toolbar keyboard** — focus Refresh · Open in editor · Auto-refresh, then ← → / h l / Home / End moves across controls (refresh-row / filter-chip parity). Space toggles auto-refresh; Enter / Space keeps button activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+
 ## [0.1.606] - 2026-08-23
 
 ### Added
