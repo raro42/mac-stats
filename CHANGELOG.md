@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.591] - 2026-08-22
+
+### Added
+- Settings theme list **toolbar keyboard** — focus a theme, then ← → / h l / Home / End moves across Apple · Architect · … (filter-chip / power-strip parity). Enter / Space applies the theme. Soft kb hint; one Tab stop via roving tabindex (current theme preferred).
+
 ## [0.1.590] - 2026-08-22
 
 ### Added

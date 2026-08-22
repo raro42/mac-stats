@@ -220,6 +220,108 @@
     );
   }
 
+  /** Theme buttons in Settings Appearance (visible only). */
+  function getThemeListButtons(themeList) {
+    if (!themeList) return [];
+    return Array.from(themeList.querySelectorAll("[data-theme]")).filter((el) => {
+      if (!el || el.hidden || el.disabled) return false;
+      return el.getClientRects().length > 0 || el.offsetParent !== null || themeList.contains(el);
+    });
+  }
+
+  function refreshThemeListRovingTabindex(themeList, preferred) {
+    const buttons = getThemeListButtons(themeList);
+    if (!buttons.length) return;
+    const focused = buttons.find((el) => el === document.activeElement);
+    const current =
+      (preferred && buttons.includes(preferred) && preferred) ||
+      focused ||
+      buttons.find((el) => el.getAttribute("aria-current") === "true") ||
+      buttons.find((el) => el.tabIndex === 0) ||
+      buttons[0];
+    for (const el of buttons) {
+      el.tabIndex = el === current ? 0 : -1;
+    }
+  }
+
+  function ensureThemeListKbStyles() {
+    if (document.getElementById("mac-stats-theme-list-kb-styles")) return;
+    const style = document.createElement("style");
+    style.id = "mac-stats-theme-list-kb-styles";
+    style.textContent = `
+      .theme-list-kb-hint {
+        margin: 6px 0 0;
+        font-size: 11px;
+        opacity: 0.72;
+        grid-column: 1 / -1;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  /**
+   * Settings theme-list toolbar keyboard — focus a theme, then ←→ / h l /
+   * Home/End (filter-chip / power-strip parity). Enter/Space keeps apply.
+   */
+  function wireThemeListToolbarKeyboard(themeList) {
+    if (!themeList) return;
+    ensureThemeListKbStyles();
+    let hint = themeList.querySelector(":scope > .theme-list-kb-hint");
+    if (!hint) {
+      hint = document.createElement("div");
+      hint.className = "theme-list-kb-hint";
+      hint.setAttribute("aria-hidden", "true");
+      themeList.appendChild(hint);
+    }
+    hint.textContent =
+      "← → / h l · Home/End move · Enter / Space applies theme";
+    refreshThemeListRovingTabindex(themeList);
+    if (themeList.dataset.themeListKbWired === "1") return;
+    themeList.dataset.themeListKbWired = "1";
+    themeList.setAttribute("role", "toolbar");
+    if (!themeList.getAttribute("aria-label")) {
+      themeList.setAttribute("aria-label", "Theme");
+    }
+    themeList.addEventListener("focusin", (e) => {
+      const buttons = getThemeListButtons(themeList);
+      if (buttons.includes(e.target)) refreshThemeListRovingTabindex(themeList, e.target);
+    });
+    themeList.addEventListener("keydown", (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const buttons = getThemeListButtons(themeList);
+      if (!buttons.length) return;
+      const idx = buttons.indexOf(document.activeElement);
+      if (idx < 0) return;
+      let next = -1;
+      if (
+        e.key === "ArrowRight" ||
+        e.key === "l" ||
+        e.key === "ArrowDown" ||
+        e.key === "j"
+      ) {
+        next = Math.min(idx + 1, buttons.length - 1);
+      } else if (
+        e.key === "ArrowLeft" ||
+        e.key === "h" ||
+        e.key === "ArrowUp" ||
+        e.key === "k"
+      ) {
+        next = Math.max(idx - 1, 0);
+      } else if (e.key === "Home") {
+        next = 0;
+      } else if (e.key === "End") {
+        next = buttons.length - 1;
+      } else {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      if (next === idx) return;
+      refreshThemeListRovingTabindex(themeList, buttons[next]);
+      buttons[next].focus();
+    });
+  }
+
   function initThemePicker() {
     // New: one-click list of themes
     const themeList = document.getElementById("theme-list");
@@ -239,6 +341,7 @@
           applyTheme(theme);
         });
       });
+      wireThemeListToolbarKeyboard(themeList);
       return;
     }
 
