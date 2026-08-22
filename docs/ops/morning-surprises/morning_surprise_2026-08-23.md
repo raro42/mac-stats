@@ -1,10 +1,10 @@
 # Morning surprise — 2026-08-23
 
-Overnight Track B extended toolbar keyboard parity into Debug Log while digester open stayed empty.
+Overnight Track B extended toolbar keyboard parity into Disk Cleanup while digester open stayed empty.
 
 ## Latest keep (this tick)
 
-**v0.1.607** — Debug Log toolbar keyboard: focus Refresh · Open in editor · Auto-refresh, then ← → / h l / Home / End moves across controls (refresh-row / filter-chip parity). Space toggles auto-refresh; Enter / Space keeps button activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+**v0.1.608** — Disk Cleanup action toolbar keyboard: focus Clean now · Refresh · Save scopes, then ← → / h l / Home / End moves across controls (Debug Log / meta-card parity). Enter / Space keeps button activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
 
 ## Tonight's keeps (selected)
 
@@ -20,6 +20,7 @@ Overnight Track B extended toolbar keyboard parity into Debug Log while digester
 | **v0.1.605** | AI Chat composer toolbar keyboard |
 | **v0.1.606** | Perplexity Search toolbar keyboard |
 | **v0.1.607** | Debug Log toolbar keyboard |
+| **v0.1.608** | Disk Cleanup action toolbar keyboard |
 
 ## Notes
 
