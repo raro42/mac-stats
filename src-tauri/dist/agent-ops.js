@@ -683,6 +683,171 @@ function ensureOpsAgentEditActionsToolbarKeyboard() {
     });
 }
 
+/** Preview-row specs: copy chip · Load into AI Chat (Sessions / Runs / Schedules / Knowledge). */
+const OPS_PREVIEW_ROW_SPECS = [
+    {
+        key: 'sessions',
+        panelId: 'ops-panel-sessions',
+        copyId: 'ops-session-copy-chip',
+        loadId: 'ops-session-load-chat',
+        hintId: 'ops-session-preview-kb-hint',
+        anchorId: 'ops-session-preview',
+        ariaLabel: 'Session preview actions',
+    },
+    {
+        key: 'runs',
+        panelId: 'ops-panel-runs',
+        copyId: 'ops-runs-copy-chip',
+        loadId: 'ops-runs-load-chat',
+        hintId: 'ops-runs-preview-kb-hint',
+        anchorId: 'ops-runs-preview',
+        ariaLabel: 'Run preview actions',
+    },
+    {
+        key: 'schedules',
+        panelId: 'ops-panel-schedules',
+        copyId: 'ops-schedule-copy-chip',
+        loadId: 'ops-schedules-load-chat',
+        hintId: 'ops-schedules-preview-kb-hint',
+        anchorId: 'ops-schedule-preview',
+        ariaLabel: 'Schedule preview actions',
+    },
+    {
+        key: 'memory',
+        panelId: 'ops-panel-memory',
+        copyId: 'ops-memory-copy-chip',
+        loadId: 'ops-memory-load-chat',
+        hintId: 'ops-memory-preview-kb-hint',
+        anchorId: 'ops-memory-preview',
+        ariaLabel: 'Knowledge preview actions',
+    },
+];
+
+function getOpsPreviewRowItems(spec) {
+    if (!spec) return [];
+    const panel = document.getElementById(spec.panelId);
+    if (!panel || panel.hidden) return [];
+    const items = [];
+    const copy = document.getElementById(spec.copyId);
+    const load = document.getElementById(spec.loadId);
+    if (copy && !copy.hidden) items.push(copy);
+    if (load && !load.hidden) items.push(load);
+    return items.filter((el) => {
+        if (!el || el.hidden) return false;
+        return el.getClientRects().length > 0 || el.offsetParent !== null;
+    });
+}
+
+function refreshOpsPreviewRowRovingTabindex(spec, preferred) {
+    const items = getOpsPreviewRowItems(spec);
+    if (!items.length) return;
+    const focused = items.find((el) => el === document.activeElement);
+    const current =
+        (preferred && items.includes(preferred) && preferred) ||
+        focused ||
+        items.find((el) => el.tabIndex === 0) ||
+        items[0];
+    for (const el of items) {
+        el.tabIndex = el === current ? 0 : -1;
+    }
+}
+
+function refreshAllOpsPreviewRowRovingTabindex(preferredByKey) {
+    for (const spec of OPS_PREVIEW_ROW_SPECS) {
+        const preferred =
+            preferredByKey && preferredByKey[spec.key]
+                ? document.getElementById(preferredByKey[spec.key])
+                : null;
+        refreshOpsPreviewRowRovingTabindex(spec, preferred);
+    }
+}
+
+function ensureOpsPreviewRowKbHint(spec) {
+    if (!spec) return;
+    const anchor = document.getElementById(spec.anchorId);
+    if (!anchor || !anchor.parentNode) return;
+    let hint = document.getElementById(spec.hintId);
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = spec.hintId;
+        hint.className = 'ops-preview-row-kb-hint';
+        hint.setAttribute('aria-hidden', 'true');
+        const load = document.getElementById(spec.loadId);
+        if (load && load.parentNode === anchor.parentNode) {
+            load.parentNode.insertBefore(hint, load.nextSibling);
+        } else {
+            anchor.parentNode.insertBefore(hint, anchor.nextSibling);
+        }
+    }
+    const items = getOpsPreviewRowItems(spec);
+    hint.hidden = items.length < 2;
+    hint.textContent =
+        '← → / h l · Home/End move · Enter / Space copies or loads chat';
+}
+
+function wireOpsPreviewRowToolbarKeyboard(spec) {
+    if (!spec) return;
+    const anchor = document.getElementById(spec.anchorId);
+    if (!anchor || !anchor.parentNode) return;
+    const host = anchor.parentNode;
+    ensureOpsPreviewRowKbHint(spec);
+    refreshOpsPreviewRowRovingTabindex(spec);
+    const wireKey = `opsPreviewRowKbWired_${spec.key}`;
+    if (host.dataset[wireKey] === '1') return;
+    host.dataset[wireKey] = '1';
+    if (!host.dataset.opsPreviewRowToolbar) {
+        host.dataset.opsPreviewRowToolbar = spec.key;
+    }
+    host.addEventListener('focusin', (e) => {
+        const items = getOpsPreviewRowItems(spec);
+        if (items.includes(e.target)) {
+            refreshOpsPreviewRowRovingTabindex(spec, e.target);
+            ensureOpsPreviewRowKbHint(spec);
+        }
+    });
+    host.addEventListener('keydown', (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const items = getOpsPreviewRowItems(spec);
+        if (!items.length) return;
+        const idx = items.indexOf(document.activeElement);
+        if (idx < 0) return;
+        let next = -1;
+        if (
+            e.key === 'ArrowRight' ||
+            e.key === 'l' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'j'
+        ) {
+            next = Math.min(idx + 1, items.length - 1);
+        } else if (
+            e.key === 'ArrowLeft' ||
+            e.key === 'h' ||
+            e.key === 'ArrowUp' ||
+            e.key === 'k'
+        ) {
+            next = Math.max(idx - 1, 0);
+        } else if (e.key === 'Home') {
+            next = 0;
+        } else if (e.key === 'End') {
+            next = items.length - 1;
+        } else {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        if (next === idx) return;
+        refreshOpsPreviewRowRovingTabindex(spec, items[next]);
+        items[next].focus();
+    });
+}
+
+/** Preview-row toolbar keyboard — copy chip · Load into AI Chat (edit-actions parity). */
+function ensureOpsPreviewRowsToolbarKeyboard() {
+    for (const spec of OPS_PREVIEW_ROW_SPECS) {
+        wireOpsPreviewRowToolbarKeyboard(spec);
+    }
+}
+
 /**
  * Tab-bar toolbar keyboard — focus 0 Overview · Agents · Sessions · Schedules ·
  * Knowledge · Runs, then ←→ / h l / Home/End (overview-card / health-strip parity).
@@ -918,6 +1083,7 @@ function setupAgentOps() {
     ensureOpsTabBarToolbarKeyboard();
     ensureOpsFileTabToolbarKeyboard();
     ensureOpsAgentEditActionsToolbarKeyboard();
+    ensureOpsPreviewRowsToolbarKeyboard();
     ensureOpsRefreshRowToolbarKeyboard();
     ensureOpsKeyboardHint();
     ensureOpsUpdatedAgo();
@@ -3527,6 +3693,8 @@ function setOpsScheduleLoadChatVisible(visible) {
             el.textContent = 'Load into AI Chat ↵';
         }
     }
+    refreshAllOpsPreviewRowRovingTabindex({ schedules: 'ops-schedules-load-chat' });
+    ensureOpsPreviewRowKbHint(OPS_PREVIEW_ROW_SPECS[2]);
 }
 
 function showOpsScheduleLoadStatus(msg, ok) {
@@ -3669,6 +3837,8 @@ function setOpsScheduleCopyChip(copyValue) {
         el.dataset.copyValue = '';
         el.classList.remove('is-just-saved');
         el.textContent = '';
+        refreshAllOpsPreviewRowRovingTabindex({ schedules: 'ops-schedule-copy-chip' });
+        ensureOpsPreviewRowKbHint(OPS_PREVIEW_ROW_SPECS[2]);
         return;
     }
     el.hidden = false;
@@ -3679,6 +3849,8 @@ function setOpsScheduleCopyChip(copyValue) {
         el.textContent = value;
         el._saveFlashOriginalLabel = value;
     }
+    refreshAllOpsPreviewRowRovingTabindex({ schedules: 'ops-schedule-copy-chip' });
+    ensureOpsPreviewRowKbHint(OPS_PREVIEW_ROW_SPECS[2]);
 }
 
 function formatOpsSchedulePreview(s) {
@@ -5127,6 +5299,8 @@ function setOpsMemoryCopyChip(copyValue) {
         el.dataset.copyValue = '';
         el.classList.remove('is-just-saved');
         el.textContent = '';
+        refreshAllOpsPreviewRowRovingTabindex({ memory: 'ops-memory-copy-chip' });
+        ensureOpsPreviewRowKbHint(OPS_PREVIEW_ROW_SPECS[3]);
         return;
     }
     el.hidden = false;
@@ -5137,6 +5311,8 @@ function setOpsMemoryCopyChip(copyValue) {
         el.textContent = value;
         el._saveFlashOriginalLabel = value;
     }
+    refreshAllOpsPreviewRowRovingTabindex({ memory: 'ops-memory-copy-chip' });
+    ensureOpsPreviewRowKbHint(OPS_PREVIEW_ROW_SPECS[3]);
 }
 
 /** Load-into-chat control under the Knowledge preview (Sessions/Runs/Schedules parity). */
@@ -5168,6 +5344,8 @@ function setOpsMemoryLoadChatVisible(visible) {
             el.textContent = 'Load into AI Chat ↵';
         }
     }
+    refreshAllOpsPreviewRowRovingTabindex({ memory: 'ops-memory-load-chat' });
+    ensureOpsPreviewRowKbHint(OPS_PREVIEW_ROW_SPECS[3]);
 }
 
 function showOpsMemoryLoadStatus(msg, ok) {
@@ -5313,6 +5491,8 @@ function setOpsSessionCopyChip(copyValue) {
         el.dataset.copyValue = '';
         el.classList.remove('is-just-saved');
         el.textContent = '';
+        refreshAllOpsPreviewRowRovingTabindex({ sessions: 'ops-session-copy-chip' });
+        ensureOpsPreviewRowKbHint(OPS_PREVIEW_ROW_SPECS[0]);
         return;
     }
     el.hidden = false;
@@ -5323,6 +5503,8 @@ function setOpsSessionCopyChip(copyValue) {
         el.textContent = value;
         el._saveFlashOriginalLabel = value;
     }
+    refreshAllOpsPreviewRowRovingTabindex({ sessions: 'ops-session-copy-chip' });
+    ensureOpsPreviewRowKbHint(OPS_PREVIEW_ROW_SPECS[0]);
 }
 
 function showOpsSessionPreview(rows, label, copyValue) {
@@ -5333,6 +5515,8 @@ function showOpsSessionPreview(rows, label, copyValue) {
     preview.textContent = (label ? `${label}\n\n` : '') + formatSessionMessagesPreview(rows || []);
     if (loadBtn) loadBtn.hidden = !opsSessionLoadRows;
     setOpsSessionCopyChip(copyValue);
+    refreshAllOpsPreviewRowRovingTabindex({ sessions: 'ops-session-load-chat' });
+    ensureOpsPreviewRowKbHint(OPS_PREVIEW_ROW_SPECS[0]);
 }
 
 function showOpsSessionStatus(msg, ok) {
@@ -5702,6 +5886,8 @@ function setOpsRunsCopyChip(copyValue) {
         el.dataset.copyValue = '';
         el.classList.remove('is-just-saved');
         el.textContent = '';
+        refreshAllOpsPreviewRowRovingTabindex({ runs: 'ops-runs-copy-chip' });
+        ensureOpsPreviewRowKbHint(OPS_PREVIEW_ROW_SPECS[1]);
         return;
     }
     el.hidden = false;
@@ -5712,6 +5898,8 @@ function setOpsRunsCopyChip(copyValue) {
         el.textContent = value;
         el._saveFlashOriginalLabel = value;
     }
+    refreshAllOpsPreviewRowRovingTabindex({ runs: 'ops-runs-copy-chip' });
+    ensureOpsPreviewRowKbHint(OPS_PREVIEW_ROW_SPECS[1]);
 }
 
 /** Load-into-chat control under the Runs preview (Sessions parity). */
@@ -5743,6 +5931,8 @@ function setOpsRunsLoadChatVisible(visible) {
             el.textContent = 'Load into AI Chat ↵';
         }
     }
+    refreshAllOpsPreviewRowRovingTabindex({ runs: 'ops-runs-load-chat' });
+    ensureOpsPreviewRowKbHint(OPS_PREVIEW_ROW_SPECS[1]);
 }
 
 function showOpsRunLoadStatus(msg, ok) {

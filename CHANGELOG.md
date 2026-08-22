@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.602] - 2026-08-22
+
+### Added
+- Agent Ops **preview-row toolbar keyboard** — focus copy chip · Load into AI Chat on Sessions, Runs, Schedules, and Knowledge previews, then ← → / h l / Home / End moves across controls (edit-actions parity). Enter / Space keeps copy or load. Soft kb hint when both controls are visible; one Tab stop via roving tabindex.
+
 ## [0.1.601] - 2026-08-22
 
 ### Added

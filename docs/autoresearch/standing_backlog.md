@@ -20,6 +20,7 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+- Agent Ops **preview-row toolbar keyboard** (← → / h l · Home/End across copy chip · Load into AI Chat on Sessions / Runs / Schedules / Knowledge previews; edit-actions parity) — **v0.1.602**
 
 - Agent Ops **agent edit-actions toolbar keyboard** (← → / h l · Home/End across Save · Load into AI Chat · Back; Enter/Space activates; file-tab / refresh-row parity) — **v0.1.601**
 
