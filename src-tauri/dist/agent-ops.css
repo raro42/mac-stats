@@ -1521,8 +1521,20 @@ textarea.ops-agent-editor.is-dirty {
 
 .chat-input-container {
   display: flex !important;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+}
+
+.chat-composer-kb-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.chat-composer-kb-hint[hidden] {
+  display: none !important;
 }
 
 /* Shared process list polish (themes load agent-ops.css) */

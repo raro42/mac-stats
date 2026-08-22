@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.605] - 2026-08-22
+
+### Added
+- AI Chat **composer toolbar keyboard** — focus input · Clear · Send, then ← → / h l / Home / End moves across controls (filter-row parity). Arrows leave the input only at text start/end. Enter still sends from the input; Clear and Send keep button activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+
 ## [0.1.604] - 2026-08-22
 
 ### Added

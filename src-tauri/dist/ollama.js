@@ -1381,6 +1381,9 @@ function updateChatClearButton() {
   applyChatTurnGlanceState();
   applyChatAnswerGlanceState();
   applyChatListFilter();
+  ensureChatComposerToolbarKeyboard();
+  refreshChatComposerRovingTabindex();
+  ensureChatComposerKbHint();
 }
 
 /**
@@ -2280,6 +2283,137 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+/** Focusable composer items in DOM order (input · Clear when enabled · Send). */
+function getChatComposerItems(container) {
+  const row = container || document.querySelector('.chat-input-container');
+  if (!row) return [];
+  const items = [];
+  const input = document.getElementById('chat-input');
+  const clearBtn = getChatClearButton();
+  const sendBtn = document.getElementById('chat-send-btn');
+  if (input && row.contains(input) && !input.hidden) items.push(input);
+  if (clearBtn && row.contains(clearBtn) && !clearBtn.hidden && !clearBtn.disabled) {
+    items.push(clearBtn);
+  }
+  if (sendBtn && row.contains(sendBtn) && !sendBtn.hidden) items.push(sendBtn);
+  return items.filter((el) => {
+    if (!el || el.hidden) return false;
+    return el.getClientRects().length > 0 || row.contains(el);
+  });
+}
+
+function chatComposerInputAtMoveBoundary(input, direction) {
+  if (!input || input.tagName !== 'INPUT') return true;
+  if (direction > 0) {
+    const len = (input.value || '').length;
+    return input.selectionStart === len && input.selectionEnd === len;
+  }
+  return input.selectionStart === 0 && input.selectionEnd === 0;
+}
+
+function refreshChatComposerRovingTabindex(container, preferred) {
+  const row = container || document.querySelector('.chat-input-container');
+  const items = getChatComposerItems(row);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureChatComposerKbHint(container) {
+  const row = container || document.querySelector('.chat-input-container');
+  if (!row) return;
+  let hint = row.querySelector('.chat-composer-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'chat-composer-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    row.appendChild(hint);
+  }
+  const items = getChatComposerItems(row);
+  hint.hidden = items.length < 2;
+  hint.textContent =
+    '← → / h l · Home/End move · Enter sends from input · Clear / Send on button';
+}
+
+/**
+ * AI Chat composer toolbar keyboard — focus input · Clear · Send, then ←→ / h l /
+ * Home/End (filter-row parity). Input keeps normal typing; arrows move only at
+ * text start/end. One Tab stop via roving tabindex.
+ */
+function ensureChatComposerToolbarKeyboard() {
+  const row = document.querySelector('.chat-input-container');
+  if (!row) return;
+  ensureChatComposerKbHint(row);
+  refreshChatComposerRovingTabindex(row);
+  if (row.dataset.chatComposerKbWired === '1') return;
+  row.dataset.chatComposerKbWired = '1';
+  if (!row.getAttribute('role')) row.setAttribute('role', 'toolbar');
+  if (!row.getAttribute('aria-label')) row.setAttribute('aria-label', 'AI Chat composer');
+  row.addEventListener('focusin', (e) => {
+    const items = getChatComposerItems(row);
+    if (items.includes(e.target)) {
+      refreshChatComposerRovingTabindex(row, e.target);
+      ensureChatComposerKbHint(row);
+    }
+  });
+  row.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getChatComposerItems(row);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (active === document.getElementById('chat-input')) return;
+      if (active?.id === 'chat-clear-btn' || active?.id === 'chat-send-btn') return;
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward) {
+      if (active?.id === 'chat-input' && !chatComposerInputAtMoveBoundary(active, 1)) {
+        return;
+      }
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (back) {
+      if (active?.id === 'chat-input' && !chatComposerInputAtMoveBoundary(active, -1)) {
+        return;
+      }
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshChatComposerRovingTabindex(row, items[next]);
+    items[next].focus();
+    if (items[next]?.id === 'chat-input' && typeof items[next].select === 'function') {
+      const len = (items[next].value || '').length;
+      items[next].setSelectionRange(len, len);
+    }
+  });
+}
+
 // ============================================================================
 // Event Listeners Setup
 // ============================================================================
@@ -2358,6 +2492,7 @@ function initOllamaChatListeners() {
   wireChatMessagesCopy(document.getElementById('chat-messages'));
   ensureChatEmptyHint();
   updateChatClearButton();
+  ensureChatComposerToolbarKeyboard();
   
   // Send button click
   chatSendBtn.addEventListener('click', () => {
