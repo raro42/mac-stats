@@ -10766,7 +10766,6 @@ function applyDiskCleanupReclaimCardState(hasReclaim) {
   if (!card) return;
   card.classList.add('is-action');
   card.setAttribute('role', 'button');
-  card.setAttribute('tabindex', '0');
   if (hasReclaim) {
     card.title = 'Click to open the first reclaimable category';
     card.setAttribute(
@@ -10780,6 +10779,7 @@ function applyDiskCleanupReclaimCardState(hasReclaim) {
       'Nothing reclaimable — click to review cleanup scopes'
     );
   }
+  refreshDiskCleanupMetaRovingTabindex();
 }
 
 function wireDiskCleanupReclaimCard() {
@@ -10815,7 +10815,6 @@ function applyDiskCleanupEnabledScopesCardState(enabledCount, totalCount) {
   card.classList.add('is-action');
   card.classList.toggle('has-scopes-off', off > 0);
   card.setAttribute('role', 'button');
-  card.setAttribute('tabindex', '0');
   if (off > 0) {
     card.title = 'Click to review scopes — some are off';
     card.setAttribute(
@@ -10835,6 +10834,7 @@ function applyDiskCleanupEnabledScopesCardState(enabledCount, totalCount) {
       'No scopes yet — click to add a cleanup path'
     );
   }
+  refreshDiskCleanupMetaRovingTabindex();
 }
 
 function wireDiskCleanupEnabledScopesCard() {
@@ -10897,7 +10897,6 @@ function applyDiskCleanupNextRunCardState(isDue) {
   card.classList.add('is-action');
   card.classList.toggle('has-due', !!isDue);
   card.setAttribute('role', 'button');
-  card.setAttribute('tabindex', '0');
   if (isDue) {
     card.title = 'Cleanup is due — click to focus Clean now';
     card.setAttribute(
@@ -10911,6 +10910,7 @@ function applyDiskCleanupNextRunCardState(isDue) {
       'Next automatic run — click to scroll to last run summary'
     );
   }
+  refreshDiskCleanupMetaRovingTabindex();
 }
 
 function wireDiskCleanupNextRunCard() {
@@ -10973,7 +10973,6 @@ function applyDiskCleanupRunsWhenCardState(triggersText) {
   if (!card) return;
   card.classList.add('is-action');
   card.setAttribute('role', 'button');
-  card.setAttribute('tabindex', '0');
   const periodicOff = (triggersText || '').includes('Periodic: off');
   card.classList.toggle('has-periodic-off', periodicOff);
   if (periodicOff) {
@@ -10990,6 +10989,7 @@ function applyDiskCleanupRunsWhenCardState(triggersText) {
       'Runs when — click to review launch and scheduled scopes'
     );
   }
+  refreshDiskCleanupMetaRovingTabindex();
 }
 
 function wireDiskCleanupRunsWhenCard() {
@@ -11011,6 +11011,127 @@ function wireDiskCleanupRunsWhenCard() {
     e.preventDefault();
     e.stopPropagation();
     activate();
+  });
+}
+
+/** Action meta cards in DOM order (Reclaim · Next · Runs when · Scopes). */
+function getDiskCleanupMetaCards() {
+  const wrap = document.querySelector('.disk-cleanup-meta');
+  if (!wrap) return [];
+  return Array.from(
+    wrap.querySelectorAll(':scope > .disk-cleanup-meta-card.is-action')
+  ).filter((el) => {
+    if (!el || el.hidden) return false;
+    return (
+      el.getClientRects().length > 0 ||
+      el.offsetParent !== null ||
+      wrap.contains(el)
+    );
+  });
+}
+
+function refreshDiskCleanupMetaRovingTabindex(preferred) {
+  const cards = getDiskCleanupMetaCards();
+  if (!cards.length) return;
+  const focused = cards.find((el) => el === document.activeElement);
+  const current =
+    (preferred && cards.includes(preferred) && preferred) ||
+    focused ||
+    cards.find((el) => el.tabIndex === 0) ||
+    cards[0];
+  for (const el of cards) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureDiskCleanupMetaKbStyles() {
+  if (document.getElementById('mac-stats-disk-meta-kb-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'mac-stats-disk-meta-kb-styles';
+  style.textContent = `
+    .disk-cleanup-meta-kb-hint {
+      margin: 4px 0 0;
+      font-size: 11px;
+      opacity: 0.72;
+      width: 100%;
+      flex-basis: 100%;
+      grid-column: 1 / -1;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function ensureDiskCleanupMetaKbHint() {
+  ensureDiskCleanupMetaKbStyles();
+  const wrap = document.querySelector('.disk-cleanup-meta');
+  if (!wrap) return;
+  let hint = document.getElementById('disk-cleanup-meta-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.id = 'disk-cleanup-meta-kb-hint';
+    hint.className = 'disk-cleanup-meta-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    wrap.appendChild(hint);
+  }
+  hint.textContent =
+    '← → / h l · Home/End move · Enter / Space opens reclaim / next / runs / scopes';
+}
+
+/**
+ * Disk Cleanup meta-card toolbar keyboard — focus Reclaim · Next · Runs when ·
+ * Scopes, then ←→ / h l / Home/End (power-strip / filter-chip parity).
+ * Enter/Space keep existing card activate.
+ */
+function ensureDiskCleanupMetaKeyboard() {
+  const wrap = document.querySelector('.disk-cleanup-meta');
+  if (!wrap) return;
+  ensureDiskCleanupMetaKbHint();
+  refreshDiskCleanupMetaRovingTabindex();
+  if (wrap.dataset.diskMetaKbWired === '1') return;
+  wrap.dataset.diskMetaKbWired = '1';
+  if (!wrap.getAttribute('role')) {
+    wrap.setAttribute('role', 'toolbar');
+  }
+  if (!wrap.getAttribute('aria-label')) {
+    wrap.setAttribute('aria-label', 'Disk cleanup summary cards');
+  }
+  wrap.addEventListener('focusin', (e) => {
+    const cards = getDiskCleanupMetaCards();
+    if (cards.includes(e.target)) refreshDiskCleanupMetaRovingTabindex(e.target);
+  });
+  wrap.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const cards = getDiskCleanupMetaCards();
+    if (!cards.length) return;
+    const idx = cards.indexOf(document.activeElement);
+    if (idx < 0) return;
+    let next = -1;
+    if (
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j'
+    ) {
+      next = Math.min(idx + 1, cards.length - 1);
+    } else if (
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k'
+    ) {
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = cards.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshDiskCleanupMetaRovingTabindex(cards[next]);
+    cards[next].focus();
   });
 }
 
@@ -12176,6 +12297,7 @@ function initDiskCleanupSection() {
   wireDiskCleanupEnabledScopesCard();
   wireDiskCleanupNextRunCard();
   wireDiskCleanupRunsWhenCard();
+  ensureDiskCleanupMetaKeyboard();
   wireDiskCleanupLastRunPanel();
   ensureDiskCleanupCollapsedGlance();
 

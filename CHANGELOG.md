@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.595] - 2026-08-22
+
+### Added
+- Disk Cleanup **meta-card toolbar keyboard** — focus Reclaimable · Next run · Runs when · Enabled scopes, then ← → / h l / Home / End moves across cards (power-strip / filter-chip parity). Enter / Space keeps existing card activate. Soft kb hint; one Tab stop via roving tabindex.
+
 ## [0.1.594] - 2026-08-22
 
 ### Added
