@@ -4,7 +4,7 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 
 ## Latest keep (this tick)
 
-**v0.1.602** — Agent Ops preview-row toolbar keyboard: focus copy chip · Load into AI Chat on Sessions, Runs, Schedules, and Knowledge previews, then ← → / h l / Home / End moves across controls (edit-actions parity). Enter / Space keeps copy or load. Soft kb hint when both controls are visible; one Tab stop via roving tabindex.
+**v0.1.603** — Agent Ops filter-row toolbar keyboard: focus search input · N/M match chip · Clear, then ← → / h l / Home / End moves across controls (preview-row / refresh-row parity). Arrows leave the input only at text start/end. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
 
 ## Tonight's keeps (selected)
 
@@ -30,10 +30,11 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 | **v0.1.600** | Agent Ops file-tab toolbar keyboard |
 | **v0.1.601** | Agent Ops agent edit-actions toolbar keyboard |
 | **v0.1.602** | Agent Ops preview-row toolbar keyboard |
+| **v0.1.603** | Agent Ops filter-row toolbar keyboard |
 
 ## Notes
 
 - Digester: no open candidates (instant-heavy sample).
 - Design review: `due=false` (grace); screenshots deferred (TCC).
 - `debug.log`: quiet in 180m scan (single-instance WARN from prior launch only).
-- Git: keep after install + LaunchAgent kickstart; Discord Ready @ PID 87055.
+- Git: keep after install + LaunchAgent kickstart; mac_stats @ PID 41439.
