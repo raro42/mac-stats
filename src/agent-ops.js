@@ -2178,7 +2178,6 @@ function wireOpsOverviewCardNavigation() {
         const tab = link?.dataset?.gotoTab || '';
         if (!tab) return;
         card.classList.add('ops-overview-clickable');
-        card.setAttribute('tabindex', '0');
         card.setAttribute('role', 'button');
         if (!card.getAttribute('aria-label')) {
             card.setAttribute('aria-label', `Open ${tab} tab`);
@@ -2207,6 +2206,106 @@ function wireOpsOverviewCardNavigation() {
             e.preventDefault();
             openTab();
         });
+    });
+    ensureOpsOverviewToolbarKeyboard();
+}
+
+/** Focusable overview cards in DOM order (Agents · Schedules · Live · Knowledge · Recent · Runs · Digest). */
+function getOpsOverviewCards() {
+    const grid = document.getElementById('ops-overview-grid');
+    if (!grid) return [];
+    return Array.from(grid.querySelectorAll(':scope > .ops-overview-card.ops-overview-clickable')).filter(
+        (el) => {
+            if (!el || el.hidden) return false;
+            return el.getClientRects().length > 0 || el.offsetParent !== null || grid.contains(el);
+        }
+    );
+}
+
+function refreshOpsOverviewRovingTabindex(preferred) {
+    const cards = getOpsOverviewCards();
+    if (!cards.length) return;
+    const focused = cards.find((el) => el === document.activeElement);
+    const current =
+        (preferred && cards.includes(preferred) && preferred) ||
+        focused ||
+        cards.find((el) => el.tabIndex === 0) ||
+        cards[0];
+    for (const el of cards) {
+        el.tabIndex = el === current ? 0 : -1;
+    }
+}
+
+function ensureOpsOverviewKbHint() {
+    const grid = document.getElementById('ops-overview-grid');
+    if (!grid) return;
+    let hint = document.getElementById('ops-overview-kb-hint');
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'ops-overview-kb-hint';
+        hint.className = 'ops-overview-kb-hint';
+        hint.setAttribute('aria-hidden', 'true');
+        grid.appendChild(hint);
+    }
+    hint.textContent =
+        '← → / h l · Home/End move · Enter / Space opens linked tab';
+}
+
+/**
+ * Overview-card toolbar keyboard — focus Agents · Schedules · Live · Knowledge ·
+ * Recent · Runs · Digest, then ←→ / h l / Home/End (health-strip / power-strip parity).
+ * Enter/Space keep existing card activate.
+ */
+function ensureOpsOverviewToolbarKeyboard() {
+    const grid = document.getElementById('ops-overview-grid');
+    if (!grid) return;
+    ensureOpsOverviewKbHint();
+    refreshOpsOverviewRovingTabindex();
+    if (grid.dataset.opsOverviewKbWired === '1') return;
+    grid.dataset.opsOverviewKbWired = '1';
+    if (!grid.getAttribute('role')) {
+        grid.setAttribute('role', 'toolbar');
+    }
+    if (!grid.getAttribute('aria-label')) {
+        grid.setAttribute('aria-label', 'Agent Ops overview cards');
+    }
+    grid.addEventListener('focusin', (e) => {
+        const cards = getOpsOverviewCards();
+        if (cards.includes(e.target)) refreshOpsOverviewRovingTabindex(e.target);
+    });
+    grid.addEventListener('keydown', (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const cards = getOpsOverviewCards();
+        if (!cards.length) return;
+        const idx = cards.indexOf(document.activeElement);
+        if (idx < 0) return;
+        let next = -1;
+        if (
+            e.key === 'ArrowRight' ||
+            e.key === 'l' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'j'
+        ) {
+            next = Math.min(idx + 1, cards.length - 1);
+        } else if (
+            e.key === 'ArrowLeft' ||
+            e.key === 'h' ||
+            e.key === 'ArrowUp' ||
+            e.key === 'k'
+        ) {
+            next = Math.max(idx - 1, 0);
+        } else if (e.key === 'Home') {
+            next = 0;
+        } else if (e.key === 'End') {
+            next = cards.length - 1;
+        } else {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        if (next === idx) return;
+        refreshOpsOverviewRovingTabindex(cards[next]);
+        cards[next].focus();
     });
 }
 

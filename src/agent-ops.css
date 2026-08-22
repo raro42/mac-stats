@@ -617,6 +617,13 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   padding: 0 4px 14px;
 }
 
+.ops-overview-kb-hint {
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
+  grid-column: 1 / -1;
+}
+
 .ops-overview-card {
   background: color-mix(in srgb, currentColor 5%, transparent);
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);

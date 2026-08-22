@@ -21,6 +21,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 ## Done recently (do not re-pick as filler)
 
 
+- Agent Ops **overview-card toolbar keyboard** (← → / h l · Home/End across Agents · Schedules · Live · Knowledge · Recent · Runs · Digest; Enter/Space opens linked tab; health-strip / power-strip parity) — **v0.1.597**
+
 - Agent Ops **health-strip toolbar keyboard** (← → / h l · Home/End across Version · Discord · Redmine · Schedule · Delivery · Digest; Enter/Space opens tab/preview; Disk Cleanup meta-card / power-strip parity) — **v0.1.596**
 
 - Disk Cleanup **meta-card toolbar keyboard** (← → / h l · Home/End across Reclaim · Next · Runs when · Scopes; Enter/Space activate; power-strip / filter-chip parity) — **v0.1.595**

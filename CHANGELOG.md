@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.597] - 2026-08-22
+
+### Added
+- Agent Ops **overview-card toolbar keyboard** — focus Agents · Schedules · Live · Knowledge · Recent · Runs · Digest, then ← → / h l / Home / End moves across overview cards (health-strip / power-strip parity). Enter / Space keeps existing tab open. Soft kb hint; one Tab stop via roving tabindex.
+
 ## [0.1.596] - 2026-08-22
 
 ### Added
