@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-22
 
-Overnight Track B (20:00–06:00) shipped user-facing listbox / copy / power-strip polish. Digester open stayed empty; design-review screens are in grace (recommended: feature-ai-chat).
+Overnight Track B (20:00–06:00) shipped user-facing listbox / copy / toolbar keyboard polish. Digester open stayed empty; design-review screens are in grace (recommended: feature-ai-chat).
 
 ## Shipped tonight
 
@@ -19,14 +19,15 @@ Overnight Track B (20:00–06:00) shipped user-facing listbox / copy / power-str
 | **v0.1.586** | AI Chat listbox chrome keyboard |
 | **v0.1.587** | Details click-to-copy + keyboard nav |
 | **v0.1.588** | Battery / power strip toolbar keyboard |
+| **v0.1.589** | Section icon-line toolbar keyboard |
 
 ## Latest keep (this tick)
 
-**v0.1.588** — Power strip: focus a chip, then ← → / h l / Home / End moves across CPU · RAM · GPU · Temp · Heat · LPM · GHz · SSD · Up · Bat · Power (Details / Monitors listbox chrome parity). Enter / Space still activates or copies. Soft kb hint; one Tab stop via roving tabindex.
+**v0.1.589** — Icon line: focus an icon, then ← → / h l / Home / End moves across Monitors · AI Chat · Perplexity · Debug Log · Discord · Disk Cleanup · Agent Ops (power-strip / Details listbox chrome parity). Enter / Space opens the section. Soft kb hint; one Tab stop via roving tabindex; AI-off icons skipped.
 
 ## Notes
 
 - Digester: no open candidates (instant-heavy sample).
 - Design review: `due=false` (grace); screenshots deferred (TCC).
 - `debug.log`: quiet in 180m scan.
-- Git: keep @ `166eb36`; install + LaunchAgent kickstart after ship.
+- Git: keep after install + LaunchAgent kickstart.
