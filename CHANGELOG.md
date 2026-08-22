@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.604] - 2026-08-22
+
+### Added
+- Agent Ops **Runs Insights toolbar keyboard** — focus Discord · Digest open · Slowest · Candidates lines, then ← → / h l / Home / End moves across insight rows (filter-row / preview-row parity). Arrow navigation previews the run; Enter loads into AI Chat. Soft kb hint when two or more lines are visible; one Tab stop via roving tabindex.
+
 ## [0.1.603] - 2026-08-22
 
 ### Added

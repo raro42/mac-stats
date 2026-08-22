@@ -426,6 +426,8 @@
   /** Runs panel lane chip: `all` | `instant` | `direct` (Agents All/On/Off parity). */
   let opsRunsLaneFilter = 'all';
   let opsRunsInsightsCache = null;
+  /** Summary payload for Runs Insights lines (toolbar keyboard preview). */
+  const opsInsightLineSummary = new WeakMap();
   let opsRunLoadQuestion = null;
   let opsScheduleLoadText = null;
   let opsAgentsFilterQ = '';
@@ -1237,6 +1239,7 @@ function setupAgentOps() {
     ensureOpsPreviewRowsToolbarKeyboard();
     ensureOpsRefreshRowToolbarKeyboard();
     ensureOpsFilterRowsToolbarKeyboard();
+    ensureOpsInsightsToolbarKeyboard();
     ensureOpsKeyboardHint();
     ensureOpsUpdatedAgo();
     ensureOpsOverviewAgentsCard();
@@ -6177,6 +6180,114 @@ function loadOpsRunIntoChat() {
     }
 }
 
+/** Clickable Runs Insights lines in DOM order (Discord · Digest open · Slowest · Candidates). */
+function getOpsInsightsToolbarItems() {
+    const card = document.getElementById('ops-runs-insights');
+    if (!card || card.hidden) return [];
+    return Array.from(card.querySelectorAll('.ops-insight-line.is-clickable')).filter((el) => {
+        if (!el || el.hidden) return false;
+        return el.getClientRects().length > 0 || el.offsetParent !== null;
+    });
+}
+
+function refreshOpsInsightsRovingTabindex(preferred) {
+    const items = getOpsInsightsToolbarItems();
+    if (!items.length) return;
+    const focused = items.find((el) => el === document.activeElement);
+    const current =
+        (preferred && items.includes(preferred) && preferred) ||
+        focused ||
+        items.find((el) => el.tabIndex === 0) ||
+        items[0];
+    for (const el of items) {
+        el.tabIndex = el === current ? 0 : -1;
+    }
+}
+
+function ensureOpsInsightsKbHint() {
+    const card = document.getElementById('ops-runs-insights');
+    if (!card) return;
+    let hint = document.getElementById('ops-insights-kb-hint');
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'ops-insights-kb-hint';
+        hint.className = 'ops-insights-kb-hint';
+        hint.setAttribute('aria-hidden', 'true');
+        card.appendChild(hint);
+    }
+    const items = getOpsInsightsToolbarItems();
+    hint.hidden = items.length < 2;
+    hint.textContent =
+        '← → / h l · Home/End move · Enter loads chat · click previews';
+}
+
+/**
+ * Runs Insights toolbar keyboard — focus Discord · Digest open · Slowest ·
+ * Candidates lines, then ←→ / h l / Home/End (filter-row / preview-row parity).
+ * Enter/Space keeps line preview; Enter also loads into AI Chat.
+ */
+function ensureOpsInsightsToolbarKeyboard() {
+    const card = document.getElementById('ops-runs-insights');
+    if (!card) return;
+    ensureOpsInsightsKbHint();
+    refreshOpsInsightsRovingTabindex();
+    if (card.dataset.opsInsightsKbWired === '1') return;
+    card.dataset.opsInsightsKbWired = '1';
+    card.addEventListener('focusin', (e) => {
+        const items = getOpsInsightsToolbarItems();
+        if (items.includes(e.target)) {
+            refreshOpsInsightsRovingTabindex(e.target);
+            ensureOpsInsightsKbHint();
+            const summary = opsInsightLineSummary.get(e.target);
+            if (summary) previewOpsRunFromInsight(summary, e.target);
+        }
+    });
+    card.addEventListener('keydown', (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const items = getOpsInsightsToolbarItems();
+        if (!items.length) return;
+        const idx = items.indexOf(document.activeElement);
+        if (idx < 0) return;
+        if (e.key === 'Enter' || e.key === ' ') return;
+        let next = -1;
+        if (
+            e.key === 'ArrowRight' ||
+            e.key === 'l' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'j'
+        ) {
+            next = Math.min(idx + 1, items.length - 1);
+        } else if (
+            e.key === 'ArrowLeft' ||
+            e.key === 'h' ||
+            e.key === 'ArrowUp' ||
+            e.key === 'k'
+        ) {
+            next = Math.max(idx - 1, 0);
+        } else if (e.key === 'Home') {
+            next = 0;
+        } else if (e.key === 'End') {
+            next = items.length - 1;
+        } else {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        if (next === idx) return;
+        refreshOpsInsightsRovingTabindex(items[next]);
+        const summary = opsInsightLineSummary.get(items[next]);
+        if (summary) previewOpsRunFromInsight(summary, items[next]);
+        items[next].focus();
+    });
+    const items = getOpsInsightsToolbarItems();
+    if (items.length >= 2) {
+        if (!card.getAttribute('role')) card.setAttribute('role', 'toolbar');
+        if (!card.getAttribute('aria-label')) {
+            card.setAttribute('aria-label', 'Runs Insights');
+        }
+    }
+}
+
 /** Preview a Slowest / Candidate insight line (select matching Runs row when present). */
 function previewOpsRunFromInsight(summary, insightLine) {
     const card = document.getElementById('ops-runs-insights');
@@ -6223,9 +6334,10 @@ function previewOpsRunFromInsight(summary, insightLine) {
 /** Wire Slowest / Candidate lines: click preview, Enter/dblclick load (list-row parity). */
 function wireOpsInsightRunLine(lineEl, summary) {
     if (!lineEl || !summary) return;
+    opsInsightLineSummary.set(lineEl, summary);
     lineEl.classList.add('is-clickable');
     lineEl.setAttribute('role', 'button');
-    lineEl.setAttribute('tabindex', '0');
+    lineEl.tabIndex = -1;
     lineEl.title = 'Click to preview · Enter / double-click to load question into AI Chat';
     const open = () => previewOpsRunFromInsight(summary, lineEl);
     lineEl.addEventListener('click', open);
@@ -6523,6 +6635,7 @@ function renderOpsRuns(insights) {
         el.innerHTML = opsFilterMissHtml('No runs match filter', 'runs');
         showOpsRunPreview('');
     }
+    ensureOpsInsightsToolbarKeyboard();
 }
 
 function escapeHtml(s) {
