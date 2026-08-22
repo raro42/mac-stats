@@ -2118,6 +2118,7 @@ function init() {
   window._forceProcessUpdate = true;
   wireMetricValueCopy();
   ensureRingGaugeKeyboard();
+  ensureHistorySparklineKeyboard();
   ensureCpuStrip();
   ensureRamStrip();
   ensureGpuStrip();
@@ -3484,6 +3485,207 @@ function ensureRingGaugeKeyboard() {
     if (next === idx) return;
     refreshRingGaugeRovingTabindex(chips[next]);
     chips[next].focus();
+  });
+}
+
+/** History sparklines section (CPU · Freq · Temp canvases). */
+function getHistorySparklineSection() {
+  const canvas =
+    document.getElementById('usage-history-chart') ||
+    document.getElementById('frequency-history-chart') ||
+    document.getElementById('temperature-history-chart');
+  if (!canvas) return null;
+  return (
+    canvas.closest('.history-section') ||
+    canvas.closest('section') ||
+    canvas.parentElement?.parentElement ||
+    null
+  );
+}
+
+/**
+ * Focusable history sparkline containers in DOM order (CPU · Freq · Temp).
+ */
+function getHistorySparklineChips() {
+  const section = getHistorySparklineSection();
+  if (!section) return [];
+  return Array.from(section.querySelectorAll('.history-chart-container')).filter(
+    (el) => {
+      if (!el || el.hidden) return false;
+      return (
+        el.getClientRects().length > 0 ||
+        el.offsetParent !== null ||
+        section.contains(el)
+      );
+    }
+  );
+}
+
+function refreshHistorySparklineRovingTabindex(preferred) {
+  const chips = getHistorySparklineChips();
+  if (!chips.length) return;
+  const focused = chips.find((el) => el === document.activeElement);
+  const current =
+    (preferred && chips.includes(preferred) && preferred) ||
+    focused ||
+    chips.find((el) => el.tabIndex === 0) ||
+    chips[0];
+  for (const el of chips) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureHistorySparklineKbStyles() {
+  if (document.getElementById('mac-stats-history-sparkline-kb-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'mac-stats-history-sparkline-kb-styles';
+  style.textContent = `
+    .history-sparkline-kb-hint {
+      margin: 6px 0 0;
+      font-size: 11px;
+      opacity: 0.72;
+      width: 100%;
+      flex-basis: 100%;
+      grid-column: 1 / -1;
+    }
+    .history-chart-container[role="button"] {
+      cursor: pointer;
+      outline: none;
+    }
+    .history-chart-container[role="button"]:focus-visible {
+      box-shadow:
+        0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.58);
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+/** Soft tip under history sparklines (ring-gauge / power-strip kb-hint parity). */
+function ensureHistorySparklineKbHint() {
+  ensureHistorySparklineKbStyles();
+  const section = getHistorySparklineSection();
+  if (!section) return;
+  let hint = document.getElementById('history-sparkline-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.id = 'history-sparkline-kb-hint';
+    hint.className = 'history-sparkline-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    section.appendChild(hint);
+  }
+  hint.textContent =
+    '← → / h l · Home/End move · Enter / Space jumps to CPU / Freq / Temp ring';
+}
+
+/**
+ * Jump from a history sparkline to its ring (power-strip strip parity —
+ * scroll + flash; no toggle / copy steal).
+ */
+function activateHistorySparkline(container) {
+  if (!container) return;
+  const canvas = container.querySelector('canvas.history-chart');
+  const id = canvas?.id || '';
+  if (id === 'usage-history-chart') {
+    openCpuRingFromStrip();
+    return;
+  }
+  if (id === 'frequency-history-chart') {
+    openFreqRingFromStrip();
+    return;
+  }
+  if (id === 'temperature-history-chart') {
+    openTempRingFromStrip();
+  }
+}
+
+/**
+ * History sparkline toolbar keyboard — focus CPU · Freq · Temp charts,
+ * then ←→ / h l / Home/End (ring-gauge / power-strip parity). Enter/Space
+ * jumps to the matching ring.
+ */
+function ensureHistorySparklineKeyboard() {
+  const section = getHistorySparklineSection();
+  if (!section) return;
+  ensureHistorySparklineKbHint();
+  const chips = getHistorySparklineChips();
+  for (const el of chips) {
+    if (!el.getAttribute('role')) el.setAttribute('role', 'button');
+    const canvas = el.querySelector('canvas.history-chart');
+    const id = canvas?.id || '';
+    let title = 'Show related ring';
+    if (id === 'usage-history-chart') title = 'Show CPU ring';
+    else if (id === 'frequency-history-chart') title = 'Show frequency ring';
+    else if (id === 'temperature-history-chart') title = 'Show temperature ring';
+    if (!el.title) el.title = title;
+    if (!el.getAttribute('aria-label')) {
+      el.setAttribute(
+        'aria-label',
+        el.getAttribute('aria-label') || title
+      );
+    }
+    if (el.dataset.historySparkActivateWired !== '1') {
+      el.dataset.historySparkActivateWired = '1';
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('select, input, button, a, label')) return;
+        e.preventDefault();
+        activateHistorySparkline(el);
+      });
+      el.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        e.preventDefault();
+        e.stopPropagation();
+        activateHistorySparkline(el);
+      });
+    }
+  }
+  refreshHistorySparklineRovingTabindex();
+  if (section.dataset.historySparkKbWired === '1') return;
+  section.dataset.historySparkKbWired = '1';
+  if (!section.getAttribute('role')) {
+    section.setAttribute('role', 'toolbar');
+  }
+  if (!section.getAttribute('aria-label')) {
+    section.setAttribute('aria-label', 'CPU history sparklines');
+  }
+  section.addEventListener('focusin', (e) => {
+    const list = getHistorySparklineChips();
+    if (list.includes(e.target)) refreshHistorySparklineRovingTabindex(e.target);
+  });
+  section.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const list = getHistorySparklineChips();
+    if (!list.length) return;
+    const idx = list.indexOf(document.activeElement);
+    if (idx < 0) return;
+    let next = -1;
+    if (
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j'
+    ) {
+      next = Math.min(idx + 1, list.length - 1);
+    } else if (
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k'
+    ) {
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = list.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshHistorySparklineRovingTabindex(list[next]);
+    list[next].focus();
   });
 }
 
@@ -8834,6 +9036,7 @@ function initCollapsibleSections() {
   ensureUptimeStrip();
   ensurePowerStripKeyboard();
   ensureRingGaugeKeyboard();
+  ensureHistorySparklineKeyboard();
   ensureProcessesTopGlance();
   ensureDetailsCollapsedGlance();
   initDetailsGridKeyboard();
