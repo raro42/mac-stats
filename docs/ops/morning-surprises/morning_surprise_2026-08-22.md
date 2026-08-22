@@ -4,7 +4,7 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 
 ## Latest keep (this tick)
 
-**v0.1.596** — Agent Ops health-strip toolbar keyboard: focus Version · Discord · Redmine · Schedule · Delivery · Digest, then ← → / h l / Home / End moves across health cards (Disk Cleanup meta-card / power-strip parity). Enter / Space keeps existing tab open or preview. Soft kb hint; one Tab stop via roving tabindex.
+**v0.1.597** — Agent Ops overview-card toolbar keyboard: focus Agents · Schedules · Live · Knowledge · Recent · Runs · Digest, then ← → / h l / Home / End moves across overview cards (health-strip / power-strip parity). Enter / Space opens the linked tab. Soft kb hint; one Tab stop via roving tabindex.
 
 ## Tonight's keeps (selected)
 
@@ -24,6 +24,7 @@ Overnight Track B kept shipping keyboard / glass affordances while digester open
 | **v0.1.594** | History sparkline toolbar keyboard |
 | **v0.1.595** | Disk Cleanup meta-card toolbar keyboard |
 | **v0.1.596** | Agent Ops health-strip toolbar keyboard |
+| **v0.1.597** | Agent Ops overview-card toolbar keyboard |
 
 ## Notes
 
