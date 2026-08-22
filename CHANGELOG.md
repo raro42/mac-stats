@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.599] - 2026-08-22
+
+### Added
+- Agent Ops **refresh-row toolbar keyboard** — focus Refresh · Refresh digest · Updated, then ← → / h l / Home / End moves across controls (tab-bar / health-strip parity). Enter / Space keeps button activate; Updated stamp triggers full refresh. Soft kb hint; one Tab stop via roving tabindex.
+
 ## [0.1.598] - 2026-08-22
 
 ### Added

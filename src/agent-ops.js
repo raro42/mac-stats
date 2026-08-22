@@ -711,6 +711,7 @@ function setupAgentOps() {
     ensureOpsOverviewJump();
     ensureOpsTabDigits();
     ensureOpsTabBarToolbarKeyboard();
+    ensureOpsRefreshRowToolbarKeyboard();
     ensureOpsKeyboardHint();
     ensureOpsUpdatedAgo();
     ensureOpsOverviewAgentsCard();
@@ -3599,6 +3600,126 @@ function renderOpsSchedulesTab(schedules, deliveries) {
     applyOpsSchedulesKindVisibility();
 }
 
+/** Focusable refresh-row items in DOM order (Refresh · Refresh digest · Updated when visible). */
+function getOpsRefreshRowItems() {
+    const row = document.querySelector('.ops-refresh-row');
+    if (!row) return [];
+    const items = [];
+    const refresh = document.getElementById('ops-refresh-btn');
+    const digest = document.getElementById('ops-digest-refresh-btn');
+    const updated = document.getElementById('ops-updated-ago');
+    if (refresh && !refresh.hidden) items.push(refresh);
+    if (digest && !digest.hidden) items.push(digest);
+    if (updated && !updated.hidden && (updated.textContent || '').trim()) {
+        if (!updated.getAttribute('role')) updated.setAttribute('role', 'button');
+        if (!updated.getAttribute('tabindex')) updated.tabIndex = -1;
+        if (!updated.title || updated.title.indexOf('Enter') < 0) {
+            updated.title = `${updated.title || 'Last refresh'} · Enter refreshes`;
+        }
+        items.push(updated);
+    }
+    return items.filter((el) => {
+        if (!el || el.hidden) return false;
+        return el.getClientRects().length > 0 || el.offsetParent !== null || row.contains(el);
+    });
+}
+
+function refreshOpsRefreshRowRovingTabindex(preferred) {
+    const items = getOpsRefreshRowItems();
+    if (!items.length) return;
+    const focused = items.find((el) => el === document.activeElement);
+    const current =
+        (preferred && items.includes(preferred) && preferred) ||
+        focused ||
+        items.find((el) => el.tabIndex === 0) ||
+        items[0];
+    for (const el of items) {
+        el.tabIndex = el === current ? 0 : -1;
+    }
+}
+
+function ensureOpsRefreshRowKbHint() {
+    const row = document.querySelector('.ops-refresh-row');
+    if (!row) return;
+    let hint = document.getElementById('ops-refresh-row-kb-hint');
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'ops-refresh-row-kb-hint';
+        hint.className = 'ops-refresh-row-kb-hint';
+        hint.setAttribute('aria-hidden', 'true');
+        row.appendChild(hint);
+    }
+    hint.textContent =
+        '← → / h l · Home/End move · Enter / Space refreshes or runs digest';
+}
+
+/**
+ * Refresh-row toolbar keyboard — focus Refresh · Refresh digest · Updated,
+ * then ←→ / h l / Home/End (tab-bar / health-strip parity). Enter/Space keeps
+ * existing button activate; Updated stamp triggers full refresh.
+ */
+function ensureOpsRefreshRowToolbarKeyboard() {
+    const row = document.querySelector('.ops-refresh-row');
+    if (!row) return;
+    ensureOpsRefreshRowKbHint();
+    refreshOpsRefreshRowRovingTabindex();
+    if (row.dataset.opsRefreshRowKbWired === '1') return;
+    row.dataset.opsRefreshRowKbWired = '1';
+    if (!row.getAttribute('role')) {
+        row.setAttribute('role', 'toolbar');
+    }
+    if (!row.getAttribute('aria-label')) {
+        row.setAttribute('aria-label', 'Agent Ops refresh controls');
+    }
+    row.addEventListener('focusin', (e) => {
+        const items = getOpsRefreshRowItems();
+        if (items.includes(e.target)) refreshOpsRefreshRowRovingTabindex(e.target);
+    });
+    row.addEventListener('keydown', (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const items = getOpsRefreshRowItems();
+        if (!items.length) return;
+        const idx = items.indexOf(document.activeElement);
+        if (idx < 0) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+            const el = items[idx];
+            if (el?.id === 'ops-updated-ago') {
+                e.preventDefault();
+                e.stopPropagation();
+                refreshAgentOps({ userTriggered: true });
+            }
+            return;
+        }
+        let next = -1;
+        if (
+            e.key === 'ArrowRight' ||
+            e.key === 'l' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'j'
+        ) {
+            next = Math.min(idx + 1, items.length - 1);
+        } else if (
+            e.key === 'ArrowLeft' ||
+            e.key === 'h' ||
+            e.key === 'ArrowUp' ||
+            e.key === 'k'
+        ) {
+            next = Math.max(idx - 1, 0);
+        } else if (e.key === 'Home') {
+            next = 0;
+        } else if (e.key === 'End') {
+            next = items.length - 1;
+        } else {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        if (next === idx) return;
+        refreshOpsRefreshRowRovingTabindex(items[next]);
+        items[next].focus();
+    });
+}
+
 /**
  * Keep Refresh / Updated under the health strip (not buried under tab panels).
  * Themes still ship the row at the bottom of agent-ops-content; we re-home it once.
@@ -3636,12 +3757,17 @@ function paintOpsUpdatedAgo() {
         el.hidden = true;
         el.textContent = '';
         el.removeAttribute('title');
+        el.removeAttribute('role');
+        el.tabIndex = -1;
+        refreshOpsRefreshRowRovingTabindex();
         return;
     }
     const age = fmtAge(opsLastRefreshMs) || 'just now';
     el.hidden = false;
     el.textContent = `Updated ${age}`;
-    el.title = `Last refresh ${new Date(opsLastRefreshMs).toLocaleTimeString()}`;
+    const when = new Date(opsLastRefreshMs).toLocaleTimeString();
+    el.title = `Last refresh ${when} · Enter refreshes`;
+    refreshOpsRefreshRowRovingTabindex();
 }
 
 function markOpsRefreshedAt(ms) {

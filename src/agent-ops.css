@@ -1263,6 +1263,31 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.78;
 }
 
+.ops-updated-ago[role='button'] {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 2px 6px;
+  margin: 0 -2px;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.ops-updated-ago[role='button']:hover {
+  opacity: 0.92;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.ops-updated-ago[role='button']:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent, #007aff) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.ops-refresh-row-kb-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
 .ops-empty {
   margin: 2px 0;
   padding: 16px 14px;
