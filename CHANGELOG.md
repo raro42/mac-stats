@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.592] - 2026-08-22
+
+### Added
+- Settings Product **toolbar keyboard** — focus a toggle or Help / Reset, then ← → / h l / Home / End moves across AI · compact menu bar · compact CPU window · Help · Reset (theme-list / filter-chip parity). Space toggles checkboxes; Enter / Space keep Help / Reset. Soft kb hint; one Tab stop via roving tabindex.
+
 ## [0.1.591] - 2026-08-22
 
 ### Added

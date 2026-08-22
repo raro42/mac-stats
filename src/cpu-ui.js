@@ -322,6 +322,119 @@
     });
   }
 
+  /** Product toggles + Help / Reset in Settings (theme-list toolbar parity). */
+  function getProductSettingControls(wrap) {
+    if (!wrap) return [];
+    const ids = [
+      "ai-agent-enabled-toggle",
+      "menu-bar-compact-toggle",
+      "cpu-window-compact-toggle",
+      "settings-help-btn",
+      "settings-reset-defaults-btn",
+    ];
+    return ids
+      .map((id) => document.getElementById(id))
+      .filter((el) => {
+        if (!el || !wrap.contains(el)) return false;
+        if (el.hidden || el.disabled) return false;
+        return el.getClientRects().length > 0 || el.offsetParent !== null;
+      });
+  }
+
+  function refreshProductSettingRovingTabindex(wrap, preferred) {
+    const controls = getProductSettingControls(wrap);
+    if (!controls.length) return;
+    const focused = controls.find((el) => el === document.activeElement);
+    const current =
+      (preferred && controls.includes(preferred) && preferred) ||
+      focused ||
+      controls.find((el) => el.tabIndex === 0) ||
+      controls[0];
+    for (const el of controls) {
+      el.tabIndex = el === current ? 0 : -1;
+    }
+  }
+
+  function ensureProductSettingKbStyles() {
+    if (document.getElementById("mac-stats-product-setting-kb-styles")) return;
+    const style = document.createElement("style");
+    style.id = "mac-stats-product-setting-kb-styles";
+    style.textContent = `
+      .product-setting-kb-hint {
+        margin: 8px 0 0;
+        font-size: 11px;
+        opacity: 0.72;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  /**
+   * Settings Product toolbar keyboard — focus a toggle or action, then ←→ /
+   * h l / Home/End (theme-list / filter-chip parity). Space toggles checkboxes;
+   * Enter/Space keep Help / Reset.
+   */
+  function wireProductSettingToolbarKeyboard(wrap) {
+    if (!wrap) return;
+    ensureProductSettingKbStyles();
+    let hint = wrap.querySelector(":scope > .product-setting-kb-hint");
+    if (!hint) {
+      hint = document.createElement("div");
+      hint.className = "product-setting-kb-hint";
+      hint.setAttribute("aria-hidden", "true");
+      wrap.appendChild(hint);
+    }
+    hint.textContent =
+      "← → / h l · Home/End move · Space toggles · Enter / Space on Help / Reset";
+    refreshProductSettingRovingTabindex(wrap);
+    if (wrap.dataset.productSettingKbWired === "1") return;
+    wrap.dataset.productSettingKbWired = "1";
+    wrap.setAttribute("role", "toolbar");
+    if (!wrap.getAttribute("aria-label")) {
+      wrap.setAttribute("aria-label", "Product settings");
+    }
+    wrap.addEventListener("focusin", (e) => {
+      const controls = getProductSettingControls(wrap);
+      if (controls.includes(e.target)) {
+        refreshProductSettingRovingTabindex(wrap, e.target);
+      }
+    });
+    wrap.addEventListener("keydown", (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const controls = getProductSettingControls(wrap);
+      if (!controls.length) return;
+      const idx = controls.indexOf(document.activeElement);
+      if (idx < 0) return;
+      let next = -1;
+      if (
+        e.key === "ArrowRight" ||
+        e.key === "l" ||
+        e.key === "ArrowDown" ||
+        e.key === "j"
+      ) {
+        next = Math.min(idx + 1, controls.length - 1);
+      } else if (
+        e.key === "ArrowLeft" ||
+        e.key === "h" ||
+        e.key === "ArrowUp" ||
+        e.key === "k"
+      ) {
+        next = Math.max(idx - 1, 0);
+      } else if (e.key === "Home") {
+        next = 0;
+      } else if (e.key === "End") {
+        next = controls.length - 1;
+      } else {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      if (next === idx) return;
+      refreshProductSettingRovingTabindex(wrap, controls[next]);
+      controls[next].focus();
+    });
+  }
+
   function initThemePicker() {
     // New: one-click list of themes
     const themeList = document.getElementById("theme-list");
@@ -591,6 +704,9 @@
         }
       });
     }
+
+    const productSetting = document.getElementById("product-setting");
+    if (productSetting) wireProductSettingToolbarKeyboard(productSetting);
   }
 
   function applyAiUiVisibility(enabled) {
