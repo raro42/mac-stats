@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-22
 
-Overnight Track B ratchet (filter / toolbar keyboard lane continued).
+Overnight Track B ratchet (toolbar keyboard → Settings theme list).
 
 ## Shipped tonight
 
@@ -21,14 +21,15 @@ Overnight Track B ratchet (filter / toolbar keyboard lane continued).
 | **v0.1.588** | Battery / power strip toolbar keyboard |
 | **v0.1.589** | Section icon-line toolbar keyboard |
 | **v0.1.590** | Filter-chip toolbar keyboard |
+| **v0.1.591** | Settings theme-list toolbar keyboard |
 
 ## Latest keep (this tick)
 
-**v0.1.590** — Filter chips: focus a chip, then ← → / h l / Home / End moves across All · … for Monitors · Top Processes · Debug Log · Disk Cleanup · AI Chat · Agent Ops kind/lane chips (power-strip / icon-line parity). Enter / Space selects the filter. Soft kb hint; one Tab stop via roving tabindex.
+**v0.1.591** — Settings Appearance theme list: focus a theme, then ← → / h l / Home / End moves across Apple · Architect · … (filter-chip / power-strip parity). Enter / Space applies the theme. Soft kb hint; one Tab stop via roving tabindex (current theme preferred).
 
 ## Notes
 
 - Digester: no open candidates (instant-heavy sample).
 - Design review: `due=false` (grace); screenshots deferred (TCC).
 - `debug.log`: quiet in 180m scan.
-- Git: keep after install + LaunchAgent kickstart.
+- Git: keep after install + LaunchAgent kickstart; Discord Ready.

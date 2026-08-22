@@ -20,6 +20,9 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently (do not re-pick as filler)
 
+
+- Settings theme list **toolbar keyboard** (← → / h l · Home/End across themes; Enter/Space applies; filter-chip / power-strip parity) — **v0.1.591**
+
 - Filter-chip **toolbar keyboard** (← → / h l · Home/End across All·… chips; Monitors · Processes · Logs · Disk · Chat · Ops; power-strip / icon-line parity) — **v0.1.590**
 
 - Section **icon-line toolbar keyboard** (← → / h l · Home/End across Monitors · AI Chat · Perplexity · Debug Log · Discord · Disk Cleanup · Agent Ops; Enter/Space opens; AI-off skipped; power-strip parity) — **v0.1.589**
