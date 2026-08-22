@@ -1,18 +1,15 @@
 # Morning surprise — 2026-08-22
 
-Overnight Track B ratchet (toolbar keyboard → Settings theme list).
+Overnight Track B kept shipping keyboard / glass affordances while digester open stayed empty.
 
-## Shipped tonight
+## Latest keep (this tick)
+
+**v0.1.592** — Settings Product: focus AI · compact menu bar · compact CPU window · Help · Reset, then ← → / h l / Home / End moves across them (theme-list / filter-chip parity). Space toggles checkboxes; Enter / Space keep Help / Reset. Soft kb hint; one Tab stop via roving tabindex.
+
+## Tonight’s keeps (selected)
 
 | Version | What |
 |---------|------|
-| **v0.1.576** | AI Chat click-to-copy on messages |
-| **v0.1.577** | AI Chat message keyboard nav |
-| **v0.1.578** | Perplexity result keyboard nav |
-| **v0.1.579** | Debug Log line keyboard nav |
-| **v0.1.580** | Disk Cleanup row Copied flash + listbox chrome |
-| **v0.1.581** | Top Processes row Copied wash |
-| **v0.1.582** | Monitors row Copied wash + listbox chrome |
 | **v0.1.583** | Top Processes listbox chrome keyboard |
 | **v0.1.584** | Agent Ops row Copied badge + ↑/k no-selection → last |
 | **v0.1.585** | Perplexity listbox chrome keyboard |
@@ -22,10 +19,7 @@ Overnight Track B ratchet (toolbar keyboard → Settings theme list).
 | **v0.1.589** | Section icon-line toolbar keyboard |
 | **v0.1.590** | Filter-chip toolbar keyboard |
 | **v0.1.591** | Settings theme-list toolbar keyboard |
-
-## Latest keep (this tick)
-
-**v0.1.591** — Settings Appearance theme list: focus a theme, then ← → / h l / Home / End moves across Apple · Architect · … (filter-chip / power-strip parity). Enter / Space applies the theme. Soft kb hint; one Tab stop via roving tabindex (current theme preferred).
+| **v0.1.592** | Settings Product toolbar keyboard |
 
 ## Notes
 
