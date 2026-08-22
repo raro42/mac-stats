@@ -11545,6 +11545,116 @@ function ensureDiskCleanupMetaKeyboard() {
   });
 }
 
+/** Focusable Disk Cleanup toolbar items (Clean now · Refresh · Save scopes). */
+function getDiskCleanupToolbarActionItems(row) {
+  const wrap =
+    row || document.querySelector('.disk-cleanup-toolbar');
+  if (!wrap) return [];
+  const items = [];
+  const runBtn = document.getElementById('disk-cleanup-run-btn');
+  const refreshBtn = document.getElementById('disk-cleanup-refresh-btn');
+  const saveBtn = document.getElementById('disk-cleanup-save-scopes-btn');
+  if (runBtn && wrap.contains(runBtn) && !runBtn.hidden) items.push(runBtn);
+  if (refreshBtn && wrap.contains(refreshBtn) && !refreshBtn.hidden) {
+    items.push(refreshBtn);
+  }
+  if (saveBtn && wrap.contains(saveBtn) && !saveBtn.hidden) items.push(saveBtn);
+  return items.filter((el) => {
+    if (!el || el.hidden) return false;
+    return el.getClientRects().length > 0 || wrap.contains(el);
+  });
+}
+
+function refreshDiskCleanupToolbarRovingTabindex(row, preferred) {
+  const items = getDiskCleanupToolbarActionItems(row);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureDiskCleanupToolbarKbHint(row) {
+  const wrap = row || document.querySelector('.disk-cleanup-toolbar');
+  if (!wrap) return;
+  let hint = wrap.querySelector('.disk-cleanup-toolbar-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'disk-cleanup-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    wrap.appendChild(hint);
+  }
+  const items = getDiskCleanupToolbarActionItems(wrap);
+  hint.hidden = items.length < 2;
+  hint.textContent =
+    '← → / h l · Home/End move · Enter / Space on buttons';
+}
+
+/**
+ * Disk Cleanup action toolbar keyboard — focus Clean now · Refresh · Save scopes,
+ * then ←→ / h l / Home/End (Debug Log / meta-card parity). Enter/Space keeps
+ * native button activate.
+ */
+function ensureDiskCleanupToolbarKeyboard() {
+  const wrap = document.querySelector('.disk-cleanup-toolbar');
+  if (!wrap) return;
+  ensureDiskCleanupToolbarKbHint(wrap);
+  refreshDiskCleanupToolbarRovingTabindex(wrap);
+  if (wrap.dataset.diskToolbarKbWired === '1') return;
+  wrap.dataset.diskToolbarKbWired = '1';
+  if (!wrap.getAttribute('role')) wrap.setAttribute('role', 'toolbar');
+  if (!wrap.getAttribute('aria-label')) {
+    wrap.setAttribute('aria-label', 'Disk cleanup actions');
+  }
+  wrap.addEventListener('focusin', (e) => {
+    const items = getDiskCleanupToolbarActionItems(wrap);
+    if (items.includes(e.target)) {
+      refreshDiskCleanupToolbarRovingTabindex(wrap, e.target);
+      ensureDiskCleanupToolbarKbHint(wrap);
+    }
+  });
+  wrap.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getDiskCleanupToolbarActionItems(wrap);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    if (e.key === 'Enter' || e.key === ' ') return;
+    let next = -1;
+    if (
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j'
+    ) {
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k'
+    ) {
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshDiskCleanupToolbarRovingTabindex(wrap, items[next]);
+    items[next].focus();
+  });
+}
+
 /** Last run panel: jump to first category cleaned last run (meta-card parity). */
 function focusDiskCleanupLastRunGlance() {
   ensureDiskCleanupSectionExpanded();
@@ -12708,6 +12818,7 @@ function initDiskCleanupSection() {
   wireDiskCleanupNextRunCard();
   wireDiskCleanupRunsWhenCard();
   ensureDiskCleanupMetaKeyboard();
+  ensureDiskCleanupToolbarKeyboard();
   wireDiskCleanupLastRunPanel();
   ensureDiskCleanupCollapsedGlance();
 

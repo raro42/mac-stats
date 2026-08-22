@@ -4364,6 +4364,13 @@ button.monitor-detail-url.is-just-saved {
   margin-bottom: 10px;
 }
 
+.disk-cleanup-toolbar-kb-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
 .disk-cleanup-toolbar .popover-btn-secondary:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px color-mix(in srgb, #0a84ff 22%, transparent);

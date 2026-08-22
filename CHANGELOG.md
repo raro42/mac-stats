@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.608] - 2026-08-23
+
+### Added
+- Disk Cleanup **action toolbar keyboard** — focus Clean now · Refresh · Save scopes, then ← → / h l / Home / End moves across controls (Debug Log / meta-card parity). Enter / Space keeps button activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+
 ## [0.1.607] - 2026-08-23
 
 ### Added
