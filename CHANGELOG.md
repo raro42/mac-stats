@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.587] - 2026-08-22
+
+### Added
+- Details **click-to-copy + keyboard nav** — click a value or use ↑↓ / j k / Home / End · Enter / c copies (green Copied badge); Esc clears; focus the grid for first/last (Debug Log / Monitors / Top Processes parity). Soft kb hint under the section title.
+
 ## [0.1.586] - 2026-08-22
 
 ### Added

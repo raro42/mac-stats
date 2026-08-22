@@ -7831,6 +7831,231 @@ function replaceThinkingWithResponse(thinkingId, content, durationMs) {
 // Initialize collapsible sections (Details and Top Processes)
 // Universal implementation that works across all themes using IDs
 
+/** Soft tip above Details grid (Debug Log / Top Processes kb-hint parity). */
+function ensureDetailsKbHint(grid, show) {
+  if (!grid || !grid.parentNode) return;
+  let hint = document.getElementById('details-kb-hint');
+  if (!show) {
+    hint?.remove();
+    return;
+  }
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'details-kb-hint';
+    hint.id = 'details-kb-hint';
+    grid.parentNode.insertBefore(hint, grid);
+  }
+  hint.textContent =
+    '↑↓ / j k · Home/End select · Enter / c copies value · Esc clears · focus grid for first/last';
+}
+
+function detailsGridValues(grid) {
+  if (!grid) return [];
+  return Array.from(grid.querySelectorAll(':scope > .detail-value'));
+}
+
+function detailsValueLabel(el) {
+  if (!el) return 'Detail';
+  const prev = el.previousElementSibling;
+  if (prev && prev.classList.contains('detail-label')) {
+    const t = (prev.textContent || '').trim();
+    if (t) return t;
+  }
+  return 'Detail';
+}
+
+/** Clipboard text for a Details cell (strip metric hints; prefer power spans). */
+function detailsValueCopyText(el) {
+  if (!el) return '';
+  const power = el.querySelector('#cpu-power, #gpu-power');
+  if (power) return metricValueCopyText(power);
+  const clone = el.cloneNode(true);
+  clone.querySelectorAll('.metric-hint').forEach((n) => n.remove());
+  return metricValueCopyText(clone);
+}
+
+function flashDetailsValueCopied(el) {
+  if (!el) return;
+  if (el._detailsCopiedTimer) {
+    clearTimeout(el._detailsCopiedTimer);
+    el._detailsCopiedTimer = null;
+  }
+  el.classList.add('is-just-copied');
+  const prevTitle = el.getAttribute('data-copy-title') || el.getAttribute('title') || '';
+  el.title = 'Copied';
+  el.setAttribute('aria-label', 'Copied');
+  el._detailsCopiedTimer = setTimeout(() => {
+    el.classList.remove('is-just-copied');
+    el._detailsCopiedTimer = null;
+    const label = detailsValueLabel(el);
+    const title = prevTitle || `Click to copy ${label}`;
+    el.title = title;
+    el.setAttribute('data-copy-title', title);
+    el.setAttribute('aria-label', `${label} — Enter or c copies`);
+  }, 1600);
+}
+
+async function copyDetailsValue(el) {
+  if (!el) return false;
+  const value = detailsValueCopyText(el);
+  if (!value) return false;
+  const ok = await copyTextToClipboard(value);
+  if (ok) flashDetailsValueCopied(el);
+  return ok;
+}
+
+function syncDetailsValuesTabOrder(grid, preferEl) {
+  const items = detailsGridValues(grid);
+  ensureDetailsKbHint(grid, items.length > 0);
+  if (!items.length) return;
+  let activeIdx = preferEl ? items.indexOf(preferEl) : -1;
+  if (activeIdx < 0) {
+    activeIdx = items.findIndex((el) => el.classList.contains('is-selected'));
+  }
+  if (activeIdx < 0) {
+    const focused = document.activeElement;
+    activeIdx = focused && items.includes(focused) ? items.indexOf(focused) : -1;
+  }
+  if (activeIdx < 0) {
+    items.forEach((el, i) => {
+      el.classList.remove('is-selected');
+      el.setAttribute('aria-selected', 'false');
+      el.tabIndex = i === 0 ? 0 : -1;
+    });
+    return;
+  }
+  items.forEach((el, i) => {
+    const on = i === activeIdx;
+    el.classList.toggle('is-selected', on);
+    el.setAttribute('aria-selected', on ? 'true' : 'false');
+    el.tabIndex = on ? 0 : -1;
+  });
+}
+
+function clearDetailsValueSelection(grid) {
+  if (!grid) return;
+  grid.querySelectorAll('.detail-value.is-selected').forEach((el) => {
+    el.classList.remove('is-selected');
+    el.setAttribute('aria-selected', 'false');
+  });
+  const items = detailsGridValues(grid);
+  items.forEach((el, i) => {
+    el.tabIndex = i === 0 ? 0 : -1;
+  });
+  if (document.activeElement && grid.contains(document.activeElement)) {
+    document.activeElement.blur();
+  }
+}
+
+/** Wire click-to-copy + j/k list nav on Details values (Debug Log / Monitors parity). */
+function wireDetailsGridKeyboard(grid) {
+  if (!grid || grid.dataset.keyboardNav === '1') return;
+  grid.dataset.keyboardNav = '1';
+  grid.setAttribute('role', 'listbox');
+  grid.setAttribute('aria-label', 'System details');
+  if (!grid.hasAttribute('tabindex')) grid.setAttribute('tabindex', '0');
+
+  const items = detailsGridValues(grid);
+  items.forEach((el) => {
+    if (el.dataset.detailsCopyWired === '1') return;
+    el.dataset.detailsCopyWired = '1';
+    el.setAttribute('role', 'option');
+    el.setAttribute('aria-selected', 'false');
+    const label = detailsValueLabel(el);
+    const title = `Click to copy ${label}`;
+    el.title = title;
+    el.setAttribute('data-copy-title', title);
+    el.setAttribute('aria-label', `${label} — Enter or c copies`);
+  });
+  syncDetailsValuesTabOrder(grid, null);
+
+  grid.addEventListener('click', (e) => {
+    const cell = e.target && e.target.closest && e.target.closest('.detail-value');
+    if (!cell || !grid.contains(cell) || cell.parentElement !== grid) return;
+    e.preventDefault();
+    e.stopPropagation();
+    syncDetailsValuesTabOrder(grid, cell);
+    cell.focus();
+    void copyDetailsValue(cell);
+  });
+
+  grid.addEventListener('keydown', (e) => {
+    const cell = e.target && e.target.closest && e.target.closest('.detail-value');
+    if (!cell || !grid.contains(cell) || cell.parentElement !== grid) {
+      // First arrow/j from listbox chrome focuses first/last value (Debug Log parity).
+      if (e.target !== grid) return;
+      const vals = detailsGridValues(grid);
+      if (!vals.length) return;
+      let next = -1;
+      if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'Home') next = 0;
+      else if (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'End') next = vals.length - 1;
+      else return;
+      e.preventDefault();
+      syncDetailsValuesTabOrder(grid, vals[next]);
+      vals[next].focus();
+      if (typeof vals[next].scrollIntoView === 'function') {
+        vals[next].scrollIntoView({ block: 'nearest' });
+      }
+      return;
+    }
+    const vals = detailsGridValues(grid);
+    const idx = vals.indexOf(cell);
+    if (idx < 0) return;
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      void copyDetailsValue(cell);
+      return;
+    }
+
+    if (
+      (e.key === 'c' || e.key === 'C') &&
+      !e.metaKey &&
+      !e.ctrlKey &&
+      !e.altKey
+    ) {
+      e.preventDefault();
+      void copyDetailsValue(cell);
+      return;
+    }
+
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      if (!cell.classList.contains('is-selected') && document.activeElement !== cell) {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      clearDetailsValueSelection(grid);
+      return;
+    }
+
+    let next = -1;
+    const page = 5;
+    if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, vals.length - 1);
+    else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
+    else if (e.key === 'PageDown') next = Math.min(idx + page, vals.length - 1);
+    else if (e.key === 'PageUp') next = Math.max(idx - page, 0);
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = vals.length - 1;
+    else return;
+    e.preventDefault();
+    if (next < 0 || next === idx) return;
+    syncDetailsValuesTabOrder(grid, vals[next]);
+    vals[next].focus();
+    if (typeof vals[next].scrollIntoView === 'function') {
+      vals[next].scrollIntoView({ block: 'nearest' });
+    }
+  });
+}
+
+function initDetailsGridKeyboard() {
+  const grid =
+    document.getElementById('details-content') ||
+    document.querySelector('.details-grid');
+  if (!grid) return;
+  wireDetailsGridKeyboard(grid);
+}
+
 /** Details section collapsed (keep-header + glance; Top Processes / Debug Log parity). */
 function isDetailsSectionCollapsed() {
   const section =
@@ -8223,6 +8448,7 @@ function initCollapsibleSections() {
   ensureUptimeStrip();
   ensureProcessesTopGlance();
   ensureDetailsCollapsedGlance();
+  initDetailsGridKeyboard();
   if (isDetailsSectionCollapsed()) {
     refreshDetailsCollapsedGlanceFromDom();
   }
