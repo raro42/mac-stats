@@ -6254,6 +6254,111 @@ async function copyMonitorUrlFromRow(item) {
   return true;
 }
 
+/** Focusable monitor detail action items (Check now · Remove). */
+function getMonitorDetailActionItems(row) {
+  const wrap =
+    row || document.querySelector('.monitor-detail-actions');
+  if (!wrap) return [];
+  const items = [];
+  const check = wrap.querySelector('.monitor-detail-check');
+  const remove = wrap.querySelector('.monitor-detail-remove');
+  if (check && wrap.contains(check) && !check.hidden) items.push(check);
+  if (remove && wrap.contains(remove) && !remove.hidden) items.push(remove);
+  return items.filter((el) => {
+    if (!el || el.hidden) return false;
+    return el.getClientRects().length > 0 || wrap.contains(el);
+  });
+}
+
+function refreshMonitorDetailActionsRovingTabindex(row, preferred) {
+  const items = getMonitorDetailActionItems(row);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureMonitorDetailActionsKbHint(row) {
+  const wrap = row || document.querySelector('.monitor-detail-actions');
+  if (!wrap) return;
+  let hint = wrap.querySelector('.monitor-detail-toolbar-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'monitor-detail-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    wrap.appendChild(hint);
+  }
+  const items = getMonitorDetailActionItems(wrap);
+  hint.hidden = items.length < 2;
+  hint.textContent =
+    '← → / h l · Home/End move · Enter / Space on buttons';
+}
+
+/**
+ * Monitors detail action toolbar keyboard — focus Check now · Remove, then
+ * ←→ / h l / Home/End (Disk Cleanup action toolbar parity).
+ */
+function ensureMonitorDetailActionsKeyboard(row) {
+  const wrap = row || document.querySelector('.monitor-detail-actions');
+  if (!wrap) return;
+  ensureMonitorDetailActionsKbHint(wrap);
+  refreshMonitorDetailActionsRovingTabindex(wrap);
+  if (wrap.dataset.monitorDetailKbWired === '1') return;
+  wrap.dataset.monitorDetailKbWired = '1';
+  if (!wrap.getAttribute('role')) wrap.setAttribute('role', 'toolbar');
+  if (!wrap.getAttribute('aria-label')) {
+    wrap.setAttribute('aria-label', 'Monitor actions');
+  }
+  wrap.addEventListener('focusin', (e) => {
+    const items = getMonitorDetailActionItems(wrap);
+    if (items.includes(e.target)) {
+      refreshMonitorDetailActionsRovingTabindex(wrap, e.target);
+      ensureMonitorDetailActionsKbHint(wrap);
+    }
+  });
+  wrap.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getMonitorDetailActionItems(wrap);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    if (e.key === 'Enter' || e.key === ' ') return;
+    let next = -1;
+    if (
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j'
+    ) {
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k'
+    ) {
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshMonitorDetailActionsRovingTabindex(wrap, items[next]);
+    items[next].focus();
+  });
+}
+
 function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
   const prevUrlFlash = captureMonitorUrlFlash(
     detail.querySelector('.monitor-detail-url')
@@ -6381,6 +6486,7 @@ function fillMonitorDetail(detail, monitorId, monitorUrl, status) {
     void removeMonitorFromListRow(detail.closest('.monitor-item'));
   });
   actions.appendChild(removeBtn);
+  ensureMonitorDetailActionsKeyboard(actions);
   detail.appendChild(actions);
 }
 

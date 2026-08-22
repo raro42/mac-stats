@@ -4129,7 +4129,16 @@ button.monitor-detail-url.is-just-saved {
 .monitor-detail-actions {
   margin-top: 8px;
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+  align-items: center;
+}
+
+.monitor-detail-toolbar-kb-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
 }
 
 .monitor-detail-check,

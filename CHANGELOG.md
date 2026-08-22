@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.609] - 2026-08-23
+
+### Added
+- Monitors **detail action toolbar keyboard** — focus Check now · Remove, then ← → / h l / Home / End moves across controls (Disk Cleanup action toolbar parity). Enter / Space keeps button activate. Soft kb hint when both buttons are visible; one Tab stop via roving tabindex.
+
 ## [0.1.608] - 2026-08-23
 
 ### Added
