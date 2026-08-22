@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-22
 
-Overnight Track B (20:00–06:00) shipped user-facing listbox / copy / toolbar keyboard polish. Digester open stayed empty; design-review screens are in grace (recommended: feature-ai-chat).
+Overnight Track B ratchet (filter / toolbar keyboard lane continued).
 
 ## Shipped tonight
 
@@ -20,10 +20,11 @@ Overnight Track B (20:00–06:00) shipped user-facing listbox / copy / toolbar k
 | **v0.1.587** | Details click-to-copy + keyboard nav |
 | **v0.1.588** | Battery / power strip toolbar keyboard |
 | **v0.1.589** | Section icon-line toolbar keyboard |
+| **v0.1.590** | Filter-chip toolbar keyboard |
 
 ## Latest keep (this tick)
 
-**v0.1.589** — Icon line: focus an icon, then ← → / h l / Home / End moves across Monitors · AI Chat · Perplexity · Debug Log · Discord · Disk Cleanup · Agent Ops (power-strip / Details listbox chrome parity). Enter / Space opens the section. Soft kb hint; one Tab stop via roving tabindex; AI-off icons skipped.
+**v0.1.590** — Filter chips: focus a chip, then ← → / h l / Home / End moves across All · … for Monitors · Top Processes · Debug Log · Disk Cleanup · AI Chat · Agent Ops kind/lane chips (power-strip / icon-line parity). Enter / Space selects the filter. Soft kb hint; one Tab stop via roving tabindex.
 
 ## Notes
 
