@@ -487,9 +487,17 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
 
 .ops-filter-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   padding: 0 4px 10px;
+}
+
+.ops-filter-row-kb-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
 }
 
 .ops-filter-input {

@@ -80,6 +80,7 @@
       chip.removeAttribute('title');
       chip.classList.remove('is-zero', 'is-partial', 'is-all');
       if (clearBtn) clearBtn.hidden = true;
+      refreshOpsFilterRowForInput(input);
       return;
     }
     const t = Math.max(0, Number(total) || 0);
@@ -91,6 +92,156 @@
     chip.classList.toggle('is-partial', s > 0 && s < t);
     chip.classList.toggle('is-all', s > 0 && s === t);
     if (clearBtn) clearBtn.hidden = false;
+    refreshOpsFilterRowForInput(input);
+  }
+
+  /** Focusable filter-row items in DOM order (input · N/M chip · Clear when visible). */
+  function getOpsFilterRowItems(row) {
+    if (!row) return [];
+    const items = [];
+    const input = row.querySelector('.ops-filter-input');
+    const chip = row.querySelector('.ops-filter-match');
+    const clear = row.querySelector('.ops-filter-clear');
+    if (input && !input.hidden) items.push(input);
+    if (chip && !chip.hidden) {
+      if (!chip.getAttribute('role')) chip.setAttribute('role', 'status');
+      if (!chip.title) chip.title = 'Match count';
+      items.push(chip);
+    }
+    if (clear && !clear.hidden) items.push(clear);
+    return items.filter((el) => {
+      if (!el || el.hidden) return false;
+      return el.getClientRects().length > 0 || row.contains(el);
+    });
+  }
+
+  function opsFilterInputAtMoveBoundary(input, direction) {
+    if (!input || input.tagName !== 'INPUT') return true;
+    if (direction > 0) {
+      const len = (input.value || '').length;
+      return input.selectionStart === len && input.selectionEnd === len;
+    }
+    return input.selectionStart === 0 && input.selectionEnd === 0;
+  }
+
+  function refreshOpsFilterRowRovingTabindex(row, preferred) {
+    const items = getOpsFilterRowItems(row);
+    if (!items.length) return;
+    const focused = items.find((el) => el === document.activeElement);
+    const current =
+      (preferred && items.includes(preferred) && preferred) ||
+      focused ||
+      items.find((el) => el.tabIndex === 0) ||
+      items[0];
+    for (const el of items) {
+      el.tabIndex = el === current ? 0 : -1;
+    }
+  }
+
+  function refreshOpsFilterRowForInput(input) {
+    const row = input && input.closest && input.closest('.ops-filter-row');
+    if (!row) return;
+    refreshOpsFilterRowRovingTabindex(row);
+    const hint = row.querySelector('.ops-filter-row-kb-hint');
+    if (hint) {
+      const items = getOpsFilterRowItems(row);
+      hint.hidden = items.length < 2;
+    }
+  }
+
+  function ensureOpsFilterRowKbHint(row) {
+    if (!row) return;
+    let hint = row.querySelector('.ops-filter-row-kb-hint');
+    if (!hint) {
+      hint = document.createElement('div');
+      hint.className = 'ops-filter-row-kb-hint';
+      hint.setAttribute('aria-hidden', 'true');
+      row.appendChild(hint);
+    }
+    const items = getOpsFilterRowItems(row);
+    hint.hidden = items.length < 2;
+    hint.textContent =
+      '← → / h l · Home/End move · Enter / Space clears when on Clear';
+  }
+
+  /**
+   * Filter-row toolbar keyboard — focus search input · N/M chip · Clear,
+   * then ←→ / h l / Home/End (preview-row / refresh-row parity). Input keeps
+   * normal typing; arrows move only at text start/end.
+   */
+  function wireOpsFilterRowToolbarKeyboard(row) {
+    if (!row) return;
+    ensureOpsFilterRowKbHint(row);
+    refreshOpsFilterRowRovingTabindex(row);
+    if (row.dataset.opsFilterRowKbWired === '1') return;
+    row.dataset.opsFilterRowKbWired = '1';
+    if (!row.getAttribute('role')) {
+      row.setAttribute('role', 'toolbar');
+    }
+    if (!row.getAttribute('aria-label')) {
+      row.setAttribute('aria-label', 'List filter');
+    }
+    row.addEventListener('focusin', (e) => {
+      const items = getOpsFilterRowItems(row);
+      if (items.includes(e.target)) {
+        refreshOpsFilterRowRovingTabindex(row, e.target);
+        ensureOpsFilterRowKbHint(row);
+      }
+    });
+    row.addEventListener('keydown', (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const items = getOpsFilterRowItems(row);
+      if (!items.length) return;
+      const idx = items.indexOf(document.activeElement);
+      if (idx < 0) return;
+      const active = items[idx];
+      if ((e.key === 'Enter' || e.key === ' ') && active?.classList?.contains('ops-filter-clear')) {
+        return;
+      }
+      let next = -1;
+      const forward =
+        e.key === 'ArrowRight' ||
+        e.key === 'l' ||
+        e.key === 'ArrowDown' ||
+        e.key === 'j';
+      const back =
+        e.key === 'ArrowLeft' ||
+        e.key === 'h' ||
+        e.key === 'ArrowUp' ||
+        e.key === 'k';
+      if (forward) {
+        if (active?.classList?.contains('ops-filter-input') && !opsFilterInputAtMoveBoundary(active, 1)) {
+          return;
+        }
+        next = Math.min(idx + 1, items.length - 1);
+      } else if (back) {
+        if (active?.classList?.contains('ops-filter-input') && !opsFilterInputAtMoveBoundary(active, -1)) {
+          return;
+        }
+        next = Math.max(idx - 1, 0);
+      } else if (e.key === 'Home') {
+        next = 0;
+      } else if (e.key === 'End') {
+        next = items.length - 1;
+      } else {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      if (next === idx) return;
+      refreshOpsFilterRowRovingTabindex(row, items[next]);
+      items[next].focus();
+      if (items[next]?.classList?.contains('ops-filter-input') && typeof items[next].select === 'function') {
+        const len = (items[next].value || '').length;
+        items[next].setSelectionRange(len, len);
+      }
+    });
+  }
+
+  function ensureOpsFilterRowsToolbarKeyboard() {
+    document.querySelectorAll('.ops-filter-row').forEach((row) => {
+      wireOpsFilterRowToolbarKeyboard(row);
+    });
   }
 
   /** @deprecated list captions replaced by filter-row chips — keep name for call-site clarity */
@@ -1085,6 +1236,7 @@ function setupAgentOps() {
     ensureOpsAgentEditActionsToolbarKeyboard();
     ensureOpsPreviewRowsToolbarKeyboard();
     ensureOpsRefreshRowToolbarKeyboard();
+    ensureOpsFilterRowsToolbarKeyboard();
     ensureOpsKeyboardHint();
     ensureOpsUpdatedAgo();
     ensureOpsOverviewAgentsCard();
@@ -1341,6 +1493,7 @@ function ensureOpsSessionFilter() {
         ensureOpsFilterMatchChip(input);
         ensureOpsFilterClearBtn(input);
         panel.insertBefore(row, panel.firstChild);
+        wireOpsFilterRowToolbarKeyboard(row);
     }
     ensureOpsSessionKindChips();
     if (input.dataset.opsBound === '1') return;
@@ -1464,6 +1617,7 @@ function ensureOpsMemoryFilter() {
         ensureOpsFilterMatchChip(input);
         ensureOpsFilterClearBtn(input);
         panel.insertBefore(row, panel.firstChild);
+        wireOpsFilterRowToolbarKeyboard(row);
     }
     ensureOpsMemoryKindChips();
     if (input.dataset.opsBound === '1') return;
@@ -1590,6 +1744,7 @@ function ensureOpsRunsFilter() {
         const insights = document.getElementById('ops-runs-insights');
         if (insights) panel.insertBefore(row, insights.nextSibling);
         else panel.insertBefore(row, panel.firstChild);
+        wireOpsFilterRowToolbarKeyboard(row);
     }
     ensureOpsRunsLaneChips();
     if (input.dataset.opsBound === '1') return;
@@ -1720,6 +1875,7 @@ function ensureOpsAgentsFilter() {
         const list = document.getElementById('ops-agents-list');
         if (list) panel.insertBefore(row, list);
         else panel.insertBefore(row, panel.firstChild);
+        wireOpsFilterRowToolbarKeyboard(row);
     }
     ensureOpsAgentsEnabledChips();
     if (input.dataset.opsBound === '1') return;
@@ -1840,6 +1996,7 @@ function ensureOpsSchedulesFilter() {
         if (sub) panel.insertBefore(row, sub);
         else if (list) panel.insertBefore(row, list);
         else panel.insertBefore(row, panel.firstChild);
+        wireOpsFilterRowToolbarKeyboard(row);
     }
     ensureOpsSchedulesKindChips();
     if (input.dataset.opsBound === '1') return;
