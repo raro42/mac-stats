@@ -18,7 +18,9 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 7. OpenClaw / Hermes ports that clearly map to mac-stats tools/sessions (not docs-only Related sections). Google SERP FETCH_URL→search rewrite shipped in **v0.1.281**. Insights/status/digest/schedules/scrub/`/help`/interrupt NL in **v0.1.306–315**. Discord voice STT harden in **v0.1.313**. Climate/clima/klima → Open-Meteo + Brave-weather→Perplexity redirect in **v0.1.319–321**.
 
-## Done recently (do not re-pick as filler)
+## Done recently
+
+- Monitors **detail action toolbar keyboard** (← → / h l · Home/End across Check now · Remove; Disk Cleanup action toolbar parity) — **v0.1.609**
 
 - Disk Cleanup **action toolbar keyboard** (← → / h l · Home/End across Clean now · Refresh · Save scopes; Debug Log / meta-card parity) — **v0.1.608**
 
