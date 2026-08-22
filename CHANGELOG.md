@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.601] - 2026-08-22
+
+### Added
+- Agent Ops **agent edit-actions toolbar keyboard** — focus Save · Load into AI Chat · Back, then ← → / h l / Home / End moves across controls (file-tab / refresh-row parity). Enter / Space keeps button activate. Soft kb hint; one Tab stop via roving tabindex.
+
 ## [0.1.600] - 2026-08-22
 
 ### Added

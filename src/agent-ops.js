@@ -577,6 +577,112 @@ function ensureOpsFileTabToolbarKeyboard() {
     });
 }
 
+/** Focusable agent edit-action items in DOM order (Save · Load into AI Chat · Back). */
+function getOpsAgentEditActionItems() {
+    const row = document.getElementById('ops-agent-edit-actions');
+    if (!row) return [];
+    const detail = document.getElementById('ops-agent-detail');
+    if (detail?.hidden) return [];
+    const items = [];
+    const save = document.getElementById('ops-agent-save');
+    const load = document.getElementById('ops-agent-load-chat');
+    const back = document.getElementById('ops-agent-back');
+    if (save && !save.hidden) items.push(save);
+    if (load && !load.hidden) items.push(load);
+    if (back && !back.hidden) items.push(back);
+    return items.filter((el) => {
+        if (!el || el.hidden) return false;
+        return el.getClientRects().length > 0 || el.offsetParent !== null || row.contains(el);
+    });
+}
+
+function refreshOpsAgentEditActionsRovingTabindex(preferred) {
+    const items = getOpsAgentEditActionItems();
+    if (!items.length) return;
+    const focused = items.find((el) => el === document.activeElement);
+    const current =
+        (preferred && items.includes(preferred) && preferred) ||
+        focused ||
+        items.find((el) => el.tabIndex === 0) ||
+        items[0];
+    for (const el of items) {
+        el.tabIndex = el === current ? 0 : -1;
+    }
+}
+
+function ensureOpsAgentEditActionsKbHint() {
+    const row = document.getElementById('ops-agent-edit-actions');
+    if (!row) return;
+    let hint = document.getElementById('ops-agent-edit-actions-kb-hint');
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'ops-agent-edit-actions-kb-hint';
+        hint.className = 'ops-agent-edit-actions-kb-hint';
+        hint.setAttribute('aria-hidden', 'true');
+        row.insertAdjacentElement('afterend', hint);
+    }
+    hint.textContent =
+        '← → / h l · Home/End move · Enter / Space saves, loads chat, or goes back';
+}
+
+/**
+ * Agent edit-actions toolbar keyboard — focus Save · Load into AI Chat · Back,
+ * then ←→ / h l / Home/End (file-tab / refresh-row parity). Enter/Space keeps
+ * existing button activate.
+ */
+function ensureOpsAgentEditActionsToolbarKeyboard() {
+    const row = document.getElementById('ops-agent-edit-actions');
+    if (!row) return;
+    ensureOpsAgentEditActionsKbHint();
+    refreshOpsAgentEditActionsRovingTabindex();
+    if (row.dataset.opsAgentEditActionsKbWired === '1') return;
+    row.dataset.opsAgentEditActionsKbWired = '1';
+    if (!row.getAttribute('role')) {
+        row.setAttribute('role', 'toolbar');
+    }
+    if (!row.getAttribute('aria-label')) {
+        row.setAttribute('aria-label', 'Agent file save and navigation');
+    }
+    row.addEventListener('focusin', (e) => {
+        const items = getOpsAgentEditActionItems();
+        if (items.includes(e.target)) refreshOpsAgentEditActionsRovingTabindex(e.target);
+    });
+    row.addEventListener('keydown', (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const items = getOpsAgentEditActionItems();
+        if (!items.length) return;
+        const idx = items.indexOf(document.activeElement);
+        if (idx < 0) return;
+        let next = -1;
+        if (
+            e.key === 'ArrowRight' ||
+            e.key === 'l' ||
+            e.key === 'ArrowDown' ||
+            e.key === 'j'
+        ) {
+            next = Math.min(idx + 1, items.length - 1);
+        } else if (
+            e.key === 'ArrowLeft' ||
+            e.key === 'h' ||
+            e.key === 'ArrowUp' ||
+            e.key === 'k'
+        ) {
+            next = Math.max(idx - 1, 0);
+        } else if (e.key === 'Home') {
+            next = 0;
+        } else if (e.key === 'End') {
+            next = items.length - 1;
+        } else {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        if (next === idx) return;
+        refreshOpsAgentEditActionsRovingTabindex(items[next]);
+        items[next].focus();
+    });
+}
+
 /**
  * Tab-bar toolbar keyboard — focus 0 Overview · Agents · Sessions · Schedules ·
  * Knowledge · Runs, then ←→ / h l / Home/End (overview-card / health-strip parity).
@@ -811,6 +917,7 @@ function setupAgentOps() {
     ensureOpsTabDigits();
     ensureOpsTabBarToolbarKeyboard();
     ensureOpsFileTabToolbarKeyboard();
+    ensureOpsAgentEditActionsToolbarKeyboard();
     ensureOpsRefreshRowToolbarKeyboard();
     ensureOpsKeyboardHint();
     ensureOpsUpdatedAgo();
@@ -4071,7 +4178,9 @@ async function openOpsAgent(id) {
         });
         ensureOpsAgentEditor();
         ensureOpsFileTabToolbarKeyboard();
+        ensureOpsAgentEditActionsToolbarKeyboard();
         refreshOpsFileTabRovingTabindex();
+        refreshOpsAgentEditActionsRovingTabindex();
         renderOpsAgentPreview();
         setOpsAgentSaveStatus('');
         refreshOpsAgentLoadText();
@@ -4161,6 +4270,7 @@ function ensureOpsAgentEditor() {
         save.addEventListener('click', () => saveOpsAgentFile());
     }
     ensureOpsAgentLoadChatBtn();
+    ensureOpsAgentEditActionsToolbarKeyboard();
     if (editor && editor.dataset.opsEditBound !== '1') {
         editor.dataset.opsEditBound = '1';
         editor.addEventListener('input', () => {
@@ -4864,6 +4974,7 @@ function setOpsAgentLoadChatVisible(visible) {
     const el = ensureOpsAgentLoadChatBtn();
     if (!el) return;
     el.hidden = !visible;
+    refreshOpsAgentEditActionsRovingTabindex();
     if (!visible) {
         el.classList.remove('is-just-saved');
         if (!el._saveFlashOriginalLabel) {

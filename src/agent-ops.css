@@ -1241,6 +1241,12 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.72;
 }
 
+.ops-agent-edit-actions-kb-hint {
+  margin: -2px 0 8px;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
 .ops-refresh-row {
   display: flex;
   flex-wrap: wrap;
