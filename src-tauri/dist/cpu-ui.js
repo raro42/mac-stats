@@ -106,6 +106,135 @@
 
   let settingsFocusReturn = null;
 
+  /** Settings modal header: title + close (toolbar keyboard parity). */
+  function getSettingsHeaderToolbarItems(header) {
+    if (!header) return [];
+    const ids = ["settings-title", "close-settings"];
+    return ids
+      .map((id) => document.getElementById(id))
+      .filter((el) => {
+        if (!el || !header.contains(el)) return false;
+        if (el.hidden || el.disabled) return false;
+        return el.getClientRects().length > 0 || header.contains(el);
+      });
+  }
+
+  function refreshSettingsHeaderRovingTabindex(header, preferred) {
+    const items = getSettingsHeaderToolbarItems(header);
+    if (!items.length) return;
+    const focused = items.find((el) => el === document.activeElement);
+    const current =
+      (preferred && items.includes(preferred) && preferred) ||
+      focused ||
+      items.find((el) => el.tabIndex === 0) ||
+      items[0];
+    for (const el of items) {
+      el.tabIndex = el === current ? 0 : -1;
+    }
+  }
+
+  function ensureSettingsHeaderKbStyles() {
+    if (document.getElementById("mac-stats-settings-header-kb-styles")) return;
+    const style = document.createElement("style");
+    style.id = "mac-stats-settings-header-kb-styles";
+    style.textContent = `
+      .settings-header-kb-hint {
+        margin: 0;
+        font-size: 11px;
+        opacity: 0.72;
+        flex: 1 1 auto;
+        text-align: center;
+      }
+      #settings-title[tabindex]:focus {
+        outline: 2px solid var(--focus-ring, rgba(0, 122, 255, 0.55));
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function ensureSettingsHeaderKbHint(header) {
+    if (!header) return;
+    let hint = header.querySelector(".settings-header-kb-hint");
+    if (!hint) {
+      hint = document.createElement("div");
+      hint.className = "settings-header-kb-hint";
+      hint.setAttribute("aria-hidden", "true");
+      const closeBtn = header.querySelector("#close-settings");
+      if (closeBtn) header.insertBefore(hint, closeBtn);
+      else header.appendChild(hint);
+    }
+    const items = getSettingsHeaderToolbarItems(header);
+    hint.hidden = items.length < 2;
+    hint.textContent =
+      "← → / h l · Home/End move · Enter / Space on Close closes";
+  }
+
+  /**
+   * Settings close/header toolbar keyboard — focus Settings title · Close,
+   * then ←→ / h l / Home/End (Perplexity key toolbar parity).
+   */
+  function wireSettingsHeaderToolbarKeyboard(header) {
+    if (!header) return;
+    ensureSettingsHeaderKbStyles();
+    ensureSettingsHeaderKbHint(header);
+    refreshSettingsHeaderRovingTabindex(header);
+    if (header.dataset.settingsHeaderToolbarKbWired === "1") return;
+    header.dataset.settingsHeaderToolbarKbWired = "1";
+    if (!header.getAttribute("role")) header.setAttribute("role", "toolbar");
+    if (!header.getAttribute("aria-label")) {
+      header.setAttribute("aria-label", "Settings header");
+    }
+    header.addEventListener("focusin", (e) => {
+      const items = getSettingsHeaderToolbarItems(header);
+      if (items.includes(e.target)) {
+        refreshSettingsHeaderRovingTabindex(header, e.target);
+        ensureSettingsHeaderKbHint(header);
+      }
+    });
+    header.addEventListener("keydown", (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const items = getSettingsHeaderToolbarItems(header);
+      if (!items.length) return;
+      const idx = items.indexOf(document.activeElement);
+      if (idx < 0) return;
+      const active = items[idx];
+      if (e.key === "Enter" || e.key === " ") {
+        if (active?.id === "settings-title" || active?.id === "close-settings") {
+          return;
+        }
+      }
+      let next = -1;
+      if (
+        e.key === "ArrowRight" ||
+        e.key === "l" ||
+        e.key === "ArrowDown" ||
+        e.key === "j"
+      ) {
+        next = Math.min(idx + 1, items.length - 1);
+      } else if (
+        e.key === "ArrowLeft" ||
+        e.key === "h" ||
+        e.key === "ArrowUp" ||
+        e.key === "k"
+      ) {
+        next = Math.max(idx - 1, 0);
+      } else if (e.key === "Home") {
+        next = 0;
+      } else if (e.key === "End") {
+        next = items.length - 1;
+      } else {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      if (next === idx) return;
+      refreshSettingsHeaderRovingTabindex(header, items[next]);
+      items[next].focus();
+    });
+  }
+
   function openSettingsModal() {
     const settingsModal = document.getElementById("settings-modal");
     if (!settingsModal) return;
@@ -133,8 +262,14 @@
     ) {
       window.ensurePerplexitySettingsToolbarKeyboard(perplexitySetting);
     }
+    const settingsHeader = settingsModal.querySelector(".settings-header");
+    if (settingsHeader) wireSettingsHeaderToolbarKeyboard(settingsHeader);
     requestAnimationFrame(() => {
-      document.getElementById("close-settings")?.focus();
+      const closeBtn = document.getElementById("close-settings");
+      if (closeBtn) {
+        refreshSettingsHeaderRovingTabindex(settingsHeader, closeBtn);
+        closeBtn.focus();
+      }
     });
   }
 
@@ -171,6 +306,8 @@
       settingsModal.addEventListener("click", (e) => {
         if (e.target === settingsModal) closeSettingsModal();
       });
+      const settingsHeader = settingsModal.querySelector(".settings-header");
+      if (settingsHeader) wireSettingsHeaderToolbarKeyboard(settingsHeader);
     }
 
     document.addEventListener("keydown", (e) => {

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.617] - 2026-08-23
+
+### Added
+- Settings **close/header toolbar keyboard** — focus Settings title · Close, then ← → / h l / Home / End moves across header controls (Perplexity key toolbar parity). Enter / Space on Close keeps native close. Soft kb hint when both are visible; one Tab stop via roving tabindex.
+
 ## [0.1.616] - 2026-08-23
 
 ### Added
