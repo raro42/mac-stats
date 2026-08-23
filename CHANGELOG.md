@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.610] - 2026-08-23
+
+### Added
+- Discord settings **toolbar keyboard** — focus token · Save · Clear · View logs, then ← → / h l / Home / End moves across controls (Monitors detail action toolbar parity). Arrows leave the token field only at start/end. Enter still saves from the input; buttons keep native activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+
 ## [0.1.609] - 2026-08-23
 
 ### Added

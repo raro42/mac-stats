@@ -4141,6 +4141,17 @@ button.monitor-detail-url.is-just-saved {
   opacity: 0.72;
 }
 
+.discord-toolbar-kb-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.discord-toolbar-kb-hint[hidden] {
+  display: none !important;
+}
+
 .monitor-detail-check,
 .monitor-detail-remove {
   font-size: 11px;
