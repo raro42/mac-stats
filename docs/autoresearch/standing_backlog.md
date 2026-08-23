@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- Discord settings **toolbar keyboard** (← → / h l · Home/End across token · Save · Clear · View logs; Monitors detail action toolbar parity) — **v0.1.610**
+
 - Monitors **detail action toolbar keyboard** (← → / h l · Home/End across Check now · Remove; Disk Cleanup action toolbar parity) — **v0.1.609**
 
 - Disk Cleanup **action toolbar keyboard** (← → / h l · Home/End across Clean now · Refresh · Save scopes; Debug Log / meta-card parity) — **v0.1.608**

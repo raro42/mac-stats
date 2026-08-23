@@ -1,10 +1,10 @@
 # Morning surprise — 2026-08-23
 
-Overnight Track B extended toolbar keyboard parity into Monitors detail actions while digester open stayed empty.
+Overnight Track B extended toolbar keyboard parity into Discord Settings while digester open stayed empty.
 
 ## Latest keep (this tick)
 
-**v0.1.609** — Monitors detail action toolbar keyboard: focus Check now · Remove, then ← → / h l / Home / End moves across controls (Disk Cleanup action toolbar parity). Enter / Space keeps button activate. Soft kb hint when both buttons are visible; one Tab stop via roving tabindex.
+**v0.1.610** — Discord settings toolbar keyboard: focus token · Save · Clear · View logs, then ← → / h l / Home / End moves across controls (Monitors detail action toolbar parity). Arrows leave the token field only at start/end. Enter still saves from the input; buttons keep native activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
 
 ## Tonight's keeps (selected)
 
@@ -22,6 +22,7 @@ Overnight Track B extended toolbar keyboard parity into Monitors detail actions 
 | **v0.1.607** | Debug Log toolbar keyboard |
 | **v0.1.608** | Disk Cleanup action toolbar keyboard |
 | **v0.1.609** | Monitors detail action toolbar keyboard |
+| **v0.1.610** | Discord settings toolbar keyboard |
 
 ## Notes
 
