@@ -1,10 +1,10 @@
 # Morning surprise — 2026-08-23
 
-Overnight Track B extended Settings keyboard parity: section toolbars now chain across Appearance, Product, and Credentials.
+Overnight Track B extended Settings keyboard parity: header now chains into Appearance, completing the top-to-bottom Settings toolbar path.
 
 ## Latest keep (this tick)
 
-**v0.1.621** — Settings **section toolbar chain**: at section ends, ← → / h l crosses Appearance · Product · Credentials so keyboard users can move through the whole Settings body without Tab-hopping (Product↔Credentials parity with Appearance).
+**v0.1.622** — Settings **header↔Appearance toolbar chain**: at Close, ← → / h l crosses into Appearance; at the first Appearance control, ← crosses back to the header (section-chain parity from v0.1.621).
 
 ## Tonight's keeps (selected)
 
@@ -34,6 +34,7 @@ Overnight Track B extended Settings keyboard parity: section toolbars now chain 
 | **v0.1.619** | Changelog + Process Details modal header toolbar keyboard |
 | **v0.1.620** | Settings Credentials section toolbar keyboard |
 | **v0.1.621** | Settings section toolbar chain (Appearance·Product·Credentials) |
+| **v0.1.622** | Settings header↔Appearance toolbar chain |
 
 ## Notes
 
