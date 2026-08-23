@@ -493,7 +493,7 @@
     const controls = getAppearanceSettingControls(section);
     hint.hidden = controls.length < 2;
     hint.textContent =
-      "← → / h l · Home/End move · Enter / Space applies theme or toggles frame";
+      "← → / h l · Home/End move · Enter / Space applies theme or toggles frame · at end crosses to Product";
     refreshAppearanceSettingRovingTabindex(section);
     if (section.dataset.appearanceSettingKbWired === "1") return;
     section.dataset.appearanceSettingKbWired = "1";
@@ -514,21 +514,35 @@
       if (!items.length) return;
       const idx = items.indexOf(document.activeElement);
       if (idx < 0) return;
-      let next = -1;
-      if (
+      const forward =
         e.key === "ArrowRight" ||
         e.key === "l" ||
         e.key === "ArrowDown" ||
-        e.key === "j"
-      ) {
-        next = Math.min(idx + 1, items.length - 1);
-      } else if (
+        e.key === "j";
+      const back =
         e.key === "ArrowLeft" ||
         e.key === "h" ||
         e.key === "ArrowUp" ||
-        e.key === "k"
-      ) {
-        next = Math.max(idx - 1, 0);
+        e.key === "k";
+      let next = -1;
+      if (forward) {
+        if (idx === items.length - 1) {
+          if (tryChainSettingsSectionFocus(section, 1)) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          return;
+        }
+        next = idx + 1;
+      } else if (back) {
+        if (idx === 0) {
+          if (tryChainSettingsSectionFocus(section, -1)) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          return;
+        }
+        next = idx - 1;
       } else if (e.key === "Home") {
         next = 0;
       } else if (e.key === "End") {
@@ -667,7 +681,7 @@
       wrap.appendChild(hint);
     }
     hint.textContent =
-      "← → / h l · Home/End move · Space toggles · Enter / Space on Help / Reset";
+      "← → / h l · Home/End move · Space toggles · Enter / Space on Help / Reset · at ends crosses Appearance / Credentials";
     refreshProductSettingRovingTabindex(wrap);
     if (wrap.dataset.productSettingKbWired === "1") return;
     wrap.dataset.productSettingKbWired = "1";
@@ -687,21 +701,35 @@
       if (!controls.length) return;
       const idx = controls.indexOf(document.activeElement);
       if (idx < 0) return;
-      let next = -1;
-      if (
+      const forward =
         e.key === "ArrowRight" ||
         e.key === "l" ||
         e.key === "ArrowDown" ||
-        e.key === "j"
-      ) {
-        next = Math.min(idx + 1, controls.length - 1);
-      } else if (
+        e.key === "j";
+      const back =
         e.key === "ArrowLeft" ||
         e.key === "h" ||
         e.key === "ArrowUp" ||
-        e.key === "k"
-      ) {
-        next = Math.max(idx - 1, 0);
+        e.key === "k";
+      let next = -1;
+      if (forward) {
+        if (idx === controls.length - 1) {
+          if (tryChainSettingsSectionFocus(wrap.closest("section") || wrap, 1)) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          return;
+        }
+        next = idx + 1;
+      } else if (back) {
+        if (idx === 0) {
+          if (tryChainSettingsSectionFocus(wrap.closest("section") || wrap, -1)) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          return;
+        }
+        next = idx - 1;
       } else if (e.key === "Home") {
         next = 0;
       } else if (e.key === "End") {
@@ -715,6 +743,75 @@
       refreshProductSettingRovingTabindex(wrap, controls[next]);
       controls[next].focus();
     });
+  }
+
+  /** Appearance → Product → Credentials in Settings modal (visible sections only). */
+  function getSettingsModalSections() {
+    const modal = document.getElementById("settings-modal");
+    if (!modal) return [];
+    const selectors = [
+      'section[aria-labelledby="settings-appearance-heading"]',
+      'section[aria-labelledby="settings-product-heading"]',
+      'section[aria-labelledby="settings-credentials-heading"]',
+    ];
+    return selectors
+      .map((sel) => modal.querySelector(sel))
+      .filter((el) => {
+        if (!el) return false;
+        return el.getClientRects().length > 0 || modal.contains(el);
+      });
+  }
+
+  function getSettingsSectionToolbarItems(section) {
+    if (!section) return [];
+    const headingId = section.getAttribute("aria-labelledby");
+    if (headingId === "settings-appearance-heading") {
+      return getAppearanceSettingControls(section);
+    }
+    if (headingId === "settings-product-heading") {
+      const wrap = section.querySelector("#product-setting") || section;
+      return getProductSettingControls(wrap);
+    }
+    if (headingId === "settings-credentials-heading") {
+      return getCredentialsSectionToolbarItems(section);
+    }
+    return [];
+  }
+
+  function focusSettingsSectionToolbarItem(section, el) {
+    if (!section || !el) return;
+    const headingId = section.getAttribute("aria-labelledby");
+    if (headingId === "settings-appearance-heading") {
+      refreshAppearanceSettingRovingTabindex(section, el);
+    } else if (headingId === "settings-product-heading") {
+      const wrap = section.querySelector("#product-setting") || section;
+      refreshProductSettingRovingTabindex(wrap, el);
+    } else if (headingId === "settings-credentials-heading") {
+      refreshCredentialsSectionRovingTabindex(section, el);
+    }
+    el.focus();
+    if (
+      (el.id === "discord-token-input" || el.id === "perplexity-api-key-input") &&
+      typeof el.setSelectionRange === "function"
+    ) {
+      const len = (el.value || "").length;
+      el.setSelectionRange(len, len);
+    }
+  }
+
+  /** Jump to first/last control in adjacent Settings section (+1 forward, -1 back). */
+  function tryChainSettingsSectionFocus(currentSection, direction) {
+    const sections = getSettingsModalSections();
+    const secIdx = sections.indexOf(currentSection);
+    if (secIdx < 0) return false;
+    const targetIdx = secIdx + direction;
+    if (targetIdx < 0 || targetIdx >= sections.length) return false;
+    const targetSection = sections[targetIdx];
+    const items = getSettingsSectionToolbarItems(targetSection);
+    if (!items.length) return false;
+    const target = direction > 0 ? items[0] : items[items.length - 1];
+    focusSettingsSectionToolbarItem(targetSection, target);
+    return true;
   }
 
   function credentialsInputAtMoveBoundary(input, direction) {
@@ -793,7 +890,7 @@
     const items = getCredentialsSectionToolbarItems(section);
     hint.hidden = items.length < 2;
     hint.textContent =
-      "← → / h l · Home/End move · arrows at token/key start/end · buttons keep activate";
+      "← → / h l · Home/End move · arrows at token/key start/end · at start crosses to Product";
     refreshCredentialsSectionRovingTabindex(section);
     if (section.dataset.credentialsSectionKbWired === "1") return;
     section.dataset.credentialsSectionKbWired = "1";
@@ -849,7 +946,8 @@
           ) {
             return;
           }
-          next = Math.min(idx + 1, controls.length - 1);
+          if (idx === controls.length - 1) return;
+          next = idx + 1;
         } else if (back) {
           if (
             (active?.id === "discord-token-input" ||
@@ -858,7 +956,14 @@
           ) {
             return;
           }
-          next = Math.max(idx - 1, 0);
+          if (idx === 0) {
+            if (tryChainSettingsSectionFocus(section, -1)) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+            return;
+          }
+          next = idx - 1;
         } else if (e.key === "Home") {
           next = 0;
         } else if (e.key === "End") {

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.621] - 2026-08-23
+
+### Added
+- Settings **section toolbar chain** — Appearance · Product · Credentials sections link with ← → / h l at section ends so keyboard users can cross the whole Settings body without Tab-hopping (Product↔Credentials parity with Appearance).
+
 ## [0.1.620] - 2026-08-23
 
 ### Added
