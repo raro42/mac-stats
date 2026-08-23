@@ -8444,12 +8444,167 @@ function initOllamaSection() {
         closeOllamaSettingsPopover();
       }
     });
+    const settingsContent = settingsPopover.querySelector('.popover-content');
+    if (settingsContent) ensureOllamaSettingsToolbarKeyboard(settingsContent);
   }
   
   // Load saved system prompt into textarea if it exists
   if (systemPromptTextarea) {
     systemPromptTextarea.value = getSystemPrompt();
   }
+}
+
+function ollamaSettingsTextareaAtMoveBoundary(textarea, direction) {
+  if (!textarea || textarea.tagName !== 'TEXTAREA') return true;
+  if (direction > 0) {
+    const len = (textarea.value || '').length;
+    return textarea.selectionStart === len && textarea.selectionEnd === len;
+  }
+  return textarea.selectionStart === 0 && textarea.selectionEnd === 0;
+}
+
+/** Focusable Ollama settings toolbar items (close · prompt · Reset · Save). */
+function getOllamaSettingsToolbarItems(wrap) {
+  const content =
+    wrap || document.querySelector('#ollama-settings-popover .popover-content');
+  if (!content) return [];
+  const ids = [
+    'ollama-settings-close',
+    'ollama-system-prompt',
+    'ollama-settings-reset',
+    'ollama-settings-save',
+  ];
+  return ids
+    .map((id) => document.getElementById(id))
+    .filter((el) => {
+      if (!el || !content.contains(el)) return false;
+      if (el.hidden || el.disabled) return false;
+      return el.getClientRects().length > 0 || content.contains(el);
+    });
+}
+
+function refreshOllamaSettingsToolbarRovingTabindex(wrap, preferred) {
+  const content =
+    wrap || document.querySelector('#ollama-settings-popover .popover-content');
+  const items = getOllamaSettingsToolbarItems(content);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureOllamaSettingsToolbarKbHint(wrap) {
+  const content =
+    wrap || document.querySelector('#ollama-settings-popover .popover-content');
+  if (!content) return;
+  const actions = content.querySelector('.popover-actions');
+  if (!actions) return;
+  let hint = actions.querySelector('.ollama-settings-toolbar-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'ollama-settings-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    actions.appendChild(hint);
+  }
+  const items = getOllamaSettingsToolbarItems(content);
+  hint.hidden = items.length < 2;
+  hint.textContent =
+    '← → / h l · Home/End move · arrows at prompt start/end · buttons keep activate';
+}
+
+/**
+ * Ollama settings toolbar keyboard — focus close · system prompt · Reset · Save,
+ * then ←→ / h l / Home/End (Discord settings toolbar parity).
+ */
+function ensureOllamaSettingsToolbarKeyboard(wrap) {
+  const content =
+    wrap || document.querySelector('#ollama-settings-popover .popover-content');
+  if (!content) return;
+  ensureOllamaSettingsToolbarKbHint(content);
+  refreshOllamaSettingsToolbarRovingTabindex(content);
+  if (content.dataset.ollamaSettingsToolbarKbWired === '1') return;
+  content.dataset.ollamaSettingsToolbarKbWired = '1';
+  if (!content.getAttribute('role')) content.setAttribute('role', 'toolbar');
+  if (!content.getAttribute('aria-label')) {
+    content.setAttribute('aria-label', 'Ollama system prompt');
+  }
+  content.addEventListener('focusin', (e) => {
+    const items = getOllamaSettingsToolbarItems(content);
+    if (items.includes(e.target)) {
+      refreshOllamaSettingsToolbarRovingTabindex(content, e.target);
+      ensureOllamaSettingsToolbarKbHint(content);
+    }
+  });
+  content.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getOllamaSettingsToolbarItems(content);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (
+        active?.id === 'ollama-settings-close' ||
+        active?.id === 'ollama-system-prompt' ||
+        active?.id === 'ollama-settings-reset' ||
+        active?.id === 'ollama-settings-save'
+      ) {
+        return;
+      }
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward) {
+      if (
+        active?.id === 'ollama-system-prompt' &&
+        !ollamaSettingsTextareaAtMoveBoundary(active, 1)
+      ) {
+        return;
+      }
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (back) {
+      if (
+        active?.id === 'ollama-system-prompt' &&
+        !ollamaSettingsTextareaAtMoveBoundary(active, -1)
+      ) {
+        return;
+      }
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshOllamaSettingsToolbarRovingTabindex(content, items[next]);
+    items[next].focus();
+    if (
+      items[next]?.id === 'ollama-system-prompt' &&
+      typeof items[next].setSelectionRange === 'function'
+    ) {
+      const len = (items[next].value || '').length;
+      items[next].setSelectionRange(len, len);
+    }
+  });
 }
 
 function closeOllamaSettingsPopover() {
@@ -8484,9 +8639,19 @@ function showSystemPromptSettings() {
       if (!title.id) title.id = 'ollama-settings-title';
       popover.setAttribute('aria-labelledby', title.id);
     }
+    const settingsContent = popover.querySelector('.popover-content');
+    if (settingsContent) {
+      ensureOllamaSettingsToolbarKeyboard(settingsContent);
+      refreshOllamaSettingsToolbarRovingTabindex(settingsContent);
+      ensureOllamaSettingsToolbarKbHint(settingsContent);
+    }
     // Focus close for consistent dialog pattern; textarea remains one Tab away
     requestAnimationFrame(() => {
-      document.getElementById('ollama-settings-close')?.focus();
+      const closeBtn = document.getElementById('ollama-settings-close');
+      if (closeBtn) {
+        refreshOllamaSettingsToolbarRovingTabindex(settingsContent, closeBtn);
+        closeBtn.focus();
+      }
     });
   }
 }

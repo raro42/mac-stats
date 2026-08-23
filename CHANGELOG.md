@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.615] - 2026-08-23
+
+### Added
+- Ollama settings **toolbar keyboard** — focus close · system prompt · Reset · Save, then ← → / h l / Home / End moves across controls (Discord settings toolbar parity). Arrows leave the prompt only at start/end. Enter / Space keeps button activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+
 ## [0.1.614] - 2026-08-23
 
 ### Added
