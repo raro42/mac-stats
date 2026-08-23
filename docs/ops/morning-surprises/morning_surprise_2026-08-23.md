@@ -1,10 +1,10 @@
 # Morning surprise — 2026-08-23
 
-Overnight Track B extended keyboard parity: Process Details header now chains into the hero toolbar, completing the modal top-to-body path.
+Overnight Track B extended keyboard parity across Settings and Process Details modals — header chains now reach the full modal body.
 
 ## Latest keep (this tick)
 
-**v0.1.623** — Process Details **header↔hero toolbar chain**: at Close, ← → / h l crosses into name · PID; at the first hero control, ← crosses back to the header (Settings header chain parity from v0.1.622).
+**v0.1.624** — Process Details **hero↔force-quit toolbar chain**: at PID, ← → / h l crosses into Advanced summary · Force Quit; at the first force-quit control, ← crosses back to PID (header↔hero chain parity from v0.1.623).
 
 ## Tonight's keeps (selected)
 
@@ -36,6 +36,7 @@ Overnight Track B extended keyboard parity: Process Details header now chains in
 | **v0.1.621** | Settings section toolbar chain (Appearance·Product·Credentials) |
 | **v0.1.622** | Settings header↔Appearance toolbar chain |
 | **v0.1.623** | Process Details header↔hero toolbar chain |
+| **v0.1.624** | Process Details hero↔force-quit toolbar chain |
 
 ## Notes
 
