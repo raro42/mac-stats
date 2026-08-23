@@ -3400,6 +3400,16 @@ function closeProcessDetailsModal() {
   }
 }
 
+function wireProcessDetailsHeaderToolbarKeyboard(header) {
+  if (!header || typeof window.wireModalHeaderToolbarKeyboard !== "function") return;
+  window.wireModalHeaderToolbarKeyboard(header, {
+    titleId: "process-details-title",
+    closeId: "close-process-details",
+    ariaLabel: "Process details header",
+    wireKey: "processDetailsHeaderToolbarKbWired",
+  });
+}
+
 function openProcessDetailsModal() {
   if (!processDetailsModal) return;
   processDetailsFocusReturn = document.activeElement;
@@ -3410,6 +3420,8 @@ function openProcessDetailsModal() {
   if (!processDetailsModal.getAttribute("aria-labelledby")) {
     processDetailsModal.setAttribute("aria-labelledby", "process-details-title");
   }
+  const header = processDetailsModal.querySelector(".settings-header");
+  if (header) wireProcessDetailsHeaderToolbarKeyboard(header);
   requestAnimationFrame(() => {
     processDetailsModal.querySelector("#close-process-details")?.focus();
   });
@@ -4081,6 +4093,8 @@ async function showProcessDetails(pid) {
     
     // Set up close handlers (only once)
     if (!processDetailsModal.dataset.handlersSetup) {
+      const header = processDetailsModal.querySelector(".settings-header");
+      if (header) wireProcessDetailsHeaderToolbarKeyboard(header);
       const closeBtn = processDetailsModal.querySelector("#close-process-details");
       if (closeBtn) {
         closeBtn.addEventListener("click", () => {

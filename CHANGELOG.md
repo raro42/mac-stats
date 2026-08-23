@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.619] - 2026-08-23
+
+### Added
+- **Changelog and Process Details modal header toolbar keyboard** — focus title · Close, then ← → / h l / Home / End moves across header controls (Settings header parity). Soft kb hint when both are visible; one Tab stop via roving tabindex.
+
 ## [0.1.618] - 2026-08-23
 
 ### Added

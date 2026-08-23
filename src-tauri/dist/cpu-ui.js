@@ -106,11 +106,10 @@
 
   let settingsFocusReturn = null;
 
-  /** Settings modal header: title + close (toolbar keyboard parity). */
-  function getSettingsHeaderToolbarItems(header) {
+  /** Modal header: title + close (toolbar keyboard parity). */
+  function getModalHeaderToolbarItems(header, titleId, closeId) {
     if (!header) return [];
-    const ids = ["settings-title", "close-settings"];
-    return ids
+    return [titleId, closeId]
       .map((id) => document.getElementById(id))
       .filter((el) => {
         if (!el || !header.contains(el)) return false;
@@ -119,8 +118,8 @@
       });
   }
 
-  function refreshSettingsHeaderRovingTabindex(header, preferred) {
-    const items = getSettingsHeaderToolbarItems(header);
+  function refreshModalHeaderRovingTabindex(header, titleId, closeId, preferred) {
+    const items = getModalHeaderToolbarItems(header, titleId, closeId);
     if (!items.length) return;
     const focused = items.find((el) => el === document.activeElement);
     const current =
@@ -133,11 +132,12 @@
     }
   }
 
-  function ensureSettingsHeaderKbStyles() {
-    if (document.getElementById("mac-stats-settings-header-kb-styles")) return;
+  function ensureModalHeaderKbStyles() {
+    if (document.getElementById("mac-stats-modal-header-kb-styles")) return;
     const style = document.createElement("style");
-    style.id = "mac-stats-settings-header-kb-styles";
+    style.id = "mac-stats-modal-header-kb-styles";
     style.textContent = `
+      .modal-header-kb-hint,
       .settings-header-kb-hint {
         margin: 0;
         font-size: 11px;
@@ -145,7 +145,7 @@
         flex: 1 1 auto;
         text-align: center;
       }
-      #settings-title[tabindex]:focus {
+      .settings-header h2[tabindex]:focus {
         outline: 2px solid var(--focus-ring, rgba(0, 122, 255, 0.55));
         outline-offset: 2px;
         border-radius: 4px;
@@ -154,54 +154,60 @@
     document.head.appendChild(style);
   }
 
-  function ensureSettingsHeaderKbHint(header) {
+  function ensureModalHeaderKbHint(header, titleId, closeId, closeSelector) {
     if (!header) return;
-    let hint = header.querySelector(".settings-header-kb-hint");
+    let hint = header.querySelector(".modal-header-kb-hint, .settings-header-kb-hint");
     if (!hint) {
       hint = document.createElement("div");
-      hint.className = "settings-header-kb-hint";
+      hint.className = "modal-header-kb-hint";
       hint.setAttribute("aria-hidden", "true");
-      const closeBtn = header.querySelector("#close-settings");
+      const closeBtn =
+        (closeSelector && header.querySelector(closeSelector)) ||
+        document.getElementById(closeId);
       if (closeBtn) header.insertBefore(hint, closeBtn);
       else header.appendChild(hint);
     }
-    const items = getSettingsHeaderToolbarItems(header);
+    const items = getModalHeaderToolbarItems(header, titleId, closeId);
     hint.hidden = items.length < 2;
     hint.textContent =
       "← → / h l · Home/End move · Enter / Space on Close closes";
   }
 
   /**
-   * Settings close/header toolbar keyboard — focus Settings title · Close,
-   * then ←→ / h l / Home/End (Perplexity key toolbar parity).
+   * Modal header toolbar keyboard — focus title · Close, then ←→ / h l / Home/End.
    */
-  function wireSettingsHeaderToolbarKeyboard(header) {
+  function wireModalHeaderToolbarKeyboard(header, options = {}) {
     if (!header) return;
-    ensureSettingsHeaderKbStyles();
-    ensureSettingsHeaderKbHint(header);
-    refreshSettingsHeaderRovingTabindex(header);
-    if (header.dataset.settingsHeaderToolbarKbWired === "1") return;
-    header.dataset.settingsHeaderToolbarKbWired = "1";
+    const titleId = options.titleId;
+    const closeId = options.closeId;
+    if (!titleId || !closeId) return;
+    const ariaLabel = options.ariaLabel || "Modal header";
+    const wireKey = options.wireKey || "modalHeaderToolbarKbWired";
+    ensureModalHeaderKbStyles();
+    ensureModalHeaderKbHint(header, titleId, closeId, options.closeSelector);
+    refreshModalHeaderRovingTabindex(header, titleId, closeId);
+    if (header.dataset[wireKey] === "1") return;
+    header.dataset[wireKey] = "1";
     if (!header.getAttribute("role")) header.setAttribute("role", "toolbar");
     if (!header.getAttribute("aria-label")) {
-      header.setAttribute("aria-label", "Settings header");
+      header.setAttribute("aria-label", ariaLabel);
     }
     header.addEventListener("focusin", (e) => {
-      const items = getSettingsHeaderToolbarItems(header);
+      const items = getModalHeaderToolbarItems(header, titleId, closeId);
       if (items.includes(e.target)) {
-        refreshSettingsHeaderRovingTabindex(header, e.target);
-        ensureSettingsHeaderKbHint(header);
+        refreshModalHeaderRovingTabindex(header, titleId, closeId, e.target);
+        ensureModalHeaderKbHint(header, titleId, closeId, options.closeSelector);
       }
     });
     header.addEventListener("keydown", (e) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-      const items = getSettingsHeaderToolbarItems(header);
+      const items = getModalHeaderToolbarItems(header, titleId, closeId);
       if (!items.length) return;
       const idx = items.indexOf(document.activeElement);
       if (idx < 0) return;
       const active = items[idx];
       if (e.key === "Enter" || e.key === " ") {
-        if (active?.id === "settings-title" || active?.id === "close-settings") {
+        if (active?.id === titleId || active?.id === closeId) {
           return;
         }
       }
@@ -230,8 +236,18 @@
       e.preventDefault();
       e.stopPropagation();
       if (next === idx) return;
-      refreshSettingsHeaderRovingTabindex(header, items[next]);
+      refreshModalHeaderRovingTabindex(header, titleId, closeId, items[next]);
       items[next].focus();
+    });
+  }
+
+  /** Settings close/header toolbar keyboard (modal header parity). */
+  function wireSettingsHeaderToolbarKeyboard(header) {
+    wireModalHeaderToolbarKeyboard(header, {
+      titleId: "settings-title",
+      closeId: "close-settings",
+      ariaLabel: "Settings header",
+      wireKey: "settingsHeaderToolbarKbWired",
     });
   }
 
@@ -267,7 +283,12 @@
     requestAnimationFrame(() => {
       const closeBtn = document.getElementById("close-settings");
       if (closeBtn) {
-        refreshSettingsHeaderRovingTabindex(settingsHeader, closeBtn);
+        refreshModalHeaderRovingTabindex(
+          settingsHeader,
+          "settings-title",
+          "close-settings",
+          closeBtn
+        );
         closeBtn.focus();
       }
     });
@@ -1466,10 +1487,23 @@
       if (!title.id) title.id = "changelog-modal-title";
       changelogModal.setAttribute("aria-labelledby", title.id);
     }
+    const changelogHeader = changelogModal.querySelector(".settings-header");
+    if (changelogHeader) wireChangelogHeaderToolbarKeyboard(changelogHeader);
     loadChangelogForModal(changelogBody, changelogModal);
     if (triggerEl) flashChangelogOpened(triggerEl);
     requestAnimationFrame(() => {
-      document.getElementById("close-changelog")?.focus();
+      const closeBtn = document.getElementById("close-changelog");
+      if (closeBtn && changelogHeader) {
+        refreshModalHeaderRovingTabindex(
+          changelogHeader,
+          "changelog-modal-title",
+          "close-changelog",
+          closeBtn
+        );
+        closeBtn.focus();
+      } else {
+        closeBtn?.focus();
+      }
     });
   }
 
@@ -1488,6 +1522,16 @@
     }
   }
 
+  /** Changelog modal header toolbar keyboard (Settings header parity). */
+  function wireChangelogHeaderToolbarKeyboard(header) {
+    wireModalHeaderToolbarKeyboard(header, {
+      titleId: "changelog-modal-title",
+      closeId: "close-changelog",
+      ariaLabel: "Changelog header",
+      wireKey: "changelogHeaderToolbarKbWired",
+    });
+  }
+
   function initChangelogModal() {
     const changelogModal = document.getElementById("changelog-modal");
     const closeChangelog = document.getElementById("close-changelog");
@@ -1497,6 +1541,9 @@
       console.warn("Changelog modal elements not found");
       return;
     }
+
+    const changelogHeader = changelogModal.querySelector(".settings-header");
+    if (changelogHeader) wireChangelogHeaderToolbarKeyboard(changelogHeader);
     
     // Get version elements - try multiple selectors to catch all cases
     const versionElements = document.querySelectorAll(
@@ -1585,6 +1632,8 @@
     initChangelogModal();
     injectAppVersion();
   }
+
+  window.wireModalHeaderToolbarKeyboard = wireModalHeaderToolbarKeyboard;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);
