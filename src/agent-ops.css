@@ -4883,6 +4883,17 @@ button.monitor-detail-url.is-just-saved {
   white-space: nowrap;
 }
 
+.disk-cleanup-add-scope-toolbar-kb-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.disk-cleanup-add-scope-toolbar-kb-hint[hidden] {
+  display: none !important;
+}
+
 @media (max-width: 720px) {
   .disk-cleanup-add-scope {
     grid-template-columns: 1fr;

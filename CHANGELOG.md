@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.612] - 2026-08-23
+
+### Added
+- Disk Cleanup **add-scope toolbar keyboard** — focus label · path · days · Recursive · Add scope, then ← → / h l / Home / End moves across controls (Monitors add-form toolbar parity). Arrows leave text fields only at start/end. Enter still adds from inputs; buttons and checkbox keep native activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+
 ## [0.1.611] - 2026-08-23
 
 ### Added

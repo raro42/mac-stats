@@ -11850,6 +11850,140 @@ function ensureDiskCleanupToolbarKbHint(row) {
  * then ←→ / h l / Home/End (Debug Log / meta-card parity). Enter/Space keeps
  * native button activate.
  */
+/** Focusable Disk Cleanup add-scope toolbar items (label · path · days · Recursive · Add scope). */
+function getDiskCleanupAddScopeToolbarItems(wrap) {
+  const form = wrap || document.querySelector('.disk-cleanup-add-scope');
+  if (!form) return [];
+  const ids = [
+    'disk-cleanup-add-label',
+    'disk-cleanup-add-path',
+    'disk-cleanup-add-days',
+    'disk-cleanup-add-recursive',
+    'disk-cleanup-add-btn',
+  ];
+  return ids
+    .map((id) => document.getElementById(id))
+    .filter((el) => {
+      if (!el || !form.contains(el)) return false;
+      if (el.hidden || el.disabled) return false;
+      return el.getClientRects().length > 0 || form.contains(el);
+    });
+}
+
+function refreshDiskCleanupAddScopeToolbarRovingTabindex(wrap, preferred) {
+  const form = wrap || document.querySelector('.disk-cleanup-add-scope');
+  const items = getDiskCleanupAddScopeToolbarItems(form);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureDiskCleanupAddScopeToolbarKbHint(wrap) {
+  const form = wrap || document.querySelector('.disk-cleanup-add-scope');
+  if (!form) return;
+  let hint = form.querySelector('.disk-cleanup-add-scope-toolbar-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'disk-cleanup-add-scope-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    form.appendChild(hint);
+  }
+  const items = getDiskCleanupAddScopeToolbarItems(form);
+  hint.hidden = items.length < 2;
+  hint.textContent =
+    '← → / h l · Home/End move · Enter adds from fields · buttons keep activate';
+}
+
+/**
+ * Disk Cleanup add-scope toolbar keyboard — focus label · path · days · Recursive ·
+ * Add scope, then ←→ / h l / Home/End (Monitors add-form toolbar parity).
+ */
+function ensureDiskCleanupAddScopeToolbarKeyboard(wrap) {
+  const form = wrap || document.querySelector('.disk-cleanup-add-scope');
+  if (!form) return;
+  ensureDiskCleanupAddScopeToolbarKbHint(form);
+  refreshDiskCleanupAddScopeToolbarRovingTabindex(form);
+  if (form.dataset.diskAddScopeToolbarKbWired === '1') return;
+  form.dataset.diskAddScopeToolbarKbWired = '1';
+  if (!form.getAttribute('role')) form.setAttribute('role', 'toolbar');
+  if (!form.getAttribute('aria-label')) {
+    form.setAttribute('aria-label', 'Add cleanup scope');
+  }
+  form.addEventListener('focusin', (e) => {
+    const items = getDiskCleanupAddScopeToolbarItems(form);
+    if (items.includes(e.target)) {
+      refreshDiskCleanupAddScopeToolbarRovingTabindex(form, e.target);
+      ensureDiskCleanupAddScopeToolbarKbHint(form);
+    }
+  });
+  form.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getDiskCleanupAddScopeToolbarItems(form);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (
+        active?.id === 'disk-cleanup-add-label' ||
+        active?.id === 'disk-cleanup-add-path' ||
+        active?.id === 'disk-cleanup-add-days' ||
+        active?.id === 'disk-cleanup-add-recursive' ||
+        active?.id === 'disk-cleanup-add-btn'
+      ) {
+        return;
+      }
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    const isTextLike =
+      active?.tagName === 'INPUT' &&
+      (active.type === 'text' || active.type === 'number');
+    if (forward) {
+      if (isTextLike && !monitorUrlInputAtMoveBoundary(active, 1)) return;
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (back) {
+      if (isTextLike && !monitorUrlInputAtMoveBoundary(active, -1)) return;
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshDiskCleanupAddScopeToolbarRovingTabindex(form, items[next]);
+    items[next].focus();
+    if (
+      isTextLike &&
+      items[next]?.tagName === 'INPUT' &&
+      typeof items[next].setSelectionRange === 'function'
+    ) {
+      const len = (items[next].value || '').length;
+      items[next].setSelectionRange(len, len);
+    }
+  });
+}
+
 function ensureDiskCleanupToolbarKeyboard() {
   const wrap = document.querySelector('.disk-cleanup-toolbar');
   if (!wrap) return;
@@ -13069,6 +13203,7 @@ function initDiskCleanupSection() {
   wireDiskCleanupRunsWhenCard();
   ensureDiskCleanupMetaKeyboard();
   ensureDiskCleanupToolbarKeyboard();
+  ensureDiskCleanupAddScopeToolbarKeyboard();
   wireDiskCleanupLastRunPanel();
   ensureDiskCleanupCollapsedGlance();
 
