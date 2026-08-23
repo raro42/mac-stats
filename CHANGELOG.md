@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.611] - 2026-08-23
+
+### Added
+- Monitors **add-form toolbar keyboard** — focus URL · Cancel · Add Monitor, then ← → / h l / Home / End moves across controls (Discord settings toolbar parity). Arrows leave the URL field only at start/end. Enter still adds from the input; buttons keep native activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+
 ## [0.1.610] - 2026-08-23
 
 ### Added

@@ -5158,6 +5158,7 @@ function initMonitorsSection() {
           urlInput.value = 'https://www.amvara.de/';
           urlInput.focus();
         }
+        ensureMonitorAddFormToolbarKeyboard(addForm);
       }
     });
   }
@@ -6255,6 +6256,149 @@ async function copyMonitorUrlFromRow(item) {
 }
 
 /** Focusable monitor detail action items (Check now · Remove). */
+function monitorUrlInputAtMoveBoundary(input, direction) {
+  if (!input || input.tagName !== 'INPUT') return true;
+  if (direction > 0) {
+    const len = (input.value || '').length;
+    return input.selectionStart === len && input.selectionEnd === len;
+  }
+  return input.selectionStart === 0 && input.selectionEnd === 0;
+}
+
+/** Focusable Monitors add-form toolbar items (URL · Cancel · Add Monitor). */
+function getMonitorAddFormToolbarItems(wrap) {
+  const form = wrap || document.getElementById('add-monitor-form');
+  if (!form || form.style.display === 'none') return [];
+  const ids = ['monitor-url-input', 'monitors-add-cancel', 'monitors-add-save'];
+  return ids
+    .map((id) => document.getElementById(id))
+    .filter((el) => {
+      if (!el || !form.contains(el)) return false;
+      if (el.hidden || el.disabled) return false;
+      return el.getClientRects().length > 0 || form.contains(el);
+    });
+}
+
+function refreshMonitorAddFormToolbarRovingTabindex(wrap, preferred) {
+  const form = wrap || document.getElementById('add-monitor-form');
+  const items = getMonitorAddFormToolbarItems(form);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureMonitorAddFormToolbarKbHint(wrap) {
+  const form = wrap || document.getElementById('add-monitor-form');
+  if (!form) return;
+  const actions = form.querySelector('.popover-actions');
+  if (!actions) return;
+  let hint = actions.querySelector('.monitor-add-toolbar-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'monitor-add-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    actions.appendChild(hint);
+  }
+  const items = getMonitorAddFormToolbarItems(form);
+  hint.hidden = items.length < 2;
+  hint.textContent =
+    '← → / h l · Home/End move · Enter adds from URL · buttons keep activate';
+}
+
+/**
+ * Monitors add-form toolbar keyboard — focus URL · Cancel · Add Monitor, then
+ * ←→ / h l / Home/End (Discord settings toolbar parity).
+ */
+function ensureMonitorAddFormToolbarKeyboard(wrap) {
+  const form = wrap || document.getElementById('add-monitor-form');
+  if (!form || form.style.display === 'none') return;
+  ensureMonitorAddFormToolbarKbHint(form);
+  refreshMonitorAddFormToolbarRovingTabindex(form);
+  if (form.dataset.monitorAddToolbarKbWired === '1') return;
+  form.dataset.monitorAddToolbarKbWired = '1';
+  if (!form.getAttribute('role')) form.setAttribute('role', 'toolbar');
+  if (!form.getAttribute('aria-label')) {
+    form.setAttribute('aria-label', 'Add monitor');
+  }
+  form.addEventListener('focusin', (e) => {
+    const items = getMonitorAddFormToolbarItems(form);
+    if (items.includes(e.target)) {
+      refreshMonitorAddFormToolbarRovingTabindex(form, e.target);
+      ensureMonitorAddFormToolbarKbHint(form);
+    }
+  });
+  form.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getMonitorAddFormToolbarItems(form);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = items[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (
+        active?.id === 'monitor-url-input' ||
+        active?.id === 'monitors-add-cancel' ||
+        active?.id === 'monitors-add-save'
+      ) {
+        return;
+      }
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward) {
+      if (
+        active?.id === 'monitor-url-input' &&
+        !monitorUrlInputAtMoveBoundary(active, 1)
+      ) {
+        return;
+      }
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (back) {
+      if (
+        active?.id === 'monitor-url-input' &&
+        !monitorUrlInputAtMoveBoundary(active, -1)
+      ) {
+        return;
+      }
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'Home') {
+      next = 0;
+    } else if (e.key === 'End') {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshMonitorAddFormToolbarRovingTabindex(form, items[next]);
+    items[next].focus();
+    if (
+      items[next]?.id === 'monitor-url-input' &&
+      typeof items[next].setSelectionRange === 'function'
+    ) {
+      const len = (items[next].value || '').length;
+      items[next].setSelectionRange(len, len);
+    }
+  });
+}
+
 function getMonitorDetailActionItems(row) {
   const wrap =
     row || document.querySelector('.monitor-detail-actions');
