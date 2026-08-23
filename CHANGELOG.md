@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.622] - 2026-08-23
+
+### Added
+- Settings **header↔Appearance toolbar chain** — at Close, ← → / h l crosses into Appearance; at the first Appearance control, ← crosses back to the header (section-chain parity).
+
 ## [0.1.621] - 2026-08-23
 
 ### Added
