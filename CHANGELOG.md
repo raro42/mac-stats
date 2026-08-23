@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.623] - 2026-08-23
+
+### Added
+- Process Details **header↔hero toolbar chain** — at Close, ← → / h l crosses into name · PID; at the first hero control, ← crosses back to the header (Settings header chain parity).
+
 ## [0.1.622] - 2026-08-23
 
 ### Added

@@ -3400,6 +3400,39 @@ function closeProcessDetailsModal() {
   }
 }
 
+function tryChainProcessDetailsHeaderToHero() {
+  const body = document.getElementById("process-details-body");
+  const hero = body?.querySelector(".process-detail-hero");
+  if (!hero) return false;
+  const items = getProcessDetailHeroToolbarItems(hero);
+  if (!items.length) return false;
+  refreshProcessDetailHeroToolbarRovingTabindex(hero, items[0]);
+  items[0].focus();
+  return true;
+}
+
+function tryChainProcessDetailsHeroToHeader() {
+  const header = processDetailsModal?.querySelector(".settings-header");
+  if (!header || typeof window.getModalHeaderToolbarItems !== "function") return false;
+  const items = window.getModalHeaderToolbarItems(
+    header,
+    "process-details-title",
+    "close-process-details"
+  );
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  if (typeof window.refreshModalHeaderRovingTabindex === "function") {
+    window.refreshModalHeaderRovingTabindex(
+      header,
+      "process-details-title",
+      "close-process-details",
+      target
+    );
+  }
+  target.focus();
+  return true;
+}
+
 function wireProcessDetailsHeaderToolbarKeyboard(header) {
   if (!header || typeof window.wireModalHeaderToolbarKeyboard !== "function") return;
   window.wireModalHeaderToolbarKeyboard(header, {
@@ -3407,6 +3440,9 @@ function wireProcessDetailsHeaderToolbarKeyboard(header) {
     closeId: "close-process-details",
     ariaLabel: "Process details header",
     wireKey: "processDetailsHeaderToolbarKbWired",
+    hintText:
+      "← → / h l · Home/End move · Enter / Space on Close closes · at end crosses to name",
+    chainForwardFromEnd: () => tryChainProcessDetailsHeaderToHero(),
   });
 }
 
@@ -3663,7 +3699,7 @@ function ensureProcessDetailHeroToolbarKbHint(hero) {
   const items = getProcessDetailHeroToolbarItems(wrap);
   hint.hidden = items.length < 2;
   hint.textContent =
-    "← → / h l · Home/End move · Enter / Space copies";
+    "← → / h l · Home/End move · Enter / Space copies · at start crosses to header";
 }
 
 /**
@@ -3709,7 +3745,14 @@ function ensureProcessDetailHeroToolbarKeyboard(hero) {
       e.key === "ArrowUp" ||
       e.key === "k"
     ) {
-      next = Math.max(idx - 1, 0);
+      if (idx === 0) {
+        if (tryChainProcessDetailsHeroToHeader()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx - 1;
     } else if (e.key === "Home") {
       next = 0;
     } else if (e.key === "End") {

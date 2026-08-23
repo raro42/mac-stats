@@ -1981,6 +1981,8 @@
   }
 
   window.wireModalHeaderToolbarKeyboard = wireModalHeaderToolbarKeyboard;
+  window.getModalHeaderToolbarItems = getModalHeaderToolbarItems;
+  window.refreshModalHeaderRovingTabindex = refreshModalHeaderRovingTabindex;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);
