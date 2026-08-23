@@ -126,6 +126,13 @@
     }
     if (window.Discord?.refreshStatus) window.Discord.refreshStatus();
     if (window.Perplexity?.refreshStatus) window.Perplexity.refreshStatus();
+    const perplexitySetting = document.getElementById("perplexity-setting");
+    if (
+      perplexitySetting &&
+      typeof window.ensurePerplexitySettingsToolbarKeyboard === "function"
+    ) {
+      window.ensurePerplexitySettingsToolbarKeyboard(perplexitySetting);
+    }
     requestAnimationFrame(() => {
       document.getElementById("close-settings")?.focus();
     });

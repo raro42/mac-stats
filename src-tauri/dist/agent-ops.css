@@ -4176,6 +4176,17 @@ button.monitor-detail-url.is-just-saved {
   display: none !important;
 }
 
+.perplexity-settings-toolbar-kb-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.perplexity-settings-toolbar-kb-hint[hidden] {
+  display: none !important;
+}
+
 .ollama-settings-toolbar-kb-hint {
   flex: 1 1 100%;
   margin: 8px 0 0;

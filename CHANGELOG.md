@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.616] - 2026-08-23
+
+### Added
+- Settings **Perplexity API key toolbar keyboard** — focus key input · Save key · Clear key, then ← → / h l / Home / End moves across controls (Discord settings toolbar parity). Arrows leave the key field only at start/end. Enter saves from the key field; buttons keep activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+
 ## [0.1.615] - 2026-08-23
 
 ### Added
