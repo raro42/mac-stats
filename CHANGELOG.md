@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.618] - 2026-08-23
+
+### Added
+- Settings **Appearance toolbar keyboard** — focus a theme or the window-frame toggle, then ← → / h l / Home / End moves across the Appearance section (theme list + Show window frame; header toolbar parity). Enter / Space applies a theme or toggles the frame. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+
 ## [0.1.617] - 2026-08-23
 
 ### Added

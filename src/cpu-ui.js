@@ -403,10 +403,121 @@
     document.head.appendChild(style);
   }
 
+  /** Theme buttons + window-frame toggle in Settings Appearance (visible only). */
+  function getAppearanceSettingControls(section) {
+    if (!section) return [];
+    const themeList = section.querySelector("#theme-list");
+    const themes = themeList ? getThemeListButtons(themeList) : [];
+    const frameToggle = section.querySelector("#window-decorations-toggle");
+    const frame =
+      frameToggle &&
+      !frameToggle.hidden &&
+      !frameToggle.disabled &&
+      (frameToggle.getClientRects().length > 0 || section.contains(frameToggle))
+        ? frameToggle
+        : null;
+    return frame ? themes.concat(frame) : themes;
+  }
+
+  function refreshAppearanceSettingRovingTabindex(section, preferred) {
+    const controls = getAppearanceSettingControls(section);
+    if (!controls.length) return;
+    const focused = controls.find((el) => el === document.activeElement);
+    const current =
+      (preferred && controls.includes(preferred) && preferred) ||
+      focused ||
+      controls.find((el) => el.getAttribute?.("aria-current") === "true") ||
+      controls.find((el) => el.tabIndex === 0) ||
+      controls[0];
+    for (const el of controls) {
+      el.tabIndex = el === current ? 0 : -1;
+    }
+  }
+
+  function ensureAppearanceSettingKbStyles() {
+    ensureThemeListKbStyles();
+    if (document.getElementById("mac-stats-appearance-setting-kb-styles")) return;
+    const style = document.createElement("style");
+    style.id = "mac-stats-appearance-setting-kb-styles";
+    style.textContent = `
+      .appearance-setting-kb-hint {
+        margin: 8px 0 0;
+        font-size: 11px;
+        opacity: 0.72;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   /**
-   * Settings theme-list toolbar keyboard — focus a theme, then ←→ / h l /
-   * Home/End (filter-chip / power-strip parity). Enter/Space keeps apply.
+   * Settings Appearance toolbar keyboard — theme list + window frame toggle;
+   * ←→ / h l / Home/End (theme-list / header toolbar parity).
    */
+  function wireAppearanceSettingToolbarKeyboard(section) {
+    if (!section) return;
+    ensureAppearanceSettingKbStyles();
+    let hint = section.querySelector(":scope > .appearance-setting-kb-hint");
+    if (!hint) {
+      hint = document.createElement("div");
+      hint.className = "appearance-setting-kb-hint";
+      hint.setAttribute("aria-hidden", "true");
+      section.appendChild(hint);
+    }
+    const controls = getAppearanceSettingControls(section);
+    hint.hidden = controls.length < 2;
+    hint.textContent =
+      "← → / h l · Home/End move · Enter / Space applies theme or toggles frame";
+    refreshAppearanceSettingRovingTabindex(section);
+    if (section.dataset.appearanceSettingKbWired === "1") return;
+    section.dataset.appearanceSettingKbWired = "1";
+    section.setAttribute("role", "toolbar");
+    if (!section.getAttribute("aria-label")) {
+      section.setAttribute("aria-label", "Appearance settings");
+    }
+    section.addEventListener("focusin", (e) => {
+      const items = getAppearanceSettingControls(section);
+      if (items.includes(e.target)) {
+        refreshAppearanceSettingRovingTabindex(section, e.target);
+        hint.hidden = items.length < 2;
+      }
+    });
+    section.addEventListener("keydown", (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const items = getAppearanceSettingControls(section);
+      if (!items.length) return;
+      const idx = items.indexOf(document.activeElement);
+      if (idx < 0) return;
+      let next = -1;
+      if (
+        e.key === "ArrowRight" ||
+        e.key === "l" ||
+        e.key === "ArrowDown" ||
+        e.key === "j"
+      ) {
+        next = Math.min(idx + 1, items.length - 1);
+      } else if (
+        e.key === "ArrowLeft" ||
+        e.key === "h" ||
+        e.key === "ArrowUp" ||
+        e.key === "k"
+      ) {
+        next = Math.max(idx - 1, 0);
+      } else if (e.key === "Home") {
+        next = 0;
+      } else if (e.key === "End") {
+        next = items.length - 1;
+      } else {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      if (next === idx) return;
+      refreshAppearanceSettingRovingTabindex(section, items[next]);
+      items[next].focus();
+    });
+  }
+
+  /** Theme-list-only fallback when Appearance section markup is missing. */
   function wireThemeListToolbarKeyboard(themeList) {
     if (!themeList) return;
     ensureThemeListKbStyles();
@@ -598,7 +709,14 @@
           applyTheme(theme);
         });
       });
-      wireThemeListToolbarKeyboard(themeList);
+      const appearanceSection = themeList.closest(
+        'section[aria-labelledby="settings-appearance-heading"]'
+      );
+      if (appearanceSection) {
+        wireAppearanceSettingToolbarKeyboard(appearanceSection);
+      } else {
+        wireThemeListToolbarKeyboard(themeList);
+      }
       return;
     }
 
