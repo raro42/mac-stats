@@ -1,10 +1,10 @@
 # Morning surprise — 2026-08-23
 
-Overnight Track B extended modal header toolbar keyboard parity to Changelog and Process Details while digester open stayed empty.
+Overnight Track B extended Settings keyboard parity: section toolbars now chain across Appearance, Product, and Credentials.
 
 ## Latest keep (this tick)
 
-**v0.1.619** — Changelog and Process Details **modal header toolbar keyboard**: focus title · Close, then ← → / h l / Home / End moves across header controls (Settings header parity). Soft kb hint when both are visible; one Tab stop via roving tabindex.
+**v0.1.621** — Settings **section toolbar chain**: at section ends, ← → / h l crosses Appearance · Product · Credentials so keyboard users can move through the whole Settings body without Tab-hopping (Product↔Credentials parity with Appearance).
 
 ## Tonight's keeps (selected)
 
@@ -32,6 +32,8 @@ Overnight Track B extended modal header toolbar keyboard parity to Changelog and
 | **v0.1.617** | Settings close/header toolbar keyboard |
 | **v0.1.618** | Settings Appearance toolbar keyboard |
 | **v0.1.619** | Changelog + Process Details modal header toolbar keyboard |
+| **v0.1.620** | Settings Credentials section toolbar keyboard |
+| **v0.1.621** | Settings section toolbar chain (Appearance·Product·Credentials) |
 
 ## Notes
 
