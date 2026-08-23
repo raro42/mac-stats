@@ -1,10 +1,10 @@
 # Morning surprise — 2026-08-23
 
-Overnight Track B extended Settings keyboard parity: header now chains into Appearance, completing the top-to-bottom Settings toolbar path.
+Overnight Track B extended keyboard parity: Process Details header now chains into the hero toolbar, completing the modal top-to-body path.
 
 ## Latest keep (this tick)
 
-**v0.1.622** — Settings **header↔Appearance toolbar chain**: at Close, ← → / h l crosses into Appearance; at the first Appearance control, ← crosses back to the header (section-chain parity from v0.1.621).
+**v0.1.623** — Process Details **header↔hero toolbar chain**: at Close, ← → / h l crosses into name · PID; at the first hero control, ← crosses back to the header (Settings header chain parity from v0.1.622).
 
 ## Tonight's keeps (selected)
 
@@ -35,6 +35,7 @@ Overnight Track B extended Settings keyboard parity: header now chains into Appe
 | **v0.1.620** | Settings Credentials section toolbar keyboard |
 | **v0.1.621** | Settings section toolbar chain (Appearance·Product·Credentials) |
 | **v0.1.622** | Settings header↔Appearance toolbar chain |
+| **v0.1.623** | Process Details header↔hero toolbar chain |
 
 ## Notes
 
