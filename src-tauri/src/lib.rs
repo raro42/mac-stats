@@ -509,8 +509,14 @@ fn run_internal(open_cpu_window: bool) {
             setup_status_item();
 
             // Set placeholder text immediately (don't call get_metrics() here - it blocks)
-            let placeholder_text = "CPU\tGPU\tRAM\tSSD\n0%\t0%\t0%\t0%";
-            let initial_attributed = make_attributed_title(placeholder_text);
+            let placeholder_metrics = SystemMetrics {
+                cpu: 0.0,
+                gpu: 0.0,
+                ram: 0.0,
+                disk: 0.0,
+            };
+            let placeholder_text = build_status_text(&placeholder_metrics);
+            let initial_attributed = make_attributed_title(&placeholder_text, Some(&placeholder_metrics));
             STATUS_ITEM.with(|cell| {
                 if let Some(item) = cell.borrow().as_ref() {
                     let mtm = MainThreadMarker::new().unwrap();
@@ -722,24 +728,12 @@ fn run_internal(open_cpu_window: bool) {
                     {
                         text.push_str("\nOllama ✕");
                     }
-                    // Monitor cues: red Mon ✕ when any check is down; else amber Mon when
-                    // any UP site responds ≥ 2000 ms (Monitors summary slowest / latency parity).
+                    // Monitor cues: red Mon ✕ when any check is down.
                     {
                         let statuses = commands::monitors::get_monitor_statuses_snapshot();
                         let any_monitor_down = statuses.iter().any(|(_, st)| !st.is_up);
                         if any_monitor_down {
                             text.push_str("\nMon ✕");
-                        } else {
-                            let any_slow = statuses.iter().any(|(_, st)| {
-                                st.is_up
-                                    && st
-                                        .response_time_ms
-                                        .map(|ms| ms >= 2000)
-                                        .unwrap_or(false)
-                            });
-                            if any_slow {
-                                text.push_str("\nMon");
-                            }
                         }
                     }
                     // Soft yellow / amber / red Heat cue when thermal pressure is
@@ -754,88 +748,15 @@ fn run_internal(open_cpu_window: bool) {
                     if crate::ffi::objc::read_process_low_power_mode() {
                         text.push_str("\nLPM");
                     }
-                    // Amber CPU cue when usage ≥ 50% (power-strip CPU is-hot parity).
-                    if metrics.cpu >= 50.0 {
-                        text.push_str("\nCPU");
-                    }
-                    // Amber GPU cue when usage ≥ 15% (power-strip GPU is-hot parity).
-                    if metrics.gpu >= 15.0 {
-                        text.push_str("\nGPU");
-                    }
-                    // Amber SSD cue when disk used ≥ 85% (power-strip SSD is-hot parity).
-                    if metrics.disk >= 85.0 {
-                        text.push_str("\nSSD");
-                    }
-                    // Amber RAM cue when memory used ≥ 85% (Details / power-strip is-hot parity).
-                    if metrics.ram >= 85.0 {
-                        text.push_str("\nRAM");
-                    }
-                    // Amber Temp cue when cached CPU °C ≥ 70 (power-strip Temp is-hot parity).
-                    // Uses TEMP_CACHE (same source as compact menu-bar T°); skipped when stale/missing.
-                    let temp_hot = TEMP_CACHE
-                        .try_lock()
-                        .ok()
-                        .and_then(|g| {
-                            g.as_ref().and_then(|(t, ts)| {
-                                if *t >= 70.0 && ts.elapsed() < TEMP_CACHE_MAX_AGE {
-                                    Some(())
-                                } else {
-                                    None
-                                }
-                            })
-                        })
-                        .is_some();
-                    if temp_hot {
-                        text.push_str("\nTemp");
-                    }
-                    // Amber GHz cue when cached frequency ≥ 3.5 (power-strip freq is-hot parity).
-                    // Uses FREQ_CACHE (IOReport); 35s freshness matches get_cpu_details(); skipped when stale/missing.
-                    let freq_hot = FREQ_CACHE
-                        .try_lock()
-                        .ok()
-                        .and_then(|g| {
-                            g.as_ref().and_then(|(f, ts)| {
-                                if *f >= 3.5 && ts.elapsed().as_secs() < 35 {
-                                    Some(())
-                                } else {
-                                    None
-                                }
-                            })
-                        })
-                        .is_some();
-                    if freq_hot {
-                        text.push_str("\nGHz");
-                    }
-                    // Amber Up cue when system uptime ≥ 7 days (power-strip Up is-long parity).
-                    // Cheap: sysinfo::System::uptime() — no SMC/IOReport.
-                    if sysinfo::System::uptime() >= 7 * 24 * 3600 {
-                        text.push_str("\nUp");
-                    }
-                    // Amber Bat cue when cached battery ≤ 20% and not charging
-                    // (power-strip battery is-low parity). Uses BATTERY_CACHE (filled when
-                    // CPU window reads battery); skipped when missing / no battery / charging.
-                    let bat_low = BATTERY_CACHE
-                        .try_lock()
-                        .ok()
-                        .and_then(|g| {
-                            g.as_ref().and_then(|(level, charging, _ts)| {
-                                if *level >= 0.0 && *level <= 20.0 && !*charging {
-                                    Some(())
-                                } else {
-                                    None
-                                }
-                            })
-                        })
-                        .is_some();
-                    if bat_low {
-                        text.push_str("\nBat");
-                    }
 
                     // Store update in static variable
                     if let Ok(mut pending) = MENU_BAR_TEXT.lock() {
                         *pending = Some(text);
                         debug3!("Menu bar update stored: CPU={}%, GPU={}%, RAM={}%, DISK={}%",
                             metrics.cpu, metrics.gpu, metrics.ram, metrics.disk);
+                    }
+                    if let Ok(mut pending_metrics) = MENU_BAR_METRICS.lock() {
+                        *pending_metrics = Some(metrics.clone());
                     }
 
                     // Add to history buffer (always collect basic metrics when available)

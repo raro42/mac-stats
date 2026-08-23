@@ -38,6 +38,9 @@ thread_local! {
 }
 pub(crate) static APP_HANDLE: OnceLock<AppHandle> = OnceLock::new();
 pub(crate) static MENU_BAR_TEXT: Mutex<Option<String>> = Mutex::new(None);
+/// Latest metrics paired with the pending menu-bar title (for per-value coloring).
+pub(crate) static MENU_BAR_METRICS: Mutex<Option<crate::metrics::SystemMetrics>> =
+    Mutex::new(None);
 
 /// Process start time (for Agent Ops uptime). Set once during Tauri setup.
 pub(crate) static PROCESS_START: OnceLock<Instant> = OnceLock::new();

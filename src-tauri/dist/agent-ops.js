@@ -6681,6 +6681,9 @@ function escapeHtml(s) {
     const btn = document.getElementById('agent-ops-collapse-btn');
     if (section) {
       section.classList.toggle('collapsed', collapsed);
+      section.style.display = collapsed ? 'none' : '';
+      if (collapsed) section.setAttribute('aria-hidden', 'true');
+      else section.removeAttribute('aria-hidden');
     }
     if (content) {
       content.classList.toggle('collapsed', collapsed);

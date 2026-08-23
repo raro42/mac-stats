@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Settings **Appearance toolbar keyboard** — focus a theme or the window-frame toggle, then ← → / h l / Home / End moves across the Appearance section (theme list + Show window frame; header toolbar parity). Enter / Space applies a theme or toggles the frame. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
 
+### Fixed
+- **Menu bar** — metric values stay visible; hot CPU/SSD/etc. use amber on the value row instead of extra cue lines that clipped the numbers.
+- **CPU window sections** — icon toggles fully hide Monitors, Ollama, Perplexity, Logs, Disk, Agent Ops, Details, and Processes (no collapsed glance peek).
+- **Battery row** — shows battery and power only; removed duplicate CPU/RAM/GPU/temp/SSD chips already on the ring gauges.
+
 ## [0.1.617] - 2026-08-23
 
 ### Added

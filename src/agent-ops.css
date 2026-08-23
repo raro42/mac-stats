@@ -80,29 +80,8 @@ body:hover {
   width: 100%;
 }
 
-/* Icon toggles: keep header + glance when collapsed (content still collapses). */
-.monitors-section.collapsed,
-.disk-cleanup-section.collapsed,
-.ollama-section.collapsed,
-.agent-ops-section.collapsed,
-.perplexity-section.collapsed,
-.logs-section.collapsed,
-#details-section.collapsed,
-.apple-details.collapsed,
-.arch-details.collapsed,
-.swiss-details.collapsed,
-.mat-details.collapsed,
-.cpu-details.collapsed,
-.details-section.collapsed,
-#processes-section.collapsed,
-.apple-processes.collapsed,
-.arch-processes.collapsed,
-.swiss-processes.collapsed,
-.mat-processes.collapsed,
-.cpu-processes.collapsed,
-.processes-section.collapsed {
-  display: block !important;
-}
+/* Icon toggles: collapsed panes are fully hidden (display:none via JS). Content-only
+   collapse rules below apply when a pane is open but inner content is folded. */
 
 /* Details keep-header: hide grid; keep Load/RAM/Up glance. */
 #details-section.collapsed #details-content,

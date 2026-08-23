@@ -154,6 +154,22 @@ window.syncSectionIcon = function syncSectionIcon(iconId, isOpen) {
   icon.classList.toggle('section-open', !!isOpen);
   icon.setAttribute('aria-pressed', isOpen ? 'true' : 'false');
 };
+
+/** Fully hide or show an icon-line pane (no keep-header / collapsed glance). */
+function setIconPaneVisibility(section, content, hidden, divider) {
+  if (section) {
+    section.style.display = hidden ? 'none' : '';
+    section.classList.toggle('collapsed', hidden);
+    if (hidden) section.setAttribute('aria-hidden', 'true');
+    else section.removeAttribute('aria-hidden');
+  }
+  if (divider) divider.style.display = hidden ? 'none' : '';
+  if (content) {
+    content.classList.toggle('collapsed', hidden);
+    if (!hidden) content.style.display = '';
+  }
+}
+window.setIconPaneVisibility = setIconPaneVisibility;
 // Kick off early so Agent Ops can await the same promise.
 window.cpuUiSectionsReady = loadCpuUiSections();
 
@@ -2119,15 +2135,8 @@ function init() {
   wireMetricValueCopy();
   ensureRingGaugeKeyboard();
   ensureHistorySparklineKeyboard();
-  ensureCpuStrip();
-  ensureRamStrip();
-  ensureGpuStrip();
-  ensureTempStrip();
-  ensureThermalStrip();
-  ensureLowPowerStrip();
-  ensureFreqStrip();
-  ensureDiskStrip();
-  ensureUptimeStrip();
+  ensureRamStripStyles();
+  pruneMetricStripChips();
   ensurePowerStripKeyboard();
   
   // Try to get Tauri immediately - don't wait if it's already available
@@ -2158,6 +2167,25 @@ function initRingGauges() {
       el.style.strokeDashoffset = CIRCUMFERENCE;
     }
   });
+}
+
+/** Gauge metrics belong on the rings — not duplicated on the battery row. */
+const METRIC_STRIP_CHIP_IDS = [
+  'cpu-strip',
+  'ram-strip',
+  'gpu-strip',
+  'temp-strip',
+  'thermal-strip',
+  'lpm-strip',
+  'freq-strip',
+  'disk-strip',
+  'uptime-strip',
+];
+
+function pruneMetricStripChips() {
+  for (const id of METRIC_STRIP_CHIP_IDS) {
+    document.getElementById(id)?.remove();
+  }
 }
 
 /** Inject click-to-copy styles for ring metric values + battery/power strip (all themes; flash via ::after so refresh can keep updating the number). */
@@ -2293,7 +2321,7 @@ function wireMetricValueCopy() {
   }
 }
 
-/** Inject RAM cell on the battery/power strip (all themes). */
+/** Minimal battery/power strip layout (no duplicate CPU/RAM/GPU chips). */
 function ensureRamStripStyles() {
   if (document.getElementById('mac-stats-ram-strip-styles')) return;
   const style = document.createElement('style');
@@ -2303,27 +2331,6 @@ function ensureRamStripStyles() {
       flex-wrap: wrap;
       gap: 8px 12px;
     }
-    .cpu-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      border-radius: 8px;
-      padding: 2px 6px;
-      margin: -2px -6px;
-      outline: none;
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .cpu-info:hover {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
-    }
-    .cpu-info:focus-visible {
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
-    }
-    .cpu-info.is-hot {
-      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
-    }
     .battery-info.is-low {
       border-radius: 8px;
       padding: 2px 6px;
@@ -2332,47 +2339,15 @@ function ensureRamStripStyles() {
       box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
       transition: background-color 0.2s ease, box-shadow 0.2s ease;
     }
-    .cpu-label {
-      color: var(--muted);
+    #battery-power-strip.is-lpm-highlight {
+      box-shadow: 0 0 0 2px color-mix(in srgb, #34c759 40%, transparent);
     }
-    .cpu-value {
-      font-weight: 650;
-      letter-spacing: -0.01em;
-      color: var(--text);
-    }
-    #cpu-usage-card.is-cpu-highlight {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
-      border-radius: 10px;
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
-    }
-    .ram-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      border-radius: 8px;
-      padding: 2px 6px;
-      margin: -2px -6px;
-      outline: none;
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .ram-info:hover {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
-    }
-    .ram-info:focus-visible {
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
-    }
-    .ram-info.is-hot {
-      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
-    }
-    .ram-label {
-      color: var(--muted);
-    }
-    .ram-value {
-      font-weight: 650;
-      letter-spacing: -0.01em;
-      color: var(--text);
+    .power-strip-kb-hint {
+      margin: 2px 0 0;
+      font-size: 11px;
+      opacity: 0.72;
+      width: 100%;
+      flex-basis: 100%;
     }
     .detail-label.is-ram-highlight,
     .detail-value.is-ram-highlight {
@@ -2380,34 +2355,10 @@ function ensureRamStripStyles() {
       border-radius: 6px;
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
     }
-    .gpu-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      border-radius: 8px;
-      padding: 2px 6px;
-      margin: -2px -6px;
-      outline: none;
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .gpu-info:hover {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
-    }
-    .gpu-info:focus-visible {
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
-    }
-    .gpu-info.is-hot {
-      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
-    }
-    .gpu-label {
-      color: var(--muted);
-    }
-    .gpu-value {
-      font-weight: 650;
-      letter-spacing: -0.01em;
-      color: var(--text);
+    #cpu-usage-card.is-cpu-highlight {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+      border-radius: 10px;
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
     }
     .metric-card.is-gpu-highlight,
     #gpu-power.is-gpu-highlight {
@@ -2415,136 +2366,16 @@ function ensureRamStripStyles() {
       border-radius: 10px;
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
     }
-    .temp-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      border-radius: 8px;
-      padding: 2px 6px;
-      margin: -2px -6px;
-      outline: none;
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .temp-info:hover {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
-    }
-    .temp-info:focus-visible {
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
-    }
-    .temp-info.is-hot {
-      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
-    }
-    .temp-label {
-      color: var(--muted);
-    }
-    .temp-value {
-      font-weight: 650;
-      letter-spacing: -0.01em;
-      color: var(--text);
-    }
-    .metric-card.is-temp-highlight {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
-      border-radius: 10px;
-      box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
-    }
-    .freq-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      border-radius: 8px;
-      padding: 2px 6px;
-      margin: -2px -6px;
-      outline: none;
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .freq-info:hover {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
-    }
-    .freq-info:focus-visible {
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
-    }
-    .freq-info.is-hot {
-      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
-    }
-    .freq-label {
-      color: var(--muted);
-    }
-    .freq-value {
-      font-weight: 650;
-      letter-spacing: -0.01em;
-      color: var(--text);
-    }
+    .metric-card.is-temp-highlight,
     .metric-card.is-freq-highlight {
       background-color: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
       border-radius: 10px;
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
     }
-    .disk-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      border-radius: 8px;
-      padding: 2px 6px;
-      margin: -2px -6px;
-      outline: none;
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .disk-info:hover {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
-    }
-    .disk-info:focus-visible {
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
-    }
-    .disk-info.is-hot {
-      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
-    }
-    .disk-label {
-      color: var(--muted);
-    }
-    .disk-value {
-      font-weight: 650;
-      letter-spacing: -0.01em;
-      color: var(--text);
-    }
     .disk-cleanup-section.is-disk-highlight {
       background-color: color-mix(in srgb, var(--accent, #0a84ff) 10%, transparent);
       border-radius: 12px;
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 14%, transparent);
-    }
-    .uptime-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      border-radius: 8px;
-      padding: 2px 6px;
-      margin: -2px -6px;
-      outline: none;
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .uptime-info:hover {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
-    }
-    .uptime-info:focus-visible {
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
-    }
-    .uptime-info.is-long {
-      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
-    }
-    .uptime-label {
-      color: var(--muted);
-    }
-    .uptime-value {
-      font-weight: 650;
-      letter-spacing: -0.01em;
-      color: var(--text);
     }
     .detail-label.is-uptime-highlight,
     .detail-value.is-uptime-highlight {
@@ -2552,86 +2383,13 @@ function ensureRamStripStyles() {
       border-radius: 6px;
       box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
     }
-    .thermal-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      border-radius: 8px;
-      padding: 2px 6px;
-      margin: -2px -6px;
-      outline: none;
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .thermal-info:hover {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
-    }
-    .thermal-info:focus-visible {
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
-    }
-    .thermal-info.is-fair {
-      background-color: color-mix(in srgb, #ffd60a 12%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in srgb, #ffd60a 28%, transparent);
-    }
-    .thermal-info.is-hot {
-      background-color: color-mix(in srgb, #ff9f0a 16%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 35%, transparent);
-    }
-    .thermal-info.is-critical {
-      background-color: color-mix(in srgb, #ff453a 18%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in srgb, #ff453a 40%, transparent);
-    }
-    .thermal-label {
-      color: var(--muted);
-    }
-    .thermal-value {
-      font-weight: 650;
-      letter-spacing: -0.01em;
-      color: var(--text);
-    }
-    .lpm-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      border-radius: 8px;
-      padding: 2px 6px;
-      margin: -2px -6px;
-      outline: none;
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .lpm-info:hover {
-      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
-    }
-    .lpm-info:focus-visible {
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
-    }
-    .lpm-info.is-on {
-      background-color: color-mix(in srgb, #30d158 16%, transparent);
-      box-shadow: 0 0 0 1px color-mix(in srgb, #30d158 35%, transparent);
-    }
-    .lpm-label {
-      color: var(--muted);
-    }
-    .lpm-value {
-      font-weight: 650;
-      letter-spacing: -0.01em;
-      color: var(--text);
-    }
-    #battery-power-strip.is-lpm-highlight {
-      background-color: color-mix(in srgb, #30d158 16%, transparent);
-      border-radius: 10px;
-      box-shadow: 0 0 0 4px color-mix(in srgb, #30d158 16%, transparent);
-    }
-    .power-strip-kb-hint {
-      margin: 4px 0 0;
-      font-size: 11px;
-      opacity: 0.72;
-      width: 100%;
-      flex-basis: 100%;
-    }
   `;
   document.head.appendChild(style);
+}
+
+function _metricStripStub() {
+  pruneMetricStripChips();
+  return null;
 }
 
 function flashRamDetails() {
@@ -2683,570 +2441,21 @@ function openCpuRingFromStrip() {
   flashCpuRing();
 }
 
-/**
- * CPU % on the battery/power strip (menu-bar parity). Click / Enter / Space
- * scrolls to the CPU ring and flashes it — not copy (`#cpu-usage-card` toggles
- * Details / Top Processes; copy on the ring value stole that in v0.1.513).
- * Soft amber wash when ≥ 50%.
- */
-function ensureCpuStrip() {
-  ensureRamStripStyles();
-  const strip = document.getElementById("battery-power-strip");
-  if (!strip) return null;
-  let cell = document.getElementById("cpu-strip");
-  if (!cell) {
-    cell = document.createElement("div");
-    cell.id = "cpu-strip";
-    cell.className = "cpu-info";
-    cell.setAttribute("role", "button");
-    cell.tabIndex = 0;
-    cell.title = "Show CPU ring";
-    cell.setAttribute("aria-label", "Show CPU ring");
-    cell.innerHTML =
-      '<span class="cpu-label">CPU</span>' +
-      '<span class="cpu-value" id="cpu-strip-value">—</span>';
-    const timeEl = document.getElementById("time-remaining");
-    if (timeEl) strip.insertBefore(cell, timeEl);
-    else strip.insertBefore(cell, strip.firstChild);
-  }
-  if (cell.dataset.cpuStripWired === "1") return cell;
-  cell.dataset.cpuStripWired = "1";
-  const openCpu = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openCpuRingFromStrip();
-  };
-  cell.addEventListener("click", openCpu);
-  cell.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    openCpu(e);
-  });
-  return cell;
-}
-
-/**
- * RAM % on the battery/power strip (menu-bar parity). Click / Enter / Space
- * opens Details and flashes the RAM rows — not copy (battery/power already copy).
- */
-function ensureRamStrip() {
-  ensureRamStripStyles();
-  const strip = document.getElementById('battery-power-strip');
-  if (!strip) return null;
-  let cell = document.getElementById('ram-strip');
-  if (!cell) {
-    cell = document.createElement('div');
-    cell.id = 'ram-strip';
-    cell.className = 'ram-info';
-    cell.setAttribute('role', 'button');
-    cell.tabIndex = 0;
-    cell.title = 'Show RAM in Details';
-    cell.setAttribute('aria-label', 'Show RAM in Details');
-    cell.innerHTML =
-      '<span class="ram-label">RAM</span>' +
-      '<span class="ram-value" id="ram-strip-value">—</span>';
-    const timeEl = document.getElementById('time-remaining');
-    if (timeEl) strip.insertBefore(cell, timeEl);
-    else strip.appendChild(cell);
-  }
-  if (cell.dataset.ramStripWired === '1') return cell;
-  cell.dataset.ramStripWired = '1';
-  const openRam = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openRamDetailsFromStrip();
-  };
-  cell.addEventListener('click', openRam);
-  cell.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    openRam(e);
-  });
-  return cell;
-}
-
-function flashGpuRing() {
-  const gpuVal = document.getElementById("gpu-usage-value");
-  const card = gpuVal && gpuVal.closest ? gpuVal.closest(".metric-card") : null;
-  const powerEl = document.getElementById("gpu-power");
-  const targets = [card, powerEl].filter(Boolean);
-  for (const el of targets) {
-    el.classList.add("is-gpu-highlight");
-    window.setTimeout(() => {
-      el.classList.remove("is-gpu-highlight");
-    }, 1600);
-  }
-}
-
-function openGpuRingFromStrip() {
-  const gpuVal = document.getElementById("gpu-usage-value");
-  if (gpuVal && typeof gpuVal.scrollIntoView === "function") {
-    gpuVal.scrollIntoView({ block: "nearest", behavior: "smooth" });
-  }
-  flashGpuRing();
-}
-
-/**
- * GPU % on the battery/power strip (RAM strip / menu-bar parity). Click /
- * Enter / Space scrolls to the GPU ring and flashes it — not copy (the ring
- * value already copies).
- */
-function ensureGpuStrip() {
-  ensureRamStripStyles();
-  const strip = document.getElementById("battery-power-strip");
-  if (!strip) return null;
-  let cell = document.getElementById("gpu-strip");
-  if (!cell) {
-    cell = document.createElement("div");
-    cell.id = "gpu-strip";
-    cell.className = "gpu-info";
-    cell.setAttribute("role", "button");
-    cell.tabIndex = 0;
-    cell.title = "Show GPU ring";
-    cell.setAttribute("aria-label", "Show GPU ring");
-    cell.innerHTML =
-      '<span class="gpu-label">GPU</span>' +
-      '<span class="gpu-value" id="gpu-strip-value">—</span>';
-    const ramEl = document.getElementById("ram-strip");
-    const timeEl = document.getElementById("time-remaining");
-    if (ramEl && ramEl.nextSibling) strip.insertBefore(cell, ramEl.nextSibling);
-    else if (timeEl) strip.insertBefore(cell, timeEl);
-    else strip.appendChild(cell);
-  }
-  if (cell.dataset.gpuStripWired === "1") return cell;
-  cell.dataset.gpuStripWired = "1";
-  const openGpu = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openGpuRingFromStrip();
-  };
-  cell.addEventListener("click", openGpu);
-  cell.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    openGpu(e);
-  });
-  return cell;
-}
-
-function flashTempRing() {
-  const tempVal = document.getElementById("temperature-value");
-  const card = tempVal && tempVal.closest ? tempVal.closest(".metric-card") : null;
-  if (!card) return;
-  card.classList.add("is-temp-highlight");
-  window.setTimeout(() => {
-    card.classList.remove("is-temp-highlight");
-  }, 1600);
-}
-
-function openTempRingFromStrip() {
-  const tempVal = document.getElementById("temperature-value");
-  if (tempVal && typeof tempVal.scrollIntoView === "function") {
-    tempVal.scrollIntoView({ block: "nearest", behavior: "smooth" });
-  }
-  flashTempRing();
-}
-
-/**
- * Temperature °C on the battery/power strip (GPU/RAM strip parity). Click /
- * Enter / Space scrolls to the temperature ring and flashes it — not copy
- * (the ring value already copies). Soft amber wash when ≥ 70°C (Serious).
- */
-function ensureTempStrip() {
-  ensureRamStripStyles();
-  const strip = document.getElementById("battery-power-strip");
-  if (!strip) return null;
-  let cell = document.getElementById("temp-strip");
-  if (!cell) {
-    cell = document.createElement("div");
-    cell.id = "temp-strip";
-    cell.className = "temp-info";
-    cell.setAttribute("role", "button");
-    cell.tabIndex = 0;
-    cell.title = "Show temperature ring";
-    cell.setAttribute("aria-label", "Show temperature ring");
-    cell.innerHTML =
-      '<span class="temp-label">Temp</span>' +
-      '<span class="temp-value" id="temp-strip-value">—</span>';
-    const gpuEl = document.getElementById("gpu-strip");
-    const timeEl = document.getElementById("time-remaining");
-    if (gpuEl && gpuEl.nextSibling) strip.insertBefore(cell, gpuEl.nextSibling);
-    else if (timeEl) strip.insertBefore(cell, timeEl);
-    else strip.appendChild(cell);
-  }
-  if (cell.dataset.tempStripWired === "1") return cell;
-  cell.dataset.tempStripWired = "1";
-  const openTemp = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openTempRingFromStrip();
-  };
-  cell.addEventListener("click", openTemp);
-  cell.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    openTemp(e);
-  });
-  return cell;
-}
-
-/** Map die temp °C → thermal band (fallback when OS thermalState is unavailable). */
-function thermalLevelFromTemp(temp, canRead) {
-  if (!canRead || typeof temp !== "number" || !Number.isFinite(temp)) {
-    return null;
-  }
-  if (temp >= 85) return "Critical";
-  if (temp >= 70) return "Serious";
-  if (temp >= 50) return "Fair";
-  return "Nominal";
-}
-
-/** Prefer Apple NSProcessInfo.thermalState; else °C bands (Heat strip / temp subtext). */
-function thermalLevelFromCpuDetails(data) {
-  const os =
-    data && typeof data.thermal_state === "string"
-      ? data.thermal_state.trim()
-      : "";
-  if (
-    os === "Nominal" ||
-    os === "Fair" ||
-    os === "Serious" ||
-    os === "Critical"
-  ) {
-    return os;
-  }
-  return thermalLevelFromTemp(
-    data && data.temperature,
-    !!(data && data.can_read_temperature && data.temperature > 0)
-  );
-}
-
-/**
- * Thermal band on the battery/power strip. Prefers Apple NSProcessInfo
- * thermalState (Nominal/Fair/Serious/Critical); falls back to °C bands.
- * Click / Enter / Space scrolls to the temperature ring. Soft yellow wash Fair;
- * amber wash Serious; red wash Critical.
- */
-function ensureThermalStrip() {
-  ensureRamStripStyles();
-  const strip = document.getElementById("battery-power-strip");
-  if (!strip) return null;
-  let cell = document.getElementById("thermal-strip");
-  if (!cell) {
-    cell = document.createElement("div");
-    cell.id = "thermal-strip";
-    cell.className = "thermal-info";
-    cell.setAttribute("role", "button");
-    cell.tabIndex = 0;
-    cell.title = "Show temperature ring";
-    cell.setAttribute("aria-label", "Show temperature ring");
-    cell.innerHTML =
-      '<span class="thermal-label">Heat</span>' +
-      '<span class="thermal-value" id="thermal-strip-value">—</span>';
-    const tempEl = document.getElementById("temp-strip");
-    const timeEl = document.getElementById("time-remaining");
-    if (tempEl && tempEl.nextSibling) strip.insertBefore(cell, tempEl.nextSibling);
-    else if (timeEl) strip.insertBefore(cell, timeEl);
-    else strip.appendChild(cell);
-  }
-  if (cell.dataset.thermalStripWired === "1") return cell;
-  cell.dataset.thermalStripWired = "1";
-  const openThermal = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openTempRingFromStrip();
-  };
-  cell.addEventListener("click", openThermal);
-  cell.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    openThermal(e);
-  });
-  return cell;
-}
-
-async function openBatterySettingsFromStrip() {
-  const urls = [
-    "x-apple.systempreferences:com.apple.Battery-Settings.extension",
-    "x-apple.systempreferences:com.apple.preference.battery",
-  ];
-  const invokeFn =
-    typeof getInvoke === "function" ? getInvoke() : null;
-  for (const url of urls) {
-    try {
-      if (invokeFn) {
-        await invokeFn("plugin:shell|open", { path: url });
-        return;
-      }
-    } catch (_) {
-      /* try next */
-    }
-    try {
-      if (window.__TAURI__?.shell?.open) {
-        await window.__TAURI__.shell.open(url);
-        return;
-      }
-    } catch (_) {
-      /* try next */
-    }
-  }
-  const strip = document.getElementById("battery-power-strip");
-  if (strip) {
-    strip.classList.add("is-lpm-highlight");
-    window.setTimeout(() => strip.classList.remove("is-lpm-highlight"), 1600);
-  }
-}
-
-/**
- * Low Power Mode on the battery/power strip (Heat / NSProcessInfo parity).
- * Label LPM + On/Off from `isLowPowerModeEnabled`. Click / Enter / Space opens
- * Battery settings. Soft green wash when On.
- */
-function ensureLowPowerStrip() {
-  ensureRamStripStyles();
-  const strip = document.getElementById("battery-power-strip");
-  if (!strip) return null;
-  let cell = document.getElementById("lpm-strip");
-  if (!cell) {
-    cell = document.createElement("div");
-    cell.id = "lpm-strip";
-    cell.className = "lpm-info";
-    cell.setAttribute("role", "button");
-    cell.tabIndex = 0;
-    cell.title = "Open Battery settings (Low Power Mode)";
-    cell.setAttribute("aria-label", "Open Battery settings (Low Power Mode)");
-    cell.innerHTML =
-      '<span class="lpm-label">LPM</span>' +
-      '<span class="lpm-value" id="lpm-strip-value">—</span>';
-    const thermalEl = document.getElementById("thermal-strip");
-    const tempEl = document.getElementById("temp-strip");
-    const anchor = thermalEl || tempEl;
-    const timeEl = document.getElementById("time-remaining");
-    if (anchor && anchor.nextSibling) strip.insertBefore(cell, anchor.nextSibling);
-    else if (timeEl) strip.insertBefore(cell, timeEl);
-    else strip.appendChild(cell);
-  }
-  if (cell.dataset.lpmStripWired === "1") return cell;
-  cell.dataset.lpmStripWired = "1";
-  const openLpm = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openBatterySettingsFromStrip();
-  };
-  cell.addEventListener("click", openLpm);
-  cell.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    openLpm(e);
-  });
-  return cell;
-}
-
-function flashFreqRing() {
-  const freqVal = document.getElementById("frequency-value");
-  const card = freqVal && freqVal.closest ? freqVal.closest(".metric-card") : null;
-  if (!card) return;
-  card.classList.add("is-freq-highlight");
-  window.setTimeout(() => {
-    card.classList.remove("is-freq-highlight");
-  }, 1600);
-}
-
-function openFreqRingFromStrip() {
-  const freqVal = document.getElementById("frequency-value");
-  if (freqVal && typeof freqVal.scrollIntoView === "function") {
-    freqVal.scrollIntoView({ block: "nearest", behavior: "smooth" });
-  }
-  flashFreqRing();
-}
-
-/**
- * CPU frequency GHz on the battery/power strip (GPU/Temp strip parity). Click /
- * Enter / Space scrolls to the frequency ring and flashes it — not copy (the
- * ring value already copies). Soft amber wash when ≥ 3.5 GHz (active boost).
- */
-function ensureFreqStrip() {
-  ensureRamStripStyles();
-  const strip = document.getElementById("battery-power-strip");
-  if (!strip) return null;
-  let cell = document.getElementById("freq-strip");
-  if (!cell) {
-    cell = document.createElement("div");
-    cell.id = "freq-strip";
-    cell.className = "freq-info";
-    cell.setAttribute("role", "button");
-    cell.tabIndex = 0;
-    cell.title = "Show frequency ring";
-    cell.setAttribute("aria-label", "Show frequency ring");
-    cell.innerHTML =
-      '<span class="freq-label">GHz</span>' +
-      '<span class="freq-value" id="freq-strip-value">—</span>';
-    const lpmEl = document.getElementById("lpm-strip");
-    const thermalEl = document.getElementById("thermal-strip");
-    const tempEl = document.getElementById("temp-strip");
-    const anchor = lpmEl || thermalEl || tempEl;
-    const timeEl = document.getElementById("time-remaining");
-    if (anchor && anchor.nextSibling) strip.insertBefore(cell, anchor.nextSibling);
-    else if (timeEl) strip.insertBefore(cell, timeEl);
-    else strip.appendChild(cell);
-  }
-  if (cell.dataset.freqStripWired === "1") return cell;
-  cell.dataset.freqStripWired = "1";
-  const openFreq = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openFreqRingFromStrip();
-  };
-  cell.addEventListener("click", openFreq);
-  cell.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    openFreq(e);
-  });
-  return cell;
-}
-
-function flashDiskCleanupSection() {
-  const section = document.querySelector('.disk-cleanup-section');
-  if (!section) return;
-  section.classList.add('is-disk-highlight');
-  window.setTimeout(() => {
-    section.classList.remove('is-disk-highlight');
-  }, 1600);
-}
-
-function openDiskCleanupFromStrip() {
-  if (typeof ensureDiskCleanupSectionExpanded === 'function') {
-    ensureDiskCleanupSectionExpanded();
-  }
-  const header = document.getElementById('disk-cleanup-header');
-  if (header && typeof header.scrollIntoView === 'function') {
-    header.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  }
-  flashDiskCleanupSection();
-}
-
-/**
- * SSD % on the battery/power strip (menu-bar parity). Click / Enter / Space
- * opens Disk Cleanup and flashes the section — not copy.
- */
-function ensureDiskStrip() {
-  ensureRamStripStyles();
-  const strip = document.getElementById('battery-power-strip');
-  if (!strip) return null;
-  let cell = document.getElementById('disk-strip');
-  if (!cell) {
-    cell = document.createElement('div');
-    cell.id = 'disk-strip';
-    cell.className = 'disk-info';
-    cell.setAttribute('role', 'button');
-    cell.tabIndex = 0;
-    cell.title = 'Show Disk Cleanup';
-    cell.setAttribute('aria-label', 'Show Disk Cleanup');
-    cell.innerHTML =
-      '<span class="disk-label">SSD</span>' +
-      '<span class="disk-value" id="disk-strip-value">—</span>';
-    const freqEl = document.getElementById('freq-strip');
-    const timeEl = document.getElementById('time-remaining');
-    if (freqEl && freqEl.nextSibling) strip.insertBefore(cell, freqEl.nextSibling);
-    else if (timeEl) strip.insertBefore(cell, timeEl);
-    else strip.appendChild(cell);
-  }
-  if (cell.dataset.diskStripWired === '1') return cell;
-  cell.dataset.diskStripWired = '1';
-  const openDisk = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openDiskCleanupFromStrip();
-  };
-  cell.addEventListener('click', openDisk);
-  cell.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    openDisk(e);
-  });
-  return cell;
-}
-
-function flashUptimeDetails() {
-  const el = document.getElementById('uptime-value');
-  if (!el) return;
-  el.classList.add('is-uptime-highlight');
-  const label = el.previousElementSibling;
-  if (label && label.classList.contains('detail-label')) {
-    label.classList.add('is-uptime-highlight');
-  }
-  window.setTimeout(() => {
-    el.classList.remove('is-uptime-highlight');
-    if (label && label.classList.contains('detail-label')) {
-      label.classList.remove('is-uptime-highlight');
-    }
-  }, 1600);
-}
-
-function openUptimeFromStrip() {
-  if (typeof window.showCpuDetailsSection === 'function') {
-    window.showCpuDetailsSection();
-  } else if (typeof window.showDetailsProcessesSections === 'function') {
-    window.showDetailsProcessesSections();
-  }
-  const uptimeEl = document.getElementById('uptime-value');
-  if (uptimeEl && typeof uptimeEl.scrollIntoView === 'function') {
-    uptimeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  }
-  flashUptimeDetails();
-}
-
-/**
- * Uptime on the battery/power strip (RAM / SSD strip parity). Click / Enter /
- * Space opens Details and flashes the Uptime row. Soft amber wash when ≥ 7d.
- */
-function ensureUptimeStrip() {
-  ensureRamStripStyles();
-  const strip = document.getElementById('battery-power-strip');
-  if (!strip) return null;
-  let cell = document.getElementById('uptime-strip');
-  if (!cell) {
-    cell = document.createElement('div');
-    cell.id = 'uptime-strip';
-    cell.className = 'uptime-info';
-    cell.setAttribute('role', 'button');
-    cell.tabIndex = 0;
-    cell.title = 'Show uptime in Details';
-    cell.setAttribute('aria-label', 'Show uptime in Details');
-    cell.innerHTML =
-      '<span class="uptime-label">Up</span>' +
-      '<span class="uptime-value" id="uptime-strip-value">—</span>';
-    const diskEl = document.getElementById('disk-strip');
-    const timeEl = document.getElementById('time-remaining');
-    if (diskEl && diskEl.nextSibling) strip.insertBefore(cell, diskEl.nextSibling);
-    else if (timeEl) strip.insertBefore(cell, timeEl);
-    else strip.appendChild(cell);
-  }
-  if (cell.dataset.uptimeStripWired === '1') return cell;
-  cell.dataset.uptimeStripWired = '1';
-  const openUptime = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openUptimeFromStrip();
-  };
-  cell.addEventListener('click', openUptime);
-  cell.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    openUptime(e);
-  });
-  return cell;
-}
+function ensureCpuStrip() { return _metricStripStub(); }
+function ensureRamStrip() { return _metricStripStub(); }
+function ensureGpuStrip() { return _metricStripStub(); }
+function ensureTempStrip() { return _metricStripStub(); }
+function ensureThermalStrip() { return _metricStripStub(); }
+function ensureLowPowerStrip() { return _metricStripStub(); }
+function ensureFreqStrip() { return _metricStripStub(); }
+function ensureDiskStrip() { return _metricStripStub(); }
+function ensureUptimeStrip() { return _metricStripStub(); }
 
 /** Focusable chips on #battery-power-strip (DOM order). */
 function getPowerStripChips() {
   const strip = document.getElementById('battery-power-strip');
   if (!strip) return [];
-  const sel = [
-    '#cpu-strip',
-    '#ram-strip',
-    '#gpu-strip',
-    '#temp-strip',
-    '#thermal-strip',
-    '#lpm-strip',
-    '#freq-strip',
-    '#disk-strip',
-    '#uptime-strip',
-    '#battery-level',
-    '#power-value',
-  ].join(',');
+  const sel = ['#battery-level', '#power-value'].join(',');
   return Array.from(strip.querySelectorAll(sel)).filter((el) => {
     if (!el || el.hidden) return false;
     // Prefer laid-out chips; keep just-created nodes before first paint.
@@ -3282,8 +2491,7 @@ function ensurePowerStripKbHint() {
     hint.setAttribute('aria-hidden', 'true');
     strip.appendChild(hint);
   }
-  hint.textContent =
-    '← → / h l · Home/End move · Enter / Space activates (or copies Bat / Power)';
+  hint.textContent = 'Click battery or power to copy';
 }
 
 /**
@@ -5227,55 +4435,15 @@ function initMonitorsSection() {
   // Restore saved state
   monitorsCollapsed = getMonitorsCollapsedState();
   updateMonitorsStatusDot();
-  const divider = document.getElementById('monitors-ollama-divider');
-  if (monitorsCollapsed) {
-    content.classList.add('collapsed');
-    if (section) {
-      section.classList.add('collapsed');
-    }
-    if (divider) {
-      divider.style.display = 'none';
-    }
-    // Summary-only poll while collapsed (collapsed glance).
-    if (!monitorsUpdateInterval) {
-      monitorsUpdateInterval = setInterval(() => {
-        updateMonitorsSummary();
-      }, 30000);
-    }
-  } else {
-    content.classList.remove('collapsed');
-    if (section) {
-      section.classList.remove('collapsed');
-    }
-    if (divider) {
-      divider.style.display = '';
-    }
-    // Update monitors every 30 seconds
-    if (!monitorsUpdateInterval) {
-      monitorsUpdateInterval = setInterval(() => {
-        updateMonitorsSummary();
-        loadMonitors().then(() => {
-          updateMonitorsHeight();
-        });
-      }, 30000);
-    }
-  }
-  syncSectionIcon('icon-monitors', !monitorsCollapsed);
-  syncMonitorsCollapsedGlance();
 
   // Make header clickable/keyboardable to toggle collapse/expand
   const applyMonitorsCollapsed = () => {
     const section = document.querySelector('.monitors-section');
     const divider = document.getElementById('monitors-ollama-divider');
 
+    setIconPaneVisibility(section, content, monitorsCollapsed, divider);
+
     if (monitorsCollapsed) {
-      content.classList.add('collapsed');
-      if (section) {
-        section.classList.add('collapsed');
-      }
-      if (divider) {
-        divider.style.display = 'none';
-      }
       // Keep a light summary poll so the collapsed glance stays fresh (no list rebuild).
       if (monitorsUpdateInterval) {
         clearInterval(monitorsUpdateInterval);
@@ -5285,17 +4453,6 @@ function initMonitorsSection() {
         updateMonitorsSummary();
       }, 30000);
     } else {
-      content.classList.remove('collapsed');
-      if (section) {
-        section.classList.remove('collapsed');
-      }
-      if (divider) {
-        divider.style.display = '';
-      }
-      // Just update height based on existing content - don't trigger backend calls
-      // The interval will handle data updates
-      updateMonitorsHeight();
-
       if (monitorsUpdateInterval) {
         clearInterval(monitorsUpdateInterval);
         monitorsUpdateInterval = null;
@@ -5313,6 +4470,7 @@ function initMonitorsSection() {
     syncSectionIcon('icon-monitors', !monitorsCollapsed);
     syncMonitorsCollapsedGlance();
   };
+  applyMonitorsCollapsed();
 
   wireCollapsibleHeaderA11y(header, {
     contentId: 'monitors-content',
@@ -8144,24 +7302,12 @@ function initOllamaSection() {
     const divider = document.getElementById('monitors-ollama-divider');
     const chat = document.getElementById('ollama-chat');
 
+    setIconPaneVisibility(section, content, ollamaCollapsed, divider);
+
     if (ollamaCollapsed) {
-      content.classList.add('collapsed');
-      if (section) {
-        section.classList.add('collapsed');
-      }
-      if (divider) {
-        divider.style.display = 'none';
-      }
       if (chat) chat.style.display = 'none';
       hideModelDropdown();
     } else {
-      content.classList.remove('collapsed');
-      if (section) {
-        section.classList.remove('collapsed');
-      }
-      if (divider) {
-        divider.style.display = '';
-      }
       if (chat) chat.style.display = 'block';
       checkOllamaConnection().then((connected) => {
         // Update icon based on connection result
@@ -9458,14 +8604,15 @@ function initCollapsibleSections() {
     );
   }
 
-  // Collapse Details: keep header + Load/RAM/Up glance (Top Processes / Debug Log parity).
+  // Collapse Details: fully hidden (icon-line / CPU card toggles).
   function hideDetails() {
     if (detailsSection) {
       detailsSection.classList.add("collapsed");
-      detailsSection.style.display = "";
+      detailsSection.style.display = "none";
+      detailsSection.setAttribute("aria-hidden", "true");
     }
     if (detailsDivider && isDivider(detailsDivider)) {
-      detailsDivider.style.display = "";
+      detailsDivider.style.display = "none";
     }
     syncDetailsCollapseA11y();
     refreshDetailsCollapsedGlanceFromDom();
@@ -9476,6 +8623,7 @@ function initCollapsibleSections() {
     if (detailsSection) {
       detailsSection.classList.remove("collapsed");
       detailsSection.style.display = "";
+      detailsSection.removeAttribute("aria-hidden");
     }
     if (detailsDivider && isDivider(detailsDivider)) {
       detailsDivider.style.display = "";
@@ -9499,11 +8647,11 @@ function initCollapsibleSections() {
   function hideProcesses() {
     if (processesSection) {
       processesSection.classList.add('collapsed');
-      processesSection.style.display = '';
+      processesSection.style.display = 'none';
+      processesSection.setAttribute('aria-hidden', 'true');
     }
-    // Details keep-header stays visible when collapsed — keep divider between sections.
     if (processesDivider && isDivider(processesDivider)) {
-      processesDivider.style.display = '';
+      processesDivider.style.display = 'none';
     }
     syncProcessesCollapseA11y();
     // Refresh quiet Waiting glance when list is empty while collapsed.
@@ -9523,6 +8671,7 @@ function initCollapsibleSections() {
     if (processesSection) {
       processesSection.classList.remove('collapsed');
       processesSection.style.display = '';
+      processesSection.removeAttribute('aria-hidden');
     }
     if (processesDivider && isDivider(processesDivider)) {
       processesDivider.style.display = '';
@@ -10671,15 +9820,7 @@ function initPerplexitySection() {
 
   perplexityCollapsed = getSectionCollapsed('perplexity_collapsed');
   const applyPerplexityCollapsed = () => {
-    if (perplexityCollapsed) {
-      content.classList.add('collapsed');
-      if (section) section.classList.add('collapsed');
-      if (divider) divider.style.display = 'none';
-    } else {
-      content.classList.remove('collapsed');
-      if (section) section.classList.remove('collapsed');
-      if (divider) divider.style.display = '';
-    }
+    setIconPaneVisibility(section, content, perplexityCollapsed, divider);
     if (header._syncCollapseA11y) header._syncCollapseA11y();
     applyPerplexityLastGlanceState();
     refreshPerplexityStatus();
@@ -13751,15 +12892,12 @@ function initDiskCleanupSection() {
 
   diskCleanupCollapsed = getSectionCollapsed('disk_cleanup_collapsed');
   const applyCollapsed = () => {
+    setIconPaneVisibility(section, content, diskCleanupCollapsed, null);
     if (diskCleanupCollapsed) {
-      content.classList.add('collapsed');
-      if (section) section.classList.add('collapsed');
       // Shallow status poll so the collapsed glance stays fresh (no deep Downloads scan).
       void refreshDiskCleanupPanel({ deep: false });
       startDiskCleanupGlancePoll();
     } else {
-      content.classList.remove('collapsed');
-      if (section) section.classList.remove('collapsed');
       stopDiskCleanupGlancePoll();
       refreshDiskCleanupPanel();
     }
@@ -14105,16 +13243,11 @@ function initLogsSection() {
 
   logsSectionCollapsed = getSectionCollapsed('logs_collapsed');
   const applyCollapsed = () => {
+    setIconPaneVisibility(section, content, logsSectionCollapsed, divider);
     if (logsSectionCollapsed) {
-      content.classList.add('collapsed');
-      if (section) section.classList.add('collapsed');
-      if (divider) divider.style.display = 'none';
       stopLogsAutoRefresh();
       applyLogsGlanceState(logsGlanceCounts);
     } else {
-      content.classList.remove('collapsed');
-      if (section) section.classList.remove('collapsed');
-      if (divider) divider.style.display = '';
       refreshLogsViewer(true);
       if (autoCb && autoCb.checked) startLogsAutoRefresh();
     }

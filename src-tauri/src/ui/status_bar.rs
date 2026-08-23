@@ -82,7 +82,11 @@ pub fn process_menu_bar_update() {
 
         if let Some(text) = update_text {
             debug3!("Processing menu bar update: '{}'", text);
-            let attributed = make_attributed_title(&text);
+            let metrics = crate::state::MENU_BAR_METRICS
+                .try_lock()
+                .ok()
+                .and_then(|g| g.clone());
+            let attributed = make_attributed_title(&text, metrics.as_ref());
             STATUS_ITEM.with(|cell| {
                 if let Some(item) = cell.borrow().as_ref() {
                     if let Some(button) = item.button(mtm) {
@@ -110,7 +114,10 @@ pub fn process_menu_bar_update() {
 }
 
 /// Create attributed title string for status bar
-pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> {
+pub fn make_attributed_title(
+    text: &str,
+    metrics: Option<&SystemMetrics>,
+) -> Retained<NSMutableAttributedString> {
     let ns_text = NSString::from_str(text);
     let attributed = NSMutableAttributedString::from_nsstring(&ns_text);
     let length = ns_text.length();
@@ -282,6 +289,54 @@ pub fn make_attributed_title(text: &str) -> Retained<NSMutableAttributedString> 
             utf16_pos += line_utf16;
             if i + 1 < lines.len() {
                 utf16_pos += 1; // newline
+            }
+        }
+
+        // Amber on hot metric values (no extra cue lines — keeps the status item short).
+        if let Some(metrics) = metrics {
+            let full_mode = lines.first().is_some_and(|l| l.contains("GPU"));
+            if let Some(value_line) = lines.get(1) {
+                let value_line_start = lines[0].encode_utf16().count() + 1;
+                let parts: Vec<&str> = value_line.split('\t').collect();
+                let mut col_utf16 = value_line_start;
+                for (i, part) in parts.iter().enumerate() {
+                    let part_utf16 = part.encode_utf16().count();
+                    let hot = if full_mode {
+                        match i {
+                            0 => metrics.cpu >= 50.0,
+                            1 => metrics.gpu >= 15.0,
+                            2 => metrics.ram >= 85.0,
+                            3 => metrics.disk >= 85.0,
+                            _ => false,
+                        }
+                    } else {
+                        match i {
+                            0 => metrics.cpu >= 50.0,
+                            1 => metrics.disk >= 85.0,
+                            2 => crate::state::TEMP_CACHE
+                                .try_lock()
+                                .ok()
+                                .and_then(|g| g.as_ref().map(|(t, _)| *t))
+                                .is_some_and(|t| t >= 70.0),
+                            _ => false,
+                        }
+                    };
+                    if hot && part_utf16 > 0 {
+                        let range = NSRange {
+                            location: col_utf16,
+                            length: part_utf16,
+                        };
+                        attributed.addAttribute_value_range(
+                            NSForegroundColorAttributeName,
+                            as_any(&*heat_serious_color),
+                            range,
+                        );
+                    }
+                    col_utf16 += part_utf16;
+                    if i + 1 < parts.len() {
+                        col_utf16 += 1; // tab
+                    }
+                }
             }
         }
     }
