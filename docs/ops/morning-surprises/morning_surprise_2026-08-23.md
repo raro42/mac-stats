@@ -1,10 +1,10 @@
 # Morning surprise — 2026-08-23
 
-Overnight Track B extended toolbar keyboard parity into Top Processes detail hero while digester open stayed empty.
+Overnight Track B extended toolbar keyboard parity through Top Processes detail hero and force-quit while digester open stayed empty.
 
 ## Latest keep (this tick)
 
-**v0.1.613** — Top Processes detail hero toolbar keyboard: focus name · PID, then ← → / h l / Home / End moves across copy chips (Disk Cleanup add-scope / Monitors detail parity). Enter / Space keeps copy activate. Soft kb hint when both are visible; one Tab stop via roving tabindex.
+**v0.1.614** — Top Processes force-quit toolbar keyboard: focus Advanced summary · Force Quit, then ← → / h l / Home / End moves across controls (detail hero toolbar parity). Enter / Space keeps button activate. Soft kb hint when both are visible; one Tab stop via roving tabindex.
 
 ## Tonight's keeps (selected)
 
@@ -26,6 +26,7 @@ Overnight Track B extended toolbar keyboard parity into Top Processes detail her
 | **v0.1.611** | Monitors add-form toolbar keyboard |
 | **v0.1.612** | Disk Cleanup add-scope toolbar keyboard |
 | **v0.1.613** | Top Processes detail hero toolbar keyboard |
+| **v0.1.614** | Top Processes force-quit toolbar keyboard |
 
 ## Notes
 
