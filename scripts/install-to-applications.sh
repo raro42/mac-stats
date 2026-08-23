@@ -50,6 +50,12 @@ if ! grep -a -F -q "$EXPECTED_VER" "$BIN_SRC"; then
 fi
 echo "Release binary version check OK ($EXPECTED_VER)"
 
+INFO_PLIST="$APP/Contents/Info.plist"
+if [[ -f "$INFO_PLIST" ]]; then
+  /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $EXPECTED_VER" "$INFO_PLIST" 2>/dev/null || true
+  /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $EXPECTED_VER" "$INFO_PLIST" 2>/dev/null || true
+fi
+
 cp -f "$BIN_SRC" "$APP/Contents/MacOS/mac_stats"
 # Prefer size match over cmp -s: overnight hosts sometimes SIGKILL cmp on ~50MB Mach-O.
 DST_BIN="$APP/Contents/MacOS/mac_stats"
@@ -98,28 +104,20 @@ if [[ -f "$PLIST" ]]; then
   done
 fi
 
-# codesign --deep can hang on some macOS builds (overnight harness saw multi-minute stalls).
-# Time out and continue — binary is already replaced; LaunchAgent restart still proceeds.
-CODESIGN_TIMEOUT_SECS="${MAC_STATS_CODESIGN_TIMEOUT_SECS:-45}"
-codesign -s - --force --deep "$APP" &
-cs_pid=$!
-(
-  sleep "$CODESIGN_TIMEOUT_SECS"
-  if kill -0 "$cs_pid" 2>/dev/null; then
-    echo "codesign still running after ${CODESIGN_TIMEOUT_SECS}s — killing and continuing" >&2
-    kill "$cs_pid" 2>/dev/null || true
-  fi
-) &
-waiter_pid=$!
-set +e
-wait "$cs_pid"
-cs_status=$?
-set -e
-kill "$waiter_pid" 2>/dev/null || true
-wait "$waiter_pid" 2>/dev/null || true
-if [[ "$cs_status" -ne 0 ]]; then
-  echo "codesign did not complete cleanly (exit $cs_status) — app binary was still updated" >&2
+# Deep-sign the full .app after replacing the Mach-O. Do not restart with a broken
+# signature — macOS kills the process (SIGKILL CODESIGNING) and KeepAlive loops.
+CODESIGN_TIMEOUT_SECS="${MAC_STATS_CODESIGN_TIMEOUT_SECS:-180}"
+echo "codesign --deep (timeout ${CODESIGN_TIMEOUT_SECS}s)…"
+if ! perl -e "alarm shift; exec @ARGV" "$CODESIGN_TIMEOUT_SECS" codesign -s - --force --deep "$APP"; then
+  echo "ERROR: codesign failed or timed out after ${CODESIGN_TIMEOUT_SECS}s" >&2
+  echo "LaunchAgent was NOT restarted — fix signing before booting the app." >&2
+  exit 1
 fi
+if ! codesign --verify --deep --strict --verbose=2 "$APP" 2>&1; then
+  echo "ERROR: codesign verify failed — refusing to restart (would crash-loop)" >&2
+  exit 1
+fi
+echo "codesign verify OK"
 
 xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
 
