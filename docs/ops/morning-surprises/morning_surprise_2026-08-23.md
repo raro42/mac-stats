@@ -1,10 +1,10 @@
 # Morning surprise — 2026-08-23
 
-Overnight Track B extended Settings modal toolbar keyboard parity through the header while digester open stayed empty.
+Overnight Track B extended Settings modal toolbar keyboard parity through Appearance (themes + window frame) while digester open stayed empty.
 
 ## Latest keep (this tick)
 
-**v0.1.617** — Settings close/header toolbar keyboard: focus Settings title · Close, then ← → / h l / Home / End moves across header controls (Perplexity key toolbar parity). Enter / Space on Close keeps native close. Soft kb hint when both are visible; one Tab stop via roving tabindex.
+**v0.1.618** — Settings Appearance toolbar keyboard: focus a theme or the window-frame toggle, then ← → / h l / Home / End moves across the Appearance section (theme list + Show window frame; header toolbar parity). Enter / Space applies a theme or toggles the frame. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
 
 ## Tonight's keeps (selected)
 
@@ -30,6 +30,7 @@ Overnight Track B extended Settings modal toolbar keyboard parity through the he
 | **v0.1.615** | Ollama settings toolbar keyboard |
 | **v0.1.616** | Settings Perplexity API key toolbar keyboard |
 | **v0.1.617** | Settings close/header toolbar keyboard |
+| **v0.1.618** | Settings Appearance toolbar keyboard |
 
 ## Notes
 

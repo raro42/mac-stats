@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- Settings **Appearance toolbar keyboard** (theme list + window frame ← → / h l · Home/End; header toolbar parity) — **v0.1.618**
+
 - Settings **close/header toolbar keyboard** (Settings title · Close ← → / h l · Home/End; Perplexity key toolbar parity) — **v0.1.617**
 
 - Settings **Perplexity API key toolbar keyboard** (key input · Save · Clear ← → / h l · Home/End; Discord settings parity) — **v0.1.616**
