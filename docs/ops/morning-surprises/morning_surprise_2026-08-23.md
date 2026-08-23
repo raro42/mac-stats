@@ -1,10 +1,10 @@
 # Morning surprise — 2026-08-23
 
-Overnight Track B extended keyboard parity across Settings and Process Details modals — the Settings modal now wraps Credentials back to the header.
+Overnight Track B extended keyboard parity across Settings and Process Details modals — changelog now chains header Close into version headings.
 
 ## Latest keep (this tick)
 
-**v0.1.625** — Settings **Credentials↔header toolbar wrap**: at the last Credentials control (Perplexity Clear), ← → / h l crosses into header Close; at the header title, ← crosses back to the last Credentials control (header↔Appearance chain parity from v0.1.622).
+**v0.1.626** — Changelog **header↔body toolbar chain**: at header Close, ← → / h l crosses into version headings in the changelog body; at the first body item, ← crosses back to header Close (Process Details header↔hero parity).
 
 ## Tonight's keeps (selected)
 
@@ -38,9 +38,10 @@ Overnight Track B extended keyboard parity across Settings and Process Details m
 | **v0.1.623** | Process Details header↔hero toolbar chain |
 | **v0.1.624** | Process Details hero↔force-quit toolbar chain |
 | **v0.1.625** | Settings Credentials↔header toolbar wrap |
+| **v0.1.626** | Changelog header↔body toolbar chain |
 
 ## Notes
 
-- Digester: no open candidates (10 turns, 7 instant).
-- Design review: `due=false` (grace); screenshots deferred (TCC).
-- `debug.log`: quiet in 180m scan (single-instance lock WARN only).
+- Digester open empty all night; fuel came from standing backlog keyboard chain track.
+- Design review not due (feature-ai-chat ~9.4d grace).
+- `debug.log`: single-instance lock WARN only (expected with install restarts).
