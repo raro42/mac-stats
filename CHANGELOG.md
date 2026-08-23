@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.614] - 2026-08-23
+
+### Added
+- Top Processes **force-quit toolbar keyboard** — focus Advanced summary · Force Quit, then ← → / h l / Home / End moves across controls (detail hero toolbar parity). Enter / Space keeps button activate. Soft kb hint when both are visible; one Tab stop via roving tabindex.
+
 ## [0.1.613] - 2026-08-23
 
 ### Added

@@ -1974,6 +1974,16 @@ textarea.ops-agent-editor.is-dirty {
   border-top: 1px dashed color-mix(in srgb, #ff3b30 28%, transparent);
 }
 
+.force-quit-toolbar-kb-hint {
+  margin: 8px 0 0;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.force-quit-toolbar-kb-hint[hidden] {
+  display: none !important;
+}
+
 .force-quit-advanced {
   border: none;
 }

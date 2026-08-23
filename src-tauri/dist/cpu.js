@@ -4522,6 +4522,119 @@ function ensureProcessDetailHeroToolbarKeyboard(hero) {
   });
 }
 
+/** Focusable Top Processes force-quit toolbar items (Advanced summary · Force Quit). */
+function getForceQuitToolbarItems(section) {
+  const wrap = section || document.querySelector(".force-quit-section");
+  if (!wrap) return [];
+  const details = wrap.querySelector(".force-quit-advanced");
+  const items = [];
+  const summary = details?.querySelector("summary");
+  const quit = wrap.querySelector("#force-quit-process-btn");
+  if (summary && wrap.contains(summary) && !summary.hidden) items.push(summary);
+  if (quit && wrap.contains(quit) && !quit.hidden) items.push(quit);
+  return items.filter((el) => {
+    if (!el || el.hidden) return false;
+    return el.getClientRects().length > 0 || wrap.contains(el);
+  });
+}
+
+function refreshForceQuitToolbarRovingTabindex(section, preferred) {
+  const wrap = section || document.querySelector(".force-quit-section");
+  const items = getForceQuitToolbarItems(wrap);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureForceQuitToolbarKbHint(section) {
+  const wrap = section || document.querySelector(".force-quit-section");
+  if (!wrap) return;
+  let hint = wrap.querySelector(".force-quit-toolbar-kb-hint");
+  if (!hint) {
+    hint = document.createElement("div");
+    hint.className = "force-quit-toolbar-kb-hint";
+    hint.setAttribute("aria-hidden", "true");
+    wrap.appendChild(hint);
+  }
+  const items = getForceQuitToolbarItems(wrap);
+  hint.hidden = items.length < 2;
+  hint.textContent =
+    "← → / h l · Home/End move · Enter / Space on buttons";
+}
+
+/**
+ * Top Processes force-quit toolbar keyboard — focus Advanced summary · Force Quit,
+ * then ←→ / h l / Home/End (detail hero toolbar parity).
+ */
+function ensureForceQuitToolbarKeyboard(section) {
+  const wrap = section || document.querySelector(".force-quit-section");
+  if (!wrap) return;
+  ensureForceQuitToolbarKbHint(wrap);
+  refreshForceQuitToolbarRovingTabindex(wrap);
+  if (wrap.dataset.forceQuitToolbarKbWired === "1") return;
+  wrap.dataset.forceQuitToolbarKbWired = "1";
+  if (!wrap.getAttribute("role")) wrap.setAttribute("role", "toolbar");
+  if (!wrap.getAttribute("aria-label")) {
+    wrap.setAttribute("aria-label", "Force quit process");
+  }
+  const details = wrap.querySelector(".force-quit-advanced");
+  if (details) {
+    details.addEventListener("toggle", () => {
+      refreshForceQuitToolbarRovingTabindex(wrap);
+      ensureForceQuitToolbarKbHint(wrap);
+    });
+  }
+  wrap.addEventListener("focusin", (e) => {
+    const items = getForceQuitToolbarItems(wrap);
+    if (items.includes(e.target)) {
+      refreshForceQuitToolbarRovingTabindex(wrap, e.target);
+      ensureForceQuitToolbarKbHint(wrap);
+    }
+  });
+  wrap.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getForceQuitToolbarItems(wrap);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    if (e.key === "Enter" || e.key === " ") return;
+    let next = -1;
+    if (
+      e.key === "ArrowRight" ||
+      e.key === "l" ||
+      e.key === "ArrowDown" ||
+      e.key === "j"
+    ) {
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (
+      e.key === "ArrowLeft" ||
+      e.key === "h" ||
+      e.key === "ArrowUp" ||
+      e.key === "k"
+    ) {
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === "Home") {
+      next = 0;
+    } else if (e.key === "End") {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshForceQuitToolbarRovingTabindex(wrap, items[next]);
+    items[next].focus();
+  });
+}
+
 function populateProcessDetailsBody(body, details, pid) {
     const startDate = formatDate(details.start_time);
     const cpuTimeFormatted = formatTime(Math.floor(details.total_cpu_time / 1000));
@@ -4736,6 +4849,8 @@ function populateProcessDetailsBody(body, details, pid) {
         }
       });
     }
+    const forceQuitSection = body.querySelector(".force-quit-section");
+    if (forceQuitSection) ensureForceQuitToolbarKeyboard(forceQuitSection);
 }
 
 async function showProcessDetails(pid) {
