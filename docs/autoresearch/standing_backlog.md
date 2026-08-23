@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- Settings **Credentials section toolbar keyboard** — **v0.1.620**
+
 - Changelog + Process Details **modal header toolbar keyboard** — **v0.1.619**
 
 - Settings **Appearance toolbar keyboard** (theme list + window frame ← → / h l · Home/End; header toolbar parity) — **v0.1.618**
