@@ -1732,6 +1732,7 @@
   // This needs to be defined before injectAppVersion and initChangelogModal
   function loadChangelogForModal(changelogBody, changelogModal) {
     changelogBody.innerHTML = '<div class="changelog-loading">Loading changelog...</div>';
+    wireChangelogBodyToolbarKeyboard(changelogBody);
     
     (async () => {
       try {
@@ -1739,6 +1740,7 @@
         if (!invoke) {
           console.error("Tauri invoke not available. window.__TAURI__:", window.__TAURI__);
           changelogBody.innerHTML = '<div class="changelog-error">Tauri API not available. Please ensure the app is running in Tauri.</div>';
+          wireChangelogBodyToolbarKeyboard(changelogBody);
           return;
         }
 
@@ -1748,16 +1750,19 @@
         
         if (!changelogText || changelogText.trim().length === 0) {
           changelogBody.innerHTML = '<div class="changelog-error">Changelog is empty. Please rebuild the app to include the changelog.</div>';
+          wireChangelogBodyToolbarKeyboard(changelogBody);
           return;
         }
         
         // Convert markdown to HTML (simple conversion for changelog format)
         const html = convertMarkdownToHtml(changelogText);
         changelogBody.innerHTML = html;
+        wireChangelogBodyToolbarKeyboard(changelogBody);
       } catch (error) {
         console.error("Failed to load changelog:", error);
         const errorMessage = error?.toString() || String(error) || "Unknown error";
         changelogBody.innerHTML = `<div class="changelog-error">Failed to load changelog:<br><br>${errorMessage}<br><br>Please ensure the app has been rebuilt after adding the changelog feature.</div>`;
+        wireChangelogBodyToolbarKeyboard(changelogBody);
       }
     })();
   }
@@ -1868,6 +1873,7 @@
     }
     const changelogHeader = changelogModal.querySelector(".settings-header");
     if (changelogHeader) wireChangelogHeaderToolbarKeyboard(changelogHeader);
+    wireChangelogBodyToolbarKeyboard(changelogBody);
     loadChangelogForModal(changelogBody, changelogModal);
     if (triggerEl) flashChangelogOpened(triggerEl);
     requestAnimationFrame(() => {
@@ -1901,6 +1907,203 @@
     }
   }
 
+  /** Focusable changelog body items (version headings, or loading/error). */
+  function getChangelogBodyToolbarItems(body) {
+    const wrap = body || document.getElementById("changelog-body");
+    if (!wrap) return [];
+    const headings = Array.from(wrap.querySelectorAll(".changelog-h2"));
+    if (headings.length) {
+      return headings.filter((el) => {
+        if (!el || el.hidden) return false;
+        return el.getClientRects().length > 0 || wrap.contains(el);
+      });
+    }
+    const fallback = wrap.querySelector(
+      ".changelog-loading, .changelog-error"
+    );
+    if (
+      fallback &&
+      wrap.contains(fallback) &&
+      !fallback.hidden &&
+      (fallback.getClientRects().length > 0 || wrap.contains(fallback))
+    ) {
+      return [fallback];
+    }
+    return [];
+  }
+
+  function refreshChangelogBodyRovingTabindex(body, preferred) {
+    const wrap = body || document.getElementById("changelog-body");
+    const items = getChangelogBodyToolbarItems(wrap);
+    if (!items.length) return;
+    const focused = items.find((el) => el === document.activeElement);
+    const current =
+      (preferred && items.includes(preferred) && preferred) ||
+      focused ||
+      items.find((el) => el.tabIndex === 0) ||
+      items[0];
+    for (const el of items) {
+      el.tabIndex = el === current ? 0 : -1;
+    }
+  }
+
+  function ensureChangelogBodyKbStyles() {
+    if (document.getElementById("mac-stats-changelog-body-kb-styles")) return;
+    const style = document.createElement("style");
+    style.id = "mac-stats-changelog-body-kb-styles";
+    style.textContent = `
+      .changelog-body-toolbar-kb-hint {
+        margin: 0 0 8px;
+        font-size: 11px;
+        opacity: 0.72;
+        text-align: center;
+      }
+      .changelog-body-toolbar-kb-hint[hidden] {
+        display: none;
+      }
+      .changelog-h2[tabindex]:focus {
+        outline: 2px solid var(--focus-ring, rgba(0, 122, 255, 0.55));
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+      .changelog-loading[tabindex]:focus,
+      .changelog-error[tabindex]:focus {
+        outline: 2px solid var(--focus-ring, rgba(0, 122, 255, 0.55));
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function ensureChangelogBodyKbHint(body) {
+    const wrap = body || document.getElementById("changelog-body");
+    if (!wrap) return;
+    let hint = wrap.querySelector(".changelog-body-toolbar-kb-hint");
+    if (!hint) {
+      hint = document.createElement("div");
+      hint.className = "changelog-body-toolbar-kb-hint";
+      hint.setAttribute("aria-hidden", "true");
+      wrap.insertBefore(hint, wrap.firstChild);
+    }
+    const items = getChangelogBodyToolbarItems(wrap);
+    hint.hidden = items.length < 2;
+    hint.textContent =
+      "← → / h l · Home/End move between versions · at start crosses to header Close";
+  }
+
+  function focusChangelogBodyItem(body, el) {
+    const wrap = body || document.getElementById("changelog-body");
+    if (!wrap || !el) return;
+    refreshChangelogBodyRovingTabindex(wrap, el);
+    el.focus();
+    try {
+      el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  /** Changelog header Close → first body version heading (or loading/error). */
+  function tryChainChangelogHeaderToBody() {
+    const body = document.getElementById("changelog-body");
+    if (!body) return false;
+    const items = getChangelogBodyToolbarItems(body);
+    if (!items.length) return false;
+    focusChangelogBodyItem(body, items[0]);
+    return true;
+  }
+
+  /** First changelog body item ← header Close. */
+  function tryChainChangelogBodyToHeader() {
+    const header = document
+      .getElementById("changelog-modal")
+      ?.querySelector(".settings-header");
+    if (!header) return false;
+    const items = getModalHeaderToolbarItems(
+      header,
+      "changelog-modal-title",
+      "close-changelog"
+    );
+    if (!items.length) return false;
+    const target = items[items.length - 1];
+    refreshModalHeaderRovingTabindex(
+      header,
+      "changelog-modal-title",
+      "close-changelog",
+      target
+    );
+    target.focus();
+    return true;
+  }
+
+  /**
+   * Changelog body toolbar keyboard — focus version headings (or loading/error),
+   * then ←→ / h l / Home/End (Process Details header↔hero parity).
+   */
+  function wireChangelogBodyToolbarKeyboard(body) {
+    const wrap = body || document.getElementById("changelog-body");
+    if (!wrap) return;
+    ensureChangelogBodyKbStyles();
+    ensureChangelogBodyKbHint(wrap);
+    refreshChangelogBodyRovingTabindex(wrap);
+    if (wrap.dataset.changelogBodyToolbarKbWired === "1") return;
+    if (!wrap.getAttribute("role")) wrap.setAttribute("role", "toolbar");
+    if (!wrap.getAttribute("aria-label")) {
+      wrap.setAttribute("aria-label", "Changelog versions");
+    }
+    wrap.dataset.changelogBodyToolbarKbWired = "1";
+    wrap.addEventListener("focusin", (e) => {
+      const items = getChangelogBodyToolbarItems(wrap);
+      if (items.includes(e.target)) {
+        refreshChangelogBodyRovingTabindex(wrap, e.target);
+        ensureChangelogBodyKbHint(wrap);
+      }
+    });
+    wrap.addEventListener("keydown", (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const items = getChangelogBodyToolbarItems(wrap);
+      if (!items.length) return;
+      const idx = items.indexOf(document.activeElement);
+      if (idx < 0) return;
+      if (e.key === "Enter" || e.key === " ") return;
+      let next = -1;
+      if (
+        e.key === "ArrowRight" ||
+        e.key === "l" ||
+        e.key === "ArrowDown" ||
+        e.key === "j"
+      ) {
+        if (idx === items.length - 1) return;
+        next = idx + 1;
+      } else if (
+        e.key === "ArrowLeft" ||
+        e.key === "h" ||
+        e.key === "ArrowUp" ||
+        e.key === "k"
+      ) {
+        if (idx === 0) {
+          if (tryChainChangelogBodyToHeader()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          return;
+        }
+        next = idx - 1;
+      } else if (e.key === "Home") {
+        next = 0;
+      } else if (e.key === "End") {
+        next = items.length - 1;
+      } else {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      if (next === idx) return;
+      focusChangelogBodyItem(wrap, items[next]);
+    });
+  }
+
   /** Changelog modal header toolbar keyboard (Settings header parity). */
   function wireChangelogHeaderToolbarKeyboard(header) {
     wireModalHeaderToolbarKeyboard(header, {
@@ -1908,6 +2111,9 @@
       closeId: "close-changelog",
       ariaLabel: "Changelog header",
       wireKey: "changelogHeaderToolbarKbWired",
+      hintText:
+        "← → / h l · Home/End move · Enter / Space on Close closes · at end crosses to changelog body",
+      chainForwardFromEnd: () => tryChainChangelogHeaderToBody(),
     });
   }
 
@@ -1923,7 +2129,8 @@
 
     const changelogHeader = changelogModal.querySelector(".settings-header");
     if (changelogHeader) wireChangelogHeaderToolbarKeyboard(changelogHeader);
-    
+    wireChangelogBodyToolbarKeyboard(changelogBody);
+
     // Get version elements - try multiple selectors to catch all cases
     const versionElements = document.querySelectorAll(
       ".app-version, .theme-version, .arch-version, [class*='version']"

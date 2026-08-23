@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.626] - 2026-08-23
+
+### Added
+- Changelog **header↔body toolbar chain** — at header Close, ← → / h l crosses into version headings in the changelog body; at the first body item, ← crosses back to header Close (Process Details header↔hero parity).
+
 ## [0.1.625] - 2026-08-23
 
 ### Added
