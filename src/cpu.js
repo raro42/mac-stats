@@ -2504,53 +2504,16 @@ function ensurePowerStripKeyboard() {
   const strip = document.getElementById('battery-power-strip');
   if (!strip) return;
   ensurePowerStripKbHint();
-  refreshPowerStripRovingTabindex();
-  if (strip.dataset.powerStripKbWired === '1') return;
-  strip.dataset.powerStripKbWired = '1';
-  if (!strip.getAttribute('role')) {
-    strip.setAttribute('role', 'toolbar');
-  }
+  wireToolbarKeyboard(
+    strip,
+    () => getPowerStripChips(),
+    (preferred) => refreshPowerStripRovingTabindex(preferred),
+    null
+  );
   if (!strip.getAttribute('aria-label')) {
     strip.setAttribute('aria-label', 'Battery and power metrics');
   }
-  strip.addEventListener('focusin', (e) => {
-    const chips = getPowerStripChips();
-    if (chips.includes(e.target)) refreshPowerStripRovingTabindex(e.target);
-  });
-  strip.addEventListener('keydown', (e) => {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    const chips = getPowerStripChips();
-    if (!chips.length) return;
-    const idx = chips.indexOf(document.activeElement);
-    if (idx < 0) return;
-    let next = -1;
-    if (
-      e.key === 'ArrowRight' ||
-      e.key === 'l' ||
-      e.key === 'ArrowDown' ||
-      e.key === 'j'
-    ) {
-      next = Math.min(idx + 1, chips.length - 1);
-    } else if (
-      e.key === 'ArrowLeft' ||
-      e.key === 'h' ||
-      e.key === 'ArrowUp' ||
-      e.key === 'k'
-    ) {
-      next = Math.max(idx - 1, 0);
-    } else if (e.key === 'Home') {
-      next = 0;
-    } else if (e.key === 'End') {
-      next = chips.length - 1;
-    } else {
-      return;
-    }
-    e.preventDefault();
-    e.stopPropagation();
-    if (next === idx) return;
-    refreshPowerStripRovingTabindex(chips[next]);
-    chips[next].focus();
-  });
+  strip.dataset.powerStripKbWired = '1';
 }
 
 /** Metrics section that holds the four ring cards (theme class varies). */
@@ -2635,65 +2598,27 @@ function ensureRingGaugeKbHint() {
     section.appendChild(hint);
   }
   hint.textContent =
-    '← → / h l · Home/End move · Enter / Space activates CPU or copies GPU / Freq / Temp';
+    'Tab or click a ring · ← → / h l · Home/End move · Enter / Space activates';
 }
 
 /**
- * Ring-gauge toolbar keyboard — focus CPU · GPU · Frequency · Temperature,
- * then ←→ / h l / Home/End (power-strip / filter-chip parity). Enter/Space
- * keep CPU toggle and metric copy.
+ * Ring-gauge toolbar keyboard — click or Tab to CPU · GPU · Frequency · Temperature,
+ * then ←→ / h l / Home/End. Enter/Space keeps CPU toggle and metric copy.
  */
 function ensureRingGaugeKeyboard() {
   const section = getRingGaugeSection();
   if (!section) return;
   ensureRingGaugeKbHint();
-  refreshRingGaugeRovingTabindex();
-  if (section.dataset.ringGaugeKbWired === '1') return;
-  section.dataset.ringGaugeKbWired = '1';
-  if (!section.getAttribute('role')) {
-    section.setAttribute('role', 'toolbar');
-  }
+  wireToolbarKeyboard(
+    section,
+    () => getRingGaugeChips(),
+    (preferred) => refreshRingGaugeRovingTabindex(preferred),
+    null
+  );
   if (!section.getAttribute('aria-label')) {
     section.setAttribute('aria-label', 'CPU metric rings');
   }
-  section.addEventListener('focusin', (e) => {
-    const chips = getRingGaugeChips();
-    if (chips.includes(e.target)) refreshRingGaugeRovingTabindex(e.target);
-  });
-  section.addEventListener('keydown', (e) => {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    const chips = getRingGaugeChips();
-    if (!chips.length) return;
-    const idx = chips.indexOf(document.activeElement);
-    if (idx < 0) return;
-    let next = -1;
-    if (
-      e.key === 'ArrowRight' ||
-      e.key === 'l' ||
-      e.key === 'ArrowDown' ||
-      e.key === 'j'
-    ) {
-      next = Math.min(idx + 1, chips.length - 1);
-    } else if (
-      e.key === 'ArrowLeft' ||
-      e.key === 'h' ||
-      e.key === 'ArrowUp' ||
-      e.key === 'k'
-    ) {
-      next = Math.max(idx - 1, 0);
-    } else if (e.key === 'Home') {
-      next = 0;
-    } else if (e.key === 'End') {
-      next = chips.length - 1;
-    } else {
-      return;
-    }
-    e.preventDefault();
-    e.stopPropagation();
-    if (next === idx) return;
-    refreshRingGaugeRovingTabindex(chips[next]);
-    chips[next].focus();
-  });
+  section.dataset.ringGaugeKbWired = '1';
 }
 
 /** History sparklines section (CPU · Freq · Temp canvases). */
@@ -2783,7 +2708,7 @@ function ensureHistorySparklineKbHint() {
     section.appendChild(hint);
   }
   hint.textContent =
-    '← → / h l · Home/End move · Enter / Space jumps to CPU / Freq / Temp ring';
+    'Tab or click a chart · ← → / h l · Home/End move · Enter / Space jumps to ring';
 }
 
 /**
@@ -2849,51 +2774,151 @@ function ensureHistorySparklineKeyboard() {
     }
   }
   refreshHistorySparklineRovingTabindex();
-  if (section.dataset.historySparkKbWired === '1') return;
-  section.dataset.historySparkKbWired = '1';
-  if (!section.getAttribute('role')) {
-    section.setAttribute('role', 'toolbar');
-  }
+  wireToolbarKeyboard(
+    section,
+    () => getHistorySparklineChips(),
+    (preferred) => refreshHistorySparklineRovingTabindex(preferred),
+    null
+  );
   if (!section.getAttribute('aria-label')) {
     section.setAttribute('aria-label', 'CPU history sparklines');
   }
-  section.addEventListener('focusin', (e) => {
-    const list = getHistorySparklineChips();
-    if (list.includes(e.target)) refreshHistorySparklineRovingTabindex(e.target);
-  });
-  section.addEventListener('keydown', (e) => {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    const list = getHistorySparklineChips();
-    if (!list.length) return;
-    const idx = list.indexOf(document.activeElement);
-    if (idx < 0) return;
-    let next = -1;
-    if (
-      e.key === 'ArrowRight' ||
-      e.key === 'l' ||
-      e.key === 'ArrowDown' ||
-      e.key === 'j'
-    ) {
-      next = Math.min(idx + 1, list.length - 1);
-    } else if (
-      e.key === 'ArrowLeft' ||
-      e.key === 'h' ||
-      e.key === 'ArrowUp' ||
-      e.key === 'k'
-    ) {
-      next = Math.max(idx - 1, 0);
-    } else if (e.key === 'Home') {
-      next = 0;
-    } else if (e.key === 'End') {
-      next = list.length - 1;
-    } else {
-      return;
-    }
+  section.dataset.historySparkKbWired = '1';
+}
+
+const TOOLBAR_NAV_KEYS = new Set([
+  'ArrowRight',
+  'ArrowLeft',
+  'ArrowUp',
+  'ArrowDown',
+  'Home',
+  'End',
+  'h',
+  'l',
+  'j',
+  'k',
+]);
+
+/** Pick a sensible default item when the toolbar has focus but no item is focused yet. */
+function seedToolbarFocusItem(items) {
+  if (!items.length) return null;
+  return (
+    items.find(
+      (el) =>
+        el.classList?.contains('is-active') ||
+        el.classList?.contains('section-open') ||
+        el.getAttribute('aria-pressed') === 'true'
+    ) || items[0]
+  );
+}
+
+/**
+ * Shared ←→ / h l / Home/End handler for chip toolbars (filter rows, ring gauges,
+ * power strip, icon line). Uses capture so WKWebView delivers keys on <button>.
+ * Returns true when the key was handled.
+ */
+function handleToolbarArrowKeydown(e, container, getItems, refreshRoving) {
+  if (e.metaKey || e.ctrlKey || e.altKey) return false;
+  if (!TOOLBAR_NAV_KEYS.has(e.key)) return false;
+  const items = getItems();
+  if (!items.length) return false;
+
+  const active = document.activeElement;
+  if (active !== container && !container.contains(active)) return false;
+
+  let idx = items.indexOf(active);
+  if (idx < 0) {
+    const seed = seedToolbarFocusItem(items);
+    if (!seed) return false;
+    refreshRoving(seed);
+    seed.focus();
+    idx = items.indexOf(document.activeElement);
+    if (idx < 0) idx = items.indexOf(seed);
+    if (idx < 0) return false;
+  }
+
+  let next = -1;
+  if (
+    e.key === 'ArrowRight' ||
+    e.key === 'l' ||
+    e.key === 'ArrowDown' ||
+    e.key === 'j'
+  ) {
+    next = Math.min(idx + 1, items.length - 1);
+  } else if (
+    e.key === 'ArrowLeft' ||
+    e.key === 'h' ||
+    e.key === 'ArrowUp' ||
+    e.key === 'k'
+  ) {
+    next = Math.max(idx - 1, 0);
+  } else if (e.key === 'Home') {
+    next = 0;
+  } else if (e.key === 'End') {
+    next = items.length - 1;
+  } else {
+    return false;
+  }
+
+  if (next === idx) {
     e.preventDefault();
     e.stopPropagation();
-    if (next === idx) return;
-    refreshHistorySparklineRovingTabindex(list[next]);
-    list[next].focus();
+    return true;
+  }
+  refreshRoving(items[next]);
+  items[next].focus();
+  e.preventDefault();
+  e.stopPropagation();
+  return true;
+}
+
+function wireToolbarKeyboard(container, getItems, refreshRoving, hintText) {
+  if (!container) return;
+  refreshRoving();
+  if (hintText) {
+    let hint = container.querySelector(
+      ':scope > .toolbar-kb-hint, :scope > .filter-chip-kb-hint'
+    );
+    if (!hint) {
+      hint = document.createElement('div');
+      hint.className = 'toolbar-kb-hint filter-chip-kb-hint';
+      hint.setAttribute('aria-hidden', 'true');
+      container.appendChild(hint);
+    }
+    hint.textContent = hintText;
+  }
+  if (container.dataset.toolbarKbWired === '1') return;
+  container.dataset.toolbarKbWired = '1';
+  if (!container.getAttribute('role')) {
+    container.setAttribute('role', 'toolbar');
+  }
+  container.addEventListener(
+    'click',
+    (e) => {
+      const items = getItems();
+      if (!items.length) return;
+      let node = e.target;
+      while (node && node !== container) {
+        if (items.includes(node)) {
+          refreshRoving(node);
+          node.focus();
+          return;
+        }
+        node = node.parentElement;
+      }
+    },
+    true
+  );
+  container.addEventListener(
+    'keydown',
+    (e) => {
+      handleToolbarArrowKeydown(e, container, getItems, refreshRoving);
+    },
+    true
+  );
+  container.addEventListener('focusin', (e) => {
+    const items = getItems();
+    if (items.includes(e.target)) refreshRoving(e.target);
   });
 }
 
@@ -2949,64 +2974,22 @@ function ensureFilterChipKbStyles() {
 }
 
 /**
- * Filter-chip toolbar keyboard — focus a chip, then ←→ / h l / Home/End
- * (power-strip / icon-line parity). Enter/Space keep native filter activate.
+ * Filter-chip toolbar keyboard — click or Tab to a chip, then ←→ / h l / Home/End.
  * Exposed on window for ollama.js / agent-ops.js.
  */
 function wireFilterChipToolbarKeyboard(wrap) {
   if (!wrap) return;
   ensureFilterChipKbStyles();
-  let hint = wrap.querySelector(':scope > .filter-chip-kb-hint');
-  if (!hint) {
-    hint = document.createElement('div');
-    hint.className = 'filter-chip-kb-hint';
-    hint.setAttribute('aria-hidden', 'true');
-    wrap.appendChild(hint);
-  }
-  hint.textContent =
-    '← → / h l · Home/End move · Enter / Space selects filter';
-  refreshFilterChipRovingTabindex(wrap);
-  if (wrap.dataset.filterChipKbWired === '1') return;
+  const hint =
+    'Tab or click a chip · ← → / h l · Home/End move · Enter / Space selects';
+  wireToolbarKeyboard(
+    wrap,
+    () => getFilterChipButtons(wrap),
+    (preferred) => refreshFilterChipRovingTabindex(wrap, preferred),
+    hint
+  );
+  // Legacy flag — ensure*FilterChips checks this before re-wiring listeners.
   wrap.dataset.filterChipKbWired = '1';
-  wrap.setAttribute('role', 'toolbar');
-  wrap.addEventListener('focusin', (e) => {
-    const chips = getFilterChipButtons(wrap);
-    if (chips.includes(e.target)) refreshFilterChipRovingTabindex(wrap, e.target);
-  });
-  wrap.addEventListener('keydown', (e) => {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    const chips = getFilterChipButtons(wrap);
-    if (!chips.length) return;
-    const idx = chips.indexOf(document.activeElement);
-    if (idx < 0) return;
-    let next = -1;
-    if (
-      e.key === 'ArrowRight' ||
-      e.key === 'l' ||
-      e.key === 'ArrowDown' ||
-      e.key === 'j'
-    ) {
-      next = Math.min(idx + 1, chips.length - 1);
-    } else if (
-      e.key === 'ArrowLeft' ||
-      e.key === 'h' ||
-      e.key === 'ArrowUp' ||
-      e.key === 'k'
-    ) {
-      next = Math.max(idx - 1, 0);
-    } else if (e.key === 'Home') {
-      next = 0;
-    } else if (e.key === 'End') {
-      next = chips.length - 1;
-    } else {
-      return;
-    }
-    e.preventDefault();
-    e.stopPropagation();
-    if (next === idx) return;
-    refreshFilterChipRovingTabindex(wrap, chips[next]);
-    chips[next].focus();
-  });
 }
 window.wireFilterChipToolbarKeyboard = wireFilterChipToolbarKeyboard;
 
@@ -13513,66 +13496,26 @@ function ensureIconLineKbHint() {
     line.appendChild(hint);
   }
   hint.textContent =
-    '← → / h l · Home/End move · Enter / Space opens section';
+    'Tab or click an icon · ← → / h l · Home/End move · Enter / Space opens section';
 }
 
 /**
- * Icon-line toolbar keyboard — focus an icon, then ←→ / h l / Home/End
- * moves across Monitors · AI Chat · Perplexity · Debug Log · Discord ·
- * Disk Cleanup · Agent Ops (power-strip / Details listbox chrome parity).
- * Enter/Space keep native button activate (section toggle).
+ * Icon-line toolbar keyboard — click or Tab to an icon, then ←→ / h l / Home/End.
  */
 function ensureIconLineKeyboard() {
   const line = document.getElementById('icon-line');
   if (!line) return;
   ensureIconLineKbHint();
-  refreshIconLineRovingTabindex();
-  if (line.dataset.iconLineKbWired === '1') return;
-  line.dataset.iconLineKbWired = '1';
-  if (!line.getAttribute('role')) {
-    line.setAttribute('role', 'toolbar');
-  }
+  wireToolbarKeyboard(
+    line,
+    () => getIconLineItems(),
+    (preferred) => refreshIconLineRovingTabindex(preferred),
+    null
+  );
   if (!line.getAttribute('aria-label')) {
     line.setAttribute('aria-label', 'Section shortcuts');
   }
-  line.addEventListener('focusin', (e) => {
-    const items = getIconLineItems();
-    if (items.includes(e.target)) refreshIconLineRovingTabindex(e.target);
-  });
-  line.addEventListener('keydown', (e) => {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    const items = getIconLineItems();
-    if (!items.length) return;
-    const idx = items.indexOf(document.activeElement);
-    if (idx < 0) return;
-    let next = -1;
-    if (
-      e.key === 'ArrowRight' ||
-      e.key === 'l' ||
-      e.key === 'ArrowDown' ||
-      e.key === 'j'
-    ) {
-      next = Math.min(idx + 1, items.length - 1);
-    } else if (
-      e.key === 'ArrowLeft' ||
-      e.key === 'h' ||
-      e.key === 'ArrowUp' ||
-      e.key === 'k'
-    ) {
-      next = Math.max(idx - 1, 0);
-    } else if (e.key === 'Home') {
-      next = 0;
-    } else if (e.key === 'End') {
-      next = items.length - 1;
-    } else {
-      return;
-    }
-    e.preventDefault();
-    e.stopPropagation();
-    if (next === idx) return;
-    refreshIconLineRovingTabindex(items[next]);
-    items[next].focus();
-  });
+  line.dataset.iconLineKbWired = '1';
 }
 
 function initIconLine() {

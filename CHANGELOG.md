@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Settings **Appearance toolbar keyboard** — focus a theme or the window-frame toggle, then ← → / h l / Home / End moves across the Appearance section (theme list + Show window frame; header toolbar parity). Enter / Space applies a theme or toggles the frame. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
 
 ### Fixed
+- **Toolbar keyboard nav** — filter chips, ring gauges, icon line, and power strip now use capture-phase arrow keys; click or Tab focuses a chip before ← → / h l work (WKWebView was ignoring unfocused toolbars).
 - **Menu bar** — metric values stay visible; hot CPU/SSD/etc. use amber on the value row instead of extra cue lines that clipped the numbers.
 - **CPU window sections** — icon toggles fully hide Monitors, Ollama, Perplexity, Logs, Disk, Agent Ops, Details, and Processes (no collapsed glance peek).
 - **Battery row** — shows battery and power only; removed duplicate CPU/RAM/GPU/temp/SSD chips already on the ring gauges.
