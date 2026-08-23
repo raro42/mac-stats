@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.620] - 2026-08-23
+
+### Added
+- Settings **Credentials section toolbar keyboard** — focus Discord token · Save · Clear · View logs · Perplexity key · Save · Clear, then ← → / h l / Home / End moves across the whole Credentials section (Discord / Perplexity subsection parity). Arrows at token/key start/end; soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+
 ## [0.1.619] - 2026-08-23
 
 ### Added

@@ -280,6 +280,12 @@
     }
     const settingsHeader = settingsModal.querySelector(".settings-header");
     if (settingsHeader) wireSettingsHeaderToolbarKeyboard(settingsHeader);
+    const credentialsSection = settingsModal.querySelector(
+      'section[aria-labelledby="settings-credentials-heading"]'
+    );
+    if (credentialsSection) {
+      wireCredentialsSectionToolbarKeyboard(credentialsSection);
+    }
     requestAnimationFrame(() => {
       const closeBtn = document.getElementById("close-settings");
       if (closeBtn) {
@@ -711,6 +717,173 @@
     });
   }
 
+  function credentialsInputAtMoveBoundary(input, direction) {
+    if (!input || input.tagName !== "INPUT") return true;
+    if (direction > 0) {
+      const len = (input.value || "").length;
+      return input.selectionStart === len && input.selectionEnd === len;
+    }
+    return input.selectionStart === 0 && input.selectionEnd === 0;
+  }
+
+  /** Discord token + Perplexity key controls in Settings Credentials (visible only). */
+  function getCredentialsSectionToolbarItems(section) {
+    if (!section) return [];
+    const ids = [
+      "discord-token-input",
+      "discord-save-token",
+      "discord-clear-token",
+      "view-debug-log",
+      "perplexity-api-key-input",
+      "perplexity-save-key",
+      "perplexity-clear-key",
+    ];
+    return ids
+      .map((id) => document.getElementById(id))
+      .filter((el) => {
+        if (!el || !section.contains(el)) return false;
+        if (el.hidden || el.disabled) return false;
+        return el.getClientRects().length > 0 || section.contains(el);
+      });
+  }
+
+  function refreshCredentialsSectionRovingTabindex(section, preferred) {
+    const items = getCredentialsSectionToolbarItems(section);
+    if (!items.length) return;
+    const focused = items.find((el) => el === document.activeElement);
+    const current =
+      (preferred && items.includes(preferred) && preferred) ||
+      focused ||
+      items.find((el) => el.tabIndex === 0) ||
+      items[0];
+    for (const el of items) {
+      el.tabIndex = el === current ? 0 : -1;
+    }
+  }
+
+  function ensureCredentialsSectionKbStyles() {
+    if (document.getElementById("mac-stats-credentials-section-kb-styles")) return;
+    const style = document.createElement("style");
+    style.id = "mac-stats-credentials-section-kb-styles";
+    style.textContent = `
+      .credentials-section-kb-hint {
+        margin: 8px 0 0;
+        font-size: 11px;
+        opacity: 0.72;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  /**
+   * Settings Credentials section toolbar keyboard — focus Discord token · Save ·
+   * Clear · View logs · Perplexity key · Save · Clear, then ←→ / h l / Home/End
+   * (Discord / Perplexity subsection parity).
+   */
+  function wireCredentialsSectionToolbarKeyboard(section) {
+    if (!section) return;
+    ensureCredentialsSectionKbStyles();
+    let hint = section.querySelector(":scope > .credentials-section-kb-hint");
+    if (!hint) {
+      hint = document.createElement("div");
+      hint.className = "credentials-section-kb-hint";
+      hint.setAttribute("aria-hidden", "true");
+      section.appendChild(hint);
+    }
+    const items = getCredentialsSectionToolbarItems(section);
+    hint.hidden = items.length < 2;
+    hint.textContent =
+      "← → / h l · Home/End move · arrows at token/key start/end · buttons keep activate";
+    refreshCredentialsSectionRovingTabindex(section);
+    if (section.dataset.credentialsSectionKbWired === "1") return;
+    section.dataset.credentialsSectionKbWired = "1";
+    section.setAttribute("role", "toolbar");
+    if (!section.getAttribute("aria-label")) {
+      section.setAttribute("aria-label", "Credentials settings");
+    }
+    section.addEventListener("focusin", (e) => {
+      const controls = getCredentialsSectionToolbarItems(section);
+      if (controls.includes(e.target)) {
+        refreshCredentialsSectionRovingTabindex(section, e.target);
+        hint.hidden = controls.length < 2;
+      }
+    });
+    section.addEventListener(
+      "keydown",
+      (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const controls = getCredentialsSectionToolbarItems(section);
+        if (!controls.length) return;
+        const idx = controls.indexOf(document.activeElement);
+        if (idx < 0) return;
+        const active = controls[idx];
+        if (e.key === "Enter" || e.key === " ") {
+          if (
+            active?.id === "discord-token-input" ||
+            active?.id === "discord-save-token" ||
+            active?.id === "discord-clear-token" ||
+            active?.id === "view-debug-log" ||
+            active?.id === "perplexity-api-key-input" ||
+            active?.id === "perplexity-save-key" ||
+            active?.id === "perplexity-clear-key"
+          ) {
+            return;
+          }
+        }
+        let next = -1;
+        const forward =
+          e.key === "ArrowRight" ||
+          e.key === "l" ||
+          e.key === "ArrowDown" ||
+          e.key === "j";
+        const back =
+          e.key === "ArrowLeft" ||
+          e.key === "h" ||
+          e.key === "ArrowUp" ||
+          e.key === "k";
+        if (forward) {
+          if (
+            (active?.id === "discord-token-input" ||
+              active?.id === "perplexity-api-key-input") &&
+            !credentialsInputAtMoveBoundary(active, 1)
+          ) {
+            return;
+          }
+          next = Math.min(idx + 1, controls.length - 1);
+        } else if (back) {
+          if (
+            (active?.id === "discord-token-input" ||
+              active?.id === "perplexity-api-key-input") &&
+            !credentialsInputAtMoveBoundary(active, -1)
+          ) {
+            return;
+          }
+          next = Math.max(idx - 1, 0);
+        } else if (e.key === "Home") {
+          next = 0;
+        } else if (e.key === "End") {
+          next = controls.length - 1;
+        } else {
+          return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        if (next === idx) return;
+        refreshCredentialsSectionRovingTabindex(section, controls[next]);
+        controls[next].focus();
+        if (
+          (controls[next]?.id === "discord-token-input" ||
+            controls[next]?.id === "perplexity-api-key-input") &&
+          typeof controls[next].setSelectionRange === "function"
+        ) {
+          const len = (controls[next].value || "").length;
+          controls[next].setSelectionRange(len, len);
+        }
+      },
+      true
+    );
+  }
+
   function initThemePicker() {
     // New: one-click list of themes
     const themeList = document.getElementById("theme-list");
@@ -990,6 +1163,12 @@
 
     const productSetting = document.getElementById("product-setting");
     if (productSetting) wireProductSettingToolbarKeyboard(productSetting);
+    const credentialsSection = document.querySelector(
+      'section[aria-labelledby="settings-credentials-heading"]'
+    );
+    if (credentialsSection) {
+      wireCredentialsSectionToolbarKeyboard(credentialsSection);
+    }
   }
 
   function applyAiUiVisibility(enabled) {
