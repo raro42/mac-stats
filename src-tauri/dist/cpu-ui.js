@@ -282,8 +282,9 @@
       ariaLabel: "Settings header",
       wireKey: "settingsHeaderToolbarKbWired",
       hintText:
-        "← → / h l · Home/End move · Enter / Space on Close closes · at end crosses to Appearance",
+        "← → / h l · Home/End move · Enter / Space on Close closes · at start crosses to Credentials · at end crosses to Appearance",
       chainForwardFromEnd: () => tryChainSettingsHeaderToAppearance(),
+      chainBackFromStart: () => tryChainSettingsHeaderToCredentials(),
     });
   }
 
@@ -862,6 +863,31 @@
     return true;
   }
 
+  /** Last Credentials control → Settings header Close. */
+  function tryChainSettingsCredentialsToHeader() {
+    const header = document.querySelector("#settings-modal .settings-header");
+    if (!header) return false;
+    const items = getModalHeaderToolbarItems(header, "settings-title", "close-settings");
+    if (!items.length) return false;
+    const target = items[items.length - 1];
+    refreshModalHeaderRovingTabindex(header, "settings-title", "close-settings", target);
+    target.focus();
+    return true;
+  }
+
+  /** Settings header title ← last Credentials control. */
+  function tryChainSettingsHeaderToCredentials() {
+    const section = document.querySelector(
+      'section[aria-labelledby="settings-credentials-heading"]'
+    );
+    if (!section) return false;
+    const items = getCredentialsSectionToolbarItems(section);
+    if (!items.length) return false;
+    const target = items[items.length - 1];
+    focusSettingsSectionToolbarItem(section, target);
+    return true;
+  }
+
   /** Jump to first/last control in adjacent Settings section (+1 forward, -1 back). */
   function tryChainSettingsSectionFocus(currentSection, direction) {
     const sections = getSettingsModalSections();
@@ -953,7 +979,7 @@
     const items = getCredentialsSectionToolbarItems(section);
     hint.hidden = items.length < 2;
     hint.textContent =
-      "← → / h l · Home/End move · arrows at token/key start/end · at start crosses to Product";
+      "← → / h l · Home/End move · arrows at token/key start/end · at start crosses to Product · at end crosses to header";
     refreshCredentialsSectionRovingTabindex(section);
     if (section.dataset.credentialsSectionKbWired === "1") return;
     section.dataset.credentialsSectionKbWired = "1";
@@ -1009,7 +1035,13 @@
           ) {
             return;
           }
-          if (idx === controls.length - 1) return;
+          if (idx === controls.length - 1) {
+            if (tryChainSettingsCredentialsToHeader()) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+            return;
+          }
           next = idx + 1;
         } else if (back) {
           if (
