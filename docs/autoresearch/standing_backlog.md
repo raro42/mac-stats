@@ -22,6 +22,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 - Process Details **hero↔force-quit toolbar chain** — **v0.1.624**
 
+- Settings **Credentials↔header toolbar wrap** — **v0.1.625**
+
 - Process Details **header↔hero toolbar chain** — **v0.1.623**
 
 - Settings **header↔Appearance toolbar chain** — **v0.1.622**

@@ -1,10 +1,10 @@
 # Morning surprise — 2026-08-23
 
-Overnight Track B extended keyboard parity across Settings and Process Details modals — header chains now reach the full modal body.
+Overnight Track B extended keyboard parity across Settings and Process Details modals — the Settings modal now wraps Credentials back to the header.
 
 ## Latest keep (this tick)
 
-**v0.1.624** — Process Details **hero↔force-quit toolbar chain**: at PID, ← → / h l crosses into Advanced summary · Force Quit; at the first force-quit control, ← crosses back to PID (header↔hero chain parity from v0.1.623).
+**v0.1.625** — Settings **Credentials↔header toolbar wrap**: at the last Credentials control (Perplexity Clear), ← → / h l crosses into header Close; at the header title, ← crosses back to the last Credentials control (header↔Appearance chain parity from v0.1.622).
 
 ## Tonight's keeps (selected)
 
@@ -37,6 +37,7 @@ Overnight Track B extended keyboard parity across Settings and Process Details m
 | **v0.1.622** | Settings header↔Appearance toolbar chain |
 | **v0.1.623** | Process Details header↔hero toolbar chain |
 | **v0.1.624** | Process Details hero↔force-quit toolbar chain |
+| **v0.1.625** | Settings Credentials↔header toolbar wrap |
 
 ## Notes
 
