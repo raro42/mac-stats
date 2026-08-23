@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- Settings **Perplexity API key toolbar keyboard** (key input · Save · Clear ← → / h l · Home/End; Discord settings parity) — **v0.1.616**
+
 - Ollama settings **toolbar keyboard** (close · system prompt · Reset · Save ← → / h l · Home/End; Discord settings parity) — **v0.1.615**
 
 - Top Processes **force-quit toolbar keyboard** (Advanced summary · Force Quit ← → / h l · Home/End; detail hero parity) — **v0.1.614**

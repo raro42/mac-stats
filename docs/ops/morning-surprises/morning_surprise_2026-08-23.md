@@ -1,10 +1,10 @@
 # Morning surprise — 2026-08-23
 
-Overnight Track B extended toolbar keyboard parity through Ollama settings while digester open stayed empty.
+Overnight Track B extended toolbar keyboard parity through Settings Perplexity API key while digester open stayed empty.
 
 ## Latest keep (this tick)
 
-**v0.1.615** — Ollama settings toolbar keyboard: focus close · system prompt · Reset · Save, then ← → / h l / Home / End moves across controls (Discord settings toolbar parity). Arrows leave the prompt only at start/end. Enter / Space keeps button activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+**v0.1.616** — Settings Perplexity API key toolbar keyboard: focus key input · Save key · Clear key, then ← → / h l / Home / End moves across controls (Discord settings toolbar parity). Arrows leave the key field only at start/end. Enter saves from the key field; buttons keep activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
 
 ## Tonight's keeps (selected)
 
@@ -28,6 +28,7 @@ Overnight Track B extended toolbar keyboard parity through Ollama settings while
 | **v0.1.613** | Top Processes detail hero toolbar keyboard |
 | **v0.1.614** | Top Processes force-quit toolbar keyboard |
 | **v0.1.615** | Ollama settings toolbar keyboard |
+| **v0.1.616** | Settings Perplexity API key toolbar keyboard |
 
 ## Notes
 
