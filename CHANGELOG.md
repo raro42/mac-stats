@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.613] - 2026-08-23
+
+### Added
+- Top Processes **detail hero toolbar keyboard** — focus name · PID, then ← → / h l / Home / End moves across copy chips (Disk Cleanup add-scope / Monitors detail parity). Enter / Space keeps copy activate. Soft kb hint when both are visible; one Tab stop via roving tabindex.
+
 ## [0.1.612] - 2026-08-23
 
 ### Added

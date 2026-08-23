@@ -1835,11 +1835,25 @@ textarea.ops-agent-editor.is-dirty {
 
 /* Shared process details modal (all themes) */
 .process-detail-hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
   margin: 0 0 12px;
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
   background: color-mix(in srgb, currentColor 5%, transparent);
+}
+
+.process-detail-hero-toolbar-kb-hint {
+  flex: 1 1 100%;
+  margin: 4px 0 0;
+  font-size: 11px;
+  opacity: 0.72;
+}
+
+.process-detail-hero-toolbar-kb-hint[hidden] {
+  display: none !important;
 }
 
 .process-detail-name {

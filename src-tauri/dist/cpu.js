@@ -4417,6 +4417,111 @@ function wireProcessDetailCopyButton(el, copyValue, idleLabel, prevFlash, failMs
   });
 }
 
+/** Focusable Top Processes detail hero toolbar items (name · PID). */
+function getProcessDetailHeroToolbarItems(hero) {
+  const wrap = hero || document.querySelector(".process-detail-hero");
+  if (!wrap) return [];
+  const items = [];
+  const name = wrap.querySelector(".process-detail-name");
+  const pid = wrap.querySelector(".process-detail-pid");
+  if (name && wrap.contains(name) && !name.hidden) items.push(name);
+  if (pid && wrap.contains(pid) && !pid.hidden) items.push(pid);
+  return items.filter((el) => {
+    if (!el || el.hidden) return false;
+    return el.getClientRects().length > 0 || wrap.contains(el);
+  });
+}
+
+function refreshProcessDetailHeroToolbarRovingTabindex(hero, preferred) {
+  const wrap = hero || document.querySelector(".process-detail-hero");
+  const items = getProcessDetailHeroToolbarItems(wrap);
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureProcessDetailHeroToolbarKbHint(hero) {
+  const wrap = hero || document.querySelector(".process-detail-hero");
+  if (!wrap) return;
+  let hint = wrap.querySelector(".process-detail-hero-toolbar-kb-hint");
+  if (!hint) {
+    hint = document.createElement("div");
+    hint.className = "process-detail-hero-toolbar-kb-hint";
+    hint.setAttribute("aria-hidden", "true");
+    wrap.appendChild(hint);
+  }
+  const items = getProcessDetailHeroToolbarItems(wrap);
+  hint.hidden = items.length < 2;
+  hint.textContent =
+    "← → / h l · Home/End move · Enter / Space copies";
+}
+
+/**
+ * Top Processes detail hero toolbar keyboard — focus name · PID, then ←→ / h l /
+ * Home/End (Disk Cleanup add-scope / Monitors detail parity). Enter/Space keeps copy.
+ */
+function ensureProcessDetailHeroToolbarKeyboard(hero) {
+  const wrap = hero || document.querySelector(".process-detail-hero");
+  if (!wrap) return;
+  ensureProcessDetailHeroToolbarKbHint(wrap);
+  refreshProcessDetailHeroToolbarRovingTabindex(wrap);
+  if (wrap.dataset.processDetailHeroToolbarKbWired === "1") return;
+  wrap.dataset.processDetailHeroToolbarKbWired = "1";
+  if (!wrap.getAttribute("role")) wrap.setAttribute("role", "toolbar");
+  if (!wrap.getAttribute("aria-label")) {
+    wrap.setAttribute("aria-label", "Process name and PID");
+  }
+  wrap.addEventListener("focusin", (e) => {
+    const items = getProcessDetailHeroToolbarItems(wrap);
+    if (items.includes(e.target)) {
+      refreshProcessDetailHeroToolbarRovingTabindex(wrap, e.target);
+      ensureProcessDetailHeroToolbarKbHint(wrap);
+    }
+  });
+  wrap.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getProcessDetailHeroToolbarItems(wrap);
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    if (e.key === "Enter" || e.key === " ") return;
+    let next = -1;
+    if (
+      e.key === "ArrowRight" ||
+      e.key === "l" ||
+      e.key === "ArrowDown" ||
+      e.key === "j"
+    ) {
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (
+      e.key === "ArrowLeft" ||
+      e.key === "h" ||
+      e.key === "ArrowUp" ||
+      e.key === "k"
+    ) {
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === "Home") {
+      next = 0;
+    } else if (e.key === "End") {
+      next = items.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshProcessDetailHeroToolbarRovingTabindex(wrap, items[next]);
+    items[next].focus();
+  });
+}
+
 function populateProcessDetailsBody(body, details, pid) {
     const startDate = formatDate(details.start_time);
     const cpuTimeFormatted = formatTime(Math.floor(details.total_cpu_time / 1000));
@@ -4541,7 +4646,9 @@ function populateProcessDetailsBody(body, details, pid) {
         "Could not copy PID."
       );
     }
-    
+    const heroEl = body.querySelector(".process-detail-hero");
+    if (heroEl) ensureProcessDetailHeroToolbarKeyboard(heroEl);
+
     // Set up force quit button handler (remove old listeners first by cloning)
     const forceQuitBtn = document.getElementById("force-quit-process-btn");
     if (forceQuitBtn) {
