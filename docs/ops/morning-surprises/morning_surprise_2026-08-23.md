@@ -1,10 +1,10 @@
 # Morning surprise — 2026-08-23
 
-Overnight Track B extended toolbar keyboard parity into Disk Cleanup add-scope while digester open stayed empty.
+Overnight Track B extended toolbar keyboard parity into Top Processes detail hero while digester open stayed empty.
 
 ## Latest keep (this tick)
 
-**v0.1.612** — Disk Cleanup add-scope toolbar keyboard: focus label · path · days · Recursive · Add scope, then ← → / h l / Home / End moves across controls (Monitors add-form toolbar parity). Arrows leave text fields only at start/end. Enter still adds from inputs; buttons and checkbox keep native activate. Soft kb hint when two or more controls are visible; one Tab stop via roving tabindex.
+**v0.1.613** — Top Processes detail hero toolbar keyboard: focus name · PID, then ← → / h l / Home / End moves across copy chips (Disk Cleanup add-scope / Monitors detail parity). Enter / Space keeps copy activate. Soft kb hint when both are visible; one Tab stop via roving tabindex.
 
 ## Tonight's keeps (selected)
 
@@ -25,6 +25,7 @@ Overnight Track B extended toolbar keyboard parity into Disk Cleanup add-scope w
 | **v0.1.610** | Discord settings toolbar keyboard |
 | **v0.1.611** | Monitors add-form toolbar keyboard |
 | **v0.1.612** | Disk Cleanup add-scope toolbar keyboard |
+| **v0.1.613** | Top Processes detail hero toolbar keyboard |
 
 ## Notes
 

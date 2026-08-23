@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- Top Processes **detail hero toolbar keyboard** (← → / h l · Home/End across name · PID; Enter/Space copies; Disk Cleanup add-scope parity) — **v0.1.613**
+
 - Disk Cleanup **add-scope toolbar keyboard** (← → / h l · Home/End across label · path · days · Recursive · Add scope; Monitors add-form parity) — **v0.1.612**
 
 - Monitors **add-form toolbar keyboard** (← → / h l · Home/End across URL · Cancel · Add Monitor; Discord settings toolbar parity) — **v0.1.611**
