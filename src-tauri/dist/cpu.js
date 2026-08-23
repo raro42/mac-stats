@@ -3433,6 +3433,29 @@ function tryChainProcessDetailsHeroToHeader() {
   return true;
 }
 
+function tryChainProcessDetailsHeroToForceQuit() {
+  const body = document.getElementById("process-details-body");
+  const section = body?.querySelector(".force-quit-section");
+  if (!section) return false;
+  const items = getForceQuitToolbarItems(section);
+  if (!items.length) return false;
+  refreshForceQuitToolbarRovingTabindex(section, items[0]);
+  items[0].focus();
+  return true;
+}
+
+function tryChainForceQuitToHero() {
+  const body = document.getElementById("process-details-body");
+  const hero = body?.querySelector(".process-detail-hero");
+  if (!hero) return false;
+  const items = getProcessDetailHeroToolbarItems(hero);
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  refreshProcessDetailHeroToolbarRovingTabindex(hero, target);
+  target.focus();
+  return true;
+}
+
 function wireProcessDetailsHeaderToolbarKeyboard(header) {
   if (!header || typeof window.wireModalHeaderToolbarKeyboard !== "function") return;
   window.wireModalHeaderToolbarKeyboard(header, {
@@ -3699,7 +3722,7 @@ function ensureProcessDetailHeroToolbarKbHint(hero) {
   const items = getProcessDetailHeroToolbarItems(wrap);
   hint.hidden = items.length < 2;
   hint.textContent =
-    "← → / h l · Home/End move · Enter / Space copies · at start crosses to header";
+    "← → / h l · Home/End move · Enter / Space copies · at start crosses to header · at end crosses to Force Quit";
 }
 
 /**
@@ -3738,7 +3761,14 @@ function ensureProcessDetailHeroToolbarKeyboard(hero) {
       e.key === "ArrowDown" ||
       e.key === "j"
     ) {
-      next = Math.min(idx + 1, items.length - 1);
+      if (idx === items.length - 1) {
+        if (tryChainProcessDetailsHeroToForceQuit()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx + 1;
     } else if (
       e.key === "ArrowLeft" ||
       e.key === "h" ||
@@ -3812,7 +3842,7 @@ function ensureForceQuitToolbarKbHint(section) {
   const items = getForceQuitToolbarItems(wrap);
   hint.hidden = items.length < 2;
   hint.textContent =
-    "← → / h l · Home/End move · Enter / Space on buttons";
+    "← → / h l · Home/End move · Enter / Space on buttons · at start crosses to PID";
 }
 
 /**
@@ -3865,7 +3895,14 @@ function ensureForceQuitToolbarKeyboard(section) {
       e.key === "ArrowUp" ||
       e.key === "k"
     ) {
-      next = Math.max(idx - 1, 0);
+      if (idx === 0) {
+        if (tryChainForceQuitToHero()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx - 1;
     } else if (e.key === "Home") {
       next = 0;
     } else if (e.key === "End") {

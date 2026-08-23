@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.624] - 2026-08-23
+
+### Added
+- Process Details **hero↔force-quit toolbar chain** — at PID, ← → / h l crosses into Advanced summary · Force Quit; at the first force-quit control, ← crosses back to PID (header↔hero chain parity).
+
 ## [0.1.623] - 2026-08-23
 
 ### Added
