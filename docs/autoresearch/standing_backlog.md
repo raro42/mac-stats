@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.632** — CPU window **footer toolbar keyboard** (version · GitHub ←→/h l/Home/End; icon-line wrap chain).
+
 - **v0.1.627 bundle** — LPM strip toggle (`toggle_low_power_mode`); GPU history sparkline + live Y-scale; icon-line section persistence; Agent Ops fully hidden when closed; changelog body↔header toolbar wrap.
 
 - Changelog **header↔body toolbar chain** — **v0.1.626**
