@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.637] - 2026-08-26
+
+### Added
+- CPU metrics **icon-line↔filter-chip toolbar chain** — last section icon → crosses to first filter chip; first chip ← crosses to last icon; last chip → crosses to footer (icon-line + footer parity).
+
 ## [0.1.636] - 2026-08-25
 
 ### Added

@@ -3259,6 +3259,82 @@ function getFilterChipButtons(wrap) {
   });
 }
 
+const FILTER_CHIP_WRAP_SELECTORS = [
+  '#monitors-filter-chips',
+  '#chat-filter-chips',
+  '#logs-filter-chips',
+  '#disk-cleanup-filter-chips',
+  '#processes-filter-chips',
+  '#ops-session-kind-chips',
+  '#ops-runs-lane-chips',
+  '#ops-agents-enabled-chips',
+  '#ops-schedules-kind-chips',
+  '#ops-memory-kind-chips',
+];
+
+/** Whether a filter-chip row is visible and has focusable chips. */
+function isFilterChipWrapVisible(wrap) {
+  if (!wrap || wrap.hidden) return false;
+  const chips = getFilterChipButtons(wrap);
+  if (!chips.length) return false;
+  try {
+    const style = window.getComputedStyle(wrap);
+    if (style.display === 'none' || style.visibility === 'hidden') return false;
+  } catch (_) {
+    /* ignore */
+  }
+  return (
+    wrap.getClientRects().length > 0 ||
+    chips.some((el) => el.getClientRects().length > 0)
+  );
+}
+
+/** Visible filter-chip rows in document order (Monitors · Chat · Logs · …). */
+function getFilterChipWraps() {
+  const wraps = [];
+  for (const sel of FILTER_CHIP_WRAP_SELECTORS) {
+    const el = document.querySelector(sel);
+    if (el && isFilterChipWrapVisible(el)) wraps.push(el);
+  }
+  wraps.sort((a, b) => {
+    if (a === b) return 0;
+    const pos = a.compareDocumentPosition(b);
+    if (pos & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
+    if (pos & Node.DOCUMENT_POSITION_PRECEDING) return 1;
+    return 0;
+  });
+  return wraps;
+}
+
+/** All visible filter-chip buttons across sections (document order). */
+function getAllFilterChipButtons() {
+  const out = [];
+  for (const wrap of getFilterChipWraps()) {
+    out.push(...getFilterChipButtons(wrap));
+  }
+  return out;
+}
+
+function getFirstFilterChipButton() {
+  const chips = getAllFilterChipButtons();
+  return chips.length ? chips[0] : null;
+}
+
+function getLastFilterChipButton() {
+  const chips = getAllFilterChipButtons();
+  return chips.length ? chips[chips.length - 1] : null;
+}
+
+function focusFilterChipButton(btn) {
+  if (!btn) return false;
+  const wrap = btn.closest(
+    '.processes-filter-chips, .monitors-filter-chips, .logs-filter-chips, .disk-cleanup-filter-chips, .chat-filter-chips, .ops-session-kind-chips, .ops-memory-kind-chips, .ops-runs-lane-chips, .ops-agents-enabled-chips, .ops-schedules-kind-chips'
+  );
+  if (wrap) refreshFilterChipRovingTabindex(wrap, btn);
+  btn.focus();
+  return true;
+}
+
 function refreshFilterChipRovingTabindex(wrap, preferred) {
   const chips = getFilterChipButtons(wrap);
   if (!chips.length) return;
@@ -3309,7 +3385,60 @@ function wireFilterChipToolbarKeyboard(wrap) {
   if (!wrap) return;
   ensureFilterChipKbStyles();
   const hint =
-    'Tab or click a chip · ← → / h l · Home/End move · Enter / Space selects';
+    'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to footer · Enter / Space selects';
+  if (wrap.dataset.filterChipChainKbWired !== '1') {
+    wrap.dataset.filterChipChainKbWired = '1';
+    wrap.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const chips = getFilterChipButtons(wrap);
+        if (!chips.length) return;
+        const idx = chips.indexOf(document.activeElement);
+        if (idx < 0) return;
+        const forward =
+          e.key === 'ArrowRight' ||
+          e.key === 'l' ||
+          e.key === 'ArrowDown' ||
+          e.key === 'j';
+        const back =
+          e.key === 'ArrowLeft' ||
+          e.key === 'h' ||
+          e.key === 'ArrowUp' ||
+          e.key === 'k';
+        if (back && idx === 0) {
+          const wraps = getFilterChipWraps();
+          const wrapIdx = wraps.indexOf(wrap);
+          if (wrapIdx > 0) {
+            const prev = getFilterChipButtons(wraps[wrapIdx - 1]);
+            if (prev.length) {
+              focusFilterChipButton(prev[prev.length - 1]);
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          } else if (tryChainFilterChipToIconLineLast()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        } else if (forward && idx === chips.length - 1) {
+          const wraps = getFilterChipWraps();
+          const wrapIdx = wraps.indexOf(wrap);
+          if (wrapIdx >= 0 && wrapIdx < wraps.length - 1) {
+            const next = getFilterChipButtons(wraps[wrapIdx + 1]);
+            if (next.length) {
+              focusFilterChipButton(next[0]);
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          } else if (tryChainFilterChipToFooterFirst()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }
+      },
+      true
+    );
+  }
   wireToolbarKeyboard(
     wrap,
     () => getFilterChipButtons(wrap),
@@ -14082,6 +14211,36 @@ function tryChainIconLineToPowerStripLast() {
   return true;
 }
 
+function tryChainIconLineToFilterChipFirst() {
+  const target = getFirstFilterChipButton();
+  if (target) return focusFilterChipButton(target);
+  return tryChainIconLineToFooterFirst();
+}
+
+function tryChainFilterChipToIconLineLast() {
+  const items = getIconLineItems();
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  refreshIconLineRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+function tryChainFilterChipToFooterFirst() {
+  const items = getFooterToolbarItems();
+  if (!items.length) return false;
+  const target = items[0];
+  refreshFooterToolbarRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+function tryChainFooterToFilterChipLast() {
+  const target = getLastFilterChipButton();
+  if (target) return focusFilterChipButton(target);
+  return tryChainFooterToIconLineLast();
+}
+
 function tryChainHeaderRefreshToFooterLast() {
   const items = getFooterToolbarItems();
   if (!items.length) return false;
@@ -14304,7 +14463,7 @@ function ensureFooterToolbarKbHint() {
   const items = getFooterToolbarItems();
   hint.hidden = items.length < 2;
   hint.textContent =
-    '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to last icon';
+    '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to filter chips';
 }
 
 function tryChainFooterToIconLineFirst() {
@@ -14453,7 +14612,7 @@ function ensureFooterToolbarKeyboard() {
         next = idx + 1;
       } else if (back) {
         if (idx === 0) {
-          if (tryChainFooterToIconLineLast()) {
+          if (tryChainFooterToFilterChipLast()) {
             e.preventDefault();
             e.stopPropagation();
           }
@@ -14558,7 +14717,7 @@ function ensureIconLineKbHint() {
     line.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click an icon · ← → / h l · Home/End move · at start crosses to power strip · at end crosses to footer · Enter / Space opens section';
+    'Tab or click an icon · ← → / h l · Home/End move · at start crosses to power strip · at end crosses to filter chips · Enter / Space opens section';
 }
 
 /**
@@ -14589,7 +14748,7 @@ function ensureIconLineKeyboard() {
           e.key === 'ArrowUp' ||
           e.key === 'k';
         if (forward && idx === items.length - 1) {
-          if (tryChainIconLineToFooterFirst()) {
+          if (tryChainIconLineToFilterChipFirst()) {
             e.preventDefault();
             e.stopPropagation();
           }
