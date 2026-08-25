@@ -1,15 +1,16 @@
 # Morning surprise — 2026-08-25
 
-Overnight Track B shipped **v0.1.627** through **v0.1.630** — CPU-window fixes, AI Chat operator instant lane, Ollama settings keyboard polish, then a **p50 latency fix** for the CPU chat path.
+Overnight Track B shipped **v0.1.627** through **v0.1.631** — CPU-window fixes, AI Chat operator instant lane, Ollama settings keyboard polish, p50 latency instant lanes, then **today/morning-surprise** zero-LLM replies.
 
 ## Latest keep (this tick)
 
-**v0.1.630** — AI Chat **instant lane before ui-chat queue** — `/status`, `/insights`, greetings, version asks, and other zero-LLM replies no longer wait behind an in-flight Ollama turn (v0.1.628 only wired the agent router). **stop/cancel/interrupt** cooperative ack before the queue (Discord parity).
+**v0.1.631** — Instant lane for **morning surprise** asks, **what shipped today** / **this morning**, **digest open candidates**, and natural-language **is everything ok** / **everything working** status (zero-LLM; CPU chat + Discord parity).
 
 ## Tonight's keeps
 
 | Version | What |
 |---------|------|
+| **v0.1.631** | Morning surprise + today shipped + digest open + NL health instant lanes |
 | **v0.1.630** | AI Chat instant lane + stop/cancel before ui-chat queue |
 | **v0.1.629** | Ollama settings header↔body toolbar chain |
 | **v0.1.628** | Operator instant lane in AI Chat (Discord gateway parity) |
@@ -19,4 +20,4 @@ Overnight Track B shipped **v0.1.627** through **v0.1.630** — CPU-window fixes
 
 - Digester open empty (10 turns, 7 instant); design review not due (feature-ai-chat ~11.36d grace).
 - `debug.log`: quiet (180m scan — no ERROR/WARN clusters).
-- Installed release @ v0.1.630; Discord Ready after install.
+- Installed release @ v0.1.631; Discord Ready after install.
