@@ -1178,6 +1178,46 @@ pub fn looks_like_ops_help_request(content: &str) -> bool {
     )
 }
 
+/// Zero-LLM operator replies for AI Chat / Ollama paths (parity with Discord fast handlers).
+pub fn try_operator_instant_reply(content: &str) -> Option<String> {
+    if looks_like_ops_help_request(content) {
+        return Some(format_ops_help_gateway());
+    }
+    if looks_like_status_request(content) {
+        return Some(format_status_gateway());
+    }
+    if looks_like_insights_request(content) {
+        let days = parse_insights_days(content);
+        let insights = compute_runs_insights_for(80, days);
+        return Some(format_runs_insights_gateway(&insights));
+    }
+    if looks_like_schedules_request(content) {
+        return Some(format_schedules_gateway());
+    }
+    if looks_like_memory_scrub_request(content) {
+        let (files, removed) = crate::commands::session_search::scrub_polluted_memory_files();
+        return Some(if removed == 0 {
+            "Memory scrub: nothing polluted to remove.".to_string()
+        } else {
+            format!(
+                "Memory scrub: removed **{}** polluted line(s) from **{}** file(s).",
+                removed, files
+            )
+        });
+    }
+    if looks_like_digest_request(content) {
+        let line = refresh_agent_digest();
+        let summary = load_digest_summary();
+        let mut reply = line;
+        if summary.open_count > 0 {
+            reply.push_str("\n**Open:** ");
+            reply.push_str(&summary.open_hints.join("; "));
+        }
+        return Some(reply);
+    }
+    None
+}
+
 /// Short Discord menu of cheap operator commands (no Ollama).
 pub fn format_ops_help_gateway() -> String {
     let version = crate::config::Config::version();
@@ -1860,6 +1900,18 @@ mod tests {
             parse_session_filename("session-memory-discord-20260720-181500-weather.md");
         assert_eq!(src, "discord");
         assert!(slug.contains("weather"));
+    }
+
+    #[test]
+    fn operator_instant_reply_covers_gateway_commands() {
+        let status = try_operator_instant_reply("/status").expect("status");
+        assert!(status.contains("mac-stats"));
+        let insights = try_operator_instant_reply("insights").expect("insights");
+        assert!(insights.to_lowercase().contains("insights"));
+        let schedules = try_operator_instant_reply("list schedules").expect("schedules");
+        assert!(schedules.to_lowercase().contains("schedule"));
+        assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
+        assert!(try_operator_instant_reply("insights on weather").is_none());
     }
 
     #[test]

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.628] - 2026-08-25
+
+### Added
+- AI Chat / Ollama **operator instant lane** — `/status`, `/insights`, `/schedules`, `/digest`, `scrub memory`, and `/help` answer without an LLM (Discord gateway parity).
+
 ## [0.1.627] - 2026-08-25
 
 ### Fixed

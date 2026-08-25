@@ -146,6 +146,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_how_solved_task_ask(&n) {
         return Some(format_instant_how_solved_task_reply());
     }
+    if let Some(reply) = crate::commands::harness_ops::try_operator_instant_reply(q) {
+        return Some(reply);
+    }
     if is_tonight_plan_ask(&n) {
         return Some(format_instant_tonight_plan_reply());
     }
@@ -1472,6 +1475,23 @@ pub fn lite_success_criteria(pre_routed: Option<&str>) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn operator_gateway_commands_are_instant() {
+        for q in ["/status", "/insights", "list schedules", "/digest", "scrub memory", "/help"] {
+            assert!(
+                matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),
+                "expected Instant for {q}"
+            );
+        }
+        assert!(
+            !matches!(
+                classify_turn_lane("status of the redmine ticket", None),
+                TurnLane::Instant { .. }
+            ),
+            "ticket status must not be operator instant"
+        );
+    }
 
     #[test]
     fn commit_push_is_instant_refusal() {
