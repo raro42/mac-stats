@@ -13821,6 +13821,265 @@ async function initCpuWindowCompactPreference() {
   }
 }
 
+/** CPU window footer (version + GitHub). */
+function getCpuFooterElement() {
+  return (
+    document.querySelector(
+      'main footer.apple-footer, main footer.theme-footer, main footer[class*="footer"]'
+    ) || document.getElementById('github-link')?.closest('footer') ||
+    null
+  );
+}
+
+/** Version chip + GitHub link in the footer toolbar. */
+function getFooterToolbarItems() {
+  const footer = getCpuFooterElement();
+  if (!footer) return [];
+  const version = footer.querySelector(
+    '.app-version, .theme-version, .arch-version'
+  );
+  const github = footer.querySelector('#github-link') || document.getElementById('github-link');
+  return [version, github].filter((el) => {
+    if (!el || !footer.contains(el)) return false;
+    if (el.hidden || el.disabled) return false;
+    if (el.getAttribute('aria-disabled') === 'true') return false;
+    return (
+      el.getClientRects().length > 0 ||
+      el.offsetParent !== null ||
+      footer.contains(el)
+    );
+  });
+}
+
+function refreshFooterToolbarRovingTabindex(preferred) {
+  const items = getFooterToolbarItems();
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureFooterToolbarKbStyles() {
+  if (document.getElementById('mac-stats-footer-toolbar-kb-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'mac-stats-footer-toolbar-kb-styles';
+  style.textContent = `
+    .footer-toolbar-kb-hint {
+      margin: 4px 0 0;
+      font-size: 11px;
+      opacity: 0.72;
+      width: 100%;
+      text-align: center;
+    }
+    footer[role="toolbar"] .app-version[tabindex],
+    footer[role="toolbar"] .theme-version[tabindex],
+    footer[role="toolbar"] .arch-version[tabindex] {
+      outline: none;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function ensureFooterToolbarKbHint() {
+  ensureFooterToolbarKbStyles();
+  const footer = getCpuFooterElement();
+  if (!footer) return;
+  let hint = footer.querySelector('.footer-toolbar-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'footer-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    footer.appendChild(hint);
+  }
+  const items = getFooterToolbarItems();
+  hint.hidden = items.length < 2;
+  hint.textContent =
+    '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to last icon';
+}
+
+function tryChainFooterToIconLineFirst() {
+  const items = getIconLineItems();
+  if (!items.length) return false;
+  const target = items[0];
+  refreshIconLineRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+function tryChainFooterToIconLineLast() {
+  const items = getIconLineItems();
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  refreshIconLineRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+function tryChainIconLineToFooterFirst() {
+  const items = getFooterToolbarItems();
+  if (!items.length) return false;
+  const target = items[0];
+  refreshFooterToolbarRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+function tryChainIconLineToFooterLast() {
+  const items = getFooterToolbarItems();
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  refreshFooterToolbarRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+function activateFooterToolbarItem(el) {
+  if (!el) return;
+  if (
+    el.classList.contains('app-version') ||
+    el.classList.contains('theme-version') ||
+    el.classList.contains('arch-version')
+  ) {
+    if (el.classList.contains('is-just-saved')) return;
+    el.click();
+    return;
+  }
+  if (el.id === 'github-link') {
+    el.click();
+  }
+}
+
+/**
+ * Footer toolbar keyboard — version · GitHub, then ←→ / h l / Home/End
+ * (icon-line wrap chain at ends).
+ */
+function ensureFooterToolbarKeyboard() {
+  const footer = getCpuFooterElement();
+  if (!footer) return;
+  ensureFooterToolbarKbHint();
+  const version = footer.querySelector(
+    '.app-version, .theme-version, .arch-version'
+  );
+  if (version) {
+    if (!version.hasAttribute('tabindex')) version.tabIndex = 0;
+    if (!version.getAttribute('role')) version.setAttribute('role', 'button');
+    if (!version.getAttribute('aria-label')) {
+      version.setAttribute('aria-label', 'App version — open changelog');
+    }
+    if (version.dataset.footerVersionKbWired !== '1') {
+      version.dataset.footerVersionKbWired = '1';
+      version.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        e.preventDefault();
+        e.stopPropagation();
+        activateFooterToolbarItem(version);
+      });
+    }
+  }
+  refreshFooterToolbarRovingTabindex();
+  if (footer.dataset.footerToolbarKbWired === '1') return;
+  footer.dataset.footerToolbarKbWired = '1';
+  if (!footer.getAttribute('role')) footer.setAttribute('role', 'toolbar');
+  if (!footer.getAttribute('aria-label')) {
+    footer.setAttribute('aria-label', 'Footer');
+  }
+  footer.addEventListener(
+    'click',
+    (e) => {
+      const items = getFooterToolbarItems();
+      if (!items.length) return;
+      let node = e.target;
+      while (node && node !== footer) {
+        if (items.includes(node)) {
+          refreshFooterToolbarRovingTabindex(node);
+          node.focus();
+          return;
+        }
+        node = node.parentElement;
+      }
+    },
+    true
+  );
+  footer.addEventListener(
+    'keydown',
+    (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const items = getFooterToolbarItems();
+      if (!items.length) return;
+      const active = document.activeElement;
+      if (active !== footer && !footer.contains(active)) return;
+      let idx = items.indexOf(active);
+      if (idx < 0) {
+        const seed = items[0];
+        refreshFooterToolbarRovingTabindex(seed);
+        seed.focus();
+        idx = items.indexOf(document.activeElement);
+        if (idx < 0) return;
+      }
+      if (e.key === 'Enter' || e.key === ' ') {
+        activateFooterToolbarItem(items[idx]);
+        return;
+      }
+      const forward =
+        e.key === 'ArrowRight' ||
+        e.key === 'l' ||
+        e.key === 'ArrowDown' ||
+        e.key === 'j';
+      const back =
+        e.key === 'ArrowLeft' ||
+        e.key === 'h' ||
+        e.key === 'ArrowUp' ||
+        e.key === 'k';
+      let next = -1;
+      if (forward) {
+        if (idx === items.length - 1) {
+          if (tryChainFooterToIconLineFirst()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          return;
+        }
+        next = idx + 1;
+      } else if (back) {
+        if (idx === 0) {
+          if (tryChainFooterToIconLineLast()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          return;
+        }
+        next = idx - 1;
+      } else if (e.key === 'Home') {
+        next = 0;
+      } else if (e.key === 'End') {
+        next = items.length - 1;
+      } else {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      if (next === idx) return;
+      refreshFooterToolbarRovingTabindex(items[next]);
+      items[next].focus();
+    },
+    true
+  );
+  footer.addEventListener('focusin', (e) => {
+    const items = getFooterToolbarItems();
+    if (items.includes(e.target)) {
+      refreshFooterToolbarRovingTabindex(e.target);
+      ensureFooterToolbarKbHint();
+    }
+  });
+}
+
 /** Visible, interactive icon-line buttons (skips AI-off / hidden). */
 function getIconLineItems() {
   const line = document.getElementById('icon-line');
@@ -13905,6 +14164,41 @@ function ensureIconLineKeyboard() {
   const line = document.getElementById('icon-line');
   if (!line) return;
   ensureIconLineKbHint();
+  if (line.dataset.iconLineChainKbWired !== '1') {
+    line.dataset.iconLineChainKbWired = '1';
+    line.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const items = getIconLineItems();
+        if (!items.length) return;
+        const idx = items.indexOf(document.activeElement);
+        if (idx < 0) return;
+        const forward =
+          e.key === 'ArrowRight' ||
+          e.key === 'l' ||
+          e.key === 'ArrowDown' ||
+          e.key === 'j';
+        const back =
+          e.key === 'ArrowLeft' ||
+          e.key === 'h' ||
+          e.key === 'ArrowUp' ||
+          e.key === 'k';
+        if (forward && idx === items.length - 1) {
+          if (tryChainIconLineToFooterFirst()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        } else if (back && idx === 0) {
+          if (tryChainIconLineToFooterLast()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }
+      },
+      true
+    );
+  }
   wireToolbarKeyboard(
     line,
     () => getIconLineItems(),
@@ -13996,6 +14290,7 @@ function initIconLine() {
 
   initDiscordIconStatus();
   ensureIconLineKeyboard();
+  ensureFooterToolbarKeyboard();
 }
 
 // Check if history data is available and show/hide dropdown accordingly

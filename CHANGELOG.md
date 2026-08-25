@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.632] - 2026-08-25
+
+### Added
+- CPU window **footer toolbar keyboard** — version · GitHub ← → / h l / Home/End; Enter/Space opens changelog or GitHub; wraps to section icon line at ends (icon-line parity).
+
 ## [0.1.631] - 2026-08-25
 
 ### Added
