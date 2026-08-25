@@ -1,12 +1,14 @@
 # Morning surprise — 2026-08-26
 
-Overnight Track B now at **v0.1.639** — **Disk Cleanup scopes↔categories toolbar chain**.
+Overnight Track B now at **v0.1.640** — **section-content↔footer toolbar chain**.
 
 ## Latest keep (this tick)
 
-**v0.1.639** — Last scope row → first category; first category ↑ → last scope (or filter chips when scopes empty); last category → Clean now toolbar; first toolbar button ← last category.
+**v0.1.640** — Last row in processes · monitors · chat · logs · Agent Ops lists → footer; footer start ← last row (or Disk Cleanup toolbar / categories / scopes when that section is open); Disk Cleanup toolbar last → footer.
 
 ## Prior this night
+
+**v0.1.639** — Disk Cleanup scopes↔categories toolbar chain.
 
 **v0.1.638** — Filter-chip↔section-content chain (last chip → list; first row ↑ → chips).
 
@@ -16,7 +18,7 @@ Overnight Track B now at **v0.1.639** — **Disk Cleanup scopes↔categories too
 
 - Digester open empty (10 turns, 7 instant); design review not due (feature-ai-chat ~11.5d grace).
 - `debug.log`: single-instance lock DEBUG/WARN only (180m scan) — no product errors.
-- Installed release @ v0.1.639; process running after install.
+- Installed release @ v0.1.640; process running after install.
 
 ## Prior night carry (2026-08-25)
 
