@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.638** — Filter-chip↔section-content toolbar chain (last chip → list; first row ↑ → chips; processes/monitors/chat/logs/disk/Agent Ops).
+
 - **v0.1.637** — CPU metrics icon-line↔filter-chip toolbar chain (last icon → first filter chip; last chip → footer).
 
 - **v0.1.636** — CPU metrics power-strip↔icon-line toolbar chain (last strip chip → first section icon; first icon ← last strip chip).
