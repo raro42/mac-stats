@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.633] - 2026-08-25
+
+### Added
+- CPU window **header toolbar keyboard** — Refresh · Settings ← → / h l / Home/End; Enter/Space activates; at end crosses to CPU ring; at start crosses to footer GitHub (ring-gauge + footer parity).
+
 ## [0.1.632] - 2026-08-25
 
 ### Added

@@ -2011,6 +2011,7 @@ function init() {
   // Force immediate process update on initial load
   window._forceProcessUpdate = true;
   wireMetricValueCopy();
+  ensureCpuHeaderToolbarKeyboard();
   ensureRingGaugeKeyboard();
   ensureHistorySparklineKeyboard();
   ensureGpuHistoryChart();
@@ -2813,7 +2814,7 @@ function ensureRingGaugeKbHint() {
     section.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click a ring · ← → / h l · Home/End move · Enter / Space activates';
+    'Tab or click a ring · ← → / h l · Home/End move · at start crosses to Settings · Enter / Space activates';
 }
 
 /**
@@ -2824,6 +2825,31 @@ function ensureRingGaugeKeyboard() {
   const section = getRingGaugeSection();
   if (!section) return;
   ensureRingGaugeKbHint();
+  if (section.dataset.ringGaugeChainKbWired !== '1') {
+    section.dataset.ringGaugeChainKbWired = '1';
+    section.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const chips = getRingGaugeChips();
+        if (!chips.length) return;
+        const idx = chips.indexOf(document.activeElement);
+        if (idx < 0) return;
+        const back =
+          e.key === 'ArrowLeft' ||
+          e.key === 'h' ||
+          e.key === 'ArrowUp' ||
+          e.key === 'k';
+        if (back && idx === 0) {
+          if (tryChainRingGaugeToHeaderSettings()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }
+      },
+      true
+    );
+  }
   wireToolbarKeyboard(
     section,
     () => getRingGaugeChips(),
@@ -13821,6 +13847,250 @@ async function initCpuWindowCompactPreference() {
   }
 }
 
+/** CPU window header actions (Refresh · Settings). */
+function getCpuHeaderActionsElement() {
+  const refresh = document.getElementById('refresh-btn');
+  if (refresh) {
+    const actions = refresh.closest(
+      '.apple-actions, .theme-actions, [class*="actions"]'
+    );
+    if (actions) return actions;
+    const header = refresh.closest('header');
+    if (header) return header;
+  }
+  return (
+    document.querySelector(
+      'header .apple-actions, header .theme-actions, header [class*="actions"]'
+    ) || null
+  );
+}
+
+/** Refresh · Settings in the CPU window header toolbar. */
+function getCpuHeaderToolbarItems() {
+  const actions = getCpuHeaderActionsElement();
+  const ids = ['refresh-btn', 'settings-btn'];
+  return ids
+    .map((id) => document.getElementById(id))
+    .filter((el) => {
+      if (!el) return false;
+      if (actions && !actions.contains(el)) return false;
+      if (el.hidden || el.disabled) return false;
+      if (el.getAttribute('aria-disabled') === 'true') return false;
+      return (
+        el.getClientRects().length > 0 ||
+        el.offsetParent !== null ||
+        (actions && actions.contains(el))
+      );
+    });
+}
+
+function refreshCpuHeaderToolbarRovingTabindex(preferred) {
+  const items = getCpuHeaderToolbarItems();
+  if (!items.length) return;
+  const focused = items.find((el) => el === document.activeElement);
+  const current =
+    (preferred && items.includes(preferred) && preferred) ||
+    focused ||
+    items.find((el) => el.tabIndex === 0) ||
+    items[0];
+  for (const el of items) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function ensureCpuHeaderToolbarKbStyles() {
+  if (document.getElementById('mac-stats-header-toolbar-kb-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'mac-stats-header-toolbar-kb-styles';
+  style.textContent = `
+    .header-toolbar-kb-hint {
+      margin: 2px 0 0;
+      font-size: 11px;
+      opacity: 0.72;
+      width: 100%;
+      text-align: right;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function ensureCpuHeaderToolbarKbHint() {
+  ensureCpuHeaderToolbarKbStyles();
+  const actions = getCpuHeaderActionsElement();
+  if (!actions) return;
+  let hint = actions.querySelector('.header-toolbar-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'header-toolbar-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    actions.appendChild(hint);
+  }
+  const items = getCpuHeaderToolbarItems();
+  hint.hidden = items.length < 2;
+  hint.textContent =
+    '← → / h l · Home/End move · at end crosses to CPU ring · at start crosses to footer';
+}
+
+function tryChainHeaderToRingGaugeFirst() {
+  const chips = getRingGaugeChips();
+  if (!chips.length) return false;
+  refreshRingGaugeRovingTabindex(chips[0]);
+  chips[0].focus();
+  return true;
+}
+
+function tryChainRingGaugeToHeaderSettings() {
+  const items = getCpuHeaderToolbarItems();
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  refreshCpuHeaderToolbarRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+function tryChainHeaderRefreshToFooterLast() {
+  const items = getFooterToolbarItems();
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  refreshFooterToolbarRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+function activateCpuHeaderToolbarItem(el) {
+  if (!el || el.disabled) return;
+  if (el.classList.contains('is-just-saved') || el.classList.contains('is-refreshing')) {
+    return;
+  }
+  el.click();
+}
+
+/**
+ * CPU window header toolbar keyboard — Refresh · Settings, then ←→ / h l / Home/End
+ * (ring-gauge + footer wrap chain at ends).
+ */
+function ensureCpuHeaderToolbarKeyboard() {
+  const actions = getCpuHeaderActionsElement();
+  if (!actions) return;
+  ensureCpuHeaderToolbarKbHint();
+  const items = getCpuHeaderToolbarItems();
+  for (const el of items) {
+    if (!el.hasAttribute('tabindex')) el.tabIndex = -1;
+    if (!el.getAttribute('role')) el.setAttribute('role', 'button');
+    if (el.id === 'refresh-btn' && !el.getAttribute('aria-label')) {
+      el.setAttribute('aria-label', 'Refresh metrics');
+    }
+    if (el.id === 'settings-btn' && !el.getAttribute('aria-label')) {
+      el.setAttribute('aria-label', 'Open settings');
+    }
+    if (el.dataset.headerToolbarKbWired !== '1') {
+      el.dataset.headerToolbarKbWired = '1';
+      el.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        e.preventDefault();
+        e.stopPropagation();
+        activateCpuHeaderToolbarItem(el);
+      });
+    }
+  }
+  refreshCpuHeaderToolbarRovingTabindex();
+  if (actions.dataset.headerToolbarKbWired === '1') return;
+  actions.dataset.headerToolbarKbWired = '1';
+  if (!actions.getAttribute('role')) actions.setAttribute('role', 'toolbar');
+  if (!actions.getAttribute('aria-label')) {
+    actions.setAttribute('aria-label', 'Window actions');
+  }
+  actions.addEventListener(
+    'click',
+    (e) => {
+      const toolbarItems = getCpuHeaderToolbarItems();
+      if (!toolbarItems.length) return;
+      let node = e.target;
+      while (node && node !== actions) {
+        if (toolbarItems.includes(node)) {
+          refreshCpuHeaderToolbarRovingTabindex(node);
+          node.focus();
+          return;
+        }
+        node = node.parentElement;
+      }
+    },
+    true
+  );
+  actions.addEventListener(
+    'keydown',
+    (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const toolbarItems = getCpuHeaderToolbarItems();
+      if (!toolbarItems.length) return;
+      const active = document.activeElement;
+      if (active !== actions && !actions.contains(active)) return;
+      let idx = toolbarItems.indexOf(active);
+      if (idx < 0) {
+        const seed = toolbarItems[0];
+        refreshCpuHeaderToolbarRovingTabindex(seed);
+        seed.focus();
+        idx = toolbarItems.indexOf(document.activeElement);
+        if (idx < 0) return;
+      }
+      if (e.key === 'Enter' || e.key === ' ') {
+        activateCpuHeaderToolbarItem(toolbarItems[idx]);
+        return;
+      }
+      const forward =
+        e.key === 'ArrowRight' ||
+        e.key === 'l' ||
+        e.key === 'ArrowDown' ||
+        e.key === 'j';
+      const back =
+        e.key === 'ArrowLeft' ||
+        e.key === 'h' ||
+        e.key === 'ArrowUp' ||
+        e.key === 'k';
+      let next = -1;
+      if (forward) {
+        if (idx === toolbarItems.length - 1) {
+          if (tryChainHeaderToRingGaugeFirst()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          return;
+        }
+        next = idx + 1;
+      } else if (back) {
+        if (idx === 0) {
+          if (tryChainHeaderRefreshToFooterLast()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          return;
+        }
+        next = idx - 1;
+      } else if (e.key === 'Home') {
+        next = 0;
+      } else if (e.key === 'End') {
+        next = toolbarItems.length - 1;
+      } else {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      if (next === idx) return;
+      refreshCpuHeaderToolbarRovingTabindex(toolbarItems[next]);
+      toolbarItems[next].focus();
+    },
+    true
+  );
+  actions.addEventListener('focusin', (e) => {
+    const toolbarItems = getCpuHeaderToolbarItems();
+    if (toolbarItems.includes(e.target)) {
+      refreshCpuHeaderToolbarRovingTabindex(e.target);
+      ensureCpuHeaderToolbarKbHint();
+    }
+  });
+}
+
 /** CPU window footer (version + GitHub). */
 function getCpuFooterElement() {
   return (
@@ -13842,7 +14112,7 @@ function getFooterToolbarItems() {
   return [version, github].filter((el) => {
     if (!el || !footer.contains(el)) return false;
     if (el.hidden || el.disabled) return false;
-  if (el.getAttribute('aria-disabled') === 'true') return false;
+    if (el.getAttribute('aria-disabled') === 'true') return false;
     return (
       el.getClientRects().length > 0 ||
       el.offsetParent !== null ||
@@ -14289,6 +14559,7 @@ function initIconLine() {
   // Agent Ops icon is wired exclusively in agent-ops.js (avoid double-toggle).
 
   initDiscordIconStatus();
+  ensureCpuHeaderToolbarKeyboard();
   ensureIconLineKeyboard();
   ensureFooterToolbarKeyboard();
 }
