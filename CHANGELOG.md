@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.629] - 2026-08-25
+
+### Added
+- Ollama settings **header↔body toolbar chain** — at header Close, ← → / h l crosses into system prompt · Reset · Save; at the first/last body control, ←/→ crosses back to header Close; at header title, ← crosses to Save (changelog header↔body parity).
+
 ## [0.1.628] - 2026-08-25
 
 ### Added

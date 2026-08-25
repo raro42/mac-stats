@@ -7888,6 +7888,8 @@ function initOllamaSection() {
         closeOllamaSettingsPopover();
       }
     });
+    const settingsHeader = settingsPopover.querySelector('.popover-header');
+    if (settingsHeader) wireOllamaSettingsHeaderToolbarKeyboard(settingsHeader);
     const settingsContent = settingsPopover.querySelector('.popover-content');
     if (settingsContent) ensureOllamaSettingsToolbarKeyboard(settingsContent);
   }
@@ -7907,13 +7909,12 @@ function ollamaSettingsTextareaAtMoveBoundary(textarea, direction) {
   return textarea.selectionStart === 0 && textarea.selectionEnd === 0;
 }
 
-/** Focusable Ollama settings toolbar items (close · prompt · Reset · Save). */
+/** Focusable Ollama settings body toolbar items (prompt · Reset · Save; close lives in header). */
 function getOllamaSettingsToolbarItems(wrap) {
   const content =
     wrap || document.querySelector('#ollama-settings-popover .popover-content');
   if (!content) return [];
   const ids = [
-    'ollama-settings-close',
     'ollama-system-prompt',
     'ollama-settings-reset',
     'ollama-settings-save',
@@ -7959,12 +7960,80 @@ function ensureOllamaSettingsToolbarKbHint(wrap) {
   const items = getOllamaSettingsToolbarItems(content);
   hint.hidden = items.length < 2;
   hint.textContent =
-    '← → / h l · Home/End move · arrows at prompt start/end · buttons keep activate';
+    '← → / h l · Home/End move · arrows at prompt start/end · at start crosses to header Close · at end crosses to header Close';
+}
+
+/** Ollama settings header Close → system prompt. */
+function tryChainOllamaSettingsHeaderToBody() {
+  const content = document.querySelector('#ollama-settings-popover .popover-content');
+  if (!content) return false;
+  const items = getOllamaSettingsToolbarItems(content);
+  if (!items.length) return false;
+  refreshOllamaSettingsToolbarRovingTabindex(content, items[0]);
+  items[0].focus();
+  if (
+    items[0]?.id === 'ollama-system-prompt' &&
+    typeof items[0].setSelectionRange === 'function'
+  ) {
+    const len = (items[0].value || '').length;
+    items[0].setSelectionRange(len, len);
+  }
+  return true;
+}
+
+/** Ollama settings header title ← Save. */
+function tryChainOllamaSettingsHeaderToBodyLast() {
+  const content = document.querySelector('#ollama-settings-popover .popover-content');
+  if (!content) return false;
+  const items = getOllamaSettingsToolbarItems(content);
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  refreshOllamaSettingsToolbarRovingTabindex(content, target);
+  target.focus();
+  return true;
+}
+
+/** Ollama settings body item ←/→ header Close. */
+function tryChainOllamaSettingsBodyToHeader() {
+  const header = document
+    .querySelector('#ollama-settings-popover .popover-header');
+  if (!header || typeof window.getModalHeaderToolbarItems !== 'function') return false;
+  const items = window.getModalHeaderToolbarItems(
+    header,
+    'ollama-settings-title',
+    'ollama-settings-close'
+  );
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  if (typeof window.refreshModalHeaderRovingTabindex === 'function') {
+    window.refreshModalHeaderRovingTabindex(
+      header,
+      'ollama-settings-title',
+      'ollama-settings-close',
+      target
+    );
+  }
+  target.focus();
+  return true;
+}
+
+function wireOllamaSettingsHeaderToolbarKeyboard(header) {
+  if (!header || typeof window.wireModalHeaderToolbarKeyboard !== 'function') return;
+  window.wireModalHeaderToolbarKeyboard(header, {
+    titleId: 'ollama-settings-title',
+    closeId: 'ollama-settings-close',
+    ariaLabel: 'Ollama settings header',
+    wireKey: 'ollamaSettingsHeaderToolbarKbWired',
+    hintText:
+      '← → / h l · Home/End move · Enter / Space on Close closes · at end crosses to system prompt · at start crosses to Save',
+    chainForwardFromEnd: () => tryChainOllamaSettingsHeaderToBody(),
+    chainBackFromStart: () => tryChainOllamaSettingsHeaderToBodyLast(),
+  });
 }
 
 /**
- * Ollama settings toolbar keyboard — focus close · system prompt · Reset · Save,
- * then ←→ / h l / Home/End (Discord settings toolbar parity).
+ * Ollama settings toolbar keyboard — focus system prompt · Reset · Save,
+ * then ←→ / h l / Home/End (changelog header↔body parity).
  */
 function ensureOllamaSettingsToolbarKeyboard(wrap) {
   const content =
@@ -7994,7 +8063,6 @@ function ensureOllamaSettingsToolbarKeyboard(wrap) {
     const active = items[idx];
     if (e.key === 'Enter' || e.key === ' ') {
       if (
-        active?.id === 'ollama-settings-close' ||
         active?.id === 'ollama-system-prompt' ||
         active?.id === 'ollama-settings-reset' ||
         active?.id === 'ollama-settings-save'
@@ -8020,7 +8088,14 @@ function ensureOllamaSettingsToolbarKeyboard(wrap) {
       ) {
         return;
       }
-      next = Math.min(idx + 1, items.length - 1);
+      if (idx === items.length - 1) {
+        if (tryChainOllamaSettingsBodyToHeader()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx + 1;
     } else if (back) {
       if (
         active?.id === 'ollama-system-prompt' &&
@@ -8028,7 +8103,14 @@ function ensureOllamaSettingsToolbarKeyboard(wrap) {
       ) {
         return;
       }
-      next = Math.max(idx - 1, 0);
+      if (idx === 0) {
+        if (tryChainOllamaSettingsBodyToHeader()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx - 1;
     } else if (e.key === 'Home') {
       next = 0;
     } else if (e.key === 'End') {
@@ -8083,6 +8165,8 @@ function showSystemPromptSettings() {
       if (!title.id) title.id = 'ollama-settings-title';
       popover.setAttribute('aria-labelledby', title.id);
     }
+    const settingsHeader = popover.querySelector('.popover-header');
+    if (settingsHeader) wireOllamaSettingsHeaderToolbarKeyboard(settingsHeader);
     const settingsContent = popover.querySelector('.popover-content');
     if (settingsContent) {
       ensureOllamaSettingsToolbarKeyboard(settingsContent);
