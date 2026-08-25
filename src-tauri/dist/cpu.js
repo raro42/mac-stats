@@ -125,6 +125,19 @@ function setCpuUiSectionValue(key, value) {
   schedulePersistCpuUiSections();
 }
 
+function getCpuUiSectionValue(key, fallback = null) {
+  if (cpuUiSectionsCache && Object.prototype.hasOwnProperty.call(cpuUiSectionsCache, key)) {
+    const v = cpuUiSectionsCache[key];
+    return v == null ? fallback : v;
+  }
+  try {
+    const raw = localStorage.getItem(key);
+    return raw == null ? fallback : raw;
+  } catch (_) {
+    return fallback;
+  }
+}
+
 function schedulePersistCpuUiSections() {
   if (cpuUiSectionsPersistTimer) clearTimeout(cpuUiSectionsPersistTimer);
   cpuUiSectionsPersistTimer = setTimeout(() => {
@@ -146,6 +159,7 @@ async function persistCpuUiSectionsNow() {
 window.getSectionCollapsed = getSectionCollapsed;
 window.setSectionCollapsed = setSectionCollapsed;
 window.setCpuUiSectionValue = setCpuUiSectionValue;
+window.getCpuUiSectionValue = getCpuUiSectionValue;
 window.loadCpuUiSections = loadCpuUiSections;
 /** Highlight icon when its section is open; fade when closed. */
 window.syncSectionIcon = function syncSectionIcon(iconId, isOpen) {
@@ -1105,33 +1119,6 @@ async function refresh() {
       // Ring gauge and theme charts only when we refresh temperature
       updateRingGauge("temperature-ring-progress", Math.min(100, data.temperature), 'temperature');
       
-      if (window.posterCharts && data.can_read_temperature && data.temperature > 0) {
-        window.posterCharts.updateTemperature(data.temperature);
-      }
-      if (window.darkHistory && data.can_read_temperature && data.temperature > 0) {
-        window.darkHistory.updateTemperature(data.temperature);
-      }
-      if (window.lightHistory && data.can_read_temperature && data.temperature > 0) {
-        window.lightHistory.updateTemperature(data.temperature);
-      }
-      if (window.futuristicHistory && data.can_read_temperature && data.temperature > 0) {
-        window.futuristicHistory.updateTemperature(data.temperature);
-      }
-      if (window.materialHistory && data.can_read_temperature && data.temperature > 0) {
-        window.materialHistory.updateTemperature(data.temperature);
-      }
-      if (window.neonHistory && data.can_read_temperature && data.temperature > 0) {
-        window.neonHistory.updateTemperature(data.temperature);
-      }
-      if (window.swissHistory && data.can_read_temperature && data.temperature > 0) {
-        window.swissHistory.updateTemperature(data.temperature);
-      }
-      if (window.architectHistory && data.can_read_temperature && data.temperature > 0) {
-        window.architectHistory.updateTemperature(data.temperature);
-      }
-      if (window.appleHistory && data.can_read_temperature && data.temperature > 0) {
-        window.appleHistory.updateTemperature(data.temperature);
-      }
       ensureTempStrip();
       const tempStripEl = document.getElementById("temp-strip-value");
       const tempStripCell = document.getElementById("temp-strip");
@@ -1192,27 +1179,9 @@ async function refresh() {
           `Thermal ${thermalStripText === "—" ? "unavailable" : thermalStripText}. ${title}`
         );
       }
-      // Low Power Mode on the power strip (NSProcessInfo.isLowPowerModeEnabled)
-      ensureLowPowerStrip();
-      const lpmStripEl = document.getElementById("lpm-strip-value");
-      const lpmStripCell = document.getElementById("lpm-strip");
-      const lpmOn = !!(data && data.low_power_mode);
-      const lpmStripText = lpmOn ? "On" : "Off";
-      if (lpmStripEl && lpmStripEl.textContent !== lpmStripText) {
-        scheduleDOMUpdate(() => {
-          lpmStripEl.textContent = lpmStripText;
-        });
-      }
-      if (lpmStripCell) {
-        lpmStripCell.classList.toggle("is-on", lpmOn);
-        const title = "Open Battery settings (Low Power Mode)";
-        lpmStripCell.title = title;
-        lpmStripCell.setAttribute(
-          "aria-label",
-          `Low Power Mode ${lpmStripText}. ${title}`
-        );
-      }
     }
+
+    updateLpmStripFromData(data);
 
     // Update GPU usage (top gauge)
     const gpuUsageEl = document.getElementById("gpu-usage-value");
@@ -1242,9 +1211,6 @@ async function refresh() {
         }
       }
       updateRingGauge("gpu-usage-ring-progress", data.gpu_usage || 0, "gpu");
-      if (window.posterCharts && typeof window.posterCharts.updateGpuUsage === "function") {
-        window.posterCharts.updateGpuUsage(data.gpu_usage || 0);
-      }
       ensureGpuStrip();
       const gpuStripEl = document.getElementById("gpu-strip-value");
       const gpuStripCell = document.getElementById("gpu-strip");
@@ -1307,51 +1273,6 @@ async function refresh() {
       const title = "Show CPU ring";
       cpuStripCell.title = title;
       cpuStripCell.setAttribute("aria-label", `CPU ${cpuPctText}. ${title}`);
-    }
-    
-    // Update data-poster charts if available
-    if (window.posterCharts) {
-      window.posterCharts.updateUsage(data.usage);
-    }
-    
-    // Update dark theme history charts if available
-    if (window.darkHistory) {
-      window.darkHistory.updateUsage(data.usage);
-    }
-    
-    // Update light theme history charts if available
-    if (window.lightHistory) {
-      window.lightHistory.updateUsage(data.usage);
-    }
-    
-    // Update futuristic theme history charts if available
-    if (window.futuristicHistory) {
-      window.futuristicHistory.updateUsage(data.usage);
-    }
-    
-    // Update material theme history charts if available
-    if (window.materialHistory) {
-      window.materialHistory.updateUsage(data.usage);
-    }
-    
-    // Update neon theme history charts if available
-    if (window.neonHistory) {
-      window.neonHistory.updateUsage(data.usage);
-    }
-    
-    // Update swiss theme history charts if available
-    if (window.swissHistory) {
-      window.swissHistory.updateUsage(data.usage);
-    }
-    
-    // Update architect theme history charts if available
-    if (window.architectHistory) {
-      window.architectHistory.updateUsage(data.usage);
-    }
-    
-    // Update apple theme history charts if available
-    if (window.appleHistory) {
-      window.appleHistory.updateUsage(data.usage);
     }
 
     // Update frequency
@@ -1421,51 +1342,6 @@ async function refresh() {
     // Always update ring gauge (it handles first paint and change detection internally)
     updateRingGauge("frequency-ring-progress", Math.min(100, (data.frequency / 5.0) * 100), 'frequency');
     
-      // Update data-poster charts if available
-      if (window.posterCharts && data.frequency > 0) {
-        window.posterCharts.updateFrequency(data.frequency);
-      }
-      
-      // Update dark theme history charts if available
-      if (window.darkHistory && data.frequency > 0) {
-        window.darkHistory.updateFrequency(data.frequency);
-      }
-      
-      // Update light theme history charts if available
-      if (window.lightHistory && data.frequency > 0) {
-        window.lightHistory.updateFrequency(data.frequency);
-      }
-      
-      // Update futuristic theme history charts if available
-      if (window.futuristicHistory && data.frequency > 0) {
-        window.futuristicHistory.updateFrequency(data.frequency);
-      }
-      
-      // Update material theme history charts if available
-      if (window.materialHistory && data.frequency > 0) {
-        window.materialHistory.updateFrequency(data.frequency);
-      }
-      
-      // Update neon theme history charts if available
-      if (window.neonHistory && data.frequency > 0) {
-        window.neonHistory.updateFrequency(data.frequency);
-      }
-      
-      // Update swiss theme history charts if available
-      if (window.swissHistory && data.frequency > 0) {
-        window.swissHistory.updateFrequency(data.frequency);
-      }
-      
-      // Update architect theme history charts if available
-      if (window.architectHistory && data.frequency > 0) {
-        window.architectHistory.updateFrequency(data.frequency);
-      }
-      
-      // Update apple theme history charts if available
-      if (window.appleHistory && data.frequency > 0) {
-        window.appleHistory.updateFrequency(data.frequency);
-      }
-
       ensureFreqStrip();
       const freqStripEl = document.getElementById("freq-strip-value");
       const freqStripCell = document.getElementById("freq-strip");
@@ -1753,6 +1629,8 @@ async function refresh() {
         });
       }
     }
+
+    feedThemeHistoryCharts(data, shouldUpdateTemperature);
 
     // STEP 7: Update process list only every 15 seconds to reduce CPU usage
     // Use document fragment to batch DOM updates and reduce WebKit reflows
@@ -2135,6 +2013,7 @@ function init() {
   wireMetricValueCopy();
   ensureRingGaugeKeyboard();
   ensureHistorySparklineKeyboard();
+  ensureGpuHistoryChart();
   ensureRamStripStyles();
   pruneMetricStripChips();
   ensurePowerStripKeyboard();
@@ -2169,14 +2048,92 @@ function initRingGauges() {
   });
 }
 
-/** Gauge metrics belong on the rings — not duplicated on the battery row. */
+/** Inject GPU sparkline (CPU · GPU · Freq · Temp) when themes only ship three charts. */
+function ensureGpuHistoryChart() {
+  if (document.getElementById('gpu-history-chart')) return;
+  const cpuCanvas = document.getElementById('usage-history-chart');
+  const freqContainer = document.getElementById('frequency-history-chart')?.closest(
+    '.history-chart-container'
+  );
+  if (!cpuCanvas || !freqContainer) return;
+  const gpuContainer = document.createElement('div');
+  gpuContainer.className = 'history-chart-container';
+  gpuContainer.setAttribute('aria-label', 'GPU usage history');
+  const caption = document.createElement('span');
+  caption.className = 'history-chart-caption';
+  caption.textContent = 'GPU';
+  const canvas = document.createElement('canvas');
+  canvas.className = 'history-chart';
+  canvas.id = 'gpu-history-chart';
+  canvas.width = 200;
+  canvas.height = 40;
+  gpuContainer.appendChild(caption);
+  gpuContainer.appendChild(canvas);
+  freqContainer.parentNode.insertBefore(gpuContainer, freqContainer);
+  if (!document.getElementById('mac-stats-history-four-col')) {
+    const style = document.createElement('style');
+    style.id = 'mac-stats-history-four-col';
+    style.textContent = `
+      .history-section:has(#gpu-history-chart) {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  if (window.themeHistory?.init) window.themeHistory.init();
+}
+
+function feedThemeHistoryCharts(data, includeTemperature) {
+  ensureGpuHistoryChart();
+  const usage = typeof data?.usage === 'number' ? data.usage : null;
+  const gpu =
+    typeof data?.gpu_usage === 'number' ? Math.max(0, data.gpu_usage) : null;
+  const freq =
+    typeof data?.frequency === 'number' && data.frequency > 0
+      ? data.frequency
+      : null;
+  const temp =
+    includeTemperature &&
+    typeof data?.temperature === 'number' &&
+    data.temperature > 0
+      ? data.temperature
+      : null;
+
+  const handlers = [
+    window.posterCharts,
+    window.themeHistory,
+    window.appleHistory,
+    window.darkHistory,
+    window.lightHistory,
+    window.futuristicHistory,
+    window.materialHistory,
+    window.neonHistory,
+    window.swissHistory,
+    window.architectHistory,
+  ];
+  for (const h of handlers) {
+    if (!h) continue;
+    if (usage !== null && typeof h.updateUsage === 'function') h.updateUsage(usage);
+    if (gpu !== null) {
+      if (typeof h.updateGpu === 'function') h.updateGpu(gpu);
+      else if (typeof h.updateGpuUsage === 'function') h.updateGpuUsage(gpu);
+    }
+    if (freq !== null && typeof h.updateFrequency === 'function') {
+      h.updateFrequency(freq);
+    }
+    if (temp !== null && typeof h.updateTemperature === 'function') {
+      h.updateTemperature(temp);
+    }
+  }
+}
+
+/** Gauge metrics belong on the rings — not duplicated on the battery row. LPM stays on the strip. */
 const METRIC_STRIP_CHIP_IDS = [
   'cpu-strip',
   'ram-strip',
   'gpu-strip',
   'temp-strip',
   'thermal-strip',
-  'lpm-strip',
   'freq-strip',
   'disk-strip',
   'uptime-strip',
@@ -2340,7 +2297,85 @@ function ensureRamStripStyles() {
       transition: background-color 0.2s ease, box-shadow 0.2s ease;
     }
     #battery-power-strip.is-lpm-highlight {
-      box-shadow: 0 0 0 2px color-mix(in srgb, #34c759 40%, transparent);
+      background-color: color-mix(in srgb, #30d158 16%, transparent);
+      border-radius: 10px;
+      box-shadow: 0 0 0 4px color-mix(in srgb, #30d158 16%, transparent);
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .lpm-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      outline: none;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .lpm-info:hover {
+      background-color: color-mix(in srgb, var(--accent, #0a84ff) 12%, transparent);
+    }
+    .lpm-info:focus-visible {
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #0a84ff) 55%, transparent);
+    }
+    .lpm-info.is-on {
+      background-color: color-mix(in srgb, #30d158 16%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #30d158 35%, transparent);
+    }
+    .lpm-info.is-on .lpm-value {
+      color: #248a3d;
+    }
+    .lpm-toggle {
+      position: relative;
+      flex-shrink: 0;
+      width: 34px;
+      height: 18px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--muted, #888) 35%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--muted, #888) 25%, transparent);
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .lpm-toggle::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+      transition: transform 0.2s ease;
+    }
+    .lpm-info.is-on .lpm-toggle {
+      background: color-mix(in srgb, #30d158 85%, #fff);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, #248a3d 40%, transparent);
+    }
+    .lpm-info.is-on .lpm-toggle::after {
+      transform: translateX(16px);
+    }
+    .lpm-info.is-busy {
+      opacity: 0.72;
+      pointer-events: none;
+    }
+    .lpm-info.is-lpm-flash {
+      box-shadow: 0 0 0 2px color-mix(in srgb, #30d158 55%, transparent);
+    }
+    .lpm-info.is-lpm-error {
+      background-color: color-mix(in srgb, #ff9f0a 14%, transparent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, #ff9f0a 45%, transparent);
+    }
+    .lpm-label {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+    .lpm-value {
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--text);
     }
     .power-strip-kb-hint {
       margin: 2px 0 0;
@@ -2441,12 +2476,192 @@ function openCpuRingFromStrip() {
   flashCpuRing();
 }
 
+function flashMetricRingHighlight(valueId, highlightClass) {
+  const el = document.getElementById(valueId);
+  const card = el?.closest?.(".metric-card") || el;
+  if (!card) return;
+  card.classList.add(highlightClass);
+  window.setTimeout(() => card.classList.remove(highlightClass), 1600);
+}
+
+function openGpuRingFromStrip() {
+  const el = document.getElementById("gpu-usage-value");
+  if (el && typeof el.scrollIntoView === "function") {
+    el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+  flashMetricRingHighlight("gpu-usage-value", "is-gpu-highlight");
+}
+
+function openFreqRingFromStrip() {
+  const el = document.getElementById("frequency-value");
+  if (el && typeof el.scrollIntoView === "function") {
+    el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+  flashMetricRingHighlight("frequency-value", "is-freq-highlight");
+}
+
+function openTempRingFromStrip() {
+  const el = document.getElementById("temperature-value");
+  if (el && typeof el.scrollIntoView === "function") {
+    el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+  flashMetricRingHighlight("temperature-value", "is-temp-highlight");
+}
+
 function ensureCpuStrip() { return _metricStripStub(); }
 function ensureRamStrip() { return _metricStripStub(); }
 function ensureGpuStrip() { return _metricStripStub(); }
 function ensureTempStrip() { return _metricStripStub(); }
 function ensureThermalStrip() { return _metricStripStub(); }
-function ensureLowPowerStrip() { return _metricStripStub(); }
+const LPM_GUI_LABEL = 'Low Power Mode (LPM)';
+
+function isLowPowerModeOn(data) {
+  if (!data) return false;
+  if (typeof data.low_power_mode === 'boolean') return data.low_power_mode;
+  if (typeof data.lowPowerMode === 'boolean') return data.lowPowerMode;
+  return false;
+}
+
+function updateLpmStripFromData(data, { optimisticOn } = {}) {
+  ensureLowPowerStrip();
+  const lpmStripEl = document.getElementById('lpm-strip-value');
+  const lpmStripCell = document.getElementById('lpm-strip');
+  if (!lpmStripEl || !lpmStripCell) return;
+  const lpmOn =
+    typeof optimisticOn === 'boolean' ? optimisticOn : isLowPowerModeOn(data);
+  const lpmStripText = lpmOn ? 'On' : 'Off';
+  if (lpmStripEl.textContent !== lpmStripText) {
+    lpmStripEl.textContent = lpmStripText;
+  }
+  lpmStripCell.classList.toggle('is-on', lpmOn);
+  lpmStripCell.dataset.lpmState = lpmOn ? 'on' : 'off';
+  const title = 'Toggle Low Power Mode (macOS may ask for your password)';
+  lpmStripCell.title = title;
+  lpmStripCell.setAttribute(
+    'aria-label',
+    `${LPM_GUI_LABEL} ${lpmStripText}. ${title}`
+  );
+  lpmStripCell.setAttribute('aria-pressed', lpmOn ? 'true' : 'false');
+}
+
+function ensureLowPowerStrip() {
+  ensureRamStripStyles();
+  const strip = document.getElementById('battery-power-strip');
+  if (!strip) return null;
+  let cell = document.getElementById('lpm-strip');
+  if (!cell) {
+    cell = document.createElement('div');
+    cell.id = 'lpm-strip';
+    cell.className = 'lpm-info';
+    cell.setAttribute('role', 'button');
+    cell.tabIndex = 0;
+    cell.title = 'Toggle Low Power Mode (macOS may ask for your password)';
+    cell.setAttribute('aria-label', `${LPM_GUI_LABEL}. ${cell.title}`);
+    cell.innerHTML =
+      `<span class="lpm-label">${LPM_GUI_LABEL}</span>` +
+      '<span class="lpm-value" id="lpm-strip-value">…</span>' +
+      '<span class="lpm-toggle" aria-hidden="true"></span>';
+    const powerEl = document.getElementById('power-value');
+    const timeEl = document.getElementById('time-remaining');
+    if (powerEl && powerEl.parentElement) {
+      powerEl.parentElement.insertAdjacentElement('afterend', cell);
+    } else if (timeEl) {
+      strip.insertBefore(cell, timeEl);
+    } else {
+      strip.appendChild(cell);
+    }
+  }
+  const labelEl = cell.querySelector('.lpm-label');
+  if (labelEl && labelEl.textContent !== LPM_GUI_LABEL) {
+    labelEl.textContent = LPM_GUI_LABEL;
+  }
+  if (cell.dataset.lpmStripWired === '1') return cell;
+  cell.dataset.lpmStripWired = '1';
+  const onLpmActivate = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleLowPowerModeFromStrip();
+  };
+  cell.addEventListener('click', onLpmActivate);
+  cell.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    onLpmActivate(e);
+  });
+  return cell;
+}
+
+async function openBatterySettingsFromStrip() {
+  const urls = [
+    'x-apple.systempreferences:com.apple.Battery-Settings.extension',
+    'x-apple.systempreferences:com.apple.preference.battery',
+  ];
+  const invokeFn = typeof getInvoke === 'function' ? getInvoke() : null;
+  for (const url of urls) {
+    try {
+      if (invokeFn) {
+        await invokeFn('plugin:shell|open', { path: url });
+        return;
+      }
+    } catch (_) {
+      /* try next */
+    }
+    try {
+      if (window.__TAURI__?.shell?.open) {
+        await window.__TAURI__.shell.open(url);
+        return;
+      }
+    } catch (_) {
+      /* try next */
+    }
+  }
+  const strip = document.getElementById('battery-power-strip');
+  if (strip) {
+    strip.classList.add('is-lpm-highlight');
+    window.setTimeout(() => strip.classList.remove('is-lpm-highlight'), 1600);
+  }
+}
+
+async function toggleLowPowerModeFromStrip() {
+  const cell = document.getElementById('lpm-strip');
+  if (!cell || cell.classList.contains('is-busy')) return;
+  const wasOn = cell.classList.contains('is-on');
+  cell.classList.remove('is-lpm-error');
+  cell.classList.add('is-busy');
+  updateLpmStripFromData(null, { optimisticOn: !wasOn });
+  const invokeFn = typeof getInvoke === 'function' ? getInvoke() : null;
+  if (invokeFn) {
+    try {
+      const result = await invokeFn('toggle_low_power_mode');
+      const enabled =
+        result && typeof result.enabled === 'boolean'
+          ? result.enabled
+          : !wasOn;
+      updateLpmStripFromData({ low_power_mode: enabled });
+      cell.classList.add('is-lpm-flash');
+      window.setTimeout(() => cell.classList.remove('is-lpm-flash'), 900);
+      if (typeof refresh === 'function') refresh();
+      return;
+    } catch (err) {
+      console.warn('[LPM] toggle failed', err);
+      updateLpmStripFromData({ low_power_mode: wasOn });
+      cell.classList.add('is-lpm-error');
+      const msg =
+        (err && (err.message || err.toString && err.toString())) ||
+        'Could not toggle Low Power Mode';
+      cell.title = msg;
+      window.setTimeout(() => {
+        cell.classList.remove('is-lpm-error');
+        cell.title = 'Toggle Low Power Mode (macOS may ask for your password)';
+      }, 4000);
+      alert(msg);
+      return;
+    } finally {
+      cell.classList.remove('is-busy');
+    }
+  }
+  cell.classList.remove('is-busy');
+  await openBatterySettingsFromStrip();
+}
 function ensureFreqStrip() { return _metricStripStub(); }
 function ensureDiskStrip() { return _metricStripStub(); }
 function ensureUptimeStrip() { return _metricStripStub(); }
@@ -2455,7 +2670,7 @@ function ensureUptimeStrip() { return _metricStripStub(); }
 function getPowerStripChips() {
   const strip = document.getElementById('battery-power-strip');
   if (!strip) return [];
-  const sel = ['#battery-level', '#power-value'].join(',');
+  const sel = ['#battery-level', '#lpm-strip', '#power-value'].join(',');
   return Array.from(strip.querySelectorAll(sel)).filter((el) => {
     if (!el || el.hidden) return false;
     // Prefer laid-out chips; keep just-created nodes before first paint.
@@ -2491,7 +2706,7 @@ function ensurePowerStripKbHint() {
     hint.setAttribute('aria-hidden', 'true');
     strip.appendChild(hint);
   }
-  hint.textContent = 'Click battery or power to copy';
+  hint.textContent = `${LPM_GUI_LABEL}: switch + On/Off · click to toggle (password may be required)`;
 }
 
 /**
@@ -2625,6 +2840,7 @@ function ensureRingGaugeKeyboard() {
 function getHistorySparklineSection() {
   const canvas =
     document.getElementById('usage-history-chart') ||
+    document.getElementById('gpu-history-chart') ||
     document.getElementById('frequency-history-chart') ||
     document.getElementById('temperature-history-chart');
   if (!canvas) return null;
@@ -2723,6 +2939,10 @@ function activateHistorySparkline(container) {
     openCpuRingFromStrip();
     return;
   }
+  if (id === 'gpu-history-chart') {
+    openGpuRingFromStrip();
+    return;
+  }
   if (id === 'frequency-history-chart') {
     openFreqRingFromStrip();
     return;
@@ -2748,6 +2968,7 @@ function ensureHistorySparklineKeyboard() {
     const id = canvas?.id || '';
     let title = 'Show related ring';
     if (id === 'usage-history-chart') title = 'Show CPU ring';
+    else if (id === 'gpu-history-chart') title = 'Show GPU ring';
     else if (id === 'frequency-history-chart') title = 'Show frequency ring';
     else if (id === 'temperature-history-chart') title = 'Show temperature ring';
     if (!el.title) el.title = title;
@@ -13612,6 +13833,21 @@ function ensureIconLineKeyboard() {
   line.dataset.iconLineKbWired = '1';
 }
 
+/** Sync icon-line highlights from persisted section open/closed state. */
+function syncIconLineFromSavedSections() {
+  const pairs = [
+    ['icon-monitors', 'monitors_collapsed'],
+    ['icon-ollama', 'ollama_collapsed'],
+    ['icon-perplexity', 'perplexity_collapsed'],
+    ['icon-logs', 'logs_collapsed'],
+    ['icon-disk-cleanup', 'disk_cleanup_collapsed'],
+    ['icon-agent-ops', 'agent_ops_collapsed'],
+  ];
+  for (const [iconId, key] of pairs) {
+    syncSectionIcon(iconId, !getSectionCollapsed(key));
+  }
+}
+
 function initIconLine() {
   const monitorsIcon = document.getElementById('icon-monitors');
   const ollamaIcon = document.getElementById('icon-ollama');
@@ -13728,6 +13964,7 @@ function initMonitoringFeatures() {
     void (async () => {
       await loadCpuUiSections();
       initIconLine();
+      syncIconLineFromSavedSections();
       initCollapsibleSections();
       initMonitorsSection();
       initPerplexitySection();

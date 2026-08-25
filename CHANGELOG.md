@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.627] - 2026-08-25
+
+### Fixed
+- CPU window **LPM chip** on the battery/power strip (restored after battery-row cleanup; click toggles Low Power Mode, green when On).
+- **LPM strip state** — updates every refresh (not only on temp ticks); shows **On/Off** + a green switch when active (not a stuck em dash).
+- **LPM toggle** — uses `pmset powermode` on recent macOS (was `lowpowermode` only, so clicks did nothing while menu bar stayed green).
+- **Temp history sparkline** in Apple and other themes (chart no longer waits on `can_read_temperature`; empty slots use NaN so the line draws once readings arrive).
+- **History sparklines** — Y-scale uses live data range (temp was pinned to the bottom); **GPU** chart added (CPU · GPU · Freq · Temp, aligned with the four rings).
+- **Agent Ops** — closed means fully hidden (no header or Discord glance); icon-line sections remember last open/closed state across restarts.
+
+### Added
+- **`toggle_low_power_mode`** — click LPM on the power strip to toggle (macOS admin password prompt); opens Battery settings if toggle is cancelled.
+- Changelog **body↔header toolbar wrap** — at the last version heading, → crosses to header Close; at header title, ← crosses to the last version (header↔body chain parity).
+
 ## [0.1.626] - 2026-08-23
 
 ### Added

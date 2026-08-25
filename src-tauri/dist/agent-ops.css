@@ -327,6 +327,11 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   clear: both;
 }
 
+.agent-ops-section.collapsed {
+  /* Icon-line pane: fully hidden when closed (no header / Discord glance). */
+  display: none !important;
+}
+
 .agent-ops-section:not(.collapsed) {
   display: block;
 }

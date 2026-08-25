@@ -1989,7 +1989,7 @@
     const items = getChangelogBodyToolbarItems(wrap);
     hint.hidden = items.length < 2;
     hint.textContent =
-      "← → / h l · Home/End move between versions · at start crosses to header Close";
+      "← → / h l · Home/End move between versions · at start/end crosses to header Close";
   }
 
   function focusChangelogBodyItem(body, el) {
@@ -2014,7 +2014,17 @@
     return true;
   }
 
-  /** First changelog body item ← header Close. */
+  /** Changelog header title ← last body version heading. */
+  function tryChainChangelogHeaderToBodyLast() {
+    const body = document.getElementById("changelog-body");
+    if (!body) return false;
+    const items = getChangelogBodyToolbarItems(body);
+    if (!items.length) return false;
+    focusChangelogBodyItem(body, items[items.length - 1]);
+    return true;
+  }
+
+  /** First changelog body item ← header Close; last body item → header Close. */
   function tryChainChangelogBodyToHeader() {
     const header = document
       .getElementById("changelog-modal")
@@ -2074,7 +2084,13 @@
         e.key === "ArrowDown" ||
         e.key === "j"
       ) {
-        if (idx === items.length - 1) return;
+        if (idx === items.length - 1) {
+          if (tryChainChangelogBodyToHeader()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          return;
+        }
         next = idx + 1;
       } else if (
         e.key === "ArrowLeft" ||
@@ -2112,8 +2128,9 @@
       ariaLabel: "Changelog header",
       wireKey: "changelogHeaderToolbarKbWired",
       hintText:
-        "← → / h l · Home/End move · Enter / Space on Close closes · at end crosses to changelog body",
+        "← → / h l · Home/End move · Enter / Space on Close closes · at end crosses to changelog body · at start crosses to last version",
       chainForwardFromEnd: () => tryChainChangelogHeaderToBody(),
+      chainBackFromStart: () => tryChainChangelogHeaderToBodyLast(),
     });
   }
 

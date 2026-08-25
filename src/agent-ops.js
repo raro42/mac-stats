@@ -487,6 +487,13 @@ function selectOpsTab(tab) {
     const panel = document.getElementById(`ops-panel-${tab}`);
     const tabs = document.querySelector('.agent-ops-tabs');
     (panel || tabs)?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+    if (typeof window.setCpuUiSectionValue === 'function') {
+        window.setCpuUiSectionValue('agent_ops_tab', tab);
+    } else {
+        try {
+            localStorage.setItem('agent_ops_tab', tab);
+        } catch (_) {}
+    }
 }
 
 function focusActiveOpsFilter() {
@@ -2238,44 +2245,8 @@ function ensureOpsCollapsedGlance() {
 }
 
 function syncOpsCollapsedGlance() {
-    const glance = ensureOpsCollapsedGlance();
-    if (!glance) return;
-    const glanceText = document.getElementById('agent-ops-collapsed-glance-text');
-    if (!agentOpsCollapsed) {
-        glance.hidden = true;
-        return;
-    }
-    const parsed = parseOpsDiscordGateway(opsRunsInsightsCache?.discord_gateway);
-    glance.hidden = false;
-    if (glanceText) glanceText.textContent = parsed.glanceLine;
-    glance.classList.toggle('is-ready', parsed.wash === 'ready');
-    glance.classList.toggle('is-warn', parsed.wash === 'warn');
-    glance.classList.toggle('is-offline', parsed.wash === 'offline');
-    glance.classList.toggle('is-empty', parsed.wash === 'empty');
-    glance.setAttribute('role', 'button');
-    glance.tabIndex = 0;
-    if (parsed.wash === 'offline') {
-        glance.title = 'Open Agent Ops — Discord is offline';
-        glance.setAttribute(
-            'aria-label',
-            'Discord offline — click to expand Agent Ops and preview gateway'
-        );
-    } else if (parsed.wash === 'warn') {
-        glance.title = 'Open Agent Ops — Discord reconnect noise';
-        glance.setAttribute(
-            'aria-label',
-            `${parsed.glanceLine} — click to expand and preview gateway`
-        );
-    } else if (parsed.wash === 'ready') {
-        glance.title = 'Show Agent Ops Discord gateway';
-        glance.setAttribute(
-            'aria-label',
-            `${parsed.glanceLine} — click to expand and preview`
-        );
-    } else {
-        glance.title = 'Show Agent Ops';
-        glance.setAttribute('aria-label', 'Discord status unknown — click to expand Agent Ops');
-    }
+    const glance = document.getElementById('agent-ops-collapsed-glance');
+    if (glance) glance.hidden = true;
 }
 
 function activateOpsCollapsedGlance() {
@@ -6674,29 +6645,46 @@ function escapeHtml(s) {
     }
   }
 
+  function restoreAgentOpsTab() {
+    let tab = 'agents';
+    if (typeof window.getCpuUiSectionValue === 'function') {
+      tab = window.getCpuUiSectionValue('agent_ops_tab', 'agents') || 'agents';
+    } else {
+      try {
+        tab = localStorage.getItem('agent_ops_tab') || 'agents';
+      } catch (_) {}
+    }
+    if (document.getElementById(`ops-panel-${tab}`)) {
+      selectOpsTab(tab);
+    }
+  }
+
   function applyOpsCollapsed(collapsed) {
     agentOpsCollapsed = collapsed;
     const section = document.getElementById('agent-ops-section') || document.querySelector('.agent-ops-section');
     const content = document.getElementById('agent-ops-content');
     const btn = document.getElementById('agent-ops-collapse-btn');
-    if (section) {
+    if (typeof window.setIconPaneVisibility === 'function') {
+      window.setIconPaneVisibility(section, content, collapsed, null);
+    } else if (section) {
       section.classList.toggle('collapsed', collapsed);
       section.style.display = collapsed ? 'none' : '';
       if (collapsed) section.setAttribute('aria-hidden', 'true');
       else section.removeAttribute('aria-hidden');
-    }
-    if (content) {
-      content.classList.toggle('collapsed', collapsed);
-      // Themes use .section-content-collapsible.collapsed { display:none }; dashboard uses inline display.
-      if (content.classList.contains('section-content-collapsible')) {
-        content.style.display = collapsed ? 'none' : 'block';
-      } else {
-        content.style.display = collapsed ? 'none' : '';
+      if (content) {
+        content.classList.toggle('collapsed', collapsed);
+        if (content.classList.contains('section-content-collapsible')) {
+          content.style.display = collapsed ? 'none' : 'block';
+        } else {
+          content.style.display = collapsed ? 'none' : '';
+        }
       }
     }
     if (btn) btn.textContent = collapsed ? '+' : '−';
     const header = document.getElementById('agent-ops-header');
     if (header) header.setAttribute('aria-expanded', String(!collapsed));
+    stopOpsGlancePoll();
+    syncOpsCollapsedGlance();
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);
@@ -6707,14 +6695,10 @@ function escapeHtml(s) {
     }
     if (collapsed) {
       stopAgentOpsAutoRefresh();
-      syncOpsCollapsedGlance();
-      startOpsGlancePoll();
     } else {
-      stopOpsGlancePoll();
-      syncOpsCollapsedGlance();
+      restoreAgentOpsTab();
       refreshAgentOps();
       startAgentOpsAutoRefresh();
-      // Defer scroll until layout applies display:block
       requestAnimationFrame(() => {
         section?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
       });
@@ -6957,9 +6941,20 @@ function escapeHtml(s) {
     })();
   }
 
+  function readQuickAgentOpsCollapsed() {
+    if (typeof window.getSectionCollapsed === 'function') {
+      return window.getSectionCollapsed('agent_ops_collapsed');
+    }
+    try {
+      const saved = localStorage.getItem('agent_ops_collapsed');
+      if (saved !== null) return saved === 'true';
+    } catch (_) {}
+    return true;
+  }
+
   function initAgentOps() {
     if (!document.getElementById('ops-health-row')) return;
-    ensureOpsCollapsedGlance();
+    applyOpsCollapsed(readQuickAgentOpsCollapsed());
     wireCollapse();
     setupAgentOps();
   }

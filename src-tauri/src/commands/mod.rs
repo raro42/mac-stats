@@ -49,6 +49,7 @@ pub mod partial_progress;
 pub mod perplexity;
 pub mod perplexity_helpers;
 pub mod plugins;
+pub mod power;
 pub mod pre_routing;
 pub mod prompt_assembly;
 pub mod python_agent;

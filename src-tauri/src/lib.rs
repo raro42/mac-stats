@@ -423,6 +423,7 @@ fn run_internal(open_cpu_window: bool) {
             commands::skills::list_skills,
             // Window commands (e.g. from chat reserved words)
             commands::window::toggle_cpu_window,
+            commands::power::toggle_low_power_mode,
             // Agent commands
             commands::agents::list_agents,
             commands::agents::get_agent_details,
