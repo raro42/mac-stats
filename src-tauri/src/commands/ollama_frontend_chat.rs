@@ -61,6 +61,18 @@ pub struct OllamaChatWithExecutionResponse {
     pub attachment_paths: Vec<String>,
 }
 
+fn instant_cpu_chat_response(reply: String) -> OllamaChatWithExecutionResponse {
+    OllamaChatWithExecutionResponse {
+        needs_code_execution: false,
+        code: None,
+        intermediate_response: None,
+        final_answer: Some(reply),
+        error: None,
+        context_message: None,
+        attachment_paths: vec![],
+    }
+}
+
 /// If the CPU window is not open, schedule opening or showing it on the main thread so the user can see the chat.
 fn ensure_cpu_window_open() {
     use crate::state::APP_HANDLE;
@@ -144,14 +156,29 @@ pub async fn ollama_chat_with_execution(
         );
     }
 
-    crate::keyed_queue::run_serial("ui-chat", async move {
-    info!(
-        "Ollama Chat with Execution: Starting for question: {}",
-        request.question
-    );
+    // Cooperative interrupt + instant lanes before ui-chat serial queue (Discord parity).
+    if let Some(reply) = crate::commands::turn_interrupt::try_cooperative_interrupt_reply(
+        coord_ui,
+        &request.question,
+    ) {
+        info!(
+            "Ollama Chat with Execution: cooperative interrupt for {:?}",
+            crate::logging::ellipse(&request.question, 40)
+        );
+        return Ok(instant_cpu_chat_response(reply));
+    }
+
+    if let crate::commands::fast_lane::TurnLane::Instant { reply } =
+        crate::commands::fast_lane::classify_turn_lane(&request.question, None)
+    {
+        info!(
+            "Ollama Chat with Execution: INSTANT lane (0 LLM) for {:?}",
+            crate::logging::ellipse(&request.question, 80)
+        );
+        return Ok(instant_cpu_chat_response(reply));
+    }
 
     // Instant weather (+ local time): same Open-Meteo path as Discord agent router.
-    // Avoids brittle FETCH_URL → Google/wttr loops in the CPU chat UI.
     if crate::commands::weather_grounding::looks_like_weather_query(&request.question) {
         if let Some(wx) =
             crate::commands::weather_grounding::format_instant_weather_reply(&request.question)
@@ -161,17 +188,15 @@ pub async fn ollama_chat_with_execution(
                 "Ollama Chat with Execution: INSTANT weather (Open-Meteo, 0 LLM) for {:?}",
                 crate::logging::ellipse(&request.question, 80)
             );
-            return Ok(OllamaChatWithExecutionResponse {
-                needs_code_execution: false,
-                code: None,
-                intermediate_response: None,
-                final_answer: Some(wx),
-                error: None,
-                context_message: None,
-                attachment_paths: vec![],
-            });
+            return Ok(instant_cpu_chat_response(wx));
         }
     }
+
+    crate::keyed_queue::run_serial("ui-chat", async move {
+    info!(
+        "Ollama Chat with Execution: Starting for question: {}",
+        request.question
+    );
 
     let token_budget =
         crate::commands::context_assembler::resolve_default_chat_context_token_budget().await;

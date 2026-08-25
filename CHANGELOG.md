@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.630] - 2026-08-25
+
+### Fixed
+- AI Chat **instant lane** now runs before the ui-chat serial queue — `/status`, `/insights`, greetings, version asks, and other zero-LLM replies no longer wait behind an in-flight Ollama turn (v0.1.628 only wired the agent router path).
+
+### Added
+- AI Chat **stop/cancel/interrupt** — cooperative interrupt before the queue (Discord parity): interrupts an active run or replies when nothing is in progress.
+
 ## [0.1.629] - 2026-08-25
 
 ### Added

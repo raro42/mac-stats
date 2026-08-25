@@ -127,6 +127,19 @@ pub fn looks_like_stop_request(content: &str) -> bool {
             || n == "s top"))
 }
 
+/// Hermes-style cooperative cancel: interrupt an active turn or ack when idle.
+pub fn try_cooperative_interrupt_reply(coord_key: u64, content: &str) -> Option<String> {
+    if !looks_like_stop_request(content) {
+        return None;
+    }
+    if crate::commands::turn_lifecycle::has_active_turn(coord_key) {
+        request(coord_key);
+        Some("Interrupted — stopping the current run.".to_string())
+    } else {
+        Some("Nothing in progress to stop.".to_string())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -140,6 +153,24 @@ mod tests {
         assert!(looks_like_stop_request("stop the run"));
         assert!(looks_like_stop_request("that's enough"));
         assert!(!looks_like_stop_request("stop the redmine ticket and summarize"));
+    }
+
+    #[test]
+    fn cooperative_interrupt_reply_idle_and_active() {
+        clear(999003);
+        assert_eq!(
+            try_cooperative_interrupt_reply(999003, "stop").as_deref(),
+            Some("Nothing in progress to stop.")
+        );
+        crate::commands::turn_lifecycle::register(999003, "test-req");
+        assert_eq!(
+            try_cooperative_interrupt_reply(999003, "cancel").as_deref(),
+            Some("Interrupted — stopping the current run.")
+        );
+        assert!(is_interrupted(999003));
+        crate::commands::turn_lifecycle::unregister_if_matches(999003, "test-req");
+        clear(999003);
+        assert!(try_cooperative_interrupt_reply(999003, "hello").is_none());
     }
 
     #[test]
