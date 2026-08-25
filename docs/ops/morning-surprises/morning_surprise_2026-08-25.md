@@ -1,15 +1,16 @@
 # Morning surprise — 2026-08-25
 
-Overnight Track B shipped **v0.1.627** through **v0.1.634** — CPU-window fixes, AI Chat operator instant lanes, Ollama/settings toolbar polish, p50 latency instant lanes, morning-surprise zero-LLM replies, footer + header toolbar keyboard, then **history sparkline↔ring chain**.
+Overnight Track B shipped **v0.1.627** through **v0.1.635** — CPU-window fixes, AI Chat operator instant lanes, Ollama/settings toolbar polish, p50 latency instant lanes, morning-surprise zero-LLM replies, footer + header toolbar keyboard, history sparkline↔ring chain, then **sparkline↔power-strip chain**.
 
 ## Latest keep (this tick)
 
-**v0.1.634** — CPU metrics **history sparkline↔ring toolbar chain** (last ring ← → crosses to first history chart; first chart ← crosses to temperature ring).
+**v0.1.635** — CPU metrics **history sparkline↔power-strip toolbar chain** (last history chart → crosses to battery strip; first strip chip ← crosses to last chart).
 
 ## Tonight's keeps
 
 | Version | What |
 |---------|------|
+| **v0.1.635** | History sparkline↔power-strip toolbar wrap chain |
 | **v0.1.634** | History sparkline↔ring toolbar wrap chain |
 | **v0.1.633** | Header toolbar keyboard + ring-gauge/footer wrap chain |
 | **v0.1.632** | Footer toolbar keyboard + icon-line wrap chain |
@@ -21,6 +22,6 @@ Overnight Track B shipped **v0.1.627** through **v0.1.634** — CPU-window fixes
 
 ## Notes
 
-- Digester open empty (10 turns, 7 instant); design review not due (feature-ai-chat ~11.43d grace).
+- Digester open empty (10 turns, 7 instant); design review not due (feature-ai-chat ~11.44d grace).
 - `debug.log`: single-instance lock WARN only (180m scan).
-- Installed release @ v0.1.634; Discord Ready after install.
+- Installed release @ v0.1.635; Discord Ready after install.
