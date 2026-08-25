@@ -1847,6 +1847,12 @@ async function refresh() {
             if (!row || !list.contains(row)) {
               // First arrow/j from listbox chrome focuses first/last row (Monitors parity).
               if (e.target !== list) return;
+              if (
+                (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'K') &&
+                tryChainListboxToFilterChips(list)
+              ) {
+                return;
+              }
               const rows = visibleProcessRows(list);
               if (!rows.length) return;
               let next = -1;
@@ -1930,7 +1936,10 @@ async function refresh() {
             let next = -1;
             const page = 5;
             if (e.key === "ArrowDown" || e.key === "j") next = Math.min(idx + 1, rows.length - 1);
-            else if (e.key === "ArrowUp" || e.key === "k") next = Math.max(idx - 1, 0);
+            else if (e.key === "ArrowUp" || e.key === "k") {
+              if (idx === 0 && tryChainListboxToFilterChips(list)) return;
+              next = Math.max(idx - 1, 0);
+            }
             else if (e.key === "PageDown") next = Math.min(idx + page, rows.length - 1);
             else if (e.key === "PageUp") next = Math.max(idx - page, 0);
             else if (e.key === "Home") next = 0;
@@ -3325,6 +3334,132 @@ function getLastFilterChipButton() {
   return chips.length ? chips[chips.length - 1] : null;
 }
 
+/** Primary list / listbox for a filter-chip row (section-content chain). */
+function getFilterChipWrapContentListbox(wrap) {
+  if (!wrap?.id) return null;
+  switch (wrap.id) {
+    case 'processes-filter-chips':
+      return document.getElementById('process-list');
+    case 'monitors-filter-chips':
+      return document.getElementById('monitors-list');
+    case 'chat-filter-chips':
+      return document.getElementById('chat-messages');
+    case 'logs-filter-chips':
+      return document.getElementById('logs-viewer');
+    case 'disk-cleanup-filter-chips':
+      return document.getElementById('disk-cleanup-scopes');
+    case 'ops-session-kind-chips': {
+      const live = document.getElementById('ops-live-sessions');
+      const files = document.getElementById('ops-session-files');
+      if (live && live.style.display !== 'none' && live.offsetParent) return live;
+      if (files && files.style.display !== 'none' && files.offsetParent) return files;
+      return live || files;
+    }
+    case 'ops-runs-lane-chips':
+      return document.getElementById('ops-runs-list');
+    case 'ops-agents-enabled-chips':
+      return document.getElementById('ops-agents-list');
+    case 'ops-schedules-kind-chips':
+      return document.getElementById('ops-schedules-list');
+    case 'ops-memory-kind-chips':
+      return document.getElementById('ops-memory-list');
+    default:
+      return null;
+  }
+}
+
+function getFilterChipWrapForContentListbox(listbox) {
+  if (!listbox?.id) return null;
+  const wrapIdByListId = {
+    'process-list': 'processes-filter-chips',
+    'monitors-list': 'monitors-filter-chips',
+    'chat-messages': 'chat-filter-chips',
+    'logs-viewer': 'logs-filter-chips',
+    'disk-cleanup-scopes': 'disk-cleanup-filter-chips',
+    'ops-live-sessions': 'ops-session-kind-chips',
+    'ops-session-files': 'ops-session-kind-chips',
+    'ops-runs-list': 'ops-runs-lane-chips',
+    'ops-agents-list': 'ops-agents-enabled-chips',
+    'ops-schedules-list': 'ops-schedules-kind-chips',
+    'ops-memory-list': 'ops-memory-kind-chips',
+  };
+  const wrapId = wrapIdByListId[listbox.id];
+  return wrapId ? document.getElementById(wrapId) : null;
+}
+
+function focusOpsListFirstRow(listEl) {
+  if (!listEl || listEl.hidden) return false;
+  const rows = Array.from(listEl.querySelectorAll('.ops-row')).filter(
+    (el) => el.offsetParent !== null && el.style.display !== 'none'
+  );
+  if (!rows.length) return false;
+  listEl.querySelectorAll('.ops-row.is-selected').forEach((el) => {
+    el.classList.remove('is-selected');
+  });
+  rows[0].classList.add('is-selected');
+  if (typeof rows[0].scrollIntoView === 'function') {
+    rows[0].scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
+function focusSectionContentListbox(el) {
+  if (!el || el.hidden) return false;
+  const visible =
+    el.getClientRects().length > 0 ||
+    el.offsetParent !== null ||
+    el.classList?.contains('ops-list');
+  if (!visible) return false;
+  if (el.classList && el.classList.contains('ops-list')) {
+    return focusOpsListFirstRow(el);
+  }
+  if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+  if (!el.getAttribute('role')) el.setAttribute('role', 'listbox');
+  el.focus();
+  return true;
+}
+
+function tryChainFilterChipWrapToContent(wrap) {
+  const listbox = getFilterChipWrapContentListbox(wrap);
+  return focusSectionContentListbox(listbox);
+}
+
+function tryChainListboxToFilterChips(listbox) {
+  const wrap = getFilterChipWrapForContentListbox(listbox);
+  if (!wrap || !isFilterChipWrapVisible(wrap)) return false;
+  const chips = getFilterChipButtons(wrap);
+  if (!chips.length) return false;
+  return focusFilterChipButton(chips[chips.length - 1]);
+}
+
+function tryListboxChainBackToFilterChips(e, listbox, idx, itemCount) {
+  if (e.metaKey || e.ctrlKey || e.altKey) return false;
+  const back =
+    e.key === 'ArrowUp' ||
+    e.key === 'k' ||
+    e.key === 'K';
+  if (!back) return false;
+  if (e.target === listbox) {
+    if (tryChainListboxToFilterChips(listbox)) {
+      e.preventDefault();
+      e.stopPropagation();
+      return true;
+    }
+    return false;
+  }
+  if (idx === 0 && itemCount > 0) {
+    if (tryChainListboxToFilterChips(listbox)) {
+      e.preventDefault();
+      e.stopPropagation();
+      return true;
+    }
+  }
+  return false;
+}
+
+window.tryChainListboxToFilterChips = tryChainListboxToFilterChips;
+window.tryChainFilterChipWrapToContent = tryChainFilterChipWrapToContent;
+
 function focusFilterChipButton(btn) {
   if (!btn) return false;
   const wrap = btn.closest(
@@ -3385,7 +3520,7 @@ function wireFilterChipToolbarKeyboard(wrap) {
   if (!wrap) return;
   ensureFilterChipKbStyles();
   const hint =
-    'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to footer · Enter / Space selects';
+    'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
   if (wrap.dataset.filterChipChainKbWired !== '1') {
     wrap.dataset.filterChipChainKbWired = '1';
     wrap.addEventListener(
@@ -3421,18 +3556,23 @@ function wireFilterChipToolbarKeyboard(wrap) {
             e.stopPropagation();
           }
         } else if (forward && idx === chips.length - 1) {
-          const wraps = getFilterChipWraps();
-          const wrapIdx = wraps.indexOf(wrap);
-          if (wrapIdx >= 0 && wrapIdx < wraps.length - 1) {
-            const next = getFilterChipButtons(wraps[wrapIdx + 1]);
-            if (next.length) {
-              focusFilterChipButton(next[0]);
+          if (tryChainFilterChipWrapToContent(wrap)) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else {
+            const wraps = getFilterChipWraps();
+            const wrapIdx = wraps.indexOf(wrap);
+            if (wrapIdx >= 0 && wrapIdx < wraps.length - 1) {
+              const next = getFilterChipButtons(wraps[wrapIdx + 1]);
+              if (next.length) {
+                focusFilterChipButton(next[0]);
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            } else if (tryChainFilterChipToFooterFirst()) {
               e.preventDefault();
               e.stopPropagation();
             }
-          } else if (tryChainFilterChipToFooterFirst()) {
-            e.preventDefault();
-            e.stopPropagation();
           }
         }
       },
@@ -7048,6 +7188,12 @@ function wireMonitorsListKeyboard() {
     if (!item || !monitorsList.contains(item)) {
       // First arrow/j from listbox chrome focuses first/last row (Disk Cleanup parity).
       if (e.target !== monitorsList) return;
+      if (
+        (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'K') &&
+        tryChainListboxToFilterChips(monitorsList)
+      ) {
+        return;
+      }
       const items = visibleMonitorItems(monitorsList);
       if (!items.length) return;
       let next = -1;
@@ -7129,7 +7275,10 @@ function wireMonitorsListKeyboard() {
     let next = -1;
     const page = 5;
     if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, items.length - 1);
-    else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
+    else if (e.key === 'ArrowUp' || e.key === 'k') {
+      if (idx === 0 && tryChainListboxToFilterChips(monitorsList)) return;
+      next = Math.max(idx - 1, 0);
+    }
     else if (e.key === 'PageDown') next = Math.min(idx + page, items.length - 1);
     else if (e.key === 'PageUp') next = Math.max(idx - page, 0);
     else if (e.key === 'Home') next = 0;
@@ -11237,6 +11386,12 @@ function wireLogsViewerKeyboard(viewer) {
     if (!line || !viewer.contains(line)) {
       // First arrow/j from viewer chrome focuses first/last line.
       if (e.target !== viewer) return;
+      if (
+        (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'K') &&
+        tryChainListboxToFilterChips(viewer)
+      ) {
+        return;
+      }
       const items = visibleLogsLines(viewer);
       if (!items.length) return;
       let next = -1;
@@ -11283,7 +11438,10 @@ function wireLogsViewerKeyboard(viewer) {
     let next = -1;
     const page = 5;
     if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, items.length - 1);
-    else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
+    else if (e.key === 'ArrowUp' || e.key === 'k') {
+      if (idx === 0 && tryChainListboxToFilterChips(viewer)) return;
+      next = Math.max(idx - 1, 0);
+    }
     else if (e.key === 'PageDown') next = Math.min(idx + page, items.length - 1);
     else if (e.key === 'PageUp') next = Math.max(idx - page, 0);
     else if (e.key === 'Home') next = 0;
@@ -13214,6 +13372,12 @@ function wireDiskCleanupScopesKeyboard() {
     if (!row || !scopesEl.contains(row)) {
       // First arrow/j from listbox chrome focuses first/last scope (Debug Log parity).
       if (e.target !== scopesEl) return;
+      if (
+        (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'K') &&
+        tryChainListboxToFilterChips(scopesEl)
+      ) {
+        return;
+      }
       const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
       if (!rows.length) return;
       let next = -1;
@@ -13347,7 +13511,10 @@ function wireDiskCleanupScopesKeyboard() {
     let next = -1;
     const page = 5;
     if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, rows.length - 1);
-    else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
+    else if (e.key === 'ArrowUp' || e.key === 'k') {
+      if (idx === 0 && tryChainListboxToFilterChips(scopesEl)) return;
+      next = Math.max(idx - 1, 0);
+    }
     else if (e.key === 'PageDown') next = Math.min(idx + page, rows.length - 1);
     else if (e.key === 'PageUp') next = Math.max(idx - page, 0);
     else if (e.key === 'Home') next = 0;

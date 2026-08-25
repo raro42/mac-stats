@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.638] - 2026-08-26
+
+### Added
+- **Filter-chip↔section-content toolbar chain** — last chip → crosses to section list (processes · monitors · chat · logs · disk scopes · Agent Ops lists); first row / listbox chrome ↑ crosses back to chips (footer chain when no list).
+
 ## [0.1.637] - 2026-08-26
 
 ### Added

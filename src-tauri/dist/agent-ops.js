@@ -5023,6 +5023,29 @@ function tryOpsArrowMoveSelection(e) {
         idx = idx < 0 ? 0 : Math.min(idx + 1, rows.length - 1);
     } else {
         // ArrowUp or k
+        if (
+            idx === 0 &&
+            typeof window.tryChainListboxToFilterChips === 'function'
+        ) {
+            const listIdByTab = {
+                agents: 'ops-agents-list',
+                schedules: 'ops-schedules-list',
+                memory: 'ops-memory-list',
+                runs: 'ops-runs-list',
+            };
+            let listEl = document.getElementById(listIdByTab[opsActiveTab] || '');
+            if (opsActiveTab === 'sessions') {
+                const live = document.getElementById('ops-live-sessions');
+                const files = document.getElementById('ops-session-files');
+                if (live && live.style.display !== 'none' && live.offsetParent) listEl = live;
+                else if (files && files.style.display !== 'none' && files.offsetParent) listEl = files;
+                else listEl = live || files;
+            }
+            if (listEl && window.tryChainListboxToFilterChips(listEl)) {
+                e.preventDefault();
+                return true;
+            }
+        }
         idx = idx < 0 ? rows.length - 1 : Math.max(idx - 1, 0);
     }
     panel.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));

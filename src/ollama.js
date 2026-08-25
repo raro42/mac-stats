@@ -1214,6 +1214,13 @@ function wireChatMessagesCopy(container) {
     if (!msg || !container.contains(msg)) {
       // First arrow/j from listbox chrome focuses first/last message (Perplexity / Monitors parity).
       if (e.target !== container) return;
+      if (
+        (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'K') &&
+        typeof window.tryChainListboxToFilterChips === 'function' &&
+        window.tryChainListboxToFilterChips(container)
+      ) {
+        return;
+      }
       const items = visibleChatMessages(container);
       if (!items.length) return;
       let next = -1;
@@ -1263,6 +1270,13 @@ function wireChatMessagesCopy(container) {
       return;
     }
     if (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'K') {
+      if (
+        idx === 0 &&
+        typeof window.tryChainListboxToFilterChips === 'function' &&
+        window.tryChainListboxToFilterChips(container)
+      ) {
+        return;
+      }
       move(idx - 1);
       return;
     }
