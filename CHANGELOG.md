@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.636] - 2026-08-25
+
+### Added
+- CPU metrics **power-strip↔icon-line toolbar chain** — last power-strip chip → crosses to first section icon; first icon ← crosses to last power strip chip (icon-line + footer parity).
+
 ## [0.1.635] - 2026-08-25
 
 ### Added

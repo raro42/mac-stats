@@ -2708,7 +2708,7 @@ function ensurePowerStripKbHint() {
     strip.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click a chip · ← → / h l · Home/End move · at start crosses to last history chart · Enter / Space activates';
+    'Tab or click Bat · LPM · Power · ← → / h l · Home/End · at start crosses to last history chart · at end crosses to section icons · LPM toggles (password may be required)';
 }
 
 /**
@@ -2736,8 +2736,18 @@ function ensurePowerStripKeyboard() {
           e.key === 'h' ||
           e.key === 'ArrowUp' ||
           e.key === 'k';
+        const forward =
+          e.key === 'ArrowRight' ||
+          e.key === 'l' ||
+          e.key === 'ArrowDown' ||
+          e.key === 'j';
         if (back && idx === 0) {
           if (tryChainPowerStripToSparklineLast()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        } else if (forward && idx === chips.length - 1) {
+          if (tryChainPowerStripToIconLineFirst()) {
             e.preventDefault();
             e.stopPropagation();
           }
@@ -14054,6 +14064,24 @@ function tryChainPowerStripToSparklineLast() {
   return true;
 }
 
+function tryChainPowerStripToIconLineFirst() {
+  const items = getIconLineItems();
+  if (!items.length) return false;
+  const target = items[0];
+  refreshIconLineRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+function tryChainIconLineToPowerStripLast() {
+  const chips = getPowerStripChips();
+  if (!chips.length) return false;
+  const target = chips[chips.length - 1];
+  refreshPowerStripRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
 function tryChainHeaderRefreshToFooterLast() {
   const items = getFooterToolbarItems();
   if (!items.length) return false;
@@ -14530,7 +14558,7 @@ function ensureIconLineKbHint() {
     line.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click an icon · ← → / h l · Home/End move · Enter / Space opens section';
+    'Tab or click an icon · ← → / h l · Home/End move · at start crosses to power strip · at end crosses to footer · Enter / Space opens section';
 }
 
 /**
@@ -14566,7 +14594,7 @@ function ensureIconLineKeyboard() {
             e.stopPropagation();
           }
         } else if (back && idx === 0) {
-          if (tryChainIconLineToFooterLast()) {
+          if (tryChainIconLineToPowerStripLast()) {
             e.preventDefault();
             e.stopPropagation();
           }
