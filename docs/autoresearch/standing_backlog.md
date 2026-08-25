@@ -20,6 +20,10 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.637** — CPU metrics icon-line↔filter-chip toolbar chain (last icon → first filter chip; last chip → footer).
+
+- **v0.1.636** — CPU metrics power-strip↔icon-line toolbar chain (last strip chip → first section icon; first icon ← last strip chip).
+
 - **v0.1.635** — CPU metrics history sparkline↔power-strip toolbar chain (last chart → battery strip; first strip ← last chart).
 
 - **v0.1.634** — CPU metrics history sparkline↔ring toolbar chain (last ring → first chart; first chart → temperature ring).
