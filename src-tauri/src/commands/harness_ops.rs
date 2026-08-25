@@ -967,8 +967,15 @@ pub fn looks_like_digest_request(content: &str) -> bool {
             | "agent digest"
             | "run digester"
             | "refresh digester"
-            | "update digest"
+            |         "update digest"
             | "rerun digest"
+            | "digest open"
+            | "open digest"
+            | "open candidates"
+            | "digest candidates"
+            | "open digest hints"
+            | "any open candidates"
+            | "show open candidates"
     )
 }
 
@@ -1097,11 +1104,21 @@ pub fn looks_like_status_request(content: &str) -> bool {
             | "system health"
             | "how healthy"
             | "are you healthy"
-            | "/version"
+            |         "/version"
             | "app version"
             | "mac-stats version"
             | "what version"
             | "which version"
+            | "is everything ok"
+            | "everything ok"
+            | "everything working"
+            | "all systems go"
+            | "systems ok"
+            | "system ok"
+            | "all good on your end"
+            | "you all good"
+            | "are you ok"
+            | "are you okay"
     )
 }
 
@@ -1266,7 +1283,11 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
             || q.contains("lately")
             || q.contains("recently")
             || q.contains("improvement loop")
-            || q.contains("harness"))
+            || q.contains("harness")
+            || q.contains("today")
+            || q.contains("this morning")
+            || q.contains("so far today")
+            || q.contains("morning surprise"))
         && !q.contains("workflow")
         && !q.contains("ticket")
         && !q.contains("redmine"))
@@ -1358,7 +1379,11 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
                 || q.contains("lately")
                 || q.contains("recently")
                 || q.contains("improvement loop")
-                || q.contains("harness")))
+                || q.contains("harness")
+                || q.contains("today")
+                || q.contains("this morning")
+                || q.contains("so far today")
+                || q.contains("morning surprise")))
     {
         return true;
     }
@@ -1486,7 +1511,11 @@ fn classify_candidate(
         || q.contains("recently")
         || q.contains("improvement loop")
         || q.contains("harness loop")
-        || q.contains("overnight harness");
+        || q.contains("overnight harness")
+        || q.contains("today")
+        || q.contains("this morning")
+        || q.contains("so far today")
+        || q.contains("morning surprise");
     let product_changelog = (q.contains("changelog")
         || q.contains("enhancement")
         || q.contains("latest change")
@@ -2063,7 +2092,16 @@ mod tests {
         assert!(looks_like_status_request("system health"));
         assert!(looks_like_status_request("what version"));
         assert!(!looks_like_status_request("status of the redmine ticket"));
-        assert!(!looks_like_status_request("status"));
+        assert!(looks_like_status_request("is everything ok"));
+        assert!(looks_like_status_request("everything working"));
+    }
+
+    #[test]
+    fn digest_open_candidates_requests() {
+        assert!(looks_like_digest_request("digest open"));
+        assert!(looks_like_digest_request("open candidates"));
+        assert!(looks_like_digest_request("any open candidates"));
+        assert!(!looks_like_digest_request("digest this long research report please"));
     }
 
     #[test]

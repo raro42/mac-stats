@@ -140,6 +140,9 @@ fn try_instant_reply(q: &str) -> Option<String> {
     if is_dump_saved_notes_ask(&n) {
         return Some(crate::commands::curated_memory::instant_dump_saved_notes(12_000));
     }
+    if is_morning_surprise_ask(&n) {
+        return Some(format_instant_morning_surprise_reply());
+    }
     if is_overnight_improvements_ask(&n) {
         return Some(format_instant_overnight_improvements_reply());
     }
@@ -386,7 +389,7 @@ fn is_overnight_improvements_ask(n: &str) -> bool {
         || n.contains("what did you change")
         || n.contains("what was done")
         || n.contains("what did you do");
-    let overnight_context = n.contains("last night")
+    let time_context = n.contains("last night")
         || n.contains("overnight")
         || n.contains("coding session")
         || n.contains("last night's")
@@ -397,8 +400,60 @@ fn is_overnight_improvements_ask(n: &str) -> bool {
         || n.contains("overnight harness")
         || n.contains("each night")
         || n.contains("every night")
-        || n.contains("nightly");
-    asks_improvements && overnight_context
+        || n.contains("nightly")
+        || n.contains("today")
+        || n.contains("this morning")
+        || n.contains("so far today");
+    asks_improvements && time_context
+}
+
+/// “Morning surprise?” / “What's the surprise?” — zero-LLM highlights from today's note.
+fn is_morning_surprise_ask(n: &str) -> bool {
+    if n.chars().count() > 96 {
+        return false;
+    }
+    if n.contains("http")
+        || n.contains("redmine")
+        || n.contains("skill:")
+        || n.contains("cursor_agent:")
+        || n.contains("ticket")
+        || n.contains("weather")
+        || n.contains("search")
+    {
+        return false;
+    }
+    n.contains("morning surprise")
+        || n.contains("morning-surprise")
+        || (n.contains("surprise") && (n.contains("morning") || n.contains("today")))
+        || matches!(
+            n,
+            "surprise"
+                | "the surprise"
+                | "todays surprise"
+                | "today's surprise"
+                | "what's the surprise"
+                | "whats the surprise"
+        )
+}
+
+fn format_instant_morning_surprise_reply() -> String {
+    let version = crate::config::Config::version();
+    let bullets = load_morning_surprise_highlights(5);
+    if bullets.is_empty() {
+        return format!(
+            "No morning surprise note yet today — I'm on **mac-stats v{version}**. \
+Ask *what shipped today?* or check `~/.mac-stats/improvements/morning_surprise_*.md`."
+        );
+    }
+    let list = bullets
+        .into_iter()
+        .map(|b| format!("• {b}"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    format!(
+        "**Morning surprise** (mac-stats v{version}):\n{list}\n\n\
+Full note: `~/.mac-stats/improvements/morning_surprise_*.md` or **Agent Ops → Digest**."
+    )
 }
 
 /// “Your changelog?” / “Latest enhancements of Mac-stats?” / “Your latest changes?”
@@ -1932,6 +1987,9 @@ commit+push, then reply briefly.";
             "Any improvement lately?",
             "No improvement loop?",
             "Don't you have a task to improve each night? I would like to know what was done.",
+            "What did you ship today?",
+            "What shipped today so far?",
+            "Any improvements this morning?",
         ] {
             match classify_turn_lane(q, None) {
                 TurnLane::Instant { reply } => {
@@ -1951,6 +2009,29 @@ commit+push, then reply briefly.";
             ),
             "improvements without overnight context must not be instant"
         );
+    }
+
+    #[test]
+    fn morning_surprise_asks_are_instant() {
+        for q in [
+            "morning surprise",
+            "What's the morning surprise?",
+            "today's surprise",
+            "surprise",
+        ] {
+            match classify_turn_lane(q, None) {
+                TurnLane::Instant { reply } => {
+                    let lower = reply.to_lowercase();
+                    assert!(
+                        lower.contains("morning surprise")
+                            || lower.contains("morning_surprise")
+                            || lower.contains("mac-stats"),
+                        "expected morning surprise blurb for {q:?}: {reply}"
+                    );
+                }
+                other => panic!("expected Instant for {q:?}, got {:?}", other),
+            }
+        }
     }
 
     #[test]

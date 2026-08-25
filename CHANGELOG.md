@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.631] - 2026-08-25
+
+### Added
+- Instant lane for **morning surprise** asks and **what shipped today** / **this morning** improvement questions (zero-LLM highlights from `morning_surprise_*.md`).
+- Operator instant lane: **is everything ok** / **everything working** status asks; **digest open** / **open candidates** digest asks.
+
 ## [0.1.630] - 2026-08-25
 
 ### Fixed
