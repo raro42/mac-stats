@@ -1935,8 +1935,10 @@ async function refresh() {
 
             let next = -1;
             const page = 5;
-            if (e.key === "ArrowDown" || e.key === "j") next = Math.min(idx + 1, rows.length - 1);
-            else if (e.key === "ArrowUp" || e.key === "k") {
+            if (e.key === "ArrowDown" || e.key === "j") {
+              if (idx === rows.length - 1 && tryChainSectionContentToFooter(list)) return;
+              next = Math.min(idx + 1, rows.length - 1);
+            } else if (e.key === "ArrowUp" || e.key === "k") {
               if (idx === 0 && tryChainListboxToFilterChips(list)) return;
               next = Math.max(idx - 1, 0);
             }
@@ -3403,6 +3405,174 @@ function focusOpsListFirstRow(listEl) {
   return true;
 }
 
+function focusOpsListLastRow(listEl) {
+  if (!listEl || listEl.hidden) return false;
+  const rows = Array.from(listEl.querySelectorAll('.ops-row')).filter(
+    (el) => el.offsetParent !== null && el.style.display !== 'none'
+  );
+  if (!rows.length) return false;
+  listEl.querySelectorAll('.ops-row.is-selected').forEach((el) => {
+    el.classList.remove('is-selected');
+  });
+  const last = rows[rows.length - 1];
+  last.classList.add('is-selected');
+  if (typeof last.scrollIntoView === 'function') {
+    last.scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
+function isSectionContentListboxVisible(el) {
+  if (!el || el.hidden) return false;
+  try {
+    const style = window.getComputedStyle(el);
+    if (style.display === 'none' || style.visibility === 'hidden') return false;
+  } catch (_) {
+    /* ignore */
+  }
+  const section = el.closest('[class*="-section"]');
+  if (section) {
+    const content = section.querySelector('[id$="-content"]');
+    if (
+      content &&
+      content.classList.contains('section-content-collapsible') &&
+      content.hidden
+    ) {
+      return false;
+    }
+  }
+  if (el.id === 'ops-live-sessions' || el.id === 'ops-session-files') {
+    return el.style.display !== 'none' && el.offsetParent;
+  }
+  return el.getClientRects().length > 0 || el.offsetParent !== null;
+}
+
+const SECTION_CONTENT_LISTBOX_IDS = [
+  'process-list',
+  'monitors-list',
+  'chat-messages',
+  'logs-viewer',
+  'disk-cleanup-scopes',
+  'disk-cleanup-list',
+  'ops-live-sessions',
+  'ops-session-files',
+  'ops-runs-list',
+  'ops-agents-list',
+  'ops-schedules-list',
+  'ops-memory-list',
+];
+
+function getVisibleSectionContentListboxes() {
+  const out = [];
+  for (const id of SECTION_CONTENT_LISTBOX_IDS) {
+    const el = document.getElementById(id);
+    if (el && isSectionContentListboxVisible(el)) out.push(el);
+  }
+  return out.sort((a, b) => {
+    if (a === b) return 0;
+    const pos = a.compareDocumentPosition(b);
+    if (pos & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
+    if (pos & Node.DOCUMENT_POSITION_PRECEDING) return 1;
+    return 0;
+  });
+}
+
+function focusDiskCleanupToolbarLast() {
+  const wrap = document.querySelector('.disk-cleanup-toolbar');
+  if (!wrap) return false;
+  const items = getDiskCleanupToolbarActionItems(wrap);
+  if (!items.length) return false;
+  refreshDiskCleanupToolbarRovingTabindex(wrap, items[items.length - 1]);
+  items[items.length - 1].focus();
+  return true;
+}
+
+function focusSectionContentListboxLast(listbox) {
+  if (!listbox || !isSectionContentListboxVisible(listbox)) return false;
+  switch (listbox.id) {
+    case 'process-list': {
+      const rows = visibleProcessRows(listbox);
+      if (!rows.length) return false;
+      rows.forEach((r, i) =>
+        r.setAttribute('tabindex', i === rows.length - 1 ? '0' : '-1')
+      );
+      rows[rows.length - 1].focus();
+      if (typeof rows[rows.length - 1].scrollIntoView === 'function') {
+        rows[rows.length - 1].scrollIntoView({ block: 'nearest' });
+      }
+      return true;
+    }
+    case 'monitors-list': {
+      const items = visibleMonitorItems(listbox);
+      if (!items.length) return false;
+      const preferId = items[items.length - 1].getAttribute('data-monitor-id');
+      syncMonitorsListTabOrder(listbox, preferId);
+      items[items.length - 1].focus();
+      if (typeof items[items.length - 1].scrollIntoView === 'function') {
+        items[items.length - 1].scrollIntoView({ block: 'nearest' });
+      }
+      return true;
+    }
+    case 'chat-messages':
+      if (typeof window.focusChatMessagesLast === 'function') {
+        return window.focusChatMessagesLast(listbox);
+      }
+      return false;
+    case 'logs-viewer': {
+      const lines = visibleLogsLines(listbox);
+      if (!lines.length) return false;
+      syncLogsLinesTabOrder(listbox, lines[lines.length - 1]);
+      lines[lines.length - 1].focus();
+      lines[lines.length - 1].scrollIntoView({ block: 'nearest' });
+      return true;
+    }
+    case 'disk-cleanup-scopes':
+      return focusDiskCleanupScopesLast();
+    case 'disk-cleanup-list':
+      return focusDiskCleanupCategoriesLast();
+    case 'ops-live-sessions':
+    case 'ops-session-files':
+    case 'ops-runs-list':
+    case 'ops-agents-list':
+    case 'ops-schedules-list':
+    case 'ops-memory-list':
+      return focusOpsListLastRow(listbox);
+    default:
+      return false;
+  }
+}
+
+function tryChainSectionContentToFooter(listbox) {
+  if (listbox?.id === 'disk-cleanup-list') {
+    return tryChainDiskCleanupCategoriesToToolbarFirst();
+  }
+  return tryChainFilterChipToFooterFirst();
+}
+
+function tryChainDiskCleanupToolbarToFooterFirst() {
+  return tryChainFilterChipToFooterFirst();
+}
+
+function tryChainFooterToSectionContentLast() {
+  const diskContent = document.getElementById('disk-cleanup-content');
+  const diskOpen =
+    diskContent &&
+    !diskContent.hidden &&
+    diskContent.getClientRects().length > 0;
+  if (diskOpen) {
+    if (focusDiskCleanupToolbarLast()) return true;
+    if (focusDiskCleanupCategoriesLast()) return true;
+    if (focusDiskCleanupScopesLast()) return true;
+  }
+  const listboxes = getVisibleSectionContentListboxes();
+  for (let i = listboxes.length - 1; i >= 0; i -= 1) {
+    const id = listboxes[i].id;
+    if (id === 'disk-cleanup-scopes' || id === 'disk-cleanup-list') continue;
+    if (focusSectionContentListboxLast(listboxes[i])) return true;
+  }
+  return false;
+}
+
 function focusSectionContentListbox(el) {
   if (!el || el.hidden) return false;
   const visible =
@@ -3466,6 +3636,8 @@ function tryListboxChainBackToFilterChips(e, listbox, idx, itemCount) {
 
 window.tryChainListboxToFilterChips = tryChainListboxToFilterChips;
 window.tryChainFilterChipWrapToContent = tryChainFilterChipWrapToContent;
+window.tryChainSectionContentToFooter = tryChainSectionContentToFooter;
+window.tryChainFooterToSectionContentLast = tryChainFooterToSectionContentLast;
 
 function focusFilterChipButton(btn) {
   if (!btn) return false;
@@ -7281,8 +7453,10 @@ function wireMonitorsListKeyboard() {
 
     let next = -1;
     const page = 5;
-    if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, items.length - 1);
-    else if (e.key === 'ArrowUp' || e.key === 'k') {
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (idx === items.length - 1 && tryChainSectionContentToFooter(monitorsList)) return;
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (e.key === 'ArrowUp' || e.key === 'k') {
       if (idx === 0 && tryChainListboxToFilterChips(monitorsList)) return;
       next = Math.max(idx - 1, 0);
     }
@@ -11444,8 +11618,10 @@ function wireLogsViewerKeyboard(viewer) {
 
     let next = -1;
     const page = 5;
-    if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, items.length - 1);
-    else if (e.key === 'ArrowUp' || e.key === 'k') {
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (idx === items.length - 1 && tryChainSectionContentToFooter(viewer)) return;
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (e.key === 'ArrowUp' || e.key === 'k') {
       if (idx === 0 && tryChainListboxToFilterChips(viewer)) return;
       next = Math.max(idx - 1, 0);
     }
@@ -12478,6 +12654,11 @@ function ensureDiskCleanupToolbarKeyboard() {
       e.key === 'ArrowDown' ||
       e.key === 'j'
     ) {
+      if (idx === items.length - 1 && tryChainDiskCleanupToolbarToFooterFirst()) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       next = Math.min(idx + 1, items.length - 1);
     } else if (
       e.key === 'ArrowLeft' ||
@@ -14507,6 +14688,7 @@ function tryChainFilterChipToFooterFirst() {
 }
 
 function tryChainFooterToFilterChipLast() {
+  if (tryChainFooterToSectionContentLast()) return true;
   const target = getLastFilterChipButton();
   if (target) return focusFilterChipButton(target);
   return tryChainFooterToIconLineLast();
@@ -14734,7 +14916,7 @@ function ensureFooterToolbarKbHint() {
   const items = getFooterToolbarItems();
   hint.hidden = items.length < 2;
   hint.textContent =
-    '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to filter chips';
+    '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to section list (or filter chips)';
 }
 
 function tryChainFooterToIconLineFirst() {

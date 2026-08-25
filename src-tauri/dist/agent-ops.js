@@ -5020,6 +5020,30 @@ function tryOpsArrowMoveSelection(e) {
     } else if (e.key === 'PageUp') {
         idx = idx < 0 ? rows.length - 1 : Math.max(idx - page, 0);
     } else if (e.key === 'ArrowDown' || e.key === 'j') {
+        if (
+            idx >= 0 &&
+            idx === rows.length - 1 &&
+            typeof window.tryChainSectionContentToFooter === 'function'
+        ) {
+            const listIdByTab = {
+                agents: 'ops-agents-list',
+                schedules: 'ops-schedules-list',
+                memory: 'ops-memory-list',
+                runs: 'ops-runs-list',
+            };
+            let listEl = document.getElementById(listIdByTab[opsActiveTab] || '');
+            if (opsActiveTab === 'sessions') {
+                const live = document.getElementById('ops-live-sessions');
+                const files = document.getElementById('ops-session-files');
+                if (live && live.style.display !== 'none' && live.offsetParent) listEl = live;
+                else if (files && files.style.display !== 'none' && files.offsetParent) listEl = files;
+                else listEl = live || files;
+            }
+            if (listEl && window.tryChainSectionContentToFooter(listEl)) {
+                e.preventDefault();
+                return true;
+            }
+        }
         idx = idx < 0 ? 0 : Math.min(idx + 1, rows.length - 1);
     } else {
         // ArrowUp or k

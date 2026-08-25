@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.640** — Section-content↔footer toolbar chain (last list row → footer; footer ← last row / Disk Cleanup toolbar).
+
 - **v0.1.639** — Disk Cleanup scopes↔categories toolbar chain (last scope → first category; first category ↑ → scopes/filter chips; last category → action toolbar; empty scopes skip to categories from filter chips).
 
 - **v0.1.638** — Filter-chip↔section-content toolbar chain (last chip → list; first row ↑ → chips; processes/monitors/chat/logs/disk/Agent Ops).

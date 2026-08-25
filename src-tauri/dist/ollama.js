@@ -1118,6 +1118,20 @@ function visibleChatMessages(container) {
   });
 }
 
+function focusChatMessagesLast(container) {
+  const items = visibleChatMessages(container);
+  if (!items.length) return false;
+  syncChatMessagesTabOrder(container, items[items.length - 1]);
+  items[items.length - 1].focus();
+  try {
+    items[items.length - 1].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  } catch (_) {
+    /* ignore */
+  }
+  return true;
+}
+window.focusChatMessagesLast = focusChatMessagesLast;
+
 /** Hint above the message list (Monitors / Top Processes kb-hint parity). */
 function ensureChatMessagesKbHint(container, show) {
   if (!container || !container.parentNode) return;
@@ -1266,6 +1280,13 @@ function wireChatMessagesCopy(container) {
     };
 
     if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'J') {
+      if (
+        idx === items.length - 1 &&
+        typeof window.tryChainSectionContentToFooter === 'function' &&
+        window.tryChainSectionContentToFooter(container)
+      ) {
+        return;
+      }
       move(idx + 1);
       return;
     }

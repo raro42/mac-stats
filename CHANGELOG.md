@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.640] - 2026-08-26
+
+### Added
+- **Section-content↔footer toolbar chain** — last row in processes · monitors · chat · logs · Agent Ops lists → footer; footer start ← last row (or Disk Cleanup toolbar/categories/scopes); Disk Cleanup toolbar last → footer.
+
 ## [0.1.639] - 2026-08-26
 
 ### Added
