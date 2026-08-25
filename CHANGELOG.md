@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.635] - 2026-08-25
+
+### Added
+- CPU metrics **history sparkline↔power-strip toolbar chain** — last history chart → crosses to battery strip; first strip chip ← crosses to last chart (sparkline + power-strip parity).
+
 ## [0.1.634] - 2026-08-25
 
 ### Added

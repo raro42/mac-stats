@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.635** — CPU metrics history sparkline↔power-strip toolbar chain (last chart → battery strip; first strip ← last chart).
+
 - **v0.1.634** — CPU metrics history sparkline↔ring toolbar chain (last ring → first chart; first chart → temperature ring).
 
 - **v0.1.633** — CPU window **header toolbar keyboard** (Refresh · Settings ←→/h l/Home/End; ring-gauge + footer wrap chain).

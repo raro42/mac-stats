@@ -2707,19 +2707,45 @@ function ensurePowerStripKbHint() {
     hint.setAttribute('aria-hidden', 'true');
     strip.appendChild(hint);
   }
-  hint.textContent = `${LPM_GUI_LABEL}: switch + On/Off · click to toggle (password may be required)`;
+  hint.textContent =
+    'Tab or click Bat · LPM · Power · ← → / h l · Home/End · at start crosses to last history chart · LPM toggles (password may be required)';
 }
 
 /**
  * Power strip toolbar keyboard — focus a chip, then ←→ / h l / Home/End
- * moves across CPU·RAM·GPU·Temp·Heat·LPM·GHz·SSD·Up·Bat·Power (Details /
- * Monitors listbox chrome parity). Enter/Space keep existing activate/copy.
+ * moves across Bat · LPM · Power (Details / sparkline wrap parity).
+ * Enter/Space keep existing activate/copy.
  */
 function ensurePowerStripKeyboard() {
   ensureRamStripStyles();
   const strip = document.getElementById('battery-power-strip');
   if (!strip) return;
   ensurePowerStripKbHint();
+  if (strip.dataset.powerStripChainKbWired !== '1') {
+    strip.dataset.powerStripChainKbWired = '1';
+    strip.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const chips = getPowerStripChips();
+        if (!chips.length) return;
+        const idx = chips.indexOf(document.activeElement);
+        if (idx < 0) return;
+        const back =
+          e.key === 'ArrowLeft' ||
+          e.key === 'h' ||
+          e.key === 'ArrowUp' ||
+          e.key === 'k';
+        if (back && idx === 0) {
+          if (tryChainPowerStripToSparklineLast()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }
+      },
+      true
+    );
+  }
   wireToolbarKeyboard(
     strip,
     () => getPowerStripChips(),
@@ -2960,7 +2986,7 @@ function ensureHistorySparklineKbHint() {
     section.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click a chart · ← → / h l · Home/End move · at start crosses to temperature ring · Enter / Space jumps to ring';
+    'Tab or click a chart · ← → / h l · Home/End move · at start crosses to temperature ring · at end crosses to battery strip · Enter / Space jumps to ring';
 }
 
 /**
@@ -3046,8 +3072,18 @@ function ensureHistorySparklineKeyboard() {
           e.key === 'h' ||
           e.key === 'ArrowUp' ||
           e.key === 'k';
+        const forward =
+          e.key === 'ArrowRight' ||
+          e.key === 'l' ||
+          e.key === 'ArrowDown' ||
+          e.key === 'j';
         if (back && idx === 0) {
           if (tryChainSparklineToRingLast()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        } else if (forward && idx === sparkChips.length - 1) {
+          if (tryChainSparklineToPowerStripFirst()) {
             e.preventDefault();
             e.stopPropagation();
           }
@@ -13996,6 +14032,24 @@ function tryChainSparklineToRingLast() {
   if (!chips.length) return false;
   const target = chips[chips.length - 1];
   refreshRingGaugeRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+function tryChainSparklineToPowerStripFirst() {
+  const chips = getPowerStripChips();
+  if (!chips.length) return false;
+  const target = chips[0];
+  refreshPowerStripRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+function tryChainPowerStripToSparklineLast() {
+  const chips = getHistorySparklineChips();
+  if (!chips.length) return false;
+  const target = chips[chips.length - 1];
+  refreshHistorySparklineRovingTabindex(target);
   target.focus();
   return true;
 }
