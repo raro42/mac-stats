@@ -2814,7 +2814,7 @@ function ensureRingGaugeKbHint() {
     section.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click a ring · ← → / h l · Home/End move · at start crosses to Settings · Enter / Space activates';
+    'Tab or click a ring · ← → / h l · Home/End move · at start crosses to Settings · at end crosses to history charts · Enter / Space activates';
 }
 
 /**
@@ -2840,8 +2840,18 @@ function ensureRingGaugeKeyboard() {
           e.key === 'h' ||
           e.key === 'ArrowUp' ||
           e.key === 'k';
+        const forward =
+          e.key === 'ArrowRight' ||
+          e.key === 'l' ||
+          e.key === 'ArrowDown' ||
+          e.key === 'j';
         if (back && idx === 0) {
           if (tryChainRingGaugeToHeaderSettings()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        } else if (forward && idx === chips.length - 1) {
+          if (tryChainRingGaugeToSparklineFirst()) {
             e.preventDefault();
             e.stopPropagation();
           }
@@ -2950,7 +2960,7 @@ function ensureHistorySparklineKbHint() {
     section.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click a chart · ← → / h l · Home/End move · Enter / Space jumps to ring';
+    'Tab or click a chart · ← → / h l · Home/End move · at start crosses to temperature ring · Enter / Space jumps to ring';
 }
 
 /**
@@ -3021,6 +3031,31 @@ function ensureHistorySparklineKeyboard() {
     }
   }
   refreshHistorySparklineRovingTabindex();
+  if (section.dataset.historySparkChainKbWired !== '1') {
+    section.dataset.historySparkChainKbWired = '1';
+    section.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        const sparkChips = getHistorySparklineChips();
+        if (!sparkChips.length) return;
+        const idx = sparkChips.indexOf(document.activeElement);
+        if (idx < 0) return;
+        const back =
+          e.key === 'ArrowLeft' ||
+          e.key === 'h' ||
+          e.key === 'ArrowUp' ||
+          e.key === 'k';
+        if (back && idx === 0) {
+          if (tryChainSparklineToRingLast()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }
+      },
+      true
+    );
+  }
   wireToolbarKeyboard(
     section,
     () => getHistorySparklineChips(),
@@ -13944,6 +13979,23 @@ function tryChainRingGaugeToHeaderSettings() {
   if (!items.length) return false;
   const target = items[items.length - 1];
   refreshCpuHeaderToolbarRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+function tryChainRingGaugeToSparklineFirst() {
+  const chips = getHistorySparklineChips();
+  if (!chips.length) return false;
+  refreshHistorySparklineRovingTabindex(chips[0]);
+  chips[0].focus();
+  return true;
+}
+
+function tryChainSparklineToRingLast() {
+  const chips = getRingGaugeChips();
+  if (!chips.length) return false;
+  const target = chips[chips.length - 1];
+  refreshRingGaugeRovingTabindex(target);
   target.focus();
   return true;
 }

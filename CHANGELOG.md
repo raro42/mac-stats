@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.634] - 2026-08-25
+
+### Added
+- CPU metrics **history sparkline↔ring toolbar chain** — last ring ← → crosses to first history chart; first chart ← crosses to temperature ring (ring-gauge + sparkline parity).
+
 ## [0.1.633] - 2026-08-25
 
 ### Added
