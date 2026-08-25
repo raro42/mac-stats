@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.639] - 2026-08-26
+
+### Added
+- **Disk Cleanup scopes↔categories toolbar chain** — last scope row → first category; first category ↑ → last scope (or filter chips when scopes empty); last category → Clean now toolbar; first toolbar button ← last category; empty scopes skip straight to categories from filter chips.
+
 ## [0.1.638] - 2026-08-26
 
 ### Added

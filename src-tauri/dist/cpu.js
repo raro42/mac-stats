@@ -3421,6 +3421,13 @@ function focusSectionContentListbox(el) {
 
 function tryChainFilterChipWrapToContent(wrap) {
   const listbox = getFilterChipWrapContentListbox(wrap);
+  if (wrap?.id === 'disk-cleanup-filter-chips') {
+    const scopeRows = listbox
+      ? Array.from(listbox.querySelectorAll('.disk-cleanup-scope-row'))
+      : [];
+    if (scopeRows.length && focusSectionContentListbox(listbox)) return true;
+    return focusDiskCleanupCategoriesFirst();
+  }
   return focusSectionContentListbox(listbox);
 }
 
@@ -12478,6 +12485,11 @@ function ensureDiskCleanupToolbarKeyboard() {
       e.key === 'ArrowUp' ||
       e.key === 'k'
     ) {
+      if (idx === 0 && tryChainDiskCleanupToolbarToCategoriesLast()) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       next = Math.max(idx - 1, 0);
     } else if (e.key === 'Home') {
       next = 0;
@@ -13336,6 +13348,75 @@ function syncDiskCleanupItemTabOrder(listEl, preferIdx) {
   });
 }
 
+function focusDiskCleanupCategoriesFirst() {
+  const listEl = document.getElementById('disk-cleanup-list');
+  if (!listEl || listEl.hidden) return false;
+  const rows = visibleDiskCleanupItems(listEl);
+  if (!rows.length) return false;
+  const prefer = parseInt(rows[0].getAttribute('data-item-idx') || '0', 10);
+  syncDiskCleanupItemTabOrder(listEl, Number.isFinite(prefer) ? prefer : 0);
+  rows[0].focus();
+  if (typeof rows[0].scrollIntoView === 'function') {
+    rows[0].scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
+function focusDiskCleanupScopesLast() {
+  const scopesEl = document.getElementById('disk-cleanup-scopes');
+  if (!scopesEl || scopesEl.hidden) return false;
+  const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
+  if (!rows.length) return false;
+  syncDiskCleanupScopeTabOrder(scopesEl, rows.length - 1);
+  rows[rows.length - 1].focus();
+  if (typeof rows[rows.length - 1].scrollIntoView === 'function') {
+    rows[rows.length - 1].scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
+function focusDiskCleanupCategoriesLast() {
+  const listEl = document.getElementById('disk-cleanup-list');
+  if (!listEl || listEl.hidden) return false;
+  const rows = visibleDiskCleanupItems(listEl);
+  if (!rows.length) return false;
+  const prefer = parseInt(
+    rows[rows.length - 1].getAttribute('data-item-idx') || '0',
+    10
+  );
+  syncDiskCleanupItemTabOrder(listEl, Number.isFinite(prefer) ? prefer : 0);
+  rows[rows.length - 1].focus();
+  if (typeof rows[rows.length - 1].scrollIntoView === 'function') {
+    rows[rows.length - 1].scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
+function tryChainDiskCleanupScopesToCategories() {
+  return focusDiskCleanupCategoriesFirst();
+}
+
+function tryChainDiskCleanupCategoriesToScopes() {
+  if (focusDiskCleanupScopesLast()) return true;
+  return tryChainListboxToFilterChips(
+    document.getElementById('disk-cleanup-scopes')
+  );
+}
+
+function tryChainDiskCleanupCategoriesToToolbarFirst() {
+  const wrap = document.querySelector('.disk-cleanup-toolbar');
+  if (!wrap) return false;
+  const items = getDiskCleanupToolbarActionItems(wrap);
+  if (!items.length) return false;
+  refreshDiskCleanupToolbarRovingTabindex(wrap, items[0]);
+  items[0].focus();
+  return true;
+}
+
+function tryChainDiskCleanupToolbarToCategoriesLast() {
+  return focusDiskCleanupCategoriesLast();
+}
+
 function wireDiskCleanupScopesKeyboard() {
   const scopesEl = document.getElementById('disk-cleanup-scopes');
   if (!scopesEl || scopesEl.dataset.keyboardNav === '1') return;
@@ -13379,7 +13460,15 @@ function wireDiskCleanupScopesKeyboard() {
         return;
       }
       const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
-      if (!rows.length) return;
+      if (!rows.length) {
+        if (
+          (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'J') &&
+          tryChainDiskCleanupScopesToCategories()
+        ) {
+          e.preventDefault();
+        }
+        return;
+      }
       let next = -1;
       if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'Home') next = 0;
       else if (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'End') next = rows.length - 1;
@@ -13510,8 +13599,10 @@ function wireDiskCleanupScopesKeyboard() {
 
     let next = -1;
     const page = 5;
-    if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, rows.length - 1);
-    else if (e.key === 'ArrowUp' || e.key === 'k') {
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (idx === rows.length - 1 && tryChainDiskCleanupScopesToCategories()) return;
+      next = Math.min(idx + 1, rows.length - 1);
+    } else if (e.key === 'ArrowUp' || e.key === 'k') {
       if (idx === 0 && tryChainListboxToFilterChips(scopesEl)) return;
       next = Math.max(idx - 1, 0);
     }
@@ -13559,6 +13650,13 @@ function wireDiskCleanupListKeyboard() {
     if (!row || !listEl.contains(row)) {
       // First arrow/j from listbox chrome focuses first/last category (Debug Log parity).
       if (e.target !== listEl) return;
+      if (
+        (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'K') &&
+        tryChainDiskCleanupCategoriesToScopes()
+      ) {
+        e.preventDefault();
+        return;
+      }
       const rows = visibleDiskCleanupItems(listEl);
       if (!rows.length) return;
       let next = -1;
@@ -13628,9 +13726,15 @@ function wireDiskCleanupListKeyboard() {
 
     let next = -1;
     const page = 5;
-    if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, rows.length - 1);
-    else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
-    else if (e.key === 'PageDown') next = Math.min(idx + page, rows.length - 1);
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (idx === rows.length - 1 && tryChainDiskCleanupCategoriesToToolbarFirst()) {
+        return;
+      }
+      next = Math.min(idx + 1, rows.length - 1);
+    } else if (e.key === 'ArrowUp' || e.key === 'k') {
+      if (idx === 0 && tryChainDiskCleanupCategoriesToScopes()) return;
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'PageDown') next = Math.min(idx + page, rows.length - 1);
     else if (e.key === 'PageUp') next = Math.max(idx - page, 0);
     else if (e.key === 'Home') next = 0;
     else if (e.key === 'End') next = rows.length - 1;
