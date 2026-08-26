@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.644] - 2026-08-26
+
+### Added
+- **Ollama settings full modal toolbar wrap** — footer version ↔ system-prompt toolbar when the popover is open; prompt first ← crosses to footer version; Save last → footer; footer version ← crosses to Save (filter-chip chain when closed).
+
 ## [0.1.643] - 2026-08-26
 
 ### Added

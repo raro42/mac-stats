@@ -8582,8 +8582,49 @@ function ensureOllamaSettingsToolbarKbHint(wrap) {
   }
   const items = getOllamaSettingsToolbarItems(content);
   hint.hidden = items.length < 2;
-  hint.textContent =
-    '← → / h l · Home/End move · arrows at prompt start/end · at start crosses to header Close · at end crosses to header Close';
+  hint.textContent = isOllamaSettingsPopoverOpen()
+    ? '← → / h l · Home/End move · arrows at prompt start/end · at start crosses to footer version · at end crosses to footer version'
+    : '← → / h l · Home/End move · arrows at prompt start/end · at start crosses to header Close · at end crosses to header Close';
+}
+
+function isOllamaSettingsPopoverOpen() {
+  const popover = document.getElementById('ollama-settings-popover');
+  if (!popover) return false;
+  return (
+    popover.style.display !== 'none' &&
+    popover.getAttribute('aria-hidden') !== 'true'
+  );
+}
+
+/** Ollama system prompt first ← footer version (full modal wrap). */
+function tryChainOllamaSettingsBodyToFooter() {
+  if (!isOllamaSettingsPopoverOpen()) return false;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/** Save last → footer version when the popover is open. */
+function tryChainOllamaSettingsSaveToFooter() {
+  if (!isOllamaSettingsPopoverOpen()) return false;
+  if (typeof window.tryChainFocusFooterVersion === 'function') {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/** Footer version ← Save when the popover is open. */
+function tryChainFooterVersionToOllamaSettingsSaveLast() {
+  if (!isOllamaSettingsPopoverOpen()) return false;
+  const content = document.querySelector('#ollama-settings-popover .popover-content');
+  if (!content) return false;
+  const items = getOllamaSettingsToolbarItems(content);
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  refreshOllamaSettingsToolbarRovingTabindex(content, target);
+  target.focus();
+  return true;
 }
 
 /** Ollama settings header Close → system prompt. */
@@ -8712,7 +8753,10 @@ function ensureOllamaSettingsToolbarKeyboard(wrap) {
         return;
       }
       if (idx === items.length - 1) {
-        if (tryChainOllamaSettingsBodyToHeader()) {
+        if (tryChainOllamaSettingsSaveToFooter()) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (tryChainOllamaSettingsBodyToHeader()) {
           e.preventDefault();
           e.stopPropagation();
         }
@@ -8727,7 +8771,10 @@ function ensureOllamaSettingsToolbarKeyboard(wrap) {
         return;
       }
       if (idx === 0) {
-        if (tryChainOllamaSettingsBodyToHeader()) {
+        if (tryChainOllamaSettingsBodyToFooter()) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (tryChainOllamaSettingsBodyToHeader()) {
           e.preventDefault();
           e.stopPropagation();
         }
@@ -14905,6 +14952,7 @@ window.refreshCpuHeaderToolbarRovingTabindex = refreshCpuHeaderToolbarRovingTabi
 window.tryChainFocusFooterVersion = tryChainFocusFooterVersion;
 window.isProcessDetailsModalOpen = isProcessDetailsModalOpen;
 window.tryChainFooterVersionToForceQuitLast = tryChainFooterVersionToForceQuitLast;
+window.isOllamaSettingsPopoverOpen = isOllamaSettingsPopoverOpen;
 
 /** CPU window footer (version + GitHub). */
 function getCpuFooterElement() {
@@ -14987,9 +15035,15 @@ function ensureFooterToolbarKbHint() {
   const changelogOpen =
     typeof window.isChangelogModalOpen === "function" &&
     window.isChangelogModalOpen();
+  const ollamaSettingsOpen = isOllamaSettingsPopoverOpen();
+  const processDetailsOpen = isProcessDetailsModalOpen();
   hint.textContent = changelogOpen
     ? '← → / h l · Home/End move · version ← crosses to changelog · at end crosses to section icons'
-    : '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to section list (or filter chips)';
+    : ollamaSettingsOpen
+      ? '← → / h l · Home/End move · version ← crosses to Ollama Save · at end crosses to section icons'
+      : processDetailsOpen
+        ? '← → / h l · Home/End move · version ← crosses to Force Quit · at end crosses to section icons'
+        : '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to section list (or filter chips)';
 }
 
 function tryChainFooterToIconLineFirst() {
@@ -15045,6 +15099,9 @@ function tryChainFooterVersionToChangelogWhenOpen() {
     typeof window.tryChainFooterVersionToChangelogBodyLast === "function"
   ) {
     return window.tryChainFooterVersionToChangelogBodyLast();
+  }
+  if (tryChainFooterVersionToOllamaSettingsSaveLast()) {
+    return true;
   }
   if (tryChainFooterVersionToForceQuitLast()) {
     return true;
