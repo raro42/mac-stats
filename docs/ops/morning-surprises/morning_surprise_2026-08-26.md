@@ -1,30 +1,32 @@
 # Morning surprise — 2026-08-26
 
-Overnight Track B now at **v0.1.657** — **Top Processes force-quit↔footer toolbar polish**.
+Overnight Track B now at **v0.1.658** — **Details section↔footer toolbar chain**.
 
-## Latest keep (this tick ~22:00)
+## Latest keep (this tick ~22:24)
 
-**v0.1.657** — Footer ← prefers Force Quit when Process Details is open (Monitors detail parity); process list last row ↓ crosses to hero when the modal is open; footer ← section chain lands on Force Quit instead of skipping to the list row.
+**v0.1.658** — Last Details value ↓ crosses to Top Processes first row (or footer when processes are hidden); processes first row ↑ crosses to Details last value; footer ← prefers Details last when processes are collapsed.
 
 ## Prior this evening
 
-**v0.1.656** — Top Processes list↔modal hero toolbar chain (selected row ↓ → name; name ← row; Force Quit → footer).
+**v0.1.657** — Top Processes force-quit↔footer toolbar polish (footer ← Force Quit when modal open; list last ↓ → hero).
 
-**v0.1.655** — Monitors add-form↔settings-list toolbar chain (last Remove/CTA ↓ → URL; URL ← list; Add Monitor → footer).
+**v0.1.656** — Top Processes list↔modal hero toolbar chain.
 
-**v0.1.654** — Monitors list↔detail toolbar chain (open row ↓ → Check now; Check now ← row; Remove → footer).
+**v0.1.655** — Monitors add-form↔settings-list toolbar chain.
 
-**v0.1.653** — Debug Log lines↔toolbar chain (last line ↓ → Refresh; Refresh ← last line; Auto-refresh → footer).
+**v0.1.654** — Monitors list↔detail toolbar chain.
 
-**v0.1.652** — Perplexity results↔search toolbar chain (last result ↓ → query; query ← last result; Search → footer).
+**v0.1.653** — Debug Log lines↔toolbar chain.
 
-**v0.1.651** — AI Chat messages↔composer toolbar chain (last message ↓ → composer; composer ← last message; Send → footer).
+**v0.1.652** — Perplexity results↔search toolbar chain.
+
+**v0.1.651** — AI Chat messages↔composer toolbar chain.
 
 ## Context
 
 - Digester open empty (10 turns / 7d); design review not due (`due=false`, grace).
 - `debug.log`: no product errors (single-instance lock WARN only).
-- Fuel: standing backlog toolbar keyboard chain after list↔modal hero.
+- Fuel: standing backlog Details section toolbar chain after Top Processes force-quit polish.
 
 ## Prior night carry (2026-08-25)
 
