@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.658] - 2026-08-26
+
+### Added
+- **Details section↔footer toolbar chain** — last Details value ↓ crosses to Top Processes first row (or footer when processes are hidden); processes first row ↑ crosses to Details last value; footer ← prefers Details last when processes are collapsed.
+
 ## [0.1.657] - 2026-08-26
 
 ### Added

@@ -587,6 +587,20 @@ function visibleProcessRows(processList) {
   );
 }
 
+/** Focus first visible process row (Details ↓ chain). */
+function focusProcessListFirst(listbox) {
+  const list = listbox || document.getElementById('process-list');
+  if (!list || isProcessesSectionCollapsed()) return false;
+  const rows = visibleProcessRows(list);
+  if (!rows.length) return false;
+  rows.forEach((r, i) => r.setAttribute('tabindex', i === 0 ? '0' : '-1'));
+  rows[0].focus();
+  if (typeof rows[0].scrollIntoView === 'function') {
+    rows[0].scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
 /** Open a process row + details from a Top Processes glance strip. */
 function openProcessFromGlance(pid) {
   if (!pid) return;
@@ -1947,6 +1961,10 @@ async function refresh() {
               if (idx === rows.length - 1 && tryChainSectionContentToFooter(list)) return;
               next = Math.min(idx + 1, rows.length - 1);
             } else if (e.key === "ArrowUp" || e.key === "k") {
+              if (idx === 0 && focusDetailsGridLast()) {
+                e.preventDefault();
+                return;
+              }
               if (idx === 0 && tryChainListboxToFilterChips(list)) return;
               next = Math.max(idx - 1, 0);
             }
@@ -3452,10 +3470,14 @@ function isSectionContentListboxVisible(el) {
   if (el.id === 'ops-live-sessions' || el.id === 'ops-session-files') {
     return el.style.display !== 'none' && el.offsetParent;
   }
+  if (el.id === 'details-content') {
+    return !isDetailsSectionCollapsed();
+  }
   return el.getClientRects().length > 0 || el.offsetParent !== null;
 }
 
 const SECTION_CONTENT_LISTBOX_IDS = [
+  'details-content',
   'process-list',
   'monitors-list',
   'chat-messages',
@@ -3498,6 +3520,8 @@ function focusDiskCleanupToolbarLast() {
 function focusSectionContentListboxLast(listbox) {
   if (!listbox || !isSectionContentListboxVisible(listbox)) return false;
   switch (listbox.id) {
+    case 'details-content':
+      return focusDetailsGridLast(listbox);
     case 'process-list': {
       if (isProcessDetailsModalOpen()) {
         if (tryChainProcessDetailsHeaderToForceQuitLast()) return true;
@@ -3554,6 +3578,12 @@ function focusSectionContentListboxLast(listbox) {
 }
 
 function tryChainSectionContentToFooter(listbox) {
+  if (listbox?.id === 'details-content') {
+    if (!isProcessesSectionCollapsed()) {
+      if (focusProcessListFirst()) return true;
+    }
+    return tryChainFilterChipToFooterFirst();
+  }
   if (listbox?.id === 'disk-cleanup-list') {
     return tryChainDiskCleanupCategoriesToToolbarFirst();
   }
@@ -3637,6 +3667,12 @@ function tryChainFooterToSectionContentLast() {
 
 function focusSectionContentListbox(el) {
   if (!el || el.hidden) return false;
+  if (el.id === 'details-content') {
+    return focusDetailsGridFirst(el);
+  }
+  if (el.id === 'process-list') {
+    return focusProcessListFirst(el);
+  }
   const visible =
     el.getClientRects().length > 0 ||
     el.offsetParent !== null ||
@@ -7711,7 +7747,7 @@ function ensureProcessesListKbHint(processList, show) {
     processList.parentNode?.insertBefore(hint, processList);
   }
   hint.textContent =
-    'All · Pinned filters · click row for details · open row ↓ → name · name ← row · Force Quit → footer · click name / c copies · ↑↓ / j k / Home / End · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
+    'All · Pinned filters · click row for details · first row ↑ → Details last value · open row ↓ → name · name ← row · Force Quit → footer · click name / c copies · ↑↓ / j k / Home / End · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
 }
 
 /** Hint above External / Monitors list (Disk Cleanup kb-hint parity). */
@@ -9617,8 +9653,52 @@ function ensureDetailsKbHint(grid, show) {
     grid.parentNode.insertBefore(hint, grid);
   }
   hint.textContent =
-    '↑↓ / j k · Home/End select · Enter / c copies value · Esc clears · focus grid for first/last';
+    '↑↓ / j k · Home/End select · last value ↓ → processes / footer · processes first ↑ → last value · Enter / c copies · Esc clears';
 }
+
+function getDetailsGridElement() {
+  return (
+    document.getElementById('details-content') ||
+    document.querySelector('.details-grid')
+  );
+}
+
+function isDetailsSectionOpen() {
+  return !isDetailsSectionCollapsed();
+}
+
+/** Focus last Details value. Used by processes ↑ chain and footer ← chain. */
+function focusDetailsGridLast(grid) {
+  if (!isDetailsSectionOpen()) return false;
+  const el = grid || getDetailsGridElement();
+  if (!el) return false;
+  const vals = detailsGridValues(el);
+  if (!vals.length) return false;
+  syncDetailsValuesTabOrder(el, vals[vals.length - 1]);
+  vals[vals.length - 1].focus();
+  if (typeof vals[vals.length - 1].scrollIntoView === 'function') {
+    vals[vals.length - 1].scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
+/** Focus first Details value. Used by processes ↓ chain from details. */
+function focusDetailsGridFirst(grid) {
+  if (!isDetailsSectionOpen()) return false;
+  const el = grid || getDetailsGridElement();
+  if (!el) return false;
+  const vals = detailsGridValues(el);
+  if (!vals.length) return false;
+  syncDetailsValuesTabOrder(el, vals[0]);
+  vals[0].focus();
+  if (typeof vals[0].scrollIntoView === 'function') {
+    vals[0].scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
+window.focusDetailsGridLast = focusDetailsGridLast;
+window.focusDetailsGridFirst = focusDetailsGridFirst;
 
 function detailsGridValues(grid) {
   if (!grid) return [];
@@ -9802,8 +9882,10 @@ function wireDetailsGridKeyboard(grid) {
 
     let next = -1;
     const page = 5;
-    if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, vals.length - 1);
-    else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (idx === vals.length - 1 && tryChainSectionContentToFooter(grid)) return;
+      next = Math.min(idx + 1, vals.length - 1);
+    } else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
     else if (e.key === 'PageDown') next = Math.min(idx + page, vals.length - 1);
     else if (e.key === 'PageUp') next = Math.max(idx - page, 0);
     else if (e.key === 'Home') next = 0;
