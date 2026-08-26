@@ -1,12 +1,14 @@
 # Morning surprise — 2026-08-26
 
-Overnight Track B now at **v0.1.651** — **AI Chat messages↔composer toolbar chain**.
+Overnight Track B now at **v0.1.652** — **Perplexity results↔search toolbar chain**.
 
-## Latest keep (this tick ~05:52)
+## Latest keep (this tick ~20:00)
 
-**v0.1.651** — With a thread open, last message ↓ / j crosses into the composer; composer ← at input start returns to the last message; Send → footer; footer ← prefers Send when chat is open. Empty starter-chip ↔ composer chain from v0.1.650 stays. Design-review fuel (feature-ai-chat ~11.7d); screenshot recapture may stay deferred under Screen Recording TCC.
+**v0.1.652** — Last Perplexity result ↓ / j crosses into the search query; query ← at input start returns to the last result; Search → footer; footer ← prefers Search when Perplexity search is open. Design-review fuel (feature-ai-chat ~12.3d); screenshot recapture may stay deferred under Screen Recording TCC.
 
 ## Prior this night
+
+**v0.1.651** — AI Chat messages↔composer toolbar chain (last message ↓ → composer; composer ← last message; Send → footer).
 
 **v0.1.650** — AI Chat empty starter chips toolbar (warm title; ←→/Enter → composer).
 
@@ -36,9 +38,9 @@ Overnight Track B now at **v0.1.651** — **AI Chat messages↔composer toolbar 
 
 ## Context
 
-- Digester open empty (10 turns / 7d); design review not strictly due (`due=false`, grace) — standing backlog / AI Chat polish.
+- Digester open empty (10 turns / 7d); design review not strictly due (`due=false`, grace) — standing backlog / Perplexity polish.
 - `debug.log`: single-instance lock DEBUG/WARN only — no product errors.
-- Fuel: standing backlog continuation after empty starter chips toolbar.
+- Fuel: standing backlog continuation after AI Chat messages↔composer chain.
 
 ## Prior night carry (2026-08-25)
 
