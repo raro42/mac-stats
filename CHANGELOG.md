@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.652] - 2026-08-26
+
+### Added
+- **Perplexity results↔search toolbar chain** — last result ↓ / j crosses to the search query; query ← at input start crosses back to the last result; Search → footer; footer ← prefers Search when Perplexity search is open.
+
 ## [0.1.651] - 2026-08-26
 
 ### Added

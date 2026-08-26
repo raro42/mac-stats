@@ -3565,6 +3565,12 @@ function tryChainFooterToSectionContentLast() {
     if (focusDiskCleanupScopesLast()) return true;
   }
   if (
+    typeof window.focusPerplexitySearchLast === 'function' &&
+    window.focusPerplexitySearchLast()
+  ) {
+    return true;
+  }
+  if (
     typeof window.focusChatComposerLast === 'function' &&
     window.focusChatComposerLast()
   ) {
@@ -9962,7 +9968,7 @@ function ensurePerplexityResultsKbHint(resultsEl, show) {
     resultsEl.parentNode.insertBefore(hint, resultsEl);
   }
   hint.textContent =
-    'Focus results then ↑↓ / j k / Home / End · PgUp/PgDn · Enter opens · c copies URL · Esc clears';
+    'Focus results then ↑↓ / j k / Home / End · last ↓ → search · PgUp/PgDn · Enter opens · c copies URL · Esc clears';
 }
 
 function syncPerplexityResultsTabOrder(resultsEl, preferEl) {
@@ -10049,6 +10055,65 @@ function openPerplexityResultUrl(item) {
     if (a) a.click();
   }
 }
+
+function isPerplexitySearchRowVisible(row) {
+  const el = row || document.querySelector('.perplexity-search-box');
+  if (!el || el.hidden) return false;
+  try {
+    return el.getClientRects().length > 0;
+  } catch (_) {
+    return false;
+  }
+}
+
+/** Focus first search control (query). Used by results-list → search chain. */
+function focusPerplexitySearchFirst() {
+  const row = document.querySelector('.perplexity-search-box');
+  if (!isPerplexitySearchRowVisible(row)) return false;
+  const items = getPerplexitySearchToolbarItems(row);
+  if (!items.length) return false;
+  refreshPerplexitySearchRovingTabindex(row, items[0]);
+  items[0].focus();
+  if (items[0]?.id === 'perplexity-query' && typeof items[0].setSelectionRange === 'function') {
+    try {
+      const len = (items[0].value || '').length;
+      items[0].setSelectionRange(len, len);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+  return true;
+}
+
+/** Focus last search control (Search). Used by footer ← search chain. */
+function focusPerplexitySearchLast() {
+  const row = document.querySelector('.perplexity-search-box');
+  if (!isPerplexitySearchRowVisible(row)) return false;
+  const items = getPerplexitySearchToolbarItems(row);
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  refreshPerplexitySearchRovingTabindex(row, target);
+  target.focus();
+  return true;
+}
+
+/** Focus last visible result card. Used by search ← results chain. */
+function focusPerplexityResultsLast(resultsEl) {
+  const el = resultsEl || document.getElementById('perplexity-results');
+  if (!el || el.hidden) return false;
+  const items = visiblePerplexityResultItems(el);
+  if (!items.length) return false;
+  syncPerplexityResultsTabOrder(el, items[items.length - 1]);
+  items[items.length - 1].focus();
+  if (typeof items[items.length - 1].scrollIntoView === 'function') {
+    items[items.length - 1].scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
+window.focusPerplexitySearchFirst = focusPerplexitySearchFirst;
+window.focusPerplexitySearchLast = focusPerplexitySearchLast;
+window.focusPerplexityResultsLast = focusPerplexityResultsLast;
 
 function decoratePerplexityResultItems(resultsEl) {
   if (!resultsEl) return;
@@ -10137,8 +10202,14 @@ function wirePerplexityResultsKeyboard(resultsEl) {
 
     let next = -1;
     const page = 5;
-    if (e.key === 'ArrowDown' || e.key === 'j') next = Math.min(idx + 1, items.length - 1);
-    else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (idx === items.length - 1 && focusPerplexitySearchFirst()) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
     else if (e.key === 'PageDown') next = Math.min(idx + page, items.length - 1);
     else if (e.key === 'PageUp') next = Math.max(idx - page, 0);
     else if (e.key === 'Home') next = 0;
@@ -10205,8 +10276,16 @@ function ensurePerplexitySearchKbHint(container) {
   }
   const items = getPerplexitySearchToolbarItems(row);
   hint.hidden = items.length < 2;
-  hint.textContent =
-    '← → / h l · Home/End move · Enter searches from input · Search on button';
+  const hasResults = visiblePerplexityResultItems(
+    document.getElementById('perplexity-results')
+  ).length > 0;
+  if (hasResults) {
+    hint.textContent =
+      '← → / h l · Home/End move · at start ← last result · Search → footer · Enter searches from input';
+  } else {
+    hint.textContent =
+      '← → / h l · Home/End move · Enter searches from input · Search on button';
+  }
 }
 
 /**
@@ -10254,9 +10333,23 @@ function wirePerplexitySearchToolbarKeyboard(row) {
       if (active?.id === 'perplexity-query' && !perplexitySearchInputAtMoveBoundary(active, 1)) {
         return;
       }
+      if (
+        idx === items.length - 1 &&
+        typeof tryChainFilterChipToFooterFirst === 'function' &&
+        tryChainFilterChipToFooterFirst()
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       next = Math.min(idx + 1, items.length - 1);
     } else if (back) {
       if (active?.id === 'perplexity-query' && !perplexitySearchInputAtMoveBoundary(active, -1)) {
+        return;
+      }
+      if (idx === 0 && focusPerplexityResultsLast()) {
+        e.preventDefault();
+        e.stopPropagation();
         return;
       }
       next = Math.max(idx - 1, 0);
