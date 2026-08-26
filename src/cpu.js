@@ -3499,6 +3499,9 @@ function focusSectionContentListboxLast(listbox) {
   if (!listbox || !isSectionContentListboxVisible(listbox)) return false;
   switch (listbox.id) {
     case 'process-list': {
+      if (isProcessDetailsModalOpen()) {
+        if (tryChainProcessDetailsHeaderToForceQuitLast()) return true;
+      }
       const rows = visibleProcessRows(listbox);
       if (!rows.length) return false;
       rows.forEach((r, i) =>
@@ -3569,6 +3572,9 @@ function tryChainSectionContentToFooter(listbox) {
       }
     }
   }
+  if (listbox?.id === 'process-list' && isProcessDetailsModalOpen()) {
+    if (focusProcessDetailHeroFirst()) return true;
+  }
   return tryChainFilterChipToFooterFirst();
 }
 
@@ -3610,6 +3616,9 @@ function tryChainFooterToSectionContentLast() {
         return true;
       }
     }
+  }
+  if (isProcessDetailsModalOpen()) {
+    if (tryChainProcessDetailsHeaderToForceQuitLast()) return true;
   }
   if (
     typeof window.focusChatComposerLast === 'function' &&

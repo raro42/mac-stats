@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.657** — Top Processes force-quit↔footer toolbar polish (footer ← Force Quit when modal open; list last ↓ → hero; section↔footer chain lands on Force Quit).
+
 - **v0.1.656** — Top Processes list↔modal hero toolbar chain (selected row ↓ → name; name ← row; Force Quit → footer).
 
 - **v0.1.655** — Monitors add-form↔settings-list toolbar chain (last Remove/CTA ↓ → URL; URL ← list; Add Monitor → footer; footer ← when Settings open).

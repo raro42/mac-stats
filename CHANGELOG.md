@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.657] - 2026-08-26
+
+### Added
+- **Top Processes force-quit↔footer toolbar polish** — footer ← prefers Force Quit when Process Details is open (Monitors detail parity); process list last row ↓ crosses to hero when the modal is open; footer ← section chain lands on Force Quit instead of skipping to the list row.
+
 ## [0.1.656] - 2026-08-26
 
 ### Added
