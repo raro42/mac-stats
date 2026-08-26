@@ -1,19 +1,29 @@
 # Morning surprise — 2026-08-27
 
-Overnight Track B now at **v0.1.664** — **Monitors icon-line↔section toolbar chain**.
+**mac-stats** overnight autoresearch (Track B). Window: 2026-08-26 20:00 → 2026-08-27 06:00.
 
-## Shipped this tick
+## Shipped tonight
 
-**v0.1.664** — Monitors vertical keyboard loop: Monitors icon ↓ → settings close (when Settings is open), filter chips, or first list row / empty Add CTA; first filter chip or settings close ↑ → Monitors icon (pairs with v0.1.654–660 list/detail chains).
+| Version | What |
+|---------|------|
+| **v0.1.665** | AI Chat icon-line↔section toolbar chain — AI Chat icon ↓ → filter chips, starter chips, composer, or messages; first filter chip ↑ → icon |
+| **v0.1.664** | Monitors icon-line↔section toolbar chain — icon ↓ → settings / filter chips / list; first chip ↑ → icon |
+| **v0.1.663** | Debug Log icon-line↔toolbar chain — logs icon ↓ → Refresh; Refresh ↑ → icon when viewer empty |
+| **v0.1.662** | Perplexity icon-line↔setup toolbar chain — icon ↓ → inline API key; key ↑ → icon |
 
-## Earlier tonight (same window)
+## Fuel used
 
-**v0.1.663** — Debug Log icon-line↔toolbar chain.
+- Digester open (no Slowest candidates).
+- Design review not due (grace on feature screens).
+- Standing backlog: keyboard toolbar chain polish across icon-line sections.
 
-**v0.1.662** — Perplexity icon-line↔setup toolbar chain.
+## Debug log
 
-**v0.1.661** — Disk Cleanup scopes↔add-scope↔categories toolbar chain.
+- Single-instance lock WARN (KeepAlive thrash — already rate-limited in v0.1.381).
+- No new product-owned errors.
 
-**v0.1.660** — Monitors add-btn↔settings-list toolbar chain.
+## Next
 
-**v0.1.641–659** — Settings/Changelog/Process Details/Ollama/Perplexity/Discord modal toolbar wraps; AI Chat and Perplexity search chains; Debug Log lines↔toolbar; Monitors list/detail and add-form chains; Top Processes and Details section↔footer chains.
+- Continue icon-line↔section chains (Discord, Disk Cleanup, Agent Ops).
+- p50 direct latency when digester gets samples.
+- Design review when `overnight_design_review.py` says due.
