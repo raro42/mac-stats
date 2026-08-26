@@ -16,6 +16,8 @@ pub(crate) mod smc_temperature;
 
 use battery::{Manager as BatteryManager, State};
 use std::process::Command;
+use std::sync::Mutex;
+use std::time::{Duration, Instant};
 use sysinfo::{Disks, System};
 use tauri::Manager;
 
@@ -947,29 +949,77 @@ pub fn get_power_consumption() -> (f32, f32) {
     (0.0, 0.0)
 }
 
+/// How often to re-read mount free space for the menu-bar SSD %.
+/// Disk free space changes slowly; avoid refreshing every metrics tick.
+const DISK_REFRESH_INTERVAL: Duration = Duration::from_secs(60);
+static LAST_DISK_REFRESH: Mutex<Option<Instant>> = Mutex::new(None);
+
+/// Prefer the macOS Data volume (real user capacity), then `/`, then largest local disk.
+/// Avoids `.first()` picking a nearly-full external / Time Machine mount (e.g. x9pro ~95%).
+fn pick_system_disk(disks: &Disks) -> Option<&sysinfo::Disk> {
+    let list = disks.list();
+    if list.is_empty() {
+        return None;
+    }
+    let by_mount = |want: &str| {
+        list.iter()
+            .find(|d| d.mount_point() == std::path::Path::new(want))
+    };
+    if let Some(d) = by_mount("/System/Volumes/Data") {
+        return Some(d);
+    }
+    if let Some(d) = by_mount("/") {
+        return Some(d);
+    }
+    list.iter()
+        .filter(|d| !d.is_removable() && d.total_space() > 0)
+        .max_by_key(|d| d.total_space())
+        .or_else(|| list.iter().max_by_key(|d| d.total_space()))
+}
+
 /// System disk used / total as percent (0–100). Same basis as menu-bar SSD.
 fn get_disk_usage_percent(refresh_if_new: bool) -> f32 {
     match DISKS.try_lock() {
         Ok(mut disks) => {
+            let now = Instant::now();
+            let need_refresh = match LAST_DISK_REFRESH.lock() {
+                Ok(mut last) => {
+                    let stale = last
+                        .map(|t| now.duration_since(t) >= DISK_REFRESH_INTERVAL)
+                        .unwrap_or(true);
+                    if stale {
+                        *last = Some(now);
+                    }
+                    stale
+                }
+                Err(_) => true,
+            };
+
             if disks.is_none() {
-                debug3!("Creating new Disks instance (will refresh once)");
+                debug3!("Creating new Disks instance");
                 let mut new_disks = Disks::new();
-                if refresh_if_new {
-                    debug3!("Initial disk refresh (one time only)");
-                    new_disks.refresh(false);
+                if refresh_if_new || need_refresh {
+                    new_disks.refresh(true);
                 }
                 *disks = Some(new_disks);
+            } else if need_refresh {
+                // Re-read free space after cleanup / large deletes (was one-shot forever).
+                if let Some(d) = disks.as_mut() {
+                    d.refresh(true);
+                    debug3!("Disk list refreshed (periodic)");
+                }
             }
-            debug3!("Reading disk info (no refresh)");
+
             let disks = disks.as_ref().unwrap();
-            if let Some(disk) = disks.list().first() {
+            if let Some(disk) = pick_system_disk(disks) {
                 let total = disk.total_space();
                 let available = disk.available_space();
                 if total > 0 {
                     let disk_usage = ((total - available) as f32 / total as f32) * 100.0;
                     debug3!(
-                        "Disk usage: {}% (total: {}, available: {})",
+                        "Disk usage: {:.1}% mount={:?} (total: {}, available: {})",
                         disk_usage,
+                        disk.mount_point(),
                         total,
                         available
                     );

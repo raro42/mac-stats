@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.649] - 2026-08-26
+
+### Fixed
+- **Menu bar disk %** — refreshes free space about every 60s (was frozen for the whole process life after first read, so cleanup never showed); prefers `/System/Volumes/Data` over `.first()` (which could pick a nearly-full external like x9pro ~95%).
+
 ## [0.1.648] - 2026-08-26
 
 ### Fixed
