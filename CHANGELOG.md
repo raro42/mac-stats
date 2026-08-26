@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.641] - 2026-08-26
+
+### Added
+- **Settings full modal toolbar wrap** — CPU header Settings → Appearance when the modal is open; Appearance first ← crosses back to header Settings (ring chain when closed).
+
 ## [0.1.640] - 2026-08-26
 
 ### Added

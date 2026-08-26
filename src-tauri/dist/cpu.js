@@ -14590,7 +14590,7 @@ function ensureCpuHeaderToolbarKbHint() {
   const items = getCpuHeaderToolbarItems();
   hint.hidden = items.length < 2;
   hint.textContent =
-    '← → / h l · Home/End move · at end crosses to CPU ring · at start crosses to footer';
+    '← → / h l · Home/End move · at end crosses to CPU ring (or Appearance when settings open) · at start crosses to footer';
 }
 
 function tryChainHeaderToRingGaugeFirst() {
@@ -14797,7 +14797,14 @@ function ensureCpuHeaderToolbarKeyboard() {
       let next = -1;
       if (forward) {
         if (idx === toolbarItems.length - 1) {
-          if (tryChainHeaderToRingGaugeFirst()) {
+          if (
+            typeof window.tryChainCpuHeaderToSettingsModalAppearance ===
+              'function' &&
+            window.tryChainCpuHeaderToSettingsModalAppearance()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (tryChainHeaderToRingGaugeFirst()) {
             e.preventDefault();
             e.stopPropagation();
           }
@@ -14836,6 +14843,8 @@ function ensureCpuHeaderToolbarKeyboard() {
     }
   });
 }
+
+window.refreshCpuHeaderToolbarRovingTabindex = refreshCpuHeaderToolbarRovingTabindex;
 
 /** CPU window footer (version + GitHub). */
 function getCpuFooterElement() {

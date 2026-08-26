@@ -274,6 +274,35 @@
     });
   }
 
+  function isSettingsModalOpen() {
+    const modal = document.getElementById("settings-modal");
+    if (!modal) return false;
+    return (
+      modal.style.display !== "none" &&
+      modal.getAttribute("aria-hidden") !== "true"
+    );
+  }
+
+  /** Appearance first control ← CPU window header Settings (full modal wrap). */
+  function tryChainSettingsAppearanceToCpuHeader() {
+    if (!isSettingsModalOpen()) return false;
+    const btn = document.getElementById("settings-btn");
+    if (!btn || btn.hidden || btn.disabled) return false;
+    if (typeof window.refreshCpuHeaderToolbarRovingTabindex === "function") {
+      window.refreshCpuHeaderToolbarRovingTabindex(btn);
+    } else if (!btn.hasAttribute("tabindex")) {
+      btn.tabIndex = 0;
+    }
+    btn.focus();
+    return true;
+  }
+
+  /** CPU header Settings → first Appearance control when the modal is open. */
+  function tryChainCpuHeaderToSettingsModalAppearance() {
+    if (!isSettingsModalOpen()) return false;
+    return tryChainSettingsHeaderToAppearance();
+  }
+
   /** Settings close/header toolbar keyboard (modal header parity). */
   function wireSettingsHeaderToolbarKeyboard(header) {
     wireModalHeaderToolbarKeyboard(header, {
@@ -530,7 +559,7 @@
     const controls = getAppearanceSettingControls(section);
     hint.hidden = controls.length < 2;
     hint.textContent =
-      "← → / h l · Home/End move · Enter / Space applies theme or toggles frame · at start crosses to header · at end crosses to Product";
+      "← → / h l · Home/End move · Enter / Space applies theme or toggles frame · at start crosses to header Settings (or modal header) · at end crosses to Product";
     refreshAppearanceSettingRovingTabindex(section);
     if (section.dataset.appearanceSettingKbWired === "1") return;
     section.dataset.appearanceSettingKbWired = "1";
@@ -851,8 +880,9 @@
     return true;
   }
 
-  /** First Appearance control ← Settings header Close. */
+  /** First Appearance control ← Settings header Close (or CPU header Settings when modal open). */
   function tryChainSettingsAppearanceToHeader() {
+    if (tryChainSettingsAppearanceToCpuHeader()) return true;
     const header = document.querySelector("#settings-modal .settings-header");
     if (!header) return false;
     const items = getModalHeaderToolbarItems(header, "settings-title", "close-settings");
@@ -2239,6 +2269,9 @@
   window.wireModalHeaderToolbarKeyboard = wireModalHeaderToolbarKeyboard;
   window.getModalHeaderToolbarItems = getModalHeaderToolbarItems;
   window.refreshModalHeaderRovingTabindex = refreshModalHeaderRovingTabindex;
+  window.isSettingsModalOpen = isSettingsModalOpen;
+  window.tryChainCpuHeaderToSettingsModalAppearance =
+    tryChainCpuHeaderToSettingsModalAppearance;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);
