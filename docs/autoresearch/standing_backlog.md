@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.653** — Debug Log lines↔toolbar chain (last line ↓ → Refresh; Refresh ← last line; Auto-refresh → footer; footer ← Auto-refresh when logs open).
+
 - **v0.1.652** — Perplexity results↔search toolbar chain (last result ↓ → query; query ← last result; Search → footer; footer ← Search).
 
 - **v0.1.651** — AI Chat messages↔composer toolbar chain (last message ↓ → composer; composer ← last message; Send → footer; footer ← Send when chat open).
