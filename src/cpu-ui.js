@@ -369,6 +369,7 @@
   function closeSettingsModal() {
     const settingsModal = document.getElementById("settings-modal");
     if (!settingsModal) return;
+    closeSettingsHelpSheet(false);
     settingsModal.style.display = "none";
     settingsModal.setAttribute("aria-hidden", "true");
     const returnEl = settingsFocusReturn;
@@ -687,7 +688,24 @@
     });
   }
 
-  /** Product toggles + Help / Reset in Settings (theme-list toolbar parity). */
+  /** True when Settings Help cheat sheet is visible. */
+  function isSettingsHelpSheetOpen(sheet) {
+    const el = sheet || document.getElementById("settings-help-sheet");
+    if (!el) return false;
+    return !el.hasAttribute("hidden");
+  }
+
+  /** Make the open Help sheet a focusable Product toolbar stop. */
+  function ensureSettingsHelpSheetFocusable(sheet) {
+    if (!sheet) return;
+    if (!sheet.hasAttribute("tabindex")) sheet.tabIndex = -1;
+    if (!sheet.getAttribute("role")) sheet.setAttribute("role", "region");
+    if (!sheet.getAttribute("aria-label")) {
+      sheet.setAttribute("aria-label", "Help cheat sheet — Enter or c copies");
+    }
+  }
+
+  /** Product toggles + Help / open sheet / Reset (theme-list toolbar parity). */
   function getProductSettingControls(wrap) {
     if (!wrap) return [];
     const ids = [
@@ -695,13 +713,20 @@
       "menu-bar-compact-toggle",
       "cpu-window-compact-toggle",
       "settings-help-btn",
+      "settings-help-sheet",
       "settings-reset-defaults-btn",
     ];
     return ids
       .map((id) => document.getElementById(id))
       .filter((el) => {
         if (!el || !wrap.contains(el)) return false;
-        if (el.hidden || el.disabled) return false;
+        if (el.disabled) return false;
+        if (el.id === "settings-help-sheet") {
+          if (!isSettingsHelpSheetOpen(el)) return false;
+          ensureSettingsHelpSheetFocusable(el);
+        } else if (el.hidden) {
+          return false;
+        }
         return el.getClientRects().length > 0 || el.offsetParent !== null;
       });
   }
@@ -730,18 +755,20 @@
         font-size: 11px;
         opacity: 0.72;
       }
+      #settings-help-sheet:focus-visible {
+        outline: 2px solid color-mix(in srgb, var(--accent, #8bb4e8) 70%, transparent);
+        outline-offset: 2px;
+      }
+      #settings-help-sheet.is-just-copied {
+        border-color: color-mix(in srgb, #34c759 55%, transparent);
+        background: color-mix(in srgb, #34c759 12%, transparent);
+      }
     `;
     document.head.appendChild(style);
   }
 
-  /**
-   * Settings Product toolbar keyboard — focus a toggle or action, then ←→ /
-   * h l / Home/End (theme-list / filter-chip parity). Space toggles checkboxes;
-   * Enter/Space keep Help / Reset.
-   */
-  function wireProductSettingToolbarKeyboard(wrap) {
+  function updateProductSettingKbHint(wrap) {
     if (!wrap) return;
-    ensureProductSettingKbStyles();
     let hint = wrap.querySelector(":scope > .product-setting-kb-hint");
     if (!hint) {
       hint = document.createElement("div");
@@ -749,8 +776,66 @@
       hint.setAttribute("aria-hidden", "true");
       wrap.appendChild(hint);
     }
-    hint.textContent =
-      "← → / h l · Home/End move · Space toggles · Enter / Space on Help / Reset · at ends crosses Appearance / Credentials";
+    const sheetOpen = isSettingsHelpSheetOpen();
+    hint.textContent = sheetOpen
+      ? "← → / h l · Home/End move · Space toggles · Enter / c copies cheat sheet · Esc closes sheet · at ends crosses Appearance / Credentials"
+      : "← → / h l · Home/End move · Space toggles · Enter / Space on Help / Reset · at ends crosses Appearance / Credentials";
+  }
+
+  function closeSettingsHelpSheet(focusHelp) {
+    const helpBtn = document.getElementById("settings-help-btn");
+    const helpSheet = document.getElementById("settings-help-sheet");
+    if (!helpSheet || !isSettingsHelpSheetOpen(helpSheet)) return false;
+    helpSheet.setAttribute("hidden", "");
+    helpSheet.tabIndex = -1;
+    helpSheet.classList.remove("is-just-copied");
+    const wrap =
+      document.getElementById("product-setting") ||
+      helpSheet.closest("#product-setting") ||
+      helpSheet.closest(".setting-item");
+    if (wrap) {
+      updateProductSettingKbHint(wrap);
+      refreshProductSettingRovingTabindex(
+        wrap,
+        focusHelp !== false ? helpBtn : undefined
+      );
+    }
+    if (focusHelp !== false && helpBtn) helpBtn.focus();
+    return true;
+  }
+
+  async function copySettingsHelpSheet(sheet) {
+    const el = sheet || document.getElementById("settings-help-sheet");
+    if (!el || !isSettingsHelpSheetOpen(el)) return false;
+    const text = (el.textContent || "").trim();
+    if (!text) return false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        return false;
+      }
+    } catch (_) {
+      return false;
+    }
+    el.classList.add("is-just-copied");
+    if (el._copiedFlashTimer) clearTimeout(el._copiedFlashTimer);
+    el._copiedFlashTimer = setTimeout(() => {
+      el.classList.remove("is-just-copied");
+      el._copiedFlashTimer = null;
+    }, 1600);
+    return true;
+  }
+
+  /**
+   * Settings Product toolbar keyboard — focus a toggle or action, then ←→ /
+   * h l / Home/End (theme-list / filter-chip parity). Space toggles checkboxes;
+   * Enter/Space keep Help / Reset. Open Help sheet joins the chain; Esc closes.
+   */
+  function wireProductSettingToolbarKeyboard(wrap) {
+    if (!wrap) return;
+    ensureProductSettingKbStyles();
+    updateProductSettingKbHint(wrap);
     refreshProductSettingRovingTabindex(wrap);
     if (wrap.dataset.productSettingKbWired === "1") return;
     wrap.dataset.productSettingKbWired = "1";
@@ -762,14 +847,34 @@
       const controls = getProductSettingControls(wrap);
       if (controls.includes(e.target)) {
         refreshProductSettingRovingTabindex(wrap, e.target);
+        updateProductSettingKbHint(wrap);
       }
     });
     wrap.addEventListener("keydown", (e) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       const controls = getProductSettingControls(wrap);
       if (!controls.length) return;
-      const idx = controls.indexOf(document.activeElement);
+      const active = document.activeElement;
+      const idx = controls.indexOf(active);
       if (idx < 0) return;
+      if (e.key === "Escape") {
+        if (active?.id === "settings-help-sheet" || isSettingsHelpSheetOpen()) {
+          if (closeSettingsHelpSheet(true)) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }
+        return;
+      }
+      if (
+        active?.id === "settings-help-sheet" &&
+        (e.key === "Enter" || e.key === " " || e.key === "c" || e.key === "C")
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        copySettingsHelpSheet(active);
+        return;
+      }
       const forward =
         e.key === "ArrowRight" ||
         e.key === "l" ||
@@ -1424,6 +1529,10 @@
       helpBtn.addEventListener("click", () => {
         if (helpBtn.disabled || helpBtn.classList.contains("is-just-saved")) return;
         const show = helpSheet.hasAttribute("hidden");
+        const wrap =
+          document.getElementById("product-setting") ||
+          helpSheet.closest("#product-setting") ||
+          helpSheet.closest(".setting-item");
         if (show) {
           helpSheet.textContent = [
             "Menu bar: click to open window.",
@@ -1434,6 +1543,16 @@
             "Docs: docs/GETTING_STARTED.md",
           ].join("\n");
           helpSheet.removeAttribute("hidden");
+          ensureSettingsHelpSheetFocusable(helpSheet);
+          if (wrap) {
+            updateProductSettingKbHint(wrap);
+            refreshProductSettingRovingTabindex(wrap, helpSheet);
+          }
+          try {
+            helpSheet.focus();
+          } catch (_) {
+            /* focus optional */
+          }
           const originalLabel =
             helpBtn._saveFlashOriginalLabel || helpBtn.textContent || "Help / cheat sheet";
           helpBtn._saveFlashOriginalLabel = originalLabel;
@@ -1449,7 +1568,7 @@
             }, 1600);
           }
         } else {
-          helpSheet.setAttribute("hidden", "");
+          closeSettingsHelpSheet(true);
         }
       });
     }

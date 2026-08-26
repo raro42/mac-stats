@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.648] - 2026-08-26
+
+### Fixed
+- **Menu bar disk %** — refreshes free space about every 60s (was frozen at first reading for the whole process life, so cleanup never showed up); prefers `/System/Volumes/Data` over the first mount in the list.
+
+## [0.1.647] - 2026-08-26
+
+### Added
+- **Settings Help cheat sheet Product toolbar chain** — open Help sheet joins Product ←→ / h l / Home/End between Help and Reset; open focuses the sheet; Esc closes and returns to Help; Enter / c copies with green flash; closing Settings hides the sheet.
+
 ## [0.1.646] - 2026-08-26
 
 ### Added

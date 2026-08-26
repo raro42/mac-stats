@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.647** — Settings Help cheat sheet Product toolbar chain (open sheet between Help · Reset; Esc closes; Enter/c copies).
+
 - **v0.1.646** — Discord settings full modal toolbar wrap (footer version ↔ Discord token toolbar when Settings open).
 
 - **v0.1.645** — Perplexity settings full modal toolbar wrap (footer version ↔ API key toolbar when Settings open).
