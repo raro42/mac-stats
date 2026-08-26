@@ -1,12 +1,14 @@
 # Morning surprise — 2026-08-26
 
-Overnight Track B now at **v0.1.659** — **Perplexity setup↔footer toolbar chain**.
+Overnight Track B now at **v0.1.660** — **Monitors add-btn↔settings-list toolbar chain**.
 
-## Latest keep (this tick ~22:50)
+## Latest keep (this tick ~23:13)
 
-**v0.1.659** — Save key on the inline Perplexity API-key panel ↓ crosses to footer; footer ← returns to setup Save key when the panel is open (search toolbar parity).
+**v0.1.660** — Monitor Settings header keyboard chain: close ↓ → add-btn; add-btn ↓ → first Remove or empty CTA; add-btn ↑ → close; list first ↑ → add-btn.
 
 ## Prior this evening
+
+**v0.1.659** — Perplexity setup↔footer toolbar chain.
 
 **v0.1.658** — Details section↔footer toolbar chain.
 
@@ -28,7 +30,7 @@ Overnight Track B now at **v0.1.659** — **Perplexity setup↔footer toolbar ch
 
 - Digester open empty (10 turns / 7d); design review not due (`due=false`, grace).
 - `debug.log`: no product errors (single-instance lock WARN only).
-- Fuel: standing backlog Perplexity setup↔footer chain after Details section chain.
+- Fuel: standing backlog Monitors add-btn↔list chain after Perplexity setup↔footer.
 
 ## Prior night carry (2026-08-25)
 
