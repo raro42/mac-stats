@@ -6,6 +6,7 @@
 
 | Version | What |
 |---------|------|
+| **v0.1.666** | Disk Cleanup icon-line↔section toolbar chain — icon ↓ → filter chips, meta cards, scopes, or categories; first filter chip ↑ → icon |
 | **v0.1.665** | AI Chat icon-line↔section toolbar chain — AI Chat icon ↓ → filter chips, starter chips, composer, or messages; first filter chip ↑ → icon |
 | **v0.1.664** | Monitors icon-line↔section toolbar chain — icon ↓ → settings / filter chips / list; first chip ↑ → icon |
 | **v0.1.663** | Debug Log icon-line↔toolbar chain — logs icon ↓ → Refresh; Refresh ↑ → icon when viewer empty |
@@ -24,6 +25,6 @@
 
 ## Next
 
-- Continue icon-line↔section chains (Discord, Disk Cleanup, Agent Ops).
+- Continue icon-line↔section chains (Discord settings modal, Agent Ops).
 - p50 direct latency when digester gets samples.
 - Design review when `overnight_design_review.py` says due.
