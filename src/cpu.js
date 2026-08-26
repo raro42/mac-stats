@@ -3546,6 +3546,9 @@ function tryChainSectionContentToFooter(listbox) {
   if (listbox?.id === 'disk-cleanup-list') {
     return tryChainDiskCleanupCategoriesToToolbarFirst();
   }
+  if (listbox?.id === 'logs-viewer') {
+    return focusLogsToolbarFirst();
+  }
   return tryChainFilterChipToFooterFirst();
 }
 
@@ -3567,6 +3570,12 @@ function tryChainFooterToSectionContentLast() {
   if (
     typeof window.focusPerplexitySearchLast === 'function' &&
     window.focusPerplexitySearchLast()
+  ) {
+    return true;
+  }
+  if (
+    typeof window.focusLogsToolbarLast === 'function' &&
+    window.focusLogsToolbarLast()
   ) {
     return true;
   }
@@ -11511,6 +11520,55 @@ function stopLogsGlancePoll() {
   }
 }
 
+function isLogsSectionOpen() {
+  const content = document.getElementById('logs-content');
+  if (!content || content.hidden) return false;
+  try {
+    return content.getClientRects().length > 0;
+  } catch (_) {
+    return false;
+  }
+}
+
+/** Focus Refresh (first toolbar control). Used by log lines → toolbar chain. */
+function focusLogsToolbarFirst() {
+  if (!isLogsSectionOpen()) return false;
+  ensureLogsToolbarKeyboard();
+  const wrap =
+    document.querySelector('.logs-toolbar-actions') ||
+    ensureLogsToolbarActionsWrap(
+      document.querySelector('#logs-content .logs-toolbar') ||
+        document.querySelector('.logs-toolbar')
+    );
+  if (!wrap) return false;
+  const items = getLogsToolbarActionItems(wrap);
+  if (!items.length) return false;
+  refreshLogsToolbarRovingTabindex(wrap, items[0]);
+  items[0].focus();
+  return true;
+}
+
+/** Focus Auto-refresh (last toolbar control). Used by footer ← toolbar chain. */
+function focusLogsToolbarLast() {
+  if (!isLogsSectionOpen()) return false;
+  ensureLogsToolbarKeyboard();
+  const wrap =
+    document.querySelector('.logs-toolbar-actions') ||
+    ensureLogsToolbarActionsWrap(
+      document.querySelector('#logs-content .logs-toolbar') ||
+        document.querySelector('.logs-toolbar')
+    );
+  if (!wrap) return false;
+  const items = getLogsToolbarActionItems(wrap);
+  if (!items.length) return false;
+  refreshLogsToolbarRovingTabindex(wrap, items[items.length - 1]);
+  items[items.length - 1].focus();
+  return true;
+}
+
+window.focusLogsToolbarFirst = focusLogsToolbarFirst;
+window.focusLogsToolbarLast = focusLogsToolbarLast;
+
 /** Group Debug Log action controls for toolbar keyboard (filter chips stay separate). */
 function ensureLogsToolbarActionsWrap(toolbar) {
   if (!toolbar) return null;
@@ -11584,8 +11642,14 @@ function ensureLogsToolbarKbHint(row) {
   }
   const items = getLogsToolbarActionItems(wrap);
   hint.hidden = items.length < 2;
-  hint.textContent =
-    '← → / h l · Home/End move · Space toggles auto-refresh · Enter / Space on buttons';
+  const hasLines = visibleLogsLines(document.getElementById('logs-viewer')).length > 0;
+  if (hasLines) {
+    hint.textContent =
+      '← → / h l · Home/End move · Refresh ← last line · Auto-refresh → footer · Space toggles auto-refresh';
+  } else {
+    hint.textContent =
+      '← → / h l · Home/End move · Space toggles auto-refresh · Enter / Space on buttons';
+  }
 }
 
 /**
@@ -11632,19 +11696,33 @@ function ensureLogsToolbarKeyboard() {
       }
     }
     let next = -1;
-    if (
+    const forward =
       e.key === 'ArrowRight' ||
       e.key === 'l' ||
       e.key === 'ArrowDown' ||
-      e.key === 'j'
-    ) {
-      next = Math.min(idx + 1, items.length - 1);
-    } else if (
+      e.key === 'j';
+    const back =
       e.key === 'ArrowLeft' ||
       e.key === 'h' ||
       e.key === 'ArrowUp' ||
-      e.key === 'k'
-    ) {
+      e.key === 'k';
+    if (forward) {
+      if (
+        idx === items.length - 1 &&
+        typeof tryChainFilterChipToFooterFirst === 'function' &&
+        tryChainFilterChipToFooterFirst()
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      next = Math.min(idx + 1, items.length - 1);
+    } else if (back) {
+      if (idx === 0 && focusLogsViewerLast()) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       next = Math.max(idx - 1, 0);
     } else if (e.key === 'Home') {
       next = 0;
@@ -11714,14 +11792,39 @@ function ensureLogsKbHint(viewer, show) {
     hint.id = 'logs-kb-hint';
     viewer.parentNode.insertBefore(hint, viewer);
   }
-  hint.textContent =
-    '↑↓ / j k · PgUp/PgDn · Home/End select · Enter / c copies line · Esc clears';
+  const hasToolbar =
+    getLogsToolbarActionItems(
+      document.querySelector('.logs-toolbar-actions') ||
+        ensureLogsToolbarActionsWrap(
+          document.querySelector('#logs-content .logs-toolbar') ||
+            document.querySelector('.logs-toolbar')
+        )
+    ).length > 0;
+  hint.textContent = hasToolbar
+    ? '↑↓ / j k · last line ↓ → Refresh toolbar · Enter / c copies line · Esc clears'
+    : '↑↓ / j k · PgUp/PgDn · Home/End select · Enter / c copies line · Esc clears';
 }
 
 function visibleLogsLines(viewer) {
   if (!viewer) return [];
   return Array.from(viewer.querySelectorAll('.logs-line'));
 }
+
+/** Focus last visible log line. Used by toolbar ← lines chain. */
+function focusLogsViewerLast() {
+  const viewer = document.getElementById('logs-viewer');
+  if (!isLogsSectionOpen() || !viewer) return false;
+  const lines = visibleLogsLines(viewer);
+  if (!lines.length) return false;
+  syncLogsLinesTabOrder(viewer, lines[lines.length - 1]);
+  lines[lines.length - 1].focus();
+  if (typeof lines[lines.length - 1].scrollIntoView === 'function') {
+    lines[lines.length - 1].scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
+window.focusLogsViewerLast = focusLogsViewerLast;
 
 function syncLogsLinesTabOrder(viewer, preferEl) {
   const items = visibleLogsLines(viewer);

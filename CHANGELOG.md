@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.653] - 2026-08-26
+
+### Added
+- **Debug Log lines↔toolbar chain** — last log line ↓ / j crosses to Refresh; Refresh ← crosses back to the last line; Auto-refresh → footer; footer ← prefers Auto-refresh when Debug Log is open.
+
 ## [0.1.652] - 2026-08-26
 
 ### Added
