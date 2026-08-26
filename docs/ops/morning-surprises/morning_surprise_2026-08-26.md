@@ -1,12 +1,14 @@
 # Morning surprise — 2026-08-26
 
-Overnight Track B now at **v0.1.640** — **section-content↔footer toolbar chain**.
+Overnight Track B now at **v0.1.641** — **Settings full modal toolbar wrap**.
 
 ## Latest keep (this tick)
 
-**v0.1.640** — Last row in processes · monitors · chat · logs · Agent Ops lists → footer; footer start ← last row (or Disk Cleanup toolbar / categories / scopes when that section is open); Disk Cleanup toolbar last → footer.
+**v0.1.641** — CPU header Settings ↔ Appearance when settings modal is open; Appearance first ← crosses back to header Settings; ring-gauge chain when modal is closed.
 
 ## Prior this night
+
+**v0.1.640** — Section-content↔footer toolbar chain.
 
 **v0.1.639** — Disk Cleanup scopes↔categories toolbar chain.
 
@@ -18,7 +20,7 @@ Overnight Track B now at **v0.1.640** — **section-content↔footer toolbar cha
 
 - Digester open empty (10 turns, 7 instant); design review not due (feature-ai-chat ~11.5d grace).
 - `debug.log`: single-instance lock DEBUG/WARN only (180m scan) — no product errors.
-- Installed release @ v0.1.640; process running after install.
+- Installed release @ v0.1.641; process running after install.
 
 ## Prior night carry (2026-08-25)
 
