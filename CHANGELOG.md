@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.659] - 2026-08-26
+
+### Added
+- **Perplexity setup↔footer toolbar chain** — Save key ↓ crosses to footer; footer ← prefers setup Save key when the inline API-key panel is open (search toolbar parity).
+
 ## [0.1.658] - 2026-08-26
 
 ### Added

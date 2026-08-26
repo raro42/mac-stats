@@ -3624,6 +3624,12 @@ function tryChainFooterToSectionContentLast() {
     if (focusDiskCleanupScopesLast()) return true;
   }
   if (
+    typeof window.focusPerplexitySetupLast === 'function' &&
+    window.focusPerplexitySetupLast()
+  ) {
+    return true;
+  }
+  if (
     typeof window.focusPerplexitySearchLast === 'function' &&
     window.focusPerplexitySearchLast()
   ) {
@@ -10475,6 +10481,53 @@ function isPerplexitySearchRowVisible(row) {
   }
 }
 
+function isPerplexitySetupVisible() {
+  const setup = document.getElementById('perplexity-setup');
+  if (!setup || setup.hidden) return false;
+  try {
+    return setup.getClientRects().length > 0;
+  } catch (_) {
+    return false;
+  }
+}
+
+/** Focus first setup control (inline key). Used by footer ← setup chain. */
+function focusPerplexitySetupFirst() {
+  const row = document.querySelector('.perplexity-setup-row');
+  if (!isPerplexitySetupVisible()) return false;
+  const items = getPerplexitySetupToolbarItems(row);
+  if (!items.length) return false;
+  refreshPerplexitySetupRovingTabindex(row, items[0]);
+  items[0].focus();
+  if (
+    items[0]?.id === 'perplexity-inline-key' &&
+    typeof items[0].setSelectionRange === 'function'
+  ) {
+    try {
+      const len = (items[0].value || '').length;
+      items[0].setSelectionRange(len, len);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+  return true;
+}
+
+/** Focus last setup control (Save key). Used by footer ← setup chain. */
+function focusPerplexitySetupLast() {
+  const row = document.querySelector('.perplexity-setup-row');
+  if (!isPerplexitySetupVisible()) return false;
+  const items = getPerplexitySetupToolbarItems(row);
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  refreshPerplexitySetupRovingTabindex(row, target);
+  target.focus();
+  return true;
+}
+
+window.focusPerplexitySetupFirst = focusPerplexitySetupFirst;
+window.focusPerplexitySetupLast = focusPerplexitySetupLast;
+
 /** Focus first search control (query). Used by results-list → search chain. */
 function focusPerplexitySearchFirst() {
   const row = document.querySelector('.perplexity-search-box');
@@ -10826,7 +10879,7 @@ function ensurePerplexitySetupKbHint(container) {
   const items = getPerplexitySetupToolbarItems(row);
   hint.hidden = items.length < 2;
   hint.textContent =
-    '← → / h l · Home/End move · Enter saves from key field · Save key on button';
+    '← → / h l · Home/End move · Save key → footer · Enter saves from key field';
 }
 
 function wirePerplexitySetupToolbarKeyboard(row) {
@@ -10872,6 +10925,15 @@ function wirePerplexitySetupToolbarKeyboard(row) {
         active?.id === 'perplexity-inline-key' &&
         !perplexitySearchInputAtMoveBoundary(active, 1)
       ) {
+        return;
+      }
+      if (
+        idx === items.length - 1 &&
+        typeof tryChainFilterChipToFooterFirst === 'function' &&
+        tryChainFilterChipToFooterFirst()
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
         return;
       }
       next = Math.min(idx + 1, items.length - 1);
