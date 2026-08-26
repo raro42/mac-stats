@@ -3549,6 +3549,18 @@ function tryChainSectionContentToFooter(listbox) {
   if (listbox?.id === 'logs-viewer') {
     return focusLogsToolbarFirst();
   }
+  if (listbox?.id === 'monitors-list') {
+    const items = visibleMonitorItems(listbox);
+    if (items.length) {
+      const last = items[items.length - 1];
+      if (
+        last.classList.contains('is-detail-open') &&
+        focusMonitorDetailToolbarFirst(last)
+      ) {
+        return true;
+      }
+    }
+  }
   return tryChainFilterChipToFooterFirst();
 }
 
@@ -3578,6 +3590,18 @@ function tryChainFooterToSectionContentLast() {
     window.focusLogsToolbarLast()
   ) {
     return true;
+  }
+  if (isMonitorsSectionOpen()) {
+    const monitorsList = document.getElementById('monitors-list');
+    const monitorItems = monitorsList ? visibleMonitorItems(monitorsList) : [];
+    for (let i = monitorItems.length - 1; i >= 0; i -= 1) {
+      if (
+        monitorItems[i].classList.contains('is-detail-open') &&
+        focusMonitorDetailToolbarLast(monitorItems[i])
+      ) {
+        return true;
+      }
+    }
   }
   if (
     typeof window.focusChatComposerLast === 'function' &&
@@ -6734,6 +6758,72 @@ function getMonitorDetailActionItems(row) {
   });
 }
 
+function getMonitorItemForDetailToolbar(wrap) {
+  const actions =
+    wrap ||
+    (document.activeElement &&
+      document.activeElement.closest &&
+      document.activeElement.closest('.monitor-detail-actions'));
+  if (!actions) return null;
+  const item = actions.closest('.monitor-item');
+  return item && item.classList.contains('is-detail-open') ? item : null;
+}
+
+function isMonitorsSectionOpen() {
+  const content = document.getElementById('monitors-content');
+  if (!content || content.hidden) return false;
+  try {
+    return content.getClientRects().length > 0;
+  } catch (_) {
+    return false;
+  }
+}
+
+function focusMonitorItemRow(item) {
+  if (!item || item.hidden || item.style.display === 'none') return false;
+  const list = document.getElementById('monitors-list');
+  if (!list || !list.contains(item)) return false;
+  const id = item.getAttribute('data-monitor-id');
+  syncMonitorsListTabOrder(list, id);
+  item.focus();
+  if (typeof item.scrollIntoView === 'function') {
+    item.scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
+/** Focus Check now on an open monitor detail (list row → detail toolbar chain). */
+function focusMonitorDetailToolbarFirst(item) {
+  const row = item || getMonitorItemForDetailToolbar();
+  if (!row || !row.classList.contains('is-detail-open')) return false;
+  const wrap = row.querySelector('.monitor-detail-actions');
+  if (!wrap) return false;
+  ensureMonitorDetailActionsKeyboard(wrap);
+  const items = getMonitorDetailActionItems(wrap);
+  if (!items.length) return false;
+  refreshMonitorDetailActionsRovingTabindex(wrap, items[0]);
+  items[0].focus();
+  return true;
+}
+
+/** Focus Remove on an open monitor detail (footer ← detail toolbar chain). */
+function focusMonitorDetailToolbarLast(item) {
+  const row = item || getMonitorItemForDetailToolbar();
+  if (!row || !row.classList.contains('is-detail-open')) return false;
+  const wrap = row.querySelector('.monitor-detail-actions');
+  if (!wrap) return false;
+  ensureMonitorDetailActionsKeyboard(wrap);
+  const items = getMonitorDetailActionItems(wrap);
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  refreshMonitorDetailActionsRovingTabindex(wrap, target);
+  target.focus();
+  return true;
+}
+
+window.focusMonitorDetailToolbarFirst = focusMonitorDetailToolbarFirst;
+window.focusMonitorDetailToolbarLast = focusMonitorDetailToolbarLast;
+
 function refreshMonitorDetailActionsRovingTabindex(row, preferred) {
   const items = getMonitorDetailActionItems(row);
   if (!items.length) return;
@@ -6761,7 +6851,7 @@ function ensureMonitorDetailActionsKbHint(row) {
   const items = getMonitorDetailActionItems(wrap);
   hint.hidden = items.length < 2;
   hint.textContent =
-    '← → / h l · Home/End move · Enter / Space on buttons';
+    '← → / h l · Home/End move · Check now ← monitor row · Remove → footer · Enter / Space on buttons';
 }
 
 /**
@@ -6800,6 +6890,15 @@ function ensureMonitorDetailActionsKeyboard(row) {
       e.key === 'ArrowDown' ||
       e.key === 'j'
     ) {
+      if (
+        idx === items.length - 1 &&
+        typeof tryChainFilterChipToFooterFirst === 'function' &&
+        tryChainFilterChipToFooterFirst()
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       next = Math.min(idx + 1, items.length - 1);
     } else if (
       e.key === 'ArrowLeft' ||
@@ -6807,6 +6906,14 @@ function ensureMonitorDetailActionsKeyboard(row) {
       e.key === 'ArrowUp' ||
       e.key === 'k'
     ) {
+      if (idx === 0) {
+        const monitorItem = getMonitorItemForDetailToolbar(wrap);
+        if (monitorItem && focusMonitorItemRow(monitorItem)) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+      }
       next = Math.max(idx - 1, 0);
     } else if (e.key === 'Home') {
       next = 0;
@@ -7418,7 +7525,7 @@ function ensureMonitorsListKbHint(monitorsList, show) {
     monitorsList.parentNode?.insertBefore(hint, monitorsList);
   }
   hint.textContent =
-    'All · Up · Down filters · click row for details · ↑↓ / j k · PgUp/PgDn · Enter check now · c copy URL · d details · Delete removes · Esc closes/clears';
+    'All · Up · Down filters · click row for details · ↑↓ / j k · open detail ↓ → Check now · detail ← row · Remove → footer · Enter check now · c copy URL · d details · Delete removes · Esc closes/clears';
 }
 
 function wireMonitorsListKeyboard() {
@@ -7541,6 +7648,13 @@ function wireMonitorsListKeyboard() {
     let next = -1;
     const page = 5;
     if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (
+        item.classList.contains('is-detail-open') &&
+        focusMonitorDetailToolbarFirst(item)
+      ) {
+        e.preventDefault();
+        return;
+      }
       if (idx === items.length - 1 && tryChainSectionContentToFooter(monitorsList)) return;
       next = Math.min(idx + 1, items.length - 1);
     } else if (e.key === 'ArrowUp' || e.key === 'k') {
