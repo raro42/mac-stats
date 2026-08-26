@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.661] - 2026-08-26
+
+### Added
+- **Disk Cleanup scopes↔add-scope↔categories toolbar chain** — scopes last ↓ → add-scope label; add-scope first ↑ → scopes last; add-scope Add scope ↓ → categories first; categories first ↑ → add-scope last (DOM order was skipping the add-scope form).
+
 ## [0.1.660] - 2026-08-26
 
 ### Added

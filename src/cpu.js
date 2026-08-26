@@ -3621,6 +3621,7 @@ function tryChainFooterToSectionContentLast() {
   if (diskOpen) {
     if (focusDiskCleanupToolbarLast()) return true;
     if (focusDiskCleanupCategoriesLast()) return true;
+    if (focusDiskCleanupAddScopeLast()) return true;
     if (focusDiskCleanupScopesLast()) return true;
   }
   if (
@@ -13432,7 +13433,7 @@ function ensureDiskCleanupAddScopeToolbarKbHint(wrap) {
   const items = getDiskCleanupAddScopeToolbarItems(form);
   hint.hidden = items.length < 2;
   hint.textContent =
-    '← → / h l · Home/End move · Enter adds from fields · buttons keep activate';
+    '← → / h l · Home/End move · ↑ scopes last · ↓ categories first · Enter adds from fields';
 }
 
 /**
@@ -13491,9 +13492,19 @@ function ensureDiskCleanupAddScopeToolbarKeyboard(wrap) {
       (active.type === 'text' || active.type === 'number');
     if (forward) {
       if (isTextLike && !monitorUrlInputAtMoveBoundary(active, 1)) return;
+      if (idx === items.length - 1 && tryChainDiskCleanupAddScopeToCategories()) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       next = Math.min(idx + 1, items.length - 1);
     } else if (back) {
       if (isTextLike && !monitorUrlInputAtMoveBoundary(active, -1)) return;
+      if (idx === 0 && tryChainDiskCleanupAddScopeToScopesLast()) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       next = Math.max(idx - 1, 0);
     } else if (e.key === 'Home') {
       next = 0;
@@ -14469,11 +14480,48 @@ function focusDiskCleanupCategoriesLast() {
   return true;
 }
 
-function tryChainDiskCleanupScopesToCategories() {
+function focusDiskCleanupAddScopeFirst() {
+  const form = document.querySelector('.disk-cleanup-add-scope');
+  if (!form) return false;
+  const items = getDiskCleanupAddScopeToolbarItems(form);
+  if (!items.length) return false;
+  refreshDiskCleanupAddScopeToolbarRovingTabindex(form, items[0]);
+  items[0].focus();
+  return true;
+}
+
+function focusDiskCleanupAddScopeLast() {
+  const form = document.querySelector('.disk-cleanup-add-scope');
+  if (!form) return false;
+  const items = getDiskCleanupAddScopeToolbarItems(form);
+  if (!items.length) return false;
+  refreshDiskCleanupAddScopeToolbarRovingTabindex(form, items[items.length - 1]);
+  items[items.length - 1].focus();
+  return true;
+}
+
+/** Scopes last ↓ → add-scope form (DOM order; was skipping the form). */
+function tryChainDiskCleanupScopesToAddScope() {
+  return focusDiskCleanupAddScopeFirst();
+}
+
+function tryChainDiskCleanupAddScopeToScopesLast() {
+  if (focusDiskCleanupScopesLast()) return true;
+  return tryChainListboxToFilterChips(
+    document.getElementById('disk-cleanup-scopes')
+  );
+}
+
+function tryChainDiskCleanupAddScopeToCategories() {
   return focusDiskCleanupCategoriesFirst();
 }
 
+function tryChainDiskCleanupCategoriesToAddScopeLast() {
+  return focusDiskCleanupAddScopeLast();
+}
+
 function tryChainDiskCleanupCategoriesToScopes() {
+  if (focusDiskCleanupAddScopeLast()) return true;
   if (focusDiskCleanupScopesLast()) return true;
   return tryChainListboxToFilterChips(
     document.getElementById('disk-cleanup-scopes')
@@ -14540,7 +14588,7 @@ function wireDiskCleanupScopesKeyboard() {
       if (!rows.length) {
         if (
           (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'J') &&
-          tryChainDiskCleanupScopesToCategories()
+          tryChainDiskCleanupScopesToAddScope()
         ) {
           e.preventDefault();
         }
@@ -14677,7 +14725,7 @@ function wireDiskCleanupScopesKeyboard() {
     let next = -1;
     const page = 5;
     if (e.key === 'ArrowDown' || e.key === 'j') {
-      if (idx === rows.length - 1 && tryChainDiskCleanupScopesToCategories()) return;
+      if (idx === rows.length - 1 && tryChainDiskCleanupScopesToAddScope()) return;
       next = Math.min(idx + 1, rows.length - 1);
     } else if (e.key === 'ArrowUp' || e.key === 'k') {
       if (idx === 0 && tryChainListboxToFilterChips(scopesEl)) return;
