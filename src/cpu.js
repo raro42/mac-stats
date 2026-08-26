@@ -10602,6 +10602,22 @@ function focusPerplexitySetupLast() {
 window.focusPerplexitySetupFirst = focusPerplexitySetupFirst;
 window.focusPerplexitySetupLast = focusPerplexitySetupLast;
 
+/** Perplexity icon-line ↓ → inline setup key (onboarding path). */
+function tryChainIconPerplexityToSetupFirst() {
+  if (perplexityCollapsed || !isPerplexitySetupVisible()) return false;
+  return focusPerplexitySetupFirst();
+}
+
+/** Perplexity inline setup key first ↑ → icon-line Perplexity icon. */
+function tryChainPerplexitySetupToIconLine() {
+  if (perplexityCollapsed || !isPerplexitySetupVisible()) return false;
+  const icon = document.getElementById('icon-perplexity');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
+}
+
 /** Focus first search control (query). Used by results-list → search chain. */
 function focusPerplexitySearchFirst() {
   const row = document.querySelector('.perplexity-search-box');
@@ -10953,7 +10969,7 @@ function ensurePerplexitySetupKbHint(container) {
   const items = getPerplexitySetupToolbarItems(row);
   hint.hidden = items.length < 2;
   hint.textContent =
-    '← → / h l · Home/End move · Save key → footer · Enter saves from key field';
+    '← → / h l · Home/End move · key first ↑ → Perplexity icon · Save key → footer · Enter saves from key field';
 }
 
 function wirePerplexitySetupToolbarKeyboard(row) {
@@ -11016,6 +11032,11 @@ function wirePerplexitySetupToolbarKeyboard(row) {
         active?.id === 'perplexity-inline-key' &&
         !perplexitySearchInputAtMoveBoundary(active, -1)
       ) {
+        return;
+      }
+      if (idx === 0 && tryChainPerplexitySetupToIconLine()) {
+        e.preventDefault();
+        e.stopPropagation();
         return;
       }
       next = Math.max(idx - 1, 0);
@@ -16228,7 +16249,17 @@ function ensureIconLineKeyboard() {
           e.key === 'h' ||
           e.key === 'ArrowUp' ||
           e.key === 'k';
-        if (forward && idx === items.length - 1) {
+        const down = e.key === 'ArrowDown' || e.key === 'j';
+        const perplexityIcon = document.getElementById('icon-perplexity');
+        if (
+          down &&
+          perplexityIcon &&
+          document.activeElement === perplexityIcon &&
+          tryChainIconPerplexityToSetupFirst()
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (forward && idx === items.length - 1) {
           if (tryChainIconLineToFilterChipFirst()) {
             e.preventDefault();
             e.stopPropagation();
