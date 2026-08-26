@@ -1,12 +1,14 @@
 # Morning surprise — 2026-08-26
 
-Overnight Track B now at **v0.1.660** — **Monitors add-btn↔settings-list toolbar chain**.
+Overnight Track B now at **v0.1.661** — **Disk Cleanup scopes↔add-scope↔categories toolbar chain**.
 
-## Latest keep (this tick ~23:13)
+## Latest keep (this tick ~23:37)
 
-**v0.1.660** — Monitor Settings header keyboard chain: close ↓ → add-btn; add-btn ↓ → first Remove or empty CTA; add-btn ↑ → close; list first ↑ → add-btn.
+**v0.1.661** — Disk Cleanup vertical keyboard chain: scopes last ↓ → add-scope label; add-scope first ↑ → scopes last; Add scope ↓ → categories first; categories first ↑ → add-scope last; footer ← prefers add-scope when Disk Cleanup is open.
 
 ## Prior this evening
+
+**v0.1.660** — Monitors add-btn↔settings-list toolbar chain.
 
 **v0.1.659** — Perplexity setup↔footer toolbar chain.
 
@@ -30,7 +32,7 @@ Overnight Track B now at **v0.1.660** — **Monitors add-btn↔settings-list too
 
 - Digester open empty (10 turns / 7d); design review not due (`due=false`, grace).
 - `debug.log`: no product errors (single-instance lock WARN only).
-- Fuel: standing backlog Monitors add-btn↔list chain after Perplexity setup↔footer.
+- Fuel: standing backlog — add-scope form was orphaned in Disk Cleanup DOM-order keyboard chain.
 
 ## Prior night carry (2026-08-25)
 
