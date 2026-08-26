@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.663] - 2026-08-27
+
+### Added
+- **Debug Log icon-line↔toolbar chain** — logs icon ↓ → Refresh when the section is open; Refresh first ↑ → logs icon when the viewer is empty (pairs with v0.1.653 lines↔toolbar).
+
 ## [0.1.662] - 2026-08-27
 
 ### Added

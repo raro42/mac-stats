@@ -12126,6 +12126,22 @@ function focusLogsToolbarLast() {
 window.focusLogsToolbarFirst = focusLogsToolbarFirst;
 window.focusLogsToolbarLast = focusLogsToolbarLast;
 
+/** Debug Log icon-line ↓ → Refresh toolbar when section is open. */
+function tryChainIconLogsToToolbarFirst() {
+  if (logsSectionCollapsed || !isLogsSectionOpen()) return false;
+  return focusLogsToolbarFirst();
+}
+
+/** Debug Log Refresh toolbar first ↑ → icon-line logs icon (empty viewer path). */
+function tryChainLogsToolbarToIconLine() {
+  if (logsSectionCollapsed || !isLogsSectionOpen()) return false;
+  const icon = document.getElementById('icon-logs');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
+}
+
 /** Group Debug Log action controls for toolbar keyboard (filter chips stay separate). */
 function ensureLogsToolbarActionsWrap(toolbar) {
   if (!toolbar) return null;
@@ -12205,7 +12221,7 @@ function ensureLogsToolbarKbHint(row) {
       '← → / h l · Home/End move · Refresh ← last line · Auto-refresh → footer · Space toggles auto-refresh';
   } else {
     hint.textContent =
-      '← → / h l · Home/End move · Space toggles auto-refresh · Enter / Space on buttons';
+      '← → / h l · Home/End move · Refresh ← logs icon · Space toggles auto-refresh · Enter / Space on buttons';
   }
 }
 
@@ -12276,6 +12292,11 @@ function ensureLogsToolbarKeyboard() {
       next = Math.min(idx + 1, items.length - 1);
     } else if (back) {
       if (idx === 0 && focusLogsViewerLast()) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      if (idx === 0 && tryChainLogsToolbarToIconLine()) {
         e.preventDefault();
         e.stopPropagation();
         return;
@@ -16219,7 +16240,7 @@ function ensureIconLineKbHint() {
     line.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click an icon · ← → / h l · Home/End move · at start crosses to power strip · at end crosses to filter chips · Enter / Space opens section';
+    'Tab or click an icon · ← → / h l · Home/End move · ↓ on Perplexity/Logs crosses into section · at start crosses to power strip · at end crosses to filter chips · Enter / Space opens section';
 }
 
 /**
@@ -16251,11 +16272,20 @@ function ensureIconLineKeyboard() {
           e.key === 'k';
         const down = e.key === 'ArrowDown' || e.key === 'j';
         const perplexityIcon = document.getElementById('icon-perplexity');
+        const logsIcon = document.getElementById('icon-logs');
         if (
           down &&
           perplexityIcon &&
           document.activeElement === perplexityIcon &&
           tryChainIconPerplexityToSetupFirst()
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (
+          down &&
+          logsIcon &&
+          document.activeElement === logsIcon &&
+          tryChainIconLogsToToolbarFirst()
         ) {
           e.preventDefault();
           e.stopPropagation();
