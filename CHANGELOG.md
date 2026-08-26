@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.664] - 2026-08-27
+
+### Added
+- **Monitors icon-line↔section toolbar chain** — Monitors icon ↓ → settings close, filter chips, or list when the section is open; first filter chip or settings close ↑ → Monitors icon (pairs with v0.1.654–660 list/detail chains).
+
 ## [0.1.663] - 2026-08-27
 
 ### Added

@@ -3844,6 +3844,12 @@ function wireFilterChipToolbarKeyboard(wrap) {
               e.preventDefault();
               e.stopPropagation();
             }
+          } else if (
+            wrap.id === 'monitors-filter-chips' &&
+            tryChainMonitorsSectionToIconLine()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
           } else if (tryChainFilterChipToIconLineLast()) {
             e.preventDefault();
             e.stopPropagation();
@@ -6876,6 +6882,70 @@ function tryChainFooterVersionToMonitorAddFormSaveLast() {
 window.tryChainFooterVersionToMonitorAddFormSaveLast =
   tryChainFooterVersionToMonitorAddFormSaveLast;
 
+function focusMonitorsSettingsCloseBtn() {
+  const closeBtn = document.getElementById('monitors-settings-close');
+  if (!closeBtn || closeBtn.hidden) return false;
+  try {
+    if (closeBtn.getClientRects().length === 0) return false;
+  } catch (_) {
+    return false;
+  }
+  closeBtn.focus();
+  return true;
+}
+
+function focusMonitorsFilterChipFirst() {
+  const wrap = document.getElementById('monitors-filter-chips');
+  if (!wrap || wrap.hidden) return false;
+  const chips = getFilterChipButtons(wrap);
+  if (!chips.length) return false;
+  return focusFilterChipButton(chips[0]);
+}
+
+function focusMonitorsListFirstOrEmpty() {
+  const monitorsList = document.getElementById('monitors-list');
+  if (!monitorsList || monitorsList.hidden) return false;
+  const items = Array.from(monitorsList.querySelectorAll('.monitor-item')).filter(
+    (el) => !el.hidden && el.style.display !== 'none'
+  );
+  if (items.length) {
+    return focusMonitorItemRow(items[0]);
+  }
+  const cta = monitorsList.querySelector('.monitors-empty-cta:not([hidden])');
+  if (cta) {
+    try {
+      if (cta.getClientRects().length > 0) {
+        cta.focus();
+        return true;
+      }
+    } catch (_) {
+      cta.focus();
+      return true;
+    }
+  }
+  return focusSectionContentListbox(monitorsList);
+}
+
+/** Monitors icon-line ↓ → settings close, filter chips, or list when section is open. */
+function tryChainIconMonitorsToSectionFirst() {
+  if (monitorsCollapsed || !isMonitorsSectionOpen()) return false;
+  if (isMonitorsSettingsPopoverOpen()) {
+    return focusMonitorsSettingsCloseBtn();
+  }
+  if (focusMonitorsFilterChipFirst()) return true;
+  return focusMonitorsListFirstOrEmpty();
+}
+
+/** Monitors filter chip / settings close first ↑ → icon-line Monitors icon. */
+function tryChainMonitorsSectionToIconLine() {
+  if (monitorsCollapsed || !isMonitorsSectionOpen()) return false;
+  const icon = document.getElementById('icon-monitors');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
+}
+
 /**
  * Monitors settings close ↓ → add-btn (header toolbar chain).
  */
@@ -6888,6 +6958,11 @@ function ensureMonitorsSettingsCloseKeyboard() {
     if (!isMonitorsSettingsPopoverOpen()) return;
     if (e.key === 'ArrowDown' || e.key === 'j') {
       if (focusMonitorsSettingsAddBtn()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    } else if (e.key === 'ArrowUp' || e.key === 'k') {
+      if (tryChainMonitorsSectionToIconLine()) {
         e.preventDefault();
         e.stopPropagation();
       }
@@ -16240,7 +16315,7 @@ function ensureIconLineKbHint() {
     line.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click an icon · ← → / h l · Home/End move · ↓ on Perplexity/Logs crosses into section · at start crosses to power strip · at end crosses to filter chips · Enter / Space opens section';
+    'Tab or click an icon · ← → / h l · Home/End move · ↓ on Perplexity/Logs/Monitors crosses into section · at start crosses to power strip · at end crosses to filter chips · Enter / Space opens section';
 }
 
 /**
@@ -16273,6 +16348,7 @@ function ensureIconLineKeyboard() {
         const down = e.key === 'ArrowDown' || e.key === 'j';
         const perplexityIcon = document.getElementById('icon-perplexity');
         const logsIcon = document.getElementById('icon-logs');
+        const monitorsIcon = document.getElementById('icon-monitors');
         if (
           down &&
           perplexityIcon &&
@@ -16286,6 +16362,14 @@ function ensureIconLineKeyboard() {
           logsIcon &&
           document.activeElement === logsIcon &&
           tryChainIconLogsToToolbarFirst()
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (
+          down &&
+          monitorsIcon &&
+          document.activeElement === monitorsIcon &&
+          tryChainIconMonitorsToSectionFirst()
         ) {
           e.preventDefault();
           e.stopPropagation();
