@@ -3850,6 +3850,12 @@ function wireFilterChipToolbarKeyboard(wrap) {
           ) {
             e.preventDefault();
             e.stopPropagation();
+          } else if (
+            wrap.id === 'chat-filter-chips' &&
+            tryChainOllamaSectionToIconLine()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
           } else if (tryChainFilterChipToIconLineLast()) {
             e.preventDefault();
             e.stopPropagation();
@@ -8650,6 +8656,61 @@ function saveSystemPrompt(prompt) {
   } else {
     localStorage.removeItem('ollama_system_prompt');
   }
+}
+
+function isOllamaSectionOpen() {
+  const content = document.getElementById('ollama-content');
+  if (!content || content.hidden) return false;
+  try {
+    return content.getClientRects().length > 0;
+  } catch (_) {
+    return false;
+  }
+}
+
+function focusChatFilterChipFirst() {
+  const wrap = document.getElementById('chat-filter-chips');
+  if (!wrap || wrap.hidden) return false;
+  const chips = getFilterChipButtons(wrap);
+  if (!chips.length) return false;
+  return focusFilterChipButton(chips[0]);
+}
+
+function focusChatSectionFirstOrEmpty() {
+  if (
+    typeof window.focusChatEmptySuggestionFirst === 'function' &&
+    window.focusChatEmptySuggestionFirst()
+  ) {
+    return true;
+  }
+  if (
+    typeof window.focusChatComposerFirst === 'function' &&
+    window.focusChatComposerFirst()
+  ) {
+    return true;
+  }
+  const messages = document.getElementById('chat-messages');
+  if (typeof window.focusChatMessagesLast === 'function' && messages) {
+    return window.focusChatMessagesLast(messages);
+  }
+  return focusSectionContentListbox(messages);
+}
+
+/** AI Chat icon-line ↓ → filter chips, starter chips, composer, or messages when open. */
+function tryChainIconOllamaToSectionFirst() {
+  if (ollamaCollapsed || !isOllamaSectionOpen()) return false;
+  if (focusChatFilterChipFirst()) return true;
+  return focusChatSectionFirstOrEmpty();
+}
+
+/** AI Chat filter chip first ↑ → icon-line AI Chat icon. */
+function tryChainOllamaSectionToIconLine() {
+  if (ollamaCollapsed || !isOllamaSectionOpen()) return false;
+  const icon = document.getElementById('icon-ollama');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
 }
 
 function initOllamaSection() {
@@ -16346,10 +16407,19 @@ function ensureIconLineKeyboard() {
           e.key === 'ArrowUp' ||
           e.key === 'k';
         const down = e.key === 'ArrowDown' || e.key === 'j';
+        const ollamaIcon = document.getElementById('icon-ollama');
         const perplexityIcon = document.getElementById('icon-perplexity');
         const logsIcon = document.getElementById('icon-logs');
         const monitorsIcon = document.getElementById('icon-monitors');
         if (
+          down &&
+          ollamaIcon &&
+          document.activeElement === ollamaIcon &&
+          tryChainIconOllamaToSectionFirst()
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (
           down &&
           perplexityIcon &&
           document.activeElement === perplexityIcon &&

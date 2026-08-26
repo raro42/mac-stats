@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.665] - 2026-08-27
+
+### Added
+- **AI Chat icon-line↔section toolbar chain** — AI Chat icon ↓ → filter chips, starter chips, composer, or messages when the section is open; first filter chip ↑ → AI Chat icon (pairs with v0.1.651 messages↔composer chain).
+
 ## [0.1.664] - 2026-08-27
 
 ### Added
