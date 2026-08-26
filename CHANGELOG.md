@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.660] - 2026-08-26
+
+### Added
+- **Monitors add-btn↔settings-list toolbar chain** — close ↓ → add-btn; add-btn ↓ → first Remove/empty CTA; add-btn ↑ → close; list first ↑ → add-btn (settings popover header chain).
+
 ## [0.1.659] - 2026-08-26
 
 ### Added

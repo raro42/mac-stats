@@ -5880,6 +5880,8 @@ async function removeMonitorFromListRow(item) {
 
 function wireMonitorRemoveDelegation() {
   const settingsList = document.getElementById('monitors-settings-list');
+  ensureMonitorsSettingsCloseKeyboard();
+  ensureMonitorAddBtnKeyboard();
   ensureMonitorSettingsListKeyboard();
   if (!settingsList || settingsList.dataset.removeDelegation === '1') return;
   settingsList.dataset.removeDelegation = '1';
@@ -6760,7 +6762,7 @@ function ensureMonitorAddFormToolbarKbHint(wrap) {
   const items = getMonitorAddFormToolbarItems(form);
   hint.hidden = items.length < 2;
   hint.textContent =
-    '← → / h l · Home/End move · list ↓ → URL · URL ← list · Add Monitor → footer · Enter adds from URL';
+    '← → / h l · Home/End move · add-btn ↓ → list · list ↓ → URL · URL ← list · Add Monitor → footer · Enter adds from URL';
 }
 
 function isMonitorsSettingsPopoverOpen() {
@@ -6794,6 +6796,16 @@ function getMonitorSettingsListFocusables() {
   });
 }
 
+function focusMonitorSettingsListFirst() {
+  const items = getMonitorSettingsListFocusables();
+  if (!items.length) return false;
+  items[0].focus();
+  if (typeof items[0].scrollIntoView === 'function') {
+    items[0].scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
 function focusMonitorSettingsListLast() {
   const items = getMonitorSettingsListFocusables();
   if (!items.length) return false;
@@ -6801,6 +6813,18 @@ function focusMonitorSettingsListLast() {
   if (typeof items[items.length - 1].scrollIntoView === 'function') {
     items[items.length - 1].scrollIntoView({ block: 'nearest' });
   }
+  return true;
+}
+
+function focusMonitorsSettingsAddBtn() {
+  const addBtn = document.getElementById('monitors-add-btn');
+  if (!addBtn || addBtn.hidden || addBtn.disabled) return false;
+  try {
+    if (addBtn.getClientRects().length === 0) return false;
+  } catch (_) {
+    return false;
+  }
+  addBtn.focus();
   return true;
 }
 
@@ -6850,6 +6874,55 @@ function tryChainFooterVersionToMonitorAddFormSaveLast() {
 
 window.tryChainFooterVersionToMonitorAddFormSaveLast =
   tryChainFooterVersionToMonitorAddFormSaveLast;
+
+/**
+ * Monitors settings close ↓ → add-btn (header toolbar chain).
+ */
+function ensureMonitorsSettingsCloseKeyboard() {
+  const closeBtn = document.getElementById('monitors-settings-close');
+  if (!closeBtn || closeBtn.dataset.settingsCloseKbWired === '1') return;
+  closeBtn.dataset.settingsCloseKbWired = '1';
+  closeBtn.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (!isMonitorsSettingsPopoverOpen()) return;
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (focusMonitorsSettingsAddBtn()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
+  });
+}
+
+/**
+ * Monitors add-btn ↓ → settings list; ↑ → close (add-btn ↔ list chain).
+ */
+function ensureMonitorAddBtnKeyboard() {
+  const addBtn = document.getElementById('monitors-add-btn');
+  if (!addBtn || addBtn.dataset.addBtnKbWired === '1') return;
+  addBtn.dataset.addBtnKbWired = '1';
+  if (!addBtn.hasAttribute('tabindex')) addBtn.tabIndex = 0;
+  if (!addBtn.title) {
+    addBtn.title = 'Add Monitor — ↓ settings list · ↑ close';
+  }
+  addBtn.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (!isMonitorsSettingsPopoverOpen()) return;
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (focusMonitorSettingsListFirst()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    } else if (e.key === 'ArrowUp' || e.key === 'k') {
+      const closeBtn = document.getElementById('monitors-settings-close');
+      if (closeBtn && closeBtn.getClientRects().length > 0) {
+        closeBtn.focus();
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
+  });
+}
 
 /**
  * Settings list ↓ → add form; empty CTA included (add-form ↔ list chain).
