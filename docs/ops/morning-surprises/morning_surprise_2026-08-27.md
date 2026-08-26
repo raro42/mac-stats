@@ -1,28 +1,17 @@
 # Morning surprise — 2026-08-27
 
-Overnight Track B now at **v0.1.662** — **Perplexity icon-line↔setup toolbar chain**.
+Overnight Track B now at **v0.1.663** — **Debug Log icon-line↔toolbar chain**.
 
-## Latest keep (this tick ~00:00)
+## Shipped this tick
 
-**v0.1.662** — Perplexity onboarding keyboard loop: icon-line Perplexity icon ↓ → inline API-key field when setup panel is open; key first ↑ → Perplexity icon (pairs with v0.1.659 setup↔footer).
+**v0.1.663** — Debug Log vertical keyboard loop: logs icon ↓ → Refresh when the section is open; Refresh first ↑ → logs icon when the viewer has no lines (pairs with v0.1.653 lines↔toolbar).
 
-## Prior this window (2026-08-26 evening)
+## Earlier tonight (same window)
+
+**v0.1.662** — Perplexity icon-line↔setup toolbar chain.
 
 **v0.1.661** — Disk Cleanup scopes↔add-scope↔categories toolbar chain.
 
 **v0.1.660** — Monitors add-btn↔settings-list toolbar chain.
 
-**v0.1.659** — Perplexity setup↔footer toolbar chain.
-
-**v0.1.658** — Details section↔footer toolbar chain.
-
-## Context
-
-- Digester open empty (10 turns / 7d); design review not due (`due=false`, grace).
-- `debug.log`: no product errors (single-instance lock WARN only).
-- Fuel: standing backlog — Perplexity inline setup lacked icon-line entry/exit after v0.1.659 footer wrap.
-
-## Next
-
-- Design review when due / screenshot when TCC allows.
-- p50 tool-heavy instant lanes, sibling ports.
+**v0.1.641–659** — Settings/Changelog/Process Details/Ollama/Perplexity/Discord modal toolbar wraps; AI Chat and Perplexity search chains; Debug Log lines↔toolbar; Monitors list/detail and add-form chains; Top Processes and Details section↔footer chains.
