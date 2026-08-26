@@ -14845,6 +14845,7 @@ function ensureCpuHeaderToolbarKeyboard() {
 }
 
 window.refreshCpuHeaderToolbarRovingTabindex = refreshCpuHeaderToolbarRovingTabindex;
+window.tryChainFocusFooterVersion = tryChainFocusFooterVersion;
 
 /** CPU window footer (version + GitHub). */
 function getCpuFooterElement() {
@@ -14924,8 +14925,12 @@ function ensureFooterToolbarKbHint() {
   }
   const items = getFooterToolbarItems();
   hint.hidden = items.length < 2;
-  hint.textContent =
-    '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to section list (or filter chips)';
+  const changelogOpen =
+    typeof window.isChangelogModalOpen === "function" &&
+    window.isChangelogModalOpen();
+  hint.textContent = changelogOpen
+    ? '← → / h l · Home/End move · version ← crosses to changelog · at end crosses to section icons'
+    : '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to section list (or filter chips)';
 }
 
 function tryChainFooterToIconLineFirst() {
@@ -14962,6 +14967,27 @@ function tryChainIconLineToFooterLast() {
   refreshFooterToolbarRovingTabindex(target);
   target.focus();
   return true;
+}
+
+/** Footer version chip (first footer item). */
+function tryChainFocusFooterVersion() {
+  const items = getFooterToolbarItems();
+  if (!items.length) return false;
+  const target = items[0];
+  refreshFooterToolbarRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+function tryChainFooterVersionToChangelogWhenOpen() {
+  if (
+    typeof window.isChangelogModalOpen === "function" &&
+    window.isChangelogModalOpen() &&
+    typeof window.tryChainFooterVersionToChangelogBodyLast === "function"
+  ) {
+    return window.tryChainFooterVersionToChangelogBodyLast();
+  }
+  return false;
 }
 
 function activateFooterToolbarItem(el) {
@@ -15074,7 +15100,10 @@ function ensureFooterToolbarKeyboard() {
         next = idx + 1;
       } else if (back) {
         if (idx === 0) {
-          if (tryChainFooterToFilterChipLast()) {
+          if (tryChainFooterVersionToChangelogWhenOpen()) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (tryChainFooterToFilterChipLast()) {
             e.preventDefault();
             e.stopPropagation();
           }

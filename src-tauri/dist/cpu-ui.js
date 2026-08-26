@@ -2019,7 +2019,7 @@
     const items = getChangelogBodyToolbarItems(wrap);
     hint.hidden = items.length < 2;
     hint.textContent =
-      "← → / h l · Home/End move between versions · at start/end crosses to header Close";
+      "← → / h l · Home/End move between versions · at start crosses to footer version (or header Close) · at end crosses to header Close";
   }
 
   function focusChangelogBodyItem(body, el) {
@@ -2046,6 +2046,35 @@
 
   /** Changelog header title ← last body version heading. */
   function tryChainChangelogHeaderToBodyLast() {
+    const body = document.getElementById("changelog-body");
+    if (!body) return false;
+    const items = getChangelogBodyToolbarItems(body);
+    if (!items.length) return false;
+    focusChangelogBodyItem(body, items[items.length - 1]);
+    return true;
+  }
+
+  function isChangelogModalOpen() {
+    const modal = document.getElementById("changelog-modal");
+    if (!modal) return false;
+    return (
+      modal.style.display !== "none" &&
+      modal.getAttribute("aria-hidden") !== "true"
+    );
+  }
+
+  /** Changelog body first item ← footer version (full modal wrap). */
+  function tryChainChangelogBodyToFooterVersion() {
+    if (!isChangelogModalOpen()) return false;
+    if (typeof window.tryChainFocusFooterVersion === "function") {
+      return window.tryChainFocusFooterVersion();
+    }
+    return false;
+  }
+
+  /** Footer version ← changelog body last when the modal is open. */
+  function tryChainFooterVersionToChangelogBodyLast() {
+    if (!isChangelogModalOpen()) return false;
     const body = document.getElementById("changelog-body");
     if (!body) return false;
     const items = getChangelogBodyToolbarItems(body);
@@ -2129,7 +2158,10 @@
         e.key === "k"
       ) {
         if (idx === 0) {
-          if (tryChainChangelogBodyToHeader()) {
+          if (tryChainChangelogBodyToFooterVersion()) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (tryChainChangelogBodyToHeader()) {
             e.preventDefault();
             e.stopPropagation();
           }
@@ -2270,8 +2302,11 @@
   window.getModalHeaderToolbarItems = getModalHeaderToolbarItems;
   window.refreshModalHeaderRovingTabindex = refreshModalHeaderRovingTabindex;
   window.isSettingsModalOpen = isSettingsModalOpen;
+  window.isChangelogModalOpen = isChangelogModalOpen;
   window.tryChainCpuHeaderToSettingsModalAppearance =
     tryChainCpuHeaderToSettingsModalAppearance;
+  window.tryChainFooterVersionToChangelogBodyLast =
+    tryChainFooterVersionToChangelogBodyLast;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);
