@@ -15091,7 +15091,7 @@ function ensureFooterToolbarKbHint() {
     : ollamaSettingsOpen
       ? '← → / h l · Home/End move · version ← crosses to Ollama Save · at end crosses to section icons'
       : settingsOpen
-        ? '← → / h l · Home/End move · version ← crosses to Perplexity Clear · at end crosses to section icons'
+        ? '← → / h l · Home/End move · version ← crosses to Perplexity Clear (or Discord View logs) · at end crosses to section icons'
         : processDetailsOpen
           ? '← → / h l · Home/End move · version ← crosses to Force Quit · at end crosses to section icons'
           : '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to section list (or filter chips)';
@@ -15158,6 +15158,19 @@ function tryChainFooterVersionToChangelogWhenOpen() {
     typeof window.tryChainFooterVersionToPerplexitySettingsClearLast ===
       "function" &&
     window.tryChainFooterVersionToPerplexitySettingsClearLast()
+  ) {
+    return true;
+  }
+  if (
+    typeof window.tryChainFooterVersionToDiscordSettingsViewLogsLast ===
+      "function" &&
+    window.tryChainFooterVersionToDiscordSettingsViewLogsLast()
+  ) {
+    return true;
+  }
+  if (
+    typeof window.tryChainFooterVersionToDiscordViewLogsLast === "function" &&
+    window.tryChainFooterVersionToDiscordViewLogsLast()
   ) {
     return true;
   }

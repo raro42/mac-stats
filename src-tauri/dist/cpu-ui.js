@@ -936,6 +936,24 @@
     return false;
   }
 
+  /** Discord token first ← footer version when Settings is open. */
+  function tryChainDiscordSettingsTokenToFooter() {
+    if (!isSettingsModalOpen()) return false;
+    if (typeof window.tryChainFocusFooterVersion === "function") {
+      return window.tryChainFocusFooterVersion();
+    }
+    return false;
+  }
+
+  /** Discord View logs last → footer when it is the last Credentials control. */
+  function tryChainDiscordSettingsViewLogsToFooter() {
+    if (!isSettingsModalOpen()) return false;
+    if (typeof window.tryChainFocusFooterVersion === "function") {
+      return window.tryChainFocusFooterVersion();
+    }
+    return false;
+  }
+
   /** Footer version ← Perplexity Clear when Settings is open. */
   function tryChainFooterVersionToPerplexitySettingsClearLast() {
     if (!isSettingsModalOpen()) return false;
@@ -952,6 +970,30 @@
     }
     refreshCredentialsSectionRovingTabindex(section, clear);
     clear.focus();
+    return true;
+  }
+
+  /** Footer version ← Discord View logs when Settings is open (no Perplexity Clear). */
+  function tryChainFooterVersionToDiscordSettingsViewLogsLast() {
+    if (!isSettingsModalOpen()) return false;
+    const section = document.querySelector(
+      'section[aria-labelledby="settings-credentials-heading"]'
+    );
+    if (!section) return false;
+    const viewLogs = document.getElementById("view-debug-log");
+    if (
+      !viewLogs ||
+      !section.contains(viewLogs) ||
+      viewLogs.hidden ||
+      viewLogs.disabled
+    ) {
+      return false;
+    }
+    if (viewLogs.getClientRects().length === 0 && viewLogs.offsetParent === null) {
+      return false;
+    }
+    refreshCredentialsSectionRovingTabindex(section, viewLogs);
+    viewLogs.focus();
     return true;
   }
 
@@ -1046,7 +1088,7 @@
     const items = getCredentialsSectionToolbarItems(section);
     hint.hidden = items.length < 2;
     hint.textContent = isSettingsModalOpen()
-      ? "← → / h l · Home/End move · arrows at token/key start/end · Perplexity key start ← footer version · Perplexity Clear end → footer · else Product / header"
+      ? "← → / h l · Home/End move · arrows at token/key start/end · Discord token / Perplexity key ← footer · Clear / View logs end → footer · else Product / header"
       : "← → / h l · Home/End move · arrows at token/key start/end · at start crosses to Product · at end crosses to header";
     refreshCredentialsSectionRovingTabindex(section);
     if (section.dataset.credentialsSectionKbWired === "1") return;
@@ -1110,6 +1152,12 @@
             ) {
               e.preventDefault();
               e.stopPropagation();
+            } else if (
+              active?.id === "view-debug-log" &&
+              tryChainDiscordSettingsViewLogsToFooter()
+            ) {
+              e.preventDefault();
+              e.stopPropagation();
             } else if (tryChainSettingsCredentialsToHeader()) {
               e.preventDefault();
               e.stopPropagation();
@@ -1128,6 +1176,14 @@
           if (
             active?.id === "perplexity-api-key-input" &&
             tryChainPerplexitySettingsKeyToFooter()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          if (
+            active?.id === "discord-token-input" &&
+            tryChainDiscordSettingsTokenToFooter()
           ) {
             e.preventDefault();
             e.stopPropagation();
@@ -2361,6 +2417,8 @@
     tryChainFooterVersionToChangelogBodyLast;
   window.tryChainFooterVersionToPerplexitySettingsClearLast =
     tryChainFooterVersionToPerplexitySettingsClearLast;
+  window.tryChainFooterVersionToDiscordSettingsViewLogsLast =
+    tryChainFooterVersionToDiscordSettingsViewLogsLast;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.646] - 2026-08-26
+
+### Added
+- **Discord settings full modal toolbar wrap** — footer version ↔ Discord token toolbar when Settings is open; token first ← crosses to footer version; View logs last → footer when it is the last Credentials control; footer version ← crosses to Perplexity Clear or Discord View logs (filter-chip chain when closed).
+
 ## [0.1.645] - 2026-08-26
 
 ### Added

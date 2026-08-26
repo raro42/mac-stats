@@ -257,6 +257,13 @@
     }
   }
 
+  function isSettingsModalOpen() {
+    return (
+      typeof window.isSettingsModalOpen === "function" &&
+      window.isSettingsModalOpen()
+    );
+  }
+
   function ensureDiscordToolbarKbHint(wrap) {
     const container = wrap || document.getElementById("discord-setting");
     if (!container) return;
@@ -271,8 +278,40 @@
     }
     const items = getDiscordToolbarItems(container);
     hint.hidden = items.length < 2;
-    hint.textContent =
-      "← → / h l · Home/End move · Enter saves from token · buttons keep activate";
+    hint.textContent = isSettingsModalOpen()
+      ? "← → / h l · Home/End move · arrows at token start/end · at start crosses to footer version · at end crosses to footer version"
+      : "← → / h l · Home/End move · Enter saves from token · buttons keep activate";
+  }
+
+  /** Discord token first ← footer version when Settings is open. */
+  function tryChainDiscordTokenToFooter() {
+    if (!isSettingsModalOpen()) return false;
+    if (typeof window.tryChainFocusFooterVersion === "function") {
+      return window.tryChainFocusFooterVersion();
+    }
+    return false;
+  }
+
+  /** Discord View logs last → footer version when Settings is open. */
+  function tryChainDiscordViewLogsToFooter() {
+    if (!isSettingsModalOpen()) return false;
+    if (typeof window.tryChainFocusFooterVersion === "function") {
+      return window.tryChainFocusFooterVersion();
+    }
+    return false;
+  }
+
+  /** Footer version ← Discord View logs when Settings is open. */
+  function tryChainFooterVersionToDiscordViewLogsLast() {
+    if (!isSettingsModalOpen()) return false;
+    const container = document.getElementById("discord-setting");
+    if (!container) return false;
+    const items = getDiscordToolbarItems(container);
+    if (!items.length) return false;
+    const target = items[items.length - 1];
+    refreshDiscordToolbarRovingTabindex(container, target);
+    target.focus();
+    return true;
   }
 
   /**
@@ -332,7 +371,14 @@
         ) {
           return;
         }
-        next = Math.min(idx + 1, items.length - 1);
+        if (idx === items.length - 1) {
+          if (tryChainDiscordViewLogsToFooter()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          return;
+        }
+        next = idx + 1;
       } else if (back) {
         if (
           active?.id === "discord-token-input" &&
@@ -340,7 +386,14 @@
         ) {
           return;
         }
-        next = Math.max(idx - 1, 0);
+        if (idx === 0) {
+          if (tryChainDiscordTokenToFooter()) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          return;
+        }
+        next = idx - 1;
       } else if (e.key === "Home") {
         next = 0;
       } else if (e.key === "End") {
@@ -362,6 +415,9 @@
       }
     });
   }
+
+  window.tryChainFooterVersionToDiscordViewLogsLast =
+    tryChainFooterVersionToDiscordViewLogsLast;
 
   function init() {
     const settingsModal = document.getElementById("settings-modal");
