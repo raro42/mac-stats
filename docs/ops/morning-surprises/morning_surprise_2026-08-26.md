@@ -1,12 +1,14 @@
 # Morning surprise — 2026-08-26
 
-Overnight Track B now at **v0.1.645** — **Perplexity settings full modal toolbar wrap**.
+Overnight Track B now at **v0.1.646** — **Discord settings full modal toolbar wrap**.
 
 ## Latest keep (this tick)
 
-**v0.1.645** — Footer version ↔ Perplexity API key toolbar when Settings is open; key first ← crosses to footer version; Clear last → footer; footer version ← crosses to Perplexity Clear (filter-chip chain when closed).
+**v0.1.646** — Footer version ↔ Discord token toolbar when Settings is open; token first ← crosses to footer version; View logs last → footer when it is the last Credentials control; footer version ← crosses to Perplexity Clear or Discord View logs (filter-chip chain when closed).
 
 ## Prior this night
+
+**v0.1.645** — Perplexity settings full modal toolbar wrap (footer version ↔ API key).
 
 **v0.1.644** — Ollama settings full modal toolbar wrap (footer version ↔ system-prompt).
 
@@ -26,9 +28,9 @@ Overnight Track B now at **v0.1.645** — **Perplexity settings full modal toolb
 
 ## Context
 
-- Digester open empty (10 turns, 7 instant); design review not due (feature-ai-chat ~11.62d grace).
+- Digester open empty (10 turns, 7 instant); design review not due (feature-ai-chat ~11.64d grace).
 - `debug.log`: single-instance lock DEBUG/WARN only (180m scan) — no product errors.
-- Installed release @ v0.1.645; Discord Ready after install.
+- Installed release @ v0.1.646; Discord Ready after install.
 
 ## Prior night carry (2026-08-25)
 
