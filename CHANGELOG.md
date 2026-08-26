@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.656] - 2026-08-26
+
+### Added
+- **Top Processes list↔modal hero toolbar chain** — selected row ↓ / j crosses to the detail name when Process Details is open; name ← crosses back to the row; Force Quit → footer (existing modal wrap).
+
 ## [0.1.655] - 2026-08-26
 
 ### Added

@@ -1936,6 +1936,14 @@ async function refresh() {
             let next = -1;
             const page = 5;
             if (e.key === "ArrowDown" || e.key === "j") {
+              if (
+                row.classList.contains("is-selected") &&
+                isProcessDetailsModalOpen() &&
+                focusProcessDetailHeroFirst()
+              ) {
+                e.preventDefault();
+                return;
+              }
               if (idx === rows.length - 1 && tryChainSectionContentToFooter(list)) return;
               next = Math.min(idx + 1, rows.length - 1);
             } else if (e.key === "ArrowUp" || e.key === "k") {
@@ -4238,6 +4246,50 @@ function isProcessDetailsModalOpen() {
   );
 }
 
+/** Selected Top Processes row when the details modal is open. */
+function getSelectedProcessRow() {
+  if (currentProcessPid === null) return null;
+  const list = document.getElementById("process-list");
+  if (!list) return null;
+  const row = list.querySelector(
+    `.process-row[data-pid="${CSS.escape(String(currentProcessPid))}"]`
+  );
+  if (!row || row.hidden || row.style.display === "none") return null;
+  return row;
+}
+
+function focusSelectedProcessRow() {
+  const row = getSelectedProcessRow();
+  if (!row) return false;
+  row.focus();
+  if (typeof row.scrollIntoView === "function") {
+    row.scrollIntoView({ block: "nearest" });
+  }
+  return true;
+}
+
+/** Focus name on open process details (list row → hero toolbar chain). */
+function focusProcessDetailHeroFirst() {
+  if (!isProcessDetailsModalOpen()) return false;
+  const body = document.getElementById("process-details-body");
+  const hero = body?.querySelector(".process-detail-hero");
+  if (!hero) return false;
+  ensureProcessDetailHeroToolbarKeyboard(hero);
+  const items = getProcessDetailHeroToolbarItems(hero);
+  if (!items.length) return false;
+  refreshProcessDetailHeroToolbarRovingTabindex(hero, items[0]);
+  items[0].focus();
+  return true;
+}
+
+function tryChainProcessDetailHeroToSelectedRow() {
+  if (!isProcessDetailsModalOpen()) return false;
+  return focusSelectedProcessRow();
+}
+
+window.focusProcessDetailHeroFirst = focusProcessDetailHeroFirst;
+window.tryChainProcessDetailHeroToSelectedRow = tryChainProcessDetailHeroToSelectedRow;
+
 function tryChainProcessDetailsHeaderToHero() {
   const body = document.getElementById("process-details-body");
   const hero = body?.querySelector(".process-detail-hero");
@@ -4597,7 +4649,7 @@ function ensureProcessDetailHeroToolbarKbHint(hero) {
   const items = getProcessDetailHeroToolbarItems(wrap);
   hint.hidden = items.length < 2;
   hint.textContent = isProcessDetailsModalOpen()
-    ? "← → / h l · Home/End move · Enter / Space copies · at start crosses to footer version · at end crosses to Force Quit"
+    ? "← → / h l · Home/End move · name ← process row · Force Quit → footer · Enter / Space copies"
     : "← → / h l · Home/End move · Enter / Space copies · at start crosses to header · at end crosses to Force Quit";
 }
 
@@ -4652,7 +4704,10 @@ function ensureProcessDetailHeroToolbarKeyboard(hero) {
       e.key === "k"
     ) {
       if (idx === 0) {
-        if (tryChainProcessDetailsHeroToFooter()) {
+        if (tryChainProcessDetailHeroToSelectedRow()) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (tryChainProcessDetailsHeroToFooter()) {
           e.preventDefault();
           e.stopPropagation();
         } else if (tryChainProcessDetailsHeroToHeader()) {
@@ -7647,7 +7702,7 @@ function ensureProcessesListKbHint(processList, show) {
     processList.parentNode?.insertBefore(hint, processList);
   }
   hint.textContent =
-    'All · Pinned filters · click row for details · click name / c copies · focus list then ↑↓ / j k / Home / End · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
+    'All · Pinned filters · click row for details · open row ↓ → name · name ← row · Force Quit → footer · click name / c copies · ↑↓ / j k / Home / End · PgUp/PgDn · Enter / d opens · P pin/unpin · Esc closes/clears';
 }
 
 /** Hint above External / Monitors list (Disk Cleanup kb-hint parity). */
