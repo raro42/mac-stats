@@ -1,14 +1,16 @@
 # Morning surprise — 2026-08-26
 
-Overnight Track B now at **v0.1.650** — **AI Chat empty starter chips toolbar**.
+Overnight Track B now at **v0.1.651** — **AI Chat messages↔composer toolbar chain**.
 
-## Latest keep (this tick ~05:25)
+## Latest keep (this tick ~05:52)
 
-**v0.1.650** — Empty chat shows a warm “Nothing in this chat yet” title. Starter chips join ← → / h l / Home/End; Enter/Space fills the composer; last chip → composer; composer ← crosses back to chips; filter chips → first starter when the thread is empty. Design-review fuel (feature-ai-chat ~11.7d); screenshot recapture may stay deferred under Screen Recording TCC — polish grace marked.
+**v0.1.651** — With a thread open, last message ↓ / j crosses into the composer; composer ← at input start returns to the last message; Send → footer; footer ← prefers Send when chat is open. Empty starter-chip ↔ composer chain from v0.1.650 stays. Design-review fuel (feature-ai-chat ~11.7d); screenshot recapture may stay deferred under Screen Recording TCC.
 
 ## Prior this night
 
-**v0.1.649** — Menu bar disk % refreshes ~60s and prefers `/System/Volumes/Data` (not a full external mount).
+**v0.1.650** — AI Chat empty starter chips toolbar (warm title; ←→/Enter → composer).
+
+**v0.1.649** — Menu bar disk % refreshes ~60s and prefers `/System/Volumes/Data`.
 
 **v0.1.647** — Settings Help cheat sheet Product toolbar chain.
 
@@ -34,9 +36,9 @@ Overnight Track B now at **v0.1.650** — **AI Chat empty starter chips toolbar*
 
 ## Context
 
-- Digester open empty (10 turns / 7d); design review not strictly due (`due=false`) but skill + standing backlog allow proceeding on stale AI chat.
+- Digester open empty (10 turns / 7d); design review not strictly due (`due=false`, grace) — standing backlog / AI Chat polish.
 - `debug.log`: single-instance lock DEBUG/WARN only — no product errors.
-- Fuel: overnight design review (AI Chat) after Help cheat-sheet chain.
+- Fuel: standing backlog continuation after empty starter chips toolbar.
 
 ## Prior night carry (2026-08-25)
 
