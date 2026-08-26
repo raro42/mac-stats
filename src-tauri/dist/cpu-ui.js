@@ -918,6 +918,43 @@
     return true;
   }
 
+  /** Perplexity Clear last → footer version when Settings is open. */
+  function tryChainPerplexitySettingsClearToFooter() {
+    if (!isSettingsModalOpen()) return false;
+    if (typeof window.tryChainFocusFooterVersion === "function") {
+      return window.tryChainFocusFooterVersion();
+    }
+    return false;
+  }
+
+  /** Perplexity key first ← footer version when Settings is open. */
+  function tryChainPerplexitySettingsKeyToFooter() {
+    if (!isSettingsModalOpen()) return false;
+    if (typeof window.tryChainFocusFooterVersion === "function") {
+      return window.tryChainFocusFooterVersion();
+    }
+    return false;
+  }
+
+  /** Footer version ← Perplexity Clear when Settings is open. */
+  function tryChainFooterVersionToPerplexitySettingsClearLast() {
+    if (!isSettingsModalOpen()) return false;
+    const section = document.querySelector(
+      'section[aria-labelledby="settings-credentials-heading"]'
+    );
+    if (!section) return false;
+    const clear = document.getElementById("perplexity-clear-key");
+    if (!clear || !section.contains(clear) || clear.hidden || clear.disabled) {
+      return false;
+    }
+    if (clear.getClientRects().length === 0 && clear.offsetParent === null) {
+      return false;
+    }
+    refreshCredentialsSectionRovingTabindex(section, clear);
+    clear.focus();
+    return true;
+  }
+
   /** Jump to first/last control in adjacent Settings section (+1 forward, -1 back). */
   function tryChainSettingsSectionFocus(currentSection, direction) {
     const sections = getSettingsModalSections();
@@ -1008,8 +1045,9 @@
     }
     const items = getCredentialsSectionToolbarItems(section);
     hint.hidden = items.length < 2;
-    hint.textContent =
-      "← → / h l · Home/End move · arrows at token/key start/end · at start crosses to Product · at end crosses to header";
+    hint.textContent = isSettingsModalOpen()
+      ? "← → / h l · Home/End move · arrows at token/key start/end · Perplexity key start ← footer version · Perplexity Clear end → footer · else Product / header"
+      : "← → / h l · Home/End move · arrows at token/key start/end · at start crosses to Product · at end crosses to header";
     refreshCredentialsSectionRovingTabindex(section);
     if (section.dataset.credentialsSectionKbWired === "1") return;
     section.dataset.credentialsSectionKbWired = "1";
@@ -1066,7 +1104,13 @@
             return;
           }
           if (idx === controls.length - 1) {
-            if (tryChainSettingsCredentialsToHeader()) {
+            if (
+              active?.id === "perplexity-clear-key" &&
+              tryChainPerplexitySettingsClearToFooter()
+            ) {
+              e.preventDefault();
+              e.stopPropagation();
+            } else if (tryChainSettingsCredentialsToHeader()) {
               e.preventDefault();
               e.stopPropagation();
             }
@@ -1079,6 +1123,14 @@
               active?.id === "perplexity-api-key-input") &&
             !credentialsInputAtMoveBoundary(active, -1)
           ) {
+            return;
+          }
+          if (
+            active?.id === "perplexity-api-key-input" &&
+            tryChainPerplexitySettingsKeyToFooter()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
             return;
           }
           if (idx === 0) {
@@ -2307,6 +2359,8 @@
     tryChainCpuHeaderToSettingsModalAppearance;
   window.tryChainFooterVersionToChangelogBodyLast =
     tryChainFooterVersionToChangelogBodyLast;
+  window.tryChainFooterVersionToPerplexitySettingsClearLast =
+    tryChainFooterVersionToPerplexitySettingsClearLast;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap);

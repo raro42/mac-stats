@@ -10444,8 +10444,40 @@ function ensurePerplexitySettingsToolbarKbHint(wrap) {
   }
   const items = getPerplexitySettingsToolbarItems(container);
   hint.hidden = items.length < 2;
-  hint.textContent =
-    '← → / h l · Home/End move · Enter saves from key field · buttons keep activate';
+  const settingsOpen =
+    typeof window.isSettingsModalOpen === "function" &&
+    window.isSettingsModalOpen();
+  hint.textContent = settingsOpen
+    ? "← → / h l · Home/End move · arrows at key start/end · at start crosses to footer version · at end crosses to footer version"
+    : "← → / h l · Home/End move · Enter saves from key field · buttons keep activate";
+}
+
+/** Perplexity key first ← footer version when Settings is open. */
+function tryChainPerplexitySettingsToolbarKeyToFooter() {
+  if (
+    typeof window.isSettingsModalOpen !== "function" ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (typeof window.tryChainFocusFooterVersion === "function") {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/** Perplexity Clear last → footer version when Settings is open. */
+function tryChainPerplexitySettingsToolbarClearToFooter() {
+  if (
+    typeof window.isSettingsModalOpen !== "function" ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  if (typeof window.tryChainFocusFooterVersion === "function") {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
 }
 
 /**
@@ -10504,7 +10536,14 @@ function wirePerplexitySettingsToolbarKeyboard(wrap) {
       ) {
         return;
       }
-      next = Math.min(idx + 1, items.length - 1);
+      if (idx === items.length - 1) {
+        if (tryChainPerplexitySettingsToolbarClearToFooter()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx + 1;
     } else if (back) {
       if (
         active?.id === 'perplexity-api-key-input' &&
@@ -10512,7 +10551,14 @@ function wirePerplexitySettingsToolbarKeyboard(wrap) {
       ) {
         return;
       }
-      next = Math.max(idx - 1, 0);
+      if (idx === 0) {
+        if (tryChainPerplexitySettingsToolbarKeyToFooter()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx - 1;
     } else if (e.key === 'Home') {
       next = 0;
     } else if (e.key === 'End') {
@@ -15036,14 +15082,19 @@ function ensureFooterToolbarKbHint() {
     typeof window.isChangelogModalOpen === "function" &&
     window.isChangelogModalOpen();
   const ollamaSettingsOpen = isOllamaSettingsPopoverOpen();
+  const settingsOpen =
+    typeof window.isSettingsModalOpen === "function" &&
+    window.isSettingsModalOpen();
   const processDetailsOpen = isProcessDetailsModalOpen();
   hint.textContent = changelogOpen
     ? '← → / h l · Home/End move · version ← crosses to changelog · at end crosses to section icons'
     : ollamaSettingsOpen
       ? '← → / h l · Home/End move · version ← crosses to Ollama Save · at end crosses to section icons'
-      : processDetailsOpen
-        ? '← → / h l · Home/End move · version ← crosses to Force Quit · at end crosses to section icons'
-        : '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to section list (or filter chips)';
+      : settingsOpen
+        ? '← → / h l · Home/End move · version ← crosses to Perplexity Clear · at end crosses to section icons'
+        : processDetailsOpen
+          ? '← → / h l · Home/End move · version ← crosses to Force Quit · at end crosses to section icons'
+          : '← → / h l · Home/End move · version opens changelog · at end crosses to section icons · at start crosses to section list (or filter chips)';
 }
 
 function tryChainFooterToIconLineFirst() {
@@ -15101,6 +15152,13 @@ function tryChainFooterVersionToChangelogWhenOpen() {
     return window.tryChainFooterVersionToChangelogBodyLast();
   }
   if (tryChainFooterVersionToOllamaSettingsSaveLast()) {
+    return true;
+  }
+  if (
+    typeof window.tryChainFooterVersionToPerplexitySettingsClearLast ===
+      "function" &&
+    window.tryChainFooterVersionToPerplexitySettingsClearLast()
+  ) {
     return true;
   }
   if (tryChainFooterVersionToForceQuitLast()) {
