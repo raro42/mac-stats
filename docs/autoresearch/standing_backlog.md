@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.664** — Monitors icon-line↔section toolbar chain (icon ↓ → settings close / filter chips / list; first chip or settings close ↑ → Monitors icon).
+
 - **v0.1.663** — Debug Log icon-line↔toolbar chain (icon ↓ → Refresh when open; Refresh first ↑ → icon when viewer empty).
 
 - **v0.1.662** — Perplexity icon-line↔setup toolbar chain (icon ↓ → inline key when setup open; key first ↑ → icon).

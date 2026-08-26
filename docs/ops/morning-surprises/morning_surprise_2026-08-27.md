@@ -1,12 +1,14 @@
 # Morning surprise — 2026-08-27
 
-Overnight Track B now at **v0.1.663** — **Debug Log icon-line↔toolbar chain**.
+Overnight Track B now at **v0.1.664** — **Monitors icon-line↔section toolbar chain**.
 
 ## Shipped this tick
 
-**v0.1.663** — Debug Log vertical keyboard loop: logs icon ↓ → Refresh when the section is open; Refresh first ↑ → logs icon when the viewer has no lines (pairs with v0.1.653 lines↔toolbar).
+**v0.1.664** — Monitors vertical keyboard loop: Monitors icon ↓ → settings close (when Settings is open), filter chips, or first list row / empty Add CTA; first filter chip or settings close ↑ → Monitors icon (pairs with v0.1.654–660 list/detail chains).
 
 ## Earlier tonight (same window)
+
+**v0.1.663** — Debug Log icon-line↔toolbar chain.
 
 **v0.1.662** — Perplexity icon-line↔setup toolbar chain.
 
