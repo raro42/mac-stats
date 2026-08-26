@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-08-26 (~05:25):** AI Chat empty title + starter-chip toolbar keyboard (v0.1.650). Recapture of `feature-ai-chat.png` attempted; if Screen Recording TCC / no on-screen CPU window blocks Quartz/`screencapture -l`, prior Aug 14 asset kept; polish grace marked.
 - **2026-08-18 (~21:20):** CPU metrics RAM on the battery/power strip (v0.1.520). Recapture of `feature-cpu-metrics.png` still deferred if Screen Recording TCC / no on-screen CPU window blocks Quartz/`screencapture -l`; prior asset kept; polish grace marked.
 - **2026-08-18 (~20:55):** Agent Ops empty Open AI Chat CTA (v0.1.519). Recapture of `feature-agent-ops.png` still deferred if Screen Recording TCC / no on-screen CPU window blocks Quartz/`screencapture -l`; prior Aug 12 asset kept; polish grace marked.
 - **2026-08-18 (~20:30):** Monitors summary click + empty Add CTA (v0.1.518). Recapture of `feature-monitors.png` still deferred if Screen Recording TCC / no on-screen CPU window blocks Quartz/`screencapture -l`; prior asset kept; polish grace marked.

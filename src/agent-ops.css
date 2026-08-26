@@ -1431,6 +1431,14 @@ textarea.ops-agent-editor.is-dirty {
   cursor: text;
 }
 
+.chat-empty-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  opacity: 0.92;
+}
+
 .chat-empty-copy {
   margin: 0;
   opacity: 0.78;
@@ -1442,6 +1450,18 @@ textarea.ops-agent-editor.is-dirty {
   justify-content: center;
   gap: 6px;
   margin-top: 12px;
+}
+
+.chat-empty-kb-hint {
+  flex: 1 1 100%;
+  margin: 8px 0 0;
+  font-size: 11px;
+  opacity: 0.72;
+  text-align: center;
+}
+
+.chat-empty-kb-hint[hidden] {
+  display: none !important;
 }
 
 .chat-empty-chip {

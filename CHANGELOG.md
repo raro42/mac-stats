@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.650] - 2026-08-26
+
+### Added
+- **AI Chat empty starter chips toolbar** — warm “Nothing in this chat yet” title; ← → / h l / Home/End across starter chips; Enter/Space fills composer; last chip → composer; composer ← crosses back to chips; filter chips → first starter when empty.
+
 ## [0.1.649] - 2026-08-26
 
 ### Fixed

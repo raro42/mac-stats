@@ -1498,6 +1498,140 @@ function applyChatEmptySuggestion(prompt, chipBtn) {
   flashChatEmptyChip(chipBtn);
 }
 
+function getChatEmptySuggestionChips() {
+  const row = document.querySelector(
+    '#chat-messages .chat-empty:not(.chat-filter-miss) .chat-empty-suggestions'
+  );
+  if (!row) return [];
+  return Array.from(row.querySelectorAll('.chat-empty-chip')).filter((el) => {
+    if (!el || el.hidden || el.disabled) return false;
+    return el.getClientRects().length > 0 || row.contains(el);
+  });
+}
+
+function refreshChatEmptySuggestionRovingTabindex(preferred) {
+  const chips = getChatEmptySuggestionChips();
+  if (!chips.length) return;
+  const focused = chips.find((el) => el === document.activeElement);
+  const current =
+    (preferred && chips.includes(preferred) && preferred) ||
+    focused ||
+    chips.find((el) => el.tabIndex === 0) ||
+    chips[0];
+  for (const el of chips) {
+    el.tabIndex = el === current ? 0 : -1;
+  }
+}
+
+function focusChatEmptySuggestionFirst() {
+  const chips = getChatEmptySuggestionChips();
+  if (!chips.length) return false;
+  refreshChatEmptySuggestionRovingTabindex(chips[0]);
+  chips[0].focus();
+  return true;
+}
+
+function focusChatEmptySuggestionLast() {
+  const chips = getChatEmptySuggestionChips();
+  if (!chips.length) return false;
+  const last = chips[chips.length - 1];
+  refreshChatEmptySuggestionRovingTabindex(last);
+  last.focus();
+  return true;
+}
+
+function ensureChatEmptySuggestionKbHint(row) {
+  if (!row) return;
+  let hint = row.querySelector('.chat-empty-kb-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'chat-empty-kb-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    row.appendChild(hint);
+  }
+  const chips = getChatEmptySuggestionChips();
+  hint.hidden = chips.length < 2;
+  hint.textContent =
+    '← → / h l · Home/End move · Enter / Space puts prompt in composer · at end crosses to composer';
+}
+
+/**
+ * Starter-chip toolbar keyboard — ←→ / h l / Home/End; Enter/Space fills composer;
+ * last chip → composer input (filter-chip / Help-sheet parity).
+ */
+function ensureChatEmptySuggestionsToolbarKeyboard(row) {
+  if (!row) return;
+  ensureChatEmptySuggestionKbHint(row);
+  refreshChatEmptySuggestionRovingTabindex();
+  if (row.dataset.chatEmptyKbWired === '1') return;
+  row.dataset.chatEmptyKbWired = '1';
+  if (!row.getAttribute('role')) row.setAttribute('role', 'toolbar');
+  if (!row.getAttribute('aria-label')) {
+    row.setAttribute('aria-label', 'AI Chat starter prompts');
+  }
+  row.addEventListener('focusin', (e) => {
+    const chips = getChatEmptySuggestionChips();
+    if (chips.includes(e.target)) {
+      refreshChatEmptySuggestionRovingTabindex(e.target);
+      ensureChatEmptySuggestionKbHint(row);
+    }
+  });
+  row.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const chips = getChatEmptySuggestionChips();
+    if (!chips.length) return;
+    const idx = chips.indexOf(document.activeElement);
+    if (idx < 0) return;
+    const active = chips[idx];
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      const prompt = active?.dataset?.prompt || active?.dataset?.idleLabel || '';
+      applyChatEmptySuggestion(prompt, active);
+      return;
+    }
+    let next = -1;
+    const forward =
+      e.key === 'ArrowRight' ||
+      e.key === 'l' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'j';
+    const back =
+      e.key === 'ArrowLeft' ||
+      e.key === 'h' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'k';
+    if (forward && idx === chips.length - 1) {
+      const input = document.getElementById('chat-input');
+      if (input) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof window.refreshChatComposerRovingTabindex === 'function') {
+          window.refreshChatComposerRovingTabindex(null, input);
+        }
+        input.focus();
+        try {
+          const len = (input.value || '').length;
+          input.setSelectionRange(len, len);
+        } catch (_) {
+          /* ignore */
+        }
+      }
+      return;
+    }
+    if (forward) next = Math.min(idx + 1, chips.length - 1);
+    else if (back) next = Math.max(idx - 1, 0);
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = chips.length - 1;
+    else return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (next === idx) return;
+    refreshChatEmptySuggestionRovingTabindex(chips[next]);
+    chips[next].focus();
+  });
+}
+
 /**
  * Show a calm empty-state hint when the chat pane has no messages yet.
  */
@@ -1510,13 +1644,21 @@ function ensureChatEmptyHint() {
     return;
   }
   ensureChatFilterMissState(container, false);
-  if (container.querySelector('.chat-empty:not(.chat-filter-miss)')) {
+  const existing = container.querySelector('.chat-empty:not(.chat-filter-miss)');
+  if (existing) {
+    const row = existing.querySelector('.chat-empty-suggestions');
+    if (row) ensureChatEmptySuggestionsToolbarKeyboard(row);
     applyChatListFilter();
     return;
   }
   const empty = document.createElement('div');
   empty.className = 'chat-empty';
   empty.setAttribute('role', 'status');
+
+  const title = document.createElement('p');
+  title.className = 'chat-empty-title';
+  title.textContent = 'Nothing in this chat yet';
+  empty.appendChild(title);
 
   const copy = document.createElement('p');
   copy.className = 'chat-empty-copy';
@@ -1531,6 +1673,8 @@ function ensureChatEmptyHint() {
     btn.type = 'button';
     btn.className = 'chat-empty-chip';
     btn.textContent = item.label;
+    btn.dataset.prompt = item.prompt;
+    btn.dataset.idleLabel = item.label;
     btn.title = 'Put this in the composer — then Send or Enter';
     btn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -1547,6 +1691,7 @@ function ensureChatEmptyHint() {
   });
 
   container.appendChild(empty);
+  ensureChatEmptySuggestionsToolbarKeyboard(row);
   applyChatListFilter();
 }
 
@@ -2373,8 +2518,10 @@ function ensureChatComposerKbHint(container) {
   }
   const items = getChatComposerItems(row);
   hint.hidden = items.length < 2;
-  hint.textContent =
-    '← → / h l · Home/End move · Enter sends from input · Clear / Send on button';
+  const hasStarters = getChatEmptySuggestionChips().length > 0;
+  hint.textContent = hasStarters
+    ? '← → / h l · Home/End move · Enter sends · at start crosses to starter chips · Clear / Send on button'
+    : '← → / h l · Home/End move · Enter sends from input · Clear / Send on button';
 }
 
 /**
@@ -2427,6 +2574,11 @@ function ensureChatComposerToolbarKeyboard() {
       next = Math.min(idx + 1, items.length - 1);
     } else if (back) {
       if (active?.id === 'chat-input' && !chatComposerInputAtMoveBoundary(active, -1)) {
+        return;
+      }
+      if (idx === 0 && focusChatEmptySuggestionLast()) {
+        e.preventDefault();
+        e.stopPropagation();
         return;
       }
       next = Math.max(idx - 1, 0);
@@ -2622,6 +2774,8 @@ window.Ollama = {
   setAssistantMessageContent: setAssistantMessageContent,
   initListeners: initOllamaChatListeners,
   syncCollapsedGlance: syncOllamaCollapsedGlance,
+  focusEmptySuggestionFirst: focusChatEmptySuggestionFirst,
+  focusEmptySuggestionLast: focusChatEmptySuggestionLast,
   
   // Utils
   getEndpoint: getOllamaEndpoint,
@@ -2629,3 +2783,7 @@ window.Ollama = {
   getSystemPrompt: getSystemPrompt,
   escapeHtml: escapeHtml
 };
+
+window.focusChatEmptySuggestionFirst = focusChatEmptySuggestionFirst;
+window.focusChatEmptySuggestionLast = focusChatEmptySuggestionLast;
+window.refreshChatComposerRovingTabindex = refreshChatComposerRovingTabindex;

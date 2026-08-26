@@ -3598,6 +3598,14 @@ function tryChainFilterChipWrapToContent(wrap) {
     if (scopeRows.length && focusSectionContentListbox(listbox)) return true;
     return focusDiskCleanupCategoriesFirst();
   }
+  if (wrap?.id === 'chat-filter-chips') {
+    if (
+      typeof window.focusChatEmptySuggestionFirst === 'function' &&
+      window.focusChatEmptySuggestionFirst()
+    ) {
+      return true;
+    }
+  }
   return focusSectionContentListbox(listbox);
 }
 

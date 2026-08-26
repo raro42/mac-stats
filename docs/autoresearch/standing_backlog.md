@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.650** — AI Chat empty starter chips toolbar (warm title + ←→/Enter → composer; composer ← chips).
+
 - **v0.1.647** — Settings Help cheat sheet Product toolbar chain (open sheet between Help · Reset; Esc closes; Enter/c copies).
 
 - **v0.1.646** — Discord settings full modal toolbar wrap (footer version ↔ Discord token toolbar when Settings open).
