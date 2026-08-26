@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.643** — Process Details full modal toolbar wrap (footer version ↔ force-quit when modal open).
+
 - **v0.1.642** — Changelog full modal toolbar wrap (footer version ↔ changelog body when modal open).
 
 - **v0.1.641** — Settings full modal toolbar wrap (CPU header Settings ↔ Appearance when modal open; ring chain when closed).

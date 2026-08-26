@@ -1,12 +1,14 @@
 # Morning surprise — 2026-08-26
 
-Overnight Track B now at **v0.1.642** — **Changelog full modal toolbar wrap**.
+Overnight Track B now at **v0.1.643** — **Process Details full modal toolbar wrap**.
 
 ## Latest keep (this tick)
 
-**v0.1.642** — Footer version ↔ changelog body when the modal is open; body first ← crosses to footer version; footer version ← crosses to last version heading (filter-chip chain when closed).
+**v0.1.643** — Footer version ↔ force-quit toolbar when Process Details is open; hero first ← crosses to footer version; force-quit last → footer; footer version ← crosses to Force Quit (filter-chip chain when closed).
 
 ## Prior this night
+
+**v0.1.642** — Changelog full modal toolbar wrap (footer version ↔ changelog body).
 
 **v0.1.641** — Settings full modal toolbar wrap (CPU header Settings ↔ Appearance).
 
@@ -20,9 +22,9 @@ Overnight Track B now at **v0.1.642** — **Changelog full modal toolbar wrap**.
 
 ## Context
 
-- Digester open empty (10 turns, 7 instant); design review not due (feature-ai-chat ~11.5d grace).
+- Digester open empty (10 turns, 7 instant); design review not due (feature-ai-chat ~11.6d grace).
 - `debug.log`: single-instance lock DEBUG/WARN only (180m scan) — no product errors.
-- Installed release @ v0.1.642; process running after install.
+- Installed release @ v0.1.643; process running after install.
 
 ## Prior night carry (2026-08-25)
 
