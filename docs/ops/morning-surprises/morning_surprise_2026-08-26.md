@@ -1,12 +1,14 @@
 # Morning surprise — 2026-08-26
 
-Overnight Track B now at **v0.1.656** — **Top Processes list↔modal hero toolbar chain**.
+Overnight Track B now at **v0.1.657** — **Top Processes force-quit↔footer toolbar polish**.
 
-## Latest keep (this tick ~21:36)
+## Latest keep (this tick ~22:00)
 
-**v0.1.656** — Selected process row ↓ / j crosses to the detail name when Process Details is open; name ← crosses back to the row; Force Quit → footer (existing modal wrap). Standing backlog keyboard chain continuation after Monitors add-form↔settings-list.
+**v0.1.657** — Footer ← prefers Force Quit when Process Details is open (Monitors detail parity); process list last row ↓ crosses to hero when the modal is open; footer ← section chain lands on Force Quit instead of skipping to the list row.
 
 ## Prior this evening
+
+**v0.1.656** — Top Processes list↔modal hero toolbar chain (selected row ↓ → name; name ← row; Force Quit → footer).
 
 **v0.1.655** — Monitors add-form↔settings-list toolbar chain (last Remove/CTA ↓ → URL; URL ← list; Add Monitor → footer).
 
@@ -18,13 +20,11 @@ Overnight Track B now at **v0.1.656** — **Top Processes list↔modal hero tool
 
 **v0.1.651** — AI Chat messages↔composer toolbar chain (last message ↓ → composer; composer ← last message; Send → footer).
 
-**v0.1.650** — AI Chat empty starter chips toolbar (warm title; ←→/Enter → composer).
-
 ## Context
 
 - Digester open empty (10 turns / 7d); design review not due (`due=false`, grace).
 - `debug.log`: no product errors (single-instance lock WARN only).
-- Fuel: standing backlog toolbar keyboard chain after Monitors add-form↔settings-list.
+- Fuel: standing backlog toolbar keyboard chain after list↔modal hero.
 
 ## Prior night carry (2026-08-25)
 
