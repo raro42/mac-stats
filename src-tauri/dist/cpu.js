@@ -3856,6 +3856,12 @@ function wireFilterChipToolbarKeyboard(wrap) {
           ) {
             e.preventDefault();
             e.stopPropagation();
+          } else if (
+            wrap.id === 'disk-cleanup-filter-chips' &&
+            tryChainDiskCleanupSectionToIconLine()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
           } else if (tryChainFilterChipToIconLineLast()) {
             e.preventDefault();
             e.stopPropagation();
@@ -14641,6 +14647,84 @@ function focusDiskCleanupScopesLast() {
   return true;
 }
 
+function focusDiskCleanupScopesFirst() {
+  const scopesEl = document.getElementById('disk-cleanup-scopes');
+  if (!scopesEl || scopesEl.hidden) return false;
+  const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
+  if (rows.length) {
+    syncDiskCleanupScopeTabOrder(scopesEl, 0);
+    rows[0].focus();
+    if (typeof rows[0].scrollIntoView === 'function') {
+      rows[0].scrollIntoView({ block: 'nearest' });
+    }
+    return true;
+  }
+  return focusSectionContentListbox(scopesEl);
+}
+
+function isDiskCleanupSectionOpen() {
+  const content = document.getElementById('disk-cleanup-content');
+  if (!content || content.hidden) return false;
+  try {
+    return content.getClientRects().length > 0;
+  } catch (_) {
+    return false;
+  }
+}
+
+function focusDiskCleanupFilterChipFirst() {
+  const wrap = document.getElementById('disk-cleanup-filter-chips');
+  if (!wrap || wrap.hidden) return false;
+  const chips = getFilterChipButtons(wrap);
+  if (!chips.length) return false;
+  return focusFilterChipButton(chips[0]);
+}
+
+function focusDiskCleanupMetaCardFirst() {
+  const cards = getDiskCleanupMetaCards();
+  if (!cards.length) return false;
+  refreshDiskCleanupMetaRovingTabindex(cards[0]);
+  cards[0].focus();
+  return true;
+}
+
+function focusDiskCleanupSectionFirstOrEmpty() {
+  if (focusDiskCleanupMetaCardFirst()) return true;
+  if (focusDiskCleanupScopesFirst()) return true;
+  if (focusDiskCleanupCategoriesFirst()) return true;
+  const list = document.getElementById('disk-cleanup-list');
+  const emptyCta = list?.querySelector('.disk-cleanup-empty-cta:not([hidden])');
+  if (emptyCta) {
+    try {
+      if (emptyCta.getClientRects().length > 0) {
+        emptyCta.focus();
+        return true;
+      }
+    } catch (_) {
+      emptyCta.focus();
+      return true;
+    }
+  }
+  return false;
+}
+
+/** Disk Cleanup icon-line ↓ → filter chips, meta cards, scopes, or categories when open. */
+function tryChainIconDiskCleanupToSectionFirst() {
+  if (diskCleanupCollapsed || !isDiskCleanupSectionOpen()) return false;
+  if (focusDiskCleanupFilterChipFirst()) return true;
+  return focusDiskCleanupSectionFirstOrEmpty();
+}
+
+/** Disk Cleanup filter chip first ↑ → icon-line Disk Cleanup icon. */
+function tryChainDiskCleanupSectionToIconLine() {
+  if (diskCleanupCollapsed || !isDiskCleanupSectionOpen()) return false;
+  const icon = document.getElementById('icon-disk-cleanup');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
+}
+
 function focusDiskCleanupCategoriesLast() {
   const listEl = document.getElementById('disk-cleanup-list');
   if (!listEl || listEl.hidden) return false;
@@ -16411,6 +16495,7 @@ function ensureIconLineKeyboard() {
         const perplexityIcon = document.getElementById('icon-perplexity');
         const logsIcon = document.getElementById('icon-logs');
         const monitorsIcon = document.getElementById('icon-monitors');
+        const diskIcon = document.getElementById('icon-disk-cleanup');
         if (
           down &&
           ollamaIcon &&
@@ -16440,6 +16525,14 @@ function ensureIconLineKeyboard() {
           monitorsIcon &&
           document.activeElement === monitorsIcon &&
           tryChainIconMonitorsToSectionFirst()
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (
+          down &&
+          diskIcon &&
+          document.activeElement === diskIcon &&
+          tryChainIconDiskCleanupToSectionFirst()
         ) {
           e.preventDefault();
           e.stopPropagation();

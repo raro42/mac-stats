@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.666] - 2026-08-27
+
+### Added
+- **Disk Cleanup icon-line↔section toolbar chain** — Disk Cleanup icon ↓ → filter chips, meta cards, scopes, or categories when the section is open; first filter chip ↑ → Disk Cleanup icon (pairs with v0.1.639–640 scopes/categories chains).
+
 ## [0.1.665] - 2026-08-27
 
 ### Added
