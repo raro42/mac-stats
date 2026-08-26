@@ -1,12 +1,14 @@
 # Morning surprise — 2026-08-26
 
-Overnight Track B now at **v0.1.655** — **Monitors add-form↔settings-list toolbar chain**.
+Overnight Track B now at **v0.1.656** — **Top Processes list↔modal hero toolbar chain**.
 
-## Latest keep (this tick ~21:12)
+## Latest keep (this tick ~21:36)
 
-**v0.1.655** — Monitor Settings list last Remove (or empty CTA) ↓ / j crosses to the add URL field; URL ← at input start crosses back to the list; Add Monitor → footer; footer ← prefers Add Monitor when Monitor Settings is open. Standing backlog keyboard chain continuation.
+**v0.1.656** — Selected process row ↓ / j crosses to the detail name when Process Details is open; name ← crosses back to the row; Force Quit → footer (existing modal wrap). Standing backlog keyboard chain continuation after Monitors add-form↔settings-list.
 
 ## Prior this evening
+
+**v0.1.655** — Monitors add-form↔settings-list toolbar chain (last Remove/CTA ↓ → URL; URL ← list; Add Monitor → footer).
 
 **v0.1.654** — Monitors list↔detail toolbar chain (open row ↓ → Check now; Check now ← row; Remove → footer).
 
@@ -22,7 +24,7 @@ Overnight Track B now at **v0.1.655** — **Monitors add-form↔settings-list to
 
 - Digester open empty (10 turns / 7d); design review not due (`due=false`, grace).
 - `debug.log`: no product errors (single-instance lock WARN only).
-- Fuel: standing backlog toolbar keyboard chain after Monitors list↔detail.
+- Fuel: standing backlog toolbar keyboard chain after Monitors add-form↔settings-list.
 
 ## Prior night carry (2026-08-25)
 
