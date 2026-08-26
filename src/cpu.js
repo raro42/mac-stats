@@ -4176,6 +4176,14 @@ function closeProcessDetailsModal() {
   }
 }
 
+function isProcessDetailsModalOpen() {
+  if (!processDetailsModal) return false;
+  return (
+    processDetailsModal.style.display !== "none" &&
+    processDetailsModal.getAttribute("aria-hidden") !== "true"
+  );
+}
+
 function tryChainProcessDetailsHeaderToHero() {
   const body = document.getElementById("process-details-body");
   const hero = body?.querySelector(".process-detail-hero");
@@ -4185,6 +4193,42 @@ function tryChainProcessDetailsHeaderToHero() {
   refreshProcessDetailHeroToolbarRovingTabindex(hero, items[0]);
   items[0].focus();
   return true;
+}
+
+function tryChainProcessDetailsHeaderToForceQuitLast() {
+  const body = document.getElementById("process-details-body");
+  const section = body?.querySelector(".force-quit-section");
+  if (!section) return false;
+  const items = getForceQuitToolbarItems(section);
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  refreshForceQuitToolbarRovingTabindex(section, target);
+  target.focus();
+  return true;
+}
+
+/** Process detail hero first ← footer version (full modal wrap). */
+function tryChainProcessDetailsHeroToFooter() {
+  if (!isProcessDetailsModalOpen()) return false;
+  if (typeof window.tryChainFocusFooterVersion === "function") {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/** Force quit last → footer version when the modal is open. */
+function tryChainForceQuitToFooter() {
+  if (!isProcessDetailsModalOpen()) return false;
+  if (typeof window.tryChainFocusFooterVersion === "function") {
+    return window.tryChainFocusFooterVersion();
+  }
+  return false;
+}
+
+/** Footer version ← force quit last when the modal is open. */
+function tryChainFooterVersionToForceQuitLast() {
+  if (!isProcessDetailsModalOpen()) return false;
+  return tryChainProcessDetailsHeaderToForceQuitLast();
 }
 
 function tryChainProcessDetailsHeroToHeader() {
@@ -4240,8 +4284,9 @@ function wireProcessDetailsHeaderToolbarKeyboard(header) {
     ariaLabel: "Process details header",
     wireKey: "processDetailsHeaderToolbarKbWired",
     hintText:
-      "← → / h l · Home/End move · Enter / Space on Close closes · at end crosses to name",
+      "← → / h l · Home/End move · Enter / Space on Close closes · at end crosses to name · at start crosses to Force Quit",
     chainForwardFromEnd: () => tryChainProcessDetailsHeaderToHero(),
+    chainBackFromStart: () => tryChainProcessDetailsHeaderToForceQuitLast(),
   });
 }
 
@@ -4497,8 +4542,9 @@ function ensureProcessDetailHeroToolbarKbHint(hero) {
   }
   const items = getProcessDetailHeroToolbarItems(wrap);
   hint.hidden = items.length < 2;
-  hint.textContent =
-    "← → / h l · Home/End move · Enter / Space copies · at start crosses to header · at end crosses to Force Quit";
+  hint.textContent = isProcessDetailsModalOpen()
+    ? "← → / h l · Home/End move · Enter / Space copies · at start crosses to footer version · at end crosses to Force Quit"
+    : "← → / h l · Home/End move · Enter / Space copies · at start crosses to header · at end crosses to Force Quit";
 }
 
 /**
@@ -4552,7 +4598,10 @@ function ensureProcessDetailHeroToolbarKeyboard(hero) {
       e.key === "k"
     ) {
       if (idx === 0) {
-        if (tryChainProcessDetailsHeroToHeader()) {
+        if (tryChainProcessDetailsHeroToFooter()) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (tryChainProcessDetailsHeroToHeader()) {
           e.preventDefault();
           e.stopPropagation();
         }
@@ -4617,8 +4666,9 @@ function ensureForceQuitToolbarKbHint(section) {
   }
   const items = getForceQuitToolbarItems(wrap);
   hint.hidden = items.length < 2;
-  hint.textContent =
-    "← → / h l · Home/End move · Enter / Space on buttons · at start crosses to PID";
+  hint.textContent = isProcessDetailsModalOpen()
+    ? "← → / h l · Home/End move · Enter / Space on buttons · at start crosses to PID · at end crosses to footer version"
+    : "← → / h l · Home/End move · Enter / Space on buttons · at start crosses to PID";
 }
 
 /**
@@ -4664,7 +4714,14 @@ function ensureForceQuitToolbarKeyboard(section) {
       e.key === "ArrowDown" ||
       e.key === "j"
     ) {
-      next = Math.min(idx + 1, items.length - 1);
+      if (idx === items.length - 1) {
+        if (tryChainForceQuitToFooter()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+      next = idx + 1;
     } else if (
       e.key === "ArrowLeft" ||
       e.key === "h" ||
@@ -14846,6 +14903,8 @@ function ensureCpuHeaderToolbarKeyboard() {
 
 window.refreshCpuHeaderToolbarRovingTabindex = refreshCpuHeaderToolbarRovingTabindex;
 window.tryChainFocusFooterVersion = tryChainFocusFooterVersion;
+window.isProcessDetailsModalOpen = isProcessDetailsModalOpen;
+window.tryChainFooterVersionToForceQuitLast = tryChainFooterVersionToForceQuitLast;
 
 /** CPU window footer (version + GitHub). */
 function getCpuFooterElement() {
@@ -14986,6 +15045,9 @@ function tryChainFooterVersionToChangelogWhenOpen() {
     typeof window.tryChainFooterVersionToChangelogBodyLast === "function"
   ) {
     return window.tryChainFooterVersionToChangelogBodyLast();
+  }
+  if (tryChainFooterVersionToForceQuitLast()) {
+    return true;
   }
   return false;
 }

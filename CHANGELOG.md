@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.643] - 2026-08-26
+
+### Added
+- **Process Details full modal toolbar wrap** — footer version ↔ force-quit toolbar when the modal is open; hero first ← crosses to footer version; force-quit last → footer; footer version ← crosses to Force Quit (filter-chip chain when closed).
+
 ## [0.1.642] - 2026-08-26
 
 ### Added
