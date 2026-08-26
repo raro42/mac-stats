@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.662** — Perplexity icon-line↔setup toolbar chain (icon ↓ → inline key when setup open; key first ↑ → icon).
+
 - **v0.1.659** — Perplexity setup↔footer toolbar chain (Save key → footer; footer ← setup when inline API-key panel open).
 
 - **v0.1.658** — Details section↔footer toolbar chain (last value ↓ → processes first / footer; processes first ↑ → Details last; footer ← Details last when processes collapsed).
