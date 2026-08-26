@@ -3564,6 +3564,12 @@ function tryChainFooterToSectionContentLast() {
     if (focusDiskCleanupCategoriesLast()) return true;
     if (focusDiskCleanupScopesLast()) return true;
   }
+  if (
+    typeof window.focusChatComposerLast === 'function' &&
+    window.focusChatComposerLast()
+  ) {
+    return true;
+  }
   const listboxes = getVisibleSectionContentListboxes();
   for (let i = listboxes.length - 1; i >= 0; i -= 1) {
     const id = listboxes[i].id;
@@ -3645,6 +3651,7 @@ function tryListboxChainBackToFilterChips(e, listbox, idx, itemCount) {
 window.tryChainListboxToFilterChips = tryChainListboxToFilterChips;
 window.tryChainFilterChipWrapToContent = tryChainFilterChipWrapToContent;
 window.tryChainSectionContentToFooter = tryChainSectionContentToFooter;
+window.tryChainFilterChipToFooterFirst = tryChainFilterChipToFooterFirst;
 window.tryChainFooterToSectionContentLast = tryChainFooterToSectionContentLast;
 
 function focusFilterChipButton(btn) {

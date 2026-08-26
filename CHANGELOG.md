@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.651] - 2026-08-26
+
+### Added
+- **AI Chat messages↔composer toolbar chain** — last message ↓ / j crosses to the composer; composer ← at input start crosses back to the last message (when the thread has replies); composer last (Send) → footer; footer ← prefers Send when chat is open.
+
 ## [0.1.650] - 2026-08-26
 
 ### Added

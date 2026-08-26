@@ -1147,7 +1147,7 @@ function ensureChatMessagesKbHint(container, show) {
     container.parentNode.insertBefore(hint, container);
   }
   hint.textContent =
-    'All · You · Assistant filters · focus list then ↑↓ / j k / Home / End · click / Enter / Space / c copies · PgUp/PgDn · Esc clears';
+    'All · You · Assistant filters · focus list then ↑↓ / j k / Home / End · last ↓ → composer · click / Enter / Space / c copies · PgUp/PgDn · Esc clears';
 }
 
 /** Keep one selected + tabbable bubble (Monitors listbox parity). */
@@ -1280,6 +1280,11 @@ function wireChatMessagesCopy(container) {
     };
 
     if (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'J') {
+      if (idx === items.length - 1 && focusChatComposerFirst()) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       if (
         idx === items.length - 1 &&
         typeof window.tryChainSectionContentToFooter === 'function' &&
@@ -2506,6 +2511,46 @@ function refreshChatComposerRovingTabindex(container, preferred) {
   }
 }
 
+function isChatComposerRowVisible(row) {
+  if (!row || row.hidden) return false;
+  try {
+    return row.getClientRects().length > 0;
+  } catch (_) {
+    return false;
+  }
+}
+
+/** Focus first composer control (input). Used by message-list → composer chain. */
+function focusChatComposerFirst() {
+  const row = document.querySelector('.chat-input-container');
+  if (!isChatComposerRowVisible(row)) return false;
+  const items = getChatComposerItems(row);
+  if (!items.length) return false;
+  refreshChatComposerRovingTabindex(row, items[0]);
+  items[0].focus();
+  if (items[0]?.id === 'chat-input' && typeof items[0].setSelectionRange === 'function') {
+    try {
+      const len = (items[0].value || '').length;
+      items[0].setSelectionRange(len, len);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+  return true;
+}
+
+/** Focus last composer control (Send). Used by footer ← composer chain. */
+function focusChatComposerLast() {
+  const row = document.querySelector('.chat-input-container');
+  if (!isChatComposerRowVisible(row)) return false;
+  const items = getChatComposerItems(row);
+  if (!items.length) return false;
+  const target = items[items.length - 1];
+  refreshChatComposerRovingTabindex(row, target);
+  target.focus();
+  return true;
+}
+
 function ensureChatComposerKbHint(container) {
   const row = container || document.querySelector('.chat-input-container');
   if (!row) return;
@@ -2519,9 +2564,17 @@ function ensureChatComposerKbHint(container) {
   const items = getChatComposerItems(row);
   hint.hidden = items.length < 2;
   const hasStarters = getChatEmptySuggestionChips().length > 0;
-  hint.textContent = hasStarters
-    ? '← → / h l · Home/End move · Enter sends · at start crosses to starter chips · Clear / Send on button'
-    : '← → / h l · Home/End move · Enter sends from input · Clear / Send on button';
+  const hasMessages = visibleChatMessages(document.getElementById('chat-messages')).length > 0;
+  if (hasStarters) {
+    hint.textContent =
+      '← → / h l · Home/End move · Enter sends · at start crosses to starter chips · last → footer · Clear / Send on button';
+  } else if (hasMessages) {
+    hint.textContent =
+      '← → / h l · Home/End move · Enter sends · at start crosses to last message · last → footer · Clear / Send on button';
+  } else {
+    hint.textContent =
+      '← → / h l · Home/End move · Enter sends from input · Clear / Send on button';
+  }
 }
 
 /**
@@ -2571,12 +2624,29 @@ function ensureChatComposerToolbarKeyboard() {
       if (active?.id === 'chat-input' && !chatComposerInputAtMoveBoundary(active, 1)) {
         return;
       }
+      if (
+        idx === items.length - 1 &&
+        typeof window.tryChainFilterChipToFooterFirst === 'function' &&
+        window.tryChainFilterChipToFooterFirst()
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       next = Math.min(idx + 1, items.length - 1);
     } else if (back) {
       if (active?.id === 'chat-input' && !chatComposerInputAtMoveBoundary(active, -1)) {
         return;
       }
       if (idx === 0 && focusChatEmptySuggestionLast()) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      if (
+        idx === 0 &&
+        focusChatMessagesLast(document.getElementById('chat-messages'))
+      ) {
         e.preventDefault();
         e.stopPropagation();
         return;
@@ -2786,4 +2856,6 @@ window.Ollama = {
 
 window.focusChatEmptySuggestionFirst = focusChatEmptySuggestionFirst;
 window.focusChatEmptySuggestionLast = focusChatEmptySuggestionLast;
+window.focusChatComposerFirst = focusChatComposerFirst;
+window.focusChatComposerLast = focusChatComposerLast;
 window.refreshChatComposerRovingTabindex = refreshChatComposerRovingTabindex;
