@@ -5774,6 +5774,7 @@ async function removeMonitorFromListRow(item) {
 
 function wireMonitorRemoveDelegation() {
   const settingsList = document.getElementById('monitors-settings-list');
+  ensureMonitorSettingsListKeyboard();
   if (!settingsList || settingsList.dataset.removeDelegation === '1') return;
   settingsList.dataset.removeDelegation = '1';
   settingsList.addEventListener('click', (e) => {
@@ -6653,7 +6654,129 @@ function ensureMonitorAddFormToolbarKbHint(wrap) {
   const items = getMonitorAddFormToolbarItems(form);
   hint.hidden = items.length < 2;
   hint.textContent =
-    '← → / h l · Home/End move · Enter adds from URL · buttons keep activate';
+    '← → / h l · Home/End move · list ↓ → URL · URL ← list · Add Monitor → footer · Enter adds from URL';
+}
+
+function isMonitorsSettingsPopoverOpen() {
+  const popover = document.getElementById('monitors-settings-popover');
+  if (!popover || popover.style.display === 'none') return false;
+  try {
+    return popover.getClientRects().length > 0;
+  } catch (_) {
+    return false;
+  }
+}
+
+function isMonitorAddFormVisible() {
+  const form = document.getElementById('add-monitor-form');
+  return !!(form && form.style.display !== 'none');
+}
+
+/** Focusable Remove / empty CTA rows in Monitor Settings list. */
+function getMonitorSettingsListFocusables() {
+  const settingsList = document.getElementById('monitors-settings-list');
+  if (!settingsList) return [];
+  return Array.from(
+    settingsList.querySelectorAll('.monitor-remove-btn, .monitors-empty-cta')
+  ).filter((el) => {
+    if (!el || el.hidden || el.disabled) return false;
+    try {
+      return el.getClientRects().length > 0;
+    } catch (_) {
+      return true;
+    }
+  });
+}
+
+function focusMonitorSettingsListLast() {
+  const items = getMonitorSettingsListFocusables();
+  if (!items.length) return false;
+  items[items.length - 1].focus();
+  if (typeof items[items.length - 1].scrollIntoView === 'function') {
+    items[items.length - 1].scrollIntoView({ block: 'nearest' });
+  }
+  return true;
+}
+
+/** Show add form (if hidden) and focus URL input (settings list → add-form chain). */
+function focusMonitorAddFormUrlInput() {
+  const addForm = document.getElementById('add-monitor-form');
+  const urlInput = document.getElementById('monitor-url-input');
+  if (!addForm || !urlInput) return false;
+  addForm.style.display = 'block';
+  ensureMonitorAddFormToolbarKeyboard(addForm);
+  refreshMonitorAddFormToolbarRovingTabindex(addForm, urlInput);
+  urlInput.focus();
+  if (typeof urlInput.setSelectionRange === 'function') {
+    const len = (urlInput.value || '').length;
+    urlInput.setSelectionRange(len, len);
+  }
+  return true;
+}
+
+function focusMonitorAddFormSaveButton() {
+  const addForm = document.getElementById('add-monitor-form');
+  if (!addForm || !isMonitorAddFormVisible()) return false;
+  ensureMonitorAddFormToolbarKeyboard(addForm);
+  const items = getMonitorAddFormToolbarItems(addForm);
+  if (!items.length) return false;
+  const save = items[items.length - 1];
+  refreshMonitorAddFormToolbarRovingTabindex(addForm, save);
+  save.focus();
+  return true;
+}
+
+function tryChainMonitorSettingsListToAddFormFirst() {
+  if (!isMonitorsSettingsPopoverOpen()) return false;
+  return focusMonitorAddFormUrlInput();
+}
+
+function tryChainMonitorAddFormToSettingsListLast() {
+  if (!isMonitorsSettingsPopoverOpen()) return false;
+  return focusMonitorSettingsListLast();
+}
+
+function tryChainFooterVersionToMonitorAddFormSaveLast() {
+  if (!isMonitorsSettingsPopoverOpen()) return false;
+  if (isMonitorAddFormVisible() && focusMonitorAddFormSaveButton()) return true;
+  return focusMonitorSettingsListLast();
+}
+
+window.tryChainFooterVersionToMonitorAddFormSaveLast =
+  tryChainFooterVersionToMonitorAddFormSaveLast;
+
+/**
+ * Settings list ↓ → add form; empty CTA included (add-form ↔ list chain).
+ */
+function ensureMonitorSettingsListKeyboard() {
+  const settingsList = document.getElementById('monitors-settings-list');
+  if (!settingsList || settingsList.dataset.settingsListKbWired === '1') return;
+  settingsList.dataset.settingsListKbWired = '1';
+  settingsList.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const items = getMonitorSettingsListFocusables();
+    if (!items.length) return;
+    const idx = items.indexOf(document.activeElement);
+    if (idx < 0) return;
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (
+        idx === items.length - 1 &&
+        tryChainMonitorSettingsListToAddFormFirst()
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    } else if (e.key === 'ArrowUp' || e.key === 'k') {
+      if (idx === 0) {
+        const addBtn = document.getElementById('monitors-add-btn');
+        if (addBtn && addBtn.getClientRects().length > 0) {
+          addBtn.focus();
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }
+    }
+  });
 }
 
 /**
@@ -6712,12 +6835,29 @@ function ensureMonitorAddFormToolbarKeyboard(wrap) {
       ) {
         return;
       }
+      if (
+        idx === items.length - 1 &&
+        typeof tryChainFilterChipToFooterFirst === 'function' &&
+        tryChainFilterChipToFooterFirst()
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       next = Math.min(idx + 1, items.length - 1);
     } else if (back) {
       if (
         active?.id === 'monitor-url-input' &&
         !monitorUrlInputAtMoveBoundary(active, -1)
       ) {
+        return;
+      }
+      if (
+        idx === 0 &&
+        tryChainMonitorAddFormToSettingsListLast()
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
         return;
       }
       next = Math.max(idx - 1, 0);
@@ -15475,6 +15615,12 @@ function tryChainFooterVersionToChangelogWhenOpen() {
     typeof window.tryChainFooterVersionToChangelogBodyLast === "function"
   ) {
     return window.tryChainFooterVersionToChangelogBodyLast();
+  }
+  if (
+    typeof tryChainFooterVersionToMonitorAddFormSaveLast === 'function' &&
+    tryChainFooterVersionToMonitorAddFormSaveLast()
+  ) {
+    return true;
   }
   if (tryChainFooterVersionToOllamaSettingsSaveLast()) {
     return true;

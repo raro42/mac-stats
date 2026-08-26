@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.655] - 2026-08-26
+
+### Added
+- **Monitors add-form↔settings-list toolbar chain** — last settings Remove (or empty CTA) ↓ crosses to the add URL field; URL ← at input start crosses back to the list; Add Monitor → footer; footer ← prefers Add Monitor when Monitor Settings is open.
+
 ## [0.1.654] - 2026-08-26
 
 ### Added

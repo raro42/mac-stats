@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.655** — Monitors add-form↔settings-list toolbar chain (last Remove/CTA ↓ → URL; URL ← list; Add Monitor → footer; footer ← when Settings open).
+
 - **v0.1.654** — Monitors list↔detail toolbar chain (open row ↓ → Check now; Check now ← row; Remove → footer; footer ← Remove when detail open).
 
 - **v0.1.653** — Debug Log lines↔toolbar chain (last line ↓ → Refresh; Refresh ← last line; Auto-refresh → footer; footer ← Auto-refresh when logs open).
