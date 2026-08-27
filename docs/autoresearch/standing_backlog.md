@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.675** — Power strip↔Details collapsed glance toolbar chain (strip last ↓ → glance; glance ↑ → strip · ↓ → processes; keep-header collapse shows glance).
+
 - **v0.1.674** — History sparkline↔Top Processes filter toolbar chain (last chart ↓ → first filter chip; filter first ↑ → last chart).
 
 - **v0.1.673** — Ring gauge↔Top Processes filter toolbar chain (temperature ring ↓ → first filter chip; filter first ↑ → temperature ring).

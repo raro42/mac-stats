@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.675] - 2026-08-27
+
+### Added
+- **Power strip↔Details collapsed glance toolbar chain** — power strip last ↓ → Details glance when the grid is collapsed; glance ↑ → power strip · ↓ → Top Processes; Details keep-header collapse now shows the glance (grid hides only).
+
 ## [0.1.674] - 2026-08-27
 
 ### Added

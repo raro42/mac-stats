@@ -723,6 +723,63 @@ function tryChainProcessesFilterToSparklineLast() {
   return true;
 }
 
+/** Details collapsed glance is visible (keep-header collapse; section not fully hidden). */
+function isDetailsCollapsedGlanceVisible() {
+  if (isDetailsSectionFullyHidden()) return false;
+  if (!isDetailsSectionCollapsed()) return false;
+  const glance = document.getElementById('details-collapsed-glance');
+  return !!(
+    glance &&
+    !glance.hidden &&
+    (glance.getClientRects().length > 0 || glance.offsetParent !== null)
+  );
+}
+
+function focusDetailsCollapsedGlance() {
+  if (!isDetailsCollapsedGlanceVisible()) return false;
+  const glance = document.getElementById('details-collapsed-glance');
+  glance.focus();
+  return true;
+}
+
+/** Power strip last ↓ → Details collapsed glance when the grid is collapsed. */
+function tryChainPowerStripToDetailsGlance() {
+  return focusDetailsCollapsedGlance();
+}
+
+/** Details collapsed glance ↑ → last power-strip chip. */
+function tryChainDetailsGlanceToPowerStripLast() {
+  const chips = getPowerStripChips();
+  if (!chips.length) return false;
+  const target = chips[chips.length - 1];
+  refreshPowerStripRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+/** Details collapsed glance ↓ → Top Processes filter chips or collapsed glances. */
+function tryChainDetailsGlanceToProcesses() {
+  if (focusProcessesFilterChipFirst()) return true;
+  for (const id of [
+    'processes-top-glance',
+    'processes-top-gpu-glance',
+    'processes-top-ram-glance',
+  ]) {
+    const el = document.getElementById(id);
+    if (el && !el.hidden && el.tabIndex >= 0) {
+      el.focus();
+      return true;
+    }
+  }
+  return focusProcessListFirst();
+}
+
+/** Details grid last when open; collapsed glance when keep-header collapsed. */
+function focusDetailsSectionKeyboardTarget() {
+  if (isDetailsSectionOpen()) return focusDetailsGridLast();
+  return focusDetailsCollapsedGlance();
+}
+
 /** CPU header Refresh first ← → Top Processes filter chips when section is open. */
 function tryChainCpuHeaderRefreshToProcessesFilter() {
   return focusProcessesFilterChipFirst();
@@ -2020,7 +2077,7 @@ async function refresh() {
               if (idx === rows.length - 1 && tryChainSectionContentToFooter(list)) return;
               next = Math.min(idx + 1, rows.length - 1);
             } else if (e.key === "ArrowUp" || e.key === "k") {
-              if (idx === 0 && focusDetailsGridLast()) {
+              if (idx === 0 && focusDetailsSectionKeyboardTarget()) {
                 e.preventDefault();
                 return;
               }
@@ -2804,7 +2861,7 @@ function ensurePowerStripKbHint() {
     strip.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click Bat · LPM · Power · ← → / h l · Home/End · at start crosses to last history chart · at end crosses to section icons · LPM toggles (password may be required)';
+    'Tab or click Bat · LPM · Power · ← → / h l · Home/End · at start crosses to last history chart · at end ↓ crosses to Details glance (when collapsed) or section icons · LPM toggles (password may be required)';
 }
 
 /**
@@ -2837,13 +2894,21 @@ function ensurePowerStripKeyboard() {
           e.key === 'l' ||
           e.key === 'ArrowDown' ||
           e.key === 'j';
+        const downOnly = e.key === 'ArrowDown' || e.key === 'j';
         if (back && idx === 0) {
           if (tryChainPowerStripToSparklineLast()) {
             e.preventDefault();
             e.stopPropagation();
           }
         } else if (forward && idx === chips.length - 1) {
-          if (tryChainPowerStripToIconLineFirst()) {
+          if (
+            downOnly &&
+            isDetailsCollapsedGlanceVisible() &&
+            tryChainPowerStripToDetailsGlance()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (tryChainPowerStripToIconLineFirst()) {
             e.preventDefault();
             e.stopPropagation();
           }
@@ -3731,6 +3796,9 @@ function tryChainFooterToSectionContentLast() {
   }
   if (isProcessDetailsModalOpen()) {
     if (tryChainProcessDetailsHeaderToForceQuitLast()) return true;
+  }
+  if (isDetailsCollapsedGlanceVisible() && focusDetailsCollapsedGlance()) {
+    return true;
   }
   if (
     typeof window.focusChatComposerLast === 'function' &&
@@ -10252,17 +10320,33 @@ function initDetailsGridKeyboard() {
   wireDetailsGridKeyboard(grid);
 }
 
-/** Details section collapsed (keep-header + glance; Top Processes / Debug Log parity). */
-function isDetailsSectionCollapsed() {
-  const section =
+function getDetailsSectionElement() {
+  return (
     document.getElementById("details-section") ||
     document.querySelector(
       ".apple-details, .arch-details, .swiss-details, .mat-details, .cpu-details, .details-section"
-    );
-  return !!(
-    section &&
-    (section.classList.contains("collapsed") || section.style.display === "none")
+    )
   );
+}
+
+/** Details section fully hidden (usage-card hide or compact layout). */
+function isDetailsSectionFullyHidden() {
+  const section = getDetailsSectionElement();
+  return !!(section && section.style.display === "none");
+}
+
+/** Details section collapsed (keep-header + glance; Top Processes / Debug Log parity). */
+function isDetailsSectionCollapsed() {
+  if (isDetailsSectionFullyHidden()) return true;
+  const content = document.getElementById("details-content");
+  if (
+    content &&
+    (content.classList.contains("collapsed") || content.style.display === "none")
+  ) {
+    return true;
+  }
+  const section = getDetailsSectionElement();
+  return !!(section && section.classList.contains("collapsed"));
 }
 
 function ensureDetailsCollapsedGlance() {
@@ -10293,8 +10377,11 @@ function applyDetailsCollapsedGlanceState({ load1, ramPct, uptime, waiting }) {
       if (text) text.textContent = "Waiting · details";
       glance.setAttribute("role", "button");
       glance.tabIndex = 0;
-      glance.title = "Show Details";
-      glance.setAttribute("aria-label", "Details waiting — click to expand");
+      glance.title = "Show Details · ↑ → power strip · ↓ → Top Processes";
+      glance.setAttribute(
+        "aria-label",
+        "Details waiting — click to expand · ↑ power strip · ↓ Top Processes"
+      );
       return;
     }
     glance.hidden = true;
@@ -10319,10 +10406,10 @@ function applyDetailsCollapsedGlanceState({ load1, ramPct, uptime, waiting }) {
   glance.classList.toggle("is-hot", hot);
   glance.setAttribute("role", "button");
   glance.tabIndex = 0;
-  glance.title = "Show Details";
+  glance.title = "Show Details · ↑ → power strip · ↓ → Top Processes";
   glance.setAttribute(
     "aria-label",
-    `Details Load ${loadStr}, RAM ${ramStr}, uptime ${upStr} — click to expand`
+    `Details Load ${loadStr}, RAM ${ramStr}, uptime ${upStr} — click to expand · ↑ power strip · ↓ Top Processes`
   );
 }
 
@@ -10385,10 +10472,26 @@ function wireDetailsCollapsedGlanceClick(glance) {
     activate();
   });
   glance.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    e.preventDefault();
-    e.stopPropagation();
-    activate();
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+      return;
+    }
+    if (e.key === "ArrowUp" || e.key === "k") {
+      if (tryChainDetailsGlanceToPowerStripLast()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      return;
+    }
+    if (e.key === "ArrowDown" || e.key === "j") {
+      if (tryChainDetailsGlanceToProcesses()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
   });
 }
 
@@ -10429,18 +10532,45 @@ function initCollapsibleSections() {
     );
   }
 
-  // Collapse Details: fully hidden (icon-line / CPU card toggles).
+  // Collapse Details: keep header + glance; hide grid (Top Processes / Debug Log parity).
   function hideDetails() {
+    const content = document.getElementById("details-content");
+    if (detailsSection) {
+      detailsSection.classList.add("collapsed");
+      detailsSection.style.display = "";
+      detailsSection.removeAttribute("aria-hidden");
+    }
+    if (content) {
+      content.classList.add("collapsed");
+      content.style.display = "none";
+      content.setAttribute("aria-hidden", "true");
+    }
+    if (detailsDivider && isDivider(detailsDivider)) {
+      detailsDivider.style.display = "";
+    }
+    syncDetailsCollapseA11y();
+    refreshDetailsCollapsedGlanceFromDom();
+  }
+
+  // Fully hide Details (usage-card hide / compact layout).
+  function hideDetailsFully() {
     if (detailsSection) {
       detailsSection.classList.add("collapsed");
       detailsSection.style.display = "none";
       detailsSection.setAttribute("aria-hidden", "true");
     }
+    const content = document.getElementById("details-content");
+    if (content) {
+      content.classList.add("collapsed");
+      content.style.display = "none";
+      content.setAttribute("aria-hidden", "true");
+    }
     if (detailsDivider && isDivider(detailsDivider)) {
       detailsDivider.style.display = "none";
     }
     syncDetailsCollapseA11y();
-    refreshDetailsCollapsedGlanceFromDom();
+    const glance = document.getElementById("details-collapsed-glance");
+    if (glance) glance.hidden = true;
   }
   
   // Show Details section (full grid)
@@ -10449,6 +10579,12 @@ function initCollapsibleSections() {
       detailsSection.classList.remove("collapsed");
       detailsSection.style.display = "";
       detailsSection.removeAttribute("aria-hidden");
+    }
+    const content = document.getElementById("details-content");
+    if (content) {
+      content.classList.remove("collapsed");
+      content.style.display = "";
+      content.removeAttribute("aria-hidden");
     }
     if (detailsDivider && isDivider(detailsDivider)) {
       detailsDivider.style.display = "";
@@ -10515,7 +10651,7 @@ function initCollapsibleSections() {
   
   // Hide both sections (Details fully; Processes keep-header)
   function hideSections() {
-    hideDetails();
+    hideDetailsFully();
     hideProcesses();
     setSectionCollapsed('details_processes_collapsed', true);
   }
