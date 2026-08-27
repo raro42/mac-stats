@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.684] - 2026-08-27
+
+### Fixed
+- **Monitors keep-header** — collapsing External / Monitors no longer hides the whole pane; header + up/down glance stay visible (Disk Cleanup / Debug Log / Perplexity parity). Compact CPU window still fully hides.
+
 ## [0.1.683] - 2026-08-27
 
 ### Fixed

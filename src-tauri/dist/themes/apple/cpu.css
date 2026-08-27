@@ -1719,10 +1719,9 @@ body {
   padding: 0;
 }
 
-/* Monitors Section */
+/* Monitors Section — keep header + collapsed glance (agent-ops.css SoT; Disk Cleanup parity). */
 .monitors-section.collapsed {
-  /* Hide the entire monitors section when collapsed */
-  display: none;
+  display: block;
 }
 
 /* Ollama Section */

@@ -1255,7 +1255,8 @@ body {
 }
 
 .monitors-section.collapsed {
-  display: none;
+  /* Keep header + collapsed glance (agent-ops.css SoT). */
+  display: block;
 }
 
 .ollama-section.collapsed {

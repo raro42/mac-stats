@@ -5794,11 +5794,27 @@ function initMonitorsSection() {
   updateMonitorsStatusDot();
 
   // Make header clickable/keyboardable to toggle collapse/expand
+  const monitorsIcon = document.getElementById('icon-monitors');
+  if (monitorsIcon && !monitorsIcon.getAttribute('data-title-base')) {
+    monitorsIcon.setAttribute('data-title-base', monitorsIcon.title || 'External / Monitors');
+  }
+
   const applyMonitorsCollapsed = () => {
     const section = document.querySelector('.monitors-section');
     const divider = document.getElementById('monitors-ollama-divider');
 
-    setIconPaneVisibility(section, content, monitorsCollapsed, divider);
+    // Keep-header: section stays visible with collapsed glance; only content hides.
+    // Compact mode still fully hides via collapseSectionByIds → setIconPaneVisibility.
+    if (section) {
+      section.style.display = '';
+      section.classList.toggle('collapsed', monitorsCollapsed);
+      section.removeAttribute('aria-hidden');
+    }
+    if (divider) divider.style.display = monitorsCollapsed ? 'none' : '';
+    if (content) {
+      content.classList.toggle('collapsed', monitorsCollapsed);
+      content.style.display = monitorsCollapsed ? 'none' : '';
+    }
 
     if (monitorsCollapsed) {
       // Keep a light summary poll so the collapsed glance stays fresh (no list rebuild).
@@ -5825,6 +5841,12 @@ function initMonitorsSection() {
     updateMonitorsStatusDot();
     header.setAttribute('aria-expanded', String(!monitorsCollapsed));
     syncSectionIcon('icon-monitors', !monitorsCollapsed);
+    const iconEl = document.getElementById('icon-monitors');
+    if (iconEl) {
+      iconEl.title = monitorsCollapsed
+        ? 'External / Monitors · ↓ → glance'
+        : iconEl.getAttribute('data-title-base') || 'Hide External / Monitors';
+    }
     syncMonitorsCollapsedGlance();
   };
   applyMonitorsCollapsed();
@@ -5832,7 +5854,7 @@ function initMonitorsSection() {
   wireCollapsibleHeaderA11y(header, {
     contentId: 'monitors-content',
     getExpanded: () => !monitorsCollapsed,
-    ignoreSelector: '#monitors-menu-btn',
+    ignoreSelector: '#monitors-menu-btn, #monitors-collapsed-glance',
     onToggle: () => {
       monitorsCollapsed = !monitorsCollapsed;
       saveMonitorsCollapsedState(monitorsCollapsed);
@@ -5848,6 +5870,9 @@ function initMonitorsSection() {
     const clickedElement = e.target;
     if (menuBtn && (clickedElement === menuBtn || clickedElement.closest && clickedElement.closest('#monitors-menu-btn'))) {
       return; // Let menu button handle its own click (opens settings)
+    }
+    if (e.target.closest && e.target.closest('#monitors-collapsed-glance')) {
+      return;
     }
 
     // Toggle collapse state when clicking anywhere else on the header (including title text)
@@ -6450,11 +6475,22 @@ function ensureMonitorsSectionExpanded() {
   const section = document.querySelector('.monitors-section');
   const header = document.getElementById('monitors-header');
   const divider = document.getElementById('monitors-ollama-divider');
-  content?.classList.remove('collapsed');
-  section?.classList.remove('collapsed');
+  if (section) {
+    section.style.display = '';
+    section.classList.remove('collapsed');
+    section.removeAttribute('aria-hidden');
+  }
+  if (content) {
+    content.classList.remove('collapsed');
+    content.style.display = '';
+  }
   if (divider) divider.style.display = '';
   header?.setAttribute('aria-expanded', 'true');
   syncSectionIcon('icon-monitors', true);
+  const iconEl = document.getElementById('icon-monitors');
+  if (iconEl) {
+    iconEl.title = iconEl.getAttribute('data-title-base') || 'Hide External / Monitors';
+  }
   updateMonitorsHeight();
   syncMonitorsCollapsedGlance();
   if (!monitorsUpdateInterval) {

@@ -60,6 +60,7 @@ We keep a local SVG because the public Star History embed needs a sealed token a
 
 ## Refresh log
 
+- **2026-08-27 (~23:35):** Monitors keep-header (v0.1.684). Recapture of `feature-monitors.png` deferred if Screen Recording TCC / no on-screen CPU window; prior Aug 14 asset kept; polish grace marked.
 - **2026-08-27 (~23:10):** Agent Ops keep-header + Discord Ready glance toolbar chain (v0.1.683). Recapture of `feature-agent-ops.png` deferred if Screen Recording TCC / no on-screen CPU window; prior Aug 12 asset kept; polish grace marked.
 - **2026-08-27 (~22:06):** Disk Cleanup keep-header (v0.1.681). Recapture of `feature-disk-cleanup.png` deferred if Screen Recording TCC / no on-screen CPU window; prior Aug 13 asset kept; polish grace marked.
 - **2026-08-26 (~05:25):** AI Chat empty title + starter-chip toolbar keyboard (v0.1.650). Recapture of `feature-ai-chat.png` attempted; if Screen Recording TCC / no on-screen CPU window blocks Quartz/`screencapture -l`, prior Aug 14 asset kept; polish grace marked.

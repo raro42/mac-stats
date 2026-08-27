@@ -2552,6 +2552,17 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.85;
 }
 
+/* External / Monitors keep-header: show header + collapsed glance when collapsed (all themes).
+   Compact mode still fully hides via inline display:none from setIconPaneVisibility. */
+.monitors-section.collapsed {
+  display: block;
+}
+
+.monitors-section.collapsed .monitors-summary {
+  /* Glance under header carries the status when collapsed. */
+  display: none;
+}
+
 /* External / Monitors — collapsed glance under header (Debug Log / Perplexity parity) */
 .monitors-collapsed-glance {
   display: flex;
