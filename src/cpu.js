@@ -9223,12 +9223,28 @@ function initOllamaSection() {
     });
   }
 
+  const ollamaIcon = document.getElementById('icon-ollama');
+  if (ollamaIcon && !ollamaIcon.getAttribute('data-title-base')) {
+    ollamaIcon.setAttribute('data-title-base', ollamaIcon.title || 'AI Chat');
+  }
+
   const applyOllamaCollapsed = () => {
     const section = document.querySelector('.ollama-section');
     const divider = document.getElementById('monitors-ollama-divider');
     const chat = document.getElementById('ollama-chat');
 
-    setIconPaneVisibility(section, content, ollamaCollapsed, divider);
+    // Keep-header: section stays visible with collapsed glance; only content hides.
+    // Compact mode still fully hides via collapseSectionByIds → setIconPaneVisibility.
+    if (section) {
+      section.style.display = '';
+      section.classList.toggle('collapsed', ollamaCollapsed);
+      section.removeAttribute('aria-hidden');
+    }
+    if (divider) divider.style.display = ollamaCollapsed ? 'none' : '';
+    if (content) {
+      content.classList.toggle('collapsed', ollamaCollapsed);
+      content.style.display = ollamaCollapsed ? 'none' : '';
+    }
 
     if (ollamaCollapsed) {
       if (chat) chat.style.display = 'none';
@@ -9265,10 +9281,17 @@ function initOllamaSection() {
     setSectionCollapsed('ollama_collapsed', ollamaCollapsed);
     if (header._syncCollapseA11y) header._syncCollapseA11y();
     syncSectionIcon('icon-ollama', !ollamaCollapsed);
+    const iconEl = document.getElementById('icon-ollama');
+    if (iconEl) {
+      iconEl.title = ollamaCollapsed
+        ? 'AI Chat · ↓ → glance'
+        : iconEl.getAttribute('data-title-base') || 'Hide AI Chat';
+    }
     if (window.Ollama && typeof window.Ollama.syncCollapsedGlance === 'function') {
       window.Ollama.syncCollapsedGlance();
     }
   };
+  applyOllamaCollapsed();
 
   wireCollapsibleHeaderA11y(header, {
     contentId: 'ollama-content',

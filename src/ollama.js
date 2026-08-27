@@ -658,9 +658,14 @@ function ensureOllamaSectionExpanded() {
   const section = document.querySelector('.ollama-section');
   const header = document.getElementById('ollama-header');
   if (!content) return;
-  if (!content.classList.contains('collapsed')) return;
+  if (!content.classList.contains('collapsed') && content.style.display !== 'none') return;
+  if (section) {
+    section.style.display = '';
+    section.classList.remove('collapsed');
+    section.removeAttribute('aria-hidden');
+  }
   content.classList.remove('collapsed');
-  section?.classList.remove('collapsed');
+  content.style.display = '';
   const divider = document.getElementById('monitors-ollama-divider');
   if (divider) divider.style.display = '';
   if (typeof window.setSectionCollapsed === 'function') {
@@ -673,6 +678,10 @@ function ensureOllamaSectionExpanded() {
   if (typeof header?._syncCollapseA11y === 'function') header._syncCollapseA11y();
   if (typeof window.syncSectionIcon === 'function') {
     window.syncSectionIcon('icon-ollama', true);
+  }
+  const iconEl = document.getElementById('icon-ollama');
+  if (iconEl) {
+    iconEl.title = iconEl.getAttribute('data-title-base') || 'Hide AI Chat';
   }
   const chat = document.getElementById('ollama-chat');
   if (chat) chat.style.display = 'block';

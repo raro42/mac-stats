@@ -1273,7 +1273,8 @@ body::before {
 }
 
 .ollama-section.collapsed {
-  display: none;
+  /* Keep header + collapsed glance (agent-ops.css SoT). */
+  display: block;
 }
 
 .monitors-summary {

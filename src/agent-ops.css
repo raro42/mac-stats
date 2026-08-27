@@ -2921,6 +2921,12 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.85;
 }
 
+/* AI Chat keep-header: show header + collapsed glance when collapsed (all themes).
+   Compact mode still fully hides via inline display:none from setIconPaneVisibility. */
+.ollama-section.collapsed {
+  display: block;
+}
+
 /* AI Chat — collapsed glance under header (Monitors / Disk Cleanup parity) */
 .ollama-collapsed-glance {
   display: flex;

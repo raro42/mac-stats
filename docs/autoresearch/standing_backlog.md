@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.685** — AI Chat keep-header restored (collapsed Ready/turns glance stays visible; Monitors / Disk Cleanup / Debug Log / Perplexity / Agent Ops parity).
+
 - **v0.1.684** — Monitors keep-header restored (collapsed up/down glance stays visible; Disk Cleanup / Debug Log / Perplexity / Agent Ops parity).
 
 - **v0.1.683** — Agent Ops keep-header restored + Discord Ready glance↔icon↔footer toolbar chain (collapsed glance stays visible; Debug Log / Disk Cleanup / Perplexity parity).

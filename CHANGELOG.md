@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.685] - 2026-08-28
+
+### Fixed
+- **AI Chat keep-header** — collapsing AI Chat no longer hides the whole pane; header + Ready/turns glance stay visible (Monitors / Disk Cleanup / Debug Log / Perplexity / Agent Ops parity). Compact CPU window still fully hides.
+
 ## [0.1.684] - 2026-08-27
 
 ### Fixed

@@ -1726,8 +1726,8 @@ body {
 
 /* Ollama Section */
 .ollama-section.collapsed {
-  /* Hide the entire ollama section when collapsed */
-  display: none;
+  /* Keep header + collapsed glance (agent-ops.css SoT). */
+  display: block;
 }
 
 /* Perplexity Search section — keep header + last-search glance (agent-ops.css) */
