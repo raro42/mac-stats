@@ -6,6 +6,7 @@
 
 | Version | What |
 |---------|------|
+| **v0.1.676** | Top Processes collapsed glances↔Details↔footer toolbar chain — first glance ↑ → Details collapsed glance; last ↓ → footer; ↑/↓ across Top CPU · GPU · RAM glances; footer ↑ → last processes glance |
 | **v0.1.675** | Power strip↔Details collapsed glance toolbar chain — strip last ↓ → Details glance when grid collapsed; glance ↑ → power strip · ↓ → Top Processes; Details header collapse keeps header + glance (grid only hides) |
 | **v0.1.674** | History sparkline↔Top Processes filter toolbar chain — last chart ↓ → first filter chip; filter first ↑ → last chart |
 | **v0.1.673** | Ring gauge↔Top Processes filter toolbar chain — temperature ring ↓ → first filter chip; filter first ↑ → temperature ring |
@@ -25,7 +26,7 @@
 
 - Digester open (no Slowest candidates).
 - Design review not due (grace on feature screens).
-- Standing backlog / morning-surprise next: power-strip↔Details collapsed glance.
+- Standing backlog: collapsed glances↔footer toolbar wrap (continues v0.1.675 power-strip↔Details chain).
 
 ## Debug log
 
@@ -36,4 +37,4 @@
 
 - p50 direct latency when digester gets samples.
 - Design review when `overnight_design_review.py` says due.
-- More toolbar wrap polish (footer ↔ collapsed glances).
+- More collapsed-glance chains (Monitors · Disk Cleanup · Perplexity ↔ footer).
