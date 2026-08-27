@@ -6,6 +6,7 @@
 
 | Version | What |
 |---------|------|
+| **v0.1.673** | Ring gauge↔Top Processes filter toolbar chain — temperature ring ↓ → first filter chip; filter first ↑ → temperature ring (header Refresh ← still pairs) |
 | **v0.1.672** | Details↔ring gauge toolbar chain — Details first value ↑ → temperature ring; ring first ↑ or last ↓ → Details first when Details is open |
 | **v0.1.671** | Settings Credentials↔header toolbar chain — CPU header Settings ↓ → Discord token; token ↑ → Settings header; Perplexity key ↑ → Perplexity icon |
 | **v0.1.671** | Top Processes filter↔header toolbar chain — filter chips first ↑ → Refresh; Refresh first ← → filter chips when section open |
@@ -23,7 +24,7 @@
 
 - Digester open (no Slowest candidates).
 - Design review not due (grace on feature screens).
-- Standing backlog: keyboard toolbar chain polish (Details↔ring gauge).
+- Standing backlog: keyboard toolbar chain polish (ring gauge↔Top Processes filters).
 
 ## Debug log
 
@@ -32,6 +33,6 @@
 
 ## Next
 
-- Ring gauge ↓ → Top Processes filters (shortcut) or power-strip↔Details glance chain.
+- Power-strip↔Details glance chain or history sparkline↔processes shortcut.
 - p50 direct latency when digester gets samples.
 - Design review when `overnight_design_review.py` says due.
