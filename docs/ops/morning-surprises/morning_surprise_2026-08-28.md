@@ -14,17 +14,18 @@ Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains
 | **v0.1.682** | **Debug Log keep-header** + Quiet/error/warn glance↔icon↔footer toolbar chain |
 | **v0.1.683** | **Agent Ops keep-header** + Discord Ready glance↔icon↔footer toolbar chain (design review) |
 | **v0.1.684** | **Monitors keep-header** — collapsed up/down glance stays visible (design review / Disk Cleanup parity) |
+| **v0.1.685** | **AI Chat keep-header** — collapsed Ready/turns glance stays visible (Monitors / Disk Cleanup / Debug Log / Perplexity / Agent Ops parity) |
 
 ## Why it matters
 
-Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Monitors, Disk Cleanup, Perplexity, Debug Log, and Agent Ops keep the header + glance on screen when collapsed (compact mode still hides). Discord Ready / Offline stays visible without opening Agent Ops. External / Monitors up/down status stays visible without opening the list.
+Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Monitors, Disk Cleanup, Perplexity, Debug Log, Agent Ops, and AI Chat keep the header + glance on screen when collapsed (compact mode still hides). Discord Ready / Offline stays visible without opening Agent Ops. External / Monitors up/down status stays visible without opening the list. AI Chat Ready / turns stay visible without opening the composer.
 
 ## Digester / design review
 
-- Digester **open** empty; design review **due** on stale `feature-monitors.png`.
-- Shipped Monitors keep-header; screenshot recapture deferred if Screen Recording TCC blocks; polish grace marked.
+- Digester **open** empty; design review under grace after Monitors / Agent Ops / Disk Cleanup / AI Chat polish.
+- Shipped AI Chat keep-header; screenshot recapture deferred if Screen Recording TCC blocks; polish grace marked for `feature-ai-chat`.
 
 ## Next fuel
 
-- AI Chat keep-header (same full-hide via `setIconPaneVisibility` if still present).
 - Digester open / debug.log product errors when present.
+- Design review when due again after grace.
