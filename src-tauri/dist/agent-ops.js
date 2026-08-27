@@ -2245,8 +2245,49 @@ function ensureOpsCollapsedGlance() {
 }
 
 function syncOpsCollapsedGlance() {
-    const glance = document.getElementById('agent-ops-collapsed-glance');
-    if (glance) glance.hidden = true;
+    const glance = ensureOpsCollapsedGlance();
+    if (!glance) return;
+    const glanceText = document.getElementById('agent-ops-collapsed-glance-text');
+    if (!agentOpsCollapsed) {
+        glance.hidden = true;
+        return;
+    }
+    const parsed = parseOpsDiscordGateway(opsRunsInsightsCache?.discord_gateway);
+    glance.hidden = false;
+    if (glanceText) glanceText.textContent = parsed.glanceLine;
+    glance.classList.toggle('is-ready', parsed.wash === 'ready');
+    glance.classList.toggle('is-warn', parsed.wash === 'warn');
+    glance.classList.toggle('is-offline', parsed.wash === 'offline');
+    glance.classList.toggle('is-empty', parsed.wash === 'empty');
+    glance.setAttribute('role', 'button');
+    glance.tabIndex = 0;
+    const chainHint = ' · ↑ → Agent Ops icon · ↓ → footer';
+    const chainAria = ' · ↑ Agent Ops icon · ↓ footer';
+    if (parsed.wash === 'offline') {
+        glance.title = `Open Agent Ops — Discord is offline${chainHint}`;
+        glance.setAttribute(
+            'aria-label',
+            `Discord offline — click to expand Agent Ops and preview gateway${chainAria}`
+        );
+    } else if (parsed.wash === 'warn') {
+        glance.title = `Open Agent Ops — Discord reconnect noise${chainHint}`;
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to expand and preview gateway${chainAria}`
+        );
+    } else if (parsed.wash === 'ready') {
+        glance.title = `Show Agent Ops Discord gateway${chainHint}`;
+        glance.setAttribute(
+            'aria-label',
+            `${parsed.glanceLine} — click to expand and preview${chainAria}`
+        );
+    } else {
+        glance.title = `Show Agent Ops${chainHint}`;
+        glance.setAttribute(
+            'aria-label',
+            `Discord status unknown — click to expand Agent Ops${chainAria}`
+        );
+    }
 }
 
 function activateOpsCollapsedGlance() {
@@ -2272,11 +2313,65 @@ function wireOpsCollapsedGlanceClick(glance) {
         activate();
     });
     glance.addEventListener('keydown', (e) => {
-        if (e.key !== 'Enter' && e.key !== ' ') return;
-        e.preventDefault();
-        e.stopPropagation();
-        activate();
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            activate();
+            return;
+        }
+        if (e.key === 'ArrowUp' || e.key === 'k') {
+            if (tryChainOpsGlanceToIconLine()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            return;
+        }
+        if (e.key === 'ArrowDown' || e.key === 'j') {
+            if (tryChainOpsGlanceToFooter()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }
     });
+}
+
+/** Agent Ops Discord glance visible (keep-header collapse; content hidden). */
+function isOpsCollapsedGlanceVisible() {
+    if (!agentOpsCollapsed) return false;
+    const glance = document.getElementById('agent-ops-collapsed-glance');
+    return !!(
+        glance &&
+        !glance.hidden &&
+        glance.tabIndex >= 0 &&
+        (glance.getClientRects().length > 0 || glance.offsetParent !== null)
+    );
+}
+
+function focusOpsCollapsedGlance() {
+    if (!isOpsCollapsedGlanceVisible()) return false;
+    const glance = document.getElementById('agent-ops-collapsed-glance');
+    glance.focus();
+    return true;
+}
+
+/** Agent Ops collapsed glance ↑ → icon-line Agent Ops icon. */
+function tryChainOpsGlanceToIconLine() {
+    const icon = document.getElementById('icon-agent-ops');
+    if (!icon || icon.hidden) return false;
+    if (typeof window.refreshIconLineRovingTabindex === 'function') {
+        window.refreshIconLineRovingTabindex(icon);
+    }
+    icon.focus();
+    return true;
+}
+
+/** Agent Ops collapsed glance ↓ → footer toolbar. */
+function tryChainOpsGlanceToFooter() {
+    if (typeof window.tryChainFilterChipToFooterFirst === 'function') {
+        return window.tryChainFilterChipToFooterFirst();
+    }
+    return false;
 }
 
 function stopOpsGlancePoll() {
@@ -2964,6 +3059,9 @@ function focusOpsSectionFirstOrEmpty() {
 }
 
 function tryChainIconAgentOpsToSectionFirst() {
+    if (agentOpsCollapsed) {
+        return focusOpsCollapsedGlance();
+    }
     if (!isAgentOpsSectionOpen()) return false;
     return focusOpsSectionFirstOrEmpty();
 }
@@ -6742,6 +6840,9 @@ function escapeHtml(s) {
   function syncOpsIcon() {
     const icon = document.getElementById('icon-agent-ops');
     if (!icon) return;
+    if (!icon.getAttribute('data-title-base')) {
+      icon.setAttribute('data-title-base', icon.title || 'Agent Ops');
+    }
     const open = !agentOpsCollapsed;
     if (typeof window.syncSectionIcon === 'function') {
       window.syncSectionIcon('icon-agent-ops', open);
@@ -6751,7 +6852,9 @@ function escapeHtml(s) {
       icon.setAttribute('aria-pressed', open ? 'true' : 'false');
     }
     if (open) icon.classList.remove('status-warning');
-    icon.title = open ? 'Hide Agent Ops' : 'Agent Ops';
+    icon.title = open
+      ? icon.getAttribute('data-title-base') || 'Hide Agent Ops'
+      : 'Agent Ops · ↓ → glance';
   }
 
   function syncOpsIconHealth(redmine) {
@@ -6784,20 +6887,17 @@ function escapeHtml(s) {
     const section = document.getElementById('agent-ops-section') || document.querySelector('.agent-ops-section');
     const content = document.getElementById('agent-ops-content');
     const btn = document.getElementById('agent-ops-collapse-btn');
-    if (typeof window.setIconPaneVisibility === 'function') {
-      window.setIconPaneVisibility(section, content, collapsed, null);
+    const compact = document.body.classList.contains('cpu-window-compact');
+    // Compact CPU window: full-hide (setIconPaneVisibility). Otherwise keep-header.
+    if (compact && collapsed && typeof window.setIconPaneVisibility === 'function') {
+      window.setIconPaneVisibility(section, content, true, null);
     } else if (section) {
+      section.style.display = '';
       section.classList.toggle('collapsed', collapsed);
-      section.style.display = collapsed ? 'none' : '';
-      if (collapsed) section.setAttribute('aria-hidden', 'true');
-      else section.removeAttribute('aria-hidden');
+      section.removeAttribute('aria-hidden');
       if (content) {
         content.classList.toggle('collapsed', collapsed);
-        if (content.classList.contains('section-content-collapsible')) {
-          content.style.display = collapsed ? 'none' : 'block';
-        } else {
-          content.style.display = collapsed ? 'none' : '';
-        }
+        content.style.display = collapsed ? 'none' : '';
       }
     }
     if (btn) btn.textContent = collapsed ? '+' : '−';
@@ -6815,7 +6915,18 @@ function escapeHtml(s) {
     }
     if (collapsed) {
       stopAgentOpsAutoRefresh();
+      if (!compact) startOpsGlancePoll();
     } else {
+      // Keep-header expand: clear any prior full-hide inline styles (compact).
+      if (section) {
+        section.style.display = '';
+        section.classList.remove('collapsed');
+        section.removeAttribute('aria-hidden');
+      }
+      if (content) {
+        content.classList.remove('collapsed');
+        content.style.display = '';
+      }
       restoreAgentOpsTab();
       refreshAgentOps();
       startAgentOpsAutoRefresh();
@@ -7095,4 +7206,6 @@ function escapeHtml(s) {
 
   window.tryChainIconAgentOpsToSectionFirst = tryChainIconAgentOpsToSectionFirst;
   window.tryChainAgentOpsSectionToIconLine = tryChainAgentOpsSectionToIconLine;
+  window.isOpsCollapsedGlanceVisible = isOpsCollapsedGlanceVisible;
+  window.focusOpsCollapsedGlance = focusOpsCollapsedGlance;
 })();

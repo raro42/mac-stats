@@ -1747,7 +1747,8 @@ body {
 }
 
 .agent-ops-section.collapsed {
-  display: none;
+  /* Keep header + Discord Ready glance (agent-ops.css SoT; Disk Cleanup/logs parity). */
+  display: block;
 }
 .perplexity-config-status {
   font-size: 12px;

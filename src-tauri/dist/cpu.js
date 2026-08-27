@@ -3843,6 +3843,14 @@ function tryChainFooterToSectionContentLast() {
   ) {
     return true;
   }
+  if (
+    typeof window.isOpsCollapsedGlanceVisible === 'function' &&
+    window.isOpsCollapsedGlanceVisible() &&
+    typeof window.focusOpsCollapsedGlance === 'function' &&
+    window.focusOpsCollapsedGlance()
+  ) {
+    return true;
+  }
   if (isLogsErrorGlanceVisible() && focusLogsErrorGlance()) {
     return true;
   }

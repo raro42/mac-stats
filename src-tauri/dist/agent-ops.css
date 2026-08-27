@@ -327,9 +327,10 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   clear: both;
 }
 
+/* Agent Ops keep-header: show header + Discord Ready glance when collapsed (all themes).
+   Compact mode still fully hides via inline display:none from setIconPaneVisibility. */
 .agent-ops-section.collapsed {
-  /* Icon-line pane: fully hidden when closed (no header / Discord glance). */
-  display: none !important;
+  display: block;
 }
 
 .agent-ops-section:not(.collapsed) {

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.683] - 2026-08-27
+
+### Fixed
+- **Agent Ops keep-header** — collapsing the section no longer hides the whole pane; header + Discord Ready glance stay visible (Debug Log / Disk Cleanup / Perplexity parity). Compact CPU window still fully hides.
+
+### Added
+- **Agent Ops collapsed glance↔icon↔footer toolbar chain** — Agent Ops icon ↓ → Discord Ready glance when collapsed; glance ↑ → icon · ↓ → footer; footer ↑ → glance.
+
 ## [0.1.682] - 2026-08-27
 
 ### Fixed
