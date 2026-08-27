@@ -1,19 +1,26 @@
 # Morning surprise — 2026-08-28
 
-Overnight Track B kept **v0.1.679** (plus earlier night keeps **v0.1.677–678**).
+Overnight Track B (20:00–06:00 local) shipped keyboard toolbar chains for collapsed section glances.
 
-## Shipped
+## Shipped tonight
 
 | Version | What |
-|---------|------|
-| **v0.1.679** | AI Chat collapsed glance↔icon↔footer toolbar chain (icon ↓ → glance when collapsed; glance ↑ → icon · ↓ → footer; footer ↑ → glance) |
-| **v0.1.678** | Disk Cleanup collapsed glance↔icon↔footer toolbar chain |
+| --- | --- |
 | **v0.1.677** | Monitors collapsed glance↔icon↔footer toolbar chain |
+| **v0.1.678** | Disk Cleanup collapsed glance↔icon↔footer toolbar chain |
+| **v0.1.679** | AI Chat collapsed glance↔icon↔footer toolbar chain |
+| **v0.1.680** | Perplexity collapsed glance↔icon↔footer toolbar chain (**keep-header restored** so the last-search glance stays visible when collapsed) |
 
-## Night notes
+## Why it matters
 
-- Digester open empty; design review in grace (not due).
-- Fuel: standing backlog collapsed-glance keyboard parity across sections.
-- Ratchet: keep rows in `~/.mac-stats/improvements/autoresearch/results.tsv`.
+Keyboard users can move **icon → collapsed glance → footer** (and back) without opening the full section first. Perplexity again shows Ready / Last / Key under the header when closed.
 
-Generated: 2026-08-27 ~21:08
+## Digester / design review
+
+- Digester **open** empty (instant noise filtered).
+- Overnight design review still in **grace** (feature screens stale but not due yet).
+
+## Next fuel
+
+- Debug Log / Agent Ops collapsed glance↔icon↔footer (parity).
+- Design review when due.
