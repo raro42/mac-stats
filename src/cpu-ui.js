@@ -1193,7 +1193,7 @@
     const items = getCredentialsSectionToolbarItems(section);
     hint.hidden = items.length < 2;
     hint.textContent = isSettingsModalOpen()
-      ? "← → / h l · Home/End move · arrows at token/key start/end · Discord token / Perplexity key ← footer · Clear / View logs end → footer · else Product / header"
+      ? "← → / h l · Home/End move · arrows at token/key start/end · Discord token ↑ → icon · Perplexity key ← footer · Clear / View logs end → footer · else Product / header"
       : "← → / h l · Home/End move · arrows at token/key start/end · at start crosses to Product · at end crosses to header";
     refreshCredentialsSectionRovingTabindex(section);
     if (section.dataset.credentialsSectionKbWired === "1") return;
@@ -1281,6 +1281,15 @@
           if (
             active?.id === "perplexity-api-key-input" &&
             tryChainPerplexitySettingsKeyToFooter()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          if (
+            active?.id === "discord-token-input" &&
+            typeof window.tryChainDiscordSettingsToIconLine === "function" &&
+            window.tryChainDiscordSettingsToIconLine()
           ) {
             e.preventDefault();
             e.stopPropagation();

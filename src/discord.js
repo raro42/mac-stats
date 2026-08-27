@@ -279,8 +279,49 @@
     const items = getDiscordToolbarItems(container);
     hint.hidden = items.length < 2;
     hint.textContent = isSettingsModalOpen()
-      ? "← → / h l · Home/End move · arrows at token start/end · at start crosses to footer version · at end crosses to footer version"
+      ? "← → / h l · Home/End move · arrows at token start/end · token first ↑ → Discord icon · at end crosses to footer version"
       : "← → / h l · Home/End move · Enter saves from token · buttons keep activate";
+  }
+
+  function isDiscordSettingVisible() {
+    const container = document.getElementById("discord-setting");
+    if (!container || container.hidden) return false;
+    if (container.style.display === "none") return false;
+    return container.getClientRects().length > 0 || container.offsetParent !== null;
+  }
+
+  function focusDiscordToolbarFirst() {
+    const container = document.getElementById("discord-setting");
+    const items = getDiscordToolbarItems(container);
+    if (!items.length) return false;
+    refreshDiscordToolbarRovingTabindex(container, items[0]);
+    items[0].focus();
+    if (
+      items[0]?.id === "discord-token-input" &&
+      typeof items[0].setSelectionRange === "function"
+    ) {
+      const len = (items[0].value || "").length;
+      items[0].setSelectionRange(len, len);
+    }
+    return true;
+  }
+
+  /** Discord icon-line ↓ → token toolbar when Settings modal is open. */
+  function tryChainIconDiscordToSettingsFirst() {
+    if (!isSettingsModalOpen() || !isDiscordSettingVisible()) return false;
+    return focusDiscordToolbarFirst();
+  }
+
+  /** Discord token first ↑ → icon-line Discord icon when Settings is open. */
+  function tryChainDiscordSettingsToIconLine() {
+    if (!isSettingsModalOpen()) return false;
+    const icon = document.getElementById("icon-discord");
+    if (!icon || icon.hidden) return false;
+    if (typeof window.refreshIconLineRovingTabindex === "function") {
+      window.refreshIconLineRovingTabindex(icon);
+    }
+    icon.focus();
+    return true;
   }
 
   /** Discord token first ← footer version when Settings is open. */
@@ -387,7 +428,10 @@
           return;
         }
         if (idx === 0) {
-          if (tryChainDiscordTokenToFooter()) {
+          if (tryChainDiscordSettingsToIconLine()) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (tryChainDiscordTokenToFooter()) {
             e.preventDefault();
             e.stopPropagation();
           }
@@ -418,6 +462,10 @@
 
   window.tryChainFooterVersionToDiscordViewLogsLast =
     tryChainFooterVersionToDiscordViewLogsLast;
+  window.tryChainIconDiscordToSettingsFirst =
+    tryChainIconDiscordToSettingsFirst;
+  window.tryChainDiscordSettingsToIconLine =
+    tryChainDiscordSettingsToIconLine;
 
   function init() {
     const settingsModal = document.getElementById("settings-modal");

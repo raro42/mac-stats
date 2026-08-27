@@ -16460,7 +16460,7 @@ function ensureIconLineKbHint() {
     line.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click an icon · ← → / h l · Home/End move · ↓ on Perplexity/Logs/Monitors crosses into section · at start crosses to power strip · at end crosses to filter chips · Enter / Space opens section';
+    'Tab or click an icon · ← → / h l · Home/End move · ↓ on Perplexity/Logs/Monitors/Discord (Settings) crosses into section · at start crosses to power strip · at end crosses to filter chips · Enter / Space opens section';
 }
 
 /**
@@ -16497,6 +16497,7 @@ function ensureIconLineKeyboard() {
         const monitorsIcon = document.getElementById('icon-monitors');
         const diskIcon = document.getElementById('icon-disk-cleanup');
         const agentOpsIcon = document.getElementById('icon-agent-ops');
+        const discordIcon = document.getElementById('icon-discord');
         if (
           down &&
           ollamaIcon &&
@@ -16534,6 +16535,15 @@ function ensureIconLineKeyboard() {
           diskIcon &&
           document.activeElement === diskIcon &&
           tryChainIconDiskCleanupToSectionFirst()
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (
+          down &&
+          discordIcon &&
+          document.activeElement === discordIcon &&
+          typeof window.tryChainIconDiscordToSettingsFirst === 'function' &&
+          window.tryChainIconDiscordToSettingsFirst()
         ) {
           e.preventDefault();
           e.stopPropagation();

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.668] - 2026-08-27
+
+### Added
+- **Discord icon-line↔Settings toolbar chain** — Discord icon ↓ → token field when Settings is open; token first ↑ → Discord icon (pairs with v0.1.646 footer wrap and Credentials toolbar).
+
 ## [0.1.667] - 2026-08-27
 
 ### Added
