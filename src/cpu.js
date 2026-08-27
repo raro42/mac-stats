@@ -3867,6 +3867,9 @@ function tryChainFooterToSectionContentLast() {
       }
     }
   }
+  if (isMonitorsCollapsedGlanceVisible() && focusMonitorsCollapsedGlance()) {
+    return true;
+  }
   if (isProcessDetailsModalOpen()) {
     if (tryChainProcessDetailsHeaderToForceQuitLast()) return true;
   }
@@ -6362,11 +6365,12 @@ function syncMonitorsCollapsedGlance() {
   );
   glance.setAttribute('role', 'button');
   glance.tabIndex = 0;
-  glance.title = summary?.title || 'Show External / Monitors';
+  const baseTitle = summary?.title || 'Show External / Monitors';
+  glance.title = `${baseTitle} · ↑ → Monitors icon · ↓ → footer`;
   const aria = summary?.getAttribute('aria-label');
   glance.setAttribute(
     'aria-label',
-    aria || 'Monitors summary — click to expand'
+    `${aria || 'Monitors summary — click to expand'} · ↑ Monitors icon · ↓ footer`
   );
 }
 
@@ -6382,10 +6386,26 @@ function wireMonitorsCollapsedGlanceClick(glance) {
     activate();
   });
   glance.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault();
-    e.stopPropagation();
-    activate();
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+      return;
+    }
+    if (e.key === 'ArrowUp' || e.key === 'k') {
+      if (tryChainMonitorsGlanceToIconLine()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      return;
+    }
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (tryChainMonitorsGlanceToFooter()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
   });
 }
 
@@ -7174,9 +7194,45 @@ function focusMonitorsListFirstOrEmpty() {
   return focusSectionContentListbox(monitorsList);
 }
 
-/** Monitors icon-line ↓ → settings close, filter chips, or list when section is open. */
+/** Monitors collapsed glance visible (keep-header collapse; content hidden). */
+function isMonitorsCollapsedGlanceVisible() {
+  if (!monitorsCollapsed) return false;
+  const glance = document.getElementById('monitors-collapsed-glance');
+  return !!(
+    glance &&
+    !glance.hidden &&
+    glance.tabIndex >= 0 &&
+    (glance.getClientRects().length > 0 || glance.offsetParent !== null)
+  );
+}
+
+function focusMonitorsCollapsedGlance() {
+  if (!isMonitorsCollapsedGlanceVisible()) return false;
+  const glance = document.getElementById('monitors-collapsed-glance');
+  glance.focus();
+  return true;
+}
+
+/** Monitors collapsed glance ↑ → icon-line Monitors icon. */
+function tryChainMonitorsGlanceToIconLine() {
+  const icon = document.getElementById('icon-monitors');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
+}
+
+/** Monitors collapsed glance ↓ → footer toolbar. */
+function tryChainMonitorsGlanceToFooter() {
+  return tryChainFilterChipToFooterFirst();
+}
+
+/** Monitors icon-line ↓ → collapsed glance, or settings/chips/list when open. */
 function tryChainIconMonitorsToSectionFirst() {
-  if (monitorsCollapsed || !isMonitorsSectionOpen()) return false;
+  if (monitorsCollapsed) {
+    return focusMonitorsCollapsedGlance();
+  }
+  if (!isMonitorsSectionOpen()) return false;
   if (isMonitorsSettingsPopoverOpen()) {
     return focusMonitorsSettingsCloseBtn();
   }
@@ -8685,13 +8741,17 @@ function updateMonitorsIconStatus({ anyDown = false, allUp = false, upCount = 0,
     if (anyDown) {
       // At least one monitor is down — red icon (visible even when section closed)
       monitorsIcon.classList.add('status-bad');
-      monitorsIcon.title = `Monitors: ${upCount}/${totalCount} up — one or more down`;
+      monitorsIcon.title = monitorsCollapsed
+        ? `Monitors: ${upCount}/${totalCount} up — one or more down · ↓ → glance`
+        : `Monitors: ${upCount}/${totalCount} up — one or more down`;
     } else if (totalCount > 0) {
       monitorsIcon.title = monitorsCollapsed
-        ? `Monitors: ${upCount}/${totalCount} up`
+        ? `Monitors: ${upCount}/${totalCount} up · ↓ → glance`
         : `Monitors: ${upCount}/${totalCount} up`;
     } else {
-      monitorsIcon.title = monitorsCollapsed ? 'Monitors' : 'Hide Monitors';
+      monitorsIcon.title = monitorsCollapsed
+        ? 'Monitors · ↓ → glance'
+        : 'Hide Monitors';
     }
   }
 

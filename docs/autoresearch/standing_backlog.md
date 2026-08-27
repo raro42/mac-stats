@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.677** — Monitors collapsed glance↔icon↔footer toolbar chain (icon ↓ → glance when collapsed; glance ↑ → icon · ↓ → footer; footer ↑ → glance).
+
 - **v0.1.676** — Top Processes collapsed glances↔Details↔footer toolbar chain (first glance ↑ → Details; last ↓ → footer; footer ↑ → last glance).
 
 - **v0.1.675** — Power strip↔Details collapsed glance toolbar chain (strip last ↓ → glance; glance ↑ → strip · ↓ → processes; keep-header collapse shows glance).
