@@ -748,18 +748,25 @@ function syncOllamaCollapsedGlance() {
   glance.classList.toggle('is-empty', wash === 'is-empty');
   glance.setAttribute('role', 'button');
   glance.tabIndex = 0;
+  const chainHint = '↑ → AI Chat icon · ↓ → footer';
   if (wash === 'is-offline') {
-    glance.title = 'Open AI Chat — configure Ollama';
-    glance.setAttribute('aria-label', `${line} — click to configure`);
-  } else if (turns && preview) {
-    glance.title = 'Show AI Chat and focus composer';
+    glance.title = `Open AI Chat — configure Ollama · ${chainHint}`;
     glance.setAttribute(
       'aria-label',
-      `${line} — click to expand and focus composer`
+      `${line} — click to configure · ↑ AI Chat icon · ↓ footer`
+    );
+  } else if (turns && preview) {
+    glance.title = `Show AI Chat and focus composer · ${chainHint}`;
+    glance.setAttribute(
+      'aria-label',
+      `${line} — click to expand and focus composer · ↑ AI Chat icon · ↓ footer`
     );
   } else {
-    glance.title = 'Show AI Chat';
-    glance.setAttribute('aria-label', `${line} — click to expand`);
+    glance.title = `Show AI Chat · ${chainHint}`;
+    glance.setAttribute(
+      'aria-label',
+      `${line} — click to expand · ↑ AI Chat icon · ↓ footer`
+    );
   }
 }
 
@@ -797,10 +804,32 @@ function wireOllamaCollapsedGlanceClick(glance) {
     activate();
   });
   glance.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault();
-    e.stopPropagation();
-    activate();
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+      return;
+    }
+    if (e.key === 'ArrowUp' || e.key === 'k') {
+      if (
+        typeof window.tryChainOllamaGlanceToIconLine === 'function' &&
+        window.tryChainOllamaGlanceToIconLine()
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      return;
+    }
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (
+        typeof window.tryChainOllamaGlanceToFooter === 'function' &&
+        window.tryChainOllamaGlanceToFooter()
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
   });
 }
 

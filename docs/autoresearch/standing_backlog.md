@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.679** — AI Chat collapsed glance↔icon↔footer toolbar chain (icon ↓ → glance when collapsed; glance ↑ → icon · ↓ → footer; footer ↑ → glance).
+
 - **v0.1.678** — Disk Cleanup collapsed glance↔icon↔footer toolbar chain (icon ↓ → glance when collapsed; glance ↑ → icon · ↓ → footer; footer ↑ → glance).
 
 - **v0.1.677** — Monitors collapsed glance↔icon↔footer toolbar chain (icon ↓ → glance when collapsed; glance ↑ → icon · ↓ → footer; footer ↑ → glance).

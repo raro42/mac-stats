@@ -3886,6 +3886,12 @@ function tryChainFooterToSectionContentLast() {
     return true;
   }
   if (
+    isOllamaCollapsedGlanceVisible() &&
+    focusOllamaCollapsedGlance()
+  ) {
+    return true;
+  }
+  if (
     typeof window.focusChatComposerLast === 'function' &&
     window.focusChatComposerLast()
   ) {
@@ -8789,7 +8795,9 @@ function updateOllamaIconStatus(status) {
   } else {
     console.log('[CPU] Ollama icon default (unknown/checking)');
   }
-  ollamaIcon.title = ollamaCollapsed ? 'AI Chat (Ollama)' : 'Hide AI Chat';
+  ollamaIcon.title = ollamaCollapsed
+    ? 'AI Chat (Ollama) · ↓ → glance'
+    : 'Hide AI Chat';
 }
 
 function updateDiscordIconStatus(connected) {
@@ -9004,9 +9012,45 @@ function focusChatSectionFirstOrEmpty() {
   return focusSectionContentListbox(messages);
 }
 
-/** AI Chat icon-line ↓ → filter chips, starter chips, composer, or messages when open. */
+/** AI Chat collapsed glance visible (keep-header collapse; content hidden). */
+function isOllamaCollapsedGlanceVisible() {
+  if (!ollamaCollapsed) return false;
+  const glance = document.getElementById('ollama-collapsed-glance');
+  return !!(
+    glance &&
+    !glance.hidden &&
+    glance.tabIndex >= 0 &&
+    (glance.getClientRects().length > 0 || glance.offsetParent !== null)
+  );
+}
+
+function focusOllamaCollapsedGlance() {
+  if (!isOllamaCollapsedGlanceVisible()) return false;
+  const glance = document.getElementById('ollama-collapsed-glance');
+  glance.focus();
+  return true;
+}
+
+/** AI Chat collapsed glance ↑ → icon-line AI Chat icon. */
+function tryChainOllamaGlanceToIconLine() {
+  const icon = document.getElementById('icon-ollama');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
+}
+
+/** AI Chat collapsed glance ↓ → footer toolbar. */
+function tryChainOllamaGlanceToFooter() {
+  return tryChainFilterChipToFooterFirst();
+}
+
+/** AI Chat icon-line ↓ → collapsed glance, or filter chips / section when open. */
 function tryChainIconOllamaToSectionFirst() {
-  if (ollamaCollapsed || !isOllamaSectionOpen()) return false;
+  if (ollamaCollapsed) {
+    return focusOllamaCollapsedGlance();
+  }
+  if (!isOllamaSectionOpen()) return false;
   if (focusChatFilterChipFirst()) return true;
   return focusChatSectionFirstOrEmpty();
 }
@@ -9737,6 +9781,10 @@ function ensureOllamaSettingsToolbarKeyboard(wrap) {
 
 window.tryChainIconOllamaToSettingsFirst = tryChainIconOllamaToSettingsFirst;
 window.tryChainOllamaSettingsToIconLine = tryChainOllamaSettingsToIconLine;
+window.tryChainOllamaGlanceToIconLine = tryChainOllamaGlanceToIconLine;
+window.tryChainOllamaGlanceToFooter = tryChainOllamaGlanceToFooter;
+window.focusOllamaCollapsedGlance = focusOllamaCollapsedGlance;
+window.isOllamaCollapsedGlanceVisible = isOllamaCollapsedGlanceVisible;
 
 function closeOllamaSettingsPopover() {
   const popover = document.getElementById('ollama-settings-popover');

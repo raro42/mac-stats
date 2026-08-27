@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.679] - 2026-08-27
+
+### Added
+- **AI Chat collapsed glance↔icon↔footer toolbar chain** — AI Chat icon ↓ → collapsed glance when the section is collapsed; glance ↑ → icon · ↓ → footer; footer ↑ → glance when AI Chat is collapsed.
+
 ## [0.1.678] - 2026-08-27
 
 ### Added
