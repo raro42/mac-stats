@@ -6,6 +6,7 @@
 
 | Version | What |
 |---------|------|
+| **v0.1.668** | Discord icon-line↔Settings toolbar chain — icon ↓ → token when Settings open; token first ↑ → Discord icon |
 | **v0.1.667** | Agent Ops icon-line↔section toolbar chain — icon ↓ → health strip, refresh row, or tab bar; health first card ↑ → icon |
 | **v0.1.666** | Disk Cleanup icon-line↔section toolbar chain — icon ↓ → filter chips, meta, scopes, categories; first chip ↑ → icon |
 | **v0.1.665** | AI Chat icon-line↔section toolbar chain — icon ↓ → filter chips, starter chips, composer, messages; first chip ↑ → icon |
@@ -17,7 +18,7 @@
 
 - Digester open (no Slowest candidates).
 - Design review not due (grace on feature screens).
-- Standing backlog: keyboard toolbar chain polish across icon-line sections.
+- Standing backlog: keyboard toolbar chain polish (icon-line sections + Discord Settings).
 
 ## Debug log
 
@@ -26,6 +27,6 @@
 
 ## Next
 
-- Discord settings modal icon-line chain (if Settings open path fits).
+- Perplexity Settings icon-line chain (Settings open path).
 - p50 direct latency when digester gets samples.
 - Design review when `overnight_design_review.py` says due.
