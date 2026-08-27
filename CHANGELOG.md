@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.678] - 2026-08-27
+
+### Added
+- **Disk Cleanup collapsed glance↔icon↔footer toolbar chain** — Disk Cleanup icon ↓ → collapsed glance when the section is collapsed; glance ↑ → icon · ↓ → footer; footer ↑ → glance when Disk Cleanup is collapsed.
+
 ## [0.1.677] - 2026-08-27
 
 ### Added

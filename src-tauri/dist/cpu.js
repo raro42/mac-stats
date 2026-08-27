@@ -3838,6 +3838,12 @@ function tryChainFooterToSectionContentLast() {
     if (focusDiskCleanupScopesLast()) return true;
   }
   if (
+    isDiskCleanupCollapsedGlanceVisible() &&
+    focusDiskCleanupCollapsedGlance()
+  ) {
+    return true;
+  }
+  if (
     typeof window.focusPerplexitySetupLast === 'function' &&
     window.focusPerplexitySetupLast()
   ) {
@@ -13498,11 +13504,60 @@ function wireDiskCleanupCollapsedGlanceClick(glance) {
     activate();
   });
   glance.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault();
-    e.stopPropagation();
-    activate();
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+      return;
+    }
+    if (e.key === 'ArrowUp' || e.key === 'k') {
+      if (tryChainDiskCleanupGlanceToIconLine()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      return;
+    }
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (tryChainDiskCleanupGlanceToFooter()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
   });
+}
+
+/** Disk Cleanup collapsed glance visible (keep-header collapse; content hidden). */
+function isDiskCleanupCollapsedGlanceVisible() {
+  if (!diskCleanupCollapsed) return false;
+  const glance = document.getElementById('disk-cleanup-collapsed-glance');
+  return !!(
+    glance &&
+    !glance.hidden &&
+    glance.tabIndex >= 0 &&
+    (glance.getClientRects().length > 0 || glance.offsetParent !== null)
+  );
+}
+
+function focusDiskCleanupCollapsedGlance() {
+  if (!isDiskCleanupCollapsedGlanceVisible()) return false;
+  const glance = document.getElementById('disk-cleanup-collapsed-glance');
+  glance.focus();
+  return true;
+}
+
+/** Disk Cleanup collapsed glance ↑ → icon-line Disk Cleanup icon. */
+function tryChainDiskCleanupGlanceToIconLine() {
+  const icon = document.getElementById('icon-disk-cleanup');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
+}
+
+/** Disk Cleanup collapsed glance ↓ → footer toolbar. */
+function tryChainDiskCleanupGlanceToFooter() {
+  return tryChainFilterChipToFooterFirst();
 }
 
 function stopDiskCleanupGlancePoll() {
@@ -15157,9 +15212,12 @@ function focusDiskCleanupSectionFirstOrEmpty() {
   return false;
 }
 
-/** Disk Cleanup icon-line ↓ → filter chips, meta cards, scopes, or categories when open. */
+/** Disk Cleanup icon-line ↓ → collapsed glance, or filter chips / section when open. */
 function tryChainIconDiskCleanupToSectionFirst() {
-  if (diskCleanupCollapsed || !isDiskCleanupSectionOpen()) return false;
+  if (diskCleanupCollapsed) {
+    return focusDiskCleanupCollapsedGlance();
+  }
+  if (!isDiskCleanupSectionOpen()) return false;
   if (focusDiskCleanupFilterChipFirst()) return true;
   return focusDiskCleanupSectionFirstOrEmpty();
 }
