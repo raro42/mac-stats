@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.667** — Agent Ops icon-line↔section toolbar chain (icon ↓ → health / refresh / tabs; health first ↑ → icon).
+
 - **v0.1.666** — Disk Cleanup icon-line↔section toolbar chain (icon ↓ → filter chips / meta / scopes / categories; first chip ↑ → icon).
 
 - **v0.1.664** — Monitors icon-line↔section toolbar chain (icon ↓ → settings close / filter chips / list; first chip or settings close ↑ → Monitors icon).
