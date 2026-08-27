@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.670] - 2026-08-27
+
+### Added
+- **AI Chat icon-line↔Ollama settings toolbar chain** — AI Chat icon ↓ → system prompt when the Ollama settings popover is open; prompt first ↑ → AI Chat icon (pairs with v0.1.644 footer wrap and v0.1.615 settings toolbar keyboard).
+
 ## [0.1.669] - 2026-08-27
 
 ### Added

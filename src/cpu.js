@@ -9189,7 +9189,7 @@ function ensureOllamaSettingsToolbarKbHint(wrap) {
   const items = getOllamaSettingsToolbarItems(content);
   hint.hidden = items.length < 2;
   hint.textContent = isOllamaSettingsPopoverOpen()
-    ? '← → / h l · Home/End move · arrows at prompt start/end · at start crosses to footer version · at end crosses to footer version'
+    ? '← → / h l · Home/End move · arrows at prompt start/end · prompt first ↑ → AI Chat icon · at start crosses to footer version · at end crosses to footer version'
     : '← → / h l · Home/End move · arrows at prompt start/end · at start crosses to header Close · at end crosses to header Close';
 }
 
@@ -9200,6 +9200,40 @@ function isOllamaSettingsPopoverOpen() {
     popover.style.display !== 'none' &&
     popover.getAttribute('aria-hidden') !== 'true'
   );
+}
+
+/** Focus system prompt (first Ollama settings toolbar control). */
+function focusOllamaSettingsToolbarFirst() {
+  const content = document.querySelector('#ollama-settings-popover .popover-content');
+  if (!content) return false;
+  const items = getOllamaSettingsToolbarItems(content);
+  if (!items.length) return false;
+  refreshOllamaSettingsToolbarRovingTabindex(content, items[0]);
+  items[0].focus();
+  if (
+    items[0]?.id === 'ollama-system-prompt' &&
+    typeof items[0].setSelectionRange === 'function'
+  ) {
+    const len = (items[0].value || '').length;
+    items[0].setSelectionRange(len, len);
+  }
+  return true;
+}
+
+/** AI Chat icon-line ↓ → system prompt when Ollama settings popover is open. */
+function tryChainIconOllamaToSettingsFirst() {
+  if (!isOllamaSettingsPopoverOpen()) return false;
+  return focusOllamaSettingsToolbarFirst();
+}
+
+/** Ollama settings prompt first ↑ → icon-line AI Chat icon when popover is open. */
+function tryChainOllamaSettingsToIconLine() {
+  if (!isOllamaSettingsPopoverOpen()) return false;
+  const icon = document.getElementById('icon-ollama');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
 }
 
 /** Ollama system prompt first ← footer version (full modal wrap). */
@@ -9235,20 +9269,7 @@ function tryChainFooterVersionToOllamaSettingsSaveLast() {
 
 /** Ollama settings header Close → system prompt. */
 function tryChainOllamaSettingsHeaderToBody() {
-  const content = document.querySelector('#ollama-settings-popover .popover-content');
-  if (!content) return false;
-  const items = getOllamaSettingsToolbarItems(content);
-  if (!items.length) return false;
-  refreshOllamaSettingsToolbarRovingTabindex(content, items[0]);
-  items[0].focus();
-  if (
-    items[0]?.id === 'ollama-system-prompt' &&
-    typeof items[0].setSelectionRange === 'function'
-  ) {
-    const len = (items[0].value || '').length;
-    items[0].setSelectionRange(len, len);
-  }
-  return true;
+  return focusOllamaSettingsToolbarFirst();
 }
 
 /** Ollama settings header title ← Save. */
@@ -9377,7 +9398,10 @@ function ensureOllamaSettingsToolbarKeyboard(wrap) {
         return;
       }
       if (idx === 0) {
-        if (tryChainOllamaSettingsBodyToFooter()) {
+        if (tryChainOllamaSettingsToIconLine()) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (tryChainOllamaSettingsBodyToFooter()) {
           e.preventDefault();
           e.stopPropagation();
         } else if (tryChainOllamaSettingsBodyToHeader()) {
@@ -9408,6 +9432,9 @@ function ensureOllamaSettingsToolbarKeyboard(wrap) {
     }
   });
 }
+
+window.tryChainIconOllamaToSettingsFirst = tryChainIconOllamaToSettingsFirst;
+window.tryChainOllamaSettingsToIconLine = tryChainOllamaSettingsToIconLine;
 
 function closeOllamaSettingsPopover() {
   const popover = document.getElementById('ollama-settings-popover');
@@ -16558,7 +16585,7 @@ function ensureIconLineKeyboard() {
           down &&
           ollamaIcon &&
           document.activeElement === ollamaIcon &&
-          tryChainIconOllamaToSectionFirst()
+          (tryChainIconOllamaToSettingsFirst() || tryChainIconOllamaToSectionFirst())
         ) {
           e.preventDefault();
           e.stopPropagation();
