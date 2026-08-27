@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.674** — History sparkline↔Top Processes filter toolbar chain (last chart ↓ → first filter chip; filter first ↑ → last chart).
+
 - **v0.1.673** — Ring gauge↔Top Processes filter toolbar chain (temperature ring ↓ → first filter chip; filter first ↑ → temperature ring).
 
 - **v0.1.672** — Details↔ring gauge toolbar chain (first value ↑ → temperature ring; ring first ↑ / last ↓ → Details first).
