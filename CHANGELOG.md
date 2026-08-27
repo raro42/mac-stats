@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.688] - 2026-08-28
+
+### Added
+- **AI Chat All · You · Assistant · Errors filter** — Errors shows failed turns (`Error: …` / send / continue / JS); counts + warm empty hint + red bubble wash (Monitors Slow / Top Processes Hot parity; design review / `feature-ai-chat`).
+
 ## [0.1.687] - 2026-08-28
 
 ### Added

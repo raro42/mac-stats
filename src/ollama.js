@@ -482,10 +482,39 @@ function clearConversationHistory() {
   updateChatClearButton();
 }
 
-/** Transcript role filter (Monitors All/Up/Down parity). */
+/** Transcript role filter (Monitors All/Up/Down/Slow parity). */
 let chatFilterMode = 'all';
 
-/** All · You · Assistant chips above the message list. */
+/** True when assistant bubble text is a failed turn (send / continue / JS). */
+function isChatErrorText(text) {
+  const t = String(text ?? '').trim();
+  if (!t) return false;
+  return (
+    /^Error:/i.test(t) ||
+    /^Error getting response:/i.test(t) ||
+    /^Error executing code:/i.test(t)
+  );
+}
+
+/** Mark (or clear) error wash on a chat bubble from class or copy text. */
+function syncChatMessageErrorClass(el) {
+  if (!el || !el.classList.contains('assistant')) {
+    el?.classList.remove('is-error');
+    return false;
+  }
+  if (el.classList.contains('thinking')) {
+    el.classList.remove('is-error');
+    return false;
+  }
+  const copy =
+    (el.dataset && el.dataset.copyText) ||
+    String(el.innerText || el.textContent || '').trim();
+  const isErr = isChatErrorText(copy);
+  el.classList.toggle('is-error', isErr);
+  return isErr;
+}
+
+/** All · You · Assistant · Errors chips above the message list. */
 function ensureChatFilterChips() {
   const chat = document.getElementById('ollama-chat');
   const messages = document.getElementById('chat-messages');
@@ -501,7 +530,8 @@ function ensureChatFilterChips() {
     wrap.innerHTML =
       '<button type="button" class="chat-filter-chip is-active" data-chat-filter="all" aria-pressed="true" title="Show every message">All</button>' +
       '<button type="button" class="chat-filter-chip" data-chat-filter="you" aria-pressed="false" title="Show your messages only">You <span class="chat-filter-count" data-chat-filter-count="you">0</span></button>' +
-      '<button type="button" class="chat-filter-chip" data-chat-filter="assistant" aria-pressed="false" title="Show assistant replies only">Assistant <span class="chat-filter-count" data-chat-filter-count="assistant">0</span></button>';
+      '<button type="button" class="chat-filter-chip" data-chat-filter="assistant" aria-pressed="false" title="Show assistant replies only">Assistant <span class="chat-filter-count" data-chat-filter-count="assistant">0</span></button>' +
+      '<button type="button" class="chat-filter-chip" data-chat-filter="errors" aria-pressed="false" title="Show failed turns only (Error: …)">Errors <span class="chat-filter-count" data-chat-filter-count="errors">0</span></button>';
     messages.parentNode.insertBefore(wrap, messages);
     wrap.addEventListener('click', (e) => {
       const btn = e.target && e.target.closest && e.target.closest('[data-chat-filter]');
@@ -510,14 +540,29 @@ function ensureChatFilterChips() {
       e.stopPropagation();
       setChatFilterMode(btn.getAttribute('data-chat-filter') || 'all');
     });
+  } else if (!wrap.querySelector('[data-chat-filter="errors"]')) {
+    const errBtn = document.createElement('button');
+    errBtn.type = 'button';
+    errBtn.className = 'chat-filter-chip';
+    errBtn.setAttribute('data-chat-filter', 'errors');
+    errBtn.setAttribute('aria-pressed', 'false');
+    errBtn.title = 'Show failed turns only (Error: …)';
+    errBtn.innerHTML =
+      'Errors <span class="chat-filter-count" data-chat-filter-count="errors">0</span>';
+    wrap.appendChild(errBtn);
   }
   if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
     window.wireFilterChipToolbarKeyboard(wrap);
   }
 }
 
+function normalizeChatFilterMode(mode) {
+  if (mode === 'you' || mode === 'assistant' || mode === 'errors') return mode;
+  return 'all';
+}
+
 function setChatFilterMode(mode) {
-  const next = mode === 'you' || mode === 'assistant' ? mode : 'all';
+  const next = normalizeChatFilterMode(mode);
   chatFilterMode = next;
   document.querySelectorAll('#chat-filter-chips [data-chat-filter]').forEach((btn) => {
     const on = btn.getAttribute('data-chat-filter') === next;
@@ -525,6 +570,19 @@ function setChatFilterMode(mode) {
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
   applyChatListFilter();
+}
+
+function chatFilterMissHint() {
+  if (chatFilterMode === 'errors') {
+    return 'No failed turns in this chat right now.';
+  }
+  if (chatFilterMode === 'you') {
+    return 'No messages from you yet.';
+  }
+  if (chatFilterMode === 'assistant') {
+    return 'No assistant replies yet.';
+  }
+  return 'Try All, or clear the role filter.';
 }
 
 function ensureChatFilterMissState(container, show) {
@@ -541,7 +599,7 @@ function ensureChatFilterMissState(container, show) {
     wrap.setAttribute('role', 'status');
     wrap.innerHTML =
       `<div class="chat-empty-copy chat-filter-miss-msg">Nothing matches this filter</div>` +
-      `<div class="chat-filter-miss-hint">Try All, or clear the role filter.</div>` +
+      `<div class="chat-filter-miss-hint"></div>` +
       `<button type="button" class="chat-filter-miss-cta chat-clear-filter">Clear filter</button>`;
     container.appendChild(wrap);
     wrap.querySelector('.chat-clear-filter')?.addEventListener('click', (e) => {
@@ -550,6 +608,8 @@ function ensureChatFilterMissState(container, show) {
       setChatFilterMode('all');
     });
   }
+  const hint = wrap.querySelector('.chat-filter-miss-hint');
+  if (hint) hint.textContent = chatFilterMissHint();
 }
 
 function applyChatListFilter() {
@@ -564,20 +624,32 @@ function applyChatListFilter() {
 
   let youCount = 0;
   let assistantCount = 0;
+  let errorsCount = 0;
   items.forEach((el) => {
     if (el.classList.contains('user')) youCount++;
-    else if (el.classList.contains('assistant')) assistantCount++;
+    else if (el.classList.contains('assistant')) {
+      assistantCount++;
+      if (syncChatMessageErrorClass(el)) errorsCount++;
+    }
   });
 
   const youEl = document.querySelector('[data-chat-filter-count="you"]');
   const asstEl = document.querySelector('[data-chat-filter-count="assistant"]');
+  const errEl = document.querySelector('[data-chat-filter-count="errors"]');
   if (youEl) youEl.textContent = String(youCount);
   if (asstEl) asstEl.textContent = String(assistantCount);
+  if (errEl) errEl.textContent = String(errorsCount);
   document.querySelectorAll('#chat-filter-chips [data-chat-filter]').forEach((btn) => {
     const key = btn.getAttribute('data-chat-filter');
     btn.classList.toggle(
       'has-hits',
-      key === 'you' ? youCount > 0 : key === 'assistant' ? assistantCount > 0 : false
+      key === 'you'
+        ? youCount > 0
+        : key === 'assistant'
+          ? assistantCount > 0
+          : key === 'errors'
+            ? errorsCount > 0
+            : false
     );
   });
 
@@ -590,9 +662,11 @@ function applyChatListFilter() {
   items.forEach((el) => {
     const isYou = el.classList.contains('user');
     const isAsst = el.classList.contains('assistant');
+    const isErr = el.classList.contains('is-error');
     let show = true;
     if (chatFilterMode === 'you') show = isYou;
     else if (chatFilterMode === 'assistant') show = isAsst;
+    else if (chatFilterMode === 'errors') show = isErr;
     el.style.display = show ? '' : 'none';
     if (show) visible++;
   });
@@ -1913,14 +1987,21 @@ async function sendChatMessage() {
       console.log('[Ollama] ✅ Response received:', response);
 
       if (response.error) {
+        const errText = `Error: ${response.error}`;
         if (useStreaming) {
           const container = document.getElementById('chat-messages');
           const assistantMessages = container?.querySelectorAll('.chat-message.assistant');
           const last = assistantMessages?.[assistantMessages.length - 1];
-          if (last && !last.textContent.trim()) last.textContent = `Error: ${response.error}`;
-          else addChatMessage('assistant', `Error: ${response.error}`);
+          if (last && !last.textContent.trim()) {
+            last.textContent = errText;
+            if (last.dataset) last.dataset.copyText = errText;
+            last.classList.add('is-error');
+            applyChatListFilter();
+          } else {
+            addChatMessage('assistant', errText);
+          }
         } else {
-          addChatMessage('assistant', `Error: ${response.error}`);
+          addChatMessage('assistant', errText);
         }
         return;
       }
@@ -2424,6 +2505,9 @@ function addChatMessage(role, content, isHtml = false) {
 
   const messageDiv = document.createElement('div');
   messageDiv.className = `chat-message ${role}`;
+  if (role === 'assistant' && !isHtml && isChatErrorText(content)) {
+    messageDiv.classList.add('is-error');
+  }
 
   if (isHtml) {
     messageDiv.innerHTML = content;
@@ -2432,7 +2516,8 @@ function addChatMessage(role, content, isHtml = false) {
       role,
       String(messageDiv.innerText || messageDiv.textContent || '').trim()
     );
-  } else if (role === 'assistant' && typeof marked !== 'undefined') {
+    syncChatMessageErrorClass(messageDiv);
+  } else if (role === 'assistant' && typeof marked !== 'undefined' && !isChatErrorText(content)) {
     try {
       marked.setOptions({ breaks: true, gfm: true });
       const markdownWrapper = document.createElement('div');
@@ -2465,7 +2550,8 @@ function addChatMessage(role, content, isHtml = false) {
 function setAssistantMessageContent(el, content) {
   if (!el) return;
   el.replaceChildren();
-  if (typeof marked !== 'undefined') {
+  el.classList.toggle('is-error', isChatErrorText(content));
+  if (typeof marked !== 'undefined' && !isChatErrorText(content)) {
     try {
       marked.setOptions({ breaks: true, gfm: true });
       const markdownWrapper = document.createElement('div');
@@ -2473,6 +2559,7 @@ function setAssistantMessageContent(el, content) {
       markdownWrapper.innerHTML = marked.parse(String(content ?? ''));
       el.appendChild(markdownWrapper);
       decorateChatMessageForCopy(el, 'assistant', content);
+      applyChatListFilter();
       return;
     } catch (_) {
       /* fall through */
@@ -2480,6 +2567,7 @@ function setAssistantMessageContent(el, content) {
   }
   el.textContent = content;
   decorateChatMessageForCopy(el, 'assistant', content);
+  applyChatListFilter();
 }
 
 /**
