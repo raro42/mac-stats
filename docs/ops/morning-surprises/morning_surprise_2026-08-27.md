@@ -6,6 +6,8 @@
 
 | Version | What |
 |---------|------|
+| **v0.1.671** | Settings Credentials↔header toolbar chain — CPU header Settings ↓ → Discord token; token ↑ → Settings header; Perplexity key ↑ → Perplexity icon |
+| **v0.1.671** | Top Processes filter↔header toolbar chain — filter chips first ↑ → Refresh; Refresh first ← → filter chips when section open |
 | **v0.1.670** | AI Chat icon-line↔Ollama settings toolbar chain — icon ↓ → system prompt when popover open; prompt first ↑ → AI Chat icon |
 | **v0.1.669** | Perplexity icon-line↔Settings toolbar chain — icon ↓ → API key when Settings open; key first ↑ → Perplexity icon |
 | **v0.1.668** | Discord icon-line↔Settings toolbar chain — icon ↓ → token when Settings open; token first ↑ → Discord icon |
@@ -20,7 +22,7 @@
 
 - Digester open (no Slowest candidates).
 - Design review not due (grace on feature screens).
-- Standing backlog: keyboard toolbar chain polish (icon-line ↔ settings paths).
+- Standing backlog: keyboard toolbar chain polish (Settings Credentials + Top Processes).
 
 ## Debug log
 
@@ -29,6 +31,6 @@
 
 ## Next
 
-- Settings header Settings↔Credentials polish or Top Processes icon-line chain.
+- Details section↔ring gauge toolbar chain or ring gauge ↓ → Top Processes filters.
 - p50 direct latency when digester gets samples.
 - Design review when `overnight_design_review.py` says due.
