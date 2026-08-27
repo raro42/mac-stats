@@ -16496,6 +16496,7 @@ function ensureIconLineKeyboard() {
         const logsIcon = document.getElementById('icon-logs');
         const monitorsIcon = document.getElementById('icon-monitors');
         const diskIcon = document.getElementById('icon-disk-cleanup');
+        const agentOpsIcon = document.getElementById('icon-agent-ops');
         if (
           down &&
           ollamaIcon &&
@@ -16533,6 +16534,15 @@ function ensureIconLineKeyboard() {
           diskIcon &&
           document.activeElement === diskIcon &&
           tryChainIconDiskCleanupToSectionFirst()
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (
+          down &&
+          agentOpsIcon &&
+          document.activeElement === agentOpsIcon &&
+          typeof window.tryChainIconAgentOpsToSectionFirst === 'function' &&
+          window.tryChainIconAgentOpsToSectionFirst()
         ) {
           e.preventDefault();
           e.stopPropagation();

@@ -2916,6 +2916,70 @@ function ensureOpsOverviewToolbarKeyboard() {
     });
 }
 
+function isAgentOpsSectionOpen() {
+    if (agentOpsCollapsed) return false;
+    const section =
+        document.getElementById('agent-ops-section') ||
+        document.querySelector('.agent-ops-section');
+    if (!section || section.hidden || section.style.display === 'none') return false;
+    const content = document.getElementById('agent-ops-content');
+    if (
+        content?.classList.contains('collapsed') &&
+        content.style.display === 'none'
+    ) {
+        return false;
+    }
+    return true;
+}
+
+function focusOpsHealthFirst() {
+    const cards = getOpsHealthCards();
+    if (!cards.length) return false;
+    refreshOpsHealthRovingTabindex(cards[0]);
+    cards[0].focus();
+    return true;
+}
+
+function focusOpsRefreshFirst() {
+    const items = getOpsRefreshRowItems();
+    if (!items.length) return false;
+    refreshOpsRefreshRowRovingTabindex(items[0]);
+    items[0].focus();
+    return true;
+}
+
+function focusOpsTabBarFirst() {
+    const buttons = getOpsTabBarButtons();
+    if (!buttons.length) return false;
+    refreshOpsTabBarRovingTabindex(buttons[0]);
+    buttons[0].focus();
+    return true;
+}
+
+/** Agent Ops icon-line ↓ → health strip, refresh row, or tab bar when open. */
+function focusOpsSectionFirstOrEmpty() {
+    if (focusOpsHealthFirst()) return true;
+    if (focusOpsRefreshFirst()) return true;
+    return focusOpsTabBarFirst();
+}
+
+function tryChainIconAgentOpsToSectionFirst() {
+    if (!isAgentOpsSectionOpen()) return false;
+    return focusOpsSectionFirstOrEmpty();
+}
+
+/** Agent Ops health strip first ↑ → icon-line Agent Ops icon. */
+function tryChainAgentOpsSectionToIconLine() {
+    if (!isAgentOpsSectionOpen()) return false;
+    const icon = document.getElementById('icon-agent-ops');
+    if (!icon || icon.hidden) return false;
+    if (typeof window.refreshIconLineRovingTabindex === 'function') {
+        window.refreshIconLineRovingTabindex(icon);
+    }
+    icon.focus();
+    return true;
+}
+
 /** Focusable health cards in DOM order (Version · Discord · Redmine · Schedule · Delivery · Digest). */
 function getOpsHealthCards() {
     const row = document.getElementById('ops-health-row');
@@ -2999,6 +3063,15 @@ function ensureOpsHealthToolbarKeyboard() {
             e.key === 'ArrowUp' ||
             e.key === 'k'
         ) {
+            if (
+                idx === 0 &&
+                (e.key === 'ArrowUp' || e.key === 'k') &&
+                tryChainAgentOpsSectionToIconLine()
+            ) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
             next = Math.max(idx - 1, 0);
         } else if (e.key === 'Home') {
             next = 0;
@@ -7019,4 +7092,7 @@ function escapeHtml(s) {
     selectTab: selectOpsTab,
     toggle: toggleAgentOpsSection,
   };
+
+  window.tryChainIconAgentOpsToSectionFirst = tryChainIconAgentOpsToSectionFirst;
+  window.tryChainAgentOpsSectionToIconLine = tryChainAgentOpsSectionToIconLine;
 })();

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.667] - 2026-08-27
+
+### Added
+- **Agent Ops icon-line↔section toolbar chain** — Agent Ops icon ↓ → health strip, refresh row, or tab bar when the section is open; health strip first card ↑ → Agent Ops icon (pairs with v0.1.596–599 health / refresh / tab chains).
+
 ## [0.1.666] - 2026-08-27
 
 ### Added
