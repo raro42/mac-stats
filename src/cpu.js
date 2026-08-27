@@ -10744,6 +10744,56 @@ function focusPerplexitySetupLast() {
 window.focusPerplexitySetupFirst = focusPerplexitySetupFirst;
 window.focusPerplexitySetupLast = focusPerplexitySetupLast;
 
+function isPerplexitySettingVisible() {
+  const container = document.getElementById('perplexity-setting');
+  if (!container || container.hidden) return false;
+  if (container.style.display === 'none') return false;
+  return container.getClientRects().length > 0 || container.offsetParent !== null;
+}
+
+function focusPerplexitySettingsToolbarFirst() {
+  const container = document.getElementById('perplexity-setting');
+  const items = getPerplexitySettingsToolbarItems(container);
+  if (!items.length) return false;
+  refreshPerplexitySettingsToolbarRovingTabindex(container, items[0]);
+  items[0].focus();
+  if (
+    items[0]?.id === 'perplexity-api-key-input' &&
+    typeof items[0].setSelectionRange === 'function'
+  ) {
+    const len = (items[0].value || '').length;
+    items[0].setSelectionRange(len, len);
+  }
+  return true;
+}
+
+/** Perplexity icon-line ↓ → Settings API-key toolbar when Settings modal is open. */
+function tryChainIconPerplexityToSettingsFirst() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen() ||
+    !isPerplexitySettingVisible()
+  ) {
+    return false;
+  }
+  return focusPerplexitySettingsToolbarFirst();
+}
+
+/** Perplexity Settings key first ↑ → icon-line Perplexity icon when Settings is open. */
+function tryChainPerplexitySettingsToIconLine() {
+  if (
+    typeof window.isSettingsModalOpen !== 'function' ||
+    !window.isSettingsModalOpen()
+  ) {
+    return false;
+  }
+  const icon = document.getElementById('icon-perplexity');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
+}
+
 /** Perplexity icon-line ↓ → inline setup key (onboarding path). */
 function tryChainIconPerplexityToSetupFirst() {
   if (perplexityCollapsed || !isPerplexitySetupVisible()) return false;
@@ -11264,7 +11314,7 @@ function ensurePerplexitySettingsToolbarKbHint(wrap) {
     typeof window.isSettingsModalOpen === "function" &&
     window.isSettingsModalOpen();
   hint.textContent = settingsOpen
-    ? "← → / h l · Home/End move · arrows at key start/end · at start crosses to footer version · at end crosses to footer version"
+    ? "← → / h l · Home/End move · arrows at key start/end · key first ↑ → Perplexity icon · at end crosses to footer version"
     : "← → / h l · Home/End move · Enter saves from key field · buttons keep activate";
 }
 
@@ -11368,7 +11418,10 @@ function wirePerplexitySettingsToolbarKeyboard(wrap) {
         return;
       }
       if (idx === 0) {
-        if (tryChainPerplexitySettingsToolbarKeyToFooter()) {
+        if (tryChainPerplexitySettingsToIconLine()) {
+          e.preventDefault();
+          e.stopPropagation();
+        } else if (tryChainPerplexitySettingsToolbarKeyToFooter()) {
           e.preventDefault();
           e.stopPropagation();
         }
@@ -11396,6 +11449,9 @@ function wirePerplexitySettingsToolbarKeyboard(wrap) {
     }
   });
 }
+
+window.tryChainIconPerplexityToSettingsFirst = tryChainIconPerplexityToSettingsFirst;
+window.tryChainPerplexitySettingsToIconLine = tryChainPerplexitySettingsToIconLine;
 
 function ensurePerplexitySearchToolbarKeyboard() {
   const searchBox = document.querySelector('.perplexity-search-box');
@@ -16460,7 +16516,7 @@ function ensureIconLineKbHint() {
     line.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click an icon · ← → / h l · Home/End move · ↓ on Perplexity/Logs/Monitors/Discord (Settings) crosses into section · at start crosses to power strip · at end crosses to filter chips · Enter / Space opens section';
+    'Tab or click an icon · ← → / h l · Home/End move · ↓ on Perplexity (setup or Settings key)/Logs/Monitors/Discord (Settings) crosses into section · at start crosses to power strip · at end crosses to filter chips · Enter / Space opens section';
 }
 
 /**
@@ -16510,7 +16566,8 @@ function ensureIconLineKeyboard() {
           down &&
           perplexityIcon &&
           document.activeElement === perplexityIcon &&
-          tryChainIconPerplexityToSetupFirst()
+          (tryChainIconPerplexityToSettingsFirst() ||
+            tryChainIconPerplexityToSetupFirst())
         ) {
           e.preventDefault();
           e.stopPropagation();

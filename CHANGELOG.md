@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.669] - 2026-08-27
+
+### Added
+- **Perplexity icon-line↔Settings toolbar chain** — Perplexity icon ↓ → API-key field when Settings is open; key first ↑ → Perplexity icon (pairs with v0.1.645 footer wrap and v0.1.662 inline setup chain).
+
 ## [0.1.668] - 2026-08-27
 
 ### Added
