@@ -2203,6 +2203,12 @@ textarea.ops-agent-editor.is-dirty {
   display: none;
 }
 
+/* Perplexity keep-header: show header + last-search glance when collapsed (all themes).
+   Compact mode still fully hides via inline display:none from setIconPaneVisibility. */
+.perplexity-section.collapsed {
+  display: block;
+}
+
 .perplexity-result-item[role='option'] {
   cursor: pointer;
   position: relative;

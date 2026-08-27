@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.680] - 2026-08-27
+
+### Added
+- **Perplexity collapsed glance↔icon↔footer toolbar chain** — Perplexity icon ↓ → last-search glance when collapsed (keep-header restored); glance ↑ → icon · ↓ → footer; footer ↑ → glance.
+
 ## [0.1.679] - 2026-08-27
 
 ### Added

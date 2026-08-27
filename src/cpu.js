@@ -3844,6 +3844,12 @@ function tryChainFooterToSectionContentLast() {
     return true;
   }
   if (
+    isPerplexityCollapsedGlanceVisible() &&
+    focusPerplexityCollapsedGlance()
+  ) {
+    return true;
+  }
+  if (
     typeof window.focusPerplexitySetupLast === 'function' &&
     window.focusPerplexitySetupLast()
   ) {
@@ -11241,10 +11247,54 @@ function tryChainPerplexitySettingsToIconLine() {
   return true;
 }
 
+/** Perplexity collapsed glance visible (keep-header collapse; content hidden). */
+function isPerplexityCollapsedGlanceVisible() {
+  if (!perplexityCollapsed) return false;
+  const glance = document.getElementById('perplexity-last-glance');
+  return !!(
+    glance &&
+    !glance.hidden &&
+    glance.tabIndex >= 0 &&
+    (glance.getClientRects().length > 0 || glance.offsetParent !== null)
+  );
+}
+
+function focusPerplexityCollapsedGlance() {
+  if (!isPerplexityCollapsedGlanceVisible()) return false;
+  const glance = document.getElementById('perplexity-last-glance');
+  glance.focus();
+  return true;
+}
+
+/** Perplexity collapsed glance ↑ → icon-line Perplexity icon. */
+function tryChainPerplexityGlanceToIconLine() {
+  const icon = document.getElementById('icon-perplexity');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
+}
+
+/** Perplexity collapsed glance ↓ → footer toolbar. */
+function tryChainPerplexityGlanceToFooter() {
+  return tryChainFilterChipToFooterFirst();
+}
+
 /** Perplexity icon-line ↓ → inline setup key (onboarding path). */
 function tryChainIconPerplexityToSetupFirst() {
   if (perplexityCollapsed || !isPerplexitySetupVisible()) return false;
   return focusPerplexitySetupFirst();
+}
+
+/**
+ * Perplexity icon-line ↓ → collapsed glance, or setup / search when open.
+ */
+function tryChainIconPerplexityToSectionFirst() {
+  if (perplexityCollapsed) {
+    return focusPerplexityCollapsedGlance();
+  }
+  if (isPerplexitySetupVisible()) return focusPerplexitySetupFirst();
+  return focusPerplexitySearchFirst();
 }
 
 /** Perplexity inline setup key first ↑ → icon-line Perplexity icon. */
@@ -11899,6 +11949,11 @@ function wirePerplexitySettingsToolbarKeyboard(wrap) {
 
 window.tryChainIconPerplexityToSettingsFirst = tryChainIconPerplexityToSettingsFirst;
 window.tryChainPerplexitySettingsToIconLine = tryChainPerplexitySettingsToIconLine;
+window.tryChainIconPerplexityToSectionFirst = tryChainIconPerplexityToSectionFirst;
+window.tryChainPerplexityGlanceToIconLine = tryChainPerplexityGlanceToIconLine;
+window.tryChainPerplexityGlanceToFooter = tryChainPerplexityGlanceToFooter;
+window.focusPerplexityCollapsedGlance = focusPerplexityCollapsedGlance;
+window.isPerplexityCollapsedGlanceVisible = isPerplexityCollapsedGlanceVisible;
 
 function ensurePerplexitySearchToolbarKeyboard() {
   const searchBox = document.querySelector('.perplexity-search-box');
@@ -12122,8 +12177,12 @@ function applyPerplexityLastGlanceState() {
     if (text) text.textContent = `Searching · ${preview}`;
     glance.setAttribute('role', 'button');
     glance.tabIndex = 0;
-    glance.title = 'Show Perplexity Search';
-    glance.setAttribute('aria-label', `Searching for ${preview}`);
+    const chainHint = perplexityCollapsed ? ' · ↑ → Perplexity icon · ↓ → footer' : '';
+    glance.title = `Show Perplexity Search${chainHint}`;
+    glance.setAttribute(
+      'aria-label',
+      `Searching for ${preview}${perplexityCollapsed ? ' · ↑ Perplexity icon · ↓ footer' : ''}`
+    );
     return;
   }
 
@@ -12133,11 +12192,16 @@ function applyPerplexityLastGlanceState() {
     glance.hidden = false;
     glance.setAttribute('role', 'button');
     glance.tabIndex = 0;
+    const chainHint = perplexityCollapsed ? ' · ↑ → Perplexity icon · ↓ → footer' : '';
+    const chainAria = perplexityCollapsed ? ' · ↑ Perplexity icon · ↓ footer' : '';
     if (last.error) {
       glance.classList.add('has-error');
       if (text) text.textContent = `Last · ${preview} · error`;
-      glance.title = 'Show last search error';
-      glance.setAttribute('aria-label', `Last Perplexity search failed: ${preview}`);
+      glance.title = `Show last search error${chainHint}`;
+      glance.setAttribute(
+        'aria-label',
+        `Last Perplexity search failed: ${preview}${chainAria}`
+      );
       return;
     }
     glance.classList.add('has-results');
@@ -12146,10 +12210,10 @@ function applyPerplexityLastGlanceState() {
     if (n > 0) outcome = `${n} result${n === 1 ? '' : 's'}`;
     else if (last.weather) outcome = 'weather';
     if (text) text.textContent = `Last · ${preview} · ${outcome}`;
-    glance.title = 'Show last Perplexity results';
+    glance.title = `Show last Perplexity results${chainHint}`;
     glance.setAttribute(
       'aria-label',
-      `Last Perplexity search: ${preview}, ${outcome}. Click to open`
+      `Last Perplexity search: ${preview}, ${outcome}. Click to open${chainAria}`
     );
     return;
   }
@@ -12160,8 +12224,14 @@ function applyPerplexityLastGlanceState() {
     if (text) text.textContent = 'Key · add API key';
     glance.setAttribute('role', 'button');
     glance.tabIndex = 0;
-    glance.title = 'Add a Perplexity API key';
-    glance.setAttribute('aria-label', 'Perplexity needs an API key — click to set up');
+    const chainHint = perplexityCollapsed ? ' · ↑ → Perplexity icon · ↓ → footer' : '';
+    glance.title = `Add a Perplexity API key${chainHint}`;
+    glance.setAttribute(
+      'aria-label',
+      `Perplexity needs an API key — click to set up${
+        perplexityCollapsed ? ' · ↑ Perplexity icon · ↓ footer' : ''
+      }`
+    );
     return;
   }
 
@@ -12172,8 +12242,11 @@ function applyPerplexityLastGlanceState() {
     if (text) text.textContent = 'Ready · search';
     glance.setAttribute('role', 'button');
     glance.tabIndex = 0;
-    glance.title = 'Show Perplexity Search';
-    glance.setAttribute('aria-label', 'Perplexity ready — click to expand and search');
+    glance.title = 'Show Perplexity Search · ↑ → Perplexity icon · ↓ → footer';
+    glance.setAttribute(
+      'aria-label',
+      'Perplexity ready — click to expand and search · ↑ Perplexity icon · ↓ footer'
+    );
     return;
   }
 
@@ -12217,10 +12290,26 @@ function wirePerplexityLastGlanceClick(glance) {
     activate();
   });
   glance.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault();
-    e.stopPropagation();
-    activate();
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+      return;
+    }
+    if (e.key === 'ArrowUp' || e.key === 'k') {
+      if (tryChainPerplexityGlanceToIconLine()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      return;
+    }
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (tryChainPerplexityGlanceToFooter()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
   });
 }
 
@@ -12237,11 +12326,28 @@ function initPerplexitySection() {
 
   perplexityCollapsed = getSectionCollapsed('perplexity_collapsed');
   const applyPerplexityCollapsed = () => {
-    setIconPaneVisibility(section, content, perplexityCollapsed, divider);
+    // Keep-header: section stays visible with last-search glance; only content hides.
+    if (section) {
+      section.style.display = '';
+      section.classList.toggle('collapsed', perplexityCollapsed);
+      if (perplexityCollapsed) section.removeAttribute('aria-hidden');
+      else section.removeAttribute('aria-hidden');
+    }
+    if (divider) divider.style.display = perplexityCollapsed ? 'none' : '';
+    if (content) {
+      content.classList.toggle('collapsed', perplexityCollapsed);
+      content.style.display = perplexityCollapsed ? 'none' : '';
+    }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
     applyPerplexityLastGlanceState();
     refreshPerplexityStatus();
     syncSectionIcon('icon-perplexity', !perplexityCollapsed);
+    const icon = document.getElementById('icon-perplexity');
+    if (icon) {
+      icon.title = perplexityCollapsed
+        ? 'Perplexity Search · ↓ → glance'
+        : 'Hide Perplexity Search';
+    }
   };
   applyPerplexityCollapsed();
 
@@ -17093,7 +17199,7 @@ function ensureIconLineKeyboard() {
           perplexityIcon &&
           document.activeElement === perplexityIcon &&
           (tryChainIconPerplexityToSettingsFirst() ||
-            tryChainIconPerplexityToSetupFirst())
+            tryChainIconPerplexityToSectionFirst())
         ) {
           e.preventDefault();
           e.stopPropagation();
