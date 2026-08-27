@@ -2914,7 +2914,7 @@ function ensureRingGaugeKbHint() {
     section.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click a ring · ← → / h l · Home/End move · at start crosses to Settings · at end crosses to history charts · Enter / Space activates';
+    'Tab or click a ring · ← → / h l · Home/End move · at start ← crosses to Settings · ↑ crosses to Details · at end → crosses to history charts · ↓ crosses to Details · Enter / Space activates';
 }
 
 /**
@@ -2935,23 +2935,27 @@ function ensureRingGaugeKeyboard() {
         if (!chips.length) return;
         const idx = chips.indexOf(document.activeElement);
         if (idx < 0) return;
+        const upOnly = e.key === 'ArrowUp' || e.key === 'k';
+        const leftOnly = e.key === 'ArrowLeft' || e.key === 'h';
+        const downOnly = e.key === 'ArrowDown' || e.key === 'j';
+        const rightOnly = e.key === 'ArrowRight' || e.key === 'l';
         const back =
-          e.key === 'ArrowLeft' ||
-          e.key === 'h' ||
-          e.key === 'ArrowUp' ||
-          e.key === 'k';
+          leftOnly || upOnly;
         const forward =
-          e.key === 'ArrowRight' ||
-          e.key === 'l' ||
-          e.key === 'ArrowDown' ||
-          e.key === 'j';
+          rightOnly || downOnly;
         if (back && idx === 0) {
-          if (tryChainRingGaugeToHeaderSettings()) {
+          if (leftOnly && tryChainRingGaugeToHeaderSettings()) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (upOnly && tryChainRingGaugeToDetailsFirst()) {
             e.preventDefault();
             e.stopPropagation();
           }
         } else if (forward && idx === chips.length - 1) {
-          if (tryChainRingGaugeToSparklineFirst()) {
+          if (downOnly && tryChainRingGaugeToDetailsFirst()) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (rightOnly && tryChainRingGaugeToSparklineFirst()) {
             e.preventDefault();
             e.stopPropagation();
           }
@@ -9935,7 +9939,7 @@ function ensureDetailsKbHint(grid, show) {
     grid.parentNode.insertBefore(hint, grid);
   }
   hint.textContent =
-    '↑↓ / j k · Home/End select · last value ↓ → processes / footer · processes first ↑ → last value · Enter / c copies · Esc clears';
+    '↑↓ / j k · Home/End select · first value ↑ → temperature ring · last value ↓ → processes / footer · processes first ↑ → last value · Enter / c copies · Esc clears';
 }
 
 function getDetailsGridElement() {
@@ -10167,8 +10171,10 @@ function wireDetailsGridKeyboard(grid) {
     if (e.key === 'ArrowDown' || e.key === 'j') {
       if (idx === vals.length - 1 && tryChainSectionContentToFooter(grid)) return;
       next = Math.min(idx + 1, vals.length - 1);
-    } else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
-    else if (e.key === 'PageDown') next = Math.min(idx + page, vals.length - 1);
+    } else if (e.key === 'ArrowUp' || e.key === 'k') {
+      if (idx === 0 && tryChainDetailsToRingGaugeLast()) return;
+      next = Math.max(idx - 1, 0);
+    } else if (e.key === 'PageDown') next = Math.min(idx + page, vals.length - 1);
     else if (e.key === 'PageUp') next = Math.max(idx - page, 0);
     else if (e.key === 'Home') next = 0;
     else if (e.key === 'End') next = vals.length - 1;
@@ -15938,6 +15944,23 @@ function tryChainRingGaugeToSparklineFirst() {
   refreshHistorySparklineRovingTabindex(chips[0]);
   chips[0].focus();
   return true;
+}
+
+/** Details first value ↑ → last ring gauge (temperature). */
+function tryChainDetailsToRingGaugeLast() {
+  if (!isDetailsSectionOpen()) return false;
+  const chips = getRingGaugeChips();
+  if (!chips.length) return false;
+  const target = chips[chips.length - 1];
+  refreshRingGaugeRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+/** Ring gauge first ↑ or last ↓ → first Details value when Details is open. */
+function tryChainRingGaugeToDetailsFirst() {
+  if (!isDetailsSectionOpen()) return false;
+  return focusDetailsGridFirst();
 }
 
 function tryChainSparklineToRingLast() {

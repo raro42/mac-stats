@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.672] - 2026-08-27
+
+### Added
+- **Details↔ring gauge toolbar chain** — Details first value ↑ → temperature ring; ring first ↑ or last ↓ → Details first value when Details is open (→ still crosses to history charts).
+
 ## [0.1.671] - 2026-08-27
 
 ### Added
