@@ -691,6 +691,22 @@ function tryChainProcessesFilterToCpuHeaderRefresh() {
   return true;
 }
 
+/** Top Processes filter chip first ↑ → last ring gauge (temperature) when section is open. */
+function tryChainProcessesFilterToRingGaugeLast() {
+  if (isProcessesSectionCollapsed()) return false;
+  const chips = getRingGaugeChips();
+  if (!chips.length) return false;
+  const target = chips[chips.length - 1];
+  refreshRingGaugeRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+/** Ring gauge last ↓ → first Top Processes filter chip when section is open. */
+function tryChainRingGaugeToProcessesFilter() {
+  return focusProcessesFilterChipFirst();
+}
+
 /** CPU header Refresh first ← → Top Processes filter chips when section is open. */
 function tryChainCpuHeaderRefreshToProcessesFilter() {
   return focusProcessesFilterChipFirst();
@@ -2914,7 +2930,7 @@ function ensureRingGaugeKbHint() {
     section.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click a ring · ← → / h l · Home/End move · at start ← crosses to Settings · ↑ crosses to Details · at end → crosses to history charts · ↓ crosses to Details · Enter / Space activates';
+    'Tab or click a ring · ← → / h l · Home/End move · at start ← crosses to Settings · ↑ crosses to Details · at end → crosses to history charts · ↓ crosses to Top Processes filters (or Details) · Enter / Space activates';
 }
 
 /**
@@ -2952,7 +2968,11 @@ function ensureRingGaugeKeyboard() {
             e.stopPropagation();
           }
         } else if (forward && idx === chips.length - 1) {
-          if (downOnly && tryChainRingGaugeToDetailsFirst()) {
+          if (
+            downOnly &&
+            (tryChainRingGaugeToProcessesFilter() ||
+              tryChainRingGaugeToDetailsFirst())
+          ) {
             e.preventDefault();
             e.stopPropagation();
           } else if (rightOnly && tryChainRingGaugeToSparklineFirst()) {
@@ -3844,7 +3864,9 @@ function wireFilterChipToolbarKeyboard(wrap) {
   if (!wrap) return;
   ensureFilterChipKbStyles();
   const hint =
-    'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
+    wrap.id === 'processes-filter-chips'
+      ? 'Tab or click a chip · ← → / h l · Home/End move · at start ↑ → temperature ring · at end → process list · Enter / Space selects'
+      : 'Tab or click a chip · ← → / h l · Home/End move · at start crosses to section icons · at end crosses to section list · Enter / Space selects';
   if (wrap.dataset.filterChipChainKbWired !== '1') {
     wrap.dataset.filterChipChainKbWired = '1';
     wrap.addEventListener(
@@ -3895,7 +3917,8 @@ function wireFilterChipToolbarKeyboard(wrap) {
             e.stopPropagation();
           } else if (
             wrap.id === 'processes-filter-chips' &&
-            tryChainProcessesFilterToCpuHeaderRefresh()
+            (tryChainProcessesFilterToRingGaugeLast() ||
+              tryChainProcessesFilterToCpuHeaderRefresh())
           ) {
             e.preventDefault();
             e.stopPropagation();

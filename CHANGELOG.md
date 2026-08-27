@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.673] - 2026-08-27
+
+### Added
+- **Ring gauge↔Top Processes filter toolbar chain** — temperature ring ↓ → first filter chip when Top Processes is open; filter chip first ↑ → temperature ring (Refresh ← still pairs via header).
+
 ## [0.1.672] - 2026-08-27
 
 ### Added
