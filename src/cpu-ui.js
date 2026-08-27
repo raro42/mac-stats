@@ -303,6 +303,33 @@
     return tryChainSettingsHeaderToAppearance();
   }
 
+  /** CPU header Settings → first Credentials control (Discord token) when modal is open. */
+  function tryChainCpuHeaderToSettingsModalCredentials() {
+    if (!isSettingsModalOpen()) return false;
+    const section = document.querySelector(
+      'section[aria-labelledby="settings-credentials-heading"]'
+    );
+    if (!section) return false;
+    const items = getCredentialsSectionToolbarItems(section);
+    if (!items.length) return false;
+    focusSettingsSectionToolbarItem(section, items[0]);
+    return true;
+  }
+
+  /** Discord token first ← CPU header Settings when Settings modal is open. */
+  function tryChainCredentialsDiscordTokenToCpuHeaderSettings() {
+    if (!isSettingsModalOpen()) return false;
+    const btn = document.getElementById("settings-btn");
+    if (!btn || btn.hidden || btn.disabled) return false;
+    if (typeof window.refreshCpuHeaderToolbarRovingTabindex === "function") {
+      window.refreshCpuHeaderToolbarRovingTabindex(btn);
+    } else if (!btn.hasAttribute("tabindex")) {
+      btn.tabIndex = 0;
+    }
+    btn.focus();
+    return true;
+  }
+
   /** Settings close/header toolbar keyboard (modal header parity). */
   function wireSettingsHeaderToolbarKeyboard(header) {
     wireModalHeaderToolbarKeyboard(header, {
@@ -1193,7 +1220,7 @@
     const items = getCredentialsSectionToolbarItems(section);
     hint.hidden = items.length < 2;
     hint.textContent = isSettingsModalOpen()
-      ? "← → / h l · Home/End move · arrows at token/key start/end · Discord token ↑ → icon · Perplexity key ← footer · Clear / View logs end → footer · else Product / header"
+      ? "← → / h l · Home/End move · arrows at token/key start/end · Discord token ↑ → Settings header · Perplexity key ↑ → icon · Clear / View logs end → footer · else Product / header"
       : "← → / h l · Home/End move · arrows at token/key start/end · at start crosses to Product · at end crosses to header";
     refreshCredentialsSectionRovingTabindex(section);
     if (section.dataset.credentialsSectionKbWired === "1") return;
@@ -1280,7 +1307,24 @@
           }
           if (
             active?.id === "perplexity-api-key-input" &&
+            typeof window.tryChainPerplexitySettingsToIconLine === "function" &&
+            window.tryChainPerplexitySettingsToIconLine()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          if (
+            active?.id === "perplexity-api-key-input" &&
             tryChainPerplexitySettingsKeyToFooter()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          if (
+            active?.id === "discord-token-input" &&
+            tryChainCredentialsDiscordTokenToCpuHeaderSettings()
           ) {
             e.preventDefault();
             e.stopPropagation();
@@ -2541,6 +2585,8 @@
   window.isChangelogModalOpen = isChangelogModalOpen;
   window.tryChainCpuHeaderToSettingsModalAppearance =
     tryChainCpuHeaderToSettingsModalAppearance;
+  window.tryChainCpuHeaderToSettingsModalCredentials =
+    tryChainCpuHeaderToSettingsModalCredentials;
   window.tryChainFooterVersionToChangelogBodyLast =
     tryChainFooterVersionToChangelogBodyLast;
   window.tryChainFooterVersionToPerplexitySettingsClearLast =

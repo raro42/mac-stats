@@ -669,6 +669,33 @@ function isProcessesSectionCollapsed() {
   );
 }
 
+/** First Top Processes filter chip when the section is open. */
+function focusProcessesFilterChipFirst() {
+  const wrap = document.getElementById('processes-filter-chips');
+  if (!wrap || isProcessesSectionCollapsed() || !isFilterChipWrapVisible(wrap)) {
+    return false;
+  }
+  const chips = getFilterChipButtons(wrap);
+  if (!chips.length) return false;
+  return focusFilterChipButton(chips[0]);
+}
+
+/** Top Processes filter chip first ↑ → CPU header Refresh when section is open. */
+function tryChainProcessesFilterToCpuHeaderRefresh() {
+  if (isProcessesSectionCollapsed()) return false;
+  const items = getCpuHeaderToolbarItems();
+  if (!items.length) return false;
+  const target = items[0];
+  refreshCpuHeaderToolbarRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
+/** CPU header Refresh first ← → Top Processes filter chips when section is open. */
+function tryChainCpuHeaderRefreshToProcessesFilter() {
+  return focusProcessesFilterChipFirst();
+}
+
 function applyProcessesTopGlanceState({ topPid, topName, topCpu, waiting }) {
   const glance = ensureProcessesTopGlance();
   if (!glance) return;
@@ -3859,6 +3886,12 @@ function wireFilterChipToolbarKeyboard(wrap) {
           } else if (
             wrap.id === 'disk-cleanup-filter-chips' &&
             tryChainDiskCleanupSectionToIconLine()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (
+            wrap.id === 'processes-filter-chips' &&
+            tryChainProcessesFilterToCpuHeaderRefresh()
           ) {
             e.preventDefault();
             e.stopPropagation();
@@ -15879,7 +15912,7 @@ function ensureCpuHeaderToolbarKbHint() {
   const items = getCpuHeaderToolbarItems();
   hint.hidden = items.length < 2;
   hint.textContent =
-    '← → / h l · Home/End move · at end crosses to CPU ring (or Appearance when settings open) · at start crosses to footer';
+    '← → / h l · Home/End move · at end crosses to CPU ring (or Credentials when settings open) · at start crosses to Top Processes filters or footer';
 }
 
 function tryChainHeaderToRingGaugeFirst() {
@@ -16087,6 +16120,13 @@ function ensureCpuHeaderToolbarKeyboard() {
       if (forward) {
         if (idx === toolbarItems.length - 1) {
           if (
+            typeof window.tryChainCpuHeaderToSettingsModalCredentials ===
+              'function' &&
+            window.tryChainCpuHeaderToSettingsModalCredentials()
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (
             typeof window.tryChainCpuHeaderToSettingsModalAppearance ===
               'function' &&
             window.tryChainCpuHeaderToSettingsModalAppearance()
@@ -16102,7 +16142,10 @@ function ensureCpuHeaderToolbarKeyboard() {
         next = idx + 1;
       } else if (back) {
         if (idx === 0) {
-          if (tryChainHeaderRefreshToFooterLast()) {
+          if (tryChainCpuHeaderRefreshToProcessesFilter()) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (tryChainHeaderRefreshToFooterLast()) {
             e.preventDefault();
             e.stopPropagation();
           }

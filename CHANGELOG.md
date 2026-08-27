@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.671] - 2026-08-27
+
+### Added
+- **Settings Credentials↔header toolbar chain** — CPU header Settings ↓ → Discord token when Settings is open; token first ↑ → Settings header; Perplexity key first ↑ → Perplexity icon (Discord parity in Credentials section).
+- **Top Processes filter↔header toolbar chain** — Top Processes filter chips first ↑ → CPU header Refresh; Refresh first ← → filter chips when the section is open.
+
 ## [0.1.670] - 2026-08-27
 
 ### Added
