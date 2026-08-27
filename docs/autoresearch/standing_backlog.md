@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.670** — AI Chat icon-line↔Ollama settings toolbar chain (icon ↓ → system prompt when popover open; prompt first ↑ → icon).
+
 - **v0.1.669** — Perplexity icon-line↔Settings toolbar chain (icon ↓ → API key when Settings open; key first ↑ → icon).
 
 - **v0.1.668** — Discord icon-line↔Settings toolbar chain (icon ↓ → token when Settings open; token ↑ → icon).
