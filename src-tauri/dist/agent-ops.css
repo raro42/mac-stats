@@ -2429,6 +2429,12 @@ textarea.ops-agent-editor.is-dirty {
   display: none;
 }
 
+/* Debug Log keep-header: show header + error/warn glance when collapsed (all themes).
+   Compact mode still fully hides via inline display:none from setIconPaneVisibility. */
+.logs-section.collapsed {
+  display: block;
+}
+
 .logs-viewer-prefix {
   opacity: 0.72;
   font-style: italic;

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.682] - 2026-08-27
+
+### Fixed
+- **Debug Log keep-header** — collapsing the section no longer hides the whole pane; header + Quiet/error/warn glance stay visible (Perplexity / Disk Cleanup parity). Compact CPU window still fully hides.
+
+### Added
+- **Debug Log collapsed glance↔icon↔footer toolbar chain** — Debug Log icon ↓ → error/warn glance when collapsed; glance ↑ → icon · ↓ → footer; footer ↑ → glance.
+
 ## [0.1.681] - 2026-08-27
 
 ### Fixed

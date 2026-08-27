@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.682** — Debug Log keep-header restored + collapsed glance↔icon↔footer toolbar chain (Quiet/error/warn glance stays visible; Perplexity / Disk Cleanup parity).
+
 - **v0.1.681** — Disk Cleanup keep-header restored (collapsed glance stays visible; Perplexity parity; compact still full-hide).
 
 - **v0.1.680** — Perplexity collapsed glance↔icon↔footer toolbar chain (keep-header restored; icon ↓ → glance when collapsed; glance ↑ → icon · ↓ → footer; footer ↑ → glance).

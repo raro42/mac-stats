@@ -3843,6 +3843,9 @@ function tryChainFooterToSectionContentLast() {
   ) {
     return true;
   }
+  if (isLogsErrorGlanceVisible() && focusLogsErrorGlance()) {
+    return true;
+  }
   if (
     isPerplexityCollapsedGlanceVisible() &&
     focusPerplexityCollapsedGlance()
@@ -12720,6 +12723,12 @@ function applyLogsGlanceState({ error, warn }) {
   const wrn = Number(warn) || 0;
   logsGlanceCounts = { error: err, warn: wrn };
   glance.classList.remove('has-errors', 'has-warns-only', 'is-quiet');
+  const chainHint = logsSectionCollapsed
+    ? ' · ↑ → Debug Log icon · ↓ → footer'
+    : '';
+  const chainAria = logsSectionCollapsed
+    ? ' · ↑ Debug Log icon · ↓ footer'
+    : '';
   if (err <= 0 && wrn <= 0) {
     // Collapsed: always show a glance so keep-header is useful (Perplexity parity).
     if (logsSectionCollapsed) {
@@ -12728,8 +12737,11 @@ function applyLogsGlanceState({ error, warn }) {
       if (text) text.textContent = 'Quiet · clean';
       glance.setAttribute('role', 'button');
       glance.tabIndex = 0;
-      glance.title = 'Show Debug Log';
-      glance.setAttribute('aria-label', 'Debug Log quiet — click to expand');
+      glance.title = `Show Debug Log${chainHint}`;
+      glance.setAttribute(
+        'aria-label',
+        `Debug Log quiet — click to expand${chainAria}`
+      );
       return;
     }
     glance.hidden = true;
@@ -12745,10 +12757,10 @@ function applyLogsGlanceState({ error, warn }) {
   glance.setAttribute('role', 'button');
   glance.tabIndex = 0;
   const filterHint = err > 0 ? 'errors' : 'warnings';
-  glance.title = `Click to show ${filterHint} in Debug Log`;
+  glance.title = `Click to show ${filterHint} in Debug Log${chainHint}`;
   glance.setAttribute(
     'aria-label',
-    `Debug Log tail has ${parts.join(' and ')} — click to filter`
+    `Debug Log tail has ${parts.join(' and ')} — click to filter${chainAria}`
   );
 }
 
@@ -12771,10 +12783,26 @@ function wireLogsErrorGlanceClick(glance) {
     activate();
   });
   glance.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault();
-    e.stopPropagation();
-    activate();
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      activate();
+      return;
+    }
+    if (e.key === 'ArrowUp' || e.key === 'k') {
+      if (tryChainLogsGlanceToIconLine()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      return;
+    }
+    if (e.key === 'ArrowDown' || e.key === 'j') {
+      if (tryChainLogsGlanceToFooter()) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
   });
 }
 
@@ -12789,13 +12817,22 @@ function ensureLogsSectionExpanded() {
   }
   logsSectionCollapsed = false;
   setSectionCollapsed('logs_collapsed', false);
+  // Keep-header expand: clear any prior full-hide inline styles.
+  if (section) {
+    section.style.display = '';
+    section.classList.remove('collapsed');
+    section.removeAttribute('aria-hidden');
+  }
   content.classList.remove('collapsed');
-  if (section) section.classList.remove('collapsed');
+  content.style.display = '';
   const divider = document.getElementById('logs-details-divider');
   if (divider) divider.style.display = '';
   header?.setAttribute('aria-expanded', 'true');
   if (typeof header?._syncCollapseA11y === 'function') header._syncCollapseA11y();
   syncSectionIcon('icon-logs', true);
+  const icon = document.getElementById('icon-logs');
+  if (icon) icon.title = icon.getAttribute('data-title-base') || 'Hide Debug Log';
+  applyLogsGlanceState(logsGlanceCounts);
   refreshLogsViewer(true);
   const autoCb = document.getElementById('logs-autorefresh');
   if (autoCb && autoCb.checked) startLogsAutoRefresh();
@@ -12877,9 +12914,45 @@ function focusLogsToolbarLast() {
 window.focusLogsToolbarFirst = focusLogsToolbarFirst;
 window.focusLogsToolbarLast = focusLogsToolbarLast;
 
-/** Debug Log icon-line ↓ → Refresh toolbar when section is open. */
+/** Debug Log error/warn glance visible (keep-header collapse; content hidden). */
+function isLogsErrorGlanceVisible() {
+  if (!logsSectionCollapsed) return false;
+  const glance = document.getElementById('logs-error-glance');
+  return !!(
+    glance &&
+    !glance.hidden &&
+    glance.tabIndex >= 0 &&
+    (glance.getClientRects().length > 0 || glance.offsetParent !== null)
+  );
+}
+
+function focusLogsErrorGlance() {
+  if (!isLogsErrorGlanceVisible()) return false;
+  const glance = document.getElementById('logs-error-glance');
+  glance.focus();
+  return true;
+}
+
+/** Debug Log collapsed glance ↑ → icon-line Debug Log icon. */
+function tryChainLogsGlanceToIconLine() {
+  const icon = document.getElementById('icon-logs');
+  if (!icon || icon.hidden) return false;
+  refreshIconLineRovingTabindex(icon);
+  icon.focus();
+  return true;
+}
+
+/** Debug Log collapsed glance ↓ → footer toolbar. */
+function tryChainLogsGlanceToFooter() {
+  return tryChainFilterChipToFooterFirst();
+}
+
+/** Debug Log icon-line ↓ → collapsed glance, or Refresh toolbar when open. */
 function tryChainIconLogsToToolbarFirst() {
-  if (logsSectionCollapsed || !isLogsSectionOpen()) return false;
+  if (logsSectionCollapsed) {
+    return focusLogsErrorGlance();
+  }
+  if (!isLogsSectionOpen()) return false;
   return focusLogsToolbarFirst();
 }
 
@@ -12892,6 +12965,9 @@ function tryChainLogsToolbarToIconLine() {
   icon.focus();
   return true;
 }
+
+window.isLogsErrorGlanceVisible = isLogsErrorGlanceVisible;
+window.focusLogsErrorGlance = focusLogsErrorGlance;
 
 /** Group Debug Log action controls for toolbar keyboard (filter chips stay separate). */
 function ensureLogsToolbarActionsWrap(toolbar) {
@@ -16214,18 +16290,42 @@ function initLogsSection() {
   ensureLogsErrorGlance();
   startLogsGlancePoll();
 
+  const logsIcon = document.getElementById('icon-logs');
+  if (logsIcon && !logsIcon.getAttribute('data-title-base')) {
+    logsIcon.setAttribute('data-title-base', logsIcon.title || 'Debug Log');
+  }
+
   logsSectionCollapsed = getSectionCollapsed('logs_collapsed');
   const applyCollapsed = () => {
-    setIconPaneVisibility(section, content, logsSectionCollapsed, divider);
+    // Keep-header: section stays visible with error/warn glance; only content hides.
+    // Compact mode still fully hides via collapseSectionByIds → setIconPaneVisibility.
+    if (section) {
+      section.style.display = '';
+      section.classList.toggle('collapsed', logsSectionCollapsed);
+      section.removeAttribute('aria-hidden');
+    }
+    if (divider) divider.style.display = logsSectionCollapsed ? 'none' : '';
+    if (content) {
+      content.classList.toggle('collapsed', logsSectionCollapsed);
+      content.style.display = logsSectionCollapsed ? 'none' : '';
+    }
     if (logsSectionCollapsed) {
       stopLogsAutoRefresh();
       applyLogsGlanceState(logsGlanceCounts);
+      void pollLogsGlanceCounts();
     } else {
       refreshLogsViewer(true);
       if (autoCb && autoCb.checked) startLogsAutoRefresh();
+      applyLogsGlanceState(logsGlanceCounts);
     }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
     syncSectionIcon('icon-logs', !logsSectionCollapsed);
+    const iconEl = document.getElementById('icon-logs');
+    if (iconEl) {
+      iconEl.title = logsSectionCollapsed
+        ? 'Debug Log · ↓ → glance'
+        : iconEl.getAttribute('data-title-base') || 'Hide Debug Log';
+    }
   };
   applyCollapsed();
 
