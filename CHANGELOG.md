@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.676] - 2026-08-27
+
+### Added
+- **Top Processes collapsed glances↔Details↔footer toolbar chain** — first glance ↑ → Details collapsed glance; last glance ↓ → footer; ↑/↓ moves across Top CPU · GPU · RAM glances; footer ↑ → last processes glance before Details glance.
+
 ## [0.1.675] - 2026-08-27
 
 ### Added

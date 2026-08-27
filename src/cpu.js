@@ -757,19 +757,52 @@ function tryChainDetailsGlanceToPowerStripLast() {
   return true;
 }
 
-/** Details collapsed glance ↓ → Top Processes filter chips or collapsed glances. */
-function tryChainDetailsGlanceToProcesses() {
-  if (focusProcessesFilterChipFirst()) return true;
+/** Visible Top Processes collapsed glances (keep-header collapse). */
+function getVisibleProcessesCollapsedGlances() {
+  const out = [];
   for (const id of [
     'processes-top-glance',
     'processes-top-gpu-glance',
     'processes-top-ram-glance',
   ]) {
     const el = document.getElementById(id);
-    if (el && !el.hidden && el.tabIndex >= 0) {
-      el.focus();
-      return true;
+    if (
+      el &&
+      !el.hidden &&
+      el.tabIndex >= 0 &&
+      (el.getClientRects().length > 0 || el.offsetParent !== null)
+    ) {
+      out.push(el);
     }
+  }
+  return out;
+}
+
+function focusProcessesCollapsedGlanceLast() {
+  const glances = getVisibleProcessesCollapsedGlances();
+  if (!glances.length) return false;
+  glances[glances.length - 1].focus();
+  return true;
+}
+
+/** First processes collapsed glance ↑ → Details collapsed glance. */
+function tryChainProcessesGlanceToDetailsGlance() {
+  if (!isDetailsCollapsedGlanceVisible()) return false;
+  return focusDetailsCollapsedGlance();
+}
+
+/** Last processes collapsed glance ↓ → footer toolbar. */
+function tryChainProcessesGlanceToFooter() {
+  return tryChainFilterChipToFooterFirst();
+}
+
+/** Details collapsed glance ↓ → Top Processes filter chips or collapsed glances. */
+function tryChainDetailsGlanceToProcesses() {
+  if (focusProcessesFilterChipFirst()) return true;
+  const glances = getVisibleProcessesCollapsedGlances();
+  if (glances.length) {
+    glances[0].focus();
+    return true;
   }
   return focusProcessListFirst();
 }
@@ -822,9 +855,47 @@ function applyProcessesTopGlanceState({ topPid, topName, topCpu, waiting }) {
   );
 }
 
+function wireProcessesGlanceToolbarChain(glance) {
+  if (!glance || glance.dataset.processesGlanceChainWired === "1") return;
+  glance.dataset.processesGlanceChainWired = "1";
+  glance.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "Enter" || e.key === " ") return;
+    const glances = getVisibleProcessesCollapsedGlances();
+    const idx = glances.indexOf(glance);
+    if (idx < 0) return;
+    if (e.key === "ArrowUp" || e.key === "k") {
+      if (idx === 0) {
+        if (tryChainProcessesGlanceToDetailsGlance()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      } else {
+        glances[idx - 1].focus();
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      return;
+    }
+    if (e.key === "ArrowDown" || e.key === "j") {
+      if (idx === glances.length - 1) {
+        if (tryChainProcessesGlanceToFooter()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      } else {
+        glances[idx + 1].focus();
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
+  });
+}
+
 function wireProcessesTopGlanceClick(glance) {
   if (!glance || glance.dataset.topGlanceWired === "1") return;
   glance.dataset.topGlanceWired = "1";
+  wireProcessesGlanceToolbarChain(glance);
   const activate = () => {
     if (window.__processesTopPid) {
       openProcessFromGlance(window.__processesTopPid);
@@ -895,6 +966,7 @@ function applyProcessesTopGpuGlanceState({ topPid, topName, topGpu, waiting }) {
 function wireProcessesTopGpuGlanceClick(glance) {
   if (!glance || glance.dataset.topGpuGlanceWired === "1") return;
   glance.dataset.topGpuGlanceWired = "1";
+  wireProcessesGlanceToolbarChain(glance);
   const activate = () => openProcessFromGlance(window.__processesTopGpuPid);
   glance.addEventListener("click", (e) => {
     e.preventDefault();
@@ -974,6 +1046,7 @@ function applyProcessesTopRamGlanceState({ topPid, topName, topMem, waiting }) {
 function wireProcessesTopRamGlanceClick(glance) {
   if (!glance || glance.dataset.topRamGlanceWired === "1") return;
   glance.dataset.topRamGlanceWired = "1";
+  wireProcessesGlanceToolbarChain(glance);
   const activate = () => openProcessFromGlance(window.__processesTopRamPid);
   glance.addEventListener("click", (e) => {
     e.preventDefault();
@@ -3796,6 +3869,9 @@ function tryChainFooterToSectionContentLast() {
   }
   if (isProcessDetailsModalOpen()) {
     if (tryChainProcessDetailsHeaderToForceQuitLast()) return true;
+  }
+  if (focusProcessesCollapsedGlanceLast()) {
+    return true;
   }
   if (isDetailsCollapsedGlanceVisible() && focusDetailsCollapsedGlance()) {
     return true;
