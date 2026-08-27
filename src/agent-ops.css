@@ -2662,6 +2662,12 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.9;
 }
 
+/* Disk Cleanup keep-header: show header + collapsed glance when collapsed (all themes).
+   Compact mode still fully hides via inline display:none from setIconPaneVisibility. */
+.disk-cleanup-section.collapsed {
+  display: block;
+}
+
 .disk-cleanup-section.collapsed .disk-cleanup-summary {
   /* Glance under header carries the status when collapsed. */
   display: none;

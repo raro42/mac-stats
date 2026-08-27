@@ -2277,7 +2277,8 @@ body {
 }
 
 .disk-cleanup-section.collapsed {
-  display: none;
+  /* Keep header + collapsed glance (agent-ops.css SoT; Perplexity/logs parity). */
+  display: block;
 }
 
 /* Shared agent-ops.css also hides collapsed sections; keep theme-local fallback. */

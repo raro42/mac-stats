@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.681] - 2026-08-27
+
+### Fixed
+- **Disk Cleanup keep-header** — collapsing the section no longer hides the whole pane; header + reclaim/due/scopes glance stay visible (Perplexity parity). Compact CPU window still fully hides.
+
 ## [0.1.680] - 2026-08-27
 
 ### Added

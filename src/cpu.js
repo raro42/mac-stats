@@ -13541,13 +13541,22 @@ function ensureDiskCleanupSectionExpanded() {
   }
   diskCleanupCollapsed = false;
   setSectionCollapsed('disk_cleanup_collapsed', false);
+  // Keep-header expand: clear any prior full-hide inline styles.
+  if (section) {
+    section.style.display = '';
+    section.classList.remove('collapsed');
+    section.removeAttribute('aria-hidden');
+  }
   content.classList.remove('collapsed');
-  section?.classList.remove('collapsed');
+  content.style.display = '';
   header?.setAttribute('aria-expanded', 'true');
   if (typeof header?._syncCollapseA11y === 'function') header._syncCollapseA11y();
   syncSectionIcon('icon-disk-cleanup', true);
+  const icon = document.getElementById('icon-disk-cleanup');
+  if (icon) icon.title = icon.getAttribute('data-title-base') || 'Hide Disk cleanup';
   stopDiskCleanupGlancePoll();
   syncDiskCleanupCollapsedGlance();
+  refreshDiskCleanupPanel();
 }
 
 /** Collapsed-section glance under Disk Cleanup header (Monitors parity). */
@@ -13603,21 +13612,32 @@ function syncDiskCleanupCollapsedGlance() {
   glance.classList.toggle('is-clean', reclaimBytes <= 0 && !due && !scopesOff);
   glance.setAttribute('role', 'button');
   glance.tabIndex = 0;
+  const chainHint = ' · ↑ → Disk cleanup icon · ↓ → footer';
+  const chainAria = ' · ↑ Disk cleanup icon · ↓ footer';
   if (reclaimBytes > 0) {
-    glance.title = 'Show reclaimable categories';
+    glance.title = `Show reclaimable categories${chainHint}`;
     glance.setAttribute(
       'aria-label',
-      `Disk Cleanup: ${line} — click to open reclaimable`
+      `Disk Cleanup: ${line} — click to open reclaimable${chainAria}`
     );
   } else if (due) {
-    glance.title = 'Open Disk Cleanup — due now';
-    glance.setAttribute('aria-label', 'Disk Cleanup is due — click to open Clean now');
+    glance.title = `Open Disk Cleanup — due now${chainHint}`;
+    glance.setAttribute(
+      'aria-label',
+      `Disk Cleanup is due — click to open Clean now${chainAria}`
+    );
   } else if (scopesOff) {
-    glance.title = 'Review Disk Cleanup scopes';
-    glance.setAttribute('aria-label', 'Some scopes are off — click to review');
+    glance.title = `Review Disk Cleanup scopes${chainHint}`;
+    glance.setAttribute(
+      'aria-label',
+      `Some scopes are off — click to review${chainAria}`
+    );
   } else {
-    glance.title = 'Show Disk Cleanup';
-    glance.setAttribute('aria-label', `Disk Cleanup: ${line} — click to expand`);
+    glance.title = `Show Disk Cleanup${chainHint}`;
+    glance.setAttribute(
+      'aria-label',
+      `Disk Cleanup: ${line} — click to expand${chainAria}`
+    );
   }
 }
 
@@ -15829,7 +15849,17 @@ function initDiskCleanupSection() {
 
   diskCleanupCollapsed = getSectionCollapsed('disk_cleanup_collapsed');
   const applyCollapsed = () => {
-    setIconPaneVisibility(section, content, diskCleanupCollapsed, null);
+    // Keep-header: section stays visible with collapsed glance; only content hides.
+    // Compact mode still fully hides via collapseSectionByIds → setIconPaneVisibility.
+    if (section) {
+      section.style.display = '';
+      section.classList.toggle('collapsed', diskCleanupCollapsed);
+      section.removeAttribute('aria-hidden');
+    }
+    if (content) {
+      content.classList.toggle('collapsed', diskCleanupCollapsed);
+      content.style.display = diskCleanupCollapsed ? 'none' : '';
+    }
     if (diskCleanupCollapsed) {
       // Shallow status poll so the collapsed glance stays fresh (no deep Downloads scan).
       void refreshDiskCleanupPanel({ deep: false });
@@ -15840,6 +15870,12 @@ function initDiskCleanupSection() {
     }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
     syncSectionIcon('icon-disk-cleanup', !diskCleanupCollapsed);
+    const iconEl = document.getElementById('icon-disk-cleanup');
+    if (iconEl) {
+      iconEl.title = diskCleanupCollapsed
+        ? 'Disk cleanup · ↓ → glance'
+        : iconEl.getAttribute('data-title-base') || 'Hide Disk cleanup';
+    }
     syncDiskCleanupCollapsedGlance();
   };
   applyCollapsed();

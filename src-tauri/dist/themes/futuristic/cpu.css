@@ -2349,7 +2349,8 @@ body {
 }
 
 .disk-cleanup-section.collapsed {
-  display: none;
+  /* Keep header + collapsed glance (agent-ops.css SoT; Perplexity/logs parity). */
+  display: block;
 }
 
 #gpu-usage-ring-progress {
