@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.674] - 2026-08-27
+
+### Added
+- **History sparkline↔Top Processes filter toolbar chain** — last chart ↓ → first filter chip when Top Processes is open; filter chip first ↑ → last chart (→ still crosses to battery strip).
+
 ## [0.1.673] - 2026-08-27
 
 ### Added

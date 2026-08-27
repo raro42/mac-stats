@@ -707,6 +707,22 @@ function tryChainRingGaugeToProcessesFilter() {
   return focusProcessesFilterChipFirst();
 }
 
+/** History sparkline last ↓ → first Top Processes filter chip when section is open. */
+function tryChainSparklineToProcessesFilter() {
+  return focusProcessesFilterChipFirst();
+}
+
+/** Top Processes filter chip first ↑ → last history sparkline when section is open. */
+function tryChainProcessesFilterToSparklineLast() {
+  if (isProcessesSectionCollapsed()) return false;
+  const chips = getHistorySparklineChips();
+  if (!chips.length) return false;
+  const target = chips[chips.length - 1];
+  refreshHistorySparklineRovingTabindex(target);
+  target.focus();
+  return true;
+}
+
 /** CPU header Refresh first ← → Top Processes filter chips when section is open. */
 function tryChainCpuHeaderRefreshToProcessesFilter() {
   return focusProcessesFilterChipFirst();
@@ -3084,7 +3100,7 @@ function ensureHistorySparklineKbHint() {
     section.appendChild(hint);
   }
   hint.textContent =
-    'Tab or click a chart · ← → / h l · Home/End move · at start crosses to temperature ring · at end crosses to battery strip · Enter / Space jumps to ring';
+    'Tab or click a chart · ← → / h l · Home/End move · at start crosses to temperature ring · at end ↓ crosses to Top Processes filters · → crosses to battery strip · Enter / Space jumps to ring';
 }
 
 /**
@@ -3175,13 +3191,21 @@ function ensureHistorySparklineKeyboard() {
           e.key === 'l' ||
           e.key === 'ArrowDown' ||
           e.key === 'j';
+        const downOnly = e.key === 'ArrowDown' || e.key === 'j';
+        const rightOnly = e.key === 'ArrowRight' || e.key === 'l';
         if (back && idx === 0) {
           if (tryChainSparklineToRingLast()) {
             e.preventDefault();
             e.stopPropagation();
           }
         } else if (forward && idx === sparkChips.length - 1) {
-          if (tryChainSparklineToPowerStripFirst()) {
+          if (downOnly && tryChainSparklineToProcessesFilter()) {
+            e.preventDefault();
+            e.stopPropagation();
+          } else if (
+            (rightOnly || downOnly) &&
+            tryChainSparklineToPowerStripFirst()
+          ) {
             e.preventDefault();
             e.stopPropagation();
           }
@@ -3915,13 +3939,21 @@ function wireFilterChipToolbarKeyboard(wrap) {
           ) {
             e.preventDefault();
             e.stopPropagation();
-          } else if (
-            wrap.id === 'processes-filter-chips' &&
-            (tryChainProcessesFilterToRingGaugeLast() ||
-              tryChainProcessesFilterToCpuHeaderRefresh())
-          ) {
-            e.preventDefault();
-            e.stopPropagation();
+          } else if (wrap.id === 'processes-filter-chips') {
+            const upOnly = e.key === 'ArrowUp' || e.key === 'k';
+            const chained =
+              (upOnly &&
+                (tryChainProcessesFilterToSparklineLast() ||
+                  tryChainProcessesFilterToRingGaugeLast() ||
+                  tryChainProcessesFilterToCpuHeaderRefresh())) ||
+              (!upOnly &&
+                (tryChainProcessesFilterToRingGaugeLast() ||
+                  tryChainProcessesFilterToSparklineLast() ||
+                  tryChainProcessesFilterToCpuHeaderRefresh()));
+            if (chained) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
           } else if (tryChainFilterChipToIconLineLast()) {
             e.preventDefault();
             e.stopPropagation();
