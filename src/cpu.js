@@ -6584,7 +6584,10 @@ function visibleMonitorItems(monitorsList) {
   );
 }
 
-/** All / Up / Down chips (Debug Log filter parity). */
+/** UP latency ≥ this ms counts as Slow (menu-bar Mon amber / summary slowest parity). */
+const MONITOR_SLOW_MS = 2000;
+
+/** All / Up / Down / Slow chips (Top Processes Hot filter parity). */
 function ensureMonitorsFilterChips() {
   const content = document.getElementById('monitors-content');
   const summary = document.getElementById('monitors-summary');
@@ -6600,7 +6603,8 @@ function ensureMonitorsFilterChips() {
     wrap.innerHTML =
       '<button type="button" class="monitors-filter-chip is-active" data-monitors-filter="all" aria-pressed="true" title="Show every monitor">All</button>' +
       '<button type="button" class="monitors-filter-chip" data-monitors-filter="up" aria-pressed="false" title="Show UP sites only">Up <span class="monitors-filter-count" data-monitors-filter-count="up">0</span></button>' +
-      '<button type="button" class="monitors-filter-chip" data-monitors-filter="down" aria-pressed="false" title="Show DOWN sites only">Down <span class="monitors-filter-count" data-monitors-filter-count="down">0</span></button>';
+      '<button type="button" class="monitors-filter-chip" data-monitors-filter="down" aria-pressed="false" title="Show DOWN sites only">Down <span class="monitors-filter-count" data-monitors-filter-count="down">0</span></button>' +
+      `<button type="button" class="monitors-filter-chip" data-monitors-filter="slow" aria-pressed="false" title="Show UP sites that are slow (≥${MONITOR_SLOW_MS} ms)">Slow <span class="monitors-filter-count" data-monitors-filter-count="slow">0</span></button>`;
     summary.insertAdjacentElement('afterend', wrap);
     wrap.addEventListener('click', (e) => {
       const btn = e.target && e.target.closest && e.target.closest('[data-monitors-filter]');
@@ -6609,12 +6613,27 @@ function ensureMonitorsFilterChips() {
       e.stopPropagation();
       setMonitorsFilterMode(btn.getAttribute('data-monitors-filter') || 'all');
     });
+  } else if (!wrap.querySelector('[data-monitors-filter="slow"]')) {
+    const slowBtn = document.createElement('button');
+    slowBtn.type = 'button';
+    slowBtn.className = 'monitors-filter-chip';
+    slowBtn.setAttribute('data-monitors-filter', 'slow');
+    slowBtn.setAttribute('aria-pressed', 'false');
+    slowBtn.title = `Show UP sites that are slow (≥${MONITOR_SLOW_MS} ms)`;
+    slowBtn.innerHTML =
+      'Slow <span class="monitors-filter-count" data-monitors-filter-count="slow">0</span>';
+    wrap.appendChild(slowBtn);
   }
   wireFilterChipToolbarKeyboard(wrap);
 }
 
+function normalizeMonitorsFilterMode(mode) {
+  if (mode === 'up' || mode === 'down' || mode === 'slow') return mode;
+  return 'all';
+}
+
 function setMonitorsFilterMode(mode) {
-  const next = mode === 'up' || mode === 'down' ? mode : 'all';
+  const next = normalizeMonitorsFilterMode(mode);
   monitorsFilterMode = next;
   document.querySelectorAll('#monitors-filter-chips [data-monitors-filter]').forEach((btn) => {
     const on = btn.getAttribute('data-monitors-filter') === next;
@@ -6622,6 +6641,19 @@ function setMonitorsFilterMode(mode) {
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
   applyMonitorsListFilter();
+}
+
+function monitorsFilterMissHint() {
+  if (monitorsFilterMode === 'slow') {
+    return `No UP site is slow right now (≥${MONITOR_SLOW_MS} ms).`;
+  }
+  if (monitorsFilterMode === 'down') {
+    return 'No site is down right now.';
+  }
+  if (monitorsFilterMode === 'up') {
+    return 'No site is up right now.';
+  }
+  return 'Try All, or clear the status filter.';
 }
 
 function ensureMonitorsFilterMissState(monitorsList, show) {
@@ -6638,7 +6670,7 @@ function ensureMonitorsFilterMissState(monitorsList, show) {
     wrap.setAttribute('role', 'status');
     wrap.innerHTML =
       `<div class="monitors-empty-msg">Nothing matches this filter</div>` +
-      `<div class="monitors-empty-hint">Try All, or clear the status filter.</div>` +
+      `<div class="monitors-empty-hint"></div>` +
       `<button type="button" class="monitors-empty-cta monitors-clear-filter">Clear filter</button>`;
     monitorsList.appendChild(wrap);
     wrap.querySelector('.monitors-clear-filter')?.addEventListener('click', (e) => {
@@ -6647,6 +6679,8 @@ function ensureMonitorsFilterMissState(monitorsList, show) {
       setMonitorsFilterMode('all');
     });
   }
+  const hint = wrap.querySelector('.monitors-empty-hint');
+  if (hint) hint.textContent = monitorsFilterMissHint();
 }
 
 function applyMonitorsListFilter() {
@@ -6661,21 +6695,30 @@ function applyMonitorsListFilter() {
 
   let upCount = 0;
   let downCount = 0;
+  let slowCount = 0;
   items.forEach((el) => {
     if (el.classList.contains('is-down')) downCount++;
     else if (!el.classList.contains('is-pending')) upCount++;
+    if (el.classList.contains('is-slow')) slowCount++;
   });
 
   const upEl = document.querySelector('[data-monitors-filter-count="up"]');
   const downEl = document.querySelector('[data-monitors-filter-count="down"]');
+  const slowEl = document.querySelector('[data-monitors-filter-count="slow"]');
   if (upEl) upEl.textContent = String(upCount);
   if (downEl) downEl.textContent = String(downCount);
+  if (slowEl) slowEl.textContent = String(slowCount);
   document.querySelectorAll('#monitors-filter-chips [data-monitors-filter]').forEach((btn) => {
     const key = btn.getAttribute('data-monitors-filter');
-    btn.classList.toggle(
-      'has-hits',
-      key === 'up' ? upCount > 0 : key === 'down' ? downCount > 0 : false
-    );
+    const hits =
+      key === 'up'
+        ? upCount > 0
+        : key === 'down'
+          ? downCount > 0
+          : key === 'slow'
+            ? slowCount > 0
+            : false;
+    btn.classList.toggle('has-hits', hits);
   });
 
   if (trueEmpty || items.length === 0) {
@@ -6688,9 +6731,11 @@ function applyMonitorsListFilter() {
   items.forEach((el) => {
     const isDown = el.classList.contains('is-down');
     const isPending = el.classList.contains('is-pending');
+    const isSlow = el.classList.contains('is-slow');
     let show = true;
     if (monitorsFilterMode === 'down') show = isDown;
     else if (monitorsFilterMode === 'up') show = !isDown && !isPending;
+    else if (monitorsFilterMode === 'slow') show = isSlow;
     el.style.display = show ? '' : 'none';
     if (show) visible++;
   });
@@ -8006,7 +8051,7 @@ async function updateMonitorsSummary() {
     const allUp = checkedCount > 0 && downCount === 0 && checkedCount === monitorIds.length;
     const slowest = upLatencyHints[0];
     // Amber slowest hint: relative (≥2 UP) or absolute (any UP ≥ 2000 ms — menu-bar Mon parity).
-    const anySlowAbs = upLatencyHints.some((h) => h.ms >= 2000);
+    const anySlowAbs = upLatencyHints.some((h) => h.ms >= MONITOR_SLOW_MS);
     const slowestHint =
       !anyDown && slowest && (upLatencyHints.length >= 2 || anySlowAbs)
         ? slowest.id || null
@@ -8346,7 +8391,7 @@ function ensureMonitorsListKbHint(monitorsList, show) {
     monitorsList.parentNode?.insertBefore(hint, monitorsList);
   }
   hint.textContent =
-    'All · Up · Down filters · click row for details · ↑↓ / j k · open detail ↓ → Check now · detail ← row · Remove → footer · Enter check now · c copy URL · d details · Delete removes · Esc closes/clears';
+    'All · Up · Down · Slow filters · click row for details · ↑↓ / j k · open detail ↓ → Check now · detail ← row · Remove → footer · Enter check now · c copy URL · d details · Delete removes · Esc closes/clears';
 }
 
 function wireMonitorsListKeyboard() {
@@ -8648,8 +8693,13 @@ function applyMonitorItemState(item, status) {
   const pending =
     !status.is_up &&
     (!status.response_time_ms || String(status.error || '').includes('Waiting'));
-  item.classList.toggle('is-down', !status.is_up && !pending);
+  const isDown = !status.is_up && !pending;
+  const ms = Number(status.response_time_ms);
+  const isSlow =
+    !!status.is_up && Number.isFinite(ms) && ms >= MONITOR_SLOW_MS;
+  item.classList.toggle('is-down', isDown);
   item.classList.toggle('is-pending', pending);
+  item.classList.toggle('is-slow', isSlow);
 }
 
 function createMonitorItem(monitorId, monitorUrl, status) {

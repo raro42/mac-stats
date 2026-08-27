@@ -3908,6 +3908,16 @@ textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #34c759 38%, transparent);
 }
 
+.monitors-filter-chip[data-monitors-filter='slow'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, transparent);
+  border-color: color-mix(in srgb, #ff9500 28%, transparent);
+}
+
+.monitors-filter-chip[data-monitors-filter='slow'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, transparent);
+  border-color: color-mix(in srgb, #ff9500 40%, transparent);
+}
+
 .monitors-filter-count {
   font-variant-numeric: tabular-nums;
   font-weight: 700;
@@ -4043,6 +4053,21 @@ textarea.ops-agent-editor.is-dirty {
 .monitor-item.is-pending {
   opacity: 0.78;
   border-style: dashed;
+}
+
+.monitor-item.is-slow:not(.is-down):not(.is-pending) {
+  border-color: color-mix(in srgb, #ff9500 28%, var(--hairline, currentColor));
+  background: color-mix(in srgb, #ff9500 6%, transparent);
+}
+
+.monitor-item.is-slow:not(.is-down):not(.is-pending):hover {
+  border-color: color-mix(in srgb, #ff9500 40%, transparent);
+  background: color-mix(in srgb, #ff9500 10%, transparent);
+}
+
+.monitor-item.is-slow:not(.is-down) .monitor-latency {
+  color: color-mix(in srgb, #ff9500 85%, var(--text));
+  font-weight: 600;
 }
 
 .monitor-info-primary {

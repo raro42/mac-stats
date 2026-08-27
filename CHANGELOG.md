@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.687] - 2026-08-28
+
+### Added
+- **Monitors All · Up · Down · Slow filter** — Slow shows UP sites at menu-bar Mon amber latency (≥2000 ms); counts + warm empty hint + amber row wash (Top Processes Hot parity; design review / `feature-monitors`).
+
 ## [0.1.686] - 2026-08-28
 
 ### Added
