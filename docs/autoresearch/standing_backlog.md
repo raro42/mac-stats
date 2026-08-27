@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.672** — Details↔ring gauge toolbar chain (first value ↑ → temperature ring; ring first ↑ / last ↓ → Details first).
+
 - **v0.1.671** — Settings Credentials↔header toolbar chain (CPU header Settings ↓ → Discord token; token ↑ → Settings; Perplexity key ↑ → icon) + Top Processes filter↔Refresh chain.
 
 - **v0.1.670** — AI Chat icon-line↔Ollama settings toolbar chain (icon ↓ → system prompt when popover open; prompt first ↑ → icon).
