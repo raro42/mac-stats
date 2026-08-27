@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.688** — AI Chat All · You · Assistant · Errors filter (failed turns `Error: …`; Monitors Slow / Top Processes Hot parity; design review / `feature-ai-chat`).
+
 - **v0.1.687** — Monitors All · Up · Down · Slow filter (UP ≥2000 ms menu-bar Mon amber; Top Processes Hot parity; design review / `feature-monitors`).
 
 - **v0.1.686** — Top Processes All · Pinned · Hot filter (glance amber thresholds; design review / `feature-processes`).
