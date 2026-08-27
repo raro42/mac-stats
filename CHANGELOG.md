@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.686] - 2026-08-28
+
+### Added
+- **Top Processes All · Pinned · Hot filter** — Hot shows processes at glance amber thresholds (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB); counts + warm empty hint (Monitors All/Up/Down parity; design review / `feature-processes`).
+
 ## [0.1.685] - 2026-08-28
 
 ### Fixed

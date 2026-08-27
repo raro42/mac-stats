@@ -379,12 +379,24 @@ let invoke = null;
 let lastProcessUpdate = 0;
 let lastProcessListKey = "";
 let isWaitingForData = false; // Track if we're waiting for real data (non-zero usage)
-/** Top Processes list filter: all | pinned (Monitors All/Up/Down parity). */
+/** Top Processes list filter: all | pinned | hot (Monitors All/Up/Down parity). */
 let processesFilterMode = "all";
 
 const PINNED_PROCESS_NAMES_KEY = "pinned_process_names";
 const MAX_PINNED_PROCESSES = 6;
 const PROCESS_LIST_DISPLAY_CAP = 10;
+/** Amber “hot” thresholds — match Top CPU/GPU/RAM glance `.is-hot` washes. */
+const PROCESS_HOT_CPU_PCT = 15;
+const PROCESS_HOT_GPU_PCT = 15;
+const PROCESS_HOT_RAM_BYTES = 1024 * 1024 * 1024;
+
+function isProcessHotMetrics(cpu, gpu, memory) {
+  return (
+    (Number(cpu) || 0) >= PROCESS_HOT_CPU_PCT ||
+    (Number(gpu) || 0) >= PROCESS_HOT_GPU_PCT ||
+    (Number(memory) || 0) >= PROCESS_HOT_RAM_BYTES
+  );
+}
 
 function getPinnedProcessNames() {
   try {
@@ -661,7 +673,7 @@ function isProcessesSectionCollapsed() {
   const section =
     document.getElementById("processes-section") ||
     document.querySelector(
-      ".apple-processes, .arch-processes, .swiss-processes, .mat-processes, .cpu-processes, .processes-section"
+      ".apple-processes, .arch-processes, .swiss-processes, .mat-processes, .cpu-processes, .poster-processes, .processes-section"
     );
   return !!(
     section &&
@@ -845,7 +857,10 @@ function applyProcessesTopGlanceState({ topPid, topName, topCpu, waiting }) {
   glance.hidden = false;
   const cpuStr = typeof topCpu === "number" ? `${topCpu.toFixed(1)}%` : "—";
   if (text) text.textContent = `Top CPU · ${topName} ${cpuStr}`;
-  glance.classList.toggle("is-hot", typeof topCpu === "number" && topCpu >= 15);
+  glance.classList.toggle(
+    "is-hot",
+    typeof topCpu === "number" && topCpu >= PROCESS_HOT_CPU_PCT
+  );
   glance.setAttribute("role", "button");
   glance.tabIndex = 0;
   glance.title = `Click to open ${topName} details`;
@@ -953,7 +968,7 @@ function applyProcessesTopGpuGlanceState({ topPid, topName, topGpu, waiting }) {
   const gpuNum = Number(topGpu) || 0;
   const gpuStr = gpuNum >= 0.1 ? `${gpuNum.toFixed(1)}%` : "—";
   if (text) text.textContent = `Top GPU · ${topName} ${gpuStr}`;
-  glance.classList.toggle("is-hot", gpuNum >= 15);
+  glance.classList.toggle("is-hot", gpuNum >= PROCESS_HOT_GPU_PCT);
   glance.setAttribute("role", "button");
   glance.tabIndex = 0;
   glance.title = `Click to open ${topName} details`;
@@ -1033,7 +1048,7 @@ function applyProcessesTopRamGlanceState({ topPid, topName, topMem, waiting }) {
   const memStr = memNum > 0 ? formatBytes(memNum) : "—";
   if (text) text.textContent = `Top RAM · ${topName} ${memStr}`;
   // Amber wash when resident ≥ 1 GiB (heavy process).
-  glance.classList.toggle("is-hot", memNum >= 1024 * 1024 * 1024);
+  glance.classList.toggle("is-hot", memNum >= PROCESS_HOT_RAM_BYTES);
   glance.setAttribute("role", "button");
   glance.tabIndex = 0;
   glance.title = `Click to open ${topName} details`;
@@ -1061,7 +1076,7 @@ function wireProcessesTopRamGlanceClick(glance) {
   });
 }
 
-/** All / Pinned chips (Monitors / Debug Log filter parity). */
+/** All / Pinned / Hot chips (Monitors All/Up/Down filter parity). */
 function ensureProcessesFilterChips() {
   const list = document.getElementById("process-list");
   if (!list || !list.parentNode) return;
@@ -1075,7 +1090,8 @@ function ensureProcessesFilterChips() {
     wrap.hidden = true;
     wrap.innerHTML =
       '<button type="button" class="processes-filter-chip is-active" data-processes-filter="all" aria-pressed="true" title="Show every process in the list">All</button>' +
-      '<button type="button" class="processes-filter-chip" data-processes-filter="pinned" aria-pressed="false" title="Show pinned favorites only">Pinned <span class="processes-filter-count" data-processes-filter-count="pinned">0</span></button>';
+      '<button type="button" class="processes-filter-chip" data-processes-filter="pinned" aria-pressed="false" title="Show pinned favorites only">Pinned <span class="processes-filter-count" data-processes-filter-count="pinned">0</span></button>' +
+      '<button type="button" class="processes-filter-chip" data-processes-filter="hot" aria-pressed="false" title="Show processes that are hot (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB)">Hot <span class="processes-filter-count" data-processes-filter-count="hot">0</span></button>';
     list.parentNode.insertBefore(wrap, list);
     wrap.addEventListener("click", (e) => {
       const btn = e.target && e.target.closest && e.target.closest("[data-processes-filter]");
@@ -1084,12 +1100,28 @@ function ensureProcessesFilterChips() {
       e.stopPropagation();
       setProcessesFilterMode(btn.getAttribute("data-processes-filter") || "all");
     });
+  } else if (!wrap.querySelector('[data-processes-filter="hot"]')) {
+    const hotBtn = document.createElement("button");
+    hotBtn.type = "button";
+    hotBtn.className = "processes-filter-chip";
+    hotBtn.setAttribute("data-processes-filter", "hot");
+    hotBtn.setAttribute("aria-pressed", "false");
+    hotBtn.title =
+      "Show processes that are hot (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB)";
+    hotBtn.innerHTML =
+      'Hot <span class="processes-filter-count" data-processes-filter-count="hot">0</span>';
+    wrap.appendChild(hotBtn);
   }
   wireFilterChipToolbarKeyboard(wrap);
 }
 
+function normalizeProcessesFilterMode(mode) {
+  if (mode === "pinned" || mode === "hot") return mode;
+  return "all";
+}
+
 function setProcessesFilterMode(mode) {
-  const next = mode === "pinned" ? "pinned" : "all";
+  const next = normalizeProcessesFilterMode(mode);
   processesFilterMode = next;
   document.querySelectorAll("#processes-filter-chips [data-processes-filter]").forEach((btn) => {
     const on = btn.getAttribute("data-processes-filter") === next;
@@ -1097,6 +1129,16 @@ function setProcessesFilterMode(mode) {
     btn.setAttribute("aria-pressed", on ? "true" : "false");
   });
   applyProcessesListFilter();
+}
+
+function processesFilterMissHint() {
+  if (processesFilterMode === "hot") {
+    return "No process is hot right now (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB).";
+  }
+  if (processesFilterMode === "pinned") {
+    return "Pin a favorite with ★ or P, or clear the filter.";
+  }
+  return "Clear the filter to show every process.";
 }
 
 function ensureProcessesFilterMissState(processList, show) {
@@ -1113,7 +1155,7 @@ function ensureProcessesFilterMissState(processList, show) {
     wrap.setAttribute("role", "status");
     wrap.innerHTML =
       `<div class="processes-filter-miss-msg">Nothing matches this filter</div>` +
-      `<div class="processes-filter-miss-hint">Pin a favorite with ★ or P, or clear the filter.</div>` +
+      `<div class="processes-filter-miss-hint"></div>` +
       `<button type="button" class="processes-filter-miss-cta processes-clear-filter">Clear filter</button>`;
     processList.appendChild(wrap);
     wrap.querySelector(".processes-clear-filter")?.addEventListener("click", (e) => {
@@ -1122,6 +1164,8 @@ function ensureProcessesFilterMissState(processList, show) {
       setProcessesFilterMode("all");
     });
   }
+  const hint = wrap.querySelector(".processes-filter-miss-hint");
+  if (hint) hint.textContent = processesFilterMissHint();
 }
 
 function applyProcessesListFilter() {
@@ -1135,15 +1179,21 @@ function applyProcessesListFilter() {
   if (chips) chips.hidden = waiting || rows.length === 0;
 
   let pinnedCount = 0;
+  let hotCount = 0;
   rows.forEach((el) => {
     if (el.classList.contains("is-pinned")) pinnedCount++;
+    if (el.classList.contains("is-hot")) hotCount++;
   });
 
   const pinnedEl = document.querySelector('[data-processes-filter-count="pinned"]');
   if (pinnedEl) pinnedEl.textContent = String(pinnedCount);
+  const hotEl = document.querySelector('[data-processes-filter-count="hot"]');
+  if (hotEl) hotEl.textContent = String(hotCount);
   document.querySelectorAll("#processes-filter-chips [data-processes-filter]").forEach((btn) => {
     const key = btn.getAttribute("data-processes-filter");
-    btn.classList.toggle("has-hits", key === "pinned" ? pinnedCount > 0 : false);
+    const hits =
+      key === "pinned" ? pinnedCount > 0 : key === "hot" ? hotCount > 0 : false;
+    btn.classList.toggle("has-hits", hits);
   });
 
   if (waiting || rows.length === 0) {
@@ -1154,7 +1204,10 @@ function applyProcessesListFilter() {
   let visible = 0;
   rows.forEach((el) => {
     const isPinned = el.classList.contains("is-pinned");
-    const show = processesFilterMode !== "pinned" || isPinned;
+    const isHot = el.classList.contains("is-hot");
+    let show = true;
+    if (processesFilterMode === "pinned") show = isPinned;
+    else if (processesFilterMode === "hot") show = isHot;
     el.style.display = show ? "" : "none";
     if (show) visible++;
   });
@@ -1936,8 +1989,12 @@ async function refresh() {
         if (tabIdx < 0) tabIdx = 0;
         processes.forEach((proc, i) => {
           const isPinned = pinnedNames.includes(proc.name);
+          const isHot = isProcessHotMetrics(proc.cpu, proc.gpu, proc.memory);
           const row = document.createElement("div");
-          row.className = "process-row" + (isPinned ? " is-pinned" : "");
+          row.className =
+            "process-row" +
+            (isPinned ? " is-pinned" : "") +
+            (isHot ? " is-hot" : "");
           row.setAttribute("data-pid", String(proc.pid));
           row.setAttribute("data-name", proc.name);
           row.setAttribute("role", "option");

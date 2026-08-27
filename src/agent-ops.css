@@ -189,6 +189,10 @@ body:hover {
 .cpu-processes.collapsed .process-table,
 .cpu-processes.collapsed .processes-filter-chips,
 .cpu-processes.collapsed .processes-kb-hint,
+.poster-processes.collapsed #process-list,
+.poster-processes.collapsed .process-table,
+.poster-processes.collapsed .processes-filter-chips,
+.poster-processes.collapsed .processes-kb-hint,
 .processes-section.collapsed #process-list,
 .processes-section.collapsed .process-table,
 .processes-section.collapsed .processes-filter-chips,
@@ -1603,6 +1607,16 @@ textarea.ops-agent-editor.is-dirty {
 .processes-filter-chip[data-processes-filter='pinned'].is-active {
   background: color-mix(in srgb, #ffd60a 22%, transparent);
   border-color: color-mix(in srgb, #ffd60a 42%, transparent);
+}
+
+.processes-filter-chip[data-processes-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, transparent);
+  border-color: color-mix(in srgb, #ff9500 28%, transparent);
+}
+
+.processes-filter-chip[data-processes-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, transparent);
+  border-color: color-mix(in srgb, #ff9500 40%, transparent);
 }
 
 .processes-filter-count {
