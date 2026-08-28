@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-28
 
-Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains, keep-header fixes, Top Processes Hot, Monitors Slow, AI Chat Errors, then CPU rings Hot filter.
+Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains, keep-header fixes, Top Processes Hot, Monitors Slow, AI Chat Errors, CPU rings Hot, then Disk Cleanup scopes On/Off.
 
 ## Shipped tonight
 
@@ -19,15 +19,16 @@ Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains
 | **v0.1.687** | **Monitors All · Up · Down · Slow** — Slow filter for UP sites ≥2000 ms (menu-bar Mon amber; Top Processes Hot parity) |
 | **v0.1.688** | **AI Chat All · You · Assistant · Errors** — Errors filter for failed turns (`Error: …`); red bubble wash (Monitors Slow / Top Processes Hot parity; design review / `feature-ai-chat`) |
 | **v0.1.689** | **CPU rings All · Hot** — Hot filter at menu-bar amber thresholds (CPU ≥50% / GPU ≥15% / Freq ≥3.5 GHz / Temp ≥70°C); amber card wash + matching history charts (design review / `feature-cpu-metrics`) |
+| **v0.1.690** | **Disk Cleanup scopes All · On · Off** — On/Off filter for enabled or disabled scopes; amber Off wash; Enabled scopes card opens Off when any are off (Agents All/On/Off parity; design review / `feature-disk-cleanup`) |
 
 ## Why it matters
 
-Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Monitors, Disk Cleanup, Perplexity, Debug Log, Agent Ops, and AI Chat keep the header + glance on screen when collapsed (compact mode still hides). Top Processes has a **Hot** chip; Monitors has a **Slow** chip; AI Chat has an **Errors** chip; CPU rings have a **Hot** chip so you can focus only on gauges above menu-bar amber thresholds.
+Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Monitors, Disk Cleanup, Perplexity, Debug Log, Agent Ops, and AI Chat keep the header + glance on screen when collapsed (compact mode still hides). Top Processes has a **Hot** chip; Monitors has a **Slow** chip; AI Chat has an **Errors** chip; CPU rings have a **Hot** chip; Disk Cleanup scopes have **On · Off** so you can find disabled paths fast.
 
 ## Digester / design review
 
-- Digester open pointed at design review (`feature-cpu-metrics.png` stale 15.7d) → rings All · Hot.
-- Polish grace marked for `feature-cpu-metrics`.
+- Digester open empty → standing backlog / design review grace → Disk Cleanup scopes On/Off (`feature-disk-cleanup` stale).
+- Polish grace marked for `feature-disk-cleanup`.
 - Screenshot recapture deferred if Screen Recording TCC blocks.
 
 ## Next fuel
