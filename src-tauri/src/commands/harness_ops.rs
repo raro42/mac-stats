@@ -1107,6 +1107,166 @@ pub fn format_schedules_gateway() -> String {
     out
 }
 
+/// Agent Ops Agents All · On · Off filter for `/agents` instant replies.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AgentsListFilter {
+    All,
+    On,
+    Off,
+}
+
+/// Parse On/Off from `/agents on`, `enabled agents`, etc. Default All.
+pub fn parse_agents_list_filter(content: &str) -> AgentsListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" on")
+        || n.ends_with(" enabled")
+        || n == "enabled agents"
+        || n == "on agents"
+        || n == "agents on"
+        || n == "/agents on"
+    {
+        return AgentsListFilter::On;
+    }
+    if n.ends_with(" off")
+        || n.ends_with(" disabled")
+        || n == "disabled agents"
+        || n == "off agents"
+        || n == "agents off"
+        || n == "/agents off"
+    {
+        return AgentsListFilter::Off;
+    }
+    AgentsListFilter::All
+}
+
+/// True for `/agents` / `list agents` — Agent Ops On/Off parity; not create/edit asks.
+pub fn looks_like_agents_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 40 {
+        return false;
+    }
+    if n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("enable ")
+        || n.contains("disable ")
+        || n.contains("write")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.starts_with("agent:")
+        || (n.starts_with("agent ") && !n.starts_with("agent list"))
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/agents"
+            | "agents"
+            | "list agents"
+            | "my agents"
+            | "which agents"
+            | "what agents"
+            | "all agents"
+            | "agent list"
+            | "agents list"
+            | "/agents on"
+            | "agents on"
+            | "enabled agents"
+            | "on agents"
+            | "agents enabled"
+            | "/agents off"
+            | "agents off"
+            | "disabled agents"
+            | "off agents"
+            | "agents disabled"
+    )
+}
+
+/// Zero-LLM agents report (Agent Ops Agents All · On · Off filter parity).
+pub fn format_agents_gateway(filter: AgentsListFilter) -> String {
+    let mut agents = crate::agents::load_all_agents();
+    agents.sort_by(|a, b| {
+        a.name
+            .to_lowercase()
+            .cmp(&b.name.to_lowercase())
+            .then_with(|| a.id.cmp(&b.id))
+    });
+    let on_n = agents.iter().filter(|a| a.enabled).count();
+    let off_n = agents.len().saturating_sub(on_n);
+    let title = match filter {
+        AgentsListFilter::All => format!(
+            "**Agents** — {on_n} on · {off_n} off ({total} total)",
+            total = agents.len()
+        ),
+        AgentsListFilter::On => format!("**Agents · On** — {on_n}"),
+        AgentsListFilter::Off => format!("**Agents · Off** — {off_n}"),
+    };
+    let mut lines = vec![title];
+    fn agent_row(a: &crate::agents::Agent) -> String {
+        let mut row = format!("• {}", a.name);
+        if let Some(slug) = a.slug.as_deref().filter(|s| !s.is_empty()) {
+            row.push_str(&format!(" · `{slug}`"));
+        }
+        if a.orchestrator {
+            row.push_str(" · orchestrator");
+        }
+        if let Some(model) = a.model.as_deref().filter(|s| !s.is_empty()) {
+            row.push_str(&format!(" · {model}"));
+        }
+        row
+    }
+    match filter {
+        AgentsListFilter::All => {
+            if agents.is_empty() {
+                lines.push("_No agents yet — add one under Agent Ops._".to_string());
+            } else {
+                if on_n > 0 {
+                    lines.push("**On**".to_string());
+                    for a in agents.iter().filter(|a| a.enabled) {
+                        lines.push(agent_row(a));
+                    }
+                }
+                if off_n > 0 {
+                    lines.push("**Off**".to_string());
+                    for a in agents.iter().filter(|a| !a.enabled) {
+                        lines.push(agent_row(a));
+                    }
+                }
+            }
+        }
+        AgentsListFilter::On => {
+            let ons: Vec<_> = agents.iter().filter(|a| a.enabled).collect();
+            if ons.is_empty() {
+                lines.push("_None on right now._".to_string());
+            } else {
+                for a in ons {
+                    lines.push(agent_row(a));
+                }
+            }
+        }
+        AgentsListFilter::Off => {
+            let offs: Vec<_> = agents.iter().filter(|a| !a.enabled).collect();
+            if offs.is_empty() {
+                lines.push("_None off right now._".to_string());
+            } else {
+                for a in offs {
+                    lines.push(agent_row(a));
+                }
+            }
+        }
+    }
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// True for short `/status` / `/health` operator asks — not free-form “status of …”.
 pub fn looks_like_status_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -1251,6 +1411,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let days = parse_insights_days(content);
         return Some(format_lite_runs_gateway(days));
     }
+    if looks_like_agents_request(content) {
+        let filter = parse_agents_list_filter(content);
+        return Some(format_agents_gateway(filter));
+    }
     if looks_like_schedules_request(content) {
         return Some(format_schedules_gateway());
     }
@@ -1288,6 +1452,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
 • `/instant` · `/lite` · `/direct` · `/instant 7` — recent instant-, lite-, or direct-lane turns\n\
+• `/agents` · `/agents on` · `/agents off` — Agent Ops On/Off list\n\
 • `/schedules` · `/cron list` — active jobs + last delivery\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
@@ -1421,6 +1586,21 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "lite")
         && !q.contains("why ")
         && !q.contains("explain")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/agents` operator asks (v0.1.705).
+    if (q.contains("/agents")
+        || q == "agents"
+        || q.contains("list agents")
+        || q.contains("enabled agents")
+        || q.contains("disabled agents")
+        || q == "agents on"
+        || q == "agents off")
+        && !q.contains("why")
+        && !q.contains("create")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -2569,6 +2749,8 @@ mod tests {
         assert!(direct.to_lowercase().contains("direct runs"));
         let lite = try_operator_instant_reply("/lite").expect("lite");
         assert!(lite.to_lowercase().contains("lite runs"));
+        let agents = try_operator_instant_reply("/agents").expect("agents");
+        assert!(agents.to_lowercase().contains("agents"));
         let schedules = try_operator_instant_reply("list schedules").expect("schedules");
         assert!(schedules.to_lowercase().contains("schedule"));
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
@@ -2577,6 +2759,26 @@ mod tests {
         assert!(try_operator_instant_reply("why is the site slow").is_none());
         assert!(try_operator_instant_reply("make it instant").is_none());
         assert!(try_operator_instant_reply("make it lite").is_none());
+        assert!(try_operator_instant_reply("create an agent for weather").is_none());
+    }
+
+    #[test]
+    fn agents_request_detected() {
+        assert!(looks_like_agents_request("/agents"));
+        assert!(looks_like_agents_request("list agents"));
+        assert!(looks_like_agents_request("agents on"));
+        assert!(looks_like_agents_request("/agents off"));
+        assert!(looks_like_agents_request("enabled agents"));
+        assert!(looks_like_agents_request("@Werner agents"));
+        assert!(!looks_like_agents_request("create an agent"));
+        assert!(!looks_like_agents_request("agent: research weather"));
+        assert!(!looks_like_agents_request("why are agents offline"));
+        assert_eq!(parse_agents_list_filter("/agents"), AgentsListFilter::All);
+        assert_eq!(parse_agents_list_filter("/agents on"), AgentsListFilter::On);
+        assert_eq!(
+            parse_agents_list_filter("disabled agents"),
+            AgentsListFilter::Off
+        );
     }
 
     #[test]
@@ -2823,8 +3025,16 @@ mod tests {
         assert!(report.contains("/instant"), "{report}");
         assert!(report.contains("/lite"), "{report}");
         assert!(report.contains("/direct"), "{report}");
+        assert!(report.contains("/agents"), "{report}");
         assert!(report.contains("/help"), "{report}");
         assert!(report.contains("Voice"), "{report}");
+    }
+
+    #[test]
+    fn agents_gateway_has_counts() {
+        let report = format_agents_gateway(AgentsListFilter::All);
+        assert!(report.to_lowercase().contains("agents"), "{report}");
+        assert!(report.contains("on"), "{report}");
     }
 
     #[test]

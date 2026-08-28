@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.705] - 2026-08-28
+
+### Added
+- **`/agents` instant operator** — `/agents`, `/agents on`, `/agents off` and NL (`list agents`, `enabled agents`, `disabled agents`) list agents with On/Off counts (Discord + AI Chat; Agent Ops Agents filter parity).
+
 ## [0.1.704] - 2026-08-28
 
 ### Added
