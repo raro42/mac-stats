@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.694** — Agent Ops Runs Fail filter (ok=false; red row wash; overview Opens → Fail; AI Chat Errors parity).
+
 - **v0.1.693** — Agent Ops Runs All · Instant · Direct · Slow filter (Slow ≥2000 ms; amber row wash; overview Opens → Slow; Monitors Slow / p50 parity).
 
 - **v0.1.692** — Perplexity Search All · Top · Snippet filter (Top = first 3; Snippet = preview text; last-search glance opens Top when >3; design review grace).
