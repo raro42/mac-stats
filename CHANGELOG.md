@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.693] - 2026-08-28
+
+### Added
+- **Agent Ops Runs All · Instant · Direct · Slow filter** — Slow shows runs ≥2000 ms wall time; counts + amber row wash; overview Opens → Slow when any qualify (Monitors Slow / p50 latency parity).
+
 ## [0.1.692] - 2026-08-28
 
 ### Added

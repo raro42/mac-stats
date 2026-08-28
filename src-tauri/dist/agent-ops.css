@@ -4012,7 +4012,7 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.85;
 }
 
-/* Agent Ops Runs — All · Instant · Direct (Agents / Sessions parity) */
+/* Agent Ops Runs — All · Instant · Direct · Slow (Monitors Slow parity) */
 .ops-runs-lane-chips {
   display: flex;
   align-items: center;
@@ -4079,6 +4079,30 @@ textarea.ops-agent-editor.is-dirty {
 .ops-runs-lane-chip[data-ops-runs-lane='direct'].is-active {
   background: color-mix(in srgb, #ff9f0a 18%, transparent);
   border-color: color-mix(in srgb, #ff9f0a 36%, transparent);
+}
+
+.ops-runs-lane-chip[data-ops-runs-lane='slow'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 28%, transparent);
+}
+
+.ops-runs-lane-chip[data-ops-runs-lane='slow'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 36%, transparent);
+}
+
+#ops-runs-list .ops-row.is-slow:not(.is-selected) {
+  background: color-mix(in srgb, #ff9f0a 8%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 22%, transparent);
+}
+
+#ops-runs-list .ops-row.is-slow:not(.is-selected):hover {
+  background: color-mix(in srgb, #ff9f0a 12%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 28%, transparent);
+}
+
+#ops-runs-list .ops-row.is-slow .ops-row-meta {
+  color: color-mix(in srgb, #ff9f0a 88%, var(--text));
 }
 
 .ops-runs-lane-count {
