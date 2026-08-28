@@ -1031,12 +1031,71 @@ fn normalize_operator_command(content: &str) -> String {
     n
 }
 
-/// True for Hermes-style `/schedules` / `/cron list` — cheap, no Ollama.
+/// Agent Ops Schedules All · Jobs · Deliveries filter for `/schedules` instant replies.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SchedulesListFilter {
+    All,
+    Jobs,
+    Deliveries,
+}
+
+/// Parse Jobs/Deliveries from `/schedules jobs`, `recent deliveries`, etc. Default All.
+pub fn parse_schedules_list_filter(content: &str) -> SchedulesListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" deliveries")
+        || n.ends_with(" delivery")
+        || n == "deliveries"
+        || n == "delivery"
+        || n == "recent deliveries"
+        || n == "last deliveries"
+        || n == "last delivery"
+        || n == "list deliveries"
+        || n == "show deliveries"
+        || n == "my deliveries"
+        || n == "schedules deliveries"
+        || n == "/schedules deliveries"
+        || n == "delivery list"
+    {
+        return SchedulesListFilter::Deliveries;
+    }
+    if n.ends_with(" jobs")
+        || n == "list jobs"
+        || n == "show jobs"
+        || n == "my jobs"
+        || n == "active jobs"
+        || n == "schedules jobs"
+        || n == "/schedules jobs"
+        || n == "cron jobs"
+        || n == "upcoming jobs"
+        || n == "scheduled jobs"
+        || n == "list scheduled jobs"
+        || n == "my cron jobs"
+    {
+        return SchedulesListFilter::Jobs;
+    }
+    SchedulesListFilter::All
+}
+
+/// True for Hermes-style `/schedules` / `/cron list` — Agent Ops Jobs/Deliveries parity; not create asks.
 pub fn looks_like_schedules_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     // Free-form “schedule a task…” stays with the agent.
-    if n.starts_with("schedule a") || n.starts_with("schedule me") || n.contains(" for tomorrow")
+    if n.starts_with("schedule a")
+        || n.starts_with("schedule me")
+        || n.contains(" for tomorrow")
+        || n.contains("create")
+        || n.contains("add ")
+        || n.contains("remove")
+        || n.contains("delete")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("ticket")
+        || n.contains("redmine")
     {
+        return false;
+    }
+    if n.chars().count() > 48 {
         return false;
     }
     matches!(
@@ -1054,6 +1113,12 @@ pub fn looks_like_schedules_request(content: &str) -> bool {
             | "scheduled jobs"
             | "list scheduled"
             | "list scheduled jobs"
+            | "list jobs"
+            | "show jobs"
+            | "my jobs"
+            | "active jobs"
+            | "schedules jobs"
+            | "/schedules jobs"
             | "my cron"
             | "my cron jobs"
             | "cron jobs"
@@ -1063,6 +1128,17 @@ pub fn looks_like_schedules_request(content: &str) -> bool {
             | "cron list"
             | "list cron"
             | "show cron"
+            | "deliveries"
+            | "delivery"
+            | "recent deliveries"
+            | "last deliveries"
+            | "last delivery"
+            | "list deliveries"
+            | "show deliveries"
+            | "my deliveries"
+            | "schedules deliveries"
+            | "/schedules deliveries"
+            | "delivery list"
     )
 }
 
@@ -1088,19 +1164,107 @@ pub fn looks_like_memory_scrub_request(content: &str) -> bool {
     )
 }
 
-/// Discord/gateway schedule report: active jobs + newest successful delivery.
-pub fn format_schedules_gateway() -> String {
-    let mut out = crate::scheduler::list_schedules_formatted();
-    if let Some(last) = crate::scheduler::list_scheduler_delivery_awareness()
-        .into_iter()
-        .next()
-    {
-        let preview: String = last.summary.chars().take(80).collect();
-        out.push_str(&format!(
-            "\n\n**Last delivery:** {}\n{}",
-            last.utc, preview
-        ));
+/// Zero-LLM schedules report (Agent Ops Schedules All · Jobs · Deliveries filter parity).
+pub fn format_schedules_gateway(filter: SchedulesListFilter) -> String {
+    let jobs = crate::scheduler::list_schedules_for_ui();
+    let deliveries = crate::scheduler::list_scheduler_delivery_awareness();
+    let jobs_n = jobs.len();
+    let del_n = deliveries.len();
+    let title = match filter {
+        SchedulesListFilter::All => {
+            format!("**Schedules** — {jobs_n} jobs · {del_n} deliveries")
+        }
+        SchedulesListFilter::Jobs => format!("**Schedules · Jobs** — {jobs_n}"),
+        SchedulesListFilter::Deliveries => format!("**Schedules · Deliveries** — {del_n}"),
+    };
+    let mut lines = vec![title];
+
+    fn job_row(j: &crate::scheduler::ScheduleForUi) -> String {
+        let id = j.id.as_deref().unwrap_or("(no id)");
+        let kind = if j.cron.is_some() {
+            "cron"
+        } else if j.at.is_some() {
+            "one-shot"
+        } else {
+            "?"
+        };
+        let next = j.next_run.as_deref().unwrap_or("—");
+        let task = truncate_preview(&j.task, 48);
+        format!("• `{id}` · {kind} · next {next} · {task}")
     }
+
+    fn delivery_row(d: &crate::scheduler::DeliveryAwarenessEntry) -> String {
+        let age = age_from_rfc3339(&d.utc);
+        let sid = d
+            .schedule_id
+            .as_deref()
+            .filter(|s| !s.is_empty())
+            .unwrap_or("—");
+        let preview = truncate_preview(&d.summary, 60);
+        format!("• `{sid}` · ch {channel} · {age} · {preview}", channel = d.channel_id)
+    }
+
+    const MAX_ROWS: usize = 12;
+    match filter {
+        SchedulesListFilter::All => {
+            if jobs_n == 0 && del_n == 0 {
+                lines.push(
+                    "_No schedules or deliveries yet — add a job under Agent Ops · Schedules._"
+                        .to_string(),
+                );
+            } else {
+                if jobs_n > 0 {
+                    lines.push("**Jobs**".to_string());
+                    for j in jobs.iter().take(MAX_ROWS) {
+                        lines.push(job_row(j));
+                    }
+                    if jobs_n > MAX_ROWS {
+                        lines.push(format!("_…+{} more_", jobs_n - MAX_ROWS));
+                    }
+                } else {
+                    lines.push("_No active jobs._".to_string());
+                }
+                if del_n > 0 {
+                    lines.push("**Deliveries**".to_string());
+                    for d in deliveries.iter().take(MAX_ROWS) {
+                        lines.push(delivery_row(d));
+                    }
+                    if del_n > MAX_ROWS {
+                        lines.push(format!("_…+{} more_", del_n - MAX_ROWS));
+                    }
+                } else {
+                    lines.push("_No deliveries yet._".to_string());
+                }
+            }
+        }
+        SchedulesListFilter::Jobs => {
+            if jobs.is_empty() {
+                lines.push("_No active jobs — add one under Agent Ops · Schedules._".to_string());
+            } else {
+                for j in jobs.iter().take(MAX_ROWS) {
+                    lines.push(job_row(j));
+                }
+                if jobs_n > MAX_ROWS {
+                    lines.push(format!("_…+{} more_", jobs_n - MAX_ROWS));
+                }
+            }
+        }
+        SchedulesListFilter::Deliveries => {
+            if deliveries.is_empty() {
+                lines.push(
+                    "_No deliveries yet — runs a schedule with a Discord channel ID._".to_string(),
+                );
+            } else {
+                for d in deliveries.iter().take(MAX_ROWS) {
+                    lines.push(delivery_row(d));
+                }
+                if del_n > MAX_ROWS {
+                    lines.push(format!("_…+{} more_", del_n - MAX_ROWS));
+                }
+            }
+        }
+    }
+    let mut out = lines.join("\n");
     if out.chars().count() > 1800 {
         out = out.chars().take(1790).collect::<String>() + "…";
     }
@@ -1855,7 +2019,8 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         return Some(format_knowledge_gateway(filter));
     }
     if looks_like_schedules_request(content) {
-        return Some(format_schedules_gateway());
+        let filter = parse_schedules_list_filter(content);
+        return Some(format_schedules_gateway(filter));
     }
     if looks_like_memory_scrub_request(content) {
         let (files, removed) = crate::commands::session_search::scrub_polluted_memory_files();
@@ -1894,7 +2059,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/agents` · `/agents on` · `/agents off` — Agent Ops On/Off list\n\
 • `/sessions` · `/sessions live` · `/sessions files` — Agent Ops Live/Files list\n\
 • `/knowledge` · `/knowledge discord` · `/knowledge core` — Agent Ops Knowledge list\n\
-• `/schedules` · `/cron list` — active jobs + last delivery\n\
+• `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` — Agent Ops Jobs/Deliveries list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` / `interrupt` — interrupt an in-flight run\n\
@@ -2077,6 +2242,26 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("create")
         && !q.contains("scrub")
         && !q.contains("save ")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/schedules` jobs/deliveries operator asks (v0.1.708).
+    if (q.contains("/schedules")
+        || q == "schedules"
+        || q.contains("list schedules")
+        || q.contains("schedules jobs")
+        || q.contains("schedules deliveries")
+        || q.contains("list deliveries")
+        || q.contains("recent deliveries")
+        || q.contains("upcoming jobs")
+        || q.contains("/cron")
+        || q == "cron list")
+        && !q.contains("why")
+        && !q.contains("schedule a")
+        && !q.contains("create")
+        && !q.contains(" for tomorrow")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -3233,6 +3418,11 @@ mod tests {
         assert!(knowledge.to_lowercase().contains("knowledge"));
         let schedules = try_operator_instant_reply("list schedules").expect("schedules");
         assert!(schedules.to_lowercase().contains("schedule"));
+        let schedules_jobs = try_operator_instant_reply("/schedules jobs").expect("schedules jobs");
+        assert!(schedules_jobs.to_lowercase().contains("jobs"));
+        let schedules_del =
+            try_operator_instant_reply("/schedules deliveries").expect("schedules deliveries");
+        assert!(schedules_del.to_lowercase().contains("deliver"));
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
         assert!(try_operator_instant_reply("insights on weather").is_none());
         assert!(try_operator_instant_reply("why did the build fail").is_none());
@@ -3499,7 +3689,32 @@ mod tests {
         assert!(looks_like_schedules_request("@Werner schedules"));
         assert!(looks_like_schedules_request("upcoming jobs"));
         assert!(looks_like_schedules_request("my cron jobs"));
+        assert!(looks_like_schedules_request("/schedules jobs"));
+        assert!(looks_like_schedules_request("/schedules deliveries"));
+        assert!(looks_like_schedules_request("recent deliveries"));
+        assert!(looks_like_schedules_request("list deliveries"));
         assert!(!looks_like_schedules_request("schedule a task for tomorrow"));
+        assert!(!looks_like_schedules_request("why are schedules empty"));
+        assert_eq!(
+            parse_schedules_list_filter("/schedules"),
+            SchedulesListFilter::All
+        );
+        assert_eq!(
+            parse_schedules_list_filter("/schedules jobs"),
+            SchedulesListFilter::Jobs
+        );
+        assert_eq!(
+            parse_schedules_list_filter("upcoming jobs"),
+            SchedulesListFilter::Jobs
+        );
+        assert_eq!(
+            parse_schedules_list_filter("/schedules deliveries"),
+            SchedulesListFilter::Deliveries
+        );
+        assert_eq!(
+            parse_schedules_list_filter("recent deliveries"),
+            SchedulesListFilter::Deliveries
+        );
     }
 
     #[test]
@@ -3553,6 +3768,8 @@ mod tests {
         let report = format_ops_help_gateway();
         assert!(report.contains("/status"), "{report}");
         assert!(report.contains("/schedules"), "{report}");
+        assert!(report.contains("/schedules jobs"), "{report}");
+        assert!(report.contains("/schedules deliveries"), "{report}");
         assert!(report.contains("/digest"), "{report}");
         assert!(report.contains("/slow"), "{report}");
         assert!(report.contains("/instant"), "{report}");
@@ -3590,6 +3807,20 @@ mod tests {
             report.to_lowercase().contains("discord") || report.to_lowercase().contains("core"),
             "{report}"
         );
+    }
+
+    #[test]
+    fn schedules_gateway_has_counts() {
+        let report = format_schedules_gateway(SchedulesListFilter::All);
+        assert!(report.to_lowercase().contains("schedules"), "{report}");
+        assert!(
+            report.to_lowercase().contains("jobs") || report.to_lowercase().contains("deliver"),
+            "{report}"
+        );
+        let jobs = format_schedules_gateway(SchedulesListFilter::Jobs);
+        assert!(jobs.to_lowercase().contains("jobs"), "{jobs}");
+        let dels = format_schedules_gateway(SchedulesListFilter::Deliveries);
+        assert!(dels.to_lowercase().contains("deliver"), "{dels}");
     }
 
     #[test]

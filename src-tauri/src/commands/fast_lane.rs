@@ -1548,6 +1548,8 @@ mod tests {
             "/agents",
             "/sessions",
             "/knowledge",
+            "/schedules jobs",
+            "/schedules deliveries",
         ] {
             assert!(
                 matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),

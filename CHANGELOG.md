@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.708] - 2026-08-29
+
+### Added
+- **`/schedules` Jobs/Deliveries filter** — `/schedules jobs`, `/schedules deliveries` and NL (`upcoming jobs`, `recent deliveries`, `list deliveries`) list active jobs or recent Discord deliveries (Discord + AI Chat; Agent Ops Schedules All · Jobs · Deliveries parity).
+
 ## [0.1.707] - 2026-08-29
 
 ### Added

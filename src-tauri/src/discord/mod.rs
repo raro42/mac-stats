@@ -2302,7 +2302,8 @@ pub(super) async fn run_discord_ollama_router(
 
     // Hermes `/cron list` parity — cheap schedules report, no Ollama.
     if crate::commands::harness_ops::looks_like_schedules_request(&content) {
-        let report = crate::commands::harness_ops::format_schedules_gateway();
+        let filter = crate::commands::harness_ops::parse_schedules_list_filter(&content);
+        let report = crate::commands::harness_ops::format_schedules_gateway(filter);
         if let Err(e) = new_message.channel_id.say(&ctx, report).await {
             error!("Discord: failed to send schedules: {}", e);
         }
