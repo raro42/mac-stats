@@ -323,6 +323,8 @@ pub fn parse_insights_days(content: &str) -> Option<u32> {
         r.trim()
     } else if let Some(r) = n.strip_prefix("/direct") {
         r.trim()
+    } else if let Some(r) = n.strip_prefix("/lite") {
+        r.trim()
     } else if let Some(r) = n.strip_prefix("failed runs") {
         r.trim()
     } else if let Some(r) = n.strip_prefix("slow runs") {
@@ -330,6 +332,8 @@ pub fn parse_insights_days(content: &str) -> Option<u32> {
     } else if let Some(r) = n.strip_prefix("instant runs") {
         r.trim()
     } else if let Some(r) = n.strip_prefix("direct runs") {
+        r.trim()
+    } else if let Some(r) = n.strip_prefix("lite runs") {
         r.trim()
     } else {
         return None;
@@ -1243,6 +1247,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let days = parse_insights_days(content);
         return Some(format_direct_runs_gateway(days));
     }
+    if looks_like_lite_runs_request(content) {
+        let days = parse_insights_days(content);
+        return Some(format_lite_runs_gateway(days));
+    }
     if looks_like_schedules_request(content) {
         return Some(format_schedules_gateway());
     }
@@ -1279,7 +1287,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
-• `/instant` · `/direct` · `/instant 7` — recent instant- or direct-lane turns\n\
+• `/instant` · `/lite` · `/direct` · `/instant 7` — recent instant-, lite-, or direct-lane turns\n\
 • `/schedules` · `/cron list` — active jobs + last delivery\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
@@ -1398,6 +1406,19 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("direct turns")
         || q.contains("/direct")
         || q == "direct")
+        && !q.contains("why ")
+        && !q.contains("explain")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/lite` / lite-lane operator asks (v0.1.704).
+    if (q.contains("lite run")
+        || q.contains("lite lane")
+        || q.contains("lite turns")
+        || q.contains("/lite")
+        || q == "lite")
         && !q.contains("why ")
         && !q.contains("explain")
         && !q.contains(" ticket")
@@ -2312,6 +2333,11 @@ pub fn format_direct_runs_gateway(days: Option<u32>) -> String {
     format_lane_runs_gateway("Direct", "direct", days)
 }
 
+/// Zero-LLM lite-lane report (Agent Ops Runs Lite filter parity).
+pub fn format_lite_runs_gateway(days: Option<u32>) -> String {
+    format_lane_runs_gateway("Lite", "lite", days)
+}
+
 /// True for `/slow` / `slow runs` — not "why is X slow" or monitor latency asks.
 pub fn looks_like_slow_runs_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -2391,6 +2417,33 @@ pub fn looks_like_direct_runs_request(content: &str) -> bool {
             | "direct"
     ) || n.starts_with("/direct ")
         || (n.starts_with("direct runs ") && parse_insights_days(content).is_some())
+}
+
+/// True for `/lite` / `lite runs` — not free-form “make it lite” asks.
+pub fn looks_like_lite_runs_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.contains(" ticket") || n.contains("redmine") || n.contains("http") {
+        return false;
+    }
+    if n.contains(" why ") || n.contains("why is") || n.contains("why did") || n.contains("explain")
+    {
+        return false;
+    }
+    if n.contains("make ") || n.contains("make it") || n.contains("lightweight") {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/lite"
+            | "lite runs"
+            | "lite run"
+            | "lite lane"
+            | "lite turns"
+            | "show lite runs"
+            | "recent lite runs"
+            | "lite"
+    ) || n.starts_with("/lite ")
+        || (n.starts_with("lite runs ") && parse_insights_days(content).is_some())
 }
 
 /// True for `/failed` / `failed runs` — not "why did X fail".
@@ -2514,6 +2567,8 @@ mod tests {
         assert!(instant.to_lowercase().contains("instant runs"));
         let direct = try_operator_instant_reply("/direct").expect("direct");
         assert!(direct.to_lowercase().contains("direct runs"));
+        let lite = try_operator_instant_reply("/lite").expect("lite");
+        assert!(lite.to_lowercase().contains("lite runs"));
         let schedules = try_operator_instant_reply("list schedules").expect("schedules");
         assert!(schedules.to_lowercase().contains("schedule"));
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
@@ -2521,6 +2576,7 @@ mod tests {
         assert!(try_operator_instant_reply("why did the build fail").is_none());
         assert!(try_operator_instant_reply("why is the site slow").is_none());
         assert!(try_operator_instant_reply("make it instant").is_none());
+        assert!(try_operator_instant_reply("make it lite").is_none());
     }
 
     #[test]
@@ -2542,6 +2598,17 @@ mod tests {
         assert!(looks_like_direct_runs_request("@Werner direct runs 3"));
         assert!(looks_like_direct_runs_request("/direct 7"));
         assert!(!looks_like_direct_runs_request("why did direct lane fail"));
+    }
+
+    #[test]
+    fn lite_runs_request_detected() {
+        assert!(looks_like_lite_runs_request("/lite"));
+        assert!(looks_like_lite_runs_request("lite runs"));
+        assert!(looks_like_lite_runs_request("lite lane"));
+        assert!(looks_like_lite_runs_request("@Werner lite runs 3"));
+        assert!(looks_like_lite_runs_request("/lite 7"));
+        assert!(!looks_like_lite_runs_request("make it lite"));
+        assert!(!looks_like_lite_runs_request("why is lite lane broken"));
     }
 
     #[test]
@@ -2593,6 +2660,7 @@ mod tests {
         assert_eq!(parse_insights_days("/slow 3"), Some(3));
         assert_eq!(parse_insights_days("/instant 7"), Some(7));
         assert_eq!(parse_insights_days("/direct 3"), Some(3));
+        assert_eq!(parse_insights_days("/lite 7"), Some(7));
     }
 
     #[test]
@@ -2753,6 +2821,7 @@ mod tests {
         assert!(report.contains("/digest"), "{report}");
         assert!(report.contains("/slow"), "{report}");
         assert!(report.contains("/instant"), "{report}");
+        assert!(report.contains("/lite"), "{report}");
         assert!(report.contains("/direct"), "{report}");
         assert!(report.contains("/help"), "{report}");
         assert!(report.contains("Voice"), "{report}");

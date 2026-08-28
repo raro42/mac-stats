@@ -423,7 +423,7 @@
   let opsMemoryCache = [];
   let opsMemoryLoadText = null;
   let opsRunsFilterQ = '';
-  /** Runs panel lane chip: `all` | `instant` | `direct` | `slow` (Monitors Slow parity). */
+  /** Runs panel lane chip: `all` | `instant` | `lite` | `direct` | `slow` | `fail`. */
   let opsRunsLaneFilter = 'all';
   /** Wall time ≥ this ms counts as Slow (Monitors MONITOR_SLOW_MS / menu-bar Mon parity). */
   const OPS_RUNS_SLOW_MS = 2000;
@@ -1773,7 +1773,7 @@ function ensureOpsRunsFilter() {
     });
 }
 
-/** All · Instant · Direct · Slow · Fail chips (Monitors Slow / AI Chat Errors parity). */
+/** All · Instant · Lite · Direct · Slow · Fail chips (Monitors Slow / AI Chat Errors parity). */
 function ensureOpsRunsLaneChips() {
     const panel = document.getElementById('ops-panel-runs');
     const filterRow = panel && panel.querySelector('.ops-filter-row');
@@ -1788,6 +1788,7 @@ function ensureOpsRunsLaneChips() {
         wrap.innerHTML =
             '<button type="button" class="ops-runs-lane-chip is-active" data-ops-runs-lane="all" aria-pressed="true" title="Show every run lane">All</button>' +
             '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="instant" aria-pressed="false" title="Show instant-lane runs only">Instant <span class="ops-runs-lane-count" data-ops-runs-lane-count="instant">0</span></button>' +
+            '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="lite" aria-pressed="false" title="Show lite-lane runs only">Lite <span class="ops-runs-lane-count" data-ops-runs-lane-count="lite">0</span></button>' +
             '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="direct" aria-pressed="false" title="Show direct-lane runs only">Direct <span class="ops-runs-lane-count" data-ops-runs-lane-count="direct">0</span></button>' +
             `<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="slow" aria-pressed="false" title="Show slow runs (≥${OPS_RUNS_SLOW_MS} ms)">Slow <span class="ops-runs-lane-count" data-ops-runs-lane-count="slow">0</span></button>` +
             '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="fail" aria-pressed="false" title="Show failed runs only (ok=false)">Fail <span class="ops-runs-lane-count" data-ops-runs-lane-count="fail">0</span></button>';
@@ -1799,6 +1800,19 @@ function ensureOpsRunsLaneChips() {
             setOpsRunsLaneFilter(btn.getAttribute('data-ops-runs-lane') || 'all');
         });
     } else {
+        if (!wrap.querySelector('[data-ops-runs-lane="lite"]')) {
+            const liteBtn = document.createElement('button');
+            liteBtn.type = 'button';
+            liteBtn.className = 'ops-runs-lane-chip';
+            liteBtn.setAttribute('data-ops-runs-lane', 'lite');
+            liteBtn.setAttribute('aria-pressed', 'false');
+            liteBtn.title = 'Show lite-lane runs only';
+            liteBtn.innerHTML =
+                'Lite <span class="ops-runs-lane-count" data-ops-runs-lane-count="lite">0</span>';
+            const directBtn = wrap.querySelector('[data-ops-runs-lane="direct"]');
+            if (directBtn) wrap.insertBefore(liteBtn, directBtn);
+            else wrap.appendChild(liteBtn);
+        }
         if (!wrap.querySelector('[data-ops-runs-lane="slow"]')) {
             const slowBtn = document.createElement('button');
             slowBtn.type = 'button';
@@ -1831,6 +1845,7 @@ function ensureOpsRunsLaneChips() {
 function setOpsRunsLaneFilter(mode) {
     const next =
         mode === 'instant' ||
+        mode === 'lite' ||
         mode === 'direct' ||
         mode === 'slow' ||
         mode === 'fail' ||
@@ -1858,14 +1873,17 @@ function paintOpsRunsLaneChips() {
         ? opsRunsInsightsCache.recent
         : [];
     const instantN = recent.filter((r) => runsRowMatchesLane(r, 'instant')).length;
+    const liteN = recent.filter((r) => runsRowMatchesLane(r, 'lite')).length;
     const directN = recent.filter((r) => runsRowMatchesLane(r, 'direct')).length;
     const slowN = recent.filter((r) => runsRowIsSlow(r)).length;
     const failN = recent.filter((r) => runsRowIsFail(r)).length;
     const instantEl = wrap.querySelector('[data-ops-runs-lane-count="instant"]');
+    const liteEl = wrap.querySelector('[data-ops-runs-lane-count="lite"]');
     const directEl = wrap.querySelector('[data-ops-runs-lane-count="direct"]');
     const slowEl = wrap.querySelector('[data-ops-runs-lane-count="slow"]');
     const failEl = wrap.querySelector('[data-ops-runs-lane-count="fail"]');
     if (instantEl) instantEl.textContent = String(instantN);
+    if (liteEl) liteEl.textContent = String(liteN);
     if (directEl) directEl.textContent = String(directN);
     if (slowEl) slowEl.textContent = String(slowN);
     if (failEl) failEl.textContent = String(failN);
@@ -1876,6 +1894,8 @@ function paintOpsRunsLaneChips() {
         btn.setAttribute('aria-pressed', active ? 'true' : 'false');
         if (key === 'instant') {
             btn.classList.toggle('has-hits', instantN > 0);
+        } else if (key === 'lite') {
+            btn.classList.toggle('has-hits', liteN > 0);
         } else if (key === 'direct') {
             btn.classList.toggle('has-hits', directN > 0);
         } else if (key === 'slow') {
@@ -1886,7 +1906,7 @@ function paintOpsRunsLaneChips() {
     });
 }
 
-/** Overview Runs open → Fail when any failed else Slow else Direct else Instant (AI Chat Errors parity). */
+/** Overview Runs open → Fail when any failed else Slow else Direct else Lite else Instant. */
 function preferOpsRunsLaneFromOverview() {
     const recent = Array.isArray(opsRunsInsightsCache?.recent)
         ? opsRunsInsightsCache.recent
@@ -1910,6 +1930,11 @@ function preferOpsRunsLaneFromOverview() {
         setOpsRunsLaneFilter('direct');
         return;
     }
+    const liteN = recent.filter((r) => runsRowMatchesLane(r, 'lite')).length;
+    if (liteN > 0) {
+        setOpsRunsLaneFilter('lite');
+        return;
+    }
     const instantN = recent.filter((r) => runsRowMatchesLane(r, 'instant')).length;
     setOpsRunsLaneFilter(instantN > 0 ? 'instant' : 'all');
 }
@@ -1918,6 +1943,7 @@ function runsRowMatchesLane(r, mode) {
     const lane = String(r?.lane || '').toLowerCase();
     const want = mode || opsRunsLaneFilter;
     if (want === 'instant') return lane === 'instant';
+    if (want === 'lite') return lane === 'lite';
     if (want === 'direct') return lane === 'direct';
     if (want === 'slow') return runsRowIsSlow(r);
     if (want === 'fail') return runsRowIsFail(r);
@@ -3431,7 +3457,7 @@ function openOpsRunPreviewNavigate(summary) {
     if (!summary) return false;
     if (agentOpsCollapsed) applyOpsCollapsed(false);
     const lane = String(summary?.lane || '').toLowerCase();
-    if (lane === 'instant' || lane === 'direct') {
+    if (lane === 'instant' || lane === 'lite' || lane === 'direct') {
         setOpsRunsLaneFilter(lane);
     }
     selectOpsTab('runs');
@@ -6978,6 +7004,7 @@ function renderOpsRuns(insights) {
         btn.className = 'ops-row';
         if (runsRowIsFail(r)) btn.classList.add('is-fail');
         else if (runsRowIsSlow(r)) btn.classList.add('is-slow');
+        else if (String(r?.lane || '').toLowerCase() === 'lite') btn.classList.add('is-lite');
         const rid = String(r?.request_id || '').trim();
         if (rid) btn.dataset.requestId = rid;
         btn.dataset.questionPreview = String(r?.question_preview || '');

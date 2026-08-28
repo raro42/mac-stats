@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.704] - 2026-08-28
+
+### Added
+- **`/lite` instant operator** — `/lite` and NL (`lite runs`, `lite lane`) list recent lite-lane turns from `runs.jsonl` (Discord + AI Chat; Agent Ops Runs Lite filter parity).
+- **Agent Ops Runs Lite filter** — All · Instant · **Lite** · Direct · Slow · Fail (blue row wash for lite-lane turns).
+
 ## [0.1.703] - 2026-08-28
 
 ### Fixed
