@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.698] - 2026-08-28
+
+### Fixed
+- **CPU window blank gauges** — syntax error in Perplexity results keyboard handler (missing `}` before PageDown) stopped `cpu.js` from loading, so rings and values never updated.
+
+
 ## [0.1.697] - 2026-08-28
 
 ### Added

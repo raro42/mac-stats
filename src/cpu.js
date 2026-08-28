@@ -12020,7 +12020,7 @@ function wirePerplexityResultsKeyboard(resultsEl) {
         return;
       }
       next = Math.max(idx - 1, 0);
-    else if (e.key === 'PageDown') next = Math.min(idx + page, items.length - 1);
+    } else if (e.key === 'PageDown') next = Math.min(idx + page, items.length - 1);
     else if (e.key === 'PageUp') next = Math.max(idx - page, 0);
     else if (e.key === 'Home') next = 0;
     else if (e.key === 'End') next = items.length - 1;
