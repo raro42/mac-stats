@@ -1,17 +1,23 @@
 # Morning surprise — 2026-08-29
 
-Overnight Track B (20:00–06:00 local, started 2026-08-28 evening). Digester open empty; design review on grace.
+Overnight Track B (autoresearch) for Ralf.
 
 ## Shipped tonight
 
 | Version | What |
-| --- | --- |
-| **v0.1.705** | **`/agents`** — zero-LLM agent list with On/Off filter (`/agents on` · `/agents off`; Discord + AI Chat; Agent Ops Agents parity) |
-| **v0.1.704** | **`/lite` + Agent Ops Runs Lite** — zero-LLM lite-lane turns from runs.jsonl; Runs All · Instant · **Lite** · Direct · Slow · Fail |
-| **v0.1.703** | **Having_fun idle thoughts** — retry Discord send once on timeout/safe API errors; do not store unsent thoughts; rate-limit idle-thought timeout WARN |
+|---------|------|
+| **v0.1.703** | Having_fun idle-thought Discord send retry + skip session memory on fail + rate-limited timeout WARN |
+| **v0.1.704** | `/lite` instant operator + Agent Ops Runs Lite filter |
+| **v0.1.705** | `/agents` instant operator (On/Off list) |
+| **v0.1.706** | `/sessions` instant operator (Live/Files list) |
 
-## Context
+## This tick (~00:25)
 
-- Digester: no open Slowest / improvement candidates (instant+direct noise filtered).
-- Design review: `due=false` (grace); recommended surface still `feature-ai-chat`.
-- Fuel this tick: standing backlog p50 / Agent Ops Agents On·Off parity gap for Discord + AI Chat.
+- Digester open empty; design review in grace.
+- Fuel: standing backlog p50 — Sessions Live/Files parity for Discord + AI Chat.
+- **`/sessions`**, **`/sessions live`**, **`/sessions files`** (+ NL) list live in-memory sessions and saved `session-memory-*.md` files without Ollama.
+
+## Next
+
+- Knowledge Discord/Core instant list when digester still empty.
+- Design review screens after grace ends.
