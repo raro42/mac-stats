@@ -11,12 +11,13 @@ Overnight Track B (autoresearch) for Ralf.
 | **v0.1.705** | `/agents` instant operator (On/Off list) |
 | **v0.1.706** | `/sessions` instant operator (Live/Files list) |
 | **v0.1.707** | `/knowledge` instant operator (Discord/Core list) |
+| **v0.1.708** | `/schedules` Jobs/Deliveries filter (jobs · deliveries list) |
 
-## This tick (~00:55)
+## This tick (~01:30)
 
 - Digester open empty; design review in grace.
-- Fuel: standing backlog p50 — Knowledge Discord/Core parity for Discord + AI Chat.
-- **`/knowledge`**, **`/knowledge discord`**, **`/knowledge core`** (+ NL) list soul/global/main and `memory-discord-*.md` files without Ollama.
+- Fuel: standing backlog p50 — Schedules Jobs/Deliveries parity for Discord + AI Chat.
+- **`/schedules`**, **`/schedules jobs`**, **`/schedules deliveries`** (+ NL) list active jobs and recent Discord deliveries without Ollama.
 
 ## Next
 

@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.708** — `/schedules` Jobs/Deliveries filter (`/schedules jobs` · `/schedules deliveries`) — Agent Ops Schedules parity (Discord + AI Chat; p50 latency).
+
 - **v0.1.707** — `/knowledge` instant operator (`/knowledge discord` · `/knowledge core`) — Agent Ops Discord/Core list (Discord + AI Chat; p50 latency).
 
 - **v0.1.706** — `/sessions` instant operator (`/sessions live` · `/sessions files`) — Agent Ops Live/Files list (Discord + AI Chat; p50 latency).
