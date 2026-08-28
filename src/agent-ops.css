@@ -1091,10 +1091,55 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   color: inherit;
 }
 
+button.ops-badge {
+  appearance: none;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 650;
+  cursor: pointer;
+  line-height: 1.2;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+button.ops-badge:hover {
+  opacity: 1;
+  box-shadow: 0 0 0 2px color-mix(in srgb, #30d158 22%, transparent);
+}
+
+button.ops-badge.off:hover {
+  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 14%, transparent);
+}
+
+button.ops-badge:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 28%, transparent);
+}
+
+button.ops-badge:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
 .ops-badge.off {
   background: color-mix(in srgb, currentColor 8%, transparent);
   border-color: color-mix(in srgb, currentColor 12%, transparent);
   opacity: 0.6;
+}
+
+.ops-agent-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ops-agent-meta-row #ops-agent-meta {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .ops-preview {

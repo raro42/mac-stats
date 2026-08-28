@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.701] - 2026-08-28
+
+### Fixed
+- **Agent Ops on/off badges** — the green/grey **on** / **off** chip on Agents (and Overview Agents) now toggles `enabled` in `agent.json` via the existing enable/disable commands. The **All · On · Off** chips stay list filters only.
+
 ## [0.1.700] - 2026-08-28
 
 ### Changed

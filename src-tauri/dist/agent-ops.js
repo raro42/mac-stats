@@ -3383,27 +3383,46 @@ function renderOverviewAgents(agents) {
         { zero: enabledN === 0 }
     );
     rows.slice(0, 4).forEach((a) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'ops-row';
+        const row = document.createElement('div');
+        row.className = 'ops-row';
+        row.setAttribute('role', 'button');
+        row.tabIndex = 0;
         const slug = a.slug || a.id || '';
         const metaBits = [
             a.model || 'default model',
             a.orchestrator ? 'orchestrator' : '',
-            a.enabled ? 'on' : 'off',
         ].filter(Boolean);
-        btn.innerHTML =
+        const on = !!a.enabled;
+        row.innerHTML =
             `<div><div class="ops-row-title">${escapeHtml(a.name || slug)}` +
             (slug ? ` <span class="ops-row-meta">· ${escapeHtml(slug)}</span>` : '') +
             `</div><div class="ops-row-meta">${escapeHtml(metaBits.join(' · '))}</div></div>` +
-            `<span class="ops-badge ${a.enabled ? '' : 'off'}">${a.enabled ? 'on' : 'off'}</span>`;
-        btn.addEventListener('click', () => {
+            `<button type="button" class="ops-badge ${on ? '' : 'off'}" data-ops-agent-toggle="${escapeHtml(a.id)}" aria-pressed="${on ? 'true' : 'false'}" title="${on ? 'Turn agent off' : 'Turn agent on'}">${on ? 'on' : 'off'}</button>`;
+        const toggle = row.querySelector('[data-ops-agent-toggle]');
+        if (toggle) {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                void toggleOpsAgentEnabled(a.id, !!a.enabled);
+            });
+        }
+        const openRow = () => {
             body.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
-            btn.classList.add('is-selected');
+            row.classList.add('is-selected');
             openOpsAgentPreviewNavigate(a);
+        };
+        row.addEventListener('click', (e) => {
+            if (e.target.closest && e.target.closest('[data-ops-agent-toggle]')) return;
+            openRow();
         });
-        btn.title = 'Open in Agents · load soul/skill/mood into AI Chat from that tab';
-        body.appendChild(btn);
+        row.addEventListener('keydown', (e) => {
+            if (e.target.closest && e.target.closest('[data-ops-agent-toggle]')) return;
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            e.preventDefault();
+            openRow();
+        });
+        row.title = 'Open in Agents · click on/off to enable or disable';
+        body.appendChild(row);
     });
 }
 
@@ -4674,30 +4693,128 @@ function renderOpsAgents(agents) {
         return;
     }
     filtered.forEach((a) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'ops-row';
+        const row = document.createElement('div');
+        row.className = 'ops-row';
+        row.setAttribute('role', 'button');
+        row.tabIndex = 0;
         const slug = a.slug || a.id;
-        btn.innerHTML = `<div><div class="ops-row-title">${escapeHtml(a.name)} <span class="ops-row-meta">· ${escapeHtml(slug)}</span></div><div class="ops-row-meta">${escapeHtml(a.model || 'default model')}${a.orchestrator ? ' · orchestrator' : ''}</div></div><span class="ops-badge ${a.enabled ? '' : 'off'}">${a.enabled ? 'on' : 'off'}</span>`;
-        setOpsRowCopyValue(btn, slug);
-        btn.addEventListener('click', () => {
+        const on = !!a.enabled;
+        row.innerHTML =
+            `<div><div class="ops-row-title">${escapeHtml(a.name)} <span class="ops-row-meta">· ${escapeHtml(slug)}</span></div>` +
+            `<div class="ops-row-meta">${escapeHtml(a.model || 'default model')}${a.orchestrator ? ' · orchestrator' : ''}</div></div>` +
+            `<button type="button" class="ops-badge ${on ? '' : 'off'}" data-ops-agent-toggle="${escapeHtml(a.id)}" aria-pressed="${on ? 'true' : 'false'}" title="${on ? 'Turn agent off' : 'Turn agent on'}">${on ? 'on' : 'off'}</button>`;
+        setOpsRowCopyValue(row, slug);
+        const toggle = row.querySelector('[data-ops-agent-toggle]');
+        if (toggle) {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                void toggleOpsAgentEnabled(a.id, !!a.enabled);
+            });
+        }
+        const openRow = () => {
             list.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
-            btn.classList.add('is-selected');
+            row.classList.add('is-selected');
             openOpsAgent(a.id);
+        };
+        row.addEventListener('click', (e) => {
+            if (e.target.closest && e.target.closest('[data-ops-agent-toggle]')) return;
+            openRow();
         });
-        btn.addEventListener('dblclick', async (e) => {
+        row.addEventListener('keydown', (e) => {
+            if (e.target.closest && e.target.closest('[data-ops-agent-toggle]')) return;
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            e.preventDefault();
+            openRow();
+        });
+        row.addEventListener('dblclick', async (e) => {
+            if (e.target.closest && e.target.closest('[data-ops-agent-toggle]')) return;
             e.preventDefault();
             e.stopPropagation();
             list.querySelectorAll('.ops-row.is-selected').forEach((el) => el.classList.remove('is-selected'));
-            btn.classList.add('is-selected');
+            row.classList.add('is-selected');
             await openOpsAgent(a.id);
             loadOpsAgentIntoChat();
         });
-        btn.title = 'Open agent · c copies id · Enter / double-click to load soul/skill/mood into AI Chat';
-        list.appendChild(btn);
+        row.title =
+            'Open agent · click on/off to enable or disable · c copies id · Enter / double-click loads into AI Chat';
+        list.appendChild(row);
     });
     paintOpsFilterMatch('ops-agents-filter', kindPool.length, filtered.length, opsAgentsFilterQ);
     paintOpsAgentsEnabledChips();
+}
+
+/** Flip agent enabled in agent.json via Tauri; refresh Agents list + overview. */
+async function toggleOpsAgentEnabled(agentId, currentlyEnabled) {
+    const id = String(agentId || '').trim();
+    if (!id) return false;
+    const next = !currentlyEnabled;
+    const cmd = next ? 'enable_agent' : 'disable_agent';
+    document.querySelectorAll(`[data-ops-agent-toggle="${CSS.escape(id)}"]`).forEach((el) => {
+        el.disabled = true;
+    });
+    try {
+        await invoke(cmd, { agentId: id });
+        opsAgentsCache = (opsAgentsCache || []).map((a) =>
+            a && String(a.id) === id ? { ...a, enabled: next } : a
+        );
+        if (opsAgentCache && String(opsAgentCache.id) === id) {
+            opsAgentCache = { ...opsAgentCache, enabled: next };
+            syncOpsAgentDetailEnabledUi();
+        }
+        renderOverviewAgents(opsAgentsCache);
+        renderOpsAgents(opsAgentsCache);
+        return true;
+    } catch (err) {
+        alert(`Could not ${next ? 'enable' : 'disable'} agent: ${err}`);
+        renderOpsAgents(opsAgentsCache);
+        return false;
+    }
+}
+
+function syncOpsAgentDetailEnabledUi() {
+    const meta = document.getElementById('ops-agent-meta');
+    if (!meta || !opsAgentCache) return;
+    meta.textContent =
+        `${opsAgentCache.name} · ${opsAgentCache.slug || opsAgentCache.id} · ${opsAgentCache.model || 'default'} · ${opsAgentCache.enabled ? 'enabled' : 'disabled'}`;
+    ensureOpsAgentEnabledToggle();
+}
+
+/** On/Off control in agent detail (same enable_agent / disable_agent path). */
+function ensureOpsAgentEnabledToggle() {
+    const detail = document.getElementById('ops-agent-detail');
+    const meta = document.getElementById('ops-agent-meta');
+    if (!detail || !meta || !opsAgentCache) return;
+    let row = document.getElementById('ops-agent-meta-row');
+    if (!row) {
+        row = document.createElement('div');
+        row.id = 'ops-agent-meta-row';
+        row.className = 'ops-agent-meta-row';
+        meta.replaceWith(row);
+        row.appendChild(meta);
+    } else if (!row.contains(meta)) {
+        row.prepend(meta);
+    }
+    let toggle = document.getElementById('ops-agent-enabled-toggle');
+    if (!toggle) {
+        toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.id = 'ops-agent-enabled-toggle';
+        toggle.className = 'ops-badge';
+        row.appendChild(toggle);
+        toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!opsAgentCache) return;
+            void toggleOpsAgentEnabled(opsAgentCache.id, !!opsAgentCache.enabled);
+        });
+    }
+    const on = !!opsAgentCache.enabled;
+    toggle.classList.toggle('off', !on);
+    toggle.setAttribute('aria-pressed', on ? 'true' : 'false');
+    toggle.title = on ? 'Turn agent off' : 'Turn agent on';
+    toggle.textContent = on ? 'on' : 'off';
+    toggle.disabled = false;
 }
 
 async function openOpsAgent(id) {
@@ -4708,6 +4825,7 @@ async function openOpsAgent(id) {
         detail.hidden = false;
         document.getElementById('ops-agent-meta').textContent =
             `${opsAgentCache.name} · ${opsAgentCache.slug || opsAgentCache.id} · ${opsAgentCache.model || 'default'} · ${opsAgentCache.enabled ? 'enabled' : 'disabled'}`;
+        ensureOpsAgentEnabledToggle();
         setOpsAgentCopyChip(opsAgentCache.slug || opsAgentCache.id || '');
         opsAgentFileTab = 'soul';
         opsAgentDirty = { soul: false, skill: false, mood: false };
@@ -6953,14 +7071,13 @@ function escapeHtml(s) {
     const section = document.getElementById('agent-ops-section') || document.querySelector('.agent-ops-section');
     const content = document.getElementById('agent-ops-content');
     const btn = document.getElementById('agent-ops-collapse-btn');
-    const compact = document.body.classList.contains('cpu-window-compact');
-    // Compact CPU window: full-hide (setIconPaneVisibility). Otherwise keep-header.
-    if (compact && collapsed && typeof window.setIconPaneVisibility === 'function') {
-      window.setIconPaneVisibility(section, content, true, null);
+    if (typeof window.setIconPaneVisibility === 'function') {
+      window.setIconPaneVisibility(section, content, collapsed, null);
     } else if (section) {
-      section.style.display = '';
       section.classList.toggle('collapsed', collapsed);
-      section.removeAttribute('aria-hidden');
+      section.style.display = collapsed ? 'none' : '';
+      if (collapsed) section.setAttribute('aria-hidden', 'true');
+      else section.removeAttribute('aria-hidden');
       if (content) {
         content.classList.toggle('collapsed', collapsed);
         content.style.display = collapsed ? 'none' : '';
@@ -6970,7 +7087,8 @@ function escapeHtml(s) {
     const header = document.getElementById('agent-ops-header');
     if (header) header.setAttribute('aria-expanded', String(!collapsed));
     stopOpsGlancePoll();
-    syncOpsCollapsedGlance();
+    const glance = document.getElementById('agent-ops-collapsed-glance');
+    if (glance) glance.hidden = true;
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);
@@ -6981,18 +7099,7 @@ function escapeHtml(s) {
     }
     if (collapsed) {
       stopAgentOpsAutoRefresh();
-      if (!compact) startOpsGlancePoll();
     } else {
-      // Keep-header expand: clear any prior full-hide inline styles (compact).
-      if (section) {
-        section.style.display = '';
-        section.classList.remove('collapsed');
-        section.removeAttribute('aria-hidden');
-      }
-      if (content) {
-        content.classList.remove('collapsed');
-        content.style.display = '';
-      }
       restoreAgentOpsTab();
       refreshAgentOps();
       startAgentOpsAutoRefresh();
