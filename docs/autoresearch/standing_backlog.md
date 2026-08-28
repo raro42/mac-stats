@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.703** — Having_fun idle-thought Discord send retry + skip session memory on failed send + rate-limited timeout WARN (`debug.log` / Discord reliability).
+
 - **v0.1.697** — `/instant` + `/direct` instant operators (`instant runs`, `direct runs`) — lane-filtered turns from runs.jsonl (Discord + AI Chat; Agent Ops Instant/Direct parity; p50 latency).
 
 - **v0.1.696** — `/slow` instant operator (`what's slow`, `slow runs`) — ok turns ≥2000 ms from runs.jsonl (Discord + AI Chat; Agent Ops Slow parity; p50 latency).

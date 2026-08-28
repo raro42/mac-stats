@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.703] - 2026-08-28
+
+### Fixed
+- **Having_fun idle thoughts** — Discord send retries once on per-send timeout or safe API errors (parity with normal replies); unsent thoughts are not written into session memory; idle-thought timeout WARN is rate-limited to once per 5 minutes (debug.log noise).
+
 ## [0.1.702] - 2026-08-28
 
 ### Fixed

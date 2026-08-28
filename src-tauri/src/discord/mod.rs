@@ -1408,6 +1408,33 @@ async fn having_fun_idle_thought(channel_id: u64, ctx: &Context) {
         .await;
 }
 
+/// Idle-thought Discord send timeouts are best-effort noise when the gateway is slow.
+/// Emit at most one WARN per interval; further timeouts stay DEBUG (single-instance busy parity).
+const IDLE_THOUGHT_TIMEOUT_WARN_INTERVAL_SECS: u64 = 5 * 60;
+static LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS: AtomicU64 = AtomicU64::new(0);
+
+fn should_warn_idle_thought_timeout(prev_secs: u64, now_secs: u64, interval_secs: u64) -> bool {
+    prev_secs == 0 || now_secs.saturating_sub(prev_secs) >= interval_secs
+}
+
+fn log_idle_thought_send_timeout(part_index: usize, total: usize) {
+    let now = std::time::SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    let prev = LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS.load(Ordering::Relaxed);
+    if should_warn_idle_thought_timeout(prev, now, IDLE_THOUGHT_TIMEOUT_WARN_INTERVAL_SECS) {
+        LAST_IDLE_THOUGHT_TIMEOUT_WARN_SECS.store(now, Ordering::Relaxed);
+        outbound_pipeline::log_send_timeout("discord_idle_thought", part_index, total);
+    } else {
+        debug!(
+            target: "outbound_pipeline",
+            "outbound discord_idle_thought: per-send timeout (part {}/{}); aborting remaining blocks (rate-limited)",
+            part_index, total
+        );
+    }
+}
+
 async fn having_fun_idle_thought_locked(channel_id: u64, ctx: Context) {
     let chan = channel_settings(channel_id);
     // Having_fun idle thoughts always use casual-only context; we never inject agent/work soul (e.g. Redmine).
@@ -1531,21 +1558,71 @@ async fn having_fun_idle_thought_locked(channel_id: u64, ctx: Context) {
             let chunks = outbound_pipeline::split_discord_reply(&reply, false);
             let send_timeout = outbound_pipeline::per_send_timeout();
             let mut dedup = ReplyDedupState::new();
+            // Best-effort: one timeout/API retry per chunk; only remember what Discord accepted.
+            let mut sent_any = false;
+            let mut aborted = false;
             for (i, chunk) in chunks.iter().enumerate() {
                 if !dedup.register_if_new(chunk.as_str(), None) {
                     continue;
                 }
-                let _ = match tokio::time::timeout(send_timeout, channel.say(&ctx, chunk)).await {
-                    Ok(r) => r,
-                    Err(_) => {
-                        outbound_pipeline::log_send_timeout(
-                            "discord_idle_thought",
-                            i + 1,
-                            chunks.len(),
-                        );
-                        break;
+                let part = i + 1;
+                let total = chunks.len();
+                let mut attempt: u8 = 0;
+                loop {
+                    attempt += 1;
+                    match tokio::time::timeout(send_timeout, channel.say(&ctx, chunk.as_str()))
+                        .await
+                    {
+                        Ok(Ok(_)) => {
+                            sent_any = true;
+                            break;
+                        }
+                        Ok(Err(e)) => {
+                            let err_str = e.to_string();
+                            if attempt < 2
+                                && crate::discord::api::is_safe_to_retry_discord_outbound_error_message(
+                                    &err_str,
+                                )
+                            {
+                                let delay = crate::discord::api::discord_outbound_safe_retry_sleep_duration(
+                                    &err_str,
+                                );
+                                info!(
+                                    "Having fun: idle thought Discord send failed (part {}/{}), retrying once after {:?}: {}",
+                                    part, total, delay, err_str
+                                );
+                                tokio::time::sleep(delay).await;
+                                continue;
+                            }
+                            warn!(
+                                "Having fun: idle thought Discord send failed (part {}/{}): {}",
+                                part, total, err_str
+                            );
+                            aborted = true;
+                            break;
+                        }
+                        Err(_) => {
+                            if attempt < 2 {
+                                const IDLE_SEND_RETRY_SECS: u64 = 2;
+                                info!(
+                                    "Having fun: idle thought Discord send timed out (part {}/{}), retrying once in {}s",
+                                    part, total, IDLE_SEND_RETRY_SECS
+                                );
+                                tokio::time::sleep(tokio::time::Duration::from_secs(
+                                    IDLE_SEND_RETRY_SECS,
+                                ))
+                                .await;
+                                continue;
+                            }
+                            log_idle_thought_send_timeout(part, total);
+                            aborted = true;
+                            break;
+                        }
                     }
-                };
+                }
+                if aborted {
+                    break;
+                }
                 if chunks.len() > 1 && i < chunks.len() - 1 {
                     tokio::time::sleep(tokio::time::Duration::from_millis(
                         DISCORD_INTER_CHUNK_DELAY_MS,
@@ -1553,7 +1630,14 @@ async fn having_fun_idle_thought_locked(channel_id: u64, ctx: Context) {
                     .await;
                 }
             }
-            crate::session_memory::add_message("discord", channel_id, "assistant", &reply);
+            if sent_any {
+                crate::session_memory::add_message("discord", channel_id, "assistant", &reply);
+            } else if aborted {
+                debug!(
+                    "Having fun: idle thought not stored in session memory (Discord send failed for channel {})",
+                    channel_id
+                );
+            }
         }
         Err(e) => {
             error!(
@@ -3849,6 +3933,18 @@ mod tests {
         assert_eq!(super::having_fun_tick_secs_for_quiet(29 * 60), 60);
         assert_eq!(super::having_fun_tick_secs_for_quiet(30 * 60), 300);
         assert_eq!(super::having_fun_tick_secs_for_quiet(2 * 60 * 60), 300);
+    }
+
+    #[test]
+    fn idle_thought_timeout_warn_rate_limit() {
+        let interval = 5 * 60;
+        assert!(super::should_warn_idle_thought_timeout(0, 1000, interval));
+        assert!(!super::should_warn_idle_thought_timeout(1000, 1000 + 60, interval));
+        assert!(super::should_warn_idle_thought_timeout(
+            1000,
+            1000 + interval,
+            interval
+        ));
     }
 
     #[test]
