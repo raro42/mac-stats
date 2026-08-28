@@ -10,14 +10,16 @@ Overnight Track B (autoresearch) for Ralf.
 | **v0.1.704** | `/lite` instant operator + Agent Ops Runs Lite filter |
 | **v0.1.705** | `/agents` instant operator (On/Off list) |
 | **v0.1.706** | `/sessions` instant operator (Live/Files list) |
+| **v0.1.707** | `/knowledge` instant operator (Discord/Core list) |
 
-## This tick (~00:25)
+## This tick (~00:55)
 
 - Digester open empty; design review in grace.
-- Fuel: standing backlog p50 — Sessions Live/Files parity for Discord + AI Chat.
-- **`/sessions`**, **`/sessions live`**, **`/sessions files`** (+ NL) list live in-memory sessions and saved `session-memory-*.md` files without Ollama.
+- Fuel: standing backlog p50 — Knowledge Discord/Core parity for Discord + AI Chat.
+- **`/knowledge`**, **`/knowledge discord`**, **`/knowledge core`** (+ NL) list soul/global/main and `memory-discord-*.md` files without Ollama.
 
 ## Next
 
-- Knowledge Discord/Core instant list when digester still empty.
+- More tool-heavy p50 patterns when digester still empty.
 - Design review screens after grace ends.
+- Watch idle-thought Discord send timeouts (v0.1.703 retry + rate-limit already shipped).
