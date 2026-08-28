@@ -2128,6 +2128,16 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/slow` — recent slow turns from runs.jsonl, no Ollama.
+    if crate::commands::harness_ops::looks_like_slow_runs_request(&content) {
+        let days = crate::commands::harness_ops::parse_insights_days(&content);
+        let report = crate::commands::harness_ops::format_slow_runs_gateway(days);
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send slow-runs report: {}", e);
+        }
+        return;
+    }
+
     // Operator command menu — discover /status /schedules /digest etc.
     if crate::commands::harness_ops::looks_like_ops_help_request(&content) {
         let report = crate::commands::harness_ops::format_ops_help_gateway();

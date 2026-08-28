@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.696] - 2026-08-28
+
+### Added
+- **`/slow` instant operator command** — `/slow` and short NL asks (`what's slow`, `slow runs`) return recent turns ≥2000 ms from runs.jsonl (Discord + AI Chat; Agent Ops Runs Slow filter parity; p50 latency).
+
 ## [0.1.695] - 2026-08-28
 
 ### Added

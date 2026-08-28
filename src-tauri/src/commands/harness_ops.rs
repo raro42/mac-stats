@@ -293,7 +293,10 @@ pub fn compute_runs_insights(limit: u32) -> RunsInsights {
     compute_runs_insights_for(limit, None)
 }
 
-/// Parse Hermes-style `/insights 7` or `/insights --days 7` (default: full file / recent limit).
+/// Agent Ops Runs Slow filter parity (wall time ≥ this ms).
+pub const OPS_RUNS_SLOW_MS: u64 = 2000;
+
+/// Parse optional day window from `/insights 7`, `/failed 7`, `/slow 7`, etc.
 pub fn parse_insights_days(content: &str) -> Option<u32> {
     let n = content
         .trim()
@@ -311,6 +314,14 @@ pub fn parse_insights_days(content: &str) -> Option<u32> {
     let rest = if let Some(r) = n.strip_prefix("/insights") {
         r.trim()
     } else if let Some(r) = n.strip_prefix("insights") {
+        r.trim()
+    } else if let Some(r) = n.strip_prefix("/failed") {
+        r.trim()
+    } else if let Some(r) = n.strip_prefix("/slow") {
+        r.trim()
+    } else if let Some(r) = n.strip_prefix("failed runs") {
+        r.trim()
+    } else if let Some(r) = n.strip_prefix("slow runs") {
         r.trim()
     } else {
         return None;
@@ -1212,6 +1223,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let days = parse_insights_days(content);
         return Some(format_failed_runs_gateway(days));
     }
+    if looks_like_slow_runs_request(content) {
+        let days = parse_insights_days(content);
+        return Some(format_slow_runs_gateway(days));
+    }
     if looks_like_schedules_request(content) {
         return Some(format_schedules_gateway());
     }
@@ -1247,6 +1262,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/status` · `/health` · `/version` — one-screen health\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
+• `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
 • `/schedules` · `/cron list` — active jobs + last delivery\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
@@ -1254,7 +1270,8 @@ pub fn format_ops_help_gateway() -> String {
 • `/ops` · `/help` — this menu\n\
 • Voice notes — transcribed locally (Ollama audio) then answered like text\n\
 \n\
-**Scheduled:** wake-up 06:00 · CHANGELOG hygiene Mondays 10:00 · UI review Wednesdays 11:00 (`docs/041_ui_command_center.md`)"
+**Scheduled:** wake-up 06:00 · CHANGELOG hygiene Mondays 10:00 · UI review Wednesdays 11:00 (`docs/041_ui_command_center.md`)",
+        slow_ms = OPS_RUNS_SLOW_MS,
     )
 }
 
@@ -1322,6 +1339,24 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("why ")
         && !q.contains("explain")
         && !q.contains("ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/slow` / slow-runs operator asks (v0.1.696).
+    if (q.contains("slow run")
+        || q.contains("what's slow")
+        || q.contains("whats slow")
+        || q.contains("what is slow")
+        || q.contains("/slow")
+        || q.contains("slowest runs")
+        || q == "slow")
+        && !q.contains("why ")
+        && !q.contains("why is")
+        && !q.contains("explain")
+        && !q.contains("monitor")
+        && !q.contains("website")
+        && !q.contains(" ticket")
         && !q.contains("redmine")
     {
         return true;
@@ -1885,6 +1920,16 @@ struct FailedRunLine {
     request_id: String,
 }
 
+#[derive(Debug, Clone)]
+struct SlowRunLine {
+    ts: String,
+    lane: String,
+    wall_ms: u64,
+    question_preview: String,
+    request_id: String,
+    ok: bool,
+}
+
 /// Recent ok=false turns from runs.jsonl (newest first).
 fn collect_failed_runs(limit: usize, days: Option<u32>) -> Vec<FailedRunLine> {
     let path = crate::commands::run_telemetry::runs_jsonl_path();
@@ -1957,6 +2002,75 @@ fn collect_failed_runs(limit: usize, days: Option<u32>) -> Vec<FailedRunLine> {
     failed
 }
 
+/// Recent slow turns (wall_ms ≥ OPS_RUNS_SLOW_MS) from runs.jsonl (newest first).
+fn collect_slow_runs(limit: usize, days: Option<u32>) -> Vec<SlowRunLine> {
+    let path = crate::commands::run_telemetry::runs_jsonl_path();
+    if !path.is_file() {
+        return Vec::new();
+    }
+    let text = match fs::read_to_string(&path) {
+        Ok(t) => t,
+        Err(_) => return Vec::new(),
+    };
+    let window_days = days.map(|d| d.clamp(1, 90));
+    let since = window_days.map(|d| chrono::Utc::now() - chrono::Duration::days(d as i64));
+    let mut slow = Vec::new();
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+        let v: serde_json::Value = match serde_json::from_str(line) {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+        if let Some(since) = since {
+            let ts = v
+                .get("ts")
+                .and_then(|x| x.as_str())
+                .and_then(parse_run_ts);
+            match ts {
+                Some(t) if t >= since => {}
+                Some(_) => continue,
+                None => continue,
+            }
+        }
+        let wall_ms = v.get("wall_ms").and_then(|x| x.as_u64()).unwrap_or(0);
+        if wall_ms < OPS_RUNS_SLOW_MS {
+            continue;
+        }
+        slow.push(SlowRunLine {
+            ts: v
+                .get("ts")
+                .and_then(|x| x.as_str())
+                .unwrap_or("")
+                .to_string(),
+            lane: v
+                .get("lane")
+                .and_then(|x| x.as_str())
+                .unwrap_or("?")
+                .to_string(),
+            wall_ms,
+            question_preview: v
+                .get("question_preview")
+                .and_then(|x| x.as_str())
+                .unwrap_or("")
+                .to_string(),
+            request_id: v
+                .get("request_id")
+                .and_then(|x| x.as_str())
+                .unwrap_or("")
+                .to_string(),
+            ok: v.get("ok").and_then(|x| x.as_bool()).unwrap_or(true),
+        });
+    }
+    if slow.len() > limit {
+        slow = slow.split_off(slow.len() - limit);
+    }
+    slow.reverse();
+    slow
+}
+
 /// Zero-LLM failed-turn report (Agent Ops Runs Fail filter parity).
 pub fn format_failed_runs_gateway(days: Option<u32>) -> String {
     let failed = collect_failed_runs(12, days);
@@ -1996,6 +2110,74 @@ pub fn format_failed_runs_gateway(days: Option<u32>) -> String {
         out = out.chars().take(1790).collect::<String>() + "…";
     }
     out
+}
+
+/// Zero-LLM slow-turn report (Agent Ops Runs Slow filter parity).
+pub fn format_slow_runs_gateway(days: Option<u32>) -> String {
+    let slow = collect_slow_runs(12, days);
+    let window = match days {
+        Some(d) => format!("last **{d}** days"),
+        None => "recent".into(),
+    };
+    if slow.is_empty() {
+        return format!(
+            "**Slow runs** ({window} · ≥{} ms · runs.jsonl)\nNo slow turns — all under threshold.",
+            OPS_RUNS_SLOW_MS
+        );
+    }
+    let mut lines = vec![format!(
+        "**Slow runs** ({window} · ≥{} ms · runs.jsonl) — **{}** shown",
+        OPS_RUNS_SLOW_MS,
+        slow.len()
+    )];
+    for r in slow {
+        let status = if r.ok { "ok" } else { "fail" };
+        let ts_short: String = r.ts.chars().take(19).collect();
+        let rid: String = r.request_id.chars().take(8).collect();
+        lines.push(format!(
+            "• **{ts_short}** · {} · {} ms · `{status}` · `{rid}`",
+            r.lane, r.wall_ms
+        ));
+        if !r.question_preview.is_empty() {
+            let q: String = r.question_preview.chars().take(72).collect();
+            lines.push(format!("  _{q}_"));
+        }
+    }
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
+/// True for `/slow` / `slow runs` — not "why is X slow" or monitor latency asks.
+pub fn looks_like_slow_runs_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.contains(" ticket") || n.contains("redmine") || n.contains("http") {
+        return false;
+    }
+    if n.contains("monitor") || n.contains("website") || n.contains("site ") {
+        return false;
+    }
+    if n.contains(" why ") || n.contains("why is") || n.contains("why did") || n.contains("explain")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/slow"
+            | "slow runs"
+            | "slow run"
+            | "slowest runs"
+            | "what's slow"
+            | "whats slow"
+            | "what is slow"
+            | "show slow runs"
+            | "recent slow runs"
+            | "slow turns"
+            | "slow"
+    ) || n.starts_with("/slow ")
+        || (n.starts_with("slow runs ") && parse_insights_days(content).is_some())
 }
 
 /// True for `/failed` / `failed runs` — not "why did X fail".
@@ -2113,11 +2295,25 @@ mod tests {
         assert!(insights.to_lowercase().contains("insights"));
         let failed = try_operator_instant_reply("/failed").expect("failed");
         assert!(failed.to_lowercase().contains("failed runs"));
+        let slow = try_operator_instant_reply("/slow").expect("slow");
+        assert!(slow.to_lowercase().contains("slow runs"));
         let schedules = try_operator_instant_reply("list schedules").expect("schedules");
         assert!(schedules.to_lowercase().contains("schedule"));
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
         assert!(try_operator_instant_reply("insights on weather").is_none());
         assert!(try_operator_instant_reply("why did the build fail").is_none());
+        assert!(try_operator_instant_reply("why is the site slow").is_none());
+    }
+
+    #[test]
+    fn slow_runs_request_detected() {
+        assert!(looks_like_slow_runs_request("/slow"));
+        assert!(looks_like_slow_runs_request("what's slow"));
+        assert!(looks_like_slow_runs_request("slow runs"));
+        assert!(looks_like_slow_runs_request("@Werner slow runs 3"));
+        assert!(looks_like_slow_runs_request("/slow 7"));
+        assert!(!looks_like_slow_runs_request("why is the build slow"));
+        assert!(!looks_like_slow_runs_request("slow monitor for example.com"));
     }
 
     #[test]
@@ -2154,6 +2350,8 @@ mod tests {
         assert_eq!(parse_insights_days("/insights --days 14"), Some(14));
         assert_eq!(parse_insights_days("@Werner insights 3"), Some(3));
         assert_eq!(parse_insights_days("/insights 999"), Some(90)); // clamp
+        assert_eq!(parse_insights_days("/failed 7"), Some(7));
+        assert_eq!(parse_insights_days("/slow 3"), Some(3));
     }
 
     #[test]
@@ -2312,6 +2510,7 @@ mod tests {
         assert!(report.contains("/status"), "{report}");
         assert!(report.contains("/schedules"), "{report}");
         assert!(report.contains("/digest"), "{report}");
+        assert!(report.contains("/slow"), "{report}");
         assert!(report.contains("/help"), "{report}");
         assert!(report.contains("Voice"), "{report}");
     }
