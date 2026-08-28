@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.690] - 2026-08-28
+
+### Added
+- **Disk Cleanup scopes All · On · Off filter** — On/Off show enabled or disabled scopes; counts + warm empty hint + amber Off wash (Agents All/On/Off parity; Enabled scopes card opens Off when any are off; design review / `feature-disk-cleanup`).
+
 ## [0.1.689] - 2026-08-28
 
 ### Added

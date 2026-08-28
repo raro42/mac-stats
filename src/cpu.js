@@ -3776,6 +3776,7 @@ const FILTER_CHIP_WRAP_SELECTORS = [
   '#monitors-filter-chips',
   '#chat-filter-chips',
   '#logs-filter-chips',
+  '#disk-cleanup-scope-filter-chips',
   '#disk-cleanup-filter-chips',
   '#processes-filter-chips',
   '#ops-session-kind-chips',
@@ -3852,8 +3853,10 @@ function getFilterChipWrapContentListbox(wrap) {
       return document.getElementById('chat-messages');
     case 'logs-filter-chips':
       return document.getElementById('logs-viewer');
-    case 'disk-cleanup-filter-chips':
+    case 'disk-cleanup-scope-filter-chips':
       return document.getElementById('disk-cleanup-scopes');
+    case 'disk-cleanup-filter-chips':
+      return document.getElementById('disk-cleanup-list');
     case 'ops-session-kind-chips': {
       const live = document.getElementById('ops-live-sessions');
       const files = document.getElementById('ops-session-files');
@@ -3881,7 +3884,8 @@ function getFilterChipWrapForContentListbox(listbox) {
     'monitors-list': 'monitors-filter-chips',
     'chat-messages': 'chat-filter-chips',
     'logs-viewer': 'logs-filter-chips',
-    'disk-cleanup-scopes': 'disk-cleanup-filter-chips',
+    'disk-cleanup-scopes': 'disk-cleanup-scope-filter-chips',
+    'disk-cleanup-list': 'disk-cleanup-filter-chips',
     'ops-live-sessions': 'ops-session-kind-chips',
     'ops-session-files': 'ops-session-kind-chips',
     'ops-runs-list': 'ops-runs-lane-chips',
@@ -4219,11 +4223,16 @@ function tryChainFilterChipWrapToContent(wrap) {
     chips[0].focus();
     return true;
   }
-  if (wrap?.id === 'disk-cleanup-filter-chips') {
+  if (wrap?.id === 'disk-cleanup-scope-filter-chips') {
     const scopeRows = listbox
-      ? Array.from(listbox.querySelectorAll('.disk-cleanup-scope-row'))
+      ? Array.from(listbox.querySelectorAll('.disk-cleanup-scope-row')).filter(
+          (el) => el.style.display !== 'none'
+        )
       : [];
     if (scopeRows.length && focusSectionContentListbox(listbox)) return true;
+    return focusDiskCleanupCategoriesFirst();
+  }
+  if (wrap?.id === 'disk-cleanup-filter-chips') {
     return focusDiskCleanupCategoriesFirst();
   }
   if (wrap?.id === 'chat-filter-chips') {
@@ -4279,7 +4288,7 @@ window.tryChainFooterToSectionContentLast = tryChainFooterToSectionContentLast;
 function focusFilterChipButton(btn) {
   if (!btn) return false;
   const wrap = btn.closest(
-    '.rings-filter-chips, .processes-filter-chips, .monitors-filter-chips, .logs-filter-chips, .disk-cleanup-filter-chips, .chat-filter-chips, .ops-session-kind-chips, .ops-memory-kind-chips, .ops-runs-lane-chips, .ops-agents-enabled-chips, .ops-schedules-kind-chips'
+    '.rings-filter-chips, .processes-filter-chips, .monitors-filter-chips, .logs-filter-chips, .disk-cleanup-scope-filter-chips, .disk-cleanup-filter-chips, .chat-filter-chips, .ops-session-kind-chips, .ops-memory-kind-chips, .ops-runs-lane-chips, .ops-agents-enabled-chips, .ops-schedules-kind-chips'
   );
   if (wrap) refreshFilterChipRovingTabindex(wrap, btn);
   btn.focus();
@@ -4315,6 +4324,7 @@ function ensureFilterChipKbStyles() {
     .processes-filter-chips,
     .monitors-filter-chips,
     .logs-filter-chips,
+    .disk-cleanup-scope-filter-chips,
     .disk-cleanup-filter-chips,
     .chat-filter-chips,
     .ops-session-kind-chips,
@@ -4384,7 +4394,8 @@ function wireFilterChipToolbarKeyboard(wrap) {
             e.preventDefault();
             e.stopPropagation();
           } else if (
-            wrap.id === 'disk-cleanup-filter-chips' &&
+            (wrap.id === 'disk-cleanup-scope-filter-chips' ||
+              wrap.id === 'disk-cleanup-filter-chips') &&
             tryChainDiskCleanupSectionToIconLine()
           ) {
             e.preventDefault();
@@ -5922,6 +5933,8 @@ let monitorsFilterMode = 'all';
 let diskCleanupCollapsed = true;
 /** Category list filter: all | reclaim | clean (Monitors All/Up/Down parity). */
 let diskCleanupFilterMode = 'all';
+/** Scopes All · On · Off (Agents enabled-filter parity). */
+let diskCleanupScopeFilterMode = 'all';
 /** Shallow status poll while Disk Cleanup is collapsed (collapsed glance). */
 let diskCleanupGlanceInterval = null;
 
@@ -14232,11 +14245,16 @@ function startDiskCleanupGlancePoll() {
 /** Focus first disabled scope (or Add form) after empty-list CTA. */
 function focusDiskCleanupScopesReview() {
   ensureDiskCleanupSectionExpanded();
+  const scopes = window.__diskCleanupScopes || [];
+  const offN = scopes.filter((s) => s && !s.enabled).length;
+  if (offN > 0) setDiskCleanupScopeFilterMode('off');
+  else setDiskCleanupScopeFilterMode('all');
   const scopesEl = document.getElementById('disk-cleanup-scopes');
   const addLabel = document.getElementById('disk-cleanup-add-label');
   requestAnimationFrame(() => {
-    const disabledRow = scopesEl?.querySelector('.disk-cleanup-scope-row.is-disabled');
-    const anyRow = scopesEl?.querySelector('.disk-cleanup-scope-row');
+    const visible = visibleDiskCleanupScopeRows(scopesEl);
+    const disabledRow = visible.find((el) => el.classList.contains('is-disabled'));
+    const anyRow = visible[0];
     const row = disabledRow || anyRow;
     if (row) {
       const idx = parseInt(row.getAttribute('data-scope-idx') || '0', 10);
@@ -15063,6 +15081,149 @@ function visibleDiskCleanupItems(listEl) {
   );
 }
 
+function visibleDiskCleanupScopeRows(scopesEl) {
+  if (!scopesEl) return [];
+  return Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row')).filter(
+    (el) => el.style.display !== 'none'
+  );
+}
+
+/** All / On / Off chips above scopes (Agents All/On/Off parity). */
+function ensureDiskCleanupScopeFilterChips() {
+  const scopesEl = document.getElementById('disk-cleanup-scopes');
+  if (!scopesEl || !scopesEl.parentNode) return;
+  let wrap = document.getElementById('disk-cleanup-scope-filter-chips');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'disk-cleanup-scope-filter-chips';
+    wrap.className = 'disk-cleanup-scope-filter-chips';
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-label', 'Cleanup scope filter');
+    wrap.hidden = true;
+    wrap.innerHTML =
+      '<button type="button" class="disk-cleanup-scope-filter-chip is-active" data-disk-cleanup-scope-filter="all" aria-pressed="true" title="Show every scope">All</button>' +
+      '<button type="button" class="disk-cleanup-scope-filter-chip" data-disk-cleanup-scope-filter="on" aria-pressed="false" title="Show enabled scopes only">On <span class="disk-cleanup-scope-filter-count" data-disk-cleanup-scope-filter-count="on">0</span></button>' +
+      '<button type="button" class="disk-cleanup-scope-filter-chip" data-disk-cleanup-scope-filter="off" aria-pressed="false" title="Show disabled scopes only">Off <span class="disk-cleanup-scope-filter-count" data-disk-cleanup-scope-filter-count="off">0</span></button>';
+    scopesEl.parentNode.insertBefore(wrap, scopesEl);
+    wrap.addEventListener('click', (e) => {
+      const btn =
+        e.target &&
+        e.target.closest &&
+        e.target.closest('[data-disk-cleanup-scope-filter]');
+      if (!btn || !wrap.contains(btn)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setDiskCleanupScopeFilterMode(
+        btn.getAttribute('data-disk-cleanup-scope-filter') || 'all'
+      );
+    });
+  }
+  wireFilterChipToolbarKeyboard(wrap);
+}
+
+function setDiskCleanupScopeFilterMode(mode) {
+  const next = mode === 'on' || mode === 'off' ? mode : 'all';
+  diskCleanupScopeFilterMode = next;
+  document
+    .querySelectorAll(
+      '#disk-cleanup-scope-filter-chips [data-disk-cleanup-scope-filter]'
+    )
+    .forEach((btn) => {
+      const on = btn.getAttribute('data-disk-cleanup-scope-filter') === next;
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  applyDiskCleanupScopeFilter();
+}
+
+function ensureDiskCleanupScopeFilterMissState(scopesEl, show) {
+  if (!scopesEl || !scopesEl.parentNode) return;
+  const existing = scopesEl.parentNode.querySelector(
+    '.disk-cleanup-scope-filter-miss'
+  );
+  if (!show) {
+    existing?.remove();
+    return;
+  }
+  let wrap = existing;
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.className = 'disk-cleanup-empty disk-cleanup-scope-filter-miss';
+    wrap.setAttribute('role', 'status');
+    wrap.innerHTML =
+      `<div class="disk-cleanup-empty-msg">Nothing matches this filter</div>` +
+      `<div class="disk-cleanup-empty-hint">Try All, or clear the scope filter.</div>` +
+      `<button type="button" class="disk-cleanup-empty-cta disk-cleanup-clear-scope-filter">Clear filter</button>`;
+    scopesEl.parentNode.insertBefore(wrap, scopesEl.nextSibling);
+    wrap
+      .querySelector('.disk-cleanup-clear-scope-filter')
+      ?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDiskCleanupScopeFilterMode('all');
+      });
+  }
+}
+
+function applyDiskCleanupScopeFilter() {
+  ensureDiskCleanupScopeFilterChips();
+  const chips = document.getElementById('disk-cleanup-scope-filter-chips');
+  const scopesEl = document.getElementById('disk-cleanup-scopes');
+  if (!scopesEl) return;
+
+  const items = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
+  if (chips) chips.hidden = items.length === 0;
+
+  let onCount = 0;
+  let offCount = 0;
+  items.forEach((el) => {
+    if (el.classList.contains('is-disabled')) offCount++;
+    else onCount++;
+  });
+
+  const onEl = document.querySelector(
+    '[data-disk-cleanup-scope-filter-count="on"]'
+  );
+  const offEl = document.querySelector(
+    '[data-disk-cleanup-scope-filter-count="off"]'
+  );
+  if (onEl) onEl.textContent = String(onCount);
+  if (offEl) offEl.textContent = String(offCount);
+  document
+    .querySelectorAll(
+      '#disk-cleanup-scope-filter-chips [data-disk-cleanup-scope-filter]'
+    )
+    .forEach((btn) => {
+      const key = btn.getAttribute('data-disk-cleanup-scope-filter');
+      btn.classList.toggle(
+        'has-hits',
+        key === 'on' ? onCount > 0 : key === 'off' ? offCount > 0 : false
+      );
+    });
+
+  if (items.length === 0) {
+    ensureDiskCleanupScopeFilterMissState(scopesEl, false);
+    return;
+  }
+
+  let visible = 0;
+  items.forEach((el) => {
+    const isOff = el.classList.contains('is-disabled');
+    let show = true;
+    if (diskCleanupScopeFilterMode === 'on') show = !isOff;
+    else if (diskCleanupScopeFilterMode === 'off') show = isOff;
+    el.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  ensureDiskCleanupScopeFilterMissState(scopesEl, visible === 0);
+  const prefer =
+    typeof window.__diskCleanupScopeFocusIdx === 'number'
+      ? window.__diskCleanupScopeFocusIdx
+      : null;
+  syncDiskCleanupScopeTabOrder(scopesEl, prefer);
+}
+
 /** All / Reclaim / Clean chips (Monitors All/Up/Down parity). */
 function ensureDiskCleanupFilterChips() {
   const list = document.getElementById('disk-cleanup-list');
@@ -15332,12 +15493,13 @@ async function refreshDiskCleanupPanel(opts) {
           scopesEl.parentNode?.insertBefore(hint, scopesEl);
         }
         hint.textContent =
-          '↑↓ / j k · PgUp/PgDn select scope · click path / c copies · Esc clears · Space toggle enable · R toggle recurse · T toggle Trash soft-delete · Delete removes custom · Enter in Add form adds · ⌘S saves';
+          'Scopes: All · On · Off filters · ↑↓ / j k · PgUp/PgDn select · click path / c copies · Esc clears · Space toggle enable · R toggle recurse · T toggle Trash soft-delete · Delete removes custom · Enter in Add form adds · ⌘S saves';
       } else {
         document.getElementById('disk-cleanup-kb-hint')?.remove();
       }
       syncDiskCleanupScopeTabOrder(scopesEl, preferIdx);
       applyDiskCleanupPathCopyFlash(scopesEl);
+      applyDiskCleanupScopeFilter();
     }
 
     const cats = (status.categories || []).filter((c) => c.enabled !== false);
@@ -15509,10 +15671,17 @@ async function addDiskCleanupScopeFromForm() {
   requestAnimationFrame(() => {
     const scopesEl = document.getElementById('disk-cleanup-scopes');
     if (!scopesEl) return;
-    const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
-    const idx = Math.min(window.__diskCleanupScopeFocusIdx || 0, Math.max(0, rows.length - 1));
-    syncDiskCleanupScopeTabOrder(scopesEl, idx);
-    rows[idx]?.focus();
+    const prefer =
+      typeof window.__diskCleanupScopeFocusIdx === 'number'
+        ? window.__diskCleanupScopeFocusIdx
+        : 0;
+    syncDiskCleanupScopeTabOrder(scopesEl, prefer);
+    const rows = visibleDiskCleanupScopeRows(scopesEl);
+    const hit =
+      rows.find(
+        (el) => parseInt(el.getAttribute('data-scope-idx') || '-1', 10) === prefer
+      ) || rows[rows.length - 1];
+    hit?.focus();
   });
   return true;
 }
@@ -15705,11 +15874,22 @@ async function copyDiskCleanupPathFromRow(row) {
 /** Roving tabindex for Disk Cleanup scope rows (Monitors / process-list parity). */
 function syncDiskCleanupScopeTabOrder(scopesEl, preferIdx) {
   if (!scopesEl) return;
-  const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
-  if (rows.length === 0) return;
+  const all = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
+  const rows = visibleDiskCleanupScopeRows(scopesEl);
+  if (rows.length === 0) {
+    all.forEach((el) => {
+      el.classList.remove('is-selected');
+      el.setAttribute('tabindex', '-1');
+      el.setAttribute('aria-selected', 'false');
+    });
+    return;
+  }
   let activeIdx = 0;
-  if (typeof preferIdx === 'number' && preferIdx >= 0 && preferIdx < rows.length) {
-    activeIdx = preferIdx;
+  if (typeof preferIdx === 'number' && preferIdx >= 0) {
+    const hit = rows.findIndex(
+      (el) => parseInt(el.getAttribute('data-scope-idx') || '-1', 10) === preferIdx
+    );
+    if (hit >= 0) activeIdx = hit;
   } else {
     const focused = rows.findIndex(
       (el) => el === document.activeElement || el.contains(document.activeElement)
@@ -15720,7 +15900,17 @@ function syncDiskCleanupScopeTabOrder(scopesEl, preferIdx) {
       if (selected >= 0) activeIdx = selected;
     }
   }
-  window.__diskCleanupScopeFocusIdx = activeIdx;
+  all.forEach((el) => {
+    if (el.style.display === 'none') {
+      el.classList.remove('is-selected');
+      el.setAttribute('tabindex', '-1');
+      el.setAttribute('aria-selected', 'false');
+    }
+  });
+  window.__diskCleanupScopeFocusIdx = parseInt(
+    rows[activeIdx].getAttribute('data-scope-idx') || '0',
+    10
+  );
   rows.forEach((el, i) => {
     el.setAttribute('tabindex', i === activeIdx ? '0' : '-1');
     el.classList.toggle('is-selected', i === activeIdx);
@@ -15790,9 +15980,10 @@ function focusDiskCleanupCategoriesFirst() {
 function focusDiskCleanupScopesLast() {
   const scopesEl = document.getElementById('disk-cleanup-scopes');
   if (!scopesEl || scopesEl.hidden) return false;
-  const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
+  const rows = visibleDiskCleanupScopeRows(scopesEl);
   if (!rows.length) return false;
-  syncDiskCleanupScopeTabOrder(scopesEl, rows.length - 1);
+  const prefer = parseInt(rows[rows.length - 1].getAttribute('data-scope-idx') || '0', 10);
+  syncDiskCleanupScopeTabOrder(scopesEl, Number.isFinite(prefer) ? prefer : 0);
   rows[rows.length - 1].focus();
   if (typeof rows[rows.length - 1].scrollIntoView === 'function') {
     rows[rows.length - 1].scrollIntoView({ block: 'nearest' });
@@ -15803,9 +15994,10 @@ function focusDiskCleanupScopesLast() {
 function focusDiskCleanupScopesFirst() {
   const scopesEl = document.getElementById('disk-cleanup-scopes');
   if (!scopesEl || scopesEl.hidden) return false;
-  const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
+  const rows = visibleDiskCleanupScopeRows(scopesEl);
   if (rows.length) {
-    syncDiskCleanupScopeTabOrder(scopesEl, 0);
+    const prefer = parseInt(rows[0].getAttribute('data-scope-idx') || '0', 10);
+    syncDiskCleanupScopeTabOrder(scopesEl, Number.isFinite(prefer) ? prefer : 0);
     rows[0].focus();
     if (typeof rows[0].scrollIntoView === 'function') {
       rows[0].scrollIntoView({ block: 'nearest' });
@@ -15826,6 +16018,11 @@ function isDiskCleanupSectionOpen() {
 }
 
 function focusDiskCleanupFilterChipFirst() {
+  const scopeWrap = document.getElementById('disk-cleanup-scope-filter-chips');
+  if (scopeWrap && !scopeWrap.hidden) {
+    const scopeChips = getFilterChipButtons(scopeWrap);
+    if (scopeChips.length) return focusFilterChipButton(scopeChips[0]);
+  }
   const wrap = document.getElementById('disk-cleanup-filter-chips');
   if (!wrap || wrap.hidden) return false;
   const chips = getFilterChipButtons(wrap);
@@ -15988,6 +16185,16 @@ function wireDiskCleanupScopesKeyboard() {
     if (!row || !scopesEl.contains(row)) return;
     if (e.target.matches && e.target.matches('input[data-scope-enabled]')) {
       row.classList.toggle('is-disabled', !e.target.checked);
+      const idx = parseInt(row.getAttribute('data-scope-idx') || '-1', 10);
+      if (
+        Number.isFinite(idx) &&
+        idx >= 0 &&
+        window.__diskCleanupScopes &&
+        window.__diskCleanupScopes[idx]
+      ) {
+        window.__diskCleanupScopes[idx].enabled = !!e.target.checked;
+      }
+      applyDiskCleanupScopeFilter();
     }
   });
 
@@ -16002,7 +16209,7 @@ function wireDiskCleanupScopesKeyboard() {
       ) {
         return;
       }
-      const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
+      const rows = visibleDiskCleanupScopeRows(scopesEl);
       if (!rows.length) {
         if (
           (e.key === 'ArrowDown' || e.key === 'j' || e.key === 'J') &&
@@ -16017,14 +16224,15 @@ function wireDiskCleanupScopesKeyboard() {
       else if (e.key === 'ArrowUp' || e.key === 'k' || e.key === 'End') next = rows.length - 1;
       else return;
       e.preventDefault();
-      syncDiskCleanupScopeTabOrder(scopesEl, next);
+      const prefer = parseInt(rows[next].getAttribute('data-scope-idx') || '0', 10);
+      syncDiskCleanupScopeTabOrder(scopesEl, Number.isFinite(prefer) ? prefer : 0);
       rows[next].focus();
       if (typeof rows[next].scrollIntoView === 'function') {
         rows[next].scrollIntoView({ block: 'nearest' });
       }
       return;
     }
-    const rows = Array.from(scopesEl.querySelectorAll('.disk-cleanup-scope-row'));
+    const rows = visibleDiskCleanupScopeRows(scopesEl);
     const idx = rows.indexOf(row);
     if (idx < 0) return;
 
@@ -16053,6 +16261,7 @@ function wireDiskCleanupScopesKeyboard() {
         cb.checked = !cb.checked;
         cb.dispatchEvent(new Event('change', { bubbles: true }));
         row.classList.toggle('is-disabled', !cb.checked);
+        applyDiskCleanupScopeFilter();
       }
       return;
     }
@@ -16157,7 +16366,8 @@ function wireDiskCleanupScopesKeyboard() {
 
     e.preventDefault();
     if (next < 0 || next === idx) return;
-    syncDiskCleanupScopeTabOrder(scopesEl, next);
+    const prefer = parseInt(rows[next].getAttribute('data-scope-idx') || '0', 10);
+    syncDiskCleanupScopeTabOrder(scopesEl, Number.isFinite(prefer) ? prefer : 0);
     rows[next].focus();
     if (typeof rows[next].scrollIntoView === 'function') {
       rows[next].scrollIntoView({ block: 'nearest' });

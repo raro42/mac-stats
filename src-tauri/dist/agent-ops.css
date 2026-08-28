@@ -3556,6 +3556,89 @@ textarea.ops-agent-editor.is-dirty {
   display: none !important;
 }
 
+/* Disk Cleanup scopes — All · On · Off (Agents enabled-filter parity) */
+.disk-cleanup-scope-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 6px;
+  padding: 0 2px;
+}
+
+.disk-cleanup-scope-filter-chips[hidden] {
+  display: none !important;
+}
+
+.disk-cleanup-scope-filter-chip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  opacity: 0.88;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.disk-cleanup-scope-filter-chip:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 7%, transparent);
+}
+
+.disk-cleanup-scope-filter-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, transparent);
+}
+
+.disk-cleanup-scope-filter-chip.is-active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, transparent);
+}
+
+.disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='on'].has-hits {
+  background: color-mix(in srgb, #34c759 12%, transparent);
+  border-color: color-mix(in srgb, #34c759 28%, transparent);
+}
+
+.disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='on'].is-active {
+  background: color-mix(in srgb, #34c759 18%, transparent);
+  border-color: color-mix(in srgb, #34c759 38%, transparent);
+}
+
+.disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='off'].has-hits {
+  background: color-mix(in srgb, #ff9f0a 12%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 28%, transparent);
+}
+
+.disk-cleanup-scope-filter-chip[data-disk-cleanup-scope-filter='off'].is-active {
+  background: color-mix(in srgb, #ff9f0a 18%, transparent);
+  border-color: color-mix(in srgb, #ff9f0a 38%, transparent);
+}
+
+.disk-cleanup-scope-filter-count {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+.disk-cleanup-scope-filter-miss {
+  margin: 4px 0 8px;
+}
+
 .disk-cleanup-filter-chip {
   appearance: none;
   display: inline-flex;
