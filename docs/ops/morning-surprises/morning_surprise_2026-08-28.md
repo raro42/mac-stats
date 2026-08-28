@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-28
 
-Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains, keep-header fixes, filter chips across sections, Perplexity Top/Snippet, Agent Ops Runs Slow/Fail, and `/failed` instant operator.
+Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains, keep-header fixes, filter chips across sections, Perplexity Top/Snippet, Agent Ops Runs Slow/Fail, `/failed` + `/slow` instant operators.
 
 ## Shipped tonight
 
@@ -25,10 +25,11 @@ Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains
 | **v0.1.693** | **Agent Ops Runs All · Instant · Direct · Slow** — Slow filter for runs ≥2000 ms wall time; amber row wash; overview Opens → Slow when any qualify (Monitors Slow / p50 latency parity) |
 | **v0.1.694** | **Agent Ops Runs Fail filter** — Fail filter for ok=false runs; red row wash; overview Opens → Fail when any failed (AI Chat Errors parity) |
 | **v0.1.695** | **`/failed` instant operator** — `/failed` + NL (`what failed`, `failed runs`) return recent ok=false turns from runs.jsonl with error text (Discord + AI Chat; Agent Ops Fail parity; p50 latency) |
+| **v0.1.696** | **`/slow` instant operator** — `/slow` + NL (`what's slow`, `slow runs`) return recent turns ≥2000 ms from runs.jsonl (Discord + AI Chat; Agent Ops Slow parity; p50 latency) |
 
 ## Why it matters
 
-Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Filter chips now cover **Top Processes Hot**, **Monitors Slow**, **AI Chat Errors**, **CPU rings Hot**, **Disk Cleanup On/Off + Big**, **Perplexity Top/Snippet**, **Agent Ops Runs Slow + Fail**. Ask **`/failed`** or **what failed** in Discord or AI Chat for a zero-LLM failed-run report.
+Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Filter chips now cover **Top Processes Hot**, **Monitors Slow**, **AI Chat Errors**, **CPU rings Hot**, **Disk Cleanup On/Off + Big**, **Perplexity Top/Snippet**, **Agent Ops Runs Slow + Fail**. Ask **`/failed`** or **what failed** for a zero-LLM failed-run report. Ask **`/slow`** or **what's slow** for slow-turn latency.
 
 ## Digester / design review
 
