@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.692] - 2026-08-28
+
+### Added
+- **Perplexity Search All · Top · Snippet filter** — Top shows first 3 results; Snippet shows results with preview text; counts + warm empty hint + accent top-row wash (Monitors Slow / AI Chat Errors parity; last-search glance opens Top when >3 results; design review grace / Perplexity surface).
+
 ## [0.1.691] - 2026-08-28
 
 ### Added

@@ -3775,6 +3775,7 @@ const FILTER_CHIP_WRAP_SELECTORS = [
   '#rings-filter-chips',
   '#monitors-filter-chips',
   '#chat-filter-chips',
+  '#perplexity-filter-chips',
   '#logs-filter-chips',
   '#disk-cleanup-scope-filter-chips',
   '#disk-cleanup-filter-chips',
@@ -3851,6 +3852,8 @@ function getFilterChipWrapContentListbox(wrap) {
       return document.getElementById('monitors-list');
     case 'chat-filter-chips':
       return document.getElementById('chat-messages');
+    case 'perplexity-filter-chips':
+      return document.getElementById('perplexity-results');
     case 'logs-filter-chips':
       return document.getElementById('logs-viewer');
     case 'disk-cleanup-scope-filter-chips':
@@ -3883,6 +3886,7 @@ function getFilterChipWrapForContentListbox(listbox) {
     'process-list': 'processes-filter-chips',
     'monitors-list': 'monitors-filter-chips',
     'chat-messages': 'chat-filter-chips',
+    'perplexity-results': 'perplexity-filter-chips',
     'logs-viewer': 'logs-filter-chips',
     'disk-cleanup-scopes': 'disk-cleanup-scope-filter-chips',
     'disk-cleanup-list': 'disk-cleanup-filter-chips',
@@ -4288,7 +4292,7 @@ window.tryChainFooterToSectionContentLast = tryChainFooterToSectionContentLast;
 function focusFilterChipButton(btn) {
   if (!btn) return false;
   const wrap = btn.closest(
-    '.rings-filter-chips, .processes-filter-chips, .monitors-filter-chips, .logs-filter-chips, .disk-cleanup-scope-filter-chips, .disk-cleanup-filter-chips, .chat-filter-chips, .ops-session-kind-chips, .ops-memory-kind-chips, .ops-runs-lane-chips, .ops-agents-enabled-chips, .ops-schedules-kind-chips'
+    '.rings-filter-chips, .processes-filter-chips, .monitors-filter-chips, .logs-filter-chips, .disk-cleanup-scope-filter-chips, .disk-cleanup-filter-chips, .chat-filter-chips, .perplexity-filter-chips, .ops-session-kind-chips, .ops-memory-kind-chips, .ops-runs-lane-chips, .ops-agents-enabled-chips, .ops-schedules-kind-chips'
   );
   if (wrap) refreshFilterChipRovingTabindex(wrap, btn);
   btn.focus();
@@ -4327,6 +4331,7 @@ function ensureFilterChipKbStyles() {
     .disk-cleanup-scope-filter-chips,
     .disk-cleanup-filter-chips,
     .chat-filter-chips,
+    .perplexity-filter-chips,
     .ops-session-kind-chips,
     .ops-memory-kind-chips,
     .ops-runs-lane-chips,
@@ -11454,6 +11459,145 @@ function visiblePerplexityResultItems(resultsEl) {
   });
 }
 
+/** Top-N Perplexity hits (Monitors Slow / Top Processes Hot parity). */
+const PERPLEXITY_TOP_N = 3;
+
+/** Result filter (All · Top · Snippet). */
+let perplexityFilterMode = 'all';
+
+function ensurePerplexityFilterChips() {
+  const resultsEl = document.getElementById('perplexity-results');
+  if (!resultsEl || !resultsEl.parentNode) return;
+  let wrap = document.getElementById('perplexity-filter-chips');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'perplexity-filter-chips';
+    wrap.className = 'perplexity-filter-chips';
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-label', 'Search result filter');
+    wrap.hidden = true;
+    wrap.innerHTML =
+      '<button type="button" class="perplexity-filter-chip is-active" data-perplexity-filter="all" aria-pressed="true" title="Show every result">All</button>' +
+      `<button type="button" class="perplexity-filter-chip" data-perplexity-filter="top" aria-pressed="false" title="Show top ${PERPLEXITY_TOP_N} results only">Top <span class="perplexity-filter-count" data-perplexity-filter-count="top">0</span></button>` +
+      '<button type="button" class="perplexity-filter-chip" data-perplexity-filter="snippet" aria-pressed="false" title="Show results with preview text">Snippet <span class="perplexity-filter-count" data-perplexity-filter-count="snippet">0</span></button>';
+    resultsEl.parentNode.insertBefore(wrap, resultsEl);
+    wrap.addEventListener('click', (e) => {
+      const btn =
+        e.target && e.target.closest && e.target.closest('[data-perplexity-filter]');
+      if (!btn || !wrap.contains(btn)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setPerplexityFilterMode(btn.getAttribute('data-perplexity-filter') || 'all');
+    });
+  }
+  wireFilterChipToolbarKeyboard(wrap);
+}
+
+function setPerplexityFilterMode(mode) {
+  const next = mode === 'top' || mode === 'snippet' ? mode : 'all';
+  perplexityFilterMode = next;
+  document
+    .querySelectorAll('#perplexity-filter-chips [data-perplexity-filter]')
+    .forEach((btn) => {
+      const on = btn.getAttribute('data-perplexity-filter') === next;
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  applyPerplexityResultsFilter();
+}
+
+function ensurePerplexityFilterMissState(resultsEl, show) {
+  if (!resultsEl) return;
+  const existing = resultsEl.querySelector('.perplexity-filter-miss');
+  if (!show) {
+    existing?.remove();
+    return;
+  }
+  let wrap = existing;
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.className = 'perplexity-empty perplexity-filter-miss';
+    wrap.setAttribute('role', 'status');
+    wrap.innerHTML =
+      `<div class="perplexity-empty-msg">Nothing matches this filter</div>` +
+      `<div class="perplexity-empty-hint">Try All, or clear the result filter.</div>` +
+      `<button type="button" class="perplexity-empty-cta perplexity-clear-filter">Clear filter</button>`;
+    resultsEl.appendChild(wrap);
+    wrap.querySelector('.perplexity-clear-filter')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setPerplexityFilterMode('all');
+    });
+  }
+}
+
+function applyPerplexityResultsFilter() {
+  ensurePerplexityFilterChips();
+  const chips = document.getElementById('perplexity-filter-chips');
+  const resultsEl = document.getElementById('perplexity-results');
+  if (!resultsEl) return;
+
+  const items = Array.from(resultsEl.querySelectorAll('.perplexity-result-item'));
+  const trueEmpty = !!resultsEl.querySelector(
+    '.perplexity-empty:not(.perplexity-filter-miss)'
+  );
+  if (chips) chips.hidden = trueEmpty || items.length === 0;
+
+  let topCount = 0;
+  let snippetCount = 0;
+  items.forEach((el) => {
+    if (el.classList.contains('is-top')) topCount++;
+    if (el.classList.contains('has-snippet')) snippetCount++;
+  });
+
+  const topEl = document.querySelector('[data-perplexity-filter-count="top"]');
+  const snippetEl = document.querySelector('[data-perplexity-filter-count="snippet"]');
+  if (topEl) topEl.textContent = String(topCount);
+  if (snippetEl) snippetEl.textContent = String(snippetCount);
+  const topBtn = document.querySelector(
+    '#perplexity-filter-chips [data-perplexity-filter="top"]'
+  );
+  if (topBtn) {
+    topBtn.title = `Show top ${PERPLEXITY_TOP_N} results only`;
+  }
+  document
+    .querySelectorAll('#perplexity-filter-chips [data-perplexity-filter]')
+    .forEach((btn) => {
+      const key = btn.getAttribute('data-perplexity-filter');
+      btn.classList.toggle(
+        'has-hits',
+        key === 'top' ? topCount > 0 : key === 'snippet' ? snippetCount > 0 : false
+      );
+    });
+
+  if (trueEmpty || items.length === 0) {
+    ensurePerplexityFilterMissState(resultsEl, false);
+    return;
+  }
+
+  let visible = 0;
+  items.forEach((el) => {
+    const isTop = el.classList.contains('is-top');
+    const hasSnippet = el.classList.contains('has-snippet');
+    let show = true;
+    if (perplexityFilterMode === 'top') show = isTop;
+    else if (perplexityFilterMode === 'snippet') show = hasSnippet;
+    el.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  ensurePerplexityFilterMissState(resultsEl, visible === 0);
+  syncPerplexityResultsTabOrder(resultsEl);
+}
+
+function focusPerplexityFilterChipFirst() {
+  const wrap = document.getElementById('perplexity-filter-chips');
+  if (!wrap || wrap.hidden) return false;
+  const chips = getFilterChipButtons(wrap);
+  if (!chips.length) return false;
+  return focusFilterChipButton(chips[0]);
+}
+
 /** Soft tip above results (Monitors / AI Chat kb-hint parity). */
 function ensurePerplexityResultsKbHint(resultsEl, show) {
   if (!resultsEl || !resultsEl.parentNode) return;
@@ -11711,6 +11855,7 @@ function tryChainIconPerplexityToSectionFirst() {
     return focusPerplexityCollapsedGlance();
   }
   if (isPerplexitySetupVisible()) return focusPerplexitySetupFirst();
+  if (focusPerplexityFilterChipFirst()) return true;
   return focusPerplexitySearchFirst();
 }
 
@@ -11867,7 +12012,14 @@ function wirePerplexityResultsKeyboard(resultsEl) {
         return;
       }
       next = Math.min(idx + 1, items.length - 1);
-    } else if (e.key === 'ArrowUp' || e.key === 'k') next = Math.max(idx - 1, 0);
+    } else if (e.key === 'ArrowUp' || e.key === 'k') {
+      if (
+        idx === 0 &&
+        tryListboxChainBackToFilterChips(e, resultsEl, idx, items.length)
+      ) {
+        return;
+      }
+      next = Math.max(idx - 1, 0);
     else if (e.key === 'PageDown') next = Math.min(idx + page, items.length - 1);
     else if (e.key === 'PageUp') next = Math.max(idx - page, 0);
     else if (e.key === 'Home') next = 0;
@@ -11993,8 +12145,10 @@ function wirePerplexitySearchToolbarKeyboard(row) {
       }
       if (
         idx === items.length - 1 &&
-        typeof tryChainFilterChipToFooterFirst === 'function' &&
-        tryChainFilterChipToFooterFirst()
+        (focusPerplexityFilterChipFirst() ||
+          focusPerplexityResultsLast() ||
+          (typeof tryChainFilterChipToFooterFirst === 'function' &&
+            tryChainFilterChipToFooterFirst()))
       ) {
         e.preventDefault();
         e.stopPropagation();
@@ -12689,6 +12843,10 @@ function wirePerplexityLastGlanceClick(glance) {
     const resultsEl = document.getElementById('perplexity-results');
     const queryInput = document.getElementById('perplexity-query');
     if (resultsEl && perplexityLastSearch && !perplexityLastSearch.error) {
+      const n = Number(perplexityLastSearch.count) || 0;
+      if (n > PERPLEXITY_TOP_N) {
+        setPerplexityFilterMode('top');
+      }
       if (typeof resultsEl.scrollIntoView === 'function') {
         resultsEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       }
@@ -12895,7 +13053,7 @@ function initPerplexitySection() {
           searchOk = true;
           return;
         }
-        resultsEl.innerHTML = weatherHtml + resp.results.map(function (r) {
+        resultsEl.innerHTML = weatherHtml + resp.results.map(function (r, i) {
           const title = esc(r.title || 'Untitled');
           const url = esc(r.url || '#');
           const snippetRaw = formatPerplexitySnippet(
@@ -12923,13 +13081,17 @@ function initPerplexitySection() {
           } catch (_) {}
           const date = r.date || r.last_updated || '';
           const meta = [domain, date].filter(Boolean).join(' · ');
-          return '<article class="perplexity-result-item" role="option" tabindex="-1" aria-selected="false" data-url="' + url + '" title="Enter opens · c copies URL · ↑↓ / j k to move · Esc clears" aria-label="Search result — Enter opens · c copies URL">' +
+          const itemClasses = ['perplexity-result-item'];
+          if (snippetHtml) itemClasses.push('has-snippet');
+          if (i < PERPLEXITY_TOP_N) itemClasses.push('is-top');
+          return '<article class="' + itemClasses.join(' ') + '" role="option" tabindex="-1" aria-selected="false" data-url="' + url + '" title="Enter opens · c copies URL · ↑↓ / j k to move · Esc clears" aria-label="Search result — Enter opens · c copies URL">' +
             '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + title + '</a>' +
             (meta ? '<div class="perplexity-result-meta">' + esc(meta) + '</div>' : '') +
             snippetHtml +
             '</article>';
         }).join('');
         decoratePerplexityResultItems(resultsEl);
+        applyPerplexityResultsFilter();
         perplexityLastSearch = {
           query: query,
           count: resp.results.length,
