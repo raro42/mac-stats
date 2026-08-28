@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.691] - 2026-08-28
+
+### Added
+- **Disk Cleanup categories All · Reclaim · Big · Clean filter** — Big shows categories with ≥50 MiB reclaimable; counts + warm empty hint + red row wash (Monitors Slow / Top Processes Hot parity; Reclaimable now card opens Big when any qualify; design review / `feature-disk-cleanup`).
+
 ## [0.1.690] - 2026-08-28
 
 ### Added

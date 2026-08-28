@@ -5931,8 +5931,10 @@ let monitorsFilterMode = 'all';
 
 /** Disk Cleanup section collapsed (module-level for empty-CTA expand). */
 let diskCleanupCollapsed = true;
-/** Category list filter: all | reclaim | clean (Monitors All/Up/Down parity). */
+/** Category list filter: all | reclaim | clean | big (Monitors Slow / Hot parity). */
 let diskCleanupFilterMode = 'all';
+/** Reclaimable bytes at or above this count as Big (50 MiB). */
+const DISK_CLEANUP_BIG_BYTES = 50 * 1024 * 1024;
 /** Scopes All · On · Off (Agents enabled-filter parity). */
 let diskCleanupScopeFilterMode = 'all';
 /** Shallow status poll while Disk Cleanup is collapsed (collapsed glance). */
@@ -14277,14 +14279,31 @@ function focusDiskCleanupScopesReview() {
 }
 
 /** Reclaimable-now card: jump to first reclaim row, or scopes when nothing pending. */
+function diskCleanupCategoryBytes(el) {
+  if (!el) return 0;
+  const raw = el.getAttribute('data-reclaim-bytes');
+  const n = raw != null ? parseInt(raw, 10) : 0;
+  return Number.isFinite(n) ? n : 0;
+}
+
+function isDiskCleanupCategoryBig(bytes) {
+  return (bytes || 0) >= DISK_CLEANUP_BIG_BYTES;
+}
+
 function focusDiskCleanupReclaimGlance() {
   ensureDiskCleanupSectionExpanded();
-  setDiskCleanupFilterMode('reclaim');
+  const list = document.getElementById('disk-cleanup-list');
+  const hasBig =
+    !!list &&
+    Array.from(list.querySelectorAll('.disk-cleanup-item')).some((el) =>
+      el.classList.contains('is-big')
+    );
+  setDiskCleanupFilterMode(hasBig ? 'big' : 'reclaim');
   requestAnimationFrame(() => {
-    const list = document.getElementById('disk-cleanup-list');
     const reclaimRow =
-      visibleDiskCleanupItems(list).find((el) => el.classList.contains('has-reclaim')) ||
-      null;
+      visibleDiskCleanupItems(list).find((el) =>
+        hasBig ? el.classList.contains('is-big') : el.classList.contains('has-reclaim')
+      ) || null;
     if (reclaimRow) {
       const idx = parseInt(reclaimRow.getAttribute('data-item-idx') || '0', 10);
       syncDiskCleanupItemTabOrder(list, Number.isFinite(idx) ? idx : 0);
@@ -15239,6 +15258,7 @@ function ensureDiskCleanupFilterChips() {
     wrap.innerHTML =
       '<button type="button" class="disk-cleanup-filter-chip is-active" data-disk-cleanup-filter="all" aria-pressed="true" title="Show every category">All</button>' +
       '<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="reclaim" aria-pressed="false" title="Show categories with reclaimable space">Reclaim <span class="disk-cleanup-filter-count" data-disk-cleanup-filter-count="reclaim">0</span></button>' +
+      `<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="big" aria-pressed="false" title="Show categories with big reclaimable space (≥${formatDiskBytes(DISK_CLEANUP_BIG_BYTES)})">Big <span class="disk-cleanup-filter-count" data-disk-cleanup-filter-count="big">0</span></button>` +
       '<button type="button" class="disk-cleanup-filter-chip" data-disk-cleanup-filter="clean" aria-pressed="false" title="Show categories that are already clean">Clean <span class="disk-cleanup-filter-count" data-disk-cleanup-filter-count="clean">0</span></button>';
     list.parentNode.insertBefore(wrap, list);
     wrap.addEventListener('click', (e) => {
@@ -15254,7 +15274,8 @@ function ensureDiskCleanupFilterChips() {
 }
 
 function setDiskCleanupFilterMode(mode) {
-  const next = mode === 'reclaim' || mode === 'clean' ? mode : 'all';
+  const next =
+    mode === 'reclaim' || mode === 'clean' || mode === 'big' ? mode : 'all';
   diskCleanupFilterMode = next;
   document
     .querySelectorAll('#disk-cleanup-filter-chips [data-disk-cleanup-filter]')
@@ -15302,25 +15323,41 @@ function applyDiskCleanupListFilter() {
   if (chips) chips.hidden = trueEmpty || items.length === 0;
 
   let reclaimCount = 0;
+  let bigCount = 0;
   let cleanCount = 0;
   items.forEach((el) => {
     if (el.classList.contains('has-reclaim')) reclaimCount++;
-    else cleanCount++;
+    if (el.classList.contains('is-big')) bigCount++;
+    else if (!el.classList.contains('has-reclaim')) cleanCount++;
   });
 
   const reclaimEl = document.querySelector(
     '[data-disk-cleanup-filter-count="reclaim"]'
   );
+  const bigEl = document.querySelector('[data-disk-cleanup-filter-count="big"]');
   const cleanEl = document.querySelector('[data-disk-cleanup-filter-count="clean"]');
   if (reclaimEl) reclaimEl.textContent = String(reclaimCount);
+  if (bigEl) bigEl.textContent = String(bigCount);
   if (cleanEl) cleanEl.textContent = String(cleanCount);
+  const bigBtn = document.querySelector(
+    '#disk-cleanup-filter-chips [data-disk-cleanup-filter="big"]'
+  );
+  if (bigBtn) {
+    bigBtn.title = `Show categories with big reclaimable space (≥${formatDiskBytes(DISK_CLEANUP_BIG_BYTES)})`;
+  }
   document
     .querySelectorAll('#disk-cleanup-filter-chips [data-disk-cleanup-filter]')
     .forEach((btn) => {
       const key = btn.getAttribute('data-disk-cleanup-filter');
       btn.classList.toggle(
         'has-hits',
-        key === 'reclaim' ? reclaimCount > 0 : key === 'clean' ? cleanCount > 0 : false
+        key === 'reclaim'
+          ? reclaimCount > 0
+          : key === 'big'
+            ? bigCount > 0
+            : key === 'clean'
+              ? cleanCount > 0
+              : false
       );
     });
 
@@ -15332,8 +15369,10 @@ function applyDiskCleanupListFilter() {
   let visible = 0;
   items.forEach((el) => {
     const hasReclaim = el.classList.contains('has-reclaim');
+    const isBig = el.classList.contains('is-big');
     let show = true;
     if (diskCleanupFilterMode === 'reclaim') show = hasReclaim;
+    else if (diskCleanupFilterMode === 'big') show = isBig;
     else if (diskCleanupFilterMode === 'clean') show = !hasReclaim;
     el.style.display = show ? '' : 'none';
     if (show) visible++;
@@ -15513,7 +15552,9 @@ async function refreshDiskCleanupPanel(opts) {
           : 0;
       list.innerHTML = cats
         .map((c, idx) => {
-          const has = (c.bytes || 0) > 0 || (c.fileCount || 0) > 0;
+          const bytes = c.bytes || 0;
+          const has = bytes > 0 || (c.fileCount || 0) > 0;
+          const isBig = isDiskCleanupCategoryBig(bytes);
           const samples = (c.sampleNames || []).slice(0, 3).join(', ');
           const pathHint = String(c.pathHint || '').trim();
           const pathEsc = escapeDiskHtml(pathHint);
@@ -15524,7 +15565,7 @@ async function refreshDiskCleanupPanel(opts) {
             ? `<button type="button" class="disk-cleanup-item-path" data-copy-path="${pathEsc}" title="Click to copy path">${pathEsc}</button>`
             : '';
           const catIdEsc = escapeDiskHtml(String(c.id || ''));
-          return `<li class="disk-cleanup-item${has ? ' has-reclaim' : ''}" role="option" data-item-idx="${idx}" data-cat-id="${catIdEsc}" data-copy-path="${pathEsc}" title="${title}">
+          return `<li class="disk-cleanup-item${has ? ' has-reclaim' : ''}${isBig ? ' is-big' : ''}" role="option" data-item-idx="${idx}" data-cat-id="${catIdEsc}" data-reclaim-bytes="${bytes}" data-copy-path="${pathEsc}" title="${title}">
             <div class="disk-cleanup-item-head">
               <span class="disk-cleanup-item-title">${c.label || c.id}</span>
               <span class="disk-cleanup-item-stat">${
@@ -15552,7 +15593,7 @@ async function refreshDiskCleanupPanel(opts) {
       }
       if (listHint) {
         listHint.textContent =
-          'Categories: All · Reclaim · Clean filters · ↑↓ / j k · PgUp/PgDn · Home / End select · click path / c copies · Esc clears · Enter runs Clean now when reclaimable';
+          `Categories: All · Reclaim · Big (≥${formatDiskBytes(DISK_CLEANUP_BIG_BYTES)}) · Clean filters · ↑↓ / j k · PgUp/PgDn · Home / End select · click path / c copies · Esc clears · Enter runs Clean now when reclaimable`;
       }
       window.__diskCleanupItemFocusIdx = preferItemIdx;
       applyDiskCleanupListFilter();

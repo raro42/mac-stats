@@ -3689,6 +3689,16 @@ textarea.ops-agent-editor.is-dirty {
   border-color: color-mix(in srgb, #ff9f0a 38%, transparent);
 }
 
+.disk-cleanup-filter-chip[data-disk-cleanup-filter='big'].has-hits {
+  background: color-mix(in srgb, #ff453a 12%, transparent);
+  border-color: color-mix(in srgb, #ff453a 28%, transparent);
+}
+
+.disk-cleanup-filter-chip[data-disk-cleanup-filter='big'].is-active {
+  background: color-mix(in srgb, #ff453a 18%, transparent);
+  border-color: color-mix(in srgb, #ff453a 38%, transparent);
+}
+
 .disk-cleanup-filter-chip[data-disk-cleanup-filter='clean'].has-hits {
   background: color-mix(in srgb, #34c759 12%, transparent);
   border-color: color-mix(in srgb, #34c759 28%, transparent);
@@ -4868,6 +4878,26 @@ button.monitor-detail-url.is-just-saved {
   box-shadow:
     inset 3px 0 0 color-mix(in srgb, #ff9f0a 80%, transparent),
     0 0 0 3px color-mix(in srgb, #ff9f0a 18%, transparent);
+}
+
+.disk-cleanup-item.has-reclaim.is-big {
+  border-color: color-mix(in srgb, #ff453a 34%, transparent);
+  background: color-mix(in srgb, #ff453a 8%, transparent);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, #ff453a 75%, transparent);
+}
+
+.disk-cleanup-item.has-reclaim.is-big:hover {
+  background: color-mix(in srgb, #ff453a 12%, transparent);
+  border-color: color-mix(in srgb, #ff453a 44%, transparent);
+}
+
+.disk-cleanup-item.has-reclaim.is-big.is-selected,
+.disk-cleanup-item.has-reclaim.is-big:focus-visible {
+  border-color: color-mix(in srgb, #ff453a 52%, transparent);
+  background: color-mix(in srgb, #ff453a 13%, transparent);
+  box-shadow:
+    inset 3px 0 0 color-mix(in srgb, #ff453a 85%, transparent),
+    0 0 0 3px color-mix(in srgb, #ff453a 20%, transparent);
 }
 
 .disk-cleanup-list-kb-hint {
