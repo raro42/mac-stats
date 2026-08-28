@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.699] - 2026-08-28
+
+### Fixed
+- **CPU window chrome clutter** — keyboard tip lines under header, rings, charts, power strip, icon line, and filter chips stay hidden until that strip is focused (clean layout again; shortcuts still work).
+
 ## [0.1.698] - 2026-08-28
 
 ### Fixed

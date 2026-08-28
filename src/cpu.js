@@ -2664,11 +2664,17 @@ function ensureRamStripStyles() {
       color: var(--text);
     }
     .power-strip-kb-hint {
+      display: none;
       margin: 2px 0 0;
       font-size: 11px;
       opacity: 0.72;
       width: 100%;
       flex-basis: 100%;
+    }
+    .power-strip:focus-within .power-strip-kb-hint,
+    #power-strip:focus-within .power-strip-kb-hint,
+    #battery-power-strip:focus-within .power-strip-kb-hint {
+      display: block;
     }
     .detail-label.is-ram-highlight,
     .detail-value.is-ram-highlight {
@@ -3318,12 +3324,22 @@ function ensureRingGaugeKbStyles() {
   style.id = 'mac-stats-ring-gauge-kb-styles';
   style.textContent = `
     .ring-gauge-kb-hint {
+      display: none;
       margin: 6px 0 0;
       font-size: 11px;
       opacity: 0.72;
       width: 100%;
       flex-basis: 100%;
       grid-column: 1 / -1;
+    }
+    .apple-metrics:focus-within .ring-gauge-kb-hint,
+    .cpu-metrics:focus-within .ring-gauge-kb-hint,
+    .metrics-grid:focus-within .ring-gauge-kb-hint,
+    .arch-metrics:focus-within .ring-gauge-kb-hint,
+    .swiss-metrics:focus-within .ring-gauge-kb-hint,
+    .mat-metrics:focus-within .ring-gauge-kb-hint,
+    .poster-metrics:focus-within .ring-gauge-kb-hint {
+      display: block;
     }
   `;
   document.head.appendChild(style);
@@ -3466,12 +3482,16 @@ function ensureHistorySparklineKbStyles() {
   style.id = 'mac-stats-history-sparkline-kb-styles';
   style.textContent = `
     .history-sparkline-kb-hint {
+      display: none;
       margin: 6px 0 0;
       font-size: 11px;
       opacity: 0.72;
       width: 100%;
       flex-basis: 100%;
       grid-column: 1 / -1;
+    }
+    .history-section:focus-within .history-sparkline-kb-hint {
+      display: block;
     }
     .history-chart-container[role="button"] {
       cursor: pointer;
@@ -4319,11 +4339,22 @@ function ensureFilterChipKbStyles() {
   style.id = 'mac-stats-filter-chip-kb-styles';
   style.textContent = `
     .filter-chip-kb-hint {
+      display: none;
       margin: 2px 0 0;
       font-size: 11px;
       opacity: 0.72;
       width: 100%;
       flex-basis: 100%;
+    }
+    .rings-filter-chips:focus-within .filter-chip-kb-hint,
+    .processes-filter-chips:focus-within .filter-chip-kb-hint,
+    .monitors-filter-chips:focus-within .filter-chip-kb-hint,
+    .logs-filter-chips:focus-within .filter-chip-kb-hint,
+    .disk-cleanup-scope-filter-chips:focus-within .filter-chip-kb-hint,
+    .disk-cleanup-filter-chips:focus-within .filter-chip-kb-hint,
+    .chat-filter-chips:focus-within .filter-chip-kb-hint,
+    .perplexity-filter-chips:focus-within .filter-chip-kb-hint {
+      display: block;
     }
     .processes-filter-chips,
     .monitors-filter-chips,
@@ -14781,12 +14812,16 @@ function ensureDiskCleanupMetaKbStyles() {
   style.id = 'mac-stats-disk-meta-kb-styles';
   style.textContent = `
     .disk-cleanup-meta-kb-hint {
+      display: none;
       margin: 4px 0 0;
       font-size: 11px;
       opacity: 0.72;
       width: 100%;
       flex-basis: 100%;
       grid-column: 1 / -1;
+    }
+    .disk-cleanup-meta:focus-within .disk-cleanup-meta-kb-hint {
+      display: block;
     }
   `;
   document.head.appendChild(style);
@@ -17381,11 +17416,21 @@ function ensureCpuHeaderToolbarKbStyles() {
   style.id = 'mac-stats-header-toolbar-kb-styles';
   style.textContent = `
     .header-toolbar-kb-hint {
+      display: none;
       margin: 2px 0 0;
       font-size: 11px;
       opacity: 0.72;
       width: 100%;
       text-align: right;
+    }
+    .apple-actions:focus-within .header-toolbar-kb-hint,
+    .cpu-actions:focus-within .header-toolbar-kb-hint,
+    .arch-actions:focus-within .header-toolbar-kb-hint,
+    .swiss-actions:focus-within .header-toolbar-kb-hint,
+    .mat-actions:focus-within .header-toolbar-kb-hint,
+    .poster-actions:focus-within .header-toolbar-kb-hint,
+    .theme-actions:focus-within .header-toolbar-kb-hint {
+      display: block;
     }
   `;
   document.head.appendChild(style);
@@ -17751,11 +17796,17 @@ function ensureFooterToolbarKbStyles() {
   style.id = 'mac-stats-footer-toolbar-kb-styles';
   style.textContent = `
     .footer-toolbar-kb-hint {
+      display: none;
       margin: 4px 0 0;
       font-size: 11px;
       opacity: 0.72;
       width: 100%;
       text-align: center;
+    }
+    footer:focus-within .footer-toolbar-kb-hint,
+    .apple-footer:focus-within .footer-toolbar-kb-hint,
+    .cpu-footer:focus-within .footer-toolbar-kb-hint {
+      display: block;
     }
     footer[role="toolbar"] .app-version[tabindex],
     footer[role="toolbar"] .theme-version[tabindex],
@@ -18080,12 +18131,17 @@ function ensureIconLineKbStyles() {
   style.id = 'mac-stats-icon-line-kb-styles';
   style.textContent = `
     .icon-line-kb-hint {
+      display: none;
       margin: 2px 0 0;
       font-size: 11px;
       opacity: 0.72;
       width: 100%;
       flex-basis: 100%;
       text-align: center;
+    }
+    #icon-line:focus-within .icon-line-kb-hint,
+    .icon-line:focus-within .icon-line-kb-hint {
+      display: block;
     }
   `;
   document.head.appendChild(style);
