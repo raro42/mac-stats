@@ -1547,6 +1547,137 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 /* Shared process list polish (themes load agent-ops.css) */
+.rings-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 8px;
+  padding: 0 2px;
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.rings-filter-chips[hidden] {
+  display: none !important;
+}
+
+.rings-filter-chip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  opacity: 0.88;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.rings-filter-chip:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 7%, transparent);
+}
+
+.rings-filter-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, transparent);
+}
+
+.rings-filter-chip.is-active {
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent, #0a84ff) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent, #0a84ff) 32%, transparent);
+}
+
+.rings-filter-chip[data-rings-filter='hot'].has-hits {
+  background: color-mix(in srgb, #ff9500 12%, transparent);
+  border-color: color-mix(in srgb, #ff9500 28%, transparent);
+}
+
+.rings-filter-chip[data-rings-filter='hot'].is-active {
+  background: color-mix(in srgb, #ff9500 20%, transparent);
+  border-color: color-mix(in srgb, #ff9500 40%, transparent);
+}
+
+.rings-filter-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  min-width: 1.1em;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.rings-filter-miss {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 4px 2px 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.rings-filter-miss-msg {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.rings-filter-miss-hint {
+  font-size: 12px;
+  opacity: 0.78;
+  line-height: 1.35;
+}
+
+.rings-filter-miss-cta {
+  appearance: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--accent, #0a84ff) 32%, transparent);
+  background: color-mix(in srgb, var(--accent, #0a84ff) 14%, transparent);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.rings-filter-miss-cta:hover {
+  background: color-mix(in srgb, var(--accent, #0a84ff) 22%, transparent);
+}
+
+.rings-filter-miss-cta:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #0a84ff) 20%, transparent);
+}
+
+.metric-card.is-hot {
+  background-color: color-mix(in srgb, #ff9500 12%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, #ff9500 28%, transparent);
+  border-radius: 12px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.history-chart-container.is-hot .history-chart-caption {
+  color: color-mix(in srgb, #ff9500 75%, var(--text, currentColor));
+  font-weight: 700;
+}
+
 .processes-filter-chips {
   display: flex;
   align-items: center;

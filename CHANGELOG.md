@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.689] - 2026-08-28
+
+### Added
+- **CPU rings All · Hot filter** — Hot shows rings at menu-bar amber thresholds (CPU ≥50%, GPU ≥15%, Freq ≥3.5 GHz, Temp ≥70°C); amber card wash + matching history charts; counts + warm empty hint (Top Processes Hot / Monitors Slow parity; design review / `feature-cpu-metrics`).
+
 ## [0.1.688] - 2026-08-28
 
 ### Added
