@@ -331,10 +331,9 @@ body.theme-data-poster .icon-line-item:not(.status-good):not(.status-bad):not(.s
   clear: both;
 }
 
-/* Agent Ops keep-header: show header + Discord Ready glance when collapsed (all themes).
-   Compact mode still fully hides via inline display:none from setIconPaneVisibility. */
+/* Agent Ops: fully hide when collapsed (icon off = no chrome below icon line). */
 .agent-ops-section.collapsed {
-  display: block;
+  display: none !important;
 }
 
 .agent-ops-section:not(.collapsed) {
@@ -2405,10 +2404,9 @@ footer:focus-within .footer-toolbar-kb-hint,
   display: none;
 }
 
-/* Perplexity keep-header: show header + last-search glance when collapsed (all themes).
-   Compact mode still fully hides via inline display:none from setIconPaneVisibility. */
+/* Perplexity: fully hide when collapsed (icon off). */
 .perplexity-section.collapsed {
-  display: block;
+  display: none !important;
 }
 
 .perplexity-result-item[role='option'] {
@@ -2631,10 +2629,9 @@ footer:focus-within .footer-toolbar-kb-hint,
   display: none;
 }
 
-/* Debug Log keep-header: show header + error/warn glance when collapsed (all themes).
-   Compact mode still fully hides via inline display:none from setIconPaneVisibility. */
+/* Debug Log: fully hide when collapsed (icon off). */
 .logs-section.collapsed {
-  display: block;
+  display: none !important;
 }
 
 .logs-viewer-prefix {
@@ -2753,10 +2750,9 @@ footer:focus-within .footer-toolbar-kb-hint,
   opacity: 0.85;
 }
 
-/* External / Monitors keep-header: show header + collapsed glance when collapsed (all themes).
-   Compact mode still fully hides via inline display:none from setIconPaneVisibility. */
+/* External / Monitors: fully hide when collapsed (icon off). */
 .monitors-section.collapsed {
-  display: block;
+  display: none !important;
 }
 
 .monitors-section.collapsed .monitors-summary {
@@ -2881,10 +2877,9 @@ footer:focus-within .footer-toolbar-kb-hint,
   opacity: 0.9;
 }
 
-/* Disk Cleanup keep-header: show header + collapsed glance when collapsed (all themes).
-   Compact mode still fully hides via inline display:none from setIconPaneVisibility. */
+/* Disk Cleanup: fully hide when collapsed (icon off). */
 .disk-cleanup-section.collapsed {
-  display: block;
+  display: none !important;
 }
 
 .disk-cleanup-section.collapsed .disk-cleanup-summary {
@@ -3122,10 +3117,9 @@ footer:focus-within .footer-toolbar-kb-hint,
   opacity: 0.85;
 }
 
-/* AI Chat keep-header: show header + collapsed glance when collapsed (all themes).
-   Compact mode still fully hides via inline display:none from setIconPaneVisibility. */
+/* AI Chat: fully hide when collapsed (icon off). */
 .ollama-section.collapsed {
-  display: block;
+  display: none !important;
 }
 
 /* AI Chat — collapsed glance under header (Monitors / Disk Cleanup parity) */

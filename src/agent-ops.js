@@ -6953,14 +6953,13 @@ function escapeHtml(s) {
     const section = document.getElementById('agent-ops-section') || document.querySelector('.agent-ops-section');
     const content = document.getElementById('agent-ops-content');
     const btn = document.getElementById('agent-ops-collapse-btn');
-    const compact = document.body.classList.contains('cpu-window-compact');
-    // Compact CPU window: full-hide (setIconPaneVisibility). Otherwise keep-header.
-    if (compact && collapsed && typeof window.setIconPaneVisibility === 'function') {
-      window.setIconPaneVisibility(section, content, true, null);
+    if (typeof window.setIconPaneVisibility === 'function') {
+      window.setIconPaneVisibility(section, content, collapsed, null);
     } else if (section) {
-      section.style.display = '';
       section.classList.toggle('collapsed', collapsed);
-      section.removeAttribute('aria-hidden');
+      section.style.display = collapsed ? 'none' : '';
+      if (collapsed) section.setAttribute('aria-hidden', 'true');
+      else section.removeAttribute('aria-hidden');
       if (content) {
         content.classList.toggle('collapsed', collapsed);
         content.style.display = collapsed ? 'none' : '';
@@ -6970,7 +6969,8 @@ function escapeHtml(s) {
     const header = document.getElementById('agent-ops-header');
     if (header) header.setAttribute('aria-expanded', String(!collapsed));
     stopOpsGlancePoll();
-    syncOpsCollapsedGlance();
+    const glance = document.getElementById('agent-ops-collapsed-glance');
+    if (glance) glance.hidden = true;
     syncOpsIcon();
     if (typeof window.setSectionCollapsed === 'function') {
       window.setSectionCollapsed('agent_ops_collapsed', collapsed);
@@ -6981,18 +6981,7 @@ function escapeHtml(s) {
     }
     if (collapsed) {
       stopAgentOpsAutoRefresh();
-      if (!compact) startOpsGlancePoll();
     } else {
-      // Keep-header expand: clear any prior full-hide inline styles (compact).
-      if (section) {
-        section.style.display = '';
-        section.classList.remove('collapsed');
-        section.removeAttribute('aria-hidden');
-      }
-      if (content) {
-        content.classList.remove('collapsed');
-        content.style.display = '';
-      }
       restoreAgentOpsTab();
       refreshAgentOps();
       startAgentOpsAutoRefresh();

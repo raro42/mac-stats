@@ -1242,7 +1242,7 @@ body {
 }
 
 .perplexity-section.collapsed {
-  display: block;
+  display: none !important;
 }
 
 .monitors-summary {
@@ -2275,7 +2275,7 @@ body {
 /* Logs section */
 /* Logs — keep header + glance when collapsed (agent-ops.css) */
 .logs-section.collapsed {
-  display: block;
+  display: none !important;
 }
 
 .disk-cleanup-section.collapsed {

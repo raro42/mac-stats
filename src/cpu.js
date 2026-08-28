@@ -6136,21 +6136,10 @@ function initMonitorsSection() {
     const section = document.querySelector('.monitors-section');
     const divider = document.getElementById('monitors-ollama-divider');
 
-    // Keep-header: section stays visible with collapsed glance; only content hides.
-    // Compact mode still fully hides via collapseSectionByIds → setIconPaneVisibility.
-    if (section) {
-      section.style.display = '';
-      section.classList.toggle('collapsed', monitorsCollapsed);
-      section.removeAttribute('aria-hidden');
-    }
-    if (divider) divider.style.display = monitorsCollapsed ? 'none' : '';
-    if (content) {
-      content.classList.toggle('collapsed', monitorsCollapsed);
-      content.style.display = monitorsCollapsed ? 'none' : '';
-    }
+    setIconPaneVisibility(section, content, monitorsCollapsed, divider);
 
     if (monitorsCollapsed) {
-      // Keep a light summary poll so the collapsed glance stays fresh (no list rebuild).
+      // Keep a light summary poll so the icon status stays fresh (no list rebuild).
       if (monitorsUpdateInterval) {
         clearInterval(monitorsUpdateInterval);
         monitorsUpdateInterval = null;
@@ -6177,10 +6166,11 @@ function initMonitorsSection() {
     const iconEl = document.getElementById('icon-monitors');
     if (iconEl) {
       iconEl.title = monitorsCollapsed
-        ? 'External / Monitors · ↓ → glance'
-        : iconEl.getAttribute('data-title-base') || 'Hide External / Monitors';
+        ? iconEl.getAttribute('data-title-base') || 'External / Monitors'
+        : 'Hide External / Monitors';
     }
-    syncMonitorsCollapsedGlance();
+    const glance = document.getElementById('monitors-collapsed-glance');
+    if (glance) glance.hidden = true;
   };
   applyMonitorsCollapsed();
 
@@ -9616,18 +9606,7 @@ function initOllamaSection() {
     const divider = document.getElementById('monitors-ollama-divider');
     const chat = document.getElementById('ollama-chat');
 
-    // Keep-header: section stays visible with collapsed glance; only content hides.
-    // Compact mode still fully hides via collapseSectionByIds → setIconPaneVisibility.
-    if (section) {
-      section.style.display = '';
-      section.classList.toggle('collapsed', ollamaCollapsed);
-      section.removeAttribute('aria-hidden');
-    }
-    if (divider) divider.style.display = ollamaCollapsed ? 'none' : '';
-    if (content) {
-      content.classList.toggle('collapsed', ollamaCollapsed);
-      content.style.display = ollamaCollapsed ? 'none' : '';
-    }
+    setIconPaneVisibility(section, content, ollamaCollapsed, divider);
 
     if (ollamaCollapsed) {
       if (chat) chat.style.display = 'none';
@@ -9662,17 +9641,16 @@ function initOllamaSection() {
       menuCollapse.textContent = ollamaCollapsed ? 'Expand' : 'Collapse';
     }
     setSectionCollapsed('ollama_collapsed', ollamaCollapsed);
-    if (header._syncCollapseA11y) header._syncCollapseA11y();
     syncSectionIcon('icon-ollama', !ollamaCollapsed);
     const iconEl = document.getElementById('icon-ollama');
     if (iconEl) {
       iconEl.title = ollamaCollapsed
-        ? 'AI Chat · ↓ → glance'
-        : iconEl.getAttribute('data-title-base') || 'Hide AI Chat';
+        ? iconEl.getAttribute('data-title-base') || 'AI Chat'
+        : 'Hide AI Chat';
     }
-    if (window.Ollama && typeof window.Ollama.syncCollapsedGlance === 'function') {
-      window.Ollama.syncCollapsedGlance();
-    }
+    const glance = document.getElementById('ollama-collapsed-glance');
+    if (glance) glance.hidden = true;
+    if (header._syncCollapseA11y) header._syncCollapseA11y();
   };
   applyOllamaCollapsed();
 
@@ -11181,24 +11159,9 @@ function initCollapsibleSections() {
     );
   }
 
-  // Collapse Details: keep header + glance; hide grid (Top Processes / Debug Log parity).
+  // Collapse Details: fully hide (below icon line — no keep-header chrome).
   function hideDetails() {
-    const content = document.getElementById("details-content");
-    if (detailsSection) {
-      detailsSection.classList.add("collapsed");
-      detailsSection.style.display = "";
-      detailsSection.removeAttribute("aria-hidden");
-    }
-    if (content) {
-      content.classList.add("collapsed");
-      content.style.display = "none";
-      content.setAttribute("aria-hidden", "true");
-    }
-    if (detailsDivider && isDivider(detailsDivider)) {
-      detailsDivider.style.display = "";
-    }
-    syncDetailsCollapseA11y();
-    refreshDetailsCollapsedGlanceFromDom();
+    hideDetailsFully();
   }
 
   // Fully hide Details (usage-card hide / compact layout).
@@ -12932,28 +12895,17 @@ function initPerplexitySection() {
 
   perplexityCollapsed = getSectionCollapsed('perplexity_collapsed');
   const applyPerplexityCollapsed = () => {
-    // Keep-header: section stays visible with last-search glance; only content hides.
-    if (section) {
-      section.style.display = '';
-      section.classList.toggle('collapsed', perplexityCollapsed);
-      if (perplexityCollapsed) section.removeAttribute('aria-hidden');
-      else section.removeAttribute('aria-hidden');
-    }
-    if (divider) divider.style.display = perplexityCollapsed ? 'none' : '';
-    if (content) {
-      content.classList.toggle('collapsed', perplexityCollapsed);
-      content.style.display = perplexityCollapsed ? 'none' : '';
-    }
+    setIconPaneVisibility(section, content, perplexityCollapsed, divider);
     if (header._syncCollapseA11y) header._syncCollapseA11y();
     applyPerplexityLastGlanceState();
     refreshPerplexityStatus();
     syncSectionIcon('icon-perplexity', !perplexityCollapsed);
     const icon = document.getElementById('icon-perplexity');
     if (icon) {
-      icon.title = perplexityCollapsed
-        ? 'Perplexity Search · ↓ → glance'
-        : 'Hide Perplexity Search';
+      icon.title = perplexityCollapsed ? 'Perplexity Search' : 'Hide Perplexity Search';
     }
+    const glance = document.getElementById('perplexity-last-glance');
+    if (glance && perplexityCollapsed) glance.hidden = true;
   };
   applyPerplexityCollapsed();
 
@@ -16772,21 +16724,9 @@ function initDiskCleanupSection() {
 
   diskCleanupCollapsed = getSectionCollapsed('disk_cleanup_collapsed');
   const applyCollapsed = () => {
-    // Keep-header: section stays visible with collapsed glance; only content hides.
-    // Compact mode still fully hides via collapseSectionByIds → setIconPaneVisibility.
-    if (section) {
-      section.style.display = '';
-      section.classList.toggle('collapsed', diskCleanupCollapsed);
-      section.removeAttribute('aria-hidden');
-    }
-    if (content) {
-      content.classList.toggle('collapsed', diskCleanupCollapsed);
-      content.style.display = diskCleanupCollapsed ? 'none' : '';
-    }
+    setIconPaneVisibility(section, content, diskCleanupCollapsed, null);
     if (diskCleanupCollapsed) {
-      // Shallow status poll so the collapsed glance stays fresh (no deep Downloads scan).
-      void refreshDiskCleanupPanel({ deep: false });
-      startDiskCleanupGlancePoll();
+      stopDiskCleanupGlancePoll();
     } else {
       stopDiskCleanupGlancePoll();
       refreshDiskCleanupPanel();
@@ -16796,10 +16736,11 @@ function initDiskCleanupSection() {
     const iconEl = document.getElementById('icon-disk-cleanup');
     if (iconEl) {
       iconEl.title = diskCleanupCollapsed
-        ? 'Disk cleanup · ↓ → glance'
-        : iconEl.getAttribute('data-title-base') || 'Hide Disk cleanup';
+        ? iconEl.getAttribute('data-title-base') || 'Disk cleanup'
+        : 'Hide Disk cleanup';
     }
-    syncDiskCleanupCollapsedGlance();
+    const glance = document.getElementById('disk-cleanup-collapsed-glance');
+    if (glance) glance.hidden = true;
   };
   applyCollapsed();
   // Do not scan Downloads/Trash on every CPU-window open — only when the section is expanded
@@ -17144,35 +17085,23 @@ function initLogsSection() {
 
   logsSectionCollapsed = getSectionCollapsed('logs_collapsed');
   const applyCollapsed = () => {
-    // Keep-header: section stays visible with error/warn glance; only content hides.
-    // Compact mode still fully hides via collapseSectionByIds → setIconPaneVisibility.
-    if (section) {
-      section.style.display = '';
-      section.classList.toggle('collapsed', logsSectionCollapsed);
-      section.removeAttribute('aria-hidden');
-    }
-    if (divider) divider.style.display = logsSectionCollapsed ? 'none' : '';
-    if (content) {
-      content.classList.toggle('collapsed', logsSectionCollapsed);
-      content.style.display = logsSectionCollapsed ? 'none' : '';
-    }
+    setIconPaneVisibility(section, content, logsSectionCollapsed, divider);
     if (logsSectionCollapsed) {
       stopLogsAutoRefresh();
-      applyLogsGlanceState(logsGlanceCounts);
-      void pollLogsGlanceCounts();
     } else {
       refreshLogsViewer(true);
       if (autoCb && autoCb.checked) startLogsAutoRefresh();
-      applyLogsGlanceState(logsGlanceCounts);
     }
     if (header._syncCollapseA11y) header._syncCollapseA11y();
     syncSectionIcon('icon-logs', !logsSectionCollapsed);
     const iconEl = document.getElementById('icon-logs');
     if (iconEl) {
       iconEl.title = logsSectionCollapsed
-        ? 'Debug Log · ↓ → glance'
-        : iconEl.getAttribute('data-title-base') || 'Hide Debug Log';
+        ? iconEl.getAttribute('data-title-base') || 'Debug Log'
+        : 'Hide Debug Log';
     }
+    const glance = document.getElementById('logs-error-glance');
+    if (glance && logsSectionCollapsed) glance.hidden = true;
   };
   applyCollapsed();
 

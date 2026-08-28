@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.700] - 2026-08-28
+
+### Changed
+- **Icon-line panes** — when an icon is off, that section is fully hidden (no keep-header / Discord glance). All icons off → only the top gauges (and chrome above the icon line). Icon click opens; click again closes.
+
 ## [0.1.699] - 2026-08-28
 
 ### Fixed
