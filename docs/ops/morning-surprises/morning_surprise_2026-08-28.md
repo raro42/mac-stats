@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-28
 
-Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains, keep-header fixes, filter chips across sections, Perplexity Top/Snippet, Agent Ops Runs Slow/Fail, `/failed` + `/slow` instant operators.
+Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains, keep-header fixes, filter chips across sections, Perplexity Top/Snippet, Agent Ops Runs Slow/Fail/Instant/Direct, `/failed` + `/slow` + `/instant` + `/direct` instant operators.
 
 ## Shipped tonight
 
@@ -26,10 +26,11 @@ Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains
 | **v0.1.694** | **Agent Ops Runs Fail filter** — Fail filter for ok=false runs; red row wash; overview Opens → Fail when any failed (AI Chat Errors parity) |
 | **v0.1.695** | **`/failed` instant operator** — `/failed` + NL (`what failed`, `failed runs`) return recent ok=false turns from runs.jsonl with error text (Discord + AI Chat; Agent Ops Fail parity; p50 latency) |
 | **v0.1.696** | **`/slow` instant operator** — `/slow` + NL (`what's slow`, `slow runs`) return recent turns ≥2000 ms from runs.jsonl (Discord + AI Chat; Agent Ops Slow parity; p50 latency) |
+| **v0.1.697** | **`/instant` + `/direct` instant operators** — `/instant`, `/direct`, and NL (`instant runs`, `direct runs`) return recent lane-filtered turns from runs.jsonl (Discord + AI Chat; Agent Ops Instant/Direct parity; p50 latency) |
 
 ## Why it matters
 
-Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Filter chips now cover **Top Processes Hot**, **Monitors Slow**, **AI Chat Errors**, **CPU rings Hot**, **Disk Cleanup On/Off + Big**, **Perplexity Top/Snippet**, **Agent Ops Runs Slow + Fail**. Ask **`/failed`** or **what failed** for a zero-LLM failed-run report. Ask **`/slow`** or **what's slow** for slow-turn latency.
+Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Filter chips now cover **Top Processes Hot**, **Monitors Slow**, **AI Chat Errors**, **CPU rings Hot**, **Disk Cleanup On/Off + Big**, **Perplexity Top/Snippet**, **Agent Ops Runs Slow + Fail + Instant + Direct**. Ask **`/failed`**, **`/slow`**, **`/instant`**, or **`/direct`** for zero-LLM run reports from runs.jsonl.
 
 ## Digester / design review
 
