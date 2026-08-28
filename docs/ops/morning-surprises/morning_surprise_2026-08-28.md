@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-28
 
-Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains, keep-header fixes, Top Processes Hot, Monitors Slow, AI Chat Errors, CPU rings Hot, Disk Cleanup scopes On/Off, then categories Big filter.
+Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains, keep-header fixes, filter chips across sections, and Perplexity Top/Snippet.
 
 ## Shipped tonight
 
@@ -21,15 +21,16 @@ Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains
 | **v0.1.689** | **CPU rings All · Hot** — Hot filter at menu-bar amber thresholds (CPU ≥50% / GPU ≥15% / Freq ≥3.5 GHz / Temp ≥70°C); amber card wash + matching history charts (design review / `feature-cpu-metrics`) |
 | **v0.1.690** | **Disk Cleanup scopes All · On · Off** — On/Off filter for enabled or disabled scopes; amber Off wash; Enabled scopes card opens Off when any are off (Agents All/On/Off parity; design review / `feature-disk-cleanup`) |
 | **v0.1.691** | **Disk Cleanup categories All · Reclaim · Big · Clean** — Big filter for categories ≥50 MiB reclaimable; red row wash; Reclaimable now card opens Big when any qualify (Monitors Slow / Top Processes Hot parity; design review / `feature-disk-cleanup`) |
+| **v0.1.692** | **Perplexity Search All · Top · Snippet** — Top filter for first 3 hits; Snippet filter for preview text; accent top-row wash; last-search glance opens Top when >3 results (Monitors Slow / AI Chat Errors parity; design review grace) |
 
 ## Why it matters
 
-Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Monitors, Disk Cleanup, Perplexity, Debug Log, Agent Ops, and AI Chat keep the header + glance on screen when collapsed (compact mode still hides). Top Processes has a **Hot** chip; Monitors has a **Slow** chip; AI Chat has an **Errors** chip; CPU rings have a **Hot** chip; Disk Cleanup scopes have **On · Off** and categories have **Big** so large reclaim targets stand out.
+Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Filter chips now cover **Top Processes Hot**, **Monitors Slow**, **AI Chat Errors**, **CPU rings Hot**, **Disk Cleanup On/Off + Big**, and **Perplexity Top/Snippet** so large or important items stand out fast.
 
 ## Digester / design review
 
-- Digester open empty → standing backlog / design review grace → Disk Cleanup categories Big (`feature-disk-cleanup` stale).
-- Polish grace marked for `feature-disk-cleanup`.
+- Digester open empty → standing backlog / design review grace → Perplexity Top/Snippet (`feature-ai-chat` adjacent).
+- Polish grace still marked for stale feature screens.
 - Screenshot recapture deferred if Screen Recording TCC blocks.
 
 ## Next fuel
