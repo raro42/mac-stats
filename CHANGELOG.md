@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.702] - 2026-08-28
+
+### Fixed
+- **Temp history sparkline** — feed temperature every refresh (not only the 3s gauge throttle), buffer samples before the canvas is ready, and call the chart API once (aliases were duplicating samples).
+- **Keyboard tip essays** — soft kb-hint lines no longer appear on focus/click (they were shifting the layout). Shortcuts still work.
+- **GitHub icon tooltip** — hover shows the repo URL instead of the word “GitHub”.
+
 ## [0.1.701] - 2026-08-28
 
 ### Fixed

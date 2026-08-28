@@ -1780,9 +1780,10 @@
     if (!githubLink) return;
 
     let githubOpenBusy = false;
-    if (!githubLink.getAttribute("title")) {
-      githubLink.setAttribute("title", "GitHub");
-    }
+    const githubUrl =
+      (githubLink.getAttribute("href") || githubLink.href || "").trim() ||
+      "https://github.com/raro42/mac-stats";
+    githubLink.setAttribute("title", githubUrl);
     if (!githubLink.getAttribute("aria-label")) {
       githubLink.setAttribute("aria-label", "Open mac-stats on GitHub");
     }
@@ -1797,8 +1798,8 @@
         return;
       }
 
-      const url = githubLink.href;
-      const idleTitle = githubLink.getAttribute("title") || "GitHub";
+      const url = githubLink.href || githubUrl;
+      const idleTitle = githubUrl;
       githubOpenBusy = true;
       githubLink.setAttribute("aria-disabled", "true");
       githubLink.setAttribute("aria-busy", "true");

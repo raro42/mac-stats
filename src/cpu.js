@@ -2369,36 +2369,40 @@ function ensureGpuHistoryChart() {
   if (window.themeHistory?.init) window.themeHistory.init();
 }
 
-function feedThemeHistoryCharts(data, includeTemperature) {
+function feedThemeHistoryCharts(data, _includeTemperature) {
   ensureGpuHistoryChart();
-  const usage = typeof data?.usage === 'number' ? data.usage : null;
+  const usage =
+    typeof data?.usage === 'number' && Number.isFinite(data.usage)
+      ? data.usage
+      : null;
   const gpu =
-    typeof data?.gpu_usage === 'number' ? Math.max(0, data.gpu_usage) : null;
+    typeof data?.gpu_usage === 'number' && Number.isFinite(data.gpu_usage)
+      ? Math.max(0, data.gpu_usage)
+      : null;
   const freq =
-    typeof data?.frequency === 'number' && data.frequency > 0
+    typeof data?.frequency === 'number' &&
+    Number.isFinite(data.frequency) &&
+    data.frequency > 0
       ? data.frequency
       : null;
+  // Feed every refresh when we have a reading. Do not gate on the 3s DOM throttle —
+  // that left the Temp sparkline empty while the gauge already showed °C.
   const temp =
-    includeTemperature &&
     typeof data?.temperature === 'number' &&
+    Number.isFinite(data.temperature) &&
     data.temperature > 0
       ? data.temperature
       : null;
 
-  const handlers = [
-    window.posterCharts,
-    window.themeHistory,
-    window.appleHistory,
-    window.darkHistory,
-    window.lightHistory,
-    window.futuristicHistory,
-    window.materialHistory,
-    window.neonHistory,
-    window.swissHistory,
-    window.architectHistory,
-  ];
+  // themeHistory aliases (appleHistory, darkHistory, …) are the same object —
+  // only call each API once or the buffer fills with duplicate samples.
+  const seen = new Set();
+  const handlers = [window.posterCharts, window.themeHistory].filter((h) => {
+    if (!h || seen.has(h)) return false;
+    seen.add(h);
+    return true;
+  });
   for (const h of handlers) {
-    if (!h) continue;
     if (usage !== null && typeof h.updateUsage === 'function') h.updateUsage(usage);
     if (gpu !== null) {
       if (typeof h.updateGpu === 'function') h.updateGpu(gpu);
@@ -2670,11 +2674,6 @@ function ensureRamStripStyles() {
       opacity: 0.72;
       width: 100%;
       flex-basis: 100%;
-    }
-    .power-strip:focus-within .power-strip-kb-hint,
-    #power-strip:focus-within .power-strip-kb-hint,
-    #battery-power-strip:focus-within .power-strip-kb-hint {
-      display: block;
     }
     .detail-label.is-ram-highlight,
     .detail-value.is-ram-highlight {
@@ -3332,15 +3331,6 @@ function ensureRingGaugeKbStyles() {
       flex-basis: 100%;
       grid-column: 1 / -1;
     }
-    .apple-metrics:focus-within .ring-gauge-kb-hint,
-    .cpu-metrics:focus-within .ring-gauge-kb-hint,
-    .metrics-grid:focus-within .ring-gauge-kb-hint,
-    .arch-metrics:focus-within .ring-gauge-kb-hint,
-    .swiss-metrics:focus-within .ring-gauge-kb-hint,
-    .mat-metrics:focus-within .ring-gauge-kb-hint,
-    .poster-metrics:focus-within .ring-gauge-kb-hint {
-      display: block;
-    }
   `;
   document.head.appendChild(style);
 }
@@ -3489,9 +3479,6 @@ function ensureHistorySparklineKbStyles() {
       width: 100%;
       flex-basis: 100%;
       grid-column: 1 / -1;
-    }
-    .history-section:focus-within .history-sparkline-kb-hint {
-      display: block;
     }
     .history-chart-container[role="button"] {
       cursor: pointer;
@@ -4345,16 +4332,6 @@ function ensureFilterChipKbStyles() {
       opacity: 0.72;
       width: 100%;
       flex-basis: 100%;
-    }
-    .rings-filter-chips:focus-within .filter-chip-kb-hint,
-    .processes-filter-chips:focus-within .filter-chip-kb-hint,
-    .monitors-filter-chips:focus-within .filter-chip-kb-hint,
-    .logs-filter-chips:focus-within .filter-chip-kb-hint,
-    .disk-cleanup-scope-filter-chips:focus-within .filter-chip-kb-hint,
-    .disk-cleanup-filter-chips:focus-within .filter-chip-kb-hint,
-    .chat-filter-chips:focus-within .filter-chip-kb-hint,
-    .perplexity-filter-chips:focus-within .filter-chip-kb-hint {
-      display: block;
     }
     .processes-filter-chips,
     .monitors-filter-chips,
@@ -14772,9 +14749,6 @@ function ensureDiskCleanupMetaKbStyles() {
       flex-basis: 100%;
       grid-column: 1 / -1;
     }
-    .disk-cleanup-meta:focus-within .disk-cleanup-meta-kb-hint {
-      display: block;
-    }
   `;
   document.head.appendChild(style);
 }
@@ -17352,15 +17326,6 @@ function ensureCpuHeaderToolbarKbStyles() {
       width: 100%;
       text-align: right;
     }
-    .apple-actions:focus-within .header-toolbar-kb-hint,
-    .cpu-actions:focus-within .header-toolbar-kb-hint,
-    .arch-actions:focus-within .header-toolbar-kb-hint,
-    .swiss-actions:focus-within .header-toolbar-kb-hint,
-    .mat-actions:focus-within .header-toolbar-kb-hint,
-    .poster-actions:focus-within .header-toolbar-kb-hint,
-    .theme-actions:focus-within .header-toolbar-kb-hint {
-      display: block;
-    }
   `;
   document.head.appendChild(style);
 }
@@ -17732,11 +17697,6 @@ function ensureFooterToolbarKbStyles() {
       width: 100%;
       text-align: center;
     }
-    footer:focus-within .footer-toolbar-kb-hint,
-    .apple-footer:focus-within .footer-toolbar-kb-hint,
-    .cpu-footer:focus-within .footer-toolbar-kb-hint {
-      display: block;
-    }
     footer[role="toolbar"] .app-version[tabindex],
     footer[role="toolbar"] .theme-version[tabindex],
     footer[role="toolbar"] .arch-version[tabindex] {
@@ -18067,10 +18027,6 @@ function ensureIconLineKbStyles() {
       width: 100%;
       flex-basis: 100%;
       text-align: center;
-    }
-    #icon-line:focus-within .icon-line-kb-hint,
-    .icon-line:focus-within .icon-line-kb-hint {
-      display: block;
     }
   `;
   document.head.appendChild(style);

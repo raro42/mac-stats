@@ -200,6 +200,10 @@
   }
 
   function updateCharts(metric, value) {
+    // Always buffer samples even if the canvas is not ready yet (zero-size layout,
+    // late GPU chart inject). Otherwise temperature can stay empty while the gauge
+    // already shows a live reading.
+    addValue(metric, value);
     if (!canvases[metric] || !contexts[metric]) {
       initializeCanvases();
     }
@@ -207,7 +211,6 @@
       setupCanvas(metric);
     }
     if (!contexts[metric]) return;
-    addValue(metric, value);
     drawLineChart(metric);
   }
 

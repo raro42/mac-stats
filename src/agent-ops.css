@@ -1591,59 +1591,12 @@ textarea.ops-agent-editor.is-dirty {
 }
 
 /*
- * Main chrome keyboard tips: hide by default so the CPU window stays clean.
- * Show only while that strip is keyboard-focused (discoverability without clutter).
+ * Soft keyboard tips stay hidden. Showing them on focus-within shifted the
+ * layout (footer / filters jumped). Shortcuts still work; no on-screen essays.
  */
-.header-toolbar-kb-hint,
-.footer-toolbar-kb-hint,
-.ring-gauge-kb-hint,
-.history-sparkline-kb-hint,
-.power-strip-kb-hint,
-.icon-line-kb-hint,
-.filter-chip-kb-hint,
-.disk-cleanup-meta-kb-hint {
+[class*="-kb-hint"],
+.ops-keyboard-hint {
   display: none !important;
-}
-
-.apple-actions:focus-within .header-toolbar-kb-hint,
-.cpu-actions:focus-within .header-toolbar-kb-hint,
-.arch-actions:focus-within .header-toolbar-kb-hint,
-.swiss-actions:focus-within .header-toolbar-kb-hint,
-.mat-actions:focus-within .header-toolbar-kb-hint,
-.poster-actions:focus-within .header-toolbar-kb-hint,
-.theme-actions:focus-within .header-toolbar-kb-hint,
-footer:focus-within .footer-toolbar-kb-hint,
-.apple-footer:focus-within .footer-toolbar-kb-hint,
-.cpu-footer:focus-within .footer-toolbar-kb-hint,
-.apple-metrics:focus-within .ring-gauge-kb-hint,
-.cpu-metrics:focus-within .ring-gauge-kb-hint,
-.metrics-grid:focus-within .ring-gauge-kb-hint,
-.arch-metrics:focus-within .ring-gauge-kb-hint,
-.swiss-metrics:focus-within .ring-gauge-kb-hint,
-.mat-metrics:focus-within .ring-gauge-kb-hint,
-.poster-metrics:focus-within .ring-gauge-kb-hint,
-.history-section:focus-within .history-sparkline-kb-hint,
-.power-strip:focus-within .power-strip-kb-hint,
-#power-strip:focus-within .power-strip-kb-hint,
-#battery-power-strip:focus-within .power-strip-kb-hint,
-#icon-line:focus-within .icon-line-kb-hint,
-.icon-line:focus-within .icon-line-kb-hint,
-.rings-filter-chips:focus-within .filter-chip-kb-hint,
-.processes-filter-chips:focus-within .filter-chip-kb-hint,
-.monitors-filter-chips:focus-within .filter-chip-kb-hint,
-.logs-filter-chips:focus-within .filter-chip-kb-hint,
-.disk-cleanup-scope-filter-chips:focus-within .filter-chip-kb-hint,
-.disk-cleanup-filter-chips:focus-within .filter-chip-kb-hint,
-.chat-filter-chips:focus-within .filter-chip-kb-hint,
-.perplexity-filter-chips:focus-within .filter-chip-kb-hint,
-.ops-session-kind-chips:focus-within .filter-chip-kb-hint,
-.ops-memory-kind-chips:focus-within .filter-chip-kb-hint,
-.ops-runs-lane-chips:focus-within .filter-chip-kb-hint,
-.ops-agents-enabled-chips:focus-within .filter-chip-kb-hint,
-.ops-schedules-kind-chips:focus-within .filter-chip-kb-hint,
-.disk-cleanup-meta:focus-within .disk-cleanup-meta-kb-hint,
-#disk-cleanup-meta:focus-within .disk-cleanup-meta-kb-hint {
-  display: block !important;
 }
 
 /* Shared process list polish (themes load agent-ops.css) */
