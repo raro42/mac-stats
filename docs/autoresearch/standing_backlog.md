@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.691** — Disk Cleanup categories All · Reclaim · Big · Clean filter (Big ≥50 MiB; Monitors Slow / Top Processes Hot parity; design review / `feature-disk-cleanup`).
+
 - **v0.1.690** — Disk Cleanup scopes All · On · Off filter (Agents On/Off parity; design review / `feature-disk-cleanup`).
 
 - **v0.1.689** — CPU rings All · Hot filter (menu-bar amber thresholds; history charts follow; design review / `feature-cpu-metrics`).
