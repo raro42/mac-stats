@@ -1773,7 +1773,7 @@ function ensureOpsRunsFilter() {
     });
 }
 
-/** All · Instant · Direct · Slow chips (Monitors Slow / Agents filter parity). */
+/** All · Instant · Direct · Slow · Fail chips (Monitors Slow / AI Chat Errors parity). */
 function ensureOpsRunsLaneChips() {
     const panel = document.getElementById('ops-panel-runs');
     const filterRow = panel && panel.querySelector('.ops-filter-row');
@@ -1789,7 +1789,8 @@ function ensureOpsRunsLaneChips() {
             '<button type="button" class="ops-runs-lane-chip is-active" data-ops-runs-lane="all" aria-pressed="true" title="Show every run lane">All</button>' +
             '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="instant" aria-pressed="false" title="Show instant-lane runs only">Instant <span class="ops-runs-lane-count" data-ops-runs-lane-count="instant">0</span></button>' +
             '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="direct" aria-pressed="false" title="Show direct-lane runs only">Direct <span class="ops-runs-lane-count" data-ops-runs-lane-count="direct">0</span></button>' +
-            `<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="slow" aria-pressed="false" title="Show slow runs (≥${OPS_RUNS_SLOW_MS} ms)">Slow <span class="ops-runs-lane-count" data-ops-runs-lane-count="slow">0</span></button>`;
+            `<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="slow" aria-pressed="false" title="Show slow runs (≥${OPS_RUNS_SLOW_MS} ms)">Slow <span class="ops-runs-lane-count" data-ops-runs-lane-count="slow">0</span></button>` +
+            '<button type="button" class="ops-runs-lane-chip" data-ops-runs-lane="fail" aria-pressed="false" title="Show failed runs only (ok=false)">Fail <span class="ops-runs-lane-count" data-ops-runs-lane-count="fail">0</span></button>';
         filterRow.insertAdjacentElement('afterend', wrap);
         wrap.addEventListener('click', (e) => {
             const btn =
@@ -1797,16 +1798,29 @@ function ensureOpsRunsLaneChips() {
             if (!btn || !wrap.contains(btn)) return;
             setOpsRunsLaneFilter(btn.getAttribute('data-ops-runs-lane') || 'all');
         });
-    } else if (!wrap.querySelector('[data-ops-runs-lane="slow"]')) {
-        const slowBtn = document.createElement('button');
-        slowBtn.type = 'button';
-        slowBtn.className = 'ops-runs-lane-chip';
-        slowBtn.setAttribute('data-ops-runs-lane', 'slow');
-        slowBtn.setAttribute('aria-pressed', 'false');
-        slowBtn.title = `Show slow runs (≥${OPS_RUNS_SLOW_MS} ms)`;
-        slowBtn.innerHTML =
-            `Slow <span class="ops-runs-lane-count" data-ops-runs-lane-count="slow">0</span>`;
-        wrap.appendChild(slowBtn);
+    } else {
+        if (!wrap.querySelector('[data-ops-runs-lane="slow"]')) {
+            const slowBtn = document.createElement('button');
+            slowBtn.type = 'button';
+            slowBtn.className = 'ops-runs-lane-chip';
+            slowBtn.setAttribute('data-ops-runs-lane', 'slow');
+            slowBtn.setAttribute('aria-pressed', 'false');
+            slowBtn.title = `Show slow runs (≥${OPS_RUNS_SLOW_MS} ms)`;
+            slowBtn.innerHTML =
+                `Slow <span class="ops-runs-lane-count" data-ops-runs-lane-count="slow">0</span>`;
+            wrap.appendChild(slowBtn);
+        }
+        if (!wrap.querySelector('[data-ops-runs-lane="fail"]')) {
+            const failBtn = document.createElement('button');
+            failBtn.type = 'button';
+            failBtn.className = 'ops-runs-lane-chip';
+            failBtn.setAttribute('data-ops-runs-lane', 'fail');
+            failBtn.setAttribute('aria-pressed', 'false');
+            failBtn.title = 'Show failed runs only (ok=false)';
+            failBtn.innerHTML =
+                'Fail <span class="ops-runs-lane-count" data-ops-runs-lane-count="fail">0</span>';
+            wrap.appendChild(failBtn);
+        }
     }
     if (typeof window.wireFilterChipToolbarKeyboard === 'function') {
         window.wireFilterChipToolbarKeyboard(wrap);
@@ -1816,7 +1830,11 @@ function ensureOpsRunsLaneChips() {
 
 function setOpsRunsLaneFilter(mode) {
     const next =
-        mode === 'instant' || mode === 'direct' || mode === 'slow' || mode === 'all'
+        mode === 'instant' ||
+        mode === 'direct' ||
+        mode === 'slow' ||
+        mode === 'fail' ||
+        mode === 'all'
             ? mode
             : 'all';
     opsRunsLaneFilter = next;
@@ -1829,6 +1847,10 @@ function runsRowIsSlow(r) {
     return Number.isFinite(wall) && wall >= OPS_RUNS_SLOW_MS;
 }
 
+function runsRowIsFail(r) {
+    return r?.ok === false;
+}
+
 function paintOpsRunsLaneChips() {
     const wrap = document.getElementById('ops-runs-lane-chips');
     if (!wrap) return;
@@ -1838,12 +1860,15 @@ function paintOpsRunsLaneChips() {
     const instantN = recent.filter((r) => runsRowMatchesLane(r, 'instant')).length;
     const directN = recent.filter((r) => runsRowMatchesLane(r, 'direct')).length;
     const slowN = recent.filter((r) => runsRowIsSlow(r)).length;
+    const failN = recent.filter((r) => runsRowIsFail(r)).length;
     const instantEl = wrap.querySelector('[data-ops-runs-lane-count="instant"]');
     const directEl = wrap.querySelector('[data-ops-runs-lane-count="direct"]');
     const slowEl = wrap.querySelector('[data-ops-runs-lane-count="slow"]');
+    const failEl = wrap.querySelector('[data-ops-runs-lane-count="fail"]');
     if (instantEl) instantEl.textContent = String(instantN);
     if (directEl) directEl.textContent = String(directN);
     if (slowEl) slowEl.textContent = String(slowN);
+    if (failEl) failEl.textContent = String(failN);
     wrap.querySelectorAll('[data-ops-runs-lane]').forEach((btn) => {
         const key = btn.getAttribute('data-ops-runs-lane');
         const active = key === opsRunsLaneFilter;
@@ -1855,17 +1880,24 @@ function paintOpsRunsLaneChips() {
             btn.classList.toggle('has-hits', directN > 0);
         } else if (key === 'slow') {
             btn.classList.toggle('has-hits', slowN > 0);
+        } else if (key === 'fail') {
+            btn.classList.toggle('has-hits', failN > 0);
         }
     });
 }
 
-/** Overview Runs open → Slow when any slow else Direct when any direct else Instant (Monitors Slow parity). */
+/** Overview Runs open → Fail when any failed else Slow else Direct else Instant (AI Chat Errors parity). */
 function preferOpsRunsLaneFromOverview() {
     const recent = Array.isArray(opsRunsInsightsCache?.recent)
         ? opsRunsInsightsCache.recent
         : [];
     if (!recent.length) {
         setOpsRunsLaneFilter('all');
+        return;
+    }
+    const failN = recent.filter((r) => runsRowIsFail(r)).length;
+    if (failN > 0) {
+        setOpsRunsLaneFilter('fail');
         return;
     }
     const slowN = recent.filter((r) => runsRowIsSlow(r)).length;
@@ -1888,6 +1920,7 @@ function runsRowMatchesLane(r, mode) {
     if (want === 'instant') return lane === 'instant';
     if (want === 'direct') return lane === 'direct';
     if (want === 'slow') return runsRowIsSlow(r);
+    if (want === 'fail') return runsRowIsFail(r);
     return true;
 }
 
@@ -6825,7 +6858,8 @@ function renderOpsRuns(insights) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'ops-row';
-        if (runsRowIsSlow(r)) btn.classList.add('is-slow');
+        if (runsRowIsFail(r)) btn.classList.add('is-fail');
+        else if (runsRowIsSlow(r)) btn.classList.add('is-slow');
         const rid = String(r?.request_id || '').trim();
         if (rid) btn.dataset.requestId = rid;
         btn.dataset.questionPreview = String(r?.question_preview || '');

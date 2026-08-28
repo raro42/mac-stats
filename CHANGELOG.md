@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.694] - 2026-08-28
+
+### Added
+- **Agent Ops Runs Fail filter** — Fail shows runs where ok=false; counts + red row wash; overview Opens → Fail when any failed (AI Chat Errors / Monitors Slow parity).
+
 ## [0.1.693] - 2026-08-28
 
 ### Added

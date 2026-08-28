@@ -4012,7 +4012,7 @@ textarea.ops-agent-editor.is-dirty {
   opacity: 0.85;
 }
 
-/* Agent Ops Runs — All · Instant · Direct · Slow (Monitors Slow parity) */
+/* Agent Ops Runs — All · Instant · Direct · Slow · Fail (Monitors Slow / AI Chat Errors parity) */
 .ops-runs-lane-chips {
   display: flex;
   align-items: center;
@@ -4103,6 +4103,30 @@ textarea.ops-agent-editor.is-dirty {
 
 #ops-runs-list .ops-row.is-slow .ops-row-meta {
   color: color-mix(in srgb, #ff9f0a 88%, var(--text));
+}
+
+.ops-runs-lane-chip[data-ops-runs-lane='fail'].has-hits {
+  background: color-mix(in srgb, #ff3b30 12%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 28%, transparent);
+}
+
+.ops-runs-lane-chip[data-ops-runs-lane='fail'].is-active {
+  background: color-mix(in srgb, #ff3b30 20%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 40%, transparent);
+}
+
+#ops-runs-list .ops-row.is-fail:not(.is-selected) {
+  background: color-mix(in srgb, #ff3b30 8%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 22%, transparent);
+}
+
+#ops-runs-list .ops-row.is-fail:not(.is-selected):hover {
+  background: color-mix(in srgb, #ff3b30 12%, transparent);
+  border-color: color-mix(in srgb, #ff3b30 28%, transparent);
+}
+
+#ops-runs-list .ops-row.is-fail .ops-row-meta {
+  color: color-mix(in srgb, #ff3b30 88%, var(--text));
 }
 
 .ops-runs-lane-count {
