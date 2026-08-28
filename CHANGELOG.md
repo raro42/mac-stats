@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.706] - 2026-08-29
+
+### Added
+- **`/sessions` instant operator** — `/sessions`, `/sessions live`, `/sessions files` and NL (`list sessions`, `live sessions`, `session files`, `saved sessions`) list live in-memory sessions and saved session files (Discord + AI Chat; Agent Ops Sessions Live/Files filter parity).
+
 ## [0.1.705] - 2026-08-28
 
 ### Added

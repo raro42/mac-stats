@@ -1267,6 +1267,234 @@ pub fn format_agents_gateway(filter: AgentsListFilter) -> String {
     out
 }
 
+/// Agent Ops Sessions All · Live · Files filter for `/sessions` instant replies.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SessionsListFilter {
+    All,
+    Live,
+    Files,
+}
+
+/// Parse Live/Files from `/sessions live`, `live sessions`, etc. Default All.
+pub fn parse_sessions_list_filter(content: &str) -> SessionsListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" live")
+        || n == "live sessions"
+        || n == "sessions live"
+        || n == "/sessions live"
+        || n == "live session"
+        || n == "active sessions"
+    {
+        return SessionsListFilter::Live;
+    }
+    if n.ends_with(" files")
+        || n == "session files"
+        || n == "sessions files"
+        || n == "/sessions files"
+        || n == "saved sessions"
+        || n == "session file"
+    {
+        return SessionsListFilter::Files;
+    }
+    SessionsListFilter::All
+}
+
+/// True for `/sessions` / `list sessions` — Agent Ops Live/Files parity; not resume/delete asks.
+pub fn looks_like_sessions_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 40 {
+        return false;
+    }
+    if n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("resume")
+        || n.contains("open ")
+        || n.contains("write")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("scrub")
+        || n.starts_with("session:")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/sessions"
+            | "sessions"
+            | "list sessions"
+            | "my sessions"
+            | "which sessions"
+            | "what sessions"
+            | "all sessions"
+            | "session list"
+            | "sessions list"
+            | "/sessions live"
+            | "sessions live"
+            | "live sessions"
+            | "live session"
+            | "active sessions"
+            | "/sessions files"
+            | "sessions files"
+            | "session files"
+            | "session file"
+            | "saved sessions"
+    )
+}
+
+fn truncate_preview(s: &str, max: usize) -> String {
+    let t = s.trim().replace('\n', " ");
+    if t.chars().count() <= max {
+        return t;
+    }
+    t.chars().take(max.saturating_sub(1)).collect::<String>() + "…"
+}
+
+fn age_from_rfc3339(ts: &str) -> String {
+    let Ok(parsed) = chrono::DateTime::parse_from_rfc3339(ts.trim()) else {
+        return "—".into();
+    };
+    let secs = chrono::Utc::now()
+        .signed_duration_since(parsed.with_timezone(&chrono::Utc))
+        .num_seconds()
+        .max(0) as u64;
+    if secs < 60 {
+        format!("{secs}s")
+    } else if secs < 3600 {
+        format!("{}m", secs / 60)
+    } else if secs < 86400 {
+        format!("{}h", secs / 3600)
+    } else {
+        format!("{}d", secs / 86400)
+    }
+}
+
+fn age_from_ms(ms: u64) -> String {
+    let now_ms = SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(ms);
+    let secs = now_ms.saturating_sub(ms) / 1000;
+    if secs < 60 {
+        format!("{secs}s")
+    } else if secs < 3600 {
+        format!("{}m", secs / 60)
+    } else if secs < 86400 {
+        format!("{}h", secs / 3600)
+    } else {
+        format!("{}d", secs / 86400)
+    }
+}
+
+/// Zero-LLM sessions report (Agent Ops Sessions All · Live · Files filter parity).
+pub fn format_sessions_gateway(filter: SessionsListFilter) -> String {
+    let live = list_live_sessions();
+    let files = list_session_files(Some(20)).unwrap_or_default();
+    let live_n = live.len();
+    let files_n = files.len();
+    let title = match filter {
+        SessionsListFilter::All => {
+            format!("**Sessions** — {live_n} live · {files_n} files")
+        }
+        SessionsListFilter::Live => format!("**Sessions · Live** — {live_n}"),
+        SessionsListFilter::Files => format!("**Sessions · Files** — {files_n}"),
+    };
+    let mut lines = vec![title];
+
+    fn live_row(s: &LiveSessionSummary) -> String {
+        let preview = truncate_preview(&s.preview, 60);
+        let age = age_from_rfc3339(&s.last_activity);
+        let mut row = format!(
+            "• `{}:{}` · {} msg · {age}",
+            s.source, s.session_id, s.message_count
+        );
+        if !preview.is_empty() {
+            row.push_str(&format!(" · {preview}"));
+        }
+        row
+    }
+
+    fn file_row(f: &SessionFileSummary) -> String {
+        let label = if f.slug.is_empty() {
+            f.name.clone()
+        } else {
+            f.slug.clone()
+        };
+        let preview = truncate_preview(&f.preview, 50);
+        let age = age_from_ms(f.modified_ms);
+        let mut row = format!("• `{label}` · {} · {age}", f.source_hint);
+        if !preview.is_empty() {
+            row.push_str(&format!(" · {preview}"));
+        }
+        row
+    }
+
+    const MAX_ROWS: usize = 12;
+    match filter {
+        SessionsListFilter::All => {
+            if live_n == 0 && files_n == 0 {
+                lines.push(
+                    "_No live sessions or saved files yet — chat in Discord or AI Chat._"
+                        .to_string(),
+                );
+            } else {
+                if live_n > 0 {
+                    lines.push("**Live**".to_string());
+                    for s in live.iter().take(MAX_ROWS) {
+                        lines.push(live_row(s));
+                    }
+                    if live_n > MAX_ROWS {
+                        lines.push(format!("_…+{} more live_", live_n - MAX_ROWS));
+                    }
+                }
+                if files_n > 0 {
+                    lines.push("**Files**".to_string());
+                    for f in files.iter().take(MAX_ROWS) {
+                        lines.push(file_row(f));
+                    }
+                    if files_n > MAX_ROWS {
+                        lines.push(format!("_…+{} more files_", files_n - MAX_ROWS));
+                    }
+                }
+            }
+        }
+        SessionsListFilter::Live => {
+            if live.is_empty() {
+                lines.push("_None live right now._".to_string());
+            } else {
+                for s in live.iter().take(MAX_ROWS) {
+                    lines.push(live_row(s));
+                }
+                if live_n > MAX_ROWS {
+                    lines.push(format!("_…+{} more_", live_n - MAX_ROWS));
+                }
+            }
+        }
+        SessionsListFilter::Files => {
+            if files.is_empty() {
+                lines.push("_No session files on disk yet._".to_string());
+            } else {
+                for f in files.iter().take(MAX_ROWS) {
+                    lines.push(file_row(f));
+                }
+                if files_n > MAX_ROWS {
+                    lines.push(format!("_…+{} more_", files_n - MAX_ROWS));
+                }
+            }
+        }
+    }
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// True for short `/status` / `/health` operator asks — not free-form “status of …”.
 pub fn looks_like_status_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -1415,6 +1643,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_agents_list_filter(content);
         return Some(format_agents_gateway(filter));
     }
+    if looks_like_sessions_request(content) {
+        let filter = parse_sessions_list_filter(content);
+        return Some(format_sessions_gateway(filter));
+    }
     if looks_like_schedules_request(content) {
         return Some(format_schedules_gateway());
     }
@@ -1453,6 +1685,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
 • `/instant` · `/lite` · `/direct` · `/instant 7` — recent instant-, lite-, or direct-lane turns\n\
 • `/agents` · `/agents on` · `/agents off` — Agent Ops On/Off list\n\
+• `/sessions` · `/sessions live` · `/sessions files` — Agent Ops Live/Files list\n\
 • `/schedules` · `/cron list` — active jobs + last delivery\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
@@ -1601,6 +1834,23 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "agents off")
         && !q.contains("why")
         && !q.contains("create")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/sessions` operator asks (v0.1.706).
+    if (q.contains("/sessions")
+        || q == "sessions"
+        || q.contains("list sessions")
+        || q.contains("live sessions")
+        || q.contains("session files")
+        || q.contains("saved sessions")
+        || q == "sessions live"
+        || q == "sessions files")
+        && !q.contains("why")
+        && !q.contains("create")
+        && !q.contains("resume")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -2751,6 +3001,8 @@ mod tests {
         assert!(lite.to_lowercase().contains("lite runs"));
         let agents = try_operator_instant_reply("/agents").expect("agents");
         assert!(agents.to_lowercase().contains("agents"));
+        let sessions = try_operator_instant_reply("/sessions").expect("sessions");
+        assert!(sessions.to_lowercase().contains("sessions"));
         let schedules = try_operator_instant_reply("list schedules").expect("schedules");
         assert!(schedules.to_lowercase().contains("schedule"));
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
@@ -2760,6 +3012,7 @@ mod tests {
         assert!(try_operator_instant_reply("make it instant").is_none());
         assert!(try_operator_instant_reply("make it lite").is_none());
         assert!(try_operator_instant_reply("create an agent for weather").is_none());
+        assert!(try_operator_instant_reply("resume this session").is_none());
     }
 
     #[test]
@@ -2778,6 +3031,31 @@ mod tests {
         assert_eq!(
             parse_agents_list_filter("disabled agents"),
             AgentsListFilter::Off
+        );
+    }
+
+    #[test]
+    fn sessions_request_detected() {
+        assert!(looks_like_sessions_request("/sessions"));
+        assert!(looks_like_sessions_request("list sessions"));
+        assert!(looks_like_sessions_request("live sessions"));
+        assert!(looks_like_sessions_request("/sessions files"));
+        assert!(looks_like_sessions_request("saved sessions"));
+        assert!(looks_like_sessions_request("@Werner sessions"));
+        assert!(!looks_like_sessions_request("resume this session"));
+        assert!(!looks_like_sessions_request("delete session files"));
+        assert!(!looks_like_sessions_request("why are sessions empty"));
+        assert_eq!(
+            parse_sessions_list_filter("/sessions"),
+            SessionsListFilter::All
+        );
+        assert_eq!(
+            parse_sessions_list_filter("/sessions live"),
+            SessionsListFilter::Live
+        );
+        assert_eq!(
+            parse_sessions_list_filter("session files"),
+            SessionsListFilter::Files
         );
     }
 
@@ -3026,6 +3304,7 @@ mod tests {
         assert!(report.contains("/lite"), "{report}");
         assert!(report.contains("/direct"), "{report}");
         assert!(report.contains("/agents"), "{report}");
+        assert!(report.contains("/sessions"), "{report}");
         assert!(report.contains("/help"), "{report}");
         assert!(report.contains("Voice"), "{report}");
     }
@@ -3035,6 +3314,16 @@ mod tests {
         let report = format_agents_gateway(AgentsListFilter::All);
         assert!(report.to_lowercase().contains("agents"), "{report}");
         assert!(report.contains("on"), "{report}");
+    }
+
+    #[test]
+    fn sessions_gateway_has_counts() {
+        let report = format_sessions_gateway(SessionsListFilter::All);
+        assert!(report.to_lowercase().contains("sessions"), "{report}");
+        assert!(
+            report.to_lowercase().contains("live") || report.to_lowercase().contains("files"),
+            "{report}"
+        );
     }
 
     #[test]

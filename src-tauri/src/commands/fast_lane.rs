@@ -1533,7 +1533,21 @@ mod tests {
 
     #[test]
     fn operator_gateway_commands_are_instant() {
-        for q in ["/status", "/insights", "list schedules", "/digest", "scrub memory", "/help", "/failed", "/slow", "/instant", "/direct"] {
+        for q in [
+            "/status",
+            "/insights",
+            "list schedules",
+            "/digest",
+            "scrub memory",
+            "/help",
+            "/failed",
+            "/slow",
+            "/instant",
+            "/direct",
+            "/lite",
+            "/agents",
+            "/sessions",
+        ] {
             assert!(
                 matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),
                 "expected Instant for {q}"
