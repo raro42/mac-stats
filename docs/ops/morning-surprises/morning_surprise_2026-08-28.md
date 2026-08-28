@@ -23,10 +23,11 @@ Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains
 | **v0.1.691** | **Disk Cleanup categories All · Reclaim · Big · Clean** — Big filter for categories ≥50 MiB reclaimable; red row wash; Reclaimable now card opens Big when any qualify (Monitors Slow / Top Processes Hot parity; design review / `feature-disk-cleanup`) |
 | **v0.1.692** | **Perplexity Search All · Top · Snippet** — Top filter for first 3 hits; Snippet filter for preview text; accent top-row wash; last-search glance opens Top when >3 results (Monitors Slow / AI Chat Errors parity; design review grace) |
 | **v0.1.693** | **Agent Ops Runs All · Instant · Direct · Slow** — Slow filter for runs ≥2000 ms wall time; amber row wash; overview Opens → Slow when any qualify (Monitors Slow / p50 latency parity) |
+| **v0.1.694** | **Agent Ops Runs Fail filter** — Fail filter for ok=false runs; red row wash; overview Opens → Fail when any failed (AI Chat Errors parity) |
 
 ## Why it matters
 
-Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Filter chips now cover **Top Processes Hot**, **Monitors Slow**, **AI Chat Errors**, **CPU rings Hot**, **Disk Cleanup On/Off + Big**, **Perplexity Top/Snippet**, and **Agent Ops Runs Slow** so large, slow, or important items stand out fast.
+Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Filter chips now cover **Top Processes Hot**, **Monitors Slow**, **AI Chat Errors**, **CPU rings Hot**, **Disk Cleanup On/Off + Big**, **Perplexity Top/Snippet**, **Agent Ops Runs Slow + Fail** so large, slow, failed, or important items stand out fast.
 
 ## Digester / design review
 
