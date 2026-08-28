@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.695] - 2026-08-28
+
+### Added
+- **`/failed` instant operator command** — `/failed` and short NL asks (`what failed`, `failed runs`) return recent ok=false turns from runs.jsonl with error text (Discord + AI Chat; Agent Ops Runs Fail filter parity; p50 latency).
+
 ## [0.1.694] - 2026-08-28
 
 ### Added

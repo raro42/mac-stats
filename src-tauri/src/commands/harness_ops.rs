@@ -1208,6 +1208,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let insights = compute_runs_insights_for(80, days);
         return Some(format_runs_insights_gateway(&insights));
     }
+    if looks_like_failed_runs_request(content) {
+        let days = parse_insights_days(content);
+        return Some(format_failed_runs_gateway(days));
+    }
     if looks_like_schedules_request(content) {
         return Some(format_schedules_gateway());
     }
@@ -1242,6 +1246,7 @@ pub fn format_ops_help_gateway() -> String {
         "**mac-stats v{version} — operator commands** (instant, no Ollama)\n\
 • `/status` · `/health` · `/version` — one-screen health\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
+• `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/schedules` · `/cron list` — active jobs + last delivery\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
@@ -1303,6 +1308,21 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
                 || q.contains("evening"))
             && !q.contains("ticket")
             && !q.contains("redmine"))
+    {
+        return true;
+    }
+    // `/failed` / failed-runs operator asks (v0.1.695).
+    if (q.contains("failed run")
+        || q.contains("what failed")
+        || q.contains("any failures")
+        || q.contains("/failed")
+        || q == "failures"
+        || q == "failed")
+        && !q.contains("why did")
+        && !q.contains("why ")
+        && !q.contains("explain")
+        && !q.contains("ticket")
+        && !q.contains("redmine")
     {
         return true;
     }
@@ -1855,6 +1875,160 @@ pub fn format_runs_insights_gateway(insights: &RunsInsights) -> String {
     out
 }
 
+#[derive(Debug, Clone)]
+struct FailedRunLine {
+    ts: String,
+    lane: String,
+    wall_ms: u64,
+    question_preview: String,
+    error: Option<String>,
+    request_id: String,
+}
+
+/// Recent ok=false turns from runs.jsonl (newest first).
+fn collect_failed_runs(limit: usize, days: Option<u32>) -> Vec<FailedRunLine> {
+    let path = crate::commands::run_telemetry::runs_jsonl_path();
+    if !path.is_file() {
+        return Vec::new();
+    }
+    let text = match fs::read_to_string(&path) {
+        Ok(t) => t,
+        Err(_) => return Vec::new(),
+    };
+    let window_days = days.map(|d| d.clamp(1, 90));
+    let since = window_days.map(|d| chrono::Utc::now() - chrono::Duration::days(d as i64));
+    let mut failed = Vec::new();
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+        let v: serde_json::Value = match serde_json::from_str(line) {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+        if let Some(since) = since {
+            let ts = v
+                .get("ts")
+                .and_then(|x| x.as_str())
+                .and_then(parse_run_ts);
+            match ts {
+                Some(t) if t >= since => {}
+                Some(_) => continue,
+                None => continue,
+            }
+        }
+        let ok = v.get("ok").and_then(|x| x.as_bool()).unwrap_or(true);
+        if ok {
+            continue;
+        }
+        failed.push(FailedRunLine {
+            ts: v
+                .get("ts")
+                .and_then(|x| x.as_str())
+                .unwrap_or("")
+                .to_string(),
+            lane: v
+                .get("lane")
+                .and_then(|x| x.as_str())
+                .unwrap_or("?")
+                .to_string(),
+            wall_ms: v.get("wall_ms").and_then(|x| x.as_u64()).unwrap_or(0),
+            question_preview: v
+                .get("question_preview")
+                .and_then(|x| x.as_str())
+                .unwrap_or("")
+                .to_string(),
+            error: v
+                .get("error")
+                .and_then(|x| x.as_str())
+                .map(|s| s.to_string()),
+            request_id: v
+                .get("request_id")
+                .and_then(|x| x.as_str())
+                .unwrap_or("")
+                .to_string(),
+        });
+    }
+    if failed.len() > limit {
+        failed = failed.split_off(failed.len() - limit);
+    }
+    failed.reverse();
+    failed
+}
+
+/// Zero-LLM failed-turn report (Agent Ops Runs Fail filter parity).
+pub fn format_failed_runs_gateway(days: Option<u32>) -> String {
+    let failed = collect_failed_runs(12, days);
+    let window = match days {
+        Some(d) => format!("last **{d}** days"),
+        None => "recent".into(),
+    };
+    if failed.is_empty() {
+        return format!(
+            "**Failed runs** ({window} · runs.jsonl)\nNo failed turns — all clear."
+        );
+    }
+    let mut lines = vec![format!(
+        "**Failed runs** ({window} · runs.jsonl) — **{}** shown",
+        failed.len()
+    )];
+    for r in failed {
+        let err = r
+            .error
+            .as_deref()
+            .filter(|s| !s.is_empty())
+            .unwrap_or("(no error text)");
+        let err_short: String = err.chars().take(100).collect();
+        let ts_short: String = r.ts.chars().take(19).collect();
+        let rid: String = r.request_id.chars().take(8).collect();
+        lines.push(format!(
+            "• **{ts_short}** · {} · {} ms · `{rid}`\n  {err_short}",
+            r.lane, r.wall_ms
+        ));
+        if !r.question_preview.is_empty() {
+            let q: String = r.question_preview.chars().take(72).collect();
+            lines.push(format!("  _{q}_"));
+        }
+    }
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
+/// True for `/failed` / `failed runs` — not "why did X fail".
+pub fn looks_like_failed_runs_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.contains(" ticket") || n.contains("redmine") || n.contains("http") {
+        return false;
+    }
+    if n.contains(" why ") || n.contains("why did") || n.contains("explain") {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/failed"
+            | "failed runs"
+            | "failed run"
+            | "fail runs"
+            | "what failed"
+            | "any failed"
+            | "any failures"
+            | "show failures"
+            | "recent failures"
+            | "failed turns"
+            | "error runs"
+            | "run errors"
+            | "failures"
+            | "failed"
+            | "what went wrong tonight"
+            | "what went wrong today"
+    ) || n.starts_with("/failed ")
+        || (n.starts_with("failed runs ") && parse_insights_days(content).is_some())
+}
+
 /// True for `/insights` / `insights` (Hermes parity) and short NL equivalents.
 pub fn looks_like_insights_request(content: &str) -> bool {
     let n = content
@@ -1937,10 +2111,24 @@ mod tests {
         assert!(status.contains("mac-stats"));
         let insights = try_operator_instant_reply("insights").expect("insights");
         assert!(insights.to_lowercase().contains("insights"));
+        let failed = try_operator_instant_reply("/failed").expect("failed");
+        assert!(failed.to_lowercase().contains("failed runs"));
         let schedules = try_operator_instant_reply("list schedules").expect("schedules");
         assert!(schedules.to_lowercase().contains("schedule"));
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
         assert!(try_operator_instant_reply("insights on weather").is_none());
+        assert!(try_operator_instant_reply("why did the build fail").is_none());
+    }
+
+    #[test]
+    fn failed_runs_request_detected() {
+        assert!(looks_like_failed_runs_request("/failed"));
+        assert!(looks_like_failed_runs_request("what failed"));
+        assert!(looks_like_failed_runs_request("failed runs"));
+        assert!(looks_like_failed_runs_request("@Werner failed runs 3"));
+        assert!(looks_like_failed_runs_request("/failed 7"));
+        assert!(!looks_like_failed_runs_request("why did the deploy fail"));
+        assert!(!looks_like_failed_runs_request("explain the failed ticket"));
     }
 
     #[test]
