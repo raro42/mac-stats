@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.707] - 2026-08-29
+
+### Added
+- **`/knowledge` instant operator** — `/knowledge`, `/knowledge discord`, `/knowledge core` and NL (`list knowledge`, `knowledge files`, `discord knowledge`, `core knowledge`) list Agent Ops knowledge files with Discord/Core counts (Discord + AI Chat; Agent Ops Knowledge filter parity).
+
 ## [0.1.706] - 2026-08-29
 
 ### Added

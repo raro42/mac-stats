@@ -1495,6 +1495,209 @@ pub fn format_sessions_gateway(filter: SessionsListFilter) -> String {
     out
 }
 
+/// Agent Ops Knowledge All · Discord · Core filter for `/knowledge` instant replies.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KnowledgeListFilter {
+    All,
+    Discord,
+    Core,
+}
+
+/// Parse Discord/Core from `/knowledge discord`, `core knowledge`, etc. Default All.
+pub fn parse_knowledge_list_filter(content: &str) -> KnowledgeListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" discord")
+        || n == "discord knowledge"
+        || n == "knowledge discord"
+        || n == "/knowledge discord"
+        || n == "discord memory"
+        || n == "discord memories"
+        || n == "channel memory"
+        || n == "channel memories"
+    {
+        return KnowledgeListFilter::Discord;
+    }
+    if n.ends_with(" core")
+        || n == "core knowledge"
+        || n == "knowledge core"
+        || n == "/knowledge core"
+        || n == "soul knowledge"
+        || n == "global knowledge"
+        || n == "main knowledge"
+    {
+        return KnowledgeListFilter::Core;
+    }
+    KnowledgeListFilter::All
+}
+
+fn knowledge_row_is_discord(kind: &str) -> bool {
+    kind.eq_ignore_ascii_case("discord")
+}
+
+fn knowledge_row_is_core(kind: &str) -> bool {
+    matches!(
+        kind.to_ascii_lowercase().as_str(),
+        "soul" | "global" | "main"
+    )
+}
+
+/// True for `/knowledge` / `list knowledge` — Agent Ops Discord/Core parity; not scrub/edit asks.
+pub fn looks_like_knowledge_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 40 {
+        return false;
+    }
+    if n.contains("create")
+        || n.contains("add ")
+        || n.contains("edit")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("scrub")
+        || n.contains("write")
+        || n.contains("append")
+        || n.contains("save ")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("pollut")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/knowledge"
+            | "knowledge"
+            | "list knowledge"
+            | "my knowledge"
+            | "which knowledge"
+            | "what knowledge"
+            | "all knowledge"
+            | "knowledge list"
+            | "knowledge files"
+            | "knowledge file"
+            | "/knowledge discord"
+            | "knowledge discord"
+            | "discord knowledge"
+            | "discord memory"
+            | "discord memories"
+            | "channel memory"
+            | "channel memories"
+            | "/knowledge core"
+            | "knowledge core"
+            | "core knowledge"
+            | "soul knowledge"
+            | "global knowledge"
+            | "main knowledge"
+    )
+}
+
+/// Zero-LLM knowledge report (Agent Ops Knowledge All · Discord · Core filter parity).
+pub fn format_knowledge_gateway(filter: KnowledgeListFilter) -> String {
+    let files = list_memory_files().unwrap_or_default();
+    let discord_n = files
+        .iter()
+        .filter(|f| knowledge_row_is_discord(&f.kind))
+        .count();
+    let core_n = files
+        .iter()
+        .filter(|f| knowledge_row_is_core(&f.kind))
+        .count();
+    let title = match filter {
+        KnowledgeListFilter::All => {
+            format!("**Knowledge** — {discord_n} Discord · {core_n} Core")
+        }
+        KnowledgeListFilter::Discord => format!("**Knowledge · Discord** — {discord_n}"),
+        KnowledgeListFilter::Core => format!("**Knowledge · Core** — {core_n}"),
+    };
+    let mut lines = vec![title];
+
+    fn knowledge_row(f: &MemoryFileSummary) -> String {
+        let age = age_from_ms(f.modified_ms);
+        format!(
+            "• `{}` · {} · {} lines · {age}",
+            f.name, f.kind, f.line_count
+        )
+    }
+
+    const MAX_ROWS: usize = 12;
+    match filter {
+        KnowledgeListFilter::All => {
+            if files.is_empty() {
+                lines.push(
+                    "_No knowledge files yet — soul/global/main or Discord channel memory._"
+                        .to_string(),
+                );
+            } else {
+                if discord_n > 0 {
+                    lines.push("**Discord**".to_string());
+                    for f in files
+                        .iter()
+                        .filter(|f| knowledge_row_is_discord(&f.kind))
+                        .take(MAX_ROWS)
+                    {
+                        lines.push(knowledge_row(f));
+                    }
+                    if discord_n > MAX_ROWS {
+                        lines.push(format!("_…+{} more_", discord_n - MAX_ROWS));
+                    }
+                }
+                if core_n > 0 {
+                    lines.push("**Core**".to_string());
+                    for f in files
+                        .iter()
+                        .filter(|f| knowledge_row_is_core(&f.kind))
+                        .take(MAX_ROWS)
+                    {
+                        lines.push(knowledge_row(f));
+                    }
+                    if core_n > MAX_ROWS {
+                        lines.push(format!("_…+{} more_", core_n - MAX_ROWS));
+                    }
+                }
+            }
+        }
+        KnowledgeListFilter::Discord => {
+            let rows: Vec<_> = files
+                .iter()
+                .filter(|f| knowledge_row_is_discord(&f.kind))
+                .collect();
+            if rows.is_empty() {
+                lines.push("_No Discord channel memory files yet._".to_string());
+            } else {
+                for f in rows.iter().take(MAX_ROWS) {
+                    lines.push(knowledge_row(f));
+                }
+                if rows.len() > MAX_ROWS {
+                    lines.push(format!("_…+{} more_", rows.len() - MAX_ROWS));
+                }
+            }
+        }
+        KnowledgeListFilter::Core => {
+            let rows: Vec<_> = files
+                .iter()
+                .filter(|f| knowledge_row_is_core(&f.kind))
+                .collect();
+            if rows.is_empty() {
+                lines.push("_No Core knowledge files (soul / global / main) yet._".to_string());
+            } else {
+                for f in rows.iter().take(MAX_ROWS) {
+                    lines.push(knowledge_row(f));
+                }
+                if rows.len() > MAX_ROWS {
+                    lines.push(format!("_…+{} more_", rows.len() - MAX_ROWS));
+                }
+            }
+        }
+    }
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// True for short `/status` / `/health` operator asks — not free-form “status of …”.
 pub fn looks_like_status_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -1647,6 +1850,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_sessions_list_filter(content);
         return Some(format_sessions_gateway(filter));
     }
+    if looks_like_knowledge_request(content) {
+        let filter = parse_knowledge_list_filter(content);
+        return Some(format_knowledge_gateway(filter));
+    }
     if looks_like_schedules_request(content) {
         return Some(format_schedules_gateway());
     }
@@ -1686,6 +1893,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/instant` · `/lite` · `/direct` · `/instant 7` — recent instant-, lite-, or direct-lane turns\n\
 • `/agents` · `/agents on` · `/agents off` — Agent Ops On/Off list\n\
 • `/sessions` · `/sessions live` · `/sessions files` — Agent Ops Live/Files list\n\
+• `/knowledge` · `/knowledge discord` · `/knowledge core` — Agent Ops Knowledge list\n\
 • `/schedules` · `/cron list` — active jobs + last delivery\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
@@ -1851,6 +2059,24 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("why")
         && !q.contains("create")
         && !q.contains("resume")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/knowledge` operator asks (v0.1.707).
+    if (q.contains("/knowledge")
+        || q == "knowledge"
+        || q.contains("list knowledge")
+        || q.contains("knowledge files")
+        || q.contains("discord knowledge")
+        || q.contains("core knowledge")
+        || q == "knowledge discord"
+        || q == "knowledge core")
+        && !q.contains("why")
+        && !q.contains("create")
+        && !q.contains("scrub")
+        && !q.contains("save ")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -3003,6 +3229,8 @@ mod tests {
         assert!(agents.to_lowercase().contains("agents"));
         let sessions = try_operator_instant_reply("/sessions").expect("sessions");
         assert!(sessions.to_lowercase().contains("sessions"));
+        let knowledge = try_operator_instant_reply("/knowledge").expect("knowledge");
+        assert!(knowledge.to_lowercase().contains("knowledge"));
         let schedules = try_operator_instant_reply("list schedules").expect("schedules");
         assert!(schedules.to_lowercase().contains("schedule"));
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
@@ -3013,6 +3241,8 @@ mod tests {
         assert!(try_operator_instant_reply("make it lite").is_none());
         assert!(try_operator_instant_reply("create an agent for weather").is_none());
         assert!(try_operator_instant_reply("resume this session").is_none());
+        assert!(try_operator_instant_reply("scrub memory").is_some());
+        assert!(try_operator_instant_reply("save this to knowledge").is_none());
     }
 
     #[test]
@@ -3056,6 +3286,31 @@ mod tests {
         assert_eq!(
             parse_sessions_list_filter("session files"),
             SessionsListFilter::Files
+        );
+    }
+
+    #[test]
+    fn knowledge_request_detected() {
+        assert!(looks_like_knowledge_request("/knowledge"));
+        assert!(looks_like_knowledge_request("list knowledge"));
+        assert!(looks_like_knowledge_request("knowledge files"));
+        assert!(looks_like_knowledge_request("/knowledge discord"));
+        assert!(looks_like_knowledge_request("core knowledge"));
+        assert!(looks_like_knowledge_request("@Werner knowledge"));
+        assert!(!looks_like_knowledge_request("scrub memory"));
+        assert!(!looks_like_knowledge_request("save this to knowledge"));
+        assert!(!looks_like_knowledge_request("why is knowledge empty"));
+        assert_eq!(
+            parse_knowledge_list_filter("/knowledge"),
+            KnowledgeListFilter::All
+        );
+        assert_eq!(
+            parse_knowledge_list_filter("/knowledge discord"),
+            KnowledgeListFilter::Discord
+        );
+        assert_eq!(
+            parse_knowledge_list_filter("core knowledge"),
+            KnowledgeListFilter::Core
         );
     }
 
@@ -3305,6 +3560,7 @@ mod tests {
         assert!(report.contains("/direct"), "{report}");
         assert!(report.contains("/agents"), "{report}");
         assert!(report.contains("/sessions"), "{report}");
+        assert!(report.contains("/knowledge"), "{report}");
         assert!(report.contains("/help"), "{report}");
         assert!(report.contains("Voice"), "{report}");
     }
@@ -3322,6 +3578,16 @@ mod tests {
         assert!(report.to_lowercase().contains("sessions"), "{report}");
         assert!(
             report.to_lowercase().contains("live") || report.to_lowercase().contains("files"),
+            "{report}"
+        );
+    }
+
+    #[test]
+    fn knowledge_gateway_has_counts() {
+        let report = format_knowledge_gateway(KnowledgeListFilter::All);
+        assert!(report.to_lowercase().contains("knowledge"), "{report}");
+        assert!(
+            report.to_lowercase().contains("discord") || report.to_lowercase().contains("core"),
             "{report}"
         );
     }

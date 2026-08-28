@@ -1547,6 +1547,7 @@ mod tests {
             "/lite",
             "/agents",
             "/sessions",
+            "/knowledge",
         ] {
             assert!(
                 matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),

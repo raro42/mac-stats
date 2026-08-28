@@ -2290,6 +2290,16 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/knowledge` — Agent Ops Discord/Core list, no Ollama.
+    if crate::commands::harness_ops::looks_like_knowledge_request(&content) {
+        let filter = crate::commands::harness_ops::parse_knowledge_list_filter(&content);
+        let report = crate::commands::harness_ops::format_knowledge_gateway(filter);
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send knowledge list: {}", e);
+        }
+        return;
+    }
+
     // Hermes `/cron list` parity — cheap schedules report, no Ollama.
     if crate::commands::harness_ops::looks_like_schedules_request(&content) {
         let report = crate::commands::harness_ops::format_schedules_gateway();
