@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-28
 
-Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains, keep-header fixes, filter chips across sections, and Perplexity Top/Snippet.
+Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains, keep-header fixes, filter chips across sections, Perplexity Top/Snippet, Agent Ops Runs Slow/Fail, and `/failed` instant operator.
 
 ## Shipped tonight
 
@@ -24,14 +24,15 @@ Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains
 | **v0.1.692** | **Perplexity Search All · Top · Snippet** — Top filter for first 3 hits; Snippet filter for preview text; accent top-row wash; last-search glance opens Top when >3 results (Monitors Slow / AI Chat Errors parity; design review grace) |
 | **v0.1.693** | **Agent Ops Runs All · Instant · Direct · Slow** — Slow filter for runs ≥2000 ms wall time; amber row wash; overview Opens → Slow when any qualify (Monitors Slow / p50 latency parity) |
 | **v0.1.694** | **Agent Ops Runs Fail filter** — Fail filter for ok=false runs; red row wash; overview Opens → Fail when any failed (AI Chat Errors parity) |
+| **v0.1.695** | **`/failed` instant operator** — `/failed` + NL (`what failed`, `failed runs`) return recent ok=false turns from runs.jsonl with error text (Discord + AI Chat; Agent Ops Fail parity; p50 latency) |
 
 ## Why it matters
 
-Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Filter chips now cover **Top Processes Hot**, **Monitors Slow**, **AI Chat Errors**, **CPU rings Hot**, **Disk Cleanup On/Off + Big**, **Perplexity Top/Snippet**, **Agent Ops Runs Slow + Fail** so large, slow, failed, or important items stand out fast.
+Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Filter chips now cover **Top Processes Hot**, **Monitors Slow**, **AI Chat Errors**, **CPU rings Hot**, **Disk Cleanup On/Off + Big**, **Perplexity Top/Snippet**, **Agent Ops Runs Slow + Fail**. Ask **`/failed`** or **what failed** in Discord or AI Chat for a zero-LLM failed-run report.
 
 ## Digester / design review
 
-- Digester open empty → standing backlog / design review grace → Agent Ops Runs Slow (`feature-agent-ops` adjacent).
+- Digester open empty → standing backlog / design review grace.
 - Polish grace still marked for stale feature screens.
 - Screenshot recapture deferred if Screen Recording TCC blocks.
 
@@ -39,3 +40,4 @@ Keyboard users can move **icon → collapsed glance → footer** without opening
 
 - Digester open / debug.log product errors when present.
 - Design review when due again after grace (`feature-ai-chat` recommended).
+- p50 direct latency — more tool-heavy patterns remain.

@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.695** — `/failed` instant operator (`what failed`, `failed runs`) — ok=false turns from runs.jsonl with error text (Discord + AI Chat; Agent Ops Fail parity; p50 latency).
+
 - **v0.1.694** — Agent Ops Runs Fail filter (ok=false; red row wash; overview Opens → Fail; AI Chat Errors parity).
 
 - **v0.1.693** — Agent Ops Runs All · Instant · Direct · Slow filter (Slow ≥2000 ms; amber row wash; overview Opens → Slow; Monitors Slow / p50 parity).
