@@ -1,6 +1,6 @@
 # Morning surprise — 2026-08-28
 
-Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains, keep-header fixes, Top Processes Hot, Monitors Slow, then AI Chat Errors filter.
+Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains, keep-header fixes, Top Processes Hot, Monitors Slow, AI Chat Errors, then CPU rings Hot filter.
 
 ## Shipped tonight
 
@@ -18,15 +18,16 @@ Overnight Track B (20:00–06:00 local) shipped collapsed-glance keyboard chains
 | **v0.1.686** | **Top Processes All · Pinned · Hot** — Hot filter at glance amber thresholds (design review / `feature-processes`) |
 | **v0.1.687** | **Monitors All · Up · Down · Slow** — Slow filter for UP sites ≥2000 ms (menu-bar Mon amber; Top Processes Hot parity) |
 | **v0.1.688** | **AI Chat All · You · Assistant · Errors** — Errors filter for failed turns (`Error: …`); red bubble wash (Monitors Slow / Top Processes Hot parity; design review / `feature-ai-chat`) |
+| **v0.1.689** | **CPU rings All · Hot** — Hot filter at menu-bar amber thresholds (CPU ≥50% / GPU ≥15% / Freq ≥3.5 GHz / Temp ≥70°C); amber card wash + matching history charts (design review / `feature-cpu-metrics`) |
 
 ## Why it matters
 
-Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Monitors, Disk Cleanup, Perplexity, Debug Log, Agent Ops, and AI Chat keep the header + glance on screen when collapsed (compact mode still hides). Top Processes has a **Hot** chip; Monitors has a **Slow** chip; AI Chat has an **Errors** chip so you can list only failed turns.
+Keyboard users can move **icon → collapsed glance → footer** without opening the full section. Monitors, Disk Cleanup, Perplexity, Debug Log, Agent Ops, and AI Chat keep the header + glance on screen when collapsed (compact mode still hides). Top Processes has a **Hot** chip; Monitors has a **Slow** chip; AI Chat has an **Errors** chip; CPU rings have a **Hot** chip so you can focus only on gauges above menu-bar amber thresholds.
 
 ## Digester / design review
 
-- Digester open empty; design review in grace — standing backlog → AI Chat Errors (Slow/Hot parity).
-- Polish grace marked for `feature-ai-chat`.
+- Digester open pointed at design review (`feature-cpu-metrics.png` stale 15.7d) → rings All · Hot.
+- Polish grace marked for `feature-cpu-metrics`.
 - Screenshot recapture deferred if Screen Recording TCC blocks.
 
 ## Next fuel
