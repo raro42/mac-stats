@@ -2138,6 +2138,26 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/instant` — recent instant-lane turns from runs.jsonl, no Ollama.
+    if crate::commands::harness_ops::looks_like_instant_runs_request(&content) {
+        let days = crate::commands::harness_ops::parse_insights_days(&content);
+        let report = crate::commands::harness_ops::format_instant_runs_gateway(days);
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send instant-runs report: {}", e);
+        }
+        return;
+    }
+
+    // `/direct` — recent direct-lane turns from runs.jsonl, no Ollama.
+    if crate::commands::harness_ops::looks_like_direct_runs_request(&content) {
+        let days = crate::commands::harness_ops::parse_insights_days(&content);
+        let report = crate::commands::harness_ops::format_direct_runs_gateway(days);
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send direct-runs report: {}", e);
+        }
+        return;
+    }
+
     // Operator command menu — discover /status /schedules /digest etc.
     if crate::commands::harness_ops::looks_like_ops_help_request(&content) {
         let report = crate::commands::harness_ops::format_ops_help_gateway();

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.697] - 2026-08-28
+
+### Added
+- **`/instant` and `/direct` instant operator commands** — `/instant`, `/direct`, and short NL asks (`instant runs`, `direct runs`) return recent turns from runs.jsonl filtered by lane (Discord + AI Chat; Agent Ops Runs Instant/Direct filter parity; p50 latency).
+
 ## [0.1.696] - 2026-08-28
 
 ### Added
