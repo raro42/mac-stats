@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.711] - 2026-08-29
+
+### Added
+- **`/logs` instant operator** — `/logs`, `/logs error`, `/logs warn` and NL (`debug log`, `any errors`, `show warnings`, `what's wrong`) list Debug Log Error/Warn lines from the log tail (Discord + AI Chat; Debug Log filter parity).
+
 ## [0.1.710] - 2026-08-29
 
 ### Added

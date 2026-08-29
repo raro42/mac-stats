@@ -1803,6 +1803,272 @@ pub fn format_disk_cleanup_gateway(filter: DiskCleanupListFilter) -> String {
     out
 }
 
+/// Debug Log All · Error · Warn filter for `/logs` instant replies (UI parity).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DebugLogListFilter {
+    All,
+    Error,
+    Warn,
+}
+
+/// Classify a debug.log line — matches `logsLineKind` in cpu.js.
+pub fn debug_log_line_kind(line: &str) -> &'static str {
+    let lower = line.to_ascii_lowercase();
+    if lower.contains(" error ")
+        || lower.contains("error:")
+        || lower.contains("panic")
+    {
+        "error"
+    } else if lower.contains(" warn ") || lower.contains("warn:") {
+        "warn"
+    } else {
+        "other"
+    }
+}
+
+/// Parse Error/Warn from `/logs error`, `show warnings`, etc. Default All.
+pub fn parse_debug_log_list_filter(content: &str) -> DebugLogListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" error")
+        || n.ends_with(" errors")
+        || n == "error"
+        || n == "errors"
+        || n == "logs error"
+        || n == "/logs error"
+        || n == "log error"
+        || n == "log errors"
+        || n == "debug error"
+        || n == "debug errors"
+        || n == "error log"
+        || n == "error logs"
+        || n == "any errors"
+        || n == "any error"
+        || n == "show errors"
+        || n == "list errors"
+        || n == "what's wrong"
+        || n == "whats wrong"
+        || n == "what is wrong"
+    {
+        return DebugLogListFilter::Error;
+    }
+    if n.ends_with(" warn")
+        || n.ends_with(" warns")
+        || n.ends_with(" warning")
+        || n.ends_with(" warnings")
+        || n == "warn"
+        || n == "warns"
+        || n == "warning"
+        || n == "warnings"
+        || n == "logs warn"
+        || n == "/logs warn"
+        || n == "log warn"
+        || n == "log warning"
+        || n == "log warnings"
+        || n == "debug warn"
+        || n == "debug warning"
+        || n == "debug warnings"
+        || n == "warn log"
+        || n == "warn logs"
+        || n == "warning log"
+        || n == "warning logs"
+        || n == "any warnings"
+        || n == "any warning"
+        || n == "any warns"
+        || n == "show warnings"
+        || n == "list warnings"
+        || n == "show warns"
+    {
+        return DebugLogListFilter::Warn;
+    }
+    DebugLogListFilter::All
+}
+
+/// True for `/logs` / `debug log` — Error/Warn filter parity; not fix/explain asks.
+pub fn looks_like_debug_log_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("fix")
+        || n.contains("explain")
+        || n.contains("how to")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("create")
+        || n.contains("delete")
+        || n.contains("clear log")
+        || n.contains("rotate")
+        || n.contains("open in")
+        || n.contains("editor")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/logs"
+            | "logs"
+            | "/log"
+            | "log"
+            | "debug log"
+            | "debug logs"
+            | "show logs"
+            | "list logs"
+            | "log tail"
+            | "logs tail"
+            | "tail logs"
+            | "log status"
+            | "logs status"
+            | "/logs error"
+            | "logs error"
+            | "log error"
+            | "log errors"
+            | "debug error"
+            | "debug errors"
+            | "error log"
+            | "error logs"
+            | "any errors"
+            | "any error"
+            | "show errors"
+            | "list errors"
+            | "what's wrong"
+            | "whats wrong"
+            | "what is wrong"
+            | "/logs warn"
+            | "logs warn"
+            | "log warn"
+            | "log warning"
+            | "log warnings"
+            | "debug warn"
+            | "debug warning"
+            | "debug warnings"
+            | "warn log"
+            | "warn logs"
+            | "warning log"
+            | "warning logs"
+            | "any warnings"
+            | "any warning"
+            | "any warns"
+            | "show warnings"
+            | "list warnings"
+            | "show warns"
+            | "error"
+            | "errors"
+            | "warn"
+            | "warns"
+            | "warning"
+            | "warnings"
+    )
+}
+
+/// Zero-LLM Debug Log report (All · Error · Warn; tail of ~/.mac-stats/debug.log).
+pub fn format_debug_log_gateway(filter: DebugLogListFilter) -> String {
+    const MAX_ROWS: usize = 12;
+    let tail = match crate::commands::logging::read_debug_log(Some(128 * 1024)) {
+        Ok(t) => t,
+        Err(e) => return format!("**Debug Log** — could not read: {e}"),
+    };
+    let body = tail.content;
+    let mut error_n = 0usize;
+    let mut warn_n = 0usize;
+    for line in body.lines() {
+        match debug_log_line_kind(line) {
+            "error" => error_n += 1,
+            "warn" => warn_n += 1,
+            _ => {}
+        }
+    }
+    let title = match filter {
+        DebugLogListFilter::All => {
+            format!("**Debug Log** — {error_n} error · {warn_n} warn (tail)")
+        }
+        DebugLogListFilter::Error => format!("**Debug Log · Error** — {error_n}"),
+        DebugLogListFilter::Warn => format!("**Debug Log · Warn** — {warn_n}"),
+    };
+    let mut lines = vec![title];
+    if filter == DebugLogListFilter::All {
+        let path_short = truncate_preview(&tail.path, 48);
+        lines.push(format!("`{path_short}`"));
+    }
+
+    let selected: Vec<String> = match filter {
+        DebugLogListFilter::All => {
+            let all: Vec<_> = body.lines().map(|s| s.to_string()).collect();
+            all.into_iter()
+                .rev()
+                .take(MAX_ROWS)
+                .collect::<Vec<_>>()
+                .into_iter()
+                .rev()
+                .collect()
+        }
+        DebugLogListFilter::Error | DebugLogListFilter::Warn => {
+            let want = match filter {
+                DebugLogListFilter::Error => "error",
+                DebugLogListFilter::Warn => "warn",
+                DebugLogListFilter::All => unreachable!(),
+            };
+            let mut out = Vec::new();
+            let mut keep_cont = false;
+            for line in body.lines() {
+                let is_cont = line.starts_with(char::is_whitespace) && !line.trim().is_empty();
+                let kind = debug_log_line_kind(line);
+                if kind == want {
+                    out.push(line.to_string());
+                    keep_cont = true;
+                } else if keep_cont && is_cont {
+                    out.push(line.to_string());
+                } else {
+                    keep_cont = false;
+                }
+            }
+            // Keep the newest matching blocks (last MAX_ROWS lines of filtered set).
+            if out.len() > MAX_ROWS {
+                out[out.len() - MAX_ROWS..].to_vec()
+            } else {
+                out
+            }
+        }
+    };
+
+    if selected.is_empty() {
+        let empty = match filter {
+            DebugLogListFilter::All => {
+                "_Nothing in the log tail yet — check back after the app runs a bit._"
+            }
+            DebugLogListFilter::Error => "_Nothing here yet — no ERROR lines in this tail._",
+            DebugLogListFilter::Warn => "_Nothing here yet — no WARN lines in this tail._",
+        };
+        lines.push(empty.to_string());
+    } else {
+        for raw in &selected {
+            let preview = truncate_preview(raw.trim_end(), 120);
+            let mark = match debug_log_line_kind(raw) {
+                "error" => "❌",
+                "warn" => "⚠",
+                _ => "·",
+            };
+            lines.push(format!("{mark} `{preview}`"));
+        }
+        let total_match = match filter {
+            DebugLogListFilter::All => body.lines().count(),
+            DebugLogListFilter::Error => error_n,
+            DebugLogListFilter::Warn => warn_n,
+        };
+        if total_match > selected.len() {
+            lines.push(format!("_…+{} more in tail_", total_match - selected.len()));
+        }
+    }
+
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// Agent Ops Agents All · On · Off filter for `/agents` instant replies.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentsListFilter {
@@ -2562,6 +2828,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_disk_cleanup_list_filter(content);
         return Some(format_disk_cleanup_gateway(filter));
     }
+    if looks_like_debug_log_request(content) {
+        let filter = parse_debug_log_list_filter(content);
+        return Some(format_debug_log_gateway(filter));
+    }
     if looks_like_memory_scrub_request(content) {
         let (files, removed) = crate::commands::session_search::scrub_polluted_memory_files();
         return Some(if removed == 0 {
@@ -2602,6 +2872,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` — Agent Ops Jobs/Deliveries list\n\
 • `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` — External / Monitors list\n\
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` — Disk Cleanup list\n\
+• `/logs` · `/logs error` · `/logs warn` — Debug Log Error/Warn list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` / `interrupt` — interrupt an in-flight run\n\
@@ -2859,6 +3130,43 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("run cleanup")
         && !q.contains("disk usage")
         && !q.contains("ssd")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/logs` Error/Warn operator asks (v0.1.711).
+    if (q.contains("/logs")
+        || q.contains("/log")
+        || q.contains("debug log")
+        || q.contains("debug logs")
+        || q.contains("show logs")
+        || q.contains("list logs")
+        || q.contains("log tail")
+        || q.contains("tail logs")
+        || q.contains("any errors")
+        || q.contains("any error")
+        || q.contains("any warnings")
+        || q.contains("any warning")
+        || q.contains("show errors")
+        || q.contains("show warnings")
+        || q.contains("list errors")
+        || q.contains("list warnings")
+        || q == "logs"
+        || q == "log"
+        || q == "error"
+        || q == "errors"
+        || q == "warn"
+        || q == "warns"
+        || q == "warning"
+        || q == "warnings"
+        || q == "what's wrong"
+        || q == "whats wrong"
+        || q == "what is wrong")
+        && !q.contains("why")
+        && !q.contains("fix")
+        && !q.contains("explain")
+        && !q.contains("clear log")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -4028,6 +4336,10 @@ mod tests {
         assert!(disk.to_lowercase().contains("disk cleanup") || disk.to_lowercase().contains("reclaim"));
         let disk_reclaim = try_operator_instant_reply("/disk reclaim").expect("disk reclaim");
         assert!(disk_reclaim.to_lowercase().contains("reclaim"));
+        let logs = try_operator_instant_reply("/logs").expect("logs");
+        assert!(logs.to_lowercase().contains("debug log"), "{logs}");
+        let logs_err = try_operator_instant_reply("/logs error").expect("logs error");
+        assert!(logs_err.to_lowercase().contains("error"), "{logs_err}");
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
         assert!(try_operator_instant_reply("insights on weather").is_none());
         assert!(try_operator_instant_reply("why did the build fail").is_none());
@@ -4041,6 +4353,9 @@ mod tests {
         assert!(try_operator_instant_reply("add a monitor for example.com").is_none());
         assert!(try_operator_instant_reply("clean now").is_none());
         assert!(try_operator_instant_reply("disk usage").is_none());
+        assert!(try_operator_instant_reply("why is there an error").is_none());
+        assert!(try_operator_instant_reply("fix the error").is_none());
+        assert!(try_operator_instant_reply("explain the warning").is_none());
     }
 
     #[test]
@@ -4415,6 +4730,56 @@ mod tests {
     }
 
     #[test]
+    fn debug_log_request_and_filter() {
+        assert!(looks_like_debug_log_request("/logs"));
+        assert!(looks_like_debug_log_request("debug log"));
+        assert!(looks_like_debug_log_request("@Werner /logs"));
+        assert!(looks_like_debug_log_request("/logs error"));
+        assert!(looks_like_debug_log_request("/logs warn"));
+        assert!(looks_like_debug_log_request("any errors"));
+        assert!(looks_like_debug_log_request("show warnings"));
+        assert!(looks_like_debug_log_request("what's wrong"));
+        assert!(!looks_like_debug_log_request("why is there an error"));
+        assert!(!looks_like_debug_log_request("fix the error"));
+        assert!(!looks_like_debug_log_request("explain the warning"));
+        assert!(!looks_like_debug_log_request("clear log"));
+        assert_eq!(
+            parse_debug_log_list_filter("/logs"),
+            DebugLogListFilter::All
+        );
+        assert_eq!(
+            parse_debug_log_list_filter("/logs error"),
+            DebugLogListFilter::Error
+        );
+        assert_eq!(
+            parse_debug_log_list_filter("any errors"),
+            DebugLogListFilter::Error
+        );
+        assert_eq!(
+            parse_debug_log_list_filter("/logs warn"),
+            DebugLogListFilter::Warn
+        );
+        assert_eq!(
+            parse_debug_log_list_filter("show warnings"),
+            DebugLogListFilter::Warn
+        );
+        assert_eq!(debug_log_line_kind("2026-08-29 ERROR boom"), "error");
+        assert_eq!(debug_log_line_kind("2026-08-29 WARN soft"), "warn");
+        assert_eq!(debug_log_line_kind("2026-08-29 INFO ok"), "other");
+        assert_eq!(debug_log_line_kind("thread panicked at src"), "error");
+    }
+
+    #[test]
+    fn debug_log_gateway_has_counts() {
+        let report = format_debug_log_gateway(DebugLogListFilter::All);
+        assert!(report.to_lowercase().contains("debug log"), "{report}");
+        let err = format_debug_log_gateway(DebugLogListFilter::Error);
+        assert!(err.to_lowercase().contains("error"), "{err}");
+        let warn = format_debug_log_gateway(DebugLogListFilter::Warn);
+        assert!(warn.to_lowercase().contains("warn"), "{warn}");
+    }
+
+    #[test]
     fn memory_scrub_request_detected() {
         assert!(looks_like_memory_scrub_request("scrub memory"));
         assert!(looks_like_memory_scrub_request("clean up memory"));
@@ -4479,6 +4844,8 @@ mod tests {
         assert!(report.contains("/monitors down"), "{report}");
         assert!(report.contains("/disk"), "{report}");
         assert!(report.contains("/disk reclaim"), "{report}");
+        assert!(report.contains("/logs"), "{report}");
+        assert!(report.contains("/logs error"), "{report}");
         assert!(report.contains("/help"), "{report}");
         assert!(report.contains("Voice"), "{report}");
     }

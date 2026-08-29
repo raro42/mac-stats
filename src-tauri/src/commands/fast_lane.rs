@@ -1559,6 +1559,9 @@ mod tests {
             "/disk on",
             "/disk off",
             "/disk clean",
+            "/logs",
+            "/logs error",
+            "/logs warn",
         ] {
             assert!(
                 matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),
