@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.726] - 2026-08-30
+
+### Added
+- **`/perplexity key` instant operator** — `/perplexity key` and NL (`perplexity status`, `is perplexity ready`, `how's perplexity`, `perplexity search key`) return Perplexity Ready / Not set with key cue (config only, no live probe; Discord + AI Chat; does not steal `/perplexity` last-search Top/Snippet or `perplexity search for …` asks).
+
 ## [0.1.725] - 2026-08-29
 
 ### Added

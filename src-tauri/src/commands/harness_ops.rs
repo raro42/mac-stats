@@ -3403,6 +3403,12 @@ pub fn looks_like_perplexity_request(content: &str) -> bool {
         || n.contains("explain")
         || n.contains("run search")
         || n.contains("do a search")
+        || n.contains("perplexity key")
+        || n.contains("perplexity status")
+        || n.contains("is perplexity ready")
+        || n.contains("is perplexity configured")
+        || n.contains("how's perplexity")
+        || n.contains("hows perplexity")
         || n.starts_with("perplexity search ")
     {
         return false;
@@ -3417,7 +3423,6 @@ pub fn looks_like_perplexity_request(content: &str) -> bool {
             | "search results"
             | "list perplexity"
             | "show perplexity"
-            | "perplexity status"
             | "perplexity search"
             | "/perplexity top"
             | "perplexity top"
@@ -4587,6 +4592,109 @@ pub fn format_brave_ready_chip() -> String {
     }
 }
 
+/// True for focused Perplexity API key/config asks (`/perplexity key` · Settings key parity) —
+/// not last-search Top/Snippet (`/perplexity`) or new search free-form.
+pub fn looks_like_perplexity_ready_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    // Last-search list, live search, and how-to stay with `/perplexity` / pre-route / agent.
+    if n.contains("search for")
+        || n.contains("look up")
+        || n.contains("look for")
+        || n.contains("research")
+        || n.contains("results")
+        || n.contains("snippet")
+        || n.contains(" last ")
+        || n.starts_with("last ")
+        || n.contains("top result")
+        || n == "top results"
+        || n.contains("query")
+        || n.contains("find ")
+        || n.contains("create")
+        || n.contains("update")
+        || n.contains("talk to")
+        || n.contains("chat with")
+        || n.contains("message ")
+        || n.contains("why")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains(" of ")
+        || n.starts_with("perplexity search ")
+        || n.chars().any(|c| c.is_ascii_digit())
+    {
+        return false;
+    }
+    // Bare `/perplexity` / `perplexity` / `perplexity search` stay last-search list.
+    if matches!(
+        n.as_str(),
+        "/perplexity"
+            | "perplexity"
+            | "perplexity search"
+            | "/perplexity top"
+            | "perplexity top"
+            | "/perplexity snippet"
+            | "perplexity snippet"
+            | "/top"
+            | "/snippet"
+            | "snippet"
+            | "snippets"
+            | "last search"
+            | "last perplexity"
+            | "list perplexity"
+            | "show perplexity"
+            | "search results"
+            | "perplexity results"
+    ) {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/perplexity key"
+            | "perplexity key"
+            | "perplexity key status"
+            | "perplexity status"
+            | "perplexity ready"
+            | "perplexity offline"
+            | "perplexity configured"
+            | "perplexity health"
+            | "is perplexity ready"
+            | "is perplexity online"
+            | "is perplexity connected"
+            | "is perplexity offline"
+            | "is perplexity configured"
+            | "is perplexity set up"
+            | "is perplexity setup"
+            | "perplexity connection"
+            | "how's perplexity"
+            | "hows perplexity"
+            | "how's the perplexity"
+            | "hows the perplexity"
+            | "perplexity search status"
+            | "perplexity search key"
+            | "perplexity search ready"
+            | "perplexity search health"
+            | "perplexity search configured"
+            | "is perplexity search ready"
+            | "is perplexity search configured"
+            | "is perplexity search set up"
+            | "is perplexity search setup"
+            | "how's perplexity search"
+            | "hows perplexity search"
+    )
+}
+
+/// Zero-LLM Perplexity Ready / Not set chip (Settings key parity; config only; no live probe).
+pub fn format_perplexity_ready_chip() -> String {
+    match crate::commands::perplexity::get_perplexity_api_key() {
+        Some(_) => "**Perplexity Search** · Ready · key set".to_string(),
+        None => "**Perplexity Search** · Not set · add API key".to_string(),
+    }
+}
+
 /// True for `/ops` / `/help` operator command list — not free-form “help me with …”.
 pub fn looks_like_ops_help_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
@@ -4635,6 +4743,9 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
     }
     if looks_like_brave_ready_request(content) {
         return Some(format_brave_ready_chip());
+    }
+    if looks_like_perplexity_ready_request(content) {
+        return Some(format_perplexity_ready_chip());
     }
     if looks_like_insights_request(content) {
         let days = parse_insights_days(content);
@@ -4753,6 +4864,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/ollama` · `/llm` — Ollama Ready / Offline (menu-bar ✕ · AI Chat glance; circuit)\n\
 • `/redmine` — Redmine Ready / Not set (Agent Ops health; URL + key; no live probe)\n\
 • `/brave` — Brave Search Ready / Not set (API key; no live probe)\n\
+• `/perplexity key` — Perplexity Ready / Not set (API key; no live probe)\n\
 • `/insights` · `/insights 7` — runs.jsonl report (+ optional day window)\n\
 • `/failed` · `/failed 7` — recent failed turns from runs.jsonl\n\
 • `/slow` · `/slow 7` — recent slow turns (≥{slow_ms} ms wall time)\n\
@@ -5387,6 +5499,51 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
+    // `/perplexity key` Ready/Not-set chip asks (v0.1.726).
+    if (q.contains("/perplexity key")
+        || q.contains("perplexity key")
+        || q.contains("perplexity status")
+        || q.contains("perplexity ready")
+        || q.contains("perplexity offline")
+        || q.contains("perplexity configured")
+        || q.contains("perplexity health")
+        || q.contains("is perplexity ready")
+        || q.contains("is perplexity online")
+        || q.contains("is perplexity connected")
+        || q.contains("is perplexity offline")
+        || q.contains("is perplexity configured")
+        || q.contains("is perplexity set up")
+        || q.contains("is perplexity setup")
+        || q.contains("perplexity connection")
+        || q == "how's perplexity"
+        || q == "hows perplexity"
+        || q == "how's the perplexity"
+        || q == "hows the perplexity"
+        || q.contains("perplexity search status")
+        || q.contains("perplexity search key")
+        || q.contains("perplexity search ready")
+        || q.contains("perplexity search health")
+        || q.contains("perplexity search configured")
+        || q.contains("is perplexity search ready")
+        || q.contains("is perplexity search configured")
+        || q.contains("is perplexity search set up")
+        || q.contains("is perplexity search setup")
+        || q == "how's perplexity search"
+        || q == "hows perplexity search")
+        && !q.contains("search for")
+        && !q.contains("look up")
+        && !q.contains("research")
+        && !q.contains("results")
+        && !q.contains("snippet")
+        && !q.contains("why")
+        && !q.contains("how to")
+        && q != "/perplexity"
+        && q != "perplexity"
+        && q != "perplexity search"
+        && !q.chars().any(|c| c.is_ascii_digit())
+    {
+        return true;
+    }
     // `/details` · `/load` operator asks (v0.1.718).
     if (q.contains("/details")
         || q.contains("/load")
@@ -5478,6 +5635,13 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q == "/snippet"
         || q == "snippet"
         || q == "snippets")
+        && !q.contains("/perplexity key")
+        && !q.contains("perplexity key")
+        && !q.contains("perplexity status")
+        && !q.contains("is perplexity ready")
+        && !q.contains("is perplexity configured")
+        && !q.contains("how's perplexity")
+        && !q.contains("hows perplexity")
         && !q.contains("why")
         && !q.contains("search for")
         && !q.contains("look up")
@@ -6645,6 +6809,15 @@ mod tests {
         assert!(try_operator_instant_reply("brave search status").is_some());
         assert!(try_operator_instant_reply("brave search").is_none());
         assert!(try_operator_instant_reply("search for weather with brave").is_none());
+        let perplexity_key = try_operator_instant_reply("/perplexity key").expect("perplexity key");
+        assert!(
+            perplexity_key.to_lowercase().contains("perplexity"),
+            "{perplexity_key}"
+        );
+        assert!(try_operator_instant_reply("is perplexity ready").is_some());
+        assert!(try_operator_instant_reply("how's perplexity").is_some());
+        assert!(try_operator_instant_reply("perplexity status").is_some());
+        assert!(try_operator_instant_reply("perplexity search for weather").is_none());
         let insights = try_operator_instant_reply("insights").expect("insights");
         assert!(insights.to_lowercase().contains("insights"));
         let failed = try_operator_instant_reply("/failed").expect("failed");
@@ -7667,6 +7840,31 @@ mod tests {
     }
 
     #[test]
+    fn perplexity_ready_request_detected() {
+        assert!(looks_like_perplexity_ready_request("/perplexity key"));
+        assert!(looks_like_perplexity_ready_request("perplexity key"));
+        assert!(looks_like_perplexity_ready_request("perplexity status"));
+        assert!(looks_like_perplexity_ready_request("is perplexity ready"));
+        assert!(looks_like_perplexity_ready_request("is perplexity configured"));
+        assert!(looks_like_perplexity_ready_request("how's perplexity"));
+        assert!(looks_like_perplexity_ready_request("perplexity search status"));
+        assert!(looks_like_perplexity_ready_request("perplexity search key"));
+        assert!(!looks_like_perplexity_ready_request("/perplexity"));
+        assert!(!looks_like_perplexity_ready_request("perplexity"));
+        assert!(!looks_like_perplexity_ready_request("/perplexity top"));
+        assert!(!looks_like_perplexity_ready_request("last search"));
+        assert!(!looks_like_perplexity_ready_request("perplexity search for news"));
+        assert!(!looks_like_perplexity_ready_request("how to use perplexity"));
+        assert!(!looks_like_perplexity_ready_request("search for barcelona"));
+        let chip = format_perplexity_ready_chip();
+        assert!(chip.to_lowercase().contains("perplexity"), "{chip}");
+        // Last-search list still owns bare `/perplexity`.
+        assert!(looks_like_perplexity_request("/perplexity"));
+        assert!(!looks_like_perplexity_request("perplexity status"));
+        assert!(!looks_like_perplexity_request("/perplexity key"));
+    }
+
+    #[test]
     fn digest_open_candidates_requests() {
         assert!(looks_like_digest_request("digest open"));
         assert!(looks_like_digest_request("open candidates"));
@@ -7697,6 +7895,7 @@ mod tests {
         assert!(report.contains("/llm"), "{report}");
         assert!(report.contains("/redmine"), "{report}");
         assert!(report.contains("/brave"), "{report}");
+        assert!(report.contains("/perplexity key"), "{report}");
         assert!(report.contains("/schedules"), "{report}");
         assert!(report.contains("/schedules jobs"), "{report}");
         assert!(report.contains("/schedules deliveries"), "{report}");

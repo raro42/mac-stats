@@ -1580,6 +1580,9 @@ mod tests {
             "/perplexity",
             "/perplexity top",
             "/perplexity snippet",
+            "/perplexity key",
+            "is perplexity ready",
+            "perplexity status",
             "last search",
             "top results",
         ] {

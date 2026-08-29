@@ -2420,6 +2420,15 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/perplexity key` — Perplexity Ready / Not set chip (Settings key parity), no LLM call.
+    if crate::commands::harness_ops::looks_like_perplexity_ready_request(&content) {
+        let report = crate::commands::harness_ops::format_perplexity_ready_chip();
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send perplexity ready chip: {}", e);
+        }
+        return;
+    }
+
     // `/perplexity` — last Perplexity Top/Snippet list, no Ollama.
     if crate::commands::harness_ops::looks_like_perplexity_request(&content) {
         let filter = crate::commands::harness_ops::parse_perplexity_list_filter(&content);
