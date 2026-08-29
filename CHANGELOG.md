@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.712] - 2026-08-29
+
+### Added
+- **`/processes` instant operator** — `/processes`, `/processes hot`, `/hot` and NL (`top processes`, `what's hot`, `hot processes`) list Top Processes with Hot counts (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB; Discord + AI Chat; Top Processes filter parity).
+
 ## [0.1.711] - 2026-08-29
 
 ### Added

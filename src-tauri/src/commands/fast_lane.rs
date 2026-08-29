@@ -1562,6 +1562,11 @@ mod tests {
             "/logs",
             "/logs error",
             "/logs warn",
+            "/processes",
+            "/processes hot",
+            "/hot",
+            "top processes",
+            "what's hot",
         ] {
             assert!(
                 matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),

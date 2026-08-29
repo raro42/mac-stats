@@ -2340,6 +2340,16 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/processes` — Top Processes Hot list, no Ollama.
+    if crate::commands::harness_ops::looks_like_processes_request(&content) {
+        let filter = crate::commands::harness_ops::parse_processes_list_filter(&content);
+        let report = crate::commands::harness_ops::format_processes_gateway(filter);
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send processes list: {}", e);
+        }
+        return;
+    }
+
     // Operator: scrub polluted memory lines (same as periodic compaction hygiene).
     if crate::commands::harness_ops::looks_like_memory_scrub_request(&content) {
         let _ = new_message.channel_id.broadcast_typing(&ctx).await;

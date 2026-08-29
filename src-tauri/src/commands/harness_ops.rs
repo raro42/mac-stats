@@ -2069,6 +2069,168 @@ pub fn format_debug_log_gateway(filter: DebugLogListFilter) -> String {
     out
 }
 
+/// Top Processes All · Hot filter for `/processes` instant replies (UI parity).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessesListFilter {
+    All,
+    Hot,
+}
+
+/// Hot thresholds — match `PROCESS_HOT_*` in cpu.js / Top Processes Hot chip.
+pub const OPS_PROCESS_HOT_CPU_PCT: f32 = 15.0;
+pub const OPS_PROCESS_HOT_GPU_PCT: f32 = 15.0;
+pub const OPS_PROCESS_HOT_RAM_BYTES: u64 = 1024 * 1024 * 1024;
+
+pub fn process_row_is_hot(p: &crate::metrics::ProcessUsage) -> bool {
+    p.cpu >= OPS_PROCESS_HOT_CPU_PCT
+        || p.gpu >= OPS_PROCESS_HOT_GPU_PCT
+        || p.memory >= OPS_PROCESS_HOT_RAM_BYTES
+}
+
+fn format_process_ram(bytes: u64) -> String {
+    const GIB: u64 = 1024 * 1024 * 1024;
+    const MIB: u64 = 1024 * 1024;
+    if bytes >= GIB {
+        format!("{:.1} GiB", bytes as f64 / GIB as f64)
+    } else if bytes >= MIB {
+        format!("{} MiB", bytes / MIB)
+    } else if bytes > 0 {
+        format!("{} KiB", bytes / 1024)
+    } else {
+        "—".into()
+    }
+}
+
+/// Parse Hot from `/processes hot`, `what's hot`, etc. Default All.
+pub fn parse_processes_list_filter(content: &str) -> ProcessesListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" hot")
+        || n == "hot"
+        || n == "/hot"
+        || n == "processes hot"
+        || n == "/processes hot"
+        || n == "process hot"
+        || n == "hot processes"
+        || n == "hot process"
+        || n == "what's hot"
+        || n == "whats hot"
+        || n == "what is hot"
+        || n == "which processes are hot"
+        || n == "which process is hot"
+    {
+        return ProcessesListFilter::Hot;
+    }
+    ProcessesListFilter::All
+}
+
+/// True for `/processes` / `top processes` — Hot filter parity; not kill/pin asks.
+pub fn looks_like_processes_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("kill")
+        || n.contains("force quit")
+        || n.contains("force-quit")
+        || n.contains("quit ")
+        || n.contains("pin")
+        || n.contains("unpin")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("how to")
+        || n.contains("explain")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/processes"
+            | "processes"
+            | "/process"
+            | "process list"
+            | "list processes"
+            | "show processes"
+            | "top processes"
+            | "top process"
+            | "process status"
+            | "processes status"
+            | "/processes hot"
+            | "processes hot"
+            | "process hot"
+            | "hot processes"
+            | "hot process"
+            | "/hot"
+            | "hot"
+            | "what's hot"
+            | "whats hot"
+            | "what is hot"
+            | "which processes are hot"
+            | "which process is hot"
+    )
+}
+
+/// Zero-LLM Top Processes report (All · Hot; cached list from get_cpu_details).
+pub fn format_processes_gateway(filter: ProcessesListFilter) -> String {
+    const MAX_ROWS: usize = 12;
+    let details = crate::metrics::get_cpu_details();
+    let rows = details.top_processes;
+    let hot_n = rows.iter().filter(|p| process_row_is_hot(p)).count();
+    let total = rows.len();
+    let title = match filter {
+        ProcessesListFilter::All => {
+            format!("**Top Processes** — {total} · {hot_n} hot")
+        }
+        ProcessesListFilter::Hot => {
+            format!(
+                "**Top Processes · Hot** — {hot_n} (CPU≥{:.0}% · GPU≥{:.0}% · RAM≥1 GiB)",
+                OPS_PROCESS_HOT_CPU_PCT, OPS_PROCESS_HOT_GPU_PCT
+            )
+        }
+    };
+    let mut lines = vec![title];
+
+    let filtered: Vec<_> = match filter {
+        ProcessesListFilter::All => rows.iter().collect(),
+        ProcessesListFilter::Hot => rows.iter().filter(|p| process_row_is_hot(p)).collect(),
+    };
+
+    if filtered.is_empty() {
+        let empty = match filter {
+            ProcessesListFilter::All => {
+                "_Nothing here yet — open the CPU window so Top Processes can fill in._"
+            }
+            ProcessesListFilter::Hot => {
+                "_No process is hot right now (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB)._"
+            }
+        };
+        lines.push(empty.to_string());
+    } else {
+        for p in filtered.iter().take(MAX_ROWS) {
+            let name = truncate_preview(&p.name, 40);
+            let ram = format_process_ram(p.memory);
+            let hot_mark = if process_row_is_hot(p) { " · hot" } else { "" };
+            lines.push(format!(
+                "• `{name}` · pid {pid} · CPU {cpu:.0}% · GPU {gpu:.0}% · {ram}{hot_mark}",
+                pid = p.pid,
+                cpu = p.cpu,
+                gpu = p.gpu,
+            ));
+        }
+        if filtered.len() > MAX_ROWS {
+            lines.push(format!("_…+{} more_", filtered.len() - MAX_ROWS));
+        }
+    }
+
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// Agent Ops Agents All · On · Off filter for `/agents` instant replies.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentsListFilter {
@@ -2832,6 +2994,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_debug_log_list_filter(content);
         return Some(format_debug_log_gateway(filter));
     }
+    if looks_like_processes_request(content) {
+        let filter = parse_processes_list_filter(content);
+        return Some(format_processes_gateway(filter));
+    }
     if looks_like_memory_scrub_request(content) {
         let (files, removed) = crate::commands::session_search::scrub_polluted_memory_files();
         return Some(if removed == 0 {
@@ -2873,6 +3039,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` — External / Monitors list\n\
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` — Disk Cleanup list\n\
 • `/logs` · `/logs error` · `/logs warn` — Debug Log Error/Warn list\n\
+• `/processes` · `/processes hot` · `/hot` — Top Processes Hot list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` / `interrupt` — interrupt an in-flight run\n\
@@ -3167,6 +3334,34 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("fix")
         && !q.contains("explain")
         && !q.contains("clear log")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/processes` Hot operator asks (v0.1.712).
+    if (q.contains("/processes")
+        || q.contains("/process")
+        || q.contains("/hot")
+        || q.contains("top processes")
+        || q.contains("top process")
+        || q.contains("list processes")
+        || q.contains("show processes")
+        || q.contains("hot processes")
+        || q.contains("hot process")
+        || q.contains("processes hot")
+        || q.contains("which processes are hot")
+        || q.contains("which process is hot")
+        || q == "processes"
+        || q == "process list"
+        || q == "hot"
+        || q == "what's hot"
+        || q == "whats hot"
+        || q == "what is hot")
+        && !q.contains("why")
+        && !q.contains("kill")
+        && !q.contains("force quit")
+        && !q.contains("pin")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -4340,6 +4535,13 @@ mod tests {
         assert!(logs.to_lowercase().contains("debug log"), "{logs}");
         let logs_err = try_operator_instant_reply("/logs error").expect("logs error");
         assert!(logs_err.to_lowercase().contains("error"), "{logs_err}");
+        let processes = try_operator_instant_reply("/processes").expect("processes");
+        assert!(
+            processes.to_lowercase().contains("top processes"),
+            "{processes}"
+        );
+        let processes_hot = try_operator_instant_reply("/processes hot").expect("processes hot");
+        assert!(processes_hot.to_lowercase().contains("hot"), "{processes_hot}");
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
         assert!(try_operator_instant_reply("insights on weather").is_none());
         assert!(try_operator_instant_reply("why did the build fail").is_none());
@@ -4356,6 +4558,9 @@ mod tests {
         assert!(try_operator_instant_reply("why is there an error").is_none());
         assert!(try_operator_instant_reply("fix the error").is_none());
         assert!(try_operator_instant_reply("explain the warning").is_none());
+        assert!(try_operator_instant_reply("kill that process").is_none());
+        assert!(try_operator_instant_reply("force quit chrome").is_none());
+        assert!(try_operator_instant_reply("pin this process").is_none());
     }
 
     #[test]
@@ -4780,6 +4985,74 @@ mod tests {
     }
 
     #[test]
+    fn processes_request_and_filter() {
+        assert!(looks_like_processes_request("/processes"));
+        assert!(looks_like_processes_request("top processes"));
+        assert!(looks_like_processes_request("@Werner /processes"));
+        assert!(looks_like_processes_request("/processes hot"));
+        assert!(looks_like_processes_request("/hot"));
+        assert!(looks_like_processes_request("what's hot"));
+        assert!(looks_like_processes_request("hot processes"));
+        assert!(looks_like_processes_request("which processes are hot"));
+        assert!(!looks_like_processes_request("kill that process"));
+        assert!(!looks_like_processes_request("force quit chrome"));
+        assert!(!looks_like_processes_request("pin this process"));
+        assert!(!looks_like_processes_request("why is chrome hot"));
+        assert_eq!(
+            parse_processes_list_filter("/processes"),
+            ProcessesListFilter::All
+        );
+        assert_eq!(
+            parse_processes_list_filter("/processes hot"),
+            ProcessesListFilter::Hot
+        );
+        assert_eq!(
+            parse_processes_list_filter("what's hot"),
+            ProcessesListFilter::Hot
+        );
+        assert_eq!(
+            parse_processes_list_filter("/hot"),
+            ProcessesListFilter::Hot
+        );
+        assert!(process_row_is_hot(&crate::metrics::ProcessUsage {
+            name: "hot".into(),
+            cpu: 20.0,
+            gpu: 0.0,
+            pid: 1,
+            memory: 0,
+        }));
+        assert!(process_row_is_hot(&crate::metrics::ProcessUsage {
+            name: "gpu".into(),
+            cpu: 0.0,
+            gpu: 16.0,
+            pid: 2,
+            memory: 0,
+        }));
+        assert!(process_row_is_hot(&crate::metrics::ProcessUsage {
+            name: "ram".into(),
+            cpu: 0.0,
+            gpu: 0.0,
+            pid: 3,
+            memory: OPS_PROCESS_HOT_RAM_BYTES,
+        }));
+        assert!(!process_row_is_hot(&crate::metrics::ProcessUsage {
+            name: "cool".into(),
+            cpu: 1.0,
+            gpu: 0.0,
+            pid: 4,
+            memory: 1024,
+        }));
+    }
+
+    #[test]
+    fn processes_gateway_has_title() {
+        let report = format_processes_gateway(ProcessesListFilter::All);
+        assert!(report.to_lowercase().contains("top processes"), "{report}");
+        let hot = format_processes_gateway(ProcessesListFilter::Hot);
+        assert!(hot.to_lowercase().contains("hot"), "{hot}");
+    }
+
+    #[test]
     fn memory_scrub_request_detected() {
         assert!(looks_like_memory_scrub_request("scrub memory"));
         assert!(looks_like_memory_scrub_request("clean up memory"));
@@ -4846,6 +5119,9 @@ mod tests {
         assert!(report.contains("/disk reclaim"), "{report}");
         assert!(report.contains("/logs"), "{report}");
         assert!(report.contains("/logs error"), "{report}");
+        assert!(report.contains("/processes"), "{report}");
+        assert!(report.contains("/processes hot"), "{report}");
+        assert!(report.contains("/hot"), "{report}");
         assert!(report.contains("/help"), "{report}");
         assert!(report.contains("Voice"), "{report}");
     }

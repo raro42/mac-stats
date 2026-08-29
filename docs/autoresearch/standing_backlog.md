@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.712** — `/processes` instant operator (`/processes hot` · `/hot`) — Top Processes Hot list (Discord + AI Chat; p50 latency). Pinned stays UI-only (localStorage).
+
 - **v0.1.711** — `/logs` instant operator (`/logs error` · `/logs warn`) — Debug Log Error/Warn list (Discord + AI Chat; p50 latency).
 
 - **v0.1.710** — `/disk` instant operator (`/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean`) — Disk Cleanup scopes/categories list (Discord + AI Chat; p50 latency).
