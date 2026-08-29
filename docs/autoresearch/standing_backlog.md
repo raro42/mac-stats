@@ -20,6 +20,8 @@ When digester **open** is empty, the overnight harness **must** pull from this l
 
 ## Done recently
 
+- **v0.1.726** — `/perplexity key` instant — Perplexity Ready / Not set with key cue (config only, no live probe; Discord + AI Chat; does not steal `/perplexity` last-search Top/Snippet or `perplexity search for …`).
+
 - **v0.1.725** — `/brave` instant — Brave Search Ready / Not set with key cue (config only, no live probe / quota burn; Discord + AI Chat; does not steal web-search / bare `brave search`).
 
 - **v0.1.724** — `/redmine` instant — Redmine Ready / Not set / Partial with URL host · key cue (Agent Ops health parity; config only, no live probe; Discord + AI Chat; does not steal ticket/issue/time/API).

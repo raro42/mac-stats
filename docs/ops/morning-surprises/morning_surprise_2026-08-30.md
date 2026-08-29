@@ -14,20 +14,21 @@ Ralf, overnight Track B kept shipping product instant lanes (not digester-empty 
 | **v0.1.723** | `/ollama` · `/llm` — Ollama Ready / Offline with model · endpoint · circuit (menu-bar ✕ + AI Chat glance) |
 | **v0.1.724** | `/redmine` — Redmine Ready / Not set / Partial with URL host · key cue (Agent Ops health parity; config only) |
 | **v0.1.725** | `/brave` — Brave Search Ready / Not set with key cue (config only; no live probe / quota burn) |
+| **v0.1.726** | `/perplexity key` — Perplexity Ready / Not set with key cue (config only; keeps `/perplexity` last-search) |
 
 ## Tried / context
 
 - Digester **open** empty (fast instant or filtered turns).
 - Design review **due=false** (grace); recommended surface still `feature-ai-chat`.
 - `debug.log` scan: no ERROR/WARN/panic clusters in the last window.
-- Fuel: standing backlog **p50** — Ready chips after strip/ring/Discord/Ollama/Redmine → Brave Search key.
+- Fuel: standing backlog **p50** — Perplexity *key* chip after Brave Search key.
 
 ## Why it helps
 
-Asks like `/brave`, `is brave ready`, or `brave search status` skip the LLM and return Ready/Not set with key cue. Bare `brave search` and `brave search for …` still go to the agent / search pre-route. No live Brave ping (avoids quota burn).
+Asks like `/perplexity key`, `is perplexity ready`, or `perplexity status` skip the LLM and return Ready/Not set with key cue. `/perplexity` · Top · Snippet still list the last search. `perplexity search for …` still goes to search. No live Perplexity probe.
 
 ## Next fuel
 
 - Design review when grace ends (stale feature screens; `feature-ai-chat` recommended).
 - Digester open / product-owned `debug.log` errors when present.
-- Perplexity *key* chip (keep `/perplexity` last-search) or tool-heavy p50 patterns when digester surfaces them.
+- Mastodon Ready chip, MCP status, or tool-heavy p50 patterns when digester surfaces them.
