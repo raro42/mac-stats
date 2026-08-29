@@ -1567,6 +1567,11 @@ mod tests {
             "/hot",
             "top processes",
             "what's hot",
+            "/perplexity",
+            "/perplexity top",
+            "/perplexity snippet",
+            "last search",
+            "top results",
         ] {
             assert!(
                 matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),

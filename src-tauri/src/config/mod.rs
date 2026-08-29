@@ -646,6 +646,14 @@ impl Config {
         std::env::temp_dir().join("mac-stats-monitors.json")
     }
 
+    /// Last Perplexity Search results for `/perplexity` instant: `$HOME/.mac-stats/perplexity_last.json`.
+    pub fn perplexity_last_file_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            return PathBuf::from(home).join(".mac-stats").join("perplexity_last.json");
+        }
+        std::env::temp_dir().join("mac-stats-perplexity_last.json")
+    }
+
     /// Ensure the monitors directory exists
     ///
     /// Creates the directory containing the monitors file if it doesn't exist.

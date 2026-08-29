@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.713] - 2026-08-29
+
+### Added
+- **`/perplexity` instant operator** — `/perplexity`, `/perplexity top`, `/perplexity snippet` and NL (`last search`, `top results`, `snippet results`) list the last Perplexity Search with Top (first 3) / Snippet (preview text) counts (Discord + AI Chat; Perplexity filter parity). Last results persist in `~/.mac-stats/perplexity_last.json`.
+
 ## [0.1.712] - 2026-08-29
 
 ### Added

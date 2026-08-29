@@ -2231,6 +2231,194 @@ pub fn format_processes_gateway(filter: ProcessesListFilter) -> String {
     out
 }
 
+/// Perplexity Search All · Top · Snippet filter for `/perplexity` instant (UI parity).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PerplexityListFilter {
+    All,
+    Top,
+    Snippet,
+}
+
+/// Top-N hits — match `PERPLEXITY_TOP_N` in cpu.js.
+pub const OPS_PERPLEXITY_TOP_N: usize = 3;
+
+fn perplexity_result_has_snippet(snippet: &str) -> bool {
+    !snippet.trim().is_empty()
+}
+
+/// Parse Top/Snippet from `/perplexity top`, `snippet results`, etc. Default All.
+pub fn parse_perplexity_list_filter(content: &str) -> PerplexityListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" top")
+        || n == "top"
+        || n == "/top"
+        || n == "perplexity top"
+        || n == "/perplexity top"
+        || n == "top results"
+        || n == "top result"
+        || n == "last search top"
+        || n == "last perplexity top"
+    {
+        return PerplexityListFilter::Top;
+    }
+    if n.ends_with(" snippet")
+        || n.ends_with(" snippets")
+        || n == "snippet"
+        || n == "snippets"
+        || n == "/snippet"
+        || n == "perplexity snippet"
+        || n == "/perplexity snippet"
+        || n == "snippet results"
+        || n == "snippets results"
+        || n == "results with snippets"
+        || n == "last search snippet"
+        || n == "last perplexity snippet"
+    {
+        return PerplexityListFilter::Snippet;
+    }
+    PerplexityListFilter::All
+}
+
+/// True for `/perplexity` / `last search` — Top/Snippet filter parity; not new search asks.
+pub fn looks_like_perplexity_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("why")
+        || n.contains("search for")
+        || n.contains("look up")
+        || n.contains(" about ")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("how to")
+        || n.contains("explain")
+        || n.contains("run search")
+        || n.contains("do a search")
+        || n.starts_with("perplexity search ")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/perplexity"
+            | "perplexity"
+            | "last search"
+            | "last perplexity"
+            | "perplexity results"
+            | "search results"
+            | "list perplexity"
+            | "show perplexity"
+            | "perplexity status"
+            | "perplexity search"
+            | "/perplexity top"
+            | "perplexity top"
+            | "top results"
+            | "top result"
+            | "last search top"
+            | "last perplexity top"
+            | "/top"
+            | "/perplexity snippet"
+            | "perplexity snippet"
+            | "snippet results"
+            | "snippets results"
+            | "results with snippets"
+            | "last search snippet"
+            | "last perplexity snippet"
+            | "/snippet"
+            | "snippet"
+            | "snippets"
+    )
+}
+
+/// Zero-LLM last Perplexity report (All · Top · Snippet; ~/.mac-stats/perplexity_last.json).
+pub fn format_perplexity_gateway(filter: PerplexityListFilter) -> String {
+    const MAX_ROWS: usize = 12;
+    let Some(cache) = crate::commands::perplexity::load_last_perplexity_search() else {
+        return "**Perplexity Search** — _Nothing here yet — run a search in the CPU window or ask me to search first._".to_string();
+    };
+    let rows = &cache.results;
+    let total = rows.len();
+    let top_n = total.min(OPS_PERPLEXITY_TOP_N);
+    let snippet_n = rows
+        .iter()
+        .filter(|r| perplexity_result_has_snippet(&r.snippet))
+        .count();
+    let q = truncate_preview(cache.query.trim(), 48);
+    let title = match filter {
+        PerplexityListFilter::All => {
+            format!("**Perplexity Search** — {total} · {top_n} top · {snippet_n} snippet")
+        }
+        PerplexityListFilter::Top => {
+            format!("**Perplexity · Top** — {top_n} (first {OPS_PERPLEXITY_TOP_N})")
+        }
+        PerplexityListFilter::Snippet => {
+            format!("**Perplexity · Snippet** — {snippet_n}")
+        }
+    };
+    let mut lines = vec![title];
+    if !q.is_empty() {
+        lines.push(format!("Query · `{q}`"));
+    }
+
+    let filtered: Vec<(usize, &crate::commands::perplexity::PerplexitySearchResult)> =
+        match filter {
+            PerplexityListFilter::All => rows.iter().enumerate().collect(),
+            PerplexityListFilter::Top => rows.iter().enumerate().take(OPS_PERPLEXITY_TOP_N).collect(),
+            PerplexityListFilter::Snippet => rows
+                .iter()
+                .enumerate()
+                .filter(|(_, r)| perplexity_result_has_snippet(&r.snippet))
+                .collect(),
+        };
+
+    if filtered.is_empty() {
+        let empty = match filter {
+            PerplexityListFilter::All => {
+                "_Last search returned no results — try another query._"
+            }
+            PerplexityListFilter::Top => "_Nothing in Top yet — last search had no hits._",
+            PerplexityListFilter::Snippet => {
+                "_Nothing here yet — no results with preview text in the last search._"
+            }
+        };
+        lines.push(empty.to_string());
+    } else {
+        for (i, r) in filtered.iter().take(MAX_ROWS) {
+            let title_s = truncate_preview(r.title.trim(), 48);
+            let url = truncate_preview(r.url.trim(), 56);
+            let snip = r.snippet.trim();
+            let snip_mark = if perplexity_result_has_snippet(snip) {
+                " · snippet"
+            } else {
+                ""
+            };
+            let top_mark = if *i < OPS_PERPLEXITY_TOP_N {
+                " · top"
+            } else {
+                ""
+            };
+            if filter == PerplexityListFilter::Snippet && !snip.is_empty() {
+                let preview = truncate_preview(snip, 80);
+                lines.push(format!(
+                    "• **{title_s}**{top_mark}\n  `{url}`\n  _{preview}_"
+                ));
+            } else {
+                lines.push(format!("• **{title_s}**{top_mark}{snip_mark}\n  `{url}`"));
+            }
+        }
+        if filtered.len() > MAX_ROWS {
+            lines.push(format!("_…+{} more_", filtered.len() - MAX_ROWS));
+        }
+    }
+
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// Agent Ops Agents All · On · Off filter for `/agents` instant replies.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentsListFilter {
@@ -2998,6 +3186,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_processes_list_filter(content);
         return Some(format_processes_gateway(filter));
     }
+    if looks_like_perplexity_request(content) {
+        let filter = parse_perplexity_list_filter(content);
+        return Some(format_perplexity_gateway(filter));
+    }
     if looks_like_memory_scrub_request(content) {
         let (files, removed) = crate::commands::session_search::scrub_polluted_memory_files();
         return Some(if removed == 0 {
@@ -3040,6 +3232,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` — Disk Cleanup list\n\
 • `/logs` · `/logs error` · `/logs warn` — Debug Log Error/Warn list\n\
 • `/processes` · `/processes hot` · `/hot` — Top Processes Hot list\n\
+• `/perplexity` · `/perplexity top` · `/perplexity snippet` — last Perplexity Top/Snippet list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` / `interrupt` — interrupt an in-flight run\n\
@@ -3362,6 +3555,32 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("kill")
         && !q.contains("force quit")
         && !q.contains("pin")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/perplexity` Top/Snippet operator asks (v0.1.713).
+    if (q.contains("/perplexity")
+        || q.contains("last search")
+        || q.contains("last perplexity")
+        || q.contains("perplexity results")
+        || q.contains("search results")
+        || q.contains("top results")
+        || q.contains("snippet results")
+        || q.contains("results with snippets")
+        || q == "perplexity"
+        || q == "perplexity search"
+        || q == "perplexity top"
+        || q == "perplexity snippet"
+        || q == "/top"
+        || q == "/snippet"
+        || q == "snippet"
+        || q == "snippets")
+        && !q.contains("why")
+        && !q.contains("search for")
+        && !q.contains("look up")
+        && !q.starts_with("perplexity search ")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -4542,6 +4761,17 @@ mod tests {
         );
         let processes_hot = try_operator_instant_reply("/processes hot").expect("processes hot");
         assert!(processes_hot.to_lowercase().contains("hot"), "{processes_hot}");
+        let perplexity = try_operator_instant_reply("/perplexity").expect("perplexity");
+        assert!(
+            perplexity.to_lowercase().contains("perplexity"),
+            "{perplexity}"
+        );
+        let perplexity_top = try_operator_instant_reply("/perplexity top").expect("perplexity top");
+        assert!(
+            perplexity_top.to_lowercase().contains("top")
+                || perplexity_top.to_lowercase().contains("perplexity"),
+            "{perplexity_top}"
+        );
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
         assert!(try_operator_instant_reply("insights on weather").is_none());
         assert!(try_operator_instant_reply("why did the build fail").is_none());
@@ -5053,6 +5283,55 @@ mod tests {
     }
 
     #[test]
+    fn perplexity_request_and_filter() {
+        assert!(looks_like_perplexity_request("/perplexity"));
+        assert!(looks_like_perplexity_request("last search"));
+        assert!(looks_like_perplexity_request("@Werner /perplexity"));
+        assert!(looks_like_perplexity_request("/perplexity top"));
+        assert!(looks_like_perplexity_request("top results"));
+        assert!(looks_like_perplexity_request("/perplexity snippet"));
+        assert!(looks_like_perplexity_request("snippet results"));
+        assert!(looks_like_perplexity_request("results with snippets"));
+        assert!(!looks_like_perplexity_request("search for barcelona"));
+        assert!(!looks_like_perplexity_request("perplexity search weather"));
+        assert!(!looks_like_perplexity_request("look up the news"));
+        assert!(!looks_like_perplexity_request("why is search slow"));
+        assert_eq!(
+            parse_perplexity_list_filter("/perplexity"),
+            PerplexityListFilter::All
+        );
+        assert_eq!(
+            parse_perplexity_list_filter("/perplexity top"),
+            PerplexityListFilter::Top
+        );
+        assert_eq!(
+            parse_perplexity_list_filter("top results"),
+            PerplexityListFilter::Top
+        );
+        assert_eq!(
+            parse_perplexity_list_filter("/perplexity snippet"),
+            PerplexityListFilter::Snippet
+        );
+        assert_eq!(
+            parse_perplexity_list_filter("snippet results"),
+            PerplexityListFilter::Snippet
+        );
+    }
+
+    #[test]
+    fn perplexity_gateway_has_title() {
+        let report = format_perplexity_gateway(PerplexityListFilter::All);
+        assert!(report.to_lowercase().contains("perplexity"), "{report}");
+        let top = format_perplexity_gateway(PerplexityListFilter::Top);
+        assert!(top.to_lowercase().contains("top") || top.to_lowercase().contains("perplexity"), "{top}");
+        let snip = format_perplexity_gateway(PerplexityListFilter::Snippet);
+        assert!(
+            snip.to_lowercase().contains("snippet") || snip.to_lowercase().contains("perplexity"),
+            "{snip}"
+        );
+    }
+
+    #[test]
     fn memory_scrub_request_detected() {
         assert!(looks_like_memory_scrub_request("scrub memory"));
         assert!(looks_like_memory_scrub_request("clean up memory"));
@@ -5122,6 +5401,9 @@ mod tests {
         assert!(report.contains("/processes"), "{report}");
         assert!(report.contains("/processes hot"), "{report}");
         assert!(report.contains("/hot"), "{report}");
+        assert!(report.contains("/perplexity"), "{report}");
+        assert!(report.contains("/perplexity top"), "{report}");
+        assert!(report.contains("/perplexity snippet"), "{report}");
         assert!(report.contains("/help"), "{report}");
         assert!(report.contains("Voice"), "{report}");
     }

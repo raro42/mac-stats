@@ -2350,6 +2350,16 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/perplexity` — last Perplexity Top/Snippet list, no Ollama.
+    if crate::commands::harness_ops::looks_like_perplexity_request(&content) {
+        let filter = crate::commands::harness_ops::parse_perplexity_list_filter(&content);
+        let report = crate::commands::harness_ops::format_perplexity_gateway(filter);
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send perplexity list: {}", e);
+        }
+        return;
+    }
+
     // Operator: scrub polluted memory lines (same as periodic compaction hygiene).
     if crate::commands::harness_ops::looks_like_memory_scrub_request(&content) {
         let _ = new_message.channel_id.broadcast_typing(&ctx).await;

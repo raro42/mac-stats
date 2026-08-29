@@ -81,6 +81,12 @@ pub(crate) async fn handle_perplexity_search(
                     .iter()
                     .any(|r| is_likely_article_like_result(&r.title, &r.url, &r.snippet));
 
+            crate::commands::perplexity::save_last_perplexity_search(
+                search_arg,
+                "",
+                &shaped_results,
+            );
+
             let news_search_was_hub_only = if is_news {
                 if !search_had_article_like {
                     info!("Agent router: news search returned only hub/landing pages; completion verification will require article-grade evidence");

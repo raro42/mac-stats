@@ -2,6 +2,9 @@
 //!
 //! API key is resolved (in order) from: PERPLEXITY_API_KEY env, .config.env / .env.config
 //! (cwd, src-tauri, ~/.mac-stats), then Keychain (perplexity_api_key).
+//!
+//! Successful searches also write `~/.mac-stats/perplexity_last.json` for the
+//! `/perplexity` · Top · Snippet instant operator (Discord + AI Chat).
 
 use crate::perplexity;
 use serde::{Deserialize, Serialize};
@@ -95,7 +98,7 @@ pub struct PerplexitySearchRequest {
     pub max_results: Option<u32>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PerplexitySearchResult {
     pub title: String,
     pub url: String,
@@ -113,6 +116,50 @@ pub struct PerplexitySearchResponse {
     /// Open-Meteo instant conditions when the query looks like weather (prefer over AEMET tables).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub weather_markdown: Option<String>,
+}
+
+/// Persisted last search for `/perplexity` instant (UI All · Top · Snippet parity).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PerplexityLastCache {
+    pub query: String,
+    #[serde(default)]
+    pub id: String,
+    #[serde(default)]
+    pub saved_at: String,
+    pub results: Vec<PerplexitySearchResult>,
+}
+
+/// Write last successful Perplexity results to `~/.mac-stats/perplexity_last.json`.
+pub fn save_last_perplexity_search(
+    query: &str,
+    id: &str,
+    results: &[PerplexitySearchResult],
+) {
+    let path = crate::config::Config::perplexity_last_file_path();
+    if let Some(parent) = path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    let cache = PerplexityLastCache {
+        query: query.trim().to_string(),
+        id: id.to_string(),
+        saved_at: chrono::Utc::now().to_rfc3339(),
+        results: results.to_vec(),
+    };
+    match serde_json::to_string_pretty(&cache) {
+        Ok(json) => {
+            if let Err(e) = crate::config::write_text_atomic(&path, &json) {
+                tracing::warn!("Perplexity: could not save last search cache: {e}");
+            }
+        }
+        Err(e) => tracing::warn!("Perplexity: could not serialize last search cache: {e}"),
+    }
+}
+
+/// Load last Perplexity search cache (if any).
+pub fn load_last_perplexity_search() -> Option<PerplexityLastCache> {
+    let path = crate::config::Config::perplexity_last_file_path();
+    let text = std::fs::read_to_string(&path).ok()?;
+    serde_json::from_str(&text).ok()
 }
 
 /// Run a Perplexity web search. API key from PERPLEXITY_API_KEY env, .config.env / .env.config, or Keychain.
@@ -154,7 +201,7 @@ pub async fn perplexity_search(
         }
     })?;
 
-    let results = response
+    let results: Vec<PerplexitySearchResult> = response
         .results
         .into_iter()
         .map(|p| PerplexitySearchResult {
@@ -165,6 +212,8 @@ pub async fn perplexity_search(
             last_updated: p.last_updated,
         })
         .collect();
+
+    save_last_perplexity_search(query, &response.id, &results);
 
     Ok(PerplexitySearchResponse {
         results,
