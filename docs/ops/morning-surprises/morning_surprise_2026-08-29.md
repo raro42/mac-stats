@@ -1,27 +1,29 @@
 # Morning surprise — 2026-08-29
 
-Overnight Track B (autoresearch) for Ralf.
+Ralf, overnight Track B shipped product instant lanes (not digester-empty quiet).
 
 ## Shipped tonight
 
 | Version | What |
 |---------|------|
-| **v0.1.703** | Having_fun idle-thought Discord send retry + skip session memory on fail + rate-limited timeout WARN |
-| **v0.1.704** | `/lite` instant operator + Agent Ops Runs Lite filter |
-| **v0.1.705** | `/agents` instant operator (On/Off list) |
-| **v0.1.706** | `/sessions` instant operator (Live/Files list) |
-| **v0.1.707** | `/knowledge` instant operator (Discord/Core list) |
-| **v0.1.708** | `/schedules` Jobs/Deliveries filter (jobs · deliveries list) |
-| **v0.1.709** | `/monitors` instant operator (Up/Down/Slow list) |
+| **v0.1.709** | `/monitors` up · down · slow — External / Monitors list (Discord + AI Chat) |
+| **v0.1.710** | `/disk` on · off · reclaim · big · clean — Disk Cleanup scopes/categories (Discord + AI Chat; shallow scan) |
 
-## This tick (~01:55)
+Also earlier same night (before this note): `/schedules` jobs/deliveries (**v0.1.708**), `/knowledge` (**v0.1.707**), `/sessions` (**v0.1.706**), and related Agent Ops operator parity.
 
-- Digester open empty; design review in grace (`feature-ai-chat` recommended).
-- Fuel: standing backlog p50 — Monitors All · Up · Down · Slow had UI filter but no Discord/AI Chat instant list.
-- **`/monitors`**, **`/monitors up`**, **`/monitors down`**, **`/monitors slow`** (+ NL) list External / Monitors from cached status without Ollama.
+## Tried / context
 
-## Next
+- Digester **open** stayed empty (9 turns, all fast instant or filtered).
+- Design review **due=false** (grace); recommended surface still `feature-ai-chat`.
+- `debug.log` scan: no ERROR/WARN/panic clusters in the last window.
+- Fuel: standing backlog **p50** — UI filters without Discord/AI Chat instant lists.
 
-- More tool-heavy p50 patterns when digester still empty.
-- Design review screens after grace ends.
-- Watch idle-thought Discord send timeouts (v0.1.703 retry + rate-limit already shipped).
+## Why it helps
+
+Asks like `what's reclaimable` or `/disk big` skip Ollama and return Disk Cleanup status immediately — same idea as `/monitors` / Agent Ops list operators.
+
+## Next fuel
+
+- Top Processes Hot/Pinned, Debug Log Error/Warn, or Perplexity Top/Snippet instant lists.
+- Design review when grace ends (stale feature screens).
+- Digester open / product-owned `debug.log` errors when they appear.
