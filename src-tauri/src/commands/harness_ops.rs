@@ -1426,6 +1426,7 @@ pub fn format_monitors_gateway(filter: MonitorsListFilter) -> String {
         } else {
             format!("{} · {}", r.name, host)
         };
+        let id = r.id.as_str();
         let age = r
             .checked_at
             .map(|t| age_from_rfc3339(&t.to_rfc3339()))
@@ -1437,7 +1438,7 @@ pub fn format_monitors_gateway(filter: MonitorsListFilter) -> String {
                     .map(|m| format!("{m} ms"))
                     .unwrap_or_else(|| "—".into());
                 let slow_mark = if monitor_row_is_slow(r) { " · slow" } else { "" };
-                format!("• ✅ {label} · {ms}{slow_mark} · {age}")
+                format!("• ✅ `{id}` · {label} · {ms}{slow_mark} · {age}")
             }
             Some(false) => {
                 let reason = r
@@ -1446,9 +1447,9 @@ pub fn format_monitors_gateway(filter: MonitorsListFilter) -> String {
                     .map(|e| truncate_preview(e, 40))
                     .filter(|e| !e.is_empty())
                     .unwrap_or_else(|| "DOWN".into());
-                format!("• ❌ {label} · {reason} · {age}")
+                format!("• ❌ `{id}` · {label} · {reason} · {age}")
             }
-            None => format!("• ⏳ {label} · waiting · {age}"),
+            None => format!("• ⏳ `{id}` · {label} · waiting · {age}"),
         }
     }
 
