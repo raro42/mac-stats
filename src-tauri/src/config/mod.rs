@@ -654,6 +654,14 @@ impl Config {
         std::env::temp_dir().join("mac-stats-perplexity_last.json")
     }
 
+    /// Pinned Top Processes names for Discord/UI parity: `$HOME/.mac-stats/pinned_processes.json`.
+    pub fn pinned_processes_file_path() -> PathBuf {
+        if let Ok(home) = std::env::var("HOME") {
+            return PathBuf::from(home).join(".mac-stats").join("pinned_processes.json");
+        }
+        std::env::temp_dir().join("mac-stats-pinned_processes.json")
+    }
+
     /// Ensure the monitors directory exists
     ///
     /// Creates the directory containing the monitors file if it doesn't exist.

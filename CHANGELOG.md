@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.714] - 2026-08-29
+
+### Added
+- **`/processes pinned` instant operator** — `/processes pinned`, `/pinned` and NL (`pinned processes`, `show pinned`) list starred Top Processes favorites (Discord + AI Chat; Pinned filter parity). Pins persist in `~/.mac-stats/pinned_processes.json` (synced from the CPU window).
+
 ## [0.1.713] - 2026-08-29
 
 ### Added

@@ -2069,10 +2069,11 @@ pub fn format_debug_log_gateway(filter: DebugLogListFilter) -> String {
     out
 }
 
-/// Top Processes All · Hot filter for `/processes` instant replies (UI parity).
+/// Top Processes All · Pinned · Hot filter for `/processes` instant replies (UI parity).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessesListFilter {
     All,
+    Pinned,
     Hot,
 }
 
@@ -2101,7 +2102,18 @@ fn format_process_ram(bytes: u64) -> String {
     }
 }
 
-/// Parse Hot from `/processes hot`, `what's hot`, etc. Default All.
+/// True for pin/unpin *actions* (not the Pinned list filter).
+fn is_process_pin_action_ask(n: &str) -> bool {
+    n.contains("unpin")
+        || n.contains("pin this")
+        || n.contains("pin that")
+        || n.contains("pin the")
+        || n == "pin"
+        || n.starts_with("pin ")
+        || n.contains(" pin ")
+}
+
+/// Parse Hot/Pinned from `/processes hot`, `/processes pinned`, etc. Default All.
 pub fn parse_processes_list_filter(content: &str) -> ProcessesListFilter {
     let n = normalize_operator_command(content);
     if n.ends_with(" hot")
@@ -2120,10 +2132,27 @@ pub fn parse_processes_list_filter(content: &str) -> ProcessesListFilter {
     {
         return ProcessesListFilter::Hot;
     }
+    if n.ends_with(" pinned")
+        || n == "pinned"
+        || n == "/pinned"
+        || n == "processes pinned"
+        || n == "/processes pinned"
+        || n == "process pinned"
+        || n == "pinned processes"
+        || n == "pinned process"
+        || n == "show pinned"
+        || n == "list pinned"
+        || n == "my pinned"
+        || n == "pinned favorites"
+        || n == "process favorites"
+        || n == "favorite processes"
+    {
+        return ProcessesListFilter::Pinned;
+    }
     ProcessesListFilter::All
 }
 
-/// True for `/processes` / `top processes` — Hot filter parity; not kill/pin asks.
+/// True for `/processes` / `top processes` — Hot/Pinned filter parity; not kill/pin-action asks.
 pub fn looks_like_processes_request(content: &str) -> bool {
     let n = normalize_operator_command(content);
     if n.chars().count() > 48 {
@@ -2134,8 +2163,7 @@ pub fn looks_like_processes_request(content: &str) -> bool {
         || n.contains("force quit")
         || n.contains("force-quit")
         || n.contains("quit ")
-        || n.contains("pin")
-        || n.contains("unpin")
+        || is_process_pin_action_ask(&n)
         || n.contains(" for ")
         || n.contains(" about ")
         || n.contains("ticket")
@@ -2169,19 +2197,34 @@ pub fn looks_like_processes_request(content: &str) -> bool {
             | "what is hot"
             | "which processes are hot"
             | "which process is hot"
+            | "/processes pinned"
+            | "processes pinned"
+            | "process pinned"
+            | "pinned processes"
+            | "pinned process"
+            | "/pinned"
+            | "pinned"
+            | "show pinned"
+            | "list pinned"
+            | "my pinned"
+            | "pinned favorites"
+            | "process favorites"
+            | "favorite processes"
     )
 }
 
-/// Zero-LLM Top Processes report (All · Hot; cached list from get_cpu_details).
+/// Zero-LLM Top Processes report (All · Pinned · Hot; cached list + pinned_processes.json).
 pub fn format_processes_gateway(filter: ProcessesListFilter) -> String {
     const MAX_ROWS: usize = 12;
     let details = crate::metrics::get_cpu_details();
     let rows = details.top_processes;
     let hot_n = rows.iter().filter(|p| process_row_is_hot(p)).count();
+    let pin_names = crate::metrics::load_pinned_process_names();
+    let pin_n = pin_names.len();
     let total = rows.len();
     let title = match filter {
         ProcessesListFilter::All => {
-            format!("**Top Processes** — {total} · {hot_n} hot")
+            format!("**Top Processes** — {total} · {hot_n} hot · {pin_n} pinned")
         }
         ProcessesListFilter::Hot => {
             format!(
@@ -2189,38 +2232,81 @@ pub fn format_processes_gateway(filter: ProcessesListFilter) -> String {
                 OPS_PROCESS_HOT_CPU_PCT, OPS_PROCESS_HOT_GPU_PCT
             )
         }
+        ProcessesListFilter::Pinned => {
+            format!(
+                "**Top Processes · Pinned** — {pin_n} (max {})",
+                crate::metrics::MAX_PINNED_PROCESS_NAMES
+            )
+        }
     };
     let mut lines = vec![title];
 
-    let filtered: Vec<_> = match filter {
-        ProcessesListFilter::All => rows.iter().collect(),
-        ProcessesListFilter::Hot => rows.iter().filter(|p| process_row_is_hot(p)).collect(),
-    };
+    match filter {
+        ProcessesListFilter::All | ProcessesListFilter::Hot => {
+            let filtered: Vec<_> = match filter {
+                ProcessesListFilter::All => rows.iter().collect(),
+                ProcessesListFilter::Hot => rows.iter().filter(|p| process_row_is_hot(p)).collect(),
+                ProcessesListFilter::Pinned => unreachable!(),
+            };
 
-    if filtered.is_empty() {
-        let empty = match filter {
-            ProcessesListFilter::All => {
-                "_Nothing here yet — open the CPU window so Top Processes can fill in._"
+            if filtered.is_empty() {
+                let empty = match filter {
+                    ProcessesListFilter::All => {
+                        "_Nothing here yet — open the CPU window so Top Processes can fill in._"
+                    }
+                    ProcessesListFilter::Hot => {
+                        "_No process is hot right now (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB)._"
+                    }
+                    ProcessesListFilter::Pinned => unreachable!(),
+                };
+                lines.push(empty.to_string());
+            } else {
+                for p in filtered.iter().take(MAX_ROWS) {
+                    let name = truncate_preview(&p.name, 40);
+                    let ram = format_process_ram(p.memory);
+                    let hot_mark = if process_row_is_hot(p) { " · hot" } else { "" };
+                    let pin_mark = if pin_names.iter().any(|n| n == &p.name) {
+                        " · ★"
+                    } else {
+                        ""
+                    };
+                    lines.push(format!(
+                        "• `{name}` · pid {pid} · CPU {cpu:.0}% · GPU {gpu:.0}% · {ram}{hot_mark}{pin_mark}",
+                        pid = p.pid,
+                        cpu = p.cpu,
+                        gpu = p.gpu,
+                    ));
+                }
+                if filtered.len() > MAX_ROWS {
+                    lines.push(format!("_…+{} more_", filtered.len() - MAX_ROWS));
+                }
             }
-            ProcessesListFilter::Hot => {
-                "_No process is hot right now (CPU ≥15%, GPU ≥15%, or RAM ≥1 GiB)._"
-            }
-        };
-        lines.push(empty.to_string());
-    } else {
-        for p in filtered.iter().take(MAX_ROWS) {
-            let name = truncate_preview(&p.name, 40);
-            let ram = format_process_ram(p.memory);
-            let hot_mark = if process_row_is_hot(p) { " · hot" } else { "" };
-            lines.push(format!(
-                "• `{name}` · pid {pid} · CPU {cpu:.0}% · GPU {gpu:.0}% · {ram}{hot_mark}",
-                pid = p.pid,
-                cpu = p.cpu,
-                gpu = p.gpu,
-            ));
         }
-        if filtered.len() > MAX_ROWS {
-            lines.push(format!("_…+{} more_", filtered.len() - MAX_ROWS));
+        ProcessesListFilter::Pinned => {
+            if pin_names.is_empty() {
+                lines.push(
+                    "_No pinned favorites yet — star a process in the CPU window (max 6)._"
+                        .to_string(),
+                );
+            } else {
+                let live = crate::metrics::get_processes_by_names(pin_names.clone());
+                for name in &pin_names {
+                    if let Some(p) = live.iter().find(|p| &p.name == name) {
+                        let short = truncate_preview(&p.name, 40);
+                        let ram = format_process_ram(p.memory);
+                        let hot_mark = if process_row_is_hot(p) { " · hot" } else { "" };
+                        lines.push(format!(
+                            "• ★ `{short}` · pid {pid} · CPU {cpu:.0}% · GPU {gpu:.0}% · {ram}{hot_mark}",
+                            pid = p.pid,
+                            cpu = p.cpu,
+                            gpu = p.gpu,
+                        ));
+                    } else {
+                        let short = truncate_preview(name, 40);
+                        lines.push(format!("• ★ `{short}` · _not running_"));
+                    }
+                }
+            }
         }
     }
 
@@ -3231,7 +3317,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` — External / Monitors list\n\
 • `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` — Disk Cleanup list\n\
 • `/logs` · `/logs error` · `/logs warn` — Debug Log Error/Warn list\n\
-• `/processes` · `/processes hot` · `/hot` — Top Processes Hot list\n\
+• `/processes` · `/processes hot` · `/hot` · `/processes pinned` · `/pinned` — Top Processes Hot/Pinned list\n\
 • `/perplexity` · `/perplexity top` · `/perplexity snippet` — last Perplexity Top/Snippet list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
@@ -3532,10 +3618,11 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
     {
         return true;
     }
-    // `/processes` Hot operator asks (v0.1.712).
+    // `/processes` Hot/Pinned operator asks (v0.1.712 / v0.1.714).
     if (q.contains("/processes")
         || q.contains("/process")
         || q.contains("/hot")
+        || q.contains("/pinned")
         || q.contains("top processes")
         || q.contains("top process")
         || q.contains("list processes")
@@ -3543,18 +3630,26 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         || q.contains("hot processes")
         || q.contains("hot process")
         || q.contains("processes hot")
+        || q.contains("pinned processes")
+        || q.contains("processes pinned")
         || q.contains("which processes are hot")
         || q.contains("which process is hot")
+        || q.contains("show pinned")
+        || q.contains("list pinned")
+        || q.contains("my pinned")
+        || q.contains("favorite processes")
         || q == "processes"
         || q == "process list"
         || q == "hot"
+        || q == "pinned"
         || q == "what's hot"
         || q == "whats hot"
         || q == "what is hot")
         && !q.contains("why")
         && !q.contains("kill")
         && !q.contains("force quit")
-        && !q.contains("pin")
+        && !q.contains("pin this")
+        && !q.contains("unpin")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -4761,6 +4856,12 @@ mod tests {
         );
         let processes_hot = try_operator_instant_reply("/processes hot").expect("processes hot");
         assert!(processes_hot.to_lowercase().contains("hot"), "{processes_hot}");
+        let processes_pinned =
+            try_operator_instant_reply("/processes pinned").expect("processes pinned");
+        assert!(
+            processes_pinned.to_lowercase().contains("pinned"),
+            "{processes_pinned}"
+        );
         let perplexity = try_operator_instant_reply("/perplexity").expect("perplexity");
         assert!(
             perplexity.to_lowercase().contains("perplexity"),
@@ -5224,9 +5325,14 @@ mod tests {
         assert!(looks_like_processes_request("what's hot"));
         assert!(looks_like_processes_request("hot processes"));
         assert!(looks_like_processes_request("which processes are hot"));
+        assert!(looks_like_processes_request("/processes pinned"));
+        assert!(looks_like_processes_request("/pinned"));
+        assert!(looks_like_processes_request("pinned processes"));
+        assert!(looks_like_processes_request("show pinned"));
         assert!(!looks_like_processes_request("kill that process"));
         assert!(!looks_like_processes_request("force quit chrome"));
         assert!(!looks_like_processes_request("pin this process"));
+        assert!(!looks_like_processes_request("unpin chrome"));
         assert!(!looks_like_processes_request("why is chrome hot"));
         assert_eq!(
             parse_processes_list_filter("/processes"),
@@ -5243,6 +5349,18 @@ mod tests {
         assert_eq!(
             parse_processes_list_filter("/hot"),
             ProcessesListFilter::Hot
+        );
+        assert_eq!(
+            parse_processes_list_filter("/processes pinned"),
+            ProcessesListFilter::Pinned
+        );
+        assert_eq!(
+            parse_processes_list_filter("pinned processes"),
+            ProcessesListFilter::Pinned
+        );
+        assert_eq!(
+            parse_processes_list_filter("/pinned"),
+            ProcessesListFilter::Pinned
         );
         assert!(process_row_is_hot(&crate::metrics::ProcessUsage {
             name: "hot".into(),
@@ -5280,6 +5398,8 @@ mod tests {
         assert!(report.to_lowercase().contains("top processes"), "{report}");
         let hot = format_processes_gateway(ProcessesListFilter::Hot);
         assert!(hot.to_lowercase().contains("hot"), "{hot}");
+        let pinned = format_processes_gateway(ProcessesListFilter::Pinned);
+        assert!(pinned.to_lowercase().contains("pinned"), "{pinned}");
     }
 
     #[test]
@@ -5400,7 +5520,9 @@ mod tests {
         assert!(report.contains("/logs error"), "{report}");
         assert!(report.contains("/processes"), "{report}");
         assert!(report.contains("/processes hot"), "{report}");
+        assert!(report.contains("/processes pinned"), "{report}");
         assert!(report.contains("/hot"), "{report}");
+        assert!(report.contains("/pinned"), "{report}");
         assert!(report.contains("/perplexity"), "{report}");
         assert!(report.contains("/perplexity top"), "{report}");
         assert!(report.contains("/perplexity snippet"), "{report}");

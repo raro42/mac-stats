@@ -1368,6 +1368,72 @@ fn resize_cpu_window_for_compact(compact: bool) {
     let _ = win.set_size(tauri::Size::Logical(tauri::LogicalSize::new(w, h)));
 }
 
+/// Cap — match `MAX_PINNED_PROCESSES` in cpu.js.
+pub const MAX_PINNED_PROCESS_NAMES: usize = 6;
+
+/// Clean + cap pinned process name list (UI / Discord shared).
+pub fn normalize_pinned_process_names(names: impl IntoIterator<Item = String>) -> Vec<String> {
+    let mut out = Vec::new();
+    for n in names {
+        let t = n.trim();
+        if t.is_empty() {
+            continue;
+        }
+        if out.iter().any(|e: &String| e == t) {
+            continue;
+        }
+        out.push(t.to_string());
+        if out.len() >= MAX_PINNED_PROCESS_NAMES {
+            break;
+        }
+    }
+    out
+}
+
+/// Load pinned favorites from `~/.mac-stats/pinned_processes.json` (JSON string array).
+pub fn load_pinned_process_names() -> Vec<String> {
+    let path = crate::config::Config::pinned_processes_file_path();
+    let Ok(text) = std::fs::read_to_string(&path) else {
+        return Vec::new();
+    };
+    let parsed: serde_json::Value = match serde_json::from_str(&text) {
+        Ok(v) => v,
+        Err(_) => return Vec::new(),
+    };
+    let arr = if let Some(a) = parsed.as_array() {
+        a.clone()
+    } else if let Some(a) = parsed.get("names").and_then(|v| v.as_array()) {
+        a.clone()
+    } else {
+        return Vec::new();
+    };
+    normalize_pinned_process_names(arr.into_iter().filter_map(|v| {
+        v.as_str().map(|s| s.to_string())
+    }))
+}
+
+/// Persist pinned favorites for Discord `/processes pinned` + multi-WebView sync.
+pub fn save_pinned_process_names(names: &[String]) -> Result<Vec<String>, String> {
+    let cleaned = normalize_pinned_process_names(names.iter().cloned());
+    let path = crate::config::Config::pinned_processes_file_path();
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+    }
+    let json = serde_json::to_string_pretty(&cleaned).map_err(|e| e.to_string())?;
+    crate::config::write_text_atomic(&path, &json)?;
+    Ok(cleaned)
+}
+
+#[tauri::command]
+pub fn get_pinned_process_names() -> Vec<String> {
+    load_pinned_process_names()
+}
+
+#[tauri::command]
+pub fn set_pinned_process_names(names: Vec<String>) -> Result<Vec<String>, String> {
+    save_pinned_process_names(&names)
+}
+
 /// Look up current CPU/pid for pinned process names (highest-CPU match per name).
 #[tauri::command]
 pub fn get_processes_by_names(names: Vec<String>) -> Vec<ProcessUsage> {

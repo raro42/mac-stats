@@ -412,13 +412,61 @@ function getPinnedProcessNames() {
   }
 }
 
+/** Persist pins to ~/.mac-stats/pinned_processes.json for Discord `/processes pinned`. */
+function persistPinnedProcessNamesToDisk(names) {
+  const invoke = getInvoke();
+  if (!invoke) return;
+  const cleaned = (names || [])
+    .filter((n) => typeof n === "string" && n.trim())
+    .map((n) => n.trim())
+    .slice(0, MAX_PINNED_PROCESSES);
+  invoke("set_pinned_process_names", { names: cleaned }).catch((e) => {
+    console.warn("set_pinned_process_names failed", e);
+  });
+}
+
 function setPinnedProcessNames(names) {
   const cleaned = (names || [])
     .filter((n) => typeof n === "string" && n.trim())
     .map((n) => n.trim())
     .slice(0, MAX_PINNED_PROCESSES);
   localStorage.setItem(PINNED_PROCESS_NAMES_KEY, JSON.stringify(cleaned));
+  persistPinnedProcessNamesToDisk(cleaned);
   return cleaned;
+}
+
+/**
+ * Sync localStorage ↔ disk: UI keeps local favorites; empty WebView hydrates from disk;
+ * non-empty local always rewrites disk so Discord sees the same list.
+ */
+async function hydratePinnedProcessNamesFromDisk() {
+  const invoke = getInvoke();
+  if (!invoke) return;
+  let disk = [];
+  try {
+    const raw = await invoke("get_pinned_process_names");
+    if (Array.isArray(raw)) {
+      disk = raw
+        .filter((n) => typeof n === "string" && n.trim())
+        .map((n) => n.trim())
+        .slice(0, MAX_PINNED_PROCESSES);
+    }
+  } catch (e) {
+    console.warn("get_pinned_process_names failed", e);
+    return;
+  }
+  const local = getPinnedProcessNames();
+  if (local.length === 0 && disk.length > 0) {
+    localStorage.setItem(PINNED_PROCESS_NAMES_KEY, JSON.stringify(disk));
+    return;
+  }
+  if (local.length > 0) {
+    const same =
+      local.length === disk.length && local.every((n, i) => n === disk[i]);
+    if (!same) {
+      persistPinnedProcessNamesToDisk(local);
+    }
+  }
 }
 
 function togglePinnedProcessName(name) {
@@ -18302,6 +18350,7 @@ function initMonitoringFeatures() {
   setTimeout(() => {
     void (async () => {
       await loadCpuUiSections();
+      await hydratePinnedProcessNamesFromDisk();
       initIconLine();
       syncIconLineFromSavedSections();
       initCollapsibleSections();

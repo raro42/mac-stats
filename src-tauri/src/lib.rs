@@ -333,6 +333,8 @@ fn run_internal(open_cpu_window: bool) {
             metrics::set_cpu_window_ui_state,
             metrics::take_open_ui_section,
             metrics::get_processes_by_names,
+            metrics::get_pinned_process_names,
+            metrics::set_pinned_process_names,
             metrics::reset_config_to_monitor_defaults,
             get_process_details,
             force_quit_process,
