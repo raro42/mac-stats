@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.710] - 2026-08-29
+
+### Added
+- **`/disk` instant operator** — `/disk`, `/disk on`, `/disk off`, `/disk reclaim`, `/disk big`, `/disk clean` and NL (`disk cleanup`, `what's reclaimable`, `enabled scopes`, `big reclaim`) list Disk Cleanup scopes/categories with On/Off · Reclaim/Big/Clean counts (Discord + AI Chat; Disk Cleanup filter parity; shallow scan).
+
 ## [0.1.709] - 2026-08-29
 
 ### Added

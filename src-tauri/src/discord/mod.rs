@@ -2320,6 +2320,16 @@ pub(super) async fn run_discord_ollama_router(
         return;
     }
 
+    // `/disk` — Disk Cleanup On/Off · Reclaim/Big/Clean list, no Ollama.
+    if crate::commands::harness_ops::looks_like_disk_cleanup_request(&content) {
+        let filter = crate::commands::harness_ops::parse_disk_cleanup_list_filter(&content);
+        let report = crate::commands::harness_ops::format_disk_cleanup_gateway(filter);
+        if let Err(e) = new_message.channel_id.say(&ctx, report).await {
+            error!("Discord: failed to send disk cleanup list: {}", e);
+        }
+        return;
+    }
+
     // Operator: scrub polluted memory lines (same as periodic compaction hygiene).
     if crate::commands::harness_ops::looks_like_memory_scrub_request(&content) {
         let _ = new_message.channel_id.broadcast_typing(&ctx).await;

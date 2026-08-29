@@ -1488,6 +1488,321 @@ pub fn format_monitors_gateway(filter: MonitorsListFilter) -> String {
     out
 }
 
+/// Disk Cleanup scopes/categories filter for `/disk` instant replies (UI parity).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DiskCleanupListFilter {
+    All,
+    On,
+    Off,
+    Reclaim,
+    Big,
+    Clean,
+}
+
+/// Big reclaimable threshold — matches UI `DISK_CLEANUP_BIG_BYTES` (50 MiB).
+pub const OPS_DISK_CLEANUP_BIG_BYTES: u64 = 50 * 1024 * 1024;
+
+/// Parse On/Off/Reclaim/Big/Clean from `/disk reclaim`, `cleanup scopes off`, etc. Default All.
+pub fn parse_disk_cleanup_list_filter(content: &str) -> DiskCleanupListFilter {
+    let n = normalize_operator_command(content);
+    if n.ends_with(" off")
+        || n == "off"
+        || n == "disk off"
+        || n == "/disk off"
+        || n == "cleanup off"
+        || n == "/cleanup off"
+        || n == "disabled scopes"
+        || n == "scopes off"
+        || n == "cleanup scopes off"
+        || n == "off scopes"
+    {
+        return DiskCleanupListFilter::Off;
+    }
+    if n.ends_with(" on")
+        || n == "on"
+        || n == "disk on"
+        || n == "/disk on"
+        || n == "cleanup on"
+        || n == "/cleanup on"
+        || n == "enabled scopes"
+        || n == "scopes on"
+        || n == "cleanup scopes on"
+        || n == "on scopes"
+    {
+        return DiskCleanupListFilter::On;
+    }
+    if n.ends_with(" reclaim")
+        || n == "reclaim"
+        || n == "disk reclaim"
+        || n == "/disk reclaim"
+        || n == "cleanup reclaim"
+        || n == "/cleanup reclaim"
+        || n == "reclaimable"
+        || n == "what's reclaimable"
+        || n == "whats reclaimable"
+        || n == "what is reclaimable"
+        || n == "reclaimable space"
+        || n == "reclaimable categories"
+    {
+        return DiskCleanupListFilter::Reclaim;
+    }
+    if n.ends_with(" big")
+        || n == "big"
+        || n == "disk big"
+        || n == "/disk big"
+        || n == "cleanup big"
+        || n == "/cleanup big"
+        || n == "big reclaim"
+        || n == "big categories"
+    {
+        return DiskCleanupListFilter::Big;
+    }
+    if n.ends_with(" clean")
+        || n == "clean"
+        || n == "disk clean"
+        || n == "/disk clean"
+        || n == "cleanup clean"
+        || n == "/cleanup clean"
+        || n == "clean categories"
+        || n == "already clean"
+    {
+        return DiskCleanupListFilter::Clean;
+    }
+    DiskCleanupListFilter::All
+}
+
+/// True for `/disk` / `disk cleanup` — Disk Cleanup filter parity; not clean-now / SSD asks.
+pub fn looks_like_disk_cleanup_request(content: &str) -> bool {
+    let n = normalize_operator_command(content);
+    if n.chars().count() > 48 {
+        return false;
+    }
+    if n.contains("clean now")
+        || n.contains("run cleanup")
+        || n.contains("run disk")
+        || n.contains("delete")
+        || n.contains("remove")
+        || n.contains("empty trash")
+        || n.contains("ssd")
+        || n.contains("disk usage")
+        || n.contains("disk free")
+        || n.contains("free space")
+        || n.contains("free disk")
+        || n.contains("how full")
+        || n.contains("percent")
+        || n.contains(" for ")
+        || n.contains(" about ")
+        || n.contains("why")
+        || n.contains("ticket")
+        || n.contains("redmine")
+        || n.contains("add ")
+        || n.contains("create")
+    {
+        return false;
+    }
+    matches!(
+        n.as_str(),
+        "/disk"
+            | "/cleanup"
+            | "cleanup"
+            | "disk cleanup"
+            | "cleanup status"
+            | "disk cleanup status"
+            | "list cleanup"
+            | "show cleanup"
+            | "cleanup scopes"
+            | "disk scopes"
+            | "/disk on"
+            | "disk on"
+            | "/cleanup on"
+            | "cleanup on"
+            | "enabled scopes"
+            | "scopes on"
+            | "cleanup scopes on"
+            | "on scopes"
+            | "/disk off"
+            | "disk off"
+            | "/cleanup off"
+            | "cleanup off"
+            | "disabled scopes"
+            | "scopes off"
+            | "cleanup scopes off"
+            | "off scopes"
+            | "/disk reclaim"
+            | "disk reclaim"
+            | "/cleanup reclaim"
+            | "cleanup reclaim"
+            | "reclaim"
+            | "reclaimable"
+            | "what's reclaimable"
+            | "whats reclaimable"
+            | "what is reclaimable"
+            | "reclaimable space"
+            | "reclaimable categories"
+            | "/disk big"
+            | "disk big"
+            | "/cleanup big"
+            | "cleanup big"
+            | "big reclaim"
+            | "big categories"
+            | "/disk clean"
+            | "disk clean"
+            | "/cleanup clean"
+            | "cleanup clean"
+            | "clean categories"
+            | "already clean"
+    )
+}
+
+/// Zero-LLM Disk Cleanup report (scopes On/Off · categories Reclaim/Big/Clean; shallow scan).
+pub fn format_disk_cleanup_gateway(filter: DiskCleanupListFilter) -> String {
+    // Shallow preview — no Downloads/Trash (TCC); same as auto-run path.
+    let status = crate::commands::disk_cleanup::get_status(false);
+    let fmt = crate::commands::disk_cleanup::format_bytes;
+    let on_n = status.scopes.iter().filter(|s| s.enabled).count();
+    let off_n = status.scopes.len().saturating_sub(on_n);
+    let reclaim_n = status
+        .categories
+        .iter()
+        .filter(|c| c.enabled && c.bytes > 0)
+        .count();
+    let big_n = status
+        .categories
+        .iter()
+        .filter(|c| c.enabled && c.bytes >= OPS_DISK_CLEANUP_BIG_BYTES)
+        .count();
+    let clean_n = status
+        .categories
+        .iter()
+        .filter(|c| c.enabled && c.bytes == 0)
+        .count();
+    let reclaim_label = fmt(status.reclaimable_bytes);
+    let title = match filter {
+        DiskCleanupListFilter::All => format!(
+            "**Disk Cleanup** — {reclaim_label} reclaimable · {reclaim_n} reclaim · {big_n} big · scopes {on_n} on · {off_n} off"
+        ),
+        DiskCleanupListFilter::On => format!("**Disk Cleanup · On** — {on_n} scopes"),
+        DiskCleanupListFilter::Off => format!("**Disk Cleanup · Off** — {off_n} scopes"),
+        DiskCleanupListFilter::Reclaim => {
+            format!("**Disk Cleanup · Reclaim** — {reclaim_n} · {reclaim_label}")
+        }
+        DiskCleanupListFilter::Big => format!(
+            "**Disk Cleanup · Big** — {big_n} (≥{})",
+            fmt(OPS_DISK_CLEANUP_BIG_BYTES)
+        ),
+        DiskCleanupListFilter::Clean => {
+            format!("**Disk Cleanup · Clean** — {clean_n} already clean")
+        }
+    };
+    let mut lines = vec![title];
+    if filter == DiskCleanupListFilter::All {
+        lines.push(format!("Next · {}", status.next_run_label));
+        if !status.enabled_scope_summary.is_empty() {
+            lines.push(format!("Scopes · {}", status.enabled_scope_summary));
+        }
+    }
+
+    const MAX_ROWS: usize = 12;
+
+    match filter {
+        DiskCleanupListFilter::On | DiskCleanupListFilter::Off => {
+            let want_on = filter == DiskCleanupListFilter::On;
+            let filtered: Vec<_> = status
+                .scopes
+                .iter()
+                .filter(|s| s.enabled == want_on)
+                .collect();
+            if filtered.is_empty() {
+                lines.push(if want_on {
+                    "_No scopes enabled — turn one on under Disk Cleanup._".into()
+                } else {
+                    "_Every scope is on right now._".into()
+                });
+            } else {
+                for s in filtered.iter().take(MAX_ROWS) {
+                    let kind = s.kind.as_str();
+                    let path = s
+                        .path
+                        .as_deref()
+                        .map(|p| truncate_preview(p, 36))
+                        .filter(|p| !p.is_empty());
+                    let mark = if s.enabled { "on" } else { "off" };
+                    let extra = path
+                        .map(|p| format!(" · `{p}`"))
+                        .unwrap_or_default();
+                    lines.push(format!(
+                        "• `{id}` · {label} · {kind} · {mark}{extra}",
+                        id = s.id,
+                        label = s.label
+                    ));
+                }
+                if filtered.len() > MAX_ROWS {
+                    lines.push(format!("_…+{} more_", filtered.len() - MAX_ROWS));
+                }
+            }
+        }
+        DiskCleanupListFilter::All
+        | DiskCleanupListFilter::Reclaim
+        | DiskCleanupListFilter::Big
+        | DiskCleanupListFilter::Clean => {
+            let filtered: Vec<_> = status
+                .categories
+                .iter()
+                .filter(|c| c.enabled)
+                .filter(|c| match filter {
+                    DiskCleanupListFilter::All => true,
+                    DiskCleanupListFilter::Reclaim => c.bytes > 0,
+                    DiskCleanupListFilter::Big => c.bytes >= OPS_DISK_CLEANUP_BIG_BYTES,
+                    DiskCleanupListFilter::Clean => c.bytes == 0,
+                    _ => true,
+                })
+                .collect();
+            // Reclaim/Big: largest first; Clean/All: reclaim first then by bytes.
+            let mut sorted = filtered;
+            sorted.sort_by(|a, b| b.bytes.cmp(&a.bytes).then_with(|| a.label.cmp(&b.label)));
+            if sorted.is_empty() {
+                let empty = match filter {
+                    DiskCleanupListFilter::All => {
+                        "_No cleanup categories yet — open Disk Cleanup in the CPU window._"
+                    }
+                    DiskCleanupListFilter::Reclaim => "_Nothing reclaimable right now._",
+                    DiskCleanupListFilter::Big => "_No big reclaimable categories (≥50 MB)._",
+                    DiskCleanupListFilter::Clean => "_No clean categories right now._",
+                    _ => "_Nothing here._",
+                };
+                lines.push(empty.into());
+            } else {
+                for c in sorted.iter().take(MAX_ROWS) {
+                    let size = fmt(c.bytes);
+                    let hint = truncate_preview(&c.path_hint, 40);
+                    let mark = if c.bytes >= OPS_DISK_CLEANUP_BIG_BYTES {
+                        " · big"
+                    } else if c.bytes > 0 {
+                        " · reclaim"
+                    } else {
+                        " · clean"
+                    };
+                    lines.push(format!(
+                        "• `{id}` · {label} · {size} · {files} files{mark} · `{hint}`",
+                        id = c.id,
+                        label = c.label,
+                        files = c.file_count
+                    ));
+                }
+                if sorted.len() > MAX_ROWS {
+                    lines.push(format!("_…+{} more_", sorted.len() - MAX_ROWS));
+                }
+            }
+        }
+    }
+
+    let mut out = lines.join("\n");
+    if out.chars().count() > 1800 {
+        out = out.chars().take(1790).collect::<String>() + "…";
+    }
+    out
+}
+
 /// Agent Ops Agents All · On · Off filter for `/agents` instant replies.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentsListFilter {
@@ -2243,6 +2558,10 @@ pub fn try_operator_instant_reply(content: &str) -> Option<String> {
         let filter = parse_monitors_list_filter(content);
         return Some(format_monitors_gateway(filter));
     }
+    if looks_like_disk_cleanup_request(content) {
+        let filter = parse_disk_cleanup_list_filter(content);
+        return Some(format_disk_cleanup_gateway(filter));
+    }
     if looks_like_memory_scrub_request(content) {
         let (files, removed) = crate::commands::session_search::scrub_polluted_memory_files();
         return Some(if removed == 0 {
@@ -2282,6 +2601,7 @@ pub fn format_ops_help_gateway() -> String {
 • `/knowledge` · `/knowledge discord` · `/knowledge core` — Agent Ops Knowledge list\n\
 • `/schedules` · `/schedules jobs` · `/schedules deliveries` · `/cron list` — Agent Ops Jobs/Deliveries list\n\
 • `/monitors` · `/monitors up` · `/monitors down` · `/monitors slow` — External / Monitors list\n\
+• `/disk` · `/disk on` · `/disk off` · `/disk reclaim` · `/disk big` · `/disk clean` — Disk Cleanup list\n\
 • `/digest` — refresh digester (latest.md/json)\n\
 • `scrub memory` — remove polluted memory lines\n\
 • `stop` / `cancel` / `interrupt` — interrupt an in-flight run\n\
@@ -2510,6 +2830,35 @@ fn is_insights_slowest_noise(lane: &str, wall_ms: u64, tools: &[String], questio
         && !q.contains("add ")
         && !q.contains("create")
         && !q.contains("check ")
+        && !q.contains(" ticket")
+        && !q.contains("redmine")
+    {
+        return true;
+    }
+    // `/disk` On/Off/Reclaim/Big/Clean operator asks (v0.1.710).
+    if (q.contains("/disk")
+        || q.contains("/cleanup")
+        || q.contains("disk cleanup")
+        || q.contains("cleanup status")
+        || q.contains("list cleanup")
+        || q.contains("cleanup scopes")
+        || q.contains("reclaimable")
+        || q.contains("disk reclaim")
+        || q.contains("disk big")
+        || q.contains("disk clean")
+        || q.contains("cleanup reclaim")
+        || q.contains("cleanup on")
+        || q.contains("cleanup off")
+        || q == "cleanup"
+        || q == "reclaim"
+        || q == "what's reclaimable"
+        || q == "whats reclaimable"
+        || q == "what is reclaimable")
+        && !q.contains("why")
+        && !q.contains("clean now")
+        && !q.contains("run cleanup")
+        && !q.contains("disk usage")
+        && !q.contains("ssd")
         && !q.contains(" ticket")
         && !q.contains("redmine")
     {
@@ -3675,6 +4024,10 @@ mod tests {
         assert!(monitors.to_lowercase().contains("monitor"));
         let monitors_down = try_operator_instant_reply("/monitors down").expect("monitors down");
         assert!(monitors_down.to_lowercase().contains("down"));
+        let disk = try_operator_instant_reply("/disk").expect("disk");
+        assert!(disk.to_lowercase().contains("disk cleanup") || disk.to_lowercase().contains("reclaim"));
+        let disk_reclaim = try_operator_instant_reply("/disk reclaim").expect("disk reclaim");
+        assert!(disk_reclaim.to_lowercase().contains("reclaim"));
         assert!(try_operator_instant_reply("status of the redmine ticket").is_none());
         assert!(try_operator_instant_reply("insights on weather").is_none());
         assert!(try_operator_instant_reply("why did the build fail").is_none());
@@ -3686,6 +4039,8 @@ mod tests {
         assert!(try_operator_instant_reply("scrub memory").is_some());
         assert!(try_operator_instant_reply("save this to knowledge").is_none());
         assert!(try_operator_instant_reply("add a monitor for example.com").is_none());
+        assert!(try_operator_instant_reply("clean now").is_none());
+        assert!(try_operator_instant_reply("disk usage").is_none());
     }
 
     #[test]
@@ -4017,6 +4372,49 @@ mod tests {
     }
 
     #[test]
+    fn disk_cleanup_request_detected() {
+        assert!(looks_like_disk_cleanup_request("/disk"));
+        assert!(looks_like_disk_cleanup_request("disk cleanup"));
+        assert!(looks_like_disk_cleanup_request("@Werner /cleanup"));
+        assert!(looks_like_disk_cleanup_request("/disk on"));
+        assert!(looks_like_disk_cleanup_request("/disk off"));
+        assert!(looks_like_disk_cleanup_request("/disk reclaim"));
+        assert!(looks_like_disk_cleanup_request("/disk big"));
+        assert!(looks_like_disk_cleanup_request("/disk clean"));
+        assert!(looks_like_disk_cleanup_request("what's reclaimable"));
+        assert!(looks_like_disk_cleanup_request("enabled scopes"));
+        assert!(looks_like_disk_cleanup_request("cleanup scopes"));
+        assert!(!looks_like_disk_cleanup_request("clean now"));
+        assert!(!looks_like_disk_cleanup_request("disk usage"));
+        assert!(!looks_like_disk_cleanup_request("run cleanup"));
+        assert!(!looks_like_disk_cleanup_request("why is cleanup slow"));
+        assert_eq!(
+            parse_disk_cleanup_list_filter("/disk"),
+            DiskCleanupListFilter::All
+        );
+        assert_eq!(
+            parse_disk_cleanup_list_filter("/disk on"),
+            DiskCleanupListFilter::On
+        );
+        assert_eq!(
+            parse_disk_cleanup_list_filter("disabled scopes"),
+            DiskCleanupListFilter::Off
+        );
+        assert_eq!(
+            parse_disk_cleanup_list_filter("what's reclaimable"),
+            DiskCleanupListFilter::Reclaim
+        );
+        assert_eq!(
+            parse_disk_cleanup_list_filter("/disk big"),
+            DiskCleanupListFilter::Big
+        );
+        assert_eq!(
+            parse_disk_cleanup_list_filter("clean categories"),
+            DiskCleanupListFilter::Clean
+        );
+    }
+
+    #[test]
     fn memory_scrub_request_detected() {
         assert!(looks_like_memory_scrub_request("scrub memory"));
         assert!(looks_like_memory_scrub_request("clean up memory"));
@@ -4079,6 +4477,8 @@ mod tests {
         assert!(report.contains("/knowledge"), "{report}");
         assert!(report.contains("/monitors"), "{report}");
         assert!(report.contains("/monitors down"), "{report}");
+        assert!(report.contains("/disk"), "{report}");
+        assert!(report.contains("/disk reclaim"), "{report}");
         assert!(report.contains("/help"), "{report}");
         assert!(report.contains("Voice"), "{report}");
     }
@@ -4132,6 +4532,21 @@ mod tests {
         assert!(down.to_lowercase().contains("down"), "{down}");
         let slow = format_monitors_gateway(MonitorsListFilter::Slow);
         assert!(slow.to_lowercase().contains("slow"), "{slow}");
+    }
+
+    #[test]
+    fn disk_cleanup_gateway_has_counts() {
+        let report = format_disk_cleanup_gateway(DiskCleanupListFilter::All);
+        assert!(
+            report.to_lowercase().contains("disk cleanup"),
+            "{report}"
+        );
+        let reclaim = format_disk_cleanup_gateway(DiskCleanupListFilter::Reclaim);
+        assert!(reclaim.to_lowercase().contains("reclaim"), "{reclaim}");
+        let on = format_disk_cleanup_gateway(DiskCleanupListFilter::On);
+        assert!(on.to_lowercase().contains("on"), "{on}");
+        let big = format_disk_cleanup_gateway(DiskCleanupListFilter::Big);
+        assert!(big.to_lowercase().contains("big"), "{big}");
     }
 
     #[test]

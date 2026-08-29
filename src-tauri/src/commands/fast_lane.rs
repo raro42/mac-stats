@@ -1553,6 +1553,12 @@ mod tests {
             "/monitors",
             "/monitors down",
             "/monitors slow",
+            "/disk",
+            "/disk reclaim",
+            "/disk big",
+            "/disk on",
+            "/disk off",
+            "/disk clean",
         ] {
             assert!(
                 matches!(classify_turn_lane(q, None), TurnLane::Instant { .. }),
